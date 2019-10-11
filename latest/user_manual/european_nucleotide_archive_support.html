@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <title>MISO : 26. European Nucleotide Archive Support</title>
+        <meta name="description" content="An open-source LIMS for NGS sequencing centres">
+
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/miso-lims/latest/css/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/latest/css/main.css">
+				<link rel="icon" href="/miso-lims/latest/favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+<a href="https://github.com/miso-lims/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+        <div class="container">
+            <div class="row">
+                <div id="header" class="col-sm-12">
+                    <h2><a class="brand" href="/miso-lims/latest/"><img src="/miso-lims/latest/images/MISO.png" alt="MISO's logo, a bowl of miso soup"/>MISO</a>
+    <small>An open-source LIMS for NGS sequencing centres</small>
+</h2>
+
+                </div>
+            </div>
+
+            <div class="row">
+                
+                
+                    <div id="navigation" class="col-sm-2">
+                        <ul class="nav nav-list">
+    <!--<li><a href="/miso-lims/latest/">Home</a></li>-->
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">User Guides</li>
+            
+            <li data-order="1"><a href="/miso-lims/latest/usr/user-manual-table-of-contents.html">User Manual</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Admin Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/latest/adm/baremetal-installation-guide.html">Installing MISO on baremetal</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/latest/adm/compose-installation-guide.html">Installing MISO with docker-compose</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/latest/adm/admin-guide.html">Administrator's Manual</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/latest/adm/installation-guide.html">Building and Deploying</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Developer Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/latest/dev/rest-testing.html">REST Testing</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/latest/dev/maven-artifacts.html">Maven artifacts</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/latest/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/latest/dev/code-style.html">Code Style</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/latest/dev/developers-manual.html">Developer's Manual</a></li>
+        
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+    
+<!-- List additional links. It is recommended to add a divider
+    e.g. <li class="divider"></li> first to break up the content. -->
+</ul>
+
+                    </div>
+
+                    <div id="content" class="col-sm-10">
+                        <div class="page-header">
+    <h2>26. European Nucleotide Archive Support
+        
+    </h2>
+</div>
+
+<p>Once sequencing is complete and analysis has been performed, the generated data
+may be deposited in an archive, such as the <a href="https://www.ebi.ac.uk/ena">ENA</a>
+(formerly ERA; previously connected to the SRA). The archive requires not only
+the sequencing data, but the biological metadata associated with the data. To
+facilitate this process, MISO provides a mechanism to export the appropriate
+metadata required. This requires adding some extra information to MISO during
+the sequencing process.</p>
+
+<p><a name="studies"></a></p>
+<h2 id="261-studies">26.1. Studies</h2>
+
+<p><a href="https://ena-docs.readthedocs.io/en/latest/prog_02.html#the-study-object">A study</a>
+is a unit of work to be submitted to the ENA in a batch. A study in MISO is
+limited in scope to a project. Although conceptually similar to a subproject,
+studies exist in MISO solely for ENA support.</p>
+
+<p><a name="studies_list"></a></p>
+<h3 id="2611-studies-list">26.1.1. Studies List</h3>
+
+<p>The studies list can be accessed by clicking the “Studies” link from the ENA list at the left side of the
+screen. The page shows all of the studies from all projects. At the top of the
+table, you will find controls for adding, and deleting studies.</p>
+
+<p>You can click on a study name or alias to get to the Edit Study page.</p>
+
+<p>For a particular project, the studies can be found on the <a href="projects.html#edit_project_page">Edit Project
+Page</a>. Click on the “Studies”
+collapsing section to view the studies table.</p>
+
+<p><a name="adding_studies"></a></p>
+<h3 id="2612-adding-studies">26.1.2. Adding Studies</h3>
+
+<p>There are two ways to create a study:</p>
+
+<ol>
+  <li>Go to the studies list and click the “Add” button in the toolbar at the top of the table.</li>
+  <li>Go to the project page, expand the “Studies” section and click the “Add” button in the toolbar at the top of the table.</li>
+</ol>
+
+<p>A study can only contain information about samples from a single project. The
+other information provided in the study description will be included in the
+metadata sent to the ENA.</p>
+
+<p><a name="deleting_studies"></a></p>
+<h3 id="2613-deleting-studies">26.1.3. Deleting Studies</h3>
+
+<p>Studies can be deleted by MISO administrators from either the “Studies List” or
+the project page.  Check the checkbox beside the study and click the “Delete”
+button from the toolbar.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="experiments"></a></p>
+<h2 id="262-experiments">26.2. Experiments</h2>
+
+<p><a href="https://ena-docs.readthedocs.io/en/latest/prog_04.html">An experiment</a> binds together a study, sequencing platform, and library.</p>
+
+<p><a name="experiments_list"></a></p>
+<h3 id="2621-experiments-list">26.2.1. Experiments List</h3>
+
+<p>Experiments can be seen in several places:</p>
+
+<ul>
+  <li>From the “ENA” section on the left, choose “Experiments” to view all
+experiments. This shows all experiments.</li>
+  <li>From the “ENA” section on the left, choose “Studies”, then select the study
+of interest. This shows experiments associated with this study.</li>
+  <li>From the “Instrument Runs” section on the left, choose “Sequencing Runs”, then select the
+run of interest. This shows experiments associated with this sequencing run.</li>
+  <li>From the “Preparation” section on the left, choose “Libraries”, then select the
+library of interest. This shows experiments associated with this library.</li>
+</ul>
+
+<p>In any of the Experiment lists, you can click on an experiment name or alias to
+get to the Edit Experiment page.</p>
+
+<p><a name="creating_an_experiment"></a></p>
+<h3 id="2622-creating-an-experiment">26.2.2. Creating an Experiment</h3>
+
+<p>From the “Instrument Runs” section on the left, choose “Sequencer Runs”, and then
+select the sequencer run of interest. If pools have not already been assigned
+to partitions, assign them. From the “Experiment” table, choose “Create New”. If the
+“Create New” button does not appear, it is because either there are no pools
+assigned to the run, or there are no studies for the projects of the libraries
+connected to this run.</p>
+
+<p>An experiment connects a study to a library on a sequencing platform. Select
+the appropriate library from the dialog box. A second dialog box will appear
+with all the studies that belong to the project of this library. Select the
+appropriate study and provide the title and alias of the experiment. The
+alias and title map directly to the alias and title in the <a href="https://ena-docs.readthedocs.io/en/latest/prog_04.html#create-the-run-and-experiment-xml">ENA
+model</a>.</p>
+
+<p>Once an experiment exists, all sequencer runs of this library from the same
+platform for a study are connected with this experiment.</p>
+
+<p><a name="editing_an_experiment"></a></p>
+<h3 id="2623-editing-an-experiment">26.2.3. Editing an Experiment</h3>
+
+<p>Once an experiment is created, the sequencing platform, study, and library it
+is attached to cannot be changed. However, the name of the experiment and kits
+used in its production can be edited.</p>
+
+<p>To edit an experiment, find the experiment from any of the “Experiments” lists
+on the study, sequencer run, or library pages or the complete list of
+experiments. Click on the name of the experiment. Edit any of the fields and click “Save”.</p>
+
+<p><a name="adding_consumables_to_an_experiment"></a></p>
+<h3 id="2624-adding-consumables-to-an-experiment">26.2.4. Adding Consumables to an Experiment</h3>
+
+<p>The ENA format allows information about the consumables used in the sequencing
+process. To add kit information, go to the edit experiment page by any of the
+above methods. In the toolbar above the “Consumables” table, click “Add”. In
+the dialog, select the kit that was used and provide the lot number and date.
+Click “Save”.</p>
+
+<p>This information will be included in the exported metadata.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="submissions"></a></p>
+<h2 id="263-submissions">26.3. Submissions</h2>
+
+<p>Once data is ready for submission to the ENA, <a href="https://ena-docs.readthedocs.io/en/latest/prog_04.html#create-the-submission-xml">a submission
+package</a>
+can be made.  MISO will provide a template for uploading the metadata. These
+files are <em>not</em> complete. Additional information must be added to describe the
+files being uploaded.</p>
+
+<p><a name="submissions_list"></a></p>
+<h3 id="2631-submissions-list">26.3.1. Submissions List</h3>
+
+<p>To view submissions, in the “ENA” list at the left side of the screen, click
+“Submissions”.</p>
+
+<p>You can click on a submission ID or alias to get to the Edit Submission page.</p>
+
+<p><a name="creating_a_submission"></a></p>
+<h3 id="2632-creating-a-submission">26.3.2. Creating a Submission</h3>
+
+<p>To create a new submission, in any one of the experiment tables mentioned
+previously, select the experiments that should be included in the submission
+and click “Create Submission” from the toolbar at the top of the table.</p>
+
+<p>Enter the title and the alias of the submission and click “Save”.</p>
+
+<p><a name="downloading_a_submission"></a></p>
+<h3 id="2633-downloading-a-submission">26.3.3. Downloading a Submission</h3>
+
+<p>To download a submission package, go to the submission list and click on the
+submission of interest. From the top right toolbar, click “Download”.</p>
+
+<p>Enter the ENA action. If this is the first submission, <code class="highlighter-rouge">ADD</code> is the right
+action. If changing existing data, use <code class="highlighter-rouge">MODIFY</code>. Enter the name of your
+sequencing centre. Click “Download”.</p>
+
+<p>This will generate a ZIP file with the XML files needed for submission to the
+ENA. Extract this archive and add the file information. After modification, the
+package is ready for submission.</p>
+
+<p><a href="#">Return to top</a></p>
+
+
+
+                    </div>
+                
+            </div>
+
+            
+
+            <div class="row">
+                <div id="footer" class="col-sm-12">
+                    Documentation for <a href="https://github.com/TGAC/miso-lims">MISO</a>
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function orderNav() {
+                var list,
+                    section,
+                    header,
+                    sections = [],
+                    lists = {},
+                    headers = {};
+
+                var navUl = document.querySelectorAll('#navigation ul')[0],
+                    navLis = document.querySelectorAll('#navigation ul li');
+
+                if (!navUl) return;
+
+                for (var i = 0; i < navLis.length; i++) {
+                    var order, li = navLis[i];
+
+                    if (li.classList.contains('nav-header')) {
+                        section = li.textContent || li.innerText;
+                        sections.push(section);
+                        headers[section] = li;
+                        continue;
+                    }
+
+                    if (!lists[section]) {
+                        lists[section] = [];
+                    }
+
+                    order = parseFloat(li.getAttribute('data-order'))
+                    lists[section].push([order, li]);
+                }
+
+                for (var i = 0; i < sections.length; i++) {
+                    section = sections[i];
+                    list = lists[section].sort(function(a, b) {
+                        return a[0] - b[0];
+                    });
+
+                    if (header = headers[section]) {
+                        navUl.appendChild(header);
+                    }
+                    for (var j = 0; j < list.length; j++) {
+                        navUl.appendChild(list[j][1]);
+                    }
+                }
+            }
+
+            if (document.querySelectorAll) orderNav();
+        </script>
+        
+    </body>
+</html>

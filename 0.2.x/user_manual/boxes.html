@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <title>MISO : 15. Boxes</title>
+        <meta name="description" content="An open-source LIMS for NGS sequencing centres">
+
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/main.css">
+				<link rel="icon" href="/miso-lims/0.2.x/favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+<a href="https://github.com/miso-lims/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+        <div class="container">
+            <div class="row">
+                <div id="header" class="col-sm-12">
+                    <h2><a class="brand" href="/miso-lims/0.2.x/"><img src="/miso-lims/0.2.x/images/MISO.png" alt="MISO's logo, a bowl of miso soup"/>MISO</a>
+    <small>An open-source LIMS for NGS sequencing centres</small>
+</h2>
+
+                </div>
+            </div>
+
+            <div class="row">
+                
+                
+                    <div id="navigation" class="col-sm-2">
+                        <ul class="nav nav-list">
+    <!--<li><a href="/miso-lims/0.2.x/">Home</a></li>-->
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">User Guides</li>
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/usr/user-manual-table-of-contents.html">User Manual</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Admin Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/baremetal-installation-guide.html">Installing MISO on baremetal</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/compose-installation-guide.html">Installing MISO with docker-compose</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/admin-guide.html">Administrator's Manual</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/adm/installation-guide.html">Building and Deploying</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Developer Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/rest-testing.html">REST Testing</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/maven-artifacts.html">Maven artifacts</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/code-style.html">Code Style</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/dev/developers-manual.html">Developer's Manual</a></li>
+        
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+    
+<!-- List additional links. It is recommended to add a divider
+    e.g. <li class="divider"></li> first to break up the content. -->
+</ul>
+
+                    </div>
+
+                    <div id="content" class="col-sm-10">
+                        <div class="page-header">
+    <h2>15. Boxes
+        
+    </h2>
+</div>
+
+<p>A Box represents a physical storage container with defined positions, and can be used to track where samples,
+libraries, library aliquots, and/or pools are stored. There are several important box properties:</p>
+<ul>
+  <li>Box size: the number of rows and columns in the box. See <a href="type_data.html#box_sizes">Type Data</a> for more
+information.
+    <ul>
+      <li>The <code class="highlighter-rouge">scannable</code> property of a box is also stored in the box size. A box is scannable if it can be read
+by a bulk barcode scanner.</li>
+    </ul>
+  </li>
+  <li>Box use: what the box items will be used for. Values can include “DNA”, “RNA”, “Library”, “Slide”,
+“Sequencing”, “Storage”, and more. See <a href="type_data.html#box_uses">Type Data</a> for more information.
+    <ul>
+      <li>The <a href="#boxes-list">Boxes List</a> page contains separate tabs for each box use.</li>
+    </ul>
+  </li>
+  <li>Location: a user-provided description of where the box is kept.</li>
+  <li>Freezer location: boxes can be stored in <a href="freezers_and_rooms.html">freezers</a> in order to precisely track
+their locations.</li>
+</ul>
+
+<p><a name="boxes_list"></a></p>
+<h2 id="151-boxes-list">15.1. Boxes List</h2>
+
+<p>To get to the Boxes list page, click “Boxes” in the Preparation list in the menu on the left side of the screen.
+Boxes are categorized by tabs, with one tab for each box use. Each box will only be listed under one box use
+tab, and searching for a box only searches the current tab. The toolbar at the top of each table includes many
+controls for working with boxes.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="creating_boxes"></a></p>
+<h2 id="152-creating-boxes">15.2. Creating Boxes</h2>
+
+<p>To create new boxes, click the “Add” button in the toolbar at the top of the Boxes list. In the dialog that
+appears, enter the quantity of boxes you would like to create. Click the “Create” button.</p>
+
+<p>If you chose to create one box, you will be taken to the Create Box page. Enter all of the box information and
+then click the “Save” button at the top right of the screen when you are done. If the box fails to save, a
+message will be displayed underneath the invalid fields. You can then make appropriate adjustments and click
+the “Save” button to try again.</p>
+
+<p>If you chose to create more than one box, you will be taken to the bulk Create Boxes page. For additional
+information regarding some of the fields in the table, or for information on how to work with the bulk table,
+check the Quick Help section near the top of the screen. Enter all of the boxes’ information and then click
+the “Save” button at the top right of the screen when you are done. If any of the boxes fail to save, a
+message will be displayed at the top of the screen explaining the problem(s). You can then make the
+appropriate adjustments and click the “Save” button to try again.</p>
+
+<p>It is also possible to create a box when creating samples, when propagating libraries or samples (if detailed
+sample mode is enabled), and when receiving libraries.</p>
+
+<ol>
+  <li>Click the appropriate box and fill out how many items to create/receive/propagate:
+    <ul>
+      <li>Creating samples: Go to the Samples list page and click “Create” in the toolbar at the top of the
+    table. In the Create Samples dialog box that opens, check “Create New Box”, fill out the rest of the
+fields in the dialog, and click “Create”.</li>
+      <li>Propagating samples or libraries: Go to the Samples list page. Check the box next to the desired parent
+    samples and click “Propagate” in the toolbar at the top of the table. In the Propagate dialog box
+that opens, check “Create New Box”, fill out the rest of the fields in the dialog, and click “Propagate”.</li>
+      <li>Receiving libraries: Go to the Libraries list page and click “Receive” in the toolbar at the top of
+the table. In the Receive Libraries dialog box that opens, check “Create New Box”, fill out the rest of
+the fields in the dialog, and click “Receive”.</li>
+    </ul>
+  </li>
+  <li>The open dialog box displays Create Box fields. Fill out the fields and click “Create”.</li>
+  <li>The bulk create/propagate/receive items page will open, and the Box Alias field will be filled in with the
+  alias of the newly-created box. Continue creating/propagating/receiving items as per usual.</li>
+</ol>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="editing_boxes"></a></p>
+<h2 id="153-editing-boxes">15.3. Editing Boxes</h2>
+
+<p>Boxes can be edited individually or in bulk. Bulk editing is convenient when you have several boxes to modify
+at once. Editing individual boxes is sometimes preferable because it allows you to modify the box contents as
+well as the box attributes.</p>
+
+<p>Most box fields can be edited, with the exception of the box ID, name, and size.</p>
+
+<p>To select boxes for bulk editing, go to the <a href="#boxes-list">Boxes list page</a>, select the boxes you wish to edit,
+and click “Edit” in the toolbar at the top of the table.</p>
+
+<p>To edit a single box, go to the <a href="#boxes-list">Boxes list page</a> and click on the target box’s name or alias.</p>
+
+<p>Freezer location can be changed on the Edit Box page by scanning the desired freezer location’s barcode or
+selecting the desired freezer location from the dropdown menu, and clicking “Set”. Freezer location can be
+changed on the bulk edit boxes page by scanning the freezer location barcode into the Freezer Location Barcode
+cell; the Freezer Location cell will update automatically with the appropriate freezer location details.</p>
+
+<p>On the Edit Box page, if no positions are selected in the Contents diagram (figure 1), the table will
+contain all box contents items. If one or more positions in the Contents diagram are selected, the table will
+be filtered to display only those items, and available actions for those items will be displayed at the top of
+the table.</p>
+
+<p><img class="userman-figure" src="/miso-lims/0.2.x/images/contents-diagram-and-table.png" alt="Contents diagram and table" /></p>
+
+<p><em>figure 1: Contents diagram and table</em></p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="selecting_positions_within_a_box"></a></p>
+<h2 id="154-selecting-positions-within-a-box">15.4. Selecting Positions within a Box</h2>
+
+<p>Positions with items in them are represented by blue circles in the Contents diagram, while empty positions
+are represented by grey/white circles. If a position in the Contents diagram is selected, its circle will
+appear brighter than that of an unselected position.</p>
+
+<p>If a single position is selected, information about its contents and available actions is displayed near the
+Contents diagram. If multiple positions are selected, the information displayed changes to be a series of
+search boxes for quickly adding items to those positions.</p>
+
+<p>To select a single position, click on a circle in the Contents diagram. The circle will become brighter to
+indicate that it is selected. To unselect a single position, hold Ctrl (Windows, Linux) or Command (Mac)
+while you click a selected circle.</p>
+
+<p>To select multiple positions, hold Ctrl (Windows, Linux) or Command (Mac) while you click on the target
+circles in the Contents diagram. To unselect multiple positions, hold Ctrl (Windows, Linux) or Command (Mac)
+while you click on the circles you wish to unselect. The circles will become less bright to indicate that they
+are not selected.</p>
+
+<p>To select an entire row or column, click on the row or column heading. To select multiple rows or columns,
+hold Ctrl (Windows, Linux) or Command (Mac) while you click on the target row or column headings.</p>
+
+<p>To select all positions, click the “Select All” button below the Contents diagram.
+To select all odd columns, click the “Select Odd Columns” button below the Contents diagram.
+To select all even columns, click the “Select Even Columns” button below the Contents diagram.</p>
+
+<p>To unselect all positions, click the “List all Box Contents” button at the top right of the contents table,
+near the Search field.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="adding_a_single_item_to_a_box"></a></p>
+<h2 id="155-adding-a-single-item-to-a-box">15.5. Adding a Single Item to a Box</h2>
+
+<p>On the Edit Box page, select the target position in the Contents diagram. In the information section that
+appears adjacent to the Contents diagram (see figure 2), scan the item’s barcode, or type its name,
+alias, or barcode into the “Search” field and press the Enter key or click “Lookup”.</p>
+
+<p><img class="userman-figure" src="/miso-lims/0.2.x/images/one-position-selected.png" alt="Additional information when one position is selected" /></p>
+
+<p><em>figure 2: Additional information when one position is selected</em></p>
+
+<p>Once the search completes, any matching items found will be in the “Results” dropdown. Select the target item
+from the dropdown and click “Update Position”. After the update completes, the information about the item in
+the selected position will update with the target item’s information.</p>
+
+<p>If the target position already contains an item, saving the new item to that position will cause the existing
+item’s location to become unknown. If the existing item’s location should be tracked, it should be moved to a
+new box before or after saving the new item to the target position.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="adding_multiple_items_to_a_box"></a></p>
+<h2 id="156-adding-multiple-items-to-a-box">15.6. Adding Multiple Items to a Box</h2>
+
+<p>On the Edit Box page, select the target positions in the Contents diagram. Find the Position and Search rows
+adjacent to the Contents diagram (see figure 3), and scan each target item’s barcode or type its
+name, alias, or barcode into the Search field for its target position.</p>
+
+<p><img class="userman-figure" src="/miso-lims/0.2.x/images/multiple-positions-selected.png" alt="Additional information when multiple positions are selected" /></p>
+
+<p><em>figure 3: Additional information when multiple positions are selected</em></p>
+
+<p>Once all Search fields are filled out, click “Update” below the last search field. If any of the target
+positions already contains an item, a dialog box will name the items that already occupy those positions and
+ask you to confirm that you wish to replace them with the items matching your search terms. If any items to be
+replaced are not being re-added to a different position in the box, they will be removed from the box. Click
+“Replace” to continue, or “Cancel” to cancel the update and select new positions.</p>
+
+<p>If one item is found for each position, the page is refreshed and the Contents diagram and table will contain
+the target items. If more than one item is found for a given position, or if no matching item can be found for
+a given search term, no items will be updated and a dialog box will display the search terms which were in
+error.</p>
+
+<p>Multiple items can also be added to a box using the <a href="#scanning_a_box">Scanning a box</a> instructions.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="removing_a_single_item_from_a_box"></a></p>
+<h2 id="157-removing-a-single-item-from-a-box">15.7. Removing a Single Item from a Box</h2>
+
+<p>A single item can be removed from a box. It is advised to scan it into another box or location position soon
+in order to keep tracking its location in MISO.</p>
+
+<p>Go to the Edit Box page and select the target position in the Contents diagram. In the information section
+that appears adjacent to the diagram, click “Remove Item”. In the dialog box that appears, click “Remove” to
+confirm that you wish to remove this item from the box. The page will refresh, and the target position will be
+empty in the Contents diagram.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="discarding_a_single_item_from_a_box"></a></p>
+<h2 id="158-discarding-a-single-item-from-a-box">15.8. Discarding a Single Item from a Box</h2>
+
+<p>A single item can be discarded from a box to indicate that the item no longer needs to be tracked. When an
+item is discarded, its volume will be set to “0”, discarded will be set to true, and its location will be
+shown as “EMPTY”. Discarded items can not be added to boxes.</p>
+
+<p>Go to the Edit Box page and select the target position in the Contents diagram. In the information section
+that appears adjacent to the diagram, click “Discard Item”. In the dialog box that appears, click “Discard” to
+confirm that you wish to discard this item from the box. The page will refresh, and the target position will
+be empty in the Contents diagram.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="discarding_all_items_from_a_box"></a></p>
+<h2 id="159-discarding-all-items-from-a-box">15.9. Discarding All Items from a Box</h2>
+
+<p>It is possible to discard all of the items from a box in a single operation. To do this, go to the Edit Box
+page by clicking on the box name in the Boxes list page. The Contents section heading has an Options menu on
+the far right of the heading; hover over it to reveal the menu, and click “Discard All Contents”. In the
+Discard All Contents dialog box that appears, click “Discard” to continue discarding all items from the box.
+The page will refresh and the box will be empty.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="scanning_a_box"></a></p>
+<h2 id="1510-scanning-a-box">15.10. Scanning a Box</h2>
+
+<p>If your MISO is configured to use a box scanner, then the box contents can be updated in one operation using
+that box scanner (at the time of this writing, only the Thermo Fisher VisionMate High Speed Barcode Reader
+is supported). A MISO box must be scannable (part of the box size attribute) in order to have the scanning
+option available.</p>
+
+<p>To scan a box, first open the box scanner software on the computer (outside of MISO). Then, go to the Edit Box
+page by clicking the box name in the Boxes list page. The Contents section heading has an Options menu on the
+far right of the heading; hover over it to reveal the menu, and click “Scan with &lt;scanner-name&gt;”, where
+&lt;scanner-name&gt; is a box scanner that your MISO is configured for. If “Scan with &lt;scanner-name&gt;” is not visible
+in the list, your box may not be scannable or MISO may not be configured to use this box scanner.</p>
+
+<p>Wait until the Scan dialog box prompts you to place the box on the scanner. It will automatically scan the box.
+Once the scan is complete, the diagram will display the tubes which the scanner found.</p>
+
+<p>Once a successful scan is made, review the changes that would be made (see figure 4) and click “Save”.</p>
+
+<p><img class="userman-figure" src="/miso-lims/0.2.x/images/box-scan-success.png" alt="Successful box scan" /></p>
+
+<p><em>figure 4: Successful box scan</em></p>
+
+<p>If there are any errors with the scan, the scan will need to be retried until there are no errors. Possible
+sources of error are:</p>
+<ul>
+  <li>The scanning software is not open
+    <ul>
+      <li>This will cause a “could not find the scanner” error message. Open the scanner software on the computer
+and rescan.</li>
+    </ul>
+  </li>
+  <li>A “No Read” scan result for a tube
+    <ul>
+      <li>This is often caused by dust on the scanner surface or frost on the tubes. Clean the scanner surface
+and/or tube bottoms and rescan.</li>
+    </ul>
+  </li>
+  <li>A barcode is scanned which is not associated with an item in MISO
+    <ul>
+      <li>Ensure that the tube barcode is correctly associated with an item in MISO.</li>
+    </ul>
+  </li>
+  <li>The network is down or MISO cannot connect to the scanner
+    <ul>
+      <li>Fix these problems first, then rescan.</li>
+    </ul>
+  </li>
+</ul>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="exporting_box_information"></a></p>
+<h2 id="1511-exporting-box-information">15.11. Exporting Box Information</h2>
+
+<p>Go to the Edit Box page by clicking on the box name in the Boxes list page. The Contents section heading has an
+Options menu on the far right of the heading; hover over it to reveal the menu, and click “Export Box to Excel”.
+The Excel spreadsheet containing information about the box contents and their positions will be downloaded.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="filling_a_box_by_barcode_pattern"></a></p>
+<h2 id="1512-filling-a-box-by-barcode-pattern">15.12. Filling a Box by Barcode Pattern</h2>
+
+<p>Sometimes it may be helpful to assign user-generated barcodes to items (especially if they are not already in
+barcoded tubes), and these user-generated barcodes can be used to quickly put items into boxes.</p>
+
+<p>For example, a plate can be represented in MISO as a non-scannable box. Adding items to this plate in MISO
+allows for easy tracking of which item is in which plate position. Items in a plate do not have a tube
+barcode and while it is possible to <a href="#adding_a_single_item_to_a_box">add a single item to a plate</a> or even to
+<a href="#adding_multiple_items_to_a_box">add multiple items to a plate</a>, it can be tedious to fill an
+entire plate this way. Instead, these items can be edited to have a matrix barcode attribute which represents
+a plate position rather than a physical barcode. Plate position barcodes must follow a specific pattern:</p>
+<ul>
+  <li>The item’s barcode must be made up of two parts: a prefix representing the box + a box position suffix.</li>
+  <li>The prefix for the box must be unique, but it does not have to match any of the box attributes (name,
+alias, matrix barcode).</li>
+  <li>The box position suffix must be in one of two formats: “standard” (A01, F12, where the letter represents
+  the row and the number represents the column) or “numeric” (001, 002, etc. moving in rows from the top
+left)
+    <ul>
+      <li>Note that for the “standard” format, column numbers less than 10 must have a 0 (zero) added to the
+      beginning of the number. Column 1 would be represented as “01”, column 2 would be “02”, etc. This
+matches the column numbers on the box Contents diagram.
+      * So for example, an item with barcode “FIRST-BOX-A01” in an 8x12 box would be intended for the first
+          row, first column, and an item with barcode “FIRST-BOX-B04” would be intended for the second row,
+  fourth column of the same box.</li>
+      <li>Note that for the “numeric” format, 001 is the position in the first row, first column, 002 is the
+    position in the first row, second column, etc. Numbering moves from left to right filling a row, and
+then continues from left to right on the next row, etc.
+      * So for example, an item with barcode “FIRST-BOX-001” in an 8x12 box would be intended for the first
+          row, first column, and an item with barcode “FIRST-BOX-016” would be intended for the second row,
+  fourth column of the same box.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Before filling by barcode pattern on the Edit Box page, the items must first be saved with the barcodes
+representing the box positions, as above.
+Then, go to the Edit Box page by clicking on the box name in the Boxes list page. The Contents section heading
+has an Options menu on the far right of the heading; hover over it to reveal the menu, and click “Fill by
+Barcode Pattern”.</p>
+
+<p>In the Fill by Barcode Pattern dialog box that appears, enter the prefix (from our example above, that would
+be “FIRST-BOX-“). Then select whether the suffix is “Standard” or “Numeric”, and click “Fill”. The box page
+will refresh and any items with matching barcodes will be placed in their appropriate positions. Note that any
+items that were in the box before the Fill By Barcode Pattern was applied will be removed from the box.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="working_with_items_in_a_box"></a></p>
+<h2 id="1513-working-with-items-in-a-box">15.13. Working with Items in a Box</h2>
+
+<p>Actions can be performed on all selected items in a box.</p>
+
+<p>First, go to the Edit Box page by clicking on the box name in the Boxes list page.
+<a href="#selecting-positions-within-a-box">Select the target positions</a> of the items you wish to act upon.
+In the toolbar at the top of the contents table, several actions are available for the selected items,
+provided that they are all of the same type (sample, library, library aliquot, pool). The actions available are the
+same as those found on the <a href="samples.html#samples-list">Samples</a>, <a href="libraries.html#libraries-list">Libraries</a>,
+<a href="library_aliquots.html#library-aliquots-list">Library Aliquots</a>, and <a href="pools.html#pools-list">Pools</a> list pages.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="printing_barcodes"></a></p>
+<h2 id="1514-printing-barcodes">15.14. Printing Barcodes</h2>
+
+<p>Barcode labels can be printed for a series of boxes from the Boxes list. See the
+<a href="barcode_label_printers.html#printing_barcodes">Barcode Label Printers section - Printing Barcodes</a> for
+details on how to do this.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="deleting_boxes"></a></p>
+<h2 id="1515-deleting-boxes">15.15. Deleting Boxes</h2>
+
+<p>To delete boxes, go to the Boxes list, check the checkbox(es) next to the box(es) that you wish to delete, and
+click the “Delete” button in the toolbar at the top of the table. A box can be deleted while it still has
+items in it; in this case, the items will be removed from the box and their location will be unknown to MISO.
+It is recommended that you add them to a new box if you wish their location to be tracked in MISO. A box can
+only be deleted by its creator or a MISO admin user.</p>
+
+<p><a href="#">Return to top</a></p>
+
+
+
+                    </div>
+                
+            </div>
+
+            
+
+            <div class="row">
+                <div id="footer" class="col-sm-12">
+                    Documentation for <a href="https://github.com/TGAC/miso-lims">MISO</a>
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function orderNav() {
+                var list,
+                    section,
+                    header,
+                    sections = [],
+                    lists = {},
+                    headers = {};
+
+                var navUl = document.querySelectorAll('#navigation ul')[0],
+                    navLis = document.querySelectorAll('#navigation ul li');
+
+                if (!navUl) return;
+
+                for (var i = 0; i < navLis.length; i++) {
+                    var order, li = navLis[i];
+
+                    if (li.classList.contains('nav-header')) {
+                        section = li.textContent || li.innerText;
+                        sections.push(section);
+                        headers[section] = li;
+                        continue;
+                    }
+
+                    if (!lists[section]) {
+                        lists[section] = [];
+                    }
+
+                    order = parseFloat(li.getAttribute('data-order'))
+                    lists[section].push([order, li]);
+                }
+
+                for (var i = 0; i < sections.length; i++) {
+                    section = sections[i];
+                    list = lists[section].sort(function(a, b) {
+                        return a[0] - b[0];
+                    });
+
+                    if (header = headers[section]) {
+                        navUl.appendChild(header);
+                    }
+                    for (var j = 0; j < list.length; j++) {
+                        navUl.appendChild(list[j][1]);
+                    }
+                }
+            }
+
+            if (document.querySelectorAll) orderNav();
+        </script>
+        
+    </body>
+</html>

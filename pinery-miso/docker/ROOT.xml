@@ -1,5 +1,0 @@
-<Context>
-  <Parameter name="spring.profiles.active" value="external" override="false" />
-  <Parameter name="pinery.external.springConfigFile" value="pinery-miso-config.xml" />
-  <Parameter name="miso.propertiesFile" value="file:/usr/local/tomcat/conf/Catalina/localhost/pinery-miso.properties" override="false" />
-</Context>

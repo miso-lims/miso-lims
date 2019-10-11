@@ -1,9 +1,0 @@
-<!-- This file is used in Tomcat to switch Spring profile and allow properties to be set outside of the packaged webapp. To use this file, copy 
-  it to $CATALINA_HOME/conf/[engine]/[host]/ and rename it to match the webapp name. E.g. if your webapp is pinery-miso, change the filename to 
-  pinery-miso.xml. You may need to change the value of miso.propertiesFile (below) if your properties file will be in a different location. -->
-
-<Context>
-  <Parameter name="spring.profiles.active" value="external" override="false" />
-  <Parameter name="pinery.external.springConfigFile" value="pinery-miso-config.xml" />
-  <Parameter name="miso.propertiesFile" value="file:${CATALINA_HOME}/conf/Catalina/localhost/pinery-miso.properties" override="false" />
-</Context>

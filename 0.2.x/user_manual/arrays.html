@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <title>MISO : 19. Arrays</title>
+        <meta name="description" content="An open-source LIMS for NGS sequencing centres">
+
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/main.css">
+				<link rel="icon" href="/miso-lims/0.2.x/favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+<a href="https://github.com/miso-lims/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+        <div class="container">
+            <div class="row">
+                <div id="header" class="col-sm-12">
+                    <h2><a class="brand" href="/miso-lims/0.2.x/"><img src="/miso-lims/0.2.x/images/MISO.png" alt="MISO's logo, a bowl of miso soup"/>MISO</a>
+    <small>An open-source LIMS for NGS sequencing centres</small>
+</h2>
+
+                </div>
+            </div>
+
+            <div class="row">
+                
+                
+                    <div id="navigation" class="col-sm-2">
+                        <ul class="nav nav-list">
+    <!--<li><a href="/miso-lims/0.2.x/">Home</a></li>-->
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">User Guides</li>
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/usr/user-manual-table-of-contents.html">User Manual</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Admin Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/baremetal-installation-guide.html">Installing MISO on baremetal</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/compose-installation-guide.html">Installing MISO with docker-compose</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/admin-guide.html">Administrator's Manual</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/adm/installation-guide.html">Building and Deploying</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Developer Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/rest-testing.html">REST Testing</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/maven-artifacts.html">Maven artifacts</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/code-style.html">Code Style</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/dev/developers-manual.html">Developer's Manual</a></li>
+        
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+    
+<!-- List additional links. It is recommended to add a divider
+    e.g. <li class="divider"></li> first to break up the content. -->
+</ul>
+
+                    </div>
+
+                    <div id="content" class="col-sm-10">
+                        <div class="page-header">
+    <h2>19. Arrays
+        
+    </h2>
+</div>
+
+
+<p><a name="arrays_list"></a></p>
+<h2 id="191-arrays-list">19.1. Arrays List</h2>
+
+<p>To get to the Arrays list page, click “Arrays” in the Array Scanning list in the menu on the left side of the screen.
+This list includes all arrays from all projects in MISO. The toolbar at the top of the table includes controls for
+working with arrays.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="creating_an_array"></a></p>
+<h2 id="192-creating-an-array">19.2. Creating an Array</h2>
+
+<p>Clicking the “Add” button in the toolbar at the top of the Arrays list will take you to the Create Array page. Here,
+you can enter all of the array information and then click the “Save” button at the top right to save the array. After
+saving, you will be taken to the single Edit Array page, where you can add samples and further modify the array.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="editing_an_array"></a></p>
+<h2 id="193-editing-an-array">19.3. Editing an Array</h2>
+
+<p>To get to the single Edit Array page, click on the array’s ID, alias, or serial number in the Arrays list. The top
+section of the Edit Array page contains a list of fields, most of which may be modified. You can make any changes you
+would like and then click the “Save” button at the top right to confirm the changes. The Samples section below that
+allows you to add and remove samples from the array, which is discussed below. Under that, there are sections listing
+the array runs that the array has been used in, and the array’s change log.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="adding_a_sample_to_an_array"></a></p>
+<h2 id="194-adding-a-sample-to-an-array">19.4. Adding a Sample to an Array</h2>
+
+<p>Samples can be added to an array using the Edit Array page. In the Samples section, there is a diagram of the array
+contents (see figure 1). Blue circles in the diagram represent positions where samples have already been
+added. Grey circles are empty positions. Select a position by clicking on its circle in the diagram.</p>
+
+<p><img class="userman-figure" src="/miso-lims/0.2.x/images/arrays-diagram.png" alt="Array contents diagram" /></p>
+
+<p><em>figure 1: Array contents diagram</em></p>
+
+<p>Once a position is selected, the search controls become available. Enter the name, alias, or barcode of a sample into
+the search box and click the Lookup button to perform the search. If your site uses
+<a href="site_configuration.html#detailed_sample_mode">detailed sample mode</a>, only aliquot samples will be searched. The search
+results will appear in the Results dropdown. Ensure that the correct sample is selected and then click the Update
+Position button to add the sample to the array position.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="removing_a_sample_from_an_array"></a></p>
+<h2 id="195-removing-a-sample-from-an-array">19.5. Removing a Sample from an Array</h2>
+
+<p>Removing samples from the array can also be done on the Edit Array page. Select an array position containing a sample,
+as described above, and then click the Remove Sample button to do so.</p>
+
+<p><a href="#">Return to top</a></p>
+
+
+
+                    </div>
+                
+            </div>
+
+            
+
+            <div class="row">
+                <div id="footer" class="col-sm-12">
+                    Documentation for <a href="https://github.com/TGAC/miso-lims">MISO</a>
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function orderNav() {
+                var list,
+                    section,
+                    header,
+                    sections = [],
+                    lists = {},
+                    headers = {};
+
+                var navUl = document.querySelectorAll('#navigation ul')[0],
+                    navLis = document.querySelectorAll('#navigation ul li');
+
+                if (!navUl) return;
+
+                for (var i = 0; i < navLis.length; i++) {
+                    var order, li = navLis[i];
+
+                    if (li.classList.contains('nav-header')) {
+                        section = li.textContent || li.innerText;
+                        sections.push(section);
+                        headers[section] = li;
+                        continue;
+                    }
+
+                    if (!lists[section]) {
+                        lists[section] = [];
+                    }
+
+                    order = parseFloat(li.getAttribute('data-order'))
+                    lists[section].push([order, li]);
+                }
+
+                for (var i = 0; i < sections.length; i++) {
+                    section = sections[i];
+                    list = lists[section].sort(function(a, b) {
+                        return a[0] - b[0];
+                    });
+
+                    if (header = headers[section]) {
+                        navUl.appendChild(header);
+                    }
+                    for (var j = 0; j < list.length; j++) {
+                        navUl.appendChild(list[j][1]);
+                    }
+                }
+            }
+
+            if (document.querySelectorAll) orderNav();
+        </script>
+        
+    </body>
+</html>

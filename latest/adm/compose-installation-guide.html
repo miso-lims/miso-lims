@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <title>MISO : Installing MISO with docker-compose</title>
+        <meta name="description" content="An open-source LIMS for NGS sequencing centres">
+
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/miso-lims/latest/css/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/latest/css/main.css">
+				<link rel="icon" href="/miso-lims/latest/favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+<a href="https://github.com/miso-lims/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+        <div class="container">
+            <div class="row">
+                <div id="header" class="col-sm-12">
+                    <h2><a class="brand" href="/miso-lims/latest/"><img src="/miso-lims/latest/images/MISO.png" alt="MISO's logo, a bowl of miso soup"/>MISO</a>
+    <small>An open-source LIMS for NGS sequencing centres</small>
+</h2>
+
+                </div>
+            </div>
+
+            <div class="row">
+                
+                
+                    <div id="navigation" class="col-sm-2">
+                        <ul class="nav nav-list">
+    <!--<li><a href="/miso-lims/latest/">Home</a></li>-->
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">User Guides</li>
+            
+            <li data-order="1"><a href="/miso-lims/latest/usr/user-manual-table-of-contents.html">User Manual</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Admin Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/latest/adm/baremetal-installation-guide.html">Installing MISO on baremetal</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/latest/adm/compose-installation-guide.html">Installing MISO with docker-compose</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/latest/adm/admin-guide.html">Administrator's Manual</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/latest/adm/installation-guide.html">Building and Deploying</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Developer Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/latest/dev/rest-testing.html">REST Testing</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/latest/dev/maven-artifacts.html">Maven artifacts</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/latest/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/latest/dev/code-style.html">Code Style</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/latest/dev/developers-manual.html">Developer's Manual</a></li>
+        
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+    
+<!-- List additional links. It is recommended to add a divider
+    e.g. <li class="divider"></li> first to break up the content. -->
+</ul>
+
+                    </div>
+
+                    <div id="content" class="col-sm-10">
+                        <div class="page-header">
+    <h2>Installing MISO with docker-compose
+        
+    </h2>
+</div>
+
+<p>This getting started guide should be all you need to do to get a demonstration
+version of MISO running on your operating system, provided you can install and
+use Docker. If you want to install MISO without using Docker, please see the
+<a href="baremetal-installation-guide">baremetal installation guide</a>.</p>
+
+<p>These compose files included in the MISO distribution are intended as a
+demonstration and <strong>not a permanent installation</strong>. To customize the behaviour
+of these compose files to be suitable for production systems, look at the
+<a href="#overview">Overview</a> and <a href="#recipes">Recipes</a> sections below.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<p>Install required dependencies:</p>
+
+<ol>
+  <li><a href="https://docs.docker.com/install/">Install Docker 18.06.0+</a></li>
+  <li>If necessary, <a href="https://docs.docker.com/compose/install/">install Docker Compose</a></li>
+</ol>
+
+<p>Download and extract the <code class="highlighter-rouge">.docker</code> directory from Github into <code class="highlighter-rouge">miso-lims-compose</code>.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mkdir miso-lims-compose
+wget https://github.com/miso-lims/miso-lims/archive/master.zip
+unzip master.zip 'miso-lims-master/.docker/*'
+mv miso-lims-master/.docker/* miso-lims-compose
+rm -r master.zip miso-lims-master/
+</code></pre></div></div>
+
+<p>You are now ready to run MISO.</p>
+
+<h2 id="quick-start">Quick Start</h2>
+
+<p>To bring up a demo environment, install the pre-requisites above and run the
+following commands.</p>
+
+<p><strong>Plain sample mode</strong> has a straightforward Sample -&gt; Library -&gt; Library Aliquot -&gt;
+Pool workflow and is sufficient for basic laboratory tracking for sequencing.</p>
+
+<p>Launch the plain sample demo with docker-compose:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd </span>miso-lims-compose
+<span class="nb">export </span><span class="nv">MISO_DB_USER</span><span class="o">=</span>tgaclims <span class="o">&amp;&amp;</span> <span class="nb">export </span><span class="nv">MISO_DB</span><span class="o">=</span>lims <span class="o">&amp;&amp;</span> <span class="nb">export </span><span class="nv">MISO_DB_PASSWORD_FILE</span><span class="o">=</span>./.miso_db_password <span class="o">&amp;&amp;</span> <span class="nb">export </span><span class="nv">MISO_TAG</span><span class="o">=</span>latest
+<span class="nb">echo</span> <span class="s2">"changeme"</span> <span class="o">&gt;</span> ./.miso_db_password
+docker-compose <span class="nt">-f</span> demo.plain.yml up
+</code></pre></div></div>
+
+<p><strong>Detailed sample mode</strong> has all of the features of plain sample mode, plus it
+allows users to build a hierarchy of Samples (e.g. Identity -&gt; Tissue -&gt; Slide
+-&gt; gDNA (stock) -&gt; gDNA (aliquot) and also includes alias autogeneration.</p>
+
+<p>Launch the detailed sample demo with docker-compose:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd </span>miso-lims-compose
+<span class="nb">export </span><span class="nv">MISO_DB_USER</span><span class="o">=</span>tgaclims <span class="o">&amp;&amp;</span> <span class="nb">export </span><span class="nv">MISO_DB</span><span class="o">=</span>lims <span class="o">&amp;&amp;</span> <span class="nb">export </span><span class="nv">MISO_DB_PASSWORD_FILE</span><span class="o">=</span>./.miso_db_password <span class="o">&amp;&amp;</span> <span class="nb">export </span><span class="nv">MISO_TAG</span><span class="o">=</span>latest
+<span class="nb">echo</span> <span class="s2">"changeme"</span> <span class="o">&gt;</span> ./.miso_db_password
+docker-compose <span class="nt">-f</span> demo.detailed.yml up
+</code></pre></div></div>
+
+<p>For both environments, navigate to <a href="http://localhost/miso">http://localhost/miso</a>
+and use the credentials <strong>admin</strong>/<strong>admin</strong>.</p>
+
+<p>Once you are finished with the container, make sure to run
+<code class="highlighter-rouge">docker-compose -f &lt;compose.yml&gt; down</code>, where <code class="highlighter-rouge">&lt;compose.yml&gt;</code> is either
+<code class="highlighter-rouge">demo.plain.yml</code> or <code class="highlighter-rouge">demo.detailed.yml</code>. This will clean up the instances and
+networks and release their resources to the host operating system.</p>
+
+<h1 id="overview">Overview</h1>
+
+<p>The MISO Docker containers consist of four parts:</p>
+
+<p><strong>MySQL database</strong>. The database. We use the
+<a href="https://hub.docker.com/_/mysql">MySQL official Docker container</a>.</p>
+
+<p><strong>Apache Tomcat server</strong>. The actual server for the MISO webapp. The image is
+<a href="https://cloud.docker.com/u/misolims/repository/docker/misolims/miso-lims-webapp">miso-lims-webapp</a>
+container, based on the
+<a href="https://hub.docker.com/_/tomcat">official Tomcat alpine container</a>.</p>
+
+<p><strong>Flyway DB migration</strong>. Initializes or updates the database.
+This is miso-lims’s
+<a href="https://cloud.docker.com/u/misolims/repository/docker/misolims/miso-lims-migrate">miso-lims-migrate</a>
+container (<em><a href="https://github.com/miso-lims/miso-lims/blob/master/Dockerfile">Dockerfile</a>,
+target <code class="highlighter-rouge">flyway-migration</code></em>), based on <a href="https://hub.docker.com/r/boxfuse/flyway">boxfuse/flyway</a>. It will initialize or update the MySQL database for a particular MISO
+version.</p>
+
+<p><strong>Nginx reverse proxy</strong>. Redirects traffic from port 80 to MISO’s 8080 address,
+and is also required for HTTPS. We use the official <a href="https://hub.docker.com/_/nginx">nginx</a> container.</p>
+
+<h1 id="installing-miso-for-production-use">Installing MISO for production use</h1>
+
+<p>The current docker-compose files emphasize that they are not for production use.
+So, how do you configure MISO for production?</p>
+
+<p>We suggest the following:</p>
+
+<ol>
+  <li>Mount the MySQL database and MISO files storage location to permanent, backed-up locations (see <a href="#adding-persistent-storage">Adding Persistent Storage</a>).</li>
+  <li>Pre-load desired data (if any) by binding SQL files to the flyway container (see <a href="#pre-loading-data-with-flyway">Pre-loading data with Flyway</a>.</li>
+  <li>Modify and mount the miso.properties file to have your desired configuration (see <a href="#modifying-the-miso-properties-file">Modifying the miso.properties file</a>.</li>
+  <li>Change the username and password for the database using the environmental variables</li>
+  <li>Enable HTTPS (see <a href="#configuring-https">Configuring HTTPS</a>.</li>
+</ol>
+
+<h1 id="recipes">Recipes</h1>
+
+<p>We provide a number of solutions to common issues so you can construct your
+own docker-compose files.</p>
+
+<h2 id="adding-persistent-storage">Adding persistent storage</h2>
+
+<p>There are two ways to add persistent storage: Docker volumes and bind mounts. In
+both cases, you will mount a volume or bind a filesystem location to
+<code class="highlighter-rouge">/var/lib/mysql</code> inside the MySQL container, and to <code class="highlighter-rouge">/storage/miso/files/</code>
+inside the webapp container.</p>
+
+<h3 id="docker-volumes">Docker volumes</h3>
+
+<p>Docker volumes can be used for testing and semi-permanent demonstrations, when
+you don’t want to lose all of your data between restarts.</p>
+
+<p>First ensure that the docker-compose file is working
+correctly before adding persistent storage. Otherwise you risk corrupting your
+database.</p>
+
+<p>Then modify the docker-compose.yml file with the following:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">...</span>
+<span class="na">services</span><span class="pi">:</span>
+  <span class="na">db</span><span class="pi">:</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">misolims_db:/var/lib/mysql"</span>
+  <span class="na">webapp</span><span class="pi">:</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">misolims_files:/storage/miso/files/"</span>
+<span class="nn">...</span>
+<span class="na">volumes</span><span class="pi">:</span>
+  <span class="na">misolims_db</span><span class="pi">:</span>
+  <span class="na">misolims_files</span><span class="pi">:</span>
+</code></pre></div></div>
+
+<h3 id="filesystem-mount">Filesystem mount</h3>
+
+<p>For permanent, production use, we recommend binding a location on the host
+filesystem for the database and file storage.</p>
+
+<p>First ensure that the docker-compose file is working correctly before adding
+persistent storage. Otherwise you risk corrupting your database.</p>
+
+<p>Then modify the docker-compose file with the following, where <code class="highlighter-rouge">/path/to</code> and
+subdirs are locations on the host filesystem:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">...</span>
+<span class="na">services</span><span class="pi">:</span>
+  <span class="na">db</span><span class="pi">:</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">/path/to/mysql/db:/var/lib/mysql"</span>
+  <span class="na">webapp</span><span class="pi">:</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">/path/to/files:/storage/miso/files/"</span>
+</code></pre></div></div>
+
+<h2 id="pre-loading-data-with-flyway">Pre-loading data with Flyway</h2>
+
+<p>Starting MISO with an entirely empty database will not provide full functions.
+The demo database starts with some pre-loaded information that may or may not be
+useful: see the SQL files
+<a href="https://github.com/miso-lims/miso-lims/tree/master/.docker/detailed_sample_config">here</a>.</p>
+
+<p>We recommend including the V0792 migration to
+clean out the database and modifying V0793 as appropriate for your institution.
+All SQL migrations that conform with Flyway’s <code class="highlighter-rouge">V####__name.sql</code> naming scheme
+will be automatically run in numerical order when mounted at <code class="highlighter-rouge">/flyway/sql</code>
+inside the container.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">...</span>
+<span class="na">services</span><span class="pi">:</span>
+  <span class="na">flyway</span><span class="pi">:</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">type</span><span class="pi">:</span> <span class="s">bind</span>
+        <span class="na">source</span><span class="pi">:</span> <span class="s2">"</span><span class="s">./V0792__drop-inconvenient-rows.sql"</span>
+        <span class="na">target</span><span class="pi">:</span> <span class="s2">"</span><span class="s">/flyway/sql/V0792__drop-inconvenient-rows.sql"</span>
+        <span class="na">volume</span><span class="pi">:</span>
+          <span class="na">nocopy</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="pi">-</span> <span class="na">type</span><span class="pi">:</span> <span class="s">bind</span>
+        <span class="na">source</span><span class="pi">:</span> <span class="s2">"</span><span class="s">./V9000__institution-custom.sql"</span>
+        <span class="na">target</span><span class="pi">:</span> <span class="s2">"</span><span class="s">/flyway/sql/V9000__institution-custom.sql"</span>
+        <span class="na">volume</span><span class="pi">:</span>
+           <span class="na">nocopy</span><span class="pi">:</span> <span class="no">true</span>
+<span class="nn">...</span>
+</code></pre></div></div>
+
+<p>See the
+<a href="http://miso-lims.github.io/miso-lims/adm/admin-guide.html">administrator’s manual</a>
+for more information on the types of data that can be added at this stage.</p>
+
+<h2 id="modifying-the-misoproperties-file">Modifying the miso.properties file</h2>
+
+<p>The
+<a href="https://github.com/miso-lims/miso-lims/blob/master/miso-web/src/main/resources/internal/miso.properties">miso.properties</a>
+file has plenty of options to configure for site-specific use. Some important
+options include:</p>
+<ul>
+  <li><code class="highlighter-rouge">miso.detailed.sample.enabled</code> : turns detailed sample mode on and off</li>
+  <li><code class="highlighter-rouge">miso.instanceName</code> : displays an instance name in the header on the webapp
+(to distinguish prod and stage, for example).</li>
+  <li><code class="highlighter-rouge">miso.naming.scheme</code> : turns on/off various validation options for
+naming samples.
+The most rigorous naming validation scheme is <code class="highlighter-rouge">oicr</code>. See
+<a href="https://miso-lims.github.io/miso-lims/adm/installation-guide.html#naming-schemes-updating-catalina_homeconfcatalinalocalhostmisoproperties">Naming schemes</a>
+for more information.</li>
+</ul>
+
+<p>This file should be mounted in the webapp container at
+<code class="highlighter-rouge">/usr/local/tomcat/conf/Catalina/localhost/miso.properties</code>.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">...</span>
+<span class="na">services</span><span class="pi">:</span>
+  <span class="na">webapp</span><span class="pi">:</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">type</span><span class="pi">:</span> <span class="s">bind</span>
+        <span class="na">source</span><span class="pi">:</span> <span class="s2">"</span><span class="s">./.docker/detailed_sample_config/miso.properties"</span>
+        <span class="na">target</span><span class="pi">:</span> <span class="s2">"</span><span class="s">/usr/local/tomcat/conf/Catalina/localhost/miso.properties"</span>
+        <span class="na">volume</span><span class="pi">:</span>
+          <span class="na">nocopy</span><span class="pi">:</span> <span class="no">true</span>
+<span class="nn">...</span>
+</code></pre></div></div>
+
+<h2 id="configuring-https">Configuring HTTPS</h2>
+
+<p>In order to turn on HTTPS for MISO, configure the nginx container to accept
+incoming connections from port 443, include the SSL certificate, key, and
+password, and bind a new configuration file.</p>
+
+<p>The first file necessary is the nginx configuration file, which can be found at
+<a href="https://github.com/miso-lims/miso-lims/blob/develop/.docker/nginx/ssl.conf">.docker/nginx/ssl.conf</a>.</p>
+
+<p>The configuration below redirects requests from port 80 (http://…) to port 443
+(https://…) and then defines the locations of the ssl password file, ssl
+certificate, and certificate key. These locations are important since we will
+have to bind the appropriate files into them through the compose file.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>server <span class="o">{</span>
+    listen 80<span class="p">;</span>
+    location / <span class="o">{</span>
+        <span class="k">return </span>301 https://<span class="nv">$host$request_uri</span><span class="p">;</span>
+    <span class="o">}</span>    
+<span class="o">}</span>
+
+server <span class="o">{</span>
+  listen 443 ssl<span class="p">;</span>
+  listen <span class="o">[</span>::]:443 ssl<span class="p">;</span>
+
+  ssl_password_file /run/secrets/ssl_password<span class="p">;</span>
+  ssl_certificate /etc/nginx/ssl/cert.pem<span class="p">;</span>
+  ssl_certificate_key /etc/nginx/ssl/key.pem<span class="p">;</span>
+
+  <span class="c"># If deploying (uploading) war files configure nginx to accept large files from clients</span>
+  client_max_body_size 100M<span class="p">;</span>
+  location / <span class="o">{</span>
+      proxy_set_header X-Forwarded-Host <span class="nv">$host</span><span class="p">;</span>
+      proxy_set_header X-Forwarded-Server <span class="nv">$host</span><span class="p">;</span>
+      proxy_set_header X-Forwarded-For <span class="nv">$proxy_add_x_forwarded_for</span><span class="p">;</span>
+      <span class="c"># assumes this is running in docker compose with DNS name 'webapp' pointing to miso</span>
+      proxy_pass http://webapp:8080<span class="p">;</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="using-a-previously-generated-security-certificate">Using a previously-generated security certificate</h3>
+
+<p>In the first case, you have a security certificate and key that you want to use
+with your MISO instance. You can request a certificate for your server from
+your local IT department or from a service such as
+<a href="https://letsencrypt.org/">Let’s Encrypt</a>.</p>
+
+<p>In the snippet below, the SSL certificate and key file are located at <code class="highlighter-rouge">./cert.pem</code>
+and <code class="highlighter-rouge">./key.pem</code> respectively, and the SSL certificate password is located in a
+file located at the environment variable <code class="highlighter-rouge">${SSL_PASSWORD_FILE}</code>. We also bind
+port 443 on the nginx container to the host machine.</p>
+
+<p>Make sure the target locations of the certificate, certificate key, and password
+match those specified in the <code class="highlighter-rouge">ssl.conf</code> file above.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">secrets</span><span class="pi">:</span>
+  <span class="na">ssl_password</span><span class="pi">:</span>
+    <span class="na">file</span><span class="pi">:</span> <span class="s">${SSL_PASSWORD_FILE}</span>
+
+<span class="na">services</span><span class="pi">:</span>
+  <span class="na">nginx</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx:1.15.12-alpine</span>
+    <span class="na">ports</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">80:80"</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">443:443"</span>
+    <span class="na">secrets</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">ssl_password</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">type</span><span class="pi">:</span> <span class="s">bind</span>
+        <span class="na">source</span><span class="pi">:</span> <span class="s2">"</span><span class="s">./.docker/nginx/ssl.conf"</span>
+        <span class="na">target</span><span class="pi">:</span> <span class="s2">"</span><span class="s">/etc/nginx/conf.d/default.conf"</span>
+      <span class="pi">-</span> <span class="na">type</span><span class="pi">:</span> <span class="s">bind</span>
+        <span class="na">source</span><span class="pi">:</span> <span class="s2">"</span><span class="s">./cert.pem"</span>
+        <span class="na">target</span><span class="pi">:</span> <span class="s">:/etc/nginx/ssl/cert.pem"</span>
+      <span class="pi">-</span> <span class="na">type</span><span class="pi">:</span> <span class="s">bind</span>
+        <span class="na">source</span><span class="pi">:</span> <span class="s2">"</span><span class="s">./key.pem"</span>
+        <span class="na">target</span><span class="pi">:</span> <span class="s">:/etc/nginx/ssl/key.pem"</span>
+    <span class="na">links</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">webapp</span>
+    <span class="na">depends_on</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">webapp</span>
+</code></pre></div></div>
+
+<p>As before, navigate to <a href="http://localhost/miso">http://localhost/miso</a>. You will
+be automatically redirected to the login page at https://localhost/miso and can
+use <strong>admin</strong>/<strong>admin</strong> to log in.</p>
+
+<h3 id="creating-a-self-signed-certificate-on-startup">Creating a self-signed certificate on startup</h3>
+
+<p>If you don’t have a certificate or you are testing, you may want to generate a
+self-signed certificate on startup for MISO to use.</p>
+
+<p>We provide an example script for this purpose at
+<a href="https://github.com/miso-lims/miso-lims/blob/develop/.docker/nginx/self-sign-cert.sh.conf">.docker/nginx/self-sign-cert.sh</a>. Copy and modify the <code class="highlighter-rouge">-subj</code> field as appropriate for your
+organization.
+The SSL password is still required and used to generate the certificate, and we
+additionally modify the command to generate the certificate as the container is
+starting.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">secrets</span><span class="pi">:</span>
+  <span class="na">ssl_password</span><span class="pi">:</span>
+    <span class="na">file</span><span class="pi">:</span> <span class="s">${SSL_PASSWORD_FILE}</span>
+
+<span class="na">services</span><span class="pi">:</span>
+  <span class="na">nginx</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx:1.15.12-alpine</span>
+    <span class="na">ports</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">80:80"</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">443:443"</span>
+    <span class="na">secrets</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">ssl_password</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">type</span><span class="pi">:</span> <span class="s">bind</span>
+        <span class="na">source</span><span class="pi">:</span> <span class="s2">"</span><span class="s">./.docker/nginx/ssl.conf"</span>
+        <span class="na">target</span><span class="pi">:</span> <span class="s2">"</span><span class="s">/etc/nginx/conf.d/default.conf"</span>
+        <span class="na">volume</span><span class="pi">:</span>
+          <span class="na">nocopy</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="pi">-</span> <span class="na">type</span><span class="pi">:</span> <span class="s">bind</span>
+        <span class="na">source</span><span class="pi">:</span> <span class="s2">"</span><span class="s">./.docker/nginx/self-sign-cert.sh"</span>
+        <span class="na">target</span><span class="pi">:</span> <span class="s2">"</span><span class="s">/self-sign-cert.sh"</span>
+        <span class="na">volume</span><span class="pi">:</span>
+          <span class="na">nocopy</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">links</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">webapp</span>
+    <span class="na">depends_on</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">webapp</span>
+    <span class="na">command</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">sh"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">-c"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">./self-sign-cert.sh;</span><span class="nv"> </span><span class="s">nginx</span><span class="nv"> </span><span class="s">-g</span><span class="nv"> </span><span class="s">'daemon</span><span class="nv"> </span><span class="s">off;'"</span><span class="pi">]</span>
+</code></pre></div></div>
+
+<p>As before, navigate to <a href="http://localhost/miso">http://localhost/miso</a>. You will
+be automatically redirected to the login page at https://localhost/miso and can
+use <strong>admin</strong>/<strong>admin</strong> to log in.</p>
+
+<p>The container creates a new self-signed certificate every time it starts up for
+security reasons: otherwise everyone would use the same certificate, leading to
+potential trust issues. If you would like to download the certificate for re-use, the files are located at <code class="highlighter-rouge">/etc/nginx/ssl/cert.pem</code> and <code class="highlighter-rouge">/etc/nginx/ssl/key.pem</code> in the nginx container, and then follow the steps in <a href="#using-a-previously-generated-security-certificate">using a previously-generated security certificate</a>.</p>
+
+<h4 id="browser-security-warnings">Browser security warnings</h4>
+
+<p>With self-signed certificates, you will likely get security warnings on Chrome
+or Firefox when you go to <a href="https://localhost/miso">https://localhost/miso</a>.
+Since you set up the certificate and you (hopefully) trust yourself, these
+warnings can be ignored. Your data is still protected despite the browser’s
+warning.</p>
+
+<p>Here is what your browser will look like, with Chrome on the left and Firefox on
+the right. To ignore the errors, click the <em>Advanced</em> button on either page.</p>
+
+<p><img src="/miso-lims/latest/images/security-warning.png" alt="Security Warnings in Chrome and Firefox" /></p>
+
+<p>Then click either “Proceed to localhost (unsafe)” or “Accept the Risk and
+Continue”.</p>
+
+<p><img src="/miso-lims/latest/images/security-warning-accept.png" alt="Accept Security Warnings in Chrome and Firefox" /></p>
+
+<p>The process for <a href="https://medium.com/@ali.dev/how-to-trust-any-self-signed-ssl-certificate-in-ie11-and-edge-fa7b416cac68">handling self-signed certificates on Internet Explorer or Edge</a>
+is very similar. Follow the accepted process for trusting self-signed
+certificates.</p>
+
+<h2 id="building-and-running-from-source">Building and running from source</h2>
+
+<p>If you are developing MISO or want to use the MISO code from a particular
+commit, modify the compose file to build the MISO-specific containers from
+source.</p>
+
+<p>There are two compose files in the main miso-lims source intended for
+developers:</p>
+
+<ul>
+  <li>docker-compose.detailed.yml : builds and starts detailed sample demo mode</li>
+  <li>docker-compose.plain.yml : builds and starts plain sample demo mode</li>
+</ul>
+
+<p>The main difference between this and the demo versions it that the two
+containers <code class="highlighter-rouge">flyway</code> and <code class="highlighter-rouge">webapp</code> are built using targets in the
+<a href="https://github.com/miso-lims/miso-lims/blob/master/Dockerfile">Dockerfile</a>.</p>
+
+<p>Both assume that you are working in the fully cloned miso-lims repository.
+First, clone the <code class="highlighter-rouge">miso-lims</code> source repository from<br />
+(<a href="https://github.com/miso-lims/miso-lims">miso-lims</a>) Github and git checkout
+the version, branch, or release that you are working on. Then build the compose
+file, and run the version as usual.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># check out the MISO source and switch to release version v0.2.174</span>
+git clone https://github.com/miso-lims/miso-lims.git
+git checkout tags/v0.2.177 <span class="nt">-b</span> v0.2.177
+
+<span class="c"># compose.yml is one of the two compose files above</span>
+docker-compose <span class="nt">-f</span> compose.yml build
+docker-compose <span class="nt">-f</span> compose.yml up
+</code></pre></div></div>
+
+<p>The URL <a href="http://localhost/miso">http://localhost/miso</a> is still where to go and 
+log in with the credentials <strong>admin</strong>/<strong>admin</strong>.</p>
+
+<h3 id="improving-build-times-while-developing">Improving build times while developing</h3>
+
+<p>For faster startup, you may interested in
+<a href="#adding-persistent-storage">adding persistent storage</a> so that the database
+doesn’t re-populate on every startup. This drops the startup time
+from ~1 minute to about 20 seconds.</p>
+
+<p><strong>Be cautious</strong> because while developing MISO or messing with the docker-compose
+file because you may inadvertently cause a database corruption. If your database
+connections are misbehaving, try pruning your Docker volumes to destroy the
+database and re-building from scratch.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># compose.yml is the location of your development compose file</span>
+docker-compose <span class="nt">-f</span> compose.yml down
+docker volume prune
+</code></pre></div></div>
+
+<h1 id="example-docker-compose-files">Example docker-compose files</h1>
+
+<h2 id="production-like-dockerfile">Production-like dockerfile</h2>
+
+<p>This docker-compose file is installed on a production machine called <code class="highlighter-rouge">miso-lims</code>
+in the <code class="highlighter-rouge">miso</code> user’s home directory.</p>
+
+<p>This environment:</p>
+<ul>
+  <li>mounts the database, MISO logs, and MISO files from the local filesystem. We
+made the directories <code class="highlighter-rouge">db</code>, <code class="highlighter-rouge">logs</code> and <code class="highlighter-rouge">files</code> to bind to.</li>
+  <li>has site-specific migrations in <code class="highlighter-rouge">V9000__institution-custom.sql</code></li>
+  <li>overrides <code class="highlighter-rouge">miso.properties</code>.</li>
+  <li>has SSL encryption for HTTPS (<code class="highlighter-rouge">ssl.conf</code> and <code class="highlighter-rouge">.ssl_password</code>) and
+automatically generates the SSL certificate on startup</li>
+  <li>has a <code class="highlighter-rouge">.env</code> file with environment variables:
+    <ul>
+      <li><code class="highlighter-rouge">MISO_DB_USER</code> : the MySQL database version</li>
+      <li><code class="highlighter-rouge">MISO_DB</code> : the MySQL database user</li>
+      <li><code class="highlighter-rouge">MISO_DB_PASSWORD_FILE</code> pointing to <code class="highlighter-rouge">.miso_db_password</code> for MISO_DB_USER</li>
+      <li><code class="highlighter-rouge">MISO_TAG</code> set to a <a href="https://cloud.docker.com/u/misolims/repository/docker/misolims/miso-lims-webapp/tags">specific MISO Docker container version</a>, and</li>
+      <li><code class="highlighter-rouge">SSL_PASSWORD_FILE</code> pointing to <code class="highlighter-rouge">.ssl_password</code>.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Create the following home directory before launching the docker-compose
+file for the first time, including the empty <code class="highlighter-rouge">db</code>, <code class="highlighter-rouge">files</code> and <code class="highlighter-rouge">logs</code>
+directories.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>miso-lims:/home/miso$ tree -a
+.
+├── db
+├── docker-compose.yml
+├── .env
+├── files
+├── logs
+├── .miso_db_password
+├── miso.properties
+├── nginx
+│   ├── self-sign-cert.sh
+│   └── ssl.conf
+├── sql
+│   ├── V0792__drop-inconvenient-rows.sql
+│   └── V9000__institution_custom.sql
+└── .ssl_password
+</code></pre></div></div>
+
+<p>Here is the complete compose file:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">version</span><span class="pi">:</span> <span class="s1">'</span><span class="s">3.7'</span>
+
+<span class="na">secrets</span><span class="pi">:</span>
+  <span class="na">lims_password</span><span class="pi">:</span>
+    <span class="na">file</span><span class="pi">:</span> <span class="s">${MISO_DB_PASSWORD_FILE}</span>
+  <span class="na">ssl_password</span><span class="pi">:</span>
+    <span class="na">file</span><span class="pi">:</span> <span class="s">${SSL_PASSWORD_FILE}</span>
+
+<span class="na">services</span><span class="pi">:</span>
+  <span class="na">db</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">mysql:5.7.25</span>
+    <span class="na">restart</span><span class="pi">:</span> <span class="s">always</span>
+    <span class="na">environment</span><span class="pi">:</span>
+      <span class="na">MYSQL_RANDOM_ROOT_PASSWORD</span><span class="pi">:</span> <span class="s1">'</span><span class="s">yes'</span>
+      <span class="na">MYSQL_DATABASE</span><span class="pi">:</span> <span class="s">${MISO_DB}</span>
+      <span class="na">MYSQL_USER</span><span class="pi">:</span> <span class="s">${MISO_DB_USER}</span>
+      <span class="na">MYSQL_PASSWORD_FILE</span><span class="pi">:</span> <span class="s">/run/secrets/lims_password</span>
+    <span class="na">secrets</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">lims_password</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">type</span><span class="pi">:</span> <span class="s">bind</span>
+        <span class="na">source</span><span class="pi">:</span> <span class="s2">"</span><span class="s">./db"</span>
+        <span class="na">target</span><span class="pi">:</span> <span class="s2">"</span><span class="s">/var/lib/mysql"</span>
+
+  <span class="na">flyway</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">misolims/miso-lims-migration:${MISO_TAG}</span>
+    <span class="na">command</span><span class="pi">:</span> <span class="s">migrate</span>
+    <span class="na">secrets</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">lims_password</span>
+    <span class="na">links</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">db</span>
+    <span class="na">depends_on</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">db</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">type</span><span class="pi">:</span> <span class="s">bind</span>
+        <span class="na">source</span><span class="pi">:</span> <span class="s2">"</span><span class="s">./V0792__drop-inconvenient-rows.sql"</span>
+        <span class="na">target</span><span class="pi">:</span> <span class="s2">"</span><span class="s">/flyway/sql/V0792__drop-inconvenient-rows.sql"</span>
+        <span class="na">volume</span><span class="pi">:</span>
+          <span class="na">nocopy</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="pi">-</span> <span class="na">type</span><span class="pi">:</span> <span class="s">bind</span>
+        <span class="na">source</span><span class="pi">:</span> <span class="s2">"</span><span class="s">./V9000__institution-custom.sql"</span>
+        <span class="na">target</span><span class="pi">:</span> <span class="s2">"</span><span class="s">/flyway/sql/V9000__institution-custom.sql"</span>
+        <span class="na">volume</span><span class="pi">:</span>
+           <span class="na">nocopy</span><span class="pi">:</span> <span class="no">true</span>
+
+
+  <span class="na">webapp</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">misolims/miso-lims-webapp:${MISO_TAG}</span>
+    <span class="na">restart</span><span class="pi">:</span> <span class="s">always</span>
+    <span class="na">secrets</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">lims_password</span>
+    <span class="na">links</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">db</span>
+    <span class="na">depends_on</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">db</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">type</span><span class="pi">:</span> <span class="s">bind</span>
+        <span class="na">source</span><span class="pi">:</span> <span class="s2">"</span><span class="s">./miso.properties"</span>
+        <span class="na">target</span><span class="pi">:</span> <span class="s2">"</span><span class="s">/usr/local/tomcat/conf/Catalina/localhost/miso.properties"</span>
+        <span class="na">volume</span><span class="pi">:</span>
+          <span class="na">nocopy</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="pi">-</span> <span class="na">type</span><span class="pi">:</span> <span class="s">bind</span>
+        <span class="na">source</span><span class="pi">:</span> <span class="s2">"</span><span class="s">./files"</span>
+        <span class="na">target</span><span class="pi">:</span> <span class="s2">"</span><span class="s">/storage/miso/files"</span>
+      <span class="pi">-</span> <span class="na">type</span><span class="pi">:</span> <span class="s">bind</span>
+        <span class="na">source</span><span class="pi">:</span> <span class="s2">"</span><span class="s">./logs"</span>
+        <span class="na">target</span><span class="pi">:</span> <span class="s2">"</span><span class="s">/storage/miso/log"</span>
+
+  <span class="na">nginx</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx:1.15.12-alpine</span>
+    <span class="na">restart</span><span class="pi">:</span> <span class="s">always</span>
+    <span class="na">ports</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">80:80"</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">443:443"</span>
+    <span class="na">secrets</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">ssl_password</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">type</span><span class="pi">:</span> <span class="s">bind</span>
+        <span class="na">source</span><span class="pi">:</span> <span class="s2">"</span><span class="s">./nginx/ssl.conf"</span>
+        <span class="na">target</span><span class="pi">:</span> <span class="s2">"</span><span class="s">/etc/nginx/conf.d/default.conf"</span>
+        <span class="na">volume</span><span class="pi">:</span>
+          <span class="na">nocopy</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="pi">-</span> <span class="na">type</span><span class="pi">:</span> <span class="s">bind</span>
+        <span class="na">source</span><span class="pi">:</span> <span class="s2">"</span><span class="s">./nginx/self-sign-cert.sh"</span>
+        <span class="na">target</span><span class="pi">:</span> <span class="s2">"</span><span class="s">/self-sign-cert.sh"</span>
+        <span class="na">volume</span><span class="pi">:</span>
+          <span class="na">nocopy</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">links</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">webapp</span>
+    <span class="na">depends_on</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">webapp</span>
+    <span class="na">command</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">sh"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">-c"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">./self-sign-cert.sh;</span><span class="nv"> </span><span class="s">nginx</span><span class="nv"> </span><span class="s">-g</span><span class="nv"> </span><span class="s">'daemon</span><span class="nv"> </span><span class="s">off;'"</span><span class="pi">]</span>
+</code></pre></div></div>
+
+<p>Launch the process with <code class="highlighter-rouge">docker-compose up --detach</code> to start the containers in
+the background.</p>
+
+<h1 id="troubleshooting-docker-compose-files">Troubleshooting docker-compose files</h1>
+
+<p>With docker-compose builds, the error that caused the problem is often not the
+last thing you see, but early on in the logs while one or more containers were
+starting.</p>
+
+<ol>
+  <li>
+    <p><strong>The flyway-migration container is failing with a “Schema <code class="highlighter-rouge">lims</code> contains a
+  failed migration to version 0790!” or  similar error.</strong></p>
+
+    <p>You may have a volume mounted with a MySQL database from a failed
+ migration. You have two options: remove the volume entirely or rename the
+ volume in the docker-compose file. Note that this will remove <em>all</em><br />
+ detached volumes, not just the MISO ones, and this data will be permanently
+ lost.</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="c"># compose.yml is the location of your compose file</span>
+ docker-compose <span class="nt">-f</span> compose.yml down
+ docker volume prune
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p><strong>Problem on docker-compose up:
+  “ERROR: Unable to obtain Jdbc connection from DataSource … for user
+  ‘tgaclims’: Could not connect: Access denied for user ‘tgaclims’@’172.21.0.3’
+  (using password: YES)”</strong></p>
+
+    <p>You likely changed the password for the database provided in
+ <code class="highlighter-rouge">$MISO_DB_PASS_FILE</code> since the database was started up. The simplest fix is to
+ revert the password to the previously used one. If you  want to change the
+ password on the existing database, you’ll have to log in to the MySQL container
+ (with <code class="highlighter-rouge">docker exec -it &lt;container-name&gt; mysql</code>) with the old password and
+ change the database user’s password. See the
+ <a href="https://dev.mysql.com/doc/refman/5.7/en/set-password.html">MySQL documentation</a>
+ for more information.</p>
+
+    <p>The more straightforward option is to destroy the database and rebuild it.
+ See the previous answer for how to destroy volumes, or delete the disk
+ location where the database was bound.</p>
+  </li>
+  <li>
+    <p><strong>MISO gives a 404 error on first startup with the database mounted to the
+  host’s disk, and the error says “java.sql.SQLException: Cannot create
+  PoolableConnectionFactory (Could not create connection to database server.
+  Attempted reconnect 3 times. Giving up.)… Related cause:
+  org.springframework.beans.factory.BeanCreationException: Error creating bean
+  with name ‘dataSource’: Invocation of init method failed; nested exception is
+  javax.naming.NameNotFoundException: Name [jdbc/MISODB] is not bound in this
+  Context. Unable to find [jdbc].”</strong></p>
+
+    <p>Sometimes when the database initialization process takes a considerable
+ time, the webapp doesn’t connect properly. To solve this, restart the
+ <code class="highlighter-rouge">webapp</code> container. While docker-compose is still up, run the following in
+ another terminal:</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="c"># compose.yml is the location of your compose file</span>
+ docker-compose <span class="nt">-f</span> compose.yml restart webapp
+</code></pre></div>    </div>
+
+    <p>The <code class="highlighter-rouge">webapp</code> container will restart in the original docker-compose window.</p>
+  </li>
+  <li>
+    <p><strong>You see both “/run/secrets/lims_password: Permission denied” and
+  “[Note] Access denied for user ‘tgaclims’@’192.168.144.3’ (using password:
+  YES)”</strong></p>
+
+    <p>Your <code class="highlighter-rouge">.miso_db_password</code> file permissions are too strict. The <code class="highlighter-rouge">docker</code> user
+ on the host machine needs to be able to read that file. We suggest changing
+ permissions to 440 (user and group read only) and changing the file’s group
+ to <code class="highlighter-rouge">docker</code>.</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nv">$ </span><span class="nb">ls</span> <span class="nt">-la</span> .miso_db_password
+   <span class="nt">-r--r-----</span> 1 miso-user docker 12 May  3 10:37 .miso_db_password
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p><strong>Problem on docker-compose up:
+  “ERROR: for miso-lims_webapp_1  Cannot start service webapp: OCI runtime
+  create failed: container_linux.go:344: starting container process caused
+  “process_linux.go:424: container init caused … “not a directory\""”:
+  unknown: Are you trying to mount a directory onto a file (or vice-versa)?
+  Check if the specified host path exists and is the expected type”</strong></p>
+
+    <p>For some reason, when it can’t find a file, Docker will create a directory
+ and attempt to link that in its place. Ensure that you have all of the
+ necessary files indicated in the compose file, and that they are at the
+ correct relative locations to the compose file.</p>
+  </li>
+  <li>
+    <p><strong>Problem on docker-compose up:
+  “ERROR: for docker_db…. Cannot create container for service
+  db: invalid mount config for type “bind”: bind source path does not exist:
+  …./.miso_db_password”</strong></p>
+
+    <p>Make sure that you have password file <code class="highlighter-rouge">.miso_db_password</code> exists in the
+ current working directory with the DB password.</p>
+  </li>
+  <li>
+    <p><strong>Problem on docker-compose up:
+  “ERROR: for docker_nginx_1_15442e33d660  Cannot start service nginx: driver
+  failed programming external connectivity on endpoint… Error starting
+  userland proxy: listen tcp 0.0.0.0:80: bind: address already in use”</strong></p>
+
+    <p>By default, MISO is served on port 80. If you have another web server
+running serving over http, you may be in conflict. The solution is either
+to turn off the other service or to choose an alternative port.</p>
+
+    <p>To use another port, 3000 for example, two files need to be changed: the
+docker compose file and the nginx configuration. First, the compose file:</p>
+
+    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">nginx</span><span class="pi">:</span>
+    <span class="na">ports</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">3000:3000"</span>
+</code></pre></div>    </div>
+
+    <p>And then in <a href="https://github.com/miso-lims/miso-lims/tree/develop/.docker/nginx/http.conf">nginx/http.conf</a>:</p>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>server {
+  listen 3000;
+...
+}
+</code></pre></div>    </div>
+    <p>Nginx in MISO really doesn’t like it when you use a port different from the
+one that you’ve specified. You cannot simply map port 80 in the nginx
+container to a port on your host machine. It will not work.</p>
+  </li>
+  <li>
+    <p><strong>Flyway prints “Usage ===== flyway [options] command …“</strong></p>
+
+    <p>You are likely using an older version of the miso-lims-migrate container.
+ Add <code class="highlighter-rouge">command: migrate</code> to the docker-compose command.</p>
+  </li>
+  <li>
+    <p><strong>The webapp eventually starts up but first it prints a stack trace about
+  “java.sql.SQLException: Cannot create PoolableConnectionFactory (Could not
+  create connection to database server. Attempted reconnect 3 times. Giving
+  up.)”</strong></p>
+
+    <p>All docker containers start at the same time in docker-compose, and this
+ means that the webapp and flyway start before the database is fully
+ initialized. Both services continue to re-try until the database is
+ available. This is normal startup behaviour.</p>
+  </li>
+  <li>
+    <p><strong>Flyway exits with “WARNING: DB: Trigger does not exist (SQL State: HY000 -
+  Error Code: 1360)… WARNING: DB: Unknown table ‘lims.CompletedPartitions’
+  (SQL State: 42S02 - Error Code: 1051)”</strong></p>
+
+    <p>This is normal startup behaviour. True errors in Flyway will have an error
+ that looks like this:</p>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> ERROR: Migration of schema `lims` to version 0794 - site-specific-migration failed! Please restore backups and roll back database and code!
+ ERROR:
+ Migration V0794__site-specific-migration.sql failed
+ --------------------------------------------------
+ SQL State  : 42000
+ Error Code : 1064
+ Message    : You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'DELETE FROM SampleClass WHERE alias='Slide'' at line 2
+ Location   : /flyway/sql/V0794__site-specific-migration.sql (/flyway/sql/V0794__site-specific-migration.sql)
+ Line       : 4
+ Statement  : DELETE FROM BoxUse WHERE alias='Libraries'
+ DELETE FROM SampleClass WHERE alias='Slide'
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p><strong>MISO started with no errors but the page at http://localhost/miso says
+  “Server not found” or “Proxy error”.</strong></p>
+
+    <p>First, to check if the problem with with MISO or nginx, temporarily expose
+ MISO’s port by adding the following section to <code class="highlighter-rouge">webapp</code>:</p>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> services:
+   webapp:
+       ports:
+         - "8080:8080"
+</code></pre></div>    </div>
+    <p>Navigate to http://localhost:8080 to check if MISO is running. If it is,
+ the problem is with nginx. Ensure that all three ports in the compose file
+   and <code class="highlighter-rouge">http.conf</code> file match each other.</p>
+  </li>
+</ol>
+
+
+                    </div>
+                
+            </div>
+
+            
+
+            <div class="row">
+                <div id="footer" class="col-sm-12">
+                    Documentation for <a href="https://github.com/TGAC/miso-lims">MISO</a>
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function orderNav() {
+                var list,
+                    section,
+                    header,
+                    sections = [],
+                    lists = {},
+                    headers = {};
+
+                var navUl = document.querySelectorAll('#navigation ul')[0],
+                    navLis = document.querySelectorAll('#navigation ul li');
+
+                if (!navUl) return;
+
+                for (var i = 0; i < navLis.length; i++) {
+                    var order, li = navLis[i];
+
+                    if (li.classList.contains('nav-header')) {
+                        section = li.textContent || li.innerText;
+                        sections.push(section);
+                        headers[section] = li;
+                        continue;
+                    }
+
+                    if (!lists[section]) {
+                        lists[section] = [];
+                    }
+
+                    order = parseFloat(li.getAttribute('data-order'))
+                    lists[section].push([order, li]);
+                }
+
+                for (var i = 0; i < sections.length; i++) {
+                    section = sections[i];
+                    list = lists[section].sort(function(a, b) {
+                        return a[0] - b[0];
+                    });
+
+                    if (header = headers[section]) {
+                        navUl.appendChild(header);
+                    }
+                    for (var j = 0; j < list.length; j++) {
+                        navUl.appendChild(list[j][1]);
+                    }
+                }
+            }
+
+            if (document.querySelectorAll) orderNav();
+        </script>
+        
+    </body>
+</html>

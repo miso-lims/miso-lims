@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <title>MISO : Kit Tracking</title>
+        <meta name="description" content="An open-source LIMS for NGS sequencing centres">
+
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/main.css">
+				<link rel="icon" href="/miso-lims/0.2.x/favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+<a href="https://github.com/miso-lims/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+        <div class="container">
+            <div class="row">
+                <div id="header" class="col-sm-12">
+                    <h2><a class="brand" href="/miso-lims/0.2.x/"><img src="/miso-lims/0.2.x/images/MISO.png" alt="MISO's logo, a bowl of miso soup"/>MISO</a>
+    <small>An open-source LIMS for NGS sequencing centres</small>
+</h2>
+
+                </div>
+            </div>
+
+            <div class="row">
+                
+                
+                    <div id="navigation" class="col-sm-2">
+                        <ul class="nav nav-list">
+    <!--<li><a href="/miso-lims/0.2.x/">Home</a></li>-->
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">User Guides</li>
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/usr/user-manual-table-of-contents.html">User Manual</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Admin Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/baremetal-installation-guide.html">Installing MISO on baremetal</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/compose-installation-guide.html">Installing MISO with docker-compose</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/admin-guide.html">Administrator's Manual</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/adm/installation-guide.html">Building and Deploying</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Developer Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/rest-testing.html">REST Testing</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/maven-artifacts.html">Maven artifacts</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/code-style.html">Code Style</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/dev/developers-manual.html">Developer's Manual</a></li>
+        
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+    
+<!-- List additional links. It is recommended to add a divider
+    e.g. <li class="divider"></li> first to break up the content. -->
+</ul>
+
+                    </div>
+
+                    <div id="content" class="col-sm-10">
+                        <div class="page-header">
+    <h2>Kit Tracking
+        
+    </h2>
+</div>
+
+<p>A Kit Component in MISO represents the unique physical box (component) that is part of the kit package.</p>
+
+<p>Each Kit Component has a unique identification barcode that can be found on the packaging along with the internal id number. The stock management system keeps track of current location of kits, their expiry dates and their overall status (exhausted or still good to use). Each Kit Component also stores a lot number and date of receipt. Once the kit component is logged into the system it can be exhausted and its location can be changed. All of these actions are also recorded and stored in a separate table that can be viewed from the ‘Kit Components Change Log’ page.</p>
+
+<h2 id="create-kit-descriptor-admin">Create Kit Descriptor (ADMIN)</h2>
+
+<h3 id="overview">Overview</h3>
+
+<p>Creating Kit Descriptor enables user to create Kit Descriptor along with its Kit Component Descriptors. This serves as a blueprint for each actual instance of Kit Components.</p>
+
+<h4 id="kit-descriptor">Kit Descriptor</h4>
+
+<p>Kit Descriptor is the top level of abstraction for the kits. e.g. <strong>MiSeq Reagent Kit v3</strong> Box 2 of 2. The information stored in a Kit Descriptor is shared across all descendant Component Descriptors and actual Component instances. Each Kit Descriptor has its own unique internal identification number and stores following information:</p>
+
+<ul>
+  <li>
+    <ul>
+      <li><strong>name</strong>
+        <ul>
+          <li>e.g. <em>MiSeq Reagent Kit v2 (500 Cycle)</em></li>
+        </ul>
+      </li>
+      <li><strong>version</strong>
+        <ul>
+          <li>e.g. <em>2</em></li>
+        </ul>
+      </li>
+      <li><strong>manufacturer</strong></li>
+      <li>
+        <ul>
+          <li>e.g. <em>Illumina</em></li>
+        </ul>
+      </li>
+      <li><strong>part number</strong>
+        <ul>
+          <li>e.g. <em>MS-102-2003</em></li>
+        </ul>
+      </li>
+      <li><strong>kit type</strong>
+        <ul>
+          <li>e.g. <em>Sequencing</em></li>
+        </ul>
+      </li>
+      <li><strong>platform type</strong>
+        <ul>
+          <li>e.g. <em>MiSeq</em></li>
+        </ul>
+      </li>
+      <li><strong>units</strong>
+        <ul>
+          <li>e.g. <em>each</em></li>
+        </ul>
+      </li>
+      <li><strong>kit value</strong>
+        <ul>
+          <li>e.g. <em>345.45</em></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="kit-component-descriptor">Kit Component Descriptor</h4>
+
+<p>Kit Component Descriptor is the next level of abstraction for the kits e.g. MiSeq Reagent Kit v3 <strong>Box 2 of 2</strong>. Each Kit Component Descriptor is linked to their parent Kit Descriptor. Kit Component Descriptor</p>
+
+<p>has its own unique internal identification number and stores the following information:</p>
+
+<ul>
+  <li>
+    <ul>
+      <li><strong>name</strong></li>
+      <li>
+        <ul>
+          <li>e.g. <em>Box 1 of __2</em></li>
+        </ul>
+      </li>
+      <li><strong>reference number</strong>
+        <ul>
+          <li>e.g. <em>122415356</em></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="manual">Manual</h3>
+
+<ol>
+  <li>
+    <p>Clicking on ‘Create a Kit Descriptor’ link takes the user to a form which needs to be filled in. The form consists of all the information required for the new Kit Descriptor instance which is: name, version, manufacturer, part number, units, value, type, platform.<br />
+<img src="/miso-lims/0.2.x/images/newdescriptor.png" alt="New kit" /></p>
+  </li>
+  <li>After filling out all the fields the user can proceed to add Component Descriptors to the newly created Kit Descriptor</li>
+  <li>
+    <p>The ‘Add a new Component’ form requires the user fill in name and reference number of a Kit Component Descriptor. There can be multiple Kit Component Descriptors linked to one Kit Descriptor.<br />
+<img src="/miso-lims/0.2.x/images/newkitcomponentdescriptor.png" alt="New kit component" /></p>
+
+    <ac:image ac:height="400" ac:style="margin-left: 2.0px;"></ac:image>
+  </li>
+  <li>Once all the Kit Component Descriptors have been added the user must save their actions by clicking on ‘Save and return to Home’ button</li>
+</ol>
+
+<h2 id="kit-descriptor-management-admin">Kit Descriptor Management (ADMIN)</h2>
+
+<h3 id="overview-1">Overview</h3>
+
+<p>Kit Descriptor Management provides functionality to see all the Kit Descriptors (along with their Kit Component Descriptors) available in the system. Additionally, in the Component Descriptors table there is a field showing the current stock levels of Kit Components that use this specific Kit Component Descriptor.</p>
+
+<h3 id="manual-1">Manual</h3>
+
+<ol>
+  <li>Clicking on ‘Kit Descriptor Management’ link takes the user to a page with a drop down list populated with all the available Kit Descriptors.</li>
+  <li>After choosing a Kit Descriptor from the list, the expanded overview of this Kit Descriptor details will be displayed. This Kit Descriptor’s Component Descriptors are presented in a sortable and searchable table. The stock level field shows the current quantity of Kit Components that use this specifiic Kit Component Descriptor</li>
+</ol>
+
+<p><img src="/miso-lims/0.2.x/images/kitdescmanagement.png" alt="Kit management" /></p>
+
+<h2 id="kit-components-change-log-admin">Kit Components Change Log (ADMIN)</h2>
+
+<h3 id="overview-2">Overview</h3>
+
+<p>Every time a Kit Component is logged, exhausted or moved to a new location the action along with the date and user id is recorded in the database. These logs are presented on the ‘Kit Components Change Log’ page in the form of a searchable and sortable table featuring following columns:</p>
+
+<ul>
+  <li>User ID</li>
+  <li>Kit Component ID</li>
+  <li>Exhausted</li>
+  <li>Location Barcode Before Change</li>
+  <li>Location Barcoded After Change</li>
+  <li>Date of Change</li>
+</ul>
+
+<p>The table is by default sorted by date of change descending.</p>
+
+<h3 id="manual-2">Manual</h3>
+
+<ol>
+  <li>Clicking on ‘Kit Components Change Log’ link takes the user to page with a change log table.</li>
+</ol>
+
+<p><img src="/miso-lims/0.2.x/images/changelog.png" alt="Change logs" /></p>
+
+<h2 id="log-kit-component">Log Kit Component</h2>
+
+<h3 id="overview-3">Overview</h3>
+
+<p>Kit Component is the representation of the actual physical box. It is based on the blueprints provided by Kit Descriptor + Kit Component Descriptor. Kit Component has its own internal unique identification number along with the identification barcode which is printed on the box. Kit Component references Kit Component Descriptor and stores the following information which are unique to each instance:</p>
+
+<ul>
+  <li>
+    <ul>
+      <li><strong>identification barcode</strong>
+        <ul>
+          <li>e.g. <em>RGT02932809</em></li>
+        </ul>
+      </li>
+      <li>l<strong>ocation barcode</strong>
+        <ul>
+          <li>e.g. <em>FRIDGEG03</em></li>
+        </ul>
+      </li>
+      <li><strong>lot number</strong>
+        <ul>
+          <li>e.g. <em>1213094</em></li>
+        </ul>
+      </li>
+      <li><strong>received date</strong>
+        <ul>
+          <li>e.g. <em>09/09/2015</em></li>
+        </ul>
+      </li>
+      <li><strong>expiry date</strong>
+        <ul>
+          <li>e.g. <em>20/03/2016</em></li>
+        </ul>
+      </li>
+      <li><strong>exhausted</strong>
+        <ul>
+          <li>e.g. <em>FALSE</em></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<p>Log Kit Component is a page that enables the user to start a logging session and log the Kit Components into the system. The logging session specifies the target location for the currently scanned Kit Components. All the Kit Components scanned within one logging session will have the same location.</p>
+
+<h3 id="manual-3">Manual</h3>
+
+<ol>
+  <li>
+    <p>Clicking on ‘Log a Kit Component’ link takes the user to a page where they have to scan the location barcode in order to start the logging session. Pressing Enter(Return) takes the user to the next page.<br />
+<img src="/miso-lims/0.2.x/images/log_location.png" alt="Set location" /></p>
+  </li>
+  <li>
+    <p>The next page requires the user to fill in the form by scanning the barcodes on the physical box and entering the expiry date. (tip: press TAB after each barcode to focus on the next field). Once all the info is filled out the user can ‘Add the component’ to the session.<br />
+<img src="/miso-lims/0.2.x/images/log_add.png" alt="Set location" /></p>
+  </li>
+  <li>There is an option to remove the entry from the list. By selecting the entry from the table and clicking “Remove selected entry” the component will be removed from the logging session.</li>
+  <li>The table is searchable and sortable to help with checking the list against the packaging slip.</li>
+  <li>Once the user has added all the components they can save the session by clicking the ‘Save logging session button’.</li>
+  <li>The Overview window will pop up. Confirming the logging session saves the components into the database.<br />
+<img src="/miso-lims/0.2.x/images/log_confirm.png" alt="Confirmation" /></li>
+</ol>
+
+<h2 id="kit-component-management">Kit Component Management</h2>
+
+<h3 id="overview-4">Overview</h3>
+
+<p>This page provides functionality to get information about a specific Kit Component (including its Change Log) and also change location and/or exhaust it. (Provided the kit has not been exhausted before</p>
+
+<h3 id="manual-4">Manual</h3>
+
+<ol>
+  <li>Clicking on ‘Kit Component Management’ link takes the user to a page where they have to scan the identification barcode of the Kit Component.<br />
+<img src="/miso-lims/0.2.x/images/component_manage.png" alt="Kit Component Management" /></li>
+  <li>On success - the user will see the detailed overview page showing all the information about the Kit Component along with its Change Log</li>
+  <li>The user can choose from two actions - Exhaust or Change Location. This actions are restricted for the Kit Components that have already been exhausted before.</li>
+  <li>With Exhaust the user has the option to add a change of location. By default exhaustion means the Kit Component has been used up but there are cases where one would want to mark the Kit Component as exhausted and move it somewhere else. Choosing this option requires user to scan the barcode of the new location.</li>
+  <li>With Change Location the only thing that changes it the location. The user is required to scan the barcode of the new location<br />
+<img src="/miso-lims/0.2.x/images/component_manage_final.png" alt="Set location" /></li>
+</ol>
+
+<h2 id="list-kit-components">List Kit Components</h2>
+
+<h3 id="overview-5">Overview</h3>
+
+<p>This page provides functionality to view all the Kit Components that have been logged into the database. The information is presented in the form of a responsive, searchable and sortable table. By default the table shows only the Kit Components that are not exhausted. The user can modify what is displayed in the table and how the table is sorted by accessing the Visibility Options.</p>
+
+<h3 id="manual-5">Manual</h3>
+
+<ol>
+  <li>Clicking on ‘List Kit Components’ link takes the user to a page where they can view all the Kit Components in the system.</li>
+  <li>The user can sort and filter the table by columns</li>
+  <li>By pressing the ‘Toggle Visibility Options’ button the user get access to visibility options
+    <ol>
+      <li>Exhausted (Show/Hide) - toggles visibility for exhausted Kit Components. By default they are not visible in the table.</li>
+      <li>Show only:
+        <ol>
+          <li>Expired - filters the table to only show the Kit Components that are past their expiration date</li>
+          <li>Soon to expire - filters the table to only show the Kit Components whose expiration date is within 30 days from current date.</li>
+        </ol>
+      </li>
+      <li>Search by Id - filters the table to only show the Kit Components of this ID</li>
+      <li>Show additional fields - checking the boxes will expand the table to show more information. Unchecking a box has the opposite effect
+<img src="/miso-lims/0.2.x/images/listKits.png" alt="Kit Component Management" /></li>
+    </ol>
+  </li>
+</ol>
+
+
+                    </div>
+                
+            </div>
+
+            
+
+            <div class="row">
+                <div id="footer" class="col-sm-12">
+                    Documentation for <a href="https://github.com/TGAC/miso-lims">MISO</a>
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function orderNav() {
+                var list,
+                    section,
+                    header,
+                    sections = [],
+                    lists = {},
+                    headers = {};
+
+                var navUl = document.querySelectorAll('#navigation ul')[0],
+                    navLis = document.querySelectorAll('#navigation ul li');
+
+                if (!navUl) return;
+
+                for (var i = 0; i < navLis.length; i++) {
+                    var order, li = navLis[i];
+
+                    if (li.classList.contains('nav-header')) {
+                        section = li.textContent || li.innerText;
+                        sections.push(section);
+                        headers[section] = li;
+                        continue;
+                    }
+
+                    if (!lists[section]) {
+                        lists[section] = [];
+                    }
+
+                    order = parseFloat(li.getAttribute('data-order'))
+                    lists[section].push([order, li]);
+                }
+
+                for (var i = 0; i < sections.length; i++) {
+                    section = sections[i];
+                    list = lists[section].sort(function(a, b) {
+                        return a[0] - b[0];
+                    });
+
+                    if (header = headers[section]) {
+                        navUl.appendChild(header);
+                    }
+                    for (var j = 0; j < list.length; j++) {
+                        navUl.appendChild(list[j][1]);
+                    }
+                }
+            }
+
+            if (document.querySelectorAll) orderNav();
+        </script>
+        
+    </body>
+</html>

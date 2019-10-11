@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <title>MISO : 9. Library Aliquots</title>
+        <meta name="description" content="An open-source LIMS for NGS sequencing centres">
+
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/main.css">
+				<link rel="icon" href="/miso-lims/0.2.x/favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+<a href="https://github.com/miso-lims/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+        <div class="container">
+            <div class="row">
+                <div id="header" class="col-sm-12">
+                    <h2><a class="brand" href="/miso-lims/0.2.x/"><img src="/miso-lims/0.2.x/images/MISO.png" alt="MISO's logo, a bowl of miso soup"/>MISO</a>
+    <small>An open-source LIMS for NGS sequencing centres</small>
+</h2>
+
+                </div>
+            </div>
+
+            <div class="row">
+                
+                
+                    <div id="navigation" class="col-sm-2">
+                        <ul class="nav nav-list">
+    <!--<li><a href="/miso-lims/0.2.x/">Home</a></li>-->
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">User Guides</li>
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/usr/user-manual-table-of-contents.html">User Manual</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Admin Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/baremetal-installation-guide.html">Installing MISO on baremetal</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/compose-installation-guide.html">Installing MISO with docker-compose</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/admin-guide.html">Administrator's Manual</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/adm/installation-guide.html">Building and Deploying</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Developer Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/rest-testing.html">REST Testing</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/maven-artifacts.html">Maven artifacts</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/code-style.html">Code Style</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/dev/developers-manual.html">Developer's Manual</a></li>
+        
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+    
+<!-- List additional links. It is recommended to add a divider
+    e.g. <li class="divider"></li> first to break up the content. -->
+</ul>
+
+                    </div>
+
+                    <div id="content" class="col-sm-10">
+                        <div class="page-header">
+    <h2>9. Library Aliquots
+        
+    </h2>
+</div>
+
+<p>A library aliquot is a portion of library, or an entire library, which may or may not have been diluted in preparation
+for pooling or adding to a sequencing container. Only library aliquots can be added to pools in MISO, and only pools
+can be added to sequencing containers. This means that you will need to create a library aliquot in MISO even if the
+library is being pooled as is, or if it is being added directly to a sequencing container.</p>
+
+<p><a name="library_aliquots_list"></a></p>
+<h2 id="91-library-aliquots-list">9.1. Library ALiquots List</h2>
+
+<p>To get to the main Library Aliquots list page, click “Library Aliquots” in the Preparation list in the menu on the left
+side of the screen. This list includes all library aliquots from all projects in MISO. The toolbar at the top of the
+table includes many controls for working with library aliquots.</p>
+
+<p>You can find a similar list in the Library Aliquots section of the Edit Project page. The list on the Edit Project page
+only includes the library aliquots belonging to the project being viewed/edited. This list has the same controls as on
+the main Library Aliquots list page.</p>
+
+<p>Clicking on a library aliquot’s name will take you to the Edit Library Aliquot page. Clicking on a library name or
+alias will take you to the Edit Library page.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="propagating_library_aliquots_from_libraries"></a></p>
+<h2 id="92-propagating-library-aliquots-from-libraries">9.2. Propagating Library Aliquots from Libraries</h2>
+
+<p>To make library aliquots from libraries, go to the Libraries list, check the checkboxes next to the libraries you wish
+to propagate from, then click the “Make aliquots” button in the toolbar at the top of the table. A dialog will appear
+and give you the option to create a box for these new library aliquots. See <a href="boxes.html#creating_boxes">Creating Boxes</a>
+in the box section more more information on this feature. When you are done in the dialog, click the “Create” button to
+proceed.</p>
+
+<p>This will take you to the bulk Create Library Aliquots from Libraries page. Enter all of the aliquot information and
+then click the “Save” button at the top right of the screen when you are done. For additional information regarding
+some of the fields in the table, check the Quick Help section near the top of the screen. If any of the library
+aliquots fail to save, a message will be displayed at the top of the screen explaining the problem(s). You can then
+make the appropriate adjustments and click the “Save” button to try again.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="propagating_library_aliquots_from_library_aliquots"></a></p>
+<h2 id="93-propagating-library-aliquots-from-library-aliquots">9.3. Propagating Library Aliquots from Library Aliquots</h2>
+
+<p>Making library aliquots from library aliquots works exactly like making them from libraries except that you start by
+selecting library aliquots to propagate from on the Library Aliquots list and clicking the “Propagate” button at the
+top of the table.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="editing_library_aliquots"></a></p>
+<h2 id="94-editing-library-aliquots">9.4. Editing Library Aliquots</h2>
+
+<p>Library aliquots can be edited individually or in bulk. Bulk editing is convenient when you have several library
+aliquots to modify at once. Editing individual library aliquots is sometimes preferable because it provides a few
+additional options, and allows you to see a more detailed view of the library aliquot.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="editing_a_single_library_aliquot"></a></p>
+<h3 id="941-editing-a-single-library-aliquot">9.4.1. Editing a Single Library Aliquot</h3>
+
+<p>To get to the single Edit Library Aliquot page, click on the aliquot’s name in the Library Aliquots list. Links to the
+Edit Library Aliquot page also appear on the Edit Pool page in the Included and Available Library Aliquots lists.</p>
+
+<p>The Library Aliquot Information section of the Edit Library Aliquot page contains a list of fields, most of which may
+be modified. You can make any changes you would like and then click the “Save” button at the top right to confirm the
+changes.</p>
+
+<p>Other sections below list the pools that the library aliquot has been added to, the runs that those pools have been
+loaded into, and the aliquot’s change log.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="editing_library_aliquots_in_bulk"></a></p>
+<h3 id="942-editing-library-aliquots-in-bulk">9.4.2. Editing Library Aliquots in Bulk</h3>
+
+<p>To get to the bulk Edit Library Aliquots page, go to the Library Aliquots list, check the checkboxes beside the
+aliquots you wish to modify, then click the “Edit” button in the toolbar at the top of the table.</p>
+
+<p>The bulk Edit Library Aliquots page works similarly to the bulk Create Library Aliquots from Libraries page. You can
+make the changes you would like, then click the “Save” button at the top right to confirm. If there are any problems
+with the data you’ve entered, the error messages will be displayed at the top of the screen and you can adjust as
+necessary before clicking “Save” again.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="pooling_library_aliquots_together"></a></p>
+<h2 id="95-pooling-library-aliquots-together">9.5. Pooling Library Aliquots Together</h2>
+
+<p>To create a single new pool containing one or several library aliquots, go to the Library Aliquots list, select the
+aliquots that you would like to include in the pool, and click the “Pool together” button in the toolbar at the top of
+the table. Further details of this process will be discussed in
+<a href="pools.html#creating_pools_from_library_aliquots">Creating Pools from Library Aliquots</a>.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="pooling_library_aliquots_separately"></a></p>
+<h2 id="96-pooling-library-aliquots-separately">9.6. Pooling Library Aliquots Separately</h2>
+
+<p>To create multiple new pools, each containing a single library aliquot, go to the Library Aliquots list, select the
+aliquots that you would like to create pools for, and click the “Pool separately” button in the toolbar at the top of
+the table. Further details of this process will be discussed in
+<a href="pools.html#creating_pools_from_library_aliquots">Creating Pools from Library Aliquots</a>.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="custom_pooling_in_bulk"></a></p>
+<h2 id="97-custom-pooling-in-bulk">9.7. Custom Pooling in Bulk</h2>
+
+<p>To create multiple new pools, each containing a variable number of library aliquots, go to the Library Aliquots list,
+select all of the aliquots that you would like to include in any of the pools, and click the “Pool custom” button in
+the toolbar at the top of the table. Further details of this process will be discussed in
+<a href="pools.html#creating_pools_from_library_aliquots">Creating Pools from Library Aliquots</a>.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="printing_barcodes"></a></p>
+<h2 id="98-printing-barcodes">9.8. Printing Barcodes</h2>
+
+<p>Barcode labels can be printed for a series of library aliquots from the Library Aliquots list. See the
+<a href="barcode_label_printers.html#printing_barcodes">Barcode Label Printers section - Printing Barcodes</a> for details on how
+to do this.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="downloading_library_aliquot_information"></a></p>
+<h2 id="99-downloading-library-aliquot-information">9.9. Downloading Library Aliquot Information</h2>
+
+<p>It is sometimes useful to have library aliquot information in spreadsheet form for use outside of MISO. To download
+library aliquot data, go to the Library Aliquots list, check the checkboxes next to the aliquots that you would like to
+export, and click the “Download” button in the toolbar at the top of the table. A dialog will appear in which you can
+choose the type and format of the spreadsheet before downloading. Different spreadsheet types include different
+columns. Feel free to try out the different types to see which ones will be useful to you. MISO supports exporting
+spreadsheets in Microsoft Excel (xlsx), Open Document (odt), and comma-delimited (csv) formats.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="selecting_library_aliquots_by_search"></a></p>
+<h2 id="910-selecting-library-aliquots-by-search">9.10. Selecting Library Aliquots by Search</h2>
+
+<p>If you have a list of library aliquot names or barcodes, or library names, aliases, or barcodes, you can use this list
+to select and act upon the aliquots instead of having to search for and select them manually. For more information on
+this feature, see the <a href="general_navigation.html#selecting_by_search">General Navigation section - Selecting by Search</a>.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="finding_related_items"></a></p>
+<h2 id="911-finding-related-items">9.11. Finding Related Items</h2>
+
+<p>You can find items related to selected library aliquots using the “Parents” and “Children” buttons in the toolbar at
+the top of the Library Aliquots list. For more information on this feature, see the
+<a href="general_navigation.html#finding_related_items">General Navigation section - Finding Related Items</a>.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="adding_library_aliquots_to_a_workset"></a></p>
+<h2 id="912-adding-library-aliquots-to-a-workset">9.12. Adding Library Aliquots to a Workset</h2>
+
+<p>It can sometimes be difficult to find and select a group of library aliquots that you want to work with. To make this
+easier, you can create a workset that includes all of the aliquots that you want grouped together. For more information
+on this feature, see the <a href="worksets.html">Worksets section</a>.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="deleting_library_aliquots"></a></p>
+<h2 id="913-deleting-library-aliquots">9.13. Deleting Library Aliquots</h2>
+
+<p>To delete library aliquots, go to the Library Aliquots list, check the checkboxes next to the aliquots that you wish to
+delete, and click the “Delete” button in the toolbar at the top of the table. A library aliquot can only be deleted if
+it has not been added to any pools. If the aliquot has been added to any pools, either these pools must be deleted, or
+the aliquot must be removed from them before the aliquot can be deleted. An aliquot can only be deleted by its creator
+or a MISO administrator.</p>
+
+<p><a href="#">Return to top</a></p>
+
+
+
+                    </div>
+                
+            </div>
+
+            
+
+            <div class="row">
+                <div id="footer" class="col-sm-12">
+                    Documentation for <a href="https://github.com/TGAC/miso-lims">MISO</a>
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function orderNav() {
+                var list,
+                    section,
+                    header,
+                    sections = [],
+                    lists = {},
+                    headers = {};
+
+                var navUl = document.querySelectorAll('#navigation ul')[0],
+                    navLis = document.querySelectorAll('#navigation ul li');
+
+                if (!navUl) return;
+
+                for (var i = 0; i < navLis.length; i++) {
+                    var order, li = navLis[i];
+
+                    if (li.classList.contains('nav-header')) {
+                        section = li.textContent || li.innerText;
+                        sections.push(section);
+                        headers[section] = li;
+                        continue;
+                    }
+
+                    if (!lists[section]) {
+                        lists[section] = [];
+                    }
+
+                    order = parseFloat(li.getAttribute('data-order'))
+                    lists[section].push([order, li]);
+                }
+
+                for (var i = 0; i < sections.length; i++) {
+                    section = sections[i];
+                    list = lists[section].sort(function(a, b) {
+                        return a[0] - b[0];
+                    });
+
+                    if (header = headers[section]) {
+                        navUl.appendChild(header);
+                    }
+                    for (var j = 0; j < list.length; j++) {
+                        navUl.appendChild(list[j][1]);
+                    }
+                }
+            }
+
+            if (document.querySelectorAll) orderNav();
+        </script>
+        
+    </body>
+</html>

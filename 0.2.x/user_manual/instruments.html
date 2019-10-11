@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <title>MISO : 17. Instruments</title>
+        <meta name="description" content="An open-source LIMS for NGS sequencing centres">
+
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/main.css">
+				<link rel="icon" href="/miso-lims/0.2.x/favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+<a href="https://github.com/miso-lims/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+        <div class="container">
+            <div class="row">
+                <div id="header" class="col-sm-12">
+                    <h2><a class="brand" href="/miso-lims/0.2.x/"><img src="/miso-lims/0.2.x/images/MISO.png" alt="MISO's logo, a bowl of miso soup"/>MISO</a>
+    <small>An open-source LIMS for NGS sequencing centres</small>
+</h2>
+
+                </div>
+            </div>
+
+            <div class="row">
+                
+                
+                    <div id="navigation" class="col-sm-2">
+                        <ul class="nav nav-list">
+    <!--<li><a href="/miso-lims/0.2.x/">Home</a></li>-->
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">User Guides</li>
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/usr/user-manual-table-of-contents.html">User Manual</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Admin Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/baremetal-installation-guide.html">Installing MISO on baremetal</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/compose-installation-guide.html">Installing MISO with docker-compose</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/admin-guide.html">Administrator's Manual</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/adm/installation-guide.html">Building and Deploying</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Developer Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/rest-testing.html">REST Testing</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/maven-artifacts.html">Maven artifacts</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/code-style.html">Code Style</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/dev/developers-manual.html">Developer's Manual</a></li>
+        
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+    
+<!-- List additional links. It is recommended to add a divider
+    e.g. <li class="divider"></li> first to break up the content. -->
+</ul>
+
+                    </div>
+
+                    <div id="content" class="col-sm-10">
+                        <div class="page-header">
+    <h2>17. Instruments
+        
+    </h2>
+</div>
+
+<p>Instruments in MISO may include sequencers and array scanners, which are used for sequencing runs and array runs
+respectively. They may also include other instruments that you wish to track in MISO. Service records can be added to
+describe ongoing issues or work that has been performed on the instrument.</p>
+
+<p><a name="instruments_list"></a></p>
+<h2 id="171-instruments-list">17.1. Instruments List</h2>
+
+<p>To get to the Instruments list page, click “Instruments” in the Instrument Runs list in the menu on the left side of
+the screen. The list is divided into tabs for the different instrument types - Sequencer, Array Scanner, and Other. The
+toolbar at the top of the table contains a control for adding new instruments.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="creating_an_instrument"></a></p>
+<h2 id="172-creating-an-instrument">17.2. Creating an Instrument</h2>
+
+<p>Click the “Add” button in the toolbar at the top of the Instruments list to add a new instrument to MISO. This will
+take you to the Create Instrument page, where you can fill out the instrument details. Click the Save button at the top
+right when you are done to save the instrument and go to the Edit Instrument page.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="editing_an_instrument"></a></p>
+<h2 id="173-editing-an-instrument">17.3. Editing an Instrument</h2>
+
+<p>To get to the Edit Instrument page, click the instrument name on the Instruments list. The top section of the page
+contains a list of fields, most of which may be modified. You can make any changes you would like and then click the
+“Save” button at the top right to confirm the changes.</p>
+
+<p>Below, there is a section for Service Records, which are discussed in other parts of this section of the user manual.
+If the instrument is a sequencer, there is also a list of all the runs that have been run on it.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="upgrading_an_instrument"></a></p>
+<h2 id="174-upgrading-an-instrument">17.4. Upgrading an Instrument</h2>
+
+<p>Sometimes, an instrument’s name changes due to an update to its software or configuration. If this happens, it may be
+required to create two instruments in MISO to accurately represent the different names. This will be especially
+important if you are using Run Scanner and it is reporting some runs under the old name and some under the new name.
+You can link these instruments to record this better.</p>
+
+<p>First, create a new instrument using the new name. Next, go to the Edit Instrument page for the instrument with the old
+name. For “Status,” choose “Upgraded.” In the “Decommissioned” field, record the date that the name was changed, and in
+the Upgraded To dropdown, choose the instrument with the new name. Click the “Save” button at the top right to save
+your changes. Once an instrument is upgraded, the old one will no longer appear in the Sequencer Status widget, or in
+the options list when creating new runs.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="retiring_an_instrument"></a></p>
+<h2 id="175-retiring-an-instrument">17.5. Retiring an Instrument</h2>
+
+<p>Instruments that are no longer being used should be marked as retired. To do this, go to the Edit Instrument page. For
+“Status,” choose “Retired,” and enter the “Decommissioned” date. Click the “Save” button at the top right to save your
+changes. Once an instrument is retired, it will no longer appear in the Sequencer Status widget, or in the options list
+when creating new runs.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="service_records"></a></p>
+<h2 id="176-service-records">17.6. Service Records</h2>
+
+<p>Service Records can describe issues with an instrument and/or work that has been performed on it. They may specify an
+issue start time and end time, and whether the instrument is out of service during this time period.</p>
+
+<p>To see the Service Records list for an instrument, expand the Service Records section on the Edit Intrument page.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="adding_a_service_record"></a></p>
+<h3 id="1761-adding-a-service-record">17.6.1. Adding a Service Record</h3>
+
+<p>Click the “Add” button in the toolbar at the top of the Service Records list to open the Create Service Record page.
+Here, you can enter all of the service record information and then click the “Save” button at the top right to save the
+service record. After saving, you will be taken to the single Edit Service Record page, where you can attach files and
+further modify the service record.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="editing_a_service_record"></a></p>
+<h3 id="1762-editing-a-service-record">17.6.2. Editing a Service Record</h3>
+
+<p>To get to the Edit Service Record page, click the record’s title in the Service Records list. This page works similarly
+to the Create Service Record page, with the addition of being able to attach and delete files.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="attachments"></a></p>
+<h3 id="1763-attachments">17.6.3. Attachments</h3>
+
+<p>You can attach any type and number of files to a service record in MISO. This feature might be used to attach a PDF
+record provided by an external technician who worked on the instrument. For more information, see the
+<a href="attachments.html">Attachments section</a>.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="deleting_a_service_record"></a></p>
+<h3 id="1764-deleting-a-service-record">17.6.4. Deleting a Service Record</h3>
+
+<p>To delete service records, first select the records that you wish to delete on the Service Records list, then click the
+“Delete” button in the toolbar at the top of the table. Service records can only be deleted by MISO administrators.</p>
+
+<p><a href="#">Return to top</a></p>
+
+
+
+                    </div>
+                
+            </div>
+
+            
+
+            <div class="row">
+                <div id="footer" class="col-sm-12">
+                    Documentation for <a href="https://github.com/TGAC/miso-lims">MISO</a>
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function orderNav() {
+                var list,
+                    section,
+                    header,
+                    sections = [],
+                    lists = {},
+                    headers = {};
+
+                var navUl = document.querySelectorAll('#navigation ul')[0],
+                    navLis = document.querySelectorAll('#navigation ul li');
+
+                if (!navUl) return;
+
+                for (var i = 0; i < navLis.length; i++) {
+                    var order, li = navLis[i];
+
+                    if (li.classList.contains('nav-header')) {
+                        section = li.textContent || li.innerText;
+                        sections.push(section);
+                        headers[section] = li;
+                        continue;
+                    }
+
+                    if (!lists[section]) {
+                        lists[section] = [];
+                    }
+
+                    order = parseFloat(li.getAttribute('data-order'))
+                    lists[section].push([order, li]);
+                }
+
+                for (var i = 0; i < sections.length; i++) {
+                    section = sections[i];
+                    list = lists[section].sort(function(a, b) {
+                        return a[0] - b[0];
+                    });
+
+                    if (header = headers[section]) {
+                        navUl.appendChild(header);
+                    }
+                    for (var j = 0; j < list.length; j++) {
+                        navUl.appendChild(list[j][1]);
+                    }
+                }
+            }
+
+            if (document.querySelectorAll) orderNav();
+        </script>
+        
+    </body>
+</html>

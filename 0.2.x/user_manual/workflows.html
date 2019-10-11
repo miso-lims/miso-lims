@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <title>MISO : 25. Workflows</title>
+        <meta name="description" content="An open-source LIMS for NGS sequencing centres">
+
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/main.css">
+				<link rel="icon" href="/miso-lims/0.2.x/favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+<a href="https://github.com/miso-lims/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+        <div class="container">
+            <div class="row">
+                <div id="header" class="col-sm-12">
+                    <h2><a class="brand" href="/miso-lims/0.2.x/"><img src="/miso-lims/0.2.x/images/MISO.png" alt="MISO's logo, a bowl of miso soup"/>MISO</a>
+    <small>An open-source LIMS for NGS sequencing centres</small>
+</h2>
+
+                </div>
+            </div>
+
+            <div class="row">
+                
+                
+                    <div id="navigation" class="col-sm-2">
+                        <ul class="nav nav-list">
+    <!--<li><a href="/miso-lims/0.2.x/">Home</a></li>-->
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">User Guides</li>
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/usr/user-manual-table-of-contents.html">User Manual</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Admin Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/baremetal-installation-guide.html">Installing MISO on baremetal</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/compose-installation-guide.html">Installing MISO with docker-compose</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/admin-guide.html">Administrator's Manual</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/adm/installation-guide.html">Building and Deploying</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Developer Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/rest-testing.html">REST Testing</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/maven-artifacts.html">Maven artifacts</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/code-style.html">Code Style</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/dev/developers-manual.html">Developer's Manual</a></li>
+        
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+    
+<!-- List additional links. It is recommended to add a divider
+    e.g. <li class="divider"></li> first to break up the content. -->
+</ul>
+
+                    </div>
+
+                    <div id="content" class="col-sm-10">
+                        <div class="page-header">
+    <h2>25. Workflows
+        
+    </h2>
+</div>
+
+<p>Workflows are series of pre-defined steps that transition one or more items from a defined starting status to
+a defined end status. They represent a series of steps which would be completed in the lab in order to do some
+amount of work. They are designed to simplify input by allowing for barcode scanning wherever possible.</p>
+
+<p><a name="workflows_widget"></a></p>
+<h2 id="251-workflows-widget">25.1. Workflows Widget</h2>
+
+<p>The Workflows widget is accessible on the MISO Home Screen. The Workflows (figure 1) widget displays
+your incomplete workflows, favourite workflows, an option to begin a new workflow, and an option to manage
+favourite workflows. Once a workflow is complete, it no longer appears in the Workflows widget.</p>
+
+<p><img class="userman-figure" src="/miso-lims/0.2.x/images/workflows-widget.png" alt="Workflows widget" /></p>
+
+<p><em>figure 1: Workflows widget</em></p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="managing_favourite_workflows"></a></p>
+<h2 id="252-managing-favourite-workflows">25.2. Managing Favourite Workflows</h2>
+
+<p>If you perform a workflow frequently, you may wish to add it to your favourite workflows. This will allow you
+to begin a new workflow of this type by clicking a single item in the Workflows widget.</p>
+
+<p>To add a new workflow to your favourites, go to the Workflows widget and click the “Edit Favourite Workflows”
+item at the bottom of the widget. In the dialog box which opens, click the “Add … to Favourites” link, where
+“…” is the name of the workflow you wish to add. The Home page will reload, and a “Begin New … Workflow”
+item will be added to the Workflows widget (figure 2).</p>
+
+<p><img class="userman-figure" src="/miso-lims/0.2.x/images/new-favourite-workflow.png" alt="Workflows widget with favourite workflow added" /></p>
+
+<p><em>figure 2: Workflows widget with favourite workflow added</em></p>
+
+<p>To remove a workflow from your favourites, go to the Workflows widget and click the “Edit Favourite Workflows”
+item at the bottom of the widget. In the dialog box which opens, click the “Remove … from Favourites” link,
+where “…” is the name of the workflow you wish to remove. The Home page will reload, and the Workflows
+widget will no longer contain a “Begin New … Workflow” item.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="beginning_a_new_workflow"></a></p>
+<h2 id="253-beginning-a-new-workflow">25.3. Beginning a New Workflow</h2>
+
+<p>To begin a new workflow, go to the Workflows widget. If the workflow you wish to begin is one of your favourite
+workflows, click on the “Begin New … Workflow” item in the widget, where “…” is the name of the workflow.</p>
+
+<p>If the workflow you wish to begin is not one of your favourite workflows, click on the “Begin New Workflow”
+item in the Workflows widget. In the dialog box which opens, click the name of the workflow you wish to begin.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="entering_workflow_data"></a></p>
+<h2 id="254-entering-workflow-data">25.4. Entering Workflow Data</h2>
+
+<p>Workflow data can be entered by scanning (using a hand-held scanner) or typing in the information for each
+step (see figure 3).</p>
+
+<p><img class="userman-figure" src="/miso-lims/0.2.x/images/workflow-steps.png" alt="Entering data for a workflow" /></p>
+
+<p><em>figure 3: Entering data for a workflow</em></p>
+
+<p>Workflows are designed to have data entered in a given order. If data from the previous step must be
+re-entered, click the “Undo” button (near-circle with arrow end, or the icon in the “Selected Flow Cell Model
+‘PRO-001’” step in figure 3) on the right side of the screen to re-enter information from that step.
+If data from an earlier step in the workflow must be changed, click the “Go Back” button (arrow pointing to
+the left, or the icon in the “Selected new Sequencing Container ‘CONTAINER’” step in figure 3) on the
+right side of the screen at the target step. If any of these buttons are clicked, you will be brought back to
+the target step and will be able to re-enter your data. If you selected “Go Back”, you must re-enter all data
+from that point in the workflow onwards.</p>
+
+<p>If you exit the workflow at any time before completing it, you will be able to 
+<a href="#resuming-an-incomplete-workflow">resume the workflow</a> at the same step you left off. No data will be created
+or saved to MISO until the entire workflow is completed.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="resuming_an_incomplete_workflow"></a></p>
+<h2 id="255-resuming-an-incomplete-workflow">25.5. Resuming an Incomplete Workflow</h2>
+
+<p>If you navigate away from the workflow page before completing the workflow, it is possible to re-enter the
+workflow where you left off.</p>
+
+<p>To resume an incomplete workflow, go to the Workflows widget and click on the incomplete workflow you wish to
+resume. You will be brought to the workflow page at the same step as you had left it.</p>
+
+<p><a href="#">Return to top</a></p>
+
+
+
+                    </div>
+                
+            </div>
+
+            
+
+            <div class="row">
+                <div id="footer" class="col-sm-12">
+                    Documentation for <a href="https://github.com/TGAC/miso-lims">MISO</a>
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function orderNav() {
+                var list,
+                    section,
+                    header,
+                    sections = [],
+                    lists = {},
+                    headers = {};
+
+                var navUl = document.querySelectorAll('#navigation ul')[0],
+                    navLis = document.querySelectorAll('#navigation ul li');
+
+                if (!navUl) return;
+
+                for (var i = 0; i < navLis.length; i++) {
+                    var order, li = navLis[i];
+
+                    if (li.classList.contains('nav-header')) {
+                        section = li.textContent || li.innerText;
+                        sections.push(section);
+                        headers[section] = li;
+                        continue;
+                    }
+
+                    if (!lists[section]) {
+                        lists[section] = [];
+                    }
+
+                    order = parseFloat(li.getAttribute('data-order'))
+                    lists[section].push([order, li]);
+                }
+
+                for (var i = 0; i < sections.length; i++) {
+                    section = sections[i];
+                    list = lists[section].sort(function(a, b) {
+                        return a[0] - b[0];
+                    });
+
+                    if (header = headers[section]) {
+                        navUl.appendChild(header);
+                    }
+                    for (var j = 0; j < list.length; j++) {
+                        navUl.appendChild(list[j][1]);
+                    }
+                }
+            }
+
+            if (document.querySelectorAll) orderNav();
+        </script>
+        
+    </body>
+</html>

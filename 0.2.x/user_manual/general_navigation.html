@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <title>MISO : 2. General Navigation</title>
+        <meta name="description" content="An open-source LIMS for NGS sequencing centres">
+
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/main.css">
+				<link rel="icon" href="/miso-lims/0.2.x/favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+<a href="https://github.com/miso-lims/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+        <div class="container">
+            <div class="row">
+                <div id="header" class="col-sm-12">
+                    <h2><a class="brand" href="/miso-lims/0.2.x/"><img src="/miso-lims/0.2.x/images/MISO.png" alt="MISO's logo, a bowl of miso soup"/>MISO</a>
+    <small>An open-source LIMS for NGS sequencing centres</small>
+</h2>
+
+                </div>
+            </div>
+
+            <div class="row">
+                
+                
+                    <div id="navigation" class="col-sm-2">
+                        <ul class="nav nav-list">
+    <!--<li><a href="/miso-lims/0.2.x/">Home</a></li>-->
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">User Guides</li>
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/usr/user-manual-table-of-contents.html">User Manual</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Admin Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/baremetal-installation-guide.html">Installing MISO on baremetal</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/compose-installation-guide.html">Installing MISO with docker-compose</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/admin-guide.html">Administrator's Manual</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/adm/installation-guide.html">Building and Deploying</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Developer Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/rest-testing.html">REST Testing</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/maven-artifacts.html">Maven artifacts</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/code-style.html">Code Style</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/dev/developers-manual.html">Developer's Manual</a></li>
+        
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+    
+<!-- List additional links. It is recommended to add a divider
+    e.g. <li class="divider"></li> first to break up the content. -->
+</ul>
+
+                    </div>
+
+                    <div id="content" class="col-sm-10">
+                        <div class="page-header">
+    <h2>2. General Navigation
+        
+    </h2>
+</div>
+
+
+<p><a name="home_screen"></a></p>
+<h2 id="21-home-screen">2.1. Home Screen</h2>
+
+<p>The Home Screen or Home Page is the main page of MISO, and contains <a href="#home-screen-widgets">widgets</a> and links
+to other areas of MISO. To get to the Home Screen, click on either the MISO logo in the top left corner of all MISO
+pages.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="home_screen_widgets"></a></p>
+<h2 id="22-home-screen-widgets">2.2. Home Screen Widgets</h2>
+
+<p>You’ll find a number of widgets on the home screen (see figure 1). How you interact with these varies
+depending on the individual widget. Some have a search box that can be used to filter what is displayed. Clicking
+on a tile within a widget will either take you to the single-item edit page for the item, open a menu with options
+depending on the item you clicked, or perform some other action.</p>
+
+<p><img class="userman-figure" src="/miso-lims/0.2.x/images/general-nav-widgets.png" alt="Home screen widgets" /></p>
+
+<p><em>figure 1: Home screen widgets</em></p>
+
+<p>Individual widgets are described in more detail in the <a href="home_screen_widgets.html">Home Screen Widgets section</a></p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="list_pages"></a></p>
+<h2 id="23-list-pages">2.3. List Pages</h2>
+
+<p>You can access the list pages by clicking links in the menu on the left side of the screen. For example, to access the
+Samples list, click “Samples” in the Preparation list. These list pages all have similar features and behaviours, as
+described below.</p>
+
+<p>A dropdown at the top of the table allows you to choose how many entries are shown on a single page. Controls at the
+bottom of the page can be used to move to other pages.</p>
+
+<p><a name="selecting_items"></a></p>
+<h3 id="231-selecting-items">2.3.1. Selecting Items</h3>
+
+<p>Tables which allow you to select items will have a column of checkboxes on the left-hand side. To select an item,
+check the checkbox in the row of the item you wish to select. To deselect an item, uncheck the checkbox. Multiple items
+may be selected by checking multiple checkboxes.</p>
+
+<p>You can select a range of checkboxes by checking the first item you’d like to select, then holding the shift key while
+you check the last item that you’d like to select. For example, if you check the checkbox in row 3, then hold shift and
+check the checkbox in row 6, this will result in rows 3, 4, 5, and 6 being selected.</p>
+
+<p>The toolbar at the top of the table also contains controls to select (☑) and deselect (☐) all items. The select all
+button will only select the items on the current page, whereas the deselect all button will deselect all items on all
+pages.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="selecting_by_search"></a></p>
+<h3 id="232-selecting-by-search">2.3.2. Selecting by Search</h3>
+
+<p>Several of the list pages have a “Select by names” feature which is represented by a button in the toolbar that looks
+like a clipboard (📋). Clicking this button will open a dialog which prompts you to enter names, aliases, or barcodes.
+This allows you to search for multiple items at once, using any of those attributes. Enter the names, aliases, or
+barcodes, one per line, then click the “Search” button. You will be given the option of what to do with the selected
+items. These will be the same options as are available in the list page’s toolbar, with two additions:</p>
+
+<ul>
+  <li><strong>View Selected</strong>: shows the name and alias of each selected item. You can click “OK” after viewing the list to
+return to the options menu with the samples still selected</li>
+  <li><strong>Select in list</strong>: closes the dialog, but selects the items in the list so that you can continue to work with them</li>
+</ul>
+
+<p>This feature is useful if you have a list of names, aliases, or barcodes that you can copy from a spreadsheet, or if
+you have several barcoded items that you can scan into the dialog.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="searching"></a></p>
+<h3 id="233-searching">2.3.3. Searching</h3>
+
+<p>Each of the list pages has a search box at the top right of the table. You can enter your search terms and press Enter
+to filter the data that is shown in the table.</p>
+
+<p>Some tables have “Advanced Search,” which allows you to better describe what it is that you’re looking for. You can
+tell which tables have Advanced Search because they will have a black help bubble (?) beside them (see figure
+2). You can click this bubble to see a full list of the applicable search terms for this page. For example, on
+the Samples list page, you can search for samples by the box that they’re stored in (<code class="highlighter-rouge">box:boxname</code>) or the date they
+were created (<code class="highlighter-rouge">created:today</code>).</p>
+
+<p><img class="userman-figure" src="/miso-lims/0.2.x/images/general-nav-search.png" alt="Advanced search" /></p>
+
+<p><em>figure 2: Advanced search</em></p>
+
+<p>On pages that don’t have Advanced Search, the search is only looking at the text you can see in the table, and
+sometimes some additional hidden fields. There is no way to specify which columns to search.</p>
+
+<p>MISO remembers your recent searches, and will maintain the search results on a list page for some time. Clear the
+search box and press Enter to reset the page and show all items again.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="sorting"></a></p>
+<h3 id="234-sorting">2.3.4. Sorting</h3>
+
+<p>Some list pages allow you to change the sorting order. You can tell which columns are sortable because they have up
+and/or down arrows in the column heading. Click on the column heading to sort the table by that column. Click the same
+column heading again to reverse the sorting order.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="finding_related_items"></a></p>
+<h3 id="235-finding-related-items">2.3.5. Finding Related Items</h3>
+
+<p>Several tables (Samples, Libraries, Library Aliquots, and Pools) have toolbar buttons labelled “Parents” and
+“Children.” These allow you to find items related to the ones you have selected. For instance, you can select a number
+of library aliquots on the Library Aliquots list page, click “Parents,” and choose “Library” from the dialog. This will
+select all of the Libraries from which the selected library aliquots were propagated. You can then select an action to
+perform on the libraries. This will be the same set of options that are available on the Libraries list page. One item
+is said to be the “parent” of another if the other item was created using the first. A library is the parent of a
+library aliquot because the aliquot was made from the library.</p>
+
+<p>Here is a list of all the related item types that can be selected using the “Parents” and “Children” buttons where
+lower-numbered items are parents of the higher-numbered items:</p>
+
+<ol>
+  <li>Samples</li>
+  <li>Libraries</li>
+  <li>Library Aliquots</li>
+  <li>Pools</li>
+</ol>
+
+<p>If your site uses detailed sample mode, samples are broken into several additional types:</p>
+
+<ol>
+  <li>Identity Samples</li>
+  <li>Tissue Samples</li>
+  <li>Tissue Processing Samples</li>
+  <li>Stock Samples</li>
+  <li>Aliquot Samples</li>
+</ol>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="single_item_create_edit_pages"></a></p>
+<h2 id="24-single-item-createedit-pages">2.4. Single Item Create/Edit Pages</h2>
+
+<p>Many types of items within MISO have an edit page that allows you to modify a single item. In some cases, the same page
+is also used to create new items.</p>
+
+<p>These single-item create/edit pages mainly consist of a form listing all of the item’s attributes. Attributes marked
+with an asterisk (*) are required and must be filled in before the item can be saved. Upon attempting to save, any
+fields that are invalid will be marked in red, and an error message will appear to explain the problem (see figure
+3).</p>
+
+<p><img class="userman-figure" src="/miso-lims/0.2.x/images/general-nav-edit-page.png" alt="Single item create/edit page" /></p>
+
+<p><em>figure 3: Single item create/edit page</em></p>
+
+<p>Depending on the item type, there will usually be a number of tables below the item’s attributes. These tables will
+detail items related to the one you’re working with. These tables function similarly to the list pages, allowing you to
+work with the related items.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="collapsible_sections"></a></p>
+<h3 id="241-collapsible-sections">2.4.1. Collapsible Sections</h3>
+
+<p>Some of the single item edit pages can get quite long if there is a lot of related information. To help shorten the
+pages, some sections may be collapsed. To expand these, click anywhere within the heading line of the collapsed
+section. Click on the heading line again to collapse the section once more. Figure 1 shows some collapsed
+sections.</p>
+
+<p><img class="userman-figure" src="/miso-lims/0.2.x/images/general-nav-collapsed-sections.png" alt="Collapsed page sections" /></p>
+
+<p><em>figure 1: Collapsed page sections</em></p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="change_logs"></a></p>
+<h3 id="242-change-logs">2.4.2. Change Logs</h3>
+
+<p>Many of the single item edit pages include a Changes table at the very bottom. This is a log of changes that have been
+made to an item and serves as a record of the item’s history. It shows when each change was made, who made the change,
+and what exactly was changed. If the item’s attributes were affected, the change log entry shows which attributes were
+changed and includes the value both before and after the change. Sometimes a change does not affect the item’s
+attributes, but is still important to the item’s history. These actions are also logged, and include thing such as
+adding a sequencing container to a run, and removing an item from a box.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="notes"></a></p>
+<h3 id="243-notes">2.4.3. Notes</h3>
+
+<p>Most items in MISO have a description field, which allows you to enter any text that you would like. For cases where
+you’d like to provide more detail, a Notes section appears on several of the single item edit pages. This allows you to
+record any number of details about the item. For more information on working with Notes, see the
+<a href="notes.html">Notes section</a>.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="bulk_create_edit_pages"></a></p>
+<h2 id="25-bulk-createedit-pages">2.5. Bulk Create/Edit Pages</h2>
+
+<p>In addition to creating and editing single items, it is often useful to work with many items at once. MISO provides
+many bulk create/edit pages to facilitate this (see figure 2). These bulk pages feature a spreadsheet-like
+interface with features similar to popular spreadsheet software.
+<img class="userman-figure" src="/miso-lims/0.2.x/images/general-nav-bulk-page.png" alt="Bulk propagate library aliquots page" /></p>
+
+<p><em>figure 2: Bulk propagate library aliquots page</em></p>
+
+<p>Any cells that are invalid will be highlighted in red. This includes any required cells which are left blank. Upon
+saving the table, it is possible that some items save successfully while others fail for various reasons. Any row
+that has been successfully saved will be disabled, and can no longer be modified. Error messages will be displayed
+at the top of the table to indicate why any item failed to save. You are then able to make any necessary changes to the
+remaining items before attempting to save again.</p>
+
+<p>After successfully saving all rows, the table toolbar will include the same
+options as the tool bar of the appropriate list page. This allows continuing
+work with the same items by moving through propagation steps for the same
+items.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="autofill"></a></p>
+<h3 id="251-autofill">2.5.1. Autofill</h3>
+
+<p>In any of the bulk tables, you can autofill a column by setting a value in the top row, selecting that cell, and then
+either dragging the fill handle to include all of the cells that you would like to copy the value to, or simply
+double-clicking the fill handle to autofill to the bottom of the column. The fill handle is the little square at the
+bottom right of the selected cell(s).</p>
+
+<p>If you wish to increment a number within the column, you can do that by entering the first two cell values, selecting
+both of those cells, and then using the fill handle in the same manner. For example, if you wished to set Pool aliases
+similar to those in figure 2, you could enter “POOL_01” into the first row, “POOL_02” into the second row,
+select both of these cells, then double-click the fill handle to continue the pattern to the bottom of the table.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="exporting_to_spreadsheet"></a></p>
+<h3 id="251-exporting-to-spreadsheet">2.5.1. Exporting to Spreadsheet</h3>
+
+<p>All of the bulk pages include an Export button in the toolbar. This allows you to download a spreadsheet containing all
+of the data in the table. A dialog will give you the option of which format to output the spreadsheet in. Microsoft
+Excel (*.xlsx), Open Document Format (*.odt), and comma-delimited data (*.csv) formats are supported.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="tools"></a></p>
+<h2 id="26-tools">2.6. Tools</h2>
+
+<p>The Tools list in the menu on the left-hand side of the page contains links to tools that are helpful for finding and
+working with items in MISO and the lab. Individual tools are documented in more detail in the
+<a href="other_miso_tools.html">Other MISO Tools section</a>.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="my_account"></a></p>
+<h2 id="27-my-account">2.7. My Account</h2>
+
+<p>Clicking on your username near the top right of the screen will take you to a page showing your name and the groups
+that you belong to. There is an Edit link that will open a page showing more of your user details. Depending on your
+site configuration, you may be able to edit some of these details and reset your password from this page. See
+<a href="site_configuration.html#logging_in">Authentication</a> for more details.</p>
+
+<p>If you are a MISO administrator, an Administration section will also appear on the My Account page. The Clear Cache
+action should not be necessary, but can be used to help troubleshoot bugs. The Refresh Constants action can be used to
+make new type data values show up immediately in cases where they do not. For more information, see the
+<a href="type_data.html">Type Data section</a>.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="help"></a></p>
+<h2 id="28-help">2.8. Help</h2>
+
+<p>The “Help” link near the top right of the screen will link you to this user manual.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="quick_help"></a></p>
+<h2 id="29-quick-help">2.9. Quick Help</h2>
+
+<p>Many pages in MISO include a Quick Help section. This section is hidden by default, but can be show by clicking the
+“Quick Help” heading near the top of the screen (see figure 3). The Quick Help section displays tips and
+details to help you work with the page.</p>
+
+<p><img class="userman-figure" src="/miso-lims/0.2.x/images/general-nav-quick-help.png" alt="Quick Help" /></p>
+
+<p><em>figure 3: Quick Help</em></p>
+
+<p><a href="#">Return to top</a></p>
+
+
+
+                    </div>
+                
+            </div>
+
+            
+
+            <div class="row">
+                <div id="footer" class="col-sm-12">
+                    Documentation for <a href="https://github.com/TGAC/miso-lims">MISO</a>
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function orderNav() {
+                var list,
+                    section,
+                    header,
+                    sections = [],
+                    lists = {},
+                    headers = {};
+
+                var navUl = document.querySelectorAll('#navigation ul')[0],
+                    navLis = document.querySelectorAll('#navigation ul li');
+
+                if (!navUl) return;
+
+                for (var i = 0; i < navLis.length; i++) {
+                    var order, li = navLis[i];
+
+                    if (li.classList.contains('nav-header')) {
+                        section = li.textContent || li.innerText;
+                        sections.push(section);
+                        headers[section] = li;
+                        continue;
+                    }
+
+                    if (!lists[section]) {
+                        lists[section] = [];
+                    }
+
+                    order = parseFloat(li.getAttribute('data-order'))
+                    lists[section].push([order, li]);
+                }
+
+                for (var i = 0; i < sections.length; i++) {
+                    section = sections[i];
+                    list = lists[section].sort(function(a, b) {
+                        return a[0] - b[0];
+                    });
+
+                    if (header = headers[section]) {
+                        navUl.appendChild(header);
+                    }
+                    for (var j = 0; j < list.length; j++) {
+                        navUl.appendChild(list[j][1]);
+                    }
+                }
+            }
+
+            if (document.querySelectorAll) orderNav();
+        </script>
+        
+    </body>
+</html>

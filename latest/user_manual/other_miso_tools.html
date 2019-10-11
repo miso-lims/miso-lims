@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <title>MISO : 28. Other MISO Tools</title>
+        <meta name="description" content="An open-source LIMS for NGS sequencing centres">
+
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/miso-lims/latest/css/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/latest/css/main.css">
+				<link rel="icon" href="/miso-lims/latest/favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+<a href="https://github.com/miso-lims/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+        <div class="container">
+            <div class="row">
+                <div id="header" class="col-sm-12">
+                    <h2><a class="brand" href="/miso-lims/latest/"><img src="/miso-lims/latest/images/MISO.png" alt="MISO's logo, a bowl of miso soup"/>MISO</a>
+    <small>An open-source LIMS for NGS sequencing centres</small>
+</h2>
+
+                </div>
+            </div>
+
+            <div class="row">
+                
+                
+                    <div id="navigation" class="col-sm-2">
+                        <ul class="nav nav-list">
+    <!--<li><a href="/miso-lims/latest/">Home</a></li>-->
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">User Guides</li>
+            
+            <li data-order="1"><a href="/miso-lims/latest/usr/user-manual-table-of-contents.html">User Manual</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Admin Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/latest/adm/baremetal-installation-guide.html">Installing MISO on baremetal</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/latest/adm/compose-installation-guide.html">Installing MISO with docker-compose</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/latest/adm/admin-guide.html">Administrator's Manual</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/latest/adm/installation-guide.html">Building and Deploying</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Developer Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/latest/dev/rest-testing.html">REST Testing</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/latest/dev/maven-artifacts.html">Maven artifacts</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/latest/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/latest/dev/code-style.html">Code Style</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/latest/dev/developers-manual.html">Developer's Manual</a></li>
+        
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+    
+<!-- List additional links. It is recommended to add a divider
+    e.g. <li class="divider"></li> first to break up the content. -->
+</ul>
+
+                    </div>
+
+                    <div id="content" class="col-sm-10">
+                        <div class="page-header">
+    <h2>28. Other MISO Tools
+        
+    </h2>
+</div>
+
+<p>The following tools can help you with planning or finding things within MISO. They can be found by clicking the
+appropriate link in the Tools list in the menu on the left side of the screen.</p>
+
+<p><a name="index_distance"></a></p>
+<h2 id="281-index-distance">28.1. Index Distance</h2>
+
+<p>When you run multiple libraries in a sequencing lane or partition, known as multiplexing, indices are used to
+identify the individual libraries and demultiplex (separate) the data afterwards. If two or more libraries in the pool
+have identical or near-identical indices, demultiplexing may be more difficult or even impossible. The Index Distance
+tool can help you identify indices which may be inadvisable to multiplex together.</p>
+
+<p><img class="userman-figure" src="/miso-lims/latest/images/tools-index-distance.png" alt="Index Distance tool" /></p>
+
+<p><em>figure 1: Index Distance tool</em></p>
+
+<p>To use the tool, enter all of the indices you wish to compare into the Indices box. You can use the Indices list below
+to search for indices and then select and add them, or you can type the index sequences directly into the Indices box.
+For dual barcodes, enter both indices together as if they were one. e.g. ‘AAAAAA’ index 1 and ‘CCCCCC’ index 2 should
+be entered as ‘AAAAAACCCCCC’.</p>
+
+<p>In the Min. Mismatches box, you can choose the minimum number of base mismatches that the sequences must have. For
+example, ‘AAAAAA’ and ‘AAAACC’ have 2 mismatches. You will be warned of any sequences which have a lower number of
+mismatches than that entered here. If indices are of different lengths, only the length of the shortest one will be
+considered, and the extra bases on the longer index will be ignored. For example, ‘AAAAAA’ and ‘AAAAAACC’ will be
+considered duplicates.</p>
+
+<p>When you have made your selections, click the Calculate button and the Results box will be updated to show any
+duplicates and near duplicates.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="index_search"></a></p>
+<h2 id="282-index-search">28.2. Index Search</h2>
+
+<p>If you have a list of index sequences, but do not know either the name of the index family containing them, or whether
+they exist in MISO at all, you can use the Index Search tool to check.</p>
+
+<p><img class="userman-figure" src="/miso-lims/latest/images/tools-index-search.png" alt="Index Search tool" /></p>
+
+<p><em>figure 2: Index Search tool</em></p>
+
+<p>To use the tool, enter the index sequences you are looking for into the Index 1 Sequences and Index 2 Sequences boxes.
+The Index 2 Sequences box should be left empty if you are not looking for dual indices. Click the Search button and the
+Results box will be updated to show every index family containing any of the index sequences you entered, along with
+how many of the indices each family contains.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="identity_search"></a></p>
+<h2 id="283-identity-search">28.3. Identity Search</h2>
+
+<p>Note: This tool only appears if your site uses <a href="site_configuration.html#detailed_sample_mode">detailed sample mode</a>.</p>
+
+<p>The Identity Search tool can be used to find identity (donor/organism) samples with a specified external name, and to
+see all of the samples descended from the resulting identities. This is useful if you’re not sure whether you’ve
+received samples from this donor or organism before, or if you want to see all of the samples related to it.</p>
+
+<p><img class="userman-figure" src="/miso-lims/latest/images/tools-identity-search.png" alt="Identity Search tool" /></p>
+
+<p><em>figure 3: Identity Search tool</em></p>
+
+<p>To use the Identity Search, enter the external names you’re looking for in the External Names box. Optionally, you can
+enter the short name of the project you wish to search in. If no results are found within that project, identities from
+other projects will still be included in the results.</p>
+
+<p>After clicking one of the Search buttons – either for exact or partial matches – results will be listed in the
+Results box for each external name you entered. Clicking on one of the identity aliases will cause all of its related
+samples to be listed in the Samples list below.</p>
+
+<p><a href="#">Return to top</a></p>
+
+
+
+                    </div>
+                
+            </div>
+
+            
+
+            <div class="row">
+                <div id="footer" class="col-sm-12">
+                    Documentation for <a href="https://github.com/TGAC/miso-lims">MISO</a>
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function orderNav() {
+                var list,
+                    section,
+                    header,
+                    sections = [],
+                    lists = {},
+                    headers = {};
+
+                var navUl = document.querySelectorAll('#navigation ul')[0],
+                    navLis = document.querySelectorAll('#navigation ul li');
+
+                if (!navUl) return;
+
+                for (var i = 0; i < navLis.length; i++) {
+                    var order, li = navLis[i];
+
+                    if (li.classList.contains('nav-header')) {
+                        section = li.textContent || li.innerText;
+                        sections.push(section);
+                        headers[section] = li;
+                        continue;
+                    }
+
+                    if (!lists[section]) {
+                        lists[section] = [];
+                    }
+
+                    order = parseFloat(li.getAttribute('data-order'))
+                    lists[section].push([order, li]);
+                }
+
+                for (var i = 0; i < sections.length; i++) {
+                    section = sections[i];
+                    list = lists[section].sort(function(a, b) {
+                        return a[0] - b[0];
+                    });
+
+                    if (header = headers[section]) {
+                        navUl.appendChild(header);
+                    }
+                    for (var j = 0; j < list.length; j++) {
+                        navUl.appendChild(list[j][1]);
+                    }
+                }
+            }
+
+            if (document.querySelectorAll) orderNav();
+        </script>
+        
+    </body>
+</html>

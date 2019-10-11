@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <title>MISO : 6. Projects</title>
+        <meta name="description" content="An open-source LIMS for NGS sequencing centres">
+
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/main.css">
+				<link rel="icon" href="/miso-lims/0.2.x/favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+<a href="https://github.com/miso-lims/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+        <div class="container">
+            <div class="row">
+                <div id="header" class="col-sm-12">
+                    <h2><a class="brand" href="/miso-lims/0.2.x/"><img src="/miso-lims/0.2.x/images/MISO.png" alt="MISO's logo, a bowl of miso soup"/>MISO</a>
+    <small>An open-source LIMS for NGS sequencing centres</small>
+</h2>
+
+                </div>
+            </div>
+
+            <div class="row">
+                
+                
+                    <div id="navigation" class="col-sm-2">
+                        <ul class="nav nav-list">
+    <!--<li><a href="/miso-lims/0.2.x/">Home</a></li>-->
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">User Guides</li>
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/usr/user-manual-table-of-contents.html">User Manual</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Admin Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/baremetal-installation-guide.html">Installing MISO on baremetal</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/compose-installation-guide.html">Installing MISO with docker-compose</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/admin-guide.html">Administrator's Manual</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/adm/installation-guide.html">Building and Deploying</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Developer Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/rest-testing.html">REST Testing</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/maven-artifacts.html">Maven artifacts</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/code-style.html">Code Style</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/dev/developers-manual.html">Developer's Manual</a></li>
+        
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+    
+<!-- List additional links. It is recommended to add a divider
+    e.g. <li class="divider"></li> first to break up the content. -->
+</ul>
+
+                    </div>
+
+                    <div id="content" class="col-sm-10">
+                        <div class="page-header">
+    <h2>6. Projects
+        
+    </h2>
+</div>
+
+<p>A project is a grouping of samples, libraries, sequencer runs, and other related items. Each sample in MISO belongs to
+a specific project. By association, a sample’s libraries and library aliquots belong to the same project. Some other
+items, such as pools and sequencer runs, may include items from multiple projects.</p>
+
+<p><a name="projects_list"></a></p>
+<h2 id="61-projects-list">6.1. Projects List</h2>
+
+<p>The Projects list page can be accessed by clicking the “Projects” link in the Preparation list in the menu on the left
+side of the screen. Here you can see all of the projects that you have access to in MISO. Clicking on the project’s
+name, alias, or short name in the table will take you to the Edit Project page, where you can see more project details,
+as well as all of the items associated with the project. The toolbar at the top of the table includes an “Add” button
+for creating new projects.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="adding_projects"></a></p>
+<h2 id="62-adding-projects">6.2. Adding Projects</h2>
+
+<p>To create a new project, click the “Add” button in the toolbar near the top of the Projects list page. This will take
+you to the Create Project page, where you can enter the project details. Choose a descriptive project alias. This is
+the long name for the project. The short name should be a short, alphanumeric code for the project. Depending on your
+site’s configuration, project short name may or may not be required. Be sure to also select an accurate project status.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="reference_genome"></a></p>
+<h3 id="621-reference-genome">6.2.1. Reference Genome</h3>
+
+<p>Reference genome refers to a model genome that sequenced data should be aligned to. This should indicate the primary
+genome used for the project if there are multiple. The default scientific name used for samples will depend on the
+reference genome set on the project. For example, if the project’s reference genome is “Human hg19 random,” then
+samples created in the project will have a default scientific name of “Homo sapiens.”</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="default_targeted_sequencing"></a></p>
+<h3 id="622-default-targeted-sequencing">6.2.2. Default Targeted Sequencing</h3>
+
+<p>Default Targeted Sequencing is a project-level property. Whichever targeted sequencing is selected here will be the
+default value for all library aliquots created within the project. Note, however, that a library aliquot’s targeted
+sequencing options depend on the library kit used on the library. If the default targeted sequencing value is not
+compatible with the library kit, it will not be selected automatically, nor will it be available for selection.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="permissions"></a></p>
+<h3 id="623-permissions">6.2.3. Permissions</h3>
+
+<p>The “Permissions” section of the Create Project page contains several options for controlling who has access to the
+project. These permissions will also affect the project’s samples, studies, and other related items.</p>
+
+<p>The project’s owner is the person who should have full control over the project. They will be granted full read/write
+access to the project and all related items regardless of the other permissions set on the project.</p>
+
+<p>If the checkbox beside “Allow all internal users access?” is checked, then all users with the Internal role will also
+be given full read/write access to the project and all related items.</p>
+
+<p>Next, there are four lists which allow you to choose which MISO users and/or groups have read and/or write access.
+Checking a checkbox next to a user of group in one of these lists grants the specified permission to the user or group
+selected.</p>
+
+<p>See <a href="users_and_groups.html#user_permissions">User Permissions</a> for more information about user roles and resource-level
+permissions.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="edit_project_page"></a></p>
+<h2 id="63-edit-project-page">6.3. Edit Project Page</h2>
+
+<p>The Edit Project page shows details about the project and all items related to it, and also provides some additional
+information and functionalities. To get to the Edit Project page, click the project name, alias, or short name on the
+Projects list page. You can edit the project’s details by changing them on this page and then clicking the “Save”
+button to confirm.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="tracked_issues"></a></p>
+<h3 id="634-tracked-issues">6.3.4. Tracked Issues</h3>
+
+<p>The Tracked Issues section of the Edit Project page shows issues from an issue tracking system that are related to the
+project. This works by searching for any issue with a label/tag that matches the project’s short name. This means that
+for tracked issues to show up:</p>
+
+<ol>
+  <li>your site must have issue tracker integration configured</li>
+  <li>your project must have a short name</li>
+  <li>you must add a label/tag that matches the project’s short name to the issues</li>
+</ol>
+
+<p>See the <a href="site_configuration.html#issue_trackers">Issue Trackers section</a> for more information on connecting issue
+trackers to MISO.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="project_files"></a></p>
+<h3 id="635-project-files">6.3.5. Project Files</h3>
+
+<p>Files can be attached to a project and will show up in the Project Files section of the Edit Project page. For more
+information about attachments, see the <a href="attachments.html">Attachments section</a>.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="subprojects"></a></p>
+<h2 id="64-subprojects">6.4. Subprojects</h2>
+
+<p>Note: This item only applies if your site uses <a href="site_configuration.html#detailed_sample_mode">detailed sample mode</a>.</p>
+
+<p>In some cases, it may be useful to divide a project’s samples into several smaller groups. For this purpose, MISO has
+subprojects. Subprojects may be designated as high priority, which will cause “PRIORITY SUBPROJECT” messages to appear
+in several places. They may also specify a different reference genome than the project they are a part of.</p>
+
+<p>The subprojects within a project are listed near the bottom of the “Project Information” section of the Edit Project
+page. Clicking on a subproject name will take you to the project’s samples list and filter it to show only the selected
+subproject. You can reset the table to show all of the project’s samples by clearing the search box at the top right of
+the table and pressing the Enter key.</p>
+
+<p>To view a list of all subprojects in all projects, click the “Subprojects” link in the Institute Defaults list in the
+menu on the left side of the screen. This will take you to the Subprojects list page. Controls at the top of the table
+allow you to create, edit, and delete subprojects.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="adding_subprojects"></a></p>
+<h3 id="641-adding-subprojects">6.4.1. Adding Subprojects</h3>
+
+<p>There are two paths to the bulk Create Subproject page. The first is to click the “Add new subproject” link near the
+bottom of the “Project Information” section of the Edit Project page. The second is to click the “Add” button in the
+toolbar at the top of the table on the Subprojects list page. This second option will allow you to create multiple
+subprojects at once - enter the quantity that you would like to create in the dialog, then click the “Create” button.</p>
+
+<p>Once on the Create Subproject page, fill out the subproject information, including the project that it falls within,
+an alias, the reference genome to use, and optionally a desription. If this is a high priority subproject, select
+“True” in the priority column. When you are done, click the “Save” button at the top right to create the subproject(s).</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="editing_subprojects"></a></p>
+<h3 id="642-editing-subprojects">6.4.2. Editing Subprojects</h3>
+
+<p>Subprojects can only be modified by a MISO administrator. If you are an administrator, you can get to the bulk Edit
+Subproject page by first going to the Subprojects list page, checking the checkbox beside each subproject that you
+would like to modify, then clicking the “Edit” button in the toolbar at the top of the table. This will take you to the
+bulk Edit Subproject page, which is identical to the Create Subproject page. Make any changes you would like, and then
+click the “Save” button at the top right of the screen to confirm. Keep in mind that these changes will affect any
+samples already included in the subproject.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="deleting_subprojects"></a></p>
+<h3 id="643-deleting-subprojects">6.4.3. Deleting Subprojects</h3>
+
+<p>A subproject can only be deleted by a MISO administrator, and only if there are no samples belonging to the subproject.
+To do so, go to the Subprojects list page, check the checkbox beside each subproject that you would like to delete,
+then click the “Delete” button in the toolbar at the top of the table.</p>
+
+<p><a href="#">Return to top</a></p>
+
+
+
+                    </div>
+                
+            </div>
+
+            
+
+            <div class="row">
+                <div id="footer" class="col-sm-12">
+                    Documentation for <a href="https://github.com/TGAC/miso-lims">MISO</a>
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function orderNav() {
+                var list,
+                    section,
+                    header,
+                    sections = [],
+                    lists = {},
+                    headers = {};
+
+                var navUl = document.querySelectorAll('#navigation ul')[0],
+                    navLis = document.querySelectorAll('#navigation ul li');
+
+                if (!navUl) return;
+
+                for (var i = 0; i < navLis.length; i++) {
+                    var order, li = navLis[i];
+
+                    if (li.classList.contains('nav-header')) {
+                        section = li.textContent || li.innerText;
+                        sections.push(section);
+                        headers[section] = li;
+                        continue;
+                    }
+
+                    if (!lists[section]) {
+                        lists[section] = [];
+                    }
+
+                    order = parseFloat(li.getAttribute('data-order'))
+                    lists[section].push([order, li]);
+                }
+
+                for (var i = 0; i < sections.length; i++) {
+                    section = sections[i];
+                    list = lists[section].sort(function(a, b) {
+                        return a[0] - b[0];
+                    });
+
+                    if (header = headers[section]) {
+                        navUl.appendChild(header);
+                    }
+                    for (var j = 0; j < list.length; j++) {
+                        navUl.appendChild(list[j][1]);
+                    }
+                }
+            }
+
+            if (document.querySelectorAll) orderNav();
+        </script>
+        
+    </body>
+</html>

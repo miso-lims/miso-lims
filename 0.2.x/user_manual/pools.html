@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <title>MISO : 12. Pools</title>
+        <meta name="description" content="An open-source LIMS for NGS sequencing centres">
+
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/main.css">
+				<link rel="icon" href="/miso-lims/0.2.x/favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+<a href="https://github.com/miso-lims/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+        <div class="container">
+            <div class="row">
+                <div id="header" class="col-sm-12">
+                    <h2><a class="brand" href="/miso-lims/0.2.x/"><img src="/miso-lims/0.2.x/images/MISO.png" alt="MISO's logo, a bowl of miso soup"/>MISO</a>
+    <small>An open-source LIMS for NGS sequencing centres</small>
+</h2>
+
+                </div>
+            </div>
+
+            <div class="row">
+                
+                
+                    <div id="navigation" class="col-sm-2">
+                        <ul class="nav nav-list">
+    <!--<li><a href="/miso-lims/0.2.x/">Home</a></li>-->
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">User Guides</li>
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/usr/user-manual-table-of-contents.html">User Manual</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Admin Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/baremetal-installation-guide.html">Installing MISO on baremetal</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/compose-installation-guide.html">Installing MISO with docker-compose</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/admin-guide.html">Administrator's Manual</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/adm/installation-guide.html">Building and Deploying</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Developer Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/rest-testing.html">REST Testing</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/maven-artifacts.html">Maven artifacts</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/code-style.html">Code Style</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/dev/developers-manual.html">Developer's Manual</a></li>
+        
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+    
+<!-- List additional links. It is recommended to add a divider
+    e.g. <li class="divider"></li> first to break up the content. -->
+</ul>
+
+                    </div>
+
+                    <div id="content" class="col-sm-10">
+                        <div class="page-header">
+    <h2>12. Pools
+        
+    </h2>
+</div>
+
+
+<p><a name="pools_list"></a></p>
+<h2 id="121-pools-list">12.1. Pools List</h2>
+
+<p>To get to the main Pools list page, click “Pools” in the Preparation list in the menu on the left side of the screen.
+This list includes all pools from all projects in MISO. The list is divided into tabs for the different sequencing
+platforms. Only platforms for which there are active sequencers or existing libraries or pools are included. The
+toolbar at the top of the table includes many controls for working with pools.</p>
+
+<p>You can find a similar list in the Pools section of the Edit Project page. The list on the Edit Project page only
+includes pools that contain libraries belonging to the project being viewed/edited. This list has the same controls as
+on the main Pools list page.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="creating_pools"></a></p>
+<h2 id="122-creating-pools">12.2. Creating Pools</h2>
+
+<p>Clicking the “Add” button in the toolbar at the top of the Pools list will take you to the Create Pool page. Here, you
+can enter all of the pool information and then click the “Save” button at the top right to save the pool. After saving,
+you will be taken to the single Edit Pool page, where you can add library aliquots and further modify the pool.</p>
+
+<p>It is also possible to create pools with library aliquots already in them. See
+<a href="#creating_pools_from_library_aliquots">Creating Pools from Library Aliquots</a> below.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="editing_pools"></a></p>
+<h2 id="123-editing-pools">12.3. Editing Pools</h2>
+
+<p>Pools can be edited individually or in bulk. Bulk editing is convenient when you have several pools to modify at once.
+Editing individual pools is sometimes preferable because it provides a few additional options, including the ability to
+modify the pool’s contents, and also allows you to see a more detailed view of the pool.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="editing_a_single_pool"></a></p>
+<h3 id="1231-editing-a-single-pool">12.3.1. Editing a Single Pool</h3>
+
+<p>To get to the single Edit Pool page, click on the pool’s name or alias in the Pools list. Links to the Edit Pool page
+appear on several pages for related items as well, including:</p>
+
+<ul>
+  <li>Name and Alias columns of the Pools table on the Edit Sample and Edit Library pages</li>
+  <li>Name and Alias columns of the Orders list</li>
+  <li>Pool column of the Partitions table on the Edit Container and Edit Run pages
+    <ul>
+      <li>Note: Platform-specific terms such as “Flow Cell” and “Lane” are used in place of “Container” and “Partition” when
+possible</li>
+    </ul>
+  </li>
+</ul>
+
+<p>The Pool Information section of the Edit Pool page contains a list of fields, most of which may be modified. You
+can make any changes you would like and then click the “Save” button at the top right to confirm the changes.</p>
+
+<p>Below, there are sections for Notes, Attachments, and QC’s, which are discussed in other parts of this section of the
+user manual. Other sections list the orders that have been made for sequencing the pool, the runs and lanes that the
+pool has been included in, library aliquots that are included in the pool, library aliquots that could be added to the
+pool, and the pool’s change log.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="editing_pools_in_bulk"></a></p>
+<h3 id="1232-editing-pools-in-bulk">12.3.2. Editing Pools in Bulk</h3>
+
+<p>To get to the bulk Edit Pools page, go to the Pools list, check the checkboxes beside the pools you wish to modify,
+then click the “Edit” button in the toolbar at the top of the table.</p>
+
+<p>On the bulk Edit Pools page, you can make the changes you would like, then click the “Save” button at the top right to
+confirm. If there are any problems with the data you’ve entered, the error messages will be displayed at the top of the
+screen and you can adjust as necessary before clicking “Save” again.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="notes"></a></p>
+<h2 id="124-notes">12.4. Notes</h2>
+
+<p>The single Edit Pool page includes a Notes section. Notes can be used to record additional pool information that is
+otherwise not recorded in MISO. More information on working with notes can be found in the <a href="notes.html">Notes section</a>.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="attachments"></a></p>
+<h2 id="125-attachments">12.5. Attachments</h2>
+
+<p>You can attach any type and number of files to a pool in MISO. This feature might be used to attach QC output or a
+spreadsheet of pool data provided by a collaborator. For more information, see the
+<a href="attachments.html">Attachments section</a>.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="adding_library_aliquots_to_a_pool"></a></p>
+<h2 id="126-adding-library-aliquots-to-a-pool">12.6. Adding Library Aliquots to a Pool</h2>
+
+<p>Library aliquots can be added to a pool using the single Edit Pool page. In the Available Library Aliquots list, find
+and select the aliquots that you wish to add to the pool. You can search aliquots using the search box at the top of
+the table. Once you have selected the appropriate aliquots, click the “Add” button in the toolbar at the top of the
+table to add the library aliquots to the pool.</p>
+
+<p>If your site has <a href="site_configuration.html">Strict Index Checking</a> rules enabled, library aliquots cannot be added to 
+pools when the library aliquots have indices which are duplicates or near-duplicates.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="removing_library_aliquots_from_a_pool"></a></p>
+<h2 id="127-removing-library-aliquots-from-a-pool">12.7. Removing Library Aliquots from a Pool</h2>
+
+<p>Library aliquots can be removed from a pool using the single Edit Pool page. In the Included Library Aliquots list,
+find and select the aliquots that you wish to remove from the pool. Click the “Remove” button in the toolbar at the top
+of the table to remove the library aliquots from the pool.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="creating_pools_from_library_aliquots"></a></p>
+<h2 id="128-creating-pools-from-library-aliquots">12.8. Creating Pools from Library Aliquots</h2>
+
+<p>To create pools from library aliquots, go to the Library Aliquots list and select the aliquots to be included in the
+pools. There are three options for creating pools from this selection. Click one of these buttons in the toolbar at the
+top of the table to continue:</p>
+
+<ul>
+  <li>Pool Together: Create a single pool containing all of the selected aliquots</li>
+  <li>Pool Separately: Create multiple pools, each containing one of the selected aliquots</li>
+  <li>Pool Custom: Create multiple pools, each containing a variable number of the selected aliquots</li>
+</ul>
+
+<p>In the dialog that appears, choose whether you’d like to create a new box for these pools. See
+<a href="boxes.html#creating_boxes">Creating Boxes</a> in the box section more more information on this feature. If you chose the
+“Pool Custom” option, set the quantity of pools that you would like to create. When you are done in the dialog, click
+the “Create” button to proceed.</p>
+
+<p>This will take you to the Create Pools from Library Aliquots page. Enter all of the pool information here. For
+additional information regarding some of the fields in the table, check the Quick Help section near the top of the
+screen.</p>
+
+<p>If you chose the “Pool Custom” option, there will be a “Choose Library Aliquots” button in the toolbar at the top of
+the table. Click this button to switch to the Library Aliquots view, where you can choose which pool to add each
+aliquot to. You will have to enter aliases in the Pools view before they show up as options here. To return to the
+Pools view, click the “Edit Pools” button in the toolbar.</p>
+
+<p>Click the “Save” button at the top right of the screen when you are done. If any of the pools fail to save,
+a message will be displayed at the top of the screen explaining the problem(s). You can then make the appropriate
+adjustments and click the “Save” button to try again.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="creating_sequencing_orders"></a></p>
+<h2 id="129-creating-sequencing-orders">12.9. Creating Sequencing Orders</h2>
+
+<p>Orders are used to track which pools are ready to be sequenced, how much sequencing needs to be done for a given pool,
+and whether that required sequencing has been completed. To create an order for a single pool, go to the Edit Pool page
+and click the “Create” button in the toolbar at the top of the Requested Orders section. To create orders for multiple
+pools at once, select the pools to order from the Pools list and click the “Create Orders” button in the toolbar at the
+top of the table. Further details of this process will be discussed in
+<a href="sequencing_orders.html#creating_sequencing_orders">Creating Sequencing Orders</a>.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="printing_barcodes"></a></p>
+<h2 id="1210-printing-barcodes">12.10. Printing Barcodes</h2>
+
+<p>Barcode labels can be printed for a series of pools from the Pools list. See the
+<a href="barcode_label_printers.html#printing_barcodes">Barcode Label Printers section - Printing Barcodes</a> for details on how
+to do this.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="downloading_pool_information"></a></p>
+<h2 id="1211-downloading-pool-information">12.11. Downloading Pool Information</h2>
+
+<p>It is sometimes useful to have pool information in spreadsheet form for use outside of MISO. To download pool data, go
+to the Pools list, check the checkboxes next to the pools that you would like to export, and click the “Download”
+button in the toolbar at the top of the table. A dialog will appear in which you can choose the type and format of the
+spreadsheet before downloading. Different spreadsheet types include different columns. Feel free to try out the
+different types to see which ones will be useful to you. MISO supports exporting spreadsheets in Microsoft Excel
+(xlsx), Open Document (odt), and comma-delimited (csv) formats.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="selecting_pools_by_search"></a></p>
+<h2 id="1212-selecting-pools-by-search">12.12. Selecting Pools by Search</h2>
+
+<p>If you have a list of pool names, aliases, or barcodes, you can use this list to select and act upon the pools instead
+of having to search for and select them manually. For more information on this feature, see the
+<a href="general_navigation.html#selecting_by_search">General Navigation section - Selecting by Search</a>.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="finding_related_items"></a></p>
+<h2 id="1213-finding-related-items">12.13. Finding Related Items</h2>
+
+<p>You can find items related to selected pools using the “Parents” button in the toolbar at the top of the Pools list.
+For more information on this feature, see the
+<a href="general_navigation.html#finding_related_items">General Navigation section - Finding Related Items</a>.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="pool_qcs"></a></p>
+<h2 id="1214-pool-qcs">12.14. Pool QCs</h2>
+
+<p>Any number of quality control measures may be recorded for a pool. For more information on this feature, see the
+<a href="qcs.html">QCs section</a>.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="deleting_pools"></a></p>
+<h2 id="1215-deleting-pools">12.15. Deleting Pools</h2>
+
+<p>To delete pools, go to the Pools list, check the checkboxes next to the pools that you wish to delete, and click the
+“Delete” button in the toolbar at the top of the table. A pool can only be deleted if it has not been added to any
+sequencing containers. If the pool has been added to any sequencing containers, it must be removed from the containers
+before it can be deleted. A pool can only be deleted by its creator or a MISO administrator.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="merging_pools"></a></p>
+<h2 id="1216-merging-pools">12.16. Merging Pools</h2>
+
+<p>Multiple pools may be merged to create a new pool containing all of the library aliquots from each of the merged pools.
+To do this, select the pools to merge from the Pools list, then click the “Merge” button in the toolbar at the top of
+the table. In the dialog, choose the proportions to merge the pools at. Click the “Merge” button to proceed. This will
+take you to the Merge Pools page, which functions the same as the bulk Create Pools from Library Aliquots page. Enter
+the pool information, then click “Save” at the top right to create the new pool.</p>
+
+<p><a href="#">Return to top</a></p>
+
+
+
+                    </div>
+                
+            </div>
+
+            
+
+            <div class="row">
+                <div id="footer" class="col-sm-12">
+                    Documentation for <a href="https://github.com/TGAC/miso-lims">MISO</a>
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function orderNav() {
+                var list,
+                    section,
+                    header,
+                    sections = [],
+                    lists = {},
+                    headers = {};
+
+                var navUl = document.querySelectorAll('#navigation ul')[0],
+                    navLis = document.querySelectorAll('#navigation ul li');
+
+                if (!navUl) return;
+
+                for (var i = 0; i < navLis.length; i++) {
+                    var order, li = navLis[i];
+
+                    if (li.classList.contains('nav-header')) {
+                        section = li.textContent || li.innerText;
+                        sections.push(section);
+                        headers[section] = li;
+                        continue;
+                    }
+
+                    if (!lists[section]) {
+                        lists[section] = [];
+                    }
+
+                    order = parseFloat(li.getAttribute('data-order'))
+                    lists[section].push([order, li]);
+                }
+
+                for (var i = 0; i < sections.length; i++) {
+                    section = sections[i];
+                    list = lists[section].sort(function(a, b) {
+                        return a[0] - b[0];
+                    });
+
+                    if (header = headers[section]) {
+                        navUl.appendChild(header);
+                    }
+                    for (var j = 0; j < list.length; j++) {
+                        navUl.appendChild(list[j][1]);
+                    }
+                }
+            }
+
+            if (document.querySelectorAll) orderNav();
+        </script>
+        
+    </body>
+</html>

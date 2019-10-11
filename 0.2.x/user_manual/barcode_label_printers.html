@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <title>MISO : 3. Barcode Label Printers</title>
+        <meta name="description" content="An open-source LIMS for NGS sequencing centres">
+
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/main.css">
+				<link rel="icon" href="/miso-lims/0.2.x/favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+<a href="https://github.com/miso-lims/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+        <div class="container">
+            <div class="row">
+                <div id="header" class="col-sm-12">
+                    <h2><a class="brand" href="/miso-lims/0.2.x/"><img src="/miso-lims/0.2.x/images/MISO.png" alt="MISO's logo, a bowl of miso soup"/>MISO</a>
+    <small>An open-source LIMS for NGS sequencing centres</small>
+</h2>
+
+                </div>
+            </div>
+
+            <div class="row">
+                
+                
+                    <div id="navigation" class="col-sm-2">
+                        <ul class="nav nav-list">
+    <!--<li><a href="/miso-lims/0.2.x/">Home</a></li>-->
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">User Guides</li>
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/usr/user-manual-table-of-contents.html">User Manual</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Admin Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/baremetal-installation-guide.html">Installing MISO on baremetal</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/compose-installation-guide.html">Installing MISO with docker-compose</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/admin-guide.html">Administrator's Manual</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/adm/installation-guide.html">Building and Deploying</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Developer Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/rest-testing.html">REST Testing</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/maven-artifacts.html">Maven artifacts</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/code-style.html">Code Style</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/dev/developers-manual.html">Developer's Manual</a></li>
+        
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+    
+<!-- List additional links. It is recommended to add a divider
+    e.g. <li class="divider"></li> first to break up the content. -->
+</ul>
+
+                    </div>
+
+                    <div id="content" class="col-sm-10">
+                        <div class="page-header">
+    <h2>3. Barcode Label Printers
+        
+    </h2>
+</div>
+
+<p>MISO pages can be printed to any printer that is installed on the computer you are using. No extra configuration is
+required to do this. Printing barcode labels to label printers does require some configuration, however.</p>
+
+<p><a name="printers_list"></a></p>
+<h2 id="31-printers-list">3.1. Printers List</h2>
+
+<p>The Printers list can be accessed by clicking the “Printers” link from the Misc list at the left side of the
+screen. The page shows all of the label printers that are configured for use in MISO. At the top of the table, you will
+find controls for adding, deleting, disabling, and enabling printers.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="adding_printers"></a></p>
+<h2 id="32-adding-printers">3.2. Adding Printers</h2>
+
+<p>To add a new printer, go to the Printers list page and click the “Add” button in the toolbar at the top of the table.
+A dialog will appear, asking you for the following:</p>
+
+<ul>
+  <li>Name: the printer name, as you would like it to appear in MISO</li>
+  <li>Driver: specifies both the type of printer and the label stock</li>
+  <li>Backend: the protocol used for communicating with the printer</li>
+</ul>
+
+<p>Click the Next button after you have filled these out. Depending on the backend you selected, more details may be
+requested, such as the hostname and port to use for connecting to the printer. Fill these out if necessary and click
+Save to finish adding the printer.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="disabling_enabling_printers"></a></p>
+<h2 id="33-disablingenabling-printers">3.3. Disabling/Enabling Printers</h2>
+
+<p>If a printer is temporarily offline or otherwise inaccessible, you can disable it in MISO without actually deleting it.
+To do this, go to the Printers list page, check the checkbox beside the printer that you’d like to disable, and click
+the “Disable” button in the toolbar at the top of the table.</p>
+
+<p>To re-enable a printer that is disabled, check the checkbox beside the printer you’d like to enable and click the
+“Enable” button in the toolbar at the top of the table.</p>
+
+<p>The “Available” column shows which printers are enabled and disabled. An “✘” means that the printer is disabled, and 
+“✔” means that the printer is enabled.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="printing_barcodes"></a></p>
+<h2 id="34-printing-barcodes">3.4. Printing Barcodes</h2>
+
+<p>A “Print Barcode(s)” button appears in the toolbar at the top of the list page for every barcodable item type in MISO,
+including samples, libraries, library aliquots, pools, and others. To print barcodes, go to the appropriate list page,
+check the checkboxes next to the items for which you would like to print barcode labels, and click this button. In the
+dialog that appears, choose the printer you would like to use, and the number of copies of each label that you would
+like to print. Click “Print” to confirm and print the labels.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="deleting_printers"></a></p>
+<h2 id="35-deleting-printers">3.5. Deleting Printers</h2>
+
+<p>To delete a printer, go to the Printers list page, check the checkbox beside the printer you’d like to delete, and
+click the “Delete” button in the toolbar at the top of the table. Note that this is permanent and cannot be undone. If
+you wish to use the printer again, you will have to add it again. Consider disabling the printer instead if you may
+want to use it again in the future.</p>
+
+<p><a href="#">Return to top</a></p>
+
+
+
+                    </div>
+                
+            </div>
+
+            
+
+            <div class="row">
+                <div id="footer" class="col-sm-12">
+                    Documentation for <a href="https://github.com/TGAC/miso-lims">MISO</a>
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function orderNav() {
+                var list,
+                    section,
+                    header,
+                    sections = [],
+                    lists = {},
+                    headers = {};
+
+                var navUl = document.querySelectorAll('#navigation ul')[0],
+                    navLis = document.querySelectorAll('#navigation ul li');
+
+                if (!navUl) return;
+
+                for (var i = 0; i < navLis.length; i++) {
+                    var order, li = navLis[i];
+
+                    if (li.classList.contains('nav-header')) {
+                        section = li.textContent || li.innerText;
+                        sections.push(section);
+                        headers[section] = li;
+                        continue;
+                    }
+
+                    if (!lists[section]) {
+                        lists[section] = [];
+                    }
+
+                    order = parseFloat(li.getAttribute('data-order'))
+                    lists[section].push([order, li]);
+                }
+
+                for (var i = 0; i < sections.length; i++) {
+                    section = sections[i];
+                    list = lists[section].sort(function(a, b) {
+                        return a[0] - b[0];
+                    });
+
+                    if (header = headers[section]) {
+                        navUl.appendChild(header);
+                    }
+                    for (var j = 0; j < list.length; j++) {
+                        navUl.appendChild(list[j][1]);
+                    }
+                }
+            }
+
+            if (document.querySelectorAll) orderNav();
+        </script>
+        
+    </body>
+</html>

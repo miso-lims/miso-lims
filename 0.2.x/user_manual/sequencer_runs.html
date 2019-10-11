@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <title>MISO : 18. Sequencer Runs</title>
+        <meta name="description" content="An open-source LIMS for NGS sequencing centres">
+
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/main.css">
+				<link rel="icon" href="/miso-lims/0.2.x/favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+<a href="https://github.com/miso-lims/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+        <div class="container">
+            <div class="row">
+                <div id="header" class="col-sm-12">
+                    <h2><a class="brand" href="/miso-lims/0.2.x/"><img src="/miso-lims/0.2.x/images/MISO.png" alt="MISO's logo, a bowl of miso soup"/>MISO</a>
+    <small>An open-source LIMS for NGS sequencing centres</small>
+</h2>
+
+                </div>
+            </div>
+
+            <div class="row">
+                
+                
+                    <div id="navigation" class="col-sm-2">
+                        <ul class="nav nav-list">
+    <!--<li><a href="/miso-lims/0.2.x/">Home</a></li>-->
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">User Guides</li>
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/usr/user-manual-table-of-contents.html">User Manual</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Admin Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/baremetal-installation-guide.html">Installing MISO on baremetal</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/compose-installation-guide.html">Installing MISO with docker-compose</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/admin-guide.html">Administrator's Manual</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/adm/installation-guide.html">Building and Deploying</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Developer Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/rest-testing.html">REST Testing</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/maven-artifacts.html">Maven artifacts</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/code-style.html">Code Style</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/dev/developers-manual.html">Developer's Manual</a></li>
+        
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+    
+<!-- List additional links. It is recommended to add a divider
+    e.g. <li class="divider"></li> first to break up the content. -->
+</ul>
+
+                    </div>
+
+                    <div id="content" class="col-sm-10">
+                        <div class="page-header">
+    <h2>18. Sequencer Runs
+        
+    </h2>
+</div>
+
+
+<p><a name="sequencer_runs_list"></a></p>
+<h2 id="181-sequencer-runs-list">18.1. Sequencer Runs List</h2>
+
+<p>To get to the Runs list page, click “Runs” under Sequencing in the Instrument Runs list in the menu on the left side of
+the screen. This list includes all sequencer runs that have been created in MISO. The list is divided into tabs for the
+different sequencing platforms. Only platforms for which there are active sequencers or existing libraries or pools are
+included. The toolbar at the top of the table includes a button for creating new runs.</p>
+
+<p>There is also a Runs list on the Edit Project page. This list shows only the runs that include library aliquots
+belonging to the project.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="creating_a_run"></a></p>
+<h2 id="182-creating-a-run">18.2. Creating a Run</h2>
+
+<p>Sequencer runs can be created from the Runs list page. Select the tab of the platform for which you would like to
+create a run. From the toolbar at the top of the table, click the “Add Run” button. This button will be labelled
+differently depending on the selected platform. For example, it will be “Add Illumina Run” on the Illumina tab.</p>
+
+<p>In the dialog that appears, select the sequencer for the run. You will then be taken to the Create Run page, where you
+can complete the run’s details. Click the Save button at the top right when you are done to save the run and go to the
+Edit Run page. Here you can add sequencing containers and further modify the run.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="editing_a_run"></a></p>
+<h2 id="183-editing-a-run">18.3. Editing a Run</h2>
+
+<p>To get to the Edit Run page, click on its ID or alias on the Runs list. The top section of the Edit Run page contains a
+list of fields, most of which may be modified. You can make any changes you would like and then click the “Save” button
+at the top right to confirm the changes.</p>
+
+<p>Below, there are sections for Notes, Attachments, Related Issues, Sequencing Containers, and Partitions, which are
+discussed in other parts of this section of the user manual. There is another section for Experiments, which are
+discussed in the
+<a href="european_nucleotide_archive_support#experiments">European Nucleotide Archive Support section - Experiments</a>. The
+Metrics section contains graphical data reported by the sequencer, and a final section includes the container’s change
+log.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="adding_a_sequencing_container_to_a_run"></a></p>
+<h2 id="184-adding-a-sequencing-container-to-a-run">18.4. Adding a Sequencing Container to a Run</h2>
+
+<p>The Edit Run page includes a Sequencing Containers section, though this will be labelled differently depending on the
+sequencing platform. For Illumina Runs, it will be labelled “Flow Cell.” Click the “Add Flow Cell” button at the top of
+this table to add a container to the run. In the dialog box that appears, choose the position (if applicable), and
+enter the serial number of the container. This container must already exist in MISO.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="removing_a_sequencing_container_from_a_run"></a></p>
+<h2 id="185-removing-a-sequencing-container-from-a-run">18.5. Removing a Sequencing Container from a Run</h2>
+
+<p>To remove a container from a run, go the the Edit Run page for the appropriate run, find the Sequencing Containers
+section, and select the container that you’d like to remove. Click the “Remove” button in the toolbar at the top of the
+table to remove the container.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="setting_partition_qcs"></a></p>
+<h2 id="186-setting-partition-qcs">18.6. Setting Partition QCs</h2>
+
+<p>Partition QCs answer two questions about a sequenced partition:</p>
+
+<ul>
+  <li>Does this partition count towards order fulfillment?</li>
+  <li>Should downstream analysis be run on this partition?</li>
+</ul>
+
+<p>To set partition QCs, a sequencing container must first be added to the run. In the Partitions list, select the
+partitions for which you wish to set QCs, then click the “Set QC” button in the toolbar at the top of the list. Note
+that the Partitions list will be labelled differently depending on the platform of the run. In the dialog that appears,
+select a QC value. The effects of the selection are displayed in parenthesis. The Partitions list will be updated to
+reflect your selection.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="external_links"></a></p>
+<h2 id="187-external-links">18.7. External Links</h2>
+
+<p>If you have a web resource that includes pages for each of your runs, and the URL for those are predictable based on
+the run ID, name, or alias in MISO, MISO can be configured to automatically link to these. For example, links could be
+added to <code class="highlighter-rouge">https://www.example.com/runs/{run-alias}</code>. These can be set up for individual sequencing platforms, so if you
+have a report that is specific to PacBio runs, there will be no link on Illumina run pages. Talk to your MISO
+administrator about setting these up.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="notes"></a></p>
+<h2 id="188-notes">18.8. Notes</h2>
+
+<p>The Edit Run page includes a Notes section. Notes can be used to record additional run information that is otherwise
+not recorded in MISO. More information on working with notes can be found in the <a href="notes.html">Notes section</a>.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="attaching_files"></a></p>
+<h2 id="189-attaching-files">18.9. Attaching Files</h2>
+
+<p>You can attach any type and number of files to a run in MISO. This feature might be used to attach a report of run
+performance, or any other run-related files. For more information, see the <a href="attachments.html">Attachments section</a>.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="related_issues"></a></p>
+<h2 id="1810-related-issues">18.10. Related Issues</h2>
+
+<p>If your MISO instance is configured for integration with an issue tracker such as JIRA, the Edit Run page will include
+a Related Issues section. This section will list links to tickets in the issue tracker that are related to the run. An
+issue is considered to be related to the run if the run alias appears in the title, text, or comments of the ticket.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="downloading_a_sample_sheet"></a></p>
+<h2 id="1811-downloading-a-sample-sheet">18.11. Downloading a Sample Sheet</h2>
+
+<p>Sample sheets are required for some sequencing analysis software in order to identify and demultiplex the libraries.
+MISO is able to automatically generate these sample sheets for several versions of BCL2FASTQ/CASAVA and Cell Ranger. To
+download these sheets, go to the Edit Run page. Near the top of the screen, there are buttons for downloading the
+sample sheets.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="automatically_populate_runs_using_run_scanner"></a></p>
+<h2 id="1812-automatically-populate-runs-using-run-scanner">18.12. Automatically Populate Runs using Run Scanner</h2>
+
+<p>Run Scanner is software that monitors your sequencer run directories and provides information about the runs. MISO can
+be configured to talk to Run Scanner and automatically add and update runs based on its data. For more information
+about Run Scanner, see the <a href="related_software#run_scanner">Related Software - Run Scanner</a> section.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="deleting_runs"></a></p>
+<h2 id="1813-deleting-runs">18.13. Deleting Runs</h2>
+
+<p>Sequencer runs can only be deleted from MISO by direct database access. If you need to delete a run, you should discuss
+this with your MISO administrator.</p>
+
+<p><a href="#">Return to top</a></p>
+
+
+
+                    </div>
+                
+            </div>
+
+            
+
+            <div class="row">
+                <div id="footer" class="col-sm-12">
+                    Documentation for <a href="https://github.com/TGAC/miso-lims">MISO</a>
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function orderNav() {
+                var list,
+                    section,
+                    header,
+                    sections = [],
+                    lists = {},
+                    headers = {};
+
+                var navUl = document.querySelectorAll('#navigation ul')[0],
+                    navLis = document.querySelectorAll('#navigation ul li');
+
+                if (!navUl) return;
+
+                for (var i = 0; i < navLis.length; i++) {
+                    var order, li = navLis[i];
+
+                    if (li.classList.contains('nav-header')) {
+                        section = li.textContent || li.innerText;
+                        sections.push(section);
+                        headers[section] = li;
+                        continue;
+                    }
+
+                    if (!lists[section]) {
+                        lists[section] = [];
+                    }
+
+                    order = parseFloat(li.getAttribute('data-order'))
+                    lists[section].push([order, li]);
+                }
+
+                for (var i = 0; i < sections.length; i++) {
+                    section = sections[i];
+                    list = lists[section].sort(function(a, b) {
+                        return a[0] - b[0];
+                    });
+
+                    if (header = headers[section]) {
+                        navUl.appendChild(header);
+                    }
+                    for (var j = 0; j < list.length; j++) {
+                        navUl.appendChild(list[j][1]);
+                    }
+                }
+            }
+
+            if (document.querySelectorAll) orderNav();
+        </script>
+        
+    </body>
+</html>

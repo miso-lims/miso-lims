@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <title>MISO : Developer's Manual</title>
+        <meta name="description" content="An open-source LIMS for NGS sequencing centres">
+
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/main.css">
+				<link rel="icon" href="/miso-lims/0.2.x/favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+<a href="https://github.com/miso-lims/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+        <div class="container">
+            <div class="row">
+                <div id="header" class="col-sm-12">
+                    <h2><a class="brand" href="/miso-lims/0.2.x/"><img src="/miso-lims/0.2.x/images/MISO.png" alt="MISO's logo, a bowl of miso soup"/>MISO</a>
+    <small>An open-source LIMS for NGS sequencing centres</small>
+</h2>
+
+                </div>
+            </div>
+
+            <div class="row">
+                
+                
+                    <div id="navigation" class="col-sm-2">
+                        <ul class="nav nav-list">
+    <!--<li><a href="/miso-lims/0.2.x/">Home</a></li>-->
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">User Guides</li>
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/usr/user-manual-table-of-contents.html">User Manual</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Admin Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/baremetal-installation-guide.html">Installing MISO on baremetal</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/compose-installation-guide.html">Installing MISO with docker-compose</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/admin-guide.html">Administrator's Manual</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/adm/installation-guide.html">Building and Deploying</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Developer Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/rest-testing.html">REST Testing</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/maven-artifacts.html">Maven artifacts</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/code-style.html">Code Style</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/dev/developers-manual.html">Developer's Manual</a></li>
+        
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+    
+<!-- List additional links. It is recommended to add a divider
+    e.g. <li class="divider"></li> first to break up the content. -->
+</ul>
+
+                    </div>
+
+                    <div id="content" class="col-sm-10">
+                        <div class="page-header">
+    <h2>Developer's Manual
+        
+    </h2>
+</div>
+
+<p>This manual is intended to be an overview of all MISO’s major development areas. If you feel that anything is missing, please
+<a href="https://github.com/miso-lims/miso-lims/issues">let us know</a>.</p>
+
+<h1 id="module-overview">Module Overview</h1>
+
+<p>MISO is divided into several modules, some of which are separate applications or libraries which may also be used in external
+applications.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Module</th>
+      <th>Subdirectory</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>MISO Core</td>
+      <td>core</td>
+      <td>the heart of MISO which models the domain of NGS metadata and underpins the other modules</td>
+    </tr>
+    <tr>
+      <td>miso-dto</td>
+      <td>miso-dto</td>
+      <td>data transfer objects primarily to be JSON-serialized in the REST API</td>
+    </tr>
+    <tr>
+      <td>MISO Integration Tools</td>
+      <td>integration-tools</td>
+      <td>miscellaneous utilities for working with external libraries</td>
+    </tr>
+    <tr>
+      <td>MISO MVC</td>
+      <td>miso-web</td>
+      <td>web front-end, including Spring MVC and REST Controllers, JSPs, and Javascript</td>
+    </tr>
+    <tr>
+      <td>miso-service</td>
+      <td>miso-service</td>
+      <td>service layer containing business logic between the persistence layer and front-end</td>
+    </tr>
+    <tr>
+      <td>MISO SQL Store</td>
+      <td>sqlstore</td>
+      <td>persistence layer</td>
+    </tr>
+    <tr>
+      <td>pinery-miso</td>
+      <td>pinery-miso</td>
+      <td>Implementation of <a href="https://github.com/oicr-gsi/pinery">Pinery</a> REST API for serving MISO LIMS data to other applications</td>
+    </tr>
+    <tr>
+      <td>migration</td>
+      <td>migration</td>
+      <td>a separate application which can be extended to facilitate migration of data from a different LIMS</td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="core">Core</h1>
+
+<h2 id="domain-model">Domain Model</h2>
+
+<h3 id="core-behavioral-interfaces">Core Behavioral Interfaces</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Interface</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Aliasable.java">Aliasable</a></td>
+      <td>Defines objects that have a human-readable identifying ‘alias’ field</td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Barcodable.java">Barcodable</a></td>
+      <td>Defines whether an implementing object is able to be identified by a barcode string. This interface also defines a label text property which can be used to provide abstraction of a number of member properties into a printable string.</td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Boxable.java">Boxable</a></td>
+      <td>Defines whether an implementing object can be stored in a <a href="https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Box.java">Box</a></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/ChangeLoggable.java">ChangeLoggable</a></td>
+      <td>Defines objects that have change logs written to the database</td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Deletable.java">Deletable</a></td>
+      <td>Defines whether an implementing object is deletable by the system. The isDeletable() method defines a contract for ascertaining whether the object has any dependencies that prevent it from being removed, e.g. child members.</td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Identifiable.java">Identifiable</a></td>
+      <td>Defines objects which have an unique ID field. This ID is used as the database primary key</td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Locatable.java">Locatable</a></td>
+      <td>Defines whether an implementing object is able to be located by a barcode string, e.g. a freezer shelf barcode.</td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Nameable.java">Nameable</a></td>
+      <td>Defines whether an implementing object is able to be identified by a unique long and named by a string. This name may or may not be unique depending on the given <a href="https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/naming/NamingScheme.java">NamingScheme</a> applied (see <a href="#naming-schemes">Naming Schemes</a>). This interface is heavily used in MISO for all persistable objects.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="core-model-interfaces">Core Model Interfaces</h3>
+
+<p>These interfaces represent the objects that store state inherent to the MISO model, and are a superset of the
+<a href="http://www.ebi.ac.uk/ena/about/sra_format">EBI SRA domain model schema</a>. This means that as object fields are inputted by
+technicians/auxiliary tools using MISO, the submission schema for the SRA is being populated behind-the-scenes. Decorators are then used
+to wrap up the synonymous objects so that SRA XMLs can be generated.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Object</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Project</td>
+      <td>a collection of studies, samples, and libraries</td>
+    </tr>
+    <tr>
+      <td>Study</td>
+      <td>represents more fine-grained information about the sequencing Project</td>
+    </tr>
+    <tr>
+      <td>Sample</td>
+      <td>the physical material received upon which sample preparation, QC and library preparations are carried out</td>
+    </tr>
+    <tr>
+      <td>Library</td>
+      <td>the first step in constructing sequenceable material from a Sample</td>
+    </tr>
+    <tr>
+      <td>LibraryAliquot</td>
+      <td>portion of a library, possibly diluted, ready to be added to a pool</td>
+    </tr>
+    <tr>
+      <td>Pool</td>
+      <td>contains one or more library aliquots that are ready to be sequenced</td>
+    </tr>
+    <tr>
+      <td>Order</td>
+      <td>a request for sequencing a specific pool using specific run parameters</td>
+    </tr>
+    <tr>
+      <td>SequencerPartitionContainer</td>
+      <td>the physical unit that holds pools during sequencing (Flowcell/Slide)</td>
+    </tr>
+    <tr>
+      <td>Run</td>
+      <td>a sequencer run</td>
+    </tr>
+    <tr>
+      <td>SequencerReference</td>
+      <td>a hardware sequencer</td>
+    </tr>
+    <tr>
+      <td>Box</td>
+      <td>storage box which holds barcoded sample/library/library aliquot/pool tubes</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="enumerated-types">Enumerated Types</h2>
+
+<p>MISO has two categories of enumerated types: those that are actual Java enums, and those that are database-defined.</p>
+
+<h3 id="enums">Enums</h3>
+
+<p>These concrete enums are intended to provide collections of relatively static instances of descriptive definitions.</p>
+
+<ul>
+  <li>HealthType</li>
+  <li>IlluminaChemistry</li>
+  <li>KitType</li>
+  <li>MisoAuthority</li>
+  <li>PlatformType</li>
+  <li>ProgressType</li>
+  <li>StrStatus</li>
+  <li>SubmissionActionType</li>
+</ul>
+
+<h3 id="database-definition-types">Database definition types</h3>
+
+<p>Unlike their enum conterparts, these type definitions are instances of database entities. The primary reason for this is to simplify
+management of types that may be institute-specific. Another is that some of these types follow the enumerations specified in the
+<a href="ftp://ftp.sra.ebi.ac.uk/meta/xsd/sra_1_5/SRA.experiment.xsd">Experiment SRA common schema</a>, and are liable to change.</p>
+
+<ul>
+  <li>LibrarySelectionType</li>
+  <li>LibraryStrategyType</li>
+  <li>LibraryType</li>
+  <li>QcType</li>
+</ul>
+
+<p><a name="naming-schemes"></a></p>
+<h2 id="naming-schemes">Naming Schemes</h2>
+
+<p>All <a href="https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Nameable.java">Nameable</a> entities
+in MISO should conform to a Naming Scheme. This ensures consistency of human-readable names across entity space, and allows centralised
+validation with no requirement of extra code (backend or frontend) on an external developer’s part. The alias attribute on Sample and
+Library can also be generated and/or validated by the naming scheme.</p>
+
+<h3 id="interfaces">Interfaces</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Interface</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>NameGenerator<T></T></td>
+      <td>provides automatic naming for a specific object field</td>
+    </tr>
+    <tr>
+      <td>NameValidator</td>
+      <td>ensures correctness of a specific object field, whether generated or entered manually</td>
+    </tr>
+    <tr>
+      <td>NamingScheme</td>
+      <td>coordinates usage of a collection of generators and validators</td>
+    </tr>
+    <tr>
+      <td>NamingSchemeResolverService</td>
+      <td>resolves naming schemes, generators, and validators given a configured property value. The default implementation simply uses static String mappings</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="managers">Managers</h2>
+
+<h3 id="files">Files</h3>
+
+<p>API access to the underlying filesystem is made available through implementors of the
+<a href="https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/manager/FilesManager.java">FilesManager</a>
+interface. This interface defines a contract to, based on a properties-supplied base directory (see
+<a href="#configuration">Web Application Configuration</a> and
+<a href="https://documentation.tgac.ac.uk/pages/viewpage.action?pageId=950282#Installation&amp;AdministrationManual-Settingupmiso.propertiesfile">Installation Readme</a>),
+generate temporary files, store files and retrieve files from disk, and list files within a given storage directory. The default file
+storage path is:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/storage/miso/files
+</code></pre></div></div>
+
+<p>It is very important that all the underlying directories exist and are writable by the user that runs the MISO instance, but at any rate
+MISO will attempt to check and create these paths if not.</p>
+
+<p>This manager provides a mechanism to standardise file output into specific directories based on Java object types (simple class names,
+lowercased) and qualifiers. These qualifiers are a simple string which can be kept constant by the implementor for a given field, e.g.
+object entity ID. So, for example, sample delivery forms can be generated and stored under a Project type and qualifier. The code to do
+this looks something like:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">File</span> <span class="n">f</span> <span class="o">=</span> <span class="n">misoFileManager</span><span class="o">.</span><span class="na">getNewFile</span><span class="o">(</span>
+           <span class="n">Project</span><span class="o">.</span><span class="na">class</span><span class="o">,</span>
+           <span class="n">projectId</span><span class="o">.</span><span class="na">toString</span><span class="o">(),</span>
+           <span class="s">"SampleDeliveryForm-"</span> <span class="o">+</span> <span class="n">LimsUtils</span><span class="o">.</span><span class="na">getCurrentDateAsString</span><span class="o">()</span> <span class="o">+</span> <span class="s">".odt"</span><span class="o">);</span>
+</code></pre></div></div>
+
+<p>A project with ID 1 and stored in the default file storage directory on the 31st May 2013 will result in the following path structure:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/storage/miso/files/project/1/SampleDeliveryForm-20130531.odt
+</code></pre></div></div>
+
+<p>MISO also obfuscates the actual filename and path within the web application user interfaces by using the file object’s hashcode.</p>
+
+<h3 id="issuetrackers">IssueTrackers</h3>
+
+<p>API access to any registered Issue trackers, e.g. JIRA, RT, Redmine, Mantis, is made available through implementors of the
+<a href="https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/manager/IssueTrackerManager.java">IssueTrackerManager</a>
+interface. The IssueTrackerManager interface has the @Spi annotation, allowing any custom managers to be automatically resolved at runtime
+by using the @ServiceProvider annotation on any concrete classes. The interface itself is very simple, with only three methods to
+override: <strong>getType()</strong> which represents the underlying issue tracker enum, e.g. “JIRA”, <strong>getBaseTrackerUrl()</strong> which represents the REST
+API base URL of the tracker service, and <strong>getIssue(String issueKey)</strong> which actually does the work of grabbing the issue and representing
+it as a JSONObject.</p>
+
+<p>Issue tracker managers allow integration with external issue trackers, removing the need to context switch between MISO and said tracker
+by a user. An example of this feature is in the Project page, where one or more issue IDs can be supplied which will import the issue
+details from the tracker’s API. Currently the only default supported implementation is JIRA, as provided by the
+<a href="https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/main/java/uk/ac/bbsrc/tgac/miso/webapp/service/integration/jira/JiraIssueManager.java">JiraIssueManager</a>
+class.</p>
+
+<h1 id="database-and-schema">Database and Schema</h1>
+
+<p>The MISO database is created and updated using <a href="https://flywaydb.org/">Flyway</a> migrations.</p>
+
+<h2 id="creating-a-new-database">Creating a New Database</h2>
+
+<ol>
+  <li>First, check out the branch you’d like to build the DB for via Github
+    <ul>
+      <li>If you want the OICR base data to be included, this should be oicr/oicr, or another branch derived from it</li>
+      <li>If you just want the base MISO data, this should be tgac/develop, or another branch derived from it</li>
+    </ul>
+  </li>
+  <li>
+    <p>Next, build the entire MISO project</p>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> mvn clean install
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>If you don’t yet have a MySQL Database, create one. Also create a user with write access. e.g.</p>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> CREATE DATABASE miso;
+ CREATE USER misouser@localhost IDENTIFIED BY 'password';
+ GRANT ALL ON miso.* TO misouser@localhost;
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Configure Flyway in MISO. This is done by creating the file: <code class="highlighter-rouge">miso-lims/sqlstore/flyway.properties</code>:</p>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> flyway.user=misouser
+ flyway.password=password
+ flyway.url=jdbc:mysql://localhost:3306/miso
+</code></pre></div>    </div>
+
+    <p>This file is gitignored, so you don’t have to worry about your credentials ending up on Github</p>
+  </li>
+  <li>
+    <p>If you have an existing database that you’d like to clear and rebuild, run Flyway Clean to wipe it out</p>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> cd sqlstore
+ mvn flyway:clean
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Finally, run the migrations</p>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> cd sqlstore
+ mvn flyway:migrate
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h2 id="updating-an-existing-database">Updating an Existing Database</h2>
+
+<ol>
+  <li>Check out and build MISO as described in steps 1-2 of Creating a New Database (above)</li>
+  <li>
+    <p>Run Flyway Migrate. Only new migrations will be run</p>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> cd sqlstore
+ mvn flyway:migrate
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h2 id="adding-new-database-migrations">Adding New Database Migrations</h2>
+
+<p>There are a few things to keep in mind when adding Flyway migrations</p>
+
+<ul>
+  <li>SQL Migrations are located in <code class="highlighter-rouge">miso-lims/sqlstore/src/main/resources/db/migration</code></li>
+  <li>All <strong>schema</strong> updates should be added to the tgac/develop branch</li>
+  <li>institute-specific <strong>data</strong> (not schema) should be added in an institute-specific fork/branch</li>
+  <li>There should be no institute-specific schema</li>
+  <li><strong>Schema</strong> changes must be done using SQL that is valid in both MySQL and the MySQL mode of H2. Refer to the
+<a href="http://www.h2database.com/html/grammar.html">H2 documentation</a>, as it does not include 100% of the MySQL syntax. Some of the minor
+differences are automatically translated to work with H2 during test build. This is done by a Groovy script run via Maven</li>
+  <li>Most <strong>data</strong> changes should be between <code class="highlighter-rouge">-- StartNoTest</code> and <code class="highlighter-rouge">-- EndNoTest</code> comments to ensure that they don’t affect unit or
+integration tests. This also means that data changes do not have to be compatible with H2</li>
+  <li><strong>Schema</strong> changes should never be excluded from tests</li>
+  <li>Triggers, stored procedures, and views should be created either in a beforeMigrate or afterMigrate script. These can be found in the
+<code class="highlighter-rouge">migration_beforeMigrate</code> and <code class="highlighter-rouge">migration_afterMigrate</code> subdirectories respectively. These scripts are run during every Flyway Migrate
+run, which means the triggers, procedures and views are recreated each time in-case of schema changes. This means that the <code class="highlighter-rouge">CREATE</code>
+statements must be preceded by <code class="highlighter-rouge">DROP</code> statements, or something similar</li>
+  <li><strong>Data</strong> additions (Tissue Origins, Kits, etc.) should usually be in an afterMigrate script</li>
+</ul>
+
+<h1 id="persistence-layer">Persistence Layer</h1>
+
+<p>Hibernate is used for Object-Relational Mapping (ORM). JPA/Hibernate annotations are used in the model classes to define columns, joins,
+constraints, and other database info. The Data Access Objects (DAOs) found in the sqlstore module are then only responsible for doing
+simple reads and writes as (usually) dictated by the Service layer. DAOs should only be consumed by the Service layer.</p>
+
+<h1 id="service-layer">Service Layer</h1>
+
+<p>The Service layer, found in the miso-service layer, contains all the business logic involved in correctly storing and retrieving things
+from the database. To ensure data consistency, all database access in MISO should be done through a Service class rather than using the
+DAOs directly. Beyond data storage and retrieval via the DAO’s, the Service layer’s responsibilities include</p>
+
+<ul>
+  <li>Authorization checks using an AuthorizationManager</li>
+  <li>Name generation using a NamingScheme</li>
+  <li>Validation in cases where database constraints are not strong enough</li>
+  <li>Updating timestamps and userId fields such as creationDate and lastModifier</li>
+  <li>Ensuring that only fields which should be modifiable can be modified</li>
+</ul>
+
+<p><a name="configuration"></a></p>
+<h1 id="web-application">Web Application</h1>
+
+<p>The main MISO web application is powered by the <a href="http://www.springsource.org/">Spring framework</a>, notably
+<a href="http://static.springsource.org/spring/docs/4.3.x/spring-framework-reference/html/mvc.html">Spring MVC</a>. This allows powerful webapp
+configuration and tailoring via Spring XML and annotations, making functionality like the REST API a breeze. Here, we will go through the
+MISO elements that comprise the web application layer.</p>
+
+<h2 id="configuration">Configuration</h2>
+
+<p>A great deal of MISO can be configured at the Spring XML level, making it easy for developers to swap out existing MISO implementations for their own, via <a href="http://static.springsource.org/spring/docs/3.2.x/spring-framework-reference/html/overview.html#overview-dependency-injection">Dependency Injection</a>. MISO uses the usual web.xml to define properties relevant to the webapp container, and a number of Spring configuration XML files for the core application itself:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Configuration file</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/web.xml">web.xml</a></td>
+      <td>Configures the web application with respect to the web container, e.g. Tomcat. Allows mapping of URLs to DispatcherServlets, and the inclusion of any relevant filters or logging framework configuration property files</td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/applicationContext.xml">applicationContext.xml</a></td>
+      <td>Configures the central application miso.properties location and pulls in the configuration files below</td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/miso-servlet.xml">miso-servlet.xml</a></td>
+      <td>Defines low-level MISO webapp-centric elements. Very little configuration should go in here</td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/miso-config.xml">miso-config.xml</a></td>
+      <td>High-level user-space MISO bean configuration</td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/db-config.xml">db-config.xml</a></td>
+      <td>Configures access to the underlying datasource</td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/jdbc-security-config.xml">jdbc-security-config.xml</a> / <a href="https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/ldap-security-config.xml">ldap-security-config.xml</a></td>
+      <td>Database and LDAP specific configuration, respectively. JDBC configuration is the initial default, and is the simplest mechanism to get started. If you would like more fine-grained access to a directory-style authentication and role assignment mechanism, then LDAP support is also available</td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/integration-config.xml">integration-config.xml</a></td>
+      <td>Configures elements in the integration layer, e.g. analysis server</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="rest-api">REST API</h2>
+
+<p>The REST API is used primarily to support AJAX on the front-end. Because the model classes may be very complex and sometimes contain a
+deep graph of nested objects, they are converted to simpler Data Transfer Objects (DTO) before serializion to JSON.</p>
+
+<h3 id="request-signing">Request Signing</h3>
+
+<p>Signing requests requires 3 elements:</p>
+
+<ul>
+  <li>REST API URL of the service you wish to request</li>
+  <li>Your MISO username</li>
+  <li>Your MISO API key - this can be found by logging in to MISO as normal and clicking your username at the top right. The key is in the top box</li>
+</ul>
+
+<p>Producing HMAC keys from these elements for your request is easy:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>echo -n "&lt;REST-url&gt;?x-url=&lt;REST-url&gt;@x-user=&lt;miso_user_name&gt;" | openssl sha1 -binary -hmac "&lt;your_key_from_miso&gt;" | openssl base64 | tr -d = | tr +/ -_
+</code></pre></div></div>
+
+<p>You can then use curl to initiate the request, using the REST API URL, your username, and the signed fragment produced above:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl --request GET 'http://&lt;miso_url&gt;/&lt;REST-url&gt;'--header 'x-user:&lt;miso_user_name&gt;'--header 'x-signature:&lt;hmac_string_from_above&gt;'--header 'x-url:&lt;REST-url&gt;'
+</code></pre></div></div>
+
+<p>Putting the two together, here’s an example shell script that can grab a list of libraries associated with a project:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/bash</span>
+
+<span class="nv">PROJECTID</span><span class="o">=</span><span class="nv">$1</span>
+<span class="nv">USER</span><span class="o">=</span><span class="nv">$2</span>
+<span class="nv">KEY</span><span class="o">=</span><span class="nv">$3</span>
+
+<span class="nv">SIGNATURE</span><span class="o">=</span><span class="sb">`</span><span class="nb">echo</span> <span class="nt">-n</span> <span class="s2">"/miso/rest/projects/</span><span class="nv">$PROJECTID</span><span class="s2">/libraries?x-url=/miso/rest/projects/</span><span class="nv">$PROJECTID</span><span class="s2">/libraries@x-user=</span><span class="nv">$USER</span><span class="s2">"</span> | openssl sha1 <span class="nt">-binary</span> <span class="nt">-hmac</span> <span class="s2">"</span><span class="nv">$KEY</span><span class="s2">"</span> | openssl <span class="nb">base64</span> | <span class="nb">tr</span> <span class="nt">-d</span> <span class="o">=</span> | <span class="nb">tr</span> +/ <span class="nt">-_</span><span class="sb">`</span>
+
+curl <span class="nt">--request</span> GET <span class="s2">"http://your.miso.url/miso/rest/projects/</span><span class="nv">$PROJECTID</span><span class="s2">/libraries"</span> <span class="nt">--header</span> <span class="s2">"x-user:</span><span class="nv">$USER</span><span class="s2">"</span> <span class="nt">--header</span> <span class="s2">"x-signature:</span><span class="nv">$SIGNATURE</span><span class="s2">"</span> <span class="nt">--header</span> <span class="s2">"x-url:/miso/rest/projects/</span><span class="nv">$PROJECTID</span><span class="s2">/libraries"</span>
+</code></pre></div></div>
+
+<h1 id="run-scanner">Run Scanner</h1>
+<p>(TODO)</p>
+
+<h1 id="testing">Testing</h1>
+
+<h2 id="unit-tests">Unit Tests</h2>
+
+<p>Tests are run through jUnit 4 via Maven. It is configured to run any classes with names ending in “Test” in the test sources. Generally,
+all new code should be unit tested. The Maven Cobertura plugin can be used to generate a coverage report. SonarQube also analyses test
+coverage.</p>
+
+<h2 id="dao-testing">DAO Testing</h2>
+
+<h3 id="test-database">Test Database</h3>
+
+<p>A test database is created in memory for DAO testing. It is an H2 database running in MySQL mode. The database understands most MySQL
+syntax, but is not perfect. A Groovy script is used to copy the production schemas and make a few changes to them so that H2 will be happy.
+Flyway is used to migrate the test schemas into the test database.</p>
+
+<p><strong>WARNING</strong>: Eclipse will show a lifecycle mapping error in sqlstore/pom.xml. This is because the groovy-maven-plugin isn’t compatible with Eclipse’s
+m2e (Maven) plugin. The tests can still be run in Eclipse, but you must first do a <code class="highlighter-rouge">mvn clean install</code> outside of Eclipse, so that Maven
+will run the schema translator.</p>
+
+<h3 id="test-data">Test Data</h3>
+
+<p>Test data is populated via Flyway from the script
+<a href="https://github.com/miso-lims/miso-lims/blob/develop/sqlstore/src/test/resources/db/test_migration/test_data.sql">test_data.sql</a></p>
+
+<p>Flyway is configured to look for any files in the migration directory ending with .test.sql. They must include version numbers higher than
+the production schema versions so that they are run after the tables are created.</p>
+
+<h3 id="tests">Tests</h3>
+
+<p>DAO test classes should all extend <code class="highlighter-rouge">AbstractDAOTest</code>. The abstract class includes the annotations necessary to make the test database
+available. It also makes your tests transactional, so any database changes made in a test case are rolled back before the next test case
+runs. In your test class, you can autowire the SessionFactory and JdbcTemplate, and pass those to your DAO to make it access the test
+database. You can also create mocks for the DAO’s other dependencies using Mockito:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public class SQLRunDAOTest extends AbstractDAOTest {
+
+  @Autowired
+  private JdbcTemplate jdbcTemplate;
+
+  @Mock private Store&lt;SecurityProfile&gt; securityProfileDAO;
+
+  @InjectMocks private SQLRunDAO dao;
+
+  @Before
+  public void setup() {
+    MockitoAnnotations.initMocks(this);
+    dao.setJdbcTemplate(jdbcTemplate);
+  }
+
+}
+</code></pre></div></div>
+
+<h2 id="ui-integration-testing">UI Integration Testing</h2>
+<p>UI integration tests should all extend <code class="highlighter-rouge">AbstractIT</code> for similar reasons as the DAO tests listed above.
+The UI tests run Selenium against a Tomcat instance using MySQL in Docker.
+UI integration tests can be run using:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn clean verify -DskipITs=false -DrunPlainITs
+</code></pre></div></div>
+
+<p>To run a specific IT test class, use:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn clean verify -DskipITs=false -Dit.test=NameOfITTestClass
+</code></pre></div></div>
+
+<p>To spin up an instance of Tomcat populated with the IT test data, use:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn clean verify -DskipITs=false -DcargoInitGoal=run
+</code></pre></div></div>
+
+<p>This will cause Tomcat to start but will not run any tests. You can access this Tomcat at
+<code class="highlighter-rouge">http://localhost:$PORT</code>, where $PORT is the port listed in the console
+output once the Tomcat has finished starting up. As Tomcat is not running tests, it will have to be killed
+with <code class="highlighter-rouge">Ctrl-C</code> and the MySQL Docker container will have to be manually cleaned up.</p>
+
+<h2 id="building-the-docker-images-after-building-a-release">Building the Docker images (after building a release)</h2>
+
+<p>If you are a MISO maintainer and you have created the latest release, you will need to create a
+Docker image for it and send it to DockerHub.</p>
+
+<p>Pull the tag or snapshot that you want to build and package it:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>export version="0.2.35-SNAPSHOT"
+git checkout "tags/${version}"
+docker build --target flyway-migration -t "misolims/miso-lims-migration:${version}" --no-cache .
+docker build --target webapp -t "misolims/miso-lims-webapp:${version}" --no-cache .
+docker tag "misolims/miso-lims-migration:${version}" misolims/miso-lims-migration:latest
+docker tag "misolims/miso-lims-webapp:${version}" misolims/miso-lims-webapp:latest
+</code></pre></div></div>
+
+<p>Once the build completes, test it by launching it. This command uses the default 
+environment variables in .env and relies on <code class="highlighter-rouge">.miso_db_password</code> file existing.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>export MISO_TAG="${version}" &amp;&amp; docker-compose up
+</code></pre></div></div>
+
+<p>Navigate to <code class="highlighter-rouge">http://localhost:8090</code> and login with the credentials admin:admin.</p>
+
+<p>Once satisfied, push the image to Docker Hub. Note that only members of the <a href="https://hub.docker.com/u/misolims/">misolims</a> organisation can push:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker login
+docker push "misolims/miso-lims-migration:${version}"
+docker push "misolims/miso-lims-migration:latest"
+docker push "misolims/miso-lims-webapp:${version}"
+docker push "misolims/miso-lims-webapp:latest"
+</code></pre></div></div>
+
+
+                    </div>
+                
+            </div>
+
+            
+
+            <div class="row">
+                <div id="footer" class="col-sm-12">
+                    Documentation for <a href="https://github.com/TGAC/miso-lims">MISO</a>
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function orderNav() {
+                var list,
+                    section,
+                    header,
+                    sections = [],
+                    lists = {},
+                    headers = {};
+
+                var navUl = document.querySelectorAll('#navigation ul')[0],
+                    navLis = document.querySelectorAll('#navigation ul li');
+
+                if (!navUl) return;
+
+                for (var i = 0; i < navLis.length; i++) {
+                    var order, li = navLis[i];
+
+                    if (li.classList.contains('nav-header')) {
+                        section = li.textContent || li.innerText;
+                        sections.push(section);
+                        headers[section] = li;
+                        continue;
+                    }
+
+                    if (!lists[section]) {
+                        lists[section] = [];
+                    }
+
+                    order = parseFloat(li.getAttribute('data-order'))
+                    lists[section].push([order, li]);
+                }
+
+                for (var i = 0; i < sections.length; i++) {
+                    section = sections[i];
+                    list = lists[section].sort(function(a, b) {
+                        return a[0] - b[0];
+                    });
+
+                    if (header = headers[section]) {
+                        navUl.appendChild(header);
+                    }
+                    for (var j = 0; j < list.length; j++) {
+                        navUl.appendChild(list[j][1]);
+                    }
+                }
+            }
+
+            if (document.querySelectorAll) orderNav();
+        </script>
+        
+    </body>
+</html>

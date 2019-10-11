@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <title>MISO : 11. Pool Orders</title>
+        <meta name="description" content="An open-source LIMS for NGS sequencing centres">
+
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/main.css">
+				<link rel="icon" href="/miso-lims/0.2.x/favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+<a href="https://github.com/miso-lims/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+        <div class="container">
+            <div class="row">
+                <div id="header" class="col-sm-12">
+                    <h2><a class="brand" href="/miso-lims/0.2.x/"><img src="/miso-lims/0.2.x/images/MISO.png" alt="MISO's logo, a bowl of miso soup"/>MISO</a>
+    <small>An open-source LIMS for NGS sequencing centres</small>
+</h2>
+
+                </div>
+            </div>
+
+            <div class="row">
+                
+                
+                    <div id="navigation" class="col-sm-2">
+                        <ul class="nav nav-list">
+    <!--<li><a href="/miso-lims/0.2.x/">Home</a></li>-->
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">User Guides</li>
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/usr/user-manual-table-of-contents.html">User Manual</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Admin Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/baremetal-installation-guide.html">Installing MISO on baremetal</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/compose-installation-guide.html">Installing MISO with docker-compose</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/admin-guide.html">Administrator's Manual</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/adm/installation-guide.html">Building and Deploying</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Developer Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/rest-testing.html">REST Testing</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/maven-artifacts.html">Maven artifacts</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/code-style.html">Code Style</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/dev/developers-manual.html">Developer's Manual</a></li>
+        
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+    
+<!-- List additional links. It is recommended to add a divider
+    e.g. <li class="divider"></li> first to break up the content. -->
+</ul>
+
+                    </div>
+
+                    <div id="content" class="col-sm-10">
+                        <div class="page-header">
+    <h2>11. Pool Orders
+        
+    </h2>
+</div>
+
+<p>Pool orders are used to track sets of library aliquots that are ready to be pooled. It may be useful for people who are
+responsible for creating libraries to then create a pool orders to pass requirements on to other people who are
+responsible for creating pools. Pool orders are intended to help organize separate teams, and using them is completely
+optional.</p>
+
+<p>A pool order specifies which library aliquots should be pooled, and at what proportions. To fulfill a pool order, a
+pool containing all of the specified aliquots must be linked to it. If the pool contains an aliquot derived from the
+specified aliquot, that is also accepted. A pool can be used to fulfill the pool order even if it contains additional
+aliquots, or if the proportions do not match, though a warning will be shown in the latter case.</p>
+
+<p>Optionally, a pool order may specify sequencing requirements. If sequencing requirements are specified, a sequencing
+order must also be linked to the pool order in order for the pool order to be fulfilled. See the
+<a href="sequencing_orders.html">Sequencing Orders</a> section for more information on sequencing orders and sequencing
+requirements.</p>
+
+<p>A pool order may be marked as draft to indicate that the requirements are not yet confirmed. The draft status must be
+removed before a pool order can be fulfilled.</p>
+
+<p><a name="pool_orders_list"></a></p>
+<h2 id="111-pool-orders-list">11.1. Pool Orders List</h2>
+
+<p>To get to the Pool Orders list page, click “Pool Orders” in the Preparation list in the navigation menu. Pool orders are
+divided into tabs depending on their status. A pool order’s status may be</p>
+
+<ul>
+  <li>Outstanding: A pool and/or sequencing order (if applicable) is not yet linked to the pool order</li>
+  <li>Fulfilled: A pool and sequencing order (if applicable) has been linked to the pool order</li>
+  <li>Draft: The pool order is marked as draft</li>
+</ul>
+
+<p>You can click on a pool order ID or alias in the list to get to the Edit Pool Order page. The toolbar at the top of the
+list provides other commands for working with pool orders.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="creating_pool_orders"></a></p>
+<h2 id="112-creating-pool-orders">11.2. Creating Pool Orders</h2>
+
+<p>The easiest way to create a pool order is from the Library Aliquots list. Select the aliquots that you would like to
+include in the order and click the “Create Order” button in the toolbar at the top of the list. This will take you to
+the Create Pool Order page. Fill in the order information in the top section of the page. Below, you’ll see a table
+containing the library aliquots you selected. By default, they are all included at a 1:1 ratio. You can click the Edit
+Proportions button at the top of the table to modify this. When you are done, click the Save button at the top of the
+page.</p>
+
+<p>You can also get to the Create Pool Order page from the Pool Orders list by clicking the Add button in the toolbar at
+the top of the list. In this case, you will have to add the library aliquots using the Add button at the top of the
+Library Aliquots table at the bottom of the page. This will allow you to search for aliquots by entering multiple names,
+aliases, or barcodes.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="fulfilling_pool_orders"></a></p>
+<h2 id="113-fulfilling-pool-orders">11.3. Fulfilling Pool Orders</h2>
+
+<p>A pool must be linked to the pool order in order to fulfill it. If the pool order specifies sequencing requirements,
+then a sequencing order must also be linked. You can create and link pools and sequencing orders from the Edit Pool
+Order page.</p>
+
+<p><a name="creating_a_pool"></a></p>
+<h3 id="1131-creating-a-pool">11.3.1. Creating a Pool</h3>
+
+<p>You can create a pool containing all of the required aliquots at the specified proportions and link it to the pool order
+in one step from the Edit Pool Order page. If the pool order has been saved and the order is not marked as a draft, a
+Create Pool button will appear near the bottom of the Order Information section. Clicking this button will bring up a
+dialog to confirm the aliquots and proportions for the pool. After you’ve confirmed, another dialog will appear for you
+to enter the pool information. After completing the pool information, click Save and the pool will be created and linked
+to the order.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="linking_an_existing_pool"></a></p>
+<h3 id="1132-linking-an-existing-pool">11.3.2. Linking an Existing Pool</h3>
+
+<p>If you have already created a pool containing the required aliquots (or aliquots derived from those), you can link it to
+the order using the Link Pool button near the bottom of the Order Information section. This will open a dialog where you
+can enter the pool name, alias, or barcode to search. Find and select a pool to link it to the order.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="creating_a_sequencing_order"></a></p>
+<h3 id="1133-creating-a-sequencing-order">11.3.3. Creating a Sequencing Order</h3>
+
+<p>If the pool order specifies sequencing requirements and a pool is already linked to the order, a Create Sequencing Order
+button will appear near the bottom of the Order Information section. Clicking this button will open a dialog where you
+can confirm the sequencing order details and optionally enter a description. Click Save to create the sequencing order
+and link it to the pool order.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="linking_an_existing_sequencing_order"></a></p>
+<h3 id="1134-linking-an-existing-sequencing-order">11.3.4. Linking an Existing Sequencing Order</h3>
+
+<p>If the pool order specifies sequencing requirements and a pool is already linked to the order, a Link Sequencing Order
+button will appear near the bottom of the Order Information section. Click this button to search for a sequencing order
+with matching requirements, and link it to the pool order.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="deleting_pool_orders"></a></p>
+<h2 id="114-deleting-pool-orders">11.4. Deleting Pool Orders</h2>
+
+<p>To delete pool orders, go to the Pool Orders list. Select the pool orders you wish to delete, then click the Delete
+button in the toolbar at the top of the list. Only unfulfilled pool orders can be deleted, and only by the order’s
+creator or a MISO administrator.</p>
+
+<p><a href="#">Return to top</a></p>
+
+
+
+                    </div>
+                
+            </div>
+
+            
+
+            <div class="row">
+                <div id="footer" class="col-sm-12">
+                    Documentation for <a href="https://github.com/TGAC/miso-lims">MISO</a>
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function orderNav() {
+                var list,
+                    section,
+                    header,
+                    sections = [],
+                    lists = {},
+                    headers = {};
+
+                var navUl = document.querySelectorAll('#navigation ul')[0],
+                    navLis = document.querySelectorAll('#navigation ul li');
+
+                if (!navUl) return;
+
+                for (var i = 0; i < navLis.length; i++) {
+                    var order, li = navLis[i];
+
+                    if (li.classList.contains('nav-header')) {
+                        section = li.textContent || li.innerText;
+                        sections.push(section);
+                        headers[section] = li;
+                        continue;
+                    }
+
+                    if (!lists[section]) {
+                        lists[section] = [];
+                    }
+
+                    order = parseFloat(li.getAttribute('data-order'))
+                    lists[section].push([order, li]);
+                }
+
+                for (var i = 0; i < sections.length; i++) {
+                    section = sections[i];
+                    list = lists[section].sort(function(a, b) {
+                        return a[0] - b[0];
+                    });
+
+                    if (header = headers[section]) {
+                        navUl.appendChild(header);
+                    }
+                    for (var j = 0; j < list.length; j++) {
+                        navUl.appendChild(list[j][1]);
+                    }
+                }
+            }
+
+            if (document.querySelectorAll) orderNav();
+        </script>
+        
+    </body>
+</html>

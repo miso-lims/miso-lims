@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <title>MISO : 16. Sequencing Containers</title>
+        <meta name="description" content="An open-source LIMS for NGS sequencing centres">
+
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/main.css">
+				<link rel="icon" href="/miso-lims/0.2.x/favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+<a href="https://github.com/miso-lims/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+        <div class="container">
+            <div class="row">
+                <div id="header" class="col-sm-12">
+                    <h2><a class="brand" href="/miso-lims/0.2.x/"><img src="/miso-lims/0.2.x/images/MISO.png" alt="MISO's logo, a bowl of miso soup"/>MISO</a>
+    <small>An open-source LIMS for NGS sequencing centres</small>
+</h2>
+
+                </div>
+            </div>
+
+            <div class="row">
+                
+                
+                    <div id="navigation" class="col-sm-2">
+                        <ul class="nav nav-list">
+    <!--<li><a href="/miso-lims/0.2.x/">Home</a></li>-->
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">User Guides</li>
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/usr/user-manual-table-of-contents.html">User Manual</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Admin Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/baremetal-installation-guide.html">Installing MISO on baremetal</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/compose-installation-guide.html">Installing MISO with docker-compose</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/admin-guide.html">Administrator's Manual</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/adm/installation-guide.html">Building and Deploying</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Developer Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/rest-testing.html">REST Testing</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/maven-artifacts.html">Maven artifacts</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/code-style.html">Code Style</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/dev/developers-manual.html">Developer's Manual</a></li>
+        
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+    
+<!-- List additional links. It is recommended to add a divider
+    e.g. <li class="divider"></li> first to break up the content. -->
+</ul>
+
+                    </div>
+
+                    <div id="content" class="col-sm-10">
+                        <div class="page-header">
+    <h2>16. Sequencing Containers
+        
+    </h2>
+</div>
+
+<p>A sequencing container holds one or more pools and is loaded onto a sequencer for a sequencing run. These actually have
+different names depending on the platform. Illumina and Oxford Nanopore containers are called flow cells, PacBio
+containers are called 8Pacs, etc. “Sequencing container” is a platform-agnostic term that we use for all of these.</p>
+
+<p><a name="sequencing_container_list"></a></p>
+<h2 id="161-sequencing-container-list">16.1. Sequencing Container List</h2>
+
+<p>To get to the Sequencing Containers list page, click “Containers” under Sequencing in the Instrument Runs list in the
+menu on the left side of the screen. This list includes all containers that have been created in MISO. The list is
+divided into tabs for the different sequencing platforms. Only platforms for which there are active sequencers or
+existing libraries or pools are included. The toolbar at the top of the table includes many controls for working with
+containers.</p>
+
+<p>There is also a Sequencing Containers list on the Edit Run page which allows you to attach containers to the run. This
+containers list has most of the same controls as on the Sequencing Containers list page, plus extra controls for adding
+and removing containers from the run.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="creating_a_container"></a></p>
+<h2 id="162-creating-a-container">16.2. Creating a Container</h2>
+
+<p>Containers can be created from the Sequencing Containers list page. Select the tab of the platform for which you would
+like to create a container. From the toolbar at the top of the table, click the “Add Container” button. This button
+will be labelled differently depending on the selected platform. For example, it will be “Add Flow Cell” on the
+Illumina tab.</p>
+
+<p>In the dialog that appears, choose the instrument model that the container will be run on. Next, choose the sequencing
+container model. You will then be taken to the Create Container page, where you can complete the container’s details.
+Click the Save button at the top right when you are done to save the container and go to the Edit Container page. Here
+you can add pools and further modify the container.</p>
+
+<p>If you are using Run Scanner, MISO will automatically create any non-existant containers for runs that it reports. If a
+container with a serial number matching the one reported for the run already exists, it will be used instead.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="editing_a_container"></a></p>
+<h2 id="163-editing-a-container">16.3. Editing a Container</h2>
+
+<p>To get to the Edit Container page, click on its ID or Serial Number on the Sequencing Containers list. There are also
+links to the Edit Container page in the Partitions lists found on the Edit Run and Edit Pool pages. Note that
+platform-specific terms may be used to label both the Sequencing Containers and Partitions lists.</p>
+
+<p>The top section of the Edit Container page contains a list of fields, most of which may be modified. You can make any
+changes you would like and then click the “Save” button at the top right to confirm the changes.</p>
+
+<p>Below, there are sections for QC’s and Partitions, which are discussed in other parts of this section of the user
+manual. Other sections list the runs that the container has been loading onto, and the container’s change log.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="assigning_pools_to_a_container"></a></p>
+<h2 id="164-assigning-pools-to-a-container">16.4. Assigning Pools to a Container</h2>
+
+<p>You can assign pools to a container using the Partitions list that is found on both the Edit Container and Edit Run
+pages. The Partitions list will be labelled differently depending on the platform. For Illumina, it will be called the
+Lanes list. Select the partitions that you would like to add a pool to and click the “Assign Pool” button in the
+toolbar at the top of the table.</p>
+
+<p>You will be given several options for selecting a pool.</p>
+
+<ul>
+  <li>Choose “No Pool” if you want to remove the current pool from the partition</li>
+  <li>Choose “Search” to search for the pool by ID, name, alias, or barcode</li>
+  <li>Choose “Outstanding Orders (All)” to select from pools that have an active order</li>
+  <li>Choose “Outstanding Orders (Matched Chemistry)” to select from pools that have active orders with sequencing
+parameters matching those of the run (only available on the Edit Run page)</li>
+  <li>Choose “Recently modified” to choose from pools that have been recently created or edited</li>
+</ul>
+
+<p>After choosing a pool, you can set the loading concentration, or leave it blank. Click the OK button to finish.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="container_qcs"></a></p>
+<h2 id="165-container-qcs">16.5. Container QCs</h2>
+
+<p>Any number of quality control measures may be recorded for a container. For more information on this feature, see the
+<a href="qcs.html">QCs section</a>.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="printing_barcodes"></a></p>
+<h2 id="166-printing-barcodes">16.6. Printing Barcodes</h2>
+
+<p>Barcode labels can be printed for a series of containers from the Containers list. See the
+<a href="barcode_label_printers.html#printing_barcodes">Barcode Label Printers section - Printing Barcodes</a> for details on how
+to do this.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="deleting_containers"></a></p>
+<h2 id="167-deleting-containers">16.7. Deleting Containers</h2>
+
+<p>To delete containers, go to the Containers list, check the checkboxes next to the containers that you wish to delete, and
+click the “Delete” button in the toolbar at the top of the table. A container can only be deleted if it has not been added
+to any runs. The container must be removed from any runs before it can be deleted. A container can only be deleted by its
+creator or a MISO administrator.</p>
+
+<p><a href="#">Return to top</a></p>
+
+
+
+                    </div>
+                
+            </div>
+
+            
+
+            <div class="row">
+                <div id="footer" class="col-sm-12">
+                    Documentation for <a href="https://github.com/TGAC/miso-lims">MISO</a>
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function orderNav() {
+                var list,
+                    section,
+                    header,
+                    sections = [],
+                    lists = {},
+                    headers = {};
+
+                var navUl = document.querySelectorAll('#navigation ul')[0],
+                    navLis = document.querySelectorAll('#navigation ul li');
+
+                if (!navUl) return;
+
+                for (var i = 0; i < navLis.length; i++) {
+                    var order, li = navLis[i];
+
+                    if (li.classList.contains('nav-header')) {
+                        section = li.textContent || li.innerText;
+                        sections.push(section);
+                        headers[section] = li;
+                        continue;
+                    }
+
+                    if (!lists[section]) {
+                        lists[section] = [];
+                    }
+
+                    order = parseFloat(li.getAttribute('data-order'))
+                    lists[section].push([order, li]);
+                }
+
+                for (var i = 0; i < sections.length; i++) {
+                    section = sections[i];
+                    list = lists[section].sort(function(a, b) {
+                        return a[0] - b[0];
+                    });
+
+                    if (header = headers[section]) {
+                        navUl.appendChild(header);
+                    }
+                    for (var j = 0; j < list.length; j++) {
+                        navUl.appendChild(list[j][1]);
+                    }
+                }
+            }
+
+            if (document.querySelectorAll) orderNav();
+        </script>
+        
+    </body>
+</html>

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <title>MISO : 1. Site Configuration</title>
+        <meta name="description" content="An open-source LIMS for NGS sequencing centres">
+
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/main.css">
+				<link rel="icon" href="/miso-lims/0.2.x/favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+<a href="https://github.com/miso-lims/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+        <div class="container">
+            <div class="row">
+                <div id="header" class="col-sm-12">
+                    <h2><a class="brand" href="/miso-lims/0.2.x/"><img src="/miso-lims/0.2.x/images/MISO.png" alt="MISO's logo, a bowl of miso soup"/>MISO</a>
+    <small>An open-source LIMS for NGS sequencing centres</small>
+</h2>
+
+                </div>
+            </div>
+
+            <div class="row">
+                
+                
+                    <div id="navigation" class="col-sm-2">
+                        <ul class="nav nav-list">
+    <!--<li><a href="/miso-lims/0.2.x/">Home</a></li>-->
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">User Guides</li>
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/usr/user-manual-table-of-contents.html">User Manual</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Admin Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/baremetal-installation-guide.html">Installing MISO on baremetal</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/compose-installation-guide.html">Installing MISO with docker-compose</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/admin-guide.html">Administrator's Manual</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/adm/installation-guide.html">Building and Deploying</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Developer Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/rest-testing.html">REST Testing</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/maven-artifacts.html">Maven artifacts</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/code-style.html">Code Style</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/dev/developers-manual.html">Developer's Manual</a></li>
+        
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+    
+<!-- List additional links. It is recommended to add a divider
+    e.g. <li class="divider"></li> first to break up the content. -->
+</ul>
+
+                    </div>
+
+                    <div id="content" class="col-sm-10">
+                        <div class="page-header">
+    <h2>1. Site Configuration
+        
+    </h2>
+</div>
+
+<p>This section is intended not as a guide to configuring MISO, but to explain the configuration options that are
+available. If you are interested in using one of these features and it is not available in your installation, talk to
+your MISO administrators about setting it up.</p>
+
+<p><a name="logging_in"></a></p>
+<h2 id="11-logging-in">1.1. Logging In</h2>
+
+<p>You log in to MISO using a username and password. These credentials may come from different places, depending on your
+site configuration.</p>
+
+<p>In some cases, user accounts are stored in the MISO database. When this is the case, MISO administrators are
+responsible for creating new users. Any user is able to edit their own user details and change their password from
+within MISO. MISO administrators are also able to reset a user’s password.</p>
+
+<p>In other cases, your credentials may come from an LDAP or Active Directory server. This will usually be for cases where
+the same credentials are used for several services. For instance, you may use the same account to log into your email,
+issue tracker, MISO, and other services within your organization. If your site uses LDAP or Active Directory
+authentication, you will have to have an account in that system, and also have to be included in the correct group(s)
+to access MISO. Your MISO administrators may not be directly responsible for creating these accounts or managing the
+groups, but they should be able to help you get set up.</p>
+
+<p>If you require a new account, password reset, or are otherwise unable to log in to MISO, you should talk to your MISO
+administrators.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="issue_trackers"></a></p>
+<h2 id="12-issue-trackers">1.2. Issue Trackers</h2>
+
+<p>MISO integrates with issue trackers in order to display and link to issues from within MISO. The only
+currently-supported issue tracker is JIRA. If JIRA integration is configured for your site, you will see a list of
+related issues on the Project page and the Run page. These lists are described in more detail in the
+<a href="projects.html">Projects</a> and <a href="sequencer_runs.html">Sequencer Runs</a> sections.</p>
+
+<p>MISO may also be configured to take bug reports. If it is, a “Report a problem” link will appear near the top right of
+the screen (see figure 1). Click this link to report a bug in your issue tracker.</p>
+
+<p><img class="userman-figure" src="/miso-lims/0.2.x/images/site-config-bug-report.png" alt="Bug report link" /></p>
+
+<p><em>figure 1: Bug report link</em></p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="naming_schemes"></a></p>
+<h2 id="13-naming-schemes">1.3. Naming Schemes</h2>
+
+<p>Some institutes will have a specific and uniform way of naming things. MISO allows you to customize the validation of
+some fields in order to enforce these naming schemes:</p>
+
+<ul>
+  <li>All item names</li>
+  <li>Sample alias</li>
+  <li>Library alias</li>
+  <li>Project short name</li>
+</ul>
+
+<p>It may also be possible to auto-generate aliases for your samples and/or libraries.</p>
+
+<p>Both validation and alias generation must be configured by your MISO administrators.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="taxon_lookup"></a></p>
+<h2 id="14-taxon-lookup">1.4. Taxon Lookup</h2>
+
+<p>A <a href="https://www.ncbi.nlm.nih.gov/">NCBI</a> service may be used to validate the scientific name entered for samples to
+ensure that the name is entered correctly. If this is enabled, you will not be able to save a sample until a valid
+scientific name is entered. You can browse the taxonomy database using NCBI’s
+<a href="https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi">Taxonomy Browser</a>.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="automatic_barcode_generation"></a></p>
+<h2 id="15-automatic-barcode-generation">1.5. Automatic Barcode Generation</h2>
+
+<p>If automatic barcode generation is enabled for your site, MISO will automatically generate a unique barcode any time
+you leave the barcode field blank for an item. These barcodes, whether auto-generated or not, may be printed from MISO
+to a label printer. See the <a href="barcode_label_printers.html">Barcode Label Printers section</a> for more information.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="barcode_scanners"></a></p>
+<h2 id="16-barcode-scanners">1.6. Barcode Scanners</h2>
+
+<p>Barcode scanners may be used to enter barcodes into any text-entry area in MISO. Most barcode scanners allow you to
+configure a key to send after scanning. If you configure your barcode scanners to send the Enter key after a scan, that
+will save you from having to press Enter or click on a button or the next item every time to scan a barcode. This
+configuration is done on the barcode scanner itself, and you should see the scanner’s manual for configuration
+instructions.</p>
+
+<p>It is also possible to use
+<a href="https://www.thermofisher.com/order/catalog/product/312800">Thermo Fisher VisionMate™ High Speed Barcode Readers</a> to
+scan entire boxes of tubes at once. These bulk scanners must be configured by your MISO administrators to work in MISO.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="report_links"></a></p>
+<h2 id="17-report-links">1.7. Report Links</h2>
+
+<p>If you are generating reports for projects or runs outside of MISO, it may be possible to automatically link to them
+from the MISO Project and Run pages. For projects, it must be possible to generate the report URL using the project’s
+ID, name, and/or short name. For runs, it must be possible to generate the report URL using the run’s ID, name, and/or
+alias. For example, you could create links to http://www.example.com/projects/{project-id}/stats or
+http://www.example.com/runreports/{run-alias}.html. The report links will appear in the External Links section of the
+Run or Project page (see figure 2).</p>
+
+<p><img class="userman-figure" src="/miso-lims/0.2.x/images/site-config-external-links.png" alt="Report links" /></p>
+
+<p><em>figure 2: Report links</em></p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="default_values"></a></p>
+<h2 id="18-default-values">1.8. Default Values</h2>
+
+<p>It is possible to set a default value for some fields to save users from repetitive entry. If a default value is
+configured, it will be filled in automatically when creating new items. The user is still free to change the value if
+they would like.</p>
+
+<p>The only field that can currently be configured with a default value is sample scientific name.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="display_options"></a></p>
+<h2 id="19-display-options">1.9. Display Options</h2>
+
+<p>In some organizations, it may be desirable to hide certain fields in order to simplify the forms. The following fields
+can be configured to be hidden on bulk create/edit pages.</p>
+
+<ul>
+  <li>Library alias (should only be hidden if Library aliases are automatically generated)</li>
+  <li>Library description</li>
+  <li>Library volume</li>
+</ul>
+
+<p>These fields will always be displayed on the single item create/edit pages, even if they are hidden on the bulk
+create/edit pages.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="detailed_sample_mode"></a></p>
+<h2 id="110-detailed-sample-mode">1.10. Detailed Sample Mode</h2>
+
+<p>By default, MISO uses plain sample mode. In plain sample mode, you create samples and propagate libraries from them.</p>
+
+<p>If detailed sample mode is enabled, a sample hierarchy is added in order to store more information about samples and
+how they have been created and processed. This means that instead of creating a single sample in MISO, you may create
+several samples that represent the process a sample has gone through before arriving at the aliquot step, from which
+libraries may be propagated. Rather than thinking of this as multiple samples, you may also think of it as the same
+sample going through multiple steps.</p>
+
+<p>The exact sample classes that are available in detailed sample mode depend on your site’s configuration, but these
+sample classes are divided into the following sample categories:</p>
+
+<ul>
+  <li>Identity: describes the donor or organism that the sample originated from</li>
+  <li>Tissue: describes a piece of tissue collected from the donor or organism</li>
+  <li>Tissue Processing: describes additional processing steps before analyte was extracted from the tissue (optional)</li>
+  <li>Stock: analyte sample that may be divided into several aliquots</li>
+  <li>Aliquot: analyte sample ready to be made into a library, or used for other purposes</li>
+</ul>
+
+<p>In some cases, you will not have all of these samples. For example, you may have received aliquot samples from a
+collaborator. In this case, it doesn’t make sense to create a tissue or stock sample. MISO will allow you to skip
+levels and create an aliquot sample directly. When you do this, “ghost samples” will automatically be created to
+represent the missing levels. This is so that you can still record any information that you know about those levels.
+You may know what the tissue origin was and want to record it even if you never received the tissue, for example.</p>
+
+<p>The other advantage to having these ghost samples is that if you receive other related samples, they can be connected
+to the existing hierarchy. For example, if you receive two different aliquots from the same tissue sample, it will be
+easier to find that they are related because they are connected to the same ghost tissue.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="strict_index_checking"></a></p>
+<h2 id="111-strict-index-checking">1.11. Strict Index Checking</h2>
+
+<p>By default, any library aliquot can be added to a pool. When strict index checking is enabled, library aliquots
+cannot be added to a pool when their addition would cause duplicate or near-duplicate indices to exist within the 
+pool.</p>
+
+<p>The advantage of enabling this setting is the prevention of sequencing library aliquots which cannot be de-multiplexed.</p>
+
+
+                    </div>
+                
+            </div>
+
+            
+
+            <div class="row">
+                <div id="footer" class="col-sm-12">
+                    Documentation for <a href="https://github.com/TGAC/miso-lims">MISO</a>
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function orderNav() {
+                var list,
+                    section,
+                    header,
+                    sections = [],
+                    lists = {},
+                    headers = {};
+
+                var navUl = document.querySelectorAll('#navigation ul')[0],
+                    navLis = document.querySelectorAll('#navigation ul li');
+
+                if (!navUl) return;
+
+                for (var i = 0; i < navLis.length; i++) {
+                    var order, li = navLis[i];
+
+                    if (li.classList.contains('nav-header')) {
+                        section = li.textContent || li.innerText;
+                        sections.push(section);
+                        headers[section] = li;
+                        continue;
+                    }
+
+                    if (!lists[section]) {
+                        lists[section] = [];
+                    }
+
+                    order = parseFloat(li.getAttribute('data-order'))
+                    lists[section].push([order, li]);
+                }
+
+                for (var i = 0; i < sections.length; i++) {
+                    section = sections[i];
+                    list = lists[section].sort(function(a, b) {
+                        return a[0] - b[0];
+                    });
+
+                    if (header = headers[section]) {
+                        navUl.appendChild(header);
+                    }
+                    for (var j = 0; j < list.length; j++) {
+                        navUl.appendChild(list[j][1]);
+                    }
+                }
+            }
+
+            if (document.querySelectorAll) orderNav();
+        </script>
+        
+    </body>
+</html>

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <title>MISO : Kit Tracking</title>
+        <meta name="description" content="An open-source LIMS for NGS sequencing centres">
+
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/miso-lims/latest/css/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/latest/css/main.css">
+				<link rel="icon" href="/miso-lims/latest/favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+<a href="https://github.com/miso-lims/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+        <div class="container">
+            <div class="row">
+                <div id="header" class="col-sm-12">
+                    <h2><a class="brand" href="/miso-lims/latest/"><img src="/miso-lims/latest/images/MISO.png" alt="MISO's logo, a bowl of miso soup"/>MISO</a>
+    <small>An open-source LIMS for NGS sequencing centres</small>
+</h2>
+
+                </div>
+            </div>
+
+            <div class="row">
+                
+                
+                    <div id="navigation" class="col-sm-2">
+                        <ul class="nav nav-list">
+    <!--<li><a href="/miso-lims/latest/">Home</a></li>-->
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">User Guides</li>
+            
+            <li data-order="1"><a href="/miso-lims/latest/usr/user-manual-table-of-contents.html">User Manual</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Admin Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/latest/adm/baremetal-installation-guide.html">Installing MISO on baremetal</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/latest/adm/compose-installation-guide.html">Installing MISO with docker-compose</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/latest/adm/admin-guide.html">Administrator's Manual</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/latest/adm/installation-guide.html">Building and Deploying</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Developer Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/latest/dev/rest-testing.html">REST Testing</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/latest/dev/maven-artifacts.html">Maven artifacts</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/latest/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/latest/dev/code-style.html">Code Style</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/latest/dev/developers-manual.html">Developer's Manual</a></li>
+        
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+    
+<!-- List additional links. It is recommended to add a divider
+    e.g. <li class="divider"></li> first to break up the content. -->
+</ul>
+
+                    </div>
+
+                    <div id="content" class="col-sm-10">
+                        <div class="page-header">
+    <h2>Kit Tracking
+        
+    </h2>
+</div>
+
+<p>These pages represent the documentation that UEA intern Michal Zak produced during his developer work placement at TGAC.</p>
+
+<p><em>Please note that this functionality is not yet part of MISO. It only exists on the following (outdated) GitHub branch:</em></p>
+
+<p><a href="https://github.com/TGAC/miso-lims/tree/kitDevelopNewDB">https://github.com/TGAC/miso-lims/tree/kitDevelopNewDB</a></p>
+
+<p>Here’s a link to a folder containing documentation and the sql files:</p>
+
+<p><a href="https://drive.google.com/folderview?id=0ByCOhROBhow9fjVMWWFRMk1FYWZ2eWwtN2xVcXNBLW1wVmdhMkRWSHd3OTZmZnNBbWIxS1k&amp;usp=sharing">https://drive.google.com/folderview?id=0ByCOhROBhow9fjVMWWFRMk1FYWZ2eWwtN2xVcXNBLW1wVmdhMkRWSHd3OTZmZnNBbWIxS1k&amp;usp=sharing</a></p>
+
+<h2 id="system-overview">System Overview</h2>
+
+<p>Kit Stock Management system records and keeps track of each Component of a Kit as an independent entity that can be counted and filtered based on its characteristics. For example:</p>
+
+<blockquote>
+  <p><em>MiSeq Reagent Kit v3 Box 2 of 2</em></p>
+
+  <p>**Kit: **MiSeq Reagent Kit v3</p>
+
+  <p>**Component: **Box 2 of 2</p>
+</blockquote>
+
+<p>Any change to Component’s location is logged and stored in a KitChangeLog table.</p>
+
+<h3 id="kit-entity">Kit Entity</h3>
+
+<h6 id="shared-by-all-instances-descriptor">Shared by all instances (descriptor):</h6>
+
+<ul>
+  <li>
+    <p>name</p>
+  </li>
+  <li>
+    <p>version</p>
+  </li>
+  <li>
+    <p>manufacturer</p>
+  </li>
+  <li>
+    <p>kit type</p>
+  </li>
+  <li>
+    <p>platform type</p>
+  </li>
+  <li>
+    <p>part number</p>
+  </li>
+  <li>
+    <p>units</p>
+  </li>
+  <li>
+    <p>value</p>
+  </li>
+</ul>
+
+<h3 id="component-entity">Component Entity</h3>
+
+<h6 id="shared-by-all-instances-descriptor-1">Shared by all instances (descriptor):</h6>
+
+<ul>
+  <li>reference to Kit this Component belongs to (id)</li>
+  <li>name</li>
+  <li>reference number</li>
+</ul>
+
+<h6 id="unique-to-each-instance">Unique to each instance:</h6>
+
+<ul>
+  <li>lot number</li>
+  <li>identification barcode</li>
+  <li>received date</li>
+  <li>expiry date</li>
+</ul>
+
+<h3 id="kit-change-log">Kit Change Log</h3>
+
+<h6 id="records">Records:</h6>
+
+<ul>
+  <li>user id</li>
+  <li>component id</li>
+  <li>old location</li>
+  <li>new location</li>
+  <li>exhaustion status</li>
+  <li>date of change</li>
+</ul>
+
+<h2 id="database-er-diagram">Database ER Diagram</h2>
+<p><img src="/miso-lims/latest/images/Database.png" alt="MISO DB" /></p>
+
+<h2 id="features">Features</h2>
+
+<h3 id="create-kit-descriptor">Create Kit Descriptor</h3>
+
+<h4 id="overview">Overview</h4>
+
+<p>This page allows the user to create a new kit descriptor. After filling out all the fields the user can add component descriptors (children of this kit descriptor)</p>
+
+<h4 id="notes">Notes</h4>
+
+<p>This feature is comprised of two building blocks - editKitDescriptor and editKitComponentDescriptor (the names are not good indicators of the functionality, there is no edit option). These are leftovers from the legacy code which means they rely on populating the model in the controller and form submission/page reload/redirect. Not the most efficient nor the easiest to code approach but that was my first task and I was not skilled enough to use ajax calls. The result is that this feature is not as responsive or robust as the rest and it also uses very little javascript. Spring framework is used to manage the form fields.</p>
+
+<h4 id="error-checking">Error checking</h4>
+
+<ul>
+  <li>user has to fill out all the form fields</li>
+  <li>user cannot create kit descriptor with the part number that is already in system</li>
+</ul>
+
+<h4 id="ideas-for-further-development">Ideas for further development</h4>
+
+<ul>
+  <li>edit kit descriptor</li>
+  <li>edit kit component descriptor</li>
+</ul>
+
+<h3 id="log-kit-component">Log Kit Component</h3>
+
+<h4 id="overview-1">Overview</h4>
+
+<p>This page allows the user to log a kit component. The first step is providing the location barcode which will be used as target location for the whole logging session. The next step is scanning the reference barcode, lot barcode, identification barcode and providing the expiry date. All that information can be found on the actual box. The received date is set by default to actual date but that can be overriden. The user can add multiple components and also remove the ones that have incorrect information. Before saving the logging session the user will receive an overview with the count of the components that can be used to check against the packaging slip. Saving the session adds the components to the database and also registers the action in the kitChangeLog table.</p>
+
+<h4 id="notes-1">Notes</h4>
+
+<p>This page uses fluxion ajax calls to perform error checking and present the kit information to the user. Datatables.js library is used to display the already added components. jQuery heavy. Handled by LogKitComponentController.java (can be easily dropped - doesn’t really do anything)</p>
+
+<h4 id="error-checking-1"><strong>Error checking</strong></h4>
+
+<ul>
+  <li>reference barcode has to exist in the database</li>
+  <li>location barcode cannot be empty</li>
+  <li>identification barcode cannot exist in the database</li>
+  <li>expiry and received date has to be in correct format  YYYY-MM-DD (partially solved by the datepicker but there are ways to go around it so I implemented additional checks for formatting)</li>
+  <li>expiry date cannot be before received date</li>
+  <li>alert user when the ref, lot and identification barcodes are the same (could happen when not paying attention while scanning the barcodes)</li>
+  <li>user cannot save the logging session unless there is at least one component logged</li>
+</ul>
+
+<h4 id="ideas-for-further-development-1">Ideas for further development</h4>
+
+<ul>
+  <li>edit already added components (at the moment user can delete components and add them again)</li>
+</ul>
+
+<h3 id="kit-descriptor-management">Kit Descriptor Management</h3>
+
+<h4 id="overview-2">Overview</h4>
+
+<p>User chooses from the dropdown list of all available kit descriptors. Once the choice is made - the information about the kit descriptor is shown on screen. The page also features a table showing the component descriptors linked to this kit descriptor along with their current stock level (non-exhausted components).</p>
+
+<h4 id="notes-2">Notes</h4>
+
+<p>This page uses fluxion ajax calls to perform error checking and present the kit information to the user. Datatables.js library is used to display the  component descriptors. jQuery heavy. Handled by MenuController.java (just a link). The page uses a CDN to deliver the table required to present the change log data. It won’t work without internet connection at the moment</p>
+
+<h4 id="error-checking-2"><strong>Error checking</strong></h4>
+
+<p>None. This is read-only page.</p>
+
+<h4 id="ideas-for-further-development-2">Ideas for further development</h4>
+
+<ul>
+  <li>edit kit descriptor</li>
+  <li>edit kit component descriptor</li>
+  <li>clicking on stock level shows detailed view of the components</li>
+</ul>
+
+<h3 id="kit-component-management">Kit Component Management</h3>
+
+<h4 id="overview-3">Overview</h4>
+
+<p>User scans the identification barcode and is presented with the detailed view of that component along with options to exhaust/change location (providing the kit has not been exhausted already). Additionally the changeLog table shows the records pertaining to this kit component. User can exhaust without location change (using up the kit) or provide new location (maybe the kit has just expired or the batch has to be returned)</p>
+
+<h4 id="notes-3">Notes</h4>
+
+<p>This page uses fluxion ajax calls to perform error checking and present the kit information to the user. Datatables.js library is used to display the kit change log table. jQuery heavy. Handled by MenuController.java (just a link)</p>
+
+<h4 id="error-checking-3"><strong>Error checking</strong></h4>
+
+<ul>
+  <li>identification barcode has to be in the database</li>
+  <li>user cannot exhaust/change location of the kit that has already been exhausted</li>
+  <li>when changing location (applies also to exhausting with location change) the new location has to be provided</li>
+</ul>
+
+<h3 id="kit-components-list">Kit Components List</h3>
+
+<h4 id="overview-4">Overview</h4>
+
+<p>This page shows list of all kit components in the database in the form of a completely sortable and searchable datatable. The columns shown by default are:</p>
+
+<ul>
+  <li>id</li>
+  <li>kit name</li>
+  <li>component name</li>
+  <li>manufacturer</li>
+  <li>identification barcode</li>
+  <li>lot number</li>
+  <li>location barcode</li>
+  <li>received date</li>
+  <li>expiry date</li>
+  <li>exhausted</li>
+</ul>
+
+<p>By clicking on ‘Toggle Visibility Options’ user can add more columns for more detailed view. They can also toggle visibility of exhausted components, search by Id and filter by expiry status (All, Soon to Expire (within 30 days) and Expired). Every column can be also used as a filter</p>
+
+<h4 id="error-checking-4"><strong>Error checking</strong></h4>
+
+<p>None. This is read-only page</p>
+
+<h4 id="ideas-for-further-development-3">Ideas for further development</h4>
+
+<ul>
+  <li>Known issuer: the table sometimes too big for the container resulting in the need to scroll horizontally to see all the information.</li>
+</ul>
+
+<h4 id="notes-4">Notes</h4>
+
+<p>This page uses fluxion ajax calls to present the kit information to the user and update the table, Datatables.js library is used to display the components. jQuery heavy. Handled by MenuController.java (just a link)</p>
+
+<h3 id="kit-change-log-1">Kit Change Log</h3>
+
+<h4 id="overview-5">Overview</h4>
+
+<p>This page shows the change log in the form of a table sorted by date of change descending.</p>
+
+<h4 id="error-checking-5"><strong>Error checking</strong></h4>
+
+<p>None. This is read-only page</p>
+
+<h4 id="notes-5">Notes</h4>
+
+<p>This page uses fluxion ajax calls to present the datatables.js table. Handled by MenuController.java (just a link). The page uses a CDN to deliver the table required to present the change log data. It won’t work without internet connection at the moment</p>
+
+
+                    </div>
+                
+            </div>
+
+            
+
+            <div class="row">
+                <div id="footer" class="col-sm-12">
+                    Documentation for <a href="https://github.com/TGAC/miso-lims">MISO</a>
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function orderNav() {
+                var list,
+                    section,
+                    header,
+                    sections = [],
+                    lists = {},
+                    headers = {};
+
+                var navUl = document.querySelectorAll('#navigation ul')[0],
+                    navLis = document.querySelectorAll('#navigation ul li');
+
+                if (!navUl) return;
+
+                for (var i = 0; i < navLis.length; i++) {
+                    var order, li = navLis[i];
+
+                    if (li.classList.contains('nav-header')) {
+                        section = li.textContent || li.innerText;
+                        sections.push(section);
+                        headers[section] = li;
+                        continue;
+                    }
+
+                    if (!lists[section]) {
+                        lists[section] = [];
+                    }
+
+                    order = parseFloat(li.getAttribute('data-order'))
+                    lists[section].push([order, li]);
+                }
+
+                for (var i = 0; i < sections.length; i++) {
+                    section = sections[i];
+                    list = lists[section].sort(function(a, b) {
+                        return a[0] - b[0];
+                    });
+
+                    if (header = headers[section]) {
+                        navUl.appendChild(header);
+                    }
+                    for (var j = 0; j < list.length; j++) {
+                        navUl.appendChild(list[j][1]);
+                    }
+                }
+            }
+
+            if (document.querySelectorAll) orderNav();
+        </script>
+        
+    </body>
+</html>

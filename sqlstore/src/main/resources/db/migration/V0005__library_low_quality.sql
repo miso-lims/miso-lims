@@ -1,1 +1,0 @@
-ALTER TABLE `Library` ADD COLUMN lowQuality BOOLEAN NOT NULL DEFAULT false;

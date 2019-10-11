@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <title>MISO : 4. Users and Groups</title>
+        <meta name="description" content="An open-source LIMS for NGS sequencing centres">
+
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/main.css">
+				<link rel="icon" href="/miso-lims/0.2.x/favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+<a href="https://github.com/miso-lims/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+        <div class="container">
+            <div class="row">
+                <div id="header" class="col-sm-12">
+                    <h2><a class="brand" href="/miso-lims/0.2.x/"><img src="/miso-lims/0.2.x/images/MISO.png" alt="MISO's logo, a bowl of miso soup"/>MISO</a>
+    <small>An open-source LIMS for NGS sequencing centres</small>
+</h2>
+
+                </div>
+            </div>
+
+            <div class="row">
+                
+                
+                    <div id="navigation" class="col-sm-2">
+                        <ul class="nav nav-list">
+    <!--<li><a href="/miso-lims/0.2.x/">Home</a></li>-->
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">User Guides</li>
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/usr/user-manual-table-of-contents.html">User Manual</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Admin Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/baremetal-installation-guide.html">Installing MISO on baremetal</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/compose-installation-guide.html">Installing MISO with docker-compose</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/admin-guide.html">Administrator's Manual</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/adm/installation-guide.html">Building and Deploying</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Developer Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/rest-testing.html">REST Testing</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/maven-artifacts.html">Maven artifacts</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/code-style.html">Code Style</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/dev/developers-manual.html">Developer's Manual</a></li>
+        
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+    
+<!-- List additional links. It is recommended to add a divider
+    e.g. <li class="divider"></li> first to break up the content. -->
+</ul>
+
+                    </div>
+
+                    <div id="content" class="col-sm-10">
+                        <div class="page-header">
+    <h2>4. Users and Groups
+        
+    </h2>
+</div>
+
+
+<p><a name="users"></a></p>
+<h2 id="41-users">4.1. Users</h2>
+
+<p><a name="users_list"></a></p>
+<h3 id="411-users-list">4.1.1. Users List</h3>
+
+<p>If you are a MISO administrator, you can find a list of all MISO users by clicking the “Users” link in the User
+Administration list at the bottom of the menu on the left side of the screen. This list is not available to regular
+(non-admin) users. The list shows some permissions, including whether the user is an admin or internal user. Clicking
+on a user’s login name will take you the Edit User page, where you will see more user details. If your site is
+configured to use the MISO database for user accounts (see <a href="site_configuration.html#logging_in">Logging In</a>), the
+toolbar at the top of the table includes an “Add” button for creating new user accounts.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="adding_users"></a></p>
+<h3 id="412-adding-users">4.1.2. Adding Users</h3>
+
+<p>If you are a MISO administrator and your site is configured to use the MISO database for user accounts (see
+<a href="site_configuration.html#logging_in">Logging In</a>), you can add new users by going to the Users list page and clicking
+the “Add” button in the toolbar at the top of the table.</p>
+
+<p>Be sure to give the user the appropriate permissions. They must be marked as “Internal” to have access to the majority
+of the MISO website. Marking the user “Admin” will give them additional privileges within MISO, such as creating new
+users.</p>
+
+<p>If your site is configured to use LDAP or Active Directory for user accounts, then user accounts must be created in
+that separate service before they can be used for logging into MISO.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="editing_users"></a></p>
+<h3 id="413-editing-users">4.1.3. Editing Users</h3>
+
+<p>User accounts can only be modified in MISO if your site is configured to use the MISO database for user accounts (see
+<a href="site_configuration.html#logging_in">Logging In</a>). If your site is configured to use LDAP or Active Directory for user
+accounts, you will have to modify users via that separate service. Regular MISO users are only able to edit their own
+user account. MISO administrators are able to edit any user account.</p>
+
+<p>To get to the Edit User page for your own user account, click on the My Account tab at the top of the screen, then
+click the “Edit” link beside your username in the My Account section. If you are a MISO administrator, then you can get
+to the Edit User page for any user by clicking on the user’s login name on the Users list page. Once you are on the
+Edit User page, make any changes you would like, then click the “Save” button at the top right to confirm your changes.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="resetting_passwords"></a></p>
+<h3 id="414-resetting-passwords">4.1.4. Resetting Passwords</h3>
+
+<p>Passwords can only be reset in MISO if your site is configured to use the MISO database for user accounts (see
+<a href="site_configuration.html#logging_in">Logging In</a>). If your site is configured to use LDAP or Active Directory for user
+accounts, you will have to reset passwords via that separate service. Regular MISO users are only able to change their
+own password. MISO administrators are able to reset passwords for any users.</p>
+
+<p>Password changes/resets are done on the Edit User screen. To get to the Edit User page for your own user account, click
+on the My Account tab at the top of the screen, then click the “Edit” link beside your username in the My Account
+section. If you are a MISO administrator, then you can get to the Edit User page for any user by clicking on the user’s
+login name on the Users list page. On the Edit User screen, enter the current password, then enter the new password in
+both the “New Password” and the “Confirm New Password” box. The same password must be entered in both boxes. Click the
+“Save” button at the top right to save the user, confirming the password change.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="user_permissions"></a></p>
+<h3 id="415-user-permissions">4.1.5. User Permissions</h3>
+
+<p>There are two types of user permissions in MISO - roles, and resource-level permissions.</p>
+
+<p>Roles control what a user is allowed to do within MISO. If your site is configured to use the MISO database for user
+accounts (see <a href="site_configuration.html#logging_in">Logging In</a>), MISO administrators can set user roles on the Create
+User and Edit User screens. If your site is configured to use LDAP or Active Directory for user accounts, then roles
+must be assigned within that separate service.</p>
+
+<p>The roles in MISO are:</p>
+
+<ul>
+  <li>Internal: A user belonging to the organization. This role grants access to the majority of MISO.</li>
+  <li>Admin: A MISO administrator who has more control over MISO and the items stored within it. Administrators have access
+to everything in MISO.</li>
+</ul>
+
+<p>Resource-level permissions are set on individual items - most commonly on projects. These items are owned by the user
+who created them. The resource’s owner, as well as any MISO administrator, is able to modify the resource-level
+permissions for the item. You can choose to allow access by all internal users, or you can select specific users
+and/or groups who are allowed to read and/or modify (write to) the resource. These permissions apply to to related
+items as well - a sample will usually have the same permissions as its project.</p>
+
+<p>Resource-level permissions apply to the following items.</p>
+
+<ul>
+  <li>Projects</li>
+  <li>Experiments</li>
+  <li>Studies</li>
+  <li>Samples</li>
+  <li>Libraries</li>
+  <li>Pools</li>
+  <li>Sequencer Runs</li>
+</ul>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="disabling_enabling_users"></a></p>
+<h3 id="416-disablingenabling-users">4.1.6. Disabling/Enabling Users</h3>
+
+<p>MISO administrators can disable and re-enable user accounts from the Edit User screen. To get there, click on the
+user’s name on the Users list page. Once on the Edit User screen, you can disable a user by unchecking the “Active?”
+checkbox and clicking the “Save” button. To re-enable the user, return to the Edit User page, check the “Active?”
+checkbox, and click “Save” again.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="groups"></a></p>
+<h2 id="42-groups">4.2. Groups</h2>
+
+<p>Groups are collections of users. Instead of assigning resource-level permissions to specific users, it may be more
+convenient to assign the permissions to a group, and then control access by adding and removing users from the group.</p>
+
+<p><a name="groups_list"></a></p>
+<h3 id="421-groups-list">4.2.1. Groups List</h3>
+
+<p>If you are a MISO administrator, you can find a list of all MISO groups by clicking the “Groups” link in the User
+Administration list at the bottom of the menu on the left side of the screen. This list is not available to regular
+(non-admin) users. Clicking a group name will take you to the Edit Group page for that group. There is an “Add” button
+in the table’s toolbar that allows you to create new groups.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="adding_groups"></a></p>
+<h3 id="422-adding-groups">4.2.2. Adding Groups</h3>
+
+<p>Groups can only be created by MISO administrators. To get to the Create Group page, click the “Add” button in the
+toolbar at the top of the table on the Groups list page. Once on the Create Group page, enter a name and description
+for the group. Click the “Save” button at the top right to finish creating the group. You can add users to the group
+after it has been saved.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="adding_removing_users_from_a_group"></a></p>
+<h3 id="423-addingremoving-users-from-a-group">4.2.3. Adding/Removing Users from a Group</h3>
+
+<p>Only MISO adminstrators can change group memberships. To get to the Edit Group page, click the group’s name on the
+Group List. From here, you can use the Included Users and Available Users lists to modify group memberships. Select
+users in the Available Users list and click the “Add” button in the toolbar at the top of the table to add users to
+the group. Similary, you can select users in the Included Users list and click the “Remove” button to remove users from
+the group.</p>
+
+<p><a href="#">Return to top</a></p>
+
+
+
+                    </div>
+                
+            </div>
+
+            
+
+            <div class="row">
+                <div id="footer" class="col-sm-12">
+                    Documentation for <a href="https://github.com/TGAC/miso-lims">MISO</a>
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function orderNav() {
+                var list,
+                    section,
+                    header,
+                    sections = [],
+                    lists = {},
+                    headers = {};
+
+                var navUl = document.querySelectorAll('#navigation ul')[0],
+                    navLis = document.querySelectorAll('#navigation ul li');
+
+                if (!navUl) return;
+
+                for (var i = 0; i < navLis.length; i++) {
+                    var order, li = navLis[i];
+
+                    if (li.classList.contains('nav-header')) {
+                        section = li.textContent || li.innerText;
+                        sections.push(section);
+                        headers[section] = li;
+                        continue;
+                    }
+
+                    if (!lists[section]) {
+                        lists[section] = [];
+                    }
+
+                    order = parseFloat(li.getAttribute('data-order'))
+                    lists[section].push([order, li]);
+                }
+
+                for (var i = 0; i < sections.length; i++) {
+                    section = sections[i];
+                    list = lists[section].sort(function(a, b) {
+                        return a[0] - b[0];
+                    });
+
+                    if (header = headers[section]) {
+                        navUl.appendChild(header);
+                    }
+                    for (var j = 0; j < list.length; j++) {
+                        navUl.appendChild(list[j][1]);
+                    }
+                }
+            }
+
+            if (document.querySelectorAll) orderNav();
+        </script>
+        
+    </body>
+</html>

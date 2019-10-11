@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <title>MISO : 27. Home Screen Widgets</title>
+        <meta name="description" content="An open-source LIMS for NGS sequencing centres">
+
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/0.2.x/css/main.css">
+				<link rel="icon" href="/miso-lims/0.2.x/favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+<a href="https://github.com/miso-lims/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+        <div class="container">
+            <div class="row">
+                <div id="header" class="col-sm-12">
+                    <h2><a class="brand" href="/miso-lims/0.2.x/"><img src="/miso-lims/0.2.x/images/MISO.png" alt="MISO's logo, a bowl of miso soup"/>MISO</a>
+    <small>An open-source LIMS for NGS sequencing centres</small>
+</h2>
+
+                </div>
+            </div>
+
+            <div class="row">
+                
+                
+                    <div id="navigation" class="col-sm-2">
+                        <ul class="nav nav-list">
+    <!--<li><a href="/miso-lims/0.2.x/">Home</a></li>-->
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">User Guides</li>
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/usr/user-manual-table-of-contents.html">User Manual</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Admin Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/baremetal-installation-guide.html">Installing MISO on baremetal</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/compose-installation-guide.html">Installing MISO with docker-compose</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/adm/admin-guide.html">Administrator's Manual</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/adm/installation-guide.html">Building and Deploying</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Developer Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/rest-testing.html">REST Testing</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/maven-artifacts.html">Maven artifacts</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/0.2.x/dev/code-style.html">Code Style</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/0.2.x/dev/developers-manual.html">Developer's Manual</a></li>
+        
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+    
+<!-- List additional links. It is recommended to add a divider
+    e.g. <li class="divider"></li> first to break up the content. -->
+</ul>
+
+                    </div>
+
+                    <div id="content" class="col-sm-10">
+                        <div class="page-header">
+    <h2>27. Home Screen Widgets
+        
+    </h2>
+</div>
+
+
+<p><a name="search"></a></p>
+<h2 id="271-search">27.1. Search</h2>
+
+<p>The Search widget can be used to quickly find an item in MISO. This includes samples, libraries, library aliquots,
+pools, sequencing containers, and boxes. Note that there are separate search widgets for projects and runs, detailed
+below. You can search for an item by its name, alias, or barcode. Scanning an item’s barcode using a barcode scanner
+also works. The search returns exact matches only, so you must enter the entire name, alias, or barcode to find what
+you are looking for. Press the Enter key to run the search. The search results will appear in the widget and you can
+click on a result tile to go to the Edit page for that item.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="instrument_status"></a></p>
+<h2 id="272-instrument-status">27.2. Instrument Status</h2>
+
+<p><img class="userman-figure" src="/miso-lims/0.2.x/images/widgets-instrument-status.png" alt="Instrument Status Widget" /></p>
+
+<p><em>figure 1: Instrument Status Widget</em></p>
+
+<p>The Instrument Status widget provides a view of what your sequencers are doing. All sequencers are listed along with
+their current status and their most recent runs. The most recent status changes appear at the top of the list.
+Sequencers that can perform multiple simultaneous runs will show the status of each position. Status can be one of the
+following.</p>
+
+<ul>
+  <li><strong>Idle</strong>: The sequencer is not currently in use</li>
+  <li><strong>Available</strong>: One or more of the sequencer’s positions are either active or out of service, but one or more
+positions are still idle</li>
+  <li><strong>Busy</strong>: All of the sequencer’s positions are active</li>
+  <li><strong>Out of Service</strong>: All of the sequencer’s positions are out of service</li>
+</ul>
+
+<p>Clicking on a tile in the Instrument Status widget will open a menu where you can choose to view the instrument, one of
+the latest runs, or one of the pools from one of the latest runs. Click an option in this menu to go to the Edit page
+for the selected item.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="workflows"></a></p>
+<h2 id="273-workflows">27.3. Workflows</h2>
+
+<p>The Workflows widget is used to start new workflows and resume existing workflows. It also allows you to mark favourite
+workflows for convenience. Usage of the Workflows widget is detailed in the <a href="workflows.html">Workflows section</a>.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="project"></a></p>
+<h2 id="274-project">27.4. Project</h2>
+
+<p>The Project widget allows you to quickly search for a project by its name, alias, short name, or description. This
+search will find partial matches, so you don’t have to enter the entire name, alias, or description. Enter your query
+and press the Enter key to run the search. Search results will appear in the widget. You can click a result tile to go
+to the Edit Project page.</p>
+
+<p><a href="#">Return to top</a></p>
+
+<p><a name="run"></a></p>
+<h2 id="275-run">27.5. Run</h2>
+
+<p>The Run widget initially shows all of the most recent runs. You can click a run tile in the widget to get to the Edit
+Run page. You can also use the widget to search for a run by its name, alias, or description. This search will find
+partial matches, so you don’t have to enter the entire name, alias, or description. Search results will appear in the
+widget and you can click a result tile to go to the Edit Run page.</p>
+
+<p><a href="#">Return to top</a></p>
+
+
+
+                    </div>
+                
+            </div>
+
+            
+
+            <div class="row">
+                <div id="footer" class="col-sm-12">
+                    Documentation for <a href="https://github.com/TGAC/miso-lims">MISO</a>
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function orderNav() {
+                var list,
+                    section,
+                    header,
+                    sections = [],
+                    lists = {},
+                    headers = {};
+
+                var navUl = document.querySelectorAll('#navigation ul')[0],
+                    navLis = document.querySelectorAll('#navigation ul li');
+
+                if (!navUl) return;
+
+                for (var i = 0; i < navLis.length; i++) {
+                    var order, li = navLis[i];
+
+                    if (li.classList.contains('nav-header')) {
+                        section = li.textContent || li.innerText;
+                        sections.push(section);
+                        headers[section] = li;
+                        continue;
+                    }
+
+                    if (!lists[section]) {
+                        lists[section] = [];
+                    }
+
+                    order = parseFloat(li.getAttribute('data-order'))
+                    lists[section].push([order, li]);
+                }
+
+                for (var i = 0; i < sections.length; i++) {
+                    section = sections[i];
+                    list = lists[section].sort(function(a, b) {
+                        return a[0] - b[0];
+                    });
+
+                    if (header = headers[section]) {
+                        navUl.appendChild(header);
+                    }
+                    for (var j = 0; j < list.length; j++) {
+                        navUl.appendChild(list[j][1]);
+                    }
+                }
+            }
+
+            if (document.querySelectorAll) orderNav();
+        </script>
+        
+    </body>
+</html>

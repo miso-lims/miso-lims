@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <title>MISO : User Manual</title>
+        <meta name="description" content="An open-source LIMS for NGS sequencing centres">
+
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/miso-lims/latest/css/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/latest/css/main.css">
+				<link rel="icon" href="/miso-lims/latest/favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+<a href="https://github.com/miso-lims/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+        <div class="container">
+            <div class="row">
+                <div id="header" class="col-sm-12">
+                    <h2><a class="brand" href="/miso-lims/latest/"><img src="/miso-lims/latest/images/MISO.png" alt="MISO's logo, a bowl of miso soup"/>MISO</a>
+    <small>An open-source LIMS for NGS sequencing centres</small>
+</h2>
+
+                </div>
+            </div>
+
+            <div class="row">
+                
+                
+                    <div id="navigation" class="col-sm-2">
+                        <ul class="nav nav-list">
+    <!--<li><a href="/miso-lims/latest/">Home</a></li>-->
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">User Guides</li>
+            
+            <li data-order="1"><a href="/miso-lims/latest/usr/user-manual-table-of-contents.html">User Manual</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Admin Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/latest/adm/baremetal-installation-guide.html">Installing MISO on baremetal</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/latest/adm/compose-installation-guide.html">Installing MISO with docker-compose</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/latest/adm/admin-guide.html">Administrator's Manual</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/latest/adm/installation-guide.html">Building and Deploying</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Developer Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/latest/dev/rest-testing.html">REST Testing</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/latest/dev/maven-artifacts.html">Maven artifacts</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/latest/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/latest/dev/code-style.html">Code Style</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/latest/dev/developers-manual.html">Developer's Manual</a></li>
+        
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+    
+<!-- List additional links. It is recommended to add a divider
+    e.g. <li class="divider"></li> first to break up the content. -->
+</ul>
+
+                    </div>
+
+                    <div id="content" class="col-sm-10">
+                        <div class="page-header">
+    <h2>User Manual
+        
+    </h2>
+</div>
+
+<p>This user manual is intended to document all of MISO’s features and everything that a user could need to know about
+using MISO. We will make every effort to keep it up to date. If you should come across any errors, outdated
+information, or a feature that is missing from the user manual, please let us know by
+<a href="https://github.com/miso-lims/miso-lims/issues">opening an issue</a>, so we can update it. Thanks!</p>
+
+<h2 id="introduction">Introduction</h2>
+
+<p><a href="https://github.com/miso-lims/miso-lims">MISO</a> (<strong>M</strong>anaging <strong>I</strong>nformation for <strong>S</strong>equencing <strong>O</strong>perations) is a Lab
+Information Management System (LIMS) developed at <a href="http://www.earlham.ac.uk/">Earlham Institute</a> and the
+<a href="https://oicr.on.ca/">Ontario Institute for Cancer Research</a>. MISO is heavily modelled upon the submission schemas
+specified by the <a href="https://www.ebi.ac.uk/ena">European Nucleotide Archive (ENA)</a> and is able to automatically generate
+the required XML and data files for submission.</p>
+
+<h2 id="history">History</h2>
+
+<p>MISO has been developed by the <a href="http://www.earlham.ac.uk/davey-group">Davey group</a> at Earlham Institute since
+February 2010. The first version of MISO was released internally to Earlham staff on 19th Sept 2011. The first beta
+community release of MISO was 0.1.6, released May 31st, 2012.</p>
+
+<p>In 2015, the <a href="http://labs.oicr.on.ca/genome-sequence-informatics/">Genome Sequence Informatics</a> team at OICR chose MISO
+as their new LIMS. OICR did not want to fork MISO entirely, so together the team at Earlham and OICR worked out a
+development plan to better support multiple institutes with the same code base. All active work is visible on GitHub
+and undergoes thorough code reviews and testing before being integrated into the mainline branches. Releases are pushed
+biweekly to <a href="https://github.com/miso-lims/miso-lims/releases">GitHub</a>.</p>
+
+<h2 id="contents">Contents</h2>
+
+<p>🔹 = item only applicable to Detailed Sample mode</p>
+
+<h1 style="text-indent: 0em; font-size: 1.6em"><a href="/miso-lims/latest/user_manual/site_configuration.html">1. Site Configuration</a></h1>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/site_configuration.html#logging_in">1.1. Logging In</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/site_configuration.html#issue_trackers">1.2. Issue Trackers</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/site_configuration.html#naming_schemes">1.3. Naming Schemes</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/site_configuration.html#taxon_lookup">1.4. Taxon Lookup</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/site_configuration.html#automatic_barcode_generation">1.5. Automatic Barcode Generation</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/site_configuration.html#barcode_scanners">1.6. Barcode Scanners</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/site_configuration.html#report_links">1.7. Report Links</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/site_configuration.html#default_values">1.8. Default Values</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/site_configuration.html#display_options">1.9. Display Options</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/site_configuration.html#detailed_sample_mode">1.10. Detailed Sample Mode</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/site_configuration.html#strict_index_checking">1.11. Strict Index Checking</a></h2>
+
+<h1 style="text-indent: 0em; font-size: 1.6em"><a href="/miso-lims/latest/user_manual/general_navigation.html">2. General Navigation</a></h1>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/general_navigation.html#home_screen">2.1. Home Screen</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/general_navigation.html#home_screen_widgets">2.2. Home Screen Widgets</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/general_navigation.html#list_pages">2.3. List Pages</a></h2>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/general_navigation.html#selecting_items">2.3.1. Selecting Items</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/general_navigation.html#selecting_by_search">2.3.2. Selecting by Search</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/general_navigation.html#searching">2.3.3. Searching</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/general_navigation.html#sorting">2.3.4. Sorting</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/general_navigation.html#finding_related_items">2.3.5. Finding Related Items</a></h3>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/general_navigation.html#single_item_create_edit_pages">2.4. Single Item Create/Edit Pages</a></h2>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/general_navigation.html#collapsible_sections">2.4.1. Collapsible Sections</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/general_navigation.html#change_logs">2.4.2. Change Logs</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/general_navigation.html#notes">2.4.3. Notes</a></h3>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/general_navigation.html#bulk_create_edit_pages">2.5. Bulk Create/Edit Pages</a></h2>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/general_navigation.html#autofill">2.5.1. Autofill</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/general_navigation.html#exporting_to_spreadsheet">2.5.2. Exporting to Spreadsheet</a></h3>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/general_navigation.html#tools">2.6. Tools</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/general_navigation.html#my_account">2.7. My Account</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/general_navigation.html#help">2.8. Help</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/general_navigation.html#quick_help">2.9. Quick Help</a></h2>
+
+<h1 style="text-indent: 0em; font-size: 1.6em"><a href="/miso-lims/latest/user_manual/barcode_label_printers.html">3. Barcode Label Printers</a></h1>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/barcode_label_printers.html#printers_list">3.1. Printers List</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/barcode_label_printers.html#adding_printers">3.2. Adding Printers</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/barcode_label_printers.html#disabling_enabling_printers">3.3. Disabling/Enabling Printers</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/barcode_label_printers.html#printing_barcodes">3.4. Printing Barcodes</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/barcode_label_printers.html#deleting_printers">3.5. Deleting Printers</a></h2>
+
+<h1 style="text-indent: 0em; font-size: 1.6em"><a href="/miso-lims/latest/user_manual/users_and_groups.html">4. Users and Groups</a></h1>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/users_and_groups.html#users">4.1. Users</a></h2>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/users_and_groups.html#users_list">4.1.1. Users List</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/users_and_groups.html#adding_users">4.1.2. Adding Users</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/users_and_groups.html#editing_users">4.1.3. Editing Users</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/users_and_groups.html#resetting_passwords">4.1.4. Resetting Passwords</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/users_and_groups.html#user_permissions">4.1.5. User Permissions</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/users_and_groups.html#disabling_enabling_users">4.1.6. Disabling/Enabling Users</a></h3>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/users_and_groups.html#groups">4.2. Groups</a></h2>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/users_and_groups.html#groups_list">4.2.1. Groups List</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/users_and_groups.html#adding_groups">4.2.2. Adding Groups</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/users_and_groups.html#adding_removing_users_from_a_group">4.2.3. Adding/Removing Users from a Group</a></h3>
+
+<h1 style="text-indent: 0em; font-size: 1.6em"><a href="/miso-lims/latest/user_manual/type_data.html">5. Type Data</a></h1>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/type_data.html#reference_genomes">5.1. Reference Genomes</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/type_data.html#sample_types">5.2. Sample Types</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/type_data.html#sample_classes_and_categories">5.3. Sample Classes and Categories🔹</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/type_data.html#tissue_materials">5.4. Tissue Materials🔹</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/type_data.html#tissue_origins">5.5. Tissue Origins🔹</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/type_data.html#tissue_piece_types">5.6. Tissue Piece Types🔹</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/type_data.html#tissue_types">5.7. Tissue Types🔹</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/type_data.html#sample_purposes">5.8. Sample Purposes🔹</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/type_data.html#labs_and_institutes">5.9. Labs and Institutes🔹</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/type_data.html#detailed_qc_status">5.10. Detailed QC Status🔹</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/type_data.html#stains">5.11. Stains🔹</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/type_data.html#library_types">5.12. Library Types</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/type_data.html#library_designs">5.13. Library Designs🔹</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/type_data.html#library_selection_types">5.14. Library Selection Types</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/type_data.html#library_strategy_types">5.15. Library Strategy Types</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/type_data.html#kit_descriptors">5.16. Kit Descriptors</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/type_data.html#indices">5.17. Indices</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/type_data.html#library_spike-ins">5.18. Library Spike-Ins</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/type_data.html#targeted_sequencing">5.19. Targeted Sequencing</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/type_data.html#order_purposes">5.20. Order Purposes</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/type_data.html#qc_types">5.21. QC Types</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/type_data.html#partition_qc_types">5.22. Partition QC Types</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/type_data.html#box_sizes">5.23. Box Sizes</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/type_data.html#box_uses">5.24. Box Uses</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/type_data.html#instrument_models">5.25. Instrument Models</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/type_data.html#sequencing_container_models">5.26. Sequencing Container Models</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/type_data.html#sequencing_parameters">5.27. Sequencing Parameters</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/type_data.html#oxford_nanopore_flow_cell_pore_versions">5.28. Oxford Nanopore Flow Cell Pore Versions</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/type_data.html#array_models">5.29. Array Models</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/type_data.html#study_types">5.30. Study Types</a></h2>
+
+<h1 style="text-indent: 0em; font-size: 1.6em"><a href="/miso-lims/latest/user_manual/projects.html">6. Projects</a></h1>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/projects.html#projects_list">6.1. Projects List</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/projects.html#adding_projects">6.2. Adding Projects</a></h2>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/projects.html#reference_genome">6.2.1. Reference Genome</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/projects.html#default_targeted_sequencing">6.2.2. Default Targeted Sequencing</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/projects.html#permissions">6.2.3. Permissions</a></h3>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/projects.html#edit_project_page">6.3. Edit Project Page</a></h2>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/projects.html#tracked_issues">6.3.1. Tracked Issues</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/projects.html#project_files">6.3.2. Project Files</a></h3>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/projects.html#subprojects">6.4. Subprojects</a></h2>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/projects.html#adding_subprojects">6.4.1. Adding Subprojects</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/projects.html#editing_subprojects">6.4.2. Editing Subprojects</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/projects.html#deleting_subprojects">6.4.3. Deleting Subprojects</a></h3>
+
+<h1 style="text-indent: 0em; font-size: 1.6em"><a href="/miso-lims/latest/user_manual/samples.html">7. Samples</a></h1>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/samples.html#naming_scheme">7.1. Naming Scheme</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/samples.html#samples_list">7.2. Samples List</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/samples.html#creating_samples">7.3. Creating Samples</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/samples.html#editing_samples">7.4. Editing Samples</a></h2>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/samples.html#editing_a_single_sample">7.4.1. Editing a Single Sample</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/samples.html#editing_samples_in_bulk">7.4.2. Editing Samples in Bulk</a></h3>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/samples.html#notes">7.5. Notes</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/samples.html#attaching_files">7.6. Attaching Files</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/samples.html#propagating_samples_to_samples">7.7. Propagating Samples to Samples🔹</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/samples.html#propagating_samples_to_libraries">7.8. Propagating Samples to Libraries</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/samples.html#printing_barcodes">7.9. Printing Barcodes</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/samples.html#downloading_sample_information">7.10. Downloading Sample Information</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/samples.html#selecting_samples_by_search">7.11. Selecting Samples by Search</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/samples.html#finding_related_items">7.12. Finding Related Items</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/samples.html#sample_qcs">7.13. Sample QCs</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/samples.html#adding_samples_to_a_workset">7.14. Adding Samples to a Workset</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/samples.html#deleting_samples">7.15. Deleting Samples</a></h2>
+
+<h1 style="text-indent: 0em; font-size: 1.6em"><a href="/miso-lims/latest/user_manual/libraries.html">8. Libraries</a></h1>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/libraries.html#naming_scheme">8.1. Naming scheme</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/libraries.html#libraries_list">8.2. Libraries List</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/libraries.html#propagating_libraries_from_samples">8.3. Propagating Libraries from Samples</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/libraries.html#receiving_libraries">8.4. Receiving Libraries</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/libraries.html#library_templates">8.5. Library Templates</a></h2>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/libraries.html#library_templates_list">8.5.1. Library Templates List</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/libraries.html#creating_library_templates">8.5.2. Creating Library Templates</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/libraries.html#editing_library_templates">8.5.3. Editing Library Templates</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/libraries.html#adding_removing_library_templates_from_a_project">8.5.4. Adding/Removing Library Templates from a Project</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/libraries.html#deleting_library_templates">8.5.5. Deleting Library Templates</a></h3>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/libraries.html#editing_libraries">8.6. Editing Libraries</a></h2>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/libraries.html#editing_a_single_library">8.6.1. Editing a Single Library</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/libraries.html#editing_libraries_in_bulk">8.6.2. Editing Libraries in Bulk</a></h3>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/libraries.html#notes">8.7. Notes</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/libraries.html#attaching_files">8.8. Attaching Files</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/libraries.html#propagating_libraries_to_library_aliquots">8.9. Propagating Libraries to Library Aliquots</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/libraries.html#printing_barcodes">8.10. Printing Barcodes</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/libraries.html#downloading_library_information">8.11. Downloading Library Information</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/libraries.html#selecting_libraries_by_search">8.12. Selecting Libraries by Search</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/libraries.html#finding_related_items">8.13. Finding Related Items</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/libraries.html#library_qcs">8.14. Library QCs</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/libraries.html#adding_libraries_to_a_workset">8.15. Adding Libraries to a Workset</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/libraries.html#deleting_libraries">8.16. Deleting Libraries</a></h2>
+
+<h1 style="text-indent: 0em; font-size: 1.6em"><a href="/miso-lims/latest/user_manual/library_aliquots.html">9. Library Aliquots</a></h1>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/library_aliquots.html#library_aliquots_list">9.1. Library Aliquots List</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/library_aliquots.html#propagating_library_aliquots_from_libraries">9.2. Propagating Library Aliquots from Libraries</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/library_aliquots.html#propagating_library_aliquots_from_library_aliquots">9.3. Propagating Library Aliquots from Library Aliquots</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/library_aliquots.html#editing_library_aliquots">9.4. Editing Library Aliquots</a></h2>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/library_aliquots.html#editing_a_single_library_aliquot">9.4.1. Editing a Single Library Aliquot</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/library_aliquots.html#editing_library_aliquots_in_bulk">9.4.2. Editing Library Aliquots in Bulk</a></h3>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/library_aliquots.html#pooling_library_aliquots_together">9.5. Pooling Library Aliquots Together</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/library_aliquots.html#pooling_library_aliquots_separately">9.6. Pooling Library Aliquots Separately</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/library_aliquots.html#custom_pooling_in_bulk">9.7. Custom Pooling in Bulk</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/library_aliquots.html#printing_barcodes">9.8. Printing Barcodes</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/library_aliquots.html#downloading_library_aliquot_information">9.9. Downloading Library Aliquot Information</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/library_aliquots.html#selecting_library_aliquots_by_search">9.10. Selecting Library Aliquots by Search</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/library_aliquots.html#finding_related_items">9.11. Finding Related Items</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/library_aliquots.html#adding_library_aliquots_to_a_workset">9.12. Adding Library Aliquots to a Workset</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/library_aliquots.html#deleting_library_aliquots">9.13. Deleting Library Aliquots</a></h2>
+
+<h1 style="text-indent: 0em; font-size: 1.6em"><a href="/miso-lims/latest/user_manual/worksets.html">10. Worksets</a></h1>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/worksets.html#worksets_list">10.1. Worksets List</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/worksets.html#creating_worksets">10.2. Creating Worksets</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/worksets.html#editing_worksets">10.3. Editing Worksets</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/worksets.html#working_with_items_in_a_workset">10.4. Working with Items in a Workset</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/worksets.html#adding_items_to_a_workset">10.5. Adding Items to a Workset</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/worksets.html#removing_items_from_a_workset">10.6. Removing Items from a Workset</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/worksets.html#moving_items_between_worksets">10.7. Moving Items Between Worksets</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/worksets.html#merging_worksets">10.8. Merging Worksets</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/worksets.html#deleting_worksets">10.9. Deleting Worksets</a></h2>
+
+<h1 style="text-indent: 0em; font-size: 1.6em"><a href="/miso-lims/latest/user_manual/pool_orders.html">11. Pool Orders</a></h1>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/pool_orders.html#pool_orders_list">11.1. Pool Orders List</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/pool_orders.html#creating_pool_orders">11.2. Creating Pool Orders</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/pool_orders.html#fulfilling_pool_orders">11.3. Fulfilling Pool Orders</a></h2>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/pool_orders.html#creating_a_pool">11.3.1. Creating a Pool</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/pool_orders.html#linking_an_existing_pool">11.3.2. Linking an Existing Pool</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/pool_orders.html#creating_a_sequencing_order">11.3.3. Creating a Sequencing Order</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/pool_orders.html#linking_an_existing_sequencing_order">11.3.4. Linking an Existing Sequencing Order</a></h3>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/pool_orders.html#deleting_pool_orders">11.4. Deleting Pool Orders</a></h2>
+
+<h1 style="text-indent: 0em; font-size: 1.6em"><a href="/miso-lims/latest/user_manual/pools.html">12. Pools</a></h1>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/pools.html#pools_list">12.1. Pools List</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/pools.html#creating_pools">12.2. Creating Pools</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/pools.html#editing_pools">12.3. Editing Pools</a></h2>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/pools.html#editing_a_single_pool">12.3.1. Editing a Single Pool</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/pools.html#editing_pools_in_bulk">12.3.2. Editing Pools in Bulk</a></h3>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/pools.html#notes">12.4. Notes</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/pools.html#attachments">12.5. Attachments</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/pools.html#adding_library_aliquots_to_a_pool">12.6. Adding Library Aliquots to a Pool</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/pools.html#removing_library_aliquots_from_a_pool">12.7. Removing Library Aliquots from a Pool</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/pools.html#creating_pools_from_library_aliquots">12.8. Creating Pools from Library Aliquots</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/pools.html#creating_sequencing_orders">12.9. Creating Sequencing Orders</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/pools.html#printing_barcodes">12.10. Printing Barcodes</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/pools.html#downloading_pool_information">12.11. Downloading Pool Information</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/pools.html#selecting_pools_by_search">12.12. Selecting Pools by Search</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/pools.html#finding_related_items">12.13. Finding Related Items</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/pools.html#pool_qcs">12.14. Pool QCs</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/pools.html#deleting_pools">12.15. Deleting Pools</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/pools.html#merging_pools">12.16. Merging Pools</a></h2>
+
+<h1 style="text-indent: 0em; font-size: 1.6em"><a href="/miso-lims/latest/user_manual/sequencing_orders.html">13. Sequencing Orders</a></h1>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/sequencing_orders.html#outstanding_sequencing_orders_list">13.1. Outstanding Sequencing Orders List</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/sequencing_orders.html#all_sequencing_orders_list">13.2. All Sequencing Orders List</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/sequencing_orders.html#in-progress_sequencing_orders_list">13.3. In-Progress Sequencing Orders List</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/sequencing_orders.html#creating_sequencing_orders">13.4. Creating Sequencing Orders</a></h2>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/sequencing_orders.html#single">13.4.1. Single</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/sequencing_orders.html#bulk">13.4.2. Bulk</a></h3>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/sequencing_orders.html#extending_a_sequencing_order">13.5. Extending a Sequencing Order</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/sequencing_orders.html#deleting_sequencing_orders">13.6. Deleting Sequencing Orders</a></h2>
+
+<h1 style="text-indent: 0em; font-size: 1.6em"><a href="/miso-lims/latest/user_manual/freezers_and_rooms.html">14. Freezers and Rooms</a></h1>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/freezers_and_rooms.html#location_maps">14.1. Location Maps</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/freezers_and_rooms.html#storage_locations_list">14.2. Storage Locations List</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/freezers_and_rooms.html#adding_a_room">14.3. Adding a Room</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/freezers_and_rooms.html#adding_a_freezer">14.4. Adding a Freezer</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/freezers_and_rooms.html#editing_a_freezer">14.5. Editing a Freezer</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/freezers_and_rooms.html#adding_storage_to_a_freezer">14.6. Adding Storage to a Freezer</a></h2>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/freezers_and_rooms.html#shelves">14.6.1. Shelves</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/freezers_and_rooms.html#stacks">14.6.2. Stacks</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/freezers_and_rooms.html#racks">14.6.3. Racks</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/freezers_and_rooms.html#tray_racks">14.6.4. Tray Racks</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/freezers_and_rooms.html#loose_storage">14.6.5. Loose Storage</a></h3>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/freezers_and_rooms.html#adding_boxes_to_storage">14.7. Adding Boxes to Storage</a></h2>
+
+<h1 style="text-indent: 0em; font-size: 1.6em"><a href="/miso-lims/latest/user_manual/boxes.html">15. Boxes</a></h1>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/boxes.html#boxes_list">15.1. Boxes List</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/boxes.html#creating_boxes">15.2. Creating Boxes</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/boxes.html#editing_boxes">15.3. Editing Boxes</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/boxes.html#selecting_positions_within_a_box">15.4. Selecting Positions within a Box</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/boxes.html#adding_a_single_item_to_a_box">15.5. Adding a Single Item to a Box</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/boxes.html#adding_multiple_items_to_a_box">15.6. Adding Multiple Items to a Box</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/boxes.html#removing_a_single_item_from_a_box">15.7. Removing a Single Item from a Box</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/boxes.html#discarding_a_single_item_from_a_box">15.8. Discarding a Single Item from a Box</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/boxes.html#discarding_all_items_from_a_box">15.9. Discarding All Items from a Box</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/boxes.html#scanning_a_box">15.10. Scanning a Box</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/boxes.html#exporting_box_information">15.11. Exporting Box Information</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/boxes.html#filling_a_box_by_barcode_pattern">15.12. Filling a Box by Barcode Pattern</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/boxes.html#working_with_items_in_a_box">15.13. Working with Items in a Box</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/boxes.html#printing_barcodes">15.14. Printing Barcodes</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/boxes.html#deleting_boxes">15.15. Deleting Boxes</a></h2>
+
+<h1 style="text-indent: 0em; font-size: 1.6em"><a href="/miso-lims/latest/user_manual/sequencing_containers.html">16. Sequencing Containers</a></h1>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/sequencing_containers.html#sequencing_containers_list">16.1. Sequencing Containers List</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/sequencing_containers.html#creating_a_container">16.2. Creating a Container</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/sequencing_containers.html#editing_a_container">16.3. Editing a Container</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/sequencing_containers.html#assigning_pools_to_a_container">16.4. Assigning Pools to a Container</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/sequencing_containers.html#container_qcs">16.5. Container QCs</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/sequencing_containers.html#printing_barcodes">16.6. Printing Barcodes</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/sequencing_containers.html#deleting_containers">16.7. Deleting Containers</a></h2>
+
+<h1 style="text-indent: 0em; font-size: 1.6em"><a href="/miso-lims/latest/user_manual/instruments.html">17. Instruments</a></h1>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/instruments.html#instruments_list">17.1. Instruments List</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/instruments.html#creating_an_instrument">17.2. Creating an Instrument</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/instruments.html#editing_an_instrument">17.3. Editing an Instrument</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/instruments.html#upgrading_an_instrument">17.4. Upgrading an Instrument</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/instruments.html#retiring_an_instrument">17.5. Retiring an Instrument</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/instruments.html#service_records">17.6. Service Records</a></h2>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/instruments.html#adding_a_service_record">17.6.1. Adding a Service Record</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/instruments.html#editing_a_service_record">17.6.2. Editing a Service Record</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/instruments.html#attachments">17.6.3. Attachments</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/instruments.html#deleting_a_service_record">17.6.4. Deleting a Service Record</a></h3>
+
+<h1 style="text-indent: 0em; font-size: 1.6em"><a href="/miso-lims/latest/user_manual/sequencer_runs.html">18. Sequencer Runs</a></h1>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/sequencer_runs.html#sequencer_runs_list">18.1. Sequencer Runs List</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/sequencer_runs.html#creating_a_run">18.2. Creating a Run</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/sequencer_runs.html#editing_a_run">18.3. Editing a Run</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/sequencer_runs.html#adding_a_sequencing_container_to_a_run">18.4. Adding a Sequencing Container to a Run</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/sequencer_runs.html#removing_a_sequencing_container_from_a_run">18.5. Removing a Sequencing Container from a Run</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/sequencer_runs.html#setting_partition_qcs">18.6. Setting Partition QCs</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/sequencer_runs.html#external_links">18.7. External Links</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/sequencer_runs.html#notes">18.8. Notes</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/sequencer_runs.html#attachments">18.9. Attachments</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/sequencer_runs.html#related_issues">18.10. Related Issues</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/sequencer_runs.html#downloading_a_sample_sheet">18.11. Downloading a Sample Sheet</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/sequencer_runs.html#automatically_populate_runs_using_run_scanner">18.12. Automatically Populate Runs using Run Scanner</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/sequencer_runs.html#deleting_runs">18.13. Deleting Runs</a></h2>
+
+<h1 style="text-indent: 0em; font-size: 1.6em"><a href="/miso-lims/latest/user_manual/arrays.html">19. Arrays</a></h1>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/arrays.html#arrays_list">19.1. Arrays List</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/arrays.html#creating_an_array">19.2. Creating an Array</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/arrays.html#editing_an_array">19.3. Editing an Array</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/arrays.html#adding_a_sample_to_an_array">19.4. Adding a Sample to an Array</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/arrays.html#removing_a_sample_from_an_array">19.5. Removing a Sample from an Array</a></h2>
+
+<h1 style="text-indent: 0em; font-size: 1.6em"><a href="/miso-lims/latest/user_manual/array_runs.html">20. Array Runs</a></h1>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/array_runs.html#array_runs_list">20.1. Array Runs List</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/array_runs.html#creating_an_array_run">20.2. Creating an Array Run</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/array_runs.html#editing_an_array_run">20.3. Editing an Array Run</a></h2>
+
+<h1 style="text-indent: 0em; font-size: 1.6em"><a href="/miso-lims/latest/user_manual/qcs.html">21. QCs</a></h1>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/qcs.html#adding_qcs">21.1. Adding QCs</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/qcs.html#editing_qcs">21.2. Editing QCs</a></h2>
+
+<h1 style="text-indent: 0em; font-size: 1.6em"><a href="/miso-lims/latest/user_manual/notes.html">22. Notes</a></h1>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/notes.html#adding_notes">22.1. Adding Notes</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/notes.html#deleting_notes">22.2. Deleting Notes</a></h2>
+
+<h1 style="text-indent: 0em; font-size: 1.6em"><a href="/miso-lims/latest/user_manual/attachments.html">23. Attachments</a></h1>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/attachments.html#adding_attachments_to_a_single_item">23.1. Adding Attachments to a Single Item</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/attachments.html#adding_attachments_to_multiple_items">23.2. Adding Attachments to Multiple Items</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/attachments.html#linking_project_attachments">23.3. Linking Project Attachments</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/attachments.html#downloading_attachments">23.4. Downloading Attachments</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/attachments.html#deleting_attachments">23.5. Deleting Attachments</a></h2>
+
+<h1 style="text-indent: 0em; font-size: 1.6em"><a href="/miso-lims/latest/user_manual/deletions.html">24. Deletions</a></h1>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/deletions.html#deletions_list">24.1. Deletions List</a></h2>
+
+<h1 style="text-indent: 0em; font-size: 1.6em"><a href="/miso-lims/latest/user_manual/workflows.html">25. Workflows</a></h1>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/workflows.html#workflows_widget">25.1. Workflows Widget</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/workflows.html#managing_favourite_workflows">25.2. Managing Favourite Workflows</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/workflows.html#beginning_a_new_workflow">25.3. Beginning a New Workflow</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/workflows.html#entering_workflow_data">25.4. Entering Workflow Data</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/workflows.html#resuming_an_incomplete_workflow">25.5. Resuming an Incomplete Workflow</a></h2>
+
+<h1 style="text-indent: 0em; font-size: 1.6em"><a href="/miso-lims/latest/user_manual/european_nucleotide_archive_support.html">26. European Nucleotide Archive Support</a></h1>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/european_nucleotide_archive_support.html#studies">26.1. Studies</a></h2>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/european_nucleotide_archive_support.html#studies_list">26.1.1. Studies List</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/european_nucleotide_archive_support.html#adding_studies">26.1.2. Adding Studies</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/european_nucleotide_archive_support.html#deleting_studies">26.1.3. Deleting Studies</a></h3>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/european_nucleotide_archive_support.html#experiments">26.2. Experiments</a></h2>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/european_nucleotide_archive_support.html#experiments_list">26.2.1. Experiments List</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/european_nucleotide_archive_support.html#creating_an_experiment">26.2.2. Creating an Experiment</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/european_nucleotide_archive_support.html#editing_an_experiment">26.2.3. Editing an Experiment</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/european_nucleotide_archive_support.html#adding_consumables_to_an_experiment">26.2.4. Adding Consumables to an Experiment</a></h3>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/european_nucleotide_archive_support.html#submissions">26.3. Submissions</a></h2>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/european_nucleotide_archive_support.html#submissions_list">26.3.1. Submissions List</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/european_nucleotide_archive_support.html#creating_a_submission">26.3.2. Creating a Submission</a></h3>
+
+<h3 style="text-indent: 8em;"><a href="/miso-lims/latest/user_manual/european_nucleotide_archive_support.html#downloading_a_submission">26.3.3. Downloading a Submission</a></h3>
+
+<h1 style="text-indent: 0em; font-size: 1.6em"><a href="/miso-lims/latest/user_manual/home_screen_widgets.html">27. Home Screen Widgets</a></h1>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/home_screen_widgets.html#search">27.1. Search</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/home_screen_widgets.html#instrument_status">27.2. Instrument Status</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/home_screen_widgets.html#workflows">27.3. Workflows</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/home_screen_widgets.html#project">27.4. Project</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/home_screen_widgets.html#run">27.5. Run</a></h2>
+
+<h1 style="text-indent: 0em; font-size: 1.6em"><a href="/miso-lims/latest/user_manual/other_miso_tools.html">28. Other MISO Tools</a></h1>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/other_miso_tools.html#index_distance">28.1. Index Distance</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/other_miso_tools.html#index_search">28.2. Index Search</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/other_miso_tools.html#identity_search">28.3. Identity Search🔹</a></h2>
+
+<h1 style="text-indent: 0em; font-size: 1.6em"><a href="/miso-lims/latest/user_manual/related_software.html">29. Related Software</a></h1>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/related_software.html#run_scanner">29.1. Run Scanner</a></h2>
+
+<h2 style="text-indent: 4em;"><a href="/miso-lims/latest/user_manual/related_software.html#pinery">29.2. Pinery</a></h2>
+
+
+
+                    </div>
+                
+            </div>
+
+            
+
+            <div class="row">
+                <div id="footer" class="col-sm-12">
+                    Documentation for <a href="https://github.com/TGAC/miso-lims">MISO</a>
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function orderNav() {
+                var list,
+                    section,
+                    header,
+                    sections = [],
+                    lists = {},
+                    headers = {};
+
+                var navUl = document.querySelectorAll('#navigation ul')[0],
+                    navLis = document.querySelectorAll('#navigation ul li');
+
+                if (!navUl) return;
+
+                for (var i = 0; i < navLis.length; i++) {
+                    var order, li = navLis[i];
+
+                    if (li.classList.contains('nav-header')) {
+                        section = li.textContent || li.innerText;
+                        sections.push(section);
+                        headers[section] = li;
+                        continue;
+                    }
+
+                    if (!lists[section]) {
+                        lists[section] = [];
+                    }
+
+                    order = parseFloat(li.getAttribute('data-order'))
+                    lists[section].push([order, li]);
+                }
+
+                for (var i = 0; i < sections.length; i++) {
+                    section = sections[i];
+                    list = lists[section].sort(function(a, b) {
+                        return a[0] - b[0];
+                    });
+
+                    if (header = headers[section]) {
+                        navUl.appendChild(header);
+                    }
+                    for (var j = 0; j < list.length; j++) {
+                        navUl.appendChild(list[j][1]);
+                    }
+                }
+            }
+
+            if (document.querySelectorAll) orderNav();
+        </script>
+        
+    </body>
+</html>

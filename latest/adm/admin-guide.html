@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <title>MISO : Administrator's Manual</title>
+        <meta name="description" content="An open-source LIMS for NGS sequencing centres">
+
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/miso-lims/latest/css/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/latest/css/main.css">
+				<link rel="icon" href="/miso-lims/latest/favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+<a href="https://github.com/miso-lims/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+        <div class="container">
+            <div class="row">
+                <div id="header" class="col-sm-12">
+                    <h2><a class="brand" href="/miso-lims/latest/"><img src="/miso-lims/latest/images/MISO.png" alt="MISO's logo, a bowl of miso soup"/>MISO</a>
+    <small>An open-source LIMS for NGS sequencing centres</small>
+</h2>
+
+                </div>
+            </div>
+
+            <div class="row">
+                
+                
+                    <div id="navigation" class="col-sm-2">
+                        <ul class="nav nav-list">
+    <!--<li><a href="/miso-lims/latest/">Home</a></li>-->
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">User Guides</li>
+            
+            <li data-order="1"><a href="/miso-lims/latest/usr/user-manual-table-of-contents.html">User Manual</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Admin Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/latest/adm/baremetal-installation-guide.html">Installing MISO on baremetal</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/latest/adm/compose-installation-guide.html">Installing MISO with docker-compose</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/latest/adm/admin-guide.html">Administrator's Manual</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/latest/adm/installation-guide.html">Building and Deploying</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Developer Guides</li>
+            
+            <li data-order="2"><a href="/miso-lims/latest/dev/rest-testing.html">REST Testing</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/latest/dev/maven-artifacts.html">Maven artifacts</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/latest/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/latest/dev/code-style.html">Code Style</a></li>
+        
+            
+            <li data-order="1"><a href="/miso-lims/latest/dev/developers-manual.html">Developer's Manual</a></li>
+        
+    
+        
+        
+
+        
+    
+        
+        
+
+        
+    
+<!-- List additional links. It is recommended to add a divider
+    e.g. <li class="divider"></li> first to break up the content. -->
+</ul>
+
+                    </div>
+
+                    <div id="content" class="col-sm-10">
+                        <div class="page-header">
+    <h2>Administrator's Manual
+        
+    </h2>
+</div>
+
+<p>This guide container instructions to facilitate day-to-day running MISO at your institution. See <a href="2016-01-11-installation-guide.md">Building and Deploying</a> if you need to set up your instance.</p>
+
+<h1 id="adding-value-type-data">Adding Value-Type Data</h1>
+
+<p>MISO has several categories of value-type data which the users interact with but cannot add or edit.
+There are some stored procedures which may help in adding these values to the database. If any of these are
+out of date, please <a href="https://github.com/miso-lims/miso-lims/issues">create an issue</a>, and check the
+source code for the exact methods of <a href="https://github.com/miso-lims/miso-lims/tree/master/sqlstore/src/main/resources/db/migration_beforeMigrate">adding</a> and <a href="https://github.com/miso-lims/miso-lims/tree/master/sqlstore/src/main/resources/db/migration_afterMigrate">removing</a> data from the database.</p>
+
+<h2 id="indices-also-known-as-barcodes-molecular-ids-tag-barcodes">Indices (also known as Barcodes, Molecular IDs, Tag Barcodes)</h2>
+
+<p>An <code class="highlighter-rouge">Index</code> has a name, a sequence, a position (1 or 2) and is a member of an <code class="highlighter-rouge">Index Family</code>. An <code class="highlighter-rouge">Index Family</code>
+has a name and is associated with a sequencing platform, and can be archived to hide its members when creating new
+libraries. If a family is unique dual-indexed, that means that position 1 and 2 indices with the same name are always
+paired together.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>addIndexFamily(name, platformType, archived, uniqueDualIndex)
+addIndex(familyName, name, sequence, position)
+</code></pre></div></div>
+
+<p>For example, to add a set of Illumina indices named “Custom Indices A,” with “Index 1” ACACACAC and “Index 2” GTGTGTGT:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CALL addIndexFamily('Custom Indices A', 'ILLUMINA', 0, 0);
+CALL addIndex('Custom Indices A', 'Index 1', 'ACACACAC', 1);
+CALL addIndex('Custom Indices A', 'Index 2', 'GTGTGTGT', 1);
+</code></pre></div></div>
+<p>Note that the sequencing platform must be entered in all caps.
+<a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_index.sql">Source</a></p>
+
+<h2 id="boxes">Boxes</h2>
+
+<p>A <code class="highlighter-rouge">Box</code> is described by a set <code class="highlighter-rouge">size</code> and <code class="highlighter-rouge">use</code>. MISO can be set up to integrate with a VisionMate scanner. Box sizes that can be read by the scanner are said to be scannable. Note that since <code class="highlighter-rouge">size</code> and <code class="highlighter-rouge">use</code> are required fields on a box, no boxes can be saved until at least one <code class="highlighter-rouge">size</code> and <code class="highlighter-rouge">use</code> are added to the database.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>addBoxSize(numRows, numColumns, scannable);
+addBoxUse(name);
+</code></pre></div></div>
+
+<p>For example, to add a box for DNA that has 10 rows and 10 columns and cannot be read by a box scanner, you would first need to add the following values to the database:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CALL addBoxUse('DNA');
+CALL addBoxSize(10, 10, 0);
+</code></pre></div></div>
+<p><a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_box_parameters.sql">Source</a></p>
+
+<h2 id="library-type">Library Type</h2>
+
+<p>Each library is described by a library type. This is a somewhat nebulous term, and not a controlled vocabulary term (in contrast to library selection and library strategy, which are <a href="https://github.com/enasequence/schema/blob/master/src/main/resources/uk/ac/ebi/ena/sra/schema/SRA.experiment.xsd">controlled vocabulary terms from the SRA</a>. Note that archived library types will not be available for creating new libraries.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>addLibraryType(name, platform, archived);
+</code></pre></div></div>
+
+<p>For example, to add a whole genome PacBio library type:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CALL addLibraryType('Whole Genome', 'PACBIO', 0);
+</code></pre></div></div>
+<p>Note that the sequencing platform must be entered in all caps.
+<a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_library_parameters.sql">Source</a></p>
+
+<h2 id="instrument-models">Instrument Models</h2>
+
+<p>Each instrument model has a platform, a model name, a description, and a maximum number of containers that can be associated with a single run.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>addInstrumentModel(platform, modelName, description, maxContainers);
+</code></pre></div></div>
+
+<p>For example, to add a MinION sequencer:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CALL addInstrumentModel('OXFORDNANOPORE', 'MinION', '1-channel portable nanopore', 1);
+</code></pre></div></div>
+<p>Note that the sequencing platform must be entered in all caps.
+<a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_platform.sql">Source</a></p>
+
+<h2 id="instruments">Instruments</h2>
+
+<p>Each instrument has a platform, an instrument model, a serial number, a date the instrument was put into service (commissionedDate), an optional date the instrument was taken out of service (decommissionedDate), and an optional reference to the sequencer that this instrument was upgraded to.
+Instruments can also be added to MISO by admin users.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>addInstrument(name, platform, instrumentModel, serialNumber, commissionedDate, decommissionedDate, upgradedInstrumentName);
+</code></pre></div></div>
+
+<p>For instance, to add an Illumina HiSeq 2000 which was later upgraded to a HiSeq2500:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CALL addInstrument('h501', 'ILLUMINA', 'Illumina HiSeq 2000', '12345', '2015-01-07', '2016-05-19', 'SN501');
+</code></pre></div></div>
+<p>Note that the platform must be in all caps, and the instrumentModel must be an exact match for a value in <code class="highlighter-rouge">Platform.instrumentModel</code>.
+Note also that if adding an instrument which references an upgraded instrument, the upgraded instrument must already exist in MISO. If the instrument to be added has not been upgraded, set upgradedInstrumentName to <code class="highlighter-rouge">NULL</code>.
+<a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_instrument.sql">Source</a></p>
+
+<h2 id="container-models">Container Models</h2>
+
+<p>Each instrument model can have various container models associated. The default container models are generic
+<code class="highlighter-rouge">Unknown &lt;#&gt;-&lt;Partition&gt; &lt;Platform&gt; &lt;Container Name&gt;</code>, like “Unknown 4-Lane Illumina Flow Cell” or “Unknown 8-SMRT-CELL PacBio 8Pac”. The run scanner uses container models to determine the correct container for a run. Container models can only be added by a MISO administrator.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>addContainerModel(name, identificationBarcode, partitionCount, platform, instrumentModel);
+</code></pre></div></div>
+
+<p>See <strong>List of container models</strong> below for usage examples, including a full list of the container models found by OICR, which can be added to your MISO as desired. If you do not add any container models, MISO will use the generic container models. MISO will emit a warning in the logs when attempting to save a new run when it cannot find a container model (but will not prevent the run from being saved, and will not warn the user). If you would like this type of error to not be emitted, you can use the information from these warnings to add new container models.</p>
+
+<p>Note that the sequencing platform must be in all caps, and the instrumentModel must be an exact match for a value in <code class="highlighter-rouge">Platform.instrumentModel</code>.
+<a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_containermodel.sql">Source</a></p>
+
+<h2 id="sequencing-parameters">Sequencing Parameters</h2>
+
+<p>Runs have sequencing parameters, and sequencing orders are requested with a given set of sequencing parameters. MISO determines whether a sequencing order has been completed by looking at the run(s) associated with the pool and seeing if their sequencing parameters match the requested sequencing parameters. While it is possible to add all possible sequencing parameter combinations to this table, it may be easier to add the parameters used most often and describing all infrequently-used parameters with the ‘Custom’ label.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>addSequencingParameters(name, platform, instrumentModel, readLength, paired, chemistryVersion);
+</code></pre></div></div>
+
+<p>For instance, to add sequencing parameters for a paired-end run with a read length of 151 bases on the MiSeq:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CALL addSequencingParameters('2x151', 'ILLUMINA', 'Illumina MiSeq', 151, 1, 'V2');
+</code></pre></div></div>
+<p>Note that the sequencing platform must be in all caps, and the instrumentModel must be an exact match for a value in <code class="highlighter-rouge">Platform.instrumentModel</code>.
+<a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_seqparam.sql">Source</a></p>
+
+<h2 id="qc-types">QC Types</h2>
+
+<p>A QC is associated with a specific QC type, which has a name, description, target (sample, library, pool, lane), units of measurement, and an indicator for the post-decimal precision associated with the specific QC instrument.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>addQcType(name, description, target, units, precision);
+</code></pre></div></div>
+
+<p>For example, to add Qubit as a QC Type for samples:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CALL addQcType('Qubit', 'Quantitation of DNA, RNA, and protein, manufactured by Invitrogen', 'Sample', 'ng/&amp;#181;l', 2);
+</code></pre></div></div>
+<p>Note that special characters should be HTML-encoded. If your lab does Qubit for libraries as well, a separate QcType for target ‘Library’ would have to be added.
+<a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_qc.sql">Source</a></p>
+
+<h2 id="kits">Kits</h2>
+
+<p>A <code class="highlighter-rouge">KitDescriptor</code> has a name, version, manufacturer, part number, kit type (Library, Multiplexing, Sequencing), sequencing platform, and description. Note that while the MISO database does have a <code class="highlighter-rouge">Kit</code> table, it is not accessible from the user interface at this time. There are plans to add a kit tracking feature to MISO in the future.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>addKitDescriptor(name, version, manufacturer, partNumber, kitType, platform, description);
+</code></pre></div></div>
+
+<p>For example, to add a Nextera library prep kit:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CALL addKitDescriptor('Nextera DNA Exome', 1, 'Nextera', 1, 'LIBRARY', 'ILLUMINA', 'Previously known as the TruSeq Rapid Exome Library Prep Kit');
+</code></pre></div></div>
+<p>Note that the kit type and sequencing platform must be entered in all caps.
+<a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_kit.sql">Source</a></p>
+
+<h2 id="targeted-sequencing">Targeted Sequencing</h2>
+
+<p>A Targeted Sequencing panel has a name, description, and name of the library kit with which it is to be used. Targeted Sequencing values can be added to library aliquots to assist with analysis.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>addTargetedSequencing(alias, description, kitName, archived);
+</code></pre></div></div>
+
+<p>For example, to add a targeted sequencing panel for a library kit of the same name:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CALL addTargetedSequencing('Agilent SureSelectXT MethylSeq', 'Agilent SureSelectXT panel for methyl seq', 'Agilent SureSelectXT MethylSeq', 0);
+</code></pre></div></div>
+<p>Note: the library kit must already exist in MISO.
+<a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_beforeMigrate/05_add_tarseq.sql">Source</a></p>
+
+<h1 id="removing-lab-entered-data">Removing Lab-entered data</h1>
+
+<p>Lab members are now able to delete samples, libraries, library aliquots, and pools. Generally, they are only able 
+to delete items they have created, but some exceptions apply. An item can only be deleted if it has no
+related downstream-processing items; for example, a library with associated library aliquots and pools can only 
+be deleted after the pools and then the library aliquots are deleted.</p>
+
+<p>Deleting an item deletes all of the associated entities (QCs, sequencing parameters, position in box or sequencing container, changelogs, etc.). Deletions are final and cannot be undone.</p>
+
+<p>As an administrator, the following items can be deleted via SQL stored procedures:</p>
+
+<h2 id="runs">Runs</h2>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CALL deleteRun(runId, runAlias);
+</code></pre></div></div>
+<p><a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_afterMigrate/05_delete_run.sql">Source</a></p>
+
+<h2 id="sequencing-containers">Sequencing Containers</h2>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CALL deleteContainer(containerId, containerBarcode);
+</code></pre></div></div>
+<p><a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_afterMigrate/05_delete_container.sql">Source</a></p>
+
+<h2 id="pools">Pools</h2>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CALL deletePool(poolId, poolAlias);
+</code></pre></div></div>
+<p><a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_afterMigrate/05_delete_pool.sql">Source</a></p>
+
+<h2 id="library-aliquots">Library Aliquots</h2>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CALL deleteLibraryAliquot(aliquotId, libraryId, userName);
+</code></pre></div></div>
+
+<p><a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_afterMigrate/05_delete_libraryaliquot.sql">Source</a></p>
+
+<h2 id="libraries">Libraries</h2>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CALL deleteLibrary(libraryId, libraryAlias);
+</code></pre></div></div>
+<p><a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_afterMigrate/05_delete_library.sql">Source</a></p>
+
+<h2 id="samples">Samples</h2>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CALL deleteSample(sampleId, sampleAlias);
+</code></pre></div></div>
+<p><a href="https://github.com/miso-lims/miso-lims/blob/master/sqlstore/src/main/resources/db/migration_afterMigrate/05_delete_sample.sql">Source</a></p>
+
+<h1 id="upgrading-to-the-latest-version">Upgrading to the latest version.</h1>
+
+<p>To upgrade MISO to the latest version, follow the upgrading instructions in <a href="installation-guide#upgrading">Building and Deploying</a>.</p>
+
+<h3 id="list-of-container-models">List of container models</h3>
+<p>INSERT INTO SequencingContainerModel(alias, identificationBarcode, partitionCount, platformType) VALUES</p>
+
+<p><em>NovaSeq</em></p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CALL addContainerModel('S2 Flow Cell', '20015845', 2, 'ILLUMINA', 'Illumina NovaSeq 6000');
+CALL addContainerModel('S4 Flow Cell', '20015843', 4, 'ILLUMINA', 'Illumina NovaSeq 6000');
+</code></pre></div></div>
+
+<p><em>HiSeq 2500</em></p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CALL addContainerModel('HiSeq SR Flow Cell v4', '15052255', 8, 'ILLUMINA', 'Illumina HiSeq 2500');
+CALL addContainerModel('HiSeq PE Flow Cell v4', '15049346', 8, 'ILLUMINA', 'Illumina HiSeq 2500');
+CALL addContainerModel('HiSeq SR Flow Cell v3', NULL, 8, 'ILLUMINA', 'Illumina HiSeq 2500');
+CALL addContainerModel('HiSeq PE Flow Cell v3', '15022186', 8, 'ILLUMINA', 'Illumina HiSeq 2500');
+CALL addContainerModel('HiSeq Flow Cell v3', NULL, 8, 'ILLUMINA', 'Illumina HiSeq 2500');
+CALL addContainerModel('HiSeq Flow Cell', NULL, 1, 'ILLUMINA', 'Illumina HiSeq 2500');
+CALL addContainerModel('HiSeq Flow Cell v1', NULL, 8, 'ILLUMINA', 'Illumina HiSeq 2500');
+CALL addContainerModel('HiSeq Flow Cell v1.5', NULL, 8, 'ILLUMINA', 'Illumina HiSeq 2500');
+</code></pre></div></div>
+
+<p><em>HiSeq 2500 Rapid Run</em></p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CALL addContainerModel('HiSeq Rapid PE Flow Cell v2', '15053059', 2, 'ILLUMINA', 'Illumina HiSeq 2500');
+CALL addContainerModel('HiSeq Rapid SR Flow Cell v2', '15053060', 2, 'ILLUMINA', 'Illumina HiSeq 2500');
+CALL addContainerModel('HiSeq Rapid PE Flow Cell', '15034173', 2, 'ILLUMINA', 'Illumina HiSeq 2500');
+CALL addContainerModel('HiSeq Rapid SR Flow Cell', '15034244', 2, 'ILLUMINA', 'Illumina HiSeq 2500');
+CALL addContainerModel('HiSeq Rapid PE Flow Cell v1', NULL, 2, 'ILLUMINA', 'Illumina HiSeq 2500');
+CALL addContainerModel('HiSeq Rapid SR Flow Cell v1', NULL, 2, 'ILLUMINA', 'Illumina HiSeq 2500');
+</code></pre></div></div>
+
+<p><em>MiSeq</em></p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CALL addContainerModel('PE MiSeq Flow Cell', '15028382', 1, 'ILLUMINA', 'Illumina HiSeq 2500');
+CALL addContainerModel('PE-Micro MiSeq Flow Cell', '15035218', 1, 'ILLUMINA', 'Illumina HiSeq 2500');
+CALL addContainerModel('PE-Nano MiSeq Flow Cell', '15035217', 1, 'ILLUMINA', 'Illumina HiSeq 2500');
+</code></pre></div></div>
+
+<p><em>NextSeq 550</em></p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CALL addContainerModel('High Output Flow Cell Cartridge V2', '15065973', 4, 'ILLUMINA', 'Illumina NextSeq 500');
+CALL addContainerModel('Mid Output Flow Cell Cartridge V2', '15065974', 4, 'ILLUMINA', 'Illumina NextSeq 500');
+</code></pre></div></div>
+
+<p><em>HiSeq X</em></p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CALL addContainerModel('HiSeq X', NULL, 8, 'ILLUMINA', 'Illumina HiSeq X');
+</code></pre></div></div>
+
+
+                    </div>
+                
+            </div>
+
+            
+
+            <div class="row">
+                <div id="footer" class="col-sm-12">
+                    Documentation for <a href="https://github.com/TGAC/miso-lims">MISO</a>
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function orderNav() {
+                var list,
+                    section,
+                    header,
+                    sections = [],
+                    lists = {},
+                    headers = {};
+
+                var navUl = document.querySelectorAll('#navigation ul')[0],
+                    navLis = document.querySelectorAll('#navigation ul li');
+
+                if (!navUl) return;
+
+                for (var i = 0; i < navLis.length; i++) {
+                    var order, li = navLis[i];
+
+                    if (li.classList.contains('nav-header')) {
+                        section = li.textContent || li.innerText;
+                        sections.push(section);
+                        headers[section] = li;
+                        continue;
+                    }
+
+                    if (!lists[section]) {
+                        lists[section] = [];
+                    }
+
+                    order = parseFloat(li.getAttribute('data-order'))
+                    lists[section].push([order, li]);
+                }
+
+                for (var i = 0; i < sections.length; i++) {
+                    section = sections[i];
+                    list = lists[section].sort(function(a, b) {
+                        return a[0] - b[0];
+                    });
+
+                    if (header = headers[section]) {
+                        navUl.appendChild(header);
+                    }
+                    for (var j = 0; j < list.length; j++) {
+                        navUl.appendChild(list[j][1]);
+                    }
+                }
+            }
+
+            if (document.querySelectorAll) orderNav();
+        </script>
+        
+    </body>
+</html>
