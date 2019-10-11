@@ -4,7 +4,16 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.generateTemporaryName;
 import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -16,7 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Note;
 
-import uk.ac.bbsrc.tgac.miso.core.data.*;
+import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
@@ -300,11 +311,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
               "fewer positions of difference, please address the following conflicts: ",
               indexChecker.getWarningMismatches());
       indices.removeAll(bcIndices);
-
-      for (String index : indices){
-        errorMessage += index + " ";
-      }
-
+      errorMessage += indices.stream().map(index -> index.length() == 0 ? "(no indices)" : index).collect(Collectors.joining(", "));
       errors.add(new ValidationError("poolElements", errorMessage));
     }
   }

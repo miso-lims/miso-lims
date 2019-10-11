@@ -38,6 +38,7 @@ public abstract class FormPage<T extends FormPage.FieldElement> extends HeaderFo
       case "span":
       case "p":
       case "a":
+      case "div":
         return element.getText();
       case "select":
         return getSelectedDropdownText(element);

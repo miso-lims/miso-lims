@@ -12,6 +12,8 @@ Changes:
   * Automatically update `/miso/constants.js` every 15 minutes
   * Fixed missing Libraries table on Edit Sample page
   * Fixed Javascript error on library index 2 autocomplete for unique dual indices in bulk form
+  * Don't show missing index warnings on pools containing only one library
+  * Fixed missing index being considered a duplicate of any index
 
 # 0.2.191
 
