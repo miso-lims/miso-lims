@@ -1,7 +1,7 @@
-dist : trusty
+dist : xenial
 language: java
 jdk:
-  - oraclejdk8
+  - openjdk8
 sudo: required
 env:  
   global:
@@ -22,6 +22,9 @@ addons:
         organization: "miso-lims"
         token:
             secure: "CuaZUL0SJiRQR3Z+zvSTKAJc+/SOC+2g5a9gG08NYYSkwN8Ujwoyd9e14DLuyFaY2xZppQb5OIcQWQH+lmZqZbycRuAlBsTy1iIooUFB9v80g5eW8RDaJu3609Y7emSV7sZ3wuTJx3sTDeITAbkhRz0FQ2FyyoFMgD1jI+lxPXA="
+
+services:
+  - xvfb
 
 before_install:
     - git clone https://github.com/oicr-gsi/gsi-config.git "${MAVEN_SETTINGS}"
