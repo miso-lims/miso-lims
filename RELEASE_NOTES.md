@@ -18,6 +18,7 @@ Changes:
     * Kit descriptors
     * Freezers
     * Rooms
+    * QC Types
 
 # 0.2.192
 

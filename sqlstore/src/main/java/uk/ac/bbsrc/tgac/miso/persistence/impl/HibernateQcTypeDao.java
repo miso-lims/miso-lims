@@ -7,20 +7,22 @@ import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ContainerQC;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.persistence.QualityControlTypeStore;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
 public class HibernateQcTypeDao implements QualityControlTypeStore {
-
-  protected static final Logger log = LoggerFactory.getLogger(HibernateQcTypeDao.class);
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -58,6 +60,32 @@ public class HibernateQcTypeDao implements QualityControlTypeStore {
   @Override
   public void update(QcType qcType) throws IOException {
     currentSession().update(qcType);
+  }
+
+  @Override
+  public long getUsage(QcType qcType) throws IOException {
+    Criteria criteria = null;
+    switch (qcType.getQcTarget()) {
+    case Container:
+      criteria = currentSession().createCriteria(ContainerQC.class);
+      break;
+    case Library:
+      criteria = currentSession().createCriteria(LibraryQC.class);
+      break;
+    case Pool:
+      criteria = currentSession().createCriteria(PoolQC.class);
+      break;
+    case Run:
+      throw new IllegalArgumentException("Unhandled QC target: Run");
+    case Sample:
+      criteria = currentSession().createCriteria(SampleQC.class);
+      break;
+    default:
+      throw new IllegalArgumentException("Unhandled QC target: " + qcType.getQcTarget() == null ? "null" : qcType.getQcTarget().getLabel());
+    }
+    return (long) criteria.add(Restrictions.eq("type", qcType))
+        .setProjection(Projections.rowCount())
+        .uniqueResult();
   }
 
 }

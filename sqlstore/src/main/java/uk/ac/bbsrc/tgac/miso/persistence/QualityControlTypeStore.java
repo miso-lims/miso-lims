@@ -6,11 +6,15 @@ import java.util.Collection;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 
 public interface QualityControlTypeStore {
-  Collection<QcType> list() throws IOException;
 
-  QcType get(long id) throws IOException;
+  public Collection<QcType> list() throws IOException;
 
-  long create(QcType qcType) throws IOException;
+  public QcType get(long id) throws IOException;
 
-  void update(QcType qcType) throws IOException;
+  public long create(QcType qcType) throws IOException;
+
+  public void update(QcType qcType) throws IOException;
+
+  public long getUsage(QcType qcType) throws IOException;
+
 }

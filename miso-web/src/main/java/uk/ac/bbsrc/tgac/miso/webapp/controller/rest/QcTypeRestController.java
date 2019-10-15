@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
@@ -32,6 +33,7 @@ import javax.ws.rs.core.Response.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,6 +42,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
@@ -50,12 +53,12 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
 
 @Controller
 @RequestMapping("/rest/qctypes")
-public class QcTypeController extends RestController {
+public class QcTypeRestController extends RestController {
 
   @Autowired
   private MenuController menuController;
 
-  protected static final Logger log = LoggerFactory.getLogger(QcTypeController.class);
+  protected static final Logger log = LoggerFactory.getLogger(QcTypeRestController.class);
 
   @Autowired
   private QcTypeService qcTypeService;
@@ -100,6 +103,13 @@ public class QcTypeController extends RestController {
     qcTypeService.update(qcType);
     menuController.refreshConstants();
     return getQcType(id, uriBuilder, response);
+  }
+
+  @PostMapping(value = "/bulk-delete")
+  @ResponseBody
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
+    RestUtils.bulkDelete("QC Type", ids, qcTypeService);
   }
 
 }

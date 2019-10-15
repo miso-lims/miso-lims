@@ -34,6 +34,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
+import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.QcCorrespondingField;
 import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 
@@ -48,7 +49,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
  */
 @Entity
 @Table(name = "QCType")
-public class QcType implements Comparable<QcType>, Serializable, Aliasable {
+public class QcType implements Comparable<QcType>, Serializable, Aliasable, Deletable {
   private static final long serialVersionUID = 1L;
 
   private static final long UNSAVED_ID = 0L;
@@ -278,5 +279,15 @@ public class QcType implements Comparable<QcType>, Serializable, Aliasable {
   @Override
   public boolean isSaved() {
     return getId() != UNSAVED_ID;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return getQcTarget().getLabel() + " QC Type";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getAlias();
   }
 }
