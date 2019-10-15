@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
+import java.io.IOException;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -33,6 +34,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.StorageLocationService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.webapp.util.TabbedListItemsPage;
@@ -46,12 +51,31 @@ public class ListStorageLocationsController {
     LOCATIONS.put("Rooms", "'rooms'");
     LOCATIONS.put("Freezers", "'freezers'");
   }
+
   @Autowired
   private StorageLocationService storageLocationService;
+  @Autowired
+  private AuthorizationManager authorizationManager;
+
+  private static class ListLocationsPage extends TabbedListItemsPage {
+
+    private final AuthorizationManager authorizationManager;
+
+    public ListLocationsPage(AuthorizationManager authorizationManager) {
+      super("storage_location", "slug", LOCATIONS);
+      this.authorizationManager = authorizationManager;
+    }
+
+    @Override
+    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+      config.put("isAdmin", authorizationManager.isAdminUser());
+    }
+
+  }
 
   @RequestMapping("/storagelocations")
   public ModelAndView listProjects(ModelMap model) throws Exception {
-    return new TabbedListItemsPage("storage_location", "slug", LOCATIONS).list(key -> {
+    return new ListLocationsPage(authorizationManager).list(key -> {
       switch (key) {
       case "Rooms":
         return storageLocationService.listRooms().stream().map(r -> Dtos.asDto(r, false, false));

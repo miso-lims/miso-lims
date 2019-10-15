@@ -31,10 +31,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLoggable;
+import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.StorageLocationChangeLog;
 
 @Entity
-public class StorageLocation implements Serializable, Aliasable, ChangeLoggable {
+public class StorageLocation implements Serializable, Aliasable, ChangeLoggable, Deletable {
 
   private static final long serialVersionUID = 1L;
 
@@ -87,7 +88,7 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable 
   @JoinColumn(name = "parentLocationId", nullable = true)
   private StorageLocation parentLocation;
 
-  @OneToMany(mappedBy = "parentLocation")
+  @OneToMany(mappedBy = "parentLocation", cascade = CascadeType.REMOVE)
   private Set<StorageLocation> childLocations;
 
   @Enumerated(EnumType.STRING)
@@ -351,6 +352,16 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable 
 
   public void setMapAnchor(String mapAnchor) {
     this.mapAnchor = mapAnchor;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return getLocationUnit().getDisplayName();
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getAlias();
   }
 
 }

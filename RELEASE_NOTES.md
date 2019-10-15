@@ -16,6 +16,8 @@ Changes:
     * Array Runs
     * Instruments
     * Kit descriptors
+    * Freezers
+    * Rooms
 
 # 0.2.192
 
