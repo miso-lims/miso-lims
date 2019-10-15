@@ -28,8 +28,9 @@ ListTarget.kit = {
   },
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {
-
-    return [];
+    return !config.isUserAdmin ? [] : [ListUtils.createBulkDeleteAction("Kits", "kitdescriptors", function(kit) {
+      return kit.name + ' (' + kit.kitType + ')';
+    })];
   },
   createStaticActions: function(config, projectId) {
     var actions = [];

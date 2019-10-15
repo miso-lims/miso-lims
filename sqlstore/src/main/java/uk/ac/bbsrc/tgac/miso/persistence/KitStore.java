@@ -40,24 +40,28 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
  * @since 0.0.2
  */
 public interface KitStore extends Store<Kit>, PaginatedDataSource<KitDescriptor> {
-  Kit getKitByIdentificationBarcode(String barcode) throws IOException;
+  public Kit getKitByIdentificationBarcode(String barcode) throws IOException;
 
-  Kit getKitByLotNumber(String lotNumber) throws IOException;
+  public Kit getKitByLotNumber(String lotNumber) throws IOException;
 
-  List<Kit> listKitsByType(KitType kitType) throws IOException;
+  public List<Kit> listKitsByType(KitType kitType) throws IOException;
 
-  KitDescriptor getKitDescriptorById(long kitDescriptorId) throws IOException;
+  public KitDescriptor getKitDescriptorById(long kitDescriptorId) throws IOException;
 
-  KitDescriptor getKitDescriptorByName(String name) throws IOException;
+  public KitDescriptor getKitDescriptorByName(String name) throws IOException;
 
-  KitDescriptor getKitDescriptorByPartNumber(String partNumber) throws IOException;
+  public KitDescriptor getKitDescriptorByPartNumber(String partNumber) throws IOException;
 
-  List<KitDescriptor> listAllKitDescriptors() throws IOException;
+  public List<KitDescriptor> listAllKitDescriptors() throws IOException;
 
-  List<KitDescriptor> listKitDescriptorsByType(KitType kitType) throws IOException;
+  public List<KitDescriptor> listKitDescriptorsByType(KitType kitType) throws IOException;
 
-  long saveKitDescriptor(KitDescriptor kitDescriptor) throws IOException;
+  public long saveKitDescriptor(KitDescriptor kitDescriptor) throws IOException;
 
-  List<LibraryAliquot> getLibraryAliquotsForKdTsRelationship(KitDescriptor kd, TargetedSequencing ts);
+  public List<LibraryAliquot> getLibraryAliquotsForKdTsRelationship(KitDescriptor kd, TargetedSequencing ts);
+
+  public long getUsageByLibraries(KitDescriptor kitDescriptor) throws IOException;
+
+  public long getUsageByContainers(KitDescriptor kitDescriptor) throws IOException;
 
 }

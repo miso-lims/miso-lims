@@ -156,4 +156,11 @@ public class KitDescriptorRestController extends RestController {
     kitDescriptorService.saveTargetedSequencingRelationships(kitDescriptor);
     return Dtos.asDto(kitDescriptorService.get(id));
   }
+
+  @PostMapping(value = "/bulk-delete")
+  @ResponseBody
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
+    RestUtils.bulkDelete("Kit Descriptor", ids, kitDescriptorService);
+  }
 }
