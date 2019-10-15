@@ -169,4 +169,10 @@ This will generate a ZIP file with the XML files needed for submission to the
 ENA. Extract this archive and add the file information. After modification, the
 package is ready for submission.
 
+{% assign subsub = subsub | plus: 1 %}
+{% include userman-heading.md sub=sub subsub=subsub section=page.section title="Deleting Submissions" %}
+
+Submissions can be deleted by MISO administrators from the Submissions list page. Select the submissions you wish to
+delete, then click the "Delete" button in the toolbar at the top of the list.
+
 {% include userman-toplink.md %}

@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.QueryParam;
@@ -10,6 +11,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -63,6 +66,13 @@ public class SubmissionRestController extends RestController {
   @PutMapping("/{submissionId}")
   public @ResponseBody SubmissionDto update(@PathVariable long submissionId, @RequestBody SubmissionDto dto) throws IOException {
     return RestUtils.updateObject("Submission", submissionId, dto, Dtos::to, submissionService, Dtos::asDto);
+  }
+
+  @PostMapping(value = "/bulk-delete")
+  @ResponseBody
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
+    RestUtils.bulkDelete("Submission", ids, submissionService);
   }
 
 }

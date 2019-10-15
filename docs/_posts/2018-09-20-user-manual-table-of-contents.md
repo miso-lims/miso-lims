@@ -735,6 +735,8 @@ biweekly to [GitHub](https://github.com/miso-lims/miso-lims/releases).
 {% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Creating a Submission" %}
 {% assign subsub = subsub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Downloading a Submission" %}
+{% assign subsub = subsub | plus: 1 %}
+{% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Deleting Submissions" %}
 
 
 {% assign section = section | plus: 1 %}
