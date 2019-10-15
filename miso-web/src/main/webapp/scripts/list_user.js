@@ -30,7 +30,9 @@ ListTarget.user = {
   createBulkActions: function(config, projectId) {
     switch (config.listMode) {
     case 'list':
-      return [];
+      return !config.isAdmin ? [] : [ListUtils.createBulkDeleteAction("Users", "users", function(user) {
+        return user.fullName;
+      })];
     case 'included':
       return [{
         name: 'Remove',

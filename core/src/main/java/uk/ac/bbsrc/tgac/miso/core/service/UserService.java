@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.eaglegenomics.simlims.core.User;
 
-public interface UserService extends SaveService<User> {
+public interface UserService extends DeleterService<User>, SaveService<User> {
 
   public User getByLoginName(String loginName) throws IOException;
 

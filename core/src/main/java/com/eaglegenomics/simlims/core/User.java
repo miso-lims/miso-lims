@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName;
 
@@ -17,7 +18,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface User extends Serializable, Comparable<User>, Identifiable {
+public interface User extends Serializable, Comparable<User>, Deletable, Identifiable {
   boolean isActive();
 
   void setActive(boolean active);

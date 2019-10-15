@@ -125,6 +125,18 @@ checkbox, and click "Save" again.
 
 
 
+{% assign subsub = subsub | plus: 1 %}
+{% include userman-heading.md section=page.section sub=sub subsub=subsub title="Deleting Users" %}
+
+MISO administrators can delete users from the Users list page. To do so, select the users you wish to delete, then
+click the "Delete" button in the toolbar at the top of the list. For many items that are created in MISO, the users who
+have created and modified the item are tracked. It will not be possible to delete any user who has created or edited
+any of these items. Instead, you may wish to disable the user (see above).
+
+{% include userman-toplink.md %}
+
+
+
 {% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Groups" %}
 
