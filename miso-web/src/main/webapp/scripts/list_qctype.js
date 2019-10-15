@@ -28,7 +28,13 @@ ListTarget.qctype = {
   },
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {
-    return HotTarget.qctype.getBulkActions(config);
+    var actions = HotTarget.qctype.getBulkActions(config);
+    if (config.isAdmin) {
+      actions.push(ListUtils.createBulkDeleteAction("QC Types", "qctypes", function(qcType) {
+        return qcType.name + ' (' + qcType.qcTarget + ' QC)';
+      }));
+    }
+    return actions;
   },
   createStaticActions: function(config, projectId) {
     return config.isAdmin ? [{

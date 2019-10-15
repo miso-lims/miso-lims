@@ -430,7 +430,8 @@ containers, or runs. Some QC types may be linked to one of the target's fields. 
 might be linked to a sample's volume. These QCs can be set to auto-update the field, so that when a new QC is entered,
 the item's related field is updated automatically.
 
-MISO administrators can add and edit QC types using the standard interface.
+MISO administrators can add, edit, and delete QC types using the standard interface. A QC type can only be deleted if
+there are no existing QCs of the type.
 
 {% include userman-toplink.md %}
 

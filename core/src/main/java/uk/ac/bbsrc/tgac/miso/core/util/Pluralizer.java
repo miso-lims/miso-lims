@@ -30,6 +30,10 @@ public class Pluralizer {
     return pluralize(count, "instrument", "instruments");
   }
 
+  public static final String items(long count) {
+    return pluralize(count, "item", "items");
+  }
+
   public static final String labs(long count) {
     return pluralize(count, "lab", "labs");
   }
@@ -56,6 +60,10 @@ public class Pluralizer {
 
   public static String partitions(long count) {
     return pluralize(count, "partition", "partitions");
+  }
+
+  public static String pools(long count) {
+    return pluralize(count, "pool", "pools");
   }
 
   public static String projects(long count) {
