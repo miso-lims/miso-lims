@@ -180,3 +180,13 @@ the group.
 
 {% include userman-toplink.md %}
 
+
+
+{% assign subsub = subsub | plus: 1 %}
+{% include userman-heading.md section=page.section sub=sub subsub=subsub title="Deleting Groups" %}
+
+MISO administrators can delete groups from the Groups list page. To do so, select the groups you wish to delete, then
+click the "Delete" button in the toolbar at the top of the list.
+
+{% include userman-toplink.md %}
+

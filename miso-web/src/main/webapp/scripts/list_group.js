@@ -28,7 +28,7 @@ ListTarget.group = {
   },
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {
-    return [];
+    return !config.isAdmin ? [] : [ListUtils.createBulkDeleteAction("Groups", "groups", Utils.array.getName)];
   },
   createStaticActions: function(config, projectId) {
     if (config.isAdmin && !config.userId) {

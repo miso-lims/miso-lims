@@ -16,6 +16,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
@@ -29,7 +30,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
  */
 @Entity
 @Table(name = "_Group")
-public class Group implements Serializable, Comparable<Group>, Identifiable {
+public class Group implements Serializable, Comparable<Group>, Deletable, Identifiable {
 
   private static final long serialVersionUID = 1L;
   private static final long UNSAVED_ID = 0L;
@@ -117,5 +118,15 @@ public class Group implements Serializable, Comparable<Group>, Identifiable {
   @Override
   public boolean isSaved() {
     return getId() != UNSAVED_ID;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "User Group";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getName();
   }
 }

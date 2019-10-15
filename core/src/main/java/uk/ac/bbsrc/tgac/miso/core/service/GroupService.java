@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.eaglegenomics.simlims.core.Group;
 
-public interface GroupService extends SaveService<Group> {
+public interface GroupService extends DeleterService<Group>, SaveService<Group> {
 
   public List<Group> list() throws IOException;
 
