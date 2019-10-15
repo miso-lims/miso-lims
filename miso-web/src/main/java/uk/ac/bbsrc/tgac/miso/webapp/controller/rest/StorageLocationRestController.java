@@ -70,7 +70,7 @@ public class StorageLocationRestController extends RestController {
   }
 
   @GetMapping(value = "/{id}/children")
-  public @ResponseBody List<StorageLocationDto> getChildLocations(@PathVariable(name = "id", required = true) long id) {
+  public @ResponseBody List<StorageLocationDto> getChildLocations(@PathVariable(name = "id", required = true) long id) throws IOException {
     StorageLocation location = storageLocationService.get(id);
     if (location == null) {
       throw new RestException("storage location not found", Status.NOT_FOUND);
@@ -116,7 +116,7 @@ public class StorageLocationRestController extends RestController {
     return Dtos.asDto(saved, false, false);
   }
 
-  private StorageLocation getFreezer(long id) {
+  private StorageLocation getFreezer(long id) throws IOException {
     StorageLocation freezer = storageLocationService.get(id);
     if (freezer == null || freezer.getLocationUnit() != LocationUnit.FREEZER) {
       throw new RestException("Freezer not found", Status.NOT_FOUND);
@@ -261,6 +261,13 @@ public class StorageLocationRestController extends RestController {
       @RequestBody StorageLocationDto dto) throws IOException {
     StorageLocation component = Dtos.to(dto);
     storageLocationService.updateStorageComponent(component);
+  }
+
+  @PostMapping(value = "/bulk-delete")
+  @ResponseBody
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
+    RestUtils.bulkDelete("Storage location", ids, storageLocationService);
   }
 
 }

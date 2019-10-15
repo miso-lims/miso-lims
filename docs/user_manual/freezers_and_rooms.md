@@ -189,3 +189,14 @@ If there was already another box stored in the storage unit you had selected, it
 
 {% include userman-toplink.md %}
 
+
+{% assign sub = sub | plus: 1 %}
+{% include userman-heading.md section=page.section sub=sub title="Deleting Freezers and Rooms" %}
+
+Freezers and rooms can be deleted from the Storage Locations list page. Select the items that you wish to delete, then
+click the "Delete" button in the toolbar at the top of the list. Freezers and rooms can only be deleted by MISO
+administrators or their creators. A room can only be deleted if it contains no freezers. A freezer can only be deleted
+if it contains no boxes.
+
+{% include userman-toplink.md %}
+

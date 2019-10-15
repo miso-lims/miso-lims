@@ -15,6 +15,9 @@ import uk.ac.bbsrc.tgac.miso.core.service.StorageLocationMapService;
 import uk.ac.bbsrc.tgac.miso.core.service.StorageLocationService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
+import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.StorageLocationStore;
 
 @Service
@@ -30,6 +33,9 @@ public class DefaultStorageLocationService implements StorageLocationService {
   @Autowired
   private AuthorizationManager authorizationManager;
 
+  @Autowired
+  private DeletionStore deletionStore;
+
   public StorageLocationStore getStorageLocationStore() {
     return storageLocationStore;
   }
@@ -38,6 +44,7 @@ public class DefaultStorageLocationService implements StorageLocationService {
     this.storageLocationStore = storageLocationStore;
   }
 
+  @Override
   public AuthorizationManager getAuthorizationManager() {
     return authorizationManager;
   }
@@ -197,6 +204,47 @@ public class DefaultStorageLocationService implements StorageLocationService {
   @Override
   public long updateStorageComponent(StorageLocation location) throws IOException {
     return update(location);
+  }
+
+  @Override
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
+  }
+
+  @Override
+  public void authorizeDeletion(StorageLocation object) throws IOException {
+    authorizationManager.throwIfNonAdminOrMatchingOwner(object.getCreator());
+  }
+
+  @Override
+  public ValidationResult validateDeletion(StorageLocation object) throws IOException {
+    ValidationResult result = new ValidationResult();
+    switch (object.getLocationUnit()) {
+    case ROOM:
+      if (!object.getChildLocations().isEmpty()) {
+        result.addError(
+            new ValidationError(String.format("Room %s contains %d freezers", object.getAlias(), object.getChildLocations().size())));
+      }
+      break;
+    case FREEZER:
+      int boxes = countBoxes(object);
+      if (boxes > 0) {
+        result.addError(new ValidationError(String.format("Freezer %s contains %d %s", object.getAlias(), boxes, Pluralizer.boxes(boxes))));
+      }
+      break;
+    default:
+      result.addError(new ValidationError(String.format("%s units cannot be deleted directly", object.getLocationUnit().getDisplayName())));
+      break;
+    }
+    return result;
+  }
+
+  private int countBoxes(StorageLocation object) {
+    int boxes = object.getBoxes().size();
+    for (StorageLocation child : object.getChildLocations()) {
+      boxes += countBoxes(child);
+    }
+    return boxes;
   }
 
 }

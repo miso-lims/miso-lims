@@ -5,9 +5,7 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 
-public interface StorageLocationService {
-
-  public StorageLocation get(long id);
+public interface StorageLocationService extends DeleterService<StorageLocation> {
 
   public StorageLocation getByBarcode(String barcode);
 

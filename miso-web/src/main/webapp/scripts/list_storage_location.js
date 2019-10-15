@@ -28,7 +28,10 @@ ListTarget.storage_location = {
   },
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {
-    return [];
+    return !config.isAdmin ? [] : [ListUtils.createBulkDeleteAction(config.slug[0].toUpperCase() + config.slug.slice(1),
+        "storagelocations", function(location) {
+          return location.alias;
+        })];
   },
   createStaticActions: function(config, projectId) {
     switch (config.slug) {
@@ -52,8 +55,8 @@ ListTarget.storage_location = {
   },
   createColumns: function(config, projectId) {
     var columns = [
-        config.slug == "freezers" ? ListUtils
-            .labelHyperlinkColumn("Freezer Name", Urls.ui.freezers.edit, Utils.array.getId, "displayLocation", 1, true) : {
+        config.slug == "freezers" ? ListUtils.labelHyperlinkColumn("Freezer Name", Urls.ui.freezers.edit, Utils.array.getId,
+            "displayLocation", 1, true) : {
           "sTitle": "Name",
           "mData": "displayLocation",
           "include": true,
