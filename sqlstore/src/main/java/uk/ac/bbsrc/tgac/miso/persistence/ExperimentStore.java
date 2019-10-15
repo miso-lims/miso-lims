@@ -45,7 +45,7 @@ public interface ExperimentStore extends Store<Experiment> {
    * @throws IOException
    *           when
    */
-  Collection<Experiment> listBySearch(String query) throws IOException;
+  public Collection<Experiment> listBySearch(String query) throws IOException;
 
   /**
    * List all Experiments that are part of a Study given a Study ID
@@ -56,7 +56,7 @@ public interface ExperimentStore extends Store<Experiment> {
    * @throws IOException
    *           when
    */
-  Collection<Experiment> listByStudyId(long studyId) throws IOException;
+  public Collection<Experiment> listByStudyId(long studyId) throws IOException;
 
   /**
    * List all persisted objects
@@ -65,9 +65,12 @@ public interface ExperimentStore extends Store<Experiment> {
    * @throws IOException
    *           when the objects cannot be retrieved
    */
-  Collection<Experiment> listAllWithLimit(long limit) throws IOException;
+  public Collection<Experiment> listAllWithLimit(long limit) throws IOException;
 
-  Collection<Experiment> listByLibrary(long id) throws IOException;
+  public Collection<Experiment> listByLibrary(long id) throws IOException;
 
-  List<Experiment> listByRun(long runId) throws IOException;
+  public List<Experiment> listByRun(long runId) throws IOException;
+
+  public long getUsage(Experiment experiment) throws IOException;
+
 }

@@ -86,6 +86,10 @@ public class Pluralizer {
     return pluralize(count, "study", "studies");
   }
 
+  public static String submissions(long count) {
+    return pluralize(count, "submission", "submissions");
+  }
+
   public static String templates(long count) {
     return pluralize(count, "template", "templates");
   }

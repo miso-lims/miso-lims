@@ -19,6 +19,7 @@ Changes:
     * Freezers
     * Rooms
     * QC Types
+    * Experiments
 
 # 0.2.192
 

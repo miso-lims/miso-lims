@@ -62,7 +62,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
  */
 @Entity
 @Table(name = "Experiment")
-public class Experiment implements Comparable<Experiment>, Nameable, ChangeLoggable, Serializable {
+public class Experiment implements Comparable<Experiment>, Nameable, ChangeLoggable, Deletable, Serializable {
   @Entity
   @Embeddable
   @Table(name = "Experiment_Run_Partition")
@@ -141,7 +141,7 @@ public class Experiment implements Comparable<Experiment>, Nameable, ChangeLogga
 
   private String alias;
 
-  @OneToMany(targetEntity = ExperimentChangeLog.class, mappedBy = "experiment")
+  @OneToMany(targetEntity = ExperimentChangeLog.class, mappedBy = "experiment", cascade = CascadeType.REMOVE)
   private final List<ChangeLog> changeLog = new ArrayList<>();
 
   private String description;
@@ -184,7 +184,7 @@ public class Experiment implements Comparable<Experiment>, Nameable, ChangeLogga
   private InstrumentModel instrumentModel;
 
   // defines the parent run which processes this experiment
-  @OneToMany(mappedBy = "experiment", cascade=CascadeType.ALL)
+  @OneToMany(mappedBy = "experiment", cascade = CascadeType.ALL)
   private List<RunPartition> runPartitions;
 
   @ManyToOne(targetEntity = StudyImpl.class)
@@ -403,6 +403,16 @@ public class Experiment implements Comparable<Experiment>, Nameable, ChangeLogga
   @Override
   public boolean isSaved() {
     return getId() != UNSAVED_ID;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Experiment";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getAlias();
   }
 
 }

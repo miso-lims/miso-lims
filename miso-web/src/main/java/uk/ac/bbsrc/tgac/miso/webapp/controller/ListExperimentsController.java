@@ -32,23 +32,39 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
 
 @Controller
 public class ListExperimentsController {
+
   @Autowired
   private ExperimentService experimentService;
+  @Autowired
+  private AuthorizationManager authorizationManager;
 
   @ModelAttribute("title")
   public String title() {
     return "Experiments";
   }
 
+  private final ListItemsPage listExperimentsPage = new ListItemsPage("experiment") {
+
+    @Override
+    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+      config.put("isAdmin", authorizationManager.isAdminUser());
+    }
+
+  };
+
   @RequestMapping("/experiments")
   public ModelAndView listExperiments(ModelMap model) throws IOException {
-    return new ListItemsPage("experiment").list(model,
-        experimentService.list().stream().map(Dtos::asDto));
+    return listExperimentsPage.list(model, experimentService.list().stream().map(Dtos::asDto));
   }
+
 }

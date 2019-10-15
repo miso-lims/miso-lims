@@ -7,7 +7,7 @@ import java.util.List;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationException;
 
-public interface ExperimentService extends ListService<Experiment>, SaveService<Experiment> {
+public interface ExperimentService extends DeleterService<Experiment>, ListService<Experiment>, SaveService<Experiment> {
 
   public Collection<Experiment> listAllByLibraryId(long id) throws AuthorizationException, IOException;
 

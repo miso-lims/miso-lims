@@ -120,6 +120,13 @@ Click "Save".
 
 This information will be included in the exported metadata.
 
+{% assign subsub = subsub | plus: 1 %}
+{% include userman-heading.md sub=sub subsub=subsub section=page.section title="Deleting Experiments" %}
+
+Experiments can be deleted by their creators or by MISO administrators from the Experiments list page. Select the
+experiments you wish to delete, then click the "Delete" button in the toolbar at the top of the list. An experiment can
+only be deleted if it is not included in any submissions.
+
 {% include userman-toplink.md %}
 
 {% assign sub = sub | plus: 1 %}

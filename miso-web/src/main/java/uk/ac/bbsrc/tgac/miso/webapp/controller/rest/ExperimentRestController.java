@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,6 +41,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment.RunPartition;
@@ -141,6 +143,13 @@ public class ExperimentRestController extends RestController {
   public @ResponseBody List<ExperimentDto> list() throws IOException {
     Collection<Experiment> experiments = experimentService.list();
     return experiments.stream().map(Dtos::asDto).collect(Collectors.toList());
+  }
+
+  @PostMapping(value = "/bulk-delete")
+  @ResponseBody
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
+    RestUtils.bulkDelete("Experiment", ids, experimentService);
   }
 
 }

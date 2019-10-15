@@ -38,6 +38,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.persistence.ExperimentStore;
 import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
@@ -149,6 +150,15 @@ public class HibernateExperimentDao implements ExperimentStore {
     @SuppressWarnings("unchecked")
     List<Experiment> results = criteria.list();
     return results;
+  }
+
+  @Override
+  public long getUsage(Experiment experiment) throws IOException {
+    return (long) currentSession().createCriteria(Submission.class)
+        .createAlias("experiments", "experiment")
+        .add(Restrictions.eq("experiment.id", experiment.getId()))
+        .setProjection(Projections.rowCount())
+        .uniqueResult();
   }
 
 }
