@@ -13,6 +13,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.GroupService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
+import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SecurityStore;
 
 @Transactional(rollbackFor = Exception.class)
@@ -23,6 +24,8 @@ public class DefaultGroupService implements GroupService {
   private SecurityStore securityStore;
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private DeletionStore deletionStore;
 
   public void setSecurityStore(SecurityStore securityStore) {
     this.securityStore = securityStore;
@@ -75,6 +78,16 @@ public class DefaultGroupService implements GroupService {
     Group managed = get(group.getId());
     managed.setUsers(group.getUsers());
     securityStore.saveGroup(managed);
+  }
+
+  @Override
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
+  }
+
+  @Override
+  public AuthorizationManager getAuthorizationManager() {
+    return authorizationManager;
   }
 
 }

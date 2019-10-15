@@ -22,6 +22,7 @@ Changes:
     * Experiments
     * Submissions
     * Users
+    * Groups
 
 # 0.2.192
 
