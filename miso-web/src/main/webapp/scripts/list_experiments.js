@@ -31,7 +31,7 @@ ListTarget.experiment = {
     if (config.inSubmission) {
       return [];
     }
-    return [{
+    var actions = [{
       name: "Create Submission",
       action: function(experiments) {
         window.location = window.location.origin + '/miso/submission/new?' + jQuery.param({
@@ -39,6 +39,10 @@ ListTarget.experiment = {
         });
       }
     }];
+    if (config.isAdmin) {
+      actions.push(ListUtils.createBulkDeleteAction("Experiments", "experiments", Utils.array.getAlias));
+    }
+    return actions;
   },
   createStaticActions: function(config, projectId) {
     var actions = [];

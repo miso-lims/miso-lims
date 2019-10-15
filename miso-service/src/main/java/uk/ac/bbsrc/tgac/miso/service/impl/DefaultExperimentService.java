@@ -25,9 +25,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.KitService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.StudyService;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
+import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.persistence.ExperimentStore;
 import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
@@ -37,6 +40,8 @@ import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 public class DefaultExperimentService implements ExperimentService, NamingSchemeAware {
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private DeletionStore deletionStore;
   @Autowired
   private ExperimentStore experimentStore;
   @Autowired
@@ -188,6 +193,31 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
   @Override
   public List<Experiment> listAllByRunId(long runId) throws IOException {
     return experimentStore.listByRun(runId);
+  }
+
+  @Override
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
+  }
+
+  @Override
+  public AuthorizationManager getAuthorizationManager() {
+    return authorizationManager;
+  }
+
+  @Override
+  public void authorizeDeletion(Experiment object) throws IOException {
+    authorizationManager.throwIfNonAdminOrMatchingOwner(object.getCreator());
+  }
+
+  @Override
+  public uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult validateDeletion(Experiment object) throws IOException {
+    uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult result = new uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult();
+    long usage = experimentStore.getUsage(object);
+    if (usage > 0L) {
+      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.submissions(usage)));
+    }
+    return result;
   }
 
 }

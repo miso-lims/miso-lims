@@ -149,4 +149,11 @@ public class HibernateExperimentDaoTest extends AbstractDAOTest {
   public void testlistByRunMissing() throws IOException {
     assertEquals(0, dao.listByRun(2).size());
   }
+
+  @Test
+  public void testGetUsage() throws Exception {
+    Experiment experiment = (Experiment) currentSession().get(Experiment.class, 1L);
+    assertEquals(2L, dao.getUsage(experiment));
+  }
+
 }
