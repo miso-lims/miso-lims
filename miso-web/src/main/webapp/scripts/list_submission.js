@@ -28,7 +28,7 @@ ListTarget.submission = {
   },
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {
-    return [];
+    return !config.isAdmin ? [] : [ListUtils.createBulkDeleteAction("Submissions", "submissions", Utils.array.getAlias)];
   },
   createStaticActions: function(config, projectId) {
     return [];

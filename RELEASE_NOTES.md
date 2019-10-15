@@ -20,6 +20,7 @@ Changes:
     * Rooms
     * QC Types
     * Experiments
+    * Submissions
 
 # 0.2.192
 

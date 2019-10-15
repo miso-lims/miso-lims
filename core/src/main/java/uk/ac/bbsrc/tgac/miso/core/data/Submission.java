@@ -41,7 +41,7 @@ import javax.persistence.TemporalType;
 
 @Entity
 @Table(name = "Submission")
-public class Submission implements Comparable<Submission>, Serializable, Identifiable
+public class Submission implements Comparable<Submission>, Deletable, Serializable, Identifiable
 {
 
   private static final long UNSAVED_ID = 0L;
@@ -166,5 +166,15 @@ public class Submission implements Comparable<Submission>, Serializable, Identif
   @Override
   public boolean isSaved() {
     return getId() != UNSAVED_ID;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Submission";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getAlias();
   }
 }

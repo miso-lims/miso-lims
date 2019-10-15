@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -30,22 +32,39 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.SubmissionService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
 
 @Controller
 public class ListSubmissionsController {
+
   @Autowired
   private SubmissionService submissionService;
+  @Autowired
+  private AuthorizationManager authorizationManager;
+
+  private final ListItemsPage listSubmissionsPage = new ListItemsPage("submission") {
+
+    @Override
+    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+      config.put("isAdmin", authorizationManager.isAdminUser());
+    }
+
+  };
 
   @RequestMapping("/submissions")
   public ModelAndView listSubmissions(ModelMap model) throws Exception {
-    return new ListItemsPage("submission").list(model, submissionService.list().stream().map(Dtos::asDto));
+    return listSubmissionsPage.list(model, submissionService.list().stream().map(Dtos::asDto));
   }
 
   @ModelAttribute("title")
   public String title() {
     return "Submissions";
   }
+
 }

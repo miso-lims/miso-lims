@@ -10,8 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
+import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.core.service.SubmissionService;
+import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.persistence.SubmissionStore;
 
@@ -23,6 +25,10 @@ public class DefaultSubmissionService implements SubmissionService {
   private SubmissionStore submissionStore;
   @Autowired
   private ExperimentService experimentService;
+  @Autowired
+  private AuthorizationManager authorizationManager;
+  @Autowired
+  private DeletionStore deletionStore;
 
   @Override
   public Submission get(long id) throws IOException {
@@ -53,6 +59,16 @@ public class DefaultSubmissionService implements SubmissionService {
     managed.setTitle(submission.getTitle());
     managed.setVerified(submission.isVerified());
     return submissionStore.save(managed);
+  }
+
+  @Override
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
+  }
+
+  @Override
+  public AuthorizationManager getAuthorizationManager() {
+    return authorizationManager;
   }
 
 }
