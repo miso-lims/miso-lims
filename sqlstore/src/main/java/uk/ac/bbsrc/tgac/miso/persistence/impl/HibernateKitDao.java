@@ -41,6 +41,8 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
@@ -236,6 +238,20 @@ public class HibernateKitDao implements KitStore, HibernatePaginatedDataSource<K
     @SuppressWarnings("unchecked")
     List<LibraryAliquot> records = criteria.list();
     return records;
+  }
+
+  @Override
+  public long getUsageByLibraries(KitDescriptor kitDescriptor) throws IOException {
+    return (long) currentSession().createCriteria(LibraryImpl.class)
+        .add(Restrictions.eq("kitDescriptor", kitDescriptor))
+        .setProjection(Projections.rowCount()).uniqueResult();
+  }
+
+  @Override
+  public long getUsageByContainers(KitDescriptor kitDescriptor) throws IOException {
+    return (long) currentSession().createCriteria(SequencerPartitionContainerImpl.class)
+        .add(Restrictions.or(Restrictions.eq("clusteringKit", kitDescriptor), Restrictions.eq("multiplexingKit", kitDescriptor)))
+        .setProjection(Projections.rowCount()).uniqueResult();
   }
 
 }

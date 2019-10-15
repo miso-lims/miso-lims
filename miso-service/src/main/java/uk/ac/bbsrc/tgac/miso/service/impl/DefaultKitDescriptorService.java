@@ -25,6 +25,8 @@ import uk.ac.bbsrc.tgac.miso.core.service.KitDescriptorService;
 import uk.ac.bbsrc.tgac.miso.core.service.TargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
+import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.KitStore;
@@ -39,6 +41,8 @@ public class DefaultKitDescriptorService implements KitDescriptorService {
   private TargetedSequencingService targetedSequencingService;
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private DeletionStore deletionStore;
 
   public void setKitStore(KitStore kitStore) {
     this.kitStore = kitStore;
@@ -159,6 +163,30 @@ public class DefaultKitDescriptorService implements KitDescriptorService {
   @Override
   public long count(Consumer<String> errorHandler, PaginationFilter... filter) throws IOException {
     return kitStore.count(errorHandler, filter);
+  }
+
+  @Override
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
+  }
+
+  @Override
+  public AuthorizationManager getAuthorizationManager() {
+    return authorizationManager;
+  }
+
+  @Override
+  public ValidationResult validateDeletion(KitDescriptor object) throws IOException {
+    ValidationResult result = new ValidationResult();
+    long libUsage = kitStore.getUsageByLibraries(object);
+    if (libUsage > 0) {
+      result.addError(ValidationError.forDeletionUsage(object, libUsage, Pluralizer.libraries(libUsage)));
+    }
+    long containerUsage = kitStore.getUsageByContainers(object);
+    if (containerUsage > 0) {
+      result.addError(ValidationError.forDeletionUsage(object, containerUsage, "sequencing " + Pluralizer.containers(containerUsage)));
+    }
+    return result;
   }
 
 }

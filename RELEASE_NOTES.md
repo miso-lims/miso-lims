@@ -15,6 +15,7 @@ Changes:
     * Arrays
     * Array Runs
     * Instruments
+    * Kit descriptors
 
 # 0.2.192
 

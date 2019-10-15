@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -53,6 +54,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLoggable;
+import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -69,7 +71,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  */
 @Entity
 @Table(name = "KitDescriptor")
-public class KitDescriptor implements Serializable, ChangeLoggable, Identifiable {
+public class KitDescriptor implements Serializable, ChangeLoggable, Deletable, Identifiable {
 
   public static int sortByName(KitDescriptor a, KitDescriptor b) {
     return a.getName().compareTo(b.getName());
@@ -89,7 +91,7 @@ public class KitDescriptor implements Serializable, ChangeLoggable, Identifiable
   private Integer stockLevel;
   private String description;
 
-  @OneToMany(targetEntity = KitDescriptorChangeLog.class, mappedBy = "kitDescriptor")
+  @OneToMany(targetEntity = KitDescriptorChangeLog.class, mappedBy = "kitDescriptor", cascade = CascadeType.REMOVE)
   private Collection<ChangeLog> changelog = new ArrayList<>();
 
   @ManyToMany(targetEntity = TargetedSequencing.class)
@@ -431,6 +433,16 @@ public class KitDescriptor implements Serializable, ChangeLoggable, Identifiable
   @Override
   public boolean isSaved() {
     return getId() != UNSAVED_ID;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Kit Descriptor (" + getKitType().getKey() + ")";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getName();
   }
 
 }

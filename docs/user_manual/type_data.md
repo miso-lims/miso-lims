@@ -339,6 +339,10 @@ assigned a targeted sequencing from the targeted sequencings linked to the kit d
 targeted sequencing is not available for a library aliquot, this can be solved by linking the targeted sequencing to
 the kit descriptor of the library aliquot's parent library.
 
+MISO administrators can delete kit descriptors using the standard interface. Library kits can only be deleted if they
+are not used by any existing libraries. Clustering and multiplexing kits can only be deleted if they are not used by
+any existing sequencing containers.
+
 {% include userman-toplink.md %}
 
 
