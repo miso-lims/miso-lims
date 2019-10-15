@@ -5,9 +5,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.hibernate.exception.ConstraintViolationException;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
+
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 
@@ -82,7 +89,19 @@ public interface DeleterService<T extends Deletable> extends ProviderService<T> 
     result.throwIfInvalid();
     for (T object : managedObjects) {
       beforeDelete(object);
-      getDeletionStore().delete(object, getAuthorizationManager().getCurrentUser());
+      try {
+        getDeletionStore().delete(object, getAuthorizationManager().getCurrentUser());
+      } catch (ConstraintViolationException | DataIntegrityViolationException e) {
+        if (e instanceof ConstraintViolationException || e.getCause() instanceof ConstraintViolationException) {
+          if (!(object instanceof User)) {
+            LoggerFactory.getLogger(DeleterService.class).error("Unhandled foreign key failure on delete", e);
+          }
+          throw new ValidationException(String.format("%s %s cannot be deleted because it is connected to other items",
+              object.getDeleteType(), object.getDeleteDescription()));
+        } else {
+          throw e;
+        }
+      }
       afterDelete(object);
     }
   }

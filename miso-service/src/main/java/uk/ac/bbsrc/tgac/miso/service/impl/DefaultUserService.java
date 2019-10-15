@@ -14,6 +14,8 @@ import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
+import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SecurityStore;
 
 @Transactional(rollbackFor = Exception.class)
@@ -26,6 +28,8 @@ public class DefaultUserService implements UserService {
   private SecurityManager securityManager;
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private DeletionStore deletionStore;
 
   public void setSecurityStore(SecurityStore securityStore) {
     this.securityStore = securityStore;
@@ -95,6 +99,25 @@ public class DefaultUserService implements UserService {
   @Override
   public List<User> list() throws IOException {
     return securityStore.listAllUsers();
+  }
+
+  @Override
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
+  }
+
+  @Override
+  public AuthorizationManager getAuthorizationManager() {
+    return authorizationManager;
+  }
+
+  @Override
+  public ValidationResult validateDeletion(User object) throws IOException {
+    ValidationResult result = new ValidationResult();
+    if (authorizationManager.getCurrentUser().getId() == object.getId()) {
+      result.addError(new ValidationError("You cannot delete yourself"));
+    }
+    return result;
   }
 
 }

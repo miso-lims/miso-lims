@@ -21,6 +21,7 @@ Changes:
     * QC Types
     * Experiments
     * Submissions
+    * Users
 
 # 0.2.192
 

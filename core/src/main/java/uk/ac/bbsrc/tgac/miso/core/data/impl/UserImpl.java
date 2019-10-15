@@ -293,4 +293,14 @@ public class UserImpl implements User, Serializable {
     return getId() != UNSAVED_ID;
   }
 
+  @Override
+  public String getDeleteType() {
+    return "User";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getFullName();
+  }
+
 }
