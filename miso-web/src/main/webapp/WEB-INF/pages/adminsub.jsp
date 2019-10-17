@@ -70,7 +70,7 @@
       <a href="<c:url value="/miso/locationmap/list"/>">Location Maps</a>
       <a href="<c:url value="/miso/librarytemplates"/>">Library Templates</a>
       <a href="<c:url value="/miso/kitdescriptors"/>">Kits</a>
-      <a href="<c:url value="/miso/indices"/>">Indices</a>
+      <a href="<c:url value="/miso/indexfamily/list"/>">Index Families</a>
       <a href="<c:url value="/miso/qctype/list"/>">QC Types</a>
       <a href="<c:url value="/miso/attachmentcategories/list"/>">Attachment Categories</a>
       <a href="<c:url value="/miso/sampletype/list"/>">Sample Types</a>

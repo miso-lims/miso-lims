@@ -68,6 +68,16 @@ var HotUtils = {
       };
     },
 
+    regex: function(pattern, required) {
+      var regex = new RegExp(pattern);
+      return function(value, callback) {
+        if (Utils.validation.isEmpty(value)) {
+          return callback(!required);
+        }
+        return callback(regex.test(value));
+      }
+    },
+
     /**
      * Custom validator for optional numeric fields
      */

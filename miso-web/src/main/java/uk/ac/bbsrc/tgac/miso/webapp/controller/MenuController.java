@@ -95,7 +95,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.BoxSizeService;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxUseService;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.service.DetailedQcStatusService;
-import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
+import uk.ac.bbsrc.tgac.miso.core.service.IndexFamilyService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.KitDescriptorService;
@@ -154,7 +154,7 @@ public class MenuController implements ServletContextAware {
   @Autowired
   private KitDescriptorService kitService;
   @Autowired
-  private IndexService indexService;
+  private IndexFamilyService indexFamilyService;
   @Autowired
   private LabService labService;
   @Autowired
@@ -377,7 +377,7 @@ public class MenuController implements ServletContextAware {
       createArray(mapper, node, "orderPurposes", orderPurposeService.list(), Dtos::asDto);
       createArray(mapper, node, "sampleSheetFormats", Arrays.asList(SampleSheet.values()), SampleSheet::name);
 
-      Collection<IndexFamily> indexFamilies = indexService.getIndexFamilies();
+      Collection<IndexFamily> indexFamilies = indexFamilyService.list();
       indexFamilies.add(IndexFamily.NULL);
       createArray(mapper, node, "indexFamilies", indexFamilies, Dtos::asDto);
       createArray(mapper, node, "qcTypes", qcService.listQcTypes(), Dtos::asDto);

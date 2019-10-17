@@ -6,10 +6,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
@@ -18,19 +16,18 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 public class HibernateIndexDaoTest extends AbstractDAOTest {
+
   private HibernateIndexDao dao;
-  @Autowired
-  private SessionFactory sessionFactory;
 
   @Before
   public void setup() {
     dao = new HibernateIndexDao();
-    dao.setSessionFactory(sessionFactory);
+    dao.setSessionFactory(getSessionFactory());
   }
 
   @Test
-  public void testGetIndexById() throws Exception {
-    Index indexById = dao.getIndexById(8);
+  public void testGet() throws Exception {
+    Index indexById = dao.get(8);
     assertEquals(8L, indexById.getId());
     assertEquals("ACTTGA", indexById.getSequence());
     assertEquals("Index 8", indexById.getName());
@@ -45,32 +42,9 @@ public class HibernateIndexDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testListIndicesByStrategyName() throws Exception {
-    IndexFamily list = dao.getIndexFamilyByName("Nextera Dual Index");
-    assertTrue(20 == list.getIndices().size());
-  }
-
-  @Test
-  public void testListAllIndices() throws Exception {
-    List<Index> list = dao.list(0, 0, true, "id");
+  public void testList() throws Exception {
+    List<Index> list = dao.list();
     assertEquals(80, list.size());
-  }
-
-  @Test
-  public void testGetIndexFamilies() throws Exception {
-    List<IndexFamily> list = dao.getIndexFamilies();
-    assertEquals(12, list.size());
-  }
-
-  @Test
-  public void testGetIndexFamiliesByPlatform() throws Exception {
-    List<IndexFamily> list = dao.getIndexFamiliesByPlatform(PlatformType.ILLUMINA);
-    assertEquals(11, list.size());
-    int totalIlluminaIndices = 0;
-    for (IndexFamily fam : list) {
-      totalIlluminaIndices += fam.getIndices().size();
-    }
-    assertEquals(68, totalIlluminaIndices);
   }
 
   @Test
@@ -90,6 +64,48 @@ public class HibernateIndexDaoTest extends AbstractDAOTest {
     assertNotNull(dao.list(err -> {
       throw new RuntimeException(err);
     }, 0, 10, true, "name", filter));
+  }
+
+  @Test
+  public void testGetByFamilyPositionAndName() throws Exception {
+    IndexFamily family = (IndexFamily) currentSession().get(IndexFamily.class, 3L);
+    int position = 1;
+    String name = "N710";
+    Index index = dao.getByFamilyPositionAndName(family, position, name);
+    assertNotNull(index);
+    assertEquals(family.getId(), index.getFamily().getId());
+    assertEquals(position, index.getPosition());
+    assertEquals(name, index.getName());
+  }
+
+  @Test
+  public void testGetUsage() throws Exception {
+    Index index = (Index) currentSession().get(Index.class, 12L);
+    assertEquals(1L, dao.getUsage(index));
+  }
+
+  @Test
+  public void testCreate() throws Exception {
+    IndexFamily family = (IndexFamily) currentSession().get(IndexFamily.class, 1L);
+    Index index = new Index();
+    index.setFamily(family);
+    index.setName("New Index");
+    index.setPosition(1);
+    index.setSequence("AAAAAA");
+    long savedId = dao.create(index);
+
+    clearSession();
+    Index saved = (Index) currentSession().get(Index.class, savedId);
+    assertNotNull(saved);
+    assertEquals(index.getFamily().getId(), saved.getFamily().getId());
+    assertEquals(index.getName(), saved.getName());
+    assertEquals(index.getPosition(), saved.getPosition());
+    assertEquals(index.getSequence(), saved.getSequence());
+  }
+
+  @Test
+  public void testUpdate() throws Exception {
+
   }
 
 }

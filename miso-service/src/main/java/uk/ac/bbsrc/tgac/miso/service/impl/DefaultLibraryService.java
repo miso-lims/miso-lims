@@ -392,7 +392,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     List<Index> managedIndices = new ArrayList<>();
     for (Index index : library.getIndices()) {
       if (index != null && index.isSaved()) {
-        Index managedIndex = indexService.getIndexById(index.getId());
+        Index managedIndex = indexService.get(index.getId());
         if (managedIndex != null) managedIndices.add(managedIndex);
       }
     }

@@ -356,8 +356,9 @@ that are intended to be used together. Index sequences should all be unique with
 
 Some index families are dual-indexed. This means that one or two indices can be added to each library. This increases
 the possibilities for unique sequences. Some dual-indexed families have an index 1 and index 2 that are always matched
-together. These are referred to as "unique dual index" families within MISO. In other index families, any index 1 may
-be matched with any index 2.
+together. These are referred to as "unique dual index" families within MISO. For unique dual index families, the name
+of the matching index 1 and index 2 in MISO must be identical in order for them to be automatically selected together.
+In other index families, any index 1 may be matched with any index 2.
 
 Some Illumina sequencers, including the NextSeq, sequence the index 2 as the
 reverse complement of other sequencers. MISO has an option to set the
@@ -365,13 +366,22 @@ sequencing platform to use the normal index in the interface and provide the
 reverse complement in sample sheets and though the Pinery data export
 interface.
 
+In some index families such as 10X Genomics kits, multiple sequences are associated with a single index. These are
+referred to as multi-sequence indices in MISO. For these, a demultiplexing name must be provided in addition to the
+sequences. The demultiplexing name is a value that may be used by demultiplexing software in order to identify the
+indices.
+
+Index families can be viewed on the Index Families list page. To get there, click "Index Families" in the Misc list in
+the menu on the left side of the screen. From here, MISO administrators can create, edit, and delete index families. To
+create a new index family, click the "Add" button in the toolbar at the top of the list. To edit an existing index
+family, click on its name in the list. To delete index families, select the ones you wish to delete, then click the
+"Delete" button in the toolbar at the top of the list. An index family can only be deleted if it has not been used by
+any existing libraries.
+
 Index families may be archived if they are no longer needed. This will prevent them from showing up in the options when
 creating new libraries.
 
-Indices can be viewed on the Indices list page. To get there, click "Indices" in the Misc list in the menu on the
-left side of the screen. The page is broken into tabs for each platform type. Modifications to indices and index
-families can only be made via direct access to the MISO database. As such, they must be performed by a MISO
-adminstrator.
+MISO administrators can add, edit, and delete indices using the standard interface within the Edit Index Family page.
 
 {% include userman-toplink.md %}
 

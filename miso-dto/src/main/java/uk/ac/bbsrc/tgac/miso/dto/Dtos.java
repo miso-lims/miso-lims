@@ -2333,23 +2333,51 @@ public class Dtos {
     return dto;
   }
 
+  public static Index to(@Nonnull IndexDto from) {
+    Index to = new Index();
+    setObject(to::setFamily, IndexFamily::new, maybeGetProperty(from.getFamily(), IndexFamilyDto::getId));
+    setLong(to::setId, from.getId(), false);
+    setString(to::setName, from.getName());
+    setString(to::setSequence, from.getSequence());
+    setInteger(to::setPosition, from.getPosition(), false);
+    to.setRealSequences(from.getRealSequences());
+    return to;
+  }
+
   public static IndexFamilyDto asDto(@Nonnull IndexFamily from) {
     return asDto(from, true);
   }
 
   private static IndexFamilyDto asDto(@Nonnull IndexFamily from, boolean includeChildren) {
     IndexFamilyDto dto = new IndexFamilyDto();
-    dto.setId(from.getId());
-    dto.setName(from.getName());
-    dto.setArchived(from.getArchived());
+    setLong(dto::setId, from.getId(), true);
+    setString(dto::setPlatformType, maybeGetProperty(from.getPlatformType(), PlatformType::name));
+    setString(dto::setName, from.getName());
+    setBoolean(dto::setFakeSequence, from.hasFakeSequence(), false);
+    setBoolean(dto::setUniqueDualIndex, from.isUniqueDualIndex(), false);
+    setBoolean(dto::setArchived, from.getArchived(), false);
     if (includeChildren) {
       dto.setIndices(from.getIndices().stream().map(x -> asDto(x, true)).collect(Collectors.toList()));
     }
-    dto.setMaximumNumber(from.getMaximumNumber());
-    dto.setPlatformType(from.getPlatformType() == null ? null : from.getPlatformType().name());
-    dto.setFakeSequence(from.hasFakeSequence());
-    dto.setUniqueDualIndex(from.isUniqueDualIndex());
     return dto;
+  }
+
+  public static IndexFamily to(@Nonnull IndexFamilyDto from) {
+    IndexFamily to = new IndexFamily();
+    setLong(to::setId, from.getId(), false);
+    setObject(to::setPlatformType, from.getPlatformType(), pt -> PlatformType.valueOf(pt));
+    setString(to::setName, from.getName());
+    setBoolean(to::setFake, from.getFakeSequence(), false);
+    setBoolean(to::setUniqueDualIndex, from.isUniqueDualIndex(), false);
+    setBoolean(to::setArchived, from.isArchived(), true);
+    if (from.getIndices() != null) {
+      to.getIndices().addAll(from.getIndices().stream().map(indexDto -> {
+        Index index = Dtos.to(indexDto);
+        index.setFamily(to);
+        return index;
+      }).collect(Collectors.toList()));
+    }
+    return to;
   }
 
   public static StainDto asDto(@Nonnull Stain from) {

@@ -67,6 +67,7 @@ public interface AbstractListPage {
     public static final String MANUFACTURER = "Manufacturer";
     public static final String MAP = "Map";
     public static final String MATRIX_BARCODE = "Matrix Barcode";
+    public static final String MULTI_SEQUENCE_INDICES = "Multi-Sequence Indices";
     public static final String NAME = "Name";
     public static final String NG_USED = "ng Lib. Used";
     public static final String NOTE_REQUIRED = "Note Required";
@@ -95,7 +96,7 @@ public interface AbstractListPage {
     public static final String SAMPLE_TYPE = "Type";
     public static final String SCANNABLE = "Scannable";
     public static final String SEQ_PARAMS = "Seq. Params.";
-    public static final String SEQUENCE = "Sequence";
+    public static final String SEQUENCE = "Sequence(s)";
     public static final String SEQUENCING_PARAMETERS = "Sequencing Parameters";
     public static final String SERIAL_NUMBER = "Serial Number";
     public static final String SHORT_NAME = "Short Name";
@@ -110,6 +111,7 @@ public interface AbstractListPage {
     public static final String TARGETED_SEQUENCING = "Targeted Sequencing";
     public static final String TARGETED_SEQUENCING_REQD = "Targeted Sequencing Required";
     public static final String TYPE = "Type";
+    public static final String UNIQUE_DUAL_INDICES = "Unique Dual Indices";
     public static final String UNKNOWN = "Unknown";
     public static final String USER_NAME = "User Name";
     public static final String VERSION = "Version";
@@ -129,7 +131,7 @@ public interface AbstractListPage {
     public static final String CONTAINERS = "containers";
     public static final String CONTAINER_MODELS = "containermodel/list";
     public static final String DETAILED_QC_STATUS = "detailedqcstatus/list";
-    public static final String INDICES = "indices";
+    public static final String INDEX_FAMILIES = "indexfamily/list";
     public static final String INSTRUMENTS = "instruments";
     public static final String INSTRUMENT_MODELS = "instrumentmodel/list";
     public static final String KITS = "kitdescriptors";
