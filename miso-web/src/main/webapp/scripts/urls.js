@@ -129,6 +129,34 @@ Urls = (function() {
     }
   }
 
+  // Index Families
+  var indexFamilyUiBase = baseUrl + '/indexfamily';
+  ui.indexFamilies = {
+    create: indexFamilyUiBase + '/new',
+    edit: idUrlFunction(indexFamilyUiBase)
+  };
+
+  var indexFamilyRestBase = restBase + '/indexfamilies';
+  rest.indexFamilies = {
+    create: indexFamilyRestBase,
+    update: idUrlFunction(indexFamilyRestBase)
+  };
+
+  // Indices
+  var indexUiBase = baseUrl + '/index';
+  ui.indices = {
+    bulkCreate: indexUiBase + '/bulk/new',
+    bulkEdit: indexUiBase + '/bulk/edit'
+  };
+
+  var indexRestBase = restBase + '/indices';
+  rest.indices = {
+    create: indexRestBase,
+    update: idUrlFunction(indexRestBase),
+    datatable: indexRestBase + '/dt',
+    platformDatatable: idUrlFunction(indexRestBase + '/dt/platform')
+  };
+
   // Institutes
   var instituteRestBase = restBase + '/institutes';
   rest.institutes = {

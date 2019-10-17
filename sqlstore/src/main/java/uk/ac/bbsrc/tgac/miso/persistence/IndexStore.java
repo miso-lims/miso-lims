@@ -23,20 +23,16 @@
 
 package uk.ac.bbsrc.tgac.miso.persistence;
 
-import java.util.List;
+import java.io.IOException;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface IndexStore extends PaginatedDataSource<Index> {
+public interface IndexStore extends PaginatedDataSource<Index>, SaveDao<Index> {
 
-  public IndexFamily getIndexFamilyByName(String name);
+  public Index getByFamilyPositionAndName(IndexFamily family, int position, String name) throws IOException;
 
-  public List<IndexFamily> getIndexFamilies();
+  public long getUsage(Index index) throws IOException;
 
-  public List<IndexFamily> getIndexFamiliesByPlatform(PlatformType platformType);
-
-  public Index getIndexById(long id);
 }

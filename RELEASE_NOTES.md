@@ -2,6 +2,7 @@
 
 Changes:
 
+  * Added interface for administrators to add, edit, and delete index families and indices
   * Added sample and library fields for initial volume, parent volume used, and parent ng used.
     Parent volume used will automatically be deducted from the parent's (current) volume on save
   * Added field for initial slides to Slide samples (detailed sample). Value of slides consumed on

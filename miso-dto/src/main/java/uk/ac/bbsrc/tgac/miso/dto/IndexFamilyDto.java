@@ -4,24 +4,19 @@ import java.util.List;
 
 public class IndexFamilyDto {
   private boolean archived;
-  private long id;
+  private Long id;
   private List<IndexDto> indices;
-  private int maximumNumber;
   private String name;
   private String platformType;
   private boolean fakeSequence;
   private boolean uniqueDualIndex;
 
-  public long getId() {
+  public Long getId() {
     return id;
   }
 
   public List<IndexDto> getIndices() {
     return indices;
-  }
-
-  public int getMaximumNumber() {
-    return maximumNumber;
   }
 
   public String getName() {
@@ -48,16 +43,12 @@ public class IndexFamilyDto {
     this.archived = archived;
   }
 
-  public void setId(long id) {
+  public void setId(Long id) {
     this.id = id;
   }
 
   public void setIndices(List<IndexDto> indices) {
     this.indices = indices;
-  }
-
-  public void setMaximumNumber(int maximumNumber) {
-    this.maximumNumber = maximumNumber;
   }
 
   public void setName(String name) {

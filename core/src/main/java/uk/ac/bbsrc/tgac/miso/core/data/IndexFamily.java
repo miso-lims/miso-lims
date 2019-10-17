@@ -25,13 +25,15 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
@@ -44,9 +46,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @Entity
 @Table(name = "IndexFamily")
-public class IndexFamily implements Serializable {
+public class IndexFamily implements Deletable, Nameable, Serializable {
 
   private static final long serialVersionUID = 1L;
+
+  private static final long UNSAVED_ID = 0L;
+
   // TODO: this is intended to be immutable, but it is not
   public static final IndexFamily NULL = new IndexFamily();
 
@@ -61,34 +66,42 @@ public class IndexFamily implements Serializable {
     index.setName("No index");
     index.setPosition(1);
     index.setSequence(null);
-    NULL.setIndices(Collections.singletonList(index));
+    NULL.getIndices().add(index);
   }
 
-  private Boolean archived;
-  @OneToMany(targetEntity = Index.class, mappedBy = "family")
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private long indexFamilyId = UNSAVED_ID;
+
+  @OneToMany(targetEntity = Index.class, mappedBy = "family", cascade = CascadeType.REMOVE)
   @OrderBy("position, name")
   private List<Index> indices;
+
   @Column(nullable = false)
   private String name;
+
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private PlatformType platformType;
-  @Id
-  private Long indexFamilyId;
+
   private boolean fakeSequence;
   private boolean uniqueDualIndex;
+  private Boolean archived;
 
   public Boolean getArchived() {
     return archived;
   }
 
   public List<Index> getIndices() {
+    if (indices == null) {
+      indices = new ArrayList<>();
+    }
     return indices;
   }
 
   public Iterable<Index> getIndicesForPosition(int position) {
     List<Index> selected = new ArrayList<>();
-    for (Index index : indices) {
+    for (Index index : getIndices()) {
       if (index.getPosition() == position) {
         selected.add(index);
       }
@@ -96,20 +109,12 @@ public class IndexFamily implements Serializable {
     return selected;
   }
 
-  public Long getId() {
+  @Override
+  public long getId() {
     return indexFamilyId;
   }
 
-  public int getMaximumNumber() {
-    int max = 0;
-    for (Index index : indices) {
-      if (index.getPosition() > max) {
-        max = index.getPosition();
-      }
-    }
-    return max;
-  }
-
+  @Override
   public String getName() {
     return name;
   }
@@ -126,11 +131,8 @@ public class IndexFamily implements Serializable {
     this.archived = archived;
   }
 
-  public void setIndices(List<Index> indices) {
-    this.indices = indices;
-  }
-
-  public void setId(Long id) {
+  @Override
+  public void setId(long id) {
     indexFamilyId = id;
   }
 
@@ -174,6 +176,21 @@ public class IndexFamily implements Serializable {
         .append(name, other.name)
         .append(platformType, other.platformType)
         .isEquals();
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Index Family";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getName();
   }
 
 }

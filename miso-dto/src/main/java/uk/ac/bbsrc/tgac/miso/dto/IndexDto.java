@@ -7,7 +7,7 @@ public class IndexDto {
   private long id;
   private String label;
   private String name;
-  private int position;
+  private int position = 1;
   private String sequence;
   private List<String> realSequences;
 

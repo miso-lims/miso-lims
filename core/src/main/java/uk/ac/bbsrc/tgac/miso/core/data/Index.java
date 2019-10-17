@@ -50,7 +50,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  */
 @Entity
 @Table(name = "Indices")
-public class Index implements Nameable, Serializable {
+public class Index implements Deletable, Nameable, Serializable {
 
   private static final long serialVersionUID = 1L;
   private static final Long UNSAVED_ID = 0L;
@@ -185,6 +185,16 @@ public class Index implements Nameable, Serializable {
 
   public void setRealSequences(List<String> realSequences) {
     this.realSequences = realSequences;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Index";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getFamily().getName() + " - " + getName();
   }
 
 }

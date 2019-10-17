@@ -78,7 +78,6 @@ public class ListTablesIT extends AbstractIT {
       Tabs.TISSUE);
   private static final Set<String> kitsTabs = Sets.newHashSet(Tabs.CLUSTERING, Tabs.EXTRACTION, Tabs.LIBRARY, Tabs.MULTIPLEXING,
       Tabs.SEQUENCING);
-  private static final Set<String> indicesTabs = Sets.newHashSet(Tabs.ILLUMINA, Tabs.PACBIO);
   private static final Set<String> worksetsTabs = Sets.newHashSet(Tabs.MINE, Tabs.ALL);
   private static final Set<String> storageLocationTabs = Sets.newHashSet(Tabs.FREEZERS, Tabs.ROOMS);
 
@@ -93,7 +92,6 @@ public class ListTablesIT extends AbstractIT {
     tabs.put(ListTarget.RUNS, runsTabs);
     tabs.put(ListTarget.BOXES, boxesTabs);
     tabs.put(ListTarget.KITS, kitsTabs);
-    tabs.put(ListTarget.INDICES, indicesTabs);
     tabs.put(ListTarget.WORKSETS, worksetsTabs);
     tabs.put(ListTarget.STORAGE_LOCATIONS, storageLocationTabs);
     tabs.put(ListTarget.POOL_ORDERS, Sets.newHashSet(Tabs.OUTSTANDING, Tabs.FULFILLED, Tabs.DRAFT));
@@ -115,7 +113,6 @@ public class ListTablesIT extends AbstractIT {
     preferredTab.put(ListTarget.RUNS, Tabs.ILLUMINA);
     preferredTab.put(ListTarget.BOXES, Tabs.STORAGE);
     preferredTab.put(ListTarget.KITS, Tabs.LIBRARY);
-    preferredTab.put(ListTarget.INDICES, Tabs.ILLUMINA);
     preferredTab.put(ListTarget.WORKSETS, Tabs.MINE);
     preferredTab.put(ListTarget.POOL_ORDERS, Tabs.OUTSTANDING);
     sortOnTab = Collections.unmodifiableMap(preferredTab);
@@ -373,13 +370,14 @@ public class ListTablesIT extends AbstractIT {
   }
 
   @Test
-  public void testListIndicesSetup() throws Exception {
-    testTabbedPageSetup(ListTarget.INDICES, indicesColumns);
+  public void testListIndexFamiliesSetup() throws Exception {
+    testPageSetup(ListTarget.INDEX_FAMILIES, Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.PLATFORM,
+        Columns.MULTI_SEQUENCE_INDICES, Columns.UNIQUE_DUAL_INDICES, Columns.ARCHIVED));
   }
 
   @Test
-  public void testListIndicesColumnSort() throws Exception {
-    testTabbedColumnsSort(ListTarget.INDICES);
+  public void testListIndexFamiliesColumnSort() throws Exception {
+    testColumnsSort(ListTarget.INDEX_FAMILIES);
   }
 
   @Test

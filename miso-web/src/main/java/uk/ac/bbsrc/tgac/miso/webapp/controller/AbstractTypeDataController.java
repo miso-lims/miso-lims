@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -42,12 +43,20 @@ public abstract class AbstractTypeDataController<T extends Identifiable, R> {
   }
 
   protected final ModelAndView bulkCreate(Integer quantity, ModelMap model) throws IOException {
+    return bulkCreate(quantity, model, null);
+  }
+
+  protected final ModelAndView bulkCreate(Integer quantity, ModelMap model, BiConsumer<ObjectNode, ObjectMapper> configurer)
+      throws IOException {
     if (quantity == null || quantity <= 0) {
       throw new RestException("Must specify quantity to create", Status.BAD_REQUEST);
     }
     ObjectNode config = makeBaseConfig();
     config.put("pageMode", "create");
     addHotConfig(config, mapper);
+    if (configurer != null) {
+      configurer.accept(config, mapper);
+    }
     addHotAttributes("Create " + pluralType, config, true, model);
 
     model.put("input", mapper.writeValueAsString(Collections.nCopies(quantity, makeDto())));
@@ -55,9 +64,17 @@ public abstract class AbstractTypeDataController<T extends Identifiable, R> {
   }
 
   protected final ModelAndView bulkEdit(String idString, ModelMap model) throws IOException {
+    return bulkEdit(idString, model, null);
+  }
+
+  protected final ModelAndView bulkEdit(String idString, ModelMap model, BiConsumer<ObjectNode, ObjectMapper> configurer)
+      throws IOException {
     ObjectNode config = makeBaseConfig();
     config.put("pageMode", "edit");
     addHotConfig(config, mapper);
+    if (configurer != null) {
+      configurer.accept(config, mapper);
+    }
     addHotAttributes("Edit " + pluralType, config, false, model);
 
     List<Long> ids = LimsUtils.parseIds(idString);
@@ -98,7 +115,7 @@ public abstract class AbstractTypeDataController<T extends Identifiable, R> {
   }
 
   /**
-   * Override to provide additional config fro Handsontable. Default implementation does nothing
+   * Override to provide additional config for Handsontable. Default implementation does nothing
    * 
    * @param config
    * @param mapper

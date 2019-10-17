@@ -81,7 +81,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.ExperimentService;
-import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
+import uk.ac.bbsrc.tgac.miso.core.service.IndexFamilyService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryTemplateService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryTypeService;
@@ -153,7 +153,7 @@ public class EditLibraryController {
   }
 
   @Autowired
-  private IndexService indexService;
+  private IndexFamilyService indexFamilyService;
   @Autowired
   private LibraryService libraryService;
   @Autowired
@@ -189,8 +189,8 @@ public class EditLibraryController {
     this.namingScheme = namingScheme;
   }
 
-  public void setIndexService(IndexService indexService) {
-    this.indexService = indexService;
+  public void setIndexFamilyService(IndexFamilyService indexFamilyService) {
+    this.indexFamilyService = indexFamilyService;
   }
 
   public void setLibraryService(LibraryService libraryService) {
@@ -244,7 +244,7 @@ public class EditLibraryController {
     List<JSONObject> rtnList = new ArrayList<>();
     try {
       if (!isStringEmptyOrNull(indexFamily)) {
-        final IndexFamily ifam = indexService.getIndexFamilyByName(indexFamily);
+        final IndexFamily ifam = indexFamilyService.getByName(indexFamily);
         if (ifam != null) {
           rtnList = indicesForPosition(ifam, Integer.parseInt(position));
         }

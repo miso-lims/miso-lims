@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
@@ -7,23 +8,23 @@ import java.util.function.Consumer;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.IndexStore;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
-public class HibernateIndexDao implements IndexStore, HibernatePaginatedDataSource<Index> {
+public class HibernateIndexDao extends HibernateSaveDao<Index> implements IndexStore, HibernatePaginatedDataSource<Index> {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateSubprojectDao.class);
 
@@ -31,12 +32,13 @@ public class HibernateIndexDao implements IndexStore, HibernatePaginatedDataSour
 
   private static final List<String> STANDARD_ALIASES = Arrays.asList("family");
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  public HibernateIndexDao() {
+    super(Index.class);
+  }
 
   @Override
   public Session currentSession() {
-    return getSessionFactory().getCurrentSession();
+    return super.currentSession();
   }
 
   @Override
@@ -45,34 +47,10 @@ public class HibernateIndexDao implements IndexStore, HibernatePaginatedDataSour
   }
 
   @Override
-  public Index getIndexById(long id) {
+  public Index get(long id) {
     Query query = currentSession().createQuery("from Index where id = :id");
     query.setLong("id", id);
     return (Index) query.uniqueResult();
-  }
-
-  @Override
-  public List<IndexFamily> getIndexFamilies() {
-    Query query = currentSession().createQuery("from IndexFamily");
-    @SuppressWarnings("unchecked")
-    List<IndexFamily> list = query.list();
-    return list;
-  }
-
-  @Override
-  public List<IndexFamily> getIndexFamiliesByPlatform(PlatformType platformType) {
-    Query query = currentSession().createQuery("from IndexFamily where platformType = :platform");
-    query.setParameter("platform", platformType);
-    @SuppressWarnings("unchecked")
-    List<IndexFamily> list = query.list();
-    return list;
-  }
-
-  @Override
-  public IndexFamily getIndexFamilyByName(String name) {
-    Query query = currentSession().createQuery("from IndexFamily where name = :name");
-    query.setString("name", name);
-    return (IndexFamily) query.uniqueResult();
   }
 
   @Override
@@ -88,10 +66,6 @@ public class HibernateIndexDao implements IndexStore, HibernatePaginatedDataSour
   @Override
   public String[] getSearchProperties() {
     return SEARCH_PROPERTIES;
-  }
-
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
   }
 
   @Override
@@ -129,8 +103,22 @@ public class HibernateIndexDao implements IndexStore, HibernatePaginatedDataSour
     criteria.add(Restrictions.eq("family.platformType", platformType));
   }
 
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
+  @Override
+  public Index getByFamilyPositionAndName(IndexFamily family, int position, String name) throws IOException {
+    return (Index) currentSession().createCriteria(Index.class)
+        .add(Restrictions.eq("family", family))
+        .add(Restrictions.eq("position", position))
+        .add(Restrictions.eq("name", name))
+        .uniqueResult();
+  }
+
+  @Override
+  public long getUsage(Index index) throws IOException {
+    return (long) currentSession().createCriteria(LibraryImpl.class)
+        .createAlias("indices", "index")
+        .add(Restrictions.eq("index.id", index.getId()))
+        .setProjection(Projections.rowCount())
+        .uniqueResult();
   }
 
 }
