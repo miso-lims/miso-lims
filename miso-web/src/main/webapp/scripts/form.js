@@ -141,6 +141,8 @@ FormUtils = (function($) {
         };
       }
 
+      form.setUnchanged();
+
       return form;
     },
 
@@ -280,8 +282,8 @@ FormUtils = (function($) {
       otherChanges = false;
       sections.forEach(function(section) {
         section.fields.forEach(function(field) {
-          if (!field.omit) {
-            original[field.data] = object[field.data];
+          if (shouldTrackField(field)) {
+            original[field.data] = getFormValue(containerId, field);
           }
         });
       });
@@ -300,9 +302,12 @@ FormUtils = (function($) {
       field.onChange(getFormValue(containerId, field), form);
     }
 
-    updateOriginal();
+    function shouldTrackField(field) {
+      return !field.omit && field.trackChanges !== false && field.type !== 'special';
+    }
 
     form = {
+      setUnchanged: updateOriginal,
       isChanged: function() {
         if (otherChanges) {
           return true;
@@ -310,8 +315,7 @@ FormUtils = (function($) {
         var changed = false;
         sections.forEach(function(section) {
           section.fields.forEach(function(field) {
-            if (!field.omit && field.trackChanges !== false && field.type !== 'special'
-                && (isSetInForm(containerId, field) || isSetInObject(original, field.data))
+            if (shouldTrackField(field) && (isSetInForm(containerId, field) || isSetInObject(original, field.data))
                 && getFormValue(containerId, field) != original[field.data]) {
               changed = true;
             }
