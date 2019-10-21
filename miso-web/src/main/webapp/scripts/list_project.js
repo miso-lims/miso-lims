@@ -28,23 +28,59 @@ ListTarget.project = {
   },
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {
-    return [ListUtils.createBulkDeleteAction("Projects", "projects", function(project) {
-      if (!project.alias) {
-        return project.shortName;
-      } else if (!project.shortName) {
-        return project.alias;
-      } else {
-        return project.alias + ' (' + project.shortName + ")";
-      }
-    })];
+    if (config.forLibraryTemplate) {
+      return [{
+        name: 'Remove',
+        action: function(items) {
+          LibraryTemplate.removeProjects(items);
+        }
+      }];
+    } else {
+      return [ListUtils.createBulkDeleteAction("Projects", "projects", function(project) {
+        if (!project.alias) {
+          return project.shortName;
+        } else if (!project.shortName) {
+          return project.alias;
+        } else {
+          return project.alias + ' (' + project.shortName + ")";
+        }
+      })];
+    }
   },
   createStaticActions: function(config, projectId) {
-    return [{
-      "name": "Add",
-      "handler": function() {
-        window.location.href = Urls.ui.projects.create;
-      }
-    }];
+    if (config.forLibraryTemplate) {
+      return [{
+        name: 'Add',
+        handler: function() {
+          Utils.showDialog('Search for Project to Add', 'Search', [{
+            type: "text",
+            label: "Search",
+            property: "query",
+            value: ""
+          }], function(results) {
+            Utils.ajaxWithDialog('Getting Projects', 'GET', '/miso/rest/projects/search?' + jQuery.param({
+              q: results.query
+            }), null, function(response) {
+              Utils.showWizardDialog("Add Project", response.map(function(project) {
+                return {
+                  name: project.alias,
+                  handler: function() {
+                    LibraryTemplate.addProject(project);
+                  }
+                };
+              }));
+            });
+          });
+        }
+      }];
+    } else {
+      return [{
+        name: "Add",
+        handler: function() {
+          window.location.href = Urls.ui.projects.create;
+        }
+      }];
+    }
   },
   createColumns: function(config, projectId) {
     return [ListUtils.idHyperlinkColumn("Name", Urls.ui.projects.edit, "id", Utils.array.getName, 0, true),

@@ -1,8 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.integration.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.List;
 import java.util.Map;
@@ -47,7 +45,6 @@ public abstract class BoxScanTests<T extends BoxScan> {
   public void testReferenceConversions() {
     BoxScan fullScan = getFullScan();
     assertEquals("33333",fullScan.getBarcode("A02"));
-    assertEquals("33333",fullScan.getBarcode("a2"));
     assertEquals("33333",fullScan.getBarcode(1,2));
     assertEquals("33333",fullScan.getBarcode('A',2));
   }

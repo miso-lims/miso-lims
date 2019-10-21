@@ -24,6 +24,9 @@ Changes:
     * Submissions
     * Users
     * Groups
+  * Added a single Create/Edit Library Template page
+  * Allow specifying indices based on library's box position in a library template
+  * Allow specifying volume units in a library template
 
 # 0.2.192
 

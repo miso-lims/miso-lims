@@ -48,7 +48,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryTemplateService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
@@ -163,9 +162,7 @@ public class LibraryTemplateRestController extends RestController {
   }
 
   private void addProject(LibraryTemplate template, Long projectId) throws IOException {
-    List<Project> projects = template.getProjects();
-    projects.add(projectService.get(projectId));
-    template.setProjects(projects);
+    template.getProjects().add(projectService.get(projectId));
     libraryTemplateService.update(template);
   }
 
@@ -185,8 +182,7 @@ public class LibraryTemplateRestController extends RestController {
   }
 
   private void removeProject(LibraryTemplate template, Long projectId) throws IOException {
-    List<Project> projects = template.getProjects();
-    template.setProjects(projects.stream().filter(project -> !projectId.equals(project.getId())).collect(Collectors.toList()));
+    template.getProjects().removeIf(project -> projectId.equals(project.getId()));
     libraryTemplateService.update(template);
   }
 }

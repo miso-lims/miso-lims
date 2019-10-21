@@ -290,6 +290,14 @@ Urls = (function() {
   };
 
   // Library Templates
+  var libraryTemplateUiBase = baseUrl + '/librarytemplate';
+  ui.libraryTemplates = {
+    create: libraryTemplateUiBase + '/new',
+    edit: idUrlFunction(libraryTemplateUiBase),
+    addIndices: middleIdUrlFunction(libraryTemplateUiBase, '/indices/add'),
+    editIndices: middleIdUrlFunction(libraryTemplateUiBase, '/indices/edit')
+  };
+
   var libraryTemplateRestBase = restBase + '/librarytemplates';
   rest.libraryTemplates = {
     create: libraryTemplateRestBase,

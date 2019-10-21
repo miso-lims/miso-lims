@@ -129,19 +129,21 @@ public class BoxUtils {
     return normalizeLetter(position.charAt(0));
   }
 
-  /**
-   * Ensures that a box position reference is in proper form ("A01") and throws an IllegalArgumentException if it is not
-   * 
-   * @param position
-   *          the position reference
-   * @throws IllegalArgumentException
-   *           if position doesn't consist of exactly one alphabetic character followed by 1-2 digits, or if the row digits form a number
-   *           greater than 25
-   */
   private static void validateReference(String position) {
-    if (!position.matches("[a-zA-Z]\\d{1,2}") || Integer.parseInt(position.substring(1, position.length())) > 26) {
+    if (!isValidBoxPosition(position)) {
       throw new IllegalArgumentException(position + " is not a valid box position reference");
     }
+  }
+
+  /**
+   * Checks whether a box position reference is in proper form, consisting of one capital alphabetic character followed by 2 digits forming
+   * a number between 1 and 26 (e.g. "A01")
+   * 
+   * @param position the position reference
+   * @return true if the position reference is valid; false otherwise
+   */
+  public static boolean isValidBoxPosition(String position) {
+    return position.matches("[A-Z]\\d{2}") && Integer.parseInt(position.substring(1, position.length())) <= 26;
   }
 
   /**

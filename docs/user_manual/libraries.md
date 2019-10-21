@@ -90,9 +90,9 @@ can store sample-level data, primarily for use in analysis.
 {% assign sub = sub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub title="Library Templates" %}
 
-A library template is a set of attribute values that can be applied to a sample. Its purpose is to reduce repetitive
-input. If you find that you are creating many similar libraries, you can create library templates so that you only have
-to select the template, and several other attributes will be selected automatically. A library template must be
+A library template is a set of attribute values that can be applied to a library. Its purpose is to reduce repetitive
+input. If you find that you are creating many similar libraries, you can create a library template so that you only
+have to select the template, and several other attributes will be selected automatically. A library template must be
 associated with a project in order for it to appear as an option for libraries created within that project. It is
 possible to associate a library template with multiple projects.
 
@@ -116,19 +116,17 @@ extra capabilities not included on the project-specific list.
 {% assign subsub = subsub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub subsub=subsub title="Creating Library Templates" %}
 
-Click the "Add" button in the toolbar at the top of the Library Templates list to create new library templates. In the
-dialog that appears, choose the quantity of templates that you would like to create, then click the "Create" button.
-For each template, enter an alias. This is the name that will appear in the template dropdown when creating new
-libraries. All other fields are optional. Any values you select for a template will be automatically applied to any
-library that this template is applied to. Any fields left blank will not be affected when applying this template to a
-library. After you have made your selections, click the "Save" button at the top right of the page to create the
-template(s).
-
-If you started by clicking the "Add" button on the project-specific Library Templates list, the template will
-automatically be associated with the project whose page you were on. If you clicked the "Add" button on the main
-Library Templates list page, the template will not be associated with any projects. See
-[Adding/Removing Library Templates from a Project](#adding_removing_library_templates_from_a_project) below for
-details on how to associate your new template(s) with projects.
+Click the "Add" button in the toolbar at the top of the Library Templates list to create new library templates. This
+will take you to the Create Library Template page. Enter an alias for the template. This is the name that will appear
+in the template dropdown when creating new libraries. All other fields are optional. Any values you select for a
+template will be automatically applied to any library that this template is applied to. Any fields left blank or
+"Unspecified" will not be affected when applying this template to a library. If you started by clicking the "Add"
+button on the project-specific Library Templates list, the template will automatically be associated with the project
+whose page you were on. If you clicked the "Add" button on the main Library Templates list page, the template will not
+be associated with any projects automatically. You can also edit the project associations before saving. See
+[Adding/Removing Library Templates from a Project](#adding_removing_library_templates_from_a_project) below for more
+information on adding and removing projects. After you have made your selections, click the "Save" button at the top
+right of the page to create the template.
 
 {% include userman-toplink.md %}
 
@@ -137,11 +135,20 @@ details on how to associate your new template(s) with projects.
 {% assign subsub = subsub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub subsub=subsub title="Editing Library Templates" %}
 
-To modify library templates, go to the Library Templates list, check the checkbox(es) next to the template(s) you would
-like to modify, and click the "Edit" button in the toolbar at the top of the table. This will bring you to the bulk
-Edit Library Templates page. This page works similarly to the bulk Create Library Templates page. Make any changes you
-would like, then click the "Save" button at the top right of the page to confirm. Changes will have no effect on
-libraries that the templates were previously applied to.
+Library templates can be edited individually or in bulk. Bulk editing is convenient when you have several templates to
+modify at once. Editing individual templates is sometimes preferable because it provides a few additional options, and
+allows you to see a more detailed view of the template. Note that when editing library templates, the changes will have
+no effect on libraries that the templates were previously applied to.
+
+To edit a single library template, click on its alias in the Library Templates list. This will take you to the Edit
+Library Template page, which works the same as the Create Library Template page. Make any changes you would like and
+then click the "Save" button at the top right to confirm the changes. The Edit Library Template page also allows you to
+specify indices. See [Specifying Library Template Indices](#specifying_library_template_indices) below for more
+information.
+
+To bulk edit library templates, go to the Library Templates list, select to the template(s) you would like to modify,
+and click the "Edit" button in the toolbar at the top of the table. This will bring you to the bulk Edit Library
+Templates page. Make any changes you would like, then click the "Save" button at the top right of the page to confirm.
 
 {% include userman-toplink.md %}
 
@@ -150,16 +157,52 @@ libraries that the templates were previously applied to.
 {% assign subsub = subsub | plus: 1 %}
 {% include userman-heading.md section=page.section sub=sub subsub=subsub title="Adding/Removing Library Templates from a Project" %}
 
-Changing which projects a library template is associated with can only be done on the main Library Templates list page.
+Changing which projects a library template is associated with can be done on the Edit Library Template page, or from
+the main Library Templates list page.
 
-To add a project association, check the checkboxes beside the templates you would like to associate with a new project
-and click the "Add Project" button in the toolbar at the top of the table. In the dialog that appears, type in the
-name, alias, or short name of the project and click the "Search" button. Click the project alias in the results dialog
-to complete the association.
+To add a project association to a single library template, go to the Edit Library Template page and click the "Add"
+button in the toolbar at the top of the Projects list section. In the dialog that appears, type in the name, alias, or
+short name of the project and click the "Search" button. Click the project alias in the results dialog to complete the
+association. Be sure to click the "Save" button at the top right of the page to confirm your changes.
 
-To remove a project association, check the checkboxes next to the appropriate templates and click the "Remove Project"
-button in the toolbar at the top of the table. In the dialog that appears, click the alias of the project that you
-would like to remove the template(s) from.
+To remove a project association from a single library template, go to the Edit Library Template page, select the
+projects you would like to remove in the Projects list section, and click the "Remove" button in the toolbar at the top
+of the list. Be sure to click the "Save" button at the top right of the page to confirm your changes.
+
+To add a project association to multiple templates at once, go to the Library Templates list page, check the checkboxes
+beside the templates you would like to associate with a new project and click the "Add Project" button in the toolbar
+at the top of the table. In the dialog that appears, type in the name, alias, or short name of the project and click
+the "Search" button. Click the project alias in the results dialog to complete the association.
+
+To remove a project association from multiple projects at once, go to the Library Templates list page, check the
+checkboxes next to the appropriate templates and click the "Remove Project" button in the toolbar at the top of the
+table. In the dialog that appears, click the alias of the project that you would like to remove the template(s) from.
+
+{% include userman-toplink.md %}
+
+
+
+{% assign subsub = subsub | plus: 1 %}
+{% include userman-heading.md section=page.section sub=sub subsub=subsub title="Specifying Library Template Indices" %}
+
+A library template may specify indices to add to libraries based on the library's box position. When applying a
+template to a library that is in a box, the indices specified for the box position that the library occupies will be
+selected. If the library is not in a box, no indices will be selected automatically.
+
+Library template indices can be edited from the Edit Library Template page using the controls in the Indices list
+section at the bottom of the page.
+
+To add indices, click the "Add" button in the toolbar at the top of the list. In the dialog that appears, enter the
+quantity of box positions you would like to add indices for and click "Create." This will take you to the bulk Create
+Library Template Indices page. Enter the box positions and select the indices for each, and then click the "Save"
+button at the top right of the page to confirm.
+
+To edit indices, select the positions you would like to modify and click the "Edit" button in the toolbar at the top of
+the list. Change any indices you would like, and then click the "Save" button at the top right of the page to confirm.
+
+To remove indices, select the positions you would like to remove index specifications from, and click the "Remove"
+button in the toolbar at the top of the list. Be sure to click the "Save" button at the top right of the page to
+confirm.
 
 {% include userman-toplink.md %}
 

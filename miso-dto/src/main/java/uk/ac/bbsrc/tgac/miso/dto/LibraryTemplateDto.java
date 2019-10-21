@@ -19,7 +19,8 @@ public class LibraryTemplateDto {
   private Long libraryTemplateId;
   private String alias;
   private List<Long> projectIds;
-  private Double defaultVolume;
+  private String defaultVolume;
+  private String volumeUnits;
   private String platformType;
   private Long libraryTypeId;
   private Long selectionId;
@@ -55,12 +56,20 @@ public class LibraryTemplateDto {
     this.projectIds = projectIds;
   }
 
-  public Double getDefaultVolume() {
+  public String getDefaultVolume() {
     return defaultVolume;
   }
 
-  public void setDefaultVolume(Double defaultVolume) {
+  public void setDefaultVolume(String defaultVolume) {
     this.defaultVolume = defaultVolume;
+  }
+
+  public String getVolumeUnits() {
+    return volumeUnits;
+  }
+
+  public void setVolumeUnits(String volumeUnits) {
+    this.volumeUnits = volumeUnits;
   }
 
   public String getPlatformType() {
