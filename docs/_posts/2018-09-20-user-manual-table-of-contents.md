@@ -308,6 +308,8 @@ biweekly to [GitHub](https://github.com/miso-lims/miso-lims/releases).
 {% assign subsub = subsub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Adding/Removing Library Templates from a Project" %}
 {% assign subsub = subsub | plus: 1 %}
+{% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Specifying Library Template Indices" %}
+{% assign subsub = subsub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub subsub=subsub section-title=section-title title="Deleting Library Templates" %}
 {% assign sub = sub | plus: 1 %}
 {% include userman-toc-link.md section=section sub=sub section-title=section-title title="Editing Libraries" %}
