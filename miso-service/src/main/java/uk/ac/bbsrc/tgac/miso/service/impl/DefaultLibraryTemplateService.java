@@ -128,13 +128,14 @@ public class DefaultLibraryTemplateService implements LibraryTemplateService {
 
   private void loadIndices(Map<String, Index> indices) throws IOException {
     Map<String, Index> loaded = new HashMap<>();
-    indices.forEach((boxPosition, index) -> {
-      Index managedIndex = indexService.getIndexById(index.getId());
+    for (String boxPosition : indices.keySet()) {
+      Index index = indices.get(boxPosition);
+      Index managedIndex = indexService.get(index.getId());
       if (managedIndex == null) {
         throw new ValidationException(new ValidationError("No index found with ID: " + index.getId()));
       }
       loaded.put(boxPosition, managedIndex);
-    });
+    }
     indices.putAll(loaded);
   }
 
