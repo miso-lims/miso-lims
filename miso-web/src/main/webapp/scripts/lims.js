@@ -1031,7 +1031,9 @@ Utils.array = {
   findUniqueOrThrow: function(predicate, referenceCollection) {
     var results = referenceCollection.filter(predicate);
     if (results.length != 1) {
-      throw new Error('element not found');
+      Utils.showOkDialog('Error', ['An unexpected JavaSript error has occurred.',
+          'Please file a ticket letting us know what you were trying to do when this happened.']);
+      throw new Error('unique element not found');
     } else {
       return results[0];
     }
