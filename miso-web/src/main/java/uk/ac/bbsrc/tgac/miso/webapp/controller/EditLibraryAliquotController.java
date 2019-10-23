@@ -123,7 +123,7 @@ public class EditLibraryAliquotController {
       }
       dto.setBox(newBox);
       if (item.getConcentration() != null) {
-        dto.setConcentration(item.getConcentration().toString());
+        dto.setConcentration(LimsUtils.toNiceString(item.getConcentration()));
         dto.setConcentrationUnits(item.getConcentrationUnits());
       }
       return dto;

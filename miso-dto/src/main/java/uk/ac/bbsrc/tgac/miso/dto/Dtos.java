@@ -1325,6 +1325,7 @@ public class Dtos {
     dto.setDistributed(from.isDistributed());
     setString(dto::setDistributionDate, formatDate(from.getDistributionDate()));
     setString(dto::setDistributionRecipient, from.getDistributionRecipient());
+    setBoolean(dto::setUmis, from.getUmis(), false);
     return dto;
   }
 
@@ -1401,6 +1402,7 @@ public class Dtos {
     to.setDistributed(from.isDistributed());
     to.setDistributionDate(parseDate(from.getDistributionDate()));
     to.setDistributionRecipient(from.getDistributionRecipient());
+    setBoolean(to::setUmis, from.getUmis(), false);
     return to;
   }
 

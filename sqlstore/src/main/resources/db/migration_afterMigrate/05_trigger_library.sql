@@ -31,9 +31,10 @@ FOR EACH ROW
         CASE WHEN (NEW.ngUsed IS NULL) <> (OLD.ngUsed IS NULL) OR NEW.ngUsed <> OLD.ngUsed THEN CONCAT('ng used: ', COALESCE(decimalToString(OLD.ngUsed), 'n/a'), ' → ', COALESCE(decimalToString(NEW.ngUsed), 'n/a')) END,
         CASE WHEN (NEW.concentrationUnits IS NULL) <> (OLD.concentrationUnits IS NULL) OR NEW.concentrationUnits <> OLD.concentrationUnits THEN CONCAT(NEW.name, ' concentration units: ', COALESCE(OLD.concentrationUnits, 'n/a'), ' → ', COALESCE(NEW.concentrationUnits, 'n/a')) END,
         CASE WHEN (NEW.volumeUnits IS NULL) <> (OLD.volumeUnits IS NULL) OR NEW.volumeUnits <> OLD.volumeUnits THEN CONCAT(NEW.name, ' volume units: ', COALESCE(OLD.volumeUnits, 'n/a'), ' → ', COALESCE(NEW.volumeUnits, 'n/a')) END,
-    CASE WHEN NEW.distributed <> OLD.distributed THEN CONCAT('distributed: ', IF(OLD.distributed = 0, 'No', 'Yes'), ' → ', IF(NEW.distributed = 0, 'No', 'Yes')) END,
-    CASE WHEN (NEW.distributionDate IS NULL) <> (OLD.distributionDate IS NULL) OR NEW.distributionDate <> OLD.distributionDate THEN CONCAT('distribution date: ', COALESCE(OLD.distributionDate, 'n/a'), ' → ', COALESCE(NEW.distributionDate, 'n/a')) END,
-    CASE WHEN (NEW.distributionRecipient IS NULL) <> (OLD.distributionRecipient IS NULL) OR NEW.distributionRecipient <> OLD.distributionRecipient THEN CONCAT('distribution recipient: ', COALESCE(OLD.distributionRecipient, 'n/a'), ' → ', COALESCE(NEW.distributionRecipient, 'n/a')) END);
+        CASE WHEN NEW.distributed <> OLD.distributed THEN CONCAT('distributed: ', IF(OLD.distributed = 0, 'No', 'Yes'), ' → ', IF(NEW.distributed = 0, 'No', 'Yes')) END,
+        CASE WHEN (NEW.distributionDate IS NULL) <> (OLD.distributionDate IS NULL) OR NEW.distributionDate <> OLD.distributionDate THEN CONCAT('distribution date: ', COALESCE(OLD.distributionDate, 'n/a'), ' → ', COALESCE(NEW.distributionDate, 'n/a')) END,
+        CASE WHEN (NEW.distributionRecipient IS NULL) <> (OLD.distributionRecipient IS NULL) OR NEW.distributionRecipient <> OLD.distributionRecipient THEN CONCAT('distribution recipient: ', COALESCE(OLD.distributionRecipient, 'n/a'), ' → ', COALESCE(NEW.distributionRecipient, 'n/a')) END,
+        CASE WHEN NEW.umis <> OLD.umis THEN CONCAT('UMIs: ', IF(OLD.umis = 0, 'No', 'Yes'), ' → ', IF(NEW.umis = 0, 'No', 'Yes')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message, changeTime) VALUES (
       NEW.libraryId,
@@ -52,7 +53,7 @@ FOR EACH ROW
         CASE WHEN (NEW.platformType IS NULL) <> (OLD.platformType IS NULL) OR NEW.platformType <> OLD.platformType THEN 'platformType' END,
         CASE WHEN (NEW.qcPassed IS NULL) <> (OLD.qcPassed IS NULL) OR NEW.qcPassed <> OLD.qcPassed THEN 'qcPassed' END,
         CASE WHEN NEW.sample_sampleId <> OLD.sample_sampleId THEN 'sample_sampleId' END,
-		CASE WHEN (NEW.receivedDate IS NULL) <> (OLD.receivedDate IS NULL) OR NEW.receivedDate <> OLD.receivedDate THEN 'receivedDate' END,
+        CASE WHEN (NEW.receivedDate IS NULL) <> (OLD.receivedDate IS NULL) OR NEW.receivedDate <> OLD.receivedDate THEN 'receivedDate' END,
         CASE WHEN NEW.discarded <> OLD.discarded THEN 'discarded' END,
         CASE WHEN (NEW.dnaSize IS NULL) <> (OLD.dnaSize IS NULL) OR NEW.dnaSize <> OLD.dnaSize THEN 'dnaSize' END,
         CASE WHEN NEW.sample_sampleId <> OLD.sample_sampleId THEN 'parentSample' END,
@@ -65,7 +66,8 @@ FOR EACH ROW
         CASE WHEN (NEW.volumeUnits IS NULL) <> (OLD.volumeUnits IS NULL) OR NEW.volumeUnits <> OLD.volumeUnits THEN CONCAT(NEW.name, ' volumeUnits') END,
         CASE WHEN NEW.distributed <> OLD.distributed THEN 'distributed' END,
         CASE WHEN (NEW.distributionDate IS NULL) <> (OLD.distributionDate IS NULL) OR NEW.distributionDate <> OLD.distributionDate THEN 'distributionDate' END,
-        CASE WHEN (NEW.distributionRecipient IS NULL) <> (OLD.distributionRecipient IS NULL) OR NEW.distributionRecipient <> OLD.distributionRecipient THEN 'distributionRecipient' END
+        CASE WHEN (NEW.distributionRecipient IS NULL) <> (OLD.distributionRecipient IS NULL) OR NEW.distributionRecipient <> OLD.distributionRecipient THEN 'distributionRecipient' END,
+        CASE WHEN NEW.umis <> OLD.umis THEN 'umis' END
   ), ''),
       NEW.lastModifier,
       log_message,

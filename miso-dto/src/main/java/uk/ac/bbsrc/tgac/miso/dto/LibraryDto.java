@@ -69,6 +69,7 @@ public class LibraryDto extends AbstractBoxableDto {
   private boolean distributed;
   private String distributionDate;
   private String distributionRecipient;
+  private boolean umis;
 
   public String getAlias() {
     return alias;
@@ -447,6 +448,14 @@ public class LibraryDto extends AbstractBoxableDto {
 
   public void setNgUsed(String ngUsed) {
     this.ngUsed = ngUsed;
+  }
+
+  public boolean getUmis() {
+    return umis;
+  }
+
+  public void setUmis(boolean umis) {
+    this.umis = umis;
   }
 
 }

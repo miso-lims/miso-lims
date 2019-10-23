@@ -37,6 +37,7 @@ SELECT s.alias NAME
         ,nanodrop.results nanodrop_concentration
         ,NULL barcode
         ,NULL barcode_two
+        ,NULL umis
         ,qpcr.results qpcr_percentage_human
         ,s.qcPassed qcPassed
         ,qpd.description detailedQcStatus
@@ -168,7 +169,8 @@ SELECT l.alias NAME
         ,qubit.results qubit_concentration 
         ,NULL nanodrop_concentration 
         ,bc1.sequence barcode 
-        ,bc2.sequence barcode_two 
+        ,bc2.sequence barcode_two
+        ,l.umis
         ,NULL qpcr_percentage_human 
         ,l.qcPassed qcPassed 
         ,NULL detailedQcStatus 
@@ -287,6 +289,7 @@ SELECT d.alias name
         ,NULL nanodrop_concentration 
         ,NULL barcode 
         ,NULL barcode_two 
+        ,NULL umis
         ,NULL qpcr_percentage_human 
         ,1 qcPassed 
         ,NULL detailedQcStatus 

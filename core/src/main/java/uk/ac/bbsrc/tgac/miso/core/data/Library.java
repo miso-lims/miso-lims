@@ -346,4 +346,8 @@ public interface Library
   @Override
   public Sample getParent();
 
+  public boolean getUmis();
+
+  public void setUmis(boolean umis);
+
 }

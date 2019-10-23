@@ -633,6 +633,7 @@ HotTarget.library = (function() {
           },
           makeIndexColumn(config, 1),
           makeIndexColumn(config, 2),
+          HotUtils.makeColumnForBoolean('Has UMIs', true, 'umis', true),
           {
             header: 'Kit',
             data: 'kitDescriptorName',
