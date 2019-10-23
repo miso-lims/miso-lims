@@ -9,6 +9,7 @@ Changes:
     tissue piece children will automatically be deducted from the slides' (current) slide count on
     save. This update will use the current slide count as initial slides, and set the current slide
     count to (initial slides - discards - slides consumed by all children)
+  * Added field to indicate whether a library has UMIs
   * Show 1 decimal place on labels for volume/concentration values less than 10
   * Made the following items deletable
     * Sequencer Runs
@@ -24,6 +25,10 @@ Changes:
     * Submissions
     * Users
     * Groups
+
+Upgrade notes:
+
+  * Upgraded Pinery version to 1.6.0
 
 # 0.2.192
 

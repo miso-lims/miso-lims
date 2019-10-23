@@ -855,7 +855,14 @@ public class MisoClient implements Lims {
         }
       },
       DISTRIBUTION_DATE("distribution_date", "Distribution Date"),
-      SLIDES_CONSUMED("slides_consumed", "Slides Consumed");
+      SLIDES_CONSUMED("slides_consumed", "Slides Consumed"), //
+      UMIS("umis", "UMIs") {
+        @Override
+        public String extractStringValueFrom(ResultSet rs) throws SQLException {
+          boolean umis = rs.getBoolean(getSqlKey());
+          return umis ? "True" : "False";
+        }
+      };
 
       private final String sqlKey;
       private final String attributeKey;

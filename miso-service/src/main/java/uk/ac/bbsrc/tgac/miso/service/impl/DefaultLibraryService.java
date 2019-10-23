@@ -475,6 +475,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     target.setDistributionDate(source.getDistributionDate());
     target.setDistributionRecipient(source.getDistributionRecipient());
     target.setLocationBarcode(source.getLocationBarcode());
+    target.setUmis(source.getUmis());
 
     if (isDetailedLibrary(target)) {
       DetailedLibrary dSource = (DetailedLibrary) source;

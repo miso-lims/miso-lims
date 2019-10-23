@@ -262,7 +262,11 @@ FormTarget.library = (function($) {
               });
             }
           }
-        }, makeIndexColumn(object, 1), makeIndexColumn(object, 2), FormUtils.makeQcPassedField(true), {
+        }, makeIndexColumn(object, 1), makeIndexColumn(object, 2), {
+          title: 'Has UMIs',
+          data: 'umis',
+          type: 'checkbox'
+        }, FormUtils.makeQcPassedField(true), {
           title: 'Low Quality Sequencing',
           data: 'lowQuality',
           type: 'checkbox',

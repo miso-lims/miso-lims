@@ -200,6 +200,8 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Enumerated(EnumType.STRING)
   private DilutionFactor spikeInDilutionFactor;
 
+  private boolean umis;
+
   @OneToMany(targetEntity = FileAttachment.class)
   @JoinTable(name = "Library_Attachment", joinColumns = { @JoinColumn(name = "libraryId") }, inverseJoinColumns = {
       @JoinColumn(name = "attachmentId") })
@@ -762,6 +764,16 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Override
   public void setSpikeInDilutionFactor(DilutionFactor dilutionFactor) {
     this.spikeInDilutionFactor = dilutionFactor;
+  }
+
+  @Override
+  public boolean getUmis() {
+    return umis;
+  }
+
+  @Override
+  public void setUmis(boolean umis) {
+    this.umis = umis;
   }
 
   @Override
