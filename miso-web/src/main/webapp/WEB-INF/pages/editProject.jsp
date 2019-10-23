@@ -62,7 +62,7 @@
   });
 </script>
 
-<c:if test="${project.id != 0 && (detailedSample || !projectReportLinks.isEmpty())}">
+<c:if test="${project.id != 0 && (detailedSample || not empty projectReportLinks)}">
   <table class="in">
     <c:if test="${detailedSample}">
       <tr>
@@ -76,7 +76,7 @@
         </td>
       </tr>
     </c:if>
-    <c:if test="${!projectReportLinks.isEmpty()}">
+    <c:if test="${not empty projectReportLinks}">
       <tr>
       	<td class="h">External Links:</td>
       	<td>

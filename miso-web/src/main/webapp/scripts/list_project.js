@@ -63,7 +63,7 @@ ListTarget.project = {
             }), null, function(response) {
               Utils.showWizardDialog("Add Project", response.map(function(project) {
                 return {
-                  name: project.alias,
+                  name: project.name + ': ' + project.alias + (project.shortName ? ' (' + project.shortName + ')' : ''),
                   handler: function() {
                     LibraryTemplate.addProject(project);
                   }

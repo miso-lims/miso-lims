@@ -64,7 +64,7 @@ ListTarget.library_template = {
               var projectActions = [];
               response.forEach(function(project) {
                 projectActions.push({
-                  name: project.alias,
+                  name: project.name + ': ' + project.alias + (project.shortName ? ' (' + project.shortName + ')' : ''),
                   handler: function() {
                     var templateIds = items.map(function(template) {
                       return template.id;
