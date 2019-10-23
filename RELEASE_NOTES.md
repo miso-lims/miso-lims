@@ -24,6 +24,7 @@ Changes:
     * Submissions
     * Users
     * Groups
+  * Fixed retrieving JIRA issues with no assignee
 
 # 0.2.192
 
