@@ -1,75 +1,42 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import java.util.Date;
+import java.io.IOException;
 import java.util.List;
 
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleClassDao;
 
 @Repository
-@Transactional
-public class HibernateSampleClassDao implements SampleClassDao {
-
-  protected static final Logger log = LoggerFactory.getLogger(HibernateSampleClassDao.class);
-
-  @Autowired
-  private SessionFactory sessionFactory;
+@Transactional(rollbackFor = Exception.class)
+public class HibernateSampleClassDao extends HibernateSaveDao<SampleClass> implements SampleClassDao {
   
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
+  public HibernateSampleClassDao() {
+    super(SampleClassImpl.class);
   }
 
-  private Session currentSession() {
-    return sessionFactory.getCurrentSession();
-  }
-
-  @Override
-  public List<SampleClass> getSampleClass() {
-    Query query = currentSession().createQuery("from SampleClassImpl");
-    @SuppressWarnings("unchecked")
-    List<SampleClass> records = query.list();
-    return records;
-  }
-  
   @Override
   public List<SampleClass> listByCategory(String sampleCategory) {
-    Query query = currentSession().createQuery("from SampleClassImpl where sampleCategory = :sampleCategory");
-    query.setString("sampleCategory", sampleCategory);
     @SuppressWarnings("unchecked")
-    List<SampleClass> records = query.list();
+    List<SampleClass> records = currentSession().createCriteria(getEntityClass())
+        .add(Restrictions.eq("sampleCategory", sampleCategory))
+        .list();
     return records;
   }
 
   @Override
-  @Transactional(propagation = Propagation.REQUIRED)
-  public SampleClass getSampleClass(Long id) {
-    return (SampleClass) currentSession().get(SampleClassImpl.class, id);
+  public SampleClass getByAlias(String alias) throws IOException {
+    return getBy("alias", alias);
   }
 
   @Override
-  public Long addSampleClass(SampleClass sampleClass) {
-    Date now = new Date();
-    sampleClass.setCreationDate(now);
-    sampleClass.setLastUpdated(now);
-    return (Long) currentSession().save(sampleClass);
-  }
-
-  @Override
-  public void update(SampleClass sampleClass) {
-    Date now = new Date();
-    sampleClass.setLastUpdated(now);
-    currentSession().update(sampleClass);
+  public long getUsage(SampleClass sampleClass) throws IOException {
+    return getUsageBy(DetailedSampleImpl.class, "sampleClass", sampleClass);
   }
 
 }

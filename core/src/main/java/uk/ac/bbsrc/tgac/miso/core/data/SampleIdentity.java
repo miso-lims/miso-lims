@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 public interface SampleIdentity extends DetailedSample {
   
   public static final String CATEGORY_NAME = "Identity";
+
+  public static final List<String> SUBCATEGORIES = Collections.unmodifiableList(Collections.emptyList());
 
   String getExternalName();
 
@@ -79,7 +82,7 @@ public interface SampleIdentity extends DetailedSample {
     }
 
     public static List<String> getLabels() {
-      return new ArrayList<String>(lookup.keySet());
+      return new ArrayList<>(lookup.keySet());
     }
   }
 

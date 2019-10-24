@@ -311,11 +311,13 @@ public class Dtos {
     dto.setSuffix(from.getSuffix());
     dto.setArchived(from.isArchived());
     dto.setDirectCreationAllowed(from.isDirectCreationAllowed());
-    dto.setCreationDate(formatDateTime(from.getCreationDate()));
-    dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
-    setLong(dto::setCreatedById, maybeGetProperty(from.getCreatedBy(), User::getId), true);
-    setLong(dto::setUpdatedById, maybeGetProperty(from.getUpdatedBy(), User::getId), true);
+    dto.setCreationDate(formatDateTime(from.getCreationTime()));
+    dto.setLastUpdated(formatDateTime(from.getLastModified()));
+    setLong(dto::setCreatedById, maybeGetProperty(from.getCreator(), User::getId), true);
+    setLong(dto::setUpdatedById, maybeGetProperty(from.getLastModifier(), User::getId), true);
     dto.setDNAseTreatable(from.getDNAseTreatable());
+    dto.setParentRelationships(from.getParentRelationships().stream().map(Dtos::asDto).collect(Collectors.toList()));
+    dto.setChildRelationships(from.getChildRelationships().stream().map(Dtos::asDto).collect(Collectors.toList()));
     return dto;
   }
 
@@ -325,6 +327,7 @@ public class Dtos {
 
   public static SampleClass to(@Nonnull SampleClassDto from) {
     SampleClass to = new SampleClassImpl();
+    setLong(to::setId, from.getId(), false);
     to.setAlias(from.getAlias());
     to.setSampleCategory(from.getSampleCategory());
     to.setSampleSubcategory(from.getSampleSubcategory());
@@ -332,6 +335,12 @@ public class Dtos {
     to.setArchived(from.isArchived());
     to.setDirectCreationAllowed(from.isDirectCreationAllowed());
     to.setDNAseTreatable(from.getDNAseTreatable());
+    if (from.getParentRelationships() != null) {
+      to.getParentRelationships().addAll(from.getParentRelationships().stream().map(Dtos::to).collect(Collectors.toSet()));
+    }
+    if (from.getChildRelationships() != null) {
+      to.getChildRelationships().addAll(from.getChildRelationships().stream().map(Dtos::to).collect(Collectors.toSet()));
+    }
     return to;
   }
 
@@ -872,14 +881,14 @@ public class Dtos {
 
   public static SampleValidRelationshipDto asDto(@Nonnull SampleValidRelationship from) {
     SampleValidRelationshipDto dto = new SampleValidRelationshipDto();
-    dto.setId(from.getId());
-    dto.setParentId(from.getParent().getId());
-    dto.setChildId(from.getChild().getId());
-    dto.setCreationDate(formatDateTime(from.getCreationDate()));
-    dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
-    setLong(dto::setCreatedById, maybeGetProperty(from.getCreatedBy(), User::getId), true);
-    setLong(dto::setUpdatedById, maybeGetProperty(from.getUpdatedBy(), User::getId), true);
-    dto.setArchived(from.getArchived());
+    setLong(dto::setId, from.getId(), true);
+    setLong(dto::setParentId, maybeGetProperty(from.getParent(), SampleClass::getId), true);
+    setLong(dto::setChildId, maybeGetProperty(from.getChild(), SampleClass::getId), true);
+    setDateTimeString(dto::setCreationDate, from.getCreationTime());
+    setDateTimeString(dto::setLastUpdated, from.getLastModified());
+    setLong(dto::setCreatedById, maybeGetProperty(from.getCreator(), User::getId), true);
+    setLong(dto::setUpdatedById, maybeGetProperty(from.getLastModifier(), User::getId), true);
+    setBoolean(dto::setArchived, from.isArchived(), false);
     return dto;
   }
 
@@ -889,6 +898,14 @@ public class Dtos {
 
   public static SampleValidRelationship to(@Nonnull SampleValidRelationshipDto from) {
     SampleValidRelationship to = new SampleValidRelationshipImpl();
+    setLong(to::setId, from.getId(), false);
+    setObject(to::setParent, SampleClassImpl::new, from.getParentId());
+    setObject(to::setChild, SampleClassImpl::new, from.getChildId());
+    setDateTime(to::setCreationTime, from.getCreationDate());
+    setDateTime(to::setLastModified, from.getLastUpdated());
+    setObject(to::setCreator, UserImpl::new, from.getCreatedById());
+    setObject(to::setLastModifier, UserImpl::new, from.getUpdatedById());
+    setBoolean(to::setArchived, from.getArchived(), false);
     return to;
   }
 
