@@ -191,7 +191,30 @@ HotTarget.libraryTemplate = (function() {
                 });
               }
             }
-          }, HotUtils.makeColumnForDecimal('Default Volume', true, 'defaultVolume', 14, 10, false, false)];
+          }, HotUtils.makeColumnForDecimal('Default Volume', true, 'defaultVolume', 14, 10, false, false), {
+            header: 'Vol. Units',
+            data: 'volumeUnits',
+            type: 'dropdown',
+            trimDropdown: false,
+            source: [none].concat(Constants.volumeUnits.map(function(unit) {
+              return unit.units;
+            })),
+            include: true,
+            allowHtml: true,
+            validator: HotUtils.validator.requiredAutocomplete,
+            unpack: function(obj, flat, setCellMeta) {
+              var units = Constants.volumeUnits.find(function(unit) {
+                return unit.name == obj.volumeUnits;
+              });
+              flat['volumeUnits'] = !!units ? units.units : none;
+            },
+            pack: function(obj, flat, errorHandler) {
+              var units = Constants.volumeUnits.find(function(unit) {
+                return unit.units == flat['volumeUnits'];
+              });
+              obj['volumeUnits'] = !!units ? units.name : null;
+            }
+          }];
     },
 
     getBulkActions: function(config) {

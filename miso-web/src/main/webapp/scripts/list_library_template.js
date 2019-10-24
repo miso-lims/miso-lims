@@ -40,9 +40,11 @@ ListTarget.library_template = {
           lines.push('* ' + librarytemplate.alias);
           ids.push(librarytemplate.id);
         });
-        Utils.showConfirmDialog('Delete Library Templates', 'Delete', lines, function() {
-          Utils.ajaxWithDialog('Deleting Library Templates', 'POST', '/miso/rest/librarytemplates/bulk-delete', ids, Utils.page.pageReload);
-        });
+        Utils.showConfirmDialog('Delete Library Templates', 'Delete', lines,
+            function() {
+              Utils.ajaxWithDialog('Deleting Library Templates', 'POST', '/miso/rest/librarytemplates/bulk-delete', ids,
+                  Utils.page.pageReload);
+            });
       }
     });
 
@@ -62,7 +64,7 @@ ListTarget.library_template = {
               var projectActions = [];
               response.forEach(function(project) {
                 projectActions.push({
-                  name: project.alias,
+                  name: project.name + ': ' + project.alias + (project.shortName ? ' (' + project.shortName + ')' : ''),
                   handler: function() {
                     var templateIds = items.map(function(template) {
                       return template.id;
@@ -128,24 +130,9 @@ ListTarget.library_template = {
     return [{
       name: "Add",
       handler: function() {
-        var fields = [{
-          property: 'quantity',
-          type: 'int',
-          label: 'Quantity',
-          value: 1,
-          required: true
-        }];
-
-        Utils.showDialog('Create Library Templates', 'Create', fields, function(result) {
-          if (result.quantity < 1) {
-            Utils.showOkDialog('Create Library Templates', ["That's a peculiar number of library templates to create."]);
-            return;
-          }
-          window.location = '/miso/librarytemplate/bulk/new?' + jQuery.param({
-            quantity: result.quantity,
-            projectId: projectId,
-          });
-        });
+        window.location = Urls.ui.libraryTemplates.create + (projectId ? '?' + jQuery.param({
+          projectId: projectId
+        }) : '');
       }
     }];
   },
@@ -158,12 +145,7 @@ ListTarget.library_template = {
     }
 
     return [
-        {
-          "sTitle": "Alias",
-          "mData": "alias",
-          "include": true,
-          "iSortPriority": 0
-        },
+        ListUtils.labelHyperlinkColumn('Alias', Urls.ui.libraryTemplates.edit, Utils.array.getId, 'alias', 0, true),
         {
           "sTitle": "Library Design",
           "mData": "designId",
@@ -192,7 +174,8 @@ ListTarget.library_template = {
           "include": true,
           "iSortPriority": 0,
           "mRender": function(data, type, full) {
-            return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(stringIdPredicate(data), Constants.libraryTypes), 'description')
+            return Utils.array
+                .maybeGetProperty(Utils.array.findFirstOrNull(stringIdPredicate(data), Constants.libraryTypes), 'description')
                 || '';
           },
           "bSortable": false
@@ -240,7 +223,8 @@ ListTarget.library_template = {
                 || '';
           },
           "bSortable": false
-        }, {
+        },
+        {
           "sTitle": "Platform Type",
           "mData": "platformType",
           "include": true,
@@ -249,14 +233,18 @@ ListTarget.library_template = {
           "mRender": function(data, type, full) {
             return data || '';
           }
-        }, {
+        },
+        {
           "sTitle": "Default Volume",
           "mData": "defaultVolume",
           "include": true,
           "iSortPriority": 0,
           "bSortable": false,
           "mRender": function(data, type, full) {
-            return data || '';
+            return (data || '')
+                + ' '
+                + (full.volumeUnits
+                    ? Utils.array.findUniqueOrThrow(Utils.array.namePredicate(full.volumeUnits), Constants.volumeUnits).units : '');
           }
         }];
   }

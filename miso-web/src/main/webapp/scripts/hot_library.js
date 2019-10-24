@@ -706,6 +706,17 @@ HotTarget.library = (function() {
                 return unit.units == flat['volumeUnits'];
               });
               obj['volumeUnits'] = !!units ? units.name : null;
+            },
+            depends: 'templateAlias',
+            update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+              var projectId = getProjectId(lib, flat, config);
+              var template = getTemplate(config, projectId, lib.parentSampleClassId, value);
+              if (template && template.volumeUnits) {
+                var unit = Utils.array.findUniqueOrThrow(Utils.array.namePredicate(template.volumeUnits), Constants.volumeUnits);
+                setData(unit.units);
+              } else {
+                setData(null);
+              }
             }
           },
           HotUtils.makeColumnForDecimal('Parent ng Used', config.showVolume && !config.isLibraryReceipt, 'ngUsed', 14, 10, false, false),

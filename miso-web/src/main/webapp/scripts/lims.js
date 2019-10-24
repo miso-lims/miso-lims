@@ -28,6 +28,13 @@ jQuery.ajaxSetup({
 
 var Utils = Utils
     || {
+
+      decodeHtmlString: function(text) {
+        var textarea = document.createElement('textarea');
+        textarea.innerHTML = text;
+        return textarea.value;
+      },
+
       /** Maps a form element's child input elements to a JSON object. */
       mappifyForm: function(formName) {
         var values = {};
