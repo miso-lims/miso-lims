@@ -3097,7 +3097,8 @@ public class Dtos {
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
     dto.setProjectIds(from.getProjects().stream().map(Project::getId).collect(Collectors.toList()));
-    dto.setDefaultVolume(from.getDefaultVolume());
+    setString(dto::setDefaultVolume, from.getDefaultVolume());
+    setString(dto::setVolumeUnits, maybeGetProperty(from.getVolumeUnits(), VolumeUnit::name));
     dto.setPlatformType(from.getPlatformType() != null ? from.getPlatformType().name() : null);
     dto.setLibraryTypeId(from.getLibraryType() != null ? from.getLibraryType().getId() : null);
     dto.setSelectionId(from.getLibrarySelectionType() != null ? from.getLibrarySelectionType().getId() : null);
@@ -3389,9 +3390,8 @@ public class Dtos {
     if (from.getId() != null) to.setId(from.getId());
     to.setAlias(from.getAlias());
     setObject(to::setPlatformType, from.getPlatformType(), PlatformType::valueOf);
-    if (from.getDefaultVolume() != null) {
-      to.setDefaultVolume(from.getDefaultVolume());
-    }
+    setBigDecimal(to::setDefaultVolume, from.getDefaultVolume());
+    setObject(to::setVolumeUnits, from.getVolumeUnits(), VolumeUnit::valueOf);
 
     if (from.getProjectIds() != null) {
       List<Project> projects = new ArrayList<>();
@@ -3400,7 +3400,7 @@ public class Dtos {
         project.setId(id);
         projects.add(project);
       });
-      to.setProjects(projects);
+      to.getProjects().addAll(projects);
     }
 
     if (from.getLibraryTypeId() != null) {
@@ -3423,6 +3423,22 @@ public class Dtos {
       IndexFamily indexFamily = new IndexFamily();
       indexFamily.setId(from.getIndexFamilyId());
       to.setIndexFamily(indexFamily);
+    }
+    if (from.getIndexOneIds() != null) {
+      to.getIndexOnes().putAll(from.getIndexOneIds().entrySet().stream()
+          .collect(Collectors.toMap(entry -> entry.getKey(), entry -> {
+            Index index = new Index();
+            index.setId(entry.getValue());
+            return index;
+          })));
+    }
+    if (from.getIndexTwoIds() != null) {
+      to.getIndexTwos().putAll(from.getIndexTwoIds().entrySet().stream()
+          .collect(Collectors.toMap(entry -> entry.getKey(), entry -> {
+            Index index = new Index();
+            index.setId(entry.getValue());
+            return index;
+          })));
     }
     return to;
   }

@@ -28,6 +28,13 @@ jQuery.ajaxSetup({
 
 var Utils = Utils
     || {
+
+      decodeHtmlString: function(text) {
+        var textarea = document.createElement('textarea');
+        textarea.innerHTML = text;
+        return textarea.value;
+      },
+
       /** Maps a form element's child input elements to a JSON object. */
       mappifyForm: function(formName) {
         var values = {};
@@ -1031,7 +1038,9 @@ Utils.array = {
   findUniqueOrThrow: function(predicate, referenceCollection) {
     var results = referenceCollection.filter(predicate);
     if (results.length != 1) {
-      throw new Error('element not found');
+      Utils.showOkDialog('Error', ['An unexpected JavaSript error has occurred.',
+          'Please file a ticket letting us know what you were trying to do when this happened.']);
+      throw new Error('unique element not found');
     } else {
       return results[0];
     }

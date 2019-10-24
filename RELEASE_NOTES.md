@@ -25,6 +25,9 @@ Changes:
     * Users
     * Groups
   * Fixed retrieving JIRA issues with no assignee
+  * Added a single Create/Edit Library Template page
+  * Allow specifying indices based on library's box position in a library template
+  * Allow specifying volume units in a library template
 
 # 0.2.192
 

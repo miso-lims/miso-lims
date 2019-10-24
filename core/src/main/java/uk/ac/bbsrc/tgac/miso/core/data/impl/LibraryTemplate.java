@@ -1,7 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +25,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
@@ -49,7 +52,10 @@ public class LibraryTemplate implements Serializable, Deletable {
           @JoinColumn(name = "projectId", nullable = false) })
   private List<Project> projects = new ArrayList<>();
 
-  private Double defaultVolume;
+  private BigDecimal defaultVolume;
+
+  @Enumerated(EnumType.STRING)
+  private VolumeUnit volumeUnits;
 
   @Enumerated(EnumType.STRING)
   private PlatformType platformType;
@@ -105,19 +111,26 @@ public class LibraryTemplate implements Serializable, Deletable {
   }
 
   public List<Project> getProjects() {
+    if (projects == null) {
+      projects = new ArrayList<>();
+    }
     return projects;
   }
 
-  public void setProjects(List<Project> projects) {
-    this.projects = projects;
-  }
-
-  public Double getDefaultVolume() {
+  public BigDecimal getDefaultVolume() {
     return defaultVolume;
   }
 
-  public void setDefaultVolume(Double defaultVolume) {
+  public void setDefaultVolume(BigDecimal defaultVolume) {
     this.defaultVolume = defaultVolume;
+  }
+
+  public VolumeUnit getVolumeUnits() {
+    return volumeUnits;
+  }
+
+  public void setVolumeUnits(VolumeUnit volumeUnits) {
+    this.volumeUnits = volumeUnits;
   }
 
   public PlatformType getPlatformType() {
@@ -169,19 +182,17 @@ public class LibraryTemplate implements Serializable, Deletable {
   }
 
   public Map<String, Index> getIndexOnes() {
+    if (indexOnes == null) {
+      indexOnes = new HashMap<>();
+    }
     return indexOnes;
   }
 
-  public void setIndexOnes(Map<String, Index> indexOnes) {
-    this.indexOnes = indexOnes;
-  }
-
   public Map<String, Index> getIndexTwos() {
+    if (indexTwos == null) {
+      indexTwos = new HashMap<>();
+    }
     return indexTwos;
-  }
-
-  public void setIndexTwos(Map<String, Index> indexTwos) {
-    this.indexTwos = indexTwos;
   }
 
   @Override

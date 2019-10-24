@@ -212,7 +212,7 @@ FormUtils = (function($) {
           return unit.source;
         },
         getItemLabel: function(item) {
-          return decodeHtmlString(item.units);
+          return Utils.decodeHtmlString(item.units);
         },
         getItemValue: function(item) {
           return item.name;
@@ -826,12 +826,6 @@ FormUtils = (function($) {
 
   function makeFieldValidationBox(inputId, field) {
     return $('<div>').attr('id', inputId + 'Error').addClass('errorContainer');
-  }
-
-  function decodeHtmlString(text) {
-    var textarea = document.createElement('textarea');
-    textarea.innerHTML = text;
-    return textarea.value;
   }
 
 })(jQuery);
