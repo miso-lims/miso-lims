@@ -179,7 +179,7 @@ public class JiraIssueManager implements IssueTrackerManager {
     issue.setAssignee("(Unassigned)");
     if (fields.has("assignee")) {
       JSONObject assignee = fields.getJSONObject("assignee");
-      if (assignee.has("displayName")) {
+      if (!assignee.isNullObject() && assignee.has("displayName")) {
         issue.setAssignee(assignee.getString("displayName"));
       }
     }
