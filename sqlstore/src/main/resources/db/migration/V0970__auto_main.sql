@@ -1,3 +1,4 @@
+-- initial_volumes
 ALTER TABLE Sample MODIFY COLUMN volume DECIMAL(14,10);
 ALTER TABLE Sample MODIFY COLUMN concentration DECIMAL(14,10);
 ALTER TABLE SampleQC MODIFY COLUMN results DECIMAL(16,10);
@@ -30,3 +31,11 @@ UPDATE SampleSlide SET slides = slides - COALESCE((
   JOIN DetailedSample ds ON ds.sampleId = stp.sampleId
   WHERE ds.parentId = SampleSlide.sampleId
 ), 0);
+
+-- libraryTemplate_volumeUnits
+ALTER TABLE LibraryTemplate ADD COLUMN volumeUnits varchar(30);
+UPDATE LibraryTemplate SET volumeUnits = 'MICROLITRES' WHERE defaultVolume IS NOT NULL;
+
+-- umis
+ALTER TABLE Library ADD COLUMN umis BOOLEAN NOT NULL DEFAULT FALSE;
+
