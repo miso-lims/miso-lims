@@ -65,7 +65,7 @@ public class MisoClient implements Lims {
 
   // @formatter:off
   // InstrumentModel queries
-  private static final String QUERY_ALL_MODELS = "SELECT im.instrumentModelId, im.alias " + "FROM InstrumentModel as im";
+  private static final String QUERY_ALL_MODELS = "SELECT im.instrumentModelId, im.alias, im.platform " + "FROM InstrumentModel as im";
   private static final String QUERY_MODEL_BY_ID = QUERY_ALL_MODELS + " WHERE im.instrumentModelId = ?";
 
   // Instrument queries
@@ -551,6 +551,7 @@ public class MisoClient implements Lims {
 
       m.setId(rs.getInt("instrumentModelId"));
       m.setName(rs.getString("alias"));
+      m.setPlatform(rs.getString("platform"));
 
       return m;
     }
