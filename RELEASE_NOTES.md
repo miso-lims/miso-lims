@@ -33,6 +33,7 @@ Changes:
 Upgrade notes:
 
   * Upgraded Pinery version to 1.6.0
+  * Upgraded Run Scanner version to 1.9.0
 
 # 0.2.192
 
