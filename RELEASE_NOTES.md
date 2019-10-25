@@ -2,7 +2,7 @@
 
 Changes:
 
-
+  * Added FTT_152C1_1WH slide label layout 
 
 # 0.2.194
 
