@@ -1,6 +1,7 @@
 package ca.on.oicr.pinery.lims.miso;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.ZoneId;
@@ -17,6 +18,7 @@ import java.util.Set;
 import javax.sql.DataSource;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -801,8 +803,18 @@ public class MisoClient implements Lims {
         }
       },
       QPCR_PERCENTAGE_HUMAN("qpcr_percentage_human", "qPCR %"),
-      QUBIT_CONCENTRATION("qubit_concentration", "Qubit (ng/uL)"),
-      NANODROP_CONCENTRATION("nanodrop_concentration", "Nanodrop (ng/uL)"),
+      QUBIT_CONCENTRATION("qubit_concentration", "Qubit (ng/uL)") {
+        @Override
+        public String extractStringValueFrom(ResultSet rs) throws SQLException {
+          return extractBigDecimalString(rs, getSqlKey());
+        }
+      },
+      NANODROP_CONCENTRATION("nanodrop_concentration", "Nanodrop (ng/uL)") {
+        @Override
+        public String extractStringValueFrom(ResultSet rs) throws SQLException {
+          return extractBigDecimalString(rs, getSqlKey());
+        }
+      },
       BARCODE("barcode", "Barcode"),
       BARCODE_TWO("barcode_two", "Barcode Two"),
       READ_LENGTH("read_length", "Read Length") {
@@ -911,6 +923,19 @@ public class MisoClient implements Lims {
         att.setName(name);
         att.setValue(value);
         return att;
+      }
+
+      private static String extractBigDecimalString(ResultSet rs, String sqlKey) throws SQLException {
+        BigDecimal value = rs.getBigDecimal(sqlKey);
+        if (!rs.wasNull()) {
+          String nice = StringUtils.strip(value.toPlainString(), "0");
+          if (nice.startsWith(".")) {
+            nice = "0" + nice;
+          }
+          nice = StringUtils.strip(nice, ".");
+          return nice;
+        }
+        return null;
       }
 
       private enum StrStatus {
