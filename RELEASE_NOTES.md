@@ -4,6 +4,12 @@ Changes:
 
 
 
+# 0.2.194
+
+Changes:
+
+  * Changed Pinery Qubit concentration formatter to eliminate trailing zeros.
+
 # 0.2.193
 
 Changes:
@@ -40,6 +46,10 @@ Upgrade notes:
 
   * Upgraded Pinery version to 1.6.0
   * Upgraded Run Scanner version to 1.9.0
+
+Bad:
+
+  * Pinery Qubit concentration displays ten decimal places
 
 # 0.2.192
 
