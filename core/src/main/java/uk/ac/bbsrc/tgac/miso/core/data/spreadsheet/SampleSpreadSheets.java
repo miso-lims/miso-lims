@@ -26,6 +26,12 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forString("Secondary Identifier", detailedSample(SampleTissue.class, SampleTissue::getSecondaryIdentifier, "")), //
       Column.forString("Location", BoxUtils::makeLocationLabel)),
   
+  BIOBANK_TRANSFER_LIST("BioBank Transfer List", //
+      Arrays.asList(SampleTissue.CATEGORY_NAME, SampleTissueProcessing.CATEGORY_NAME), //
+      Column.forString("Alias", Sample::getAlias), //
+      Column.forString("Barcode", Sample::getIdentificationBarcode), //
+      Column.forString("Tissue Origin", detailedSample(SampleTissue.class, st -> st.getTissueOrigin().getAlias(), ""))),
+
   TRANSFER_LIST("Transfer List", //
       Arrays.asList(SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME), //
       Column.forString("Alias", Sample::getAlias),
