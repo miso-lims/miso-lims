@@ -76,13 +76,13 @@ The MISO Docker containers consist of four parts:
 [MySQL official Docker container](https://hub.docker.com/_/mysql).
 
 **Apache Tomcat server**. The actual server for the MISO webapp. The image is
-[miso-lims-webapp](https://cloud.docker.com/u/misolims/repository/docker/misolims/miso-lims-webapp)
+[miso-lims-webapp](https://hub.docker.com/r/misolims/miso-lims-webapp)
 container, based on the
 [official Tomcat alpine container](https://hub.docker.com/_/tomcat).
 
 **Flyway DB migration**. Initializes or updates the database.
 This is miso-lims's
-[miso-lims-migrate](https://cloud.docker.com/u/misolims/repository/docker/misolims/miso-lims-migrate)
+[miso-lims-migration](https://hub.docker.com/r/misolims/miso-lims-migration)
 container (_[Dockerfile](https://github.com/miso-lims/miso-lims/blob/master/Dockerfile),
 target `flyway-migration`_), based on [boxfuse/flyway](https://hub.docker.com/r/boxfuse/flyway). It will initialize or update the MySQL database for a particular MISO
 version.
@@ -429,7 +429,7 @@ docker-compose -f compose.yml build
 docker-compose -f compose.yml up
 ```
 
-The URL [http://localhost/miso](http://localhost/miso) is still where to go and 
+The URL [http://localhost/miso](http://localhost/miso) is still where to go and
 log in with the credentials **admin**/**admin**.
 
 #### Improving build times while developing
@@ -611,7 +611,7 @@ starting.
     volume in the docker-compose file. Note that this will remove _all_  
     detached volumes, not just the MISO ones, and this data will be permanently
     lost.
- 
+
         # compose.yml is the location of your compose file
         docker-compose -f compose.yml down
         docker volume prune

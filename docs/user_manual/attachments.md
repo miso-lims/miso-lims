@@ -42,7 +42,7 @@ accessible from both the Edit Project page, and the Edit page for each item it w
 stored on the MISO server once, but it is linked to all of the intended items.
 
 Before you can link the project file, you will need to attach the file to the project, as described above in
-[Adding Attachments to a Single Item](attachments#adding_attachments_to_a_single_item). You can then use either the
+[Adding Attachments to a Single Item](#adding-attachments-to-a-single-item). You can then use either the
 same "Upload" button as when adding attachments to a single sample or library, or the same "Attach Files" button on the
 Samples or Libraries list page as when adding attachments to other items, depending on whether you want to link the
 attachment to one or multiple items. In the dialog, choose "Link Project File" and then select the file that you wish

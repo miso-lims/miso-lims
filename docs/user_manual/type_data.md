@@ -114,10 +114,9 @@ MISO administrators can add, edit, and delete tissue origins using the standard 
 deleted if the option has not been used by any existing samples.
 
 
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Tissue Piece Types" %}
+## Tissue Piece Types
 
-Note: This item only applies if your site uses [detailed sample mode](site_configuration.html#detailed_sample_mode).
+Note: This item only applies if your site uses [detailed sample mode](../site_configuration/#detailed-sample-mode).
 
 For tissue processing, slides can be made and then used for various other
 preparations (e.g., LCM). A tissue piece is a sample class that consumes slides
@@ -129,9 +128,6 @@ category.
 MISO administrators can add, edit, and delete tissue piece types using the
 standard interface. A tissue piece type can only be deleted if the option has
 not been used by any existing samples.
-
-{% include userman-toplink.md %}
-
 
 
 ## Tissue Types
@@ -247,7 +243,7 @@ existing libraries or library designs.
 
 **WARNING**: Library selection type is defined by [NCBI](https://www.ncbi.nlm.nih.gov/) as the "method used to enrich
 the target in the sequence library preparation" and is required in order to submit libraries to the ENA (see the
-[ENA section](european_nucleotide_archive_support/)). The values available in MISO should be limited to the default
+[ENA section](../european_nucleotide_archive_support/)). The values available in MISO should be limited to the default
 options, which are the same as defined in the ENA schema. If these values are modified, or additional options are
 added, your data may not be valid for ENA submission.
 
@@ -399,7 +395,7 @@ only be deleted if the type has not been used by any existing partitions.
 
 A box in MISO describes a physical container that holds multiple samples, libraries, library aliquots, and/or pools.
 Box sizes define the possible dimensions of these boxes. A box size may be marked as scannable. This means that the box
-can be scanned using a bulk barcode scanner (see [Barcode Scanners](site_configuration/#barcode-scanners)).
+can be scanned using a bulk barcode scanner (see [Barcode Scanners](../site_configuration/#barcode-scanners)).
 
 MISO administrators can add, edit, and delete box sizes using the standard interface. Box size dimensions cannot be
 modified if there are any existing boxes using the size. A box size can only be deleted if the size has not been used

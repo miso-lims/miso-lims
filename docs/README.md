@@ -1,50 +1,31 @@
 # MISO Github pages
 
-MISO's project website is built with Jekyll and intended to be hosted on Github pages.
+Documentation: https://miso-lims.readthedocs.io
 
-The page template is a slightly modified version of [jekyll-docs-template](http://bruth.github.io/jekyll-docs-template).
-
-
-## Installing
-
-For Ubuntu, install jekyll directly (don't mess around with Ruby versions and Gem and Jekyll versions -- that way leads to madness.
-
-    sudo apt-get install jekyll
+MISO's documentation is built with [mkdocs](https://www.mkdocs.org/)
+and hosted by [readthedocs](https://www.mkdocs.org/).
 
 
-## Building locally and testing
+## Prerequisites
 
-The project is configured to run on Github, so build and serve the website like this during testing
-
-    jekyll build ; jekyll serve --baseurl ''
+Install [mkdocs](https://www.mkdocs.org/#installation).
 
 
-## Deploying to GitHub Pages
+## Test and deploy locally
 
-The [miso-lims/miso-lims](https://github.com/miso-lims/miso-lims/) repository on GitHub is configured to deploy the `docs`
-subdirectory of the `master` branch to GitHub Pages automatically:
-[http://miso-lims.github.io/miso-lims/](http://miso-lims.github.io/miso-lims/)
+To test out changes locally, run:
 
+```
+mkdocs serve -f .mkdocs.yml
+```
 
-## Cheat sheet
-
-### Code blocks
-
-As per Github-flavoured markdown, code blocks can either have each line preceeded by at least four spaces or be surrounded by back-tick blocks.
-
-    ```
-    This is a code block
-    ```
-
-### Link to a post
-
-    [REST API]({{ site.baseurl }}{% post_url 2016-01-12-rest-api %})
+The pages will be likely be hosted at [http://127.0.0.1:8000](http://127.0.0.1:8000),
+though be sure to check the output in case it hosts at another address or port.
 
 
-(no slash between baseurl and posturl)
+## Readthedocs configuration
 
-### Display an image
-
-    ![MISO model interfaces]({{ site.baseurl }}/images/core_model.png)
-
-(include slash between baseurl and image)
+Configuration for readthedocs is located in
+[../.readthedocs.yml](../.readthedocs.yml). It should build automatically.
+Launch a build manually (or do other configuration by going to
+[https://readthedocs.org/projects/runscanner/](https://readthedocs.org/projects/runscanner/).

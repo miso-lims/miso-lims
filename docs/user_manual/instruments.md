@@ -62,7 +62,7 @@ when creating new runs.
 Service Records can describe issues with an instrument and/or work that has been performed on it. They may specify an
 issue start time and end time, and whether the instrument is out of service during this time period.
 
-To see the Service Records list for an instrument, expand the Service Records section on the Edit Intrument page.
+To see the Service Records list for an instrument, expand the Service Records section on the Edit Instrument page.
 
 
 
@@ -84,7 +84,7 @@ to the Create Service Record page, with the addition of being able to attach and
 
 You can attach any type and number of files to a service record in MISO. This feature might be used to attach a PDF
 record provided by an external technician who worked on the instrument. For more information, see the
-[Attachments section](attachments/).
+[Attachments section](../attachments/).
 
 
 ### Deleting a Service Record

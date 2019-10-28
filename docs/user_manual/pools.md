@@ -86,8 +86,8 @@ and select the aliquots that you wish to add to the pool. You can search aliquot
 the table. Once you have selected the appropriate aliquots, click the "Add" button in the toolbar at the top of the
 table to add the library aliquots to the pool.
 
-If your site has [Strict Index Checking](../site_configuration/) rules enabled, library aliquots cannot be added to 
-pools when the library aliquots have indices which are duplicates or near-duplicates. 
+If your site has [Strict Index Checking](../site_configuration/#strict-index-checking) rules enabled, library aliquots cannot be added to 
+pools when the library aliquots have indices which are duplicates or near-duplicates.
 
 
 
@@ -198,4 +198,3 @@ To do this, select the pools to merge from the Pools list, then click the "Merge
 the table. In the dialog, choose the proportions to merge the pools at. Click the "Merge" button to proceed. This will
 take you to the Merge Pools page, which functions the same as the bulk Create Pools from Library Aliquots page. Enter
 the pool information, then click "Save" at the top right to create the new pool.
-

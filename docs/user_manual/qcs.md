@@ -6,7 +6,7 @@ described in the [Type Data section - QC Types](../type_data/#qc-types). It is p
 same type to the same item to show a change in the results, as the date of the QC is also recorded.
 
 MISO also has partition QCs, but they work differently than those described here. See the
-[Sequencer Runs section - Partition QCs](../runs/#partition-qcs) for more information on partition QCs.
+[Sequencer Runs section - Partition QCs](../sequencer_runs/#setting-partition-qcs) for more information on partition QCs.
 
 # Adding QCs
 
@@ -31,4 +31,3 @@ To edit QCs, go to the list page for the item type you wish to work on. Select t
 QCs, then click the "Edit QCs" button in the toolbar at the top of the list. You will be taken to the Edit QCs page
 and all of the QCs for each of the selected items will be shown. Make any changes you would like, then click the "Save"
 button at the top right to confirm the changes.
-

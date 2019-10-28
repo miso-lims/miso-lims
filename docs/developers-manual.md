@@ -86,7 +86,6 @@ management of types that may be institute-specific. Another is that some of thes
 * QcType
 
 
-<a name="naming-schemes"/>
 ### Naming Schemes
 
 All [Nameable](https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Nameable.java) entities
@@ -110,8 +109,7 @@ Library can also be generated and/or validated by the naming scheme.
 API access to the underlying filesystem is made available through implementors of the
 [FilesManager](https://github.com/miso-lims/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/manager/FilesManager.java)
 interface. This interface defines a contract to, based on a properties-supplied base directory (see
-[Web Application Configuration](#configuration) and
-[Installation Readme](https://documentation.tgac.ac.uk/pages/viewpage.action?pageId=950282#Installation&AdministrationManual-Settingupmiso.propertiesfile)),
+[Web Application Configuration](#configuration)),
 generate temporary files, store files and retrieve files from disk, and list files within a given storage directory. The default file
 storage path is:
 
@@ -241,7 +239,6 @@ DAOs directly. Beyond data storage and retrieval via the DAO's, the Service laye
 * Updating timestamps and userId fields such as creationDate and lastModifier
 * Ensuring that only fields which should be modifiable can be modified
 
-<a name="configuration"/>
 ## Web Application
 
 The main MISO web application is powered by the [Spring framework](http://www.springsource.org/), notably
@@ -393,7 +390,7 @@ Pull the tag or snapshot that you want to build and package it:
     docker tag "misolims/miso-lims-migration:${version}" misolims/miso-lims-migration:latest
     docker tag "misolims/miso-lims-webapp:${version}" misolims/miso-lims-webapp:latest
 
-Once the build completes, test it by launching it. This command uses the default 
+Once the build completes, test it by launching it. This command uses the default
 environment variables in .env and relies on `.miso_db_password` file existing.
 
     export MISO_TAG="${version}" && docker-compose up

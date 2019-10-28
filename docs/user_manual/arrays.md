@@ -31,7 +31,7 @@ added. Grey circles are empty positions. Select a position by clicking on its ci
 
 Once a position is selected, the search controls become available. Enter the name, alias, or barcode of a sample into
 the search box and click the Lookup button to perform the search. If your site uses
-[detailed sample mode](site_configuration/#detailed_sample_mode), only aliquot samples will be searched. The search
+[detailed sample mode](../site_configuration/#detailed-sample-mode), only aliquot samples will be searched. The search
 results will appear in the Results dropdown. Ensure that the correct sample is selected and then click the Update
 Position button to add the sample to the array position.
 

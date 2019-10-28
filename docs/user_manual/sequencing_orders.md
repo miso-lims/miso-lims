@@ -46,10 +46,9 @@ sequencing run. This page shows all of the sequencing orders in this intermediat
 
 Sequencing orders can be created on pools either for a single pool or for multiple pools at once.
 
-{% assign subsub = 1 %}
-{% include userman-heading.md section=page.section sub=sub subsub=subsub section-title=section-title title="Single
+### Single
 
-To create a sequencing order for a single pool, first navigate to the 
+To create a sequencing order for a single pool, first navigate to the
 [Edit Pool Page](../pools/#editing-a-single-pool).
 
 On the Edit Pool Page, scroll down to the "Requested Sequencing Orders" table and click

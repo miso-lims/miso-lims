@@ -70,7 +70,7 @@ to filter the data that is shown in the table.
 *Advanced search*
 
 Some tables have "Advanced Search," which allows you to better describe what it is that you're looking for. You can
-tell which tables have Advanced Search because they will have a black help bubble (?) beside them. 
+tell which tables have Advanced Search because they will have a black help bubble (?) beside them.
 You can click this bubble to see a full list of the applicable search terms for this page. For example, on
 the Samples list page, you can search for samples by the box that they're stored in (`box:boxname`) or the date they
 were created (`created:today`).
@@ -133,7 +133,7 @@ fields that are invalid will be marked in red, and an error message will appear 
 
 Depending on the item type, there will usually be a number of tables below the item's attributes. These tables will
 detail items related to the one you're working with. These tables function similarly to the list pages, allowing you to
-work with the related items. 
+work with the related items.
 
 
 ## Collapsible Sections
@@ -220,7 +220,7 @@ working with items in MISO and the lab. Individual tools are documented in more 
 Clicking on your username near the top right of the screen will take you to a page showing your name and the groups
 that you belong to. There is an Edit link that will open a page showing more of your user details. Depending on your
 site configuration, you may be able to edit some of these details and reset your password from this page. See
-[Authentication](../site_configuration/#logging_in) for more details.
+[Logging In](../site_configuration/#logging_in) for more details.
 
 If you are a MISO administrator, an Administration section will also appear on the My Account page. The Clear Cache
 action should not be necessary, but can be used to help troubleshoot bugs. The Refresh Constants action can be used to
@@ -243,5 +243,3 @@ The "Help" link near the top right of the screen will link you to this user manu
 Many pages in MISO include a Quick Help section. This section is hidden by default, but can be shown by clicking the
 "Quick Help" heading near the top of the screen. The Quick Help section displays tips and
 details to help you work with the page.
-
-

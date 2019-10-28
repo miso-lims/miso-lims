@@ -3,7 +3,7 @@
 This installation guide is intended to be used if you cannot use Docker and
 Docker compose, and is not trivial to set up. We recommend using Docker compose
 if possible by following the
-[Docker compose installation guide](compose-installation-guide).
+[Docker compose installation guide](../compose-installation-guide).
 
 ## Prerequisites
 For each service, which may be put on the same machine, the following tools are
@@ -185,7 +185,7 @@ Use the `security.ad.url` property to indicate the url for the Active Directory.
 Some valid examples are: `ad.oicr.on.ca`, `ldap://ad.oicr.on.ca:389` and
 `ldaps://ad.oicr.on.ca:636`.
 
-The groups used by MISO are `ROLE_INTERNAL` for regular users 
+The groups used by MISO are `ROLE_INTERNAL` for regular users
 and `ROLE_ADMIN` for administrators. If you find these names
 too general you may wish to add a prefix before adding these groups to your Active
 Directory. For example `MISO_ROLE_INTERNAL` gives a clearer indication as to what
@@ -196,7 +196,7 @@ prefix.
 If using JDBC, once running, you should change the passwords of the `admin` and
 `notification` accounts.
 
-## Naming Schemes 
+## Naming Schemes
 
 (updating `$CATALINA_HOME/conf/Catalina/localhost/miso.properties`)
 MISO Naming Schemes are used to validate and generate entity String fields. They are
@@ -337,8 +337,7 @@ and replacing `zeroDateTimeBehavior=convertToNull` with `zeroDateTimeBehavior=CO
 jdbc:mysql://localhost:3306/lims?autoReconnect=true&zeroDateTimeBehavior=CONVERT_TO_NULL&useUnicode=true&characterEncoding=UTF-8
 ```
 
-<details>
-<summary>Click here if you have run into an issue with migration `V0320` with MariaDB:</summary>
+### If you have run into an issue with migration `V0320` with MariaDB:
 
 This migration contains some syntax which is not compatible with MariaDB. You can skip over the `Printer` code at issue, and manually copy the remainder of the migration into the MySQL console (as seen below). The last command changes the Flyway state from failed to succeeded. You can then run Flyway again from the terminal and it will resume with the next migration.
 
@@ -427,17 +426,13 @@ DELETE FROM QCType WHERE qcTarget = 'Run';
 
 UPDATE flyway_schema_history SET success = 1 WHERE version = '0320';
 ```
-</details>
-
-<details>
-<summary>Click here if you have run into an issue with migration `V0611`:</summary>
+### If you have run into an issue with migration `V0611`:
 
 Ths command changes the Flyway state from failed to succeeded. You can then run Flyway again from the terminal and it will resume with the next migration.
 
     UPDATE flyway_schema_history SET success = 1 WHERE version = '0611';
 
 
-</details>
 
 If you encounter other errors migrating the database, make sure that you are using the recommended version of Flyway (see
 [Prerequisites](#prerequisites)).
