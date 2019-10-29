@@ -53,7 +53,8 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
           (sam-> (LimsUtils.isDetailedSample(sam) && ((DetailedSample) sam).getSubproject() != null ? 
               ((DetailedSample) sam).getSubproject().getAlias() : ""))), //
       Column.forString("Group ID", effectiveGroupIdProperty(GroupIdentifiable::getGroupId)), //
-      Column.forString("Group Description", effectiveGroupIdProperty(GroupIdentifiable::getGroupDescription))
+      Column.forString("Group Description", effectiveGroupIdProperty(GroupIdentifiable::getGroupDescription)), //
+      Column.forString("Barcode", Sample::getIdentificationBarcode)
 	);
   
   private static <S extends DetailedSample, T> Function<Sample, T> detailedSample(Class<S> clazz, Function<S, T> function, T defaultValue) {
