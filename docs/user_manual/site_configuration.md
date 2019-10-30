@@ -34,7 +34,7 @@ related issues on the Project page and the Run page. These lists are described i
 
 
 MISO may also be configured to take bug reports. If it is, a "Report a problem" link will appear near the top right of
-the screen (see figure {{figure}}). Click this link to report a bug in your issue tracker.
+the screen (see the figure below). Click this link to report a bug in your issue tracker.
 
 ![Bug report link](../images/site-config-bug-report.png)
 *Bug report link*
@@ -148,7 +148,7 @@ easier to find that they are related because they are connected to the same ghos
 ## Strict Index Checking
 
 By default, any library aliquot can be added to a pool. When strict index checking is enabled, library aliquots
-cannot be added to a pool when their addition would cause duplicate or near-duplicate indices to exist within the 
-pool. 
+cannot be added to a pool when their addition would cause duplicate or near-duplicate indices to exist within the
+pool.
 
 The advantage of enabling this setting is the prevention of sequencing library aliquots which cannot be de-multiplexed.

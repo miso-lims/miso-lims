@@ -28,4 +28,4 @@ though be sure to check the output in case it hosts at another address or port.
 Configuration for readthedocs is located in
 [../.readthedocs.yml](../.readthedocs.yml). It should build automatically.
 Launch a build manually (or do other configuration by going to
-[https://readthedocs.org/projects/runscanner/](https://readthedocs.org/projects/runscanner/).
+[https://readthedocs.org/projects/miso-lims-docs/](https://readthedocs.org/projects/miso-lims-docs/).
