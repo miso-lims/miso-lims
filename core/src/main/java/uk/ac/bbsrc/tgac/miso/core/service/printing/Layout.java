@@ -140,6 +140,18 @@ public enum Layout {
       return label;
     }
   },
+  FTT_152C1_1WH {
+    @Override
+    public LabelCanvas draw(Driver driver, Barcodable barcodable) {
+      String barcode = getBarcode(barcodable);
+      LabelCanvas label = driver.start(22.86, 19.05);
+      label.barcode2d(3, 12, 0.3, barcode);
+      label.multilineText(0, 5, 1.8, 14, 3, Stream.of(//
+          new Pair<>(FontStyle.REGULAR, barcodable.getLabelText()), //
+          new Pair<>(FontStyle.REGULAR, LimsUtils.formatDate(barcodable.getBarcodeDate()))));
+      return label;
+    }
+  },
   THT_181_492_3 {
     @Override
     public LabelCanvas draw(Driver driver, Barcodable barcodable) {
