@@ -2,7 +2,8 @@
 
 Changes:
 
-
+  * Fixed error where pool created from the Edit Pool Order page was not automatically linked to
+    the pool order
 
 # 0.2.194
 
