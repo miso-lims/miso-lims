@@ -12,7 +12,7 @@ public interface SampleIdentity extends DetailedSample {
   
   public static final String CATEGORY_NAME = "Identity";
 
-  public static final List<String> SUBCATEGORIES = Collections.unmodifiableList(Collections.emptyList());
+  public static final List<String> SUBCATEGORIES = Collections.emptyList();
 
   String getExternalName();
 
