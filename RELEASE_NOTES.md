@@ -2,7 +2,7 @@
 
 Changes:
 
-
+  * Added RIN and DV200 for samples in Pinery-MISO
 
 # 0.2.194
 

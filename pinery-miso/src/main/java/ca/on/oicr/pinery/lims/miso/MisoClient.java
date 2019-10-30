@@ -875,6 +875,18 @@ public class MisoClient implements Lims {
           boolean umis = rs.getBoolean(getSqlKey());
           return umis ? "True" : "False";
         }
+      }, //
+      RIN("rin", "RIN") {
+        @Override
+        public String extractStringValueFrom(ResultSet rs) throws SQLException {
+          return extractBigDecimalString(rs, getSqlKey());
+        }
+      }, //
+      DV200("dv200", "DV200") {
+        @Override
+        public String extractStringValueFrom(ResultSet rs) throws SQLException {
+          return extractBigDecimalString(rs, getSqlKey());
+        }
       };
 
       private final String sqlKey;
