@@ -168,7 +168,7 @@ record any number of details about the item. For more information on working wit
 ## Bulk Create/Edit Pages
 
 In addition to creating and editing single items, it is often useful to work with many items at once. MISO provides
-many bulk create/edit pages to facilitate this (see figure {{figure}}). These bulk pages feature a spreadsheet-like
+many bulk create/edit pages to facilitate this (see figure below). These bulk pages feature a spreadsheet-like
 interface with features similar to popular spreadsheet software.
 
 ![Bulk propagate library aliquots page](../images/general-nav-bulk-page.png)
@@ -195,7 +195,7 @@ bottom right of the selected cell(s).
 
 If you wish to increment a number within the column, you can do that by entering the first two cell values, selecting
 both of those cells, and then using the fill handle in the same manner. For example, if you wished to set Pool aliases
-similar to those in figure {{figure}}, you could enter "POOL_01" into the first row, "POOL_02" into the second row,
+similar to those in the figure above, you could enter "POOL_01" into the first row, "POOL_02" into the second row,
 select both of these cells, then double-click the fill handle to continue the pattern to the bottom of the table.
 
 
