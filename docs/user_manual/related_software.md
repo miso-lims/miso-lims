@@ -1,23 +1,14 @@
----
-layout: page
-title: "29. Related Software"
-section: 29
----
+# Related Software
 
-
-{% assign sub = 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Run Scanner" %}
+## Run Scanner
 
 Run Scanner is a service that scans run directories on the file system and serves run metadata via a REST interface.
 MISO features integration with Run Scanner, allowing MISO to retrieve run data from Run Scanner and automatically
 create and update runs in MISO.
 
-Documentation for Run Scanner can be found in its [GitHub repository](https://github.com/oicr-gsi/runscanner).
+Documentation for Run Scanner can be found in its [GitHub repository](https://github.com/miso-lims/runscanner).
 
-{% include userman-toplink.md %}
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Pinery" %}
+## Pinery
 
 Pinery is a REST webservice for serving LIMS data, mainly for consumption by other applications. Pinery is used as an
 abstraction layer to prevent other applications from depending on a specific LIMS' schema. This means that you can
@@ -27,7 +18,5 @@ compatible.
 
 Documentation for Pinery can be found in its [GitHub repository](https://github.com/oicr-gsi/pinery). Documentation for
 the MISO implementation of Pinery can be found in
-[MISO's GitHub repository](https://github.com/TGAC/miso-lims/tree/develop/pinery-miso).
-
-{% include userman-toplink.md %}
+[MISO's GitHub repository](https://github.com/miso-lims/miso-lims/tree/develop/pinery-miso).
 

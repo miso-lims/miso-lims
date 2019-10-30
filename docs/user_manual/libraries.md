@@ -1,16 +1,9 @@
----
-layout: page
-title: "8. Libraries"
-section: 8
----
+# Libraries
 
-
-
-{% assign sub = 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Naming Scheme" %}
+## Naming Scheme
 
 MISO can be configured with a naming scheme appropriate for your organization. For more details about this
-configuration, see [Naming Scheme](site_configuration.html#naming_schemes) in the Site Configuration section.
+configuration, see [Naming Scheme](../site_configuration/#naming-schemes) in the Site Configuration section.
 
 For libraries, the naming scheme specifies whether or not duplicate aliases are allowed, and may also specify a pattern
 that all library aliases must follow. If such a pattern is specified, then the aliases will be compared to this pattern
@@ -21,12 +14,9 @@ The naming scheme may also specify a library alias generator. This means that us
 aliases because they will be generated automatically when saving libraries. The user is still free to choose a library
 alias by typing it in manually if they would like.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Libraries List" %}
+## Libraries List
 
 To get to the main Libraries list page, click "Libraries" in the Preparation list in the menu on the left side of the
 screen. This list includes all libraries from all projects in MISO. The toolbar at the top of the table includes many
@@ -36,12 +26,9 @@ You can find a similar list in the Libraries section of the Edit Project page. T
 includes the libraries belonging to the project being viewed/edited. This list has the same controls as on the main
 Libraries list page.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Propagating Libraries from Samples" %}
+## Propagating Libraries from Samples
 
 To make libraries from samples, go to the Samples list and check the checkbox(es) next to the sample(s) you wish to
 propagate from. If your site uses detailed sample mode, only aliquot samples can be propagated to libraries. After you
@@ -50,7 +37,7 @@ appears, choose the number of replicates you would like to propagate from each o
 like to specify a different number of replicates per selected sample, check the "Specify replicates per sample"
 checkbox. This will cause another dialog to open after the current one and ask you for the number of replicates for
 each sample. There is also an option to create a new box for the new libraries. See
-[Creating Boxes](boxes.html#creating_boxes) in the box section more more information on this feature. Click the
+[Creating Boxes](../boxes/#creating-boxes) in the box section more more information on this feature. Click the
 "Propagate" button when you are done in the dialog.
 
 This will take you to the bulk Create Libraries from Samples page. Enter all of the library information and then click
@@ -59,12 +46,9 @@ fields in the table, check the Quick Help section near the top of the screen. If
 message will be displayed at the top of the screen explaining the problem(s). You can then make the appropriate
 adjustments and click the "Save" button to try again.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Receiving Libraries" %}
+## Receiving Libraries
 
 When libraries are received from an external collaborator rather than being created in-house, we can create these
 libraries directly without creating the samples first. MISO does require a sample, so one will be created
@@ -76,19 +60,16 @@ To get to the bulk Create Libraries page, click the "Receive" button in the tool
 In the dialog that appears, choose the quantity of libraries you would like to create. If your site uses detailed
 sample mode, you will have to choose the aliquot class to use when creating the ghost samples that these libraries are
 parented to. There is also an option to create a new box for the new libraries. See
-[Creating Boxes](boxes.html#creating_boxes) in the box section more more information on this feature. Click the
+[Creating Boxes](../boxes/#creating-boxes) in the box section more more information on this feature. Click the
 "Receive" button when you are done in the dialog.
 
 The bulk Create Libraries page works similarly to the bulk Create Libraries from Samples page, except that more data
 will be required. This additional data is used in creating the sample(s) that the libraries are parented to so that we
 can store sample-level data, primarily for use in analysis.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Library Templates" %}
+## Library Templates
 
 A library template is a set of attribute values that can be applied to a library. Its purpose is to reduce repetitive
 input. If you find that you are creating many similar libraries, you can create a library template so that you only
@@ -96,12 +77,9 @@ have to select the template, and several other attributes will be selected autom
 associated with a project in order for it to appear as an option for libraries created within that project. It is
 possible to associate a library template with multiple projects.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign subsub = 1 %}
-{% include userman-heading.md section=page.section sub=sub subsub=subsub title="Library Templates List" %}
+### Library Templates List
 
 The Edit Project page includes a list of Library Templates associated with the project being viewed/edited.
 
@@ -109,12 +87,9 @@ The main Library Templates list can be accessed by clicking the "Library Templat
 left side of the screen. This list includes all the library templates that have been created in MISO, and includes some
 extra capabilities not included on the project-specific list.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign subsub = subsub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub subsub=subsub title="Creating Library Templates" %}
+### Creating Library Templates
 
 Click the "Add" button in the toolbar at the top of the Library Templates list to create new library templates. This
 will take you to the Create Library Template page. Enter an alias for the template. This is the name that will appear
@@ -124,16 +99,13 @@ template will be automatically applied to any library that this template is appl
 button on the project-specific Library Templates list, the template will automatically be associated with the project
 whose page you were on. If you clicked the "Add" button on the main Library Templates list page, the template will not
 be associated with any projects automatically. You can also edit the project associations before saving. See
-[Adding/Removing Library Templates from a Project](#adding_removing_library_templates_from_a_project) below for more
+[Adding/Removing Library Templates from a Project](#adding-removing-library-templates-from-a-project) below for more
 information on adding and removing projects. After you have made your selections, click the "Save" button at the top
 right of the page to create the template.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign subsub = subsub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub subsub=subsub title="Editing Library Templates" %}
+### Editing Library Templates
 
 Library templates can be edited individually or in bulk. Bulk editing is convenient when you have several templates to
 modify at once. Editing individual templates is sometimes preferable because it provides a few additional options, and
@@ -143,19 +115,16 @@ no effect on libraries that the templates were previously applied to.
 To edit a single library template, click on its alias in the Library Templates list. This will take you to the Edit
 Library Template page, which works the same as the Create Library Template page. Make any changes you would like and
 then click the "Save" button at the top right to confirm the changes. The Edit Library Template page also allows you to
-specify indices. See [Specifying Library Template Indices](#specifying_library_template_indices) below for more
+specify indices. See [Specifying Library Template Indices](#specifying-library-template-indices) below for more
 information.
 
 To bulk edit library templates, go to the Library Templates list, select to the template(s) you would like to modify,
 and click the "Edit" button in the toolbar at the top of the table. This will bring you to the bulk Edit Library
 Templates page. Make any changes you would like, then click the "Save" button at the top right of the page to confirm.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign subsub = subsub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub subsub=subsub title="Adding/Removing Library Templates from a Project" %}
+### Adding/Removing Library Templates from a Project
 
 Changing which projects a library template is associated with can be done on the Edit Library Template page, or from
 the main Library Templates list page.
@@ -178,12 +147,7 @@ To remove a project association from multiple projects at once, go to the Librar
 checkboxes next to the appropriate templates and click the "Remove Project" button in the toolbar at the top of the
 table. In the dialog that appears, click the alias of the project that you would like to remove the template(s) from.
 
-{% include userman-toplink.md %}
-
-
-
-{% assign subsub = subsub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub subsub=subsub title="Specifying Library Template Indices" %}
+### Specifying Library Template Indices
 
 A library template may specify indices to add to libraries based on the library's box position. When applying a
 template to a library that is in a box, the indices specified for the box position that the library occupies will be
@@ -204,35 +168,26 @@ To remove indices, select the positions you would like to remove index specifica
 button in the toolbar at the top of the list. Be sure to click the "Save" button at the top right of the page to
 confirm.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign subsub = subsub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub subsub=subsub title="Deleting Library Templates" %}
+### Deleting Library Templates
 
 To delete library templates, go to the Library Templates list, check the checkboxes next to the templates you wish to
 delete, and click the "Delete" button in the toolbar at the top of the table. The templates will be removed from all
 projects they were associated with, and deleted. This will not affect any libraries that the templates were previously
 applied to.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Editing Libraries" %}
+## Editing Libraries
 
 Libraries can be edited individually or in bulk. Bulk editing is convenient when you have several libraries to modify
 at once. Editing individual libraries is sometimes preferable because it provides a few additional options, and allows
 you to see a more detailed view of the library.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign subsub = 1 %}
-{% include userman-heading.md section=page.section sub=sub subsub=subsub title="Editing a Single Library" %}
+### Editing a Single Library
 
 To get to the single Edit Library page, click on the library's name or alias in the Libraries list. Links to the Edit
 Library page appear on several pages for related items as well, including:
@@ -247,12 +202,9 @@ Below, there are sections for Notes and QC's, which are discussed in other parts
 Other sections list the library aliquots that have been created from the library, the pools that those library aliquots
 have been added to, the runs that those pools have been loaded into, and the library's change log.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign subsub = subsub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub subsub=subsub title="Editing Libraries in Bulk" %}
+### Editing Libraries in Bulk
 
 To get to the bulk Edit Libraries page, go to the Libraries list, check the checkboxes beside the libraries you wish to
 modify, then click the "Edit" button in the toolbar at the top of the table.
@@ -262,57 +214,42 @@ you would like, then click the "Save" button at the top right to confirm. If the
 you've entered, the error messages will be displayed at the top of the screen and you can adjust as necessary before
 clicking "Save" again.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Notes" %}
+## Notes
 
 The single Edit Library page includes a Notes section. Notes can be used to record additional library information that
 is otherwise not recorded in MISO. More information on working with notes can be found in the
-[Notes section](notes.html).
-
-{% include userman-toplink.md %}
+[Notes section](../notes/).
 
 
 
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Attaching Files" %}
+## Attaching Files
 
 You can attach any type and number of files to a library in MISO. This feature might be used to attach QC output or a
 spreadsheet of library data provided by a collaborator. For more information, see the
-[Attachments section](attachments.html).
-
-{% include userman-toplink.md %}
+[Attachments section](../attachments/).
 
 
 
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Propagating Libraries to Library Aliquots" %}
+## Propagating Libraries to Library Aliquots
 
 To make library aliquots from libraries, go to the Libraries list, check the checkboxes next to the libraries you wish
 to propagate from, then click the "Make aliquots" button in the toolbar at the top of the table. Further details of
 propagating libraries to library aliquots will be discussed in the
-[Library Aliquots section - Propagating Library Aliquots from Libraries](library_aliquots.html#propagating_library_aliquots_from_libraries).
-
-{% include userman-toplink.md %}
+[Library Aliquots section - Propagating Library Aliquots from Libraries](../library_aliquots/#propagating-library-aliquots-from-libraries).
 
 
 
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Printing Barcodes" %}
+## Printing Barcodes
 
 Barcode labels can be printed for a series of libraries from the Libraries list. See the
-[Barcode Label Printers section - Printing Barcodes](barcode_label_printers.html#printing_barcodes) for details on how
+[Barcode Label Printers section - Printing Barcodes](../barcode_label_printers/#printing-barcodes) for details on how
 to do this.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Downloading Library Information" %}
+## Downloading Library Information
 
 It is sometimes useful to have library information in spreadsheet form for use outside of MISO. To download library
 data, go to the Libraries list, check the checkboxes next to the libraries that you would like to export, and click the
@@ -321,60 +258,42 @@ format of the spreadsheet before downloading. Different spreadsheet types includ
 out the different types to see which ones will be useful to you. MISO supports exporting spreadsheets in Microsoft
 Excel (xlsx), Open Document (odt), and comma-delimited (csv) formats.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Selecting Libraries by Search" %}
+## Selecting Libraries by Search
 
 If you have a list of library names, aliases, or barcodes, you can use this list to select and act upon the libraries
 instead of having to search for and select them manually. For more information on this feature, see the
-[General Navigation section - Selecting by Search](general_navigation.html#selecting_by_search).
-
-{% include userman-toplink.md %}
+[General Navigation section - Selecting by Search](../general_navigation/#selecting-by-search).
 
 
 
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Finding Related Items" %}
+## Finding Related Items
 
 You can find items related to selected libraries using the "Parents" and "Children" buttons in the toolbar at the top of
 the Libraries list. For more information on this feature, see the
-[General Navigation section - Finding Related Items](general_navigation.html#finding_related_items).
-
-{% include userman-toplink.md %}
+[General Navigation section - Finding Related Items](../general_navigation/#finding_related_items).
 
 
 
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Library QCs" %}
+## Library QCs
 
 Any number of quality control measures may be recorded for a library. For more information on this feature, see the
-[QCs section](qcs.html).
-
-{% include userman-toplink.md %}
+[QCs section](../qcs/).
 
 
 
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Adding Libraries to a Workset" %}
+## Adding Libraries to a Workset
 
 It can sometimes be difficult to find and select a group of libraries that you want to work with. To make this easier,
 you can create a workset that includes all of the libraries that you want grouped together. For more information on
-this feature, see the [Worksets section](worksets.html).
-
-{% include userman-toplink.md %}
+this feature, see the [Worksets section](../worksets/).
 
 
 
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Deleting Libraries" %}
+## Deleting Libraries
 
 To delete libraries, go to the Libraries list, check the checkboxes next to the libraries that you wish to delete, and
 click the "Delete" button in the toolbar at the top of the table. A library can only be deleted if it has no library
 aliquots. Any library aliquots must be deleted before the library can be deleted. A library can only be deleted by its
 creator or a MISO administrator.
-
-{% include userman-toplink.md %}
-

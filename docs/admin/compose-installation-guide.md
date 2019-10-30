@@ -1,15 +1,9 @@
----
-layout: page
-title: Installing MISO with docker-compose
-category: adm
-date: 2016-01-11 13:51:46
-order: 2
----
+# Installing MISO with docker-compose
 
 This getting started guide should be all you need to do to get a demonstration
 version of MISO running on your operating system, provided you can install and
 use Docker. If you want to install MISO without using Docker, please see the
-[baremetal installation guide](baremetal-installation-guide).
+[baremetal installation guide](../baremetal-installation-guide).
 
 These compose files included in the MISO distribution are intended as a
 demonstration and __not a permanent installation__. To customize the behaviour
@@ -46,7 +40,7 @@ following commands.
 Pool workflow and is sufficient for basic laboratory tracking for sequencing.
 
 Launch the plain sample demo with docker-compose:
-``` bash
+```
 cd miso-lims-compose
 export MISO_DB_USER=tgaclims && export MISO_DB=lims && export MISO_DB_PASSWORD_FILE=./.miso_db_password && export MISO_TAG=latest
 echo "changeme" > ./.miso_db_password
@@ -74,7 +68,7 @@ Once you are finished with the container, make sure to run
 networks and release their resources to the host operating system.
 
 
-# Overview
+## Overview
 
 The MISO Docker containers consist of four parts:
 
@@ -82,13 +76,13 @@ The MISO Docker containers consist of four parts:
 [MySQL official Docker container](https://hub.docker.com/_/mysql).
 
 **Apache Tomcat server**. The actual server for the MISO webapp. The image is
-[miso-lims-webapp](https://cloud.docker.com/u/misolims/repository/docker/misolims/miso-lims-webapp)
+[miso-lims-webapp](https://hub.docker.com/r/misolims/miso-lims-webapp)
 container, based on the
 [official Tomcat alpine container](https://hub.docker.com/_/tomcat).
 
 **Flyway DB migration**. Initializes or updates the database.
 This is miso-lims's
-[miso-lims-migrate](https://cloud.docker.com/u/misolims/repository/docker/misolims/miso-lims-migrate)
+[miso-lims-migration](https://hub.docker.com/r/misolims/miso-lims-migration)
 container (_[Dockerfile](https://github.com/miso-lims/miso-lims/blob/master/Dockerfile),
 target `flyway-migration`_), based on [boxfuse/flyway](https://hub.docker.com/r/boxfuse/flyway). It will initialize or update the MySQL database for a particular MISO
 version.
@@ -96,7 +90,7 @@ version.
 **Nginx reverse proxy**. Redirects traffic from port 80 to MISO's 8080 address,
 and is also required for HTTPS. We use the official [nginx](https://hub.docker.com/_/nginx) container.
 
-# Installing MISO for production use
+## Installing MISO for production use
 
 The current docker-compose files emphasize that they are not for production use.
 So, how do you configure MISO for production?
@@ -105,23 +99,23 @@ We suggest the following:
 
 1. Mount the MySQL database and MISO files storage location to permanent, backed-up locations (see [Adding Persistent Storage](#adding-persistent-storage)).
 3. Pre-load desired data (if any) by binding SQL files to the flyway container (see [Pre-loading data with Flyway](#pre-loading-data-with-flyway).
-4. Modify and mount the miso.properties file to have your desired configuration (see [Modifying the miso.properties file](#modifying-the-miso-properties-file).
+4. Modify and mount the miso.properties file to have your desired configuration (see [Modifying the miso.properties file](#modifying-the-misoproperties-file).
 5. Change the username and password for the database using the environmental variables
-6. Enable HTTPS (see [Configuring HTTPS](#configuring-https).
+6. Enable HTTPS (see [Configuring HTTPS](#configuring-https)).
 
-# Recipes
+## Recipes
 
 We provide a number of solutions to common issues so you can construct your
 own docker-compose files.
 
-## Adding persistent storage
+### Adding persistent storage
 
 There are two ways to add persistent storage: Docker volumes and bind mounts. In
 both cases, you will mount a volume or bind a filesystem location to
 `/var/lib/mysql` inside the MySQL container, and to `/storage/miso/files/`
 inside the webapp container.
 
-### Docker volumes
+#### Docker volumes
 
 Docker volumes can be used for testing and semi-permanent demonstrations, when
 you don't want to lose all of your data between restarts.
@@ -147,7 +141,7 @@ volumes:
   misolims_files:
 ```
 
-### Filesystem mount
+#### Filesystem mount
 
 For permanent, production use, we recommend binding a location on the host
 filesystem for the database and file storage.
@@ -169,7 +163,7 @@ services:
       - "/path/to/files:/storage/miso/files/"
 ```
 
-## Pre-loading data with Flyway
+### Pre-loading data with Flyway
 
 Starting MISO with an entirely empty database will not provide full functions.
 The demo database starts with some pre-loaded information that may or may not be
@@ -202,10 +196,10 @@ services:
 ```
 
 See the
-[administrator's manual](http://miso-lims.github.io/miso-lims/adm/admin-guide.html)
+[administrator's manual](../admin-guide/)
 for more information on the types of data that can be added at this stage.
 
-## Modifying the miso.properties file
+### Modifying the miso.properties file
 
 The
 [miso.properties](https://github.com/miso-lims/miso-lims/blob/master/miso-web/src/main/resources/internal/miso.properties)
@@ -217,7 +211,7 @@ options include:
 * `miso.naming.scheme` : turns on/off various validation options for
   naming samples.
   The most rigorous naming validation scheme is `oicr`. See
-  [Naming schemes](https://miso-lims.github.io/miso-lims/adm/installation-guide.html#naming-schemes-updating-catalina_homeconfcatalinalocalhostmisoproperties)
+  [Naming schemes](../baremetal-installation-guide/#naming-schemes)
   for more information.
 
 This file should be mounted in the webapp container at
@@ -236,7 +230,7 @@ services:
 ...
 ```
 
-## Configuring HTTPS
+### Configuring HTTPS
 
 In order to turn on HTTPS for MISO, configure the nginx container to accept
 incoming connections from port 443, include the SSL certificate, key, and
@@ -250,7 +244,7 @@ The configuration below redirects requests from port 80 (http://...) to port 443
 certificate, and certificate key. These locations are important since we will
 have to bind the appropriate files into them through the compose file.
 
-``` bash
+```
 server {
     listen 80;
     location / {
@@ -280,7 +274,7 @@ server {
 
 
 
-### Using a previously-generated security certificate
+#### Using a previously-generated security certificate
 
 In the first case, you have a security certificate and key that you want to use
 with your MISO instance. You can request a certificate for your server from
@@ -329,7 +323,7 @@ be automatically redirected to the login page at https://localhost/miso and can
 use **admin**/**admin** to log in.
 
 
-### Creating a self-signed certificate on startup
+#### Creating a self-signed certificate on startup
 
 If you don't have a certificate or you are testing, you may want to generate a
 self-signed certificate on startup for MISO to use.
@@ -380,7 +374,7 @@ The container creates a new self-signed certificate every time it starts up for
 security reasons: otherwise everyone would use the same certificate, leading to
 potential trust issues. If you would like to download the certificate for re-use, the files are located at `/etc/nginx/ssl/cert.pem` and `/etc/nginx/ssl/key.pem` in the nginx container, and then follow the steps in [using a previously-generated security certificate](#using-a-previously-generated-security-certificate).
 
-#### Browser security warnings
+##### Browser security warnings
 
 With self-signed certificates, you will likely get security warnings on Chrome
 or Firefox when you go to [https://localhost/miso](https://localhost/miso).
@@ -391,19 +385,19 @@ warning.
 Here is what your browser will look like, with Chrome on the left and Firefox on
 the right. To ignore the errors, click the _Advanced_ button on either page.
 
-![Security Warnings in Chrome and Firefox]({{ site.baseurl }}/images/security-warning.png)
+![Security Warnings in Chrome and Firefox](../images/security-warning.png)
 
 Then click either "Proceed to localhost (unsafe)" or "Accept the Risk and
 Continue".
 
-![Accept Security Warnings in Chrome and Firefox]({{ site.baseurl }}/images/security-warning-accept.png)
+![Accept Security Warnings in Chrome and Firefox](../images/security-warning-accept.png)
 
 The process for [handling self-signed certificates on Internet Explorer or Edge](https://medium.com/@ali.dev/how-to-trust-any-self-signed-ssl-certificate-in-ie11-and-edge-fa7b416cac68)
 is very similar. Follow the accepted process for trusting self-signed
 certificates.
 
 
-## Building and running from source
+### Building and running from source
 
 If you are developing MISO or want to use the MISO code from a particular
 commit, modify the compose file to build the MISO-specific containers from
@@ -425,7 +419,7 @@ First, clone the `miso-lims` source repository from
 the version, branch, or release that you are working on. Then build the compose
 file, and run the version as usual.
 
-``` bash
+```
 # check out the MISO source and switch to release version v0.2.174
 git clone https://github.com/miso-lims/miso-lims.git
 git checkout tags/v0.2.177 -b v0.2.177
@@ -435,10 +429,10 @@ docker-compose -f compose.yml build
 docker-compose -f compose.yml up
 ```
 
-The URL [http://localhost/miso](http://localhost/miso) is still where to go and 
+The URL [http://localhost/miso](http://localhost/miso) is still where to go and
 log in with the credentials **admin**/**admin**.
 
-### Improving build times while developing
+#### Improving build times while developing
 
 For faster startup, you may interested in
 [adding persistent storage](#adding-persistent-storage) so that the database
@@ -450,15 +444,15 @@ file because you may inadvertently cause a database corruption. If your database
 connections are misbehaving, try pruning your Docker volumes to destroy the
 database and re-building from scratch.
 
-``` bash
+```
 # compose.yml is the location of your development compose file
 docker-compose -f compose.yml down
 docker volume prune
 ```
 
-# Example docker-compose files
+## Example docker-compose files
 
-## Production-like dockerfile
+### Production-like dockerfile
 
 This docker-compose file is installed on a production machine called `miso-lims`
 in the `miso` user's home directory.
@@ -603,7 +597,7 @@ the background.
 
 
 
-# Troubleshooting docker-compose files
+## Troubleshooting docker-compose files
 
 With docker-compose builds, the error that caused the problem is often not the
 last thing you see, but early on in the logs while one or more containers were
@@ -618,11 +612,10 @@ starting.
     detached volumes, not just the MISO ones, and this data will be permanently
     lost.
 
-    ``` bash
-    # compose.yml is the location of your compose file
-    docker-compose -f compose.yml down
-    docker volume prune
-    ```
+        # compose.yml is the location of your compose file
+        docker-compose -f compose.yml down
+        docker volume prune
+
 
 1. **Problem on docker-compose up:
   "ERROR: Unable to obtain Jdbc connection from DataSource ... for user
@@ -656,10 +649,8 @@ starting.
     `webapp` container. While docker-compose is still up, run the following in
     another terminal:
 
-    ``` bash
-    # compose.yml is the location of your compose file
-    docker-compose -f compose.yml restart webapp
-    ```
+        # compose.yml is the location of your compose file
+        docker-compose -f compose.yml restart webapp
 
     The `webapp` container will restart in the original docker-compose window.
 
@@ -672,10 +663,9 @@ starting.
     permissions to 440 (user and group read only) and changing the file's group
     to `docker`.
 
-    ``` bash
-    $ ls -la .miso_db_password
-      -r--r----- 1 miso-user docker 12 May  3 10:37 .miso_db_password
-    ```
+
+        $ ls -la .miso_db_password
+          -r--r----- 1 miso-user docker 12 May  3 10:37 .miso_db_password
 
 1. **Problem on docker-compose up:
   "ERROR: for miso-lims_webapp_1  Cannot start service webapp: OCI runtime
@@ -709,21 +699,20 @@ starting.
     To use another port, 3000 for example, two files need to be changed: the
     docker compose file and the nginx configuration. First, the compose file:
 
-    ``` yaml
-    services:
-      nginx:
-        ports:
-          - "3000:3000"
-    ```
+
+        services:
+          nginx:
+            ports:
+              - "3000:3000"
 
     And then in [nginx/http.conf](https://github.com/miso-lims/miso-lims/tree/develop/.docker/nginx/http.conf):
 
-    ```
-    server {
-      listen 3000;
-    ...
-    }
-    ```
+
+        server {
+          listen 3000;
+        ...
+        }
+
     Nginx in MISO really doesn't like it when you use a port different from the
     one that you've specified. You cannot simply map port 80 in the nginx
     container to a port on your host machine. It will not work.
@@ -750,19 +739,18 @@ starting.
     This is normal startup behaviour. True errors in Flyway will have an error
     that looks like this:
 
-    ```
-    ERROR: Migration of schema `lims` to version 0794 - site-specific-migration failed! Please restore backups and roll back database and code!
-    ERROR:
-    Migration V0794__site-specific-migration.sql failed
-    --------------------------------------------------
-    SQL State  : 42000
-    Error Code : 1064
-    Message    : You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'DELETE FROM SampleClass WHERE alias='Slide'' at line 2
-    Location   : /flyway/sql/V0794__site-specific-migration.sql (/flyway/sql/V0794__site-specific-migration.sql)
-    Line       : 4
-    Statement  : DELETE FROM BoxUse WHERE alias='Libraries'
-    DELETE FROM SampleClass WHERE alias='Slide'
-    ```
+
+        ERROR: Migration of schema `lims` to version 0794 - site-specific-migration failed! Please restore backups and roll back database and code!
+        ERROR:
+        Migration V0794__site-specific-migration.sql failed
+        --------------------------------------------------
+        SQL State  : 42000
+        Error Code : 1064
+        Message    : You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'DELETE FROM SampleClass WHERE alias='Slide'' at line 2
+        Location   : /flyway/sql/V0794__site-specific-migration.sql (/flyway/sql/V0794__site-specific-migration.sql)
+        Line       : 4
+        Statement  : DELETE FROM BoxUse WHERE alias='Libraries'
+        DELETE FROM SampleClass WHERE alias='Slide'
 
 1. **MISO started with no errors but the page at http://localhost/miso says
   "Server not found" or "Proxy error".**
@@ -770,12 +758,12 @@ starting.
     First, to check if the problem with with MISO or nginx, temporarily expose
     MISO's port by adding the following section to `webapp`:
 
-    ```
-    services:
-      webapp:
-          ports:
-            - "8080:8080"
-    ```
+
+        services:
+          webapp:
+              ports:
+                - "8080:8080"
+
     Navigate to http://localhost:8080 to check if MISO is running. If it is,
     the problem is with nginx. Ensure that all three ports in the compose file
       and `http.conf` file match each other.
