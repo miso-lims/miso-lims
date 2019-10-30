@@ -3,6 +3,7 @@
 Changes:
 
   * Added FTT_152C1_1WH slide label layout 
+  * Added RIN and DV200 for samples in Pinery-MISO
 
 # 0.2.194
 

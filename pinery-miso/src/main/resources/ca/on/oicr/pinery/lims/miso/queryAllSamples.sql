@@ -35,6 +35,8 @@ SELECT s.alias NAME
         ,sp.alias purpose
         ,qubit.results qubit_concentration
         ,nanodrop.results nanodrop_concentration
+        ,rin.results rin
+        ,dv200.results dv200
         ,NULL barcode
         ,NULL barcode_two
         ,NULL umis
@@ -125,6 +127,36 @@ LEFT JOIN (
         GROUP BY sqc.sample_sampleId
         ) newestQpcr ON newestQpcr.sample_sampleId = s.sampleId
 LEFT JOIN SampleQC qpcr ON qpcr.qcId = newestQpcr.qcId
+LEFT JOIN (
+	    SELECT sqc.sample_sampleId, MAX(sqc.qcId) AS qcId
+	    FROM (
+            SELECT sample_sampleId, type, MAX(date) AS maxDate
+	        FROM SampleQC
+	        JOIN QCType ON QCType.qcTypeId = SampleQC.type
+	        WHERE QCType.name = 'RIN'
+	        GROUP By sample_sampleId, type
+	        ) maxRinDates
+	    JOIN SampleQC sqc ON sqc.sample_sampleId = maxRinDates.sample_sampleId
+	        AND sqc.date = maxRinDates.maxDate
+	        AND sqc.type = maxRinDates.type
+	    GROUP BY sqc.sample_sampleId
+		) newestRin ON newestRin.sample_sampleId = s.sampleId
+LEFT JOIN SampleQC rin ON rin.qcId = newestRin.qcId
+LEFT JOIN (
+	    SELECT sqc.sample_sampleId, MAX(sqc.qcId) AS qcId
+	    FROM (
+            SELECT sample_sampleId, type, MAX(date) AS maxDate
+	        FROM SampleQC
+	        JOIN QCType ON QCType.qcTypeId = SampleQC.type
+	        WHERE QCType.name = 'DV200'
+	        GROUP By sample_sampleId, type
+	        ) maxDv200Dates
+	    JOIN SampleQC sqc ON sqc.sample_sampleId = maxDv200Dates.sample_sampleId
+	        AND sqc.date = maxDv200Dates.maxDate
+	        AND sqc.type = maxDv200Dates.type
+	    GROUP BY sqc.sample_sampleId
+		) newestDv200 ON newestDv200.sample_sampleId = s.sampleId
+LEFT JOIN SampleQC dv200 ON dv200.qcId = newestDv200.qcId
 LEFT JOIN BoxPosition pos ON pos.targetId = s.sampleId 
         AND pos.targetType = 'SAMPLE' 
 LEFT JOIN Box box ON box.boxId = pos.boxId 
@@ -168,6 +200,8 @@ SELECT l.alias NAME
         ,NULL purpose 
         ,qubit.results qubit_concentration 
         ,NULL nanodrop_concentration 
+        ,NULL rin
+        ,NULL dv200
         ,bc1.sequence barcode 
         ,bc2.sequence barcode_two
         ,l.umis
@@ -287,6 +321,8 @@ SELECT d.alias name
         ,NULL purpose 
         ,NULL qubit_concentration 
         ,NULL nanodrop_concentration 
+        ,NULL rin 
+        ,NULL dv200 
         ,NULL barcode 
         ,NULL barcode_two 
         ,NULL umis
