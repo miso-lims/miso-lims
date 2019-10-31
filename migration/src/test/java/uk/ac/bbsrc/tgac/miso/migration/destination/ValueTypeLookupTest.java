@@ -91,7 +91,7 @@ public class ValueTypeLookupTest {
     HibernateSampleClassDao scDao = Mockito.mock(HibernateSampleClassDao.class);
     List<SampleClass> scs = new ArrayList<>();
     scs.add(makeSampleClass(VALID_LONG, VALID_STRING));
-    Mockito.when(scDao.getSampleClass()).thenReturn(scs);
+    Mockito.when(scDao.list()).thenReturn(scs);
     Mockito.when(mgr.getSampleClassDao()).thenReturn(scDao);
 
     HibernateTissueTypeDao ttDao = Mockito.mock(HibernateTissueTypeDao.class);

@@ -1,17 +1,20 @@
 package uk.ac.bbsrc.tgac.miso.persistence;
 
+import java.io.IOException;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 
 public interface SampleValidRelationshipDao {
 
-  List<SampleValidRelationship> getSampleValidRelationship();
+  public List<SampleValidRelationship> getSampleValidRelationship();
 
-  SampleValidRelationship getSampleValidRelationship(Long id);
+  public SampleValidRelationship getSampleValidRelationship(Long id);
 
-  Long addSampleValidRelationship(SampleValidRelationship sampleValidRelationship);
+  public Long addSampleValidRelationship(SampleValidRelationship sampleValidRelationship);
 
-  void update(SampleValidRelationship sampleValidRelationship);
+  public void update(SampleValidRelationship sampleValidRelationship);
+
+  public void delete(SampleValidRelationship sampleValidRelationship) throws IOException;
 
 }

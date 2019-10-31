@@ -86,7 +86,7 @@ var Validate = Validate || {
     if (property === 'GENERAL') {
       container = jQuery('#' + formId + ' .generalErrors');
     } else {
-      container = jQuery('#' + formId + ' #' + formId + '_' + property + 'Error');
+      container = jQuery('#' + formId + '_' + property + 'Error');
     }
     var list = container.find('.errorList');
     if (!list.length) {

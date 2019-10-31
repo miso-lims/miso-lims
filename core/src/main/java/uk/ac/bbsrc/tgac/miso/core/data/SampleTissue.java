@@ -1,8 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.util.Collections;
+import java.util.List;
+
 public interface SampleTissue extends DetailedSample {
 
   public static final String CATEGORY_NAME = "Tissue";
+
+  public static final List<String> SUBCATEGORIES = Collections.unmodifiableList(Collections.emptyList());
 
   public String getSecondaryIdentifier();
 

@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -302,6 +304,13 @@ public class MenuController implements ServletContextAware {
     }
   }
 
+  private static void createMap(ObjectMapper mapper, ObjectNode node, String name, Map<String, List<String>> map) {
+    ObjectNode mapNode = node.putObject(name);
+    for (String key : map.keySet()) {
+      createArray(mapper, mapNode, key, map.get(key), Function.identity());
+    }
+  }
+
   @GetMapping(path = "/constants.js")
   @ResponseBody
   public synchronized ResponseEntity<String> constantsScript(HttpServletResponse response, final UriComponentsBuilder uriBuilder)
@@ -348,7 +357,7 @@ public class MenuController implements ServletContextAware {
         return dto;
       });
       createArray(mapper, node, "kitDescriptors", kitService.list(), Dtos::asDto);
-      createArray(mapper, node, "sampleClasses", sampleClassService.getAll(), Dtos::asDto);
+      createArray(mapper, node, "sampleClasses", sampleClassService.list(), Dtos::asDto);
       createArray(mapper, node, "sampleValidRelationships", relationships, Dtos::asDto);
       createArray(mapper, node, "detailedQcStatuses", detailedQcStatusService.getAll(), Dtos::asDto);
       createArray(mapper, node, "sampleGroups", sampleGroupService.getAll(), Dtos::asDto);
@@ -369,6 +378,7 @@ public class MenuController implements ServletContextAware {
       createArray(mapper, node, "boxUses", boxUseService.list(), Dtos::asDto);
       createArray(mapper, node, "studyTypes", studyTypeService.list(), Dtos::asDto);
       createArray(mapper, node, "sampleCategories", SampleClass.CATEGORIES, Function.identity());
+      createMap(mapper, node, "sampleSubcategories", SampleClass.SUBCATEGORIES);
       createArray(mapper, node, "submissionAction", Arrays.asList(SubmissionActionType.values()), SubmissionActionType::name);
       createArray(mapper, node, "containerModels", containerModelService.list(), Dtos::asDto);
       createArray(mapper, node, "poreVersions", containerService.listPoreVersions(), Dtos::asDto);

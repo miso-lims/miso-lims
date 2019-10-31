@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -49,16 +50,21 @@ public class HibernateSampleValidRelationshipDao implements SampleValidRelations
   @Override
   public Long addSampleValidRelationship(SampleValidRelationship sampleValidRelationship) {
     Date now = new Date();
-    sampleValidRelationship.setCreationDate(now);
-    sampleValidRelationship.setLastUpdated(now);
+    sampleValidRelationship.setCreationTime(now);
+    sampleValidRelationship.setLastModified(now);
     return (Long) currentSession().save(sampleValidRelationship);
   }
 
   @Override
   public void update(SampleValidRelationship sampleValidRelationship) {
     Date now = new Date();
-    sampleValidRelationship.setLastUpdated(now);
+    sampleValidRelationship.setLastModified(now);
     currentSession().update(sampleValidRelationship);
+  }
+
+  @Override
+  public void delete(SampleValidRelationship sampleValidRelationship) throws IOException {
+    currentSession().delete(sampleValidRelationship);
   }
 
 }
