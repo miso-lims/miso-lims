@@ -1,8 +1,4 @@
----
-layout: page
-title: "11. Pool Orders"
-section: 11
----
+# Pool Orders
 
 Pool orders are used to track sets of library aliquots that are ready to be pooled. It may be useful for people who are
 responsible for creating libraries to then create a pool orders to pass requirements on to other people who are
@@ -16,15 +12,14 @@ aliquots, or if the proportions do not match, though a warning will be shown in 
 
 Optionally, a pool order may specify sequencing requirements. If sequencing requirements are specified, a sequencing
 order must also be linked to the pool order in order for the pool order to be fulfilled. See the
-[Sequencing Orders](sequencing_orders.html) section for more information on sequencing orders and sequencing
+[Sequencing Orders](../sequencing_orders/) section for more information on sequencing orders and sequencing
 requirements.
 
 A pool order may be marked as draft to indicate that the requirements are not yet confirmed. The draft status must be
 removed before a pool order can be fulfilled.
 
 
-{% assign sub = 1 %}
-{% include userman-heading.md section=page.section sub=sub section-title=section-title title="Pool Orders List" %}
+## Pool Orders List
 
 To get to the Pool Orders list page, click "Pool Orders" in the Preparation list in the navigation menu. Pool orders are
 divided into tabs depending on their status. A pool order's status may be
@@ -36,11 +31,8 @@ divided into tabs depending on their status. A pool order's status may be
 You can click on a pool order ID or alias in the list to get to the Edit Pool Order page. The toolbar at the top of the
 list provides other commands for working with pool orders.
 
-{% include userman-toplink.md %}
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub section-title=section-title title="Creating Pool Orders" %}
+## Creating Pool Orders
 
 The easiest way to create a pool order is from the Library Aliquots list. Select the aliquots that you would like to
 include in the order and click the "Create Order" button in the toolbar at the top of the list. This will take you to
@@ -54,19 +46,15 @@ the top of the list. In this case, you will have to add the library aliquots usi
 Library Aliquots table at the bottom of the page. This will allow you to search for aliquots by entering multiple names,
 aliases, or barcodes.
 
-{% include userman-toplink.md %}
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub section-title=section-title title="Fulfilling Pool Orders" %}
+## Fulfilling Pool Orders
 
 A pool must be linked to the pool order in order to fulfill it. If the pool order specifies sequencing requirements,
 then a sequencing order must also be linked. You can create and link pools and sequencing orders from the Edit Pool
 Order page.
 
 
-{% assign subsub = 1 %}
-{% include userman-heading.md section=page.section sub=sub subsub=subsub section-title=section-title title="Creating a Pool" %}
+## Creating a Pool
 
 You can create a pool containing all of the required aliquots at the specified proportions and link it to the pool order
 in one step from the Edit Pool Order page. If the pool order has been saved and the order is not marked as a draft, a
@@ -75,45 +63,31 @@ dialog to confirm the aliquots and proportions for the pool. After you've confir
 to enter the pool information. After completing the pool information, click Save and the pool will be created and linked
 to the order.
 
-{% include userman-toplink.md %}
 
-
-{% assign subsub = subsub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub subsub=subsub section-title=section-title title="Linking an Existing Pool" %}
+## Linking an Existing Pool
 
 If you have already created a pool containing the required aliquots (or aliquots derived from those), you can link it to
 the order using the Link Pool button near the bottom of the Order Information section. This will open a dialog where you
 can enter the pool name, alias, or barcode to search. Find and select a pool to link it to the order.
 
-{% include userman-toplink.md %}
 
-
-{% assign subsub = subsub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub subsub=subsub section-title=section-title title="Creating a Sequencing Order" %}
+## Creating a Sequencing Order
 
 If the pool order specifies sequencing requirements and a pool is already linked to the order, a Create Sequencing Order
 button will appear near the bottom of the Order Information section. Clicking this button will open a dialog where you
 can confirm the sequencing order details and optionally enter a description. Click Save to create the sequencing order
 and link it to the pool order.
 
-{% include userman-toplink.md %}
 
-
-{% assign subsub = subsub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub subsub=subsub section-title=section-title title="Linking an Existing Sequencing Order" %}
+## Linking an Existing Sequencing Order
 
 If the pool order specifies sequencing requirements and a pool is already linked to the order, a Link Sequencing Order
 button will appear near the bottom of the Order Information section. Click this button to search for a sequencing order
 with matching requirements, and link it to the pool order.
 
-{% include userman-toplink.md %}
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub section-title=section-title title="Deleting Pool Orders" %}
+## Deleting Pool Orders
 
 To delete pool orders, go to the Pool Orders list. Select the pool orders you wish to delete, then click the Delete
 button in the toolbar at the top of the list. Only unfulfilled pool orders can be deleted, and only by the order's
 creator or a MISO administrator.
-
-{% include userman-toplink.md %}

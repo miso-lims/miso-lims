@@ -88,8 +88,8 @@ import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
-import uk.ac.bbsrc.tgac.miso.dto.SampleTissuePieceDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleStockDto;
+import uk.ac.bbsrc.tgac.miso.dto.SampleTissuePieceDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueProcessingDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
@@ -246,7 +246,7 @@ public class SampleRestController extends RestController {
   }
 
   private Long inferIntermediateSampleClassId(DetailedSampleDto dto, Long childClassId,
-      String childClassCategory, String parentCategory, boolean nullOk) {
+      String childClassCategory, String parentCategory, boolean nullOk) throws IOException {
     if (dto.getParentId() != null) {
       return null;
     }

@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -16,7 +18,9 @@ public class SampleClassDto {
   private String creationDate;
   private Long updatedById;
   private String lastUpdated;
-  private Boolean dnaseTreatable;
+  private boolean dnaseTreatable;
+  private List<SampleValidRelationshipDto> parentRelationships;
+  private List<SampleValidRelationshipDto> childRelationships;
 
   public Long getId() {
     return id;
@@ -98,11 +102,11 @@ public class SampleClassDto {
     this.directCreationAllowed = directCreationAllowed;
   }
 
-  public Boolean getDNAseTreatable() {
+  public boolean getDNAseTreatable() {
     return dnaseTreatable;
   }
 
-  public void setDNAseTreatable(Boolean dnaseTreatable) {
+  public void setDNAseTreatable(boolean dnaseTreatable) {
     this.dnaseTreatable = dnaseTreatable;
   }
 
@@ -112,6 +116,22 @@ public class SampleClassDto {
 
   public void setSampleSubcategory(String sampleSubcategory) {
     this.sampleSubcategory = sampleSubcategory;
+  }
+
+  public List<SampleValidRelationshipDto> getParentRelationships() {
+    return parentRelationships;
+  }
+
+  public void setParentRelationships(List<SampleValidRelationshipDto> parentRelationships) {
+    this.parentRelationships = parentRelationships;
+  }
+
+  public List<SampleValidRelationshipDto> getChildRelationships() {
+    return childRelationships;
+  }
+
+  public void setChildRelationships(List<SampleValidRelationshipDto> childRelationships) {
+    this.childRelationships = childRelationships;
   }
 
   @Override

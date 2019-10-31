@@ -2,6 +2,10 @@
 
 Changes:
 
+  * Added FTT_152C1_1WH slide label layout 
+  * Added RIN and DV200 for samples in Pinery-MISO
+  * Added interface for administrators to add, edit, and delete sample classes and relationships
+    (detailed sample)
   * Fixed error where pool created from the Edit Pool Order page was not automatically linked to
     the pool order
 

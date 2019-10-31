@@ -178,7 +178,7 @@ public class RunScannerClient {
           badRuns.remove(dto.getRunAlias());
           Run saved = runService.getRunByAlias(notificationRun.getAlias());
           if (hasFallbackContainerModel(saved)) {
-            if (isNew) {
+            if (isNew && dto.getContainerModel() != null) {
               fallbackContainerModelRuns.add(saved.getAlias());
             }
           } else {

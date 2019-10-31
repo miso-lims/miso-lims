@@ -1,8 +1,4 @@
----
-layout: page
-title: "5. Type Data"
-section: 5
----
+# Type Data
 
 Type data describes sets of items listed as dropdown options in various forms throughout MISO. Most of these options
 can be modified to suit your institute. In most cases, only MISO administrators can make these changes.
@@ -27,8 +23,7 @@ To delete items, go to the list page, check the checkboxes beside the items you 
 
 
 
-{% assign sub = 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Reference Genomes" %}
+## Reference Genomes
 
 Reference genome refers to a file that sequenced data will be aligned to. This is set at the project level, and can be
 changed on both the Create Project and Edit Project page. A reference genome may specify a default scientific name to
@@ -37,15 +32,12 @@ be used for new samples within the project.
 MISO administrators can add, edit, and delete reference genomes using the standard interface. A reference genome can
 only be deleted if it is not used by any existing projects.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Sample Types" %}
+## Sample Types
 
 **WARNING**: Sample type is defined by [NCBI](https://www.ncbi.nlm.nih.gov/) and is required in order to submit samples
-to the ENA (see the [ENA section](european_nucleotide_archive_support.html)). The values available in MISO should be
+to the ENA (see the [ENA section](../european_nucleotide_archive_support/)). The values available in MISO should be
 limited to the default options, which are the same as defined in the ENA schema. If these values are modified, or
 additional options are added, your data may not be valid for ENA submission.
 
@@ -57,28 +49,25 @@ MISO administrators can add, edit, and delete sample types using the standard in
 archived on the bulk Create or Edit page. A sample type can only be deleted if the option has not been used by any
 existing samples.
 
-{% include userman-toplink.md %}
 
 
+## Sample Classes and Categories
 
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Sample Classes and Categories" %}
-
-Note: These items only apply if your site uses [detailed sample mode](site_configuration.html#detailed_sample_mode).
+Note: These items only apply if your site uses [detailed sample mode](../site_configuration/#detailed-sample-mode).
 
 Detailed sample mode introduces a hierarchy of samples. Sample classes identify where a sample fits into the hierarchy.
 Sample categories are used to group sample classes into levels. Sample categories may not be modified. See
-[Detailed Sample Mode](site_configuration.html#detailed_sample_mode) for more information about the sample categories
+[Detailed Sample Mode](../site_configuration/#detailed-sample-mode) for more information about the sample categories
 and ghost samples.
 
-{% assign figure = 1 %}
-Sample classes, and the relationships between them define the sample hierarchy. Both the classes and relationships can
-be customized to suit your requirements. Figure {{figure}} shows the sample hierarchy used at OICR. Sample
-relationships have a parent and child class. This means that if you have a sample of the parent class, you can
-propagate a sample of the child class. In figure {{figure}}, the relationships are illustrated using arrows that point
-from the parent class to the child class.
 
-{% include userman-figure.md num=figure cap="OICR sample hierarchy" img="type-data-sample-hierarchy.png" %}
+Sample classes, and the relationships between them define the sample hierarchy. Both the classes and relationships can
+be customized to suit your requirements. The figure below shows the sample hierarchy used at OICR. Sample
+relationships have a parent and child class. This means that if you have a sample of the parent class, you can
+propagate a sample of the child class.
+
+![OICR sample hierarchy](../images/type-data-sample-hierarchy.png)
+*OICR sample hierarchy. The relationships are illustrated using arrows that point from the parent class to the child class.*
 
 Sample classes and valid relationships can only be modified via direct access to the MISO database, and so must be done
 by a MISO administrator. A custom hierarchy must follow these rules:
@@ -92,7 +81,7 @@ by a MISO administrator. A custom hierarchy must follow these rules:
 
 Sample classes may be archived, which means that they will no longer available when creating new samples. Similarly,
 relationships between classes may also be archived. This means that you will no longer be able to propagate samples
-to create that type of relationship. Using the OICR sample hierarchy in figure {{figure}} as an example, we could
+to create that type of relationship. Using the OICR sample hierarchy in figure 1 as an example, we could
 archive the relationship between Slide and LCM Tube to prevent users from propagating LCM Tubes from Slide samples.
 
 Another option is to prevent direct creation of a sample class. This means that the sample class will be available as
@@ -100,14 +89,11 @@ an option for the aliquot class to use when receiving libraries, but it won't be
 or propagating samples. This is useful if you want to have an "Unknown" type of sample class for cases where libraries
 are received and not much is known about the samples they were made from.
 
-{% include userman-toplink.md %}
 
 
+## Tissue Materials
 
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Tissue Materials" %}
-
-Note: This item only applies if your site uses [detailed sample mode](site_configuration.html#detailed_sample_mode).
+Note: This item only applies if your site uses [detailed sample mode](../site_configuration/#detailed-sample-mode).
 
 Tissue materials describe how the tissue was prepared and may include options such as 'Fresh Frozen,' 'FFPE,' and 'Blood.'
 Tissue material is an optional field for tissue samples.
@@ -115,14 +101,11 @@ Tissue material is an optional field for tissue samples.
 Any user can add tissue materials using the standard interface. MISO administrators can also edit and delete tissue
 materials. A tissue material can only be deleted if the option has not been used by any existing samples.
 
-{% include userman-toplink.md %}
 
 
+## Tissue Origins
 
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Tissue Origins" %}
-
-Note: This item only applies if your site uses [detailed sample mode](site_configuration.html#detailed_sample_mode).
+Note: This item only applies if your site uses [detailed sample mode](../site_configuration/#detailed-sample-mode).
 
 Tissue origins describe what part of the donor or organism the sample was taken from. For human donors, options may
 include 'Brain,' 'Lung,' and 'Pancreas.'
@@ -130,13 +113,10 @@ include 'Brain,' 'Lung,' and 'Pancreas.'
 MISO administrators can add, edit, and delete tissue origins using the standard interface. A tissue origin can only be
 deleted if the option has not been used by any existing samples.
 
-{% include userman-toplink.md %}
 
+## Tissue Piece Types
 
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Tissue Piece Types" %}
-
-Note: This item only applies if your site uses [detailed sample mode](site_configuration.html#detailed_sample_mode).
+Note: This item only applies if your site uses [detailed sample mode](../site_configuration/#detailed-sample-mode).
 
 For tissue processing, slides can be made and then used for various other
 preparations (e.g., LCM). A tissue piece is a sample class that consumes slides
@@ -149,14 +129,10 @@ MISO administrators can add, edit, and delete tissue piece types using the
 standard interface. A tissue piece type can only be deleted if the option has
 not been used by any existing samples.
 
-{% include userman-toplink.md %}
 
+## Tissue Types
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Tissue Types" %}
-
-Note: This item only applies if your site uses [detailed sample mode](site_configuration.html#detailed_sample_mode).
+Note: This item only applies if your site uses [detailed sample mode](../site_configuration/#detailed-sample-mode).
 
 Tissue Type is a classifier for tissue samples. It may be used to categorize the sample. For example, tissue types at
 OICR include the following (and others).
@@ -171,14 +147,11 @@ OICR include the following (and others).
 MISO administrators can add, edit, and delete tissue types using the standard interface. A tissue type can only be
 deleted if the option has not been used by any existing samples.
 
-{% include userman-toplink.md %}
 
 
+## Sample Purposes
 
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Sample Purposes" %}
-
-Note: This item only applies if your site uses [detailed sample mode](site_configuration.html#detailed_sample_mode).
+Note: This item only applies if your site uses [detailed sample mode](../site_configuration/#detailed-sample-mode).
 
 Sample purpose describes the reason an aliquot was created. Example purposes include, 'Library,' 'Validation,' and
 'Extra.'
@@ -186,14 +159,11 @@ Sample purpose describes the reason an aliquot was created. Example purposes inc
 MISO administrators can add, edit, and delete sample purposes using the standard interface. A sample purpose can only
 be deleted if the option has not been used by any existing samples.
 
-{% include userman-toplink.md %}
 
 
+## Labs and Institutes
 
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Labs and Institutes" %}
-
-Note: These items only apply if your site uses [detailed sample mode](site_configuration.html#detailed_sample_mode).
+Note: These items only apply if your site uses [detailed sample mode](../site_configuration/#detailed-sample-mode).
 
 If a sample was received from an external lab, this can be recorded at the tissue level. Each lab belongs to an
 institute.
@@ -203,14 +173,11 @@ edit and delete existing labs and institutes. You will only be allowed to delete
 existing samples. You will only be allowed to delete an institute if it has no labs associated with it. This means that
 if you want to delete an institute, you will first have to delete all of its labs.
 
-{% include userman-toplink.md %}
 
 
+## Detailed QC Status
 
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Detailed QC Status" %}
-
-Note: This item only applies if your site uses [detailed sample mode](site_configuration.html#detailed_sample_mode).
+Note: This item only applies if your site uses [detailed sample mode](../site_configuration/#detailed-sample-mode).
 
 In plain sample mode, samples have a "QC Passed?" field that can be set to true (passed), false (failed), or unknown.
 Detailed sample mode expands upon this with detailed QC status. A detailed QC status does specify a QC status of
@@ -226,14 +193,11 @@ passed, failed, or unknown, but also provides more specific information about th
 MISO administrators can add, edit, and delete detailed QC statuses using the standard interface. A detailed QC status
 can only be deleted if the status has not been used by any existing samples.
 
-{% include userman-toplink.md %}
 
 
+## Stains
 
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Stains" %}
-
-Note: This item only applies if your site uses [detailed sample mode](site_configuration.html#detailed_sample_mode).
+Note: This item only applies if your site uses [detailed sample mode](../site_configuration/#detailed-sample-mode).
 
 Different stains such as Cresyl Violet and Hematoxylin+Eosin may be used on a slide sample. These stains can be broken
 into categories, which is useful if you use many different stains.
@@ -244,12 +208,9 @@ there are no stains associated with it.
 
 
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Library Types" %}
+## Library Types
 
 Library type is a classifier for libraries that depends on the platform type. Library types for Illumina libraries
 include 'Paired End,' 'Single End,' and 'Mate Pair,' for example. Depending on your naming scheme, the library type
@@ -260,16 +221,13 @@ MISO administrators can add, edit, and delete library types using the standard i
 is linked to cannot be changed if the library type has been used for any existing libraries or library templates. A
 library type can only be deleted if the status has not been used by any existing libraries or library templates.
 
-{% include userman-toplink.md %}
 
 
+## Library Designs
 
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Library Designs" %}
+Note: This item only applies if your site uses [detailed sample mode](../site_configuration/#detailed-sample-mode).
 
-Note: This item only applies if your site uses [detailed sample mode](site_configuration.html#detailed_sample_mode).
-
-A library design is a grouping of [selection](#library_selection_types) and [strategy](#library_strategy_types) types
+A library design is a grouping of [selection](#library-selection-types) and [strategy](#library-strategy-types) types
 and a design code. The library designs that are available for a library depend on the sample class of the aliquot that
 the library was propagated from.
 
@@ -279,44 +237,35 @@ libraries, as this would cause the libraries' attributes to be out of sync. A li
 has not been used by any existing libraries. A library design code can only be deleted if it has not been used by any
 existing libraries or library designs.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Library Selection Types" %}
+## Library Selection Types
 
 **WARNING**: Library selection type is defined by [NCBI](https://www.ncbi.nlm.nih.gov/) as the "method used to enrich
 the target in the sequence library preparation" and is required in order to submit libraries to the ENA (see the
-[ENA section](european_nucleotide_archive_support.html)). The values available in MISO should be limited to the default
+[ENA section](../european_nucleotide_archive_support/)). The values available in MISO should be limited to the default
 options, which are the same as defined in the ENA schema. If these values are modified, or additional options are
 added, your data may not be valid for ENA submission.
 
 MISO administrators can add, edit, and delete library selection types using the standard interface. A library selection
 type can only be deleted if it has not been used by any existing libraries.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Library Strategy Types" %}
+## Library Strategy Types
 
 **WARNING**: Library strategy type is defined by [NCBI](https://www.ncbi.nlm.nih.gov/) as the "sequencing type intended
 for this library" and is required in order to submit libraries to the ENA (see the
-[ENA section](european_nucleotide_archive_support.html)). The values available in MISO should be limited to the default
+[ENA section](../european_nucleotide_archive_support/)). The values available in MISO should be limited to the default
 options, which are the same as defined in the ENA schema. If these values are modified, or additional options are
 added, your data may not be valid for ENA submission.
 
 MISO administrators can add, edit, and delete library strategy types using the standard interface. A library strategy
 type can only be deleted if it has not been used by any existing libraries.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Kit Descriptors" %}
+## Kit Descriptors
 
 A kit descriptor describes a kit product that is used for library or run preparation. The types of kits available in
 MISO are:
@@ -333,8 +282,8 @@ To add a new kit descriptor, click the "Add" button in the toolbar at the top of
 will take you to the Create Kit Descriptor page. Enter all of the kit details, then click the "Save" button at the top
 right to create the kit descriptor.
 
-Once a kit has been created, it is possible to link existing [Targeted Sequencing](#targeted_sequencing) values to the
-kit descriptor. Then, if a library is prepared using this kit descriptor, aliquots created from the library can be 
+Once a kit has been created, it is possible to link existing [Targeted Sequencing](#targeted-sequencing) values to the
+kit descriptor. Then, if a library is prepared using this kit descriptor, aliquots created from the library can be
 assigned a targeted sequencing from the targeted sequencings linked to the kit descriptor. This means that if a desired
 targeted sequencing is not available for a library aliquot, this can be solved by linking the targeted sequencing to
 the kit descriptor of the library aliquot's parent library.
@@ -343,12 +292,10 @@ MISO administrators can delete kit descriptors using the standard interface. Lib
 are not used by any existing libraries. Clustering and multiplexing kits can only be deleted if they are not used by
 any existing sequencing containers.
 
-{% include userman-toplink.md %}
 
 
 
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Indices" %}
+## Indices
 
 Indices, also known as barcodes or primers, are sequences that are added to libraries in order to identify which
 library each individual DNA fragment came from in a multiplexed pool. An index family is a collection of these indices
@@ -383,23 +330,17 @@ creating new libraries.
 
 MISO administrators can add, edit, and delete indices using the standard interface within the Edit Index Family page.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Library Spike-Ins" %}
+## Library Spike-Ins
 
 A library spike-in is a control added to a library for normalization. MISO administrators can add, edit, and delete
 library spike-ins using the standard interface. A library spike-in can only be deleted if it has not been used by any
 existing libraries.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Targeted Sequencing" %}
+## Targeted Sequencing
 
 Targeted sequencing allows specific sections of the genome to be sequenced resulting in more depth and lower cost. The
 targeted sequencing value specified on a library aliquot should be associated with a .bed file that will be used for
@@ -415,12 +356,9 @@ Targeted sequencings are associated with kits, and a targeted sequencing may onl
 parent library uses an associated kit. Targeted sequencings can be associated with a kit from the Edit Kit Descriptor
 page.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Order Purposes" %}
+## Order Purposes
 
 Order purposes describe the reason for a sequencing order, such as QC or production. A pool order may also specify an
 order purpose if it includes sequencing requirements.
@@ -428,12 +366,9 @@ order purpose if it includes sequencing requirements.
 MISO administrators can add, edit, and delete order purposes using the standard interface. An order purpose can only be
 deleted if it has not been used by any existing pool orders or sequencing orders.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="QC Types" %}
+## QC Types
 
 QC types identify instruments or methods used to QC an item. A QC type may target samples, libraries, pools, sequencing
 containers, or runs. Some QC types may be linked to one of the target's fields. For example, a "Volume Check" QC type
@@ -443,12 +378,9 @@ the item's related field is updated automatically.
 MISO administrators can add, edit, and delete QC types using the standard interface. A QC type can only be deleted if
 there are no existing QCs of the type.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Partition QC Types" %}
+## Partition QC Types
 
 Partition QCs describe the status of a sequenced partition and allows individual partitions within a run to have their
 own status, rather than grouping them all together with the run's status. Partition QCs can be used to determine
@@ -457,27 +389,21 @@ whether the partition counts towards order fulfillment, and whether downstream a
 MISO administrators can add, edit, and delete partition QC types using the standard interface. A partition QC type can
 only be deleted if the type has not been used by any existing partitions.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Box Sizes" %}
+## Box Sizes
 
 A box in MISO describes a physical container that holds multiple samples, libraries, library aliquots, and/or pools.
 Box sizes define the possible dimensions of these boxes. A box size may be marked as scannable. This means that the box
-can be scanned using a bulk barcode scanner (see [Barcode Scanners](site_configuration.html#barcode_scanners)).
+can be scanned using a bulk barcode scanner (see [Barcode Scanners](../site_configuration/#barcode-scanners)).
 
 MISO administrators can add, edit, and delete box sizes using the standard interface. Box size dimensions cannot be
 modified if there are any existing boxes using the size. A box size can only be deleted if the size has not been used
 by any existing boxes.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Box Uses" %}
+## Box Uses
 
 A box in MISO describes a physical container that holds multiple samples, libraries, library aliquots, and/or pools.
 Box uses are used to categorize these boxes. The Boxes list page is broken into tabs - one for each box use.
@@ -485,12 +411,9 @@ Box uses are used to categorize these boxes. The Boxes list page is broken into 
 MISO administrators can add, edit, and delete box uses using the standard interface. A box use can only be deleted if
 it has not been used by any existing boxes.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Instrument Models" %}
+## Instrument Models
 
 Instrument models describe the instrument types that can be registered in MISO. These can be broken into three
 categories:
@@ -510,12 +433,9 @@ container models must already exist, and can be looked up by alias or barcode.
 MISO administrators can delete instrument models using the standard interface. An instrument model can only be deleted
 if there are no exiting instruments of that model.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Sequencing Container Models" %}
+## Sequencing Container Models
 
 Most instrument models may be run with different sequencing container models. Some sequencing container models may also
 be used by multiple instrument models. A sequencing container must specify its model, and this is used to determine
@@ -526,12 +446,9 @@ a new container model, it can be linked to instrument models from the Edit Instr
 only be deleted if it has not been used by any existing sequencing containers. Alternately, container models no longer
 in use can be archived.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Sequencing Parameters" %}
+## Sequencing Parameters
 
 Sequencing parameters describe the settings that a sequencer run was configured with for a run. They include details
 such as the chemistry version and read lengths. When making orders, you can choose the parameters that are required.
@@ -541,23 +458,17 @@ been completed.
 MISO administrators can add, edit, and delete sequencing parameters using the standard interface. A sequencing
 parameters option can only be deleted if it has not been used by any existing runs or orders.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Oxford Nanopore Flow Cell Pore Versions" %}
+## Oxford Nanopore Flow Cell Pore Versions
 
 Oxford Nanopore flow cells (sequencing containers) specify a pore version. This can be recorded in MISO for any Oxford
 Nanopore flow cells. Modifications to pore version options can only be made via direct access to the MISO database. As
 such, they must be performed by a MISO adminstrator.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Array Models" %}
+## Array Models
 
 Array models are similar to sequencing container models, except they describe the chip or cartridge that the array is
 loaded into, including the number of samples it can hold.
@@ -565,21 +476,15 @@ loaded into, including the number of samples it can hold.
 MISO administrators can add, edit, and delete array models using the standard interface. An array model can only be
 deleted if it is not used by any existing arrays.
 
-{% include userman-toplink.md %}
 
 
-
-{% assign sub = sub | plus: 1 %}
-{% include userman-heading.md section=page.section sub=sub title="Study Types" %}
+## Study Types
 
 **WARNING**: Study type is defined by [NCBI](https://www.ncbi.nlm.nih.gov/) as "expressing the overall purpose of the
 study." This property is required in order to submit studies to the ENA (see the
-[ENA section](european_nucleotide_archive_support.html)). The values available in MISO should be limited to the default
+[ENA section](../european_nucleotide_archive_support/)). The values available in MISO should be limited to the default
 options, which are the same as defined in the ENA schema. If these values are modified, or additional options are
 added, your data may not be valid for ENA submission.
 
 MISO administrators can add, edit, and delete study types using the standard interface. A study type can only be
 deleted if it is not used by any existing studies.
-
-{% include userman-toplink.md %}
-

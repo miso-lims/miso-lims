@@ -104,12 +104,12 @@ public class DefaultWorkflowExecutor implements WorkflowExecutor {
     if (sample.getSubproject() != null) aliquot.setSubproject(sample.getSubproject());
     aliquot.setGroupId(sample.getGroupId());
     aliquot.setGroupDescription(sample.getGroupDescription());
-    aliquot.setSampleClass(sampleClassService.getAll().stream()
+    aliquot.setSampleClass(sampleClassService.list().stream()
         .filter(sampleClass -> {
           try {
             return sampleClass.getSampleCategory().equals("Aliquot") && sampleValidRelationshipService.getAll().stream()
                 .anyMatch(
-                    validRelationship -> !validRelationship.getArchived()
+                    validRelationship -> !validRelationship.isArchived()
                         && validRelationship.getChild().getId() == sampleClass.getId()
                         && validRelationship.getParent().getId() == sample.getSampleClass().getId());
           } catch (IOException e) {

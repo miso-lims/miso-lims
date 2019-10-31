@@ -106,7 +106,7 @@ public class ValueTypeLookup {
    * @throws IOException if an there is an error pulling data from misoServiceManager
    */
   public ValueTypeLookup(MisoServiceManager misoServiceManager) throws IOException {
-    setSampleClasses(misoServiceManager.getSampleClassDao().getSampleClass());
+    setSampleClasses(misoServiceManager.getSampleClassDao().list());
     setTissueTypes(misoServiceManager.getTissueTypeDao().list());
     setTissueMaterials(misoServiceManager.getTissueMaterialDao().getTissueMaterial());
     setKits(misoServiceManager.getKitDao().listAllKitDescriptors());
