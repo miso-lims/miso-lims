@@ -107,7 +107,10 @@ FormTarget.box = (function($) {
 
   function makeLocationSelect(form) {
     var controls = [];
-    controls.push($('<input>').attr('id', 'freezerLocationScan').attr('type', 'text').css('width', '120px').keyup(function(event) {
+    controls.push($('<input>').attr('id', 'freezerLocationScan').attr('type', 'text').css({
+      'width': '25%',
+      'min-width': '120px'
+    }).keyup(function(event) {
       if (event.which == "13") {
         onLocationScan();
       }
@@ -117,7 +120,10 @@ FormTarget.box = (function($) {
       }, 100);
     }).after(' '));
     controls.push($('<span>').attr('id', 'freezerLocationRoot').after(' '));
-    controls.push($('<select>').attr('id', 'freezerLocationSelect').change(onLocationSelect).after(' '));
+    controls.push($('<select>').attr('id', 'freezerLocationSelect').css({
+      'width': '50%',
+      'min-width': '250px'
+    }).change(onLocationSelect).after(' '));
     controls.push($('<img>').attr('id', 'freezerLocationLoader').addClass('fg-button hidden').attr('src', '/styles/images/ajax-loader.gif')
         .css('display', 'none').after(' '));
     controls.push($('<button>').attr('id', 'setFreezerLocation').addClass('ui-state-default').attr('type', 'button').text('Set').click(
