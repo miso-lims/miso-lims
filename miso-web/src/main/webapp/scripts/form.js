@@ -396,7 +396,9 @@ FormUtils = (function($) {
       },
       save: function(postSaveCallback) {
         validateAndSave(containerId, object, target, sections, config, function(data) {
-          updateOriginal();
+          if (containerId !== dialogFormId) {
+            updateOriginal();
+          }
           if (postSaveCallback) {
             postSaveCallback(data);
           } else {
