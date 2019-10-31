@@ -306,6 +306,10 @@ table.in textarea {
     font-family: inherit;
 }
 
+table.in select {
+    width: 95%
+}
+
 table.in select[multiple="multiple"] {
     background-color: #EEEEFF;
     border-left: 1px solid #666699;
