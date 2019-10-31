@@ -7,12 +7,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 
 public interface SampleValidRelationshipService {
 
-  SampleValidRelationship get(Long sampleValidRelationshipId) throws IOException;
+  public SampleValidRelationship get(Long sampleValidRelationshipId) throws IOException;
 
-  Long create(SampleValidRelationship sampleValidRelationship, Long parentSampleClassId, Long childSampleClassId) throws IOException;
+  public Set<SampleValidRelationship> getAll() throws IOException;
 
-  void update(SampleValidRelationship sampleValidRelationship, Long parentSampleClassId, Long childSampleClassId) throws IOException;
-
-  Set<SampleValidRelationship> getAll() throws IOException;
+  public void delete(SampleValidRelationship sampleValidRelationship) throws IOException;
 
 }

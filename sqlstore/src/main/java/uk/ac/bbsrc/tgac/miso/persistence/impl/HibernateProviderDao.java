@@ -20,9 +20,9 @@ public abstract class HibernateProviderDao<T> implements ProviderDao<T> {
   @Autowired
   private SessionFactory sessionFactory;
 
-  private final Class<T> entityClass;
+  private final Class<? extends T> entityClass;
 
-  public HibernateProviderDao(Class<T> entityClass) {
+  public HibernateProviderDao(Class<? extends T> entityClass) {
     this.entityClass = entityClass;
   }
 
@@ -34,7 +34,7 @@ public abstract class HibernateProviderDao<T> implements ProviderDao<T> {
     this.sessionFactory = sessionFactory;
   }
 
-  protected Class<T> getEntityClass() {
+  protected Class<? extends T> getEntityClass() {
     return entityClass;
   }
 

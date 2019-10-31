@@ -96,6 +96,7 @@
     <c:if test="${detailedSample}">
       <h2>Institute Defaults</h2>
       <div class="menu">
+        <a href="<c:url value="/miso/sampleclass/list"/>">Sample Classes</a>
         <a href="<c:url value="/miso/tissuematerial/list"/>">Tissue Materials</a>
         <a href="<c:url value="/miso/tissueorigin/list"/>">Tissue Origins</a>
         <a href="<c:url value="/miso/tissuetype/list"/>">Tissue Types</a>

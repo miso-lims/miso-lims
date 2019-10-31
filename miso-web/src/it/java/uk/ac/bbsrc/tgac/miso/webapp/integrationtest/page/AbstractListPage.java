@@ -108,6 +108,7 @@ public interface AbstractListPage {
     public static final String STOCK_LEVEL = "Stock Level";
     public static final String STOPPED = "Stopped";
     public static final String STORAGE_LOCATION = "Storage Location";
+    public static final String SUBCATEGORY = "Subcategory";
     public static final String TARGETED_SEQUENCING = "Targeted Sequencing";
     public static final String TARGETED_SEQUENCING_REQD = "Targeted Sequencing Required";
     public static final String TYPE = "Type";
@@ -156,6 +157,7 @@ public interface AbstractListPage {
     public static final String REFERENCE_GENOMES = "referencegenome/list";
     public static final String RUNS = "runs";
     public static final String SAMPLES = "samples";
+    public static final String SAMPLE_CLASSES = "sampleclass/list";
     public static final String SAMPLE_TYPES = "sampletype/list";
     public static final String SEQUENCING_PARAMETERS = "sequencingparameters/list";
     public static final String STAINS = "stain/list";

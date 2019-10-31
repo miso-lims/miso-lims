@@ -1,19 +1,16 @@
 package uk.ac.bbsrc.tgac.miso.persistence;
 
+import java.io.IOException;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 
-public interface SampleClassDao {
+public interface SampleClassDao extends SaveDao<SampleClass> {
 
-  List<SampleClass> getSampleClass();
+  public SampleClass getByAlias(String alias) throws IOException;
+
+  public List<SampleClass> listByCategory(String sampleCategory) throws IOException;
   
-  List<SampleClass> listByCategory(String sampleCategory);
-
-  SampleClass getSampleClass(Long id);
-
-  Long addSampleClass(SampleClass sampleClass);
-
-  void update(SampleClass sampleClass);
+  public long getUsage(SampleClass sampleClass) throws IOException;
 
 }
