@@ -127,8 +127,7 @@ public class TissueTypeImpl implements TissueType {
    */
   @Override
   public String getItemLabel() {
-    String label = getAlias() + " (" + getDescription() + ")";
-    return (label.length() < 51 ? label : label.substring(0, 49) + "\u2026");
+    return getAlias() + " (" + getDescription() + ")";
   }
 
   @Override

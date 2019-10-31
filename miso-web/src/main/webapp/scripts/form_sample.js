@@ -315,11 +315,7 @@ FormTarget.sample = (function($) {
                 return Constants.tissueTypes.sort(Utils.sorting.standardSortWithException('alias', 'n'));
               },
               getItemLabel: function(item) {
-                var label = item.alias + ' (' + item.description + ')';
-                if (label.length > 50) {
-                  label = label.substring(0, 49) + '…)';
-                }
-                return label;
+                return item.label;
               },
               getItemValue: function(item) {
                 return item.id;
@@ -375,7 +371,7 @@ FormTarget.sample = (function($) {
                 return Constants.labs.sort(Utils.sorting.standardSort('alias'));
               },
               getItemLabel: function(item) {
-                return item.alias + ' (' + item.instituteAlias + ')';
+                return item.label;
               },
               getItemValue: function(item) {
                 return item.id;

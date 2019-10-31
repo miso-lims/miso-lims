@@ -8,6 +8,7 @@ Changes:
     (detailed sample)
   * Fixed error where pool created from the Edit Pool Order page was not automatically linked to
     the pool order
+  * Fixed copying tissue type and lab values from Excel by no longer truncating the labels
 
 # 0.2.194
 
