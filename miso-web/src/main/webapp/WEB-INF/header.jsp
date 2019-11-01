@@ -43,33 +43,33 @@
   <jsp:useBean id="timestamp" class="java.util.Date" scope="request"/>
 
   <title><c:if test="${not empty title}">${title} &mdash; </c:if>MISO LIMS ${misoInstanceName}</title>
-          
+
   <!-- jQuery -->
   <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery-1.8.3.min.js'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery-ui-1.9.2.custom.min.js'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.validate.min.js'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/jquery/colorbox/jquery.colorbox-min-1.4.16.js'/>"></script>
   <link rel="stylesheet" href="<c:url value='/scripts/jquery/css/smoothness/jquery-ui-1.9.2.custom.min.css'/>"
-    type="text/css">  
+    type="text/css">
   <link rel="stylesheet" href="<c:url value='/scripts/jquery/colorbox/colorbox-1.4.16.css'/>"
     type="text/css">
   <!-- give $ back to prototype -->
   <script type="text/javascript">jQuery.noConflict();</script>
-  
+
   <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.simplyCountable.js'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.tinysort.min.js'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.typewatch.js'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.uitablefilter.js'/>"></script>
- 
+
   <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.tablesorter.min.js'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.metadata.js'/>"></script>
-  
+
   <!-- unicode regexs for il8n validation -->
   <script type="text/javascript" src="<c:url value='/scripts/xregexp-all-min.js'/>"></script>
-  
+
   <!-- D3.js for Graphics -->
   <script type="text/javascript" src="<c:url value='/scripts/d3v2/d3.v2.min.js'/>"></script>
-  
+
   <!-- high charts -->
   <script type="text/javascript" src="<c:url value='/scripts/highcharts/highcharts.js'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/highcharts/highcharts-more.js'/>"></script>
@@ -115,7 +115,7 @@
   <div class="cell">
     <sec:authorize access="isAuthenticated()">
       <div id="loggedInBanner">
-        <a href="http://miso-lims.github.io/miso-lims/${miso:docsVersion()}/usr/user-manual-table-of-contents.html">Help</a> |
+        <a href="https://miso-lims.readthedocs.io/projects/docs/en/${miso:docsVersion()}/user_manual/">Help</a> |
         <a href="https://gitter.im/miso-lims/users">Chat</a> |
         <c:if test="${misoBugUrl != null}">
           <a href="${misoBugUrl}" target="_blank">Report a problem</a> |

@@ -1,4 +1,4 @@
-site_name: MISO LIMS
+site_name: MISO LIMS Documentation
 site_url: http://miso-lims.github.io
 site_description: MISO LIMS Documentation
 site_author: Genome Sequence Informatics, Ontario Institute for Cancer Research
@@ -11,6 +11,7 @@ theme:
   hljs_languages:
     - yaml
     - bash
+  logo: images/miso.png
 
 nav:
   - About: index.md
