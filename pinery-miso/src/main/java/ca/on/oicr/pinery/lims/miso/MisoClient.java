@@ -636,6 +636,8 @@ public class MisoClient implements Lims {
         String workflowType = workflowTypeMapper.get(rawWorkflowType);
         r.setWorkflowType(workflowType != null ? workflowType : rawWorkflowType);
       }
+      r.setContainerModel(rs.getString("containerModel"));
+      r.setSequencingKit(rs.getString("sequencingKit"));
 
       return r;
     }

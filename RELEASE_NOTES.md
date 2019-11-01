@@ -9,6 +9,7 @@ Changes:
   * Added interface for administrators to add, edit, and delete sample classes and relationships
     (detailed sample)
   * Added sequencing kits to runs
+  * Added sequencing kit and container model to Pinery-MISO runs
   * Fixed error where pool created from the Edit Pool Order page was not automatically linked to
     the pool order
   * Fixed error where sorting the bulk libraries page by sample location (including the default
