@@ -254,4 +254,11 @@ public class HibernateKitDao implements KitStore, HibernatePaginatedDataSource<K
         .setProjection(Projections.rowCount()).uniqueResult();
   }
 
+  @Override
+  public long getUsageByRuns(KitDescriptor kitDescriptor) throws IOException {
+    return (long) currentSession().createCriteria(LibraryImpl.class)
+        .add(Restrictions.eq("sequencingKit", kitDescriptor))
+        .setProjection(Projections.rowCount()).uniqueResult();
+  }
+
 }

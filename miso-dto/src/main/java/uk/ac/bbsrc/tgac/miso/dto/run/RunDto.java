@@ -35,6 +35,7 @@ public class RunDto {
   private String progress;
   private Long sequencingParametersId;
   private String sequencingParametersName;
+  private Long sequencingKitId;
   private String runPath;
   private List<ContainerDto> containers;
 
@@ -156,6 +157,14 @@ public class RunDto {
 
   public void setSequencingParametersName(String sequencingParametersName) {
     this.sequencingParametersName = sequencingParametersName;
+  }
+
+  public Long getSequencingKitId() {
+    return sequencingKitId;
+  }
+
+  public void setSequencingKitId(Long sequencingKitId) {
+    this.sequencingKitId = sequencingKitId;
   }
 
   public String getRunPath() {

@@ -60,6 +60,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
@@ -142,6 +143,11 @@ public abstract class Run
   @ManyToOne
   @JoinColumn(name = "sequencingParameters_parametersId")
   private SequencingParameters sequencingParameters;
+
+  @ManyToOne
+  @JoinColumn(name = "sequencingKitId")
+  private KitDescriptor sequencingKit;
+
   @Temporal(TemporalType.DATE)
   private Date startDate;
 
@@ -424,6 +430,14 @@ public abstract class Run
 
   public String getProgress() {
     return getHealth() == HealthType.Running ? "Running" : "";
+  }
+
+  public KitDescriptor getSequencingKit() {
+    return sequencingKit;
+  }
+
+  public void setSequencingKit(KitDescriptor sequencingKit) {
+    this.sequencingKit = sequencingKit;
   }
 
   @Override

@@ -1857,6 +1857,7 @@ public class Dtos {
       dto.setSequencingParametersId(from.getSequencingParameters().getId());
       dto.setSequencingParametersName(from.getSequencingParameters().getName());
     }
+    setId(dto::setSequencingKitId, from.getSequencingKit());
     dto.setProgress(from.getProgress());
     dto.setRunPath(from.getFilePath());
 
@@ -1921,6 +1922,7 @@ public class Dtos {
     setDate(to::setStartDate, dto.getStartDate());
     setDate(to::setCompletionDate, dto.getEndDate());
     setObject(to::setSequencingParameters, SequencingParameters::new, dto.getSequencingParametersId());
+    setObject(to::setSequencingKit, KitDescriptor::new, dto.getSequencingKitId());
     setString(to::setFilePath, dto.getRunPath());
     return to;
   }
@@ -2460,6 +2462,11 @@ public class Dtos {
     to.setStartDate(LimsUtils.toBadDate(from.getStartDate()));
     to.setCompletionDate(LimsUtils.toBadDate(from.getCompletionDate()));
     to.setMetrics(from.getMetrics());
+    if (from.getSequencingKit() != null) {
+      to.setSequencingKit(new KitDescriptor());
+      to.getSequencingKit().setName(from.getSequencingKit());
+      to.getSequencingKit().setPartNumber(from.getSequencingKit());
+    }
   }
 
   public static TargetedSequencingDto asDto(@Nonnull TargetedSequencing from) {
