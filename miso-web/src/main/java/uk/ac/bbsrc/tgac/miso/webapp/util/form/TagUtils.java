@@ -53,12 +53,12 @@ public class TagUtils {
   }
 
   public static String docsVersion() {
-    if (Version.VERSION.matches("^\\d*\\.\\d*\\.\\d*$")) {
-      //FIXME once we know how readthedocs handles version tags
-      return Version.VERSION;
-    } else {
+     //FIXME once we know how readthedocs handles version tags
+//    if (Version.VERSION.matches("^\\d*\\.\\d*\\.\\d*$")) {
+//      return Version.VERSION;
+//    } else {
       return "latest";
-    }
+//    }
   }
 
 }
