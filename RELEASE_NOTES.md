@@ -8,6 +8,8 @@ Changes:
     (detailed sample)
   * Fixed error where pool created from the Edit Pool Order page was not automatically linked to
     the pool order
+  * Fixed error where sorting the bulk libraries page by sample location (including the default
+    sort when propagating from the Edit Box Page) reset options in some of the dropdowns
 
 # 0.2.194
 

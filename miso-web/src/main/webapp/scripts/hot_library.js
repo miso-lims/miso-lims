@@ -249,8 +249,7 @@ HotTarget.library = (function() {
     onLoad: function(config, table) {
       if (config.sort) {
         var sortOption = sortOptions[config.sort];
-        var sortColIndex = table.propToCol(sortOption.sortColumn);
-        HotUtils.sortTable(table, sortColIndex, sortOption.sortFunction);
+        HotUtils.sortTable(table, sortOption.sortColumn, sortOption.sortFunction);
       }
     },
     getFixedColumns: function(config) {

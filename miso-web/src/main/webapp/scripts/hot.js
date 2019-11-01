@@ -227,6 +227,7 @@ var HotUtils = {
       return flatObj;
     });
     var anyInvalidCells = false;
+    var sortFunctions = {};
     var table = new Handsontable(hotContainer, {
       licenseKey: 'non-commercial-and-evaluation',
       fixedColumnsLeft: target.hasOwnProperty('getFixedColumns') ? target.getFixedColumns(config) : 1,
@@ -242,7 +243,13 @@ var HotUtils = {
       data: flatObjects,
       maxRows: data.length,
       renderAllRows: true,
-      columnSorting: true,
+      columnSorting: {
+        compareFunctionFactory: function(sortOrder, columnMeta) {
+          return sortFunctions[columnMeta.data] || function(value, nextValue) {
+            return value.localeCompare(nextValue);
+          };
+        }
+      },
       cells: function(row, col, prop) {
         var cellProperties = {};
 
@@ -376,6 +383,8 @@ var HotUtils = {
       }
     });
 
+    table.sortFunctions = sortFunctions;
+
     table.getDtoData = function() {
       var errorHandler = function(errorMessage) {
         // ignore errors since we are not saving yet
@@ -487,13 +496,13 @@ var HotUtils = {
       }
     });
 
-    var makeSortButton = function(sortOption, sortColIndex) {
+    var makeSortButton = function(sortOption, sortProperty) {
       var button = document.createElement('SPAN');
       button.setAttribute('class', 'ui-button ui-state-default');
       button.id = 'sort' + sortOption.sortTarget;
       button.innerText = sortOption.buttonText;
       button.addEventListener('click', function() {
-        HotUtils.sortTable(table, sortColIndex, sortOption.sortFunc);
+        HotUtils.sortTable(table, sortProperty, sortOption.sortFunc);
       });
       return button;
     };
@@ -503,7 +512,7 @@ var HotUtils = {
       return column.customSorting;
     }).forEach(function(column) {
       column.customSorting.forEach(function(sortOption) {
-        var sortBy = makeSortButton(sortOption, column.hotIndex);
+        var sortBy = makeSortButton(sortOption, column.data);
         document.getElementById('bulkactions').appendChild(sortBy);
       });
     });
@@ -1526,17 +1535,11 @@ var HotUtils = {
     }
   },
 
-  sortTable: function(table, sortColIndex, sortFunction) {
-    var settings = table.getSettings();
-    settings.columns[sortColIndex].columnSorting = {
-      compareFunctionFactory: function(sortOrder, columnMeta) {
-        return sortFunction;
-      }
-    };
-    table.updateSettings(settings);
+  sortTable: function(table, sortProperty, sortFunction) {
+    table.sortFunctions[sortProperty] = sortFunction;
 
     table.getPlugin('columnSorting').sort({
-      column: sortColIndex,
+      column: table.propToCol(sortProperty),
       sortOrder: 'asc'
     });
   },
