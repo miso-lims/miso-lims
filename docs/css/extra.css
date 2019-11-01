@@ -1,0 +1,71 @@
+
+
+.fa-home:before, .icon-home:before {
+  content: url(../images/miso_icon.svg);
+}
+
+/*Page links*/
+a {
+  color: #404087;
+}
+
+/*Top left page name*/
+.wy-side-nav-search>a {
+  color: #666666;
+}
+
+/*Unlinked top level menu items*/
+.caption-text {
+  font-size: 4em;
+  margin: 0.8em 0em 0em 0em;
+  color: #666666;
+  font-weight: bold;
+  font-size:100% !important;
+
+}
+
+/*Top level menu links*/
+.wy-menu-vertical a {
+  font-size: 4em;
+  color: #666666;
+  font-weight: bold;
+  font-size: 100% !important;
+}
+
+.wy-menu-vertical a:hover {
+  color: #FFFFFF;
+}
+
+/*Second level menu links*/
+.wy-menu-vertical li ul li a {
+  font-size:1em;
+  color: #666666;
+  font-weight: normal;
+}
+
+
+
+/* All four of these are necessary to change the color of the sidebar...!*/
+/*Top*/
+.wy-side-nav-search {
+  background: #F0F0FF;
+}
+/*Main sidebar background*/
+.wy-nav-side {
+  background: #F0F0FF;
+}
+/*Margin on top of Github bar*/
+.rst-versions{
+  border-top:solid 10px #F0F0FF;
+}
+/*Github bar*/
+/* .rst-versions .rst-current-version {
+  background: #000000;
+} */
+.wy-nav-top {
+  background: #F0F0FF;
+  color: #666666;
+}
+.wy-nav-top>a {
+  color: #666666;
+}

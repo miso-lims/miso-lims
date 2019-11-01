@@ -127,8 +127,7 @@ public class LabImpl implements Lab {
 
   @Override
   public String getItemLabel() {
-    String label = getAlias() + " (" + getInstitute().getAlias() + ")";
-    return (label.length() < 51 ? label : label.substring(0, 49) + "\u2026");
+    return getAlias() + " (" + getInstitute().getAlias() + ")";
   }
 
   @Override

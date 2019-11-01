@@ -1,11 +1,12 @@
-[![Build Status](https://travis-ci.org/miso-lims/miso-lims.svg?branch=develop)](https://travis-ci.org/miso-lims/miso-lims) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=uk.ac.bbsrc.tgac.miso:miso&metric=alert_status)](https://sonarcloud.io/dashboard?id=uk.ac.bbsrc.tgac.miso:miso) [![DOI](https://zenodo.org/badge/4726428.svg)](https://zenodo.org/badge/latestdoi/4726428) [![Gitter](https://badges.gitter.im/miso-lims/community.svg)](https://gitter.im/miso-lims/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Build Status](https://travis-ci.org/miso-lims/miso-lims.svg?branch=develop)](https://travis-ci.org/miso-lims/miso-lims) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=uk.ac.bbsrc.tgac.miso:miso&metric=alert_status)](https://sonarcloud.io/dashboard?id=uk.ac.bbsrc.tgac.miso:miso) [![DOI](https://zenodo.org/badge/4726428.svg)](https://zenodo.org/badge/latestdoi/4726428) [![Gitter](https://badges.gitter.im/miso-lims/community.svg)](https://gitter.im/miso-lims/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) [![Documentation Status](https://readthedocs.org/projects/miso-lims-docs/badge/?version=latest)](https://miso-lims.readthedocs.io/projects/docs/en/latest/?badge=latest)
+
 
 
 # MISO: An open source LIMS for small-to-large scale sequencing centres
 
-&copy; 2017. [Earlham Institute](http://earlham.ac.uk/), Norwich, UK, [Ontario Institute for Cancer Research](http://oicr.on.ca), Toronto, Canada
+&copy; 2019. [Ontario Institute for Cancer Research](http://oicr.on.ca), Toronto, Canada, [Earlham Institute](http://earlham.ac.uk/), Norwich, UK.
 
-> MISO project contacts: [Robert Davey](robert.davey@earlham.ac.uk), [Morgan Taschuk](morgan.taschuk@oicr.on.ca)
+> MISO project contacts: [Morgan Taschuk](morgan.taschuk@oicr.on.ca), [Robert Davey](robert.davey@earlham.ac.uk)
 >
 > MISO is free software: you can redistribute it and/or modify
 > it under the terms of the GNU General Public License as published by
@@ -89,7 +90,7 @@ networks and release their resources to the host operating system.
 
 These compose files are intended as a demonstration and __not a permanent installation__.
 
-Please see the [Docker Compose Guide](http://miso-lims.github.io/miso-lims/latest/adm/compose-installation-guide) for more information on configuring the containers and the compose files.
+Please see the [Docker Compose Guide](https://miso-lims.readthedocs.io/projects/docs/en/latest/admin/compose-installation-guide/) for more information on configuring the containers and the compose files.
 
 
 ## User Tutorial
@@ -108,7 +109,7 @@ lab's specific needs.
 To run your own MISO instance in the long term, download the
 [latest release](https://github.com/miso-lims/miso-lims/releases/latest).
 
-Installation and configuration details can be found in the [MISO installation guide](http://miso-lims.github.io/miso-lims/latest/adm/installation-guide.html).
+Installation and configuration details can be found in the [MISO building and deploying guide](https://miso-lims.readthedocs.io/projects/docs/en/latest/admin/installation-guide/).
 
 ## Contact and Community
 
@@ -116,4 +117,3 @@ Installation and configuration details can be found in the [MISO installation gu
 - [MISO Community Gitter](https://gitter.im/miso-lims/community) : for user group and developer questions and discussion
 - [MISO Users Gitter](https://gitter.im/miso-lims/users) : for user group questions and discussion
 - [MISO Developers Gitter](https://gitter.im/miso-lims/developers) : for developer questions and discussion
-- [Slack Group](https://miso-lims.slack.com/) : for developers
