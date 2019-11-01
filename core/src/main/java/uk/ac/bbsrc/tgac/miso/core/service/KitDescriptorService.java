@@ -14,6 +14,8 @@ public interface KitDescriptorService extends DeleterService<KitDescriptor>, Lis
 
   public long saveTargetedSequencingRelationships(KitDescriptor kitDescriptor) throws IOException;
 
+  public KitDescriptor getByName(String name) throws IOException;
+
   public KitDescriptor getByPartNumber(String partNumber) throws IOException;
 
 }

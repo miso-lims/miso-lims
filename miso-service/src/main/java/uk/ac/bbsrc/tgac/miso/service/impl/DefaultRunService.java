@@ -52,7 +52,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SequencerPartitionContainerChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -60,6 +62,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
+import uk.ac.bbsrc.tgac.miso.core.service.KitDescriptorService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
@@ -122,6 +125,8 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   private PoolService poolService;
   @Autowired
   private SequencingContainerModelService containerModelService;
+  @Autowired
+  private KitDescriptorService kitDescriptorService;
   @Autowired
   private FileAttachmentService fileAttachmentService;
 
@@ -287,6 +292,9 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       run.setSequencingParameters(sequencingParametersService.get(run.getSequencingParameters().getId()));
     }
     run.setSequencer(instrumentService.get(run.getSequencer().getId()));
+    if (run.getSequencingKit() != null) {
+      run.setSequencingKit(kitDescriptorService.get(run.getSequencingKit().getId()));
+    }
   }
 
   private void validateChanges(Run before, Run changed) throws IOException {
@@ -319,6 +327,9 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       }
     }
 
+    if (changed.getSequencingKit() != null && changed.getSequencingKit().getKitType() != KitType.SEQUENCING) {
+      errors.add(new ValidationError("sequencingKitId", "Must be a sequencing kit"));
+    }
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
@@ -339,6 +350,7 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     applyContainerChanges(target, source);
     target.setSequencingParameters(source.getSequencingParameters());
     target.setSequencer(source.getSequencer());
+    target.setSequencingKit(source.getSequencingKit());
     if (isIlluminaRun(target)) {
       applyIlluminaChanges((IlluminaRun) target, (IlluminaRun) source);
     } else if (isLS454Run(target)) {
@@ -548,6 +560,7 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
 
     isMutated |= updateContainerFromNotification(target, user, model, containerSerialNumber, getLaneContents, positionName);
     isMutated |= updateHealthFromNotification(source, target, user);
+    isMutated |= updateSequencingKitFromNotification(target, source.getSequencingKit());
 
     switch (source.getPlatformType()) {
     case ILLUMINA:
@@ -762,6 +775,21 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       }
     }
     return false;
+  }
+
+  private boolean updateSequencingKitFromNotification(Run target, KitDescriptor kit) throws IOException {
+    if (kit == null) {
+      boolean changed = target.getSequencingKit() != null;
+      target.setSequencingKit(null);
+      return changed;
+    }
+    KitDescriptor managedKit = kitDescriptorService.getByPartNumber(kit.getPartNumber());
+    if (managedKit == null) {
+      managedKit = kitDescriptorService.getByName(kit.getName());
+    }
+    boolean changed = target.getSequencingKit() == null || target.getSequencingKit().getId() != managedKit.getId();
+    target.setSequencingKit(managedKit);
+    return changed;
   }
 
   private <T> boolean updateField(T newValue, T oldValue, Consumer<T> writer) {

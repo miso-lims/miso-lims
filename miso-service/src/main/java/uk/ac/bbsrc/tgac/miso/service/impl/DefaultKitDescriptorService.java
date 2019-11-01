@@ -150,6 +150,11 @@ public class DefaultKitDescriptorService implements KitDescriptorService {
   }
 
   @Override
+  public KitDescriptor getByName(String name) throws IOException {
+    return kitStore.getKitDescriptorByName(name);
+  }
+
+  @Override
   public KitDescriptor getByPartNumber(String partNumber) throws IOException {
     return kitStore.getKitDescriptorByPartNumber(partNumber);
   }
@@ -185,6 +190,10 @@ public class DefaultKitDescriptorService implements KitDescriptorService {
     long containerUsage = kitStore.getUsageByContainers(object);
     if (containerUsage > 0) {
       result.addError(ValidationError.forDeletionUsage(object, containerUsage, "sequencing " + Pluralizer.containers(containerUsage)));
+    }
+    long runUsage = kitStore.getUsageByRuns(object);
+    if (runUsage > 0) {
+      result.addError(ValidationError.forDeletionUsage(object, runUsage, "sequencing " + Pluralizer.runs(runUsage)));
     }
     return result;
   }

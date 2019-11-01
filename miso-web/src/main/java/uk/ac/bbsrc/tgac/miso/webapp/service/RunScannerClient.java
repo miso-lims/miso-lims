@@ -55,6 +55,9 @@ public class RunScannerClient {
   private static final Gauge fallbackContainerModelCount = Gauge.build()
       .name("miso_runscanner_client_bad_container_models").help("The number of runs that have unknown container models.").register();
 
+  private static final Gauge unknownSequencingKitCount = Gauge.build()
+      .name("miso_runscanner_client_unknown_sequencing_kits").help("The number of runs that have unknown sequencing kits.").register();
+
   private static final Logger log = LoggerFactory.getLogger(RunScannerClient.class);
 
   private static final Counter saveCount = Counter.build().name("miso_runscanner_client_run_count").help("The number of runs processed.")
@@ -84,6 +87,7 @@ public class RunScannerClient {
   private final Set<String> badRuns = new HashSet<>();
 
   private final Set<String> fallbackContainerModelRuns = new HashSet<>();
+  private final Set<String> unknownSequencingKitRuns = new HashSet<>();
 
   private final Semaphore lock = new Semaphore(1);
   @Autowired
@@ -184,6 +188,13 @@ public class RunScannerClient {
           } else {
             fallbackContainerModelRuns.remove(saved.getAlias());
           }
+          if (dto.getSequencingKit() != null && saved.getSequencingKit() == null) {
+            if (isNew) {
+              unknownSequencingKitRuns.add(saved.getAlias());
+            }
+          } else {
+            unknownSequencingKitRuns.remove(saved.getAlias());
+          }
         } catch (Exception e) {
           log.error("Failed to save run: " + dto.getRunAlias(), e);
           saveFailures.inc();
@@ -191,6 +202,7 @@ public class RunScannerClient {
         }
         badRunCount.set(badRuns.size());
         fallbackContainerModelCount.set(fallbackContainerModelRuns.size());
+        unknownSequencingKitCount.set(unknownSequencingKitRuns.size());
       }
       lock.release();
     } catch (IOException e) {

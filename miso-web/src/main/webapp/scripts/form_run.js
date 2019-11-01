@@ -78,13 +78,21 @@ FormTarget.run = (function($) {
               return param.instrumentModelId === object.instrumentModelId;
             });
           },
-          getItemLabel: function(item) {
-            return item.name;
-          },
-          getItemValue: function(item) {
-            return item.id;
-          },
+          getItemLabel: Utils.array.getName,
+          getItemValue: Utils.array.getId,
           required: true
+        }, {
+          title: 'Sequencing Kit',
+          data: 'sequencingKitId',
+          type: 'dropdown',
+          nullLabel: 'N/A',
+          getSource: function() {
+            return Constants.kitDescriptors.filter(function(kit) {
+              return kit.kitType === 'Sequencing' && kit.platformType === object.platformType;
+            });
+          },
+          getItemLabel: Utils.array.getName,
+          getItemValue: Utils.array.getId
         }, {
           title: 'Description',
           data: 'description',

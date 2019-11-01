@@ -8,6 +8,7 @@ Changes:
   * Documentation switched to readthedocs format
   * Added interface for administrators to add, edit, and delete sample classes and relationships
     (detailed sample)
+  * Added sequencing kits to runs
   * Fixed error where pool created from the Edit Pool Order page was not automatically linked to
     the pool order
   * Fixed error where sorting the bulk libraries page by sample location (including the default
@@ -33,6 +34,8 @@ Upgrade Notes:
     ```
     * If this query returns any runs, please update them so that all runs have unique aliases
       before you migrate to this version of MISO.
+  * Upgraded to Run Scanner 1.10.0
+  * Upgraded to Pinery 2.7.0
 
 # 0.2.194
 

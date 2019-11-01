@@ -288,26 +288,28 @@ A kit descriptor describes a kit product that is used for library or run prepara
 MISO are:
 
 * Library kit - used for libraries
-* Sequencing kit - not currently used in MISO
+* Sequencing kit -used for runs
 * Clustering kit - used for sequencing containers
 * Multiplexing kit - used for sequencing containers
 * Extraction kit - not currently used in MISO
 
-The Kits lost page is broken into tabs for the different kit types.
+The Kits list page is broken into tabs for the different kit types.
 
-To add a new kit descriptor, click the "Add" button in the toolbar at the top of the table on the Kits list page. This
-will take you to the Create Kit Descriptor page. Enter all of the kit details, then click the "Save" button at the top
-right to create the kit descriptor.
+MISO administrators can add and edit kit descriptors from the Kits list page. To add a new kit descriptor, click the
+"Add" button in the toolbar at the top of the table on the Kits list page. This will take you to the Create Kit
+Descriptor page. Enter all of the kit details, then click the "Save" button at the top right to create the kit
+descriptor. To edit an existing kit descriptor, click the kit name in the list. This will take you to the Edit Kit
+Descriptor page, which works similarly to the Create Kit Descriptor page.
 
-Once a kit has been created, it is possible to link existing [Targeted Sequencing](#targeted-sequencing) values to the
-kit descriptor. Then, if a library is prepared using this kit descriptor, aliquots created from the library can be
-assigned a targeted sequencing from the targeted sequencings linked to the kit descriptor. This means that if a desired
-targeted sequencing is not available for a library aliquot, this can be solved by linking the targeted sequencing to
-the kit descriptor of the library aliquot's parent library.
+Once a library kit has been created, it is possible to link existing [Targeted Sequencing](#targeted-sequencing) values
+to the kit descriptor. Then, if a library is prepared using this kit descriptor, aliquots created from the library can
+be assigned a targeted sequencing from the targeted sequencings linked to the kit descriptor. This means that if a
+desired targeted sequencing is not available for a library aliquot, this can be solved by linking the targeted
+sequencing to the kit descriptor of the library aliquot's parent library.
 
 MISO administrators can delete kit descriptors using the standard interface. Library kits can only be deleted if they
 are not used by any existing libraries. Clustering and multiplexing kits can only be deleted if they are not used by
-any existing sequencing containers.
+any existing sequencing containers. Sequencing kits can only be deleted if they are not used by any existing runs.
 
 
 
