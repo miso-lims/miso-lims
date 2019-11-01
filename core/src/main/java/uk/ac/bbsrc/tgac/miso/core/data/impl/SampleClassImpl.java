@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,6 +14,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -50,8 +52,8 @@ public class SampleClassImpl implements SampleClass {
   @Column(nullable = true)
   private String suffix;
 
-  private boolean archived;
-  private boolean directCreationAllowed;
+  private boolean archived = false;
+  private boolean directCreationAllowed = true;
 
   @ManyToOne(targetEntity = UserImpl.class, fetch = FetchType.LAZY)
   @JoinColumn(name = "createdBy", nullable = false)
@@ -69,7 +71,13 @@ public class SampleClassImpl implements SampleClass {
   @Temporal(TemporalType.TIMESTAMP)
   private Date lastUpdated;
 
-  private Boolean dnaseTreatable;
+  private boolean dnaseTreatable = false;
+
+  @OneToMany(targetEntity = SampleValidRelationshipImpl.class, mappedBy = "child", cascade = CascadeType.ALL)
+  private Set<SampleValidRelationship> parentRelationships;
+
+  @OneToMany(targetEntity = SampleValidRelationshipImpl.class, mappedBy = "parent")
+  private Set<SampleValidRelationship> childRelationships;
 
   @Override
   public long getId() {
@@ -92,42 +100,42 @@ public class SampleClassImpl implements SampleClass {
   }
 
   @Override
-  public User getCreatedBy() {
+  public User getCreator() {
     return createdBy;
   }
 
   @Override
-  public void setCreatedBy(User createdBy) {
+  public void setCreator(User createdBy) {
     this.createdBy = createdBy;
   }
 
   @Override
-  public Date getCreationDate() {
+  public Date getCreationTime() {
     return creationDate;
   }
 
   @Override
-  public void setCreationDate(Date creationDate) {
+  public void setCreationTime(Date creationDate) {
     this.creationDate = creationDate;
   }
 
   @Override
-  public User getUpdatedBy() {
+  public User getLastModifier() {
     return updatedBy;
   }
 
   @Override
-  public void setUpdatedBy(User updatedBy) {
+  public void setLastModifier(User updatedBy) {
     this.updatedBy = updatedBy;
   }
 
   @Override
-  public Date getLastUpdated() {
+  public Date getLastModified() {
     return lastUpdated;
   }
 
   @Override
-  public void setLastUpdated(Date lastUpdated) {
+  public void setLastModified(Date lastUpdated) {
     this.lastUpdated = lastUpdated;
   }
 
@@ -172,12 +180,12 @@ public class SampleClassImpl implements SampleClass {
   }
 
   @Override
-  public Boolean getDNAseTreatable() {
+  public boolean getDNAseTreatable() {
     return dnaseTreatable;
   }
 
   @Override
-  public void setDNAseTreatable(Boolean treatable) {
+  public void setDNAseTreatable(boolean treatable) {
     dnaseTreatable = treatable;
   }
 
@@ -205,7 +213,7 @@ public class SampleClassImpl implements SampleClass {
       return false;
     }
     return relationships.stream()
-        .filter(relationship -> !relationship.getArchived()
+        .filter(relationship -> !relationship.isArchived()
             && !relationship.getParent().isArchived()
             && relationship.getChild().getId() == from.getId()
             && !checked.contains(relationship.getParent().getId()))
@@ -242,4 +250,31 @@ public class SampleClassImpl implements SampleClass {
   public boolean isSaved() {
     return getId() != UNSAVED_ID;
   }
+
+  @Override
+  public String getDeleteType() {
+    return "Sample Class";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getAlias();
+  }
+
+  @Override
+  public Set<SampleValidRelationship> getParentRelationships() {
+    if (parentRelationships == null) {
+      parentRelationships = new HashSet<>();
+    }
+    return parentRelationships;
+  }
+
+  @Override
+  public Set<SampleValidRelationship> getChildRelationships() {
+    if (childRelationships == null) {
+      childRelationships = new HashSet<>();
+    }
+    return childRelationships;
+  }
+
 }

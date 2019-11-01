@@ -703,6 +703,17 @@ public class ListTablesIT extends AbstractIT {
     testColumnsSort(ListTarget.INSTRUMENT_MODELS);
   }
 
+  @Test
+  public void testListSampleClassesSetup() throws Exception {
+    testPageSetup(ListTarget.SAMPLE_CLASSES,
+        Sets.newHashSet(Columns.SORT, Columns.ALIAS, Columns.CATEGORY, Columns.SUBCATEGORY, Columns.ARCHIVED));
+  }
+
+  @Test
+  public void testListSampleClassesColumnSort() throws Exception {
+    testColumnsSort(ListTarget.SAMPLE_CLASSES);
+  }
+
   private void testPageSetup(String listTarget, Set<String> targetColumns) {
     // Goal: confirm that all expected columns are present
     ListPage page = getList(listTarget);

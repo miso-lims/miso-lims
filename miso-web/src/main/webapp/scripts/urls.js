@@ -419,6 +419,19 @@ Urls = (function() {
     query: sampleRestBase + '/query'
   };
 
+  // Sample Classes
+  var sampleClassUiBase = baseUrl + '/sampleclass';
+  ui.sampleClasses = {
+    create: sampleClassUiBase + '/new',
+    edit: idUrlFunction(sampleClassUiBase)
+  };
+
+  var sampleClassRestBase = restBase + '/sampleclasses';
+  rest.sampleClasses = {
+    create: sampleClassRestBase,
+    update: idUrlFunction(sampleClassRestBase)
+  };
+
   // Sample Purposes
   var samplePurposeRestBase = restBase + '/samplepurposes';
   rest.samplePurposes = {

@@ -26,9 +26,11 @@ public class SampleValidRelationshipImpl implements SampleValidRelationship, Ser
 
   private static final long serialVersionUID = 1L;
 
+  private static final long UNSAVED_ID = 0L;
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long sampleValidRelationshipId;
+  private long sampleValidRelationshipId = UNSAVED_ID;
 
   @ManyToOne(targetEntity = SampleClassImpl.class)
   @JoinColumn(name = "parentId", nullable = false)
@@ -55,55 +57,55 @@ public class SampleValidRelationshipImpl implements SampleValidRelationship, Ser
   private Date lastUpdated;
 
   @Column(nullable = false)
-  private Boolean archived;
+  private boolean archived;
 
   @Override
-  public Long getId() {
+  public long getId() {
     return sampleValidRelationshipId;
   }
 
   @Override
-  public void setId(Long sampleValidRelationshipId) {
+  public void setId(long sampleValidRelationshipId) {
     this.sampleValidRelationshipId = sampleValidRelationshipId;
   }
 
   @Override
-  public User getCreatedBy() {
+  public User getCreator() {
     return createdBy;
   }
 
   @Override
-  public void setCreatedBy(User createdBy) {
+  public void setCreator(User createdBy) {
     this.createdBy = createdBy;
   }
 
   @Override
-  public Date getCreationDate() {
+  public Date getCreationTime() {
     return creationDate;
   }
 
   @Override
-  public void setCreationDate(Date creationDate) {
+  public void setCreationTime(Date creationDate) {
     this.creationDate = creationDate;
   }
 
   @Override
-  public User getUpdatedBy() {
+  public User getLastModifier() {
     return updatedBy;
   }
 
   @Override
-  public void setUpdatedBy(User updatedBy) {
+  public void setLastModifier(User updatedBy) {
     this.updatedBy = updatedBy;
   }
 
   @Override
-  public Date getLastUpdated() {
+  public Date getLastModified() {
     return lastUpdated;
   }
 
   @Override
-  public void setLastUpdated(Date lastUpdated) {
+  public void setLastModified(Date lastUpdated) {
     this.lastUpdated = lastUpdated;
   }
 
@@ -128,13 +130,18 @@ public class SampleValidRelationshipImpl implements SampleValidRelationship, Ser
   }
 
   @Override
-  public Boolean getArchived() {
+  public boolean isArchived() {
     return archived;
   }
 
   @Override
-  public void setArchived(Boolean archived) {
+  public void setArchived(boolean archived) {
     this.archived = archived;
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
   }
 
 }

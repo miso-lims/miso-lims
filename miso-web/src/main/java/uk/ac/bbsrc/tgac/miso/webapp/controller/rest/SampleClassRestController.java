@@ -24,18 +24,11 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.List;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Response.Status;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -43,64 +36,48 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.util.UriComponentsBuilder;
 
-import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleClassDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
 
 @Controller
 @RequestMapping("/rest/sampleclasses")
 public class SampleClassRestController extends RestController {
 
-  protected static final Logger log = LoggerFactory.getLogger(SampleClassRestController.class);
-
   @Autowired
   private SampleClassService sampleClassService;
-
-  @GetMapping(value = "/{id}", produces = { "application/json" })
-  @ResponseBody
-  public SampleClassDto getSampleClass(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
-      HttpServletResponse response) throws IOException {
-    SampleClass sampleClass = sampleClassService.get(id);
-    if (sampleClass == null) {
-      throw new RestException("No sample class found with ID: " + id, Status.UNAUTHORIZED);
-    } else {
-      SampleClassDto dto = Dtos.asDto(sampleClass);
-      return dto;
-    }
-  }
-
-  @GetMapping(produces = { "application/json" })
-  @ResponseBody
-  public Set<SampleClassDto> getSampleClasses(UriComponentsBuilder uriBuilder, HttpServletResponse response)
-      throws IOException {
-    return sampleClassService.getAll().stream().map(sc -> {
-      SampleClassDto dto = Dtos.asDto(sc);
-      return dto;
-    }).collect(Collectors.toSet());
-  }
+  @Autowired
+  private MenuController menuController;
 
   @PostMapping(headers = { "Content-type=application/json" })
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public SampleClassDto createSampleClass(@RequestBody SampleClassDto sampleClassDto, UriComponentsBuilder b,
-      HttpServletResponse response) throws IOException {
-    SampleClass sampleClass = Dtos.to(sampleClassDto);
-    Long id = sampleClassService.create(sampleClass);
-    return Dtos.asDto(sampleClassService.get(id));
+  public SampleClassDto createSampleClass(@RequestBody SampleClassDto sampleClassDto) throws IOException {
+    return RestUtils.createObject("Sample Class", sampleClassDto, Dtos::to, sampleClassService, sampleClass -> {
+      SampleClassDto dto = Dtos.asDto(sampleClass);
+      menuController.refreshConstants();
+      return dto;
+    });
   }
 
   @PutMapping(value = "/{id}", headers = { "Content-type=application/json" })
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public SampleClassDto updateSampleClass(@PathVariable("id") Long id, @RequestBody SampleClassDto sampleClassDto,
-      HttpServletResponse response) throws IOException {
-    SampleClass sampleClass = Dtos.to(sampleClassDto);
-    sampleClass.setId(id);
-    sampleClassService.update(sampleClass);
-    return Dtos.asDto(sampleClassService.get(id));
+  public SampleClassDto updateSampleClass(@PathVariable("id") long id, @RequestBody SampleClassDto sampleClassDto) throws IOException {
+    return RestUtils.updateObject("Sample Class", id, sampleClassDto, Dtos::to, sampleClassService, sampleClass -> {
+      SampleClassDto dto = Dtos.asDto(sampleClass);
+      menuController.refreshConstants();
+      return dto;
+    });
+  }
+
+  @PostMapping(value = "/bulk-delete")
+  @ResponseBody
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
+    RestUtils.bulkDelete("Sample Class", ids, sampleClassService);
   }
 
 }

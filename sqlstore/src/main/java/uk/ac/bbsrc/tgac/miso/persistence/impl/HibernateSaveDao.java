@@ -12,7 +12,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.SaveDao;
 @Repository
 public abstract class HibernateSaveDao<T extends Identifiable> extends HibernateProviderDao<T> implements SaveDao<T> {
 
-  public HibernateSaveDao(Class<T> entityClass) {
+  public HibernateSaveDao(Class<? extends T> entityClass) {
     super(entityClass);
   }
 

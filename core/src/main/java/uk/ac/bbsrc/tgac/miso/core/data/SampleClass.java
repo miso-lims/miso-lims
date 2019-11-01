@@ -4,68 +4,65 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import com.eaglegenomics.simlims.core.User;
+import uk.ac.bbsrc.tgac.miso.core.util.MapBuilder;
 
-public interface SampleClass extends Identifiable, Serializable {
+public interface SampleClass extends Deletable, Identifiable, Serializable, Timestamped {
 
-  List<String> CATEGORIES = Collections.unmodifiableList(Arrays.asList(SampleIdentity.CATEGORY_NAME, SampleTissue.CATEGORY_NAME,
-  SampleTissueProcessing.CATEGORY_NAME, SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME));
+  public static final List<String> CATEGORIES = Collections.unmodifiableList(Arrays.asList(SampleIdentity.CATEGORY_NAME,
+      SampleTissue.CATEGORY_NAME, SampleTissueProcessing.CATEGORY_NAME, SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME));
 
-  String getAlias();
+  public static final Map<String, List<String>> SUBCATEGORIES = new MapBuilder<String, List<String>>()
+      .put(SampleIdentity.CATEGORY_NAME, SampleIdentity.SUBCATEGORIES)
+      .put(SampleTissue.CATEGORY_NAME, SampleTissue.SUBCATEGORIES)
+      .put(SampleTissueProcessing.CATEGORY_NAME, SampleTissueProcessing.SUBCATEGORIES)
+      .put(SampleStock.CATEGORY_NAME, SampleStock.SUBCATEGORIES)
+      .put(SampleAliquot.CATEGORY_NAME, SampleAliquot.SUBCATEGORIES)
+      .build();
 
-  void setAlias(String alias);
+  public String getAlias();
 
-  User getCreatedBy();
+  public void setAlias(String alias);
 
-  void setCreatedBy(User createdBy);
+  public String getSampleCategory();
 
-  Date getCreationDate();
+  public void setSampleCategory(String sampleCategory);
 
-  void setCreationDate(Date creationDate);
+  public String getSampleSubcategory();
 
-  User getUpdatedBy();
-
-  void setUpdatedBy(User updatedBy);
-
-  Date getLastUpdated();
-
-  void setLastUpdated(Date lastUpdated);
-
-  String getSampleCategory();
-
-  void setSampleCategory(String sampleCategory);
-
-  String getSampleSubcategory();
-
-  void setSampleSubcategory(String sampleCategory);
+  public void setSampleSubcategory(String sampleCategory);
 
   /**
    * @return the class identifier used in Sample alias generation
    */
-  String getSuffix();
+  public String getSuffix();
 
   /**
    * Sets the class identifier used in Sample alias generation
    * 
    * @param suffix
    */
-  void setSuffix(String suffix);
+  public void setSuffix(String suffix);
 
-  boolean isArchived();
+  public boolean isArchived();
 
-  void setArchived(boolean archived);
+  public void setArchived(boolean archived);
 
-  boolean isDirectCreationAllowed();
+  public boolean isDirectCreationAllowed();
 
-  void setDirectCreationAllowed(boolean directCreationAllowed);
+  public void setDirectCreationAllowed(boolean directCreationAllowed);
 
-  Boolean getDNAseTreatable();
+  public boolean getDNAseTreatable();
 
-  void setDNAseTreatable(Boolean treatable);
+  public void setDNAseTreatable(boolean treatable);
 
-  boolean hasPathToDnaseTreatable(Collection<SampleValidRelationship> relationships);
+  public boolean hasPathToDnaseTreatable(Collection<SampleValidRelationship> relationships);
+
+  public Set<SampleValidRelationship> getParentRelationships();
+
+  public Set<SampleValidRelationship> getChildRelationships();
 
 }

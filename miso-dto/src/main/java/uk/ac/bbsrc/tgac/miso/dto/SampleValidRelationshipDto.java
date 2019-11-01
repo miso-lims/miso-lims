@@ -12,7 +12,7 @@ public class SampleValidRelationshipDto {
   private String creationDate;
   private Long updatedById;
   private String lastUpdated;
-  private Boolean archived;
+  private boolean archived;
 
   public Long getId() {
     return id;
@@ -70,11 +70,11 @@ public class SampleValidRelationshipDto {
     this.childId = childId;
   }
 
-  public Boolean getArchived() {
+  public boolean getArchived() {
     return archived;
   }
 
-  public void setArchived(Boolean archived) {
+  public void setArchived(boolean archived) {
     this.archived = archived;
   }
 
