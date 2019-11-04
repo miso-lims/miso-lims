@@ -5,6 +5,7 @@ import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.validateNameOrT
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -212,6 +213,11 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     saveContainers(run);
     run.setChangeDetails(authorizationManager.getCurrentUser());
     loadChildEntities(run);
+    // validate alias uniqueness
+    ValidationError aliasError = maybeGetAliasUniquenessError(run);
+    if (aliasError != null) {
+      throw new ValidationException(Arrays.asList(aliasError));
+    }
 
     run.setName(generateTemporaryName());
 
@@ -289,6 +295,16 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     run.setSequencer(instrumentService.get(run.getSequencer().getId()));
   }
 
+  private ValidationError maybeGetAliasUniquenessError(Run run) throws IOException {
+    if (run.getAlias() == null) return null;
+    Run maybeDupe = getRunByAlias(run.getAlias());
+    if (run.getId() == Run.UNSAVED_ID || run.getId() != maybeDupe.getId()) {
+      // an existing DIFFERENT run already has this alias
+      return new ValidationError("alias", "A different run with this alias already exists. Run alias must be unique.");
+    }
+    return null;
+  }
+
   private void validateChanges(Run before, Run changed) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
 
@@ -314,6 +330,10 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
         errors.add(new ValidationError(
             String.format("Platform %s does not have a position %s", platform.getAlias(), position.getPosition())));
       }
+    }
+    ValidationError aliasError = maybeGetAliasUniquenessError(changed);
+    if (aliasError != null) {
+      errors.add(aliasError);
     }
 
     if (!errors.isEmpty()) {

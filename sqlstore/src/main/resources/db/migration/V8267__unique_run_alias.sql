@@ -1,0 +1,1 @@
+ALTER TABLE Run ADD CONSTRAINT uk_run_alias UNIQUE (alias);

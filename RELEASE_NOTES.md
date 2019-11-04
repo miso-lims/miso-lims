@@ -2,6 +2,13 @@
 
 Changes:
 
+  * Run aliases must now be unique.
+    * This query will tell you if you have non-unique run aliases in your database:
+    ```
+    SELECT alias, COUNT(alias) FROM Run GROUP BY alias HAVING COUNT(alias) > 1;
+    ```
+    * If the query turns up any runs, please update them so that all runs have unique aliases
+      before you update to this version of MISO.
   * Added FTT_152C1_1WH slide label layout
   * Added RIN and DV200 for samples in Pinery-MISO
   * Documentation switched to readthedocs format
