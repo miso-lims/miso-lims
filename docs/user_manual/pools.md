@@ -16,10 +16,10 @@ on the main Pools list page.
 ## Creating Pools
 
 Clicking the "Add" button in the toolbar at the top of the Pools list will take you to the Create Pool page. Here, you
-can enter all of the pool information and then click the "Save" button at the top right to save the pool. After saving,
-you will be taken to the single Edit Pool page, where you can add library aliquots and further modify the pool.
+can enter all of the pool information and then click the "Save" button at the top right to save the pool. See the below
+sections for information on how to add library aliquots to the pool.
 
-It is also possible to create pools with library aliquots already in them. See
+It is also possible to create pools from a selection of library aliquots on the Library Aliquots list page. See
 [Creating Pools from Library Aliquots](#creating-pools-from-library-aliquots) below.
 
 
@@ -48,8 +48,7 @@ can make any changes you would like and then click the "Save" button at the top 
 
 Below, there are sections for Notes, Attachments, and QC's, which are discussed in other parts of this section of the
 user manual. Other sections list the orders that have been made for sequencing the pool, the runs and lanes that the
-pool has been included in, library aliquots that are included in the pool, library aliquots that could be added to the
-pool, and the pool's change log.
+pool has been included in, library aliquots that are included in the pool, and the pool's change log.
 
 
 
@@ -81,21 +80,32 @@ spreadsheet of pool data provided by a collaborator. For more information, see t
 
 ## Adding Library Aliquots to a Pool
 
-Library aliquots can be added to a pool using the single Edit Pool page. In the Available Library Aliquots list, find
-and select the aliquots that you wish to add to the pool. You can search aliquots using the search box at the top of
-the table. Once you have selected the appropriate aliquots, click the "Add" button in the toolbar at the top of the
-table to add the library aliquots to the pool.
+Library aliquots can be added to a pool using the single Create or Edit Pool page. In the toolbar of the Library
+Aliquots list, click the "Add" button. In the dialog that appears, enter the names, aliases, or barcodes of the library
+aliquots you wish to add to the pool, then click the "Search" button. In the next dialog, enter the proportions of
+these aliquots in the pool, then click the "Add" button. The aliquots will appear in the table. Be sure to click the
+"Save" button at the top right of the page to confirm your changes.
 
-If your site has [Strict Index Checking](../site_configuration/#strict-index-checking) rules enabled, library aliquots cannot be added to 
-pools when the library aliquots have indices which are duplicates or near-duplicates.
+If your site has [Strict Index Checking](../site_configuration/#strict-index-checking) rules enabled, library aliquots
+cannot be added to pools when the library aliquots have indices which are duplicates or near-duplicates.
 
 
 
 ## Removing Library Aliquots from a Pool
 
-Library aliquots can be removed from a pool using the single Edit Pool page. In the Included Library Aliquots list,
-find and select the aliquots that you wish to remove from the pool. Click the "Remove" button in the toolbar at the top
-of the table to remove the library aliquots from the pool.
+Library aliquots can be removed from a pool using the single Edit Pool page. In the Library Aliquots list, find and
+select the aliquots that you wish to remove from the pool. Click the "Remove" button in the toolbar at the top of the
+table to remove the library aliquots from the pool. Be sure to click the "Save" button at the top right of the page to
+confirm your changes.
+
+
+
+## Editing Proportions
+
+Library aliquot proportions within a pool can be edited using the single Edit Pool page. In the Library Aliquots list,
+find and select the aliquots for which you wish to modify the proportions. Click the "Edit Proportions" button in the
+toolbar at the top of the table. In the dialog that appears, enter the new proportions, then click the "OK" button. Be
+sure to click the "Save" button at the top of the table to confirm your changes.
 
 
 

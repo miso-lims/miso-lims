@@ -1,4 +1,4 @@
-var PoolOrder = (function($) {
+var Pool = (function($) {
 
   var containerSelector = '#listAliquotsContainer';
   var listId = 'listAliquots';
@@ -10,7 +10,7 @@ var PoolOrder = (function($) {
   function computeDuplicates(aliquots) {
     Utils.ajaxWithDialog('Checking duplicates', 'POST', Urls.rest.poolOrders.indexChecker, aliquots.map(Utils.array.getId), function(
         response) {
-      PoolOrder.setAliquots(aliquots, response.duplicateIndices, response.nearDuplicateIndices)
+      Pool.setAliquots(aliquots, response.duplicateIndices, response.nearDuplicateIndices)
     });
   }
 
@@ -24,7 +24,7 @@ var PoolOrder = (function($) {
       return $(listSelector).dataTable().fnGetData();
     },
 
-    setAliquots: function(orderAliquots, duplicateSequences, nearDuplicateIndices) {
+    setAliquots: function(poolAliquots, duplicateIndicesSequences, nearDuplicateIndicesSequences) {
       if (aliquotListInitialized) {
         form.markOtherChanges();
         $(listSelector).dataTable().fnDestroy();
@@ -32,21 +32,21 @@ var PoolOrder = (function($) {
         ListState[listId] = null;
       }
       $(containerSelector).append($('<table>').attr('id', listId).addClass('display no-border ui-widget-content'));
-      ListUtils.createStaticTable(listId, ListTarget.orderaliquot, {
-        duplicateSequences: duplicateSequences,
-        nearDuplicateIndices: nearDuplicateIndices
-      }, orderAliquots);
+      ListUtils.createStaticTable(listId, ListTarget.poolelement, {
+        duplicateIndicesSequences: duplicateIndicesSequences || [],
+        nearDuplicateIndicesSequences: nearDuplicateIndicesSequences || []
+      }, poolAliquots || []);
       aliquotListInitialized = true;
     },
 
-    addAliquots: function(orderAliquots) {
-      var aliquots = PoolOrder.getAliquots().concat(orderAliquots);
+    addAliquots: function(poolAliquots) {
+      var aliquots = Pool.getAliquots().concat(poolAliquots);
       computeDuplicates(aliquots);
     },
 
     removeAliquots: function(aliquotIds) {
-      var aliquots = PoolOrder.getAliquots().filter(function(orderAli) {
-        return aliquotIds.indexOf(orderAli.aliquot.id) === -1;
+      var aliquots = Pool.getAliquots().filter(function(poolAli) {
+        return aliquotIds.indexOf(poolAli.id) === -1;
       });
       computeDuplicates(aliquots);
     }

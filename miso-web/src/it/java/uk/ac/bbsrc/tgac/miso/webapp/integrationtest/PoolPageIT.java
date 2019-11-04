@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.FormPageTestUtils.*;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -18,12 +19,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.Columns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.PoolPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.PoolPage.Field;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.PoolPage.PoolTableWrapperId;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.dialog.AddNoteDialog;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.Note;
 
 
@@ -266,28 +264,22 @@ public class PoolPageIT extends AbstractIT {
   public void testAddAliquots() {
     // goal: add one library aliquot by selecting it from the list of available aliquots on the pool page
     PoolPage page1 = PoolPage.getForEdit(getDriver(), getBaseUrl(), 701L);
-    DataTable includedTable = page1.getTable(PoolTableWrapperId.INCLUDED_LIBRARY_ALIQUOTS);
-    assertEquals(0, includedTable.countRows());
+    assertEquals(0, page1.countAliquots());
+    page1.addAliquots(Arrays.asList("LDI701"));
 
-    DataTable available = page1.getTable(PoolTableWrapperId.AVAILABLE_LIBRARY_ALIQUOTS);
-    available.searchFor("LDI701");
-    available.checkBoxForRow(0);
-    PoolPage page2 = page1.addSelectedAliquots();
-    DataTable includedTable2 = page2.getTable(PoolTableWrapperId.INCLUDED_LIBRARY_ALIQUOTS);
-    assertEquals(1, includedTable2.countRows());
+    PoolPage page2 = page1.save(false);
+    assertEquals(1, page2.countAliquots());
   }
 
   @Test
   public void testRemoveAliquots() {
     // goal: remove one library aliquot from a pool via the pool page
     PoolPage page1 = PoolPage.getForEdit(getDriver(), getBaseUrl(), 702L);
-    DataTable includedTable = page1.getTable(PoolTableWrapperId.INCLUDED_LIBRARY_ALIQUOTS);
-    assertEquals(1, includedTable.countRows());
+    assertEquals(1, page1.countAliquots());
 
-    includedTable.checkBoxForRow(0);
-    PoolPage page2 = page1.removeSelectedAliquots();
-    DataTable includedTable2 = page2.getTable(PoolTableWrapperId.INCLUDED_LIBRARY_ALIQUOTS);
-    assertEquals(0, includedTable2.countRows());
+    page1.removeAliquotsByName(Arrays.asList("LDI702"));
+    PoolPage page2 = page1.save(false);
+    assertEquals(0, page2.countAliquots());
   }
 
   @Test
@@ -297,11 +289,10 @@ public class PoolPageIT extends AbstractIT {
     testLibraryAliquotTableWarningOnPoolWithError(803L, "DUPLICATE INDICES");
   }
 
-  public void testLibraryAliquotTableWarningOnPoolWithError(long id, String warning) {
+  private void testLibraryAliquotTableWarningOnPoolWithError(long id, String warning) {
     PoolPage page = PoolPage.getForEdit(getDriver(), getBaseUrl(), id);
-    DataTable table = page.getTable(PoolTableWrapperId.INCLUDED_LIBRARY_ALIQUOTS);
     assertTrue("Library aliquot table fails to show '" + warning + "' warning",
-        table.doesColumnContainSubstring(Columns.WARNINGS, warning));
+        page.hasAliquotWarning(warning));
   }
 
   @Test
@@ -320,10 +311,9 @@ public class PoolPageIT extends AbstractIT {
   @Test
   public void testWarningsOnPoolWithNoErrors() {
     PoolPage page = PoolPage.getForEdit(getDriver(), getBaseUrl(), 120001L);
-    DataTable table = page.getTable(PoolTableWrapperId.INCLUDED_LIBRARY_ALIQUOTS);
-    assertFalse(table.doesColumnContainSubstring(Columns.INDICES, "MISSING INDEX"));
-    assertFalse(table.doesColumnContainSubstring(Columns.INDICES, "Near-Duplicate Indices"));
-    assertFalse(table.doesColumnContainSubstring(Columns.INDICES, "DUPLICATE INDICES"));
+    assertFalse(page.hasAliquotIndexWarning("MISSING INDEX"));
+    assertFalse(page.hasAliquotIndexWarning("Near-Duplicate Indices"));
+    assertFalse(page.hasAliquotIndexWarning("DUPLICATE INDICES"));
   }
 
   private void assertPoolAttributes(Map<PoolPage.Field, String> expectedValues, Pool pool) {
