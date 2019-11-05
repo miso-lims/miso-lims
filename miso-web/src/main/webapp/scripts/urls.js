@@ -357,7 +357,8 @@ Urls = (function() {
   var poolOrderRestBase = restBase + '/poolorders';
   rest.poolOrders = {
     create: poolOrderRestBase,
-    update: idUrlFunction(poolOrderRestBase)
+    update: idUrlFunction(poolOrderRestBase),
+    indexChecker: poolOrderRestBase + '/indexchecker'
   };
 
   // Projects

@@ -46,15 +46,6 @@
 <div id="warnings"></div>
 
 <form:form id="poolForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
-<script type="text/javascript">
-  jQuery(document).ready(function () {
-    var dto = ${poolDto};
-    if (dto.id) {
-      Warning.generateHeaderWarnings('warnings', WarningTarget.pool, dto);
-    }
-    FormUtils.createForm('poolForm', 'save', dto, 'pool', {});
-  });
-</script>
 
 <c:if test="${pool.id != 0}">
     <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#notes_arrowclick'), 'notes');">Notes
@@ -103,14 +94,27 @@
   <miso:list-section-ajax id="list_completion" name="Sequencing Order Status" target="sequencingordercompletion" config="{ poolId: ${pool.id} }"/>
   <miso:list-section id="list_run" name="Runs" target="run" items="${runs}" config="{ poolId: ${pool.id} }"/>
   <miso:list-section id="list_partition" name="${pool.platformType.pluralPartitionName}" target="partition" items="${partitions}" config="{'showContainer': true, 'showPool': false}"/>
-  <miso:list-section id="list_included" name="Included Library Aliquots" target="poolelement" alwaysShow="true" items="${includedLibraryAliquots}" config="{ poolId: ${pool.id}, add: false, duplicateIndicesSequences: ${duplicateIndicesSequences}, nearDuplicateIndicesSequences: ${nearDuplicateIndicesSequences}}"/>
-  <div class="noPrint">
-    <miso:list-section-ajax id="list_available" name="Available Library Aliquots" target="poolelement" config="{ poolId: ${pool.id}, add: true }"/>
-  </div>
 </c:if>
+
+<br/>
+<h1>Library Aliquots</h1>
+<div id="listAliquotsContainer"></div>
+
 <div class="noPrint">
   <miso:changelog item="${pool}"/>
 </div>
+
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    var dto = ${poolDto};
+    if (dto.id) {
+      Warning.generateHeaderWarnings('warnings', WarningTarget.pool, dto);
+    }
+    var form = FormUtils.createForm('poolForm', 'save', dto, 'pool', {});
+    Pool.setForm(form);
+    Pool.setAliquots(dto.pooledElements, dto.duplicateIndicesSequences, dto.nearDuplicateIndicesSequences);
+  });
+</script>
 
 </div>
 </div>

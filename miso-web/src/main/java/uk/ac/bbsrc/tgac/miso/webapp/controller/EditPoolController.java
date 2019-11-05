@@ -165,8 +165,6 @@ public class EditPoolController {
     model.put("duplicateIndicesSequences", mapper.writeValueAsString(poolDto.getDuplicateIndicesSequences()));
     model.put("nearDuplicateIndicesSequences", mapper.writeValueAsString(poolDto.getNearDuplicateIndicesSequences()));
 
-    model.put("includedLibraryAliquots", Dtos.asDto(pool, true, false, indexChecker).getPooledElements());
-
     return new ModelAndView("/WEB-INF/pages/editPool.jsp", model);
   }
 
