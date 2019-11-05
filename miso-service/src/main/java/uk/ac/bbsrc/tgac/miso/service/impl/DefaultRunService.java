@@ -309,7 +309,7 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     }
     if (isSetAndChanged(Run::getAlias, changed, before)) {
       Run maybeDupe = getRunByAlias(changed.getAlias());
-      if (changed.getId() == Run.UNSAVED_ID || changed.getId() != maybeDupe.getId()) {
+      if (changed.getId() != maybeDupe.getId()) {
         // an existing DIFFERENT run already has this alias
         errors.add(new ValidationError("alias", "A different run with this alias already exists. Run alias must be unique."));
       }
