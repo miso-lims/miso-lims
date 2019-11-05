@@ -162,10 +162,8 @@ HotTarget.libraryaliquot = {
               return dil.libraryDesignCodeId == code.id;
             }, Constants.libraryDesignCodes);
             if (Utils.array.maybeGetProperty(designCode, 'targetedSequencingRequired')) {
-              setCellMeta('validator', HotUtils.validator.requiredAutocomplete);
               missingValueString = '';
             } else {
-              setCellMeta('validator', HotUtils.validator.permitEmptyDropdown);
               missingValueString = '(None)';
             }
 
@@ -179,23 +177,24 @@ HotTarget.libraryaliquot = {
               return flat.targetedSequencingAlias == tarSeq.alias && tarSeq.kitDescriptorIds.indexOf(dil.libraryKitDescriptorId) != -1;
             }, Constants.targetedSequencings), 'id');
           },
-          depends: '*start', // This is a dummy value that gets this run on
-          // table creation only
+          depends: ['*start', 'libraryDesignCode'],
           update: function(dil, flat, flatProperty, value, setReadOnly, setOptions, setData) {
             var baseOptionList;
+            var options = {};
             var designCode = Utils.array.findFirstOrNull(function(code) {
-              return dil.libraryDesignCodeId == code.id;
+              return flat.libraryDesignCode == code.code;
             }, Constants.libraryDesignCodes);
             if (Utils.array.maybeGetProperty(designCode, 'targetedSequencingRequired')) {
               baseOptionList = [];
+              options.validator = HotUtils.validator.requiredAutocomplete;
             } else {
               baseOptionList = ['(None)'];
+              options.validator = HotUtils.validator.permitEmptyDropdown;
             }
-            setOptions({
-              source: baseOptionList.concat(Constants.targetedSequencings.filter(function(targetedSequencing) {
-                return targetedSequencing.kitDescriptorIds.indexOf(dil.libraryKitDescriptorId) != -1;
-              }).map(Utils.array.getAlias).sort())
-            });
+            options.source = baseOptionList.concat(Constants.targetedSequencings.filter(function(targetedSequencing) {
+              return targetedSequencing.kitDescriptorIds.indexOf(dil.libraryKitDescriptorId) != -1;
+            }).map(Utils.array.getAlias).sort());
+            setOptions(options);
           }
         }];
 

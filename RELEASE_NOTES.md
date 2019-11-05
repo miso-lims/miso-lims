@@ -12,6 +12,7 @@ Changes:
   * Fixed error where sorting the bulk libraries page by sample location (including the default
     sort when propagating from the Edit Box Page) reset options in some of the dropdowns
   * Fixed copying tissue type and lab values from Excel by no longer truncating the labels
+  * Fixed validation for library aliquot targeted sequencing when library design code is changed
   * Changed the interface for modifying pool contents on the Edit Pool page
 
 # 0.2.194
