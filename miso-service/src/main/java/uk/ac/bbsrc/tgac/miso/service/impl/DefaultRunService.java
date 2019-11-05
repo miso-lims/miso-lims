@@ -307,12 +307,8 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
         errors.add(new ValidationError("completionDate", "Only admin may change start date"));
       }
     }
-    if (isSetAndChanged(Run::getAlias, changed, before)) {
-      Run maybeDupe = getRunByAlias(changed.getAlias());
-      if (maybeDupe != null && changed.getId() != maybeDupe.getId()) {
-        // an existing DIFFERENT run already has this alias
-        errors.add(new ValidationError("alias", "A different run with this alias already exists. Run alias must be unique."));
-      }
+    if (isSetAndChanged(Run::getAlias, changed, before) && getRunByAlias(changed.getAlias()) != null) {
+      errors.add(new ValidationError("alias", "A different run with this alias already exists. Run alias must be unique."));
     }
 
     InstrumentModel platform = changed.getSequencer().getInstrumentModel();
