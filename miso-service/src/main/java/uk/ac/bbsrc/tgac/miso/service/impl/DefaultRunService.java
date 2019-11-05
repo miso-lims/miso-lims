@@ -1,7 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
-import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.validateNameOrThrow;
+import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -307,6 +307,9 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
         errors.add(new ValidationError("completionDate", "Only admin may change start date"));
       }
     }
+    if (isSetAndChanged(Run::getAlias, changed, before) && getRunByAlias(changed.getAlias()) != null) {
+      errors.add(new ValidationError("alias", "A different run with this alias already exists. Run alias must be unique."));
+    }
 
     InstrumentModel platform = changed.getSequencer().getInstrumentModel();
     for (RunPosition position : changed.getRunPositions()) {
@@ -315,6 +318,7 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
             String.format("Platform %s does not have a position %s", platform.getAlias(), position.getPosition())));
       }
     }
+
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);

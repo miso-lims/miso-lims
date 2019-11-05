@@ -2,6 +2,7 @@
 
 Changes:
 
+  * Run aliases must now be unique.
   * Added FTT_152C1_1WH slide label layout
   * Added RIN and DV200 for samples in Pinery-MISO
   * Documentation switched to readthedocs format
@@ -13,6 +14,16 @@ Changes:
     sort when propagating from the Edit Box Page) reset options in some of the dropdowns
   * Fixed copying tissue type and lab values from Excel by no longer truncating the labels
   * Changed the interface for modifying pool contents on the Edit Pool page
+
+Upgrade Notes:
+
+  * This version adds a constraint that run aliases must now be unique. Before migrating, first
+    confirm that all run alases are already unique:
+    ```
+    SELECT alias, COUNT(alias) FROM Run GROUP BY alias HAVING COUNT(alias) > 1;
+    ```
+    * If this query returns any runs, please update them so that all runs have unique aliases
+      before you migrate to this version of MISO.
 
 # 0.2.194
 
