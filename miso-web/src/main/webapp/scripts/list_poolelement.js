@@ -107,7 +107,6 @@ ListTarget.poolelement = {
         });
       }
     }];
-    return [];
   },
   createColumns: function(config, projectId) {
     return [
