@@ -134,24 +134,4 @@ public class DelegatingNamingScheme implements NamingScheme {
     return actualNamingScheme.nullProjectShortNameAllowed();
   }
 
-  @Override
-  public Integer projectShortNameLengthAdjustment() {
-    return actualNamingScheme.projectShortNameLengthAdjustment();
-  }
-
-  @Override
-  public Integer nameLengthAdjustment() {
-    return actualNamingScheme.nameLengthAdjustment();
-  }
-
-  @Override
-  public Integer libraryAliasLengthAdjustment() {
-    return actualNamingScheme.libraryAliasLengthAdjustment();
-  }
-
-  @Override
-  public Integer sampleAliasLengthAdjustment() {
-    return actualNamingScheme.sampleAliasLengthAdjustment();
-  }
-
 }

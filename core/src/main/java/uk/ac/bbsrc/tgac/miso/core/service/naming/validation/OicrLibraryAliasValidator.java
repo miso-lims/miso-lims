@@ -28,7 +28,7 @@ public class OicrLibraryAliasValidator extends RegexValidator {
   private final Pattern pattern = null;
 
   public OicrLibraryAliasValidator() {
-    super("", false, false, null);
+    super("", false, false);
   }
 
   @Override

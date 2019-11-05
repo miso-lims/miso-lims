@@ -44,9 +44,4 @@ public interface NameValidator {
 
   boolean nullsAllowed();
 
-  /**
-   * The maximum length of the input allowed, or null if there is no implied maximum.
-   */
-  Integer validationLength();
-
 }
