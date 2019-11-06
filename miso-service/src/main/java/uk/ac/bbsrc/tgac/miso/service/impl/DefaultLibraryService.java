@@ -559,7 +559,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
       uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult aliasValidation = namingScheme.validateLibraryAlias(library
           .getAlias());
       if (!aliasValidation.isValid()) {
-        throw new IllegalArgumentException("Invalid library alias: '" + library.getAlias() + "' - " + aliasValidation.getMessage());
+        throw new ValidationException(new ValidationError("alias", aliasValidation.getMessage()));
       }
     }
   }
@@ -574,7 +574,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     for (Library potentialDupe : potentialDupes) {
       if (library.getId() == AbstractLibrary.UNSAVED_ID || library.getId() != potentialDupe.getId()) {
         // an existing DIFFERENT library already has this alias
-        throw new IllegalArgumentException("NEW: A library with this alias already exists in the database");
+        throw new ValidationException(new ValidationError("alias", "A library with this alias already exists in the database"));
       }
     }
   }
