@@ -21,6 +21,7 @@ Changes:
     * "entered" refers to a date that an item was entered into MISO
   * Prevent changing project shortname if it is used for generating aliases and the project already
     contains samples
+  * Renamed project field from progress to status
 
 Upgrade Notes:
 

@@ -7,7 +7,7 @@ FormTarget.project = (function($) {
    * Expected config {
    *   shortNameRequired: boolean
    *   shortNameMofifiable: boolean
-   *   progressOptions: array
+   *   statusOptions: array
    * }
    */
 
@@ -60,12 +60,12 @@ FormTarget.project = (function($) {
           type: 'text',
           maxLength: 255
         }, {
-          title: 'Progress',
-          data: 'progress',
+          title: 'Status',
+          data: 'status',
           type: 'dropdown',
           required: true,
           getSource: function() {
-            return config.progressOptions;
+            return config.statusOptions;
           }
         }, {
           title: 'Reference Genome',

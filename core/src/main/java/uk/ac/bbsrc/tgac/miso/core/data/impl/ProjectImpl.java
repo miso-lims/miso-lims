@@ -59,7 +59,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.ProjectChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 
 /**
@@ -123,7 +123,7 @@ public class ProjectImpl implements Project {
   private Collection<Study> studies = new HashSet<>();
 
   @Enumerated(EnumType.STRING)
-  private ProgressType progress;
+  private StatusType status;
 
   @ManyToOne(targetEntity = ReferenceGenomeImpl.class)
   @JoinColumn(name = "referenceGenomeId", referencedColumnName = "referenceGenomeId", nullable = false)
@@ -212,13 +212,13 @@ public class ProjectImpl implements Project {
   }
 
   @Override
-  public ProgressType getProgress() {
-    return progress;
+  public StatusType getStatus() {
+    return status;
   }
 
   @Override
-  public void setProgress(ProgressType progress) {
-    this.progress = progress;
+  public void setStatus(StatusType status) {
+    this.status = status;
   }
 
   public void addStudy(Study s) {
@@ -295,7 +295,7 @@ public class ProjectImpl implements Project {
     return new HashCodeBuilder(5, 35)
         .append(alias)
         .append(description)
-        .append(progress)
+        .append(status)
         .append(referenceGenome)
         .append(shortName)
         .toHashCode();
@@ -310,7 +310,7 @@ public class ProjectImpl implements Project {
     return new EqualsBuilder()
         .append(alias, other.alias)
         .append(description, other.description)
-        .append(progress, other.progress)
+        .append(status, other.status)
         .append(referenceGenome, other.referenceGenome)
         .append(shortName, other.shortName)
         .isEquals();

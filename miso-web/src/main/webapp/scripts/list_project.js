@@ -93,8 +93,8 @@ ListTarget.project = {
           "include": true,
           "iSortPriority": 0
         }, {
-          "sTitle": "Progress",
-          "mData": "progress",
+          "sTitle": "Status",
+          "mData": "status",
           "include": true,
           "iSortPriority": 0
         }];

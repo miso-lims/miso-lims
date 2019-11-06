@@ -58,7 +58,7 @@
     FormUtils.createForm('projectForm', 'save', ${projectDto}, 'project', {
       shortNameRequired: ${shortNameRequired},
       shortNameModifiable: ${shortNameModifiable},
-      progressOptions: ${progressOptions}
+      statusOptions: ${statusOptions}
     });
   });
 </script>

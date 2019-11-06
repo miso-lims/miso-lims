@@ -25,7 +25,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.SecurityStore;
 
@@ -56,7 +56,7 @@ public class HibernateProjectDaoTest extends AbstractDAOTest {
     projectDAO.setSessionFactory(sessionFactory);
     projectDAO.setSecurityStore(securityStore);
 
-    project.setProgress(ProgressType.ACTIVE);
+    project.setStatus(StatusType.ACTIVE);
     ReferenceGenome referenceGenome = new ReferenceGenomeImpl();
     referenceGenome.setId(1L);
     referenceGenome.setAlias("hg19");

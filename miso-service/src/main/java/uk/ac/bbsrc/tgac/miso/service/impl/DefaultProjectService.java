@@ -177,7 +177,7 @@ public class DefaultProjectService implements ProjectService {
   private void applyChanges(Project original, Project project) {
     original.setAlias(project.getAlias());
     original.setDescription(project.getDescription());
-    original.setProgress(project.getProgress());
+    original.setStatus(project.getStatus());
     original.setReferenceGenome(project.getReferenceGenome());
     original.setDefaultTargetedSequencing(project.getDefaultTargetedSequencing());
     original.setShortName(project.getShortName());

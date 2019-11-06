@@ -47,7 +47,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Issue;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.SubprojectService;
@@ -121,11 +121,11 @@ public class EditProjectController {
     ObjectMapper mapper = new ObjectMapper();
     model.put("projectDto", mapper.writeValueAsString(Dtos.asDto(project)));
 
-    ArrayNode progressOptions = mapper.createArrayNode();
-    for (ProgressType item : ProgressType.values()) {
-      progressOptions.add(item.getKey());
+    ArrayNode statusOptions = mapper.createArrayNode();
+    for (StatusType item : StatusType.values()) {
+      statusOptions.add(item.getKey());
     }
-    model.put("progressOptions", progressOptions);
+    model.put("statusOptions", statusOptions);
     model.put("shortNameRequired", !namingScheme.nullProjectShortNameAllowed());
     model.put("shortNameModifiable", namingScheme.nullProjectShortNameAllowed() || project.getSamples().isEmpty());
 
