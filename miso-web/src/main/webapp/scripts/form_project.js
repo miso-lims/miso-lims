@@ -6,6 +6,7 @@ FormTarget.project = (function($) {
   /*
    * Expected config {
    *   shortNameRequired: boolean
+   *   shortNameMofifiable: boolean
    *   progressOptions: array
    * }
    */
@@ -50,7 +51,7 @@ FormTarget.project = (function($) {
         }, {
           title: 'Short Name',
           data: 'shortName',
-          type: 'text',
+          type: config.shortNameModifiable ? 'text' : 'read-only',
           required: config.shortNameRequired,
           maxLength: 255
         }, {

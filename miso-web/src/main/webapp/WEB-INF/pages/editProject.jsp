@@ -57,6 +57,7 @@
   jQuery(document).ready(function () {
     FormUtils.createForm('projectForm', 'save', ${projectDto}, 'project', {
       shortNameRequired: ${shortNameRequired},
+      shortNameModifiable: ${shortNameModifiable},
       progressOptions: ${progressOptions}
     });
   });
