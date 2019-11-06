@@ -166,6 +166,8 @@ public class HibernateLibraryAliquotDao
     switch (type) {
     case CREATE:
       return "creationDate";
+    case ENTERED:
+      return "creationTime";
     case UPDATE:
       return "lastUpdated";
     default:

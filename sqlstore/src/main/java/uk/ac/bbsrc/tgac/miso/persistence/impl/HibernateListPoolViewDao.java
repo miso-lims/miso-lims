@@ -74,6 +74,8 @@ public class HibernateListPoolViewDao implements ListPoolViewDao, HibernatePagin
   public String propertyForDate(Criteria criteria, DateType type) {
     switch (type) {
     case CREATE:
+      return "creationDate";
+    case ENTERED:
       return "creationTime";
     case UPDATE:
       return "lastModified";

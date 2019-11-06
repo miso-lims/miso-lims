@@ -141,7 +141,7 @@ public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginat
 
   @Override
   public String propertyForDate(Criteria criteria, DateType type) {
-    return type == DateType.CREATE ? "dateComissioned":null;
+    return type == DateType.CREATE ? "dateComissioned" : null;
   }
 
   @Override
