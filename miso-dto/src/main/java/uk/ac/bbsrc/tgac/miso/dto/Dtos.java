@@ -195,7 +195,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.TissuePieceType;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow;
@@ -2229,7 +2229,7 @@ public class Dtos {
     dto.setAlias(from.getAlias());
     dto.setShortName(from.getShortName());
     dto.setDescription(from.getDescription());
-    setObject(dto::setProgress, from.getProgress(), (progress) -> progress.getKey());
+    setObject(dto::setStatus, from.getStatus(), (progress) -> progress.getKey());
     if (from.getReferenceGenome() != null) {
       dto.setReferenceGenomeId(from.getReferenceGenome().getId());
       dto.setDefaultSciName(from.getReferenceGenome().getDefaultSciName());
@@ -2250,7 +2250,7 @@ public class Dtos {
     setString(to::setAlias, dto.getAlias());
     setString(to::setShortName, dto.getShortName());
     setString(to::setDescription, dto.getDescription());
-    setObject(to::setProgress, dto.getProgress(), (key) -> ProgressType.get(key));
+    setObject(to::setStatus, dto.getStatus(), (key) -> StatusType.get(key));
     setObject(to::setReferenceGenome, ReferenceGenomeImpl::new, dto.getReferenceGenomeId());
     setObject(to::setDefaultTargetedSequencing, TargetedSequencing::new, dto.getDefaultTargetedSequencingId());
     return to;

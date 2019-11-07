@@ -57,7 +57,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
 import uk.ac.bbsrc.tgac.miso.migration.MigrationData;
 import uk.ac.bbsrc.tgac.miso.migration.MigrationProperties;
 
@@ -168,7 +168,7 @@ public class LoadGeneratorSource implements MigrationSource {
         Project project = new ProjectImpl();
         project.setAlias("LT" + projectNum);
         project.setDescription(projectDescription);
-        project.setProgress(ProgressType.ACTIVE);
+        project.setStatus(StatusType.ACTIVE);
         project.setCreationTime(now);
         project.setLastModified(now);
         project.setReferenceGenome(createReferenceGenome());

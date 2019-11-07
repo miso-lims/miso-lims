@@ -46,7 +46,7 @@ public class ProjectPageIT extends AbstractIT {
     unsaved.put(Fields.ALIAS, "Create New Project via UI");
     unsaved.put(Fields.SHORTNAME, "SUCHNEW");
     unsaved.put(Fields.DESCRIPTION, "New Project via UI");
-    unsaved.put(Fields.PROGRESS, "Proposed");
+    unsaved.put(Fields.STATUS, "Proposed");
     unsaved.put(Fields.REFERENCE_GENOME, "Human hg18 random");
     
     assertEquals("Project ID is unsaved", unsaved.get(Fields.ID), page.getId());
@@ -54,7 +54,7 @@ public class ProjectPageIT extends AbstractIT {
     page.setAlias(unsaved.get(Fields.ALIAS));
     page.setShortName(unsaved.get(Fields.SHORTNAME));
     page.setDescription(unsaved.get(Fields.DESCRIPTION));
-    page.setProgress(unsaved.get(Fields.PROGRESS));
+    page.setStatus(unsaved.get(Fields.STATUS));
     page.setReferenceGenome(unsaved.get(Fields.REFERENCE_GENOME));
 
     ProjectPage savedPage = page.clickSave();
@@ -65,7 +65,7 @@ public class ProjectPageIT extends AbstractIT {
     assertEquals(unsaved.get(Fields.ALIAS), savedPage.getAlias());
     assertEquals(unsaved.get(Fields.SHORTNAME), savedPage.getShortName());
     assertEquals(unsaved.get(Fields.DESCRIPTION), savedPage.getDescription());
-    assertEquals(unsaved.get(Fields.PROGRESS), savedPage.getProgress());
+    assertEquals(unsaved.get(Fields.STATUS), savedPage.getStatus());
     assertEquals(unsaved.get(Fields.REFERENCE_GENOME), savedPage.getReferenceGenome());
   }
 
@@ -77,13 +77,13 @@ public class ProjectPageIT extends AbstractIT {
     updated.put(Fields.ALIAS, "Changed Project");
     updated.put(Fields.DESCRIPTION, "Changed Description");
     updated.put(Fields.SHORTNAME, "NEWER");
-    updated.put(Fields.PROGRESS, "Active");
+    updated.put(Fields.STATUS, "Active");
     updated.put(Fields.REFERENCE_GENOME, "Human hg19 random");
 
     page.setAlias(updated.get(Fields.ALIAS));
     page.setShortName(updated.get(Fields.SHORTNAME));
     page.setDescription(updated.get(Fields.DESCRIPTION));
-    page.setProgress(updated.get(Fields.PROGRESS));
+    page.setStatus(updated.get(Fields.STATUS));
     page.setReferenceGenome(updated.get(Fields.REFERENCE_GENOME));
 
     ProjectPage savedPage = page.clickSave();
@@ -91,7 +91,7 @@ public class ProjectPageIT extends AbstractIT {
     assertEquals(updated.get(Fields.ALIAS), savedPage.getAlias());
     assertEquals(updated.get(Fields.SHORTNAME), savedPage.getShortName());
     assertEquals(updated.get(Fields.DESCRIPTION), savedPage.getDescription());
-    assertEquals(updated.get(Fields.PROGRESS), savedPage.getProgress());
+    assertEquals(updated.get(Fields.STATUS), savedPage.getStatus());
     assertEquals(updated.get(Fields.REFERENCE_GENOME), savedPage.getReferenceGenome());
   }
 

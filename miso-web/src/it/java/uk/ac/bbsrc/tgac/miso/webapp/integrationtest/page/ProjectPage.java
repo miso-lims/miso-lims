@@ -22,7 +22,7 @@ public class ProjectPage extends HeaderFooterPage {
     public static final String ALIAS = "alias";
     public static final String SHORTNAME = "shortName";
     public static final String DESCRIPTION = "description";
-    public static final String PROGRESS = "progress";
+    public static final String STATUS = "status";
     public static final String REFERENCE_GENOME = "referenceGenome";
 
     private Fields() {
@@ -51,8 +51,8 @@ public class ProjectPage extends HeaderFooterPage {
   private WebElement shortNameLabel;
   @FindBy(id = "projectForm_description")
   private WebElement descriptionLabel;
-  @FindBy(id = "projectForm_progress")
-  private WebElement progressLabel;
+  @FindBy(id = "projectForm_status")
+  private WebElement statusLabel;
   @FindBy(id = "projectForm_referenceGenomeId")
   private WebElement referenceGenomeLabel;
   @FindBy(id = "save")
@@ -112,12 +112,12 @@ public class ProjectPage extends HeaderFooterPage {
     setText(description, descriptionLabel);
   }
 
-  public String getProgress() {
-    return getSelectedDropdownText(progressLabel);
+  public String getStatus() {
+    return getSelectedDropdownText(statusLabel);
   }
 
-  public void setProgress(String progress) {
-    setDropdown(progress, progressLabel);
+  public void setStatus(String status) {
+    setDropdown(status, statusLabel);
   }
 
   public String getReferenceGenome() {
