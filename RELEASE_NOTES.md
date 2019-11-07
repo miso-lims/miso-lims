@@ -2,6 +2,12 @@
 
 Changes:
 
+
+
+# 0.2.195
+
+Changes:
+
   * Run aliases must now be unique.
   * Added FTT_152C1_1WH slide label layout
   * Added RIN and DV200 for samples in Pinery-MISO
