@@ -15,6 +15,8 @@ Changes:
   * Fixed copying tissue type and lab values from Excel by no longer truncating the labels
   * Fixed validation for library aliquot targeted sequencing when library design code is changed
   * Changed the interface for modifying pool contents on the Edit Pool page
+  * Prevent changing project shortname if it is used for generating aliases and the project already
+    contains samples
 
 Upgrade Notes:
 

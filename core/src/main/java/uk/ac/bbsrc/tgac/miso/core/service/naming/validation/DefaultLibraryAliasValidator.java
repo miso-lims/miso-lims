@@ -5,7 +5,7 @@ public class DefaultLibraryAliasValidator extends RegexValidator {
   private static final String regex = "([A-z0-9]+)_L([A-z0-9]+)-([A-Z0-9]+)_(.*)";
 
   public DefaultLibraryAliasValidator() {
-    super(regex, false, false, null);
+    super(regex, false, false);
   }
 
   @Override

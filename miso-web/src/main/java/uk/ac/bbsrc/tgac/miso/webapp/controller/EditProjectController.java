@@ -127,6 +127,7 @@ public class EditProjectController {
     }
     model.put("progressOptions", progressOptions);
     model.put("shortNameRequired", !namingScheme.nullProjectShortNameAllowed());
+    model.put("shortNameModifiable", namingScheme.nullProjectShortNameAllowed() || project.getSamples().isEmpty());
 
     return new ModelAndView("/WEB-INF/pages/editProject.jsp", model);
   }
