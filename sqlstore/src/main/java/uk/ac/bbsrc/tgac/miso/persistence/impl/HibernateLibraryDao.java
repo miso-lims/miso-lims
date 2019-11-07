@@ -355,6 +355,8 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   public String propertyForDate(Criteria criteria, DateType type) {
     switch (type) {
     case CREATE:
+      return "creationDate";
+    case ENTERED:
       return "creationTime";
     case UPDATE:
       return "lastModified";

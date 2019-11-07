@@ -59,7 +59,7 @@ public class HibernatePoolOrderDao extends HibernateSaveDao<PoolOrder> implement
   @Override
   public String propertyForDate(Criteria criteria, DateType type) {
     switch (type) {
-    case CREATE:
+    case ENTERED:
       return "creationDate";
     case UPDATE:
       return "lastUpdated";

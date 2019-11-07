@@ -143,8 +143,8 @@ ListTarget.sample = {
           "iSortPriority": 0,
           "bVisible": "true",
           "mRender": function(data, type, full) {
-                      return data || "";
-                    }
+            return data || "";
+          }
         }, {
           "sTitle": "Last Modified",
           "mData": "lastModified",
@@ -161,10 +161,10 @@ ListTarget.sample = {
         }];
   },
   searchTermSelector: function(searchTerms) {
-    const plainSampleTerms = [searchTerms['id'], searchTerms['created'], searchTerms['changed'], searchTerms['received'],
+    const plainSampleTerms = [searchTerms['id'], searchTerms['entered'], searchTerms['changed'], searchTerms['received'],
         searchTerms['creator'], searchTerms['changedby'], searchTerms['box'], searchTerms['distributed'], searchTerms['distributedto']];
-    const detailedSampleTerms = [searchTerms['class'], searchTerms['institute'], searchTerms['external'], searchTerms['subproject'],
-        searchTerms['groupid'], searchTerms['ghost']];
+    const detailedSampleTerms = [searchTerms['created'], searchTerms['class'], searchTerms['institute'], searchTerms['external'],
+        searchTerms['subproject'], searchTerms['groupid'], searchTerms['ghost']];
     if (Constants.isDetailedSample) {
       return plainSampleTerms.concat(detailedSampleTerms);
     } else {

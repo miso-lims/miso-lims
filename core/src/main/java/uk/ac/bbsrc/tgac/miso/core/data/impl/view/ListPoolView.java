@@ -51,6 +51,9 @@ public class ListPoolView implements Aliasable, Nameable, Serializable, Timestam
   @JoinColumn(name = "creator", nullable = false, updatable = false)
   private User creator;
 
+  @Temporal(TemporalType.DATE)
+  private Date creationDate;
+
   @Column(name = "created", nullable = false, updatable = false)
   @Temporal(TemporalType.TIMESTAMP)
   private Date creationTime;
@@ -140,6 +143,22 @@ public class ListPoolView implements Aliasable, Nameable, Serializable, Timestam
   @Override
   public void setCreator(User creator) {
     this.creator = creator;
+  }
+
+  /**
+   * @return the user-specified creation date of the pool
+   */
+  public Date getCreationDate() {
+    return creationDate;
+  }
+
+  /**
+   * Sets the user-specified creation date of the pool
+   * 
+   * @param creationDate
+   */
+  public void setCreationDate(Date creationDate) {
+    this.creationDate = creationDate;
   }
 
   @Override

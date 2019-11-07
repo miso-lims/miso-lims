@@ -90,6 +90,11 @@ public class AdvancedSearchParser {
         case "created":
         case "createdon":
           return parseDate(parts[1], DateType.CREATE, errorHandler);
+        case "entered":
+        case "enteredOn":
+        case "recorded":
+        case "recordedOn":
+          return parseDate(parts[1], DateType.ENTERED, errorHandler);
         case "changed":
         case "modified":
         case "updated":

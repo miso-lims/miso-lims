@@ -66,6 +66,7 @@ SELECT
   p.platformType,
   p.creator,
   p.created,
+  p.creationDate,
   p.lastModifier,
   p.lastModified,
   p.concentration,

@@ -23,6 +23,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,11 +49,18 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
 
   private final static String[] SEARCH_PROPERTIES = new String[] { "alias", "identificationBarcode", "name" };
 
+  @Value("${miso.detailed.sample.enabled}")
+  private Boolean detailedSample;
+
   @Autowired
   private SessionFactory sessionFactory;
 
   @Autowired
   private BoxStore boxStore;
+
+  public void setDetailedSample(boolean detailedSample) {
+    this.detailedSample = detailedSample;
+  }
 
   public void setBoxStore(BoxStore boxStore) {
     this.boxStore = boxStore;
@@ -330,6 +338,8 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   public String propertyForDate(Criteria criteria, DateType type) {
     switch (type) {
     case CREATE:
+      return detailedSample ? "creationDate" : null;
+    case ENTERED:
       return "creationTime";
     case UPDATE:
       return "lastModified";

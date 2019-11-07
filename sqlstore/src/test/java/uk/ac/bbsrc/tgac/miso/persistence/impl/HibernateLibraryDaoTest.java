@@ -278,6 +278,11 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
   }
 
   @Test
+  public void testSearchByEntered() throws IOException {
+    testSearch(PaginationFilter.date(LimsUtils.parseDate("2017-01-01"), LimsUtils.parseDate("2018-01-01"), DateType.ENTERED));
+  }
+
+  @Test
   public void testSearchByCreator() throws IOException {
     testSearch(PaginationFilter.user("admin", true));
   }
