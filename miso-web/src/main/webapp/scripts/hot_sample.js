@@ -171,6 +171,11 @@ HotTarget.sample = (function() {
               sam.receivedDate = flat.receivedDate;
             }
           },
+          HotUtils.makeColumnForText('Requisition ID', (!Constants.isDetailedSample || !isTargetIdentity(config))
+              && !config.isLibraryReceipt, 'requisitionId', {
+            validator: HotUtils.validator.optionalTextAlphanumeric,
+            description: 'ID of a requisition form stored in a separate system'
+          }),
           HotUtils.makeColumnForText('Matrix Barcode', !Constants.automaticBarcodes && !config.isLibraryReceipt
               && (!Constants.isDetailedSample || !isTargetIdentity(config)), 'identificationBarcode', {
             validator: HotUtils.validator.optionalTextNoSpecialChars

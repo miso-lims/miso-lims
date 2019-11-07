@@ -26,7 +26,8 @@ FOR EACH ROW
     CASE WHEN (NEW.volumeUnits IS NULL) <> (OLD.volumeUnits IS NULL) OR NEW.volumeUnits <> OLD.volumeUnits THEN CONCAT('volume units: ', COALESCE(OLD.volumeUnits, 'n/a'), ' → ', COALESCE(NEW.volumeUnits, 'n/a')) END,
     CASE WHEN NEW.distributed <> OLD.distributed THEN CONCAT('distributed: ', IF(OLD.distributed = 0, 'No', 'Yes'), ' → ', IF(NEW.distributed = 0, 'No', 'Yes')) END,
     CASE WHEN (NEW.distributionDate IS NULL) <> (OLD.distributionDate IS NULL) OR NEW.distributionDate <> OLD.distributionDate THEN CONCAT('distribution date: ', COALESCE(OLD.distributionDate, 'n/a'), ' → ', COALESCE(NEW.distributionDate, 'n/a')) END,
-    CASE WHEN (NEW.distributionRecipient IS NULL) <> (OLD.distributionRecipient IS NULL) OR NEW.distributionRecipient <> OLD.distributionRecipient THEN CONCAT('distribution recipient: ', COALESCE(OLD.distributionRecipient, 'n/a'), ' → ', COALESCE(NEW.distributionRecipient, 'n/a')) END);
+    CASE WHEN (NEW.distributionRecipient IS NULL) <> (OLD.distributionRecipient IS NULL) OR NEW.distributionRecipient <> OLD.distributionRecipient THEN CONCAT('distribution recipient: ', COALESCE(OLD.distributionRecipient, 'n/a'), ' → ', COALESCE(NEW.distributionRecipient, 'n/a')) END,
+    CASE WHEN (NEW.requisitionId IS NULL) <> (OLD.requisitionId IS NULL) OR NEW.requisitionId <> OLD.requisitionId THEN CONCAT('requisition ID: ', COALESCE(OLD.requisitionId, 'n/a'), ' → ', COALESCE(NEW.requisitionId, 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime) VALUES (
       NEW.sampleId,
@@ -50,7 +51,8 @@ FOR EACH ROW
         CASE WHEN (NEW.volumeUnits IS NULL) <> (OLD.volumeUnits IS NULL) OR NEW.volumeUnits <> OLD.volumeUnits THEN CONCAT(NEW.name, ' volumeUnits') END,
         CASE WHEN NEW.distributed <> OLD.distributed THEN 'distributed' END,
         CASE WHEN (NEW.distributionDate IS NULL) <> (OLD.distributionDate IS NULL) OR NEW.distributionDate <> OLD.distributionDate THEN 'distributionDate' END,
-        CASE WHEN (NEW.distributionRecipient IS NULL) <> (OLD.distributionRecipient IS NULL) OR NEW.distributionRecipient <> OLD.distributionRecipient THEN 'distributionRecipient' END
+        CASE WHEN (NEW.distributionRecipient IS NULL) <> (OLD.distributionRecipient IS NULL) OR NEW.distributionRecipient <> OLD.distributionRecipient THEN 'distributionRecipient' END,
+        CASE WHEN (NEW.requisitionId IS NULL) <> (OLD.requisitionId IS NULL) OR NEW.requisitionId <> OLD.requisitionId THEN 'requisitionId' END
   ), ''),
       NEW.lastModifier,
       log_message,

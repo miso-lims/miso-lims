@@ -118,6 +118,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private BigDecimal concentration;
   @Enumerated(EnumType.STRING)
   private ConcentrationUnit concentrationUnits;
+  private String requisitionId;
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "creator", nullable = false, updatable = false)
@@ -581,6 +582,16 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public Sample getParent() {
     return null;
+  }
+
+  @Override
+  public String getRequisitionId() {
+    return requisitionId;
+  }
+
+  @Override
+  public void setRequisitionId(String requisitionId) {
+    this.requisitionId = requisitionId;
   }
 
 }

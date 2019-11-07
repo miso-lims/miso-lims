@@ -195,8 +195,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.TissuePieceType;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName;
@@ -445,6 +445,7 @@ public class Dtos {
     dto.setDistributed(from.isDistributed());
     dto.setDistributionDate(formatDate(from.getDistributionDate()));
     dto.setDistributionRecipient(from.getDistributionRecipient());
+    setString(dto::setRequisitionId, from.getRequisitionId());
 
     return dto;
 
@@ -817,6 +818,7 @@ public class Dtos {
     to.setDistributed(from.isDistributed());
     to.setDistributionDate(parseDate(from.getDistributionDate()));
     to.setDistributionRecipient(from.getDistributionRecipient());
+    setString(to::setRequisitionId, from.getRequisitionId());
     return to;
   }
 

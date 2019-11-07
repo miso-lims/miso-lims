@@ -289,4 +289,16 @@ public interface Sample
   @Override
   public Sample getParent();
 
+  /**
+   * @return the ID for a requisition form for this sample stored in another system
+   */
+  public String getRequisitionId();
+
+  /**
+   * Sets the ID for a requisition form for this sample stored in another system
+   * 
+   * @param requisitionId
+   */
+  public void setRequisitionId(String requisitionId);
+
 }
