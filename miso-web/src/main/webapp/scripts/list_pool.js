@@ -151,7 +151,7 @@ ListTarget.pool = {
         }];
   },
   searchTermSelector: function(searchTerms) {
-    return [searchTerms['id'], searchTerms['created'], searchTerms['changed'], searchTerms['creator'], searchTerms['changedby'],
-        searchTerms['platform'], searchTerms['index_name'], searchTerms['index_seq'], searchTerms['box']];
+    return [searchTerms['id'], searchTerms['created'], searchTerms['entered'], searchTerms['changed'], searchTerms['creator'],
+        searchTerms['changedby'], searchTerms['platform'], searchTerms['index_name'], searchTerms['index_seq'], searchTerms['box']];
   }
 };

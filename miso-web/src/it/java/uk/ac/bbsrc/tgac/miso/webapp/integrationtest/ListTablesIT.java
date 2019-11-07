@@ -60,7 +60,7 @@ public class ListTablesIT extends AbstractIT {
   private static final Set<String> printersColumns = Sets.newHashSet(Columns.SORT, Columns.PRINTER, Columns.DRIVER, Columns.LAYOUT, Columns.BACKEND,
       Columns.AVAILABLE);
   private static final Set<String> projectsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.SHORT_NAME,
-      Columns.DESCRIPTION, Columns.PROGRESS);
+      Columns.DESCRIPTION, Columns.STATUS);
   private static final Set<String> arraysColumns = Sets.newHashSet(Columns.SORT, Columns.ID, Columns.ALIAS, Columns.SERIAL_NUMBER,
       Columns.LAST_MODIFIED);
   private static final Set<String> arrayRunsColumns = Sets.newHashSet(Columns.SORT, Columns.ID, Columns.ALIAS, Columns.STATUS,

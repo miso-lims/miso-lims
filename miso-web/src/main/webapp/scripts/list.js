@@ -57,23 +57,27 @@ ListUtils = (function($) {
     },
     "created": {
       term: "created:DATE",
-      help: "Checks when this item was entered into MISO.  For rules about dates, see below."
+      help: "Checks when this item was created in the lab. For rules about dates, see below."
+    },
+    "entered": {
+      term: "entered:DATE",
+      help: "Checks when this item was entered into MISO. For rules about dates, see below."
     },
     "received": {
       term: "received:DATE",
-      help: "Checks whether this item has a received date that matches the provided date.  For rules about dates, see below."
+      help: "Checks whether this item has a received date that matches the provided date. For rules about dates, see below."
     },
     "changed": {
       term: "changed:DATE",
-      help: "Checks when any person last edited this item.  For rules about dates, see below."
+      help: "Checks when any person last edited this item. For rules about dates, see below."
     },
     "creator": {
       term: "creator:USER",
-      help: "Check for items entered into MISO by a particular user.  For the rules about users, see below."
+      help: "Check for items entered into MISO by a particular user. For the rules about users, see below."
     },
     "changedby": {
       term: "changedby:USER",
-      help: "Checks for the last person to edit this item in MISO.  For the rules about users, see below."
+      help: "Checks for the last person to edit this item in MISO. For the rules about users, see below."
     },
     "platform": {
       term: "platform:PLATFORM",
@@ -81,19 +85,19 @@ ListUtils = (function($) {
     },
     "index_name": {
       term: "index:NAME",
-      help: "Checks if this item has the index provided.  The name can be a partial match."
+      help: "Checks if this item has the index provided. The name can be a partial match."
     },
     "index_seq": {
       term: "index:SEQ",
-      help: "Checks if this item has the index provided.  The sequence must be an exact match."
+      help: "Checks if this item has the index provided. The sequence must be an exact match."
     },
     "class": {
       term: "class:NAME",
-      help: "Check if the item belong to the sample class provided.  This is taken as a partial match."
+      help: "Check if the item belong to the sample class provided. This is taken as a partial match."
     },
     "institute": {
       term: "institute:NAME",
-      help: "Check if the item came from the institute mentioned.  This is a partial match."
+      help: "Check if the item came from the institute mentioned. This is a partial match."
     },
     "external": {
       term: "external:NAME",

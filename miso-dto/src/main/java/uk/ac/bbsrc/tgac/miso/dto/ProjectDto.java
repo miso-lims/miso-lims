@@ -7,7 +7,7 @@ public class ProjectDto {
   private String creationDate;
   private String shortName;
   private String description;
-  private String progress;
+  private String status;
   private Long referenceGenomeId;
   private String defaultSciName;
   private Long defaultTargetedSequencingId;
@@ -60,12 +60,12 @@ public class ProjectDto {
     this.description = description;
   }
 
-  public String getProgress() {
-    return progress;
+  public String getStatus() {
+    return status;
   }
 
-  public void setProgress(String progress) {
-    this.progress = progress;
+  public void setStatus(String status) {
+    this.status = status;
   }
 
   public Long getReferenceGenomeId() {

@@ -126,7 +126,7 @@ public class HibernateWorksetDao implements WorksetStore, HibernatePaginatedData
   @Override
   public String propertyForDate(Criteria criteria, DateType type) {
     switch (type) {
-    case CREATE:
+    case ENTERED:
       return "created";
     case UPDATE:
       return "lastModified";

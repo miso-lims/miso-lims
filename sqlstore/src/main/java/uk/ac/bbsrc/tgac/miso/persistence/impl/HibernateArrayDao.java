@@ -168,7 +168,7 @@ public class HibernateArrayDao implements ArrayStore, HibernatePaginatedDataSour
   @Override
   public String propertyForDate(Criteria criteria, DateType type) {
     switch (type) {
-    case CREATE:
+    case ENTERED:
       return "creationTime";
     case UPDATE:
       return "lastModified";

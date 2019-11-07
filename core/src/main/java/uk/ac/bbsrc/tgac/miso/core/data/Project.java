@@ -27,13 +27,13 @@ import java.io.Serializable;
 import java.util.Collection;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
-import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
 
 /**
  * A Project represents the top level object in the MISO data model. A Project couples together {@link Study} and {@link Sample} objects to
  * record information about a given sequencing project.
  * <p/>
- * A Project's progress status is tracked by its {@link ProgressType} enumeration.
+ * A Project's status is tracked by its {@link StatusType} enumeration.
  * 
  * @author Rob Davey
  * @since 0.0.2
@@ -75,19 +75,16 @@ public interface Project extends Comparable<Project>, Deletable, Nameable, Seria
   void setShortName(String shortName);
 
   /**
-   * Returns the progress of this Project object.
-   * 
-   * @return ProgressType progress.
+   * @return the status of this Project
    */
-  ProgressType getProgress();
+  StatusType getStatus();
 
   /**
-   * Sets the progress of this Project object.
+   * Sets the status of this Project
    * 
-   * @param progress
-   *          progress.
+   * @param status
    */
-  void setProgress(ProgressType progress);
+  void setStatus(StatusType status);
 
   /**
    * Returns the registered samples of this Project object.

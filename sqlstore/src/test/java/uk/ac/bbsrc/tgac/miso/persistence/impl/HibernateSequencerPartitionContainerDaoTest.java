@@ -260,8 +260,8 @@ public class HibernateSequencerPartitionContainerDaoTest extends AbstractDAOTest
   }
 
   @Test
-  public void testSearchByCreated() throws IOException {
-    testSearch(PaginationFilter.date(LimsUtils.parseDate("2017-01-01"), LimsUtils.parseDate("2018-01-01"), DateType.CREATE));
+  public void testSearchByEntered() throws IOException {
+    testSearch(PaginationFilter.date(LimsUtils.parseDate("2017-01-01"), LimsUtils.parseDate("2018-01-01"), DateType.ENTERED));
   }
 
   @Test

@@ -180,12 +180,4 @@ public interface NamingScheme {
    */
   public boolean nullProjectShortNameAllowed();
 
-  public Integer projectShortNameLengthAdjustment();
-
-  public Integer nameLengthAdjustment();
-
-  public Integer libraryAliasLengthAdjustment();
-
-  public Integer sampleAliasLengthAdjustment();
-
 }

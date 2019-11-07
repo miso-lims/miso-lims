@@ -133,6 +133,8 @@ public class HibernateArrayRunDao implements ArrayRunStore, HibernatePaginatedDa
   public String propertyForDate(Criteria criteria, DateType type) {
     switch (type) {
     case CREATE:
+      return "startDate";
+    case ENTERED:
       return "creationTime";
     case UPDATE:
       return "lastModified";

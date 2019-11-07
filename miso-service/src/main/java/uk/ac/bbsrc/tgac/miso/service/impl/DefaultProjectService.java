@@ -27,6 +27,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.generateTemporaryName;
 import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.validateNameOrThrow;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -122,11 +123,9 @@ public class DefaultProjectService implements ProjectService {
 
   @Override
   public long create(Project project) throws IOException {
+    loadChildEntities(project);
+    validateChange(project, null);
     project.setChangeDetails(authorizationManager.getCurrentUser());
-    ValidationResult shortNameValidation = namingScheme.validateProjectShortName(project.getShortName());
-    if (!shortNameValidation.isValid()) {
-      throw new ValidationException(new ValidationError("shortName", shortNameValidation.getMessage()));
-    }
     project.setName(generateTemporaryName());
     projectStore.save(project);
     try {
@@ -140,24 +139,48 @@ public class DefaultProjectService implements ProjectService {
 
   @Override
   public long update(Project project) throws IOException {
-    ValidationResult shortNameValidation = namingScheme.validateProjectShortName(project.getShortName());
-    if (!shortNameValidation.isValid()) {
-      throw new ValidationException(new ValidationError("shortName", shortNameValidation.getMessage()));
-    }
     Project original = projectStore.get(project.getId());
-    original.setAlias(project.getAlias());
-    original.setDescription(project.getDescription());
-    original.setProgress(project.getProgress());
-    original.setReferenceGenome(referenceGenomeDao.get(project.getReferenceGenome().getId()));
-    if (project.getDefaultTargetedSequencing() != null) {
-      original.setDefaultTargetedSequencing(targetedSequencingStore.get(project.getDefaultTargetedSequencing().getId()));
-    } else {
-      original.setDefaultTargetedSequencing(null);
-    }
-    original.setShortName(project.getShortName());
+    loadChildEntities(project);
+    validateChange(project, original);
+    applyChanges(original, project);
     project = original;
     project.setChangeDetails(authorizationManager.getCurrentUser());
     return projectStore.save(project);
+  }
+
+  private void validateChange(Project project, Project beforeChange) throws IOException {
+    List<ValidationError> errors = new ArrayList<>();
+
+    if (ValidationUtils.isSetAndChanged(Project::getShortName, project, beforeChange)) {
+      // assume that if project shortname is required, it is used for generating sample aliases
+      if (beforeChange != null && !namingScheme.nullProjectShortNameAllowed() && !beforeChange.getSamples().isEmpty()) {
+        errors.add(new ValidationError("shortName", "Cannot change because there are already samples in the project"));
+      }
+    }
+    ValidationResult shortNameValidation = namingScheme.validateProjectShortName(project.getShortName());
+    if (!shortNameValidation.isValid()) {
+      errors.add(new ValidationError("shortName", shortNameValidation.getMessage()));
+    }
+
+    if (!errors.isEmpty()) {
+      throw new ValidationException(errors);
+    }
+  }
+
+  private void loadChildEntities(Project project) throws IOException {
+    project.setReferenceGenome(referenceGenomeDao.get(project.getReferenceGenome().getId()));
+    if (project.getDefaultTargetedSequencing() != null) {
+      project.setDefaultTargetedSequencing(targetedSequencingStore.get(project.getDefaultTargetedSequencing().getId()));
+    }
+  }
+
+  private void applyChanges(Project original, Project project) {
+    original.setAlias(project.getAlias());
+    original.setDescription(project.getDescription());
+    original.setStatus(project.getStatus());
+    original.setReferenceGenome(project.getReferenceGenome());
+    original.setDefaultTargetedSequencing(project.getDefaultTargetedSequencing());
+    original.setShortName(project.getShortName());
   }
 
   public void setNamingScheme(NamingScheme namingScheme) {

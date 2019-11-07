@@ -29,12 +29,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This enum represents progress stages that any monitored process can utilise.
+ * This enum represents status stages that any monitored process can utilise.
  * 
  * @author Rob Davey
  * @since 0.0.2
  */
-public enum ProgressType {
+public enum StatusType {
   UNKNOWN("Unknown"), ACTIVE("Active"), INACTIVE("Inactive"), CANCELLED("Cancelled"), PROPOSED("Proposed"), PENDING("Pending"), APPROVED(
       "Approved"), COMPLETED("Completed");
 
@@ -45,51 +45,46 @@ public enum ProgressType {
   /**
    * Field lookup
    */
-  private static final Map<String, ProgressType> lookup = new HashMap<String, ProgressType>();
+  private static final Map<String, StatusType> lookup = new HashMap<>();
 
   static {
-    for (ProgressType s : EnumSet.allOf(ProgressType.class))
+    for (StatusType s : EnumSet.allOf(StatusType.class))
       lookup.put(s.getKey(), s);
   }
 
   /**
-   * Constructs a ProgressType based on a given key
+   * Constructs a StatusType based on a given key
    * 
    * @param key
    *          of type String
    */
-  ProgressType(String key) {
+  StatusType(String key) {
     this.key = key;
   }
 
   /**
-   * Returns a ProgressType given an enum key
+   * Returns a StatusType given an enum key
    * 
    * @param key
-   *          of type String
-   * @return ProgressType
+   * @return StatusType
    */
-  public static ProgressType get(String key) {
+  public static StatusType get(String key) {
     return lookup.get(key);
   }
 
   /**
-   * Returns the key of this ProgressType enum.
-   * 
-   * @return String key.
+   * @return the key of this StatusType value
    */
   public String getKey() {
     return key;
   }
 
   /**
-   * Returns the keys of this ProgressType enum.
-   * 
-   * @return ArrayList<String> keys.
+   * @return the keys of this StatusType enum
    */
   public static ArrayList<String> getKeys() {
-    ArrayList<String> keys = new ArrayList<String>();
-    for (ProgressType h : ProgressType.values()) {
+    ArrayList<String> keys = new ArrayList<>();
+    for (StatusType h : StatusType.values()) {
       keys.add(h.getKey());
     }
     return keys;

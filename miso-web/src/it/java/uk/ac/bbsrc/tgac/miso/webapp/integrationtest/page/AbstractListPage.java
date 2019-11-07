@@ -81,7 +81,6 @@ public interface AbstractListPage {
     public static final String POOL_DESCRIPTION = "Pool Description";
     public static final String POSITION = "Position";
     public static final String PRINTER = "Printer";
-    public static final String PROGRESS = "Progress";
     public static final String PURPOSE = "Purpose";
     public static final String QC_NOTE = "QC Note";
     public static final String QC_PASSED = "QC Passed";

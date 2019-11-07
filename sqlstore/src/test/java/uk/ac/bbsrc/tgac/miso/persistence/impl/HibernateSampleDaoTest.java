@@ -49,6 +49,7 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   public void setup() {
     dao = new HibernateSampleDao();
     dao.setSessionFactory(sessionFactory);
+    dao.setDetailedSample(true);
   }
 
   @Test
@@ -361,6 +362,11 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   @Test
   public void testSearchByCreated() throws IOException {
     testSearch(PaginationFilter.date(LimsUtils.parseDate("2017-01-01"), LimsUtils.parseDate("2018-01-01"), DateType.CREATE));
+  }
+
+  @Test
+  public void testSearchByEntered() throws IOException {
+    testSearch(PaginationFilter.date(LimsUtils.parseDate("2017-01-01"), LimsUtils.parseDate("2018-01-01"), DateType.ENTERED));
   }
 
   @Test
