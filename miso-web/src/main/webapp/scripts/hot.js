@@ -407,6 +407,26 @@ var HotUtils = {
     cellMetaData.forEach(function(data) {
       table.setCellMeta(data.row, data.col, data.key, data.val);
     });
+    table.addHook('beforeChange', function(changes, source) {
+      // Each element of changes contains [rowIndex, colName, oldValue, newValue]
+      for (var i = 0; i < changes.length; i++) {
+        // auto-select partial matches from dropdowns
+        // Note: object returned by getCellMeta doesn't always have the correct type and source, but the one in getCellMetaAtRow does...
+        var cellMetas = table.getCellMetaAtRow(changes[i][0]);
+        var column = Utils.array.findUniqueOrThrow(function(cellMeta) {
+          return cellMeta.prop === changes[i][1];
+        }, cellMetas);
+        if ((column.type === 'dropdown' || column.type === 'autocomplete') && column.source && column.source.length) {
+          var matchingOptions = column.source.filter(function(option) {
+            return option.startsWith(changes[i][3]);
+          });
+          if (matchingOptions.length === 1) {
+            changes[i][3] = matchingOptions[0];
+            needsRender = true;
+          }
+        }
+      }
+    });
     table.addHook('afterChange', function(changes, source) {
       var needsRender = false;
       // 'changes' is a variable-length array of arrays. Each inner array has
@@ -470,6 +490,9 @@ var HotUtils = {
           table.runHooks('afterChange', triggeredChanges, 'Autofill.fill');
         }
       });
+
+      // Need to validate the changes made in beforeChange
+      table.validateCells();
     });
 
     // For cells that have change notifiers, we have to call them to set up the

@@ -15,6 +15,7 @@ Changes:
   * Fixed copying tissue type and lab values from Excel by no longer truncating the labels
   * Fixed validation for library aliquot targeted sequencing when library design code is changed
   * Changed the interface for modifying pool contents on the Edit Pool page
+  * Autocomplete dropdown entries when pasting partial values into bulk tables
   * Updated advanced search terms
     * "created" now always refers to a date that the item was created in the lab, such as the
       user-specified creation date for libraries or the start date for sequencing runs
