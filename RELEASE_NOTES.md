@@ -19,6 +19,8 @@ Changes:
     * "created" now always refers to a date that the item was created in the lab, such as the
       user-specified creation date for libraries or the start date for sequencing runs
     * "entered" refers to a date that an item was entered into MISO
+  * Prevent changing project shortname if it is used for generating aliases and the project already
+    contains samples
 
 Upgrade Notes:
 

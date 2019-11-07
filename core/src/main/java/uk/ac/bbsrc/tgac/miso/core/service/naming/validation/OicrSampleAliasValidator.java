@@ -10,7 +10,7 @@ public class OicrSampleAliasValidator extends RegexValidator {
   private static final String REGEX = "^" + IDENTITY_REGEX_PART + "(_" + TISSUE_REGEX_PART + "(_" + ANALYTE_REGEX_PART + ")?)?$";
 
   public OicrSampleAliasValidator() {
-    super(REGEX, false, false, null);
+    super(REGEX, false, false);
   }
 
   @Override
