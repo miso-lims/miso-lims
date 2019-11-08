@@ -348,4 +348,10 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
       errorHandler.accept(String.format("%s has no %s.", getFriendlyName(), (creator ? "creator" : "modifier")));
     }
   }
+
+  @Override
+  public default void restrictPaginationByFreezer(Criteria item, String query, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s cannot be filtered by freezer.", getFriendlyName()));
+  }
+
 }

@@ -2,7 +2,7 @@
 
 Changes:
 
-
+  * Added ability to search samples, libraries, library aliquots, and pools by freezer
 
 # 0.2.195
 

@@ -405,6 +405,11 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   }
 
   @Test
+  public void testSearchByFreezer() throws Exception {
+    testSearch(PaginationFilter.freezer("freezer1"));
+  }
+
+  @Test
   public void testSearchByGhost() throws IOException {
     testSearch(PaginationFilter.ghost(true));
   }

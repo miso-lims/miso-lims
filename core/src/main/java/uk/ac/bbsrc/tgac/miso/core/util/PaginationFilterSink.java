@@ -73,4 +73,6 @@ public interface PaginationFilterSink<T> {
 
   public void restrictPaginationByUserOrGroup(T item, String name, boolean creator, Consumer<String> errorHandler);
 
+  public void restrictPaginationByFreezer(T item, String query, Consumer<String> errorHandler);
+
 }

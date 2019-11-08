@@ -11,10 +11,12 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -23,9 +25,11 @@ import org.hibernate.annotations.Immutable;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
+import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Timestamped;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
@@ -73,6 +77,10 @@ public class ListPoolView implements Aliasable, Nameable, Serializable, Timestam
 
   private boolean discarded;
   private boolean distributed;
+
+  @OneToOne(targetEntity = BoxImpl.class, fetch = FetchType.LAZY)
+  @JoinColumn(name = "boxId", insertable = false, updatable = false)
+  private Box box;
 
   private Long boxId;
   private String boxName;
@@ -221,6 +229,14 @@ public class ListPoolView implements Aliasable, Nameable, Serializable, Timestam
 
   public void setDistributed(boolean distributed) {
     this.distributed = distributed;
+  }
+
+  public Box getBox() {
+    return box;
+  }
+
+  public void setBox(Box box) {
+    this.box = box;
   }
 
   public Long getBoxId() {

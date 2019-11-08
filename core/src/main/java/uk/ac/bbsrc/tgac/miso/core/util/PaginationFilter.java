@@ -379,6 +379,16 @@ public abstract interface PaginationFilter {
     };
   }
 
+  public static PaginationFilter freezer(String freezer) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByFreezer(item, freezer, errorHandler);
+      }
+    };
+  }
+
   public abstract <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler);
 
 }

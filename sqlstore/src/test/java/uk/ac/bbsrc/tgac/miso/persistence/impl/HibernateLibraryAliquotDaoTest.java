@@ -310,6 +310,11 @@ public class HibernateLibraryAliquotDaoTest extends AbstractDAOTest {
     testSearch(PaginationFilter.box("BOX1"));
   }
 
+  @Test
+  public void testSearchByFreezer() throws Exception {
+    testSearch(PaginationFilter.freezer("freezer1"));
+  }
+
   /**
    * Verifies Hibernate mappings by ensuring that no exception is thrown by a search
    * 
