@@ -9,10 +9,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
-import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
-import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
-
-import java.util.stream.Collectors;
 
 @ControllerAdvice("uk.ac.bbsrc.tgac.miso.webapp.controller")
 public class ExceptionHandlerAdvice {
@@ -27,7 +23,7 @@ public class ExceptionHandlerAdvice {
 
   @ExceptionHandler(ClientErrorException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public ModelAndView showClientError(final ServerErrorException e) {
+  public ModelAndView showClientError(final ClientErrorException e) {
     return fromExceptionMessage("Bad Request", e, true);
   }
 
@@ -43,18 +39,6 @@ public class ExceptionHandlerAdvice {
     logException(e);
     return withMessages("Server Error",
         "An unexpected error has occurred. If the problem persists, please report it to your MISO administrators", true);
-  }
-
-  @ExceptionHandler(ValidationException.class)
-  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  public ModelAndView showValidationErrors(final ValidationException e){
-    // A ValidationException might have >1 ValidationError. Show all their messages
-    return withMessages("Input Validation Error",
-            e.getErrors()
-              .stream()
-              .map(ValidationError::getMessage)
-              .collect(Collectors.joining("\n")),
-            true);
   }
 
   private ModelAndView fromExceptionMessage(String genericMessage, Exception e, boolean possibleBug) {
