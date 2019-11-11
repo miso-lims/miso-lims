@@ -35,7 +35,7 @@ public class FreezerPage extends FormPage<FreezerPage.Field> {
   private WebElement saveButton;
 
   public FreezerPage(WebDriver driver) {
-    super(driver);
+    super(driver, "freezerForm");
     PageFactory.initElements(driver, this);
     waitWithTimeout().until(titleContains("Freezer "));
   }

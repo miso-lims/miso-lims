@@ -52,7 +52,7 @@ public class WorksetPage extends FormPage<WorksetPage.Field> {
   private DataTable libraryAliquotsTable = null;
 
   public WorksetPage(WebDriver driver) {
-    super(driver);
+    super(driver, "worksetForm");
     PageFactory.initElements(driver, this);
     waitWithTimeout().until(titleContains("Workset "));
     if (findElementIfExists(By.id(samplesTableWrapper)) != null) {

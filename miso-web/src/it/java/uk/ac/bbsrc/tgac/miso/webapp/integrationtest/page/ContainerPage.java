@@ -45,7 +45,7 @@ public class ContainerPage extends FormPage<ContainerPage.Field> {
   private WebElement saveButton;
 
   public ContainerPage(WebDriver driver) {
-    super(driver);
+    super(driver, "containerForm");
     PageFactory.initElements(driver, this);
     waitWithTimeout().until(or(titleContains("Flow Cell "), titleContains("8Pac ")));
   }

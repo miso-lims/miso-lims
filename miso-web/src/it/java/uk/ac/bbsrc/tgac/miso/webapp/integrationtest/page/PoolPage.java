@@ -83,7 +83,7 @@ public class PoolPage extends FormPage<PoolPage.Field> {
   private DataTable aliquotsTable = null;
 
   public PoolPage(WebDriver driver) {
-    super(driver);
+    super(driver, "poolForm");
     PageFactory.initElements(driver, this);
     waitWithTimeout().until(or(titleContains("Pool "), titleContains(NEW_TITLE_PREFIX)));
     boolean isNew = driver.getTitle().startsWith(NEW_TITLE_PREFIX);

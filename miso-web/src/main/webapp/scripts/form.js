@@ -98,6 +98,8 @@ FormUtils = (function($) {
     }
   };
 
+  var initializedForms = [];
+
   return {
     createForm: function(containerId, saveId, object, targetName, config) {
       var container = $('#' + containerId);
@@ -142,7 +144,7 @@ FormUtils = (function($) {
       }
 
       form.setUnchanged();
-
+      initializedForms.push(containerId);
       return form;
     },
 
@@ -171,6 +173,10 @@ FormUtils = (function($) {
           }
         }
       });
+    },
+
+    isInitialized: function(formId) {
+      return initializedForms.indexOf(formId) !== -1;
     },
 
     makeQcPassedField: function(include) {

@@ -10,6 +10,8 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.MoreExpectedConditions;
+
 /**
  * Page that is mainly composed of a list of fields
  */
@@ -105,8 +107,9 @@ public abstract class FormPage<T extends FormPage.FieldElement> extends HeaderFo
     }
   }
 
-  public FormPage(WebDriver driver) {
+  public FormPage(WebDriver driver, String formId) {
     super(driver);
+    waitUntil(MoreExpectedConditions.jsReturnsTrue(String.format("return FormUtils.isInitialized('%s');", formId)));
   }
 
   public boolean isEditable(T field) {
