@@ -34,8 +34,8 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.QcCorrespondingField;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcCorrespondingField;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl

@@ -2,8 +2,8 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.util.List;
 
-import uk.ac.bbsrc.tgac.miso.core.data.QcCorrespondingField;
-import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcCorrespondingField;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
 
 public class QcTargetDto {
   private QcTarget qcTarget;

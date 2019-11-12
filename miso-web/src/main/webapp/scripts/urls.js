@@ -369,6 +369,13 @@ Urls = (function() {
   };
 
   // QCs
+  var qcUiBase = baseUrl + '/qc';
+  ui.qcs = {
+    bulkAddFrom: idUrlFunction(qcUiBase + '/bulk/addFrom'),
+    bulkEdit: idUrlFunction(qcUiBase + '/bulk/edit'),
+    bulkEditFrom: idUrlFunction(qcUiBase + '/bulk/editFrom')
+  }
+
   var qcRestBase = restBase + '/qcs';
   rest.qcs = {
     create: qcRestBase,
@@ -376,6 +383,14 @@ Urls = (function() {
   };
 
   // QC Types
+  var qcTypeUiBase = baseUrl + '/qctype';
+  ui.qcTypes = {
+    create: qcTypeUiBase + '/new',
+    edit: idUrlFunction(qcTypeUiBase),
+    bulkCreate: qcTypeUiBase + '/bulk/new',
+    bulkEdit: qcTypeUiBase + '/bulk/edit'
+  };
+
   var qcTypeRestBase = restBase + '/qctypes';
   rest.qcTypes = {
     create: qcTypeRestBase,

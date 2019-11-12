@@ -21,8 +21,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkQCPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkQCPage.QcColumns;
@@ -34,7 +34,7 @@ public class BulkLibraryQCIT extends AbstractIT {
   private static final Logger log = LoggerFactory.getLogger(BulkLibraryQCIT.class);
 
   private static final Set<String> qcColumns = Sets.newHashSet(QcColumns.LIBRARY_ALIAS, QcColumns.DATE, QcColumns.TYPE,
-      QcColumns.RESULT, QcColumns.UNITS, QcColumns.DESCRIPTION);
+      QcColumns.INSTRUMENT, QcColumns.KIT_LOT, QcColumns.RESULT, QcColumns.UNITS, QcColumns.DESCRIPTION);
 
   @Before
   public void setup() {

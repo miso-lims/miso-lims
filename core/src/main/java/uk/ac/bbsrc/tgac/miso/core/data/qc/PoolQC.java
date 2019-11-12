@@ -21,13 +21,18 @@
  * *********************************************************************
  */
 
-package uk.ac.bbsrc.tgac.miso.core.data;
+package uk.ac.bbsrc.tgac.miso.core.data.qc;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 
 /**
@@ -45,6 +50,8 @@ public class PoolQC extends QC {
   @JoinColumn(name = "pool_poolId")
   private Pool pool;
 
+  @OneToMany(mappedBy = "qc")
+  private List<PoolQcControlRun> controls;
 
   @Override
   public QualityControllable<?> getEntity() {
@@ -57,6 +64,14 @@ public class PoolQC extends QC {
 
   public void setPool(Pool pool) {
     this.pool = pool;
+  }
+
+  @Override
+  public List<PoolQcControlRun> getControls() {
+    if (controls == null) {
+      controls = new ArrayList<>();
+    }
+    return controls;
   }
 
 }

@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.util.List;
+
 public class QcDto {
 
   private String creator;
@@ -10,6 +12,9 @@ public class QcDto {
   private String results;
   private QcTypeDto type;
   private String description;
+  private Long instrumentId;
+  private String kitLot;
+  private List<QcControlRunDto> controls;
 
   public String getCreator() {
     return creator;
@@ -73,6 +78,30 @@ public class QcDto {
 
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  public Long getInstrumentId() {
+    return instrumentId;
+  }
+
+  public void setInstrumentId(Long instrumentId) {
+    this.instrumentId = instrumentId;
+  }
+
+  public String getKitLot() {
+    return kitLot;
+  }
+
+  public void setKitLot(String kitLot) {
+    this.kitLot = kitLot;
+  }
+
+  public List<QcControlRunDto> getControls() {
+    return controls;
+  }
+
+  public void setControls(List<QcControlRunDto> controls) {
+    this.controls = controls;
   }
 
 }

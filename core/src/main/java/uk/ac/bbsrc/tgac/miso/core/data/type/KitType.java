@@ -35,7 +35,7 @@ import java.util.Map;
  * @since 0.0.2
  */
 public enum KitType {
-  LIBRARY("Library"), SEQUENCING("Sequencing"), CLUSTERING("Clustering"), MULTIPLEXING("Multiplexing"), EXTRACTION("Extraction");
+  LIBRARY("Library"), SEQUENCING("Sequencing"), CLUSTERING("Clustering"), MULTIPLEXING("Multiplexing"), EXTRACTION("Extraction"), QC("QC");
 
   /** Field key */
   private String key;

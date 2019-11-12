@@ -25,17 +25,10 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Response.Status;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -43,9 +36,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.util.UriComponentsBuilder;
 
-import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.service.QcTypeService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.QcTypeDto;
@@ -58,51 +49,27 @@ public class QcTypeRestController extends RestController {
   @Autowired
   private MenuController menuController;
 
-  protected static final Logger log = LoggerFactory.getLogger(QcTypeRestController.class);
-
   @Autowired
   private QcTypeService qcTypeService;
 
-  @GetMapping(value = "/{id}", produces = { "application/json" })
-  @ResponseBody
-  public QcTypeDto getQcType(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletResponse response)
-      throws IOException {
-    QcType qcType = qcTypeService.get(id);
-    if (qcType == null) {
-      throw new RestException("No subproject found with ID: " + id, Status.NOT_FOUND);
-    } else {
-      QcTypeDto dto = Dtos.asDto(qcType);
-      return dto;
-    }
-  }
-
-  @GetMapping(produces = { "application/json" })
-  @ResponseBody
-  public Set<QcTypeDto> getQcTypes(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
-    Set<QcType> qcTypes = (Set<QcType>) qcTypeService.getAll();
-    Set<QcTypeDto> qcTypeDtos = Dtos.asQcTypeDtos(qcTypes);
-    return qcTypeDtos;
-  }
-
   @PostMapping(headers = { "Content-type=application/json" })
   @ResponseBody
-  public QcTypeDto createQcType(@RequestBody QcTypeDto qcTypeDto, UriComponentsBuilder uriBuilder, HttpServletResponse response)
-      throws IOException {
-    QcType qcType = Dtos.to(qcTypeDto);
-    Long id = qcTypeService.create(qcType);
-    menuController.refreshConstants();
-    return getQcType(id, uriBuilder, response);
+  public QcTypeDto createQcType(@RequestBody QcTypeDto qcTypeDto) throws IOException {
+    return RestUtils.createObject("QC Type", qcTypeDto, Dtos::to, qcTypeService, qcType -> {
+      QcTypeDto dto = Dtos.asDto(qcType);
+      menuController.refreshConstants();
+      return dto;
+    });
   }
 
   @PutMapping(value = "/{id}", headers = { "Content-type=application/json" })
   @ResponseBody
-  public QcTypeDto updateSubproject(@PathVariable("id") Long id, @RequestBody QcTypeDto qcTypeDto, UriComponentsBuilder uriBuilder,
-      HttpServletResponse response) throws IOException {
-    QcType qcType = Dtos.to(qcTypeDto);
-    qcType.setId(id);
-    qcTypeService.update(qcType);
-    menuController.refreshConstants();
-    return getQcType(id, uriBuilder, response);
+  public QcTypeDto updateSubproject(@PathVariable("id") long id, @RequestBody QcTypeDto qcTypeDto) throws IOException {
+    return RestUtils.updateObject("QC Type", id, qcTypeDto, Dtos::to, qcTypeService, qcType -> {
+      QcTypeDto dto = Dtos.asDto(qcType);
+      menuController.refreshConstants();
+      return dto;
+    });
   }
 
   @PostMapping(value = "/bulk-delete")

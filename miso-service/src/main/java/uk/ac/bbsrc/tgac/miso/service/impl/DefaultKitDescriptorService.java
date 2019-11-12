@@ -195,6 +195,10 @@ public class DefaultKitDescriptorService implements KitDescriptorService {
     if (runUsage > 0) {
       result.addError(ValidationError.forDeletionUsage(object, runUsage, "sequencing " + Pluralizer.runs(runUsage)));
     }
+    long qcTypeUsage = kitStore.getUsageByQcTypes(object);
+    if (qcTypeUsage > 0) {
+      result.addError(ValidationError.forDeletionUsage(object, qcTypeUsage, "QC " + Pluralizer.types(qcTypeUsage)));
+    }
     return result;
   }
 

@@ -18,9 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 
 /**
@@ -46,7 +46,7 @@ public class HibernateLibraryQcDaoTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryQCDAO#create(uk.ac.bbsrc.tgac.miso.core.data.LibraryQC)}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryQCDAO#create(uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQC)}.
    * 
    * @throws IOException
    */

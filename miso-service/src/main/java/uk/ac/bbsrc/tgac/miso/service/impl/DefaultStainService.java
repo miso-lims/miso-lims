@@ -74,7 +74,7 @@ public class DefaultStainService implements StainService {
   }
 
   private void loadChildEntities(Stain stain) throws IOException {
-    ValidationUtils.loadChildEntity(stain, stain.getCategory(), stainCategoryService, "categoryId");
+    ValidationUtils.loadChildEntity(stain::setCategory, stain.getCategory(), stainCategoryService, "categoryId");
   }
 
   private void validateChange(Stain stain, Stain beforeChange) throws IOException {

@@ -412,6 +412,9 @@ var HotUtils = {
       for (var i = 0; i < changes.length; i++) {
         // auto-select partial matches from dropdowns
         // Note: object returned by getCellMeta doesn't always have the correct type and source, but the one in getCellMetaAtRow does...
+        if (!changes[i][3]) {
+          continue;
+        }
         var cellMetas = table.getCellMetaAtRow(changes[i][0]);
         var column = Utils.array.findUniqueOrThrow(function(cellMeta) {
           return cellMeta.prop === changes[i][1];
@@ -1235,19 +1238,42 @@ var HotUtils = {
           type: 'int',
           label: 'QCs per ' + qcTarget,
           value: 1
-        }, ], function(result) {
-          window.location = window.location.origin + '/miso/qc/bulk/addFrom/' + qcTarget + '?' + jQuery.param({
-            entityIds: items.map(Utils.array.getId).join(','),
-            copies: result.copies
-
-          });
+        }, {
+          property: 'controls',
+          type: 'int',
+          label: 'Controls per QC',
+          value: 1
+        }], function(result) {
+          if (!Number.isInteger(result.copies) || result.copies < 1) {
+            Utils.showOkDialog('Error', ['Invalid number of QCs entered']);
+          } else if (!Number.isInteger(result.controls) || result.controls < 0) {
+            Utils.showOkDialog('Error', ['Invalid number of controls entered']);
+          } else {
+            window.location = Urls.ui.qcs.bulkAddFrom(qcTarget) + '?' + jQuery.param({
+              entityIds: items.map(Utils.array.getId).join(','),
+              copies: result.copies,
+              controls: result.controls
+            });
+          }
         });
       }
     }, {
       name: 'Edit QCs',
       action: function(items) {
-        window.location = window.location.origin + '/miso/qc/bulk/editFrom/' + qcTarget + '?' + jQuery.param({
-          entityIds: items.map(Utils.array.getId).join(',')
+        Utils.showDialog('Edit QCs', 'Edit', [{
+          property: 'controls',
+          type: 'int',
+          label: 'Add controls per QC',
+          value: 0
+        }], function(result) {
+          if (!Number.isInteger(result.controls) || result.controls < 0) {
+            Utils.showOkDialog('Error', ['Invalid number of controls entered']);
+            return;
+          }
+          window.location = Urls.ui.qcs.bulkEditFrom(qcTarget) + '?' + jQuery.param({
+            entityIds: items.map(Utils.array.getId).join(','),
+            addControls: result.controls
+          });
         });
       }
     }, ];

@@ -1,16 +1,26 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcControl;
+import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.InstrumentModelService;
+import uk.ac.bbsrc.tgac.miso.core.service.KitDescriptorService;
 import uk.ac.bbsrc.tgac.miso.core.service.QcTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -23,12 +33,14 @@ public class DefaultQcTypeService implements QcTypeService {
 
   @Autowired
   private QualityControlTypeStore qcTypeStore;
-
   @Autowired
   private AuthorizationManager authorizationManager;
-
   @Autowired
   private DeletionStore deletionStore;
+  @Autowired
+  private InstrumentModelService instrumentModelService;
+  @Autowired
+  private KitDescriptorService kitDescriptorService;
 
   @Override
   public QcType get(long id) throws IOException {
@@ -37,29 +49,127 @@ public class DefaultQcTypeService implements QcTypeService {
   }
 
   @Override
-  public void update(QcType qcType) throws IOException {
+  public long update(QcType qcType) throws IOException {
     authorizationManager.throwIfNonAdmin();
-    QcType updatedQcType = get(qcType.getId());
-    updatedQcType.setName(qcType.getName());
-    updatedQcType.setDescription(LimsUtils.isStringBlankOrNull(qcType.getDescription()) ? "" : qcType.getDescription());
-    updatedQcType.setQcTarget(qcType.getQcTarget());
-    updatedQcType.setUnits(LimsUtils.isStringBlankOrNull(qcType.getUnits()) ? "" : qcType.getUnits());
-    updatedQcType.setPrecisionAfterDecimal(qcType.getPrecisionAfterDecimal());
-    updatedQcType.setCorrespondingField(qcType.getCorrespondingField());
-    updatedQcType.setAutoUpdateField(qcType.isAutoUpdateField());
-    qcTypeStore.update(updatedQcType);
+    loadChildEntities(qcType);
+    QcType managed = get(qcType.getId());
+    validateChange(qcType, managed);
+    applyChanges(managed, qcType);
+    qcTypeStore.update(managed);
+    saveControls(managed.getId(), qcType);
+    return managed.getId();
   }
 
   @Override
-  public Long create(QcType qcType) throws IOException {
+  public long create(QcType qcType) throws IOException {
     authorizationManager.throwIfNonAdmin();
-    if (qcType.getDescription() == null) {
-      qcType.setDescription("");
+    loadChildEntities(qcType);
+    validateChange(qcType, null);
+    long savedId = qcTypeStore.create(qcType);
+    saveControls(savedId, qcType);
+    return savedId;
+  }
+
+  private void loadChildEntities(QcType qcType) throws IOException {
+    if (qcType.getInstrumentModel() != null) {
+      qcType.setInstrumentModel(instrumentModelService.get(qcType.getInstrumentModel().getId()));
     }
-    if (qcType.getUnits() == null) {
-      qcType.setUnits("");
+    if (qcType.getKitDescriptor() != null) {
+      qcType.setKitDescriptor(kitDescriptorService.get(qcType.getKitDescriptor().getId()));
     }
-    return qcTypeStore.create(qcType);
+    Set<QcControl> managedControls = new HashSet<>();
+    for (QcControl control : qcType.getControls()) {
+      if (control.isSaved()) {
+        QcControl managedControl = qcTypeStore.getControl(control.getId());
+        if (managedControl == null) {
+          throw new ValidationException("No control found with ID: " + control.getId());
+        }
+        managedControls.add(managedControl);
+      } else {
+        managedControls.add(control);
+      }
+    }
+    qcType.getControls().clear();
+    qcType.getControls().addAll(managedControls);
+  }
+
+  private void applyChanges(QcType to, QcType from) {
+    to.setName(from.getName());
+    to.setDescription(LimsUtils.isStringBlankOrNull(from.getDescription()) ? "" : from.getDescription());
+    to.setQcTarget(from.getQcTarget());
+    to.setUnits(LimsUtils.isStringBlankOrNull(from.getUnits()) ? "" : from.getUnits());
+    to.setPrecisionAfterDecimal(from.getPrecisionAfterDecimal());
+    to.setCorrespondingField(from.getCorrespondingField());
+    to.setAutoUpdateField(from.isAutoUpdateField());
+    to.setInstrumentModel(from.getInstrumentModel());
+    to.setKitDescriptor(from.getKitDescriptor());
+    to.setArchived(from.isArchived());
+  }
+
+  private void validateChange(QcType qcType, QcType beforeChange) throws IOException {
+    List<ValidationError> errors = new ArrayList<>();
+
+    if (beforeChange != null) {
+      long usage = qcTypeStore.getUsage(beforeChange);
+      if (usage > 1L) {
+        if (ValidationUtils.isChanged(QcType::getInstrumentModel, qcType, beforeChange)) {
+          errors.add(new ValidationError("instrumentModelId", "Cannot change because there are already QCs of this type"));
+        }
+        if (ValidationUtils.isChanged(QcType::getKitDescriptor, qcType, beforeChange)) {
+          errors.add(new ValidationError("kitDescriptorId", "Cannot change because there are already QCs of this type"));
+        }
+        if (!qcType.getControls().isEmpty() && beforeChange.getControls().isEmpty()) {
+          errors.add(new ValidationError("controls", "Cannot add controls because there are already QCs of this type"));
+        }
+      }
+
+      Set<QcControl> toDelete = getControlsToDelete(qcType, beforeChange);
+      for (QcControl control : toDelete) {
+        long controlUsage = qcTypeStore.getControlUsage(control);
+        if (controlUsage > 0L) {
+          throw new ValidationException(
+              String.format("Cannot remove control '%s' because it is used in %d %s", control.getAlias(), controlUsage,
+                  Pluralizer.qcs(controlUsage)));
+        }
+      }
+    }
+
+    if (!qcType.isArchived()) {
+      List<QcType> dupes = qcTypeStore.listByNameAndTarget(qcType.getName(), qcType.getQcTarget());
+      if (dupes.stream().anyMatch(dupe -> dupe.getId() != qcType.getId() && !dupe.isArchived())) {
+        errors.add(new ValidationError("name",
+            String.format("There is already a non-archived %s QC type with this name", qcType.getQcTarget().getLabel())));
+      }
+    }
+
+    if (qcType.getKitDescriptor() != null && qcType.getKitDescriptor().getKitType() != KitType.QC) {
+      errors.add(new ValidationError("kitDescriptorId", "Must be a QC kit"));
+    }
+
+    if (!errors.isEmpty()) {
+      throw new ValidationException(errors);
+    }
+  }
+
+  private void saveControls(long savedId, QcType from) throws IOException {
+    QcType to = get(savedId);
+    Set<QcControl> toDelete = getControlsToDelete(from, to);
+    for (QcControl control : toDelete) {
+      qcTypeStore.deleteControl(control);
+    }
+
+    for (QcControl fromControl : from.getControls()) {
+      if (!fromControl.isSaved()) {
+        fromControl.setQcType(to);
+        qcTypeStore.createControl(fromControl);
+      }
+    }
+  }
+
+  private Set<QcControl> getControlsToDelete(QcType qcType, QcType beforeChange) {
+    return beforeChange.getControls().stream()
+        .filter(toControl -> qcType.getControls().stream().noneMatch(fromControl -> fromControl.getId() == toControl.getId()))
+        .collect(Collectors.toSet());
   }
 
   @Override

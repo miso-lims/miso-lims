@@ -6,7 +6,7 @@ FormUtils = (function($) {
    *   getSaveMethod: required function(object) returning string (POST|PUT); HTTP method to save object
    *   getEditUrl: required function(object, config) returning string; URL for the object's edit page
    *   getSections: required function(config, object) returning array of FormSections; see below
-   *   onLoad: optional function(updateField); called after the form is initialized
+   *   onLoad: optional function(form); called after the form is initialized
    *   confirmSave: optional function(object, saveCallback); called before saving. saveCallback must be invoked to confirm and save
    * }
    * 
@@ -99,6 +99,8 @@ FormUtils = (function($) {
   };
 
   var initializedForms = [];
+  var initializedTables = [];
+  var temporaryIdCounter = 0;
 
   return {
     createForm: function(containerId, saveId, object, targetName, config) {
@@ -130,7 +132,7 @@ FormUtils = (function($) {
         });
       });
       if (target.onLoad) {
-        target.onLoad(form.updateField);
+        target.onLoad(form);
       }
 
       if (containerId !== dialogFormId) {
@@ -276,6 +278,41 @@ FormUtils = (function($) {
         type: 'text',
         maxLength: 250
       }];
+    },
+
+    setTableData: function(listTarget, config, containerId, data, form) {
+      var listId = containerId + 'Table';
+      if (initializedTables.indexOf(containerId) !== -1) {
+        if (form) {
+          form.markOtherChanges();
+        }
+        var listSelector = '#' + containerId + 'Table';
+        $('#' + listId).dataTable().fnDestroy();
+        $('#' + containerId).empty();
+        ListState[listId] = null;
+      }
+      // IDs needed for list checkboxes to work correctly
+      data.forEach(function(item) {
+        if (!item.id) {
+          item.id = generateTemporaryId();
+        }
+      });
+      $('#' + containerId).append($('<table>').attr('id', listId).addClass('display no-border ui-widget-content'));
+      ListUtils.createStaticTable(listId, listTarget, config, data);
+      initializedTables.push(containerId);
+    },
+
+    getTableData: function(containerId) {
+      if (initializedTables.indexOf(containerId) === -1) {
+        return null;
+      }
+      return $('#' + containerId + 'Table').dataTable().fnGetData().map(function(item) {
+        // remove temporary IDs
+        if (item.id < 0) {
+          item.id = null;
+        }
+        return item;
+      });
     }
   };
 
@@ -834,6 +871,11 @@ FormUtils = (function($) {
 
   function makeFieldValidationBox(inputId, field) {
     return $('<div>').attr('id', inputId + 'Error').addClass('errorContainer');
+  }
+
+  function generateTemporaryId() {
+    temporaryIdCounter--;
+    return temporaryIdCounter;
   }
 
 })(jQuery);

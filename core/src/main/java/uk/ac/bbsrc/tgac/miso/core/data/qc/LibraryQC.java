@@ -21,44 +21,52 @@
  * *********************************************************************
  */
 
-package uk.ac.bbsrc.tgac.miso.core.data;
+package uk.ac.bbsrc.tgac.miso.core.data.qc;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 
-/**
- * uk.ac.bbsrc.tgac.miso.core.data.impl
- * <p/>
- * Info
- * 
- * @author Rob Davey
- * @since 0.0.2
- */
 @Entity
-@Table(name = "SampleQC")
-public class SampleQC extends QC {
+@Table(name = "LibraryQC")
+public class LibraryQC extends QC {
 
   private static final long serialVersionUID = 1L;
 
-  @ManyToOne(targetEntity = SampleImpl.class)
-  @JoinColumn(name = "sample_sampleId")
-  private Sample sample;
+  @ManyToOne(targetEntity = LibraryImpl.class)
+  @JoinColumn(name = "library_libraryId")
+  private Library library;
 
-  public Sample getSample() {
-    return sample;
+  @OneToMany(mappedBy = "qc")
+  private List<LibraryQcControlRun> controls;
+
+  public Library getLibrary() {
+    return library;
   }
 
-  public void setSample(Sample sample) {
-    this.sample = sample;
+  public void setLibrary(Library library) {
+    this.library = library;
   }
 
   @Override
   public QualityControllable<?> getEntity() {
-    return sample;
+    return library;
+  }
+
+  @Override
+  public List<LibraryQcControlRun> getControls() {
+    if (controls == null) {
+      controls = new ArrayList<>();
+    }
+    return controls;
   }
 
 }

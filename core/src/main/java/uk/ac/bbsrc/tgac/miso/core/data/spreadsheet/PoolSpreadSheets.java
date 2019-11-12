@@ -6,7 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.PoolQC;;
 
 public enum PoolSpreadSheets implements Spreadsheet<Pool> {
   QPCR_RESULTS("qPCR Results", //

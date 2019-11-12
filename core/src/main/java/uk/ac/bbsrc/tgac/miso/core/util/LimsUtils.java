@@ -39,8 +39,10 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -572,6 +574,16 @@ public class LimsUtils {
   private static void updateParentVolume(HierarchyEntity parent, BigDecimal value, User changeUser) {
     parent.setChangeDetails(changeUser);
     parent.setVolume(value);
+  }
+
+  @SafeVarargs
+  public static <T> boolean equals(T item, T other, Function<T, Object>... getters) {
+    for (Function<T, Object> getter : getters) {
+      if (!Objects.equals(getter.apply(item), getter.apply(other))) {
+        return false;
+      }
+    }
+    return true;
   }
 
 }
