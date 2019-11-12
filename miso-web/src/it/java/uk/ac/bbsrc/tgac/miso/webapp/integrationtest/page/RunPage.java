@@ -85,7 +85,7 @@ public class RunPage extends FormPage<RunPage.Field> {
   private WebElement dialog;
 
   public RunPage(WebDriver driver) {
-    super(driver);
+    super(driver, "runForm");
     PageFactory.initElements(driver, this);
     waitWithTimeout().until(or(titleContains("Run "), titleContains("New Run ")));
   }

@@ -30,16 +30,17 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
 
   private static final Set<String> identityColumns = Sets.newHashSet(SamColumns.EXTERNAL_NAME, SamColumns.DONOR_SEX, SamColumns.CONSENT);
 
-  private static final Set<String> tissueColumns = Sets.newHashSet(SamColumns.RECEIVE_DATE, SamColumns.TISSUE_ORIGIN,
-      SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER, SamColumns.TIMES_RECEIVED, SamColumns.TUBE_NUMBER, SamColumns.LAB,
-      SamColumns.SECONDARY_ID, SamColumns.TISSUE_MATERIAL, SamColumns.REGION);
+  private static final Set<String> tissueColumns = Sets.newHashSet(SamColumns.RECEIVE_DATE, SamColumns.REQUISITION_ID,
+      SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER, SamColumns.TIMES_RECEIVED, SamColumns.TUBE_NUMBER,
+      SamColumns.LAB, SamColumns.SECONDARY_ID, SamColumns.TISSUE_MATERIAL, SamColumns.REGION);
 
-  private static final Set<String> slideColumns = Sets.newHashSet(SamColumns.RECEIVE_DATE, SamColumns.INITIAL_SLIDES, SamColumns.SLIDES,
-      SamColumns.DISCARDS, SamColumns.THICKNESS, SamColumns.STAIN);
+  private static final Set<String> slideColumns = Sets.newHashSet(SamColumns.RECEIVE_DATE, SamColumns.REQUISITION_ID,
+      SamColumns.INITIAL_SLIDES, SamColumns.SLIDES, SamColumns.DISCARDS, SamColumns.THICKNESS, SamColumns.STAIN);
 
-  private static final Set<String> curlsColumns = Sets.newHashSet(SamColumns.RECEIVE_DATE);
+  private static final Set<String> curlsColumns = Sets.newHashSet(SamColumns.RECEIVE_DATE, SamColumns.REQUISITION_ID);
 
-  private static final Set<String> tissuePieceColumns = Sets.newHashSet(SamColumns.RECEIVE_DATE, SamColumns.PIECE_TYPE, SamColumns.SLIDES_CONSUMED);
+  private static final Set<String> tissuePieceColumns = Sets.newHashSet(SamColumns.RECEIVE_DATE, SamColumns.REQUISITION_ID,
+      SamColumns.PIECE_TYPE, SamColumns.SLIDES_CONSUMED);
 
   @Before
   public void setup() {

@@ -55,7 +55,7 @@ public class BoxPage extends FormPage<BoxPage.Field> {
   private final BoxVisualization visualization;
 
   public BoxPage(WebDriver driver) {
-    super(driver);
+    super(driver, "boxForm");
     PageFactory.initElements(driver, this);
     waitWithTimeout().until(titleContains("Box"));
     if (driver.getTitle().startsWith("New Box")) {

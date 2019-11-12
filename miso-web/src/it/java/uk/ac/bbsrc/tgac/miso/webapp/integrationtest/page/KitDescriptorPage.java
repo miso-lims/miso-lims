@@ -41,7 +41,7 @@ public class KitDescriptorPage extends FormPage<KitDescriptorPage.Field> {
   private WebElement saveButton;
 
   public KitDescriptorPage(WebDriver driver) {
-    super(driver);
+    super(driver, "kitDescriptorForm");
     PageFactory.initElements(driver, this);
     waitWithTimeout().until(or(titleContains(NEW_TITLE_PREFIX), titleContains("Kit Descriptor ")));
   }

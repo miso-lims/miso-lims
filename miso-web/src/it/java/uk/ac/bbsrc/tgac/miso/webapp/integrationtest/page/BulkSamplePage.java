@@ -21,6 +21,7 @@ public class BulkSamplePage extends HeaderFooterPage {
     public static final String ALIAS = "Sample Alias";
     public static final String DESCRIPTION = "Description";
     public static final String RECEIVE_DATE = "Date of receipt";
+    public static final String REQUISITION_ID = "Requisition ID";
     public static final String ID_BARCODE = "Matrix Barcode";
     public static final String BOX_SEARCH = "Box Search";
     public static final String BOX_ALIAS = "Box Alias";

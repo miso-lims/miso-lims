@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
@@ -16,6 +17,10 @@ public class MoreExpectedConditions {
 
   public static ExpectedCondition<Boolean> elementDoesNotExist(By selector) {
     return (driver) -> driver.findElements(selector).size() == 0;
+  }
+
+  public static ExpectedCondition<Boolean> jsReturnsTrue(String script) {
+    return (driver) -> (Boolean) ((JavascriptExecutor) driver).executeScript(script);
   }
 
 }

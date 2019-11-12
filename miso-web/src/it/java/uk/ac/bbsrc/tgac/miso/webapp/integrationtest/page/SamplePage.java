@@ -64,7 +64,7 @@ public class SamplePage extends FormPage<SamplePage.Field> {
   }
 
   public SamplePage(WebDriver driver) {
-    super(driver);
+    super(driver, "sampleForm");
     PageFactory.initElements(driver, this);
     waitWithTimeout().until(titleContains("Sample "));
   }

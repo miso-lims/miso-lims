@@ -72,6 +72,7 @@ public class SampleDto extends AbstractBoxableDto {
   private boolean distributed;
   private String distributionDate;
   private String distributionRecipient;
+  private String requisitionId;
 
   public Long getId() {
     return id;
@@ -324,6 +325,14 @@ public class SampleDto extends AbstractBoxableDto {
 
   public void setDistributionRecipient(String distributionRecipient) {
     this.distributionRecipient = distributionRecipient;
+  }
+
+  public String getRequisitionId() {
+    return requisitionId;
+  }
+
+  public void setRequisitionId(String requisitionId) {
+    this.requisitionId = requisitionId;
   }
 
 }

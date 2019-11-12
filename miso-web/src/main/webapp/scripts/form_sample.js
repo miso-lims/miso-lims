@@ -83,7 +83,15 @@ FormTarget.sample = (function($) {
                 }, {
                   title: 'Date of Receipt',
                   data: 'receivedDate',
-                  type: 'date'
+                  type: 'date',
+                  include: !config.detailedSample || object.sampleCategory !== 'Identity'
+                }, {
+                  title: 'Requisition ID',
+                  data: 'requisitionId',
+                  type: 'text',
+                  maxLength: 50,
+                  regex: Utils.validation.alphanumRegex,
+                  include: !config.detailedSample || object.sampleCategory !== 'Identity'
                 }, {
                   title: 'Scientific Name',
                   data: 'scientificName',
