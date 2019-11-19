@@ -137,5 +137,9 @@ ListTarget.box = {
           "iSortPriority": 0,
           "mRender": ListUtils.render.textFromId(Constants.boxUses, 'alias')
         }];
+  },
+  searchTermSelector: function(searchTerms) {
+    return [searchTerms['id'], searchTerms['entered'], searchTerms['changed'], searchTerms['creator'], searchTerms['changedby'],
+        searchTerms['freezer']];
   }
 };

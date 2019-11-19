@@ -2,6 +2,7 @@
 
 Changes:
 
+  * Added ability to search samples, libraries, library aliquots, pools, and boxes by freezer
   * Added sample requisition ID field
 
 # 0.2.195

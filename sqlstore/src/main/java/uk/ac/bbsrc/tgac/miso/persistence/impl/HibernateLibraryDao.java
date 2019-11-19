@@ -425,4 +425,5 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   public String getFriendlyName() {
     return "Library";
   }
+
 }

@@ -107,6 +107,10 @@ ListUtils = (function($) {
       term: "box:NAME",
       help: "Checks if an item is located in a particular box.  The name can either be the partial name or partial alias of the box."
     },
+    "freezer": {
+      term: "freezer:NAME",
+      help: "Checks if an item is located in a particular freezer. This is a partial match."
+    },
     "kitname": {
       term: "kitname:NAME",
       help: "Checks if an item uses a library, clustering, or multiplexing kit of the specified name. This is a partial match."

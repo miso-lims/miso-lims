@@ -160,6 +160,8 @@ public class AdvancedSearchParser {
           }
         case "distributedto":
           return PaginationFilter.distributedTo(parts[1]);
+        case "freezer":
+          return PaginationFilter.freezer(parts[1]);
         }
       }
       return PaginationFilter.query(x);
