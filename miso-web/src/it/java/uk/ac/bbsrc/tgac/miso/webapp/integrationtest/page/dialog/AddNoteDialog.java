@@ -15,8 +15,9 @@ import org.openqa.selenium.support.PageFactory;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.FormPage;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.HeaderFooterPage;
 
-public class AddNoteDialog<T extends AbstractPage> extends FormPage<AddNoteDialog.Field> {
+public class AddNoteDialog<T extends AbstractPage> extends HeaderFooterPage {
 
   public static enum Field implements FormPage.FieldElement {
     INTERNAL_ONLY(By.cssSelector("#dialog input[type='checkbox']")), //
@@ -80,6 +81,14 @@ public class AddNoteDialog<T extends AbstractPage> extends FormPage<AddNoteDialo
   public void cancel() {
     cancelButton.click();
     waitUntil(invisibilityOf(dialogContainer));
+  }
+
+  public String getField(Field field) {
+    return field.get(getDriver());
+  }
+
+  public void setField(Field field, String value) {
+    field.set(getDriver(), value);
   }
 
 }

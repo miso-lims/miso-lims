@@ -2,8 +2,8 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page;
 
 import static org.openqa.selenium.support.ui.ExpectedConditions.titleContains;
 
-import java.util.concurrent.TimeUnit;
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -48,7 +48,7 @@ public class PoolOrderPage extends FormPage<PoolOrderPage.Field> {
   private final DataTable aliquotsTable;
 
   public PoolOrderPage(WebDriver driver) {
-    super(driver);
+    super(driver, "orderForm");
     PageFactory.initElements(driver, this);
     waitWithTimeout().until(titleContains("Pool Order "));
     aliquotsTable = new DataTable(driver, "listAliquots_wrapper");

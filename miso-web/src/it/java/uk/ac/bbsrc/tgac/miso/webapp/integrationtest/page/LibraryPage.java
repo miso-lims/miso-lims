@@ -59,7 +59,7 @@ public class LibraryPage extends FormPage<LibraryPage.Field> {
   private final NotesSection<LibraryPage> notesSection;
 
   public LibraryPage(WebDriver driver) {
-    super(driver);
+    super(driver, "libraryForm");
     PageFactory.initElements(driver, this);
     waitWithTimeout().until(titleContains("Library "));
     notesSection = new NotesSection<>(driver, LibraryPage::new);

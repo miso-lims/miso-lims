@@ -812,6 +812,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     target.setDistributionDate(source.getDistributionDate());
     target.setDistributionRecipient(source.getDistributionRecipient());
     target.setLocationBarcode(source.getLocationBarcode());
+    target.setRequisitionId(source.getRequisitionId());
 
     if (isDetailedSample(target)) {
       DetailedSample dTarget = (DetailedSample) target;

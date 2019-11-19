@@ -43,7 +43,7 @@ public class InstrumentPage extends FormPage<InstrumentPage.Field> {
   private final DataTable serviceRecords;
 
   public InstrumentPage(WebDriver driver) {
-    super(driver);
+    super(driver, "instrumentForm");
     PageFactory.initElements(driver, this);
     waitWithTimeout().until(titleContains("Instrument "));
     this.serviceRecords = new DataTable(getDriver(), "list_servicerecords_wrapper");

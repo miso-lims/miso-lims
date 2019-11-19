@@ -38,7 +38,7 @@ public class ServiceRecordPage extends FormPage<ServiceRecordPage.Field> {
   private WebElement saveButton;
 
   public ServiceRecordPage(WebDriver driver) {
-    super(driver);
+    super(driver, "serviceRecordForm");
     PageFactory.initElements(driver, this);
     waitWithTimeout().until(titleContains("Service Record "));
   }
