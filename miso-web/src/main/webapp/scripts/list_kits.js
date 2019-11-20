@@ -50,7 +50,7 @@ ListTarget.kit = {
       "include": true,
       "iSortPriority": 0,
       "mData": function(data){
-        return data.version? data.version : null;
+        return data.hasOwnProperty("version")? data.version : null;
       }
     }, {
       "sTitle": "Manufacturer",
