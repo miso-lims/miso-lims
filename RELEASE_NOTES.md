@@ -4,6 +4,8 @@ Changes:
 
   * Added ability to search samples, libraries, library aliquots, pools, and boxes by freezer
   * Added sample requisition ID field
+  * Fixed an issue where searching for library aliquot children (pools) would cause MISO to run out
+    of resources and become unresponsive
 
 # 0.2.195
 
