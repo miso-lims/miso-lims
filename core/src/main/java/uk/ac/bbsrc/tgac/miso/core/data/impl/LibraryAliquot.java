@@ -37,6 +37,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -124,7 +125,7 @@ public class LibraryAliquot extends AbstractBoxable
   @JoinColumn(name = "targetedSequencingId")
   private TargetedSequencing targetedSequencing;
 
-  @ManyToMany(targetEntity = PoolImpl.class)
+  @ManyToMany(targetEntity = PoolImpl.class, fetch = FetchType.EAGER)
   @JoinTable(name = "Pool_LibraryAliquot", joinColumns = { @JoinColumn(name = "aliquotId") }, inverseJoinColumns = {
       @JoinColumn(name = "poolId") })
   private Set<Pool> pools;
