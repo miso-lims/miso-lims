@@ -4,7 +4,6 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 
 import java.util.Collection;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -33,9 +32,6 @@ public class BulkQCPage extends HeaderFooterPage {
     }
   };
 
-  private static final By ADD_BUTTON_TEXT = By.linkText("Add QCs");
-  private static final By EDIT_BUTTON_TEXT = By.linkText("Edit QCs");
-
   @FindBy(id = "bulkactions")
   private WebElement toolbar;
 
@@ -49,44 +45,44 @@ public class BulkQCPage extends HeaderFooterPage {
     table = new HandsOnTable(driver);
   }
 
-  public static BulkQCPage getForEditSample(WebDriver driver, String baseUrl, Collection<Long> sampleIds) {
+  public static BulkQCPage getForEditSample(WebDriver driver, String baseUrl, Collection<Long> sampleIds, int addControls) {
     String ids = Joiner.on(',').join(sampleIds);
-    String url = baseUrl + "miso/qc/bulk/editFrom/Sample?entityIds=" + ids;
+    String url = baseUrl + "miso/qc/bulk/editFrom/Sample?entityIds=" + ids + "&addControls=" + addControls;
     driver.get(url);
     return new BulkQCPage(driver);
   }
 
-  public static BulkQCPage getForAddSample(WebDriver driver, String baseUrl, Collection<Long> sampleIds, int copies) {
+  public static BulkQCPage getForAddSample(WebDriver driver, String baseUrl, Collection<Long> sampleIds, int copies, int controls) {
     String ids = Joiner.on(',').join(sampleIds);
-    String url = baseUrl + "miso/qc/bulk/addFrom/Sample?entityIds=" + ids + "&copies=" + copies;
+    String url = baseUrl + "miso/qc/bulk/addFrom/Sample?entityIds=" + ids + "&copies=" + copies + "&controls=" + controls;
     driver.get(url);
     return new BulkQCPage(driver);
   }
 
-  public static BulkQCPage getForEditLibrary(WebDriver driver, String baseUrl, Collection<Long> libraryIds) {
+  public static BulkQCPage getForEditLibrary(WebDriver driver, String baseUrl, Collection<Long> libraryIds, int addControls) {
     String ids = Joiner.on(',').join(libraryIds);
-    String url = baseUrl + "miso/qc/bulk/editFrom/Library?entityIds=" + ids;
+    String url = baseUrl + "miso/qc/bulk/editFrom/Library?entityIds=" + ids + "&addControls=" + addControls;
     driver.get(url);
     return new BulkQCPage(driver);
   }
 
-  public static BulkQCPage getForAddLibrary(WebDriver driver, String baseUrl, Collection<Long> libraryIds, int copies) {
+  public static BulkQCPage getForAddLibrary(WebDriver driver, String baseUrl, Collection<Long> libraryIds, int copies, int controls) {
     String ids = Joiner.on(',').join(libraryIds);
-    String url = baseUrl + "miso/qc/bulk/addFrom/Library?entityIds=" + ids + "&copies=" + copies;
+    String url = baseUrl + "miso/qc/bulk/addFrom/Library?entityIds=" + ids + "&copies=" + copies + "&controls=" + controls;
     driver.get(url);
     return new BulkQCPage(driver);
   }
 
-  public static BulkQCPage getForEditPool(WebDriver driver, String baseUrl, Collection<Long> poolIds) {
+  public static BulkQCPage getForEditPool(WebDriver driver, String baseUrl, Collection<Long> poolIds, int addControls) {
     String ids = Joiner.on(',').join(poolIds);
-    String url = baseUrl + "miso/qc/bulk/editFrom/Pool?entityIds=" + ids;
+    String url = baseUrl + "miso/qc/bulk/editFrom/Pool?entityIds=" + ids + "&addControls=" + addControls;
     driver.get(url);
     return new BulkQCPage(driver);
   }
 
-  public static BulkQCPage getForAddPool(WebDriver driver, String baseUrl, Collection<Long> poolIds, int copies) {
+  public static BulkQCPage getForAddPool(WebDriver driver, String baseUrl, Collection<Long> poolIds, int copies, int controls) {
     String ids = Joiner.on(',').join(poolIds);
-    String url = baseUrl + "miso/qc/bulk/addFrom/Pool?entityIds=" + ids + "&copies=" + copies;
+    String url = baseUrl + "miso/qc/bulk/addFrom/Pool?entityIds=" + ids + "&copies=" + copies + "&controls=" + controls;
     driver.get(url);
     return new BulkQCPage(driver);
   }

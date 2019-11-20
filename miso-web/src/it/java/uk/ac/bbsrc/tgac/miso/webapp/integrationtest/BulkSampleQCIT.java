@@ -42,11 +42,11 @@ public class BulkSampleQCIT extends AbstractBulkSampleIT {
   }
 
   private BulkQCPage getEditPage(List<Long> ids) {
-    return BulkQCPage.getForEditSample(getDriver(), getBaseUrl(), ids);
+    return BulkQCPage.getForEditSample(getDriver(), getBaseUrl(), ids, 0);
   }
 
   private BulkQCPage getAddPage(List<Long> ids, int copies) {
-    return BulkQCPage.getForAddSample(getDriver(), getBaseUrl(), ids, copies);
+    return BulkQCPage.getForAddSample(getDriver(), getBaseUrl(), ids, copies, 0);
   }
 
 

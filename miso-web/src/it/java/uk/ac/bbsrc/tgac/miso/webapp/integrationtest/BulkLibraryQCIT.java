@@ -42,11 +42,11 @@ public class BulkLibraryQCIT extends AbstractIT {
   }
 
   private BulkQCPage getEditPage(List<Long> ids) {
-    return BulkQCPage.getForEditLibrary(getDriver(), getBaseUrl(), ids);
+    return BulkQCPage.getForEditLibrary(getDriver(), getBaseUrl(), ids, 0);
   }
 
   private BulkQCPage getAddPage(List<Long> ids, int copies) {
-    return BulkQCPage.getForAddLibrary(getDriver(), getBaseUrl(), ids, copies);
+    return BulkQCPage.getForAddLibrary(getDriver(), getBaseUrl(), ids, copies, 0);
   }
 
 
