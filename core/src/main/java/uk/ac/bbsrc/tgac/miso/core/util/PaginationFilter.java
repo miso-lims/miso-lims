@@ -389,6 +389,16 @@ public abstract interface PaginationFilter {
     };
   }
 
+  public static PaginationFilter requisitionId(String requisitionId) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByRequisitionId(item, requisitionId, errorHandler);
+      }
+    };
+  }
+
   public abstract <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler);
 
 }

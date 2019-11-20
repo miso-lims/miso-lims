@@ -424,6 +424,11 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
     testSearch(PaginationFilter.ghost(false));
   }
 
+  @Test
+  public void testSearchByRequisition() throws IOException {
+    testSearch(PaginationFilter.requisitionId("FORM1234"));
+  }
+
   /**
    * Verifies Hibernate mappings by ensuring that no exception is thrown by a search
    * 

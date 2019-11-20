@@ -139,6 +139,10 @@ ListUtils = (function($) {
       term: "is:GHOST?",
       help: "Match based on whether a sample is real or a ghost/synthetic sample created for hierarchy purposes. 'GHOST?' may be either "
           + "'ghost' or 'real'. 'is:ghost' matches ghost/synthetic samples, and 'is:real' matches NON-ghost/synthetic samples."
+    },
+    "requisition": {
+      term: "req:#",
+      help: "Checks whether an item has the specified requisition ID"
     }
   };
 
