@@ -70,6 +70,10 @@ public class Pluralizer {
     return pluralize(count, "project", "projects");
   }
 
+  public static String qcs(long count) {
+    return pluralize(count, "QC", "QCs");
+  }
+
   public static String runs(long count) {
     return pluralize(count, "run", "runs");
   }
@@ -94,12 +98,16 @@ public class Pluralizer {
     return pluralize(count, "template", "templates");
   }
 
-  private static String pluralize(long count, String singular, String plural) {
-    return count == 1 ? singular : plural;
-  }
-
   public static String tissuePiece(long count) {
     return pluralize(count, "tissue piece", "tissue pieces");
+  }
+
+  public static String types(long count) {
+    return pluralize(count, "type", "types");
+  }
+
+  private static String pluralize(long count, String singular, String plural) {
+    return count == 1 ? singular : plural;
   }
 
 }

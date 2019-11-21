@@ -21,11 +21,13 @@
  * *********************************************************************
  */
 
-package uk.ac.bbsrc.tgac.miso.core.data;
+package uk.ac.bbsrc.tgac.miso.core.data.qc;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -39,11 +41,15 @@ import javax.persistence.TemporalType;
 
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
+import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @MappedSuperclass
-public abstract class QC implements Serializable, Comparable<QC> {
+public abstract class QC implements Serializable, Comparable<QC>, Identifiable {
   private static final long serialVersionUID = 1L;
 
   public static final Long UNSAVED_ID = 0L;
@@ -76,32 +82,11 @@ public abstract class QC implements Serializable, Comparable<QC> {
 
   private String description;
 
-  @Override
-  public int compareTo(QC o) {
-    if (type != null && !type.equals(o.getType())) {
-      return type.compareTo(o.getType());
-    }
-    return date.compareTo(o.getDate());
-  }
+  @ManyToOne(targetEntity = InstrumentImpl.class)
+  @JoinColumn(name = "instrumentId")
+  private Instrument instrument;
 
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
-    QC other = (QC) obj;
-    if (date == null) {
-      if (other.date != null) return false;
-    } else if (!date.equals(other.date)) return false;
-    if (qcId != other.qcId) return false;
-    if (results == null) {
-      if (other.results != null) return false;
-    } else if (!results.equals(other.results)) return false;
-    if (type == null) {
-      if (other.type != null) return false;
-    } else if (!type.equals(other.type)) return false;
-    return true;
-  }
+  private String kitLot;
 
   public Date getCreationTime() {
     return creationTime;
@@ -117,6 +102,7 @@ public abstract class QC implements Serializable, Comparable<QC> {
 
   public abstract QualityControlEntity getEntity();
 
+  @Override
   public long getId() {
     return qcId;
   }
@@ -137,17 +123,15 @@ public abstract class QC implements Serializable, Comparable<QC> {
     return description;
   }
 
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((date == null) ? 0 : date.hashCode());
-    result = prime * result + (int) (qcId ^ (qcId >>> 32));
-    result = prime * result + ((results == null) ? 0 : results.hashCode());
-    result = prime * result + ((type == null) ? 0 : type.hashCode());
-    result = prime * result + ((description == null) ? 0 : description.hashCode());
-    return result;
+  public Instrument getInstrument() {
+    return instrument;
   }
+
+  public String getKitLot() {
+    return kitLot;
+  }
+
+  public abstract List<? extends QcControlRun> getControls();
 
   public void setCreationTime(Date creationTime) {
     this.creationTime = creationTime;
@@ -161,6 +145,7 @@ public abstract class QC implements Serializable, Comparable<QC> {
     this.date = date;
   }
 
+  @Override
   public void setId(long qcId) {
     this.qcId = qcId;
   }
@@ -180,4 +165,48 @@ public abstract class QC implements Serializable, Comparable<QC> {
   public void setDescription(String description) {
     this.description = description;
   }
+
+  public void setInstrument(Instrument instrument) {
+    this.instrument = instrument;
+  }
+
+  public void setKitLot(String kitLot) {
+    this.kitLot = kitLot;
+  }
+
+  @Override
+  public int compareTo(QC o) {
+    if (type != null && !type.equals(o.getType())) {
+      return type.compareTo(o.getType());
+    }
+    return date.compareTo(o.getDate());
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    QC other = (QC) obj;
+    return LimsUtils.equals(this, other,
+        QC::getDate,
+        QC::getResults,
+        QC::getType);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(date,
+        results,
+        type,
+        description,
+        instrument,
+        kitLot);
+  }
+
+  @Override
+  public boolean isSaved() {
+    return getId() != UNSAVED_ID;
+  }
+
 }

@@ -50,21 +50,19 @@ ListTarget.qctype = {
           if (result.quantity < 1) {
             Utils.showOkDialog('Create QC Types', ["That's a peculiar number of qctypes to create."]);
             return;
+          } else if (result.quantity === 1) {
+            window.location = Urls.ui.qcTypes.create;
+          } else {
+            window.location = Urls.ui.qcTypes.bulkCreate + '?' + jQuery.param({
+              quantity: result.quantity,
+            });
           }
-          window.location = '/miso/qctype/bulk/new?' + jQuery.param({
-            quantity: result.quantity,
-          });
         });
       }
     }] : [];
   },
   createColumns: function(config, projectId) {
-    return [{
-      "sTitle": "Name",
-      "mData": "name",
-      "include": true,
-      "iSortPriority": 0
-    }, {
+    return [ListUtils.labelHyperlinkColumn('Name', Urls.ui.qcTypes.edit, Utils.array.getId, 'name', 0, true), {
       "sTitle": "Description",
       "mData": "description",
       "include": true,

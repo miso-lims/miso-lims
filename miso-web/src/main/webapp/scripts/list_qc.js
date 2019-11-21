@@ -40,11 +40,23 @@ ListTarget.qc = function(qcTarget) {
             type: 'int',
             label: 'QCs per ' + qcTarget,
             value: 1
-          }, ], function(result) {
-            window.location = window.location.origin + '/miso/qc/bulk/addFrom/' + qcTarget + '?' + jQuery.param({
-              entityIds: config.entityId,
-              copies: result.copies
-            });
+          }, {
+            property: 'controls',
+            type: 'int',
+            label: 'Controls per QC',
+            value: 1
+          }], function(result) {
+            if (!Number.isInteger(result.copies) || result.copies < 1) {
+              Utils.showOkDialog('Error', ['Invalid number of QCs entered']);
+            } else if (!Number.isInteger(result.controls) || result.controls < 0) {
+              Utils.showOkDialog('Error', ['Invalid number of controls entered']);
+            } else {
+              window.location = Urls.ui.qcs.bulkAddFrom(qcTarget) + '?' + jQuery.param({
+                entityIds: config.entityId,
+                copies: result.copies,
+                controls: result.controls
+              });
+            }
           });
         }
       }] : [];
@@ -71,7 +83,15 @@ ListTarget.qc = function(qcTarget) {
         "include": true,
         "iSortPriority": 0,
         "mRender": function(data, type, full) {
-          return data + " " + full.type.units;
+          if (type === 'display') {
+            if (full.type.precisionAfterDecimal < 0) {
+              return ListUtils.render.booleanChecks(!!data, type, full);
+            } else {
+              return data + " " + full.type.units;
+            }
+          } else {
+            return data;
+          }
         }
       }, {
         "sTitle": "Description",

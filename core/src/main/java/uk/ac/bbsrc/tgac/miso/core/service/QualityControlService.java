@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import uk.ac.bbsrc.tgac.miso.core.data.QC;
-import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
-import uk.ac.bbsrc.tgac.miso.core.data.QualityControlEntity;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QC;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QualityControlEntity;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 
 public interface QualityControlService {

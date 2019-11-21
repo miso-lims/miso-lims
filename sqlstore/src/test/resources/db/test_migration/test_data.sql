@@ -149,6 +149,7 @@ VALUES
     (62,'N702','CGTACTAG',3),
     (61,'N701','TAAGGCGA',3);
 
+DELETE FROM QcControl;
 DELETE FROM QCType;
 INSERT INTO `QCType` (`qcTypeId`, `name`, `description`, `qcTarget`, `units`)
 VALUES
@@ -164,6 +165,11 @@ VALUES
   (10,'poolQcType3', 'qc 3 for pools', 'Pool', 'nM'),
   (11,'poolQcType4', 'qc 4 for pools', 'Pool', 'nM'),
   (12,'InsertSizeQC', 'Insert Size QC', 'Library', 'bp');
+
+INSERT INTO QcControl (controlId, qcTypeId, alias) VALUES
+(1, 11, 'Control 1'),
+(2, 11, 'Control 2'),
+(3, 11, 'Control 3');
 
 DELETE FROM `Printer`;
 INSERT INTO Printer(printerId, name, backend, configuration, driver, layout, enabled) VALUES (1, 'foo', 'CUPS', '{}', 'BRADY', 'AVERY_8363', 1);
@@ -224,21 +230,21 @@ VALUES (1,NULL,'SAM1','Inherited from TEST_0001','SAM1::TEST_0001_Bn_P_nn_1-1_D_
 
 DELETE FROM `SampleQC`;
 INSERT INTO `SampleQC`(`sample_sampleId`, `creator`, `date`, `type`, `results`) 
-VALUES (1,1,'2015-08-27',1,5),
-(2,1,'2015-08-27',1,5),
-(3,1,'2015-08-27',1,5),
-(4,1,'2015-08-27',1,5),
-(5,1,'2015-08-27',1,5),
-(6,1,'2015-08-27',1,5),
-(7,1,'2015-08-27',1,5),
-(8,1,'2015-08-27',1,5),
-(9,1,'2015-08-27',1,5),
-(10,1,'2015-08-27',1,5),
-(11,1,'2015-08-27',1,5),
-(12,1,'2015-08-27',1,5),
-(13,1,'2015-08-27',1,5),
-(14,1,'2015-08-27',1,5),
-(14,1,'2015-08-28',1,55);
+VALUES (1,1,'2015-08-27',3,5),
+(2,1,'2015-08-27',3,5),
+(3,1,'2015-08-27',3,5),
+(4,1,'2015-08-27',3,5),
+(5,1,'2015-08-27',3,5),
+(6,1,'2015-08-27',3,5),
+(7,1,'2015-08-27',3,5),
+(8,1,'2015-08-27',3,5),
+(9,1,'2015-08-27',3,5),
+(10,1,'2015-08-27',3,5),
+(11,1,'2015-08-27',3,5),
+(12,1,'2015-08-27',3,5),
+(13,1,'2015-08-27',3,5),
+(14,1,'2015-08-27',3,5),
+(14,1,'2015-08-28',3,55);
 
 DELETE FROM SampleChangeLog;
 INSERT INTO `SampleChangeLog`(`sampleChangeLogId`, `sampleId`, `columnsChanged`, `userId`, `message`, `changeTime`)
@@ -426,11 +432,17 @@ VALUES (1,2),
 (1,1),
 (2,3);
 
+DELETE FROM PoolQcControl;
 DELETE FROM `PoolQC`;
 INSERT INTO `PoolQC`(`qcId`, `pool_poolId`, `creator`, `date`, `type`, `results`)
 VALUES (1,1,1,'2016-03-18',1,12.3),
-(2,1,1,'2016-03-18',1,45.6),
-(3,2,1,'2016-03-18',1,7.89);
+(2,1,1,'2016-03-18',11,45.6),
+(3,2,1,'2016-03-18',11,7.89);
+
+INSERT INTO PoolQcControl (qcControlId, qcId, controlId, lot, qcPassed) VALUES
+(1, 2, 1, 'controllot1', TRUE),
+(2, 3, 1, 'controllot1', FALSE),
+(3, 3, 2, 'controllot1', TRUE);
 
 INSERT INTO `PoolChangeLog`(`poolId`, `columnsChanged`, `userId`, `message`, `changeTime`)
 VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),

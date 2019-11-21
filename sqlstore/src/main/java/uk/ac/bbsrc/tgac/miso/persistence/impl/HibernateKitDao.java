@@ -46,6 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.KitStore;
 
@@ -258,6 +259,13 @@ public class HibernateKitDao implements KitStore, HibernatePaginatedDataSource<K
   public long getUsageByRuns(KitDescriptor kitDescriptor) throws IOException {
     return (long) currentSession().createCriteria(LibraryImpl.class)
         .add(Restrictions.eq("sequencingKit", kitDescriptor))
+        .setProjection(Projections.rowCount()).uniqueResult();
+  }
+
+  @Override
+  public long getUsageByQcTypes(KitDescriptor kitDescriptor) throws IOException {
+    return (long) currentSession().createCriteria(QcType.class)
+        .add(Restrictions.eq("kitDescriptor", kitDescriptor))
         .setProjection(Projections.rowCount()).uniqueResult();
   }
 

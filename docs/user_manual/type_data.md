@@ -292,6 +292,7 @@ MISO are:
 * Clustering kit - used for sequencing containers
 * Multiplexing kit - used for sequencing containers
 * Extraction kit - not currently used in MISO
+* QC kit - used for QCs
 
 The Kits list page is broken into tabs for the different kit types.
 
@@ -309,7 +310,8 @@ sequencing to the kit descriptor of the library aliquot's parent library.
 
 MISO administrators can delete kit descriptors using the standard interface. Library kits can only be deleted if they
 are not used by any existing libraries. Clustering and multiplexing kits can only be deleted if they are not used by
-any existing sequencing containers. Sequencing kits can only be deleted if they are not used by any existing runs.
+any existing sequencing containers. Sequencing kits can only be deleted if they are not used by any existing runs. QC
+kits can only be deleted if they are not used by any existing QCs.
 
 
 
@@ -389,13 +391,27 @@ deleted if it has not been used by any existing pool orders or sequencing orders
 
 ## QC Types
 
-QC types identify instruments or methods used to QC an item. A QC type may target samples, libraries, pools, sequencing
-containers, or runs. Some QC types may be linked to one of the target's fields. For example, a "Volume Check" QC type
+QC types identify methods used to QC an item. A QC type may target samples, libraries, pools, sequencing containers, or
+runs. A QC type may specify the instrument model, kit descriptor, and controls that it uses. If these are specified,
+additional related information is required when entering QCs.
+
+Some QC types may be linked to one of the target's fields. For example, a "Volume Check" QC type
 might be linked to a sample's volume. These QCs can be set to auto-update the field, so that when a new QC is entered,
 the item's related field is updated automatically.
 
 MISO administrators can add, edit, and delete QC types using the standard interface. A QC type can only be deleted if
 there are no existing QCs of the type.
+
+In addition to the bulk Create/Edit QC Types page, there is a single Create/Edit QC Type page. The single Create/Edit
+page allows you to make all the same changes to a QC type as the bulk page, and also allows you to manage the QC type's
+controls. To get to the single Create QC Type page, enter "1" for the quantity when adding a QC type. To get to the
+Edit QC Type page, click the name of the QC you wish to edit on the QC Types list page.
+
+The Controls table at the bottom of the single Create/Edit QC Type page allows you to manage the QC type's controls. To
+add a new control, click the "Add" button in the toolbar, enter an alias for the new control when prompted, and click
+the "Add" button. To remove an existing control, select it in the list and click the "Remove" button in the toolbar.
+You will only be able to remove a control if it has not been used in any QCs. Be sure to click the "Save" button at the
+top right of the page to confirm any changes.
 
 
 

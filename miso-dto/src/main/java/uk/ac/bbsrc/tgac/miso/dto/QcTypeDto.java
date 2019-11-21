@@ -1,10 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.util.List;
+
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
-import uk.ac.bbsrc.tgac.miso.core.data.QcCorrespondingField;
-import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcCorrespondingField;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
 
 public class QcTypeDto {
 
@@ -19,6 +21,9 @@ public class QcTypeDto {
   @Enumerated(EnumType.STRING)
   private QcCorrespondingField correspondingField;
   private boolean autoUpdateField;
+  private Long instrumentModelId;
+  private Long kitDescriptorId;
+  private List<QcControlDto> controls;
 
   public Long getId() {
     return id;
@@ -90,6 +95,30 @@ public class QcTypeDto {
 
   public void setAutoUpdateField(boolean autoUpdateField) {
     this.autoUpdateField = autoUpdateField;
+  }
+
+  public Long getInstrumentModelId() {
+    return instrumentModelId;
+  }
+
+  public void setInstrumentModelId(Long instrumentModelId) {
+    this.instrumentModelId = instrumentModelId;
+  }
+
+  public Long getKitDescriptorId() {
+    return kitDescriptorId;
+  }
+
+  public void setKitDescriptorId(Long kitDescriptorId) {
+    this.kitDescriptorId = kitDescriptorId;
+  }
+
+  public List<QcControlDto> getControls() {
+    return controls;
+  }
+
+  public void setControls(List<QcControlDto> controls) {
+    this.controls = controls;
   }
 
 }

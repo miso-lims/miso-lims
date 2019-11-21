@@ -21,8 +21,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkQCPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkQCPage.QcColumns;
@@ -34,7 +34,7 @@ public class BulkSampleQCIT extends AbstractBulkSampleIT {
   private static final Logger log = LoggerFactory.getLogger(BulkSampleQCIT.class);
 
   private static final Set<String> qcColumns = Sets.newHashSet(QcColumns.SAMPLE_ALIAS, QcColumns.DATE, QcColumns.TYPE,
-      QcColumns.RESULT, QcColumns.UNITS, QcColumns.DESCRIPTION);
+      QcColumns.INSTRUMENT, QcColumns.KIT_LOT, QcColumns.RESULT, QcColumns.UNITS, QcColumns.DESCRIPTION);
 
   @Before
   public void setup() {
@@ -42,11 +42,11 @@ public class BulkSampleQCIT extends AbstractBulkSampleIT {
   }
 
   private BulkQCPage getEditPage(List<Long> ids) {
-    return BulkQCPage.getForEditSample(getDriver(), getBaseUrl(), ids);
+    return BulkQCPage.getForEditSample(getDriver(), getBaseUrl(), ids, 0);
   }
 
   private BulkQCPage getAddPage(List<Long> ids, int copies) {
-    return BulkQCPage.getForAddSample(getDriver(), getBaseUrl(), ids, copies);
+    return BulkQCPage.getForAddSample(getDriver(), getBaseUrl(), ids, copies, 0);
   }
 
 

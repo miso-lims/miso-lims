@@ -22,7 +22,7 @@ import org.springframework.web.servlet.tags.RequestContextAwareTag;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import uk.ac.bbsrc.tgac.miso.core.data.QualityControllable;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QualityControllable;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 
 @SuppressWarnings("serial")

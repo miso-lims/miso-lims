@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.core.data;
+package uk.ac.bbsrc.tgac.miso.core.data.qc;
 
 import java.util.ArrayList;
 import java.util.Arrays;

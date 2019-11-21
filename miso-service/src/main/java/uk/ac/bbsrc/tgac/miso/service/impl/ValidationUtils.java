@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -125,13 +126,28 @@ public class ValidationUtils {
     return !after.equals(before);
   }
 
-  public static <T, R extends Identifiable> void loadChildEntity(T object, R childEntity, ProviderService<R> service, String property)
+  public static <T, R> boolean isChanged(Function<T, R> getter, T newItem, T beforeChange) {
+    if (beforeChange == null) {
+      return true;
+    }
+    R after = getter.apply(newItem);
+    R before = getter.apply(beforeChange);
+    if (after == null) {
+      return before != null;
+    } else {
+      return !after.equals(before);
+    }
+  }
+
+  public static <T extends Identifiable> void loadChildEntity(Consumer<T> setter, T childEntity, ProviderService<T> service,
+      String property)
       throws IOException {
     if (childEntity != null) {
-      R item = service.get(childEntity.getId());
+      T item = service.get(childEntity.getId());
       if (item == null) {
         throw new ValidationException(new ValidationError(property, "Invalid item ID: " + childEntity.getId()));
       }
+      setter.accept(item);
     }
   }
 

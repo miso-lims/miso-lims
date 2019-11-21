@@ -67,18 +67,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
 import uk.ac.bbsrc.tgac.miso.core.data.OxfordNanoporeRun;
 import uk.ac.bbsrc.tgac.miso.core.data.PacBioRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Printer;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.QC;
-import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -89,7 +85,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
@@ -118,7 +113,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ContainerQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Deletion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
@@ -182,6 +176,18 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolViewElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQC;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQcControlRun;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQcControlRun;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.PoolQC;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.PoolQcControlRun;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QC;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcControl;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcControlRun;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQcControlRun;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.Spreadsheet;
@@ -2113,6 +2119,9 @@ public class Dtos {
     dto.setCorrespondingField(from.getCorrespondingField());
     dto.setAutoUpdateField(from.isAutoUpdateField());
     dto.setArchived(from.isArchived());
+    setId(dto::setInstrumentModelId, from.getInstrumentModel());
+    setId(dto::setKitDescriptorId, from.getKitDescriptor());
+    dto.setControls(from.getControls().stream().map(Dtos::asDto).collect(Collectors.toList()));
     return dto;
   }
 
@@ -2127,6 +2136,25 @@ public class Dtos {
     to.setArchived(from.isArchived());
     to.setCorrespondingField(from.getCorrespondingField());
     to.setAutoUpdateField(from.isAutoUpdateField());
+    setObject(to::setInstrumentModel, InstrumentModel::new, from.getInstrumentModelId());
+    setObject(to::setKitDescriptor, KitDescriptor::new, from.getKitDescriptorId());
+    if (from.getControls() != null) {
+      to.getControls().addAll(from.getControls().stream().map(Dtos::to).collect(Collectors.toSet()));
+    }
+    return to;
+  }
+
+  private static QcControlDto asDto(@Nonnull QcControl from) {
+    QcControlDto to = new QcControlDto();
+    setLong(to::setId, from.getId(), true);
+    setString(to::setAlias, from.getAlias());
+    return to;
+  }
+
+  private static QcControl to(@Nonnull QcControlDto from) {
+    QcControl to = new QcControl();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setAlias, from.getAlias());
     return to;
   }
 
@@ -2140,11 +2168,116 @@ public class Dtos {
     dto.setEntityId(from.getEntity().getId());
     dto.setEntityAlias(from.getEntity().getAlias());
     dto.setDescription(from.getDescription());
+    setId(dto::setInstrumentId, from.getInstrument());
+    setString(dto::setKitLot, from.getKitLot());
+    dto.setControls(from.getControls().stream().map(Dtos::asDto).collect(Collectors.toList()));
     return dto;
   }
 
   public static List<QcDto> asQcDtos(@Nonnull Collection<? extends QC> qcSubset) {
     return qcSubset.stream().map(Dtos::asDto).collect(Collectors.toList());
+  }
+
+  public static QC to(@Nonnull QcDto dto) {
+    QC to;
+    switch (dto.getType().getQcTarget()) {
+    case Library:
+      LibraryQC newLibraryQc = new LibraryQC();
+      Library ownerLibrary = new LibraryImpl();
+      ownerLibrary.setId(dto.getEntityId());
+      newLibraryQc.setLibrary(ownerLibrary);
+      to = newLibraryQc;
+      break;
+    case Sample:
+      SampleQC newSampleQc = new SampleQC();
+      Sample ownerSample = new SampleImpl();
+      ownerSample.setId(dto.getEntityId());
+      newSampleQc.setSample(ownerSample);
+      to = newSampleQc;
+      break;
+    case Pool:
+      PoolQC newPoolQc = new PoolQC();
+      Pool ownerPool = new PoolImpl();
+      ownerPool.setId(dto.getEntityId());
+      newPoolQc.setPool(ownerPool);
+      to = newPoolQc;
+      break;
+    case Container:
+      ContainerQC newContainerQc = new ContainerQC();
+      SequencerPartitionContainer ownerContainer = new SequencerPartitionContainerImpl();
+      ownerContainer.setId(dto.getEntityId());
+      newContainerQc.setContainer(ownerContainer);
+      to = newContainerQc;
+      break;
+    default:
+      throw new IllegalArgumentException("No such QC target: " + dto.getType().getQcTarget());
+    }
+    if (dto.getId() != null) {
+      to.setId(dto.getId());
+    }
+    to.setDate(parseDate(dto.getDate()));
+    setBigDecimal(to::setResults, dto.getResults());
+    to.setType(to(dto.getType()));
+    to.setDescription(dto.getDescription());
+    setObject(to::setInstrument, InstrumentImpl::new, dto.getInstrumentId());
+    setString(to::setKitLot, dto.getKitLot());
+    addQcControlRuns(dto.getControls(), to);
+    return to;
+  }
+
+  private static QcControlRunDto asDto(@Nonnull QcControlRun from) {
+    QcControlRunDto to = new QcControlRunDto();
+    setLong(to::setId, from.getId(), true);
+    setId(to::setControlId, from.getControl());
+    setString(to::setLot, from.getLot());
+    setBoolean(to::setQcPassed, from.isQcPassed(), true);
+    return to;
+  }
+
+  private static void addQcControlRuns(@Nonnull Collection<QcControlRunDto> list, QC qc) {
+    if (list == null) {
+      return;
+    }
+
+    for (QcControlRunDto from : list) {
+      QcControlRun to = null;
+
+      switch (qc.getType().getQcTarget()) {
+      case Container:
+        ContainerQcControlRun containerQcControlRun = new ContainerQcControlRun();
+        containerQcControlRun.setQc((ContainerQC) qc);
+        ((ContainerQC) qc).getControls().add(containerQcControlRun);
+        to = containerQcControlRun;
+        break;
+      case Library:
+        LibraryQcControlRun libraryQcControlRun = new LibraryQcControlRun();
+        libraryQcControlRun.setQc((LibraryQC) qc);
+        ((LibraryQC) qc).getControls().add(libraryQcControlRun);
+        to = libraryQcControlRun;
+        break;
+      case Pool:
+        PoolQcControlRun poolQcControlRun = new PoolQcControlRun();
+        poolQcControlRun.setQc((PoolQC) qc);
+        ((PoolQC) qc).getControls().add(poolQcControlRun);
+        to = poolQcControlRun;
+        break;
+      case Run:
+        throw new IllegalArgumentException("Unhandled QC target: Run");
+      case Sample:
+        SampleQcControlRun sampleQcControlRun = new SampleQcControlRun();
+        sampleQcControlRun.setQc((SampleQC) qc);
+        ((SampleQC) qc).getControls().add(sampleQcControlRun);
+        to = sampleQcControlRun;
+        break;
+      default:
+        throw new IllegalArgumentException(
+            "Unhandled QC target: " + qc.getType().getQcTarget() == null ? "null" : qc.getType().getQcTarget().getLabel());
+      }
+      setLong(to::setId, from.getId(), false);
+      setObject(to::setControl, QcControl::new, from.getControlId());
+      setString(to::setLot, from.getLot());
+      setBoolean(to::setQcPassed, from.getQcPassed(), false);
+    }
   }
 
   public static List<QcTypeDto> asQcTypeDtos(@Nonnull Collection<QcType> qcTypeSubset) {
@@ -2703,50 +2836,6 @@ public class Dtos {
     setObject(to::setInstrumentModel, InstrumentModel::new, dto.getInstrumentModelId());
     setString(to::setSerialNumber, dto.getSerialNumber());
     setObject(to::setUpgradedInstrument, InstrumentImpl::new, dto.getUpgradedInstrumentId());
-    return to;
-  }
-
-  public static QC to(@Nonnull QcDto dto) {
-    QC to;
-    switch (dto.getType().getQcTarget()) {
-    case Library:
-      LibraryQC newLibraryQc = new LibraryQC();
-      Library ownerLibrary = new LibraryImpl();
-      ownerLibrary.setId(dto.getEntityId());
-      newLibraryQc.setLibrary(ownerLibrary);
-      to = newLibraryQc;
-      break;
-    case Sample:
-      SampleQC newSampleQc = new SampleQC();
-      Sample ownerSample = new SampleImpl();
-      ownerSample.setId(dto.getEntityId());
-      newSampleQc.setSample(ownerSample);
-      to = newSampleQc;
-      break;
-    case Pool:
-      PoolQC newPoolQc = new PoolQC();
-      Pool ownerPool = new PoolImpl();
-      ownerPool.setId(dto.getEntityId());
-      newPoolQc.setPool(ownerPool);
-      to = newPoolQc;
-      break;
-    case Container:
-      ContainerQC newContainerQc = new ContainerQC();
-      SequencerPartitionContainer ownerContainer = new SequencerPartitionContainerImpl();
-      ownerContainer.setId(dto.getEntityId());
-      newContainerQc.setContainer(ownerContainer);
-      to = newContainerQc;
-      break;
-    default:
-      throw new IllegalArgumentException("No such QC target: " + dto.getType().getQcTarget());
-    }
-    if (dto.getId() != null) {
-      to.setId(dto.getId());
-    }
-    to.setDate(parseDate(dto.getDate()));
-    setBigDecimal(to::setResults, dto.getResults());
-    to.setType(to(dto.getType()));
-    to.setDescription(dto.getDescription());
     return to;
   }
 

@@ -32,6 +32,8 @@ import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QualityControllable;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
 
 /**
  * A Sample contains information about the original material upon which a sequencing experiment is to be based.

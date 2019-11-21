@@ -27,10 +27,11 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ContainerQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQC;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QualityControllable;
 
 /**
  * A SequencerPartitionContainer describes a collection of {@link Partition} objects that can be used as part of a sequencer {@link Run}.

@@ -4,8 +4,17 @@ Changes:
 
   * Added ability to search samples, libraries, library aliquots, pools, and boxes by freezer
   * Added sample requisition ID field
+  * Added instrument model, kit descriptor, and controls to QC types. When specified, a QC of the
+    type must include related details
   * Fixed an issue where searching for library aliquot children (pools) would cause MISO to run out
     of resources and become unresponsive
+
+Upgrade Notes:
+
+  * You may wish to update QC types to specify an instrument model, kit descriptor, and/or
+    controls. It is not possible to update existing QC types in this way, as it would invalidate
+    existing QCs. Instead, you can archive the existing QC type and then create a new QC type with
+    the same name to replace it.
 
 # 0.2.195
 

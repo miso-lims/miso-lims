@@ -1,13 +1,16 @@
-package uk.ac.bbsrc.tgac.miso.core.data.impl;
+package uk.ac.bbsrc.tgac.miso.core.data.qc;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import uk.ac.bbsrc.tgac.miso.core.data.QC;
-import uk.ac.bbsrc.tgac.miso.core.data.QualityControllable;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 
 @Entity
 @Table(name = "ContainerQC")
@@ -18,6 +21,9 @@ public class ContainerQC extends QC {
   @ManyToOne(targetEntity = SequencerPartitionContainerImpl.class)
   @JoinColumn(name = "containerId")
   private SequencerPartitionContainer container;
+
+  @OneToMany(mappedBy = "qc")
+  private List<ContainerQcControlRun> controls;
 
   public SequencerPartitionContainer getContainer() {
     return container;
@@ -50,6 +56,14 @@ public class ContainerQC extends QC {
       if (other.container != null) return false;
     } else if (!container.equals(other.container)) return false;
     return true;
+  }
+
+  @Override
+  public List<ContainerQcControlRun> getControls() {
+    if (controls == null) {
+      controls = new ArrayList<>();
+    }
+    return controls;
   }
 
 }

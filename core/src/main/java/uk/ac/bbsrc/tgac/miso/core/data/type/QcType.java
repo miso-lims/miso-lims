@@ -24,6 +24,9 @@
 package uk.ac.bbsrc.tgac.miso.core.data.type;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -31,12 +34,19 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
-import uk.ac.bbsrc.tgac.miso.core.data.QcCorrespondingField;
-import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcControl;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcCorrespondingField;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
  * Provides model access to the underlying MISO QcType lookup table. These types should hold manufacturer platform information for QC
@@ -68,6 +78,17 @@ public class QcType implements Comparable<QcType>, Serializable, Aliasable, Dele
   @Enumerated(EnumType.STRING)
   private QcCorrespondingField correspondingField;
   private boolean autoUpdateField;
+
+  @ManyToOne
+  @JoinColumn(name = "instrumentModelId")
+  private InstrumentModel instrumentModel;
+
+  @ManyToOne
+  @JoinColumn(name = "kitDescriptorId")
+  private KitDescriptor kitDescriptor;
+
+  @OneToMany(mappedBy = "qcType")
+  private Set<QcControl> controls;
 
   /**
    * Returns the qcTypeId of this QcType object.
@@ -204,6 +225,45 @@ public class QcType implements Comparable<QcType>, Serializable, Aliasable, Dele
     this.archived = archived;
   }
 
+  public QcCorrespondingField getCorrespondingField() {
+    return correspondingField;
+  }
+
+  public void setCorrespondingField(QcCorrespondingField correspondingField) {
+    this.correspondingField = correspondingField;
+  }
+
+  public boolean isAutoUpdateField() {
+    return autoUpdateField;
+  }
+
+  public void setAutoUpdateField(boolean autoUpdateField) {
+    this.autoUpdateField = autoUpdateField;
+  }
+
+  public InstrumentModel getInstrumentModel() {
+    return instrumentModel;
+  }
+
+  public void setInstrumentModel(InstrumentModel instrumentModel) {
+    this.instrumentModel = instrumentModel;
+  }
+
+  public KitDescriptor getKitDescriptor() {
+    return kitDescriptor;
+  }
+
+  public void setKitDescriptor(KitDescriptor kitDescriptor) {
+    this.kitDescriptor = kitDescriptor;
+  }
+
+  public Set<QcControl> getControls() {
+    if (controls == null) {
+      controls = new HashSet<>();
+    }
+    return controls;
+  }
+
   @Override
   public boolean equals(Object obj) {
     if (obj == null) return false;
@@ -212,19 +272,40 @@ public class QcType implements Comparable<QcType>, Serializable, Aliasable, Dele
     QcType them = (QcType) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    return getName().equals(them.getName()) && getQcTarget().equals(them.getQcTarget());
+    if (isSaved() && them.isSaved()) {
+      return qcTypeId == them.qcTypeId;
+    } else {
+      return LimsUtils.equals(this, them,
+          QcType::getName,
+          QcType::getQcTarget,
+          QcType::getDescription,
+          QcType::getUnits,
+          QcType::getPrecisionAfterDecimal,
+          QcType::isArchived,
+          QcType::getCorrespondingField,
+          QcType::isAutoUpdateField,
+          QcType::getInstrumentModel,
+          QcType::getKitDescriptor,
+          QcType::getControls);
+    }
   }
 
   @Override
   public int hashCode() {
-    if (getId() != UNSAVED_ID) {
+    if (isSaved()) {
       return (int) getId();
     } else {
-      int hashcode = -1;
-      if (getName() != null) hashcode = 37 * hashcode + getName().hashCode();
-      if (getDescription() != null) hashcode = 37 * hashcode + getDescription().hashCode();
-      if (getQcTarget() != null) hashcode = 37 * hashcode + getQcTarget().hashCode();
-      return hashcode;
+      return Objects.hash(name,
+          qcTarget,
+          description,
+          units,
+          precisionAfterDecimal,
+          archived,
+          correspondingField,
+          autoUpdateField,
+          instrumentModel,
+          kitDescriptor,
+          controls);
     }
   }
 
@@ -257,23 +338,7 @@ public class QcType implements Comparable<QcType>, Serializable, Aliasable, Dele
 
   @Override
   public String getAlias() {
-    return name;
-  }
-
-  public QcCorrespondingField getCorrespondingField() {
-    return correspondingField;
-  }
-
-  public void setCorrespondingField(QcCorrespondingField correspondingField) {
-    this.correspondingField = correspondingField;
-  }
-
-  public boolean isAutoUpdateField() {
-    return autoUpdateField;
-  }
-
-  public void setAutoUpdateField(boolean autoUpdateField) {
-    this.autoUpdateField = autoUpdateField;
+    return getName();
   }
 
   @Override
