@@ -2,6 +2,12 @@
 
 Changes:
 
+
+
+# 0.2.196
+
+Changes:
+
   * Added ability to search samples, libraries, library aliquots, pools, and boxes by freezer
   * Added sample requisition ID field
   * Added instrument model, kit descriptor, and controls to QC types. When specified, a QC of the

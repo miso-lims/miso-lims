@@ -1,3 +1,7 @@
+-- requisitionId
+ALTER TABLE Sample ADD COLUMN requisitionId varchar(50);
+
+-- qcs
 -- StartNoTest
 ALTER TABLE QCType DROP INDEX uk_qcType_byTarget;
 -- EndNoTest
@@ -73,3 +77,4 @@ CREATE TABLE ContainerQcControl (
 
 ALTER TABLE QCType MODIFY COLUMN description varchar(255);
 ALTER TABLE QCType MODIFY COLUMN units varchar(20);
+
