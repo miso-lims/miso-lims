@@ -21,6 +21,11 @@ public class BulkSamplePage extends HeaderFooterPage {
     public static final String ALIAS = "Sample Alias";
     public static final String DESCRIPTION = "Description";
     public static final String RECEIVE_DATE = "Date of receipt";
+    public static final String RECEIVED_FROM = "Received From";
+    public static final String RECEIVED_BY = "Received By";
+    public static final String RECEIPT_CONFIRMED = "Receipt Confirmed";
+    public static final String RECEIPT_QC_PASSED = "Receipt QC Passed";
+    public static final String RECEIPT_QC_NOTE = "Receipt QC Note";
     public static final String REQUISITION_ID = "Requisition ID";
     public static final String ID_BARCODE = "Matrix Barcode";
     public static final String BOX_SEARCH = "Box Search";
@@ -77,9 +82,6 @@ public class BulkSamplePage extends HeaderFooterPage {
     public static final String CELL_VIABILITY = "Cell Viability";
     public static final String LOADING_CELL_CONC = "Loading Cell Conc.";
     public static final String INPUT_INTO_LIBRARY = "Input into Library";
-    public static final String DISTRIBUTED = "Distributed";
-    public static final String DISTRIBUTION_DATE = "Distribution Date";
-    public static final String DISTRIBUTION_RECIPIENT = "Distribution Recipient";
 
     private SamColumns() {
       throw new IllegalStateException("Util class not intended for instantiation");

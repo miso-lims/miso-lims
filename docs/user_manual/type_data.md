@@ -180,15 +180,12 @@ be deleted if the option has not been used by any existing samples.
 
 ## Labs and Institutes
 
-Note: These items only apply if your site uses [detailed sample mode](../site_configuration/#detailed-sample-mode).
-
-If a sample was received from an external lab, this can be recorded at the tissue level. Each lab belongs to an
-institute.
+Labs can be recorded as the sender that samples, libraries, library aliquots, or pools were received from.
 
 Any user may create new labs and institutes in MISO using the standard interface. Administrators may also
 edit and delete existing labs and institutes. You will only be allowed to delete a lab if it has not been used by any
-existing samples. You will only be allowed to delete an institute if it has no labs associated with it. This means that
-if you want to delete an institute, you will first have to delete all of its labs.
+existing receipts. You will only be allowed to delete an institute if it has no labs associated with it. This means
+that if you want to delete an institute, you will first have to delete all of its labs.
 
 
 

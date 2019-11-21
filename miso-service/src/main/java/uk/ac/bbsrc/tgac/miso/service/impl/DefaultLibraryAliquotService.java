@@ -231,8 +231,9 @@ public class DefaultLibraryAliquotService
   }
 
   private void maybeRemoveFromBox(LibraryAliquot aliquot) {
-    if (aliquot.isDiscarded() || aliquot.isDistributed()) {
+    if (aliquot.isDiscarded() || aliquot.getDistributionTransfer() != null) {
       aliquot.setBoxPosition(null);
+      aliquot.setVolume(BigDecimal.ZERO);
     }
   }
 
@@ -248,15 +249,8 @@ public class DefaultLibraryAliquotService
     target.setTargetedSequencing(source.getTargetedSequencing());
     target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
     target.setDiscarded(source.isDiscarded());
-    if (source.isDiscarded() || source.isDistributed()) {
-      target.setVolume(BigDecimal.ZERO);
-    } else {
-      target.setVolume(source.getVolume());
-    }
+    target.setVolume(source.getVolume());
     target.setVolumeUnits(source.getVolume() == null ? null : source.getVolumeUnits());
-    target.setDistributed(source.isDistributed());
-    target.setDistributionDate(source.getDistributionDate());
-    target.setDistributionRecipient(source.getDistributionRecipient());
     target.setDnaSize(source.getDnaSize());
     target.setConcentration(source.getConcentration());
     target.setConcentrationUnits(target.getConcentration() == null ? null : source.getConcentrationUnits());
@@ -280,6 +274,7 @@ public class DefaultLibraryAliquotService
     validateVolumeUnits(aliquot.getVolume(), aliquot.getVolumeUnits(), errors);
     validateBarcodeUniqueness(aliquot, beforeChange, libraryAliquotDao::getByBarcode, errors, "library aliquot");
     validateTargetedSequencing(aliquot, errors);
+    validateUnboxableFields(aliquot, errors);
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);

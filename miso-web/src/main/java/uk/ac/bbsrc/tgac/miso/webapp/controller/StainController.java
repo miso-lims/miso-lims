@@ -20,6 +20,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.StainCategoryService;
 import uk.ac.bbsrc.tgac.miso.core.service.StainService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.StainDto;
+import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
 @RequestMapping("/stain")
@@ -55,7 +56,7 @@ public class StainController extends AbstractTypeDataController<Stain, StainDto>
 
   @Override
   protected void addHotConfig(ObjectNode config, ObjectMapper mapper) throws IOException {
-    addConfigArray(config, mapper, "stainCategories", stainCategoryService.list(), Dtos::asDto);
+    MisoWebUtils.addJsonArray(mapper, config, "stainCategories", stainCategoryService.list(), Dtos::asDto);
   }
 
   @Override

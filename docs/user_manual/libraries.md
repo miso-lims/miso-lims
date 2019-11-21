@@ -65,7 +65,8 @@ parented to. There is also an option to create a new box for the new libraries. 
 
 The bulk Create Libraries page works similarly to the bulk Create Libraries from Samples page, except that more data
 will be required. This additional data is used in creating the sample(s) that the libraries are parented to so that we
-can store sample-level data, primarily for use in analysis.
+can store sample-level data, primarily for use in analysis. If a date of receipt and other receipt information is
+entered, a receipt transfer will be created. See the [Transfers section](../transfers/) for more information.
 
 
 

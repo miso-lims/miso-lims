@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.service.TargetedSequencingService;
@@ -75,8 +74,8 @@ public class TargetedSequencingRestController extends RestController {
 
   @GetMapping(value = "/dt/kit/{id}/available", produces = "application/json")
   public @ResponseBody DataTablesResponseDto<TargetedSequencingDto> availableTargetedSequencings(@PathVariable("id") Long kitDescriptorId,
-      HttpServletRequest request, HttpServletResponse response, UriComponentsBuilder builder) throws IOException {
-    return jQueryBackend.get(request, response, builder, advancedSearchParser, new PaginationFilter[0]);
+      HttpServletRequest request) throws IOException {
+    return jQueryBackend.get(request, advancedSearchParser, new PaginationFilter[0]);
   }
 
   @PostMapping

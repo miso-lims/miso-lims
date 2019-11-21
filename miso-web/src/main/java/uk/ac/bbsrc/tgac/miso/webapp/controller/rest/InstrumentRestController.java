@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
@@ -93,20 +91,19 @@ public class InstrumentRestController extends RestController {
 
   @GetMapping(value = "/dt", produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<InstrumentDto> datatable(HttpServletRequest request, HttpServletResponse response,
-      UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser);
+  public DataTablesResponseDto<InstrumentDto> datatable(HttpServletRequest request) throws IOException {
+    return jQueryBackend.get(request, advancedSearchParser);
   }
 
   @GetMapping(value = "/dt/instrument-type/{type}", produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<InstrumentDto> datatableByInstrumentType(@PathVariable("type") String type, HttpServletRequest request,
-      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
+  public DataTablesResponseDto<InstrumentDto> datatableByInstrumentType(@PathVariable("type") String type, HttpServletRequest request)
+      throws IOException {
     InstrumentType instrumentType = InstrumentType.valueOf(type);
     if (instrumentType == null) {
       throw new RestException("Invalid instrument type.", Status.BAD_REQUEST);
     }
-    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.instrumentType(instrumentType));
+    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.instrumentType(instrumentType));
   }
 
   @PostMapping(value = "/bulk-delete")

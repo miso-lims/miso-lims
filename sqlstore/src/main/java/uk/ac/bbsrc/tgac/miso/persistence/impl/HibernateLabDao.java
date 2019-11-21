@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.persistence.LabDao;
 
 @Repository
@@ -69,9 +70,17 @@ public class HibernateLabDao implements LabDao {
   }
 
   @Override
-  public long getUsage(Lab lab) {
+  public long getUsageByTissues(Lab lab) {
     return (long) currentSession().createCriteria(SampleTissueImpl.class)
         .add(Restrictions.eq("lab", lab))
+        .setProjection(Projections.rowCount())
+        .uniqueResult();
+  }
+
+  @Override
+  public long getUsageByTransfers(Lab lab) {
+    return (long) currentSession().createCriteria(Transfer.class)
+        .add(Restrictions.eq("senderLab", lab))
         .setProjection(Projections.rowCount())
         .uniqueResult();
   }

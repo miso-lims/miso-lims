@@ -26,12 +26,13 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.Date;
+import java.util.List;
 
 import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QualityControllable;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
 
@@ -47,8 +48,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface Sample
-    extends Attachable, Comparable<Sample>, Deletable, HierarchyEntity, Locatable, QualityControllable<SampleQC>, Serializable {
+public interface Sample extends Attachable, Comparable<Sample>, Deletable, HierarchyEntity, Locatable, QualityControllable<SampleQC>,
+    Serializable {
 
   /** Field UNSAVED_ID */
   public static final long UNSAVED_ID = 0L;
@@ -202,21 +203,6 @@ public interface Sample
   public void setSampleType(String string);
 
   /**
-   * Returns the receivedDate of this Sample object.
-   * 
-   * @return Date receivedDate.
-   */
-  public Date getReceivedDate();
-
-  /**
-   * Sets the receivedDate of this Sample object.
-   * 
-   * @param date
-   *          receivedDate.
-   */
-  public void setReceivedDate(Date date);
-
-  /**
    * Returns the qcPassed of this Sample object.
    * 
    * @return Boolean qcPassed.
@@ -302,5 +288,8 @@ public interface Sample
    * @param requisitionId
    */
   public void setRequisitionId(String requisitionId);
+
+  @Override
+  public List<TransferSample> getTransfers();
 
 }

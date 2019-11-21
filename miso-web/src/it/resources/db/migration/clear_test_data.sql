@@ -2,6 +2,11 @@
 DROP TRIGGER IF EXISTS BeforeInsertPool;
 
 SET FOREIGN_KEY_CHECKS=0;
+DELETE FROM Transfer_Sample;
+DELETE FROM Transfer_Library;
+DELETE FROM Transfer_LibraryAliquot;
+DELETE FROM Transfer_Pool;
+DELETE FROM Transfer;
 DELETE FROM Workset_Sample;
 DELETE FROM Workset_Library;
 DELETE FROM Workset_LibraryAliquot;

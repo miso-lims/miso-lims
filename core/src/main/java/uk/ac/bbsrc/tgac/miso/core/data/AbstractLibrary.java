@@ -65,6 +65,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.type.DilutionFactor;
@@ -190,9 +191,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @JoinColumn(name = "kitDescriptorId")
   private KitDescriptor kitDescriptor;
 
-  @Temporal(TemporalType.DATE)
-  private Date receivedDate;
-
   @ManyToOne
   @JoinColumn(name = "spikeInId")
   private LibrarySpikeIn spikeIn;
@@ -211,6 +209,9 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
 
   @Transient
   private List<FileAttachment> pendingAttachmentDeletions;
+
+  @OneToMany(mappedBy = "item")
+  private List<TransferLibrary> transfers;
 
   @Override
   public Boxable.EntityType getEntityType() {
@@ -596,16 +597,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
-  public Date getReceivedDate() {
-    return receivedDate;
-  }
-
-  @Override
-  public void setReceivedDate(Date receivedDate) {
-    this.receivedDate = receivedDate;
-  }
-
-  @Override
   public int hashCode() {
     return new HashCodeBuilder(3, 33)
         .appendSuper(super.hashCode())
@@ -625,7 +616,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
         .append(platformType)
         .append(qcPassed)
         .append(kitDescriptor)
-        .append(receivedDate)
         .toHashCode();
   }
 
@@ -653,7 +643,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
         .append(platformType, other.platformType)
         .append(qcPassed, other.qcPassed)
         .append(kitDescriptor, other.kitDescriptor)
-        .append(receivedDate, other.receivedDate)
         .isEquals();
   }
 
@@ -806,6 +795,14 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Override
   public Sample getParent() {
     return getSample();
+  }
+
+  @Override
+  public List<TransferLibrary> getTransfers() {
+    if (transfers == null) {
+      transfers = new ArrayList<>();
+    }
+    return transfers;
   }
 
 }

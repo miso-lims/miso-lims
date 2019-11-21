@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -48,6 +49,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl.IdentityBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
@@ -57,6 +60,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.core.service.StainService;
+import uk.ac.bbsrc.tgac.miso.core.service.TransferService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
@@ -144,6 +148,8 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   private WorksetService worksetService;
   @Autowired
   private FileAttachmentService fileAttachmentService;
+  @Autowired
+  private TransferService transferService;
 
   @Autowired
   private NamingScheme namingScheme;
@@ -305,6 +311,20 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       sampleStore.update(sample.getParent());
     }
     boxService.updateBoxableLocation(sample);
+    if (!sample.getTransfers().isEmpty()) {
+      TransferSample transferSample = sample.getTransfers().iterator().next();
+      Transfer transfer = transferSample.getTransfer();
+      List<Transfer> existingTransfers = transferService.listByProperties(transfer.getSenderLab(), transfer.getRecipientGroup(),
+          sample.getProject(), transfer.getTransferDate());
+      Transfer existingTransfer = existingTransfers.stream().max(Comparator.comparing(Transfer::getCreationTime)).orElse(null);
+      if (existingTransfer != null) {
+        existingTransfer.getSampleTransfers().add(transferSample);
+        transferSample.setTransfer(existingTransfer);
+        transferService.update(existingTransfer);
+      } else {
+        transferService.create(transfer);
+      }
+    }
     return savedId;
   }
 
@@ -746,8 +766,9 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   }
 
   private void maybeRemoveFromBox(Sample sample) {
-    if (sample.isDiscarded() || sample.isDistributed()) {
+    if (sample.isDiscarded() || sample.getDistributionTransfer() != null) {
       sample.setBoxPosition(null);
+      sample.setVolume(BigDecimal.ZERO);
     }
   }
 
@@ -757,13 +778,28 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     validateConcentrationUnits(sample.getConcentration(), sample.getConcentrationUnits(), errors);
     validateVolumeUnits(sample.getVolume(), sample.getVolumeUnits(), errors);
     validateBarcodeUniqueness(sample, beforeChange, sampleStore::getByBarcode, errors, "sample");
-    validateDistributionFields(sample.isDistributed(), sample.getDistributionDate(), sample.getDistributionRecipient(), sample.getBox(),
-        errors);
-    validateUnboxableFields(sample.isDiscarded(), sample.isDistributed(), sample.getBox(), errors);
+    validateUnboxableFields(sample, errors);
 
     if (taxonLookupEnabled && (beforeChange == null || !sample.getScientificName().equals(beforeChange.getScientificName()))
         && (sample.getScientificName() == null || TaxonomyUtils.checkScientificNameAtNCBI(sample.getScientificName()) == null)) {
       errors.add(new ValidationError("scientificName", "This scientific name is not of a known taxonomy"));
+    }
+
+    if (beforeChange == null) {
+      if (sample.getTransfers().size() > 1) {
+        errors.add(new ValidationError("Cannot have more than one transfer upon creation"));
+      } else if (sample.getTransfers().size() == 1) {
+        TransferSample transfer = sample.getTransfers().iterator().next();
+        if (transfer.getTransfer().getSenderLab() == null) {
+          errors.add(new ValidationError("senderLabId", "Receipt transfer must specify a lab"));
+        }
+        if (transfer.getTransfer().getRecipientGroup() == null) {
+          errors.add(new ValidationError("recipientGroupId", "Receipt transfer must specify a recipient group"));
+        }
+        if (Boolean.FALSE.equals(transfer.isQcPassed()) && transfer.getQcNote() == null) {
+          errors.add(new ValidationError("reciptQcNote", "A receipt QC note is required when receipt QC is failed"));
+        }
+      }
     }
 
     if (!errors.isEmpty()) {
@@ -781,7 +817,6 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   private void applyChanges(Sample target, Sample source) throws IOException {
     target.setDescription(source.getDescription());
     target.setSampleType(source.getSampleType());
-    target.setReceivedDate(source.getReceivedDate());
     target.setScientificName(source.getScientificName());
     target.setTaxonIdentifier(source.getTaxonIdentifier());
 
@@ -790,11 +825,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     target.setDescription(source.getDescription());
     target.setDiscarded(source.isDiscarded());
     target.setInitialVolume(source.getInitialVolume());
-    if (source.isDiscarded() || source.isDistributed()) {
-      target.setVolume(BigDecimal.ZERO);
-    } else {
-      target.setVolume(source.getVolume());
-    }
+    target.setVolume(source.getVolume());
     if (target.getVolume() == null) {
       target.setVolumeUnits(null);
     } else if (!target.getVolume().equals(BigDecimal.ZERO) || target.getVolumeUnits() != null) {
@@ -808,9 +839,6 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     }
     target.setLocationBarcode(source.getLocationBarcode());
     target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
-    target.setDistributed(source.isDistributed());
-    target.setDistributionDate(source.getDistributionDate());
-    target.setDistributionRecipient(source.getDistributionRecipient());
     target.setLocationBarcode(source.getLocationBarcode());
     target.setRequisitionId(source.getRequisitionId());
 

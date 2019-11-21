@@ -83,10 +83,9 @@ public class SequencingOrderRestController extends RestController {
 
   @GetMapping(value = "/pools/{id}/dt/completions", produces = { "application/json" })
   @ResponseBody
-  public DataTablesResponseDto<SequencingOrderCompletionDto> getCompletionsByPool(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
-      HttpServletRequest request, HttpServletResponse response)
+  public DataTablesResponseDto<SequencingOrderCompletionDto> getCompletionsByPool(@PathVariable("id") Long id, HttpServletRequest request)
       throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.pool(id));
+    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.pool(id));
   }
 
   @GetMapping(value = "/sequencingorders/{id}", produces = { "application/json" })
@@ -114,30 +113,25 @@ public class SequencingOrderRestController extends RestController {
   
   @GetMapping(value = "/sequencingorders/dt/completions/all/{platform}", produces = { "application/json" })
   @ResponseBody
-  public DataTablesResponseDto<SequencingOrderCompletionDto> getDtCompletions(@PathVariable String platform, UriComponentsBuilder uriBuilder,
-      HttpServletRequest request, HttpServletResponse response)
+  public DataTablesResponseDto<SequencingOrderCompletionDto> getDtCompletions(@PathVariable String platform, HttpServletRequest request)
       throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser,
+    return jQueryBackend.get(request, advancedSearchParser,
         PaginationFilter.platformType(PlatformType.valueOf(platform)));
   }
 
   @GetMapping(value = "/sequencingorders/dt/completions/outstanding/{platform}", produces = { "application/json" })
   @ResponseBody
   public DataTablesResponseDto<SequencingOrderCompletionDto> getDtCompletionsOutstanding(@PathVariable String platform,
-      UriComponentsBuilder uriBuilder, HttpServletRequest request,
-      HttpServletResponse response)
-      throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.fulfilled(false),
+      HttpServletRequest request) throws IOException {
+    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.fulfilled(false),
         PaginationFilter.platformType(PlatformType.valueOf(platform)));
   }
 
   @GetMapping(value = "/sequencingorders/dt/completions/in-progress/{platform}", produces = { "application/json" })
   @ResponseBody
   public DataTablesResponseDto<SequencingOrderCompletionDto> getDtCompletionsInProgress(@PathVariable String platform,
-      UriComponentsBuilder uriBuilder, HttpServletRequest request,
-      HttpServletResponse response)
-      throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.pending(),
+      HttpServletRequest request) throws IOException {
+    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.pending(),
         PaginationFilter.platformType(PlatformType.valueOf(platform)));
   }
 

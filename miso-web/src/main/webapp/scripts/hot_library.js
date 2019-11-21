@@ -340,6 +340,7 @@ HotTarget.library = (function() {
               numberOfMonths: 1
             },
             allowEmpty: true,
+            description: 'The date that the library was created in lab',
             include: !config.isLibraryReceipt,
             unpack: function(lib, flat, setCellMeta) {
               // If creating, default to today's date in format YYYY-MM-DD
@@ -362,8 +363,9 @@ HotTarget.library = (function() {
               firstDay: 0,
               numberOfMonths: 1
             },
-            allowEmpty: !config.isLibraryReceipt,
-            include: config.isLibraryReceipt || !create,
+            allowEmpty: false,
+            description: 'The date that the library was received from an external source.',
+            include: config.isLibraryReceipt,
             unpack: function(lib, flat, setCellMeta) {
               // If creating, default to today's date in format YYYY-MM-DD
               if (!lib.receivedDate && create) {
@@ -376,6 +378,77 @@ HotTarget.library = (function() {
               lib.receivedDate = flat.receivedDate;
             }
           },
+          HotUtils.makeColumnForConstantsList('Received From', config.isLibraryReceipt, 'receivedFrom', 'senderLabId', 'id', 'label',
+              Constants.labs, true, {
+                depends: ['*start', 'receivedDate'],
+                update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+                  setReadOnly(!flat.receivedDate);
+                  setOptions({
+                    validator: flat.receivedDate ? HotUtils.validator.requiredAutocomplete : null
+                  });
+                  if (!flat.receivedDate) {
+                    setData(null);
+                  }
+                }
+              }),
+          HotUtils.makeColumnForConstantsList('Received By', config.isLibraryReceipt, 'receivedBy', 'recipientGroupId', 'id', 'name',
+              config.recipientGroups, true, {
+                depends: ['*start', 'receivedDate'],
+                update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+                  setReadOnly(!flat.receivedDate);
+                  setOptions({
+                    validator: flat.receivedDate ? HotUtils.validator.requiredAutocomplete : null
+                  });
+                  if (flat.receivedDate) {
+                    if (config.recipientGroups.length === 1) {
+                      setData(config.recipientGroups[0].name);
+                    }
+                  } else {
+                    setData(null);
+                  }
+                }
+              }),
+          HotUtils.makeColumnForBoolean('Receipt Confirmed', config.isLibraryReceipt, 'received', false, {
+            depends: ['*start', 'receivedDate'],
+            update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+              setReadOnly(!flat.receivedDate);
+              setOptions({
+                validator: flat.receivedDate ? HotUtils.validator.requiredAutocomplete : null
+              });
+              if (flat.receivedDate) {
+                setData('True');
+              } else {
+                setData(null);
+              }
+            }
+          }, 'True'),
+          HotUtils.makeColumnForBoolean('Receipt QC Passed', config.isLibraryReceipt, 'receiptQcPassed', false, {
+            depends: ['*start', 'receivedDate'],
+            update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+              setReadOnly(!flat.receivedDate);
+              setOptions({
+                validator: flat.receivedDate ? HotUtils.validator.requiredAutocomplete : null
+              });
+              if (flat.receivedDate) {
+                setData('True');
+              } else {
+                setData(null);
+              }
+            }
+          }, 'True'),
+          HotUtils.makeColumnForText('Receipt QC Note', config.isLibraryReceipt, 'receiptQcNote', {
+            depends: ['*start', 'receivedDate', 'receiptQcPassed'],
+            update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+              setReadOnly(!flat.receivedDate);
+              setOptions({
+                validator: flat.receiptQcPassed === 'False' ? HotUtils.validator.requiredTextNoSpecialChars
+                    : HotUtils.validator.optionalTextNoSpecialChars
+              });
+              if (!flat.receivedDate) {
+                setData(null);
+              }
+            }
+          }),
           {
             header: 'Effective Group ID',
             data: 'effectiveGroupId',
@@ -828,7 +901,7 @@ HotTarget.library = (function() {
                   : HotUtils.makeAddToWorkset('libraries', 'libraryIds', Urls.rest.worksets.addLibraries),
               HotUtils.makeAttachFile('library', function(library) {
                 return library.parentSampleProjectId;
-              })]);
+              }), HotUtils.makeTransferAction('libraryIds')]);
     }
   };
 })();

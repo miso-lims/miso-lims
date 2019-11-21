@@ -38,7 +38,7 @@ public abstract class HibernateProviderDao<T> implements ProviderDao<T> {
     return entityClass;
   }
 
-  protected Session currentSession() {
+  public Session currentSession() {
     return getSessionFactory().getCurrentSession();
   }
 

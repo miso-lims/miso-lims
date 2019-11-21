@@ -1,7 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.migration.destination;
 
 import java.io.IOException;
+import java.util.Collection;
 
+import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationException;
@@ -76,4 +78,16 @@ public class MigrationAuthorizationManager implements AuthorizationManager {
   public void throwIfNotOwner(User owner) throws IOException {
     // auth disabled in this manager; do nothing
   }
+
+  @Override
+  public boolean isGroupMember(Group group) throws IOException {
+    // auth disabled in this manager; allow all access
+    return true;
+  }
+
+  @Override
+  public void throwIfNonAdminOrGroupMember(Collection<Group> groups) throws IOException {
+    // auth disabled in this manager; do nothing
+  }
+
 }

@@ -56,9 +56,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
@@ -72,6 +69,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.PoolQC;
@@ -169,6 +167,9 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Transient
   private List<FileAttachment> pendingAttachmentDeletions;
 
+  @OneToMany(mappedBy = "item")
+  private List<TransferPool> transfers;
+
   @Transient
   private Set<String> duplicateIndicesSequences;
 
@@ -206,16 +207,22 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) return false;
-    if (obj == this) return true;
-    if (!(obj instanceof Pool)) return false;
-    Pool other = (Pool) obj;
-    return new EqualsBuilder().appendSuper(super.equals(obj)).append(description, other.getDescription())
-        .append(poolElements, other.getPoolContents())
-        .append(concentration, other.getConcentration())
-        .append(identificationBarcode, other.getIdentificationBarcode())
-        .append(qcPassed, other.getQcPassed())
-        .isEquals();
+    return LimsUtils.equalsByIdFirst(this, obj,
+        PoolImpl::getDescription,
+        PoolImpl::getPoolContents,
+        PoolImpl::getConcentration,
+        PoolImpl::getIdentificationBarcode,
+        PoolImpl::getQcPassed);
+  }
+
+  @Override
+  public int hashCode() {
+    return LimsUtils.hashCodeByIdFirst(this,
+        description,
+        poolElements,
+        concentration,
+        identificationBarcode,
+        qcPassed);
   }
 
   @Override
@@ -351,12 +358,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Override
   public boolean hasLibrariesWithoutIndex() {
     return getPoolContents().stream().map(PoolElement::getPoolableElementView).anyMatch(v -> v.getIndices().isEmpty());
-  }
-
-  @Override
-  public int hashCode() {
-    return new HashCodeBuilder(23, 47).appendSuper(super.hashCode()).append(description).append(poolElements)
-        .append(concentration).append(identificationBarcode).append(qcPassed).toHashCode();
   }
 
   @Override
@@ -564,4 +565,13 @@ public class PoolImpl extends AbstractBoxable implements Pool {
         .map(PoolElement::getPoolableElementView).filter(view -> view.getSubprojectPriority() != null && view.getSubprojectPriority())
         .map(view -> view.getSubprojectAlias()).collect(Collectors.toSet());
   }
+
+  @Override
+  public List<TransferPool> getTransfers() {
+    if (transfers == null) {
+      transfers = new ArrayList<>();
+    }
+    return transfers;
+  }
+
 }

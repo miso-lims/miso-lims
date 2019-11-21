@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -38,6 +39,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
@@ -170,10 +173,17 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferItem;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferPool;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BarcodableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolViewElement;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListTransferView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQC;
@@ -429,7 +439,6 @@ public class Dtos {
       dto.setBoxPosition(from.getBoxPosition());
     }
     dto.setSampleType(from.getSampleType());
-    dto.setReceivedDate(from.getReceivedDate() == null ? null : formatDate(from.getReceivedDate()));
     if (from.getQcPassed() != null) {
       dto.setQcPassed(from.getQcPassed());
     }
@@ -448,10 +457,17 @@ public class Dtos {
     dto.setDiscarded(from.isDiscarded());
     dto.setLastModified(formatDateTime(from.getLastModified()));
 
-    dto.setDistributed(from.isDistributed());
-    dto.setDistributionDate(formatDate(from.getDistributionDate()));
-    dto.setDistributionRecipient(from.getDistributionRecipient());
     setString(dto::setRequisitionId, from.getRequisitionId());
+
+    TransferItem<?> receipt = from.getReceiptTransfer();
+    if (receipt != null) {
+      setDateString(dto::setReceivedDate, receipt.getTransfer().getTransferDate());
+      setId(dto::setSenderLabId, receipt.getTransfer().getSenderLab());
+      setId(dto::setRecipientGroupId, receipt.getTransfer().getRecipientGroup());
+      setBoolean(dto::setReceived, receipt.isReceived(), true);
+      setBoolean(dto::setReceiptQcPassed, receipt.isQcPassed(), true);
+      setString(dto::setReceiptQcNote, receipt.getQcNote());
+    }
 
     return dto;
 
@@ -803,7 +819,6 @@ public class Dtos {
     to.setIdentificationBarcode(nullifyStringIfBlank(from.getIdentificationBarcode()));
     to.setLocationBarcode(nullifyStringIfBlank(from.getLocationBarcode()));
     to.setSampleType(from.getSampleType());
-    to.setReceivedDate(parseDate(from.getReceivedDate()));
     to.setQcPassed(from.getQcPassed());
     to.setScientificName(from.getScientificName());
     to.setTaxonIdentifier(from.getTaxonIdentifier());
@@ -821,10 +836,23 @@ public class Dtos {
     }
     to.setBoxPosition((SampleBoxPosition) makeBoxablePosition(from, (SampleImpl) to));
 
-    to.setDistributed(from.isDistributed());
-    to.setDistributionDate(parseDate(from.getDistributionDate()));
-    to.setDistributionRecipient(from.getDistributionRecipient());
     setString(to::setRequisitionId, from.getRequisitionId());
+
+    if (from.getReceivedDate() != null) {
+      Transfer receipt = new Transfer();
+      setDate(receipt::setTransferDate, from.getReceivedDate());
+      setObject(receipt::setSenderLab, LabImpl::new, from.getSenderLabId());
+      setObject(receipt::setRecipientGroup, Group::new, from.getRecipientGroupId());
+      TransferSample item = new TransferSample();
+      setBoolean(item::setReceived, from.isReceived(), true);
+      setBoolean(item::setQcPassed, from.isReceiptQcPassed(), true);
+      setString(item::setQcNote, from.getReceiptQcNote());
+      item.setItem(to);
+      item.setTransfer(receipt);
+      receipt.getSampleTransfers().add(item);
+      to.getTransfers().add(item);
+    }
+
     return to;
   }
 
@@ -1341,16 +1369,21 @@ public class Dtos {
     if (from.getSample().getBox() != null) {
       dto.setSampleBoxPositionLabel(BoxUtils.makeBoxPositionLabel(from.getSample().getBox().getAlias(), from.getSample().getBoxPosition()));
     }
-    if (from.getReceivedDate() != null) {
-      dto.setReceivedDate(formatDate(from.getReceivedDate()));
-    }
     setId(dto::setSpikeInId, from.getSpikeIn());
     setString(dto::setSpikeInVolume, from.getSpikeInVolume());
     setString(dto::setSpikeInDilutionFactor, maybeGetProperty(from.getSpikeInDilutionFactor(), DilutionFactor::getLabel));
-    dto.setDistributed(from.isDistributed());
-    setString(dto::setDistributionDate, formatDate(from.getDistributionDate()));
-    setString(dto::setDistributionRecipient, from.getDistributionRecipient());
     setBoolean(dto::setUmis, from.getUmis(), false);
+
+    TransferItem<?> receipt = from.getReceiptTransfer();
+    if (receipt != null) {
+      setDateString(dto::setReceivedDate, receipt.getTransfer().getTransferDate());
+      setId(dto::setSenderLabId, receipt.getTransfer().getSenderLab());
+      setId(dto::setRecipientGroupId, receipt.getTransfer().getRecipientGroup());
+      setBoolean(dto::setReceived, receipt.isReceived(), true);
+      setBoolean(dto::setReceiptQcPassed, receipt.isQcPassed(), true);
+      setString(dto::setReceiptQcNote, receipt.getQcNote());
+    }
+
     return dto;
   }
 
@@ -1416,18 +1449,28 @@ public class Dtos {
     }
     to.setLocationBarcode(from.getLocationBarcode());
     to.setCreationDate(parseDate(from.getCreationDate()));
-    if (from.getReceivedDate() != null) {
-      to.setReceivedDate(parseDate(from.getReceivedDate()));
-    }
     to.setBoxPosition((LibraryBoxPosition) makeBoxablePosition(from, (LibraryImpl) to));
     to.setDiscarded(from.isDiscarded());
     setObject(to::setSpikeIn, LibrarySpikeIn::new, from.getSpikeInId());
     setBigDecimal(to::setSpikeInVolume, from.getSpikeInVolume());
     setObject(to::setSpikeInDilutionFactor, from.getSpikeInDilutionFactor(), DilutionFactor::get);
-    to.setDistributed(from.isDistributed());
-    to.setDistributionDate(parseDate(from.getDistributionDate()));
-    to.setDistributionRecipient(from.getDistributionRecipient());
     setBoolean(to::setUmis, from.getUmis(), false);
+
+    if (from.getReceivedDate() != null) {
+      Transfer receipt = new Transfer();
+      setDate(receipt::setTransferDate, from.getReceivedDate());
+      setObject(receipt::setSenderLab, LabImpl::new, from.getSenderLabId());
+      setObject(receipt::setRecipientGroup, Group::new, from.getRecipientGroupId());
+      TransferLibrary item = new TransferLibrary();
+      setBoolean(item::setReceived, from.isReceived(), true);
+      setBoolean(item::setQcPassed, from.isReceiptQcPassed(), true);
+      setString(item::setQcNote, from.getReceiptQcNote());
+      item.setItem(to);
+      item.setTransfer(receipt);
+      receipt.getLibraryTransfers().add(item);
+      to.getTransfers().add(item);
+    }
+
     return to;
   }
 
@@ -1601,9 +1644,6 @@ public class Dtos {
       dto.setBoxPosition(from.getBoxPosition());
     }
     dto.setDiscarded(from.isDiscarded());
-    dto.setDistributed(from.isDistributed());
-    dto.setDistributionDate(formatDate(from.getDistributionDate()));
-    dto.setDistributionRecipient(from.getDistributionRecipient());
     setDateTimeString(dto::setLastModified, from.getLastModified());
     return dto;
   }
@@ -1703,9 +1743,6 @@ public class Dtos {
     }
     to.setBoxPosition((LibraryAliquotBoxPosition) makeBoxablePosition(from, to));
     to.setDiscarded(from.isDiscarded());
-    to.setDistributed(from.isDistributed());
-    to.setDistributionDate(parseDate(from.getDistributionDate()));
-    to.setDistributionRecipient(from.getDistributionRecipient());
     return to;
   }
 
@@ -1777,9 +1814,6 @@ public class Dtos {
       dto.setBoxPosition(from.getBoxPosition());
     }
     dto.setDiscarded(from.isDiscarded());
-    dto.setDistributed(from.isDistributed());
-    dto.setDistributionDate(formatDate(from.getDistributionDate()));
-    dto.setDistributionRecipient(from.getDistributionRecipient());
     dto.setHasLowQualityLibraries(from.getHasLowQualityMembers());
     dto.setPrioritySubprojectAliases(from.getPrioritySubprojectAliases());
 
@@ -2644,9 +2678,6 @@ public class Dtos {
     to.setDescription(dto.getDescription());
     to.setIdentificationBarcode(dto.getIdentificationBarcode());
     to.setDiscarded(dto.isDiscarded());
-    to.setDistributed(dto.isDistributed());
-    to.setDistributionDate(parseDate(dto.getDistributionDate()));
-    to.setDistributionRecipient(dto.getDistributionRecipient());
     setBigDecimal(to::setVolume, dto.getVolume());
     to.setVolumeUnits(dto.getVolumeUnits());
     setObject(to::setPlatformType, dto.getPlatformType(), pt -> PlatformType.valueOf(pt));
@@ -3767,6 +3798,113 @@ public class Dtos {
     setString(to::setName, from.getName());
     setString(to::setAbbreviation, from.getAbbreviation());
     setBoolean(to::setArchived, from.isArchived(), false);
+    return to;
+  }
+
+  public static TransferDto asDto(@Nonnull Transfer from) {
+    TransferDto to = new TransferDto();
+    setLong(to::setId, from.getId(), true);
+    setDateString(to::setTransferDate, from.getTransferDate());
+    setId(to::setSenderLabId, from.getSenderLab());
+    setString(to::setSenderLabLabel, maybeGetProperty(from.getSenderLab(), Lab::getItemLabel));
+    setId(to::setSenderGroupId, from.getSenderGroup());
+    setString(to::setSenderGroupName, maybeGetProperty(from.getSenderGroup(), Group::getName));
+    setString(to::setRecipient, from.getRecipient());
+    setId(to::setRecipientGroupId, from.getRecipientGroup());
+    setString(to::setRecipientGroupName, maybeGetProperty(from.getRecipientGroup(), Group::getName));
+    to.setItems(new ArrayList<>());
+    to.getItems().addAll(from.getSampleTransfers().stream().map(item -> Dtos.asDto(item)).collect(Collectors.toList()));
+    to.getItems().addAll(from.getLibraryTransfers().stream().map(item -> Dtos.asDto(item)).collect(Collectors.toList()));
+    to.getItems()
+        .addAll(from.getLibraryAliquotTransfers().stream().map(item -> Dtos.asDto(item)).collect(Collectors.toList()));
+    to.getItems().addAll(from.getPoolTransfers().stream().map(item -> Dtos.asDto(item)).collect(Collectors.toList()));
+    return to;
+  }
+
+  public static Transfer to(@Nonnull TransferDto from) {
+    Transfer to = new Transfer();
+    setLong(to::setId, from.getId(), false);
+    setDate(to::setTransferDate, from.getTransferDate());
+    setObject(to::setSenderLab, LabImpl::new, from.getSenderLabId());
+    setObject(to::setSenderGroup, Group::new, from.getSenderGroupId());
+    setString(to::setRecipient, from.getRecipient());
+    setObject(to::setRecipientGroup, Group::new, from.getRecipientGroupId());
+    addTransferItems(to::getSampleTransfers, from.getItems(), EntityType.SAMPLE, TransferSample::new, SampleImpl::new,
+        SampleBoxPosition::new, Sample::setBoxPosition);
+    addTransferItems(to::getLibraryTransfers, from.getItems(), EntityType.LIBRARY, TransferLibrary::new, LibraryImpl::new,
+        LibraryBoxPosition::new, Library::setBoxPosition);
+    addTransferItems(to::getLibraryAliquotTransfers, from.getItems(), EntityType.LIBRARY_ALIQUOT, TransferLibraryAliquot::new,
+        LibraryAliquot::new, LibraryAliquotBoxPosition::new, LibraryAliquot::setBoxPosition);
+    addTransferItems(to::getPoolTransfers, from.getItems(), EntityType.POOL, TransferPool::new, PoolImpl::new, PoolBoxPosition::new,
+        Pool::setBoxPosition);
+    return to;
+  }
+
+  private static <T extends Boxable, U extends TransferItem<T>, V extends AbstractBoxPosition> void addTransferItems(
+      Supplier<Set<U>> getToSet,
+      List<TransferItemDto> transferItemDtos, EntityType type, Supplier<U> constructor, Supplier<T> itemConstructor,
+      Supplier<V> boxPositionConstructor, BiConsumer<T, V> boxPositionSetter) {
+    if (transferItemDtos != null && !transferItemDtos.isEmpty()) {
+      getToSet.get().addAll(transferItemDtos.stream()
+          .filter(transferItemDto -> type.getLabel().equals(transferItemDto.getType()))
+          .map(transferItemDto -> Dtos.to(transferItemDto, constructor, (xfer, item) -> xfer.setItem(item), itemConstructor,
+              boxPositionConstructor, boxPositionSetter))
+          .collect(Collectors.toList()));
+    }
+  }
+
+  private static TransferItemDto asDto(@Nonnull TransferItem<?> from) {
+    TransferItemDto to = new TransferItemDto();
+    setString(to::setType, maybeGetProperty(maybeGetProperty(from.getItem(), Boxable::getEntityType), EntityType::getLabel));
+    setLong(to::setId, maybeGetProperty(from.getItem(), Boxable::getId), true);
+    setString(to::setName, maybeGetProperty(from.getItem(), Boxable::getName));
+    setString(to::setAlias, maybeGetProperty(from.getItem(), Boxable::getAlias));
+    setBoolean(to::setReceived, from.isReceived(), true);
+    setBoolean(to::setQcPassed, from.isQcPassed(), true);
+    setString(to::setQcNote, from.getQcNote());
+    setLong(to::setBoxId, maybeGetProperty(maybeGetProperty(from.getItem(), Boxable::getBox), Box::getId), true);
+    setString(to::setBoxAlias, maybeGetProperty(maybeGetProperty(from.getItem(), Boxable::getBox), Box::getAlias));
+    setString(to::setBoxPosition, maybeGetProperty(from.getItem(), Boxable::getBoxPosition));
+    return to;
+  }
+
+  private static <T extends Boxable, U extends TransferItem<T>, V extends AbstractBoxPosition> U to(@Nonnull TransferItemDto from,
+      Supplier<U> constructor,
+      BiConsumer<U, T> itemSetter, Supplier<T> itemConstructor, Supplier<V> boxPositionConstructor, BiConsumer<T, V> boxPositionSetter) {
+    U to = constructor.get();
+    T toItem = itemConstructor.get();
+    setLong(toItem::setId, from.getId(), false);
+    itemSetter.accept(to, toItem);
+    setBoolean(to::setReceived, from.isReceived(), true);
+    setBoolean(to::setQcPassed, from.isQcPassed(), true);
+    setString(to::setQcNote, from.getQcNote());
+    if (from.getBoxId() != null && from.getBoxPosition() != null) {
+      V boxPos = boxPositionConstructor.get();
+      Box box = new BoxImpl();
+      box.setId(from.getBoxId());
+      boxPos.setBox(box);
+      boxPos.setPosition(from.getBoxPosition());
+      boxPositionSetter.accept(toItem, boxPos);
+    }
+    return to;
+  }
+
+  public static ListTransferViewDto asDto(@Nonnull ListTransferView from) {
+    ListTransferViewDto to = new ListTransferViewDto();
+    setLong(to::setId, from.getId(), false);
+    setDateString(to::setTransferDate, from.getTransferDate());
+    setId(to::setSenderLabId, from.getSenderLab());
+    setString(to::setSenderLabLabel, maybeGetProperty(from.getSenderLab(), Lab::getItemLabel));
+    setId(to::setSenderGroupId, from.getSenderGroup());
+    setString(to::setSenderGroupName, maybeGetProperty(from.getSenderGroup(), Group::getName));
+    setString(to::setRecipient, from.getRecipient());
+    setId(to::setRecipientGroupId, from.getRecipientGroup());
+    setString(to::setRecipientGroupName, maybeGetProperty(from.getRecipientGroup(), Group::getName));
+    setInteger(to::setItems, from.getItems(), false);
+    setInteger(to::setReceived, from.getReceived(), false);
+    setInteger(to::setReceiptPending, from.getReceiptPending(), false);
+    setInteger(to::setQcPassed, from.getQcPassed(), false);
+    setInteger(to::setQcPending, from.getQcPending(), false);
     return to;
   }
 

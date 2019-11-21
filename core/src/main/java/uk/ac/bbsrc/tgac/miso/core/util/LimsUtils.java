@@ -59,6 +59,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.HierarchyEntity;
+import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -577,13 +578,48 @@ public class LimsUtils {
   }
 
   @SafeVarargs
-  public static <T> boolean equals(T item, T other, Function<T, Object>... getters) {
+  public static <T> boolean equals(T item, Object other, Function<T, Object>... getters) {
+    if (item == other) return true;
+    if (other == null) return false;
+    if (item.getClass() != other.getClass()) return false;
+
+    @SuppressWarnings("unchecked")
+    T castedOther = (T) other;
+
+    return allEquals(item, castedOther, getters);
+  }
+
+  @SafeVarargs
+  public static <T extends Identifiable> boolean equalsByIdFirst(T item, Object other, Function<T, Object>... getters) {
+    if (item == other) return true;
+    if (other == null) return false;
+    if (item.getClass() != other.getClass()) return false;
+
+    @SuppressWarnings("unchecked")
+    T castedOther = (T) other;
+
+    if (item.isSaved()) {
+      return item.getId() == castedOther.getId();
+    }
+    return allEquals(item, castedOther, getters);
+  }
+
+  @SafeVarargs
+  private static <T> boolean allEquals(T item, T other, Function<T, Object>... getters) {
     for (Function<T, Object> getter : getters) {
       if (!Objects.equals(getter.apply(item), getter.apply(other))) {
         return false;
       }
     }
     return true;
+  }
+
+  public static <T extends Identifiable> int hashCodeByIdFirst(T item, Object... fields) {
+    if (item.isSaved()) {
+      return (int) item.getId();
+    } else {
+      return Objects.hash(fields);
+    }
   }
 
 }

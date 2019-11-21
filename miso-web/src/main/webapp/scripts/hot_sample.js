@@ -158,7 +158,7 @@ HotTarget.sample = (function() {
             },
             allowEmpty: true,
             description: 'The date that the sample was received from an external source.',
-            include: (!Constants.isDetailedSample || !isTargetIdentity(config)) && !config.isLibraryReceipt,
+            include: create && (!Constants.isDetailedSample || !isTargetIdentity(config)) && !config.isLibraryReceipt,
             unpack: function(sam, flat, setCellMeta) {
               // If creating, default to today's date in format YYYY-MM-DD
               if (!sam.receivedDate && config.pageMode == 'create') {
@@ -171,6 +171,80 @@ HotTarget.sample = (function() {
               sam.receivedDate = flat.receivedDate;
             }
           },
+          HotUtils.makeColumnForConstantsList('Received From', create && (!Constants.isDetailedSample || !isTargetIdentity(config))
+              && !config.isLibraryReceipt, 'receivedFrom', 'senderLabId', 'id', 'label', Constants.labs, true, {
+            depends: ['*start', 'receivedDate'],
+            update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+              setReadOnly(!flat.receivedDate);
+              setOptions({
+                validator: flat.receivedDate ? HotUtils.validator.requiredAutocomplete : null
+              });
+              if (!flat.receivedDate) {
+                setData(null);
+              }
+            }
+          }),
+          HotUtils.makeColumnForConstantsList('Received By', create && (!Constants.isDetailedSample || !isTargetIdentity(config))
+              && !config.isLibraryReceipt, 'receivedBy', 'recipientGroupId', 'id', 'name', config.recipientGroups, true, {
+            depends: ['*start', 'receivedDate'],
+            update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+              setReadOnly(!flat.receivedDate);
+              setOptions({
+                validator: flat.receivedDate ? HotUtils.validator.requiredAutocomplete : null
+              });
+              if (flat.receivedDate) {
+                if (config.recipientGroups.length === 1) {
+                  setData(config.recipientGroups[0].name);
+                }
+              } else {
+                setData(null);
+              }
+            }
+          }),
+          HotUtils.makeColumnForBoolean('Receipt Confirmed', create && (!Constants.isDetailedSample || !isTargetIdentity(config))
+              && !config.isLibraryReceipt, 'received', false, {
+            depends: ['*start', 'receivedDate'],
+            update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+              setReadOnly(!flat.receivedDate);
+              setOptions({
+                validator: flat.receivedDate ? HotUtils.validator.requiredAutocomplete : null
+              });
+              if (flat.receivedDate) {
+                setData('True');
+              } else {
+                setData(null);
+              }
+            }
+          }, config.pageMode == 'create' ? 'True' : null),
+          HotUtils.makeColumnForBoolean('Receipt QC Passed', create && (!Constants.isDetailedSample || !isTargetIdentity(config))
+              && !config.isLibraryReceipt, 'receiptQcPassed', false, {
+            depends: ['*start', 'receivedDate'],
+            update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+              setReadOnly(!flat.receivedDate);
+              setOptions({
+                validator: flat.receivedDate ? HotUtils.validator.requiredAutocomplete : null
+              });
+              if (flat.receivedDate) {
+                setData('True');
+              } else {
+                setData(null);
+              }
+            }
+          }, config.pageMode == 'create' ? 'True' : null),
+          HotUtils.makeColumnForText('Receipt QC Note', create && (!Constants.isDetailedSample || !isTargetIdentity(config))
+              && !config.isLibraryReceipt, 'receiptQcNote', {
+            depends: ['*start', 'receivedDate', 'receiptQcPassed'],
+            update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+              setReadOnly(!flat.receivedDate);
+              setOptions({
+                validator: flat.receiptQcPassed === 'False' ? HotUtils.validator.requiredTextNoSpecialChars
+                    : HotUtils.validator.optionalTextNoSpecialChars
+              });
+              if (!flat.receivedDate) {
+                setData(null);
+              }
+            }
+          }),
           HotUtils.makeColumnForText('Requisition ID', (!Constants.isDetailedSample || !isTargetIdentity(config))
               && !config.isLibraryReceipt, 'requisitionId', {
             validator: HotUtils.validator.optionalTextAlphanumeric,
@@ -523,7 +597,7 @@ HotTarget.sample = (function() {
               numberOfMonths: 1
             },
             allowEmpty: true,
-            description: 'The date that the sample was created.',
+            description: 'The date that the sample was created in lab',
             include: Constants.isDetailedSample && !config.isLibraryReceipt,
             unpack: function(sam, flat, setCellMeta) {
               if (!sam.creationDate && config.pageMode == 'propagate') {
@@ -553,8 +627,11 @@ HotTarget.sample = (function() {
           HotUtils.makeColumnForInt('Passage #', show['Tissue'], 'passageNumber', null),
           HotUtils.makeColumnForInt('Times Received', show['Tissue'], 'timesReceived', HotUtils.validator.integer(true, 1)),
           HotUtils.makeColumnForInt('Tube Number', show['Tissue'], 'tubeNumber', HotUtils.validator.integer(true, 1)),
-          HotUtils.makeColumnForConstantsList('Lab', show['Tissue'] && !config.isLibraryReceipt, 'labComposite', 'labId', 'id', 'label',
-              Constants.labs, false),
+          HotUtils.makeColumnForConstantsList('Lab', show['Tissue'] && !config.isLibraryReceipt && config.pageMode === 'edit',
+              'labComposite', 'labId', 'id', 'label', Constants.labs, false, {
+                description: 'The external lab that a tissue came from. This field is intended for historical data only as the lab should '
+                    + 'normally be recorded in a receipt transfer instead'
+              }),
           HotUtils.makeColumnForText('Secondary ID', show['Tissue'] && !config.isLibraryReceipt, 'secondaryIdentifier', {
             validator: HotUtils.validator.optionalTextNoSpecialChars
           }),
@@ -1004,7 +1081,7 @@ HotTarget.sample = (function() {
                   : HotUtils.makeAddToWorkset('samples', 'sampleIds', Urls.rest.worksets.addSamples),
               HotUtils.makeAttachFile('sample', function(sample) {
                 return sample.projectId;
-              })]);
+              }), HotUtils.makeTransferAction('sampleIds')]);
     },
 
     getCustomActions: function(table) {

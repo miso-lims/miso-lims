@@ -18,7 +18,7 @@ var QcType = (function($) {
     setControls: function(controls) {
       FormUtils.setTableData(ListTarget.qccontrol, {
         isAdmin: isAdmin
-      }, controlsListId, controls, form)
+      }, controlsListId, controls, form);
     },
 
     getControls: function() {

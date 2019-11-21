@@ -1,12 +1,15 @@
 package uk.ac.bbsrc.tgac.miso.service.security;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
 
+import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -14,6 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 
 public class DefaultAuthorizationManager implements AuthorizationManager {
 
@@ -109,5 +113,40 @@ public class DefaultAuthorizationManager implements AuthorizationManager {
     if (getCurrentUser().getId() != owner.getId()) {
       throw new AuthorizationException("Current user is not owner");
     }
+  }
+
+  @Override
+  public boolean isGroupMember(Group group) throws IOException {
+    return group != null && getCurrentUser().getGroups().stream().anyMatch(userGroup -> userGroup.getId() == group.getId());
+  }
+
+  @Override
+  public void throwIfNonAdminOrGroupMember(Collection<Group> groups) throws IOException {
+    User currentUser = getCurrentUser();
+    if (!currentUser.isAdmin()
+        && !currentUser.getGroups().stream().anyMatch(userGroup -> groups.stream().anyMatch(group -> group.getId() == userGroup.getId()))) {
+      throw new AuthorizationException(
+          String.format("Current user is not admin or a member of %s %s", Pluralizer.groups(groups.size()), makeGroupList(groups)));
+    }
+  }
+
+  private String makeGroupList(Collection<Group> groups) {
+    StringBuilder sb = new StringBuilder();
+    int i = 0;
+    for (Iterator<Group> groupIterator = groups.iterator(); groupIterator.hasNext();) {
+      Group group = groupIterator.next();
+      if (i != 0) {
+        sb.append(",' ");
+      }
+      if (i > 0 && i == groups.size()) {
+        sb.append("or ");
+      }
+      sb.append("'").append(group.getName());
+      if (i == groups.size()) {
+        sb.append("'");
+      }
+      i++;
+    }
+    return sb.toString();
   }
 }

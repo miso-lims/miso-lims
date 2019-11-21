@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.HandsontableSpreadsheet;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
@@ -149,6 +155,16 @@ public class MisoWebUtils {
         "attachment; filename=" + String.format("%s-%s.%s", spreadsheet.name(), DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(
             ZonedDateTime.now()), formatter.extension()));
     return headers;
+  }
+
+  public static <U, V> void addJsonArray(ObjectMapper mapper, ObjectNode node, String key, Collection<U> items,
+      Function<U, V> toDto) {
+    ArrayNode array = node.putArray(key);
+    for (U item : items) {
+      V dto = toDto.apply(item);
+      JsonNode itemNode = mapper.valueToTree(dto);
+      array.add(itemNode);
+    }
   }
 
 }

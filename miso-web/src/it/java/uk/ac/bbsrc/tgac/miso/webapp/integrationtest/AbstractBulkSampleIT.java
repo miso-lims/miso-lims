@@ -4,10 +4,7 @@ import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtils.*;
 
-import java.math.BigDecimal;
 import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -89,12 +86,20 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
         s -> s.getIdentificationBarcode() == null ? "" : s.getIdentificationBarcode());
     assertEntityAttribute(SamColumns.SAMPLE_TYPE, attributes, sample, Sample::getSampleType);
     assertEntityAttribute(SamColumns.SCIENTIFIC_NAME, attributes, sample, Sample::getScientificName);
-    if (!LimsUtils.isIdentitySample(sample)) {
-      assertEntityAttribute(SamColumns.RECEIVE_DATE, attributes, sample,
-          s -> s.getReceivedDate() == null ? "" : LimsUtils.formatDate(s.getReceivedDate()));
-    }
     assertEntityAttribute(SamColumns.BOX_ALIAS, attributes, sample, s -> s.getBox() == null ? "" : s.getBox().getAlias());
     assertEntityAttribute(SamColumns.BOX_POSITION, attributes, sample, s -> s.getBoxPosition() == null ? "" : s.getBoxPosition());
+    assertEntityAttribute(SamColumns.RECEIVE_DATE, attributes, sample,
+        s -> s.getReceiptTransfer() == null ? "" : LimsUtils.formatDate(s.getReceiptTransfer().getTransfer().getTransferDate()));
+    assertEntityAttribute(SamColumns.RECEIVED_FROM, attributes, sample,
+        s -> s.getReceiptTransfer() == null ? "" : s.getReceiptTransfer().getTransfer().getSenderLab().getItemLabel());
+    assertEntityAttribute(SamColumns.RECEIVED_BY, attributes, sample,
+        s -> s.getReceiptTransfer() == null ? "" : s.getReceiptTransfer().getTransfer().getRecipientGroup().getName());
+    assertEntityAttribute(SamColumns.RECEIPT_CONFIRMED, attributes, sample,
+        s -> s.getReceiptTransfer() == null ? "" : booleanString(s.getReceiptTransfer().isReceived()));
+    assertEntityAttribute(SamColumns.RECEIPT_QC_PASSED, attributes, sample,
+        s -> s.getReceiptTransfer() == null ? "" : booleanString(s.getReceiptTransfer().isQcPassed()));
+    assertEntityAttribute(SamColumns.RECEIPT_QC_NOTE, attributes, sample,
+        s -> s.getReceiptTransfer() == null ? "" : emptyIfNull(s.getReceiptTransfer().getQcNote()));
   }
 
   protected void assertDetailedSampleAttributes(Map<String, String> attributes, DetailedSample sample) {
@@ -335,7 +340,4 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
     return Long.valueOf(newId);
   }
 
-  private String emptyIfNull(BigDecimal value) {
-    return value == null ? "" : StringUtils.strip(value.toPlainString(), "0");
-  }
 }

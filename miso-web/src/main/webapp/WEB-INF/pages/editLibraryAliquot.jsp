@@ -70,6 +70,7 @@
   });
 </script>
 
+<miso:list-section id="list_transfer" name="Transfers" target="itemtransfer" items="${aliquotTransfers}" config="{ libraryAliquotId: ${aliquot.id} }" alwaysShow="true"/>
 <miso:list-section id="list_pool" name="Pools" target="pool" items="${aliquotPools}"/>
 <miso:list-section id="list_run" name="Runs" target="run" items="${aliquotRuns}"/>
 <miso:changelog item="${aliquot}"/>

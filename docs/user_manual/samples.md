@@ -43,8 +43,10 @@ Samples page.
 
 Enter all of the sample information and then click the "Save" button at the top right of the screen when you are done.
 For additional information regarding some of the fields in the table, check the Quick Help section near the top of the
-screen. If any of the samples fail to save, a message will be displayed at the top of the screen explaining the
-problem(s). You can then make the appropriate adjustments and click the "Save" button to try again.
+screen. If a date of receipt and other receipt information is entered, a receipt transfer will be created. See the
+[Transfers section](../transfers/) for more information. If any of the samples fail to save, a message will be
+displayed at the top of the screen explaining the problem(s). You can then make the appropriate adjustments and click
+the "Save" button to try again.
 
 If your site uses detailed sample mode, then saving a single sample may result in multiple samples being created. For
 example, if you've chosen to create a stock sample, the sample hierarchy requires a tissue and an identity. MISO will

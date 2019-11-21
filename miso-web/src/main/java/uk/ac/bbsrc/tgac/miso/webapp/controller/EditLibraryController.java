@@ -23,7 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.getParent;
 
 import java.io.IOException;
 import java.security.InvalidParameterException;
@@ -33,6 +33,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -51,22 +52,20 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.eaglegenomics.simlims.core.Group;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -77,14 +76,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
+import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.ExperimentService;
-import uk.ac.bbsrc.tgac.miso.core.service.IndexFamilyService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryTemplateService;
-import uk.ac.bbsrc.tgac.miso.core.service.LibraryTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
@@ -110,6 +107,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
+import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -153,11 +151,7 @@ public class EditLibraryController {
   }
 
   @Autowired
-  private IndexFamilyService indexFamilyService;
-  @Autowired
   private LibraryService libraryService;
-  @Autowired
-  private LibraryTypeService libraryTypeService;
   @Autowired
   private SampleService sampleService;
   @Autowired
@@ -180,6 +174,8 @@ public class EditLibraryController {
   private BoxService boxService;
   @Autowired
   private IndexChecker indexChecker;
+  @Autowired
+  private AuthorizationManager authorizationManager;
 
   public NamingScheme getNamingScheme() {
     return namingScheme;
@@ -187,10 +183,6 @@ public class EditLibraryController {
 
   public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
-  }
-
-  public void setIndexFamilyService(IndexFamilyService indexFamilyService) {
-    this.indexFamilyService = indexFamilyService;
   }
 
   public void setLibraryService(LibraryService libraryService) {
@@ -236,54 +228,6 @@ public class EditLibraryController {
 
   }
 
-  /* HOT */
-  @GetMapping(value = "indicesJson")
-  public @ResponseBody JSONObject indicesJson(@RequestParam("indexFamily") String indexFamily, @RequestParam("position") String position)
-      throws IOException {
-    final JSONObject rtn = new JSONObject();
-    List<JSONObject> rtnList = new ArrayList<>();
-    try {
-      if (!isStringEmptyOrNull(indexFamily)) {
-        final IndexFamily ifam = indexFamilyService.getByName(indexFamily);
-        if (ifam != null) {
-          rtnList = indicesForPosition(ifam, Integer.parseInt(position));
-        }
-      }
-    } catch (Exception e) {
-      log.error("Failed to get indices", e);
-    }
-    rtn.put("indices", rtnList);
-    return rtn;
-  }
-
-  public List<JSONObject> indicesForPosition(IndexFamily ifam, int position) {
-    final List<JSONObject> rtnList = new ArrayList<>();
-    for (final Index index : ifam.getIndicesForPosition(position)) {
-      final JSONObject obj = new JSONObject();
-      obj.put("id", index.getId());
-      obj.put("name", index.getName());
-      obj.put("sequence", index.getSequence());
-      obj.put("label", index.getLabel());
-      rtnList.add(obj);
-    }
-    return rtnList;
-  }
-
-  /* HOT */
-  @GetMapping(value = "libraryTypesJson")
-  public @ResponseBody JSONObject libraryTypesJson(@RequestParam("platform") String platform) throws IOException {
-    final JSONObject rtn = new JSONObject();
-    final List<String> rtnLibTypes = new ArrayList<>();
-    if (!isStringEmptyOrNull(platform)) {
-      final Collection<LibraryType> libTypes = libraryTypeService.listByPlatform(PlatformType.get(platform));
-      for (final LibraryType type : libTypes) {
-        rtnLibTypes.add(type.getDescription());
-      }
-    }
-    rtn.put("libraryTypes", rtnLibTypes);
-    return rtn;
-  }
-
   @GetMapping(value = "/{libraryId}")
   public ModelAndView setupForm(@PathVariable Long libraryId, ModelMap model) throws IOException {
     Library library = libraryService.get(libraryId);
@@ -314,6 +258,12 @@ public class EditLibraryController {
       SampleIdentity identity = getParent(SampleIdentity.class, (DetailedSample) detailed.getSample());
       model.put("effectiveExternalNames", identity.getExternalName());
     }
+
+    model.put("libraryTransfers", library.getTransfers().stream()
+        .map(TransferLibrary::getTransfer)
+        .map(Dtos::asDto)
+        .collect(Collectors.toList()));
+
     return new ModelAndView("/WEB-INF/pages/editLibrary.jsp", model);
   }
 
@@ -496,7 +446,10 @@ public class EditLibraryController {
       libDto.setBox(Dtos.asDto(boxService.get(boxId), true));
     }
 
-    return new BulkReceiveLibraryBackend(libDto, quantity, project, aliquotClass, defaultSciName, libraryTemplateService).create(model);
+    Set<Group> recipientGroups = authorizationManager.getCurrentUser().getGroups();
+
+    return new BulkReceiveLibraryBackend(libDto, quantity, project, aliquotClass, defaultSciName, libraryTemplateService, recipientGroups)
+        .create(model);
   }
 
   private final class BulkReceiveLibraryBackend extends BulkCreateTableBackend<LibraryDto> {
@@ -506,15 +459,17 @@ public class EditLibraryController {
     private final String defaultSciName;
     private final BoxDto newBox;
     private final LibraryTemplateService libraryTemplateService;
+    private final Set<Group> recipientGroups;
 
     public BulkReceiveLibraryBackend(LibraryDto dto, Integer quantity, Project project, SampleClass aliquotClass, String defaultSciName,
-        LibraryTemplateService libraryTemplateService) {
+        LibraryTemplateService libraryTemplateService, Set<Group> recipientGroups) {
       super("libraryReceipt", LibraryDto.class, "Libraries", dto, quantity);
       if (isDetailedSampleEnabled() && aliquotClass == null) throw new InvalidParameterException("Aliquot class cannot be null");
       this.project = project;
       this.aliquotClass = aliquotClass;
       this.defaultSciName = defaultSciName;
       this.libraryTemplateService = libraryTemplateService;
+      this.recipientGroups = recipientGroups;
       newBox = dto.getBox();
     }
 
@@ -553,6 +508,7 @@ public class EditLibraryController {
       config.put(Config.IS_LIBRARY_RECEIPT, true);
       config.putPOJO(Config.BOX, newBox);
       config.putPOJO(Config.TEMPLATES, templatesByProjectId);
+      MisoWebUtils.addJsonArray(mapper, config, "recipientGroups", recipientGroups, Dtos::asDto);
     }
 
   }

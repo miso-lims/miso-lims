@@ -31,6 +31,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Timestamped;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferPool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @Entity
@@ -90,6 +91,9 @@ public class ListPoolView implements Aliasable, Nameable, Serializable, Timestam
 
   @OneToMany(mappedBy = "pool")
   private List<ListPoolViewElement> elements;
+
+  @OneToMany(mappedBy = "item")
+  private List<TransferPool> transfers;
 
   @Override
   public long getId() {
@@ -376,6 +380,13 @@ public class ListPoolView implements Aliasable, Nameable, Serializable, Timestam
 
   public void setElements(List<ListPoolViewElement> elements) {
     this.elements = elements;
+  }
+
+  public List<TransferPool> getTransfers() {
+    if (transfers == null) {
+      transfers = new ArrayList<>();
+    }
+    return transfers;
   }
 
 }

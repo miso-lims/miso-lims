@@ -422,20 +422,19 @@ public class PoolRestController extends RestController {
 
   @GetMapping(value = "dt/platform/{platform}", produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<PoolDto> getDTPoolsByPlatform(@PathVariable("platform") String platform, HttpServletRequest request,
-      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
+  public DataTablesResponseDto<PoolDto> getDTPoolsByPlatform(@PathVariable("platform") String platform, HttpServletRequest request)
+      throws IOException {
     PlatformType platformType = PlatformType.valueOf(platform);
     if (platformType == null) {
       throw new RestException("Invalid platform type.", Status.BAD_REQUEST);
     }
-    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.platformType(platformType));
+    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.platformType(platformType));
   }
 
   @GetMapping(value = "dt/project/{id}", produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<PoolDto> getDTPoolsByProject(@PathVariable("id") Long id, HttpServletRequest request,
-      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.project(id));
+  public DataTablesResponseDto<PoolDto> getDTPoolsByProject(@PathVariable("id") Long id, HttpServletRequest request) throws IOException {
+    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.project(id));
   }
 
   public List<PoolDto> serializePools(Collection<Pool> pools, UriComponentsBuilder uriBuilder)

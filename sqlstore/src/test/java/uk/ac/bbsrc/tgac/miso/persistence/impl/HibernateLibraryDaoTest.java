@@ -317,26 +317,25 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
   public void testSearchByKitName() throws IOException {
     testSearch(PaginationFilter.kitName("Test Kit"));
   }
-  
-
-  @Test
-  public void testSearchByDistributed() throws IOException {
-    testSearch(PaginationFilter.distributed());
-  }
-
-  @Test
-  public void testSearchByDistributedDate() throws IOException {
-    testSearch(PaginationFilter.date(LimsUtils.parseDate("2017-01-01"), LimsUtils.parseDate("2017-01-02"), DateType.CREATE));
-  }
-  
-  @Test
-  public void testSearchByDistributedTo() throws IOException {
-    testSearch(PaginationFilter.distributedTo("elsewhere"));
-  }
 
   @Test
   public void testSearchByGroupId() throws IOException {
     testSearch(PaginationFilter.groupId("ID of group"));
+  }
+
+  @Test
+  public void testSearchByDistributed() throws Exception {
+    testSearch(PaginationFilter.distributed());
+  }
+
+  @Test
+  public void testSearchByDistributionDate() throws Exception {
+    testSearch(PaginationFilter.date(LimsUtils.parseDate("2019-01-01"), LimsUtils.parseDate("2020-01-01"), DateType.DISTRIBUTED));
+  }
+
+  @Test
+  public void testSearchByDistributionRecipient() throws Exception {
+    testSearch(PaginationFilter.distributedTo("far away"));
   }
 
   /**

@@ -43,20 +43,18 @@ public class BulkLibraryIT extends AbstractIT {
       LibColumns.KIT_DESCRIPTOR, LibColumns.QC_PASSED, LibColumns.SIZE, LibColumns.VOLUME, LibColumns.VOLUME_UNITS,
       LibColumns.CONCENTRATION, LibColumns.CONCENTRATION_UNITS, LibColumns.SPIKE_IN, LibColumns.SPIKE_IN_DILUTION, LibColumns.SPIKE_IN_VOL);
 
-  private static final Set<String> editColumns = Sets.newHashSet(LibColumns.RECEIVE_DATE, LibColumns.SAMPLE_ALIAS,
-      LibColumns.SAMPLE_LOCATION, LibColumns.EFFECTIVE_GROUP_ID, LibColumns.CREATION_DATE, LibColumns.DISTRIBUTED,
-      LibColumns.DISTRIBUTION_DATE, LibColumns.DISTRIBUTION_RECIPIENT, LibColumns.INITIAL_VOLUME, LibColumns.PARENT_NG_USED,
+  private static final Set<String> editColumns = Sets.newHashSet(LibColumns.SAMPLE_ALIAS, LibColumns.SAMPLE_LOCATION,
+      LibColumns.EFFECTIVE_GROUP_ID, LibColumns.CREATION_DATE, LibColumns.INITIAL_VOLUME, LibColumns.PARENT_NG_USED,
       LibColumns.PARENT_VOLUME_USED);
 
   private static final Set<String> propagateColumns = Sets.newHashSet(LibColumns.SAMPLE_ALIAS, LibColumns.SAMPLE_LOCATION,
       LibColumns.EFFECTIVE_GROUP_ID, LibColumns.CREATION_DATE, LibColumns.PARENT_NG_USED, LibColumns.PARENT_VOLUME_USED);
 
-  private static final Set<String> receiptColumns = Sets.newHashSet(SamColumns.SAMPLE_TYPE,
-      SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT, SamColumns.SUBPROJECT, SamColumns.EXTERNAL_NAME,
-      SamColumns.IDENTITY_ALIAS, SamColumns.DONOR_SEX, SamColumns.CONSENT, SamColumns.SAMPLE_CLASS,
-      SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER,
-      SamColumns.TIMES_RECEIVED, SamColumns.TUBE_NUMBER, SamColumns.TISSUE_MATERIAL,
-      SamColumns.REGION, LibColumns.RECEIVE_DATE, LibColumns.TEMPLATE);
+  private static final Set<String> receiptColumns = Sets.newHashSet(SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT,
+      SamColumns.SUBPROJECT, SamColumns.EXTERNAL_NAME, SamColumns.IDENTITY_ALIAS, SamColumns.DONOR_SEX, SamColumns.CONSENT,
+      SamColumns.SAMPLE_CLASS, SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER, SamColumns.TIMES_RECEIVED,
+      SamColumns.TUBE_NUMBER, SamColumns.TISSUE_MATERIAL, SamColumns.REGION, LibColumns.RECEIVE_DATE, LibColumns.RECEIVED_FROM,
+      LibColumns.RECEIVED_BY, LibColumns.RECEIPT_CONFIRMED, LibColumns.RECEIPT_QC_PASSED, LibColumns.RECEIPT_QC_NOTE, LibColumns.TEMPLATE);
 
   private static final String NO_INDEX_FAMILY = "No indices";
   private static final String NO_INDEX = "No index";
@@ -368,9 +366,6 @@ public class BulkLibraryIT extends AbstractIT {
     changes.put(LibColumns.SIZE, "241");
     changes.put(LibColumns.VOLUME, "1.88");
     changes.put(LibColumns.CONCENTRATION, "12.34");
-    changes.put(LibColumns.DISTRIBUTED, "Sent Out");
-    changes.put(LibColumns.DISTRIBUTION_DATE, "2018-11-14");
-    changes.put(LibColumns.DISTRIBUTION_RECIPIENT, "Outside Lab");
     fillRow(table, 0, changes);
 
     // unchanged
@@ -387,7 +382,6 @@ public class BulkLibraryIT extends AbstractIT {
 
     saveAndAssertSuccess(table);
     assertColumnValues(table, 0, changes, "post-save");
-    changes.put(LibColumns.VOLUME, "0.0");
     DetailedLibrary lib = (DetailedLibrary) getSession().get(LibraryImpl.class, 100001L);
     assertDetailedLibraryAttributes(changes, lib);
   }
@@ -539,6 +533,11 @@ public class BulkLibraryIT extends AbstractIT {
     attrs.put(LibColumns.ID_BARCODE, "LIBT_RCV1");
     attrs.put(LibColumns.DESCRIPTION, "LIBT receive test");
     attrs.put(LibColumns.RECEIVE_DATE, "2017-10-12");
+    attrs.put(LibColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    attrs.put(LibColumns.RECEIVED_BY, "TestGroup1");
+    attrs.put(LibColumns.RECEIPT_CONFIRMED, "True");
+    attrs.put(LibColumns.RECEIPT_QC_PASSED, "True");
+    attrs.put(LibColumns.RECEIPT_QC_NOTE, "");
     attrs.put(LibColumns.DESIGN, "WG");
     attrs.put(LibColumns.PLATFORM, "Illumina");
     attrs.put(LibColumns.LIBRARY_TYPE, "Paired End");
@@ -804,9 +803,18 @@ public class BulkLibraryIT extends AbstractIT {
     });
     testLibraryAttribute(LibColumns.VOLUME, attributes, library, lib -> LimsUtils.toNiceString(lib.getVolume()));
     testLibraryAttribute(LibColumns.CONCENTRATION, attributes, library, lib -> LimsUtils.toNiceString(lib.getConcentration()));
-    testLibraryAttribute(LibColumns.RECEIVE_DATE, attributes, library, lib -> {
-      return lib.getReceivedDate() == null ? null : LimsUtils.formatDate(lib.getReceivedDate());
-    });
+    testLibraryAttribute(LibColumns.RECEIVE_DATE, attributes, library,
+        lib -> lib.getReceiptTransfer() == null ? "" : LimsUtils.formatDate(lib.getReceiptTransfer().getTransfer().getTransferDate()));
+    testLibraryAttribute(LibColumns.RECEIVED_FROM, attributes, library,
+        lib -> lib.getReceiptTransfer() == null ? "" : lib.getReceiptTransfer().getTransfer().getSenderLab().getItemLabel());
+    testLibraryAttribute(LibColumns.RECEIVED_BY, attributes, library,
+        lib -> lib.getReceiptTransfer() == null ? "" : lib.getReceiptTransfer().getTransfer().getRecipientGroup().getName());
+    testLibraryAttribute(LibColumns.RECEIPT_CONFIRMED, attributes, library,
+        lib -> lib.getReceiptTransfer() == null ? "" : booleanString(lib.getReceiptTransfer().isReceived()));
+    testLibraryAttribute(LibColumns.RECEIPT_QC_PASSED, attributes, library,
+        lib -> lib.getReceiptTransfer() == null ? "" : booleanString(lib.getReceiptTransfer().isQcPassed()));
+    testLibraryAttribute(LibColumns.RECEIPT_QC_NOTE, attributes, library,
+        lib -> lib.getReceiptTransfer() == null ? "" : emptyIfNull(lib.getReceiptTransfer().getQcNote()));
   }
 
   private void assertDetailedLibraryAttributes(Map<String, String> attributes, DetailedLibrary library) {

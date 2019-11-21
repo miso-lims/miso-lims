@@ -4,6 +4,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringBlankOrNull;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
@@ -22,6 +23,8 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eaglegenomics.simlims.core.Group;
+
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
@@ -30,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilterSink;
+import uk.ac.bbsrc.tgac.miso.core.util.TransferType;
 import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
 /**
@@ -78,7 +82,7 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
     return criteria;
   }
 
-  Session currentSession();
+  public Session currentSession();
 
   public String getFriendlyName();
 
@@ -357,6 +361,16 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   @Override
   public default void restrictPaginationByRequisitionId(Criteria criteria, String requisitionId, Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s cannot be filtered by requisition ID.", getFriendlyName()));
+  }
+
+  @Override
+  public default void restrictPaginationByRecipientGroups(Criteria item, Collection<Group> groups, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s has no recipient groups", getFriendlyName()));
+  }
+
+  @Override
+  public default void restrictPaginationByTransferType(Criteria item, TransferType transferType, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s has no transfer type", getFriendlyName()));
   }
 
 }

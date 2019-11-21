@@ -320,7 +320,8 @@ HotTarget.libraryaliquot = {
             [HotUtils.relations.library()])),
         HotUtils.makeChildren(Urls.rest.libraryAliquots.children, [HotUtils.relations.pool()]),
         config.worksetId ? HotUtils.makeRemoveFromWorkset('library aliquots', Urls.rest.worksets.removeLibraryAliquots(config.worksetId))
-            : HotUtils.makeAddToWorkset('library aliquots', 'libraryAliquotIds', Urls.rest.worksets.addLibraryAliquots)];
+            : HotUtils.makeAddToWorkset('library aliquots', 'libraryAliquotIds', Urls.rest.worksets.addLibraryAliquots),
+        HotUtils.makeTransferAction('libraryAliquotIds')];
   },
 
   confirmSave: function(flatObjects, isCreate, config, table) {

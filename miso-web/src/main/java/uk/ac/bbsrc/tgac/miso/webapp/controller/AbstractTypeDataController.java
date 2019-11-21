@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response.Status;
@@ -16,9 +15,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
@@ -122,16 +119,6 @@ public abstract class AbstractTypeDataController<T extends Identifiable, R> {
    */
   protected void addHotConfig(ObjectNode config, ObjectMapper mapper) throws IOException {
     // Does nothing
-  }
-
-  protected final <U, V> void addConfigArray(ObjectNode config, ObjectMapper mapper, String key, Collection<U> items,
-      Function<U, V> toDto) {
-    ArrayNode array = config.putArray(key);
-    for (U item : items) {
-      V dto = toDto.apply(item);
-      JsonNode itemNode = mapper.valueToTree(dto);
-      array.add(itemNode);
-    }
   }
 
   protected abstract AuthorizationManager getAuthorizationManager();

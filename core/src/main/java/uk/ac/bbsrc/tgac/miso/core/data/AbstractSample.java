@@ -63,6 +63,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferItem;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -108,9 +110,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private String scientificName;
   private String taxonIdentifier;
   private String sampleType;
-
-  @Temporal(TemporalType.DATE)
-  private Date receivedDate;
   private Boolean qcPassed;
   private String identificationBarcode;
   private String locationBarcode;
@@ -149,6 +148,9 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
 
   @Transient
   private List<FileAttachment> pendingAttachmentDeletions;
+
+  @OneToMany(mappedBy = "item")
+  private List<TransferSample> transfers;
 
   @Override
   public EntityType getEntityType() {
@@ -346,11 +348,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   }
 
   @Override
-  public Date getReceivedDate() {
-    return receivedDate;
-  }
-
-  @Override
   public Boolean getQcPassed() {
     return qcPassed;
   }
@@ -358,11 +355,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public void setSampleType(String sampleType) {
     this.sampleType = nullifyStringIfBlank(sampleType);
-  }
-
-  @Override
-  public void setReceivedDate(Date receivedDate) {
-    this.receivedDate = receivedDate;
   }
 
   @Override
@@ -437,7 +429,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
         .append(locationBarcode)
         .append(project)
         .append(qcPassed)
-        .append(receivedDate)
         .append(sampleType)
         .append(scientificName)
         .append(taxonIdentifier)
@@ -460,7 +451,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
         .append(locationBarcode, other.locationBarcode)
         .append(project, other.project)
         .append(qcPassed, other.qcPassed)
-        .append(receivedDate, other.receivedDate)
         .append(sampleType, other.sampleType)
         .append(scientificName, other.scientificName)
         .append(taxonIdentifier, other.taxonIdentifier)
@@ -474,7 +464,8 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
 
   @Override
   public Date getBarcodeDate() {
-    return getReceivedDate() == null ? getCreationTime() : getReceivedDate();
+    TransferItem<?> receipt = getReceiptTransfer();
+    return receipt == null ? getCreationTime() : receipt.getTransfer().getTransferDate();
   }
 
   @Override
@@ -594,6 +585,14 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public void setRequisitionId(String requisitionId) {
     this.requisitionId = requisitionId;
+  }
+
+  @Override
+  public List<TransferSample> getTransfers() {
+    if (transfers == null) {
+      transfers = new ArrayList<>();
+    }
+    return transfers;
   }
 
 }

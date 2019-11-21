@@ -1,7 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.core.security;
 
 import java.io.IOException;
+import java.util.Collection;
 
+import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 
 /**
@@ -76,4 +78,9 @@ public interface AuthorizationManager {
   public void throwIfNotInternal() throws IOException, AuthorizationException;
 
   public void throwIfNotOwner(User owner) throws IOException;
+
+  public boolean isGroupMember(Group group) throws IOException;
+
+  public void throwIfNonAdminOrGroupMember(Collection<Group> groups) throws IOException;
+
 }

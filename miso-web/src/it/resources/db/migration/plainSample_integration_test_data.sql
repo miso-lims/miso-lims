@@ -2,8 +2,9 @@ INSERT INTO `User` (`userId`, `active`, `admin`, `fullName`, `internal`, `loginN
 (1,1,1,'admin',1,'admin','ROLE_ADMIN,ROLE_INTERNAL','{SHA-1}d033e22ae348aeb5660fc2140aec35850c4da997','admin@admin'),
 (3,1,0,'user',1,'user','ROLE_INTERNAL','user','user@user.user');
 
-INSERT INTO `_Group` (description, name) VALUES
-('TestGroup1', 'TestGroup1'), ('TestGroup2', 'TestGroup2');
+INSERT INTO `_Group` (groupId, description, name) VALUES
+(1, 'TestGroup1', 'TestGroup1'),
+(2, 'TestGroup2', 'TestGroup2');
 
 INSERT INTO `User_Group` (`users_userId`, `groups_groupId`)
 VALUES (3,1),(3,2),(1,1);
@@ -129,9 +130,22 @@ INSERT INTO Project(projectId, name, alias, shortName, created, description, sta
 INSERT INTO Study (studyId, name, project_projectId, alias, studyTypeId, creator, created, lastModifier, lastModified) VALUES
 (1, 'STU1',  1, 'PLAIN Study One', 1, 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00');
 
-INSERT INTO Sample (sampleId, name, alias, description, identificationBarcode, sampleType, receivedDate, project_projectId,
+INSERT INTO Sample (sampleId, name, alias, description, identificationBarcode, sampleType, project_projectId,
 scientificName, volume, qcPassed, lastModifier, creator, created, lastModified) VALUES
-(1, 'SAM1', 'PLAIN_S0001_1', 'Plain', 'SAM1::PLAIN_S0001_first', 'GENOMIC', '2017-07-20', 1, 'Triticum aestivum', NULL, 1, 1, 1, '2017-07-20 09:00:00', '2017-07-20 09:00:00');
+(1, 'SAM1', 'PLAIN_S0001_1', 'Plain', 'SAM1::PLAIN_S0001_first', 'GENOMIC', 1, 'Triticum aestivum', NULL, 1, 1, 1, '2017-07-20 09:00:00', '2017-07-20 09:00:00');
+
+INSERT INTO Institute(instituteId, alias, createdBy, creationDate, updatedBy, lastUpdated) VALUES
+(1, 'University Health Network',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00');
+
+INSERT INTO Lab(labId, alias, instituteId, createdBy, creationDate, updatedBy, lastUpdated) VALUES
+(1, 'BioBank', 1, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(2, 'Pathology', 1, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00');
+
+INSERT INTO Transfer(transferId, transferDate, senderLabId, recipientGroupId, creator, created, lastModifier, lastModified) VALUES
+(1, '2017-07-20', 1, 1, 1, '2017-07-20 12:53:00', 1, '2017-07-20 12:53:00');
+
+INSERT INTO Transfer_Sample(transferId, sampleId, received, qcPassed, qcNote) VALUES
+(1, 1, TRUE, TRUE, NULL);
 
 INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, sample_sampleId, platformType,
   libraryType, librarySelectionType, libraryStrategyType, creationDate, creator, created, lastModifier, lastModified, qcPassed, dnaSize,

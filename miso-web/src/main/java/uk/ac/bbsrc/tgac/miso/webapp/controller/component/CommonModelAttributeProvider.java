@@ -1,11 +1,23 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.component;
 
+import java.io.IOException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.TransferService;
+
 @ControllerAdvice
 public class CommonModelAttributeProvider {
+
+  private static final Logger log = LoggerFactory.getLogger(CommonModelAttributeProvider.class);
 
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
@@ -18,6 +30,11 @@ public class CommonModelAttributeProvider {
 
   @Value("${miso.instanceName:#{null}}")
   private String instanceName;
+
+  @Autowired
+  private TransferService transferService;
+  @Autowired
+  private AuthorizationManager authorizationManager;
 
   @ModelAttribute("autoGenerateIdBarcodes")
   public Boolean autoGenerateIdentificationBarcodes() {
@@ -37,6 +54,17 @@ public class CommonModelAttributeProvider {
   @ModelAttribute("misoInstanceName")
   public String getInstanceName() {
     return instanceName;
+  }
+
+  @ModelAttribute("pendingTransfers")
+  public boolean hasPendingTransfers() {
+    try {
+      User user = authorizationManager.getCurrentUser();
+      return user == null ? false : transferService.anyPendingForUser(user);
+    } catch (IOException e) {
+      log.error("Error querying for pending transfers", e);
+      return false;
+    }
   }
 
 }

@@ -49,6 +49,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.eaglegenomics.simlims.core.Group;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -69,6 +70,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
+import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
@@ -102,6 +105,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
+import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 
 @Controller
@@ -129,6 +133,8 @@ public class EditSampleController {
   private ArrayRunService arrayRunService;
   @Autowired
   private BoxService boxService;
+  @Autowired
+  private AuthorizationManager authorizationManager;
 
   public void setProjectService(ProjectService projectService) {
     this.projectService = projectService;
@@ -263,6 +269,11 @@ public class EditSampleController {
     model.put("sampleRelations", getRelations(sample));
     addArrayData(sampleId, model);
 
+    model.put("sampleTransfers", sample.getTransfers().stream()
+        .map(TransferSample::getTransfer)
+        .map(Dtos::asDto)
+        .collect(Collectors.toList()));
+
     model.put("sample", sample);
     model.put("sampleDto", sample.getId() == SampleImpl.UNSAVED_ID ? "null" : mapper.writeValueAsString(Dtos.asDto(sample, false)));
 
@@ -315,9 +326,9 @@ public class EditSampleController {
   public ModelAndView propagateBulkSamples(@RequestParam("parentIds") String parentIds, @RequestParam("sampleClassId") Long sampleClassId,
       @RequestParam("replicates") String replicates, @RequestParam(value = "boxId", required = false) Long boxId, ModelMap model)
       throws IOException {
+    Set<Group> recipientGroups = authorizationManager.getCurrentUser().getGroups();
     BulkPropagateSampleBackend bulkPropagateSampleBackend = new BulkPropagateSampleBackend(sampleClassService.get(sampleClassId),
-        (boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null));
-
+        (boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null), recipientGroups);
     return bulkPropagateSampleBackend.propagate(parentIds, replicates, model);
   }
 
@@ -363,7 +374,9 @@ public class EditSampleController {
       template.setBox(Dtos.asDto(boxService.get(boxId), true));
     }
 
-    return new BulkCreateSampleBackend(template.getClass(), template, quantity, project, target).create(model);
+    Set<Group> recipientGroups = authorizationManager.getCurrentUser().getGroups();
+
+    return new BulkCreateSampleBackend(template.getClass(), template, quantity, project, target, recipientGroups).create(model);
   }
 
   private static DetailedSampleDto getCorrectDetailedSampleDto(SampleClass target) {
@@ -452,11 +465,13 @@ public class EditSampleController {
     private SampleClass sourceSampleClass;
     private final SampleClass targetSampleClass;
     private final BoxDto newBox;
+    private final Set<Group> recipientGroups;
 
-    private BulkPropagateSampleBackend(SampleClass targetSampleClass, BoxDto newBox) {
+    private BulkPropagateSampleBackend(SampleClass targetSampleClass, BoxDto newBox, Set<Group> recipientGroups) {
       super("sample", SampleDto.class, "Samples", "Samples");
       this.targetSampleClass = targetSampleClass;
       this.newBox = newBox;
+      this.recipientGroups = recipientGroups;
     }
 
     @Override
@@ -499,6 +514,7 @@ public class EditSampleController {
       config.putPOJO(Config.BOX, newBox);
       config.put(Config.DEFAULT_LCM_TUBE_GROUP_ID, defaultLcmTubeGroupId);
       config.put(Config.DEFAULT_LCM_TUBE_GROUP_DESC, defaultLcmTubeGroupDesc);
+      MisoWebUtils.addJsonArray(mapper, config, "recipientGroups", recipientGroups, Dtos::asDto);
     }
   }
 
@@ -506,13 +522,15 @@ public class EditSampleController {
     private final SampleClass targetSampleClass;
     private final Project project;
     private final BoxDto box;
+    private final Set<Group> recipientGroups;
 
     public BulkCreateSampleBackend(Class<? extends SampleDto> dtoClass, SampleDto dto, Integer quantity, Project project,
-        SampleClass sampleClass) {
+        SampleClass sampleClass, Set<Group> recipientGroups) {
       super("sample", dtoClass, "Samples", dto, quantity);
       targetSampleClass = sampleClass;
       this.project = project;
       box = dto.getBox();
+      this.recipientGroups = recipientGroups;
     }
 
     @Override
@@ -539,6 +557,7 @@ public class EditSampleController {
         }
       }
       config.putPOJO(Config.BOX, box);
+      MisoWebUtils.addJsonArray(mapper, config, "recipientGroups", recipientGroups, Dtos::asDto);
     }
   }
 

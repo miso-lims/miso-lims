@@ -184,11 +184,7 @@ public abstract class QC implements Serializable, Comparable<QC>, Identifiable {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
-    QC other = (QC) obj;
-    return LimsUtils.equals(this, other,
+    return LimsUtils.equals(this, obj,
         QC::getDate,
         QC::getResults,
         QC::getType);

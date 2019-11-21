@@ -26,6 +26,10 @@ public class Pluralizer {
     return pluralize(count, "freezer", "freezers");
   }
 
+  public static final String groups(long count) {
+    return pluralize(count, "group", "groups");
+  }
+
   public static final String instruments(long count) {
     return pluralize(count, "instrument", "instruments");
   }
@@ -100,6 +104,10 @@ public class Pluralizer {
 
   public static String tissuePiece(long count) {
     return pluralize(count, "tissue piece", "tissue pieces");
+  }
+
+  public static String transfers(long count) {
+    return pluralize(count, "transfer", "transfers");
   }
 
   public static String types(long count) {

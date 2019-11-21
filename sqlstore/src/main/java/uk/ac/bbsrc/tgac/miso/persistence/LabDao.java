@@ -40,6 +40,8 @@ public interface LabDao {
    * @param lab the Lab to check usage of
    * @return the number of Samples referencing the Lab
    */
-  public long getUsage(Lab lab);
+  public long getUsageByTissues(Lab lab);
+
+  public long getUsageByTransfers(Lab lab);
 
 }

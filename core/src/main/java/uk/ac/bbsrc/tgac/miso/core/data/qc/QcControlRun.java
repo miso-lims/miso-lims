@@ -75,11 +75,7 @@ public abstract class QcControlRun implements Identifiable, Serializable {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) return false;
-    if (obj == this) return true;
-    if (!(obj instanceof QcControlRun)) return false;
-    QcControlRun other = (QcControlRun) obj;
-    return LimsUtils.equals(this, other,
+    return LimsUtils.equals(this, obj,
         QcControlRun::getControl,
         QcControlRun::getLot,
         QcControlRun::isQcPassed);

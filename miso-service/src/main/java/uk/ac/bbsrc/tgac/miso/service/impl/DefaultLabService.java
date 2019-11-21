@@ -93,9 +93,13 @@ public class DefaultLabService implements LabService {
   public ValidationResult validateDeletion(Lab object) {
     ValidationResult result = new ValidationResult();
 
-    long usage = labDao.getUsage(object);
-    if (usage > 0L) {
-      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.samples(usage)));
+    long tissueUsage = labDao.getUsageByTissues(object);
+    if (tissueUsage > 0L) {
+      result.addError(ValidationError.forDeletionUsage(object, tissueUsage, Pluralizer.samples(tissueUsage)));
+    }
+    long transferUsage = labDao.getUsageByTransfers(object);
+    if (transferUsage > 0L) {
+      result.addError(ValidationError.forDeletionUsage(object, transferUsage, Pluralizer.transfers(transferUsage)));
     }
 
     return result;

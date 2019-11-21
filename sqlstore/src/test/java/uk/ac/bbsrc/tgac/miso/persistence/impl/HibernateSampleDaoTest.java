@@ -115,17 +115,16 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   public void testGet() throws Exception {
     Sample sample = dao.get(3);
     assertNotNull(sample);
-    assertEquals("sample name does not match", "SAM3", sample.getName());
-    assertEquals("sample description does not match", "Inherited from TEST_0002", sample.getDescription());
-    assertNull("sample accession is not null", sample.getAccession());
-    assertEquals("sample identification does not match", "SAM3::TEST_0002_Bn_P_nn_1-1_D_1", sample.getIdentificationBarcode());
-    assertEquals("sample location barcode does not match", "Freezer1_3", sample.getLocationBarcode());
-    assertEquals("sample location type does not match", "GENOMIC", sample.getSampleType());
+    assertEquals("SAM3", sample.getName());
+    assertEquals("Inherited from TEST_0002", sample.getDescription());
+    assertNull(sample.getAccession());
+    assertEquals("SAM3::TEST_0002_Bn_P_nn_1-1_D_1", sample.getIdentificationBarcode());
+    assertEquals("Freezer1_3", sample.getLocationBarcode());
+    assertEquals("GENOMIC", sample.getSampleType());
     assertTrue(sample.getQcPassed());
-    assertEquals("sample alias type does not match", "TEST_0002_Bn_P_nn_1-1_D_1", sample.getAlias());
-    assertEquals("sample scientific name does not match", "Homo sapiens", sample.getScientificName());
-    assertNull("sample scientific name does not match", sample.getTaxonIdentifier());
-    assertEquals("sample location type does not match", "2014-01-17", LimsUtils.formatDate(sample.getReceivedDate()));
+    assertEquals("TEST_0002_Bn_P_nn_1-1_D_1", sample.getAlias());
+    assertEquals("Homo sapiens", sample.getScientificName());
+    assertNull(sample.getTaxonIdentifier());
   }
 
   @Test
@@ -375,21 +374,6 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testSearchByDistributed() throws IOException {
-    testSearch(PaginationFilter.distributed());
-  }
-
-  @Test
-  public void testSearchByDistributedDate() throws IOException {
-    testSearch(PaginationFilter.date(LimsUtils.parseDate("2017-01-01"), LimsUtils.parseDate("2017-01-02"), DateType.DISTRIBUTED));
-  }
-
-  @Test
-  public void testSearchByDistributedTo() throws IOException {
-    testSearch(PaginationFilter.distributedTo("elsewhere"));
-  }
-
-  @Test
   public void testSearchByCreator() throws IOException {
     testSearch(PaginationFilter.user("admin", true));
   }
@@ -427,6 +411,21 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   @Test
   public void testSearchByRequisition() throws IOException {
     testSearch(PaginationFilter.requisitionId("FORM1234"));
+  }
+
+  @Test
+  public void testSearchByDistributed() throws Exception {
+    testSearch(PaginationFilter.distributed());
+  }
+
+  @Test
+  public void testSearchByDistributionDate() throws Exception {
+    testSearch(PaginationFilter.date(LimsUtils.parseDate("2019-01-01"), LimsUtils.parseDate("2020-01-01"), DateType.DISTRIBUTED));
+  }
+
+  @Test
+  public void testSearchByDistributionRecipient() throws Exception {
+    testSearch(PaginationFilter.distributedTo("far away"));
   }
 
   /**

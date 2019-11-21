@@ -3,9 +3,11 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util;
 import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,6 +69,24 @@ public class HandsontableUtils {
     if (qcPassed == null) {
       return "Unknown";
     } else if (qcPassed) {
+      return "True";
+    } else {
+      return "False";
+    }
+  }
+
+  public static String emptyIfNull(BigDecimal value) {
+    return value == null ? "" : StringUtils.strip(value.toPlainString(), "0");
+  }
+
+  public static String emptyIfNull(String value) {
+    return value == null ? "" : value;
+  }
+
+  public static String booleanString(Boolean value) {
+    if (value == null) {
+      return "Unknown";
+    } else if (Boolean.TRUE.equals(value)) {
       return "True";
     } else {
       return "False";

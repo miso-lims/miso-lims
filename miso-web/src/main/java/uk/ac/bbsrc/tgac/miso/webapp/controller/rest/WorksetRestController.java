@@ -8,7 +8,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
@@ -78,16 +76,14 @@ public class WorksetRestController extends RestController {
   };
 
   @GetMapping(value = "/dt/all", produces = "application/json")
-  public @ResponseBody DataTablesResponseDto<WorksetDto> dataTable(HttpServletRequest request, HttpServletResponse response,
-      UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser);
+  public @ResponseBody DataTablesResponseDto<WorksetDto> dataTable(HttpServletRequest request) throws IOException {
+    return jQueryBackend.get(request, advancedSearchParser);
   }
 
   @GetMapping(value = "/dt/mine", produces = "application/json")
-  public @ResponseBody DataTablesResponseDto<WorksetDto> dataTableForUser(HttpServletRequest request, HttpServletResponse response,
-      UriComponentsBuilder uriBuilder) throws IOException {
+  public @ResponseBody DataTablesResponseDto<WorksetDto> dataTableForUser(HttpServletRequest request) throws IOException {
     String username = authorizationManager.getCurrentUser().getLoginName();
-    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.user(username, true));
+    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.user(username, true));
   }
 
   @GetMapping

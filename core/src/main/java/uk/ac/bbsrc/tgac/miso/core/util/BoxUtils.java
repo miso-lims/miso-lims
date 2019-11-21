@@ -161,14 +161,17 @@ public class BoxUtils {
   }
 
   public static String makeLocationLabel(BoxableView boxable) {
-    return makeLocationLabel(boxable.isDiscarded(), boxable.isDistributed(), boxable.getLocationBarcode(), boxable.getBoxAlias(),
+    return makeLocationLabel(boxable.isDiscarded(),
+        boxable.isDistributed(),
+        boxable.getLocationBarcode(),
+        boxable.getBoxAlias(),
         boxable.getBoxPosition(),
         boxable.getBoxLocationBarcode());
   }
 
   public static String makeLocationLabel(Boxable boxable) {
     return makeLocationLabel(boxable.isDiscarded(),
-        boxable.isDistributed(),
+        boxable.getDistributionTransfer() != null,
         boxable.getLocationBarcode(),
         boxable.getBox() == null ? null : boxable.getBox().getAlias(),
         boxable.getBoxPosition(),
@@ -181,10 +184,10 @@ public class BoxUtils {
       return (isStringEmptyOrNull(locationBarcode) ? "" : locationBarcode + ", ")
           + boxAlias + " - " + position
           + (isStringEmptyOrNull(boxLocationBarcode) ? "" : " (" + boxLocationBarcode + ")");
-    } else if (discarded) {
-      return "EMPTY";
     } else if (distributed) {
       return "DISTRIBUTED";
+    } else if (discarded) {
+      return "EMPTY";
     } else if (locationBarcode != null) {
       return locationBarcode;
     } else {

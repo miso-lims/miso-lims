@@ -47,8 +47,8 @@ FormUtils = (function($) {
    *   getItemLabel: function(item) returning string; get the label for a dropdown option. If omitted and the item is a string, it is
    *       used as the label; otherwise, an error is thrown
    *   getItemValue: function(item) returning string; get the value for a dropdown option. If omitted, the item is used as the value
-   *   onChange: function(newValue, formObject); allows modifying other fields when a dropdown type field value is changed. See Form
-   *       object below
+   *   onChange: function(newValue, formObject); allows modifying other fields when a dropdown, checkbox, or text type field value is
+   *       changed. See Form object below
    *   makeControls: function(form) returning single or array of jQuery controls; required for special fields; set up special fields
    *   trackChanges: optional boolean (default: true); whether changes to the field should be tracked. This only affects the warning that
    *       appears when leaving a page with unsaved changes
@@ -376,6 +376,7 @@ FormUtils = (function($) {
       updateField: function(dataProperty, options) {
         var field = findField(sections, dataProperty);
         var inputSelector = '#' + makeInputId(containerId, field.data);
+        var cascade = false;
         Object.keys(options).sort(sortChanges).forEach(
             function(option) {
               switch (option) {
@@ -384,6 +385,7 @@ FormUtils = (function($) {
                 break;
               case 'value':
                 setFormValue(containerId, field, options.value, object);
+                cascade = true;
                 break;
               case 'required':
                 field.required = options.required;
@@ -403,6 +405,8 @@ FormUtils = (function($) {
                 var newOption = $(inputSelector + ' option[value="' + originalValue + '"]');
                 if (newOption.length) {
                   select.val(originalValue);
+                } else {
+                  cascade = true;
                 }
                 break;
               }
@@ -411,6 +415,7 @@ FormUtils = (function($) {
                   throw new Error('Cannot set label for field \'' + field.title + '\'');
                 }
                 $('#' + makeInputId(containerId, field.data) + 'Label').text(options.label);
+                cascade = true;
                 break;
               }
               case 'link': {
@@ -434,7 +439,7 @@ FormUtils = (function($) {
                 throw new Error('Invalid field update option: ' + option);
               }
             });
-        if (field.onChange) {
+        if (cascade && field.onChange) {
           triggerUpdate(field);
         }
       },

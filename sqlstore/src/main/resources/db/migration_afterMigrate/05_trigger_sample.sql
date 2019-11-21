@@ -14,7 +14,6 @@ FOR EACH ROW
     CASE WHEN (NEW.locationBarcode IS NULL) <> (OLD.locationBarcode IS NULL) OR NEW.locationBarcode <> OLD.locationBarcode THEN CONCAT('location: ', COALESCE(OLD.locationBarcode, 'n/a'), ' → ', COALESCE(NEW.locationBarcode, 'n/a')) END,
     CASE WHEN NEW.project_projectId <> OLD.project_projectId THEN CONCAT('project: ', (SELECT name FROM Project WHERE projectId = OLD.project_projectId), ' → ', (SELECT name FROM Project WHERE projectId = NEW.project_projectId)) END,
     CASE WHEN (NEW.qcPassed IS NULL) <> (OLD.qcPassed IS NULL) OR NEW.qcPassed <> OLD.qcPassed THEN CONCAT('qcPassed: ', COALESCE(OLD.qcPassed, 'n/a'), ' → ', COALESCE(NEW.qcPassed, 'n/a')) END,
-    CASE WHEN (NEW.receivedDate IS NULL) <> (OLD.receivedDate IS NULL) OR NEW.receivedDate <> OLD.receivedDate THEN CONCAT('received: ', COALESCE(OLD.receivedDate, 'n/a'), ' → ', COALESCE(NEW.receivedDate, 'n/a')) END,
     CASE WHEN NEW.sampleType <> OLD.sampleType THEN CONCAT('type: ', OLD.sampleType, ' → ', NEW.sampleType) END,
     CASE WHEN NEW.scientificName <> OLD.scientificName THEN CONCAT('scientific name: ', OLD.scientificName, ' → ', NEW.scientificName) END,
     CASE WHEN (NEW.taxonIdentifier IS NULL) <> (OLD.taxonIdentifier IS NULL) OR NEW.taxonIdentifier <> OLD.taxonIdentifier THEN CONCAT('taxon: ', COALESCE(OLD.taxonIdentifier, 'n/a'), ' → ', COALESCE(NEW.taxonIdentifier, 'n/a')) END,
@@ -24,9 +23,6 @@ FOR EACH ROW
     CASE WHEN (NEW.volume IS NULL) <> (OLD.volume IS NULL) OR NEW.volume <> OLD.volume THEN CONCAT('volume: ', COALESCE(decimalToString(OLD.volume), 'n/a'), ' → ', COALESCE(decimalToString(NEW.volume), 'n/a')) END,
     CASE WHEN (NEW.concentrationUnits IS NULL) <> (OLD.concentrationUnits IS NULL) OR NEW.concentrationUnits <> OLD.concentrationUnits THEN CONCAT('concentration units: ', COALESCE(OLD.concentrationUnits, 'n/a'), ' → ', COALESCE(NEW.concentrationUnits, 'n/a')) END,
     CASE WHEN (NEW.volumeUnits IS NULL) <> (OLD.volumeUnits IS NULL) OR NEW.volumeUnits <> OLD.volumeUnits THEN CONCAT('volume units: ', COALESCE(OLD.volumeUnits, 'n/a'), ' → ', COALESCE(NEW.volumeUnits, 'n/a')) END,
-    CASE WHEN NEW.distributed <> OLD.distributed THEN CONCAT('distributed: ', IF(OLD.distributed = 0, 'No', 'Yes'), ' → ', IF(NEW.distributed = 0, 'No', 'Yes')) END,
-    CASE WHEN (NEW.distributionDate IS NULL) <> (OLD.distributionDate IS NULL) OR NEW.distributionDate <> OLD.distributionDate THEN CONCAT('distribution date: ', COALESCE(OLD.distributionDate, 'n/a'), ' → ', COALESCE(NEW.distributionDate, 'n/a')) END,
-    CASE WHEN (NEW.distributionRecipient IS NULL) <> (OLD.distributionRecipient IS NULL) OR NEW.distributionRecipient <> OLD.distributionRecipient THEN CONCAT('distribution recipient: ', COALESCE(OLD.distributionRecipient, 'n/a'), ' → ', COALESCE(NEW.distributionRecipient, 'n/a')) END,
     CASE WHEN (NEW.requisitionId IS NULL) <> (OLD.requisitionId IS NULL) OR NEW.requisitionId <> OLD.requisitionId THEN CONCAT('requisition ID: ', COALESCE(OLD.requisitionId, 'n/a'), ' → ', COALESCE(NEW.requisitionId, 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime) VALUES (
@@ -39,7 +35,6 @@ FOR EACH ROW
         CASE WHEN NEW.locationBarcode <> OLD.locationBarcode THEN 'locationBarcode' END,
         CASE WHEN NEW.project_projectId <> OLD.project_projectId THEN 'project_projectId' END,
         CASE WHEN (NEW.qcPassed IS NULL) <> (OLD.qcPassed IS NULL) OR NEW.qcPassed <> OLD.qcPassed THEN 'qcPassed' END,
-        CASE WHEN (NEW.receivedDate IS NULL) <> (OLD.receivedDate IS NULL) OR NEW.receivedDate <> OLD.receivedDate THEN 'receivedDate' END,
         CASE WHEN NEW.sampleType <> OLD.sampleType THEN 'sampleType' END,
         CASE WHEN NEW.scientificName <> OLD.scientificName THEN 'scientificName' END,
         CASE WHEN (NEW.taxonIdentifier IS NULL) <> (OLD.taxonIdentifier IS NULL) OR NEW.taxonIdentifier <> OLD.taxonIdentifier THEN 'taxonIdentifier' END,
@@ -49,9 +44,6 @@ FOR EACH ROW
         CASE WHEN (NEW.volume IS NULL) <> (OLD.volume IS NULL) OR NEW.volume <> OLD.volume THEN 'volume' END,
         CASE WHEN (NEW.concentrationUnits IS NULL) <> (OLD.concentrationUnits IS NULL) OR NEW.concentrationUnits <> OLD.concentrationUnits THEN CONCAT(NEW.name, ' concentrationUnits') END,
         CASE WHEN (NEW.volumeUnits IS NULL) <> (OLD.volumeUnits IS NULL) OR NEW.volumeUnits <> OLD.volumeUnits THEN CONCAT(NEW.name, ' volumeUnits') END,
-        CASE WHEN NEW.distributed <> OLD.distributed THEN 'distributed' END,
-        CASE WHEN (NEW.distributionDate IS NULL) <> (OLD.distributionDate IS NULL) OR NEW.distributionDate <> OLD.distributionDate THEN 'distributionDate' END,
-        CASE WHEN (NEW.distributionRecipient IS NULL) <> (OLD.distributionRecipient IS NULL) OR NEW.distributionRecipient <> OLD.distributionRecipient THEN 'distributionRecipient' END,
         CASE WHEN (NEW.requisitionId IS NULL) <> (OLD.requisitionId IS NULL) OR NEW.requisitionId <> OLD.requisitionId THEN 'requisitionId' END
   ), ''),
       NEW.lastModifier,

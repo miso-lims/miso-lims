@@ -2,7 +2,26 @@
 
 Changes:
 
+  * Tranfer/Distribution Overhaul
+    * Transfers can now be created to show when items are handed from one lab or group to another
+    * Item receipt and QC can be confirmed for each item in a transfer
+    * Distribution fields have been removed from samples, libraries, library aliquots, and pools.
+      Transfers are automatically created to replace this data upon update
   * Fixed error saving QCs with controls specified
+
+Upgrade Notes:
+
+  * With the addition of transfers, labs and user groups have become more important and you will
+    likely want to create some if you haven't already.
+    * For any samples or libraries received from an external lab, a lab must be specified during
+      creation
+    * When receiving samples or libraries, and when creating transfers, groups are required to
+      specify sets of internal users as the senders and/or recipients, depending on the type of
+      transfer. These groups are used to determine who can perform what actions on a transfer. If
+      your organization does not transfer items between different groups internally, you may wish
+      to just have a single "All Users" group to use for item receipt and distribution. A group
+      named "Unspecified (Internal)" is created during the upgrade, which you can use for this
+      purpose if you choose. The group may also be renamed if you like.
 
 # 0.2.197
 

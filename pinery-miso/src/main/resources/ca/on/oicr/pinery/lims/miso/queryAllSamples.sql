@@ -22,7 +22,7 @@ SELECT s.alias NAME
         ,NULL kitName
         ,NULL kitDescription
         ,NULL library_design_code
-        ,s.receivedDate receive_date
+        ,dist.transferDate receive_date
         ,i.externalName external_name
         ,i.donorSex sex
         ,tor.alias tissue_origin
@@ -53,15 +53,15 @@ SELECT s.alias NAME
         ,sai.preMigrationId premigration_id
         ,s.scientificName organism
         ,subp.alias subproject
-        ,it.alias institute
+        ,COALESCE(rcpt.institute, it.alias) institute
         ,slide.initialSlides slides
         ,slide.discards discards
         ,stain.name stain
         ,piece.slidesConsumed slides_consumed
         ,NULL pdac
         ,sai.isSynthetic isSynthetic
-        ,s.distributed distributed
-        ,s.distributionDate distribution_date
+        ,NOT ISNULL(dist.recipient) distributed
+        ,dist.transferDate distribution_date
 FROM Sample s
 LEFT JOIN DetailedSample sai ON sai.sampleId = s.sampleId 
 LEFT JOIN DetailedQcStatus qpd ON qpd.detailedQcStatusId = sai.detailedQcStatusId 
@@ -160,6 +160,20 @@ LEFT JOIN SampleQC dv200 ON dv200.qcId = newestDv200.qcId
 LEFT JOIN BoxPosition pos ON pos.targetId = s.sampleId 
         AND pos.targetType = 'SAMPLE' 
 LEFT JOIN Box box ON box.boxId = pos.boxId 
+LEFT JOIN (
+  SELECT xfers.sampleId, xferinst.alias institute, xfer.transferDate
+  FROM Transfer_Sample xfers
+  JOIN Transfer xfer ON xfer.transferId = xfers.transferId
+  JOIN Lab xferlab ON xferlab.labId = xfer.senderLabId
+  JOIN Institute xferinst ON xferinst.instituteId = xferlab.instituteId
+  WHERE xfer.senderLabId IS NOT NULL
+) rcpt ON rcpt.sampleId = s.sampleId
+LEFT JOIN (
+  SELECT xfers.sampleId, xfer.recipient, xfer.transferDate
+  FROM Transfer_Sample xfers
+  JOIN Transfer xfer ON xfer.transferId = xfers.transferId
+  WHERE xfer.recipient IS NOT NULL
+) dist ON dist.sampleId = s.sampleId
  
 UNION ALL
  
@@ -187,7 +201,7 @@ SELECT l.alias NAME
         ,kd.NAME kitName 
         ,kd.description kitDescription 
         ,ldc.code library_design_code 
-        ,l.receivedDate receive_date 
+        ,dist.transferDate receive_date
         ,NULL external_name 
         ,NULL sex
         ,NULL tissue_origin 
@@ -218,15 +232,15 @@ SELECT l.alias NAME
         ,lai.preMigrationId premigration_id 
         ,NULL organism 
         ,NULL subproject
-        ,NULL institute
+        ,rcpt.institute institute
         ,NULL slides
         ,NULL discards
         ,NULL stain
         ,NULL slides_consumed
         ,pdac.results pdac
         ,NULL isSynthetic
-        ,l.distributed distributed
-        ,l.distributionDate distribution_date
+        ,NOT ISNULL(dist.recipient) distributed
+        ,dist.transferDate distribution_date
 FROM Library l 
 LEFT JOIN Sample parent ON parent.sampleId = l.sample_sampleId
 LEFT JOIN Project sp ON sp.projectId = parent.project_projectId
@@ -281,6 +295,20 @@ LEFT JOIN (
 LEFT JOIN BoxPosition pos ON pos.targetId = l.libraryId 
         AND pos.targetType = 'LIBRARY' 
 LEFT JOIN Box box ON box.boxId = pos.boxId
+LEFT JOIN (
+  SELECT xferl.libraryId, xferinst.alias institute, xfer.transferDate
+  FROM Transfer_Library xferl
+  JOIN Transfer xfer ON xfer.transferId = xferl.transferId
+  JOIN Lab xferlab ON xferlab.labId = xfer.senderLabId
+  JOIN Institute xferinst ON xferinst.instituteId = xferlab.instituteId
+  WHERE xfer.senderLabId IS NOT NULL
+) rcpt ON rcpt.libraryId = l.libraryId
+LEFT JOIN (
+  SELECT xferl.libraryId, xfer.recipient, xfer.transferDate
+  FROM Transfer_Library xferl
+  JOIN Transfer xfer ON xfer.transferId = xferl.transferId
+  WHERE xfer.recipient IS NOT NULL
+) dist ON dist.libraryId = l.libraryId
  
 UNION ALL
  
@@ -308,7 +336,7 @@ SELECT d.alias name
         ,NULL kitName 
         ,NULL kitDescription 
         ,ldc.code library_design_code 
-        ,NULL receive_date 
+        ,dist.transferDate receive_date
         ,NULL external_name 
         ,NULL sex
         ,NULL tissue_origin 
@@ -339,15 +367,15 @@ SELECT d.alias name
         ,d.preMigrationId premigration_id 
         ,NULL organism 
         ,NULL subproject
-        ,NULL institute
+        ,rcpt.institute institute
         ,NULL slides
         ,NULL discards
         ,NULL stain
         ,NULL slides_consumed
         ,NULL pdac
         ,NULL isSynthetic
-        ,d.distributed distributed
-        ,d.distributionDate distribution_date
+        ,NOT ISNULL(dist.recipient) distributed
+        ,dist.transferDate distribution_date
 FROM LibraryAliquot d 
 LEFT JOIN LibraryAliquot laParent ON laParent.aliquotId = d.parentAliquotId
 JOIN Library lib ON lib.libraryId = d.libraryId 
@@ -360,3 +388,17 @@ LEFT JOIN TargetedSequencing ts ON d.targetedSequencingId = ts.targetedSequencin
 LEFT JOIN BoxPosition pos ON pos.targetId = d.aliquotId 
         AND pos.targetType = 'LIBRARY_ALIQUOT' 
 LEFT JOIN Box box ON box.boxId = pos.boxId
+LEFT JOIN (
+  SELECT xferla.aliquotId, xferinst.alias institute, xfer.transferDate
+  FROM Transfer_LibraryAliquot xferla
+  JOIN Transfer xfer ON xfer.transferId = xferla.transferId
+  JOIN Lab xferlab ON xferlab.labId = xfer.senderLabId
+  JOIN Institute xferinst ON xferinst.instituteId = xferlab.instituteId
+  WHERE xfer.senderLabId IS NOT NULL
+) rcpt ON rcpt.aliquotId = d.aliquotId
+LEFT JOIN (
+  SELECT xferla.aliquotId, xfer.recipient, xfer.transferDate
+  FROM Transfer_LibraryAliquot xferla
+  JOIN Transfer xfer ON xfer.transferId = xferla.transferId
+  WHERE xfer.recipient IS NOT NULL
+) dist ON dist.aliquotId = d.aliquotId
