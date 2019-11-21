@@ -75,4 +75,6 @@ public interface PaginationFilterSink<T> {
 
   public void restrictPaginationByFreezer(T item, String query, Consumer<String> errorHandler);
 
+  public void restrictPaginationByRequisitionId(T item, String requisitionId, Consumer<String> errorHandler);
+
 }

@@ -350,8 +350,13 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
-  public default void restrictPaginationByFreezer(Criteria item, String query, Consumer<String> errorHandler) {
+  public default void restrictPaginationByFreezer(Criteria criteria, String query, Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s cannot be filtered by freezer.", getFriendlyName()));
+  }
+
+  @Override
+  public default void restrictPaginationByRequisitionId(Criteria criteria, String requisitionId, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s cannot be filtered by requisition ID.", getFriendlyName()));
   }
 
 }

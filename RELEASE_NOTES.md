@@ -6,6 +6,8 @@ Changes:
   * Added sample requisition ID field
   * Added instrument model, kit descriptor, and controls to QC types. When specified, a QC of the
     type must include related details
+  * Fixed an issue where searching for library aliquot children (pools) would cause MISO to run out
+    of resources and become unresponsive
 
 Upgrade Notes:
 
