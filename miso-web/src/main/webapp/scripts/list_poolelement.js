@@ -188,6 +188,9 @@ ListTarget.poolelement = {
           bSortable: false,
           iSortPriority: 0,
           mRender: function(data, type, full) {
+            if (data === null) {
+              return 'None';
+            }
             var indices = Constants.indexFamilies.reduce(function(acc, family) {
               return acc.concat(family.indices.filter(function(index) {
                 return data.indexOf(index.id) != -1;

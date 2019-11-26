@@ -2,7 +2,8 @@
 
 Changes:
 
-
+  * Fixed Javascript error when adding library aliquot with no indices to a pool on the Edit Pool
+    page
 
 # 0.2.196
 
@@ -21,6 +22,11 @@ Upgrade Notes:
     controls. It is not possible to update existing QC types in this way, as it would invalidate
     existing QCs. Instead, you can archive the existing QC type and then create a new QC type with
     the same name to replace it.
+
+Known Issues:
+
+  * When attempting to add a library aliquot with no indices to a pool on the Edit Pool page, a
+    Javascript error occurs and the Library Aliquots table disappears
 
 # 0.2.195
 
@@ -61,6 +67,11 @@ Upgrade Notes:
       before you migrate to this version of MISO.
   * Upgraded to Run Scanner 1.10.0
   * Upgraded to Pinery 2.7.0
+
+Known Issues:
+
+  * When attempting to add a library aliquot with no indices to a pool on the Edit Pool page, a
+    Javascript error occurs and the Library Aliquots table disappears
 
 # 0.2.194
 
