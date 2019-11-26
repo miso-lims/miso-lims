@@ -25,17 +25,20 @@ WarningTarget.poolelement = {
   makeTarget: function(duplicateSequences, nearDuplicateSequences) {
     return {
       getWarnings: function(element) {
-        var indices = Constants.indexFamilies.reduce(function(acc, family) {
-          return acc.concat(family.indices.filter(function(index) {
-            return element.indexIds.indexOf(index.id) != -1;
-          }));
-        }, []).sort(function(a, b) {
-          return a.position - b.position;
-        });
+        var combined = null;
+        if (element.indexIds) {
+          var indices = Constants.indexFamilies.reduce(function(acc, family) {
+            return acc.concat(family.indices.filter(function(index) {
+              return element.indexIds.indexOf(index.id) != -1;
+            }));
+          }, []).sort(function(a, b) {
+            return a.position - b.position;
+          });
 
-        var combined = indices.map(function(index) {
-          return index.sequence;
-        }).join('-');
+          combined = indices.map(function(index) {
+            return index.sequence;
+          }).join('-');
+        }
 
         return [
             {
@@ -48,11 +51,11 @@ WarningTarget.poolelement = {
               tableMessage: Constants.warningMessages.lowQualityLibraries + ')'
             },
             {
-              include: duplicateSequences && duplicateSequences.indexOf(combined) != -1,
+              include: duplicateSequences && combined && duplicateSequences.indexOf(combined) != -1,
               tableMessage: Constants.warningMessages.duplicateIndices
             },
             {
-              include: nearDuplicateSequences && nearDuplicateSequences.indexOf(combined) != -1
+              include: nearDuplicateSequences && combined && nearDuplicateSequences.indexOf(combined) != -1
                   && !(duplicateSequences && duplicateSequences.indexOf(combined) != -1),
               tableMessage: Constants.warningMessages.nearDuplicateIndices
             }, {
