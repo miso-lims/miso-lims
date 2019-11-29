@@ -48,10 +48,10 @@ ListTarget.kit = {
     return [ListUtils.labelHyperlinkColumn("Kit Name", Urls.ui.kitDescriptors.edit, Utils.array.getId, "name", 1, true), {
       "sTitle": "Version",
       "include": true,
-      "iSortPriority": 0,
-      "mData": function(data){
-        return data.hasOwnProperty("version")? data.version : null;
-      }
+      "mData": function(data) {
+        return data.hasOwnProperty("version") ? data.version : null;
+      },
+      "bSortable": false
     }, {
       "sTitle": "Manufacturer",
       "include": true,
