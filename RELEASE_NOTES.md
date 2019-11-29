@@ -4,6 +4,7 @@ Changes:
 
   * Fixed Javascript error when adding library aliquot with no indices to a pool on the Edit Pool
     page
+  * Improved performance of Index Families list page
 
 # 0.2.196
 
