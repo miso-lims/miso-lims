@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -11,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -57,6 +58,8 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 @Controller
 @RequestMapping("/rest/libraryaliquots")
 public class LibraryAliquotRestController extends RestController {
+
+  private static final Logger log = LoggerFactory.getLogger(LibraryAliquotRestController.class);
 
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
@@ -209,7 +212,14 @@ public class LibraryAliquotRestController extends RestController {
 
         @Override
         public Stream<Pool> find(LibraryAliquot model, Consumer<String> emitError) {
-          Set<Pool> children = model.getPools();
+          List<Pool> children;
+          try {
+            children = poolService.listByLibraryAliquotId(model.getId());
+          } catch (IOException e) {
+            log.error("Failed looking up pools for library aliquot", e);
+            emitError.accept("Database error");
+            return Stream.empty();
+          }
           if (children.isEmpty()) {
             emitError.accept(String.format("%s (%s) has no %s.", model.getName(), model.getAlias(), category()));
             return Stream.empty();

@@ -255,6 +255,11 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
   }
 
   @Test
+  public void testListByLibraryAliquotId() throws Exception {
+    assertEquals(2, dao.listByLibraryAliquotId(1L).size());
+  }
+
+  @Test
   public void testListByProjectId() throws IOException {
     assertEquals(10, dao.listByProjectId(1L).size());
   }

@@ -26,16 +26,18 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -64,6 +66,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibrarySpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -90,6 +93,8 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 @RequestMapping("/rest/libraries")
 public class LibraryRestController extends RestController {
 
+  private static final Logger log = LoggerFactory.getLogger(LibraryRestController.class);
+
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
 
@@ -107,6 +112,8 @@ public class LibraryRestController extends RestController {
 
   @Autowired
   private LibraryService libraryService;
+  @Autowired
+  private PoolService poolService;
   @Autowired
   private SampleRestController sampleController;
   @Autowired
@@ -245,8 +252,16 @@ public class LibraryRestController extends RestController {
 
         @Override
         public Stream<Pool> find(Library model, Consumer<String> emitError) {
-          Set<Pool> children = model.getLibraryAliquots().stream().flatMap(aliquot -> aliquot.getPools().stream())
-              .collect(Collectors.toSet());
+          Set<Pool> children = new HashSet<>();
+          for (LibraryAliquot aliquot : model.getLibraryAliquots()) {
+            try {
+              children.addAll(poolService.listByLibraryAliquotId(aliquot.getId()));
+            } catch (IOException e) {
+              log.error("Failed looking up pools for library", e);
+              emitError.accept("Database error");
+              return Stream.empty();
+            }
+          }
           if (children.isEmpty()) {
             emitError.accept(String.format("%s (%s) has no %s.", model.getName(), model.getAlias(), category()));
             return Stream.empty();
