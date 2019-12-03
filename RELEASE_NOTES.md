@@ -4,6 +4,7 @@ Changes:
 
   * Fixed Javascript error when adding library aliquot with no indices to a pool on the Edit Pool
     page
+  * Fixed error creating pool from the Edit Pool Order page
 
 # 0.2.196
 
@@ -27,6 +28,7 @@ Known Issues:
 
   * When attempting to add a library aliquot with no indices to a pool on the Edit Pool page, a
     Javascript error occurs and the Library Aliquots table disappears
+  * Creating a pool from the Edit Pool Order page fails
 
 # 0.2.195
 
