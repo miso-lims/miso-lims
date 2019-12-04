@@ -73,6 +73,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
+import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
@@ -107,6 +108,8 @@ public class SampleRestController extends RestController {
   private SampleClassService sampleClassService;
   @Autowired
   private ProjectService projectService;
+  @Autowired
+  private PoolService poolService;
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
@@ -404,9 +407,17 @@ public class SampleRestController extends RestController {
 
         @Override
         public Stream<Pool> find(Sample model, Consumer<String> emitError) {
-          Set<Pool> children = RelationFinder.ChildrenSampleAdapter.searchChildrenLibraries((DetailedSample) model)
-              .flatMap(library -> library.getLibraryAliquots().stream().flatMap(aliquot -> aliquot.getPools().stream()))
-              .collect(Collectors.toSet());
+          Set<Pool> children = new HashSet<>();
+          for (LibraryAliquot aliquot : RelationFinder.ChildrenSampleAdapter.searchChildrenLibraries((DetailedSample) model)
+              .flatMap(library -> library.getLibraryAliquots().stream()).collect(Collectors.toList())) {
+            try {
+              children.addAll(poolService.listByLibraryAliquotId(aliquot.getId()));
+            } catch (IOException e) {
+              log.error("Failed looking up pools for sample", e);
+              emitError.accept("Database error");
+              return Stream.empty();
+            }
+          }
           if (children.isEmpty()) {
             emitError.accept(String.format("%s (%s) has no %s.", model.getName(), model.getAlias(), category()));
             return Stream.empty();

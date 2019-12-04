@@ -33,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.TargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
@@ -43,6 +44,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAliquotStore;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryStore;
 
@@ -65,6 +67,8 @@ public class DefaultLibraryAliquotService
   private LibraryDesignCodeService libraryDesignCodeService;
   @Autowired
   private TargetedSequencingService targetedSequencingService;
+  @Autowired
+  private PoolService poolService;
   @Autowired
   private BoxService boxService;
   @Autowired
@@ -359,12 +363,13 @@ public class DefaultLibraryAliquotService
   }
 
   @Override
-  public ValidationResult validateDeletion(LibraryAliquot object) {
+  public ValidationResult validateDeletion(LibraryAliquot object) throws IOException {
     ValidationResult result = new ValidationResult();
 
-    if (object.getPools() != null && !object.getPools().isEmpty()) {
-      result.addError(new ValidationError(object.getName() + " is included in " + object.getPools().size() + " pool"
-          + (object.getPools().size() > 1 ? "s" : "")));
+    int poolCount = poolService.listByLibraryAliquotId(object.getId()).size();
+    if (poolCount > 0) {
+      result.addError(
+          new ValidationError(String.format("%s is included in %d %s", object.getName(), poolCount, Pluralizer.pools(poolCount))));
     }
 
     return result;
