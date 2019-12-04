@@ -197,9 +197,9 @@ public enum IlluminaExperiment {
           escape(output, paddedIndices.getKey().getKey());
           output
               .append(",")//
-              .append(paddedIndices.getKey().getValue())//
-              .append(",");
+              .append(paddedIndices.getKey().getValue());
           if (i5Length > 0) {
+            output.append(",");
             escape(output, paddedIndices.getValue().getKey());
             output
                 .append(",")//
