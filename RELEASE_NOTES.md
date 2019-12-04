@@ -8,6 +8,7 @@ Changes:
   * Improved performance of Worksets list page and other things affected by the library aliquot
     child search fix in v0.2.196
   * Improved performance of Index Families list page
+  * Fix misaligned columns when generating single-indexed Illumina sample sheet
 
 # 0.2.196
 
