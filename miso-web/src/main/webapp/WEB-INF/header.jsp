@@ -22,7 +22,6 @@
   --%>
 
 <%@ page import="uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider" %>
-<%@ page import="uk.ac.bbsrc.tgac.miso.Version" %>
 <!DOCTYPE html>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -89,7 +88,7 @@
   <!-- concatenated MISO stylesheets and scripts -->
   <link rel="stylesheet" href="<c:url value='/styles/style.css'/>" type="text/css">
   <script type="text/javascript" src="<c:url value='/miso/constants.js'/>?ts=<fmt:formatNumber value="${timestamp.time / 60000}" maxFractionDigits="0" groupingUsed="false" />"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/header_script.js'/>?version=<%=Version.VERSION%>"></script>
+  <script type="text/javascript" src="<c:url value='/scripts/header_script.js'/>?version=${miso:version()}"></script>
 
 
   <link rel="shortcut icon" href="<c:url value='/styles/images/favicon.ico'/>" type="image/x-icon"/>
