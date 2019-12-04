@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -40,6 +41,8 @@ import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 /**
  * Indices represent adapter sequences that can be prepended to sequencable material in order to facilitate multiplexing.
@@ -93,10 +96,11 @@ public class Index implements Deletable, Nameable, Serializable {
   @Column(nullable = false)
   private String sequence;
 
+  @Fetch(FetchMode.JOIN)
   @ElementCollection
   @CollectionTable(name = "Index_RealSequences", joinColumns = @JoinColumn(name = "indexId"))
   @Column(name = "sequence")
-  private List<String> realSequences;
+  private Set<String> realSequences;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -179,11 +183,11 @@ public class Index implements Deletable, Nameable, Serializable {
     return getId() != UNSAVED_ID;
   }
 
-  public List<String> getRealSequences() {
+  public Set<String> getRealSequences() {
     return realSequences;
   }
 
-  public void setRealSequences(List<String> realSequences) {
+  public void setRealSequences(Set<String> realSequences) {
     this.realSequences = realSequences;
   }
 
