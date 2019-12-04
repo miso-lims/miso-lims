@@ -19,8 +19,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -136,35 +134,24 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
 
   @Override
   public List<Pool> listByLibraryId(long libraryId) throws IOException {
-    Criteria idCriteria = currentSession().createCriteria(LibraryImpl.class);
-    idCriteria.add(Restrictions.eq("id", libraryId));
-    idCriteria.createAlias("libraryAliquots", "libraryAliquots");
-    idCriteria.createAlias("libraryAliquots.pools", "pools");
-    idCriteria.setProjection(Projections.distinct(Projections.property("pools.id")));
     @SuppressWarnings("unchecked")
-    List<Long> ids = idCriteria.list();
-    return listByIdList(ids);
+    List<Pool> results = currentSession().createCriteria(PoolImpl.class)
+        .createAlias("poolElements", "element")
+        .createAlias("element.poolableElementView", "view")
+        .add(Restrictions.eq("view.libraryId", libraryId))
+        .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
+        .list();
+    return results;
   }
 
   @Override
   public List<Pool> listByLibraryAliquotId(long aliquotId) throws IOException {
-    Criteria idCriteria = currentSession().createCriteria(LibraryAliquot.class)
-        .add(Restrictions.eq("id", aliquotId))
-        .createAlias("pools", "pool")
-        .setProjection(Projections.distinct(Projections.property("pool.id")));
     @SuppressWarnings("unchecked")
-    List<Long> ids = idCriteria.list();
-    return listByIdList(ids);
-  }
-
-  private List<Pool> listByIdList(List<Long> ids) {
-    if (ids.isEmpty()) {
-      return Collections.emptyList();
-    }
-    Criteria criteria = createCriteria();
-    criteria.add(Restrictions.in("id", ids));
-    @SuppressWarnings("unchecked")
-    List<Pool> results = criteria.list();
+    List<Pool> results = currentSession().createCriteria(PoolImpl.class)
+        .createAlias("poolElements", "element")
+        .createAlias("element.poolableElementView", "view")
+        .add(Restrictions.eq("view.aliquotId", aliquotId))
+        .list();
     return results;
   }
 

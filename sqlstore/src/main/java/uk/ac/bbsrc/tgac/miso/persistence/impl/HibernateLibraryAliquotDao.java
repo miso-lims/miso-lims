@@ -10,13 +10,16 @@ import java.util.function.Consumer;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.BoxStore;
@@ -152,8 +155,12 @@ public class HibernateLibraryAliquotDao
 
   @Override
   public void restrictPaginationByPoolId(Criteria criteria, long poolId, Consumer<String> errorHandler) {
-    criteria.createAlias("pools", "pool");
-    criteria.add(Restrictions.eq("pool.id", poolId));
+    DetachedCriteria subquery = DetachedCriteria.forClass(PoolImpl.class)
+        .createAlias("poolElements", "element")
+        .createAlias("element.poolableElementView", "view")
+        .add(Restrictions.eq("id", poolId))
+        .setProjection(Projections.property("view.aliquotId"));
+    criteria.add(Property.forName("id").in(subquery));
   }
 
   @Override
