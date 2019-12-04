@@ -4,6 +4,9 @@ Changes:
 
   * Fixed Javascript error when adding library aliquot with no indices to a pool on the Edit Pool
     page
+  * Fixed issue where wrong MISO version was sometimes shown in the page footer
+  * Improved performance of Worksets list page and other things affected by the library aliquot
+    child search fix in v0.2.196
   * Improved performance of Index Families list page
 
 # 0.2.196
@@ -28,6 +31,8 @@ Known Issues:
 
   * When attempting to add a library aliquot with no indices to a pool on the Edit Pool page, a
     Javascript error occurs and the Library Aliquots table disappears
+  * Some functions are very slow due to the library aliquot child search fix, especially the
+    Worksets list page
 
 # 0.2.195
 

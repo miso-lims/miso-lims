@@ -426,6 +426,12 @@
         <function-class>uk.ac.bbsrc.tgac.miso.webapp.util.form.TagUtils</function-class>
         <function-signature>String docsVersion()</function-signature>
     </function>
+    
+    <function>
+        <name>version</name>
+        <function-class>uk.ac.bbsrc.tgac.miso.webapp.util.form.TagUtils</function-class>
+        <function-signature>String version()</function-signature>
+    </function>
 
 
 </taglib>
