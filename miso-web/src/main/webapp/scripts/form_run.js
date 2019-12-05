@@ -5,23 +5,25 @@ FormTarget.run = (function($) {
 
   /*
    * Expected config {
-   *   isAdmin: boolean
+   *   isAdmin: boolean,
+   *   userId: integer,
+   *   userFullName: string
    * }
    */
 
   return {
     getSaveUrl: function(run) {
       if (run.id) {
-        return '/miso/rest/runs/' + run.id;
+        return Urls.rest.runs.update(run.id);
       } else {
-        return '/miso/rest/runs';
+        return Urls.rest.runs.create;
       }
     },
     getSaveMethod: function(run) {
       return run.id ? 'PUT' : 'POST';
     },
     getEditUrl: function(run) {
-      return '/miso/run/' + run.id;
+      return Urls.ui.runs.edit(run.id);
     },
     getSections: function(config, object) {
       return [{
@@ -205,6 +207,47 @@ FormTarget.run = (function($) {
           title: 'Completion Date',
           data: 'endDate',
           type: 'date'
+        }, {
+          title: 'Data Approved',
+          data: 'dataApproved',
+          type: 'dropdown',
+          getSource: function() {
+            return [{
+              label: 'True',
+              value: true
+            }, {
+              label: 'False',
+              value: false
+            }];
+          },
+          convertToBoolean: true,
+          getItemLabel: function(item) {
+            return item.label;
+          },
+          getItemValue: function(item) {
+            return item.value;
+          },
+          nullLabel: 'Unknown',
+          onChange: function(newValue, form) {
+            if (newValue) {
+              form.updateField('dataApproverId', {
+                value: config.userId,
+                label: config.userFullName
+              });
+            } else {
+              form.updateField('dataApproverId', {
+                value: null,
+                label: 'n/a'
+              });
+            }
+          }
+        }, {
+          title: 'Data Approver',
+          data: 'dataApproverId',
+          type: 'read-only',
+          getDisplayValue: function(run) {
+            return run.dataApproverName || 'n/a';
+          }
         }]
       }];
     }

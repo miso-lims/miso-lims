@@ -45,6 +45,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -54,6 +55,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.PartitionQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
+import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.PartitionQCService;
@@ -98,6 +100,8 @@ public class EditRunController {
   private ExternalUriBuilder externalUriBuilder;
   @Autowired
   private IndexChecker indexChecker;
+  @Autowired
+  private AuthorizationManager authorizationManager;
 
   public void setRunService(RunService runService) {
     this.runService = runService;
@@ -193,6 +197,10 @@ public class EditRunController {
     model.put("experimentConfiguration", mapper.writeValueAsString(experimentConfig));
 
     model.put("runDto", mapper.writeValueAsString(Dtos.asDto(run)));
+
+    User user = authorizationManager.getCurrentUser();
+    model.put("userId", user.getId());
+    model.put("userFullName", user.getFullName());
 
     return new ModelAndView("/WEB-INF/pages/editRun.jsp", model);
   }
