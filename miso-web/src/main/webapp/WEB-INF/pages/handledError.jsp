@@ -27,7 +27,7 @@
 <div id="flasherror" class="flasherror">${specificMessage}</div>
 <br/>
 
-<c:if test="${showBugUrl}">
+<c:if test="${showBugUrl and not empty misoBugUrl}">
   <p><a href="${misoBugUrl}">Report Bug</a></p>
 </c:if>
 
