@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.component;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.ui.ModelMap;
@@ -14,6 +15,12 @@ import org.springframework.web.servlet.ModelAndView;
 public class ExceptionHandlerAdvice {
 
   private static final Logger log = LoggerFactory.getLogger(ExceptionHandlerAdvice.class);
+
+  @Value("${miso.bugUrl:#{null}}")
+  private String bugUrl;
+
+  @Value("${miso.instanceName:#{null}}")
+  private String instanceName;
 
   @ExceptionHandler(NotFoundException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -50,6 +57,8 @@ public class ExceptionHandlerAdvice {
 
   private ModelAndView withMessages(String genericMessage, String specificMessage, boolean showBugUrl) {
     ModelMap model = new ModelMap();
+    model.addAttribute("misoBugUrl", bugUrl);
+    model.addAttribute("misoInstanceName", instanceName);
     model.addAttribute("genericMessage", genericMessage);
     model.addAttribute("specificMessage", specificMessage);
     model.addAttribute("showBugUrl", showBugUrl);
