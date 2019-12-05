@@ -30,22 +30,18 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -64,7 +60,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.HierarchyEntity;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryAliquotBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryAliquotChangeLog;
@@ -124,11 +119,6 @@ public class LibraryAliquot extends AbstractBoxable
   @ManyToOne
   @JoinColumn(name = "targetedSequencingId")
   private TargetedSequencing targetedSequencing;
-
-  @ManyToMany(targetEntity = PoolImpl.class, fetch = FetchType.EAGER)
-  @JoinTable(name = "Pool_LibraryAliquot", joinColumns = { @JoinColumn(name = "aliquotId") }, inverseJoinColumns = {
-      @JoinColumn(name = "poolId") })
-  private Set<Pool> pools;
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier")
@@ -269,14 +259,6 @@ public class LibraryAliquot extends AbstractBoxable
   @Override
   public void setIdentificationBarcode(String identificationBarcode) {
     this.identificationBarcode = nullifyStringIfBlank(identificationBarcode);
-  }
-
-  public Set<Pool> getPools() {
-    return pools;
-  }
-
-  public void setPools(Set<Pool> pools) {
-    this.pools = pools;
   }
 
   @Override

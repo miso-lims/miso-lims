@@ -2482,7 +2482,7 @@ public class Dtos {
     dto.setName(from.getName());
     dto.setPosition(from.getPosition());
     dto.setSequence(from.getSequence());
-    dto.setRealSequences(from.getRealSequences() == null ? Collections.emptyList() : new ArrayList<>(from.getRealSequences()));
+    dto.setRealSequences(from.getRealSequences() == null ? Collections.emptySet() : new HashSet<>(from.getRealSequences()));
     if (includeFamily) {
       dto.setFamily(asDto(from.getFamily(), false));
     }

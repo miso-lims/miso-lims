@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -82,11 +83,11 @@ public enum IlluminaExperiment {
         .findFirst();
   }
 
-  private List<String> extractCollection(List<Index> indices, int position) {
+  private Set<String> extractCollection(List<Index> indices, int position) {
     return indices.stream()//
         .filter(i -> i.getPosition() == position)//
         .map(i -> i.getRealSequences())//
-        .findFirst().orElse(Collections.singletonList(""));
+        .findFirst().orElse(Collections.singleton(""));
   }
 
   public String getDescription() {
@@ -171,7 +172,7 @@ public enum IlluminaExperiment {
               new Pair<>(new Pair<>("No Index", String.join("", Collections.nCopies(i7Length, "N"))),
                   new Pair<>("No Index", String.join("", Collections.nCopies(i5Length, "N")))));
         } else if (indices.get(0).getFamily().hasFakeSequence()) {
-          final List<String> i5s = extractCollection(indices, 2);
+          final Set<String> i5s = extractCollection(indices, 2);
           outputIndicies = new ArrayList<>();
           for (final String i7 : extractCollection(indices, 1)) {
             for (final String i5 : i5s) {
@@ -196,9 +197,9 @@ public enum IlluminaExperiment {
           escape(output, paddedIndices.getKey().getKey());
           output
               .append(",")//
-              .append(paddedIndices.getKey().getValue())//
-              .append(",");
+              .append(paddedIndices.getKey().getValue());
           if (i5Length > 0) {
+            output.append(",");
             escape(output, paddedIndices.getValue().getKey());
             output
                 .append(",")//

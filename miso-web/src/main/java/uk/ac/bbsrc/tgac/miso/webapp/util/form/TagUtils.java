@@ -60,4 +60,8 @@ public class TagUtils {
     }
   }
 
+  public static String version() {
+    return Version.VERSION;
+  }
+
 }
