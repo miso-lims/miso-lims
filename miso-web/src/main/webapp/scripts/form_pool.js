@@ -98,8 +98,10 @@ FormTarget.pool = (function($) {
         }].concat(FormUtils.makeDistributionFields()).concat(FormUtils.makeBoxLocationField(true))
       }];
     },
-    confirmSave: function(pool, saveCallback) {
-      pool.pooledElements = Pool.getAliquots();
+    confirmSave: function(pool, saveCallback, isDialog) {
+      if (!isDialog) {
+        pool.pooledElements = Pool.getAliquots();
+      }
       if (!pool.id && !pool.identificationBarcode && !Constants.automaticBarcodes) {
         Utils.showConfirmDialog("Missing Barcode", "Save",
             ["Pools should usually have barcodes. Are you sure you wish to save without one?"], saveCallback);
