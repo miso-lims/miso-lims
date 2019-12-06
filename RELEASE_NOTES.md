@@ -2,15 +2,21 @@
 
 Changes:
 
+
+
+# 0.2.197
+
+Changes:
+
   * Fixed Javascript error when adding library aliquot with no indices to a pool on the Edit Pool
     page
   * Fixed error creating pool from the Edit Pool Order page
   * Fixed issue where wrong MISO version was sometimes shown in the page footer
   * Fixed Report Bug link and instance name showing on error page
+  * Fixed misaligned columns when generating single-indexed Illumina sample sheet
   * Improved performance of Worksets list page and other things affected by the library aliquot
     child search fix in v0.2.196
   * Improved performance of Index Families list page
-  * Fix misaligned columns when generating single-indexed Illumina sample sheet
 
 # 0.2.196
 
