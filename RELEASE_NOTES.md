@@ -29,6 +29,8 @@ Upgrade Notes:
     controls. It is not possible to update existing QC types in this way, as it would invalidate
     existing QCs. Instead, you can archive the existing QC type and then create a new QC type with
     the same name to replace it.
+  * Updated to Run Scanner 1.10.1
+  * Updated to Pinery 2.8.0
 
 Known Issues:
 
