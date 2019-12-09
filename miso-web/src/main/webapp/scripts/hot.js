@@ -57,7 +57,12 @@ var HotUtils = {
     decimal: function(precision, scale, allowNegative, required) {
       var max = Math.pow(10, precision - scale) - Math.pow(0.1, scale);
       var min = allowNegative ? max * -1 : 0;
-      var regex = new RegExp('^\\d{0,' + (precision - scale) + '}(?:\\.\\d{1,' + scale + '})?$');
+      var pattern = '^\\d{0,' + (precision - scale) + '}';
+      if (scale > 0) {
+        pattern += '(?:\\.\\d{1,' + scale + '})?';
+      }
+      pattern += '$';
+      var regex = new RegExp(pattern);
       return {
         min: min,
         max: max,

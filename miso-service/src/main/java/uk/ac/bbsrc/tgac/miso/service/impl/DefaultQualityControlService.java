@@ -116,6 +116,10 @@ public class DefaultQualityControlService implements QualityControlService {
     QC to = get(from.getEntity().getQcTarget(), from.getId());
     List<QcControlRun> toDelete = new ArrayList<>();
     for (QcControlRun toControl : to.getControls()) {
+      if (!toControl.isSaved()) {
+        // newly created QC
+        continue;
+      }
       QcControlRun fromControl = from.getControls().stream()
           .filter(fc -> fc.getId() == toControl.getId())
           .findFirst().orElse(null);
