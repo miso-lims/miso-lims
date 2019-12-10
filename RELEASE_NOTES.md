@@ -2,6 +2,7 @@
 
 Changes:
 
+  * Added "Data Approved" and "Data Approver" fields to sequencing runs
   * Fixed error saving QCs with controls specified
 
 # 0.2.197

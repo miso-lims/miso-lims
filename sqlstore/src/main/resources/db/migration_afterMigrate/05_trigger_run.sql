@@ -15,7 +15,9 @@ FOR EACH ROW
         CASE WHEN (NEW.health IS NULL) <> (OLD.health IS NULL) OR NEW.health <> OLD.health THEN CONCAT('health: ', COALESCE(OLD.health, 'n/a'), ' → ', COALESCE(NEW.health, 'n/a')) END,
         CASE WHEN (NEW.startDate IS NULL) <> (OLD.startDate IS NULL) OR NEW.startDate <> OLD.startDate THEN CONCAT('startDate: ', COALESCE(OLD.startDate, 'n/a'), ' → ', COALESCE(NEW.startDate, 'n/a')) END,
         CASE WHEN (NEW.sequencingParameters_parametersId IS NULL) <> (OLD.sequencingParameters_parametersId IS NULL) OR NEW.sequencingParameters_parametersId <> OLD.sequencingParameters_parametersId THEN CONCAT('parameters: ', COALESCE((SELECT name FROM SequencingParameters WHERE parametersId = OLD.sequencingParameters_parametersId), 'n/a'), ' → ', COALESCE((SELECT name FROM SequencingParameters WHERE parametersId = NEW.sequencingParameters_parametersId), 'n/a')) END,
-        CASE WHEN (NEW.instrumentId IS NULL) <> (OLD.instrumentId IS NULL) OR NEW.instrumentId <> OLD.instrumentId THEN CONCAT('sequencer: ', COALESCE((SELECT name FROM Instrument WHERE instrumentId = OLD.instrumentId), 'n/a'), ' → ', COALESCE((SELECT name FROM Instrument WHERE instrumentId = NEW.instrumentId), 'n/a')) END);
+        CASE WHEN (NEW.instrumentId IS NULL) <> (OLD.instrumentId IS NULL) OR NEW.instrumentId <> OLD.instrumentId THEN CONCAT('sequencer: ', COALESCE((SELECT name FROM Instrument WHERE instrumentId = OLD.instrumentId), 'n/a'), ' → ', COALESCE((SELECT name FROM Instrument WHERE instrumentId = NEW.instrumentId), 'n/a')) END,
+        CASE WHEN (NEW.dataApproved IS NULL) <> (OLD.dataApproved IS NULL) OR NEW.dataApproved <> OLD.dataApproved THEN CONCAT('data approved: ', booleanToString(OLD.dataApproved), ' → ', booleanToString(NEW.dataApproved)) END,
+        CASE WHEN (NEW.dataApproverId IS NULL) <> (OLD.dataApproverId IS NULL) OR NEW.dataApproverId <> OLD.dataApproverId THEN CONCAT('data approver: ', COALESCE((SELECT fullName FROM User WHERE userId = OLD.dataApproverId), 'n/a'), ' → ', COALESCE((SELECT fullName FROM User WHERE userId = NEW.dataApproverId), 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO RunChangeLog(runId, columnsChanged, userId, message, changeTime) VALUES (
       NEW.runId,
@@ -29,7 +31,9 @@ FOR EACH ROW
         CASE WHEN (NEW.metrics IS NULL) <> (OLD.metrics IS NULL) OR NEW.metrics <> OLD.metrics THEN 'metrics' END,
         CASE WHEN (NEW.startDate IS NULL) <> (OLD.startDate IS NULL) OR NEW.startDate <> OLD.startDate THEN 'startDate' END,
         CASE WHEN (NEW.sequencingParameters_parametersId IS NULL) <> (OLD.sequencingParameters_parametersId IS NULL) OR NEW.sequencingParameters_parametersId <> OLD.sequencingParameters_parametersId THEN 'parameters' END,
-        CASE WHEN (NEW.instrumentId IS NULL) <> (OLD.instrumentId IS NULL) OR NEW.instrumentId <> OLD.instrumentId THEN 'instrumentId' END), ''),
+        CASE WHEN (NEW.instrumentId IS NULL) <> (OLD.instrumentId IS NULL) OR NEW.instrumentId <> OLD.instrumentId THEN 'instrumentId' END,
+        CASE WHEN (NEW.dataApproved IS NULL) <> (OLD.dataApproved IS NULL) OR NEW.dataApproved <> OLD.dataApproved THEN 'dataApproved' END,
+        CASE WHEN (NEW.dataApproverId IS NULL) <> (OLD.dataApproverId IS NULL) OR NEW.dataApproverId <> OLD.dataApproverId THEN 'dataApproverId' END), ''),
       NEW.lastModifier,
       log_message,
       NEW.lastModified);

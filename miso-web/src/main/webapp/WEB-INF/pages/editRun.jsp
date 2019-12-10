@@ -57,7 +57,11 @@
 <form:form id="runForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
 <script type="text/javascript">
   jQuery(document).ready(function () {
-    FormUtils.createForm('runForm', 'save', ${runDto}, 'run', {isAdmin: ${miso:isAdmin()}});
+    FormUtils.createForm('runForm', 'save', ${runDto}, 'run', {
+      isAdmin: ${miso:isAdmin()},
+      userId: ${userId},
+      userFullName: '${userFullName}'
+    });
   });
 </script>
       

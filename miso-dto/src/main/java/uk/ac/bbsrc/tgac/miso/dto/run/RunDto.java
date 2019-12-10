@@ -38,6 +38,9 @@ public class RunDto {
   private Long sequencingKitId;
   private String runPath;
   private List<ContainerDto> containers;
+  private Boolean dataApproved;
+  private Long dataApproverId;
+  private String dataApproverName;
 
   public Long getId() {
     return id;
@@ -197,5 +200,29 @@ public class RunDto {
 
   public void setContainers(List<ContainerDto> containers) {
     this.containers = containers;
+  }
+
+  public Boolean isDataApproved() {
+    return dataApproved;
+  }
+
+  public void setDataApproved(Boolean dataApproved) {
+    this.dataApproved = dataApproved;
+  }
+
+  public Long getDataApproverId() {
+    return dataApproverId;
+  }
+
+  public void setDataApproverId(Long dataApproverId) {
+    this.dataApproverId = dataApproverId;
+  }
+
+  public String getDataApproverName() {
+    return dataApproverName;
+  }
+
+  public void setDataApproverName(String dataApproverName) {
+    this.dataApproverName = dataApproverName;
   }
 }

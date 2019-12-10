@@ -413,6 +413,8 @@ Urls = (function() {
 
   var runRestBase = restBase + '/runs';
   rest.runs = {
+    create: runRestBase,
+    update: idUrlFunction(runRestBase),
     datatable: runRestBase + '/dt',
     projectDatatable: idUrlFunction(runRestBase + '/dt/project'),
     sequencerDatatable: idUrlFunction(runRestBase + '/dt/sequencer'),

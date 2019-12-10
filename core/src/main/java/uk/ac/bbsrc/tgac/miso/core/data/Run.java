@@ -159,6 +159,12 @@ public abstract class Run
   @Transient
   private List<FileAttachment> pendingAttachmentDeletions;
 
+  private Boolean dataApproved;
+
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "dataApproverId")
+  private User dataApprover;
+
   /**
    * Construct a new Run with a default empty SecurityProfile
    */
@@ -448,6 +454,22 @@ public abstract class Run
   @Override
   public String getDeleteDescription() {
     return getAlias();
+  }
+
+  public Boolean isDataApproved() {
+    return dataApproved;
+  }
+
+  public void setDataApproved(Boolean dataApproved) {
+    this.dataApproved = dataApproved;
+  }
+
+  public User getDataApprover() {
+    return dataApprover;
+  }
+
+  public void setDataApprover(User dataApprover) {
+    this.dataApprover = dataApprover;
   }
 
 }

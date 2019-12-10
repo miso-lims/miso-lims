@@ -1873,6 +1873,10 @@ public class Dtos {
       dto.setContainers(asContainerDtos(from.getSequencerPartitionContainers(), includeContainerPartitions, includePoolContents));
     }
 
+    setBoolean(dto::setDataApproved, from.isDataApproved(), true);
+    setId(dto::setDataApproverId, from.getDataApprover());
+    setString(dto::setDataApproverName, maybeGetProperty(from.getDataApprover(), User::getFullName));
+
     return dto;
   }
 
@@ -1932,6 +1936,8 @@ public class Dtos {
     setObject(to::setSequencingParameters, SequencingParameters::new, dto.getSequencingParametersId());
     setObject(to::setSequencingKit, KitDescriptor::new, dto.getSequencingKitId());
     setString(to::setFilePath, dto.getRunPath());
+    setBoolean(to::setDataApproved, dto.isDataApproved(), true);
+    setObject(to::setDataApprover, UserImpl::new, dto.getDataApproverId());
     return to;
   }
 

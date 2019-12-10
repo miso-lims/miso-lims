@@ -20,5 +20,15 @@ BEGIN
   RETURN CAST(original AS CHAR(21))+0;
 END//
 
+DROP FUNCTION IF EXISTS booleanToString//
+CREATE FUNCTION booleanToString(original BOOLEAN) RETURNS CHAR(21)
+BEGIN
+  RETURN CASE original
+    WHEN TRUE THEN 'yes'
+    WHEN FALSE THEN 'no'
+    ELSE 'n/a'
+  END;
+END//
+
 DELIMITER ;
 -- EndNoTest
