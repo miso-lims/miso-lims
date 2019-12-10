@@ -469,11 +469,7 @@ FormUtils = (function($) {
     case 'dropdown': {
       var val = control.val() !== null && control.val().length ? control.val() : null;
       if (field.convertToBoolean) {
-        if (val === 'true') {
-          return true;
-        } else if (val === 'false') {
-          return false;
-        }
+        return convertToBoolean(val);
       }
       return val;
     }
@@ -827,7 +823,11 @@ FormUtils = (function($) {
     select.val(value);
     if (field.onChange) {
       select.change(function() {
-        field.onChange(this.value, form);
+        var val = this.value;
+        if (field.convertToBoolean) {
+          val = convertToBoolean(val);
+        }
+        field.onChange(val, form);
       });
     }
     return select;
@@ -872,6 +872,17 @@ FormUtils = (function($) {
 
   function makeFieldValidationBox(inputId, field) {
     return $('<div>').attr('id', inputId + 'Error').addClass('errorContainer');
+  }
+
+  function convertToBoolean(value) {
+    if (value === 'true') {
+      return true;
+    } else if (value === 'false') {
+      return false;
+    } else if (value === null || !value.length) {
+      return null;
+    }
+    return value;
   }
 
   function generateTemporaryId() {

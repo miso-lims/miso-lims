@@ -2,13 +2,12 @@
 
 Changes:
 
-
+  * Added "Data Approved" and "Data Approver" fields to sequencing runs
 
 # 0.2.197
 
 Changes:
 
-  * Added "Data Approved" and "Data Approver" fields to sequencing runs
   * Fixed Javascript error when adding library aliquot with no indices to a pool on the Edit Pool
     page
   * Fixed error creating pool from the Edit Pool Order page

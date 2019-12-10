@@ -213,10 +213,10 @@ FormTarget.run = (function($) {
           type: 'dropdown',
           getSource: function() {
             return [{
-              label: 'True',
+              label: 'Yes',
               value: true
             }, {
-              label: 'False',
+              label: 'No',
               value: false
             }];
           },
@@ -229,7 +229,7 @@ FormTarget.run = (function($) {
           },
           nullLabel: 'Unknown',
           onChange: function(newValue, form) {
-            if (newValue) {
+            if (newValue != null) {
               form.updateField('dataApproverId', {
                 value: config.userId,
                 label: config.userFullName
