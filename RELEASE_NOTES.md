@@ -3,6 +3,7 @@
 Changes:
 
   * Added "Data Approved" and "Data Approver" fields to sequencing runs
+  * Fixed error saving QCs with controls specified
 
 # 0.2.197
 
@@ -17,6 +18,10 @@ Changes:
   * Improved performance of Worksets list page and other things affected by the library aliquot
     child search fix in v0.2.196
   * Improved performance of Index Families list page
+
+Known Issues:
+
+  * QCs fail to save when controls are specified
 
 # 0.2.196
 
@@ -45,6 +50,7 @@ Known Issues:
   * Creating a pool from the Edit Pool Order page fails
   * Some functions are very slow due to the library aliquot child search fix, especially the
     Worksets list page
+  * QCs fail to save when controls are specified
 
 # 0.2.195
 
