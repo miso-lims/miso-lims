@@ -35,12 +35,11 @@ public class HibernateTransferDao extends HibernateSaveDao<Transfer> implements 
     if (groups == null || groups.isEmpty()) {
       return false;
     }
-    @SuppressWarnings("unchecked")
-    List<BigInteger> pendingGroups = currentSession()
-        .createSQLQuery("SELECT groupId FROM PendingTransferGroupView WHERE groupId IN (:ids)")
+    BigInteger pendingGroups = (BigInteger) currentSession()
+        .createSQLQuery("SELECT COUNT(groupId) FROM PendingTransferGroupView WHERE groupId IN (:ids)")
         .setParameterList("ids", groups.stream().map(Group::getId).collect(Collectors.toSet()))
-        .list();
-    return !pendingGroups.isEmpty();
+        .uniqueResult();
+    return pendingGroups.compareTo(BigInteger.ZERO) > 0;
   }
 
   @Override

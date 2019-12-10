@@ -22,7 +22,7 @@ SELECT s.alias NAME
         ,NULL kitName
         ,NULL kitDescription
         ,NULL library_design_code
-        ,dist.transferDate receive_date
+        ,rcpt.transferDate receive_date
         ,i.externalName external_name
         ,i.donorSex sex
         ,tor.alias tissue_origin
@@ -201,7 +201,7 @@ SELECT l.alias NAME
         ,kd.NAME kitName 
         ,kd.description kitDescription 
         ,ldc.code library_design_code 
-        ,dist.transferDate receive_date
+        ,rcpt.transferDate receive_date
         ,NULL external_name 
         ,NULL sex
         ,NULL tissue_origin 
@@ -336,7 +336,7 @@ SELECT d.alias name
         ,NULL kitName 
         ,NULL kitDescription 
         ,ldc.code library_design_code 
-        ,dist.transferDate receive_date
+        ,rcpt.transferDate receive_date
         ,NULL external_name 
         ,NULL sex
         ,NULL tissue_origin 
