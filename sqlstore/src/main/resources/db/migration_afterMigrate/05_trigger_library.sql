@@ -68,7 +68,6 @@ FOR EACH ROW
   END IF;
   END//
 
-DROP TRIGGER IF EXISTS LibraryAdditionalInfoChange//
 DROP TRIGGER IF EXISTS DetailedLibraryChange//
 CREATE TRIGGER DetailedLibraryChange BEFORE UPDATE ON DetailedLibrary
 FOR EACH ROW
@@ -97,8 +96,6 @@ FOR EACH ROW
     FROM Library WHERE libraryId = NEW.libraryId;
   END IF;
   END//
-
-DROP TRIGGER IF EXISTS BeforeInsertLibrary//
 
 DROP TRIGGER IF EXISTS LibraryInsert//
 CREATE TRIGGER LibraryInsert AFTER INSERT ON Library
