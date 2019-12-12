@@ -61,7 +61,6 @@ FOR EACH ROW
   END IF;
   END//
 
-DROP TRIGGER IF EXISTS SampleAdditionalInfoChange//
 DROP TRIGGER IF EXISTS DetailedSampleChange//
 CREATE TRIGGER DetailedSampleChange BEFORE UPDATE ON DetailedSample
 FOR EACH ROW
@@ -124,7 +123,6 @@ FOR EACH ROW
   END IF;
   END//
 
-DROP TRIGGER IF EXISTS SampleCVSlideChange//
 DROP TRIGGER IF EXISTS SampleSlideChange//
 CREATE TRIGGER SampleSlideChange BEFORE UPDATE ON SampleSlide
 FOR EACH ROW
@@ -323,8 +321,6 @@ FOR EACH ROW
       FROM Sample WHERE sampleId = NEW.sampleId;
     END IF;
   END//
-
-DROP TRIGGER IF EXISTS BeforeInsertSample//
 
 DROP TRIGGER IF EXISTS SampleInsert//
 CREATE TRIGGER SampleInsert AFTER INSERT ON Sample
