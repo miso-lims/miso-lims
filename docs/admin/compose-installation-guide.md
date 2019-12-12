@@ -195,8 +195,7 @@ services:
 ...
 ```
 
-See the
-[administrator's manual](../admin-guide/)
+See the [Type Data](../../user_manual/type_data/) section of the [User Manual](../../user_manual/)
 for more information on the types of data that can be added at this stage.
 
 ### Modifying the miso.properties file
@@ -205,6 +204,7 @@ The
 [miso.properties](https://github.com/miso-lims/miso-lims/blob/master/miso-web/src/main/resources/internal/miso.properties)
 file has plenty of options to configure for site-specific use. Some important
 options include:
+
 * `miso.detailed.sample.enabled` : turns detailed sample mode on and off
 * `miso.instanceName` : displays an instance name in the header on the webapp
   (to distinguish prod and stage, for example).
