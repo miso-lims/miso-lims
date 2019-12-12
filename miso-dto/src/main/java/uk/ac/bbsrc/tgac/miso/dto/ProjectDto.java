@@ -11,6 +11,7 @@ public class ProjectDto {
   private Long referenceGenomeId;
   private String defaultSciName;
   private Long defaultTargetedSequencingId;
+  private boolean clinical;
 
   public long getId() {
     return id;
@@ -90,5 +91,13 @@ public class ProjectDto {
 
   public void setDefaultTargetedSequencingId(Long defaultTargetedSequencingId) {
     this.defaultTargetedSequencingId = defaultTargetedSequencingId;
+  }
+
+  public boolean isClinical() {
+    return clinical;
+  }
+
+  public void setClinical(boolean clinical) {
+    this.clinical = clinical;
   }
 }

@@ -133,6 +133,8 @@ public class ProjectImpl implements Project {
   @JoinColumn(name = "targetedSequencingId", referencedColumnName = "targetedSequencingId", nullable = true)
   private TargetedSequencing defaultTargetedSequencing;
 
+  private boolean clinical;
+
   @Override
   public String getDescription() {
     return description;
@@ -400,6 +402,16 @@ public class ProjectImpl implements Project {
     } else {
       return getAlias() + " (" + getShortName() + ")";
     }
+  }
+
+  @Override
+  public boolean isClinical() {
+    return clinical;
+  }
+
+  @Override
+  public void setClinical(boolean clinical) {
+    this.clinical = clinical;
   }
 
 }

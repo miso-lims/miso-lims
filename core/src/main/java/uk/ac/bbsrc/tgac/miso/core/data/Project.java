@@ -134,4 +134,9 @@ public interface Project extends Comparable<Project>, Deletable, Nameable, Seria
 
   @Override
   public boolean isSaved();
+
+  public boolean isClinical();
+
+  public void setClinical(boolean clinical);
+
 }

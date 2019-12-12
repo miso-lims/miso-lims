@@ -2,6 +2,7 @@
 
 Changes:
 
+  * Added "clinical" field to projects
   * Added "Run Approvers" group. Only users in this group will be allowed to modify "Data Approved"
     on the Edit Run page
   * Freeze "Parent Alias" column on the bulk Propagate Samples page
