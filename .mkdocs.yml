@@ -19,7 +19,6 @@ nav:
     - Building and Deploying: admin/installation-guide.md
     - Docker Compose Installation: admin/compose-installation-guide.md
     - Baremetal Installation: admin/baremetal-installation-guide.md
-    - Administering MISO: admin/admin-guide.md
   - Walkthroughs: https://miso-lims.github.io/walkthroughs/
   - User Manual:
     - Introduction: user_manual/index.md

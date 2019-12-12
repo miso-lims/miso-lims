@@ -15,4 +15,13 @@ Available metrics can be obtained at at `http://<miso-URL>/metrics` (note: no `/
 
 ## Next steps
 
-After MISO is installed, refer to the [Admin Manual](../admin-guide) for tips on maintaining and running MISO.
+After MISO is installed, you will want to configure it with data specific to your institute. The
+following sections of the [User Manual](../../user_manual/) should be immediately helpful:
+
+* [Type Data](../../user_manual/type_data/)
+* [Instruments](../../user_manual/instruments/)
+* [Freezers and Rooms](../../user_manual/freezers_and_rooms/)
+* [Barcode Label Printers](../../user_manual/barcode_label_printers/)
+
+See also [Related Software](../../user_manual/related_software) that you may wish to use with MISO.
+
