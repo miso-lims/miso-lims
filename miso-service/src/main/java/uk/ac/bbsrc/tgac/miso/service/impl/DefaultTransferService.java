@@ -369,8 +369,8 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
   }
 
   @Override
-  public boolean anyPendingForUser(User user) throws IOException {
-    return transferStore.anyPendingForGroups(user.getGroups());
+  public long countPendingForUser(User user) throws IOException {
+    return transferStore.countPendingForGroups(user.getGroups());
   }
 
   @Override

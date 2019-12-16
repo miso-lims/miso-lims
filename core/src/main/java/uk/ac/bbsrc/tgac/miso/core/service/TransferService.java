@@ -13,7 +13,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 
 public interface TransferService extends ListService<Transfer>, SaveService<Transfer> {
 
-  public boolean anyPendingForUser(User user) throws IOException;
+  public long countPendingForUser(User user) throws IOException;
 
   public List<Transfer> listByProperties(Lab sender, Group recipient, Project project, Date transferDate) throws IOException;
 

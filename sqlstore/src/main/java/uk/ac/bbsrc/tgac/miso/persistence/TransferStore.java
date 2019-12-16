@@ -15,7 +15,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferItem;
 
 public interface TransferStore extends SaveDao<Transfer> {
 
-  public boolean anyPendingForGroups(Collection<Group> groups) throws IOException;
+  public long countPendingForGroups(Collection<Group> groups) throws IOException;
 
   public <T extends TransferItem<?>> void deleteTransferItem(T item) throws IOException;
 

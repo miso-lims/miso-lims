@@ -57,13 +57,13 @@ public class CommonModelAttributeProvider {
   }
 
   @ModelAttribute("pendingTransfers")
-  public boolean hasPendingTransfers() {
+  public long countPendingTransfers() {
     try {
       User user = authorizationManager.getCurrentUser();
-      return user == null ? false : transferService.anyPendingForUser(user);
+      return user == null ? 0 : transferService.countPendingForUser(user);
     } catch (IOException e) {
       log.error("Error querying for pending transfers", e);
-      return false;
+      return 0;
     }
   }
 

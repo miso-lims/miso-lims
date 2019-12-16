@@ -1,7 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
-import java.math.BigInteger;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -31,15 +31,15 @@ public class HibernateTransferDao extends HibernateSaveDao<Transfer> implements 
   }
 
   @Override
-  public boolean anyPendingForGroups(Collection<Group> groups) throws IOException {
+  public long countPendingForGroups(Collection<Group> groups) throws IOException {
     if (groups == null || groups.isEmpty()) {
-      return false;
+      return 0L;
     }
-    BigInteger pendingGroups = (BigInteger) currentSession()
-        .createSQLQuery("SELECT COUNT(groupId) FROM PendingTransferGroupView WHERE groupId IN (:ids)")
+    BigDecimal pendingGroups = (BigDecimal) currentSession()
+        .createSQLQuery("SELECT COALESCE(SUM(transfers), 0) FROM PendingTransferGroupView WHERE groupId IN (:ids)")
         .setParameterList("ids", groups.stream().map(Group::getId).collect(Collectors.toSet()))
         .uniqueResult();
-    return pendingGroups.compareTo(BigInteger.ZERO) > 0;
+    return pendingGroups.longValueExact();
   }
 
   @Override

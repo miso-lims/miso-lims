@@ -35,7 +35,7 @@
         <a href="<c:url value="/miso/pools"/>">Pools</a>
         <a href="<c:url value="/miso/worksets"/>">Worksets</a>
         <a href="<c:url value="/miso/boxes"/>">Boxes</a>
-        <a href="<c:url value="/miso/transfer/list"/>"><c:choose><c:when test="${pendingTransfers}"><strong>Transfers</strong></c:when><c:otherwise>Transfers</c:otherwise></c:choose></a>
+        <a href="<c:url value="/miso/transfer/list"/>"><c:choose><c:when test="${pendingTransfers > 0}"><strong>Transfers (${pendingTransfers})</strong></c:when><c:otherwise>Transfers</c:otherwise></c:choose></a>
     </div>
 
     <h2>Instrument Runs</h2>
