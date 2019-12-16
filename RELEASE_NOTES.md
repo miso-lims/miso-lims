@@ -7,6 +7,7 @@ Changes:
     * Item receipt and QC can be confirmed for each item in a transfer
     * Distribution fields have been removed from samples, libraries, library aliquots, and pools.
       Transfers are automatically created to replace this data upon update
+  * Added "Data Approved" and "Data Approver" fields to sequencing runs
   * Fixed error saving QCs with controls specified
 
 Upgrade Notes:

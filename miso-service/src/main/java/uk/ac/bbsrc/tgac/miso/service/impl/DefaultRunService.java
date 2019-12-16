@@ -295,6 +295,9 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     if (run.getSequencingKit() != null) {
       run.setSequencingKit(kitDescriptorService.get(run.getSequencingKit().getId()));
     }
+    if (run.getDataApprover() != null) {
+      run.setDataApprover(userService.get(run.getDataApprover().getId()));
+    }
   }
 
   private void validateChanges(Run before, Run changed) throws IOException {
@@ -331,6 +334,10 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       errors.add(new ValidationError("sequencingKitId", "Must be a sequencing kit"));
     }
 
+    if (changed.isDataApproved() != null && changed.getDataApprover() == null) {
+      errors.add(new ValidationError("dataApproverId", "Must be set when approval is specified"));
+    }
+
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }
@@ -351,6 +358,8 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     target.setSequencingParameters(source.getSequencingParameters());
     target.setSequencer(source.getSequencer());
     target.setSequencingKit(source.getSequencingKit());
+    target.setDataApproved(source.isDataApproved());
+    target.setDataApprover(target.isDataApproved() == null ? null : source.getDataApprover());
     if (isIlluminaRun(target)) {
       applyIlluminaChanges((IlluminaRun) target, (IlluminaRun) source);
     } else if (isLS454Run(target)) {
