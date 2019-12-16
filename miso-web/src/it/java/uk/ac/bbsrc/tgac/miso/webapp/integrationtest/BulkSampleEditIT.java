@@ -33,12 +33,13 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
       SamColumns.LAB, SamColumns.SECONDARY_ID, SamColumns.TISSUE_MATERIAL, SamColumns.REGION);
 
   private static final Set<String> slideColumns = Sets.newHashSet(SamColumns.REQUISITION_ID, SamColumns.INITIAL_SLIDES, SamColumns.SLIDES,
-      SamColumns.DISCARDS, SamColumns.THICKNESS, SamColumns.STAIN);
+      SamColumns.DISCARDS, SamColumns.THICKNESS, SamColumns.STAIN, SamColumns.PERCENT_TUMOUR, SamColumns.PERCENT_NECROSIS,
+      SamColumns.MARKED_AREA, SamColumns.MARKED_AREA_PERCENT_TUMOUR);
 
   private static final Set<String> curlsColumns = Sets.newHashSet(SamColumns.REQUISITION_ID);
 
   private static final Set<String> tissuePieceColumns = Sets.newHashSet(SamColumns.REQUISITION_ID, SamColumns.PIECE_TYPE,
-      SamColumns.SLIDES_CONSUMED);
+      SamColumns.SLIDES_CONSUMED, SamColumns.REFERENCE_SLIDE);
 
   @Before
   public void setup() {

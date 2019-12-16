@@ -63,6 +63,11 @@ SELECT s.alias NAME
         ,NOT ISNULL(dist.recipient) distributed
         ,dist.transferDate distribution_date
         ,s.initialVolume initial_volume
+        ,slide.percentTumour percent_tumour
+        ,slide.percentNecrosis percent_necrosis
+        ,slide.markedAreaSize marked_area_size
+        ,slide.markedAreaPercentTumour marked_area_percent_tumour
+        ,COALESCE(pieceRefSlide.name, ssRefSlide.name) reference_slide_id
 FROM Sample s
 LEFT JOIN DetailedSample sai ON sai.sampleId = s.sampleId 
 LEFT JOIN DetailedQcStatus qpd ON qpd.detailedQcStatusId = sai.detailedQcStatusId 
@@ -80,9 +85,11 @@ LEFT JOIN TissueMaterial tm ON tm.tissueMaterialId = st.tissueMaterialId
 LEFT JOIN Lab la ON st.labId = la.labId
 LEFT JOIN Institute it ON la.instituteId = it.instituteId
 LEFT JOIN SampleStock ss ON sai.sampleId = ss.sampleId
+LEFT JOIN Sample ssRefSlide ON ssRefSlide.sampleId = ss.referenceSlideId
 LEFT JOIN SampleSlide slide ON slide.sampleId = s.sampleId
 LEFT JOIN Stain stain ON stain.stainId = slide.stain
 LEFT JOIN SampleTissuePiece piece ON piece.sampleId = s.sampleId
+LEFT JOIN Sample pieceRefSlide ON pieceRefSlide.sampleId = piece.referenceSlideId
 LEFT JOIN (
 	    SELECT sqc.sample_sampleId, MAX(sqc.qcId) AS qcId
 	    FROM (
@@ -243,6 +250,11 @@ SELECT l.alias NAME
         ,NOT ISNULL(dist.recipient) distributed
         ,dist.transferDate distribution_date
         ,l.initialVolume initial_volume
+        ,NULL percent_tumour
+        ,NULL percent_necrosis
+        ,NULL marked_area_size
+        ,NULL marked_area_percent_tumour
+        ,NULL reference_slide_id
 FROM Library l 
 LEFT JOIN Sample parent ON parent.sampleId = l.sample_sampleId
 LEFT JOIN Project sp ON sp.projectId = parent.project_projectId
@@ -379,6 +391,11 @@ SELECT d.alias name
         ,NOT ISNULL(dist.recipient) distributed
         ,dist.transferDate distribution_date
         ,NULL initial_volume
+        ,NULL percent_tumour
+        ,NULL percent_necrosis
+        ,NULL marked_area_size
+        ,NULL marked_area_percent_tumour
+        ,NULL reference_slide_id
 FROM LibraryAliquot d 
 LEFT JOIN LibraryAliquot laParent ON laParent.aliquotId = d.parentAliquotId
 JOIN Library lib ON lib.libraryId = d.libraryId 

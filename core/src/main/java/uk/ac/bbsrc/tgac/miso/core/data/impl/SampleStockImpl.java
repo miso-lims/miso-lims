@@ -5,8 +5,11 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 
@@ -21,6 +24,10 @@ public class SampleStockImpl extends DetailedSampleImpl implements SampleStock {
   private StrStatus strStatus = StrStatus.NOT_SUBMITTED;
 
   private Boolean dnaseTreated;
+
+  @ManyToOne(targetEntity = SampleSlideImpl.class)
+  @JoinColumn(name = "referenceSlideId")
+  private SampleSlide referenceSlide;
 
   @Override
   public StrStatus getStrStatus() {
@@ -45,6 +52,16 @@ public class SampleStockImpl extends DetailedSampleImpl implements SampleStock {
   @Override
   public void setDNAseTreated(Boolean dnaseTreated) {
     this.dnaseTreated = dnaseTreated;
+  }
+
+  @Override
+  public SampleSlide getReferenceSlide() {
+    return referenceSlide;
+  }
+
+  @Override
+  public void setReferenceSlide(SampleSlide referenceSlide) {
+    this.referenceSlide = referenceSlide;
   }
 
   @Override

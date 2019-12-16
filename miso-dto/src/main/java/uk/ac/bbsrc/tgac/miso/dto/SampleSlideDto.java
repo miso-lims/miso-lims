@@ -12,6 +12,10 @@ public class SampleSlideDto extends SampleTissueProcessingDto {
   private Integer discards;
   private Integer thickness;
   private Long stainId;
+  private String percentTumour;
+  private String percentNecrosis;
+  private String markedArea;
+  private String markedAreaPercentTumour;
 
   public Integer getInitialSlides() {
     return initialSlides;
@@ -51,6 +55,38 @@ public class SampleSlideDto extends SampleTissueProcessingDto {
 
   public void setStainId(Long stainId) {
     this.stainId = stainId;
+  }
+
+  public String getPercentTumour() {
+    return percentTumour;
+  }
+
+  public void setPercentTumour(String percentTumour) {
+    this.percentTumour = percentTumour;
+  }
+
+  public String getPercentNecrosis() {
+    return percentNecrosis;
+  }
+
+  public void setPercentNecrosis(String percentNecrosis) {
+    this.percentNecrosis = percentNecrosis;
+  }
+
+  public String getMarkedArea() {
+    return markedArea;
+  }
+
+  public void setMarkedArea(String markedArea) {
+    this.markedArea = markedArea;
+  }
+
+  public String getMarkedAreaPercentTumour() {
+    return markedAreaPercentTumour;
+  }
+
+  public void setMarkedAreaPercentTumour(String markedAreaPercentTumour) {
+    this.markedAreaPercentTumour = markedAreaPercentTumour;
   }
 
 }

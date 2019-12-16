@@ -127,7 +127,11 @@ FOR EACH ROW
      CASE WHEN NEW.slides <> OLD.slides THEN CONCAT('slides: ', OLD.slides, ' → ', NEW.slides) END,
      CASE WHEN (NEW.discards IS NULL) <> (OLD.discards IS NULL) OR NEW.discards <> OLD.discards THEN CONCAT('discards: ', COALESCE(OLD.discards, 'n/a'), ' → ', COALESCE(NEW.discards, 'n/a')) END,
      CASE WHEN (NEW.thickness IS NULL) <> (OLD.thickness IS NULL) OR NEW.thickness <> OLD.thickness THEN CONCAT('thickness: ', COALESCE(OLD.thickness, 'n/a'), ' → ', COALESCE(NEW.thickness, 'n/a')) END,
-     CASE WHEN (NEW.stain IS NULL) <> (OLD.stain IS NULL) OR NEW.stain <> OLD.stain THEN CONCAT('stain: ', COALESCE((SELECT name FROM Stain WHERE stainId = OLD.stain), 'none'), ' → ', COALESCE((SELECT name FROM Stain WHERE stainId = NEW.stain), 'none')) END);
+     CASE WHEN (NEW.stain IS NULL) <> (OLD.stain IS NULL) OR NEW.stain <> OLD.stain THEN CONCAT('stain: ', COALESCE((SELECT name FROM Stain WHERE stainId = OLD.stain), 'none'), ' → ', COALESCE((SELECT name FROM Stain WHERE stainId = NEW.stain), 'none')) END,
+     CASE WHEN (NEW.percentTumour IS NULL) <> (OLD.percentTumour IS NULL) OR NEW.percentTumour <> OLD.percentTumour THEN CONCAT('percent tumour: ', COALESCE(OLD.percentTumour, 'n/a'), ' → ', COALESCE(NEW.percentTumour, 'n/a')) END,
+     CASE WHEN (NEW.percentNecrosis IS NULL) <> (OLD.percentNecrosis IS NULL) OR NEW.percentNecrosis <> OLD.percentNecrosis THEN CONCAT('percent necrosis: ', COALESCE(OLD.percentNecrosis, 'n/a'), ' → ', COALESCE(NEW.percentNecrosis, 'n/a')) END,
+     CASE WHEN (NEW.markedAreaSize IS NULL) <> (OLD.markedAreaSize IS NULL) OR NEW.markedAreaSize <> OLD.markedAreaSize THEN CONCAT('marked area size: ', COALESCE(OLD.markedAreaSize, 'n/a'), ' → ', COALESCE(NEW.markedAreaSize, 'n/a')) END,
+     CASE WHEN (NEW.markedAreaPercentTumour IS NULL) <> (OLD.markedAreaPercentTumour IS NULL) OR NEW.markedAreaPercentTumour <> OLD.markedAreaPercentTumour THEN CONCAT('marked area percent tumour: ', COALESCE(OLD.markedAreaPercentTumour, 'n/a'), ' → ', COALESCE(NEW.markedAreaPercentTumour, 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime)
     SELECT
@@ -136,7 +140,11 @@ FOR EACH ROW
         CASE WHEN NEW.slides <> OLD.slides THEN 'slides' END,
         CASE WHEN (NEW.discards IS NULL) <> (OLD.discards IS NULL) OR NEW.discards <> OLD.discards THEN 'discards' END,
         CASE WHEN (NEW.thickness IS NULL) <> (OLD.thickness IS NULL) OR NEW.thickness <> OLD.thickness THEN 'thickness' END,
-        CASE WHEN (NEW.stain IS NULL) <> (OLD.stain IS NULL) OR NEW.stain <> OLD.stain THEN 'stain' END
+        CASE WHEN (NEW.stain IS NULL) <> (OLD.stain IS NULL) OR NEW.stain <> OLD.stain THEN 'stain' END,
+        CASE WHEN (NEW.percentTumour IS NULL) <> (OLD.percentTumour IS NULL) OR NEW.percentTumour <> OLD.percentTumour THEN 'percentTumour' END,
+        CASE WHEN (NEW.percentNecrosis IS NULL) <> (OLD.percentNecrosis IS NULL) OR NEW.percentNecrosis <> OLD.percentNecrosis THEN 'percentNecrosis' END,
+        CASE WHEN (NEW.markedAreaSize IS NULL) <> (OLD.markedAreaSize IS NULL) OR NEW.markedAreaSize <> OLD.markedAreaSize THEN 'markedAreaSize' END,
+        CASE WHEN (NEW.markedAreaPercentTumour IS NULL) <> (OLD.markedAreaPercentTumour IS NULL) OR NEW.markedAreaPercentTumour <> OLD.markedAreaPercentTumour THEN 'markedAreaPercentTumour' END
       ), ''),
       lastModifier,
       log_message,
@@ -152,13 +160,16 @@ FOR EACH ROW
   DECLARE log_message varchar(500) CHARACTER SET utf8;
   SET log_message = CONCAT_WS(', ',
      CASE WHEN NEW.slidesConsumed <> OLD.slidesConsumed THEN CONCAT('slides: ', OLD.slidesConsumed, ' → ', NEW.slidesConsumed) END,
-     CASE WHEN NEW.tissuePieceType <> OLD.tissuePieceType THEN CONCAT('type: ', (SELECT name FROM TissuePieceType WHERE tissuePieceTypeId = OLD.tissuePieceType), ' → ', (SELECT name FROM TissuePieceType WHERE tissuePieceTypeId = NEW.tissuePieceType)) END);
+     CASE WHEN NEW.tissuePieceType <> OLD.tissuePieceType THEN CONCAT('type: ', (SELECT name FROM TissuePieceType WHERE tissuePieceTypeId = OLD.tissuePieceType), ' → ', (SELECT name FROM TissuePieceType WHERE tissuePieceTypeId = NEW.tissuePieceType)) END,
+     CASE WHEN (NEW.referenceSlideId IS NULL) <> (OLD.referenceSlideId IS NULL) OR NEW.referenceSlideId <> OLD.referenceSlideId THEN CONCAT('reference slide: ', COALESCE((SELECT name FROM Sample WHERE sampleId = OLD.referenceSlideId), 'n/a'), ' → ', COALESCE((SELECT name FROM Sample WHERE sampleId = NEW.referenceSlideId), 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime)
     SELECT
       NEW.sampleId,
       COALESCE(CONCAT_WS(',',
-        CASE WHEN NEW.slidesConsumed <> OLD.slidesConsumed THEN 'slides' END
+        CASE WHEN NEW.slidesConsumed <> OLD.slidesConsumed THEN 'slides' END,
+        CASE WHEN NEW.tissuePieceType <> OLD.tissuePieceType THEN 'tissuePieceType' END,
+        CASE WHEN (NEW.referenceSlideId IS NULL) <> (OLD.referenceSlideId IS NULL) OR NEW.referenceSlideId <> OLD.referenceSlideId THEN 'referenceSlideId' END
       ), ''),
       lastModifier,
       log_message,
@@ -173,13 +184,15 @@ FOR EACH ROW
   BEGIN
   DECLARE log_message varchar(500) CHARACTER SET utf8;
   SET log_message = CONCAT_WS(', ',
-    CASE WHEN NEW.strStatus <> OLD.strStatus THEN CONCAT('STR status: ', OLD.strStatus, ' → ', NEW.strStatus) END);
+    CASE WHEN NEW.strStatus <> OLD.strStatus THEN CONCAT('STR status: ', OLD.strStatus, ' → ', NEW.strStatus) END,
+    CASE WHEN (NEW.referenceSlideId IS NULL) <> (OLD.referenceSlideId IS NULL) OR NEW.referenceSlideId <> OLD.referenceSlideId THEN CONCAT('reference slide: ', COALESCE((SELECT name FROM Sample WHERE sampleId = OLD.referenceSlideId), 'n/a'), ' → ', COALESCE((SELECT name FROM Sample WHERE sampleId = NEW.referenceSlideId), 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime)
     SELECT
       NEW.sampleId,
       COALESCE(CONCAT_WS(',',
-         CASE WHEN NEW.strStatus <> OLD.strStatus THEN 'strStatus' END
+         CASE WHEN NEW.strStatus <> OLD.strStatus THEN 'strStatus' END,
+         CASE WHEN (NEW.referenceSlideId IS NULL) <> (OLD.referenceSlideId IS NULL) OR NEW.referenceSlideId <> OLD.referenceSlideId THEN 'referenceSlideId' END
       ), ''),
       lastModifier,
       log_message,
