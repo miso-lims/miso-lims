@@ -6,12 +6,16 @@ public interface SampleTissuePiece extends SampleTissueProcessing {
 
   public static final String SUBCATEGORY_NAME = "Tissue Piece";
 
-  TissuePieceType getTissuePieceType();
+  public TissuePieceType getTissuePieceType();
 
-  void setTissuePieceType(TissuePieceType type);
+  public void setTissuePieceType(TissuePieceType type);
 
-  Integer getSlidesConsumed();
+  public Integer getSlidesConsumed();
 
-  void setSlidesConsumed(Integer slidesConsumed);
+  public void setSlidesConsumed(Integer slidesConsumed);
+
+  public SampleSlide getReferenceSlide();
+
+  public void setReferenceSlide(SampleSlide referenceSlide);
 
 }

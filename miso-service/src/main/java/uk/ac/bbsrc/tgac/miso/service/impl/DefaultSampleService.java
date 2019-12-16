@@ -676,39 +676,50 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       sample.setProject(projectStore.get(sample.getProject().getId()));
     }
     if (isDetailedSample(sample)) {
-      DetailedSample sai = (DetailedSample) sample;
-      if (sai.getSampleClass() != null && sai.getSampleClass().isSaved()) {
-        sai.setSampleClass(sampleClassService.get(sai.getSampleClass().getId()));
+      DetailedSample detailed = (DetailedSample) sample;
+      if (detailed.getSampleClass() != null && detailed.getSampleClass().isSaved()) {
+        detailed.setSampleClass(sampleClassService.get(detailed.getSampleClass().getId()));
       }
-      if (sai.getDetailedQcStatus() != null && sai.getDetailedQcStatus().isSaved()) {
-        sai.setDetailedQcStatus(detailedQcStatusDao.get(sai.getDetailedQcStatus().getId()));
+      if (detailed.getDetailedQcStatus() != null && detailed.getDetailedQcStatus().isSaved()) {
+        detailed.setDetailedQcStatus(detailedQcStatusDao.get(detailed.getDetailedQcStatus().getId()));
       }
-      if (sai.getSubproject() != null && sai.getSubproject().isSaved()) {
-        sai.setSubproject(subProjectDao.getSubproject(sai.getSubproject().getId()));
+      if (detailed.getSubproject() != null && detailed.getSubproject().isSaved()) {
+        detailed.setSubproject(subProjectDao.getSubproject(detailed.getSubproject().getId()));
       }
-      if (isTissueProcessingSample(sai)) {
-        if (sai instanceof SampleSlide) {
-        Stain originalStain = ((SampleSlide) sai).getStain();
-        Stain stain;
-        if (originalStain == null) {
-          stain = null;
-        } else {
-          stain = stainService.get(originalStain.getId());
+      if (isTissueProcessingSample(detailed)) {
+        if (detailed instanceof SampleSlide) {
+          Stain originalStain = ((SampleSlide) detailed).getStain();
+          Stain stain;
+          if (originalStain == null) {
+            stain = null;
+          } else {
+            stain = stainService.get(originalStain.getId());
+          }
+          ((SampleSlide) detailed).setStain(stain);
+        } else if (detailed instanceof SampleTissuePiece) {
+          SampleTissuePiece tissuePiece = (SampleTissuePiece) detailed;
+          tissuePiece.setTissuePieceType(tissuePieceTypeDao.get(tissuePiece.getTissuePieceType().getId()));
+          if (tissuePiece.getReferenceSlide() != null) {
+            Sample ref = deproxify(get(tissuePiece.getReferenceSlide().getId()));
+            tissuePiece.setReferenceSlide((SampleSlide) ref);
+          }
         }
-        ((SampleSlide) sai).setStain(stain);
       }
-        else if (sai instanceof SampleTissuePiece) {
-          ((SampleTissuePiece) sai).setTissuePieceType(tissuePieceTypeDao.get(((SampleTissuePiece) sai).getTissuePieceType().getId()));
-        }
-      }
-      if (isAliquotSample(sai)) {
-        SampleAliquot sa = (SampleAliquot) sai;
+      if (isAliquotSample(detailed)) {
+        SampleAliquot sa = (SampleAliquot) detailed;
         if (sa.getSamplePurpose() != null && sa.getSamplePurpose().isSaved()) {
           sa.setSamplePurpose(samplePurposeDao.getSamplePurpose(sa.getSamplePurpose().getId()));
         }
       }
-      if (isTissueSample(sai)) {
-        SampleTissue st = (SampleTissue) sai;
+      if (isStockSample(detailed)) {
+        SampleStock stock = (SampleStock) detailed;
+        if (stock.getReferenceSlide() != null) {
+          Sample ref = deproxify(get(stock.getReferenceSlide().getId()));
+          stock.setReferenceSlide((SampleSlide) ref);
+        }
+      }
+      if (isTissueSample(detailed)) {
+        SampleTissue st = (SampleTissue) detailed;
         if (st.getTissueMaterial() != null && st.getTissueMaterial().isSaved()) {
           st.setTissueMaterial(tissueMaterialDao.getTissueMaterial(st.getTissueMaterial().getId()));
         }
@@ -746,9 +757,9 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     }
     LimsUtils.updateParentVolume(sample, managed, changeUser);
     updateParentSlides(sample, managed, changeUser);
+    loadChildEntities(sample);
     validateChange(sample, managed);
     applyChanges(managed, sample);
-    loadChildEntities(managed);
     if (isDetailedSample(managed)) {
       DetailedSample detailedUpdated = (DetailedSample) managed;
       if (detailedUpdated.getParent() != null) {
@@ -802,8 +813,30 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       }
     }
 
+    if (isDetailedSample(sample)) {
+      validateReferenceSlide((DetailedSample) sample, errors);
+    }
+
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
+    }
+  }
+
+  private void validateReferenceSlide(DetailedSample sample, List<ValidationError> errors) {
+    SampleSlide reference = null;
+    if (isTissuePieceSample(sample)) {
+      reference = ((SampleTissuePiece) sample).getReferenceSlide();
+    } else if (isStockSample(sample)) {
+      reference = ((SampleStock) sample).getReferenceSlide();
+    } else {
+      return;
+    }
+    if (reference != null) {
+      Sample tissue = getParent(SampleTissue.class, sample);
+      Sample referenceTissue = getParent(SampleTissue.class, reference);
+      if (tissue.getId() != referenceTissue.getId()) {
+        errors.add(new ValidationError("referenceSlideId", "Reference slide must be derived from the same tissue"));
+      }
     }
   }
 
@@ -902,6 +935,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     }
     target.setStrStatus(source.getStrStatus());
     target.setDNAseTreated(source.getDNAseTreated());
+    target.setReferenceSlide(source.getReferenceSlide());
   }
 
   private void applyTissueChanges(SampleTissue target, SampleTissue source) {
@@ -924,9 +958,14 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       ((SampleSlide) target).setDiscards(((SampleSlide) source).getDiscards());
       ((SampleSlide) target).setThickness(((SampleSlide) source).getThickness());
       ((SampleSlide) target).setStain(((SampleSlide) source).getStain());
+      ((SampleSlide) target).setPercentTumour(((SampleSlide) source).getPercentTumour());
+      ((SampleSlide) target).setPercentNecrosis(((SampleSlide) source).getPercentNecrosis());
+      ((SampleSlide) target).setMarkedArea(((SampleSlide) source).getMarkedArea());
+      ((SampleSlide) target).setMarkedAreaPercentTumour(((SampleSlide) source).getMarkedAreaPercentTumour());
     } else if (source instanceof SampleTissuePiece) {
       ((SampleTissuePiece) target).setSlidesConsumed(((SampleTissuePiece) source).getSlidesConsumed());
       ((SampleTissuePiece) target).setTissuePieceType(((SampleTissuePiece) source).getTissuePieceType());
+      ((SampleTissuePiece) target).setReferenceSlide(((SampleTissuePiece) source).getReferenceSlide());
     } else if (source instanceof SampleSingleCell) {
       ((SampleSingleCell) target).setInitialCellConcentration(((SampleSingleCell) source).getInitialCellConcentration());
       ((SampleSingleCell) target).setDigestion(((SampleSingleCell) source).getDigestion());

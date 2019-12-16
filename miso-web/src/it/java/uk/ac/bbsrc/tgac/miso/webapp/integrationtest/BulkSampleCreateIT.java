@@ -51,7 +51,8 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
   // columns specific to creating Slides
   private static final Set<String> slideColumns = Sets.newHashSet(SamColumns.SLIDES, SamColumns.DISCARDS, SamColumns.THICKNESS,
-      SamColumns.STAIN);
+      SamColumns.STAIN, SamColumns.PERCENT_TUMOUR, SamColumns.PERCENT_NECROSIS, SamColumns.MARKED_AREA,
+      SamColumns.MARKED_AREA_PERCENT_TUMOUR);
 
   // columns specific to creating curls
   private static final Set<String> curlsColumns = Sets.newHashSet();
@@ -59,14 +60,13 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
   // columns specific to creating single cells (tissue processing)
   private static final Set<String> singleCellColumns = Sets.newHashSet(SamColumns.INITIAL_CELL_CONC, SamColumns.DIGESTION);
 
-  // columns specific to creating gDNA stocks
-  private static final Set<String> gDnaStockColumns = Sets.newHashSet(SamColumns.STR_STATUS, SamColumns.VOLUME, SamColumns.VOLUME_UNITS,
-      SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS, SamColumns.PARENT_NG_USED, SamColumns.PARENT_VOLUME_USED);
+  // columns specific to creating stocks
+  private static final Set<String> stockColumns = Sets.newHashSet(SamColumns.STR_STATUS, SamColumns.VOLUME, SamColumns.VOLUME_UNITS,
+      SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS, SamColumns.PARENT_NG_USED, SamColumns.PARENT_VOLUME_USED,
+      SamColumns.REFERENCE_SLIDE);
 
   // columns specific to creating RNA stocks
-  private static final Set<String> rnaStockColumns = Sets.newHashSet(SamColumns.STR_STATUS, SamColumns.VOLUME, SamColumns.VOLUME_UNITS,
-      SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS, SamColumns.DNASE_TREATED, SamColumns.PARENT_NG_USED,
-      SamColumns.PARENT_VOLUME_USED);
+  private static final Set<String> rnaStockColumns = Sets.newHashSet(SamColumns.DNASE_TREATED);
 
   private static final Set<String> singleCellStockColumns = Sets.newHashSet(SamColumns.TARGET_CELL_RECOVERERY, SamColumns.CELL_VIABILITY,
       SamColumns.LOADING_CELL_CONC, SamColumns.PARENT_NG_USED, SamColumns.PARENT_VOLUME_USED);
@@ -644,7 +644,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Set<String> expectedHeadings = Sets.newHashSet();
     expectedHeadings.addAll(identityColumns);
     expectedHeadings.addAll(tissueColumns);
-    expectedHeadings.addAll(gDnaStockColumns);
+    expectedHeadings.addAll(stockColumns);
 
     BulkSamplePage page = getCreatePage(1, null, gStockClassId);
     assertTableSetup(page.getTable(), expectedHeadings, 1);
@@ -773,7 +773,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     expectedHeadings.addAll(identityColumns);
     expectedHeadings.addAll(tissueColumns);
     expectedHeadings.addAll(singleCellColumns);
-    expectedHeadings.addAll(gDnaStockColumns);
+    expectedHeadings.addAll(stockColumns);
     expectedHeadings.addAll(singleCellStockColumns);
 
     BulkSamplePage page = getCreatePage(1, null, singleCellStockClassId);
@@ -840,6 +840,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Set<String> expectedHeadings = Sets.newHashSet();
     expectedHeadings.addAll(identityColumns);
     expectedHeadings.addAll(tissueColumns);
+    expectedHeadings.addAll(stockColumns);
     expectedHeadings.addAll(rnaStockColumns);
 
     BulkSamplePage page = getCreatePage(1, null, rStockClassId);
@@ -971,7 +972,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Set<String> expectedHeadings = Sets.newHashSet();
     expectedHeadings.addAll(identityColumns);
     expectedHeadings.addAll(tissueColumns);
-    expectedHeadings.addAll(gDnaStockColumns);
+    expectedHeadings.addAll(stockColumns);
     expectedHeadings.addAll(aliquotColumns);
 
     BulkSamplePage page = getCreatePage(1, null, gAliquotClassId);
@@ -1104,7 +1105,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     expectedHeadings.addAll(identityColumns);
     expectedHeadings.addAll(tissueColumns);
     expectedHeadings.addAll(singleCellColumns);
-    expectedHeadings.addAll(gDnaStockColumns);
+    expectedHeadings.addAll(stockColumns);
     expectedHeadings.addAll(singleCellStockColumns);
     expectedHeadings.addAll(aliquotColumns);
     expectedHeadings.addAll(singleCellAliquotColumns);
@@ -1174,6 +1175,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Set<String> expectedHeadings = Sets.newHashSet();
     expectedHeadings.addAll(identityColumns);
     expectedHeadings.addAll(tissueColumns);
+    expectedHeadings.addAll(stockColumns);
     expectedHeadings.addAll(rnaStockColumns);
     expectedHeadings.addAll(aliquotColumns);
 

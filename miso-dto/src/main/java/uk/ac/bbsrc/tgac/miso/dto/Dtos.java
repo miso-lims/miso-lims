@@ -774,6 +774,7 @@ public class Dtos {
     }
     dto.setStrStatus(from.getStrStatus().getLabel());
     dto.setDnaseTreated(from.getDNAseTreated());
+    setId(dto::setReferenceSlideId, from.getReferenceSlide());
     return dto;
   }
 
@@ -793,6 +794,7 @@ public class Dtos {
       to.setStrStatus(from.getStrStatus());
     }
     to.setDNAseTreated(from.getDnaseTreated());
+    setObject(to::setReferenceSlide, SampleSlideImpl::new, from.getReferenceSlideId());
     return to;
   }
 
@@ -1086,6 +1088,10 @@ public class Dtos {
     setInteger(dto::setDiscards, from.getDiscards(), true);
     setInteger(dto::setThickness, from.getThickness(), true);
     setId(dto::setStainId, from.getStain());
+    setString(dto::setPercentTumour, from.getPercentTumour());
+    setString(dto::setPercentNecrosis, from.getPercentNecrosis());
+    setString(dto::setMarkedArea, from.getMarkedArea());
+    setString(dto::setMarkedAreaPercentTumour, from.getMarkedAreaPercentTumour());
     return dto;
   }
 
@@ -1096,6 +1102,10 @@ public class Dtos {
     setInteger(to::setDiscards, from.getDiscards(), true);
     setInteger(to::setThickness, from.getThickness(), true);
     setObject(to::setStain, Stain::new, from.getStainId());
+    setBigDecimal(to::setPercentTumour, from.getPercentTumour());
+    setBigDecimal(to::setPercentNecrosis, from.getPercentNecrosis());
+    setBigDecimal(to::setMarkedArea, from.getMarkedArea());
+    setBigDecimal(to::setMarkedAreaPercentTumour, from.getMarkedAreaPercentTumour());
     return to;
   }
 
@@ -1110,6 +1120,7 @@ public class Dtos {
     SampleTissuePieceDto dto = new SampleTissuePieceDto();
     dto.setSlidesConsumed(from.getSlidesConsumed());
     dto.setTissuePieceTypeId(from.getTissuePieceType().getId());
+    setId(dto::setReferenceSlideId, from.getReferenceSlide());
     return dto;
   }
 
@@ -1126,6 +1137,7 @@ public class Dtos {
     tissuePieceType.setId(from.getTissuePieceTypeId());
     to.setTissuePieceType(tissuePieceType);
     to.setSlidesConsumed(from.getSlidesConsumed());
+    setObject(to::setReferenceSlide, SampleSlideImpl::new, from.getReferenceSlideId());
     return to;
   }
 

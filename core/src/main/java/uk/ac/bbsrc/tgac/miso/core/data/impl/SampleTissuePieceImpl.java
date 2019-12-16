@@ -5,6 +5,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.type.TissuePieceType;
 
@@ -15,9 +16,14 @@ public class SampleTissuePieceImpl extends SampleTissueProcessingImpl implements
   private static final long serialVersionUID = 1L;
 
   private Integer slidesConsumed;
+
   @ManyToOne
   @JoinColumn(name = "tissuePieceType")
   private TissuePieceType tissuePieceType;
+
+  @ManyToOne(targetEntity = SampleSlideImpl.class)
+  @JoinColumn(name = "referenceSlideId")
+  private SampleSlide referenceSlide;
 
   @Override
   public Integer getSlidesConsumed() {
@@ -37,6 +43,16 @@ public class SampleTissuePieceImpl extends SampleTissueProcessingImpl implements
   @Override
   public void setTissuePieceType(TissuePieceType tissuePieceType) {
     this.tissuePieceType = tissuePieceType;
+  }
+
+  @Override
+  public SampleSlide getReferenceSlide() {
+    return referenceSlide;
+  }
+
+  @Override
+  public void setReferenceSlide(SampleSlide referenceSlide) {
+    this.referenceSlide = referenceSlide;
   }
 
 }

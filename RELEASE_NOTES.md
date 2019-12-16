@@ -8,6 +8,13 @@ Changes:
     * Distribution fields have been removed from samples, libraries, library aliquots, and pools.
       Transfers are automatically created to replace this data upon update
   * Added "Data Approved" and "Data Approver" fields to sequencing runs
+  * Added fields to slide samples (detailed sample)
+    * Percent Tumour
+    * Percent Necrosis
+    * Marked Area
+    * Marked Area Percent Tumour
+  * Added "Reference Slide" to tissue piece and stock samples (detailed sample) to indicate which
+    slide holds the above attributes that are relevant to the sample
   * Added JTT\_7\_GROUPDESC label layout as alternate to JTT\_7 that includes group description
     (detailed sample) instead of the usual extra barcode info
   * Added a Quick Help section to the Edit Freezer page, including a link to the User Manual

@@ -38,4 +38,8 @@ public interface SampleStock extends DetailedSample {
 
   public void setDNAseTreated(Boolean dnaseTreated);
 
+  public SampleSlide getReferenceSlide();
+
+  public void setReferenceSlide(SampleSlide referenceSlide);
+
 }

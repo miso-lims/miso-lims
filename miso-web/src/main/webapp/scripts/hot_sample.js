@@ -45,11 +45,15 @@ HotTarget.sample = (function() {
 
   var getExternalNames = function(identityAlias) {
     return identityAlias.replace(/.*--(\s*)/, "").toLowerCase().split(",");
-  }
+  };
 
   var isTargetIdentity = function(config) {
     return config && config.targetSampleClass && config.targetSampleClass.sampleCategory == 'Identity';
-  }
+  };
+
+  var makeReferenceSlideLabel = function(sample) {
+    return sample.name + ' (' + sample.alias + ')';
+  };
 
   return {
 
@@ -680,6 +684,15 @@ HotTarget.sample = (function() {
             },
             include: show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory == 'Slide'
           },
+          HotUtils.makeColumnForDecimal('% Tumour', (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory == 'Slide'),
+              'percentTumour', 11, 8, false, false),
+          HotUtils.makeColumnForDecimal('% Necrosis', (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory == 'Slide'),
+              'percentNecrosis', 11, 8, false, false),
+          HotUtils.makeColumnForDecimal('Marked Area (mm²)',
+              (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory == 'Slide'), 'markedArea', 11, 8, false, false),
+          HotUtils.makeColumnForDecimal('Marked Area % Tumour',
+              (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory == 'Slide'), 'markedAreaPercentTumour', 11, 8,
+              false, false),
 
           // Tissue Processing: Tissue Piece columns
           HotUtils.makeAutocompleteColumnForConstantsList('Piece Type',
@@ -790,7 +803,44 @@ HotTarget.sample = (function() {
           HotUtils.makeColumnForDecimal('Loading Cell Conc.',
               (show['Stock'] && config.targetSampleClass.sampleSubcategory && config.targetSampleClass.sampleSubcategory
                   .startsWith('Single Cell')), 'loadingCellConcentration', 14, 10, false, false),
-
+          // Stock/Tissue Piece columns
+          {
+            header: 'Reference Slide',
+            data: 'referenceSlideLabel',
+            description: 'Indicates a slide whose attributes such as marked area and % tumour are relevant to this sample.'
+                + ' May be used for calculating extraction input per yield, for example.',
+            type: 'dropdown',
+            trimDropdown: false,
+            source: [],
+            unpack: function(sam, flat, setCellMeta) {
+              if (sam.referenceSlideId) {
+                var slide = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(sam.referenceSlideId), sam.relatedSlides);
+                flat.referenceSlideLabel = makeReferenceSlideLabel(slide);
+              }
+              if (sam.relatedSlides && sam.relatedSlides.length) {
+                setCellMeta('source', sam.relatedSlides.map(function(slide) {
+                  return makeReferenceSlideLabel(slide);
+                }));
+                if (sam.relatedSlides.length === 1) {
+                  flat.referenceSlideLabel = makeReferenceSlideLabel(sam.relatedSlides[0]);
+                }
+              }
+            },
+            pack: function(sam, flat, errorHandler) {
+              if (flat.referenceSlideLabel) {
+                var slide = Utils.array.findUniqueOrThrow(function(relatedSlide) {
+                  var label = makeReferenceSlideLabel(relatedSlide);
+                  return label === flat.referenceSlideLabel;
+                }, sam.relatedSlides);
+                sam.referenceSlideId = slide.id;
+              } else {
+                sam.referenceSlideId = null;
+              }
+            },
+            validator: HotUtils.validator.permitEmptyDropdown,
+            include: (show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory == 'Tissue Piece')
+                || (show['Stock'] && !config.isLibraryReceipt)
+          },
           // QC status columns for detailed and non-detailed samples
           {
             header: 'QC Passed?',

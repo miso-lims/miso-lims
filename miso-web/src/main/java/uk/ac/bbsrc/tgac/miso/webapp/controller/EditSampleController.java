@@ -275,9 +275,43 @@ public class EditSampleController {
         .collect(Collectors.toList()));
 
     model.put("sample", sample);
-    model.put("sampleDto", sample.getId() == SampleImpl.UNSAVED_ID ? "null" : mapper.writeValueAsString(Dtos.asDto(sample, false)));
+    SampleDto sampleDto = Dtos.asDto(sample, false);
+    setRelatedSlideDtos(sample, sampleDto);
+    model.put("sampleDto", sample.getId() == SampleImpl.UNSAVED_ID ? "null" : mapper.writeValueAsString(sampleDto));
+
+    if (LimsUtils.isTissuePieceSample(sample) || LimsUtils.isStockSample(sample)) {
+      model.put("relatedSlides", getRelatedSlideDtos((DetailedSample) sample));
+    }
 
     return new ModelAndView("/WEB-INF/pages/editSample.jsp", model);
+  }
+
+  private void setRelatedSlideDtos(Sample sample, SampleDto dto) {
+    if (dto instanceof SampleTissuePieceDto) {
+      ((SampleTissuePieceDto) dto).setRelatedSlides(getRelatedSlideDtos((DetailedSample) sample));
+    } else if (dto instanceof SampleStockDto) {
+      ((SampleStockDto) dto).setRelatedSlides(getRelatedSlideDtos((DetailedSample) sample));
+    }
+  }
+
+  private List<SampleDto> getRelatedSlideDtos(DetailedSample sample) {
+    DetailedSample tissue = LimsUtils.isTissueSample(sample) ? sample : LimsUtils.getParent(SampleTissue.class, sample);
+    if (tissue == null) {
+      return Collections.emptyList();
+    }
+    return getSlideChildren(tissue).stream().map(Dtos::asMinimalDto).collect(Collectors.toList());
+  }
+
+  private List<DetailedSample> getSlideChildren(DetailedSample parent) {
+    List<DetailedSample> slides = new ArrayList<>();
+    for (DetailedSample child : parent.getChildren()) {
+      if (LimsUtils.isSampleSlide(child)) {
+        slides.add(child);
+      } else if (!LimsUtils.isStockSample(child)) {
+        slides.addAll(getSlideChildren(child));
+      }
+    }
+    return slides;
   }
 
   private void addArrayData(long sampleId, ModelMap model) throws IOException {
@@ -430,7 +464,9 @@ public class EditSampleController {
 
     @Override
     protected SampleDto asDto(Sample model) {
-      return Dtos.asDto(model, true);
+      SampleDto dto = Dtos.asDto(model, true);
+      setRelatedSlideDtos(model, dto);
+      return dto;
     }
 
     @Override
@@ -494,6 +530,11 @@ public class EditSampleController {
         dto.setGroupDescription(sample.getGroupDescription());
         sourceSampleClass = sample.getSampleClass();
         dto.setBox(newBox);
+        if (targetSampleClass.getSampleCategory().equals(SampleStock.CATEGORY_NAME)
+            || (targetSampleClass.getSampleCategory().equals(SampleTissueProcessing.CATEGORY_NAME)
+                && targetSampleClass.getSampleSubcategory().equals(SampleTissuePiece.SUBCATEGORY_NAME))) {
+          setRelatedSlideDtos(sample, dto);
+        }
         return dto;
       } else {
         throw new IllegalArgumentException("Cannot create plain samples from other plain samples!");

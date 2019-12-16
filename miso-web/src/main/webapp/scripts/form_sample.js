@@ -425,6 +425,37 @@ FormTarget.sample = (function($) {
               getItemValue: function(item) {
                 return item.id;
               }
+            }, {
+              title: '% Tumour',
+              data: 'percentTumour',
+              type: 'decimal',
+              precision: 11,
+              scale: 8,
+              min: 0,
+              max: 100
+            }, {
+              title: '% Necrosis',
+              data: 'percentNecrosis',
+              type: 'decimal',
+              precision: 11,
+              scale: 8,
+              min: 0,
+              max: 100
+            }, {
+              title: 'Marked Area (mm²)',
+              data: 'markedArea',
+              type: 'decimal',
+              precision: 11,
+              scale: 8,
+              min: 0
+            }, {
+              title: 'Marked Area % Tumour',
+              data: 'markedAreaPercentTumour',
+              type: 'decimal',
+              precision: 11,
+              scale: 8,
+              min: 0,
+              max: 100
             }]
           }, {
             title: 'Tissue Pieces',
@@ -435,6 +466,18 @@ FormTarget.sample = (function($) {
               type: 'int',
               min: 0,
               required: true
+            }, {
+              title: 'Reference Slide',
+              data: 'referenceSlideId',
+              type: 'dropdown',
+              getSource: function() {
+                return object.relatedSlides;
+              },
+              getItemLabel: function(item) {
+                return item.name + ' (' + item.alias + ')';
+              },
+              getItemValue: Utils.array.getId,
+              sortSource: Utils.sorting.standardSort('id')
             }]
           }, {
             title: 'Single Cell',
@@ -468,6 +511,18 @@ FormTarget.sample = (function($) {
               data: 'dnaseTreated',
               type: 'checkbox',
               include: config.dnaseTreatable
+            }, {
+              title: 'Reference Slide',
+              data: 'referenceSlideId',
+              type: 'dropdown',
+              getSource: function() {
+                return object.relatedSlides;
+              },
+              getItemLabel: function(item) {
+                return item.name + ' (' + item.alias + ')';
+              },
+              getItemValue: Utils.array.getId,
+              sortSource: Utils.sorting.standardSort('id')
             }, {
               title: 'Target Cell Recovery',
               data: 'targetCellRecovery',

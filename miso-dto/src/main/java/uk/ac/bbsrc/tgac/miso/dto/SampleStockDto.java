@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
@@ -11,6 +13,8 @@ public class SampleStockDto extends SampleTissueDto {
   private String concentration;
   private String strStatus;
   private Boolean dnaseTreated;
+  private Long referenceSlideId;
+  private List<SampleDto> relatedSlides;
 
   public Long getTissueProcessingClassId() {
     return tissueProcessingClassId;
@@ -44,6 +48,22 @@ public class SampleStockDto extends SampleTissueDto {
 
   public void setDnaseTreated(Boolean dnaseTreated) {
     this.dnaseTreated = dnaseTreated;
+  }
+
+  public Long getReferenceSlideId() {
+    return referenceSlideId;
+  }
+
+  public void setReferenceSlideId(Long referenceSlideId) {
+    this.referenceSlideId = referenceSlideId;
+  }
+
+  public List<SampleDto> getRelatedSlides() {
+    return relatedSlides;
+  }
+
+  public void setRelatedSlides(List<SampleDto> relatedSlides) {
+    this.relatedSlides = relatedSlides;
   }
 
 }
