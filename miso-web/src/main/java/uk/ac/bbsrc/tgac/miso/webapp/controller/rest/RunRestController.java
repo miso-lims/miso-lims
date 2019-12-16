@@ -48,7 +48,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -226,37 +225,32 @@ public class RunRestController extends RestController {
 
   @GetMapping(value = "/dt", produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<RunDto> dataTable(HttpServletRequest request, HttpServletResponse response, UriComponentsBuilder uriBuilder)
-      throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser);
+  public DataTablesResponseDto<RunDto> dataTable(HttpServletRequest request) throws IOException {
+    return jQueryBackend.get(request, advancedSearchParser);
   }
 
   @GetMapping(value = "/dt/project/{id}", produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<RunDto> dataTableByProject(@PathVariable("id") Long id, HttpServletRequest request,
-      HttpServletResponse response, UriComponentsBuilder uriBuilder)
-      throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.project(id));
+  public DataTablesResponseDto<RunDto> dataTableByProject(@PathVariable("id") Long id, HttpServletRequest request) throws IOException {
+    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.project(id));
   }
 
   @GetMapping(value = "/dt/platform/{platform}", produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<RunDto> dataTableByPlatform(@PathVariable("platform") String platform, HttpServletRequest request,
-      HttpServletResponse response, UriComponentsBuilder uriBuilder)
+  public DataTablesResponseDto<RunDto> dataTableByPlatform(@PathVariable("platform") String platform, HttpServletRequest request)
       throws IOException {
     PlatformType platformType = PlatformType.valueOf(platform);
     if (platformType == null) {
       throw new RestException("Invalid platform type.", Status.BAD_REQUEST);
     }
-    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.platformType(platformType));
+    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.platformType(platformType));
   }
 
   @GetMapping(value = "/dt/sequencer/{id}", produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<RunDto> dataTableBySequencer(@PathVariable("id") Long id, HttpServletRequest request,
-      HttpServletResponse response, UriComponentsBuilder uriBuilder)
+  public DataTablesResponseDto<RunDto> dataTableBySequencer(@PathVariable("id") Long id, HttpServletRequest request)
       throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.sequencer(id));
+    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.sequencer(id));
   }
 
   @PostMapping(value = "{runId}/add", produces = "application/json")

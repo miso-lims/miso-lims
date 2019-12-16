@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
+import java.util.Date;
 import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
@@ -9,6 +10,7 @@ import org.hibernate.sql.JoinType;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
+import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
@@ -46,6 +48,37 @@ public interface HibernatePaginatedBoxableSource<T extends Boxable> extends Hibe
                 Restrictions.ilike("location5.alias", freezer, MatchMode.START)),
             Restrictions.and(Restrictions.eq("location6.locationUnit", LocationUnit.FREEZER),
                 Restrictions.ilike("location6.alias", freezer, MatchMode.START))));
+  }
+
+  @Override
+  public default void restrictPaginationByDate(Criteria criteria, Date start, Date end, DateType type, Consumer<String> errorHandler) {
+    if (type == DateType.RECEIVE) {
+      criteria.createAlias("transfers", "transferItem")
+          .createAlias("transferItem.transfer", "transfer")
+          .add(Restrictions.isNotNull("transfer.senderLab"))
+          .add(Restrictions.between("transfer.transferDate", start, end));
+    } else if (type == DateType.DISTRIBUTED) {
+      criteria.createAlias("transfers", "transferItem")
+          .createAlias("transferItem.transfer", "transfer")
+          .add(Restrictions.isNotNull("transfer.recipient"))
+          .add(Restrictions.between("transfer.transferDate", start, end));
+    } else {
+      HibernatePaginatedDataSource.super.restrictPaginationByDate(criteria, start, end, type, errorHandler);
+    }
+  }
+
+  @Override
+  public default void restrictPaginationByDistributed(Criteria criteria, Consumer<String> errorHandler) {
+    criteria.createAlias("transfers", "transferItem")
+        .createAlias("transferItem.transfer", "transfer")
+        .add(Restrictions.isNotNull("transfer.recipient"));
+  }
+
+  @Override
+  public default void restrictPaginationByDistributionRecipient(Criteria criteria, String recipient, Consumer<String> errorHandler) {
+    criteria.createAlias("transfers", "transferItem")
+        .createAlias("transferItem.transfer", "transfer")
+        .add(Restrictions.ilike("transfer.recipient", recipient, MatchMode.ANYWHERE));
   }
 
 }

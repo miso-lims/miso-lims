@@ -30,6 +30,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -63,6 +64,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryAliquotBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryAliquotChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -142,6 +144,9 @@ public class LibraryAliquot extends AbstractBoxable
 
   @OneToMany(targetEntity = LibraryAliquotChangeLog.class, mappedBy = "libraryAliquot", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
+
+  @OneToMany(mappedBy = "item")
+  private List<TransferLibraryAliquot> transfers;
 
   @Override
   public Boxable.EntityType getEntityType() {
@@ -289,79 +294,27 @@ public class LibraryAliquot extends AbstractBoxable
     return sb.toString();
   }
 
-  /**
-   * Equivalency is based on getId() if set, otherwise on name, barcode, concentration, creation date, and creator userName.
-   */
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) return false;
-    if (obj == this) return true;
-    if (!(obj instanceof LibraryAliquot)) return false;
-    final LibraryAliquot them = (LibraryAliquot) obj;
-    // If not saved, then compare resolved actual objects. Otherwise
-    // just compare IDs.
-    if (LibraryAliquot.UNSAVED_ID == getId() || LibraryAliquot.UNSAVED_ID == them.getId()) {
-      if (name == null) {
-        if (them.getName() != null)
-          return false;
-      } else if (!name.equals(them.getName())) {
-        return false;
-      }
-      if (identificationBarcode == null) {
-        if (them.getIdentificationBarcode() != null)
-          return false;
-      } else if (!identificationBarcode.equals(them.getIdentificationBarcode())) {
-        return false;
-      }
-      if (concentration == null) {
-        if (them.getConcentration() != null)
-          return false;
-      } else if (!concentration.equals(them.getConcentration())) {
-        return false;
-      }
-      if (creationDate == null) {
-        if (them.getCreationDate() != null)
-          return false;
-      } else if (!creationDate.equals(them.getCreationDate())) {
-        return false;
-      }
-      if (creator == null) {
-        if (them.getCreator() != null)
-          return false;
-      } else if (!creator.equals(them.getCreator())) {
-        return false;
-      }
-      if (library == null) {
-        if (them.getLibrary() != null)
-          return false;
-      } else if (!library.equals(them.getLibrary())) {
-        return false;
-      }
-      if (targetedSequencing == null) {
-        if (them.getTargetedSequencing() != null)
-          return false;
-      } else if (!targetedSequencing.equals(them.getTargetedSequencing())) {
-        return false;
-      }
-      return true;
-    } else {
-      return getId() == them.getId();
-    }
+    return LimsUtils.equalsByIdFirst(this, obj,
+        LibraryAliquot::getIdentificationBarcode,
+        LibraryAliquot::getConcentration,
+        LibraryAliquot::getCreationDate,
+        LibraryAliquot::getCreator,
+        LibraryAliquot::getLibrary,
+        LibraryAliquot::getTargetedSequencing);
   }
 
   @CoverageIgnore
   @Override
   public int hashCode() {
-    if (LibraryAliquot.UNSAVED_ID != getId()) {
-      return (int) getId();
-    } else {
-      final int PRIME = 37;
-      int hashcode = 1;
-      if (getCreationDate() != null) hashcode = PRIME * hashcode + getCreationDate().hashCode();
-      if (getCreator() != null) hashcode = PRIME * hashcode + getCreator().hashCode();
-      if (getConcentration() != null) hashcode = PRIME * hashcode + getConcentration().hashCode();
-      return hashcode;
-    }
+    return LimsUtils.hashCodeByIdFirst(this,
+        identificationBarcode,
+        concentration,
+        creationDate,
+        creator,
+        library,
+        targetedSequencing);
   }
 
   @Override
@@ -493,6 +446,14 @@ public class LibraryAliquot extends AbstractBoxable
   @Override
   public HierarchyEntity getParent() {
     return getParentAliquot() != null ? getParentAliquot() : getLibrary();
+  }
+
+  @Override
+  public List<TransferLibraryAliquot> getTransfers() {
+    if (transfers == null) {
+      transfers = new ArrayList<>();
+    }
+    return transfers;
   }
 
 }

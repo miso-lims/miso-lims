@@ -72,7 +72,7 @@ SELECT
   p.concentration,
   p.concentrationUnits,
   p.discarded,
-  p.distributed,
+  dist.distributed,
   b.boxId,
   b.name AS boxName,
   b.alias AS boxAlias,
@@ -80,7 +80,8 @@ SELECT
   bp.position AS boxPosition
 FROM Pool p
 LEFT JOIN BoxPosition bp ON bp.targetType = 'POOL' AND bp.targetId = p.poolId
-LEFT JOIN Box b ON b.boxId = bp.boxId;
+LEFT JOIN Box b ON b.boxId = bp.boxId
+JOIN PoolDistributionView dist ON dist.poolId = p.poolId;
 
 CREATE OR REPLACE VIEW ListPoolView_Element AS
 SELECT

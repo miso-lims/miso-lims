@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -65,22 +63,19 @@ public class IndexRestController extends RestController {
 
   @GetMapping("/dt")
   @ResponseBody
-  public DataTablesResponseDto<IndexDto> dataTable(HttpServletRequest request, HttpServletResponse response,
-      UriComponentsBuilder uriBuilder)
-      throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser);
+  public DataTablesResponseDto<IndexDto> dataTable(HttpServletRequest request) throws IOException {
+    return jQueryBackend.get(request, advancedSearchParser);
   }
 
   @GetMapping("/dt/platform/{platform}")
   @ResponseBody
-  public DataTablesResponseDto<IndexDto> dataTableByPlatform(@PathVariable("platform") String platform, HttpServletRequest request,
-      HttpServletResponse response, UriComponentsBuilder uriBuilder)
+  public DataTablesResponseDto<IndexDto> dataTableByPlatform(@PathVariable("platform") String platform, HttpServletRequest request)
       throws IOException {
     PlatformType platformType = PlatformType.valueOf(platform);
     if (platformType == null) {
       throw new RestException("Invalid platform type.", Status.BAD_REQUEST);
     }
-    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.platformType(platformType),
+    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.platformType(platformType),
         PaginationFilter.archived(false));
   }
 

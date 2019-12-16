@@ -27,6 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferItem;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
@@ -261,6 +262,11 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   @Override
   public Date getBarcodeDate() {
     return Stream.of(getReceivedDate(), getCreationDate(), getCreationTime()).filter(Objects::nonNull).findFirst().orElse(null);
+  }
+
+  private Date getReceivedDate() {
+    TransferItem<?> receipt = getReceiptTransfer();
+    return receipt == null ? null : receipt.getTransfer().getTransferDate();
   }
 
   @Override

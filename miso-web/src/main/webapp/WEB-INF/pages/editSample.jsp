@@ -143,6 +143,10 @@
 <miso:attachments item="${sample}" projectId="${sample.project.id}"/>
 <miso:qcs id="list_qc" item="${sample}"/>
 
+<c:if test="${!detailedSample or sampleCategory ne 'Identity'}">
+  <miso:list-section id="list_transfer" name="Transfers" target="itemtransfer" items="${sampleTransfers}" config="{ sampleId: ${sample.id} }" alwaysShow="true"/>
+</c:if>
+
 <c:if test="${ !detailedSample or sampleCategory eq 'Aliquot' }">
   <miso:list-section id="list_library" name="Libraries" target="library" items="${sampleLibraries}"/>
 </c:if>

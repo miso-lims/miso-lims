@@ -66,7 +66,8 @@ Urls = (function() {
   var boxRestBase = restBase + '/boxes';
   rest.boxes = {
     create: boxRestBase,
-    update: idUrlFunction(boxRestBase)
+    update: idUrlFunction(boxRestBase),
+    searchPartial: boxRestBase + '/search/partial'
   };
 
   // Box Sizes
@@ -572,6 +573,20 @@ Urls = (function() {
   rest.tissueTypes = {
     create: tissueTypeRestBase,
     update: idUrlFunction(tissueTypeRestBase)
+  };
+
+  // Transfers
+  var transferUiBase = baseUrl + '/transfer';
+  ui.transfers = {
+    create: transferUiBase + '/new',
+    edit: idUrlFunction(transferUiBase)
+  };
+
+  var transferRestBase = restBase + '/transfers';
+  rest.transfers = {
+    datatable: idUrlFunction(transferRestBase + '/dt'),
+    create: transferRestBase,
+    update: idUrlFunction(transferRestBase)
   };
 
   // Worksets

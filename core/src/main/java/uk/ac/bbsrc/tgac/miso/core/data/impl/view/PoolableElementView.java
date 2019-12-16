@@ -35,6 +35,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @Entity
@@ -159,6 +160,9 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
       @JoinColumn(name = "library_libraryId", nullable = false, referencedColumnName = "libraryId") }, inverseJoinColumns = {
           @JoinColumn(name = "index_indexId", nullable = false) })
   private List<Index> indices = new ArrayList<>();
+
+  @OneToMany(mappedBy = "item")
+  private List<TransferLibraryAliquot> transfers;
 
   public static PoolableElementView fromLibraryAliquot(LibraryAliquot aliquot) {
     PoolableElementView v = new PoolableElementView();
@@ -616,6 +620,13 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   public void setLibraryQcPassed(Boolean libraryQcPassed) {
     this.libraryQcPassed = libraryQcPassed;
+  }
+
+  public List<TransferLibraryAliquot> getTransfers() {
+    if (transfers == null) {
+      transfers = new ArrayList<>();
+    }
+    return transfers;
   }
 
   @Override

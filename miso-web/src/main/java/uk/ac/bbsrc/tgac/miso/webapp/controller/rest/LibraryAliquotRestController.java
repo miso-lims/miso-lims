@@ -111,25 +111,22 @@ public class LibraryAliquotRestController extends RestController {
 
   @GetMapping(value = "/dt", produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<LibraryAliquotDto> getLibraryAliquots(HttpServletRequest request,
-      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser);
+  public DataTablesResponseDto<LibraryAliquotDto> getLibraryAliquots(HttpServletRequest request) throws IOException {
+    return jQueryBackend.get(request, advancedSearchParser);
   }
 
   @GetMapping(value = "/dt/project/{id}", produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<LibraryAliquotDto> getByProject(@PathVariable("id") Long id, HttpServletRequest request,
-      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.project(id));
+  public DataTablesResponseDto<LibraryAliquotDto> getByProject(@PathVariable("id") Long id, HttpServletRequest request) throws IOException {
+    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.project(id));
   }
 
   @GetMapping(value = "/dt/pool/{id}/available", produces = "application/json")
-  public @ResponseBody DataTablesResponseDto<LibraryAliquotDto> getAvailable(@PathVariable("id") Long poolId, HttpServletRequest request,
-      HttpServletResponse response,
-      UriComponentsBuilder uriBuilder) throws IOException {
+  public @ResponseBody DataTablesResponseDto<LibraryAliquotDto> getAvailable(@PathVariable("id") Long poolId, HttpServletRequest request)
+      throws IOException {
 
     final Pool pool = poolService.get(poolId);
-    return jQueryBackend.get(request, response, null, advancedSearchParser, PaginationFilter.platformType(pool.getPlatformType()));
+    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.platformType(pool.getPlatformType()));
   }
 
   @PostMapping(value = "query", produces = { "application/json" })

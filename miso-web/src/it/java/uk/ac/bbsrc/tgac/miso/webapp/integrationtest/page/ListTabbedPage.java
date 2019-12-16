@@ -20,9 +20,11 @@ public class ListTabbedPage extends HeaderFooterPage implements AbstractListPage
     public static final String ALL = "All";
     public static final String CLUSTERING = "Clustering";
     public static final String EXTRACTION = "Extraction";
+    public static final String DISTRIBUTION = "Distribution";
     public static final String DNA = "DNA";
     public static final String FREEZERS = "Freezers";
     public static final String ILLUMINA = "Illumina";
+    public static final String INTERNAL = "Internal";
     public static final String LIBRARIES = "Libraries";
     public static final String LIBRARY = "Library";
     public static final String LS454 = "LS454";
@@ -30,6 +32,8 @@ public class ListTabbedPage extends HeaderFooterPage implements AbstractListPage
     public static final String MULTIPLEXING = "Multiplexing";
     public static final String OXFORD_NANOPORE = "OxfordNanopore";
     public static final String PACBIO = "PacBio";
+    public static final String PENDING = "Pending";
+    public static final String RECEIPT = "Receipt";
     public static final String RNA = "RNA";
     public static final String ROOMS = "Rooms";
     public static final String SEQUENCING = "Sequencing";

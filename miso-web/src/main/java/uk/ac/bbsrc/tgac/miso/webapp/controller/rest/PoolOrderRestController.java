@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
@@ -112,16 +110,16 @@ public class PoolOrderRestController extends RestController {
   }
 
   @GetMapping("/dt/{status}")
-  public @ResponseBody DataTablesResponseDto<PoolOrderDto> list(@PathVariable String status, UriComponentsBuilder uriBuilder,
-      HttpServletRequest request, HttpServletResponse response) throws IOException {
+  public @ResponseBody DataTablesResponseDto<PoolOrderDto> list(@PathVariable String status, HttpServletRequest request)
+      throws IOException {
     switch (PoolOrder.Status.get(status)) {
     case OUTSTANDING:
-      return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.draft(false),
+      return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.draft(false),
           PaginationFilter.fulfilled(false));
     case FULFILLED:
-      return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.fulfilled(true));
+      return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.fulfilled(true));
     case DRAFT:
-      return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.draft(true),
+      return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.draft(true),
           PaginationFilter.fulfilled(false));
     default:
       throw new RestException("Unknown pool order status: " + status, Status.BAD_REQUEST);

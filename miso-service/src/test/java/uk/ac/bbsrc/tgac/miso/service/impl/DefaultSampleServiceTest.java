@@ -6,7 +6,6 @@ import static uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils.generateTemporaryNa
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -410,7 +409,6 @@ public class DefaultSampleServiceTest {
     updated.setAlias("newAlias");
     updated.setDescription("newDesc");
     updated.setSampleType("newType");
-    updated.setReceivedDate(new Date());
     updated.setQcPassed(true);
     updated.setScientificName("newSciName");
     updated.setTaxonIdentifier("newTaxonId");
@@ -429,7 +427,6 @@ public class DefaultSampleServiceTest {
     assertEquals("Sample sampleType should be modifiable", updated.getSampleType(), result.getSampleType());
     assertEquals("Sample description should be modifiable", updated.getDescription(), result.getDescription());
     assertEquals("Sample sampleType should be modifiable", updated.getSampleType(), result.getSampleType());
-    assertEquals("Sample receivedDate should be modifiable", updated.getReceivedDate(), result.getReceivedDate());
     assertEquals("Sample qcPassed should be modifiable", updated.getQcPassed(), result.getQcPassed());
     assertEquals("Sample scientificName should be modifiable", updated.getScientificName(), result.getScientificName());
     assertEquals("Sample taxonIdentifier should be modifiable", updated.getTaxonIdentifier(), result.getTaxonIdentifier());

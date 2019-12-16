@@ -40,9 +40,6 @@ public class PoolDto extends AbstractBoxableDto {
   private Double insertSize;
   private boolean hasEmptySequence;
   private Set<String> prioritySubprojectAliases;
-  private boolean distributed;
-  private String distributionDate;
-  private String distributionRecipient;
   private boolean mergeChild;
 
   public String getAlias() {
@@ -245,30 +242,6 @@ public class PoolDto extends AbstractBoxableDto {
 
   public void setPrioritySubprojectAliases(Set<String> prioritySubprojectAliases) {
     this.prioritySubprojectAliases = prioritySubprojectAliases;
-  }
-
-  public boolean isDistributed() {
-    return distributed;
-  }
-
-  public void setDistributed(boolean distributed) {
-    this.distributed = distributed;
-  }
-
-  public String getDistributionDate() {
-    return distributionDate;
-  }
-
-  public void setDistributionDate(String distributionDate) {
-    this.distributionDate = distributionDate;
-  }
-
-  public String getDistributionRecipient() {
-    return distributionRecipient;
-  }
-
-  public void setDistributionRecipient(String distributionRecipient) {
-    this.distributionRecipient = distributionRecipient;
   }
 
   public boolean isMergeChild() {

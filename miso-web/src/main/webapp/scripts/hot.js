@@ -979,7 +979,7 @@ var HotUtils = {
 
   makeColumnForConstantsList: function(headerName, include, flatProperty, modelProperty, id, name, items, required, baseobj, sortFunc,
       nullLabel) {
-    var labels = items.sort(sortFunc || Utils.sorting.standardSort(name)).map(function(item) {
+    var labels = !include ? [] : items.sort(sortFunc || Utils.sorting.standardSort(name)).map(function(item) {
       return item[name];
     });
     if (!required)
@@ -1027,7 +1027,7 @@ var HotUtils = {
     return baseobj;
   },
 
-  makeColumnForBoolean: function(headerName, include, property, required, baseObj) {
+  makeColumnForBoolean: function(headerName, include, property, required, baseObj, defaultValue) {
     var column = baseObj || {};
     column.header = headerName;
     column.data = property;
@@ -1041,6 +1041,8 @@ var HotUtils = {
         result = 'True';
       } else if (obj[property] === false) {
         result = 'False';
+      } else if (defaultValue !== undefined) {
+        result = defaultValue;
       } else if (required) {
         result = 'False';
       } else {
@@ -1528,6 +1530,17 @@ var HotUtils = {
         }
       }
     }
+  },
+
+  makeTransferAction: function(idsParameter) {
+    return {
+      name: 'Transfer',
+      action: function(items) {
+        var params = {};
+        params[idsParameter] = items.map(Utils.array.getId).join(",");
+        window.location = Urls.ui.transfers.create + '?' + jQuery.param(params);
+      }
+    };
   },
 
   relationCategoriesForDetailed: function() { // Change name to relationCategoriesForDetailed

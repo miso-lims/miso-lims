@@ -34,6 +34,7 @@ import com.eaglegenomics.simlims.core.Note;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QualityControllable;
 import uk.ac.bbsrc.tgac.miso.core.data.type.DilutionFactor;
@@ -51,8 +52,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface Library
-    extends Attachable, Comparable<Library>, Deletable, HierarchyEntity, Locatable, QualityControllable<LibraryQC>, Serializable {
+public interface Library extends Attachable, Comparable<Library>, Deletable, HierarchyEntity, Locatable, QualityControllable<LibraryQC>,
+    Serializable {
 
   /** Field UNSAVED_ID */
   public static final long UNSAVED_ID = 0L;
@@ -293,10 +294,6 @@ public interface Library
 
   void setKitDescriptor(KitDescriptor prepKit);
 
-  public Date getReceivedDate();
-
-  public void setReceivedDate(Date date);
-
   /**
    * Returns the concentration units of this Library object.
    * 
@@ -351,5 +348,8 @@ public interface Library
   public boolean getUmis();
 
   public void setUmis(boolean umis);
+
+  @Override
+  public List<TransferLibrary> getTransfers();
 
 }

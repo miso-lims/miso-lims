@@ -266,28 +266,30 @@ public class QcType implements Comparable<QcType>, Serializable, Aliasable, Dele
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) return false;
-    if (obj == this) return true;
-    if (!(obj instanceof QcType)) return false;
-    QcType them = (QcType) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (isSaved() && them.isSaved()) {
-      return qcTypeId == them.qcTypeId;
-    } else {
-      return LimsUtils.equals(this, them,
-          QcType::getName,
-          QcType::getQcTarget,
-          QcType::getDescription,
-          QcType::getUnits,
-          QcType::getPrecisionAfterDecimal,
-          QcType::isArchived,
-          QcType::getCorrespondingField,
-          QcType::isAutoUpdateField,
-          QcType::getInstrumentModel,
-          QcType::getKitDescriptor,
-          QcType::getControls);
+    if (isSaved()) {
+      if (obj == null) return false;
+      if (obj == this) return true;
+      if (!(obj instanceof QcType)) return false;
+      QcType them = (QcType) obj;
+      if (them.isSaved()) {
+        return qcTypeId == them.qcTypeId;
+      }
     }
+
+    return LimsUtils.equals(this, obj,
+        QcType::getName,
+        QcType::getQcTarget,
+        QcType::getDescription,
+        QcType::getUnits,
+        QcType::getPrecisionAfterDecimal,
+        QcType::isArchived,
+        QcType::getCorrespondingField,
+        QcType::isAutoUpdateField,
+        QcType::getInstrumentModel,
+        QcType::getKitDescriptor,
+        QcType::getControls);
   }
 
   @Override

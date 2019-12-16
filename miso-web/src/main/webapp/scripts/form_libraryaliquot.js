@@ -149,7 +149,7 @@ FormTarget.libraryaliquot = (function($) {
           type: 'decimal',
           precision: 14,
           scale: 10
-        }].concat(FormUtils.makeDistributionFields())
+        }]
       }, {
         title: 'Details',
         include: config.detailedSample,

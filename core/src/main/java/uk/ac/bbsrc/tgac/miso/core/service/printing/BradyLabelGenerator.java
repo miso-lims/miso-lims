@@ -18,7 +18,6 @@ public class BradyLabelGenerator extends LabelCanvas {
   @Override
   public String finish(int copies) {
     sb.append("A ").append(copies).append("\n");
-    System.out.println(sb.toString());
     return sb.toString();
   }
 

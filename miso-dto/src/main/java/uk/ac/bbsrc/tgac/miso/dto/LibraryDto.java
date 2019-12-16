@@ -62,13 +62,15 @@ public class LibraryDto extends AbstractBoxableDto {
   private Long kitDescriptorId;
   private SampleDto sample;
   private String receivedDate;
+  private Long senderLabId;
+  private Long recipientGroupId;
+  private Boolean received;
+  private Boolean receiptQcPassed;
+  private String receiptQcNote;
   private String sampleBoxPositionLabel;
   private Long spikeInId;
   private String spikeInVolume;
   private String spikeInDilutionFactor;
-  private boolean distributed;
-  private String distributionDate;
-  private String distributionRecipient;
   private boolean umis;
 
   public String getAlias() {
@@ -90,30 +92,6 @@ public class LibraryDto extends AbstractBoxableDto {
 
   public String getDescription() {
     return description;
-  }
-
-  public boolean isDistributed() {
-    return distributed;
-  }
-
-  public void setDistributed(boolean distributed) {
-    this.distributed = distributed;
-  }
-
-  public String getDistributionDate() {
-    return distributionDate;
-  }
-
-  public void setDistributionDate(String distributionDate) {
-    this.distributionDate = distributionDate;
-  }
-
-  public String getDistributionRecipient() {
-    return distributionRecipient;
-  }
-
-  public void setDistributionRecipient(String distributionRecipient) {
-    this.distributionRecipient = distributionRecipient;
   }
 
   public Long getId() {
@@ -392,6 +370,46 @@ public class LibraryDto extends AbstractBoxableDto {
 
   public void setReceivedDate(String receivedDate) {
     this.receivedDate = receivedDate;
+  }
+
+  public Long getSenderLabId() {
+    return senderLabId;
+  }
+
+  public void setSenderLabId(Long senderLabId) {
+    this.senderLabId = senderLabId;
+  }
+
+  public Long getRecipientGroupId() {
+    return recipientGroupId;
+  }
+
+  public void setRecipientGroupId(Long recipientGroupId) {
+    this.recipientGroupId = recipientGroupId;
+  }
+
+  public Boolean isReceived() {
+    return received;
+  }
+
+  public void setReceived(Boolean received) {
+    this.received = received;
+  }
+
+  public Boolean isReceiptQcPassed() {
+    return receiptQcPassed;
+  }
+
+  public void setReceiptQcPassed(Boolean receiptQcPassed) {
+    this.receiptQcPassed = receiptQcPassed;
+  }
+
+  public String getReceiptQcNote() {
+    return receiptQcNote;
+  }
+
+  public void setReceiptQcNote(String receiptQcNote) {
+    this.receiptQcNote = receiptQcNote;
   }
 
   public String getSampleBoxPositionLabel() {

@@ -7,7 +7,6 @@ import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -15,7 +14,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
-import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
@@ -61,24 +60,11 @@ public class ValidationUtils {
     }
   }
 
-  public static void validateDistributionFields(boolean isDistributed, Date distributionDate, String distributionRecipient, Box box,
-      Collection<ValidationError> errors) {
-    if (isDistributed) {
-      if (distributionDate == null)
-        errors.add(new ValidationError("distributionDate", "Distribution date must be recorded for distributed item"));
-      if (isStringEmptyOrNull(distributionRecipient))
-        errors.add(new ValidationError("distributionRecipient", "Distribution recipient must be recorded for distributed item"));
-    } else {
-      if (distributionDate != null)
-        errors.add(new ValidationError("distributionDate", "Distribution date should be empty since item is not distributed"));
-      if (!isStringEmptyOrNull(distributionRecipient))
-        errors.add(new ValidationError("distributionRecipient", "Distribution recipient should be empty since item is not distributed"));
+  public static void validateUnboxableFields(Boxable item, Collection<ValidationError> errors) {
+    if (item.getBox() != null) {
+      if (item.isDiscarded()) errors.add(new ValidationError("Discarded item cannot be added to a box"));
+      if (item.getDistributionTransfer() != null) errors.add(new ValidationError("Distributed item cannot be added to a box"));
     }
-  }
-  
-  public static void validateUnboxableFields(boolean discarded, boolean distributed, Box box, Collection<ValidationError> errors) {
-    if (discarded && box != null) errors.add(new ValidationError("box", "Discarded item cannot be added to a box"));
-    if (distributed && box != null) errors.add(new ValidationError("box", "Distributed item cannot be added to a box"));
   }
 
   public static void validateUrl(String fieldName, String maybeUrl, boolean allowEmptyUrl, Collection<ValidationError> errors) {

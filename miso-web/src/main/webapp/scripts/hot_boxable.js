@@ -37,7 +37,7 @@ HotTarget.boxable = (function() {
     };
     return col;
   };
-  
+
   var isTargetIdentity = function(config) {
     return config && config.targetSampleClass && config.targetSampleClass.alias == 'Identity';
   }
@@ -95,9 +95,9 @@ HotTarget.boxable = (function() {
             pack: function(obj, flat, errorHandler) {
               // search field only
             },
-            depends: ['discarded', 'distributed'],
+            depends: 'discarded',
             update: function(obj, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-              if ((flatProperty === 'discarded' && value == 'True') || (flatProperty == 'distributed' && value == 'Sent Out')) {
+              if (flatProperty === 'discarded' && value == 'True') {
                 setData(null);
                 setReadOnly(true);
               } else {
@@ -131,7 +131,7 @@ HotTarget.boxable = (function() {
                 obj.box.id = null;
               }
             },
-            depends: ['boxSearch', 'distributed', 'discarded'],
+            depends: ['boxSearch', 'discarded'],
             update: function(obj, flat, flatProperty, value, setReadOnly, setOptions, setData) {
               var applyChanges = function(source, autoSelect) {
                 setOptions({
@@ -144,7 +144,7 @@ HotTarget.boxable = (function() {
                 applyChanges([''], false);
                 return;
               }
-              if ((flatProperty === 'discarded') || (flatProperty === 'distributed')) {
+              if (flatProperty === 'discarded') {
                 applyChanges([''], true);
                 return;
               }
@@ -237,94 +237,7 @@ HotTarget.boxable = (function() {
                 });
               }
             }
-          }, makeDiscardedColumn(),
-          // Distribution to collaborator or outside destination
-          {
-            header: 'Distributed',
-            data: 'distributed',
-            type: 'dropdown',
-            trimDropdown: false,
-            source: ['Sent Out', 'No'],
-            include: config.pageMode == 'edit' && (!Constants.isDetailedSample || !isTargetIdentity(config)),
-            unpack: function(obj, flat, setCellMeta) {
-              if (obj.distributed === true) {
-                flat.distributed = 'Sent Out';
-              } else {
-                flat.distributed = 'No';
-              }
-            },
-            pack: function(obj, flat, errorHandler) {
-              if (flat.distributed === 'Sent Out') {
-                obj.distributed = true;
-              } else {
-                obj.distributed = false;
-              }
-            }
-          }, {
-            header: 'Distribution Date',
-            data: 'distributionDate',
-            type: 'date',
-            dateFormat: 'YYYY-MM-DD',
-            datePickerConfig: {
-              firstDay: 0,
-              numberOfMonths: 1
-            },
-            allowEmpty: true,
-            include: config.pageMode == 'edit' && (!Constants.isDetailedSample || !isTargetIdentity(config)),
-            depends: 'distributed',
-            update: function(obj, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-              if (value === 'Sent Out') {
-                setReadOnly(false);
-                setOptions({
-                  required: true,
-                  validator: HotUtils.validator.requiredTextNoSpecialChars
-                });
-              } else {
-                setReadOnly(true);
-                setOptions({
-                  validator: HotUtils.validator.requiredEmpty
-                });
-                setData(null);
-              }
-            },
-            unpack: function(obj, flat, setCellMeta) {
-              if (obj.distributionDate) {
-                flat.distributionDate = Utils.valOrNull(obj.distributionDate);
-              }
-            },
-            pack: function(obj, flat, errorHandler) {
-              obj.distributionDate = flat.distributionDate;
-            }
-          }, {
-            header: 'Distribution Recipient',
-            data: 'distributionRecipient',
-            type: 'text',
-            include: config.pageMode == 'edit' && (!Constants.isDetailedSample || !isTargetIdentity(config)),
-            depends: 'distributed',
-            update: function(obj, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-              if (value === 'Sent Out') {
-                setOptions({
-                  required: true,
-                  validator: HotUtils.validator.requiredTextNoSpecialChars
-                });
-                setReadOnly(false);
-              } else {
-                setOptions({
-                  validator: HotUtils.validator.requiredEmpty
-                });
-                setData(null);
-                setReadOnly(true);
-              }
-            },
-            unpack: function(obj, flat, setCellMeta) {
-              if (obj.distributionRecipient) {
-                flat.distributionRecipient = Utils.valOrNull(obj.distributionRecipient);
-              }
-            },
-            pack: function(obj, flat, errorHandler) {
-              obj.distributionRecipient = flat.distributionRecipient;
-            }
-          }];
+          }, makeDiscardedColumn()];
     },
     getCustomActions: function(table) {
       return [{

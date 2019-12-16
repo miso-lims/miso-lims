@@ -116,16 +116,15 @@ public class LibraryTemplateRestController extends RestController {
   
   @GetMapping(value = "/dt", produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<LibraryTemplateDto> getLibraryTemplates(HttpServletRequest request, HttpServletResponse response,
-      UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser);
+  public DataTablesResponseDto<LibraryTemplateDto> getLibraryTemplates(HttpServletRequest request) throws IOException {
+    return jQueryBackend.get(request, advancedSearchParser);
   }
 
   @GetMapping(value = "/dt/project/{id}", produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<LibraryTemplateDto> getDTLibraryTemplatesByProject(@PathVariable("id") Long id, HttpServletRequest request,
-      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.project(id));
+  public DataTablesResponseDto<LibraryTemplateDto> getDTLibraryTemplatesByProject(@PathVariable("id") Long id, HttpServletRequest request)
+      throws IOException {
+    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.project(id));
   }
 
   @PostMapping(value = "/bulk-delete")

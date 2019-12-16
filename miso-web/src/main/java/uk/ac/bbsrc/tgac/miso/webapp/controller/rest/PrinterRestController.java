@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
@@ -25,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -230,9 +228,8 @@ public class PrinterRestController extends RestController {
 
   @GetMapping(value = "dt", produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<PrinterDto> dataTable(HttpServletRequest request,
-      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser);
+  public DataTablesResponseDto<PrinterDto> dataTable(HttpServletRequest request) throws IOException {
+    return jQueryBackend.get(request, advancedSearchParser);
   }
 
   @DeleteMapping(headers = { "Content-type=application/json" })

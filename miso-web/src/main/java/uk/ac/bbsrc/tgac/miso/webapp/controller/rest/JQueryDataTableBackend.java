@@ -11,13 +11,11 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -30,8 +28,8 @@ public abstract class JQueryDataTableBackend<Model, Dto> {
 
   protected abstract Dto asDto(Model model);
 
-  public DataTablesResponseDto<Dto> get(HttpServletRequest request, HttpServletResponse response,
-      UriComponentsBuilder uriBuilder, AdvancedSearchParser advancedSearchParser, PaginationFilter... filters) throws IOException {
+  public DataTablesResponseDto<Dto> get(HttpServletRequest request, AdvancedSearchParser advancedSearchParser, PaginationFilter... filters)
+      throws IOException {
     if (request.getParameterMap().size() > 0) {
       long numItems = getSource().count(filters);
       // get request params from DataTables

@@ -3,6 +3,9 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import com.eaglegenomics.simlims.core.User;
@@ -15,25 +18,46 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryAliquotBoxPositio
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferItem;
 
 /**
  * This interface simply describes an object that can be placed into a box. i.e. Sample, Library
  * 
  */
-public interface Boxable extends Nameable, Barcodable, Distributable, Serializable {
+public interface Boxable extends Nameable, Barcodable, Serializable {
 
   public enum EntityType {
-    SAMPLE(SampleImpl.class, SampleBoxPosition::new),
-    LIBRARY(LibraryImpl.class, LibraryBoxPosition::new),
-    LIBRARY_ALIQUOT(LibraryAliquot.class, LibraryAliquotBoxPosition::new),
-    POOL(PoolImpl.class, PoolBoxPosition::new);
+    SAMPLE("Sample", SampleImpl.class, SampleBoxPosition::new), //
+    LIBRARY("Library", LibraryImpl.class, LibraryBoxPosition::new), //
+    LIBRARY_ALIQUOT("Library Aliquot", LibraryAliquot.class, LibraryAliquotBoxPosition::new), //
+    POOL("Pool", PoolImpl.class, PoolBoxPosition::new); //
 
+    private static final Map<String, EntityType> lookup;
+
+    static {
+      Map<String, EntityType> map = new HashMap<>();
+      for (EntityType type : EntityType.values()) {
+        map.put(type.getLabel(), type);
+      }
+      lookup = map;
+    }
+
+    private final String label;
     private final Class<? extends Boxable> persistClass;
     private final Supplier<? extends AbstractBoxPosition> positionConstructor;
 
-    private EntityType(Class<? extends Boxable> persistClass, Supplier<? extends AbstractBoxPosition> positionConstructor) {
+    private EntityType(String label, Class<? extends Boxable> persistClass, Supplier<? extends AbstractBoxPosition> positionConstructor) {
+      this.label = label;
       this.persistClass = persistClass;
       this.positionConstructor = positionConstructor;
+    }
+
+    public static EntityType get(String label) {
+      return lookup.get(label);
+    }
+
+    public String getLabel() {
+      return label;
     }
 
     public Class<? extends Boxable> getPersistClass() {
@@ -110,5 +134,19 @@ public interface Boxable extends Nameable, Barcodable, Distributable, Serializab
    * Remove Box and position information from this Boxable
    */
   public void removeFromBox();
+
+  public List<? extends TransferItem<?>> getTransfers();
+
+  public default TransferItem<?> getReceiptTransfer() {
+    return getTransfers().stream()
+        .filter(transferItem -> transferItem.getTransfer().getSenderLab() != null)
+        .findFirst().orElse(null);
+  }
+
+  public default TransferItem<?> getDistributionTransfer() {
+    return getTransfers().stream()
+        .filter(transferItem -> transferItem.getTransfer().getRecipient() != null)
+        .findFirst().orElse(null);
+  }
 
 }

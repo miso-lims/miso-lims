@@ -35,6 +35,7 @@
         <a href="<c:url value="/miso/pools"/>">Pools</a>
         <a href="<c:url value="/miso/worksets"/>">Worksets</a>
         <a href="<c:url value="/miso/boxes"/>">Boxes</a>
+        <a href="<c:url value="/miso/transfer/list"/>"><c:choose><c:when test="${pendingTransfers > 0}"><strong>Transfers (${pendingTransfers})</strong></c:when><c:otherwise>Transfers</c:otherwise></c:choose></a>
     </div>
 
     <h2>Instrument Runs</h2>
@@ -85,6 +86,8 @@
       <a href="<c:url value="/miso/instrumentmodel/list"/>">Instrument Models</a>
       <a href="<c:url value="/miso/boxsize/list"/>">Box Sizes</a>
       <a href="<c:url value="/miso/boxuse/list"/>">Box Uses</a>
+      <a href="<c:url value="/miso/institute/list"/>">Institutes</a>
+      <a href="<c:url value="/miso/lab/list"/>">Labs</a>
       <a href="<c:url value="/miso/arraymodel/list"/>">Array Models</a>
       <a href="<c:url value="/miso/partitionqctype/list"/>">Partition QC Types</a>
       <a href="<c:url value="/miso/referencegenome/list"/>">Reference Genomes</a>
@@ -103,8 +106,6 @@
         <a href="<c:url value="/miso/tissuepiecetype/list"/>">Tissue Piece Types</a>
         <a href="<c:url value="/miso/samplepurpose/list"/>">Sample Purposes</a>
         <a href="<c:url value="/miso/subproject/list"/>">Subprojects</a>
-        <a href="<c:url value="/miso/institute/list"/>">Institutes</a>
-        <a href="<c:url value="/miso/lab/list"/>">Labs</a>
         <a href="<c:url value="/miso/stain/list"/>">Stains</a>
         <a href="<c:url value="/miso/staincategory/list"/>">Stain Categories</a>
         <a href="<c:url value="/miso/detailedqcstatus/list"/>">Detailed QC Statuses</a>

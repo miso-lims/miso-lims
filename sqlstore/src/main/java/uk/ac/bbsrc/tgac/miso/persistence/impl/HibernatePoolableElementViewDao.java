@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -213,4 +214,36 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
             Restrictions.and(Restrictions.eq("location6.locationUnit", LocationUnit.FREEZER),
                 Restrictions.ilike("location6.alias", freezer, MatchMode.START))));
   }
+
+  @Override
+  public void restrictPaginationByDate(Criteria criteria, Date start, Date end, DateType type, Consumer<String> errorHandler) {
+    if (type == DateType.RECEIVE) {
+      criteria.createAlias("transfers", "transferItem")
+          .createAlias("transferItem.transfer", "transfer")
+          .add(Restrictions.isNotNull("transfer.senderLab"))
+          .add(Restrictions.between("transfer.transferDate", start, end));
+    } else if (type == DateType.DISTRIBUTED) {
+      criteria.createAlias("transfers", "transferItem")
+          .createAlias("transferItem.transfer", "transfer")
+          .add(Restrictions.isNotNull("transfer.recipient"))
+          .add(Restrictions.between("transfer.transferDate", start, end));
+    } else {
+      HibernatePaginatedDataSource.super.restrictPaginationByDate(criteria, start, end, type, errorHandler);
+    }
+  }
+
+  @Override
+  public void restrictPaginationByDistributed(Criteria criteria, Consumer<String> errorHandler) {
+    criteria.createAlias("transfers", "transferItem")
+        .createAlias("transferItem.transfer", "transfer")
+        .add(Restrictions.isNotNull("transfer.recipient"));
+  }
+
+  @Override
+  public void restrictPaginationByDistributionRecipient(Criteria criteria, String recipient, Consumer<String> errorHandler) {
+    criteria.createAlias("transfers", "transferItem")
+        .createAlias("transferItem.transfer", "transfer")
+        .add(Restrictions.ilike("transfer.recipient", recipient, MatchMode.ANYWHERE));
+  }
+
 }

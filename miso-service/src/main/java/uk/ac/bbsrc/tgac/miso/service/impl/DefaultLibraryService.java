@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -40,6 +41,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
@@ -55,6 +58,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.LibrarySpikeInService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryStrategyService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.core.service.TransferService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
@@ -110,6 +114,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   private SampleStore sampleStore;
   @Autowired
   private FileAttachmentService fileAttachmentService;
+  @Autowired
+  private TransferService transferService;
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
 
@@ -198,6 +204,20 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     long savedId = save(library, true).getId();
     sampleStore.update(library.getParent());
     boxService.updateBoxableLocation(library);
+    if (!library.getTransfers().isEmpty()) {
+      TransferLibrary transferLibrary = library.getTransfers().iterator().next();
+      Transfer transfer = transferLibrary.getTransfer();
+      List<Transfer> existingTransfers = transferService.listByProperties(transfer.getSenderLab(), transfer.getRecipientGroup(),
+          library.getSample().getProject(), transfer.getTransferDate());
+      Transfer existingTransfer = existingTransfers.stream().max(Comparator.comparing(Transfer::getCreationTime)).orElse(null);
+      if (existingTransfer != null) {
+        existingTransfer.getLibraryTransfers().add(transferLibrary);
+        transferLibrary.setTransfer(existingTransfer);
+        transferService.update(existingTransfer);
+      } else {
+        transferService.create(transfer);
+      }
+    }
     return savedId;
   }
 
@@ -442,11 +462,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     target.setDiscarded(source.isDiscarded());
     target.setCreationDate(source.getCreationDate());
     target.setInitialVolume(source.getInitialVolume());
-    if (source.isDiscarded() || source.isDistributed()) {
-      target.setVolume(BigDecimal.ZERO);
-    } else {
-      target.setVolume(source.getVolume());
-    }
+    target.setVolume(source.getVolume());
     target.setVolumeUnits(target.getVolume() == null ? null : source.getVolumeUnits());
     target.setVolumeUsed(source.getVolumeUsed());
     target.setNgUsed(source.getNgUsed());
@@ -462,7 +478,6 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     } else {
       target.setKitDescriptor(null);
     }
-    target.setReceivedDate(source.getReceivedDate());
     target.setSpikeIn(source.getSpikeIn());
     if (target.getSpikeIn() == null) {
       target.setSpikeInDilutionFactor(null);
@@ -471,9 +486,6 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
       target.setSpikeInDilutionFactor(source.getSpikeInDilutionFactor());
       target.setSpikeInVolume(source.getSpikeInVolume());
     }
-    target.setDistributed(source.isDistributed());
-    target.setDistributionDate(source.getDistributionDate());
-    target.setDistributionRecipient(source.getDistributionRecipient());
     target.setLocationBarcode(source.getLocationBarcode());
     target.setUmis(source.getUmis());
 
@@ -494,8 +506,9 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   }
 
   private void maybeRemoveFromBox(Library library) {
-    if (library.isDiscarded() || library.isDistributed()) {
+    if (library.isDiscarded() || library.getDistributionTransfer() != null) {
       library.setBoxPosition(null);
+      library.setVolume(BigDecimal.ZERO);
     }
   }
 
@@ -505,9 +518,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     validateConcentrationUnits(library.getConcentration(), library.getConcentrationUnits(), errors);
     validateVolumeUnits(library.getVolume(), library.getVolumeUnits(), errors);
     validateBarcodeUniqueness(library, beforeChange, libraryDao::getByBarcode, errors, "library");
-    validateDistributionFields(library.isDistributed(), library.getDistributionDate(), library.getDistributionRecipient(), library.getBox(),
-        errors);
-    validateUnboxableFields(library.isDiscarded(), library.isDistributed(), library.getBox(), errors);
+    validateUnboxableFields(library, errors);
     if (isDetailedLibrary(library) && beforeChange != null) {
       validateTargetedSequencing(((DetailedLibrary) library).getLibraryDesignCode(), beforeChange.getLibraryAliquots(), errors);
     }

@@ -95,6 +95,7 @@ public class ListTablesIT extends AbstractIT {
     tabs.put(ListTarget.WORKSETS, worksetsTabs);
     tabs.put(ListTarget.STORAGE_LOCATIONS, storageLocationTabs);
     tabs.put(ListTarget.POOL_ORDERS, Sets.newHashSet(Tabs.OUTSTANDING, Tabs.FULFILLED, Tabs.DRAFT));
+    tabs.put(ListTarget.TRANSFERS, Sets.newHashSet(Tabs.PENDING, Tabs.RECEIPT, Tabs.INTERNAL, Tabs.DISTRIBUTION));
     tabsForTarget = Collections.unmodifiableMap(tabs);
   }
 
@@ -115,6 +116,7 @@ public class ListTablesIT extends AbstractIT {
     preferredTab.put(ListTarget.KITS, Tabs.LIBRARY);
     preferredTab.put(ListTarget.WORKSETS, Tabs.MINE);
     preferredTab.put(ListTarget.POOL_ORDERS, Tabs.OUTSTANDING);
+    preferredTab.put(ListTarget.TRANSFERS, Tabs.RECEIPT);
     sortOnTab = Collections.unmodifiableMap(preferredTab);
   }
 
@@ -712,6 +714,17 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListSampleClassesColumnSort() throws Exception {
     testColumnsSort(ListTarget.SAMPLE_CLASSES);
+  }
+
+  @Test
+  public void testListTransfersSetup() throws Exception {
+    testTabbedPageSetup(ListTarget.TRANSFERS, Sets.newHashSet(Columns.ID, Columns.ITEMS, Columns.SENDER, Columns.RECIPIENT,
+        Columns.TRANSFER_DATE, Columns.RECEIVED, Columns.QC_PASSED));
+  }
+
+  @Test
+  public void testListTransfersColumnSort() throws Exception {
+    testTabbedColumnsSort(ListTarget.TRANSFERS);
   }
 
   private void testPageSetup(String listTarget, Set<String> targetColumns) {

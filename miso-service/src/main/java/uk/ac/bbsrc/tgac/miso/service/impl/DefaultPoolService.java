@@ -222,17 +222,15 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
 
   @Override
   public long update(Pool pool) throws IOException {
-    if (pool.isDiscarded()) {
-      pool.setVolume(BigDecimal.ZERO);
-    }
+    Pool managed = poolStore.get(pool.getId());
+    maybeRemoveFromBox(pool);
+    boxService.throwIfBoxPositionIsFilled(pool);
     if (pool.getConcentration() == null) {
       pool.setConcentrationUnits(null);
     }
     if (pool.getVolume() == null) {
       pool.setVolumeUnits(null);
     }
-    Pool managed = poolStore.get(pool.getId());
-    boxService.throwIfBoxPositionIsFilled(pool);
     validateChange(pool, managed);
     managed.setAlias(pool.getAlias());
     managed.setConcentration(pool.getConcentration());
@@ -243,15 +241,8 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     managed.setQcPassed(pool.getQcPassed());
     managed.setDiscarded(pool.isDiscarded());
     managed.setCreationDate(pool.getCreationDate());
-    if (pool.isDiscarded() || pool.isDistributed()) {
-      managed.setVolume(BigDecimal.ZERO);
-    } else {
-      managed.setVolume(pool.getVolume());
-    }
+    managed.setVolume(pool.getVolume());
     managed.setVolumeUnits(pool.getVolume() == null ? null : pool.getVolumeUnits());
-    managed.setDistributed(pool.isDistributed());
-    managed.setDistributionDate(pool.getDistributionDate());
-    managed.setDistributionRecipient(pool.getDistributionRecipient());
 
     Set<String> originalItems = extractAliquotNames(managed.getPoolContents());
     loadPoolElements(pool, managed);
@@ -280,6 +271,13 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     long savedId = poolStore.save(managed);
     boxService.updateBoxableLocation(pool);
     return savedId;
+  }
+
+  private void maybeRemoveFromBox(Pool pool) {
+    if (pool.isDiscarded() || pool.getDistributionTransfer() != null) {
+      pool.setBoxPosition(null);
+      pool.setVolume(BigDecimal.ZERO);
+    }
   }
 
   private void refreshPoolElements(Pool pool) throws IOException {
@@ -353,6 +351,8 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     validateConcentrationUnits(pool.getConcentration(), pool.getConcentrationUnits(), errors);
     validateVolumeUnits(pool.getVolume(), pool.getVolumeUnits(), errors);
     validateBarcodeUniqueness(pool, beforeChange, poolStore::getByBarcode, errors, "pool");
+    validateUnboxableFields(pool, errors);
+
     if (strictPools && !pool.isMergeChild()) validateIndices(pool, beforeChange, errors);
     //If this is a new pool, we don't have to worry about syncing to pool orders: either it's irrelevant, or a guarantee
     List<PoolOrder> potentialPoolOrders = beforeChange == null? null: poolOrderService.getAllByPoolId(pool.getId());

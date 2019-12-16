@@ -48,6 +48,11 @@ public class SampleDto extends AbstractBoxableDto {
   private String locationLabel;
   private String sampleType;
   private String receivedDate;
+  private Long senderLabId;
+  private Long recipientGroupId;
+  private Boolean received;
+  private Boolean receiptQcPassed;
+  private String receiptQcNote;
   private Boolean qcPassed;
   private String alias;
   private Long projectId;
@@ -69,9 +74,6 @@ public class SampleDto extends AbstractBoxableDto {
   private String qcDv200;
   private String qcRin;
   private List<QcDto> qcs;
-  private boolean distributed;
-  private String distributionDate;
-  private String distributionRecipient;
   private String requisitionId;
 
   public Long getId() {
@@ -146,6 +148,46 @@ public class SampleDto extends AbstractBoxableDto {
 
   public void setReceivedDate(String receivedDate) {
     this.receivedDate = receivedDate;
+  }
+
+  public Long getSenderLabId() {
+    return senderLabId;
+  }
+
+  public void setSenderLabId(Long senderLabId) {
+    this.senderLabId = senderLabId;
+  }
+
+  public Long getRecipientGroupId() {
+    return recipientGroupId;
+  }
+
+  public void setRecipientGroupId(Long recipientGroupId) {
+    this.recipientGroupId = recipientGroupId;
+  }
+
+  public Boolean isReceived() {
+    return received;
+  }
+
+  public void setReceived(Boolean received) {
+    this.received = received;
+  }
+
+  public Boolean isReceiptQcPassed() {
+    return receiptQcPassed;
+  }
+
+  public void setReceiptQcPassed(Boolean receiptQcPassed) {
+    this.receiptQcPassed = receiptQcPassed;
+  }
+
+  public String getReceiptQcNote() {
+    return receiptQcNote;
+  }
+
+  public void setReceiptQcNote(String receiptQcNote) {
+    this.receiptQcNote = receiptQcNote;
   }
 
   public Boolean getQcPassed() {
@@ -301,30 +343,6 @@ public class SampleDto extends AbstractBoxableDto {
 
   public void setConcentrationUnits(ConcentrationUnit concentrationUnits) {
     this.concentrationUnits = concentrationUnits;
-  }
-
-  public boolean isDistributed() {
-    return distributed;
-  }
-
-  public void setDistributed(boolean distributed) {
-    this.distributed = distributed;
-  }
-
-  public String getDistributionDate() {
-    return distributionDate;
-  }
-
-  public void setDistributionDate(String distributionDate) {
-    this.distributionDate = distributionDate;
-  }
-
-  public String getDistributionRecipient() {
-    return distributionRecipient;
-  }
-
-  public void setDistributionRecipient(String distributionRecipient) {
-    this.distributionRecipient = distributionRecipient;
   }
 
   public String getRequisitionId() {

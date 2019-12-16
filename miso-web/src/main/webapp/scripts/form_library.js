@@ -315,7 +315,7 @@ FormTarget.library = (function($) {
           type: 'decimal',
           precision: 14,
           scale: 10
-        }, FormUtils.makeUnitsField(object, 'concentration')].concat(FormUtils.makeDistributionFields()).concat([{
+        }, FormUtils.makeUnitsField(object, 'concentration'), {
           title: 'Location',
           data: 'locationBarcode',
           type: 'text',
@@ -379,7 +379,7 @@ FormTarget.library = (function($) {
           type: 'decimal',
           precision: 14,
           scale: 10
-        }])
+        }]
       }, {
         title: 'Details',
         include: config.detailedSample,

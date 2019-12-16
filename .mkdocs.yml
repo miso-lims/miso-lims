@@ -38,20 +38,21 @@ nav:
     - 13. Sequencing Orders: user_manual/sequencing_orders.md
     - 14. Freezers and Rooms: user_manual/freezers_and_rooms.md
     - 15. Boxes: user_manual/boxes.md
-    - 16. Sequencing Containers: user_manual/sequencing_containers.md
-    - 17. Instruments: user_manual/instruments.md
-    - 18. Sequencer Runs: user_manual/sequencer_runs.md
-    - 19. Arrays : user_manual/arrays.md
-    - 20. Array Runs: user_manual/array_runs.md
-    - 21. QCs: user_manual/qcs.md
-    - 22. Notes: user_manual/notes.md
-    - 23. Attachments: user_manual/attachments.md
-    - 24. Deletions: user_manual/deletions.md
-    - 25. Workflows: user_manual/workflows.md
-    - 26. European Nucleotide Archive Support: user_manual/european_nucleotide_archive_support.md
-    - 27. Home Screen Widgets: user_manual/home_screen_widgets.md
-    - 28. Other MISO Tools: user_manual/other_miso_tools.md
-    - 29. Related Software: user_manual/related_software.md
+    - 16. Transfers: user_manual/transfers.md
+    - 17. Sequencing Containers: user_manual/sequencing_containers.md
+    - 18. Instruments: user_manual/instruments.md
+    - 19. Sequencer Runs: user_manual/sequencer_runs.md
+    - 20. Arrays : user_manual/arrays.md
+    - 21. Array Runs: user_manual/array_runs.md
+    - 22. QCs: user_manual/qcs.md
+    - 23. Notes: user_manual/notes.md
+    - 24. Attachments: user_manual/attachments.md
+    - 25. Deletions: user_manual/deletions.md
+    - 26. Workflows: user_manual/workflows.md
+    - 27. European Nucleotide Archive Support: user_manual/european_nucleotide_archive_support.md
+    - 28. Home Screen Widgets: user_manual/home_screen_widgets.md
+    - 29. Other MISO Tools: user_manual/other_miso_tools.md
+    - 30. Related Software: user_manual/related_software.md
   - Developer Guide: developers-manual.md
 
 extra_css:

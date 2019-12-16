@@ -38,7 +38,9 @@ public class PlainSampleITs extends AbstractIT {
 
   private static final Set<String> sampleColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
       SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS, SamColumns.BOX_POSITION, SamColumns.DISCARDED, SamColumns.RECEIVE_DATE,
-      SamColumns.REQUISITION_ID, SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT, SamColumns.QC_PASSED);
+      SamColumns.RECEIVED_FROM, SamColumns.RECEIVED_BY, SamColumns.RECEIPT_CONFIRMED, SamColumns.RECEIPT_QC_PASSED,
+      SamColumns.RECEIPT_QC_NOTE, SamColumns.REQUISITION_ID, SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT,
+      SamColumns.QC_PASSED);
 
   private static final Set<String> libraryColumns = Sets.newHashSet(LibColumns.NAME, LibColumns.SAMPLE_ALIAS, LibColumns.SAMPLE_LOCATION,
       LibColumns.BOX_SEARCH, LibColumns.BOX_ALIAS, LibColumns.BOX_POSITION, LibColumns.DISCARDED, LibColumns.CREATION_DATE,
@@ -89,6 +91,11 @@ public class PlainSampleITs extends AbstractIT {
     attrs.put(SamColumns.ALIAS, "PRO1_S02_1");
     attrs.put(SamColumns.DESCRIPTION, "description");
     attrs.put(SamColumns.RECEIVE_DATE, "2017-10-10");
+    attrs.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    attrs.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    attrs.put(SamColumns.RECEIPT_CONFIRMED, "True");
+    attrs.put(SamColumns.RECEIPT_QC_PASSED, "True");
+    attrs.put(SamColumns.RECEIPT_QC_NOTE, "");
     attrs.put(SamColumns.SAMPLE_TYPE, "TRANSCRIPTOMIC");
     attrs.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
     attrs.put(SamColumns.PROJECT, "PRO1");
@@ -176,6 +183,11 @@ public class PlainSampleITs extends AbstractIT {
     attrs.put(SamColumns.SCIENTIFIC_NAME, "Hank");
     attrs.put(SamColumns.PROJECT, "PRO1");
     attrs.put(LibColumns.RECEIVE_DATE, "2017-11-28");
+    attrs.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    attrs.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    attrs.put(SamColumns.RECEIPT_CONFIRMED, "True");
+    attrs.put(SamColumns.RECEIPT_QC_PASSED, "True");
+    attrs.put(SamColumns.RECEIPT_QC_NOTE, "");
     attrs.put(LibColumns.PLATFORM, "Illumina");
     attrs.put(LibColumns.LIBRARY_TYPE, "Paired End");
     attrs.put(LibColumns.SELECTION, "PCR");

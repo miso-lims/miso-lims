@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +21,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkLibraryAliquotPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkLibraryAliquotPage.LibraryAliquotColumns;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkPoolPage.Columns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 
 public class BulkLibraryAliquotIT extends AbstractIT {
@@ -39,9 +36,6 @@ public class BulkLibraryAliquotIT extends AbstractIT {
 
   private static final String NO_TAR_SEQ = "(None)";
 
-  private static final Set<String> editColumns = Sets.newHashSet(Columns.DISTRIBUTED, Columns.DISTRIBUTION_DATE,
-      Columns.DISTRIBUTION_RECIPIENT);
-
   @Before
   public void setup() {
     loginAdmin();
@@ -53,9 +47,8 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     BulkLibraryAliquotPage page = BulkLibraryAliquotPage.getForEdit(getDriver(), getBaseUrl(), Sets.newHashSet(304L, 305L));
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
-    Set<String> expectedHeadings = Stream.of(columns, editColumns).flatMap(Set::stream).collect(Collectors.toSet());
-    assertEquals(expectedHeadings.size(), headings.size());
-    for (String col : expectedHeadings) {
+    assertEquals(columns.size(), headings.size());
+    for (String col : columns) {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
     }
     assertEquals(2, table.getRowCount());

@@ -3,7 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,9 +44,10 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
   // columns for creating Tissue and everything downstream of it
   private static final Set<String> tissueColumns = Sets.newHashSet(SamColumns.ID_BARCODE, SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS,
-      SamColumns.BOX_POSITION, SamColumns.DISCARDED, SamColumns.RECEIVE_DATE, SamColumns.REQUISITION_ID, SamColumns.IDENTITY_ALIAS,
-      SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER, SamColumns.TIMES_RECEIVED, SamColumns.TUBE_NUMBER,
-      SamColumns.LAB, SamColumns.SECONDARY_ID, SamColumns.TISSUE_MATERIAL, SamColumns.REGION);
+      SamColumns.BOX_POSITION, SamColumns.DISCARDED, SamColumns.RECEIVE_DATE, SamColumns.RECEIVED_FROM, SamColumns.RECEIVED_BY,
+      SamColumns.RECEIPT_CONFIRMED, SamColumns.RECEIPT_QC_PASSED, SamColumns.RECEIPT_QC_NOTE, SamColumns.REQUISITION_ID,
+      SamColumns.IDENTITY_ALIAS, SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER, SamColumns.TIMES_RECEIVED,
+      SamColumns.TUBE_NUMBER, SamColumns.SECONDARY_ID, SamColumns.TISSUE_MATERIAL, SamColumns.REGION);
 
   // columns specific to creating Slides
   private static final Set<String> slideColumns = Sets.newHashSet(SamColumns.SLIDES, SamColumns.DISCARDS, SamColumns.THICKNESS,
@@ -152,14 +153,6 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     table.enterText(SamColumns.TISSUE_TYPE, 0, "Benign");
     assertEquals("B (Benign tumour)", table.getText(SamColumns.TISSUE_TYPE, 0));
 
-    Set<String> labs = table.getDropdownOptions(SamColumns.LAB, 0);
-    assertTrue(labs.size() >= 3); // 2 + (None)
-    assertTrue(labs.contains("Pathology (University Health Network)"));
-    assertTrue(labs.contains("(None)"));
-
-    table.enterText(SamColumns.LAB, 0, "Bio");
-    assertEquals("BioBank (University Health Network)", table.getText(SamColumns.LAB, 0));
-
     Set<String> materials = table.getDropdownOptions(SamColumns.TISSUE_MATERIAL, 0);
     assertTrue(materials.size() >= 4); // 3 + (None)
     assertTrue(materials.contains("FFPE"));
@@ -195,9 +188,14 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getCreatePage(1, null, tissueClassId);
     HandsOnTable table = page.getTable();
 
-    Map<String, String> tissue = new HashMap<>();
+    Map<String, String> tissue = new LinkedHashMap<>();
     tissue.put(SamColumns.DESCRIPTION, "Description");
     tissue.put(SamColumns.RECEIVE_DATE, "2017-07-17");
+    tissue.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    tissue.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    tissue.put(SamColumns.RECEIPT_CONFIRMED, "True");
+    tissue.put(SamColumns.RECEIPT_QC_PASSED, "True");
+    tissue.put(SamColumns.RECEIPT_QC_NOTE, "");
     tissue.put(SamColumns.ID_BARCODE, "101"); // increment
     tissue.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     tissue.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
@@ -209,7 +207,6 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     tissue.put(SamColumns.PASSAGE_NUMBER, "");
     tissue.put(SamColumns.TIMES_RECEIVED, "1");
     tissue.put(SamColumns.TUBE_NUMBER, "1");
-    tissue.put(SamColumns.LAB, "BioBank (University Health Network)");
     tissue.put(SamColumns.SECONDARY_ID, "tube id 1");
     tissue.put(SamColumns.TISSUE_MATERIAL, "FFPE");
     tissue.put(SamColumns.REGION, "Medulla oblongata");
@@ -241,9 +238,14 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getCreatePage(1, projectId, tissueClassId);
     HandsOnTable table = page.getTable();
 
-    Map<String, String> tissue = new HashMap<>();
+    Map<String, String> tissue = new LinkedHashMap<>();
     tissue.put(SamColumns.DESCRIPTION, "Description");
     tissue.put(SamColumns.RECEIVE_DATE, "2017-07-17");
+    tissue.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    tissue.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    tissue.put(SamColumns.RECEIPT_CONFIRMED, "True");
+    tissue.put(SamColumns.RECEIPT_QC_PASSED, "True");
+    tissue.put(SamColumns.RECEIPT_QC_NOTE, "");
     tissue.put(SamColumns.ID_BARCODE, "102"); // increment
     tissue.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     tissue.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
@@ -254,7 +256,6 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     tissue.put(SamColumns.PASSAGE_NUMBER, "");
     tissue.put(SamColumns.TIMES_RECEIVED, "1");
     tissue.put(SamColumns.TUBE_NUMBER, "1");
-    tissue.put(SamColumns.LAB, "BioBank (University Health Network)");
     tissue.put(SamColumns.SECONDARY_ID, "tube id 1");
     tissue.put(SamColumns.TISSUE_MATERIAL, "FFPE");
     tissue.put(SamColumns.REGION, "Medulla oblongata");
@@ -286,9 +287,14 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getCreatePage(2, projectId, tissueClassId);
     HandsOnTable table = page.getTable();
 
-    Map<String, String> tissue = new HashMap<>();
+    Map<String, String> tissue = new LinkedHashMap<>();
     tissue.put(SamColumns.DESCRIPTION, "Description");
     tissue.put(SamColumns.RECEIVE_DATE, "2017-07-17");
+    tissue.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    tissue.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    tissue.put(SamColumns.RECEIPT_CONFIRMED, "True");
+    tissue.put(SamColumns.RECEIPT_QC_PASSED, "True");
+    tissue.put(SamColumns.RECEIPT_QC_NOTE, "");
     tissue.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     tissue.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
     tissue.put(SamColumns.GROUP_ID, "1");
@@ -298,7 +304,6 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     tissue.put(SamColumns.PASSAGE_NUMBER, "");
     tissue.put(SamColumns.TIMES_RECEIVED, "1");
     // tube number will be added separately to differentiate the tissues
-    tissue.put(SamColumns.LAB, "BioBank (University Health Network)");
     tissue.put(SamColumns.SECONDARY_ID, "tube id 1");
     tissue.put(SamColumns.TISSUE_MATERIAL, "FFPE");
     tissue.put(SamColumns.REGION, "Medulla oblongata");
@@ -367,9 +372,14 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getCreatePage(1, null, slideClassId);
     HandsOnTable table = page.getTable();
 
-    Map<String, String> slide = new HashMap<>();
+    Map<String, String> slide = new LinkedHashMap<>();
     slide.put(SamColumns.DESCRIPTION, "Description");
     slide.put(SamColumns.RECEIVE_DATE, "2017-07-17");
+    slide.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    slide.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    slide.put(SamColumns.RECEIPT_CONFIRMED, "True");
+    slide.put(SamColumns.RECEIPT_QC_PASSED, "True");
+    slide.put(SamColumns.RECEIPT_QC_NOTE, "");
     slide.put(SamColumns.ID_BARCODE, "103"); // increment
     slide.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     slide.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
@@ -381,7 +391,6 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     slide.put(SamColumns.PASSAGE_NUMBER, "");
     slide.put(SamColumns.TIMES_RECEIVED, "1");
     slide.put(SamColumns.TUBE_NUMBER, "1");
-    slide.put(SamColumns.LAB, "BioBank (University Health Network)");
     slide.put(SamColumns.SECONDARY_ID, "tube id 1");
     slide.put(SamColumns.TISSUE_MATERIAL, "FFPE");
     slide.put(SamColumns.REGION, "Medulla oblongata");
@@ -413,9 +422,14 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getCreatePage(1, projectId, slideClassId);
     HandsOnTable table = page.getTable();
 
-    Map<String, String> slide = new HashMap<>();
+    Map<String, String> slide = new LinkedHashMap<>();
     slide.put(SamColumns.DESCRIPTION, "Description");
     slide.put(SamColumns.RECEIVE_DATE, "2017-07-17");
+    slide.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    slide.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    slide.put(SamColumns.RECEIPT_CONFIRMED, "True");
+    slide.put(SamColumns.RECEIPT_QC_PASSED, "True");
+    slide.put(SamColumns.RECEIPT_QC_NOTE, "");
     slide.put(SamColumns.ID_BARCODE, "104"); // increment
     slide.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     slide.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
@@ -426,7 +440,6 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     slide.put(SamColumns.PASSAGE_NUMBER, "");
     slide.put(SamColumns.TIMES_RECEIVED, "1");
     slide.put(SamColumns.TUBE_NUMBER, "1");
-    slide.put(SamColumns.LAB, "BioBank (University Health Network)");
     slide.put(SamColumns.SECONDARY_ID, "tube id 1");
     slide.put(SamColumns.TISSUE_MATERIAL, "FFPE");
     slide.put(SamColumns.REGION, "Medulla oblongata");
@@ -474,9 +487,14 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getCreatePage(1, null, curlsClassId);
     HandsOnTable table = page.getTable();
 
-    Map<String, String> curls = new HashMap<>();
+    Map<String, String> curls = new LinkedHashMap<>();
     curls.put(SamColumns.DESCRIPTION, "Description");
     curls.put(SamColumns.RECEIVE_DATE, "2017-07-17");
+    curls.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    curls.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    curls.put(SamColumns.RECEIPT_CONFIRMED, "True");
+    curls.put(SamColumns.RECEIPT_QC_PASSED, "True");
+    curls.put(SamColumns.RECEIPT_QC_NOTE, "");
     curls.put(SamColumns.ID_BARCODE, "105"); // increment
     curls.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     curls.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
@@ -489,7 +507,6 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     curls.put(SamColumns.PASSAGE_NUMBER, "");
     curls.put(SamColumns.TIMES_RECEIVED, "1");
     curls.put(SamColumns.TUBE_NUMBER, "1");
-    curls.put(SamColumns.LAB, "BioBank (University Health Network)");
     curls.put(SamColumns.SECONDARY_ID, "tube id 1");
     curls.put(SamColumns.TISSUE_MATERIAL, "FFPE");
     curls.put(SamColumns.REGION, "Medulla oblongata");
@@ -517,9 +534,14 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getCreatePage(1, projectId, curlsClassId);
     HandsOnTable table = page.getTable();
 
-    Map<String, String> curls = new HashMap<>();
+    Map<String, String> curls = new LinkedHashMap<>();
     curls.put(SamColumns.DESCRIPTION, "Description");
     curls.put(SamColumns.RECEIVE_DATE, "2017-07-17");
+    curls.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    curls.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    curls.put(SamColumns.RECEIPT_CONFIRMED, "True");
+    curls.put(SamColumns.RECEIPT_QC_PASSED, "True");
+    curls.put(SamColumns.RECEIPT_QC_NOTE, "");
     curls.put(SamColumns.ID_BARCODE, "106"); // increment
     curls.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     curls.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
@@ -530,7 +552,6 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     curls.put(SamColumns.PASSAGE_NUMBER, "");
     curls.put(SamColumns.TIMES_RECEIVED, "1");
     curls.put(SamColumns.TUBE_NUMBER, "1");
-    curls.put(SamColumns.LAB, "BioBank (University Health Network)");
     curls.put(SamColumns.SECONDARY_ID, "tube id 1");
     curls.put(SamColumns.TISSUE_MATERIAL, "FFPE");
     curls.put(SamColumns.REGION, "Medulla oblongata");
@@ -574,9 +595,14 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getCreatePage(1, null, singleCellClassId);
     HandsOnTable table = page.getTable();
 
-    Map<String, String> singleCell = new HashMap<>();
+    Map<String, String> singleCell = new LinkedHashMap<>();
     singleCell.put(SamColumns.DESCRIPTION, "Description");
     singleCell.put(SamColumns.RECEIVE_DATE, "2017-07-17");
+    singleCell.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    singleCell.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    singleCell.put(SamColumns.RECEIPT_CONFIRMED, "True");
+    singleCell.put(SamColumns.RECEIPT_QC_PASSED, "True");
+    singleCell.put(SamColumns.RECEIPT_QC_NOTE, "");
     singleCell.put(SamColumns.ID_BARCODE, "105");
     singleCell.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     singleCell.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
@@ -589,7 +615,6 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     singleCell.put(SamColumns.PASSAGE_NUMBER, "");
     singleCell.put(SamColumns.TIMES_RECEIVED, "1");
     singleCell.put(SamColumns.TUBE_NUMBER, "1");
-    singleCell.put(SamColumns.LAB, "BioBank (University Health Network)");
     singleCell.put(SamColumns.SECONDARY_ID, "tube id 1");
     singleCell.put(SamColumns.TISSUE_MATERIAL, "FFPE");
     singleCell.put(SamColumns.REGION, "Medulla oblongata");
@@ -646,9 +671,14 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getCreatePage(1, null, gStockClassId);
     HandsOnTable table = page.getTable();
 
-    Map<String, String> gDnaStock = new HashMap<>();
+    Map<String, String> gDnaStock = new LinkedHashMap<>();
     gDnaStock.put(SamColumns.DESCRIPTION, "Description");
     gDnaStock.put(SamColumns.RECEIVE_DATE, "2017-07-17");
+    gDnaStock.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    gDnaStock.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    gDnaStock.put(SamColumns.RECEIPT_CONFIRMED, "True");
+    gDnaStock.put(SamColumns.RECEIPT_QC_PASSED, "True");
+    gDnaStock.put(SamColumns.RECEIPT_QC_NOTE, "");
     gDnaStock.put(SamColumns.ID_BARCODE, "107"); // increment
     gDnaStock.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     gDnaStock.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
@@ -660,7 +690,6 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     gDnaStock.put(SamColumns.PASSAGE_NUMBER, "");
     gDnaStock.put(SamColumns.TIMES_RECEIVED, "1");
     gDnaStock.put(SamColumns.TUBE_NUMBER, "1");
-    gDnaStock.put(SamColumns.LAB, "BioBank (University Health Network)");
     gDnaStock.put(SamColumns.SECONDARY_ID, "tube id 1");
     gDnaStock.put(SamColumns.TISSUE_MATERIAL, "FFPE");
     gDnaStock.put(SamColumns.REGION, "Medulla oblongata");
@@ -691,9 +720,14 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getCreatePage(1, projectId, gStockClassId);
     HandsOnTable table = page.getTable();
 
-    Map<String, String> gDnaStock = new HashMap<>();
+    Map<String, String> gDnaStock = new LinkedHashMap<>();
     gDnaStock.put(SamColumns.DESCRIPTION, "Description");
     gDnaStock.put(SamColumns.RECEIVE_DATE, "2017-07-17");
+    gDnaStock.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    gDnaStock.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    gDnaStock.put(SamColumns.RECEIPT_CONFIRMED, "True");
+    gDnaStock.put(SamColumns.RECEIPT_QC_PASSED, "True");
+    gDnaStock.put(SamColumns.RECEIPT_QC_NOTE, "");
     gDnaStock.put(SamColumns.ID_BARCODE, "108"); // increment
     gDnaStock.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     gDnaStock.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
@@ -704,7 +738,6 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     gDnaStock.put(SamColumns.PASSAGE_NUMBER, "");
     gDnaStock.put(SamColumns.TIMES_RECEIVED, "1");
     gDnaStock.put(SamColumns.TUBE_NUMBER, "1");
-    gDnaStock.put(SamColumns.LAB, "BioBank (University Health Network)");
     gDnaStock.put(SamColumns.SECONDARY_ID, "tube id 1");
     gDnaStock.put(SamColumns.TISSUE_MATERIAL, "FFPE");
     gDnaStock.put(SamColumns.REGION, "Medulla oblongata");
@@ -753,9 +786,14 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getCreatePage(1, null, singleCellStockClassId);
     HandsOnTable table = page.getTable();
 
-    Map<String, String> stock = new HashMap<>();
+    Map<String, String> stock = new LinkedHashMap<>();
     stock.put(SamColumns.DESCRIPTION, "Description");
     stock.put(SamColumns.RECEIVE_DATE, "2017-07-17");
+    stock.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    stock.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    stock.put(SamColumns.RECEIPT_CONFIRMED, "True");
+    stock.put(SamColumns.RECEIPT_QC_PASSED, "True");
+    stock.put(SamColumns.RECEIPT_QC_NOTE, "");
     stock.put(SamColumns.ID_BARCODE, "107"); // increment
     stock.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     stock.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
@@ -767,7 +805,6 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     stock.put(SamColumns.PASSAGE_NUMBER, "");
     stock.put(SamColumns.TIMES_RECEIVED, "1");
     stock.put(SamColumns.TUBE_NUMBER, "1");
-    stock.put(SamColumns.LAB, "BioBank (University Health Network)");
     stock.put(SamColumns.SECONDARY_ID, "tube id 1");
     stock.put(SamColumns.TISSUE_MATERIAL, "FFPE");
     stock.put(SamColumns.REGION, "Medulla oblongata");
@@ -827,9 +864,14 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getCreatePage(1, null, rStockClassId);
     HandsOnTable table = page.getTable();
 
-    Map<String, String> rnaStock = new HashMap<>();
+    Map<String, String> rnaStock = new LinkedHashMap<>();
     rnaStock.put(SamColumns.DESCRIPTION, "Description");
     rnaStock.put(SamColumns.RECEIVE_DATE, "2017-07-17");
+    rnaStock.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    rnaStock.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    rnaStock.put(SamColumns.RECEIPT_CONFIRMED, "True");
+    rnaStock.put(SamColumns.RECEIPT_QC_PASSED, "True");
+    rnaStock.put(SamColumns.RECEIPT_QC_NOTE, "");
     rnaStock.put(SamColumns.ID_BARCODE, "109"); // increment
     rnaStock.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     rnaStock.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
@@ -841,7 +883,6 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     rnaStock.put(SamColumns.PASSAGE_NUMBER, "");
     rnaStock.put(SamColumns.TIMES_RECEIVED, "1");
     rnaStock.put(SamColumns.TUBE_NUMBER, "1");
-    rnaStock.put(SamColumns.LAB, "BioBank (University Health Network)");
     rnaStock.put(SamColumns.SECONDARY_ID, "tube id 1");
     rnaStock.put(SamColumns.TISSUE_MATERIAL, "FFPE");
     rnaStock.put(SamColumns.REGION, "Medulla oblongata");
@@ -876,9 +917,14 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getCreatePage(1, projectId, rStockClassId);
     HandsOnTable table = page.getTable();
 
-    Map<String, String> rnaStock = new HashMap<>();
+    Map<String, String> rnaStock = new LinkedHashMap<>();
     rnaStock.put(SamColumns.DESCRIPTION, "Description");
     rnaStock.put(SamColumns.RECEIVE_DATE, "2017-07-17");
+    rnaStock.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    rnaStock.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    rnaStock.put(SamColumns.RECEIPT_CONFIRMED, "True");
+    rnaStock.put(SamColumns.RECEIPT_QC_PASSED, "True");
+    rnaStock.put(SamColumns.RECEIPT_QC_NOTE, "");
     rnaStock.put(SamColumns.ID_BARCODE, "110"); // increment
     rnaStock.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     rnaStock.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
@@ -889,7 +935,6 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     rnaStock.put(SamColumns.PASSAGE_NUMBER, "");
     rnaStock.put(SamColumns.TIMES_RECEIVED, "1");
     rnaStock.put(SamColumns.TUBE_NUMBER, "1");
-    rnaStock.put(SamColumns.LAB, "BioBank (University Health Network)");
     rnaStock.put(SamColumns.SECONDARY_ID, "tube id 1");
     rnaStock.put(SamColumns.TISSUE_MATERIAL, "FFPE");
     rnaStock.put(SamColumns.REGION, "Medulla oblongata");
@@ -954,9 +999,14 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getCreatePage(1, null, gAliquotClassId);
     HandsOnTable table = page.getTable();
 
-    Map<String, String> gDnaAliquot = new HashMap<>();
+    Map<String, String> gDnaAliquot = new LinkedHashMap<>();
     gDnaAliquot.put(SamColumns.DESCRIPTION, "Description");
     gDnaAliquot.put(SamColumns.RECEIVE_DATE, "2017-07-17");
+    gDnaAliquot.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    gDnaAliquot.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    gDnaAliquot.put(SamColumns.RECEIPT_CONFIRMED, "True");
+    gDnaAliquot.put(SamColumns.RECEIPT_QC_PASSED, "True");
+    gDnaAliquot.put(SamColumns.RECEIPT_QC_NOTE, "");
     gDnaAliquot.put(SamColumns.ID_BARCODE, "111"); // increment
     gDnaAliquot.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     gDnaAliquot.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
@@ -968,7 +1018,6 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     gDnaAliquot.put(SamColumns.PASSAGE_NUMBER, "");
     gDnaAliquot.put(SamColumns.TIMES_RECEIVED, "1");
     gDnaAliquot.put(SamColumns.TUBE_NUMBER, "1");
-    gDnaAliquot.put(SamColumns.LAB, "BioBank (University Health Network)");
     gDnaAliquot.put(SamColumns.SECONDARY_ID, "tube id 1");
     gDnaAliquot.put(SamColumns.TISSUE_MATERIAL, "FFPE");
     gDnaAliquot.put(SamColumns.REGION, "Medulla oblongata");
@@ -1000,9 +1049,14 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getCreatePage(1, projectId, gAliquotClassId);
     HandsOnTable table = page.getTable();
 
-    Map<String, String> gDnaAliquot = new HashMap<>();
+    Map<String, String> gDnaAliquot = new LinkedHashMap<>();
     gDnaAliquot.put(SamColumns.DESCRIPTION, "Description");
     gDnaAliquot.put(SamColumns.RECEIVE_DATE, "2017-07-17");
+    gDnaAliquot.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    gDnaAliquot.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    gDnaAliquot.put(SamColumns.RECEIPT_CONFIRMED, "True");
+    gDnaAliquot.put(SamColumns.RECEIPT_QC_PASSED, "True");
+    gDnaAliquot.put(SamColumns.RECEIPT_QC_NOTE, "");
     gDnaAliquot.put(SamColumns.ID_BARCODE, "112"); // increment
     gDnaAliquot.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     gDnaAliquot.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
@@ -1013,7 +1067,6 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     gDnaAliquot.put(SamColumns.PASSAGE_NUMBER, "");
     gDnaAliquot.put(SamColumns.TIMES_RECEIVED, "1");
     gDnaAliquot.put(SamColumns.TUBE_NUMBER, "1");
-    gDnaAliquot.put(SamColumns.LAB, "BioBank (University Health Network)");
     gDnaAliquot.put(SamColumns.SECONDARY_ID, "tube id 1");
     gDnaAliquot.put(SamColumns.TISSUE_MATERIAL, "FFPE");
     gDnaAliquot.put(SamColumns.REGION, "Medulla oblongata");
@@ -1066,9 +1119,14 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getCreatePage(1, null, singleCellAliquotClassId);
     HandsOnTable table = page.getTable();
 
-    Map<String, String> aliquot = new HashMap<>();
+    Map<String, String> aliquot = new LinkedHashMap<>();
     aliquot.put(SamColumns.DESCRIPTION, "Description");
     aliquot.put(SamColumns.RECEIVE_DATE, "2017-07-17");
+    aliquot.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    aliquot.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    aliquot.put(SamColumns.RECEIPT_CONFIRMED, "True");
+    aliquot.put(SamColumns.RECEIPT_QC_PASSED, "True");
+    aliquot.put(SamColumns.RECEIPT_QC_NOTE, "");
     aliquot.put(SamColumns.ID_BARCODE, "111"); // increment
     aliquot.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     aliquot.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
@@ -1080,7 +1138,6 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     aliquot.put(SamColumns.PASSAGE_NUMBER, "");
     aliquot.put(SamColumns.TIMES_RECEIVED, "1");
     aliquot.put(SamColumns.TUBE_NUMBER, "1");
-    aliquot.put(SamColumns.LAB, "BioBank (University Health Network)");
     aliquot.put(SamColumns.SECONDARY_ID, "tube id 1");
     aliquot.put(SamColumns.TISSUE_MATERIAL, "FFPE");
     aliquot.put(SamColumns.REGION, "Medulla oblongata");
@@ -1130,9 +1187,14 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getCreatePage(1, null, rAliquotClassId);
     HandsOnTable table = page.getTable();
 
-    Map<String, String> rnaAliquot = new HashMap<>();
+    Map<String, String> rnaAliquot = new LinkedHashMap<>();
     rnaAliquot.put(SamColumns.DESCRIPTION, "Description");
     rnaAliquot.put(SamColumns.RECEIVE_DATE, "2017-07-17");
+    rnaAliquot.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    rnaAliquot.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    rnaAliquot.put(SamColumns.RECEIPT_CONFIRMED, "True");
+    rnaAliquot.put(SamColumns.RECEIPT_QC_PASSED, "True");
+    rnaAliquot.put(SamColumns.RECEIPT_QC_NOTE, "");
     rnaAliquot.put(SamColumns.ID_BARCODE, "113"); // increment
     rnaAliquot.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     rnaAliquot.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
@@ -1144,7 +1206,6 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     rnaAliquot.put(SamColumns.PASSAGE_NUMBER, "");
     rnaAliquot.put(SamColumns.TIMES_RECEIVED, "1");
     rnaAliquot.put(SamColumns.TUBE_NUMBER, "1");
-    rnaAliquot.put(SamColumns.LAB, "BioBank (University Health Network)");
     rnaAliquot.put(SamColumns.SECONDARY_ID, "tube id 1");
     rnaAliquot.put(SamColumns.TISSUE_MATERIAL, "FFPE");
     rnaAliquot.put(SamColumns.REGION, "Medulla oblongata");
@@ -1177,9 +1238,14 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getCreatePage(1, projectId, rAliquotClassId);
     HandsOnTable table = page.getTable();
 
-    Map<String, String> rnaAliquot = new HashMap<>();
+    Map<String, String> rnaAliquot = new LinkedHashMap<>();
     rnaAliquot.put(SamColumns.DESCRIPTION, "Description");
     rnaAliquot.put(SamColumns.RECEIVE_DATE, "2017-07-17");
+    rnaAliquot.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    rnaAliquot.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    rnaAliquot.put(SamColumns.RECEIPT_CONFIRMED, "True");
+    rnaAliquot.put(SamColumns.RECEIPT_QC_PASSED, "True");
+    rnaAliquot.put(SamColumns.RECEIPT_QC_NOTE, "");
     rnaAliquot.put(SamColumns.ID_BARCODE, "114"); // increment
     rnaAliquot.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     rnaAliquot.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
@@ -1190,7 +1256,6 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     rnaAliquot.put(SamColumns.PASSAGE_NUMBER, "");
     rnaAliquot.put(SamColumns.TIMES_RECEIVED, "1");
     rnaAliquot.put(SamColumns.TUBE_NUMBER, "1");
-    rnaAliquot.put(SamColumns.LAB, "BioBank (University Health Network)");
     rnaAliquot.put(SamColumns.SECONDARY_ID, "tube id 1");
     rnaAliquot.put(SamColumns.TISSUE_MATERIAL, "FFPE");
     rnaAliquot.put(SamColumns.REGION, "Medulla oblongata");
@@ -1289,7 +1354,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getCreatePage(1, null, identityClassId);
     HandsOnTable table = page.getTable();
 
-    Map<String, String> identity = new HashMap<>();
+    Map<String, String> identity = new LinkedHashMap<>();
     identity.put(SamColumns.ALIAS, "PRO2_1001");
     identity.put(SamColumns.DESCRIPTION, "");
     identity.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
@@ -1320,7 +1385,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     // different project so as not to mess with the SampleNumberPerProject generator
     HandsOnTable table = page.getTable();
 
-    Map<String, String> identity = new HashMap<>();
+    Map<String, String> identity = new LinkedHashMap<>();
     identity.put(SamColumns.ALIAS, "PRO2_1002");
     identity.put(SamColumns.DESCRIPTION, "");
     identity.put(SamColumns.SAMPLE_TYPE, "GENOMIC");

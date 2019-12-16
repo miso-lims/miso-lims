@@ -13,7 +13,6 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.SamColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
@@ -25,22 +24,21 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
       SamColumns.GROUP_DESCRIPTION, SamColumns.CREATION_DATE, SamColumns.QC_STATUS, SamColumns.QC_NOTE);
 
   private static final Set<String> boxableColumns = Sets.newHashSet(SamColumns.ID_BARCODE, SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS,
-      SamColumns.BOX_POSITION, SamColumns.DISCARDED, SamColumns.EFFECTIVE_GROUP_ID, SamColumns.DISTRIBUTED, SamColumns.DISTRIBUTION_DATE,
-      SamColumns.DISTRIBUTION_RECIPIENT);
+      SamColumns.BOX_POSITION, SamColumns.DISCARDED, SamColumns.EFFECTIVE_GROUP_ID);
 
   private static final Set<String> identityColumns = Sets.newHashSet(SamColumns.EXTERNAL_NAME, SamColumns.DONOR_SEX, SamColumns.CONSENT);
 
-  private static final Set<String> tissueColumns = Sets.newHashSet(SamColumns.RECEIVE_DATE, SamColumns.REQUISITION_ID,
+  private static final Set<String> tissueColumns = Sets.newHashSet(SamColumns.REQUISITION_ID,
       SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER, SamColumns.TIMES_RECEIVED, SamColumns.TUBE_NUMBER,
       SamColumns.LAB, SamColumns.SECONDARY_ID, SamColumns.TISSUE_MATERIAL, SamColumns.REGION);
 
-  private static final Set<String> slideColumns = Sets.newHashSet(SamColumns.RECEIVE_DATE, SamColumns.REQUISITION_ID,
-      SamColumns.INITIAL_SLIDES, SamColumns.SLIDES, SamColumns.DISCARDS, SamColumns.THICKNESS, SamColumns.STAIN);
+  private static final Set<String> slideColumns = Sets.newHashSet(SamColumns.REQUISITION_ID, SamColumns.INITIAL_SLIDES, SamColumns.SLIDES,
+      SamColumns.DISCARDS, SamColumns.THICKNESS, SamColumns.STAIN);
 
-  private static final Set<String> curlsColumns = Sets.newHashSet(SamColumns.RECEIVE_DATE, SamColumns.REQUISITION_ID);
+  private static final Set<String> curlsColumns = Sets.newHashSet(SamColumns.REQUISITION_ID);
 
-  private static final Set<String> tissuePieceColumns = Sets.newHashSet(SamColumns.RECEIVE_DATE, SamColumns.REQUISITION_ID,
-      SamColumns.PIECE_TYPE, SamColumns.SLIDES_CONSUMED);
+  private static final Set<String> tissuePieceColumns = Sets.newHashSet(SamColumns.REQUISITION_ID, SamColumns.PIECE_TYPE,
+      SamColumns.SLIDES_CONSUMED);
 
   @Before
   public void setup() {
@@ -181,7 +179,6 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
    Map<String, String> editable = new HashMap<>();
     editable.put(SamColumns.ALIAS, "TEST_0002_Pa_M_13_2-5");
     editable.put(SamColumns.DESCRIPTION, "changed");
-    editable.put(SamColumns.RECEIVE_DATE, "2015-07-17");
     editable.put(SamColumns.ID_BARCODE, "changed"); // increment
     editable.put(SamColumns.SAMPLE_TYPE, "TRANSCRIPTOMIC");
     editable.put(SamColumns.SCIENTIFIC_NAME, "changed");
@@ -221,7 +218,6 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     Map<String, String> editable = new HashMap<>();
     editable.put(SamColumns.ALIAS, "TEST_0002_Pa_M_13_2-2");
     editable.put(SamColumns.DESCRIPTION, "changed description");
-    editable.put(SamColumns.RECEIVE_DATE, "2016-07-17");
     editable.put(SamColumns.ID_BARCODE, "3001"); // increment
     editable.put(SamColumns.SAMPLE_TYPE, "METAGENOMIC");
     editable.put(SamColumns.SCIENTIFIC_NAME, "Mus musculus");
@@ -258,7 +254,6 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     Map<String, String> empty = new HashMap<>();
     empty.put(SamColumns.ALIAS, "TEST_0002_Pa_M_13_2-2");
     empty.put(SamColumns.DESCRIPTION, "");
-    empty.put(SamColumns.RECEIVE_DATE, "");
     empty.put(SamColumns.ID_BARCODE, ""); // increment
     empty.put(SamColumns.SAMPLE_TYPE, "METAGENOMIC");
     empty.put(SamColumns.SCIENTIFIC_NAME, "Mus musculus");
@@ -288,25 +283,6 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
   }
 
   @Test
-  public void testDistributeTissueEffects() throws Exception {
-    // Goal: ensure the editable fields change based on whether a sample is distributed
-    BulkSamplePage page = getEditPage(Arrays.asList(205L));
-    HandsOnTable table = page.getTable();
-
-    assertEquals(table.getText(SamColumns.DISTRIBUTED, 0), "No");
-    assertFalse(LimsUtils.isStringEmptyOrNull(table.getText(SamColumns.BOX_ALIAS, 0)));
-    assertFalse(LimsUtils.isStringEmptyOrNull(table.getText(SamColumns.BOX_POSITION, 0)));
-    assertFalse(table.isWritable(SamColumns.DISTRIBUTION_DATE, 0));
-    assertFalse(table.isWritable(SamColumns.DISTRIBUTION_RECIPIENT, 0));
-
-    table.enterText(SamColumns.DISTRIBUTED, 0, "Sent Out");
-    assertTrue(LimsUtils.isStringEmptyOrNull(table.getText(SamColumns.BOX_ALIAS, 0)));
-    assertTrue(LimsUtils.isStringEmptyOrNull(table.getText(SamColumns.BOX_POSITION, 0)));
-    assertTrue(table.isWritable(SamColumns.DISTRIBUTION_DATE, 0));
-    assertTrue(table.isWritable(SamColumns.DISTRIBUTION_RECIPIENT, 0));
-  }
-
-  @Test
   public void testEditSlideSetup() throws Exception {
     // Goal: ensure all expected fields are present, and no extra
     Set<String> expectedHeadings = Sets.newHashSet();
@@ -333,7 +309,6 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     Map<String, String> editable = new HashMap<>();
     editable.put(SamColumns.ALIAS, "TEST_0002_Pa_M_13_2-2_SL05");
     editable.put(SamColumns.DESCRIPTION, "changed");
-    editable.put(SamColumns.RECEIVE_DATE, "2015-06-17");
     editable.put(SamColumns.ID_BARCODE, "changed"); // increment
     editable.put(SamColumns.SAMPLE_TYPE, "TRANSCRIPTOMIC");
     editable.put(SamColumns.SCIENTIFIC_NAME, "changed");
@@ -365,7 +340,6 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     Map<String, String> editable = new HashMap<>();
     editable.put(SamColumns.ALIAS, "TEST_0002_Pa_M_13_2-2_SL01");
     editable.put(SamColumns.DESCRIPTION, "different");
-    editable.put(SamColumns.RECEIVE_DATE, "2017-06-17");
     editable.put(SamColumns.ID_BARCODE, "4003"); // increment
     editable.put(SamColumns.SAMPLE_TYPE, "METAGENOMIC");
     editable.put(SamColumns.SCIENTIFIC_NAME, "Panthera tigris altaica");
@@ -392,7 +366,6 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     Map<String, String> empty = new HashMap<>();
     empty.put(SamColumns.ALIAS, "TEST_0002_Pa_M_13_2-2_SL01");
     empty.put(SamColumns.DESCRIPTION, "");
-    empty.put(SamColumns.RECEIVE_DATE, "");
     empty.put(SamColumns.ID_BARCODE, ""); // increment
     empty.put(SamColumns.SAMPLE_TYPE, "METAGENOMIC");
     empty.put(SamColumns.SCIENTIFIC_NAME, "Panthera tigris altaica");
@@ -440,7 +413,6 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     Map<String, String> editable = new HashMap<>();
     editable.put(SamColumns.ALIAS, "TEST_0002_Pa_M_13_2-2_C05");
     editable.put(SamColumns.DESCRIPTION, "changed");
-    editable.put(SamColumns.RECEIVE_DATE, "2015-06-17");
     editable.put(SamColumns.ID_BARCODE, "changed"); // increment
     editable.put(SamColumns.SAMPLE_TYPE, "TRANSCRIPTOMIC");
     editable.put(SamColumns.SCIENTIFIC_NAME, "changed");
@@ -468,7 +440,6 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     Map<String, String> editable = new HashMap<>();
     editable.put(SamColumns.ALIAS, "TEST_0002_Pa_M_13_2-2_C01");
     editable.put(SamColumns.DESCRIPTION, "different");
-    editable.put(SamColumns.RECEIVE_DATE, "2017-06-17");
     editable.put(SamColumns.ID_BARCODE, "4003"); // increment
     editable.put(SamColumns.SAMPLE_TYPE, "METAGENOMIC");
     editable.put(SamColumns.SCIENTIFIC_NAME, "Rattus rat");
@@ -491,7 +462,6 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     Map<String, String> empty = new HashMap<>();
     empty.put(SamColumns.ALIAS, "TEST_0002_Pa_M_13_2-2_C01");
     empty.put(SamColumns.DESCRIPTION, "");
-    empty.put(SamColumns.RECEIVE_DATE, "");
     empty.put(SamColumns.ID_BARCODE, ""); // increment
     empty.put(SamColumns.SAMPLE_TYPE, "METAGENOMIC");
     empty.put(SamColumns.SCIENTIFIC_NAME, "Rattus rat");

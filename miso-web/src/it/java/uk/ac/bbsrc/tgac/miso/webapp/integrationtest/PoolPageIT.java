@@ -86,9 +86,6 @@ public class PoolPageIT extends AbstractIT {
     fields.put(Field.QC_PASSED, "False");
     fields.put(Field.VOLUME, "12.0");
     fields.put(Field.DISCARDED, Boolean.FALSE.toString());
-    fields.put(Field.DISTRIBUTED, Boolean.FALSE.toString());
-    fields.put(Field.DISTRIBUTION_DATE, null);
-    fields.put(Field.DISTRIBUTION_RECIPIENT, null);
     fields.put(Field.LOCATION, null);
     assertFieldValues("initial values", fields, page1);
 
@@ -98,9 +95,6 @@ public class PoolPageIT extends AbstractIT {
     changes.put(Field.CONCENTRATION, "7.25");
     changes.put(Field.QC_PASSED, "True");
     changes.put(Field.VOLUME, "0.0");
-    changes.put(Field.DISTRIBUTED, Boolean.TRUE.toString());
-    changes.put(Field.DISTRIBUTION_DATE, "2019-04-12");
-    changes.put(Field.DISTRIBUTION_RECIPIENT, "Elsewhere");
     page1.setFields(changes);
 
     fields.putAll(changes);

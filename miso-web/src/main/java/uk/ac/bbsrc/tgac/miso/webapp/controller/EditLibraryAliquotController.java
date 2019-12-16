@@ -27,6 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
@@ -84,6 +85,11 @@ public class EditLibraryAliquotController {
     model.put("aliquotPools",
         pools.stream().map(p -> Dtos.asDto(p, false, false, indexChecker)).collect(Collectors.toList()));
     model.put("aliquotRuns", pools.stream().flatMap(WhineyFunction.flatRethrow(p -> runService.listByPoolId(p.getId()))).map(Dtos::asDto)
+        .collect(Collectors.toList()));
+
+    model.put("aliquotTransfers", aliquot.getTransfers().stream()
+        .map(TransferLibraryAliquot::getTransfer)
+        .map(Dtos::asDto)
         .collect(Collectors.toList()));
 
     return new ModelAndView("/WEB-INF/pages/editLibraryAliquot.jsp", model);

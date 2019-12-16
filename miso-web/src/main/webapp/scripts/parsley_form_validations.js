@@ -103,6 +103,8 @@ var Validate = Validate || {
     jQuery(formSelector).parsley().destroy();
     jQuery(formSelector + ' .generalErrors').empty();
     jQuery(formSelector + ' .errorContainer').empty();
+    // for error containers that are outside of the form such as for lists
+    jQuery('[id^="' + formSelector.substring(1) + '_"][id$="Error"]').empty();
   },
 
   makeDecimalField: function(selector, precision, scale, required, allowNegative) {

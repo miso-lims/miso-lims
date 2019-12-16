@@ -373,7 +373,8 @@ HotTarget.pool = (function() {
             }
           },
           HotUtils.makeParents(Urls.rest.pools.parents, HotUtils.relationCategoriesForDetailed().concat(
-              [HotUtils.relations.library(), HotUtils.relations.libraryAliquot()]))].concat(HotUtils.makeQcActions("Pool"));
+              [HotUtils.relations.library(), HotUtils.relations.libraryAliquot()]))].concat(HotUtils.makeQcActions("Pool")).concat(
+          [HotUtils.makeTransferAction('poolIds')]);
     },
 
     confirmSave: function(flatObjects, isCreate, config, table) {

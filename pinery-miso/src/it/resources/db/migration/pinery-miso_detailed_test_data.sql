@@ -82,13 +82,6 @@ INSERT INTO TissueType(tissueTypeId, alias, description, createdBy, creationDate
 (13, 'U','Unspecified',1,'2017-03-23 22:01:22',1,'2017-03-23 22:01:22'),
 (14, 'n','Unknown',1,'2017-05-29 20:02:03',1,'2017-05-29 20:02:03');
 
-INSERT INTO Institute(instituteId, alias, createdBy, creationDate, updatedBy, lastUpdated) VALUES
-(1, 'University Health Network',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00');
-
-INSERT INTO Lab(labId, alias, instituteId, createdBy, creationDate, updatedBy, lastUpdated) VALUES
-(1, 'BioBank', 1, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(2, 'Pathology', 1, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00');
-
 INSERT INTO Stain (stainId, name, stainCategoryId) VALUES
 (1, 'Cresyl Violet', NULL),
 (2, 'Hematoxylin+Eosin', NULL);

@@ -196,12 +196,12 @@ FormTarget.sample = (function($) {
                   type: 'decimal',
                   precision: 14,
                   scale: 10
-                }, FormUtils.makeUnitsField(object, 'concentration')].concat(FormUtils.makeDistributionFields()).concat([{
-              title: 'Location',
-              data: 'locationBarcode',
-              type: 'text',
-              maxLength: 255
-            }, FormUtils.makeBoxLocationField()])
+                }, FormUtils.makeUnitsField(object, 'concentration'), {
+                  title: 'Location',
+                  data: 'locationBarcode',
+                  type: 'text',
+                  maxLength: 255
+                }, FormUtils.makeBoxLocationField()]
           }, {
             title: 'Identity',
             include: config.detailedSample && object.sampleCategory === 'Identity',
@@ -383,7 +383,8 @@ FormTarget.sample = (function($) {
               },
               getItemValue: function(item) {
                 return item.id;
-              }
+              },
+              include: !!object.lab
             }]
           }, {
             title: 'Slide',

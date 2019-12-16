@@ -85,6 +85,8 @@ public interface AbstractListPage {
     public static final String QC_NOTE = "QC Note";
     public static final String QC_PASSED = "QC Passed";
     public static final String QC_STATUS = "QC Status";
+    public static final String RECEIVED = "Received";
+    public static final String RECIPIENT = "Recipient";
     public static final String REMAINING = "Remaining";
     public static final String REQUESTED = "Requested";
     public static final String ROWS = "Rows";
@@ -94,6 +96,7 @@ public interface AbstractListPage {
     public static final String SAMPLE_NAME = "Sample Name";
     public static final String SAMPLE_TYPE = "Type";
     public static final String SCANNABLE = "Scannable";
+    public static final String SENDER = "Sender";
     public static final String SEQ_PARAMS = "Seq. Params.";
     public static final String SEQUENCE = "Sequence(s)";
     public static final String SEQUENCING_PARAMETERS = "Sequencing Parameters";
@@ -110,6 +113,7 @@ public interface AbstractListPage {
     public static final String SUBCATEGORY = "Subcategory";
     public static final String TARGETED_SEQUENCING = "Targeted Sequencing";
     public static final String TARGETED_SEQUENCING_REQD = "Targeted Sequencing Required";
+    public static final String TRANSFER_DATE = "Transfer Date";
     public static final String TYPE = "Type";
     public static final String UNIQUE_DUAL_INDICES = "Unique Dual Indices";
     public static final String UNKNOWN = "Unknown";
@@ -166,6 +170,7 @@ public interface AbstractListPage {
     public static final String STUDY_TYPES = "studytype/list";
     public static final String TARGETED_SEQUENCINGS = "targetedsequencing/list";
     public static final String TISSUE_TYPES = "tissuetype/list";
+    public static final String TRANSFERS = "transfer/list";
     public static final String WORKSETS = "worksets";
   }
 

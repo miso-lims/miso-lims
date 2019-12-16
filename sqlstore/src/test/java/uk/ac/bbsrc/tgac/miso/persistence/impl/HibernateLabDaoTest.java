@@ -89,9 +89,15 @@ public class HibernateLabDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testGetUsage() {
+  public void testGetUsageByTissues() {
     Lab lab = dao.getLab(2L);
-    assertEquals(1L, dao.getUsage(lab));
+    assertEquals(1L, dao.getUsageByTissues(lab));
+  }
+
+  @Test
+  public void testGetUsageByTransfers() {
+    Lab lab = dao.getLab(1L);
+    assertEquals(1L, dao.getUsageByTransfers(lab));
   }
 
 }

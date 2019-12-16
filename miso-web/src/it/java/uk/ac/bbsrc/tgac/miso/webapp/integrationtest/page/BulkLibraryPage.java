@@ -29,6 +29,11 @@ public class BulkLibraryPage extends HeaderFooterPage {
     public static final String SAMPLE_LOCATION = "Sample Location";
     public static final String DESCRIPTION = "Description";
     public static final String RECEIVE_DATE = "Date of receipt";
+    public static final String RECEIVED_FROM = "Received From";
+    public static final String RECEIVED_BY = "Received By";
+    public static final String RECEIPT_CONFIRMED = "Receipt Confirmed";
+    public static final String RECEIPT_QC_PASSED = "Receipt QC Passed";
+    public static final String RECEIPT_QC_NOTE = "Receipt QC Note";
     public static final String EFFECTIVE_GROUP_ID = "Effective Group ID";
     public static final String GROUP_ID = "Group ID";
     public static final String GROUP_DESC = "Group Desc.";
@@ -57,9 +62,6 @@ public class BulkLibraryPage extends HeaderFooterPage {
     public static final String SPIKE_IN_DILUTION = "Spike-In Dilution Factor";
     public static final String SPIKE_IN_VOL = "Spike-In Volume";
     public static final String TEMPLATE = "Template";
-    public static final String DISTRIBUTED = "Distributed";
-    public static final String DISTRIBUTION_DATE = "Distribution Date";
-    public static final String DISTRIBUTION_RECIPIENT = "Distribution Recipient";
 
     private LibColumns() {
       throw new IllegalStateException("Util class not intended for instantiation");

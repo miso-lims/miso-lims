@@ -153,25 +153,22 @@ public class SampleRestController extends RestController {
 
   @GetMapping(value = "/dt", produces = { "application/json" })
   @ResponseBody
-  public DataTablesResponseDto<SampleDto> getDTSamples(HttpServletRequest request, HttpServletResponse response,
-      UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser);
+  public DataTablesResponseDto<SampleDto> getDTSamples(HttpServletRequest request) throws IOException {
+    return jQueryBackend.get(request, advancedSearchParser);
   }
 
   @GetMapping(value = "/dt/project/{id}", produces = { "application/json" })
   @ResponseBody
-  public DataTablesResponseDto<SampleDto> getDTSamplesByProject(@PathVariable("id") Long id, HttpServletRequest request,
-      HttpServletResponse response,
-      UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.project(id));
+  public DataTablesResponseDto<SampleDto> getDTSamplesByProject(@PathVariable("id") Long id, HttpServletRequest request)
+      throws IOException {
+    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.project(id));
   }
 
   @GetMapping(value = "/dt/project/{id}/arrayed", produces = { "application/json" })
   @ResponseBody
-  public DataTablesResponseDto<SampleDto> getDTArrayedSamplesByProject(@PathVariable("id") Long id, HttpServletRequest request,
-      HttpServletResponse response,
-      UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder, advancedSearchParser, PaginationFilter.project(id),
+  public DataTablesResponseDto<SampleDto> getDTArrayedSamplesByProject(@PathVariable("id") Long id, HttpServletRequest request)
+      throws IOException {
+    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.project(id),
         PaginationFilter.arrayed(true));
   }
 

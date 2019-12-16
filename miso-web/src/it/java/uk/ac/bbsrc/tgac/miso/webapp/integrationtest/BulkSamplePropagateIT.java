@@ -3,7 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,9 +31,14 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getPropagatePage(Arrays.asList(4441L), 1, tissueClassId);
     HandsOnTable table = page.getTable();
 
-    Map<String, String> attrs = new HashMap<>();
+    Map<String, String> attrs = new LinkedHashMap<>();
     attrs.put(SamColumns.DESCRIPTION, "Description");
     attrs.put(SamColumns.RECEIVE_DATE, "2017-10-27");
+    attrs.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    attrs.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    attrs.put(SamColumns.RECEIPT_CONFIRMED, "True");
+    attrs.put(SamColumns.RECEIPT_QC_PASSED, "True");
+    attrs.put(SamColumns.RECEIPT_QC_NOTE, "");
     attrs.put(SamColumns.ID_BARCODE, "4440-T");
     attrs.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     attrs.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
@@ -44,7 +49,6 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.PASSAGE_NUMBER, "");
     attrs.put(SamColumns.TIMES_RECEIVED, "1");
     attrs.put(SamColumns.TUBE_NUMBER, "1");
-    attrs.put(SamColumns.LAB, "BioBank (University Health Network)");
     attrs.put(SamColumns.SECONDARY_ID, "tube id 1");
     attrs.put(SamColumns.TISSUE_MATERIAL, "FFPE");
     attrs.put(SamColumns.REGION, "Medulla oblongata");
@@ -74,16 +78,15 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getPropagatePage(Arrays.asList(4442L), 1, curlsClassId);
     HandsOnTable table = page.getTable();
 
-    Map<String, String> attrs = new HashMap<>();
+    Map<String, String> attrs = new LinkedHashMap<>();
     attrs.put(SamColumns.DESCRIPTION, "Description");
-    attrs.put(SamColumns.RECEIVE_DATE, "2017-07-17");
+    attrs.put(SamColumns.CREATION_DATE, "2017-07-17");
     attrs.put(SamColumns.ID_BARCODE, "4440-Curls");
     attrs.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     attrs.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
     attrs.put(SamColumns.GROUP_ID, "1");
     attrs.put(SamColumns.GROUP_DESCRIPTION, "Test one");
     attrs.put(SamColumns.QC_STATUS, "Ready");
-    attrs.put(SamColumns.CREATION_DATE, "");
 
     attrs.forEach((k, v) -> table.enterText(k, 0, v));
 
@@ -108,9 +111,9 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getPropagatePage(Arrays.asList(4442L), 1, slideClassId);
     HandsOnTable table = page.getTable();
 
-    Map<String, String> attrs = new HashMap<>();
+    Map<String, String> attrs = new LinkedHashMap<>();
     attrs.put(SamColumns.DESCRIPTION, "Description");
-    attrs.put(SamColumns.RECEIVE_DATE, "2017-07-17");
+    attrs.put(SamColumns.CREATION_DATE, "2017-07-17");
     attrs.put(SamColumns.ID_BARCODE, "PROP-Slide");
     attrs.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     attrs.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
@@ -145,9 +148,9 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getPropagatePage(Arrays.asList(4442L), 1, cStockClassId);
     HandsOnTable table = page.getTable();
 
-    Map<String, String> attrs = new HashMap<>();
+    Map<String, String> attrs = new LinkedHashMap<>();
     attrs.put(SamColumns.DESCRIPTION, "Description");
-    attrs.put(SamColumns.RECEIVE_DATE, "2017-07-17");
+    attrs.put(SamColumns.CREATION_DATE, "2017-07-17");
     attrs.put(SamColumns.ID_BARCODE, "PROP-CDNA");
     attrs.put(SamColumns.SAMPLE_TYPE, "TRANSCRIPTOMIC");
     attrs.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
@@ -181,9 +184,9 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getPropagatePage(Arrays.asList(4442L), 1, rStockClassId);
     HandsOnTable table = page.getTable();
 
-    Map<String, String> attrs = new HashMap<>();
+    Map<String, String> attrs = new LinkedHashMap<>();
     attrs.put(SamColumns.DESCRIPTION, "Description");
-    attrs.put(SamColumns.RECEIVE_DATE, "2017-07-17");
+    attrs.put(SamColumns.CREATION_DATE, "2017-07-17");
     attrs.put(SamColumns.ID_BARCODE, "PROP-RNASTOCK");
     attrs.put(SamColumns.SAMPLE_TYPE, "TRANSCRIPTOMIC");
     attrs.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
@@ -218,9 +221,9 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getPropagatePage(Arrays.asList(4443L), 1, lcmTubeClassId);
     HandsOnTable table = page.getTable();
 
-    Map<String, String> attrs = new HashMap<>();
+    Map<String, String> attrs = new LinkedHashMap<>();
     attrs.put(SamColumns.DESCRIPTION, "Description");
-    attrs.put(SamColumns.RECEIVE_DATE, "2017-07-17");
+    attrs.put(SamColumns.CREATION_DATE, "2017-07-17");
     attrs.put(SamColumns.ID_BARCODE, "PROP-LCM");
     attrs.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     attrs.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
@@ -253,9 +256,9 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getPropagatePage(Arrays.asList(4444L), 1, gStockClassId);
     HandsOnTable table = page.getTable();
 
-    Map<String, String> attrs = new HashMap<>();
+    Map<String, String> attrs = new LinkedHashMap<>();
     attrs.put(SamColumns.DESCRIPTION, "Description");
-    attrs.put(SamColumns.RECEIVE_DATE, "");
+    attrs.put(SamColumns.CREATION_DATE, "");
     attrs.put(SamColumns.ID_BARCODE, "PROP-GDNA");
     attrs.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     attrs.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
@@ -288,9 +291,9 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getPropagatePage(Arrays.asList(4445L), 1, cAliquotClassId);
     HandsOnTable table = page.getTable();
 
-    Map<String, String> attrs = new HashMap<>();
+    Map<String, String> attrs = new LinkedHashMap<>();
     attrs.put(SamColumns.DESCRIPTION, "Description");
-    attrs.put(SamColumns.RECEIVE_DATE, "2017-07-17");
+    attrs.put(SamColumns.CREATION_DATE, "2017-07-17");
     attrs.put(SamColumns.ID_BARCODE, "PROP-CDNA-ALIQUOT");
     attrs.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     attrs.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
@@ -321,9 +324,9 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getPropagatePage(Arrays.asList(4446L), 1, rAliquotClassId);
     HandsOnTable table = page.getTable();
 
-    Map<String, String> attrs = new HashMap<>();
+    Map<String, String> attrs = new LinkedHashMap<>();
     attrs.put(SamColumns.DESCRIPTION, "Description");
-    attrs.put(SamColumns.RECEIVE_DATE, "2017-07-17");
+    attrs.put(SamColumns.CREATION_DATE, "2017-07-17");
     attrs.put(SamColumns.ID_BARCODE, "PROP-RNA-ALIQUOT");
     attrs.put(SamColumns.SAMPLE_TYPE, "TRANSCRIPTOMIC");
     attrs.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
@@ -354,9 +357,9 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getPropagatePage(Arrays.asList(4447L), 1, mRnaClassId);
     HandsOnTable table = page.getTable();
 
-    Map<String, String> attrs = new HashMap<>();
+    Map<String, String> attrs = new LinkedHashMap<>();
     attrs.put(SamColumns.DESCRIPTION, "Description");
-    attrs.put(SamColumns.RECEIVE_DATE, "2017-07-17");
+    attrs.put(SamColumns.CREATION_DATE, "2017-07-17");
     attrs.put(SamColumns.ID_BARCODE, "PROP-MRNA");
     attrs.put(SamColumns.SAMPLE_TYPE, "TRANSCRIPTOMIC");
     attrs.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
