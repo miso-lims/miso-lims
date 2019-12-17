@@ -167,7 +167,9 @@ public class PoolPage extends FormPage<PoolPage.Field> {
   }
 
   public void removeAliquotsByName(List<String> namesToRemove) {
-    List<String> tableNames = aliquotsTable.getColumnValues("Library Aliquot Name");
+    List<String> tableNames = aliquotsTable.getColumnValues("Library Aliquot Name").stream()
+        .map(this::stripWarnings)
+        .collect(Collectors.toList());
     int selected = 0;
     for (int i = 0; i < tableNames.size(); i++) {
       if (namesToRemove.contains(tableNames.get(i))) {
@@ -182,12 +184,12 @@ public class PoolPage extends FormPage<PoolPage.Field> {
     waitUntil(invisibilityOf(dialogContainer));
   }
 
-  public boolean hasAliquotWarning(String warning) {
-    return aliquotsTable.doesColumnContainSubstring(Columns.WARNINGS, warning);
+  public String stripWarnings(String value) {
+    return value.contains(" ") ? value.substring(0, value.indexOf(" ")) : value;
   }
 
-  public boolean hasAliquotIndexWarning(String warning) {
-    return aliquotsTable.doesColumnContainSubstring(Columns.INDICES, warning);
+  public boolean hasAliquotWarning(String warning) {
+    return aliquotsTable.doesColumnContainTooltip(Columns.LIBRARY_ALIQUOT_NAME, warning);
   }
 
 }

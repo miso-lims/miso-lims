@@ -53,6 +53,8 @@ public class LibraryAliquotDto extends AbstractBoxableDto {
   private List<Long> indexIds;
   private List<String> indexLabels;
   private String identityConsentLevel;
+  private String effectiveTissueOriginLabel;
+  private String effectiveTissueTypeLabel;
   private String ngUsed;
   private String volumeUsed;
   private Integer dnaSize;
@@ -302,6 +304,22 @@ public class LibraryAliquotDto extends AbstractBoxableDto {
 
   public void setIdentityConsentLevel(String identityConsentLevel) {
     this.identityConsentLevel = identityConsentLevel;
+  }
+
+  public String getEffectiveTissueOriginLabel() {
+    return effectiveTissueOriginLabel;
+  }
+
+  public void setEffectiveTissueOriginLabel(String effectiveTissueOriginLabel) {
+    this.effectiveTissueOriginLabel = effectiveTissueOriginLabel;
+  }
+
+  public String getEffectiveTissueTypeLabel() {
+    return effectiveTissueTypeLabel;
+  }
+
+  public void setEffectiveTissueTypeLabel(String effectiveTissueTypeLabel) {
+    this.effectiveTissueTypeLabel = effectiveTissueTypeLabel;
   }
 
   public String getNgUsed() {

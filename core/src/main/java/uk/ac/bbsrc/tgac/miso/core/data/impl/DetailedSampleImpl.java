@@ -17,6 +17,7 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -28,6 +29,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferItem;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SampleHierarchyView;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
@@ -77,6 +79,10 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
 
   private BigDecimal volumeUsed;
   private BigDecimal ngUsed;
+
+  @OneToOne
+  @JoinColumn(name = "sampleId")
+  private SampleHierarchyView hierarchyAttributes;
 
   @Transient
   private Long identityId;
@@ -277,6 +283,15 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   @Override
   public String getBarcodeGroupDescription() {
     return getEffectiveGroupIdEntity().getGroupDescription();
+  }
+
+  @Override
+  public SampleHierarchyView getHierarchyAttributes() {
+    return hierarchyAttributes;
+  }
+
+  public void setHierarchyAttributes(SampleHierarchyView hierarchyAttributes) {
+    this.hierarchyAttributes = hierarchyAttributes;
   }
 
 }

@@ -92,6 +92,9 @@ FOR EACH ROW
       lastModified
     FROM Sample WHERE sampleId = NEW.sampleId;
   END IF;
+  IF (NEW.parentId IS NULL) <> (OLD.parentId IS NULL) OR NEW.parentId <> OLD.parentId THEN
+    CALL updateSampleHierarchy(NEW.sampleId);
+  END IF;
   END//
 
 DROP TRIGGER IF EXISTS SampleAliquotChange//
@@ -323,6 +326,11 @@ FOR EACH ROW
     NEW.lastModifier,
     'Sample created.',
     NEW.lastModified)//
-    
+
+DROP TRIGGER IF EXISTS DetailedSampleInsert//
+CREATE TRIGGER DetailedSampleInsert AFTER INSERT ON DetailedSample
+FOR EACH ROW
+  CALL updateSampleHierarchy(NEW.sampleId)//
+
 DELIMITER ;
 -- EndNoTest

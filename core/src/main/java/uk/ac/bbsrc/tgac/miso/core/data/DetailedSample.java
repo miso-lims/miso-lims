@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SampleHierarchyView;
+
 public interface DetailedSample extends Sample, GroupIdentifiable {
 
   @Override
@@ -99,5 +101,7 @@ public interface DetailedSample extends Sample, GroupIdentifiable {
   public BigDecimal getNgUsed();
 
   public void setNgUsed(BigDecimal ngUsed);
+
+  public SampleHierarchyView getHierarchyAttributes();
 
 }
