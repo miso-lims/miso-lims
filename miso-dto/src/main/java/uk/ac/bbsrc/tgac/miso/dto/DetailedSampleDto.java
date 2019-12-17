@@ -26,6 +26,8 @@ public class DetailedSampleDto extends SampleDto {
   private String effectiveExternalNames;
   private String effectiveGroupId;
   private String effectiveGroupIdSample;
+  private String effectiveTissueOriginLabel;
+  private String effectiveTissueTypeLabel;
   private String creationDate;
   private String volumeUsed;
   private String ngUsed;
@@ -229,6 +231,22 @@ public class DetailedSampleDto extends SampleDto {
 
   public void setNgUsed(String ngUsed) {
     this.ngUsed = ngUsed;
+  }
+
+  public String getEffectiveTissueOriginLabel() {
+    return effectiveTissueOriginLabel;
+  }
+
+  public void setEffectiveTissueOriginLabel(String effectiveTissueOriginLabel) {
+    this.effectiveTissueOriginLabel = effectiveTissueOriginLabel;
+  }
+
+  public String getEffectiveTissueTypeLabel() {
+    return effectiveTissueTypeLabel;
+  }
+
+  public void setEffectiveTissueTypeLabel(String effectiveTissueTypeLabel) {
+    this.effectiveTissueTypeLabel = effectiveTissueTypeLabel;
   }
 
 }

@@ -66,9 +66,23 @@ var Warning = (function($) {
             html += '</a>';
           }
         }
-        getWarnings(target, full, 'tableMessage').forEach(function(warning) {
-          html += ' <span class="message-' + (warning.level || 'error') + '"><strong>' + warning.tableMessage + '</strong></span>';
-        });
+        var warnings = getWarnings(target, full, 'tableMessage');
+        if (warnings && warnings.length) {
+          var level = 'info';
+          if (warnings.some(function(warning) {
+            return !warning.level || warning.level === 'error';
+          })) {
+            level = 'error';
+          } else if (warnings.some(function(warning) {
+            return !warning.level || warning.level === 'important';
+          })) {
+            level = 'important';
+          }
+          html += ' <div class="tooltip"><span class="message-' + level + ' warning-icon">⚠</span><span class="tooltiptext">'
+              + warnings.map(function(warning) {
+                return warning.tableMessage;
+              }).join(';<br>') + '</span></div>';
+        }
         return html;
       };
     },

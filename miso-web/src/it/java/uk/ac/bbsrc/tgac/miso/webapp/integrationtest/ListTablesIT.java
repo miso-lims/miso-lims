@@ -20,6 +20,10 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SampleHierarchyView;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.Columns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.ListTarget;
@@ -31,13 +35,13 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 public class ListTablesIT extends AbstractIT {
 
   private static final Set<String> samplesColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.SAMPLE_CLASS,
-      Columns.SAMPLE_TYPE, Columns.QC_PASSED, Columns.LOCATION, Columns.CREATION_DATE, Columns.LAST_MODIFIED, Columns.WARNINGS);
-  private static final Set<String> librariesColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS,
-      Columns.SAMPLE_NAME, Columns.SAMPLE_ALIAS, Columns.QC_PASSED, Columns.INDEX, Columns.LOCATION, Columns.LAST_MODIFIED,
-      Columns.WARNINGS);
-  private static final Set<String> libraryAliquotsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.WARNINGS,
-      Columns.LIBRARY_NAME, Columns.LIBRARY_ALIAS, Columns.PLATFORM, Columns.TARGETED_SEQUENCING, Columns.INDEX, Columns.VOLUME, Columns.CONCENTRATION,
-      Columns.NG_USED, Columns.VOLUME_USED, Columns.MATRIX_BARCODE, Columns.CREATOR, Columns.CREATION_DATE);
+      Columns.TISSUE_ORIGIN, Columns.TISSUE_TYPE, Columns.QC, Columns.LOCATION, Columns.CREATION_DATE, Columns.LAST_MODIFIED);
+  private static final Set<String> librariesColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.TISSUE_ORIGIN,
+      Columns.TISSUE_TYPE, Columns.QC, Columns.DESIGN, Columns.INDICES, Columns.LOCATION, Columns.VOLUME, Columns.CONCENTRATION,
+      Columns.LAST_MODIFIED);
+  private static final Set<String> libraryAliquotsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS,
+      Columns.TISSUE_ORIGIN, Columns.TISSUE_TYPE, Columns.DESIGN, Columns.INDICES, Columns.LOCATION, Columns.VOLUME, Columns.CONCENTRATION,
+      Columns.LAST_MODIFIED);
   private static final Set<String> poolsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS,
       Columns.DESCRIPTION, Columns.DATE_CREATED, Columns.LIBRARY_ALIQUOTS, Columns.CONCENTRATION, Columns.LOCATION, Columns.AVG_INSERT_SIZE,
       Columns.LAST_MODIFIED);
@@ -235,6 +239,16 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListLibrariesPageSetup() throws Exception {
+    List<Library> libraries = getSession().createCriteria(LibraryImpl.class).list(); // TODO: rm
+    for (Library lib : libraries) {
+      System.out.print("########## Checking " + lib.getName() + "...");
+      assertNotNull(lib.getSample());
+      SampleHierarchyView attrs = ((DetailedSample) lib.getSample()).getHierarchyAttributes();
+      assertNotNull(attrs);
+      assertNotNull(attrs.getTissueOrigin());
+      System.out.println("OK");
+    }
+
     // Goal: ensure all expected columns are present and no extra
     testPageSetup(ListTarget.LIBRARIES, librariesColumns);
   }
@@ -247,7 +261,7 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListLibrariesWarnings() throws Exception {
-    testWarningNormal(ListTarget.LIBRARIES, "LIB901", "Negative Volume", Columns.WARNINGS);
+    testWarningNormal(ListTarget.LIBRARIES, "LIB901", "Negative Volume", Columns.NAME);
   }
 
   @Test
@@ -276,10 +290,10 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListPoolsWarnings() throws Exception {
-    testWarningTabbed(ListTarget.POOLS, "no indices", "MISSING INDEX", Columns.DESCRIPTION);
-    testWarningTabbed(ListTarget.POOLS, "similar index", "Near-Duplicate Indices", Columns.DESCRIPTION);
-    testWarningTabbed(ListTarget.POOLS, "same index", "DUPLICATE INDICES", Columns.DESCRIPTION);
-    testWarningTabbed(ListTarget.POOLS, "low quality library", "Low Quality Libraries", Columns.DESCRIPTION);
+    testWarningTabbed(ListTarget.POOLS, "no indices", "MISSING INDEX", Columns.NAME);
+    testWarningTabbed(ListTarget.POOLS, "similar index", "Near-Duplicate Indices", Columns.NAME);
+    testWarningTabbed(ListTarget.POOLS, "same index", "DUPLICATE INDICES", Columns.NAME);
+    testWarningTabbed(ListTarget.POOLS, "low quality library", "Low Quality Libraries", Columns.NAME);
   }
 
   @Test
@@ -818,7 +832,7 @@ public class ListTablesIT extends AbstractIT {
     DataTable table = page.getTable();
     table.searchFor(query);
     assertTrue(String.format("'%s' column does not contain '%s' warning", column, warning),
-        table.doesColumnContainSubstring(column, warning));
+        table.doesColumnContainTooltip(column, warning));
   }
 
   private void testWarningTabbed(String target, String query, String warning, String column) {
@@ -826,7 +840,7 @@ public class ListTablesIT extends AbstractIT {
     DataTable table = page.getTable();
     table.searchFor(query);
     assertTrue(String.format("'%s' column does not contain '%s' warning", column, warning),
-        table.doesColumnContainSubstring(column, warning));
+        table.doesColumnContainTooltip(column, warning));
   }
 
   private int compareFirstTwoNonMatchingValues(DataTable table, String heading) {

@@ -1,4 +1,6 @@
--- StartNoTest
+-- Any triggers, procedures, and functions that are created in after migrate scripts
+-- and depend on the schema should be dropped here
+
 -- Disable "Trigger does not exist" warnings
 SET sql_notes = 0;
 
@@ -14,6 +16,7 @@ DROP TRIGGER IF EXISTS ContainerQCInsert;
 DROP TRIGGER IF EXISTS ContainerQcUpdate;
 DROP TRIGGER IF EXISTS DetailedLibraryChange;
 DROP TRIGGER IF EXISTS DetailedSampleChange;
+DROP TRIGGER IF EXISTS DetailedSampleInsert;
 DROP TRIGGER IF EXISTS ExperimentChange;
 DROP TRIGGER IF EXISTS ExperimentInsert;
 DROP TRIGGER IF EXISTS IdentityChange;
@@ -63,5 +66,10 @@ DROP TRIGGER IF EXISTS StorageLocationChange;
 DROP TRIGGER IF EXISTS StudyChange;
 DROP TRIGGER IF EXISTS StudyInsert;
 
+DROP FUNCTION IF EXISTS getParentTissueId;
+DROP FUNCTION IF EXISTS getParentIdentityId;
+
+DROP PROCEDURE IF EXISTS updateSampleHierarchy;
+
 SET sql_notes = 1;
--- EndNoTest
+

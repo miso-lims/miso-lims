@@ -470,36 +470,36 @@ INSERT INTO DetailedSample (sampleId, sampleClassId, parentId, siblingNumber, gr
 
 INSERT INTO DetailedSample(sampleId, sampleClassId, parentId, detailedQcStatusId, archived) VALUES
   (100001, 1, NULL, 1, 0),  -- Identity
-  (100002, 23, NULL, 1, 0), -- Tissue
-  (100003, 11, NULL, 1, 0), -- gDNA (stock)
-  (100004, 15, NULL, 1, 0), -- gDNA (aliquot)
+  (100002, 23, 100001, 1, 0), -- Tissue
+  (100003, 11, 100002, 1, 0), -- gDNA (stock)
+  (100004, 15, 100003, 1, 0), -- gDNA (aliquot)
   (110001, 1, NULL, 1, 0),  -- Identity
   (110002, 23, 110001, 1, 0), -- Tissue
   (110003, 11, 110002, 1, 0), -- gDNA (stock)
   (110004, 15, 110003, 1, 0), -- gDNA (aliquot)
   (120001, 1, NULL, 1, 0),  -- Identity
-  (120002, 23, NULL, 1, 0), -- Tissue
-  (120003, 11, NULL, 1, 0), -- gDNA (stock)
-  (120004, 15, NULL, 1, 0), -- gDNA (aliquot)
+  (120002, 23, 120001, 1, 0), -- Tissue
+  (120003, 11, 120002, 1, 0), -- gDNA (stock)
+  (120004, 15, 120003, 1, 0), -- gDNA (aliquot)
   (200001, 1, NULL, 1, 0),  -- Identity
-  (200002, 23, NULL, 1, 0), -- Tissue
-  (200003, 11, NULL, 1, 0), -- gDNA (stock)
-  (200004, 15, NULL, 1, 0), -- gDNA (aliquot)
-  (201, 1, NULL, 1, 0),
-  (202, 23, NULL, 1, 0),
-  (203, 24, NULL, 1, 0),
-  (204, 15, NULL, 1, 0),
-  (205, 15, NULL, 1, 0),
-  (206, 15, NULL, 1, 0),
-  (301, 1, NULL, 1, 0),
-  (302, 23, NULL, 1, 0),
-  (303, 11, NULL, 1, 0),
-  (304, 15, NULL, 1, 0),
-  (305, 15, NULL, 1, 0),
-  (501, 1, NULL, 1, 0),
-  (502, 23, 501, 1, 0),
-  (503, 11, 502, 1, 0),
-  (504, 15, 503, 1, 0);
+  (200002, 23, 200001, 1, 0), -- Tissue
+  (200003, 11, 200002, 1, 0), -- gDNA (stock)
+  (200004, 15, 200003, 1, 0), -- gDNA (aliquot)
+  (201, 1, NULL, 1, 0), -- Identity
+  (202, 23, 201, 1, 0), -- Tissue
+  (203, 11, 202, 1, 0), -- gDNA (stock)
+  (204, 15, 203, 1, 0), -- gDNA (aliquot)
+  (205, 15, 203, 1, 0), -- gDNA (aliquot)
+  (206, 15, 203, 1, 0), -- gDNA (aliquot)
+  (301, 1, NULL, 1, 0), -- Identity
+  (302, 23, 301, 1, 0), -- Tissue
+  (303, 11, 302, 1, 0), -- gDNA (stock)
+  (304, 15, 303, 1, 0), -- gDNA (aliquot)
+  (305, 15, 303, 1, 0), -- gDNA (aliquot)
+  (501, 1, NULL, 1, 0), -- Identity
+  (502, 23, 501, 1, 0), -- Tissue
+  (503, 11, 502, 1, 0), -- gDNA (stock)
+  (504, 15, 503, 1, 0); -- gDNA (aliquot)
 
 INSERT INTO Identity (sampleId, externalName, donorSex, consentLevel) VALUES
   (1, 'TEST_external_1', 'MALE', 'THIS_PROJECT'),
@@ -709,6 +709,7 @@ INSERT INTO DetailedLibrary(libraryId, archived, libraryDesign, libraryDesignCod
   (306, 0, NULL, 7),
   (504, 0, NULL, 7),
   (505, 0, NULL, 7),
+  (600, 0, NULL, 7),
   (601, 0, NULL, 7),
   (602, 0, NULL, 7),
   (603, 0, NULL, 7),
@@ -722,7 +723,8 @@ INSERT INTO DetailedLibrary(libraryId, archived, libraryDesign, libraryDesignCod
   (805, 0, NULL, 7),
   (806, 0, NULL, 7),
   (807, 0, NULL, 7),
-  (901, 0, NULL, 7);
+  (901, 0, NULL, 7),
+  (2201, 0, NULL, 7);
 
 INSERT INTO Library_Index(library_libraryId, index_indexId) VALUES
   (100001, 5),
@@ -1064,3 +1066,10 @@ INSERT INTO StorageLocation(locationId, locationUnit, parentLocationId, alias, c
 (1, 'ROOM', NULL, 'Room One', 1, '2019-05-22 13:10:00', 1, '2019-05-22 13:10:00'),
 (2, 'ROOM', NULL, 'Room Two', 1, '2019-05-22 13:10:00', 1, '2019-05-22 13:10:00'),
 (3, 'FREEZER', 1, 'Freezer One', 1, '2019-05-22 13:10:00', 1, '2019-05-22 13:10:00');
+
+-- SampleHierarchy needs repopulated because everything is not created in expected order in test data
+-- (parent SampleTissue and Identity records aren't always created before childrens' DetailedSample records)
+DELETE FROM SampleHierarchy;
+INSERT INTO SampleHierarchy(sampleId, identityId, tissueId)
+SELECT sampleId, getParentIdentityId(sampleId), getParentTissueId(sampleId)
+FROM DetailedSample;

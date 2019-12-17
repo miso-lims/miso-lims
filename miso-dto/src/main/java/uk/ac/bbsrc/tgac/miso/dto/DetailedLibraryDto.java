@@ -17,6 +17,8 @@ public class DetailedLibraryDto extends LibraryDto {
   private String identityConsentLevel;
   private String effectiveGroupId;
   private String effectiveGroupIdSample;
+  private String effectiveTissueOriginLabel;
+  private String effectiveTissueTypeLabel;
   private Boolean subprojectPriority;
   private String subprojectAlias;
 
@@ -98,6 +100,22 @@ public class DetailedLibraryDto extends LibraryDto {
 
   public void setEffectiveGroupIdSample(String effectiveGroupIdSample) {
     this.effectiveGroupIdSample = effectiveGroupIdSample;
+  }
+
+  public String getEffectiveTissueOriginLabel() {
+    return effectiveTissueOriginLabel;
+  }
+
+  public void setEffectiveTissueOriginLabel(String effectiveTissueOriginLabel) {
+    this.effectiveTissueOriginLabel = effectiveTissueOriginLabel;
+  }
+
+  public String getEffectiveTissueTypeLabel() {
+    return effectiveTissueTypeLabel;
+  }
+
+  public void setEffectiveTissueTypeLabel(String effectiveTissueTypeLabel) {
+    this.effectiveTissueTypeLabel = effectiveTissueTypeLabel;
   }
 
   public Boolean getSubprojectPriority() {

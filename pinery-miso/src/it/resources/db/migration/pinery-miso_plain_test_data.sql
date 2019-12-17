@@ -1,6 +1,4 @@
--- fixes BeforeInsertPool trigger created in V0004
-DROP TRIGGER IF EXISTS BeforeInsertPool;
-
+DELETE FROM SampleHierarchy;
 DELETE FROM Transfer_Sample;
 DELETE FROM Transfer_Library;
 DELETE FROM Transfer_LibraryAliquot;

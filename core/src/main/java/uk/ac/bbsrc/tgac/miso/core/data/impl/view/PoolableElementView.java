@@ -29,6 +29,7 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
@@ -73,6 +74,10 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
   private BigDecimal aliquotNgUsed;
 
   private BigDecimal aliquotVolumeUsed;
+
+  @ManyToOne
+  @JoinColumn(name = "libraryDesignCodeId")
+  private LibraryDesignCode aliquotDesignCode;
 
   private Long preMigrationId;
 
@@ -303,6 +308,14 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   public void setAliquotVolumeUsed(BigDecimal aliquotVolumeUsed) {
     this.aliquotVolumeUsed = aliquotVolumeUsed;
+  }
+
+  public LibraryDesignCode getAliquotDesignCode() {
+    return aliquotDesignCode;
+  }
+
+  public void setAliquotDesignCode(LibraryDesignCode aliquotDesignCode) {
+    this.aliquotDesignCode = aliquotDesignCode;
   }
 
   public String getProjectShortName() {

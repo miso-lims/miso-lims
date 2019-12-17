@@ -107,58 +107,75 @@ ListTarget.sample = {
     }];
   },
   createColumns: function(config, projectId) {
-    return [ListUtils.idHyperlinkColumn("Name", Urls.ui.samples.edit, "id", Utils.array.getName, 1, true),
-        ListUtils.labelHyperlinkColumn("Alias", Urls.ui.samples.edit, Utils.array.getId, "alias", 0, true), {
-          "sTitle": "Sample Class",
-          "mData": "sampleClassId",
-          "include": Constants.isDetailedSample,
-          "mRender": ListUtils.render.textFromId(Constants.sampleClasses, 'alias', "Plain"),
-          "bVisible": "true",
-          "bSortable": false,
-          "iSortPriority": 0
-        }, {
-          "sTitle": "Type",
-          "mData": "sampleType",
-          "include": true,
-          "iSortPriority": 0
-        }, {
-          "sTitle": "QC Passed",
-          "mData": "qcPassed",
-          "mRender": ListUtils.render.booleanChecks,
-          "include": true,
-          "iSortPriority": 0
-        }, {
-          "sTitle": "Location",
-          "mData": "locationLabel",
-          "bSortable": false,
-          "mRender": function(data, type, full) {
-            return full.boxId ? "<a href='/miso/box/" + full.boxId + "'>" + data + "</a>" : data;
-          },
-          "include": true,
-          "iSortPriority": 0
-        }, {
-          "sTitle": "Creation Date",
-          "mData": "creationDate",
-          "include": Constants.isDetailedSample,
-          "iSortPriority": 0,
-          "bVisible": "true",
-          "mRender": function(data, type, full) {
-            return data || "";
-          }
-        }, {
-          "sTitle": "Last Modified",
-          "mData": "lastModified",
-          "include": Constants.isDetailedSample,
-          "iSortPriority": 2
-        }, {
-          "sTitle": "Warnings",
-          "mData": null,
-          "mRender": Warning.tableWarningRenderer(WarningTarget.sample),
-          "include": true,
-          "iSortPriority": 0,
-          "bVisible": true,
-          "bSortable": false
-        }];
+    return [{
+      "sTitle": "ID",
+      "mData": "id",
+      "bVisible": false
+    }, {
+      "sTitle": "Name",
+      "mData": "name",
+      "include": true,
+      "iSortPriority": 1,
+      "iDataSort": 0, // Use ID for sorting
+      "mRender": Warning.tableWarningRenderer(WarningTarget.sample, function(sample) {
+        return Urls.ui.samples.edit(sample.id);
+      }),
+      "sClass": "nowrap"
+    }, ListUtils.labelHyperlinkColumn("Alias", Urls.ui.samples.edit, Utils.array.getId, "alias", 0, true), {
+      "sTitle": "Sample Class",
+      "mData": "sampleClassId",
+      "include": Constants.isDetailedSample,
+      "mRender": ListUtils.render.textFromId(Constants.sampleClasses, 'alias', "Plain"),
+      "bSortable": false,
+      "iSortPriority": 0
+    }, {
+      "sTitle": "Tissue Origin",
+      "mData": "effectiveTissueOriginLabel",
+      "include": Constants.isDetailedSample,
+      "mRender": ListUtils.render.naIfNull,
+      "bSortable": false,
+      "iSortPriority": 0
+    }, {
+      "sTitle": "Tissue Type",
+      "mData": "effectiveTissueTypeLabel",
+      "include": Constants.isDetailedSample,
+      "mRender": ListUtils.render.naIfNull,
+      "bSortable": false,
+      "iSortPriority": 0
+    }, {
+      "sTitle": "Type",
+      "mData": "sampleType",
+      "include": !Constants.isDetailedSample,
+      "iSortPriority": 0
+    }, {
+      "sTitle": "QC",
+      "mData": "qcPassed",
+      "mRender": ListUtils.render.booleanChecks,
+      "include": true,
+      "iSortPriority": 0
+    }, {
+      "sTitle": "Location",
+      "mData": "locationLabel",
+      "bSortable": false,
+      "mRender": function(data, type, full) {
+        return full.boxId ? "<a href='/miso/box/" + full.boxId + "'>" + data + "</a>" : data;
+      },
+      "include": true,
+      "iSortPriority": 0
+    }, {
+      "sTitle": "Creation Date",
+      "mData": "creationDate",
+      "include": Constants.isDetailedSample,
+      "iSortPriority": 0,
+      "mRender": function(data, type, full) {
+        return data || "";
+      }
+    }, {
+      "sTitle": "Last Modified",
+      "mData": "lastModified",
+      "include": Constants.isDetailedSample,
+      "iSortPriority": 2
+    }];
   },
   searchTermSelector: function(searchTerms) {
     const plainSampleTerms = [searchTerms['id'], searchTerms['requisition'], searchTerms['entered'], searchTerms['changed'],
