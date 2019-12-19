@@ -7,6 +7,7 @@ CREATE TABLE SampleHierarchy (
   CONSTRAINT fk_sampleHierarchy_tissue FOREIGN KEY (tissueId) REFERENCES SampleTissue (sampleId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+SET sql_notes = 0;
 DELIMITER //
 
 DROP FUNCTION IF EXISTS getParentTissueId//
@@ -32,6 +33,7 @@ BEGIN
 END//
 
 DELIMITER ;
+SET sql_notes = 1;
 
 INSERT INTO SampleHierarchy(sampleId, identityId, tissueId)
 SELECT sampleId, getParentIdentityId(sampleId), getParentTissueId(sampleId)
