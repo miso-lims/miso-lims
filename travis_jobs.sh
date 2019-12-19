@@ -10,6 +10,9 @@ if [ "$JOB" = "SONAR_AND_UNIT_TESTS" ]; then
     fi
     # Unit Tests
     mvn clean test
+elif [ "$JOB" = "SQLSTORE_IT" ]; then
+    cd sqlstore
+    mvn clean verify -DskipUTs=true -DskipITs=false
 elif [ "$JOB" = "PLAIN_WEB_IT" ]; then
     cd miso-web
     mvn clean verify -DskipUTs=true -DrunPlainITs

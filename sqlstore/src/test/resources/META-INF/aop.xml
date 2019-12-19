@@ -1,8 +1,0 @@
-<!DOCTYPE xml>
-<aspectj>
-    <!-- <weaver options="-verbose -showWeaveInfo "> -->
-    <weaver>
-      <include within="uk.ac.bbsrc.tgac.miso.sqlstore.*"/>
-      <include within="org.springframework.jdbc.core.JdbcTemplate"/>
-    </weaver>
-</aspectj>
