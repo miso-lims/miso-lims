@@ -120,8 +120,11 @@ JOIN TissueParentView v ON v.sampleId = s.sampleId
 LEFT JOIN SampleTissue st ON st.sampleId = v.tissueId
 WHERE s.receivedDate IS NOT NULL;
 
+-- Disable "Duplicate entry" warnings
+SET sql_notes = 0;
 INSERT IGNORE INTO User_Group (users_userId, groups_groupId)
 SELECT DISTINCT creator, @internalGroup FROM TemporaryTransfer;
+SET sql_notes = 1;
 
 INSERT INTO Transfer(transferId, transferDate, senderLabId, recipientGroupId, creator, created, lastModifier, lastModified)
 SELECT transferId, receivedDate, labId, @internalGroup, creator, @now, creator, @now
@@ -152,8 +155,11 @@ JOIN TissueParentView v ON v.sampleId = s.sampleId
 LEFT JOIN SampleTissue st ON st.sampleId = v.tissueId
 WHERE l.receivedDate IS NOT NULL;
 
+-- Disable "Duplicate entry" warnings
+SET sql_notes = 0;
 INSERT IGNORE INTO User_Group (users_userId, groups_groupId)
 SELECT DISTINCT creator, @internalGroup FROM TemporaryTransfer;
+SET sql_notes = 1;
 
 INSERT INTO Transfer(transferId, transferDate, senderLabId, recipientGroupId, creator, created, lastModifier, lastModified)
 SELECT transferId, receivedDate, labId, @internalGroup, @admin, @now, @admin, @now

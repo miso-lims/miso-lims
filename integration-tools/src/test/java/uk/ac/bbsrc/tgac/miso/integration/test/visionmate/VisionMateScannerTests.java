@@ -37,7 +37,7 @@ public class VisionMateScannerTests extends BoxScannerTests<VisionMateScanner> {
   protected void simulateScan(BoxScan scan) {
     int rows = scan.getRowCount();
     int cols = scan.getColumnCount();
-    server.setCurrentProduct(new RackType(Manufacturer.MATRIX, rows, cols));
+    server.setCurrentProduct(new RackType(Manufacturer.OTHER, rows, cols));
     String[] barcodes = new String[rows*cols];
     int i = 0;
     for (int col = 1; col <= cols; col++) {
@@ -51,7 +51,7 @@ public class VisionMateScannerTests extends BoxScannerTests<VisionMateScanner> {
 
   @Override
   protected BoxScan getSampleScan(String barcode) {
-    RackType rack = new RackType(Manufacturer.MATRIX, 2, 2);
+    RackType rack = new RackType(Manufacturer.OTHER, 2, 2);
     ServerConfig config = new ServerConfig();
     String data = barcode + ",22222,33333,44444,";
     Scan wrappedScan = new Scan(rack, data, config);

@@ -103,9 +103,9 @@ public class VisionMateScanner implements BoxScanner {
   public synchronized void prepareScan(int expectedRows, int expectedColumns) throws IntegrationException {
     try {
       client.connect();
-      // Note: VisionMate documentation recommends setting Matrix as the manufacturer if the rack manufacturer is unknown. 
-      // The row and column configuration is the important part of this.
-      RackType rack = new RackType(Manufacturer.MATRIX, expectedRows, expectedColumns);
+      // Note: VisionMate documentation recommends setting Matrix as the manufacturer if the rack manufacturer is unknown; however, this
+      // allows orientation detection and sometimes results in upside-down results, so we are using Other instead
+      RackType rack = new RackType(Manufacturer.OTHER, expectedRows, expectedColumns);
       
       if (!client.setCurrentProduct(rack) || !client.resetStatus()) {
         throw new IntegrationException("Scanner failed to execute preparation instructions");
