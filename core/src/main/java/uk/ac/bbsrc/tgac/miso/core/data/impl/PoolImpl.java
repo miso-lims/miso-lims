@@ -574,4 +574,9 @@ public class PoolImpl extends AbstractBoxable implements Pool {
     return transfers;
   }
 
+  @Override
+  public String getBarcodeGroupDescription() {
+    return null;
+  }
+
 }

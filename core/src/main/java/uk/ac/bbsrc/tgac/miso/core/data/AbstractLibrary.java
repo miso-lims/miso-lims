@@ -805,4 +805,9 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
     return transfers;
   }
 
+  @Override
+  public String getBarcodeGroupDescription() {
+    return null;
+  }
+
 }

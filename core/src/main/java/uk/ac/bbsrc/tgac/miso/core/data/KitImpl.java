@@ -212,4 +212,9 @@ public class KitImpl implements Kit {
   public boolean isSaved() {
     return getId() != UNSAVED_ID;
   }
+
+  @Override
+  public String getBarcodeGroupDescription() {
+    return null;
+  }
 }

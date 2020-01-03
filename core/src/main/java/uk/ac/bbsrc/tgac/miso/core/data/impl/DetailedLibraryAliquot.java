@@ -66,4 +66,9 @@ public class DetailedLibraryAliquot extends LibraryAliquot implements GroupIdent
     return getLibrary() != null && LimsUtils.isDetailedLibrary(getLibrary()) ? (DetailedLibrary) getLibrary() : null;
   }
 
+  @Override
+  public String getBarcodeGroupDescription() {
+    return getEffectiveGroupIdEntity().getGroupDescription();
+  }
+
 }

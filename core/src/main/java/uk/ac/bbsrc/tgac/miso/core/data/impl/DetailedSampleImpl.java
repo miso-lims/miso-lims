@@ -274,4 +274,9 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
     return getParent();
   }
 
+  @Override
+  public String getBarcodeGroupDescription() {
+    return getEffectiveGroupIdEntity().getGroupDescription();
+  }
+
 }
