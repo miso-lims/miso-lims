@@ -62,6 +62,7 @@ SELECT s.alias NAME
         ,sai.isSynthetic isSynthetic
         ,NOT ISNULL(dist.recipient) distributed
         ,dist.transferDate distribution_date
+        ,s.initialVolume initial_volume
 FROM Sample s
 LEFT JOIN DetailedSample sai ON sai.sampleId = s.sampleId 
 LEFT JOIN DetailedQcStatus qpd ON qpd.detailedQcStatusId = sai.detailedQcStatusId 
@@ -241,6 +242,7 @@ SELECT l.alias NAME
         ,NULL isSynthetic
         ,NOT ISNULL(dist.recipient) distributed
         ,dist.transferDate distribution_date
+        ,l.initialVolume initial_volume
 FROM Library l 
 LEFT JOIN Sample parent ON parent.sampleId = l.sample_sampleId
 LEFT JOIN Project sp ON sp.projectId = parent.project_projectId
@@ -376,6 +378,7 @@ SELECT d.alias name
         ,NULL isSynthetic
         ,NOT ISNULL(dist.recipient) distributed
         ,dist.transferDate distribution_date
+        ,NULL initial_volume
 FROM LibraryAliquot d 
 LEFT JOIN LibraryAliquot laParent ON laParent.aliquotId = d.parentAliquotId
 JOIN Library lib ON lib.libraryId = d.libraryId 

@@ -11,6 +11,7 @@ Changes:
   * Added JTT\_7\_GROUPDESC label layout as alternate to JTT\_7 that includes group description
     (detailed sample) instead of the usual extra barcode info
   * Fixed error saving QCs with controls specified
+  * Exports initialVolume in Pinery /samples
 
 Upgrade Notes:
 
