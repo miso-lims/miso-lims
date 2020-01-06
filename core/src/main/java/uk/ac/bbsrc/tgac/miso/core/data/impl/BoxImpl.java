@@ -120,4 +120,9 @@ public class BoxImpl extends AbstractBox {
     return getSize().getRowsByColumns();
   }
 
+  @Override
+  public String getBarcodeGroupDescription() {
+    return null;
+  }
+
 }

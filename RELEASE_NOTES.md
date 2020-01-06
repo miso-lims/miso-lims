@@ -8,6 +8,8 @@ Changes:
     * Distribution fields have been removed from samples, libraries, library aliquots, and pools.
       Transfers are automatically created to replace this data upon update
   * Added "Data Approved" and "Data Approver" fields to sequencing runs
+  * Added JTT\_7\_GROUPDESC label layout as alternate to JTT\_7 that includes group description
+    (detailed sample) instead of the usual extra barcode info
   * Fixed error saving QCs with controls specified
 
 Upgrade Notes:

@@ -147,4 +147,9 @@ public class DetailedLibraryImpl extends LibraryImpl implements DetailedLibrary 
     return getSample() != null && LimsUtils.isDetailedSample(getSample()) ? (DetailedSample) getSample() : null;
   }
 
+  @Override
+  public String getBarcodeGroupDescription() {
+    return getEffectiveGroupIdEntity().getGroupDescription();
+  }
+
 }

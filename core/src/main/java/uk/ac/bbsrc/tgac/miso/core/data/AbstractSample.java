@@ -595,4 +595,9 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
     return transfers;
   }
 
+  @Override
+  public String getBarcodeGroupDescription() {
+    return null;
+  }
+
 }

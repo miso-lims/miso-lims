@@ -405,4 +405,9 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
     return getIdentificationBarcode() + " (" + getModel().getAlias() + ")";
   }
 
+  @Override
+  public String getBarcodeGroupDescription() {
+    return null;
+  }
+
 }

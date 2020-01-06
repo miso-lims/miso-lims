@@ -456,4 +456,9 @@ public class LibraryAliquot extends AbstractBoxable
     return transfers;
   }
 
+  @Override
+  public String getBarcodeGroupDescription() {
+    return null;
+  }
+
 }

@@ -85,7 +85,22 @@ public enum Layout {
     }
 
   },
+  JTT_7_GROUPDESC {
+    // Rectangle
 
+    @Override
+    public LabelCanvas draw(Driver driver, Barcodable barcodable) {
+      LabelCanvas label = driver.start(8.3, 4.08);
+      label.multilineText(0.3, 1, .8, 18, 2, Stream.of(//
+          new Pair<>(FontStyle.BOLD, barcodable.getAlias())));
+      label.multilineText(0.3, 3, .8, 12, 2, Stream.of(//
+          new Pair<>(FontStyle.REGULAR, LimsUtils.formatDate(barcodable.getBarcodeDate())), //
+          new Pair<>(FontStyle.REGULAR, unescapeHtml(barcodable.getBarcodeGroupDescription()))));
+      label.barcode2d(5.78, 3.8, 0.1, getBarcode(barcodable));
+      return label;
+    }
+
+  },
   JTT_7S {
     // Rectangle
 
