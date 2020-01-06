@@ -10,6 +10,7 @@ Changes:
   * Added "Data Approved" and "Data Approver" fields to sequencing runs
   * Added JTT\_7\_GROUPDESC label layout as alternate to JTT\_7 that includes group description
     (detailed sample) instead of the usual extra barcode info
+  * Changed OicrProjectShortNameValidator to allow short names up to 10 characters long
   * Fixed error saving QCs with controls specified
   * Exports initialVolume in Pinery /samples
 
