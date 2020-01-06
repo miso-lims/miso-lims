@@ -12,13 +12,13 @@ FormTarget.freezer = (function($) {
 
   return {
     getSaveUrl: function(freezer) {
-      return freezer.id ? ('/miso/rest/storagelocations/freezers/' + freezer.id) : '/miso/rest/storagelocations/freezers';
+      return freezer.id ? Urls.rest.storageLocations.updateFreezer(freezer.id) : Urls.rest.storageLocations.createFreezer;
     },
     getSaveMethod: function(freezer) {
       return freezer.id ? 'PUT' : 'POST';
     },
     getEditUrl: function(freezer) {
-      return '/miso/freezer/' + freezer.id;
+      return Urls.ui.freezers.edit(freezer.id);
     },
     getSections: function(config, object) {
       return [{

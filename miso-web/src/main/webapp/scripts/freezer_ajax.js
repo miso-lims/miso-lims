@@ -68,7 +68,7 @@
       fields.forEach(function(field) {
         params[field.property] = output[field.property];
       });
-      var url = '/miso/rest/storagelocations/rooms' + '?' + $.param(params);
+      var url = Urls.rest.storageLocations.createRoom + '?' + $.param(params);
       Utils.ajaxWithDialog("Adding Room", 'POST', url, {}, function(responseData) {
         callback();
       });
@@ -76,24 +76,28 @@
   };
 
   Freezer.addFreezerStorage = function() {
-    Utils.showWizardDialog('Add Freezer Storage', [makeHandler('Shelf', [barcodeField], '/shelves'),
-        makeHandler('Stack', [heightField, barcodeField], '/stacks', getStackChildLabels)]);
+    Utils.showWizardDialog('Add Freezer Storage', [
+        makeHandler('Shelf', [barcodeField], Urls.rest.storageLocations.createShelf(freezerJson.id)),
+        makeHandler('Stack', [heightField, barcodeField], Urls.rest.storageLocations.createStack(freezerJson.id), getStackChildLabels)]);
   };
 
   Freezer.addShelfStorage = function(shelf) {
     Utils.showWizardDialog('Add Shelf Storage', [
-        makeHandler('Rack', [depthField, heightField, barcodeField], '/shelves/' + shelf.id + '/racks', getRackChildLabels),
-        makeHandler('Stack', [heightField, barcodeField], '/shelves/' + shelf.id + '/stacks', getStackChildLabels),
-        makeHandler('Tray Rack', [heightField, barcodeField], '/shelves/' + shelf.id + '/tray-racks', getTrayRackChildLabels), {
+        makeHandler('Rack', [depthField, heightField, barcodeField], Urls.rest.storageLocations.createRack(freezerJson.id, shelf.id),
+            getRackChildLabels),
+        makeHandler('Stack', [heightField, barcodeField], Urls.rest.storageLocations.createStack(freezerJson.id, shelf.id),
+            getStackChildLabels),
+        makeHandler('Tray Rack', [heightField, barcodeField], Urls.rest.storageLocations.createTrayRack(freezerJson.id, shelf.id),
+            getTrayRackChildLabels), {
           name: 'Loose Storage',
           handler: function() {
-            var url = '/miso/rest/storagelocations/freezers/' + freezerJson.id + '/shelves/' + shelf.id + '/loose';
+            var url = Urls.rest.storageLocations.createLooseStorage(freezerJson.id, shelf.id);
             Utils.ajaxWithDialog("Adding Storage", 'POST', url, {}, Utils.page.pageReload);
           }
         }]);
   };
 
-  function makeHandler(name, fields, relativeUrl, getChildBarcodeLabelsFunction) {
+  function makeHandler(name, fields, createUrl, getChildBarcodeLabelsFunction) {
     return {
       name: name,
       handler: function() {
@@ -102,7 +106,7 @@
           fields.forEach(function(field) {
             params[field.property] = output[field.property];
           });
-          var url = '/miso/rest/storagelocations/freezers/' + freezerJson.id + relativeUrl + '?' + $.param(params);
+          var url = createUrl + '?' + $.param(params);
           var data = [];
           var submitFunction = function() {
             Utils.ajaxWithDialog("Adding Storage", 'POST', url, data, Utils.page.pageReload);
@@ -309,7 +313,7 @@
         property: "query",
         value: ""
       }, ], function(results) {
-        Utils.ajaxWithDialog('Searching for Boxes', 'GET', '/miso/rest/boxes/search/partial?' + jQuery.param({
+        Utils.ajaxWithDialog('Searching for Boxes', 'GET', Urls.rest.boxes.searchPartial + '?' + jQuery.param({
           q: results.query,
           b: true
         }), null, function(response) {
@@ -317,7 +321,7 @@
             return {
               name: box.alias,
               handler: function() {
-                Utils.ajaxWithDialog('Moving Box', 'POST', '/miso/rest/boxes/' + box.id + '/setlocation?' + jQuery.param({
+                Utils.ajaxWithDialog('Moving Box', 'POST', Urls.rest.boxes.setLocation(box.id) + '?' + jQuery.param({
                   storageId: node.item.id
                 }), {}, Utils.page.pageReload, function(json) {
                   Utils.showOkDialog('Error Moving Box', [json.error]);
@@ -354,7 +358,7 @@
         return {
           name: "View " + box.alias,
           handler: function() {
-            window.location = window.location.origin + '/miso/box/' + box.id;
+            window.location = Urls.ui.boxes.edit(box.id);
           }
         };
       });
@@ -472,7 +476,7 @@
     component.identificationBarcode = $('#storageComponentBarcode').val();
 
     $.ajax({
-      url: '/miso/rest/storagelocations/' + component.id,
+      url: Urls.rest.storageLocations.updateComponent(component.id),
       type: 'PUT',
       dataType: 'json',
       contentType: 'application/json; charset=utf8',

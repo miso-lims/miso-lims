@@ -37,9 +37,18 @@
   <button id="save" type="button" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
 
+<div class="sectionDivider"  onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
+  <div id="note_arrowclick" class="toggleLeft"></div>
+</div>
+<div id="notediv" class="note" style="display:none;">
+  Freezers can be divided into several storage spaces which hold boxes. For full descriptions of the different storage
+  spaces, see the User Manual: <a id="addingStorageLink" target="_blank">Adding Storage to a Freezer</a>
+</div>
+
 <form:form id="freezerForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
 <script type="text/javascript">
   jQuery(document).ready(function () {
+    jQuery('#addingStorageLink').attr('href', Urls.external.userManual('${miso:docsVersion()}', 'freezers_and_rooms', 'adding-storage-to-a-freezer'));
     var dto = ${empty freezerJson ? '{}' : freezerJson};
     Freezer.setFreezerJson(dto);
     FormUtils.createForm('freezerForm', 'save', dto, 'freezer', {
