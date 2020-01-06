@@ -9,6 +9,7 @@ Changes:
       Transfers are automatically created to replace this data upon update
   * Added "Data Approved" and "Data Approver" fields to sequencing runs
   * Fixed error saving QCs with controls specified
+  * Exports initialVolume in Pinery /samples
 
 Upgrade Notes:
 
