@@ -149,7 +149,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Transient
   private List<FileAttachment> pendingAttachmentDeletions;
 
-  @OneToMany(mappedBy = "item")
+  @OneToMany(mappedBy = "item", cascade = CascadeType.REMOVE)
   private List<TransferSample> transfers;
 
   @Override

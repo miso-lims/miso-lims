@@ -145,7 +145,7 @@ public class LibraryAliquot extends AbstractBoxable
   @OneToMany(targetEntity = LibraryAliquotChangeLog.class, mappedBy = "libraryAliquot", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
-  @OneToMany(mappedBy = "item")
+  @OneToMany(mappedBy = "item", cascade = CascadeType.REMOVE)
   private List<TransferLibraryAliquot> transfers;
 
   @Override
