@@ -6,16 +6,16 @@ FormTarget.box = (function($) {
   return {
     getSaveUrl: function(box) {
       if (box.id) {
-        return '/miso/rest/boxes/' + box.id;
+        return Urls.rest.boxes.update(box.id);
       } else {
-        return '/miso/rest/boxes';
+        return Urls.rest.boxes.create;
       }
     },
     getSaveMethod: function(box) {
       return box.id ? 'PUT' : 'POST';
     },
     getEditUrl: function(box) {
-      return '/miso/box/' + box.id;
+      return Urls.ui.boxes.edit(box.id);
     },
     getSections: function(config) {
       return [{
@@ -143,7 +143,7 @@ FormTarget.box = (function($) {
     var barcode = $('#freezerLocationScan').val();
 
     $.ajax({
-      url: '/miso/rest/storagelocations/bybarcode?' + jQuery.param({
+      url: Urls.rest.storageLocations.queryByBarcode + '?' + jQuery.param({
         q: barcode
       }),
       type: 'GET',
@@ -172,30 +172,32 @@ FormTarget.box = (function($) {
   }
 
   function onLocationSelect() {
-    $('#freezerLocationLoader').show();
     $('#freezerLocationScan').empty();
     Utils.ui.setDisabled('#setFreezerLocation', true);
     Utils.ui.setDisabled('#resetFreezerLocation', true);
 
     var location = getSelectedLocation();
 
-    $.ajax({
-      url: '/miso/rest/storagelocations/' + location.id + '/children',
-      type: 'GET',
-      dataType: 'json',
-      contentType: 'application/json; charset=utf8'
-    }).success(function(data) {
-      if (data.length) {
+    if (location.availableStorage) {
+      Utils.ui.setDisabled('#resetFreezerLocation', false);
+      Utils.ui.setDisabled('#setFreezerLocation', false);
+    } else {
+      $('#freezerLocationLoader').show();
+      $.ajax({
+        url: Urls.rest.storageLocations.children(location.id),
+        type: 'GET',
+        dataType: 'json',
+        contentType: 'application/json; charset=utf8'
+      }).success(function(data) {
         $('#freezerLocationRoot').text(location.fullDisplayLocation + ' > ');
         setFreezerLocationOptions(data, location, false);
-      }
-    }).fail(function(response, textStatus, serverStatus) {
-      Utils.showOkDialog('Error', ['Location search failed']);
-    }).always(function() {
-      $('#freezerLocationLoader').hide();
-      Utils.ui.setDisabled('#resetFreezerLocation', false);
-      Utils.ui.setDisabled('#setFreezerLocation', !location.availableStorage);
-    });
+      }).fail(function(response, textStatus, serverStatus) {
+        Utils.showOkDialog('Error', ['Location search failed']);
+      }).always(function() {
+        $('#freezerLocationLoader').hide();
+        Utils.ui.setDisabled('#resetFreezerLocation', false);
+      });
+    }
   }
 
   function setFreezerLocation(form) {
@@ -230,7 +232,7 @@ FormTarget.box = (function($) {
     Utils.ui.setDisabled('#resetFreezerLocation', true);
 
     $.ajax({
-      url: '/miso/rest/storagelocations/freezers',
+      url: Urls.rest.storageLocations.freezers,
       type: 'GET',
       dataType: 'json',
       contentType: 'application/json; charset=utf8'
@@ -251,22 +253,32 @@ FormTarget.box = (function($) {
     freezerLocations = locations;
     parentFreezerLocation = parentLocation;
     $('#freezerLocationSelect').empty();
-    $('#freezerLocationSelect').append($('<option>').val('-1').text('SELECT'));
-    var displayProperty = fullDisplay ? 'fullDisplayLocation' : 'displayLocation';
-    locations.sort(function(a, b) {
-      if (a[displayProperty] < b[displayProperty]) {
-        return -1;
+    if (!locations || !locations.length) {
+      $('#freezerLocationSelect').append($('<option>').val('-1').text('NO SPACE'));
+    } else {
+      if (!parentLocation || locations.length > 1) {
+        $('#freezerLocationSelect').append($('<option>').val('-1').text('SELECT'));
+        $('#freezerLocationSelect').val('-1');
       }
-      if (a[displayProperty] > b[displayProperty]) {
-        return 1;
+      var displayProperty = fullDisplay ? 'fullDisplayLocation' : 'displayLocation';
+      locations.sort(function(a, b) {
+        if (a[displayProperty] < b[displayProperty]) {
+          return -1;
+        }
+        if (a[displayProperty] > b[displayProperty]) {
+          return 1;
+        }
+        return 0;
+      });
+      locations.forEach(function(location) {
+        $('#freezerLocationSelect').append(
+            $('<option>').val(location.id).text(location[displayProperty] + (location.availableStorage ? ' *' : '')));
+      });
+      if (parentLocation && locations.length === 1) {
+        $('#freezerLocationSelect').val(locations[0].id);
+        onLocationSelect();
       }
-      return 0;
-    });
-    locations.forEach(function(location) {
-      $('#freezerLocationSelect').append(
-          $('<option>').val(location.id).text(location[displayProperty] + (location.availableStorage ? ' *' : '')));
-    });
-    $('#freezerLocationSelect').val('-1');
+    }
   }
 
 })(jQuery);

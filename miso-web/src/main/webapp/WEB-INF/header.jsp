@@ -114,7 +114,7 @@
   <div class="cell">
     <sec:authorize access="isAuthenticated()">
       <div id="loggedInBanner">
-        <a href="https://miso-lims.readthedocs.io/projects/docs/en/${miso:docsVersion()}/user_manual/">Help</a> |
+        <a id="userManualLink">Help</a> |
         <a href="https://gitter.im/miso-lims/users">Chat</a> |
         <c:if test="${misoBugUrl != null}">
           <a href="${misoBugUrl}" target="_blank">Report a problem</a> |
@@ -131,6 +131,7 @@
 
 <sec:authorize access="isAuthenticated()">
   <script type="text/javascript">
+    jQuery('#userManualLink').attr('href', Urls.external.userManual('${miso:docsVersion()}'));
     jQuery(function () {
       //all hover and click logic for buttons
       jQuery(".fg-button:not(.ui-state-disabled)")
