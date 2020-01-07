@@ -12,10 +12,14 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.AbstractElement;
 
 public abstract class AbstractPage extends AbstractElement {
+
+  private static final Logger log = LoggerFactory.getLogger(AbstractPage.class);
 
   private static final ExpectedCondition<Boolean> pageLoaded = (driver) -> {
     return ((JavascriptExecutor) driver).executeScript("return document.readyState").equals("complete");
@@ -89,17 +93,22 @@ public abstract class AbstractPage extends AbstractElement {
 
   public static boolean checkForErrors(WebDriver driver, String baseUrl, String urlSlug) {
     String url = String.format(MISO_URL, baseUrl, urlSlug);
-    driver.get(url);
-    // confirm that page contains logo
-    if (driver.findElements(By.id("misologo")).isEmpty())
-      throw new IllegalArgumentException("Page at /miso/" + urlSlug + " is completely empty. Is resource correct?");
+    try {
+      driver.get(url);
+      // confirm that page contains logo
+      if (driver.findElements(By.id("misologo")).isEmpty())
+        throw new IllegalArgumentException("Page at /miso/" + urlSlug + " is completely empty. Is resource correct?");
 
-    List<WebElement> errors = driver.findElements(By.xpath("//li[contains(text(), '" + MISO_STACKTRACE + "')]"));
-    if (errors.size() > 0) {
-      errors.stream().map(item -> item.getText().trim()).collect(Collectors.toList()).toString();
-      return true;
-    } else {
-      return false;
+      List<WebElement> errors = driver.findElements(By.xpath("//li[contains(text(), '" + MISO_STACKTRACE + "')]"));
+      if (errors.size() > 0) {
+        errors.stream().map(item -> item.getText().trim()).collect(Collectors.toList()).toString();
+        return true;
+      } else {
+        return false;
+      }
+    } catch (Exception e) {
+      log.error(String.format("Exception thrown while checking slug: %s", urlSlug), e);
+      throw e;
     }
   }
 

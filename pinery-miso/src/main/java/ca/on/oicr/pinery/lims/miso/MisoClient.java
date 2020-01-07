@@ -889,6 +889,12 @@ public class MisoClient implements Lims {
         public String extractStringValueFrom(ResultSet rs) throws SQLException {
           return extractBigDecimalString(rs, getSqlKey());
         }
+      }, //
+      INITIAL_VOLUME("initial_volume", "Initial Volume") {
+        @Override
+        public String extractStringValueFrom(ResultSet rs) throws SQLException {
+          return extractBigDecimalString(rs, getSqlKey());
+        }
       };
 
       private final String sqlKey;

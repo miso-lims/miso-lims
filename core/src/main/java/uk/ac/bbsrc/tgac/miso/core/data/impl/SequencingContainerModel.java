@@ -162,4 +162,9 @@ public class SequencingContainerModel implements Deletable, Serializable, Barcod
   public String getDeleteDescription() {
     return getAlias() + " (" + getPlatformType().getKey() + ")";
   }
+
+  @Override
+  public String getBarcodeGroupDescription() {
+    return null;
+  }
 }

@@ -80,4 +80,6 @@ public interface Barcodable extends Nameable, Aliasable {
   }
 
   public String getBarcodeSizeInfo();
+
+  public String getBarcodeGroupDescription();
 }

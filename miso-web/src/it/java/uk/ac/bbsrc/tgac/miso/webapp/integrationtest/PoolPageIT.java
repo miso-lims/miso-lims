@@ -305,9 +305,9 @@ public class PoolPageIT extends AbstractIT {
   @Test
   public void testWarningsOnPoolWithNoErrors() {
     PoolPage page = PoolPage.getForEdit(getDriver(), getBaseUrl(), 120001L);
-    assertFalse(page.hasAliquotIndexWarning("MISSING INDEX"));
-    assertFalse(page.hasAliquotIndexWarning("Near-Duplicate Indices"));
-    assertFalse(page.hasAliquotIndexWarning("DUPLICATE INDICES"));
+    assertFalse(page.hasAliquotWarning("MISSING INDEX"));
+    assertFalse(page.hasAliquotWarning("Near-Duplicate Indices"));
+    assertFalse(page.hasAliquotWarning("DUPLICATE INDICES"));
   }
 
   private void assertPoolAttributes(Map<PoolPage.Field, String> expectedValues, Pool pool) {

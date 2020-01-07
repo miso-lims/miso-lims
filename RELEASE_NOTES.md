@@ -8,12 +8,17 @@ Changes:
     * Distribution fields have been removed from samples, libraries, library aliquots, and pools.
       Transfers are automatically created to replace this data upon update
   * Added "Data Approved" and "Data Approver" fields to sequencing runs
+  * Added JTT\_7\_GROUPDESC label layout as alternate to JTT\_7 that includes group description
+    (detailed sample) instead of the usual extra barcode info
   * Added a Quick Help section to the Edit Freezer page, including a link to the User Manual
     section describing the different storage space types
   * Improved interface for selecting freezer location on the Edit Box page
     * If there is only one option in the location dropdown, it will be selected automatically
     * If there is no valid storage space within the selected location, "NO SPACE" will be displayed
+  * Changed columns shown on Samples, Libraries, and Library Aliquots list pages
+  * Changed warnings on table rows to only show an icon; icon tooltip shows full warning messages
   * Fixed error saving QCs with controls specified
+  * Exports initialVolume in Pinery /samples
 
 Upgrade Notes:
 

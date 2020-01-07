@@ -68,16 +68,6 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
       String[] parts = alias.split("\\.");
       criteria.createAlias(alias, parts[parts.length - 1]);
     }
-    String creator = propertyForUser(true);
-    String modifier = propertyForUser(false);
-    if (creator != null) {
-      criteria.createAlias(creator, creator);
-      criteria.createAlias(creator + ".groups", "creatorGroup", JoinType.LEFT_OUTER_JOIN);
-    }
-    if (modifier != null) {
-      criteria.createAlias(modifier, modifier);
-      criteria.createAlias(modifier + ".groups", "modifierGroup", JoinType.LEFT_OUTER_JOIN);
-    }
     criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
     return criteria;
   }
@@ -104,7 +94,18 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
     String sortProperty = propertyForSortColumn(sortCol);
     Order order = sortDir ? Order.asc(sortProperty) : Order.desc(sortProperty);
 
-    Criteria idCriteria = createPaginationCriteria();
+    Criteria idCriteria = null;
+    if (filters.length == 0 && !sortProperty.contains(".")) {
+      // Faster method
+      idCriteria = currentSession().createCriteria(getRealClass())
+          .setProjection(Projections.projectionList().add(Projections.property("id")).add(Projections.property(sortProperty)));
+    } else {
+      // We need to keep both the id column and the sort column in the result set for the database to provide us with sorted, duplicate-free
+      // results. We will throw the sort property out later.
+      idCriteria = createPaginationCriteria()
+          .setProjection(Projections.projectionList().add(Projections.groupProperty("id")).add(Projections.groupProperty(sortProperty)));
+    }
+
     idCriteria.addOrder(order);
 
     for (PaginationFilter filter : filters) {
@@ -115,10 +116,6 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
     if (limit > 0) {
       idCriteria.setMaxResults(limit);
     }
-    // We need to keep both the id column and the sort column in the result set for the database to provide us with sorted, duplicate-free
-    // results. We will throw the sort property out later.
-    idCriteria.setProjection(
-        Projections.projectionList().add(Projections.groupProperty("id")).add(Projections.groupProperty(sortProperty)));
 
     @SuppressWarnings("unchecked")
     List<Object[]> ids = idCriteria.list();
@@ -334,7 +331,9 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   public default void restrictPaginationByUser(Criteria criteria, String userName, boolean creator, Consumer<String> errorHandler) {
     String property = propertyForUser(creator);
     if (property != null) {
-      criteria.add(Restrictions.ilike(property + ".loginName", userName, MatchMode.START));
+      criteria.createAlias(property, property)
+          .createAlias(property + ".groups", property + "Group", JoinType.LEFT_OUTER_JOIN)
+          .add(Restrictions.ilike(property + ".loginName", userName, MatchMode.START));
     } else {
       errorHandler.accept(String.format("%s has no %s.", getFriendlyName(), (creator ? "creator" : "modifier")));
     }
@@ -342,12 +341,12 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
 
   @Override
   public default void restrictPaginationByUserOrGroup(Criteria criteria, String name, boolean creator, Consumer<String> errorHandler) {
-    String propertyForUser = propertyForUser(creator);
-    if (propertyForUser != null) {
-      propertyForUser += ".loginName";
-      String propertyForGroup = creator ? "creatorGroup.name" : "modifierGroup.name";
-      criteria.add(Restrictions.or(Restrictions.ilike(propertyForUser, name, MatchMode.START),
-          Restrictions.ilike(propertyForGroup, name, MatchMode.START)));
+    String property = propertyForUser(creator);
+    if (property != null) {
+      criteria.createAlias(property, property)
+          .createAlias(property + ".groups", property + "Group")
+          .add(Restrictions.or(Restrictions.ilike(property + ".loginName", name, MatchMode.START),
+              Restrictions.ilike(property + "Group.name", name, MatchMode.START)));
     } else {
       errorHandler.accept(String.format("%s has no %s.", getFriendlyName(), (creator ? "creator" : "modifier")));
     }

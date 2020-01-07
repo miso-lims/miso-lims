@@ -88,42 +88,45 @@ ListTarget.libraryaliquot = {
   },
   createColumns: function(config, projectId) {
     return [{
+      "sTitle": "ID",
+      "mData": "id",
+      "bVisible": false
+    }, {
       "sTitle": "Name",
-      "mData": "id", // for sorting purposes (numerical order instead of string)
+      "mData": "name",
       "include": true,
       "iSortPriority": 1,
-      "mRender": function(data, type, full) {
-        if (type === 'display') {
-          return '<a href="' + Urls.ui.libraryAliquots.edit(data) + '">' + full.name + '</a>';
-        }
-        return data;
-      }
+      "iDataSort": 0, // Use ID for sorting
+      "mRender": Warning.tableWarningRenderer(WarningTarget.libraryaliquot, function(aliquot) {
+        return Urls.ui.libraryAliquots.edit(aliquot.id);
+      }),
+      "sClass": "nowrap"
     }, ListUtils.labelHyperlinkColumn("Alias", Urls.ui.libraryAliquots.edit, Utils.array.getId, "alias", 0, true), {
-      "sTitle": "Warnings",
-      "mData": null,
-      "mRender": Warning.tableWarningRenderer(WarningTarget.libraryaliquot),
-      "include": true,
-      "iSortPriority": 0,
-      "bVisible": true,
-      "bSortable": false
-    }, ListUtils.idHyperlinkColumn("Library Name", Urls.ui.libraries.edit, "libraryId", function(aliquot) {
-      return aliquot.libraryName;
-    }, 0, !config.library), ListUtils.labelHyperlinkColumn("Library Alias", Urls.ui.libraries.edit, function(aliquot) {
-      return aliquot.libraryId;
-    }, "libraryAlias", 0, !config.library), {
-      "sTitle": "Platform",
-      "mData": "libraryPlatformType",
-      "include": true,
+      "sTitle": "Tissue Origin",
+      "mData": "effectiveTissueOriginLabel",
+      "include": Constants.isDetailedSample,
+      "mRender": ListUtils.render.naIfNull,
+      "bSortable": false,
       "iSortPriority": 0
     }, {
-      "sTitle": "Targeted Sequencing",
-      "mData": "targetedSequencingId",
+      "sTitle": "Tissue Type",
+      "mData": "effectiveTissueTypeLabel",
       "include": Constants.isDetailedSample,
-      "mRender": ListUtils.render.textFromId(Constants.targetedSequencings, 'alias', '(None)'),
-      "iSortPriority": 0,
+      "mRender": ListUtils.render.naIfNull,
+      "bSortable": false,
+      "iSortPriority": 0
+    }, {
+      "sTitle": "Design",
+      "mData": "libraryDesignCodeId",
+      "include": Constants.isDetailedSample,
+      "mRender": ListUtils.render.textFromId(Constants.libraryDesignCodes, "code"),
       "bSortable": false
     }, {
-      "sTitle": "Index(es)",
+      "sTitle": "Size (bp)",
+      "mData": "dnaSize",
+      "iSortPriority": 0
+    }, {
+      "sTitle": "Indices",
       "mData": "indexLabels",
       "mRender": function(data, type, full) {
         if (!data) {
@@ -135,62 +138,31 @@ ListTarget.libraryaliquot = {
       "iSortPriority": 0,
       "bSortable": false
     }, {
+      "sTitle": "Location",
+      "mData": "locationLabel",
+      "include": true,
+      "iSortPriority": 0,
+      "mRender": function(data, type, full) {
+        return full.boxId ? "<a href='/miso/box/" + full.boxId + "'>" + data + "</a>" : data;
+      },
+      "bSortable": false
+    }, {
       "sTitle": "Volume",
       "mData": "volume",
       "include": true,
       "iSortPriority": 0,
-      "mRender": function(data, type, full) {
-        if (type === 'display' && !!data) {
-          var units = Constants.volumeUnits.find(function(unit) {
-            return unit.name == full.volumeUnits;
-          });
-          if (!!units) {
-            return data + ' ' + units.units;
-          }
-        }
-        return data;
-      }
+      "mRender": ListUtils.render.measureWithUnits(Constants.volumeUnits, 'volumeUnits')
     }, {
       "sTitle": "Concentration",
       "mData": "concentration",
       "include": true,
       "iSortPriority": 0,
-      "mRender": function(data, type, full) {
-        if (type === 'display' && !!data) {
-          var units = Constants.concentrationUnits.find(function(unit) {
-            return unit.name == full.concentrationUnits;
-          });
-          if (!!units) {
-            return data + ' ' + units.units;
-          }
-        }
-        return data;
-      }
+      "mRender": ListUtils.render.measureWithUnits(Constants.concentrationUnits, 'concentrationUnits')
     }, {
-      "sTitle": "ng Lib. Used",
-      "mData": "ngUsed",
+      "sTitle": "Last Modified",
+      "mData": "lastModified",
       "include": true,
-      "iSortPriority": 0
-    }, {
-      "sTitle": "Vol. Lib. Used",
-      "mData": "volumeUsed",
-      "include": true,
-      "iSortPriority": 0
-    }, {
-      "sTitle": "Matrix Barcode",
-      "mData": "identificationBarcode",
-      "include": true,
-      "iSortPriority": 0
-    }, {
-      "sTitle": "Creator",
-      "mData": "creatorName",
-      "include": true,
-      "iSortPriority": 0
-    }, {
-      "sTitle": "Creation Date",
-      "mData": "creationDate",
-      "include": true,
-      "iSortPriority": 0
+      "iSortPriority": 2
     }];
   },
   searchTermSelector: function(searchTerms) {

@@ -44,7 +44,8 @@ AS SELECT
     box.alias AS boxAlias,
     box.name AS boxName,
     box.identificationBarcode AS boxIdentificationBarcode,
-    box.locationBarcode AS boxLocationBarcode
+    box.locationBarcode AS boxLocationBarcode,
+    dla.libraryDesignCodeId AS libraryDesignCodeId
   FROM LibraryAliquot d
     JOIN Library l ON l.libraryId = d.libraryId
     JOIN Sample s ON s.sampleId = l.sample_sampleId
@@ -54,7 +55,8 @@ AS SELECT
     LEFT JOIN LibrarySelectionType sel ON sel.librarySelectionTypeId = l.librarySelectionType
     LEFT JOIN LibraryStrategyType strat ON strat.libraryStrategyTypeId = l.libraryStrategyType
     LEFT JOIN LibraryAliquotBoxPosition dbp ON dbp.aliquotId = d.aliquotId
-    LEFT JOIN Box box ON box.boxId = dbp.boxId;
+    LEFT JOIN Box box ON box.boxId = dbp.boxId
+    LEFT JOIN DetailedLibraryAliquot dla ON dla.aliquotId = d.aliquotId;
 
 CREATE OR REPLACE VIEW ListPoolView AS
 SELECT

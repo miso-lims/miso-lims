@@ -28,6 +28,7 @@ public interface AbstractListPage {
     public static final String DATE_CREATED = "Date Created";
     public static final String DEFAULT_SCI_NAME = "Default Scientific Name";
     public static final String DESCRIPTION = "Description";
+    public static final String DESIGN = "Design";
     public static final String DRIVER = "Driver";
     public static final String END_DATE = "End Date";
     public static final String EXTERNAL = "External";
@@ -55,6 +56,7 @@ public interface AbstractListPage {
     public static final String LAST_SEQUENCER = "Last Sequencer Used";
     public static final String LAYOUT = "Layout";
     public static final String LIBRARY_ALIAS = "Library Alias";
+    public static final String LIBRARY_ALIQUOT_NAME = "Library Aliquot Name";
     public static final String LIBRARY_ALIQUOTS = "Library Aliquots";
     public static final String LIBRARY_DESIGN_CODE = "Design Code";
     public static final String LIBRARY_NAME = "Library Name";
@@ -82,6 +84,7 @@ public interface AbstractListPage {
     public static final String POSITION = "Position";
     public static final String PRINTER = "Printer";
     public static final String PURPOSE = "Purpose";
+    public static final String QC = "QC";
     public static final String QC_NOTE = "QC Note";
     public static final String QC_PASSED = "QC Passed";
     public static final String QC_STATUS = "QC Status";
@@ -113,6 +116,8 @@ public interface AbstractListPage {
     public static final String SUBCATEGORY = "Subcategory";
     public static final String TARGETED_SEQUENCING = "Targeted Sequencing";
     public static final String TARGETED_SEQUENCING_REQD = "Targeted Sequencing Required";
+    public static final String TISSUE_ORIGIN = "Tissue Origin";
+    public static final String TISSUE_TYPE = "Tissue Type";
     public static final String TRANSFER_DATE = "Transfer Date";
     public static final String TYPE = "Type";
     public static final String UNIQUE_DUAL_INDICES = "Unique Dual Indices";
@@ -122,7 +127,6 @@ public interface AbstractListPage {
     public static final String VOLUME = "Volume";
     public static final String VOLUME_UNITS = "Vol. Units";
     public static final String VOLUME_USED = "Vol. Lib. Used";
-    public static final String WARNINGS = "Warnings";
   }
 
   public static class ListTarget {

@@ -34,6 +34,12 @@
   <artifactId>sqlstore</artifactId>
   <packaging>jar</packaging>
   <name>MISO SQL Store</name>
+  <properties>
+    <skipITs>true</skipITs>
+    <mysql.db>lims</mysql.db>
+    <mysql.user>tgaclims</mysql.user>
+    <mysql.pw>tgaclims</mysql.pw>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>${project.parent.groupId}</groupId>
@@ -71,11 +77,6 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>org.aspectj</groupId>
-      <artifactId>aspectjweaver</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
       <type>jar</type>
@@ -103,6 +104,10 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
@@ -153,39 +158,6 @@
         <artifactId>maven-compiler-plugin</artifactId>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy</id>
-            <phase>process-sources</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.aspectj</groupId>
-                  <artifactId>aspectjweaver</artifactId>
-                  <version>1.6.12</version>
-                  <type>jar</type>
-                  <overWrite>true</overWrite>
-                  <outputDirectory>${project.build.directory}/dependency</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
-        <configuration>
-          <usedDependencies>
-            <usedDependency>mysql:mysql-connector-java</usedDependency>
-            <usedDependency>org.flywaydb:flyway-core</usedDependency>
-            <usedDependency>com.h2database:h2</usedDependency>
-            <usedDependency>cglib:cglib-nodep</usedDependency>
-          </usedDependencies>
-        </configuration>
-      </plugin>
-      <plugin>
         <groupId>org.codehaus.gmaven</groupId>
         <artifactId>groovy-maven-plugin</artifactId>
         <executions>
@@ -197,16 +169,6 @@
             </goals>
             <configuration>
               <source>${project.basedir}/src/main/resources/db/scripts/concat_migrate.groovy</source>
-            </configuration>
-          </execution>
-          <execution>
-            <id>translate-schema</id>
-            <phase>generate-test-resources</phase>
-            <goals>
-              <goal>execute</goal>
-            </goals>
-            <configuration>
-              <source>${project.basedir}/src/test/resources/db/scripts/schema_translator.groovy</source>
             </configuration>
           </execution>
         </executions>
@@ -277,4 +239,157 @@
     	</plugins>
     </pluginManagement>
   </build>
+  <profiles>
+  	<profile>
+      <id>integration-test-setup</id>
+      <activation>
+        <property>
+          <!-- activate when integration tests are enabled -->
+          <name>skipITs</name>
+          <value>false</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <!-- separate integration test sources/resources from unit tests -->
+	        <groupId>org.codehaus.mojo</groupId>
+	        <artifactId>build-helper-maven-plugin</artifactId>
+	        <executions>
+	          <execution>
+	            <id>add-it-sources</id>
+	            <phase>generate-test-sources</phase>
+	            <goals>
+	              <goal>add-test-source</goal>
+	            </goals>
+	            <configuration>
+	              <sources>
+	                <source>src/it/java</source>
+	              </sources>
+	            </configuration>
+	          </execution>
+	          <execution>
+	            <id>add-it-resources</id>
+	            <phase>generate-test-resources</phase>
+	            <goals>
+	              <goal>add-test-resource</goal>
+	            </goals>
+	            <configuration>
+	              <resources>
+	                <resource>
+	                  <filtering>true</filtering>
+	                  <directory>src/it/resources</directory>
+	                </resource>
+	              </resources>
+	            </configuration>
+	          </execution>
+	        </executions>
+	      </plugin>
+	      <plugin>
+	        <!-- Start MySQL Docker container -->
+            <groupId>io.fabric8</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <version>0.21.0</version>
+            <configuration>
+            <removeVolumes>true</removeVolumes>
+              <images>
+                <image>
+                  <name>mysql:5.7</name>
+                  <alias>mysql</alias>
+                  <run>
+                    <env>
+                      <MYSQL_ROOT_PASSWORD>abc123</MYSQL_ROOT_PASSWORD>
+                      <MYSQL_USER>${mysql.user}</MYSQL_USER>
+                      <MYSQL_PASSWORD>${mysql.pw}</MYSQL_PASSWORD>
+                      <MYSQL_DATABASE>${mysql.db}</MYSQL_DATABASE>
+                    </env>
+                    <ports>
+                      <port>${mysql.port}:3306</port>
+                    </ports>
+                    <wait>
+                      <tcp>
+                        <ports>
+                          <port>3306</port>
+                        </ports>
+                      </tcp>
+                      <time>30000</time>
+                    </wait>
+                  </run>
+                </image>
+              </images>
+            </configuration>
+            <executions>
+              <execution>
+                <id>start</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>start</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>stop</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>stop</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+	        <!-- populate DB -->
+	        <groupId>org.flywaydb</groupId>
+	        <artifactId>flyway-maven-plugin</artifactId>
+	        <executions>
+	          <execution>
+	            <id>integration-test-db</id>
+	            <phase>pre-integration-test</phase>
+	            <goals>
+	              <goal>clean</goal>
+	              <goal>migrate</goal>
+	            </goals>
+	          </execution>
+	        </executions>
+	        <configuration>
+	          <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?autoReconnect=true</url>
+	          <user>${mysql.user}</user>
+	          <password>${mysql.pw}</password>
+	          <locations>
+                <location>classpath:uk.ac.bbsrc.tgac.miso.db.migration</location>
+                <location>filesystem:target/classes/db/migration</location>
+                <location>filesystem:target/test-classes/db/migration</location>
+              </locations>
+	          <sqlMigrationSuffix>.sql</sqlMigrationSuffix>
+              <placeholders>
+                <filesDir>/storage/miso/files/</filesDir>
+              </placeholders>
+              <!-- this is to prevent flyway.properties from overriding the settings here -->
+              <configFile>empty.properties</configFile>
+	        </configuration>
+	      </plugin>
+          <plugin>
+            <!-- run integration tests -->
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>integration-test</goal>
+                  <goal>verify</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <systemPropertyVariables>
+                <!-- Make config available for tests -->
+                <miso.it.mysql.url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?autoReconnect=true</miso.it.mysql.url>
+                <miso.it.mysql.user>${mysql.user}</miso.it.mysql.user>
+                <miso.it.mysql.pw>${mysql.pw}</miso.it.mysql.pw>
+              </systemPropertyVariables>
+              <skipTests>${skipITs}</skipTests>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

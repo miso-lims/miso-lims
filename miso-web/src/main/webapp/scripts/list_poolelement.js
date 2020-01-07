@@ -111,18 +111,22 @@ ListTarget.poolelement = {
   createColumns: function(config, projectId) {
     return [
         {
-          sTitle: 'Library Aliquot Name',
-          mData: 'id', // for sorting purposes
-          include: true,
-          iSortPriority: 1,
-          mRender: function(data, type, full) {
-            if (type === 'display') {
-              return '<a href="' + Urls.ui.libraryAliquots.edit(full.id) + '">' + full.name + '</a>';
-            }
-            return data;
-          }
+          sTitle: 'ID',
+          mData: 'id',
+          bVisible: false
         },
         {
+          sTitle: 'Library Aliquot Name',
+          mData: 'name',
+          include: true,
+          iSortPriority: 1,
+          iDataSort: 0, // Use ID for sorting
+          mRender: Warning.tableWarningRenderer(WarningTarget.poolelement.makeTarget(config.duplicateIndicesSequences,
+              config.nearDuplicateIndicesSequences), function(aliquot) {
+            return Urls.ui.libraryAliquots.edit(aliquot.id);
+          }),
+          sClass: 'nowrap'
+        }, {
           sTitle: 'Library Aliquot Alias',
           mData: 'alias',
           include: true,
@@ -133,16 +137,6 @@ ListTarget.poolelement = {
             }
             return data;
           }
-        },
-        {
-          sTitle: "Warnings",
-          mData: null,
-          mRender: Warning.tableWarningRenderer(WarningTarget.poolelement.makeTarget(config.duplicateIndicesSequences,
-              config.nearDuplicateIndicesSequences)),
-          include: true,
-          iSortPriority: 0,
-          bVisible: true,
-          bSortable: false
         }, {
           sTitle: 'Proportion',
           sType: 'numeric',

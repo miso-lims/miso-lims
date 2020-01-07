@@ -1785,8 +1785,9 @@ textarea.parsley-error {
   color: #666666;
 }
 
-.message-info {
-  color: #666666;
+.warning-icon {
+  font-size: 150%;
+  font-weight: bold;
 }
 
 .hidden {
@@ -2031,6 +2032,10 @@ button.disabled {
 .tooltip:hover .tooltiptext {
     visibility: visible;
     opacity: 1;
+}
+
+.nowrap {
+    white-space: nowrap;
 }
 
 .popup {

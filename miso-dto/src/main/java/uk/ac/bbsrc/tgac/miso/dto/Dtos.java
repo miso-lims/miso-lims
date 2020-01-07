@@ -186,6 +186,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolViewElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListTransferView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SampleHierarchyView;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQcControlRun;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQC;
@@ -394,10 +395,15 @@ public class Dtos {
       DetailedSample detailed = (DetailedSample) from;
       dto.setSampleClassId(detailed.getSampleClass().getId());
       setDateString(dto::setCreationDate, detailed.getCreationDate());
-      dto.setIdentityConsentLevel(getIdentityConsentLevelString(detailed));
       if (detailed.getSubproject() != null) {
         dto.setSubprojectAlias(detailed.getSubproject().getAlias());
         dto.setSubprojectPriority(detailed.getSubproject().getPriority());
+      }
+      if (detailed.getHierarchyAttributes() != null) {
+        SampleHierarchyView attributes = detailed.getHierarchyAttributes();
+        setString(dto::setEffectiveTissueOriginLabel, maybeGetProperty(attributes.getTissueOrigin(), TissueOrigin::getAlias));
+        setString(dto::setEffectiveTissueTypeLabel, maybeGetProperty(attributes.getTissueType(), TissueType::getAlias));
+        setString(dto::setIdentityConsentLevel, maybeGetProperty(attributes.getConsentLevel(), ConsentLevel::getLabel));
       }
     }
     return dto;
@@ -504,10 +510,6 @@ public class Dtos {
       dto.setParentId(from.getParent().getId());
       dto.setParentAlias(from.getParent().getAlias());
       dto.setParentTissueSampleClassId(from.getParent().getSampleClass().getId());
-      dto.setIdentityConsentLevel(getIdentityConsentLevelString(from));
-
-      SampleIdentity identity = LimsUtils.getParent(SampleIdentity.class, from);
-      dto.setEffectiveExternalNames(identity.getExternalName());
     }
     GroupIdentifiable effective = from.getEffectiveGroupIdEntity();
     if (effective != null) {
@@ -531,6 +533,13 @@ public class Dtos {
     dto.setDetailedQcStatusNote(from.getDetailedQcStatusNote());
     setString(dto::setVolumeUsed, from.getVolumeUsed());
     setString(dto::setNgUsed, from.getNgUsed());
+
+    if (from.getHierarchyAttributes() != null) {
+      SampleHierarchyView attributes = from.getHierarchyAttributes();
+      setString(dto::setIdentityConsentLevel, maybeGetProperty(attributes.getConsentLevel(), ConsentLevel::getLabel));
+      setString(dto::setEffectiveExternalNames, attributes.getExternalName());
+    }
+
     return dto;
   }
 
@@ -1191,19 +1200,19 @@ public class Dtos {
       dto.setGroupDescription(from.getGroupDescription());
     }
     if (from.getSample() != null) {
-      dto.setIdentityConsentLevel(getIdentityConsentLevelString((DetailedSample) from.getSample()));
       DetailedSample detailed = (DetailedSample) from.getSample();
       if (detailed.getSubproject() != null) {
         dto.setSubprojectAlias(detailed.getSubproject().getAlias());
         dto.setSubprojectPriority(detailed.getSubproject().getPriority());
       }
+      if (detailed.getHierarchyAttributes() != null) {
+        SampleHierarchyView attributes = detailed.getHierarchyAttributes();
+        setString(dto::setEffectiveTissueOriginLabel, maybeGetProperty(attributes.getTissueOrigin(), TissueOrigin::getAlias));
+        setString(dto::setEffectiveTissueTypeLabel, maybeGetProperty(attributes.getTissueType(), TissueType::getAlias));
+        setString(dto::setIdentityConsentLevel, maybeGetProperty(attributes.getConsentLevel(), ConsentLevel::getLabel));
+      }
     }
     return dto;
-  }
-
-  private static String getIdentityConsentLevelString(@Nonnull DetailedSample sample) {
-    ConsentLevel level = getIdentityConsentLevel(sample);
-    return level == null ? null : level.getLabel();
   }
 
   public static DetailedLibrary toDetailedLibrary(DetailedLibraryDto from) {
@@ -1606,10 +1615,15 @@ public class Dtos {
         setString(dto::setSampleAlias, sample.getAlias());
         if (isDetailedSample(sample)) {
           DetailedSample detailed = (DetailedSample) sample;
-          dto.setIdentityConsentLevel(getIdentityConsentLevelString(detailed));
           if (detailed.getSubproject() != null) {
             dto.setSubprojectAlias(detailed.getSubproject().getAlias());
             dto.setSubprojectPriority(detailed.getSubproject().getPriority());
+          }
+          if (detailed.getHierarchyAttributes() != null) {
+            SampleHierarchyView attributes = detailed.getHierarchyAttributes();
+            setString(dto::setEffectiveTissueOriginLabel, maybeGetProperty(attributes.getTissueOrigin(), TissueOrigin::getAlias));
+            setString(dto::setEffectiveTissueTypeLabel, maybeGetProperty(attributes.getTissueType(), TissueType::getAlias));
+            setString(dto::setIdentityConsentLevel, maybeGetProperty(attributes.getConsentLevel(), ConsentLevel::getLabel));
           }
         }
       }
@@ -1663,7 +1677,14 @@ public class Dtos {
   }
 
   public static LibraryAliquotDto asDto(@Nonnull PoolableElementView from) {
-    LibraryAliquotDto dto = new LibraryAliquotDto();
+    LibraryAliquotDto dto = null;
+    if (from.getAliquotDesignCode() != null) {
+      DetailedLibraryAliquotDto detailedDto = new DetailedLibraryAliquotDto();
+      setId(detailedDto::setLibraryDesignCodeId, from.getAliquotDesignCode());
+      dto = detailedDto;
+    } else {
+      dto = new LibraryAliquotDto();
+    }
     dto.setId(from.getAliquotId());
     dto.setName(from.getAliquotName());
     setString(dto::setAlias, from.getAliquotAlias());
@@ -1696,10 +1717,15 @@ public class Dtos {
     Sample sample = from.getSample();
     if (isDetailedSample(sample)) {
       DetailedSample detailed = (DetailedSample) sample;
-      dto.setIdentityConsentLevel(getIdentityConsentLevelString(detailed));
       if (detailed.getSubproject() != null) {
         dto.setSubprojectAlias(detailed.getSubproject().getAlias());
         dto.setSubprojectPriority(detailed.getSubproject().getPriority());
+      }
+      if (detailed.getHierarchyAttributes() != null) {
+        SampleHierarchyView attributes = detailed.getHierarchyAttributes();
+        setString(dto::setEffectiveTissueOriginLabel, maybeGetProperty(attributes.getTissueOrigin(), TissueOrigin::getAlias));
+        setString(dto::setEffectiveTissueTypeLabel, maybeGetProperty(attributes.getTissueType(), TissueType::getAlias));
+        setString(dto::setIdentityConsentLevel, maybeGetProperty(attributes.getConsentLevel(), ConsentLevel::getLabel));
       }
     }
 

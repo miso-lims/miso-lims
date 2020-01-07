@@ -2,9 +2,9 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element;
 
 import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -12,6 +12,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 
+import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.Columns;
@@ -146,18 +147,24 @@ public class DataTable extends AbstractElement {
     return table.findElements(emptyTableSelector).size() == 1;
   }
 
-  public List<String> getColumnValues(String columnHeading) {
-    int colNum = columnHeadings.indexOf(columnHeading);
+  private Stream<WebElement> getColumnCellsStream(String columnHeading) {
     if (table.findElements(rowSelector).isEmpty()) {
-      return new ArrayList<>();
+      return Stream.empty();
     }
+    int colNum = columnHeadings.indexOf(columnHeading);
     return table.findElements(rowSelector).stream()
         .map(row -> {
           if (row == null) return null;
           List<WebElement> cells = row.findElements(cellSelector);
           if (cells.size() < 2) return null; // empty table has one cell saying "No data available in table"
-          return cells.get(colNum).getText();
+          return cells.get(colNum);
         })
+        .filter(Predicates.notNull());
+  }
+
+  public List<String> getColumnValues(String columnHeading) {
+    return getColumnCellsStream(columnHeading)
+        .map(WebElement::getText)
         .collect(Collectors.toList());
   }
 
@@ -167,6 +174,21 @@ public class DataTable extends AbstractElement {
 
   public boolean doesColumnContainSubstring(String columnHeading, String target) {
     return getColumnValues(columnHeading).stream().anyMatch(value -> value != null && value.contains(target));
+  }
+
+  public boolean doesColumnContainTooltip(String columnHeading, String message) {
+    return getColumnCellsStream(columnHeading)
+        .map(this::getToolTipMessage)
+        .filter(Predicates.notNull())
+        .anyMatch(tooltip -> tooltip.contains(message));
+  }
+
+  private String getToolTipMessage(WebElement cell) {
+    List<WebElement> tooltips = cell.findElements(By.className("tooltiptext"));
+    if (tooltips == null || tooltips.isEmpty()) {
+      return null;
+    }
+    return tooltips.stream().map(tip -> tip.getAttribute("textContent")).collect(Collectors.joining(", "));
   }
 
   public void searchFor(String searchTerm) {
