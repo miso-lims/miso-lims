@@ -167,7 +167,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Transient
   private List<FileAttachment> pendingAttachmentDeletions;
 
-  @OneToMany(mappedBy = "item")
+  @OneToMany(mappedBy = "item", cascade = CascadeType.REMOVE)
   private List<TransferPool> transfers;
 
   @Transient

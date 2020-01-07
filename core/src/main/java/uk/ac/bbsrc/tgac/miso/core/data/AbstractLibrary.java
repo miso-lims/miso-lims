@@ -210,7 +210,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Transient
   private List<FileAttachment> pendingAttachmentDeletions;
 
-  @OneToMany(mappedBy = "item")
+  @OneToMany(mappedBy = "item", cascade = CascadeType.REMOVE)
   private List<TransferLibrary> transfers;
 
   @Override
