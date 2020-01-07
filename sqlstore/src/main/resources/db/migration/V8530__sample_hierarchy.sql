@@ -2,7 +2,7 @@ CREATE TABLE SampleHierarchy (
   sampleId bigint(20) PRIMARY KEY,
   identityId bigint(20),
   tissueId bigint(20),
-  CONSTRAINT fk_sampleHierarchy_sample FOREIGN KEY (sampleId) REFERENCES DetailedSample (sampleId),
+  CONSTRAINT fk_sampleHierarchy_sample FOREIGN KEY (sampleId) REFERENCES DetailedSample (sampleId) ON DELETE CASCADE,
   CONSTRAINT fk_sampleHierarchy_identity FOREIGN KEY (identityId) REFERENCES Identity (sampleId),
   CONSTRAINT fk_sampleHierarchy_tissue FOREIGN KEY (tissueId) REFERENCES SampleTissue (sampleId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
