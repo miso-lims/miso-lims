@@ -17,6 +17,7 @@ Changes:
     * If there is no valid storage space within the selected location, "NO SPACE" will be displayed
   * Changed columns shown on Samples, Libraries, and Library Aliquots list pages
   * Changed warnings on table rows to only show an icon; icon tooltip shows full warning messages
+  * Changed OicrProjectShortNameValidator to allow short names up to 10 characters long
   * Fixed error saving QCs with controls specified
   * Exports initialVolume in Pinery /samples
 
