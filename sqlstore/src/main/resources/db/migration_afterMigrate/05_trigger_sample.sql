@@ -345,5 +345,11 @@ CREATE TRIGGER DetailedSampleInsert AFTER INSERT ON DetailedSample
 FOR EACH ROW
   CALL updateSampleHierarchy(NEW.sampleId)//
 
+-- Need to fix for tissues because DetailedSample record is created before SampleTissue
+DROP TRIGGER IF EXISTS SampleTissueInsert//
+CREATE TRIGGER SampleTissueInsert AFTER INSERT ON SampleTissue
+FOR EACH ROW
+  UPDATE SampleHierarchy SET tissueId = NEW.sampleId WHERE sampleId = NEW.sampleId//
+
 DELIMITER ;
 -- EndNoTest
