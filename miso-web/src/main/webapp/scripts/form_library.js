@@ -90,7 +90,7 @@ FormTarget.library = (function($) {
           required: true,
           getSource: function() {
             return Constants.platformTypes.filter(function(platformType) {
-              return platformType.active;
+              return platformType.active || platformType.key === object.platformType;
             });
           },
           sortSource: Utils.sorting.standardSort('key'),

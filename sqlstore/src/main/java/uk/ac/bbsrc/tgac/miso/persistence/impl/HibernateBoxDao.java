@@ -219,6 +219,9 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
 
   @Override
   public List<BoxableView> getBoxableViewsByBarcodeList(Collection<String> barcodes) throws IOException {
+    if (barcodes == null || barcodes.isEmpty()) {
+      return Collections.emptyList();
+    }
     return queryBoxables(Restrictions.in("identificationBarcode", barcodes));
   }
 

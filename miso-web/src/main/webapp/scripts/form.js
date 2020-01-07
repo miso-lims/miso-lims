@@ -616,12 +616,12 @@ FormUtils = (function($) {
       var precision = field.precision || defaultDecimalPrecision;
       var scale = field.scale || defaultDecimalScale;
       control.attr('data-parsley-type', 'number');
-      control.attr('data-parsley-maxlength', precision + 1);
+      control.attr('data-parsley-maxlength', precision + 2);
       var maxPossible = Math.pow(10, precision - scale) - Math.pow(0.1, scale);
       var max = field.hasOwnProperty('max') ? field.max : maxPossible;
       var min = field.hasOwnProperty('min') ? field.min : maxPossible * -1;
       control.attr('data-parsley-range', '[' + min + ', ' + max + ']')
-      var pattern = '\\d{0,' + (precision - scale) + '}(?:\\.\\d{1,' + scale + '})?';
+      var pattern = '-?\\d{0,' + (precision - scale) + '}(?:\\.\\d{1,' + scale + '})?';
       control.attr('data-parsley-pattern', pattern);
       control.attr('data-parsley-error-message', 'Must be a number between ' + min + ' and ' + max);
     }

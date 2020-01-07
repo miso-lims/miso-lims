@@ -27,6 +27,8 @@ We have several types of automated testing:
 
 * Unit tests
   * Run with `mvn clean install`
+* Integration tests in `sqlstore`
+  * Run with `cd sqlstore; mvn clean verify -DskipITs=false`
 * Integration tests in `miso-web` for plain sample mode
   * Run with `cd miso-web; mvn clean verify -DrunPlainITs`
 * Integration tests in `miso-web` for detailed sample mode (also contains tests which are relevant to both modes)

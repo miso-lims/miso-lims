@@ -84,7 +84,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 
 /**
  * Utility class to provde helpful functions to MISO
@@ -281,19 +280,6 @@ public class LimsUtils {
 
   public static boolean isDetailedLibraryAliquot(LibraryAliquot aliquot) {
     return aliquot instanceof DetailedLibraryAliquot;
-  }
-
-  public static ConsentLevel getIdentityConsentLevel(DetailedSample sample) {
-    SampleIdentity identity = null;
-    if (isIdentitySample(sample)) {
-      identity = (SampleIdentity) sample;
-    } else {
-      identity = LimsUtils.getParent(SampleIdentity.class, sample);
-    }
-    if (identity != null && identity.getConsentLevel() != null) {
-      return identity.getConsentLevel();
-    }
-    return null;
   }
 
   public static boolean isIlluminaRun(Run run) {

@@ -17,6 +17,7 @@ Urls = (function() {
 
   var ui = {};
   var rest = {};
+  var external = {};
 
   // Arrays
   var arrayUiBase = baseUrl + '/array';
@@ -67,7 +68,8 @@ Urls = (function() {
   rest.boxes = {
     create: boxRestBase,
     update: idUrlFunction(boxRestBase),
-    searchPartial: boxRestBase + '/search/partial'
+    searchPartial: boxRestBase + '/search/partial',
+    setLocation: middleIdUrlFunction(boxRestBase, '/setlocation')
   };
 
   // Box Sizes
@@ -116,7 +118,7 @@ Urls = (function() {
     edit: idUrlFunction(experimentUiBase)
   };
 
-  // Freezers
+  // Freezers - REST components are under Storage Locations
   var freezerUiBase = baseUrl + '/freezer';
   ui.freezers = {
     edit: idUrlFunction(freezerUiBase)
@@ -505,6 +507,34 @@ Urls = (function() {
     update: idUrlFunction(stainCategoryRestBase)
   };
 
+  // Storage Locations
+  var storageLocationRestBase = restBase + '/storagelocations';
+  function createStorageFunction(storageType) {
+    return function(freezerId, shelfId) {
+      var url = storageLocationRestBase + '/freezers/' + freezerId;
+      if (shelfId) {
+        url += '/shelves/' + shelfId;
+      }
+      url += '/' + storageType;
+      return url;
+    }
+  }
+
+  rest.storageLocations = {
+    children: middleIdUrlFunction(storageLocationRestBase, '/children'),
+    createFreezer: storageLocationRestBase + '/freezers',
+    createLooseStorage: createStorageFunction('loose'),
+    createRack: createStorageFunction('racks'),
+    createRoom: storageLocationRestBase + '/rooms',
+    createShelf: createStorageFunction('shelves'),
+    createStack: createStorageFunction('stacks'),
+    createTrayRack: createStorageFunction('tray-racks'),
+    freezers: storageLocationRestBase + '/freezers',
+    updateComponent: idUrlFunction(storageLocationRestBase),
+    updateFreezer: idUrlFunction(storageLocationRestBase + '/freezers'),
+    queryByBarcode: storageLocationRestBase + '/byBarcode'
+  };
+
   // Studies
   var studyUiBase = baseUrl + '/study';
   ui.studies = {
@@ -608,9 +638,22 @@ Urls = (function() {
     moveLibraryAliquots: middleIdUrlFunction(worksetRestBase, '/libraryaliquots/move')
   };
 
+  // External sites
+  external.userManual = function(version, section, subsection) {
+    var url = 'https://miso-lims.readthedocs.io/projects/docs/en/' + version + '/user_manual/';
+    if (section) {
+      url += section + '/';
+      if (subsection) {
+        url += '#' + subsection;
+      }
+    }
+    return url;
+  };
+
   return {
     ui: ui,
-    rest: rest
+    rest: rest,
+    external: external
   };
 
 })();

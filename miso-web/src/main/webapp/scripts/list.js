@@ -156,9 +156,9 @@ ListUtils = (function($) {
     var searchTooltipId = "searchHelpTooltip_" + target.name.replace(/\s/g, '');
 
     $("#" + searchDivId).append(
-        '<div id="' + searchTooltipId + '" class="tooltip"> ' + '  <span>'
-            + '   <img id="searchHelpQuestionMark" src="/styles/images/question_mark.png"' + '  </span>' + '  <span class="tooltiptext">'
-            + makeTooltipHelp(target) + '  </span>' + '</div>');
+        '<div id="' + searchTooltipId + '" class="tooltip">'
+            + '<img id="searchHelpQuestionMark" src="/styles/images/question_mark.png"><span class="tooltiptext">'
+            + makeTooltipHelp(target) + '</span>' + '</div>');
 
     return searchTooltipId;
   };
@@ -681,6 +681,25 @@ ListUtils = (function($) {
               || "Unknown";
         };
       },
+      naIfNull: function(data, type, full) {
+        if (type === 'display' && data === null) {
+          return 'n/a';
+        }
+        return data;
+      },
+      measureWithUnits: function(unitsList, unitsProperty) {
+        return function(data, type, full) {
+          if (type === 'display' && data) {
+            var units = unitsList.find(function(unit) {
+              return unit.name == full[unitsProperty];
+            });
+            if (!!units) {
+              return data + ' ' + units.units;
+            }
+          }
+          return data;
+        };
+      }
     },
     createBoxField: {
       property: 'createBox',
