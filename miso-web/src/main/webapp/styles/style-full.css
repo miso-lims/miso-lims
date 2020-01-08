@@ -2181,6 +2181,11 @@ div#inputError {
   font-weight: bold;
 }
 
+#storageComponentActionContainer {
+  float: right;
+  margin-left: 12px;
+}
+
 .storageComponentButton {
   float: right;
 }

@@ -8,6 +8,7 @@ import java.util.List;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -44,6 +45,7 @@ public interface DeleterService<T extends Deletable> extends ProviderService<T> 
 
   public AuthorizationManager getAuthorizationManager();
 
+  @Transactional(rollbackFor = Exception.class)
   public default void delete(T object) throws IOException {
     T managed = get(object.getId());
     authorizeDeletion(managed);
@@ -73,6 +75,7 @@ public interface DeleterService<T extends Deletable> extends ProviderService<T> 
     // do nothing
   }
 
+  @Transactional(rollbackFor = Exception.class)
   public default void bulkDelete(Collection<T> objects) throws IOException {
     List<T> managedObjects = new ArrayList<>();
     for (T object : objects) {

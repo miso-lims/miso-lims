@@ -529,6 +529,7 @@ Urls = (function() {
     createShelf: createStorageFunction('shelves'),
     createStack: createStorageFunction('stacks'),
     createTrayRack: createStorageFunction('tray-racks'),
+    deleteComponent: idUrlFunction(storageLocationRestBase),
     freezers: storageLocationRestBase + '/freezers',
     updateComponent: idUrlFunction(storageLocationRestBase),
     updateFreezer: idUrlFunction(storageLocationRestBase + '/freezers'),

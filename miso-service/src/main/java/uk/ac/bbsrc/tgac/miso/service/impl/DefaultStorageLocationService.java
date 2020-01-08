@@ -2,11 +2,15 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
@@ -216,35 +220,29 @@ public class DefaultStorageLocationService implements StorageLocationService {
     authorizationManager.throwIfNonAdminOrMatchingOwner(object.getCreator());
   }
 
+  private static final Set<LocationUnit> DELETABLE_FROM = Collections
+      .unmodifiableSet(Sets.newHashSet(LocationUnit.ROOM, LocationUnit.FREEZER, LocationUnit.SHELF));
+
   @Override
   public ValidationResult validateDeletion(StorageLocation object) throws IOException {
     ValidationResult result = new ValidationResult();
-    switch (object.getLocationUnit()) {
-    case ROOM:
+    if (object.getLocationUnit() == LocationUnit.ROOM) {
       if (!object.getChildLocations().isEmpty()) {
-        result.addError(
-            new ValidationError(String.format("Room %s contains %d freezers", object.getAlias(), object.getChildLocations().size())));
+        result.addError(new ValidationError(String.format("Room %s contains %d %s", object.getAlias(), object.getChildLocations().size(),
+            Pluralizer.freezers(object.getChildLocations().size()))));
       }
-      break;
-    case FREEZER:
-      int boxes = countBoxes(object);
-      if (boxes > 0) {
-        result.addError(new ValidationError(String.format("Freezer %s contains %d %s", object.getAlias(), boxes, Pluralizer.boxes(boxes))));
+    } else {
+      if (object.getParentLocation() != null && !DELETABLE_FROM.contains(object.getParentLocation().getLocationUnit())) {
+        result.addError(new ValidationError("This storage unit cannot be deleted directly"));
+      } else {
+        int boxCount = object.countBoxes();
+        if (boxCount > 0) {
+          result.addError(new ValidationError(String.format("%s %s contains %d %s", object.getLocationUnit().getDisplayName(),
+              object.getAlias(), boxCount, Pluralizer.boxes(boxCount))));
+        }
       }
-      break;
-    default:
-      result.addError(new ValidationError(String.format("%s units cannot be deleted directly", object.getLocationUnit().getDisplayName())));
-      break;
     }
     return result;
-  }
-
-  private int countBoxes(StorageLocation object) {
-    int boxes = object.getBoxes().size();
-    for (StorageLocation child : object.getChildLocations()) {
-      boxes += countBoxes(child);
-    }
-    return boxes;
   }
 
 }

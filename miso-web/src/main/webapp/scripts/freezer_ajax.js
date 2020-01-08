@@ -1,4 +1,4 @@
-(function(Freezer, $, undefined) { // NOSONAR (paranoid assurance that undefined is undefined)
+var Freezer = (function($) {
   var freezerJson = null;
   var selectedComponent = null;
 
@@ -23,78 +23,94 @@
     required: false
   };
 
-  Freezer.setFreezerJson = function(json) {
-    freezerJson = json;
-    updateVisual();
-  };
+  return {
 
-  Freezer.validateAndSaveComponent = function() {
-    Validate.cleanFields('#freezerComponent-form');
-    Validate.clearErrors('#freezerComponent-form');
+    setFreezerJson: function(json) {
+      freezerJson = json;
+      updateVisual();
+    },
 
-    $('#storageComponentBarcode').attr('class', 'form-control');
-    $('#storageComponentBarcode').attr('data-parsley-maxlength', '255');
-    $('#storageComponentBarcode').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-    $('#storageComponentBarcode').attr('data-parsley-errors-container', '#storageComponentBarcodeError');
+    validateAndSaveComponent: function() {
+      Validate.cleanFields('#freezerComponent-form');
+      Validate.clearErrors('#freezerComponent-form');
 
-    $('#freezerComponent-form').parsley();
-    $('#freezerComponent-form').parsley().validate();
+      $('#storageComponentBarcode').attr('class', 'form-control');
+      $('#storageComponentBarcode').attr('data-parsley-maxlength', '255');
+      $('#storageComponentBarcode').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+      $('#storageComponentBarcode').attr('data-parsley-errors-container', '#storageComponentBarcodeError');
 
-    Validate.updateWarningOrSubmit('#freezerComponent-form', null, function() {
-      saveComponent();
-    });
-  };
+      $('#freezerComponent-form').parsley();
+      $('#freezerComponent-form').parsley().validate();
 
-  Freezer.addRoom = function() {
-    Freezer.addRoomWithCallback(function() {
-      Utils.showOkDialog('Room created', []);
-    });
-  };
-
-  Freezer.addRoomWithCallback = function(callback) {
-    var fields = [{
-      type: 'text',
-      label: 'Alias',
-      property: 'alias',
-      required: true
-    }, {
-      type: 'text',
-      label: 'Barcode',
-      property: 'identificationBarcode',
-      required: false
-    }];
-    Utils.showDialog('Add Room', 'Add', fields, function(output) {
-      var params = {};
-      fields.forEach(function(field) {
-        params[field.property] = output[field.property];
+      Validate.updateWarningOrSubmit('#freezerComponent-form', null, function() {
+        saveComponent();
       });
-      var url = Urls.rest.storageLocations.createRoom + '?' + $.param(params);
-      Utils.ajaxWithDialog("Adding Room", 'POST', url, {}, function(responseData) {
-        callback();
+    },
+
+    deleteComponent: function() {
+      var component = $('#storageComponentAlias').text();
+      Utils.showConfirmDialog('Delete Storage', 'Delete', ['Are you sure you wish to delete ' + component + '?'], function() {
+        var componentId = parseInt($('#storageComponentId').text());
+        Utils.ajaxWithDialog('Deleting Storage', 'DELETE', Urls.rest.storageLocations.deleteComponent(componentId), null, function() {
+          Utils.showOkDialog('Storage Deleted', [component + ' has been deleted.'], function() {
+            Utils.page.pageReload();
+          });
+        });
       });
-    });
-  };
+    },
 
-  Freezer.addFreezerStorage = function() {
-    Utils.showWizardDialog('Add Freezer Storage', [
-        makeHandler('Shelf', [barcodeField], Urls.rest.storageLocations.createShelf(freezerJson.id)),
-        makeHandler('Stack', [heightField, barcodeField], Urls.rest.storageLocations.createStack(freezerJson.id), getStackChildLabels)]);
-  };
+    addRoom: function() {
+      Freezer.addRoomWithCallback(function() {
+        Utils.showOkDialog('Room created', []);
+      });
+    },
 
-  Freezer.addShelfStorage = function(shelf) {
-    Utils.showWizardDialog('Add Shelf Storage', [
-        makeHandler('Rack', [depthField, heightField, barcodeField], Urls.rest.storageLocations.createRack(freezerJson.id, shelf.id),
-            getRackChildLabels),
-        makeHandler('Stack', [heightField, barcodeField], Urls.rest.storageLocations.createStack(freezerJson.id, shelf.id),
-            getStackChildLabels),
-        makeHandler('Tray Rack', [heightField, barcodeField], Urls.rest.storageLocations.createTrayRack(freezerJson.id, shelf.id),
-            getTrayRackChildLabels), {
-          name: 'Loose Storage',
-          handler: function() {
-            var url = Urls.rest.storageLocations.createLooseStorage(freezerJson.id, shelf.id);
-            Utils.ajaxWithDialog("Adding Storage", 'POST', url, {}, Utils.page.pageReload);
-          }
-        }]);
+    addRoomWithCallback: function(callback) {
+      var fields = [{
+        type: 'text',
+        label: 'Alias',
+        property: 'alias',
+        required: true
+      }, {
+        type: 'text',
+        label: 'Barcode',
+        property: 'identificationBarcode',
+        required: false
+      }];
+      Utils.showDialog('Add Room', 'Add', fields, function(output) {
+        var params = {};
+        fields.forEach(function(field) {
+          params[field.property] = output[field.property];
+        });
+        var url = Urls.rest.storageLocations.createRoom + '?' + $.param(params);
+        Utils.ajaxWithDialog("Adding Room", 'POST', url, {}, function(responseData) {
+          callback();
+        });
+      });
+    },
+
+    addFreezerStorage: function() {
+      Utils.showWizardDialog('Add Freezer Storage', [
+          makeHandler('Shelf', [barcodeField], Urls.rest.storageLocations.createShelf(freezerJson.id)),
+          makeHandler('Stack', [heightField, barcodeField], Urls.rest.storageLocations.createStack(freezerJson.id), getStackChildLabels)]);
+    },
+
+    addShelfStorage: function(shelf) {
+      Utils.showWizardDialog('Add Shelf Storage', [
+          makeHandler('Rack', [depthField, heightField, barcodeField], Urls.rest.storageLocations.createRack(freezerJson.id, shelf.id),
+              getRackChildLabels),
+          makeHandler('Stack', [heightField, barcodeField], Urls.rest.storageLocations.createStack(freezerJson.id, shelf.id),
+              getStackChildLabels),
+          makeHandler('Tray Rack', [heightField, barcodeField], Urls.rest.storageLocations.createTrayRack(freezerJson.id, shelf.id),
+              getTrayRackChildLabels), {
+            name: 'Loose Storage',
+            handler: function() {
+              var url = Urls.rest.storageLocations.createLooseStorage(freezerJson.id, shelf.id);
+              Utils.ajaxWithDialog("Adding Storage", 'POST', url, {}, Utils.page.pageReload);
+            }
+          }]);
+    }
+
   };
 
   function makeHandler(name, fields, createUrl, getChildBarcodeLabelsFunction) {
@@ -285,7 +301,9 @@
       break;
     case 'LOOSE_STORAGE':
       displayLooseStorage(storage);
-      $('#editStorageComponentContainer').hide();
+      displayEditStorageComponentControls(storage);
+      $('#saveStorageComponent').hide();
+      $('#storageComponentBarcodeRow').hide();
       break;
     case 'TRAY_RACK':
       displayTrayRack(storage);
@@ -303,6 +321,9 @@
     $('#storageComponentId').text(storage.id);
     $('#storageComponentBarcode').val(storage.identificationBarcode);
     $('#editStorageComponentContainer').show();
+    $('#saveStorageComponent').show();
+    $('#deleteStorageComponent').show();
+    $('#storageComponentBarcodeRow').show();
   }
 
   function getLevelTwoNodeSelectFunction(node) {
@@ -340,19 +361,20 @@
         selectedComponent = node.item;
         node.addClass('selected');
         displayEditStorageComponentControls(node.item);
+        $('#deleteStorageComponent').hide();
       };
       break;
     case 'LOOSE_STORAGE':
-      return getUnorganizedStorageSelectFunction(node, false, assignBox);
+      return getUnorganizedStorageSelectFunction(node, false, true, assignBox);
       break;
     case 'TRAY':
-      return getUnorganizedStorageSelectFunction(node, true, assignBox);
+      return getUnorganizedStorageSelectFunction(node, true, false, assignBox);
     default:
       throw new Error('Unexpected box location');
     }
   }
 
-  function getUnorganizedStorageSelectFunction(node, allowEdit, assignBoxFunction) {
+  function getUnorganizedStorageSelectFunction(node, allowEdit, allowDelete, assignBoxFunction) {
     return function() {
       var actions = node.item.boxes.map(function(box) {
         return {
@@ -370,10 +392,13 @@
       $('#levelTwoStorageContainer .selected').removeClass('selected');
       selectedComponent = node.item;
       node.addClass('selected');
-      if (allowEdit) {
-        displayEditStorageComponentControls(node.item);
-      } else {
-        $('#editStorageComponentContainer').hide();
+      displayEditStorageComponentControls(node.item);
+      if (!allowDelete) {
+        $('#deleteStorageComponent').hide();
+      }
+      if (!allowEdit) {
+        $('#saveStorageComponent').hide();
+        $('#storageComponentBarcodeRow').hide();
       }
     };
   }
@@ -486,4 +511,4 @@
     });
   }
 
-}(window.Freezer = window.Freezer || {}, jQuery));
+})(jQuery);

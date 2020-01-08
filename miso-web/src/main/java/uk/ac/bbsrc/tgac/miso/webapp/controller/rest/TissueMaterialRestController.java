@@ -125,11 +125,7 @@ public class TissueMaterialRestController extends RestController {
   @DeleteMapping(value = "/{id}")
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
   public void deleteTissueMaterial(@PathVariable(name = "id", required = true) long id) throws IOException {
-    TissueMaterial tissueMaterial = tissueMaterialService.get(id);
-    if (tissueMaterial == null) {
-      throw new RestException("Tissue Material " + id + " not found", Status.NOT_FOUND);
-    }
-    tissueMaterialService.delete(tissueMaterial);
+    RestUtils.delete("Tissue material", id, tissueMaterialService);
     menuController.refreshConstants();
   }
 

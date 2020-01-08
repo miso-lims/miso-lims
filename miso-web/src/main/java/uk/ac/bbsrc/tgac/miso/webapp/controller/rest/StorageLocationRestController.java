@@ -9,6 +9,7 @@ import javax.ws.rs.core.Response.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -268,6 +269,12 @@ public class StorageLocationRestController extends RestController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
     RestUtils.bulkDelete("Storage location", ids, storageLocationService);
+  }
+
+  @DeleteMapping("/{locationId}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public @ResponseBody void delete(@PathVariable(name = "locationId", required = true) long locationId) throws IOException {
+    RestUtils.delete("Storage location", locationId, storageLocationService);
   }
 
 }

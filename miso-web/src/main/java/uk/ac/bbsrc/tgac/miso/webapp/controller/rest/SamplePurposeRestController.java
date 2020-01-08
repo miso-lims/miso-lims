@@ -109,11 +109,7 @@ public class SamplePurposeRestController extends RestController {
   @DeleteMapping(value = "/{id}")
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
   public void deleteSamplePurpose(@PathVariable(name = "id", required = true) long id) throws IOException {
-    SamplePurpose samplePurpose = samplePurposeService.get(id);
-    if (samplePurpose == null) {
-      throw new RestException("Sample Purpose " + id + " not found", Status.NOT_FOUND);
-    }
-    samplePurposeService.delete(samplePurpose);
+    RestUtils.delete("Sample purpose", id, samplePurposeService);
     menuController.refreshConstants();
   }
 

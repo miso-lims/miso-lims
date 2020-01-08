@@ -74,4 +74,12 @@ public class RestUtils {
     service.bulkDelete(items);
   }
 
+  public static <T extends Deletable> void delete(String type, long targetId, DeleterService<T> service) throws IOException {
+    T item = service.get(targetId);
+    if (item == null) {
+      throw new RestException(type + " not found", Status.NOT_FOUND);
+    }
+    service.delete(item);
+  }
+
 }
