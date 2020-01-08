@@ -18,6 +18,9 @@ Changes:
   * Changed columns shown on Samples, Libraries, and Library Aliquots list pages
   * Changed warnings on table rows to only show an icon; icon tooltip shows full warning messages
   * Changed OicrProjectShortNameValidator to allow short names up to 10 characters long
+  * Changed VisionMate scanner setup to disable orientation detection. This means that boxes must
+    now be placed in the correct orientation on the scanner. This fixes an issue where orientation
+    detection did not work consistently for some box types and results were sometimes upside-down
   * Fixed error saving QCs with controls specified
   * Exports initialVolume in Pinery /samples
 
