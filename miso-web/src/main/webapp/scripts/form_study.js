@@ -36,9 +36,7 @@ FormTarget.study = (function($) {
           type: 'dropdown',
           include: !object.id,
           required: true,
-          getSource: function() {
-            return config.projects;
-          },
+          source: config.projects,
           getItemLabel: function(item) {
             return config.detailedSample ? item.shortName : item.alias;
           },
@@ -79,16 +77,14 @@ FormTarget.study = (function($) {
           data: 'accession',
           type: 'read-only',
           getLink: function(study) {
-            return 'http://www.ebi.ac.uk/ena/data/view/' + study.accession;
+            return Urls.external.enaAccession(study.accession);
           },
           include: !!object.accession
         }, {
           title: 'Study Type',
           data: 'studyTypeId',
           type: 'dropdown',
-          getSource: function() {
-            return Constants.studyTypes;
-          },
+          source: Constants.studyTypes,
           getItemLabel: Utils.array.getName,
           getItemValue: Utils.array.getId,
           sortSource: Utils.sorting.standardSort('name'),

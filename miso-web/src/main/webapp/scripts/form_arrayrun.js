@@ -37,9 +37,7 @@ FormTarget.arrayrun = (function($) {
           include: !object.id,
           required: true,
           nullValue: 'SELECT',
-          getSource: function() {
-            return config.instruments;
-          },
+          source: config.instruments,
           getItemLabel: Utils.array.getName,
           getItemValue: Utils.array.getId,
           sortSource: Utils.sorting.standardSort('name')
@@ -131,9 +129,7 @@ FormTarget.arrayrun = (function($) {
           data: 'status',
           type: 'dropdown',
           required: true,
-          getSource: function() {
-            return Constants.healthTypes;
-          },
+          source: Constants.healthTypes,
           getItemLabel: function(item) {
             return item.label;
           },

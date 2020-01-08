@@ -54,9 +54,7 @@ FormTarget.box = (function($) {
           title: 'Box Use',
           data: 'useId',
           type: 'dropdown',
-          getSource: function() {
-            return Constants.boxUses;
-          },
+          source: Constants.boxUses,
           getItemLabel: Utils.array.getAlias,
           getItemValue: Utils.array.getId,
           required: true
@@ -64,9 +62,7 @@ FormTarget.box = (function($) {
           title: 'Box Size',
           data: 'sizeId',
           type: 'dropdown',
-          getSource: function() {
-            return Constants.boxSizes;
-          },
+          source: Constants.boxSizes,
           getItemLabel: function(boxSize) {
             return boxSize.rowsByColumnsWithScan;
           },

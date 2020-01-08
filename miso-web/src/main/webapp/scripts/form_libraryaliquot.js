@@ -73,9 +73,7 @@ FormTarget.libraryaliquot = (function($) {
           type: 'dropdown',
           include: config.detailedSample,
           required: true,
-          getSource: function() {
-            return Constants.libraryDesignCodes;
-          },
+          source: Constants.libraryDesignCodes,
           sortSource: Utils.sorting.standardSort('code'),
           getItemLabel: function(item) {
             return item.code + ' (' + item.description + ')';
@@ -125,11 +123,9 @@ FormTarget.libraryaliquot = (function($) {
           title: 'Targeted Sequencing',
           data: 'targetedSequencingId',
           type: 'dropdown',
-          getSource: function() {
-            return Constants.targetedSequencings.filter(function(targetedSequencing) {
-              return targetedSequencing.kitDescriptorIds.indexOf(object.libraryKitDescriptorId) > -1;
-            });
-          },
+          source: Constants.targetedSequencings.filter(function(targetedSequencing) {
+            return targetedSequencing.kitDescriptorIds.indexOf(object.libraryKitDescriptorId) > -1;
+          }),
           sortSource: Utils.sorting.standardSort('alias'),
           getItemLabel: function(item) {
             return item.alias;

@@ -285,37 +285,27 @@ HotTarget.sample = (function() {
             data: 'projectAlias',
             type: (config.hasProject ? 'text' : 'dropdown'),
             trimDropdown: false,
-            source: (function() {
-              if ((!config.projects || config.projects.length == 0) && config.pageMode == 'create' && !config.hasProject) {
-                /* projects list failed to generate when it should have, and we can't proceed. Notify the user. */
-                var serverErrorMessages = document.getElementById('serverErrors');
-                serverErrorMessages.innerHTML = '<p>Failed to generate list of projects. Please notify your MISO administrators.</p>';
-                document.getElementById('errors').classList.remove('hidden');
-                /* throw an error to keep the table from generating */
-                throw new Error('Server error generating list of projects');
-              }
-              var comparator = Constants.isDetailedSample ? 'shortName' : 'id';
-              var label = Constants.isDetailedSample ? 'shortName' : 'name';
-              var projectLabels = (config.projects ? config.projects.sort(Utils.sorting.standardSort(comparator)).map(function(item) {
-                return item[label];
-              }) : []); /* use empty array if projects are not provided (should only happen during propagate or edit) */
-              return projectLabels;
-            })(),
+            source: config.projects.sort(Utils.sorting.standardSort(Constants.isDetailedSample ? 'shortName' : 'id')).map(function(item) {
+              return Constants.isDetailedSample ? item.shortName : item.name;
+            }),
             unpack: function(sam, flat, setCellMeta) {
               var label = Constants.isDetailedSample ? 'shortName' : 'name';
               if (config.hasProject) {
                 flat.projectAlias = Utils.valOrNull(config.project[label]);
               } else {
-                flat.projectAlias = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(item) {
+                var projectAlias = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(item) {
                   return item.id == sam.projectId;
-                }, config.projects), 'alias');
+                }, config.projects), label);
+                flat.projectAlias = projectAlias;
+                flat.originalProjectAlias = projectAlias;
+                flat.identityConsentLevel = sam.identityConsentLevel;
               }
             },
             pack: function(sam, flat, errorHandler) {
-              var label = Constants.isDetailedSample ? 'shortName' : 'name';
               if (config.hasProject) {
                 sam.projectId = config.project.id;
               } else {
+                var label = Constants.isDetailedSample ? 'shortName' : 'name';
                 sam.projectId = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(item) {
                   return item[label] == flat.projectAlias;
                 }, config.projects), 'id');
@@ -323,7 +313,7 @@ HotTarget.sample = (function() {
             },
             readOnly: config.hasProject,
             validator: HotUtils.validator.requiredAutocomplete,
-            include: config.pageMode == 'create'
+            include: true
           },
           HotUtils.makeColumnForText('Sci. Name', true, 'scientificName', {
             validator: HotUtils.validator.requiredTextNoSpecialChars,
@@ -1136,6 +1126,29 @@ HotTarget.sample = (function() {
 
     getCustomActions: function(table) {
       return HotTarget.boxable.getCustomActions(table);
+    },
+
+    confirmSave: function(flatObjects, create, config, table) {
+      var deferred = jQuery.Deferred();
+      if (!config.hasProject) {
+        var warnings = flatObjects.filter(
+            function(sample) {
+              return sample.identityConsentLevel && sample.identityConsentLevel !== 'All Projects' && sample.originalProjectAlias
+                  && sample.projectAlias !== sample.originalProjectAlias;
+            }).map(
+            function(sample) {
+              return '• ' + (sample.alias || sample.parentAlias) + ' (Consent: ' + sample.identityConsentLevel + '): '
+                  + sample.originalProjectAlias + ' → ' + sample.projectAlias;
+            });
+        if (warnings.length) {
+          Utils.showConfirmDialog('Project Changes', 'Save',
+              ['The following project changes may violate consent. Are you sure you wish to save?'].concat(warnings), deferred.resolve,
+              deferred.reject);
+        } else {
+          deferred.resolve();
+        }
+        return deferred.promise();
+      }
     }
   };
 })();

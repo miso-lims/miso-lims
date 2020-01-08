@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
+import static uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils.addJsonArray;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -105,7 +107,6 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
-import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 
 @Controller
@@ -190,6 +191,7 @@ public class EditSampleController {
     private static final String PROPAGATE = "propagate";
     private static final String EDIT = "edit";
     private static final String HAS_PROJECT = "hasProject";
+    private static final String PROJECTS = "projects";
     private static final String DNASE_TREATABLE = "dnaseTreatable";
     private static final String DEFAULT_SCI_NAME = "defaultSciName";
     private static final String DEFAULT_LCM_TUBE_GROUP_ID = "defaultLcmTubeGroupId";
@@ -197,6 +199,7 @@ public class EditSampleController {
     private static final String SOURCE_SAMPLE_CLASS = "sourceSampleClass";
     private static final String TARGET_SAMPLE_CLASS = "targetSampleClass";
     private static final String BOX = "box";
+    private static final String RECIPIENT_GROUPS = "recipientGroups";
   }
 
   @ModelAttribute("stains")
@@ -273,6 +276,8 @@ public class EditSampleController {
         .map(TransferSample::getTransfer)
         .map(Dtos::asDto)
         .collect(Collectors.toList()));
+
+    model.put("projects", mapper.writeValueAsString(projectService.list().stream().map(Dtos::asDto).collect(Collectors.toList())));
 
     model.put("sample", sample);
     SampleDto sampleDto = Dtos.asDto(sample, false);
@@ -485,7 +490,7 @@ public class EditSampleController {
     }
 
     @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
       if (sampleClass != null) {
         config.putPOJO(Config.TARGET_SAMPLE_CLASS, Dtos.asDto(sampleClass));
         config.putPOJO(Config.SOURCE_SAMPLE_CLASS, Dtos.asDto(sampleClass));
@@ -494,6 +499,7 @@ public class EditSampleController {
         config.put(Config.DNASE_TREATABLE, false);
       }
       config.put(Config.PAGE_MODE, Config.EDIT);
+      addJsonArray(mapper, config, "projects", projectService.list(), Dtos::asDto);
     }
   }
 
@@ -511,7 +517,7 @@ public class EditSampleController {
     }
 
     @Override
-    protected SampleDto createDtoFromParent(Sample item) {
+    protected SampleDto createDtoFromParent(Sample item) { // TODO: identityConsentLevel
       if (LimsUtils.isDetailedSample(item)) {
         DetailedSample sample = (DetailedSample) item;
         DetailedSampleDto dto = EditSampleController.getCorrectDetailedSampleDto(targetSampleClass);
@@ -521,6 +527,9 @@ public class EditSampleController {
         dto.setParentAlias(sample.getAlias());
         dto.setParentTissueSampleClassId(sample.getSampleClass().getId());
         dto.setProjectId(sample.getProject().getId());
+        if (sample.getHierarchyAttributes() != null && sample.getHierarchyAttributes().getConsentLevel() != null) {
+          dto.setIdentityConsentLevel(sample.getHierarchyAttributes().getConsentLevel().getLabel());
+        }
         if (sample.getSubproject() != null) {
           dto.setSubprojectId(sample.getSubproject().getId());
           dto.setSubprojectAlias(sample.getSubproject().getAlias());
@@ -547,7 +556,7 @@ public class EditSampleController {
     }
 
     @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
       config.put(Config.PAGE_MODE, Config.PROPAGATE);
       config.put(Config.DNASE_TREATABLE, targetSampleClass.getDNAseTreatable());
       config.putPOJO(Config.TARGET_SAMPLE_CLASS, Dtos.asDto(targetSampleClass));
@@ -555,7 +564,8 @@ public class EditSampleController {
       config.putPOJO(Config.BOX, newBox);
       config.put(Config.DEFAULT_LCM_TUBE_GROUP_ID, defaultLcmTubeGroupId);
       config.put(Config.DEFAULT_LCM_TUBE_GROUP_DESC, defaultLcmTubeGroupDesc);
-      MisoWebUtils.addJsonArray(mapper, config, "recipientGroups", recipientGroups, Dtos::asDto);
+      addJsonArray(mapper, config, Config.RECIPIENT_GROUPS, recipientGroups, Dtos::asDto);
+      addJsonArray(mapper, config, Config.PROJECTS, projectService.list(), Dtos::asDto);
     }
   }
 
@@ -587,7 +597,7 @@ public class EditSampleController {
       config.put(Config.DEFAULT_LCM_TUBE_GROUP_ID, defaultLcmTubeGroupId);
       config.put(Config.DEFAULT_LCM_TUBE_GROUP_DESC, defaultLcmTubeGroupDesc);
       if (project == null) {
-        projectService.list().stream().map(Dtos::asDto).forEach(config.putArray("projects")::addPOJO);
+        addJsonArray(mapper, config, Config.PROJECTS, projectService.list(), Dtos::asDto);
         config.put(Config.DEFAULT_SCI_NAME, defaultSciName);
       } else {
         config.putPOJO("project", Dtos.asDto(project));
@@ -598,7 +608,7 @@ public class EditSampleController {
         }
       }
       config.putPOJO(Config.BOX, box);
-      MisoWebUtils.addJsonArray(mapper, config, "recipientGroups", recipientGroups, Dtos::asDto);
+      addJsonArray(mapper, config, "recipientGroups", recipientGroups, Dtos::asDto);
     }
   }
 

@@ -102,9 +102,7 @@ FormTarget.sampleclass = (function($) {
           data: 'sampleCategory',
           type: 'dropdown',
           required: true,
-          getSource: function() {
-            return Constants.sampleCategories;
-          },
+          source: Constants.sampleCategories,
           onChange: function(newValue, form) {
             form.updateField('sampleSubcategory', {
               source: newValue ? Constants.sampleSubcategories[newValue] : []
@@ -118,9 +116,7 @@ FormTarget.sampleclass = (function($) {
           title: 'Subcategory',
           data: 'sampleSubcategory',
           type: 'dropdown',
-          getSource: function() {
-            return object.sampleCategory ? Constants.sampleSubcategories[object.sampleCategory] : [];
-          },
+          source: object.sampleCategory ? Constants.sampleSubcategories[object.sampleCategory] : [],
           nullLabel: 'n/a'
         }, {
           title: 'Suffix',

@@ -37,9 +37,7 @@ FormTarget.librarytemplate = (function($) {
               data: 'designId',
               type: 'dropdown',
               include: Constants.isDetailedSample,
-              getSource: function() {
-                return Constants.libraryDesigns;
-              },
+              source: Constants.libraryDesigns,
               getItemLabel: function(item) {
                 return item.name + ' - '
                     + Utils.array.findUniqueOrThrow(Utils.array.idPredicate(item.sampleClassId), Constants.sampleClasses).alias;
@@ -57,9 +55,7 @@ FormTarget.librarytemplate = (function($) {
               data: 'designCodeId',
               type: 'dropdown',
               include: Constants.isDetailedSample,
-              getSource: function() {
-                return Constants.libraryDesignCodes;
-              },
+              source: Constants.libraryDesignCodes,
               getItemLabel: function(item) {
                 return item.code;
               },
@@ -69,11 +65,9 @@ FormTarget.librarytemplate = (function($) {
               title: 'Platform',
               data: 'platformType',
               type: 'dropdown',
-              getSource: function() {
-                return Constants.platformTypes.filter(function(pt) {
-                  return pt.active || object.platformType === pt.name;
-                });
-              },
+              source: Constants.platformTypes.filter(function(pt) {
+                return pt.active || object.platformType === pt.name;
+              }),
               getItemLabel: function(item) {
                 return item.key;
               },
@@ -95,9 +89,7 @@ FormTarget.librarytemplate = (function($) {
               title: 'Type',
               data: 'libraryTypeId',
               type: 'dropdown',
-              getSource: function() {
-                return getLibraryTypeOptions(getPlatformType(object.platformType), object);
-              },
+              source: getLibraryTypeOptions(getPlatformType(object.platformType), object),
               getItemLabel: function(item) {
                 return item.description;
               },
@@ -107,9 +99,7 @@ FormTarget.librarytemplate = (function($) {
               title: 'Selection',
               data: 'selectionId',
               type: 'dropdown',
-              getSource: function() {
-                return Constants.librarySelections;
-              },
+              source: Constants.librarySelections,
               getItemLabel: Utils.array.getName,
               getItemValue: Utils.array.getId,
               nullLabel: unspecified
@@ -117,9 +107,7 @@ FormTarget.librarytemplate = (function($) {
               title: 'Strategy',
               data: 'strategyId',
               type: 'dropdown',
-              getSource: function() {
-                return Constants.libraryStrategies;
-              },
+              source: Constants.libraryStrategies,
               getItemLabel: Utils.array.getName,
               getItemValue: Utils.array.getId,
               nullLabel: unspecified
@@ -127,9 +115,7 @@ FormTarget.librarytemplate = (function($) {
               title: 'Kit',
               data: 'kitDescriptorId',
               type: 'dropdown',
-              getSource: function() {
-                return getKitDescriptorOptions(getPlatformType(object.platformType));
-              },
+              source: getKitDescriptorOptions(getPlatformType(object.platformType)),
               getItemLabel: Utils.array.getName,
               getItemValue: Utils.array.getId,
               nullLabel: unspecified
@@ -137,9 +123,7 @@ FormTarget.librarytemplate = (function($) {
               title: 'Index Kit',
               data: 'indexFamilyId',
               type: 'dropdown',
-              getSource: function() {
-                return getIndexFamilyOptions(getPlatformType(object.platformType), object);
-              },
+              source: getIndexFamilyOptions(getPlatformType(object.platformType), object),
               getItemLabel: Utils.array.getName,
               getItemValue: Utils.array.getId,
               nullLabel: unspecified
@@ -154,9 +138,7 @@ FormTarget.librarytemplate = (function($) {
               title: 'Volume Units',
               data: 'volumeUnits',
               type: 'dropdown',
-              getSource: function() {
-                return Constants.volumeUnits;
-              },
+              source: Constants.volumeUnits,
               getItemLabel: function(item) {
                 return Utils.decodeHtmlString(item.units);
               },

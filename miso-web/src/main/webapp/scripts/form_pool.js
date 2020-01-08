@@ -52,11 +52,9 @@ FormTarget.pool = (function($) {
           type: 'dropdown',
           include: !object.platformType,
           required: true,
-          getSource: function() {
-            return Constants.platformTypes.filter(function(platformType) {
-              return platformType.active;
-            });
-          },
+          source: Constants.platformTypes.filter(function(platformType) {
+            return platformType.active;
+          }),
           sortSource: Utils.sorting.standardSort('key'),
           getItemLabel: function(item) {
             return item.key;

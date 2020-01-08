@@ -50,7 +50,7 @@ FormTarget.experiment = (function($) {
           data: 'accession',
           type: 'read-only',
           getLink: function(experiment) {
-            return 'http://www.ebi.ac.uk/ena/data/view/' + experiment.accession;
+            return Urls.external.enaAccession(experiment.accession);
           },
           include: object.accession
         }, {

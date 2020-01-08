@@ -35,9 +35,7 @@ FormTarget.freezer = (function($) {
           data: 'parentLocationId',
           type: 'dropdown',
           required: true,
-          getSource: function() {
-            return config.rooms;
-          },
+          source: config.rooms,
           getItemLabel: Utils.array.getAlias,
           getItemValue: Utils.array.getId,
           sortSource: Utils.sorting.standardSort('alias')
@@ -56,9 +54,7 @@ FormTarget.freezer = (function($) {
           title: 'Map',
           data: 'mapId',
           type: 'dropdown',
-          getSource: function() {
-            return config.locationMaps;
-          },
+          source: config.locationMaps,
           getItemLabel: function(item) {
             return item.filename;
           },

@@ -49,15 +49,13 @@ FormTarget.servicerecord = (function($) {
           title: 'Details',
           data: 'details',
           type: 'textarea',
-          regex: '^[^<>]*$', /* one of the form field labels has an ampersand, so allow that here */ 
+          regex: '^[^<>]*$', /* one of the form field labels has an ampersand, so allow that here */
           maxLength: 65535
         }, {
           title: 'Position Affected',
           data: 'positionId',
           type: 'dropdown',
-          getSource: function() {
-            return config.instrumentPositions;
-          },
+          source: config.instrumentPositions,
           sortSource: Utils.sorting.standardSort('alias'),
           getItemLabel: function(item) {
             return item.alias;

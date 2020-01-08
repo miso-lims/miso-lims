@@ -7,14 +7,15 @@ FormTarget.sample = (function($) {
    * Expected config {
    *   detailedSample: boolean,
    *   dnaseTreatable: boolean,
-   *   generateSampleAliases: boolean
+   *   generateSampleAliases: boolean,
+   *   projects: array
    * }
    */
 
   return {
     getSaveUrl: function(sample) {
       if (sample.id) {
-        return '/miso/rest/samples/' + sample.id;
+        return Urls.rest.samples.update(sample.id);
       } else {
         throw new Error('Page not intended for new sample creation');
       }
@@ -23,7 +24,7 @@ FormTarget.sample = (function($) {
       return sample.id ? 'PUT' : 'POST';
     },
     getEditUrl: function(sample) {
-      return '/miso/sample/' + sample.id;
+      return Urls.ui.samples.edit(sample.id);
     },
     getSections: function(config, object) {
       return [
@@ -41,17 +42,14 @@ FormTarget.sample = (function($) {
                 {
                   title: 'Project',
                   data: 'projectId',
-                  type: 'read-only',
-                  getDisplayValue: function(sample) {
-                    if (sample.projectShortName) {
-                      return sample.projectShortName + ' (' + sample.projectName + ')';
-                    } else {
-                      return sample.projectName + ': ' + sample.projectAlias;
-                    }
+                  type: 'dropdown',
+                  required: true,
+                  source: config.projects,
+                  getItemLabel: function(item) {
+                    return Constants.isDetailedSample ? item.shortName : item.name;
                   },
-                  getLink: function(sample) {
-                    return '/miso/project/' + sample.projectId;
-                  }
+                  getItemValue: Utils.array.getId,
+                  sortSource: Utils.sorting.standardSort(Constants.isDetailedSample ? 'shortName' : 'id')
                 },
                 {
                   title: 'Name',
@@ -103,16 +101,14 @@ FormTarget.sample = (function($) {
                   data: 'accession',
                   type: 'read-only',
                   getLink: function(sample) {
-                    return 'http://www.ebi.ac.uk/ena/data/view/' + sample.accession;
+                    return Urls.external.enaAccession(sample.accession);
                   },
                   include: object.accession
                 }, {
                   title: 'Sample Type',
                   data: 'sampleType',
                   type: 'dropdown',
-                  getSource: function() {
-                    return Constants.sampleTypes.sort();
-                  },
+                  source: Constants.sampleTypes.sort(),
                   getItemLabel: function(item) {
                     return item;
                   },
@@ -125,9 +121,7 @@ FormTarget.sample = (function($) {
                   data: 'detailedQcStatusId',
                   type: 'dropdown',
                   nullLabel: 'Not Ready',
-                  getSource: function() {
-                    return Constants.detailedQcStatuses.sort(Utils.sorting.standardSort('description'));
-                  },
+                  source: Constants.detailedQcStatuses.sort(Utils.sorting.standardSort('description')),
                   getItemLabel: function(item) {
                     return item.description;
                   },
@@ -216,18 +210,14 @@ FormTarget.sample = (function($) {
               data: 'donorSex',
               type: 'dropdown',
               required: true,
-              getSource: function() {
-                return Constants.donorSexes;
-              },
+              source: Constants.donorSexes,
               initial: 'Unknown'
             }, {
               title: 'Consent',
               data: 'consentLevel',
               type: 'dropdown',
               required: true,
-              getSource: function() {
-                return Constants.consentLevels;
-              },
+              source: Constants.consentLevels,
               initial: 'This Project'
             }]
           }, {
@@ -241,7 +231,7 @@ FormTarget.sample = (function($) {
                 return sample.parentAlias || 'n/a';
               },
               getLink: function(sample) {
-                return sample.parentId ? '/miso/sample/' + sample.parentId : null;
+                return sample.parentId ? Urls.ui.samples.edit(sample.parentId) : null;
               }
             }, {
               title: 'Sample Class',
@@ -254,11 +244,9 @@ FormTarget.sample = (function($) {
               title: 'Sub-project',
               data: 'subprojectId',
               type: 'dropdown',
-              getSource: function() {
-                return Constants.subprojects.filter(function(subproject) {
-                  return subproject.parentProjectId === object.projectId;
-                }).sort(Utils.sorting.standardSort('alias'));
-              },
+              source: Constants.subprojects.filter(function(subproject) {
+                return subproject.parentProjectId === object.projectId;
+              }).sort(Utils.sorting.standardSort('alias')),
               getItemLabel: function(item) {
                 return item.alias;
               },
@@ -305,9 +293,7 @@ FormTarget.sample = (function($) {
               title: 'Tissue Origin',
               data: 'tissueOriginId',
               type: 'dropdown',
-              getSource: function() {
-                return Constants.tissueOrigins.sort(Utils.sorting.standardSortWithException('alias', 'nn'));
-              },
+              source: Constants.tissueOrigins.sort(Utils.sorting.standardSortWithException('alias', 'nn')),
               getItemLabel: function(item) {
                 return item.alias + ' (' + item.description + ')';
               },
@@ -319,9 +305,7 @@ FormTarget.sample = (function($) {
               title: 'Tissue Type',
               data: 'tissueTypeId',
               type: 'dropdown',
-              getSource: function() {
-                return Constants.tissueTypes.sort(Utils.sorting.standardSortWithException('alias', 'n'));
-              },
+              source: Constants.tissueTypes.sort(Utils.sorting.standardSortWithException('alias', 'n')),
               getItemLabel: function(item) {
                 return item.label;
               },
@@ -351,9 +335,7 @@ FormTarget.sample = (function($) {
               data: 'tissueMaterialId',
               type: 'dropdown',
               nullLabel: 'Unknown',
-              getSource: function() {
-                return Constants.tissueMaterials;
-              },
+              source: Constants.tissueMaterials,
               getItemLabel: function(item) {
                 return item.alias;
               },
@@ -375,9 +357,7 @@ FormTarget.sample = (function($) {
               data: 'labId',
               type: 'dropdown',
               nullLabel: 'n/a',
-              getSource: function() {
-                return Constants.labs.sort(Utils.sorting.standardSort('alias'));
-              },
+              source: Constants.labs.sort(Utils.sorting.standardSort('alias')),
               getItemLabel: function(item) {
                 return item.label;
               },
@@ -416,9 +396,7 @@ FormTarget.sample = (function($) {
               title: 'Stain',
               data: 'stainId',
               type: 'dropdown',
-              getSource: function() {
-                return Constants.stains.sort(Utils.sorting.standardSort('name'));
-              },
+              source: Constants.stains.sort(Utils.sorting.standardSort('name')),
               getItemLabel: function(item) {
                 return item.name;
               },
@@ -502,9 +480,7 @@ FormTarget.sample = (function($) {
               title: 'STR Status',
               data: 'strStatus',
               type: 'dropdown',
-              getSource: function() {
-                return Constants.strStatuses;
-              },
+              source: Constants.strStatuses,
               required: true
             }, {
               title: 'DNAse Treated',
@@ -552,9 +528,7 @@ FormTarget.sample = (function($) {
               title: 'Purpose',
               data: 'samplePurposeId',
               type: 'dropdown',
-              getSource: function() {
-                return Constants.samplePurposes.sort(Utils.sorting.standardSort('alias'));
-              },
+              source: Constants.samplePurposes.sort(Utils.sorting.standardSort('alias')),
               getItemLabel: function(item) {
                 return item.alias;
               },
@@ -571,6 +545,14 @@ FormTarget.sample = (function($) {
               include: object.sampleSubcategory === 'Single Cell (aliquot)'
             }]
           }];
+    },
+    confirmSave: function(object, saveCallback, isDialog, form) {
+      if (form.isChanged('projectId') && object.identityConsentLevel && object.identityConsentLevel !== 'All Projects') {
+        Utils.showConfirmDialog('Confirm', 'Save', ['Identity consent level is set to ' + object.identityConsentLevel
+            + '. Are you sure you wish to transfer the sample to a different project?'], saveCallback);
+      } else {
+        saveCallback();
+      }
     }
   }
 

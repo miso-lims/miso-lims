@@ -48,9 +48,7 @@ FormTarget.transfer = (function($) {
           title: 'Sender Lab (External)',
           data: 'senderLabId',
           type: 'dropdown',
-          getSource: function() {
-            return Constants.labs;
-          },
+          source: Constants.labs,
           getItemLabel: function(item) {
             return item.label;
           },
@@ -67,9 +65,7 @@ FormTarget.transfer = (function($) {
           title: 'Sender Group (Internal)',
           data: 'senderGroupId',
           type: 'dropdown',
-          getSource: function() {
-            return config.senderGroups;
-          },
+          source: config.senderGroups,
           getItemLabel: Utils.array.getName,
           getItemValue: Utils.array.getId,
           sortSource: Utils.sorting.standardSort('name'),
@@ -103,9 +99,7 @@ FormTarget.transfer = (function($) {
           title: 'Recipient Group (Internal)',
           data: 'recipientGroupId',
           type: 'dropdown',
-          getSource: function() {
-            return config.recipientGroups;
-          },
+          source: config.recipientGroups,
           getItemLabel: Utils.array.getName,
           getItemValue: Utils.array.getId,
           sortSource: Utils.sorting.standardSort('name'),
