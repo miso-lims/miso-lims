@@ -269,7 +269,7 @@ public class LibraryAliquot extends AbstractBoxable
   @Override
   @CoverageIgnore
   public String getLabelText() {
-    return getLibrary().getAlias();
+    return getAlias();
   }
 
   @Override
