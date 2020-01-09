@@ -144,6 +144,13 @@ appears showing any boxes contained in the space. Clicking this diagram will bri
 a box to the space or view any of the boxes that have already been added.
 
 
+## Deleting Storage from a Freezer
+
+To delete a storage component such as a shelf or rack from a freezer, select the component in the layout diagram and
+click the "Delete" button that appears in the Edit section for the component. A component can only be deleted if it
+contains no boxes.
+
+
 ## Adding Boxes to Storage
 
 To add a box to storage, first select a storage unit in the Layout diagram that can hold a box. This includes positions

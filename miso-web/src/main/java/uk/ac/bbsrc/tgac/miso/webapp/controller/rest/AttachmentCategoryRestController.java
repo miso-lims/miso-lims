@@ -51,8 +51,7 @@ public class AttachmentCategoryRestController extends RestController {
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void delete(@PathVariable(value = "id", required = true) long id) throws IOException {
-    AttachmentCategory existing = getExisting(id);
-    attachmentCategoryService.delete(existing);
+    RestUtils.delete("Attachment category", id, attachmentCategoryService);
     menuController.refreshConstants();
   }
 

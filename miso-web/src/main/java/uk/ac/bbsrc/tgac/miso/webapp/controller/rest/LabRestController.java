@@ -78,11 +78,7 @@ public class LabRestController extends RestController {
   @DeleteMapping(value = "/{id}")
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
   public void deleteLab(@PathVariable(name = "id", required = true) long id) throws IOException {
-    Lab lab = labService.get(id);
-    if (lab == null) {
-      throw new RestException("Lab " + id + " not found", Status.NOT_FOUND);
-    }
-    labService.delete(lab);
+    RestUtils.delete("Lab", id, labService);
     menuController.refreshConstants();
   }
 

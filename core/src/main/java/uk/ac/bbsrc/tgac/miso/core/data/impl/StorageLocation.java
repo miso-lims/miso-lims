@@ -364,4 +364,8 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable,
     return getAlias();
   }
 
+  public int countBoxes() {
+    return getBoxes().size() + getChildLocations().stream().mapToInt(StorageLocation::countBoxes).sum();
+  }
+
 }

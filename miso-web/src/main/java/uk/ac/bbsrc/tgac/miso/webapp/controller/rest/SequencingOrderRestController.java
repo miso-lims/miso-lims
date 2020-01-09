@@ -157,11 +157,7 @@ public class SequencingOrderRestController extends RestController {
   @ResponseBody
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void delete(@PathVariable(name = "id", required = true) long id, HttpServletResponse response) throws IOException {
-    SequencingOrder order = sequencingOrderService.get(id);
-    if (order == null) {
-      throw new RestException("Sequencing Order " + id + " not found", Status.NOT_FOUND);
-    }
-    sequencingOrderService.delete(order);
+    RestUtils.delete("Sequencing order", id, sequencingOrderService);
   }
 
   @GetMapping(value = "/sequencingorders/picker/active", produces = { "application/json" })

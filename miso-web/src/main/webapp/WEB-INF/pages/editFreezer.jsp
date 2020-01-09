@@ -78,7 +78,10 @@
           <div class="generalErrors"></div>
         </div>
         <span class="storageComponentLabel">Edit <span id="storageComponentAlias"></span></span>
-        <button id="saveStorageComponent" type="button" class="fg-button ui-state-default ui-corner-all" onclick="Freezer.validateAndSaveComponent()">Save</button>
+        <div id="storageComponentActionContainer">
+          <button id="deleteStorageComponent" type="button" class="fg-button ui-state-default ui-corner-all" onclick="Freezer.deleteComponent()">Delete</button>
+          <button id="saveStorageComponent" type="button" class="fg-button ui-state-default ui-corner-all" onclick="Freezer.validateAndSaveComponent()">Save</button>
+        </div>
         <br />
         <table>
           <tbody>
@@ -88,11 +91,11 @@
                 <span id="storageComponentId"></span>
               </td>
             </tr>
-            <tr>
+            <tr id="storageComponentBarcodeRow">
               <td class="h">Barcode:</td>
               <td>
                 <input id="storageComponentBarcode" type="text">
-                <div id="freezerComponent-form_storageComponentBarcodeError" class="errorContainer"></div>
+                <div id="freezerComponent-form_identificationBarcodeError" class="errorContainer"></div>
               </td>
             </tr>
           </tbody>

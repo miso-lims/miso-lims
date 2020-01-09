@@ -19,6 +19,7 @@ Changes:
     (detailed sample) instead of the usual extra barcode info
   * Added a Quick Help section to the Edit Freezer page, including a link to the User Manual
     section describing the different storage space types
+  * Added ability to delete storage units within a freezer
   * Improved interface for selecting freezer location on the Edit Box page
     * If there is only one option in the location dropdown, it will be selected automatically
     * If there is no valid storage space within the selected location, "NO SPACE" will be displayed

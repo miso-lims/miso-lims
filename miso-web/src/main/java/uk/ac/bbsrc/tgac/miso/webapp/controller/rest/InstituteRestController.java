@@ -83,11 +83,7 @@ public class InstituteRestController extends RestController {
   @DeleteMapping(value = "/{id}")
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
   public void deleteInstitute(@PathVariable(name = "id", required = true) long id) throws IOException {
-    Institute institute = instituteService.get(id);
-    if (institute == null) {
-      throw new RestException("Institute " + id + " not found", Status.NOT_FOUND);
-    }
-    instituteService.delete(institute);
+    RestUtils.delete("Institute", id, instituteService);
     menuController.refreshConstants();
   }
   
