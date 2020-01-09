@@ -547,12 +547,21 @@ FormTarget.sample = (function($) {
           }];
     },
     confirmSave: function(object, saveCallback, isDialog, form) {
-      if (form.isChanged('projectId') && object.identityConsentLevel && object.identityConsentLevel !== 'All Projects') {
-        Utils.showConfirmDialog('Confirm', 'Save', ['Identity consent level is set to ' + object.identityConsentLevel
-            + '. Are you sure you wish to transfer the sample to a different project?'], saveCallback);
-      } else {
-        saveCallback();
+      if (form.isChanged('projectId')) {
+        var messages = [];
+        if (object.identityConsentLevel && object.identityConsentLevel !== 'All Projects') {
+          messages.push('• Identity consent level is set to ' + object.identityConsentLevel);
+        }
+        if (object.libraryCount > 0) {
+          messages.push('• ' + object.libraryCount + ' existing librar' + (object.libraryCount > 1 ? 'ies' : 'y') + ' will be affected');
+        }
+        if (messages.length) {
+          messages.unshift('Are you sure you wish to transfer the sample to a different project?');
+          Utils.showConfirmDialog('Confirm', 'Save', messages, saveCallback);
+          return;
+        }
       }
+      saveCallback();
     }
   }
 

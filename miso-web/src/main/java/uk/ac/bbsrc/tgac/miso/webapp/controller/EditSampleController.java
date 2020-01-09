@@ -517,7 +517,7 @@ public class EditSampleController {
     }
 
     @Override
-    protected SampleDto createDtoFromParent(Sample item) { // TODO: identityConsentLevel
+    protected SampleDto createDtoFromParent(Sample item) {
       if (LimsUtils.isDetailedSample(item)) {
         DetailedSample sample = (DetailedSample) item;
         DetailedSampleDto dto = EditSampleController.getCorrectDetailedSampleDto(targetSampleClass);

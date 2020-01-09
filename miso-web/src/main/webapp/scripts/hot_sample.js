@@ -285,7 +285,8 @@ HotTarget.sample = (function() {
             data: 'projectAlias',
             type: (config.hasProject ? 'text' : 'dropdown'),
             trimDropdown: false,
-            source: config.projects.sort(Utils.sorting.standardSort(Constants.isDetailedSample ? 'shortName' : 'id')).map(function(item) {
+            source: (config.hasProject ? [config.project] : config.projects.sort(Utils.sorting.standardSort(Constants.isDetailedSample
+                ? 'shortName' : 'id'))).map(function(item) {
               return Constants.isDetailedSample ? item.shortName : item.name;
             }),
             unpack: function(sam, flat, setCellMeta) {
@@ -299,6 +300,7 @@ HotTarget.sample = (function() {
                 flat.projectAlias = projectAlias;
                 flat.originalProjectAlias = projectAlias;
                 flat.identityConsentLevel = sam.identityConsentLevel;
+                flat.libraryCount = sam.libraryCount;
               }
             },
             pack: function(sam, flat, errorHandler) {
@@ -1131,19 +1133,35 @@ HotTarget.sample = (function() {
     confirmSave: function(flatObjects, create, config, table) {
       var deferred = jQuery.Deferred();
       if (!config.hasProject) {
-        var warnings = flatObjects.filter(
-            function(sample) {
-              return sample.identityConsentLevel && sample.identityConsentLevel !== 'All Projects' && sample.originalProjectAlias
-                  && sample.projectAlias !== sample.originalProjectAlias;
-            }).map(
+        var changed = flatObjects.filter(function(sample) {
+          return sample.originalProjectAlias && sample.projectAlias !== sample.originalProjectAlias;
+        });
+        var consentWarnings = changed.filter(function(sample) {
+          return (sample.identityConsentLevel && sample.identityConsentLevel !== 'All Projects');
+        }).map(
             function(sample) {
               return '• ' + (sample.alias || sample.parentAlias) + ' (Consent: ' + sample.identityConsentLevel + '): '
                   + sample.originalProjectAlias + ' → ' + sample.projectAlias;
             });
-        if (warnings.length) {
-          Utils.showConfirmDialog('Project Changes', 'Save',
-              ['The following project changes may violate consent. Are you sure you wish to save?'].concat(warnings), deferred.resolve,
-              deferred.reject);
+        var libraryWarnings = changed.filter(function(sample) {
+          return sample.libraryCount > 0;
+        }).map(
+            function(sample) {
+              return '• ' + (sample.alias || sample.parentAlias) + ': ' + sample.originalProjectAlias + ' → ' + sample.projectAlias + '; '
+                  + sample.libraryCount + ' librar' + (sample.libraryCount > 1 ? 'ies' : 'y') + ' affected'
+            });
+        var messages = [];
+        if (consentWarnings.length) {
+          messages.push('The following project changes may violate consent:');
+          messages = messages.concat(consentWarnings);
+        }
+        if (libraryWarnings.length) {
+          messages.push('The following project changes affect existing libraries:');
+          messages = messages.concat(libraryWarnings);
+        }
+        if (messages.length) {
+          messages.push('Are you sure you wish to save?');
+          Utils.showConfirmDialog('Project Changes', 'Save', messages, deferred.resolve, deferred.reject);
         } else {
           deferred.resolve();
         }
