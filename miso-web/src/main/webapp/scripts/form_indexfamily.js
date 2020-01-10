@@ -46,9 +46,7 @@ FormTarget.indexfamily = (function($) {
       type: 'dropdown',
       include: config.pageMode === 'create',
       required: true,
-      getSource: function() {
-        return Constants.platformTypes;
-      },
+      source: Constants.platformTypes,
       getItemLabel: function(item) {
         return item.key;
       },

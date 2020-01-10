@@ -46,9 +46,7 @@ FormTarget.poolorder = (function($) {
           data: 'purposeId',
           type: 'dropdown',
           required: true,
-          getSource: function() {
-            return Constants.orderPurposes;
-          },
+          source: Constants.orderPurposes,
           getItemLabel: Utils.array.getAlias,
           getItemValue: Utils.array.getId,
           sortSource: Utils.sorting.standardSort('alias')
@@ -75,11 +73,9 @@ FormTarget.poolorder = (function($) {
           data: 'platform',
           omit: true,
           type: 'dropdown',
-          getSource: function() {
-            return Constants.platformTypes.filter(function(pt) {
-              return pt.active;
-            });
-          },
+          source: Constants.platformTypes.filter(function(pt) {
+            return pt.active;
+          }),
           getItemLabel: function(item) {
             return item.key;
           },
@@ -103,11 +99,9 @@ FormTarget.poolorder = (function($) {
           omit: true,
           type: 'dropdown',
           initial: instrumentModel ? instrumentModel.id : null,
-          getSource: function() {
-            return !platform ? [] : Constants.instrumentModels.filter(function(model) {
-              return model.platformType === platform.name && model.instrumentType === 'SEQUENCER';
-            });
-          },
+          source: !platform ? [] : Constants.instrumentModels.filter(function(model) {
+            return model.platformType === platform.name && model.instrumentType === 'SEQUENCER';
+          }),
           sortSource: Utils.sorting.standardSort('alias'),
           getItemLabel: Utils.array.getAlias,
           getItemValue: Utils.array.getId,
@@ -128,9 +122,7 @@ FormTarget.poolorder = (function($) {
           title: 'Sequencing Parameters',
           data: 'parametersId',
           type: 'dropdown',
-          getSource: function() {
-            return [];
-          },
+          source: [],
           sortSource: Utils.sorting.standardSort('name'),
           getItemLabel: Utils.array.getName,
           getItemValue: Utils.array.getId,
@@ -217,8 +209,9 @@ FormTarget.poolorder = (function($) {
           controls.push(makeButton('Unlink Sequencing Order', unlinkSequencingOrder, form));
         } else {
           controls.push(makeButton('Unlink Pool', unlinkPool, form));
-          if (object.status !== "Fulfilled") controls.push(makeButton('Create Sequencing Order', createSequencingOrder, form), makeButton('Link Sequencing Order',
-              linkSequencingOrder, form));
+          if (object.status !== "Fulfilled")
+            controls.push(makeButton('Create Sequencing Order', createSequencingOrder, form), makeButton('Link Sequencing Order',
+                linkSequencingOrder, form));
         }
       } else {
         controls.push(makeButton('Create Pool', createPool, form), makeButton('Link Pool', linkPool, form));
@@ -327,15 +320,15 @@ FormTarget.poolorder = (function($) {
   }
 
   function doSetPool(form, pool) {
-  if(pool && (pool.duplicateIndices || pool.nearDuplicateIndices)){
-    Utils.showOkDialog('Error', ['Selected pool contains duplicate or near duplicate indices.']);
-  } else {
-    form.updateField('poolId', {
-      value: pool ? pool.id : null,
-      label: pool ? pool.alias : 'not linked',
-      link: pool ? Urls.ui.pools.edit(pool.id) : null
-    });
-    form.save();
+    if (pool && (pool.duplicateIndices || pool.nearDuplicateIndices)) {
+      Utils.showOkDialog('Error', ['Selected pool contains duplicate or near duplicate indices.']);
+    } else {
+      form.updateField('poolId', {
+        value: pool ? pool.id : null,
+        label: pool ? pool.alias : 'not linked',
+        link: pool ? Urls.ui.pools.edit(pool.id) : null
+      });
+      form.save();
     }
   }
 

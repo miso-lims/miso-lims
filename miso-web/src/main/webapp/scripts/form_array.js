@@ -35,9 +35,7 @@ FormTarget.array = (function($) {
           type: 'dropdown',
           include: !object.id,
           required: true,
-          getSource: function() {
-            return config.arrayModels;
-          },
+          source: config.arrayModels,
           getItemLabel: Utils.array.getAlias,
           getItemValue: Utils.array.getId,
           sortSource: Utils.sorting.standardSort('alias')

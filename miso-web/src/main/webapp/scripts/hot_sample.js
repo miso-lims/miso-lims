@@ -285,37 +285,34 @@ HotTarget.sample = (function() {
             data: 'projectAlias',
             type: (config.hasProject ? 'text' : 'dropdown'),
             trimDropdown: false,
-            source: (function() {
-              if ((!config.projects || config.projects.length == 0) && config.pageMode == 'create' && !config.hasProject) {
-                /* projects list failed to generate when it should have, and we can't proceed. Notify the user. */
-                var serverErrorMessages = document.getElementById('serverErrors');
-                serverErrorMessages.innerHTML = '<p>Failed to generate list of projects. Please notify your MISO administrators.</p>';
-                document.getElementById('errors').classList.remove('hidden');
-                /* throw an error to keep the table from generating */
-                throw new Error('Server error generating list of projects');
-              }
-              var comparator = Constants.isDetailedSample ? 'shortName' : 'id';
-              var label = Constants.isDetailedSample ? 'shortName' : 'name';
-              var projectLabels = (config.projects ? config.projects.sort(Utils.sorting.standardSort(comparator)).map(function(item) {
-                return item[label];
-              }) : []); /* use empty array if projects are not provided (should only happen during propagate or edit) */
-              return projectLabels;
-            })(),
+            source: [],
             unpack: function(sam, flat, setCellMeta) {
               var label = Constants.isDetailedSample ? 'shortName' : 'name';
+              var projects = null;
               if (config.hasProject) {
+                projects = [config.project];
                 flat.projectAlias = Utils.valOrNull(config.project[label]);
               } else {
-                flat.projectAlias = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(item) {
+                projects = config.projects.filter(function(project) {
+                  return project.status === 'Active' || project.id === sam.projectId;
+                }).sort(Utils.sorting.standardSort(Constants.isDetailedSample ? 'shortName' : 'id'));
+                var projectAlias = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(item) {
                   return item.id == sam.projectId;
-                }, config.projects), 'alias');
+                }, config.projects), label);
+                flat.projectAlias = projectAlias;
+                flat.originalProjectAlias = projectAlias;
+                flat.identityConsentLevel = sam.identityConsentLevel;
+                flat.libraryCount = sam.libraryCount;
               }
+              setCellMeta('source', projects.map(function(project) {
+                return project[label];
+              }));
             },
             pack: function(sam, flat, errorHandler) {
-              var label = Constants.isDetailedSample ? 'shortName' : 'name';
               if (config.hasProject) {
                 sam.projectId = config.project.id;
               } else {
+                var label = Constants.isDetailedSample ? 'shortName' : 'name';
                 sam.projectId = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(item) {
                   return item[label] == flat.projectAlias;
                 }, config.projects), 'id');
@@ -323,7 +320,7 @@ HotTarget.sample = (function() {
             },
             readOnly: config.hasProject,
             validator: HotUtils.validator.requiredAutocomplete,
-            include: config.pageMode == 'create'
+            include: true
           },
           HotUtils.makeColumnForText('Sci. Name', true, 'scientificName', {
             validator: HotUtils.validator.requiredTextNoSpecialChars,
@@ -1136,6 +1133,45 @@ HotTarget.sample = (function() {
 
     getCustomActions: function(table) {
       return HotTarget.boxable.getCustomActions(table);
+    },
+
+    confirmSave: function(flatObjects, create, config, table) {
+      var deferred = jQuery.Deferred();
+      if (!config.hasProject) {
+        var changed = flatObjects.filter(function(sample) {
+          return sample.originalProjectAlias && sample.projectAlias !== sample.originalProjectAlias;
+        });
+        var consentWarnings = changed.filter(function(sample) {
+          return (sample.identityConsentLevel && sample.identityConsentLevel !== 'All Projects');
+        }).map(
+            function(sample) {
+              return '• ' + (sample.alias || sample.parentAlias) + ' (Consent: ' + sample.identityConsentLevel + '): '
+                  + sample.originalProjectAlias + ' → ' + sample.projectAlias;
+            });
+        var libraryWarnings = changed.filter(function(sample) {
+          return sample.libraryCount > 0;
+        }).map(
+            function(sample) {
+              return '• ' + (sample.alias || sample.parentAlias) + ': ' + sample.originalProjectAlias + ' → ' + sample.projectAlias + '; '
+                  + sample.libraryCount + ' librar' + (sample.libraryCount > 1 ? 'ies' : 'y') + ' affected'
+            });
+        var messages = [];
+        if (consentWarnings.length) {
+          messages.push('The following project changes may violate consent:');
+          messages = messages.concat(consentWarnings);
+        }
+        if (libraryWarnings.length) {
+          messages.push('The following project changes affect existing libraries:');
+          messages = messages.concat(libraryWarnings);
+        }
+        if (messages.length) {
+          messages.push('Are you sure you wish to save?');
+          Utils.showConfirmDialog('Project Changes', 'Save', messages, deferred.resolve, deferred.reject);
+        } else {
+          deferred.resolve();
+        }
+        return deferred.promise();
+      }
     }
   };
 })();

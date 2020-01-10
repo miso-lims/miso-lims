@@ -45,7 +45,7 @@ FormTarget.submission = (function($) {
           data: 'accession',
           type: 'read-only',
           getLink: function(sample) {
-            return 'http://www.ebi.ac.uk/ena/data/view/' + sample.accession;
+            return Urls.external.enaAccession(sample.accession);
           },
           include: object.accession
         }, {

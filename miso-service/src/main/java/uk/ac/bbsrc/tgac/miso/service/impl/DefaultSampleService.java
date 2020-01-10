@@ -852,6 +852,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     target.setSampleType(source.getSampleType());
     target.setScientificName(source.getScientificName());
     target.setTaxonIdentifier(source.getTaxonIdentifier());
+    target.setProject(source.getProject());
 
     // validate alias uniqueness only if the alias has changed and the sample does not have a non-standard alias
     target.setAlias(source.getAlias());

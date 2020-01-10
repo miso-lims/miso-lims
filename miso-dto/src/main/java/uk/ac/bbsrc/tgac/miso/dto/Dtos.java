@@ -474,6 +474,9 @@ public class Dtos {
       setBoolean(dto::setReceiptQcPassed, receipt.isQcPassed(), true);
       setString(dto::setReceiptQcNote, receipt.getQcNote());
     }
+    if (from.getLibraries() != null) {
+      dto.setLibraryCount(from.getLibraries().size());
+    }
 
     return dto;
 

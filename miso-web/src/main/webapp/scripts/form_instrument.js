@@ -117,9 +117,7 @@ FormTarget.instrument = (function($) {
       type: 'dropdown',
       include: !object.id,
       required: true,
-      getSource: function() {
-        return config.instrumentTypes;
-      },
+      source: config.instrumentTypes,
       getItemLabel: function(item) {
         return item.label;
       },
@@ -139,11 +137,9 @@ FormTarget.instrument = (function($) {
       data: 'instrumentModelId',
       type: 'dropdown',
       required: true,
-      getSource: function() {
-        return Constants.instrumentModels.filter(function(model) {
-          return model.instrumentType === object.instrumentType;
-        });
-      },
+      source: Constants.instrumentModels.filter(function(model) {
+        return model.instrumentType === object.instrumentType;
+      }),
       getItemLabel: function(item) {
         return Utils.array.findUniqueOrThrow(function(type) {
           return type.name === item.platformType;
@@ -184,9 +180,7 @@ FormTarget.instrument = (function($) {
       data: 'status',
       type: 'dropdown',
       required: true,
-      getSource: function() {
-        return ['Production', 'Retired', 'Upgraded'];
-      },
+      source: ['Production', 'Retired', 'Upgraded'],
       onChange: function(newValue, form) {
         var decommissioned = {
           disabled: true,
@@ -228,9 +222,7 @@ FormTarget.instrument = (function($) {
       data: 'upgradedInstrumentId',
       type: 'dropdown',
       nullLabel: 'N/A',
-      getSource: function() {
-        return config.instruments;
-      },
+      source: config.instruments,
       getItemLabel: Utils.array.getName,
       getItemValue: Utils.array.getId,
       sortSource: Utils.sorting.standardSort('name'),

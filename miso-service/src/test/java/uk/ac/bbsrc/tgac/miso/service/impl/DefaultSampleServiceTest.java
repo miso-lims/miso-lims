@@ -431,8 +431,8 @@ public class DefaultSampleServiceTest {
     assertEquals("Sample scientificName should be modifiable", updated.getScientificName(), result.getScientificName());
     assertEquals("Sample taxonIdentifier should be modifiable", updated.getTaxonIdentifier(), result.getTaxonIdentifier());
     assertEquals("Sample volume should be modifiable", updated.getVolume(), result.getVolume());
+    assertEquals("Sample project should be modifiable", updated.getProject().getId(), result.getProject().getId());
 
-    assertNull("Sample project should NOT be modifiable", result.getProject());
     assertEquals("Sample name should NOT be modifiable", old.getName(), result.getName());
   }
 

@@ -92,7 +92,8 @@
     
     var opts = {
       detailedSample: Constants.isDetailedSample,
-      generateSampleAliases: Constants.automaticSampleAlias
+      generateSampleAliases: Constants.automaticSampleAlias,
+      projects: ${projects}
     };
     <c:if test="${detailedSample}">
     opts.dnaseTreatable = ${sample.sampleClass.DNAseTreatable};

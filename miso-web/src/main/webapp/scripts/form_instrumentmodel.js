@@ -107,9 +107,7 @@ FormTarget.instrumentmodel = (function($) {
       type: 'dropdown',
       include: config.pageMode === 'create',
       required: true,
-      getSource: function() {
-        return Constants.platformTypes;
-      },
+      source: Constants.platformTypes,
       getItemLabel: function(item) {
         return item.key;
       },
@@ -128,9 +126,7 @@ FormTarget.instrumentmodel = (function($) {
       type: 'dropdown',
       include: config.pageMode === 'create',
       required: true,
-      getSource: function() {
-        return Constants.instrumentTypes;
-      },
+      source: Constants.instrumentTypes,
       getItemLabel: function(item) {
         return item.label;
       },
@@ -175,12 +171,10 @@ FormTarget.instrumentmodel = (function($) {
       data: 'dataManglingPolicy',
       type: 'dropdown',
       required: true,
-      getSource: function() {
-        return object.instrumentType === 'SEQUENCER' ? Constants.dataManglingPolicies : [{
-          label: 'Normal',
-          value: 'NONE'
-        }];
-      },
+      source: object.instrumentType === 'SEQUENCER' ? Constants.dataManglingPolicies : [{
+        label: 'Normal',
+        value: 'NONE'
+      }],
       getItemLabel: function(item) {
         return item.label;
       },

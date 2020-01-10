@@ -77,9 +77,7 @@ FormTarget.kitdescriptor = (function($) {
       data: 'kitType',
       type: 'dropdown',
       required: true,
-      getSource: function() {
-        return config.kitTypes;
-      }
+      source: config.kitTypes
     }, {
       title: 'Kit Type',
       include: !isNew,
@@ -91,9 +89,7 @@ FormTarget.kitdescriptor = (function($) {
       data: 'platformType',
       type: 'dropdown',
       required: true,
-      getSource: function() {
-        return Constants.platformTypes;
-      },
+      source: Constants.platformTypes,
       getItemLabel: function(item) {
         return item.key;
       },

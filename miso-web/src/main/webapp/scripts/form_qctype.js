@@ -121,9 +121,7 @@ FormTarget.qctype = (function($) {
       data: 'qcTarget',
       type: 'dropdown',
       required: true,
-      getSource: function() {
-        return Constants.qcTargets;
-      },
+      source: Constants.qcTargets,
       getItemLabel: function(item) {
         return item.qcTarget;
       },
@@ -150,15 +148,13 @@ FormTarget.qctype = (function($) {
       omit: true,
       type: 'dropdown',
       required: true,
-      getSource: function() {
-        return [{
-          label: 'Numbers',
-          value: 0
-        }, {
-          label: 'Yes/No',
-          value: -1
-        }];
-      },
+      source: [{
+        label: 'Numbers',
+        value: 0
+      }, {
+        label: 'Yes/No',
+        value: -1
+      }],
       getItemLabel: function(item) {
         return item.label;
       },
@@ -189,9 +185,7 @@ FormTarget.qctype = (function($) {
       data: 'correspondingField',
       type: 'dropdown',
       required: true,
-      getSource: function() {
-        return [];
-      }
+      source: []
     }, {
       title: 'Auto Update Field',
       data: 'autoUpdateField',
@@ -200,11 +194,9 @@ FormTarget.qctype = (function($) {
       title: 'Instrument Model',
       data: 'instrumentModelId',
       type: 'dropdown',
-      getSource: function() {
-        return Constants.instrumentModels.filter(function(model) {
-          return model.active || model.id === object.instrumentModelId;
-        });
-      },
+      source: Constants.instrumentModels.filter(function(model) {
+        return model.active || model.id === object.instrumentModelId;
+      }),
       getItemLabel: Utils.array.getAlias,
       getItemValue: Utils.array.getId,
       sortSource: Utils.sorting.standardSort('alias')
@@ -212,11 +204,9 @@ FormTarget.qctype = (function($) {
       title: 'Kit',
       data: 'kitDescriptorId',
       type: 'dropdown',
-      getSource: function() {
-        return Constants.kitDescriptors.filter(function(item) {
-          return item.kitType === 'QC';
-        });
-      },
+      source: Constants.kitDescriptors.filter(function(item) {
+        return item.kitType === 'QC';
+      }),
       getItemLabel: Utils.array.getName,
       getItemValue: Utils.array.getId,
       sortSource: Utils.sorting.standardSort('name')

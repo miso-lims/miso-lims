@@ -53,7 +53,7 @@ FormTarget.run = (function($) {
           data: 'accession',
           type: 'read-only',
           getLink: function(run) {
-            return 'http://www.ebi.ac.uk/ena/data/view/' + run.accession;
+            return Urls.external.enaAccession(run.accession);
           },
           include: object.accession
         }, {
@@ -75,11 +75,9 @@ FormTarget.run = (function($) {
           data: 'sequencingParametersId',
           type: 'dropdown',
           nullLabel: 'SELECT',
-          getSource: function() {
-            return Constants.sequencingParameters.filter(function(param) {
-              return param.instrumentModelId === object.instrumentModelId;
-            });
-          },
+          source: Constants.sequencingParameters.filter(function(param) {
+            return param.instrumentModelId === object.instrumentModelId;
+          }),
           getItemLabel: Utils.array.getName,
           getItemValue: Utils.array.getId,
           required: true
@@ -88,11 +86,9 @@ FormTarget.run = (function($) {
           data: 'sequencingKitId',
           type: 'dropdown',
           nullLabel: 'N/A',
-          getSource: function() {
-            return Constants.kitDescriptors.filter(function(kit) {
-              return kit.kitType === 'Sequencing' && kit.platformType === object.platformType;
-            });
-          },
+          source: Constants.kitDescriptors.filter(function(kit) {
+            return kit.kitType === 'Sequencing' && kit.platformType === object.platformType;
+          }),
           getItemLabel: Utils.array.getName,
           getItemValue: Utils.array.getId
         }, {
@@ -111,9 +107,7 @@ FormTarget.run = (function($) {
           data: 'workflowType',
           type: 'dropdown',
           nullLabel: 'N/A',
-          getSource: function() {
-            return Constants.illuminaWorkflowTypes;
-          },
+          source: Constants.illuminaWorkflowTypes,
           getItemLabel: function(item) {
             return item.label;
           },
@@ -171,11 +165,9 @@ FormTarget.run = (function($) {
           title: 'Status',
           data: 'status',
           type: 'dropdown',
-          getSource: function() {
-            return Constants.healthTypes.filter(function(status) {
-              return status.allowedFromSequencer;
-            });
-          },
+          source: Constants.healthTypes.filter(function(status) {
+            return status.allowedFromSequencer;
+          }),
           getItemLabel: function(item) {
             return item.label;
           },
@@ -211,15 +203,13 @@ FormTarget.run = (function($) {
           title: 'Data Approved',
           data: 'dataApproved',
           type: 'dropdown',
-          getSource: function() {
-            return [{
-              label: 'Yes',
-              value: true
-            }, {
-              label: 'No',
-              value: false
-            }];
-          },
+          source: [{
+            label: 'Yes',
+            value: true
+          }, {
+            label: 'No',
+            value: false
+          }],
           convertToBoolean: true,
           getItemLabel: function(item) {
             return item.label;

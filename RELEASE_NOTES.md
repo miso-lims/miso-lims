@@ -20,6 +20,7 @@ Changes:
   * Added a Quick Help section to the Edit Freezer page, including a link to the User Manual
     section describing the different storage space types
   * Added ability to delete storage units within a freezer
+  * Allow changing sample project
   * Improved interface for selecting freezer location on the Edit Box page
     * If there is only one option in the location dropdown, it will be selected automatically
     * If there is no valid storage space within the selected location, "NO SPACE" will be displayed
@@ -30,7 +31,7 @@ Changes:
     now be placed in the correct orientation on the scanner. This fixes an issue where orientation
     detection did not work consistently for some box types and results were sometimes upside-down
   * Fixed error saving QCs with controls specified
-  * Exports initialVolume in Pinery /samples
+  * Export initialVolume in Pinery /samples
   * Print library aliquot alias instead of library alias on labels
 
 Upgrade Notes:

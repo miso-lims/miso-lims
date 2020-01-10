@@ -41,7 +41,7 @@ FormUtils = (function($) {
    *   scale: maximum scale (decimal places) for decimal input
    *   nullLabel: optional string; label for null value in dropdown. If not provided, and the field is not required, there will be no
    *       null value in the dropdown - it will default to the first option unless an initial value is specified
-   *   getSource: function() returning array of objects; required for dropdown fields; Provides dropdown options
+   *   source: array of objects; required for dropdown fields; Provides dropdown options
    *   convertToBoolean: optional boolean (default: false); if true, dropdown values 'true' and 'false' will be converted to booleans
    *   sortSource: optional function(a, b); sort function for dropdown options
    *   getItemLabel: function(item) returning string; get the label for a dropdown option. If omitted and the item is a string, it is
@@ -55,7 +55,8 @@ FormUtils = (function($) {
    * }
    * 
    * Form object: {
-   *   isChanged: function() returns true if the form has been modified by the user; false otherwise
+   *   isChanged: function([dataProperty]) if dataProperty is specified, returns true if the field has been modified by the user; false
+   *       otherwise. If dataProperty is omitted, returns true if the form has been modified by the user; false otherwise
    *   markOtherChanges: function() marks the form as having been modified. This is automatic for the normal form fields, but is
    *       necessary for other page elements
    *   get: function(dataProperty) returns the field value
@@ -187,15 +188,13 @@ FormUtils = (function($) {
         title: 'QC Passed',
         data: 'qcPassed',
         type: 'dropdown',
-        getSource: function() {
-          return [{
-            label: 'True',
-            value: true
-          }, {
-            label: 'False',
-            value: false
-          }];
-        },
+        source: [{
+          label: 'True',
+          value: true
+        }, {
+          label: 'False',
+          value: false
+        }],
         convertToBoolean: true,
         getItemLabel: function(item) {
           return item.label;
@@ -217,9 +216,7 @@ FormUtils = (function($) {
         title: unit.title,
         data: unit.data,
         type: 'dropdown',
-        getSource: function() {
-          return unit.source;
-        },
+        source: unit.source,
         getItemLabel: function(item) {
           return Utils.decodeHtmlString(item.units);
         },
@@ -342,6 +339,11 @@ FormUtils = (function($) {
       return object.hasOwnProperty(property) && object[property] != null;
     }
 
+    function isFieldChanged(field) {
+      return shouldTrackField(field) && (isSetInForm(containerId, field) || isSetInObject(original, field.data))
+          && getFormValue(containerId, field) != original[field.data];
+    }
+
     function triggerUpdate(field) {
       field.onChange(getFormValue(containerId, field), form);
     }
@@ -352,20 +354,20 @@ FormUtils = (function($) {
 
     form = {
       setUnchanged: updateOriginal,
-      isChanged: function() {
-        if (otherChanges) {
-          return true;
-        }
-        var changed = false;
-        sections.forEach(function(section) {
-          section.fields.forEach(function(field) {
-            if (shouldTrackField(field) && (isSetInForm(containerId, field) || isSetInObject(original, field.data))
-                && getFormValue(containerId, field) != original[field.data]) {
-              changed = true;
-            }
+      isChanged: function(dataProperty) {
+        if (dataProperty) {
+          var field = findField(sections, dataProperty);
+          return isFieldChanged(field);
+        } else {
+          if (otherChanges) {
+            return true;
+          }
+          var changed = false;
+          sections.forEach(function(section) {
+            changed |= section.fields.some(isFieldChanged);
           });
-        });
-        return changed;
+          return changed;
+        }
       },
       markOtherChanges: function() {
         otherChanges = true;
@@ -395,9 +397,7 @@ FormUtils = (function($) {
                 if (field.type !== 'dropdown') {
                   throw new Error('Cannot set source for non-dropdown field \'' + field.title + '\'');
                 }
-                field.getSource = function() {
-                  return options.source;
-                }
+                field.source = options.source;
                 var originalValue = getFormValue(containerId, field);
                 var select = $(inputSelector);
                 select.empty();
@@ -453,7 +453,7 @@ FormUtils = (function($) {
           } else {
             window.location.href = target.getEditUrl(data, config);
           }
-        });
+        }, form);
       }
     };
     return form;
@@ -537,7 +537,7 @@ FormUtils = (function($) {
     return (changeOrder[a] || 0) - (changeOrder[b] || 0);
   }
 
-  function validateAndSave(containerId, object, target, sections, config, postSaveCallback) {
+  function validateAndSave(containerId, object, target, sections, config, postSaveCallback, form) {
     var selector = '#' + containerId;
     Validate.removeValidation(selector + ' .form-control');
     Validate.cleanFields(selector);
@@ -563,7 +563,7 @@ FormUtils = (function($) {
       };
 
       if (target.confirmSave) {
-        target.confirmSave(object, saveCallback, containerId === dialogFormId);
+        target.confirmSave(object, saveCallback, containerId === dialogFormId, form);
       } else {
         saveCallback();
       }
@@ -842,7 +842,7 @@ FormUtils = (function($) {
     if (!field.required || field.nullLabel) {
       select.append($('<option>').val(null).text(field.nullLabel || 'None'));
     }
-    var items = field.sortSource ? field.getSource().sort(field.sortSource) : field.getSource();
+    var items = field.sortSource ? field.source.sort(field.sortSource) : field.source;
     items.forEach(function(item) {
       var itemValue = field.getItemValue ? field.getItemValue(item) : item;
       var itemLabel = field.getItemLabel ? field.getItemLabel(item) : null;

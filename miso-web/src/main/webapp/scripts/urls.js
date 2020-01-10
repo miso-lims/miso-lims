@@ -651,6 +651,8 @@ Urls = (function() {
     return url;
   };
 
+  external.enaAccession = idUrlFunction('http://www.ebi.ac.uk/ena/data/view');
+
   return {
     ui: ui,
     rest: rest,

@@ -64,17 +64,13 @@ FormTarget.project = (function($) {
           data: 'status',
           type: 'dropdown',
           required: true,
-          getSource: function() {
-            return config.statusOptions;
-          }
+          source: config.statusOptions
         }, {
           title: 'Reference Genome',
           data: 'referenceGenomeId',
           type: 'dropdown',
           required: 'true',
-          getSource: function() {
-            return Constants.referenceGenomes;
-          },
+          source: Constants.referenceGenomes,
           sortSource: Utils.sorting.standardSortWithException('alias', 'Unknown', true),
           getItemLabel: function(item) {
             return item.alias;
@@ -86,9 +82,7 @@ FormTarget.project = (function($) {
           title: 'Default Targeted Sequencing',
           data: 'defaultTargetedSequencingId',
           type: 'dropdown',
-          getSource: function() {
-            return Constants.targetedSequencings;
-          },
+          source: Constants.targetedSequencings,
           sortSource: Utils.sorting.standardSort('alias'),
           getItemLabel: function(item) {
             return item.alias;

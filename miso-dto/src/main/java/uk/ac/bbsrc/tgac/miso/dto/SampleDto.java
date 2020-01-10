@@ -75,6 +75,7 @@ public class SampleDto extends AbstractBoxableDto {
   private String qcRin;
   private List<QcDto> qcs;
   private String requisitionId;
+  private int libraryCount = 0;
 
   public Long getId() {
     return id;
@@ -351,6 +352,14 @@ public class SampleDto extends AbstractBoxableDto {
 
   public void setRequisitionId(String requisitionId) {
     this.requisitionId = requisitionId;
+  }
+
+  public int getLibraryCount() {
+    return libraryCount;
+  }
+
+  public void setLibraryCount(int libraryCount) {
+    this.libraryCount = libraryCount;
   }
 
 }

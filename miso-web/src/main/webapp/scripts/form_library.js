@@ -75,7 +75,7 @@ FormTarget.library = (function($) {
           data: 'accession',
           type: 'read-only',
           getLink: function(library) {
-            return 'http://www.ebi.ac.uk/ena/data/view/' + library.accession;
+            return Urls.external.enaAccession(library.accession);
           },
           include: object.accession
         }, {
@@ -88,11 +88,9 @@ FormTarget.library = (function($) {
           data: 'platformType',
           type: 'dropdown',
           required: true,
-          getSource: function() {
-            return Constants.platformTypes.filter(function(platformType) {
-              return platformType.active || platformType.key === object.platformType;
-            });
-          },
+          source: Constants.platformTypes.filter(function(platformType) {
+            return platformType.active || platformType.key === object.platformType;
+          }),
           sortSource: Utils.sorting.standardSort('key'),
           getItemLabel: function(item) {
             return item.key;
@@ -120,11 +118,9 @@ FormTarget.library = (function($) {
           data: 'libraryTypeId',
           type: 'dropdown',
           required: true,
-          getSource: function() {
-            return Constants.libraryTypes.filter(function(libraryType) {
-              return libraryType.platform === platformName;
-            });
-          },
+          source: Constants.libraryTypes.filter(function(libraryType) {
+            return libraryType.platform === platformName;
+          }),
           sortSource: Utils.sorting.standardSort('description'),
           getItemLabel: function(item) {
             return item.description;
@@ -137,11 +133,9 @@ FormTarget.library = (function($) {
           data: 'libraryDesignId',
           type: 'dropdown',
           include: config.detailedSample,
-          getSource: function() {
-            return Constants.libraryDesigns.filter(function(design) {
-              return design.sampleClassId === object.parentSampleClassId;
-            });
-          },
+          source: Constants.libraryDesigns.filter(function(design) {
+            return design.sampleClassId === object.parentSampleClassId;
+          }),
           sortSource: Utils.sorting.standardSort('name'),
           getItemLabel: function(item) {
             return item.name;
@@ -182,9 +176,7 @@ FormTarget.library = (function($) {
           type: 'dropdown',
           include: config.detailedSample,
           required: true,
-          getSource: function() {
-            return Constants.libraryDesignCodes;
-          },
+          source: Constants.libraryDesignCodes,
           sortSource: Utils.sorting.standardSort('code'),
           getItemLabel: function(item) {
             return item.code + ' (' + item.description + ')';
@@ -196,9 +188,7 @@ FormTarget.library = (function($) {
           title: 'Library Selection Type',
           data: 'librarySelectionTypeId',
           type: 'dropdown',
-          getSource: function() {
-            return Constants.librarySelections;
-          },
+          source: Constants.librarySelections,
           sortSource: Utils.sorting.standardSort('name'),
           getItemLabel: function(item) {
             return item.name;
@@ -210,9 +200,7 @@ FormTarget.library = (function($) {
           title: 'Library Strategy Type',
           data: 'libraryStrategyTypeId',
           type: 'dropdown',
-          getSource: function() {
-            return Constants.libraryStrategies;
-          },
+          source: Constants.libraryStrategies,
           sortSource: Utils.sorting.standardSort('name'),
           getItemLabel: function(item) {
             return item.name;
@@ -225,11 +213,9 @@ FormTarget.library = (function($) {
           data: 'indexFamilyId',
           type: 'dropdown',
           nullLabel: 'No indices',
-          getSource: function() {
-            return Constants.indexFamilies.filter(function(family) {
-              return family.platformType === platformName;
-            });
-          },
+          source: Constants.indexFamilies.filter(function(family) {
+            return family.platformType === platformName;
+          }),
           sortSource: Utils.sorting.standardSort('name'),
           getItemLabel: function(item) {
             return item.name;
@@ -325,11 +311,9 @@ FormTarget.library = (function($) {
           data: 'kitDescriptorId',
           type: 'dropdown',
           required: true,
-          getSource: function() {
-            return Constants.kitDescriptors.filter(function(kit) {
-              return kit.kitType === 'Library';
-            });
-          },
+          source: Constants.kitDescriptors.filter(function(kit) {
+            return kit.kitType === 'Library';
+          }),
           sortSource: Utils.sorting.standardSort('name'),
           getItemLabel: function(item) {
             return item.name;
@@ -341,9 +325,7 @@ FormTarget.library = (function($) {
           title: 'Spike-In',
           data: 'spikeInId',
           type: 'dropdown',
-          getSource: function() {
-            return Constants.spikeIns;
-          },
+          source: Constants.spikeIns,
           sortSource: Utils.sorting.standardSort('alias'),
           getItemLabel: function(item) {
             return item.alias;
@@ -366,9 +348,7 @@ FormTarget.library = (function($) {
           title: 'Spike-In Dilution Factor',
           data: 'spikeInDilutionFactor',
           type: 'dropdown',
-          getSource: function() {
-            return Constants.dilutionFactors;
-          },
+          source: Constants.dilutionFactors,
           sortSource: function(a, b) {
             return a.length - b.length;
           },
@@ -423,9 +403,7 @@ FormTarget.library = (function($) {
       title: 'Index ' + position,
       data: 'index' + position + 'Id',
       type: 'dropdown',
-      getSource: function() {
-        return getIndices(library.indexFamilyId, position);
-      },
+      source: getIndices(library.indexFamilyId, position),
       sortSource: Utils.sorting.standardSort('label'),
       getItemLabel: function(item) {
         return item.label;

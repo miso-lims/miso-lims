@@ -49,9 +49,7 @@ FormTarget.container = (function() {
           title: 'Clustering Kit',
           data: 'clusteringKitId',
           type: 'dropdown',
-          getSource: function() {
-            return getKitsByType('Clustering');
-          },
+          source: getKitsByType('Clustering'),
           getItemLabel: function(item) {
             return item.name;
           },
@@ -62,9 +60,7 @@ FormTarget.container = (function() {
           title: 'Multiplexing Kit',
           data: 'multiplexingKitId',
           type: 'dropdown',
-          getSource: function() {
-            return getKitsByType('Multiplexing');
-          },
+          source: getKitsByType('Multiplexing'),
           getItemLabel: function(item) {
             return item.name;
           },
@@ -75,9 +71,7 @@ FormTarget.container = (function() {
           title: 'Pore Version',
           data: 'poreVersionId',
           type: 'dropdown',
-          getSource: function() {
-            return Constants.poreVersions;
-          },
+          source: Constants.poreVersions,
           getItemLabel: function(item) {
             return item.alias;
           },
