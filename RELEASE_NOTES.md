@@ -32,6 +32,7 @@ Changes:
     detection did not work consistently for some box types and results were sometimes upside-down
   * Fixed error saving QCs with controls specified
   * Export initialVolume in Pinery /samples
+  * Print library aliquot alias instead of library alias on labels
 
 Upgrade Notes:
 
