@@ -44,7 +44,9 @@ FormTarget.sample = (function($) {
                   data: 'projectId',
                   type: 'dropdown',
                   required: true,
-                  source: config.projects,
+                  source: config.projects.filter(function(project) {
+                    return project.status === 'Active' || project.id === object.projectId;
+                  }),
                   getItemLabel: function(item) {
                     return Constants.isDetailedSample ? item.shortName : item.name;
                   },

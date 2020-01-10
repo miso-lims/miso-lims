@@ -285,15 +285,17 @@ HotTarget.sample = (function() {
             data: 'projectAlias',
             type: (config.hasProject ? 'text' : 'dropdown'),
             trimDropdown: false,
-            source: (config.hasProject ? [config.project] : config.projects.sort(Utils.sorting.standardSort(Constants.isDetailedSample
-                ? 'shortName' : 'id'))).map(function(item) {
-              return Constants.isDetailedSample ? item.shortName : item.name;
-            }),
+            source: [],
             unpack: function(sam, flat, setCellMeta) {
               var label = Constants.isDetailedSample ? 'shortName' : 'name';
+              var projects = null;
               if (config.hasProject) {
+                projects = [config.project];
                 flat.projectAlias = Utils.valOrNull(config.project[label]);
               } else {
+                projects = config.projects.filter(function(project) {
+                  return project.status === 'Active' || project.id === sam.projectId;
+                }).sort(Utils.sorting.standardSort(Constants.isDetailedSample ? 'shortName' : 'id'));
                 var projectAlias = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(item) {
                   return item.id == sam.projectId;
                 }, config.projects), label);
@@ -302,6 +304,9 @@ HotTarget.sample = (function() {
                 flat.identityConsentLevel = sam.identityConsentLevel;
                 flat.libraryCount = sam.libraryCount;
               }
+              setCellMeta('source', projects.map(function(project) {
+                return project[label];
+              }));
             },
             pack: function(sam, flat, errorHandler) {
               if (config.hasProject) {
