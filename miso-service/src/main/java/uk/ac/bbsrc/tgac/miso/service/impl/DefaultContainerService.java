@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -140,17 +140,18 @@ public class DefaultContainerService
             String.format("Can only be changed to a model with the same number of partitions (%d)", before.getPartitionCount())));
       }
       if (beforeChange.getRunPositions() != null) {
-        Stream<InstrumentModel> requiredInstrumentModels = beforeChange.getRunPositions().stream()
+        Set<InstrumentModel> requiredInstrumentModels = beforeChange.getRunPositions().stream()
             .map(RunPosition::getRun)
             .map(Run::getSequencer)
-            .map(Instrument::getInstrumentModel);
-        if (requiredInstrumentModels.anyMatch(required -> after.getInstrumentModels().stream()
+            .map(Instrument::getInstrumentModel)
+            .collect(Collectors.toSet());
+        if (requiredInstrumentModels.stream().anyMatch(required -> after.getInstrumentModels().stream()
             .map(InstrumentModel::getId)
             .noneMatch(id -> id == required.getId()))) {
           errors.add(new ValidationError("model.id",
               String.format("Can only change to a model compatible with the linked runs' instrument models (%s)",
-                  LimsUtils.joinWithConjunction(requiredInstrumentModels.map(InstrumentModel::getAlias).collect(Collectors.toSet()),
-                      "and"))));
+                  LimsUtils.joinWithConjunction(
+                      requiredInstrumentModels.stream().map(InstrumentModel::getAlias).collect(Collectors.toSet()), "and"))));
         }
       }
     }
