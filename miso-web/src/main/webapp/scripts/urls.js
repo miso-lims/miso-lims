@@ -92,6 +92,12 @@ Urls = (function() {
     edit: idUrlFunction(containerUiBase)
   };
 
+  var containerRestBase = restBase + '/containers';
+  rest.containers = {
+    create: containerRestBase,
+    update: idUrlFunction(containerRestBase)
+  };
+
   // Container Models
   var containerModelUiBase = baseUrl + '/containermodel';
   ui.containerModels = {

@@ -728,20 +728,24 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       return true;
     case 1:
       SequencerPartitionContainer container = containers.iterator().next();
+      boolean isMutated = false;
       if (container.getPartitions().size() != laneCount) {
         throw new IllegalArgumentException(String.format("The container %s has %d partitions, but %d were detected by the scanner.",
             containerSerialNumber, container.getPartitions().size(), laneCount));
       }
+      if (container.getModel().getId() != containerModel.getId()) {
+        container.setModel(containerModel);
+        isMutated = true;
+      }
       if (target.getSequencerPartitionContainers().stream().noneMatch(c -> c.getId() == container.getId())) {
         target.addSequencerPartitionContainer(container, position);
         updatePartitionContents(getLaneContents, container);
-        return true;
+        isMutated = true;
       }
-      break;
+      return isMutated;
     default:
       throw new IllegalArgumentException("Multiple containers with same identifier: " + containerSerialNumber);
     }
-    return false;
   }
 
   private void updatePartitionContents(final GetLaneContents getLaneContents, SequencerPartitionContainer newContainer) {

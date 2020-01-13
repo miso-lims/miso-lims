@@ -21,6 +21,7 @@ Changes:
     section describing the different storage space types
   * Added ability to delete storage units within a freezer
   * Allow changing sample project
+  * Allow changing sequencing container model
   * Improved interface for selecting freezer location on the Edit Box page
     * If there is only one option in the location dropdown, it will be selected automatically
     * If there is no valid storage space within the selected location, "NO SPACE" will be displayed

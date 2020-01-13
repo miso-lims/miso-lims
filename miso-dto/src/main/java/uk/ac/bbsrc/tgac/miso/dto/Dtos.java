@@ -2081,6 +2081,7 @@ public class Dtos {
     if (lastRun != null) {
       dto.setLastRunAlias(lastRun.getAlias());
       dto.setLastRunId(lastRun.getId());
+      dto.setLastRunInstrumentModelId(lastRun.getSequencer().getInstrumentModel().getId());
       dto.setLastSequencerId(lastRun.getSequencer().getId());
       dto.setLastSequencerName(lastRun.getSequencer().getName());
     }
