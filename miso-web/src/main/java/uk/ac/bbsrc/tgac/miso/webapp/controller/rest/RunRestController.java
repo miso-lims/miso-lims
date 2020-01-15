@@ -55,11 +55,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pair;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
-import uk.ac.bbsrc.tgac.miso.core.data.PartitionQC;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -67,8 +69,10 @@ import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
-import uk.ac.bbsrc.tgac.miso.core.service.PartitionQCService;
 import uk.ac.bbsrc.tgac.miso.core.service.PartitionQcTypeService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionAliquotService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
@@ -85,6 +89,7 @@ import uk.ac.bbsrc.tgac.miso.dto.ExperimentDto;
 import uk.ac.bbsrc.tgac.miso.dto.ExperimentDto.RunPartitionDto;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentModelDto;
 import uk.ac.bbsrc.tgac.miso.dto.PartitionDto;
+import uk.ac.bbsrc.tgac.miso.dto.RunPartitionAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.StudyDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
@@ -129,6 +134,27 @@ public class RunRestController extends RestController {
     }
   }
 
+  public static class RunPartitionPurposeRequest {
+    private List<Long> partitionIds;
+    private Long runPurposeId;
+
+    public List<Long> getPartitionIds() {
+      return partitionIds;
+    }
+
+    public void setPartitionIds(List<Long> partitionIds) {
+      this.partitionIds = partitionIds;
+    }
+
+    public Long getRunPurposeId() {
+      return runPurposeId;
+    }
+
+    public void setRunPurposeId(Long runPurposeId) {
+      this.runPurposeId = runPurposeId;
+    }
+  }
+
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -136,13 +162,17 @@ public class RunRestController extends RestController {
   @Autowired
   private ContainerService containerService;
   @Autowired
-  private PartitionQCService partitionQCService;
+  private RunPartitionService runPartitionService;
   @Autowired
   private PartitionQcTypeService partitionQcTypeService;
+  @Autowired
+  private RunPartitionAliquotService runPartitionAliquotService;
   @Autowired
   private LibraryService libraryService;
   @Autowired
   private ExperimentService experimentService;
+  @Autowired
+  private RunPurposeService runPurposeService;
   @Autowired
   private IndexChecker indexChecker;
   @Autowired
@@ -296,25 +326,54 @@ public class RunRestController extends RestController {
   }
 
   @PostMapping(value = "/{runId}/qc", produces = "application/json")
-  @ResponseStatus(code = HttpStatus.OK)
+  @ResponseStatus(code = HttpStatus.NO_CONTENT)
   public void setQc(@PathVariable Long runId, @RequestBody RunPartitionQCRequest request) throws IOException {
-    Run run = runService.get(runId);
+    Run run = RestUtils.retrieve("Run", runId, runService);
     PartitionQCType qcType = partitionQcTypeService.list().stream().filter(qt -> qt.getId() == request.getQcTypeId()).findAny()
         .orElseThrow(() -> new RestException(Status.BAD_REQUEST));
     run.getSequencerPartitionContainers().stream()//
         .flatMap(container -> container.getPartitions().stream())//
         .filter(partition -> request.partitionIds.contains(partition.getId()))//
         .map(WhineyFunction.rethrow(partition -> {
-          PartitionQC qc = partitionQCService.get(run, partition);
-          if (qc == null) {
-            qc = new PartitionQC();
-            qc.setRun(run);
-            qc.setPartition(partition);
+          RunPartition runPartition = runPartitionService.get(run, partition);
+          if (runPartition == null) {
+            runPartition = new RunPartition();
+            runPartition.setRun(run);
+            runPartition.setPartition(partition);
           }
-          qc.setType(qcType);
-          qc.setNotes(request.notes);
-          return qc;
-        })).forEach(WhineyConsumer.rethrow(partitionQCService::save));
+          runPartition.setQcType(qcType);
+          runPartition.setNotes(request.notes);
+          return runPartition;
+        })).forEach(WhineyConsumer.rethrow(runPartitionService::save));
+  }
+
+  @PutMapping("/{runId}/partition-purposes")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void setPartitionPurposes(@PathVariable long runId, @RequestBody RunPartitionPurposeRequest request) throws IOException {
+    Run run = RestUtils.retrieve("Run", runId, runService);
+    RunPurpose purpose = RestUtils.retrieve("Run purpose", request.getRunPurposeId(), runPurposeService);
+    List<Partition> partitions = run.getSequencerPartitionContainers().stream()
+        .flatMap(container -> container.getPartitions().stream())
+        .filter(partition -> request.getPartitionIds().contains(partition.getId()))
+        .collect(Collectors.toList());
+    for (Partition partition : partitions) {
+      RunPartition runPartition = runPartitionService.get(run, partition);
+      if (runPartition == null) {
+        runPartition = new RunPartition();
+        runPartition.setRun(run);
+        runPartition.setPartition(partition);
+      }
+      runPartition.setPurpose(purpose);
+      runPartitionService.save(runPartition);
+    }
+  }
+
+  @PutMapping("/{runId}/aliquot-purposes")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void setAliquotPurposes(@PathVariable long runId, @RequestBody List<RunPartitionAliquotDto> dtos) throws IOException {
+    RestUtils.retrieve("Run", runId, runService);
+    List<RunPartitionAliquot> runPartitionAliquots = dtos.stream().map(Dtos::to).collect(Collectors.toList());
+    runPartitionAliquotService.save(runPartitionAliquots);
   }
 
   public static class StudiesForExperiment {

@@ -8,7 +8,7 @@ CREATE OR REPLACE VIEW RunPartitionsByHealth AS
     FROM Run JOIN Run_SequencerPartitionContainer ON Run.runId = Run_SequencerPartitionContainer.Run_runId
      JOIN SequencerPartitionContainer_Partition ON Run_SequencerPartitionContainer.containers_containerId = SequencerPartitionContainer_Partition.container_containerId
      JOIN _Partition ON SequencerPartitionContainer_Partition.partitions_partitionId = _Partition.partitionId
-     LEFT JOIN Run_Partition_QC rpqc ON rpqc.runId = Run.runId AND rpqc.partitionId = _Partition.partitionId
+     LEFT JOIN Run_Partition rpqc ON rpqc.runId = Run.runId AND rpqc.partitionId = _Partition.partitionId
      LEFT JOIN PartitionQCType qct ON qct.partitionQcTypeId = rpqc.partitionQcTypeId
     WHERE sequencingParameters_parametersId IS NOT NULL AND pool_poolId IS NOT NULL
     AND (qct.orderFulfilled IS NULL OR qct.orderFulfilled = TRUE)
@@ -19,9 +19,9 @@ CREATE OR REPLACE VIEW DesiredPartitions AS
     SUM(partitions) AS num_partitions,
     MAX(lastUpdated) as lastUpdated,
     GROUP_CONCAT(description SEPARATOR '; ') as description,
-    GROUP_CONCAT(DISTINCT OrderPurpose.alias SEPARATOR '; ') as purpose
+    GROUP_CONCAT(DISTINCT RunPurpose.alias SEPARATOR '; ') as purpose
     FROM SequencingOrder
-    JOIN OrderPurpose ON OrderPurpose.purposeId = SequencingOrder.purposeId
+    JOIN RunPurpose ON RunPurpose.purposeId = SequencingOrder.purposeId
     GROUP BY poolId, parametersId;
 
 CREATE OR REPLACE VIEW SequencingOrderCompletion_Backing AS

@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
-import uk.ac.bbsrc.tgac.miso.core.data.PartitionQC;
+import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
@@ -27,7 +27,7 @@ public class HibernatePartitionQcDaoIT extends AbstractDAOTest {
   public final ExpectedException exception = ExpectedException.none();
 
   @InjectMocks
-  private HibernatePartitionQcDao dao;
+  private HibernateRunPartitionDao dao;
 
   @Autowired
   SessionFactory sessionFactory;
@@ -43,15 +43,15 @@ public class HibernatePartitionQcDaoIT extends AbstractDAOTest {
     PartitionQCType type = (PartitionQCType) sessionFactory.getCurrentSession().get(PartitionQCType.class, 1L);
     Run run = (Run) sessionFactory.getCurrentSession().get(Run.class, 2L);
     Partition partition = (Partition) sessionFactory.getCurrentSession().get(PartitionImpl.class, 2L);
-    PartitionQC qc = new PartitionQC();
+    RunPartition qc = new RunPartition();
     qc.setRun(run);
     qc.setPartition(partition);
-    qc.setType(type);
+    qc.setQcType(type);
     dao.create(qc);
 
-    PartitionQC fetchedQc = dao.get(run, partition);
+    RunPartition fetchedQc = dao.get(run, partition);
     assertNotNull(fetchedQc);
-    assertEquals(qc.getType().getId(), fetchedQc.getType().getId());
+    assertEquals(qc.getQcType().getId(), fetchedQc.getQcType().getId());
     assertEquals(qc.getNotes(), fetchedQc.getNotes());
   }
 
@@ -61,9 +61,9 @@ public class HibernatePartitionQcDaoIT extends AbstractDAOTest {
     assertNotNull(run);
     Partition partition = (Partition) sessionFactory.getCurrentSession().get(PartitionImpl.class, 1L);
     assertNotNull(partition);
-    PartitionQC qc = dao.get(run, partition);
+    RunPartition qc = dao.get(run, partition);
     assertNotNull(qc);
-    assertEquals(1L, qc.getType().getId());
+    assertEquals(1L, qc.getQcType().getId());
     assertEquals("it is written", qc.getNotes());
   }
 
@@ -71,7 +71,7 @@ public class HibernatePartitionQcDaoIT extends AbstractDAOTest {
   public void testGetNonExistent() throws Exception {
     Run run = (Run) sessionFactory.getCurrentSession().get(Run.class, 1L);
     Partition partition = (Partition) sessionFactory.getCurrentSession().get(PartitionImpl.class, 2L);
-    PartitionQC qc = dao.get(run, partition);
+    RunPartition qc = dao.get(run, partition);
     assertNull(qc);
   }
 
@@ -79,14 +79,14 @@ public class HibernatePartitionQcDaoIT extends AbstractDAOTest {
   public void testUpdate() throws Exception {
     Run run = (Run) sessionFactory.getCurrentSession().get(Run.class, 1L);
     Partition partition = (Partition) sessionFactory.getCurrentSession().get(PartitionImpl.class, 1L);
-    PartitionQC qc = dao.get(run, partition);
+    RunPartition qc = dao.get(run, partition);
     assertNotNull(qc);
     qc.setNotes("change is inevitable");
     dao.update(qc);
 
-    PartitionQC fetchedQc = dao.get(run, partition);
+    RunPartition fetchedQc = dao.get(run, partition);
     assertNotNull(fetchedQc);
-    assertEquals(qc.getType().getId(), fetchedQc.getType().getId());
+    assertEquals(qc.getQcType().getId(), fetchedQc.getQcType().getId());
     assertEquals(qc.getNotes(), fetchedQc.getNotes());
 
   }

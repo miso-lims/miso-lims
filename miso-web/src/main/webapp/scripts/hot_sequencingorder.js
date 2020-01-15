@@ -12,31 +12,28 @@ HotTarget.sequencingorder = (function() {
     fixUp: function(lib, errorHandler) {
     },
     createColumns: function(config, create, data) {
-      return [
+      return [{
+        header: 'Pool Name',
+        data: 'poolName',
+        readOnly: true,
+        include: true,
+        unpack: function(order, flat, setCellMeta) {
+          flat.poolName = order.pool.name;
+        },
+        pack: function(order, flat, errorHandler) {
+        }
+      }, {
+        header: 'Pool Alias',
+        data: 'poolAlias',
+        readOnly: true,
+        include: true,
+        unpack: function(order, flat, setCellMeta) {
+          flat.poolAlias = order.pool.alias;
+        },
+        pack: function(order, flat, errorHandler) {
+        }
+      }, HotUtils.makeColumnForConstantsList('Purpose', true, 'purposeAlias', 'purposeId', 'id', 'alias', Constants.runPurposes, true, {}),
           {
-            header: 'Pool Name',
-            data: 'poolName',
-            readOnly: true,
-            include: true,
-            unpack: function(order, flat, setCellMeta) {
-              flat.poolName = order.pool.name;
-            },
-            pack: function(order, flat, errorHandler) {
-            }
-          },
-          {
-            header: 'Pool Alias',
-            data: 'poolAlias',
-            readOnly: true,
-            include: true,
-            unpack: function(order, flat, setCellMeta) {
-              flat.poolAlias = order.pool.alias;
-            },
-            pack: function(order, flat, errorHandler) {
-            }
-          },
-          HotUtils.makeColumnForConstantsList('Purpose', true, 'purposeAlias', 'purposeId', 'id', 'alias', Constants.orderPurposes, true,
-              {}), {
             header: 'Description',
             data: 'description',
             include: true,

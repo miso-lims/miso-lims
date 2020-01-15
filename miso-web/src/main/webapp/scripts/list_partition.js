@@ -141,8 +141,7 @@ ListTarget.partition = {
               data.concentration = concentration;
               data.units = units;
             }
-            Utils.ajaxWithDialog('Assigning Pool', 'POST', '/miso/rest/pools/' + (pool ? pool.id : 0) + '/assign', data,
-                Utils.page.pageReload);
+            Utils.ajaxWithDialog('Assigning Pool', 'POST', Urls.rest.pools.assign(pool ? pool.id : 0), data, Utils.page.pageReload);
           };
           if (pool) {
             HotUtils.warnIfConsentRevoked(pool.pooledElements, function() {
@@ -186,7 +185,7 @@ ListTarget.partition = {
               property: "query",
               value: defaultQuery
             }, ], function(results) {
-              Utils.ajaxWithDialog('Getting Pools', 'GET', '/miso/rest/pools/picker/search?' + jQuery.param({
+              Utils.ajaxWithDialog('Getting Pools', 'GET', Urls.rest.pools.picker.search + '?' + jQuery.param({
                 platform: platformType.name,
                 query: results.query
               }), null, function(response) {
@@ -210,15 +209,15 @@ ListTarget.partition = {
         }, {
           name: "Search",
           handler: makeSearch("", assignDialog)
-        }, config.sequencingParametersId ? assignFromRest('/miso/rest/sequencingorders/picker/chemistry?' + jQuery.param({
+        }, config.sequencingParametersId ? assignFromRest(Urls.rest.sequencingOrders.picker.chemistry + '?' + jQuery.param({
           platform: platformType.name,
           seqParamsId: config.sequencingParametersId,
           fulfilled: false
         }), 'Outstanding Orders (Matched Chemistry)', setConcentration, assignDialog) : null,
-            assignFromRest('/miso/rest/sequencingorders/picker/active?' + jQuery.param({
+            assignFromRest(Urls.rest.sequencingOrders.picker.active + '?' + jQuery.param({
               platform: platformType.name
             }), 'Outstanding Orders (All)', setConcentration, assignDialog),
-            assignFromRest('/miso/rest/pools/picker/recent?' + jQuery.param({
+            assignFromRest(Urls.rest.pools.picker.recent + '?' + jQuery.param({
               platform: platformType.name
             }), 'Recently Modified', setConcentration, assignDialog), ].filter(function(x) {
           return x;
@@ -231,7 +230,7 @@ ListTarget.partition = {
         name: "Set QC",
         action: function(partitions) {
           var setQc = function(id, notes) {
-            Utils.ajaxWithDialog('Setting QC', 'POST', '/miso/rest/runs/' + config.runId + '/qc', {
+            Utils.ajaxWithDialog('Setting QC', 'POST', Urls.rest.runs.setPartitionQcs(config.runId), {
               "partitionIds": partitions.map(Utils.array.getId),
               "qcTypeId": id,
               "notes": notes
@@ -255,6 +254,22 @@ ListTarget.partition = {
                 }
               }
             };
+          }));
+        }
+      });
+      actions.push({
+        name: "Set Purpose",
+        action: function(partitions) {
+          Utils.showWizardDialog("Set Purpose", Constants.runPurposes.sort(Utils.sorting.standardSort('alias')).map(function(purpose) {
+            return {
+              name: purpose.alias,
+              handler: function() {
+                Utils.ajaxWithDialog('Setting Purpose', 'PUT', Urls.rest.runs.setPartitionPurposes(config.runId), {
+                  partitionIds: partitions.map(Utils.array.getId),
+                  runPurposeId: purpose.id
+                }, Utils.page.pageReload);
+              }
+            }
           }));
         }
       });
@@ -327,6 +342,12 @@ ListTarget.partition = {
       "mData": "qcNotes",
       "iSortPriority": 0,
       "include": config.runId
+    }, {
+      "sTitle": "Purpose",
+      "mData": "runPurposeId",
+      "include": config.runId,
+      "iSortPriority": 0,
+      "mRender": ListUtils.render.textFromId(Constants.runPurposes, 'alias')
     }];
   }
 };

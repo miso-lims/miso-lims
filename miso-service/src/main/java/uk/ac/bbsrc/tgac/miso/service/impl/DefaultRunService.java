@@ -42,7 +42,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.OxfordNanoporeRun;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
@@ -64,6 +66,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.KitDescriptorService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
@@ -127,6 +130,8 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   private SequencingContainerModelService containerModelService;
   @Autowired
   private KitDescriptorService kitDescriptorService;
+  @Autowired
+  private RunPartitionService runPartitionService;
   @Autowired
   private FileAttachmentService fileAttachmentService;
 
@@ -251,6 +256,7 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
         runDao.save(saved);
         saved = runDao.get(saved.getId());
       }
+      createRunPartitions(run);
       return saved;
     } catch (MisoNamingException e) {
       throw new IllegalArgumentException("Name generator failed to generate a valid name", e);
@@ -258,6 +264,21 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       // Send the nested root cause message to the user, since it contains the actual error.
       throw new ConstraintViolationException(e.getMessage() + " " + ExceptionUtils.getRootCauseMessage(e), e.getSQLException(),
           e.getConstraintName());
+    }
+  }
+
+  private void createRunPartitions(Run run) throws IOException {
+    for (SequencerPartitionContainer container : run.getSequencerPartitionContainers()) {
+      for (Partition partition : container.getPartitions()) {
+        RunPartition runPartition = runPartitionService.get(run, partition);
+        if (runPartition == null) {
+          runPartition = new RunPartition();
+          runPartition.setRun(run);
+          runPartition.setPartition(partition);
+          runPartition.setPurpose(run.getSequencer().getDefaultRunPurpose());
+          runPartitionService.save(runPartition);
+        }
+      }
     }
   }
 

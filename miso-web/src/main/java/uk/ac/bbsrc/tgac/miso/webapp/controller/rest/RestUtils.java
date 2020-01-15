@@ -21,13 +21,7 @@ public class RestUtils {
 
   public static <T, R extends Identifiable> T getObject(String type, long id, ProviderService<R> service, Function<R, T> toDto)
       throws IOException {
-    if (id <= 0) {
-      throw new RestException("Invalid id", Status.BAD_REQUEST);
-    }
-    R object = service.get(id);
-    if (object == null) {
-      throw new RestException(type + " not found");
-    }
+    R object = retrieve(type, id, service);
     return toDto.apply(object);
   }
 
@@ -65,10 +59,7 @@ public class RestUtils {
       if (id == null) {
         throw new RestException(type + " id cannot be null", Status.BAD_REQUEST);
       }
-      T item = service.get(id);
-      if (item == null) {
-        throw new RestException(type + " " + id + " not found", Status.BAD_REQUEST);
-      }
+      T item = retrieve(type, id, service);
       items.add(item);
     }
     service.bulkDelete(items);
@@ -80,6 +71,17 @@ public class RestUtils {
       throw new RestException(type + " not found", Status.NOT_FOUND);
     }
     service.delete(item);
+  }
+
+  public static <T extends Identifiable> T retrieve(String type, long id, ProviderService<T> service) throws IOException {
+    if (id <= 0) {
+      throw new RestException("Invalid id: " + id, Status.BAD_REQUEST);
+    }
+    T object = service.get(id);
+    if (object == null) {
+      throw new RestException(type + " " + id + " not found", Status.NOT_FOUND);
+    }
+    return object;
   }
 
 }

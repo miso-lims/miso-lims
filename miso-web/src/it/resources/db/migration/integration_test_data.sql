@@ -2,7 +2,7 @@ INSERT INTO `User` (`userId`, `active`, `admin`, `fullName`, `internal`, `loginN
 (1,1,1,'admin',1,'admin','ROLE_ADMIN,ROLE_INTERNAL','{SHA-1}d033e22ae348aeb5660fc2140aec35850c4da997','admin@admin'),
 (3,1,0,'user',1,'user','ROLE_INTERNAL','user','user@user.user');
 
-INSERT INTO OrderPurpose(purposeId, alias) VALUES
+INSERT INTO RunPurpose(purposeId, alias) VALUES
 (1, 'Production'),
 (2, 'QC');
 

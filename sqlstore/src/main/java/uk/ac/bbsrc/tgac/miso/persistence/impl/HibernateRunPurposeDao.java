@@ -4,30 +4,30 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderPurpose;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
-import uk.ac.bbsrc.tgac.miso.persistence.OrderPurposeDao;
+import uk.ac.bbsrc.tgac.miso.persistence.RunPurposeDao;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
-public class HibernateOrderPurposeDao extends HibernateSaveDao<OrderPurpose> implements OrderPurposeDao {
+public class HibernateRunPurposeDao extends HibernateSaveDao<RunPurpose> implements RunPurposeDao {
 
-  public HibernateOrderPurposeDao() {
-    super(OrderPurpose.class);
+  public HibernateRunPurposeDao() {
+    super(RunPurpose.class);
   }
 
   @Override
-  public OrderPurpose getByAlias(String alias) {
+  public RunPurpose getByAlias(String alias) {
     return getBy("alias", alias);
   }
 
   @Override
-  public long getUsageByPoolOrders(OrderPurpose purpose) {
+  public long getUsageByPoolOrders(RunPurpose purpose) {
     return getUsageBy(PoolOrder.class, "purpose", purpose);
   }
 
   @Override
-  public long getUsageBySequencingOrders(OrderPurpose purpose) {
+  public long getUsageBySequencingOrders(RunPurpose purpose) {
     return getUsageBy(SequencingOrder.class, "purpose", purpose);
   }
 

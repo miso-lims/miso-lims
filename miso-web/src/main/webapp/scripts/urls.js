@@ -176,6 +176,8 @@ Urls = (function() {
 
   var instrumentRestBase = restBase + '/instruments';
   rest.instruments = {
+    create: instrumentRestBase,
+    update: idUrlFunction(instrumentRestBase),
     datatable: instrumentRestBase + '/dt',
     instrumentTypeDatatable: idUrlFunction(instrumentRestBase + '/dt/instrument-type'),
     list: instrumentRestBase
@@ -315,18 +317,6 @@ Urls = (function() {
     update: idUrlFunction(libraryTypeRestBase)
   };
 
-  // Order Purposes
-  var orderPurposeBase = baseUrl + '/orderpurpose';
-  ui.orderPurposes = {
-    bulkEdit: orderPurposeBase + '/bulk/edit'
-  }
-
-  var orderPurposeRestBase = restBase + '/orderpurposes';
-  rest.orderPurposes = {
-    create: orderPurposeRestBase,
-    update: idUrlFunction(orderPurposeRestBase)
-  };
-
   // Partition QC Types
   var partitionQcTypeRestBase = restBase + '/partitionqctypes';
   rest.partitionQcTypes = {
@@ -347,7 +337,12 @@ Urls = (function() {
     update: idUrlFunction(poolRestBase),
     parents: idUrlFunction(poolRestBase + '/parents'),
     query: poolRestBase + '/query',
-    search: poolRestBase + '/search'
+    search: poolRestBase + '/search',
+    picker: {
+      recent: poolRestBase + '/picker/recent',
+      search: poolRestBase + '/picker/search'
+    },
+    assign: middleIdUrlFunction(poolRestBase, '/assign')
   };
 
   // Pool Orders
@@ -421,7 +416,22 @@ Urls = (function() {
     datatable: runRestBase + '/dt',
     projectDatatable: idUrlFunction(runRestBase + '/dt/project'),
     sequencerDatatable: idUrlFunction(runRestBase + '/dt/sequencer'),
-    platformDatatable: idUrlFunction(runRestBase + '/dt/platform')
+    platformDatatable: idUrlFunction(runRestBase + '/dt/platform'),
+    setPartitionQcs: middleIdUrlFunction(runRestBase, '/qc'),
+    setPartitionPurposes: middleIdUrlFunction(runRestBase, '/partition-purposes'),
+    setAliquotPurposes: middleIdUrlFunction(runRestBase, '/aliquot-purposes')
+  };
+
+  // Run Purposes
+  var runPurposeBase = baseUrl + '/runpurpose';
+  ui.runPurposes = {
+    bulkEdit: runPurposeBase + '/bulk/edit'
+  }
+
+  var runPurposeRestBase = restBase + '/runpurposes';
+  rest.runPurposes = {
+    create: runPurposeRestBase,
+    update: idUrlFunction(runPurposeRestBase)
   };
 
   // Samples
@@ -472,7 +482,11 @@ Urls = (function() {
   rest.sequencingOrders = {
     create: sequencingOrderRestBase,
     update: idUrlFunction(sequencingOrderRestBase),
-    search: sequencingOrderRestBase + '/search'
+    search: sequencingOrderRestBase + '/search',
+    picker: {
+      chemistry: sequencingOrderRestBase + '/picker/chemistry',
+      active: sequencingOrderRestBase + '/picker/active'
+    }
   };
 
   // Sequencing Parameters

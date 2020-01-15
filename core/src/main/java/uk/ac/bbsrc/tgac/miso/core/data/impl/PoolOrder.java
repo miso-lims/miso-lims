@@ -78,7 +78,7 @@ public class PoolOrder implements Deletable, Identifiable, Serializable, Timesta
 
   @ManyToOne
   @JoinColumn(name = "purposeId")
-  private OrderPurpose purpose;
+  private RunPurpose purpose;
 
   private String description;
 
@@ -135,11 +135,11 @@ public class PoolOrder implements Deletable, Identifiable, Serializable, Timesta
     this.alias = alias;
   }
 
-  public OrderPurpose getPurpose() {
+  public RunPurpose getPurpose() {
     return this.purpose;
   }
 
-  public void setPurpose(OrderPurpose purpose) {
+  public void setPurpose(RunPurpose purpose) {
     this.purpose = purpose;
   }
 

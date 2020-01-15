@@ -10,14 +10,19 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import uk.ac.bbsrc.tgac.miso.core.data.PartitionQC.PartitionQCId;
+import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.data.RunPartition.RunPartitionId;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
 @Entity
-@Table(name = "Run_Partition_QC")
-@IdClass(PartitionQCId.class)
-public class PartitionQC implements Serializable {
-  public static class PartitionQCId implements Serializable {
+@Table(name = "Run_Partition")
+@IdClass(RunPartitionId.class)
+public class RunPartition implements Serializable {
+
+  public static class RunPartitionId implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -34,7 +39,7 @@ public class PartitionQC implements Serializable {
       if (this == obj) return true;
       if (obj == null) return false;
       if (getClass() != obj.getClass()) return false;
-      PartitionQCId other = (PartitionQCId) obj;
+      RunPartitionId other = (RunPartitionId) obj;
       if (partition == null) {
         if (other.partition != null) return false;
       } else if (!partition.equals(other.partition)) return false;
@@ -84,7 +89,15 @@ public class PartitionQC implements Serializable {
 
   @ManyToOne
   @JoinColumn(name = "partitionQcTypeId")
-  private PartitionQCType type;
+  private PartitionQCType qcType;
+
+  @ManyToOne
+  @JoinColumn(name = "purposeId")
+  private RunPurpose purpose;
+
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "lastModifier")
+  private User lastModifier;
 
   public String getNotes() {
     return notes;
@@ -98,8 +111,8 @@ public class PartitionQC implements Serializable {
     return run;
   }
 
-  public PartitionQCType getType() {
-    return type;
+  public PartitionQCType getQcType() {
+    return qcType;
   }
 
   public void setNotes(String notes) {
@@ -114,8 +127,24 @@ public class PartitionQC implements Serializable {
     this.run = run;
   }
 
-  public void setType(PartitionQCType type) {
-    this.type = type;
+  public void setQcType(PartitionQCType qcType) {
+    this.qcType = qcType;
+  }
+
+  public RunPurpose getPurpose() {
+    return purpose;
+  }
+
+  public void setPurpose(RunPurpose purpose) {
+    this.purpose = purpose;
+  }
+
+  public User getLastModifier() {
+    return lastModifier;
+  }
+
+  public void setLastModifier(User lastModifier) {
+    this.lastModifier = lastModifier;
   }
 
 }

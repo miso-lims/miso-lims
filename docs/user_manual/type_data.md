@@ -376,12 +376,12 @@ page.
 
 
 
-## Order Purposes
+## Run Purposes
 
-Order purposes describe the reason for a sequencing order, such as QC or production. A pool order may also specify an
-order purpose if it includes sequencing requirements.
+Run purposes describe the reason for a sequencing order, such as QC or production. A pool order may also specify an
+run purpose if it includes sequencing requirements.
 
-MISO administrators can add, edit, and delete order purposes using the standard interface. An order purpose can only be
+MISO administrators can add, edit, and delete run purposes using the standard interface. A run purpose can only be
 deleted if it has not been used by any existing pool orders or sequencing orders.
 
 

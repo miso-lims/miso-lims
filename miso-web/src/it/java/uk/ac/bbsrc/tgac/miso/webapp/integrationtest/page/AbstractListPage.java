@@ -155,7 +155,6 @@ public interface AbstractListPage {
     public static final String ORDERS_ALL = "sequencingorders/all";
     public static final String ORDERS_IN_PROGRESS = "sequencingorders/in-progress";
     public static final String ORDERS_OUTSTANDING = "sequencingorders/outstanding";
-    public static final String ORDER_PURPOSES = "orderpurpose/list";
     public static final String PARTITION_QC_TYPE = "partitionqctype/list";
     public static final String POOLS = "pools";
     public static final String POOL_ORDERS = "poolorders";
@@ -163,6 +162,7 @@ public interface AbstractListPage {
     public static final String PROJECTS = "projects";
     public static final String REFERENCE_GENOMES = "referencegenome/list";
     public static final String RUNS = "runs";
+    public static final String RUN_PURPOSES = "runpurpose/list";
     public static final String SAMPLES = "samples";
     public static final String SAMPLE_CLASSES = "sampleclass/list";
     public static final String SAMPLE_TYPES = "sampletype/list";

@@ -708,7 +708,7 @@ INSERT INTO Workset_Sample(worksetId, sampleId) VALUES
 (1, 2),
 (1, 3);
 
-INSERT INTO OrderPurpose(purposeId, alias) VALUES
+INSERT INTO RunPurpose(purposeId, alias) VALUES
 (1, 'Production');
 
 INSERT INTO SequencingOrder(sequencingOrderId, poolId, partitions, parametersId, purposeId, description, createdBy, creationDate, updatedBy, lastUpdated) VALUES

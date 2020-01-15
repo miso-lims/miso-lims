@@ -26,8 +26,10 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringBlankOrNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
@@ -51,19 +53,24 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
-import uk.ac.bbsrc.tgac.miso.core.data.PartitionQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
-import uk.ac.bbsrc.tgac.miso.core.service.PartitionQCService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionAliquotService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PartitionDto;
+import uk.ac.bbsrc.tgac.miso.dto.RunPartitionAliquotDto;
 import uk.ac.bbsrc.tgac.miso.webapp.context.ExternalUriBuilder;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.JsonArrayCollector;
@@ -89,7 +96,9 @@ public class EditRunController {
   @Autowired
   private RunService runService;
   @Autowired
-  private PartitionQCService partitionQCService;
+  private RunPartitionService runPartitionService;
+  @Autowired
+  private RunPartitionAliquotService runPartitionAliquotService;
   @Autowired
   private InstrumentService instrumentService;
   @Autowired
@@ -162,15 +171,21 @@ public class EditRunController {
     model.put("runPartitions", run.getSequencerPartitionContainers().stream().flatMap(container -> container.getPartitions().stream())
         .map(WhineyFunction.rethrow(partition -> {
           PartitionDto dto = Dtos.asDto(partition, false, indexChecker);
-          PartitionQC qc = partitionQCService.get(run, partition);
-          if (qc != null) {
-            dto.setQcType(qc.getType().getId());
-            dto.setQcNotes(qc.getNotes());
+          RunPartition runPartition = runPartitionService.get(run, partition);
+          if (runPartition != null) {
+            if (runPartition.getQcType() != null) {
+              dto.setQcType(runPartition.getQcType().getId());
+              dto.setQcNotes(runPartition.getNotes());
+            }
+            if (runPartition.getPurpose() != null) {
+              dto.setRunPurposeId(runPartition.getPurpose().getId());
+            }
           } else {
             dto.setQcNotes("");
           }
           return dto;
         })).collect(Collectors.toList()));
+    model.put("runAliquots", getRunAliquots(run));
     try {
       model.put("runIssues", issueTrackerManager.searchIssues(run.getAlias()).stream().map(Dtos::asDto).collect(Collectors.toList()));
     } catch (IOException e) {
@@ -203,6 +218,35 @@ public class EditRunController {
     model.put("userFullName", user.getFullName());
 
     return new ModelAndView("/WEB-INF/pages/editRun.jsp", model);
+  }
+
+  private List<RunPartitionAliquotDto> getRunAliquots(Run run) throws IOException {
+    List<RunPartitionAliquot> runPartitionAliquots = runPartitionAliquotService.listByRunId(run.getId());
+    for (SequencerPartitionContainer container : run.getSequencerPartitionContainers()) {
+      for (Partition partition : container.getPartitions()) {
+        if (partition.getPool() != null) {
+          for (PoolElement poolElement : partition.getPool().getPoolContents()) {
+            RunPartitionAliquot runPartitionAliquot = runPartitionAliquots.stream()
+                .filter(rpa -> rpa.getRun().getId() == run.getId()
+                    && rpa.getPartition().getId() == partition.getId()
+                    && rpa.getAliquot().getId() == poolElement.getPoolableElementView().getAliquotId())
+                .findAny().orElse(null);
+            if (runPartitionAliquot == null) {
+              runPartitionAliquot = new RunPartitionAliquot(run, partition, poolElement.getPoolableElementView());
+              runPartitionAliquots.add(runPartitionAliquot);
+            }
+          }
+        }
+      }
+    }
+    List<RunPartitionAliquotDto> dtos = new ArrayList<>();
+    for (int i = 0; i < runPartitionAliquots.size(); i++) {
+      RunPartitionAliquotDto dto = Dtos.asDto(runPartitionAliquots.get(i));
+      // Add id for DataTables
+      dto.setId(Long.valueOf(i));
+      dtos.add(dto);
+    }
+    return dtos;
   }
 
 }

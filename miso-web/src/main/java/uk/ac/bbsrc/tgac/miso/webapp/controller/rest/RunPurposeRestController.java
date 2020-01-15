@@ -14,32 +14,32 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import uk.ac.bbsrc.tgac.miso.core.service.OrderPurposeService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.dto.OrderPurposeDto;
+import uk.ac.bbsrc.tgac.miso.dto.RunPurposeDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
 
 @Controller
-@RequestMapping("/rest/orderpurposes")
-public class OrderPurposeRestController extends RestController {
+@RequestMapping("/rest/runpurposes")
+public class RunPurposeRestController extends RestController {
 
   @Autowired
-  private OrderPurposeService orderPurposeService;
+  private RunPurposeService runPurposeService;
 
   @Autowired
   private MenuController menuController;
 
   @PostMapping
-  public @ResponseBody OrderPurposeDto create(@RequestBody OrderPurposeDto dto) throws IOException {
-    return RestUtils.createObject("Order Purpose", dto, Dtos::to, orderPurposeService, d -> {
+  public @ResponseBody RunPurposeDto create(@RequestBody RunPurposeDto dto) throws IOException {
+    return RestUtils.createObject("Run Purpose", dto, Dtos::to, runPurposeService, d -> {
       menuController.refreshConstants();
       return Dtos.asDto(d);
     });
   }
 
   @PutMapping("/{purposeId}")
-  public @ResponseBody OrderPurposeDto update(@PathVariable long purposeId, @RequestBody OrderPurposeDto dto) throws IOException {
-    return RestUtils.updateObject("Order Purpose", purposeId, dto, Dtos::to, orderPurposeService, d -> {
+  public @ResponseBody RunPurposeDto update(@PathVariable long purposeId, @RequestBody RunPurposeDto dto) throws IOException {
+    return RestUtils.updateObject("Run Purpose", purposeId, dto, Dtos::to, runPurposeService, d -> {
       menuController.refreshConstants();
       return Dtos.asDto(d);
     });
@@ -49,7 +49,7 @@ public class OrderPurposeRestController extends RestController {
   @ResponseBody
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
-    RestUtils.bulkDelete("Order Purpose", ids, orderPurposeService);
+    RestUtils.bulkDelete("Run Purpose", ids, runPurposeService);
   }
 
 }

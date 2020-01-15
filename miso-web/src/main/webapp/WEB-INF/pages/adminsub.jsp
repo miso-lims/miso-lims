@@ -80,7 +80,7 @@
       <a href="<c:url value="/miso/librarystrategy/list"/>">Library Strategy Types</a>
       <a href="<c:url value="/miso/libraryspikein/list"/>">Library Spike-Ins</a>
       <a href="<c:url value="/miso/targetedsequencing/list"/>">Targeted Sequencings</a>
-      <a href="<c:url value="/miso/orderpurpose/list"/>">Order Purposes</a>
+      <a href="<c:url value="/miso/runpurpose/list"/>">Run Purposes</a>
       <a href="<c:url value="/miso/sequencingparameters/list"/>">Sequencing Parameters</a>
       <a href="<c:url value="/miso/containermodel/list"/>">Sequencing Container Models</a>
       <a href="<c:url value="/miso/instrumentmodel/list"/>">Instrument Models</a>

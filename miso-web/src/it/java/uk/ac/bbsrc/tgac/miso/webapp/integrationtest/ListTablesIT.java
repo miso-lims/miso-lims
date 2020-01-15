@@ -20,10 +20,6 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SampleHierarchyView;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.Columns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.ListTarget;
@@ -239,16 +235,6 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListLibrariesPageSetup() throws Exception {
-    List<Library> libraries = getSession().createCriteria(LibraryImpl.class).list(); // TODO: rm
-    for (Library lib : libraries) {
-      System.out.print("########## Checking " + lib.getName() + "...");
-      assertNotNull(lib.getSample());
-      SampleHierarchyView attrs = ((DetailedSample) lib.getSample()).getHierarchyAttributes();
-      assertNotNull(attrs);
-      assertNotNull(attrs.getTissueOrigin());
-      System.out.println("OK");
-    }
-
     // Goal: ensure all expected columns are present and no extra
     testPageSetup(ListTarget.LIBRARIES, librariesColumns);
   }
@@ -654,14 +640,14 @@ public class ListTablesIT extends AbstractIT {
   }
 
   @Test
-  public void testListOrderPurposesSetup() throws Exception {
-    testPageSetup(ListTarget.ORDER_PURPOSES,
+  public void testListRunPurposesSetup() throws Exception {
+    testPageSetup(ListTarget.RUN_PURPOSES,
         Sets.newHashSet(Columns.SORT, Columns.ALIAS));
   }
 
   @Test
-  public void testListOrderPurposesColumnSort() throws Exception {
-    testColumnsSort(ListTarget.ORDER_PURPOSES);
+  public void testListRunPurposesColumnSort() throws Exception {
+    testColumnsSort(ListTarget.RUN_PURPOSES);
   }
 
   @Test

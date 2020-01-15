@@ -4,7 +4,7 @@ import java.util.Date;
 
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderPurpose;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 
 public interface SequencingOrder extends Deletable {
 
@@ -40,8 +40,8 @@ public interface SequencingOrder extends Deletable {
 
   public void setDescription(String description);
 
-  public OrderPurpose getPurpose();
+  public RunPurpose getPurpose();
 
-  public void setPurpose(OrderPurpose purpose);
+  public void setPurpose(RunPurpose purpose);
 
 }

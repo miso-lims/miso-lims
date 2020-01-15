@@ -15,10 +15,10 @@ import com.google.common.collect.Sets;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderPurpose;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.core.service.OrderPurposeService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
@@ -44,7 +44,7 @@ public class DefaultSequencingOrderService implements SequencingOrderService {
   private SequencingParametersService sequencingParametersService;
 
   @Autowired
-  private OrderPurposeService orderPurposeService;
+  private RunPurposeService runPurposeService;
 
   @Autowired
   private PoolService poolService;
@@ -77,7 +77,7 @@ public class DefaultSequencingOrderService implements SequencingOrderService {
     User user = authorizationManager.getCurrentUser();
     seqOrder.setPool(pool);
     seqOrder.setSequencingParameters(sequencingParametersService.get(seqOrder.getSequencingParameter().getId()));
-    seqOrder.setPurpose(orderPurposeService.get(seqOrder.getPurpose().getId()));
+    seqOrder.setPurpose(runPurposeService.get(seqOrder.getPurpose().getId()));
     seqOrder.setCreatedBy(user);
     seqOrder.setUpdatedBy(user);
     return sequencingOrderDao.create(seqOrder);
@@ -141,7 +141,7 @@ public class DefaultSequencingOrderService implements SequencingOrderService {
   }
 
   @Override
-  public List<SequencingOrder> listByAttributes(Pool pool, OrderPurpose purpose, SequencingParameters parameters, Integer partitions)
+  public List<SequencingOrder> listByAttributes(Pool pool, RunPurpose purpose, SequencingParameters parameters, Integer partitions)
       throws IOException {
     return sequencingOrderDao.listByAttributes(pool, purpose, parameters, partitions);
   }

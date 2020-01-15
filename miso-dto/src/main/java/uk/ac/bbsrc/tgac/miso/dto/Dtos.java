@@ -80,6 +80,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Printer;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
@@ -130,7 +131,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderLibraryAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
@@ -139,6 +139,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotSingleCellImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
@@ -1258,8 +1259,8 @@ public class Dtos {
     setLong(dto::setCreatedById, maybeGetProperty(from.getCreatedBy(), User::getId), true);
     setLong(dto::setUpdatedById, maybeGetProperty(from.getUpdatedBy(), User::getId), true);
     dto.setDescription(from.getDescription());
-    setLong(dto::setPurposeId, maybeGetProperty(from.getPurpose(), OrderPurpose::getId), false);
-    setString(dto::setPurposeAlias, maybeGetProperty(from.getPurpose(), OrderPurpose::getAlias));
+    setLong(dto::setPurposeId, maybeGetProperty(from.getPurpose(), RunPurpose::getId), false);
+    setString(dto::setPurposeAlias, maybeGetProperty(from.getPurpose(), RunPurpose::getAlias));
     return dto;
   }
 
@@ -1274,7 +1275,7 @@ public class Dtos {
     to.setSequencingParameters(to(from.getParameters()));
     to.setPartitions(from.getPartitions());
     to.setDescription(from.getDescription());
-    setObject(to::setPurpose, OrderPurpose::new, from.getPurposeId());
+    setObject(to::setPurpose, RunPurpose::new, from.getPurposeId());
     return to;
   }
 
@@ -2902,6 +2903,7 @@ public class Dtos {
     }
     setBoolean(dto::setOutOfService, from.isOutOfService(), false);
     setId(dto::setUpgradedInstrumentId, from.getUpgradedInstrument());
+    setId(dto::setDefaultRunPurposeId, from.getDefaultRunPurpose());
     return dto;
   }
 
@@ -2914,6 +2916,7 @@ public class Dtos {
     setObject(to::setInstrumentModel, InstrumentModel::new, dto.getInstrumentModelId());
     setString(to::setSerialNumber, dto.getSerialNumber());
     setObject(to::setUpgradedInstrument, InstrumentImpl::new, dto.getUpgradedInstrumentId());
+    setObject(to::setDefaultRunPurpose, RunPurpose::new, dto.getDefaultRunPurposeId());
     return to;
   }
 
@@ -3752,8 +3755,8 @@ public class Dtos {
     setLong(to::setId, from.getId(), true);
     setString(to::setAlias, from.getAlias());
     setString(to::setDescription, from.getDescription());
-    setLong(to::setPurposeId, maybeGetProperty(from.getPurpose(), OrderPurpose::getId), true);
-    setString(to::setPurposeAlias, maybeGetProperty(from.getPurpose(), OrderPurpose::getAlias));
+    setLong(to::setPurposeId, maybeGetProperty(from.getPurpose(), RunPurpose::getId), true);
+    setString(to::setPurposeAlias, maybeGetProperty(from.getPurpose(), RunPurpose::getAlias));
     setInteger(to::setPartitions, from.getPartitions(), true);
     setId(to::setParametersId, from.getParameters());
     setString(to::setParametersName, maybeGetProperty(from.getParameters(), SequencingParameters::getName));
@@ -3793,7 +3796,7 @@ public class Dtos {
     setLong(to::setId, from.getId(), false);
     setString(to::setAlias, from.getAlias());
     setString(to::setDescription, from.getDescription());
-    setObject(to::setPurpose, OrderPurpose::new, from.getPurposeId());
+    setObject(to::setPurpose, RunPurpose::new, from.getPurposeId());
     setInteger(to::setPartitions, from.getPartitions(), true);
     setObject(to::setParameters, SequencingParameters::new, from.getParametersId());
     setBoolean(to::setDraft, from.isDraft(), false);
@@ -3816,15 +3819,15 @@ public class Dtos {
     return to;
   }
 
-  public static OrderPurposeDto asDto(@Nonnull OrderPurpose from) {
-    OrderPurposeDto to = new OrderPurposeDto();
+  public static RunPurposeDto asDto(@Nonnull RunPurpose from) {
+    RunPurposeDto to = new RunPurposeDto();
     setLong(to::setId, from.getId(), true);
     setString(to::setAlias, from.getAlias());
     return to;
   }
 
-  public static OrderPurpose to(@Nonnull OrderPurposeDto from) {
-    OrderPurpose to = new OrderPurpose();
+  public static RunPurpose to(@Nonnull RunPurposeDto from) {
+    RunPurpose to = new RunPurpose();
     setLong(to::setId, from.getId(), false);
     setString(to::setAlias, from.getAlias());
     return to;
@@ -3952,6 +3955,35 @@ public class Dtos {
     setInteger(to::setReceiptPending, from.getReceiptPending(), false);
     setInteger(to::setQcPassed, from.getQcPassed(), false);
     setInteger(to::setQcPending, from.getQcPending(), false);
+    return to;
+  }
+
+  public static RunPartitionAliquotDto asDto(@Nonnull RunPartitionAliquot from) {
+    RunPartitionAliquotDto to = new RunPartitionAliquotDto();
+    setId(to::setRunId, from.getRun());
+    setId(to::setPartitionId, from.getPartition());
+    setId(to::setAliquotId, from.getAliquot());
+    if (from.getRun() != null && from.getRun().getPlatformType() != null) {
+      to.setPlatformType(from.getRun().getPlatformType().name());
+    }
+    if (from.getPartition() != null && from.getPartition().getSequencerPartitionContainer() != null) {
+      to.setContainerId(from.getPartition().getSequencerPartitionContainer().getId());
+      to.setContainerIdentificationBarcode(from.getPartition().getSequencerPartitionContainer().getIdentificationBarcode());
+    }
+    setInteger(to::setPartitionNumber, maybeGetProperty(from.getPartition(), Partition::getPartitionNumber), true);
+    setString(to::setAliquotName, maybeGetProperty(from.getAliquot(), LibraryAliquot::getName));
+    setString(to::setAliquotAlias, maybeGetProperty(from.getAliquot(), LibraryAliquot::getAlias));
+    setId(to::setRunPurposeId, from.getPurpose());
+    return to;
+  }
+
+  public static RunPartitionAliquot to(@Nonnull RunPartitionAliquotDto from) {
+    RunPartitionAliquot to = new RunPartitionAliquot();
+    PlatformType platform = PlatformType.valueOf(from.getPlatformType());
+    setObject(to::setRun, platform::createRun, from.getRunId());
+    setObject(to::setPartition, PartitionImpl::new, from.getPartitionId());
+    setObject(to::setAliquot, LibraryAliquot::new, from.getAliquotId());
+    setObject(to::setPurpose, RunPurpose::new, from.getRunPurposeId());
     return to;
   }
 

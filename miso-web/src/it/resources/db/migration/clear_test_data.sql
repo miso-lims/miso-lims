@@ -112,5 +112,5 @@ DELETE FROM User;
 DELETE FROM _Group;
 DELETE FROM StorageLocation;
 DELETE FROM StorageLocationMap;
-DELETE FROM OrderPurpose;
+DELETE FROM RunPurpose;
 SET FOREIGN_KEY_CHECKS=1;

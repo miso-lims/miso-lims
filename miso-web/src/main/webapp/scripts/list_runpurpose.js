@@ -1,18 +1,18 @@
-ListTarget.orderpurpose = {
-  name: "Order Purposes",
+ListTarget.runpurpose = {
+  name: "Run Purposes",
   createUrl: function(config, projectId) {
     throw new Error("Must be provided statically");
   },
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {
-    var actions = HotTarget.orderpurpose.getBulkActions(config);
+    var actions = HotTarget.runpurpose.getBulkActions(config);
     if (config.isAdmin) {
-      actions.push(ListUtils.createBulkDeleteAction('Order Purposes', 'orderpurposes', Utils.array.getAlias));
+      actions.push(ListUtils.createBulkDeleteAction('Run Purposes', 'runpurposes', Utils.array.getAlias));
     }
     return actions;
   },
   createStaticActions: function(config, projectId) {
-    return config.isAdmin ? [ListUtils.createStaticAddAction('Order Purposes', 'orderpurpose')] : [];
+    return config.isAdmin ? [ListUtils.createStaticAddAction('Run Purposes', 'runpurpose')] : [];
   },
   createColumns: function(config, projectId) {
     return [{

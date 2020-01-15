@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderPurpose;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingOrderImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.SequencingOrderDao;
 
@@ -71,7 +71,7 @@ public class HibernateSequencingOrderDao implements SequencingOrderDao {
   }
 
   @Override
-  public List<SequencingOrder> listByAttributes(Pool pool, OrderPurpose purpose, SequencingParameters parameters, Integer partitions)
+  public List<SequencingOrder> listByAttributes(Pool pool, RunPurpose purpose, SequencingParameters parameters, Integer partitions)
       throws IOException {
     @SuppressWarnings("unchecked")
     List<SequencingOrder> records = currentSession().createCriteria(SequencingOrderImpl.class)

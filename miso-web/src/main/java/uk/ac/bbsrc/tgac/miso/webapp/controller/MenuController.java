@@ -109,10 +109,10 @@ import uk.ac.bbsrc.tgac.miso.core.service.LibrarySelectionService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibrarySpikeInService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryStrategyService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryTypeService;
-import uk.ac.bbsrc.tgac.miso.core.service.OrderPurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.PartitionQcTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.QualityControlService;
 import uk.ac.bbsrc.tgac.miso.core.service.ReferenceGenomeService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleGroupService;
 import uk.ac.bbsrc.tgac.miso.core.service.SamplePurposeService;
@@ -223,7 +223,7 @@ public class MenuController implements ServletContextAware {
   @Autowired
   private AttachmentCategoryService attachmentCategoryService;
   @Autowired
-  private OrderPurposeService orderPurposeService;
+  private RunPurposeService runPurposeService;
   @Autowired
   private IndexChecker indexChecker;
   @Autowired
@@ -374,7 +374,7 @@ public class MenuController implements ServletContextAware {
       addJsonArray(mapper, node, "poreVersions", containerService.listPoreVersions(), Dtos::asDto);
       addJsonArray(mapper, node, "spikeIns", librarySpikeInService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "attachmentCategories", attachmentCategoryService.list(), Dtos::asDto);
-      addJsonArray(mapper, node, "orderPurposes", orderPurposeService.list(), Dtos::asDto);
+      addJsonArray(mapper, node, "runPurposes", runPurposeService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "sampleSheetFormats", Arrays.asList(SampleSheet.values()), SampleSheet::name);
 
       Collection<IndexFamily> indexFamilies = indexFamilyService.list();

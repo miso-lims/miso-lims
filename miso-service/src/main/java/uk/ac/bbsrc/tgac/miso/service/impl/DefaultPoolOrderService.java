@@ -47,7 +47,7 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
   private SequencingParametersService sequencingParametersService;
 
   @Autowired
-  private OrderPurposeService orderPurposeService;
+  private RunPurposeService runPurposeService;
 
   @Autowired
   private LibraryAliquotService libraryAliquotService;
@@ -86,7 +86,7 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
   @Override
   protected void loadChildEntities(PoolOrder object) throws IOException {
     loadChildEntity(object.getParameters(), object::setParameters, sequencingParametersService);
-    loadChildEntity(object.getPurpose(), object::setPurpose, orderPurposeService);
+    loadChildEntity(object.getPurpose(), object::setPurpose, runPurposeService);
     for (OrderLibraryAliquot orderAliquot : object.getOrderLibraryAliquots()) {
       orderAliquot.setAliquot(libraryAliquotService.get(orderAliquot.getAliquot().getId()));
     }

@@ -11,7 +11,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 
 @Entity
-public class OrderPurpose implements Deletable, Aliasable, Serializable {
+public class RunPurpose implements Deletable, Aliasable, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -49,7 +49,7 @@ public class OrderPurpose implements Deletable, Aliasable, Serializable {
 
   @Override
   public String getDeleteType() {
-    return "Order Purpose";
+    return "Run Purpose";
   }
 
   @Override
@@ -70,7 +70,7 @@ public class OrderPurpose implements Deletable, Aliasable, Serializable {
     if (this == obj) return true;
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
-    OrderPurpose other = (OrderPurpose) obj;
+    RunPurpose other = (RunPurpose) obj;
     if (alias == null) {
       if (other.alias != null) return false;
     } else if (!alias.equals(other.alias)) return false;

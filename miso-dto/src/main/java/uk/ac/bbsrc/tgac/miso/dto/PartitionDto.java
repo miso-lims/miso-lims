@@ -12,6 +12,7 @@ public class PartitionDto {
   private PoolDto pool;
   private String qcNotes;
   private long qcType;
+  private Long runPurposeId;
 
   public Long getContainerId() {
     return containerId;
@@ -83,5 +84,13 @@ public class PartitionDto {
 
   public void setQcType(long qcType) {
     this.qcType = qcType;
+  }
+
+  public Long getRunPurposeId() {
+    return runPurposeId;
+  }
+
+  public void setRunPurposeId(Long runPurposeId) {
+    this.runPurposeId = runPurposeId;
   }
 }
