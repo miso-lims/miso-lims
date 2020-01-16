@@ -1,23 +1,19 @@
 if (typeof FormTarget === 'undefined') {
   FormTarget = {};
 }
-FormTarget.container = (function() {
+FormTarget.container = (function($) {
 
   return {
     getSaveUrl: function(container) {
-      if (container.id) {
-        return '/miso/rest/containers/' + container.id;
-      } else {
-        return '/miso/rest/containers';
-      }
+      return container.id ? Urls.rest.containers.update(container.id) : Urls.rest.containers.create;
     },
     getSaveMethod: function(container) {
       return container.id ? 'PUT' : 'POST';
     },
     getEditUrl: function(container) {
-      return '/miso/container/' + container.id;
+      return Urls.ui.containers.edit(container.id);
     },
-    getSections: function(config) {
+    getSections: function(config, object) {
       return [{
         title: 'Container Information',
         fields: [{
@@ -36,10 +32,12 @@ FormTarget.container = (function() {
         }, {
           title: 'Container Model',
           data: 'model.id',
-          type: 'read-only',
-          getDisplayValue: function(container) {
-            return container.model.alias;
-          }
+          type: 'dropdown',
+          required: true,
+          source: getValidContainerModels(object),
+          getItemLabel: Utils.array.getAlias,
+          getItemValue: Utils.array.getId,
+          sortSource: Utils.sorting.standardSort('alias')
         }, {
           title: 'Description',
           data: 'description',
@@ -95,10 +93,34 @@ FormTarget.container = (function() {
     }
   }
 
+  function getValidContainerModels(container) {
+    var currentModel = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(container.model.id), Constants.containerModels);
+    var platformType = Utils.array.findUniqueOrThrow(Utils.array.namePredicate(currentModel.platformType), Constants.platformTypes);
+    var instrumentModels = null;
+    if (container.lastRunInstrumentModelId) {
+      instrumentModels = [Utils.array.findUniqueOrThrow(Utils.array.idPredicate(container.lastRunInstrumentModelId),
+          Constants.instrumentModels)];
+    } else {
+      instrumentModels = Constants.instrumentModels.filter(function(instrumentModel) {
+        return currentModel.instrumentModelIds.indexOf(instrumentModel.id) !== -1;
+      });
+    }
+    return instrumentModels.flatMap(function(instrumentModel) {
+      return instrumentModel.containerModels;
+    }).reduce(function(accumulator, currentValue) {
+      if (currentValue.partitionCount === currentModel.partitionCount && !accumulator.find(function(model) {
+        return model.id === currentValue.id;
+      })) {
+        accumulator.push(currentValue);
+      }
+      return accumulator;
+    }, []);
+  }
+
   function getKitsByType(type) {
     return Constants.kitDescriptors.filter(function(kit) {
       return kit.kitType === type;
     });
   }
 
-})();
+})(jQuery);

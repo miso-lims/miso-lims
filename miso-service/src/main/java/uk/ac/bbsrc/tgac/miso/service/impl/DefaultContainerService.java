@@ -4,26 +4,33 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.service.KitDescriptorService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
@@ -122,6 +129,33 @@ public class DefaultContainerService
       errors.add(new ValidationError("identificationBarcode", "There is already a container with this serial number"));
     }
 
+    if (beforeChange != null && ValidationUtils.isSetAndChanged(SequencerPartitionContainer::getModel, container, beforeChange)) {
+      SequencingContainerModel before = beforeChange.getModel();
+      SequencingContainerModel after = container.getModel();
+      if (after.getPlatformType() != before.getPlatformType()) {
+        errors.add(new ValidationError("model.id",
+            String.format("Can only be changed to a model of the same platform (%s)", before.getPlatformType().getKey())));
+      } else if (after.getPartitionCount() != before.getPartitionCount()) {
+        errors.add(new ValidationError("model.id",
+            String.format("Can only be changed to a model with the same number of partitions (%d)", before.getPartitionCount())));
+      }
+      if (beforeChange.getRunPositions() != null) {
+        Set<InstrumentModel> requiredInstrumentModels = beforeChange.getRunPositions().stream()
+            .map(RunPosition::getRun)
+            .map(Run::getSequencer)
+            .map(Instrument::getInstrumentModel)
+            .collect(Collectors.toSet());
+        if (requiredInstrumentModels.stream().anyMatch(required -> after.getInstrumentModels().stream()
+            .map(InstrumentModel::getId)
+            .noneMatch(id -> id == required.getId()))) {
+          errors.add(new ValidationError("model.id",
+              String.format("Can only change to a model compatible with the linked runs' instrument models (%s)",
+                  LimsUtils.joinWithConjunction(
+                      requiredInstrumentModels.stream().map(InstrumentModel::getAlias).collect(Collectors.toSet()), "and"))));
+        }
+      }
+    }
+
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }
@@ -133,6 +167,7 @@ public class DefaultContainerService
     managed.setDescription(source.getDescription());
     managed.setClusteringKit(source.getClusteringKit());
     managed.setMultiplexingKit(source.getMultiplexingKit());
+    managed.setModel(source.getModel());
 
     if (LimsUtils.isOxfordNanoporeContainer(managed)) {
       applyOxfordNanoporeChanges((OxfordNanoporeContainer) source, (OxfordNanoporeContainer) managed);

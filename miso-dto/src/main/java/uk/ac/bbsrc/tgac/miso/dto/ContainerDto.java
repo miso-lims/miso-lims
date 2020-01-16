@@ -18,6 +18,7 @@ public class ContainerDto {
   private String description;
   private String lastRunAlias;
   private Long lastRunId;
+  private Long lastRunInstrumentModelId;
   private String lastSequencerName;
   private Long lastSequencerId;
   private String lastModified;
@@ -71,6 +72,14 @@ public class ContainerDto {
 
   public void setLastRunId(Long lastRunId) {
     this.lastRunId = lastRunId;
+  }
+
+  public Long getLastRunInstrumentModelId() {
+    return lastRunInstrumentModelId;
+  }
+
+  public void setLastRunInstrumentModelId(Long lastRunInstrumentModelId) {
+    this.lastRunInstrumentModelId = lastRunInstrumentModelId;
   }
 
   public String getLastModified() {

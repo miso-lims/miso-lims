@@ -24,6 +24,7 @@ Changes:
   * Added run purpose per sequencing run partition
   * Added run purpose per aliquot in sequencing run partitions
   * Allow changing sample project
+  * Allow changing sequencing container model
   * Improved interface for selecting freezer location on the Edit Box page
     * If there is only one option in the location dropdown, it will be selected automatically
     * If there is no valid storage space within the selected location, "NO SPACE" will be displayed

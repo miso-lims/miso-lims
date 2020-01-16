@@ -13,7 +13,7 @@ public class ContainerPage extends FormPage<ContainerPage.Field> {
   public static enum Field implements FormPage.FieldElement {
     ID(By.id("containerForm_id"), By.id("containerForm_idLabel")), //
     SERIAL_NUMBER(By.id("containerForm_identificationBarcode")), //
-    MODEL(By.id("containerForm_model.id"), By.id("containerForm_model.idLabel")), //
+    MODEL(By.id("containerForm_model_id")), //
     CLUSTERING_KIT(By.id("containerForm_clusteringKitId")), //
     MULTIPLEXING_KIT(By.id("containerForm_multiplexingKitId"));
 

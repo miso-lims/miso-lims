@@ -324,7 +324,7 @@ FormUtils = (function($) {
       sections.forEach(function(section) {
         section.fields.forEach(function(field) {
           if (shouldTrackField(field)) {
-            original[field.data] = getFormValue(containerId, field);
+            setObjectField(original, field.data, getFormValue(containerId, field));
           }
         });
       });
@@ -341,7 +341,7 @@ FormUtils = (function($) {
 
     function isFieldChanged(field) {
       return shouldTrackField(field) && (isSetInForm(containerId, field) || isSetInObject(original, field.data))
-          && getFormValue(containerId, field) != original[field.data];
+          && getFormValue(containerId, field) != getObjectField(original, field.data);
     }
 
     function triggerUpdate(field) {
@@ -546,7 +546,7 @@ FormUtils = (function($) {
     sections.forEach(function(section) {
       section.fields.forEach(function(field) {
         if (!field.omit && field.type !== 'special') { // FormTarget is responsible for managing updates, likely via an additional hidden field
-          object[field.data] = getFormValue(containerId, field);
+          setObjectField(object, field.data, getFormValue(containerId, field));
         }
         if (['text', 'textarea', 'password', 'dropdown', 'date', 'datetime', 'decimal', 'int'].indexOf(field.type) !== -1) {
           addValidation(containerId, field);
@@ -686,16 +686,18 @@ FormUtils = (function($) {
 
     var containerId = container.attr('id');
     section.fields.forEach(function(field) {
-      var inputId = makeInputId(containerId, field.data);
-      if (field.type === 'date') {
-        $('#' + inputId).attr('placeholder', 'YYYY-MM-DD');
-        Utils.ui.addDatePicker(inputId);
-      } else if (field.type === 'datetime') {
-        $('#' + inputId).attr('placeholder', 'YYYY-MM-DD hh:mm:ss');
-        Utils.ui.addDateTimePicker(inputId);
-      }
-      if (field.disabled) {
-        Utils.ui.setDisabled('#' + inputId, true);
+      if (field.type !== 'special') {
+        var inputId = makeInputId(containerId, field.data);
+        if (field.type === 'date') {
+          $('#' + inputId).attr('placeholder', 'YYYY-MM-DD');
+          Utils.ui.addDatePicker(inputId);
+        } else if (field.type === 'datetime') {
+          $('#' + inputId).attr('placeholder', 'YYYY-MM-DD hh:mm:ss');
+          Utils.ui.addDateTimePicker(inputId);
+        }
+        if (field.disabled) {
+          Utils.ui.setDisabled('#' + inputId, true);
+        }
       }
     });
   }
@@ -715,13 +717,14 @@ FormUtils = (function($) {
     if (field.getDisplayValue) {
       // we're displaying something different, so put the actual data in a hidden field
       var hidden = $('<input>').attr('id', makeInputId(containerId, field.data)).attr('type', 'hidden');
-      if (object[field.data]) {
-        hidden.val(object[field.data]);
+      var dataValue = getObjectField(object, field.data)
+      if (dataValue) {
+        hidden.val(dataValue);
       }
       td.append(hidden);
     }
 
-    var inputId = makeInputId(containerId, field.data);
+    var inputId = field.type === 'special' ? null : makeInputId(containerId, field.data);
     switch (field.type) {
     case 'read-only':
       td.append(makeReadOnlyInput(inputId, field, value, object));
@@ -760,16 +763,33 @@ FormUtils = (function($) {
     return td;
   }
 
+  function getObjectField(object, dataProperty) {
+    return dataProperty.split('.').reduce(function(accumulator, currentValue) {
+      return accumulator && accumulator.hasOwnProperty(currentValue) ? accumulator[currentValue] : null;
+    }, object);
+  }
+
+  function setObjectField(object, dataProperty, value) {
+    dataProperty.split('.').reduce(function(accumulator, currentValue, index, array) {
+      if (index === array.length - 1) {
+        accumulator[currentValue] = value;
+      } else if (!accumulator[currentValue]) {
+        accumulator[currentValue] = {};
+      }
+      return accumulator[currentValue];
+    }, object);
+  }
+
   function makeInputId(containerId, dataField) {
-    return containerId + '_' + dataField;
+    return containerId + '_' + dataField.replace('.', '_');
   }
 
   function getDisplayValue(field, object) {
     var value = null;
     if (field.getDisplayValue) {
       value = field.getDisplayValue(object);
-    } else if (object.hasOwnProperty(field.data)) {
-      value = object[field.data];
+    } else if (field.data) {
+      value = getObjectField(object, field.data);
     }
     if (value === null && field.hasOwnProperty('initial')) {
       value = field.initial;
@@ -783,7 +803,7 @@ FormUtils = (function($) {
     if (value !== null) {
       input.text(value);
     }
-    if (isLink && item[field.data]) {
+    if (isLink && getObjectField(item, field.data)) {
       input.attr('href', field.getLink(item));
       if (field.openNewTab) {
         input.attr('target', '_blank');
