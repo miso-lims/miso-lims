@@ -788,7 +788,7 @@ FormUtils = (function($) {
     var value = null;
     if (field.getDisplayValue) {
       value = field.getDisplayValue(object);
-    } else {
+    } else if (field.data) {
       value = getObjectField(object, field.data);
     }
     if (value === null && field.hasOwnProperty('initial')) {
