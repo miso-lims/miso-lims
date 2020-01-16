@@ -21,7 +21,8 @@ public class InstrumentPage extends FormPage<InstrumentPage.Field> {
     COMMISSIONED(By.id("instrumentForm_dateCommissioned")), //
     DECOMMISSIONED(By.id("instrumentForm_dateDecommissioned")), //
     STATUS(By.id("instrumentForm_status")), //
-    UPGRADED_INSTRUMENT(By.id("instrumentForm_upgradedInstrumentId"));
+    UPGRADED_INSTRUMENT(By.id("instrumentForm_upgradedInstrumentId")), //
+    DEFAULT_PURPOSE(By.id("instrumentForm_defaultRunPurposeId"));
 
     private final By selector;
 

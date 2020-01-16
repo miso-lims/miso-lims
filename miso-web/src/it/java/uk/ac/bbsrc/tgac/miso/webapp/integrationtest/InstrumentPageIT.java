@@ -38,6 +38,7 @@ public class InstrumentPageIT extends AbstractIT {
     fields.put(Field.STATUS, "Upgraded");
     fields.put(Field.DECOMMISSIONED, "2017-02-01");
     fields.put(Field.UPGRADED_INSTRUMENT, "NewHiSeq_101");
+    fields.put(Field.DEFAULT_PURPOSE, "Production");
     assertFieldValues("loaded (upgraded)", fields, page);
 
     // set status to retired
@@ -84,6 +85,7 @@ public class InstrumentPageIT extends AbstractIT {
     fields.put(Field.SERIAL_NUMBER, "100");
     fields.put(Field.NAME, "HiSeq_100");
     fields.put(Field.STATUS, "Production");
+    fields.put(Field.DEFAULT_PURPOSE, "Production");
     assertFieldValues("loaded", fields, page);
 
     // make changes

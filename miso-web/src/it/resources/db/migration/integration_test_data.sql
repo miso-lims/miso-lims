@@ -343,15 +343,15 @@ INSERT INTO Instrument (instrumentId, name, instrumentModelId, defaultPurposeId)
   (1, 'T2000', 1, 1),
   (2, 'TMS1', 2, 1),
   (3, 'TPB2', 3, 1),
-  (4, 'iScan1', 4, 1);
+  (4, 'iScan1', 4, NULL);
   
-INSERT INTO Instrument (instrumentId, name, instrumentModelId, serialNumber, dateCommissioned, dateDecommissioned, upgradedInstrumentId) VALUES
-  (100, 'HiSeq_100', 1, '100', '2017-01-01', NULL, NULL),
-  (101, 'NewHiSeq_101', 1, '101', '2017-02-01', NULL, NULL),
-  (102, 'OldHiSeq_102', 1, '102', '2017-01-01', '2017-02-01', 101),
-  (200, 'HiSeq_200', 1, '200', '2017-01-01', NULL, NULL),
-  (5001, 'PacBio_SR_5001', 3, '5001', '2017-09-21', NULL, NULL),
-  (5002, 'HiSeq_SR_5002', 1, '5002', '2017-02-01', NULL, NULL);
+INSERT INTO Instrument (instrumentId, name, instrumentModelId, serialNumber, dateCommissioned, dateDecommissioned, upgradedInstrumentId, defaultPurposeId) VALUES
+  (100, 'HiSeq_100', 1, '100', '2017-01-01', NULL, NULL, 1),
+  (101, 'NewHiSeq_101', 1, '101', '2017-02-01', NULL, NULL, 1),
+  (102, 'OldHiSeq_102', 1, '102', '2017-01-01', '2017-02-01', 101, 1),
+  (200, 'HiSeq_200', 1, '200', '2017-01-01', NULL, NULL, 1),
+  (5001, 'PacBio_SR_5001', 3, '5001', '2017-09-21', NULL, NULL, 1),
+  (5002, 'HiSeq_SR_5002', 1, '5002', '2017-02-01', NULL, NULL, 1);
 
 INSERT INTO ServiceRecord(recordId, instrumentId, title, details, servicedBy, referenceNumber, serviceDate, startTime, endTime, outOfService) VALUES
   (150, 101, 'Test 150', 'details go here', 'technician1', '12345', '2017-09-05', '2017-09-01 10:00:00', '2017-09-05 10:00:00', 0),
