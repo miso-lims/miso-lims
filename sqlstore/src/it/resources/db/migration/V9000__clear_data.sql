@@ -76,7 +76,7 @@ DELETE FROM RunOxfordNanopore;
 DELETE FROM RunPacBio;
 DELETE FROM RunPurpose;
 DELETE FROM Run_Partition;
-DELETE FROM Run_Partition_Aliquot;
+DELETE FROM Run_Partition_LibraryAliquot;
 DELETE FROM Run_SequencerPartitionContainer;
 DELETE FROM Sample;
 DELETE FROM SampleAliquot;

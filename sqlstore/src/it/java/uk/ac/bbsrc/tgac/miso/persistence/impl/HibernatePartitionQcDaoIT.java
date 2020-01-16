@@ -15,9 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
-import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 
@@ -65,14 +65,6 @@ public class HibernatePartitionQcDaoIT extends AbstractDAOTest {
     assertNotNull(qc);
     assertEquals(1L, qc.getQcType().getId());
     assertEquals("it is written", qc.getNotes());
-  }
-
-  @Test
-  public void testGetNonExistent() throws Exception {
-    Run run = (Run) sessionFactory.getCurrentSession().get(Run.class, 1L);
-    Partition partition = (Partition) sessionFactory.getCurrentSession().get(PartitionImpl.class, 2L);
-    RunPartition qc = dao.get(run, partition);
-    assertNull(qc);
   }
 
   @Test
