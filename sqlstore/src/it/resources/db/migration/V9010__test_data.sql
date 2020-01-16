@@ -592,14 +592,48 @@ VALUES (1, 'identificationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:47'),
 (3, 'identificationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:51'),
 (4, 'identificationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:53');
 
-INSERT INTO `SequencerPartitionContainer_Partition`(`container_containerId`, `partitions_partitionId`) 
-VALUES (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),(2,9),(2,10),(2,11),(2,12),(2,13),(2,14),(2,15),(2,16),(3,17),(3,18),(3,19),
-(3,20),(3,21),(3,22),(3,23),(3,24),(4,25),(4,26),(4,27),(4,28),(4,29),(4,30),(4,31),(4,32);
+INSERT INTO `SequencerPartitionContainer_Partition`(`container_containerId`, `partitions_partitionId`) VALUES
+(1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),
+(2,9),(2,10),(2,11),(2,12),(2,13),(2,14),(2,15),(2,16),
+(3,17),(3,18),(3,19),(3,20),(3,21),(3,22),(3,23),(3,24),
+(4,25),(4,26),(4,27),(4,28),(4,29),(4,30),(4,31),(4,32);
 
 INSERT INTO `Run_SequencerPartitionContainer`(`Run_runId`, `containers_containerId`) 
 VALUES (1,1),(2,2),(3,3),(4,4);
 
-INSERT INTO Run_Partition_QC(runId, partitionId, partitionQcTypeId, notes) VALUES (1, 1, 1, 'it is written');
+INSERT INTO Run_Partition(runId, partitionId, partitionQcTypeId, notes) VALUES
+(1, 1, 1, 'it is written'),
+(1, 2, NULL, NULL),
+(1, 3, NULL, NULL),
+(1, 4, NULL, NULL),
+(1, 5, NULL, NULL),
+(1, 6, NULL, NULL),
+(1, 7, NULL, NULL),
+(1, 8, NULL, NULL),
+(2, 9, NULL, NULL),
+(2, 10, NULL, NULL),
+(2, 11, NULL, NULL),
+(2, 12, NULL, NULL),
+(2, 13, NULL, NULL),
+(2, 14, NULL, NULL),
+(2, 15, NULL, NULL),
+(2, 16, NULL, NULL),
+(3, 17, NULL, NULL),
+(3, 18, NULL, NULL),
+(3, 19, NULL, NULL),
+(3, 20, NULL, NULL),
+(3, 21, NULL, NULL),
+(3, 22, NULL, NULL),
+(3, 23, NULL, NULL),
+(3, 24, NULL, NULL),
+(4, 25, NULL, NULL),
+(4, 26, NULL, NULL),
+(4, 27, NULL, NULL),
+(4, 28, NULL, NULL),
+(4, 29, NULL, NULL),
+(4, 30, NULL, NULL),
+(4, 31, NULL, NULL),
+(4, 32, NULL, NULL);
 
 INSERT INTO Experiment_Run_Partition(experiment_experimentId, run_runId, partition_partitionId)
 VALUES
