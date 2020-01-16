@@ -1,14 +1,14 @@
-HotTarget.orderpurpose = {
+HotTarget.runpurpose = {
   getCreateUrl: function() {
-    return Urls.rest.orderPurposes.create;
+    return Urls.rest.runPurposes.create;
   },
   getUpdateUrl: function(id) {
-    return Urls.rest.orderPurposes.update(id);
+    return Urls.rest.runPurposes.update(id);
   },
   requestConfiguration: function(config, callback) {
     callback(config)
   },
-  fixUp: function(arraymodel, errorHandler) {
+  fixUp: function(purpose, errorHandler) {
   },
   createColumns: function(config, create, data) {
     return [HotUtils.makeColumnForText('Alias', true, 'alias', {
@@ -20,7 +20,7 @@ HotTarget.orderpurpose = {
     return !config.isAdmin ? [] : [{
       name: 'Edit',
       action: function(items) {
-        window.location = Urls.ui.orderPurposes.bulkEdit + '?' + jQuery.param({
+        window.location = Urls.ui.runPurposes.bulkEdit + '?' + jQuery.param({
           ids: items.map(Utils.array.getId).join(',')
         });
       }

@@ -13,13 +13,13 @@ FormTarget.instrument = (function($) {
 
   return {
     getSaveUrl: function(instrument) {
-      return instrument.id ? ('/miso/rest/instruments/' + instrument.id) : '/miso/rest/instruments';
+      return instrument.id ? Urls.rest.instruments.update(instrument.id) : Urls.rest.instruments.create;
     },
     getSaveMethod: function(instrument) {
       return instrument.id ? 'PUT' : 'POST';
     },
     getEditUrl: function(instrument) {
-      return '/miso/instrument/' + instrument.id;
+      return Urls.ui.instruments.edit(instrument.id);
     },
     getSections: function(config, object) {
       return [{
@@ -66,7 +66,7 @@ FormTarget.instrument = (function($) {
         return instrument.preUpgradeInstrumentAlias;
       },
       getLink: function(instrument) {
-        return '/miso/instrument/' + instrument.preUpgradeInstrumentId;
+        return Urls.ui.instruments.edit(instrument.preUpgradeInstrumentId);
       },
       include: !!object.preUpgradeInstrumentId
     }, {
@@ -131,6 +131,14 @@ FormTarget.instrument = (function($) {
             return model.instrumentType === newValue;
           })
         });
+        var purposeOptions = {
+          required: newValue === 'SEQUENCER',
+          disabled: newValue !== 'SEQUENCER'
+        };
+        if (newValue !== 'SEQUENCER') {
+          purposeOptions.value = null;
+        }
+        form.updateField('defaultRunPurposeId', purposeOptions);
       }
     }, {
       title: 'Instrument Model',
@@ -168,7 +176,7 @@ FormTarget.instrument = (function($) {
         return instrument.preUpgradeInstrumentAlias;
       },
       getLink: function(instrument) {
-        return '/miso/instrument/' + instrument.preUpgradeInstrumentId;
+        return Urls.ui.instruments.edit(instrument.preUpgradeInstrumentId);
       },
       include: !!object.preUpgradeInstrumentId
     }, {
@@ -227,7 +235,23 @@ FormTarget.instrument = (function($) {
       getItemValue: Utils.array.getId,
       sortSource: Utils.sorting.standardSort('name'),
       disabled: true
+    }, {
+      title: 'Default Run Purpose',
+      data: 'defaultRunPurposeId',
+      type: 'dropdown',
+      source: Constants.runPurposes,
+      getItemLabel: Utils.array.getAlias,
+      getItemValue: Utils.array.getId,
+      nullLabel: 'N/A',
+      sortSource: Utils.sorting.standardSort('alias'),
+      required: isSequencer(object.instrumentModelId),
+      disabled: !isSequencer(object.instrumentModelId)
     }];
+  }
+
+  function isSequencer(instrumentModelId) {
+    return instrumentModelId
+        && Utils.array.findUniqueOrThrow(Utils.array.idPredicate(instrumentModelId), Constants.instrumentModels).instrumentType === 'SEQUENCER'
   }
 
 })(jQuery);

@@ -16,6 +16,7 @@ public class InstrumentDto {
   private Long preUpgradeInstrumentId;
   private String preUpgradeInstrumentName;
   private Long upgradedInstrumentId;
+  private Long defaultRunPurposeId;
 
   public String getDateCommissioned() {
     return dateCommissioned;
@@ -127,6 +128,14 @@ public class InstrumentDto {
 
   public void setUpgradedInstrumentId(Long upgradedInstrumentId) {
     this.upgradedInstrumentId = upgradedInstrumentId;
+  }
+
+  public Long getDefaultRunPurposeId() {
+    return defaultRunPurposeId;
+  }
+
+  public void setDefaultRunPurposeId(Long defaultRunPurposeId) {
+    this.defaultRunPurposeId = defaultRunPurposeId;
   }
 
 }

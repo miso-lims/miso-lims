@@ -46,7 +46,7 @@ FormTarget.poolorder = (function($) {
           data: 'purposeId',
           type: 'dropdown',
           required: true,
-          source: Constants.orderPurposes,
+          source: Constants.runPurposes,
           getItemLabel: Utils.array.getAlias,
           getItemValue: Utils.array.getId,
           sortSource: Utils.sorting.standardSort('alias')
@@ -369,7 +369,7 @@ FormTarget.poolorder = (function($) {
   }
 
   function createSequencingOrder(form) {
-    var purpose = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(form.get('purposeId')), Constants.orderPurposes);
+    var purpose = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(form.get('purposeId')), Constants.runPurposes);
     var sequencingOrder = {
       purposeId: purpose.id,
       purposeAlias: purpose.alias,

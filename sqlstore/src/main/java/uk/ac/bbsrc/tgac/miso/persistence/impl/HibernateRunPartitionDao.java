@@ -9,21 +9,20 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
-import uk.ac.bbsrc.tgac.miso.core.data.PartitionQC;
-import uk.ac.bbsrc.tgac.miso.core.data.PartitionQC.PartitionQCId;
-import uk.ac.bbsrc.tgac.miso.persistence.PartitionQcStore;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.RunPartition.RunPartitionId;
+import uk.ac.bbsrc.tgac.miso.persistence.RunPartitionStore;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernatePartitionQcDao implements PartitionQcStore {
+public class HibernateRunPartitionDao implements RunPartitionStore {
   @Autowired
   private SessionFactory sessionFactory;
 
   @Override
-  public void create(PartitionQC qc) throws IOException {
-    currentSession().flush(); // required to update related entity lastModifiers for changelogs
-    currentSession().save(qc);
+  public void create(RunPartition runPartition) throws IOException {
+    currentSession().save(runPartition);
   }
 
   public Session currentSession() {
@@ -31,11 +30,11 @@ public class HibernatePartitionQcDao implements PartitionQcStore {
   }
 
   @Override
-  public PartitionQC get(Run run, Partition partition) throws IOException {
-    PartitionQCId id = new PartitionQCId();
+  public RunPartition get(Run run, Partition partition) throws IOException {
+    RunPartitionId id = new RunPartitionId();
     id.setRun(run);
     id.setPartition(partition);
-    return (PartitionQC) currentSession().get(PartitionQC.class, id);
+    return (RunPartition) currentSession().get(RunPartition.class, id);
   }
 
   public SessionFactory getSessionFactory() {
@@ -47,9 +46,8 @@ public class HibernatePartitionQcDao implements PartitionQcStore {
   }
 
   @Override
-  public void update(PartitionQC managedQc) throws IOException {
-    currentSession().flush(); // required to update related entity lastModifiers for changelogs
-    currentSession().update(managedQc);
+  public void update(RunPartition runPartition) throws IOException {
+    currentSession().update(runPartition);
   }
 
 }

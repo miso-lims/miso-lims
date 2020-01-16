@@ -10,30 +10,30 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderPurpose;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.core.service.OrderPurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.dto.OrderPurposeDto;
+import uk.ac.bbsrc.tgac.miso.dto.RunPurposeDto;
 
 @Controller
-@RequestMapping("/orderpurpose")
-public class OrderPurposeController extends AbstractTypeDataController<OrderPurpose, OrderPurposeDto> {
+@RequestMapping("/runpurpose")
+public class RunPurposeController extends AbstractTypeDataController<RunPurpose, RunPurposeDto> {
 
   @Autowired
-  private OrderPurposeService orderPurposeService;
+  private RunPurposeService runPurposeService;
 
   @Autowired
   private AuthorizationManager authorizationManager;
 
-  public OrderPurposeController() {
-    super("Order Purposes", "orderpurpose", "orderpurpose");
+  public RunPurposeController() {
+    super("Run Purposes", "runpurpose", "runpurpose");
   }
 
   @GetMapping("/list")
   public ModelAndView list(ModelMap model) throws IOException {
-    return listStatic(orderPurposeService.list(), model);
+    return listStatic(runPurposeService.list(), model);
   }
 
   @GetMapping("/bulk/new")
@@ -52,18 +52,18 @@ public class OrderPurposeController extends AbstractTypeDataController<OrderPurp
   }
 
   @Override
-  protected ProviderService<OrderPurpose> getService() {
-    return orderPurposeService;
+  protected ProviderService<RunPurpose> getService() {
+    return runPurposeService;
   }
 
   @Override
-  protected OrderPurposeDto toDto(OrderPurpose object) {
+  protected RunPurposeDto toDto(RunPurpose object) {
     return Dtos.asDto(object);
   }
 
   @Override
-  protected OrderPurposeDto makeDto() {
-    return new OrderPurposeDto();
+  protected RunPurposeDto makeDto() {
+    return new RunPurposeDto();
   }
 
 }

@@ -2,7 +2,7 @@ INSERT INTO `User` (`userId`, `active`, `admin`, `fullName`, `internal`, `loginN
 (1,1,1,'admin',1,'admin','ROLE_ADMIN,ROLE_INTERNAL','{SHA-1}d033e22ae348aeb5660fc2140aec35850c4da997','admin@admin'),
 (3,1,0,'user',1,'user','ROLE_INTERNAL','user','user@user.user');
 
-INSERT INTO OrderPurpose(purposeId, alias) VALUES
+INSERT INTO RunPurpose(purposeId, alias) VALUES
 (1, 'Production'),
 (2, 'QC');
 
@@ -339,19 +339,19 @@ INSERT INTO SequencingContainerModel_InstrumentModel (instrumentModelId, sequenc
 (3, 18),
 (3, 19);
 
-INSERT INTO Instrument (instrumentId, name, instrumentModelId) VALUES
-  (1, 'T2000', 1),
-  (2, 'TMS1', 2),
-  (3, 'TPB2', 3),
-  (4, 'iScan1', 4);
+INSERT INTO Instrument (instrumentId, name, instrumentModelId, defaultPurposeId) VALUES
+  (1, 'T2000', 1, 1),
+  (2, 'TMS1', 2, 1),
+  (3, 'TPB2', 3, 1),
+  (4, 'iScan1', 4, NULL);
   
-INSERT INTO Instrument (instrumentId, name, instrumentModelId, serialNumber, dateCommissioned, dateDecommissioned, upgradedInstrumentId) VALUES
-  (100, 'HiSeq_100', 1, '100', '2017-01-01', NULL, NULL),
-  (101, 'NewHiSeq_101', 1, '101', '2017-02-01', NULL, NULL),
-  (102, 'OldHiSeq_102', 1, '102', '2017-01-01', '2017-02-01', 101),
-  (200, 'HiSeq_200', 1, '200', '2017-01-01', NULL, NULL),
-  (5001, 'PacBio_SR_5001', 3, '5001', '2017-09-21', NULL, NULL),
-  (5002, 'HiSeq_SR_5002', 1, '5002', '2017-02-01', NULL, NULL);
+INSERT INTO Instrument (instrumentId, name, instrumentModelId, serialNumber, dateCommissioned, dateDecommissioned, upgradedInstrumentId, defaultPurposeId) VALUES
+  (100, 'HiSeq_100', 1, '100', '2017-01-01', NULL, NULL, 1),
+  (101, 'NewHiSeq_101', 1, '101', '2017-02-01', NULL, NULL, 1),
+  (102, 'OldHiSeq_102', 1, '102', '2017-01-01', '2017-02-01', 101, 1),
+  (200, 'HiSeq_200', 1, '200', '2017-01-01', NULL, NULL, 1),
+  (5001, 'PacBio_SR_5001', 3, '5001', '2017-09-21', NULL, NULL, 1),
+  (5002, 'HiSeq_SR_5002', 1, '5002', '2017-02-01', NULL, NULL, 1);
 
 INSERT INTO ServiceRecord(recordId, instrumentId, title, details, servicedBy, referenceNumber, serviceDate, startTime, endTime, outOfService) VALUES
   (150, 101, 'Test 150', 'details go here', 'technician1', '12345', '2017-09-05', '2017-09-01 10:00:00', '2017-09-05 10:00:00', 0),
@@ -985,7 +985,8 @@ INSERT INTO RunIllumina (runId, callCycle, imgCycle, numCycles, scoreCycle, pair
 INSERT INTO RunPacBio (runId) VALUES (2);
 
 INSERT INTO Run_SequencerPartitionContainer (Run_runId, containers_containerId) VALUES
-(1, 1), (2, 2),
+(1, 1),
+(2, 2),
 (5003, 5003),
 (5004, 5004),
 (5005, 5005),
@@ -995,6 +996,92 @@ INSERT INTO Run_SequencerPartitionContainer (Run_runId, containers_containerId) 
 (5010, 5010),
 (5100, 5100),
 (5101, 5101);
+
+INSERT INTO Run_Partition (runId, partitionId, purposeId, lastModifier) VALUES
+(1, 11, 1, 1),
+(1, 12, 1, 1),
+(1, 13, 1, 1),
+(1, 14, 1, 1),
+(2, 21, 1, 1),
+(2, 22, 1, 1),
+(2, 23, 1, 1),
+(2, 24, 1, 1),
+(2, 25, 1, 1),
+(2, 26, 1, 1),
+(2, 27, 1, 1),
+(2, 28, 1, 1),
+(5003, 5201, 1, 1),
+(5003, 5202, 1, 1),
+(5003, 5203, 1, 1),
+(5003, 5204, 1, 1),
+(5003, 5205, 1, 1),
+(5003, 5206, 1, 1),
+(5003, 5207, 1, 1),
+(5003, 5208, 1, 1),
+(5004, 5401, 1, 1),
+(5004, 5402, 1, 1),
+(5004, 5403, 1, 1),
+(5004, 5404, 1, 1),
+(5004, 5405, 1, 1),
+(5004, 5406, 1, 1),
+(5004, 5407, 1, 1),
+(5004, 5408, 1, 1),
+(5005, 5501, 1, 1),
+(5005, 5502, 1, 1),
+(5005, 5503, 1, 1),
+(5005, 5504, 1, 1),
+(5005, 5505, 1, 1),
+(5005, 5506, 1, 1),
+(5005, 5507, 1, 1),
+(5005, 5508, 1, 1),
+(5006, 5601, 1, 1),
+(5006, 5602, 1, 1),
+(5006, 5603, 1, 1),
+(5006, 5604, 1, 1),
+(5006, 5605, 1, 1),
+(5006, 5606, 1, 1),
+(5006, 5607, 1, 1),
+(5006, 5608, 1, 1),
+(5008, 5801, 1, 1),
+(5008, 5802, 1, 1),
+(5008, 5803, 1, 1),
+(5008, 5804, 1, 1),
+(5008, 5805, 1, 1),
+(5008, 5806, 1, 1),
+(5008, 5807, 1, 1),
+(5008, 5808, 1, 1),
+(5009, 5901, 1, 1),
+(5009, 5902, 1, 1),
+(5009, 5903, 1, 1),
+(5009, 5904, 1, 1),
+(5009, 5905, 1, 1),
+(5009, 5906, 1, 1),
+(5009, 5907, 1, 1),
+(5009, 5908, 1, 1),
+(5010, 5111, 1, 1),
+(5010, 5112, 1, 1),
+(5010, 5113, 1, 1),
+(5010, 5114, 1, 1),
+(5010, 5115, 1, 1),
+(5010, 5116, 1, 1),
+(5010, 5117, 1, 1),
+(5010, 5118, 1, 1),
+(5100, 51001, 1, 1),
+(5100, 51002, 1, 1),
+(5100, 51003, 1, 1),
+(5100, 51004, 1, 1),
+(5100, 51005, 1, 1),
+(5100, 51006, 1, 1),
+(5100, 51007, 1, 1),
+(5100, 51008, 1, 1),
+(5101, 51011, 1, 1),
+(5101, 51012, 1, 1),
+(5101, 51013, 1, 1),
+(5101, 51014, 1, 1),
+(5101, 51015, 1, 1),
+(5101, 51016, 1, 1),
+(5101, 51017, 1, 1),
+(5101, 51018, 1, 1);
 
 INSERT INTO Note(noteId, creationDate, internalOnly, text, owner_userId) VALUES
   (1, '2017-08-22', 1, 'LIB110005 existing note', 1),

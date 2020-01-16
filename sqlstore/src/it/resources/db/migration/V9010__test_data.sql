@@ -478,10 +478,13 @@ INSERT INTO SequencingParameters (parametersId, name, instrumentModelId, readLen
 (2, 'Rapid Run 2x151', 16, 151, 151, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'RAPID_RUN'),
 (3, 'MiSeq Params 1', 1, 100, 100, 1, 1, '2019-09-23 10:05:00', '2019-09-23 10:05:00', NULL);
 
-INSERT INTO `Instrument`(`instrumentId`, `name`, `instrumentModelId`) VALUES
-(1, 'SN7001179', 16),
-(2, 'h1180', 16),
-(3, 'iScan_1', 30);
+INSERT INTO RunPurpose(purposeId, alias) VALUES
+(1, 'Production');
+
+INSERT INTO `Instrument`(`instrumentId`, `name`, `instrumentModelId`, defaultPurposeId) VALUES
+(1, 'SN7001179', 16, 1),
+(2, 'h1180', 16, 1),
+(3, 'iScan_1', 30, 1);
 
 INSERT INTO `Experiment`(`experimentId`, `name`, `description`, `accession`, `title`, `study_studyId`, `alias`, `instrumentModelId`,`lastModifier`, lastModified, creator, created, `library_libraryId`) 
 VALUES
@@ -592,14 +595,48 @@ VALUES (1, 'identificationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:47'),
 (3, 'identificationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:51'),
 (4, 'identificationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:53');
 
-INSERT INTO `SequencerPartitionContainer_Partition`(`container_containerId`, `partitions_partitionId`) 
-VALUES (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),(2,9),(2,10),(2,11),(2,12),(2,13),(2,14),(2,15),(2,16),(3,17),(3,18),(3,19),
-(3,20),(3,21),(3,22),(3,23),(3,24),(4,25),(4,26),(4,27),(4,28),(4,29),(4,30),(4,31),(4,32);
+INSERT INTO `SequencerPartitionContainer_Partition`(`container_containerId`, `partitions_partitionId`) VALUES
+(1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),
+(2,9),(2,10),(2,11),(2,12),(2,13),(2,14),(2,15),(2,16),
+(3,17),(3,18),(3,19),(3,20),(3,21),(3,22),(3,23),(3,24),
+(4,25),(4,26),(4,27),(4,28),(4,29),(4,30),(4,31),(4,32);
 
 INSERT INTO `Run_SequencerPartitionContainer`(`Run_runId`, `containers_containerId`) 
 VALUES (1,1),(2,2),(3,3),(4,4);
 
-INSERT INTO Run_Partition_QC(runId, partitionId, partitionQcTypeId, notes) VALUES (1, 1, 1, 'it is written');
+INSERT INTO Run_Partition(runId, partitionId, partitionQcTypeId, notes, purposeId, lastModifier) VALUES
+(1, 1, 1, 'it is written', 1, 1),
+(1, 2, NULL, NULL, 1, 1),
+(1, 3, NULL, NULL, 1, 1),
+(1, 4, NULL, NULL, 1, 1),
+(1, 5, NULL, NULL, 1, 1),
+(1, 6, NULL, NULL, 1, 1),
+(1, 7, NULL, NULL, 1, 1),
+(1, 8, NULL, NULL, 1, 1),
+(2, 9, NULL, NULL, 1, 1),
+(2, 10, NULL, NULL, 1, 1),
+(2, 11, NULL, NULL, 1, 1),
+(2, 12, NULL, NULL, 1, 1),
+(2, 13, NULL, NULL, 1, 1),
+(2, 14, NULL, NULL, 1, 1),
+(2, 15, NULL, NULL, 1, 1),
+(2, 16, NULL, NULL, 1, 1),
+(3, 17, NULL, NULL, 1, 1),
+(3, 18, NULL, NULL, 1, 1),
+(3, 19, NULL, NULL, 1, 1),
+(3, 20, NULL, NULL, 1, 1),
+(3, 21, NULL, NULL, 1, 1),
+(3, 22, NULL, NULL, 1, 1),
+(3, 23, NULL, NULL, 1, 1),
+(3, 24, NULL, NULL, 1, 1),
+(4, 25, NULL, NULL, 1, 1),
+(4, 26, NULL, NULL, 1, 1),
+(4, 27, NULL, NULL, 1, 1),
+(4, 28, NULL, NULL, 1, 1),
+(4, 29, NULL, NULL, 1, 1),
+(4, 30, NULL, NULL, 1, 1),
+(4, 31, NULL, NULL, 1, 1),
+(4, 32, NULL, NULL, 1, 1);
 
 INSERT INTO Experiment_Run_Partition(experiment_experimentId, run_runId, partition_partitionId)
 VALUES
@@ -707,9 +744,6 @@ INSERT INTO Workset_Sample(worksetId, sampleId) VALUES
 (1, 1),
 (1, 2),
 (1, 3);
-
-INSERT INTO OrderPurpose(purposeId, alias) VALUES
-(1, 'Production');
 
 INSERT INTO SequencingOrder(sequencingOrderId, poolId, partitions, parametersId, purposeId, description, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 1, 1, 1, 1, 'seq order 1', 1, '2019-09-23 10:30:00', 1, '2019-09-23 10:30:00');

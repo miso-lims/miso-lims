@@ -27,6 +27,8 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
+
 public interface Instrument extends Deletable, Nameable, Serializable {
 
   public void setName(String name);
@@ -103,6 +105,10 @@ public interface Instrument extends Deletable, Nameable, Serializable {
   public Set<InstrumentPosition> getOutOfServicePositions();
 
   public String getOutOfServicePositionsLabel();
+
+  public RunPurpose getDefaultRunPurpose();
+
+  public void setDefaultRunPurpose(RunPurpose defaultRunPurpose);
 
   @Override
   int hashCode();

@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
+import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,9 +13,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
+import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
@@ -32,6 +37,10 @@ public class DefaultInstrumentService implements InstrumentService {
   private DeletionStore deletionStore;
   @Autowired
   private InstrumentStore instrumentDao;
+  @Autowired
+  private InstrumentModelService instrumentModelService;
+  @Autowired
+  private RunPurposeService runPurposeService;
 
   @Override
   public List<Instrument> list() throws IOException {
@@ -70,9 +79,9 @@ public class DefaultInstrumentService implements InstrumentService {
   public long update(Instrument instrument) throws IOException {
     authorizationManager.throwIfNonAdmin();
     Instrument managed = get(instrument.getId());
+    loadChildEntities(instrument);
     validateChange(instrument, managed);
     applyChanges(managed, instrument);
-    loadChildEntities(managed);
     return save(managed);
   }
 
@@ -83,12 +92,21 @@ public class DefaultInstrumentService implements InstrumentService {
   private void validateChange(Instrument instrument, Instrument beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
 
-    if (ValidationUtils.isSetAndChanged(Instrument::getName, instrument, beforeChange) && getByName(instrument.getName()) != null) {
+    if (isSetAndChanged(Instrument::getName, instrument, beforeChange) && getByName(instrument.getName()) != null) {
       errors.add(new ValidationError("name", "There is already an instrument with this name"));
     }
-    if (ValidationUtils.isSetAndChanged(Instrument::getUpgradedInstrument, instrument, beforeChange)
+    if (isSetAndChanged(Instrument::getUpgradedInstrument, instrument, beforeChange)
         && getByUpgradedInstrumentId(instrument.getUpgradedInstrument().getId()) != null) {
       errors.add(new ValidationError("upgradedInstrumentId", "There is already an instrument that has been upgraded to this one"));
+    }
+    if (instrument.getInstrumentModel().getInstrumentType() == InstrumentType.SEQUENCER) {
+      if (instrument.getDefaultRunPurpose() == null) {
+        errors.add(new ValidationError("defaultRunPurposeId", "Required for sequencing instruments"));
+      }
+    } else {
+      if (instrument.getDefaultRunPurpose() != null) {
+        errors.add(new ValidationError("defaultRunPurposeId", "Invalid for non-sequencing instruments"));
+      }
     }
 
     if (!errors.isEmpty()) {
@@ -103,14 +121,13 @@ public class DefaultInstrumentService implements InstrumentService {
     target.setDateCommissioned(source.getDateCommissioned());
     target.setDateDecommissioned(source.getDateDecommissioned());
     target.setUpgradedInstrument(source.getUpgradedInstrument());
+    target.setDefaultRunPurpose(source.getDefaultRunPurpose());
   }
 
   private void loadChildEntities(Instrument instrument) throws IOException {
-    if (instrument.getUpgradedInstrument() != null) {
-      instrument.setUpgradedInstrument(get(instrument.getUpgradedInstrument().getId()));
-    } else {
-      instrument.setUpgradedInstrument(null);
-    }
+    loadChildEntity(instrument::setUpgradedInstrument, instrument.getUpgradedInstrument(), this, "upgradedInstrumentId");
+    loadChildEntity(instrument::setInstrumentModel, instrument.getInstrumentModel(), instrumentModelService, "instrumentModelId");
+    loadChildEntity(instrument::setDefaultRunPurpose, instrument.getDefaultRunPurpose(), runPurposeService, "defaultRunPurposeId");
   }
 
   public void setInstrumentDao(InstrumentStore instrumentDao) {

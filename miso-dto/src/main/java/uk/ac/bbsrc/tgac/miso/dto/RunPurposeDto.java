@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-public class OrderPurposeDto {
+public class RunPurposeDto {
 
   private Long id;
 

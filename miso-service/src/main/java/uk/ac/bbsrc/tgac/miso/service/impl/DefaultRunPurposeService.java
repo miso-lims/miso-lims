@@ -7,23 +7,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderPurpose;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.core.service.OrderPurposeService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
-import uk.ac.bbsrc.tgac.miso.persistence.OrderPurposeDao;
+import uk.ac.bbsrc.tgac.miso.persistence.RunPurposeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SaveDao;
 import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class DefaultOrderPurposeService extends AbstractSaveService<OrderPurpose> implements OrderPurposeService {
+public class DefaultRunPurposeService extends AbstractSaveService<RunPurpose> implements RunPurposeService {
 
   @Autowired
-  private OrderPurposeDao orderPurposeDao;
+  private RunPurposeDao runPurposeDao;
 
   @Autowired
   private AuthorizationManager authorizationManager;
@@ -42,35 +42,35 @@ public class DefaultOrderPurposeService extends AbstractSaveService<OrderPurpose
   }
 
   @Override
-  public SaveDao<OrderPurpose> getDao() {
-    return orderPurposeDao;
+  public SaveDao<RunPurpose> getDao() {
+    return runPurposeDao;
   }
 
   @Override
-  public List<OrderPurpose> list() throws IOException {
-    return orderPurposeDao.list();
+  public List<RunPurpose> list() throws IOException {
+    return runPurposeDao.list();
   }
 
   @Override
-  protected void collectValidationErrors(OrderPurpose object, OrderPurpose beforeChange, List<ValidationError> errors) throws IOException {
-    if (ValidationUtils.isSetAndChanged(OrderPurpose::getAlias, object, beforeChange)
-        && orderPurposeDao.getByAlias(object.getAlias()) != null) {
-      errors.add(new ValidationError("alias", "There is already an order purpose with this alias"));
+  protected void collectValidationErrors(RunPurpose object, RunPurpose beforeChange, List<ValidationError> errors) throws IOException {
+    if (ValidationUtils.isSetAndChanged(RunPurpose::getAlias, object, beforeChange)
+        && runPurposeDao.getByAlias(object.getAlias()) != null) {
+      errors.add(new ValidationError("alias", "There is already a run purpose with this alias"));
     }
   }
 
   @Override
-  protected void applyChanges(OrderPurpose to, OrderPurpose from) throws IOException {
+  protected void applyChanges(RunPurpose to, RunPurpose from) throws IOException {
     to.setAlias(from.getAlias());
   }
 
   @Override
-  public ValidationResult validateDeletion(OrderPurpose object) throws IOException {
+  public ValidationResult validateDeletion(RunPurpose object) throws IOException {
     ValidationResult result = new ValidationResult();
-    long poolUsage = orderPurposeDao.getUsageByPoolOrders(object);
-    long seqUsage = orderPurposeDao.getUsageBySequencingOrders(object);
+    long poolUsage = runPurposeDao.getUsageByPoolOrders(object);
+    long seqUsage = runPurposeDao.getUsageBySequencingOrders(object);
     if (poolUsage > 0L || seqUsage > 0L) {
-      result.addError(new ValidationError(String.format("Order purpose %s is used by %d pool %s and %d sequencing %s", object.getAlias(),
+      result.addError(new ValidationError(String.format("Run purpose %s is used by %d pool %s and %d sequencing %s", object.getAlias(),
           poolUsage, Pluralizer.orders(poolUsage), seqUsage, Pluralizer.orders(seqUsage))));
     }
     return result;

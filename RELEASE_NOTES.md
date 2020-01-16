@@ -20,6 +20,9 @@ Changes:
   * Added a Quick Help section to the Edit Freezer page, including a link to the User Manual
     section describing the different storage space types
   * Added ability to delete storage units within a freezer
+  * Added default run purpose to sequencing instruments
+  * Added run purpose per sequencing run partition
+  * Added run purpose per aliquot in sequencing run partitions
   * Allow changing sample project
   * Improved interface for selecting freezer location on the Edit Box page
     * If there is only one option in the location dropdown, it will be selected automatically
@@ -30,6 +33,7 @@ Changes:
   * Changed VisionMate scanner setup to disable orientation detection. This means that boxes must
     now be placed in the correct orientation on the scanner. This fixes an issue where orientation
     detection did not work consistently for some box types and results were sometimes upside-down
+  * Renamed order purposes to run purposes
   * Fixed error saving QCs with controls specified
   * Export initialVolume in Pinery /samples
   * Print library aliquot alias instead of library alias on labels
@@ -47,6 +51,11 @@ Upgrade Notes:
       to just have a single "All Users" group to use for item receipt and distribution. A group
       named "Unspecified (Internal)" is created during the upgrade, which you can use for this
       purpose if you choose. The group may also be renamed if you like.
+  * Sequencing instruments must now specify a default purpose. A previous version added the order
+    purpose 'Production.' If you deleted or modified the name of this purpose, you will have to add
+    a new purpose with the alias 'Production' before migrating your database to the new version.
+    All sequencers will then be given a default purpose of 'Production.' After migrating, you can
+    change each instrument's default purpose and delete the 'Production' purpose if you choose.
 
 # 0.2.197
 

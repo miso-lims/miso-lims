@@ -29,11 +29,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrderCompletion;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderPurpose;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.service.OrderPurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderCompletionService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
@@ -62,7 +62,7 @@ public class SequencingOrderRestController extends RestController {
   @Autowired
   private PoolService poolService;
   @Autowired
-  private OrderPurposeService orderPurposeService;
+  private RunPurposeService runPurposeService;
   @Autowired
   private IndexChecker indexChecker;
   @Autowired
@@ -199,7 +199,7 @@ public class SequencingOrderRestController extends RestController {
   public List<SequencingOrderDto> search(@RequestParam long poolId, @RequestParam long purposeId, @RequestParam long parametersId,
       @RequestParam int partitions) throws IOException {
     Pool pool = getOrThrow(poolService, poolId, "Pool");
-    OrderPurpose purpose = getOrThrow(orderPurposeService, purposeId, "Order purpose");
+    RunPurpose purpose = getOrThrow(runPurposeService, purposeId, "Run purpose");
     SequencingParameters parameters = getOrThrow(sequencingParametersService, parametersId, "Sequencing parameters");
     List<SequencingOrder> results = sequencingOrderService.listByAttributes(pool, purpose, parameters, partitions);
     return results.stream().map(so -> Dtos.asDto(so, indexChecker)).collect(Collectors.toList());

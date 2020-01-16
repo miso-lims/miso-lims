@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.PartitionQC;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
+import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
 import uk.ac.bbsrc.tgac.miso.persistence.PartitionQcTypeDao;
 
 @Repository
@@ -62,8 +62,8 @@ public class HibernatePartitionQcTypeDao implements PartitionQcTypeDao {
 
   @Override
   public long getUsage(PartitionQCType type) throws IOException {
-    return (long) currentSession().createCriteria(PartitionQC.class)
-        .add(Restrictions.eq("type", type))
+    return (long) currentSession().createCriteria(RunPartition.class)
+        .add(Restrictions.eq("qcType", type))
         .setProjection(Projections.rowCount()).uniqueResult();
   }
 

@@ -84,7 +84,7 @@ DELETE FROM Note;
 DELETE FROM User_Group;
 DELETE FROM User;
 DELETE FROM _Group;
-DELETE FROM OrderPurpose;
+DELETE FROM RunPurpose;
 
 INSERT INTO User (userId, active, admin, fullName, internal, loginName, password, email) VALUES
 (1,1,1,'admin',1,'admin','admin','admin@admin.admin');
@@ -308,7 +308,7 @@ INSERT INTO RunIllumina (runId, pairedEnd) VALUES
 INSERT INTO Run_SequencerPartitionContainer (Run_runId, containers_containerId) VALUES
 (1, 1);
 
-INSERT INTO OrderPurpose(purposeId, alias) VALUES
+INSERT INTO RunPurpose(purposeId, alias) VALUES
 (1, 'Production');
 
 INSERT INTO SequencingOrder (sequencingOrderId, poolId, partitions, parametersId, createdBy, updatedBy, creationDate, lastUpdated, purposeId) VALUES
