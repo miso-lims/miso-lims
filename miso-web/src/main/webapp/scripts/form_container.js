@@ -32,14 +32,12 @@ FormTarget.container = (function($) {
         }, {
           title: 'Container Model',
           data: 'model.id',
-          type: 'read-only',
-          getDisplayValue: function(container) {
-            return container.model.alias;
-          }
-        }, {
-          title: 'Change Model',
-          type: 'special',
-          makeControls: makeModelSelect(object)
+          type: 'dropdown',
+          required: true,
+          source: getValidContainerModels(object),
+          getItemLabel: Utils.array.getAlias,
+          getItemValue: Utils.array.getId,
+          sortSource: Utils.sorting.standardSort('alias')
         }, {
           title: 'Description',
           data: 'description',
@@ -95,76 +93,28 @@ FormTarget.container = (function($) {
     }
   }
 
-  function makeModelSelect(container) {
-    return function(form) {
-      return $('<button>').addClass('ui-state-default').attr('type', 'button').text('Select').click(
-          function() {
-            var currentModelId = form.get('model.id');
-            if (currentModelId) {
-              var currentSelection = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(currentModelId), Constants.containerModels);
-              var platformType = Utils.array.findUniqueOrThrow(Utils.array.namePredicate(currentSelection.platformType),
-                  Constants.platformTypes);
-              if (container.lastRunInstrumentModelId) {
-                showContainerModelSelect(form, platformType, container.lastRunInstrumentModelId, currentSelection.partitionCount);
-              } else {
-                showInstrumentModelSelect(form, platformType, currentSelection.partitionCount);
-              }
-            } else {
-              showPlatformSelect(form);
-            }
-          });
-    }
-  }
-
-  function showPlatformSelect(form) {
-    var options = Constants.platformTypes.filter(function(platform) {
-      return platform.active;
-    }).sort(Utils.sorting.standardSort('key')).map(function(platform) {
-      return {
-        name: platform.key,
-        handler: function() {
-          showInstrumentModelSelect(form, platform);
-        }
-      };
-    });
-    Utils.showWizardDialog('Select Platform', options);
-  }
-
-  function showInstrumentModelSelect(form, platformType, partitionCount) {
-    var options = Constants.instrumentModels.filter(function(model) {
-      return model.platformType === platformType.name && model.instrumentType === 'SEQUENCER' && model.active;
-    }).sort(Utils.sorting.standardSort('alias')).map(function(model) {
-      return {
-        name: model.alias,
-        handler: function() {
-          showContainerModelSelect(form, platformType, model.id, partitionCount);
-        }
-      };
-    });
-    Utils.showWizardDialog('Select Instrument Model', options);
-  }
-
-  function showContainerModelSelect(form, platformType, instrumentModelId, partitionCount) {
-    var options = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(instrumentModelId), Constants.instrumentModels).containerModels
-        .filter(function(model) {
-          return !model.archived && (!partitionCount || model.partitionCount === partitionCount);
-        }).sort(Utils.sorting.standardSort('alias')).map(function(model) {
-          return {
-            name: model.alias,
-            handler: function() {
-              form.updateField('model.id', {
-                value: model.id,
-                label: model.alias
-              });
-            }
-          };
-        });
-    if (options.length) {
-      Utils.showWizardDialog('Select ' + platformType.containerName + ' Model', options);
+  function getValidContainerModels(container) {
+    var currentModel = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(container.model.id), Constants.containerModels);
+    var platformType = Utils.array.findUniqueOrThrow(Utils.array.namePredicate(currentModel.platformType), Constants.platformTypes);
+    var instrumentModels = null;
+    if (container.lastRunInstrumentModelId) {
+      instrumentModels = [Utils.array.findUniqueOrThrow(Utils.array.idPredicate(container.lastRunInstrumentModelId),
+          Constants.instrumentModels)];
     } else {
-      Utils.showOkDialog('Error', ['No eligible container models found. Must have the same number of '
-          + platformType.pluralPartitionName.toLowerCase() + '.']);
+      instrumentModels = Constants.instrumentModels.filter(function(instrumentModel) {
+        return currentModel.instrumentModelIds.indexOf(instrumentModel.id) !== -1;
+      });
     }
+    return instrumentModels.flatMap(function(instrumentModel) {
+      return instrumentModel.containerModels;
+    }).reduce(function(accumulator, currentValue) {
+      if (currentValue.partitionCount === currentModel.partitionCount && !accumulator.find(function(model) {
+        return model.id === currentValue.id;
+      })) {
+        accumulator.push(currentValue);
+      }
+      return accumulator;
+    }, []);
   }
 
   function getKitsByType(type) {
