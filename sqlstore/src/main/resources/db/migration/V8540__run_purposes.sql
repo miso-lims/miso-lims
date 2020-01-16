@@ -18,10 +18,7 @@ RENAME TABLE Run_Partition_QC TO Run_Partition;
 ALTER TABLE Run_Partition MODIFY COLUMN partitionQcTypeId bigint(20);
 ALTER TABLE Run_Partition ADD COLUMN purposeId bigint(20);
 ALTER TABLE Run_Partition ADD CONSTRAINT runPartition_purpose FOREIGN KEY (purposeId) REFERENCES RunPurpose (purposeId);
-ALTER TABLE Run_Partition MODIFY COLUMN purposeId bigint(20) NOT NULL;
 ALTER TABLE Run_Partition ADD COLUMN lastModifier bigint(20);
-UPDATE Run_Partition SET lastModifier = (SELECT userId FROM User WHERE loginName = 'admin');
-ALTER TABLE Run_Partition MODIFY COLUMN lastModifier bigint(20) NOT NULL;
 ALTER TABLE Run_Partition ADD CONSTRAINT runPartition_lastModifier FOREIGN KEY (lastModifier) REFERENCES User (userId);
 
 INSERT INTO Run_Partition (runId, partitionId)
@@ -33,8 +30,12 @@ WHERE NOT EXISTS (
   WHERE runId = rspc.Run_runId AND partitionId = spcp.partitions_partitionId
 );
 
+UPDATE Run_Partition SET lastModifier = (SELECT userId FROM User WHERE loginName = 'admin');
+ALTER TABLE Run_Partition MODIFY COLUMN lastModifier bigint(20) NOT NULL;
+
 UPDATE Run_Partition
 SET purposeId = (SELECT purposeId FROM RunPurpose WHERE alias = 'Production');
+ALTER TABLE Run_Partition MODIFY COLUMN purposeId bigint(20) NOT NULL;
 
 CREATE TABLE Run_Partition_LibraryAliquot (
   runId bigint(20) NOT NULL,
