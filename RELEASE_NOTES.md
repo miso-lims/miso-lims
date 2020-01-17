@@ -16,6 +16,9 @@ Changes:
     on bulk sample pages (detailed sample)
   * Export more attributes in Pinery-MISO
     * Run purpose
+    * Single Cell Stock (detailed sample) attributes
+      * Target cell recovery
+      * Cell Viability
   * Fixed detailed sample pages loading
   * Fixed error updating transfer items
   * Fixed receipt validation errors when date of receipt is not specified
