@@ -936,6 +936,34 @@ public class MisoClient implements Lims {
         public String extractStringValueFrom(ResultSet rs) throws SQLException {
           return extractBigDecimalString(rs, getSqlKey());
         }
+      }, //
+      SPIKE_IN("spike_in", "Spike-In"), //
+      SPIKE_IN_DILUTION("spike_in_dilution_factor", "Spike-In Dilution Factor") {
+        @Override
+        public String extractStringValueFrom(ResultSet rs) throws SQLException {
+          String raw = rs.getString(getSqlKey());
+          if (raw == null) {
+            return null;
+          }
+          switch (raw) {
+          case "TEN":
+            return "0.1";
+          case "HUNDRED":
+            return "0.01";
+          case "THOUSAND":
+            return "0.001";
+          case "TEN_THOUSAND":
+            return "0.0001";
+          default:
+            return null;
+          }
+        }
+      }, //
+      SPIKE_IN_VOLUME("spike_in_volume_ul", "Spike-In-Volume (uL)") {
+        @Override
+        public String extractStringValueFrom(ResultSet rs) throws SQLException {
+          return extractBigDecimalString(rs, getSqlKey());
+        }
       };
 
       private final String sqlKey;

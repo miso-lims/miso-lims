@@ -19,6 +19,10 @@ Changes:
     * Single Cell Stock (detailed sample) attributes
       * Target cell recovery
       * Cell Viability
+    * Library spike-in attributes
+      * Spike-in
+      * Spike-in dilution factor
+      * Spike-in volume
   * Fixed detailed sample pages loading
   * Fixed error updating transfer items
   * Fixed receipt validation errors when date of receipt is not specified
