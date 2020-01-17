@@ -92,27 +92,33 @@ SELECT userId, @internalGroup
 FROM User
 WHERE INTERNAL = TRUE;
 
-CREATE VIEW TissueParentView AS
-SELECT s.sampleId, st.sampleId AS tissueId
-FROM Sample s
-LEFT JOIN DetailedSample ds ON ds.sampleId = s.sampleId
-LEFT JOIN DetailedSample p1 ON p1.sampleId = ds.parentId
-LEFT JOIN DetailedSample p2 ON p2.sampleId = p1.parentId
-LEFT JOIN DetailedSample p3 ON p3.sampleId = p2.parentId
-LEFT JOIN DetailedSample p4 ON p4.sampleId = p3.parentId
-LEFT JOIN DetailedSample p5 ON p5.sampleId = p4.parentId
-LEFT JOIN DetailedSample p6 ON p6.sampleId = p5.parentId
-LEFT JOIN DetailedSample p7 ON p7.sampleId = p6.parentId
-LEFT JOIN SampleTissue st ON st.sampleId = COALESCE(
-  (SELECT sampleId FROM SampleTissue WHERE sampleId = s.sampleId),
-  (SELECT sampleId FROM SampleTissue WHERE sampleId = p1.sampleId),
-  (SELECT sampleId FROM SampleTissue WHERE sampleId = p2.sampleId),
-  (SELECT sampleId FROM SampleTissue WHERE sampleId = p3.sampleId),
-  (SELECT sampleId FROM SampleTissue WHERE sampleId = p4.sampleId),
-  (SELECT sampleId FROM SampleTissue WHERE sampleId = p5.sampleId),
-  (SELECT sampleId FROM SampleTissue WHERE sampleId = p6.sampleId),
-  (SELECT sampleId FROM SampleTissue WHERE sampleId = p7.sampleId)
-);
+SET sql_notes = 0;
+DELIMITER //
+
+DROP FUNCTION IF EXISTS findParentWithLab//
+CREATE FUNCTION findParentWithLab(pSampleId bigint(20)) RETURNS bigint(20)
+BEGIN
+  DECLARE vTissueId bigint(20);
+  SET vTissueId = pSampleId;
+  WHILE vTissueId IS NOT NULL AND NOT EXISTS (SELECT sampleId FROM SampleTissue WHERE sampleId = vTissueId AND labId IS NOT NULL) DO
+    SELECT parentId INTO vTissueId FROM DetailedSample WHERE sampleId = vTissueId;
+  END WHILE;
+  RETURN vTissueId;
+END//
+
+DELIMITER ;
+SET sql_notes = 1;
+
+CREATE TABLE TissueParentView (
+  sampleId bigint(20),
+  tissueId bigint(20)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO TissueParentView (sampleId, tissueId)
+SELECT sampleId, findParentWithLab(sampleId)
+FROM Sample;
+
+DROP FUNCTION findParentWithLab;
 
 -- Construct inbound sample transfers
 INSERT INTO TemporaryTransfer(projectId, receivedDate, creator, labId)
@@ -122,11 +128,9 @@ JOIN TissueParentView v ON v.sampleId = s.sampleId
 LEFT JOIN SampleTissue st ON st.sampleId = v.tissueId
 WHERE s.receivedDate IS NOT NULL;
 
--- Disable "Duplicate entry" warnings
-SET sql_notes = 0;
-INSERT IGNORE INTO User_Group (users_userId, groups_groupId)
-SELECT DISTINCT creator, @internalGroup FROM TemporaryTransfer;
-SET sql_notes = 1;
+INSERT INTO User_Group (users_userId, groups_groupId)
+SELECT DISTINCT creator, @internalGroup FROM TemporaryTransfer
+WHERE NOT EXISTS (SELECT 1 FROM User_Group WHERE users_userId = creator AND groups_groupId = @internalGroup);
 
 INSERT INTO Transfer(transferId, transferDate, senderLabId, recipientGroupId, creator, created, lastModifier, lastModified)
 SELECT transferId, receivedDate, labId, @internalGroup, creator, @now, creator, @now
@@ -157,11 +161,9 @@ JOIN TissueParentView v ON v.sampleId = s.sampleId
 LEFT JOIN SampleTissue st ON st.sampleId = v.tissueId
 WHERE l.receivedDate IS NOT NULL;
 
--- Disable "Duplicate entry" warnings
-SET sql_notes = 0;
-INSERT IGNORE INTO User_Group (users_userId, groups_groupId)
-SELECT DISTINCT creator, @internalGroup FROM TemporaryTransfer;
-SET sql_notes = 1;
+INSERT INTO User_Group (users_userId, groups_groupId)
+SELECT DISTINCT creator, @internalGroup FROM TemporaryTransfer
+WHERE NOT EXISTS (SELECT 1 FROM User_Group WHERE users_userId = creator AND groups_groupId = @internalGroup);
 
 INSERT INTO Transfer(transferId, transferDate, senderLabId, recipientGroupId, creator, created, lastModifier, lastModified)
 SELECT transferId, receivedDate, labId, @internalGroup, @admin, @now, @admin, @now
@@ -183,7 +185,7 @@ LEFT JOIN SampleTissue st ON st.sampleId = v.tissueId
 WHERE l.receivedDate IS NOT NULL;
 
 DROP TABLE TemporaryTransfer;
-DROP VIEW TissueParentView;
+DROP TABLE TissueParentView;
 
 -- Construct outbound sample transfers
 CREATE TABLE TemporaryTransfer (
