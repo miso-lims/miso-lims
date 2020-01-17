@@ -68,6 +68,8 @@ SELECT s.alias NAME
         ,slide.markedAreaSize marked_area_size
         ,slide.markedAreaPercentTumour marked_area_percent_tumour
         ,COALESCE(pieceRefSlide.name, ssRefSlide.name) reference_slide_id
+        ,sssc.targetCellRecovery target_cell_recovery
+        ,sssc.cellViability cell_viability
 FROM Sample s
 LEFT JOIN DetailedSample sai ON sai.sampleId = s.sampleId 
 LEFT JOIN DetailedQcStatus qpd ON qpd.detailedQcStatusId = sai.detailedQcStatusId 
@@ -85,6 +87,7 @@ LEFT JOIN TissueMaterial tm ON tm.tissueMaterialId = st.tissueMaterialId
 LEFT JOIN Lab la ON st.labId = la.labId
 LEFT JOIN Institute it ON la.instituteId = it.instituteId
 LEFT JOIN SampleStock ss ON sai.sampleId = ss.sampleId
+LEFT JOIN SampleStockSingleCell sssc ON sssc.sampleId = ss.sampleId
 LEFT JOIN Sample ssRefSlide ON ssRefSlide.sampleId = ss.referenceSlideId
 LEFT JOIN SampleSlide slide ON slide.sampleId = s.sampleId
 LEFT JOIN Stain stain ON stain.stainId = slide.stain
@@ -255,6 +258,8 @@ SELECT l.alias NAME
         ,NULL marked_area_size
         ,NULL marked_area_percent_tumour
         ,NULL reference_slide_id
+        ,NULL target_cell_recovery
+        ,NULL cell_viability
 FROM Library l 
 LEFT JOIN Sample parent ON parent.sampleId = l.sample_sampleId
 LEFT JOIN Project sp ON sp.projectId = parent.project_projectId
@@ -396,6 +401,8 @@ SELECT d.alias name
         ,NULL marked_area_size
         ,NULL marked_area_percent_tumour
         ,NULL reference_slide_id
+        ,NULL target_cell_recovery
+        ,NULL cell_viability
 FROM LibraryAliquot d 
 LEFT JOIN LibraryAliquot laParent ON laParent.aliquotId = d.parentAliquotId
 JOIN Library lib ON lib.libraryId = d.libraryId 

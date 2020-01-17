@@ -924,7 +924,19 @@ public class MisoClient implements Lims {
           return extractBigDecimalString(rs, getSqlKey());
         }
       }, //
-      REERENCE_SLIDE_ID("reference_slide_id", "Reference Slide");
+      REFERENCE_SLIDE_ID("reference_slide_id", "Reference Slide"), //
+      TARGET_CELL_RECOVERY("target_cell_recovery", "Target Cell Recovery") {
+        @Override
+        public String extractStringValueFrom(ResultSet rs) throws SQLException {
+          return extractBigDecimalString(rs, getSqlKey());
+        }
+      }, //
+      CELL_VIABILITY("cell_viability", "Cell Viability") {
+        @Override
+        public String extractStringValueFrom(ResultSet rs) throws SQLException {
+          return extractBigDecimalString(rs, getSqlKey());
+        }
+      };
 
       private final String sqlKey;
       private final String attributeKey;
