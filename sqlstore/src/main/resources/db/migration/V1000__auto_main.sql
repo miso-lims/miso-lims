@@ -1,3 +1,4 @@
+-- transfers
 CREATE TABLE Transfer (
   transferId bigint(20) PRIMARY KEY AUTO_INCREMENT,
   transferDate DATE NOT NULL,
@@ -320,3 +321,173 @@ ALTER TABLE LibraryAliquot DROP COLUMN distributionRecipient;
 ALTER TABLE Pool DROP COLUMN distributed;
 ALTER TABLE Pool DROP COLUMN distributionDate;
 ALTER TABLE Pool DROP COLUMN distributionRecipient;
+
+-- run_approval
+ALTER TABLE Run ADD COLUMN dataApproved BOOLEAN;
+ALTER TABLE Run ADD COLUMN dataApproverId bigint(20);
+ALTER TABLE Run ADD CONSTRAINT fk_run_approver FOREIGN KEY (dataApproverId) REFERENCES User (userId);
+
+-- remove_old_triggers
+-- StartNoTest
+-- Disable "x does not exist" warnings
+SET sql_notes = 0;
+
+DROP TRIGGER IF EXISTS LibraryAdditionalInfoChange;
+DROP TRIGGER IF EXISTS BeforeInsertLibrary;
+DROP TRIGGER IF EXISTS BeforeInsertPool;
+DROP TRIGGER IF EXISTS RunChangePacBio;
+DROP TRIGGER IF EXISTS SampleAdditionalInfoChange;
+DROP TRIGGER IF EXISTS SampleCVSlideChange;
+DROP TRIGGER IF EXISTS BeforeInsertSample;
+DROP TRIGGER IF EXISTS LibraryAdditionalInfoChange;
+DROP TRIGGER IF EXISTS PlateChange;
+DROP TRIGGER IF EXISTS PlateInsert;
+DROP TRIGGER IF EXISTS SampleLCMTubeChange;
+DROP TRIGGER IF EXISTS StatusChange;
+
+DROP FUNCTION IF EXISTS `nextval`;
+DROP PROCEDURE IF EXISTS moveBoxItem;
+DROP PROCEDURE IF EXISTS removeBoxItem;
+DROP VIEW IF EXISTS BoxableView;
+
+DROP PROCEDURE IF EXISTS addBoxSize;
+DROP PROCEDURE IF EXISTS addBoxUse;
+DROP PROCEDURE IF EXISTS addContainerModel;
+DROP PROCEDURE IF EXISTS addIndex;
+DROP PROCEDURE IF EXISTS addIndexFamily;
+DROP PROCEDURE IF EXISTS addInstitute;
+DROP PROCEDURE IF EXISTS addInstrument;
+DROP PROCEDURE IF EXISTS addInstrumentModel;
+DROP PROCEDURE IF EXISTS addKitDescriptor;
+DROP PROCEDURE IF EXISTS addLab;
+DROP PROCEDURE IF EXISTS addLibraryDesign;
+DROP PROCEDURE IF EXISTS addLibraryDesignCode;
+DROP PROCEDURE IF EXISTS addLibraryType;
+DROP PROCEDURE IF EXISTS addQcType;
+DROP PROCEDURE IF EXISTS addReferenceGenome;
+DROP PROCEDURE IF EXISTS addSamplePurpose;
+DROP PROCEDURE IF EXISTS addSequencingParameters;
+DROP PROCEDURE IF EXISTS addTargetedSequencing;
+DROP PROCEDURE IF EXISTS addTissueMaterial;
+DROP PROCEDURE IF EXISTS addTissueOrigin;
+DROP PROCEDURE IF EXISTS addTissueType;
+DROP PROCEDURE IF EXISTS deleteContainer;
+DROP PROCEDURE IF EXISTS deleteLibrary;
+DROP PROCEDURE IF EXISTS deleteLibraryAliquot;
+DROP PROCEDURE IF EXISTS deletePool;
+DROP PROCEDURE IF EXISTS deleteRun;
+DROP PROCEDURE IF EXISTS deleteSample;
+
+SET sql_notes = 1;
+-- EndNoTest
+
+-- sample_hierarchy
+CREATE TABLE SampleHierarchy (
+  sampleId bigint(20) PRIMARY KEY,
+  identityId bigint(20),
+  tissueId bigint(20),
+  CONSTRAINT fk_sampleHierarchy_sample FOREIGN KEY (sampleId) REFERENCES DetailedSample (sampleId) ON DELETE CASCADE,
+  CONSTRAINT fk_sampleHierarchy_identity FOREIGN KEY (identityId) REFERENCES Identity (sampleId),
+  CONSTRAINT fk_sampleHierarchy_tissue FOREIGN KEY (tissueId) REFERENCES SampleTissue (sampleId)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+SET sql_notes = 0;
+DELIMITER //
+
+DROP FUNCTION IF EXISTS getParentTissueId//
+CREATE FUNCTION getParentTissueId(pSampleId bigint(20)) RETURNS bigint(20)
+BEGIN
+  DECLARE vTissueId bigint(20);
+  SET vTissueId = pSampleId;
+  WHILE vTissueId IS NOT NULL AND NOT EXISTS (SELECT sampleId FROM SampleTissue WHERE sampleId = vTissueId) DO
+    SELECT parentId INTO vTissueId FROM DetailedSample WHERE sampleId = vTissueId;
+  END WHILE;
+  RETURN vTissueId;
+END//
+
+DROP FUNCTION IF EXISTS getParentIdentityId//
+CREATE FUNCTION getParentIdentityId(pSampleId bigint(20)) RETURNS bigint(20)
+BEGIN
+  DECLARE vIdentityId bigint(20);
+  SET vIdentityId = pSampleId;
+  WHILE vIdentityId IS NOT NULL AND NOT EXISTS (SELECT sampleId FROM Identity WHERE sampleId = vIdentityId) DO
+    SELECT parentId INTO vIdentityId FROM DetailedSample WHERE sampleId = vIdentityId;
+  END WHILE;
+  RETURN vIdentityId;
+END//
+
+DELIMITER ;
+SET sql_notes = 1;
+
+INSERT INTO SampleHierarchy(sampleId, identityId, tissueId)
+SELECT sampleId, getParentIdentityId(sampleId), getParentTissueId(sampleId)
+FROM DetailedSample;
+
+DROP FUNCTION getParentTissueId;
+DROP FUNCTION getParentIdentityId;
+
+-- slide_fields
+ALTER TABLE SampleSlide ADD COLUMN percentTumour DECIMAL(11,8);
+ALTER TABLE SampleSlide ADD COLUMN percentNecrosis DECIMAL(11,8);
+ALTER TABLE SampleSlide ADD COLUMN markedAreaSize DECIMAL(11,8);
+ALTER TABLE SampleSlide ADD COLUMN markedAreaPercentTumour DECIMAL(11,8);
+
+ALTER TABLE SampleTissuePiece ADD COLUMN referenceSlideId bigint(20);
+ALTER TABLE SampleTissuePiece ADD CONSTRAINT fk_sampleTissuePiece_referenceSlide FOREIGN KEY (referenceSlideId) REFERENCES SampleSlide(sampleId);
+ALTER TABLE SampleStock ADD COLUMN referenceSlideId bigint(20);
+ALTER TABLE SampleStock ADD CONSTRAINT fk_sampleStock_referenceSlide FOREIGN KEY (referenceSlideId) REFERENCES SampleSlide(sampleId);
+
+-- run_purposes
+-- Disable "trigger doesn't exist" warnings
+SET sql_notes = 0;
+DROP TRIGGER IF EXISTS PartitionQCInsert;
+DROP TRIGGER IF EXISTS PartitionQCUpdate;
+SET sql_notes = 1;
+
+RENAME TABLE OrderPurpose TO RunPurpose;
+
+ALTER TABLE Instrument ADD COLUMN defaultPurposeId bigint(20);
+ALTER TABLE Instrument ADD CONSTRAINT instrument_defaultPurpose FOREIGN KEY (defaultPurposeId) REFERENCES RunPurpose (purposeId);
+UPDATE Instrument inst
+JOIN InstrumentModel im ON im.instrumentModelId = inst.instrumentModelId
+SET defaultPurposeId = (SELECT purposeId FROM RunPurpose WHERE alias = 'Production')
+WHERE im.instrumentType = 'SEQUENCER';
+
+RENAME TABLE Run_Partition_QC TO Run_Partition;
+
+ALTER TABLE Run_Partition MODIFY COLUMN partitionQcTypeId bigint(20);
+ALTER TABLE Run_Partition ADD COLUMN purposeId bigint(20);
+ALTER TABLE Run_Partition ADD CONSTRAINT runPartition_purpose FOREIGN KEY (purposeId) REFERENCES RunPurpose (purposeId);
+ALTER TABLE Run_Partition ADD COLUMN lastModifier bigint(20);
+ALTER TABLE Run_Partition ADD CONSTRAINT runPartition_lastModifier FOREIGN KEY (lastModifier) REFERENCES User (userId);
+
+INSERT INTO Run_Partition (runId, partitionId)
+SELECT rspc.Run_runId, spcp.partitions_partitionId
+FROM Run_SequencerPartitionContainer rspc
+JOIN SequencerPartitionContainer_Partition spcp ON spcp.container_containerId = rspc.containers_containerId
+WHERE NOT EXISTS (
+  SELECT 1 FROM Run_Partition
+  WHERE runId = rspc.Run_runId AND partitionId = spcp.partitions_partitionId
+);
+
+UPDATE Run_Partition SET lastModifier = (SELECT userId FROM User WHERE loginName = 'admin');
+ALTER TABLE Run_Partition MODIFY COLUMN lastModifier bigint(20) NOT NULL;
+
+UPDATE Run_Partition
+SET purposeId = (SELECT purposeId FROM RunPurpose WHERE alias = 'Production');
+ALTER TABLE Run_Partition MODIFY COLUMN purposeId bigint(20) NOT NULL;
+
+CREATE TABLE Run_Partition_LibraryAliquot (
+  runId bigint(20) NOT NULL,
+  partitionId bigint(20) NOT NULL,
+  aliquotId bigint(20) NOT NULL,
+  purposeId bigint(20),
+  lastModifier bigint(20) NOT NULL,
+  PRIMARY KEY (runId, partitionId, aliquotId),
+  CONSTRAINT runAliquot_run FOREIGN KEY (runId) REFERENCES Run (runId),
+  CONSTRAINT runAliquot_partition FOREIGN KEY (partitionId) REFERENCES _Partition (partitionId),
+  CONSTRAINT runAliquot_aliquot FOREIGN KEY (aliquotId) REFERENCES LibraryAliquot (aliquotId),
+  CONSTRAINT runAliquot_purpose FOREIGN KEY (purposeId) REFERENCES RunPurpose (purposeId),
+  CONSTRAINT runAliquot_lastModifier FOREIGN KEY (lastModifier) REFERENCES User (userId)
+) Engine=InnoDB DEFAULT CHARSET=utf8;
+

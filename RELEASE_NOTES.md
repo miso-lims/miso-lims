@@ -2,6 +2,12 @@
 
 Changes:
 
+
+
+# 0.2.198
+
+Changes:
+
   * Tranfer/Distribution Overhaul
     * Transfers can now be created to show when items are handed from one lab or group to another
     * Item receipt and QC can be confirmed for each item in a transfer
