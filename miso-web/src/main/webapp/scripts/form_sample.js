@@ -450,9 +450,7 @@ FormTarget.sample = (function($) {
               title: 'Reference Slide',
               data: 'referenceSlideId',
               type: 'dropdown',
-              getSource: function() {
-                return object.relatedSlides;
-              },
+              source: object.relatedSlides,
               getItemLabel: function(item) {
                 return item.name + ' (' + item.alias + ')';
               },
@@ -493,9 +491,7 @@ FormTarget.sample = (function($) {
               title: 'Reference Slide',
               data: 'referenceSlideId',
               type: 'dropdown',
-              getSource: function() {
-                return object.relatedSlides;
-              },
+              source: object.relatedSlides,
               getItemLabel: function(item) {
                 return item.name + ' (' + item.alias + ')';
               },
