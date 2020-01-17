@@ -60,6 +60,8 @@ CREATE TABLE Transfer_Pool (
   CONSTRAINT fk_transfer_pool FOREIGN KEY (poolId) REFERENCES Pool (poolId)
 ) Engine=InnoDB DEFAULT CHARSET=utf8;
 
+ALTER TABLE Lab ADD COLUMN excludeFromPinery BOOLEAN NOT NULL DEFAULT FALSE;
+
 -- StartNoTest
 CREATE TABLE TemporaryTransfer (
   transferId bigint(20) PRIMARY KEY AUTO_INCREMENT,
@@ -75,8 +77,8 @@ SET @now = NOW();
 INSERT INTO Institute(alias, createdBy, updatedBy) VALUES
 ('External', @admin, @admin);
 
-INSERT INTO Lab(instituteId, alias, createdBy, updatedBy) VALUES
-((SELECT instituteId FROM Institute WHERE alias = 'External'), 'Not Specified', @admin, @admin);
+INSERT INTO Lab(instituteId, alias, createdBy, updatedBy, excludeFromPinery) VALUES
+((SELECT instituteId FROM Institute WHERE alias = 'External'), 'Not Specified', @admin, @admin, TRUE);
 
 SET @unknownLab = LAST_INSERT_ID();
 
