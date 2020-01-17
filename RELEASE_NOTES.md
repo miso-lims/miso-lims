@@ -14,6 +14,8 @@ Changes:
   * Added buttons to sort by location (box position) on bulk pages
   * Added parent alias and location columns and buttons to sort by parent location (box position)
     on bulk sample pages (detailed sample)
+  * Export more attributes in Pinery-MISO
+    * Run purpose
   * Fixed detailed sample pages loading
   * Fixed error updating transfer items
   * Fixed receipt validation errors when date of receipt is not specified

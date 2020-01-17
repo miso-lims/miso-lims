@@ -389,21 +389,24 @@ public class MisoClient implements Lims {
   }
 
   private List<MisoRunPosition> mapSamplesToPositions(List<MisoRunPosition> positions, List<MisoRunSample> samples) {
-    Map<Integer, List<MisoRunPosition>> map = new HashMap<>();
-    for (MisoRunPosition p : positions) {
-      if (!map.containsKey(p.getPartitionId())) {
-        map.put(p.getPartitionId(), new ArrayList<>());
+    Map<Integer, Map<Integer, MisoRunPosition>> runMap = new HashMap<>();
+    for (MisoRunPosition position : positions) {
+      if (!runMap.containsKey(position.getRunId())) {
+        runMap.put(position.getRunId(), new HashMap<>());
       }
-      map.get(p.getPartitionId()).add(p);
+      Map<Integer, MisoRunPosition> partitionMap = runMap.get(position.getRunId());
+      partitionMap.put(position.getPartitionId(), position);
     }
+
     for (MisoRunSample s : samples) {
-      List<MisoRunPosition> ps = map.get(s.getPartitionId());
-      if (ps != null) {
-        for (MisoRunPosition p : ps) {
-          Set<RunSample> rs = p.getRunSample();
+      Map<Integer, MisoRunPosition> partitionMap = runMap.get(s.getRunId());
+      if (partitionMap != null) {
+        MisoRunPosition ps = partitionMap.get(s.getPartitionId());
+        if (ps != null) {
+          Set<RunSample> rs = ps.getRunSample();
           if (rs == null) {
             rs = new HashSet<>();
-            p.setRunSample(rs);
+            ps.setRunSample(rs);
           }
           rs.add(s);
         }
@@ -663,6 +666,7 @@ public class MisoClient implements Lims {
       p.setPoolModified(rs.getTimestamp("pool_modified"));
       p.setAnalysisSkipped(rs.getBoolean("analysis_skipped"));
       p.setQcStatus(rs.getString("qc_status"));
+      p.setRunPurpose(rs.getString("run_purpose"));
 
       return p;
     }
@@ -1058,11 +1062,13 @@ public class MisoClient implements Lims {
       MisoRunSample s = new MisoRunSample();
 
       s.setId(rs.getString("aliquotId"));
+      s.setRunId(rs.getInt("runId"));
       s.setPartitionId(rs.getInt("partitionId"));
       s.setBarcode(AttributeKey.BARCODE.extractStringValueFrom(rs));
       String barcode2 = AttributeKey.BARCODE_TWO.extractStringValueFrom(rs);
       boolean reverseComplement2 = rs.getString("dataManglingPolicy").equals("I5_RC");
       s.setBarcodeTwo(reverseComplement2 ? reverseComplement(barcode2) : barcode2);
+      s.setRunPurpose(rs.getString("run_purpose"));
 
       Attribute att = AttributeKey.TARGETED_RESEQUENCING.extractAttributeFrom(rs);
       if (att != null) {

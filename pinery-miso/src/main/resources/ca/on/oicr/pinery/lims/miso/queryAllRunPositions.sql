@@ -1,6 +1,7 @@
 SELECT p.partitionId
   ,p.partitionNumber
   ,pqt.analysisSkipped AS analysis_skipped
+  ,rp.alias AS run_purpose
   ,pqt.description AS qc_status
   ,r_spc.Run_runId
   ,pool.poolId
@@ -17,3 +18,4 @@ JOIN SequencerPartitionContainer_Partition AS spc_p ON spc_p.partitions_partitio
 JOIN Run_SequencerPartitionContainer AS r_spc ON r_spc.containers_containerId = spc_p.container_containerId
 LEFT JOIN Run_Partition rpq ON rpq.runId = r_spc.Run_runId AND rpq.partitionId = p.partitionId
 LEFT JOIN PartitionQCType pqt ON pqt.partitionQcTypeId = rpq.partitionQcTypeId
+LEFT JOIN RunPurpose rp ON rp.purposeId = rpq.purposeId
