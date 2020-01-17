@@ -2,7 +2,7 @@
 
 Changes:
 
-
+  * Fix detailed sample pages loading
 
 # 0.2.198
 
@@ -63,6 +63,10 @@ Upgrade Notes:
     a new purpose with the alias 'Production' before migrating your database to the new version.
     All sequencers will then be given a default purpose of 'Production.' After migrating, you can
     change each instrument's default purpose and delete the 'Production' purpose if you choose.
+
+BAD:
+
+  * Individual sample pages do not load correctly in detailed mode
 
 # 0.2.197
 
