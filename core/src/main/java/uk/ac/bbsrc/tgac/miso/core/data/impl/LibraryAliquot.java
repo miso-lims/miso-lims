@@ -375,7 +375,7 @@ public class LibraryAliquot extends AbstractBoxable
 
   @Override
   public String getBarcodeExtraInfo() {
-    return library.getName();
+    return null;
   }
 
   @Override
