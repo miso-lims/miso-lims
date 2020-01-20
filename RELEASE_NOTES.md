@@ -3,6 +3,7 @@
 Changes:
 
   * Fix detailed sample pages loading
+  * Don't show library name on library aliquot labels
 
 # 0.2.198
 
