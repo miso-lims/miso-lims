@@ -55,7 +55,32 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forString("Group ID", effectiveGroupIdProperty(GroupIdentifiable::getGroupId)), //
       Column.forString("Group Description", effectiveGroupIdProperty(GroupIdentifiable::getGroupDescription)), //
       Column.forString("Barcode", Sample::getIdentificationBarcode)
-	);
+  ), //
+  INITIAL_EXTRACTION_YIELDS("Initial Extraction Yields List", //
+      Arrays.asList(SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME), //
+      Column.forString("Alias", Sample::getAlias), Column.forString("Type", detailedSample(SampleStock.class, (sam -> {
+        if (sam.getSampleClass().getAlias().contains("DNA")) {
+          return "DNA";
+        } else if (sam.getSampleClass().getAlias().contains("RNA")) {
+          return "RNA";
+        } else {
+          return "Other";
+        }
+      }), "Other")), //
+      Column.forString("External Identifier", detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
+      Column.forBigDecimal("VOL (uL)", Sample::getInitialVolume), //
+      Column.forBigDecimal("[] (ng/uL)", Sample::getConcentration), //
+      Column.forBigDecimal("Total (ng)",
+          (sam -> (sam.getVolume() != null && sam.getConcentration() != null) ? sam.getVolume().multiply(sam.getConcentration()) : null)), //
+      Column.forString("Subproject",
+          (sam -> (LimsUtils.isDetailedSample(sam) && ((DetailedSample) sam).getSubproject() != null
+              ? ((DetailedSample) sam).getSubproject().getAlias()
+              : ""))), //
+      Column.forString("Group ID", effectiveGroupIdProperty(GroupIdentifiable::getGroupId)), //
+      Column.forString("Group Description", effectiveGroupIdProperty(GroupIdentifiable::getGroupDescription)), //
+      Column.forString("Barcode", Sample::getIdentificationBarcode), //
+      Column.forString("Created By", s -> s.getCreator().getLoginName()), //
+      Column.forDate("Created Date", Sample::getCreationTime));
   
   private static <S extends DetailedSample, T> Function<Sample, T> detailedSample(Class<S> clazz, Function<S, T> function, T defaultValue) {
     return s -> {
