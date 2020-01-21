@@ -2,6 +2,7 @@
 
 Changes:
 
+  * Freeze "Parent Alias" column on the bulk Propagate Samples page
   * Fix detailed sample pages loading
   * Don't show library name on library aliquot labels
 
