@@ -4,6 +4,7 @@ Changes:
 
   * Fixed detailed sample pages loading
   * Fixed error updating transfer items
+  * Fixed receipt validation errors when date of receipt is not specified
   * Don't show library name on library aliquot labels
 
 # 0.2.198
