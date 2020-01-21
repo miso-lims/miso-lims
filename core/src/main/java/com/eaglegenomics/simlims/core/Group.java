@@ -35,8 +35,12 @@ public class Group implements Serializable, Comparable<Group>, Deletable, Identi
   private static final long serialVersionUID = 1L;
   private static final long UNSAVED_ID = 0L;
 
+  public static final String RUN_APPROVERS = "Run Approvers";
+
   private String description = "";
   private String name = "";
+  private boolean builtIn;
+
   @ManyToMany(targetEntity = UserImpl.class)
   @Fetch(FetchMode.SUBSELECT)
   @JoinTable(name = "User_Group", joinColumns = { @JoinColumn(name = "groups_groupId") }, inverseJoinColumns = {
@@ -62,20 +66,28 @@ public class Group implements Serializable, Comparable<Group>, Deletable, Identi
     return description;
   }
 
-  public String getName() {
-    return name;
-  }
-
-  public Set<User> getUsers() {
-    return users;
-  }
-
   public void setDescription(String description) {
     this.description = description;
   }
 
+  public String getName() {
+    return name;
+  }
+
   public void setName(String name) {
     this.name = name;
+  }
+
+  public boolean isBuiltIn() {
+    return builtIn;
+  }
+
+  public void setBuiltIn(boolean builtIn) {
+    this.builtIn = builtIn;
+  }
+
+  public Set<User> getUsers() {
+    return users;
   }
 
   public void setUsers(Set<User> users) {

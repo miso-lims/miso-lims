@@ -2,6 +2,8 @@
 
 Changes:
 
+  * Added "Run Approvers" group. Only users in this group will be allowed to modifiy "Data
+    Approved" on the Edit Run page
   * Fixed detailed sample pages loading
   * Fixed error updating transfer items
   * Don't show library name on library aliquot labels
