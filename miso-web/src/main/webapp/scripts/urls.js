@@ -553,7 +553,7 @@ Urls = (function() {
     freezers: storageLocationRestBase + '/freezers',
     updateComponent: idUrlFunction(storageLocationRestBase),
     updateFreezer: idUrlFunction(storageLocationRestBase + '/freezers'),
-    queryByBarcode: storageLocationRestBase + '/byBarcode'
+    queryByBarcode: storageLocationRestBase + '/bybarcode'
   };
 
   // Studies
