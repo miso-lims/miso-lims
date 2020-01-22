@@ -5,6 +5,7 @@ Changes:
   * Allow removing box from freezer on Edit Box page
   * Fixed detailed sample pages loading
   * Fixed error updating transfer items
+  * Fixed receipt validation errors when date of receipt is not specified
   * Fixed error when scanning freezer location on Edit Box page
   * Don't show library name on library aliquot labels
 
