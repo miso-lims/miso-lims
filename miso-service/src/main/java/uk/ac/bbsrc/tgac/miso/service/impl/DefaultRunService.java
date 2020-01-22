@@ -27,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -356,8 +355,9 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       errors.add(new ValidationError("sequencingKitId", "Must be a sequencing kit"));
     }
 
-    if (((before == null && changed.isDataApproved() != null) || isChanged(Run::isDataApproved, changed, before))
-        && authorizationManager.getCurrentUser().getGroups().stream().noneMatch(group -> Group.RUN_APPROVERS.equals(group.getName()))) {
+    User user = authorizationManager.getCurrentUser();
+    if (((before == null && changed.isDataApproved() != null) || (before != null && isChanged(Run::isDataApproved, changed, before)))
+        && !user.isRunApprover() && !user.isAdmin()) {
       errors.add(new ValidationError("dataApproved", "You are not authorized to make this change"));
     }
     if (changed.isDataApproved() != null && changed.getDataApprover() == null) {

@@ -47,7 +47,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -217,7 +216,7 @@ public class EditRunController {
     ObjectNode formConfig = mapper.createObjectNode();
     User user = authorizationManager.getCurrentUser();
     formConfig.put("isAdmin", user.isAdmin());
-    if (user.getGroups().stream().anyMatch(group -> Group.RUN_APPROVERS.equals(group.getName()))) {
+    if (user.isRunApprover() || user.isAdmin()) {
       formConfig.put("isRunApprover", true);
       formConfig.put("userId", user.getId());
       formConfig.put("userFullName", user.getFullName());
