@@ -96,45 +96,58 @@ FormTarget.box = (function($) {
         }]
       }];
     },
-    onLoad: function() {
-      resetLocationSearch();
+    onLoad: function(form) {
+      resetLocationSearch(form);
     }
   }
 
   function makeLocationSelect(form) {
-    var controls = [];
-    controls.push($('<input>').attr('id', 'freezerLocationScan').attr('type', 'text').css({
-      'width': '25%',
-      'min-width': '120px'
+    var container = $('<div>').css({
+      'width': '95%',
+      'display': 'flex',
+      'align-items': 'center'
+    });
+    container.append($('<input>').attr('id', 'freezerLocationScan').attr('type', 'text').css({
+      'margin-right': '2px',
+      'min-width': '120px',
+      'flex': 1
     }).keyup(function(event) {
       if (event.which == "13") {
-        onLocationScan();
+        onLocationScan(form);
       }
     }).on('paste', function(e) {
       window.setTimeout(function() {
-        onLocationScan();
+        onLocationScan(form);
       }, 100);
     }).after(' '));
-    controls.push($('<span>').attr('id', 'freezerLocationRoot').after(' '));
-    controls.push($('<select>').attr('id', 'freezerLocationSelect').css({
-      'width': '50%',
-      'min-width': '250px'
-    }).change(onLocationSelect).after(' '));
-    controls.push($('<img>').attr('id', 'freezerLocationLoader').addClass('fg-button hidden').attr('src', '/styles/images/ajax-loader.gif')
-        .css('display', 'none').after(' '));
-    controls.push($('<button>').attr('id', 'setFreezerLocation').addClass('ui-state-default').attr('type', 'button').text('Set').click(
+    container.append($('<span>').attr('id', 'freezerLocationRoot').css('margin', '2px'));
+    container.append($('<select>').attr('id', 'freezerLocationSelect').css({
+      'margin': '2px',
+      'min-width': '250px',
+      'flex': 2
+    }).change(function() {
+      onLocationSelect(form);
+    }).after(' '));
+    container.append($('<img>').attr('id', 'freezerLocationLoader').addClass('fg-button hidden').attr('src',
+        '/styles/images/ajax-loader.gif').css('display', 'none').css('margin', '2px'));
+    container.append($('<button>').attr('id', 'setFreezerLocation').addClass('ui-state-default').attr('type', 'button').text('Set').click(
         function() {
           setFreezerLocation(form);
-        }).after(' '));
-    controls.push($('<button>').attr('id', 'resetFreezerLocation').addClass('ui-state-default').attr('type', 'button').text('Reset').click(
-        resetLocationSearch).after(' '));
-    return controls;
+        }).css('margin', '2px'));
+    container.append($('<button>').attr('id', 'resetFreezerLocation').addClass('ui-state-default').attr('type', 'button').text('Reset')
+        .click(function() {
+          resetLocationSearch(form);
+        }).css('margin', '2px'));
+    container.append($('<button>').attr('id', 'removeFreezerLocation').addClass('ui-state-default').attr('type', 'button').text('Remove')
+        .click(function() {
+          removeFreezerLocation(form);
+        }).css('margin', '2px'));
+    return container;
   }
 
-  function onLocationScan() {
+  function onLocationScan(form) {
     $('#freezerLocationLoader').show();
-    Utils.ui.setDisabled('#setFreezerLocation', true);
-    Utils.ui.setDisabled('#resetFreezerLocation', true);
+    disableLocationControls(true, form);
 
     var barcode = $('#freezerLocationScan').val();
 
@@ -149,7 +162,7 @@ FormTarget.box = (function($) {
         function(data) {
           if (data.childLocations && data.childLocations.length) {
             $('#freezerLocationRoot').text(data.fullDisplayLocation + ' > ');
-            setFreezerLocationOptions(data.childLocations, data, false);
+            setFreezerLocationOptions(data.childLocations, data, false, form);
           } else {
             $('#freezerLocationRoot').text('');
             $('#freezerLocationSelect').empty();
@@ -158,25 +171,22 @@ FormTarget.box = (function($) {
             freezerLocations = [data];
             parentFreezerLocation = null;
           }
-          Utils.ui.setDisabled('#setFreezerLocation', !data.availableStorage);
         }).fail(function(response, textStatus, serverStatus) {
       Utils.showOkDialog('Error', ['No storage location found with barcode \'' + barcode + '\'']);
     }).always(function() {
       $('#freezerLocationLoader').hide();
-      Utils.ui.setDisabled('#resetFreezerLocation', false);
+      disableLocationControls(false, form);
     });
   }
 
-  function onLocationSelect() {
+  function onLocationSelect(form) {
     $('#freezerLocationScan').empty();
-    Utils.ui.setDisabled('#setFreezerLocation', true);
-    Utils.ui.setDisabled('#resetFreezerLocation', true);
+    disableLocationControls(true, form);
 
     var location = getSelectedLocation();
 
     if (location.availableStorage) {
-      Utils.ui.setDisabled('#resetFreezerLocation', false);
-      Utils.ui.setDisabled('#setFreezerLocation', false);
+      disableLocationControls(false, form);
     } else {
       $('#freezerLocationLoader').show();
       $.ajax({
@@ -186,24 +196,33 @@ FormTarget.box = (function($) {
         contentType: 'application/json; charset=utf8'
       }).success(function(data) {
         $('#freezerLocationRoot').text(location.fullDisplayLocation + ' > ');
-        setFreezerLocationOptions(data, location, false);
+        setFreezerLocationOptions(data, location, false, form);
       }).fail(function(response, textStatus, serverStatus) {
         Utils.showOkDialog('Error', ['Location search failed']);
       }).always(function() {
         $('#freezerLocationLoader').hide();
-        Utils.ui.setDisabled('#resetFreezerLocation', false);
+        disableLocationControls(false, form);
       });
     }
   }
 
   function setFreezerLocation(form) {
-    Utils.ui.setDisabled('#setFreezerLocation', true);
+    disableLocationControls(true, form);
     var location = getSelectedLocation();
     form.updateField('storageLocationId', {
       value: location.id,
       label: location.fullDisplayLocation
     })
-    resetLocationSearch();
+    resetLocationSearch(form);
+  }
+
+  function removeFreezerLocation(form) {
+    disableLocationControls(true, form);
+    form.updateField('storageLocationId', {
+      value: null,
+      label: 'Unknown'
+    });
+    resetLocationSearch(form);
   }
 
   function getSelectedLocation() {
@@ -219,13 +238,30 @@ FormTarget.box = (function($) {
     }, freezerLocations);
   }
 
-  function resetLocationSearch() {
+  function disableLocationControls(disable, form) {
+    if (disable) {
+      Utils.ui.setDisabled('#setFreezerLocation', true);
+      Utils.ui.setDisabled('#resetFreezerLocation', true);
+      Utils.ui.setDisabled('#removeFreezerLocation', true);
+    } else {
+      if ($('#freezerLocationRoot').text()) {
+        if (getSelectedLocation().availableStorage) {
+          Utils.ui.setDisabled('#setFreezerLocation', false);
+        }
+        Utils.ui.setDisabled('#resetFreezerLocation', false);
+      }
+      if (form.get('storageLocationId')) {
+        Utils.ui.setDisabled('#removeFreezerLocation', false);
+      }
+    }
+  }
+
+  function resetLocationSearch(form) {
+    disableLocationControls(true, form);
     $('#freezerLocationLoader').show();
     $('#freezerLocationScan').empty();
     $('#freezerLocationRoot').text('');
     $('#freezerLocationSelect').empty();
-    Utils.ui.setDisabled('#setFreezerLocation', true);
-    Utils.ui.setDisabled('#resetFreezerLocation', true);
 
     $.ajax({
       url: Urls.rest.storageLocations.freezers,
@@ -233,19 +269,19 @@ FormTarget.box = (function($) {
       dataType: 'json',
       contentType: 'application/json; charset=utf8'
     }).success(function(data) {
-      setFreezerLocationOptions(data, null, true);
+      setFreezerLocationOptions(data, null, true, form);
     }).fail(function(response, textStatus, serverStatus) {
       Utils.showOkDialog('Error', ['Freezer search failed']);
     }).always(function() {
       jQuery('#freezerLocationLoader').hide();
-      Utils.ui.setDisabled('#resetFreezerLocation', false);
+      disableLocationControls(false, form);
     });
   }
 
   var freezerLocations = [];
   var parentFreezerLocation = null;
 
-  function setFreezerLocationOptions(locations, parentLocation, fullDisplay) {
+  function setFreezerLocationOptions(locations, parentLocation, fullDisplay, form) {
     freezerLocations = locations;
     parentFreezerLocation = parentLocation;
     $('#freezerLocationSelect').empty();
@@ -272,7 +308,7 @@ FormTarget.box = (function($) {
       });
       if (parentLocation && locations.length === 1) {
         $('#freezerLocationSelect').val(locations[0].id);
-        onLocationSelect();
+        onLocationSelect(form);
       }
     }
   }
