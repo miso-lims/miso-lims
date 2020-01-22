@@ -2,6 +2,7 @@
 
 Changes:
 
+  * Freeze "Parent Alias" column on the bulk Propagate Samples page
   * Allow removing box from freezer on Edit Box page
   * Fixed detailed sample pages loading
   * Fixed error updating transfer items
