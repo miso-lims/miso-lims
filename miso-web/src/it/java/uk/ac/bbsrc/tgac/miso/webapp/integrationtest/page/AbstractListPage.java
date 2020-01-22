@@ -106,6 +106,7 @@ public interface AbstractListPage {
     public static final String SERIAL_NUMBER = "Serial Number";
     public static final String SHORT_NAME = "Short Name";
     public static final String SIZE = "Size";
+    public static final String SIZE_BP = "Size (bp)";
     public static final String SORT = "";
     public static final String START_DATE = "Start Date";
     public static final String STARTED = "Started";

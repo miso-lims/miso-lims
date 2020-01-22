@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -48,6 +49,8 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   protected static final Logger log = LoggerFactory.getLogger(HibernateSampleDao.class);
 
   private final static String[] SEARCH_PROPERTIES = new String[] { "alias", "identificationBarcode", "name" };
+  private final static List<String> STANDARD_ALIASES = Arrays.asList("hierarchyAttributes", "hierarchyAttributes.tissueOrigin",
+      "hierarchyAttributes.tissueType", "sampleClass");
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
@@ -311,12 +314,21 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
 
   @Override
   public Iterable<String> listAliases() {
-    return Collections.emptyList();
+    return STANDARD_ALIASES;
   }
 
   @Override
   public String propertyForSortColumn(String original) {
-    return original;
+    switch (original) {
+    case "effectiveTissueOriginLabel":
+      return "tissueOrigin.alias";
+    case "effectiveTissueTypeLabel":
+      return "tissueType.alias";
+    case "sampleClassId":
+      return "sampleClass.alias";
+    default:
+      return original;
+    }
   }
 
   @Override
@@ -375,6 +387,16 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   public void restrictPaginationBySubproject(Criteria criteria, String subproject, Consumer<String> errorHandler) {
     criteria.createAlias("subproject", "subproject");
     criteria.add(Restrictions.ilike("subproject.alias", subproject, MatchMode.START));
+  }
+
+  @Override
+  public void restrictPaginationByTissueOrigin(Criteria criteria, String origin, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.eq("tissueOrigin.alias", origin));
+  }
+
+  @Override
+  public void restrictPaginationByTissueType(Criteria criteria, String type, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.eq("tissueType.alias", type));
   }
 
   @Override

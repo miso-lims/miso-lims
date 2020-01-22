@@ -422,6 +422,26 @@ public abstract interface PaginationFilter {
     };
   }
 
+  public static PaginationFilter tissueOrigin(String origin) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByTissueOrigin(item, origin, errorHandler);
+      }
+    };
+  }
+
+  public static PaginationFilter tissueType(String type) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByTissueType(item, type, errorHandler);
+      }
+    };
+  }
+
   public abstract <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler);
 
 }

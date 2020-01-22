@@ -57,7 +57,7 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   private String aliquotAlias;
 
-  private Long aliquotDnaSize;
+  private Integer aliquotDnaSize;
 
   private BigDecimal aliquotConcentration;
 
@@ -181,9 +181,7 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     v.setAliquotVolumeUsed(aliquot.getVolumeUsed());
     v.setLastModified(aliquot.getLastModified());
     v.setPreMigrationId(aliquot.getPreMigrationId());
-    if (aliquot.getDnaSize() != null) {
-      v.setAliquotDnaSize(aliquot.getDnaSize().longValue());
-    }
+    v.setAliquotDnaSize(aliquot.getDnaSize());
     if (aliquot.getBox() != null) {
       v.setBoxName(aliquot.getBox().getName());
       v.setBoxAlias(aliquot.getBox().getAlias());
@@ -270,11 +268,11 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     this.aliquotAlias = aliquotAlias;
   }
 
-  public Long getAliquotDnaSize() {
+  public Integer getAliquotDnaSize() {
     return aliquotDnaSize;
   }
 
-  public void setAliquotDnaSize(Long aliquotDnaSize) {
+  public void setAliquotDnaSize(Integer aliquotDnaSize) {
     this.aliquotDnaSize = aliquotDnaSize;
   }
 

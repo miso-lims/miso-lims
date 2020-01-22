@@ -106,14 +106,12 @@ ListTarget.libraryaliquot = {
       "mData": "effectiveTissueOriginLabel",
       "include": Constants.isDetailedSample,
       "mRender": ListUtils.render.naIfNull,
-      "bSortable": false,
       "iSortPriority": 0
     }, {
       "sTitle": "Tissue Type",
       "mData": "effectiveTissueTypeLabel",
       "include": Constants.isDetailedSample,
       "mRender": ListUtils.render.naIfNull,
-      "bSortable": false,
       "iSortPriority": 0
     }, {
       "sTitle": "Design",
@@ -124,6 +122,8 @@ ListTarget.libraryaliquot = {
     }, {
       "sTitle": "Size (bp)",
       "mData": "dnaSize",
+      "sDefaultContent": "",
+      "include": true,
       "iSortPriority": 0
     }, {
       "sTitle": "Indices",
@@ -143,7 +143,7 @@ ListTarget.libraryaliquot = {
       "include": true,
       "iSortPriority": 0,
       "mRender": function(data, type, full) {
-        return full.boxId ? "<a href='/miso/box/" + full.boxId + "'>" + data + "</a>" : data;
+        return full.boxId ? "<a href='" + Urls.ui.boxes.edit(full.boxId) + "'>" + data + "</a>" : data;
       },
       "bSortable": false
     }, {
@@ -166,8 +166,14 @@ ListTarget.libraryaliquot = {
     }];
   },
   searchTermSelector: function(searchTerms) {
-    return [searchTerms['id'], searchTerms['created'], searchTerms['entered'], searchTerms['changed'], searchTerms['creator'],
-        searchTerms['changedby'], searchTerms['platform'], searchTerms['index_name'], searchTerms['index_seq'], searchTerms['box'],
-        searchTerms['freezer'], searchTerms['distributed'], searchTerms['distributedto']]
+    const plainSampleTerms = [searchTerms['id'], searchTerms['created'], searchTerms['entered'], searchTerms['changed'],
+        searchTerms['creator'], searchTerms['changedby'], searchTerms['platform'], searchTerms['index_name'], searchTerms['index_seq'],
+        searchTerms['box'], searchTerms['freezer'], searchTerms['distributed'], searchTerms['distributedto']];
+    const detailedSampleTerms = [searchTerms['tissueOrigin'], searchTerms['tissueType']];
+    if (Constants.isDetailedSample) {
+      return plainSampleTerms.concat(detailedSampleTerms);
+    } else {
+      return plainSampleTerms;
+    }
   }
 };

@@ -372,4 +372,14 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
     errorHandler.accept(String.format("%s has no transfer type", getFriendlyName()));
   }
 
+  @Override
+  public default void restrictPaginationByTissueOrigin(Criteria item, String origin, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s has no tissue origin", getFriendlyName()));
+  }
+
+  @Override
+  public default void restrictPaginationByTissueType(Criteria item, String type, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s has no tissue type", getFriendlyName()));
+  }
+
 }

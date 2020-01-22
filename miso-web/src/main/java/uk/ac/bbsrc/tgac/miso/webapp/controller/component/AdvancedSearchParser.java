@@ -166,6 +166,11 @@ public class AdvancedSearchParser {
         case "requisition":
         case "requisitionId":
           return PaginationFilter.requisitionId(parts[1]);
+        case "tissueOrigin":
+        case "origin":
+          return PaginationFilter.tissueOrigin(parts[1]);
+        case "tissueType":
+          return PaginationFilter.tissueType(parts[1]);
         }
       }
       return PaginationFilter.query(x);

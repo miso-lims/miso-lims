@@ -338,6 +338,16 @@ public class HibernateLibraryDaoIT extends AbstractDAOTest {
     testSearch(PaginationFilter.distributedTo("far away"));
   }
 
+  @Test
+  public void testSearchByTissueOrigin() throws Exception {
+    testSearch(PaginationFilter.tissueOrigin("Ly"));
+  }
+
+  @Test
+  public void testSearchByTissueType() throws Exception {
+    testSearch(PaginationFilter.tissueType("P"));
+  }
+
   /**
    * Verifies Hibernate mappings by ensuring that no exception is thrown by a search
    * 

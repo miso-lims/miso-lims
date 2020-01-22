@@ -90,6 +90,8 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   }
 
   private final static String[] SEARCH_FIELDS = new String[] { "name", "alias", "description", "identificationBarcode" };
+  private final static List<String> STANDARD_ALIASES = Arrays.asList("sample", "sample.hierarchyAttributes",
+      "hierarchyAttributes.tissueOrigin", "hierarchyAttributes.tissueType");
 
   @Override
   public long save(Library library) throws IOException {
@@ -231,8 +233,6 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
     return records;
   }
 
-  private final static List<String> STANDARD_ALIASES = Arrays.asList("sample");
-
   @Override
   public long countLibrariesBySearch(String querystr) throws IOException {
     if (isStringEmptyOrNull(querystr)) {
@@ -346,6 +346,10 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
       return "sample.id";
     case "parentSampleAlias":
       return "sample.alias";
+    case "effectiveTissueOriginLabel":
+      return "tissueOrigin.alias";
+    case "effectiveTissueTypeLabel":
+      return "tissueType.alias";
     default:
       return original;
     }
@@ -407,6 +411,16 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   @Override
   public void restrictPaginationByGroupId(Criteria criteria, String groupId, Consumer<String> errorHandler) {
     criteria.add(Restrictions.ilike("groupId", groupId, MatchMode.EXACT));
+  }
+
+  @Override
+  public void restrictPaginationByTissueOrigin(Criteria criteria, String origin, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.eq("tissueOrigin.alias", origin));
+  }
+
+  @Override
+  public void restrictPaginationByTissueType(Criteria criteria, String type, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.eq("tissueType.alias", type));
   }
 
   @Override
