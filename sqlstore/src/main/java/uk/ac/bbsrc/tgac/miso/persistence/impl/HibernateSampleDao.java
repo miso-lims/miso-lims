@@ -21,6 +21,7 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,8 +50,11 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   protected static final Logger log = LoggerFactory.getLogger(HibernateSampleDao.class);
 
   private final static String[] SEARCH_PROPERTIES = new String[] { "alias", "identificationBarcode", "name" };
-  private final static List<String> STANDARD_ALIASES = Arrays.asList("hierarchyAttributes", "hierarchyAttributes.tissueOrigin",
-      "hierarchyAttributes.tissueType", "sampleClass");
+  private final static List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(
+      new AliasDescriptor("hierarchyAttributes", JoinType.LEFT_OUTER_JOIN),
+      new AliasDescriptor("hierarchyAttributes.tissueOrigin", JoinType.LEFT_OUTER_JOIN),
+      new AliasDescriptor("hierarchyAttributes.tissueType", JoinType.LEFT_OUTER_JOIN),
+      new AliasDescriptor("sampleClass", JoinType.LEFT_OUTER_JOIN));
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
@@ -313,7 +317,7 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
-  public Iterable<String> listAliases() {
+  public Iterable<AliasDescriptor> listAliases() {
     return STANDARD_ALIASES;
   }
 

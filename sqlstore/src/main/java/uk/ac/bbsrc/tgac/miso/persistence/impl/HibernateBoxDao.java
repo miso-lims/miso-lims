@@ -45,7 +45,7 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
 
   protected static final String[] SEARCH_PROPERTIES = new String[] { "name", FIELD_ALIAS, FIELD_BARCODE, "locationBarcode" };
 
-  private static final List<String> STANDARD_ALIASES = Arrays.asList("size", "use");
+  private static final List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("size"), new AliasDescriptor("use"));
 
   private static final List<Class<? extends BoxableView>> VIEW_CLASSES = Lists.newArrayList(SampleBoxableView.class,
       LibraryBoxableView.class, LibraryAliquotBoxableView.class, PoolBoxableView.class);
@@ -302,7 +302,7 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
   }
 
   @Override
-  public Iterable<String> listAliases() {
+  public Iterable<AliasDescriptor> listAliases() {
     return STANDARD_ALIASES;
   }
 

@@ -18,6 +18,7 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,8 +91,10 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   }
 
   private final static String[] SEARCH_FIELDS = new String[] { "name", "alias", "description", "identificationBarcode" };
-  private final static List<String> STANDARD_ALIASES = Arrays.asList("sample", "sample.hierarchyAttributes",
-      "hierarchyAttributes.tissueOrigin", "hierarchyAttributes.tissueType");
+  private final static List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("sample"),
+      new AliasDescriptor("sample.hierarchyAttributes", JoinType.LEFT_OUTER_JOIN),
+      new AliasDescriptor("hierarchyAttributes.tissueOrigin", JoinType.LEFT_OUTER_JOIN),
+      new AliasDescriptor("hierarchyAttributes.tissueType", JoinType.LEFT_OUTER_JOIN));
 
   @Override
   public long save(Library library) throws IOException {
@@ -335,7 +338,7 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   }
 
   @Override
-  public Iterable<String> listAliases() {
+  public Iterable<AliasDescriptor> listAliases() {
     return STANDARD_ALIASES;
   }
 

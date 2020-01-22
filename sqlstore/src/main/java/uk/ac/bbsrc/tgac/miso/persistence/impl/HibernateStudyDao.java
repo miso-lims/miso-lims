@@ -57,7 +57,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 @Repository
 public class HibernateStudyDao implements StudyStore, HibernatePaginatedDataSource<Study> {
   private static final String[] SEARCH_PROPERTIES = new String[] { "name", "alias", "description" };
-  private static final Iterable<String> STANDARD_ALIASES = Arrays.asList("project");
+  private static final Iterable<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("project"));
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateStudyDao.class);
 
@@ -160,7 +160,7 @@ public class HibernateStudyDao implements StudyStore, HibernatePaginatedDataSour
   }
 
   @Override
-  public Iterable<String> listAliases() {
+  public Iterable<AliasDescriptor> listAliases() {
     return STANDARD_ALIASES;
   }
 

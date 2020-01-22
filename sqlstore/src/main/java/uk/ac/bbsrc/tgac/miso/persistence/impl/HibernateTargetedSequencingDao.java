@@ -60,7 +60,7 @@ public class HibernateTargetedSequencingDao extends HibernateSaveDao<TargetedSeq
   }
 
   @Override
-  public Iterable<String> listAliases() {
+  public Iterable<AliasDescriptor> listAliases() {
     return Collections.emptyList();
   }
 

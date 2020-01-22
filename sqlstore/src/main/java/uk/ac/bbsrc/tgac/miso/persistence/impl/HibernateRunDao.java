@@ -31,7 +31,8 @@ import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 @Transactional(rollbackFor = Exception.class)
 public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<Run> {
 
-  private static final List<String> STANDARD_ALIASES = Arrays.asList("sequencer", "sequencer.instrumentModel");
+  private static final List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("sequencer"),
+      new AliasDescriptor("sequencer.instrumentModel"));
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateRunDao.class);
 
@@ -250,7 +251,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   }
 
   @Override
-  public Iterable<String> listAliases() {
+  public Iterable<AliasDescriptor> listAliases() {
     return STANDARD_ALIASES;
   }
 

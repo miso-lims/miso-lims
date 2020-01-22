@@ -31,8 +31,6 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,7 +42,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.PrinterStore;
 @Transactional(rollbackFor = Exception.class)
 @Repository
 public class HibernatePrinterDao implements PrinterStore, HibernatePaginatedDataSource<Printer> {
-  protected static final Logger log = LoggerFactory.getLogger(HibernatePrinterDao.class);
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -90,7 +87,7 @@ public class HibernatePrinterDao implements PrinterStore, HibernatePaginatedData
   }
 
   @Override
-  public Iterable<String> listAliases() {
+  public Iterable<AliasDescriptor> listAliases() {
     return Collections.emptySet();
   }
 

@@ -20,6 +20,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.Columns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.ListTarget;
@@ -174,6 +175,9 @@ public class ListTablesIT extends AbstractIT {
   private static final Pattern numberWithUnits = Pattern.compile("^(-?\\d+(?:\\.\\d+)?)(?: .+)?$");
 
   private static String removeUnits(String num) {
+    if (LimsUtils.isStringEmptyOrNull(num)) {
+      return num;
+    }
     Matcher m1 = numberWithUnits.matcher(num);
     if (!m1.matches()) {
       throw new IllegalArgumentException("Input does not match expected pattern: " + num);
@@ -852,6 +856,7 @@ public class ListTablesIT extends AbstractIT {
     case Columns.SAMPLE_NAME:
       return nameNumericComparator;
     case Columns.CONCENTRATION:
+    case Columns.VOLUME:
       return numericIgnoreUnitsComparator;
     default:
       return standardComparator;

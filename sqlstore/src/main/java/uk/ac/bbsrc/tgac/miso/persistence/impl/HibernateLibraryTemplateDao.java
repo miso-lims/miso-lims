@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
@@ -27,7 +26,6 @@ public class HibernateLibraryTemplateDao implements LibraryTemplateStore, Hibern
   protected static final Logger log = LoggerFactory.getLogger(HibernateLibraryTemplateDao.class);
 
   private static final String[] SEARCH_PROPERTIES = new String[] {};
-  private static final List<String> STANDARD_ALIASES = Arrays.asList();
 
 
   @Autowired
@@ -82,8 +80,8 @@ public class HibernateLibraryTemplateDao implements LibraryTemplateStore, Hibern
   }
 
   @Override
-  public Iterable<String> listAliases() {
-    return STANDARD_ALIASES;
+  public Iterable<AliasDescriptor> listAliases() {
+    return Collections.emptyList();
   }
 
   @Override

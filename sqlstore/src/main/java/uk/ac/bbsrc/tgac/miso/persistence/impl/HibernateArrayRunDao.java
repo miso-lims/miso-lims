@@ -25,7 +25,8 @@ public class HibernateArrayRunDao implements ArrayRunStore, HibernatePaginatedDa
 
   private static final String[] SEARCH_PROPERTIES = new String[] { "alias", "description" };
 
-  private static final List<String> STANDARD_ALIASES = Arrays.asList("lastModifier", "creator", "instrument", "instrument.instrumentModel");
+  private static final List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("lastModifier"),
+      new AliasDescriptor("creator"), new AliasDescriptor("instrument"), new AliasDescriptor("instrument.instrumentModel"));
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -125,7 +126,7 @@ public class HibernateArrayRunDao implements ArrayRunStore, HibernatePaginatedDa
   }
 
   @Override
-  public Iterable<String> listAliases() {
+  public Iterable<AliasDescriptor> listAliases() {
     return STANDARD_ALIASES;
   }
 

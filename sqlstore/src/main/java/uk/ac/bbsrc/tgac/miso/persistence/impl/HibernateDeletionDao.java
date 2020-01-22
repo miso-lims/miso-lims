@@ -83,7 +83,7 @@ public class HibernateDeletionDao implements DeletionStore, HibernatePaginatedDa
   }
 
   @Override
-  public Iterable<String> listAliases() {
+  public Iterable<AliasDescriptor> listAliases() {
     return Collections.emptyList();
   }
 

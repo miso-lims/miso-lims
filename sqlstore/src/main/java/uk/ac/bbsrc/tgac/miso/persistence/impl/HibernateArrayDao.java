@@ -29,7 +29,7 @@ public class HibernateArrayDao implements ArrayStore, HibernatePaginatedDataSour
   private static final String FIELD_SERIALNUM = "serialNumber";
 
   private static final String[] SEARCH_PROPERTIES = new String[] { FIELD_ALIAS, FIELD_SERIALNUM, "description" };
-  private static final List<String> STANDARD_ALIASES = Arrays.asList("arrayModel");
+  private static final List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("arrayModel"));
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -161,7 +161,7 @@ public class HibernateArrayDao implements ArrayStore, HibernatePaginatedDataSour
   }
 
   @Override
-  public Iterable<String> listAliases() {
+  public Iterable<AliasDescriptor> listAliases() {
     return STANDARD_ALIASES;
   }
 
