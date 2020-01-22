@@ -3,7 +3,11 @@
 Changes:
 
   * Freeze "Parent Alias" column on the bulk Propagate Samples page
-  * Fix detailed sample pages loading
+  * Allow removing box from freezer on Edit Box page
+  * Fixed detailed sample pages loading
+  * Fixed error updating transfer items
+  * Fixed receipt validation errors when date of receipt is not specified
+  * Fixed error when scanning freezer location on Edit Box page
   * Don't show library name on library aliquot labels
 
 # 0.2.198
@@ -66,9 +70,11 @@ Upgrade Notes:
     All sequencers will then be given a default purpose of 'Production.' After migrating, you can
     change each instrument's default purpose and delete the 'Production' purpose if you choose.
 
-BAD:
+Known Issues:
 
-  * Individual sample pages do not load correctly in detailed mode
+  * Individual sample pages do not load correctly in detailed mode (recommended to skip this version
+    if you use detailed sample mode)
+  * Transfer item changes fail to save under some conditions
 
 # 0.2.197
 

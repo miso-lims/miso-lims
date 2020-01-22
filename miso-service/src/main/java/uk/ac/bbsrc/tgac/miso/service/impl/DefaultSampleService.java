@@ -890,6 +890,8 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       dTarget.setSubproject(dSource.getSubproject());
       dTarget.setVolumeUsed(dSource.getVolumeUsed());
       dTarget.setNgUsed(dSource.getNgUsed());
+      source = deproxify(source);
+      target = deproxify(target);
       if (isIdentitySample(target)) {
         applyIdentityChanges((SampleIdentity) target, (SampleIdentity) source);
       } else if (isTissueSample(target)) {
@@ -920,7 +922,6 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   }
 
   private void applyAliquotChanges(SampleAliquot target, SampleAliquot source) {
-    source = deproxify(source);
     if (source instanceof SampleAliquotSingleCell) {
       ((SampleAliquotSingleCell) target).setInputIntoLibrary(((SampleAliquotSingleCell) source).getInputIntoLibrary());
     }
@@ -928,7 +929,6 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   }
 
   private void applyStockChanges(SampleStock target, SampleStock source) {
-    source = deproxify(source);
     if (source instanceof SampleStockSingleCell) {
       ((SampleStockSingleCell) target).setTargetCellRecovery(((SampleStockSingleCell) source).getTargetCellRecovery());
       ((SampleStockSingleCell) target).setCellViability(((SampleStockSingleCell) source).getCellViability());
@@ -952,7 +952,6 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   }
 
   private void applyTissueProcessingChanges(SampleTissueProcessing target, SampleTissueProcessing source) {
-    source = deproxify(source);
     if (source instanceof SampleSlide) {
       ((SampleSlide) target).setInitialSlides(((SampleSlide) source).getInitialSlides());
       ((SampleSlide) target).setSlides(((SampleSlide) source).getSlides());

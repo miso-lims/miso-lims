@@ -183,7 +183,7 @@ HotTarget.sample = (function() {
               }
             },
             pack: function(sam, flat, errorHandler) {
-              sam.receivedDate = flat.receivedDate;
+              sam.receivedDate = Utils.valOrNull(flat.receivedDate);
             }
           },
           HotUtils.makeColumnForConstantsList('Received From', create && (!Constants.isDetailedSample || !isTargetIdentity(config))
