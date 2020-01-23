@@ -568,9 +568,9 @@ INSERT INTO `SampleAliquot` (sampleId, samplePurposeId) VALUES
 (504, NULL),
 (4447, 3);
 
-INSERT INTO Transfer(transferId, transferDate, senderLabId, recipientGroupId, creator, created, lastModifier, lastModified) VALUES
-(1, '2017-07-20', 1, 1, 1, '2017-07-20 12:53:00', 1, '2017-07-20 12:53:00'),
-(2, '2017-07-20', 1, 1, 1, '2017-07-20 12:53:00', 1, '2017-07-20 12:53:00');
+INSERT INTO Transfer(transferId, transferTime, senderLabId, recipientGroupId, creator, created, lastModifier, lastModified) VALUES
+(1, '2017-07-20 12:00:00', 1, 1, 1, '2017-07-20 12:53:00', 1, '2017-07-20 12:53:00'),
+(2, '2017-07-20 12:00:00', 1, 1, 1, '2017-07-20 12:53:00', 1, '2017-07-20 12:53:00');
 
 INSERT INTO Transfer_Sample(transferId, sampleId, received, qcPassed, qcNote) VALUES
 (1, 2, TRUE, TRUE, NULL),

@@ -65,7 +65,7 @@ public class HibernateListTransferViewDao implements ListTransferViewDao, Hibern
     switch (type) {
     case CREATE:
     case RECEIVE:
-      return "transferDate";
+      return "transferTime";
     default:
       return null;
     }

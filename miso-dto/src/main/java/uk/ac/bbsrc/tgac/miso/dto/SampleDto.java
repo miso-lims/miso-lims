@@ -47,7 +47,7 @@ public class SampleDto extends AbstractBoxableDto {
   private String locationBarcode;
   private String locationLabel;
   private String sampleType;
-  private String receivedDate;
+  private String receivedTime;
   private Long senderLabId;
   private Long recipientGroupId;
   private Boolean received;
@@ -143,12 +143,12 @@ public class SampleDto extends AbstractBoxableDto {
     this.sampleType = sampleType;
   }
 
-  public String getReceivedDate() {
-    return receivedDate;
+  public String getReceivedTime() {
+    return receivedTime;
   }
 
-  public void setReceivedDate(String receivedDate) {
-    this.receivedDate = receivedDate;
+  public void setReceivedTime(String receivedTime) {
+    this.receivedTime = receivedTime;
   }
 
   public Long getSenderLabId() {

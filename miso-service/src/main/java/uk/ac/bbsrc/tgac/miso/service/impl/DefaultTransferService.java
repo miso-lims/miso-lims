@@ -273,7 +273,7 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
 
   @Override
   protected void applyChanges(Transfer to, Transfer from) throws IOException {
-    to.setTransferDate(from.getTransferDate());
+    to.setTransferTime(from.getTransferTime());
     to.setSenderGroup(from.getSenderGroup());
     to.setSenderLab(from.getSenderLab());
     to.setRecipient(from.getRecipient());
@@ -374,8 +374,8 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
   }
 
   @Override
-  public List<Transfer> listByProperties(Lab sender, Group recipient, Project project, Date transferDate) throws IOException {
-    return transferStore.listByProperties(sender, recipient, project, transferDate);
+  public List<Transfer> listByProperties(Lab sender, Group recipient, Project project, Date transferTime) throws IOException {
+    return transferStore.listByProperties(sender, recipient, project, transferTime);
   }
 
 }

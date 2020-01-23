@@ -315,7 +315,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       TransferSample transferSample = sample.getTransfers().iterator().next();
       Transfer transfer = transferSample.getTransfer();
       List<Transfer> existingTransfers = transferService.listByProperties(transfer.getSenderLab(), transfer.getRecipientGroup(),
-          sample.getProject(), transfer.getTransferDate());
+          sample.getProject(), transfer.getTransferTime());
       Transfer existingTransfer = existingTransfers.stream().max(Comparator.comparing(Transfer::getCreationTime)).orElse(null);
       if (existingTransfer != null) {
         existingTransfer.getSampleTransfers().add(transferSample);

@@ -249,8 +249,8 @@ INSERT INTO SampleStock (sampleId) VALUES
 INSERT INTO SampleAliquot (sampleId) VALUES
 (19);
 
-INSERT INTO Transfer(transferId, transferDate, senderLabId, recipientGroupId, creator, created, lastModifier, lastModified) VALUES
-(1, '2016-07-07', 1, 1, 1, '2016-07-07 15:47:00', 1, '2016-07-07 15:47:00');
+INSERT INTO Transfer(transferId, transferTime, senderLabId, recipientGroupId, creator, created, lastModifier, lastModified) VALUES
+(1, '2016-07-07 12:00:00', 1, 1, 1, '2016-07-07 15:47:00', 1, '2016-07-07 15:47:00');
 
 INSERT INTO Transfer_Sample(transferId, sampleId) VALUES
 (1, 1),

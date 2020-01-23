@@ -687,13 +687,47 @@ var Utils = Utils
 
       // Return current date in format YYYY-MM-DD
       getCurrentDate: function() {
-        var today = new Date();
-        var dd = today.getDate();
-        var mm = today.getMonth() + 1; // Month is zero-indexed
-        var yyyy = today.getFullYear();
-
-        // Zero-pad month and day if necessary
-        return yyyy + "-" + (mm < 10 ? "0" + mm : mm) + "-" + (dd < 10 ? "0" + dd : dd);
+        var now = new Date();
+        return now.getFullYear() + "-" + Utils.zeroPad(now.getMonth() + 1, 2) + "-" + Utils.zeroPad(now.getDate(), 2)
+      },
+      // Return current time in format hh:mm a (e.g. 2:30 pm)
+      getCurrentTime: function() {
+        var now = new Date();
+        return Utils.formatTwelveHourTime(now.getHours(), now.getMinutes());
+      },
+      // Given a 24hr time format (14:30[:00]), returns the same time in 12hr format hh:mm a (e.g. 2:30 pm). Seconds are ignored
+      toTwelveHourTime: function(time) {
+        timeParts = time.split(':');
+        return Utils.formatTwelveHourTime(timeParts[0], timeParts[1]);
+      },
+      // Format hours (0-23) and minutes (0-59) in 12hr format hh:mm a (e.g. 2:30 pm)
+      formatTwelveHourTime: function(hours, minutes) {
+        var dayPart = null;
+        if (hours > 11) {
+          dayPart = 'pm';
+          if (hours > 12) {
+            hours -= 12;
+          }
+        } else {
+          dayPart = 'am';
+        }
+        return hours + ':' + Utils.zeroPad(minutes, 2) + ' ' + dayPart;
+      },
+      formatTwentyFourHourTime: function(time) {
+        var parts1 = time.split(' ');
+        var parts2 = parts1[0].split(':');
+        var hours = parseInt(parts2[0]);
+        if (parts1[1] === 'pm' && hours < 12) {
+          hours += 12;
+        }
+        return Utils.zeroPad(hours, 2) + ':' + Utils.zeroPad(parts2[1]) + ':' + (parts2.length > 2 ? Utils.zeroPad(parts2[2]) : '00');
+      },
+      zeroPad: function(number, desiredLength) {
+        var string = number.toString();
+        if (string.length >= desiredLength) {
+          return string;
+        }
+        return ('0'.repeat(desiredLength - string.length)) + string;
       },
       createBoxDialog: function(result, getItemCount, callback) {
         var boxFields = [{

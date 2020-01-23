@@ -208,7 +208,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
       TransferLibrary transferLibrary = library.getTransfers().iterator().next();
       Transfer transfer = transferLibrary.getTransfer();
       List<Transfer> existingTransfers = transferService.listByProperties(transfer.getSenderLab(), transfer.getRecipientGroup(),
-          library.getSample().getProject(), transfer.getTransferDate());
+          library.getSample().getProject(), transfer.getTransferTime());
       Transfer existingTransfer = existingTransfers.stream().max(Comparator.comparing(Transfer::getCreationTime)).orElse(null);
       if (existingTransfer != null) {
         existingTransfer.getLibraryTransfers().add(transferLibrary);

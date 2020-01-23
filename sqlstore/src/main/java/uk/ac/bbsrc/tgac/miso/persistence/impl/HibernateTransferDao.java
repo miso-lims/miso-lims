@@ -48,7 +48,7 @@ public class HibernateTransferDao extends HibernateSaveDao<Transfer> implements 
   }
 
   @Override
-  public List<Transfer> listByProperties(Lab sender, Group recipient, Project project, Date transferDate) throws IOException {
+  public List<Transfer> listByProperties(Lab sender, Group recipient, Project project, Date transferTime) throws IOException {
     @SuppressWarnings("unchecked")
     List<Transfer> results = currentSession().createCriteria(Transfer.class)
         .createAlias("sampleTransfers", "sampleTransfer", JoinType.LEFT_OUTER_JOIN)
@@ -58,7 +58,7 @@ public class HibernateTransferDao extends HibernateSaveDao<Transfer> implements 
         .createAlias("library.sample", "librarySample", JoinType.LEFT_OUTER_JOIN)
         .add(Restrictions.eq("senderLab", sender))
         .add(Restrictions.eq("recipientGroup", recipient))
-        .add(Restrictions.eq("transferDate", transferDate))
+        .add(Restrictions.eq("transferTime", transferTime))
         .add(Restrictions.or(Restrictions.eq("sample.project", project), Restrictions.eq("librarySample.project", project)))
         .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
         .list();

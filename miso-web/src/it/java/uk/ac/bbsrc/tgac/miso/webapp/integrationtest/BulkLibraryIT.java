@@ -804,7 +804,7 @@ public class BulkLibraryIT extends AbstractIT {
     testLibraryAttribute(LibColumns.VOLUME, attributes, library, lib -> LimsUtils.toNiceString(lib.getVolume()));
     testLibraryAttribute(LibColumns.CONCENTRATION, attributes, library, lib -> LimsUtils.toNiceString(lib.getConcentration()));
     testLibraryAttribute(LibColumns.RECEIVE_DATE, attributes, library,
-        lib -> lib.getReceiptTransfer() == null ? "" : LimsUtils.formatDate(lib.getReceiptTransfer().getTransfer().getTransferDate()));
+        lib -> lib.getReceiptTransfer() == null ? "" : LimsUtils.formatDate(lib.getReceiptTransfer().getTransfer().getTransferTime()));
     testLibraryAttribute(LibColumns.RECEIVED_FROM, attributes, library,
         lib -> lib.getReceiptTransfer() == null ? "" : lib.getReceiptTransfer().getTransfer().getSenderLab().getItemLabel());
     testLibraryAttribute(LibColumns.RECEIVED_BY, attributes, library,

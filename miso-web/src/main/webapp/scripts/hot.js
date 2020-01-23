@@ -160,6 +160,7 @@ var HotUtils = {
       return callback(false);
     }
   },
+
   /**
    * Create a Handsontables for our data. This involves a “target” that knows how to handle the particulars of our object type, whether
    * these are being created or modified and a list of data items.
@@ -1655,5 +1656,25 @@ var HotUtils = {
   }
 
 };
+
+//jQuery(document).ready(function() {
+//  HotUtils.editor = {
+//    datetime: (function() {
+//      var editor = Handsontable.editors.TextEditor.prototype.extend();
+//
+//      editor.prototype.createElements = function() {
+//        Handsontable.editors.TextEditor.prototype.createElements.apply(this, arguments);
+//        jQuery(this.TEXTAREA).datetimepicker({
+//          controlType: 'select',
+//          oneLine: true,
+//          dateFormat: Utils.ui.goodDateFormat,
+//          timeFormat: 'HH:mm:ss'
+//        });
+//      };
+//
+//      return editor;
+//    })()
+//  };
+//});
 
 HotTarget = {};

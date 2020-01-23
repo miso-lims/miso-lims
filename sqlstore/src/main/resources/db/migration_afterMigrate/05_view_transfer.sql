@@ -12,7 +12,7 @@ GROUP BY recipientGroupId;
 
 CREATE OR REPLACE VIEW ListTransferView AS
 SELECT t.transferId,
-  t.transferDate,
+  t.transferTime,
   t.senderLabId,
   t.senderGroupId,
   t.recipient,

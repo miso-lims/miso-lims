@@ -465,7 +465,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public Date getBarcodeDate() {
     TransferItem<?> receipt = getReceiptTransfer();
-    return receipt == null ? getCreationTime() : receipt.getTransfer().getTransferDate();
+    return receipt == null ? getCreationTime() : receipt.getTransfer().getTransferTime();
   }
 
   @Override
