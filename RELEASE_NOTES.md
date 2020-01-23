@@ -4,8 +4,12 @@ Changes:
 
   * Added "Run Approvers" group. Only users in this group will be allowed to modify "Data Approved"
     on the Edit Run page
+  * Freeze "Parent Alias" column on the bulk Propagate Samples page
+  * Allow removing box from freezer on Edit Box page
   * Fixed detailed sample pages loading
   * Fixed error updating transfer items
+  * Fixed receipt validation errors when date of receipt is not specified
+  * Fixed error when scanning freezer location on Edit Box page
   * Don't show library name on library aliquot labels
 
 # 0.2.198

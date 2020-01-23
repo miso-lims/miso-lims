@@ -74,7 +74,14 @@ HotTarget.sample = (function() {
 
     },
     getFixedColumns: function(config) {
-      return config.pageMode === 'edit' || !Constants.automaticSampleAlias ? 2 : 0;
+      var cols = 0;
+      if (config.pageMode === 'edit' || !Constants.automaticSampleAlias) {
+        cols += 2;
+      }
+      if (Constants.isDetailedSample && config.pageMode === 'propagate') {
+        cols += 1;
+      }
+      return cols;
     },
     createColumns: function(config, create, data) {
       var targetCategory = (config.targetSampleClass ? config.targetSampleClass.sampleCategory : null);
@@ -120,6 +127,10 @@ HotTarget.sample = (function() {
       }
 
       var columns = [
+          HotUtils.makeColumnForText('Parent Alias',
+              (Constants.isDetailedSample && config.pageMode == 'propagate' && !config.isLibraryReceipt), 'parentAlias', {
+                readOnly: true
+              }),
           {
             header: 'Sample Name',
             data: 'name',
@@ -172,7 +183,7 @@ HotTarget.sample = (function() {
               }
             },
             pack: function(sam, flat, errorHandler) {
-              sam.receivedDate = flat.receivedDate;
+              sam.receivedDate = Utils.valOrNull(flat.receivedDate);
             }
           },
           HotUtils.makeColumnForConstantsList('Received From', create && (!Constants.isDetailedSample || !isTargetIdentity(config))
@@ -342,10 +353,6 @@ HotTarget.sample = (function() {
 
           // Detailed Sample
           // parent columns
-          HotUtils.makeColumnForText('Parent Alias',
-              (Constants.isDetailedSample && config.pageMode == 'propagate' && !config.isLibraryReceipt), 'parentAlias', {
-                readOnly: true
-              }),
           {
             header: 'Parent Sample Class',
             data: 'parentTissueSampleClassAlias',

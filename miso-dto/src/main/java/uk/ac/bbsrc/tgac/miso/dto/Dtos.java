@@ -853,7 +853,7 @@ public class Dtos {
 
     setString(to::setRequisitionId, from.getRequisitionId());
 
-    if (from.getReceivedDate() != null) {
+    if (!isStringEmptyOrNull(from.getReceivedDate())) {
       Transfer receipt = new Transfer();
       setDate(receipt::setTransferDate, from.getReceivedDate());
       setObject(receipt::setSenderLab, LabImpl::new, from.getSenderLabId());
