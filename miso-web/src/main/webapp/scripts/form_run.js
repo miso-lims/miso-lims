@@ -6,8 +6,9 @@ FormTarget.run = (function($) {
   /*
    * Expected config {
    *   isAdmin: boolean,
-   *   userId: integer,
-   *   userFullName: string
+   *   isRunApprover: boolean,
+   *   userId: integer (if isRunApprover),
+   *   userFullName: string (if isRunApprover)
    * }
    */
 
@@ -203,6 +204,7 @@ FormTarget.run = (function($) {
           title: 'Data Approved',
           data: 'dataApproved',
           type: 'dropdown',
+          include: config.isRunApprover,
           source: [{
             label: 'Yes',
             value: true
@@ -231,6 +233,20 @@ FormTarget.run = (function($) {
               });
             }
           }
+        }, {
+          title: 'Data Approved',
+          data: 'dataApproved',
+          type: 'read-only',
+          getDisplayValue: function(item) {
+            if (item.dataApproved === true) {
+              return 'Yes';
+            } else if (item.dataApproved === false) {
+              return 'No';
+            } else {
+              return 'Unknown';
+            }
+          },
+          include: !config.isRunApprover
         }, {
           title: 'Data Approver',
           data: 'dataApproverId',

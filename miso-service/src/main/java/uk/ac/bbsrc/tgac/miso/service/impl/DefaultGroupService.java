@@ -13,6 +13,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.GroupService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SecurityStore;
 
@@ -88,6 +89,15 @@ public class DefaultGroupService implements GroupService {
   @Override
   public AuthorizationManager getAuthorizationManager() {
     return authorizationManager;
+  }
+
+  @Override
+  public ValidationResult validateDeletion(Group object) throws IOException {
+    ValidationResult result = new ValidationResult();
+    if (object.isBuiltIn()) {
+      result.addError(new ValidationError("This group is built-in and required for MISO functionality"));
+    }
+    return result;
   }
 
 }

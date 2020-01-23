@@ -355,6 +355,11 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       errors.add(new ValidationError("sequencingKitId", "Must be a sequencing kit"));
     }
 
+    User user = authorizationManager.getCurrentUser();
+    if (((before == null && changed.isDataApproved() != null) || (before != null && isChanged(Run::isDataApproved, changed, before)))
+        && !user.isRunApprover() && !user.isAdmin()) {
+      errors.add(new ValidationError("dataApproved", "You are not authorized to make this change"));
+    }
     if (changed.isDataApproved() != null && changed.getDataApprover() == null) {
       errors.add(new ValidationError("dataApproverId", "Must be set when approval is specified"));
     }
