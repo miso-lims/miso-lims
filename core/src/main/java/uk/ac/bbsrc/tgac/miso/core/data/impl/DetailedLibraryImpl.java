@@ -149,7 +149,8 @@ public class DetailedLibraryImpl extends LibraryImpl implements DetailedLibrary 
 
   @Override
   public String getBarcodeGroupDescription() {
-    return getEffectiveGroupIdEntity().getGroupDescription();
+    GroupIdentifiable groupParent = getEffectiveGroupIdEntity();
+    return groupParent == null ? null : groupParent.getGroupDescription();
   }
 
 }

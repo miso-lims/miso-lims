@@ -68,7 +68,8 @@ public class DetailedLibraryAliquot extends LibraryAliquot implements GroupIdent
 
   @Override
   public String getBarcodeGroupDescription() {
-    return getEffectiveGroupIdEntity().getGroupDescription();
+    GroupIdentifiable groupParent = getEffectiveGroupIdEntity();
+    return groupParent == null ? null : groupParent.getGroupDescription();
   }
 
 }
