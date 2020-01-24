@@ -123,6 +123,10 @@ public class ListTablesIT extends AbstractIT {
 
   private static final Comparator<String> standardComparator = (s1, s2) -> s1.compareToIgnoreCase(s2);
 
+  private static Comparator<String> standardComparatorWithNullLabel(String nullLabel) {
+    return (s1, s2) -> (nullLabel.equals(s1) ? "" : s1).compareToIgnoreCase(nullLabel.equals(s2) ? "" : s2);
+  }
+
   /**
    * Comparator for columns which render the boolean values as symbols.
    */
@@ -858,6 +862,9 @@ public class ListTablesIT extends AbstractIT {
     case Columns.CONCENTRATION:
     case Columns.VOLUME:
       return numericIgnoreUnitsComparator;
+    case Columns.TISSUE_ORIGIN:
+    case Columns.TISSUE_TYPE:
+      return standardComparatorWithNullLabel("n/a");
     default:
       return standardComparator;
     }
