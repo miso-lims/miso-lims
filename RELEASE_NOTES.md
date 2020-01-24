@@ -19,6 +19,10 @@ Changes:
   * Don't show library name on library aliquot labels
   * Fixed error printing items without group descriptions on `JTT_7_GROUPDESC`
 
+Upgrade Notes:
+
+  * Upgraded to Pinery 2.9.0
+
 # 0.2.198
 
 Changes:
