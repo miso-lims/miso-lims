@@ -1657,24 +1657,4 @@ var HotUtils = {
 
 };
 
-//jQuery(document).ready(function() {
-//  HotUtils.editor = {
-//    datetime: (function() {
-//      var editor = Handsontable.editors.TextEditor.prototype.extend();
-//
-//      editor.prototype.createElements = function() {
-//        Handsontable.editors.TextEditor.prototype.createElements.apply(this, arguments);
-//        jQuery(this.TEXTAREA).datetimepicker({
-//          controlType: 'select',
-//          oneLine: true,
-//          dateFormat: Utils.ui.goodDateFormat,
-//          timeFormat: 'HH:mm:ss'
-//        });
-//      };
-//
-//      return editor;
-//    })()
-//  };
-//});
-
 HotTarget = {};
