@@ -70,8 +70,8 @@ public class BulkLibraryPage extends HeaderFooterPage {
 
   private static final By EDIT_BUTTON_TEXT = By.linkText("Edit");
   private static final By PROPAGATE_BUTTON_TEXT = By.linkText("Make aliquots");
-  private static final By SORT_BY_SAMPLE_LOCATION_ROWS = By.id("sortrows");
-  private static final By SORT_BY_SAMPLE_LOCATION_COLS = By.id("sortcolumns");
+  private static final By SORT_BY_SAMPLE_LOCATION_ROWS = By.id("sortSampleRows");
+  private static final By SORT_BY_SAMPLE_LOCATION_COLS = By.id("sortSampleColumns");
 
   @FindBy(id = "bulkactions")
   private WebElement toolbar;
