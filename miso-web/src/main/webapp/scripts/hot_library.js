@@ -316,11 +316,11 @@ HotTarget.library = (function() {
             },
             customSorting: [{
               buttonText: 'Sort by Sample Location (rows)',
-              sortTarget: 'rows',
+              sortTarget: 'SampleRows',
               sortFunc: HotUtils.sorting.rowSort
             }, {
               buttonText: 'Sort by Sample Location (columns)',
-              sortTarget: 'columns',
+              sortTarget: 'SampleColumns',
               sortFunc: HotUtils.sorting.colSort
             }]
           },

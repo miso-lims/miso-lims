@@ -236,7 +236,16 @@ HotTarget.boxable = (function() {
                   source: box.emptyPositions
                 });
               }
-            }
+            },
+            customSorting: [{
+              buttonText: 'Sort by Location (rows)',
+              sortTarget: 'Rows',
+              sortFunc: HotUtils.sorting.rowSort
+            }, {
+              buttonText: 'Sort by Location (columns)',
+              sortTarget: 'Columns',
+              sortFunc: HotUtils.sorting.colSort
+            }]
           }, makeDiscardedColumn()];
     },
     getCustomActions: function(table) {
