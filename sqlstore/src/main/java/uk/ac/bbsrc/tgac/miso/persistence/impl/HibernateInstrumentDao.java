@@ -132,10 +132,10 @@ public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginat
     return SEARCH_PROPERTIES;
   }
 
-  private static final List<String> STANDARD_ALIASES = Arrays.asList("instrumentModel");
+  private static final List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("instrumentModel"));
 
   @Override
-  public Iterable<String> listAliases() {
+  public Iterable<AliasDescriptor> listAliases() {
     return STANDARD_ALIASES;
   }
 

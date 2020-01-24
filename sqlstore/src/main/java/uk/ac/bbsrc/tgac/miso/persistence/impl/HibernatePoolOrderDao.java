@@ -20,7 +20,7 @@ public class HibernatePoolOrderDao extends HibernateSaveDao<PoolOrder> implement
 
   private static final String FIELD_POOL = "pool.id";
   private static final String[] SEARCH_PROPERTIES = new String[] { "alias", "description" };
-  private static final List<String> STANDARD_ALIASES = Arrays.asList("purpose");
+  private static final List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("purpose"));
 
   public HibernatePoolOrderDao() {
     super(PoolOrder.class);
@@ -52,7 +52,7 @@ public class HibernatePoolOrderDao extends HibernateSaveDao<PoolOrder> implement
   }
 
   @Override
-  public Iterable<String> listAliases() {
+  public Iterable<AliasDescriptor> listAliases() {
     return STANDARD_ALIASES;
   }
 

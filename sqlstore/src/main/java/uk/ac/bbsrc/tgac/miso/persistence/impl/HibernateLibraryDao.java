@@ -18,6 +18,7 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,6 +91,10 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   }
 
   private final static String[] SEARCH_FIELDS = new String[] { "name", "alias", "description", "identificationBarcode" };
+  private final static List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("sample"),
+      new AliasDescriptor("sample.hierarchyAttributes", JoinType.LEFT_OUTER_JOIN),
+      new AliasDescriptor("hierarchyAttributes.tissueOrigin", JoinType.LEFT_OUTER_JOIN),
+      new AliasDescriptor("hierarchyAttributes.tissueType", JoinType.LEFT_OUTER_JOIN));
 
   @Override
   public long save(Library library) throws IOException {
@@ -231,8 +236,6 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
     return records;
   }
 
-  private final static List<String> STANDARD_ALIASES = Arrays.asList("sample");
-
   @Override
   public long countLibrariesBySearch(String querystr) throws IOException {
     if (isStringEmptyOrNull(querystr)) {
@@ -335,7 +338,7 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   }
 
   @Override
-  public Iterable<String> listAliases() {
+  public Iterable<AliasDescriptor> listAliases() {
     return STANDARD_ALIASES;
   }
 
@@ -346,6 +349,10 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
       return "sample.id";
     case "parentSampleAlias":
       return "sample.alias";
+    case "effectiveTissueOriginLabel":
+      return "tissueOrigin.alias";
+    case "effectiveTissueTypeLabel":
+      return "tissueType.alias";
     default:
       return original;
     }
@@ -407,6 +414,16 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   @Override
   public void restrictPaginationByGroupId(Criteria criteria, String groupId, Consumer<String> errorHandler) {
     criteria.add(Restrictions.ilike("groupId", groupId, MatchMode.EXACT));
+  }
+
+  @Override
+  public void restrictPaginationByTissueOrigin(Criteria criteria, String origin, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.eq("tissueOrigin.alias", origin));
+  }
+
+  @Override
+  public void restrictPaginationByTissueType(Criteria criteria, String type, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.eq("tissueType.alias", type));
   }
 
   @Override

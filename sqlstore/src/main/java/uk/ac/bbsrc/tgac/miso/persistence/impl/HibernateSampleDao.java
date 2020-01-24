@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +50,11 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   protected static final Logger log = LoggerFactory.getLogger(HibernateSampleDao.class);
 
   private final static String[] SEARCH_PROPERTIES = new String[] { "alias", "identificationBarcode", "name" };
+  private final static List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(
+      new AliasDescriptor("hierarchyAttributes", JoinType.LEFT_OUTER_JOIN),
+      new AliasDescriptor("hierarchyAttributes.tissueOrigin", JoinType.LEFT_OUTER_JOIN),
+      new AliasDescriptor("hierarchyAttributes.tissueType", JoinType.LEFT_OUTER_JOIN),
+      new AliasDescriptor("sampleClass", JoinType.LEFT_OUTER_JOIN));
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
@@ -310,13 +317,22 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
-  public Iterable<String> listAliases() {
-    return Collections.emptyList();
+  public Iterable<AliasDescriptor> listAliases() {
+    return STANDARD_ALIASES;
   }
 
   @Override
   public String propertyForSortColumn(String original) {
-    return original;
+    switch (original) {
+    case "effectiveTissueOriginLabel":
+      return "tissueOrigin.alias";
+    case "effectiveTissueTypeLabel":
+      return "tissueType.alias";
+    case "sampleClassId":
+      return "sampleClass.alias";
+    default:
+      return original;
+    }
   }
 
   @Override
@@ -375,6 +391,16 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   public void restrictPaginationBySubproject(Criteria criteria, String subproject, Consumer<String> errorHandler) {
     criteria.createAlias("subproject", "subproject");
     criteria.add(Restrictions.ilike("subproject.alias", subproject, MatchMode.START));
+  }
+
+  @Override
+  public void restrictPaginationByTissueOrigin(Criteria criteria, String origin, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.eq("tissueOrigin.alias", origin));
+  }
+
+  @Override
+  public void restrictPaginationByTissueType(Criteria criteria, String type, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.eq("tissueType.alias", type));
   }
 
   @Override

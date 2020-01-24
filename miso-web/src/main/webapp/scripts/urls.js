@@ -229,7 +229,10 @@ Urls = (function() {
     update: idUrlFunction(libraryRestBase),
     parents: idUrlFunction(libraryRestBase + '/parents'),
     children: idUrlFunction(libraryRestBase + '/children'),
-    query: libraryRestBase + '/query'
+    query: libraryRestBase + '/query',
+    datatable: libraryRestBase + '/dt',
+    projectDatatable: idUrlFunction(libraryRestBase + '/dt/project'),
+    bulkDelete: libraryRestBase + '/bulk-delete'
   };
 
   // Library Aliquots
@@ -453,7 +456,11 @@ Urls = (function() {
     update: idUrlFunction(sampleRestBase),
     parents: idUrlFunction(sampleRestBase + '/parents'),
     children: idUrlFunction(sampleRestBase + '/children'),
-    query: sampleRestBase + '/query'
+    query: sampleRestBase + '/query',
+    datatable: sampleRestBase + '/dt',
+    projectDatatable: idUrlFunction(sampleRestBase + '/dt/project'),
+    projectArrayedDatatable: middleIdUrlFunction(sampleRestBase + '/dt/project', '/arrayed'),
+    bulkDelete: sampleRestBase + '/bulk-delete'
   };
 
   // Sample Classes

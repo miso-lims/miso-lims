@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -31,6 +32,10 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
   // Make sure these match the HiberateLibraryAliquotDao
   private static final String[] SEARCH_PROPERTIES = new String[] { "aliquotName", "aliquotBarcode", "libraryName", "libraryAlias",
       "libraryDescription" };
+  private final static List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("sample"),
+      new AliasDescriptor("sample.hierarchyAttributes", JoinType.LEFT_OUTER_JOIN),
+      new AliasDescriptor("hierarchyAttributes.tissueOrigin", JoinType.LEFT_OUTER_JOIN),
+      new AliasDescriptor("hierarchyAttributes.tissueType", JoinType.LEFT_OUTER_JOIN));
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -88,8 +93,8 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
   }
 
   @Override
-  public Iterable<String> listAliases() {
-    return Collections.emptyList();
+  public Iterable<AliasDescriptor> listAliases() {
+    return STANDARD_ALIASES;
   }
 
   @Override
@@ -129,6 +134,12 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
       return "aliquotNgUsed";
     case "volumeUsed":
       return "aliquotVolumeUsed";
+    case "dnaSize":
+      return "aliquotDnaSize";
+    case "effectiveTissueOriginLabel":
+      return "tissueOrigin.alias";
+    case "effectiveTissueTypeLabel":
+      return "tissueType.alias";
     default:
       return original;
     }
@@ -244,6 +255,16 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
     criteria.createAlias("transfers", "transferItem")
         .createAlias("transferItem.transfer", "transfer")
         .add(Restrictions.ilike("transfer.recipient", recipient, MatchMode.ANYWHERE));
+  }
+
+  @Override
+  public void restrictPaginationByTissueOrigin(Criteria criteria, String origin, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.eq("tissueOrigin.alias", origin));
+  }
+
+  @Override
+  public void restrictPaginationByTissueType(Criteria criteria, String type, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.eq("tissueType.alias", type));
   }
 
 }

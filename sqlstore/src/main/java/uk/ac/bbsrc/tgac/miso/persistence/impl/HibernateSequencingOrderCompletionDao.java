@@ -25,7 +25,8 @@ import uk.ac.bbsrc.tgac.miso.persistence.SequencingOrderCompletionDao;
 public class HibernateSequencingOrderCompletionDao implements SequencingOrderCompletionDao, HibernatePaginatedDataSource<SequencingOrderCompletion> {
   private static final String[] SEARCH_PROPERTIES = new String[] { "pool.alias", "pool.name", "pool.identificationBarcode",
       "pool.description" };
-  private static final List<String> STANDARD_ALIASES = Arrays.asList("pool", "parameters");
+  private static final List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("pool"),
+      new AliasDescriptor("parameters"));
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -55,7 +56,7 @@ public class HibernateSequencingOrderCompletionDao implements SequencingOrderCom
   }
 
   @Override
-  public Iterable<String> listAliases() {
+  public Iterable<AliasDescriptor> listAliases() {
     return STANDARD_ALIASES;
   }
 

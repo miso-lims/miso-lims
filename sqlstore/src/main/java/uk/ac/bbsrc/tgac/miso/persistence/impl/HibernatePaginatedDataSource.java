@@ -64,9 +64,9 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   default Criteria createPaginationCriteria() throws IOException {
     final Criteria backingCriteria = currentSession().createCriteria(getRealClass());
     Criteria criteria = new AliasTrackingCriteria(backingCriteria);
-    for (String alias : listAliases()) {
-      String[] parts = alias.split("\\.");
-      criteria.createAlias(alias, parts[parts.length - 1]);
+    for (AliasDescriptor descriptor : listAliases()) {
+      String[] parts = descriptor.getAssociationPath().split("\\.");
+      criteria.createAlias(descriptor.getAlias(), parts[parts.length - 1], descriptor.getJoinType());
     }
     criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
     return criteria;
@@ -133,9 +133,9 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   /**
-   * List all the aliases that should be created for the {@link Criteria}. Probably at least "derivedInfo".
+   * List all the aliases that should be created for the {@link Criteria}.
    */
-  Iterable<String> listAliases();
+  Iterable<AliasDescriptor> listAliases();
 
   /**
    * The property name for the modification/creation date of the object.
@@ -370,6 +370,16 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   @Override
   public default void restrictPaginationByTransferType(Criteria item, TransferType transferType, Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s has no transfer type", getFriendlyName()));
+  }
+
+  @Override
+  public default void restrictPaginationByTissueOrigin(Criteria item, String origin, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s has no tissue origin", getFriendlyName()));
+  }
+
+  @Override
+  public default void restrictPaginationByTissueType(Criteria item, String type, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s has no tissue type", getFriendlyName()));
   }
 
 }

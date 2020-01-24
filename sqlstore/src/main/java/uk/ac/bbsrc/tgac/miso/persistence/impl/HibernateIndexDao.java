@@ -30,7 +30,7 @@ public class HibernateIndexDao extends HibernateSaveDao<Index> implements IndexS
 
   private static final String[] SEARCH_PROPERTIES = new String[] { "name", "sequence", "family.name" };
 
-  private static final List<String> STANDARD_ALIASES = Arrays.asList("family");
+  private static final List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("family"));
 
   public HibernateIndexDao() {
     super(Index.class);
@@ -69,7 +69,7 @@ public class HibernateIndexDao extends HibernateSaveDao<Index> implements IndexS
   }
 
   @Override
-  public Iterable<String> listAliases() {
+  public Iterable<AliasDescriptor> listAliases() {
     return STANDARD_ALIASES;
   }
 

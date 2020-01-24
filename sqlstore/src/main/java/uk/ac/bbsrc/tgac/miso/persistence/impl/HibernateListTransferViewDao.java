@@ -56,7 +56,7 @@ public class HibernateListTransferViewDao implements ListTransferViewDao, Hibern
   }
 
   @Override
-  public Iterable<String> listAliases() {
+  public Iterable<AliasDescriptor> listAliases() {
     return Collections.emptyList();
   }
 

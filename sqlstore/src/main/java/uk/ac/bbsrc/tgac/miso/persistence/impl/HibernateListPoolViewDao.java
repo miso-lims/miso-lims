@@ -69,7 +69,7 @@ public class HibernateListPoolViewDao implements ListPoolViewDao, HibernatePagin
   }
 
   @Override
-  public Iterable<String> listAliases() {
+  public Iterable<AliasDescriptor> listAliases() {
     return Collections.emptyList();
   }
 

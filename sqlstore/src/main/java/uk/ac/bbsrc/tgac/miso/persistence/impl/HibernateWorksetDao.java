@@ -119,7 +119,7 @@ public class HibernateWorksetDao implements WorksetStore, HibernatePaginatedData
   }
 
   @Override
-  public Iterable<String> listAliases() {
+  public Iterable<AliasDescriptor> listAliases() {
     return Collections.emptyList();
   }
 

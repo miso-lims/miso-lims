@@ -1715,6 +1715,7 @@ public class Dtos {
     dto.setIndexLabels(from.getIndices().stream().sorted(Comparator.comparingInt(Index::getPosition)).map(Index::getLabel)
         .collect(Collectors.toList()));
     dto.setTargetedSequencingId(from.getTargetedSequencingId());
+    setInteger(dto::setDnaSize, from.getAliquotDnaSize(), true);
     setString(dto::setVolume, from.getAliquotVolume());
     dto.setVolumeUnits(from.getAliquotVolumeUnits());
     setString(dto::setNgUsed, from.getAliquotNgUsed());
@@ -1821,7 +1822,7 @@ public class Dtos {
         .map(PoolElement::getPoolableElementView)//
         .map(PoolableElementView::getAliquotDnaSize)//
         .filter(Objects::nonNull)//
-        .mapToDouble(Long::doubleValue)//
+        .mapToDouble(Integer::doubleValue)//
         .average()//
         .ifPresent(dto::setInsertSize);
 

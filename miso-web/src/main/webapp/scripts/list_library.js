@@ -24,7 +24,7 @@
 ListTarget.library = {
   name: "Libraries",
   createUrl: function(config, projectId) {
-    return "/miso/rest/libraries/dt" + (projectId ? '/project/' + projectId : '');
+    return projectId ? Urls.rest.libraries.projectDatatable(projectId) : Urls.rest.libraries.datatable;
   },
   getQueryUrl: function() {
     return Urls.rest.libraries.query;
@@ -47,7 +47,7 @@ ListTarget.library = {
           ids.push(library.id);
         });
         Utils.showConfirmDialog('Delete Libraries', 'Delete', lines, function() {
-          Utils.ajaxWithDialog('Deleting Libraries', 'POST', '/miso/rest/libraries/bulk-delete', ids, function() {
+          Utils.ajaxWithDialog('Deleting Libraries', 'POST', Urls.rest.libraries.bulkDelete, ids, function() {
             Utils.page.pageReload();
           });
         });
@@ -114,14 +114,12 @@ ListTarget.library = {
       "mData": "effectiveTissueOriginLabel",
       "include": Constants.isDetailedSample,
       "mRender": ListUtils.render.naIfNull,
-      "bSortable": false,
       "iSortPriority": 0
     }, {
       "sTitle": "Tissue Type",
       "mData": "effectiveTissueTypeLabel",
       "include": Constants.isDetailedSample,
       "mRender": ListUtils.render.naIfNull,
-      "bSortable": false,
       "iSortPriority": 0
     }, {
       "sTitle": "QC",
@@ -137,9 +135,9 @@ ListTarget.library = {
       "bSortable": false
     }, {
       "sTitle": "Size (bp)",
-      "mData": function(full, type, set) {
-        return full.hasOwnProperty('dnaSize') ? full.dnaSize : null;
-      },
+      "mData": "dnaSize",
+      "sDefaultContent": "",
+      "include": true,
       "iSortPriority": 0
     }, {
       "sTitle": "Indices",
@@ -156,24 +154,20 @@ ListTarget.library = {
       "include": true,
       "iSortPriority": 0,
       "mRender": function(data, type, full) {
-        return full.boxId ? "<a href='/miso/box/" + full.boxId + "'>" + data + "</a>" : data;
+        return full.boxId ? "<a href='" + Urls.ui.boxes.edit(full.boxId) + "'>" + data + "</a>" : data;
       },
       "bSortable": false
     }, {
       "sTitle": "Volume",
-      "mData": function(full, type, set) {
-        return full.hasOwnProperty('volume') ? full.volume : null;
-      },
+      "mData": "volume",
+      "sDefaultContent": "",
       "include": true,
-      "bSortable": false,
       "mRender": ListUtils.render.measureWithUnits(Constants.volumeUnits, 'volumeUnits')
     }, {
       "sTitle": "Concentration",
-      "mData": function(full, type, set) {
-        return full.hasOwnProperty('concentration') ? full.concentration : null;
-      },
+      "mData": "concentration",
+      "sDefaultContent": "",
       "include": true,
-      "bSortable": false,
       "mRender": ListUtils.render.measureWithUnits(Constants.concentrationUnits, 'concentrationUnits')
     }, {
       "sTitle": "Last Modified",
@@ -186,7 +180,7 @@ ListTarget.library = {
     const plainSampleTerms = [searchTerms['id'], searchTerms['created'], searchTerms['entered'], searchTerms['changed'],
         searchTerms['creator'], searchTerms['changedby'], searchTerms['platform'], searchTerms['index_name'], searchTerms['index_seq'],
         searchTerms['box'], searchTerms['freezer'], searchTerms['kitname'], searchTerms['distributed'], searchTerms['distributedto']];
-    const detailedSampleTerms = [searchTerms['groupid']];
+    const detailedSampleTerms = [searchTerms['tissueOrigin'], searchTerms['tissueType'], searchTerms['groupid']];
     if (Constants.isDetailedSample) {
       return plainSampleTerms.concat(detailedSampleTerms);
     } else {

@@ -13,8 +13,6 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,10 +31,8 @@ import uk.ac.bbsrc.tgac.miso.persistence.SequencerPartitionContainerStore;
 public class HibernateSequencerPartitionContainerDao
     implements SequencerPartitionContainerStore, HibernatePaginatedDataSource<SequencerPartitionContainer> {
 
-  protected static final Logger log = LoggerFactory.getLogger(HibernateSequencerPartitionContainerDao.class);
-
   private static final String[] SEARCH_PROPERTIES = new String[] { "identificationBarcode" };
-  private static final List<String> STANDARD_ALIASES = Arrays.asList("model");
+  private static final List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("model"));
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -165,7 +161,7 @@ public class HibernateSequencerPartitionContainerDao
   }
 
   @Override
-  public Iterable<String> listAliases() {
+  public Iterable<AliasDescriptor> listAliases() {
     return STANDARD_ALIASES;
   }
 

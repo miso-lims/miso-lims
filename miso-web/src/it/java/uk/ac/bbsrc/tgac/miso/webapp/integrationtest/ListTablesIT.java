@@ -20,6 +20,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.Columns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.ListTarget;
@@ -30,14 +31,14 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 
 public class ListTablesIT extends AbstractIT {
 
-  private static final Set<String> samplesColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.SAMPLE_CLASS,
-      Columns.TISSUE_ORIGIN, Columns.TISSUE_TYPE, Columns.QC, Columns.LOCATION, Columns.CREATION_DATE, Columns.LAST_MODIFIED);
+  private static final Set<String> samplesColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.TISSUE_ORIGIN,
+      Columns.TISSUE_TYPE, Columns.SAMPLE_CLASS, Columns.QC, Columns.LOCATION, Columns.CREATION_DATE, Columns.LAST_MODIFIED);
   private static final Set<String> librariesColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.TISSUE_ORIGIN,
-      Columns.TISSUE_TYPE, Columns.QC, Columns.DESIGN, Columns.INDICES, Columns.LOCATION, Columns.VOLUME, Columns.CONCENTRATION,
-      Columns.LAST_MODIFIED);
+      Columns.TISSUE_TYPE, Columns.QC, Columns.DESIGN, Columns.SIZE_BP, Columns.INDICES, Columns.LOCATION, Columns.VOLUME,
+      Columns.CONCENTRATION, Columns.LAST_MODIFIED);
   private static final Set<String> libraryAliquotsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS,
-      Columns.TISSUE_ORIGIN, Columns.TISSUE_TYPE, Columns.DESIGN, Columns.INDICES, Columns.LOCATION, Columns.VOLUME, Columns.CONCENTRATION,
-      Columns.LAST_MODIFIED);
+      Columns.TISSUE_ORIGIN, Columns.TISSUE_TYPE, Columns.DESIGN, Columns.SIZE_BP, Columns.INDICES, Columns.LOCATION, Columns.VOLUME,
+      Columns.CONCENTRATION, Columns.LAST_MODIFIED);
   private static final Set<String> poolsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS,
       Columns.DESCRIPTION, Columns.DATE_CREATED, Columns.LIBRARY_ALIQUOTS, Columns.CONCENTRATION, Columns.LOCATION, Columns.AVG_INSERT_SIZE,
       Columns.LAST_MODIFIED);
@@ -122,6 +123,10 @@ public class ListTablesIT extends AbstractIT {
 
   private static final Comparator<String> standardComparator = (s1, s2) -> s1.compareToIgnoreCase(s2);
 
+  private static Comparator<String> standardComparatorWithNullLabel(String nullLabel) {
+    return (s1, s2) -> (nullLabel.equals(s1) ? "" : s1).compareToIgnoreCase(nullLabel.equals(s2) ? "" : s2);
+  }
+
   /**
    * Comparator for columns which render the boolean values as symbols.
    */
@@ -174,6 +179,9 @@ public class ListTablesIT extends AbstractIT {
   private static final Pattern numberWithUnits = Pattern.compile("^(-?\\d+(?:\\.\\d+)?)(?: .+)?$");
 
   private static String removeUnits(String num) {
+    if (LimsUtils.isStringEmptyOrNull(num)) {
+      return num;
+    }
     Matcher m1 = numberWithUnits.matcher(num);
     if (!m1.matches()) {
       throw new IllegalArgumentException("Input does not match expected pattern: " + num);
@@ -852,7 +860,11 @@ public class ListTablesIT extends AbstractIT {
     case Columns.SAMPLE_NAME:
       return nameNumericComparator;
     case Columns.CONCENTRATION:
+    case Columns.VOLUME:
       return numericIgnoreUnitsComparator;
+    case Columns.TISSUE_ORIGIN:
+    case Columns.TISSUE_TYPE:
+      return standardComparatorWithNullLabel("n/a");
     default:
       return standardComparator;
     }

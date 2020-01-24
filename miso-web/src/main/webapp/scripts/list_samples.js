@@ -24,14 +24,14 @@
 ListTarget.sample = {
   name: "Samples",
   createUrl: function(config, projectId) {
-    var url = "/miso/rest/samples/dt";
     if (projectId) {
-      url += '/project/' + projectId;
       if (config.arrayed) {
-        url += '/arrayed';
+        return Urls.rest.samples.projectArrayedDatatable(projectId);
+      } else {
+        return Urls.rest.samples.projectDatatable(projectId);
       }
     }
-    return url;
+    return Urls.rest.samples.datatable;
   },
   getQueryUrl: function() {
     return Urls.rest.samples.query;
@@ -54,7 +54,7 @@ ListTarget.sample = {
           ids.push(sample.id);
         });
         Utils.showConfirmDialog('Delete Samples', 'Delete', lines, function() {
-          Utils.ajaxWithDialog('Deleting Samples', 'POST', '/miso/rest/samples/bulk-delete', ids, function() {
+          Utils.ajaxWithDialog('Deleting Samples', 'POST', Urls.rest.samples.bulkDelete, ids, function() {
             Utils.page.pageReload();
           });
         });
@@ -122,25 +122,22 @@ ListTarget.sample = {
       }),
       "sClass": "nowrap"
     }, ListUtils.labelHyperlinkColumn("Alias", Urls.ui.samples.edit, Utils.array.getId, "alias", 0, true), {
-      "sTitle": "Sample Class",
-      "mData": "sampleClassId",
-      "include": Constants.isDetailedSample,
-      "mRender": ListUtils.render.textFromId(Constants.sampleClasses, 'alias', "Plain"),
-      "bSortable": false,
-      "iSortPriority": 0
-    }, {
       "sTitle": "Tissue Origin",
       "mData": "effectiveTissueOriginLabel",
       "include": Constants.isDetailedSample,
       "mRender": ListUtils.render.naIfNull,
-      "bSortable": false,
       "iSortPriority": 0
     }, {
       "sTitle": "Tissue Type",
       "mData": "effectiveTissueTypeLabel",
       "include": Constants.isDetailedSample,
       "mRender": ListUtils.render.naIfNull,
-      "bSortable": false,
+      "iSortPriority": 0
+    }, {
+      "sTitle": "Sample Class",
+      "mData": "sampleClassId",
+      "include": Constants.isDetailedSample,
+      "mRender": ListUtils.render.textFromId(Constants.sampleClasses, 'alias', "Plain"),
       "iSortPriority": 0
     }, {
       "sTitle": "Type",
@@ -158,18 +155,16 @@ ListTarget.sample = {
       "mData": "locationLabel",
       "bSortable": false,
       "mRender": function(data, type, full) {
-        return full.boxId ? "<a href='/miso/box/" + full.boxId + "'>" + data + "</a>" : data;
+        return full.boxId ? "<a href='" + Urls.ui.boxes.edit(full.boxId) + "'>" + data + "</a>" : data;
       },
       "include": true,
       "iSortPriority": 0
     }, {
       "sTitle": "Creation Date",
       "mData": "creationDate",
+      "sDefaultContent": "",
       "include": Constants.isDetailedSample,
-      "iSortPriority": 0,
-      "mRender": function(data, type, full) {
-        return data || "";
-      }
+      "iSortPriority": 0
     }, {
       "sTitle": "Last Modified",
       "mData": "lastModified",
@@ -181,8 +176,8 @@ ListTarget.sample = {
     const plainSampleTerms = [searchTerms['id'], searchTerms['requisition'], searchTerms['entered'], searchTerms['changed'],
         searchTerms['received'], searchTerms['creator'], searchTerms['changedby'], searchTerms['box'], searchTerms['freezer'],
         searchTerms['distributed'], searchTerms['distributedto']];
-    const detailedSampleTerms = [searchTerms['created'], searchTerms['class'], searchTerms['institute'], searchTerms['external'],
-        searchTerms['subproject'], searchTerms['groupid'], searchTerms['ghost']];
+    const detailedSampleTerms = [searchTerms['created'], searchTerms['class'], searchTerms['tissueOrigin'], searchTerms['tissueType'],
+        searchTerms['institute'], searchTerms['external'], searchTerms['subproject'], searchTerms['groupid'], searchTerms['ghost']];
     if (Constants.isDetailedSample) {
       return plainSampleTerms.concat(detailedSampleTerms);
     } else {

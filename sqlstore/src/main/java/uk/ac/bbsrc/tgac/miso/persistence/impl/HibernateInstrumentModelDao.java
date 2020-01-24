@@ -152,7 +152,7 @@ public class HibernateInstrumentModelDao extends HibernateSaveDao<InstrumentMode
   }
 
   @Override
-  public Iterable<String> listAliases() {
+  public Iterable<AliasDescriptor> listAliases() {
     return Collections.emptyList();
   }
 

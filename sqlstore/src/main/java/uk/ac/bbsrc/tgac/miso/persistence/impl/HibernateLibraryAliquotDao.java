@@ -33,7 +33,7 @@ public class HibernateLibraryAliquotDao
   // Make sure these match the HiberatePoolableElementViewDao
   private final static String[] SEARCH_PROPERTIES = new String[] { "name", "identificationBarcode", "library.name", "library.alias",
       "library.description" };
-  private final static List<String> STANDARD_ALIASES = Arrays.asList("library");
+  private final static List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("library"));
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -132,7 +132,7 @@ public class HibernateLibraryAliquotDao
   }
 
   @Override
-  public Iterable<String> listAliases() {
+  public Iterable<AliasDescriptor> listAliases() {
     return STANDARD_ALIASES;
   }
 
