@@ -11,6 +11,7 @@ Changes:
   * Fixed receipt validation errors when date of receipt is not specified
   * Fixed error when scanning freezer location on Edit Box page
   * Don't show library name on library aliquot labels
+  * Fixed error printing items without group descriptions on `JTT_7_GROUPDESC`
 
 # 0.2.198
 
@@ -77,6 +78,7 @@ Known Issues:
   * Individual sample pages do not load correctly in detailed mode (recommended to skip this version
     if you use detailed sample mode)
   * Transfer item changes fail to save under some conditions
+  * Items without group descriptions fail to print on `JTT_7_GROUPDESC` labels
 
 # 0.2.197
 
