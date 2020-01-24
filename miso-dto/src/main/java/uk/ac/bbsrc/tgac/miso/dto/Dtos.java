@@ -511,9 +511,13 @@ public class Dtos {
       dto.setSubprojectPriority(from.getSubproject().getPriority());
     }
     if (from.getParent() != null) {
-      dto.setParentId(from.getParent().getId());
-      dto.setParentAlias(from.getParent().getAlias());
-      dto.setParentTissueSampleClassId(from.getParent().getSampleClass().getId());
+      DetailedSample parent = from.getParent();
+      dto.setParentId(parent.getId());
+      dto.setParentAlias(parent.getAlias());
+      dto.setParentTissueSampleClassId(parent.getSampleClass().getId());
+      if (parent.getBox() != null) {
+        dto.setParentBoxPositionLabel(BoxUtils.makeBoxPositionLabel(parent.getBox().getAlias(), parent.getBoxPosition()));
+      }
     }
     GroupIdentifiable effective = from.getEffectiveGroupIdEntity();
     if (effective != null) {

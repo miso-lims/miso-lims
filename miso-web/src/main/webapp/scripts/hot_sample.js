@@ -127,10 +127,6 @@ HotTarget.sample = (function() {
       }
 
       var columns = [
-          HotUtils.makeColumnForText('Parent Alias',
-              (Constants.isDetailedSample && config.pageMode == 'propagate' && !config.isLibraryReceipt), 'parentAlias', {
-                readOnly: true
-              }),
           {
             header: 'Sample Name',
             data: 'name',
@@ -333,6 +329,41 @@ HotTarget.sample = (function() {
             validator: HotUtils.validator.requiredAutocomplete,
             include: true
           },
+          {
+            header: 'Subproject',
+            data: 'subprojectAlias',
+            type: 'dropdown',
+            source: ['(None)'],
+            depends: ['*start', 'projectAlias'], // *start is a dummy value that gets run on page load only
+            update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+              var projectId = sam.projectId;
+              if (flatProperty === 'projectAlias') {
+                // sample's project has changed
+                projectId = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.aliasPredicate(flat.projectAlias),
+                    config.projects), 'id');
+              }
+              var subprojectsSource = Constants.subprojects.filter(function(subp) {
+                return subp.parentProjectId == projectId;
+              }).map(function(subp) {
+                return subp.alias;
+              }).sort();
+              setOptions({
+                'source': (subprojectsSource.length ? subprojectsSource : ['(None)'])
+              });
+              setData(subprojectsSource.length ? '' : '(None)');
+            },
+            validator: HotUtils.validator.requiredAutocomplete,
+            include: Constants.isDetailedSample,
+            unpack: function(sam, flat, setCellMeta) {
+              flat.subprojectAlias = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.idPredicate(sam.subprojectId),
+                  Constants.subprojects), 'alias')
+                  || '(None)';
+            },
+            pack: function(sam, flat, errorHandler) {
+              sam.subprojectId = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.aliasPredicate(flat.subprojectAlias),
+                  Constants.subprojects), 'id');
+            }
+          },
           HotUtils.makeColumnForText('Sci. Name', true, 'scientificName', {
             validator: HotUtils.validator.requiredTextNoSpecialChars,
             unpack: function(obj, flat, setCellMeta) {
@@ -352,25 +383,6 @@ HotTarget.sample = (function() {
           }),
 
           // Detailed Sample
-          // parent columns
-          {
-            header: 'Parent Sample Class',
-            data: 'parentTissueSampleClassAlias',
-            type: 'text',
-            readOnly: true,
-            unpack: function(sam, flat, setCellMeta) {
-              flat.parentTissueSampleClassAlias = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(item) {
-                return item.id == sam.parentTissueSampleClassId;
-              }, Constants.sampleClasses), 'alias');
-            },
-            pack: function(sam, flat, errorHandler) {
-              sam.parentTissueSampleClassId = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(item) {
-                return item.alias == flat.parentTissueSampleClassAlias;
-              }, Constants.sampleClasses), 'id');
-            },
-            include: Constants.isDetailedSample && config.pageMode == 'propagate' && !config.isLibraryReceipt
-          },
-
           // Identity columns
           {
             header: 'External Name',
@@ -518,41 +530,6 @@ HotTarget.sample = (function() {
           HotUtils.makeColumnForEnum('Consent', show['Identity'], true, 'consentLevel', Constants.consentLevels, 'This Project'),
 
           // Detailed sample columns
-          {
-            header: 'Subproject',
-            data: 'subprojectAlias',
-            type: 'dropdown',
-            source: ['(None)'],
-            depends: ['*start', 'projectAlias'], // *start is a dummy value that gets run on page load only
-            update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-              var projectId = sam.projectId;
-              if (flatProperty === 'projectAlias') {
-                // sample's project has changed
-                projectId = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.aliasPredicate(flat.projectAlias),
-                    config.projects), 'id');
-              }
-              var subprojectsSource = Constants.subprojects.filter(function(subp) {
-                return subp.parentProjectId == projectId;
-              }).map(function(subp) {
-                return subp.alias;
-              }).sort();
-              setOptions({
-                'source': (subprojectsSource.length ? subprojectsSource : ['(None)'])
-              });
-              setData(subprojectsSource.length ? '' : '(None)');
-            },
-            validator: HotUtils.validator.requiredAutocomplete,
-            include: Constants.isDetailedSample,
-            unpack: function(sam, flat, setCellMeta) {
-              flat.subprojectAlias = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.idPredicate(sam.subprojectId),
-                  Constants.subprojects), 'alias')
-                  || '(None)';
-            },
-            pack: function(sam, flat, errorHandler) {
-              sam.subprojectId = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.aliasPredicate(flat.subprojectAlias),
-                  Constants.subprojects), 'id');
-            }
-          },
           {
             header: 'Sample Class',
             data: 'sampleClassAlias',
@@ -959,6 +936,55 @@ HotTarget.sample = (function() {
         if (!Constants.isDetailedSample || !isTargetIdentity(config)) {
           // don't add boxable columns to Identities
           columns.splice.apply(columns, [spliceIndex, 0].concat(HotTarget.boxable.makeBoxLocationColumns(config)));
+        }
+
+        // parent columns go at start if propagating, or after the sample name and alias if editing
+        var parentColumns = [HotUtils.makeColumnForText('Parent Alias', true, 'parentAlias', {
+          readOnly: true
+        }), {
+          header: 'Parent Location',
+          data: 'parentBoxPositionLabel',
+          type: 'text',
+          readOnly: true,
+          include: true,
+          unpack: function(sam, flat, setCellMeta) {
+            flat.parentBoxPositionLabel = Utils.valOrNull(sam.parentBoxPositionLabel);
+          },
+          pack: function(sam, flat, errorHandler) {
+            // not modifiable
+          },
+          customSorting: [{
+            buttonText: 'Sort by Parent Location (rows)',
+            sortTarget: 'ParentRows',
+            sortFunc: HotUtils.sorting.rowSort
+          }, {
+            buttonText: 'Sort by Parent Location (columns)',
+            sortTarget: 'ParentColumns',
+            sortFunc: HotUtils.sorting.colSort
+          }]
+        }, {
+          header: 'Parent Sample Class',
+          data: 'parentTissueSampleClassAlias',
+          type: 'text',
+          readOnly: true,
+          unpack: function(sam, flat, setCellMeta) {
+            flat.parentTissueSampleClassAlias = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(item) {
+              return item.id == sam.parentTissueSampleClassId;
+            }, Constants.sampleClasses), 'alias');
+          },
+          pack: function(sam, flat, errorHandler) {
+            sam.parentTissueSampleClassId = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(item) {
+              return item.alias == flat.parentTissueSampleClassAlias;
+            }, Constants.sampleClasses), 'id');
+          },
+          include: config.pageMode == 'propagate'
+        }];
+        if (Constants.isDetailedSample) {
+          if (config.pageMode === 'propagate') {
+            columns.splice.apply(columns, [0, 0].concat(parentColumns));
+          } else if (config.pageMode === 'edit' && !isTargetIdentity(config)) {
+            columns.splice.apply(columns, [2, 0].concat(parentColumns));
+          }
         }
       }
 

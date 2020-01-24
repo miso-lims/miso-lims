@@ -10,6 +10,8 @@ Changes:
   * Allow searching and sorting by tissue origin and tissue type (detailed sample)
   * Allow sorting by volume and concentration on Library and Library Aliquot lists
   * Added buttons to sort by location (box position) on bulk pages
+  * Added parent alias and location columns and buttons to sort by parent location (box position)
+    on bulk sample pages (detailed sample)
   * Fixed detailed sample pages loading
   * Fixed error updating transfer items
   * Fixed receipt validation errors when date of receipt is not specified

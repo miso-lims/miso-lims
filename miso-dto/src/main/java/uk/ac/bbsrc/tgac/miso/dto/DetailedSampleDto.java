@@ -6,6 +6,7 @@ public class DetailedSampleDto extends SampleDto {
 
   private Long parentId;
   private String parentAlias;
+  private String parentBoxPositionLabel;
   private Long parentTissueSampleClassId;
   private Long sampleClassId;
   private String sampleClassAlias;
@@ -46,6 +47,14 @@ public class DetailedSampleDto extends SampleDto {
 
   public void setParentAlias(String parentAlias) {
     this.parentAlias = parentAlias;
+  }
+
+  public String getParentBoxPositionLabel() {
+    return parentBoxPositionLabel;
+  }
+
+  public void setParentBoxPositionLabel(String parentBoxPositionLabel) {
+    this.parentBoxPositionLabel = parentBoxPositionLabel;
   }
 
   public Long getParentTissueSampleClassId() {

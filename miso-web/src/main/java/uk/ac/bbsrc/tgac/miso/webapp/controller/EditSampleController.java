@@ -85,6 +85,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.core.service.StainService;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
+import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
@@ -525,6 +526,9 @@ public class EditSampleController {
         dto.setSampleType(sample.getSampleType());
         dto.setParentId(sample.getId());
         dto.setParentAlias(sample.getAlias());
+        if (sample.getBox() != null) {
+          dto.setParentBoxPositionLabel(BoxUtils.makeBoxPositionLabel(sample.getBox().getAlias(), sample.getBoxPosition()));
+        }
         dto.setParentTissueSampleClassId(sample.getSampleClass().getId());
         dto.setProjectId(sample.getProject().getId());
         if (sample.getHierarchyAttributes() != null && sample.getHierarchyAttributes().getConsentLevel() != null) {
