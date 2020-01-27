@@ -573,7 +573,7 @@ HotTarget.sample = (function() {
           {
             header: 'Effective Group ID',
             data: 'effectiveGroupId',
-            include: Constants.isDetailedSample && !isTargetIdentity(config) && !config.isLibraryReceipt && config.pageMode != 'create',
+            include: Constants.isDetailedSample && !isTargetIdentity(config) && !config.isLibraryReceipt && config.pageMode === 'edit',
             type: 'text',
             readOnly: true,
             depends: 'groupId',
