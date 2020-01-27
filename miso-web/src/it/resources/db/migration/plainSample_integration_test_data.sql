@@ -13,10 +13,10 @@ INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (1, 'Triticu
 
 INSERT INTO QCType (name, description, qcTarget, units, archived, precisionAfterDecimal) VALUES
 ('RIN', 'RIN', 'Sample', ' ', 0, 1),
-('DV200', 'DV200', 'Sample', 'percent', 0, 2),
+('DV200', 'DV200', 'Sample', '%', 0, 2),
 ('Tape Station', 'Tape Station', 'Library', 'bp', 0, 2),
-('Qubit', 'Qubit', 'Library', 'ng/ul', 0, 2),
-('qPCR', 'qPCR', 'Library', 'mol/ul', 0, 2);
+('Qubit', 'Qubit', 'Library', 'ng/µl', 0, 2),
+('qPCR', 'qPCR', 'Library', 'mol/µl', 0, 2);
 
 INSERT INTO LibraryType(libraryTypeId, description, platformType, archived, abbreviation) VALUES
   (1, 'Paired End',  'ILLUMINA',0,'PE'),
