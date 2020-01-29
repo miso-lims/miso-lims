@@ -8,6 +8,7 @@ Changes:
   * Freeze "Parent Alias" column on the bulk Propagate Samples page
   * Allow removing box from freezer on Edit Box page
   * Added size (bp) column to Library and Library Aliquot lists
+  * Removed "Effective Group ID" column from bulk propagate samples page (detailed sample)
   * Allow searching and sorting by tissue origin and tissue type (detailed sample)
   * Allow sorting by volume and concentration on Library and Library Aliquot lists
   * Added buttons to sort by location (box position) on bulk pages
