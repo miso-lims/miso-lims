@@ -43,4 +43,8 @@ public interface SampleService
 
   Sample save(Sample sample) throws IOException;
 
+  public Sample getNextInProject(Sample sample);
+
+  public Sample getPreviousInProject(Sample sample);
+
 }

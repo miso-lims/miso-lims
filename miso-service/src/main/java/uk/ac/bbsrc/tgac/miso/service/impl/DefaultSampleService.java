@@ -1129,4 +1129,14 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     return sampleStore.list(errorHandler, offset, limit, sortDir, sortCol, filter);
   }
 
+  @Override
+  public Sample getNextInProject(Sample sample) {
+    return sampleStore.getNextInProject(sample);
+  }
+
+  @Override
+  public Sample getPreviousInProject(Sample sample) {
+    return sampleStore.getPreviousInProject(sample);
+  }
+
 }

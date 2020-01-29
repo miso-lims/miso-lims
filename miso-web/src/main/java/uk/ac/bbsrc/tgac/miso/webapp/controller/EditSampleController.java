@@ -29,9 +29,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -208,40 +206,6 @@ public class EditSampleController {
     return stainService.list();
   }
 
-  public Map<String, Sample> getAdjacentSamplesInProject(Sample s, @RequestParam(value = "projectId", required = false) Long projectId)
-      throws IOException {
-    Project p = s.getProject();
-    Sample prevS = null;
-    Sample nextS = null;
-
-    if (p != null && p.getId() == projectId) {
-      if (p.getSamples().isEmpty()) {
-        // if p was lazy loaded then it doesn't have samples.
-        p = projectService.get(p.getId());
-      }
-      if (!p.getSamples().isEmpty()) {
-        Map<String, Sample> ret = new HashMap<>();
-        List<Sample> ss = new ArrayList<>(p.getSamples());
-        Collections.sort(ss, (a, b) -> Long.compare(a.getId(), b.getId()));
-        for (int i = 0; i < ss.size(); i++) {
-          if (ss.get(i).getId() == s.getId()) {
-            if (i > 0) {
-              prevS = ss.get(i - 1);
-            }
-            if (i < ss.size() - 2) {
-              nextS = ss.get(i + 1);
-            }
-            break;
-          }
-        }
-        ret.put("previousSample", prevS);
-        ret.put("nextSample", nextS);
-        return ret;
-      }
-    }
-    return Collections.emptyMap();
-  }
-
   @Autowired
   private SampleClassService sampleClassService;
 
@@ -252,11 +216,8 @@ public class EditSampleController {
 
     model.put("title", "Sample " + sampleId);
 
-    Map<String, Sample> adjacentSamples = getAdjacentSamplesInProject(sample, sample.getProject().getId());
-    if (!adjacentSamples.isEmpty()) {
-      model.put("previousSample", adjacentSamples.get("previousSample"));
-      model.put("nextSample", adjacentSamples.get("nextSample"));
-    }
+    model.put("previousSample", sampleService.getPreviousInProject(sample));
+    model.put("nextSample", sampleService.getNextInProject(sample));
 
     model.put("sampleCategory",
         LimsUtils.isDetailedSample(sample) ? ((DetailedSample) sample).getSampleClass().getSampleCategory() : "plain");

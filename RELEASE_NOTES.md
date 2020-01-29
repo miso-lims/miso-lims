@@ -28,6 +28,7 @@ Changes:
       * Spike-in
       * Spike-in dilution factor
       * Spike-in volume
+  * Improved performance of Edit Sample page
   * Fixed detailed sample pages loading
   * Fixed error updating transfer items
   * Fixed receipt validation errors when date of receipt is not specified
@@ -102,8 +103,9 @@ Upgrade Notes:
 
 Known Issues:
 
-  * Individual sample pages do not load correctly in detailed mode (recommended to skip this version
-    if you use detailed sample mode)
+  * Edit Sample page does not load correctly in detailed mode (recommended to skip this version if
+    you use detailed sample mode)
+  * Edit Sample page is slow to load for samples in large projects
   * Transfer item changes fail to save under some conditions
   * Items without group descriptions fail to print on `JTT_7_GROUPDESC` labels
 

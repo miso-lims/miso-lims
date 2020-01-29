@@ -133,5 +133,16 @@ public interface SampleStore extends Store<Sample>, PaginatedDataSource<Sample> 
 
   public long getChildSampleCount(Sample sample);
 
+  /**
+   * @param sample the "current" sample
+   * @return the sample in the same project as the "current" sample with the next ID in numerical order
+   */
+  public Sample getNextInProject(Sample sample);
+
+  /**
+   * @param sample the "current" sample
+   * @return the sample in the same project as the "current" sample with the previous ID in numerical order
+   */
+  public Sample getPreviousInProject(Sample sample);
 
 }
