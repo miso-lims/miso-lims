@@ -218,9 +218,9 @@ INSERT INTO Indices (indexId, indexFamilyId, name, sequence, position) VALUES
 -- Plain sample data
 
 INSERT INTO Project(projectId, name, alias, shortName, created, description,
-  status, referenceGenomeId, lastModified, creator, lastModifier) VALUES
-  (1, 'PRO1', 'Project One', 'PRO1', '2017-06-27', 'integration test project one', 'ACTIVE', 1, '2017-06-27 14:11:00', 1, 1),
-  (2, 'PRO2', 'Project Two', 'PRO2', '2017-06-27', 'integration test project two', 'ACTIVE', 1, '2017-06-27 14:11:00', 1, 1);
+  status, referenceGenomeId, lastModified, creator, lastModifier, clinical) VALUES
+  (1, 'PRO1', 'Project One', 'PRO1', '2017-06-27', 'integration test project one', 'ACTIVE', 1, '2017-06-27 14:11:00', 1, 1, FALSE),
+  (2, 'PRO2', 'Project Two', 'PRO2', '2017-06-27', 'integration test project two', 'ACTIVE', 1, '2017-06-27 14:11:00', 1, 1, TRUE);
 
 INSERT INTO Sample (sampleId, name, alias, description, identificationBarcode, sampleType, project_projectId,
 scientificName, volume, qcPassed, lastModifier, creator, created, lastModified) VALUES

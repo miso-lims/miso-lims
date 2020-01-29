@@ -90,6 +90,10 @@ FormTarget.project = (function($) {
           getItemValue: function(item) {
             return item.id;
           }
+        }, {
+          title: 'Clinical',
+          data: 'clinical',
+          type: 'checkbox'
         }]
       }];
     }

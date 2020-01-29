@@ -1141,6 +1141,7 @@ public class MisoClient implements Lims {
       p.setEarliest(rs.getTimestamp("earliest"));
       p.setLatest(rs.getTimestamp("latest"));
       p.setActive(rs.getBoolean("active"));
+      p.setClinical(rs.getBoolean("clinical"));
 
       return p;
     }

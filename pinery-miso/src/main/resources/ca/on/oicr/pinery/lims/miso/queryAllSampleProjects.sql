@@ -7,12 +7,14 @@ SELECT NAME
         ,MIN(created) earliest 
         ,MAX(updated) latest 
         ,MAX(active) active 
+        ,MAX(clinical) clinical
 FROM ( 
         SELECT COALESCE(sp.shortName, sp.alias) NAME 
                 ,sai.archived archived 
                 ,s.created created 
                 ,s.lastModified updated 
                 ,sp.status IN ('ACTIVE', 'PENDING') active 
+                ,sp.clinical clinical
         FROM Sample s 
         LEFT JOIN DetailedSample sai ON sai.sampleId = s.sampleId 
         INNER JOIN Project sp ON sp.projectId = s.project_projectId 
@@ -23,7 +25,8 @@ UNION ALL
                 ,lai.archived archived 
                 ,l.created created 
                 ,l.lastModified updated
-                ,lp.status IN ('ACTIVE', 'PENDING') active 
+                ,lp.status IN ('ACTIVE', 'PENDING') active
+                ,lp.clinical clinical
         FROM Library l
         LEFT JOIN DetailedLibrary lai ON lai.libraryId = l.libraryId
         INNER JOIN Sample ls ON l.sample_sampleId = ls.sampleId 

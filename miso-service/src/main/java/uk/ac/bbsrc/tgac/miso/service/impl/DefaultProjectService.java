@@ -181,6 +181,7 @@ public class DefaultProjectService implements ProjectService {
     original.setReferenceGenome(project.getReferenceGenome());
     original.setDefaultTargetedSequencing(project.getDefaultTargetedSequencing());
     original.setShortName(project.getShortName());
+    original.setClinical(project.isClinical());
   }
 
   public void setNamingScheme(NamingScheme namingScheme) {

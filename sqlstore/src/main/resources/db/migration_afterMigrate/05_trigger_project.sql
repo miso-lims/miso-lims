@@ -18,7 +18,8 @@ FOR EACH ROW
         CASE WHEN (NEW.description IS NULL) <> (OLD.description IS NULL) OR NEW.description <> OLD.description THEN CONCAT('description: ', OLD.description, ' → ', NEW.description) END,
         CASE WHEN NEW.status <> OLD.status THEN CONCAT('status: ', OLD.status, ' → ', NEW.status) END,
         CASE WHEN NEW.referenceGenomeId <> OLD.referenceGenomeId THEN CONCAT('reference genome: ', (SELECT alias FROM ReferenceGenome WHERE referenceGenomeId = OLD.referenceGenomeId), ' → ', (SELECT alias FROM ReferenceGenome WHERE referenceGenomeId = NEW.referenceGenomeId)) END,
-        CASE WHEN (NEW.targetedSequencingId IS NULL) <> (OLD.targetedSequencingId IS NULL) OR NEW.targetedSequencingId <> OLD.targetedSequencingId THEN CONCAT('targeted sequencing: ', COALESCE((SELECT alias FROM TargetedSequencing WHERE targetedSequencingId = OLD.targetedSequencingId), 'n/a'), ' → ', COALESCE((SELECT alias FROM TargetedSequencing WHERE targetedSequencingId = NEW.targetedSequencingId), 'n/a')) END);
+        CASE WHEN (NEW.targetedSequencingId IS NULL) <> (OLD.targetedSequencingId IS NULL) OR NEW.targetedSequencingId <> OLD.targetedSequencingId THEN CONCAT('targeted sequencing: ', COALESCE((SELECT alias FROM TargetedSequencing WHERE targetedSequencingId = OLD.targetedSequencingId), 'n/a'), ' → ', COALESCE((SELECT alias FROM TargetedSequencing WHERE targetedSequencingId = NEW.targetedSequencingId), 'n/a')) END,
+        CASE WHEN NEW.clinical <> OLD.clinical THEN CONCAT('clinical: ', booleanToString(OLD.clinical), ' → ', booleanToString(NEW.clinical)) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO ProjectChangeLog(projectId, columnsChanged, userId, message, changeTime) VALUES (
       NEW.projectId,
@@ -28,7 +29,8 @@ FOR EACH ROW
         CASE WHEN (NEW.description IS NULL) <> (OLD.description IS NULL) OR NEW.description <> OLD.description THEN 'description' END,
         CASE WHEN NEW.status <> OLD.status THEN 'status' END,
         CASE WHEN NEW.referenceGenomeId <> OLD.referenceGenomeId THEN 'reference genome' END,
-        CASE WHEN (NEW.targetedSequencingId IS NULL) <> (OLD.targetedSequencingId IS NULL) OR NEW.targetedSequencingId <> OLD.targetedSequencingId THEN 'targeted sequencing' END), ''),
+        CASE WHEN (NEW.targetedSequencingId IS NULL) <> (OLD.targetedSequencingId IS NULL) OR NEW.targetedSequencingId <> OLD.targetedSequencingId THEN 'targeted sequencing' END,
+        CASE WHEN NEW.clinical <> OLD.clinical THEN 'clinical' END), ''),
       NEW.lastModifier,
       log_message,
       NEW.lastModified);
