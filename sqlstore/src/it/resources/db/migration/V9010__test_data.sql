@@ -150,12 +150,12 @@ VALUES
 INSERT INTO `QCType` (`qcTypeId`, `name`, `description`, `qcTarget`, `units`)
 VALUES
     (2,'Bioanalyzer','Chip-based capillary electrophoresis machine to analyse RNA, DNA, and protein, manufactured by Agilent','Library','nM'),
-    (7,'QuBit','Quantitation of DNA, RNA and protein, manufacturered by Invitrogen','Sample','ng/&#181;l'),
-    (3,'Bioanalyser','Chip-based capillary electrophoresis machine to analyse RNA, DNA, and protein, manufactured by Agilent','Sample','ng/&#181;l'),
-    (4,'QuBit','Quantitation of DNA, RNA and protein, manufacturered by Invitrogen','Library','ng/&#181;l'),
+    (7,'QuBit','Quantitation of DNA, RNA and protein, manufacturered by Invitrogen','Sample','ng/µl'),
+    (3,'Bioanalyser','Chip-based capillary electrophoresis machine to analyse RNA, DNA, and protein, manufactured by Agilent','Sample','ng/µl'),
+    (4,'QuBit','Quantitation of DNA, RNA and protein, manufacturered by Invitrogen','Library','ng/µl'),
     (6,'SeqInfo QC','Post-run completion run QC step, undertaken by the SeqInfo team, as part of the primary analysis stage.','Run',''),
     (5,'SeqOps QC','Post-run completion run QC step, undertaken by the SeqOps team, to move a run through to the primary analysis stage.','Run',''),
-    (1,'qPCR','Quantitative PCR','Library','mol/&#181;l'),
+    (1,'qPCR','Quantitative PCR','Library','mol/µl'),
     (8,'poolQcType1', 'qc 1 for pools', 'Pool', 'nM'),
   (9,'poolQcType2', 'qc 2 for pools', 'Pool', 'nM'),
   (10,'poolQcType3', 'qc 3 for pools', 'Pool', 'nM'),

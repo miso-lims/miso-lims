@@ -136,10 +136,10 @@ INSERT INTO `DetailedQcStatus` (DetailedQcStatusId, status, description, noteReq
 
 INSERT INTO QCType (name, description, qcTarget, units, archived, precisionAfterDecimal) VALUES
 ('RIN', 'RIN', 'Sample', ' ', 0, 1),
-('DV200', 'DV200', 'Sample', 'percent', 0, 2),
+('DV200', 'DV200', 'Sample', '%', 0, 2),
 ('Tape Station', 'Tape Station', 'Library', 'bp', 0, 2),
-('Qubit', 'Qubit', 'Library', 'ng/ul', 0, 2),
-('qPCR', 'qPCR', 'Library', 'mol/ul', 0, 2);
+('Qubit', 'Qubit', 'Library', 'ng/µl', 0, 2),
+('qPCR', 'qPCR', 'Library', 'mol/µl', 0, 2);
 
 INSERT INTO LibraryType(libraryTypeId, description, platformType, archived, abbreviation) VALUES
   (1, 'Paired End',  'ILLUMINA',0,'PE'),
@@ -1107,13 +1107,13 @@ INSERT INTO ArrayRun(arrayRunId, alias, instrumentId, arrayId, health, startDate
 
 INSERT INTO QCType(qcTypeId, name, description, qcTarget, units, archived, precisionAfterDecimal, correspondingField, autoUpdateField) VALUES
 (101, 'test edit qc', '', 'Sample', 'test units', 0, 2, 'NONE', 0),
-(102, 'update volume qc', '', 'Sample', '&#181;L', 0, 2, 'VOLUME', 1),
+(102, 'update volume qc', '', 'Sample', 'µL', 0, 2, 'VOLUME', 1),
 (103, 'update concentration qc', '', 'Sample', 'nM', 0, 2, 'CONCENTRATION', 1),
 (104, 'test edit qc', '', 'Library', 'test units', 0, 2, 'NONE', 0),
-(105, 'update volume qc', '', 'Library', '&#181;L', 0, 2, 'VOLUME', 1),
+(105, 'update volume qc', '', 'Library', 'µL', 0, 2, 'VOLUME', 1),
 (106, 'update concentration qc', '', 'Library', 'nM', 0, 2, 'CONCENTRATION', 1),
 (107, 'test edit qc', '', 'Pool', 'test units', 0, 2, 'NONE', 0),
-(108, 'update volume qc', '', 'Pool', '&#181;L', 0, 2, 'VOLUME', 1),
+(108, 'update volume qc', '', 'Pool', 'µL', 0, 2, 'VOLUME', 1),
 (109, 'update concentration qc', '', 'Pool', 'nM', 0, 2, 'CONCENTRATION', 1);
 
 

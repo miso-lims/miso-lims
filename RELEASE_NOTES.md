@@ -19,6 +19,7 @@ Changes:
   * Fixed error when scanning freezer location on Edit Box page
   * Don't show library name on library aliquot labels
   * Fixed error printing items without group descriptions on `JTT_7_GROUPDESC`
+  * Fixed validation of QC Type units; HTML character references should no longer be used
 
 Upgrade Notes:
 
