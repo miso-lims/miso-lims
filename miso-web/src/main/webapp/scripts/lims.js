@@ -695,6 +695,12 @@ var Utils = Utils
         var now = new Date();
         return Utils.formatTwelveHourTime(now.getHours(), now.getMinutes());
       },
+      // Return current date and time in format YYYY-MM-DD HH:mm:ss (e.g. 2020-01-30 15:30:00)
+      getCurrentDatetime: function() {
+        var now = new Date();
+        return now.getFullYear() + "-" + Utils.zeroPad(now.getMonth() + 1, 2) + "-" + Utils.zeroPad(now.getDate(), 2)
+        + ' ' + now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds();
+      },
       // Given a 24hr time format (14:30[:00]), returns the same time in 12hr format hh:mm a (e.g. 2:30 pm). Seconds are ignored
       toTwelveHourTime: function(time) {
         timeParts = time.split(':');
