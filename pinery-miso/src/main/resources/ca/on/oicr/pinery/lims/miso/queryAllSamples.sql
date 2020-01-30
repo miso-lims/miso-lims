@@ -68,6 +68,11 @@ SELECT s.alias NAME
         ,slide.markedAreaSize marked_area_size
         ,slide.markedAreaPercentTumour marked_area_percent_tumour
         ,COALESCE(pieceRefSlide.name, ssRefSlide.name) reference_slide_id
+        ,sssc.targetCellRecovery target_cell_recovery
+        ,sssc.cellViability cell_viability
+        ,NULL spike_in
+        ,NULL spike_in_dilution_factor
+        ,NULL spike_in_volume_ul
 FROM Sample s
 LEFT JOIN DetailedSample sai ON sai.sampleId = s.sampleId 
 LEFT JOIN DetailedQcStatus qpd ON qpd.detailedQcStatusId = sai.detailedQcStatusId 
@@ -85,6 +90,7 @@ LEFT JOIN TissueMaterial tm ON tm.tissueMaterialId = st.tissueMaterialId
 LEFT JOIN Lab la ON st.labId = la.labId
 LEFT JOIN Institute it ON la.instituteId = it.instituteId
 LEFT JOIN SampleStock ss ON sai.sampleId = ss.sampleId
+LEFT JOIN SampleStockSingleCell sssc ON sssc.sampleId = ss.sampleId
 LEFT JOIN Sample ssRefSlide ON ssRefSlide.sampleId = ss.referenceSlideId
 LEFT JOIN SampleSlide slide ON slide.sampleId = s.sampleId
 LEFT JOIN Stain stain ON stain.stainId = slide.stain
@@ -255,10 +261,16 @@ SELECT l.alias NAME
         ,NULL marked_area_size
         ,NULL marked_area_percent_tumour
         ,NULL reference_slide_id
+        ,NULL target_cell_recovery
+        ,NULL cell_viability
+        ,lsi.alias spike_in
+        ,l.spikeInDilutionFactor spike_in_dilution_factor
+        ,l.spikeInVolume spike_in_volume_ul
 FROM Library l 
 LEFT JOIN Sample parent ON parent.sampleId = l.sample_sampleId
 LEFT JOIN Project sp ON sp.projectId = parent.project_projectId
 LEFT JOIN DetailedLibrary lai ON lai.libraryId = l.libraryId
+LEFT JOIN LibrarySpikeIn lsi ON lsi.spikeInId = l.spikeInId
 LEFT JOIN KitDescriptor kd ON kd.kitDescriptorId = l.kitDescriptorId
 LEFT JOIN LibraryDesignCode ldc ON lai.libraryDesignCodeId = ldc.libraryDesignCodeId
 LEFT JOIN LibraryType lt ON lt.libraryTypeId = l.libraryType
@@ -396,6 +408,11 @@ SELECT d.alias name
         ,NULL marked_area_size
         ,NULL marked_area_percent_tumour
         ,NULL reference_slide_id
+        ,NULL target_cell_recovery
+        ,NULL cell_viability
+        ,NULL spike_in
+        ,NULL spike_in_dilution_factor
+        ,NULL spike_in_volume_ul
 FROM LibraryAliquot d 
 LEFT JOIN LibraryAliquot laParent ON laParent.aliquotId = d.parentAliquotId
 JOIN Library lib ON lib.libraryId = d.libraryId 

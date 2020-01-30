@@ -19,6 +19,15 @@ Changes:
   * Default received and QC passed to "Yes" in transfer item dialogs
   * Exclude receipt fields from propagate samples page
   * Changed transfer date to include time
+  * Export more attributes in Pinery-MISO
+    * Run purpose
+    * Single Cell Stock (detailed sample) attributes
+      * Target cell recovery
+      * Cell Viability
+    * Library spike-in attributes
+      * Spike-in
+      * Spike-in dilution factor
+      * Spike-in volume
   * Fixed detailed sample pages loading
   * Fixed error updating transfer items
   * Fixed receipt validation errors when date of receipt is not specified

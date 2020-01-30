@@ -1,9 +1,11 @@
-SELECT DISTINCT part.partitionId
+SELECT DISTINCT Run.runId
+  ,part.partitionId
   ,ld.name aliquotId
   ,bc1.sequence barcode
   ,bc2.sequence barcode_two
   ,tr.alias targeted_sequencing 
   ,im.dataManglingPolicy dataManglingPolicy
+  ,rp.alias run_purpose
 FROM SequencingContainerModel scm
 JOIN SequencerPartitionContainer spc ON scm.sequencingContainerModelId = spc.sequencingContainerModelId
 JOIN SequencerPartitionContainer_Partition spcp ON spcp.container_containerId = spc.containerId
@@ -27,3 +29,8 @@ JOIN Run_SequencerPartitionContainer rspc ON rspc.containers_containerId = spc.c
 JOIN Run ON Run.runId = rspc.run_runId
 JOIN Instrument inst ON inst.instrumentId = Run.instrumentId
 JOIN InstrumentModel im ON im.instrumentModelId = inst.instrumentModelId
+LEFT JOIN Run_Partition_LibraryAliquot rpa
+  ON rpa.runId = Run.runId
+  AND rpa.partitionId = part.partitionId
+  AND rpa.aliquotId = ld.aliquotId
+LEFT JOIN RunPurpose rp ON rp.purposeId = rpa.purposeId
