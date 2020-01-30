@@ -36,8 +36,8 @@ ListTarget.transfer = (function() {
         include: true,
         bSortable: false
       }, {
-        sTitle: 'Transfer Date',
-        mData: 'transferDate',
+        sTitle: 'Transfer Time',
+        mData: 'transferTime',
         include: true,
         iSortPriority: 1
       }, {

@@ -28,7 +28,7 @@ public class ListTransferView implements Identifiable, Serializable {
   private long transferId;
 
   @Temporal(TemporalType.DATE)
-  private Date transferDate;
+  private Date transferTime;
 
   @ManyToOne(targetEntity = LabImpl.class)
   @JoinColumn(name = "senderLabId")
@@ -60,12 +60,12 @@ public class ListTransferView implements Identifiable, Serializable {
     this.transferId = id;
   }
 
-  public Date getTransferDate() {
-    return transferDate;
+  public Date getTransferTime() {
+    return transferTime;
   }
 
-  public void setTransferDate(Date transferDate) {
-    this.transferDate = transferDate;
+  public void setTransferTime(Date transferTime) {
+    this.transferTime = transferTime;
   }
 
   public Lab getSenderLab() {

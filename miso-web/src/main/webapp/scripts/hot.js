@@ -160,6 +160,7 @@ var HotUtils = {
       return callback(false);
     }
   },
+
   /**
    * Create a Handsontables for our data. This involves a “target” that knows how to handle the particulars of our object type, whether
    * these are being created or modified and a list of data items.

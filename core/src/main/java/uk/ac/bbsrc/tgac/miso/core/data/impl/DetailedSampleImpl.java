@@ -272,7 +272,7 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
 
   private Date getReceivedDate() {
     TransferItem<?> receipt = getReceiptTransfer();
-    return receipt == null ? null : receipt.getTransfer().getTransferDate();
+    return receipt == null ? null : receipt.getTransfer().getTransferTime();
   }
 
   @Override

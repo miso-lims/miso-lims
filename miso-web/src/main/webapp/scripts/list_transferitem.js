@@ -41,42 +41,42 @@ ListTarget.transferitem = (function() {
                     });
                 return;
               }
-              Utils.ajaxWithDialog('Searching for Boxes', 'GET', Urls.rest.boxes.searchPartial + '?' + jQuery.param({
-                q: results.query,
-                b: true
-              }), null, function(boxes) {
-                Utils.showWizardDialog('Add to Box', boxes.map(function(box) {
-                  return {
-                    name: box.name + ' - ' + box.alias,
-                    handler: function() {
-                      Utils.showDialog('Add to Box', 'Add', items.map(function(item) {
-                        return {
-                          label: item.name + ' - ' + item.alias,
-                          property: item.name + 'Position',
-                          type: 'select',
-                          values: [null].concat(Utils.getEmptyBoxPositions(box)),
-                          getLabel: function(value) {
-                            return value || 'n/a';
-                          }
-                        };
-                      }), function(positionResults) {
-                        items.forEach(function(item) {
-                          if (positionResults[item.name + 'Position']) {
-                            item.boxId = box.id;
-                            item.boxAlias = box.alias;
-                            item.boxPosition = positionResults[item.name + 'Position'];
-                          } else {
-                            item.boxId = null;
-                            item.boxAlias = null;
-                            item.boxPosition = null;
-                          }
-                        });
-                        Transfer.updateItems(items);
-                      });
-                    }
-                  };
-                }));
-              });
+              queryBoxes(results.query, items);
+            });
+          }
+        }, {
+          name: 'Receipt Wizard',
+          action: function(items) {
+            Utils.showDialog('Receipt Wizard', 'Save', [makeBooleanField('Received', 'received'),
+                makeBooleanField('QC Passed', 'qcPassed'), {
+                  label: 'QC Note',
+                  property: 'qcNote',
+                  type: 'text'
+                }, {
+                  label: 'Box Name, Alias, or Barcode (if changing)',
+                  property: 'boxQuery',
+                  type: 'text'
+                }], function(results) {
+              if (results.qcPassed === false && !results.qcNote) {
+                Utils.showOkDialog('Error', ['QC note is required when QC is failed']);
+                return;
+              } else if (!new RegExp(Utils.validation.sanitizeRegex).test(results.qcNote)) {
+                Utils.showOkDialog('Error', ['QC note contains invalid characters']);
+                return;
+              }
+              var applyChanges = function() {
+                items.forEach(function(item) {
+                  item.received = results.received;
+                  item.qcPassed = results.qcPassed;
+                  item.qcNote = results.qcNote;
+                });
+              }
+              if (results.boxQuery) {
+                queryBoxes(results.boxQuery, items, applyChanges);
+              } else {
+                applyChanges();
+                Transfer.updateItems(items);
+              }
             });
           }
         })
@@ -135,7 +135,7 @@ ListTarget.transferitem = (function() {
         mData: 'boxId',
         mRender: function(data, type, full) {
           if (type === 'display') {
-            return data ? (full.boxAlias + ' ' + full.boxPosition) : 'Unknown';
+            return data ? "<a href='" + Urls.ui.boxes.edit(data) + "'>" + full.boxAlias + ' ' + full.boxPosition + "</a>" : 'Unknown';
           }
           return data;
         },
@@ -225,23 +225,7 @@ ListTarget.transferitem = (function() {
   function makeUpdateBooleanHandler(title, fieldLabel, property, includeQcNote) {
     var isQc = property === 'qcPassed';
     return function(items) {
-      var fields = [{
-        label: fieldLabel,
-        property: 'value',
-        type: 'select',
-        values: [true, false, null],
-        getLabel: function(value) {
-          switch (value) {
-          case true:
-            return 'Yes';
-          case false:
-            return 'No';
-          case null:
-            return 'Unknown';
-          }
-        },
-        value: 'Unknown'
-      }];
+      var fields = [makeBooleanField(fieldLabel, 'value')];
       if (isQc) {
         fields.push({
           label: 'QC Note',
@@ -268,6 +252,68 @@ ListTarget.transferitem = (function() {
         Transfer.updateItems(items);
       });
     };
+  }
+
+  function makeBooleanField(fieldLabel, property) {
+    return {
+      label: fieldLabel,
+      property: property,
+      type: 'select',
+      values: [true, false, null],
+      getLabel: function(value) {
+        switch (value) {
+        case true:
+          return 'Yes';
+        case false:
+          return 'No';
+        case null:
+          return 'Unknown';
+        }
+      },
+      value: 'Yes'
+    };
+  }
+
+  function queryBoxes(query, items, callback) {
+    Utils.ajaxWithDialog('Searching for Boxes', 'GET', Urls.rest.boxes.searchPartial + '?' + jQuery.param({
+      q: query,
+      b: true
+    }), null, function(boxes) {
+      Utils.showWizardDialog('Add to Box', boxes.map(function(box) {
+        return {
+          name: box.name + ' - ' + box.alias,
+          handler: function() {
+            Utils.showDialog('Add to Box', 'Add', items.map(function(item) {
+              return {
+                label: item.name + ' - ' + item.alias,
+                property: item.name + 'Position',
+                type: 'select',
+                values: [null].concat(Utils.getEmptyBoxPositions(box)),
+                getLabel: function(value) {
+                  return value || 'n/a';
+                }
+              };
+            }), function(positionResults) {
+              items.forEach(function(item) {
+                if (positionResults[item.name + 'Position']) {
+                  item.boxId = box.id;
+                  item.boxAlias = box.alias;
+                  item.boxPosition = positionResults[item.name + 'Position'];
+                } else {
+                  item.boxId = null;
+                  item.boxAlias = null;
+                  item.boxPosition = null;
+                }
+              });
+              if (callback) {
+                callback();
+              }
+              Transfer.updateItems(items);
+            });
+          }
+        };
+      }));
+    });
   }
 
 })();

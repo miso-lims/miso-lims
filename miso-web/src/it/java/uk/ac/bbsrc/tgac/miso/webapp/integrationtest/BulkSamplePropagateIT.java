@@ -33,12 +33,6 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
 
     Map<String, String> attrs = new LinkedHashMap<>();
     attrs.put(SamColumns.DESCRIPTION, "Description");
-    attrs.put(SamColumns.RECEIVE_DATE, "2017-10-27");
-    attrs.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
-    attrs.put(SamColumns.RECEIVED_BY, "TestGroup1");
-    attrs.put(SamColumns.RECEIPT_CONFIRMED, "True");
-    attrs.put(SamColumns.RECEIPT_QC_PASSED, "True");
-    attrs.put(SamColumns.RECEIPT_QC_NOTE, "");
     attrs.put(SamColumns.ID_BARCODE, "4440-T");
     attrs.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     attrs.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");

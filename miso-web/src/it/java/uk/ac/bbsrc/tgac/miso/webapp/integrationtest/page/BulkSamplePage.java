@@ -20,7 +20,8 @@ public class BulkSamplePage extends HeaderFooterPage {
     public static final String NAME = "Sample Name";
     public static final String ALIAS = "Sample Alias";
     public static final String DESCRIPTION = "Description";
-    public static final String RECEIVE_DATE = "Date of receipt";
+    public static final String RECEIVE_DATE = "Date of Receipt";
+    public static final String RECEIVE_TIME = "Time of Receipt";
     public static final String RECEIVED_FROM = "Received From";
     public static final String RECEIVED_BY = "Received By";
     public static final String RECEIPT_CONFIRMED = "Receipt Confirmed";

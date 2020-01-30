@@ -36,8 +36,8 @@ public class Transfer implements Identifiable, Timestamped, Serializable {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long transferId;
 
-  @Temporal(TemporalType.DATE)
-  private Date transferDate;
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date transferTime;
 
   @ManyToOne(targetEntity = LabImpl.class)
   @JoinColumn(name = "senderLabId")
@@ -89,12 +89,12 @@ public class Transfer implements Identifiable, Timestamped, Serializable {
     this.transferId = id;
   }
 
-  public Date getTransferDate() {
-    return transferDate;
+  public Date getTransferTime() {
+    return transferTime;
   }
 
-  public void setTransferDate(Date transferDate) {
-    this.transferDate = transferDate;
+  public void setTransferTime(Date transferTime) {
+    this.transferTime = transferTime;
   }
 
   public Lab getSenderLab() {

@@ -337,7 +337,7 @@ public class DefaultTransferServiceTest {
 
   private Transfer makeTransfer(Lab sender, Group recipient) {
     Transfer transfer = new Transfer();
-    transfer.setTransferDate(new Date());
+    transfer.setTransferTime(new Date());
     transfer.setSenderLab(sender);
     transfer.setRecipientGroup(recipient);
     return transfer;
@@ -345,7 +345,7 @@ public class DefaultTransferServiceTest {
 
   private Transfer makeTransfer(Group sender, String recipient) {
     Transfer transfer = new Transfer();
-    transfer.setTransferDate(new Date());
+    transfer.setTransferTime(new Date());
     transfer.setSenderGroup(sender);
     transfer.setRecipient(recipient);
     return transfer;
@@ -353,7 +353,7 @@ public class DefaultTransferServiceTest {
 
   private Transfer makeTransfer(Group sender, Group recipient) {
     Transfer transfer = new Transfer();
-    transfer.setTransferDate(new Date());
+    transfer.setTransferTime(new Date());
     transfer.setSenderGroup(sender);
     transfer.setRecipientGroup(recipient);
     return transfer;
@@ -399,7 +399,7 @@ public class DefaultTransferServiceTest {
     to.setSenderGroup(from.getSenderGroup());
     to.setRecipient(from.getRecipient());
     to.setRecipientGroup(from.getRecipientGroup());
-    to.setTransferDate(from.getTransferDate());
+    to.setTransferTime(from.getTransferTime());
 
     from.getSampleTransfers().forEach(fromItem -> addTransferSample(to, makeSample(fromItem.getItem().getId())));
 

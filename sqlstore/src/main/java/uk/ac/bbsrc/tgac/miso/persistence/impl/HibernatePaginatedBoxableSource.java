@@ -56,12 +56,12 @@ public interface HibernatePaginatedBoxableSource<T extends Boxable> extends Hibe
       criteria.createAlias("transfers", "transferItem")
           .createAlias("transferItem.transfer", "transfer")
           .add(Restrictions.isNotNull("transfer.senderLab"))
-          .add(Restrictions.between("transfer.transferDate", start, end));
+          .add(Restrictions.between("transfer.transferTime", start, end));
     } else if (type == DateType.DISTRIBUTED) {
       criteria.createAlias("transfers", "transferItem")
           .createAlias("transferItem.transfer", "transfer")
           .add(Restrictions.isNotNull("transfer.recipient"))
-          .add(Restrictions.between("transfer.transferDate", start, end));
+          .add(Restrictions.between("transfer.transferTime", start, end));
     } else {
       HibernatePaginatedDataSource.super.restrictPaginationByDate(criteria, start, end, type, errorHandler);
     }

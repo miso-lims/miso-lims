@@ -126,6 +126,9 @@ HotTarget.sample = (function() {
         show['Tissue Processing'] = false;
       }
 
+      var includeReceiptColumns = config.pageMode === 'create' && (!Constants.isDetailedSample || !isTargetIdentity(config))
+          && !config.isLibraryReceipt;
+
       var columns = [
           {
             header: 'Sample Name',
@@ -159,7 +162,7 @@ HotTarget.sample = (function() {
             validator: HotUtils.validator.optionalTextNoSpecialChars
           }),
           {
-            header: 'Date of receipt',
+            header: 'Date of Receipt',
             data: 'receivedDate',
             type: 'date',
             dateFormat: 'YYYY-MM-DD',
@@ -169,51 +172,91 @@ HotTarget.sample = (function() {
             },
             allowEmpty: true,
             description: 'The date that the sample was received from an external source.',
-            include: create && (!Constants.isDetailedSample || !isTargetIdentity(config)) && !config.isLibraryReceipt,
+            include: includeReceiptColumns,
             unpack: function(sam, flat, setCellMeta) {
               // If creating, default to today's date in format YYYY-MM-DD
-              if (!sam.receivedDate && config.pageMode == 'create') {
+              if (!sam.receivedTime && config.pageMode == 'create') {
                 flat.receivedDate = Utils.getCurrentDate();
+              } else if (sam.receivedTime) {
+                flat.receivedDate = sam.receivedTime.split(' ')[0];
               } else {
-                flat.receivedDate = Utils.valOrNull(sam.receivedDate);
+                flat.receivedDate = null;
               }
             },
             pack: function(sam, flat, errorHandler) {
-              sam.receivedDate = Utils.valOrNull(flat.receivedDate);
+              // Do nothing - handled in receivedTime
             }
           },
-          HotUtils.makeColumnForConstantsList('Received From', create && (!Constants.isDetailedSample || !isTargetIdentity(config))
-              && !config.isLibraryReceipt, 'receivedFrom', 'senderLabId', 'id', 'label', Constants.labs, true, {
+          {
+            header: 'Time of Receipt',
+            data: 'receivedTime',
+            type: 'time',
+            timeFormat: 'h:mm a',
+            correctFormat: true,
+            allowEmpty: true,
+            description: 'The time that the sample was received from an external source. Example of expected format: "2:30 pm"',
+            include: includeReceiptColumns,
             depends: ['*start', 'receivedDate'],
             update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
               setReadOnly(!flat.receivedDate);
               setOptions({
-                validator: flat.receivedDate ? HotUtils.validator.requiredAutocomplete : null
+                allowEmpty: !flat.receivedDate
               });
               if (!flat.receivedDate) {
                 setData(null);
+              } else if (!flat.receivedTime) {
+                setData(Utils.getCurrentTime());
+              }
+            },
+            unpack: function(sam, flat, setCellMeta) {
+              // If creating, default to today's date in format YYYY-MM-DD
+              if (!sam.receivedTime && config.pageMode == 'create') {
+                flat.receivedTime = Utils.getCurrentTime();
+              } else if (sam.receivedTime) {
+                flat.receivedTime = Utils.formatTwelveHourTime(sam.receivedTime.split(' ')[1]);
+              } else {
+                flat.receivedTime = null;
+              }
+            },
+            pack: function(sam, flat, errorHandler) {
+              if (flat.receivedDate) {
+                sam.receivedTime = flat.receivedDate + ' ' + Utils.formatTwentyFourHourTime(flat.receivedTime);
+              } else {
+                sam.receivedTime = null;
               }
             }
-          }),
-          HotUtils.makeColumnForConstantsList('Received By', create && (!Constants.isDetailedSample || !isTargetIdentity(config))
-              && !config.isLibraryReceipt, 'receivedBy', 'recipientGroupId', 'id', 'name', config.recipientGroups, true, {
-            depends: ['*start', 'receivedDate'],
-            update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-              setReadOnly(!flat.receivedDate);
-              setOptions({
-                validator: flat.receivedDate ? HotUtils.validator.requiredAutocomplete : null
-              });
-              if (flat.receivedDate) {
-                if (config.recipientGroups.length === 1) {
-                  setData(config.recipientGroups[0].name);
+          },
+          HotUtils.makeColumnForConstantsList('Received From', includeReceiptColumns, 'receivedFrom', 'senderLabId', 'id', 'label',
+              Constants.labs, true, {
+                depends: ['*start', 'receivedDate'],
+                update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+                  setReadOnly(!flat.receivedDate);
+                  setOptions({
+                    validator: flat.receivedDate ? HotUtils.validator.requiredAutocomplete : null
+                  });
+                  if (!flat.receivedDate) {
+                    setData(null);
+                  }
                 }
-              } else {
-                setData(null);
-              }
-            }
-          }),
-          HotUtils.makeColumnForBoolean('Receipt Confirmed', create && (!Constants.isDetailedSample || !isTargetIdentity(config))
-              && !config.isLibraryReceipt, 'received', false, {
+              }),
+          HotUtils.makeColumnForConstantsList('Received By', includeReceiptColumns, 'receivedBy', 'recipientGroupId', 'id', 'name',
+              config.recipientGroups, true, {
+                depends: ['*start', 'receivedDate'],
+                update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+                  setReadOnly(!flat.receivedDate);
+                  setOptions({
+                    validator: flat.receivedDate ? HotUtils.validator.requiredAutocomplete : null
+                  });
+                  if (flat.receivedDate) {
+                    if (config.recipientGroups.length === 1) {
+                      setData(config.recipientGroups[0].name);
+                    }
+                  } else {
+                    setData(null);
+                  }
+                }
+              }),
+          HotUtils.makeColumnForBoolean('Receipt Confirmed', includeReceiptColumns, 'received', false, {
             depends: ['*start', 'receivedDate'],
             update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
               setReadOnly(!flat.receivedDate);
@@ -227,8 +270,7 @@ HotTarget.sample = (function() {
               }
             }
           }, config.pageMode == 'create' ? 'True' : null),
-          HotUtils.makeColumnForBoolean('Receipt QC Passed', create && (!Constants.isDetailedSample || !isTargetIdentity(config))
-              && !config.isLibraryReceipt, 'receiptQcPassed', false, {
+          HotUtils.makeColumnForBoolean('Receipt QC Passed', includeReceiptColumns, 'receiptQcPassed', false, {
             depends: ['*start', 'receivedDate'],
             update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
               setReadOnly(!flat.receivedDate);
@@ -242,8 +284,7 @@ HotTarget.sample = (function() {
               }
             }
           }, config.pageMode == 'create' ? 'True' : null),
-          HotUtils.makeColumnForText('Receipt QC Note', create && (!Constants.isDetailedSample || !isTargetIdentity(config))
-              && !config.isLibraryReceipt, 'receiptQcNote', {
+          HotUtils.makeColumnForText('Receipt QC Note', includeReceiptColumns, 'receiptQcNote', {
             depends: ['*start', 'receivedDate', 'receiptQcPassed'],
             update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
               setReadOnly(!flat.receivedDate);

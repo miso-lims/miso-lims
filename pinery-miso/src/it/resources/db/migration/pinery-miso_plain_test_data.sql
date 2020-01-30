@@ -247,8 +247,8 @@ INSERT INTO Lab(labId, alias, instituteId, createdBy, creationDate, updatedBy, l
 (1, 'BioBank', 1, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
 (2, 'Pathology', 1, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00');
 
-INSERT INTO Transfer(transferId, transferDate, senderLabId, recipientGroupId, creator, created, lastModifier, lastModified) VALUES
-(1, '2017-07-20', 1, 1, 1, '2017-07-20 12:53:00', 1, '2017-07-20 12:53:00');
+INSERT INTO Transfer(transferId, transferTime, senderLabId, recipientGroupId, creator, created, lastModifier, lastModified) VALUES
+(1, '2017-07-20 12:00:00', 1, 1, 1, '2017-07-20 12:53:00', 1, '2017-07-20 12:53:00');
 
 INSERT INTO Transfer_Sample(transferId, sampleId, received, qcPassed, qcNote) VALUES
 (1, 2, TRUE, TRUE, NULL);

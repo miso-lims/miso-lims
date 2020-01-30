@@ -15,6 +15,6 @@ public interface TransferService extends ListService<Transfer>, SaveService<Tran
 
   public long countPendingForUser(User user) throws IOException;
 
-  public List<Transfer> listByProperties(Lab sender, Group recipient, Project project, Date transferDate) throws IOException;
+  public List<Transfer> listByProperties(Lab sender, Group recipient, Project project, Date transferTime) throws IOException;
 
 }

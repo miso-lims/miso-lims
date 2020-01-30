@@ -14,6 +14,11 @@ Changes:
   * Added buttons to sort by location (box position) on bulk pages
   * Added parent alias and location columns and buttons to sort by parent location (box position)
     on bulk sample pages (detailed sample)
+  * Added Receipt Wizard button for setting transfer items' receipt, QC, and location in a single
+    dialog
+  * Default received and QC passed to "Yes" in transfer item dialogs
+  * Exclude receipt fields from propagate samples page
+  * Changed transfer date to include time
   * Export more attributes in Pinery-MISO
     * Run purpose
     * Single Cell Stock (detailed sample) attributes

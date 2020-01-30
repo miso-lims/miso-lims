@@ -3,7 +3,7 @@ package uk.ac.bbsrc.tgac.miso.dto;
 public class ListTransferViewDto {
 
   private long id;
-  private String transferDate;
+  private String transferTime;
   private Long senderLabId;
   private String senderLabLabel;
   private Long senderGroupId;
@@ -25,12 +25,12 @@ public class ListTransferViewDto {
     this.id = id;
   }
 
-  public String getTransferDate() {
-    return transferDate;
+  public String getTransferTime() {
+    return transferTime;
   }
 
-  public void setTransferDate(String transferDate) {
-    this.transferDate = transferDate;
+  public void setTransferTime(String transferTime) {
+    this.transferTime = transferTime;
   }
 
   public Long getSenderLabId() {

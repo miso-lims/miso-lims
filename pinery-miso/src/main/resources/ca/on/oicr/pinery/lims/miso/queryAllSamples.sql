@@ -22,7 +22,7 @@ SELECT s.alias NAME
         ,NULL kitName
         ,NULL kitDescription
         ,NULL library_design_code
-        ,rcpt.transferDate receive_date
+        ,DATE(rcpt.transferTime) receive_date
         ,i.externalName external_name
         ,i.donorSex sex
         ,tor.alias tissue_origin
@@ -61,7 +61,7 @@ SELECT s.alias NAME
         ,NULL pdac
         ,sai.isSynthetic isSynthetic
         ,NOT ISNULL(dist.recipient) distributed
-        ,dist.transferDate distribution_date
+        ,DATE(dist.transferTime) distribution_date
         ,s.initialVolume initial_volume
         ,slide.percentTumour percent_tumour
         ,slide.percentNecrosis percent_necrosis
@@ -175,7 +175,7 @@ LEFT JOIN BoxPosition pos ON pos.targetId = s.sampleId
         AND pos.targetType = 'SAMPLE' 
 LEFT JOIN Box box ON box.boxId = pos.boxId 
 LEFT JOIN (
-  SELECT xfers.sampleId, xferinst.alias institute, xfer.transferDate, xferlab.excludeFromPinery
+  SELECT xfers.sampleId, xferinst.alias institute, xfer.transferTime, xferlab.excludeFromPinery
   FROM Transfer_Sample xfers
   JOIN Transfer xfer ON xfer.transferId = xfers.transferId
   JOIN Lab xferlab ON xferlab.labId = xfer.senderLabId
@@ -183,7 +183,7 @@ LEFT JOIN (
   WHERE xfer.senderLabId IS NOT NULL
 ) rcpt ON rcpt.sampleId = s.sampleId
 LEFT JOIN (
-  SELECT xfers.sampleId, xfer.recipient, xfer.transferDate
+  SELECT xfers.sampleId, xfer.recipient, xfer.transferTime
   FROM Transfer_Sample xfers
   JOIN Transfer xfer ON xfer.transferId = xfers.transferId
   WHERE xfer.recipient IS NOT NULL
@@ -215,7 +215,7 @@ SELECT l.alias NAME
         ,kd.NAME kitName 
         ,kd.description kitDescription 
         ,ldc.code library_design_code 
-        ,rcpt.transferDate receive_date
+        ,DATE(rcpt.transferTime) receive_date
         ,NULL external_name 
         ,NULL sex
         ,NULL tissue_origin 
@@ -254,7 +254,7 @@ SELECT l.alias NAME
         ,pdac.results pdac
         ,NULL isSynthetic
         ,NOT ISNULL(dist.recipient) distributed
-        ,dist.transferDate distribution_date
+        ,DATE(dist.transferTime) distribution_date
         ,l.initialVolume initial_volume
         ,NULL percent_tumour
         ,NULL percent_necrosis
@@ -322,7 +322,7 @@ LEFT JOIN BoxPosition pos ON pos.targetId = l.libraryId
         AND pos.targetType = 'LIBRARY' 
 LEFT JOIN Box box ON box.boxId = pos.boxId
 LEFT JOIN (
-  SELECT xferl.libraryId, xferinst.alias institute, xfer.transferDate, xferlab.excludeFromPinery
+  SELECT xferl.libraryId, xferinst.alias institute, xfer.transferTime, xferlab.excludeFromPinery
   FROM Transfer_Library xferl
   JOIN Transfer xfer ON xfer.transferId = xferl.transferId
   JOIN Lab xferlab ON xferlab.labId = xfer.senderLabId
@@ -330,7 +330,7 @@ LEFT JOIN (
   WHERE xfer.senderLabId IS NOT NULL
 ) rcpt ON rcpt.libraryId = l.libraryId
 LEFT JOIN (
-  SELECT xferl.libraryId, xfer.recipient, xfer.transferDate
+  SELECT xferl.libraryId, xfer.recipient, xfer.transferTime
   FROM Transfer_Library xferl
   JOIN Transfer xfer ON xfer.transferId = xferl.transferId
   WHERE xfer.recipient IS NOT NULL
@@ -362,7 +362,7 @@ SELECT d.alias name
         ,NULL kitName 
         ,NULL kitDescription 
         ,ldc.code library_design_code 
-        ,rcpt.transferDate receive_date
+        ,DATE(rcpt.transferTime) receive_date
         ,NULL external_name 
         ,NULL sex
         ,NULL tissue_origin 
@@ -401,7 +401,7 @@ SELECT d.alias name
         ,NULL pdac
         ,NULL isSynthetic
         ,NOT ISNULL(dist.recipient) distributed
-        ,dist.transferDate distribution_date
+        ,DATE(dist.transferTime) distribution_date
         ,NULL initial_volume
         ,NULL percent_tumour
         ,NULL percent_necrosis
@@ -426,7 +426,7 @@ LEFT JOIN BoxPosition pos ON pos.targetId = d.aliquotId
         AND pos.targetType = 'LIBRARY_ALIQUOT' 
 LEFT JOIN Box box ON box.boxId = pos.boxId
 LEFT JOIN (
-  SELECT xferla.aliquotId, xferinst.alias institute, xfer.transferDate, xferlab.excludeFromPinery
+  SELECT xferla.aliquotId, xferinst.alias institute, xfer.transferTime, xferlab.excludeFromPinery
   FROM Transfer_LibraryAliquot xferla
   JOIN Transfer xfer ON xfer.transferId = xferla.transferId
   JOIN Lab xferlab ON xferlab.labId = xfer.senderLabId
@@ -434,7 +434,7 @@ LEFT JOIN (
   WHERE xfer.senderLabId IS NOT NULL
 ) rcpt ON rcpt.aliquotId = d.aliquotId
 LEFT JOIN (
-  SELECT xferla.aliquotId, xfer.recipient, xfer.transferDate
+  SELECT xferla.aliquotId, xfer.recipient, xfer.transferTime
   FROM Transfer_LibraryAliquot xferla
   JOIN Transfer xfer ON xfer.transferId = xferla.transferId
   WHERE xfer.recipient IS NOT NULL

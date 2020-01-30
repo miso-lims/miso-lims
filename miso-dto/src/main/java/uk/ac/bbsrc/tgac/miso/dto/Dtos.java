@@ -468,7 +468,7 @@ public class Dtos {
 
     TransferItem<?> receipt = from.getReceiptTransfer();
     if (receipt != null) {
-      setDateString(dto::setReceivedDate, receipt.getTransfer().getTransferDate());
+      setDateTimeString(dto::setReceivedTime, receipt.getTransfer().getTransferTime());
       setId(dto::setSenderLabId, receipt.getTransfer().getSenderLab());
       setId(dto::setRecipientGroupId, receipt.getTransfer().getRecipientGroup());
       setBoolean(dto::setReceived, receipt.isReceived(), true);
@@ -857,9 +857,9 @@ public class Dtos {
 
     setString(to::setRequisitionId, from.getRequisitionId());
 
-    if (!isStringEmptyOrNull(from.getReceivedDate())) {
+    if (!isStringEmptyOrNull(from.getReceivedTime())) {
       Transfer receipt = new Transfer();
-      setDate(receipt::setTransferDate, from.getReceivedDate());
+      setDateTime(receipt::setTransferTime, from.getReceivedTime());
       setObject(receipt::setSenderLab, LabImpl::new, from.getSenderLabId());
       setObject(receipt::setRecipientGroup, Group::new, from.getRecipientGroupId());
       TransferSample item = new TransferSample();
@@ -1405,7 +1405,7 @@ public class Dtos {
 
     TransferItem<?> receipt = from.getReceiptTransfer();
     if (receipt != null) {
-      setDateString(dto::setReceivedDate, receipt.getTransfer().getTransferDate());
+      setDateString(dto::setReceivedDate, receipt.getTransfer().getTransferTime());
       setId(dto::setSenderLabId, receipt.getTransfer().getSenderLab());
       setId(dto::setRecipientGroupId, receipt.getTransfer().getRecipientGroup());
       setBoolean(dto::setReceived, receipt.isReceived(), true);
@@ -1487,7 +1487,7 @@ public class Dtos {
 
     if (from.getReceivedDate() != null) {
       Transfer receipt = new Transfer();
-      setDate(receipt::setTransferDate, from.getReceivedDate());
+      setDate(receipt::setTransferTime, from.getReceivedDate());
       setObject(receipt::setSenderLab, LabImpl::new, from.getSenderLabId());
       setObject(receipt::setRecipientGroup, Group::new, from.getRecipientGroupId());
       TransferLibrary item = new TransferLibrary();
@@ -3862,7 +3862,7 @@ public class Dtos {
   public static TransferDto asDto(@Nonnull Transfer from) {
     TransferDto to = new TransferDto();
     setLong(to::setId, from.getId(), true);
-    setDateString(to::setTransferDate, from.getTransferDate());
+    setDateTimeString(to::setTransferTime, from.getTransferTime());
     setId(to::setSenderLabId, from.getSenderLab());
     setString(to::setSenderLabLabel, maybeGetProperty(from.getSenderLab(), Lab::getItemLabel));
     setId(to::setSenderGroupId, from.getSenderGroup());
@@ -3882,7 +3882,7 @@ public class Dtos {
   public static Transfer to(@Nonnull TransferDto from) {
     Transfer to = new Transfer();
     setLong(to::setId, from.getId(), false);
-    setDate(to::setTransferDate, from.getTransferDate());
+    setDateTime(to::setTransferTime, from.getTransferTime());
     setObject(to::setSenderLab, LabImpl::new, from.getSenderLabId());
     setObject(to::setSenderGroup, Group::new, from.getSenderGroupId());
     setString(to::setRecipient, from.getRecipient());
@@ -3950,7 +3950,7 @@ public class Dtos {
   public static ListTransferViewDto asDto(@Nonnull ListTransferView from) {
     ListTransferViewDto to = new ListTransferViewDto();
     setLong(to::setId, from.getId(), false);
-    setDateString(to::setTransferDate, from.getTransferDate());
+    setDateString(to::setTransferTime, from.getTransferTime());
     setId(to::setSenderLabId, from.getSenderLab());
     setString(to::setSenderLabLabel, maybeGetProperty(from.getSenderLab(), Lab::getItemLabel));
     setId(to::setSenderGroupId, from.getSenderGroup());

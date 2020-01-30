@@ -1,4 +1,3 @@
-
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
 import static org.junit.Assert.*;
@@ -38,7 +37,7 @@ public class PlainSampleITs extends AbstractIT {
 
   private static final Set<String> sampleColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
       SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS, SamColumns.BOX_POSITION, SamColumns.DISCARDED, SamColumns.RECEIVE_DATE,
-      SamColumns.RECEIVED_FROM, SamColumns.RECEIVED_BY, SamColumns.RECEIPT_CONFIRMED, SamColumns.RECEIPT_QC_PASSED,
+      SamColumns.RECEIVE_TIME, SamColumns.RECEIVED_FROM, SamColumns.RECEIVED_BY, SamColumns.RECEIPT_CONFIRMED, SamColumns.RECEIPT_QC_PASSED,
       SamColumns.RECEIPT_QC_NOTE, SamColumns.REQUISITION_ID, SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT,
       SamColumns.QC_PASSED);
 

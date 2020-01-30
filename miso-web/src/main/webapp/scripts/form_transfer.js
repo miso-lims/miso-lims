@@ -34,14 +34,15 @@ FormTarget.transfer = (function($) {
             return transfer.id || 'Unsaved';
           }
         }, {
-          title: 'Transfer Date',
-          data: 'transferDate',
-          type: 'date',
+          title: 'Transfer Time',
+          data: 'transferTime',
+          type: 'datetime',
           required: true,
-          include: config.editSend || config.editReceipt
+          include: config.editSend || config.editReceipt,
+          initial: Utils.getCurrentDatetime()
         }, {
-          title: 'Transfer Date',
-          data: 'transferDate',
+          title: 'Transfer Time',
+          data: 'transferTime',
           type: 'read-only',
           include: !config.editSend && !config.editReceipt
         }, {

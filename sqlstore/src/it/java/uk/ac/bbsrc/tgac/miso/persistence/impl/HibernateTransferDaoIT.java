@@ -54,9 +54,9 @@ public class HibernateTransferDaoIT extends AbstractDAOTest {
     Lab sender = (Lab) currentSession().get(LabImpl.class, 1L);
     Group recipient = (Group) currentSession().get(Group.class, 1L);
     Project project = (Project) currentSession().get(ProjectImpl.class, 1L);
-    Date transferDate = new SimpleDateFormat("yyyy-MM-dd").parse("2016-07-07");
+    Date transferTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2016-07-07 12:00:00");
 
-    List<Transfer> list = sut.listByProperties(sender, recipient, project, transferDate);
+    List<Transfer> list = sut.listByProperties(sender, recipient, project, transferTime);
     assertNotNull(list);
     assertEquals(1, list.size());
 
@@ -64,7 +64,7 @@ public class HibernateTransferDaoIT extends AbstractDAOTest {
     assertEquals(sender.getId(), transfer.getSenderLab().getId());
     assertEquals(recipient.getId(), transfer.getRecipientGroup().getId());
     assertEquals(project.getId(), transfer.getSampleTransfers().iterator().next().getItem().getProject().getId());
-    assertEquals(transferDate, transfer.getTransferDate());
+    assertEquals(transferTime, transfer.getTransferTime());
   }
 
   @Test
@@ -76,7 +76,7 @@ public class HibernateTransferDaoIT extends AbstractDAOTest {
     transfer.setRecipientGroup(recipientGroup);
     User user = (User) currentSession().get(UserImpl.class, 1L);
     transfer.setChangeDetails(user);
-    transfer.setTransferDate(new Date());
+    transfer.setTransferTime(new Date());
     long savedId = sut.create(transfer);
 
     clearSession();
