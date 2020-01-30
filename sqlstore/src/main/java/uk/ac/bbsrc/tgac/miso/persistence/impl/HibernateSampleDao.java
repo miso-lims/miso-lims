@@ -18,6 +18,7 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
@@ -418,6 +419,26 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
     return (long) currentSession().createCriteria(DetailedSampleImpl.class)
         .add(Restrictions.eqOrIsNull("parent", sample))
         .setProjection(Projections.rowCount())
+        .uniqueResult();
+  }
+
+  @Override
+  public Sample getNextInProject(Sample sample) {
+    return (Sample) currentSession().createCriteria(SampleImpl.class)
+        .add(Restrictions.eq("project", sample.getProject()))
+        .add(Restrictions.gt("sampleId", sample.getId()))
+        .addOrder(Order.asc("sampleId"))
+        .setMaxResults(1)
+        .uniqueResult();
+  }
+
+  @Override
+  public Sample getPreviousInProject(Sample sample) {
+    return (Sample) currentSession().createCriteria(SampleImpl.class)
+        .add(Restrictions.eq("project", sample.getProject()))
+        .add(Restrictions.lt("sampleId", sample.getId()))
+        .addOrder(Order.desc("sampleId"))
+        .setMaxResults(1)
         .uniqueResult();
   }
 
