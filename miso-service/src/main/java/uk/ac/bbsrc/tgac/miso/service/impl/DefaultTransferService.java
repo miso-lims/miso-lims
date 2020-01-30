@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -48,6 +49,8 @@ import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.TransferService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.SaveDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TransferStore;
 import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
@@ -55,6 +58,14 @@ import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class DefaultTransferService extends AbstractSaveService<Transfer> implements TransferService {
+
+  private static final String ERROR_QC_NOTE_REQUIRED = "A QC note is required when QC is failed";
+  private static final String ERROR_UNAUTHORIZED_ITEM_MODIFY = "Only administrators and members of the sender group can modify items";
+  private static final String ERROR_UNAUTHORIZED_QC = "Only administrators and members of the recipient group can set QC results";
+  private static final String ERROR_UNAUTHORIZED_RECEIPT = "Only administrators and members of the recipient group can mark receipt";
+  private static final String ERROR_DISTRIBUTION_NOT_RECEIVED = "Items transferred externally must be marked received";
+  private static final String ERROR_MULTIPLE_RECEIPT = "Items can only have one receipt (external lab to internal group) transfer";
+  private static final String ERROR_MULTIPLE_DISTRIBUTION = "Items can only have one distribution (internal group to external named recipient) transfer";
 
   @Autowired
   private TransferStore transferStore;
@@ -211,24 +222,24 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
       Function<Transfer, Set<U>> getItems, List<ValidationError> errors) throws IOException {
     Set<U> items = getItems.apply(transfer);
     Set<U> beforeChangeItems = beforeChange == null ? null : getItems.apply(beforeChange);
-    if (items.stream().anyMatch(item -> Boolean.FALSE.equals(item.isQcPassed()) && item.getQcNote() == null)) {
-      errors.add(new ValidationError("items", "A QC note is required when QC is failed"));
+    if (items.stream().anyMatch(item -> Boolean.FALSE.equals(item.isQcPassed()) && LimsUtils.isStringEmptyOrNull(item.getQcNote()))) {
+      errors.add(new ValidationError("items", ERROR_QC_NOTE_REQUIRED));
     }
     if (beforeChange != null && !authorizationManager.isAdminUser() && !authorizationManager.isGroupMember(transfer.getSenderGroup())
         && (items.size() != beforeChangeItems.size()
             || items.stream().anyMatch(item -> beforeChangeItems.stream()
                 .noneMatch(beforeItem -> beforeItem.getItem().getId() == item.getItem().getId())))) {
-      errors.add(new ValidationError("items", "Only administrators and members of the sender group can modify items"));
+      errors.add(new ValidationError("items", ERROR_UNAUTHORIZED_ITEM_MODIFY));
     }
     if (!authorizationManager.isAdminUser()) {
       if (beforeChange == null) {
-        if (transfer.getRecipientGroup() != null && !authorizationManager.isGroupMember(transfer.getRecipientGroup())
-            && items.stream().anyMatch(item -> item.isQcPassed() != null || item.getQcNote() != null)) {
-          errors.add(new ValidationError("items", "Only administrators and members of the recipient group can set QC results"));
-        }
-        if (transfer.getSenderGroup() != null && !authorizationManager.isGroupMember(transfer.getRecipientGroup())
-            && items.stream().anyMatch(item -> item.isReceived() != null)) {
-          errors.add(new ValidationError("items", "Only administrators and members of the recipient group can mark receipt"));
+        if (transfer.getRecipientGroup() != null && !authorizationManager.isGroupMember(transfer.getRecipientGroup())) {
+          if (items.stream().anyMatch(item -> item.isQcPassed() != null || item.getQcNote() != null)) {
+            errors.add(new ValidationError("items", ERROR_UNAUTHORIZED_QC));
+          }
+          if (items.stream().anyMatch(item -> item.isReceived() != null)) {
+            errors.add(new ValidationError("items", ERROR_UNAUTHORIZED_RECEIPT));
+          }
         }
       } else {
         if (!authorizationManager.isGroupMember(transfer.getRecipientGroup()) && items.stream().anyMatch(item -> {
@@ -241,8 +252,8 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
         }
       }
     }
-    if (transfer.getRecipient() != null && items.parallelStream().anyMatch(item -> !Boolean.TRUE.equals(item.isReceived()))) {
-      errors.add(new ValidationError("items", "Items transferred externally must be marked received"));
+    if (transfer.getRecipient() != null && items.stream().anyMatch(item -> !Boolean.TRUE.equals(item.isReceived()))) {
+      errors.add(new ValidationError("items", ERROR_DISTRIBUTION_NOT_RECEIVED));
     }
 
     if (transfer.getSenderLab() != null) {
@@ -252,7 +263,7 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
               .map(TransferItem::getTransfer)
               .anyMatch(itemTransfer -> itemTransfer.getSenderLab() != null
                   && itemTransfer.isSaved() && (!transfer.isSaved() || itemTransfer.getId() != transfer.getId())))) {
-        errors.add(new ValidationError("items", "Items can only have one receipt (external lab to internal group) transfer"));
+        errors.add(new ValidationError("items", ERROR_MULTIPLE_RECEIPT));
       }
     } else if (transfer.getRecipient() != null && items.stream()
         .map(TransferItem::getItem)
@@ -260,8 +271,7 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
             .map(TransferItem::getTransfer)
             .anyMatch(itemTransfer -> itemTransfer.getRecipient() != null
                 && itemTransfer.isSaved() && (!transfer.isSaved() || itemTransfer.getId() != transfer.getId())))) {
-                  errors.add(new ValidationError("items",
-                      "Items can only have one distribution (internal group to external named recipient) transfer"));
+                  errors.add(new ValidationError("items", ERROR_MULTIPLE_DISTRIBUTION));
     }
   }
 
@@ -269,6 +279,43 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
     return !Objects.equals(item.isReceived(), beforeChange.isReceived())
         || !Objects.equals(item.isQcPassed(), beforeChange.isQcPassed())
         || !Objects.equals(item.getQcNote(), beforeChange.getQcNote());
+  }
+
+  private <T extends Boxable> void validateAddition(Transfer transfer, TransferItem<T> item) throws IOException {
+    List<ValidationError> errors = new ArrayList<>();
+
+    if (Boolean.FALSE.equals(item.isQcPassed()) && LimsUtils.isStringEmptyOrNull(item.getQcNote())) {
+      errors.add(new ValidationError("receiptQcNote", ERROR_QC_NOTE_REQUIRED));
+    }
+    if (!authorizationManager.isAdminUser() && !authorizationManager.isGroupMember(transfer.getSenderGroup())) {
+      errors.add(new ValidationError(ERROR_UNAUTHORIZED_ITEM_MODIFY));
+    }
+    if (transfer.getRecipientGroup() != null && !authorizationManager.isGroupMember(transfer.getRecipientGroup())) {
+      if (item.isQcPassed() != null || item.getQcNote() != null) {
+        errors.add(new ValidationError("receiptQcPassed", ERROR_UNAUTHORIZED_QC));
+      }
+      if (item.isReceived() != null) {
+        errors.add(new ValidationError("received", ERROR_UNAUTHORIZED_RECEIPT));
+      }
+    }
+    if (transfer.getRecipient() != null && !Boolean.TRUE.equals(item.isReceived())) {
+      errors.add(new ValidationError("received", ERROR_DISTRIBUTION_NOT_RECEIVED));
+    }
+
+    if (item.getItem().getTransfers().stream()
+        .map(TransferItem::getTransfer)
+        .anyMatch(itemTransfer -> itemTransfer.getSenderLab() != null && itemTransfer.getId() != transfer.getId())) {
+      errors.add(new ValidationError(ERROR_MULTIPLE_RECEIPT));
+    }
+    if (item.getItem().getTransfers().stream()
+        .map(TransferItem::getTransfer)
+        .anyMatch(itemTransfer -> itemTransfer.getRecipient() != null && itemTransfer.getId() != transfer.getId())) {
+      errors.add(new ValidationError(ERROR_MULTIPLE_DISTRIBUTION));
+    }
+
+    if (!errors.isEmpty()) {
+      throw new ValidationException(errors);
+    }
   }
 
   @Override
@@ -376,6 +423,18 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
   @Override
   public List<Transfer> listByProperties(Lab sender, Group recipient, Project project, Date transferTime) throws IOException {
     return transferStore.listByProperties(sender, recipient, project, transferTime);
+  }
+
+  @Override
+  public void addTransferSample(TransferSample transferSample) throws IOException {
+    Transfer managedTransfer = get(transferSample.getTransfer().getId());
+    Sample managedSample = sampleService.get(transferSample.getItem().getId());
+    transferSample.setTransfer(managedTransfer);
+    transferSample.setItem(managedSample);
+    managedSample.getTransfers().add(transferSample);
+    validateAddition(managedTransfer, transferSample);
+    sampleService.update(managedSample);
+    transferStore.update(managedTransfer);
   }
 
 }

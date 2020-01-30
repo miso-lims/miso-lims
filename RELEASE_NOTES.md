@@ -2,7 +2,7 @@
 
 Changes:
 
-
+  * Improved performance of saving samples with receipt info
 
 # 0.2.199
 
