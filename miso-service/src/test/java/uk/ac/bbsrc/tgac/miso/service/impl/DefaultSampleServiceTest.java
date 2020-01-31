@@ -624,6 +624,7 @@ public class DefaultSampleServiceTest {
     rel.setChild(childClass);
     relationships.add(rel);
     Mockito.when(sampleValidRelationshipService.getAll()).thenReturn(relationships);
+    Mockito.when(sampleValidRelationshipService.getByClasses(parentClass, childClass)).thenReturn(rel);
   }
 
   /**
