@@ -2,7 +2,7 @@
 
 Changes:
 
-
+  * Fixed Javascript error when loading Edit Transfer page
 
 # 0.2.199
 
@@ -46,6 +46,10 @@ Changes:
 Upgrade Notes:
 
   * Upgraded to Pinery 2.9.0
+
+Known Issues
+
+  * Edit Transfer page fails to load due to a Javascript error
 
 # 0.2.198
 
