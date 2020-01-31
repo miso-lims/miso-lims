@@ -4,15 +4,16 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleValidRelationshipDao;
@@ -35,20 +36,27 @@ public class HibernateSampleValidRelationshipDao implements SampleValidRelations
   }
 
   @Override
-  public List<SampleValidRelationship> getSampleValidRelationship() {
-    Query query = currentSession().createQuery("from SampleValidRelationshipImpl");
+  public List<SampleValidRelationship> list() {
     @SuppressWarnings("unchecked")
-    List<SampleValidRelationship> records = query.list();
+    List<SampleValidRelationship> records = currentSession().createCriteria(SampleValidRelationshipImpl.class).list();
     return records;
   }
 
   @Override
-  public SampleValidRelationship getSampleValidRelationship(Long id) {
+  public SampleValidRelationship get(Long id) {
     return (SampleValidRelationship) currentSession().get(SampleValidRelationshipImpl.class, id);
   }
 
   @Override
-  public Long addSampleValidRelationship(SampleValidRelationship sampleValidRelationship) {
+  public SampleValidRelationship getByClasses(SampleClass parent, SampleClass child) throws IOException {
+    return (SampleValidRelationship) currentSession().createCriteria(SampleValidRelationshipImpl.class)
+        .add(Restrictions.eq("parent", parent))
+        .add(Restrictions.eq("child", child))
+        .uniqueResult();
+  }
+
+  @Override
+  public Long create(SampleValidRelationship sampleValidRelationship) {
     Date now = new Date();
     sampleValidRelationship.setCreationTime(now);
     sampleValidRelationship.setLastModified(now);

@@ -662,7 +662,7 @@ public class DefaultSampleServiceTest {
     Sample parent = null; // Simple sample has no parent.
     assertTrue(
         "Simple sample with a null parent and null DetailedSample is a valid relationship",
-        DefaultSampleService.isValidRelationship(null, parent, child));
+        sut.isValidRelationship(parent, child));
   }
 
 }

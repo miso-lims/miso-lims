@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Sets;
 
+import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
@@ -34,12 +35,17 @@ public class DefaultSampleValidRelationshipService implements SampleValidRelatio
 
   @Override
   public SampleValidRelationship get(Long sampleValidRelationshipId) throws IOException {
-    return sampleValidRelationshipDao.getSampleValidRelationship(sampleValidRelationshipId);
+    return sampleValidRelationshipDao.get(sampleValidRelationshipId);
+  }
+
+  @Override
+  public SampleValidRelationship getByClasses(SampleClass parent, SampleClass child) throws IOException {
+    return sampleValidRelationshipDao.getByClasses(parent, child);
   }
 
   @Override
   public Set<SampleValidRelationship> getAll() throws IOException {
-    return Sets.newHashSet(sampleValidRelationshipDao.getSampleValidRelationship());
+    return Sets.newHashSet(sampleValidRelationshipDao.list());
   }
 
   @Override
