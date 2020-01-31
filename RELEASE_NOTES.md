@@ -2,6 +2,7 @@
 
 Changes:
 
+  * Improved performance of saving samples
   * Fixed Javascript error when loading Edit Transfer page
 
 # 0.2.199

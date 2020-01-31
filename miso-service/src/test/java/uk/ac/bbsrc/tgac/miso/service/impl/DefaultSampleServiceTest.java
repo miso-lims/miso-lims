@@ -624,6 +624,7 @@ public class DefaultSampleServiceTest {
     rel.setChild(childClass);
     relationships.add(rel);
     Mockito.when(sampleValidRelationshipService.getAll()).thenReturn(relationships);
+    Mockito.when(sampleValidRelationshipService.getByClasses(parentClass, childClass)).thenReturn(rel);
   }
 
   /**
@@ -662,7 +663,7 @@ public class DefaultSampleServiceTest {
     Sample parent = null; // Simple sample has no parent.
     assertTrue(
         "Simple sample with a null parent and null DetailedSample is a valid relationship",
-        DefaultSampleService.isValidRelationship(null, parent, child));
+        sut.isValidRelationship(parent, child));
   }
 
 }
