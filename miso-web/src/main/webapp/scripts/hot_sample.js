@@ -651,8 +651,8 @@ HotTarget.sample = (function() {
                 return item.label;
               }),
           HotUtils.makeColumnForInt('Passage #', show['Tissue'], 'passageNumber', null),
-          HotUtils.makeColumnForInt('Times Received', show['Tissue'], 'timesReceived', HotUtils.validator.integer(true, 1)),
-          HotUtils.makeColumnForInt('Tube Number', show['Tissue'], 'tubeNumber', HotUtils.validator.integer(true, 1)),
+          HotUtils.makeColumnForInt('Times Received', show['Tissue'], 'timesReceived', HotUtils.validator.integer(false, 1)),
+          HotUtils.makeColumnForInt('Tube Number', show['Tissue'], 'tubeNumber', HotUtils.validator.integer(false, 1)),
           HotUtils.makeColumnForConstantsList('Lab', show['Tissue'] && !config.isLibraryReceipt && config.pageMode === 'edit',
               'labComposite', 'labId', 'id', 'label', Constants.labs, false, {
                 description: 'The external lab that a tissue came from. This field is intended for historical data only as the lab should '

@@ -9,44 +9,43 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.DefaultNameGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.NameGenerator;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.OicrLibraryAliasGenerator;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.OicrLibraryAliquotAliasGenerator;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.OicrSampleAliasGenerator;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.V2LibraryAliasGenerator;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.V2LibraryAliquotAliasGenerator;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.V2SampleAliasGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.DefaultNameValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.NameValidator;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrLibraryAliasValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrProjectShortNameValidator;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrSampleAliasValidator;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.V2LibraryAliasValidator;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.V2SampleAliasValidator;
 
 /**
- * Non-customizeable NamingScheme which conforms to OICR's standard naming scheme
+ * Non-customizeable NamingScheme which conforms to OICR's V2 standard naming scheme
  */
-public class OicrNamingScheme extends AbstractNamingScheme {
+public class V2NamingScheme extends AbstractNamingScheme {
 
   private final DefaultNameValidator nameValidator = new DefaultNameValidator();
   private final DefaultNameGenerator nameGenerator = new DefaultNameGenerator();
-  private final OicrSampleAliasValidator sampleAliasValidator = new OicrSampleAliasValidator();
-  private final OicrSampleAliasGenerator sampleAliasGenerator = new OicrSampleAliasGenerator();
-  private final OicrLibraryAliasValidator libraryAliasValidator = new OicrLibraryAliasValidator();
-  private final OicrLibraryAliasGenerator libraryAliasGenerator = new OicrLibraryAliasGenerator();
-  private final OicrLibraryAliquotAliasGenerator libraryAliquotAliasGenerator = new OicrLibraryAliquotAliasGenerator();
+  private final V2SampleAliasValidator sampleAliasValidator = new V2SampleAliasValidator();
+  private final V2SampleAliasGenerator sampleAliasGenerator = new V2SampleAliasGenerator();
+  private final V2LibraryAliasValidator libraryAliasValidator = new V2LibraryAliasValidator();
+  private final V2LibraryAliasGenerator libraryAliasGenerator = new V2LibraryAliasGenerator();
+  private final V2LibraryAliquotAliasGenerator libraryAliquotAliasGenerator = new V2LibraryAliquotAliasGenerator();
   private final OicrProjectShortNameValidator projectShortNameValidator = new OicrProjectShortNameValidator();
 
   /**
-   * Creates a new OicrNamingScheme and attempts to autowire all of its validators' and generators' dependencies. If no
+   * Creates a new V2NamingScheme and attempts to autowire all of its validators' and generators' dependencies. If no
    * WebApplicationContext is available, wiring will be skipped, and setters within this class (e.g.
    * {@link #setSiblingNumberGenerator(SiblingNumberGenerator)}) should be used to complete the necessary wiring manually
    */
-  public OicrNamingScheme() {
+  public V2NamingScheme() {
     SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(sampleAliasGenerator);
     SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(libraryAliasGenerator);
-    SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(libraryAliasValidator);
     SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(libraryAliquotAliasGenerator);
   }
 
   /**
    * Sets the SiblingNumberGenerator to use in generating aliases. Within a Spring context, this will be autowired. This
-   * method exists for cases where the OicrNamingScheme is not a Spring-managed bean
+   * method exists for cases where the V2NamingScheme is not a Spring-managed bean
    * 
    * @param siblingNumberGenerator
    */
@@ -58,7 +57,7 @@ public class OicrNamingScheme extends AbstractNamingScheme {
 
   /**
    * Sets the SampleNumberPerProjectService to use in generating aliases. Within a Spring context, this will be autowired. This
-   * method exists for cases where the OicrNamingScheme is not a Spring-managed bean
+   * method exists for cases where the V2NamingScheme is not a Spring-managed bean
    * 
    * @param sampleNumberPerProjectService
    */

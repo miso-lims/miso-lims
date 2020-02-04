@@ -11,15 +11,13 @@ HotTarget.tissuepiecetype = {
   fixUp: function(librarytype, errorHandler) {
   },
   createColumns: function(config, create, data) {
-    return [
-        HotUtils.makeColumnForText('Name', true, 'name', {
-          validator: HotUtils.validator.requiredText
-        }),
-        HotUtils.makeColumnForText('Abbreviation', true, 'abbreviation', {
-          validator: HotUtils.validator.optionalTextNoSpecialChars
-        }),
-        HotUtils.makeColumnForBoolean('Archived', true, 'archived', true)
-      ];
+    return [HotUtils.makeColumnForText('Name', true, 'name', {
+      validator: HotUtils.validator.requiredText
+    }), HotUtils.makeColumnForText('Abbreviation', true, 'abbreviation', {
+      validator: HotUtils.validator.optionalTextNoSpecialChars
+    }), HotUtils.makeColumnForText('V2 Naming Code', true, 'v2NamingCode', {
+      validator: HotUtils.validator.requiredTextNoSpecialChars
+    }), HotUtils.makeColumnForBoolean('Archived', true, 'archived', true)];
   },
 
   getBulkActions: function(config) {

@@ -52,6 +52,8 @@ public class SampleClassImpl implements SampleClass {
   @Column(nullable = true)
   private String suffix;
 
+  private String v2NamingCode;
+
   private boolean archived = false;
   private boolean directCreationAllowed = true;
 
@@ -160,6 +162,16 @@ public class SampleClassImpl implements SampleClass {
   }
 
   @Override
+  public String getV2NamingCode() {
+    return v2NamingCode;
+  }
+
+  @Override
+  public void setV2NamingCode(String v2NamingCode) {
+    this.v2NamingCode = v2NamingCode;
+  }
+
+  @Override
   public boolean isArchived() {
     return archived;
   }
@@ -228,6 +240,7 @@ public class SampleClassImpl implements SampleClass {
         .append(sampleCategory)
         .append(sampleSubcategory)
         .append(suffix)
+        .append(v2NamingCode)
         .toHashCode();
   }
 
@@ -243,6 +256,7 @@ public class SampleClassImpl implements SampleClass {
         .append(sampleCategory, other.sampleCategory)
         .append(sampleSubcategory, other.sampleSubcategory)
         .append(suffix, other.suffix)
+        .append(v2NamingCode, other.v2NamingCode)
         .isEquals();
   }
 

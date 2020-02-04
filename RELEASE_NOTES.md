@@ -3,6 +3,7 @@
 Changes:
 
   * Added configuration for library aliquot alias generator and validator
+  * Added V2 naming scheme
   * Fixed error deleting tissues and identities (detailed sample)
   * Fixed distributed items not being removed from boxes
   * Fixed error deleting sequencing orders

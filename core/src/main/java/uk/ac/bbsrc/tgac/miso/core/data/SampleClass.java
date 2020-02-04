@@ -47,6 +47,10 @@ public interface SampleClass extends Deletable, Identifiable, Serializable, Time
    */
   public void setSuffix(String suffix);
 
+  public String getV2NamingCode();
+
+  public void setV2NamingCode(String v2NamingCode);
+
   public boolean isArchived();
 
   public void setArchived(boolean archived);

@@ -56,7 +56,7 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
   public void testListAll() throws IOException {
     Collection<Sample> samples = dao.listAll();
     samples.iterator().next().getScientificName().equals("Homo sapiens");
-    assertEquals(20, samples.size());
+    assertEquals(21, samples.size());
   }
 
   @Test
@@ -115,7 +115,7 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
   @Test
   public void testCount() throws Exception {
     int total = dao.count();
-    assertEquals(20, total);
+    assertEquals(21, total);
   }
 
   @Test
@@ -189,14 +189,14 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
   public void getSamplesOffsetZeroWithTwoSamplesPerPageTest() throws Exception {
     List<Sample> samples = dao.list(0, 2, false, "id");
     assertEquals(2, samples.size());
-    assertEquals(20L, samples.get(0).getId());
+    assertEquals(21L, samples.get(0).getId());
   }
 
   @Test
   public void getSamplesOffsetThreeWithThreeSamplesPerPageTest() throws Exception {
     List<Sample> samples = dao.list(3, 3, false, "id");
     assertEquals(3, samples.size());
-    assertEquals(17L, samples.get(0).getId());
+    assertEquals(18L, samples.get(0).getId());
   }
 
   @Test
@@ -235,7 +235,7 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
   @Test
   public void countSamplesByEmptySearch() throws IOException {
     Long numSamples = dao.count(PaginationFilter.query(""));
-    assertEquals(Long.valueOf(20L), numSamples);
+    assertEquals(Long.valueOf(21L), numSamples);
   }
 
   @Test
@@ -307,7 +307,7 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
     assertTrue(LimsUtils.isDetailedSample(sample));
     DetailedSample detailed = (DetailedSample) sample;
     assertNotNull(detailed.getChildren());
-    assertEquals(2, detailed.getChildren().size());
+    assertEquals(3, detailed.getChildren().size());
     for (@SuppressWarnings("unused")
     Sample child : detailed.getChildren()) {
       // will throw ClassCastException if children are not correctly loaded as Samples

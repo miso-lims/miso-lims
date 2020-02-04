@@ -82,8 +82,15 @@ public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
     return internalName;
   }
 
-  private String generateTissueAlias(SampleTissue tissue, SampleIdentity identity) {
+  private String generateTissueAlias(SampleTissue tissue, SampleIdentity identity) throws MisoNamingException {
     StringBuilder sb = new StringBuilder();
+
+    if (tissue.getTimesReceived() == null) {
+      throw new MisoNamingException("Cannot generate an alias without times received set");
+    }
+    if (tissue.getTubeNumber() == null) {
+      throw new MisoNamingException("Cannot generate an alias without tube number set");
+    }
 
     sb.append(identity.getAlias())
         .append(SEPARATOR)
@@ -93,12 +100,10 @@ public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
         .append(SEPARATOR)
         .append(passageNumber(tissue.getPassageNumber()))
         .append(SEPARATOR)
-        .append(tissue.getTimesReceived());
+        .append(tissue.getTimesReceived())
+        .append(DASH)
+        .append(tissue.getTubeNumber());
 
-    if (tissue.getTubeNumber() != null) {
-      sb.append(DASH)
-          .append(tissue.getTubeNumber());
-    }
     return sb.toString();
   }
 

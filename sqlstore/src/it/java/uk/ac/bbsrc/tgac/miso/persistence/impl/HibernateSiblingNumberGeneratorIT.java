@@ -33,7 +33,31 @@ public class HibernateSiblingNumberGeneratorIT extends AbstractDAOTest {
     assertEquals(new Integer(1), s1.getSiblingNumber());
     assertTrue(s2.getAlias().startsWith(partialAlias));
     assertEquals(new Integer(2), s2.getSiblingNumber());
-    assertEquals(3, sut.getNextSiblingNumber(SampleImpl.class, partialAlias));
+    assertEquals(5, sut.getNextSiblingNumber(SampleImpl.class, partialAlias));
+  }
+
+  @Test
+  public void getFirstAvailableSiblingNumberTest() throws Exception {
+    String partialAlias = "TEST_0001_TISSUE_";
+    DetailedSample s1 = (DetailedSample) sessionFactory.getCurrentSession().get(SampleImpl.class, 16L);
+    DetailedSample s2 = (DetailedSample) sessionFactory.getCurrentSession().get(SampleImpl.class, 17L);
+    assertTrue(s1.getAlias().startsWith(partialAlias));
+    assertEquals(new Integer(1), s1.getSiblingNumber());
+    assertTrue(s2.getAlias().startsWith(partialAlias));
+    assertEquals(new Integer(2), s2.getSiblingNumber());
+    assertEquals(3, sut.getFirstAvailableSiblingNumber(SampleImpl.class, partialAlias));
+  }
+
+  @Test
+  public void getNextForFirstChildTest() throws Exception {
+    String partialAlias = "only_child_";
+    assertEquals(1, sut.getNextSiblingNumber(SampleImpl.class, partialAlias));
+  }
+
+  @Test
+  public void getFirstForFirstChildTest() throws Exception {
+    String partialAlias = "only_child_";
+    assertEquals(1, sut.getFirstAvailableSiblingNumber(SampleImpl.class, partialAlias));
   }
 
 }

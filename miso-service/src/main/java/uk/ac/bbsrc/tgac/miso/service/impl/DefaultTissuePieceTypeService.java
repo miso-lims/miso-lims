@@ -69,6 +69,7 @@ public class DefaultTissuePieceTypeService extends AbstractSaveService<TissuePie
   protected void applyChanges(TissuePieceType to, TissuePieceType from) {
     to.setName(from.getName());
     to.setAbbreviation(from.getAbbreviation());
+    to.setV2NamingCode(from.getV2NamingCode());
     to.setArchived(from.getArchived());
   }
 

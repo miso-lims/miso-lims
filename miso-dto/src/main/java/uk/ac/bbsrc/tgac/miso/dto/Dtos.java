@@ -327,6 +327,7 @@ public class Dtos {
     dto.setSampleCategory(from.getSampleCategory());
     dto.setSampleSubcategory(from.getSampleSubcategory());
     dto.setSuffix(from.getSuffix());
+    setString(dto::setV2NamingCode, from.getV2NamingCode());
     dto.setArchived(from.isArchived());
     dto.setDirectCreationAllowed(from.isDirectCreationAllowed());
     dto.setCreationDate(formatDateTime(from.getCreationTime()));
@@ -350,6 +351,7 @@ public class Dtos {
     to.setSampleCategory(from.getSampleCategory());
     to.setSampleSubcategory(from.getSampleSubcategory());
     to.setSuffix(from.getSuffix());
+    setString(to::setV2NamingCode, from.getV2NamingCode());
     to.setArchived(from.isArchived());
     to.setDirectCreationAllowed(from.isDirectCreationAllowed());
     to.setDNAseTreatable(from.getDNAseTreatable());
@@ -3846,6 +3848,7 @@ public class Dtos {
     setLong(to::setId, from.getId(), true);
     setString(to::setName, from.getName());
     setString(to::setAbbreviation, from.getAbbreviation());
+    setString(to::setV2NamingCode, from.getV2NamingCode());
     setBoolean(to::setArchived, from.getArchived(), true);
     return to;
   }
@@ -3855,6 +3858,7 @@ public class Dtos {
     if (from.getId() != null) to.setId(from.getId());
     setString(to::setName, from.getName());
     setString(to::setAbbreviation, from.getAbbreviation());
+    setString(to::setV2NamingCode, from.getV2NamingCode());
     setBoolean(to::setArchived, from.isArchived(), false);
     return to;
   }

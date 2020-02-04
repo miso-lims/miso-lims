@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.dto;
 public class TissuePieceTypeDto {
 
   private String abbreviation;
+  private String v2NamingCode;
   private Boolean archived;
   private Long id;
   private String name;
@@ -14,7 +15,6 @@ public class TissuePieceTypeDto {
   public Long getId() {
     return id;
   }
-
 
   public String getName() {
     return name;
@@ -38,6 +38,14 @@ public class TissuePieceTypeDto {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public String getV2NamingCode() {
+    return v2NamingCode;
+  }
+
+  public void setV2NamingCode(String v2NamingCode) {
+    this.v2NamingCode = v2NamingCode;
   }
 
 }
