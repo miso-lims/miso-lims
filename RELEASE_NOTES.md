@@ -2,7 +2,7 @@
 
 Changes:
 
-
+  * Fixed error bulk creating samples with the same receipt time
 
 # 0.2.200
 
@@ -10,6 +10,10 @@ Changes:
 
   * Improved performance of saving samples
   * Fixed Javascript error when loading Edit Transfer page
+
+Known Issues:
+
+  * Bulk creating samples with the same receipt time fails
 
 # 0.2.199
 
@@ -57,6 +61,7 @@ Upgrade Notes:
 Known Issues
 
   * Edit Transfer page fails to load due to a Javascript error
+  * Bulk creating samples with the same receipt time fails
 
 # 0.2.198
 
