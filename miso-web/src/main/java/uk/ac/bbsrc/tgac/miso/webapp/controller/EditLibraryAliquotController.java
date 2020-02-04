@@ -116,7 +116,6 @@ public class EditLibraryAliquotController {
       } else {
         dto = new LibraryAliquotDto();
       }
-      dto.setAlias(item.getAlias());
       dto.setDnaSize(item.getDnaSize());
       dto.setLibraryId(item.getId());
       dto.setLibraryName(item.getName());

@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.core.service.naming.resolvers;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.NameGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.NameValidator;
@@ -19,11 +20,15 @@ public interface NamingSchemeResolverService {
 
   NameGenerator<Library> getLibraryAliasGenerator(String generatorName);
 
+  NameGenerator<LibraryAliquot> getLibraryAliquotAliasGenerator(String generatorName);
+
   NameValidator getNameValidator(String validatorName);
 
   NameValidator getSampleAliasValidator(String validatorName);
 
   NameValidator getLibraryAliasValidator(String validatorName);
+
+  NameValidator getLibraryAliquotAliasValidator(String validatorName);
 
   NameValidator getProjectShortNameValidator(String validatorName);
 }

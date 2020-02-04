@@ -5,6 +5,7 @@ import java.io.IOException;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.NameGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.NameValidator;
@@ -52,6 +53,16 @@ public class DelegatingNamingScheme implements NamingScheme {
   @Override
   public void setLibraryAliasValidator(NameValidator validator) {
     actualNamingScheme.setLibraryAliasValidator(validator);
+  }
+
+  @Override
+  public void setLibraryAliquotAliasGenerator(NameGenerator<LibraryAliquot> generator) {
+    actualNamingScheme.setLibraryAliquotAliasGenerator(generator);
+  }
+
+  @Override
+  public void setLibraryAliquotAliasValidator(NameValidator validator) {
+    actualNamingScheme.setLibraryAliquotAliasValidator(validator);
   }
 
   @Override
@@ -117,6 +128,26 @@ public class DelegatingNamingScheme implements NamingScheme {
   @Override
   public boolean duplicateLibraryAliasAllowed() {
     return actualNamingScheme.duplicateLibraryAliasAllowed();
+  }
+
+  @Override
+  public boolean hasLibraryAliquotAliasGenerator() {
+    return actualNamingScheme.hasLibraryAliquotAliasGenerator();
+  }
+
+  @Override
+  public String generateLibraryAliquotAlias(LibraryAliquot aliquot) throws MisoNamingException, IOException {
+    return actualNamingScheme.generateLibraryAliquotAlias(aliquot);
+  }
+
+  @Override
+  public ValidationResult validateLibraryAliquotAlias(String alias) {
+    return actualNamingScheme.validateLibraryAliquotAlias(alias);
+  }
+
+  @Override
+  public boolean duplicateLibraryAliquotAliasAllowed() {
+    return actualNamingScheme.duplicateLibraryAliquotAliasAllowed();
   }
 
   @Override

@@ -215,6 +215,8 @@ default configurations:
 | Sample Alias Validator      | DefaultSampleAliasValidator  | OicrSampleAliasValidator      |
 | Library Alias Generator     | DefaultLibraryAliasGenerator | OicrLibraryAliasGenerator     |
 | Library Alias Validator     | DefaultLibraryAliasValidator | OicrLibraryAliasValidator     |
+| Library Aliquot Alias Generator | DefaultLibraryAliquotAliasGenerator | OicrLibraryAliquotAliasGenerator |
+| Library Aliquot Alias Validator | DefaultLibraryAliquotAliasValidator | OicrLibraryAliasValidator |
 | Project ShortName Validator | AllowAnythingValidator       | OicrProjectShortNameValidator |
 | Configurable components     | all                          | none                          |
 
@@ -241,6 +243,13 @@ as follows.
 | default | XX_LYY-1                 | XX and YY taken from sample alias - depends on sample alias passing default validator with default regex |
 | oicr    | PROJ_0001_Ad_P_PE_300_WG | For use with DetailedSample only. Depends on sample alias passing oicr validator                         |
 
+### `miso.naming.generator.libraryaliquot.alias`
+
+| Option  | Example                  | Note                                                                             |
+|---------|--------------------------|----------------------------------------------------------------------------------|
+| default | XX_LYY-1                 | This generator just copies the library's alias                                   |
+| oicr    | PROJ_0001_Ad_P_PE_300_WG | For use with DetailedSample only. Depends on sample alias passing oicr validator |
+
 ### `miso.naming.validator.nameable.name`
 
 | Option   | Detail                                       | Allow null | Allow duplicates | Custom Regex | Custom Duplication |
@@ -261,6 +270,14 @@ as follows.
 | Option   | Detail                                 | Allow null | Allow duplicates | Custom Regex | Custom Duplication |
 |----------|----------------------------------------|------------|------------------|--------------|--------------------|
 | default  | Matches 'default' generator            | no         | no               | yes          | no                 |
+| allowany | Only checks that the alias is not null | no         | yes              | no           | no                 |
+| oicr     | Matches 'oicr' generator               | no         | no               | no           | no                 |
+
+### `miso.naming.validator.libraryaliquot.alias`
+
+| Option   | Detail                                 | Allow null | Allow duplicates | Custom Regex | Custom Duplication |
+|----------|----------------------------------------|------------|------------------|--------------|--------------------|
+| default  | Matches 'default' generator            | no         | yes              | yes          | yes                |
 | allowany | Only checks that the alias is not null | no         | yes              | no           | no                 |
 | oicr     | Matches 'oicr' generator               | no         | no               | no           | no                 |
 

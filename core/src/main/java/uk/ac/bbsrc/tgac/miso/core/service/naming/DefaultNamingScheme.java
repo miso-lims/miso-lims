@@ -5,11 +5,14 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.DefaultLibraryAliasGenerator;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.DefaultLibraryAliquotAliasGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.DefaultNameGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.NameGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.AllowAnythingValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.DefaultLibraryAliasValidator;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.DefaultLibraryAliquotAliasValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.DefaultNameValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.DefaultSampleAliasValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.NameValidator;
@@ -25,6 +28,8 @@ public class DefaultNamingScheme extends AbstractNamingScheme {
   private NameGenerator<Sample> sampleAliasGenerator = null;
   private NameValidator libraryAliasValidator = new DefaultLibraryAliasValidator();
   private NameGenerator<Library> libraryAliasGenerator = new DefaultLibraryAliasGenerator();
+  private NameValidator libraryAliquotAliasValidator = new DefaultLibraryAliquotAliasValidator();
+  private NameGenerator<LibraryAliquot> libraryAliquotAliasGenerator = new DefaultLibraryAliquotAliasGenerator();
   private NameValidator projectShortNameValidator = new AllowAnythingValidator();
 
   /**
@@ -107,6 +112,26 @@ public class DefaultNamingScheme extends AbstractNamingScheme {
   @Override
   protected NameValidator getProjectShortNameValidator() {
     return projectShortNameValidator;
+  }
+
+  @Override
+  public void setLibraryAliquotAliasGenerator(NameGenerator<LibraryAliquot> generator) {
+    this.libraryAliquotAliasGenerator = generator;
+  }
+
+  @Override
+  protected NameValidator getLibraryAliquotAliasValidator() {
+    return libraryAliquotAliasValidator;
+  }
+
+  @Override
+  public void setLibraryAliquotAliasValidator(NameValidator validator) {
+    this.libraryAliquotAliasValidator = validator;
+  }
+
+  @Override
+  protected NameGenerator<LibraryAliquot> getLibraryAliquotAliasGenerator() {
+    return libraryAliquotAliasGenerator;
   }
 
 }

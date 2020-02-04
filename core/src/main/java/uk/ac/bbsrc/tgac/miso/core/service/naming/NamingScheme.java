@@ -6,6 +6,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.NameGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.NameValidator;
@@ -153,6 +154,52 @@ public interface NamingScheme {
    * @return true if duplicate {@link Library} aliases are allowed by this NamingScheme
    */
   public boolean duplicateLibraryAliasAllowed();
+
+  /**
+   * Optional method. Sets a generator to be used for {@link LibraryAliquot} aliases
+   * 
+   * @param generator
+   * @throws UnsupportedOperationException if this NamingScheme does not accept custom {@link LibraryAliquot} alias generators
+   */
+  public void setLibraryAliquotAliasGenerator(NameGenerator<LibraryAliquot> generator);
+
+  /**
+   * @return true if {@link LibraryAloquot} alias generation is supported; false otherwise
+   */
+  public boolean hasLibraryAliquotAliasGenerator();
+
+  /**
+   * Generates a {@link LibraryAliquot} alias
+   * 
+   * @param aliquot the {@link LibraryAliquot} to generate an alias for
+   * @return the generated alias
+   * @throws MisoNamingException if alias generation fails
+   * @throws IOException if database access is required and fails
+   * @throws UnsupportedOperationException if {@link LibraryAliquot} alias generation is not supported. this can be avoided by checking
+   *           {@link #hasLibraryAliquotAliasGenerator()} first
+   */
+  public String generateLibraryAliquotAlias(LibraryAliquot aliquot) throws MisoNamingException, IOException;
+
+  /**
+   * Optional method. Sets a validator to be used for {@link LibraryAliquot} aliases
+   * 
+   * @param validator
+   * @throws UnsupportedOperationException if this NamingScheme does not accept custom {@link LibraryAliquot} alias validators
+   */
+  public void setLibraryAliquotAliasValidator(NameValidator validator);
+
+  /**
+   * Checks that the provided {@link LibraryAliquot} alias conforms to the naming scheme
+   * 
+   * @param alias
+   * @return the {@link ValidationResult}
+   */
+  public ValidationResult validateLibraryAliquotAlias(String alias);
+
+  /**
+   * @return true if duplicate {@link LibraryAliquot} aliases are allowed by this NamingScheme
+   */
+  public boolean duplicateLibraryAliquotAliasAllowed();
 
   /**
    * Optional method. Sets a validator to be used for {@link Project} short names

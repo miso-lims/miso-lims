@@ -5,6 +5,21 @@ for pooling or adding to a sequencing container. Only library aliquots can be ad
 can be added to sequencing containers. This means that you will need to create a library aliquot in MISO even if the
 library is being pooled as is, or if it is being added directly to a sequencing container.
 
+## Naming Scheme
+
+MISO can be configured with a naming scheme appropriate for your organization. For more details about this
+configuration, see [Naming Scheme](../site_configuration/#naming-schemes) in the Site Configuration section.
+
+For library aliquots, the naming scheme specifies whether or not duplicate aliases are allowed, and may also specify a
+pattern that all library aliquot aliases must follow. If such a pattern is specified, then the aliases will be compared
+to this pattern whenever saving a library aliquot. If the alias does not follow the pattern specified by the naming
+scheme, or if there is a duplicate alias when not allowed, the save will fail and a validation message will state the
+cause.
+
+The naming scheme may also specify a library aliquot alias generator. This means that users will not have to choose
+library aliquot aliases because they will be generated automatically when saving library aliquots. The user is still
+free to choose a library aliquot alias by typing it in manually if they would like.
+
 ## Library Aliquots List
 
 To get to the main Library Aliquots list page, click "Library Aliquots" in the Preparation list in the menu on the left

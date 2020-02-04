@@ -47,9 +47,10 @@ some fields in order to enforce these naming schemes:
 * All item names
 * Sample alias
 * Library alias
+* Library aliquot alias
 * Project short name
 
-It may also be possible to auto-generate aliases for your samples and/or libraries.
+It may also be possible to auto-generate aliases for your samples, libraries, and/or library aliquots.
 
 Both validation and alias generation must be configured by your MISO administrators.
 

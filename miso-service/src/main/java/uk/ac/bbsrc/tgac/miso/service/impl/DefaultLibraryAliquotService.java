@@ -85,16 +85,29 @@ public class DefaultLibraryAliquotService
   }
 
   private LibraryAliquot save(LibraryAliquot aliquot) throws IOException {
-    validateAlias(aliquot);
     try {
+      if (!hasTemporaryAlias(aliquot)) {
+        validateAlias(aliquot);
+      }
       Long newId = libraryAliquotDao.save(aliquot);
       LibraryAliquot managed = libraryAliquotDao.get(newId);
 
       // post-save field generation
       boolean needsUpdate = false;
-      if (hasTemporaryName(aliquot)) {
+      if (hasTemporaryName(managed)) {
         managed.setName(namingScheme.generateNameFor(managed));
         validateNameOrThrow(managed, namingScheme);
+        needsUpdate = true;
+      }
+      if (hasTemporaryAlias(managed)) {
+        String generatedAlias = namingScheme.generateLibraryAliquotAlias(managed);
+        managed.setAlias(generatedAlias);
+        if (isDetailedLibraryAliquot(managed)) {
+          // generation of non-standard aliases is allowed
+          ((DetailedLibraryAliquot) managed).setNonStandardAlias(!namingScheme.validateLibraryAliquotAlias(generatedAlias).isValid());
+        } else {
+          validateAlias(managed);
+        }
         needsUpdate = true;
       }
       if (autoGenerateIdBarcodes && isStringEmptyOrNull(managed.getIdentificationBarcode())) {
@@ -116,7 +129,7 @@ public class DefaultLibraryAliquotService
   private void validateAlias(LibraryAliquot aliquot) {
     if (!isDetailedLibraryAliquot(aliquot) || !((DetailedLibraryAliquot) aliquot).isNonStandardAlias()) {
       uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult aliasValidation = namingScheme
-          .validateLibraryAlias(aliquot.getAlias());
+          .validateLibraryAliquotAlias(aliquot.getAlias());
       if (!aliasValidation.isValid()) {
         throw new ValidationException(new ValidationError("alias", aliasValidation.getMessage()));
       }
@@ -143,6 +156,9 @@ public class DefaultLibraryAliquotService
 
     // pre-save field generation
     aliquot.setName(generateTemporaryName());
+    if (isStringEmptyOrNull(aliquot.getAlias()) && namingScheme.hasLibraryAliquotAliasGenerator()) {
+      aliquot.setAlias(generateTemporaryName());
+    }
     validateChange(aliquot, null);
     long savedId = save(aliquot).getId();
     updateParent(aliquot.getParent());
