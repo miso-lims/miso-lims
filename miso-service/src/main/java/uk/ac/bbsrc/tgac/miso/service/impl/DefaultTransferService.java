@@ -225,9 +225,9 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
     if (items.stream().anyMatch(item -> Boolean.FALSE.equals(item.isQcPassed()) && LimsUtils.isStringEmptyOrNull(item.getQcNote()))) {
       errors.add(new ValidationError("items", ERROR_QC_NOTE_REQUIRED));
     }
-    if (beforeChange != null && !authorizationManager.isAdminUser() && !authorizationManager.isGroupMember(transfer.getSenderGroup())
-        && (items.size() != beforeChangeItems.size()
-            || items.stream().anyMatch(item -> beforeChangeItems.stream()
+    if (beforeChange != null && !authorizationManager.isAdminUser() && transfer.getSenderGroup() != null
+        && !authorizationManager.isGroupMember(transfer.getSenderGroup())
+        && (items.size() != beforeChangeItems.size() || items.stream().anyMatch(item -> beforeChangeItems.stream()
                 .noneMatch(beforeItem -> beforeItem.getItem().getId() == item.getItem().getId())))) {
       errors.add(new ValidationError("items", ERROR_UNAUTHORIZED_ITEM_MODIFY));
     }
@@ -287,7 +287,8 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
     if (Boolean.FALSE.equals(item.isQcPassed()) && LimsUtils.isStringEmptyOrNull(item.getQcNote())) {
       errors.add(new ValidationError("receiptQcNote", ERROR_QC_NOTE_REQUIRED));
     }
-    if (!authorizationManager.isAdminUser() && !authorizationManager.isGroupMember(transfer.getSenderGroup())) {
+    if (!authorizationManager.isAdminUser() && transfer.getSenderGroup() != null
+        && !authorizationManager.isGroupMember(transfer.getSenderGroup())) {
       errors.add(new ValidationError(ERROR_UNAUTHORIZED_ITEM_MODIFY));
     }
     if (transfer.getRecipientGroup() != null && !authorizationManager.isGroupMember(transfer.getRecipientGroup())) {
