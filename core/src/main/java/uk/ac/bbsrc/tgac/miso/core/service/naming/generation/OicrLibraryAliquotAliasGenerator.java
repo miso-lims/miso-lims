@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.service.naming.generation;
 
 import java.util.Date;
 
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
@@ -34,12 +35,12 @@ public class OicrLibraryAliquotAliasGenerator extends OicrBaseLibraryAliasGenera
 
   @Override
   protected Integer getDnaSize(DetailedLibraryAliquot item) {
-    return item.getDnaSize();
+    return item.getDnaSize() != null ? item.getDnaSize() : item.getLibrary().getDnaSize();
   }
 
   @Override
   protected LibraryDesignCode getLibraryDesignCode(DetailedLibraryAliquot item) {
-    return item.getLibraryDesignCode();
+    return item.getLibraryDesignCode() != null ? item.getLibraryDesignCode() : ((DetailedLibrary) item.getLibrary()).getLibraryDesignCode();
   }
 
   @Override
