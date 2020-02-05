@@ -2,13 +2,17 @@
 
 Changes:
 
-
+  * Fixed error deleting tissues and identities (detailed sample)
 
 # 0.2.201
 
 Changes:
 
   * Fixed error bulk creating samples with the same receipt time
+
+Known Issues:
+
+  * Error deleting tissues and identities (detailed sample)
 
 # 0.2.200
 
@@ -20,6 +24,7 @@ Changes:
 Known Issues:
 
   * Bulk creating samples with the same receipt time fails
+  * Error deleting tissues and identities (detailed sample)
 
 # 0.2.199
 
@@ -68,6 +73,7 @@ Known Issues
 
   * Edit Transfer page fails to load due to a Javascript error
   * Bulk creating samples with the same receipt time fails
+  * Error deleting tissues and identities (detailed sample)
 
 # 0.2.198
 
@@ -136,6 +142,7 @@ Known Issues:
   * Edit Sample page is slow to load for samples in large projects
   * Transfer item changes fail to save under some conditions
   * Items without group descriptions fail to print on `JTT_7_GROUPDESC` labels
+  * Error deleting tissues and identities (detailed sample)
 
 # 0.2.197
 
