@@ -179,11 +179,15 @@ public class MisoAppListener implements ServletContextListener {
     applyGenerator("miso.naming.generator.sample.alias", misoProperties, resolver::getSampleAliasGenerator, scheme::setSampleAliasGenerator);
     applyGenerator("miso.naming.generator.library.alias", misoProperties, resolver::getLibraryAliasGenerator,
         scheme::setLibraryAliasGenerator);
+    applyGenerator("miso.naming.generator.libraryaliquot.alias", misoProperties, resolver::getLibraryAliquotAliasGenerator,
+        scheme::setLibraryAliquotAliasGenerator);
 
     applyValidator("miso.naming.validator.nameable.name", misoProperties, resolver::getNameValidator, scheme::setNameValidator);
     applyValidator("miso.naming.validator.sample.alias", misoProperties, resolver::getSampleAliasValidator, scheme::setSampleAliasValidator);
     applyValidator("miso.naming.validator.library.alias", misoProperties, resolver::getLibraryAliasValidator,
         scheme::setLibraryAliasValidator);
+    applyValidator("miso.naming.validator.libraryaliquot.alias", misoProperties, resolver::getLibraryAliquotAliasValidator,
+        scheme::setLibraryAliquotAliasValidator);
     applyValidator("miso.naming.validator.project.shortName", misoProperties, resolver::getProjectShortNameValidator,
         scheme::setProjectShortNameValidator);
   }

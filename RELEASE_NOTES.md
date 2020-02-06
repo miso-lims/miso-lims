@@ -2,8 +2,21 @@
 
 Changes:
 
+  * Added configuration for library aliquot alias generator and validator
   * Fixed error deleting tissues and identities (detailed sample)
   * Fixed distributed items not being removed from boxes
+
+Upgrade Notes:
+
+  * Previously when propagating libraries to library aliquots, the library alias was copied to the
+    library aliquot. Library aliquot alias were validated against the library alias validator. Now
+    library aliquots have their own generators and validators. The default generator and validator
+    will depend on which naming scheme you have configured.
+    * default: Generator copies alias from the library. Aliases are validated against the library
+      alias validator.
+    * oicr: Generator follows same format as OicrLibraryAliasGenerator, but uses fields from the
+      library aliquot instead of the library. Aliases are validated against the library alias
+      validator.
 
 # 0.2.201
 

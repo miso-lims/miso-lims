@@ -11,10 +11,21 @@ HotTarget.libraryaliquot = {
   fixUp: function(lib, errorHandler) {
   },
   getFixedColumns: function(config) {
-    return 2;
+    return config.pageMode === 'propagate' ? 1 : 2;
   },
   createColumns: function(config, create, data) {
     var columns = [
+        {
+          header: 'Parent Alias',
+          data: 'parentAlias',
+          readOnly: true,
+          include: config.pageMode === 'propagate',
+          unpack: function(aliquot, flat, setCellMeta) {
+            flat.parentAlias = aliquot.parentAliquotAlias ? aliquot.parentAliquotAlias : aliquot.libraryAlias;
+          },
+          pack: function(aliquot, flat, errorHandler) {
+          }
+        },
         {
           header: 'Name',
           data: 'name',
@@ -30,19 +41,9 @@ HotTarget.libraryaliquot = {
           }
         },
         HotUtils.makeColumnForText('Alias', true, 'alias', {
-          validator: HotUtils.validator.requiredTextNoSpecialChars
+          validator: HotUtils.validator.optionalTextNoSpecialChars,
+          unpackAfterSave: true
         }),
-        {
-          header: 'Parent Alias',
-          data: 'parentAlias',
-          readOnly: true,
-          include: true,
-          unpack: function(aliquot, flat, setCellMeta) {
-            flat.parentAlias = aliquot.parentAliquotAlias ? aliquot.parentAliquotAlias : aliquot.libraryAlias;
-          },
-          pack: function(aliquot, flat, errorHandler) {
-          }
-        },
         HotUtils.makeColumnForText('Matrix Barcode', !Constants.automaticBarcodes, 'identificationBarcode', {
           validator: HotUtils.validator.optionalTextNoSpecialChars
         }),

@@ -5,6 +5,7 @@ import java.io.IOException;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.NameGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.NameValidator;
@@ -84,6 +85,32 @@ public abstract class AbstractNamingScheme implements NamingScheme {
   }
 
   @Override
+  public boolean hasLibraryAliquotAliasGenerator() {
+    return getLibraryAliquotAliasGenerator() != null;
+  }
+
+  @Override
+  public String generateLibraryAliquotAlias(LibraryAliquot aliquot) throws MisoNamingException, IOException {
+    if (getLibraryAliquotAliasGenerator() == null)
+      throw new UnsupportedOperationException("check hasLibraryAliquotAliasGenerator() to determine availability");
+    return getLibraryAliquotAliasGenerator().generate(aliquot);
+  }
+
+  @Override
+  public ValidationResult validateLibraryAliquotAlias(String alias) {
+    if (getLibraryAliquotAliasValidator() != null) {
+      return getLibraryAliquotAliasValidator().validate(alias);
+    } else {
+      return ValidationResult.success();
+    }
+  }
+
+  @Override
+  public boolean duplicateLibraryAliquotAliasAllowed() {
+    return getLibraryAliquotAliasValidator() == null ? true : getLibraryAliquotAliasValidator().duplicatesAllowed();
+  }
+
+  @Override
   public ValidationResult validateProjectShortName(String shortName) {
     if (getProjectShortNameValidator() == null) return ValidationResult.success();
     return getProjectShortNameValidator().validate(shortName);
@@ -91,7 +118,7 @@ public abstract class AbstractNamingScheme implements NamingScheme {
 
   @Override
   public boolean duplicateProjectShortNamesAllowed() {
-    return getProjectShortNameValidator() == null ? null : getProjectShortNameValidator().duplicatesAllowed();
+    return getProjectShortNameValidator() == null ? true : getProjectShortNameValidator().duplicatesAllowed();
   }
 
   @Override
@@ -110,6 +137,10 @@ public abstract class AbstractNamingScheme implements NamingScheme {
   protected abstract NameValidator getLibraryAliasValidator();
 
   protected abstract NameGenerator<Library> getLibraryAliasGenerator();
+
+  protected abstract NameValidator getLibraryAliquotAliasValidator();
+
+  protected abstract NameGenerator<LibraryAliquot> getLibraryAliquotAliasGenerator();
 
   protected abstract NameValidator getProjectShortNameValidator();
 
