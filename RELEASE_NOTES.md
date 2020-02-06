@@ -2,7 +2,7 @@
 
 Changes:
 
-
+  * fix distributed items not being removed from boxes
 
 # 0.2.201
 

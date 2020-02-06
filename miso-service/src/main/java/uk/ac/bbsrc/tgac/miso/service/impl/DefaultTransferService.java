@@ -252,7 +252,7 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
         }
       }
     }
-    if (transfer.getRecipient() != null && items.stream().anyMatch(item -> !Boolean.TRUE.equals(item.isReceived()))) {
+    if (transfer.isDistribution() && items.stream().anyMatch(item -> !Boolean.TRUE.equals(item.isReceived()))) {
       errors.add(new ValidationError("items", ERROR_DISTRIBUTION_NOT_RECEIVED));
     }
 
@@ -261,16 +261,16 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
           .map(TransferItem::getItem)
           .anyMatch(item -> item.getTransfers().stream()
               .map(TransferItem::getTransfer)
-              .anyMatch(itemTransfer -> itemTransfer.getSenderLab() != null
-                  && itemTransfer.isSaved() && (!transfer.isSaved() || itemTransfer.getId() != transfer.getId())))) {
+              .anyMatch(itemTransfer -> itemTransfer.isReceipt() && itemTransfer.isSaved()
+                  && (!transfer.isSaved() || itemTransfer.getId() != transfer.getId())))) {
         errors.add(new ValidationError("items", ERROR_MULTIPLE_RECEIPT));
       }
     } else if (transfer.getRecipient() != null && items.stream()
         .map(TransferItem::getItem)
         .anyMatch(item -> item.getTransfers().stream()
             .map(TransferItem::getTransfer)
-            .anyMatch(itemTransfer -> itemTransfer.getRecipient() != null
-                && itemTransfer.isSaved() && (!transfer.isSaved() || itemTransfer.getId() != transfer.getId())))) {
+            .anyMatch(itemTransfer -> itemTransfer.isDistribution() && itemTransfer.isSaved()
+                && (!transfer.isSaved() || itemTransfer.getId() != transfer.getId())))) {
                   errors.add(new ValidationError("items", ERROR_MULTIPLE_DISTRIBUTION));
     }
   }
@@ -299,18 +299,18 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
         errors.add(new ValidationError("received", ERROR_UNAUTHORIZED_RECEIPT));
       }
     }
-    if (transfer.getRecipient() != null && !Boolean.TRUE.equals(item.isReceived())) {
+    if (transfer.isDistribution() && !Boolean.TRUE.equals(item.isReceived())) {
       errors.add(new ValidationError("received", ERROR_DISTRIBUTION_NOT_RECEIVED));
     }
 
     if (item.getItem().getTransfers().stream()
         .map(TransferItem::getTransfer)
-        .anyMatch(itemTransfer -> itemTransfer.getSenderLab() != null && itemTransfer.getId() != transfer.getId())) {
+        .anyMatch(itemTransfer -> itemTransfer.isReceipt() && itemTransfer.getId() != transfer.getId())) {
       errors.add(new ValidationError(ERROR_MULTIPLE_RECEIPT));
     }
     if (item.getItem().getTransfers().stream()
         .map(TransferItem::getTransfer)
-        .anyMatch(itemTransfer -> itemTransfer.getRecipient() != null && itemTransfer.getId() != transfer.getId())) {
+        .anyMatch(itemTransfer -> itemTransfer.isDistribution() && itemTransfer.getId() != transfer.getId())) {
       errors.add(new ValidationError(ERROR_MULTIPLE_DISTRIBUTION));
     }
 
@@ -368,51 +368,53 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
   }
 
   @Override
-  protected void beforeSave(Transfer object) throws IOException {
-    object.getSampleTransfers().forEach(item -> item.setTransfer(object));
-    object.getLibraryTransfers().forEach(item -> item.setTransfer(object));
-    object.getLibraryAliquotTransfers().forEach(item -> item.setTransfer(object));
-    object.getPoolTransfers().forEach(item -> item.setTransfer(object));
+  protected void beforeValidate(Transfer transfer) throws IOException {
+    Consumer<TransferItem<?>> action = null;
+    if (transfer.isDistribution()) {
+      // Mark all items received for distribution transfers
+      action = item -> {
+        item.setTransfer(transfer);
+        item.setReceived(true);
+      };
+    } else {
+      action = item -> item.setTransfer(transfer);
+    }
+    transfer.getSampleTransfers().forEach(action);
+    transfer.getLibraryTransfers().forEach(action);
+    transfer.getLibraryAliquotTransfers().forEach(action);
+    transfer.getPoolTransfers().forEach(action);
 
-    object.setChangeDetails(authorizationManager.getCurrentUser());
+    transfer.setChangeDetails(authorizationManager.getCurrentUser());
   }
 
   @Override
-  public long create(Transfer object) throws IOException {
-    setReceivedForDistribution(object);
-    long savedId = super.create(object);
-    return savedId;
-  }
-
-  @Override
-  public long update(Transfer object) throws IOException {
-    setReceivedForDistribution(object);
-    long savedId = super.update(object);
-    updateItems(object);
-    return savedId;
-  }
-
-  private void setReceivedForDistribution(Transfer transfer) {
-    if (transfer.getRecipient() != null) {
-      transfer.getSampleTransfers().forEach(item -> item.setReceived(true));
-      transfer.getLibraryTransfers().forEach(item -> item.setReceived(true));
-      transfer.getLibraryAliquotTransfers().forEach(item -> item.setReceived(true));
-      transfer.getPoolTransfers().forEach(item -> item.setReceived(true));
-    }
-  }
-
-  private void updateItems(Transfer object) throws IOException {
-    for (TransferSample item : object.getSampleTransfers()) {
-      sampleService.update(item.getItem());
-    }
-    for (TransferLibrary item : object.getLibraryTransfers()) {
-      libraryService.update(item.getItem());
-    }
-    for (TransferLibraryAliquot item : object.getLibraryAliquotTransfers()) {
-      libraryAliquotService.update(item.getItem());
-    }
-    for (TransferPool item : object.getPoolTransfers()) {
-      poolService.update(item.getItem());
+  protected void afterSave(Transfer object) throws IOException {
+    if (object.isDistribution()) {
+      // Individual services are responsible for setting volume to 0 and removing items from boxes
+      for (TransferSample item : object.getSampleTransfers()) {
+        if (!item.getItem().getTransfers().contains(item)) {
+          item.getItem().getTransfers().add(item);
+        }
+        sampleService.update(item.getItem());
+      }
+      for (TransferLibrary item : object.getLibraryTransfers()) {
+        if (!item.getItem().getTransfers().contains(item)) {
+          item.getItem().getTransfers().add(item);
+        }
+        libraryService.update(item.getItem());
+      }
+      for (TransferLibraryAliquot item : object.getLibraryAliquotTransfers()) {
+        if (!item.getItem().getTransfers().contains(item)) {
+          item.getItem().getTransfers().add(item);
+        }
+        libraryAliquotService.update(item.getItem());
+      }
+      for (TransferPool item : object.getPoolTransfers()) {
+        if (!item.getItem().getTransfers().contains(item)) {
+          item.getItem().getTransfers().add(item);
+        }
+        poolService.update(item.getItem());
+      }
     }
   }
 
