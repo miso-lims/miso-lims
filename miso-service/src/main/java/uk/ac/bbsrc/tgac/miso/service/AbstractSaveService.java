@@ -26,9 +26,12 @@ public abstract class AbstractSaveService<T extends Identifiable> implements Sav
   public long create(T object) throws IOException {
     authorizeSave(object);
     loadChildEntities(object);
+    beforeValidate(object);
     validateChange(object, null);
     beforeSave(object);
-    return getDao().create(object);
+    long savedId = getDao().create(object);
+    afterSave(object);
+    return savedId;
   }
 
   @Override
@@ -36,10 +39,13 @@ public abstract class AbstractSaveService<T extends Identifiable> implements Sav
     T managed = get(object.getId());
     authorizeSave(managed);
     loadChildEntities(object);
+    beforeValidate(object);
     validateChange(object, managed);
     applyChanges(managed, object);
     beforeSave(managed);
-    return getDao().update(managed);
+    long savedId = getDao().update(managed);
+    afterSave(managed);
+    return savedId;
   }
 
   /**
@@ -54,12 +60,32 @@ public abstract class AbstractSaveService<T extends Identifiable> implements Sav
   }
 
   /**
+   * Make any changes necessary to the object before validating. Default implementation does nothing
+   * 
+   * @param object object being saved
+   * @throws IOException
+   */
+  protected void beforeValidate(T object) throws IOException {
+    // do nothing
+  }
+
+  /**
    * Make any other changes necessary to the object before saving. This happens *after* validation. Default implementation does nothing
    * 
    * @param object object being saved
    * @throws IOException
    */
   protected void beforeSave(T object) throws IOException {
+    // do nothing
+  }
+
+  /**
+   * Perform any other actions necessary after saving. Default implementation does nothing
+   * 
+   * @param object object that has been saved
+   * @throws IOException
+   */
+  protected void afterSave(T object) throws IOException {
     // do nothing
   }
 

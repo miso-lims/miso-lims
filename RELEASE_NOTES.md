@@ -3,6 +3,7 @@
 Changes:
 
   * Fixed error deleting tissues and identities (detailed sample)
+  * Fixed distributed items not being removed from boxes
 
 # 0.2.201
 
