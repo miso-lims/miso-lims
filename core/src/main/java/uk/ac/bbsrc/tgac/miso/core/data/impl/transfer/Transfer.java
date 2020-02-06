@@ -202,4 +202,12 @@ public class Transfer implements Identifiable, Timestamped, Serializable {
     return getId() != UNSAVED_ID;
   }
 
+  public boolean isReceipt() {
+    return getSenderLab() != null;
+  }
+
+  public boolean isDistribution() {
+    return getRecipient() != null;
+  }
+
 }
