@@ -19,9 +19,13 @@ Upgrade Notes:
       library aliquot instead of the library. Aliases are validated against the library alias
       validator.
   * The webapp now explicitly sets the JVM time zone to the value configured in `miso.properties`
-    `miso.timeCorrection.dbZone` on startup. This means that MISO should not run on the same Tomcat
-    instance as any other webapp that modifies the JVM time zone or depends on it being a different
-    value. If you run MISO on its own Tomcat instance or in Docker, this is not an issue.
+    `miso.timeCorrection.dbZone` on startup. This means that
+    1. It is now even more important to correctly set `miso.timeCorrection.uiZone` and
+       `miso.timeCorrection.dbZone` in `miso.properties`, and to ensure that `dbZone` matches the
+       time zone that MySQL is using.
+    1. MISO should not run on the same Tomcat instance as any other webapp that modifies the JVM
+       time zone or depends on it being a different value. If you run MISO on its own Tomcat
+       instance or in Docker, this is not an issue.
 
 # 0.2.201
 
