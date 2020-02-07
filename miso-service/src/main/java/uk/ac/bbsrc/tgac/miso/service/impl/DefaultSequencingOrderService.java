@@ -18,8 +18,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
@@ -135,9 +135,8 @@ public class DefaultSequencingOrderService implements SequencingOrderService {
 
   @Override
   public void beforeDelete(SequencingOrder object) throws IOException {
-    Pool pool = poolService.get(object.getPool().getId());
-    pool.setLastModifier(authorizationManager.getCurrentUser());
-    poolService.update(pool);
+    // update pool to affect last modifier and last modified time
+    poolService.update(object.getPool());
   }
 
   @Override

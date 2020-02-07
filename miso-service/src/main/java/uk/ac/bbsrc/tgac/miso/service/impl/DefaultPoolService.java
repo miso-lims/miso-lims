@@ -281,15 +281,10 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   }
 
   private void refreshPoolElements(Pool pool) throws IOException {
-    Set<PoolElement> pes = new HashSet<>();
-    for(PoolElement oldPe : pool.getPoolContents()){
-      PoolElement newPe = new PoolElement();
-      newPe.setPool(pool);
-      newPe.setProportion(oldPe.getProportion());
-      newPe.setPoolableElementView(poolableElementViewService.get(oldPe.getPoolableElementView().getAliquotId()));
-      pes.add(newPe);
+    for (PoolElement element : pool.getPoolContents()) {
+      element.setPool(pool);
+      element.setPoolableElementView(poolableElementViewService.get(element.getPoolableElementView().getAliquotId()));
     }
-    pool.setPoolElements(pes);
   }
 
   private Set<String> getAllBadIndices(Pool pool) {
@@ -299,16 +294,15 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     return indices;
   }
 
-  public void validateIndices(Pool pool, Pool beforeChange, Collection<ValidationError> errors)
-      throws IOException {
+  public void validateIndices(Pool pool, Pool beforeChange, Collection<ValidationError> errors) throws IOException {
     refreshPoolElements(pool);
     Set<String> indices = getAllBadIndices(pool);
     Set<String> bcIndices = getAllBadIndices(beforeChange);
 
-    if(indices.size() > bcIndices.size()){ // If this change introduces new conflicts
+    if (indices.size() > bcIndices.size()) { // If this change introduces new conflicts
       String errorMessage = String.format("Pools may not contain Library Aliquots with indices with %d or " +
-              "fewer positions of difference, please address the following conflicts: ",
-              indexChecker.getWarningMismatches());
+          "fewer positions of difference, please address the following conflicts: ",
+          indexChecker.getWarningMismatches());
       indices.removeAll(bcIndices);
       errorMessage += indices.stream().map(index -> index.length() == 0 ? "(no indices)" : index).collect(Collectors.joining(", "));
       errors.add(new ValidationError("poolElements", errorMessage));
@@ -353,9 +347,11 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     validateBarcodeUniqueness(pool, beforeChange, poolStore::getByBarcode, errors, "pool");
     validateUnboxableFields(pool, errors);
 
-    if (strictPools && !pool.isMergeChild()) validateIndices(pool, beforeChange, errors);
+    if (strictPools && !pool.isMergeChild()) {
+      validateIndices(pool, beforeChange, errors);
+    }
     //If this is a new pool, we don't have to worry about syncing to pool orders: either it's irrelevant, or a guarantee
-    List<PoolOrder> potentialPoolOrders = beforeChange == null? null: poolOrderService.getAllByPoolId(pool.getId());
+    List<PoolOrder> potentialPoolOrders = beforeChange == null ? null : poolOrderService.getAllByPoolId(beforeChange.getId());
     if (potentialPoolOrders != null && potentialPoolOrders.size() != 0) {
       errors.addAll(getMismatchesWithOrders(pool, potentialPoolOrders));
     }

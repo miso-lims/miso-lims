@@ -142,7 +142,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   private Set<PoolElement> poolElements = new HashSet<>();
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long poolId = PoolImpl.UNSAVED_ID;
 
   @OneToMany(targetEntity = PoolQC.class, mappedBy = "pool", cascade = CascadeType.REMOVE)

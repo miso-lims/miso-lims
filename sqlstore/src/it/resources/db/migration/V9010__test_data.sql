@@ -749,7 +749,13 @@ INSERT INTO SequencingOrder(sequencingOrderId, poolId, partitions, parametersId,
 (1, 1, 1, 1, 1, 'seq order 1', 1, '2019-09-23 10:30:00', 1, '2019-09-23 10:30:00');
 
 INSERT INTO PoolOrder(poolOrderId, alias, description, purposeId, parametersId, partitions, draft, poolId, sequencingOrderId, createdBy, creationDate, updatedBy, lastUpdated) VALUES
-(1, 'pool order 1', 'pool order 1 desc', 1, 2, 1, FALSE, NULL, NULL, 1, '2019-09-23 10:30:00', 1, '2019-09-23 10:30:00');
+(1, 'pool order 1', 'pool order 1 desc', 1, 2, 1, FALSE, NULL, NULL, 1, '2019-09-23 10:30:00', 1, '2019-09-23 10:30:00'),
+(2, 'pool order 2', 'pool order 2 desc', 1, NULL, NULL, FALSE, 2, NULL, 1, '2019-09-23 10:30:00', 1, '2019-09-23 10:30:00');
+
+INSERT INTO PoolOrder_LibraryAliquot (poolOrderId, aliquotId) VALUES
+(2,6),
+(2,5),
+(2,4);
 
 -- SampleHierarchy needs repopulated because everything is not created in expected order in test data
 -- (parent SampleTissue and Identity records aren't always created before childrens' DetailedSample records)
