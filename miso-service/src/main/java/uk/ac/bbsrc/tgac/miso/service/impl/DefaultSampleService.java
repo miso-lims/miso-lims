@@ -739,7 +739,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     User changeUser = authorizationManager.getCurrentUser();
     managed.setChangeDetails(changeUser);
     boolean validateAliasUniqueness = !managed.getAlias().equals(sample.getAlias());
-    maybeRemoveFromBox(sample);
+    maybeRemoveFromBox(sample, managed);
     boxService.throwIfBoxPositionIsFilled(sample);
     if (sample.getParent() != null) {
       ((DetailedSample) sample).setParent((DetailedSample) get(sample.getParent().getId()));
@@ -765,8 +765,8 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     return sample.getId();
   }
 
-  private void maybeRemoveFromBox(Sample sample) {
-    if (sample.isDiscarded() || sample.getDistributionTransfer() != null) {
+  private void maybeRemoveFromBox(Sample sample, Sample managed) {
+    if (sample.isDiscarded() || sample.getDistributionTransfer() != null || managed.getDistributionTransfer() != null) {
       sample.setBoxPosition(null);
       sample.setVolume(BigDecimal.ZERO);
     }

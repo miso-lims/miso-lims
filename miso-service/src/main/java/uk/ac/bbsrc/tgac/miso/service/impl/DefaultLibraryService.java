@@ -227,7 +227,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     User changeUser = authorizationManager.getCurrentUser();
     managed.setChangeDetails(changeUser);
     List<Index> originalIndices = new ArrayList<>(managed.getIndices());
-    maybeRemoveFromBox(library);
+    maybeRemoveFromBox(library, managed);
     boxService.throwIfBoxPositionIsFilled(library);
     library.setSample(sampleService.get(library.getSample().getId()));
     LimsUtils.updateParentVolume(library, managed, changeUser);
@@ -505,8 +505,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     }
   }
 
-  private void maybeRemoveFromBox(Library library) {
-    if (library.isDiscarded() || library.getDistributionTransfer() != null) {
+  private void maybeRemoveFromBox(Library library, Library managed) {
+    if (library.isDiscarded() || library.getDistributionTransfer() != null || managed.getDistributionTransfer() != null) {
       library.setBoxPosition(null);
       library.setVolume(BigDecimal.ZERO);
     }

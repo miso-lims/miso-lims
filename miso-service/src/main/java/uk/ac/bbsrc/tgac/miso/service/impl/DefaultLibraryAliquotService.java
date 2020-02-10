@@ -183,7 +183,7 @@ public class DefaultLibraryAliquotService
     LibraryAliquot managed = get(aliquot.getId());
     User changeUser = authorizationManager.getCurrentUser();
     managed.setChangeDetails(changeUser);
-    maybeRemoveFromBox(aliquot);
+    maybeRemoveFromBox(aliquot, managed);
     boxService.throwIfBoxPositionIsFilled(aliquot);
 
     loadChildEntities(aliquot);
@@ -246,8 +246,8 @@ public class DefaultLibraryAliquotService
     }
   }
 
-  private void maybeRemoveFromBox(LibraryAliquot aliquot) {
-    if (aliquot.isDiscarded() || aliquot.getDistributionTransfer() != null) {
+  private void maybeRemoveFromBox(LibraryAliquot aliquot, LibraryAliquot managed) {
+    if (aliquot.isDiscarded() || aliquot.getDistributionTransfer() != null || managed.getDistributionTransfer() != null) {
       aliquot.setBoxPosition(null);
       aliquot.setVolume(BigDecimal.ZERO);
     }

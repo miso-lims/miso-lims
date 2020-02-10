@@ -6,6 +6,7 @@ Changes:
   * Fixed error deleting tissues and identities (detailed sample)
   * Fixed distributed items not being removed from boxes
   * Fixed error deleting sequencing orders
+  * Fixed transfer time and service record start and end times saving in incorrect time zone
 
 Upgrade Notes:
 
@@ -18,6 +19,14 @@ Upgrade Notes:
     * oicr: Generator follows same format as OicrLibraryAliasGenerator, but uses fields from the
       library aliquot instead of the library. Aliases are validated against the library alias
       validator.
+  * The webapp now explicitly sets the JVM time zone to the value configured in `miso.properties`
+    `miso.timeCorrection.dbZone` on startup. This means that
+    1. It is now even more important to correctly set `miso.timeCorrection.uiZone` and
+       `miso.timeCorrection.dbZone` in `miso.properties`, and to ensure that `dbZone` matches the
+       time zone that MySQL is using.
+    1. MISO should not run on the same Tomcat instance as any other webapp that modifies the JVM
+       time zone or depends on it being a different value. If you run MISO on its own Tomcat
+       instance or in Docker, this is not an issue.
 
 # 0.2.201
 
@@ -29,6 +38,8 @@ Known Issues:
 
   * Error deleting tissues and identities (detailed sample)
   * Error deleting sequencing orders
+  * Transfer time and service record start and end times may save in incorrect time zone depending
+    on configuration
 
 # 0.2.200
 
@@ -42,6 +53,8 @@ Known Issues:
   * Bulk creating samples with the same receipt time fails
   * Error deleting tissues and identities (detailed sample)
   * Error deleting sequencing orders
+  * Transfer time and service record start and end times may save in incorrect time zone depending
+    on configuration
 
 # 0.2.199
 
@@ -92,6 +105,8 @@ Known Issues
   * Bulk creating samples with the same receipt time fails
   * Error deleting tissues and identities (detailed sample)
   * Error deleting sequencing orders
+  * Transfer time and service record start and end times may save in incorrect time zone depending
+    on configuration
 
 # 0.2.198
 
@@ -162,6 +177,8 @@ Known Issues:
   * Items without group descriptions fail to print on `JTT_7_GROUPDESC` labels
   * Error deleting tissues and identities (detailed sample)
   * Error deleting sequencing orders
+  * Transfer time and service record start and end times may save in incorrect time zone depending
+    on configuration
 
 # 0.2.197
 
@@ -181,6 +198,7 @@ Known Issues:
 
   * QCs fail to save when controls are specified
   * Error deleting sequencing orders
+  * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.196
 
@@ -211,6 +229,7 @@ Known Issues:
     Worksets list page
   * QCs fail to save when controls are specified
   * Error deleting sequencing orders
+  * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.195
 
@@ -257,6 +276,7 @@ Known Issues:
   * When attempting to add a library aliquot with no indices to a pool on the Edit Pool page, a
     Javascript error occurs and the Library Aliquots table disappears
   * Error deleting sequencing orders
+  * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.194
 
@@ -305,6 +325,7 @@ Known Issues:
 
   * Pinery Qubit concentration displays ten decimal places
   * Error deleting sequencing orders
+  * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.192
 
@@ -336,6 +357,7 @@ Upgrade notes:
 Known Issues:
 
   * Error deleting sequencing orders
+  * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.191
 
@@ -368,6 +390,7 @@ Known issues:
   * `/miso/constants.js` did not automatically reload
   * Detailed sample demo Docker image failed Flyway migration from a fresh database
   * Error deleting sequencing orders
+  * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.190
 
@@ -394,6 +417,7 @@ Known issues:
   * `/miso/constants.js` did not automatically reload
   * Detailed sample demo Docker image failed Flyway migration from a fresh database
   * Error deleting sequencing orders
+  * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.189
 
@@ -410,6 +434,7 @@ Known issues:
   * Confirm password field shows an error and prevents changing passwords and creating new users
   * `/miso/constants.js` did not automatically reload
   * Error deleting sequencing orders
+  * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.188
 
@@ -426,6 +451,7 @@ Known issues:
 
   * Confirm password field shows an error and prevents changing passwords and creating new users
   * Error deleting sequencing orders
+  * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.187
 
@@ -438,6 +464,7 @@ Known issues:
 
   * Confirm password field shows an error and prevents changing passwords and creating new users
   * Error deleting sequencing orders
+  * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.186
 
@@ -477,6 +504,7 @@ Known issues:
 
   * Confirm password field shows an error and prevents changing passwords and creating new users
   * Error deleting sequencing orders
+  * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.185:
 
@@ -484,9 +512,10 @@ Changes:
 
   * Added missing migration that should have been in 0.2.184
 
-BAD:
+Known Issues:
 
   * List Freezers page still broken
+  * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.184
 
@@ -512,10 +541,11 @@ Changes:
   * Fixed migration that altered library aliquot created dates
   * Fixed intermittent bug preventing receiving libraries due to Scientific Name (and potentially other fields) not saving correctly
 
-BAD:
+Known Issues:
 
   * Was missing a migration
   * List Freezers page still broken
+  * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.183
 
@@ -535,16 +565,21 @@ Upgrade Notes:
     no longer necessary to use the parameter `-P external`. Documentation has been updated
     accordingly
 
-BAD:
+Known Issues:
 
   * Migration altered all library aliquot creation dates to current date
   * Broke List Freezers page
+  * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.182
 
 Changes:
 
   * Fixed run metrics disappearing when saving a run on the Edit Run page
+
+Known Issues:
+
+  * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.181
 
@@ -579,9 +614,10 @@ Upgrade Notes:
     removed during the migration to this version
   * Upgraded to Run Scanner v1.6.0
 
-BAD:
+Known Issues:
 
   * Run metrics disappear when saving a run on the Edit Run page
+  * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.180
 
@@ -613,9 +649,10 @@ Upgrade Notes:
       for more information. Your own `security.properties` file is in the MISO storage directory,
       which is `/storage/miso` by default
 
-BAD:
+Known Issues:
 
   * Run metrics disappear when saving a run on the Edit Run page
+  * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.179
 
@@ -639,9 +676,10 @@ Upgrade Notes:
 
   * Upgraded Run Scanner version to 1.5.0
 
-BAD:
+Known Issues:
 
   * Run metrics disappear when saving a run on the Edit Run page
+  * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.178
 
@@ -658,10 +696,11 @@ Changes:
   * Changed Instrument creation to use the Edit Instrument page instead of a dialog
   * Fixed Edit Dilution page URL: /miso/dilution/{id} (was /miso/dilutions/{id})
 
-BAD:
+Known Issues:
 
   * Several broken links to dilution-related pages
   * Run metrics disappear when saving a run on the Edit Run page
+  * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.177
 
@@ -675,9 +714,10 @@ Changes:
   * Fixed incompatibility of some forms with Firefox versions < 62
   * Upgraded version of Run Scanner to 1.4.5
 
-BAD:
+Known Issues:
 
   * Run metrics disappear when saving a run on the Edit Run page
+  * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.176
 
@@ -697,9 +737,10 @@ Changes:
   * Fixed Pinery-MISO failing to reverse compliment indices when appropriate if the container model
     is not accurately detected
 
-BAD:
+Known Issues:
 
   * Run metrics disappear when saving a run on the Edit Run page
+  * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.175
 

@@ -223,7 +223,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   @Override
   public long update(Pool pool) throws IOException {
     Pool managed = poolStore.get(pool.getId());
-    maybeRemoveFromBox(pool);
+    maybeRemoveFromBox(pool, managed);
     boxService.throwIfBoxPositionIsFilled(pool);
     if (pool.getConcentration() == null) {
       pool.setConcentrationUnits(null);
@@ -273,8 +273,8 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     return savedId;
   }
 
-  private void maybeRemoveFromBox(Pool pool) {
-    if (pool.isDiscarded() || pool.getDistributionTransfer() != null) {
+  private void maybeRemoveFromBox(Pool pool, Pool managed) {
+    if (pool.isDiscarded() || pool.getDistributionTransfer() != null || managed.getDistributionTransfer() != null) {
       pool.setBoxPosition(null);
       pool.setVolume(BigDecimal.ZERO);
     }

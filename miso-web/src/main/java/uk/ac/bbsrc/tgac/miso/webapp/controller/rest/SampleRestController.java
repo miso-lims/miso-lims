@@ -72,6 +72,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferItem;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
@@ -94,6 +95,7 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleTissuePieceDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueProcessingDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.TimeZoneCorrector;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
@@ -110,6 +112,8 @@ public class SampleRestController extends RestController {
   private ProjectService projectService;
   @Autowired
   private PoolService poolService;
+  @Autowired
+  private TimeZoneCorrector timeZoneCorrector;
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
@@ -242,7 +246,15 @@ public class SampleRestController extends RestController {
           inferIntermediateSampleClassId(dto, topProcessingClassId, SampleTissueProcessing.CATEGORY_NAME,
               SampleTissue.CATEGORY_NAME, false));
     }
-    return Dtos.to(sampleDto);
+    return to(sampleDto);
+  }
+
+  private Sample to(SampleDto from) {
+    Sample to = Dtos.to(from);
+    to.getTransfers().stream().map(TransferItem::getTransfer).forEach(transfer -> {
+      timeZoneCorrector.toDbTime(transfer.getTransferTime(), transfer::setTransferTime);
+    });
+    return to;
   }
 
   private Long inferIntermediateSampleClassId(DetailedSampleDto dto, Long childClassId,
@@ -265,7 +277,7 @@ public class SampleRestController extends RestController {
   @PutMapping(value = "/{id}")
   @ResponseStatus(HttpStatus.OK)
   public @ResponseBody SampleDto updateSample(@PathVariable long id, @RequestBody SampleDto sampleDto) throws IOException {
-    return RestUtils.updateObject("Sample", id, sampleDto, Dtos::to, sampleService, sam -> Dtos.asDto(sam, false));
+    return RestUtils.updateObject("Sample", id, sampleDto, this::to, sampleService, sam -> Dtos.asDto(sam, false));
   }
 
   /**

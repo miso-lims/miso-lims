@@ -30,6 +30,7 @@ import java.nio.file.Paths;
 import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TimeZone;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -98,6 +99,13 @@ public class MisoAppListener implements ServletContextListener {
     // resolve property file configuration placeholders
     MisoPropertyExporter exporter = (MisoPropertyExporter) context.getBean("propertyConfigurer");
     Map<String, String> misoProperties = exporter.getResolvedProperties();
+
+    // Set JVM time zone to configured DB time to ensure that generated timestamps are correct
+    String dbZone = getStringPropertyOrNull("miso.timeCorrection.dbZone", misoProperties);
+    if (dbZone == null) {
+      dbZone = "UTC";
+    }
+    TimeZone.setDefault(TimeZone.getTimeZone(dbZone));
 
     log.info("Checking MISO storage paths...");
     String baseStoragePath = misoProperties.get("miso.baseDirectory");
