@@ -491,6 +491,11 @@ Urls = (function() {
   };
 
   // Sequencing Orders
+  var sequencingOrderUiBase = baseUrl + '/sequencingorder';
+  ui.sequencingOrders = {
+    bulkCreate: sequencingOrderUiBase + '/bulk/create'
+  };
+
   var sequencingOrderRestBase = restBase + '/sequencingorders';
   rest.sequencingOrders = {
     create: sequencingOrderRestBase,

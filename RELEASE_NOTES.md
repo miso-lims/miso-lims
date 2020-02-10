@@ -5,6 +5,7 @@ Changes:
   * Added configuration for library aliquot alias generator and validator
   * Fixed error deleting tissues and identities (detailed sample)
   * Fixed distributed items not being removed from boxes
+  * Fixed error deleting sequencing orders
   * Fixed transfer time and service record start and end times saving in incorrect time zone
 
 Upgrade Notes:
@@ -36,6 +37,7 @@ Changes:
 Known Issues:
 
   * Error deleting tissues and identities (detailed sample)
+  * Error deleting sequencing orders
   * Transfer time and service record start and end times may save in incorrect time zone depending
     on configuration
 
@@ -50,6 +52,7 @@ Known Issues:
 
   * Bulk creating samples with the same receipt time fails
   * Error deleting tissues and identities (detailed sample)
+  * Error deleting sequencing orders
   * Transfer time and service record start and end times may save in incorrect time zone depending
     on configuration
 
@@ -101,6 +104,7 @@ Known Issues
   * Edit Transfer page fails to load due to a Javascript error
   * Bulk creating samples with the same receipt time fails
   * Error deleting tissues and identities (detailed sample)
+  * Error deleting sequencing orders
   * Transfer time and service record start and end times may save in incorrect time zone depending
     on configuration
 
@@ -172,6 +176,7 @@ Known Issues:
   * Transfer item changes fail to save under some conditions
   * Items without group descriptions fail to print on `JTT_7_GROUPDESC` labels
   * Error deleting tissues and identities (detailed sample)
+  * Error deleting sequencing orders
   * Transfer time and service record start and end times may save in incorrect time zone depending
     on configuration
 
@@ -192,6 +197,7 @@ Changes:
 Known Issues:
 
   * QCs fail to save when controls are specified
+  * Error deleting sequencing orders
   * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.196
@@ -222,6 +228,7 @@ Known Issues:
   * Some functions are very slow due to the library aliquot child search fix, especially the
     Worksets list page
   * QCs fail to save when controls are specified
+  * Error deleting sequencing orders
   * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.195
@@ -268,6 +275,7 @@ Known Issues:
 
   * When attempting to add a library aliquot with no indices to a pool on the Edit Pool page, a
     Javascript error occurs and the Library Aliquots table disappears
+  * Error deleting sequencing orders
   * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.194
@@ -316,6 +324,7 @@ Upgrade notes:
 Known Issues:
 
   * Pinery Qubit concentration displays ten decimal places
+  * Error deleting sequencing orders
   * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.192
@@ -347,6 +356,7 @@ Upgrade notes:
 
 Known Issues:
 
+  * Error deleting sequencing orders
   * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.191
@@ -379,6 +389,7 @@ Upgrade notes:
 Known issues:
   * `/miso/constants.js` did not automatically reload
   * Detailed sample demo Docker image failed Flyway migration from a fresh database
+  * Error deleting sequencing orders
   * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.190
@@ -405,6 +416,7 @@ Known issues:
   * Confirm password field shows an error and prevents changing passwords and creating new users
   * `/miso/constants.js` did not automatically reload
   * Detailed sample demo Docker image failed Flyway migration from a fresh database
+  * Error deleting sequencing orders
   * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.189
@@ -421,6 +433,7 @@ Known issues:
 
   * Confirm password field shows an error and prevents changing passwords and creating new users
   * `/miso/constants.js` did not automatically reload
+  * Error deleting sequencing orders
   * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.188
@@ -437,6 +450,7 @@ Changes:
 Known issues:
 
   * Confirm password field shows an error and prevents changing passwords and creating new users
+  * Error deleting sequencing orders
   * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.187
@@ -449,6 +463,7 @@ Changes:
 Known issues:
 
   * Confirm password field shows an error and prevents changing passwords and creating new users
+  * Error deleting sequencing orders
   * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.186
@@ -488,6 +503,7 @@ Upgrade Notes:
 Known issues:
 
   * Confirm password field shows an error and prevents changing passwords and creating new users
+  * Error deleting sequencing orders
   * Service record start and end times may save in incorrect time zone depending on configuration
 
 # 0.2.185:

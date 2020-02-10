@@ -99,6 +99,7 @@
 
 <br/>
 <h1>Library Aliquots</h1>
+<div id="poolForm_poolElementsError" class="errorContainer"></div>
 <div id="listAliquotsContainer"></div>
 
 <div class="noPrint">

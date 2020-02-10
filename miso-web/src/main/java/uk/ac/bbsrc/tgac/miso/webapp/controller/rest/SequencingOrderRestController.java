@@ -160,6 +160,13 @@ public class SequencingOrderRestController extends RestController {
     RestUtils.delete("Sequencing order", id, sequencingOrderService);
   }
 
+  @PostMapping(value = "/sequencingorders/bulk-delete")
+  @ResponseBody
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
+    RestUtils.bulkDelete("Sequencing order", ids, sequencingOrderService);
+  }
+
   @GetMapping(value = "/sequencingorders/picker/active", produces = { "application/json" })
   @ResponseBody
   public PoolPickerResponse getPickersByUnfulfilled(@RequestParam("platform") String platform) throws IOException {

@@ -47,28 +47,16 @@ ListTarget.sequencingorder = {
             }
             var copy = JSON.parse(JSON.stringify(orders[index]));
             copy.partitions += results.count;
-            Utils.ajaxWithDialog('Updating Order', 'PUT', '/miso/rest/sequencingorders/' + orders[index].id, copy, function() {
+            Utils.ajaxWithDialog('Updating Order', 'PUT', Urls.rest.sequencingOrders.update(orders[index].id), copy, function() {
               updateNext(index + 1)
             });
           };
           updateNext(0);
         });
       }
-    }, {
-      name: 'Delete',
-      action: function(orders) {
-        var deleteNext = function(index) {
-          if (index >= orders.length) {
-            Utils.page.pageReload();
-            return;
-          }
-          Utils.ajaxWithDialog('Deleting Order', 'DELETE', '/miso/rest/sequencingorders/' + orders[index].id, null, function() {
-            deleteNext(index + 1)
-          });
-        };
-        deleteNext(0);
-      }
-    }, ];
+    }, ListUtils.createBulkDeleteAction('Sequencing Orders', 'sequencingorders', function(order) {
+      return order.pool.alias + ': ' + order.partitions + ' partitions';
+    }), ];
   },
   createStaticActions: function(config, projectId) {
     if (config.pool.id) {
@@ -78,7 +66,7 @@ ListTarget.sequencingorder = {
       return [{
         name: "Create",
         handler: function() {
-          window.location = window.location.origin + '/miso/sequencingorder/bulk/create?' + jQuery.param({
+          window.location = Urls.ui.sequencingOrders.bulkCreate + '?' + jQuery.param({
             ids: config.pool.id
           });
         }

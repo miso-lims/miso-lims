@@ -1,7 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
@@ -19,29 +24,19 @@ import javax.persistence.TemporalType;
 
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.*;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLoggable;
+import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
+import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
+import uk.ac.bbsrc.tgac.miso.core.data.Timestamped;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolOrderChangeLog;
 
 @Entity
 public class PoolOrder implements Deletable, Identifiable, Serializable, Timestamped, ChangeLoggable {
-
-  @OneToMany(targetEntity = PoolOrderChangeLog.class, mappedBy = "poolOrder", cascade = CascadeType.REMOVE)
-  private final Collection<ChangeLog> changeLog = new ArrayList<>();
-
-  @Override
-  public Collection<ChangeLog> getChangeLog() {
-    return changeLog;
-  }
-
-  @Override
-  public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
-    PoolOrderChangeLog changeLog = new PoolOrderChangeLog();
-    changeLog.setPoolOrder(this);
-    changeLog.setSummary(summary);
-    changeLog.setColumnsChanged(columnsChanged);
-    changeLog.setUser(user);
-    return changeLog;
-  }
 
   public enum Status {
     OUTSTANDING("Outstanding"), DRAFT("Draft"), FULFILLED("Fulfilled");
@@ -116,6 +111,9 @@ public class PoolOrder implements Deletable, Identifiable, Serializable, Timesta
   @Column(nullable = false)
   @Temporal(TemporalType.TIMESTAMP)
   private Date lastUpdated;
+
+  @OneToMany(targetEntity = PoolOrderChangeLog.class, mappedBy = "poolOrder", cascade = CascadeType.REMOVE)
+  private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @Override
   public long getId() {
@@ -240,6 +238,21 @@ public class PoolOrder implements Deletable, Identifiable, Serializable, Timesta
   @Override
   public void setLastModified(Date lastUpdated) {
     this.lastUpdated = lastUpdated;
+  }
+
+  @Override
+  public Collection<ChangeLog> getChangeLog() {
+    return changeLog;
+  }
+
+  @Override
+  public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
+    PoolOrderChangeLog changeLog = new PoolOrderChangeLog();
+    changeLog.setPoolOrder(this);
+    changeLog.setSummary(summary);
+    changeLog.setColumnsChanged(columnsChanged);
+    changeLog.setUser(user);
+    return changeLog;
   }
 
   @Override
