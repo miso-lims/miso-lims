@@ -126,7 +126,7 @@ public class V2SampleAliasGeneratorTest {
     stock.setParent(lcm);
     SampleClass stockSc = new SampleClassImpl();
     stockSc.setSampleCategory(SampleStock.CATEGORY_NAME);
-    stockSc.setSuffix("SG");
+    stockSc.setV2NamingCode("SG");
     stock.setSampleClass(stockSc);
     stock.setSiblingNumber(4);
     stock.setAlias("PROJ_0001_01_SG04");
@@ -148,7 +148,7 @@ public class V2SampleAliasGeneratorTest {
     stock.setParent(parentStock);
     SampleClass sc = new SampleClassImpl();
     sc.setSampleCategory(SampleStock.CATEGORY_NAME);
-    sc.setSuffix("SG");
+    sc.setV2NamingCode("SG");
     stock.setSampleClass(sc);
     stock.setSiblingNumber(6);
     return stock;
@@ -161,7 +161,7 @@ public class V2SampleAliasGeneratorTest {
     stock.setParent(lcmTube);
     SampleClass sc = new SampleClassImpl();
     sc.setSampleCategory(SampleStock.CATEGORY_NAME);
-    sc.setSuffix("SG");
+    sc.setV2NamingCode("SG");
     stock.setSampleClass(sc);
     stock.setSiblingNumber(4);
     return stock;
@@ -174,7 +174,7 @@ public class V2SampleAliasGeneratorTest {
     stock.setParent(tissue);
     SampleClass sc = new SampleClassImpl();
     sc.setSampleCategory(SampleStock.CATEGORY_NAME);
-    sc.setSuffix("SG");
+    sc.setV2NamingCode("SG");
     stock.setSampleClass(sc);
     stock.setSiblingNumber(4);
     return stock;
@@ -202,7 +202,7 @@ public class V2SampleAliasGeneratorTest {
     sc.setSampleCategory(SampleTissueProcessing.CATEGORY_NAME);
     lcmTube.setSampleClass(sc);
     TissuePieceType pieceType = new TissuePieceType();
-    pieceType.setAbbreviation("TL");
+    pieceType.setV2NamingCode("TL");
     lcmTube.setTissuePieceType(pieceType);
     return lcmTube;
   }

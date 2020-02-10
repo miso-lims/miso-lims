@@ -42,6 +42,7 @@ public class HibernateTissuePieceTypeDaoIT extends AbstractDAOTest {
     TissuePieceType type = new TissuePieceType();
     type.setName(name);
     type.setAbbreviation("TT");
+    type.setV2NamingCode("TT");
     long savedId = sut.create(type);
 
     clearSession();

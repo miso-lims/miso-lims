@@ -353,10 +353,6 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
   public void testLoadBoxPositions() throws IOException {
     Box box = dao.get(1L);
     assertEquals(2, box.getBoxPositions().size());
-    for (BoxPosition bp : box.getBoxPositions().values()) {
-      System.out.println(String.format("Box %d pos %s: %s %s", bp.getBox().getId(), bp.getPosition(), bp.getBoxableId().getTargetType(),
-          bp.getBoxableId().getTargetId()));
-    }
   }
 
   @Test
