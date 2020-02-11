@@ -118,6 +118,7 @@ public class DefaultSampleServiceTest {
     sut.setAutoGenerateIdBarcodes(false);
     relationships = new HashSet<>();
     Mockito.when(namingSchemeHolder.getPrimary()).thenReturn(namingScheme);
+    Mockito.when(namingSchemeHolder.get(Mockito.anyBoolean())).thenReturn(namingScheme);
     Mockito.when(namingScheme.validateSampleAlias(Matchers.anyString())).thenReturn(ValidationResult.success());
     Mockito.when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
     Mockito.when(namingScheme.generateNameFor(Matchers.any(Sample.class))).thenReturn("SAM1");
@@ -579,6 +580,7 @@ public class DefaultSampleServiceTest {
     SampleTissue sample = makeUnsavedParentTissue();
     sample.setSampleType("type");
     sample.setScientificName("scientific");
+    mockShellProjectWithRealLookup(sample);
     return sample;
   }
 
