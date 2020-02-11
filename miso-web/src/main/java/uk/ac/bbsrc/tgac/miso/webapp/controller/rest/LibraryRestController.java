@@ -64,6 +64,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferItem;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibrarySpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
@@ -80,6 +81,7 @@ import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.TimeZoneCorrector;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 /**
@@ -118,6 +120,8 @@ public class LibraryRestController extends RestController {
   private SampleRestController sampleController;
   @Autowired
   private IndexChecker indexChecker;
+  @Autowired
+  private TimeZoneCorrector timeZoneCorrector;
 
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
@@ -135,7 +139,7 @@ public class LibraryRestController extends RestController {
   public LibraryDto createLibrary(@RequestBody LibraryDto libraryDto)
       throws IOException {
     return RestUtils.createObject("Library", libraryDto, WhineyFunction.rethrow(dto -> {
-      Library lib = Dtos.to(dto);
+      Library lib = to(dto);
       if (dto.getSample() != null) {
         Sample sample = sampleController.buildHierarchy(dto.getSample());
         if (LimsUtils.isDetailedSample(sample)) {
@@ -147,11 +151,19 @@ public class LibraryRestController extends RestController {
     }), libraryService, lib -> Dtos.asDto(lib, false));
   }
 
+  private Library to(LibraryDto from) {
+    Library to = Dtos.to(from);
+    to.getTransfers().stream().map(TransferItem::getTransfer).forEach(transfer -> {
+      timeZoneCorrector.toDbTime(transfer.getTransferTime(), transfer::setTransferTime);
+    });
+    return to;
+  }
+
   @PutMapping(value = "/{id}")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public LibraryDto updateLibrary(@PathVariable("id") long id, @RequestBody LibraryDto libraryDto) throws IOException {
-    return RestUtils.updateObject("Library", id, libraryDto, Dtos::to, libraryService, lib -> Dtos.asDto(lib, false));
+    return RestUtils.updateObject("Library", id, libraryDto, this::to, libraryService, lib -> Dtos.asDto(lib, false));
   }
 
   @GetMapping(value = "/dt", produces = "application/json")

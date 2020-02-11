@@ -331,7 +331,7 @@ HotTarget.library = (function() {
             validator: HotUtils.validator.optionalTextNoSpecialChars
           }),
           {
-            header: 'Date of creation',
+            header: 'Date of Creation',
             data: 'creationDate',
             type: 'date',
             dateFormat: 'YYYY-MM-DD',
@@ -355,7 +355,7 @@ HotTarget.library = (function() {
             }
           },
           {
-            header: 'Date of receipt',
+            header: 'Date of Receipt',
             data: 'receivedDate',
             type: 'date',
             dateFormat: 'YYYY-MM-DD',
@@ -368,14 +368,55 @@ HotTarget.library = (function() {
             include: config.isLibraryReceipt,
             unpack: function(lib, flat, setCellMeta) {
               // If creating, default to today's date in format YYYY-MM-DD
-              if (!lib.receivedDate && create) {
+              if (!lib.receivedTime && config.pageMode == 'create') {
                 flat.receivedDate = Utils.getCurrentDate();
+              } else if (lib.receivedTime) {
+                flat.receivedDate = lib.receivedTime.split(' ')[0];
               } else {
-                flat.receivedDate = Utils.valOrNull(lib.receivedDate);
+                flat.receivedDate = null;
               }
             },
             pack: function(lib, flat, errorHandler) {
-              lib.receivedDate = flat.receivedDate;
+              // Do nothing - handled in receivedTime
+            }
+          },
+          {
+            header: 'Time of Receipt',
+            data: 'receivedTime',
+            type: 'time',
+            timeFormat: 'h:mm a',
+            correctFormat: true,
+            allowEmpty: true,
+            description: 'The time that the library was received from an external source. Example of expected format: "2:30 pm"',
+            include: config.isLibraryReceipt,
+            depends: ['*start', 'receivedDate'],
+            update: function(lib, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+              setReadOnly(!flat.receivedDate);
+              setOptions({
+                allowEmpty: !flat.receivedDate
+              });
+              if (!flat.receivedDate) {
+                setData(null);
+              } else if (!flat.receivedTime) {
+                setData(Utils.getCurrentTime());
+              }
+            },
+            unpack: function(lib, flat, setCellMeta) {
+              // If creating, default to today's date in format YYYY-MM-DD
+              if (!lib.receivedTime && config.pageMode == 'create') {
+                flat.receivedTime = Utils.getCurrentTime();
+              } else if (lib.receivedTime) {
+                flat.receivedTime = Utils.formatTwelveHourTime(lib.receivedTime.split(' ')[1]);
+              } else {
+                flat.receivedTime = null;
+              }
+            },
+            pack: function(sam, flat, errorHandler) {
+              if (flat.receivedDate) {
+                sam.receivedTime = flat.receivedDate + ' ' + Utils.formatTwentyFourHourTime(flat.receivedTime);
+              } else {
+                sam.receivedTime = null;
+              }
             }
           },
           HotUtils.makeColumnForConstantsList('Received From', config.isLibraryReceipt, 'receivedFrom', 'senderLabId', 'id', 'label',

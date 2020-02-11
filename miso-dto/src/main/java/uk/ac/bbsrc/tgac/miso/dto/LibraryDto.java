@@ -61,7 +61,7 @@ public class LibraryDto extends AbstractBoxableDto {
   private Integer dnaSize;
   private Long kitDescriptorId;
   private SampleDto sample;
-  private String receivedDate;
+  private String receivedTime;
   private Long senderLabId;
   private Long recipientGroupId;
   private Boolean received;
@@ -364,12 +364,12 @@ public class LibraryDto extends AbstractBoxableDto {
     this.sample = sample;
   }
 
-  public String getReceivedDate() {
-    return receivedDate;
+  public String getReceivedTime() {
+    return receivedTime;
   }
 
-  public void setReceivedDate(String receivedDate) {
-    this.receivedDate = receivedDate;
+  public void setReceivedTime(String receivedDate) {
+    this.receivedTime = receivedDate;
   }
 
   public Long getSenderLabId() {
