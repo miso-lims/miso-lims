@@ -89,8 +89,7 @@
     Warning.generateHeaderWarnings('warnings', WarningTarget.library, ${libraryDto});
     
     var opts = {
-      detailedSample: Constants.isDetailedSample,
-      generateLibraryAliases: Constants.automaticLibraryAlias
+      detailedSample: Constants.isDetailedSample
     };
     var dto = ${libraryDto};
     if (Constants.isDetailedSample) {

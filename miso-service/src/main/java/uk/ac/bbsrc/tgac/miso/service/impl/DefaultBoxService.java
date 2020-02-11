@@ -41,6 +41,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.StorageLocationService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -72,7 +73,7 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
   private ChangeLogService changeLogService;
 
   @Autowired
-  private NamingScheme namingScheme;
+  private NamingSchemeHolder namingSchemeHolder;
 
   @Autowired
   private DeletionStore deletionStore;
@@ -385,6 +386,7 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
       if (autoGenerateIdBarcodes) {
         box.setIdentificationBarcode(box.getName() + "::" + box.getAlias());
       }
+      NamingScheme namingScheme = namingSchemeHolder.getPrimary();
       box.setName(namingScheme.generateNameFor(box));
       validateNameOrThrow(box, namingScheme);
 
@@ -470,8 +472,8 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
     this.changeLogService = changeLogService;
   }
 
-  public void setNamingScheme(NamingScheme namingScheme) {
-    this.namingScheme = namingScheme;
+  public void setNamingSchemeHolder(NamingSchemeHolder namingSchemeHolder) {
+    this.namingSchemeHolder = namingSchemeHolder;
   }
 
   @Override

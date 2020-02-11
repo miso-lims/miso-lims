@@ -12,6 +12,7 @@ public class ProjectDto {
   private String defaultSciName;
   private Long defaultTargetedSequencingId;
   private boolean clinical;
+  private boolean secondaryNaming;
 
   public long getId() {
     return id;
@@ -99,5 +100,13 @@ public class ProjectDto {
 
   public void setClinical(boolean clinical) {
     this.clinical = clinical;
+  }
+
+  public boolean isSecondaryNaming() {
+    return secondaryNaming;
+  }
+
+  public void setSecondaryNaming(boolean secondaryNaming) {
+    this.secondaryNaming = secondaryNaming;
   }
 }

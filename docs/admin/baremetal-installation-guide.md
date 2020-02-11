@@ -305,6 +305,16 @@ If a validator accepts custom duplication, that can be configured via
 to allow duplicate library aliases. A custom validator must be specified for this
 property to be enabled - the naming scheme’s default validator will not be altered.
 
+### Secondary Naming Scheme
+
+It is possible to configure a second naming scheme using the same properties above, except replacing `naming` with `naming2`,
+e.g. `miso.naming2.scheme=v2`. When two naming schemes are configured, an extra field called "Use Secondary Naming Scheme"
+is shown on the Edit Project page. If unselected, the primary naming scheme will be used for the project; if selected, the
+secondary scheme is used instead. The secondary scheme will only ever be used for items that are tied to a single project. This
+includes samples, libraries, and library aliquots. Other items, such as pools, boxes, and studies will always use the primary
+naming scheme. When using two naming schemes, it is ideal to use the same name generator (`nameable.name`) in both in order
+to maintain consistent names throughout MISO.
+
 # Setting Up the Run Scanner
 [Run Scanner](https://github.com/miso-lims/runscanner) is a webservice that scans the paths containing
 sequencer output. It is not required for a functioning MISO install, but

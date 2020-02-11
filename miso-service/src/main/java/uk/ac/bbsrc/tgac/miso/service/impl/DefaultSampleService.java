@@ -65,6 +65,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -129,7 +130,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   private TransferService transferService;
 
   @Autowired
-  private NamingScheme namingScheme;
+  private NamingSchemeHolder namingSchemeHolder;
 
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
@@ -199,8 +200,8 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     this.fileAttachmentService = fileAttachmentService;
   }
 
-  public void setNamingScheme(NamingScheme namingScheme) {
-    this.namingScheme = namingScheme;
+  public void setNamingSchemeHolder(NamingSchemeHolder namingSchemeHolder) {
+    this.namingSchemeHolder = namingSchemeHolder;
   }
 
   @CoverageIgnore
@@ -266,7 +267,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
 
     // pre-save field generation
     sample.setName(generateTemporaryName());
-    if (isStringEmptyOrNull(sample.getAlias()) && namingScheme.hasSampleAliasGenerator()) {
+    if (isStringEmptyOrNull(sample.getAlias()) && getNamingScheme(sample).hasSampleAliasGenerator()) {
       sample.setAlias(generateTemporaryName());
     }
     if (sample.getConcentration() == null) {
@@ -305,6 +306,10 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     return savedId;
   }
 
+  private NamingScheme getNamingScheme(Sample sample) {
+    return namingSchemeHolder.get(sample.getProject().isSecondaryNaming());
+  }
+
   private void updateParentSlides(Sample child, Sample beforeChange, User changeUser) {
     if (child.getParent() == null || !isSampleSlide(child.getParent()) || !isTissuePieceSample(child)) {
       return;
@@ -341,10 +346,11 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     if (sample instanceof DetailedSample && ((DetailedSample) sample).getDetailedQcStatus() != null) {
       ((DetailedSample) sample).setQcPassed(((DetailedSample) sample).getDetailedQcStatus().getStatus());
     }
+    NamingScheme namingScheme = getNamingScheme(sample);
     try {
       Long newId = sample.getId();
       if (!hasTemporaryAlias(sample)) {
-        validateAlias(sample);
+        validateAlias(sample, namingScheme);
       }
       if (newId == Sample.UNSAVED_ID) {
         newId = sampleStore.addSample(sample);
@@ -376,7 +382,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
           // generation of non-standard aliases is allowed
           ((DetailedSample) created).setNonStandardAlias(!namingScheme.validateSampleAlias(generatedAlias).isValid());
         } else {
-          validateAlias(created);
+          validateAlias(created, namingScheme);
         }
         needsUpdate = true;
       }
@@ -390,7 +396,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       }
 
       if (validateAliasUniqueness) {
-        validateAliasUniqueness(created);
+        validateAliasUniqueness(created, namingScheme);
       }
       return created;
     } catch (ConstraintViolationException e) {
@@ -406,7 +412,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
    * 
    * @param sample
    */
-  private void validateAlias(Sample sample) {
+  private void validateAlias(Sample sample, NamingScheme namingScheme) {
     if (!isDetailedSample(sample) || !((DetailedSample) sample).hasNonStandardAlias()) {
       uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult aliasValidation = namingScheme.validateSampleAlias(sample
           .getAlias());
@@ -426,7 +432,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
    *           <b>and</b> the alias is used by multiple Samples
    * @throws IOException
    */
-  private void validateAliasUniqueness(Sample sample) throws IOException {
+  private void validateAliasUniqueness(Sample sample, NamingScheme namingScheme) throws IOException {
     if (isDetailedSample(sample) && ((DetailedSample) sample).hasNonStandardAlias()) {
       return;
     }
@@ -631,7 +637,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
         .sampleType(sample.getSampleType()).scientificName(sample.getScientificName()).name(generateTemporaryName())
         .rootSampleClass(rootSampleClass).volume(BigDecimal.ZERO).externalName(identity.getExternalName())
         .donorSex(identity.getDonorSex()).consentLevel(identity.getConsentLevel()).build();
-    identitySample.setAlias(namingScheme.generateSampleAlias(identitySample));
+    identitySample.setAlias(getNamingScheme(sample).generateSampleAlias(identitySample));
 
     identitySample.setChangeDetails(authorizationManager.getCurrentUser());
     return (SampleIdentity) save(identitySample, true);

@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -41,7 +42,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Issue;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -52,8 +53,10 @@ import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.SubprojectService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.webapp.context.ExternalUriBuilder;
+import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
 @RequestMapping("/project")
@@ -69,7 +72,7 @@ public class EditProjectController {
   @Autowired
   private SubprojectService subprojectService;
   @Autowired
-  private NamingScheme namingScheme;
+  private NamingSchemeHolder namingSchemeHolder;
 
   public void setProjectService(ProjectService projectService) {
     this.projectService = projectService;
@@ -121,15 +124,22 @@ public class EditProjectController {
     ObjectMapper mapper = new ObjectMapper();
     model.put("projectDto", mapper.writeValueAsString(Dtos.asDto(project)));
 
-    ArrayNode statusOptions = mapper.createArrayNode();
-    for (StatusType item : StatusType.values()) {
-      statusOptions.add(item.getKey());
-    }
-    model.put("statusOptions", statusOptions);
-    model.put("shortNameRequired", !namingScheme.nullProjectShortNameAllowed());
-    model.put("shortNameModifiable", namingScheme.nullProjectShortNameAllowed() || project.getSamples().isEmpty());
+    ObjectNode formConfig = mapper.createObjectNode();
+    MisoWebUtils.addJsonArray(mapper, formConfig, "statusOptions", Arrays.asList(StatusType.values()), StatusType::getKey);
+    ObjectNode namingConfig = formConfig.putObject("naming");
+    addNamingSchemeConfig(namingConfig, "primary", namingSchemeHolder.getPrimary(), project);
+    addNamingSchemeConfig(namingConfig, "secondary", namingSchemeHolder.getSecondary(), project);
+    model.put("formConfig", mapper.writeValueAsString(formConfig));
 
     return new ModelAndView("/WEB-INF/pages/editProject.jsp", model);
+  }
+
+  private static void addNamingSchemeConfig(ObjectNode namingConfig, String property, NamingScheme scheme, Project project) {
+    if (scheme != null) {
+      ObjectNode config = namingConfig.putObject(property);
+      config.put("shortNameRequired", !scheme.nullProjectShortNameAllowed());
+      config.put("shortNameModifiable", scheme.nullProjectShortNameAllowed() || project.getSamples().isEmpty());
+    }
   }
 
 }

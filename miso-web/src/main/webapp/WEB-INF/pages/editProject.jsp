@@ -55,11 +55,7 @@
 <form:form id="projectForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
 <script type="text/javascript">
   jQuery(document).ready(function () {
-    FormUtils.createForm('projectForm', 'save', ${projectDto}, 'project', {
-      shortNameRequired: ${shortNameRequired},
-      shortNameModifiable: ${shortNameModifiable},
-      statusOptions: ${statusOptions}
-    });
+    FormUtils.createForm('projectForm', 'save', ${projectDto}, 'project', ${formConfig});
   });
 </script>
 

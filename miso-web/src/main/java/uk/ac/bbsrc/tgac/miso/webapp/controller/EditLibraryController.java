@@ -88,7 +88,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.AlphanumericComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
@@ -148,14 +148,14 @@ public class EditLibraryController {
     private static final String TEMPLATES = "templatesByProjectId";
     private static final String SORT = "sort";
     private static final String BOX = "box";
+    private static final String SAMPLE_ALIAS_MAYBE_REQUIRED = "sampleAliasMaybeRequired";
+    private static final String LIBRARY_ALIAS_MAYBE_REQUIRED = "libraryAliasMaybeRequired";
   }
 
   @Autowired
   private LibraryService libraryService;
   @Autowired
   private SampleService sampleService;
-  @Autowired
-  private NamingScheme namingScheme;
   @Autowired
   private RunService runService;
   @Autowired
@@ -176,14 +176,8 @@ public class EditLibraryController {
   private IndexChecker indexChecker;
   @Autowired
   private AuthorizationManager authorizationManager;
-
-  public NamingScheme getNamingScheme() {
-    return namingScheme;
-  }
-
-  public void setNamingScheme(NamingScheme namingScheme) {
-    this.namingScheme = namingScheme;
-  }
+  @Autowired
+  private NamingSchemeHolder namingSchemeHolder;
 
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
@@ -284,11 +278,23 @@ public class EditLibraryController {
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.put(Config.SORTABLE_LOCATION, true);
       config.put(Config.PAGE_MODE, Config.EDIT);
+      config.put(Config.SAMPLE_ALIAS_MAYBE_REQUIRED, !alwaysGenerateSampleAliases());
+      config.put(Config.LIBRARY_ALIAS_MAYBE_REQUIRED, !alwaysGenerateLibraryAliases());
       writeLibraryConfiguration(config);
     }
   };
 
-  private static class LibraryBulkPropagateBackend extends BulkPropagateTableBackend<Sample, LibraryDto> {
+  private boolean alwaysGenerateSampleAliases() {
+    return namingSchemeHolder.getPrimary().hasSampleAliasGenerator()
+        && (namingSchemeHolder.getSecondary() == null || namingSchemeHolder.getSecondary().hasSampleAliasGenerator());
+  }
+
+  private boolean alwaysGenerateLibraryAliases() {
+    return namingSchemeHolder.getPrimary().hasLibraryAliasGenerator()
+        && (namingSchemeHolder.getSecondary() == null || namingSchemeHolder.getSecondary().hasLibraryAliasGenerator());
+  }
+
+  private final class LibraryBulkPropagateBackend extends BulkPropagateTableBackend<Sample, LibraryDto> {
 
     private final SampleService sampleService;
     private final LibraryTemplateService libraryTemplateService;
@@ -382,6 +388,8 @@ public class EditLibraryController {
       }
       config.putPOJO(Config.BOX, newBox);
       config.put(Config.PAGE_MODE, Config.PROPAGATE);
+      config.put(Config.SAMPLE_ALIAS_MAYBE_REQUIRED, !alwaysGenerateSampleAliases());
+      config.put(Config.LIBRARY_ALIAS_MAYBE_REQUIRED, !alwaysGenerateLibraryAliases());
     }
 
     public ModelAndView propagate(String idString, String replicates, String sort, ModelMap model) throws IOException {
@@ -508,6 +516,8 @@ public class EditLibraryController {
       config.put(Config.IS_LIBRARY_RECEIPT, true);
       config.putPOJO(Config.BOX, newBox);
       config.putPOJO(Config.TEMPLATES, templatesByProjectId);
+      config.put(Config.SAMPLE_ALIAS_MAYBE_REQUIRED, !alwaysGenerateSampleAliases());
+      config.put(Config.LIBRARY_ALIAS_MAYBE_REQUIRED, !alwaysGenerateLibraryAliases());
       MisoWebUtils.addJsonArray(mapper, config, "recipientGroups", recipientGroups, Dtos::asDto);
     }
 

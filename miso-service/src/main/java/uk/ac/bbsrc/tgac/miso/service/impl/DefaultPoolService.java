@@ -48,6 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -73,7 +74,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   @Autowired
   private DeletionStore deletionStore;
   @Autowired
-  private NamingScheme namingScheme;
+  private NamingSchemeHolder namingSchemeHolder;
   @Autowired
   private ChangeLogService changeLogService;
   @Autowired
@@ -101,8 +102,8 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     this.poolStore = poolStore;
   }
 
-  public void setNamingScheme(NamingScheme namingScheme) {
-    this.namingScheme = namingScheme;
+  public void setNamingSchemeHolder(NamingSchemeHolder namingSchemeHolder) {
+    this.namingSchemeHolder = namingSchemeHolder;
   }
 
   public void setChangeLogService(ChangeLogService changeLogService) {
@@ -210,6 +211,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
       LimsUtils.generateAndSetIdBarcode(pool);
     }
     try {
+      NamingScheme namingScheme = namingSchemeHolder.getPrimary();
       pool.setName(namingScheme.generateNameFor(pool));
       validateNameOrThrow(pool, namingScheme);
     } catch (MisoNamingException e) {

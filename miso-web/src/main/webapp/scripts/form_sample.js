@@ -7,7 +7,6 @@ FormTarget.sample = (function($) {
    * Expected config {
    *   detailedSample: boolean,
    *   dnaseTreatable: boolean,
-   *   generateSampleAliases: boolean,
    *   projects: array
    * }
    */
@@ -65,7 +64,7 @@ FormTarget.sample = (function($) {
                   title: 'Alias',
                   data: 'alias',
                   type: 'text',
-                  required: !config.generateSampleAliases,
+                  required: true,
                   maxLength: 100,
                   note: config.detailedSample && object.nonStandardAlias
                       ? 'Double-check this alias -- it will be saved even if it is duplicated or does not follow the naming standard!'

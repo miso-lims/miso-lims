@@ -1,25 +1,31 @@
-if (typeof FormTarget === 'undefined') {
-  FormTarget = {};
-}
+FormTarget = FormTarget || {};
 FormTarget.project = (function($) {
 
   /*
    * Expected config {
-   *   shortNameRequired: boolean
-   *   shortNameMofifiable: boolean
    *   statusOptions: array
+   *   naming: {
+   *     primary: {
+   *       shortNameRequired: boolean
+   *       shortNameMofifiable: boolean
+   *     },
+   *     secondary: { // optional
+   *       shortNameRequired: boolean
+   *       shortNameMofifiable: boolean
+   *     }
+   *   }
    * }
    */
 
   return {
     getSaveUrl: function(project) {
-      return project.id ? ('/miso/rest/projects/' + project.id) : '/miso/rest/projects';
+      return project.id ? Urls.rest.projects.update(project.id) : Urls.rest.projects.create;
     },
     getSaveMethod: function(project) {
       return project.id ? 'PUT' : 'POST';
     },
     getEditUrl: function(project) {
-      return '/miso/project/' + project.id;
+      return Urls.ui.projects.edit(project.id);
     },
     getSections: function(config, object) {
       return [{
@@ -51,9 +57,10 @@ FormTarget.project = (function($) {
         }, {
           title: 'Short Name',
           data: 'shortName',
-          type: config.shortNameModifiable ? 'text' : 'read-only',
-          required: config.shortNameRequired,
-          maxLength: 255
+          type: 'text',
+          maxLength: 255,
+          required: config.naming.primary.shortNameRequired,
+          disabled: !config.naming.primary.shortNameModifiable
         }, {
           title: 'Description',
           data: 'description',
@@ -94,6 +101,18 @@ FormTarget.project = (function($) {
           title: 'Clinical',
           data: 'clinical',
           type: 'checkbox'
+        }, {
+          title: 'Use Secondary Naming Scheme',
+          data: 'secondaryNaming',
+          type: 'checkbox',
+          include: !!config.naming.secondary,
+          onChange: function(newValue, form) {
+            var scheme = config.naming[newValue ? 'secondary' : 'primary'];
+            form.updateField('shortName', {
+              required: scheme.shortNameRequired,
+              disabled: !scheme.shortNameModifiable
+            });
+          }
         }]
       }];
     }

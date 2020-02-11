@@ -50,6 +50,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.DetailedQcStatusDao;
@@ -71,52 +72,38 @@ public class DefaultSampleServiceTest {
 
   @Mock
   private SampleStore sampleStore;
-
   @Mock
   private AuthorizationManager authorizationManager;
-
   @Mock
   private HibernateProjectDao projectDAO;
-
   @Mock
   private SampleClassService sampleClassService;
-
   @Mock
   private SampleValidRelationshipService sampleValidRelationshipService;
-
   @Mock
   private SampleNumberPerProjectService sampleNumberPerProjectService;
-
   @Mock
   private ProjectStore projectStore;
-
   @Mock
   private TissueOriginDao tissueOriginDao;
-
   @Mock
   private TissueTypeDao tissueTypeDao;
-
   @Mock
   private DetailedQcStatusDao detailedQcStatusDao;
-
   @Mock
   private SubprojectDao subProjectDao;
-
   @Mock
   private SecurityStore securityStore;
-
   @Mock
   private SamplePurposeDao samplePurposeDao;
-
   @Mock
   private SampleGroupDao sampleGroupDao;
-
   @Mock
   private TissueMaterialDao tissueMaterialDao;
-
+  @Mock
+  private NamingSchemeHolder namingSchemeHolder;
   @Mock
   private NamingScheme namingScheme;
-
   @Mock
   private BoxService boxService;
 
@@ -130,6 +117,7 @@ public class DefaultSampleServiceTest {
     MockitoAnnotations.initMocks(this);
     sut.setAutoGenerateIdBarcodes(false);
     relationships = new HashSet<>();
+    Mockito.when(namingSchemeHolder.getPrimary()).thenReturn(namingScheme);
     Mockito.when(namingScheme.validateSampleAlias(Matchers.anyString())).thenReturn(ValidationResult.success());
     Mockito.when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
     Mockito.when(namingScheme.generateNameFor(Matchers.any(Sample.class))).thenReturn("SAM1");

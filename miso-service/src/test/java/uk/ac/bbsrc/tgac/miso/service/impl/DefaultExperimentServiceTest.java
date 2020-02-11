@@ -25,6 +25,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.KitDescriptorService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.persistence.ExperimentStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SecurityStore;
@@ -51,6 +52,8 @@ public class DefaultExperimentServiceTest {
   @Mock
   private AuthorizationManager authorizationManager;
   @Mock
+  private NamingSchemeHolder namingSchemeHolder;
+  @Mock
   private NamingScheme namingScheme;
   @InjectMocks
   private DefaultExperimentService sut;
@@ -58,6 +61,7 @@ public class DefaultExperimentServiceTest {
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
+    Mockito.when(namingSchemeHolder.getPrimary()).thenReturn(namingScheme);
     Mockito.when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
     experiment.setInstrumentModel(new InstrumentModel());
     experiment.getInstrumentModel().setId(2L);

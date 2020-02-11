@@ -139,4 +139,8 @@ public interface Project extends Comparable<Project>, Deletable, Nameable, Seria
 
   public void setClinical(boolean clinical);
 
+  public boolean isSecondaryNaming();
+
+  public void setSecondaryNaming(boolean secondaryNaming);
+
 }

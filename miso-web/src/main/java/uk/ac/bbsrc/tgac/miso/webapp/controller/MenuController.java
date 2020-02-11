@@ -128,7 +128,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.TissueMaterialService;
 import uk.ac.bbsrc.tgac.miso.core.service.TissueOriginService;
 import uk.ac.bbsrc.tgac.miso.core.service.TissuePieceTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.TissueTypeService;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Layout;
@@ -226,8 +225,6 @@ public class MenuController implements ServletContextAware {
   private RunPurposeService runPurposeService;
   @Autowired
   private IndexChecker indexChecker;
-  @Autowired
-  private NamingScheme namingScheme;
 
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
@@ -327,8 +324,6 @@ public class MenuController implements ServletContextAware {
       ObjectNode node = mapper.createObjectNode();
       node.put("isDetailedSample", detailedSample);
       node.put("automaticBarcodes", autoGenerateIdentificationBarcodes());
-      node.put("automaticSampleAlias", namingScheme.hasSampleAliasGenerator());
-      node.put("automaticLibraryAlias", namingScheme.hasLibraryAliasGenerator());
       node.put("boxScannerEnabled", boxScannerEnabled);
 
       final Collection<SampleValidRelationship> relationships = sampleValidRelationshipService.getAll();

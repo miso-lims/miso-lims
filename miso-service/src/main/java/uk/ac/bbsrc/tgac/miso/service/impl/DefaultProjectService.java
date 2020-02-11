@@ -48,6 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -67,7 +68,7 @@ public class DefaultProjectService implements ProjectService {
   @Autowired
   private TargetedSequencingStore targetedSequencingStore;
   @Autowired
-  private NamingScheme namingScheme;
+  private NamingSchemeHolder namingSchemeHolder;
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -128,6 +129,7 @@ public class DefaultProjectService implements ProjectService {
     project.setChangeDetails(authorizationManager.getCurrentUser());
     project.setName(generateTemporaryName());
     projectStore.save(project);
+    NamingScheme namingScheme = namingSchemeHolder.get(project.isSecondaryNaming());
     try {
       project.setName(namingScheme.generateNameFor(project));
     } catch (MisoNamingException e) {
@@ -151,6 +153,7 @@ public class DefaultProjectService implements ProjectService {
   private void validateChange(Project project, Project beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
 
+    NamingScheme namingScheme = namingSchemeHolder.get(project.isSecondaryNaming());
     if (ValidationUtils.isSetAndChanged(Project::getShortName, project, beforeChange)) {
       // assume that if project shortname is required, it is used for generating sample aliases
       if (beforeChange != null && !namingScheme.nullProjectShortNameAllowed() && !beforeChange.getSamples().isEmpty()) {
@@ -184,8 +187,8 @@ public class DefaultProjectService implements ProjectService {
     original.setClinical(project.isClinical());
   }
 
-  public void setNamingScheme(NamingScheme namingScheme) {
-    this.namingScheme = namingScheme;
+  public void setNamingSchemeHolder(NamingSchemeHolder namingSchemeHolder) {
+    this.namingSchemeHolder = namingSchemeHolder;
   }
 
   public void setProjectStore(ProjectStore projectStore) {

@@ -89,16 +89,7 @@
 <script type="text/javascript">
   jQuery(document).ready(function () {
     Warning.generateHeaderWarnings('warnings', WarningTarget.sample, ${sampleDto});
-    
-    var opts = {
-      detailedSample: Constants.isDetailedSample,
-      generateSampleAliases: Constants.automaticSampleAlias,
-      projects: ${projects}
-    };
-    <c:if test="${detailedSample}">
-    opts.dnaseTreatable = ${sample.sampleClass.DNAseTreatable};
-    </c:if>
-    FormUtils.createForm('sampleForm', 'save', ${sampleDto}, 'sample', opts);
+    FormUtils.createForm('sampleForm', 'save', ${sampleDto}, 'sample', ${formConfig});
   });
 </script>
 

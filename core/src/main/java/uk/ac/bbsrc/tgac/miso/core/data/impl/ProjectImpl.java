@@ -134,6 +134,7 @@ public class ProjectImpl implements Project {
   private TargetedSequencing defaultTargetedSequencing;
 
   private boolean clinical;
+  private boolean secondaryNaming;
 
   @Override
   public String getDescription() {
@@ -412,6 +413,16 @@ public class ProjectImpl implements Project {
   @Override
   public void setClinical(boolean clinical) {
     this.clinical = clinical;
+  }
+
+  @Override
+  public boolean isSecondaryNaming() {
+    return secondaryNaming;
+  }
+
+  @Override
+  public void setSecondaryNaming(boolean secondaryNaming) {
+    this.secondaryNaming = secondaryNaming;
   }
 
 }

@@ -253,7 +253,7 @@ HotTarget.library = (function() {
       }
     },
     getFixedColumns: function(config) {
-      return config.pageMode === 'edit' || !Constants.automaticLibraryAlias ? 2 : 0;
+      return config.pageMode === 'edit' || config.libraryAliasMaybeRequired ? 2 : 0;
     },
     createColumns: function(config, create, data) {
       var columns = [
@@ -289,12 +289,12 @@ HotTarget.library = (function() {
             header: 'Sample Alias',
             data: 'parentSampleAlias',
             readOnly: !config.isLibraryReceipt,
-            include: !config.isLibraryReceipt || !Constants.automaticSampleAlias,
+            include: !config.isLibraryReceipt || config.sampleAliasMaybeRequired,
             unpack: function(lib, flat, setCellMeta) {
               flat.parentSampleAlias = lib.parentSampleAlias;
             },
             pack: function(lib, flat, errorHandler) {
-              if (config.isLibraryReceipt && !Constants.automaticSampleAlias) {
+              if (config.isLibraryReceipt && config.sampleAliasMaybeRequired) {
                 if (!lib.sample) {
                   lib.sample = {};
                 }

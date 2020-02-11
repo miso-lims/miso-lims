@@ -49,9 +49,7 @@
   <!-- issueTrackerManager is reconfigured in MisoAppListener if applicable -->
   <bean name="issueTrackerManager" class="uk.ac.bbsrc.tgac.miso.core.manager.DummyIssueTrackerManager" />
 
-  <bean id="namingSchemeResolverService" name="namingSchemeResolverService" class="uk.ac.bbsrc.tgac.miso.core.service.naming.resolvers.StaticMappedNamingSchemeResolverService" />
-
   <!-- further naming scheme config happens in MisoAppListener -->
-  <bean id="namingScheme" name="namingScheme" class="uk.ac.bbsrc.tgac.miso.core.service.naming.DelegatingNamingScheme"/>
+  <bean id="namingSchemeResolverService" name="namingSchemeResolverService" class="uk.ac.bbsrc.tgac.miso.core.service.naming.resolvers.StaticMappedNamingSchemeResolverService" />
 
 </beans>
