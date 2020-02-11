@@ -46,6 +46,8 @@ public class TissuePieceType implements Deletable, Identifiable, Serializable {
   @Column(nullable = false)
   private String abbreviation;
 
+  private String v2NamingCode;
+
   @Column(nullable = false)
   private boolean archived = false;
 
@@ -65,6 +67,9 @@ public class TissuePieceType implements Deletable, Identifiable, Serializable {
     if (abbreviation == null) {
       if (other.abbreviation != null) return false;
     } else if (!abbreviation.equals(other.abbreviation)) return false;
+    if (v2NamingCode == null) {
+      if (other.v2NamingCode != null) return false;
+    } else if (!v2NamingCode.equals(other.v2NamingCode)) return false;
     if (archived != other.archived) return false;
     if (name == null) {
       if (other.name != null) return false;
@@ -105,6 +110,7 @@ public class TissuePieceType implements Deletable, Identifiable, Serializable {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((abbreviation == null) ? 0 : abbreviation.hashCode());
+    result = prime * result + ((v2NamingCode == null) ? 0 : v2NamingCode.hashCode());
     result = prime * result + (archived ? 1231 : 1237);
     result = prime * result + ((name == null) ? 0 : name.hashCode());
     result = prime * result + (int) (tissuePieceTypeId ^ (tissuePieceTypeId >>> 32));
@@ -133,10 +139,18 @@ public class TissuePieceType implements Deletable, Identifiable, Serializable {
     this.name = name;
   }
 
+  public String getV2NamingCode() {
+    return v2NamingCode;
+  }
+
+  public void setV2NamingCode(String v2NamingCode) {
+    this.v2NamingCode = v2NamingCode;
+  }
+
   @Override
   public String toString() {
-    return "TissuePieceType [abbreviation=" + abbreviation + ", archived=" + archived + ", tissuePieceTypeId=" + tissuePieceTypeId
-        + ", name=" + name + "]";
+    return "TissuePieceType [abbreviation=" + abbreviation + ", archived=" + archived + ", v2NamingCode=" + v2NamingCode
+        + ", tissuePieceTypeId=" + tissuePieceTypeId + ", name=" + name + "]";
   }
 
 }

@@ -204,21 +204,22 @@ used for all `name` fields, and some `alias` fields. You may configure a base na
 scheme, and customize it by switching validators and generators in `miso.properties` in
 `$CATALINA_HOME/conf/Catalina/localhost/`.
 
-The options for `miso.naming.scheme` are `default` and `oicr`, which have these
-default configurations:
+The options for `miso.naming.scheme` are `default`, `oicr`, and `v2`, which have the
+default configurations shown below. Only `default` supports plain sample mode. For detailed
+sample mode, `v2` is recommended.
 
-|                             | default                      | oicr                          |
-|-----------------------------|------------------------------|-------------------------------|
-| Name generator              | DefaultNameGenerator         | DefaultNameGenerator          |
-| Name Validator              | DefaultNameValidator         | DefaultNameValidator          |
-| Sample Alias Generator      | none                         | OicrSampleAliasGenerator      |
-| Sample Alias Validator      | DefaultSampleAliasValidator  | OicrSampleAliasValidator      |
-| Library Alias Generator     | DefaultLibraryAliasGenerator | OicrLibraryAliasGenerator     |
-| Library Alias Validator     | DefaultLibraryAliasValidator | OicrLibraryAliasValidator     |
-| Library Aliquot Alias Generator | DefaultLibraryAliquotAliasGenerator | OicrLibraryAliquotAliasGenerator |
-| Library Aliquot Alias Validator | DefaultLibraryAliquotAliasValidator | OicrLibraryAliasValidator |
-| Project ShortName Validator | AllowAnythingValidator       | OicrProjectShortNameValidator |
-| Configurable components     | all                          | none                          |
+|                             | default                      | oicr                          | v2                   |
+|-----------------------------|------------------------------|-------------------------------|----------------------|
+| Name generator              | DefaultNameGenerator         | DefaultNameGenerator          | DefaultNameGenerator |
+| Name Validator              | DefaultNameValidator         | DefaultNameValidator          | DefaultNameValidator |
+| Sample Alias Generator      | none                         | OicrSampleAliasGenerator      | V2SampleAliasGenerator |
+| Sample Alias Validator      | DefaultSampleAliasValidator  | OicrSampleAliasValidator      | V2SampleAliasValidator |
+| Library Alias Generator     | DefaultLibraryAliasGenerator | OicrLibraryAliasGenerator     | V2LibraryAliasGenerator |
+| Library Alias Validator     | DefaultLibraryAliasValidator | OicrLibraryAliasValidator     | V2LibraryAliasValidator |
+| Library Aliquot Alias Generator | DefaultLibraryAliquotAliasGenerator | OicrLibraryAliquotAliasGenerator | V2LibraryAliquotAliasGenerator |
+| Library Aliquot Alias Validator | DefaultLibraryAliquotAliasValidator | OicrLibraryAliasValidator | V2LibraryAliquotAliasValidator |
+| Project ShortName Validator | AllowAnythingValidator       | OicrProjectShortNameValidator | OicrProjectShortNameValidator |
+| Configurable components     | all                          | none                          | none |
 
 If the naming scheme you’ve selected has configurable components, you may configure them
 as follows.
@@ -235,6 +236,7 @@ as follows.
 | Option  | Example               | Note                             |
 |---------|-----------------------|----------------------------------|
 | oicr    | PROJ_0001_Ad_P_nn_1-1 | for use with DetailedSample only |
+| v2      | PROJ_0001_02_SG03_04  | for use with DetailedSample only |
 
 ### `miso.naming.generator.library.alias`
 
@@ -242,6 +244,7 @@ as follows.
 |---------|--------------------------|----------------------------------------------------------------------------------------------------------|
 | default | XX_LYY-1                 | XX and YY taken from sample alias - depends on sample alias passing default validator with default regex |
 | oicr    | PROJ_0001_Ad_P_PE_300_WG | For use with DetailedSample only. Depends on sample alias passing oicr validator                         |
+| v2      | PROJ_0001_02_LB05        | For use with DetailedSample only. Depends on tissue alias passing v2 validator                           |
 
 ### `miso.naming.generator.libraryaliquot.alias`
 
@@ -249,6 +252,7 @@ as follows.
 |---------|--------------------------|----------------------------------------------------------------------------------|
 | default | XX_LYY-1                 | This generator just copies the library's alias                                   |
 | oicr    | PROJ_0001_Ad_P_PE_300_WG | For use with DetailedSample only. Depends on sample alias passing oicr validator |
+| v2      | PROJ_0001_02_LB05-06     | For use with DetailedSample only. Depends on library alias passing v2 validator  |
 
 ### `miso.naming.validator.nameable.name`
 
@@ -264,6 +268,7 @@ as follows.
 | default  | Default regex: `([A-z0-9]+)_S([A-z0-9]+)_(.*)` | no         | no               | yes          | no                 |
 | allowany | Only checks that the alias is not null         | no         | yes              | no           | no                 |
 | oicr     | Matches 'oicr' generator                       | no         | no               | no           | no                 |
+| v2       | Matches 'v2' generator                         | no         | no               | no           | no                 |
 
 ### `miso.naming.validator.library.alias`
 
@@ -272,6 +277,7 @@ as follows.
 | default  | Matches 'default' generator            | no         | no               | yes          | no                 |
 | allowany | Only checks that the alias is not null | no         | yes              | no           | no                 |
 | oicr     | Matches 'oicr' generator               | no         | no               | no           | no                 |
+| v2       | Matches 'v2' generator                 | no         | no               | no           | no                 |
 
 ### `miso.naming.validator.libraryaliquot.alias`
 
@@ -280,6 +286,7 @@ as follows.
 | default  | Matches 'default' generator            | no         | yes              | yes          | yes                |
 | allowany | Only checks that the alias is not null | no         | yes              | no           | no                 |
 | oicr     | Matches 'oicr' generator               | no         | no               | no           | no                 |
+| v2       | Matches 'v2' generator                 | no         | no               | no           | no                 |
 
 ### `miso.naming.validator.project.shortName`
 

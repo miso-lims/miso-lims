@@ -121,6 +121,14 @@ public class LimsUtils {
     return nice;
   }
 
+  public static String zeroPad(int number, int minLength) {
+    String string = Integer.toString(number);
+    while (string.length() < minLength) {
+      string = "0" + string;
+    }
+    return string;
+  }
+
   public static List<Long> parseIds(String idString) {
     String[] split = idString.split(",");
     List<Long> ids = new ArrayList<>();

@@ -225,7 +225,8 @@ VALUES (1,NULL,'SAM1','Inherited from TEST_0001','SAM1::TEST_0001_Bn_P_nn_1-1_D_
 (17,NULL,'SAM17','tissue2','SAM17::TEST_0001_TISSUE_2','Freezer1_1','GENOMIC',TRUE,'TEST_0001_TISSUE_2',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:17',1,'2016-07-07 13:31:17'),
 (18,NULL,'SAM18','stock1','SAM18::TEST_0001_STOCK_1','Freezer1_1','GENOMIC',TRUE,'TEST_0001_STOCK_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:19',1,'2016-07-07 13:31:19'),
 (19,NULL,'SAM19','aliquot1','SAM19::TEST_0001_ALIQUOT_1','Freezer1_1','GENOMIC',TRUE,'TEST_0001_ALIQUOT_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:21',1,'2016-07-07 13:31:21'),
-(20,NULL,'SAM20','identity2','SAM20::TEST_0002_IDENTITY_2','Freezer1_1','GENOMIC',TRUE,'TEST_0002_IDENTITY_2',1,'Homo sapiens',NULL,1,'2018-02-22 14:34:00',1,'2018-02-22 14:34:00');
+(20,NULL,'SAM20','identity2','SAM20::TEST_0002_IDENTITY_2','Freezer1_1','GENOMIC',TRUE,'TEST_0002_IDENTITY_2',1,'Homo sapiens',NULL,1,'2018-02-22 14:34:00',1,'2018-02-22 14:34:00'),
+(21,NULL,'SAM21','tissue4','SAM21::TEST_0001_TISSUE_4','Freezer1_1','GENOMIC',TRUE,'TEST_0001_TISSUE_4',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:17',1,'2016-07-07 13:31:17');
 
 INSERT INTO `DetailedSample`(`sampleId`, `sampleClassId`, `archived`, `parentId`, `siblingNumber`, `preMigrationId`, isSynthetic) VALUES
 (15,1,0,NULL,NULL,NULL,0),
@@ -233,7 +234,8 @@ INSERT INTO `DetailedSample`(`sampleId`, `sampleClassId`, `archived`, `parentId`
 (17,2,0,15,2,1,0),
 (18,3,0,17,1,NULL,0),
 (19,4,0,18,1,NULL,0),
-(20,1,0,NULL,NULL,NULL,0);
+(20,1,0,NULL,NULL,NULL,0),
+(21,2,0,15,4,NULL,0);
 
 INSERT INTO Identity (sampleId, externalName, donorSex, consentLevel) VALUES
 (15, '15_EXT15,EXT15','UNKNOWN', 'THIS_PROJECT'),
@@ -241,7 +243,8 @@ INSERT INTO Identity (sampleId, externalName, donorSex, consentLevel) VALUES
 
 INSERT INTO SampleTissue(sampleId, tissueOriginId, tissueTypeId, timesReceived, tubeNumber, labId)
 VALUES (16, 1, 1, 1, 1, 2),
-(17, 1, 1, 1, 2, NULL);
+(17, 1, 1, 1, 2, NULL),
+(21, 1, 1, 1, 3, NULL);
 
 INSERT INTO SampleStock (sampleId) VALUES
 (18);

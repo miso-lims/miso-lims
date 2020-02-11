@@ -13,6 +13,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.OicrNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.V2NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.ClassnameNameGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.DefaultLibraryAliasGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.DefaultLibraryAliquotAliasGenerator;
@@ -21,6 +22,9 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.NameGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.OicrLibraryAliasGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.OicrLibraryAliquotAliasGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.OicrSampleAliasGenerator;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.V2LibraryAliasGenerator;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.V2LibraryAliquotAliasGenerator;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.V2SampleAliasGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.AllowAnythingValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.DefaultLibraryAliasValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.DefaultLibraryAliquotAliasValidator;
@@ -30,6 +34,9 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.NameValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrLibraryAliasValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrProjectShortNameValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrSampleAliasValidator;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.V2LibraryAliasValidator;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.V2LibraryAliquotAliasValidator;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.V2SampleAliasValidator;
 
 /**
  * Resolves NamingSchemes, NameGenerators, and NameValidators using statically-defined mappings
@@ -53,17 +60,21 @@ public class StaticMappedNamingSchemeResolverService implements NamingSchemeReso
 
     namingSchemes.put("default", DefaultNamingScheme.class);
     namingSchemes.put("oicr", OicrNamingScheme.class);
+    namingSchemes.put("v2", V2NamingScheme.class);
     
     nameGenerators.put("default", DefaultNameGenerator.class);
     nameGenerators.put("classname", ClassnameNameGenerator.class);
     
     sampleAliasGenerators.put("oicr", OicrSampleAliasGenerator.class);
+    sampleAliasGenerators.put("v2", V2SampleAliasGenerator.class);
 
     libraryAliasGenerators.put("default", DefaultLibraryAliasGenerator.class);
     libraryAliasGenerators.put("oicr", OicrLibraryAliasGenerator.class);
+    libraryAliasGenerators.put("v2", V2LibraryAliasGenerator.class);
 
     libraryAliquotAliasGenerators.put("default", DefaultLibraryAliquotAliasGenerator.class);
     libraryAliquotAliasGenerators.put("oicr", OicrLibraryAliquotAliasGenerator.class);
+    libraryAliquotAliasGenerators.put("v2", V2LibraryAliquotAliasGenerator.class);
 
     nameValidators.put("default", DefaultNameValidator.class);
     nameValidators.put("allowany", AllowAnythingValidator.class);
@@ -71,14 +82,17 @@ public class StaticMappedNamingSchemeResolverService implements NamingSchemeReso
     sampleAliasValidators.put("default", DefaultSampleAliasValidator.class);
     sampleAliasValidators.put("allowany", AllowAnythingValidator.class);
     sampleAliasValidators.put("oicr", OicrSampleAliasValidator.class);
+    sampleAliasValidators.put("v2", V2SampleAliasValidator.class);
 
     libraryAliasValidators.put("default", DefaultLibraryAliasValidator.class);
     libraryAliasValidators.put("allowany", AllowAnythingValidator.class);
     libraryAliasValidators.put("oicr", OicrLibraryAliasValidator.class);
+    libraryAliasValidators.put("v2", V2LibraryAliasValidator.class);
 
     libraryAliquotAliasValidators.put("default", DefaultLibraryAliquotAliasValidator.class);
     libraryAliquotAliasValidators.put("allowAny", AllowAnythingValidator.class);
     libraryAliquotAliasValidators.put("oicr", OicrLibraryAliasValidator.class);
+    libraryAliquotAliasValidators.put("v2", V2LibraryAliquotAliasValidator.class);
 
     projectShortNameValidators.put("allowany", AllowAnythingValidator.class);
     projectShortNameValidators.put("oicr", OicrProjectShortNameValidator.class);

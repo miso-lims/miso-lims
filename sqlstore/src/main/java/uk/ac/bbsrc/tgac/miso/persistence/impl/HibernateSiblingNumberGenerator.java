@@ -2,13 +2,16 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -34,26 +37,40 @@ public class HibernateSiblingNumberGenerator implements SiblingNumberGenerator {
 
   @Override
   public <T extends Aliasable> int getNextSiblingNumber(Class<T> clazz, String partialAlias) throws IOException {
-    // Find highest existing siblingNumber matching this partialAlias
-    Criteria criteria = currentSession().createCriteria(clazz);
-    criteria.add(Restrictions.like("alias", partialAlias, MatchMode.START));
+    Set<Integer> siblingNumbers = getExistingSiblingNumbers(clazz, partialAlias);
+    Integer max = siblingNumbers.stream().max(Integer::compare).orElse(0);
+    return max + 1;
+  }
+
+  @Override
+  public <T extends Aliasable> int getFirstAvailableSiblingNumber(Class<T> clazz, String partialAlias) throws IOException {
+    Set<Integer> siblingNumbers = getExistingSiblingNumbers(clazz, partialAlias);
+    int next = 1;
+    while (siblingNumbers.contains(next)) {
+      next++;
+    }
+    return next;
+  }
+
+  public <T extends Aliasable> Set<Integer> getExistingSiblingNumbers(Class<T> clazz, String partialAlias) throws IOException {
     @SuppressWarnings("unchecked")
-    List<Aliasable> aliasables = criteria.list();
+    List<String> results = currentSession().createCriteria(clazz)
+        .add(Restrictions.like("alias", partialAlias, MatchMode.START))
+        .setProjection(Projections.property("alias"))
+        .list();
+
     String regex = "^.{" + partialAlias.length() + "}(\\d+)$";
     Pattern pattern = Pattern.compile(regex);
-    int next = 0;
-    for (Aliasable aliasable : aliasables) {
-      Matcher m = pattern.matcher(aliasable.getAlias());
-      if (!m.matches()) {
-        continue;
-      }
-      int siblingNumber = Integer.parseInt(m.group(1));
-      if (siblingNumber > next) {
-        next = siblingNumber;
-      }
-    }
-    next++;
-    return next;
+    return results.stream()
+        .map(alias -> {
+          Matcher m = pattern.matcher(alias);
+          if (!m.matches()) {
+            return null;
+          }
+          return Integer.parseInt(m.group(1));
+        })
+        .filter(Objects::nonNull)
+        .collect(Collectors.toSet());
   }
 
 }

@@ -63,6 +63,13 @@ FormTarget.sampleclass = (function($) {
       },
       type: 'read-only'
     }, {
+      title: 'V2 Naming Code',
+      data: 'v2NamingCode',
+      getDisplayValue: function(sampleClass) {
+        return sampleClass.v2NamingCode || 'n/a';
+      },
+      type: 'read-only'
+    }, {
       title: 'Receipt Allowed?',
       data: 'directCreationAllowed',
       type: 'checkbox',
@@ -123,6 +130,11 @@ FormTarget.sampleclass = (function($) {
           data: 'suffix',
           type: 'text',
           maxLength: 5
+        }, {
+          title: 'V2 Naming Code',
+          data: 'v2NamingCode',
+          type: 'text',
+          maxLength: 2
         }, {
           title: 'Direct Creation Allowed?',
           data: 'directCreationAllowed',

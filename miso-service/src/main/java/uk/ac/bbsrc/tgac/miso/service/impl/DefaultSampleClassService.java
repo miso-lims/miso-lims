@@ -294,6 +294,8 @@ public class DefaultSampleClassService extends AbstractSaveService<SampleClass> 
     to.setArchived(from.isArchived());
     to.setSampleCategory(from.getSampleCategory());
     to.setSampleSubcategory(from.getSampleSubcategory());
+    to.setSuffix(from.getSuffix());
+    to.setV2NamingCode(from.getV2NamingCode());
 
     User currentUser = authorizationManager.getCurrentUser();
     for (Iterator<SampleValidRelationship> iterator = to.getParentRelationships().iterator(); iterator.hasNext();) {

@@ -12,6 +12,7 @@ public class SampleClassDto {
   private String sampleCategory;
   private String sampleSubcategory;
   private String suffix;
+  private String v2NamingCode;
   private boolean archived;
   private boolean directCreationAllowed;
   private Long createdById;
@@ -84,6 +85,14 @@ public class SampleClassDto {
 
   public void setSuffix(String suffix) {
     this.suffix = suffix;
+  }
+
+  public String getV2NamingCode() {
+    return v2NamingCode;
+  }
+
+  public void setV2NamingCode(String v2NamingCode) {
+    this.v2NamingCode = v2NamingCode;
   }
 
   public boolean isArchived() {
