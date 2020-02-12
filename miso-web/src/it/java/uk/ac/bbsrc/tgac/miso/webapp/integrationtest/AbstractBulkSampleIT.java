@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtils.*;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
@@ -90,6 +92,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
     assertEntityAttribute(SamColumns.BOX_POSITION, attributes, sample, s -> s.getBoxPosition() == null ? "" : s.getBoxPosition());
     assertEntityAttribute(SamColumns.RECEIVE_DATE, attributes, sample,
         s -> s.getReceiptTransfer() == null ? "" : LimsUtils.formatDate(s.getReceiptTransfer().getTransfer().getTransferTime()));
+    assertEntityAttribute(SamColumns.RECEIVE_TIME, attributes, sample, AbstractBulkSampleIT::getReceiptTime);
     assertEntityAttribute(SamColumns.RECEIVED_FROM, attributes, sample,
         s -> s.getReceiptTransfer() == null ? "" : s.getReceiptTransfer().getTransfer().getSenderLab().getItemLabel());
     assertEntityAttribute(SamColumns.RECEIVED_BY, attributes, sample,
@@ -100,6 +103,14 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
         s -> s.getReceiptTransfer() == null ? "" : booleanString(s.getReceiptTransfer().isQcPassed()));
     assertEntityAttribute(SamColumns.RECEIPT_QC_NOTE, attributes, sample,
         s -> s.getReceiptTransfer() == null ? "" : emptyIfNull(s.getReceiptTransfer().getQcNote()));
+  }
+
+  private static String getReceiptTime(Sample sam) {
+    if (sam.getReceiptTransfer() == null) {
+      return "";
+    }
+    DateFormat formatter = new SimpleDateFormat("h:mm a");
+    return formatter.format(sam.getReceiptTransfer().getTransfer().getTransferTime()).toLowerCase();
   }
 
   protected void assertDetailedSampleAttributes(Map<String, String> attributes, DetailedSample sample) {

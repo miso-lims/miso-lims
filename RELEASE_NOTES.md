@@ -2,6 +2,7 @@
 
 Changes:
 
+  * Added "Time of Receipt" column to library receipt page
   * Added configuration for library aliquot alias generator and validator
   * Added V2 naming scheme
   * Fixed error deleting tissues and identities (detailed sample)

@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtils.*;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -53,8 +55,9 @@ public class BulkLibraryIT extends AbstractIT {
   private static final Set<String> receiptColumns = Sets.newHashSet(SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT,
       SamColumns.SUBPROJECT, SamColumns.EXTERNAL_NAME, SamColumns.IDENTITY_ALIAS, SamColumns.DONOR_SEX, SamColumns.CONSENT,
       SamColumns.SAMPLE_CLASS, SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER, SamColumns.TIMES_RECEIVED,
-      SamColumns.TUBE_NUMBER, SamColumns.TISSUE_MATERIAL, SamColumns.REGION, LibColumns.RECEIVE_DATE, LibColumns.RECEIVED_FROM,
-      LibColumns.RECEIVED_BY, LibColumns.RECEIPT_CONFIRMED, LibColumns.RECEIPT_QC_PASSED, LibColumns.RECEIPT_QC_NOTE, LibColumns.TEMPLATE);
+      SamColumns.TUBE_NUMBER, SamColumns.TISSUE_MATERIAL, SamColumns.REGION, LibColumns.RECEIVE_DATE, LibColumns.RECEIVE_TIME,
+      LibColumns.RECEIVED_FROM, LibColumns.RECEIVED_BY, LibColumns.RECEIPT_CONFIRMED, LibColumns.RECEIPT_QC_PASSED,
+      LibColumns.RECEIPT_QC_NOTE, LibColumns.TEMPLATE);
 
   private static final String NO_INDEX_FAMILY = "No indices";
   private static final String NO_INDEX = "No index";
@@ -533,6 +536,7 @@ public class BulkLibraryIT extends AbstractIT {
     attrs.put(LibColumns.ID_BARCODE, "LIBT_RCV1");
     attrs.put(LibColumns.DESCRIPTION, "LIBT receive test");
     attrs.put(LibColumns.RECEIVE_DATE, "2017-10-12");
+    attrs.put(LibColumns.RECEIVE_TIME, "3:00 pm");
     attrs.put(LibColumns.RECEIVED_FROM, "BioBank (University Health Network)");
     attrs.put(LibColumns.RECEIVED_BY, "TestGroup1");
     attrs.put(LibColumns.RECEIPT_CONFIRMED, "True");
@@ -805,6 +809,7 @@ public class BulkLibraryIT extends AbstractIT {
     testLibraryAttribute(LibColumns.CONCENTRATION, attributes, library, lib -> LimsUtils.toNiceString(lib.getConcentration()));
     testLibraryAttribute(LibColumns.RECEIVE_DATE, attributes, library,
         lib -> lib.getReceiptTransfer() == null ? "" : LimsUtils.formatDate(lib.getReceiptTransfer().getTransfer().getTransferTime()));
+    testLibraryAttribute(LibColumns.RECEIVE_TIME, attributes, library, BulkLibraryIT::getReceiptTime);
     testLibraryAttribute(LibColumns.RECEIVED_FROM, attributes, library,
         lib -> lib.getReceiptTransfer() == null ? "" : lib.getReceiptTransfer().getTransfer().getSenderLab().getItemLabel());
     testLibraryAttribute(LibColumns.RECEIVED_BY, attributes, library,
@@ -815,6 +820,14 @@ public class BulkLibraryIT extends AbstractIT {
         lib -> lib.getReceiptTransfer() == null ? "" : booleanString(lib.getReceiptTransfer().isQcPassed()));
     testLibraryAttribute(LibColumns.RECEIPT_QC_NOTE, attributes, library,
         lib -> lib.getReceiptTransfer() == null ? "" : emptyIfNull(lib.getReceiptTransfer().getQcNote()));
+  }
+
+  private static String getReceiptTime(Library lib) {
+    if (lib.getReceiptTransfer() == null) {
+      return "";
+    }
+    DateFormat formatter = new SimpleDateFormat("h:mm a");
+    return formatter.format(lib.getReceiptTransfer().getTransfer().getTransferTime()).toLowerCase();
   }
 
   private void assertDetailedLibraryAttributes(Map<String, String> attributes, DetailedLibrary library) {

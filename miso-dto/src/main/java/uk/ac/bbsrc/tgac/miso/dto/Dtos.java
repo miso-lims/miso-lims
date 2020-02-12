@@ -1407,7 +1407,7 @@ public class Dtos {
 
     TransferItem<?> receipt = from.getReceiptTransfer();
     if (receipt != null) {
-      setDateString(dto::setReceivedDate, receipt.getTransfer().getTransferTime());
+      setDateTimeString(dto::setReceivedTime, receipt.getTransfer().getTransferTime());
       setId(dto::setSenderLabId, receipt.getTransfer().getSenderLab());
       setId(dto::setRecipientGroupId, receipt.getTransfer().getRecipientGroup());
       setBoolean(dto::setReceived, receipt.isReceived(), true);
@@ -1487,9 +1487,9 @@ public class Dtos {
     setObject(to::setSpikeInDilutionFactor, from.getSpikeInDilutionFactor(), DilutionFactor::get);
     setBoolean(to::setUmis, from.getUmis(), false);
 
-    if (from.getReceivedDate() != null) {
+    if (from.getReceivedTime() != null) {
       Transfer receipt = new Transfer();
-      setDate(receipt::setTransferTime, from.getReceivedDate());
+      setDateTime(receipt::setTransferTime, from.getReceivedTime());
       setObject(receipt::setSenderLab, LabImpl::new, from.getSenderLabId());
       setObject(receipt::setRecipientGroup, Group::new, from.getRecipientGroupId());
       TransferLibrary item = new TransferLibrary();
