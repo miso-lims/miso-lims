@@ -43,7 +43,7 @@ public class DefaultTissueMaterialService implements TissueMaterialService {
 
   @Override
   public Long create(TissueMaterial tissueMaterial) throws IOException {
-    authorizationManager.throwIfNotInternal();
+    authorizationManager.throwIfNonAdmin();
     User user = authorizationManager.getCurrentUser();
     tissueMaterial.setCreatedBy(user);
     tissueMaterial.setUpdatedBy(user);

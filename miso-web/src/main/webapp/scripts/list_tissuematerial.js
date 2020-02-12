@@ -31,7 +31,7 @@ ListTarget.tissuematerial = {
     return HotTarget.tissuematerial.getBulkActions(config);
   },
   createStaticActions: function(config, projectId) {
-    return config.isInternal ? [{
+    return config.isAdmin ? [{
       "name": "Add",
       "handler": function() {
 
