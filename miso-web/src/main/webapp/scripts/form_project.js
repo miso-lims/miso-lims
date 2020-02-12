@@ -55,6 +55,18 @@ FormTarget.project = (function($) {
           required: true,
           maxLength: 100
         }, {
+          title: 'Use Secondary Naming Scheme',
+          data: 'secondaryNaming',
+          type: 'checkbox',
+          include: !!config.naming.secondary,
+          onChange: function(newValue, form) {
+            var scheme = config.naming[newValue ? 'secondary' : 'primary'];
+            form.updateField('shortName', {
+              required: scheme.shortNameRequired,
+              disabled: !scheme.shortNameModifiable
+            });
+          }
+        }, {
           title: 'Short Name',
           data: 'shortName',
           type: 'text',
@@ -101,18 +113,6 @@ FormTarget.project = (function($) {
           title: 'Clinical',
           data: 'clinical',
           type: 'checkbox'
-        }, {
-          title: 'Use Secondary Naming Scheme',
-          data: 'secondaryNaming',
-          type: 'checkbox',
-          include: !!config.naming.secondary,
-          onChange: function(newValue, form) {
-            var scheme = config.naming[newValue ? 'secondary' : 'primary'];
-            form.updateField('shortName', {
-              required: scheme.shortNameRequired,
-              disabled: !scheme.shortNameModifiable
-            });
-          }
         }]
       }];
     }

@@ -315,6 +315,10 @@ includes samples, libraries, and library aliquots. Other items, such as pools, b
 naming scheme. When using two naming schemes, it is ideal to use the same name generator (`nameable.name`) in both in order
 to maintain consistent names throughout MISO.
 
+If you are switching to a new naming scheme and want it to be the default for new projects, you can make your current naming
+scheme secondary and the new one primary. Set all existing projects to use the secondary naming scheme, and they will continue
+to use the old scheme. This way, you don't have to select "Use Secondary Naming Scheme" for every new project.
+
 # Setting Up the Run Scanner
 [Run Scanner](https://github.com/miso-lims/runscanner) is a webservice that scans the paths containing
 sequencer output. It is not required for a functioning MISO install, but
