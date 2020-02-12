@@ -129,12 +129,10 @@ public class LibraryAliquotRestController extends RestController {
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.platformType(pool.getPlatformType()));
   }
 
-  @PostMapping(value = "query", produces = { "application/json" })
+  @PostMapping(value = "/query", produces = { "application/json" })
   @ResponseBody
-  public List<LibraryAliquotDto> getLibraryAliquotsInBulk(@RequestBody List<String> names, HttpServletRequest request,
-      HttpServletResponse response,
-      UriComponentsBuilder uriBuilder) {
-    return PaginationFilter.bulkSearch(names, libraryAliquotService, ldi -> Dtos.asDto(ldi, false),
+  public List<LibraryAliquotDto> getLibraryAliquotsInBulk(@RequestBody List<String> names) {
+    return PaginationFilter.bulkSearch(names, poolableElementViewService, Dtos::asDto,
         message -> new RestException(message, Status.BAD_REQUEST));
   }
 

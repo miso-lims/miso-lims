@@ -30,8 +30,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 public class HibernatePoolableElementViewDao implements PoolableElementViewDao, HibernatePaginatedDataSource<PoolableElementView> {
 
   // Make sure these match the HiberateLibraryAliquotDao
-  private static final String[] SEARCH_PROPERTIES = new String[] { "aliquotName", "aliquotBarcode", "libraryName", "libraryAlias",
-      "libraryDescription" };
+  private static final String[] SEARCH_PROPERTIES = new String[] { "aliquotName", "aliquotAlias", "aliquotBarcode" };
   private final static List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("sample"),
       new AliasDescriptor("sample.hierarchyAttributes", JoinType.LEFT_OUTER_JOIN),
       new AliasDescriptor("hierarchyAttributes.tissueOrigin", JoinType.LEFT_OUTER_JOIN),

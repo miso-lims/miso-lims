@@ -9,6 +9,7 @@ Changes:
   * Fixed distributed items not being removed from boxes
   * Fixed error deleting sequencing orders
   * Fixed transfer time and service record start and end times saving in incorrect time zone
+  * Fixed searching library aliquots by alias (was previously using library alias)
 
 Upgrade Notes:
 
