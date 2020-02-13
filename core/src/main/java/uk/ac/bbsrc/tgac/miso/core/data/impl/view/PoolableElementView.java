@@ -27,6 +27,7 @@ import org.hibernate.annotations.LazyToOneOption;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
@@ -42,7 +43,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 @Entity
 @Immutable
 @Table(name = "PoolableElementView")
-public class PoolableElementView implements Serializable, Comparable<PoolableElementView> {
+public class PoolableElementView implements Identifiable, Serializable, Comparable<PoolableElementView> {
 
   private static final long serialVersionUID = 1L;
 
@@ -806,6 +807,21 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
       if (other.targetedSequencingId != null) return false;
     } else if (!targetedSequencingId.equals(other.targetedSequencingId)) return false;
     return true;
+  }
+
+  @Override
+  public long getId() {
+    return aliquotId;
+  }
+
+  @Override
+  public void setId(long id) {
+    this.aliquotId = id;
+  }
+
+  @Override
+  public boolean isSaved() {
+    return aliquotId != LibraryAliquot.UNSAVED_ID;
   }
 
 }
