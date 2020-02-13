@@ -32,7 +32,7 @@
     trying to do when this error occurred.<br/><br/>
   </c:if>
 
-  <h2>${pageContext.exception.message}</h2><br/>
+  <h2 id="exceptionMessage">${pageContext.exception.message}</h2><br/>
   <ul>
     <c:forEach items="${pageContext.exception.stackTrace}" var="trace">
       <li>${trace}</li>

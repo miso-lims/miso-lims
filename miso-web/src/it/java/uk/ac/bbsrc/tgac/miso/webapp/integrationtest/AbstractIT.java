@@ -4,6 +4,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 import javax.sql.DataSource;
 
@@ -16,6 +17,9 @@ import org.junit.runner.RunWith;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.logging.LogType;
+import org.openqa.selenium.logging.LoggingPreferences;
+import org.openqa.selenium.remote.CapabilityType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -56,7 +60,11 @@ public abstract class AbstractIT {
     ChromeOptions opts = new ChromeOptions();
     opts.setHeadless(true);
     // large width is important so that all columns of handsontables get rendered
-    opts.addArguments("--disable-gpu", "--window-size=4000x1440");
+    // sandboxing doesn't work in container-based environments and causes occasional Chrome crashes
+    opts.addArguments("--disable-gpu", "--window-size=4000x1440", "--no-sandbox");
+    LoggingPreferences loggingPrefs = new LoggingPreferences();
+    loggingPrefs.enable(LogType.BROWSER, Level.ALL);
+    opts.setCapability(CapabilityType.LOGGING_PREFS, loggingPrefs);
     driver = new ChromeDriver(opts);
 
     // don't allow page load or script execution to take longer than 10 seconds
