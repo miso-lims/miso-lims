@@ -306,7 +306,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
    */
   private boolean mergeIfAppropriate(DetailedSample sample) throws IOException {
     try {
-      sample.setAlias(serviceManager.getNamingScheme().generateSampleAlias(sample));
+      sample.setAlias(serviceManager.getNamingSchemeHolder().getPrimary().generateSampleAlias(sample));
     } catch (MisoNamingException e) {
       throw new IOException("Sample alias generation failed", e);
     }

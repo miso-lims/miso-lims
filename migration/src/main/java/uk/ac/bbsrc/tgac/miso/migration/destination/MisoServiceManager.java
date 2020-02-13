@@ -18,7 +18,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.LocalSecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.security.SuperuserAuthentication;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.OicrNamingScheme;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateBoxDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateBoxSizeDao;
@@ -111,7 +111,7 @@ public class MisoServiceManager {
 
   static {
     addDependency(DefaultProjectService.class, HibernateProjectDao.class, DefaultProjectService::setProjectStore);
-    addDependency(DefaultProjectService.class, NamingScheme.class, DefaultProjectService::setNamingScheme);
+    addDependency(DefaultProjectService.class, NamingSchemeHolder.class, DefaultProjectService::setNamingSchemeHolder);
     addDependency(DefaultProjectService.class, HibernateReferenceGenomeDao.class, DefaultProjectService::setReferenceGenomeDao);
     addDependency(HibernateSecurityDao.class, SessionFactory.class, HibernateSecurityDao::setSessionFactory);
     addDependency(DefaultUserService.class, HibernateSecurityDao.class, DefaultUserService::setSecurityStore);
@@ -122,7 +122,7 @@ public class MisoServiceManager {
     addDependency(DefaultSampleClassService.class, MigrationAuthorizationManager.class, DefaultSampleClassService::setAuthorizationManager);
     addDependency(DefaultSampleClassService.class, HibernateSampleClassDao.class, DefaultSampleClassService::setSampleClassDao);
     addDependency(DefaultSampleService.class, MigrationAuthorizationManager.class, DefaultSampleService::setAuthorizationManager);
-    addDependency(DefaultSampleService.class, NamingScheme.class, DefaultSampleService::setNamingScheme);
+    addDependency(DefaultSampleService.class, NamingSchemeHolder.class, DefaultSampleService::setNamingSchemeHolder);
     addDependency(DefaultSampleService.class, HibernateProjectDao.class, DefaultSampleService::setProjectStore);
     addDependency(DefaultSampleService.class, HibernateDetailedQcStatusDao.class, DefaultSampleService::setDetailedQcStatusDao);
     addDependency(DefaultSampleService.class, DefaultSampleClassService.class, DefaultSampleService::setSampleClassService);
@@ -143,7 +143,7 @@ public class MisoServiceManager {
     addDependency(HibernateLibraryDao.class, SessionFactory.class, HibernateLibraryDao::setSessionFactory);
     addDependency(HibernateLibraryDao.class, HibernateBoxDao.class, HibernateLibraryDao::setBoxDao);
     addDependency(DefaultLibraryService.class, MigrationAuthorizationManager.class, DefaultLibraryService::setAuthorizationManager);
-    addDependency(DefaultLibraryService.class, NamingScheme.class, DefaultLibraryService::setNamingScheme);
+    addDependency(DefaultLibraryService.class, NamingSchemeHolder.class, DefaultLibraryService::setNamingSchemeHolder);
     addDependency(DefaultLibraryService.class, HibernateLibraryDao.class, DefaultLibraryService::setLibraryDao);
     addDependency(DefaultLibraryService.class, DefaultLibraryDesignService.class, DefaultLibraryService::setLibraryDesignService);
     addDependency(DefaultLibraryService.class, DefaultLibraryDesignCodeService.class, DefaultLibraryService::setLibraryDesignCodeService);
@@ -157,7 +157,7 @@ public class MisoServiceManager {
     addDependency(DefaultLibraryAliquotService.class, HibernateLibraryAliquotDao.class, DefaultLibraryAliquotService::setLibraryAliquotDao);
     addDependency(DefaultLibraryAliquotService.class, MigrationAuthorizationManager.class,
         DefaultLibraryAliquotService::setAuthorizationManager);
-    addDependency(DefaultLibraryAliquotService.class, NamingScheme.class, DefaultLibraryAliquotService::setNamingScheme);
+    addDependency(DefaultLibraryAliquotService.class, NamingSchemeHolder.class, DefaultLibraryAliquotService::setNamingSchemeHolder);
     addDependency(DefaultLibraryAliquotService.class, DefaultLibraryService.class, DefaultLibraryAliquotService::setLibraryService);
     addDependency(DefaultLibraryAliquotService.class, DefaultTargetedSequencingService.class,
         DefaultLibraryAliquotService::setTargetedSequencingService);
@@ -166,7 +166,7 @@ public class MisoServiceManager {
     addDependency(HibernatePoolDao.class, HibernateSecurityDao.class, HibernatePoolDao::setSecurityStore);
     addDependency(HibernatePoolDao.class, SessionFactory.class, HibernatePoolDao::setSessionFactory);
     addDependency(DefaultPoolService.class, MigrationAuthorizationManager.class, DefaultPoolService::setAuthorizationManager);
-    addDependency(DefaultPoolService.class, NamingScheme.class, DefaultPoolService::setNamingScheme);
+    addDependency(DefaultPoolService.class, NamingSchemeHolder.class, DefaultPoolService::setNamingSchemeHolder);
     addDependency(DefaultPoolService.class, HibernatePoolDao.class, DefaultPoolService::setPoolStore);
     addDependency(DefaultPoolService.class, DefaultPoolableElementViewService.class, DefaultPoolService::setPoolableElementViewService);
     addDependency(HibernateExperimentDao.class, SessionFactory.class, HibernateExperimentDao::setSessionFactory);
@@ -203,7 +203,7 @@ public class MisoServiceManager {
     addDependency(DefaultStudyService.class, MigrationAuthorizationManager.class, DefaultStudyService::setAuthorizationManager);
     addDependency(DefaultStudyService.class, HibernateProjectDao.class, DefaultStudyService::setProjectStore);
     addDependency(DefaultStudyService.class, HibernateStudyDao.class, DefaultStudyService::setStudyStore);
-    addDependency(DefaultStudyService.class, NamingScheme.class, DefaultStudyService::setNamingScheme);
+    addDependency(DefaultStudyService.class, NamingSchemeHolder.class, DefaultStudyService::setNamingSchemeHolder);
     addDependency(DefaultReferenceGenomeService.class, MigrationAuthorizationManager.class,
         DefaultReferenceGenomeService::setAuthorizationManager);
     addDependency(DefaultReferenceGenomeService.class, HibernateReferenceGenomeDao.class,
@@ -222,7 +222,7 @@ public class MisoServiceManager {
     addDependency(DefaultRunService.class, MigrationAuthorizationManager.class, DefaultRunService::setAuthorizationManager);
     addDependency(DefaultRunService.class, HibernateRunDao.class, DefaultRunService::setRunDao);
     addDependency(DefaultRunService.class, DefaultUserService.class, DefaultRunService::setUserService);
-    addDependency(DefaultRunService.class, NamingScheme.class, DefaultRunService::setNamingScheme);
+    addDependency(DefaultRunService.class, NamingSchemeHolder.class, DefaultRunService::setNamingSchemeHolder);
     addDependency(DefaultRunService.class, DefaultContainerService.class, DefaultRunService::setContainerService);
     addDependency(DefaultRunService.class, DefaultInstrumentService.class, DefaultRunService::setInstrumentService);
     addDependency(DefaultRunService.class, DefaultSequencingParametersService.class, DefaultRunService::setSequencingParametersService);
@@ -256,14 +256,14 @@ public class MisoServiceManager {
     addDependency(DefaultExperimentService.class, MigrationAuthorizationManager.class, DefaultExperimentService::setAuthorizationManager);
     addDependency(DefaultExperimentService.class, HibernateExperimentDao.class, DefaultExperimentService::setExperimentStore);
     addDependency(DefaultExperimentService.class, DefaultKitService.class, DefaultExperimentService::setKitService);
-    addDependency(DefaultExperimentService.class, NamingScheme.class, DefaultExperimentService::setNamingScheme);
+    addDependency(DefaultExperimentService.class, NamingSchemeHolder.class, DefaultExperimentService::setNamingSchemeHolder);
     addDependency(DefaultExperimentService.class, DefaultInstrumentModelService.class, DefaultExperimentService::setInstrumentModelService);
     addDependency(DefaultExperimentService.class, DefaultLibraryService.class, DefaultExperimentService::setLibraryService);
     addDependency(DefaultExperimentService.class, DefaultStudyService.class, DefaultExperimentService::setStudyService);
     addDependency(DefaultBoxService.class, HibernateBoxDao.class, DefaultBoxService::setBoxStore);
     addDependency(DefaultBoxService.class, MigrationAuthorizationManager.class, DefaultBoxService::setAuthorizationManager);
     addDependency(DefaultBoxService.class, DefaultChangeLogService.class, DefaultBoxService::setChangeLogService);
-    addDependency(DefaultBoxService.class, NamingScheme.class, DefaultBoxService::setNamingScheme);
+    addDependency(DefaultBoxService.class, NamingSchemeHolder.class, DefaultBoxService::setNamingSchemeHolder);
     addDependency(DefaultBoxService.class, DefaultBoxUseService.class, DefaultBoxService::setBoxUseService);
     addDependency(DefaultBoxService.class, DefaultBoxSizeService.class, DefaultBoxService::setBoxSizeService);
     addDependency(DefaultQualityControlService.class, MigrationAuthorizationManager.class,
@@ -317,7 +317,9 @@ public class MisoServiceManager {
     setService(SessionFactory.class, sessionFactory);
 
     // TODO: Add naming scheme config instead of hard-coding
-    setService(NamingScheme.class, new OicrNamingScheme());
+    NamingSchemeHolder namingSchemeHolder = new NamingSchemeHolder();
+    namingSchemeHolder.setPrimary(new OicrNamingScheme());
+    setService(NamingSchemeHolder.class, namingSchemeHolder);
   }
 
   /**
@@ -465,8 +467,8 @@ public class MisoServiceManager {
     SecurityContextHolder.setContext(context);
   }
 
-  public NamingScheme getNamingScheme() {
-    return getService(NamingScheme.class);
+  public NamingSchemeHolder getNamingSchemeHolder() {
+    return getService(NamingSchemeHolder.class);
   }
 
   private <T> T getService(Class<T> clazz) {

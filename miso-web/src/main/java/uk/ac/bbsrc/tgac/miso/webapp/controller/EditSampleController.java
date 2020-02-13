@@ -106,6 +106,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
+import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 
 @Controller
@@ -239,16 +240,19 @@ public class EditSampleController {
         .map(Dtos::asDto)
         .collect(Collectors.toList()));
 
-    model.put("projects", mapper.writeValueAsString(projectService.list().stream().map(Dtos::asDto).collect(Collectors.toList())));
-
     model.put("sample", sample);
     SampleDto sampleDto = Dtos.asDto(sample, false);
     setRelatedSlideDtos(sample, sampleDto);
     model.put("sampleDto", sample.getId() == SampleImpl.UNSAVED_ID ? "null" : mapper.writeValueAsString(sampleDto));
 
-    if (LimsUtils.isTissuePieceSample(sample) || LimsUtils.isStockSample(sample)) {
-      model.put("relatedSlides", getRelatedSlideDtos((DetailedSample) sample));
+    ObjectNode formConfig = mapper.createObjectNode();
+    formConfig.put("detailedSample", isDetailedSampleEnabled());
+    MisoWebUtils.addJsonArray(mapper, formConfig, "projects", projectService.list(), Dtos::asDto);
+    if (LimsUtils.isDetailedSample(sample)) {
+      DetailedSample detailed = (DetailedSample) sample;
+      formConfig.put("dnaseTreatable", detailed.getSampleClass().getDNAseTreatable());
     }
+    model.put("formConfig", mapper.writeValueAsString(formConfig));
 
     return new ModelAndView("/WEB-INF/pages/editSample.jsp", model);
   }

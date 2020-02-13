@@ -27,6 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 
 /**
@@ -40,6 +41,8 @@ public class HibernateExperimentDaoIT extends AbstractDAOTest {
   private SessionFactory sessionFactory;
 
   @Mock
+  private NamingSchemeHolder namingSchemeHolder;
+  @Mock
   private NamingScheme namingScheme;
 
   @InjectMocks
@@ -49,6 +52,7 @@ public class HibernateExperimentDaoIT extends AbstractDAOTest {
   public void setup() throws Exception {
     MockitoAnnotations.initMocks(this);
     dao.setSessionFactory(sessionFactory);
+    when(namingSchemeHolder.getPrimary()).thenReturn(namingScheme);
     when(namingScheme.generateNameFor(Matchers.any(Experiment.class))).thenReturn("EDI123");
     when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
   }

@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
@@ -18,6 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.persistence.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.persistence.StudyStore;
 import uk.ac.bbsrc.tgac.miso.persistence.StudyTypeDao;
@@ -29,16 +31,14 @@ public class DefaultStudyServiceTest {
 
   @Mock
   private AuthorizationManager authorizationManager;
-
   @Mock
   private StudyStore studyStore;
-
   @Mock
   private StudyTypeDao studyTypeDao;
-
   @Mock
   private ProjectStore projectStore;
-
+  @Mock
+  private NamingSchemeHolder namingSchemeHolder;
   @Mock
   private NamingScheme namingScheme;
 
@@ -48,6 +48,7 @@ public class DefaultStudyServiceTest {
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
+    Mockito.when(namingSchemeHolder.getPrimary()).thenReturn(namingScheme);
   }
 
   @Test

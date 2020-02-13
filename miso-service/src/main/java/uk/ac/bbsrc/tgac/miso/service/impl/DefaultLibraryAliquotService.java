@@ -40,6 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -60,7 +61,7 @@ public class DefaultLibraryAliquotService
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
-  private NamingScheme namingScheme;
+  private NamingSchemeHolder namingSchemeHolder;
   @Autowired
   private LibraryService libraryService;
   @Autowired
@@ -86,8 +87,9 @@ public class DefaultLibraryAliquotService
 
   private LibraryAliquot save(LibraryAliquot aliquot) throws IOException {
     try {
+      NamingScheme namingScheme = getNamingScheme(aliquot);
       if (!hasTemporaryAlias(aliquot)) {
-        validateAlias(aliquot);
+        validateAlias(aliquot, namingScheme);
       }
       Long newId = libraryAliquotDao.save(aliquot);
       LibraryAliquot managed = libraryAliquotDao.get(newId);
@@ -106,7 +108,7 @@ public class DefaultLibraryAliquotService
           // generation of non-standard aliases is allowed
           ((DetailedLibraryAliquot) managed).setNonStandardAlias(!namingScheme.validateLibraryAliquotAlias(generatedAlias).isValid());
         } else {
-          validateAlias(managed);
+          validateAlias(managed, namingScheme);
         }
         needsUpdate = true;
       }
@@ -126,7 +128,7 @@ public class DefaultLibraryAliquotService
     }
   }
 
-  private void validateAlias(LibraryAliquot aliquot) {
+  private void validateAlias(LibraryAliquot aliquot, NamingScheme namingScheme) {
     if (!isDetailedLibraryAliquot(aliquot) || !((DetailedLibraryAliquot) aliquot).isNonStandardAlias()) {
       uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult aliasValidation = namingScheme
           .validateLibraryAliquotAlias(aliquot.getAlias());
@@ -156,6 +158,7 @@ public class DefaultLibraryAliquotService
 
     // pre-save field generation
     aliquot.setName(generateTemporaryName());
+    NamingScheme namingScheme = getNamingScheme(aliquot);
     if (isStringEmptyOrNull(aliquot.getAlias()) && namingScheme.hasLibraryAliquotAliasGenerator()) {
       aliquot.setAlias(generateTemporaryName());
     }
@@ -164,6 +167,10 @@ public class DefaultLibraryAliquotService
     updateParent(aliquot.getParent());
     boxService.updateBoxableLocation(aliquot);
     return savedId;
+  }
+
+  private NamingScheme getNamingScheme(LibraryAliquot aliquot) {
+    return namingSchemeHolder.get(aliquot.getLibrary().getSample().getProject().isSecondaryNaming());
   }
 
   private void updateParent(HierarchyEntity parent) throws IOException {
@@ -327,8 +334,8 @@ public class DefaultLibraryAliquotService
     this.authorizationManager = authorizationManager;
   }
 
-  public void setNamingScheme(NamingScheme namingScheme) {
-    this.namingScheme = namingScheme;
+  public void setNamingSchemeHolder(NamingSchemeHolder namingSchemeHolder) {
+    this.namingSchemeHolder = namingSchemeHolder;
   }
 
   public void setTargetedSequencingService(TargetedSequencingService targetedSequencingService) {

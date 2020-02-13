@@ -64,6 +64,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -85,7 +86,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
-  private NamingScheme namingScheme;
+  private NamingSchemeHolder namingSchemeHolder;
   @Autowired
   private LibraryTypeService libraryTypeService;
   @Autowired
@@ -125,9 +126,10 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   }
 
   private Library save(Library library, boolean validateAliasUniqueness) throws IOException {
+    NamingScheme namingScheme = getNamingScheme(library);
     try {
       if (!hasTemporaryAlias(library)) {
-        validateAliasOrThrow(library);
+        validateAliasOrThrow(library, namingScheme);
       }
       long newId = libraryDao.save(library);
 
@@ -147,7 +149,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
           // generation of non-standard aliases is allowed
           ((DetailedLibrary) managed).setNonStandardAlias(!namingScheme.validateLibraryAlias(generatedAlias).isValid());
         } else {
-          validateAliasOrThrow(managed);
+          validateAliasOrThrow(managed, namingScheme);
         }
         needsUpdate = true;
       }
@@ -160,7 +162,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
         libraryDao.save(managed);
       }
       if (validateAliasUniqueness) {
-        validateAliasUniqueness(managed);
+        validateAliasUniqueness(managed, namingScheme);
       }
       return managed;
     } catch (MisoNamingException e) {
@@ -170,6 +172,10 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
       throw new ConstraintViolationException(e.getMessage() + " " + ExceptionUtils.getRootCauseMessage(e), e.getSQLException(),
           e.getConstraintName());
     }
+  }
+
+  private NamingScheme getNamingScheme(Library library) {
+    return namingSchemeHolder.get(library.getSample().getProject().isSecondaryNaming());
   }
 
   @Override
@@ -186,7 +192,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
 
     // pre-save field generation
     library.setName(generateTemporaryName());
-    if (isStringEmptyOrNull(library.getAlias()) && namingScheme.hasLibraryAliasGenerator()) {
+    if (isStringEmptyOrNull(library.getAlias()) && getNamingScheme(library).hasLibraryAliasGenerator()) {
       library.setAlias(generateTemporaryName());
     }
     if (library.getConcentration() == null) {
@@ -564,8 +570,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
    * @throws IOException
    * @throws IllegalArgumentException
    */
-  private void validateAliasOrThrow(Library library) throws IOException {
-    validateAliasUniqueness(library);
+  private void validateAliasOrThrow(Library library, NamingScheme namingScheme) throws IOException {
+    validateAliasUniqueness(library, namingScheme);
     if (!isDetailedLibrary(library) || !((DetailedLibrary) library).hasNonStandardAlias()) {
       uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult aliasValidation = namingScheme.validateLibraryAlias(library
           .getAlias());
@@ -575,7 +581,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     }
   }
 
-  private void validateAliasUniqueness(Library library) throws IOException {
+  private void validateAliasUniqueness(Library library, NamingScheme namingScheme) throws IOException {
     // duplicate aliases may be allowed via naming scheme, or with nonStandardAlias=true in the case of a DetailedLibrary
     if (namingScheme.duplicateLibraryAliasAllowed()
         || (LimsUtils.isDetailedLibrary(library) && ((DetailedLibrary) library).hasNonStandardAlias())) {
@@ -613,8 +619,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     this.authorizationManager = authorizationManager;
   }
 
-  public void setNamingScheme(NamingScheme namingScheme) {
-    this.namingScheme = namingScheme;
+  public void setNamingSchemeHolder(NamingSchemeHolder namingSchemeHolder) {
+    this.namingSchemeHolder = namingSchemeHolder;
   }
 
   public void setLibraryDesignService(LibraryDesignService libraryDesignService) {

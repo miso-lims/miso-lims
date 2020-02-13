@@ -49,8 +49,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.DelegatingNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.NameGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.resolvers.NamingSchemeResolverService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.NameValidator;
@@ -169,35 +169,45 @@ public class MisoAppListener implements ServletContextListener {
 
   private void initializeNamingSchemes(XmlWebApplicationContext context, Map<String, String> misoProperties) {
     // set up naming schemes
-    NamingSchemeResolverService resolver = (NamingSchemeResolverService) context
-        .getBean("namingSchemeResolverService");
+    NamingSchemeResolverService resolver = (NamingSchemeResolverService) context.getBean("namingSchemeResolverService");
+    NamingSchemeHolder schemeHolder = context.getBeanFactory().getBean(NamingSchemeHolder.class);
 
-    String currentPropertyValue = null;
-    DelegatingNamingScheme schemeHolder = (DelegatingNamingScheme) context.getBeanFactory().getBean("namingScheme");
-    if ((currentPropertyValue = getStringPropertyOrNull("miso.naming.scheme", misoProperties)) == null) {
+    schemeHolder.setPrimary(getConfiguredNamingScheme("miso.naming", misoProperties, resolver));
+    if (schemeHolder.getPrimary() == null) {
       throw new IllegalArgumentException("No naming scheme configured");
     }
-    NamingScheme scheme = resolver.getNamingScheme(currentPropertyValue);
-    if (scheme == null) throw new IllegalArgumentException("Failed to load naming scheme '" + currentPropertyValue + "'");
-    SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(scheme);
-    log.info("Replacing default namingScheme with {}", scheme.getClass().getSimpleName());
-    schemeHolder.setActualNamingScheme(scheme);
+    schemeHolder.setSecondary(getConfiguredNamingScheme("miso.naming2", misoProperties, resolver));
+  }
 
-    applyGenerator("miso.naming.generator.nameable.name", misoProperties, resolver::getNameGenerator, scheme::setNameGenerator);
-    applyGenerator("miso.naming.generator.sample.alias", misoProperties, resolver::getSampleAliasGenerator, scheme::setSampleAliasGenerator);
-    applyGenerator("miso.naming.generator.library.alias", misoProperties, resolver::getLibraryAliasGenerator,
+  private NamingScheme getConfiguredNamingScheme(String namespace, Map<String, String> misoProperties,
+      NamingSchemeResolverService resolver) {
+    String schemeName = getStringPropertyOrNull(namespace + ".scheme", misoProperties);
+    if (schemeName == null) {
+      return null;
+    }
+    NamingScheme scheme = resolver.getNamingScheme(schemeName);
+    if (scheme == null) throw new IllegalArgumentException("Failed to load naming scheme '" + schemeName + "'");
+    SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(scheme);
+
+    applyGenerator(namespace + ".generator.nameable.name", misoProperties, resolver::getNameGenerator, scheme::setNameGenerator);
+    applyGenerator(namespace + ".generator.sample.alias", misoProperties, resolver::getSampleAliasGenerator,
+        scheme::setSampleAliasGenerator);
+    applyGenerator(namespace + ".generator.library.alias", misoProperties, resolver::getLibraryAliasGenerator,
         scheme::setLibraryAliasGenerator);
-    applyGenerator("miso.naming.generator.libraryaliquot.alias", misoProperties, resolver::getLibraryAliquotAliasGenerator,
+    applyGenerator(namespace + ".generator.libraryaliquot.alias", misoProperties, resolver::getLibraryAliquotAliasGenerator,
         scheme::setLibraryAliquotAliasGenerator);
 
-    applyValidator("miso.naming.validator.nameable.name", misoProperties, resolver::getNameValidator, scheme::setNameValidator);
-    applyValidator("miso.naming.validator.sample.alias", misoProperties, resolver::getSampleAliasValidator, scheme::setSampleAliasValidator);
-    applyValidator("miso.naming.validator.library.alias", misoProperties, resolver::getLibraryAliasValidator,
+    applyValidator(namespace + ".validator.nameable.name", misoProperties, resolver::getNameValidator, scheme::setNameValidator);
+    applyValidator(namespace + ".validator.sample.alias", misoProperties, resolver::getSampleAliasValidator,
+        scheme::setSampleAliasValidator);
+    applyValidator(namespace + ".validator.library.alias", misoProperties, resolver::getLibraryAliasValidator,
         scheme::setLibraryAliasValidator);
-    applyValidator("miso.naming.validator.libraryaliquot.alias", misoProperties, resolver::getLibraryAliquotAliasValidator,
+    applyValidator(namespace + ".validator.libraryaliquot.alias", misoProperties, resolver::getLibraryAliquotAliasValidator,
         scheme::setLibraryAliquotAliasValidator);
-    applyValidator("miso.naming.validator.project.shortName", misoProperties, resolver::getProjectShortNameValidator,
+    applyValidator(namespace + ".validator.project.shortName", misoProperties, resolver::getProjectShortNameValidator,
         scheme::setProjectShortNameValidator);
+
+    return scheme;
   }
 
   private <T> void applyGenerator(String property, Map<String, String> misoProperties, Function<String, NameGenerator<T>> resolver,

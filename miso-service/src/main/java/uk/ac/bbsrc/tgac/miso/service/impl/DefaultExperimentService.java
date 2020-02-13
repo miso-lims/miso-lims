@@ -26,8 +26,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
@@ -37,7 +36,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultExperimentService implements ExperimentService, NamingSchemeAware {
+public class DefaultExperimentService implements ExperimentService {
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -47,7 +46,7 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
   @Autowired
   private KitService kitService;
   @Autowired
-  private NamingScheme namingScheme;
+  private NamingSchemeHolder namingSchemeHolder;
   @Autowired
   private InstrumentModelService instrumentModelService;
   @Autowired
@@ -62,10 +61,6 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
   @Override
   public Experiment get(long experimentId) throws IOException {
     return experimentStore.get(experimentId);
-  }
-
-  public NamingScheme getNamingScheme() {
-    return namingScheme;
   }
 
   @Override
@@ -100,13 +95,13 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
     experimentStore.save(experiment);
     String name;
     try {
-      name = namingScheme.generateNameFor(experiment);
+      name = namingSchemeHolder.getPrimary().generateNameFor(experiment);
     } catch (MisoNamingException e) {
       throw new IOException("Cannot save Experiment - failed to generate a valid name", e);
     }
     experiment.setName(name);
 
-    ValidationResult nameValidation = namingScheme.validateName(experiment.getName());
+    ValidationResult nameValidation = namingSchemeHolder.getPrimary().validateName(experiment.getName());
     if (!nameValidation.isValid()) {
       throw new IOException("Cannot save Experiment - invalid name:" + nameValidation.getMessage());
     }
@@ -116,7 +111,7 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
   @Override
   public long update(Experiment experiment) throws IOException {
     loadRunPartitions(experiment);
-    ValidationResult nameValidation = namingScheme.validateName(experiment.getName());
+    ValidationResult nameValidation = namingSchemeHolder.getPrimary().validateName(experiment.getName());
     if (!nameValidation.isValid()) {
       throw new IOException("Cannot save Experiment - invalid name:" + nameValidation.getMessage());
     }
@@ -156,9 +151,8 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
     }
   }
 
-  @Override
-  public void setNamingScheme(NamingScheme namingScheme) {
-    this.namingScheme = namingScheme;
+  public void setNamingSchemeHolder(NamingSchemeHolder namingSchemeHolder) {
+    this.namingSchemeHolder = namingSchemeHolder;
   }
 
   public void setAuthorizationManager(AuthorizationManager authorizationManager) {

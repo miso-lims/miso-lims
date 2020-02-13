@@ -46,7 +46,7 @@ HotTarget.libraryReceipt = (function() {
           }
           // Sometimes sample properties don't go into the nested subobject, but become a field called
           // "sample.[name]". If this happens, it breaks validation on save. Move it back.
-          if(flat.hasOwnProperty(col.data)){
+          if (flat.hasOwnProperty(col.data)) {
             flat.sample[col.initialData] = flat[col.data];
           }
           col.libraryPack(lib.sample, flat.sample, errorHandler);
@@ -67,7 +67,7 @@ HotTarget.libraryReceipt = (function() {
     },
 
     getFixedColumns: function(config) {
-      return Constants.automaticLibraryAlias ? 0 : 2;
+      return config.libraryAliasMaybeRequired ? 2 : 0;
     },
 
     getCustomActions: function(table) {

@@ -19,6 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -34,7 +35,7 @@ public class DefaultStudyService implements StudyService, PaginatedDataSource<St
   private AuthorizationManager authorizationManager;
 
   @Autowired
-  private NamingScheme namingScheme;
+  private NamingSchemeHolder namingSchemeHolder;
 
   @Autowired
   private ProjectStore projectStore;
@@ -78,8 +79,8 @@ public class DefaultStudyService implements StudyService, PaginatedDataSource<St
     this.authorizationManager = authorizationManager;
   }
 
-  public void setNamingScheme(NamingScheme namingScheme) {
-    this.namingScheme = namingScheme;
+  public void setNamingSchemeHolder(NamingSchemeHolder namingSchemeHolder) {
+    this.namingSchemeHolder = namingSchemeHolder;
   }
 
   @Override
@@ -111,6 +112,7 @@ public class DefaultStudyService implements StudyService, PaginatedDataSource<St
     study.setName(LimsUtils.generateTemporaryName());
     long id = studyStore.save(study);
     try {
+      NamingScheme namingScheme = namingSchemeHolder.getPrimary();
       study.setName(namingScheme.generateNameFor(study));
       validateNameOrThrow(study, namingScheme);
       studyStore.save(study);

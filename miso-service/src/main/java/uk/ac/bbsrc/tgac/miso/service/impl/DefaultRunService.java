@@ -74,6 +74,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -117,7 +118,7 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   @Autowired
   private UserService userService;
   @Autowired
-  private NamingScheme namingScheme;
+  private NamingSchemeHolder namingSchemeHolder;
   @Autowired
   private ContainerService containerService;
   @Autowired
@@ -248,6 +249,7 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       // post-save field generation
       boolean needsUpdate = false;
       if (hasTemporaryName(run)) {
+        NamingScheme namingScheme = namingSchemeHolder.getPrimary();
         saved.setName(namingScheme.generateNameFor(saved));
         validateNameOrThrow(saved, namingScheme);
         needsUpdate = true;
@@ -515,8 +517,8 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     this.userService = userService;
   }
 
-  public void setNamingScheme(NamingScheme namingScheme) {
-    this.namingScheme = namingScheme;
+  public void setNamingSchemeHolder(NamingSchemeHolder namingSchemeHolder) {
+    this.namingSchemeHolder = namingSchemeHolder;
   }
 
   public void setSequencingParametersService(SequencingParametersService sequencingParametersService) {

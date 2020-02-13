@@ -2463,6 +2463,7 @@ public class Dtos {
     }
     setId(dto::setDefaultTargetedSequencingId, from.getDefaultTargetedSequencing());
     setBoolean(dto::setClinical, from.isClinical(), false);
+    setBoolean(dto::setSecondaryNaming, from.isSecondaryNaming(), false);
     return dto;
   }
 
@@ -2482,6 +2483,7 @@ public class Dtos {
     setObject(to::setReferenceGenome, ReferenceGenomeImpl::new, dto.getReferenceGenomeId());
     setObject(to::setDefaultTargetedSequencing, TargetedSequencing::new, dto.getDefaultTargetedSequencingId());
     setBoolean(to::setClinical, dto.isClinical(), false);
+    setBoolean(to::setSecondaryNaming, dto.isSecondaryNaming(), false);
     return to;
   }
 

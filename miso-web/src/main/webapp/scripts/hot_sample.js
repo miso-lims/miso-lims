@@ -74,14 +74,14 @@ HotTarget.sample = (function() {
 
     },
     getFixedColumns: function(config) {
-      var cols = 0;
-      if (config.pageMode === 'edit' || !Constants.automaticSampleAlias) {
-        cols += 2;
+      switch (config.pageMode) {
+      case 'edit':
+        return 2;
+      case 'propagate':
+        return 1;
+      default:
+        return 0;
       }
-      if (Constants.isDetailedSample && config.pageMode === 'propagate') {
-        cols += 1;
-      }
-      return cols;
     },
     createColumns: function(config, create, data) {
       var targetCategory = (config.targetSampleClass ? config.targetSampleClass.sampleCategory : null);

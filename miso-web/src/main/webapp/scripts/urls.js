@@ -375,6 +375,12 @@ Urls = (function() {
     edit: idUrlFunction(projectUiBase)
   };
 
+  var projectRestBase = restBase + '/projects';
+  rest.projects = {
+    create: projectRestBase,
+    update: idUrlFunction(projectRestBase)
+  };
+
   // QCs
   var qcUiBase = baseUrl + '/qc';
   ui.qcs = {

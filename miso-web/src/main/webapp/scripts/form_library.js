@@ -5,15 +5,14 @@ FormTarget.library = (function($) {
 
   /*
    * Expected config {
-   *   detailedSample: boolean,
-   *   generateLibraryAliases: boolean
+   *   detailedSample: boolean
    * }
    */
 
   return {
     getSaveUrl: function(library) {
       if (library.id) {
-        return '/miso/rest/libraries/' + library.id;
+        return Urls.rest.libraries.update(library.id);
       } else {
         throw new Error('Page not intended for new library creation');
       }
@@ -22,7 +21,7 @@ FormTarget.library = (function($) {
       return 'PUT';
     },
     getEditUrl: function(library) {
-      return '/miso/library/' + library.id;
+      return Urls.ui.libraries.edit(library.id);
     },
     getSections: function(config, object) {
       var platformName = Utils.array.findUniqueOrThrow(function(item) {
@@ -44,7 +43,7 @@ FormTarget.library = (function($) {
           data: 'parentSampleAlias',
           type: 'read-only',
           getLink: function(library) {
-            return '/miso/sample/' + library.parentSampleId;
+            return Urls.ui.samples.edit(library.parentSampleId);
           }
         }, {
           title: 'Alias',
