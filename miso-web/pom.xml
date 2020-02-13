@@ -29,7 +29,7 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>0.2.202-SNAPSHOT</version>
+    <version>0.2.202</version>
   </parent>
   <artifactId>miso-web</artifactId>
   <packaging>war</packaging>
@@ -521,9 +521,7 @@
                   <!-- 'start' by default. Specify 'run' to keep Tomcat running until stopped manually.
                   If you want test data, you can populate it manually using Docker:
                   
-                  sudo docker exec -i ${CONTAINER_ID} sh -c 'exec mysql -uroot -pabc123 -D lims' < ./src/it/resources/db/migration/clear_test_data.sql
-                  
-                  sudo docker exec -i ${CONTAINER_ID} sh -c 'exec mysql -uroot -pabc123 -D lims' < ./src/it/resources/db/migration/integration_test_data.sql
+                  sudo docker exec -i ${CONTAINER_ID} sh -c 'exec mysql -uroot -pabc123 -D lims' < ./src/it/resources/db/migration/clear_test_data.sql sudo docker exec -i ${CONTAINER_ID} sh -c 'exec mysql -uroot -pabc123 -D lims' < ./src/it/resources/db/migration/integration_test_data.sql
                   
                   (then refresh constants manually via admin My Account page) -->
                   <goal>${cargoInitGoal}</goal>
