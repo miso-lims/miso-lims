@@ -259,6 +259,7 @@ public class LimsUtils {
   }
 
   public static boolean isStockSample(Sample sample) {
+    if (!isDetailedSample(sample)) return false;
     return sample instanceof SampleStock || safeCategoryCheck(sample, SampleStock.CATEGORY_NAME);
   }
 
