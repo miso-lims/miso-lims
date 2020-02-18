@@ -100,6 +100,8 @@ A custom hierarchy must follow these rules:
 * any class may be parented to another class in the same category
 * an aliquot class must always be parented to a single stock class
 * a stock class may be parented to tissue processing classes, but must always be parented to a single tissue class
+  * exception: a stock class in the Single Cell (stock) subcategory should be parented to a tissue processing class
+    in the Single Cell subcategory instead of a tissue class
 * a tissue class must be parented to the identity class
 * there must be a path from every sample class to the identity class
 
