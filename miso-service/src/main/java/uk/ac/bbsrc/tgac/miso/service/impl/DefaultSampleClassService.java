@@ -19,7 +19,9 @@ import com.google.common.collect.Sets;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
@@ -232,7 +234,17 @@ public class DefaultSampleClassService extends AbstractSaveService<SampleClass> 
       break;
     case SampleStock.CATEGORY_NAME:
       allowedParents = Sets.newHashSet(SampleTissue.CATEGORY_NAME, SampleTissueProcessing.CATEGORY_NAME, SampleStock.CATEGORY_NAME);
-      validateSingleParentRequirement(sampleClass, SampleTissue.CATEGORY_NAME, errors);
+      if (SampleStockSingleCell.SUBCATEGORY_NAME.contentEquals(sampleClass.getSampleSubcategory())) {
+        // Single Cell Stocks need to be parented to a Single Cell (tissue processing) class instead of a tissue class
+        if (sampleClass.getParentRelationships().stream()
+            .filter(relationship -> SampleTissueProcessing.CATEGORY_NAME.equals(relationship.getParent().getSampleCategory())
+                && SampleSingleCell.SUBCATEGORY_NAME.equals(relationship.getParent().getSampleSubcategory()) && !relationship.isArchived())
+            .count() != 1L) {
+          errors.add(makeSingleParentRequirementError(sampleClass.getSampleSubcategory(), SampleSingleCell.SUBCATEGORY_NAME));
+        }
+      } else {
+        validateSingleParentRequirement(sampleClass, SampleTissue.CATEGORY_NAME, errors);
+      }
       break;
     case SampleAliquot.CATEGORY_NAME:
       allowedParents = Sets.newHashSet(SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME);
@@ -268,7 +280,6 @@ public class DefaultSampleClassService extends AbstractSaveService<SampleClass> 
       if (hasPathToIdentity(parentRelationship.getParent())) {
         return true;
       }
-      ;
     }
     return false;
   }
