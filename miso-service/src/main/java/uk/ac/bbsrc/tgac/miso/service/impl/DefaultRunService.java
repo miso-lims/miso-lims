@@ -219,10 +219,10 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
 
   @Override
   public long create(Run run) throws IOException {
+    loadChildEntities(run);
     validateChanges(null, run);
     saveContainers(run);
     run.setChangeDetails(authorizationManager.getCurrentUser());
-    loadChildEntities(run);
 
     run.setName(generateTemporaryName());
 
@@ -321,6 +321,11 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     if (run.getDataApprover() != null) {
       run.setDataApprover(userService.get(run.getDataApprover().getId()));
     }
+    if (run.getRunPositions() != null) {
+      for (RunPosition position : run.getRunPositions()) {
+        position.setContainer(containerService.get(position.getContainer().getId()));
+      }
+    }
   }
 
   private void validateChanges(Run before, Run changed) throws IOException {
@@ -365,6 +370,21 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     if (changed.isDataApproved() != null && changed.getDataApprover() == null) {
       errors.add(new ValidationError("dataApproverId", "Must be set when approval is specified"));
     }
+
+    if (changed.getSequencerPartitionContainers() != null) {
+      if (changed.getSequencerPartitionContainers().size() > changed.getSequencer().getInstrumentModel().getNumContainers()) {
+        errors.add(new ValidationError(
+            String.format("Cannot have more than %d containers", changed.getSequencer().getInstrumentModel().getNumContainers())));
+      }
+      for (SequencerPartitionContainer container : changed.getSequencerPartitionContainers()) {
+        if (changed.getSequencer().getInstrumentModel().getContainerModels().stream()
+            .noneMatch(model -> model.getId() == container.getModel().getId())) {
+          errors.add(new ValidationError(String.format("Container model '%s' is not valid for instrument '%s'", container.getAlias(),
+              changed.getSequencer().getInstrumentModel().getAlias())));
+        }
+      }
+    }
+
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
