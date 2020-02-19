@@ -19,6 +19,7 @@ Changes:
   * Fixed error deleting sequencing orders
   * Fixed transfer time and service record start and end times saving in incorrect time zone
   * Fixed searching library aliquots by alias (was previously using library alias)
+  * Fixed server error on Edit Sample page in plain sample mode
 
 Upgrade Notes:
 
@@ -52,6 +53,7 @@ Known Issues:
   * Error deleting sequencing orders
   * Transfer time and service record start and end times may save in incorrect time zone depending
     on configuration
+  * Edit Sample page returned a server error in plain sample mode
 
 # 0.2.200
 
@@ -67,6 +69,7 @@ Known Issues:
   * Error deleting sequencing orders
   * Transfer time and service record start and end times may save in incorrect time zone depending
     on configuration
+  * Edit Sample page returned a server error in plain sample mode
 
 # 0.2.199
 
@@ -119,6 +122,7 @@ Known Issues
   * Error deleting sequencing orders
   * Transfer time and service record start and end times may save in incorrect time zone depending
     on configuration
+  * Edit Sample page returned a server error in plain sample mode
 
 # 0.2.198
 
@@ -191,6 +195,7 @@ Known Issues:
   * Error deleting sequencing orders
   * Transfer time and service record start and end times may save in incorrect time zone depending
     on configuration
+  * Edit Sample page returned a server error in plain sample mode
 
 # 0.2.197
 

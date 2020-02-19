@@ -10,7 +10,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -22,8 +21,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkLibraryAliquotPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkLibraryAliquotPage.LibraryAliquotColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkLibraryPage;
@@ -32,6 +29,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.SamColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTableSaveResult;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.TestUtils;
 
 public class PlainSampleITs extends AbstractIT {
 
@@ -282,10 +280,10 @@ public class PlainSampleITs extends AbstractIT {
     slugs.add("pool/1");
     final Set<String> urlSlugs = Collections.unmodifiableSet(slugs);
 
-    String errors = urlSlugs.stream()
-        .filter(slug -> AbstractPage.checkForErrors(getDriver(), getBaseUrl(), slug))
-        .collect(Collectors.joining("\n"));
-    if (!LimsUtils.isStringEmptyOrNull(errors)) throw new IllegalArgumentException("Errors on PLAIN sample page(s): " + errors);
+    long errors = urlSlugs.stream()
+        .filter(slug -> TestUtils.checkForErrors(getDriver(), getBaseUrl(), slug))
+        .count();
+    assertEquals(0L, errors);
 
   }
 }
