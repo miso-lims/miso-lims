@@ -8,6 +8,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.NotesSection;
 
 public class LibraryPage extends FormPage<LibraryPage.Field> {
@@ -79,6 +80,10 @@ public class LibraryPage extends FormPage<LibraryPage.Field> {
 
   public NotesSection<LibraryPage> getNotesSection() {
     return notesSection;
+  }
+
+  public DataTable getChangeLogTable() {
+    return new DataTable(getDriver(), "changelog_wrapper");
   }
 
 }
