@@ -29,7 +29,7 @@ public class PoolPageIT extends AbstractIT {
 
   @Before
   public void setup() {
-    loginAdmin();
+    login();
   }
 
   @Test

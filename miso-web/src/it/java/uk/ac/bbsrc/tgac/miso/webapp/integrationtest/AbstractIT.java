@@ -109,6 +109,12 @@ public abstract class AbstractIT {
     return sessionFactory.openSession();
   }
 
+  protected final void login() {
+    LoginPage loginPage = LoginPage.get(getDriver(), getBaseUrl());
+    HomePage homePage = loginPage.loginValidUser("user", "user");
+    assertNotNull(homePage);
+  }
+
   protected final void loginAdmin() {
     LoginPage loginPage = LoginPage.get(getDriver(), getBaseUrl());
     HomePage homePage = loginPage.loginValidUser("admin", "admin");

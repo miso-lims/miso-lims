@@ -2,6 +2,13 @@
 DROP TRIGGER IF EXISTS BeforeInsertPool;
 
 SET FOREIGN_KEY_CHECKS=0;
+DELETE FROM Submission_Experiment;
+DELETE FROM Submission;
+DELETE FROM ExperimentChangeLog;
+DELETE FROM Experiment_Run_Partition;
+DELETE FROM Experiment;
+DELETE FROM DetailedLibraryTemplate;
+DELETE FROM LibraryTemplate;
 DELETE FROM Transfer_Sample;
 DELETE FROM Transfer_Library;
 DELETE FROM Transfer_LibraryAliquot;
@@ -103,6 +110,7 @@ DELETE FROM InstrumentModel;
 DELETE FROM StudyChangeLog;
 DELETE FROM Study;
 DELETE FROM SampleNumberPerProject;
+DELETE FROM Subproject;
 DELETE FROM ProjectChangeLog;
 DELETE FROM Project;
 DELETE FROM ReferenceGenome;
@@ -114,4 +122,6 @@ DELETE FROM _Group;
 DELETE FROM StorageLocation;
 DELETE FROM StorageLocationMap;
 DELETE FROM RunPurpose;
+DELETE FROM AttachmentCategory;
+DELETE FROM StainCategory;
 SET FOREIGN_KEY_CHECKS=1;

@@ -38,7 +38,7 @@ public class BulkLibraryQCIT extends AbstractIT {
 
   @Before
   public void setup() {
-    loginAdmin();
+    login();
   }
 
   private BulkQCPage getEditPage(List<Long> ids) {

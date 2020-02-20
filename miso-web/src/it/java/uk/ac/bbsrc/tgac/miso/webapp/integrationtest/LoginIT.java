@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.HeaderFooterPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.HomePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.LoginPage;
 
@@ -16,6 +17,14 @@ public class LoginIT extends AbstractIT {
   public void setup() {
     page = LoginPage.get(getDriver(), getBaseUrl());
     assertNotNull(page);
+  }
+
+  @Test
+  public void testVersion() {
+    HeaderFooterPage page = LoginPage.get(getDriver(), getBaseUrl());
+    String text = page.getFooterText();
+    assertNotNull(text);
+    assertTrue("Version number in footer", text.matches(".*Version: .*\\d+\\.\\d+\\.\\d+.*"));
   }
 
   @Test

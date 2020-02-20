@@ -208,7 +208,12 @@ Urls = (function() {
   var kitDescriptorUiBase = baseUrl + '/kitdescriptor';
   ui.kitDescriptors = {
     edit: idUrlFunction(kitDescriptorUiBase)
-  }
+  };
+
+  var kitDescriptorRestBase = restBase + '/kitdescriptors';
+  rest.kitDescriptors = {
+    updateTargetedSequencings: middleIdUrlFunction(kitDescriptorRestBase, '/targetedsequencing')
+  };
 
   // Labs
   var labRestBase = restBase + '/labs';
@@ -612,7 +617,9 @@ Urls = (function() {
   var targetedSequencingRestBase = restBase + '/targetedsequencings';
   rest.targetedSequencings = {
     create: targetedSequencingRestBase,
-    update: idUrlFunction(targetedSequencingRestBase)
+    update: idUrlFunction(targetedSequencingRestBase),
+    kitAvailableDatatable: middleIdUrlFunction(targetedSequencingRestBase + '/dt/kit', '/available'),
+    kitIncludedDatatable: middleIdUrlFunction(targetedSequencingRestBase + '/dt/kit', '/included')
   };
 
   // Tissue Materials

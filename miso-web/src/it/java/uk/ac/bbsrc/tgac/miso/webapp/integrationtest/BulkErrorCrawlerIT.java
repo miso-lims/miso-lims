@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.TestUtils;
@@ -14,6 +13,8 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.TestUtils;
 public class BulkErrorCrawlerIT extends AbstractIT {
   
   private static final Set<String> urlSlugs;
+  private static final Set<String> adminSlugs;
+
   static {
     Set<String> slugs = new HashSet<>();
     // Misc pages
@@ -88,9 +89,6 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("experiments");
     slugs.add("submissions");
 
-    slugs.add("admin/users");
-    slugs.add("admin/groups");
-
     // Form pages
     slugs.add("project/new");
     slugs.add("project/1");
@@ -127,28 +125,25 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("array/1");
     slugs.add("arrayrun/new");
     slugs.add("arrayrun/1");
-    slugs.add("instrument/new");
     slugs.add("instrument/1");
 
     slugs.add("freezer/new");
     slugs.add("freezer/3");
+    slugs.add("librarytemplate/1");
     slugs.add("kitdescriptor/new");
     slugs.add("kitdescriptor/1");
-    slugs.add("indexfamily/new");
     slugs.add("indexfamily/1");
-    slugs.add("qctype/new");
     slugs.add("qctype/102");
-    slugs.add("instrumentmodel/new");
     slugs.add("instrumentmodel/1");
     slugs.add("sampleclass/new");
     slugs.add("sampleclass/1");
 
     slugs.add("study/new");
     slugs.add("study/1");
-    slugs.add("admin/user/new");
-    slugs.add("admin/user/1");
-    slugs.add("admin/group/new");
-    slugs.add("admin/group/1");
+    slugs.add("experiment/1");
+    slugs.add("submission/new?experimentIds=1");
+    slugs.add("submission/1");
+    slugs.add("user/3");
 
     // Bulk pages
     slugs.add("sample/bulk/new?quantity=5&projectId=&sampleClassId=15");
@@ -169,9 +164,11 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("box/bulk/new?quantity=5");
     slugs.add("box/bulk/edit?ids=500%2C501");
 
+    slugs.add("librarytemplate/bulk/edit?ids=1");
     slugs.add("index/bulk/edit?ids=1%2C2%2C3%2C4");
     slugs.add("qctype/bulk/edit?ids=102%2C103");
     slugs.add("attachmentcategories/bulk/new?quantity=3");
+    slugs.add("attachmentcategories/bulk/edit?ids=1%2C2%2C3");
     slugs.add("sampletype/bulk/new?quantity=3");
     slugs.add("sampletype/bulk/edit?ids=1%2C2");
     slugs.add("librarytype/bulk/new?quantity=3");
@@ -218,9 +215,11 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("samplepurpose/bulk/new?quantity=3");
     slugs.add("samplepurpose/bulk/edit?ids=10%2C9");
     slugs.add("subproject/bulk/new?quantity=3");
+    slugs.add("subproject/bulk/edit?ids=1%2C2%2C3");
     slugs.add("stain/bulk/new?quantity=3");
     slugs.add("stain/bulk/edit?ids=1%2C2");
     slugs.add("staincategory/bulk/new?quantity=3");
+    slugs.add("staincategory/bulk/edit?ids=1%2C2%2C3");
     slugs.add("detailedqcstatus/bulk/new?quantity=3");
     slugs.add("detailedqcstatus/bulk/edit?ids=1%2C2");
     slugs.add("librarydesigncode/bulk/new?quantity=3");
@@ -228,16 +227,36 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("librarydesign/bulk/new?quantity=3");
 
     urlSlugs = Collections.unmodifiableSet(slugs);
-  }
 
-  @Before
-  public void setup() {
-    loginAdmin();
+    // admin-only pages
+    Set<String> moreSlugs = new HashSet<>();
+    moreSlugs.add("instrumentmodel/new");
+    moreSlugs.add("qctype/new");
+    moreSlugs.add("indexfamily/new");
+    moreSlugs.add("instrument/new");
+    moreSlugs.add("admin/users");
+    moreSlugs.add("admin/groups");
+    moreSlugs.add("admin/user/new");
+    moreSlugs.add("admin/user/1");
+    moreSlugs.add("admin/group/new");
+    moreSlugs.add("admin/group/1");
+
+    adminSlugs = Collections.unmodifiableSet(moreSlugs);
   }
 
   @Test
-  public void testForStacktracesOnPages() {
+  public void testPages() {
+    login();
     long errors = urlSlugs.stream()
+        .filter(slug -> TestUtils.checkForErrors(getDriver(), getBaseUrl(), slug))
+        .count();
+    assertEquals(0L, errors);
+  }
+
+  @Test
+  public void testAdminPages() {
+    loginAdmin();
+    long errors = adminSlugs.stream()
         .filter(slug -> TestUtils.checkForErrors(getDriver(), getBaseUrl(), slug))
         .count();
     assertEquals(0L, errors);

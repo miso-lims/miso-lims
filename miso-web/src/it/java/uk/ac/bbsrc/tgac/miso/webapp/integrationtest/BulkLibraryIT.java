@@ -65,7 +65,7 @@ public class BulkLibraryIT extends AbstractIT {
 
   @Before
   public void setup() {
-    loginAdmin();
+    login();
   }
 
   @Test

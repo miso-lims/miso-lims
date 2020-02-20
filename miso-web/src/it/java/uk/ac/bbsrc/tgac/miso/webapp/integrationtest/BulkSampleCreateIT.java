@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -77,11 +76,6 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
   private static final Set<String> singleCellAliquotColumns = Sets.newHashSet(SamColumns.INPUT_INTO_LIBRARY, SamColumns.PARENT_NG_USED,
       SamColumns.PARENT_VOLUME_USED);
-
-  @Before
-  public void setup() {
-    loginAdmin();
-  }
 
   private BulkSamplePage getCreatePage(Integer quantity, Long projectId, Long sampleClassId) {
     return BulkSamplePage.getForCreate(getDriver(), getBaseUrl(), quantity, projectId, sampleClassId);

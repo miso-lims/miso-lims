@@ -1,14 +1,20 @@
-INSERT INTO `User` (`userId`, `active`, `admin`, `fullName`, `internal`, `loginName`, `roles`, `password`, `email`) VALUES
-(1,1,1,'admin',1,'admin','ROLE_ADMIN,ROLE_INTERNAL','{SHA-1}d033e22ae348aeb5660fc2140aec35850c4da997','admin@admin'),
-(3,1,0,'user',1,'user','ROLE_INTERNAL','user','user@user.user');
+INSERT INTO User (userId, active, admin, fullName, internal, loginName, roles, password, email) VALUES
+(1,1,1,'admin',1,'admin','ROLE_ADMIN,ROLE_INTERNAL','{SHA-1}d033e22ae348aeb5660fc2140aec35850c4da997','admin@admin'), -- password 'admin'
+(3,1,0,'user',1,'user','ROLE_INTERNAL','{bcrypt}$2a$10$vqYii//w2shSZnt/4uNyIeeU4FGQIB4QJeisv9l16xVRQ1lTOghIO','user@user.user'); -- password 'user'
+
+INSERT INTO AttachmentCategory(categoryId, alias) VALUES
+(1, 'Submission Forms'),
+(2, 'Tapestation'),
+(3, 'Fragment Analyzer');
 
 INSERT INTO RunPurpose(purposeId, alias) VALUES
 (1, 'Production'),
 (2, 'QC');
 
-INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (1, 'Human hg19 random');
-INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (2, 'Human hg19');
-INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (3, 'Human hg18 random');
+INSERT INTO ReferenceGenome (referenceGenomeId, alias) VALUES
+(1, 'Human hg19 random'),
+(2, 'Human hg19'),
+(3, 'Human hg18 random');
 
 INSERT INTO SampleClass (sampleClassId, alias, sampleCategory, sampleSubcategory, suffix, dnaseTreatable, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 'Identity',             'Identity',          NULL,                    NULL,  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
@@ -106,9 +112,14 @@ INSERT INTO Lab(labId, alias, instituteId, createdBy, creationDate, updatedBy, l
 (1, 'BioBank', 1, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
 (2, 'Pathology', 1, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00');
 
+INSERT INTO StainCategory(stainCategoryId, name) VALUES
+(1, 'One'),
+(2, 'Two'),
+(3, 'Three');
+
 INSERT INTO Stain (stainId, name, stainCategoryId) VALUES
-(1, 'Cresyl Violet', NULL),
-(2, 'Hematoxylin+Eosin', NULL);
+(1, 'Cresyl Violet', 1),
+(2, 'Hematoxylin+Eosin', 2);
 
 INSERT INTO SamplePurpose (samplePurposeId, alias, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 'CNV',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00'),
@@ -123,7 +134,7 @@ INSERT INTO SamplePurpose (samplePurposeId, alias, createdBy, creationDate, upda
 (10, 'WGA',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00'),
 (11, 'Ion Torrent',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00');
 
-INSERT INTO `DetailedQcStatus` (DetailedQcStatusId, status, description, noteRequired, createdBy, creationDate, updatedBy, lastUpdated) VALUES
+INSERT INTO DetailedQcStatus (DetailedQcStatusId, status, description, noteRequired, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1,TRUE,  'Ready',                  0,1,'2016-09-26 15:55:44',1,'2016-09-26 15:55:44'),
 (2,TRUE,  'OKd by Collaborator',    1,1,'2016-09-26 15:55:44',1,'2016-09-26 15:55:44'),
 (4,NULL,  'Waiting: Path Report',   0,1,'2016-09-26 15:55:44',1,'2016-09-26 15:55:44'),
@@ -253,15 +264,15 @@ INSERT INTO TargetedSequencing_KitDescriptor (targetedSequencingId, kitDescripto
 INSERT INTO BoxUse (boxUseId, alias) VALUES 
 (1, 'DNA'), (2, 'RNA'), (3, 'Libraries'), (4, 'Sequencing'), (5, 'Storage'), (6, 'Tissue');
 
-INSERT INTO BoxSize (boxSizeId, `boxSizeRows`, `boxSizeColumns`, `scannable`) VALUES
+INSERT INTO BoxSize (boxSizeId, boxSizeRows, boxSizeColumns, scannable) VALUES
 (1, 8, 12, 1),
 (2, 10, 10, 0);
 
-INSERT INTO `_Group` (groupId, description, name) VALUES
+INSERT INTO _Group (groupId, description, name) VALUES
 (1, 'TestGroup1', 'TestGroup1'),
 (2, 'TestGroup2', 'TestGroup2');
 
-INSERT INTO `User_Group` (`users_userId`, `groups_groupId`)
+INSERT INTO User_Group (users_userId, groups_groupId)
 VALUES (3,1),(3,2),(1,1);
 
 INSERT INTO IndexFamily (indexFamilyId, name, platformType) VALUES
@@ -364,6 +375,7 @@ INSERT INTO Project(projectId, name, alias, shortName, created, description, sta
   (3, 'PRO3', 'Test Data', 'TEST', '2017-06-27', 'integration test project three', 'ACTIVE', 1, '2017-06-27 14:12:00', 1, 1),
   (4, 'PRO4', 'Project To Change', 'DELTA', '2017-08-04', 'integration test project for changing fields', 'PROPOSED', 2, '2017-08-04 15:12:00', 1, 1),
   (5, 'PRO5', 'Search Tables Project', 'SRCH', '2017-10-10', 'integration test project five', 'ACTIVE', 1, '2017-10-10 10:10:10', 1, 1),
+  (6, 'PRO6', 'Subprojects', 'SUBP', '2020-02-20', 'integration test project six', 'ACTIVE', 1, '2020-02-20 11:32:00', 1, 1),
   (100001, 'PRO100001', 'BulkLibraryIT', 'LIBT', '2017-07-24', 'bulk library test project', 'ACTIVE', 1, '2017-07-24 16:11:00', 1, 1),
   (110001, 'PRO110001', 'SingleLibraryIT', '1LIB', '2017-08-16', 'single library test project', 'ACTIVE', 1, '2017-08-16 16:11:00', 1, 1),
   (120001, 'PRO120001', 'SinglePoolIT', '1IPO', '2017-08-22', 'single pool test project', 'ACTIVE', 1, '2017-08-22 16:35:00', 1, 1),
@@ -375,11 +387,17 @@ INSERT INTO Project(projectId, name, alias, shortName, created, description, sta
   (4440, 'PRO4440', 'Propagate Samples', 'PROP', '2017-10-26', 'propagate samples', 'ACTIVE', 1, '2017-10-26 14:20:00', 1, 1),
   (2200, 'PRO2200', 'Update Via QC', 'UQC', '2018-07-10', 'update via qc', 'ACTIVE', 1, '2018-07-10 12:52:00', 1, 1);
 
+INSERT INTO Subproject(subprojectId, projectId, alias, referenceGenomeId, description, priority, createdBy, creationDate, updatedBy, lastUpdated) VALUES
+(1, 6, 'Subproject 1', 1, 'test subproject one', TRUE, 1, '2020-02-20 11:35:00', 1, '2020-02-20 11:35:00'),
+(2, 6, 'Subproject 2', 1, 'test subproject two', TRUE, 1, '2020-02-20 11:35:00', 1, '2020-02-20 11:35:00'),
+(3, 6, 'Subproject 3', 1, 'test subproject three', TRUE, 1, '2020-02-20 11:35:00', 1, '2020-02-20 11:35:00');
+  
 INSERT INTO SampleNumberPerProject(projectId, highestSampleNumber, padding, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (100001, 1, 4, 1, '2017-10-11 15:33:00', 1, '2017-10-11 15:33:00');
 
 INSERT INTO Study (studyId, name, project_projectId, alias, studyTypeId, creator, created, lastModifier, lastModified) VALUES
 (1, 'STU1', 1, 'Study One', 1, 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
+(3, 'STU3', 3, 'Study Three', 1, 1, '2020-02-20 11:53:00', 1, '2020-02-20 11:53:00'),
 (400, 'STU400', 400, 'UI Test Study', 1, 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00');
 
 INSERT INTO Sample (sampleId, name, alias, description, identificationBarcode, sampleType, project_projectId,
@@ -512,7 +530,7 @@ INSERT INTO Identity (sampleId, externalName, donorSex, consentLevel) VALUES
   (501, 'TIB_identity_1', 'UNKNOWN', 'THIS_PROJECT'),
   (4441, 'PROP_identity_1', 'UNKNOWN', 'THIS_PROJECT');
 
-INSERT INTO `SampleTissue` (sampleId, tissueOriginId, tissueTypeId, secondaryIdentifier, labId, region, passageNumber, tubeNumber, timesReceived, tissueMaterialId) VALUES
+INSERT INTO SampleTissue (sampleId, tissueOriginId, tissueTypeId, secondaryIdentifier, labId, region, passageNumber, tubeNumber, timesReceived, tissueMaterialId) VALUES
   (2, 1, 1, 'tube 1', 2, 'cortex', NULL, 1, 1, 2),
   (100002, 2, 2, NULL, NULL, NULL, NULL, 1, 1, NULL),
   (110002, 2, 2, NULL, NULL, NULL, NULL, 1, 1, NULL),
@@ -527,15 +545,15 @@ INSERT INTO SampleTissueProcessing(sampleId) VALUES
 (3),(4),(5),
 (4443), (4444);
 
-INSERT INTO `SampleSlide` (sampleId, initialSlides, slides) VALUES
+INSERT INTO SampleSlide (sampleId, initialSlides, slides) VALUES
 (3, 15, 15),
 (4443, 3, 3);
 
-INSERT INTO `SampleTissuePiece` (sampleId, tissuePieceType, slidesConsumed) VALUES
+INSERT INTO SampleTissuePiece (sampleId, tissuePieceType, slidesConsumed) VALUES
 (5, 1, 10),
 (4444, 1, 1);
 
-INSERT INTO `SampleStock` (sampleId, strStatus, dnaseTreated) VALUES
+INSERT INTO SampleStock (sampleId, strStatus, dnaseTreated) VALUES
 (6, 'SUBMITTED', 0),
 (7, 'NOT_SUBMITTED', 0),
 (10, 'PASS', 0),
@@ -549,7 +567,7 @@ INSERT INTO `SampleStock` (sampleId, strStatus, dnaseTreated) VALUES
 (4445, 'NOT_SUBMITTED', 0),
 (4446, 'NOT_SUBMITTED', 1);
 
-INSERT INTO `SampleAliquot` (sampleId, samplePurposeId) VALUES
+INSERT INTO SampleAliquot (sampleId, samplePurposeId) VALUES
 (8, 9),
 (9, 3),
 (11, 4),
@@ -921,7 +939,7 @@ INSERT INTO SequencerPartitionContainer (containerId, identificationBarcode, seq
 (5101, 'POOL_COMPLETED_ORDER', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
 (6001, 'CHANGEABLE', 1, 1, 1, '2017-10-03 14:45', '2017-10-03 14:45');
 
-INSERT INTO `_Partition` (partitionId, partitionNumber, pool_poolId) VALUES
+INSERT INTO _Partition (partitionId, partitionNumber, pool_poolId) VALUES
 (11, 1, 1),(12, 2, NULL),(13, 3, NULL),(14, 4, NULL),
 (21, 1, NULL),(22, 2, NULL),(23, 3, NULL),(24, 4, NULL),(25, 5, NULL),(26, 6, NULL),(27, 7, NULL),(28, 8, NULL),
 (5101, 1, NULL),(5102, 2, NULL),(5103, 3, NULL),(5104, 4, NULL),(5105, 5, NULL),(5106, 6, NULL),(5107, 7, NULL),(5108, 8, NULL),
@@ -1084,8 +1102,8 @@ INSERT INTO Run_Partition (runId, partitionId, purposeId, lastModifier) VALUES
 (5101, 51018, 1, 1);
 
 INSERT INTO Note(noteId, creationDate, internalOnly, text, owner_userId) VALUES
-  (1, '2017-08-22', 1, 'LIB110005 existing note', 1),
-  (2, '2017-08-25', 1, 'IPO120001 existing note', 1);
+  (1, '2017-08-22', 1, 'LIB110005 existing note', 3),
+  (2, '2017-08-25', 1, 'IPO120001 existing note', 3);
 
 INSERT INTO Library_Note(library_libraryId, notes_noteId) VALUES
   (110005, 1);
@@ -1153,6 +1171,24 @@ INSERT INTO StorageLocation(locationId, locationUnit, parentLocationId, alias, c
 (1, 'ROOM', NULL, 'Room One', 1, '2019-05-22 13:10:00', 1, '2019-05-22 13:10:00'),
 (2, 'ROOM', NULL, 'Room Two', 1, '2019-05-22 13:10:00', 1, '2019-05-22 13:10:00'),
 (3, 'FREEZER', 1, 'Freezer One', 1, '2019-05-22 13:10:00', 1, '2019-05-22 13:10:00');
+
+INSERT INTO LibraryTemplate(libraryTemplateId, alias, defaultVolume, platformType, libraryTypeId, librarySelectionTypeId, libraryStrategyTypeId, kitDescriptorId, indexFamilyId, volumeUnits) VALUES
+(1, 'TestLibTemp', 12.34, 'ILLUMINA', 1, 3, 5, 1, NULL, 'MICROLITRES');
+
+INSERT INTO DetailedLibraryTemplate(libraryTemplateId, libraryDesignId, libraryDesignCodeId) VALUES
+(1, 3, 6);
+
+INSERT INTO Experiment(experimentId, name, title, alias, study_studyId, instrumentModelId, library_libraryId, creator, created, lastModifier, lastModified) VALUES
+(1, 'EXP1', 'Experiment One', 'Experiment One', 3, 2, 1, 1, '2020-02-20 11:47:00', 1, '2020-02-20 11:47:00');
+
+INSERT INTO Experiment_Run_Partition(experiment_experimentId, run_runId, partition_partitionId) VALUES
+(1, 1, 11);
+
+INSERT INTO Submission(submissionId, title, alias, creationDate) VALUES
+(1, 'Submission One', 'Submission One', '2020-02-20');
+
+INSERT INTO Submission_Experiment(submission_submissionId, experiments_experimentId) VALUES
+(1, 1);
 
 -- SampleHierarchy needs repopulated because everything is not created in expected order in test data
 -- (parent SampleTissue and Identity records aren't always created before childrens' DetailedSample records)

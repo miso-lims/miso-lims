@@ -36,7 +36,7 @@ public class ContainerPageIT extends AbstractIT {
 
   @Before
   public void setup() {
-    loginAdmin();
+    login();
   }
 
   @Test

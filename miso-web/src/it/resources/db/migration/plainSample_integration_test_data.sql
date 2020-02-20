@@ -1,15 +1,15 @@
-INSERT INTO `User` (`userId`, `active`, `admin`, `fullName`, `internal`, `loginName`, `roles`, `password`, `email`) VALUES
-(1,1,1,'admin',1,'admin','ROLE_ADMIN,ROLE_INTERNAL','{SHA-1}d033e22ae348aeb5660fc2140aec35850c4da997','admin@admin'),
-(3,1,0,'user',1,'user','ROLE_INTERNAL','user','user@user.user');
+INSERT INTO User (userId, active, admin, fullName, internal, loginName, roles, password, email) VALUES
+(1,1,1,'admin',1,'admin','ROLE_ADMIN,ROLE_INTERNAL','{SHA-1}d033e22ae348aeb5660fc2140aec35850c4da997','admin@admin'), -- password 'admin'
+(3,1,0,'user',1,'user','ROLE_INTERNAL','{bcrypt}$2a$10$vqYii//w2shSZnt/4uNyIeeU4FGQIB4QJeisv9l16xVRQ1lTOghIO','user@user.user'); -- password 'user'
 
-INSERT INTO `_Group` (groupId, description, name) VALUES
+INSERT INTO _Group (groupId, description, name) VALUES
 (1, 'TestGroup1', 'TestGroup1'),
 (2, 'TestGroup2', 'TestGroup2');
 
-INSERT INTO `User_Group` (`users_userId`, `groups_groupId`)
+INSERT INTO User_Group (users_userId, groups_groupId)
 VALUES (3,1),(3,2),(1,1);
 
-INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (1, 'Triticum aestivum');
+INSERT INTO ReferenceGenome (referenceGenomeId, alias) VALUES (1, 'Triticum aestivum');
 
 INSERT INTO QCType (name, description, qcTarget, units, archived, precisionAfterDecimal) VALUES
 ('RIN', 'RIN', 'Sample', ' ', 0, 1),
@@ -88,7 +88,7 @@ INSERT INTO KitDescriptor (kitDescriptorId, name, version, manufacturer, partNum
 INSERT INTO BoxUse (boxUseId, alias) VALUES
 (1, 'DNA'), (2, 'RNA'), (3, 'Libraries'), (4, 'Sequencing'), (5, 'Storage'), (6, 'Tissue');
 
-INSERT INTO BoxSize (boxSizeId, `boxSizeRows`, `boxSizeColumns`, `scannable`) VALUES
+INSERT INTO BoxSize (boxSizeId, boxSizeRows, boxSizeColumns, scannable) VALUES
 (1, 8, 12, 1),
 (2, 10, 10, 0);
 

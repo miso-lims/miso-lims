@@ -12,7 +12,6 @@ import java.util.function.Function;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
-import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,11 +34,6 @@ public class BulkSampleQCIT extends AbstractBulkSampleIT {
 
   private static final Set<String> qcColumns = Sets.newHashSet(QcColumns.SAMPLE_ALIAS, QcColumns.DATE, QcColumns.TYPE,
       QcColumns.INSTRUMENT, QcColumns.KIT_LOT, QcColumns.RESULT, QcColumns.UNITS, QcColumns.DESCRIPTION);
-
-  @Before
-  public void setup() {
-    loginAdmin();
-  }
 
   private BulkQCPage getEditPage(List<Long> ids) {
     return BulkQCPage.getForEditSample(getDriver(), getBaseUrl(), ids, 0);

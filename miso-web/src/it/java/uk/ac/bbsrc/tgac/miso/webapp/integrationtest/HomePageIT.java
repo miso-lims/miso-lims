@@ -16,7 +16,7 @@ public class HomePageIT extends AbstractIT {
 
   @Before
   public void setup() {
-    loginAdmin();
+    login();
     page = HomePage.get(getDriver(), getBaseUrl());
     assertNotNull(page);
   }

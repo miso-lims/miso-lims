@@ -8,6 +8,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Map;
 
+import org.junit.Before;
+
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
@@ -53,6 +55,11 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   protected static final long singleCellClassId = 25;
   protected static final long singleCellStockClassId = 26;
   protected static final long singleCellAliquotClassId = 27;
+
+  @Before
+  public void setup() {
+    login();
+  }
 
   protected void saveSingleAndAssertSuccess(HandsOnTable table) {
     HandsOnTableSaveResult result = table.save();

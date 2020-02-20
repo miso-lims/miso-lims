@@ -52,8 +52,8 @@
 
     <c:if test="${kitDescriptor.id != 0}">
       <c:if test="${kitDescriptor.kitType.key == 'Library'}">
-        <miso:list-section id="list_associated_ts" name="Associated Targeted Sequencings" target="targetedsequencing" alwaysShow="true" items="${associatedTargetedSequencings}" config="{kitDescriptorId: ${kitDescriptor.id}}" />
-        <miso:list-section-ajax id="list_available_ts" name="Available Targeted Sequencings" target="targetedsequencing" config="{kitDescriptorId: ${kitDescriptor.id}, add: true}" />
+        <miso:list-section id="list_associated_ts" name="Associated Targeted Sequencings" target="targetedsequencing" alwaysShow="true" items="${associatedTargetedSequencings}" config="{isAdmin: ${miso:isAdmin()}, kitDescriptorId: ${kitDescriptor.id}}" />
+        <miso:list-section-ajax id="list_available_ts" name="Available Targeted Sequencings" target="targetedsequencing" config="{isAdmin: ${miso:isAdmin()}, kitDescriptorId: ${kitDescriptor.id}, add: true}" />
       </c:if>
       <miso:changelog item="${kitDescriptor}"/>
     </c:if>
