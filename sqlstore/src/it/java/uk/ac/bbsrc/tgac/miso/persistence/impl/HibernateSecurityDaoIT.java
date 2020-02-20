@@ -171,7 +171,7 @@ public class HibernateSecurityDaoIT extends AbstractDAOTest {
   @Test
   public void testSaveGroupNew() throws IOException {
     Group group = new Group();
-    String name = "testgroup";
+    String name = "new group";
     group.setName(name);
     group.setDescription("test group");
     Set<User> users = new HashSet<>();
