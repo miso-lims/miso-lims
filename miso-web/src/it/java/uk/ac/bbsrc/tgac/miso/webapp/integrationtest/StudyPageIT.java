@@ -16,7 +16,7 @@ public class StudyPageIT extends AbstractIT {
 
   @Before
   public void setup() {
-    loginAdmin();
+    login();
   }
 
   private StudyPage getStudyPage(Long studyId, Long projectId) {

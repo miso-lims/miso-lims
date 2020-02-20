@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.Sets;
@@ -43,11 +42,6 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
 
   private static final Set<String> tissuePieceColumns = Sets.newHashSet(SamColumns.PIECE_TYPE, SamColumns.SLIDES_CONSUMED,
       SamColumns.REFERENCE_SLIDE);
-
-  @Before
-  public void setup() {
-    loginAdmin();
-  }
 
   private BulkSamplePage getEditPage(List<Long> ids) {
     return BulkSamplePage.getForEdit(getDriver(), getBaseUrl(), ids);

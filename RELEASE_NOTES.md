@@ -3,7 +3,10 @@
 Changes:
 
   * Added library aliquot alias to downloadable library aliquot tracking list
+  * Removed add/remove targeted sequencing buttons from Edit Kit Descriptor page for non-admin
+    users
   * Fixed an issue where Run Scanner could add more containers to a run than should be allowed
+  * Fixed Edit QC Type page failing to load for non-admin users
 
 # 0.2.202
 

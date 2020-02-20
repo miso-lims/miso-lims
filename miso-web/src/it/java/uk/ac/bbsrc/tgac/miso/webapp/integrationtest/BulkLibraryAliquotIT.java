@@ -39,7 +39,7 @@ public class BulkLibraryAliquotIT extends AbstractIT {
 
   @Before
   public void setup() {
-    loginAdmin();
+    login();
   }
 
   @Test

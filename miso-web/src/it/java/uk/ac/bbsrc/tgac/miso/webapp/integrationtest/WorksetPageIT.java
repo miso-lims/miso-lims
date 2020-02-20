@@ -21,7 +21,7 @@ public class WorksetPageIT extends AbstractIT {
 
   @Before
   public void setup() {
-    loginAdmin();
+    login();
   }
 
   private WorksetPage getWorksetPage(Long id) {

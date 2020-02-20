@@ -29,7 +29,7 @@ public class BoxPageIT extends AbstractIT {
 
   @Before
   public void setup() {
-    loginAdmin();
+    login();
   }
 
   private BoxPage getBoxPage(Long boxId) {

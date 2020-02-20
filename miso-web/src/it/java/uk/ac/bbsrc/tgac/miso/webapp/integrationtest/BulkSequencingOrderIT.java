@@ -25,7 +25,7 @@ public class BulkSequencingOrderIT extends AbstractIT {
 
   @Before
   public void setup() {
-    loginAdmin();
+    login();
   }
 
   @Test

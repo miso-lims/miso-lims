@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.Sets;
@@ -51,11 +50,6 @@ public class PlainSampleITs extends AbstractIT {
       LibraryAliquotColumns.CONCENTRATION_UNITS, LibraryAliquotColumns.VOLUME, LibraryAliquotColumns.VOLUME_UNITS,
       LibraryAliquotColumns.NG_USED, LibraryAliquotColumns.VOLUME_USED, LibraryAliquotColumns.CREATION_DATE);
 
-  @Before
-  public void setup() {
-    loginAdmin();
-  }
-
   @Override
   protected boolean isDetailedSampleMode() {
     return false;
@@ -65,6 +59,7 @@ public class PlainSampleITs extends AbstractIT {
   public void testCreatePlainSampleSetup() {
     // Goal: ensure all expected fields are present and no extra, and that dropdowns appear as expected
     // (dropdowns do not render properly when table is broken)
+    login();
     BulkSamplePage page = BulkSamplePage.getForCreate(getDriver(), getBaseUrl(), 2, 1L, null);
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
@@ -81,6 +76,7 @@ public class PlainSampleITs extends AbstractIT {
   @Test
   public void testCreateOnePlainSampleNoProject() throws Exception {
     // Goal: ensure one sample can be saved
+    login();
     BulkSamplePage page = BulkSamplePage.getForCreate(getDriver(), getBaseUrl(), 1, null, null);
     HandsOnTable table = page.getTable();
 
@@ -115,6 +111,7 @@ public class PlainSampleITs extends AbstractIT {
   public void testCreatePlainLibrarySetup() {
     // Goal: ensure all expected fields are present and no extra and that dropdowns appear as expected
     // (dropdowns do not render properly when table is broken)
+    login();
     BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(1L), Arrays.asList(1));
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
@@ -141,6 +138,7 @@ public class PlainSampleITs extends AbstractIT {
   @Test
   public void testPropagateOnePlainLibrary() {
     // Goal: ensure one library can be saved
+    login();
     BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(1L), Arrays.asList(1));
     HandsOnTable table = page.getTable();
 
@@ -171,6 +169,7 @@ public class PlainSampleITs extends AbstractIT {
 
   @Test
   public void testReceiveLibrary() {
+    login();
     BulkLibraryPage page = BulkLibraryPage.getForReceive(getDriver(), getBaseUrl(), 1, null, null);
     HandsOnTable table = page.getTable();
 
@@ -212,6 +211,7 @@ public class PlainSampleITs extends AbstractIT {
   public void testCreatePlainLibraryAliquotSetup() {
     // Goal: ensure all expected fields are present and no extra and that data can be entered in date field
     // (date field cannot be entered when table is broken)
+    login();
     BulkLibraryAliquotPage page = BulkLibraryAliquotPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(1L));
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
@@ -227,6 +227,7 @@ public class PlainSampleITs extends AbstractIT {
   @Test
   public void testCreateOnePlainLibraryAliquot() {
     // Goal: ensure one library aliquot can be saved
+    login();
     BulkLibraryAliquotPage page = BulkLibraryAliquotPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(1L));
     HandsOnTable table = page.getTable();
 
@@ -251,8 +252,6 @@ public class PlainSampleITs extends AbstractIT {
   @Test
   public void testNoErrorsOnPages() {
     Set<String> slugs = new HashSet<>();
-    slugs.add("admin/users");
-    slugs.add("admin/groups");
     slugs.add("mainMenu");
     slugs.add("myAccount");
     slugs.add("projects");
@@ -280,10 +279,25 @@ public class PlainSampleITs extends AbstractIT {
     slugs.add("pool/1");
     final Set<String> urlSlugs = Collections.unmodifiableSet(slugs);
 
+    login();
     long errors = urlSlugs.stream()
         .filter(slug -> TestUtils.checkForErrors(getDriver(), getBaseUrl(), slug))
         .count();
     assertEquals(0L, errors);
-
   }
+
+  @Test
+  public void testNoErrorsOnAdminPages() {
+    Set<String> slugs = new HashSet<>();
+    slugs.add("admin/users");
+    slugs.add("admin/groups");
+    final Set<String> urlSlugs = Collections.unmodifiableSet(slugs);
+
+    loginAdmin();
+    long errors = urlSlugs.stream()
+        .filter(slug -> TestUtils.checkForErrors(getDriver(), getBaseUrl(), slug))
+        .count();
+    assertEquals(0L, errors);
+  }
+
 }

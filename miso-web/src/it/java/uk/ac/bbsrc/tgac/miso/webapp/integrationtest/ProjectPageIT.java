@@ -26,7 +26,7 @@ public class ProjectPageIT extends AbstractIT {
 
   @Before
   public void setup() {
-    loginAdmin();
+    login();
   }
 
   private ProjectPage getProjectPage(Long projectId) {

@@ -7,7 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage;
@@ -15,11 +14,6 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.SamColum
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 
 public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
-
-  @Before
-  public void setup() {
-    loginAdmin();
-  }
 
   private BulkSamplePage getPropagatePage(List<Long> parentIds, Integer quantity, Long sampleClassId) {
     return BulkSamplePage.getForPropagate(getDriver(), getBaseUrl(), parentIds, Arrays.asList(quantity), sampleClassId);

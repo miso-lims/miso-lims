@@ -80,14 +80,22 @@ FormTarget.qctype = (function($) {
       data: 'instrumentModelId',
       type: 'read-only',
       getDisplayValue: function(qcType) {
-        return Utils.array.findUniqueOrThrow(Utils.array.idPredicate(qcType.instrumentModelId), Constants.instrumentModels).alias;
+        if (qcType.instrumentModelId) {
+          return Utils.array.findUniqueOrThrow(Utils.array.idPredicate(qcType.instrumentModelId), Constants.instrumentModels).alias;
+        } else {
+          return 'n/a';
+        }
       }
     }, {
       title: 'Kit',
       data: 'kitDescriptorId',
       type: 'read-only',
       getDisplayValue: function(qcType) {
-        return Utils.array.findUniqueOrThrow(Utils.array.idPredicate(qcType.kitDescriptorId), Constants.kitDescriptors).name;
+        if (qcType.kitDescriptorId) {
+          return Utils.array.findUniqueOrThrow(Utils.array.idPredicate(qcType.kitDescriptorId), Constants.kitDescriptors).name;
+        } else {
+          return 'n/a';
+        }
       }
     }, {
       title: 'Archived',
