@@ -25,14 +25,14 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.HomePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.LoginPage;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.TestRunner;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(TestRunner.class)
 @ContextConfiguration("/it-context.xml")
 public abstract class AbstractIT {
 
