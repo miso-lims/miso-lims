@@ -2,7 +2,7 @@
 
 Changes:
 
-
+  * Added library aliquot alias to downloadable library aliquot tracking list
 
 # 0.2.202
 
