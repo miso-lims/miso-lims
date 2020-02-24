@@ -30,11 +30,11 @@ ListTarget.run_position = {
     actions.push({
       name: "Remove",
       action: function(containers) {
-        Utils.ajaxWithDialog('Removing', 'POST', '/miso/rest/runs/' + config.runId + '/remove', containers.map(Utils.array.getId),
+        Utils.ajaxWithDialog('Removing', 'POST', Urls.rest.runs.removeContainers(config.runId), containers.map(Utils.array.getId),
             Utils.page.pageReload);
       }
     });
-    actions.push(HotUtils.spreadsheetAction('/miso/rest/containers/spreadsheet', Constants.partitionSpreadsheets, function(containers,
+    actions.push(HotUtils.spreadsheetAction(Urls.rest.containers.spreadsheet, Constants.partitionSpreadsheets, function(containers,
         spreadsheet) {
       return [];
     }));
@@ -46,7 +46,8 @@ ListTarget.run_position = {
     }, Constants.platformTypes);
     var getPlatformPositions = function() {
       var instrumentModel = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(config.instrumentModelId), Constants.instrumentModels);
-      return (instrumentModel.positions && instrumentModel.positions.length) ? instrumentModel.positions.map(Utils.array.getAlias).sort() : [null];
+      return (instrumentModel.positions && instrumentModel.positions.length) ? instrumentModel.positions.map(Utils.array.getAlias).sort()
+          : [null];
     }
     return [{
       "name": "Add " + platformType.containerName,
@@ -69,7 +70,7 @@ ListTarget.run_position = {
           label: "Serial Number",
           property: "barcode"
         }], function(results) {
-          Utils.ajaxWithDialog('Adding ' + platformType.containerName, 'POST', '/miso/rest/runs/' + config.runId + '/add?'
+          Utils.ajaxWithDialog('Adding ' + platformType.containerName, 'POST', Urls.rest.runs.addContainer(config.runId) + '?'
               + jQuery.param({
                 position: results.position,
                 barcode: results.barcode
@@ -91,15 +92,15 @@ ListTarget.run_position = {
       }
     }, ListUtils.labelHyperlinkColumn("ID", Urls.ui.containers.edit, Utils.array.getId, "id", 1, true),
         ListUtils.labelHyperlinkColumn("Serial Number", Urls.ui.containers.edit, Utils.array.getId, "identificationBarcode", 1, true), {
-      sTitle: "Model",
-      mData: "containerModel.alias",
-      include: true
-    }, {
-      sTitle: "Last Modified",
-      mData: "lastModified",
-      include: true,
-      iSortPriority: 2
-    }];
+          sTitle: "Model",
+          mData: "containerModel.alias",
+          include: true
+        }, {
+          sTitle: "Last Modified",
+          mData: "lastModified",
+          include: true,
+          iSortPriority: 2
+        }];
   },
   searchTermSelector: function(searchTerms) {
     return [searchTerms['created'], searchTerms['changed'], searchTerms['creator'], searchTerms['changedby'], searchTerms['platform'],

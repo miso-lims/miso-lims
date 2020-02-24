@@ -95,7 +95,8 @@ Urls = (function() {
   var containerRestBase = restBase + '/containers';
   rest.containers = {
     create: containerRestBase,
-    update: idUrlFunction(containerRestBase)
+    update: idUrlFunction(containerRestBase),
+    spreadsheet: containerRestBase + '/spreadsheet'
   };
 
   // Container Models
@@ -434,7 +435,9 @@ Urls = (function() {
     platformDatatable: idUrlFunction(runRestBase + '/dt/platform'),
     setPartitionQcs: middleIdUrlFunction(runRestBase, '/qc'),
     setPartitionPurposes: middleIdUrlFunction(runRestBase, '/partition-purposes'),
-    setAliquotPurposes: middleIdUrlFunction(runRestBase, '/aliquot-purposes')
+    setAliquotPurposes: middleIdUrlFunction(runRestBase, '/aliquot-purposes'),
+    addContainer: middleIdUrlFunction(runRestBase, '/add'),
+    removeContainers: middleIdUrlFunction(runRestBase, '/remove')
   };
 
   // Run Purposes
