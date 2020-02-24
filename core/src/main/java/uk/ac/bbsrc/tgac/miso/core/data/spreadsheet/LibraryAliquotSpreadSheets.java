@@ -18,6 +18,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 public enum LibraryAliquotSpreadSheets implements Spreadsheet<LibraryAliquot> {
   TRACKING_LIST("Tracking List", //
       Column.forString("Name", LibraryAliquot::getName), //
+      Column.forString("Alias", LibraryAliquot::getAlias), //
       Column.forString("Barcode", LibraryAliquot::getIdentificationBarcode), //
       Column.forString("Library Name", libraryAliquot -> libraryAliquot.getLibrary().getName()), //
       Column.forString("Library Alias", libraryAliquot -> libraryAliquot.getLibrary().getAlias()), //

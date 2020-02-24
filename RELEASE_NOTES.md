@@ -2,6 +2,7 @@
 
 Changes:
 
+  * Added library aliquot alias to downloadable library aliquot tracking list
   * Fixed an issue where Run Scanner could add more containers to a run than should be allowed
 
 # 0.2.202
