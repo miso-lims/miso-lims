@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -36,6 +37,8 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 @ContextConfiguration("/it-context.xml")
 public abstract class AbstractIT {
 
+  public static final TimeZone EASTERN_TIME_ZONE = TimeZone.getTimeZone("Canada/Eastern");
+
   private static final String SCRIPT_DIR = System.getProperty("basedir") + "/src/it/resources/db/migration/";
   private static final String CLEAR_DATA_SCRIPT = "clear_test_data.sql";
   private static final String PLAIN_SCRIPT = "plainSample_integration_test_data.sql";
@@ -52,6 +55,7 @@ public abstract class AbstractIT {
 
   @BeforeClass
   public static final void setupAbstractClass() {
+    TimeZone.setDefault(EASTERN_TIME_ZONE);
     WebDriverManager.chromedriver().setup();
   }
 
@@ -60,8 +64,7 @@ public abstract class AbstractIT {
     ChromeOptions opts = new ChromeOptions();
     opts.setHeadless(true);
     // large width is important so that all columns of handsontables get rendered
-    // sandboxing doesn't work in container-based environments and causes occasional Chrome crashes
-    opts.addArguments("--disable-gpu", "--window-size=4000x1440", "--no-sandbox");
+    opts.addArguments("--disable-gpu", "--window-size=4000x1440");
     LoggingPreferences loggingPrefs = new LoggingPreferences();
     loggingPrefs.enable(LogType.BROWSER, Level.ALL);
     opts.setCapability(CapabilityType.LOGGING_PREFS, loggingPrefs);

@@ -24,12 +24,13 @@ public class TimestampConversionIT extends AbstractIT {
 
   @Before
   public void setup() {
-    TimeZone.setDefault(TimeZone.getTimeZone("Canada/Eastern"));
     login();
   }
 
   @Test
-  public void verifyDatabaseTimezone() {
+  public void verifyConfiguredTimezones() {
+    assertEquals(EASTERN_TIME_ZONE, TimeZone.getDefault());
+
     Object[] results = (Object[]) getSession().createSQLQuery("SELECT @@session.time_zone, @@system_time_zone")
         .addScalar("@@session.time_zone", StringType.INSTANCE)
         .addScalar("@@system_time_zone", StringType.INSTANCE)
