@@ -76,8 +76,8 @@ public class ServiceRecordPageIT extends AbstractIT {
     fields.put(Field.SERVICED_BY, "technician1");
     fields.put(Field.REFERENCE_NUMBER, "12345");
     fields.put(Field.SERVICE_DATE, "2017-09-05");
-    fields.put(Field.START_TIME, "2017-09-01 10:00:00");
-    fields.put(Field.END_TIME, "2017-09-05 10:00:00");
+    fields.put(Field.START_TIME, "2017-09-01 06:00:00");
+    fields.put(Field.END_TIME, "2017-09-05 06:00:00");
     assertFieldValues("initial values", fields, page1);
     
     Map<ServiceRecordPage.Field, String> changes = Maps.newLinkedHashMap();
@@ -148,9 +148,9 @@ public class ServiceRecordPageIT extends AbstractIT {
     fields.put(Field.SERVICED_BY, "technitchin");
     fields.put(Field.REFERENCE_NUMBER, "Riffraff");
     fields.put(Field.SERVICE_DATE, "2017-09-12");
-    fields.put(Field.START_TIME, "2017-09-11 11:00:00");
+    fields.put(Field.START_TIME, "2017-09-11 07:00:00");
     fields.put(Field.OUT_OF_SERVICE, "true");
-    fields.put(Field.END_TIME, "2017-09-12 12:00:00");
+    fields.put(Field.END_TIME, "2017-09-12 08:00:00");
     assertFieldValues("initial values", fields, page1);
 
     Map<ServiceRecordPage.Field, String> changes = Maps.newLinkedHashMap();
