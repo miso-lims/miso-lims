@@ -33,7 +33,6 @@ public class DataTable extends AbstractElement {
   private final WebElement table;
   private final WebElement toolbar;
   private final List<WebElement> columnHeaders;
-  private final List<String> columnHeadings;
   private final WebElement searchBar;
   private final WebElement searchBarDiv;
   private final WebElement processing;
@@ -45,9 +44,6 @@ public class DataTable extends AbstractElement {
     this.table = tableWrapper.findElement(tableSelector);
     this.toolbar = findElementIfExists(By.xpath(".//div[@id='" + tableWrapperId + "']/preceding::div[contains(@class, 'fg-toolbar')][1]"));
     this.columnHeaders = table.findElements(columnHeadingsSelector).stream().collect(Collectors.toList());
-    this.columnHeadings = columnHeaders.stream()
-        .map(element -> element.getText().trim())
-        .collect(Collectors.toList());
     this.searchBar = tableWrapper.findElement(searchBarSelector);
     this.searchBarDiv = tableWrapper.findElement(searchBarDivSelector);
     this.processing = tableWrapper.findElement(processingSelector);
@@ -58,7 +54,9 @@ public class DataTable extends AbstractElement {
   }
 
   public List<String> getColumnHeadings() {
-    return Lists.newArrayList(columnHeadings);
+    return columnHeaders.stream()
+        .map(element -> element.getText().trim())
+        .collect(Collectors.toList());
   }
 
   public List<String> getSortableColumnHeadings() {
@@ -109,7 +107,7 @@ public class DataTable extends AbstractElement {
   }
 
   private WebElement getHeader(String columnHeading) {
-    int colNum = columnHeadings.indexOf(columnHeading);
+    int colNum = getColumnHeadings().indexOf(columnHeading);
     if (colNum == -1) {
       throw new IllegalArgumentException("Column " + columnHeading + " doesn't exist");
     }
@@ -130,7 +128,7 @@ public class DataTable extends AbstractElement {
   }
 
   private WebElement getCell(String columnHeading, int rowNum) {
-    int colNum = columnHeadings.indexOf(columnHeading);
+    int colNum = getColumnHeadings().indexOf(columnHeading);
     if (colNum == -1) {
       throw new IllegalArgumentException("Column " + columnHeading + " doesn't exist");
     }
@@ -151,7 +149,10 @@ public class DataTable extends AbstractElement {
     if (table.findElements(rowSelector).isEmpty()) {
       return Stream.empty();
     }
-    int colNum = columnHeadings.indexOf(columnHeading);
+    int colNum = getColumnHeadings().indexOf(columnHeading);
+    if (colNum == -1) {
+      throw new IllegalArgumentException("Column '" + columnHeading + "' not found in table");
+    }
     return table.findElements(rowSelector).stream()
         .map(row -> {
           if (row == null) return null;

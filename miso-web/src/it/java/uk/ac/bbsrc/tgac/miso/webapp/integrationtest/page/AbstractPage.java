@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page;
 import static org.openqa.selenium.support.ui.ExpectedConditions.stalenessOf;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -118,4 +119,11 @@ public abstract class AbstractPage extends AbstractElement {
     waitForPageRefresh(html);
     return getCurrentUrl();
   }
+
+  protected List<String> getDialogText() {
+    return getDriver().findElements(By.cssSelector("#dialog p")).stream()
+        .map(WebElement::getText)
+        .collect(Collectors.toList());
+  }
+
 }

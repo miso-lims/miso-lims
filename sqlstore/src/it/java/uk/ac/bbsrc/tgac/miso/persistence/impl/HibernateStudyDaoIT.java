@@ -155,6 +155,12 @@ public class HibernateStudyDaoIT extends AbstractDAOTest {
     testSearch(PaginationFilter.user("admin", false));
   }
 
+  @Test
+  public void testGetUsage() throws Exception {
+    Study study = (Study) currentSession().get(StudyImpl.class, 1L);
+    assertEquals(25L, dao.getUsage(study));
+  }
+
   /**
    * Verifies Hibernate mappings by ensuring that no exception is thrown by a search
    * 

@@ -1,6 +1,40 @@
 INSERT INTO User (userId, active, admin, fullName, internal, loginName, roles, password, email) VALUES
 (1,1,1,'admin',1,'admin','ROLE_ADMIN,ROLE_INTERNAL','{SHA-1}d033e22ae348aeb5660fc2140aec35850c4da997','admin@admin'), -- password 'admin'
-(3,1,0,'user',1,'user','ROLE_INTERNAL','{bcrypt}$2a$10$vqYii//w2shSZnt/4uNyIeeU4FGQIB4QJeisv9l16xVRQ1lTOghIO','user@user.user'); -- password 'user'
+(3,1,0,'user',1,'user','ROLE_INTERNAL','{bcrypt}$2a$10$vqYii//w2shSZnt/4uNyIeeU4FGQIB4QJeisv9l16xVRQ1lTOghIO','user@user.user'), -- password 'user'
+(4,1,0,'Harry Henderson', 1, 'hhenderson', 'ROLE_INTERNAL', '{bcrypt}$2a$10$vqYii//w2shSZnt/4uNyIeeU4FGQIB4QJeisv9l16xVRQ1lTOghIO', 'hhenderson@somewhere.maybe');
+
+INSERT INTO TissuePieceType (tissuePieceTypeId, abbreviation, name, archived) VALUES
+(1, 'LCM' , 'LCM Tube', FALSE),
+(2, 'UNU', 'Unused', FALSE);
+
+INSERT INTO PartitionQCType(partitionQcTypeId, description, noteRequired, orderFulfilled, analysisSkipped) VALUES
+(1, 'OK', FALSE, TRUE, FALSE),
+(2, 'Failed: Instrument Problem', FALSE, FALSE, TRUE),
+(3, 'Failed: Sasquatch Problem', TRUE, FALSE, TRUE);
+
+INSERT INTO StudyType (typeId, name) VALUES
+(1,'Other'),
+(12,'RNASeq'),
+(11,'Population Genomics'),
+(10,'Cancer Genomics'),
+(9,'Gene Regulation Study'),
+(8,'Forensic or Paleo-genomics'),
+(7,'Synthetic Genomics'),
+(6,'Epigenetics'),
+(5,'Resequencing'),
+(4,'Transcriptome Analysis'),
+(3,'Metagenomics'),
+(2,'Whole Genome Sequencing');
+
+INSERT INTO SampleType (typeId, name) VALUES
+(2,'NON GENOMIC'),
+(1,'GENOMIC'),
+(5,'OTHER'),
+(4,'VIRAL RNA'),
+(3,'SYNTHETIC'),
+(6,'TRANSCRIPTOMIC'),
+(7,'METAGENOMIC'),
+(8,'METATRANSCRIPTOMIC');
 
 INSERT INTO AttachmentCategory(categoryId, alias) VALUES
 (1, 'Submission Forms'),
@@ -9,12 +43,14 @@ INSERT INTO AttachmentCategory(categoryId, alias) VALUES
 
 INSERT INTO RunPurpose(purposeId, alias) VALUES
 (1, 'Production'),
-(2, 'QC');
+(2, 'QC'),
+(3, 'Unused');
 
 INSERT INTO ReferenceGenome (referenceGenomeId, alias) VALUES
 (1, 'Human hg19 random'),
 (2, 'Human hg19'),
-(3, 'Human hg18 random');
+(3, 'Human hg18 random'),
+(4, 'Sasquatch sg12 random');
 
 INSERT INTO SampleClass (sampleClassId, alias, sampleCategory, sampleSubcategory, suffix, dnaseTreatable, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 'Identity',             'Identity',          NULL,                    NULL,  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
@@ -35,7 +71,8 @@ INSERT INTO SampleClass (sampleClassId, alias, sampleCategory, sampleSubcategory
 (21, 'cDNA (aliquot)',      'Aliquot',           NULL,                    'D_',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
 (25, 'Single Cell',         'Tissue Processing', 'Single Cell',           'SC',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
 (26, 'Single Cell DNA (stock)',   'Stock',       'Single Cell (stock)',   'D_S', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(27, 'Single Cell DNA (aliquot)', 'Aliquot',     'Single Cell (aliquot)', 'D_',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00');
+(27, 'Single Cell DNA (aliquot)', 'Aliquot',     'Single Cell (aliquot)', 'D_',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(28, 'Unused', 'Aliquot', NULL, NULL, 0, 1, '2020-02-28 20:08:00', 1, '2020-02-28 20:08:00');
 
 INSERT INTO SampleValidRelationship (parentId, childId, createdBy, creationDate, updatedBy, lastUpdated, archived) VALUES
 ( 8, 11, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00', 0),
@@ -76,18 +113,21 @@ INSERT INTO SampleValidRelationship (parentId, childId, createdBy, creationDate,
 (23, 24, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00', 0),
 (23, 25, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00', 0),
 (25, 26, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00', 0),
-(26, 27, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00', 0);
+(26, 27, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00', 0),
+(11, 28, 1, '2020-02-28 20:08:00', 1, '2020-02-28 20:08:00', 0);
 
 INSERT INTO TissueMaterial(tissueMaterialId, alias, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 'Fresh Frozen', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
 (2, 'FFPE', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(3, 'Blood', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00');
+(3, 'Blood', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(4, 'Fur', 1, '2020-02-28 20:11:00', 1, '2020-02-28 20:11:00');
 
 INSERT INTO TissueOrigin(tissueOriginId, alias, description, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 'Bn', 'Brain', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
 (2, 'Ly', 'Lymphocyte', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
 (3, 'Pa', 'Pancreas', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(4, 'nn', 'Unknown', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00');
+(4, 'nn', 'Unknown', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(5, 'Bf', 'Big Foot', 1, '2020-02-28 20:41:00', 1, '2020-02-28 20:41:00');
 
 INSERT INTO TissueType(tissueTypeId, alias, description, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 'R','Reference or non-tumour, non-diseased tissue sample. Typically used as a donor-specific comparison to a diseased tissue, usually a cancer',1,'2016-09-26 15:55:43',1,'2016-09-26 15:55:43'),
@@ -106,11 +146,14 @@ INSERT INTO TissueType(tissueTypeId, alias, description, createdBy, creationDate
 (14, 'n','Unknown',1,'2017-05-29 20:02:03',1,'2017-05-29 20:02:03');
 
 INSERT INTO Institute(instituteId, alias, createdBy, creationDate, updatedBy, lastUpdated) VALUES
-(1, 'University Health Network',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00');
+(1, 'University Health Network',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00'),
+(2, 'Almost Unused Institute', 3, '2020-02-28 16:01:00', 3, '2020-02-28 16:01:00'),
+(3, 'Unused Institute', 3, '2020-02-28 16:01:00', 3, '2020-02-28 16:01:00');
 
 INSERT INTO Lab(labId, alias, instituteId, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 'BioBank', 1, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(2, 'Pathology', 1, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00');
+(2, 'Pathology', 1, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(3, 'Unused Lab', 2, 3, '2020-02-28 16:01:00', 3, '2020-02-28 16:01:00');
 
 INSERT INTO StainCategory(stainCategoryId, name) VALUES
 (1, 'One'),
@@ -119,7 +162,8 @@ INSERT INTO StainCategory(stainCategoryId, name) VALUES
 
 INSERT INTO Stain (stainId, name, stainCategoryId) VALUES
 (1, 'Cresyl Violet', 1),
-(2, 'Hematoxylin+Eosin', 2);
+(2, 'Hematoxylin+Eosin', 2),
+(3, 'Unused', 2);
 
 INSERT INTO SamplePurpose (samplePurposeId, alias, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 'CNV',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00'),
@@ -221,7 +265,8 @@ INSERT INTO LibraryDesignCode (libraryDesignCodeId, code, description) VALUES
   (7, 'WG','Whole Genome'),
   (8, 'WT','Whole Transcriptome'),
   (16,'TR','Total RNA'),
-  (17, 'SC', 'Single Cell');
+  (17, 'SC', 'Single Cell'),
+  (18, 'UN', 'Unused');
 
 INSERT INTO LibraryDesign (libraryDesignId, name, sampleClassId, librarySelectionType, libraryStrategyType, libraryDesignCodeId) VALUES
   (1, 'WG',                   15, 3, 1, 7),
@@ -241,11 +286,13 @@ INSERT INTO LibraryDesign (libraryDesignId, name, sampleClassId, librarySelectio
   (16,'WT',                   20,11,19, 8),
   (17,'TR',                   17,11,19,16),
   (18,'Single Cell',          27, 1,19,17),
-  (19,'Single Cell CNV',      27, 2, 1,17);
+  (19,'Single Cell CNV',      27, 2, 1,17),
+  (20,'Unused',               27, 2, 1,17);
 
 INSERT INTO LibrarySpikeIn(spikeInId, alias) VALUES
   (1, 'Spike-In One'),
-  (2, 'Spike-In Two');
+  (2, 'Spike-In Two'),
+  (3, 'Unused Spike-In');
 
 INSERT INTO KitDescriptor (kitDescriptorId, name, version, manufacturer, partNumber, kitType, platformType, creator, created, lastModifier, lastModified) VALUES
   (1, 'Test Kit', 1, 'TestCo', '123', 'LIBRARY', 'ILLUMINA', 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
@@ -266,19 +313,22 @@ INSERT INTO BoxUse (boxUseId, alias) VALUES
 
 INSERT INTO BoxSize (boxSizeId, boxSizeRows, boxSizeColumns, scannable) VALUES
 (1, 8, 12, 1),
-(2, 10, 10, 0);
+(2, 10, 10, 0),
+(3, 3, 3, 0);
 
 INSERT INTO _Group (groupId, description, name) VALUES
 (1, 'TestGroup1', 'TestGroup1'),
-(2, 'TestGroup2', 'TestGroup2');
+(2, 'TestGroup2', 'TestGroup2'),
+(3, 'DeleteGroup', 'DeleteGroup');
 
 INSERT INTO User_Group (users_userId, groups_groupId)
-VALUES (3,1),(3,2),(1,1);
+VALUES (3,1),(3,2),(1,1),(1,3),(4,3);
 
 INSERT INTO IndexFamily (indexFamilyId, name, platformType) VALUES
   (1, 'Single Index 6bp', 'ILLUMINA'),
   (2, 'Dual Index 6bp', 'ILLUMINA'),
-  (3, 'Similar Index Pair', 'ILLUMINA');
+  (3, 'Similar Index Pair', 'ILLUMINA'),
+  (4, 'Unused Family', 'ILLUMINA');
 
 INSERT INTO Indices (indexId, indexFamilyId, name, sequence, position) VALUES
   (1,  1, 'Index 01', 'AAAAAA', 1),
@@ -294,13 +344,18 @@ INSERT INTO Indices (indexId, indexFamilyId, name, sequence, position) VALUES
   (11, 2, 'B03',      'GGGCCC', 2),
   (12, 2, 'B04',      'TTTAAA', 2),
   (13, 3, 'Index 01', 'AAAAAC', 1),
-  (14, 3, 'Index 02', 'AAAAGT', 1);
+  (14, 3, 'Index 02', 'AAAAGT', 1),
+  (15, 4, 'A01', 'AAAAAA', 1),
+  (16, 4, 'A02', 'CCCCCC', 1),
+  (17, 4, 'B01', 'GGGGGG', 2),
+  (18, 4, 'B02', 'TTTTTT', 2);
 
 INSERT INTO InstrumentModel (instrumentModelId, platform, alias, numContainers, instrumentType) VALUES
   (1, 'ILLUMINA', 'Illumina HiSeq 2500', 1, 'SEQUENCER'),
   (2, 'ILLUMINA', 'Illumina MiSeq', 1, 'SEQUENCER'),
   (3, 'PACBIO', 'PacBio RS II', 1, 'SEQUENCER'),
-  (4, 'ILLUMINA', 'Illumina iScan', 1, 'ARRAY_SCANNER');
+  (4, 'ILLUMINA', 'Illumina iScan', 1, 'ARRAY_SCANNER'),
+  (5, 'ILLUMINA', 'Deletable', 1, 'OTHER');
   
 INSERT INTO SequencingParameters (parametersId, name, instrumentModelId, readLength, readLength2, createdBy, updatedBy, creationDate, lastUpdated, chemistry) VALUES
   (1, 'Custom (see notes)', 3, 0, 0, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', NULL),
@@ -354,7 +409,8 @@ INSERT INTO Instrument (instrumentId, name, instrumentModelId, defaultPurposeId)
   (1, 'T2000', 1, 1),
   (2, 'TMS1', 2, 1),
   (3, 'TPB2', 3, 1),
-  (4, 'iScan1', 4, NULL);
+  (4, 'iScan1', 4, NULL),
+  (5, 'Deletable', 4, NULL);
   
 INSERT INTO Instrument (instrumentId, name, instrumentModelId, serialNumber, dateCommissioned, dateDecommissioned, upgradedInstrumentId, defaultPurposeId) VALUES
   (100, 'HiSeq_100', 1, '100', '2017-01-01', NULL, NULL, 1),
@@ -376,6 +432,7 @@ INSERT INTO Project(projectId, name, alias, shortName, created, description, sta
   (4, 'PRO4', 'Project To Change', 'DELTA', '2017-08-04', 'integration test project for changing fields', 'PROPOSED', 2, '2017-08-04 15:12:00', 1, 1),
   (5, 'PRO5', 'Search Tables Project', 'SRCH', '2017-10-10', 'integration test project five', 'ACTIVE', 1, '2017-10-10 10:10:10', 1, 1),
   (6, 'PRO6', 'Subprojects', 'SUBP', '2020-02-20', 'integration test project six', 'ACTIVE', 1, '2020-02-20 11:32:00', 1, 1),
+  (7, 'PRO7', 'Please Delete Me', 'GSLE', '2020-02-25', 'project to delete', 'ACTIVE', 1, '2020-02-25 19:18:00', 3, 3),
   (100001, 'PRO100001', 'BulkLibraryIT', 'LIBT', '2017-07-24', 'bulk library test project', 'ACTIVE', 1, '2017-07-24 16:11:00', 1, 1),
   (110001, 'PRO110001', 'SingleLibraryIT', '1LIB', '2017-08-16', 'single library test project', 'ACTIVE', 1, '2017-08-16 16:11:00', 1, 1),
   (120001, 'PRO120001', 'SinglePoolIT', '1IPO', '2017-08-22', 'single pool test project', 'ACTIVE', 1, '2017-08-22 16:35:00', 1, 1),
@@ -413,7 +470,7 @@ scientificName, volume, volumeUnits, qcPassed, lastModifier, creator, created, l
 (9, 'SAM9', 'TEST_0001_Bn_R_nn_1-1_R_1', 'whole RNA aliquot', '99999', 'GENOMIC', 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
 (10, 'SAM10', 'TEST_0001_Bn_R_nn_1-1_D_S2', 'cDNA stock', '10101', 'GENOMIC', 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
 (11, 'SAM11', 'TEST_0001_Bn_R_nn_1-1_D_2', 'cDNA aliquot', '11011', 'GENOMIC', 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
-(12, 'SAM12', 'TEST_0001_Bn_R_nn_1-1_R_1_SM_1', 'smRNA', '12121', 'GENOMIC', 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
+(12, 'SAM12', 'TEST_0001_Bn_R_nn_1-1_R_1_SM_1', 'smRNA', '12121', 'GENOMIC', 3, 'Homo sapiens', NULL, NULL, 1, 1, 3, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
 (13, 'SAM13', 'TEST_0001_Bn_R_nn_1-1_R_1_MR_1', 'mRNA', '13131', 'GENOMIC', 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
 (14, 'SAM14', 'TEST_0001_Bn_R_nn_1-1_R_1_WT_1', 'rRNA_depleted', '14141', 'GENOMIC', 3, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
 (501, 'SAM501', 'TIB_0001', NULL, NULL, 'GENOMIC', 500, 'Homo sapiens', NULL, NULL, 1, 1, 1, '2017-08-15 13:45:00', '2017-08-15 13:45:00'),
@@ -602,7 +659,7 @@ INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, 
     1, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00', 1, 300, 5.0, 2.75, NULL, 1, 0, 'MICROLITRES', 'NANOGRAMS_PER_MICROLITRE',
     NULL, NULL, NULL),
   (100001, 'LIB100001', 'LIBT_0001_Ly_P_PE_251_WG', 'libbar100001', 'libdesc100001', 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
-    1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 0,    251,  2.5,  10, NULL, 1, 0, 'MICROLITRES', 'NANOGRAMS_PER_MICROLITRE',
+    3, '2017-07-24 16:11:00', 3, '2017-07-24 16:11:00', 0,    251,  2.5,  10, NULL, 1, 0, 'MICROLITRES', 'NANOGRAMS_PER_MICROLITRE',
     1, 'TEN', 12.34),
   (100002, 'LIB100002', 'LIBT_0001_Ly_P_PE_252_WG', 'libbar100002', 'libdesc100002', 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 0,    252,  4,    6.3, NULL, 1, 0, 'MICROLITRES', 'NANOGRAMS_PER_MICROLITRE',
@@ -768,7 +825,7 @@ INSERT INTO Library_Index(library_libraryId, index_indexId) VALUES
 
 INSERT INTO LibraryAliquot (aliquotId, name, alias, concentration, concentrationUnits, libraryId, identificationBarcode, creationDate, creator, lastModifier, lastUpdated, volumeUsed) VALUES
 (1, 'LDI1', 'TEST_0001_Bn_R_PE_300_WG', 5.9, 'NANOGRAMS_PER_MICROLITRE', 1, '12321', '2017-07-20', 1, 1, '2017-07-20 09:01:00', NULL),
-(304, 'LDI304', 'DILT_0001_nn_n_PE_304_WG', 7.97, 'NANOGRAMS_PER_MICROLITRE', 304, '300304', '2017-08-14', 1, 1, '2017-08-14 12:25:00', NULL),
+(304, 'LDI304', 'DILT_0001_nn_n_PE_304_WG', 7.97, 'NANOGRAMS_PER_MICROLITRE', 304, '300304', '2017-08-14', 3, 3, '2017-08-14 12:25:00', NULL),
 (305, 'LDI305', 'DILT_0001_nn_n_PE_305_WG', 7.97, 'NANOGRAMS_PER_MICROLITRE', 305, '300305', '2017-08-14', 1, 1, '2017-08-14 12:25:00', NULL),
 (120001, 'LDI120001', '1IPO_0001_Ly_P_PE_251_WG', 4, 'NANOGRAMS_PER_MICROLITRE', 120001, NULL, '2017-08-15', 1, 1, '2017-08-15 09:01:00', NULL),
 (120002, 'LDI120002', '1IPO_0001_Ly_P_PE_252_WG', 4, 'NANOGRAMS_PER_MICROLITRE', 120002, NULL, '2017-08-15', 1, 1, '2017-08-15 09:01:00', NULL),
@@ -837,7 +894,7 @@ INSERT INTO Pool (poolId, concentration, concentrationUnits, volume, volumeUnits
 (5103, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO5103', 'POOL_WITH_ORDERS', 'ipobar5103', 'sergeant', '2017-09-27', 'ILLUMINA', 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
 (5104, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO5104', 'POOL_WITH_COMPLETED_ORDERS', 'ipobar5104', 'mission accomplished', '2017-09-27', 'ILLUMINA', 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
 (5105, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO5105', 'POOL_NOT_READY', 'ipobar5105', 'unprepared', '2017-09-27', 'ILLUMINA', 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
-(701, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO701', 'TEST_POOLING_ALIQUOTS', 'ipobar701', 'test pool', '2017-10-17', 'ILLUMINA', 1, 1, '2017-10-17 10:00:00', '2017-10-17 10:00:00', NULL),
+(701, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO701', 'TEST_POOLING_ALIQUOTS', 'ipobar701', 'test pool', '2017-10-17', 'ILLUMINA', 3, 3, '2017-10-17 10:00:00', '2017-10-17 10:00:00', NULL),
 (702, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO702', 'TEST_REMOVING_ALIQUOTS', 'ipobar702', 'test pool', '2017-10-17', 'ILLUMINA', 1, 1, '2017-10-17 10:00:00', '2017-10-17 10:00:00', NULL),
 (801, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO801', 'TEST_NO_INDEX_WARNING', 'ipobar801', 'no indices', '2018-06-22', 'ILLUMINA', 1, 1, '2018-06-22 10:15:00', '2018-06-22', NULL),
 (802, 4, 'NANOGRAMS_PER_MICROLITRE', 4, 'MICROLITRES', 'IPO802', 'TEST_SIMILAR_INDEX_WARNING', 'ipobar802', 'similar index', '2018-06-22', 'ILLUMINA', 1, 1, '2018-06-22 10:15:00', '2018-06-22', NULL),
@@ -887,7 +944,7 @@ INSERT INTO SequencingOrder (sequencingOrderId, poolId, partitions, parametersId
 INSERT INTO PoolOrder (poolOrderId, alias, description, purposeId, parametersId, partitions, draft, poolId, sequencingOrderId, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 'Pool Order One', 'first pool order', 2, 3, 1, FALSE, NULL, NULL, 1, '2019-07-24 16:15:00', 1, '2019-07-24 16:15:00'),
 (2, 'Pool Order Two', 'second pool order', 1, 2, 2, FALSE, 802, 6, 1, '2019-07-24 16:15:00', 1, '2019-07-24 16:15:00'),
-(3, 'Pool Order Three', NULL, 1, NULL, NULL, FALSE, NULL, NULL, 1, '2019-07-24 16:15:00', 1, '2019-07-24 16:15:00');
+(3, 'Pool Order Three', NULL, 1, NULL, NULL, FALSE, NULL, NULL, 3, '2019-07-24 16:15:00', 3, '2019-07-24 16:15:00');
 
 INSERT INTO PoolOrder_LibraryAliquot (poolOrderId, aliquotId, proportion) VALUES
 (1, 1001, 1),
@@ -900,7 +957,7 @@ INSERT INTO Box (boxId, boxSizeId, boxUseId, name, alias, lastModifier, creator,
 (1, 1, 1, 'BOX1', 'First Box', 1, 1, '2017-07-20 13:01:01', '2017-07-20 13:01:01'),
 (2, 1, 1, 'BOX2', 'Boxxy', 1, 1, '2018-08-30 15:15:00', '2018-08-30 15:15:00'),
 (500, 1, 1, 'BOX500', 'Tubes In Boxes Test', 1, 1, '2017-08-15 13:55:00', '2017-08-15 13:55:00'),
-(501, 1, 1, 'BOX501', 'Second box for Tubes in Boxes test', 1, 1, '2017-08-16 16:40:00', '2017-08-16 16:40:00'),
+(501, 1, 1, 'BOX501', 'Second box for Tubes in Boxes test', 3, 3, '2017-08-16 16:40:00', '2017-08-16 16:40:00'),
 (502, 1, 1, 'BOX502', 'Editable box', 1, 1, '2017-08-16 16:40:00', '2017-08-16 16:40:00'),
 (100001, 1, 1, 'BOX100001', 'Bulk Boxables Test', 1, 1, '2017-12-19 15:04:00', '2017-12-19 15:04:00');
 
@@ -937,7 +994,7 @@ INSERT INTO SequencerPartitionContainer (containerId, identificationBarcode, seq
 (5010, 'FAIL_LANE_TO_PASS', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
 (5100, 'SEARCH_POOLS', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
 (5101, 'POOL_COMPLETED_ORDER', 2, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
-(6001, 'CHANGEABLE', 1, 1, 1, '2017-10-03 14:45', '2017-10-03 14:45');
+(6001, 'CHANGEABLE', 1, 3, 3, '2017-10-03 14:45', '2017-10-03 14:45');
 
 INSERT INTO _Partition (partitionId, partitionNumber, pool_poolId) VALUES
 (11, 1, 1),(12, 2, NULL),(13, 3, NULL),(14, 4, NULL),
@@ -971,7 +1028,7 @@ INSERT INTO SequencerPartitionContainer_Partition (container_containerId, partit
 
 INSERT INTO Run (runId, name, alias, instrumentId, startDate, completionDate, health, creator, created, lastModifier, lastModified) VALUES
 (1, 'RUN1', 'MiSeq_Run_1', 2, '2017-08-02', '2017-08-03', 'Completed', 1, '2017-08-02 10:03:02', 1, '2017-08-03 10:03:02'),
-(2, 'RUN2', 'PacBio_Run_1', 3, '2017-08-01', NULL, 'Running', 1, '2017-08-01 10:03:02', 1, '2017-08-01 10:03:02');
+(2, 'RUN2', 'PacBio_Run_1', 3, '2017-08-01', NULL, 'Running', 3, '2017-08-01 10:03:02', 3, '2017-08-01 10:03:02');
 
 INSERT INTO Run (runId, name, alias, instrumentId, sequencingParameters_parametersId, description, filePath, startDate, completionDate, health, creator, created, lastModifier, lastModified) VALUES
 (5001, 'RUN5001', 'Change_Values_Run', 5002, 2, 'description', '/filePath', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
@@ -1112,35 +1169,41 @@ INSERT INTO Pool_Note(pool_poolId, notes_noteId) VALUES
   (120001, 2);
 
 INSERT INTO ArrayModel(arrayModelId, alias, rows, columns) VALUES
-(1, 'Test BeadChip', 8, 1);
+(1, 'Test BeadChip', 8, 1),
+(2, 'Unused', 8, 1);
 
 INSERT INTO Array(arrayId, alias, arrayModelId, serialNumber, description, creator, created, lastModifier, lastModified) VALUES
-(1, 'Array_1', 1, '1234', 'test array', 1, '2018-01-26 17:11:00', 1, '2018-01-26 17:11:00');
+(1, 'Array_1', 1, '1234', 'test array', 1, '2018-01-26 17:11:00', 1, '2018-01-26 17:11:00'),
+(2, 'Array_2', 1, '5678', 'array to delete', 3, '2020-02-27 13:16:00', 3, '2020-02-27 13:16:00');
 
 INSERT INTO ArrayPosition(arrayId, position, sampleId) VALUES
-(1, 'R01C01', 8);
+(1, 'R01C01', 8),
+(2, 'R01C01', 8);
 
 INSERT INTO ArrayRun(arrayRunId, alias, instrumentId, arrayId, health, startDate, creator, created, lastModifier, lastModified) VALUES
-(1, 'ArrayRun_1', 3, 1, 'Running', '2018-02-02', 1, '2018-02-02 15:40:00', 1, '2018-02-02 15:40:00');
+(1, 'ArrayRun_1', 3, 1, 'Running', '2018-02-02', 3, '2018-02-02 15:40:00', 3, '2018-02-02 15:40:00');
 
 INSERT INTO QCType(qcTypeId, name, description, qcTarget, units, archived, precisionAfterDecimal, correspondingField, autoUpdateField) VALUES
-(101, 'test edit qc', '', 'Sample', 'test units', 0, 2, 'NONE', 0),
-(102, 'update volume qc', '', 'Sample', 'µL', 0, 2, 'VOLUME', 1),
-(103, 'update concentration qc', '', 'Sample', 'nM', 0, 2, 'CONCENTRATION', 1),
-(104, 'test edit qc', '', 'Library', 'test units', 0, 2, 'NONE', 0),
-(105, 'update volume qc', '', 'Library', 'µL', 0, 2, 'VOLUME', 1),
-(106, 'update concentration qc', '', 'Library', 'nM', 0, 2, 'CONCENTRATION', 1),
-(107, 'test edit qc', '', 'Pool', 'test units', 0, 2, 'NONE', 0),
-(108, 'update volume qc', '', 'Pool', 'µL', 0, 2, 'VOLUME', 1),
-(109, 'update concentration qc', '', 'Pool', 'nM', 0, 2, 'CONCENTRATION', 1);
+(101, 'test edit qc', '', 'Sample', 'test units', FALSE, 2, 'NONE', FALSE),
+(102, 'update volume qc', '', 'Sample', 'µL', FALSE, 2, 'VOLUME', TRUE),
+(103, 'update concentration qc', '', 'Sample', 'nM', FALSE, 2, 'CONCENTRATION', TRUE),
+(104, 'test edit qc', '', 'Library', 'test units', FALSE, 2, 'NONE', FALSE),
+(105, 'update volume qc', '', 'Library', 'µL', FALSE, 2, 'VOLUME', TRUE),
+(106, 'update concentration qc', '', 'Library', 'nM', FALSE, 2, 'CONCENTRATION', TRUE),
+(107, 'test edit qc', '', 'Pool', 'test units', FALSE, 2, 'NONE', FALSE),
+(108, 'update volume qc', '', 'Pool', 'µL', FALSE, 2, 'VOLUME', TRUE),
+(109, 'update concentration qc', '', 'Pool', 'nM', FALSE, 2, 'CONCENTRATION', TRUE),
+(110, 'unused qc', '', 'Sample', 'things', FALSE, 2, 'NONE', FALSE);
 
+INSERT INTO QcControl(controlId, qcTypeId, alias) VALUES
+(1, 110, 'standard control');
 
 INSERT INTO SampleQC(sample_sampleId, creator, date, type, results, created, lastModified) VALUES
 (2201, 1, '2018-07-10', 101, 4.3, '2018-07-10 14:29:00', '2018-07-10 14:29:00');
 
 INSERT INTO Workset(worksetId, alias, description, creator, created, lastModifier, lastModified) VALUES
 (1, 'Workset One', 'Workset One description', 1, '2018-08-03 13:12:00', 1, '2018-08-03 13:12:00'),
-(2, 'Workset Two', 'Workset Two description', 1, '2018-08-03 13:12:00', 1, '2018-08-03 13:12:00');
+(2, 'Workset Two', 'Workset Two description', 3, '2018-08-03 13:12:00', 3, '2018-08-03 13:12:00');
 
 INSERT INTO LibraryQC(library_libraryId, creator, date, type, results, created, lastModified) VALUES
 (2201, 1, '2018-07-10', 104, 4.3, '2018-07-10 14:29:00', '2018-07-10 14:29:00');
@@ -1165,12 +1228,17 @@ INSERT INTO Workset_LibraryAliquot(worksetId, aliquotId) VALUES
 DELETE FROM StorageLocationMap;
 INSERT INTO StorageLocationMap(mapId, filename, description) VALUES
 (1, 'floor_one.html', 'floor one map'),
-(2, 'floor_two.html', 'floor two map');
+(2, 'floor_two.html', 'floor two map'),
+(3, 'unused.html', 'unused map');
 
 INSERT INTO StorageLocation(locationId, locationUnit, parentLocationId, alias, creator, created, lastModifier, lastModified) VALUES
 (1, 'ROOM', NULL, 'Room One', 1, '2019-05-22 13:10:00', 1, '2019-05-22 13:10:00'),
 (2, 'ROOM', NULL, 'Room Two', 1, '2019-05-22 13:10:00', 1, '2019-05-22 13:10:00'),
-(3, 'FREEZER', 1, 'Freezer One', 1, '2019-05-22 13:10:00', 1, '2019-05-22 13:10:00');
+(3, 'FREEZER', 1, 'Freezer One', 1, '2019-05-22 13:10:00', 1, '2019-05-22 13:10:00'),
+(4, 'ROOM', NULL, 'Empty Room', 3, '2020-02-27 15:46:00', 3, '2020-02-27 15:46:00'),
+(5, 'FREEZER', 1, 'Empty Freezer', 3, '2020-02-27 15:46:00', 3, '2020-02-27 15:46:00'),
+(6, 'SHELF', 5, '1', 3, '2020-02-27 15:46:00', 3, '2020-02-27 15:46:00'),
+(7, 'LOOSE_STORAGE', 6, '1', 3, '2020-02-27 15:46:00', 3, '2020-02-27 15:46:00');
 
 INSERT INTO LibraryTemplate(libraryTemplateId, alias, defaultVolume, platformType, libraryTypeId, librarySelectionTypeId, libraryStrategyTypeId, kitDescriptorId, indexFamilyId, volumeUnits) VALUES
 (1, 'TestLibTemp', 12.34, 'ILLUMINA', 1, 3, 5, 1, NULL, 'MICROLITRES');
@@ -1179,7 +1247,8 @@ INSERT INTO DetailedLibraryTemplate(libraryTemplateId, libraryDesignId, libraryD
 (1, 3, 6);
 
 INSERT INTO Experiment(experimentId, name, title, alias, study_studyId, instrumentModelId, library_libraryId, creator, created, lastModifier, lastModified) VALUES
-(1, 'EXP1', 'Experiment One', 'Experiment One', 3, 2, 1, 1, '2020-02-20 11:47:00', 1, '2020-02-20 11:47:00');
+(1, 'EXP1', 'Experiment One', 'Experiment One', 3, 2, 1, 1, '2020-02-20 11:47:00', 1, '2020-02-20 11:47:00'),
+(2, 'EXP2', 'Unused Experiment', 'Unused Experiment', 3, 2, 1, 1, '2020-03-02 16:32:00', 1, '2020-03-02 16:32:00');
 
 INSERT INTO Experiment_Run_Partition(experiment_experimentId, run_runId, partition_partitionId) VALUES
 (1, 1, 11);
@@ -1189,6 +1258,9 @@ INSERT INTO Submission(submissionId, title, alias, creationDate) VALUES
 
 INSERT INTO Submission_Experiment(submission_submissionId, experiments_experimentId) VALUES
 (1, 1);
+
+INSERT INTO Printer(printerId, name, driver, backend, configuration, enabled, layout) VALUES
+(1, 'Printer', 'BRADY', 'BRADY_FTP', '{"host:"127.0.0.1","pin":"0000"}', TRUE, 'THT_155_490T');
 
 -- SampleHierarchy needs repopulated because everything is not created in expected order in test data
 -- (parent SampleTissue and Identity records aren't always created before childrens' DetailedSample records)

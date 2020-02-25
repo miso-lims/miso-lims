@@ -37,7 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
  */
 public interface StudyStore extends Store<Study>, PaginatedDataSource<Study> {
 
-  Study getByAlias(String alias) throws IOException;
+  public Study getByAlias(String alias) throws IOException;
 
   /**
    * List all Studies that match a search criteria
@@ -48,7 +48,7 @@ public interface StudyStore extends Store<Study>, PaginatedDataSource<Study> {
    * @throws IOException
    *           when
    */
-  Collection<Study> listBySearch(String query) throws IOException;
+  public Collection<Study> listBySearch(String query) throws IOException;
 
 
   /**
@@ -60,7 +60,7 @@ public interface StudyStore extends Store<Study>, PaginatedDataSource<Study> {
    * @throws IOException
    *           when
    */
-  Collection<Study> listByProjectId(long projectId) throws IOException;
+  public Collection<Study> listByProjectId(long projectId) throws IOException;
 
   /**
    * List all persisted objects
@@ -69,6 +69,8 @@ public interface StudyStore extends Store<Study>, PaginatedDataSource<Study> {
    * @throws IOException
    *           when the objects cannot be retrieved
    */
-  Collection<Study> listAllWithLimit(long limit) throws IOException;
+  public Collection<Study> listAllWithLimit(long limit) throws IOException;
+
+  public long getUsage(Study study) throws IOException;
 
 }

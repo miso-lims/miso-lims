@@ -4,11 +4,14 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,10 +19,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.ArrayChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
+import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
@@ -50,6 +55,9 @@ public class DefaultArrayService implements ArrayService {
 
   @Autowired
   private SampleService sampleService;
+
+  @Autowired
+  private ChangeLogService changeLogService;
 
   @Override
   public AuthorizationManager getAuthorizationManager() {
@@ -110,8 +118,8 @@ public class DefaultArrayService implements ArrayService {
     loadChildEntities(array);
     Array managed = get(array.getId());
     validateChange(array, managed);
-    applyChanges(array, managed);
     managed.setChangeDetails(authorizationManager.getCurrentUser());
+    applyChanges(array, managed);
     return arrayStore.save(managed);
   }
 
@@ -185,20 +193,36 @@ public class DefaultArrayService implements ArrayService {
     });
   }
 
-  private void applyChanges(Array from, Array to) {
+  private void applyChanges(Array from, Array to) throws IOException {
     to.setAlias(from.getAlias());
     to.setSerialNumber(from.getSerialNumber());
     to.setDescription(from.getDescription());
 
-    // have to add/remove samples individually to avoid unneccessary "sample removed; sample added" changelogs for non-changes
+    // have to add/remove samples individually to avoid unnecessary "sample removed; sample added" changelogs for non-changes
     Map<String, Sample> toSamples = to.getSamples();
-    toSamples.entrySet().removeIf(entry -> !from.getSamples().containsKey(entry.getKey()));
+    Set<String> removePositions = toSamples.keySet().stream().filter(key -> !from.getSamples().containsKey(key))
+        .collect(Collectors.toSet());
+    for (String key : removePositions) {
+      recordRemoval(to, toSamples.get(key).getName(), key);
+      toSamples.remove(key);
+    }
+
     from.getSamples().forEach((key, val) -> {
       Sample current = toSamples.get(key);
       if (toSamples.get(key) == null || current.getId() != val.getId()) {
         toSamples.put(key, val);
       }
     });
+  }
+
+  private void recordRemoval(Array array, String sampleName, String position) throws IOException {
+    ArrayChangeLog changeLog = new ArrayChangeLog();
+    changeLog.setArray(array);
+    changeLog.setTime(new Date());
+    changeLog.setColumnsChanged("");
+    changeLog.setUser(authorizationManager.getCurrentUser());
+    changeLog.setSummary(String.format("%s removed from %s", sampleName, position));
+    changeLogService.create(changeLog);
   }
 
   @Override
@@ -230,12 +254,6 @@ public class DefaultArrayService implements ArrayService {
           object.getAlias(), usage, Pluralizer.runs(usage))));
     }
     return result;
-  }
-
-  @Override
-  public void beforeDelete(Array object) throws IOException {
-    object.getSamples().clear();
-    update(object);
   }
 
 }

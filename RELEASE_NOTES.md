@@ -10,6 +10,7 @@ Changes:
   * Fixed an issue where Run Scanner could cause a container to repeatedly flip between multiple
     container models if the container is linked to multiple runs
   * Fixed error when creating Sample Classes
+  * Fixed several bugs related to deleting things
 
 # 1.0.1
 

@@ -121,4 +121,5 @@ public interface RunStore extends Store<Run>, PaginatedDataSource<Run> {
   public long countRuns() throws IOException;
 
   public long countBySearch(String querystr) throws IOException;
+
 }

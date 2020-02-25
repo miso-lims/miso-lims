@@ -12,11 +12,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition.RunPartitionId;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.persistence.RunPartitionStore;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
 public class HibernateRunPartitionDao implements RunPartitionStore {
+
   @Autowired
   private SessionFactory sessionFactory;
 
@@ -48,6 +50,16 @@ public class HibernateRunPartitionDao implements RunPartitionStore {
   @Override
   public void update(RunPartition runPartition) throws IOException {
     currentSession().update(runPartition);
+  }
+
+  @Override
+  public void deleteForRun(Run run) throws IOException {
+    for (RunPosition position : run.getRunPositions()) {
+      for (Partition partition : position.getContainer().getPartitions()) {
+        RunPartition runPartition = get(run, partition);
+        currentSession().delete(runPartition);
+      }
+    }
   }
 
 }

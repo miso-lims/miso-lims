@@ -45,7 +45,7 @@ ListTarget.tissuematerial = {
             Utils.showOkDialog('Create Tissue Materials', ["That's a peculiar number of tissuematerials to create."]);
             return;
           }
-          window.location = '/miso/tissuematerial/bulk/new?' + jQuery.param({
+          window.location = Urls.ui.tissueMaterials.bulkCreate + '?' + jQuery.param({
             quantity: result.quantity,
           });
         });

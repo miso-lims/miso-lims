@@ -52,4 +52,6 @@ public interface InstrumentStore extends Store<Instrument>, PaginatedDataSource<
 
   public long getUsageByArrayRuns(Instrument instrument) throws IOException;
 
+  public long getUsageByQcs(Instrument instrument) throws IOException;
+
 }

@@ -46,7 +46,7 @@ ListTarget.storage_location = {
       return [{
         "name": "Add",
         "handler": function() {
-          window.location = window.location.origin + '/miso/freezer/new';
+          window.location = Urls.ui.freezers.create;
         }
       }];
     default:
@@ -55,10 +55,9 @@ ListTarget.storage_location = {
   },
   createColumns: function(config, projectId) {
     var columns = [
-        config.slug == "freezers" ? ListUtils.labelHyperlinkColumn("Freezer Name", Urls.ui.freezers.edit, Utils.array.getId,
-            "displayLocation", 1, true) : {
-          "sTitle": "Name",
-          "mData": "displayLocation",
+        config.slug == "freezers" ? ListUtils.labelHyperlinkColumn("Alias", Urls.ui.freezers.edit, Utils.array.getId, "alias", 1, true) : {
+          "sTitle": "Alias",
+          "mData": "alias",
           "include": true,
           "iSortPriority": 1
         }, {
@@ -75,8 +74,7 @@ ListTarget.storage_location = {
         "iSortPriority": 0,
         "mRender": function(data, type, full) {
           if (type === 'display' && data) {
-            var url = '/freezermaps/' + data + (full.mapAnchor ? '#' + full.mapAnchor : '');
-            return "<a href=\"" + url + "\">View Map</a>";
+            return "<a href=\"" + Urls.ui.freezerMaps.view(data, full.mapAnchor) + "\">View Map</a>";
           }
           return data || '';
         }

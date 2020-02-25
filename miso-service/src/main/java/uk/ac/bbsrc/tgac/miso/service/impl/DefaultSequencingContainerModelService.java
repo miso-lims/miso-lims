@@ -116,6 +116,15 @@ public class DefaultSequencingContainerModelService extends AbstractSaveService<
   }
 
   @Override
+  public void beforeDelete(SequencingContainerModel object) throws IOException {
+    for (InstrumentModel instrumentModel : object.getInstrumentModels()) {
+      instrumentModel.getContainerModels().remove(object);
+      instrumentModelService.update(instrumentModel);
+    }
+    object.getInstrumentModels().clear();
+  }
+
+  @Override
   public List<SequencingContainerModel> find(PlatformType platform, String search) throws IOException {
     return containerModelDao.find(platform, search);
   }

@@ -61,7 +61,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.InstrumentModelStore;
 public class HibernateInstrumentModelDao extends HibernateSaveDao<InstrumentModel>
     implements HibernatePaginatedDataSource<InstrumentModel>, InstrumentModelStore {
 
-  private static final String[] SEARCH_PROPERTIES = new String[] { "alias", "platformType" };
+  private static final String[] SEARCH_PROPERTIES = new String[] { "alias" };
 
   @Autowired
   private JdbcTemplate template;

@@ -52,6 +52,7 @@ public class ListTablesIT extends AbstractIT {
     tabs.put(ListTarget.STORAGE_LOCATIONS, Sets.newHashSet(Tabs.FREEZERS, Tabs.ROOMS));
     tabs.put(ListTarget.POOL_ORDERS, Sets.newHashSet(Tabs.OUTSTANDING, Tabs.FULFILLED, Tabs.DRAFT));
     tabs.put(ListTarget.TRANSFERS, Sets.newHashSet(Tabs.PENDING, Tabs.RECEIPT, Tabs.INTERNAL, Tabs.DISTRIBUTION));
+    tabs.put(ListTarget.INSTRUMENTS, Sets.newHashSet(Tabs.SEQUENCER, Tabs.ARRAY_SCANNER, Tabs.OTHER));
     tabsForTarget = Collections.unmodifiableMap(tabs);
   }
 
@@ -73,6 +74,7 @@ public class ListTablesIT extends AbstractIT {
     preferredTab.put(ListTarget.WORKSETS, Tabs.MINE);
     preferredTab.put(ListTarget.POOL_ORDERS, Tabs.OUTSTANDING);
     preferredTab.put(ListTarget.TRANSFERS, Tabs.RECEIPT);
+    preferredTab.put(ListTarget.INSTRUMENTS, Tabs.SEQUENCER);
     sortOnTab = Collections.unmodifiableMap(preferredTab);
   }
 
@@ -329,13 +331,13 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListInstrumentsSetup() throws Exception {
-    testPageSetup(ListTarget.INSTRUMENTS,
+    testTabbedPageSetup(ListTarget.INSTRUMENTS,
         Sets.newHashSet(Columns.INSTRUMENT_NAME, Columns.PLATFORM, Columns.INSTRUMENT_MODEL, Columns.STATUS, Columns.SERIAL_NUMBER));
   }
 
   @Test
   public void testListSequencersColumnSort() throws Exception {
-    testColumnsSort(ListTarget.INSTRUMENTS);
+    testTabbedColumnsSort(ListTarget.INSTRUMENTS);
   }
 
   @Test
@@ -609,7 +611,7 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListTabbedStorageLocationsSetup() throws Exception {
-    testTabbedPageSetup(ListTarget.STORAGE_LOCATIONS, Sets.newHashSet(Columns.FREEZER_NAME, Columns.IDENTIFICATION_BARCODE, Columns.MAP));
+    testTabbedPageSetup(ListTarget.STORAGE_LOCATIONS, Sets.newHashSet(Columns.ALIAS, Columns.IDENTIFICATION_BARCODE, Columns.MAP));
   }
 
   @Test
@@ -698,6 +700,153 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListTransfersColumnSort() throws Exception {
     testTabbedColumnsSort(ListTarget.TRANSFERS);
+  }
+
+  @Test
+  public void testListLibraryTemplatesSetup() throws Exception {
+    testPageSetup(ListTarget.LIBRARY_TEMPLATES,
+        Sets.newHashSet(Columns.SORT, Columns.ALIAS, Columns.LIBRARY_DESIGN, Columns.LIBRARY_DESIGN_CODE, Columns.LIBRARY_TYPE,
+            Columns.LIBRARY_SELECTION, Columns.LIBRARY_STRATEGY, Columns.KIT_NAME, Columns.INDEX_FAMILY, Columns.PLATFORM,
+            Columns.DEFAULT_VOLUME));
+  }
+
+  @Test
+  public void testListLibraryTemplatesColumnSort() throws Exception {
+    testColumnsSort(ListTarget.LIBRARY_TEMPLATES);
+  }
+
+  @Test
+  public void testListQcTypesSetup() throws Exception {
+    testPageSetup(ListTarget.QC_TYPE,
+        Sets.newHashSet(Columns.NAME, Columns.DESCRIPTION, Columns.TARGET, Columns.CORRESPONDING_FIELD, Columns.AUTO_UPDATE_FIELD));
+  }
+
+  @Test
+  public void testListQcTypesColumnSort() throws Exception {
+    testColumnsSort(ListTarget.QC_TYPE);
+  }
+
+  @Test
+  public void testListAttachmentCategoriesSetup() throws Exception {
+    testPageSetup(ListTarget.ATTACHMENT_CATEGORIES, Sets.newHashSet(Columns.SORT, Columns.ALIAS));
+  }
+
+  @Test
+  public void testListAttachmentCategoriesColumnSort() throws Exception {
+    testColumnsSort(ListTarget.ATTACHMENT_CATEGORIES);
+  }
+
+  @Test
+  public void testListInstitutesSetup() throws Exception {
+    testPageSetup(ListTarget.INSTITUTES, Sets.newHashSet(Columns.ALIAS));
+  }
+
+  @Test
+  public void testListInstitutesColumnSort() throws Exception {
+    testColumnsSort(ListTarget.INSTITUTES);
+  }
+
+  @Test
+  public void testListLabsSetup() throws Exception {
+    testPageSetup(ListTarget.LABS, Sets.newHashSet(Columns.ALIAS));
+  }
+
+  @Test
+  public void testListLabsColumnSort() throws Exception {
+    testColumnsSort(ListTarget.LABS);
+  }
+
+  @Test
+  public void testListTissueMaterialsSetup() throws Exception {
+    testPageSetup(ListTarget.TISSUE_MATERIALS, Sets.newHashSet(Columns.ALIAS));
+  }
+
+  @Test
+  public void testListTissueMaterialsColumnSort() throws Exception {
+    testColumnsSort(ListTarget.TISSUE_MATERIALS);
+  }
+
+  @Test
+  public void testListTissueOriginsSetup() throws Exception {
+    testPageSetup(ListTarget.TISSUE_ORIGINS, Sets.newHashSet(Columns.ALIAS));
+  }
+
+  @Test
+  public void testListTissueOriginsColumnSort() throws Exception {
+    testColumnsSort(ListTarget.TISSUE_ORIGINS);
+  }
+
+  @Test
+  public void testListTissuePieceTypesSetup() throws Exception {
+    testPageSetup(ListTarget.TISSUE_PIECE_TYPE, Sets.newHashSet(Columns.NAME, Columns.ABBREVIATION, Columns.ARCHIVED));
+  }
+
+  @Test
+  public void testListTissuePieceTypesColumnSort() throws Exception {
+    testColumnsSort(ListTarget.TISSUE_PIECE_TYPE);
+  }
+
+  @Test
+  public void testListSamplePurposesSetup() throws Exception {
+    testPageSetup(ListTarget.SAMPLE_PURPOSES, Sets.newHashSet(Columns.ALIAS));
+  }
+
+  @Test
+  public void testListSamplePurposesColumnSort() throws Exception {
+    testColumnsSort(ListTarget.SAMPLE_PURPOSES);
+  }
+
+  @Test
+  public void testListSubprojectsSetup() throws Exception {
+    testPageSetup(ListTarget.SUBPROJECTS, Sets.newHashSet(Columns.ALIAS, Columns.PROJECT, Columns.PRIORITY, Columns.REFERENCE_GENOME));
+  }
+
+  @Test
+  public void testListSubprojectsColumnSort() throws Exception {
+    testColumnsSort(ListTarget.SUBPROJECTS);
+  }
+
+  @Test
+  public void testListExperimentsSetup() throws Exception {
+    testPageSetup(ListTarget.EXPERIMENTS, Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.PLATFORM, Columns.LIBRARY_NAME,
+        Columns.LIBRARY_ALIAS, Columns.STUDY_NAME, Columns.STUDY_ALIAS));
+  }
+
+  @Test
+  public void testListExperimentsColumnSort() throws Exception {
+    testColumnsSort(ListTarget.EXPERIMENTS);
+  }
+
+  @Test
+  public void testListSubmissionsSetup() throws Exception {
+    testPageSetup(ListTarget.SUBMISSIONS, Sets.newHashSet(Columns.ID, Columns.ALIAS, Columns.CREATION_DATE, Columns.SUBMISSION_DATE,
+        Columns.VERIFIED, Columns.COMPLETED));
+  }
+
+  @Test
+  public void testListSubmissionsColumnSort() throws Exception {
+    testColumnsSort(ListTarget.SUBMISSIONS);
+  }
+
+  @Test
+  public void testListUsersSetup() throws Exception {
+    testPageSetup(ListTarget.USERS, Sets.newHashSet(Columns.SORT, Columns.LOGIN_NAME, Columns.FULL_NAME, Columns.ACTIVE, Columns.ADMIN,
+        Columns.INTERNAL, Columns.LOGGED_IN));
+  }
+
+  @Test
+  public void testListUsersColumnSort() throws Exception {
+    testColumnsSort(ListTarget.USERS);
+  }
+
+  @Test
+  public void testListGroupsSetup() throws Exception {
+    testPageSetup(ListTarget.GROUPS, Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.DESCRIPTION));
+  }
+
+  @Test
+  public void testListGroupsColumnSort() throws Exception {
+    testColumnsSort(ListTarget.GROUPS);
   }
 
   private void testPageSetup(String listTarget, Set<String> targetColumns) {

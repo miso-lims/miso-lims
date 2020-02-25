@@ -45,7 +45,7 @@ ListTarget.subproject = {
             Utils.showOkDialog('Create Subprojects', ["That's a peculiar number of subprojects to create."]);
             return;
           }
-          window.location = '/miso/subproject/bulk/new?' + jQuery.param({
+          window.location = Urls.ui.subprojects.bulkCreate + '?' + jQuery.param({
             quantity: result.quantity,
           });
         });
@@ -70,7 +70,7 @@ ListTarget.subproject = {
                 'alias')
                 || "Unknown";
             if (type === 'display') {
-              return "<a href=\"/miso/project/" + data + "\">" + projectAlias + "</a>";
+              return "<a href=\"" + Urls.ui.projects.edit(data) + "\">" + projectAlias + "</a>";
             } else {
               return projectAlias;
             }

@@ -24,7 +24,8 @@
 ListTarget.library_template = {
   name: "Library Templates",
   createUrl: function(config, projectId) {
-    return "/miso/rest/librarytemplates/dt" + (projectId ? '/project/' + projectId : '');
+    var namespace = Urls.rest.libraryTemplates;
+    return projectId ? namespace.projectDatatable(projectId) : namespace.datatable;
   },
   getQueryUrl: function() {
     return Urls.rest.libraryTemplates.query;
@@ -40,11 +41,9 @@ ListTarget.library_template = {
           lines.push('* ' + librarytemplate.alias);
           ids.push(librarytemplate.id);
         });
-        Utils.showConfirmDialog('Delete Library Templates', 'Delete', lines,
-            function() {
-              Utils.ajaxWithDialog('Deleting Library Templates', 'POST', '/miso/rest/librarytemplates/bulk-delete', ids,
-                  Utils.page.pageReload);
-            });
+        Utils.showConfirmDialog('Delete Library Templates', 'Delete', lines, function() {
+          Utils.ajaxWithDialog('Deleting Library Templates', 'POST', Urls.rest.libraryTemplates.bulkDelete, ids, Utils.page.pageReload);
+        });
       }
     });
 
@@ -58,7 +57,7 @@ ListTarget.library_template = {
             property: "query",
             value: ""
           }, ], function(results) {
-            Utils.ajaxWithDialog('Getting Projects', 'GET', '/miso/rest/projects/search?' + jQuery.param({
+            Utils.ajaxWithDialog('Getting Projects', 'GET', Urls.rest.projects.search + '?' + jQuery.param({
               q: results.query
             }), null, function(response) {
               var projectActions = [];
@@ -70,7 +69,7 @@ ListTarget.library_template = {
                       return template.id;
                     });
                     Utils.ajaxWithDialog("Adding Library Template" + (items.length > 1 ? "s" : "") + " to Project", "POST",
-                        "/miso/rest/librarytemplates/project/add?" + jQuery.param({
+                        Urls.rest.libraryTemplates.addProject + "?" + jQuery.param({
                           projectId: project.id,
                         }), templateIds, function() {
                           Utils.showOkDialog("Add Project", ["Successfully added Library Template" + (items.length > 1 ? "s" : "")
@@ -95,7 +94,7 @@ ListTarget.library_template = {
               if (!projectIds.hasOwnProperty(id)) {
                 projectIds[id] = true;
                 jQuery.ajax({
-                  url: '/miso/rest/projects/' + id,
+                  url: Urls.rest.projects.get(id),
                   type: 'GET',
                   contentType: 'application/json; charset=utf8',
                 }).success(
@@ -107,7 +106,7 @@ ListTarget.library_template = {
                             return item.id;
                           });
                           Utils.ajaxWithDialog("Removing Library Template " + (items.length > 1 ? "s" : "") + " from Project", "POST",
-                              "/miso/rest/librarytemplates/project/remove?" + jQuery.param({
+                              Urls.rest.libraryTemplates.removeProject + "?" + jQuery.param({
                                 projectId: id
                               }), templateIds, function() {
                                 Utils.showOkDialog("Add Project", ["Successfully removed Library Template" + (items.length > 1 ? "s" : "")
@@ -158,7 +157,7 @@ ListTarget.library_template = {
           "bSortable": false
         },
         {
-          "sTitle": "Library Code",
+          "sTitle": "Design Code",
           "mData": "designCodeId",
           "include": Constants.isDetailedSample,
           "iSortPriority": 0,
@@ -181,7 +180,7 @@ ListTarget.library_template = {
           "bSortable": false
         },
         {
-          "sTitle": "Library Selection Type",
+          "sTitle": "Selection",
           "mData": "selectionId",
           "include": true,
           "iSortPriority": 0,
@@ -192,7 +191,7 @@ ListTarget.library_template = {
           "bSortable": false
         },
         {
-          "sTitle": "Library Strategy Type",
+          "sTitle": "Strategy",
           "mData": "strategyId",
           "include": true,
           "iSortPriority": 0,
@@ -203,7 +202,7 @@ ListTarget.library_template = {
           "bSortable": false
         },
         {
-          "sTitle": "Kit",
+          "sTitle": "Kit Name",
           "mData": "kitDescriptorId",
           "include": true,
           "iSortPriority": 0,
@@ -225,7 +224,7 @@ ListTarget.library_template = {
           "bSortable": false
         },
         {
-          "sTitle": "Platform Type",
+          "sTitle": "Platform",
           "mData": "platformType",
           "include": true,
           "iSortPriority": 0,

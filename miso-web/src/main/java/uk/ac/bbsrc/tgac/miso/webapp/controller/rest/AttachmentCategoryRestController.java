@@ -1,13 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -48,11 +48,11 @@ public class AttachmentCategoryRestController extends RestController {
     return doSave(dto);
   }
 
-  @DeleteMapping("/{id}")
+  @PostMapping(value = "/bulk-delete")
+  @ResponseBody
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void delete(@PathVariable(value = "id", required = true) long id) throws IOException {
-    RestUtils.delete("Attachment category", id, attachmentCategoryService);
-    menuController.refreshConstants();
+  public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
+    RestUtils.bulkDelete("Attachment Category", ids, attachmentCategoryService);
   }
 
   private AttachmentCategory getExisting(long id) throws IOException {
