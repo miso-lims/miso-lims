@@ -7,6 +7,7 @@ FOR EACH ROW
   BEGIN
     DECLARE log_message varchar(500) CHARACTER SET utf8;
     SET log_message = CONCAT_WS(', ',
+      CASE WHEN NEW.alias <> OLD.alias THEN CONCAT('alias: ', OLD.alias, ' → ', NEW.alias) END,
       CASE WHEN (NEW.concentration IS NULL) <> (OLD.concentration IS NULL) OR NEW.concentration <> OLD.concentration THEN CONCAT('concentration: ', COALESCE(decimalToString(OLD.concentration), 'n/a'), ' → ', COALESCE(decimalToString(NEW.concentration), 'n/a')) END,
       CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN CONCAT('barcode: ', COALESCE(OLD.identificationBarcode, 'n/a'), ' → ', COALESCE(NEW.identificationBarcode, 'n/a')) END,
       CASE WHEN NEW.libraryId <> OLD.libraryId THEN CONCAT('parent: ', (SELECT name FROM Library WHERE libraryId = OLD.libraryId), ' → ', (SELECT name FROM Library WHERE libraryId = NEW.libraryId)) END,
@@ -21,6 +22,7 @@ FOR EACH ROW
       INSERT INTO LibraryAliquotChangeLog(aliquotId, columnsChanged, userId, message, changeTime) VALUES (
       NEW.aliquotId,
         COALESCE(CONCAT_WS(',',
+          CASE WHEN NEW.alias <> OLD.alias THEN 'alias' END,
           CASE WHEN (NEW.concentration IS NULL) <> (OLD.concentration IS NULL) OR NEW.concentration <> OLD.concentration THEN 'concentration' END,
           CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN 'identificationBarcode' END,
           CASE WHEN NEW.libraryId <> OLD.libraryId THEN 'parent' END,

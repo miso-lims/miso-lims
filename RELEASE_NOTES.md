@@ -2,7 +2,7 @@
 
 Changes:
 
-
+  * Added changelog entry when library aliquot alias is changed
 
 # 1.0.0
 
