@@ -3,7 +3,7 @@
   <parent>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
     <artifactId>miso</artifactId>
-    <version>0.2.203-SNAPSHOT</version>
+    <version>1.0.0</version>
   </parent>
   <artifactId>pinery-miso</artifactId>
   <name>pinery-miso</name>
