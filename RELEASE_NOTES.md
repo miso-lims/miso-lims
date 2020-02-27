@@ -2,6 +2,16 @@
 
 Changes:
 
+
+
+# 1.0.0
+
+Users and/or administrators can now add, edit, and delete everything through the MISO website
+without having to resort to direct database manipulation. MISO is now able to track tasks
+required for CAP compliance.
+
+Changes:
+
   * Added library aliquot alias to downloadable library aliquot tracking list
   * Removed add/remove targeted sequencing buttons from Edit Kit Descriptor page for non-admin
     users
