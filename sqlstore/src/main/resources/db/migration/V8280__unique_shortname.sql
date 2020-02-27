@@ -1,0 +1,1 @@
+ALTER TABLE Project ADD CONSTRAINT uk_project_shortname UNIQUE (shortName);

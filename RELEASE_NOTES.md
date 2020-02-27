@@ -7,6 +7,7 @@ Changes:
     users
   * Fixed an issue where Run Scanner could add more containers to a run than should be allowed
   * Fixed Edit QC Type page failing to load for non-admin users
+  * Added constraint that project short name must be unique (or empty)
 
 # 0.2.202
 
