@@ -164,6 +164,13 @@ public class DefaultProjectService implements ProjectService {
     if (!shortNameValidation.isValid()) {
       errors.add(new ValidationError("shortName", shortNameValidation.getMessage()));
     }
+    if ((beforeChange == null || (project.getShortName() != null && !project.getShortName().equals(beforeChange.getShortName())))
+        && (project.getShortName() != null && getProjectByShortName(project.getShortName()) != null)) {
+      errors.add(new ValidationError("shortName", "There is already a project with this short name"));
+    }
+    if ((beforeChange == null || !project.getAlias().equals(beforeChange.getAlias())) && getProjectByAlias(project.getAlias()) != null) {
+      errors.add(new ValidationError("alias", "There is already a project with this alias"));
+    }
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
