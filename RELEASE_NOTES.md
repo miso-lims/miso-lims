@@ -2,6 +2,12 @@
 
 Changes:
 
+
+
+# 1.0.1
+
+Changes:
+
   * Added changelog entry when library aliquot alias is changed
 
 # 1.0.0
@@ -19,6 +25,10 @@ Changes:
   * Fixed Edit QC Type page failing to load for non-admin users
   * Added constraint that project short name must be unique (or empty)
   * Updated to Run Scanner 1.12.0
+
+Known Issues:
+
+  * Some samples may error on load.
 
 # 0.2.202
 
