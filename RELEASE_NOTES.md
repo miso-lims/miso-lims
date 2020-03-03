@@ -2,7 +2,8 @@
 
 Changes:
 
-
+  * Fixed an issue where Run Scanner could cause a container to repeatedly flip between multiple
+    container models if the container is linked to multiple runs
 
 # 1.0.1
 
