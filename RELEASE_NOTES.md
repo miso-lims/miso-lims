@@ -2,7 +2,14 @@
 
 Changes:
 
+  * Added several downloadable spreadsheet types
+    * Samples: Processing & Extraction, RNA Library Preparation, DNA Library Preparation
+    * Libraries: Pool Preparation, Dilution Preparation
+    * Library aliquots: Pool Preparation, Dilution Preparation
   * Sort Transfers list by last modified time
+  * Fixed an issue where Run Scanner could cause a container to repeatedly flip between multiple
+    container models if the container is linked to multiple runs
+  * Fixed error when creating Sample Classes
 
 # 1.0.1
 

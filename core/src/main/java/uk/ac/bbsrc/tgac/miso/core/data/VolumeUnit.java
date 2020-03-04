@@ -4,16 +4,22 @@ import java.util.stream.Stream;
 
 public enum VolumeUnit {
 
-  MICROLITRES("&#181;L");
+  MICROLITRES("&#181;L", "µL");
 
   private final String units;
+  private final String rawLabel;
 
-  private VolumeUnit(String units) {
+  private VolumeUnit(String units, String rawLabel) {
     this.units = units;
+    this.rawLabel = rawLabel;
   }
 
   public String getUnits() {
     return units;
+  }
+
+  public String getRawLabel() {
+    return rawLabel;
   }
 
   /**
