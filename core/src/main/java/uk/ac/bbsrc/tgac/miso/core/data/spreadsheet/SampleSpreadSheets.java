@@ -1,17 +1,24 @@
 package uk.ac.bbsrc.tgac.miso.core.data.spreadsheet;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QC;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -44,7 +51,7 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
           return "Other";
         }
       }), "Other")), //
-      Column.forString("External Identifier",  detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
+      Column.forString("External Identifier", detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
       Column.forBigDecimal("VOL (uL)", Sample::getVolume), //
       Column.forBigDecimal("[] (ng/uL)", Sample::getConcentration), //
       Column.forBigDecimal("Total (ng)",
@@ -80,7 +87,57 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forString("Group Description", effectiveGroupIdProperty(GroupIdentifiable::getGroupDescription)), //
       Column.forString("Barcode", Sample::getIdentificationBarcode), //
       Column.forString("Created By", s -> s.getCreator().getLoginName()), //
-      Column.forDate("Created Date", Sample::getCreationTime));
+      Column.forDate("Created Date", Sample::getCreationTime)),
+  PROCESSING_AND_EXTRACTION("Processing & Extraction", //
+      Arrays.asList(SampleTissue.CATEGORY_NAME, SampleTissueProcessing.CATEGORY_NAME, SampleStock.CATEGORY_NAME,
+          SampleAliquot.CATEGORY_NAME), //
+      Column.forString("Name", Sample::getName), //
+      Column.forString("Project", sample -> sample.getProject().getShortName()), //
+      Column.forString("Alias", Sample::getAlias), //
+      Column.forString("Group ID", effectiveGroupIdProperty(GroupIdentifiable::getGroupId)), //
+      Column.forString("Description", Sample::getDescription), //
+      Column.forInteger("Slides", detailedSample(SampleSlide.class, SampleSlide::getSlides, null)), //
+      Column.forInteger("Discards", detailedSample(SampleSlide.class, SampleSlide::getDiscards, null)), //
+      Column.forString("QC Status", qcStatusFunction()), //
+      Column.forString("QC Status Note", detailedSample(DetailedSample.class, DetailedSample::getDetailedQcStatusNote, "")), //
+      Column.forString("Notes",
+          sam -> sam.getNotes() == null ? "" : sam.getNotes().stream().map(Note::getText).collect(Collectors.joining("; "))), //
+      Column.forString("QCs", sam -> sam.getQCs() == null ? ""
+          : sam.getQCs().stream().map(qc -> qc.getType().getAlias() + ": " + LimsUtils.toNiceString(qc.getResults()))
+              .collect(Collectors.joining("; ")))), //
+  RNA_LIBRARY_PREPARATION("RNA Library Preparation", //
+      Arrays.asList(SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME), //
+      Column.forString("Name", Sample::getName), //
+      Column.forString("Project", sample -> sample.getProject().getShortName()), //
+      Column.forString("Alias", Sample::getAlias), //
+      Column.forString("Group ID", effectiveGroupIdProperty(GroupIdentifiable::getGroupId)), //
+      Column.forString("Description", Sample::getDescription), //
+      Column.forBigDecimal("Concentration", Sample::getConcentration), //
+      Column.forString("Concentration Units", sam -> sam.getConcentrationUnits() == null ? "" : sam.getConcentrationUnits().getRawLabel()), //
+      Column.forBigDecimal("Volume", Sample::getVolume), //
+      Column.forString("Volume Units", sam -> sam.getVolumeUnits() == null ? "" : sam.getVolumeUnits().getRawLabel()), //
+      Column.forBigDecimal("DV200", sam -> qcValue(sam, "DV200")), //
+      Column.forBigDecimal("RIN", sam -> qcValue(sam, "RIN")), //
+      Column.forString("QC Status", qcStatusFunction()), //
+      Column.forString("QC Status Note", detailedSample(DetailedSample.class, DetailedSample::getDetailedQcStatusNote, "")), //
+      Column.forString("Notes",
+          sam -> sam.getNotes() == null ? "" : sam.getNotes().stream().map(Note::getText).collect(Collectors.joining("; ")))), //
+  DNA_LIBRARY_PREPARATION("DNA Library Preparation", //
+      Arrays.asList(SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME), //
+      Column.forString("Name", Sample::getName), //
+      Column.forString("Project", sample -> sample.getProject().getShortName()), //
+      Column.forString("Alias", Sample::getAlias), //
+      Column.forString("Group ID", effectiveGroupIdProperty(GroupIdentifiable::getGroupId)), //
+      Column.forString("Description", Sample::getDescription), //
+      Column.forBigDecimal("Concentration", Sample::getConcentration), //
+      Column.forString("Concentration Units", sam -> sam.getConcentrationUnits() == null ? "" : sam.getConcentrationUnits().getRawLabel()), //
+      Column.forBigDecimal("Volume", Sample::getVolume), //
+      Column.forString("Volume Units", sam -> sam.getVolumeUnits() == null ? "" : sam.getVolumeUnits().getRawLabel()), //
+      Column.forString("QC Status", qcStatusFunction()), //
+      Column.forString("QC Status Note", detailedSample(DetailedSample.class, DetailedSample::getDetailedQcStatusNote, "")), //
+      Column.forString("Notes",
+          sam -> sam.getNotes() == null ? "" : sam.getNotes().stream().map(Note::getText).collect(Collectors.joining("; ")))
+      );
   
   private static <S extends DetailedSample, T> Function<Sample, T> detailedSample(Class<S> clazz, Function<S, T> function, T defaultValue) {
     return s -> {
@@ -107,6 +164,31 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       }
       return "";
     };
+  }
+
+  private static Function<Sample, String> qcStatusFunction() {
+    return s -> {
+      if (LimsUtils.isDetailedSample(s)) {
+        return detailedSample(DetailedSample.class,
+            ds -> ds.getDetailedQcStatus() == null ? "Not Ready" : ds.getDetailedQcStatus().getDescription(), "").apply(s);
+      } else {
+        return qcPassedLabel(s.getQcPassed());
+      }
+    };
+  }
+
+  private static BigDecimal qcValue(Sample sample, String qcTypeName) {
+    return sample.getQCs().stream()
+        .filter(qc -> qcTypeName.equals(qc.getType().getName()))
+        .max(Comparator.comparing(QC::getDate))
+        .map(QC::getResults).orElse(null);
+  }
+
+  private static String qcPassedLabel(Boolean qcPassed) {
+    if (qcPassed == null) {
+      return "Unknown";
+    }
+    return qcPassed ? "Passed" : "Failed";
   }
 
   private final List<Column<Sample>> columns;
