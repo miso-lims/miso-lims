@@ -379,7 +379,8 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       for (SequencerPartitionContainer container : changed.getSequencerPartitionContainers()) {
         if (changed.getSequencer().getInstrumentModel().getContainerModels().stream()
             .noneMatch(model -> model.getId() == container.getModel().getId())) {
-          errors.add(new ValidationError(String.format("Container model '%s' is not valid for instrument '%s'", container.getAlias(),
+          errors.add(
+              new ValidationError(String.format("Container '%s' is not valid for instrument '%s'", container.getIdentificationBarcode(),
               changed.getSequencer().getInstrumentModel().getAlias())));
         }
       }
@@ -781,7 +782,8 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
         throw new IllegalArgumentException(String.format("The container %s has %d partitions, but %d were detected by the scanner.",
             containerSerialNumber, container.getPartitions().size(), laneCount));
       }
-      if (container.getModel().getId() != containerModel.getId()) {
+      // only update container model from fallback to non-fallback
+      if (container.getModel().isFallback() && !containerModel.isFallback() && container.getModel().getId() != containerModel.getId()) {
         container.setModel(containerModel);
         isMutated = true;
       }
