@@ -2,7 +2,7 @@
 
 Changes:
 
-
+  * Fixed error when creating Sample Classes
 
 # 1.0.1
 

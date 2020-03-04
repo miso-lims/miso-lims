@@ -173,7 +173,7 @@ public class DefaultSampleClassService extends AbstractSaveService<SampleClass> 
 
   @Override
   protected void collectValidationErrors(SampleClass object, SampleClass beforeChange, List<ValidationError> errors) throws IOException {
-    long usage = sampleClassDao.getUsage(object);
+    long usage = beforeChange == null ? 0L : sampleClassDao.getUsage(beforeChange);
     if (beforeChange == null && SampleIdentity.CATEGORY_NAME.equals(object.getSampleCategory())
         && list().stream().anyMatch(sampleClass -> SampleIdentity.CATEGORY_NAME.equals(sampleClass.getSampleCategory()))) {
       errors.add(new ValidationError("sampleCategory", "There can be only one identity class"));
@@ -331,6 +331,13 @@ public class DefaultSampleClassService extends AbstractSaveService<SampleClass> 
         fromRelationship.setChangeDetails(currentUser);
       }
     }
+  }
+
+  @Override
+  protected void beforeSave(SampleClass object) throws IOException {
+    User user = authorizationManager.getCurrentUser();
+    object.setChangeDetails(user);
+    object.getParentRelationships().forEach(relationship -> relationship.setChangeDetails(user));
   }
 
   @Override
