@@ -3969,6 +3969,7 @@ public class Dtos {
     setInteger(to::setReceiptPending, from.getReceiptPending(), false);
     setInteger(to::setQcPassed, from.getQcPassed(), false);
     setInteger(to::setQcPending, from.getQcPending(), false);
+    setDateTimeString(to::setLastModified, from.getLastModified());
     return to;
   }
 

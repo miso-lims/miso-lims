@@ -50,6 +50,9 @@ public class ListTransferView implements Identifiable, Serializable {
   private int qcPassed;
   private int qcPending;
 
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date lastModified;
+
   @Override
   public long getId() {
     return transferId;
@@ -138,6 +141,14 @@ public class ListTransferView implements Identifiable, Serializable {
 
   public void setQcPending(int qcPending) {
     this.qcPending = qcPending;
+  }
+
+  public Date getLastModified() {
+    return lastModified;
+  }
+
+  public void setLastModified(Date lastModified) {
+    this.lastModified = lastModified;
   }
 
   @Override
