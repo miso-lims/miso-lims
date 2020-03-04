@@ -15,7 +15,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.math.NumberUtils;
-import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.Sets;
@@ -146,11 +145,6 @@ public class ListTablesIT extends AbstractIT {
     return m1.group(1);
   }
 
-  @Before
-  public void setup() {
-    login();
-  }
-
   private ListPage getList(String listTarget) {
     return ListPage.getListPage(getDriver(), getBaseUrl(), listTarget);
   }
@@ -162,6 +156,7 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testIndexDistanceToolSetup() throws Exception {
     // Goal: ensure all expected columns are present and no extra
+    login();
     Set<String> indicesColumns = Sets.newHashSet(Columns.FAMILY, Columns.INDEX_NAME, Columns.SEQUENCE, Columns.POSITION);
     ListPage page = ListPage.getListPage(getDriver(), getBaseUrl(), "tools/indexdistance");
     DataTable table = page.getTable();
@@ -178,6 +173,7 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testIdentitySearchToolSetup() throws Exception {
     // Goal: ensure all expected columns are present and no extra
+    login();
     ListPage page = ListPage.getListPage(getDriver(), getBaseUrl(), "tools/identitysearch");
     DataTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
@@ -248,6 +244,7 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListPoolsWarnings() throws Exception {
+    login();
     testWarningTabbed(ListTarget.POOLS, "no indices", "MISSING INDEX", Columns.NAME);
     testWarningTabbed(ListTarget.POOLS, "similar index", "Near-Duplicate Indices", Columns.NAME);
     testWarningTabbed(ListTarget.POOLS, "same index", "DUPLICATE INDICES", Columns.NAME);
@@ -283,13 +280,15 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListOrdersColumnSort() throws Exception {
-    testTabbedColumnsSort(ListTarget.ORDERS_ALL);
-    testTabbedColumnsSort(ListTarget.ORDERS_OUTSTANDING);
-    testTabbedColumnsSort(ListTarget.ORDERS_IN_PROGRESS);
+    login();
+    testTabbedColumnsSort(ListTarget.ORDERS_ALL, true);
+    testTabbedColumnsSort(ListTarget.ORDERS_OUTSTANDING, true);
+    testTabbedColumnsSort(ListTarget.ORDERS_IN_PROGRESS, true);
   }
 
   @Test
   public void testListOrdersWarnings() throws Exception {
+    login();
     testWarningTabbed(ListTarget.ORDERS_ALL, "no indices", "MISSING INDEX", Columns.POOL_DESCRIPTION);
     testWarningTabbed(ListTarget.ORDERS_ALL, "similar index", "Near-Duplicate Indices", Columns.POOL_DESCRIPTION);
     testWarningTabbed(ListTarget.ORDERS_ALL, "same index", "DUPLICATE INDICES", Columns.POOL_DESCRIPTION);
@@ -717,8 +716,8 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListQcTypesSetup() throws Exception {
-    testPageSetup(ListTarget.QC_TYPE,
-        Sets.newHashSet(Columns.NAME, Columns.DESCRIPTION, Columns.TARGET, Columns.CORRESPONDING_FIELD, Columns.AUTO_UPDATE_FIELD));
+    testPageSetup(ListTarget.QC_TYPE, Sets.newHashSet(Columns.NAME, Columns.DESCRIPTION, Columns.TARGET, Columns.UNITS,
+        Columns.CORRESPONDING_FIELD, Columns.AUTO_UPDATE_FIELD));
   }
 
   @Test
@@ -728,7 +727,7 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListAttachmentCategoriesSetup() throws Exception {
-    testPageSetup(ListTarget.ATTACHMENT_CATEGORIES, Sets.newHashSet(Columns.SORT, Columns.ALIAS));
+    testPageSetup(ListTarget.ATTACHMENT_CATEGORIES, Sets.newHashSet(Columns.ALIAS));
   }
 
   @Test
@@ -748,7 +747,7 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListLabsSetup() throws Exception {
-    testPageSetup(ListTarget.LABS, Sets.newHashSet(Columns.ALIAS));
+    testPageSetup(ListTarget.LABS, Sets.newHashSet(Columns.ALIAS, Columns.INSTITUTE));
   }
 
   @Test
@@ -768,7 +767,7 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListTissueOriginsSetup() throws Exception {
-    testPageSetup(ListTarget.TISSUE_ORIGINS, Sets.newHashSet(Columns.ALIAS));
+    testPageSetup(ListTarget.TISSUE_ORIGINS, Sets.newHashSet(Columns.ALIAS, Columns.DESCRIPTION));
   }
 
   @Test
@@ -808,7 +807,7 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListExperimentsSetup() throws Exception {
-    testPageSetup(ListTarget.EXPERIMENTS, Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.PLATFORM, Columns.LIBRARY_NAME,
+    testPageSetup(ListTarget.EXPERIMENTS, Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.PLATFORM, Columns.LIBRARY_NAME,
         Columns.LIBRARY_ALIAS, Columns.STUDY_NAME, Columns.STUDY_ALIAS));
   }
 
@@ -830,27 +829,38 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListUsersSetup() throws Exception {
+    loginAdmin();
     testPageSetup(ListTarget.USERS, Sets.newHashSet(Columns.SORT, Columns.LOGIN_NAME, Columns.FULL_NAME, Columns.ACTIVE, Columns.ADMIN,
-        Columns.INTERNAL, Columns.LOGGED_IN));
+        Columns.INTERNAL, Columns.LOGGED_IN), true);
   }
 
   @Test
   public void testListUsersColumnSort() throws Exception {
-    testColumnsSort(ListTarget.USERS);
+    loginAdmin();
+    testColumnsSort(ListTarget.USERS, true);
   }
 
   @Test
   public void testListGroupsSetup() throws Exception {
-    testPageSetup(ListTarget.GROUPS, Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.DESCRIPTION));
+    loginAdmin();
+    testPageSetup(ListTarget.GROUPS, Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.DESCRIPTION), false);
   }
 
   @Test
   public void testListGroupsColumnSort() throws Exception {
-    testColumnsSort(ListTarget.GROUPS);
+    loginAdmin();
+    testColumnsSort(ListTarget.GROUPS, true);
   }
 
   private void testPageSetup(String listTarget, Set<String> targetColumns) {
+    testPageSetup(listTarget, targetColumns, false);
+  }
+
+  private void testPageSetup(String listTarget, Set<String> targetColumns, boolean skipLogin) {
     // Goal: confirm that all expected columns are present
+    if (!skipLogin) {
+      login();
+    }
     ListPage page = getList(listTarget);
     DataTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
@@ -862,6 +872,7 @@ public class ListTablesIT extends AbstractIT {
 
   private void testTabbedPageSetup(String listTarget, Set<String> targetColumns) {
     // Goal: confirm that all expected tabs and columns are present
+    login();
     ListTabbedPage page = getTabbedList(listTarget);
     DataTable table = page.getTable();
     // confirm expected number of tabs
@@ -879,14 +890,28 @@ public class ListTablesIT extends AbstractIT {
   }
 
   private void testColumnsSort(String listTarget) {
+    testColumnsSort(listTarget, false);
+  }
+
+  private void testColumnsSort(String listTarget, boolean skipLogin) {
     // confirm that sortable columns can be sorted on
+    if (!skipLogin) {
+      login();
+    }
     ListPage page = getList(listTarget);
     sortColumns(page.getTable(), page);
   }
 
   private void testTabbedColumnsSort(String listTarget) {
+    testTabbedColumnsSort(listTarget, false);
+  }
+
+  private void testTabbedColumnsSort(String listTarget, boolean skipLogin) {
     // confirm that sortable columns can be sorted on
     // note that this sorts in a single tab only, as different tabs should not have different columns.
+    if (!skipLogin) {
+      login();
+    }
     ListTabbedPage page = getTabbedList(listTarget);
     DataTable table = page.getTable();
     sortColumns(table, page);

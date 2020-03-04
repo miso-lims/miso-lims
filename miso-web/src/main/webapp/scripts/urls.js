@@ -350,7 +350,7 @@ Urls = (function() {
     update: idUrlFunction(libraryTemplateRestBase),
     query: libraryTemplateRestBase + '/query',
     datatable: libraryTemplateRestBase + '/dt',
-    projectDatatable: idUrlFunction(libraryTemplateRestBase + '/dt/project/'),
+    projectDatatable: idUrlFunction(libraryTemplateRestBase + '/dt/project'),
     bulkDelete: libraryTemplateRestBase + '/bulk-delete',
     addProject: libraryTemplateRestBase + '/project/add',
     removeProject: libraryTemplateRestBase + '/project/remove'

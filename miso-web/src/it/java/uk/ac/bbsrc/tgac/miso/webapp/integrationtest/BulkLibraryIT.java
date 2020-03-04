@@ -140,7 +140,7 @@ public class BulkLibraryIT extends AbstractIT {
     assertTrue(designs.contains("AS"));
 
     Set<String> codes = table.getDropdownOptions(LibColumns.CODE, 0);
-    assertEquals(10, codes.size());
+    assertTrue(codes.size() > 10);
     assertTrue(codes.contains("EX"));
     assertTrue(codes.contains("MR"));
 
@@ -190,7 +190,7 @@ public class BulkLibraryIT extends AbstractIT {
     assertTrue(types.contains("Single End"));
 
     families = table.getDropdownOptions(LibColumns.INDEX_FAMILY, 0);
-    assertEquals(4, families.size());
+    assertTrue(families.size() > 4);
     assertTrue(families.contains(NO_INDEX_FAMILY));
     assertTrue(families.contains("Single Index 6bp"));
     assertTrue(families.contains("Dual Index 6bp"));
