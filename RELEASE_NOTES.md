@@ -2,7 +2,10 @@
 
 Changes:
 
-
+  * Added several downloadable spreadsheet types
+    * Samples: Processing & Extraction, RNA Library Preparation, DNA Library Preparation
+    * Libraries: Pool Preparation, Dilution Preparation
+    * Library aliquots: Pool Preparation, Dilution Preparation
 
 # 1.0.1
 
