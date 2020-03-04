@@ -2,7 +2,7 @@
 
 Changes:
 
-
+  * Sort Transfers list by last modified time
 
 # 1.0.1
 

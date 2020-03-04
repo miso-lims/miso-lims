@@ -19,8 +19,7 @@ ListTarget.transfer = (function() {
       return [ListUtils.idHyperlinkColumn('ID', Urls.ui.transfers.edit, 'id', Utils.array.getId, 0, true), {
         sTitle: 'Items',
         mData: 'items',
-        include: true,
-        iSortPriority: 0
+        include: true
       }, {
         sTitle: 'Sender',
         mData: function(full, type) {
@@ -38,8 +37,7 @@ ListTarget.transfer = (function() {
       }, {
         sTitle: 'Transfer Time',
         mData: 'transferTime',
-        include: true,
-        iSortPriority: 1
+        include: true
       }, {
         sTitle: 'Received',
         mData: 'received',
@@ -56,6 +54,11 @@ ListTarget.transfer = (function() {
         },
         include: true,
         bSortable: false
+      }, {
+        sTitle: 'Last Modified',
+        mData: 'lastModified',
+        include: true,
+        iSortPriority: 1
       }];
     },
     searchTermSelector: function(searchTerms) {

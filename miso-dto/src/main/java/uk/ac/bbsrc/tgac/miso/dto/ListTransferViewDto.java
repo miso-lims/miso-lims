@@ -16,6 +16,7 @@ public class ListTransferViewDto {
   private int receiptPending;
   private int qcPassed;
   private int qcPending;
+  private String lastModified;
 
   public long getId() {
     return id;
@@ -127,6 +128,14 @@ public class ListTransferViewDto {
 
   public void setQcPending(int qcPending) {
     this.qcPending = qcPending;
+  }
+
+  public String getLastModified() {
+    return lastModified;
+  }
+
+  public void setLastModified(String lastModified) {
+    this.lastModified = lastModified;
   }
 
 }

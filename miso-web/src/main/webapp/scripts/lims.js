@@ -70,7 +70,7 @@ var Utils = Utils
 
       setSortFromPriority: function(table) {
         var info = table.aoColumns.reduce(function(acc, curr, index) {
-          return acc.iSortPriority > curr.iSortPriority ? acc : {
+          return !curr.hasOwnProperty('iSortPriority') || acc.iSortPriority > curr.iSortPriority ? acc : {
             iSortPriority: curr.iSortPriority,
             bSortDirection: !!curr.bSortDirection,
             iPos: index
