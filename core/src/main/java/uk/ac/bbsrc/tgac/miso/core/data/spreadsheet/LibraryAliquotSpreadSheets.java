@@ -7,6 +7,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
@@ -36,7 +37,37 @@ public enum LibraryAliquotSpreadSheets implements Spreadsheet<LibraryAliquot> {
       Column.forString("Identity Alias", detailedSample(SampleIdentity.class, SampleIdentity::getAlias, "")), //
       Column.forString("External Identifier", detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
       Column.forString("Secondary Identifier", detailedSample(SampleTissue.class, SampleTissue::getSecondaryIdentifier, "")), //
-      Column.forString("Location", BoxUtils::makeLocationLabel));
+      Column.forString("Location", BoxUtils::makeLocationLabel)), //
+  POOL_PREPARATION("Pool Preparation", //
+      Column.forString("Name", LibraryAliquot::getName), //
+      Column.forString("Alias", LibraryAliquot::getAlias), //
+      Column.forString("Group ID", groupIdFunction()), //
+      Column.forString("Library Description", aliquot -> aliquot.getLibrary().getDescription()), //
+      Column.forBigDecimal("Concentration", LibraryAliquot::getConcentration), //
+      Column.forString("Concentration Units",
+          aliquot -> aliquot.getConcentrationUnits() == null ? "" : aliquot.getConcentrationUnits().getRawLabel()), //
+      Column.forInteger("Size (bp)", LibraryAliquot::getDnaSize), //
+      Column.forString("Index 1", listIndex(1)), //
+      Column.forString("Index 2", listIndex(2)), //
+      Column.forString("Index Family",
+          aliquot -> aliquot.getLibrary().getIndices() == null || aliquot.getLibrary().getIndices().isEmpty() ? ""
+              : aliquot.getLibrary().getIndices().get(0).getFamily().getName())), //
+  DILUTION_PREPARATION("Dilution Preparation", //
+      Column.forString("Name", LibraryAliquot::getName), //
+      Column.forString("Alias", LibraryAliquot::getAlias), //
+      Column.forString("Group ID", groupIdFunction()), //
+      Column.forString("Library Description", aliquot -> aliquot.getLibrary().getDescription()), //
+      Column.forBigDecimal("Concentration", LibraryAliquot::getConcentration), //
+      Column.forString("Concentration Units",
+          aliquot -> aliquot.getConcentrationUnits() == null ? "" : aliquot.getConcentrationUnits().getRawLabel()), //
+      Column.forBigDecimal("Volume", LibraryAliquot::getVolume), //
+      Column.forString("Volume Units", aliquot -> aliquot.getVolumeUnits() == null ? "" : aliquot.getVolumeUnits().getRawLabel()), //
+      Column.forInteger("Size (bp)", LibraryAliquot::getDnaSize), //
+      Column.forString("Index 1", listIndex(1)), //
+      Column.forString("Index 2", listIndex(2)), //
+      Column.forString("Index Family",
+          aliquot -> aliquot.getLibrary().getIndices() == null || aliquot.getLibrary().getIndices().isEmpty() ? ""
+              : aliquot.getLibrary().getIndices().get(0).getFamily().getName()));
 
   private static <S extends DetailedSample, T> Function<LibraryAliquot, T> detailedSample(Class<S> clazz, Function<S, T> function,
       T defaultValue) {
@@ -65,6 +96,17 @@ public enum LibraryAliquotSpreadSheets implements Spreadsheet<LibraryAliquot> {
         .map(Index::getSequence)
         .findFirst().orElse("");
   }
+
+  private static Function<LibraryAliquot, String> groupIdFunction() {
+    return aliquot -> {
+      if (!LimsUtils.isDetailedLibraryAliquot(aliquot)) {
+        return "";
+      }
+      GroupIdentifiable entity = ((DetailedSample) aliquot.getLibrary().getSample()).getEffectiveGroupIdEntity();
+      return entity == null ? "" : entity.getGroupId();
+    };
+  }
+
   private final List<Column<LibraryAliquot>> columns;
   private final String description;
 

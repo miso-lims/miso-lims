@@ -7,6 +7,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
@@ -30,7 +31,33 @@ public enum LibrarySpreadSheets implements Spreadsheet<Library> {
       Column.forString("Identity Alias", detailedSample(SampleIdentity.class, SampleIdentity::getAlias, "")), //
       Column.forString("External Identifier", detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
       Column.forString("Secondary Identifier", detailedSample(SampleTissue.class, SampleTissue::getSecondaryIdentifier, "")), //
-      Column.forString("Location", BoxUtils::makeLocationLabel));
+      Column.forString("Location", BoxUtils::makeLocationLabel)), //
+  POOL_PREPARATION("Pool Preparation", //
+      Column.forString("Name", Library::getName), //
+      Column.forString("Alias", Library::getAlias), //
+      Column.forString("Group ID", groupIdFunction()), //
+      Column.forString("Description", Library::getDescription), //
+      Column.forBigDecimal("Concentration", Library::getConcentration), //
+      Column.forString("Concentration Units", lib -> lib.getConcentrationUnits() == null ? "" : lib.getConcentrationUnits().getRawLabel()), //
+      Column.forInteger("Size (bp)", Library::getDnaSize), //
+      Column.forString("Index 1", listIndex(1)), //
+      Column.forString("Index 2", listIndex(2)), //
+      Column.forString("Index Family",
+          lib -> lib.getIndices() == null || lib.getIndices().isEmpty() ? "" : lib.getIndices().get(0).getFamily().getName())), //
+  DILUTION_PREPARATION("Dilution Preparation", //
+      Column.forString("Name", Library::getName), //
+      Column.forString("Alias", Library::getAlias), //
+      Column.forString("Group ID", groupIdFunction()), //
+      Column.forString("Description", Library::getDescription), //
+      Column.forBigDecimal("Concentration", Library::getConcentration), //
+      Column.forString("Concentration Units", lib -> lib.getConcentrationUnits() == null ? "" : lib.getConcentrationUnits().getRawLabel()), //
+      Column.forBigDecimal("Volume", Library::getVolume), //
+      Column.forString("Volume Units", lib -> lib.getVolumeUnits() == null ? "" : lib.getVolumeUnits().getRawLabel()), //
+      Column.forInteger("Size (bp)", Library::getDnaSize), //
+      Column.forString("Index 1", listIndex(1)), //
+      Column.forString("Index 2", listIndex(2)), //
+      Column.forString("Index Family",
+          lib -> lib.getIndices() == null || lib.getIndices().isEmpty() ? "" : lib.getIndices().get(0).getFamily().getName()));
 
   private static <S extends DetailedSample, T> Function<Library, T> detailedSample(Class<S> clazz, Function<S, T> function,
       T defaultValue) {
@@ -57,6 +84,16 @@ public enum LibrarySpreadSheets implements Spreadsheet<Library> {
     return library -> library.getIndices().stream().filter(i -> i.getPosition() == position)
         .map(Index::getSequence)
         .findFirst().orElse("");
+  }
+
+  private static Function<Library, String> groupIdFunction() {
+    return lib -> {
+      if (!LimsUtils.isDetailedLibrary(lib)) {
+        return "";
+      }
+      GroupIdentifiable entity = ((DetailedSample) lib.getSample()).getEffectiveGroupIdEntity();
+      return entity == null ? "" : entity.getGroupId();
+    };
   }
 
   private final List<Column<Library>> columns;

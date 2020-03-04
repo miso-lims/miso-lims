@@ -4,16 +4,29 @@ import java.util.stream.Stream;
 
 public enum ConcentrationUnit {
 
-  NANOGRAMS_PER_MICROLITRE("ng/&#181;L"), NANOMOLAR("nM"), PICOMOLAR("pM");
+  NANOGRAMS_PER_MICROLITRE("ng/&#181;L", "µL"), //
+  NANOMOLAR("nM"), //
+  PICOMOLAR("pM");
 
   private final String units;
+  private final String rawLabel;
 
   private ConcentrationUnit(String units) {
     this.units = units;
+    this.rawLabel = units;
+  }
+
+  private ConcentrationUnit(String units, String rawLabel) {
+    this.units = units;
+    this.rawLabel = rawLabel;
   }
 
   public String getUnits() {
     return units;
+  }
+
+  public String getRawLabel() {
+    return rawLabel;
   }
 
   /**
