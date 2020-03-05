@@ -9,8 +9,12 @@ INSERT INTO TissuePieceType (tissuePieceTypeId, abbreviation, name, archived) VA
 
 INSERT INTO PartitionQCType(partitionQcTypeId, description, noteRequired, orderFulfilled, analysisSkipped) VALUES
 (1, 'OK', FALSE, TRUE, FALSE),
-(2, 'Failed: Instrument Problem', FALSE, FALSE, TRUE),
-(3, 'Failed: Sasquatch Problem', TRUE, FALSE, TRUE);
+(2, 'OK''d by collaborator', FALSE, TRUE, FALSE),
+(3, 'Failed: Sasquatch Problem', TRUE, FALSE, TRUE),
+(4, 'Failed: Instrument problem', FALSE, FALSE, TRUE),
+(5, 'Failed: Library preparation problem', FALSE, TRUE, TRUE),
+(6, 'Failed: Analysis problem', FALSE, TRUE, TRUE),
+(7, 'Failed: Other problem', TRUE, FALSE, TRUE);
 
 INSERT INTO StudyType (typeId, name) VALUES
 (1,'Other'),

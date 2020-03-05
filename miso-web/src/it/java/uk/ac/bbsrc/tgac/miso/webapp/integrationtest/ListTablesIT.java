@@ -211,6 +211,7 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListLibrariesWarnings() throws Exception {
+    login();
     testWarningNormal(ListTarget.LIBRARIES, "LIB901", "Negative Volume", Columns.NAME);
   }
 
@@ -253,6 +254,7 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListOrdersSetup() throws Exception {
+    login();
     Set<String> ordersColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.PURPOSE, Columns.ORDER_DESCRIPTION,
         Columns.POOL_DESCRIPTION, Columns.INSTRUMENT_MODEL, Columns.LONGEST_INDEX, Columns.SEQUENCING_PARAMETERS, Columns.REMAINING,
         Columns.LAST_MODIFIED);
@@ -843,7 +845,7 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListGroupsSetup() throws Exception {
     loginAdmin();
-    testPageSetup(ListTarget.GROUPS, Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.DESCRIPTION), false);
+    testPageSetup(ListTarget.GROUPS, Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.DESCRIPTION), true);
   }
 
   @Test
@@ -994,6 +996,9 @@ public class ListTablesIT extends AbstractIT {
     case Columns.ORDER_FULFILLED:
     case Columns.ANALYSIS_SKIPPED:
       return booleanColumnComparator;
+    case Columns.ROWS:
+    case Columns.COLUMNS:
+      return numericComparator;
     case Columns.LIBRARY_NAME:
     case Columns.NAME:
     case Columns.SAMPLE_NAME:
