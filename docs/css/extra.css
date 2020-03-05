@@ -69,3 +69,29 @@ a {
 .wy-nav-top>a {
   color: #666666;
 }
+
+#index-checker-container {
+  display: flex;
+  align-items: flex-end;
+  margin-bottom: 18px;
+}
+
+#index-checker-control-box {
+  flex: 0 0 auto;
+  width: 150px;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.index-checker-control {
+  width: 100%;
+  margin-top: 6px;
+}
+
+.index-checker-box {
+  flex: 1 0 auto;
+}
+
+.index-checker-box textarea {
+  width: 100%;
+}

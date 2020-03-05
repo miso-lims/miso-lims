@@ -137,7 +137,13 @@ Urls = (function() {
     view: function(filename, anchor) {
       return freezerMapUiBase + '/' + filename + (anchor ? '#' + anchor : '');
     }
-  }
+  };
+
+  // Index Distance Tool
+  var indexDistanceRestBase = restBase + '/indexdistance';
+  rest.indexDistance = {
+    check: indexDistanceRestBase
+  };
 
   // Index Families
   var indexFamilyUiBase = baseUrl + '/indexfamily';

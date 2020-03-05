@@ -7,6 +7,7 @@ Changes:
     * Libraries: Pool Preparation, Dilution Preparation
     * Library aliquots: Pool Preparation, Dilution Preparation
   * Sort Transfers list by last modified time
+  * Added another version of the Index Distance tool to the MISO online documentation site
   * Fixed an issue where Run Scanner could cause a container to repeatedly flip between multiple
     container models if the container is linked to multiple runs
   * Fixed error when creating Sample Classes

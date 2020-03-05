@@ -28,6 +28,10 @@ considered duplicates.
 When you have made your selections, click the Calculate button and the Results box will be updated to show any
 duplicates and near duplicates.
 
+Another version of this tool can be found within this documentation [here](../../index-checker/). This version requires
+that you enter index sequences yourself, as it is not connected to a MISO database from which it can look up indices.
+It is available to people who don't have access to MISO, however.
+
 
 ## Index Search
 
