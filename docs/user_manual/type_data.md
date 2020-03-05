@@ -117,8 +117,8 @@ Note: This item only applies if your site uses [detailed sample mode](../site_co
 Tissue materials describe how the tissue was prepared and may include options such as 'Fresh Frozen,' 'FFPE,' and 'Blood.'
 Tissue material is an optional field for tissue samples.
 
-Any user can add tissue materials using the standard interface. MISO administrators can also edit and delete tissue
-materials. A tissue material can only be deleted if the option has not been used by any existing samples.
+MISO administrators can add, edit, and delete tissue materials using the standard interface. A tissue material can only be
+deleted if the option has not been used by any existing samples.
 
 
 
@@ -127,7 +127,8 @@ materials. A tissue material can only be deleted if the option has not been used
 Note: This item only applies if your site uses [detailed sample mode](../site_configuration/#detailed-sample-mode).
 
 Tissue origins describe what part of the donor or organism the sample was taken from. For human donors, options may
-include 'Brain,' 'Lung,' and 'Pancreas.'
+include 'Brain,' 'Lung,' and 'Pancreas.' The alias is a short code that may be used for generating sample aliases
+depending on the naming scheme (e.g. "Lv"). The description is the full origin name (e.g. "Liver").
 
 MISO administrators can add, edit, and delete tissue origins using the standard interface. A tissue origin can only be
 deleted if the option has not been used by any existing samples.
@@ -141,7 +142,7 @@ For tissue processing, slides can be made and then used for various other
 preparations (e.g., LCM). A tissue piece is a sample class that consumes slides
 to produce some new thing. The tissue piece type is the type of these new
 things. By default, _LCM Tube_ is created for laser-captured microdissection,
-but curls, macrodissections, and extracted nuceli are other procedures in this
+but curls, macrodissections, and extracted nuclei are other procedures in this
 category.
 
 MISO administrators can add, edit, and delete tissue piece types using the
@@ -243,9 +244,13 @@ library type can only be deleted if the status has not been used by any existing
 
 Note: This item only applies if your site uses [detailed sample mode](../site_configuration/#detailed-sample-mode).
 
+The design code describes what type of sequencing a library was designed for. Examples include "Whole Genome" and
+"Targeted Sequencing." The 2-letter code is a compact representation of this. Design codes define whether targeted
+sequencing is required for library aliquots.
+
 A library design is a grouping of [selection](#library-selection-types) and [strategy](#library-strategy-types) types
-and a design code. The library designs that are available for a library depend on the sample class of the aliquot that
-the library was propagated from.
+and a design code. The library designs that are available for a library depend on the sample class of the aliquot sample
+that the library was propagated from.
 
 MISO administrators can add, edit, and delete both library designs and library design codes using the standard
 interface. Most attributes of a library design cannot be modified if the design has been used by any existing
@@ -314,7 +319,6 @@ kits can only be deleted if they are not used by any existing QCs.
 
 
 
-
 ## Indices
 
 Indices, also known as barcodes or primers, are sequences that are added to libraries in order to identify which
@@ -323,7 +327,7 @@ that are intended to be used together. Index sequences should all be unique with
 
 Some index families are dual-indexed. This means that one or two indices can be added to each library. This increases
 the possibilities for unique sequences. Some dual-indexed families have an index 1 and index 2 that are always matched
-together. These are referred to as "unique dual index" families within MISO. For unique dual index families, the name
+together. These are referred to as **unique dual index** families within MISO. For unique dual index families, the name
 of the matching index 1 and index 2 in MISO must be identical in order for them to be automatically selected together.
 In other index families, any index 1 may be matched with any index 2.
 
@@ -334,7 +338,7 @@ reverse complement in sample sheets and though the Pinery data export
 interface.
 
 In some index families such as 10X Genomics kits, multiple sequences are associated with a single index. These are
-referred to as multi-sequence indices in MISO. For these, a demultiplexing name must be provided in addition to the
+referred to as **multi-sequence indices** in MISO. For these, a demultiplexing name must be provided in addition to the
 sequences. The demultiplexing name is a value that may be used by demultiplexing software in order to identify the
 indices.
 
@@ -349,6 +353,10 @@ Index families may be archived if they are no longer needed. This will prevent t
 creating new libraries.
 
 MISO administrators can add, edit, and delete indices using the standard interface within the Edit Index Family page.
+
+When creating indices, keep in mind that they are sorted alphabetically in dropdowns. If your indices are named "Index 1,
+Index 2... Index 10, Index 11..." then it may be ideal to add zeros before the numbers so that they sort in the expected
+order. e.g. "Index 01, Index 02... Index 10, Index 11"
 
 
 
@@ -380,8 +388,8 @@ page.
 
 ## Run Purposes
 
-Run purposes describe the reason for a sequencing order, such as QC or production. A pool order may also specify an
-run purpose if it includes sequencing requirements.
+Run purposes describe the reason for a sequencing order or run, such as QC or production. A pool order may also specify
+a run purpose if it includes sequencing requirements.
 
 MISO administrators can add, edit, and delete run purposes using the standard interface. A run purpose can only be
 deleted if it has not been used by any existing pool orders or sequencing orders.
@@ -411,6 +419,21 @@ add a new control, click the "Add" button in the toolbar, enter an alias for the
 the "Add" button. To remove an existing control, select it in the list and click the "Remove" button in the toolbar.
 You will only be able to remove a control if it has not been used in any QCs. Be sure to click the "Save" button at the
 top right of the page to confirm any changes.
+
+If a QC type specifies an instrument model then an instrument will have to be chosen whenever creating a QC of that type.
+If a QC type specifies a kit then a kit LOT# must be entered when creating a QC of that type. If a QC type specifies
+controls then a control must be selected and the control LOT# and pass/fail must also be entered when creating a QC of
+that type.
+
+Before adding a new QC type:
+
+* If an instrument is used for the QC and that instrument does not yet exist in MISO, first add the instrument type if
+  necessary, then add one or more instruments of that type
+* If a kit is used for the QC and the kit does not yet exist in MISO, create it
+
+Instruments, kits and controls are recent additions to QCs in MISO. You won't be able to update older QC types to
+include these items, as that would invalidate any of the existing QCs that were created from them. Instead, you can
+archive the existing QC and create a new one with the same name that includes the new options.
 
 
 
@@ -460,12 +483,22 @@ MISO administrators can add, edit, and delete instrument models from the List In
 instrument model, click the "Add" button at the top of the table. To edit an existing instrument model, click on its
 alias in the Instrument Models list.
 
-If a model has multiple run positions, these may be added on the Create or Edit Instrument Model page. Container models
-may be linked to an instrument model using the Edit Instrument Model page after the instrument model is saved. The
-container models must already exist, and can be looked up by alias or barcode.
+If a model has multiple run positions, these may be added on the Create or Edit Instrument Model page. For example, the
+Illumina HiSeq has an "A" position and a "B" position. Container models may be linked to an instrument model using the
+Edit Instrument Model page after the instrument model is saved. The container models must already exist, and can be
+looked up by alias or barcode.
 
 MISO administrators can delete instrument models using the standard interface. An instrument model can only be deleted
 if there are no exiting instruments of that model.
+
+Some things to keep in mind when adding instrument models:
+
+* Platform is only important for sequencers. For array scanners and other instruments, it doesn't matter which platform
+  is selected
+* Containers per run only applies to sequencers and should be set to 0 for other instrument types
+* Index sequencing should be set to normal except for instruments that sequence the reverse compliment of the i5 index,
+  such as the Illumina NextSeq. For these, "Reverse compliment i5" should be chosen
+* If you are creating a sequencer-type instrument, don't forget to add container models to it
 
 
 
@@ -480,6 +513,18 @@ a new container model, it can be linked to instrument models from the Edit Instr
 only be deleted if it has not been used by any existing sequencing containers. Alternately, container models no longer
 in use can be archived.
 
+Things to consider when adding container models:
+
+* If using Run Scanner, the container model's alias or barcode must match what is reported by Run Scanner. If in doubt,
+  use the name from the packaging, and it can be updated later if necessary
+* Partitions is the count of lanes/chambers/partitions in the container
+* Fallback should usually not be checked. A fallback container represents an unknown container model and is used when
+  there is no matching non-fallback container. Fallback containers usually have an alias like "Unknown 1-lane Illumina
+  Flow Cell"
+* If archived is checked, the container model will not be available to use when creating new containers
+* After creating the container model, remember to add it to one or more instrument models from the Edit Instrument Model
+  page
+
 
 
 ## Sequencing Parameters
@@ -492,6 +537,8 @@ been completed.
 MISO administrators can add, edit, and delete sequencing parameters using the standard interface. A sequencing
 parameters option can only be deleted if it has not been used by any existing runs or orders.
 
+Note that a sequencing parameters option is linked to a single sequencer model. If the parameters are valid for multiple
+sequencer models, you must create a sequencing parameters option for each sequencer model.
 
 
 ## Oxford Nanopore Flow Cell Pore Versions
@@ -505,7 +552,7 @@ such, they must be performed by a MISO adminstrator.
 ## Array Models
 
 Array models are similar to sequencing container models, except they describe the chip or cartridge that the array is
-loaded into, including the number of samples it can hold.
+loaded into. This includes the number of samples it can hold, specified in rows and columns.
 
 MISO administrators can add, edit, and delete array models using the standard interface. An array model can only be
 deleted if it is not used by any existing arrays.
@@ -522,3 +569,13 @@ added, your data may not be valid for ENA submission.
 
 MISO administrators can add, edit, and delete study types using the standard interface. A study type can only be
 deleted if it is not used by any existing studies.
+
+
+
+## Attachment Categories
+
+When uploading a file attachment (See [Attachments](../attachments)), you can choose a category that describes what type
+of file it is.
+
+Any user can add attachment categories using the standard interface. MISO administrators can also edit and delete them.
+An attachment category can only be deleted if there are no attachments of that category posted.
