@@ -35,7 +35,7 @@ IndexChecker = (function($) {
           }
         }
         let results = 'Indices were compared at the length of the shortest index, which is ' + shortestIndexLength + ' bp.\n';
-        if (results.length) {
+        if (errors.length) {
           errors.forEach(function(error) {
             results += '\n';
             if (error.index1 === error.index2) {
@@ -46,7 +46,7 @@ IndexChecker = (function($) {
           });
           showError(results);
         } else {
-          results += 'All sequences are at least ' + minDistance + ' edits apart';
+          results += '\nAll sequences are at least ' + minDistance + ' edits apart';
           getResultsBox().style.color = 'green';
           getResultsBox().value = results;
         }
@@ -92,7 +92,7 @@ IndexChecker = (function($) {
   function getShortestLength(strings) {
     return strings.reduce(function(accumulator, currentValue) {
       return accumulator ? Math.min(accumulator, currentValue.length) : currentValue.length;
-    });
+    }, null);
   }
   
   function getEditDistance(index1, index2, shortestIndexLength) {
