@@ -43,6 +43,10 @@ a {
   font-weight: normal;
 }
 
+.wy-menu-vertical > ul:last-child {
+  margin-bottom: 20px;
+}
+
 
 
 /* All four of these are necessary to change the color of the sidebar...!*/
@@ -69,6 +73,7 @@ a {
 .wy-nav-top>a {
   color: #666666;
 }
+
 
 #index-checker-container {
   display: flex;
