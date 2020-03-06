@@ -8,6 +8,7 @@ public enum InstrumentType {
   // Note: ListInstrumentsController sorts InstrumentType tabs by ordinal
   SEQUENCER("Sequencer"),
   ARRAY_SCANNER("Array Scanner"),
+  THERMAL_CYCLER("Thermal Cycler"),
   OTHER("Other");
 
   private static final Map<String, InstrumentType> lookup;

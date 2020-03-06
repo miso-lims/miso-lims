@@ -34,7 +34,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -77,9 +76,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryTemplateService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
@@ -88,6 +89,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
+import uk.ac.bbsrc.tgac.miso.core.service.WorkstationService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.AlphanumericComparator;
@@ -175,6 +177,10 @@ public class EditLibraryController {
   @Autowired
   private IndexChecker indexChecker;
   @Autowired
+  private WorkstationService workstationService;
+  @Autowired
+  private InstrumentService instrumentService;
+  @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
   private NamingSchemeHolder namingSchemeHolder;
@@ -252,11 +258,17 @@ public class EditLibraryController {
       SampleIdentity identity = getParent(SampleIdentity.class, (DetailedSample) detailed.getSample());
       model.put("effectiveExternalNames", identity.getExternalName());
     }
-
     model.put("libraryTransfers", library.getTransfers().stream()
         .map(TransferLibrary::getTransfer)
         .map(Dtos::asDto)
         .collect(Collectors.toList()));
+
+    ObjectNode formConfig = mapper.createObjectNode();
+    formConfig.put("detailedSample", isDetailedSampleEnabled());
+    MisoWebUtils.addJsonArray(mapper, formConfig, "workstations", workstationService.list(), Dtos::asDto);
+    MisoWebUtils.addJsonArray(mapper, formConfig, "thermalCyclers", instrumentService.listByType(InstrumentType.THERMAL_CYCLER),
+        Dtos::asDto);
+    model.put("formConfig", mapper.writeValueAsString(formConfig));
 
     return new ModelAndView("/WEB-INF/pages/editLibrary.jsp", model);
   }
@@ -275,12 +287,19 @@ public class EditLibraryController {
     }
 
     @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
       config.put(Config.SORTABLE_LOCATION, true);
       config.put(Config.PAGE_MODE, Config.EDIT);
       config.put(Config.SAMPLE_ALIAS_MAYBE_REQUIRED, !alwaysGenerateSampleAliases());
       config.put(Config.LIBRARY_ALIAS_MAYBE_REQUIRED, !alwaysGenerateLibraryAliases());
-      writeLibraryConfiguration(config);
+      MisoWebUtils.addJsonArray(mapper, config, "workstations", workstationService.list(), Dtos::asDto);
+      MisoWebUtils.addJsonArray(mapper, config, "thermalCyclers", instrumentService.listByType(InstrumentType.THERMAL_CYCLER),
+          Dtos::asDto);
+
+      config.put(Config.SHOW_DESCRIPTION, showDescription);
+      config.put(Config.SHOW_VOLUME, showVolume);
+      config.put(Config.SHOW_LIBRARY_ALIAS, showLibraryAlias);
+      config.put(Config.SORTABLE_LOCATION, true);
     }
   };
 
@@ -296,22 +315,16 @@ public class EditLibraryController {
 
   private final class LibraryBulkPropagateBackend extends BulkPropagateTableBackend<Sample, LibraryDto> {
 
-    private final SampleService sampleService;
-    private final LibraryTemplateService libraryTemplateService;
-    private final Consumer<ObjectNode> additionalConfigFunction;
     private final BoxDto newBox;
+    private final String sort;
 
-    public LibraryBulkPropagateBackend(SampleService sampleService, LibraryTemplateService libraryTemplateService,
-        Consumer<ObjectNode> additionalConfigFunction, BoxDto newBox) {
+    public LibraryBulkPropagateBackend(BoxDto newBox, String sort) {
       super("library", LibraryDto.class, "Libraries", "Samples");
-      this.sampleService = sampleService;
-      this.libraryTemplateService = libraryTemplateService;
-      this.additionalConfigFunction = additionalConfigFunction;
       this.newBox = newBox;
+      this.sort = sort;
     }
 
     private Map<Long, List<LibraryTemplateDto>> templatesByProjectId;
-    private String sort = null;
 
     @Override
     protected LibraryDto createDtoFromParent(Sample item) {
@@ -378,8 +391,7 @@ public class EditLibraryController {
     }
 
     @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
-      additionalConfigFunction.accept(config);
+    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
       if (templatesByProjectId != null && !templatesByProjectId.isEmpty()) {
         config.putPOJO(Config.TEMPLATES, templatesByProjectId);
       }
@@ -390,20 +402,15 @@ public class EditLibraryController {
       config.put(Config.PAGE_MODE, Config.PROPAGATE);
       config.put(Config.SAMPLE_ALIAS_MAYBE_REQUIRED, !alwaysGenerateSampleAliases());
       config.put(Config.LIBRARY_ALIAS_MAYBE_REQUIRED, !alwaysGenerateLibraryAliases());
+      config.put(Config.SHOW_DESCRIPTION, showDescription);
+      config.put(Config.SHOW_VOLUME, showVolume);
+      config.put(Config.SHOW_LIBRARY_ALIAS, showLibraryAlias);
+      config.put(Config.SORTABLE_LOCATION, true);
+      MisoWebUtils.addJsonArray(mapper, config, "workstations", workstationService.list(), Dtos::asDto);
+      MisoWebUtils.addJsonArray(mapper, config, "thermalCyclers", instrumentService.listByType(InstrumentType.THERMAL_CYCLER),
+          Dtos::asDto);
     }
 
-    public ModelAndView propagate(String idString, String replicates, String sort, ModelMap model) throws IOException {
-      this.sort = sort;
-      return propagate(idString, replicates, model);
-    }
-
-  }
-
-  private void writeLibraryConfiguration(ObjectNode config) {
-    config.put(Config.SHOW_DESCRIPTION, showDescription);
-    config.put(Config.SHOW_VOLUME, showVolume);
-    config.put(Config.SHOW_LIBRARY_ALIAS, showLibraryAlias);
-    config.put(Config.SORTABLE_LOCATION, true);
   }
 
   @GetMapping(value = "/bulk/propagate")
@@ -411,8 +418,8 @@ public class EditLibraryController {
       @RequestParam(name = "sort", required = false) String sort, @RequestParam(name = "boxId", required = false) Long boxId,
       ModelMap model) throws IOException {
     BoxDto newBox = boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null;
-    return new LibraryBulkPropagateBackend(sampleService, libraryTemplateService, this::writeLibraryConfiguration, newBox)
-        .propagate(sampleIds, replicates, sort, model);
+    return new LibraryBulkPropagateBackend(newBox, sort)
+        .propagate(sampleIds, replicates, model);
   }
 
   @GetMapping(value = "/bulk/edit")

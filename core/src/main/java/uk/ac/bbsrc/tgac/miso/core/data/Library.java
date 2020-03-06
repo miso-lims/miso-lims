@@ -352,4 +352,12 @@ public interface Library extends Attachable, Comparable<Library>, Deletable, Hie
   @Override
   public List<TransferLibrary> getTransfers();
 
+  public Workstation getWorkstation();
+
+  public void setWorkstation(Workstation workstation);
+
+  public Instrument getThermalCycler();
+
+  public void setThermalCycler(Instrument thermalCycler);
+
 }

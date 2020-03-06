@@ -130,4 +130,5 @@ DELETE FROM SampleType;
 DELETE FROM PartitionQCType;
 DELETE FROM StudyType;
 DELETE FROM TissuePieceType;
+DELETE FROM Workstation;
 SET FOREIGN_KEY_CHECKS=1;

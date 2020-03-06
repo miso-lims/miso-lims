@@ -87,15 +87,11 @@
 <script type="text/javascript">
   jQuery(document).ready(function () {
     Warning.generateHeaderWarnings('warnings', WarningTarget.library, ${libraryDto});
-    
-    var opts = {
-      detailedSample: Constants.isDetailedSample
-    };
     var dto = ${libraryDto};
     if (Constants.isDetailedSample) {
       dto.effectiveExternalNames = '${effectiveExternalNames}';
     }
-    FormUtils.createForm('libraryForm', 'save', dto, 'library', opts);
+    FormUtils.createForm('libraryForm', 'save', dto, 'library', ${formConfig});
   });
 </script>
 

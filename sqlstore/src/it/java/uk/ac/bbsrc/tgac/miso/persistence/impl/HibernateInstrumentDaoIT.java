@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
@@ -45,6 +46,11 @@ public class HibernateInstrumentDaoIT extends AbstractDAOTest {
   public void testListAll() throws IOException {
     Collection<Instrument> instruments = dao.listAll();
     assertEquals(PlatformType.ILLUMINA, instruments.iterator().next().getInstrumentModel().getPlatformType());
+  }
+
+  @Test
+  public void testListByType() throws Exception {
+    assertEquals(2L, dao.listByType(InstrumentType.SEQUENCER).size());
   }
 
   @Test

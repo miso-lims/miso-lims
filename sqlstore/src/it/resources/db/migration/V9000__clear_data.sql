@@ -128,5 +128,6 @@ DELETE FROM Workset;
 DELETE FROM Workset_Library;
 DELETE FROM Workset_LibraryAliquot;
 DELETE FROM Workset_Sample;
+DELETE FROM Workstation;
 
 SET FOREIGN_KEY_CHECKS=1;

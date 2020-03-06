@@ -72,6 +72,8 @@ public class LibraryDto extends AbstractBoxableDto {
   private String spikeInVolume;
   private String spikeInDilutionFactor;
   private boolean umis;
+  private Long workstationId;
+  private Long thermalCyclerId;
 
   public String getAlias() {
     return alias;
@@ -474,6 +476,22 @@ public class LibraryDto extends AbstractBoxableDto {
 
   public void setUmis(boolean umis) {
     this.umis = umis;
+  }
+
+  public Long getWorkstationId() {
+    return workstationId;
+  }
+
+  public void setWorkstationId(Long workstationId) {
+    this.workstationId = workstationId;
+  }
+
+  public Long getThermalCyclerId() {
+    return thermalCyclerId;
+  }
+
+  public void setThermalCyclerId(Long thermalCyclerId) {
+    this.thermalCyclerId = thermalCyclerId;
   }
 
 }

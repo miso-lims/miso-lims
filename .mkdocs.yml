@@ -40,18 +40,19 @@ nav:
     - 16. Transfers: user_manual/transfers.md
     - 17. Sequencing Containers: user_manual/sequencing_containers.md
     - 18. Instruments: user_manual/instruments.md
-    - 19. Sequencer Runs: user_manual/sequencer_runs.md
-    - 20. Arrays : user_manual/arrays.md
-    - 21. Array Runs: user_manual/array_runs.md
-    - 22. QCs: user_manual/qcs.md
-    - 23. Notes: user_manual/notes.md
-    - 24. Attachments: user_manual/attachments.md
-    - 25. Deletions: user_manual/deletions.md
-    - 26. Workflows: user_manual/workflows.md
-    - 27. European Nucleotide Archive Support: user_manual/european_nucleotide_archive_support.md
-    - 28. Home Screen Widgets: user_manual/home_screen_widgets.md
-    - 29. Other MISO Tools: user_manual/other_miso_tools.md
-    - 30. Related Software: user_manual/related_software.md
+    - 19. Workstations: user_manual/workstations.md
+    - 20. Sequencer Runs: user_manual/sequencer_runs.md
+    - 21. Arrays : user_manual/arrays.md
+    - 22. Array Runs: user_manual/array_runs.md
+    - 23. QCs: user_manual/qcs.md
+    - 24. Notes: user_manual/notes.md
+    - 25. Attachments: user_manual/attachments.md
+    - 26. Deletions: user_manual/deletions.md
+    - 27. Workflows: user_manual/workflows.md
+    - 28. European Nucleotide Archive Support: user_manual/european_nucleotide_archive_support.md
+    - 29. Home Screen Widgets: user_manual/home_screen_widgets.md
+    - 30. Other MISO Tools: user_manual/other_miso_tools.md
+    - 31. Related Software: user_manual/related_software.md
   - Developer Guide: developers-manual.md
 
 extra_css:

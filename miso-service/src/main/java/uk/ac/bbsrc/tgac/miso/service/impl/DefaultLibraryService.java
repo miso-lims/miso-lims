@@ -49,6 +49,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
+import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.KitDescriptorService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryDesignService;
@@ -60,6 +61,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.LibraryTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.TransferService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
+import uk.ac.bbsrc.tgac.miso.core.service.WorkstationService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
@@ -111,6 +113,10 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   private BoxService boxService;
   @Autowired
   private WorksetService worksetService;
+  @Autowired
+  private WorkstationService workstationService;
+  @Autowired
+  private InstrumentService instrumentService;
   @Autowired
   private SampleStore sampleStore;
   @Autowired
@@ -429,6 +435,12 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     if (library.getSpikeIn() != null) {
       library.setSpikeIn(librarySpikeInService.get(library.getSpikeIn().getId()));
     }
+    if (library.getWorkstation() != null) {
+      library.setWorkstation(workstationService.get(library.getWorkstation().getId()));
+    }
+    if (library.getThermalCycler() != null) {
+      library.setThermalCycler(instrumentService.get(library.getThermalCycler().getId()));
+    }
     if (isDetailedLibrary(library)) {
       DetailedLibrary lai = (DetailedLibrary) library;
       if (lai.getLibraryDesignCode() != null) {
@@ -494,6 +506,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     }
     target.setLocationBarcode(source.getLocationBarcode());
     target.setUmis(source.getUmis());
+    target.setWorkstation(source.getWorkstation());
+    target.setThermalCycler(source.getThermalCycler());
 
     if (isDetailedLibrary(target)) {
       DetailedLibrary dSource = (DetailedLibrary) source;

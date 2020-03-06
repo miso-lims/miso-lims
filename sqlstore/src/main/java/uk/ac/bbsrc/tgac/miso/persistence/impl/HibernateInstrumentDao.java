@@ -83,10 +83,21 @@ public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginat
     return (Instrument) currentSession().get(InstrumentImpl.class, id);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public List<Instrument> listAll() throws IOException {
-    return currentSession().createCriteria(InstrumentImpl.class).list();
+    @SuppressWarnings("unchecked")
+    List<Instrument> results = currentSession().createCriteria(InstrumentImpl.class).list();
+    return results;
+  }
+
+  @Override
+  public List<Instrument> listByType(InstrumentType type) throws IOException {
+    @SuppressWarnings("unchecked")
+    List<Instrument> results = currentSession().createCriteria(InstrumentImpl.class)
+        .createAlias("instrumentModel", "instrumentModel")
+        .add(Restrictions.eq("instrumentModel.instrumentType", type))
+        .list();
+    return results;
   }
 
   @Override

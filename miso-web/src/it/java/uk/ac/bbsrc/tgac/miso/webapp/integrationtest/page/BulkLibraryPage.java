@@ -28,6 +28,9 @@ public class BulkLibraryPage extends HeaderFooterPage {
     public static final String DISCARDED = "Discarded";
     public static final String SAMPLE_LOCATION = "Sample Location";
     public static final String DESCRIPTION = "Description";
+    public static final String CREATION_DATE = "Date of Creation";
+    public static final String WORKSTATION = "Workstation";
+    public static final String THERMAL_CYCLER = "Thermal Cycler";
     public static final String RECEIVE_DATE = "Date of Receipt";
     public static final String RECEIVE_TIME = "Time of Receipt";
     public static final String RECEIVED_FROM = "Received From";
@@ -58,7 +61,6 @@ public class BulkLibraryPage extends HeaderFooterPage {
     public static final String PARENT_VOLUME_USED = "Parent Vol. Used";
     public static final String CONCENTRATION = "Conc.";
     public static final String CONCENTRATION_UNITS = "Conc. Units";
-    public static final String CREATION_DATE = "Date of Creation";
     public static final String SPIKE_IN = "Spike-In";
     public static final String SPIKE_IN_DILUTION = "Spike-In Dilution Factor";
     public static final String SPIKE_IN_VOL = "Spike-In Volume";
