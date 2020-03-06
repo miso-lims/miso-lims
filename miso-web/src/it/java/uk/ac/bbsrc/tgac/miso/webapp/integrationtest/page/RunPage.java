@@ -200,18 +200,10 @@ public class RunPage extends FormPage<RunPage.Field> {
   public RunPage setPartitionQC(List<Integer> partitions, String option, String noteText) {
     WebElement html = getHtmlElement();
     checkLaneBoxesAndSelectOption(partitions, "Set QC", option);
-    switch (option) {
-    case LaneQC.OK:
-    case LaneQC.OK_COLLAB:
-    case LaneQC.FAIL_INSTRUMENT:
-    case LaneQC.FAIL_LIB_PREP:
-    case LaneQC.FAIL_ANALYSIS:
-      break;
-    case LaneQC.FAIL_OTHER:
+    if (LaneQC.FAIL_OTHER.equals(option)) {
       waitUntil(textToBe(By.className("ui-dialog-title"), "Failed: Other problem Notes"));
       dialog.findElement(By.tagName("input")).sendKeys(noteText);
       getDriver().findElement(By.id("ok")).click();
-      break;
     }
     waitForPageRefresh(html);
     return new RunPage(getDriver());

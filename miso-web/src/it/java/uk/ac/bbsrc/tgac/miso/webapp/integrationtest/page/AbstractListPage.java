@@ -1,10 +1,17 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page;
 
+import java.util.function.Function;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 
-public interface AbstractListPage {
+public abstract class AbstractListPage extends HeaderFooterPage {
 
   public static class Columns {
     public static final String ABBREVIATION = "Abbreviation";
@@ -13,6 +20,7 @@ public interface AbstractListPage {
     public static final String ALIAS = "Alias";
     public static final String ANALYSIS_SKIPPED = "Analysis Skipped";
     public static final String ARCHIVED = "Archived";
+    public static final String AUTO_UPDATE_FIELD = "Auto Update Field";
     public static final String AVAILABLE = "Available";
     public static final String AVG_INSERT_SIZE = "Average Insert Size";
     public static final String BACKEND = "Backend";
@@ -23,10 +31,12 @@ public interface AbstractListPage {
     public static final String CONCENTRATION = "Concentration";
     public static final String CONCENTRATION_UNITS = "Conc. Units";
     public static final String CONTAINER = "Container";
+    public static final String CORRESPONDING_FIELD = "Corresponding Field";
     public static final String CREATION_DATE = "Creation Date";
     public static final String CREATOR = "Creator";
     public static final String DATE_CREATED = "Date Created";
     public static final String DEFAULT_SCI_NAME = "Default Scientific Name";
+    public static final String DEFAULT_VOLUME = "Default Volume";
     public static final String DESCRIPTION = "Description";
     public static final String DESIGN = "Design";
     public static final String DRIVER = "Driver";
@@ -36,17 +46,18 @@ public interface AbstractListPage {
     public static final String FALLBACK = "Fallback";
     public static final String FAMILY = "Family";
     public static final String FILENAME = "Filename";
-    public static final String FREEZER_NAME = "Freezer Name";
-    public static final String GROUP_NAME = "Group Name";
+    public static final String FULL_NAME = "Full Name";
+    public static final String ID = "ID";
     public static final String IDENTIFICATION_BARCODE = "Identification Barcode";
     public static final String INDEX = "Index(es)";
+    public static final String INDEX_FAMILY = "Index Family";
     public static final String INDEX_NAME = "Index Name";
     public static final String INDICES = "Indices";
+    public static final String INSTITUTE = "Institute";
     public static final String INSTRUMENT_MODEL = "Instrument Model";
     public static final String INSTRUMENT_NAME = "Instrument Name";
     public static final String INSTRUMENT_TYPE = "Instrument Type";
     public static final String INTERNAL = "Internal";
-    public static final String ID = "ID";
     public static final String ITEMS = "Items";
     public static final String ITEMS_CAPACITY = "Items/Capacity";
     public static final String KIT_NAME = "Kit Name";
@@ -58,10 +69,12 @@ public interface AbstractListPage {
     public static final String LIBRARY_ALIAS = "Library Alias";
     public static final String LIBRARY_ALIQUOT_NAME = "Library Aliquot Name";
     public static final String LIBRARY_ALIQUOTS = "Library Aliquots";
+    public static final String LIBRARY_DESIGN = "Library Design";
     public static final String LIBRARY_DESIGN_CODE = "Design Code";
     public static final String LIBRARY_NAME = "Library Name";
     public static final String LIBRARY_SELECTION = "Selection";
     public static final String LIBRARY_STRATEGY = "Strategy";
+    public static final String LIBRARY_TYPE = "Library Type";
     public static final String LOCATION = "Location";
     public static final String LOGGED_IN = "Logged In";
     public static final String LOGIN_NAME = "Login Name";
@@ -83,6 +96,8 @@ public interface AbstractListPage {
     public static final String POOL_DESCRIPTION = "Pool Description";
     public static final String POSITION = "Position";
     public static final String PRINTER = "Printer";
+    public static final String PRIORITY = "Priority";
+    public static final String PROJECT = "Project";
     public static final String PURPOSE = "Purpose";
     public static final String QC = "QC";
     public static final String QC_NOTE = "QC Note";
@@ -90,6 +105,7 @@ public interface AbstractListPage {
     public static final String QC_STATUS = "QC Status";
     public static final String RECEIVED = "Received";
     public static final String RECIPIENT = "Recipient";
+    public static final String REFERENCE_GENOME = "Reference Genome";
     public static final String REMAINING = "Remaining";
     public static final String REQUESTED = "Requested";
     public static final String ROWS = "Rows";
@@ -114,7 +130,11 @@ public interface AbstractListPage {
     public static final String STOCK_LEVEL = "Stock Level";
     public static final String STOPPED = "Stopped";
     public static final String STORAGE_LOCATION = "Storage Location";
+    public static final String STUDY_ALIAS = "Study Alias";
+    public static final String STUDY_NAME = "Study Name";
     public static final String SUBCATEGORY = "Subcategory";
+    public static final String SUBMISSION_DATE = "Submission Date";
+    public static final String TARGET = "Target";
     public static final String TARGETED_SEQUENCING = "Targeted Sequencing";
     public static final String TARGETED_SEQUENCING_REQD = "Targeted Sequencing Required";
     public static final String TISSUE_ORIGIN = "Tissue Origin";
@@ -122,8 +142,10 @@ public interface AbstractListPage {
     public static final String TRANSFER_TIME = "Transfer Time";
     public static final String TYPE = "Type";
     public static final String UNIQUE_DUAL_INDICES = "Unique Dual Indices";
+    public static final String UNITS = "Units";
     public static final String UNKNOWN = "Unknown";
     public static final String USER_NAME = "User Name";
+    public static final String VERIFIED = "Verified";
     public static final String VERSION = "Version";
     public static final String VOLUME = "Volume";
     public static final String VOLUME_UNITS = "Vol. Units";
@@ -134,16 +156,21 @@ public interface AbstractListPage {
     public static final String ARRAYS = "arrays";
     public static final String ARRAY_RUNS = "arrayruns";
     public static final String ARRAY_MODELS = "arraymodel/list";
+    public static final String ATTACHMENT_CATEGORIES = "attachmentcategories/list";
     public static final String BOX_SIZES = "boxsize/list";
     public static final String BOX_USES = "boxuse/list";
     public static final String BOXES = "boxes";
     public static final String CONTAINERS = "containers";
     public static final String CONTAINER_MODELS = "containermodel/list";
     public static final String DETAILED_QC_STATUS = "detailedqcstatus/list";
+    public static final String EXPERIMENTS = "experiments";
+    public static final String GROUPS = "admin/groups";
     public static final String INDEX_FAMILIES = "indexfamily/list";
+    public static final String INSTITUTES = "institute/list";
     public static final String INSTRUMENTS = "instruments";
     public static final String INSTRUMENT_MODELS = "instrumentmodel/list";
     public static final String KITS = "kitdescriptors";
+    public static final String LABS = "lab/list";
     public static final String LIBRARIES = "libraries";
     public static final String LIBRARY_ALIQUOTS = "libraryaliquots";
     public static final String LIBRARY_DESIGNS = "librarydesign/list";
@@ -151,6 +178,7 @@ public interface AbstractListPage {
     public static final String LIBRARY_SELECTION_TYPES = "libraryselection/list";
     public static final String LIBRARY_SPIKE_INS = "libraryspikein/list";
     public static final String LIBRARY_STRATEGY_TYPES = "librarystrategy/list";
+    public static final String LIBRARY_TEMPLATES = "librarytemplates";
     public static final String LIBRARY_TYPES = "librarytype/list";
     public static final String LOCATION_MAPS = "locationmap/list";
     public static final String ORDERS_ALL = "sequencingorders/all";
@@ -161,11 +189,13 @@ public interface AbstractListPage {
     public static final String POOL_ORDERS = "poolorders";
     public static final String PRINTERS = "printers";
     public static final String PROJECTS = "projects";
+    public static final String QC_TYPE = "qctype/list";
     public static final String REFERENCE_GENOMES = "referencegenome/list";
     public static final String RUNS = "runs";
     public static final String RUN_PURPOSES = "runpurpose/list";
     public static final String SAMPLES = "samples";
     public static final String SAMPLE_CLASSES = "sampleclass/list";
+    public static final String SAMPLE_PURPOSES = "samplepurpose/list";
     public static final String SAMPLE_TYPES = "sampletype/list";
     public static final String SEQUENCING_PARAMETERS = "sequencingparameters/list";
     public static final String STAINS = "stain/list";
@@ -173,9 +203,15 @@ public interface AbstractListPage {
     public static final String STORAGE_LOCATIONS = "storagelocations";
     public static final String STUDIES = "studies";
     public static final String STUDY_TYPES = "studytype/list";
+    public static final String SUBMISSIONS = "submissions";
+    public static final String SUBPROJECTS = "subproject/list";
     public static final String TARGETED_SEQUENCINGS = "targetedsequencing/list";
+    public static final String TISSUE_MATERIALS = "tissuematerial/list";
+    public static final String TISSUE_ORIGINS = "tissueorigin/list";
+    public static final String TISSUE_PIECE_TYPE = "tissuepiecetype/list";
     public static final String TISSUE_TYPES = "tissuetype/list";
     public static final String TRANSFERS = "transfer/list";
+    public static final String USERS = "admin/users";
     public static final String WORKSETS = "worksets";
   }
 
@@ -196,7 +232,43 @@ public interface AbstractListPage {
     public static final String MERGE = "Merge";
   }
 
-  public WebElement getErrors();
+  private static final Logger log = LoggerFactory.getLogger(AbstractListPage.class);
 
-  public DataTable getTable();
+  private final Function<WebDriver, ? extends AbstractListPage> constructor;
+
+  public AbstractListPage(WebDriver driver, Function<WebDriver, ? extends AbstractListPage> constructor) {
+    super(driver);
+    this.constructor = constructor;
+  }
+
+  public abstract WebElement getErrors();
+
+  public abstract DataTable getTable();
+
+  /**
+   * Deletes items selected in the table
+   * 
+   * @return the new ListPage if the delete is successful; otherwise null
+   */
+  public AbstractListPage deleteSelected() {
+    getTable().clickButton("Delete");
+    waitUntil(ExpectedConditions.visibilityOfElementLocated(By.id("dialog")));
+    WebElement dialogElement = getDriver().findElements(By.cssSelector("#dialog *")).get(0);
+    clickOk();
+    // dialog will be recreated to show "Working..." dialog
+    waitUntil(ExpectedConditions.stalenessOf(dialogElement));
+    WebElement workingDialogText = findElementIfExists(By.cssSelector("#dialog p:first-of-type"));
+    // sometimes the working dialog disappears too quickly to catch
+    if (workingDialogText != null) {
+      // working dialog will be recreated either to show error, or for page refresh
+      waitUntil(ExpectedConditions.stalenessOf(workingDialogText));
+    }
+    WebElement errorDialog = getDriver().findElement(By.id("dialog"));
+    if (errorDialog != null && errorDialog.isDisplayed()) {
+      log.error("Error dialog: " + String.join("\n\t", getDialogText()));
+      clickOk();
+      return null;
+    }
+    return constructor.apply(getDriver());
+  }
 }

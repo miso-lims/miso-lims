@@ -14,7 +14,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 
-public class ListTabbedPage extends HeaderFooterPage implements AbstractListPage {
+public class ListTabbedPage extends AbstractListPage {
 
   public static class Tabs {
     public static final String ALL = "All";
@@ -43,6 +43,9 @@ public class ListTabbedPage extends HeaderFooterPage implements AbstractListPage
     public static final String OUTSTANDING = "Outstanding";
     public static final String FULFILLED = "Fulfilled";
     public static final String DRAFT = "Draft";
+    public static final String SEQUENCER = "Sequencer";
+    public static final String ARRAY_SCANNER = "Array Scanner";
+    public static final String OTHER = "Other";
   }
 
   @FindBy(className = "dataTables_wrapper")
@@ -61,7 +64,7 @@ public class ListTabbedPage extends HeaderFooterPage implements AbstractListPage
   private WebElement dialog;
 
   public ListTabbedPage(WebDriver driver) {
-    super(driver);
+    super(driver, ListTabbedPage::new);
     PageFactory.initElements(driver, this);
     tabs = driver.findElements(By.xpath("//li[@role='tab']"));
     waitWithTimeout().until(ExpectedConditions.visibilityOf(selectedTab));

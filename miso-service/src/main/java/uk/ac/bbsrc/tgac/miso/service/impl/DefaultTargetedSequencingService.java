@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.KitDescriptorService;
 import uk.ac.bbsrc.tgac.miso.core.service.TargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
@@ -32,6 +34,9 @@ public class DefaultTargetedSequencingService extends AbstractSaveService<Target
 
   @Autowired
   private DeletionStore deletionStore;
+
+  @Autowired
+  private KitDescriptorService kitDescriptorService;
 
   @Override
   public List<TargetedSequencing> list() throws IOException {
@@ -101,6 +106,15 @@ public class DefaultTargetedSequencingService extends AbstractSaveService<Target
       result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.libraryAliquots(usage)));
     }
     return result;
+  }
+
+  @Override
+  public void beforeDelete(TargetedSequencing object) throws IOException {
+    for (KitDescriptor kit : object.getKitDescriptors()) {
+      kit.getTargetedSequencing().remove(object);
+      kitDescriptorService.update(kit);
+    }
+    object.getKitDescriptors().clear();
   }
 
 }

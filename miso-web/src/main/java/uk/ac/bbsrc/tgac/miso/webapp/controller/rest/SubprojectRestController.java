@@ -37,7 +37,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -58,9 +57,9 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
 
 @Controller
 @RequestMapping("/rest/subprojects")
-public class SubprojectController extends RestController {
+public class SubprojectRestController extends RestController {
 
-  protected static final Logger log = LoggerFactory.getLogger(SubprojectController.class);
+  protected static final Logger log = LoggerFactory.getLogger(SubprojectRestController.class);
 
   @Autowired
   private SubprojectService subprojectService;
@@ -115,14 +114,11 @@ public class SubprojectController extends RestController {
     return getSubproject(id, uriBuilder, response);
   }
 
-  @DeleteMapping(value = "/{id}")
-  @ResponseStatus(code = HttpStatus.OK)
-  public void deleteSubproject(@PathVariable(name = "id", required = true) long id) throws IOException {
-    Subproject subproject = subprojectService.get(id);
-    if (subproject == null) {
-      throw new RestException("Subproject " + id + " not found", Status.NOT_FOUND);
-    }
-    subprojectService.delete(subproject);
+  @PostMapping(value = "/bulk-delete")
+  @ResponseBody
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
+    RestUtils.bulkDelete("Subproject", ids, subprojectService);
     menuController.refreshConstants();
   }
 

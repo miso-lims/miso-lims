@@ -325,4 +325,5 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   public String getFriendlyName() {
     return "Run";
   }
+
 }

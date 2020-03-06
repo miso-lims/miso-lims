@@ -14,12 +14,14 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentDataManglingPolicy;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
+import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
@@ -37,6 +39,8 @@ public class DefaultInstrumentModelService extends AbstractSaveService<Instrumen
   private InstrumentModelStore instrumentModelStore;
   @Autowired
   private SequencingContainerModelService containerModelService;
+  @Autowired
+  private SequencingParametersService sequencingParametersService;
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -210,6 +214,14 @@ public class DefaultInstrumentModelService extends AbstractSaveService<Instrumen
       result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.instruments(usage)));
     }
     return result;
+  }
+
+  @Override
+  public void beforeDelete(InstrumentModel object) throws IOException {
+    List<SequencingParameters> params = sequencingParametersService.listByInstrumentModelId(object.getId());
+    if (!params.isEmpty()) {
+      sequencingParametersService.bulkDelete(params);
+    }
   }
 
   @Override

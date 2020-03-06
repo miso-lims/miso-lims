@@ -45,7 +45,7 @@ ListTarget.tissueorigin = {
             Utils.showOkDialog('Create Tissue Origins', ["That's a peculiar number of tissueorigins to create."]);
             return;
           }
-          window.location = '/miso/tissueorigin/bulk/new?' + jQuery.param({
+          window.location = Urls.ui.tissueOrigins.bulkCreate + '?' + jQuery.param({
             quantity: result.quantity,
           });
         });

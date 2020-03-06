@@ -40,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
@@ -257,7 +258,7 @@ public class HibernateKitDao implements KitStore, HibernatePaginatedDataSource<K
 
   @Override
   public long getUsageByRuns(KitDescriptor kitDescriptor) throws IOException {
-    return (long) currentSession().createCriteria(LibraryImpl.class)
+    return (long) currentSession().createCriteria(Run.class)
         .add(Restrictions.eq("sequencingKit", kitDescriptor))
         .setProjection(Projections.rowCount()).uniqueResult();
   }

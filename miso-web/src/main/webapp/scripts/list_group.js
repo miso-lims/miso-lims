@@ -35,7 +35,7 @@ ListTarget.group = {
       return [{
         "name": "Add",
         "handler": function() {
-          window.location = "/miso/admin/group/new";
+          window.location = Urls.ui.groups.create;
         }
       }];
     } else {
@@ -44,14 +44,14 @@ ListTarget.group = {
   },
   createColumns: function(config, projectId) {
     return [{
-      "sTitle": "Group Name",
+      "sTitle": "Name",
       "mData": "name",
       "include": true,
       "iSortPriority": 1,
       "bSortDirection": true,
       "mRender": function(data, type, full) {
         if (config.isAdmin) {
-          return "<a href=\"/miso/admin/group/" + full.id + "\">" + data + "</a>";
+          return "<a href=\"" + Urls.ui.groups.edit(full.id) + "\">" + data + "</a>";
         } else {
           return data;
         }

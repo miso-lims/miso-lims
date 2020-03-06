@@ -45,7 +45,7 @@ ListTarget.lab = {
             Utils.showOkDialog('Create Labs', ["That's a peculiar number of labs to create."]);
             return;
           }
-          window.location = '/miso/lab/bulk/new?' + jQuery.param({
+          window.location = Urls.ui.labs.bulkCreate + '?' + jQuery.param({
             quantity: result.quantity,
           });
         });

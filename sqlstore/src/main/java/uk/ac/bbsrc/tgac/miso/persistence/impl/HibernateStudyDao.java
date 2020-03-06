@@ -39,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
@@ -187,6 +188,13 @@ public class HibernateStudyDao implements StudyStore, HibernatePaginatedDataSour
   @Override
   public String propertyForUser(boolean creator) {
     return creator ? "creator" : "lastModifier";
+  }
+
+  @Override
+  public long getUsage(Study study) throws IOException {
+    return (long) currentSession().createCriteria(Experiment.class)
+        .add(Restrictions.eq("study", study))
+        .setProjection(Projections.rowCount()).uniqueResult();
   }
 
 }

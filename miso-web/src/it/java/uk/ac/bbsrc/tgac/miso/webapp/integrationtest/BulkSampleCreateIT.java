@@ -352,7 +352,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     HandsOnTable table = page.getTable();
 
     Set<String> stains = table.getDropdownOptions(SamColumns.STAIN, 0);
-    assertEquals(3, stains.size()); // 2 + (None)
+    assertTrue(stains.size() > 3); // includes "(None)"
     assertTrue(stains.contains("Cresyl Violet"));
     assertTrue(stains.contains("(None)"));
 

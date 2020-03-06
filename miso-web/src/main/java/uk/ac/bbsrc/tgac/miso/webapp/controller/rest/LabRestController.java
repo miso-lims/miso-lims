@@ -9,7 +9,6 @@ import javax.ws.rs.core.Response.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -75,10 +74,10 @@ public class LabRestController extends RestController {
     return getLab(id, uriBuilder);
   }
 
-  @DeleteMapping(value = "/{id}")
+  @PostMapping(value = "/bulk-delete")
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
-  public void deleteLab(@PathVariable(name = "id", required = true) long id) throws IOException {
-    RestUtils.delete("Lab", id, labService);
+  public void deleteLab(@RequestBody(required = true) List<Long> ids) throws IOException {
+    RestUtils.bulkDelete("Lab", ids, labService);
     menuController.refreshConstants();
   }
 

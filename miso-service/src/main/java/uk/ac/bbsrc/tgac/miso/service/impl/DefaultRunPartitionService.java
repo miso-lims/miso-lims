@@ -63,4 +63,11 @@ public class DefaultRunPartitionService implements RunPartitionService {
       runPartitionDao.update(managed);
     }
   }
+
+  @Override
+  public void deleteForRun(Run run) throws IOException {
+    Run managed = runService.get(run.getId());
+    authorizationManager.throwIfNonAdminOrMatchingOwner(managed.getCreator());
+    runPartitionDao.deleteForRun(managed);
+  }
 }

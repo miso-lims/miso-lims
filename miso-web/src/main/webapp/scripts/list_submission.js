@@ -36,12 +36,12 @@ ListTarget.submission = {
   createColumns: function(config, projectId) {
     return [ListUtils.idHyperlinkColumn("ID", Urls.ui.submissions.edit, "id", Utils.array.getId, 1, true),
         ListUtils.labelHyperlinkColumn("Alias", Urls.ui.submissions.edit, Utils.array.getId, "alias", 0, true), {
-          "sTitle": "Created Date",
+          "sTitle": "Creation Date",
           "mData": "creationDate",
           "include": true,
           "iSortPriority": 0,
         }, {
-          "sTitle": "Submitted Date",
+          "sTitle": "Submission Date",
           "mData": "submittedDate",
           "include": true,
           "iSortPriority": 0,

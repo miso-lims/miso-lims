@@ -40,6 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QC;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
@@ -193,6 +194,15 @@ public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginat
     return (long) currentSession().createCriteria(ArrayRun.class)
         .add(Restrictions.eq("instrument", instrument))
         .setProjection(Projections.rowCount()).uniqueResult();
+  }
+
+  @Override
+  public long getUsageByQcs(Instrument instrument) throws IOException {
+    @SuppressWarnings("unchecked")
+    List<Long> counts = currentSession().createCriteria(QC.class)
+        .add(Restrictions.eq("instrument", instrument))
+        .setProjection(Projections.rowCount()).list(); // returns one count per QC table (samples, libraries...)
+    return counts.stream().mapToLong(Long::longValue).sum();
   }
 
 }

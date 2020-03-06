@@ -45,7 +45,7 @@ ListTarget.institute = {
             Utils.showOkDialog("Create Institutes", ["That's a peculiar number of institutes to create."]);
             return;
           }
-          window.location = '/miso/institute/bulk/new?' + jQuery.param({
+          window.location = Urls.ui.institutes.bulkCreate + '?' + jQuery.param({
             quantity: result.quantity,
           });
         });

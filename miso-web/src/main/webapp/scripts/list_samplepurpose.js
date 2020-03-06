@@ -45,7 +45,7 @@ ListTarget.samplepurpose = {
             Utils.showOkDialog('Create Sample Purposes', ["That's a peculiar number of sample purposes to create."]);
             return;
           }
-          window.location = '/miso/samplepurpose/bulk/new?' + jQuery.param({
+          window.location = Urls.ui.samplePurposes.bulkCreate + '?' + jQuery.param({
             quantity: result.quantity,
           });
         });

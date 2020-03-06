@@ -9,6 +9,30 @@ INSERT INTO _Group (groupId, description, name) VALUES
 INSERT INTO User_Group (users_userId, groups_groupId)
 VALUES (3,1),(3,2),(1,1);
 
+INSERT INTO StudyType (typeId, name) VALUES
+(1,'Other'),
+(12,'RNASeq'),
+(11,'Population Genomics'),
+(10,'Cancer Genomics'),
+(9,'Gene Regulation Study'),
+(8,'Forensic or Paleo-genomics'),
+(7,'Synthetic Genomics'),
+(6,'Epigenetics'),
+(5,'Resequencing'),
+(4,'Transcriptome Analysis'),
+(3,'Metagenomics'),
+(2,'Whole Genome Sequencing');
+
+INSERT INTO SampleType (typeId, name) VALUES
+(2,'NON GENOMIC'),
+(1,'GENOMIC'),
+(5,'OTHER'),
+(4,'VIRAL RNA'),
+(3,'SYNTHETIC'),
+(6,'TRANSCRIPTOMIC'),
+(7,'METAGENOMIC'),
+(8,'METATRANSCRIPTOMIC');
+
 INSERT INTO ReferenceGenome (referenceGenomeId, alias) VALUES (1, 'Triticum aestivum');
 
 INSERT INTO QCType (name, description, qcTarget, units, archived, precisionAfterDecimal) VALUES

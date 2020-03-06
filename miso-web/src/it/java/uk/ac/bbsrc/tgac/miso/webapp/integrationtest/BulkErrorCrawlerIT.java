@@ -198,7 +198,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("arraymodel/bulk/new?quantity=3");
     slugs.add("arraymodel/bulk/edit?ids=1");
     slugs.add("partitionqctype/bulk/new?quantity=3");
-    slugs.add("partitionqctype/bulk/edit?ids=22%2C23");
+    slugs.add("partitionqctype/bulk/edit?ids=2%2C3");
     slugs.add("referencegenome/bulk/new?quantity=3");
     slugs.add("referencegenome/bulk/edit?ids=1%2C2%2C3");
     slugs.add("studytype/bulk/new?quantity=3");
