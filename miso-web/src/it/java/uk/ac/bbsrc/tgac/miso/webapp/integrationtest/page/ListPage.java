@@ -9,7 +9,7 @@ import org.openqa.selenium.support.PageFactory;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 
-public class ListPage extends HeaderFooterPage implements AbstractListPage {
+public class ListPage extends AbstractListPage {
 
   @FindBy(className = "dataTables_wrapper")
   private WebElement tableWrapper;
@@ -19,7 +19,7 @@ public class ListPage extends HeaderFooterPage implements AbstractListPage {
   private final DataTable table;
 
   public ListPage(WebDriver driver) {
-    super(driver);
+    super(driver, ListPage::new);
     PageFactory.initElements(driver, this);
     waitWithTimeout().until(visibilityOf(tableWrapper));
     table = new DataTable(driver, tableWrapper.getAttribute("id"));
@@ -29,10 +29,6 @@ public class ListPage extends HeaderFooterPage implements AbstractListPage {
     String url = String.format("%smiso/%s", baseUrl, listTarget);
     driver.get(url);
     return new ListPage(driver);
-  }
-
-  public String clickButtonAndGetUrl(String linkText) {
-    return clickLinkButtonAndGetUrl(linkText, null, false);
   }
 
   public String clickButtonAndGetUrlWithConfirm(String linkText) {
@@ -48,4 +44,5 @@ public class ListPage extends HeaderFooterPage implements AbstractListPage {
   public WebElement getErrors() {
     return errors;
   }
+
 }

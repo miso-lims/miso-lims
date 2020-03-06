@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -87,7 +88,7 @@ public class QcType implements Comparable<QcType>, Serializable, Aliasable, Dele
   @JoinColumn(name = "kitDescriptorId")
   private KitDescriptor kitDescriptor;
 
-  @OneToMany(mappedBy = "qcType")
+  @OneToMany(mappedBy = "qcType", cascade = CascadeType.REMOVE)
   private Set<QcControl> controls;
 
   /**

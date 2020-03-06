@@ -895,6 +895,7 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   @Override
   public void beforeDelete(Run object) throws IOException {
     fileAttachmentService.beforeDelete(object);
+    runPartitionService.deleteForRun(object);
   }
 
   @Override

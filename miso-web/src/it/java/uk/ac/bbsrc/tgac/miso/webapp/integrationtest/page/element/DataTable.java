@@ -13,7 +13,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 
 import com.google.common.base.Predicates;
-import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.Columns;
 
@@ -32,8 +31,6 @@ public class DataTable extends AbstractElement {
 
   private final WebElement table;
   private final WebElement toolbar;
-  private final List<WebElement> columnHeaders;
-  private final List<String> columnHeadings;
   private final WebElement searchBar;
   private final WebElement searchBarDiv;
   private final WebElement processing;
@@ -44,24 +41,23 @@ public class DataTable extends AbstractElement {
     WebElement tableWrapper = getDriver().findElement(By.id(tableWrapperId));
     this.table = tableWrapper.findElement(tableSelector);
     this.toolbar = findElementIfExists(By.xpath(".//div[@id='" + tableWrapperId + "']/preceding::div[contains(@class, 'fg-toolbar')][1]"));
-    this.columnHeaders = table.findElements(columnHeadingsSelector).stream().collect(Collectors.toList());
-    this.columnHeadings = columnHeaders.stream()
-        .map(element -> element.getText().trim())
-        .collect(Collectors.toList());
     this.searchBar = tableWrapper.findElement(searchBarSelector);
     this.searchBarDiv = tableWrapper.findElement(searchBarDivSelector);
     this.processing = tableWrapper.findElement(processingSelector);
   }
 
   public List<WebElement> getColumnHeaders() {
-    return Lists.newArrayList(columnHeaders);
+    return table.findElements(columnHeadingsSelector);
   }
 
   public List<String> getColumnHeadings() {
-    return Lists.newArrayList(columnHeadings);
+    return getColumnHeaders().stream()
+        .map(element -> element.getText().trim())
+        .collect(Collectors.toList());
   }
 
   public List<String> getSortableColumnHeadings() {
+    List<WebElement> columnHeaders = getColumnHeaders();
     List<WebElement> sortableColumns = columnHeaders.stream()
         .filter(th -> th.findElements(sortableColumnSelector).size() != 0)
         .collect(Collectors.toList());
@@ -109,11 +105,11 @@ public class DataTable extends AbstractElement {
   }
 
   private WebElement getHeader(String columnHeading) {
-    int colNum = columnHeadings.indexOf(columnHeading);
+    int colNum = getColumnHeadings().indexOf(columnHeading);
     if (colNum == -1) {
       throw new IllegalArgumentException("Column " + columnHeading + " doesn't exist");
     }
-    return columnHeaders.get(colNum);
+    return getColumnHeaders().get(colNum);
   }
 
   public String getTextAtCell(String columnHeading, int rowNum) {
@@ -130,7 +126,7 @@ public class DataTable extends AbstractElement {
   }
 
   private WebElement getCell(String columnHeading, int rowNum) {
-    int colNum = columnHeadings.indexOf(columnHeading);
+    int colNum = getColumnHeadings().indexOf(columnHeading);
     if (colNum == -1) {
       throw new IllegalArgumentException("Column " + columnHeading + " doesn't exist");
     }
@@ -151,8 +147,11 @@ public class DataTable extends AbstractElement {
     if (table.findElements(rowSelector).isEmpty()) {
       return Stream.empty();
     }
-    int colNum = columnHeadings.indexOf(columnHeading);
-    return table.findElements(rowSelector).stream()
+    int colNum = getColumnHeadings().indexOf(columnHeading);
+    if (colNum == -1) {
+      throw new IllegalArgumentException("Column '" + columnHeading + "' not found in table");
+    }
+    Stream<WebElement> stream = table.findElements(rowSelector).stream()
         .map(row -> {
           if (row == null) return null;
           List<WebElement> cells = row.findElements(cellSelector);
@@ -160,6 +159,7 @@ public class DataTable extends AbstractElement {
           return cells.get(colNum);
         })
         .filter(Predicates.notNull());
+    return stream;
   }
 
   public List<String> getColumnValues(String columnHeading) {

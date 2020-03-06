@@ -38,12 +38,5 @@ FOR EACH ROW
   SELECT NEW.arrayId, '', a.lastModifier, CONCAT('SAM', NEW.sampleId, ' added to ', NEW.position), a.lastModified
   FROM Array a WHERE a.arrayId = NEW.arrayId//
 
-DROP TRIGGER IF EXISTS ArrayPositionDelete//
-CREATE TRIGGER ArrayPositionDelete AFTER DELETE ON ArrayPosition
-FOR EACH ROW
-  INSERT INTO ArrayChangeLog(arrayId, columnsChanged, userId, message, changeTime)
-  SELECT OLD.arrayId, '', a.lastModifier, CONCAT('SAM', OLD.sampleId, ' removed from ', OLD.position), a.lastModified
-  FROM Array a WHERE a.arrayId = OLD.arrayId//
-
 DELIMITER ;
 -- EndNoTest

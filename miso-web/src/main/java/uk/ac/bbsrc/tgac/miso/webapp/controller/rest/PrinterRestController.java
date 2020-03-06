@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -232,15 +231,10 @@ public class PrinterRestController extends RestController {
     return jQueryBackend.get(request, advancedSearchParser);
   }
 
-  @DeleteMapping(headers = { "Content-type=application/json" })
+  @PostMapping(value = "/bulk-delete", headers = { "Content-type=application/json" })
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void delete(@RequestBody List<Long> printerIds) throws IOException {
-    for (long id : printerIds) {
-      Printer printer = printerService.get(id);
-      if (printer != null) {
-        printerService.delete(printer);
-      }
-    }
+    RestUtils.bulkDelete("Printer", printerIds, printerService);
   }
 
   @PutMapping(value = "/disable", headers = { "Content-type=application/json" })

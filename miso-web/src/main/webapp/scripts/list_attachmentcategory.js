@@ -46,7 +46,7 @@ ListTarget.attachmentcategory = {
             Utils.showOkDialog('Create Attachment Categories', ["That's a peculiar number of attachment categories to create."]);
             return;
           }
-          window.location = '/miso/attachmentcategories/bulk/new?' + jQuery.param({
+          window.location = Urls.ui.attachmentCategories.bulkCreate + '?' + jQuery.param({
             quantity: result.quantity,
           });
         });

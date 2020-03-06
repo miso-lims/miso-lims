@@ -170,6 +170,10 @@ public class DefaultInstrumentService implements InstrumentService {
     if (arrayRunUsage > 0L) {
       result.addError(ValidationError.forDeletionUsage(object, arrayRunUsage, "array " + Pluralizer.runs(arrayRunUsage)));
     }
+    long qcUsage = instrumentDao.getUsageByQcs(object);
+    if (qcUsage > 0L) {
+      result.addError(ValidationError.forDeletionUsage(object, qcUsage, Pluralizer.qcs(qcUsage)));
+    }
     return result;
   }
 

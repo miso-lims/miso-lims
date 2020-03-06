@@ -18,12 +18,14 @@ import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.persistence.StudyStore;
 import uk.ac.bbsrc.tgac.miso.persistence.StudyTypeDao;
@@ -157,6 +159,16 @@ public class DefaultStudyService implements StudyService, PaginatedDataSource<St
   public List<Study> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol, PaginationFilter... filter)
       throws IOException {
     return studyStore.list(errorHandler, offset, limit, sortDir, sortCol, filter);
+  }
+
+  @Override
+  public ValidationResult validateDeletion(Study object) throws IOException {
+    ValidationResult result = new ValidationResult();
+    long usage = studyStore.getUsage(object);
+    if (usage > 0L) {
+      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.experiments(usage)));
+    }
+    return result;
   }
 
 }

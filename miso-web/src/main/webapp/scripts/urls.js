@@ -52,6 +52,12 @@ Urls = (function() {
   };
 
   // Attachment Categories
+  var attachmentCategoryUiBase = baseUrl + '/attachmentcategories';
+  ui.attachmentCategories = {
+    bulkCreate: attachmentCategoryUiBase + '/bulk/new',
+    bulkEdit: attachmentCategoryUiBase + '/bulk/edit'
+  };
+
   var attachmentCategoryRestBase = restBase + '/attachmentcategories'
   rest.attachmentCategories = {
     create: attachmentCategoryRestBase,
@@ -128,15 +134,23 @@ Urls = (function() {
   // Freezers - REST components are under Storage Locations
   var freezerUiBase = baseUrl + '/freezer';
   ui.freezers = {
+    create: freezerUiBase + '/new',
     edit: idUrlFunction(freezerUiBase)
   };
 
   // Freezer Maps
-  var freezerMapUiBase = baseUrl + '/freezermap';
+  var freezerMapUiBase = '/freezermap';
   ui.freezerMaps = {
     view: function(filename, anchor) {
       return freezerMapUiBase + '/' + filename + (anchor ? '#' + anchor : '');
     }
+  };
+
+  // Groups
+  var groupUiBase = baseUrl + '/admin/group';
+  ui.groups = {
+    create: groupUiBase + '/new',
+    edit: idUrlFunction(groupUiBase)
   };
 
   // Index Distance Tool
@@ -174,6 +188,12 @@ Urls = (function() {
   };
 
   // Institutes
+  var instituteUiBase = baseUrl + '/institute'
+  ui.institutes = {
+    bulkCreate: instituteUiBase + '/bulk/new',
+    bulkdEdit: instituteUiBase + '/bulk/edit'
+  };
+
   var instituteRestBase = restBase + '/institutes';
   rest.institutes = {
     create: instituteRestBase,
@@ -185,7 +205,7 @@ Urls = (function() {
   ui.instruments = {
     create: instrumentUiBase + '/new',
     edit: idUrlFunction(instrumentUiBase)
-  }
+  };
 
   var instrumentRestBase = restBase + '/instruments';
   rest.instruments = {
@@ -222,6 +242,12 @@ Urls = (function() {
   };
 
   // Labs
+  var labUiBase = baseUrl + '/lab';
+  ui.labs = {
+    bulkCreate: labUiBase + '/bulk/new',
+    bulkEdit: labUiBase + '/bulk/edit'
+  };
+
   var labRestBase = restBase + '/labs';
   rest.labs = {
     create: labRestBase,
@@ -328,7 +354,12 @@ Urls = (function() {
   rest.libraryTemplates = {
     create: libraryTemplateRestBase,
     update: idUrlFunction(libraryTemplateRestBase),
-    query: libraryTemplateRestBase + '/query'
+    query: libraryTemplateRestBase + '/query',
+    datatable: libraryTemplateRestBase + '/dt',
+    projectDatatable: idUrlFunction(libraryTemplateRestBase + '/dt/project'),
+    bulkDelete: libraryTemplateRestBase + '/bulk-delete',
+    addProject: libraryTemplateRestBase + '/project/add',
+    removeProject: libraryTemplateRestBase + '/project/remove'
   };
 
   // Library Types
@@ -380,6 +411,15 @@ Urls = (function() {
     indexChecker: poolOrderRestBase + '/indexchecker'
   };
 
+  // Printers
+  var printerRestBase = restBase + '/printers';
+  rest.printers = {
+    datatable: printerRestBase + '/dt',
+    create: printerRestBase,
+    enable: printerRestBase + '/enable',
+    disable: printerRestBase + '/disable'
+  };
+
   // Projects
   var projectUiBase = baseUrl + '/project';
   ui.projects = {
@@ -389,8 +429,10 @@ Urls = (function() {
 
   var projectRestBase = restBase + '/projects';
   rest.projects = {
+    get: idUrlFunction(projectRestBase),
     create: projectRestBase,
-    update: idUrlFunction(projectRestBase)
+    update: idUrlFunction(projectRestBase),
+    search: projectRestBase + '/search'
   };
 
   // QCs
@@ -399,7 +441,7 @@ Urls = (function() {
     bulkAddFrom: idUrlFunction(qcUiBase + '/bulk/addFrom'),
     bulkEdit: idUrlFunction(qcUiBase + '/bulk/edit'),
     bulkEditFrom: idUrlFunction(qcUiBase + '/bulk/editFrom')
-  }
+  };
 
   var qcRestBase = restBase + '/qcs';
   rest.qcs = {
@@ -455,7 +497,7 @@ Urls = (function() {
   var runPurposeBase = baseUrl + '/runpurpose';
   ui.runPurposes = {
     bulkEdit: runPurposeBase + '/bulk/edit'
-  }
+  };
 
   var runPurposeRestBase = restBase + '/runpurposes';
   rest.runPurposes = {
@@ -497,6 +539,12 @@ Urls = (function() {
   };
 
   // Sample Purposes
+  var samplePurposeUiBase = baseUrl + '/samplepurpose';
+  ui.samplePurposes = {
+    bulkCreate: samplePurposeUiBase + '/bulk/new',
+    bulkEdit: samplePurposeUiBase + '/bulk/edit'
+  };
+
   var samplePurposeRestBase = restBase + '/samplepurposes';
   rest.samplePurposes = {
     create: samplePurposeRestBase,
@@ -591,7 +639,15 @@ Urls = (function() {
   // Studies
   var studyUiBase = baseUrl + '/study';
   ui.studies = {
+    create: studyUiBase + '/new',
+    createInProject: idUrlFunction(studyUiBase + '/new'),
     edit: idUrlFunction(studyUiBase)
+  };
+
+  var studyRestBase = restBase + '/studies';
+  rest.studies = {
+    datatable: studyRestBase + '/dt',
+    projectDatatable: idUrlFunction(studyRestBase + '/dt/project')
   };
 
   // Study Types
@@ -608,6 +664,12 @@ Urls = (function() {
   };
 
   // Subprojects
+  var subprojectUiBase = baseUrl + '/subproject';
+  ui.subprojects = {
+    bulkCreate: subprojectUiBase + '/bulk/new',
+    bulkEdit: subprojectUiBase + '/bulk/edit'
+  };
+
   var subprojectRestBase = restBase + '/subprojects';
   rest.subprojects = {
     create: subprojectRestBase,
@@ -629,6 +691,12 @@ Urls = (function() {
   };
 
   // Tissue Materials
+  var tissueMaterialUiBase = baseUrl + '/tissuematerial';
+  ui.tissueMaterials = {
+    bulkCreate: tissueMaterialUiBase + '/bulk/new',
+    bulkEdit: tissueMaterialUiBase + '/bulk/edit'
+  };
+
   var tissueMaterialRestBase = restBase + '/tissuematerials';
   rest.tissueMaterials = {
     create: tissueMaterialRestBase,
@@ -636,6 +704,12 @@ Urls = (function() {
   };
 
   // Tissue Origins
+  var tissueOriginUiBase = baseUrl + '/tissueorigin';
+  ui.tissueOrigins = {
+    bulkCreate: tissueOriginUiBase + '/bulk/new',
+    bulkEdit: tissueOriginUiBase + '/bulk/edit'
+  };
+
   var tissueOriginRestBase = restBase + '/tissueorigins';
   rest.tissueOrigins = {
     create: tissueOriginRestBase,

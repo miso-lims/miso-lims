@@ -116,4 +116,9 @@ public class DefaultIndexService extends AbstractSaveService<Index> implements I
     return result;
   }
 
+  @Override
+  protected void authorizeSave(Index object) throws IOException {
+    authorizationManager.throwIfNonAdmin();
+  }
+
 }

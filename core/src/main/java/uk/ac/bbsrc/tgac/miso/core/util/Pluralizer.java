@@ -6,39 +6,43 @@ public class Pluralizer {
     throw new IllegalStateException("Static util class not intended for instantiation");
   }
 
-  public static final String arrays(long count) {
+  public static String arrays(long count) {
     return pluralize(count, "array", "arrays");
   }
 
-  public static final String attachments(long count) {
+  public static String attachments(long count) {
     return pluralize(count, "attachment", "attachments");
   }
 
-  public static final String boxes(long count) {
+  public static String boxes(long count) {
     return pluralize(count, "box", "boxes");
   }
 
-  public static final String containers(long count) {
+  public static String containers(long count) {
     return pluralize(count, "container", "containers");
   }
 
-  public static final String freezers(long count) {
+  public static String experiments(long count) {
+    return pluralize(count, "experiment", "experiments");
+  }
+
+  public static String freezers(long count) {
     return pluralize(count, "freezer", "freezers");
   }
 
-  public static final String groups(long count) {
+  public static String groups(long count) {
     return pluralize(count, "group", "groups");
   }
 
-  public static final String instruments(long count) {
+  public static String instruments(long count) {
     return pluralize(count, "instrument", "instruments");
   }
 
-  public static final String items(long count) {
+  public static String items(long count) {
     return pluralize(count, "item", "items");
   }
 
-  public static final String labs(long count) {
+  public static String labs(long count) {
     return pluralize(count, "lab", "labs");
   }
 

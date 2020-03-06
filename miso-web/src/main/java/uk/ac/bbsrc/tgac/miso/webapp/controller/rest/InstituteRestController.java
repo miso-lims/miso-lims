@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -80,10 +79,10 @@ public class InstituteRestController extends RestController {
     return getInstitute(id, uriBuilder);
   }
   
-  @DeleteMapping(value = "/{id}")
+  @PostMapping(value = "/bulk-delete")
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
-  public void deleteInstitute(@PathVariable(name = "id", required = true) long id) throws IOException {
-    RestUtils.delete("Institute", id, instituteService);
+  public void deleteInstitute(@RequestBody(required = true) List<Long> ids) throws IOException {
+    RestUtils.bulkDelete("Institute", ids, instituteService);
     menuController.refreshConstants();
   }
   

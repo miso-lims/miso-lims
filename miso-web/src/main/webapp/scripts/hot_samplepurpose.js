@@ -18,30 +18,15 @@ HotTarget.samplepurpose = {
   },
 
   getBulkActions: function(config) {
-    return !config.isAdmin ? [] : [
-        {
-          name: 'Edit',
-          action: function(items) {
-            window.location = window.location.origin + '/miso/samplepurpose/bulk/edit?' + jQuery.param({
-              ids: items.map(Utils.array.getId).join(',')
-            });
-          }
-        },
+    return !config.isAdmin ? [] : [{
+      name: 'Edit',
+      action: function(items) {
+        window.location = window.location.origin + Urls.ui.samplePurposes.bulkEdit + '?' + jQuery.param({
+          ids: items.map(Utils.array.getId).join(',')
+        });
+      }
+    },
 
-        {
-          name: 'Delete',
-          action: function(items) {
-            var deleteNext = function(index) {
-              if (index == items.length) {
-                window.location = window.location.origin + '/miso/samplepurpose/list';
-              }
-              Utils.ajaxWithDialog('Deleting ' + items[index].alias, 'DELETE', '/miso/rest/samplepurposes/' + items[index].id, null,
-                  function() {
-                    deleteNext(index + 1);
-                  });
-            };
-            deleteNext(0);
-          }
-        }, ];
+    ListUtils.createBulkDeleteAction("Sample Purposes", "samplepurposes", Utils.array.getAlias)];
   }
 };

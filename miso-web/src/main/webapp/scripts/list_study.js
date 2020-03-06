@@ -24,30 +24,12 @@
 ListTarget.study = {
   name: "Studies",
   createUrl: function(config, projectId) {
-    return "/miso/rest/studies/dt" + (projectId ? "/project/" + projectId : "");
+    return projectId ? Urls.rest.studies.projectDatatable(projectId) : Urls.rest.studies.datatable;
   },
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {
     if (config.isAdmin) {
-      return [{
-        "name": "Delete",
-        "action": function(studies) {
-          Utils.showConfirmDialog("Confirm Delete", "OK", ["Are you sure you really want to delete? This operation is permanent!"],
-              function() {
-                var deleter = function(index) {
-                  if (index >= studies.length) {
-                    Utils.page.pageReload();
-                    return;
-                  }
-                  Utils.ajaxWithDialog('Deleting study', 'DELETE', '/miso/rest/studies/' + studies[index].id, null, function() {
-                    deleter(index + 1);
-                  });
-                };
-
-                deleter(0);
-              });
-        }
-      }];
+      return [ListUtils.createBulkDeleteAction("Studies", "studies", Utils.array.getAlias)];
     } else {
       return [];
     }
@@ -57,7 +39,7 @@ ListTarget.study = {
     return [{
       "name": "Add",
       "handler": function() {
-        window.location = "/miso/study/new" + (projectId ? '/' + projectId : '')
+        window.location = projectId ? Urls.ui.studies.createInProject(projectId) : Urls.ui.studies.create;
       }
     }]
   },

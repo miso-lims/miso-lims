@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -122,10 +121,11 @@ public class TissueMaterialRestController extends RestController {
     return getTissueMaterial(id, uriBuilder, response);
   }
 
-  @DeleteMapping(value = "/{id}")
-  @ResponseStatus(code = HttpStatus.NO_CONTENT)
-  public void deleteTissueMaterial(@PathVariable(name = "id", required = true) long id) throws IOException {
-    RestUtils.delete("Tissue material", id, tissueMaterialService);
+  @PostMapping(value = "/bulk-delete")
+  @ResponseBody
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
+    RestUtils.bulkDelete("Tissue Material", ids, tissueMaterialService);
     menuController.refreshConstants();
   }
 

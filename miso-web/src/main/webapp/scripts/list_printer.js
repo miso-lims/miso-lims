@@ -24,37 +24,23 @@
 ListTarget.printer = {
   name: "Printers",
   createUrl: function(config, projectId) {
-    return "/miso/rest/printers/dt";
+    return Urls.rest.printers.datatable;
   },
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {
-    return [
-        {
-          "name": "Enable",
-          "include": config.isInternal || config.isAdmin,
-          "action": function(items) {
-            Utils.ajaxWithDialog('Enabling Printer', 'PUT', '/miso/rest/printers/enable', items.map(Utils.array.getId),
-                Utils.page.pageReload);
+    return !config.isAdmin ? [] : [{
+      "name": "Enable",
+      "action": function(items) {
+        Utils.ajaxWithDialog('Enabling Printer', 'PUT', Urls.rest.printers.enable, items.map(Utils.array.getId), Utils.page.pageReload);
 
-          }
-        },
-        {
-          "name": "Disable",
-          "include": config.isInternal || config.isAdmin,
-          "action": function(items) {
-            Utils.ajaxWithDialog('Disabling Printer', 'PUT', '/miso/rest/printers/disable', items.map(Utils.array.getId),
-                Utils.page.pageReload);
+      }
+    }, {
+      "name": "Disable",
+      "action": function(items) {
+        Utils.ajaxWithDialog('Disabling Printer', 'PUT', Urls.rest.printers.disable, items.map(Utils.array.getId), Utils.page.pageReload);
 
-          }
-        }, {
-          "name": "Delete",
-          "include": config.isAdmin,
-          "action": function(items) {
-            Utils.ajaxWithDialog('Deleting Printer', 'DELETE', '/miso/rest/printers', items.map(Utils.array.getId), Utils.page.pageReload);
-          }
-        }].filter(function(action) {
-      return action.include;
-    });
+      }
+    }, ListUtils.createBulkDeleteAction("Printers", 'printers', Utils.array.getName)];
   },
   createStaticActions: function(config, projectId) {
     if (config.isAdmin) {
@@ -90,7 +76,7 @@ ListTarget.printer = {
             }
             var save = function(printerConfig) {
 
-              Utils.ajaxWithDialog('Saving Printer', 'POST', '/miso/rest/printers', {
+              Utils.ajaxWithDialog('Saving Printer', 'POST', Urls.rest.printers.create, {
                 "id": 0,
                 "available": true,
                 "backend": printer.backend.name,

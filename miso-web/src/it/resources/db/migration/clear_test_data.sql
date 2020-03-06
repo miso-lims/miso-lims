@@ -2,6 +2,7 @@
 DROP TRIGGER IF EXISTS BeforeInsertPool;
 
 SET FOREIGN_KEY_CHECKS=0;
+DELETE FROM Printer;
 DELETE FROM Submission_Experiment;
 DELETE FROM Submission;
 DELETE FROM ExperimentChangeLog;
@@ -88,6 +89,7 @@ DELETE FROM Institute;
 DELETE FROM Stain;
 DELETE FROM SamplePurpose;
 DELETE FROM DetailedQcStatus;
+DELETE FROM QcControl;
 DELETE FROM QCType;
 DELETE FROM LibraryType;
 DELETE FROM LibrarySelectionType;
@@ -124,4 +126,8 @@ DELETE FROM StorageLocationMap;
 DELETE FROM RunPurpose;
 DELETE FROM AttachmentCategory;
 DELETE FROM StainCategory;
+DELETE FROM SampleType;
+DELETE FROM PartitionQCType;
+DELETE FROM StudyType;
+DELETE FROM TissuePieceType;
 SET FOREIGN_KEY_CHECKS=1;
