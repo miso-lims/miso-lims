@@ -488,13 +488,8 @@ Box.ui = {
     actions.forEach(function(action) {
       var button;
       if (action) {
-        button = jQuery('<a />', {
-          'class': 'ui-button ui-state-default',
-          title: action.title || '',
-          text: action.name
-        });
-        button.click(function() {
-          action.action(items);
+        button = Utils.ui.makeBulkActionButton(action, function() {
+          return items;
         });
       } else {
         button = jQuery('<span />', {

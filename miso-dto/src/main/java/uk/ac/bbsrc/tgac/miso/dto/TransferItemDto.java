@@ -13,6 +13,11 @@ public class TransferItemDto {
   private String boxAlias;
   private String boxPosition;
 
+  // needed for bulk actions
+  private Long sampleClassId;
+  private Long projectId;
+  private String platformType;
+
   public String getType() {
     return type;
   }
@@ -91,6 +96,30 @@ public class TransferItemDto {
 
   public void setBoxPosition(String boxPosition) {
     this.boxPosition = boxPosition;
+  }
+
+  public Long getSampleClassId() {
+    return sampleClassId;
+  }
+
+  public void setSampleClassId(Long sampleClassId) {
+    this.sampleClassId = sampleClassId;
+  }
+
+  public Long getProjectId() {
+    return projectId;
+  }
+
+  public void setProjectId(Long projectId) {
+    this.projectId = projectId;
+  }
+
+  public String getPlatformType() {
+    return platformType;
+  }
+
+  public void setPlatformType(String platformType) {
+    this.platformType = platformType;
   }
 
 }

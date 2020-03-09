@@ -311,6 +311,13 @@ FormUtils = (function($) {
         }
         return item;
       });
+    },
+
+    getSelectedTableData: function(containerId) {
+      if (initializedTables.indexOf(containerId) === -1) {
+        return null;
+      }
+      return ListState[containerId + 'Table'].selected;
     }
   };
 

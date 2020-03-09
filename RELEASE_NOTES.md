@@ -7,6 +7,7 @@ Changes:
     * Libraries: Pool Preparation, Dilution Preparation
     * Library aliquots: Pool Preparation, Dilution Preparation
   * Sort Transfers list by last modified time
+  * Added bulk actions to Items list on Edit Transfer page depending on item types
   * Allow only administrators to add tissue materials (detailed sample)
   * Fixed an issue where Run Scanner could cause a container to repeatedly flip between multiple
     container models if the container is linked to multiple runs

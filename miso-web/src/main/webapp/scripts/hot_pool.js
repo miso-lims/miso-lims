@@ -255,7 +255,7 @@ HotTarget.pool = (function() {
           {
             name: 'Edit',
             action: function(items) {
-              window.location = window.location.origin + '/miso/pool/bulk/edit?' + jQuery.param({
+              window.location = window.location.origin + Urls.ui.pools.bulkEdit + '?' + jQuery.param({
                 ids: items.map(Utils.array.getId).join(',')
               });
             }
@@ -264,18 +264,18 @@ HotTarget.pool = (function() {
             name: "Create Orders",
             excludeOnOrders: true,
             action: function(pools) {
-              window.location = window.location.origin + '/miso/sequencingorder/bulk/create?' + jQuery.param({
+              window.location = window.location.origin + Urls.ui.sequencingOrders.bulkCreate + '?' + jQuery.param({
                 ids: pools.map(Utils.array.getId).join(',')
               });
             }
           },
 
           HotUtils.printAction('pool'),
-          HotUtils.spreadsheetAction('/miso/rest/pools/spreadsheet', Constants.poolSpreadsheets, function(pools, spreadsheet) {
+          HotUtils.spreadsheetAction(Urls.rest.pools.spreadsheet, Constants.poolSpreadsheets, function(pools, spreadsheet) {
             var errors = [];
             return errors;
           }),
-          HotUtils.spreadsheetAction('/miso/rest/pools/contents/spreadsheet', Constants.libraryAliquotSpreadsheets, function(aliquots,
+          HotUtils.spreadsheetAction(Urls.rest.pools.contentsSpreadsheet, Constants.libraryAliquotSpreadsheets, function(aliquots,
               spreadsheet) {
             var errors = [];
             return errors;
@@ -349,7 +349,7 @@ HotTarget.pool = (function() {
                   getLabel: Utils.array.getAlias,
                   values: pools
                 }], function(result) {
-                  Utils.ajaxDownloadWithDialog("/miso/rest/pools/samplesheet", {
+                  Utils.ajaxDownloadWithDialog(Urls.rest.pools.samplesheet, {
                     customRead1Primer: result.customRead1Primer,
                     customIndexPrimer: result.customIndexPrimer,
                     customRead2Primer: result.customRead2Primer,

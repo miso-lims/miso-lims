@@ -981,6 +981,18 @@ Utils.ui = {
     var queryString = (searchTerm ? searchTerm + ':' : '') + '\"' + queryTarget + '\"';
     jQuery('#' + tableId).dataTable().fnFilter(queryString); // regrettably ugly
     jQuery('#' + tableId + '_filter input').val(queryString);
+  },
+
+  makeBulkActionButton: function(action, getItems) {
+    var button = jQuery('<a />', {
+      'class': 'ui-button ui-state-default',
+      title: action.title || '',
+      text: action.name
+    });
+    button.click(function() {
+      action.action(getItems());
+    });
+    return button;
   }
 };
 
