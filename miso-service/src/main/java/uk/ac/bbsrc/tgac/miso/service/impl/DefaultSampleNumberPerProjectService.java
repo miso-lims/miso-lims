@@ -74,6 +74,13 @@ public class DefaultSampleNumberPerProjectService implements SampleNumberPerProj
   }
 
   @Override
+  public void delete(SampleNumberPerProject sampleNumberPerProject) throws IOException {
+    authorizationManager.throwIfNonAdmin();
+    SampleNumberPerProject updatedSampleNumberPerProject = get(sampleNumberPerProject.getId());
+    sampleNumberPerProjectDao.delete(updatedSampleNumberPerProject);
+  }
+
+  @Override
   public Set<SampleNumberPerProject> getAll() throws IOException {
     authorizationManager.throwIfUnauthenticated();
     return Sets.newHashSet(sampleNumberPerProjectDao.getSampleNumberPerProject());

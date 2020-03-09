@@ -38,12 +38,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryTemplateService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
+import uk.ac.bbsrc.tgac.miso.core.service.SampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
@@ -79,6 +81,8 @@ public class DefaultProjectService implements ProjectService {
   private SampleService sampleService;
   @Autowired
   private LibraryTemplateService libraryTemplateService;
+  @Autowired
+  private SampleNumberPerProjectService sampleNumberPerProjectService;
 
   @Override
   public Project get(long projectId) throws IOException {
@@ -246,6 +250,10 @@ public class DefaultProjectService implements ProjectService {
     for (LibraryTemplate template : templates) {
       template.getProjects().removeIf(templateProject -> templateProject.getId() == object.getId());
       libraryTemplateService.update(template);
+    }
+    SampleNumberPerProject sampleNumberPerProject = sampleNumberPerProjectService.getByProject(object);
+    if (sampleNumberPerProject != null) {
+      sampleNumberPerProjectService.delete(sampleNumberPerProject);
     }
   }
 
