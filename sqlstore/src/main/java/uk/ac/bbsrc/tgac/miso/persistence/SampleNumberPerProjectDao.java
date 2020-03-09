@@ -19,5 +19,7 @@ public interface SampleNumberPerProjectDao {
 
   void update(SampleNumberPerProject sampleNumberPerProject);
 
+  void delete(SampleNumberPerProject sampleNumberPerProject);
+
   String nextNumber(Project project, User user, String partialAlias);
 }

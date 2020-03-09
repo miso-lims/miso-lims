@@ -65,6 +65,11 @@ public class HibernateSampleNumberPerProjectDao implements SampleNumberPerProjec
     currentSession().update(sampleNumberPerProject);
   }
 
+  @Override
+  public void delete(SampleNumberPerProject sampleNumberPerProject) {
+    currentSession().delete(sampleNumberPerProject);
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public synchronized String nextNumber(Project project, User user, String partialAlias) {
