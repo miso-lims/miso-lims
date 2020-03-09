@@ -29,7 +29,7 @@
       };
 
       $.ajax({
-        url: '/miso/rest/indexdistance',
+        url: Urls.rest.indexDistance.check,
         type: 'POST',
         dataType: 'json',
         contentType: 'application/json; charset=utf8',

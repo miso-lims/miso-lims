@@ -153,6 +153,12 @@ Urls = (function() {
     edit: idUrlFunction(groupUiBase)
   };
 
+  // Index Distance Tool
+  var indexDistanceRestBase = restBase + '/indexdistance';
+  rest.indexDistance = {
+    check: indexDistanceRestBase
+  };
+
   // Index Families
   var indexFamilyUiBase = baseUrl + '/indexfamily';
   ui.indexFamilies = {
