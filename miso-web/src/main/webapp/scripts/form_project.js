@@ -58,13 +58,21 @@ FormTarget.project = (function($) {
           title: 'Use Secondary Naming Scheme',
           data: 'secondaryNaming',
           type: 'checkbox',
-          include: !!config.naming.secondary,
+          include: !!config.naming.secondary && !object.id,
           onChange: function(newValue, form) {
             var scheme = config.naming[newValue ? 'secondary' : 'primary'];
             form.updateField('shortName', {
               required: scheme.shortNameRequired,
               disabled: !scheme.shortNameModifiable
             });
+          }
+        }, {
+          title: 'Use Secondary Naming Scheme',
+          data: 'secondaryNaming',
+          type: 'read-only',
+          include: !!config.naming.secondary && object.id,
+          getDisplayValue: function(project) {
+            return project.secondaryNaming ? 'Yes (Secondary)' : 'No (Primary)';
           }
         }, {
           title: 'Short Name',
