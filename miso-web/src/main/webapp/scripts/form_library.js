@@ -5,7 +5,9 @@ FormTarget.library = (function($) {
 
   /*
    * Expected config {
-   *   detailedSample: boolean
+   *   detailedSample: boolean,
+   *   workstations: array,
+   *   thermalCyclers: array
    * }
    */
 
@@ -69,6 +71,22 @@ FormTarget.library = (function($) {
           title: 'Creation Date',
           data: 'creationDate',
           type: 'date'
+        }, {
+          title: 'Workstation',
+          data: 'workstationId',
+          type: 'dropdown',
+          source: config.workstations,
+          sortSource: Utils.sorting.standardSort('alias'),
+          getItemLabel: Utils.array.getAlias,
+          getItemValue: Utils.array.getId
+        }, {
+          title: 'Thermal Cycler',
+          data: 'thermalCyclerId',
+          type: 'dropdown',
+          source: config.thermalCyclers,
+          sortSource: Utils.sorting.standardSort('name'),
+          getItemLabel: Utils.array.getName,
+          getItemValue: Utils.array.getId
         }, {
           title: 'Accession',
           data: 'accession',

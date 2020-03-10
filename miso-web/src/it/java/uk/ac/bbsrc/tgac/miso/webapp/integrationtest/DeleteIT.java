@@ -29,6 +29,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.StainCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
+import uk.ac.bbsrc.tgac.miso.core.data.Workstation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
@@ -267,6 +268,11 @@ public class DeleteIT extends AbstractIT {
   @Test
   public void testDeleteStudyType() {
     testAdminDelete(ListTarget.STUDY_TYPES, null, "Epigenetics", Columns.NAME, StudyType.class, 6L);
+  }
+
+  @Test
+  public void testDeleteWorkstation() {
+    testAdminDelete(ListTarget.WORKSTATIONS, null, "Workstation 3", Columns.ALIAS, Workstation.class, 3L);
   }
 
   @Test

@@ -40,6 +40,11 @@ INSERT INTO SampleType (typeId, name) VALUES
 (7,'METAGENOMIC'),
 (8,'METATRANSCRIPTOMIC');
 
+INSERT INTO Workstation(workstationId, alias, description) VALUES
+(1, 'Workstation 1', 'first bench'),
+(2, 'Workstation 2', 'second bench'),
+(3, 'Workstation 3', 'third bench');
+
 INSERT INTO AttachmentCategory(categoryId, alias) VALUES
 (1, 'Submission Forms'),
 (2, 'Tapestation'),

@@ -150,6 +150,11 @@ public class DefaultInstrumentService implements InstrumentService {
   }
 
   @Override
+  public List<Instrument> listByType(InstrumentType type) throws IOException {
+    return instrumentDao.listByType(type);
+  }
+
+  @Override
   public DeletionStore getDeletionStore() {
     return deletionStore;
   }

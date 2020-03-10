@@ -59,6 +59,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -155,6 +156,14 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @ManyToOne
   @JoinColumn(name = "libraryStrategyType")
   private LibraryStrategyType libraryStrategyType;
+
+  @ManyToOne
+  @JoinColumn(name = "workstationId")
+  private Workstation workstation;
+
+  @ManyToOne(targetEntity = InstrumentImpl.class)
+  @JoinColumn(name = "thermalCyclerId")
+  private Instrument thermalCycler;
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "creator", nullable = false, updatable = false)
@@ -808,6 +817,26 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Override
   public String getBarcodeGroupDescription() {
     return null;
+  }
+
+  @Override
+  public Workstation getWorkstation() {
+    return workstation;
+  }
+
+  @Override
+  public void setWorkstation(Workstation workstation) {
+    this.workstation = workstation;
+  }
+
+  @Override
+  public Instrument getThermalCycler() {
+    return thermalCycler;
+  }
+
+  @Override
+  public void setThermalCycler(Instrument thermalCycler) {
+    this.thermalCycler = thermalCycler;
   }
 
 }

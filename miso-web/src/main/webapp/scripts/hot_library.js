@@ -354,6 +354,10 @@ HotTarget.library = (function() {
               lib.creationDate = flat.creationDate;
             }
           },
+          HotUtils.makeColumnForConstantsList('Workstation', !config.isLibraryReceipt, 'workstation', 'workstationId', 'id', 'alias',
+              config.workstations, false),
+          HotUtils.makeColumnForConstantsList('Thermal Cycler', !config.isLibraryReceipt, 'thermalCycler', 'thermalCyclerId', 'id', 'name',
+              config.thermalCyclers, false),
           {
             header: 'Date of Receipt',
             data: 'receivedDate',

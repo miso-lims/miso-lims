@@ -115,6 +115,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
+import uk.ac.bbsrc.tgac.miso.core.data.Workstation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Deletion;
@@ -1404,6 +1405,8 @@ public class Dtos {
     setString(dto::setSpikeInVolume, from.getSpikeInVolume());
     setString(dto::setSpikeInDilutionFactor, maybeGetProperty(from.getSpikeInDilutionFactor(), DilutionFactor::getLabel));
     setBoolean(dto::setUmis, from.getUmis(), false);
+    setId(dto::setWorkstationId, from.getWorkstation());
+    setId(dto::setThermalCyclerId, from.getThermalCycler());
 
     TransferItem<?> receipt = from.getReceiptTransfer();
     if (receipt != null) {
@@ -1486,6 +1489,8 @@ public class Dtos {
     setBigDecimal(to::setSpikeInVolume, from.getSpikeInVolume());
     setObject(to::setSpikeInDilutionFactor, from.getSpikeInDilutionFactor(), DilutionFactor::get);
     setBoolean(to::setUmis, from.getUmis(), false);
+    setObject(to::setWorkstation, Workstation::new, from.getWorkstationId());
+    setObject(to::setThermalCycler, InstrumentImpl::new, from.getThermalCyclerId());
 
     if (from.getReceivedTime() != null) {
       Transfer receipt = new Transfer();
@@ -3999,6 +4004,22 @@ public class Dtos {
     setObject(to::setPartition, PartitionImpl::new, from.getPartitionId());
     setObject(to::setAliquot, LibraryAliquot::new, from.getAliquotId());
     setObject(to::setPurpose, RunPurpose::new, from.getRunPurposeId());
+    return to;
+  }
+
+  public static WorkstationDto asDto(@Nonnull Workstation from) {
+    WorkstationDto to = new WorkstationDto();
+    setLong(to::setId, from.getId(), true);
+    setString(to::setAlias, from.getAlias());
+    setString(to::setDescription, from.getDescription());
+    return to;
+  }
+
+  public static Workstation to(@Nonnull WorkstationDto from) {
+    Workstation to = new Workstation();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setAlias, from.getAlias());
+    setString(to::setDescription, from.getDescription());
     return to;
   }
 

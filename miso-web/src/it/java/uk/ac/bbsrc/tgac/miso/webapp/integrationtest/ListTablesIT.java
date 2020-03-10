@@ -854,6 +854,16 @@ public class ListTablesIT extends AbstractIT {
     testColumnsSort(ListTarget.GROUPS, true);
   }
 
+  @Test
+  public void testListWorkstationsSetup() throws Exception {
+    testPageSetup(ListTarget.WORKSTATIONS, Sets.newHashSet(Columns.ALIAS, Columns.DESCRIPTION));
+  }
+
+  @Test
+  public void testListWorkstationsColumnSort() throws Exception {
+    testColumnsSort(ListTarget.WORKSTATIONS);
+  }
+
   private void testPageSetup(String listTarget, Set<String> targetColumns) {
     testPageSetup(listTarget, targetColumns, false);
   }

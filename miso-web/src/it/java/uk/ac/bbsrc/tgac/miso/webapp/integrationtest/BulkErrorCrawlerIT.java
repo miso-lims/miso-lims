@@ -69,6 +69,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("partitionqctype/list");
     slugs.add("referencegenome/list");
     slugs.add("studytype/list");
+    slugs.add("workstation/list");
     slugs.add("printers");
     slugs.add("deletions");
 
@@ -203,6 +204,8 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("referencegenome/bulk/edit?ids=1%2C2%2C3");
     slugs.add("studytype/bulk/new?quantity=3");
     slugs.add("studytype/bulk/edit?ids=2%2C4");
+    slugs.add("workstation/bulk/new?quantity=2");
+    slugs.add("workstation/bulk/edit?ids=1%2C2");
 
     slugs.add("tissuematerial/bulk/new?quantity=3");
     slugs.add("tissuematerial/bulk/edit?ids=1%2C2%2C3");

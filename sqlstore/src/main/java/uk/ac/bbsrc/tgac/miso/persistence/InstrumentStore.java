@@ -24,8 +24,10 @@
 package uk.ac.bbsrc.tgac.miso.persistence;
 
 import java.io.IOException;
+import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
+import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 public interface InstrumentStore extends Store<Instrument>, PaginatedDataSource<Instrument> {
@@ -47,6 +49,8 @@ public interface InstrumentStore extends Store<Instrument>, PaginatedDataSource<
    * @throws IOException if there is more than one pre-upgrade Instrument for the provided Instrument, or there are any other IO errors
    */
   public Instrument getByUpgradedInstrument(long upgradedInstrumentId) throws IOException;
+
+  public List<Instrument> listByType(InstrumentType type) throws IOException;
 
   public long getUsageByRuns(Instrument instrument) throws IOException;
 

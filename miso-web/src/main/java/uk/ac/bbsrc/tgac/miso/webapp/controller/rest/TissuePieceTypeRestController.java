@@ -50,6 +50,7 @@ public class TissuePieceTypeRestController extends RestController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
     RestUtils.bulkDelete("Tissue Piece Type", ids, tissuePieceTypeService);
+    menuController.refreshConstants();
   }
 
 }

@@ -30,7 +30,9 @@ FOR EACH ROW
         CASE WHEN (NEW.ngUsed IS NULL) <> (OLD.ngUsed IS NULL) OR NEW.ngUsed <> OLD.ngUsed THEN CONCAT('ng used: ', COALESCE(decimalToString(OLD.ngUsed), 'n/a'), ' → ', COALESCE(decimalToString(NEW.ngUsed), 'n/a')) END,
         CASE WHEN (NEW.concentrationUnits IS NULL) <> (OLD.concentrationUnits IS NULL) OR NEW.concentrationUnits <> OLD.concentrationUnits THEN CONCAT(NEW.name, ' concentration units: ', COALESCE(OLD.concentrationUnits, 'n/a'), ' → ', COALESCE(NEW.concentrationUnits, 'n/a')) END,
         CASE WHEN (NEW.volumeUnits IS NULL) <> (OLD.volumeUnits IS NULL) OR NEW.volumeUnits <> OLD.volumeUnits THEN CONCAT(NEW.name, ' volume units: ', COALESCE(OLD.volumeUnits, 'n/a'), ' → ', COALESCE(NEW.volumeUnits, 'n/a')) END,
-        CASE WHEN NEW.umis <> OLD.umis THEN CONCAT('UMIs: ', IF(OLD.umis = 0, 'No', 'Yes'), ' → ', IF(NEW.umis = 0, 'No', 'Yes')) END);
+        CASE WHEN NEW.umis <> OLD.umis THEN CONCAT('UMIs: ', IF(OLD.umis = 0, 'No', 'Yes'), ' → ', IF(NEW.umis = 0, 'No', 'Yes')) END,
+        CASE WHEN (NEW.thermalCyclerId IS NULL) <> (OLD.thermalCyclerId IS NULL) OR NEW.thermalCyclerId <> OLD.thermalCyclerId THEN CONCAT('thermal cycler: ', COALESCE((SELECT name FROM Instrument WHERE instrumentId = OLD.thermalCyclerId), 'n/a'), ' → ', COALESCE((SELECT name FROM Instrument WHERE instrumentId = NEW.thermalCyclerId), 'n/a')) END,
+        CASE WHEN (NEW.workstationId IS NULL) <> (OLD.workstationId IS NULL) OR NEW.workstationId <> OLD.workstationId THEN CONCAT('kit: ', COALESCE((SELECT alias FROM Workstation WHERE workstationId = OLD.workstationId), 'n/a'), ' → ', COALESCE((SELECT alias FROM Workstation WHERE workstationId = NEW.workstationId), 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message, changeTime) VALUES (
       NEW.libraryId,
@@ -59,7 +61,9 @@ FOR EACH ROW
         CASE WHEN (NEW.ngUsed IS NULL) <> (OLD.ngUsed IS NULL) OR NEW.ngUsed <> OLD.ngUsed THEN 'ng used' END,
         CASE WHEN (NEW.concentrationUnits IS NULL) <> (OLD.concentrationUnits IS NULL) OR NEW.concentrationUnits <> OLD.concentrationUnits THEN CONCAT(NEW.name, ' concentrationUnits') END,
         CASE WHEN (NEW.volumeUnits IS NULL) <> (OLD.volumeUnits IS NULL) OR NEW.volumeUnits <> OLD.volumeUnits THEN CONCAT(NEW.name, ' volumeUnits') END,
-        CASE WHEN NEW.umis <> OLD.umis THEN 'umis' END
+        CASE WHEN NEW.umis <> OLD.umis THEN 'umis' END,
+        CASE WHEN (NEW.thermalCyclerId IS NULL) <> (OLD.thermalCyclerId IS NULL) OR NEW.thermalCyclerId <> OLD.thermalCyclerId THEN 'thermalCyclerId' END,
+        CASE WHEN (NEW.workstationId IS NULL) <> (OLD.workstationId IS NULL) OR NEW.workstationId <> OLD.workstationId THEN 'workstationId' END
   ), ''),
       NEW.lastModifier,
       log_message,

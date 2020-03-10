@@ -767,6 +767,19 @@ Urls = (function() {
     moveLibraryAliquots: middleIdUrlFunction(worksetRestBase, '/libraryaliquots/move')
   };
 
+  // Workstations
+  var workstationUiBase = baseUrl + '/workstation';
+  ui.workstations = {
+    bulkCreate: workstationUiBase + '/bulk/new',
+    bulkEdit: workstationUiBase + '/bulk/edit'
+  };
+
+  var workstationRestBase = restBase + '/workstations';
+  rest.workstations = {
+    create: workstationRestBase,
+    update: idUrlFunction(workstationRestBase)
+  };
+
   // External sites
   external.userManual = function(version, section, subsection) {
     var url = 'https://miso-lims.readthedocs.io/projects/docs/en/' + version + '/user_manual/';

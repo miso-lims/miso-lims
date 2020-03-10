@@ -477,6 +477,7 @@ categories:
 
 * Sequencers: Used for sequencer runs
 * Array scanners: Used for array runs
+* Thermal cyclers: Used for library preparation
 * Others: Not used within MISO; however, they may be registered in order to track service records or for other purposes
 
 MISO administrators can add, edit, and delete instrument models from the List Instrument Models page. To create a new

@@ -213,6 +213,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String TRANSFERS = "transfer/list";
     public static final String USERS = "admin/users";
     public static final String WORKSETS = "worksets";
+    public static final String WORKSTATIONS = "workstation/list";
   }
 
   public static class ButtonText {

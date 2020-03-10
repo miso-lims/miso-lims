@@ -39,8 +39,9 @@ FormUtils = (function($) {
    *   max: maximum value for int or decimal input
    *   precision: maximum precision (length, excluding the decimal) for decimal input
    *   scale: maximum scale (decimal places) for decimal input
-   *   nullLabel: optional string; label for null value in dropdown. If not provided, and the field is not required, there will be no
-   *       null value in the dropdown - it will default to the first option unless an initial value is specified
+   *   nullLabel: optional string; label for null value in dropdown. If not provided, and the field is NOT required, defaults to 'None'.
+   *       If not provided, and the field IS required, there will be no null value in the dropdown - it will default to the first option
+   *       unless an initial value is specified
    *   source: array of objects; required for dropdown fields; Provides dropdown options
    *   convertToBoolean: optional boolean (default: false); if true, dropdown values 'true' and 'false' will be converted to booleans
    *   sortSource: optional function(a, b); sort function for dropdown options
