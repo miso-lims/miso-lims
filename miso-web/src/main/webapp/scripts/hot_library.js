@@ -97,7 +97,7 @@ HotTarget.library = (function() {
         }
         var readOnly = false;
         if (flat.templateAlias && flat.boxPosition && indexFamily) {
-          var template = getTemplate(config, lib.parentSampleProjectId, lib.parentSampleClassId, flat.templateAlias);
+          var template = getTemplate(config, lib.projectId, lib.parentSampleClassId, flat.templateAlias);
           if (template) {
             var positionProp = n == 1 ? 'indexOneIds' : 'indexTwoIds';
             if (template.indexFamilyId && template[positionProp] && template[positionProp][flat.boxPosition]) {
@@ -167,8 +167,8 @@ HotTarget.library = (function() {
   };
 
   var getProjectId = function(library, flat, config) {
-    if (library.parentSampleProjectId) {
-      return library.parentSampleProjectId;
+    if (library.projectId) {
+      return library.projectId;
     } else if (config.project) {
       return config.project.id;
     } else if (flat.sample && flat.sample.projectAlias) {
@@ -534,8 +534,8 @@ HotTarget.library = (function() {
                       return project.name === value;
                     }
                   }, config.projects).id;
-                } else if (lib.parentSampleProjectId) {
-                  projectId = lib.parentSampleProjectId;
+                } else if (lib.projectId) {
+                  projectId = lib.projectId;
                 }
               }
               var templates = ['(None)'];
@@ -903,7 +903,7 @@ HotTarget.library = (function() {
       return [{
         name: 'Edit',
         action: function(items) {
-          window.location = window.location.origin + '/miso/library/bulk/edit?' + jQuery.param({
+          window.location = window.location.origin + Urls.ui.libraries.bulkEdit + '?' + jQuery.param({
             ids: items.map(Utils.array.getId).join(',')
           });
         }
@@ -933,7 +933,7 @@ HotTarget.library = (function() {
           });
         }
       }, HotUtils.printAction('library'),
-          HotUtils.spreadsheetAction('/miso/rest/libraries/spreadsheet', Constants.librarySpreadsheets, function(libraries, spreadsheet) {
+          HotUtils.spreadsheetAction(Urls.rest.libraries.spreadsheet, Constants.librarySpreadsheets, function(libraries, spreadsheet) {
             var errors = [];
             return errors;
           }),
@@ -945,7 +945,7 @@ HotTarget.library = (function() {
               config.worksetId ? HotUtils.makeRemoveFromWorkset('libraries', Urls.rest.worksets.removeLibraries(config.worksetId))
                   : HotUtils.makeAddToWorkset('libraries', 'libraryIds', Urls.rest.worksets.addLibraries),
               HotUtils.makeAttachFile('library', function(library) {
-                return library.parentSampleProjectId;
+                return library.projectId;
               }), HotUtils.makeTransferAction('libraryIds')]);
     }
   };

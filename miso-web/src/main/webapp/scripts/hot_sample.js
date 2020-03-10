@@ -500,7 +500,7 @@ HotTarget.sample = (function() {
               function getIdentities() {
                 // we search by null project in case the user wants to choose an identity from another project
                 jQuery.ajax({
-                  url: "/miso/rest/samples/identitiesLookup?exactMatch=true",
+                  url: Urls.rest.samples.identitiesLookup + "?exactMatch=true",
                   data: JSON.stringify({
                     "identitiesSearches": [flat.externalName],
                     "project": null
@@ -1054,7 +1054,7 @@ HotTarget.sample = (function() {
                 return;
               }
 
-              window.location = "/miso/sample/bulk/edit?" + jQuery.param({
+              window.location = Urls.ui.samples.bulkEdit + "?" + jQuery.param({
                 ids: samples.map(Utils.array.getId).join(',')
               });
             }
@@ -1075,7 +1075,7 @@ HotTarget.sample = (function() {
                   return {
                     name: sampleClass.alias,
                     action: function(replicates, newBoxId) {
-                      window.location = "/miso/sample/bulk/propagate?" + jQuery.param({
+                      window.location = Urls.ui.samples.bulkPropagate + "?" + jQuery.param({
                         boxId: newBoxId,
                         parentIds: idsString,
                         replicates: replicates,
@@ -1098,7 +1098,7 @@ HotTarget.sample = (function() {
                       if (config.sortLibraryPropagate) {
                         params.sort = config.sortLibraryPropagate;
                       }
-                      window.location = "/miso/library/bulk/propagate?" + jQuery.param(params);
+                      window.location = Urls.ui.libraries.bulkPropagate + "?" + jQuery.param(params);
                     }
                   });
                 }
@@ -1173,7 +1173,7 @@ HotTarget.sample = (function() {
             }
           },
           HotUtils.printAction('sample'),
-          HotUtils.spreadsheetAction('/miso/rest/samples/spreadsheet', Constants.sampleSpreadsheets, function(samples, spreadsheet) {
+          HotUtils.spreadsheetAction(Urls.rest.samples.spreadsheet, Constants.sampleSpreadsheets, function(samples, spreadsheet) {
             var errors = [];
             var invalidSamples = [];
             samples.forEach(function(sample) {

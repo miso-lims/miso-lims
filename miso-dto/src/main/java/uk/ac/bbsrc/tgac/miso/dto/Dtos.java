@@ -1334,7 +1334,7 @@ public class Dtos {
     dto.setName(from.getName());
     dto.setParentSampleId(from.getSample().getId());
     dto.setParentSampleAlias(from.getSample().getAlias());
-    dto.setParentSampleProjectId(from.getSample().getProject().getId());
+    dto.setProjectId(from.getSample().getProject().getId());
     if (from.getSample() instanceof DetailedSample) {
       dto.setParentSampleClassId(((DetailedSample) from.getSample()).getSampleClass().getId());
     }
@@ -3882,11 +3882,27 @@ public class Dtos {
     setId(to::setRecipientGroupId, from.getRecipientGroup());
     setString(to::setRecipientGroupName, maybeGetProperty(from.getRecipientGroup(), Group::getName));
     to.setItems(new ArrayList<>());
-    to.getItems().addAll(from.getSampleTransfers().stream().map(item -> Dtos.asDto(item)).collect(Collectors.toList()));
-    to.getItems().addAll(from.getLibraryTransfers().stream().map(item -> Dtos.asDto(item)).collect(Collectors.toList()));
+    to.getItems().addAll(from.getSampleTransfers().stream().map(item -> {
+      TransferItemDto dto = Dtos.asDto(item);
+      setId(dto::setProjectId, item.getItem().getProject());
+      if (isDetailedSample(item.getItem())) {
+        DetailedSample ds = (DetailedSample) item.getItem();
+        setId(dto::setSampleClassId, ds.getSampleClass());
+      }
+      return dto;
+    }).collect(Collectors.toList()));
+    to.getItems().addAll(from.getLibraryTransfers().stream().map(item -> {
+      TransferItemDto dto = Dtos.asDto(item);
+      setId(dto::setProjectId, item.getItem().getSample().getProject());
+      return dto;
+    }).collect(Collectors.toList()));
     to.getItems()
         .addAll(from.getLibraryAliquotTransfers().stream().map(item -> Dtos.asDto(item)).collect(Collectors.toList()));
-    to.getItems().addAll(from.getPoolTransfers().stream().map(item -> Dtos.asDto(item)).collect(Collectors.toList()));
+    to.getItems().addAll(from.getPoolTransfers().stream().map(item -> {
+      TransferItemDto dto = Dtos.asDto(item);
+      setString(dto::setPlatformType, maybeGetProperty(item.getItem().getPlatformType(), PlatformType::name));
+      return dto;
+    }).collect(Collectors.toList()));
     return to;
   }
 

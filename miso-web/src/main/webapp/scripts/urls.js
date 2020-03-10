@@ -258,7 +258,9 @@ Urls = (function() {
   var libraryUiBase = baseUrl + '/library';
   ui.libraries = {
     edit: idUrlFunction(libraryUiBase),
-    bulkReceive: libraryUiBase + '/bulk/receive'
+    bulkReceive: libraryUiBase + '/bulk/receive',
+    bulkEdit: libraryUiBase + '/bulk/edit',
+    bulkPropagate: libraryUiBase + '/bulk/propagate'
   };
 
   var libraryRestBase = restBase + '/libraries';
@@ -270,7 +272,8 @@ Urls = (function() {
     query: libraryRestBase + '/query',
     datatable: libraryRestBase + '/dt',
     projectDatatable: idUrlFunction(libraryRestBase + '/dt/project'),
-    bulkDelete: libraryRestBase + '/bulk-delete'
+    bulkDelete: libraryRestBase + '/bulk-delete',
+    spreadsheet: libraryRestBase + '/spreadsheet'
   };
 
   // Library Aliquots
@@ -380,6 +383,7 @@ Urls = (function() {
   var poolUiBase = baseUrl + '/pool';
   ui.pools = {
     edit: idUrlFunction(poolUiBase),
+    bulkEdit: poolUiBase + '/bulk/edit',
     bulkMerge: poolUiBase + '/bulk/merge'
   };
 
@@ -394,7 +398,10 @@ Urls = (function() {
       recent: poolRestBase + '/picker/recent',
       search: poolRestBase + '/picker/search'
     },
-    assign: middleIdUrlFunction(poolRestBase, '/assign')
+    assign: middleIdUrlFunction(poolRestBase, '/assign'),
+    spreadsheet: poolRestBase + '/spreadsheet',
+    contentsSpreadsheet: poolRestBase + '/contents/spreadsheet',
+    samplesheet: poolRestBase + '/samplesheet'
   };
 
   // Pool Orders
@@ -509,7 +516,9 @@ Urls = (function() {
   var sampleUiBase = baseUrl + '/sample';
   ui.samples = {
     edit: idUrlFunction(sampleUiBase),
-    bulkCreate: sampleUiBase + '/bulk/new'
+    bulkCreate: sampleUiBase + '/bulk/new',
+    bulkEdit: sampleUiBase + '/bulk/edit',
+    bulkPropagate: sampleUiBase + '/bulk/propagate'
   };
 
   var sampleRestBase = restBase + '/samples';
@@ -522,7 +531,9 @@ Urls = (function() {
     datatable: sampleRestBase + '/dt',
     projectDatatable: idUrlFunction(sampleRestBase + '/dt/project'),
     projectArrayedDatatable: middleIdUrlFunction(sampleRestBase + '/dt/project', '/arrayed'),
-    bulkDelete: sampleRestBase + '/bulk-delete'
+    bulkDelete: sampleRestBase + '/bulk-delete',
+    identitiesLookup: sampleRestBase + '/identitiesLookup',
+    spreadsheet: sampleRestBase + '/spreadsheet'
   };
 
   // Sample Classes

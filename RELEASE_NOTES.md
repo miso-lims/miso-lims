@@ -7,6 +7,7 @@ Changes:
     * Libraries: Pool Preparation, Dilution Preparation
     * Library aliquots: Pool Preparation, Dilution Preparation
   * Sort Transfers list by last modified time
+  * Added bulk actions to Items list on Edit Transfer page depending on item types
   * Allow only administrators to add tissue materials (detailed sample)
   * Added workstations
   * Added thermal cycler instrument type

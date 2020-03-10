@@ -42,7 +42,7 @@ public class LibraryDto extends AbstractBoxableDto {
   private String parentSampleAlias;
   private Long parentSampleId;
   private Long parentSampleClassId;
-  private Long parentSampleProjectId;
+  private Long projectId;
   private String platformType;
   private Boolean qcPassed;
   private Long index1Id;
@@ -184,8 +184,8 @@ public class LibraryDto extends AbstractBoxableDto {
     return parentSampleClassId;
   }
 
-  public Long getParentSampleProjectId() {
-    return parentSampleProjectId;
+  public Long getProjectId() {
+    return projectId;
   }
 
   public Long getParentSampleId() {
@@ -313,8 +313,8 @@ public class LibraryDto extends AbstractBoxableDto {
     this.parentSampleClassId = parentSampleClassId;
   }
 
-  public void setParentSampleProjectId(Long parentSampleProjectId) {
-    this.parentSampleProjectId = parentSampleProjectId;
+  public void setProjectId(Long projectId) {
+    this.projectId = projectId;
   }
 
   public void setParentSampleId(Long parentSampleId) {

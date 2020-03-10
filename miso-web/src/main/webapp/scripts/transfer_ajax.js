@@ -17,6 +17,7 @@ var Transfer = (function($) {
 
     setItems: function(items) {
       FormUtils.setTableData(ListTarget.transferitem, itemsListConfig, itemsListId, items, form);
+      updateBulkActions(items);
     },
 
     getItems: function() {
@@ -46,6 +47,62 @@ var Transfer = (function($) {
         return removeItem.type === transferItem.type && removeItem.id === transferItem.id;
       });
     });
+  }
+
+  function updateBulkActions(items) {
+    if (!items || !items.length) {
+      setNoBulkActionsMessage('Add items to transfer to see bulk actions.');
+      return;
+    }
+
+    var itemTypes = Utils.array.deduplicateString(items.map(function(item) {
+      return item.type;
+    }));
+
+    if (itemTypes.length > 1) {
+      setNoBulkActionsMessage('Bulk actions not available for multi-type transfers.');
+      return;
+    }
+
+    switch (itemTypes[0]) {
+    case 'Sample':
+      setBulkActions(HotTarget.sample.getBulkActions({}));
+      break;
+    case 'Library':
+      setBulkActions(HotTarget.library.getBulkActions({}));
+      break;
+    case 'Library Aliquot':
+      setBulkActions(HotTarget.libraryaliquot.getBulkActions({}));
+      break;
+    case 'Pool':
+      setBulkActions(HotTarget.pool.getBulkActions({}));
+      break;
+    default:
+      throw new Error('Unexpected item type: ' + itemTypes[0]);
+    }
+  }
+
+  function setNoBulkActionsMessage(message) {
+    setToolbar($('<span>').text(message));
+  }
+
+  function setBulkActions(actions) {
+    var getItems = function() {
+      return FormUtils.getSelectedTableData(itemsListId);
+    }
+
+    setToolbar(actions.filter(function(action) {
+      return !!action;
+    }).map(function(action) {
+      return Utils.ui.makeBulkActionButton(action, getItems);
+    }));
+  }
+
+  function setToolbar(items) {
+    $('#type-toolbar').remove();
+    var toolbar = $('<div>').prop('id', 'type-toolbar');
+    toolbar.append(items);
+    $('#listItems > .fg-toolbar').append(toolbar);
   }
 
 })(jQuery);
