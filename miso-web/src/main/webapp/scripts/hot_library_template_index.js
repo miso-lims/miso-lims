@@ -25,7 +25,16 @@ HotTarget.libraryTemplate_index = (function($) {
       return [
           HotUtils.makeColumnForText('Box Position', true, 'boxPosition', {
             readOnly: config.pageMode === 'edit',
-            validator: HotUtils.validator.regex('^[A-Z](0[1-9]|1[0-9]|2[0-6])$', true)
+            validator: HotUtils.validator.regex('^[A-Z](0[1-9]|1[0-9]|2[0-6])$', true),
+            customSorting: [{
+              buttonText: 'Sort by Rows',
+              sortTarget: 'Rows',
+              sortFunc: HotUtils.sorting.rowSort
+            }, {
+              buttonText: 'Sort by Columns',
+              sortTarget: 'Columns',
+              sortFunc: HotUtils.sorting.colSort
+            }]
           }),
           HotUtils.makeColumnForConstantsList('Index 1', !!index1s.length, 'index1Id', 'index1Id', 'id', 'label', index1s, false, {}, null,
               'Unspecified'),

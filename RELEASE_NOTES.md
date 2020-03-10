@@ -22,6 +22,7 @@ Changes:
   * Fixed several bugs related to deleting things
   * Disallow editing whether a project uses the secondary naming scheme
   * Allow setting custom fields in printer labels
+  * Added 'Sort by Rows' and 'Sort by Columns' buttons when editing library template indices
 
 # 1.0.1
 
