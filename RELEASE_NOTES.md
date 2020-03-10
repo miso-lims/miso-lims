@@ -11,6 +11,7 @@ Changes:
   * Added workstations
   * Added thermal cycler instrument type
   * Allow recording the workstation and thermal cycler used to prepare libraries
+  * Added another version of the Index Distance tool to the MISO online documentation site
   * Fixed an issue where Run Scanner could cause a container to repeatedly flip between multiple
     container models if the container is linked to multiple runs
   * Fixed error when creating Sample Classes
