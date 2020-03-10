@@ -7,6 +7,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import uk.ac.bbsrc.tgac.miso.core.data.BarcodableVisitor;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
@@ -134,4 +135,10 @@ public class SampleTissueImpl extends DetailedSampleImpl implements SampleTissue
   public void setTubeNumber(Integer tubeNumber) {
     this.tubeNumber = tubeNumber;
   }
+
+  @Override
+  public <T> T visit(BarcodableVisitor<T> visitor) {
+    return visitor.visitSampleTissue(this);
+  }
+
 }

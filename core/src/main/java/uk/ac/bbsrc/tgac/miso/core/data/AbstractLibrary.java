@@ -75,7 +75,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
  * Skeleton implementation of a Library
@@ -660,16 +659,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
     return getCreationDate();
   }
 
-  @Override
-  public String getBarcodeExtraInfo() {
-    return getDescription();
-  }
-
-  @Override
-  public String getBarcodeSizeInfo() {
-    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), getVolumeUnits(),
-        getConcentrationUnits());
-  }
 
   @Override
   public String getDeleteType() {
@@ -812,11 +801,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
       transfers = new ArrayList<>();
     }
     return transfers;
-  }
-
-  @Override
-  public String getBarcodeGroupDescription() {
-    return null;
   }
 
   @Override

@@ -50,6 +50,7 @@ import javax.persistence.TemporalType;
 
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.BarcodableVisitor;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -327,11 +328,6 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   }
 
   @Override
-  public String getBarcodeExtraInfo() {
-    return getModel().getAlias();
-  }
-
-  @Override
   public String getAlias() {
     return getIdentificationBarcode();
   }
@@ -376,11 +372,6 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   }
 
   @Override
-  public String getBarcodeSizeInfo() {
-    return String.format("%s: %d", getModel().getPlatformType().getPluralPartitionName(), getPartitions().size());
-  }
-
-  @Override
   public SequencingContainerModel getModel() {
     return model;
   }
@@ -406,8 +397,7 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   }
 
   @Override
-  public String getBarcodeGroupDescription() {
-    return null;
+  public <T> T visit(BarcodableVisitor<T> visitor) {
+    return visitor.visitContainer(this);
   }
-
 }

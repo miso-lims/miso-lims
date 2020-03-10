@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
+import uk.ac.bbsrc.tgac.miso.core.data.BarcodableVisitor;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog;
@@ -111,18 +112,8 @@ public class BoxImpl extends AbstractBox {
   }
 
   @Override
-  public String getBarcodeExtraInfo() {
-    return getDescription();
-  }
-
-  @Override
-  public String getBarcodeSizeInfo() {
-    return getSize().getRowsByColumns();
-  }
-
-  @Override
-  public String getBarcodeGroupDescription() {
-    return null;
+  public <T> T visit(BarcodableVisitor<T> visitor) {
+    return visitor.visitBox(this);
   }
 
 }

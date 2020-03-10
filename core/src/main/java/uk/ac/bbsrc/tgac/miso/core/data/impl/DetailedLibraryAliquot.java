@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import uk.ac.bbsrc.tgac.miso.core.data.BarcodableVisitor;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
@@ -66,10 +67,9 @@ public class DetailedLibraryAliquot extends LibraryAliquot implements GroupIdent
     return getLibrary() != null && LimsUtils.isDetailedLibrary(getLibrary()) ? (DetailedLibrary) getLibrary() : null;
   }
 
-  @Override
-  public String getBarcodeGroupDescription() {
-    GroupIdentifiable groupParent = getEffectiveGroupIdEntity();
-    return groupParent == null ? null : groupParent.getGroupDescription();
-  }
 
+  @Override
+  public <T> T visit(BarcodableVisitor<T> visitor) {
+    return visitor.visitLibraryAliquotDetailed(this);
+  }
 }

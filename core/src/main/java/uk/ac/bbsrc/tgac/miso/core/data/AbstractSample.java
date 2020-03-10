@@ -67,7 +67,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferItem;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
  * Skeleton implementation of a Sample
@@ -469,17 +468,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   }
 
   @Override
-  public String getBarcodeExtraInfo() {
-    return getDescription();
-  }
-
-  @Override
-  public String getBarcodeSizeInfo() {
-    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), getVolumeUnits(),
-        getConcentrationUnits());
-  }
-
-  @Override
   public String getDeleteType() {
     return "Sample";
   }
@@ -594,10 +582,4 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
     }
     return transfers;
   }
-
-  @Override
-  public String getBarcodeGroupDescription() {
-    return null;
-  }
-
 }
