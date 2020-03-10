@@ -131,7 +131,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.TissuePieceTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.TissueTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.Layout;
 import uk.ac.bbsrc.tgac.miso.core.util.IlluminaExperiment;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.SampleSheet;
@@ -360,7 +359,6 @@ public class MenuController implements ServletContextAware {
       addJsonArray(mapper, node, "sequencingParameters", sequencingParametersService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "printerBackends", Arrays.asList(Backend.values()), Dtos::asDto);
       addJsonArray(mapper, node, "printerDrivers", Arrays.asList(Driver.values()), Dtos::asDto);
-      addJsonArray(mapper, node, "printerLayouts", Arrays.asList(Layout.values()), Dtos::asDto);
       addJsonArray(mapper, node, "boxSizes", boxSizeService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "boxUses", boxUseService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "studyTypes", studyTypeService.list(), Dtos::asDto);

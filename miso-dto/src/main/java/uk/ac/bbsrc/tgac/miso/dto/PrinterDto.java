@@ -7,9 +7,11 @@ public class PrinterDto {
   private String backend;
   private ObjectNode configuration;
   private String driver;
+  private double height;
   private long id;
-  private String layout;
+  private ObjectNode layout;
   private String name;
+  private double width;
 
   public String getBackend() {
     return backend;
@@ -23,16 +25,24 @@ public class PrinterDto {
     return driver;
   }
 
+  public double getHeight() {
+    return height;
+  }
+
   public long getId() {
     return id;
   }
 
-  public String getLayout() {
+  public ObjectNode getLayout() {
     return layout;
   }
 
   public String getName() {
     return name;
+  }
+
+  public double getWidth() {
+    return width;
   }
 
   public boolean isAvailable() {
@@ -55,11 +65,15 @@ public class PrinterDto {
     this.driver = driver;
   }
 
+  public void setHeight(double height) {
+    this.height = height;
+  }
+
   public void setId(long id) {
     this.id = id;
   }
 
-  public void setLayout(String layout) {
+  public void setLayout(ObjectNode layout) {
     this.layout = layout;
   }
 
@@ -67,4 +81,7 @@ public class PrinterDto {
     this.name = name;
   }
 
+  public void setWidth(double width) {
+    this.width = width;
+  }
 }

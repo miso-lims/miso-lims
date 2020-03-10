@@ -60,10 +60,17 @@ ListTarget.printer = {
             property: "driver",
             values: Constants.printerDrivers.map(Utils.array.getName)
           }, {
-            type: "select",
+            type: "text",
+            label: "Width (mm)",
+            property: "width",
+          }, {
+            type: "text",
+            label: "Height (mm)",
+            property: "height",
+          }, {
+            type: "text",
             label: "Layout",
             property: "layout",
-            values: Constants.printerLayouts.map(Utils.array.getName)
           }, {
             type: "select",
             label: "Backend",
@@ -77,6 +84,13 @@ ListTarget.printer = {
               Utils.showOkDialog('Create Printer', ['A printer needs a name.']);
               return;
             }
+            var layout;
+            try {
+              layout = JSON.parse(printer.layout);
+            } catch (e) {
+              Utils.showOkDialog('Create Printer', ['Layout must be valid JSON.']);
+              return;
+            }
             var save = function(printerConfig) {
 
               Utils.ajaxWithDialog('Saving Printer', 'POST', Urls.rest.printers.create, {
@@ -85,8 +99,10 @@ ListTarget.printer = {
                 "backend": printer.backend.name,
                 "configuration": printerConfig,
                 "driver": printer.driver,
-                "layout": printer.layout,
+                "height": printer.height,
+                "layout": layout,
                 "name": printer.name,
+                "width": printer.width,
               }, Utils.page.pageReload);
             }
 
@@ -122,11 +138,6 @@ ListTarget.printer = {
       "include": true,
       "iSortPriority": 0,
       "mData": "driver"
-    }, {
-      "sTitle": "Layout",
-      "include": true,
-      "iSortPriority": 0,
-      "mData": "layout"
     }, {
       "sTitle": "Backend",
       "include": true,

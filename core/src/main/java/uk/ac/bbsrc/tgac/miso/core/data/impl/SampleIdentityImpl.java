@@ -12,6 +12,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
+import uk.ac.bbsrc.tgac.miso.core.data.BarcodableVisitor;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
@@ -183,4 +184,8 @@ public class SampleIdentityImpl extends DetailedSampleImpl implements SampleIden
     this.consentLevel = consentLevel;
   }
 
+  @Override
+  public <T> T visit(BarcodableVisitor<T> visitor) {
+    return visitor.visitSampleIdentity(this);
+  }
 }

@@ -23,17 +23,22 @@ public class BradyLabelGenerator extends LabelCanvas {
 
   @Override
   public void barcode2d(double x, double y, double moduleSize, String contents) {
-    sb.append("B ").append(x).append(",").append(y).append(",0,DATAMATRIX,").append(moduleSize).append(";")
-        .append(contents).append("\n");
+    if (contents != null)
+      sb.append("B ").append(x).append(",").append(y).append(",0,DATAMATRIX,").append(moduleSize).append(";")
+          .append(contents).append("\n");
   }
 
   @Override
   public void barcode1d(double x, double y, double height, double moduleWidth, String contents) {
-    sb.append("B ").append(x).append(",").append(y).append(",0,CODE128,").append(height).append(";").append(contents).append("\n");
+    if (contents != null)
+      sb.append("B ").append(x).append(",").append(y).append(",0,CODE128,").append(height).append(";").append(contents).append("\n");
   }
 
   @Override
   public void text(double x, double y, double height, TextDirection direction, FontStyle style, Justification justification, String text) {
+    if (text == null) {
+      return;
+    }
     int rotation;
     switch (direction) {
     case UPSIDEDOWN:

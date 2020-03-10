@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -37,8 +37,9 @@ import java.util.TreeSet;
  */
 public interface Barcodable extends Nameable, Aliasable {
   public enum EntityType {
-    LIBRARY_ALIQUOT, POOL, SAMPLE, LIBRARY, BOX, CONTAINER, CONTAINER_MODEL;
+    LIBRARY_ALIQUOT, POOL, SAMPLE, LIBRARY, BOX, CONTAINER, CONTAINER_MODEL, KIT;
   }
+
   /**
    * Returns the label text of this Barcodable object.
    * 
@@ -59,11 +60,6 @@ public interface Barcodable extends Nameable, Aliasable {
   public Date getBarcodeDate();
 
   /**
-   * Supplemental description displayed on larger labels.
-   */
-  public String getBarcodeExtraInfo();
-
-  /**
    * Sets the identificationBarcode of this Barcodable object.
    * 
    * @param identificationBarcode
@@ -79,7 +75,6 @@ public interface Barcodable extends Nameable, Aliasable {
     return labels;
   }
 
-  public String getBarcodeSizeInfo();
+  public <T> T visit(BarcodableVisitor<T> visitor);
 
-  public String getBarcodeGroupDescription();
 }

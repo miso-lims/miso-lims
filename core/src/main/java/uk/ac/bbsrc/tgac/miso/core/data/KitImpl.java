@@ -194,19 +194,10 @@ public class KitImpl implements Kit {
   }
 
   @Override
-  public String getBarcodeExtraInfo() {
-    return getKitDescriptor().getName();
-  }
-
-  @Override
   public String getAlias() {
     return getLotNumber();
   }
 
-  @Override
-  public String getBarcodeSizeInfo() {
-    return null;
-  }
 
   @Override
   public boolean isSaved() {
@@ -214,7 +205,7 @@ public class KitImpl implements Kit {
   }
 
   @Override
-  public String getBarcodeGroupDescription() {
-    return null;
+  public <T> T visit(BarcodableVisitor<T> visitor) {
+    return visitor.visitKit(this);
   }
 }

@@ -5,6 +5,7 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 
+import uk.ac.bbsrc.tgac.miso.core.data.BarcodableVisitor;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 
 @Entity
@@ -13,5 +14,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 public class SampleTissueProcessingImpl extends DetailedSampleImpl implements SampleTissueProcessing {
 
   private static final long serialVersionUID = 1L;
+
+  @Override
+  public <T> T visit(BarcodableVisitor<T> visitor) {
+    return visitor.visitSampleTissueProcessing(this);
+  }
 
 }

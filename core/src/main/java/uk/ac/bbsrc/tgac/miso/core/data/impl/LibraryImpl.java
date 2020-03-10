@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.BarcodableVisitor;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 
@@ -62,6 +63,11 @@ public class LibraryImpl extends AbstractLibrary {
     changeLog.setColumnsChanged(columnsChanged);
     changeLog.setUser(user);
     return changeLog;
+  }
+
+  @Override
+  public <T> T visit(BarcodableVisitor<T> visitor) {
+    return visitor.visitLibrary(this);
   }
 
 }

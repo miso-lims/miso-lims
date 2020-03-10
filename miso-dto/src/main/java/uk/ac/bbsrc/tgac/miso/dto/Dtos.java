@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,11 +25,14 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
 import org.apache.commons.lang.NotImplementedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
@@ -222,7 +226,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStepPrompt;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.Layout;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -242,6 +245,7 @@ import ca.on.oicr.gsi.runscanner.dto.OxfordNanoporeNotificationDto;
 
 @SuppressWarnings("squid:S3776") // make Sonar ignore cognitive complexity warnings for this file
 public class Dtos {
+  private static final Logger log = LoggerFactory.getLogger(Dtos.class);
 
   public static TissueOriginDto asDto(@Nonnull TissueOrigin from) {
     TissueOriginDto dto = new TissueOriginDto();
@@ -2780,13 +2784,6 @@ public class Dtos {
     return dto;
   }
 
-  public static PrinterLayoutDto asDto(@Nonnull Layout from) {
-    PrinterLayoutDto dto = new PrinterLayoutDto();
-    dto.setId(from.ordinal());
-    dto.setName(from.name());
-    return dto;
-  }
-
   public static PrinterDto asDto(@Nonnull Printer from) {
     PrinterDto dto = new PrinterDto();
     dto.setId(from.getId());
@@ -2794,7 +2791,13 @@ public class Dtos {
     dto.setBackend(from.getBackend().name());
     // We intentionally do not pass configuration to the front end since it has passwords in it.
     dto.setDriver(from.getDriver().name());
-    dto.setLayout(from.getLayout().name());
+    dto.setHeight(from.getHeight());
+    dto.setWidth(from.getWidth());
+    try {
+      dto.setLayout(new ObjectMapper().readValue(from.getLayout(), ObjectNode.class));
+    } catch (IOException e) {
+      log.error("Corrupt printer contents", e);
+    }
     dto.setName(from.getName());
     return dto;
   }
@@ -2805,7 +2808,9 @@ public class Dtos {
     to.setBackend(Backend.valueOf(dto.getBackend()));
     to.setConfiguration(new ObjectMapper().writeValueAsString(dto.getConfiguration()));
     to.setDriver(Driver.valueOf(dto.getDriver()));
-    to.setLayout(Layout.valueOf(dto.getLayout()));
+    to.setLayout(new ObjectMapper().writeValueAsString(dto.getLayout()));
+    to.setHeight(dto.getHeight());
+    to.setWidth(dto.getWidth());
     to.setEnabled(dto.isAvailable());
     to.setName(dto.getName());
 

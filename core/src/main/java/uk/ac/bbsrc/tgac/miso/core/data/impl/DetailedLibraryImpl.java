@@ -13,6 +13,7 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
+import uk.ac.bbsrc.tgac.miso.core.data.BarcodableVisitor;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
@@ -148,9 +149,8 @@ public class DetailedLibraryImpl extends LibraryImpl implements DetailedLibrary 
   }
 
   @Override
-  public String getBarcodeGroupDescription() {
-    GroupIdentifiable groupParent = getEffectiveGroupIdEntity();
-    return groupParent == null ? null : groupParent.getGroupDescription();
+  public <T> T visit(BarcodableVisitor<T> visitor) {
+    return visitor.visitLibraryDetailed(this);
   }
 
 }

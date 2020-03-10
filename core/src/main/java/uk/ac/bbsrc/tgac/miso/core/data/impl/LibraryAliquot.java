@@ -54,6 +54,7 @@ import javax.persistence.TemporalType;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
+import uk.ac.bbsrc.tgac.miso.core.data.BarcodableVisitor;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
@@ -373,16 +374,6 @@ public class LibraryAliquot extends AbstractBoxable
     return getCreationDate();
   }
 
-  @Override
-  public String getBarcodeExtraInfo() {
-    return null;
-  }
-
-  @Override
-  public String getBarcodeSizeInfo() {
-    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), getVolumeUnits(),
-        getConcentrationUnits());
-  }
 
   @Override
   public String getDeleteType() {
@@ -457,8 +448,8 @@ public class LibraryAliquot extends AbstractBoxable
   }
 
   @Override
-  public String getBarcodeGroupDescription() {
-    return null;
+  public <T> T visit(BarcodableVisitor<T> visitor) {
+    return visitor.visitLibraryAliquot(this);
   }
 
 }

@@ -60,6 +60,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
+import uk.ac.bbsrc.tgac.miso.core.data.BarcodableVisitor;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
@@ -533,16 +534,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
     return getCreationDate();
   }
 
-  @Override
-  public String getBarcodeExtraInfo() {
-    return getDescription();
-  }
-
-  @Override
-  public String getBarcodeSizeInfo() {
-    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), getVolumeUnits(),
-        getConcentrationUnits());
-  }
 
   @Override
   public String getDeleteType() {
@@ -575,8 +566,8 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
-  public String getBarcodeGroupDescription() {
-    return null;
+  public <T> T visit(BarcodableVisitor<T> visitor) {
+    return visitor.visitPool(this);
   }
 
 }

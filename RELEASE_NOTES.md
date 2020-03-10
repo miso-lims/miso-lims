@@ -20,6 +20,7 @@ Changes:
   * Fixed error when creating Sample Classes
   * Fixed several bugs related to deleting things
   * Disallow editing whether a project uses the secondary naming scheme
+  * Allow setting custom fields in printer labels
 
 # 1.0.1
 

@@ -31,6 +31,7 @@ public class ZebraLabelGenerator extends LabelCanvas {
 
   @Override
   public void barcode1d(double x, double y, double height, double moduleWidth, String contents) {
+    if (contents == null) return;
     // Set origin for barcode
     sb.append("^FT").append(dots(x)).append(",").append(dots(y)).append(",0\r\n");
     // Code 128 barcode in normal orientation
@@ -40,6 +41,7 @@ public class ZebraLabelGenerator extends LabelCanvas {
 
   @Override
   public void barcode2d(double x, double y, double moduleSize, String contents) {
+    if (contents == null) return;
     // Set origin for barcode
     sb.append("^FT").append(dots(x)).append(",").append(dots(y)).append(",0\r\n");
     // Datamatrix barcode in normal orientation, maximum quality

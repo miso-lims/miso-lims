@@ -1268,8 +1268,8 @@ INSERT INTO Submission(submissionId, title, alias, creationDate) VALUES
 INSERT INTO Submission_Experiment(submission_submissionId, experiments_experimentId) VALUES
 (1, 1);
 
-INSERT INTO Printer(printerId, name, driver, backend, configuration, enabled, layout) VALUES
-(1, 'Printer', 'BRADY', 'BRADY_FTP', '{"host:"127.0.0.1","pin":"0000"}', TRUE, 'THT_155_490T');
+INSERT INTO Printer(printerId, name, driver, backend, configuration, enabled, width, height, layout) VALUES
+(1, 'Printer', 'BRADY', 'BRADY_FTP', '{"host:"127.0.0.1","pin":"0000"}', TRUE, 25, 25, '[{"element":"text", "contents":{"use":"ALIAS"}}]');
 
 -- SampleHierarchy needs repopulated because everything is not created in expected order in test data
 -- (parent SampleTissue and Identity records aren't always created before childrens' DetailedSample records)
