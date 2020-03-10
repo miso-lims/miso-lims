@@ -16,6 +16,7 @@ Changes:
     container models if the container is linked to multiple runs
   * Fixed error when creating Sample Classes
   * Fixed several bugs related to deleting things
+  * Disallow editing whether a project uses the secondary naming scheme
 
 # 1.0.1
 
