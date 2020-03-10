@@ -80,6 +80,7 @@
 <script type="text/javascript">
   jQuery(document).ready(function () {
     FormUtils.createForm('experimentForm', 'save', ${experimentDto}, 'experiment', {});
+    Utils.ui.updateHelpLink(FormTarget.experiment.getUserManualUrl());
   });
 </script>
 

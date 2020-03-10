@@ -68,6 +68,7 @@
     <script type="text/javascript">
       jQuery(document).ready(function () {
         FormUtils.createForm('serviceRecordForm', 'save', ${serviceRecordDto}, 'servicerecord', {instrumentPositions: ${instrumentPositions}});
+        Utils.ui.updateHelpLink(FormTarget.servicerecord.getUserManualUrl());
       });
     </script>
     <br>

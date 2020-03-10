@@ -23,6 +23,9 @@
 
 ListTarget.targetedsequencing = {
   name: "Targeted Sequencing",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'targeted-sequencing');
+  },
   createUrl: function(config, kitDescriptorId) {
     return Urls.rest.targetedSequencings[config.add ? 'kitAvailableDatatable' : 'kitIncludedDatatable'](config.kitDescriptorId);
   },

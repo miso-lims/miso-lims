@@ -4,14 +4,17 @@ if (typeof FormTarget === 'undefined') {
 FormTarget.submission = (function($) {
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('european_nucleotide_archive_support', 'submissions');
+    },
     getSaveUrl: function(submission) {
-      return submission.id ? ('/miso/rest/submissions/' + submission.id) : '/miso/rest/submissions';
+      return submission.id ? Urls.rest.submissions.update(submission.id) : Urls.rest.submissions.create;
     },
     getSaveMethod: function(submission) {
       return submission.id ? 'PUT' : 'POST';
     },
     getEditUrl: function(submission) {
-      return '/miso/submission/' + submission.id;
+      return Urls.ui.submissions.edit(submission.id);
     },
     getSections: function(config, object) {
       return [{

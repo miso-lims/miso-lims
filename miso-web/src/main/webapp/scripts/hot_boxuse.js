@@ -1,4 +1,7 @@
 HotTarget.boxuse = {
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'box-uses');
+  },
   getCreateUrl: function() {
     return Urls.rest.boxUses.create;
   },
@@ -20,7 +23,7 @@ HotTarget.boxuse = {
     return !config.isAdmin ? [] : [{
       name: 'Edit',
       action: function(items) {
-        window.location = window.location.origin + '/miso/boxuse/bulk/edit?' + jQuery.param({
+        window.location = Urls.ui.boxUses.bulkEdit + '?' + jQuery.param({
           ids: items.map(Utils.array.getId).join(',')
         });
       }

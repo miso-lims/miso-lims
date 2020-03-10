@@ -92,6 +92,7 @@
       dto.effectiveExternalNames = '${effectiveExternalNames}';
     }
     FormUtils.createForm('libraryForm', 'save', dto, 'library', ${formConfig});
+    Utils.ui.updateHelpLink(FormTarget.library.getUserManualUrl());
   });
 </script>
 

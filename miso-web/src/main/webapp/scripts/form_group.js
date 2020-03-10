@@ -4,14 +4,17 @@ if (typeof FormTarget === 'undefined') {
 FormTarget.group = (function($) {
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('users_and_groups', 'groups');
+    },
     getSaveUrl: function(group) {
-      return group.id ? ('/miso/rest/groups/' + group.id) : '/miso/rest/groups';
+      return group.id ? Urls.rest.groups.update(group.id) : Urls.rest.groups.create;
     },
     getSaveMethod: function(group) {
       return group.id ? 'PUT' : 'POST';
     },
     getEditUrl: function(group) {
-      return '/miso/admin/group/' + group.id;
+      return Urls.ui.groups.edit(group.id);
     },
     getSections: function(config, object) {
       return [{

@@ -23,6 +23,9 @@
 
 ListTarget.arrayrun = {
   name: 'Array Runs',
+  getUserManualUrl: function() {
+    return Urls.external.userManual('array_runs');
+  },
   createUrl: function(config, projectId) {
     return projectId ? Urls.rest.arrayRuns.projectDatatable(projectId) : Urls.rest.arrayRuns.datatable;
   },

@@ -1,4 +1,7 @@
 HotTarget.tissueorigin = {
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'tissue-origins');
+  },
   getCreateUrl: function() {
     return Urls.rest.tissueOrigins.create;
   },
@@ -24,7 +27,7 @@ HotTarget.tissueorigin = {
     return !config.isAdmin ? [] : [{
       name: 'Edit',
       action: function(items) {
-        window.location = window.location.origin + Urls.ui.tissueOrigins.bulkEdit + '?' + jQuery.param({
+        window.location = Urls.ui.tissueOrigins.bulkEdit + '?' + jQuery.param({
           ids: items.map(Utils.array.getId).join(',')
         });
       }

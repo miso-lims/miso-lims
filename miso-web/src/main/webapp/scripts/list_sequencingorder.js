@@ -23,6 +23,9 @@
 
 ListTarget.sequencingorder = {
   name: "Sequencing Orders",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('sequencing_orders');
+  },
   createUrl: function(config, projectId) {
     throw new Error("Orders can only be shown statically.");
   },

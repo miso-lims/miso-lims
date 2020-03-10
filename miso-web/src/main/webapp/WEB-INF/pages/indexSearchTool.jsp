@@ -72,6 +72,12 @@
   </div>
 </div>
 
+<script type="text/javascript">
+jQuery(document).ready(function () {
+  Utils.ui.updateHelpLink(Urls.external.userManual('other_miso_tools', 'index-search'));
+});
+</script>
+
 </div>
 </div>
 </div>

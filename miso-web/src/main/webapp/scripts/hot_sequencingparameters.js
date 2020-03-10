@@ -1,4 +1,7 @@
 HotTarget.sequencingparameters = {
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'sequencing-parameters');
+  },
   getCreateUrl: function() {
     return Urls.rest.sequencingParameters.create;
   },

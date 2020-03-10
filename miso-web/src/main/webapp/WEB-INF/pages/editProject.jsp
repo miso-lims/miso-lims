@@ -56,6 +56,7 @@
 <script type="text/javascript">
   jQuery(document).ready(function () {
     FormUtils.createForm('projectForm', 'save', ${projectDto}, 'project', ${formConfig});
+    Utils.ui.updateHelpLink(FormTarget.project.getUserManualUrl());
   });
 </script>
 

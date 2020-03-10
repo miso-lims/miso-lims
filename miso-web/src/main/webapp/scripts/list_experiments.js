@@ -23,6 +23,9 @@
 
 ListTarget.experiment = {
   name: "Experiments",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('european_nucleotide_archive_support', 'experiments');
+  },
   createUrl: function(config, projectId) {
     throw new Error("Experiments must be provided statically");
   },
@@ -34,7 +37,7 @@ ListTarget.experiment = {
     var actions = [{
       name: "Create Submission",
       action: function(experiments) {
-        window.location = window.location.origin + '/miso/submission/new?' + jQuery.param({
+        window.location = Urls.ui.submissions.create + '?' + jQuery.param({
           experimentIds: experiments.map(Utils.array.getId).join(',')
         });
       }
@@ -50,7 +53,7 @@ ListTarget.experiment = {
       actions.push({
         name: 'Create New',
         handler: function() {
-          var url = window.location.origin + '/miso/rest/runs/' + config.runId + '/potentialExperiments';
+          var url = Urls.rest.runs.potentialExperiments(config.runId);
           Utils.ajaxWithDialog('Finding potential experiments', 'GET', url, null, function(potentialExperiments) {
             if (!potentialExperiments || !potentialExperiments.length) {
               Utils.showOkDialog('Error',
@@ -85,7 +88,7 @@ ListTarget.experiment = {
                     request.experiment.study = result.study;
                     request.experiment.title = result.title;
 
-                    Utils.ajaxWithDialog('Creating to Experiment', 'POST', '/miso/rest/experiments', request.experiment,
+                    Utils.ajaxWithDialog('Creating to Experiment', 'POST', Urls.rest.experiments.create, request.experiment,
                         Utils.page.pageReload);
 
                   }, showCreate);
@@ -101,7 +104,7 @@ ListTarget.experiment = {
       }, {
         name: 'Add to Existing',
         handler: function() {
-          var url = window.location.origin + '/miso/rest/runs/' + config.runId + '/potentialExperiments';
+          var url = Urls.rest.runs.potentialExperiments(config.runId);
           Utils.ajaxWithDialog('Finding potential experiments', 'GET', url, null, function(potentialExperiments) {
             if (!potentialExperiments || !potentialExperiments.length) {
               Utils.showOkDialog('Error', ['No existing experiments found']);
@@ -112,7 +115,7 @@ ListTarget.experiment = {
                 name: request.partition.containerName + " " + request.partition.partitionNumber + " (" + request.partition.pool.name
                     + ") to " + request.experiment.name + " (" + request.experiment.alias + ")",
                 handler: function() {
-                  Utils.ajaxWithDialog("Adding to Experiment", "POST", "/miso/rest/experiments/" + request.experiment.id + "/add?"
+                  Utils.ajaxWithDialog("Adding to Experiment", "POST", Urls.rest.experiments.addRunPartition(request.experiment.id) + "?"
                       + jQuery.param({
                         runId: config.runId,
                         partitionId: request.partition.id
@@ -135,7 +138,7 @@ ListTarget.experiment = {
               name: request.partition.containerName + " " + request.partition.partitionNumber + " (" + request.partition.pool.name
                   + ") to " + request.experiment.name + " (" + request.experiment.alias + ")",
               handler: function() {
-                Utils.ajaxWithDialog("Adding to Experiment", "POST", "/miso/rest/experiments/" + request.experiment.id + "/add?"
+                Utils.ajaxWithDialog("Adding to Experiment", "POST", Urls.rest.experiments.addRunPartition(request.experiment.id) + "?"
                     + jQuery.param({
                       runId: config.runId,
                       partitionId: request.partition.id

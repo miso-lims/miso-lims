@@ -23,8 +23,15 @@
 
 ListTarget.kit = {
   name: "Kits",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'kit-descriptors');
+  },
   createUrl: function(config, projectId) {
-    return "/miso/rest/kitdescriptors/dt" + (config.kitType ? "/type/" + config.kitType : "");
+    if (config.kitType) {
+      return Urls.rest.kitDescriptors.typeDatatable(config.kitType);
+    } else {
+      return Urls.rest.kitDescriptors.datatable;
+    }
   },
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {
@@ -38,7 +45,7 @@ ListTarget.kit = {
       actions.push({
         "name": "Add",
         "handler": function() {
-          window.location = '/miso/kitdescriptor/new';
+          window.location = Urls.ui.kitDescriptors.create;
         }
       });
     }

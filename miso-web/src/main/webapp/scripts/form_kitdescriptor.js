@@ -11,14 +11,17 @@ FormTarget.kitdescriptor = (function($) {
    */
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('type_data', 'kit-descriptors');
+    },
     getSaveUrl: function(kit) {
-      return kit.id ? ('/miso/rest/kitdescriptors/' + kit.id) : '/miso/rest/kitdescriptors';
+      return kit.id ? Urls.rest.kitDescriptors.update(kit.id) : Urls.rest.kitDescriptors.create;
     },
     getSaveMethod: function(kit) {
       return kit.id ? 'PUT' : 'POST';
     },
     getEditUrl: function(kit) {
-      return '/miso/kitdescriptor/' + kit.id;
+      return Urls.ui.kitDescriptors.edit(kit.id);
     },
     getSections: function(config, object) {
       return [{

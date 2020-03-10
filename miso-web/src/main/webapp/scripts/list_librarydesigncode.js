@@ -1,5 +1,8 @@
 ListTarget.librarydesigncode = {
   name: "Library Design Codes",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'library-designs');
+  },
   createUrl: function(config, projectId) {
     throw new Error("Must be provided statically");
   },

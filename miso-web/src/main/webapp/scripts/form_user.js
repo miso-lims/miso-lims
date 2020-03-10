@@ -12,14 +12,17 @@ FormTarget.user = (function($) {
    */
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('users_and_groups', 'users');
+    },
     getSaveUrl: function(user) {
-      return user.id ? ('/miso/rest/users/' + user.id) : '/miso/rest/users';
+      return user.id ? Urls.rest.users.update(user.id) : Urls.rest.users.create;
     },
     getSaveMethod: function(user) {
       return user.id ? 'PUT' : 'POST';
     },
     getEditUrl: function(user) {
-      return '/miso/admin/user/' + user.id;
+      return Urls.ui.users.edit(user.id);
     },
     getSections: function(config, object) {
       return [{
@@ -144,13 +147,13 @@ FormTarget.passwordreset = (function($) {
 
   return {
     getSaveUrl: function(object, config) {
-      return '/miso/rest/users/' + config.userId + '/password';
+      return Urls.rest.users.resetPassword(config.userId);
     },
     getSaveMethod: function() {
       return 'POST';
     },
     getEditUrl: function(user, config) {
-      return '/miso' + (config.isAdmin ? '/admin' : '') + '/user/' + user.id;
+      return config.isAdmin ? Urls.ui.users.edit(user.id) : Urls.ui.users.view(user.id);
     },
     getSections: function(config, object) {
       return [{

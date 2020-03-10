@@ -1,4 +1,7 @@
 HotTarget.subproject = {
+  getUserManualUrl: function() {
+    return Urls.external.userManual('projects', 'subprojects');
+  },
   getCreateUrl: function() {
     return Urls.rest.subprojects.create;
   },
@@ -33,7 +36,7 @@ HotTarget.subproject = {
     return !config.isAdmin ? [] : [{
       name: 'Edit',
       action: function(items) {
-        window.location = window.location.origin + Urls.ui.subprojects.bulkEdit + '?' + jQuery.param({
+        window.location = Urls.ui.subprojects.bulkEdit + '?' + jQuery.param({
           ids: items.map(Utils.array.getId).join(',')
         });
       }

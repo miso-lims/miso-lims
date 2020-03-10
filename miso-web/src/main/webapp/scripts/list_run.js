@@ -23,6 +23,9 @@
 
 ListTarget.run = {
   name: "Runs",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('sequencing_runs');
+  },
   createUrl: function(config, projectId) {
     if (projectId) {
       return Urls.rest.runs.projectDatatable(projectId);

@@ -1,5 +1,8 @@
 HotTarget.sequencingorder = (function() {
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('sequencing_orders');
+    },
     getCreateUrl: function() {
       return Urls.rest.sequencingOrders.create;
     },

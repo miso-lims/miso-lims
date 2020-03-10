@@ -1,4 +1,7 @@
 HotTarget.libraryspikein = {
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'library-spike-ins');
+  },
   getCreateUrl: function() {
     return Urls.rest.librarySpikeIns.create;
   },
@@ -20,7 +23,7 @@ HotTarget.libraryspikein = {
     return !config.isAdmin ? [] : [{
       name: 'Edit',
       action: function(items) {
-        window.location = window.location.origin + '/miso/libraryspikein/bulk/edit?' + jQuery.param({
+        window.location = Urls.ui.librarySpikeIns.bulkEdit + '?' + jQuery.param({
           ids: items.map(Utils.array.getId).join(',')
         });
       }

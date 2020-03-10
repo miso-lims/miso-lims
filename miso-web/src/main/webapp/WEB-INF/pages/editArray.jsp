@@ -46,6 +46,7 @@
       config.arrayModels = ${arrayModels};
     </c:if>
     FormUtils.createForm('arrayForm', 'save', dto, 'array', config);
+    Utils.ui.updateHelpLink(FormTarget.array.getUserManualUrl());
   });
 </script>
 

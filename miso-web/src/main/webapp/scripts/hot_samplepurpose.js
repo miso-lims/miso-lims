@@ -1,4 +1,7 @@
 HotTarget.samplepurpose = {
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'sample-purposes');
+  },
   getCreateUrl: function() {
     return Urls.rest.samplePurposes.create;
   },
@@ -21,7 +24,7 @@ HotTarget.samplepurpose = {
     return !config.isAdmin ? [] : [{
       name: 'Edit',
       action: function(items) {
-        window.location = window.location.origin + Urls.ui.samplePurposes.bulkEdit + '?' + jQuery.param({
+        window.location = Urls.ui.samplePurposes.bulkEdit + '?' + jQuery.param({
           ids: items.map(Utils.array.getId).join(',')
         });
       }

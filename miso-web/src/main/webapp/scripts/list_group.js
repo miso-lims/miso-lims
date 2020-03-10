@@ -23,6 +23,9 @@
 
 ListTarget.group = {
   name: "Groups",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('users_and_groups', 'groups');
+  },
   createUrl: function(config, projectId) {
     throw new Error("Static data only");
   },

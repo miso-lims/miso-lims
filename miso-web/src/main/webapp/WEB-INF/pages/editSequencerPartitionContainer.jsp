@@ -52,6 +52,7 @@
       isNew: ${container.id == 0},
       platformType: '${container.model.platformType}'
     });
+    Utils.ui.updateHelpLink(FormTarget.container.getUserManualUrl());
   });
 </script>
 

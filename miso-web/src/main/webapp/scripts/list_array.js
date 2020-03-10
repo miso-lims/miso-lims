@@ -23,6 +23,9 @@
 
 ListTarget.array = {
   name: "Arrays",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('arrays');
+  },
   createUrl: function(config, projectId) {
     return Urls.rest.arrays.datatable;
   },

@@ -10,9 +10,12 @@ FormTarget.libraryaliquot = (function($) {
    */
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('library_aliquots');
+    },
     getSaveUrl: function(aliquot) {
       if (aliquot.id) {
-        return '/miso/rest/libraryaliquots/' + aliquot.id;
+        return Urls.rest.libraryAliquots.update(aliquot.id);
       } else {
         throw new Error('Page not intended for new library aliquot creation');
       }
@@ -21,7 +24,7 @@ FormTarget.libraryaliquot = (function($) {
       return 'PUT';
     },
     getEditUrl: function(aliquot) {
-      return '/miso/libraryaliquot/' + aliquot.id;
+      return Urls.ui.libraryAliquots.edit(aliquot.id);
     },
     getSections: function(config, object) {
       return [{

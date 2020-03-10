@@ -1,7 +1,10 @@
 ListTarget.poolorder = {
   name: "Pool Orders",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('pool_orders');
+  },
   createUrl: function(config, projectId) {
-    return '/miso/rest/poolorders/dt/' + config.status;
+    return Urls.rest.poolOrders.statusDatatable(config.status);
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {
@@ -11,7 +14,7 @@ ListTarget.poolorder = {
     return [{
       "name": "Add",
       "handler": function() {
-        window.location.href = '/miso/poolorder/new';
+        window.location.href = Urls.ui.poolOrders.create;
       }
     }];
   },

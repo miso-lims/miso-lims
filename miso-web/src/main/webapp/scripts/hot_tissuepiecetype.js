@@ -1,4 +1,7 @@
 HotTarget.tissuepiecetype = {
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'tissue-piece-types');
+  },
   getCreateUrl: function() {
     return Urls.rest.tissuePieceTypes.create;
   },

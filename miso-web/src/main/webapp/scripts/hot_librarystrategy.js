@@ -1,4 +1,7 @@
 HotTarget.librarystrategy = {
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'library-strategy-types');
+  },
   getCreateUrl: function() {
     return Urls.rest.libraryStrategies.create;
   },
@@ -22,7 +25,7 @@ HotTarget.librarystrategy = {
     return !config.isAdmin ? [] : [{
       name: 'Edit',
       action: function(items) {
-        window.location = window.location.origin + '/miso/librarystrategy/bulk/edit?' + jQuery.param({
+        window.location = Urls.ui.libraryStrategies.bulkEdit + '?' + jQuery.param({
           ids: items.map(Utils.array.getId).join(',')
         });
       }

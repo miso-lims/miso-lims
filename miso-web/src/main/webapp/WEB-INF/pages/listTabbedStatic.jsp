@@ -49,21 +49,25 @@
       </c:forEach>
       <script type="text/javascript">
         jQuery(document).ready(function () {
+          var target = ${targetType};
           <c:choose>
             <c:when test="${empty customTitle}">
-              document.getElementById('tableTitle').innerText = ${targetType}.name;
+              document.getElementById('tableTitle').innerText = target.name;
             </c:when>
             <c:otherwise>
               document.getElementById('tableTitle').innerText = '${customTitle}';
             </c:otherwise>
           </c:choose>
-          var storageKey = ${targetType}.name + "_tab_${property}";
+          var storageKey = target.name + "_tab_${property}";
           jQuery("#tabs").tabs({
             active : parseInt(window.localStorage.getItem(storageKey) || 0),
             activate: function(event, ui) {
               window.localStorage.setItem(storageKey, ui.newTab.index());
             }
           });
+          if (target.hasOwnProperty('getUserManualUrl')) {
+            Utils.ui.updateHelpLink(target.getUserManualUrl());
+          }
         });
       </script>
     </div>

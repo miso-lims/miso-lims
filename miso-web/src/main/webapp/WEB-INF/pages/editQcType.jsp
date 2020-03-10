@@ -30,6 +30,7 @@
     QcType.setAdmin(${miso:isAdmin()});
     QcType.setForm(form);
     QcType.setControls(qcType.controls);
+    Utils.ui.updateHelpLink(FormTarget.qctype.getUserManualUrl());
   });
 </script>
 

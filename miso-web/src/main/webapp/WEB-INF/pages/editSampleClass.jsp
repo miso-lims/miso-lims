@@ -37,6 +37,7 @@
     SampleClass.setAdmin(${miso:isAdmin()});
     SampleClass.setParents(sampleClass.parentRelationships);
     SampleClass.setChildren(sampleClass.childRelationships);
+    Utils.ui.updateHelpLink(FormTarget.sampleclass.getUserManualUrl());
   });
 </script>
 

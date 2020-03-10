@@ -23,6 +23,9 @@
 
 ListTarget.libraryaliquot = {
   name: "Library Aliquots",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('library_aliquots');
+  },
   createUrl: function(config, projectId) {
     return projectId ? Urls.rest.libraryAliquots.projectDatatable(projectId) : Urls.rest.libraryAliquots.datatable;
   },

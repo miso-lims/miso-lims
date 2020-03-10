@@ -23,6 +23,9 @@
 
 ListTarget.study = {
   name: "Studies",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('european_nucleotide_archive_support', 'studies');
+  },
   createUrl: function(config, projectId) {
     return projectId ? Urls.rest.studies.projectDatatable(projectId) : Urls.rest.studies.datatable;
   },

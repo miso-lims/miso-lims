@@ -90,6 +90,7 @@
   jQuery(document).ready(function () {
     Warning.generateHeaderWarnings('warnings', WarningTarget.sample, ${sampleDto});
     FormUtils.createForm('sampleForm', 'save', ${sampleDto}, 'sample', ${formConfig});
+    Utils.ui.updateHelpLink(FormTarget.sample.getUserManualUrl());
   });
 </script>
 

@@ -993,6 +993,10 @@ Utils.ui = {
       action.action(getItems());
     });
     return button;
+  },
+
+  updateHelpLink: function(url) {
+    jQuery('#userManualLink').attr('href', url ? url : Urls.external.userManual());
   }
 };
 

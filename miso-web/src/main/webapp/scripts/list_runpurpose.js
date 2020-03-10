@@ -1,5 +1,8 @@
 ListTarget.runpurpose = {
   name: "Run Purposes",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'run-purposes');
+  },
   createUrl: function(config, projectId) {
     throw new Error("Must be provided statically");
   },

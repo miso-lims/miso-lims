@@ -1,5 +1,8 @@
 ListTarget.locationmap = {
   name: "Location Maps",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('freezers_and_rooms');
+  },
   createUrl: function(config, projectId) {
     throw new Error("Must be provided statically");
   },
@@ -55,7 +58,7 @@ ListTarget.locationmap = {
                 });
 
                 jQuery.ajax({
-                  url: '/miso/rest/locationmaps',
+                  url: Urls.rest.locationMaps.create,
                   type: 'POST',
                   data: formData,
                   cache: false,
@@ -88,7 +91,7 @@ ListTarget.locationmap = {
       include: true,
       iSortPriority: 0,
       mRender: function(data, type, full) {
-        return "<a href=\"/freezermaps/" + data + "\">" + data + "</a>";
+        return "<a href=\"" + Urls.ui.freezerMaps.view(data) + "\">" + data + "</a>";
       }
     }, {
       sTitle: 'Description',

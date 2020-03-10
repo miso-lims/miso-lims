@@ -1,4 +1,7 @@
 HotTarget.detailedqcstatus = {
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'detailed-qc-status');
+  },
   getCreateUrl: function() {
     return Urls.rest.detailedQcStatuses.create;
   },
@@ -21,7 +24,7 @@ HotTarget.detailedqcstatus = {
     return !config.isAdmin ? [] : [{
       name: 'Edit',
       action: function(items) {
-        window.location = window.location.origin + '/miso/detailedqcstatus/bulk/edit?' + jQuery.param({
+        window.location = Urls.ui.detailedQcStatuses.bulkEdit + '?' + jQuery.param({
           ids: items.map(Utils.array.getId).join(',')
         });
       }

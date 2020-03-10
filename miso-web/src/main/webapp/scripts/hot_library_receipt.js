@@ -4,6 +4,9 @@
 
 HotTarget.libraryReceipt = (function() {
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('libraries');
+    },
     getCreateUrl: function() {
       return Urls.rest.libraries.create;
     },

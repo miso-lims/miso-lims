@@ -1,5 +1,8 @@
 ListTarget.staincategory = {
   name: "Stain Categories",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'stains');
+  },
   createUrl: function(config, projectId) {
     throw new Error("Must be provided statically");
   },

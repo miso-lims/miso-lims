@@ -2,6 +2,7 @@ FormUtils = (function($) {
 
   /*
    * FormTarget Structure: {
+   *   getUserManualUrl: optional function() returning string; URL for help link
    *   getSaveUrl: required function(object, config) returning string; URL to save object
    *   getSaveMethod: required function(object) returning string (POST|PUT); HTTP method to save object
    *   getEditUrl: required function(object, config) returning string; URL for the object's edit page

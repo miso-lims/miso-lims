@@ -232,6 +232,9 @@ HotTarget.library = (function() {
   };
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('libraries');
+    },
     getCreateUrl: function() {
       return Urls.rest.libraries.create;
     },
@@ -903,7 +906,7 @@ HotTarget.library = (function() {
       return [{
         name: 'Edit',
         action: function(items) {
-          window.location = window.location.origin + Urls.ui.libraries.bulkEdit + '?' + jQuery.param({
+          window.location = Urls.ui.libraries.bulkEdit + '?' + jQuery.param({
             ids: items.map(Utils.array.getId).join(',')
           });
         }
@@ -917,7 +920,7 @@ HotTarget.library = (function() {
                 ids: items.map(Utils.array.getId).join(',')
               }
               var loadPage = function() {
-                window.location = window.location.origin + Urls.ui.libraryAliquots.bulkPropagate + '?' + jQuery.param(params);
+                window.location = Urls.ui.libraryAliquots.bulkPropagate + '?' + jQuery.param(params);
               }
               if (result.createBox) {
                 Utils.createBoxDialog(result, function(result) {

@@ -23,6 +23,9 @@
 
 ListTarget.qctype = {
   name: "QC Types",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'qc-types');
+  },
   createUrl: function(config, projectId) {
     throw new Error("Must be provided statically");
   },

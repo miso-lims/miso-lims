@@ -1,4 +1,7 @@
 HotTarget.index = {
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'indices');
+  },
   getCreateUrl: function() {
     return Urls.rest.indices.create;
   },

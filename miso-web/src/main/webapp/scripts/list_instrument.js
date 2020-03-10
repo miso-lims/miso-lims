@@ -23,6 +23,9 @@
 
 ListTarget.instrument = {
   name: "Instruments",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('instruments');
+  },
   createUrl: function(config, projectId) {
     if (config.instrumentType) {
       return Urls.rest.instruments.instrumentTypeDatatable(config.instrumentType);

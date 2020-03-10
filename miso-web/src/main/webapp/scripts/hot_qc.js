@@ -13,6 +13,9 @@ HotTarget.qc = function(qcTarget) {
   }
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('qcs');
+    },
     getCreateUrl: function() {
       return Urls.rest.qcs.create;
     },

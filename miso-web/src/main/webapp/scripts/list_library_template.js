@@ -23,6 +23,9 @@
 
 ListTarget.library_template = {
   name: "Library Templates",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('libraries', 'library-templates');
+  },
   createUrl: function(config, projectId) {
     var namespace = Urls.rest.libraryTemplates;
     return projectId ? namespace.projectDatatable(projectId) : namespace.datatable;

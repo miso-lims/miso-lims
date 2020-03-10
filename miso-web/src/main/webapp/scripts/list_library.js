@@ -23,6 +23,9 @@
 
 ListTarget.library = {
   name: "Libraries",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('libraries');
+  },
   createUrl: function(config, projectId) {
     return projectId ? Urls.rest.libraries.projectDatatable(projectId) : Urls.rest.libraries.datatable;
   },

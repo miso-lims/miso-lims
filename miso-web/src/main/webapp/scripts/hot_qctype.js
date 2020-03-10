@@ -1,4 +1,7 @@
 HotTarget.qctype = {
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'qc-types');
+  },
   getCreateUrl: function() {
     return Urls.rest.qcTypes.create;
   },

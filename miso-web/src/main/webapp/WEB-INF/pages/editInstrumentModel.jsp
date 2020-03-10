@@ -50,6 +50,7 @@
     if ('${pageMode}' === 'edit' && '${instrumentType}' === 'SEQUENCER') {
       InstrumentModel.setContainerModels(model.containerModels);
     }
+    Utils.ui.updateHelpLink(FormTarget.instrumentmodel.getUserManualUrl());
   });
 </script>
 

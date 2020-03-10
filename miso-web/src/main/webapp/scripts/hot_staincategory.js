@@ -1,4 +1,7 @@
 HotTarget.staincategory = {
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'stains');
+  },
   getCreateUrl: function() {
     return Urls.rest.stainCategories.create;
   },
@@ -20,7 +23,7 @@ HotTarget.staincategory = {
     return !config.isAdmin ? [] : [{
       name: 'Edit',
       action: function(items) {
-        window.location = window.location.origin + '/miso/staincategory/bulk/edit?' + jQuery.param({
+        window.location = Urls.ui.stainCategories.bulkEdit + '?' + jQuery.param({
           ids: items.map(Utils.array.getId).join(',')
         });
       }

@@ -23,6 +23,9 @@
 
 ListTarget.samplepurpose = {
   name: "Sample Purposes",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'sample-purposes');
+  },
   createUrl: function(config, projectId) {
     throw new Error("Must be provided statically");
   },

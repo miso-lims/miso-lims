@@ -1,4 +1,7 @@
 HotTarget.runpurpose = {
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'run-purposes');
+  },
   getCreateUrl: function() {
     return Urls.rest.runPurposes.create;
   },

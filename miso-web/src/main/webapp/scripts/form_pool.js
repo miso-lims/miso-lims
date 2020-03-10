@@ -4,14 +4,17 @@ if (typeof FormTarget === 'undefined') {
 FormTarget.pool = (function($) {
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('pools');
+    },
     getSaveUrl: function(pool) {
-      return pool.id ? ('/miso/rest/pools/' + pool.id) : '/miso/rest/pools';
+      return pool.id ? Urls.rest.pools.update(pool.id) : Urls.rest.pools.create;
     },
     getSaveMethod: function(pool) {
       return pool.id ? 'PUT' : 'POST';
     },
     getEditUrl: function(pool) {
-      return '/miso/pool/' + pool.id;
+      return Urls.ui.pools.edit(pool.id);
     },
     getSections: function(config, object) {
       return [{

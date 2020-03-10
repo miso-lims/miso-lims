@@ -48,13 +48,14 @@
 <form:form id="freezerForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
 <script type="text/javascript">
   jQuery(document).ready(function () {
-    jQuery('#addingStorageLink').attr('href', Urls.external.userManual('${miso:docsVersion()}', 'freezers_and_rooms', 'adding-storage-to-a-freezer'));
+    jQuery('#addingStorageLink').attr('href', Urls.external.userManual('freezers_and_rooms', 'adding-storage-to-a-freezer'));
     var dto = ${empty freezerJson ? '{}' : freezerJson};
     Freezer.setFreezerJson(dto);
     FormUtils.createForm('freezerForm', 'save', dto, 'freezer', {
       rooms: ${rooms},
       locationMaps: ${locationMaps}
     });
+    Utils.ui.updateHelpLink(FormTarget.freezer.getUserManualUrl());
   });
 </script>
 

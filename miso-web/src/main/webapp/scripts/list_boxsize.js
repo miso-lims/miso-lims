@@ -1,5 +1,8 @@
 ListTarget.boxsize = {
   name: "Box Sizes",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'box-sizes');
+  },
   createUrl: function(config, projectId) {
     throw new Error("Must be provided statically");
   },

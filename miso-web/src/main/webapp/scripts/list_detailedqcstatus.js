@@ -1,5 +1,8 @@
 ListTarget.detailedqcstatus = {
   name: "Detailed QC Statuses",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'detailed-qc-status');
+  },
   createUrl: function(config, projectId) {
     throw new Error("Must be provided statically");
   },

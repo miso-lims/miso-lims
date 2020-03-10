@@ -98,6 +98,9 @@ HotTarget.pool = (function() {
   };
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('pools');
+    },
     getNotes: function(config) {
       return config.aliquotsToPool ? customPoolNotes : null
     },
@@ -255,7 +258,7 @@ HotTarget.pool = (function() {
           {
             name: 'Edit',
             action: function(items) {
-              window.location = window.location.origin + Urls.ui.pools.bulkEdit + '?' + jQuery.param({
+              window.location = Urls.ui.pools.bulkEdit + '?' + jQuery.param({
                 ids: items.map(Utils.array.getId).join(',')
               });
             }
@@ -264,7 +267,7 @@ HotTarget.pool = (function() {
             name: "Create Orders",
             excludeOnOrders: true,
             action: function(pools) {
-              window.location = window.location.origin + Urls.ui.sequencingOrders.bulkCreate + '?' + jQuery.param({
+              window.location = Urls.ui.sequencingOrders.bulkCreate + '?' + jQuery.param({
                 ids: pools.map(Utils.array.getId).join(',')
               });
             }

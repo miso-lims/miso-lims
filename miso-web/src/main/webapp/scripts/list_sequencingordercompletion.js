@@ -23,11 +23,15 @@
 
 ListTarget.sequencingordercompletion = {
   name: "Sequencing Orders",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('sequencing_orders');
+  },
   createUrl: function(config, projectId) {
     if (config.poolId) {
-      return '/miso/rest/pools/' + config.poolId + '/dt/completions';
+      return Urls.rest.pools.completionsDatatable(config.poolId);
+    } else {
+      return Urls.rest.sequencingOrders.completionsDatatable(config.slug, config.platform);
     }
-    return '/miso/rest/sequencingorders/dt/completions/' + config.slug + '/' + config.platform;
   },
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {

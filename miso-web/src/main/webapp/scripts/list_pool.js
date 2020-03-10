@@ -23,11 +23,14 @@
 
 ListTarget.pool = {
   name: "Pools",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('pools');
+  },
   createUrl: function(config, projectId) {
     if (projectId) {
-      return "/miso/rest/pools/dt/project/" + projectId;
+      return Urls.rest.pools.projectDatatable(projectId);
     } else {
-      return "/miso/rest/pools/dt/platform/" + config.platformType;
+      return Urls.rest.pools.platformDatatable(config.platformType);
     }
   },
   getQueryUrl: function() {
@@ -46,7 +49,7 @@ ListTarget.pool = {
           ids.push(pool.id);
         });
         Utils.showConfirmDialog('Delete Pools', 'Delete', lines, function() {
-          Utils.ajaxWithDialog('Deleting Pools', 'POST', '/miso/rest/pools/bulk-delete', ids, function() {
+          Utils.ajaxWithDialog('Deleting Pools', 'POST', Urls.rest.pools.bulkDelete, ids, function() {
             Utils.page.pageReload();
           });
         });
@@ -85,7 +88,7 @@ ListTarget.pool = {
     return [{
       name: "Add",
       handler: function() {
-        window.location = "/miso/pool/new";
+        window.location = Urls.ui.pools.create;
       }
     }];
   },
@@ -142,7 +145,7 @@ ListTarget.pool = {
       "mData": "locationLabel",
       "bSortable": false,
       "mRender": function(data, type, full) {
-        return full.box ? "<a href='/miso/box/" + full.box.id + "'>" + data + "</a>" : data;
+        return full.box ? "<a href='" + Urls.ui.boxes.edit(full.box.id) + "'>" + data + "</a>" : data;
       },
       "include": true,
       "iSortPriority": 0

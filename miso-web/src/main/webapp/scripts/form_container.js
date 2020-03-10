@@ -4,6 +4,9 @@ if (typeof FormTarget === 'undefined') {
 FormTarget.container = (function($) {
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('sequencing_containers');
+    },
     getSaveUrl: function(container) {
       return container.id ? Urls.rest.containers.update(container.id) : Urls.rest.containers.create;
     },

@@ -14,6 +14,9 @@ FormTarget.transfer = (function($) {
    */
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('transfers');
+    },
     getSaveUrl: function(model) {
       return model.id ? Urls.rest.transfers.update(model.id) : Urls.rest.transfers.create;
     },

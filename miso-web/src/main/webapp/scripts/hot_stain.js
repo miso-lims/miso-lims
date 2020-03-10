@@ -1,4 +1,7 @@
 HotTarget.stain = {
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'stains');
+  },
   getCreateUrl: function() {
     return Urls.rest.stains.create;
   },
@@ -23,7 +26,7 @@ HotTarget.stain = {
     return !config.isAdmin ? [] : [{
       name: 'Edit',
       action: function(items) {
-        window.location = window.location.origin + '/miso/stain/bulk/edit?' + jQuery.param({
+        window.location = Urls.ui.stains.bulkEdit + '?' + jQuery.param({
           ids: items.map(Utils.array.getId).join(',')
         });
       }

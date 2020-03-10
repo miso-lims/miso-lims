@@ -11,14 +11,17 @@ FormTarget.study = (function($) {
    */
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('european_nucleotide_archive_support', 'studies');
+    },
     getSaveUrl: function(study) {
-      return study.id ? ('/miso/rest/studies/' + study.id) : '/miso/rest/studies';
+      return study.id ? Urls.rest.studies.update(study.id) : Urls.rest.studies.create;
     },
     getSaveMethod: function(study) {
       return study.id ? 'PUT' : 'POST';
     },
     getEditUrl: function(study) {
-      return '/miso/study/' + study.id;
+      return Urls.ui.studies.edit(study.id);
     },
     getSections: function(config, object) {
       return [{

@@ -69,6 +69,12 @@
   </div>
 </div>
 
+<script type="text/javascript">
+jQuery(document).ready(function () {
+  Utils.ui.updateHelpLink(Urls.external.userManual('other_miso_tools', 'identity-search'));
+});
+</script>
+
 <miso:list-section-ajax id="list_samples" name="Samples" target="sample" config="{}"/>
 
 </div>

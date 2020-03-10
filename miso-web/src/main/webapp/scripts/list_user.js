@@ -23,6 +23,9 @@
 
 ListTarget.user = {
   name: "Users",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('users_and_groups', 'users');
+  },
   createUrl: function(config, projectId) {
     throw new Error("Static data only");
   },
@@ -43,7 +46,7 @@ ListTarget.user = {
           }
           Utils.showConfirmDialog('Remove Users', 'Remove', ['Remove '
               + (items.length == 1 ? 'selected user' : items.length + ' selected users') + ' from the group?'], function() {
-            var url = '/miso/rest/groups/' + config.groupId + '/users/remove';
+            var url = Urls.rest.groups.removeUsers(config.groupId);
             var data = items.map(Utils.array.getId);
             Utils.ajaxWithDialog('Removing Users', 'POST', url, data, Utils.page.pageReload);
           });
@@ -57,7 +60,7 @@ ListTarget.user = {
             Utils.showOkDialog('Error', 'No users selected');
             return;
           }
-          var url = '/miso/rest/groups/' + config.groupId + '/users';
+          var url = Urls.rest.groups.addUsers(config.groupId);
           var data = items.map(Utils.array.getId);
           Utils.ajaxWithDialog('Adding Users', 'POST', url, data, Utils.page.pageReload);
         }
@@ -71,7 +74,7 @@ ListTarget.user = {
       return [{
         "name": "Add",
         "handler": function() {
-          window.location = "/miso/admin/user/new";
+          window.location = Urls.ui.users.create;
         }
       }];
     } else {
@@ -98,7 +101,7 @@ ListTarget.user = {
       "iSortPriority": 1,
       "mRender": function(data, type, full) {
         if (config.isAdmin) {
-          return "<a href=\"/miso/admin/user/" + full.id + "\">" + data + "</a>";
+          return "<a href=\"" + Urls.ui.users.edit(full.id) + "\">" + data + "</a>";
         } else {
           return data;
         }

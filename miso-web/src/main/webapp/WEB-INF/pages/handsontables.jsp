@@ -83,6 +83,9 @@
     jQuery(document).ready(function () {
       var target = ${targetType};
       target.requestConfiguration(${config}, function(config) { HotUtils.makeTable(target, ${create}, ${input}, config); });
+      if (target.hasOwnProperty('getUserManualUrl')) {
+      	Utils.ui.updateHelpLink(target.getUserManualUrl());
+      }
     });
   </script>
 </div>

@@ -1,5 +1,8 @@
 ListTarget.sampleclass = {
   name: "Sample Classes",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'sample-classes-and-categories');
+  },
   createUrl: function(config, projectId) {
     throw new Error("Must be provided statically");
   },

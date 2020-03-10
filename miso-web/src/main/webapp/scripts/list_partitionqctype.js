@@ -1,5 +1,8 @@
 ListTarget.partitionqctype = {
   name: "PartitionQC Types",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'partition-qc-types');
+  },
   createUrl: function(config, projectId) {
     throw new Error("Must be provided statically");
   },

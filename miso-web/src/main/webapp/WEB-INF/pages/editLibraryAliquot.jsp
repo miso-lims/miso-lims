@@ -67,6 +67,7 @@
     FormUtils.createForm('libraryAliquotForm', 'save', ${aliquotDto}, 'libraryaliquot', {
       detailedSample: Constants.isDetailedSample
     });
+    Utils.ui.updateHelpLink(FormTarget.libraryaliquot.getUserManualUrl());
   });
 </script>
 
