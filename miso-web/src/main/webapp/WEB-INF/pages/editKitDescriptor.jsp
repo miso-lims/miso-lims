@@ -47,6 +47,7 @@
           isAdmin: ${miso:isAdmin()},
           kitTypes: ${kitTypes}
         });
+        Utils.ui.updateHelpLink(FormTarget.kitdescriptor.getUserManualUrl());
       });
     </script>
 

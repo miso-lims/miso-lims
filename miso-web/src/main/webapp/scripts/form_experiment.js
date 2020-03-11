@@ -4,9 +4,12 @@ if (typeof FormTarget === 'undefined') {
 FormTarget.experiment = (function($) {
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('european_nucleotide_archive_support', 'experiments');
+    },
     getSaveUrl: function(experiment) {
       if (experiment.id) {
-        return '/miso/rest/experiments/' + experiment.id;
+        return Urls.rest.experiments.update(experiment.id);
       } else {
         throw new Error('Page not intended for new experiment creation');
       }
@@ -15,7 +18,7 @@ FormTarget.experiment = (function($) {
       return 'PUT';
     },
     getEditUrl: function(experiment) {
-      return '/miso/experiment/' + experiment.id;
+      return Urls.ui.experiments.edit(experiment.id);
     },
     getSections: function(config, object) {
       return [{
@@ -61,7 +64,7 @@ FormTarget.experiment = (function($) {
             return experiment.study.name + ' (' + experiment.study.alias + ')';
           },
           getLink: function(experiment) {
-            return '/miso/study/' + experiment.study.id;
+            return Urls.ui.studies.edit(experiment.study.id);
           }
         }, {
           title: 'Platform',
@@ -78,7 +81,7 @@ FormTarget.experiment = (function($) {
             return experiment.library.name + ' (' + experiment.library.alias + ')';
           },
           getLink: function(experiment) {
-            return '/miso/library/' + experiment.libraryId;
+            return Urls.ui.libraries.edit(experiment.libraryId);
           }
         }]
       }];

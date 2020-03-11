@@ -10,6 +10,9 @@ FormTarget.qctype = (function($) {
    */
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('type_data', 'qc-types');
+    },
     getSaveUrl: function(qcType) {
       return qcType.id ? Urls.rest.qcTypes.update(qcType.id) : Urls.rest.qcTypes.create;
     },

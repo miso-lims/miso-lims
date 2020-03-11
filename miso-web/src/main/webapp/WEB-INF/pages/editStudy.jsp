@@ -72,6 +72,7 @@
           detailedSample: Constants.isDetailedSample,
           projects: ${projects}
         });
+        Utils.ui.updateHelpLink(FormTarget.study.getUserManualUrl());
       });
     </script>
 

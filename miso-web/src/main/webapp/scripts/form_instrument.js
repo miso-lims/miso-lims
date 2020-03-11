@@ -12,6 +12,9 @@ FormTarget.instrument = (function($) {
    */
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('instruments');
+    },
     getSaveUrl: function(instrument) {
       return instrument.id ? Urls.rest.instruments.update(instrument.id) : Urls.rest.instruments.create;
     },

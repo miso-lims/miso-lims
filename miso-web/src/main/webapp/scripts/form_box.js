@@ -4,6 +4,9 @@ if (typeof FormTarget === 'undefined') {
 FormTarget.box = (function($) {
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('boxes');
+    },
     getSaveUrl: function(box) {
       if (box.id) {
         return Urls.rest.boxes.update(box.id);

@@ -38,6 +38,7 @@
           isSelf: ${miso:isCurrentUser(user.loginName)},
           usersEditable: ${usersEditable}
         });
+        Utils.ui.updateHelpLink(FormTarget.user.getUserManualUrl());
       });
     </script>
     

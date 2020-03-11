@@ -1,4 +1,7 @@
 HotTarget.lab = {
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'labs-and-institutes');
+  },
   getCreateUrl: function() {
     return Urls.rest.labs.create;
   },

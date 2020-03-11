@@ -9,6 +9,9 @@ FormTarget.indexfamily = (function($) {
    */
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('type_data', 'indices');
+    },
     getSaveUrl: function(family) {
       return family.id ? Urls.rest.indexFamilies.update(family.id) : Urls.rest.indexFamilies.create;
     },

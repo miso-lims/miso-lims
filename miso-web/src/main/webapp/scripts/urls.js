@@ -28,10 +28,17 @@ Urls = (function() {
 
   var arrayRestBase = restBase + '/arrays';
   rest.arrays = {
+    create: arrayRestBase,
+    update: idUrlFunction(arrayRestBase),
     datatable: arrayRestBase + '/dt'
   };
 
   // Array Models
+  var arrayModelUiBase = baseUrl + '/arraymodel';
+  ui.arrayModels = {
+    bulkEdit: arrayModelUiBase + '/bulk/edit'
+  };
+
   var arrayModelRestBase = restBase + '/arraymodels'
   rest.arrayModels = {
     create: arrayModelRestBase,
@@ -47,8 +54,11 @@ Urls = (function() {
 
   var arrayRunRestBase = restBase + '/arrayruns';
   rest.arrayRuns = {
+    create: arrayRunRestBase,
+    update: idUrlFunction(arrayRunRestBase),
     datatable: arrayRunRestBase + '/dt',
-    projectDatatable: idUrlFunction(arrayRunRestBase + '/dt/project')
+    projectDatatable: idUrlFunction(arrayRunRestBase + '/dt/project'),
+    arraySearch: arrayRunRestBase + '/array-search'
   };
 
   // Attachment Categories
@@ -67,7 +77,10 @@ Urls = (function() {
   // Boxes
   var boxUiBase = baseUrl + '/box';
   ui.boxes = {
-    edit: idUrlFunction(boxUiBase)
+    create: boxUiBase + '/new',
+    edit: idUrlFunction(boxUiBase),
+    bulkCreate: boxUiBase + '/bulk/new',
+    bulkEdit: boxUiBase + '/bulk/edit'
   };
 
   var boxRestBase = restBase + '/boxes';
@@ -75,10 +88,18 @@ Urls = (function() {
     create: boxRestBase,
     update: idUrlFunction(boxRestBase),
     searchPartial: boxRestBase + '/search/partial',
-    setLocation: middleIdUrlFunction(boxRestBase, '/setlocation')
+    setLocation: middleIdUrlFunction(boxRestBase, '/setlocation'),
+    datatable: boxRestBase + '/dt',
+    useDatatable: idUrlFunction(boxRestBase + '/dt/use'),
+    bulkDelete: boxRestBase + '/bulk-delete'
   };
 
   // Box Sizes
+  var boxSizeUiBase = baseUrl + '/boxsize';
+  ui.boxSizes = {
+    bulkEdit: boxSizeUiBase + '/bulk/edit'
+  };
+
   var boxSizeRestBase = restBase + '/boxsizes';
   rest.boxSizes = {
     create: boxSizeRestBase,
@@ -86,6 +107,11 @@ Urls = (function() {
   };
 
   // Box Uses
+  var boxUseUiBase = baseUrl + '/boxuses';
+  ui.boxUses = {
+    bulkEdit: boxUseUiBase + '/bulk/edit'
+  };
+
   var boxUseRestBase = restBase + '/boxuses';
   rest.boxUses = {
     create: boxUseRestBase,
@@ -95,6 +121,7 @@ Urls = (function() {
   // Containers
   var containerUiBase = baseUrl + '/container';
   ui.containers = {
+    create: idUrlFunction(containerUiBase + '/new'),
     edit: idUrlFunction(containerUiBase)
   };
 
@@ -102,7 +129,11 @@ Urls = (function() {
   rest.containers = {
     create: containerRestBase,
     update: idUrlFunction(containerRestBase),
-    spreadsheet: containerRestBase + '/spreadsheet'
+    spreadsheet: containerRestBase + '/spreadsheet',
+    datatable: containerRestBase + '/dt',
+    platformDatatable: idUrlFunction(containerRestBase + '/dt/platform'),
+    spreadsheet: containerRestBase + '/spreadsheet',
+    bulkDelete: containerRestBase + '/bulk-delete'
   };
 
   // Container Models
@@ -118,7 +149,18 @@ Urls = (function() {
     search: containerModelRestBase + '/search'
   };
 
+  // Deletions
+  var deletionRestBase = restBase + '/deletions';
+  rest.deletions = {
+    datatable: deletionRestBase + '/dt'
+  };
+
   // Detailed QC Statuses
+  var detailedQcStatusUiBase = baseUrl + '/detailedqcstatus';
+  ui.detailedQcStatuses = {
+    bulkEdit: detailedQcStatusUiBase + '/bulk/edit'
+  };
+
   var detailedQcStatusRestBase = restBase + '/detailedqcstatuses';
   rest.detailedQcStatuses = {
     create: detailedQcStatusRestBase,
@@ -129,6 +171,13 @@ Urls = (function() {
   var experimentUiBase = baseUrl + '/experiment';
   ui.experiments = {
     edit: idUrlFunction(experimentUiBase)
+  };
+
+  var experimentRestBase = restBase + '/experiments';
+  rest.experiments = {
+    create: experimentRestBase,
+    update: idUrlFunction(experimentRestBase),
+    addRunPartition: middleIdUrlFunction(experimentRestBase, '/add')
   };
 
   // Freezers - REST components are under Storage Locations
@@ -151,6 +200,14 @@ Urls = (function() {
   ui.groups = {
     create: groupUiBase + '/new',
     edit: idUrlFunction(groupUiBase)
+  };
+
+  var groupRestBase = restBase + '/groups';
+  rest.groups = {
+    create: groupRestBase,
+    update: idUrlFunction(groupRestBase),
+    addUsers: middleIdUrlFunction(groupRestBase, '/users'),
+    removeUsers: middleIdUrlFunction(groupRestBase, '/users/remove')
   };
 
   // Index Distance Tool
@@ -233,12 +290,17 @@ Urls = (function() {
   // Kit Descriptors
   var kitDescriptorUiBase = baseUrl + '/kitdescriptor';
   ui.kitDescriptors = {
+    create: kitDescriptorUiBase + '/new',
     edit: idUrlFunction(kitDescriptorUiBase)
   };
 
   var kitDescriptorRestBase = restBase + '/kitdescriptors';
   rest.kitDescriptors = {
-    updateTargetedSequencings: middleIdUrlFunction(kitDescriptorRestBase, '/targetedsequencing')
+    create: kitDescriptorRestBase,
+    update: idUrlFunction(kitDescriptorRestBase),
+    updateTargetedSequencings: middleIdUrlFunction(kitDescriptorRestBase, '/targetedsequencing'),
+    datatable: kitDescriptorRestBase + '/dt',
+    typeDatatable: idUrlFunction(kitDescriptorRestBase + '/dt/type')
   };
 
   // Labs
@@ -310,6 +372,11 @@ Urls = (function() {
   };
 
   // Library Designs
+  var libraryDesignUiBase = baseUrl + '/librarydesign';
+  ui.libraryDesigns = {
+    bulkEdit: libraryDesignUiBase + '/bulk/edit'
+  };
+
   var libraryDesignRestBase = restBase + '/librarydesigns';
   rest.libraryDesigns = {
     create: libraryDesignRestBase,
@@ -317,6 +384,10 @@ Urls = (function() {
   };
 
   // Library Design Codes
+  var libraryDesignCodeUiBase = baseUrl + '/librarydesigncode';
+  ui.libraryDesignCodes = {
+    bulkEdit: libraryDesignCodeUiBase + '/bulk/edit'
+  };
   var libraryDesignCodeRestBase = restBase + '/librarydesigncodes';
   rest.libraryDesignCodes = {
     create: libraryDesignCodeRestBase,
@@ -324,6 +395,11 @@ Urls = (function() {
   };
 
   // Library Selections
+  var librarySelectionUiBase = baseUrl + '/libraryselection';
+  ui.librarySelections = {
+    bulkEdit: librarySelectionUiBase + '/bulk/edit'
+  };
+
   var librarySelectionRestBase = restBase + '/libraryselections';
   rest.librarySelections = {
     create: librarySelectionRestBase,
@@ -331,6 +407,11 @@ Urls = (function() {
   };
 
   // Library Spike-Ins
+  var librarySpikeInUiBase = baseUrl + '/libraryspikein';
+  ui.librarySpikeIns = {
+    bulkEdit: librarySpikeInUiBase + '/bulk/edit'
+  };
+
   var librarySpikeInRestBase = restBase + '/libraryspikeins';
   rest.librarySpikeIns = {
     create: librarySpikeInRestBase,
@@ -338,6 +419,11 @@ Urls = (function() {
   };
 
   // Library Strategies
+  var libraryStrategyUiBase = baseUrl + '/librarystrategy';
+  ui.libraryStrategies = {
+    bulkEdit: libraryStrategyUiBase + '/bulk/edit'
+  };
+
   var libraryStrategyRestBase = restBase + '/librarystrategies';
   rest.libraryStrategies = {
     create: libraryStrategyRestBase,
@@ -349,6 +435,7 @@ Urls = (function() {
   ui.libraryTemplates = {
     create: libraryTemplateUiBase + '/new',
     edit: idUrlFunction(libraryTemplateUiBase),
+    bulkEdit: libraryTemplateUiBase + '/bulk/edit',
     addIndices: middleIdUrlFunction(libraryTemplateUiBase, '/indices/add'),
     editIndices: middleIdUrlFunction(libraryTemplateUiBase, '/indices/edit')
   };
@@ -366,13 +453,29 @@ Urls = (function() {
   };
 
   // Library Types
+  var libraryTypeUiBase = baseUrl + '/librarytype';
+  ui.libraryTypes = {
+    bulkEdit: libraryTypeUiBase + '/bulk/edit'
+  };
+
   var libraryTypeRestBase = restBase + '/librarytypes';
   rest.libraryTypes = {
     create: libraryTypeRestBase,
     update: idUrlFunction(libraryTypeRestBase)
   };
 
+  // Location Maps
+  var locationMapRestBase = restBase + '/locationmaps';
+  rest.locationMaps = {
+    create: locationMapRestBase
+  };
+
   // Partition QC Types
+  var partitionQcTypeUiBase = baseUrl + '/partitionqctype';
+  ui.partitionQcTypes = {
+    bulkEdit: partitionQcTypeUiBase + '/bulk/edit'
+  };
+
   var partitionQcTypeRestBase = restBase + '/partitionqctypes';
   rest.partitionQcTypes = {
     create: partitionQcTypeRestBase,
@@ -382,6 +485,7 @@ Urls = (function() {
   // Pools
   var poolUiBase = baseUrl + '/pool';
   ui.pools = {
+    create: poolUiBase + '/new',
     edit: idUrlFunction(poolUiBase),
     bulkEdit: poolUiBase + '/bulk/edit',
     bulkMerge: poolUiBase + '/bulk/merge'
@@ -399,6 +503,10 @@ Urls = (function() {
       search: poolRestBase + '/picker/search'
     },
     assign: middleIdUrlFunction(poolRestBase, '/assign'),
+    projectDatatable: idUrlFunction(poolRestBase + '/dt/project'),
+    platformDatatable: idUrlFunction(poolRestBase + '/dt/platform'),
+    completionsDatatable: middleIdUrlFunction(poolRestBase, '/dt/completions'),
+    bulkDelete: poolRestBase + '/bulk-delete',
     spreadsheet: poolRestBase + '/spreadsheet',
     contentsSpreadsheet: poolRestBase + '/contents/spreadsheet',
     samplesheet: poolRestBase + '/samplesheet'
@@ -415,7 +523,8 @@ Urls = (function() {
   rest.poolOrders = {
     create: poolOrderRestBase,
     update: idUrlFunction(poolOrderRestBase),
-    indexChecker: poolOrderRestBase + '/indexchecker'
+    indexChecker: poolOrderRestBase + '/indexchecker',
+    statusDatatable: idUrlFunction(poolOrderRestBase + '/dt')
   };
 
   // Printers
@@ -424,7 +533,8 @@ Urls = (function() {
     datatable: printerRestBase + '/dt',
     create: printerRestBase,
     enable: printerRestBase + '/enable',
-    disable: printerRestBase + '/disable'
+    disable: printerRestBase + '/disable',
+    printBoxContents: middleIdUrlFunction(printerRestBase, '/boxcontents')
   };
 
   // Projects
@@ -472,6 +582,11 @@ Urls = (function() {
   };
 
   // Reference Genomes
+  var referenceGenomeUiBase = baseUrl + '/refernecegenome';
+  ui.referenceGenomes = {
+    bulkEdit: referenceGenomeUiBase + '/bulk/edit'
+  };
+
   var referenceGenomeRestBase = restBase + '/referencegenomes';
   rest.referenceGenomes = {
     create: referenceGenomeRestBase,
@@ -497,7 +612,8 @@ Urls = (function() {
     setPartitionPurposes: middleIdUrlFunction(runRestBase, '/partition-purposes'),
     setAliquotPurposes: middleIdUrlFunction(runRestBase, '/aliquot-purposes'),
     addContainer: middleIdUrlFunction(runRestBase, '/add'),
-    removeContainers: middleIdUrlFunction(runRestBase, '/remove')
+    removeContainers: middleIdUrlFunction(runRestBase, '/remove'),
+    potentialExperiments: middleIdUrlFunction(runRestBase, '/potentialExperiments')
   };
 
   // Run Purposes
@@ -563,6 +679,11 @@ Urls = (function() {
   };
 
   // Sample Types
+  var sampleTypeUiBase = baseUrl + '/sampletype';
+  ui.sampleTypes = {
+    bulkEdit: sampleTypeUiBase + '/bulk/edit'
+  };
+
   var sampleTypeRestBase = restBase + '/sampletypes';
   rest.sampleTypes = {
     create: sampleTypeRestBase,
@@ -583,6 +704,9 @@ Urls = (function() {
     picker: {
       chemistry: sequencingOrderRestBase + '/picker/chemistry',
       active: sequencingOrderRestBase + '/picker/active'
+    },
+    completionsDatatable: function(status, platform) {
+      return sequencingOrderRestBase + '/dt/completions/' + status + '/' + platform;
     }
   };
 
@@ -604,7 +728,18 @@ Urls = (function() {
     edit: idUrlFunction(serviceRecordUiBase)
   };
 
+  var serviceRecordRestBase = restBase + '/servicerecords';
+  rest.serviceRecords = {
+    create: serviceRecordRestBase,
+    update: idUrlFunction(serviceRecordRestBase)
+  };
+
   // Stains
+  var stainUiBase = baseUrl + '/stain';
+  ui.stains = {
+    bulkEdit: stainUiBase + '/bulk/edit'
+  };
+
   var stainRestBase = restBase + '/stains';
   rest.stains = {
     create: stainRestBase,
@@ -612,6 +747,11 @@ Urls = (function() {
   };
 
   // Stain Categories
+  var stainCategoryUiBase = baseUrl + '/staincategory';
+  ui.stainCategories = {
+    bulkEdit: stainCategoryUiBase + '/bulk/edit'
+  };
+
   var stainCategoryRestBase = restBase + '/staincategories';
   rest.stainCategories = {
     create: stainCategoryRestBase,
@@ -657,11 +797,18 @@ Urls = (function() {
 
   var studyRestBase = restBase + '/studies';
   rest.studies = {
+    create: studyRestBase,
+    update: idUrlFunction(studyRestBase),
     datatable: studyRestBase + '/dt',
     projectDatatable: idUrlFunction(studyRestBase + '/dt/project')
   };
 
   // Study Types
+  var studyTypeUiBase = baseUrl + '/studytype';
+  ui.studyTypes = {
+    bulkEdit: studyTypeUiBase + '/bulk/edit'
+  };
+
   var studyTypeRestBase = restBase + '/studytypes';
   rest.studyTypes = {
     create: studyTypeRestBase,
@@ -671,7 +818,14 @@ Urls = (function() {
   // Submissions
   var submissionUiBase = baseUrl + '/submission';
   ui.submissions = {
+    create: submissionUiBase + '/new',
     edit: idUrlFunction(submissionUiBase)
+  };
+
+  var submissionRestBase = restBase + '/submissions';
+  rest.submissions = {
+    create: submissionRestBase,
+    update: idUrlFunction(submissionRestBase)
   };
 
   // Subprojects
@@ -739,6 +893,11 @@ Urls = (function() {
   };
 
   // Tissue Types
+  var tissueTypeUiBase = baseUrl + '/tissuetype';
+  ui.tissueTypes = {
+    bulkEdit: tissueTypeUiBase + '/bulk/edit'
+  };
+
   var tissueTypeRestBase = restBase + '/tissuetypes';
   rest.tissueTypes = {
     create: tissueTypeRestBase,
@@ -759,14 +918,32 @@ Urls = (function() {
     update: idUrlFunction(transferRestBase)
   };
 
+  // Users
+  var userUiBase = baseUrl + '/admin/user';
+  ui.users = {
+    create: userUiBase + '/new',
+    edit: idUrlFunction(userUiBase),
+    view: idUrlFunction(baseUrl + '/users')
+  };
+
+  var userRestBase = restBase + '/users';
+  rest.users = {
+    create: userRestBase,
+    update: idUrlFunction(userRestBase),
+    resetPassword: middleIdUrlFunction(userRestBase, '/password')
+  };
+
   // Worksets
   var worksetUiBase = baseUrl + '/workset';
   ui.worksets = {
+    create: worksetUiBase + '/new',
     edit: idUrlFunction(worksetUiBase)
   };
 
   var worksetRestBase = restBase + '/worksets';
   rest.worksets = {
+    create: worksetRestBase,
+    update: idUrlFunction(worksetRestBase),
     addSamples: middleIdUrlFunction(worksetRestBase, '/samples'),
     addLibraries: middleIdUrlFunction(worksetRestBase, '/libraries'),
     addLibraryAliquots: middleIdUrlFunction(worksetRestBase, '/libraryaliquots'),
@@ -775,7 +952,10 @@ Urls = (function() {
     removeLibraryAliquots: middleIdUrlFunction(worksetRestBase, '/libraryaliquots'),
     moveSamples: middleIdUrlFunction(worksetRestBase, '/samples/move'),
     moveLibraries: middleIdUrlFunction(worksetRestBase, '/libraries/move'),
-    moveLibraryAliquots: middleIdUrlFunction(worksetRestBase, '/libraryaliquots/move')
+    moveLibraryAliquots: middleIdUrlFunction(worksetRestBase, '/libraryaliquots/move'),
+    merge: worksetRestBase + '/merge',
+    creatorDatatable: idUrlFunction(worksetRestBase + '/dt'),
+    bulkDelete: worksetRestBase + '/bulk-delete'
   };
 
   // Workstations
@@ -792,8 +972,8 @@ Urls = (function() {
   };
 
   // External sites
-  external.userManual = function(version, section, subsection) {
-    var url = 'https://miso-lims.readthedocs.io/projects/docs/en/' + version + '/user_manual/';
+  external.userManual = function(section, subsection) {
+    var url = 'https://miso-lims.readthedocs.io/projects/docs/en/' + Constants.docsVersion + '/user_manual/';
     if (section) {
       url += section + '/';
       if (subsection) {

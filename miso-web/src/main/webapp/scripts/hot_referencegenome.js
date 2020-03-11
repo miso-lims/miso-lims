@@ -1,4 +1,7 @@
 HotTarget.referencegenome = {
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'reference-genomes');
+  },
   getCreateUrl: function() {
     return Urls.rest.referenceGenomes.create;
   },
@@ -22,7 +25,7 @@ HotTarget.referencegenome = {
     return !config.isAdmin ? [] : [{
       name: 'Edit',
       action: function(items) {
-        window.location = window.location.origin + '/miso/referencegenome/bulk/edit?' + jQuery.param({
+        window.location = Urls.ui.referenceGenomes.bulkEdit + '?' + jQuery.param({
           ids: items.map(Utils.array.getId).join(',')
         });
       }

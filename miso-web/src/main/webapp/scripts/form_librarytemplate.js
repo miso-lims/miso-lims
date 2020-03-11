@@ -4,6 +4,9 @@ FormTarget.librarytemplate = (function($) {
   var unspecified = 'Unspecified';
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('libraries', 'library-templates');
+    },
     getSaveUrl: function(template) {
       return template.id ? Urls.rest.libraryTemplates.update(template.id) : Urls.rest.libraryTemplates.create;
     },

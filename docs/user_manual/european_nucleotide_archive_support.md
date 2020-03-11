@@ -116,7 +116,9 @@ can be made.  MISO will provide a template for uploading the metadata. These
 files are _not_ complete. Additional information must be added to describe the
 files being uploaded.
 
-## Submissions List
+## Submissions
+
+### Submissions List
 
 To view submissions, in the "ENA" list at the left side of the screen, click
 "Submissions".

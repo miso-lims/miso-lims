@@ -13,6 +13,9 @@ FormTarget.run = (function($) {
    */
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('sequencing_runs');
+    },
     getSaveUrl: function(run) {
       if (run.id) {
         return Urls.rest.runs.update(run.id);
@@ -69,7 +72,7 @@ FormTarget.run = (function($) {
             return run.instrumentName + ' - ' + run.instrumentModelAlias;
           },
           getLink: function(run) {
-            return '/miso/instrument/' + run.instrumentId;
+            return Urls.ui.instruments.edit(run.instrumentId);
           }
         }, {
           title: 'Sequencing Parameters',

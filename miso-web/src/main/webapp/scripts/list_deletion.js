@@ -23,8 +23,11 @@
 
 ListTarget.deletion = {
   name: "Deletions",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('deletions');
+  },
   createUrl: function(config, projectId) {
-    return '/miso/rest/deletions/dt';
+    return Urls.rest.deletions.datatable;
   },
   createBulkActions: function(config, projectId) {
     return [];

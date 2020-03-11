@@ -1,5 +1,8 @@
 ListTarget.sampletype = {
   name: "Sample Types",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'sample-types');
+  },
   createUrl: function(config, projectId) {
     throw new Error("Must be provided statically");
   },

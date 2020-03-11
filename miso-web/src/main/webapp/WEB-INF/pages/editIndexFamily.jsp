@@ -38,6 +38,7 @@
     if ('${pageMode}' === 'edit') {
       IndexFamily.setIndices(dto.indices);
     }
+    Utils.ui.updateHelpLink(FormTarget.indexfamily.getUserManualUrl());
   });
 </script>
 

@@ -23,6 +23,9 @@
 
 ListTarget.sample = {
   name: "Samples",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('samples');
+  },
   createUrl: function(config, projectId) {
     if (projectId) {
       if (config.arrayed) {

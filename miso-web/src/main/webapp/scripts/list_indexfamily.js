@@ -1,5 +1,8 @@
 ListTarget.indexfamily = {
   name: "Index Families",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'indices');
+  },
   createUrl: function(config, projectId) {
     throw new Error("Must be provided statically");
   },

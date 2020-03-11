@@ -23,6 +23,9 @@
 
 ListTarget.tissueorigin = {
   name: "Tissue Origins",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'tissue-origins');
+  },
   createUrl: function(config, projectId) {
     throw new Error("Must be provided statically");
   },

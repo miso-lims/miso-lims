@@ -1,5 +1,8 @@
 ListTarget.libraryselection = {
   name: "Library Selection Types",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'library-selection-types');
+  },
   createUrl: function(config, projectId) {
     throw new Error("Must be provided statically");
   },

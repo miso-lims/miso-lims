@@ -1,4 +1,7 @@
 HotTarget.librarydesigncode = {
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'library-designs');
+  },
   getCreateUrl: function() {
     return Urls.rest.libraryDesignCodes.create;
   },
@@ -22,7 +25,7 @@ HotTarget.librarydesigncode = {
     return !config.isAdmin ? [] : [{
       name: 'Edit',
       action: function(items) {
-        window.location = window.location.origin + '/miso/librarydesigncode/bulk/edit?' + jQuery.param({
+        window.location = Urls.ui.libraryDesignCodes.bulkEdit + '?' + jQuery.param({
           ids: items.map(Utils.array.getId).join(',')
         });
       }

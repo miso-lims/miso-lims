@@ -23,6 +23,9 @@
 
 ListTarget.subproject = {
   name: "Subprojects",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('projects', 'subprojects');
+  },
   createUrl: function(config, projectId) {
     throw new Error("Must be provided statically");
   },

@@ -66,6 +66,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import uk.ac.bbsrc.tgac.miso.Version;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaChemistry;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
@@ -322,6 +323,7 @@ public class MenuController implements ServletContextAware {
     try {
       ObjectMapper mapper = new ObjectMapper();
       ObjectNode node = mapper.createObjectNode();
+      node.put("docsVersion", getDocsVersion());
       node.put("isDetailedSample", detailedSample);
       node.put("automaticBarcodes", autoGenerateIdentificationBarcodes());
       node.put("boxScannerEnabled", boxScannerEnabled);
@@ -475,6 +477,14 @@ public class MenuController implements ServletContextAware {
       constantsTimestamp.set(System.currentTimeMillis() / 1000.0);
     } catch (IOException e) {
       throw new RestException(e);
+    }
+  }
+
+  private static String getDocsVersion() {
+    if (Version.VERSION.matches("^\\d+\\.\\d+\\.\\d+$")) {
+      return "v" + Version.VERSION;
+    } else {
+      return "latest";
     }
   }
 

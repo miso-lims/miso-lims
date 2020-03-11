@@ -43,6 +43,7 @@
   <script>
     jQuery(document).ready(function () {
       FormUtils.createForm('submissionForm', 'save', ${submissionDto}, 'submission', {});
+      Utils.ui.updateHelpLink(FormTarget.submission.getUserManualUrl());
     });
   </script>
 

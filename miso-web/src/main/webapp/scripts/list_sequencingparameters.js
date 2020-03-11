@@ -1,5 +1,8 @@
 ListTarget.sequencingparameters = {
   name: "Sequencing Parameters",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'sequencing-parameters');
+  },
   createUrl: function(config, projectId) {
     throw new Error("Must be provided statically");
   },

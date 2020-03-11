@@ -57,6 +57,9 @@ HotTarget.sample = (function() {
 
   return {
 
+    getUserManualUrl: function() {
+      return Urls.external.userManual('samples');
+    },
     getCreateUrl: function() {
       return Urls.rest.samples.create;
     },

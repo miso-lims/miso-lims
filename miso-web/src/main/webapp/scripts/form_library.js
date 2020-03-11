@@ -12,6 +12,9 @@ FormTarget.library = (function($) {
    */
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('libraries');
+    },
     getSaveUrl: function(library) {
       if (library.id) {
         return Urls.rest.libraries.update(library.id);

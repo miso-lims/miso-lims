@@ -11,6 +11,9 @@ FormTarget.instrumentmodel = (function($) {
    */
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('type_data', 'instrument-models');
+    },
     getSaveUrl: function(model) {
       return model.id ? Urls.rest.instrumentModels.update(model.id) : Urls.rest.instrumentModels.create;
     },

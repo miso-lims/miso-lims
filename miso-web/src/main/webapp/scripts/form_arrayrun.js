@@ -11,14 +11,17 @@ FormTarget.arrayrun = (function($) {
    */
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('array_runs');
+    },
     getSaveUrl: function(arrayrun) {
-      return arrayrun.id ? ('/miso/rest/arrayruns/' + arrayrun.id) : '/miso/rest/arrayruns';
+      return arrayrun.id ? Urls.rest.arrayRuns.update(arrayrun.id) : Urls.rest.arrayRuns.create;
     },
     getSaveMethod: function(arrayrun) {
       return arrayrun.id ? 'PUT' : 'POST';
     },
     getEditUrl: function(arrayrun) {
-      return '/miso/arrayrun/' + arrayrun.id;
+      return Urls.ui.arrayRuns.edit(arrayrun.id);
     },
     getSections: function(config, object) {
       return [{
@@ -73,7 +76,7 @@ FormTarget.arrayrun = (function($) {
             return arrayrun.arrayAlias;
           },
           getLink: function(arrayrun) {
-            return '/miso/array/' + arrayrun.arrayId;
+            return Urls.ui.arrays.edit(arrayrun.arrayId);
           }
         }, {
           title: 'Change Array',
@@ -86,7 +89,7 @@ FormTarget.arrayrun = (function($) {
                 type: 'text',
                 required: true
               }], function(formData) {
-                Utils.ajaxWithDialog('Searching', 'GET', '/miso/rest/arrayruns/array-search?' + jQuery.param({
+                Utils.ajaxWithDialog('Searching', 'GET', Urls.rest.arrayRuns.arraySearch + '?' + jQuery.param({
                   q: formData.query
                 }), null, function(data) {
                   if (!data || !data.length) {

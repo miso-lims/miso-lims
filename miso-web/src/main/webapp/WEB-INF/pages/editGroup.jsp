@@ -35,6 +35,7 @@
     <script type="text/javascript">
       jQuery(document).ready(function () {
         FormUtils.createForm('groupForm', 'save', ${groupDto}, 'group', {});
+        Utils.ui.updateHelpLink(FormTarget.group.getUserManualUrl());
       });
     </script>
     

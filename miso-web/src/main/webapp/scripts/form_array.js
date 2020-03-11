@@ -10,14 +10,17 @@ FormTarget.array = (function($) {
    */
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('arrays');
+    },
     getSaveUrl: function(array) {
-      return array.id ? ('/miso/rest/arrays/' + array.id) : '/miso/rest/arrays';
+      return array.id ? Urls.rest.arrays.update(array.id) : Urls.rest.arrays.create;
     },
     getSaveMethod: function(array) {
       return array.id ? 'PUT' : 'POST';
     },
     getEditUrl: function(array) {
-      return '/miso/array/' + array.id;
+      return Urls.ui.arrays.edit(array.id);
     },
     getSections: function(config, object) {
       return [{

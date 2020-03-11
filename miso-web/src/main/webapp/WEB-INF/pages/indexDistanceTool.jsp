@@ -77,7 +77,12 @@
   </div>
 </div>
 
-<script type="text/javascript">IndexDistance.clearForm();</script>
+<script type="text/javascript">
+IndexDistance.clearForm();
+jQuery(document).ready(function () {
+  Utils.ui.updateHelpLink(Urls.external.userManual('other_miso_tools', 'index-distance'));
+});
+</script>
 
 <miso:list-section-ajax id="list_indices" name="Indices" target="index" config="{additionalBulkActions: IndexDistance.getBulkIndexActions()}"/>
 

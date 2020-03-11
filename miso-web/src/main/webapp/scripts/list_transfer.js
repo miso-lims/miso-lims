@@ -1,6 +1,9 @@
 ListTarget.transfer = (function() {
   return {
     name: "Transfers",
+    getUserManualUrl: function() {
+      return Urls.external.userManual('transfers');
+    },
     createUrl: function(config, projectId) {
       return Urls.rest.transfers.datatable(config.tab);
     },

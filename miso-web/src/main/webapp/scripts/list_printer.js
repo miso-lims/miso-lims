@@ -23,6 +23,9 @@
 
 ListTarget.printer = {
   name: "Printers",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('barcode_label_printers');
+  },
   createUrl: function(config, projectId) {
     return Urls.rest.printers.datatable;
   },

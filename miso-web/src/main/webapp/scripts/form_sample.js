@@ -12,6 +12,9 @@ FormTarget.sample = (function($) {
    */
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('samples');
+    },
     getSaveUrl: function(sample) {
       if (sample.id) {
         return Urls.rest.samples.update(sample.id);

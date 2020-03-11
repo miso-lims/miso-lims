@@ -23,6 +23,9 @@
 
 ListTarget.submission = {
   name: "Submissions",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('european_nucleotide_archive_support', 'submissions');
+  },
   createUrl: function(config, projectId) {
     throw new Error("Submissions must be provided statically");
   },

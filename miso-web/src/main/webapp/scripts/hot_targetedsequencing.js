@@ -1,4 +1,7 @@
 HotTarget.targetedsequencing = {
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'targeted-sequencing');
+  },
   getCreateUrl: function() {
     return Urls.rest.targetedSequencings.create;
   },

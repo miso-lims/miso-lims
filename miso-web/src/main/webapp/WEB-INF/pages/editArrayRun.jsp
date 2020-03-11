@@ -47,6 +47,7 @@ jQuery(document).ready(function() {
     config.instruments = ${arrayScanners};
   </c:if>
   FormUtils.createForm('arrayrunForm', 'save', ${pageMode eq 'create' ? '{}' : arrayRunJson}, 'arrayrun', config);
+  Utils.ui.updateHelpLink(FormTarget.arrayrun.getUserManualUrl());
 });
 </script>
 

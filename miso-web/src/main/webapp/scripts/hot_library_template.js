@@ -17,6 +17,9 @@ HotTarget.libraryTemplate = (function() {
   const none = '(Unspecified)';
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('libraries', 'library-templates');
+    },
     getCreateUrl: function() {
       return Urls.rest.libraryTemplates.create;
     },
@@ -221,7 +224,7 @@ HotTarget.libraryTemplate = (function() {
       return [{
         name: 'Edit',
         action: function(items) {
-          window.location = window.location.origin + '/miso/librarytemplate/bulk/edit?' + jQuery.param({
+          window.location = Urls.ui.libraryTemplates.bulkEdit + '?' + jQuery.param({
             ids: items.map(Utils.array.getId).join(',')
           });
         }

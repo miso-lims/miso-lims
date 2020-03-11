@@ -23,6 +23,9 @@
 
 ListTarget.storage_location = {
   name: "Storage Locations",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('freezers_and_rooms');
+  },
   createUrl: function(config, projectId) {
     throw new Error("Storage locations must be specified statically.");
   },

@@ -9,6 +9,9 @@ FormTarget.sampleclass = (function($) {
    */
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('type_data', 'sample-classes-and-categories');
+    },
     getSaveUrl: function(sampleClass) {
       return sampleClass.id ? Urls.rest.sampleClasses.update(sampleClass.id) : Urls.rest.sampleClasses.create;
     },

@@ -23,8 +23,15 @@
 
 ListTarget.container = {
   name: "Sequencing Containers",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('sequencing_containers');
+  },
   createUrl: function(config, projectId) {
-    return "/miso/rest/containers/dt" + (config.platformType ? "/platform/" + config.platformType : "");
+    if (config.platformType) {
+      return Urls.rest.containers.platformDatatable(config.platformType);
+    } else {
+      return Urls.rest.containers.datatable;
+    }
   },
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {
@@ -33,14 +40,14 @@ ListTarget.container = {
       actions.push({
         name: "Remove",
         action: function(containers) {
-          Utils.ajaxWithDialog('Removing', 'POST', '/miso/rest/runs/' + config.runId + '/remove', containers.map(Utils.array.getId),
+          Utils.ajaxWithDialog('Removing', 'POST', Urls.rest.runs.removeContainers(config.runId), containers.map(Utils.array.getId),
               Utils.page.pageReload);
         }
       });
     } else {
       actions.push(HotUtils.printAction('container'));
     }
-    actions.push(HotUtils.spreadsheetAction('/miso/rest/containers/spreadsheet', Constants.partitionSpreadsheets, function(containers,
+    actions.push(HotUtils.spreadsheetAction(Urls.rest.containers.spreadsheet, Constants.partitionSpreadsheets, function(containers,
         spreadsheet) {
       return [];
     }));
@@ -55,7 +62,7 @@ ListTarget.container = {
           ids.push(container.id);
         });
         Utils.showConfirmDialog('Delete Containers', 'Delete', lines, function() {
-          Utils.ajaxWithDialog('Deleting Containers', 'POST', '/miso/rest/containers/bulk-delete', ids, function() {
+          Utils.ajaxWithDialog('Deleting Containers', 'POST', Urls.rest.containers.bulkDelete, ids, function() {
             Utils.page.pageReload();
           });
         });
@@ -81,7 +88,7 @@ ListTarget.container = {
             label: "Serial Number",
             property: "barcode"
           }, ], function(results) {
-            Utils.ajaxWithDialog('Adding ' + platformType.containerName, 'POST', '/miso/rest/runs/' + config.runId + '/add?'
+            Utils.ajaxWithDialog('Adding ' + platformType.containerName, 'POST', Urls.rest.runs.addContainer(config.runId) + '?'
                 + jQuery.param({
                   barcode: results.barcode
                 }), null, Utils.page.pageReload);
@@ -109,7 +116,7 @@ ListTarget.container = {
                 return {
                   name: model.alias,
                   handler: function() {
-                    window.location = "/miso/container/new/" + model.id;
+                    window.location = Urls.ui.containers.create(model.id);
                   }
                 }
               });

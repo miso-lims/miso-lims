@@ -66,6 +66,7 @@
 <script type="text/javascript">
   jQuery(document).ready(function () {
     FormUtils.createForm('boxForm', 'save', ${boxJSON}, 'box', {isNew: ${pageMode eq 'create'}});
+    Utils.ui.updateHelpLink(FormTarget.box.getUserManualUrl());
   });
 </script>
 

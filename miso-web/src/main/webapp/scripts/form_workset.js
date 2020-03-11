@@ -4,14 +4,17 @@ if (typeof FormTarget === 'undefined') {
 FormTarget.workset = (function($) {
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('worksets');
+    },
     getSaveUrl: function(workset) {
-      return workset.id ? ('/miso/rest/worksets/' + workset.id) : '/miso/rest/worksets';
+      return workset.id ? Urls.rest.worksets.update(workset.id) : Urls.rest.worksets.create;
     },
     getSaveMethod: function(workset) {
       return workset.id ? 'PUT' : 'POST';
     },
     getEditUrl: function(workset) {
-      return '/miso/workset/' + workset.id;
+      return Urls.ui.worksets.edit(workset.id);
     },
     getSections: function(config, object) {
       return [{

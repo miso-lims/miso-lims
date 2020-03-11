@@ -52,14 +52,6 @@ public class TagUtils {
     return SecurityContextHolder.getContextHolderStrategy().getContext().getAuthentication();
   }
 
-  public static String docsVersion() {
-    if (Version.VERSION.matches("^\\d+\\.\\d+\\.\\d+$")) {
-      return "v" + Version.VERSION;
-    } else {
-      return "latest";
-    }
-  }
-
   public static String version() {
     return Version.VERSION;
   }

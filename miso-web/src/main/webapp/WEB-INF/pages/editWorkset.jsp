@@ -44,6 +44,7 @@
 <script type="text/javascript">
   jQuery(document).ready(function () {
     FormUtils.createForm('worksetForm', 'save', ${empty worksetJson ? '{}' : worksetJson}, 'workset', {});
+    Utils.ui.updateHelpLink(FormTarget.workset.getUserManualUrl());
   });
 </script>
 

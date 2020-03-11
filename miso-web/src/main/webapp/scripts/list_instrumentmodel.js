@@ -1,5 +1,8 @@
 ListTarget.instrumentmodel = {
   name: "Instrument Models",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'instrument-models');
+  },
   createUrl: function(config, projectId) {
     return Urls.rest.instrumentModels.datatable;
   },

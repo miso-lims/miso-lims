@@ -10,14 +10,17 @@ FormTarget.servicerecord = (function($) {
    */
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('instruments', 'service-records');
+    },
     getSaveUrl: function(record) {
-      return record.id ? ('/miso/rest/servicerecords/' + record.id) : '/miso/rest/servicerecords';
+      return record.id ? Urls.rest.serviceRecords.update(record.id) : Urls.rest.serviceRecords.create;
     },
     getSaveMethod: function(record) {
       return record.id ? 'PUT' : 'POST';
     },
     getEditUrl: function(record) {
-      return '/miso/instrument/servicerecord/' + record.id;
+      return Urls.ui.serviceRecords.edit(record.id);
     },
     getSections: function(config, object) {
       return [{
@@ -37,7 +40,7 @@ FormTarget.servicerecord = (function($) {
             return record.instrumentName;
           },
           getLink: function(record) {
-            return '/miso/instrument/' + record.instrumentId;
+            return Urls.ui.instruments.edit(record.instrumentId);
           }
         }, {
           title: 'Title',

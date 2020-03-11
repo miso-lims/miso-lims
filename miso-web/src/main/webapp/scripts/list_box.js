@@ -23,8 +23,15 @@
 
 ListTarget.box = {
   name: "Boxes",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('boxes');
+  },
   createUrl: function(config, projectId) {
-    return "/miso/rest/boxes/dt" + (config.boxUse ? "/use/" + config.boxUse : "");
+    if (config.boxUse) {
+      return Urls.rest.boxes.useDatatable(config.boxUse);
+    } else {
+      return Urls.rest.boxes.datatable;
+    }
   },
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {
@@ -35,7 +42,7 @@ ListTarget.box = {
               name: 'Print Contents',
               action: function(items) {
                 Utils.printSelectDialog(function(printer, copies) {
-                  Utils.ajaxWithDialog('Printing', 'POST', window.location.origin + '/miso/rest/printers/' + printer + '/boxcontents', {
+                  Utils.ajaxWithDialog('Printing', 'POST', Urls.rest.printers.printBoxContents(printer), {
                     boxes: items.map(Utils.array.getId),
                     copies: copies
                   }, function(result) {
@@ -57,7 +64,7 @@ ListTarget.box = {
                   ids.push(box.id);
                 });
                 Utils.showConfirmDialog('Delete Boxes', 'Delete', lines, function() {
-                  Utils.ajaxWithDialog('Deleting Boxes', 'POST', '/miso/rest/boxes/bulk-delete', ids, function() {
+                  Utils.ajaxWithDialog('Deleting Boxes', 'POST', Urls.rest.boxes.bulkDelete, ids, function() {
                     Utils.page.pageReload();
                   });
                 });
@@ -81,10 +88,10 @@ ListTarget.box = {
             return;
           }
           if (result.quantity == 1) {
-            window.location = '/miso/box/new';
+            window.location = Urls.ui.boxes.create;
             return;
           }
-          window.location = '/miso/box/bulk/new?' + jQuery.param({
+          window.location = Urls.ui.boxes.bulkCreate + '?' + jQuery.param({
             quantity: result.quantity,
           });
         });

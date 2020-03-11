@@ -1,6 +1,9 @@
 HotTarget.box = (function(box) {
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('boxes');
+    },
     getCreateUrl: function() {
       return Urls.rest.boxes.create;
     },
@@ -77,7 +80,7 @@ HotTarget.box = (function(box) {
           setData('(...searching...)');
 
           jQuery.ajax({
-            url: '/miso/rest/storagelocations/bybarcode?' + jQuery.param({
+            url: Urls.rest.storageLocations.queryByBarcode + '?' + jQuery.param({
               q: flat.storageLocationBarcode,
             }),
             contentType: "application/json; charset=utf8",
@@ -107,7 +110,7 @@ HotTarget.box = (function(box) {
       return [{
         name: 'Edit',
         action: function(items) {
-          window.location = window.location.origin + '/miso/box/bulk/edit' + '?' + jQuery.param({
+          window.location = Urls.ui.boxes.bulkEdit + '?' + jQuery.param({
             ids: items.map(Utils.array.getId).join(',')
           });
         }

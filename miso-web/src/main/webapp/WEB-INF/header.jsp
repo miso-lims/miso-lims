@@ -114,8 +114,8 @@
   <div class="cell">
     <sec:authorize access="isAuthenticated()">
       <div id="loggedInBanner">
-        <a id="userManualLink">Help</a> |
-        <a href="https://gitter.im/miso-lims/users">Chat</a> |
+        <a id="userManualLink" target="_blank">Help</a> |
+        <a href="https://gitter.im/miso-lims/users" target="_blank">Chat</a> |
         <c:if test="${misoBugUrl != null}">
           <a href="${misoBugUrl}" target="_blank">Report a problem</a> |
         </c:if>
@@ -131,7 +131,6 @@
 
 <sec:authorize access="isAuthenticated()">
   <script type="text/javascript">
-    jQuery('#userManualLink').attr('href', Urls.external.userManual('${miso:docsVersion()}'));
     jQuery(function () {
       //all hover and click logic for buttons
       jQuery(".fg-button:not(.ui-state-disabled)")
@@ -146,6 +145,7 @@
     });
 
     jQuery(document).ready(function () {
+      Utils.ui.updateHelpLink();
       jQuery('.misoicon').hover(
         function () {
           jQuery(this).addClass('misoicon-hover');

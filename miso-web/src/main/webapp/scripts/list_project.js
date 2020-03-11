@@ -23,6 +23,9 @@
 
 ListTarget.project = {
   name: "Projects",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('projects');
+  },
   createUrl: function(config, projectId) {
     throw new Error("Static display only");
   },

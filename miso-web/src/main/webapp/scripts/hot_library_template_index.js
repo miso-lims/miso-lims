@@ -1,6 +1,9 @@
 HotTarget.libraryTemplate_index = (function($) {
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('libraries', 'library-templates');
+    },
     getCreateUrl: function() {
       return null;
     },

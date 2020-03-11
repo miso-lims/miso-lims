@@ -115,6 +115,7 @@
     var form = FormUtils.createForm('poolForm', 'save', dto, 'pool', {});
     Pool.setForm(form);
     Pool.setAliquots(dto.pooledElements, dto.duplicateIndicesSequences, dto.nearDuplicateIndicesSequences);
+    Utils.ui.updateHelpLink(FormTarget.pool.getUserManualUrl());
   });
 </script>
 

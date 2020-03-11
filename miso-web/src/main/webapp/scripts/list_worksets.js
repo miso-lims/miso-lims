@@ -23,8 +23,11 @@
 
 ListTarget.workset = {
   name: "Worksets",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('worksets');
+  },
   createUrl: function(config, projectId) {
-    return '/miso/rest/worksets/dt/' + config.creator;
+    return Urls.rest.worksets.creatorDatatable(config.creator);
   },
   createBulkActions: function(config, projectId) {
     return [
@@ -49,9 +52,9 @@ ListTarget.workset = {
                 alias: input.alias,
                 description: input.description
               };
-              Utils.ajaxWithDialog('Merging Worksets', 'POST', '/miso/rest/worksets/merge', mergeData, function(mergedWorkset) {
+              Utils.ajaxWithDialog('Merging Worksets', 'POST', Urls.rest.worksets.merge, mergeData, function(mergedWorkset) {
                 Utils.showOkDialog('Merged Worksets', ['New workset \'' + input.alias + '\' created.'], function() {
-                  Utils.page.pageRedirect('/miso/workset/' + mergedWorkset.id);
+                  Utils.page.pageRedirect(Urls.ui.worksets.edit(mergedWorkset.id));
                 });
               });
             });
@@ -68,9 +71,7 @@ ListTarget.workset = {
               ids.push(workset.id);
             });
             Utils.showConfirmDialog('Delete Worksets', 'Delete', lines, function() {
-              Utils.ajaxWithDialog('Deleting Worksets', 'POST', '/miso/rest/worksets/bulk-delete', ids, function() {
-                window.location = window.location.origin + '/miso/worksets';
-              });
+              Utils.ajaxWithDialog('Deleting Worksets', 'POST', Urls.rest.worksets.bulkDelete, ids, Utils.page.pageReload);
             });
           }
         }];
@@ -79,7 +80,7 @@ ListTarget.workset = {
     return [{
       name: 'Add',
       handler: function() {
-        window.location = "/miso/workset/new";
+        window.location = Urls.ui.worksets.create;
       }
     }];
   },

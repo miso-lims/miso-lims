@@ -1,4 +1,7 @@
 HotTarget.partitionqctype = {
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'partition-qc-types');
+  },
   getCreateUrl: function() {
     return Urls.rest.partitionQcTypes.create;
   },
@@ -22,7 +25,7 @@ HotTarget.partitionqctype = {
     return !config.isAdmin ? [] : [{
       name: 'Edit',
       action: function(items) {
-        window.location = window.location.origin + '/miso/partitionqctype/bulk/edit?' + jQuery.param({
+        window.location = Urls.ui.partitionQcTypes.bulkEdit + '?' + jQuery.param({
           ids: items.map(Utils.array.getId).join(',')
         });
       }

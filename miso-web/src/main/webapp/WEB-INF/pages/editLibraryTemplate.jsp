@@ -44,6 +44,7 @@
     if (template.indexFamilyId) {
       LibraryTemplate.setIndicesFromTemplate(template);
     }
+    Utils.ui.updateHelpLink(FormTarget.librarytemplate.getUserManualUrl());
   });
 </script>
 

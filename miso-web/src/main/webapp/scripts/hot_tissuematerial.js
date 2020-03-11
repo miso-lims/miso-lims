@@ -1,4 +1,7 @@
 HotTarget.tissuematerial = {
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'tissue-materials');
+  },
   getCreateUrl: function() {
     return Urls.rest.tissueMaterials.create;
   },
@@ -21,7 +24,7 @@ HotTarget.tissuematerial = {
     return !config.isAdmin ? [] : [{
       name: 'Edit',
       action: function(items) {
-        window.location = window.location.origin + Urls.ui.tissueMaterials.bulkEdit + '?' + jQuery.param({
+        window.location = Urls.ui.tissueMaterials.bulkEdit + '?' + jQuery.param({
           ids: items.map(Utils.array.getId).join(',')
         });
       }

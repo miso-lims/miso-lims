@@ -18,6 +18,9 @@ FormTarget.project = (function($) {
    */
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('projects');
+    },
     getSaveUrl: function(project) {
       return project.id ? Urls.rest.projects.update(project.id) : Urls.rest.projects.create;
     },

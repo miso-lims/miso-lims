@@ -77,6 +77,7 @@
           instrumentTypes: ${instrumentTypes},
           instruments: ${otherInstruments}
         });
+        Utils.ui.updateHelpLink(FormTarget.instrument.getUserManualUrl());
       });
     </script>
     

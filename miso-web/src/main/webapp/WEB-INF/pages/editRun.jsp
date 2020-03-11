@@ -59,6 +59,7 @@
   jQuery(document).ready(function () {
     FormUtils.createForm('runForm', 'save', ${runDto}, 'run', ${formConfig});
   });
+  Utils.ui.updateHelpLink(FormTarget.run.getUserManualUrl());
 </script>
       
 <c:if test="${run.id != 0 && !runReportLinks.isEmpty()}">

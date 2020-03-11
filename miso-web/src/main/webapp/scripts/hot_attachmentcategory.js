@@ -1,4 +1,7 @@
 HotTarget.attachmentcategory = {
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'attachment-categories');
+  },
   getCreateUrl: function() {
     return Urls.rest.attachmentCategories.create;
   },
@@ -21,7 +24,7 @@ HotTarget.attachmentcategory = {
     return !config.isAdmin ? [] : [{
       name: 'Edit',
       action: function(items) {
-        window.location = window.location.origin + Urls.ui.attachmentCategories.bulkEdit + '?' + jQuery.param({
+        window.location = Urls.ui.attachmentCategories.bulkEdit + '?' + jQuery.param({
           ids: items.map(Utils.array.getId).join(',')
         });
       }

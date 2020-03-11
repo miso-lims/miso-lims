@@ -1,4 +1,7 @@
 HotTarget.sampletype = {
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'sample-types');
+  },
   getCreateUrl: function() {
     return Urls.rest.sampleTypes.create;
   },
@@ -20,7 +23,7 @@ HotTarget.sampletype = {
     return !config.isAdmin ? [] : [{
       name: 'Edit',
       action: function(items) {
-        window.location = window.location.origin + '/miso/sampletype/bulk/edit?' + jQuery.param({
+        window.location = Urls.ui.sampleTypes.bulkEdit + '?' + jQuery.param({
           ids: items.map(Utils.array.getId).join(',')
         });
       }

@@ -4,6 +4,9 @@ if (typeof FormTarget === 'undefined') {
 FormTarget.poolorder = (function($) {
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('pool_orders');
+    },
     getSaveUrl: function(order) {
       return order.id ? Urls.rest.poolOrders.update(order.id) : Urls.rest.poolOrders.create;
     },
@@ -11,7 +14,7 @@ FormTarget.poolorder = (function($) {
       return order.id ? 'PUT' : 'POST';
     },
     getEditUrl: function(order) {
-      return '/miso/poolorder/' + order.id;
+      return Urls.ui.poolOrders.edit(order.id);
     },
     getSections: function(config, object) {
       var platform = getPlatform(object);

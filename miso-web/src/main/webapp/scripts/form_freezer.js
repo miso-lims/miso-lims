@@ -11,6 +11,9 @@ FormTarget.freezer = (function($) {
    */
 
   return {
+    getUserManualUrl: function() {
+      return Urls.external.userManual('freezers_and_rooms');
+    },
     getSaveUrl: function(freezer) {
       return freezer.id ? Urls.rest.storageLocations.updateFreezer(freezer.id) : Urls.rest.storageLocations.createFreezer;
     },

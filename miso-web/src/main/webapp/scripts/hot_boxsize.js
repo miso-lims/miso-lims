@@ -1,4 +1,7 @@
 HotTarget.boxsize = {
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'box-sizes');
+  },
   getCreateUrl: function() {
     return Urls.rest.boxSizes.create;
   },
@@ -20,7 +23,7 @@ HotTarget.boxsize = {
     return !config.isAdmin ? [] : [{
       name: 'Edit',
       action: function(items) {
-        window.location = window.location.origin + '/miso/boxsize/bulk/edit?' + jQuery.param({
+        window.location = Urls.ui.boxSizes.bulkEdit + '?' + jQuery.param({
           ids: items.map(Utils.array.getId).join(',')
         });
       }

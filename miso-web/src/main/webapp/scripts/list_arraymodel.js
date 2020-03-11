@@ -1,5 +1,8 @@
 ListTarget.arraymodel = {
   name: "Array Models",
+  getUserManualUrl: function() {
+    return Urls.external.userManual('type_data', 'array-models');
+  },
   createUrl: function(config, projectId) {
     throw new Error("Must be provided statically");
   },

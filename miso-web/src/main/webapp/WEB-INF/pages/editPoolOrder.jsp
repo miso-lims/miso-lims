@@ -49,6 +49,7 @@
     var form = FormUtils.createForm('orderForm', 'save', order, 'poolorder', {});
     PoolOrder.setForm(form);
     PoolOrder.setAliquots(order.orderAliquots, order.duplicateIndicesSequences, order.nearDuplicateIndicesSequences);
+    Utils.ui.updateHelpLink(FormTarget.poolorder.getUserManualUrl());
   });
 </script>
 

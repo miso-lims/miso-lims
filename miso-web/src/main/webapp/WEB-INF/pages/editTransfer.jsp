@@ -32,6 +32,7 @@
     Transfer.setForm(form);
     Transfer.setItemsListConfig(${itemsListConfig});
     Transfer.setItems(transfer.items);
+    Utils.ui.updateHelpLink(FormTarget.transfer.getUserManualUrl());
   });
 </script>
 

@@ -1,4 +1,7 @@
 HotTarget.libraryaliquot = {
+  getUserManualUrl: function() {
+    return Urls.external.userManual('library_aliquots');
+  },
   getCreateUrl: function() {
     return Urls.rest.libraryAliquots.create;
   },
