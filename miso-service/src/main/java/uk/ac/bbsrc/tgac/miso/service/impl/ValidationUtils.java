@@ -137,6 +137,15 @@ public class ValidationUtils {
     }
   }
 
+  public static <T extends Identifiable> void applySetChanges(Set<T> to, Set<T> from) {
+    to.removeIf(toItem -> from.stream().noneMatch(fromItem -> fromItem.getId() == toItem.getId()));
+    from.forEach(fromItem -> {
+      if (to.stream().noneMatch(toItem -> toItem.getId() == fromItem.getId())) {
+        to.add(fromItem);
+      }
+    });
+  }
+
   public static ValidationException rewriteParentErrors(ValidationException original) {
     return new ValidationException(original.getErrors().stream()
         .map(err -> new ValidationError(String.format("Parent %s: %s", err.getProperty(), err.getMessage())))

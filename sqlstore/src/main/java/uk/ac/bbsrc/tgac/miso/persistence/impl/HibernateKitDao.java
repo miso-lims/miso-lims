@@ -270,4 +270,16 @@ public class HibernateKitDao implements KitStore, HibernatePaginatedDataSource<K
         .setProjection(Projections.rowCount()).uniqueResult();
   }
 
+  @Override
+  public List<KitDescriptor> search(KitType type, String search) throws IOException {
+    @SuppressWarnings("unchecked")
+    List<KitDescriptor> results = currentSession().createCriteria(KitDescriptor.class)
+        .add(Restrictions.eq("kitType", type))
+        .add(Restrictions.or(
+            Restrictions.ilike("name", search, MatchMode.START),
+            Restrictions.ilike("partNumber", search, MatchMode.EXACT)))
+        .list();
+    return results;
+  }
+
 }

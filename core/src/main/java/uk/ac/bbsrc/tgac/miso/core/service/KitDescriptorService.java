@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.service;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
@@ -17,5 +18,7 @@ public interface KitDescriptorService extends DeleterService<KitDescriptor>, Lis
   public KitDescriptor getByName(String name) throws IOException;
 
   public KitDescriptor getByPartNumber(String partNumber) throws IOException;
+
+  public List<KitDescriptor> search(KitType type, String search) throws IOException;
 
 }

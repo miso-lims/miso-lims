@@ -738,6 +738,37 @@ ListUtils = (function($) {
         }
       }
     },
+    createStaticAddBySearchAction: function(typeLabel, searchLabel, searchUrl, searchParams, callback) {
+      var dialogTitle = 'Add ' + typeLabel;
+      return {
+        name: 'Add',
+        handler: function() {
+          Utils.showDialog(dialogTitle, 'Search', [{
+            label: searchLabel,
+            type: 'text',
+            property: 'query',
+            required: true
+          }], function(output) {
+            searchParams.q = output.query;
+            Utils.ajaxWithDialog('Searching...', 'GET', searchUrl + '?' + jQuery.param(searchParams), null,
+                function(items, textStatus, xhr) {
+                  if (!items || !items.length) {
+                    Utils.showOkDialog(dialogTitle, [typeLabel + ' not found.']);
+                    return;
+                  }
+                  Utils.showWizardDialog(dialogTitle, items.map(function(item) {
+                    return {
+                      name: item.name,
+                      handler: function() {
+                        callback(item);
+                      }
+                    }
+                  }));
+                });
+          });
+        }
+      }
+    },
     createBulkDeleteAction: function(pluralType, urlFragment, getLabel) {
       return {
         name: "Delete",

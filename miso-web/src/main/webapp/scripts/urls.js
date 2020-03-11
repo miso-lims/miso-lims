@@ -300,7 +300,9 @@ Urls = (function() {
     update: idUrlFunction(kitDescriptorRestBase),
     updateTargetedSequencings: middleIdUrlFunction(kitDescriptorRestBase, '/targetedsequencing'),
     datatable: kitDescriptorRestBase + '/dt',
-    typeDatatable: idUrlFunction(kitDescriptorRestBase + '/dt/type')
+    typeDatatable: idUrlFunction(kitDescriptorRestBase + '/dt/type'),
+    updateTargetedSequencings: middleIdUrlFunction(kitDescriptorRestBase, '/targetedsequencing'),
+    search: kitDescriptorRestBase + '/search'
   };
 
   // Labs

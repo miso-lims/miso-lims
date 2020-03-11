@@ -36,6 +36,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -84,9 +86,10 @@ public class QcType implements Comparable<QcType>, Serializable, Aliasable, Dele
   @JoinColumn(name = "instrumentModelId")
   private InstrumentModel instrumentModel;
 
-  @ManyToOne
-  @JoinColumn(name = "kitDescriptorId")
-  private KitDescriptor kitDescriptor;
+  @ManyToMany
+  @JoinTable(name = "QCType_KitDescriptor", joinColumns = { @JoinColumn(name = "qcTypeId") }, inverseJoinColumns = {
+      @JoinColumn(name = "kitDescriptorId") })
+  private Set<KitDescriptor> kitDescriptors;
 
   @OneToMany(mappedBy = "qcType", cascade = CascadeType.REMOVE)
   private Set<QcControl> controls;
@@ -250,12 +253,11 @@ public class QcType implements Comparable<QcType>, Serializable, Aliasable, Dele
     this.instrumentModel = instrumentModel;
   }
 
-  public KitDescriptor getKitDescriptor() {
-    return kitDescriptor;
-  }
-
-  public void setKitDescriptor(KitDescriptor kitDescriptor) {
-    this.kitDescriptor = kitDescriptor;
+  public Set<KitDescriptor> getKitDescriptors() {
+    if (kitDescriptors == null) {
+      kitDescriptors = new HashSet<>();
+    }
+    return kitDescriptors;
   }
 
   public Set<QcControl> getControls() {
@@ -289,7 +291,7 @@ public class QcType implements Comparable<QcType>, Serializable, Aliasable, Dele
         QcType::getCorrespondingField,
         QcType::isAutoUpdateField,
         QcType::getInstrumentModel,
-        QcType::getKitDescriptor,
+        QcType::getKitDescriptors,
         QcType::getControls);
   }
 
@@ -307,7 +309,7 @@ public class QcType implements Comparable<QcType>, Serializable, Aliasable, Dele
           correspondingField,
           autoUpdateField,
           instrumentModel,
-          kitDescriptor,
+          kitDescriptors,
           controls);
     }
   }

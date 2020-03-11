@@ -2215,7 +2215,7 @@ public class Dtos {
     dto.setAutoUpdateField(from.isAutoUpdateField());
     dto.setArchived(from.isArchived());
     setId(dto::setInstrumentModelId, from.getInstrumentModel());
-    setId(dto::setKitDescriptorId, from.getKitDescriptor());
+    dto.setKitDescriptors(from.getKitDescriptors().stream().map(Dtos::asDto).collect(Collectors.toList()));
     dto.setControls(from.getControls().stream().map(Dtos::asDto).collect(Collectors.toList()));
     return dto;
   }
@@ -2232,7 +2232,9 @@ public class Dtos {
     to.setCorrespondingField(from.getCorrespondingField());
     to.setAutoUpdateField(from.isAutoUpdateField());
     setObject(to::setInstrumentModel, InstrumentModel::new, from.getInstrumentModelId());
-    setObject(to::setKitDescriptor, KitDescriptor::new, from.getKitDescriptorId());
+    if (from.getKitDescriptors() != null) {
+      to.getKitDescriptors().addAll(from.getKitDescriptors().stream().map(Dtos::to).collect(Collectors.toSet()));
+    }
     if (from.getControls() != null) {
       to.getControls().addAll(from.getControls().stream().map(Dtos::to).collect(Collectors.toSet()));
     }
@@ -2264,6 +2266,7 @@ public class Dtos {
     dto.setEntityAlias(from.getEntity().getAlias());
     dto.setDescription(from.getDescription());
     setId(dto::setInstrumentId, from.getInstrument());
+    setId(dto::setKitDescriptorId, from.getKit());
     setString(dto::setKitLot, from.getKitLot());
     dto.setControls(from.getControls().stream().map(Dtos::asDto).collect(Collectors.toList()));
     return dto;
@@ -2315,6 +2318,7 @@ public class Dtos {
     to.setType(to(dto.getType()));
     to.setDescription(dto.getDescription());
     setObject(to::setInstrument, InstrumentImpl::new, dto.getInstrumentId());
+    setObject(to::setKit, KitDescriptor::new, dto.getKitDescriptorId());
     setString(to::setKitLot, dto.getKitLot());
     addQcControlRuns(dto.getControls(), to);
     return to;

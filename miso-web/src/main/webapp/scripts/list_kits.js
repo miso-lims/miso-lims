@@ -35,19 +35,40 @@ ListTarget.kit = {
   },
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {
-    return !config.isUserAdmin ? [] : [ListUtils.createBulkDeleteAction("Kits", "kitdescriptors", function(kit) {
-      return kit.name + ' (' + kit.kitType + ')';
-    })];
+    if (config.isUserAdmin) {
+      if (config.isQcTypePage) {
+        return [{
+          name: 'Remove',
+          action: function(items) {
+            QcType.removeKits(items);
+          }
+        }];
+      } else {
+        return [ListUtils.createBulkDeleteAction("Kits", "kitdescriptors", function(kit) {
+          return kit.name + ' (' + kit.kitType + ')';
+        })];
+      }
+    } else {
+      return [];
+    }
   },
   createStaticActions: function(config, projectId) {
     var actions = [];
     if (config.isUserAdmin) {
-      actions.push({
-        "name": "Add",
-        "handler": function() {
-          window.location = Urls.ui.kitDescriptors.create;
-        }
-      });
+      if (config.isQcTypePage) {
+        actions.push(ListUtils.createStaticAddBySearchAction('Kit', 'Name or Part Number', Urls.rest.kitDescriptors.search, {
+          kitType: 'QC'
+        }, function(kit) {
+          QcType.addKit(kit);
+        }));
+      } else {
+        actions.push({
+          "name": "Add",
+          "handler": function() {
+            window.location = Urls.ui.kitDescriptors.create;
+          }
+        });
+      }
     }
     return actions;
   },

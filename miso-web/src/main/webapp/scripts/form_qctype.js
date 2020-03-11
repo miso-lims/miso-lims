@@ -30,6 +30,7 @@ FormTarget.qctype = (function($) {
     },
     confirmSave: function(object, saveCallback) {
       object.controls = QcType.getControls();
+      object.kitDescriptors = QcType.getKits();
       saveCallback();
     }
   };
@@ -85,17 +86,6 @@ FormTarget.qctype = (function($) {
       getDisplayValue: function(qcType) {
         if (qcType.instrumentModelId) {
           return Utils.array.findUniqueOrThrow(Utils.array.idPredicate(qcType.instrumentModelId), Constants.instrumentModels).alias;
-        } else {
-          return 'n/a';
-        }
-      }
-    }, {
-      title: 'Kit',
-      data: 'kitDescriptorId',
-      type: 'read-only',
-      getDisplayValue: function(qcType) {
-        if (qcType.kitDescriptorId) {
-          return Utils.array.findUniqueOrThrow(Utils.array.idPredicate(qcType.kitDescriptorId), Constants.kitDescriptors).name;
         } else {
           return 'n/a';
         }
@@ -211,16 +201,6 @@ FormTarget.qctype = (function($) {
       getItemLabel: Utils.array.getAlias,
       getItemValue: Utils.array.getId,
       sortSource: Utils.sorting.standardSort('alias')
-    }, {
-      title: 'Kit',
-      data: 'kitDescriptorId',
-      type: 'dropdown',
-      source: Constants.kitDescriptors.filter(function(item) {
-        return item.kitType === 'QC';
-      }),
-      getItemLabel: Utils.array.getName,
-      getItemValue: Utils.array.getId,
-      sortSource: Utils.sorting.standardSort('name')
     }, {
       title: 'Archived',
       data: 'archived',

@@ -144,11 +144,51 @@ HotTarget.qc = function(qcTarget) {
               }
             }
           },
+          {
+            header: 'Kit',
+            include: true,
+            data: 'kit',
+            type: 'dropdown',
+            trimDropdown: false,
+            source: [],
+            depends: 'typeName',
+            update: function(qc, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+              var qcType = getQcType(flat.typeId, flat.typeName);
+              if (qcType && qcType.kitDescriptors && qcType.kitDescriptors.length) {
+                setReadOnly(false);
+                setOptions({
+                  source: qcType.kitDescriptors.map(Utils.array.getName),
+                  validator: HotUtils.validator.requiredAutocomplete
+                });
+              } else {
+                setData(null);
+                setReadOnly(true);
+                setOptions({
+                  source: [],
+                  validator: HotUtils.validator.requiredEmpty
+                });
+              }
+            },
+            unpack: function(qc, flat, setCellMeta) {
+              if (qc.kitDescriptorId) {
+                flat.kit = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(qc.kitDescriptorId), Constants.kitDescriptors).name;
+              } else {
+                flat.kit = null;
+              }
+            },
+            pack: function(qc, flat, errorHandler) {
+              if (flat.kit) {
+                qc.kitDescriptorId = Utils.array.findUniqueOrThrow(Utils.array.namePredicate(flat.kit), Constants.kitDescriptors).id;
+              } else {
+                qc.kitDescriptorId = null;
+              }
+            }
+          },
           HotUtils.makeColumnForText('Kit Lot', true, 'kitLot', {
             depends: 'typeName',
             update: function(qc, flat, flatProperty, value, setReadOnly, setOptions, setData) {
               var qcType = getQcType(flat.typeId, flat.typeName);
-              if (qcType && qcType.kitDescriptorId) {
+              if (qcType && qcType.kitDescriptors && qcType.kitDescriptors.length) {
                 setReadOnly(false);
                 setOptions({
                   validator: HotUtils.validator.requiredTextNoSpecialChars

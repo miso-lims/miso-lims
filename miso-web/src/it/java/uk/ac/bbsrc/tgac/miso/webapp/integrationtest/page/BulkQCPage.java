@@ -22,6 +22,7 @@ public class BulkQCPage extends HeaderFooterPage {
     public static final String DATE = "Date";
     public static final String TYPE = "Type";
     public static final String INSTRUMENT = "Instrument";
+    public static final String KIT = "Kit";
     public static final String KIT_LOT = "Kit Lot";
     public static final String RESULT = "Result";
     public static final String UNITS = "Units";
