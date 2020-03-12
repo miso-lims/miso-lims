@@ -99,3 +99,15 @@ add the items to, and click the "Search" button. This search returns partial mat
 box from the search results. In the final dialog, choose a box position for each item, then click the "Add" button. Be
 sure to click the "Save" button at the top right of the page if you are done making changes.
 
+
+
+### Receipt Wizard
+
+The Receipt Wizard allows you to mark item receipt and QC status, move items to another box, and/or move their box to
+a different freezer location. To use the wizard, select the items you wish to modify, then click the "Receipt Wizard"
+button in the toolbar. In the first dialog, select the receipt and QC statuses and choose which type of moves to make.
+If you chose to move items to another box, the next dialog will allow you to search for and select a box. If you chose
+to move the box to another freezer, the next dialog will allow you to either scan a location barcode or select a
+location from a dropdown. Subsequent dialogs will allow you to select more specific locations. Once you have made all
+of your selections, the changes will all be applied. Be sure to click the "Save" button at the top right of the page
+if you are done making changes.

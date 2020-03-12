@@ -1,9 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,10 +21,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eaglegenomics.simlims.core.Group;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListTransferView;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.ListTransferViewService;
+import uk.ac.bbsrc.tgac.miso.core.service.StorageLocationService;
 import uk.ac.bbsrc.tgac.miso.core.service.TransferService;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -40,6 +48,10 @@ public class TransferRestController extends RestController {
   private TransferService transferService;
   @Autowired
   private ListTransferViewService listTransferViewService;
+  @Autowired
+  private BoxService boxService;
+  @Autowired
+  private StorageLocationService storageLocationService;
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -81,7 +93,31 @@ public class TransferRestController extends RestController {
 
   @PutMapping("/{id}")
   public @ResponseBody TransferDto update(@RequestBody TransferDto dto, @PathVariable long id) throws IOException {
-    return RestUtils.updateObject("Transfer", id, dto, this::to, transferService, Dtos::asDto);
+    TransferDto updated = RestUtils.updateObject("Transfer", id, dto, this::to, transferService, Dtos::asDto);
+
+    Map<Long, Long> boxMoves = new HashMap<>();
+    dto.getItems().forEach(item -> {
+      if (item.getNewBoxLocationId() != null) {
+        if (boxMoves.containsKey(item.getBoxId()) && !item.getNewBoxLocationId().equals(boxMoves.get(item.getBoxId()))) {
+          throw new RestException("Multiple locations specified for the same box", Status.BAD_REQUEST);
+        }
+        boxMoves.put(item.getBoxId(), item.getNewBoxLocationId());
+      }
+    });
+    for (Entry<Long, Long> entry : boxMoves.entrySet()) {
+      Box box = boxService.get(entry.getKey());
+      if (box == null) {
+        throw new RestException("No box found with ID " + entry.getKey(), Status.BAD_REQUEST);
+      }
+      StorageLocation location = storageLocationService.get(entry.getValue());
+      if (location == null) {
+        throw new RestException("No location found with ID " + entry.getKey(), Status.BAD_REQUEST);
+      }
+      box.setStorageLocation(location);
+      boxService.update(box);
+    }
+
+    return updated;
   }
 
   private Transfer to(TransferDto from) {

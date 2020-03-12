@@ -135,10 +135,19 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
     String position = item.getItem().getBoxPosition();
     loadChildEntity(item.getItem(), setter, service);
     transferStore.detachEntity(item.getItem());
-    V boxPosition = positionConstructor.get();
-    boxPosition.setBox(box);
-    boxPosition.setPosition(position);
-    positionSetter.accept(item.getItem(), boxPosition);
+    setBoxPosition(item, box, position, positionConstructor, positionSetter);
+  }
+
+  private <T extends Boxable, U extends TransferItem<T>, V extends AbstractBoxPosition> void setBoxPosition(U item, Box box,
+      String position, Supplier<V> positionConstructor, BiConsumer<T, V> positionSetter) {
+    if (box == null) {
+      positionSetter.accept(item.getItem(), null);
+    } else {
+      V boxPosition = positionConstructor.get();
+      boxPosition.setBox(box);
+      boxPosition.setPosition(position);
+      positionSetter.accept(item.getItem(), boxPosition);
+    }
   }
 
   @Override
@@ -327,10 +336,10 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
     to.setRecipient(from.getRecipient());
     to.setRecipientGroup(from.getRecipientGroup());
 
-    applyItemChanges(to, from, Transfer::getSampleTransfers);
-    applyItemChanges(to, from, Transfer::getLibraryTransfers);
-    applyItemChanges(to, from, Transfer::getLibraryAliquotTransfers);
-    applyItemChanges(to, from, Transfer::getPoolTransfers);
+    applyItemChanges(to, from, Transfer::getSampleTransfers, SampleBoxPosition::new, Sample::setBoxPosition);
+    applyItemChanges(to, from, Transfer::getLibraryTransfers, LibraryBoxPosition::new, Library::setBoxPosition);
+    applyItemChanges(to, from, Transfer::getLibraryAliquotTransfers, LibraryAliquotBoxPosition::new, LibraryAliquot::setBoxPosition);
+    applyItemChanges(to, from, Transfer::getPoolTransfers, PoolBoxPosition::new, Pool::setBoxPosition);
 
     if (to.getRecipient() != null) {
       to.getSampleTransfers().forEach(item -> item.getItem().setBoxPosition(null));
@@ -340,8 +349,8 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
     }
   }
 
-  private <T extends Boxable, U extends TransferItem<T>> void applyItemChanges(Transfer to, Transfer from,
-      Function<Transfer, Set<U>> getItems) throws IOException {
+  private <T extends Boxable, U extends TransferItem<T>, V extends AbstractBoxPosition> void applyItemChanges(Transfer to, Transfer from,
+      Function<Transfer, Set<U>> getItems, Supplier<V> positionConstructor, BiConsumer<T, V> positionSetter) throws IOException {
     Set<U> toItems = getItems.apply(to);
     Set<U> fromItems = getItems.apply(from);
     for (Iterator<U> iterator = toItems.iterator(); iterator.hasNext();) {
@@ -356,6 +365,7 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
         toItem.setReceived(fromItem.isReceived());
         toItem.setQcPassed(fromItem.isQcPassed());
         toItem.setQcNote(fromItem.getQcNote());
+        setBoxPosition(toItem, fromItem.getItem().getBox(), fromItem.getItem().getBoxPosition(), positionConstructor, positionSetter);
       }
     }
 
@@ -389,32 +399,30 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
 
   @Override
   protected void afterSave(Transfer object) throws IOException {
-    if (object.isDistribution()) {
-      // Individual services are responsible for setting volume to 0 and removing items from boxes
-      for (TransferSample item : object.getSampleTransfers()) {
-        if (!item.getItem().getTransfers().contains(item)) {
-          item.getItem().getTransfers().add(item);
-        }
-        sampleService.update(item.getItem());
+    // Individual services are responsible for updating box locations, or setting volume to 0 and removing items from boxes if distributed
+    for (TransferSample item : object.getSampleTransfers()) {
+      if (!item.getItem().getTransfers().contains(item)) {
+        item.getItem().getTransfers().add(item);
       }
-      for (TransferLibrary item : object.getLibraryTransfers()) {
-        if (!item.getItem().getTransfers().contains(item)) {
-          item.getItem().getTransfers().add(item);
-        }
-        libraryService.update(item.getItem());
+      sampleService.update(item.getItem());
+    }
+    for (TransferLibrary item : object.getLibraryTransfers()) {
+      if (!item.getItem().getTransfers().contains(item)) {
+        item.getItem().getTransfers().add(item);
       }
-      for (TransferLibraryAliquot item : object.getLibraryAliquotTransfers()) {
-        if (!item.getItem().getTransfers().contains(item)) {
-          item.getItem().getTransfers().add(item);
-        }
-        libraryAliquotService.update(item.getItem());
+      libraryService.update(item.getItem());
+    }
+    for (TransferLibraryAliquot item : object.getLibraryAliquotTransfers()) {
+      if (!item.getItem().getTransfers().contains(item)) {
+        item.getItem().getTransfers().add(item);
       }
-      for (TransferPool item : object.getPoolTransfers()) {
-        if (!item.getItem().getTransfers().contains(item)) {
-          item.getItem().getTransfers().add(item);
-        }
-        poolService.update(item.getItem());
+      libraryAliquotService.update(item.getItem());
+    }
+    for (TransferPool item : object.getPoolTransfers()) {
+      if (!item.getItem().getTransfers().contains(item)) {
+        item.getItem().getTransfers().add(item);
       }
+      poolService.update(item.getItem());
     }
   }
 
