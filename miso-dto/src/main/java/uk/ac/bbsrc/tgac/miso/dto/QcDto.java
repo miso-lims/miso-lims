@@ -13,6 +13,7 @@ public class QcDto {
   private QcTypeDto type;
   private String description;
   private Long instrumentId;
+  private Long kitDescriptorId;
   private String kitLot;
   private List<QcControlRunDto> controls;
 
@@ -86,6 +87,14 @@ public class QcDto {
 
   public void setInstrumentId(Long instrumentId) {
     this.instrumentId = instrumentId;
+  }
+
+  public Long getKitDescriptorId() {
+    return kitDescriptorId;
+  }
+
+  public void setKitDescriptorId(Long kitDescriptorId) {
+    this.kitDescriptorId = kitDescriptorId;
   }
 
   public String getKitLot() {

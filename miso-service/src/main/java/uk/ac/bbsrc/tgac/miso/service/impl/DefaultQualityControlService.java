@@ -27,6 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQcControlRun;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
+import uk.ac.bbsrc.tgac.miso.core.service.KitDescriptorService;
 import uk.ac.bbsrc.tgac.miso.core.service.QcTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.QualityControlService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
@@ -53,6 +54,8 @@ public class DefaultQualityControlService implements QualityControlService {
   @Autowired
   private QcTypeService qcTypeService;
   @Autowired
+  private KitDescriptorService kitDescriptorService;
+  @Autowired
   private QualityControlTypeStore qcTypeStore;
   @Autowired
   private SampleQcStore sampleQcStore;
@@ -67,6 +70,7 @@ public class DefaultQualityControlService implements QualityControlService {
 
     QualityControlEntity entity = handler.getEntity(qc.getEntity().getId());
     loadChildEntities(qc);
+    validateChange(qc, null);
 
     User user = authorizationManager.getCurrentUser();
     qc.setCreator(user);
@@ -163,12 +167,14 @@ public class DefaultQualityControlService implements QualityControlService {
   private void loadChildEntities(QC qc) throws IOException {
     ValidationUtils.loadChildEntity(qc::setType, qc.getType(), qcTypeService, "typeName");
     ValidationUtils.loadChildEntity(qc::setInstrument, qc.getInstrument(), instrumentService, "instrument");
+    ValidationUtils.loadChildEntity(qc::setKit, qc.getKit(), kitDescriptorService, "kit");
   }
 
   private void applyChanges(QC to, QC from) {
     to.setResults(from.getResults());
     to.setLastModified(new Date());
     to.setInstrument(from.getInstrument());
+    to.setKit(from.getKit());
     to.setKitLot(from.getKitLot());
   }
 
@@ -186,8 +192,15 @@ public class DefaultQualityControlService implements QualityControlService {
         errors.add(new ValidationError("instrument", "Invalid instrument model"));
       }
     }
-    if (qc.getType().getKitDescriptor() != null && qc.getKitLot() == null) {
-      errors.add(new ValidationError("kitLot", "Must be specified"));
+    if (qc.getType().getKitDescriptors() != null && !qc.getType().getKitDescriptors().isEmpty()) {
+      if (qc.getKit() == null) {
+        errors.add(new ValidationError("kitDescriptorId", "Must be specified"));
+      } else if (qc.getType().getKitDescriptors().stream().noneMatch(kit -> kit.getId() == qc.getKit().getId())) {
+        errors.add(new ValidationError("kitDescriptorId", "Kit is not valid for this QC type"));
+      }
+      if (qc.getKitLot() == null) {
+        errors.add(new ValidationError("kitLot", "Must be specified"));
+      }
     }
 
     for (QcControlRun controlRun : qc.getControls()) {

@@ -152,25 +152,32 @@ VALUES
     (62,'N702','CGTACTAG',3),
     (61,'N701','TAAGGCGA',3);
 
-INSERT INTO `QCType` (`qcTypeId`, `name`, `description`, `qcTarget`, `units`)
-VALUES
-    (2,'Bioanalyzer','Chip-based capillary electrophoresis machine to analyse RNA, DNA, and protein, manufactured by Agilent','Library','nM'),
-    (7,'QuBit','Quantitation of DNA, RNA and protein, manufacturered by Invitrogen','Sample','ng/µl'),
-    (3,'Bioanalyser','Chip-based capillary electrophoresis machine to analyse RNA, DNA, and protein, manufactured by Agilent','Sample','ng/µl'),
-    (4,'QuBit','Quantitation of DNA, RNA and protein, manufacturered by Invitrogen','Library','ng/µl'),
-    (6,'SeqInfo QC','Post-run completion run QC step, undertaken by the SeqInfo team, as part of the primary analysis stage.','Run',''),
-    (5,'SeqOps QC','Post-run completion run QC step, undertaken by the SeqOps team, to move a run through to the primary analysis stage.','Run',''),
-    (1,'qPCR','Quantitative PCR','Library','mol/µl'),
-    (8,'poolQcType1', 'qc 1 for pools', 'Pool', 'nM'),
-  (9,'poolQcType2', 'qc 2 for pools', 'Pool', 'nM'),
-  (10,'poolQcType3', 'qc 3 for pools', 'Pool', 'nM'),
-  (11,'poolQcType4', 'qc 4 for pools', 'Pool', 'nM'),
-  (12,'InsertSizeQC', 'Insert Size QC', 'Library', 'bp');
+INSERT INTO KitDescriptor (kitDescriptorId, name, version, manufacturer, partNumber, stockLevel, kitType, platformType, creator, created, lastModifier, lastModified) VALUES
+(1, 'Test Kit 1', 1, 'KitMaker', 'k001', 0, 'LIBRARY', 'ILLUMINA', 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
+(2, 'Test Kit 2', 1, 'KitMaker', 'k002', 0, 'LIBRARY', 'ILLUMINA', 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
+(3, 'Test QC Kit', 1, 'KitMaker', 'k003', 0, 'QC', 'ILLUMINA', 1, '2020-03-11 13:24:00', 1, '2020-03-11 13:24:00');
+
+INSERT INTO `QCType` (`qcTypeId`, `name`, `description`, `qcTarget`, `units`) VALUES
+(2,'Bioanalyzer','Chip-based capillary electrophoresis machine to analyse RNA, DNA, and protein, manufactured by Agilent','Library','nM'),
+(7,'QuBit','Quantitation of DNA, RNA and protein, manufacturered by Invitrogen','Sample','ng/µl'),
+(3,'Bioanalyser','Chip-based capillary electrophoresis machine to analyse RNA, DNA, and protein, manufactured by Agilent','Sample','ng/µl'),
+(4,'QuBit','Quantitation of DNA, RNA and protein, manufacturered by Invitrogen','Library','ng/µl'),
+(6,'SeqInfo QC','Post-run completion run QC step, undertaken by the SeqInfo team, as part of the primary analysis stage.','Run',''),
+(5,'SeqOps QC','Post-run completion run QC step, undertaken by the SeqOps team, to move a run through to the primary analysis stage.','Run',''),
+(1,'qPCR','Quantitative PCR','Library','mol/µl'),
+(8,'poolQcType1', 'qc 1 for pools', 'Pool', 'nM'),
+(9,'poolQcType2', 'qc 2 for pools', 'Pool', 'nM'),
+(10,'poolQcType3', 'qc 3 for pools', 'Pool', 'nM'),
+(11,'poolQcType4', 'qc 4 for pools', 'Pool', 'nM'),
+(12,'InsertSizeQC', 'Insert Size QC', 'Library', 'bp');
 
 INSERT INTO QcControl (controlId, qcTypeId, alias) VALUES
 (1, 11, 'Control 1'),
 (2, 11, 'Control 2'),
 (3, 11, 'Control 3');
+
+INSERT INTO QCType_KitDescriptor (qcTypeId, kitDescriptorId) VALUES
+(7, 3);
 
 INSERT INTO Printer(printerId, name, backend, configuration, driver, layout, enabled) VALUES (1, 'foo', 'CUPS', '{}', 'BRADY', 'AVERY_8363', 1);
     
@@ -265,22 +272,23 @@ INSERT INTO Transfer_Sample(transferId, sampleId) VALUES
 (1, 2),
 (1, 3);
 
-INSERT INTO `SampleQC`(`sample_sampleId`, `creator`, `date`, `type`, `results`) 
-VALUES (1,1,'2015-08-27',3,5),
-(2,1,'2015-08-27',3,5),
-(3,1,'2015-08-27',3,5),
-(4,1,'2015-08-27',3,5),
-(5,1,'2015-08-27',3,5),
-(6,1,'2015-08-27',3,5),
-(7,1,'2015-08-27',3,5),
-(8,1,'2015-08-27',3,5),
-(9,1,'2015-08-27',3,5),
-(10,1,'2015-08-27',3,5),
-(11,1,'2015-08-27',3,5),
-(12,1,'2015-08-27',3,5),
-(13,1,'2015-08-27',3,5),
-(14,1,'2015-08-27',3,5),
-(14,1,'2015-08-28',3,55);
+INSERT INTO `SampleQC`(`sample_sampleId`, `creator`, `date`, `type`, `results`, kitDescriptorId, kitLot) 
+VALUES (1,1,'2015-08-27',3,5, NULL, NULL),
+(2,1,'2015-08-27',3,5, NULL, NULL),
+(3,1,'2015-08-27',3,5, NULL, NULL),
+(4,1,'2015-08-27',3,5, NULL, NULL),
+(5,1,'2015-08-27',3,5, NULL, NULL),
+(6,1,'2015-08-27',3,5, NULL, NULL),
+(7,1,'2015-08-27',3,5, NULL, NULL),
+(8,1,'2015-08-27',3,5, NULL, NULL),
+(9,1,'2015-08-27',3,5, NULL, NULL),
+(10,1,'2015-08-27',3,5, NULL, NULL),
+(11,1,'2015-08-27',3,5, NULL, NULL),
+(12,1,'2015-08-27',3,5, NULL, NULL),
+(13,1,'2015-08-27',3,5, NULL, NULL),
+(14,1,'2015-08-27',3,5, NULL, NULL),
+(14,1,'2015-08-28',3,55, NULL, NULL),
+(1,1,'2020-03-11',7,12, 3, 'asdf');
 
 INSERT INTO `SampleChangeLog`(`sampleChangeLogId`, `sampleId`, `columnsChanged`, `userId`, `message`, `changeTime`)
 VALUES (1, 1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:47'),
@@ -323,10 +331,6 @@ INSERT INTO `LibraryStrategyType` (`libraryStrategyTypeId`,`name`,`description`)
 VALUES (1,'WGS','Whole genome shotgun'),
 (12,'EST','Single pass sequencing of cDNA templates'),
 (14,'CTS','Concatenated Tag Sequencing');
-
-INSERT INTO KitDescriptor (kitDescriptorId, name, version, manufacturer, partNumber, stockLevel, kitType, platformType, creator, created, lastModifier, lastModified) VALUES
-(1, 'Test Kit 1', 1, 'KitMaker', 'k001', 0, 'LIBRARY', 'ILLUMINA', 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
-(2, 'Test Kit 2', 1, 'KitMaker', 'k002', 0, 'LIBRARY', 'ILLUMINA', 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00');
 
 INSERT INTO `Library`(`libraryId`, `name`, `description`, `accession`, `sample_sampleId`, `identificationBarcode`, `locationBarcode`, `libraryType`, `concentration`, `creationDate`, `platformType`, `alias`, `paired`, `librarySelectionType`, `libraryStrategyType`, `qcPassed`, `lastModifier`, `lastModified`, `creator`, `created`, `kitDescriptorId`, workstationId)
 VALUES (1,'LIB1','Inherited from TEST_0001',NULL,1,'LIB1::TEST_0001_Bn_P_PE_300_WG','LIBRARY_INBOX_A01',3,0,'2015-08-27','ILLUMINA','TEST_0001_Bn_P_PE_300_WG',1,1,1,TRUE,1,'2016-07-07 13:30:49',1,'2016-07-07 13:30:49', 1, 1),

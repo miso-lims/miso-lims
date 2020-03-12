@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -151,6 +154,16 @@ public class KitDescriptorRestController extends RestController {
     }
     kitDescriptorService.saveTargetedSequencingRelationships(kitDescriptor);
     return Dtos.asDto(kitDescriptorService.get(id));
+  }
+
+  @GetMapping("/search")
+  public @ResponseBody List<KitDescriptorDto> search(@RequestParam("q") String search, @RequestParam("kitType") String kitTypeString)
+      throws IOException {
+    KitType kitType = KitType.get(kitTypeString);
+    if (kitType == null) {
+      throw new RestException("Invalid kit type", Status.BAD_REQUEST);
+    }
+    return kitDescriptorService.search(kitType, search).stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
   @PostMapping(value = "/bulk-delete")

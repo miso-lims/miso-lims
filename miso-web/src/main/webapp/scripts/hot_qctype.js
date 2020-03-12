@@ -141,11 +141,7 @@ HotTarget.qctype = {
           }
         },
         HotUtils.makeColumnForConstantsList('Instrument Model', true, 'instrumentModel', 'instrumentModelId', 'id', 'alias',
-            Constants.instrumentModels, false),
-        HotUtils.makeColumnForConstantsList('Kit', true, 'kitDescriptor', 'kitDescriptorId', 'id', 'name', Constants.kitDescriptors
-            .filter(function(kitDescriptor) {
-              return kitDescriptor.kitType === 'QC';
-            }), false)];
+            Constants.instrumentModels, false)];
   },
 
   getBulkActions: function(config) {

@@ -39,6 +39,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcControl;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcCorrespondingField;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
@@ -175,6 +176,15 @@ public class HibernateQcTypeDaoIT extends AbstractDAOTest {
     QcControl control = (QcControl) currentSession().get(QcControl.class, 1L);
     assertNotNull(control);
     assertEquals(2L, dao.getControlUsage(control));
+  }
+
+  @Test
+  public void testGetKitUsage() throws Exception {
+    QcType qcType = (QcType) currentSession().get(QcType.class, 7L);
+    KitDescriptor kit = (KitDescriptor) currentSession().get(KitDescriptor.class, 3L);
+    assertNotNull(qcType);
+    assertNotNull(kit);
+    assertEquals(1L, dao.getKitUsage(qcType, kit));
   }
 
 }

@@ -66,6 +66,7 @@ DELETE FROM Project;
 DELETE FROM ProjectChangeLog;
 DELETE FROM QcControl;
 DELETE FROM QCType;
+DELETE FROM QCType_KitDescriptor;
 DELETE FROM ReferenceGenome;
 DELETE FROM Run;
 DELETE FROM RunChangeLog;

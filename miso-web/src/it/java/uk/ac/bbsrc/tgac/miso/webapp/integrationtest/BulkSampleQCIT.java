@@ -33,7 +33,7 @@ public class BulkSampleQCIT extends AbstractBulkSampleIT {
   private static final Logger log = LoggerFactory.getLogger(BulkSampleQCIT.class);
 
   private static final Set<String> qcColumns = Sets.newHashSet(QcColumns.SAMPLE_ALIAS, QcColumns.DATE, QcColumns.TYPE,
-      QcColumns.INSTRUMENT, QcColumns.KIT_LOT, QcColumns.RESULT, QcColumns.UNITS, QcColumns.DESCRIPTION);
+      QcColumns.INSTRUMENT, QcColumns.KIT, QcColumns.KIT_LOT, QcColumns.RESULT, QcColumns.UNITS, QcColumns.DESCRIPTION);
 
   private BulkQCPage getEditPage(List<Long> ids) {
     return BulkQCPage.getForEditSample(getDriver(), getBaseUrl(), ids, 0);

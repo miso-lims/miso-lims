@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQcControlRun;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQC;
@@ -122,6 +123,15 @@ public class HibernateQcTypeDao implements QualityControlTypeStore {
   public long getControlUsage(QcControl control) throws IOException {
     return (long) getCriteriaForTargetQcControlRun(control)
         .add(Restrictions.eq("control", control))
+        .setProjection(Projections.rowCount())
+        .uniqueResult();
+  }
+
+  @Override
+  public long getKitUsage(QcType qcType, KitDescriptor kit) throws IOException {
+    return (long) getCriteriaForQcTarget(qcType)
+        .add(Restrictions.eq("type", qcType))
+        .add(Restrictions.eq("kit", kit))
         .setProjection(Projections.rowCount())
         .uniqueResult();
   }

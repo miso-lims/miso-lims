@@ -202,4 +202,9 @@ public class DefaultKitDescriptorService implements KitDescriptorService {
     return result;
   }
 
+  @Override
+  public List<KitDescriptor> search(KitType type, String search) throws IOException {
+    return kitStore.search(type, search);
+  }
+
 }

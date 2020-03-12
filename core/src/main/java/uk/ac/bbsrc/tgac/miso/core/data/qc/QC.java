@@ -45,6 +45,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -85,6 +86,10 @@ public abstract class QC implements Serializable, Comparable<QC>, Identifiable {
   @ManyToOne(targetEntity = InstrumentImpl.class)
   @JoinColumn(name = "instrumentId")
   private Instrument instrument;
+
+  @ManyToOne
+  @JoinColumn(name = "kitDescriptorId")
+  private KitDescriptor kit;
 
   private String kitLot;
 
@@ -174,6 +179,14 @@ public abstract class QC implements Serializable, Comparable<QC>, Identifiable {
     this.kitLot = kitLot;
   }
 
+  public KitDescriptor getKit() {
+    return kit;
+  }
+
+  public void setKit(KitDescriptor kit) {
+    this.kit = kit;
+  }
+
   @Override
   public int compareTo(QC o) {
     if (type != null && !type.equals(o.getType())) {
@@ -187,7 +200,11 @@ public abstract class QC implements Serializable, Comparable<QC>, Identifiable {
     return LimsUtils.equals(this, obj,
         QC::getDate,
         QC::getResults,
-        QC::getType);
+        QC::getType,
+        QC::getDescription,
+        QC::getInstrument,
+        QC::getKit,
+        QC::getKitLot);
   }
 
   @Override
@@ -197,6 +214,7 @@ public abstract class QC implements Serializable, Comparable<QC>, Identifiable {
         type,
         description,
         instrument,
+        kit,
         kitLot);
   }
 
