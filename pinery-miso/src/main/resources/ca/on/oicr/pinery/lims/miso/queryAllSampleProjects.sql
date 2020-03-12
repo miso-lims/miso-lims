@@ -8,6 +8,7 @@ SELECT NAME
         ,MAX(updated) latest 
         ,MAX(active) active 
         ,MAX(clinical) clinical
+        ,MAX(secondaryNaming) secondaryNamingScheme
 FROM ( 
         SELECT COALESCE(sp.shortName, sp.alias) NAME 
                 ,sai.archived archived 
@@ -15,6 +16,7 @@ FROM (
                 ,s.lastModified updated 
                 ,sp.status IN ('ACTIVE', 'PENDING') active 
                 ,sp.clinical clinical
+                ,sp.secondaryNaming secondaryNaming
         FROM Sample s 
         LEFT JOIN DetailedSample sai ON sai.sampleId = s.sampleId 
         INNER JOIN Project sp ON sp.projectId = s.project_projectId 
@@ -27,6 +29,7 @@ UNION ALL
                 ,l.lastModified updated
                 ,lp.status IN ('ACTIVE', 'PENDING') active
                 ,lp.clinical clinical
+                ,lp.secondaryNaming secondaryNaming
         FROM Library l
         LEFT JOIN DetailedLibrary lai ON lai.libraryId = l.libraryId
         INNER JOIN Sample ls ON l.sample_sampleId = ls.sampleId 
