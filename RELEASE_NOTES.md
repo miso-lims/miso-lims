@@ -2,6 +2,12 @@
 
 Changes:
 
+
+
+# 1.1.0
+
+Changes:
+
   * Changed the "Help" link in the header to link to the user manual section that is relevant to
     the current page
   * Added several downloadable spreadsheet types
