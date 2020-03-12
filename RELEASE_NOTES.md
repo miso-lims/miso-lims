@@ -26,6 +26,10 @@ Changes:
   * Added 'Sort by Rows' and 'Sort by Columns' buttons when editing library template indices
   * Expose naming scheme selection on Pinery projects
 
+Upgrade Notes:
+
+  * Updated to Pinery 2.11.0
+
 # 1.0.1
 
 Changes:
