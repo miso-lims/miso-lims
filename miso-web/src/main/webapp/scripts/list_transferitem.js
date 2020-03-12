@@ -47,15 +47,19 @@ ListTarget.transferitem = (function() {
         }, {
           name: 'Receipt Wizard',
           action: function(items) {
-            Utils.showDialog('Receipt Wizard', 'Save', [makeBooleanField('Received', 'received'),
-                makeBooleanField('QC Passed', 'qcPassed'), {
+            Utils.showDialog('Receipt Wizard', 'OK', [makeBooleanField('Received', 'received'), makeBooleanField('QC Passed', 'qcPassed'),
+                {
                   label: 'QC Note',
                   property: 'qcNote',
                   type: 'text'
                 }, {
-                  label: 'Box Name, Alias, or Barcode (if changing)',
-                  property: 'boxQuery',
-                  type: 'text'
+                  label: 'Move items to another box',
+                  property: 'moveItems',
+                  type: 'checkbox'
+                }, {
+                  label: 'Move box to another freezer',
+                  property: 'moveBox',
+                  type: 'checkbox'
                 }], function(results) {
               if (results.qcPassed === false && !results.qcNote) {
                 Utils.showOkDialog('Error', ['QC note is required when QC is failed']);
@@ -71,8 +75,10 @@ ListTarget.transferitem = (function() {
                   item.qcNote = results.qcNote;
                 });
               }
-              if (results.boxQuery) {
-                queryBoxes(results.boxQuery, items, applyChanges);
+              if (results.moveItems) {
+                moveItems(items, results.moveBox, applyChanges);
+              } else if (results.moveBox) {
+                moveBox(items, applyChanges);
               } else {
                 applyChanges();
                 Transfer.updateItems(items);
@@ -274,7 +280,17 @@ ListTarget.transferitem = (function() {
     };
   }
 
-  function queryBoxes(query, items, callback) {
+  function moveItems(items, moveBoxToo, callback) {
+    Utils.showDialog('Box Search', 'Search', [{
+      label: 'Box Name, Alias, or Barcode',
+      property: 'query',
+      type: 'text'
+    }], function(results) {
+      queryBoxes(results.query, items, moveBoxToo, callback);
+    });
+  }
+
+  function queryBoxes(query, items, moveBoxToo, callback) {
     Utils.ajaxWithDialog('Searching for Boxes', 'GET', Urls.rest.boxes.searchPartial + '?' + jQuery.param({
       q: query,
       b: true
@@ -294,25 +310,89 @@ ListTarget.transferitem = (function() {
                 }
               };
             }), function(positionResults) {
-              items.forEach(function(item) {
-                if (positionResults[item.name + 'Position']) {
-                  item.boxId = box.id;
-                  item.boxAlias = box.alias;
-                  item.boxPosition = positionResults[item.name + 'Position'];
-                } else {
-                  item.boxId = null;
-                  item.boxAlias = null;
-                  item.boxPosition = null;
+              var applyChanges = function() {
+                items.forEach(function(item) {
+                  if (positionResults[item.name + 'Position']) {
+                    item.boxId = box.id;
+                    item.boxAlias = box.alias;
+                    item.boxPosition = positionResults[item.name + 'Position'];
+                  } else {
+                    item.boxId = null;
+                    item.boxAlias = null;
+                    item.boxPosition = null;
+                  }
+                });
+                if (callback) {
+                  callback();
                 }
-              });
-              if (callback) {
-                callback();
+              };
+              if (moveBoxToo) {
+                moveBox(items, applyChanges);
+              } else {
+                applyChanges();
+                Transfer.updateItems(items);
               }
-              Transfer.updateItems(items);
             });
           }
         };
       }));
+    });
+  }
+
+  function moveBox(items, callback) {
+    Utils.ajaxWithDialog('Finding Storage', 'GET', Urls.rest.storageLocations.freezers, null, function(freezers) {
+      Utils.showDialog('Set Box Location', 'Next', [{
+        label: 'Barcode',
+        property: 'barcode',
+        type: 'text'
+      }, {
+        label: 'or Select',
+        property: 'freezer',
+        type: 'select',
+        values: freezers,
+        getLabel: function(freezer) {
+          return freezer.fullDisplayLocation;
+        }
+      }], function(results) {
+        if (results.barcode) {
+          continueLocationSelect(Urls.rest.storageLocations.queryByBarcode + '?' + $.params({
+            q: results.barcode
+          }), items, callback);
+        } else if (!results.freezer) {
+          Utils.showOkDialog('Error', ['Must select a freezer or location barcode']);
+        } else {
+          continueLocationSelect(Urls.rest.storageLocations.children(results.freezer.id), items, callback);
+        }
+      });
+    });
+  }
+
+  function continueLocationSelect(url, items, callback) {
+    Utils.ajaxWithDialog('Finding Storage', 'GET', url, null, function(locations) {
+      if (!locations || (Array.isArray(locations) && !locations.length)) {
+        Utils.showOkDialog('Error', ['No storage found']);
+      } else {
+        if (!Array.isArray(locations)) {
+          locations = [locations];
+        }
+        locations.sort(Utils.sorting.standardSort('displayLocation'));
+        Utils.showWizardDialog('Set Box Location', locations.map(function(location) {
+          return {
+            name: location.displayLocation + (location.availableStorage ? '*' : ''),
+            handler: function() {
+              if (location.availableStorage) {
+                items.forEach(function(item) {
+                  item.newBoxLocationId = location.id;
+                });
+                callback();
+                Transfer.updateItems(items);
+              } else {
+                continueLocationSelect(Urls.rest.storageLocations.children(location.id), items, callback);
+              }
+            }
+          }
+        }));
+      }
     });
   }
 

@@ -12,6 +12,7 @@ public class TransferItemDto {
   private Long boxId;
   private String boxAlias;
   private String boxPosition;
+  private Long newBoxLocationId;
 
   // needed for bulk actions
   private Long sampleClassId;
@@ -120,6 +121,14 @@ public class TransferItemDto {
 
   public void setPlatformType(String platformType) {
     this.platformType = platformType;
+  }
+
+  public Long getNewBoxLocationId() {
+    return newBoxLocationId;
+  }
+
+  public void setNewBoxLocationId(Long newBoxLocationId) {
+    this.newBoxLocationId = newBoxLocationId;
   }
 
 }
