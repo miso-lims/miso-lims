@@ -34,7 +34,7 @@ public class BulkPoolQCIT extends AbstractIT {
   private static final Logger log = LoggerFactory.getLogger(BulkPoolQCIT.class);
 
   private static final Set<String> qcColumns = Sets.newHashSet(QcColumns.POOL_ALIAS, QcColumns.DATE, QcColumns.TYPE,
-      QcColumns.INSTRUMENT, QcColumns.KIT_LOT, QcColumns.RESULT, QcColumns.UNITS, QcColumns.DESCRIPTION);
+      QcColumns.INSTRUMENT, QcColumns.KIT, QcColumns.KIT_LOT, QcColumns.RESULT, QcColumns.UNITS, QcColumns.DESCRIPTION);
 
   @Before
   public void setup() {

@@ -22,7 +22,7 @@ public class QcTypeDto {
   private QcCorrespondingField correspondingField;
   private boolean autoUpdateField;
   private Long instrumentModelId;
-  private Long kitDescriptorId;
+  private List<KitDescriptorDto> kitDescriptors;
   private List<QcControlDto> controls;
 
   public Long getId() {
@@ -105,12 +105,12 @@ public class QcTypeDto {
     this.instrumentModelId = instrumentModelId;
   }
 
-  public Long getKitDescriptorId() {
-    return kitDescriptorId;
+  public List<KitDescriptorDto> getKitDescriptors() {
+    return kitDescriptors;
   }
 
-  public void setKitDescriptorId(Long kitDescriptorId) {
-    this.kitDescriptorId = kitDescriptorId;
+  public void setKitDescriptors(List<KitDescriptorDto> kitDescriptors) {
+    this.kitDescriptors = kitDescriptors;
   }
 
   public List<QcControlDto> getControls() {

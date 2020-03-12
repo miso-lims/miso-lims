@@ -208,6 +208,14 @@ public class HibernateKitDaoIT extends AbstractDAOTest {
     testSearch(PaginationFilter.kitName("Test Kit"));
   }
 
+  @Test
+  public void testSearchMethod() throws Exception {
+    String partNumber = "k003";
+    List<KitDescriptor> results = dao.search(KitType.QC, partNumber);
+    assertEquals(1, results.size());
+    assertEquals(partNumber, results.get(0).getPartNumber());
+  }
+
   /**
    * Verifies Hibernate mappings by ensuring that no exception is thrown by a search
    * 

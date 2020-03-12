@@ -14,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
+import uk.ac.bbsrc.tgac.miso.core.data.BarcodableVisitor;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -80,18 +81,8 @@ public class SequencingContainerModel implements Deletable, Serializable, Barcod
   }
 
   @Override
-  public String getBarcodeExtraInfo() {
-    return null;
-  }
-
-  @Override
   public void setIdentificationBarcode(String identificationBarcode) {
     this.identificationBarcode = identificationBarcode;
-  }
-
-  @Override
-  public String getBarcodeSizeInfo() {
-    return null;
   }
 
   public PlatformType getPlatformType() {
@@ -164,7 +155,8 @@ public class SequencingContainerModel implements Deletable, Serializable, Barcod
   }
 
   @Override
-  public String getBarcodeGroupDescription() {
-    return null;
+  public <T> T visit(BarcodableVisitor<T> visitor) {
+    return visitor.visitContainerModel(this);
   }
+
 }

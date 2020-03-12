@@ -376,7 +376,7 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListPrintersSetup() throws Exception {
     testPageSetup(ListTarget.PRINTERS,
-        Sets.newHashSet(Columns.PRINTER, Columns.DRIVER, Columns.LAYOUT, Columns.BACKEND, Columns.AVAILABLE));
+        Sets.newHashSet(Columns.PRINTER, Columns.DRIVER, Columns.BACKEND, Columns.AVAILABLE));
   }
 
   @Test

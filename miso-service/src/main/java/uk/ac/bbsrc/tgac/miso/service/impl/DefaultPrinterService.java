@@ -59,6 +59,9 @@ public class DefaultPrinterService implements PrinterService {
     original.setBackend(printer.getBackend());
     original.setConfiguration(printer.getConfiguration());
     original.setDriver(printer.getDriver());
+    original.setLayout(printer.getLayout());
+    original.setHeight(printer.getHeight());
+    original.setWidth(printer.getWidth());
     original.setEnabled(printer.isEnabled());
     original.setName(printer.getName());
     return printerStore.save(original);

@@ -80,7 +80,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
-import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer;
@@ -463,18 +462,8 @@ public class LimsUtils {
     return Arrays.stream(sets).flatMap(Collection::stream).collect(Collectors.toSet());
   }
 
-  public static String makeVolumeAndConcentrationLabel(BigDecimal volume, BigDecimal concentration, VolumeUnit volumeUnits,
-      ConcentrationUnit concentrationUnits) {
-    String strVolumeUnits = (volumeUnits == null ? "" : volumeUnits.getUnits());
+  public static String makeConcentrationLabel(BigDecimal concentration, ConcentrationUnit concentrationUnits) {
     String strConcentrationUnits = (concentrationUnits == null ? "" : concentrationUnits.getUnits());
-    if (volume != null && volume.compareTo(BigDecimal.ZERO) != 0 && concentration != null
-        && concentration.compareTo(BigDecimal.ZERO) != 0) {
-      return String.format(makeFormatString(volume) + "@" + makeFormatString(concentration), volume, strVolumeUnits, concentration,
-          strConcentrationUnits);
-    }
-    if (volume != null && volume.compareTo(BigDecimal.ZERO) != 0) {
-      return String.format(makeFormatString(volume), volume, strVolumeUnits);
-    }
     if (concentration != null && concentration.compareTo(BigDecimal.ZERO) != 0) {
       return String.format(makeFormatString(concentration), concentration, strConcentrationUnits);
     }

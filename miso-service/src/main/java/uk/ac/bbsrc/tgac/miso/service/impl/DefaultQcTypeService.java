@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
+import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcControl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
@@ -74,9 +77,18 @@ public class DefaultQcTypeService implements QcTypeService {
     if (qcType.getInstrumentModel() != null) {
       qcType.setInstrumentModel(instrumentModelService.get(qcType.getInstrumentModel().getId()));
     }
-    if (qcType.getKitDescriptor() != null) {
-      qcType.setKitDescriptor(kitDescriptorService.get(qcType.getKitDescriptor().getId()));
+
+    Set<KitDescriptor> managedKits = new HashSet<>();
+    for (KitDescriptor kit : qcType.getKitDescriptors()) {
+      KitDescriptor managedKit = kitDescriptorService.get(kit.getId());
+      if (managedKit == null) {
+        throw new ValidationException("No kit descriptor found with ID: " + kit.getId());
+      }
+      managedKits.add(managedKit);
     }
+    qcType.getKitDescriptors().clear();
+    qcType.getKitDescriptors().addAll(managedKits);
+
     Set<QcControl> managedControls = new HashSet<>();
     for (QcControl control : qcType.getControls()) {
       if (control.isSaved()) {
@@ -102,8 +114,8 @@ public class DefaultQcTypeService implements QcTypeService {
     to.setCorrespondingField(from.getCorrespondingField());
     to.setAutoUpdateField(from.isAutoUpdateField());
     to.setInstrumentModel(from.getInstrumentModel());
-    to.setKitDescriptor(from.getKitDescriptor());
     to.setArchived(from.isArchived());
+    applySetChanges(to.getKitDescriptors(), from.getKitDescriptors());
   }
 
   private void validateChange(QcType qcType, QcType beforeChange) throws IOException {
@@ -112,11 +124,11 @@ public class DefaultQcTypeService implements QcTypeService {
     if (beforeChange != null) {
       long usage = qcTypeStore.getUsage(beforeChange);
       if (usage > 1L) {
-        if (ValidationUtils.isChanged(QcType::getInstrumentModel, qcType, beforeChange)) {
+        if (isChanged(QcType::getInstrumentModel, qcType, beforeChange)) {
           errors.add(new ValidationError("instrumentModelId", "Cannot change because there are already QCs of this type"));
         }
-        if (ValidationUtils.isChanged(QcType::getKitDescriptor, qcType, beforeChange)) {
-          errors.add(new ValidationError("kitDescriptorId", "Cannot change because there are already QCs of this type"));
+        if (!qcType.getKitDescriptors().isEmpty() && beforeChange.getKitDescriptors().isEmpty()) {
+          errors.add(new ValidationError("kitDescriptors", "Cannot add kits because there are already QCs of this type"));
         }
         if (!qcType.getControls().isEmpty() && beforeChange.getControls().isEmpty()) {
           errors.add(new ValidationError("controls", "Cannot add controls because there are already QCs of this type"));
@@ -132,6 +144,17 @@ public class DefaultQcTypeService implements QcTypeService {
                   Pluralizer.qcs(controlUsage)));
         }
       }
+
+      Set<KitDescriptor> kitsToRemove = beforeChange.getKitDescriptors().stream()
+          .filter(beforeKit -> qcType.getKitDescriptors().stream().anyMatch(kit -> kit.getId() == beforeKit.getId()))
+          .collect(Collectors.toSet());
+      for (KitDescriptor kit : kitsToRemove) {
+        long kitUsage = qcTypeStore.getKitUsage(qcType, kit);
+        if (kitUsage > 0L) {
+          errors.add(new ValidationError("kitDescriptors",
+              String.format("Cannot remove kit '%s' because it is used in %d %s", kit.getName(), kitUsage, Pluralizer.qcs(kitUsage))));
+        }
+      }
     }
 
     if (!qcType.isArchived()) {
@@ -142,8 +165,10 @@ public class DefaultQcTypeService implements QcTypeService {
       }
     }
 
-    if (qcType.getKitDescriptor() != null && qcType.getKitDescriptor().getKitType() != KitType.QC) {
-      errors.add(new ValidationError("kitDescriptorId", "Must be a QC kit"));
+    for (KitDescriptor kit : qcType.getKitDescriptors()) {
+      if (kit.getKitType() != KitType.QC) {
+        errors.add(new ValidationError("kitDescriptorId", "Must be a QC kit"));
+      }
     }
 
     if (!errors.isEmpty()) {

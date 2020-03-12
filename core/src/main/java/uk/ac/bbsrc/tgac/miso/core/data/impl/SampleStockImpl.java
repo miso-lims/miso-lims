@@ -9,6 +9,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import uk.ac.bbsrc.tgac.miso.core.data.BarcodableVisitor;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
@@ -67,6 +68,11 @@ public class SampleStockImpl extends DetailedSampleImpl implements SampleStock {
   @Override
   public String toString() {
     return "SampleStockImpl [strStatus=" + strStatus + ", dnaseTreated=" + dnaseTreated + "]";
+  }
+
+  @Override
+  public <T> T visit(BarcodableVisitor<T> visitor) {
+    return visitor.visitSampleStock(this);
   }
 
 }

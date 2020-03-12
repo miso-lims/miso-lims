@@ -15,12 +15,14 @@ Changes:
   * Added thermal cycler instrument type
   * Allow recording the workstation and thermal cycler used to prepare libraries
   * Allow moving box to another location from the Edit Transfer page Receipt Wizard
+  * Allow specifying multiple valid kits per QC type
   * Added another version of the Index Distance tool to the MISO online documentation site
   * Fixed an issue where Run Scanner could cause a container to repeatedly flip between multiple
     container models if the container is linked to multiple runs
   * Fixed error when creating Sample Classes
   * Fixed several bugs related to deleting things
   * Disallow editing whether a project uses the secondary naming scheme
+  * Allow setting custom fields in printer labels
 
 # 1.0.1
 

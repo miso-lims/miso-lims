@@ -168,8 +168,9 @@ public abstract class LabelCanvas {
    */
   public final void textClipped(double x, double y, double height, int numCharsPerLine, TextDirection direction, FontStyle style,
       Justification justification, String text) {
-    text(x, y, height, direction, style, justification,
-        text.length() > numCharsPerLine ? text.substring(0, numCharsPerLine - 2) + "..." : text);
+    if (text != null)
+      text(x, y, height, direction, style, justification,
+          text.length() > numCharsPerLine ? text.substring(0, numCharsPerLine - 2) + "..." : text);
   }
 
 }

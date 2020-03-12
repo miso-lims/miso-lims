@@ -266,8 +266,21 @@ public class HibernateKitDao implements KitStore, HibernatePaginatedDataSource<K
   @Override
   public long getUsageByQcTypes(KitDescriptor kitDescriptor) throws IOException {
     return (long) currentSession().createCriteria(QcType.class)
-        .add(Restrictions.eq("kitDescriptor", kitDescriptor))
+        .createAlias("kitDescriptors", "kitDescriptor")
+        .add(Restrictions.eq("kitDescriptor.kitDescriptorId", kitDescriptor.getId()))
         .setProjection(Projections.rowCount()).uniqueResult();
+  }
+
+  @Override
+  public List<KitDescriptor> search(KitType type, String search) throws IOException {
+    @SuppressWarnings("unchecked")
+    List<KitDescriptor> results = currentSession().createCriteria(KitDescriptor.class)
+        .add(Restrictions.eq("kitType", type))
+        .add(Restrictions.or(
+            Restrictions.ilike("name", search, MatchMode.START),
+            Restrictions.ilike("partNumber", search, MatchMode.EXACT)))
+        .list();
+    return results;
   }
 
 }

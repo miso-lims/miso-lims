@@ -30,7 +30,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferItem;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SampleHierarchyView;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
 @Table(name = "DetailedSample")
@@ -260,12 +259,6 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   }
 
   @Override
-  public String getBarcodeSizeInfo() {
-    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), getVolumeUnits(),
-        getConcentrationUnits());
-  }
-
-  @Override
   public Date getBarcodeDate() {
     return Stream.of(getReceivedDate(), getCreationDate(), getCreationTime()).filter(Objects::nonNull).findFirst().orElse(null);
   }
@@ -278,12 +271,6 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   @Override
   public GroupIdentifiable getGroupIdentifiableParent() {
     return getParent();
-  }
-
-  @Override
-  public String getBarcodeGroupDescription() {
-    GroupIdentifiable groupParent = getEffectiveGroupIdEntity();
-    return groupParent == null ? null : groupParent.getGroupDescription();
   }
 
   @Override

@@ -33,6 +33,7 @@ import javax.persistence.Table;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
+import uk.ac.bbsrc.tgac.miso.core.data.BarcodableVisitor;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcCorrespondingField;
@@ -70,6 +71,11 @@ public class SampleImpl extends AbstractSample {
 
   public void updateFromQc(QcCorrespondingField correspondingField, BigDecimal value, String units) {
     correspondingField.updateField(this, value, units);
+  }
+
+  @Override
+  public <T> T visit(BarcodableVisitor<T> visitor) {
+    return visitor.visitSample(this);
   }
 
 }

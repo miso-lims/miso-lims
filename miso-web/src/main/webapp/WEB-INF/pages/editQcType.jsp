@@ -21,6 +21,11 @@
 <div id="qcTypeForm_controlsError"></div>
 <div id="listControls"></div>
 
+<br/>
+<h1>Kits</h1>
+<div id="qcTypeForm_kitDescriptorsError"></div>
+<div id="listKits"></div>
+
 <script type="text/javascript">
   jQuery(document).ready(function () {
     var qcType = ${qcTypeDto};
@@ -30,6 +35,7 @@
     QcType.setAdmin(${miso:isAdmin()});
     QcType.setForm(form);
     QcType.setControls(qcType.controls);
+    QcType.setKits(qcType.kitDescriptors);
     Utils.ui.updateHelpLink(FormTarget.qctype.getUserManualUrl());
   });
 </script>

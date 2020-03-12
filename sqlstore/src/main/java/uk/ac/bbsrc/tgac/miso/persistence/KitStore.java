@@ -68,4 +68,6 @@ public interface KitStore extends Store<Kit>, PaginatedDataSource<KitDescriptor>
 
   public long getUsageByQcTypes(KitDescriptor kitDescriptor) throws IOException;
 
+  public List<KitDescriptor> search(KitType type, String search) throws IOException;
+
 }

@@ -399,7 +399,7 @@ deleted if it has not been used by any existing pool orders or sequencing orders
 ## QC Types
 
 QC types identify methods used to QC an item. A QC type may target samples, libraries, pools, sequencing containers, or
-runs. A QC type may specify the instrument model, kit descriptor, and controls that it uses. If these are specified,
+runs. A QC type may specify the instrument model, kit descriptors, and controls that it uses. If these are specified,
 additional related information is required when entering QCs.
 
 Some QC types may be linked to one of the target's fields. For example, a "Volume Check" QC type
@@ -411,8 +411,14 @@ there are no existing QCs of the type.
 
 In addition to the bulk Create/Edit QC Types page, there is a single Create/Edit QC Type page. The single Create/Edit
 page allows you to make all the same changes to a QC type as the bulk page, and also allows you to manage the QC type's
-controls. To get to the single Create QC Type page, enter "1" for the quantity when adding a QC type. To get to the
-Edit QC Type page, click the name of the QC you wish to edit on the QC Types list page.
+kits and controls. To get to the single Create QC Type page, enter "1" for the quantity when adding a QC type. To get to
+the Edit QC Type page, click the name of the QC you wish to edit on the QC Types list page.
+
+The Kits table near the bottom of the single Create/Edit QC Type page allows you to manage the QC type's kits. To add a
+kit, click the "Add" button in the toolbar. In the dialog that appears, enter a kit name or part number to search for
+and click "Search." In the results dialog, choose the kit you wish to add. To remove a kit, select it in the list and
+click the "Remove" button in the toolbar. You will only be able to remove a kit if it has not been used by any QCs of
+this type. Be sure to click the "Save" button at the top right of the page to confirm any changes.
 
 The Controls table at the bottom of the single Create/Edit QC Type page allows you to manage the QC type's controls. To
 add a new control, click the "Add" button in the toolbar, enter an alias for the new control when prompted, and click
@@ -421,15 +427,15 @@ You will only be able to remove a control if it has not been used in any QCs. Be
 top right of the page to confirm any changes.
 
 If a QC type specifies an instrument model then an instrument will have to be chosen whenever creating a QC of that type.
-If a QC type specifies a kit then a kit LOT# must be entered when creating a QC of that type. If a QC type specifies
-controls then a control must be selected and the control LOT# and pass/fail must also be entered when creating a QC of
-that type.
+If a QC type specifies any kits then one of those kits, as well as a kit LOT#, must be entered when creating a QC of that
+type. If a QC type specifies any controls then a control must be selected and the control LOT# and pass/fail must also be
+entered when creating a QC of that type.
 
 Before adding a new QC type:
 
 * If an instrument is used for the QC and that instrument does not yet exist in MISO, first add the instrument type if
   necessary, then add one or more instruments of that type
-* If a kit is used for the QC and the kit does not yet exist in MISO, create it
+* If any kits are used for the QC and the kits do not yet exist in MISO, create them
 
 Instruments, kits and controls are recent additions to QCs in MISO. You won't be able to update older QC types to
 include these items, as that would invalidate any of the existing QCs that were created from them. Instead, you can
