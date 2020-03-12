@@ -24,6 +24,7 @@ Changes:
   * Disallow editing whether a project uses the secondary naming scheme
   * Allow setting custom fields in printer labels
   * Added 'Sort by Rows' and 'Sort by Columns' buttons when editing library template indices
+  * Expose naming scheme selection on Pinery projects
 
 # 1.0.1
 

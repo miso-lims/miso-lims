@@ -8,6 +8,7 @@ SELECT NAME
         ,MAX(updated) latest 
         ,MAX(active) active 
         ,MAX(clinical) clinical
+        ,MAX(secondaryNaming) secondaryNamingScheme
 FROM ( 
         SELECT COALESCE(sp.shortName, sp.alias) NAME 
                 ,sai.archived archived 
