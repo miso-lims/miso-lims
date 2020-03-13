@@ -39,6 +39,8 @@ public class LabImpl implements Lab {
   @Column(nullable = false)
   private String alias;
 
+  private boolean archived;
+
   @ManyToOne(targetEntity = UserImpl.class, fetch = FetchType.LAZY)
   @JoinColumn(name = "createdBy", nullable = false)
   private User createdBy;
@@ -73,6 +75,16 @@ public class LabImpl implements Lab {
   @Override
   public void setAlias(String alias) {
     this.alias = alias;
+  }
+
+  @Override
+  public boolean isArchived() {
+    return archived;
+  }
+
+  @Override
+  public void setArchived(boolean archived) {
+    this.archived = archived;
   }
 
   @Override

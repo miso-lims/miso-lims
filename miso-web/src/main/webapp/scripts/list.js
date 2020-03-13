@@ -273,7 +273,7 @@ ListUtils = (function($) {
     var staticActions = target.createStaticActions(config, projectId);
     var bulkActions = target.createBulkActions(config, projectId);
     var columns = target.createColumns(config, projectId).filter(function(x) {
-      return x.include;
+      return !x.hasOwnProperty('include') || x.include;
     });
     ListState[elementId] = {
       selected: [],

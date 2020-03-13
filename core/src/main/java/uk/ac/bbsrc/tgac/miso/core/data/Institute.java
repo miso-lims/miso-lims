@@ -7,22 +7,26 @@ import com.eaglegenomics.simlims.core.User;
 
 public interface Institute extends Serializable, Aliasable, Deletable {
 
-  void setAlias(String alias);
+  public void setAlias(String alias);
 
-  User getCreatedBy();
+  public boolean isArchived();
 
-  void setCreatedBy(User createdBy);
+  public void setArchived(boolean archived);
 
-  Date getCreationDate();
+  public User getCreatedBy();
 
-  void setCreationDate(Date creationDate);
+  public void setCreatedBy(User createdBy);
 
-  User getUpdatedBy();
+  public Date getCreationDate();
 
-  void setUpdatedBy(User updatedBy);
+  public void setCreationDate(Date creationDate);
 
-  Date getLastUpdated();
+  public User getUpdatedBy();
 
-  void setLastUpdated(Date lastUpdated);
+  public void setUpdatedBy(User updatedBy);
+
+  public Date getLastUpdated();
+
+  public void setLastUpdated(Date lastUpdated);
 
 }
