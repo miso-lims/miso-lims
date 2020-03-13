@@ -41,6 +41,7 @@ public class RunDto {
   private Boolean dataApproved;
   private Long dataApproverId;
   private String dataApproverName;
+  private String projectsLabel;
 
   public Long getId() {
     return id;
@@ -225,4 +226,13 @@ public class RunDto {
   public void setDataApproverName(String dataApproverName) {
     this.dataApproverName = dataApproverName;
   }
+
+  public String getProjectsLabel() {
+    return projectsLabel;
+  }
+
+  public void setProjectsLabel(String projectsLabel) {
+    this.projectsLabel = projectsLabel;
+  }
+
 }

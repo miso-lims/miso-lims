@@ -1969,6 +1969,8 @@ public class Dtos {
     setId(dto::setDataApproverId, from.getDataApprover());
     setString(dto::setDataApproverName, maybeGetProperty(from.getDataApprover(), User::getFullName));
 
+    dto.setProjectsLabel(from.getProjectsLabel());
+
     return dto;
   }
 

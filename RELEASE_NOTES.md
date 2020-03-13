@@ -2,7 +2,7 @@
 
 Changes:
 
-
+  * show included projects in Runs list
 
 # 1.1.0
 
