@@ -310,8 +310,8 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListRunsSetup() throws Exception {
-    testTabbedPageSetup(ListTarget.RUNS, Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.SEQ_PARAMS, Columns.STATUS,
-        Columns.START_DATE, Columns.END_DATE, Columns.LAST_MODIFIED));
+    testTabbedPageSetup(ListTarget.RUNS, Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.PROJECTS, Columns.SEQ_PARAMS,
+        Columns.STATUS, Columns.START_DATE, Columns.END_DATE, Columns.LAST_MODIFIED));
   }
 
   @Test
@@ -386,8 +386,8 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListProjectsSetup() throws Exception {
-    testPageSetup(ListTarget.PROJECTS, Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.PROJECTS, Columns.SHORT_NAME,
-        Columns.DESCRIPTION, Columns.STATUS));
+    testPageSetup(ListTarget.PROJECTS,
+        Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.SHORT_NAME, Columns.DESCRIPTION, Columns.STATUS));
   }
 
   @Test
