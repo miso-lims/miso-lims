@@ -3,6 +3,11 @@
 Changes:
 
   * Allow archiving labs and institutes
+  * Added fields for tracking kit lot numbers
+    * Library kit
+    * Run sequencing kit
+    * Container clustering kit
+    * Container multiplexing ki
 
 # 1.1.0
 

@@ -94,7 +94,21 @@ FormTarget.run = (function($) {
             return kit.kitType === 'Sequencing' && kit.platformType === object.platformType;
           }),
           getItemLabel: Utils.array.getName,
-          getItemValue: Utils.array.getId
+          getItemValue: Utils.array.getId,
+          onChange: function(newValue, form) {
+            var opts = {
+              disabled: !newValue
+            }
+            if (!newValue) {
+              opts.value = null;
+            }
+            form.updateField('sequencingKitLot', opts);
+          }
+        }, {
+          title: 'Sequencing Kit Lot',
+          data: 'sequencingKitLot',
+          type: 'text',
+          maxLength: 100
         }, {
           title: 'Description',
           data: 'description',

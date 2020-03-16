@@ -42,7 +42,7 @@ public class BulkLibraryIT extends AbstractIT {
       LibColumns.BOX_SEARCH, LibColumns.BOX_ALIAS, LibColumns.BOX_POSITION, LibColumns.DISCARDED, LibColumns.DESCRIPTION,
       LibColumns.GROUP_ID, LibColumns.GROUP_DESC, LibColumns.DESIGN, LibColumns.CODE, LibColumns.PLATFORM, LibColumns.LIBRARY_TYPE,
       LibColumns.SELECTION, LibColumns.STRATEGY, LibColumns.INDEX_FAMILY, LibColumns.INDEX_1, LibColumns.INDEX_2, LibColumns.UMIS,
-      LibColumns.KIT_DESCRIPTOR, LibColumns.QC_PASSED, LibColumns.SIZE, LibColumns.VOLUME, LibColumns.VOLUME_UNITS,
+      LibColumns.KIT_DESCRIPTOR, LibColumns.KIT_LOT, LibColumns.QC_PASSED, LibColumns.SIZE, LibColumns.VOLUME, LibColumns.VOLUME_UNITS,
       LibColumns.CONCENTRATION, LibColumns.CONCENTRATION_UNITS, LibColumns.SPIKE_IN, LibColumns.SPIKE_IN_DILUTION, LibColumns.SPIKE_IN_VOL);
 
   private static final Set<String> editColumns = Sets.newHashSet(LibColumns.SAMPLE_ALIAS, LibColumns.SAMPLE_LOCATION,

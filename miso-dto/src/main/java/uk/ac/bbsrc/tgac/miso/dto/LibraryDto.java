@@ -60,6 +60,7 @@ public class LibraryDto extends AbstractBoxableDto {
   private List<QcDto> qcs;
   private Integer dnaSize;
   private Long kitDescriptorId;
+  private String kitLot;
   private SampleDto sample;
   private String receivedTime;
   private Long senderLabId;
@@ -356,6 +357,14 @@ public class LibraryDto extends AbstractBoxableDto {
 
   public void setKitDescriptorId(Long kitDescriptorId) {
     this.kitDescriptorId = kitDescriptorId;
+  }
+
+  public String getKitLot() {
+    return kitLot;
+  }
+
+  public void setKitLot(String kitLot) {
+    this.kitLot = kitLot;
   }
 
   public SampleDto getSample() {

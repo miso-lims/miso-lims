@@ -23,7 +23,9 @@ public class ContainerDto {
   private Long lastSequencerId;
   private String lastModified;
   private Long clusteringKitId;
+  private String clusteringKitLot;
   private Long multiplexingKitId;
+  private String multiplexingKitLot;
   private List<PartitionDto> partitions;
 
   public Long getId() {
@@ -114,12 +116,28 @@ public class ContainerDto {
     this.clusteringKitId = clusteringKitId;
   }
 
+  public String getClusteringKitLot() {
+    return clusteringKitLot;
+  }
+
+  public void setClusteringKitLot(String clusteringKitLot) {
+    this.clusteringKitLot = clusteringKitLot;
+  }
+
   public Long getMultiplexingKitId() {
     return multiplexingKitId;
   }
 
   public void setMultiplexingKitId(Long multiplexingKitId) {
     this.multiplexingKitId = multiplexingKitId;
+  }
+
+  public String getMultiplexingKitLot() {
+    return multiplexingKitLot;
+  }
+
+  public void setMultiplexingKitLot(String multiplexingKitLot) {
+    this.multiplexingKitLot = multiplexingKitLot;
   }
 
   public List<PartitionDto> getPartitions() {

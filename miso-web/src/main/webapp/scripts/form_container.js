@@ -56,7 +56,21 @@ FormTarget.container = (function($) {
           },
           getItemValue: function(item) {
             return item.id;
+          },
+          onChange: function(newValue, form) {
+            var opts = {
+              disabled: !newValue
+            }
+            if (!newValue) {
+              opts.value = null;
+            }
+            form.updateField('clusteringKitLot', opts);
           }
+        }, {
+          title: 'Clustering Kit Lot',
+          data: 'clusteringKitLot',
+          type: 'text',
+          maxLength: 100
         }, {
           title: 'Multiplexing Kit',
           data: 'multiplexingKitId',
@@ -67,7 +81,21 @@ FormTarget.container = (function($) {
           },
           getItemValue: function(item) {
             return item.id;
+          },
+          onChange: function(newValue, form) {
+            var opts = {
+              disabled: !newValue
+            }
+            if (!newValue) {
+              opts.value = null;
+            }
+            form.updateField('multiplexingKitLot', opts);
           }
+        }, {
+          title: 'Multiplexing Kit Lot',
+          data: 'multiplexingKitLot',
+          type: 'text',
+          maxLength: 100
         }, {
           title: 'Pore Version',
           data: 'poreVersionId',

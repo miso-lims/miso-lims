@@ -361,6 +361,9 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     if (changed.getSequencingKit() != null && changed.getSequencingKit().getKitType() != KitType.SEQUENCING) {
       errors.add(new ValidationError("sequencingKitId", "Must be a sequencing kit"));
     }
+    if (changed.getSequencingKitLot() != null && changed.getSequencingKit() == null) {
+      errors.add(new ValidationError("sequencingKitLot", "Sequencing kit not specified"));
+    }
 
     User user = authorizationManager.getCurrentUser();
     if (((before == null && changed.isDataApproved() != null) || (before != null && isChanged(Run::isDataApproved, changed, before)))
@@ -407,6 +410,7 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     target.setSequencingParameters(source.getSequencingParameters());
     target.setSequencer(source.getSequencer());
     target.setSequencingKit(source.getSequencingKit());
+    target.setSequencingKitLot(source.getSequencingKitLot());
     target.setDataApproved(source.isDataApproved());
     target.setDataApprover(target.isDataApproved() == null ? null : source.getDataApprover());
     if (isIlluminaRun(target)) {

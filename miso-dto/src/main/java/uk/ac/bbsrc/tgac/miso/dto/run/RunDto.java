@@ -36,6 +36,7 @@ public class RunDto {
   private Long sequencingParametersId;
   private String sequencingParametersName;
   private Long sequencingKitId;
+  private String sequencingKitLot;
   private String runPath;
   private List<ContainerDto> containers;
   private Boolean dataApproved;
@@ -168,6 +169,14 @@ public class RunDto {
 
   public void setSequencingKitId(Long sequencingKitId) {
     this.sequencingKitId = sequencingKitId;
+  }
+
+  public String getSequencingKitLot() {
+    return sequencingKitLot;
+  }
+
+  public void setSequencingKitLot(String sequencingKitLot) {
+    this.sequencingKitLot = sequencingKitLot;
   }
 
   public String getRunPath() {

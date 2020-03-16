@@ -153,7 +153,7 @@ public interface Library extends Attachable, Comparable<Library>, Deletable, Hie
    * 
    * @return Boolean paired.
    */
-  Boolean getPaired();
+  public Boolean getPaired();
 
   /**
    * Sets the paired attribute of this Library object, i.e. true is paired, false is single.
@@ -161,7 +161,7 @@ public interface Library extends Attachable, Comparable<Library>, Deletable, Hie
    * @param paired
    *          paired.
    */
-  void setPaired(Boolean paired);
+  public void setPaired(Boolean paired);
 
   /**
    * Returns the libraryType of this Library object.
@@ -272,9 +272,9 @@ public interface Library extends Attachable, Comparable<Library>, Deletable, Hie
 
   public IndexFamily getCurrentFamily();
 
-  Integer getDnaSize();
+  public Integer getDnaSize();
 
-  void setDnaSize(Integer dnaSize);
+  public void setDnaSize(Integer dnaSize);
 
   public void setBoxPosition(LibraryBoxPosition boxPosition);
 
@@ -290,9 +290,13 @@ public interface Library extends Attachable, Comparable<Library>, Deletable, Hie
    */
   public void setCreationDate(Date creationDate);
 
-  KitDescriptor getKitDescriptor();
+  public KitDescriptor getKitDescriptor();
 
-  void setKitDescriptor(KitDescriptor prepKit);
+  public void setKitDescriptor(KitDescriptor prepKit);
+
+  public String getKitLot();
+
+  public void setKitLot(String kitLot);
 
   /**
    * Returns the concentration units of this Library object.

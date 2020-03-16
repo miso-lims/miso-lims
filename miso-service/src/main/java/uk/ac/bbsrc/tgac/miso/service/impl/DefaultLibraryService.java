@@ -496,6 +496,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     } else {
       target.setKitDescriptor(null);
     }
+    target.setKitLot(source.getKitLot());
     target.setSpikeIn(source.getSpikeIn());
     if (target.getSpikeIn() == null) {
       target.setSpikeInDilutionFactor(null);
