@@ -98,6 +98,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String PRINTER = "Printer";
     public static final String PRIORITY = "Priority";
     public static final String PROJECT = "Project";
+    public static final String PROJECTS = "Projects";
     public static final String PURPOSE = "Purpose";
     public static final String QC = "QC";
     public static final String QC_NOTE = "QC Note";

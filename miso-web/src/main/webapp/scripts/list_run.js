@@ -77,6 +77,11 @@ ListTarget.run = {
   createColumns: function(config, projectId) {
     return [ListUtils.idHyperlinkColumn("Name", Urls.ui.runs.edit, "id", Utils.array.getName, 1, true),
         ListUtils.labelHyperlinkColumn("Alias", Urls.ui.runs.edit, Utils.array.getId, "alias", 0, true), {
+          sTitle: "Projects",
+          mData: "projectsLabel",
+          include: true,
+          bSortable: false
+        }, {
           "sTitle": "Seq. Params.",
           "mData": "sequencingParametersName",
           "include": true,

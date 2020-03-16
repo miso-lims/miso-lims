@@ -310,8 +310,8 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListRunsSetup() throws Exception {
-    testTabbedPageSetup(ListTarget.RUNS, Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.SEQ_PARAMS, Columns.STATUS,
-        Columns.START_DATE, Columns.END_DATE, Columns.LAST_MODIFIED));
+    testTabbedPageSetup(ListTarget.RUNS, Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.PROJECTS, Columns.SEQ_PARAMS,
+        Columns.STATUS, Columns.START_DATE, Columns.END_DATE, Columns.LAST_MODIFIED));
   }
 
   @Test
