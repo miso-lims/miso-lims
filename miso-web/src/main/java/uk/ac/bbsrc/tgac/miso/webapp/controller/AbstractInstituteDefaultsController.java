@@ -100,7 +100,7 @@ public abstract class AbstractInstituteDefaultsController<Model extends Aliasabl
 
   @RequestMapping("/list")
   public ModelAndView list(ModelMap model) throws IOException {
-
+    model.addAttribute("title", getName());
     return listPage.list(model,
         getAll().stream().map(AbstractInstituteDefaultsController.this::asDto));
   }

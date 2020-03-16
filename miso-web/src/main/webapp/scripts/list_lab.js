@@ -22,12 +22,12 @@
  */
 
 ListTarget.lab = {
-  name: "Labs",
+  name: 'Labs',
   getUserManualUrl: function() {
     return Urls.external.userManual('type_data', 'labs-and-institutes');
   },
   createUrl: function(config, projectId) {
-    throw new Error("Must be provided statically");
+    throw new Error('Must be provided statically');
   },
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {
@@ -35,8 +35,8 @@ ListTarget.lab = {
   },
   createStaticActions: function(config, projectId) {
     return config.isInternal ? [{
-      "name": "Add",
-      "handler": function() {
+      name: 'Add',
+      handler: function() {
 
         Utils.showDialog('Create Labs', 'Create', [{
           property: 'quantity',
@@ -45,7 +45,7 @@ ListTarget.lab = {
           value: 1
         }], function(result) {
           if (result.quantity < 1) {
-            Utils.showOkDialog('Create Labs', ["That's a peculiar number of labs to create."]);
+            Utils.showOkDialog('Create Labs', ['That\'s a peculiar number of labs to create.']);
             return;
           }
           window.location = Urls.ui.labs.bulkCreate + '?' + jQuery.param({
@@ -57,16 +57,18 @@ ListTarget.lab = {
   },
   createColumns: function(config, projectId) {
     return [{
-      "sTitle": "Alias",
-      "mData": "alias",
-      "include": true,
-      "iSortPriority": 0
+      sTitle: 'Alias',
+      mData: 'alias',
+      iSortPriority: 1,
+      bSortDirection: true
     }, {
-      "sTitle": "Institute",
-      "mData": "instituteId",
-      "include": true,
-      "iSortPriority": 0,
-      "mRender": ListUtils.render.textFromId(config.institutes, 'alias')
-    }, ];
+      sTitle: 'Institute',
+      mData: 'instituteId',
+      mRender: ListUtils.render.textFromId(config.institutes, 'alias')
+    }, {
+      sTitle: 'Archived',
+      mData: 'archived',
+      mRender: ListUtils.render.booleanChecks
+    }];
   }
 };

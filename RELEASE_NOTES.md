@@ -2,7 +2,7 @@
 
 Changes:
 
-
+  * Allow archiving labs and institutes
 
 # 1.1.0
 

@@ -248,7 +248,7 @@ Urls = (function() {
   var instituteUiBase = baseUrl + '/institute'
   ui.institutes = {
     bulkCreate: instituteUiBase + '/bulk/new',
-    bulkdEdit: instituteUiBase + '/bulk/edit'
+    bulkEdit: instituteUiBase + '/bulk/edit'
   };
 
   var instituteRestBase = restBase + '/institutes';

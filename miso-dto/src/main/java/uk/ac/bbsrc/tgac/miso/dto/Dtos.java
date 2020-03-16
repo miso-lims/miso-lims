@@ -975,6 +975,7 @@ public class Dtos {
     InstituteDto dto = new InstituteDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
+    setBoolean(dto::setArchived, from.isArchived(), true);
     dto.setCreationDate(formatDateTime(from.getCreationDate()));
     dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
     setLong(dto::setCreatedById, maybeGetProperty(from.getCreatedBy(), User::getId), true);
@@ -989,6 +990,7 @@ public class Dtos {
   public static Institute to(@Nonnull InstituteDto from) {
     Institute to = new InstituteImpl();
     to.setAlias(from.getAlias());
+    setBoolean(to::setArchived, from.getArchived(), false);
     return to;
   }
 
@@ -997,8 +999,10 @@ public class Dtos {
     dto.setId(from.getId());
     dto.setInstituteId(from.getInstitute().getId());
     dto.setInstituteAlias(from.getInstitute().getAlias());
+    setBoolean(dto::setInstituteArchived, maybeGetProperty(from.getInstitute(), Institute::isArchived), true);
     dto.setAlias(from.getAlias());
     dto.setLabel(from.getItemLabel());
+    setBoolean(dto::setArchived, from.isArchived(), true);
     dto.setCreationDate(formatDateTime(from.getCreationDate()));
     dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
     setLong(dto::setCreatedById, maybeGetProperty(from.getCreatedBy(), User::getId), true);
@@ -1013,6 +1017,7 @@ public class Dtos {
   public static Lab to(@Nonnull LabDto from) {
     Lab to = new LabImpl();
     to.setAlias(from.getAlias());
+    setBoolean(to::setArchived, from.getArchived(), false);
     return to;
   }
 

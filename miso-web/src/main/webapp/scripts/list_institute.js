@@ -22,12 +22,12 @@
  */
 
 ListTarget.institute = {
-  name: "Institutes",
+  name: 'Institutes',
   getUserManualUrl: function() {
     return Urls.external.userManual('type_data', 'labs-and-institutes');
   },
   createUrl: function(config, projectId) {
-    throw new Error("Must be provided statically");
+    throw new Error('Must be provided statically');
   },
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {
@@ -35,8 +35,8 @@ ListTarget.institute = {
   },
   createStaticActions: function(config, projectId) {
     return config.isInternal ? [{
-      "name": "Add",
-      "handler": function() {
+      name: 'Add',
+      handler: function() {
 
         Utils.showDialog('Create Institutes', 'Create', [{
           property: 'quantity',
@@ -45,7 +45,7 @@ ListTarget.institute = {
           value: 1
         }], function(result) {
           if (result.quantity < 1) {
-            Utils.showOkDialog("Create Institutes", ["That's a peculiar number of institutes to create."]);
+            Utils.showOkDialog('Create Institutes', ['That\'s a peculiar number of institutes to create.']);
             return;
           }
           window.location = Urls.ui.institutes.bulkCreate + '?' + jQuery.param({
@@ -57,10 +57,14 @@ ListTarget.institute = {
   },
   createColumns: function(config, projectId) {
     return [{
-      "sTitle": "Alias",
-      "mData": "alias",
-      "include": true,
-      "iSortPriority": 0
-    }, ];
+      sTitle: 'Alias',
+      mData: 'alias',
+      iSortPriority: 1,
+      bSortDirection: true
+    }, {
+      sTitle: 'Archived',
+      mData: 'archived',
+      mRender: ListUtils.render.booleanChecks
+    }];
   }
 };

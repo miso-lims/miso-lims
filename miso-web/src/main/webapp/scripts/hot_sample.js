@@ -230,7 +230,9 @@ HotTarget.sample = (function() {
             }
           },
           HotUtils.makeColumnForConstantsList('Received From', includeReceiptColumns, 'receivedFrom', 'senderLabId', 'id', 'label',
-              Constants.labs, true, {
+              Constants.labs.filter(function(lab) {
+                return !lab.archived && !lab.instituteArchived;
+              }), true, {
                 depends: ['*start', 'receivedDate'],
                 update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
                   setReadOnly(!flat.receivedDate);

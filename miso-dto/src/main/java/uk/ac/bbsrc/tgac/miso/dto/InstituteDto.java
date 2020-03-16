@@ -7,6 +7,7 @@ public class InstituteDto {
   
   private Long id;
   private String alias;
+  private Boolean archived;
   private Long createdById;
   private String creationDate;
   private Long updatedById;
@@ -28,6 +29,14 @@ public class InstituteDto {
     this.alias = alias;
   }
   
+  public Boolean getArchived() {
+    return archived;
+  }
+
+  public void setArchived(boolean archived) {
+    this.archived = archived;
+  }
+
   public Long getCreatedById() {
     return createdById;
   }

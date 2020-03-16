@@ -8,8 +8,10 @@ public class LabDto {
   private Long id;
   private Long instituteId;
   private String instituteAlias;
+  private Boolean instituteArchived;
   private String alias;
   private String label;
+  private Boolean archived;
   private Long createdById;
   private String creationDate;
   private Long updatedById;
@@ -39,6 +41,14 @@ public class LabDto {
     this.instituteAlias = instituteAlias;
   }
 
+  public Boolean getInstituteArchived() {
+    return instituteArchived;
+  }
+
+  public void setInstituteArchived(Boolean instituteArchived) {
+    this.instituteArchived = instituteArchived;
+  }
+
   public String getAlias() {
     return alias;
   }
@@ -53,6 +63,14 @@ public class LabDto {
 
   public void setLabel(String label) {
     this.label = label;
+  }
+
+  public Boolean getArchived() {
+    return archived;
+  }
+
+  public void setArchived(Boolean archived) {
+    this.archived = archived;
   }
 
   public Long getCreatedById() {

@@ -10,39 +10,43 @@ import com.eaglegenomics.simlims.core.User;
  */
 public interface Lab extends Serializable, Aliasable, Deletable {
 
-  void setAlias(String alias);
+  public void setAlias(String alias);
+
+  public boolean isArchived();
+
+  public void setArchived(boolean archived);
   
   /**
    * @return the Institute to which this Lab belongs
    */
-  Institute getInstitute();
+  public Institute getInstitute();
   
   /**
    * Sets the Institute to which this Lab belongs
    * 
    * @param institute
    */
-  void setInstitute(Institute institute);
+  public void setInstitute(Institute institute);
 
-  User getCreatedBy();
+  public User getCreatedBy();
 
-  void setCreatedBy(User createdBy);
+  public void setCreatedBy(User createdBy);
 
-  Date getCreationDate();
+  public Date getCreationDate();
 
-  void setCreationDate(Date creationDate);
+  public void setCreationDate(Date creationDate);
 
-  User getUpdatedBy();
+  public User getUpdatedBy();
 
-  void setUpdatedBy(User updatedBy);
+  public void setUpdatedBy(User updatedBy);
 
-  Date getLastUpdated();
+  public Date getLastUpdated();
 
-  void setLastUpdated(Date lastUpdated);
+  public void setLastUpdated(Date lastUpdated);
 
   /**
    * Get custom label for dropdown options
    */
-  String getItemLabel();
+  public String getItemLabel();
 
 }

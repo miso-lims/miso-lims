@@ -69,6 +69,7 @@ public class DefaultLabService implements LabService {
     Lab updatedLab = get(lab.getId());
     updatedLab.setAlias(lab.getAlias());
     updatedLab.setInstitute(instituteDao.getInstitute(instituteId));
+    updatedLab.setArchived(lab.isArchived());
     User user = authorizationManager.getCurrentUser();
     updatedLab.setUpdatedBy(user);
     labDao.update(updatedLab);
