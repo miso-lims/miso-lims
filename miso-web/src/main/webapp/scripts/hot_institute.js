@@ -17,7 +17,7 @@ HotTarget.institute = {
     return [HotUtils.makeColumnForText('Name', true, 'alias', {
       unpackAfterSave: true,
       validator: HotUtils.validator.requiredText
-    }), ];
+    }), HotUtils.makeColumnForBoolean('Archived', true, 'archived', true)];
   },
 
   getBulkActions: function(config) {

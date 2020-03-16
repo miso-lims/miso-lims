@@ -20,7 +20,7 @@ HotTarget.lab = {
           validator: HotUtils.validator.requiredText
         }),
         HotUtils.makeColumnForConstantsList('Institute', true, 'instituteAlias', 'instituteId', 'id', 'alias', config.institutes, true, {},
-            null), ];
+            null), HotUtils.makeColumnForBoolean('Archived', true, 'archived', true)];
   },
 
   getBulkActions: function(config) {

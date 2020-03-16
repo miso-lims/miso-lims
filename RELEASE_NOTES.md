@@ -2,7 +2,8 @@
 
 Changes:
 
-  * show included projects in Runs list
+  * Show included projects in Runs list
+  * Allow archiving labs and institutes
 
 # 1.1.0
 

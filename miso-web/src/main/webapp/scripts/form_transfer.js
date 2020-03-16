@@ -52,7 +52,9 @@ FormTarget.transfer = (function($) {
           title: 'Sender Lab (External)',
           data: 'senderLabId',
           type: 'dropdown',
-          source: Constants.labs,
+          source: Constants.labs.filter(function(lab) {
+            return lab.id === object.senderLabId || (!lab.archived && !lab.instituteArchived)
+          }),
           getItemLabel: function(item) {
             return item.label;
           },
