@@ -36,6 +36,11 @@
   });
 </script>
 
+<c:if test="${pageMode eq 'edit'}">
+  <br>
+  <miso:changelog item="${transfer}"/>
+</c:if>
+
 </div>
 </div>
 

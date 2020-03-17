@@ -9,6 +9,7 @@ Changes:
     * Run sequencing kit
     * Container clustering kit
     * Container multiplexing ki
+  * Added change logs to transfers
 
 # 1.1.0
 
