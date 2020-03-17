@@ -75,6 +75,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
@@ -90,6 +91,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.BoxDto;
 import uk.ac.bbsrc.tgac.miso.dto.DetailedSampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotSingleCellDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
@@ -120,6 +122,8 @@ public class EditSampleController {
   private ProjectService projectService;
   @Autowired
   private SampleService sampleService;
+  @Autowired
+  private LibraryService libraryService;
   @Autowired
   private SampleValidRelationshipService sampleValidRelationshipService;
   @Autowired
@@ -222,8 +226,9 @@ public class EditSampleController {
 
     model.put("sampleCategory",
         LimsUtils.isDetailedSample(sample) ? ((DetailedSample) sample).getSampleClass().getSampleCategory() : "plain");
-    model.put("sampleLibraries", sample.getLibraries().stream().map(lib -> Dtos.asDto(lib, false)).collect(Collectors.toList()));
-    Set<Pool> pools = sample.getLibraries().stream()
+    List<LibraryDto> libraries = sample.getId() == SampleImpl.UNSAVED_ID ? Collections.emptyList() : libraryService.listBySampleId(sample.getId()).stream().map(lib -> Dtos.asDto(lib, false)).collect(Collectors.toList());
+    model.put("sampleLibraries", libraries);
+    Set<Pool> pools = libraries.stream()
         .flatMap(WhineyFunction.flatRethrow(library -> poolService.listByLibraryId(library.getId())))
         .distinct().collect(Collectors.toSet());
     List<RunDto> runDtos = pools.stream().flatMap(WhineyFunction.flatRethrow(pool -> runService.listByPoolId(pool.getId())))
@@ -241,7 +246,7 @@ public class EditSampleController {
         .collect(Collectors.toList()));
 
     model.put("sample", sample);
-    SampleDto sampleDto = Dtos.asDto(sample, false);
+    SampleDto sampleDto = Dtos.asDto(sample, false, libraries.size());
     setRelatedSlideDtos(sample, sampleDto);
     model.put("sampleDto", sample.getId() == SampleImpl.UNSAVED_ID ? "null" : mapper.writeValueAsString(sampleDto));
 
@@ -435,7 +440,13 @@ public class EditSampleController {
 
     @Override
     protected SampleDto asDto(Sample model) {
-      SampleDto dto = Dtos.asDto(model, true);
+      int libraryCount;
+      try {
+        libraryCount = libraryService.listBySampleId(model.getId()).size();
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+      SampleDto dto = Dtos.asDto(model, true, libraryCount);
       setRelatedSlideDtos(model, dto);
       return dto;
     }

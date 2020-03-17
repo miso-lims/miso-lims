@@ -74,6 +74,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferItem;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
@@ -104,6 +105,8 @@ public class SampleRestController extends RestController {
 
   protected static final Logger log = LoggerFactory.getLogger(SampleRestController.class);
 
+  @Autowired
+  private LibraryService libraryService;
   @Autowired
   private SampleService sampleService;
   @Autowired
@@ -378,7 +381,7 @@ public class SampleRestController extends RestController {
 
         @Override
         public Stream<Library> find(Sample model, Consumer<String> emitError) {
-          Set<Library> children = RelationFinder.ChildrenSampleAdapter.searchChildrenLibraries((DetailedSample) model)
+          Set<Library> children = RelationFinder.ChildrenSampleAdapter.searchChildrenLibraries((DetailedSample) model, libraryService)
               .collect(Collectors.toSet());
           if (children.isEmpty()) {
             emitError.accept(String.format("%s (%s) has no %s.", model.getName(), model.getAlias(), category()));
@@ -397,7 +400,7 @@ public class SampleRestController extends RestController {
 
         @Override
         public Stream<LibraryAliquot> find(Sample model, Consumer<String> emitError) {
-          Set<LibraryAliquot> children = RelationFinder.ChildrenSampleAdapter.searchChildrenLibraries((DetailedSample) model)
+          Set<LibraryAliquot> children = RelationFinder.ChildrenSampleAdapter.searchChildrenLibraries((DetailedSample) model, libraryService)
               .flatMap(library -> library.getLibraryAliquots().stream()).collect(Collectors.toSet());
           if (children.isEmpty()) {
             emitError.accept(String.format("%s (%s) has no %s.", model.getName(), model.getAlias(), category()));
@@ -417,7 +420,7 @@ public class SampleRestController extends RestController {
         @Override
         public Stream<Pool> find(Sample model, Consumer<String> emitError) {
           Set<Pool> children = new HashSet<>();
-          for (LibraryAliquot aliquot : RelationFinder.ChildrenSampleAdapter.searchChildrenLibraries((DetailedSample) model)
+          for (LibraryAliquot aliquot : RelationFinder.ChildrenSampleAdapter.searchChildrenLibraries((DetailedSample) model, libraryService)
               .flatMap(library -> library.getLibraryAliquots().stream()).collect(Collectors.toList())) {
             try {
               children.addAll(poolService.listByLibraryAliquotId(aliquot.getId()));
