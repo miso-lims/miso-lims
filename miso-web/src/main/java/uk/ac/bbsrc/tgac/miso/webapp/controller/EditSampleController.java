@@ -69,12 +69,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.core.service.ListTransferViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
@@ -137,6 +137,8 @@ public class EditSampleController {
   private ArrayRunService arrayRunService;
   @Autowired
   private BoxService boxService;
+  @Autowired
+  private ListTransferViewService listTransferViewService;
   @Autowired
   private AuthorizationManager authorizationManager;
 
@@ -225,7 +227,7 @@ public class EditSampleController {
 
     model.put("sampleCategory",
         LimsUtils.isDetailedSample(sample) ? ((DetailedSample) sample).getSampleClass().getSampleCategory() : "plain");
-    List<LibraryDto> libraries = sample.getId() == SampleImpl.UNSAVED_ID ? Collections.emptyList() : libraryService.listBySampleId(sample.getId()).stream().map(lib -> Dtos.asDto(lib, false)).collect(Collectors.toList());
+    List<LibraryDto> libraries = sample.isSaved() ? libraryService.listBySampleId(sample.getId()).stream().map(lib -> Dtos.asDto(lib, false)).collect(Collectors.toList()) : Collections.emptyList();
     model.put("sampleLibraries", libraries);
     Set<Pool> pools = libraries.stream()
         .flatMap(WhineyFunction.flatRethrow(library -> poolService.listByLibraryId(library.getId())))
@@ -239,8 +241,7 @@ public class EditSampleController {
     model.put("sampleRelations", getRelations(sample));
     addArrayData(sampleId, model);
 
-    model.put("sampleTransfers", sample.getTransfers().stream()
-        .map(TransferSample::getTransfer)
+    model.put("sampleTransfers", listTransferViewService.listBySample(sample).stream()
         .map(Dtos::asDto)
         .collect(Collectors.toList()));
 

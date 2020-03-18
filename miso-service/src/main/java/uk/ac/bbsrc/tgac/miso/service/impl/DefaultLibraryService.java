@@ -269,8 +269,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   }
 
   @Override
-  public Library getAdjacentLibrary(long libraryId, boolean before) throws IOException {
-    return libraryDao.getAdjacentLibrary(libraryId, before);
+  public Library getAdjacentLibrary(Library library, boolean before) throws IOException {
+    return libraryDao.getAdjacentLibrary(library, before);
   }
 
   @Override

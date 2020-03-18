@@ -14,7 +14,20 @@ ListTarget.transfer = (function() {
       return [{
         name: 'Add',
         handler: function() {
-          window.location = Urls.ui.transfers.create;
+          var params = {};
+          if (config.sampleId) {
+            params.sampleIds = config.sampleId;
+          } else if (config.libraryId) {
+            params.libraryIds = config.libraryId;
+          } else if (config.libraryAliquotId) {
+            params.libraryAliquotIds = config.libraryAliquotId;
+          } else if (config.poolId) {
+            params.poolIds = config.poolId;
+          } else {
+            window.location = Urls.ui.transfers.create;
+            return;
+          }
+          window.location = Urls.ui.transfers.create + '?' + jQuery.param(params);
         }
       }];
     },

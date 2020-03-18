@@ -45,21 +45,14 @@ import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.Group;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import net.sf.json.JSONArray;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
@@ -75,7 +68,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
@@ -83,6 +75,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryTemplateService;
+import uk.ac.bbsrc.tgac.miso.core.service.ListTransferViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
@@ -121,7 +114,6 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
  */
 @Controller
 @RequestMapping("/library")
-@SessionAttributes("library")
 public class EditLibraryController {
   protected static final Logger log = LoggerFactory.getLogger(EditLibraryController.class);
 
@@ -181,6 +173,8 @@ public class EditLibraryController {
   @Autowired
   private InstrumentService instrumentService;
   @Autowired
+  private ListTransferViewService listTransferViewService;
+  @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
   private NamingSchemeHolder namingSchemeHolder;
@@ -197,8 +191,6 @@ public class EditLibraryController {
     this.runService = runService;
   }
 
-  @Value("${miso.autoGenerateIdentificationBarcodes}")
-  private Boolean autoGenerateIdBarcodes;
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
   @Value("${miso.display.library.bulk.libraryalias}")
@@ -210,21 +202,16 @@ public class EditLibraryController {
   @Value("${miso.defaults.sample.bulk.scientificname:}")
   private String defaultSciName;
 
-  @ModelAttribute("autoGenerateIdBarcodes")
-  public Boolean autoGenerateIdentificationBarcodes() {
-    return autoGenerateIdBarcodes;
-  }
-
   public Boolean isDetailedSampleEnabled() {
     return detailedSample;
   }
 
-  public void addAdjacentLibraries(Library l, ModelMap model) throws IOException {
-    if (l.getId() == AbstractLibrary.UNSAVED_ID) {
+  public void addAdjacentLibraries(Library library, ModelMap model) throws IOException {
+    if (library.getId() == AbstractLibrary.UNSAVED_ID) {
       return;
     }
-    model.put("previousLibrary", libraryService.getAdjacentLibrary(l.getId(), true));
-    model.put("nextLibrary", libraryService.getAdjacentLibrary(l.getId(), false));
+    model.put("previousLibrary", libraryService.getAdjacentLibrary(library, true));
+    model.put("nextLibrary", libraryService.getAdjacentLibrary(library, false));
 
   }
 
@@ -258,8 +245,7 @@ public class EditLibraryController {
       SampleIdentity identity = getParent(SampleIdentity.class, (DetailedSample) detailed.getSample());
       model.put("effectiveExternalNames", identity.getExternalName());
     }
-    model.put("libraryTransfers", library.getTransfers().stream()
-        .map(TransferLibrary::getTransfer)
+    model.put("libraryTransfers", listTransferViewService.listByLibrary(library).stream()
         .map(Dtos::asDto)
         .collect(Collectors.toList()));
 
@@ -530,36 +516,4 @@ public class EditLibraryController {
 
   }
 
-  @PostMapping
-  public ModelAndView processSubmit(@ModelAttribute("library") Library library, ModelMap model, SessionStatus session)
-      throws IOException {
-    if (library.getId() == AbstractLibrary.UNSAVED_ID) {
-      libraryService.create(library);
-    } else {
-      libraryService.update(library);
-    }
-
-    session.setComplete();
-    model.clear();
-    return new ModelAndView("redirect:/miso/library/" + library.getId(), model);
-  }
-
-  @PostMapping(value = "/bulk/create")
-  public String processBulkSubmit(@RequestBody JSONArray librariesDtos) throws IOException {
-    if (librariesDtos != null && librariesDtos.size() > 0) {
-      List<Long> savedLibraryIds = new ArrayList<>();
-
-      for (Object lDto : librariesDtos) {
-        ObjectMapper mapper = new ObjectMapper();
-        LibraryDto libDto = mapper.readValue(lDto.toString(), LibraryDto.class);
-        Library library = Dtos.to(libDto);
-
-        Long savedId = libraryService.create(library);
-        savedLibraryIds.add(savedId);
-      }
-      return "redirect:/miso/library/bulk/edit/" + savedLibraryIds.toString();
-    } else {
-      throw new IOException("There are no libraries to save!");
-    }
-  }
 }

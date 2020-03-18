@@ -1420,16 +1420,6 @@ public class Dtos {
     setId(dto::setWorkstationId, from.getWorkstation());
     setId(dto::setThermalCyclerId, from.getThermalCycler());
 
-    TransferItem<?> receipt = from.getReceiptTransfer();
-    if (receipt != null) {
-      setDateTimeString(dto::setReceivedTime, receipt.getTransfer().getTransferTime());
-      setId(dto::setSenderLabId, receipt.getTransfer().getSenderLab());
-      setId(dto::setRecipientGroupId, receipt.getTransfer().getRecipientGroup());
-      setBoolean(dto::setReceived, receipt.isReceived(), true);
-      setBoolean(dto::setReceiptQcPassed, receipt.isQcPassed(), true);
-      setString(dto::setReceiptQcNote, receipt.getQcNote());
-    }
-
     return dto;
   }
 

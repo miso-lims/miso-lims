@@ -62,11 +62,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
+import uk.ac.bbsrc.tgac.miso.core.service.ListTransferViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderService;
@@ -115,6 +115,8 @@ public class EditPoolController {
   private IndexChecker indexChecker;
   @Autowired
   private PoolOrderService poolOrderService;
+  @Autowired
+  private ListTransferViewService listTransferViewService;
 
   public void setRunService(RunService runService) {
     this.runService = runService;
@@ -166,8 +168,7 @@ public class EditPoolController {
     model.put("duplicateIndicesSequences", mapper.writeValueAsString(poolDto.getDuplicateIndicesSequences()));
     model.put("nearDuplicateIndicesSequences", mapper.writeValueAsString(poolDto.getNearDuplicateIndicesSequences()));
 
-    model.put("poolTransfers", pool.getTransfers().stream()
-        .map(TransferPool::getTransfer)
+    model.put("poolTransfers", listTransferViewService.listByPool(pool).stream()
         .map(Dtos::asDto)
         .collect(Collectors.toList()));
 

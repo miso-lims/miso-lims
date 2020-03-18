@@ -22,7 +22,7 @@ public interface LibraryService
 
   List<Library> list() throws IOException;
 
-  Library getAdjacentLibrary(long libraryId, boolean before) throws IOException;
+  Library getAdjacentLibrary(Library library, boolean before) throws IOException;
 
   Library getByBarcode(String barcode) throws IOException;
 

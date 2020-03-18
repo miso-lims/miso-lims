@@ -138,7 +138,7 @@
 <c:if test="${library.id != 0}">
   <miso:attachments item="${library}" projectId="${library.sample.project.id}"/>
   <miso:qcs id="list_qcs" item="${library}"/>
-  <miso:list-section id="list_transfer" name="Transfers" target="itemtransfer" items="${libraryTransfers}" config="{ libraryId: ${library.id} }" alwaysShow="true"/>
+  <miso:list-section id="list_transfer" name="Transfers" target="transfer" items="${libraryTransfers}" config="{ libraryId: ${library.id} }" alwaysShow="true"/>
   <miso:list-section id="list_aliquot" name="Library Aliquots" target="libraryaliquot" items="${libraryAliquots}" config="${libraryAliquotsConfig}"/>
   <miso:list-section id="list_pool" name="Pools" target="pool" items="${libraryPools}"/>
   <miso:list-section id="list_run" name="Runs" target="run" items="${libraryRuns}"/>

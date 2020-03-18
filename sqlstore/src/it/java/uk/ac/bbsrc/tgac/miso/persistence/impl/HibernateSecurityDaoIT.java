@@ -165,7 +165,7 @@ public class HibernateSecurityDaoIT extends AbstractDAOTest {
 
   @Test
   public void testListAllGroups() throws IOException {
-    assertEquals(1, dao.listAllGroups().size());
+    assertEquals(2, dao.listAllGroups().size());
   }
   
   @Test

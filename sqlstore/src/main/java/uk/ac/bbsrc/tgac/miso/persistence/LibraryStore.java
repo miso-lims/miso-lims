@@ -157,7 +157,7 @@ public interface LibraryStore extends Store<Library>, PaginatedDataSource<Librar
    */
   long countLibrariesBySearch(String querystr) throws IOException;
 
-  Library getAdjacentLibrary(long libraryId, boolean before) throws IOException;
+  Library getAdjacentLibrary(Library library, boolean before) throws IOException;
 
   List<Library> searchByCreationDate(Date from, Date to) throws IOException;
 

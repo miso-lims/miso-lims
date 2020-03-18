@@ -248,17 +248,14 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   }
 
   @Override
-  public Library getAdjacentLibrary(long libraryId, boolean before) throws IOException {
+  public Library getAdjacentLibrary(Library lib, boolean before) throws IOException {
     AdjacencySelector selector = before ? BEFORE : AFTER;
-
-    Library lib = get(libraryId);
-    if (lib == null) throw new IOException("Library not found");
 
     // get library siblings
     Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
     criteria.createAlias("sample", "sample");
     criteria.add(Restrictions.eq("sample.id", lib.getSample().getId()));
-    criteria.add(selector.generateCriterion("id", libraryId));
+    criteria.add(selector.generateCriterion("id", lib.getId()));
     criteria.addOrder(selector.getOrder("id"));
     criteria.setMaxResults(1);
     Library library = (Library) criteria.uniqueResult();
