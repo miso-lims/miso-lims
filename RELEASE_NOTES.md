@@ -11,6 +11,7 @@ Changes:
     * Container multiplexing kit
   * Log positions that box items are removed from
   * Added change logs to transfers
+  * Performance improvements, especially for Edit Sample, Library, Library Aliquot, and Pool pages
   * Fixed error that caused libraries to be missing from some sample contexts (including Children button and edit Sample page)
   * Fixed error in LDAP configuration
   * Fixed creating samples parented to existing tissues with null times received and tube number
