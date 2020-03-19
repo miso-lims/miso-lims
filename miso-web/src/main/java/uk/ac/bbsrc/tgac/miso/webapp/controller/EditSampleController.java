@@ -42,11 +42,9 @@ import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.Group;
@@ -68,7 +66,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
-import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
@@ -80,7 +77,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
-import uk.ac.bbsrc.tgac.miso.core.service.StainService;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
@@ -111,7 +107,6 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
 @RequestMapping("/sample")
-@SessionAttributes("sample")
 public class EditSampleController {
 
   private final ObjectMapper mapper = new ObjectMapper();
@@ -129,15 +124,26 @@ public class EditSampleController {
   @Autowired
   private RunService runService;
   @Autowired
-  private StainService stainService;
-  @Autowired
   private ArrayService arrayService;
   @Autowired
   private ArrayRunService arrayRunService;
   @Autowired
   private BoxService boxService;
   @Autowired
+  private SampleClassService sampleClassService;
+  @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private IndexChecker indexChecker;
+
+  @Value("${miso.detailed.sample.enabled}")
+  private Boolean detailedSample;
+  @Value("${miso.defaults.sample.bulk.scientificname:}")
+  private String defaultSciName;
+  @Value("${miso.defaults.sample.lcmtube.groupid:}")
+  private String defaultLcmTubeGroupId;
+  @Value("${miso.defaults.sample.lcmtube.groupdescription:}")
+  private String defaultLcmTubeGroupDesc;
 
   public void setProjectService(ProjectService projectService) {
     this.projectService = projectService;
@@ -167,24 +173,8 @@ public class EditSampleController {
     this.runService = runService;
   }
 
-  @Value("${miso.detailed.sample.enabled}")
-  private Boolean detailedSample;
-  @Value("${miso.defaults.sample.bulk.scientificname:}")
-  private String defaultSciName;
-  @Value("${miso.defaults.sample.lcmtube.groupid:}")
-  private String defaultLcmTubeGroupId;
-  @Value("${miso.defaults.sample.lcmtube.groupdescription:}")
-  private String defaultLcmTubeGroupDesc;
-  @Autowired
-  private IndexChecker indexChecker;
-
   private Boolean isDetailedSampleEnabled() {
     return detailedSample;
-  }
-
-  @ModelAttribute("defaultSciName")
-  public String getDefaultSciName() {
-    return defaultSciName != null ? defaultSciName : "";
   }
 
   private static class Config {
@@ -203,14 +193,6 @@ public class EditSampleController {
     private static final String BOX = "box";
     private static final String RECIPIENT_GROUPS = "recipientGroups";
   }
-
-  @ModelAttribute("stains")
-  public List<Stain> populateStains() throws IOException {
-    return stainService.list();
-  }
-
-  @Autowired
-  private SampleClassService sampleClassService;
 
   @GetMapping(value = "/{sampleId}")
   public ModelAndView setupForm(@PathVariable Long sampleId, ModelMap model) throws IOException {

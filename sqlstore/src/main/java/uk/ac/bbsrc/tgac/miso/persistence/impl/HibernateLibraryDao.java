@@ -31,6 +31,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
@@ -248,7 +249,7 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   }
 
   @Override
-  public Library getAdjacentLibrary(Library lib, boolean before) throws IOException {
+  public EntityReference getAdjacentLibrary(Library lib, boolean before) throws IOException {
     AdjacencySelector selector = before ? BEFORE : AFTER;
 
     // get library siblings
@@ -258,7 +259,9 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
     criteria.add(selector.generateCriterion("id", lib.getId()));
     criteria.addOrder(selector.getOrder("id"));
     criteria.setMaxResults(1);
-    Library library = (Library) criteria.uniqueResult();
+    criteria.setProjection(EntityReference.makeProjectionList("id", "alias"));
+    criteria.setResultTransformer(EntityReference.RESULT_TRANSFORMER);
+    EntityReference library = (EntityReference) criteria.uniqueResult();
     if (library != null) return library;
 
     // get library cousins
@@ -270,7 +273,9 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
     criteria.addOrder(selector.getOrder("sample.id"));
     criteria.addOrder(selector.getOrder("id"));
     criteria.setMaxResults(1);
-    library = (Library) criteria.uniqueResult();
+    criteria.setProjection(EntityReference.makeProjectionList("id", "alias"));
+    criteria.setResultTransformer(EntityReference.RESULT_TRANSFORMER);
+    library = (EntityReference) criteria.uniqueResult();
     return library;
   }
 

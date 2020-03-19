@@ -65,12 +65,12 @@
   </ul>
   <c:if test="${not empty nextLibrary}">
     <span style="float:right; padding-top: 5px; padding-left: 6px">
-      <a class='arrowright' href='<c:url value="/miso/library/${nextLibrary.id}"/>'>Next Library <b>${nextLibrary.alias}</b></a>
+      <a class='arrowright' href='<c:url value="/miso/library/${nextLibrary.id}"/>'>Next Library <b>${nextLibrary.label}</b></a>
     </span>
   </c:if>
   <c:if test="${not empty previousLibrary}">
     <span style="float:right; padding-top: 5px">
-      <a class='arrowleft' href='<c:url value="/miso/library/${previousLibrary.id}"/>'>Previous Library <b>${previousLibrary.alias}</b></a>
+      <a class='arrowleft' href='<c:url value="/miso/library/${previousLibrary.id}"/>'>Previous Library <b>${previousLibrary.label}</b></a>
     </span>
   </c:if>
 </div>

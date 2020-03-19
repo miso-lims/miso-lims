@@ -50,6 +50,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl.IdentityBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
@@ -1131,12 +1132,12 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   }
 
   @Override
-  public Sample getNextInProject(Sample sample) {
+  public EntityReference getNextInProject(Sample sample) {
     return sampleStore.getNextInProject(sample);
   }
 
   @Override
-  public Sample getPreviousInProject(Sample sample) {
+  public EntityReference getPreviousInProject(Sample sample) {
     return sampleStore.getPreviousInProject(sample);
   }
 

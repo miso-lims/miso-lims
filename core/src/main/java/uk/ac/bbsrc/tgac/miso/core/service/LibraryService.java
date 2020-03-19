@@ -7,6 +7,7 @@ import java.util.List;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 public interface LibraryService
@@ -23,7 +24,7 @@ public interface LibraryService
 
   public List<Library> list() throws IOException;
 
-  public Library getAdjacentLibrary(Library library, boolean before) throws IOException;
+  public EntityReference getAdjacentLibrary(Library library, boolean before) throws IOException;
 
   public Library getByBarcode(String barcode) throws IOException;
 

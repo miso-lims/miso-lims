@@ -8,6 +8,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 public interface SampleService
@@ -44,9 +45,9 @@ public interface SampleService
 
   public Sample save(Sample sample) throws IOException;
 
-  public Sample getNextInProject(Sample sample);
+  public EntityReference getNextInProject(Sample sample);
 
-  public Sample getPreviousInProject(Sample sample);
+  public EntityReference getPreviousInProject(Sample sample);
 
   public long create(Sample sample, TransferSample transferSample) throws IOException;
 
