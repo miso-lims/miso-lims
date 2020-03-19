@@ -31,7 +31,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
-import uk.ac.bbsrc.tgac.miso.core.service.ListTransferViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
@@ -69,8 +68,6 @@ public class EditLibraryAliquotController {
   @Autowired
   private BoxService boxService;
   @Autowired
-  private ListTransferViewService listTransferViewService;
-  @Autowired
   private IndexChecker indexChecker;
 
   @GetMapping("/{aliquotId}")
@@ -89,7 +86,7 @@ public class EditLibraryAliquotController {
     model.put("aliquotRuns", pools.stream().flatMap(WhineyFunction.flatRethrow(p -> runService.listByPoolId(p.getId()))).map(Dtos::asDto)
         .collect(Collectors.toList()));
 
-    model.put("aliquotTransfers", listTransferViewService.listByLibraryAliquot(aliquot).stream()
+    model.put("aliquotTransfers", aliquot.getTransferViews().stream()
         .map(Dtos::asDto)
         .collect(Collectors.toList()));
 

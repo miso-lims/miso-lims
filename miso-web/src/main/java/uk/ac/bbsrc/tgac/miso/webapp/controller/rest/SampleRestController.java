@@ -72,7 +72,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferItem;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
@@ -82,7 +83,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
-import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.DetailedSampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -183,8 +183,16 @@ public class SampleRestController extends RestController {
   @ResponseStatus(HttpStatus.CREATED)
   public @ResponseBody SampleDto createSample(@RequestBody SampleDto sampleDto)
       throws IOException {
-    return RestUtils.createObject("Sample", sampleDto, WhineyFunction.rethrow(this::buildHierarchy), sampleService,
-        sam -> Dtos.asDto(sam, false));
+    RestUtils.validateDtoProvided("Sample", sampleDto);
+    Sample sample = buildHierarchy(sampleDto);
+    RestUtils.validateNewObject("Sample", sample);
+    TransferSample transferSample = Dtos.toReceiptTransfer(sampleDto, sample);
+    if (transferSample != null) {
+      Transfer transfer = transferSample.getTransfer();
+      timeZoneCorrector.toDbTime(transfer.getTransferTime(), transfer::setTransferTime);
+    }
+    long savedId = sampleService.create(sample, transferSample);
+    return Dtos.asDto(sampleService.get(savedId), false);
   }
 
   /**
@@ -249,15 +257,7 @@ public class SampleRestController extends RestController {
           inferIntermediateSampleClassId(dto, topProcessingClassId, SampleTissueProcessing.CATEGORY_NAME,
               SampleTissue.CATEGORY_NAME, false));
     }
-    return to(sampleDto);
-  }
-
-  private Sample to(SampleDto from) {
-    Sample to = Dtos.to(from);
-    to.getTransfers().stream().map(TransferItem::getTransfer).forEach(transfer -> {
-      timeZoneCorrector.toDbTime(transfer.getTransferTime(), transfer::setTransferTime);
-    });
-    return to;
+    return Dtos.to(sampleDto);
   }
 
   private Long inferIntermediateSampleClassId(DetailedSampleDto dto, Long childClassId,
@@ -280,7 +280,7 @@ public class SampleRestController extends RestController {
   @PutMapping(value = "/{id}")
   @ResponseStatus(HttpStatus.OK)
   public @ResponseBody SampleDto updateSample(@PathVariable long id, @RequestBody SampleDto sampleDto) throws IOException {
-    return RestUtils.updateObject("Sample", id, sampleDto, this::to, sampleService, sam -> Dtos.asDto(sam, false));
+    return RestUtils.updateObject("Sample", id, sampleDto, Dtos::to, sampleService, sam -> Dtos.asDto(sam, false));
   }
 
   /**

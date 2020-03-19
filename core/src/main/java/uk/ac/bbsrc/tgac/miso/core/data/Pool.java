@@ -27,14 +27,12 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QualityControllable;
@@ -243,8 +241,5 @@ public interface Pool extends Comparable<Pool>, Barcodable, Boxable, Nameable, C
   public boolean isMergeChild();
 
   public void makeMergeChild();
-
-  @Override
-  public List<TransferPool> getTransfers();
 
 }

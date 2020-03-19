@@ -26,13 +26,11 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.List;
 
 import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QualityControllable;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
 
@@ -266,8 +264,5 @@ public interface Sample extends Attachable, Comparable<Sample>, Deletable, Hiera
    * @param requisitionId
    */
   public void setRequisitionId(String requisitionId);
-
-  @Override
-  public List<TransferSample> getTransfers();
 
 }

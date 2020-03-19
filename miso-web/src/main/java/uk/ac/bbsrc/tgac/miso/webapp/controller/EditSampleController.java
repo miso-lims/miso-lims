@@ -74,7 +74,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
-import uk.ac.bbsrc.tgac.miso.core.service.ListTransferViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
@@ -137,8 +136,6 @@ public class EditSampleController {
   private ArrayRunService arrayRunService;
   @Autowired
   private BoxService boxService;
-  @Autowired
-  private ListTransferViewService listTransferViewService;
   @Autowired
   private AuthorizationManager authorizationManager;
 
@@ -241,7 +238,7 @@ public class EditSampleController {
     model.put("sampleRelations", getRelations(sample));
     addArrayData(sampleId, model);
 
-    model.put("sampleTransfers", listTransferViewService.listBySample(sample).stream()
+    model.put("sampleTransfers", sample.getTransferViews().stream()
         .map(Dtos::asDto)
         .collect(Collectors.toList()));
 

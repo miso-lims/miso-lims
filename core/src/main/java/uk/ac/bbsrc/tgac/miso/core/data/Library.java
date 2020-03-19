@@ -34,7 +34,6 @@ import com.eaglegenomics.simlims.core.Note;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QualityControllable;
 import uk.ac.bbsrc.tgac.miso.core.data.type.DilutionFactor;
@@ -352,9 +351,6 @@ public interface Library extends Attachable, Comparable<Library>, Deletable, Hie
   public boolean getUmis();
 
   public void setUmis(boolean umis);
-
-  @Override
-  public List<TransferLibrary> getTransfers();
 
   public Workstation getWorkstation();
 

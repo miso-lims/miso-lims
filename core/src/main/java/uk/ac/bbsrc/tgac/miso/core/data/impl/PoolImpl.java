@@ -47,6 +47,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -55,6 +56,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+
+import org.hibernate.annotations.Immutable;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
@@ -70,7 +73,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferPool;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListTransferView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.PoolQC;
@@ -168,8 +171,11 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Transient
   private List<FileAttachment> pendingAttachmentDeletions;
 
-  @OneToMany(mappedBy = "item", cascade = CascadeType.REMOVE)
-  private List<TransferPool> transfers;
+  @Immutable
+  @ManyToMany
+  @JoinTable(name = "Transfer_Pool", joinColumns = { @JoinColumn(name = "poolId") }, inverseJoinColumns = {
+      @JoinColumn(name = "transferId") })
+  private Set<ListTransferView> listTransferViews;
 
   @Transient
   private Set<String> duplicateIndicesSequences;
@@ -558,11 +564,11 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
-  public List<TransferPool> getTransfers() {
-    if (transfers == null) {
-      transfers = new ArrayList<>();
+  public Set<ListTransferView> getTransferViews() {
+    if (listTransferViews == null) {
+      listTransferViews = new HashSet<>();
     }
-    return transfers;
+    return listTransferViews;
   }
 
   @Override

@@ -8,6 +8,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Map;
 
+import org.hibernate.criterion.Restrictions;
 import org.junit.Before;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
@@ -32,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockSingleCellImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissuePieceImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.SamColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
@@ -97,27 +99,40 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
     assertEntityAttribute(SamColumns.SCIENTIFIC_NAME, attributes, sample, Sample::getScientificName);
     assertEntityAttribute(SamColumns.BOX_ALIAS, attributes, sample, s -> s.getBox() == null ? "" : s.getBox().getAlias());
     assertEntityAttribute(SamColumns.BOX_POSITION, attributes, sample, s -> s.getBoxPosition() == null ? "" : s.getBoxPosition());
-    assertEntityAttribute(SamColumns.RECEIVE_DATE, attributes, sample,
-        s -> s.getReceiptTransfer() == null ? "" : LimsUtils.formatDate(s.getReceiptTransfer().getTransfer().getTransferTime()));
-    assertEntityAttribute(SamColumns.RECEIVE_TIME, attributes, sample, AbstractBulkSampleIT::getReceiptTime);
-    assertEntityAttribute(SamColumns.RECEIVED_FROM, attributes, sample,
-        s -> s.getReceiptTransfer() == null ? "" : s.getReceiptTransfer().getTransfer().getSenderLab().getItemLabel());
-    assertEntityAttribute(SamColumns.RECEIVED_BY, attributes, sample,
-        s -> s.getReceiptTransfer() == null ? "" : s.getReceiptTransfer().getTransfer().getRecipientGroup().getName());
-    assertEntityAttribute(SamColumns.RECEIPT_CONFIRMED, attributes, sample,
-        s -> s.getReceiptTransfer() == null ? "" : booleanString(s.getReceiptTransfer().isReceived()));
-    assertEntityAttribute(SamColumns.RECEIPT_QC_PASSED, attributes, sample,
-        s -> s.getReceiptTransfer() == null ? "" : booleanString(s.getReceiptTransfer().isQcPassed()));
-    assertEntityAttribute(SamColumns.RECEIPT_QC_NOTE, attributes, sample,
-        s -> s.getReceiptTransfer() == null ? "" : emptyIfNull(s.getReceiptTransfer().getQcNote()));
+    if (attributes.containsKey(SamColumns.RECEIVE_DATE)) {
+      assertReceiptAttributes(attributes, sample);
+    }
   }
 
-  private static String getReceiptTime(Sample sam) {
-    if (sam.getReceiptTransfer() == null) {
+  protected void assertReceiptAttributes(Map<String, String> attributes, Sample sample) {
+    TransferSample receipt = (TransferSample) getSession().createCriteria(TransferSample.class)
+        .createAlias("transfer", "transfer")
+        .add(Restrictions.eq("item", sample))
+        .add(Restrictions.isNotNull("transfer.senderLab"))
+        .uniqueResult();
+    assertNotNull("A receipt transfer should be created", receipt);
+
+    assertEntityAttribute(SamColumns.RECEIVE_DATE, attributes, receipt,
+        s -> s == null ? "" : LimsUtils.formatDate(s.getTransfer().getTransferTime()));
+    assertEntityAttribute(SamColumns.RECEIVE_TIME, attributes, receipt, AbstractBulkSampleIT::getReceiptTime);
+    assertEntityAttribute(SamColumns.RECEIVED_FROM, attributes, receipt,
+        s -> s == null ? "" : s.getTransfer().getSenderLab().getItemLabel());
+    assertEntityAttribute(SamColumns.RECEIVED_BY, attributes, receipt,
+        s -> s == null ? "" : s.getTransfer().getRecipientGroup().getName());
+    assertEntityAttribute(SamColumns.RECEIPT_CONFIRMED, attributes, receipt,
+        s -> s == null ? "" : booleanString(s.isReceived()));
+    assertEntityAttribute(SamColumns.RECEIPT_QC_PASSED, attributes, receipt,
+        s -> s == null ? "" : booleanString(s.isQcPassed()));
+    assertEntityAttribute(SamColumns.RECEIPT_QC_NOTE, attributes, receipt,
+        s -> s == null ? "" : emptyIfNull(s.getQcNote()));
+  }
+
+  private static String getReceiptTime(TransferSample receipt) {
+    if (receipt == null) {
       return "";
     }
     DateFormat formatter = new SimpleDateFormat("h:mm a");
-    return formatter.format(sam.getReceiptTransfer().getTransfer().getTransferTime()).toLowerCase();
+    return formatter.format(receipt.getTransfer().getTransferTime()).toLowerCase();
   }
 
   protected void assertDetailedSampleAttributes(Map<String, String> attributes, DetailedSample sample) {

@@ -27,22 +27,28 @@ public class RestUtils {
 
   public static <T, R extends Identifiable, S> T createObject(String type, T dto, Function<T, R> toObject, SaveService<R> service,
       Function<R, T> toDto) throws IOException {
-    if (dto == null) {
-      throw new RestException(type + " not provided", Status.BAD_REQUEST);
-    }
+    validateDtoProvided(type, dto);
     R object = toObject.apply(dto);
-    if (object.isSaved()) {
-      throw new RestException(type + " is already saved", Status.BAD_REQUEST);
-    }
+    validateNewObject(type, object);
     long savedId = service.create(object);
     return toDto.apply(service.get(savedId));
   }
 
-  public static <T, R extends Identifiable, S> T updateObject(String type, long targetId, T dto, Function<T, R> toObject,
-      SaveService<R> service, Function<R, T> toDto) throws IOException {
+  public static <T> void validateDtoProvided(String type, T dto) {
     if (dto == null) {
       throw new RestException(type + " not provided", Status.BAD_REQUEST);
     }
+  }
+
+  public static <T extends Identifiable> void validateNewObject(String type, T object) {
+    if (object.isSaved()) {
+      throw new RestException(type + " is already saved", Status.BAD_REQUEST);
+    }
+  }
+
+  public static <T, R extends Identifiable, S> T updateObject(String type, long targetId, T dto, Function<T, R> toObject,
+      SaveService<R> service, Function<R, T> toDto) throws IOException {
+    validateDtoProvided(type, dto);
     R object = toObject.apply(dto);
     if (object.getId() != targetId) {
       throw new RestException(type + " ID mismatch", Status.BAD_REQUEST);

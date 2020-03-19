@@ -75,7 +75,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryTemplateService;
-import uk.ac.bbsrc.tgac.miso.core.service.ListTransferViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
@@ -173,8 +172,6 @@ public class EditLibraryController {
   @Autowired
   private InstrumentService instrumentService;
   @Autowired
-  private ListTransferViewService listTransferViewService;
-  @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
   private NamingSchemeHolder namingSchemeHolder;
@@ -245,7 +242,7 @@ public class EditLibraryController {
       SampleIdentity identity = getParent(SampleIdentity.class, (DetailedSample) detailed.getSample());
       model.put("effectiveExternalNames", identity.getExternalName());
     }
-    model.put("libraryTransfers", listTransferViewService.listByLibrary(library).stream()
+    model.put("libraryTransfers", library.getTransferViews().stream()
         .map(Dtos::asDto)
         .collect(Collectors.toList()));
 

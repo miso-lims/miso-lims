@@ -1,6 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -11,7 +13,10 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
@@ -19,7 +24,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
     @JsonSubTypes.Type(value = DetailedLibraryDto.class, name = "Detailed"),
     @JsonSubTypes.Type(value = LibraryDto.class, name = "Plain") })
 @JsonTypeName(value = "Plain")
-public class LibraryDto extends AbstractBoxableDto {
+public class LibraryDto extends AbstractBoxableDto implements ReceivableDto<Library, TransferLibrary> {
 
   private String alias;
   private String concentration;
@@ -375,50 +380,62 @@ public class LibraryDto extends AbstractBoxableDto {
     this.sample = sample;
   }
 
+  @Override
   public String getReceivedTime() {
     return receivedTime;
   }
 
+  @Override
   public void setReceivedTime(String receivedDate) {
     this.receivedTime = receivedDate;
   }
 
+  @Override
   public Long getSenderLabId() {
     return senderLabId;
   }
 
+  @Override
   public void setSenderLabId(Long senderLabId) {
     this.senderLabId = senderLabId;
   }
 
+  @Override
   public Long getRecipientGroupId() {
     return recipientGroupId;
   }
 
+  @Override
   public void setRecipientGroupId(Long recipientGroupId) {
     this.recipientGroupId = recipientGroupId;
   }
 
+  @Override
   public Boolean isReceived() {
     return received;
   }
 
+  @Override
   public void setReceived(Boolean received) {
     this.received = received;
   }
 
+  @Override
   public Boolean isReceiptQcPassed() {
     return receiptQcPassed;
   }
 
+  @Override
   public void setReceiptQcPassed(Boolean receiptQcPassed) {
     this.receiptQcPassed = receiptQcPassed;
   }
 
+  @Override
   public String getReceiptQcNote() {
     return receiptQcNote;
   }
 
+  @Override
   public void setReceiptQcNote(String receiptQcNote) {
     this.receiptQcNote = receiptQcNote;
   }
@@ -501,6 +518,16 @@ public class LibraryDto extends AbstractBoxableDto {
 
   public void setThermalCyclerId(Long thermalCyclerId) {
     this.thermalCyclerId = thermalCyclerId;
+  }
+
+  @Override
+  public TransferLibrary makeTransferItem() {
+    return new TransferLibrary();
+  }
+
+  @Override
+  public Function<Transfer, Set<TransferLibrary>> getTransferItemsFunction() {
+    return Transfer::getLibraryTransfers;
   }
 
 }

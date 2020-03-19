@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.util.List;
@@ -11,9 +11,6 @@ import org.junit.Test;
 import com.eaglegenomics.simlims.core.Group;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListTransferView;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.TransferType;
 
@@ -57,13 +54,6 @@ public class HibernateListTransferViewDaoIT extends AbstractDAOTest {
     assertNotNull(sut.list(err -> {
       throw new RuntimeException(err);
     }, 0, 10, true, "transferId", filter));
-  }
-
-  @Test
-  public void testListByLibrary() throws Exception {
-    Library library = (Library) currentSession().get(LibraryImpl.class, 2L);
-    List<ListTransferView> transfers = sut.listByLibrary(library);
-    assertEquals(2, transfers.size());
   }
 
 }

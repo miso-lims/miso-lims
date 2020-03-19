@@ -24,6 +24,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListTransferView;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 
@@ -387,7 +388,14 @@ public class DefaultTransferServiceTest {
     item.setTransfer(to);
     item.setReceived(received);
     if (to.isSaved()) {
-      sample.getTransfers().add(item);
+      ListTransferView view = new ListTransferView();
+      view.setId(to.getId());
+      view.setSenderLab(to.getSenderLab());
+      view.setSenderGroup(to.getSenderGroup());
+      view.setRecipientGroup(to.getRecipientGroup());
+      view.setRecipient(to.getRecipient());
+      view.setTransferTime(to.getTransferTime());
+      sample.getTransferViews().add(view);
     }
     to.getSampleTransfers().add(item);
   }

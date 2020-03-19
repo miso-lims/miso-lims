@@ -64,7 +64,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferItem;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibrarySpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
@@ -72,7 +73,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
-import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryAliquotDto;
@@ -136,34 +136,31 @@ public class LibraryRestController extends RestController {
   @PostMapping(produces = "application/json")
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public LibraryDto createLibrary(@RequestBody LibraryDto libraryDto)
-      throws IOException {
-    return RestUtils.createObject("Library", libraryDto, WhineyFunction.rethrow(dto -> {
-      Library lib = to(dto);
-      if (dto.getSample() != null) {
-        Sample sample = sampleController.buildHierarchy(dto.getSample());
-        if (LimsUtils.isDetailedSample(sample)) {
-          ((DetailedSample) sample).setSynthetic(true);
-        }
-        lib.setSample(sample);
+  public LibraryDto createLibrary(@RequestBody LibraryDto libraryDto) throws IOException {
+    RestUtils.validateDtoProvided("Library", libraryDto);
+    Library library = Dtos.to(libraryDto);
+    if (libraryDto.getSample() != null) {
+      Sample sample = sampleController.buildHierarchy(libraryDto.getSample());
+      if (LimsUtils.isDetailedSample(sample)) {
+        ((DetailedSample) sample).setSynthetic(true);
       }
-      return lib;
-    }), libraryService, lib -> Dtos.asDto(lib, false));
-  }
-
-  private Library to(LibraryDto from) {
-    Library to = Dtos.to(from);
-    to.getTransfers().stream().map(TransferItem::getTransfer).forEach(transfer -> {
+      library.setSample(sample);
+    }
+    RestUtils.validateNewObject("Library", library);
+    TransferLibrary transferLibrary = Dtos.toReceiptTransfer(libraryDto, library);
+    if (transferLibrary != null) {
+      Transfer transfer = transferLibrary.getTransfer();
       timeZoneCorrector.toDbTime(transfer.getTransferTime(), transfer::setTransferTime);
-    });
-    return to;
+    }
+    long savedId = libraryService.create(library, transferLibrary);
+    return Dtos.asDto(libraryService.get(savedId), false);
   }
 
   @PutMapping(value = "/{id}")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public LibraryDto updateLibrary(@PathVariable("id") long id, @RequestBody LibraryDto libraryDto) throws IOException {
-    return RestUtils.updateObject("Library", id, libraryDto, this::to, libraryService, lib -> Dtos.asDto(lib, false));
+    return RestUtils.updateObject("Library", id, libraryDto, Dtos::to, libraryService, lib -> Dtos.asDto(lib, false));
   }
 
   @GetMapping(value = "/dt", produces = "application/json")

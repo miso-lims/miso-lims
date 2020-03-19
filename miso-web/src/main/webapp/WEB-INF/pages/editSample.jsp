@@ -137,7 +137,7 @@
 <miso:qcs id="list_qc" item="${sample}"/>
 
 <c:if test="${!detailedSample or sampleCategory ne 'Identity'}">
-  <miso:list-section id="list_transfer" name="Transfers" target="itemtransfer" items="${sampleTransfers}" config="{ sampleId: ${sample.id} }" alwaysShow="true"/>
+  <miso:list-section id="list_transfer" name="Transfers" target="transfer" items="${sampleTransfers}" config="{ sampleId: ${sample.id} }" alwaysShow="true"/>
 </c:if>
 
 <c:if test="${ !detailedSample or sampleCategory eq 'Aliquot' }">

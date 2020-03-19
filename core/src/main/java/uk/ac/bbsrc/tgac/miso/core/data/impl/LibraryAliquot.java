@@ -30,7 +30,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -43,6 +44,8 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -50,6 +53,8 @@ import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
+import org.hibernate.annotations.Immutable;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -65,7 +70,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryAliquotBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryAliquotChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListTransferView;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -146,8 +151,11 @@ public class LibraryAliquot extends AbstractBoxable
   @OneToMany(targetEntity = LibraryAliquotChangeLog.class, mappedBy = "libraryAliquot", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
-  @OneToMany(mappedBy = "item", cascade = CascadeType.REMOVE)
-  private List<TransferLibraryAliquot> transfers;
+  @Immutable
+  @ManyToMany
+  @JoinTable(name = "Transfer_LibraryAliquot", joinColumns = { @JoinColumn(name = "aliquotId") }, inverseJoinColumns = {
+      @JoinColumn(name = "transferId") })
+  private Set<ListTransferView> listTransferViews;
 
   @Override
   public Boxable.EntityType getEntityType() {
@@ -440,11 +448,11 @@ public class LibraryAliquot extends AbstractBoxable
   }
 
   @Override
-  public List<TransferLibraryAliquot> getTransfers() {
-    if (transfers == null) {
-      transfers = new ArrayList<>();
+  public Set<ListTransferView> getTransferViews() {
+    if (listTransferViews == null) {
+      listTransferViews = new HashSet<>();
     }
-    return transfers;
+    return listTransferViews;
   }
 
   @Override
