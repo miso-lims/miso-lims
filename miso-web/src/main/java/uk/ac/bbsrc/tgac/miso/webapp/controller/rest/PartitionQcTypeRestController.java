@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.ac.bbsrc.tgac.miso.core.service.PartitionQcTypeService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PartitionQCTypeDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 
 @Controller
 @RequestMapping("/rest/partitionqctypes")
@@ -27,12 +27,12 @@ public class PartitionQcTypeRestController extends RestController {
   private PartitionQcTypeService partitionQcTypeService;
 
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   @PostMapping
   public @ResponseBody PartitionQCTypeDto create(@RequestBody PartitionQCTypeDto dto) throws IOException {
     return RestUtils.createObject("Partition QC Type", dto, Dtos::to, partitionQcTypeService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }
@@ -40,7 +40,7 @@ public class PartitionQcTypeRestController extends RestController {
   @PutMapping("/{typeId}")
   public @ResponseBody PartitionQCTypeDto update(@PathVariable long typeId, @RequestBody PartitionQCTypeDto dto) throws IOException {
     return RestUtils.updateObject("Partition QC Type", typeId, dto, Dtos::to, partitionQcTypeService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }

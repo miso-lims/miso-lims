@@ -23,7 +23,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentModelDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
 @Controller
@@ -32,7 +32,7 @@ public class InstrumentModelRestController extends RestController {
   @Autowired
   private InstrumentModelService instrumentModelService;
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
 
@@ -58,7 +58,7 @@ public class InstrumentModelRestController extends RestController {
   @PostMapping
   public @ResponseBody InstrumentModelDto create(@RequestBody InstrumentModelDto dto) throws IOException {
     return RestUtils.createObject("Instrument Models", dto, Dtos::to, instrumentModelService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }
@@ -67,7 +67,7 @@ public class InstrumentModelRestController extends RestController {
   public @ResponseBody InstrumentModelDto update(@PathVariable("id") Long id, @RequestBody InstrumentModelDto dto)
       throws IOException {
     return RestUtils.updateObject("Instrument Models", id, dto, Dtos::to, instrumentModelService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }

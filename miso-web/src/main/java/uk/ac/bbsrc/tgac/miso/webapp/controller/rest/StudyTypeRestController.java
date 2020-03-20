@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.ac.bbsrc.tgac.miso.core.service.StudyTypeService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.StudyTypeDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 
 @Controller
 @RequestMapping("/rest/studytypes")
@@ -27,12 +27,12 @@ public class StudyTypeRestController extends RestController {
   private StudyTypeService studyTypeService;
 
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   @PostMapping
   public @ResponseBody StudyTypeDto create(@RequestBody StudyTypeDto dto) throws IOException {
     return RestUtils.createObject("Study Type", dto, Dtos::to, studyTypeService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }
@@ -40,7 +40,7 @@ public class StudyTypeRestController extends RestController {
   @PutMapping("/{typeId}")
   public @ResponseBody StudyTypeDto update(@PathVariable long typeId, @RequestBody StudyTypeDto dto) throws IOException {
     return RestUtils.updateObject("Study Type", typeId, dto, Dtos::to, studyTypeService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }

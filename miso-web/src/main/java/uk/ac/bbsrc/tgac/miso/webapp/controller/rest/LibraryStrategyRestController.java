@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryStrategyService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryStrategyTypeDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 
 @Controller
 @RequestMapping("/rest/librarystrategies")
@@ -27,12 +27,12 @@ public class LibraryStrategyRestController extends RestController {
   private LibraryStrategyService libraryStrategyService;
 
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   @PostMapping
   public @ResponseBody LibraryStrategyTypeDto create(@RequestBody LibraryStrategyTypeDto dto) throws IOException {
     return RestUtils.createObject("Library Strategy Type", dto, Dtos::to, libraryStrategyService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }
@@ -41,7 +41,7 @@ public class LibraryStrategyRestController extends RestController {
   public @ResponseBody LibraryStrategyTypeDto update(@PathVariable long typeId, @RequestBody LibraryStrategyTypeDto dto)
       throws IOException {
     return RestUtils.updateObject("Library Strategy Type", typeId, dto, Dtos::to, libraryStrategyService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }

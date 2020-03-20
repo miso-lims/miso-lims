@@ -20,7 +20,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
 import uk.ac.bbsrc.tgac.miso.core.service.AttachmentCategoryService;
 import uk.ac.bbsrc.tgac.miso.dto.AttachmentCategoryDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 
 @Controller
 @RequestMapping("/rest/attachmentcategories")
@@ -30,7 +30,7 @@ public class AttachmentCategoryRestController extends RestController {
   private AttachmentCategoryService attachmentCategoryService;
 
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   @PostMapping
   public @ResponseBody AttachmentCategoryDto create(@RequestBody AttachmentCategoryDto dto) throws IOException {
@@ -66,7 +66,7 @@ public class AttachmentCategoryRestController extends RestController {
   private AttachmentCategoryDto doSave(AttachmentCategoryDto dto) throws IOException {
     AttachmentCategory category = Dtos.to(dto);
     long id = attachmentCategoryService.save(category);
-    menuController.refreshConstants();
+    constantsController.refreshConstants();
     AttachmentCategory saved = attachmentCategoryService.get(id);
     return Dtos.asDto(saved);
   }

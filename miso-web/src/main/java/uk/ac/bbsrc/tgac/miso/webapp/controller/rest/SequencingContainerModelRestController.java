@@ -23,7 +23,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingContainerModelDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 
 @Controller
 @RequestMapping("/rest/containermodels")
@@ -33,12 +33,12 @@ public class SequencingContainerModelRestController extends RestController {
   private SequencingContainerModelService containerModelService;
 
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   @PostMapping
   public @ResponseBody SequencingContainerModelDto create(@RequestBody SequencingContainerModelDto dto) throws IOException {
     return RestUtils.createObject("Container Model", dto, Dtos::to, containerModelService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }
@@ -47,7 +47,7 @@ public class SequencingContainerModelRestController extends RestController {
   public @ResponseBody SequencingContainerModelDto update(@PathVariable long modelId, @RequestBody SequencingContainerModelDto dto)
       throws IOException {
     return RestUtils.updateObject("Container Model", modelId, dto, Dtos::to, containerModelService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }

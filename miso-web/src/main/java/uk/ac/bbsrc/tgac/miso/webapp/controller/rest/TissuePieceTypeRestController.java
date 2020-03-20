@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.ac.bbsrc.tgac.miso.core.service.TissuePieceTypeService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.TissuePieceTypeDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 
 @Controller
 @RequestMapping("/rest/tissuepiecetypes")
@@ -27,12 +27,12 @@ public class TissuePieceTypeRestController extends RestController {
   private TissuePieceTypeService tissuePieceTypeService;
 
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   @PostMapping
   public @ResponseBody TissuePieceTypeDto create(@RequestBody TissuePieceTypeDto dto) throws IOException {
     return RestUtils.createObject("Tissue Piece Type", dto, Dtos::to, tissuePieceTypeService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }
@@ -40,7 +40,7 @@ public class TissuePieceTypeRestController extends RestController {
   @PutMapping("/{typeId}")
   public @ResponseBody TissuePieceTypeDto update(@PathVariable long typeId, @RequestBody TissuePieceTypeDto dto) throws IOException {
     return RestUtils.updateObject("Tissue Piece Type", typeId, dto, Dtos::to, tissuePieceTypeService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }
@@ -50,7 +50,7 @@ public class TissuePieceTypeRestController extends RestController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
     RestUtils.bulkDelete("Tissue Piece Type", ids, tissuePieceTypeService);
-    menuController.refreshConstants();
+    constantsController.refreshConstants();
   }
 
 }

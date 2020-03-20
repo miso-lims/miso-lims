@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.ac.bbsrc.tgac.miso.core.service.StainService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.StainDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 
 @Controller
 @RequestMapping("/rest/stains")
@@ -27,12 +27,12 @@ public class StainRestController extends RestController {
   private StainService stainService;
 
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   @PostMapping
   public @ResponseBody StainDto create(@RequestBody StainDto dto) throws IOException {
     return RestUtils.createObject("Stain", dto, Dtos::to, stainService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }
@@ -40,7 +40,7 @@ public class StainRestController extends RestController {
   @PutMapping("/{stainId}")
   public @ResponseBody StainDto update(@PathVariable long stainId, @RequestBody StainDto dto) throws IOException {
     return RestUtils.updateObject("Stain", stainId, dto, Dtos::to, stainService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }

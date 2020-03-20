@@ -53,7 +53,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.SampleGroupService;
 import uk.ac.bbsrc.tgac.miso.core.service.SubprojectService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SubprojectDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 
 @Controller
 @RequestMapping("/rest/subprojects")
@@ -68,7 +68,7 @@ public class SubprojectRestController extends RestController {
   private SampleGroupService sampleGroupService;
 
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   @GetMapping(value = "/{id}", produces = { "application/json" })
   @ResponseBody
@@ -98,7 +98,7 @@ public class SubprojectRestController extends RestController {
       throws IOException {
     Subproject subproject = Dtos.to(subprojectDto);
     Long id = subprojectService.create(subproject, subprojectDto.getParentProjectId());
-    menuController.refreshConstants();
+    constantsController.refreshConstants();
     return getSubproject(id, uriBuilder, response);
   }
 
@@ -110,7 +110,7 @@ public class SubprojectRestController extends RestController {
     Subproject subproject = Dtos.to(subprojectDto);
     subproject.setId(id);
     subprojectService.update(subproject);
-    menuController.refreshConstants();
+    constantsController.refreshConstants();
     return getSubproject(id, uriBuilder, response);
   }
 
@@ -119,7 +119,7 @@ public class SubprojectRestController extends RestController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
     RestUtils.bulkDelete("Subproject", ids, subprojectService);
-    menuController.refreshConstants();
+    constantsController.refreshConstants();
   }
 
   @GetMapping(value = "/{id}/groups", produces = { "application/json" })

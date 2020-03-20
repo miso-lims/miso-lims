@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryTypeService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryTypeDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 
 @Controller
 @RequestMapping("/rest/librarytypes")
@@ -27,12 +27,12 @@ public class LibraryTypeRestController extends RestController {
   private LibraryTypeService libraryTypeService;
 
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   @PostMapping
   public @ResponseBody LibraryTypeDto create(@RequestBody LibraryTypeDto dto) throws IOException {
     return RestUtils.createObject("Library Type", dto, Dtos::to, libraryTypeService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }
@@ -40,7 +40,7 @@ public class LibraryTypeRestController extends RestController {
   @PutMapping("/{typeId}")
   public @ResponseBody LibraryTypeDto update(@PathVariable long typeId, @RequestBody LibraryTypeDto dto) throws IOException {
     return RestUtils.updateObject("Library Type", typeId, dto, Dtos::to, libraryTypeService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }

@@ -14,7 +14,7 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.TransferService;
 
-@ControllerAdvice
+@ControllerAdvice("uk.ac.bbsrc.tgac.miso.webapp.controller.view")
 public class CommonModelAttributeProvider {
 
   private static final Logger log = LoggerFactory.getLogger(CommonModelAttributeProvider.class);

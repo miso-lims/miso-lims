@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleTypeService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTypeDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 
 @Controller
 @RequestMapping("/rest/sampletypes")
@@ -27,12 +27,12 @@ public class SampleTypeRestController extends RestController {
   private SampleTypeService sampleTypeService;
 
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   @PostMapping
   public @ResponseBody SampleTypeDto create(@RequestBody SampleTypeDto dto) throws IOException {
     return RestUtils.createObject("Sample Type", dto, Dtos::to, sampleTypeService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }
@@ -40,7 +40,7 @@ public class SampleTypeRestController extends RestController {
   @PutMapping("/{typeId}")
   public @ResponseBody SampleTypeDto update(@PathVariable long typeId, @RequestBody SampleTypeDto dto) throws IOException {
     return RestUtils.updateObject("Sample Type", typeId, dto, Dtos::to, sampleTypeService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }

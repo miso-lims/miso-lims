@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.ac.bbsrc.tgac.miso.core.service.ReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ReferenceGenomeDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 
 @Controller
 @RequestMapping("/rest/referencegenomes")
@@ -27,12 +27,12 @@ public class ReferenceGenomeRestController extends RestController {
   private ReferenceGenomeService referenceGenomeService;
 
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   @PostMapping
   public @ResponseBody ReferenceGenomeDto create(@RequestBody ReferenceGenomeDto dto) throws IOException {
     return RestUtils.createObject("Reference Genome", dto, Dtos::to, referenceGenomeService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }
@@ -40,7 +40,7 @@ public class ReferenceGenomeRestController extends RestController {
   @PutMapping("/{referenceId}")
   public @ResponseBody ReferenceGenomeDto update(@PathVariable long referenceId, @RequestBody ReferenceGenomeDto dto) throws IOException {
     return RestUtils.updateObject("Reference Genome", referenceId, dto, Dtos::to, referenceGenomeService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }

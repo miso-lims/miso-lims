@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.ac.bbsrc.tgac.miso.core.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.dto.DetailedQcStatusDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 
 @Controller
 @RequestMapping("/rest/detailedqcstatuses")
@@ -50,13 +50,13 @@ public class DetailedQcStatusRestController extends RestController {
   private DetailedQcStatusService detailedQcStatusService;
 
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   @PostMapping(headers = { "Content-type=application/json" })
   @ResponseBody
   public DetailedQcStatusDto createDetailedQcStatus(@RequestBody DetailedQcStatusDto detailedQcStatusDto) throws IOException {
     return RestUtils.createObject("Detailed QC Status", detailedQcStatusDto, Dtos::to, detailedQcStatusService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }
@@ -66,7 +66,7 @@ public class DetailedQcStatusRestController extends RestController {
   public DetailedQcStatusDto updateDetailedQcStatus(@PathVariable long id, @RequestBody DetailedQcStatusDto detailedQcStatusDto)
       throws IOException {
     return RestUtils.updateObject("Detailed QC Status", id, detailedQcStatusDto, Dtos::to, detailedQcStatusService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }

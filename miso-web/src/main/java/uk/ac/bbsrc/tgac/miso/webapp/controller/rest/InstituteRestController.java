@@ -25,7 +25,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.service.InstituteService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstituteDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 
 @Controller
 @RequestMapping("/rest/institutes")
@@ -37,7 +37,7 @@ public class InstituteRestController extends RestController {
   private InstituteService instituteService;
   
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
   
   @GetMapping(value = "/{id}", produces = { "application/json" })
   @ResponseBody
@@ -64,7 +64,7 @@ public class InstituteRestController extends RestController {
   public InstituteDto createInstitute(@RequestBody InstituteDto instituteDto, UriComponentsBuilder uriBuilder) throws IOException {
     Institute institute = Dtos.to(instituteDto);
     Long id = instituteService.create(institute);
-    menuController.refreshConstants();
+    constantsController.refreshConstants();
     return getInstitute(id, uriBuilder);
   }
   
@@ -75,7 +75,7 @@ public class InstituteRestController extends RestController {
     Institute institute = Dtos.to(instituteDto);
     institute.setId(id);
     instituteService.update(institute);
-    menuController.refreshConstants();
+    constantsController.refreshConstants();
     return getInstitute(id, uriBuilder);
   }
   
@@ -83,7 +83,7 @@ public class InstituteRestController extends RestController {
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
   public void deleteInstitute(@RequestBody(required = true) List<Long> ids) throws IOException {
     RestUtils.bulkDelete("Institute", ids, instituteService);
-    menuController.refreshConstants();
+    constantsController.refreshConstants();
   }
   
 }

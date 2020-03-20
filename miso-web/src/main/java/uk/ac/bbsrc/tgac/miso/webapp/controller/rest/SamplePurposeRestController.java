@@ -49,7 +49,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.service.SamplePurposeService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SamplePurposeDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 
 @Controller
 @RequestMapping("/rest/samplepurposes")
@@ -61,7 +61,7 @@ public class SamplePurposeRestController extends RestController {
   private SamplePurposeService samplePurposeService;
 
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   @GetMapping(value = "/{id}", produces = { "application/json" })
   @ResponseBody
@@ -90,7 +90,7 @@ public class SamplePurposeRestController extends RestController {
       HttpServletResponse response) throws IOException {
     SamplePurpose samplePurpose = Dtos.to(samplePurposeDto);
     Long id = samplePurposeService.create(samplePurpose);
-    menuController.refreshConstants();
+    constantsController.refreshConstants();
     return getSamplePurpose(id, uriBuilder, response);
   }
 
@@ -101,7 +101,7 @@ public class SamplePurposeRestController extends RestController {
     SamplePurpose samplePurpose = Dtos.to(samplePurposeDto);
     samplePurpose.setId(id);
     samplePurposeService.update(samplePurpose);
-    menuController.refreshConstants();
+    constantsController.refreshConstants();
     return getSamplePurpose(id, uriBuilder, response);
   }
 
@@ -110,7 +110,7 @@ public class SamplePurposeRestController extends RestController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
     RestUtils.bulkDelete("Sample Purpose", ids, samplePurposeService);
-    menuController.refreshConstants();
+    constantsController.refreshConstants();
   }
 
 }

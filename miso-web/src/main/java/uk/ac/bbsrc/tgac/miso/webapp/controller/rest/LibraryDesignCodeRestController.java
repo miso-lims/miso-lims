@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDesignCodeDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 
 @Controller
 @RequestMapping("/rest/librarydesigncodes")
@@ -27,12 +27,12 @@ public class LibraryDesignCodeRestController extends RestController {
   private LibraryDesignCodeService designCodeService;
 
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   @PostMapping
   public @ResponseBody LibraryDesignCodeDto create(@RequestBody LibraryDesignCodeDto dto) throws IOException {
     return RestUtils.createObject("Library Design Code", dto, Dtos::to, designCodeService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }
@@ -41,7 +41,7 @@ public class LibraryDesignCodeRestController extends RestController {
   public @ResponseBody LibraryDesignCodeDto update(@PathVariable long designCodeId, @RequestBody LibraryDesignCodeDto dto)
       throws IOException {
     return RestUtils.updateObject("Library Design Code", designCodeId, dto, Dtos::to, designCodeService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-@ControllerAdvice("uk.ac.bbsrc.tgac.miso.webapp.controller")
+@ControllerAdvice("uk.ac.bbsrc.tgac.miso.webapp.controller.view")
 public class ExceptionHandlerAdvice {
 
   private static final Logger log = LoggerFactory.getLogger(ExceptionHandlerAdvice.class);

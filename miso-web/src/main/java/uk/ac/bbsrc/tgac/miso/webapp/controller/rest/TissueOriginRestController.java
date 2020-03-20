@@ -49,7 +49,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.service.TissueOriginService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.TissueOriginDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 
 @Controller
 @RequestMapping("/rest/tissueorigins")
@@ -61,7 +61,7 @@ public class TissueOriginRestController extends RestController {
   private TissueOriginService tissueOriginService;
 
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   @GetMapping(value = "/{id}", produces = { "application/json" })
   @ResponseBody
@@ -89,7 +89,7 @@ public class TissueOriginRestController extends RestController {
   public @ResponseBody TissueOriginDto createTissueOrigin(@RequestBody TissueOriginDto tissueOriginDto) throws IOException {
     TissueOrigin tissueOrigin = Dtos.to(tissueOriginDto);
     Long id = tissueOriginService.create(tissueOrigin);
-    menuController.refreshConstants();
+    constantsController.refreshConstants();
     return Dtos.asDto(tissueOriginService.get(id));
   }
 
@@ -99,7 +99,7 @@ public class TissueOriginRestController extends RestController {
     TissueOrigin tissueOrigin = Dtos.to(tissueOriginDto);
     tissueOrigin.setId(id);
     tissueOriginService.update(tissueOrigin);
-    menuController.refreshConstants();
+    constantsController.refreshConstants();
     return Dtos.asDto(tissueOriginService.get(id));
   }
 
@@ -108,7 +108,7 @@ public class TissueOriginRestController extends RestController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
     RestUtils.bulkDelete("Tissue Origin", ids, tissueOriginService);
-    menuController.refreshConstants();
+    constantsController.refreshConstants();
   }
 
 }

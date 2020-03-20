@@ -43,7 +43,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import uk.ac.bbsrc.tgac.miso.core.service.TissueTypeService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.TissueTypeDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 
 @Controller
 @RequestMapping("/rest/tissuetypes")
@@ -53,7 +53,7 @@ public class TissueTypeRestController extends RestController {
   private TissueTypeService tissueTypeService;
 
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   @PostMapping(headers = { "Content-type=application/json" })
   @ResponseStatus(HttpStatus.CREATED)
@@ -61,7 +61,7 @@ public class TissueTypeRestController extends RestController {
   public TissueTypeDto createTissueType(@RequestBody TissueTypeDto tissueTypeDto, UriComponentsBuilder b, HttpServletResponse response)
       throws IOException {
     return RestUtils.createObject("Tissue Type", tissueTypeDto, Dtos::to, tissueTypeService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }
@@ -71,7 +71,7 @@ public class TissueTypeRestController extends RestController {
   public TissueTypeDto updateTissueType(@PathVariable long id, @RequestBody TissueTypeDto tissueTypeDto,
       HttpServletResponse response) throws IOException {
     return RestUtils.updateObject("Tissue Type", id, tissueTypeDto, Dtos::to, tissueTypeService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }

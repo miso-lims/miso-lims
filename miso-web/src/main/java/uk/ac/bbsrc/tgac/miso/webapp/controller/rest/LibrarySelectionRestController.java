@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.ac.bbsrc.tgac.miso.core.service.LibrarySelectionService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibrarySelectionTypeDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 
 @Controller
 @RequestMapping("/rest/libraryselections")
@@ -27,12 +27,12 @@ public class LibrarySelectionRestController extends RestController {
   private LibrarySelectionService librarySelectionService;
 
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   @PostMapping
   public @ResponseBody LibrarySelectionTypeDto create(@RequestBody LibrarySelectionTypeDto dto) throws IOException {
     return RestUtils.createObject("Library Selection Type", dto, Dtos::to, librarySelectionService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }
@@ -41,7 +41,7 @@ public class LibrarySelectionRestController extends RestController {
   public @ResponseBody LibrarySelectionTypeDto update(@PathVariable long typeId, @RequestBody LibrarySelectionTypeDto dto)
       throws IOException {
     return RestUtils.updateObject("Library Selection Type", typeId, dto, Dtos::to, librarySelectionService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }

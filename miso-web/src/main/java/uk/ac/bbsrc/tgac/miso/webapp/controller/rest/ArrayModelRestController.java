@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayModelService;
 import uk.ac.bbsrc.tgac.miso.dto.ArrayModelDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 
 @Controller
 @RequestMapping("/rest/arraymodels")
@@ -27,12 +27,12 @@ public class ArrayModelRestController extends RestController {
   private ArrayModelService arrayModelService;
 
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   @PostMapping
   public @ResponseBody ArrayModelDto create(@RequestBody ArrayModelDto dto) throws IOException {
     return RestUtils.createObject("Array Model", dto, Dtos::to, arrayModelService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }
@@ -40,7 +40,7 @@ public class ArrayModelRestController extends RestController {
   @PutMapping("/{modelId}")
   public @ResponseBody ArrayModelDto update(@PathVariable long modelId, @RequestBody ArrayModelDto dto) throws IOException {
     return RestUtils.updateObject("Array Model", modelId, dto, Dtos::to, arrayModelService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }

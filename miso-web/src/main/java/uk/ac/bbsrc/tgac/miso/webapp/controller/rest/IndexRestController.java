@@ -29,7 +29,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.IndexDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
 @Controller
@@ -46,7 +46,7 @@ public class IndexRestController extends RestController {
   private AdvancedSearchParser advancedSearchParser;
 
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   private final JQueryDataTableBackend<Index, IndexDto> jQueryBackend = new JQueryDataTableBackend<Index, IndexDto>() {
 
@@ -82,7 +82,7 @@ public class IndexRestController extends RestController {
   @PostMapping
   public @ResponseBody IndexDto create(@RequestBody IndexDto dto) throws IOException {
     return RestUtils.createObject("Index", dto, Dtos::to, indexService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }
@@ -90,7 +90,7 @@ public class IndexRestController extends RestController {
   @PutMapping("/{indexId}")
   public @ResponseBody IndexDto update(@PathVariable long indexId, @RequestBody IndexDto dto) throws IOException {
     return RestUtils.updateObject("Index", indexId, dto, Dtos::to, indexService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }
