@@ -8,7 +8,8 @@ Changes:
     * Library kit
     * Run sequencing kit
     * Container clustering kit
-    * Container multiplexing ki
+    * Container multiplexing kit
+  * Log positions that box items are removed from
 
 # 1.1.0
 
