@@ -51,13 +51,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
 public interface Sample extends Attachable, Comparable<Sample>, Deletable, HierarchyEntity, Locatable, QualityControllable<SampleQC>,
     Serializable {
 
-  /** Field UNSAVED_ID */
-  public static final long UNSAVED_ID = 0L;
-  /** Field PREFIX */
-  public static final String PREFIX = "SAM";
-
-  public static final String CONCENTRATION_UNITS = "ng/µL";
-
   /**
    * Returns the accession of this Sample object.
    * 

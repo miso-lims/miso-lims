@@ -29,7 +29,6 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
@@ -223,7 +222,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
   }
 
   private void saveSample(Sample sample) throws IOException {
-    if (sample.getId() != Sample.UNSAVED_ID) {
+    if (sample.isSaved()) {
       // already saved
       return;
     }
@@ -385,7 +384,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
   }
 
   private static boolean hasUnsavedParent(DetailedSample sample) {
-    return sample.getParent() != null && sample.getParent().getId() == AbstractSample.UNSAVED_ID;
+    return sample.getParent() != null && !sample.getParent().isSaved();
   }
 
   private void saveSampleChangeLog(Sample sample, Collection<ChangeLog> changes) throws IOException {
@@ -439,14 +438,14 @@ public class DefaultMigrationTarget implements MigrationTarget {
     log.debug("Saving library " + library.getAlias());
     if (isDetailedSample(library.getSample())) {
       DetailedSample sample = (DetailedSample) library.getSample();
-      if (sample.getId() == AbstractSample.UNSAVED_ID && sample.getPreMigrationId() != null) {
+      if (!sample.isSaved() && sample.getPreMigrationId() != null) {
         library.setSample(serviceManager.getSampleDao().getByPreMigrationId(sample.getPreMigrationId()));
         if (library.getSample() == null) {
           throw new IOException("No Sample found with pre-migration ID " + sample.getPreMigrationId());
         }
       }
     }
-    if (library.getSample() == null || library.getSample().getId() == AbstractSample.UNSAVED_ID) {
+    if (library.getSample() == null || !library.getSample().isSaved()) {
       throw new IOException("Library does not have a parent sample set");
     }
     valueTypeLookup.resolveAll(library);

@@ -9,6 +9,8 @@ Changes:
     * Run sequencing kit
     * Container clustering kit
     * Container multiplexing ki
+  * Fixed creating samples parented to existing tissues with null times received and tube number
+    (detailed sample)
 
 # 1.1.0
 

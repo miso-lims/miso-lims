@@ -212,7 +212,7 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
 
   @Override
   public long save(Sample t) throws IOException {
-    if (t.getId() == SampleImpl.UNSAVED_ID) {
+    if (!t.isSaved()) {
       return addSample(t);
     } else {
       update(t);
@@ -282,25 +282,23 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
     criteria.add(Restrictions.eq("parent.id", tissue.getParent().getId()));
     criteria.add(Restrictions.eq("tissueOrigin.id", tissue.getTissueOrigin().getId()));
     criteria.add(Restrictions.eq("tissueType.id", tissue.getTissueType().getId()));
-    criteria.add(Restrictions.eq("timesReceived", tissue.getTimesReceived()));
-    criteria.add(Restrictions.eq("tubeNumber", tissue.getTubeNumber()));
-    if (tissue.getPassageNumber() == null) {
-      criteria.add(Restrictions.isNull("passageNumber"));
-    } else {
-      criteria.add(Restrictions.eq("passageNumber", tissue.getPassageNumber()));
-    }
+    criteria.add(eqNullable("timesReceived", tissue.getTimesReceived()));
+    criteria.add(eqNullable("tubeNumber", tissue.getTubeNumber()));
+    criteria.add(eqNullable("passageNumber", tissue.getPassageNumber()));
     return (SampleTissue) criteria.uniqueResult();
+  }
+
+  private Criterion eqNullable(String propertyName, Integer value) {
+    return value == null ? Restrictions.isNull(propertyName) : Restrictions.eq(propertyName, value);
   }
 
   private void validateGhostTissueLookup(SampleTissue tissue) {
     if (tissue.getParent() == null
-        || tissue.getParent().getId() == SampleImpl.UNSAVED_ID
+        || !tissue.getParent().isSaved()
         || tissue.getTissueOrigin() == null
         || !tissue.getTissueOrigin().isSaved()
         || tissue.getTissueType() == null
-        || !tissue.getTissueType().isSaved()
-        || tissue.getTimesReceived() == null
-        || tissue.getTubeNumber() == null) {
+        || !tissue.getTissueType().isSaved()) {
       throw new IllegalArgumentException("Missing tissue attributes required for lookup");
     }
   }
