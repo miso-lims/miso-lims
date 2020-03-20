@@ -53,13 +53,11 @@ public interface HibernatePaginatedBoxableSource<T extends Boxable> extends Hibe
   @Override
   public default void restrictPaginationByDate(Criteria criteria, Date start, Date end, DateType type, Consumer<String> errorHandler) {
     if (type == DateType.RECEIVE) {
-      criteria.createAlias("transfers", "transferItem")
-          .createAlias("transferItem.transfer", "transfer")
+      criteria.createAlias("listTransferViews", "transfer")
           .add(Restrictions.isNotNull("transfer.senderLab"))
           .add(Restrictions.between("transfer.transferTime", start, end));
     } else if (type == DateType.DISTRIBUTED) {
-      criteria.createAlias("transfers", "transferItem")
-          .createAlias("transferItem.transfer", "transfer")
+      criteria.createAlias("listTransferViews", "transfer")
           .add(Restrictions.isNotNull("transfer.recipient"))
           .add(Restrictions.between("transfer.transferTime", start, end));
     } else {
@@ -69,15 +67,13 @@ public interface HibernatePaginatedBoxableSource<T extends Boxable> extends Hibe
 
   @Override
   public default void restrictPaginationByDistributed(Criteria criteria, Consumer<String> errorHandler) {
-    criteria.createAlias("transfers", "transferItem")
-        .createAlias("transferItem.transfer", "transfer")
+    criteria.createAlias("listTransferViews", "transfer")
         .add(Restrictions.isNotNull("transfer.recipient"));
   }
 
   @Override
   public default void restrictPaginationByDistributionRecipient(Criteria criteria, String recipient, Consumer<String> errorHandler) {
-    criteria.createAlias("transfers", "transferItem")
-        .createAlias("transferItem.transfer", "transfer")
+    criteria.createAlias("listTransferViews", "transfer")
         .add(Restrictions.ilike("transfer.recipient", recipient, MatchMode.ANYWHERE));
   }
 
