@@ -789,6 +789,9 @@ HotTarget.library = (function() {
               }
             }
           },
+          HotUtils.makeColumnForText('Kit Lot', true, 'kitLot', {
+            validator: HotUtils.validator.optionalTextNoSpecialChars
+          }),
           HotUtils.makeColumnForBoolean('QC Passed?', true, 'qcPassed', false),
           HotUtils.makeColumnForFloat('Size (bp)', true, 'dnaSize', false),
           HotUtils.makeColumnForDecimal('Initial Volume', config.pageMode === 'edit' && config.showVolume, 'initialVolume', 14, 10, false,

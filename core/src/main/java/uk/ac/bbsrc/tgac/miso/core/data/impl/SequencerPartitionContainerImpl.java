@@ -120,9 +120,13 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   @JoinColumn(name = "clusteringKit")
   private KitDescriptor clusteringKit;
 
+  private String clusteringKitLot;
+
   @ManyToOne
   @JoinColumn(name = "multiplexingKit")
   private KitDescriptor multiplexingKit;
+
+  private String multiplexingKitLot;
 
   @ManyToOne
   @JoinColumn(name = "sequencingContainerModelId")
@@ -343,6 +347,16 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   }
 
   @Override
+  public String getClusteringKitLot() {
+    return clusteringKitLot;
+  }
+
+  @Override
+  public void setClusteringKitLot(String clusteringKitLot) {
+    this.clusteringKitLot = clusteringKitLot;
+  }
+
+  @Override
   public KitDescriptor getMultiplexingKit() {
     return multiplexingKit;
   }
@@ -350,6 +364,16 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   @Override
   public void setMultiplexingKit(KitDescriptor multiplexingKit) {
     this.multiplexingKit = multiplexingKit;
+  }
+
+  @Override
+  public String getMultiplexingKitLot() {
+    return multiplexingKitLot;
+  }
+
+  @Override
+  public void setMultiplexingKitLot(String multiplexingKitLot) {
+    this.multiplexingKitLot = multiplexingKitLot;
   }
 
   private static final Comparator<Partition> partitionNumberComparator = new Comparator<Partition>() {

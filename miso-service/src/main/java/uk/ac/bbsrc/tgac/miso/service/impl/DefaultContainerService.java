@@ -133,6 +133,20 @@ public class DefaultContainerService
       errors.add(new ValidationError("identificationBarcode", "There is already a container with this serial number"));
     }
 
+    if (container.getClusteringKit() != null && container.getClusteringKit().getKitType() != KitType.CLUSTERING) {
+      errors.add(new ValidationError("clusteringKitId", "Must be a clustering kit"));
+    }
+    if (container.getClusteringKitLot() != null && container.getClusteringKit() == null) {
+      errors.add(new ValidationError("clusteringKitLot", "Clustering kit not specified"));
+    }
+
+    if (container.getMultiplexingKit() != null && container.getMultiplexingKit().getKitType() != KitType.MULTIPLEXING) {
+      errors.add(new ValidationError("MultiplexingKitId", "Must be a multiplexing kit"));
+    }
+    if (container.getMultiplexingKitLot() != null && container.getMultiplexingKit() == null) {
+      errors.add(new ValidationError("MultiplexingKitLot", "Multiplexing kit not specified"));
+    }
+
     if (beforeChange != null && ValidationUtils.isSetAndChanged(SequencerPartitionContainer::getModel, container, beforeChange)) {
       SequencingContainerModel before = beforeChange.getModel();
       SequencingContainerModel after = container.getModel();
@@ -170,7 +184,9 @@ public class DefaultContainerService
     managed.setIdentificationBarcode(source.getIdentificationBarcode());
     managed.setDescription(source.getDescription());
     managed.setClusteringKit(source.getClusteringKit());
+    managed.setClusteringKitLot(source.getClusteringKitLot());
     managed.setMultiplexingKit(source.getMultiplexingKit());
+    managed.setMultiplexingKitLot(source.getMultiplexingKitLot());
     managed.setModel(source.getModel());
 
     if (LimsUtils.isOxfordNanoporeContainer(managed)) {

@@ -150,6 +150,8 @@ public abstract class Run
   @JoinColumn(name = "sequencingKitId")
   private KitDescriptor sequencingKit;
 
+  private String sequencingKitLot;
+
   @Temporal(TemporalType.DATE)
   private Date startDate;
 
@@ -450,6 +452,14 @@ public abstract class Run
 
   public void setSequencingKit(KitDescriptor sequencingKit) {
     this.sequencingKit = sequencingKit;
+  }
+
+  public String getSequencingKitLot() {
+    return sequencingKitLot;
+  }
+
+  public void setSequencingKitLot(String sequencingKitLot) {
+    this.sequencingKitLot = sequencingKitLot;
   }
 
   @Override

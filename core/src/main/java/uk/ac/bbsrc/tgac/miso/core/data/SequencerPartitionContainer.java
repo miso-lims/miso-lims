@@ -44,11 +44,11 @@ public interface SequencerPartitionContainer
     extends Comparable<SequencerPartitionContainer>, Barcodable, ChangeLoggable, Serializable,
     QualityControllable<ContainerQC>, Deletable {
 
-  String getDescription();
+  public String getDescription();
 
-  void setDescription(String description);
+  public void setDescription(String description);
 
-  Set<RunPosition> getRunPositions();
+  public Set<RunPosition> getRunPositions();
 
   /**
    * Returns the {@link Run} with
@@ -57,21 +57,21 @@ public interface SequencerPartitionContainer
    * 
    * @return Run run
    */
-  Run getLastRun();
+  public Run getLastRun();
 
   /**
    * Get the list of {@link Partition} objects comprising this container
    * 
    * @return List<Partition> partitions
    */
-  List<Partition> getPartitions();
+  public List<Partition> getPartitions();
 
   /**
    * Set the list of {@link Partition} objects comprising this container
    * 
    * @param partitions List<Partition>
    */
-  void setPartitions(List<Partition> partitions);
+  public void setPartitions(List<Partition> partitions);
 
   /**
    * Get a {@link Partition} at a given relative partition number index (base-1)
@@ -79,22 +79,30 @@ public interface SequencerPartitionContainer
    * @param partitionNumber
    * @return the {@link Partition} at the given index
    */
-  Partition getPartitionAt(int partitionNumber);
+  public Partition getPartitionAt(int partitionNumber);
 
   /**
    * Set the number of partitions that this container can hold
    * 
    * @param partitionLimit
    */
-  void setPartitionLimit(int partitionLimit);
+  public void setPartitionLimit(int partitionLimit);
 
-  void setClusteringKit(KitDescriptor clusteringKit);
+  public void setClusteringKit(KitDescriptor clusteringKit);
 
-  KitDescriptor getClusteringKit();
+  public KitDescriptor getClusteringKit();
 
-  KitDescriptor getMultiplexingKit();
+  public String getClusteringKitLot();
 
-  void setMultiplexingKit(KitDescriptor multiplexingKit);
+  public void setClusteringKitLot(String clusteringKitLot);
+
+  public KitDescriptor getMultiplexingKit();
+
+  public void setMultiplexingKit(KitDescriptor multiplexingKit);
+
+  public String getMultiplexingKitLot();
+
+  public void setMultiplexingKitLot(String multiplexingKitLot);
 
   public SequencingContainerModel getModel();
 

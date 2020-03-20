@@ -199,6 +199,8 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @JoinColumn(name = "kitDescriptorId")
   private KitDescriptor kitDescriptor;
 
+  private String kitLot;
+
   @ManyToOne
   @JoinColumn(name = "spikeInId")
   private LibrarySpikeIn spikeIn;
@@ -605,6 +607,16 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
+  public String getKitLot() {
+    return kitLot;
+  }
+
+  @Override
+  public void setKitLot(String kitLot) {
+    this.kitLot = kitLot;
+  }
+
+  @Override
   public int hashCode() {
     return new HashCodeBuilder(3, 33)
         .appendSuper(super.hashCode())
@@ -624,6 +636,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
         .append(platformType)
         .append(qcPassed)
         .append(kitDescriptor)
+        .append(kitLot)
         .toHashCode();
   }
 
@@ -651,6 +664,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
         .append(platformType, other.platformType)
         .append(qcPassed, other.qcPassed)
         .append(kitDescriptor, other.kitDescriptor)
+        .append(kitLot, other.kitLot)
         .isEquals();
   }
 

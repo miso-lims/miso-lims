@@ -52,6 +52,7 @@ public class BulkLibraryPage extends HeaderFooterPage {
     public static final String INDEX_2 = "Index 2";
     public static final String UMIS = "Has UMIs";
     public static final String KIT_DESCRIPTOR = "Kit";
+    public static final String KIT_LOT = "Kit Lot";
     public static final String QC_PASSED = "QC Passed?";
     public static final String SIZE = "Size (bp)";
     public static final String INITIAL_VOLUME = "Initial Volume";

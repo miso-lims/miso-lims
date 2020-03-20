@@ -342,6 +342,11 @@ FormTarget.library = (function($) {
             return item.id;
           }
         }, {
+          title: 'Kit Lot',
+          data: 'kitLot',
+          type: 'text',
+          maxLength: 100
+        }, {
           title: 'Spike-In',
           data: 'spikeInId',
           type: 'dropdown',

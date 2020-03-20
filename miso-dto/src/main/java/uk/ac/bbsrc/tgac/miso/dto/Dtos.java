@@ -1372,6 +1372,7 @@ public class Dtos {
     if (from.getKitDescriptor() != null) {
       dto.setKitDescriptorId(from.getKitDescriptor().getId());
     }
+    setString(dto::setKitLot, from.getKitLot());
     if (!from.getIndices().isEmpty()) {
       dto.setIndexFamilyId(from.getIndices().get(0).getFamily().getId());
       dto.setIndexFamilyName(from.getIndices().get(0).getFamily().getName());
@@ -1490,6 +1491,7 @@ public class Dtos {
       kitDescriptor.setId(from.getKitDescriptorId());
       to.setKitDescriptor(kitDescriptor);
     }
+    setString(to::setKitLot, from.getKitLot());
     to.setLocationBarcode(from.getLocationBarcode());
     to.setCreationDate(parseDate(from.getCreationDate()));
     to.setBoxPosition((LibraryBoxPosition) makeBoxablePosition(from, (LibraryImpl) to));
@@ -1963,6 +1965,7 @@ public class Dtos {
       dto.setSequencingParametersName(from.getSequencingParameters().getName());
     }
     setId(dto::setSequencingKitId, from.getSequencingKit());
+    setString(dto::setSequencingKitLot, from.getSequencingKitLot());
     dto.setProgress(from.getProgress());
     dto.setRunPath(from.getFilePath());
 
@@ -2034,6 +2037,7 @@ public class Dtos {
     setDate(to::setCompletionDate, dto.getEndDate());
     setObject(to::setSequencingParameters, SequencingParameters::new, dto.getSequencingParametersId());
     setObject(to::setSequencingKit, KitDescriptor::new, dto.getSequencingKitId());
+    setString(to::setSequencingKitLot, dto.getSequencingKitLot());
     setString(to::setFilePath, dto.getRunPath());
     setBoolean(to::setDataApproved, dto.isDataApproved(), true);
     setObject(to::setDataApprover, UserImpl::new, dto.getDataApproverId());
@@ -2115,9 +2119,11 @@ public class Dtos {
     if (from.getClusteringKit() != null) {
       dto.setClusteringKitId(from.getClusteringKit().getId());
     }
+    setString(dto::setClusteringKitLot, from.getClusteringKitLot());
     if (from.getMultiplexingKit() != null) {
       dto.setMultiplexingKitId(from.getMultiplexingKit().getId());
     }
+    setString(dto::setMultiplexingKitLot, from.getMultiplexingKitLot());
 
     if (includePartitions) {
       dto.setPartitions(asPartitionDtos(from.getPartitions(), includePoolContents, indexChecker));
@@ -2147,7 +2153,9 @@ public class Dtos {
     setObject(to::setModel, SequencingContainerModel::new, maybeGetProperty(from.getModel(), SequencingContainerModelDto::getId));
     setString(to::setDescription, from.getDescription());
     setObject(to::setClusteringKit, KitDescriptor::new, from.getClusteringKitId());
+    setString(to::setClusteringKitLot, from.getClusteringKitLot());
     setObject(to::setMultiplexingKit, KitDescriptor::new, from.getMultiplexingKitId());
+    setString(to::setMultiplexingKitLot, from.getMultiplexingKitLot());
 
     // Note: partitions not included
 
