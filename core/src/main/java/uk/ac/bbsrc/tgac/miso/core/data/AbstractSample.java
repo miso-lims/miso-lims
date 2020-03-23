@@ -58,7 +58,6 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
@@ -88,9 +87,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @ManyToOne(targetEntity = ProjectImpl.class)
   @JoinColumn(name = "project_projectId")
   private Project project;
-
-  @OneToMany(targetEntity = LibraryImpl.class, mappedBy = "sample")
-  private final Collection<Library> libraries = new HashSet<>();
 
   @OneToMany(targetEntity = SampleQC.class, mappedBy = "sample", cascade = CascadeType.ALL)
   private Collection<SampleQC> sampleQCs = new TreeSet<>();
@@ -321,16 +317,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public String getLabelText() {
     return getAlias();
-  }
-
-  @Override
-  public void addLibrary(Library l) {
-    this.libraries.add(l);
-  }
-
-  @Override
-  public Collection<Library> getLibraries() {
-    return libraries;
   }
 
   @Override

@@ -166,21 +166,6 @@ public interface Sample extends Attachable, Comparable<Sample>, Deletable, Hiera
   public Collection<ChangeLog> getChangeLog();
 
   /**
-   * Adds a Library that has been prepared from this Sample
-   * 
-   * @param library
-   *          of type Library
-   */
-  public void addLibrary(Library library);
-
-  /**
-   * Returns the libraries prepared from this Sample object.
-   * 
-   * @return Collection<Library> libraries.
-   */
-  public Collection<Library> getLibraries();
-
-  /**
    * Returns the sampleType of this Sample object.
    * 
    * @return String sampleType.

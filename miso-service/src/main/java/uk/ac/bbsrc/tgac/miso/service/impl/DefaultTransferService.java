@@ -33,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryAliquotBoxPositio
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.TransferChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferItem;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
@@ -40,6 +41,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.core.service.GroupService;
 import uk.ac.bbsrc.tgac.miso.core.service.LabService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
@@ -81,6 +83,8 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
   private LibraryAliquotService libraryAliquotService;
   @Autowired
   private PoolService poolService;
+  @Autowired
+  private ChangeLogService changeLogService;
   @Autowired
   private AuthorizationManager authorizationManager;
 
@@ -361,11 +365,31 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
       if (fromItem == null) {
         iterator.remove();
         transferStore.deleteTransferItem(toItem);
+        writeItemsChangeLog(to, String.format("Item removed: %s (%s)", toItem.getItem().getAlias(), toItem.getItem().getName()));
       } else {
-        toItem.setReceived(fromItem.isReceived());
-        toItem.setQcPassed(fromItem.isQcPassed());
-        toItem.setQcNote(fromItem.getQcNote());
+        StringBuilder sb = new StringBuilder();
+        boolean changed = false;
+        sb.append("Status changed for ").append(toItem.getItem().getAlias())
+            .append(" (").append(toItem.getItem().getName()).append(") - ");
+        if (!Objects.equals(toItem.isReceived(), fromItem.isReceived())) {
+          addMessage(sb, changed, "Received", receiptLabel(toItem), receiptLabel(fromItem));
+          changed = true;
+          toItem.setReceived(fromItem.isReceived());
+        }
+        if (!Objects.equals(toItem.isQcPassed(), fromItem.isQcPassed())) {
+          addMessage(sb, changed, "QC", qcLabel(toItem), qcLabel(fromItem));
+          changed = true;
+          toItem.setQcPassed(fromItem.isQcPassed());
+        }
+        if (!Objects.equals(toItem.getQcNote(), fromItem.getQcNote())) {
+          addMessage(sb, changed, "QC Note", qcNoteLabel(toItem), qcNoteLabel(fromItem));
+          changed = true;
+          toItem.setQcNote(fromItem.getQcNote());
+        }
         setBoxPosition(toItem, fromItem.getItem().getBox(), fromItem.getItem().getBoxPosition(), positionConstructor, positionSetter);
+        if (changed) {
+          writeItemsChangeLog(to, sb.toString());
+        }
       }
     }
 
@@ -373,8 +397,50 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
       if (toItems.stream().noneMatch(toItem -> toItem.getItem().getId() == fromItem.getItem().getId())) {
         fromItem.setTransfer(to);
         toItems.add(fromItem);
+        writeItemsChangeLog(to, String.format("Item added: %s (%s)", fromItem.getItem().getAlias(), fromItem.getItem().getName()));
       }
     }
+  }
+
+  private void addMessage(StringBuilder sb, boolean commaNeeded, String fieldName, String fromValue, String toValue) {
+    if (commaNeeded) {
+      sb.append(", ");
+    }
+    sb.append(fieldName).append(": ").append(fromValue).append(" → ").append(toValue);
+  }
+
+  private String receiptLabel(TransferItem<?> item) {
+    if (item.isReceived() == null) {
+      return "n/a";
+    } else if (item.isReceived()) {
+      return "true";
+    } else {
+      return "false";
+    }
+  }
+
+  private String qcLabel(TransferItem<?> item) {
+    if (item.isQcPassed() == null) {
+      return "n/a";
+    } else if (item.isQcPassed()) {
+      return "passed";
+    } else {
+      return "failed";
+    }
+  }
+
+  private String qcNoteLabel(TransferItem<?> item) {
+    return item.getQcNote() == null ? "n/a" : item.getQcNote();
+  }
+
+  private void writeItemsChangeLog(Transfer transfer, String message) throws IOException {
+    TransferChangeLog change = new TransferChangeLog();
+    change.setTransfer(transfer);
+    change.setTime(new Date());
+    change.setUser(authorizationManager.getCurrentUser());
+    change.setColumnsChanged("items");
+    change.setSummary(message);
+    changeLogService.create(change);
   }
 
   @Override

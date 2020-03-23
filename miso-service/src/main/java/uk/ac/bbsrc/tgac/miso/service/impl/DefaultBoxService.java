@@ -121,7 +121,8 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
       throw new IllegalArgumentException("No item in the specified box position");
     }
     Boxable target = boxStore.getBoxable(bp.getBoxableId());
-    addBoxContentsChangeLog(managed, String.format("Discarded %s (%s)", target.getAlias(), target.getName()));
+    addBoxContentsChangeLog(managed,
+        String.format("Discarded %s (%s) from %s", target.getAlias(), target.getName(), target.getBoxPosition()));
     discardBoxable(bp.getBoxableId());
     managed.getBoxPositions().remove(position);
     boxStore.save(managed);
@@ -260,8 +261,8 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
         } else {
           // Moved from a different box
           Box oldBox = get(oldOccupant.getBoxId());
-          addBoxContentsChangeLog(oldBox, String.format("Removed %s (%s) to %s (%s)", oldOccupant.getAlias(), oldOccupant.getName(),
-              managed.getAlias(), managed.getName()));
+          addBoxContentsChangeLog(oldBox, String.format("Removed %s (%s) from %s to %s (%s)", oldOccupant.getAlias(), oldOccupant.getName(),
+              oldOccupant.getBoxPosition(), managed.getAlias(), managed.getName()));
           message.append(String.format("Moved %s (%s) from %s (%s) to %s", oldOccupant.getAlias(), oldOccupant.getName(),
               oldOccupant.getBoxAlias(), oldOccupant.getBoxName(), entry.getKey()));
           movedFromOtherBoxes.add(oldOccupant);
@@ -288,7 +289,7 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
         if (message.length() > 0) {
           message.append("\n");
         }
-        message.append(String.format("Removed %s (%s)", v.getAlias(), v.getName()));
+        message.append(String.format("Removed %s (%s) from %s", v.getAlias(), v.getName(), v.getBoxPosition()));
       }
     }
 
@@ -497,7 +498,8 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
       Box box = get(managedOriginal.getBox().getId());
       box.getBoxPositions().remove(managedOriginal.getBoxPosition());
       addBoxContentsChangeLog(managedOriginal.getBox(),
-          String.format("Removed %s (%s)", managedOriginal.getAlias(), managedOriginal.getName()));
+          String.format("Removed %s (%s) from %s", managedOriginal.getAlias(), managedOriginal.getName(),
+              managedOriginal.getBoxPosition()));
       box.setChangeDetails(authorizationManager.getCurrentUser());
       boxStore.save(box);
     }
