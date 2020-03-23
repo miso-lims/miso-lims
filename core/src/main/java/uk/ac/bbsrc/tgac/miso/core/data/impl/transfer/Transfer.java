@@ -1,6 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl.transfer;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -19,14 +21,16 @@ import javax.persistence.TemporalType;
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLoggable;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
-import uk.ac.bbsrc.tgac.miso.core.data.Timestamped;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.TransferChangeLog;
 
 @Entity
-public class Transfer implements Identifiable, Timestamped, Serializable {
+public class Transfer implements Identifiable, ChangeLoggable, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -66,6 +70,9 @@ public class Transfer implements Identifiable, Timestamped, Serializable {
 
   @Temporal(TemporalType.TIMESTAMP)
   private Date lastModified;
+
+  @OneToMany(targetEntity = TransferChangeLog.class, mappedBy = "transfer", cascade = CascadeType.REMOVE)
+  private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @OneToMany(mappedBy = "transfer", cascade = CascadeType.ALL)
   private Set<TransferSample> sampleTransfers;
@@ -167,6 +174,21 @@ public class Transfer implements Identifiable, Timestamped, Serializable {
   @Override
   public void setLastModified(Date lastModified) {
     this.lastModified = lastModified;
+  }
+
+  @Override
+  public Collection<ChangeLog> getChangeLog() {
+    return changeLog;
+  }
+
+  @Override
+  public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
+    TransferChangeLog change = new TransferChangeLog();
+    change.setTransfer(this);
+    change.setSummary(summary);
+    change.setColumnsChanged(columnsChanged);
+    change.setUser(user);
+    return change;
   }
 
   public Set<TransferSample> getSampleTransfers() {
