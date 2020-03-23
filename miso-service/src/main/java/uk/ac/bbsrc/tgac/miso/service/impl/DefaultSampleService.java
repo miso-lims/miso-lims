@@ -48,7 +48,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl.IdentityBuilder;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
@@ -248,7 +247,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
         if (detailed.getParent() == null) {
           throw new IllegalArgumentException(ERR_MISSING_PARENT_ID);
         }
-        if (detailed.getParent().getId() != SampleImpl.UNSAVED_ID) {
+        if (detailed.getParent().isSaved()) {
           detailed.setParent((DetailedSample) get(detailed.getParent().getId()));
         } else {
           try {
@@ -357,7 +356,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       if (!hasTemporaryAlias(sample)) {
         validateAlias(sample, namingScheme);
       }
-      if (newId == Sample.UNSAVED_ID) {
+      if (!sample.isSaved()) {
         newId = sampleStore.addSample(sample);
       } else {
         sampleStore.update(sample);
@@ -526,7 +525,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       throw new IllegalArgumentException(ERR_MISSING_PARENT_ID);
     }
     DetailedSample tempParent = sample.getParent();
-    if (tempParent.getId() != Sample.UNSAVED_ID) {
+    if (tempParent.isSaved()) {
       Sample parent = sampleStore.getSample(tempParent.getId());
       if (parent == null)
         throw new IllegalArgumentException("Parent sample does not exist");
@@ -557,7 +556,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       slides += ((SampleTissuePiece) child).getSlidesConsumed();
       parentSlides.setSlides(slides);
       parentSlides.setDiscards(0);
-      if (parentSlides.getId() != SampleImpl.UNSAVED_ID) {
+      if (parentSlides.isSaved()) {
         update(parentSlides);
       }
     }
@@ -601,7 +600,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   }
 
   private SampleIdentity findOrCreateIdentity(DetailedSample descendant, SampleIdentity identity) throws IOException, MisoNamingException {
-    if (identity.getId() != SampleImpl.UNSAVED_ID) {
+    if (identity.isSaved()) {
       return (SampleIdentity) sampleStore.getSample(identity.getId());
     } else {
       // If samples are being bulk received for the same new donor, they will all have a null parentId.
@@ -1109,7 +1108,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
 
   @Override
   public Sample save(Sample sample) throws IOException {
-    if (sample.getId() == SampleImpl.UNSAVED_ID) {
+    if (!sample.isSaved()) {
       return get(create(sample));
     } else {
       update(sample);

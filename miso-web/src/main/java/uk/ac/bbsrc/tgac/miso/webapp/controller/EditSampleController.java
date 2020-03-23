@@ -69,7 +69,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
@@ -248,7 +247,7 @@ public class EditSampleController {
     model.put("sample", sample);
     SampleDto sampleDto = Dtos.asDto(sample, false, libraries.size());
     setRelatedSlideDtos(sample, sampleDto);
-    model.put("sampleDto", sample.getId() == SampleImpl.UNSAVED_ID ? "null" : mapper.writeValueAsString(sampleDto));
+    model.put("sampleDto", !sample.isSaved() ? "null" : mapper.writeValueAsString(sampleDto));
 
     ObjectNode formConfig = mapper.createObjectNode();
     formConfig.put("detailedSample", isDetailedSampleEnabled());

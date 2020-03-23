@@ -13,6 +13,8 @@ Changes:
   * Added change logs to transfers
   * Fixed error that caused libraries to be missing from some sample contexts (including Children button and edit Sample page)
   * Fixed error in LDAP configuration
+  * Fixed creating samples parented to existing tissues with null times received and tube number
+    (detailed sample)
 
 # 1.1.0
 

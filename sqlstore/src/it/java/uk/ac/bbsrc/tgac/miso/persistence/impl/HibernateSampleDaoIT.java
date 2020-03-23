@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -66,7 +65,6 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
     sample.setName(sampleName);
     sample.setAlias("alias32LK");
     sample.setProject(dao.get(1L).getProject());
-    sample.setId(AbstractSample.UNSAVED_ID);
     sample.setSampleType("GENOMIC");
     sample.setScientificName("Homo Sapiens");
     User user = new UserImpl();

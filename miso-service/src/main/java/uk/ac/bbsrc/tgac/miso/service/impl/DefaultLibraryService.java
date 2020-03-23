@@ -36,7 +36,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
@@ -186,7 +185,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
 
   @Override
   public long create(Library library) throws IOException {
-    if (library.getSample() != null && library.getSample().getId() == Sample.UNSAVED_ID) {
+    if (library.getSample() != null && !library.getSample().isSaved()) {
       Long sampleId = sampleService.create(library.getSample());
       library.getSample().setId(sampleId);
     }
