@@ -17,6 +17,7 @@ Urls = (function() {
 
   var ui = {};
   var rest = {};
+  var download = {};
   var external = {};
 
   // Arrays
@@ -87,11 +88,34 @@ Urls = (function() {
   rest.boxes = {
     create: boxRestBase,
     update: idUrlFunction(boxRestBase),
+    updatePosition: function(boxId, position) {
+      return boxRestBase + '/' + boxId + '/position/' + position;
+    },
+    removePosition: function(boxId, position) {
+      return boxRestBase + '/' + boxId + '/positions/' + position;
+    },
+    discardPosition: function(boxId, position) {
+      return boxRestBase + '/' + boxId + '/positions/' + position + '/discard';
+    },
+    updateContents: middleIdUrlFunction(boxRestBase, '/bulk-update'),
+    removeContents: middleIdUrlFunction(boxRestBase, '/bulk-remove'),
+    discardContents: middleIdUrlFunction(boxRestBase, '/bulk-discard'),
+    discardAll: middleIdUrlFunction(boxRestBase, '/discard-all'),
     searchPartial: boxRestBase + '/search/partial',
     setLocation: middleIdUrlFunction(boxRestBase, '/setlocation'),
     datatable: boxRestBase + '/dt',
     useDatatable: idUrlFunction(boxRestBase + '/dt/use'),
-    bulkDelete: boxRestBase + '/bulk-delete'
+    bulkDelete: boxRestBase + '/bulk-delete',
+    fillByPattern: middleIdUrlFunction(boxRestBase, '/positions/fill-by-pattern'),
+    prepareScan: boxRestBase + '/prepare-scan',
+    scan: middleIdUrlFunction(boxRestBase, '/scan'),
+    spreadsheet: middleIdUrlFunction(boxRestBase, '/spreadsheet')
+  };
+
+  // Boxables
+  var boxablesRestBase = restBase + '/boxables';
+  rest.boxables = {
+    search: boxablesRestBase + '/search'
   };
 
   // Box Sizes
@@ -536,7 +560,8 @@ Urls = (function() {
     create: printerRestBase,
     enable: printerRestBase + '/enable',
     disable: printerRestBase + '/disable',
-    printBoxContents: middleIdUrlFunction(printerRestBase, '/boxcontents')
+    printBoxContents: middleIdUrlFunction(printerRestBase, '/boxcontents'),
+    printBoxPositions: middleIdUrlFunction(printerRestBase, '/boxpositions')
   };
 
   // Projects
@@ -973,6 +998,9 @@ Urls = (function() {
     update: idUrlFunction(workstationRestBase)
   };
 
+  // Downloads
+  download.boxSpreadsheet = idUrlFunction(baseUrl + '/download/box/forms')
+
   // External sites
   external.userManual = function(section, subsection) {
     var url = 'https://miso-lims.readthedocs.io/projects/docs/en/' + Constants.docsVersion + '/user_manual/';
@@ -990,6 +1018,7 @@ Urls = (function() {
   return {
     ui: ui,
     rest: rest,
+    download: download,
     external: external
   };
 

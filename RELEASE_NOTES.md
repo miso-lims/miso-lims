@@ -9,6 +9,7 @@ Changes:
     * Run sequencing kit
     * Container clustering kit
     * Container multiplexing kit
+  * Log positions that box items are removed from
   * Added change logs to transfers
   * Fixed error that caused libraries to be missing from some sample contexts (including Children button and edit Sample page)
   * Fixed error in LDAP configuration
