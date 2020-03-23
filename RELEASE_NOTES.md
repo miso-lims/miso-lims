@@ -9,6 +9,7 @@ Changes:
     * Run sequencing kit
     * Container clustering kit
     * Container multiplexing ki
+  * Fixed error in LDAP configuration
 
 # 1.1.0
 
