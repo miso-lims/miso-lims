@@ -397,7 +397,7 @@ public class Dtos {
 
   public static SampleDto asMinimalDto(@Nonnull Sample from) {
     DetailedSampleDto dto = new DetailedSampleDto();
-    copySampleFields(from, dto, false);
+    copySampleFields(from, dto, false, 0);
 
     if (isDetailedSample(from)) {
       DetailedSample detailed = (DetailedSample) from;
@@ -418,6 +418,10 @@ public class Dtos {
   }
 
   public static SampleDto asDto(@Nonnull Sample from, boolean includeBoxPositions) {
+    return asDto(from, includeBoxPositions, 0);
+  }
+
+  public static SampleDto asDto(@Nonnull Sample from, boolean includeBoxPositions, int libraryCount) {
     SampleDto dto = null;
 
     if (isDetailedSample(from)) {
@@ -425,7 +429,7 @@ public class Dtos {
     } else {
       dto = new SampleDto();
     }
-    copySampleFields(from, dto, includeBoxPositions);
+    copySampleFields(from, dto, includeBoxPositions, libraryCount);
     dto.setAccession(from.getAccession());
 
     if (from.getQCs() != null && !from.getQCs().isEmpty()) {
@@ -440,7 +444,7 @@ public class Dtos {
         .collect(Collectors.toList());
   }
 
-  private static SampleDto copySampleFields(@Nonnull Sample from, @Nonnull SampleDto dto, boolean includeBoxPositions) {
+  private static SampleDto copySampleFields(@Nonnull Sample from, @Nonnull SampleDto dto, boolean includeBoxPositions, int libraryCount) {
     dto.setId(from.getId());
     dto.setName(from.getName());
     dto.setDescription(from.getDescription());
@@ -482,9 +486,7 @@ public class Dtos {
       setBoolean(dto::setReceiptQcPassed, receipt.isQcPassed(), true);
       setString(dto::setReceiptQcNote, receipt.getQcNote());
     }
-    if (from.getLibraries() != null) {
-      dto.setLibraryCount(from.getLibraries().size());
-    }
+    dto.setLibraryCount(libraryCount);
 
     return dto;
 
