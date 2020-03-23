@@ -95,7 +95,7 @@
   </bean>
   
   <security:authentication-manager alias="authenticationManager">
-    <security:authentication-provider ref="ldapAuthPopulator">
+    <security:authentication-provider ref="ldapAuthProvider">
     </security:authentication-provider>
   </security:authentication-manager>
   

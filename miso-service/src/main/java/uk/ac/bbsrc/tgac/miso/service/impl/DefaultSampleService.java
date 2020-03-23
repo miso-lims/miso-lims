@@ -30,6 +30,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
@@ -55,6 +56,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
 import uk.ac.bbsrc.tgac.miso.core.service.LabService;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
@@ -71,6 +73,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.core.util.TaxonomyUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.DetailedQcStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.ProjectStore;
@@ -118,6 +121,8 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   private DeletionStore deletionStore;
   @Autowired
   private LabService labService;
+  @Autowired
+  private LibraryService libraryService;
   @Autowired
   private StainService stainService;
   @Autowired
@@ -1066,7 +1071,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   }
 
   @Override
-  public ValidationResult validateDeletion(Sample object) {
+  public ValidationResult validateDeletion(Sample object) throws IOException {
     ValidationResult result = new ValidationResult();
 
     if (isDetailedSample(object)) {
@@ -1075,11 +1080,10 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
         result.addError(new ValidationError(object.getName() + " has " + childCount + " child sample" + (childCount > 1 ? "s" : "")));
       }
     }
-    if (object.getLibraries() != null && !object.getLibraries().isEmpty()) {
-      result.addError(new ValidationError(object.getName() + " has " + object.getLibraries().size() + " librar"
-          + (object.getLibraries().size() > 1 ? "ies" : "y")));
+    final int libraries = libraryService.listBySampleId(object.getId()).size();
+    if (libraries > 0) {
+      result.addError(ValidationError.forDeletionUsage(object, libraries, Pluralizer.libraries(libraries)));
     }
-
     return result;
   }
 

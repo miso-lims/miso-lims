@@ -119,6 +119,7 @@ DELETE FROM TissueMaterial;
 DELETE FROM TissueOrigin;
 DELETE FROM TissueType;
 DELETE FROM Transfer;
+DELETE FROM TransferChangeLog;
 DELETE FROM Transfer_Library;
 DELETE FROM Transfer_LibraryAliquot;
 DELETE FROM Transfer_Pool;

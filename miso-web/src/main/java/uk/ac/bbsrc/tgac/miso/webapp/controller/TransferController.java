@@ -158,6 +158,7 @@ public class TransferController {
     itemsListConfig.put("editReceipt", editReceipt);
 
     model.put("pageMode", pageMode);
+    model.put("transfer", transfer);
     model.put("transferDto", mapper.writeValueAsString(Dtos.asDto(transfer)));
     model.put("formConfig", mapper.writeValueAsString(formConfig));
     model.put("itemsListConfig", mapper.writeValueAsString(itemsListConfig));
