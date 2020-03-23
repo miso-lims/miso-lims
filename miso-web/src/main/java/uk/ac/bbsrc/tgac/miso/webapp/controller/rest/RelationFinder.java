@@ -14,6 +14,8 @@ import java.util.stream.Stream;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -23,12 +25,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 
 public abstract class RelationFinder<M extends Identifiable> {
+  protected static final Logger log = LoggerFactory.getLogger(RelationFinder.class);
+
   public abstract static class RelationAdapter<M extends Identifiable, P extends Identifiable, D> {
 
     public abstract D asDto(P model);
@@ -158,9 +163,13 @@ public abstract class RelationFinder<M extends Identifiable> {
           .flatMap(child -> Stream.concat(Stream.of(child).filter(targetChildClass::isInstance), searchChildren(targetChildClass, child)));
     }
 
-    public static Stream<Library> searchChildrenLibraries(DetailedSample model) {
-      return model.getChildren().stream()
-          .flatMap(child -> Stream.concat(child.getLibraries().stream(), searchChildrenLibraries(child)));
+    public static Stream<Library> searchChildrenLibraries(DetailedSample model, LibraryService libraryService) {
+      try {
+        return Stream.concat(libraryService.listBySampleId(model.getId()).stream(), model.getChildren().stream().flatMap(child -> searchChildrenLibraries(child, libraryService)));
+      } catch (IOException e) {
+        log.error("Failed to get child libraries.", e);
+        throw new RestException("Error fetching library information", Status.INTERNAL_SERVER_ERROR);
+      }
     }
 
   }

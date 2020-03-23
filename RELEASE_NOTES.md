@@ -8,7 +8,8 @@ Changes:
     * Library kit
     * Run sequencing kit
     * Container clustering kit
-    * Container multiplexing ki
+    * Container multiplexing kit
+  * Fixed error that caused libraries to be missing from some sample contexts (including Children button and edit Sample page)
   * Fixed error in LDAP configuration
 
 # 1.1.0
