@@ -30,7 +30,6 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
@@ -60,6 +59,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
+import uk.ac.bbsrc.tgac.miso.core.service.SequencingControlTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.StainService;
 import uk.ac.bbsrc.tgac.miso.core.service.TransferService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
@@ -129,6 +129,8 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   private BoxService boxService;
   @Autowired
   private WorksetService worksetService;
+  @Autowired
+  private SequencingControlTypeService sequencingControlTypeService;
   @Autowired
   private FileAttachmentService fileAttachmentService;
   @Autowired
@@ -667,6 +669,8 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     if (sample.getProject() != null) {
       sample.setProject(projectStore.get(sample.getProject().getId()));
     }
+    loadChildEntity(sample::setSequncingControlType, sample.getSequencingControlType(), sequencingControlTypeService,
+        "sequencingControlTypeId");
     if (isDetailedSample(sample)) {
       DetailedSample detailed = (DetailedSample) sample;
       if (detailed.getSampleClass() != null && detailed.getSampleClass().isSaved()) {
@@ -878,6 +882,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
     target.setLocationBarcode(source.getLocationBarcode());
     target.setRequisitionId(source.getRequisitionId());
+    target.setSequncingControlType(source.getSequencingControlType());
 
     if (isDetailedSample(target)) {
       DetailedSample dTarget = (DetailedSample) target;

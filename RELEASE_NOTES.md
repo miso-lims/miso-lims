@@ -11,11 +11,18 @@ Changes:
     * Container multiplexing kit
   * Log positions that box items are removed from
   * Added change logs to transfers
+  * Allow marking samples as sequencing controls
   * Performance improvements, especially for Edit Sample, Library, Library Aliquot, and Pool pages
   * Fixed error that caused libraries to be missing from some sample contexts (including Children button and edit Sample page)
   * Fixed error in LDAP configuration
   * Fixed creating samples parented to existing tissues with null times received and tube number
     (detailed sample)
+
+Upgrade Notes:
+
+  * Sequencing control types have been added, but the feature is not yet completed and they must be added to the database via
+    SQL. It will be possible to edit these through the UI in the next release.
+  * Updated to Pinery 1.12.0
 
 # 1.1.0
 

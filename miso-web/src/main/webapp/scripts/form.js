@@ -901,7 +901,7 @@ FormUtils = (function($) {
   }
 
   function makeFieldNote(field) {
-    return $('<span>').addClass('message-info').text(field.note);
+    return $('<div>').addClass('message-info').text(field.note);
   }
 
   function makeFieldValidationBox(inputId, field) {

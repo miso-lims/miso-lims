@@ -199,7 +199,17 @@ FormTarget.sample = (function($) {
                   data: 'locationBarcode',
                   type: 'text',
                   maxLength: 255
-                }, FormUtils.makeBoxLocationField()]
+                }, FormUtils.makeBoxLocationField(), {
+                  title: 'Sequencing Control Type',
+                  data: 'sequencingControlTypeId',
+                  type: 'dropdown',
+                  source: Constants.sequencingControlTypes,
+                  sortSource: Utils.sorting.standardSort('alias'),
+                  getItemLabel: Utils.array.getAlias,
+                  getItemValue: Utils.array.getId,
+                  nullLabel: 'n/a',
+                  include: !Constants.isDetailedSample || object.sampleCategory === 'Aliquot'
+                }]
           }, {
             title: 'Identity',
             include: config.detailedSample && object.sampleCategory === 'Identity',
