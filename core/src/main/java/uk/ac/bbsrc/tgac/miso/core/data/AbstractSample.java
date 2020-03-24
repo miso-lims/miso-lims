@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
@@ -42,6 +43,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
@@ -53,6 +55,7 @@ import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.annotations.Immutable;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
@@ -62,8 +65,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferItem;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListTransferView;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
 
@@ -146,8 +148,11 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Transient
   private List<FileAttachment> pendingAttachmentDeletions;
 
-  @OneToMany(mappedBy = "item", cascade = CascadeType.REMOVE)
-  private List<TransferSample> transfers;
+  @Immutable
+  @ManyToMany
+  @JoinTable(name = "Transfer_Sample", joinColumns = { @JoinColumn(name = "sampleId") }, inverseJoinColumns = {
+      @JoinColumn(name = "transferId") })
+  private Set<ListTransferView> listTransferViews;
 
   @Override
   public EntityType getEntityType() {
@@ -451,8 +456,8 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
 
   @Override
   public Date getBarcodeDate() {
-    TransferItem<?> receipt = getReceiptTransfer();
-    return receipt == null ? getCreationTime() : receipt.getTransfer().getTransferTime();
+    ListTransferView receipt = getReceiptTransfer();
+    return receipt == null ? getCreationTime() : receipt.getTransferTime();
   }
 
   @Override
@@ -564,10 +569,11 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   }
 
   @Override
-  public List<TransferSample> getTransfers() {
-    if (transfers == null) {
-      transfers = new ArrayList<>();
+  public Set<ListTransferView> getTransferViews() {
+    if (listTransferViews == null) {
+      listTransferViews = new HashSet<>();
     }
-    return transfers;
+    return listTransferViews;
   }
+
 }

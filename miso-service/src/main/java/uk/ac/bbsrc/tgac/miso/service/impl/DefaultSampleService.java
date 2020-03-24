@@ -50,6 +50,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl.IdentityBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
@@ -235,6 +236,11 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
 
   @Override
   public long create(Sample sample) throws IOException {
+    return create(sample, null);
+  }
+
+  @Override
+  public long create(Sample sample, TransferSample transferSample) throws IOException {
     loadChildEntities(sample);
     boxService.throwIfBoxPositionIsFilled(sample);
     User changeUser = authorizationManager.getCurrentUser();
@@ -287,18 +293,17 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     }
     LimsUtils.updateParentVolume(sample, null, changeUser);
     updateParentSlides(sample, null, changeUser);
-    validateChange(sample, null);
+    validateChange(sample, transferSample, null);
     long savedId = save(sample, true).getId();
     if (sample.getParent() != null) {
       sampleStore.update(sample.getParent());
     }
     boxService.updateBoxableLocation(sample);
-    if (!sample.getTransfers().isEmpty()) {
-      TransferSample transferSample = sample.getTransfers().iterator().next();
+    if (transferSample != null) {
       Transfer transfer = transferSample.getTransfer();
-      List<Transfer> existingTransfers = transferService.listByProperties(transfer.getSenderLab(), transfer.getRecipientGroup(),
-          sample.getProject(), transfer.getTransferTime());
-      Transfer existingTransfer = existingTransfers.stream().max(Comparator.comparing(Transfer::getCreationTime)).orElse(null);
+      Transfer existingTransfer = transferService.listByProperties(transfer.getSenderLab(), transfer.getRecipientGroup(),
+          sample.getProject(), transfer.getTransferTime()).stream()
+          .max(Comparator.comparing(Transfer::getCreationTime)).orElse(null);
       if (existingTransfer != null) {
         existingTransfer.getSampleTransfers().add(transferSample);
         transferSample.setTransfer(existingTransfer);
@@ -757,7 +762,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     LimsUtils.updateParentVolume(sample, managed, changeUser);
     updateParentSlides(sample, managed, changeUser);
     loadChildEntities(sample);
-    validateChange(sample, managed);
+    validateChange(sample, null, managed);
     applyChanges(managed, sample);
     if (isDetailedSample(managed)) {
       DetailedSample detailedUpdated = (DetailedSample) managed;
@@ -782,7 +787,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     }
   }
 
-  private void validateChange(Sample sample, Sample beforeChange) throws IOException {
+  private void validateChange(Sample sample, TransferSample receipt, Sample beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
 
     validateConcentrationUnits(sample.getConcentration(), sample.getConcentrationUnits(), errors);
@@ -795,29 +800,28 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       errors.add(new ValidationError("scientificName", "This scientific name is not of a known taxonomy"));
     }
 
-    if (beforeChange == null) {
-      if (sample.getTransfers().size() > 1) {
-        errors.add(new ValidationError("Cannot have more than one transfer upon creation"));
-      } else if (sample.getTransfers().size() == 1) {
-        TransferSample transfer = sample.getTransfers().iterator().next();
-        if (transfer.getTransfer().getSenderLab() == null) {
-          errors.add(new ValidationError("senderLabId", "Receipt transfer must specify a lab"));
-        }
-        if (transfer.getTransfer().getRecipientGroup() == null) {
-          errors.add(new ValidationError("recipientGroupId", "Receipt transfer must specify a recipient group"));
-        }
-        if (Boolean.FALSE.equals(transfer.isQcPassed()) && transfer.getQcNote() == null) {
-          errors.add(new ValidationError("reciptQcNote", "A receipt QC note is required when receipt QC is failed"));
-        }
-      }
-    }
-
     if (isDetailedSample(sample)) {
       validateReferenceSlide((DetailedSample) sample, errors);
     }
 
+    if (receipt != null) {
+      validateReceiptTransfer(receipt, errors);
+    }
+
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
+    }
+  }
+
+  private void validateReceiptTransfer(TransferSample transferSample, List<ValidationError> errors) {
+    if (transferSample.getTransfer().getSenderLab() == null) {
+      errors.add(new ValidationError("senderLabId", "Receipt transfer must specify a lab"));
+    }
+    if (transferSample.getTransfer().getRecipientGroup() == null) {
+      errors.add(new ValidationError("recipientGroupId", "Receipt transfer must specify a recipient group"));
+    }
+    if (Boolean.FALSE.equals(transferSample.isQcPassed()) && transferSample.getQcNote() == null) {
+      errors.add(new ValidationError("reciptQcNote", "A receipt QC note is required when receipt QC is failed"));
     }
   }
 
@@ -1128,12 +1132,12 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   }
 
   @Override
-  public Sample getNextInProject(Sample sample) {
+  public EntityReference getNextInProject(Sample sample) {
     return sampleStore.getNextInProject(sample);
   }
 
   @Override
-  public Sample getPreviousInProject(Sample sample) {
+  public EntityReference getPreviousInProject(Sample sample) {
     return sampleStore.getPreviousInProject(sample);
   }
 

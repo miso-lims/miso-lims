@@ -474,18 +474,7 @@ public class Dtos {
     dto.setConcentrationUnits(from.getConcentrationUnits());
     dto.setDiscarded(from.isDiscarded());
     dto.setLastModified(formatDateTime(from.getLastModified()));
-
     setString(dto::setRequisitionId, from.getRequisitionId());
-
-    TransferItem<?> receipt = from.getReceiptTransfer();
-    if (receipt != null) {
-      setDateTimeString(dto::setReceivedTime, receipt.getTransfer().getTransferTime());
-      setId(dto::setSenderLabId, receipt.getTransfer().getSenderLab());
-      setId(dto::setRecipientGroupId, receipt.getTransfer().getRecipientGroup());
-      setBoolean(dto::setReceived, receipt.isReceived(), true);
-      setBoolean(dto::setReceiptQcPassed, receipt.isQcPassed(), true);
-      setString(dto::setReceiptQcNote, receipt.getQcNote());
-    }
     dto.setLibraryCount(libraryCount);
 
     return dto;
@@ -865,22 +854,6 @@ public class Dtos {
     to.setBoxPosition((SampleBoxPosition) makeBoxablePosition(from, (SampleImpl) to));
 
     setString(to::setRequisitionId, from.getRequisitionId());
-
-    if (!isStringEmptyOrNull(from.getReceivedTime())) {
-      Transfer receipt = new Transfer();
-      setDateTime(receipt::setTransferTime, from.getReceivedTime());
-      setObject(receipt::setSenderLab, LabImpl::new, from.getSenderLabId());
-      setObject(receipt::setRecipientGroup, Group::new, from.getRecipientGroupId());
-      TransferSample item = new TransferSample();
-      setBoolean(item::setReceived, from.isReceived(), true);
-      setBoolean(item::setQcPassed, from.isReceiptQcPassed(), true);
-      setString(item::setQcNote, from.getReceiptQcNote());
-      item.setItem(to);
-      item.setTransfer(receipt);
-      receipt.getSampleTransfers().add(item);
-      to.getTransfers().add(item);
-    }
-
     return to;
   }
 
@@ -1420,16 +1393,6 @@ public class Dtos {
     setId(dto::setWorkstationId, from.getWorkstation());
     setId(dto::setThermalCyclerId, from.getThermalCycler());
 
-    TransferItem<?> receipt = from.getReceiptTransfer();
-    if (receipt != null) {
-      setDateTimeString(dto::setReceivedTime, receipt.getTransfer().getTransferTime());
-      setId(dto::setSenderLabId, receipt.getTransfer().getSenderLab());
-      setId(dto::setRecipientGroupId, receipt.getTransfer().getRecipientGroup());
-      setBoolean(dto::setReceived, receipt.isReceived(), true);
-      setBoolean(dto::setReceiptQcPassed, receipt.isQcPassed(), true);
-      setString(dto::setReceiptQcNote, receipt.getQcNote());
-    }
-
     return dto;
   }
 
@@ -1504,22 +1467,6 @@ public class Dtos {
     setBoolean(to::setUmis, from.getUmis(), false);
     setObject(to::setWorkstation, Workstation::new, from.getWorkstationId());
     setObject(to::setThermalCycler, InstrumentImpl::new, from.getThermalCyclerId());
-
-    if (from.getReceivedTime() != null) {
-      Transfer receipt = new Transfer();
-      setDateTime(receipt::setTransferTime, from.getReceivedTime());
-      setObject(receipt::setSenderLab, LabImpl::new, from.getSenderLabId());
-      setObject(receipt::setRecipientGroup, Group::new, from.getRecipientGroupId());
-      TransferLibrary item = new TransferLibrary();
-      setBoolean(item::setReceived, from.isReceived(), true);
-      setBoolean(item::setQcPassed, from.isReceiptQcPassed(), true);
-      setString(item::setQcNote, from.getReceiptQcNote());
-      item.setItem(to);
-      item.setTransfer(receipt);
-      receipt.getLibraryTransfers().add(item);
-      to.getTransfers().add(item);
-    }
-
     return to;
   }
 
@@ -4063,6 +4010,24 @@ public class Dtos {
     setString(to::setAlias, from.getAlias());
     setString(to::setDescription, from.getDescription());
     return to;
+  }
+
+  public static <T extends Boxable, R extends TransferItem<T>> R toReceiptTransfer(@Nonnull ReceivableDto<T, R> from, @Nonnull T item) {
+    if (isStringEmptyOrNull(from.getReceivedTime())) {
+      return null;
+    }
+    R transferItem = from.makeTransferItem();
+    transferItem.setItem(item);
+    setBoolean(transferItem::setReceived, from.isReceived(), true);
+    setBoolean(transferItem::setQcPassed, from.isReceiptQcPassed(), true);
+    setString(transferItem::setQcNote, from.getReceiptQcNote());
+    Transfer transfer = new Transfer();
+    transferItem.setTransfer(transfer);
+    from.getTransferItemsFunction().apply(transfer).add(transferItem);
+    setDateTime(transfer::setTransferTime, from.getReceivedTime());
+    setObject(transfer::setSenderLab, LabImpl::new, from.getSenderLabId());
+    setObject(transfer::setRecipientGroup, Group::new, from.getRecipientGroupId());
+    return transferItem;
   }
 
   private static void setBigDecimal(@Nonnull Consumer<BigDecimal> setter, String value) {

@@ -156,4 +156,12 @@ public class ListTransferView implements Identifiable, Serializable {
     return true;
   }
 
+  public boolean isReceipt() {
+    return getSenderLab() != null;
+  }
+
+  public boolean isDistribution() {
+    return getRecipient() != null;
+  }
+
 }

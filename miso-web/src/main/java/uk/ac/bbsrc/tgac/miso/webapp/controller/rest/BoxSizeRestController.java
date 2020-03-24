@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxSizeService;
 import uk.ac.bbsrc.tgac.miso.dto.BoxSizeDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 
 @Controller
 @RequestMapping("/rest/boxsizes")
@@ -27,12 +27,12 @@ public class BoxSizeRestController extends RestController {
   private BoxSizeService boxSizeService;
 
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   @PostMapping
   public @ResponseBody BoxSizeDto create(@RequestBody BoxSizeDto dto) throws IOException {
     return RestUtils.createObject("Box Size", dto, Dtos::to, boxSizeService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }
@@ -40,7 +40,7 @@ public class BoxSizeRestController extends RestController {
   @PutMapping("/{sizeId}")
   public @ResponseBody BoxSizeDto update(@PathVariable long sizeId, @RequestBody BoxSizeDto dto) throws IOException {
     return RestUtils.updateObject("Box Size", sizeId, dto, Dtos::to, boxSizeService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }

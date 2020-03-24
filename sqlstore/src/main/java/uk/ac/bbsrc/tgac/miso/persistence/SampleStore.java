@@ -30,6 +30,7 @@ import java.util.List;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 /**
@@ -135,14 +136,14 @@ public interface SampleStore extends Store<Sample>, PaginatedDataSource<Sample> 
 
   /**
    * @param sample the "current" sample
-   * @return the sample in the same project as the "current" sample with the next ID in numerical order
+   * @return a reference to the sample in the same project as the "current" sample with the next ID in numerical order
    */
-  public Sample getNextInProject(Sample sample);
+  public EntityReference getNextInProject(Sample sample);
 
   /**
    * @param sample the "current" sample
-   * @return the sample in the same project as the "current" sample with the previous ID in numerical order
+   * @return a reference to the sample in the same project as the "current" sample with the previous ID in numerical order
    */
-  public Sample getPreviousInProject(Sample sample);
+  public EntityReference getPreviousInProject(Sample sample);
 
 }

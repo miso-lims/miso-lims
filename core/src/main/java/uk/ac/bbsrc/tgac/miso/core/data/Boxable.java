@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import com.eaglegenomics.simlims.core.User;
@@ -18,7 +18,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryAliquotBoxPositio
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferItem;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListTransferView;
 
 /**
  * This interface simply describes an object that can be placed into a box. i.e. Sample, Library
@@ -135,17 +135,17 @@ public interface Boxable extends Nameable, Barcodable, Serializable {
    */
   public void removeFromBox();
 
-  public List<? extends TransferItem<?>> getTransfers();
+  public Set<ListTransferView> getTransferViews();
 
-  public default TransferItem<?> getReceiptTransfer() {
-    return getTransfers().stream()
-        .filter(transferItem -> transferItem.getTransfer().getSenderLab() != null)
+  public default ListTransferView getReceiptTransfer() {
+    return getTransferViews().stream()
+        .filter(ListTransferView::isReceipt)
         .findFirst().orElse(null);
   }
 
-  public default TransferItem<?> getDistributionTransfer() {
-    return getTransfers().stream()
-        .filter(transferItem -> transferItem.getTransfer().getRecipient() != null)
+  public default ListTransferView getDistributionTransfer() {
+    return getTransferViews().stream()
+        .filter(ListTransferView::isDistribution)
         .findFirst().orElse(null);
   }
 

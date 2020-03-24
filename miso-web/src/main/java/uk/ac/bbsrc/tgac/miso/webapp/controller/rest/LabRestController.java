@@ -23,7 +23,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.service.LabService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LabDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 
 @Controller
 @RequestMapping("/rest/labs")
@@ -33,7 +33,7 @@ public class LabRestController extends RestController {
   private LabService labService;
 
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   @GetMapping(value = "/{id}", produces = { "application/json" })
   @ResponseBody
@@ -60,7 +60,7 @@ public class LabRestController extends RestController {
   public LabDto createLab(@RequestBody LabDto labDto, UriComponentsBuilder uriBuilder) throws IOException {
     Lab lab = Dtos.to(labDto);
     Long id = labService.create(lab, labDto.getInstituteId());
-    menuController.refreshConstants();
+    constantsController.refreshConstants();
     return getLab(id, uriBuilder);
   }
 
@@ -70,7 +70,7 @@ public class LabRestController extends RestController {
     Lab lab = Dtos.to(labDto);
     lab.setId(id);
     labService.update(lab, labDto.getInstituteId());
-    menuController.refreshConstants();
+    constantsController.refreshConstants();
     return getLab(id, uriBuilder);
   }
 
@@ -78,7 +78,7 @@ public class LabRestController extends RestController {
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
   public void deleteLab(@RequestBody(required = true) List<Long> ids) throws IOException {
     RestUtils.bulkDelete("Lab", ids, labService);
-    menuController.refreshConstants();
+    constantsController.refreshConstants();
   }
 
 }

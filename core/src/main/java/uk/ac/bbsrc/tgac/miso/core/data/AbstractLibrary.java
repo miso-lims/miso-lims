@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
@@ -54,6 +55,7 @@ import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.annotations.Immutable;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
@@ -66,7 +68,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListTransferView;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.type.DilutionFactor;
@@ -212,6 +214,12 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
 
   private boolean umis;
 
+  @Immutable
+  @ManyToMany
+  @JoinTable(name = "Transfer_Library", joinColumns = { @JoinColumn(name = "libraryId") }, inverseJoinColumns = {
+      @JoinColumn(name = "transferId") })
+  private Set<ListTransferView> listTransferViews;
+
   @OneToMany(targetEntity = FileAttachment.class)
   @JoinTable(name = "Library_Attachment", joinColumns = { @JoinColumn(name = "libraryId") }, inverseJoinColumns = {
       @JoinColumn(name = "attachmentId") })
@@ -219,9 +227,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
 
   @Transient
   private List<FileAttachment> pendingAttachmentDeletions;
-
-  @OneToMany(mappedBy = "item", cascade = CascadeType.REMOVE)
-  private List<TransferLibrary> transfers;
 
   @Override
   public Boxable.EntityType getEntityType() {
@@ -810,11 +815,11 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
-  public List<TransferLibrary> getTransfers() {
-    if (transfers == null) {
-      transfers = new ArrayList<>();
+  public Set<ListTransferView> getTransferViews() {
+    if (listTransferViews == null) {
+      listTransferViews = new HashSet<>();
     }
-    return transfers;
+    return listTransferViews;
   }
 
   @Override

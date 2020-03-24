@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.RunPurposeDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 
 @Controller
 @RequestMapping("/rest/runpurposes")
@@ -27,12 +27,12 @@ public class RunPurposeRestController extends RestController {
   private RunPurposeService runPurposeService;
 
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   @PostMapping
   public @ResponseBody RunPurposeDto create(@RequestBody RunPurposeDto dto) throws IOException {
     return RestUtils.createObject("Run Purpose", dto, Dtos::to, runPurposeService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }
@@ -40,7 +40,7 @@ public class RunPurposeRestController extends RestController {
   @PutMapping("/{purposeId}")
   public @ResponseBody RunPurposeDto update(@PathVariable long purposeId, @RequestBody RunPurposeDto dto) throws IOException {
     return RestUtils.updateObject("Run Purpose", purposeId, dto, Dtos::to, runPurposeService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }

@@ -7,30 +7,32 @@ import java.util.List;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 public interface SampleService
     extends PaginatedDataSource<Sample>, BarcodableService<Sample>, DeleterService<Sample>, NoteService<Sample>, SaveService<Sample> {
 
   @Override
-  default EntityType getEntityType() {
+  public default EntityType getEntityType() {
     return EntityType.SAMPLE;
   }
 
-  List<Sample> list() throws IOException;
+  public List<Sample> list() throws IOException;
 
-  List<Sample> getByAlias(String alias) throws IOException;
+  public List<Sample> getByAlias(String alias) throws IOException;
 
-  Long countAll() throws IOException;
+  public Long countAll() throws IOException;
 
-  Collection<SampleIdentity> getIdentitiesByExternalNameOrAliasAndProject(String externalName, Long projectId, boolean exactMatch)
+  public Collection<SampleIdentity> getIdentitiesByExternalNameOrAliasAndProject(String externalName, Long projectId, boolean exactMatch)
       throws IOException;
 
-  void confirmExternalNameUniqueForProjectIfRequired(String externalNames, Sample sample) throws IOException;
+  public void confirmExternalNameUniqueForProjectIfRequired(String externalNames, Sample sample) throws IOException;
 
-  Sample getByBarcode(String barcode) throws IOException;
+  public Sample getByBarcode(String barcode) throws IOException;
 
-  Collection<Sample> listByProjectId(long projectId) throws IOException;
+  public Collection<Sample> listByProjectId(long projectId) throws IOException;
 
   /**
    * Throws AuthorizationException if user cannot read one of the requested samples
@@ -39,12 +41,14 @@ public interface SampleService
    * @return
    * @throws IOException
    */
-  Collection<Sample> listByIdList(List<Long> idList) throws IOException;
+  public Collection<Sample> listByIdList(List<Long> idList) throws IOException;
 
-  Sample save(Sample sample) throws IOException;
+  public Sample save(Sample sample) throws IOException;
 
-  public Sample getNextInProject(Sample sample);
+  public EntityReference getNextInProject(Sample sample);
 
-  public Sample getPreviousInProject(Sample sample);
+  public EntityReference getPreviousInProject(Sample sample);
+
+  public long create(Sample sample, TransferSample transferSample) throws IOException;
 
 }

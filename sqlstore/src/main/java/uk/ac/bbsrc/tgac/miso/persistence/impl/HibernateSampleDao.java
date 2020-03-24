@@ -39,6 +39,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.BoxStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleStore;
@@ -421,22 +422,26 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
-  public Sample getNextInProject(Sample sample) {
-    return (Sample) currentSession().createCriteria(SampleImpl.class)
+  public EntityReference getNextInProject(Sample sample) {
+    return (EntityReference) currentSession().createCriteria(SampleImpl.class)
         .add(Restrictions.eq("project", sample.getProject()))
         .add(Restrictions.gt("sampleId", sample.getId()))
         .addOrder(Order.asc("sampleId"))
         .setMaxResults(1)
+        .setProjection(EntityReference.makeProjectionList("id", "name"))
+        .setResultTransformer(EntityReference.RESULT_TRANSFORMER)
         .uniqueResult();
   }
 
   @Override
-  public Sample getPreviousInProject(Sample sample) {
-    return (Sample) currentSession().createCriteria(SampleImpl.class)
+  public EntityReference getPreviousInProject(Sample sample) {
+    return (EntityReference) currentSession().createCriteria(SampleImpl.class)
         .add(Restrictions.eq("project", sample.getProject()))
         .add(Restrictions.lt("sampleId", sample.getId()))
         .addOrder(Order.desc("sampleId"))
         .setMaxResults(1)
+        .setProjection(EntityReference.makeProjectionList("id", "name"))
+        .setResultTransformer(EntityReference.RESULT_TRANSFORMER)
         .uniqueResult();
   }
 

@@ -46,7 +46,7 @@ public class HibernateTransferDaoIT extends AbstractDAOTest {
   public void testList() throws Exception {
     List<Transfer> list = sut.list();
     assertNotNull(list);
-    assertEquals(1, list.size());
+    assertEquals(3, list.size());
   }
 
   @Test

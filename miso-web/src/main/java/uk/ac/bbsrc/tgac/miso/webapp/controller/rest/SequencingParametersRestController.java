@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 
 @Controller
 @RequestMapping("/rest/sequencingparameters")
@@ -25,12 +25,12 @@ public class SequencingParametersRestController extends RestController {
   @Autowired
   private SequencingParametersService sequencingParametersService;
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   @PostMapping
   public @ResponseBody SequencingParametersDto create(@RequestBody SequencingParametersDto dto) throws IOException {
     return RestUtils.createObject("Sequencing Parameters", dto, Dtos::to, sequencingParametersService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }
@@ -39,7 +39,7 @@ public class SequencingParametersRestController extends RestController {
   public @ResponseBody SequencingParametersDto update(@PathVariable("id") Long id, @RequestBody SequencingParametersDto dto)
       throws IOException {
     return RestUtils.updateObject("Sequencing Parameters", id, dto, Dtos::to, sequencingParametersService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }

@@ -55,4 +55,5 @@ public class HibernateListTransferViewDaoIT extends AbstractDAOTest {
       throw new RuntimeException(err);
     }, 0, 10, true, "transferId", filter));
   }
+
 }

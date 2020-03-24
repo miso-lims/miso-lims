@@ -65,12 +65,12 @@
   </ul>
   <c:if test="${not empty nextLibrary}">
     <span style="float:right; padding-top: 5px; padding-left: 6px">
-      <a class='arrowright' href='<c:url value="/miso/library/${nextLibrary.id}"/>'>Next Library <b>${nextLibrary.alias}</b></a>
+      <a class='arrowright' href='<c:url value="/miso/library/${nextLibrary.id}"/>'>Next Library <b>${nextLibrary.label}</b></a>
     </span>
   </c:if>
   <c:if test="${not empty previousLibrary}">
     <span style="float:right; padding-top: 5px">
-      <a class='arrowleft' href='<c:url value="/miso/library/${previousLibrary.id}"/>'>Previous Library <b>${previousLibrary.alias}</b></a>
+      <a class='arrowleft' href='<c:url value="/miso/library/${previousLibrary.id}"/>'>Previous Library <b>${previousLibrary.label}</b></a>
     </span>
   </c:if>
 </div>
@@ -138,7 +138,7 @@
 <c:if test="${library.id != 0}">
   <miso:attachments item="${library}" projectId="${library.sample.project.id}"/>
   <miso:qcs id="list_qcs" item="${library}"/>
-  <miso:list-section id="list_transfer" name="Transfers" target="itemtransfer" items="${libraryTransfers}" config="{ libraryId: ${library.id} }" alwaysShow="true"/>
+  <miso:list-section id="list_transfer" name="Transfers" target="transfer" items="${libraryTransfers}" config="{ libraryId: ${library.id} }" alwaysShow="true"/>
   <miso:list-section id="list_aliquot" name="Library Aliquots" target="libraryaliquot" items="${libraryAliquots}" config="${libraryAliquotsConfig}"/>
   <miso:list-section id="list_pool" name="Pools" target="pool" items="${libraryPools}"/>
   <miso:list-section id="list_run" name="Runs" target="run" items="${libraryRuns}"/>

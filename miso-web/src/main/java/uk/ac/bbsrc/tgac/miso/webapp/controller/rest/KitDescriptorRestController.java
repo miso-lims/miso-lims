@@ -32,7 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.KitDescriptorDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
 @Controller
@@ -45,7 +45,7 @@ public class KitDescriptorRestController extends RestController {
   private TargetedSequencingService targetedSequencingService;
 
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
@@ -106,7 +106,7 @@ public class KitDescriptorRestController extends RestController {
   @ResponseStatus(HttpStatus.CREATED)
   public @ResponseBody KitDescriptorDto createKitDescriptor(@RequestBody KitDescriptorDto kitDescriptorDto) throws IOException {
     return RestUtils.createObject("Kit descriptor", kitDescriptorDto, Dtos::to, kitDescriptorService, kd -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(kd);
     });
   }
@@ -116,7 +116,7 @@ public class KitDescriptorRestController extends RestController {
   public @ResponseBody KitDescriptorDto updateKitDescriptor(@PathVariable long id, @RequestBody KitDescriptorDto kitDescriptorDto)
       throws IOException {
     return RestUtils.updateObject("Kit descriptor", id, kitDescriptorDto, Dtos::to, kitDescriptorService, kd -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(kd);
     });
   }

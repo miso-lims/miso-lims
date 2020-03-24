@@ -40,14 +40,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.ac.bbsrc.tgac.miso.core.service.QcTypeService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.QcTypeDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 
 @Controller
 @RequestMapping("/rest/qctypes")
 public class QcTypeRestController extends RestController {
 
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   @Autowired
   private QcTypeService qcTypeService;
@@ -57,7 +57,7 @@ public class QcTypeRestController extends RestController {
   public QcTypeDto createQcType(@RequestBody QcTypeDto qcTypeDto) throws IOException {
     return RestUtils.createObject("QC Type", qcTypeDto, Dtos::to, qcTypeService, qcType -> {
       QcTypeDto dto = Dtos.asDto(qcType);
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return dto;
     });
   }
@@ -67,7 +67,7 @@ public class QcTypeRestController extends RestController {
   public QcTypeDto updateSubproject(@PathVariable("id") long id, @RequestBody QcTypeDto qcTypeDto) throws IOException {
     return RestUtils.updateObject("QC Type", id, qcTypeDto, Dtos::to, qcTypeService, qcType -> {
       QcTypeDto dto = Dtos.asDto(qcType);
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return dto;
     });
   }

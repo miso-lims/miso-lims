@@ -42,6 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
@@ -185,6 +186,11 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
 
   @Override
   public long create(Library library) throws IOException {
+    return create(library, null);
+  }
+
+  @Override
+  public long create(Library library, TransferLibrary transferLibrary) throws IOException {
     if (library.getSample() != null && !library.getSample().isSaved()) {
       Long sampleId = sampleService.create(library.getSample());
       library.getSample().setId(sampleId);
@@ -215,12 +221,11 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     long savedId = save(library, true).getId();
     sampleStore.update(library.getParent());
     boxService.updateBoxableLocation(library);
-    if (!library.getTransfers().isEmpty()) {
-      TransferLibrary transferLibrary = library.getTransfers().iterator().next();
+    if (transferLibrary != null) {
       Transfer transfer = transferLibrary.getTransfer();
-      List<Transfer> existingTransfers = transferService.listByProperties(transfer.getSenderLab(), transfer.getRecipientGroup(),
-          library.getSample().getProject(), transfer.getTransferTime());
-      Transfer existingTransfer = existingTransfers.stream().max(Comparator.comparing(Transfer::getCreationTime)).orElse(null);
+      Transfer existingTransfer = transferService.listByProperties(transfer.getSenderLab(), transfer.getRecipientGroup(),
+          library.getSample().getProject(), transfer.getTransferTime()).stream()
+          .max(Comparator.comparing(Transfer::getCreationTime)).orElse(null);
       if (existingTransfer != null) {
         existingTransfer.getLibraryTransfers().add(transferLibrary);
         transferLibrary.setTransfer(existingTransfer);
@@ -269,8 +274,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   }
 
   @Override
-  public Library getAdjacentLibrary(long libraryId, boolean before) throws IOException {
-    return libraryDao.getAdjacentLibrary(libraryId, before);
+  public EntityReference getAdjacentLibrary(Library library, boolean before) throws IOException {
+    return libraryDao.getAdjacentLibrary(library, before);
   }
 
   @Override

@@ -28,7 +28,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferItem;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListTransferView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SampleHierarchyView;
 
 @Entity
@@ -264,8 +264,8 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   }
 
   private Date getReceivedDate() {
-    TransferItem<?> receipt = getReceiptTransfer();
-    return receipt == null ? null : receipt.getTransfer().getTransferTime();
+    ListTransferView receipt = getReceiptTransfer();
+    return receipt == null ? null : receipt.getTransferTime();
   }
 
   @Override

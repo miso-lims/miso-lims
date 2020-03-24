@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.ac.bbsrc.tgac.miso.core.service.LibrarySpikeInService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibrarySpikeInDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 
 @Controller
 @RequestMapping("/rest/libraryspikeins")
@@ -27,12 +27,12 @@ public class LibrarySpikeInRestController extends RestController {
   private LibrarySpikeInService librarySpikeInService;
 
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   @PostMapping
   public @ResponseBody LibrarySpikeInDto create(@RequestBody LibrarySpikeInDto dto) throws IOException {
     return RestUtils.createObject("Library Spike-In", dto, Dtos::to, librarySpikeInService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }
@@ -40,7 +40,7 @@ public class LibrarySpikeInRestController extends RestController {
   @PutMapping("/{spikeInId}")
   public @ResponseBody LibrarySpikeInDto update(@PathVariable long spikeInId, @RequestBody LibrarySpikeInDto dto) throws IOException {
     return RestUtils.updateObject("Library Spike-In", spikeInId, dto, Dtos::to, librarySpikeInService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }

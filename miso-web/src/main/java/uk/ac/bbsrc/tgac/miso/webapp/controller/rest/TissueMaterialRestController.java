@@ -50,7 +50,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.service.TissueMaterialService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.TissueMaterialDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 
 @Controller
 @RequestMapping("/rest/tissuematerials")
@@ -62,7 +62,7 @@ public class TissueMaterialRestController extends RestController {
   private TissueMaterialService tissueMaterialService;
 
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   @GetMapping(value = "/{id}", produces = { "application/json" })
   @ResponseBody
@@ -106,7 +106,7 @@ public class TissueMaterialRestController extends RestController {
       HttpServletResponse response) throws IOException {
     TissueMaterial tissueMaterial = Dtos.to(tissueMaterialDto);
     Long id = tissueMaterialService.create(tissueMaterial);
-    menuController.refreshConstants();
+    constantsController.refreshConstants();
     return getTissueMaterial(id, uriBuilder, response);
   }
 
@@ -117,7 +117,7 @@ public class TissueMaterialRestController extends RestController {
     TissueMaterial tissueMaterial = Dtos.to(tissueMaterialDto);
     tissueMaterial.setId(id);
     tissueMaterialService.update(tissueMaterial);
-    menuController.refreshConstants();
+    constantsController.refreshConstants();
     return getTissueMaterial(id, uriBuilder, response);
   }
 
@@ -126,7 +126,7 @@ public class TissueMaterialRestController extends RestController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
     RestUtils.bulkDelete("Tissue Material", ids, tissueMaterialService);
-    menuController.refreshConstants();
+    constantsController.refreshConstants();
   }
 
 }

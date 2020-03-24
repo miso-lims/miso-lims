@@ -272,17 +272,15 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
     if (transfer.getSenderLab() != null) {
       if (items.stream()
           .map(TransferItem::getItem)
-          .anyMatch(item -> item.getTransfers().stream()
-              .map(TransferItem::getTransfer)
-              .anyMatch(itemTransfer -> itemTransfer.isReceipt() && itemTransfer.isSaved()
+          .anyMatch(item -> item.getTransferViews().stream()
+              .anyMatch(itemTransfer -> itemTransfer.isReceipt()
                   && (!transfer.isSaved() || itemTransfer.getId() != transfer.getId())))) {
         errors.add(new ValidationError("items", ERROR_MULTIPLE_RECEIPT));
       }
     } else if (transfer.getRecipient() != null && items.stream()
         .map(TransferItem::getItem)
-        .anyMatch(item -> item.getTransfers().stream()
-            .map(TransferItem::getTransfer)
-            .anyMatch(itemTransfer -> itemTransfer.isDistribution() && itemTransfer.isSaved()
+        .anyMatch(item -> item.getTransferViews().stream()
+            .anyMatch(itemTransfer -> itemTransfer.isDistribution()
                 && (!transfer.isSaved() || itemTransfer.getId() != transfer.getId())))) {
                   errors.add(new ValidationError("items", ERROR_MULTIPLE_DISTRIBUTION));
     }
@@ -316,14 +314,12 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
       errors.add(new ValidationError("received", ERROR_DISTRIBUTION_NOT_RECEIVED));
     }
 
-    if (item.getItem().getTransfers().stream()
-        .map(TransferItem::getTransfer)
-        .anyMatch(itemTransfer -> itemTransfer.isReceipt() && itemTransfer.getId() != transfer.getId())) {
+    if (item.getItem().getTransferViews().stream()
+        .anyMatch(transferView -> transferView.isReceipt() && transferView.getId() != transfer.getId())) {
       errors.add(new ValidationError(ERROR_MULTIPLE_RECEIPT));
     }
-    if (item.getItem().getTransfers().stream()
-        .map(TransferItem::getTransfer)
-        .anyMatch(itemTransfer -> itemTransfer.isDistribution() && itemTransfer.getId() != transfer.getId())) {
+    if (item.getItem().getTransferViews().stream()
+        .anyMatch(transferView -> transferView.isDistribution() && transferView.getId() != transfer.getId())) {
       errors.add(new ValidationError(ERROR_MULTIPLE_DISTRIBUTION));
     }
 
@@ -467,27 +463,15 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
   protected void afterSave(Transfer object) throws IOException {
     // Individual services are responsible for updating box locations, or setting volume to 0 and removing items from boxes if distributed
     for (TransferSample item : object.getSampleTransfers()) {
-      if (!item.getItem().getTransfers().contains(item)) {
-        item.getItem().getTransfers().add(item);
-      }
       sampleService.update(item.getItem());
     }
     for (TransferLibrary item : object.getLibraryTransfers()) {
-      if (!item.getItem().getTransfers().contains(item)) {
-        item.getItem().getTransfers().add(item);
-      }
       libraryService.update(item.getItem());
     }
     for (TransferLibraryAliquot item : object.getLibraryAliquotTransfers()) {
-      if (!item.getItem().getTransfers().contains(item)) {
-        item.getItem().getTransfers().add(item);
-      }
       libraryAliquotService.update(item.getItem());
     }
     for (TransferPool item : object.getPoolTransfers()) {
-      if (!item.getItem().getTransfers().contains(item)) {
-        item.getItem().getTransfers().add(item);
-      }
       poolService.update(item.getItem());
     }
   }
@@ -508,10 +492,9 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
     Sample managedSample = sampleService.get(transferSample.getItem().getId());
     transferSample.setTransfer(managedTransfer);
     transferSample.setItem(managedSample);
-    managedSample.getTransfers().add(transferSample);
     validateAddition(managedTransfer, transferSample);
-    sampleService.update(managedSample);
     transferStore.update(managedTransfer);
+    sampleService.update(managedSample);
   }
 
 }

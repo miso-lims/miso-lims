@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexFamilyService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.IndexFamilyDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 
 @Controller
 @RequestMapping("/rest/indexfamilies")
@@ -27,12 +27,12 @@ public class IndexFamilyRestController extends RestController {
   private IndexFamilyService indexFamilyService;
 
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   @PostMapping
   public @ResponseBody IndexFamilyDto create(@RequestBody IndexFamilyDto dto) throws IOException {
     return RestUtils.createObject("Index Family", dto, Dtos::to, indexFamilyService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }
@@ -40,7 +40,7 @@ public class IndexFamilyRestController extends RestController {
   @PutMapping("/{familyId}")
   public @ResponseBody IndexFamilyDto update(@PathVariable long familyId, @RequestBody IndexFamilyDto dto) throws IOException {
     return RestUtils.updateObject("Index Family", familyId, dto, Dtos::to, indexFamilyService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }

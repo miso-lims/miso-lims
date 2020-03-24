@@ -97,7 +97,7 @@ public class HibernateLabDaoIT extends AbstractDAOTest {
   @Test
   public void testGetUsageByTransfers() {
     Lab lab = dao.getLab(1L);
-    assertEquals(1L, dao.getUsageByTransfers(lab));
+    assertEquals(2L, dao.getUsageByTransfers(lab));
   }
 
 }

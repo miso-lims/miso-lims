@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.ac.bbsrc.tgac.miso.core.service.StainCategoryService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.StainCategoryDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 
 @Controller
 @RequestMapping("/rest/staincategories")
@@ -27,12 +27,12 @@ public class StainCategoryRestController extends RestController {
   private StainCategoryService stainCategoryService;
 
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   @PostMapping
   public @ResponseBody StainCategoryDto create(@RequestBody StainCategoryDto dto) throws IOException {
     return RestUtils.createObject("Stain Category", dto, Dtos::to, stainCategoryService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }
@@ -40,7 +40,7 @@ public class StainCategoryRestController extends RestController {
   @PutMapping("/{categoryId}")
   public @ResponseBody StainCategoryDto update(@PathVariable long categoryId, @RequestBody StainCategoryDto dto) throws IOException {
     return RestUtils.updateObject("Stain Category", categoryId, dto, Dtos::to, stainCategoryService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }

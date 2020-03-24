@@ -27,7 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.TargetedSequencingDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
 @Controller
@@ -41,7 +41,7 @@ public class TargetedSequencingRestController extends RestController {
   private AdvancedSearchParser advancedSearchParser;
 
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   private final JQueryDataTableBackend<TargetedSequencing, TargetedSequencingDto> jQueryBackend = new JQueryDataTableBackend<TargetedSequencing, TargetedSequencingDto>() {
     @Override
@@ -81,7 +81,7 @@ public class TargetedSequencingRestController extends RestController {
   @PostMapping
   public @ResponseBody TargetedSequencingDto create(@RequestBody TargetedSequencingDto dto) throws IOException {
     return RestUtils.createObject("Targeted Sequencing", dto, Dtos::to, targetedSequencingService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }
@@ -90,7 +90,7 @@ public class TargetedSequencingRestController extends RestController {
   public @ResponseBody TargetedSequencingDto update(@PathVariable long targetedSequencingId, @RequestBody TargetedSequencingDto dto)
       throws IOException {
     return RestUtils.updateObject("Targeted Sequencing", targetedSequencingId, dto, Dtos::to, targetedSequencingService, d -> {
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }

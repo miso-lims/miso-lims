@@ -3,7 +3,10 @@ VALUES (1, TRUE, TRUE, 'admin', TRUE, 'admin', 'admin', 'admin@admin'),
 (2, FALSE, FALSE, 'Notification Server', TRUE, 'notification', 'notification', 'notification@notification'),
 (3, TRUE, FALSE, 'user' , TRUE, 'user', 'user', 'user@user');
 
-INSERT INTO `_Group`(`groupId`, `name`, `description`) VALUES (1, 'TestGroup', 'Is full of testing');
+INSERT INTO `_Group`(`groupId`, `name`, `description`) VALUES
+(1, 'TestGroup', 'Is full of testing'),
+(2, 'TestGroup2', 'More testing');
+
 INSERT INTO `User_Group` (`users_userId`, `groups_groupId`)
 VALUES (3,1),(1,1);
 
@@ -263,14 +266,6 @@ INSERT INTO SampleStock (sampleId) VALUES
 
 INSERT INTO SampleAliquot (sampleId) VALUES
 (19);
-
-INSERT INTO Transfer(transferId, transferTime, senderLabId, recipientGroupId, creator, created, lastModifier, lastModified) VALUES
-(1, '2016-07-07 12:00:00', 1, 1, 1, '2016-07-07 15:47:00', 1, '2016-07-07 15:47:00');
-
-INSERT INTO Transfer_Sample(transferId, sampleId) VALUES
-(1, 1),
-(1, 2),
-(1, 3);
 
 INSERT INTO `SampleQC`(`sample_sampleId`, `creator`, `date`, `type`, `results`, kitDescriptorId, kitLot) 
 VALUES (1,1,'2015-08-27',3,5, NULL, NULL),
@@ -768,6 +763,23 @@ INSERT INTO PoolOrder_LibraryAliquot (poolOrderId, aliquotId) VALUES
 (2,6),
 (2,5),
 (2,4);
+
+INSERT INTO Transfer(transferId, transferTime, senderLabId, senderGroupId, recipientGroupId, creator, created, lastModifier, lastModified) VALUES
+(1, '2016-07-07 12:00:00', 1, NULL, 1, 1, '2016-07-07 15:47:00', 1, '2016-07-07 15:47:00'),
+(2, '2020-03-18 12:00:00', 1, NULL, 1, 1, '2020-03-18 12:00:00', 1, '2020-03-18 12:00:00'),
+(3, '2020-03-18 12:30:00', NULL, 1, 2, 1, '2020-03-18 12:30:00', 1, '2020-03-18 12:30:00');
+
+INSERT INTO Transfer_Sample(transferId, sampleId) VALUES
+(1, 1),
+(1, 2),
+(1, 3);
+
+INSERT INTO Transfer_Library(transferId, libraryId) VALUES
+(2, 1),
+(2, 2),
+(2, 3),
+(3, 1),
+(3, 2);
 
 -- SampleHierarchy needs repopulated because everything is not created in expected order in test data
 -- (parent SampleTissue and Identity records aren't always created before childrens' DetailedSample records)

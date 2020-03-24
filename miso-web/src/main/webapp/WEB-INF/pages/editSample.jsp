@@ -65,12 +65,12 @@
     </ul>
     <c:if test="${not empty nextSample}">
       <span style="float:right; padding-top: 5px; padding-left: 6px">
-        <a class='arrowright' href='<c:url value="/miso/sample/${nextSample.id}"/>'>Next Sample <b>${nextSample.name}</b></a>
+        <a class='arrowright' href='<c:url value="/miso/sample/${nextSample.id}"/>'>Next Sample <b>${nextSample.label}</b></a>
       </span>
     </c:if>
     <c:if test="${not empty previousSample}">
       <span style="float:right; padding-top: 5px">
-        <a class='arrowleft' href='<c:url value="/miso/sample/${previousSample.id}"/>'>Previous Sample <b>${previousSample.name}</b></a>
+        <a class='arrowleft' href='<c:url value="/miso/sample/${previousSample.id}"/>'>Previous Sample <b>${previousSample.label}</b></a>
       </span>
     </c:if>
   </div>
@@ -137,7 +137,7 @@
 <miso:qcs id="list_qc" item="${sample}"/>
 
 <c:if test="${!detailedSample or sampleCategory ne 'Identity'}">
-  <miso:list-section id="list_transfer" name="Transfers" target="itemtransfer" items="${sampleTransfers}" config="{ sampleId: ${sample.id} }" alwaysShow="true"/>
+  <miso:list-section id="list_transfer" name="Transfers" target="transfer" items="${sampleTransfers}" config="{ sampleId: ${sample.id} }" alwaysShow="true"/>
 </c:if>
 
 <c:if test="${ !detailedSample or sampleCategory eq 'Aliquot' }">

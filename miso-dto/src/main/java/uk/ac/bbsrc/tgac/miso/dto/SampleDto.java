@@ -1,6 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -11,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
@@ -22,6 +25,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({ @JsonSubTypes.Type(value = SampleAliquotDto.class, name = SampleAliquot.CATEGORY_NAME),
@@ -36,7 +41,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
     @JsonSubTypes.Type(value = SampleSingleCellDto.class, name = SampleSingleCell.SUBCATEGORY_NAME),
     @JsonSubTypes.Type(value = SampleDto.class, name = "Plain") })
 @JsonTypeName(value = "Plain")
-public class SampleDto extends AbstractBoxableDto {
+public class SampleDto extends AbstractBoxableDto implements ReceivableDto<Sample, TransferSample> {
 
   private Long id;
   private String accession;
@@ -143,50 +148,62 @@ public class SampleDto extends AbstractBoxableDto {
     this.sampleType = sampleType;
   }
 
+  @Override
   public String getReceivedTime() {
     return receivedTime;
   }
 
+  @Override
   public void setReceivedTime(String receivedTime) {
     this.receivedTime = receivedTime;
   }
 
+  @Override
   public Long getSenderLabId() {
     return senderLabId;
   }
 
+  @Override
   public void setSenderLabId(Long senderLabId) {
     this.senderLabId = senderLabId;
   }
 
+  @Override
   public Long getRecipientGroupId() {
     return recipientGroupId;
   }
 
+  @Override
   public void setRecipientGroupId(Long recipientGroupId) {
     this.recipientGroupId = recipientGroupId;
   }
 
+  @Override
   public Boolean isReceived() {
     return received;
   }
 
+  @Override
   public void setReceived(Boolean received) {
     this.received = received;
   }
 
+  @Override
   public Boolean isReceiptQcPassed() {
     return receiptQcPassed;
   }
 
+  @Override
   public void setReceiptQcPassed(Boolean receiptQcPassed) {
     this.receiptQcPassed = receiptQcPassed;
   }
 
+  @Override
   public String getReceiptQcNote() {
     return receiptQcNote;
   }
 
+  @Override
   public void setReceiptQcNote(String receiptQcNote) {
     this.receiptQcNote = receiptQcNote;
   }
@@ -360,6 +377,16 @@ public class SampleDto extends AbstractBoxableDto {
 
   public void setLibraryCount(int libraryCount) {
     this.libraryCount = libraryCount;
+  }
+
+  @Override
+  public TransferSample makeTransferItem() {
+    return new TransferSample();
+  }
+
+  @Override
+  public Function<Transfer, Set<TransferSample>> getTransferItemsFunction() {
+    return Transfer::getSampleTransfers;
   }
 
 }

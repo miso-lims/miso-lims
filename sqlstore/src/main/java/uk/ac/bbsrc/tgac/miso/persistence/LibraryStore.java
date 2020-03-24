@@ -31,6 +31,7 @@ import java.util.List;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -157,7 +158,7 @@ public interface LibraryStore extends Store<Library>, PaginatedDataSource<Librar
    */
   long countLibrariesBySearch(String querystr) throws IOException;
 
-  Library getAdjacentLibrary(long libraryId, boolean before) throws IOException;
+  EntityReference getAdjacentLibrary(Library library, boolean before) throws IOException;
 
   List<Library> searchByCreationDate(Date from, Date to) throws IOException;
 

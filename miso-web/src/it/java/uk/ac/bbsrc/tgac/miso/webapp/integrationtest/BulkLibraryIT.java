@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
+import org.hibernate.criterion.Restrictions;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -27,6 +28,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkLibraryPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkLibraryPage.LibColumns;
@@ -808,27 +810,40 @@ public class BulkLibraryIT extends AbstractIT {
     });
     testLibraryAttribute(LibColumns.VOLUME, attributes, library, lib -> LimsUtils.toNiceString(lib.getVolume()));
     testLibraryAttribute(LibColumns.CONCENTRATION, attributes, library, lib -> LimsUtils.toNiceString(lib.getConcentration()));
-    testLibraryAttribute(LibColumns.RECEIVE_DATE, attributes, library,
-        lib -> lib.getReceiptTransfer() == null ? "" : LimsUtils.formatDate(lib.getReceiptTransfer().getTransfer().getTransferTime()));
-    testLibraryAttribute(LibColumns.RECEIVE_TIME, attributes, library, BulkLibraryIT::getReceiptTime);
-    testLibraryAttribute(LibColumns.RECEIVED_FROM, attributes, library,
-        lib -> lib.getReceiptTransfer() == null ? "" : lib.getReceiptTransfer().getTransfer().getSenderLab().getItemLabel());
-    testLibraryAttribute(LibColumns.RECEIVED_BY, attributes, library,
-        lib -> lib.getReceiptTransfer() == null ? "" : lib.getReceiptTransfer().getTransfer().getRecipientGroup().getName());
-    testLibraryAttribute(LibColumns.RECEIPT_CONFIRMED, attributes, library,
-        lib -> lib.getReceiptTransfer() == null ? "" : booleanString(lib.getReceiptTransfer().isReceived()));
-    testLibraryAttribute(LibColumns.RECEIPT_QC_PASSED, attributes, library,
-        lib -> lib.getReceiptTransfer() == null ? "" : booleanString(lib.getReceiptTransfer().isQcPassed()));
-    testLibraryAttribute(LibColumns.RECEIPT_QC_NOTE, attributes, library,
-        lib -> lib.getReceiptTransfer() == null ? "" : emptyIfNull(lib.getReceiptTransfer().getQcNote()));
+    if (attributes.containsKey(LibColumns.RECEIVE_DATE)) {
+      assertReceiptAttributes(attributes, library);
+    }
   }
 
-  private static String getReceiptTime(Library lib) {
-    if (lib.getReceiptTransfer() == null) {
+  protected void assertReceiptAttributes(Map<String, String> attributes, Library library) {
+    TransferLibrary receipt = (TransferLibrary) getSession().createCriteria(TransferLibrary.class)
+        .createAlias("transfer", "transfer")
+        .add(Restrictions.eq("item", library))
+        .add(Restrictions.isNotNull("transfer.senderLab"))
+        .uniqueResult();
+    assertNotNull("A receipt transfer should be created", receipt);
+
+    assertEntityAttribute(LibColumns.RECEIVE_DATE, attributes, receipt,
+        s -> s == null ? "" : LimsUtils.formatDate(s.getTransfer().getTransferTime()));
+    assertEntityAttribute(LibColumns.RECEIVE_TIME, attributes, receipt, BulkLibraryIT::getReceiptTime);
+    assertEntityAttribute(LibColumns.RECEIVED_FROM, attributes, receipt,
+        s -> s == null ? "" : s.getTransfer().getSenderLab().getItemLabel());
+    assertEntityAttribute(LibColumns.RECEIVED_BY, attributes, receipt,
+        s -> s == null ? "" : s.getTransfer().getRecipientGroup().getName());
+    assertEntityAttribute(LibColumns.RECEIPT_CONFIRMED, attributes, receipt,
+        s -> s == null ? "" : booleanString(s.isReceived()));
+    assertEntityAttribute(LibColumns.RECEIPT_QC_PASSED, attributes, receipt,
+        s -> s == null ? "" : booleanString(s.isQcPassed()));
+    assertEntityAttribute(LibColumns.RECEIPT_QC_NOTE, attributes, receipt,
+        s -> s == null ? "" : emptyIfNull(s.getQcNote()));
+  }
+
+  private static String getReceiptTime(TransferLibrary receipt) {
+    if (receipt == null) {
       return "";
     }
     DateFormat formatter = new SimpleDateFormat("h:mm a");
-    return formatter.format(lib.getReceiptTransfer().getTransfer().getTransferTime()).toLowerCase();
+    return formatter.format(receipt.getTransfer().getTransferTime()).toLowerCase();
   }
 
   private void assertDetailedLibraryAttributes(Map<String, String> attributes, DetailedLibrary library) {

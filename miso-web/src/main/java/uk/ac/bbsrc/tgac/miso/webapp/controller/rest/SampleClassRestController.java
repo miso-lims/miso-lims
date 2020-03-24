@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleClassDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.MenuController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 
 @Controller
 @RequestMapping("/rest/sampleclasses")
@@ -49,7 +49,7 @@ public class SampleClassRestController extends RestController {
   @Autowired
   private SampleClassService sampleClassService;
   @Autowired
-  private MenuController menuController;
+  private ConstantsController constantsController;
 
   @PostMapping(headers = { "Content-type=application/json" })
   @ResponseStatus(HttpStatus.CREATED)
@@ -57,7 +57,7 @@ public class SampleClassRestController extends RestController {
   public SampleClassDto createSampleClass(@RequestBody SampleClassDto sampleClassDto) throws IOException {
     return RestUtils.createObject("Sample Class", sampleClassDto, Dtos::to, sampleClassService, sampleClass -> {
       SampleClassDto dto = Dtos.asDto(sampleClass);
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return dto;
     });
   }
@@ -68,7 +68,7 @@ public class SampleClassRestController extends RestController {
   public SampleClassDto updateSampleClass(@PathVariable("id") long id, @RequestBody SampleClassDto sampleClassDto) throws IOException {
     return RestUtils.updateObject("Sample Class", id, sampleClassDto, Dtos::to, sampleClassService, sampleClass -> {
       SampleClassDto dto = Dtos.asDto(sampleClass);
-      menuController.refreshConstants();
+      constantsController.refreshConstants();
       return dto;
     });
   }
