@@ -1502,6 +1502,7 @@ public class Dtos {
       dto.setStorageLocationBarcode(from.getStorageLocation().getIdentificationBarcode());
       dto.setFreezerDisplayLocation(from.getStorageLocation().getFreezerDisplayLocation());
       dto.setStorageDisplayLocation(from.getStorageLocation().getFullDisplayLocation());
+      setId(dto::setFreezerId, from.getStorageLocation().getFreezerLocation());
     }
     dto.setTubeCount(from.getTubeCount());
     return dto;
@@ -3373,6 +3374,7 @@ public class Dtos {
     if (from.getParentLocation() != null) {
       dto.setParentLocationId(from.getParentLocation().getId());
     }
+    setId(dto::setFreezerId, from.getFreezerLocation());
     dto.setLocationUnit(from.getLocationUnit().name());
     switch (from.getLocationUnit().getBoxStorageAmount()) {
     case NONE:

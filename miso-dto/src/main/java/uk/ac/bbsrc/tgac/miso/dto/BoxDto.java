@@ -24,6 +24,7 @@ public class BoxDto {
   private Long storageLocationId;
   private String storageLocationBarcode;
   private String freezerDisplayLocation;
+  private Long freezerId;
   private String storageDisplayLocation;
 
   public int getTubeCount() {
@@ -152,6 +153,14 @@ public class BoxDto {
 
   public void setFreezerDisplayLocation(String freezerDisplayLocation) {
     this.freezerDisplayLocation = freezerDisplayLocation;
+  }
+
+  public Long getFreezerId() {
+    return freezerId;
+  }
+
+  public void setFreezerId(Long freezerId) {
+    this.freezerId = freezerId;
   }
 
   public String getStorageDisplayLocation() {
