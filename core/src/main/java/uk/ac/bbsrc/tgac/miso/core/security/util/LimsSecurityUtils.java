@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.ldap.userdetails.InetOrgPerson;
 
 import com.eaglegenomics.simlims.core.User;
@@ -57,13 +58,13 @@ public class LimsSecurityUtils {
   }
 
   /**
-   * Converts a LDAP {@link org.springframework.security.ldap.userdetails.InetOrgPerson} object into a MISO user object
+   * Converts a LDAP {@link org.springframework.security.core.userdetails.UserDetails} implementation into a MISO user object
    * 
    * @param details
-   *          of type InetOrgPerson
+   *          of type implementing UserDetails
    * @return User
    */
-  public static User fromLdapUser(InetOrgPerson details) {
+  public static User fromLdapUser(UserDetails details) {
     // remember that this user has no userID!
     // upon persistence using the default MISO securityManager, this user is checked against the MISO SQL DB
     // by username. If a user already exists with that username that has been authed, then they must be the same
@@ -76,7 +77,7 @@ public class LimsSecurityUtils {
     return user;
   }
 
-  public static void updateFromLdapUser(User target, InetOrgPerson ldapUserDetails) {
+  public static void updateFromLdapUser(User target, UserDetails ldapUserDetails) {
     final List<String> roles = new ArrayList<>();
     for (final GrantedAuthority ga : ldapUserDetails.getAuthorities()) {
       roles.add(removePrefix(ga.toString(), LimsSecurityUtils.rolePrefix));
@@ -88,8 +89,11 @@ public class LimsSecurityUtils {
     target.setInternal(roles.contains(MisoAuthority.ROLE_INTERNAL.name()));
 
     target.setPassword(ldapUserDetails.getPassword());
-    target.setFullName(ldapUserDetails.getDisplayName());
-    target.setEmail(ldapUserDetails.getMail());
+    if(ldapUserDetails instanceof InetOrgPerson) {
+      InetOrgPerson person = (InetOrgPerson) ldapUserDetails;
+      target.setFullName(person.getDisplayName());
+      target.setEmail(person.getMail());
+    }
   }
 
   private static String removePrefix(String s, String prefix) {
