@@ -474,18 +474,7 @@ public class Dtos {
     dto.setConcentrationUnits(from.getConcentrationUnits());
     dto.setDiscarded(from.isDiscarded());
     dto.setLastModified(formatDateTime(from.getLastModified()));
-
     setString(dto::setRequisitionId, from.getRequisitionId());
-
-    TransferItem<?> receipt = from.getReceiptTransfer();
-    if (receipt != null) {
-      setDateTimeString(dto::setReceivedTime, receipt.getTransfer().getTransferTime());
-      setId(dto::setSenderLabId, receipt.getTransfer().getSenderLab());
-      setId(dto::setRecipientGroupId, receipt.getTransfer().getRecipientGroup());
-      setBoolean(dto::setReceived, receipt.isReceived(), true);
-      setBoolean(dto::setReceiptQcPassed, receipt.isQcPassed(), true);
-      setString(dto::setReceiptQcNote, receipt.getQcNote());
-    }
     dto.setLibraryCount(libraryCount);
 
     return dto;
