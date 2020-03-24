@@ -9,6 +9,7 @@ public class StorageLocationDto {
 
   private long id;
   private Long parentLocationId;
+  private Long freezerId;
   private String locationUnit;
   private boolean availableStorage;
   private String alias;
@@ -36,6 +37,14 @@ public class StorageLocationDto {
 
   public void setParentLocationId(Long parentLocationId) {
     this.parentLocationId = parentLocationId;
+  }
+
+  public Long getFreezerId() {
+    return freezerId;
+  }
+
+  public void setFreezerId(Long freezerId) {
+    this.freezerId = freezerId;
   }
 
   public String getLocationUnit() {
