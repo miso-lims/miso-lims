@@ -93,6 +93,8 @@ public class LimsSecurityUtils {
       InetOrgPerson person = (InetOrgPerson) ldapUserDetails;
       target.setFullName(person.getDisplayName());
       target.setEmail(person.getMail());
+    } else {
+      target.setFullName(ldapUserDetails.getUsername());
     }
   }
 
