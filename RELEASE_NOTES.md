@@ -23,7 +23,7 @@ Upgrade Notes:
 
   * Sequencing control types have been added, but the feature is not yet completed and they must be added to the database via
     SQL. It will be possible to edit these through the UI in the next release.
-  * Updated to Pinery 1.12.0
+  * Updated to Pinery 2.12.0
 
 # 1.1.0
 
