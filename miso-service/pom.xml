@@ -29,7 +29,7 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>1.1.0</version>
+    <version>1.0.3-SNAPSHOT</version>
   </parent>
   <artifactId>miso-service</artifactId>
   <name>miso-service</name>
