@@ -25,7 +25,7 @@ Upgrade Notes:
     SQL. It will be possible to edit these through the UI in the next release.
   * Updated to Pinery 2.12.0
 
-# 1.1.0
+# 1.0.2
 
 Changes:
 
