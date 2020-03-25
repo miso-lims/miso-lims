@@ -206,7 +206,9 @@ public class EditSampleController {
 
     model.put("sampleCategory",
         LimsUtils.isDetailedSample(sample) ? ((DetailedSample) sample).getSampleClass().getSampleCategory() : "plain");
-    List<LibraryDto> libraries = sample.isSaved() ? libraryService.listBySampleId(sample.getId()).stream().map(lib -> Dtos.asDto(lib, false)).collect(Collectors.toList()) : Collections.emptyList();
+    List<LibraryDto> libraries = sample.isSaved()
+        ? libraryService.listBySampleId(sample.getId()).stream().map(lib -> Dtos.asDto(lib, false)).collect(Collectors.toList())
+        : Collections.emptyList();
     model.put("sampleLibraries", libraries);
     Set<Pool> pools = libraries.stream()
         .flatMap(WhineyFunction.flatRethrow(library -> poolService.listByLibraryId(library.getId())))

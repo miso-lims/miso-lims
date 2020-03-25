@@ -91,6 +91,9 @@ FormTarget.box = (function($) {
           getDisplayValue: function(box) {
             return box.storageDisplayLocation || 'Unknown';
           },
+          getLink: function(box) {
+            return box.freezerId ? Urls.ui.freezers.edit(box.freezerId) : null;
+          },
           type: 'read-only'
         }, {
           title: 'Change Location (scan or select)',
@@ -214,7 +217,8 @@ FormTarget.box = (function($) {
     var location = getSelectedLocation();
     form.updateField('storageLocationId', {
       value: location.id,
-      label: location.fullDisplayLocation
+      label: location.fullDisplayLocation,
+      link: Urls.ui.freezers.edit(location.freezerId)
     })
     resetLocationSearch(form);
   }
@@ -223,7 +227,8 @@ FormTarget.box = (function($) {
     disableLocationControls(true, form);
     form.updateField('storageLocationId', {
       value: null,
-      label: 'Unknown'
+      label: 'Unknown',
+      link: null
     });
     resetLocationSearch(form);
   }
