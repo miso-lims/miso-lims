@@ -52,13 +52,12 @@ public class LDAPSecurityManager implements SecurityManager {
 
   @Override
   public void syncUser(UserDetails userDetails) throws IOException {
-    InetOrgPerson person = (InetOrgPerson) userDetails;
-    User u = LimsSecurityUtils.fromLdapUser(person);
+    User u = LimsSecurityUtils.fromLdapUser(userDetails);
     User dbu = userService.getByLoginName(u.getLoginName());
     if (dbu == null || !dbu.equals(u)) {
       userService.create(u);
     } else {
-      LimsSecurityUtils.updateFromLdapUser(dbu, person);
+      LimsSecurityUtils.updateFromLdapUser(dbu, userDetails);
       userService.update(dbu);
     }
   }
