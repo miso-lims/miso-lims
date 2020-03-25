@@ -154,6 +154,10 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
       @JoinColumn(name = "transferId") })
   private Set<ListTransferView> listTransferViews;
 
+  @ManyToOne
+  @JoinColumn(name = "sequencingControlTypeId")
+  private SequencingControlType sequencingControlType;
+
   @Override
   public EntityType getEntityType() {
     return EntityType.SAMPLE;
@@ -424,6 +428,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
         .append(sampleType)
         .append(scientificName)
         .append(taxonIdentifier)
+        .append(sequencingControlType)
         .toHashCode();
   }
 
@@ -446,6 +451,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
         .append(sampleType, other.sampleType)
         .append(scientificName, other.scientificName)
         .append(taxonIdentifier, other.taxonIdentifier)
+        .append(sequencingControlType, other.sequencingControlType)
         .isEquals();
   }
 
@@ -574,6 +580,16 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
       listTransferViews = new HashSet<>();
     }
     return listTransferViews;
+  }
+
+  @Override
+  public SequencingControlType getSequencingControlType() {
+    return sequencingControlType;
+  }
+
+  @Override
+  public void setSequncingControlType(SequencingControlType sequencingControlType) {
+    this.sequencingControlType = sequencingControlType;
   }
 
 }

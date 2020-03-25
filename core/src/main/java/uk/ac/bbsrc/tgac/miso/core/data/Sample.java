@@ -265,4 +265,8 @@ public interface Sample extends Attachable, Comparable<Sample>, Deletable, Hiera
    */
   public void setRequisitionId(String requisitionId);
 
+  public SequencingControlType getSequencingControlType();
+
+  public void setSequncingControlType(SequencingControlType sequencingControlType);
+
 }

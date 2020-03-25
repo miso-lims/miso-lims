@@ -23,7 +23,8 @@ FOR EACH ROW
     CASE WHEN (NEW.volume IS NULL) <> (OLD.volume IS NULL) OR NEW.volume <> OLD.volume THEN CONCAT('volume: ', COALESCE(decimalToString(OLD.volume), 'n/a'), ' → ', COALESCE(decimalToString(NEW.volume), 'n/a')) END,
     CASE WHEN (NEW.concentrationUnits IS NULL) <> (OLD.concentrationUnits IS NULL) OR NEW.concentrationUnits <> OLD.concentrationUnits THEN CONCAT('concentration units: ', COALESCE(OLD.concentrationUnits, 'n/a'), ' → ', COALESCE(NEW.concentrationUnits, 'n/a')) END,
     CASE WHEN (NEW.volumeUnits IS NULL) <> (OLD.volumeUnits IS NULL) OR NEW.volumeUnits <> OLD.volumeUnits THEN CONCAT('volume units: ', COALESCE(OLD.volumeUnits, 'n/a'), ' → ', COALESCE(NEW.volumeUnits, 'n/a')) END,
-    CASE WHEN (NEW.requisitionId IS NULL) <> (OLD.requisitionId IS NULL) OR NEW.requisitionId <> OLD.requisitionId THEN CONCAT('requisition ID: ', COALESCE(OLD.requisitionId, 'n/a'), ' → ', COALESCE(NEW.requisitionId, 'n/a')) END);
+    CASE WHEN (NEW.requisitionId IS NULL) <> (OLD.requisitionId IS NULL) OR NEW.requisitionId <> OLD.requisitionId THEN CONCAT('requisition ID: ', COALESCE(OLD.requisitionId, 'n/a'), ' → ', COALESCE(NEW.requisitionId, 'n/a')) END,
+    CASE WHEN (NEW.sequencingControlTypeId IS NULL) <> (OLD.sequencingControlTypeId IS NULL) OR NEW.sequencingControlTypeId <> OLD.sequencingControlTypeId THEN CONCAT('sequencing control type: ', COALESCE((SELECT alias FROM SequencingControlType WHERE sequencingControlTypeId = OLD.sequencingControlTypeId), 'n/a'), ' → ', COALESCE((SELECT alias FROM SequencingControlType WHERE sequencingControlTypeId = NEW.sequencingControlTypeId), 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime) VALUES (
       NEW.sampleId,
@@ -44,7 +45,8 @@ FOR EACH ROW
         CASE WHEN (NEW.volume IS NULL) <> (OLD.volume IS NULL) OR NEW.volume <> OLD.volume THEN 'volume' END,
         CASE WHEN (NEW.concentrationUnits IS NULL) <> (OLD.concentrationUnits IS NULL) OR NEW.concentrationUnits <> OLD.concentrationUnits THEN CONCAT(NEW.name, ' concentrationUnits') END,
         CASE WHEN (NEW.volumeUnits IS NULL) <> (OLD.volumeUnits IS NULL) OR NEW.volumeUnits <> OLD.volumeUnits THEN CONCAT(NEW.name, ' volumeUnits') END,
-        CASE WHEN (NEW.requisitionId IS NULL) <> (OLD.requisitionId IS NULL) OR NEW.requisitionId <> OLD.requisitionId THEN 'requisitionId' END
+        CASE WHEN (NEW.requisitionId IS NULL) <> (OLD.requisitionId IS NULL) OR NEW.requisitionId <> OLD.requisitionId THEN 'requisitionId' END,
+        CASE WHEN (NEW.sequencingControlTypeId IS NULL) <> (OLD.sequencingControlTypeId IS NULL) OR NEW.sequencingControlTypeId <> OLD.sequencingControlTypeId THEN 'sequencingControlTypeId' END
   ), ''),
       NEW.lastModifier,
       log_message,

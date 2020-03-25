@@ -35,6 +35,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -100,7 +101,7 @@ public class KitDescriptor implements Serializable, ChangeLoggable, Deletable, I
           @JoinColumn(name = "kitDescriptorId") })
   private final Set<TargetedSequencing> targetedSequencing = new HashSet<>();
 
-  @ManyToOne(targetEntity = UserImpl.class)
+  @ManyToOne(targetEntity = UserImpl.class, fetch = FetchType.LAZY)
   @JoinColumn(name = "creator", nullable = false, updatable = false)
   private User creator;
 
@@ -108,7 +109,7 @@ public class KitDescriptor implements Serializable, ChangeLoggable, Deletable, I
   @Temporal(TemporalType.TIMESTAMP)
   private Date creationTime;
 
-  @ManyToOne(targetEntity = UserImpl.class)
+  @ManyToOne(targetEntity = UserImpl.class, fetch = FetchType.LAZY)
   @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
 

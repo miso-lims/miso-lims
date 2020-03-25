@@ -80,6 +80,7 @@ public class SampleDto extends AbstractBoxableDto implements ReceivableDto<Sampl
   private String qcRin;
   private List<QcDto> qcs;
   private String requisitionId;
+  private Long sequencingControlTypeId;
   private int libraryCount = 0;
 
   public Long getId() {
@@ -387,6 +388,14 @@ public class SampleDto extends AbstractBoxableDto implements ReceivableDto<Sampl
   @Override
   public Function<Transfer, Set<TransferSample>> getTransferItemsFunction() {
     return Transfer::getSampleTransfers;
+  }
+
+  public Long getSequencingControlTypeId() {
+    return sequencingControlTypeId;
+  }
+
+  public void setSequencingControlTypeId(Long sequencingControlTypeId) {
+    this.sequencingControlTypeId = sequencingControlTypeId;
   }
 
 }

@@ -103,6 +103,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleType;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingControlType;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrderCompletion;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
@@ -476,6 +477,7 @@ public class Dtos {
     dto.setLastModified(formatDateTime(from.getLastModified()));
     setString(dto::setRequisitionId, from.getRequisitionId());
     dto.setLibraryCount(libraryCount);
+    setId(dto::setSequencingControlTypeId, from.getSequencingControlType());
 
     return dto;
 
@@ -854,6 +856,7 @@ public class Dtos {
     to.setBoxPosition((SampleBoxPosition) makeBoxablePosition(from, (SampleImpl) to));
 
     setString(to::setRequisitionId, from.getRequisitionId());
+    setObject(to::setSequncingControlType, SequencingControlType::new, from.getSequencingControlTypeId());
     return to;
   }
 
@@ -4030,6 +4033,20 @@ public class Dtos {
     setObject(transfer::setSenderLab, LabImpl::new, from.getSenderLabId());
     setObject(transfer::setRecipientGroup, Group::new, from.getRecipientGroupId());
     return transferItem;
+  }
+
+  public static SequencingControlTypeDto asDto(@Nonnull SequencingControlType from) {
+    SequencingControlTypeDto to = new SequencingControlTypeDto();
+    setLong(to::setId, from.getId(), true);
+    setString(to::setAlias, from.getAlias());
+    return to;
+  }
+
+  public static SequencingControlType to(@Nonnull SequencingControlTypeDto from) {
+    SequencingControlType to = new SequencingControlType();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setAlias, from.getAlias());
+    return to;
   }
 
   private static void setBigDecimal(@Nonnull Consumer<BigDecimal> setter, String value) {
