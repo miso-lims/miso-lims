@@ -717,6 +717,18 @@ Urls = (function() {
     update: idUrlFunction(sampleTypeRestBase)
   };
 
+  // Sequencing Control Types
+  var sequencingControlTypeUiBase = baseUrl + '/sequencingcontroltype';
+  ui.sequencingControlTypes = {
+    bulkEdit: sequencingControlTypeUiBase + '/bulk/edit'
+  };
+
+  var sequencingControlTypeRestBase = restBase + '/sequencingcontroltypes';
+  rest.sequencingControlTypes = {
+    create: sequencingControlTypeRestBase,
+    update: idUrlFunction(sequencingControlTypeRestBase)
+  };
+
   // Sequencing Orders
   var sequencingOrderUiBase = baseUrl + '/sequencingorder';
   ui.sequencingOrders = {

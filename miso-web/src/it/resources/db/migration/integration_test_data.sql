@@ -3,6 +3,11 @@ INSERT INTO User (userId, active, admin, fullName, internal, loginName, roles, p
 (3,1,0,'user',1,'user','ROLE_INTERNAL','{bcrypt}$2a$10$vqYii//w2shSZnt/4uNyIeeU4FGQIB4QJeisv9l16xVRQ1lTOghIO','user@user.user'), -- password 'user'
 (4,1,0,'Harry Henderson', 1, 'hhenderson', 'ROLE_INTERNAL', '{bcrypt}$2a$10$vqYii//w2shSZnt/4uNyIeeU4FGQIB4QJeisv9l16xVRQ1lTOghIO', 'hhenderson@somewhere.maybe');
 
+INSERT INTO SequencingControlType (sequencingControlTypeId, alias) VALUES
+(1, 'Positive'),
+(2, 'Negative'),
+(3, 'Delete Me');
+
 INSERT INTO TissuePieceType (tissuePieceTypeId, abbreviation, name, archived) VALUES
 (1, 'LCM' , 'LCM Tube', FALSE),
 (2, 'UNU', 'Unused', FALSE);

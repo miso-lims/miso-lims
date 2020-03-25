@@ -10,6 +10,10 @@ INSERT INTO `_Group`(`groupId`, `name`, `description`) VALUES
 INSERT INTO `User_Group` (`users_userId`, `groups_groupId`)
 VALUES (3,1),(1,1);
 
+INSERT INTO SequencingControlType(sequencingControlTypeId, alias) VALUES
+(1, 'Positive'),
+(2, 'Negative');
+
 INSERT INTO Workstation(workstationId, alias) VALUES
 (1, 'Workstation 1'),
 (2, 'Workstation 2'),
@@ -220,28 +224,28 @@ VALUES (1,'Identity','Identity',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00')
 (3,'Stock','Stock',1,'2017-05-31 14:57:00',1,'2017-05-31 14:57:00'),
 (4,'Aliquot','Aliquot',1,'2017-05-31 14:57:00',1,'2017-05-31 14:57:00');
 
-INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identificationBarcode`, `locationBarcode`, `sampleType`, `qcPassed`, `alias`, `project_projectId`, `scientificName`, `taxonIdentifier`, `lastModifier`, `lastModified`, `creator`, `created`) 
-VALUES (1,NULL,'SAM1','Inherited from TEST_0001','SAM1::TEST_0001_Bn_P_nn_1-1_D_1','Freezer1_1','GENOMIC',TRUE,'TEST_0001_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:30:47',1,'2016-07-07 13:30:47'),
-(2,NULL,'SAM2','Inherited from TEST_0001','SAM2::TEST_0001_Bn_R_nn_1-1_D_1','Freezer1_2','GENOMIC',TRUE,'TEST_0001_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:30:48',1,'2016-07-07 13:30:48'),
-(3,NULL,'SAM3','Inherited from TEST_0002','SAM3::TEST_0002_Bn_P_nn_1-1_D_1','Freezer1_3','GENOMIC',TRUE,'TEST_0002_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:30:49',1,'2016-07-07 13:30:49'),
-(4,NULL,'SAM4','Inherited from TEST_0002','SAM4::TEST_0002_Bn_R_nn_1-1_D_1','Freezer1_4','GENOMIC',TRUE,'TEST_0002_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:30:51',1,'2016-07-07 13:30:51'),
-(5,NULL,'SAM5','Inherited from TEST_0003','SAM5::TEST_0003_Bn_P_nn_1-1_D_1','Freezer1_5','GENOMIC',TRUE,'TEST_0003_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:30:53',1,'2016-07-07 13:30:53'),
-(6,NULL,'SAM6','Inherited from TEST_0003','SAM6::TEST_0003_Bn_R_nn_1-1_D_1','Freezer1_6','GENOMIC',TRUE,'TEST_0003_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:30:55',1,'2016-07-07 13:30:55'),
-(7,NULL,'SAM7','Inherited from TEST_0004','SAM7::TEST_0004_Bn_P_nn_1-1_D_1','Freezer1_7','GENOMIC',TRUE,'TEST_0004_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:30:57',1,'2016-07-07 13:30:57'),
-(8,NULL,'SAM8','Inherited from TEST_0004','SAM8::TEST_0004_Bn_R_nn_1-1_D_1','Freezer1_8','GENOMIC',TRUE,'TEST_0004_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:30:59',1,'2016-07-07 13:30:59'),
-(9,NULL,'SAM9','Inherited from TEST_0005','SAM9::TEST_0005_Bn_P_nn_1-1_D_1','Freezer1_9','GENOMIC',TRUE,'TEST_0005_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:01',1,'2016-07-07 13:31:01'),
-(10,NULL,'SAM10','Inherited from TEST_0005','SAM10::TEST_0005_Bn_R_nn_1-1_D_1','Freezer1_10','GENOMIC',TRUE,'TEST_0005_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:03',1,'2016-07-07 13:31:03'),
-(11,NULL,'SAM11','Inherited from TEST_0006','SAM11::TEST_0006_Bn_P_nn_1-1_D_1','Freezer1_11','GENOMIC',TRUE,'TEST_0006_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:05',1,'2016-07-07 13:31:05'),
-(12,NULL,'SAM12','Inherited from TEST_0006','SAM12::TEST_0006_Bn_R_nn_1-1_D_1','Freezer1_12','GENOMIC',TRUE,'TEST_0006_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:07',1,'2016-07-07 13:31:07'),
-(13,NULL,'SAM13','Inherited from TEST_0007','SAM13::TEST_0007_Bn_P_nn_1-1_D_1','Freezer1_13','GENOMIC',TRUE,'TEST_0007_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:09',1,'2016-07-07 13:31:09'),
-(14,NULL,'SAM14','Inherited from TEST_0007','SAM14::TEST_0007_Bn_R_nn_1-1_D_1','Freezer1_14','GENOMIC',TRUE,'TEST_0007_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:11',1,'2016-07-07 13:31:11'),
-(15,NULL,'SAM15','identity1','SAM15::TEST_0001_IDENTITY_1','Freezer1_1','GENOMIC',TRUE,'TEST_0001_IDENTITY_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:13',1,'2016-07-07 13:31:13'),
-(16,NULL,'SAM16','tissue1','SAM16::TEST_0001_TISSUE_1','Freezer1_1','GENOMIC',TRUE,'TEST_0001_TISSUE_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:15',1,'2016-07-07 13:31:15'),
-(17,NULL,'SAM17','tissue2','SAM17::TEST_0001_TISSUE_2','Freezer1_1','GENOMIC',TRUE,'TEST_0001_TISSUE_2',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:17',1,'2016-07-07 13:31:17'),
-(18,NULL,'SAM18','stock1','SAM18::TEST_0001_STOCK_1','Freezer1_1','GENOMIC',TRUE,'TEST_0001_STOCK_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:19',1,'2016-07-07 13:31:19'),
-(19,NULL,'SAM19','aliquot1','SAM19::TEST_0001_ALIQUOT_1','Freezer1_1','GENOMIC',TRUE,'TEST_0001_ALIQUOT_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:21',1,'2016-07-07 13:31:21'),
-(20,NULL,'SAM20','identity2','SAM20::TEST_0002_IDENTITY_2','Freezer1_1','GENOMIC',TRUE,'TEST_0002_IDENTITY_2',1,'Homo sapiens',NULL,1,'2018-02-22 14:34:00',1,'2018-02-22 14:34:00'),
-(21,NULL,'SAM21','tissue4','SAM21::TEST_0001_TISSUE_4','Freezer1_1','GENOMIC',TRUE,'TEST_0001_TISSUE_4',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:17',1,'2016-07-07 13:31:17');
+INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identificationBarcode`, `locationBarcode`, `sampleType`, `qcPassed`, `alias`, `project_projectId`, `scientificName`, `taxonIdentifier`, sequencingControlTypeId, `lastModifier`, `lastModified`, `creator`, `created`) 
+VALUES (1,NULL,'SAM1','Inherited from TEST_0001','SAM1::TEST_0001_Bn_P_nn_1-1_D_1','Freezer1_1','GENOMIC',TRUE,'TEST_0001_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,NULL,1,'2016-07-07 13:30:47',1,'2016-07-07 13:30:47'),
+(2,NULL,'SAM2','Inherited from TEST_0001','SAM2::TEST_0001_Bn_R_nn_1-1_D_1','Freezer1_2','GENOMIC',TRUE,'TEST_0001_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,NULL,1,'2016-07-07 13:30:48',1,'2016-07-07 13:30:48'),
+(3,NULL,'SAM3','Inherited from TEST_0002','SAM3::TEST_0002_Bn_P_nn_1-1_D_1','Freezer1_3','GENOMIC',TRUE,'TEST_0002_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,NULL,1,'2016-07-07 13:30:49',1,'2016-07-07 13:30:49'),
+(4,NULL,'SAM4','Inherited from TEST_0002','SAM4::TEST_0002_Bn_R_nn_1-1_D_1','Freezer1_4','GENOMIC',TRUE,'TEST_0002_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,NULL,1,'2016-07-07 13:30:51',1,'2016-07-07 13:30:51'),
+(5,NULL,'SAM5','Inherited from TEST_0003','SAM5::TEST_0003_Bn_P_nn_1-1_D_1','Freezer1_5','GENOMIC',TRUE,'TEST_0003_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,NULL,1,'2016-07-07 13:30:53',1,'2016-07-07 13:30:53'),
+(6,NULL,'SAM6','Inherited from TEST_0003','SAM6::TEST_0003_Bn_R_nn_1-1_D_1','Freezer1_6','GENOMIC',TRUE,'TEST_0003_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,NULL,1,'2016-07-07 13:30:55',1,'2016-07-07 13:30:55'),
+(7,NULL,'SAM7','Inherited from TEST_0004','SAM7::TEST_0004_Bn_P_nn_1-1_D_1','Freezer1_7','GENOMIC',TRUE,'TEST_0004_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,NULL,1,'2016-07-07 13:30:57',1,'2016-07-07 13:30:57'),
+(8,NULL,'SAM8','Inherited from TEST_0004','SAM8::TEST_0004_Bn_R_nn_1-1_D_1','Freezer1_8','GENOMIC',TRUE,'TEST_0004_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,NULL,1,'2016-07-07 13:30:59',1,'2016-07-07 13:30:59'),
+(9,NULL,'SAM9','Inherited from TEST_0005','SAM9::TEST_0005_Bn_P_nn_1-1_D_1','Freezer1_9','GENOMIC',TRUE,'TEST_0005_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,NULL,1,'2016-07-07 13:31:01',1,'2016-07-07 13:31:01'),
+(10,NULL,'SAM10','Inherited from TEST_0005','SAM10::TEST_0005_Bn_R_nn_1-1_D_1','Freezer1_10','GENOMIC',TRUE,'TEST_0005_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,NULL,1,'2016-07-07 13:31:03',1,'2016-07-07 13:31:03'),
+(11,NULL,'SAM11','Inherited from TEST_0006','SAM11::TEST_0006_Bn_P_nn_1-1_D_1','Freezer1_11','GENOMIC',TRUE,'TEST_0006_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,NULL,1,'2016-07-07 13:31:05',1,'2016-07-07 13:31:05'),
+(12,NULL,'SAM12','Inherited from TEST_0006','SAM12::TEST_0006_Bn_R_nn_1-1_D_1','Freezer1_12','GENOMIC',TRUE,'TEST_0006_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,NULL,1,'2016-07-07 13:31:07',1,'2016-07-07 13:31:07'),
+(13,NULL,'SAM13','Inherited from TEST_0007','SAM13::TEST_0007_Bn_P_nn_1-1_D_1','Freezer1_13','GENOMIC',TRUE,'TEST_0007_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,NULL,1,'2016-07-07 13:31:09',1,'2016-07-07 13:31:09'),
+(14,NULL,'SAM14','Inherited from TEST_0007','SAM14::TEST_0007_Bn_R_nn_1-1_D_1','Freezer1_14','GENOMIC',TRUE,'TEST_0007_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,NULL,1,'2016-07-07 13:31:11',1,'2016-07-07 13:31:11'),
+(15,NULL,'SAM15','identity1','SAM15::TEST_0001_IDENTITY_1','Freezer1_1','GENOMIC',TRUE,'TEST_0001_IDENTITY_1',1,'Homo sapiens',NULL,NULL,1,'2016-07-07 13:31:13',1,'2016-07-07 13:31:13'),
+(16,NULL,'SAM16','tissue1','SAM16::TEST_0001_TISSUE_1','Freezer1_1','GENOMIC',TRUE,'TEST_0001_TISSUE_1',1,'Homo sapiens',NULL,NULL,1,'2016-07-07 13:31:15',1,'2016-07-07 13:31:15'),
+(17,NULL,'SAM17','tissue2','SAM17::TEST_0001_TISSUE_2','Freezer1_1','GENOMIC',TRUE,'TEST_0001_TISSUE_2',1,'Homo sapiens',NULL,NULL,1,'2016-07-07 13:31:17',1,'2016-07-07 13:31:17'),
+(18,NULL,'SAM18','stock1','SAM18::TEST_0001_STOCK_1','Freezer1_1','GENOMIC',TRUE,'TEST_0001_STOCK_1',1,'Homo sapiens',NULL,NULL,1,'2016-07-07 13:31:19',1,'2016-07-07 13:31:19'),
+(19,NULL,'SAM19','aliquot1','SAM19::TEST_0001_ALIQUOT_1','Freezer1_1','GENOMIC',TRUE,'TEST_0001_ALIQUOT_1',1,'Homo sapiens',NULL,1,1,'2016-07-07 13:31:21',1,'2016-07-07 13:31:21'),
+(20,NULL,'SAM20','identity2','SAM20::TEST_0002_IDENTITY_2','Freezer1_1','GENOMIC',TRUE,'TEST_0002_IDENTITY_2',1,'Homo sapiens',NULL,NULL,1,'2018-02-22 14:34:00',1,'2018-02-22 14:34:00'),
+(21,NULL,'SAM21','tissue4','SAM21::TEST_0001_TISSUE_4','Freezer1_1','GENOMIC',TRUE,'TEST_0001_TISSUE_4',1,'Homo sapiens',NULL,NULL,1,'2016-07-07 13:31:17',1,'2016-07-07 13:31:17');
 
 INSERT INTO `DetailedSample`(`sampleId`, `sampleClassId`, `archived`, `parentId`, `siblingNumber`, `preMigrationId`, isSynthetic) VALUES
 (15,1,0,NULL,NULL,NULL,0),

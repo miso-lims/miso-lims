@@ -2,7 +2,7 @@
 
 Changes:
 
-
+  * Allow editing sequencing control types
 
 # 1.1.0
 
