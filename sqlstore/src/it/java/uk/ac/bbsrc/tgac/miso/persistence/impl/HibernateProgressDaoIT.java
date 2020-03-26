@@ -83,9 +83,15 @@ public class HibernateProgressDaoIT extends AbstractDAOTest {
   @Test
   public void testListByKnownUser() {
     List<Progress> progresses = dao.listByUserId(USER_ID);
+    assertEquals(2, progresses.size());
 
-    assertEquivalent(progress1, progresses.get(0));
-    assertEquivalent(progress2, progresses.get(1));
+    Progress dbProgress1 = progresses.stream().filter(progress -> progress.getId() == 1L).findFirst().orElse(null);
+    assertNotNull(dbProgress1);
+    Progress dbProgress2 = progresses.stream().filter(progress -> progress.getId() == 2L).findFirst().orElse(null);
+    assertNotNull(dbProgress2);
+
+    assertEquivalent(progress1, dbProgress1);
+    assertEquivalent(progress2, dbProgress2);
   }
 
   @Test
