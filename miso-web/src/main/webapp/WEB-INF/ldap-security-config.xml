@@ -51,7 +51,9 @@
     <property name="userDetailsMapper" ref="ldapInetOrgPersonMapper" />
   </bean>
 
-  <bean id="ldapInetOrgPersonMapper" class="org.springframework.security.ldap.userdetails.InetOrgPersonContextMapper" />
+  <bean id="ldapInetOrgPersonMapper" class="uk.ac.bbsrc.tgac.miso.webapp.controller.component.CustomPersonMapper">
+    <property name="emailAttribute" value="${security.ldap.emailAttribute:mail}" />
+  </bean>
 
   <bean id="ldapUserDetailsMapper" class="org.springframework.security.ldap.DefaultLdapUsernameToDnMapper">
     <constructor-arg index="0" value="${security.ldap.userDnBase}" />
@@ -72,6 +74,7 @@
       </bean>
     </constructor-arg>
     <constructor-arg ref="ldapAuthPopulator" />
+    <property name="userDetailsContextMapper" ref="ldapInetOrgPersonMapper" />
   </bean>
 
   <bean id="ldapUserSearch" class="org.springframework.security.ldap.search.FilterBasedLdapUserSearch">
