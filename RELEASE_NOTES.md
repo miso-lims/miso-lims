@@ -2,7 +2,13 @@
 
 Changes:
 
+  * Fix LDAP user full name and email retrieval
+  * Allow specifying custom LDAP email attribute
 
+Upgrade Notes:
+
+  * It is now possible to specify a custom attribute to use for LDAP users' email address via `security.ldap.emailAttribute`
+    in `security.properties`. If not specified, it defaults to "mail" as before.
 
 # 1.1.0
 
