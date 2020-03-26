@@ -4,6 +4,7 @@ Changes:
 
   * Allow editing sequencing control types
   * Improved performace of Worksets list page
+  * Always show MISO error page instead of default Tomcat error page
 
 # 1.1.0
 

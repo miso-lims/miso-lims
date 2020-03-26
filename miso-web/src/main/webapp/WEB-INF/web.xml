@@ -152,7 +152,6 @@
 
 
   <error-page>
-    <exception-type>java.lang.Exception</exception-type>
     <location>/miso/error</location>
   </error-page>
 

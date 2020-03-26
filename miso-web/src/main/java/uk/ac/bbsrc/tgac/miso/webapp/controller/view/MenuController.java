@@ -29,6 +29,8 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,7 +125,12 @@ public class MenuController {
   }
 
   @GetMapping("/error")
-  public ModelAndView showError(ModelMap model) {
-    return new ModelAndView("/WEB-INF/error.jsp", model);
+  public ModelAndView showError(ModelMap model, HttpServletRequest request) {
+    int statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
+    Status status = Status.fromStatusCode(statusCode);
+    model.addAttribute("genericMessage", statusCode);
+    model.addAttribute("specificMessage", status.getReasonPhrase());
+    model.addAttribute("showBugUrl", true);
+    return new ModelAndView("/WEB-INF/pages/handledError.jsp", model);
   }
 }
