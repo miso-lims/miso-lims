@@ -1396,7 +1396,7 @@ var HotUtils = {
                     required: true
                   }]
                   Utils.showDialog('Add to Existing Workset', 'Search', fields, function(input) {
-                    Utils.ajaxWithDialog('Finding Worksets', 'GET', '/miso/rest/worksets?' + jQuery.param({
+                    Utils.ajaxWithDialog('Finding Worksets', 'GET', Urls.rest.worksets.query + '?' + jQuery.param({
                       q: input.query
                     }), null, function(worksets) {
                       var selectFields = [];
@@ -1442,7 +1442,7 @@ var HotUtils = {
                     description: input.description
                   };
                   workset[idsField] = ids;
-                  Utils.ajaxWithDialog('Creating Workset', 'POST', '/miso/rest/worksets', workset, function() {
+                  Utils.ajaxWithDialog('Creating Workset', 'POST', Urls.rest.worksets.create, workset, function() {
                     Utils.showOkDialog('Add to Workset', ['New workset \'' + workset.alias + '\' created.']);
                   });
                 });
@@ -1480,7 +1480,7 @@ var HotUtils = {
           required: true
         }];
         Utils.showDialog('Move to Workset', 'Search', fields, function(input) {
-          Utils.ajaxWithDialog('Finding Worksets', 'GET', '/miso/rest/worksets?' + jQuery.param({
+          Utils.ajaxWithDialog('Finding Worksets', 'GET', Urls.rest.worksets.query + '?' + jQuery.param({
             q: input.query
           }), null, function(worksets) {
             if (!worksets || !worksets.length) {

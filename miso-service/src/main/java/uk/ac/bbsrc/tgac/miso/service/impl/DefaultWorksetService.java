@@ -19,6 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListWorksetView;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
@@ -29,6 +30,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
+import uk.ac.bbsrc.tgac.miso.persistence.ListWorksetViewStore;
 import uk.ac.bbsrc.tgac.miso.persistence.WorksetStore;
 
 @Service
@@ -37,6 +39,8 @@ public class DefaultWorksetService implements WorksetService {
 
   @Autowired
   private WorksetStore worksetStore;
+  @Autowired
+  private ListWorksetViewStore listWorksetViewStore;
   @Autowired
   private SampleService sampleService;
   @Autowired
@@ -50,6 +54,10 @@ public class DefaultWorksetService implements WorksetService {
 
   public void setWorksetStore(WorksetStore worksetStore) {
     this.worksetStore = worksetStore;
+  }
+
+  public void setListWorksetViewStore(ListWorksetViewStore listWorksetViewStore) {
+    this.listWorksetViewStore = listWorksetViewStore;
   }
 
   public void setSampleService(SampleService sampleService) {
@@ -74,37 +82,37 @@ public class DefaultWorksetService implements WorksetService {
 
   @Override
   public long count(Consumer<String> errorHandler, PaginationFilter... filter) throws IOException {
-    return worksetStore.count(errorHandler, filter);
+    return listWorksetViewStore.count(errorHandler, filter);
   }
 
   @Override
-  public List<Workset> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
+  public List<ListWorksetView> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
       PaginationFilter... filter) throws IOException {
-    return worksetStore.list(errorHandler, offset, limit, sortDir, sortCol, filter);
+    return listWorksetViewStore.list(errorHandler, offset, limit, sortDir, sortCol, filter);
   }
 
   @Override
-  public Workset get(long id) {
+  public Workset get(long id) throws IOException {
     return worksetStore.get(id);
   }
 
   @Override
-  public List<Workset> listBySearch(String query) {
-    return worksetStore.listBySearch(query);
+  public List<ListWorksetView> listBySearch(String query) throws IOException {
+    return listWorksetViewStore.listBySearch(query);
   }
 
   @Override
-  public List<Workset> listBySample(long sampleId) {
+  public List<Workset> listBySample(long sampleId) throws IOException {
     return worksetStore.listBySample(sampleId);
   }
 
   @Override
-  public List<Workset> listByLibrary(long libraryId) {
+  public List<Workset> listByLibrary(long libraryId) throws IOException {
     return worksetStore.listByLibrary(libraryId);
   }
 
   @Override
-  public List<Workset> listByLibraryAliquot(long aliquotId) {
+  public List<Workset> listByLibraryAliquot(long aliquotId) throws IOException {
     return worksetStore.listByLibraryAliquot(aliquotId);
   }
 
@@ -172,7 +180,7 @@ public class DefaultWorksetService implements WorksetService {
     managed.addAll(addedMembers);
   }
 
-  private void validateChange(Workset workset, Workset beforeChange) {
+  private void validateChange(Workset workset, Workset beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
 
     if ((beforeChange == null || !workset.getAlias().equals(beforeChange.getAlias()))
@@ -201,22 +209,22 @@ public class DefaultWorksetService implements WorksetService {
   }
 
   @Override
-  public void moveSamples(Workset from, Workset to, Collection<Sample> items) {
+  public void moveSamples(Workset from, Workset to, Collection<Sample> items) throws IOException {
     moveItems(from, to, items, Workset::getSamples, "samples");
   }
 
   @Override
-  public void moveLibraries(Workset from, Workset to, Collection<Library> items) {
+  public void moveLibraries(Workset from, Workset to, Collection<Library> items) throws IOException {
     moveItems(from, to, items, Workset::getLibraries, "libraries");
   }
 
   @Override
-  public void moveLibraryAliquots(Workset from, Workset to, Collection<LibraryAliquot> items) {
+  public void moveLibraryAliquots(Workset from, Workset to, Collection<LibraryAliquot> items) throws IOException {
     moveItems(from, to, items, Workset::getLibraryAliquots, "library aliquots");
   }
 
   public <T extends Identifiable> void moveItems(Workset from, Workset to, Collection<T> items, Function<Workset, Set<T>> getter,
-      String pluralTypeLabel) {
+      String pluralTypeLabel) throws IOException {
     if (from.getId() == to.getId()) {
       throw new ValidationException(String.format("Trying to move %s from the same workset", pluralTypeLabel));
     }

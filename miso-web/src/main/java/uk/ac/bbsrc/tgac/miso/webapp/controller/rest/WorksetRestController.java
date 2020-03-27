@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListWorksetView;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
@@ -40,6 +41,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.TriConsumer;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.ListWorksetViewDto;
 import uk.ac.bbsrc.tgac.miso.dto.WorksetDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
@@ -61,33 +63,33 @@ public class WorksetRestController extends RestController {
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
 
-  private final JQueryDataTableBackend<Workset, WorksetDto> jQueryBackend = new JQueryDataTableBackend<Workset, WorksetDto>() {
+  private final JQueryDataTableBackend<ListWorksetView, ListWorksetViewDto> jQueryBackend = new JQueryDataTableBackend<ListWorksetView, ListWorksetViewDto>() {
 
     @Override
-    protected WorksetDto asDto(Workset model) {
+    protected ListWorksetViewDto asDto(ListWorksetView model) {
       return Dtos.asDto(model);
     }
 
     @Override
-    protected PaginatedDataSource<Workset> getSource() throws IOException {
+    protected PaginatedDataSource<ListWorksetView> getSource() throws IOException {
       return worksetService;
     }
 
   };
 
   @GetMapping(value = "/dt/all", produces = "application/json")
-  public @ResponseBody DataTablesResponseDto<WorksetDto> dataTable(HttpServletRequest request) throws IOException {
+  public @ResponseBody DataTablesResponseDto<ListWorksetViewDto> dataTable(HttpServletRequest request) throws IOException {
     return jQueryBackend.get(request, advancedSearchParser);
   }
 
   @GetMapping(value = "/dt/mine", produces = "application/json")
-  public @ResponseBody DataTablesResponseDto<WorksetDto> dataTableForUser(HttpServletRequest request) throws IOException {
+  public @ResponseBody DataTablesResponseDto<ListWorksetViewDto> dataTableForUser(HttpServletRequest request) throws IOException {
     String username = authorizationManager.getCurrentUser().getLoginName();
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.user(username, true));
   }
 
   @GetMapping
-  public @ResponseBody List<WorksetDto> queryWorksets(@RequestParam String q) {
+  public @ResponseBody List<ListWorksetViewDto> queryWorksets(@RequestParam String q) throws IOException {
     return worksetService.listBySearch(q).stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
@@ -282,8 +284,7 @@ public class WorksetRestController extends RestController {
   }
 
   private <T extends Identifiable> void moveItems(long sourceWorksetId, MoveItemsDto dto, String itemTypeName, ProviderService<T> service,
-      TriConsumer<Workset, Workset, Collection<T>> moveFunction)
-      throws IOException {
+      TriConsumer<Workset, Workset, Collection<T>> moveFunction) throws IOException {
     Workset sourceWorkset = worksetService.get(sourceWorksetId);
     if (sourceWorkset == null) {
       throw new NotFoundException(String.format("Source workset %d not found", sourceWorksetId));

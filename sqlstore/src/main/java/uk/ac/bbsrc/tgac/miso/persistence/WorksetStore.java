@@ -1,24 +1,22 @@
 package uk.ac.bbsrc.tgac.miso.persistence;
 
+import java.io.IOException;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
-import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface WorksetStore extends PaginatedDataSource<Workset> {
+public interface WorksetStore {
 
-  public Workset get(long id);
+  public Workset get(long id) throws IOException;
 
-  public Workset getByAlias(String alias);
+  public Workset getByAlias(String alias) throws IOException;
 
-  public List<Workset> listBySearch(String query);
+  public List<Workset> listBySample(long sampleId) throws IOException;
 
-  public List<Workset> listBySample(long sampleId);
+  public List<Workset> listByLibrary(long libraryId) throws IOException;
 
-  public List<Workset> listByLibrary(long libraryId);
+  public List<Workset> listByLibraryAliquot(long aliquotId) throws IOException;
 
-  public List<Workset> listByLibraryAliquot(long aliquotId);
-
-  public long save(Workset workset);
+  public long save(Workset workset) throws IOException;
 
 }

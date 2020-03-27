@@ -971,6 +971,7 @@ Urls = (function() {
   rest.worksets = {
     create: worksetRestBase,
     update: idUrlFunction(worksetRestBase),
+    query: worksetRestBase,
     addSamples: middleIdUrlFunction(worksetRestBase, '/samples'),
     addLibraries: middleIdUrlFunction(worksetRestBase, '/libraries'),
     addLibraryAliquots: middleIdUrlFunction(worksetRestBase, '/libraryaliquots'),
