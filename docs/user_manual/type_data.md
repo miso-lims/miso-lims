@@ -231,6 +231,16 @@ there are no stains associated with it.
 
 
 
+## Sequencing Control Types
+
+A sample can be marked as a control for sequencing, and you can define the available control types how you like. It
+may make sense to have "Positive" and "Negative" control types, or other types may also make sense. In plain sample mode, any sample can be marked as a control. In detailed sample mode, the option is available for aliquot samples.
+This option can only be changed on the single Edit Sample page - it does not appear on the bulk Create/Edit Samples
+pages.
+
+MISO administrators can add, edit, and delete sequencing control types using the standard interface. A sequencing
+control type can only be deleted if the option has not been used by any existing samples.
+
 
 
 ## Library Types

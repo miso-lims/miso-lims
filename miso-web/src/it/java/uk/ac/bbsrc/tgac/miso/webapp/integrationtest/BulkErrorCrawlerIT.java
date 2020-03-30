@@ -52,6 +52,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("qctype/list");
     slugs.add("attachmentcategories/list");
     slugs.add("sampletype/list");
+    slugs.add("sequencingcontroltype/list");
     slugs.add("librarytype/list");
     slugs.add("libraryselection/list");
     slugs.add("librarystrategy/list");
@@ -172,6 +173,8 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("attachmentcategories/bulk/edit?ids=1%2C2%2C3");
     slugs.add("sampletype/bulk/new?quantity=3");
     slugs.add("sampletype/bulk/edit?ids=1%2C2");
+    slugs.add("sequencingcontroltype/bulk/new?quantity=3");
+    slugs.add("sequencingcontroltype/bulk/edit?ids=1%2C2");
     slugs.add("librarytype/bulk/new?quantity=3");
     slugs.add("librarytype/bulk/edit?ids=28%2C27%2C17");
     slugs.add("libraryselection/bulk/new?quantity=3");

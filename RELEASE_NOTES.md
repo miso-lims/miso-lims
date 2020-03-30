@@ -2,6 +2,7 @@
 
 Changes:
 
+  * Allow editing sequencing control types
   * Improved performace of Worksets list page
 
 # 1.1.0

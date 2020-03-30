@@ -23,6 +23,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
 import uk.ac.bbsrc.tgac.miso.core.data.Printer;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleType;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingControlType;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.StainCategory;
@@ -182,6 +183,11 @@ public class DeleteIT extends AbstractIT {
   @Test
   public void testDeleteSampleType() {
     testAdminDelete(ListTarget.SAMPLE_TYPES, null, "SYNTHETIC", Columns.NAME, SampleType.class, 3L);
+  }
+
+  @Test
+  public void testDeleteSequencingControlType() {
+    testAdminDelete(ListTarget.SEQUENCING_CONTROL_TYPES, null, "Delete Me", Columns.ALIAS, SequencingControlType.class, 3L);
   }
 
   @Test
