@@ -13,6 +13,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.SequencingControlTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.SaveDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SequencingControlTypeDao;
 import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
@@ -50,22 +51,34 @@ public class DefaultSequencingControlTypeService extends AbstractSaveService<Seq
   }
 
   @Override
+  protected void authorizeSave(SequencingControlType object) throws IOException {
+    authorizationManager.throwIfNonAdmin();
+  }
+
+  @Override
   protected void collectValidationErrors(SequencingControlType object, SequencingControlType beforeChange, List<ValidationError> errors)
       throws IOException {
-    // TODO (not yet modifiable via the UI)
-
+    if (ValidationUtils.isSetAndChanged(SequencingControlType::getAlias, object, beforeChange)
+        && sequencingControlTypeDao.getByAlias(object.getAlias()) != null) {
+      errors.add(ValidationError.forDuplicate("sequencing control type", "alias"));
+    }
   }
 
   @Override
   protected void applyChanges(SequencingControlType to, SequencingControlType from) throws IOException {
-    // TODO (not yet modifiable via the UI)
-
+    to.setAlias(from.getAlias());
   }
 
   @Override
   public ValidationResult validateDeletion(SequencingControlType object) throws IOException {
-    // TODO (not yet modifiable via the UI)
-    return new ValidationResult();
+    ValidationResult result = new ValidationResult();
+
+    long usage = sequencingControlTypeDao.getUsage(object);
+    if (usage > 0L) {
+      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.samples(usage)));
+    }
+
+    return result;
   }
 
 }

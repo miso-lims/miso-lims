@@ -102,6 +102,7 @@ DELETE FROM SequencerPartitionContainerChangeLog;
 DELETE FROM SequencerPartitionContainer_Partition;
 DELETE FROM SequencingContainerModel;
 DELETE FROM SequencingContainerModel_InstrumentModel;
+DELETE FROM SequencingControlType;
 DELETE FROM SequencingOrder;
 DELETE FROM SequencingParameters;
 DELETE FROM ServiceRecord;

@@ -40,7 +40,7 @@ public class SequencingControlType implements Aliasable, Deletable, Serializable
 
   @Override
   public String getDeleteType() {
-    return "SequencingControlType";
+    return "Sequencing Control Type";
   }
 
   @Override

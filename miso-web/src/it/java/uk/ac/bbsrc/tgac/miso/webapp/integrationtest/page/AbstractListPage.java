@@ -198,6 +198,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String SAMPLE_CLASSES = "sampleclass/list";
     public static final String SAMPLE_PURPOSES = "samplepurpose/list";
     public static final String SAMPLE_TYPES = "sampletype/list";
+    public static final String SEQUENCING_CONTROL_TYPES = "sequencingcontroltype/list";
     public static final String SEQUENCING_PARAMETERS = "sequencingparameters/list";
     public static final String STAINS = "stain/list";
     public static final String STAIN_CATEGORIES = "staincategory/list";
