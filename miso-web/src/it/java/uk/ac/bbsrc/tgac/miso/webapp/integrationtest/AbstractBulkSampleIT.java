@@ -45,7 +45,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   protected static final long identityClassId = 1L;
   protected static final long tissueClassId = 23L;
   protected static final long slideClassId = 24L;
-  protected static final long curlsClassId = 8L;
+  protected static final long tissuePieceClassId = 10L;
   protected static final long lcmTubeClassId = 10L;
   protected static final long gStockClassId = 11L;
   protected static final long rStockClassId = 13L;

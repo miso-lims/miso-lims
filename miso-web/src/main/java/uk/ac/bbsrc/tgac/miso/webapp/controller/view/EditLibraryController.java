@@ -54,7 +54,6 @@ import com.eaglegenomics.simlims.core.Group;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
@@ -67,6 +66,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -204,7 +204,7 @@ public class EditLibraryController {
   }
 
   public void addAdjacentLibraries(Library library, ModelMap model) throws IOException {
-    if (library.getId() == AbstractLibrary.UNSAVED_ID) {
+    if (library.getId() == LibraryImpl.UNSAVED_ID) {
       return;
     }
     model.put("previousLibrary", libraryService.getAdjacentLibrary(library, true));

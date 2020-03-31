@@ -56,20 +56,18 @@ CREATE OR REPLACE VIEW PoolDistributionView AS
 
 CREATE OR REPLACE VIEW SampleBoxableView AS
   SELECT s.sampleId AS targetId, 'SAMPLE' AS targetType, s.name, s.alias, s.identificationBarcode, s.locationBarcode,
-    s.volume, s.discarded, dist.distributed, ds.preMigrationId, ds.sampleClassId, bp.boxId AS boxId, bp.position AS boxPosition,
+    s.volume, s.discarded, dist.distributed, s.preMigrationId, s.sampleClassId, bp.boxId AS boxId, bp.position AS boxPosition,
     b.name AS boxName, b.alias AS boxAlias, b.locationBarcode AS boxLocationBarcode
   FROM Sample s
-  LEFT JOIN DetailedSample ds ON ds.sampleId = s.sampleId
   LEFT JOIN BoxPosition bp ON bp.targetId = s.sampleId AND bp.targetType = 'SAMPLE'
   LEFT JOIN Box b ON b.boxId = bp.boxId
   JOIN SampleDistributionView dist ON dist.sampleId = s.sampleId;
 
 CREATE OR REPLACE VIEW LibraryBoxableView AS
   SELECT l.libraryId AS targetId, 'LIBRARY' AS targetType, l.name, l.alias, l.identificationBarcode, l.locationBarcode,
-    l.volume, l.discarded, dist.distributed, dl.preMigrationId, NULL AS sampleClassId, bp.boxId, bp.position AS boxPosition,
+    l.volume, l.discarded, dist.distributed, l.preMigrationId, NULL AS sampleClassId, bp.boxId, bp.position AS boxPosition,
     b.name AS boxName, b.alias AS boxAlias, b.locationBarcode AS boxLocationBarcode
   FROM Library l
-  LEFT JOIN DetailedLibrary dl ON dl.libraryId = l.libraryId
   LEFT JOIN BoxPosition bp ON bp.targetId = l.libraryId AND bp.targetType = 'LIBRARY'
   LEFT JOIN Box b ON b.boxId = bp.boxId
   JOIN LibraryDistributionView dist ON dist.libraryId = l.libraryId;

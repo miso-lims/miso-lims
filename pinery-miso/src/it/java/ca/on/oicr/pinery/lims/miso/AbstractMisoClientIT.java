@@ -38,7 +38,7 @@ import ca.on.oicr.pinery.api.User;
 public abstract class AbstractMisoClientIT {
 
   private static final String SCRIPT_DIR = System.getProperty("basedir") + "/src/it/resources/db/migration/";
-  private static final String BASE_SCRIPT = "pinery-miso_plain_test_data.sql";
+  private static final String BASE_SCRIPT = "pinery-miso_base_test_data.sql";
 
   @Autowired
   private DataSource dataSource;
@@ -47,7 +47,7 @@ public abstract class AbstractMisoClientIT {
   private MisoClient sut;
   
   /**
-   * @return filename of an SQL script with additional data to load after the base data file (pinery-miso_plain_test_data.sql). May
+   * @return filename of an SQL script with additional data to load after the base data file (pinery-miso_base_test_data.sql). May
    *         return null if there is no additional data
    */
   protected abstract String getAdditionalDataFilename();

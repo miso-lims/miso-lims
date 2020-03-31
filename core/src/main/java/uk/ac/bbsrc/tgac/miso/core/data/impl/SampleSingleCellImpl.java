@@ -3,13 +3,13 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import java.math.BigDecimal;
 
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
 
 @Entity
-@Table(name = "SampleSingleCell")
+@DiscriminatorValue("SingleCell")
 public class SampleSingleCellImpl extends SampleTissueProcessingImpl implements SampleSingleCell {
 
   private static final long serialVersionUID = 1L;

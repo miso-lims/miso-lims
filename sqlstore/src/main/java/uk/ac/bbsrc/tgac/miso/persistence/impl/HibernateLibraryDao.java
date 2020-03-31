@@ -26,7 +26,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
@@ -100,7 +99,7 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   @Override
   public long save(Library library) throws IOException {
     long id;
-    if (library.getId() == AbstractLibrary.UNSAVED_ID) {
+    if (library.getId() == LibraryImpl.UNSAVED_ID) {
       id = (long) currentSession().save(library);
     } else {
       if (library.isDiscarded()) {

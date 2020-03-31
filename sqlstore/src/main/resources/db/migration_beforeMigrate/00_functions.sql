@@ -32,6 +32,38 @@ BEGIN
   END;
 END//
 
+DROP FUNCTION IF EXISTS isChanged//
+CREATE FUNCTION isChanged(val1 varchar(255), val2 varchar(255)) RETURNS BOOLEAN
+BEGIN
+  IF (val1 IS NULL) <> (val2 IS NULL) THEN
+    RETURN TRUE;
+  ELSEIF val1 IS NULL AND val2 IS NULL THEN
+    RETURN FALSE;
+  ELSE
+    RETURN val1 <> val2;
+  END IF;
+END//
+
+DROP FUNCTION IF EXISTS makeChangeMessage//
+CREATE FUNCTION makeChangeMessage(fieldName varchar(255), beforeVal varchar(255), afterVal varchar(255)) RETURNS varchar(255)
+BEGIN
+  IF isChanged(beforeVal, afterVal) THEN
+    RETURN CONCAT(fieldName, ': ', COALESCE(beforeVal, 'n/a'), ' → ', COALESCE(afterVal, 'n/a'));
+  ELSE
+    RETURN NULL;
+  END IF;
+END//
+
+DROP FUNCTION IF EXISTS makeChangeColumn//
+CREATE FUNCTION makeChangeColumn(fieldName varchar(255), beforeVal varchar(255), afterVal varchar(255)) RETURNS varchar(255)
+BEGIN
+  IF isChanged(beforeVal, afterVal) THEN
+    RETURN fieldName;
+  ELSE
+    RETURN NULL;
+  END IF;
+END//
+
 DELIMITER ;
 SET sql_notes = 1;
 -- EndNoTest

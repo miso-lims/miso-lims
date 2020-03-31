@@ -4,7 +4,7 @@ public class PlainMisoClientIT extends AbstractMisoClientIT {
 
   @Override
   protected String getAdditionalDataFilename() {
-    return null;
+    return "pinery-miso_plain_test_data.sql";
   }
 
   @Override

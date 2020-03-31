@@ -5,353 +5,158 @@ DROP TRIGGER IF EXISTS SampleChange//
 CREATE TRIGGER SampleChange BEFORE UPDATE ON Sample
 FOR EACH ROW
   BEGIN
-  DECLARE log_message varchar(500) CHARACTER SET utf8;
+  DECLARE log_message longtext CHARACTER SET utf8;
   SET log_message = CONCAT_WS(', ',
-    CASE WHEN (NEW.accession IS NULL) <> (OLD.accession IS NULL) OR NEW.accession <> OLD.accession THEN CONCAT('accession: ', COALESCE(OLD.accession, 'n/a'), ' → ', COALESCE(NEW.accession, 'n/a')) END,
-    CASE WHEN (NEW.alias IS NULL) <> (OLD.alias IS NULL) OR NEW.alias <> OLD.alias AND (OLD.alias NOT LIKE 'TEMPORARY%') THEN CONCAT('alias: ', COALESCE(OLD.alias, 'n/a'), ' → ', COALESCE(NEW.alias, 'n/a')) END,
-    CASE WHEN (NEW.description IS NULL) <> (OLD.description IS NULL) OR NEW.description <> OLD.description THEN CONCAT('description: ', OLD.description, ' → ', NEW.description) END,
-    CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN CONCAT('barcode: ', COALESCE(OLD.identificationBarcode, 'n/a'), ' → ', COALESCE(NEW.identificationBarcode, 'n/a')) END,
-    CASE WHEN (NEW.locationBarcode IS NULL) <> (OLD.locationBarcode IS NULL) OR NEW.locationBarcode <> OLD.locationBarcode THEN CONCAT('location: ', COALESCE(OLD.locationBarcode, 'n/a'), ' → ', COALESCE(NEW.locationBarcode, 'n/a')) END,
-    CASE WHEN NEW.project_projectId <> OLD.project_projectId THEN CONCAT('project: ', (SELECT name FROM Project WHERE projectId = OLD.project_projectId), ' → ', (SELECT name FROM Project WHERE projectId = NEW.project_projectId)) END,
-    CASE WHEN (NEW.qcPassed IS NULL) <> (OLD.qcPassed IS NULL) OR NEW.qcPassed <> OLD.qcPassed THEN CONCAT('qcPassed: ', COALESCE(OLD.qcPassed, 'n/a'), ' → ', COALESCE(NEW.qcPassed, 'n/a')) END,
-    CASE WHEN NEW.sampleType <> OLD.sampleType THEN CONCAT('type: ', OLD.sampleType, ' → ', NEW.sampleType) END,
-    CASE WHEN NEW.scientificName <> OLD.scientificName THEN CONCAT('scientific name: ', OLD.scientificName, ' → ', NEW.scientificName) END,
-    CASE WHEN (NEW.taxonIdentifier IS NULL) <> (OLD.taxonIdentifier IS NULL) OR NEW.taxonIdentifier <> OLD.taxonIdentifier THEN CONCAT('taxon: ', COALESCE(OLD.taxonIdentifier, 'n/a'), ' → ', COALESCE(NEW.taxonIdentifier, 'n/a')) END,
-    CASE WHEN NEW.discarded <> OLD.discarded THEN CONCAT('discarded: ', IF(OLD.discarded = 0, 'No', 'Yes'), ' → ', IF(NEW.discarded = 0, 'No', 'Yes')) END,
-    CASE WHEN (NEW.concentration IS NULL) <> (OLD.concentration IS NULL) OR NEW.concentration <> OLD.concentration THEN CONCAT('concentration: ', COALESCE(decimalToString(OLD.concentration), 'n/a'), ' → ', COALESCE(decimalToString(NEW.concentration), 'n/a')) END, 
-    CASE WHEN (NEW.initialVolume IS NULL) <> (OLD.initialVolume IS NULL) OR NEW.initialVolume <> OLD.initialVolume THEN CONCAT('initial volume: ', COALESCE(decimalToString(OLD.initialVolume), 'n/a'), ' → ', COALESCE(decimalToString(NEW.initialVolume), 'n/a')) END,
-    CASE WHEN (NEW.volume IS NULL) <> (OLD.volume IS NULL) OR NEW.volume <> OLD.volume THEN CONCAT('volume: ', COALESCE(decimalToString(OLD.volume), 'n/a'), ' → ', COALESCE(decimalToString(NEW.volume), 'n/a')) END,
-    CASE WHEN (NEW.concentrationUnits IS NULL) <> (OLD.concentrationUnits IS NULL) OR NEW.concentrationUnits <> OLD.concentrationUnits THEN CONCAT('concentration units: ', COALESCE(OLD.concentrationUnits, 'n/a'), ' → ', COALESCE(NEW.concentrationUnits, 'n/a')) END,
-    CASE WHEN (NEW.volumeUnits IS NULL) <> (OLD.volumeUnits IS NULL) OR NEW.volumeUnits <> OLD.volumeUnits THEN CONCAT('volume units: ', COALESCE(OLD.volumeUnits, 'n/a'), ' → ', COALESCE(NEW.volumeUnits, 'n/a')) END,
-    CASE WHEN (NEW.requisitionId IS NULL) <> (OLD.requisitionId IS NULL) OR NEW.requisitionId <> OLD.requisitionId THEN CONCAT('requisition ID: ', COALESCE(OLD.requisitionId, 'n/a'), ' → ', COALESCE(NEW.requisitionId, 'n/a')) END,
-    CASE WHEN (NEW.sequencingControlTypeId IS NULL) <> (OLD.sequencingControlTypeId IS NULL) OR NEW.sequencingControlTypeId <> OLD.sequencingControlTypeId THEN CONCAT('sequencing control type: ', COALESCE((SELECT alias FROM SequencingControlType WHERE sequencingControlTypeId = OLD.sequencingControlTypeId), 'n/a'), ' → ', COALESCE((SELECT alias FROM SequencingControlType WHERE sequencingControlTypeId = NEW.sequencingControlTypeId), 'n/a')) END);
+    makeChangeMessage('accession', OLD.accession, NEW.accession),
+    CASE WHEN OLD.alias NOT LIKE 'TEMPORARY%' THEN makeChangeMessage('alias', OLD.alias, NEW.alias) END,
+    makeChangeMessage('description', OLD.description, NEW.description),
+    makeChangeMessage('barcode', OLD.identificationBarcode, NEW.identificationBarcode),
+    makeChangeMessage('location', OLD.locationBarcode, NEW.locationBarcode),
+    makeChangeMessage('project', (SELECT name FROM Project WHERE projectId = OLD.project_projectId), (SELECT name FROM Project WHERE projectId = NEW.project_projectId)),
+    makeChangeMessage('qcPassed', booleanToString(OLD.qcPassed), booleanToString(NEW.qcPassed)),
+    makeChangeMessage('type', OLD.sampleType, NEW.sampleType),
+    makeChangeMessage('scientific name', OLD.scientificName, NEW.scientificName),
+    makeChangeMessage('taxon', OLD.taxonIdentifier, NEW.taxonIdentifier),
+    makeChangeMessage('discarded', booleanToString(OLD.discarded), booleanToString(NEW.discarded)),
+    makeChangeMessage('concentration', decimalToString(OLD.concentration), decimalToString(NEW.concentration)),
+    makeChangeMessage('initial volume', decimalToString(OLD.initialVolume), decimalToString(NEW.initialVolume)),
+    makeChangeMessage('volume', decimalToString(OLD.volume), decimalToString(NEW.volume)),
+    makeChangeMessage('concentration units', OLD.concentrationUnits, NEW.concentrationUnits),
+    makeChangeMessage('volume units', OLD.volumeUnits, NEW.volumeUnits),
+    makeChangeMessage('requisition ID', OLD.requisitionId, NEW.requisitionId),
+    makeChangeMessage('sequencing control type', (SELECT alias FROM SequencingControlType WHERE sequencingControlTypeId = OLD.sequencingControlTypeId), (SELECT alias FROM SequencingControlType WHERE sequencingControlTypeId = NEW.sequencingControlTypeId)),
+    makeChangeMessage('archived', booleanToString(OLD.archived), booleanToString(NEW.archived)),
+    makeChangeMessage('group description', OLD.groupDescription, NEW.groupDescription),
+    makeChangeMessage('group id', OLD.groupId, NEW.groupId),
+    makeChangeMessage('parent', (SELECT name FROM Sample WHERE sampleId = OLD.parentId), (SELECT name FROM Sample WHERE sampleId = NEW.parentId)),
+    makeChangeMessage('QC Status', (SELECT description FROM DetailedQcStatus WHERE detailedQcStatusId = OLD.detailedQcStatusId), (SELECT description FROM DetailedQcStatus WHERE detailedQcStatusId = NEW.detailedQcStatusId)),
+    makeChangeMessage('QC Status Not', OLD.detailedQcStatusNote, NEW.detailedQcStatusNote),
+    makeChangeMessage('class', (SELECT alias FROM SampleClass WHERE sampleClassId = OLD.sampleClassId), (SELECT alias FROM SampleClass WHERE sampleClassId = NEW.sampleClassId)),
+    makeChangeMessage('subproject', (SELECT alias FROM Subproject WHERE subprojectId = OLD.subprojectId), (SELECT alias FROM Subproject WHERE subprojectId = NEW.subprojectId)),
+    makeChangeMessage('volume used', decimalToString(OLD.volumeUsed), decimalToString(NEW.volumeUsed)),
+    makeChangeMessage('ng used', decimalToString(OLD.ngUsed), decimalToString(NEW.ngUsed)),
+    makeChangeMessage('creation date', OLD.creationDate, NEW.creationDate),
+    makeChangeMessage('purpose', (SELECT alias FROM SamplePurpose WHERE samplePurposeId = OLD.samplePurposeId), (SELECT alias FROM SamplePurpose WHERE samplePurposeId = NEW.samplePurposeId)),
+    makeChangeMessage('slides', OLD.slides, NEW.slides),
+    makeChangeMessage('discards', OLD.discards, NEW.discards),
+    makeChangeMessage('thickness', OLD.thickness, NEW.thickness),
+    makeChangeMessage('stain', (SELECT name FROM Stain WHERE stainId = OLD.stain), (SELECT name FROM Stain WHERE stainId = NEW.stain)),
+    makeChangeMessage('percent tumour', OLD.percentTumour, NEW.percentTumour),
+    makeChangeMessage('percent necrosis', OLD.percentNecrosis, NEW.percentNecrosis),
+    makeChangeMessage('marked area size', OLD.markedAreaSize, NEW.markedAreaSize),
+    makeChangeMessage('marked area percent tumour', OLD.markedAreaPercentTumour, NEW.markedAreaPercentTumour),
+    makeChangeMessage('slides', OLD.slidesConsumed, NEW.slidesConsumed),
+    makeChangeMessage('type', (SELECT name FROM TissuePieceType WHERE tissuePieceTypeId = OLD.tissuePieceType), (SELECT name FROM TissuePieceType WHERE tissuePieceTypeId = NEW.tissuePieceType)),
+    makeChangeMessage('reference slide', (SELECT name FROM Sample WHERE sampleId = OLD.referenceSlideId), (SELECT name FROM Sample WHERE sampleId = NEW.referenceSlideId)),
+    makeChangeMessage('STR status', OLD.strStatus, NEW.strStatus),
+    makeChangeMessage('secondary identifier', OLD.secondaryIdentifier, NEW.secondaryIdentifier),
+    makeChangeMessage('lab', (SELECT alias FROM Lab WHERE labId = OLD.labId), (SELECT alias FROM Lab WHERE labId = NEW.labId)),
+    makeChangeMessage('passage number', OLD.passageNumber, NEW.passageNumber),
+    makeChangeMessage('times received', OLD.timesReceived, NEW.timesReceived),
+    makeChangeMessage('tube number', OLD.tubeNumber, NEW.tubeNumber),
+    makeChangeMessage('region', OLD.region, NEW.region),
+    makeChangeMessage('material', (SELECT alias FROM TissueMaterial WHERE tissueMaterialId = OLD.tissueMaterialId), (SELECT alias FROM TissueMaterial WHERE tissueMaterialId = NEW.tissueMaterialId)),
+    makeChangeMessage('origin', (SELECT alias FROM TissueOrigin WHERE tissueOriginId = OLD.tissueOriginId), (SELECT alias FROM TissueOrigin WHERE tissueOriginId = NEW.tissueOriginId)),
+    makeChangeMessage('type', (SELECT alias FROM TissueType WHERE tissueTypeId = OLD.tissueTypeId), (SELECT alias FROM TissueType WHERE tissueTypeId = NEW.tissueTypeId)),
+    makeChangeMessage('donor sex', OLD.donorSex, NEW.donorSex),
+    makeChangeMessage('consent level', OLD.consentLevel, NEW.consentLevel),
+    makeChangeMessage('external name', OLD.externalName, NEW.externalName),
+    makeChangeMessage('initial cell concentration', decimalToString(OLD.initialCellConcentration), decimalToString(NEW.initialCellConcentration)),
+    makeChangeMessage('digestion', OLD.digestion, NEW.digestion),
+    makeChangeMessage('target cell recovery', decimalToString(OLD.targetCellRecovery), decimalToString(NEW.targetCellRecovery)),
+    makeChangeMessage('cell viability', decimalToString(OLD.cellViability), decimalToString(NEW.cellViability)),
+    makeChangeMessage('loading cell concentration', decimalToString(OLD.loadingCellConcentration), decimalToString(NEW.loadingCellConcentration)),
+    makeChangeMessage('input into library', decimalToString(OLD.inputIntoLibrary), decimalToString(NEW.inputIntoLibrary))
+  );
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime) VALUES (
       NEW.sampleId,
       COALESCE(CONCAT_WS(',',
-        CASE WHEN (NEW.accession IS NULL) <> (OLD.accession IS NULL) OR NEW.accession <> OLD.accession THEN 'accession' END,
-        CASE WHEN (NEW.alias IS NULL) <> (OLD.alias IS NULL) OR NEW.alias <> OLD.alias AND (OLD.alias NOT LIKE 'TEMPORARY%') THEN 'alias' END,
-        CASE WHEN (NEW.description IS NULL) <> (OLD.description IS NULL) OR NEW.description <> OLD.description THEN 'description' END,
-        CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN 'barcode' END,
-        CASE WHEN NEW.locationBarcode <> OLD.locationBarcode THEN 'locationBarcode' END,
-        CASE WHEN NEW.project_projectId <> OLD.project_projectId THEN 'project_projectId' END,
-        CASE WHEN (NEW.qcPassed IS NULL) <> (OLD.qcPassed IS NULL) OR NEW.qcPassed <> OLD.qcPassed THEN 'qcPassed' END,
-        CASE WHEN NEW.sampleType <> OLD.sampleType THEN 'sampleType' END,
-        CASE WHEN NEW.scientificName <> OLD.scientificName THEN 'scientificName' END,
-        CASE WHEN (NEW.taxonIdentifier IS NULL) <> (OLD.taxonIdentifier IS NULL) OR NEW.taxonIdentifier <> OLD.taxonIdentifier THEN 'taxonIdentifier' END,
-        CASE WHEN NEW.discarded <> OLD.discarded THEN 'discarded' END,
-        CASE WHEN (NEW.concentration IS NULL) <> (OLD.concentration IS NULL) OR NEW.concentration <> OLD.concentration THEN 'concentration' END,
-        CASE WHEN (NEW.initialVolume IS NULL) <> (OLD.initialVolume IS NULL) OR NEW.initialVolume <> OLD.initialVolume THEN 'initial volume' END,
-        CASE WHEN (NEW.volume IS NULL) <> (OLD.volume IS NULL) OR NEW.volume <> OLD.volume THEN 'volume' END,
-        CASE WHEN (NEW.concentrationUnits IS NULL) <> (OLD.concentrationUnits IS NULL) OR NEW.concentrationUnits <> OLD.concentrationUnits THEN CONCAT(NEW.name, ' concentrationUnits') END,
-        CASE WHEN (NEW.volumeUnits IS NULL) <> (OLD.volumeUnits IS NULL) OR NEW.volumeUnits <> OLD.volumeUnits THEN CONCAT(NEW.name, ' volumeUnits') END,
-        CASE WHEN (NEW.requisitionId IS NULL) <> (OLD.requisitionId IS NULL) OR NEW.requisitionId <> OLD.requisitionId THEN 'requisitionId' END,
-        CASE WHEN (NEW.sequencingControlTypeId IS NULL) <> (OLD.sequencingControlTypeId IS NULL) OR NEW.sequencingControlTypeId <> OLD.sequencingControlTypeId THEN 'sequencingControlTypeId' END
+        makeChangeColumn('accession', OLD.accession, NEW.accession),
+        CASE WHEN OLD.alias NOT LIKE 'TEMPORARY%' THEN makeChangeColumn('alias', OLD.alias, NEW.alias) END,
+        makeChangeColumn('description', OLD.description, NEW.description),
+        makeChangeColumn('identificationBarcode', OLD.identificationBarcode, NEW.identificationBarcode),
+        makeChangeColumn('locationBarcode', OLD.locationBarcode, NEW.locationBarcode),
+        makeChangeColumn('project_projectId', OLD.project_projectId, NEW.project_projectId),
+        makeChangeColumn('qcPassed', OLD.qcPassed, NEW.qcPassed),
+        makeChangeColumn('sampleType', OLD.sampleType, NEW.sampleType),
+        makeChangeColumn('scientificName', OLD.scientificName, NEW.scientificName),
+        makeChangeColumn('taxonIdentifier', OLD.taxonIdentifier, NEW.taxonIdentifier),
+        makeChangeColumn('discarded', OLD.discarded, NEW.discarded),
+        makeChangeColumn('concentration', OLD.concentration, NEW.concentration),
+        makeChangeColumn('initialVolume', OLD.initialVolume, NEW.initialVolume),
+        makeChangeColumn('volume', OLD.volume, NEW.volume),
+        makeChangeColumn('concentrationUnits', OLD.concentrationUnits, NEW.concentrationUnits),
+        makeChangeColumn('volumeUnits', OLD.volumeUnits, NEW.volumeUnits),
+        makeChangeColumn('requisitionId', OLD.requisitionId, NEW.requisitionId),
+        makeChangeColumn('sequencingControlTypeId', OLD.sequencingControlTypeId, NEW.sequencingControlTypeId),
+        makeChangeColumn('archived', OLD.archived, NEW.archived),
+        makeChangeColumn('groupDescription', OLD.groupDescription, NEW.groupDescription),
+        makeChangeColumn('groupId', OLD.groupId, NEW.groupId),
+        makeChangeColumn('parentId', OLD.parentId, NEW.parentId),
+        makeChangeColumn('detailedQcStatusId', OLD.detailedQcStatusId, NEW.detailedQcStatusId),
+        makeChangeColumn('detailedQcStatusNote', OLD.detailedQcStatusNote, NEW.detailedQcStatusNote),
+        makeChangeColumn('sampleClassId', OLD.sampleClassId, NEW.sampleClassId),
+        makeChangeColumn('subprojectId', OLD.subprojectId, NEW.subprojectId),
+        makeChangeColumn('volumeUsed', OLD.volumeUsed, NEW.volumeUsed),
+        makeChangeColumn('ngUsed', OLD.ngUsed, NEW.ngUsed),
+        makeChangeColumn('creationDate', OLD.creationDate, NEW.creationDate),
+        makeChangeColumn('samplePurposeId', OLD.samplePurposeId, NEW.samplePurposeId),
+        makeChangeColumn('slides', OLD.slides, NEW.slides),
+        makeChangeColumn('discards', OLD.discards, NEW.discards),
+        makeChangeColumn('thickness', OLD.thickness, NEW.thickness),
+        makeChangeColumn('stain', OLD.stain, NEW.stain),
+        makeChangeColumn('percentTumour', OLD.percentTumour, NEW.percentTumour),
+        makeChangeColumn('percentNecrosis', OLD.percentNecrosis, NEW.percentNecrosis),
+        makeChangeColumn('markedAreaSize', OLD.markedAreaSize, NEW.markedAreaSize),
+        makeChangeColumn('markedAreaPercentTumour', OLD.markedAreaPercentTumour, NEW.markedAreaPercentTumour),
+        makeChangeColumn('slidesConsumed', OLD.slidesConsumed, NEW.slidesConsumed),
+        makeChangeColumn('tissuePieceType', OLD.tissuePieceType, NEW.tissuePieceType),
+        makeChangeColumn('referenceSlideId', OLD.referenceSlideId, NEW.referenceSlideId),
+        makeChangeColumn('strStatus', OLD.strStatus, NEW.strStatus),
+        makeChangeColumn('secondaryIdentifier', OLD.secondaryIdentifier, NEW.secondaryIdentifier),
+        makeChangeColumn('labId', OLD.labId, NEW.labId),
+        makeChangeColumn('passageNumber', OLD.passageNumber, NEW.passageNumber),
+        makeChangeColumn('region', OLD.region, NEW.region),
+        makeChangeColumn('timesReceived', OLD.timesReceived, NEW.timesReceived),
+        makeChangeColumn('tubeNumber', OLD.tubeNumber, NEW.tubeNumber),
+        makeChangeColumn('tissueMaterialId', OLD.tissueMaterialId, NEW.tissueMaterialId),
+        makeChangeColumn('tissueOriginId', OLD.tissueOriginId, NEW.tissueOriginId),
+        makeChangeColumn('tissueTypeId', OLD.tissueTypeId, NEW.tissueTypeId),
+        makeChangeColumn('donorSex', OLD.donorSex, NEW.donorSex),
+        makeChangeColumn('consentLevel', OLD.consentLevel, NEW.consentLevel),
+        makeChangeColumn('externalName', OLD.externalName, NEW.externalName),
+        makeChangeColumn('initialCellConcentration', OLD.initialCellConcentration, NEW.initialCellConcentration),
+        makeChangeColumn('digestion', OLD.digestion, NEW.digestion),
+        makeChangeColumn('targetCellRecovery', OLD.targetCellRecovery, NEW.targetCellRecovery),
+        makeChangeColumn('cellViability', OLD.cellViability, NEW.cellViability),
+        makeChangeColumn('loadingCellConcentration', OLD.loadingCellConcentration, NEW.loadingCellConcentration),
+        makeChangeColumn('inputIntoLibrary', OLD.inputIntoLibrary, NEW.inputIntoLibrary)
   ), ''),
       NEW.lastModifier,
       log_message,
       NEW.lastModified
       );
   END IF;
-  END//
-
-DROP TRIGGER IF EXISTS DetailedSampleChange//
-CREATE TRIGGER DetailedSampleChange BEFORE UPDATE ON DetailedSample
-FOR EACH ROW
-  BEGIN
-  DECLARE log_message varchar(500) CHARACTER SET utf8;
-  SET log_message = CONCAT_WS(', ',
-     CASE WHEN NEW.archived <> OLD.archived THEN CONCAT('archived: ', OLD.archived, ' → ', NEW.archived) END,
-     CASE WHEN (NEW.groupDescription IS NULL) <> (OLD.groupDescription IS NULL) OR NEW.groupDescription <> OLD.groupDescription THEN CONCAT('group description: ', COALESCE(OLD.groupDescription, 'n/a'), ' → ', COALESCE(NEW.groupDescription, 'n/a')) END,
-     CASE WHEN (NEW.groupId IS NULL) <> (OLD.groupId IS NULL) OR NEW.groupId <> OLD.groupId THEN CONCAT('group id: ', COALESCE(OLD.groupId, 'n/a'), ' → ', COALESCE(NEW.groupId, 'n/a')) END,
-     CASE WHEN (NEW.parentId IS NULL) <> (OLD.parentId IS NULL) OR NEW.parentId <> OLD.parentId THEN CONCAT('parent: ', (SELECT name FROM Sample WHERE sampleId = OLD.parentId), ' → ', (SELECT name FROM Sample WHERE sampleId = NEW.parentId)) END,
-     CASE WHEN (NEW.detailedQcStatusId IS NULL) <> (OLD.detailedQcStatusId IS NULL) OR NEW.detailedQcStatusId <> OLD.detailedQcStatusId THEN CONCAT('QC Status: ', COALESCE((SELECT description FROM DetailedQcStatus WHERE detailedQcStatusId = OLD.detailedQcStatusId), 'n/a'), ' → ', COALESCE((SELECT description FROM DetailedQcStatus WHERE detailedQcStatusId = NEW.detailedQcStatusId), 'n/a')) END,
-     CASE WHEN (NEW.detailedQcStatusNote IS NULL) <> (OLD.detailedQcStatusNote IS NULL) OR NEW.detailedQcStatusNote <> OLD.detailedQcStatusNote THEN CONCAT('QC Status Note: ', COALESCE(OLD.detailedQcStatusNote, 'n/a'), ' → ', COALESCE(NEW.detailedQcStatusNote, 'n/a')) END,
-     CASE WHEN NEW.sampleClassId <> OLD.sampleClassId THEN CONCAT('class: ', (SELECT alias FROM SampleClass WHERE sampleClassId = OLD.sampleClassId), ' → ', (SELECT alias FROM SampleClass WHERE sampleClassId = NEW.sampleClassId)) END,
-     CASE WHEN (NEW.subprojectId IS NULL) <> (OLD.subprojectId IS NULL) OR NEW.subprojectId <> OLD.subprojectId THEN CONCAT('subproject: ', COALESCE((SELECT alias FROM Subproject WHERE subprojectId = OLD.subprojectId), 'n/a'), ' → ', COALESCE((SELECT alias FROM Subproject WHERE subprojectId = NEW.subprojectId), 'n/a')) END,
-     CASE WHEN (NEW.volumeUsed IS NULL) <> (OLD.volumeUsed IS NULL) OR NEW.volumeUsed <> OLD.volumeUsed THEN CONCAT('volume used: ', COALESCE(decimalToString(OLD.volumeUsed), 'n/a'), ' → ', COALESCE(decimalToString(NEW.volumeUsed), 'n/a')) END,
-     CASE WHEN (NEW.ngUsed IS NULL) <> (OLD.ngUsed IS NULL) OR NEW.ngUsed <> OLD.ngUsed THEN CONCAT('ng used: ', COALESCE(decimalToString(OLD.ngUsed), 'n/a'), ' → ', COALESCE(decimalToString(NEW.ngUsed), 'n/a')) END,
-     CASE WHEN (NEW.creationDate IS NULL) <> (OLD.creationDate IS NULL) OR NEW.creationDate <> OLD.creationDate THEN CONCAT('creationDate: ', COALESCE(OLD.creationDate, 'n/a'), ' → ', COALESCE(NEW.creationDate, 'n/a')) END);
-  IF log_message IS NOT NULL AND log_message <> '' THEN
-    INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime) 
-    SELECT
-      NEW.sampleId,
-      COALESCE(CONCAT_WS(',',
-        CASE WHEN NEW.archived <> OLD.archived THEN 'archived' END,
-        CASE WHEN (NEW.groupDescription IS NULL) <> (OLD.groupDescription IS NULL) OR NEW.groupDescription <> OLD.groupDescription THEN 'groupDescription' END,
-        CASE WHEN (NEW.groupId IS NULL) <> (OLD.groupId IS NULL) OR NEW.groupId <> OLD.groupId THEN 'groupId' END,
-        CASE WHEN (NEW.parentId IS NULL) <> (OLD.parentId IS NULL) OR NEW.parentId <> OLD.parentId THEN 'parentId' END,
-        CASE WHEN (NEW.detailedQcStatusId IS NULL) <> (OLD.detailedQcStatusId IS NULL) OR NEW.detailedQcStatusId <> OLD.detailedQcStatusId THEN 'detailedQcStatusId' END,
-        CASE WHEN (NEW.detailedQcStatusNote IS NULL) <> (OLD.detailedQcStatusNote IS NULL) OR NEW.detailedQcStatusNote <> OLD.detailedQcStatusNote THEN 'detailedQcStatusNote' END,
-        CASE WHEN NEW.sampleClassId <> OLD.sampleClassId THEN 'sampleClassId' END,
-        CASE WHEN (NEW.subprojectId IS NULL) <> (OLD.subprojectId IS NULL) OR NEW.subprojectId <> OLD.subprojectId THEN 'subprojectId' END,
-        CASE WHEN (NEW.volumeUsed IS NULL) <> (OLD.volumeUsed IS NULL) OR NEW.volumeUsed <> OLD.volumeUsed THEN 'volume used' END,
-        CASE WHEN (NEW.ngUsed IS NULL) <> (OLD.ngUsed IS NULL) OR NEW.ngUsed <> OLD.ngUsed THEN 'ng used' END,
-        CASE WHEN (NEW.creationDate IS NULL) <> (OLD.creationDate IS NULL) OR NEW.creationDate <> OLD.creationDate THEN 'creationDate' END
-      ), ''),
-      lastModifier,
-      log_message,
-      lastModified
-    FROM Sample WHERE sampleId = NEW.sampleId;
-  END IF;
   IF (NEW.parentId IS NULL) <> (OLD.parentId IS NULL) OR NEW.parentId <> OLD.parentId THEN
     CALL updateSampleHierarchy(NEW.sampleId);
   END IF;
   END//
 
-DROP TRIGGER IF EXISTS SampleAliquotChange//
-CREATE TRIGGER SampleAliquotChange BEFORE UPDATE ON SampleAliquot
-FOR EACH ROW
-  BEGIN
-  DECLARE log_message varchar(500) CHARACTER SET utf8;
-  SET log_message = CONCAT_WS(', ',
-     CASE WHEN (NEW.samplePurposeId IS NULL) <> (OLD.samplePurposeId IS NULL) OR NEW.samplePurposeId <> OLD.samplePurposeId THEN CONCAT('purpose: ', COALESCE((SELECT alias FROM SamplePurpose WHERE samplePurposeId = OLD.samplePurposeId), 'n/a'), ' → ', COALESCE((SELECT alias FROM SamplePurpose WHERE samplePurposeId = NEW.samplePurposeId), 'n/a')) END);
-  IF log_message IS NOT NULL AND log_message <> '' THEN
-    INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime)
-    SELECT
-      NEW.sampleId,
-      COALESCE(CONCAT_WS(',',
-        CASE WHEN (NEW.samplePurposeId IS NULL) <> (OLD.samplePurposeId IS NULL) OR NEW.samplePurposeId <> OLD.samplePurposeId THEN 'samplePurposeId' END
-      ), ''),
-      lastModifier,
-      log_message,
-      lastModified
-    FROM Sample WHERE sampleId = NEW.sampleId;
-  END IF;
-  END//
-
-DROP TRIGGER IF EXISTS SampleSlideChange//
-CREATE TRIGGER SampleSlideChange BEFORE UPDATE ON SampleSlide
-FOR EACH ROW
-  BEGIN
-  DECLARE log_message varchar(500) CHARACTER SET utf8;
-  SET log_message = CONCAT_WS(', ',
-     CASE WHEN NEW.slides <> OLD.slides THEN CONCAT('slides: ', OLD.slides, ' → ', NEW.slides) END,
-     CASE WHEN (NEW.discards IS NULL) <> (OLD.discards IS NULL) OR NEW.discards <> OLD.discards THEN CONCAT('discards: ', COALESCE(OLD.discards, 'n/a'), ' → ', COALESCE(NEW.discards, 'n/a')) END,
-     CASE WHEN (NEW.thickness IS NULL) <> (OLD.thickness IS NULL) OR NEW.thickness <> OLD.thickness THEN CONCAT('thickness: ', COALESCE(OLD.thickness, 'n/a'), ' → ', COALESCE(NEW.thickness, 'n/a')) END,
-     CASE WHEN (NEW.stain IS NULL) <> (OLD.stain IS NULL) OR NEW.stain <> OLD.stain THEN CONCAT('stain: ', COALESCE((SELECT name FROM Stain WHERE stainId = OLD.stain), 'none'), ' → ', COALESCE((SELECT name FROM Stain WHERE stainId = NEW.stain), 'none')) END,
-     CASE WHEN (NEW.percentTumour IS NULL) <> (OLD.percentTumour IS NULL) OR NEW.percentTumour <> OLD.percentTumour THEN CONCAT('percent tumour: ', COALESCE(OLD.percentTumour, 'n/a'), ' → ', COALESCE(NEW.percentTumour, 'n/a')) END,
-     CASE WHEN (NEW.percentNecrosis IS NULL) <> (OLD.percentNecrosis IS NULL) OR NEW.percentNecrosis <> OLD.percentNecrosis THEN CONCAT('percent necrosis: ', COALESCE(OLD.percentNecrosis, 'n/a'), ' → ', COALESCE(NEW.percentNecrosis, 'n/a')) END,
-     CASE WHEN (NEW.markedAreaSize IS NULL) <> (OLD.markedAreaSize IS NULL) OR NEW.markedAreaSize <> OLD.markedAreaSize THEN CONCAT('marked area size: ', COALESCE(OLD.markedAreaSize, 'n/a'), ' → ', COALESCE(NEW.markedAreaSize, 'n/a')) END,
-     CASE WHEN (NEW.markedAreaPercentTumour IS NULL) <> (OLD.markedAreaPercentTumour IS NULL) OR NEW.markedAreaPercentTumour <> OLD.markedAreaPercentTumour THEN CONCAT('marked area percent tumour: ', COALESCE(OLD.markedAreaPercentTumour, 'n/a'), ' → ', COALESCE(NEW.markedAreaPercentTumour, 'n/a')) END);
-  IF log_message IS NOT NULL AND log_message <> '' THEN
-    INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime)
-    SELECT
-      NEW.sampleId,
-      COALESCE(CONCAT_WS(',',
-        CASE WHEN NEW.slides <> OLD.slides THEN 'slides' END,
-        CASE WHEN (NEW.discards IS NULL) <> (OLD.discards IS NULL) OR NEW.discards <> OLD.discards THEN 'discards' END,
-        CASE WHEN (NEW.thickness IS NULL) <> (OLD.thickness IS NULL) OR NEW.thickness <> OLD.thickness THEN 'thickness' END,
-        CASE WHEN (NEW.stain IS NULL) <> (OLD.stain IS NULL) OR NEW.stain <> OLD.stain THEN 'stain' END,
-        CASE WHEN (NEW.percentTumour IS NULL) <> (OLD.percentTumour IS NULL) OR NEW.percentTumour <> OLD.percentTumour THEN 'percentTumour' END,
-        CASE WHEN (NEW.percentNecrosis IS NULL) <> (OLD.percentNecrosis IS NULL) OR NEW.percentNecrosis <> OLD.percentNecrosis THEN 'percentNecrosis' END,
-        CASE WHEN (NEW.markedAreaSize IS NULL) <> (OLD.markedAreaSize IS NULL) OR NEW.markedAreaSize <> OLD.markedAreaSize THEN 'markedAreaSize' END,
-        CASE WHEN (NEW.markedAreaPercentTumour IS NULL) <> (OLD.markedAreaPercentTumour IS NULL) OR NEW.markedAreaPercentTumour <> OLD.markedAreaPercentTumour THEN 'markedAreaPercentTumour' END
-      ), ''),
-      lastModifier,
-      log_message,
-      lastModified
-    FROM Sample WHERE sampleId = NEW.sampleId;
-  END IF;
-  END//
-
-DROP TRIGGER IF EXISTS SampleTissuePieceChange//
-CREATE TRIGGER SampleTissuePieceChange BEFORE UPDATE ON SampleTissuePiece
-FOR EACH ROW
-  BEGIN
-  DECLARE log_message varchar(500) CHARACTER SET utf8;
-  SET log_message = CONCAT_WS(', ',
-     CASE WHEN NEW.slidesConsumed <> OLD.slidesConsumed THEN CONCAT('slides: ', OLD.slidesConsumed, ' → ', NEW.slidesConsumed) END,
-     CASE WHEN NEW.tissuePieceType <> OLD.tissuePieceType THEN CONCAT('type: ', (SELECT name FROM TissuePieceType WHERE tissuePieceTypeId = OLD.tissuePieceType), ' → ', (SELECT name FROM TissuePieceType WHERE tissuePieceTypeId = NEW.tissuePieceType)) END,
-     CASE WHEN (NEW.referenceSlideId IS NULL) <> (OLD.referenceSlideId IS NULL) OR NEW.referenceSlideId <> OLD.referenceSlideId THEN CONCAT('reference slide: ', COALESCE((SELECT name FROM Sample WHERE sampleId = OLD.referenceSlideId), 'n/a'), ' → ', COALESCE((SELECT name FROM Sample WHERE sampleId = NEW.referenceSlideId), 'n/a')) END);
-  IF log_message IS NOT NULL AND log_message <> '' THEN
-    INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime)
-    SELECT
-      NEW.sampleId,
-      COALESCE(CONCAT_WS(',',
-        CASE WHEN NEW.slidesConsumed <> OLD.slidesConsumed THEN 'slides' END,
-        CASE WHEN NEW.tissuePieceType <> OLD.tissuePieceType THEN 'tissuePieceType' END,
-        CASE WHEN (NEW.referenceSlideId IS NULL) <> (OLD.referenceSlideId IS NULL) OR NEW.referenceSlideId <> OLD.referenceSlideId THEN 'referenceSlideId' END
-      ), ''),
-      lastModifier,
-      log_message,
-      lastModified
-    FROM Sample WHERE sampleId = NEW.sampleId;
-  END IF;
-  END//
-
-DROP TRIGGER IF EXISTS SampleStockChange//
-CREATE TRIGGER SampleStockChange BEFORE UPDATE ON SampleStock
-FOR EACH ROW
-  BEGIN
-  DECLARE log_message varchar(500) CHARACTER SET utf8;
-  SET log_message = CONCAT_WS(', ',
-    CASE WHEN NEW.strStatus <> OLD.strStatus THEN CONCAT('STR status: ', OLD.strStatus, ' → ', NEW.strStatus) END,
-    CASE WHEN (NEW.referenceSlideId IS NULL) <> (OLD.referenceSlideId IS NULL) OR NEW.referenceSlideId <> OLD.referenceSlideId THEN CONCAT('reference slide: ', COALESCE((SELECT name FROM Sample WHERE sampleId = OLD.referenceSlideId), 'n/a'), ' → ', COALESCE((SELECT name FROM Sample WHERE sampleId = NEW.referenceSlideId), 'n/a')) END);
-  IF log_message IS NOT NULL AND log_message <> '' THEN
-    INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime)
-    SELECT
-      NEW.sampleId,
-      COALESCE(CONCAT_WS(',',
-         CASE WHEN NEW.strStatus <> OLD.strStatus THEN 'strStatus' END,
-         CASE WHEN (NEW.referenceSlideId IS NULL) <> (OLD.referenceSlideId IS NULL) OR NEW.referenceSlideId <> OLD.referenceSlideId THEN 'referenceSlideId' END
-      ), ''),
-      lastModifier,
-      log_message,
-      lastModified
-    FROM Sample WHERE sampleId = NEW.sampleId;
-  END IF;
-  END//
-
-DROP TRIGGER IF EXISTS SampleTissueChange//
-CREATE TRIGGER SampleTissueChange BEFORE UPDATE ON SampleTissue
-FOR EACH ROW
-  BEGIN
-  DECLARE log_message varchar(500) CHARACTER SET utf8;
-  SET log_message = CONCAT_WS(', ',
-    CASE WHEN (NEW.secondaryIdentifier IS NULL) <> (OLD.secondaryIdentifier IS NULL) OR NEW.secondaryIdentifier <> OLD.secondaryIdentifier THEN CONCAT('secondary identifier: ', COALESCE(OLD.secondaryIdentifier, 'n/a'), ' → ', COALESCE(NEW.secondaryIdentifier, 'n/a')) END,
-    CASE WHEN (NEW.labId IS NULL) <> (OLD.labId IS NULL) OR NEW.labId <> OLD.labId THEN CONCAT('lab: ', COALESCE((SELECT alias FROM Lab WHERE labId = OLD.labId), 'n/a'), ' → ', COALESCE((SELECT alias FROM Lab WHERE labId = NEW.labId), 'n/a')) END,
-    CASE WHEN (NEW.passageNumber IS NULL) <> (OLD.passageNumber IS NULL) OR NEW.passageNumber <> OLD.passageNumber OR (NEW.timesReceived IS NULL) <> (OLD.timesReceived IS NULL) OR NEW.timesReceived <> OLD.timesReceived OR (NEW.tubeNumber IS NULL) <> (OLD.tubeNumber IS NULL) OR NEW.tubeNumber <> OLD.tubeNumber THEN CONCAT('passage: ', COALESCE(OLD.passageNumber, 'n/a'), '-', COALESCE(OLD.timesReceived, 'n/a'), '-', COALESCE(OLD.tubeNumber, 'n/a'), ' → ', COALESCE(NEW.passageNumber, 'n/a'), '-', COALESCE(NEW.timesReceived, 'n/a'), '-', COALESCE(NEW.tubeNumber, 'n/a')) END,
-    CASE WHEN (NEW.region IS NULL) <> (OLD.region IS NULL) OR NEW.region <> OLD.region THEN CONCAT('region: ', COALESCE(OLD.region, 'n/a'), ' → ', COALESCE(NEW.region, 'n/a')) END,
-    CASE WHEN (NEW.tissueMaterialId IS NULL) <> (OLD.tissueMaterialId IS NULL) OR NEW.tissueMaterialId <> OLD.tissueMaterialId THEN CONCAT('material: ', COALESCE((SELECT alias FROM TissueMaterial WHERE tissueMaterialId = OLD.tissueMaterialId), 'n/a'), ' → ', COALESCE((SELECT alias FROM TissueMaterial WHERE tissueMaterialId = NEW.tissueMaterialId), 'n/a')) END,
-    CASE WHEN (NEW.tissueOriginId IS NULL) <> (OLD.tissueOriginId IS NULL) OR NEW.tissueOriginId <> OLD.tissueOriginId THEN CONCAT('origin: ', COALESCE((SELECT alias FROM TissueOrigin WHERE tissueOriginId = OLD.tissueOriginId), 'n/a'), ' → ', COALESCE((SELECT alias FROM TissueOrigin WHERE tissueOriginId = NEW.tissueOriginId), 'n/a')) END,
-    CASE WHEN (NEW.tissueTypeId IS NULL) <> (OLD.tissueTypeId IS NULL) OR NEW.tissueTypeId <> OLD.tissueTypeId THEN CONCAT('type: ', COALESCE((SELECT alias FROM TissueType WHERE tissueTypeId = OLD.tissueTypeId), 'n/a'), ' → ', COALESCE((SELECT alias FROM TissueType WHERE tissueTypeId = NEW.tissueTypeId), 'n/a')) END);
-  IF log_message IS NOT NULL AND log_message <> '' THEN
-    INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime)
-    SELECT
-      NEW.sampleId,
-      COALESCE(CONCAT_WS(',',
-         CASE WHEN (NEW.secondaryIdentifier IS NULL) <> (OLD.secondaryIdentifier IS NULL) OR NEW.secondaryIdentifier <> OLD.secondaryIdentifier THEN 'secondaryIdentifier' END,
-         CASE WHEN (NEW.labId IS NULL) <> (OLD.labId IS NULL) OR NEW.labId <> OLD.labId THEN 'labId' END,
-         CASE WHEN (NEW.passageNumber IS NULL) <> (OLD.passageNumber IS NULL) OR NEW.passageNumber <> OLD.passageNumber THEN 'passageNumber' END,
-         CASE WHEN (NEW.region IS NULL) <> (OLD.region IS NULL) OR NEW.region <> OLD.region THEN 'region' END,
-         CASE WHEN (NEW.timesReceived IS NULL) <> (OLD.timesReceived IS NULL) OR NEW.timesReceived <> OLD.timesReceived THEN 'timesReceived' END,
-         CASE WHEN (NEW.tissueMaterialId IS NULL) <> (OLD.tissueMaterialId IS NULL) OR NEW.tissueMaterialId <> OLD.tissueMaterialId THEN 'tissueMaterialId' END,
-         CASE WHEN (NEW.tissueOriginId IS NULL) <> (OLD.tissueOriginId IS NULL) OR NEW.tissueOriginId <> OLD.tissueOriginId THEN 'tissueOriginId' END,
-         CASE WHEN (NEW.tissueTypeId IS NULL) <> (OLD.tissueTypeId IS NULL) OR NEW.tissueTypeId <> OLD.tissueTypeId THEN 'tissueTypeId' END,
-         CASE WHEN (NEW.tubeNumber IS NULL) <> (OLD.tubeNumber IS NULL) OR NEW.tubeNumber <> OLD.tubeNumber THEN 'tubeNumber' END
-      ), ''),
-      lastModifier,
-      log_message,
-      lastModified
-    FROM Sample WHERE sampleId = NEW.sampleId;
-  END IF;
-  END//
-
-DROP TRIGGER IF EXISTS IdentityChange//
-CREATE TRIGGER IdentityChange BEFORE UPDATE ON Identity
-FOR EACH ROW
-  BEGIN
-  DECLARE log_message varchar(500) CHARACTER SET utf8;
-  SET log_message = CONCAT_WS(', ',
-    CASE WHEN NEW.donorSex <> OLD.donorSex THEN CONCAT('donor sex: ', OLD.donorSex, ' → ', NEW.donorSex) END,
-    CASE WHEN NEW.consentLevel <> OLD.consentLevel THEN CONCAT('consent level: ', OLD.consentLevel, ' → ', NEW.consentLevel) END,
-    CASE WHEN NEW.externalName <> OLD.externalName THEN CONCAT('externalName: ', OLD.externalName, ' → ', NEW.externalName) END);
-  IF log_message IS NOT NULL AND log_message <> '' THEN
-    INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime)
-    SELECT
-      NEW.sampleId,
-      COALESCE(CONCAT_WS(',',
-        CASE WHEN NEW.donorSex <> OLD.donorSex THEN 'donorSex' END,
-        CASE WHEN NEW.consentLevel <> OLD.consentLevel THEN 'consentLevel' END,
-        CASE WHEN NEW.externalName <> OLD.externalName THEN 'externalName' END
-      ), ''),
-      lastModifier,
-      log_message,
-      lastModified
-    FROM Sample WHERE sampleId = NEW.sampleId;
-  END IF;
-  END//
-
-DROP TRIGGER IF EXISTS SampleSingleCellChange//
-CREATE TRIGGER SampleSingleCellChange BEFORE UPDATE ON SampleSingleCell
-FOR EACH ROW
-  BEGIN
-	DECLARE log_message varchar(500) CHARACTER SET utf8;
-    SET log_message = CONCAT_WS(', ',
-      CASE WHEN (NEW.initialCellConcentration IS NULL) <> (OLD.initialCellConcentration IS NULL) OR NEW.initialCellConcentration <> OLD.initialCellConcentration THEN CONCAT('initial cell concentration: ', COALESCE(decimalToString(OLD.initialCellConcentration), 'n/a'), ' → ', COALESCE(decimalToString(NEW.initialCellConcentration), 'n/a')) END,
-      CASE WHEN NEW.digestion <> OLD.digestion THEN CONCAT('digestion: ', OLD.digestion, ' → ', NEW.digestion) END);
-    IF log_message IS NOT NULL AND log_message <> '' THEN
-      INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime)
-      SELECT
-        NEW.sampleId,
-        COALESCE(CONCAT_WS(',',
-          CASE WHEN (NEW.initialCellConcentration IS NULL) <> (OLD.initialCellConcentration IS NULL) OR NEW.initialCellConcentration <> OLD.initialCellConcentration THEN 'initialConcentration' END,
-          CASE WHEN NEW.digestion <> OLD.digestion THEN 'digestion' END
-        ), ''),
-        lastModifier,
-        log_message,
-        lastModified
-      FROM Sample WHERE sampleId = NEW.sampleId;
-    END IF;
-  END//
-
-DROP TRIGGER IF EXISTS SampleStockSingleCellChange//
-CREATE TRIGGER SampleStockSingleCellChange BEFORE UPDATE ON SampleStockSingleCell
-FOR EACH ROW
-  BEGIN
-	DECLARE log_message varchar(500) CHARACTER SET utf8;
-    SET log_message = CONCAT_WS(', ',
-      CASE WHEN (NEW.targetCellRecovery IS NULL) <> (OLD.targetCellRecovery IS NULL) OR NEW.targetCellRecovery <> OLD.targetCellRecovery THEN CONCAT('target cell recovery: ', COALESCE(decimalToString(OLD.targetCellRecovery), 'n/a'), ' → ', COALESCE(decimalToString(NEW.targetCellRecovery), 'n/a')) END,
-      CASE WHEN (NEW.cellViability IS NULL) <> (OLD.cellViability IS NULL) OR NEW.cellViability <> OLD.cellViability THEN CONCAT('cell viability: ', COALESCE(decimalToString(OLD.cellViability), 'n/a'), ' → ', COALESCE(decimalToString(NEW.cellViability), 'n/a')) END,
-      CASE WHEN (NEW.loadingCellConcentration IS NULL) <> (OLD.loadingCellConcentration IS NULL) OR NEW.loadingCellConcentration <> OLD.loadingCellConcentration THEN CONCAT('loading cell concentration: ', COALESCE(decimalToString(OLD.loadingCellConcentration), 'n/a'), ' → ', COALESCE(decimalToString(NEW.loadingCellConcentration), 'n/a')) END);
-    IF log_message IS NOT NULL AND log_message <> '' THEN
-      INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime)
-      SELECT
-        NEW.sampleId,
-        COALESCE(CONCAT_WS(',',
-          CASE WHEN (NEW.targetCellRecovery IS NULL) <> (OLD.targetCellRecovery IS NULL) OR NEW.targetCellRecovery <> OLD.targetCellRecovery THEN 'targetCellRecovery' END,
-          CASE WHEN (NEW.cellViability IS NULL) <> (OLD.cellViability IS NULL) OR NEW.cellViability <> OLD.cellViability THEN 'cellViability' END,
-          CASE WHEN (NEW.loadingCellConcentration IS NULL) <> (OLD.loadingCellConcentration IS NULL) OR NEW.loadingCellConcentration <> OLD.loadingCellConcentration THEN 'loadingCellConcentration' END
-        ), ''),
-        lastModifier,
-        log_message,
-        lastModified
-      FROM Sample WHERE sampleId = NEW.sampleId;
-    END IF;
-  END//
-
-DROP TRIGGER IF EXISTS SampleAliquotSingleCellChange//
-CREATE TRIGGER SampleAliquotSingleCellChange BEFORE UPDATE ON SampleAliquotSingleCell
-FOR EACH ROW
-  BEGIN
-    DECLARE log_message varchar(500) CHARACTER SET utf8;
-    SET log_message = CONCAT_WS(', ',
-      CASE WHEN (NEW.inputIntoLibrary IS NULL) <> (OLD.inputIntoLibrary IS NULL) OR NEW.inputIntoLibrary <> OLD.inputIntoLibrary THEN CONCAT('input into library: ', COALESCE(decimalToString(OLD.inputIntoLibrary), 'n/a'), ' → ', COALESCE(decimalToString(NEW.inputIntoLibrary), 'n/a')) END);
-    IF log_message IS NOT NULL AND log_message <> '' THEN
-      INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime)
-      SELECT
-        NEW.sampleId,
-        COALESCE(CONCAT_WS(',',
-          CASE WHEN (NEW.inputIntoLibrary IS NULL) <> (OLD.inputIntoLibrary IS NULL) OR NEW.inputIntoLibrary <> OLD.inputIntoLibrary THEN 'inputINtoLibrary' END
-        ), ''),
-        lastModifier,
-        log_message,
-        lastModified
-      FROM Sample WHERE sampleId = NEW.sampleId;
-    END IF;
-  END//
-
 DROP TRIGGER IF EXISTS SampleInsert//
 CREATE TRIGGER SampleInsert AFTER INSERT ON Sample
 FOR EACH ROW
+BEGIN
   INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime) VALUES (
     NEW.sampleId,
     '',
     NEW.lastModifier,
     'Sample created.',
-    NEW.lastModified)//
-
-DROP TRIGGER IF EXISTS DetailedSampleInsert//
-CREATE TRIGGER DetailedSampleInsert AFTER INSERT ON DetailedSample
-FOR EACH ROW
-  CALL updateSampleHierarchy(NEW.sampleId)//
-
--- Need to fix for tissues because DetailedSample record is created before SampleTissue
-DROP TRIGGER IF EXISTS SampleTissueInsert//
-CREATE TRIGGER SampleTissueInsert AFTER INSERT ON SampleTissue
-FOR EACH ROW
-  UPDATE SampleHierarchy SET tissueId = NEW.sampleId WHERE sampleId = NEW.sampleId//
+    NEW.lastModified);
+  IF (NEW.discriminator <> 'Sample') THEN
+    CALL updateSampleHierarchy(NEW.sampleId);
+  END IF;
+END//
 
 DELIMITER ;
 -- EndNoTest

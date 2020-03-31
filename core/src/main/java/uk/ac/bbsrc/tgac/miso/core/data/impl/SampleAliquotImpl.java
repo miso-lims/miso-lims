@@ -1,19 +1,19 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.data.BarcodableVisitor;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 
 @Entity
-@Table(name = "SampleAliquot")
-@Inheritance(strategy = InheritanceType.JOINED)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorValue("Aliquot")
 public class SampleAliquotImpl extends DetailedSampleImpl implements SampleAliquot {
 
   private static final long serialVersionUID = 1L;

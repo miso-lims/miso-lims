@@ -61,9 +61,9 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
   }
 
   @Test
-  public void testPropagateCurlsFromTissue() {
-    // goal: ensure one curls can be propagated from one tissue
-    BulkSamplePage page = getPropagatePage(Arrays.asList(4442L), 1, curlsClassId);
+  public void testPropagateTissuePieceFromSlide() {
+    // goal: ensure one curls can be propagated from one slide
+    BulkSamplePage page = getPropagatePage(Arrays.asList(4443L), 1, tissuePieceClassId);
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new LinkedHashMap<>();
@@ -75,13 +75,15 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.GROUP_ID, "1");
     attrs.put(SamColumns.GROUP_DESCRIPTION, "Test one");
     attrs.put(SamColumns.QC_STATUS, "Ready");
+    attrs.put(SamColumns.PIECE_TYPE, "Curls");
+    attrs.put(SamColumns.SLIDES_CONSUMED, "2");
 
     attrs.forEach((k, v) -> table.enterText(k, 0, v));
 
     // add in fields that are read-only
-    attrs.put(SamColumns.PARENT_ALIAS, "PROP_0001_nn_n_1-1");
-    attrs.put(SamColumns.PARENT_SAMPLE_CLASS, "Tissue");
-    attrs.put(SamColumns.SAMPLE_CLASS, "Curls");
+    attrs.put(SamColumns.PARENT_ALIAS, "PROP_0001_nn_n_1-1_SL01");
+    attrs.put(SamColumns.PARENT_SAMPLE_CLASS, "Slide");
+    attrs.put(SamColumns.SAMPLE_CLASS, "Tissue Piece");
 
     attrs.forEach((k, v) -> assertEquals("pre-save", v, table.getText(k, 0)));
     saveSingleAndAssertSuccess(table);

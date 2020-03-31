@@ -28,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
@@ -39,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
@@ -608,7 +608,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     }
     List<Library> potentialDupes = listByAlias(library.getAlias());
     for (Library potentialDupe : potentialDupes) {
-      if (library.getId() == AbstractLibrary.UNSAVED_ID || library.getId() != potentialDupe.getId()) {
+      if (library.getId() == LibraryImpl.UNSAVED_ID || library.getId() != potentialDupe.getId()) {
         // an existing DIFFERENT library already has this alias
         throw new ValidationException(new ValidationError("alias", "A library with this alias already exists in the database"));
       }

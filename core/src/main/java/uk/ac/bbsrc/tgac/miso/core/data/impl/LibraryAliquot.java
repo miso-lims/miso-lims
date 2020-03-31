@@ -35,6 +35,8 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -76,7 +78,9 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
 @Table(name = "LibraryAliquot")
-@Inheritance(strategy = InheritanceType.JOINED)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "discriminator")
+@DiscriminatorValue("LibraryAliquot")
 public class LibraryAliquot extends AbstractBoxable
     implements Comparable<LibraryAliquot>, Deletable, HierarchyEntity, Serializable {
 

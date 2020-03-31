@@ -2,16 +2,16 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.math.BigDecimal;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 
 @Entity
-@Table(name = "SampleSlide")
+@DiscriminatorValue("Slide")
 public class SampleSlideImpl extends SampleTissueProcessingImpl implements SampleSlide {
 
   private static final long serialVersionUID = 1L;

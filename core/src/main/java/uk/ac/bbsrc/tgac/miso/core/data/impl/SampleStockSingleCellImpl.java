@@ -2,13 +2,13 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.math.BigDecimal;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
 
 @Entity
-@Table(name = "SampleStockSingleCell")
+@DiscriminatorValue("StockSingleCell")
 public class SampleStockSingleCellImpl extends SampleStockImpl implements SampleStockSingleCell {
 
   private static final long serialVersionUID = 1L;
