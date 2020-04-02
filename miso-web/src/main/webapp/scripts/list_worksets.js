@@ -85,16 +85,10 @@ ListTarget.workset = {
     }];
   },
   createColumns: function(config, projectId) {
-    return [
-        ListUtils.idHyperlinkColumn('ID', Urls.ui.worksets.edit, 'id', Utils.array.getId, 0, true),
-        ListUtils.labelHyperlinkColumn('Alias', Urls.ui.worksets.edit, Utils.array.getId, 'alias', 0, true),
-        {
+    return [ListUtils.idHyperlinkColumn('ID', Urls.ui.worksets.edit, 'id', Utils.array.getId, 0, true),
+        ListUtils.labelHyperlinkColumn('Alias', Urls.ui.worksets.edit, Utils.array.getId, 'alias', 0, true), {
           sTitle: 'Items',
-          mData: 'id',
-          mRender: function(data, type, full) {
-            return (full.sampleIds ? full.sampleIds.length : 0) + (full.libraryIds ? full.libraryIds.length : 0)
-                + (full.libraryAliquotIds ? full.libraryAliquotIds.length : 0);
-          },
+          mData: 'itemCount',
           include: true,
           iSortPriority: 0
         }, {

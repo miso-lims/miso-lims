@@ -749,12 +749,20 @@ INSERT INTO LibraryTemplate_Project(libraryTemplateId, projectId) VALUES
 (1, 1);
 
 INSERT INTO Workset(worksetId, alias, description, creator, created, lastModifier, lastModified) VALUES
-(1, 'test', 'test workset', 1, '2018-08-08 14:47:00', 1, '2018-08-08 14:47:00');
+(1, 'test', 'test workset', 1, '2018-08-08 14:47:00', 1, '2018-08-08 14:47:00'),
+(2, 'two', 'second workset', 1, '2020-03-27 18:50:00', 1, '2020-03-27 18:50:00');
 
 INSERT INTO Workset_Sample(worksetId, sampleId) VALUES
 (1, 1),
 (1, 2),
-(1, 3);
+(1, 3),
+(2, 1);
+
+INSERT INTO Workset_Library(worksetId, libraryId) VALUES
+(2, 1);
+
+INSERT INTO Workset_LibraryAliquot(worksetId, aliquotId) VALUES
+(2, 1);
 
 INSERT INTO SequencingOrder(sequencingOrderId, poolId, partitions, parametersId, purposeId, description, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 1, 1, 1, 1, 'seq order 1', 1, '2019-09-23 10:30:00', 1, '2019-09-23 10:30:00');

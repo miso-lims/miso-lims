@@ -191,6 +191,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolViewElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListTransferView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListWorksetView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SampleHierarchyView;
@@ -4014,6 +4015,17 @@ public class Dtos {
     setLong(to::setId, from.getId(), false);
     setString(to::setAlias, from.getAlias());
     setString(to::setDescription, from.getDescription());
+    return to;
+  }
+
+  public static ListWorksetViewDto asDto(@Nonnull ListWorksetView from) {
+    ListWorksetViewDto to = new ListWorksetViewDto();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setAlias, from.getAlias());
+    setInteger(to::setItemCount, from.getItemCount(), false);
+    setString(to::setDescription, from.getDescription());
+    setString(to::setCreator, maybeGetProperty(from.getCreator(), User::getFullName));
+    setDateTimeString(to::setLastModified, from.getLastModified());
     return to;
   }
 
