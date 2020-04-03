@@ -2,6 +2,7 @@
 
 Changes:
 
+  * Added an "All" tab to the Boxes list page
   * Allow editing sequencing control types
   * Improved performace of Worksets list page
   * Always show MISO error page instead of default Tomcat error page
