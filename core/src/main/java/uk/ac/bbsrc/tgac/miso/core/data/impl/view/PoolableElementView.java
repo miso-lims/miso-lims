@@ -33,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingControlType;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
@@ -125,6 +126,10 @@ public class PoolableElementView implements Identifiable, Serializable, Comparab
   private String sampleAccession;
 
   private String sampleType;
+
+  @ManyToOne
+  @JoinColumn(name = "sampleSequencingControlTypeId")
+  private SequencingControlType sampleSequencingControlType;
 
   private Long projectId;
 
@@ -507,6 +512,14 @@ public class PoolableElementView implements Identifiable, Serializable, Comparab
 
   public void setSampleType(String sampleType) {
     this.sampleType = sampleType;
+  }
+
+  public SequencingControlType getSampleSequencingControlType() {
+    return sampleSequencingControlType;
+  }
+
+  public void setSampleSequencingControlType(SequencingControlType sampleSequencingControlType) {
+    this.sampleSequencingControlType = sampleSequencingControlType;
   }
 
   public Date getLastModified() {

@@ -1706,6 +1706,7 @@ public class Dtos {
     dto.setSampleId(from.getSampleId());
     dto.setSampleName(from.getSampleName());
     dto.setSampleAlias(from.getSampleAlias());
+    setString(dto::setSequencingControlTypeAlias, maybeGetProperty(from.getSampleSequencingControlType(), SequencingControlType::getAlias));
 
     Sample sample = from.getSample();
     if (isDetailedSample(sample)) {
