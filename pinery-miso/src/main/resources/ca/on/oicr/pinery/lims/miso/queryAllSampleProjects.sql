@@ -11,27 +11,25 @@ SELECT NAME
         ,MAX(secondaryNaming) secondaryNamingScheme
 FROM ( 
         SELECT COALESCE(sp.shortName, sp.alias) NAME 
-                ,sai.archived archived 
+                ,s.archived archived 
                 ,s.created created 
                 ,s.lastModified updated 
                 ,sp.status IN ('ACTIVE', 'PENDING') active 
                 ,sp.clinical clinical
                 ,sp.secondaryNaming secondaryNaming
-        FROM Sample s 
-        LEFT JOIN DetailedSample sai ON sai.sampleId = s.sampleId 
+        FROM Sample s
         INNER JOIN Project sp ON sp.projectId = s.project_projectId 
          
 UNION ALL 
          
         SELECT COALESCE(lp.shortName, lp.alias) NAME 
-                ,lai.archived archived 
+                ,l.archived archived 
                 ,l.created created 
                 ,l.lastModified updated
                 ,lp.status IN ('ACTIVE', 'PENDING') active
                 ,lp.clinical clinical
                 ,lp.secondaryNaming secondaryNaming
         FROM Library l
-        LEFT JOIN DetailedLibrary lai ON lai.libraryId = l.libraryId
         INNER JOIN Sample ls ON l.sample_sampleId = ls.sampleId 
         INNER JOIN Project lp ON lp.projectId = ls.project_projectId 
         ) combined 

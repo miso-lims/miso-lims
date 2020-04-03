@@ -155,8 +155,8 @@ INSERT INTO Study (studyId, name, project_projectId, alias, studyTypeId, creator
 (1, 'STU1',  1, 'PLAIN Study One', 1, 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00');
 
 INSERT INTO Sample (sampleId, name, alias, description, identificationBarcode, sampleType, project_projectId,
-scientificName, volume, qcPassed, lastModifier, creator, created, lastModified) VALUES
-(1, 'SAM1', 'PLAIN_S0001_1', 'Plain', 'SAM1::PLAIN_S0001_first', 'GENOMIC', 1, 'Triticum aestivum', NULL, 1, 1, 1, '2017-07-20 09:00:00', '2017-07-20 09:00:00');
+scientificName, volume, qcPassed, lastModifier, creator, created, lastModified, discriminator) VALUES
+(1, 'SAM1', 'PLAIN_S0001_1', 'Plain', 'SAM1::PLAIN_S0001_first', 'GENOMIC', 1, 'Triticum aestivum', NULL, 1, 1, 1, '2017-07-20 09:00:00', '2017-07-20 09:00:00', 'Sample');
 
 INSERT INTO Institute(instituteId, alias, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 'University Health Network',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00');
@@ -173,15 +173,15 @@ INSERT INTO Transfer_Sample(transferId, sampleId, received, qcPassed, qcNote) VA
 
 INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, sample_sampleId, platformType,
   libraryType, librarySelectionType, libraryStrategyType, creationDate, creator, created, lastModifier, lastModified, qcPassed, dnaSize,
-  volume, volumeUnits, concentration, concentrationUnits, locationBarcode, kitDescriptorId) VALUES
+  volume, volumeUnits, concentration, concentrationUnits, locationBarcode, kitDescriptorId, discriminator) VALUES
   (1, 'LIB1', 'PLAIN_L0001-1_1', 'LIB1::PLAIN_L0001-1_1', 'plain lib', 1, 'ILLUMINA', 1, 3, 1,  '2016-11-07', 
-    1, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00', 1, 300, 5.0, 'MICROLITRES', 2.75, 'NANOGRAMS_PER_MICROLITRE', NULL, 1);
+    1, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00', 1, 300, 5.0, 'MICROLITRES', 2.75, 'NANOGRAMS_PER_MICROLITRE', NULL, 1, 'Library');
 
 INSERT INTO Library_Index(library_libraryId, index_indexId) VALUES
   (1, 5);
 
-INSERT INTO LibraryAliquot (aliquotId, name, alias, concentration, concentrationUnits, libraryId, identificationBarcode, creationDate, creator, lastModifier, lastUpdated) VALUES
-(1, 'LDI1', 'PLAIN_L0001-1_1', 5.9, 'NANOGRAMS_PER_MICROLITRE', 1, 'LDI1::PLAIN_L0001_1-1', '2017-07-20', 1, 1, '2017-07-20 09:01:00');
+INSERT INTO LibraryAliquot (aliquotId, name, alias, concentration, concentrationUnits, libraryId, identificationBarcode, creationDate, creator, lastModifier, lastUpdated, discriminator) VALUES
+(1, 'LDI1', 'PLAIN_L0001-1_1', 5.9, 'NANOGRAMS_PER_MICROLITRE', 1, 'LDI1::PLAIN_L0001_1-1', '2017-07-20', 1, 1, '2017-07-20 09:01:00', 'LibraryAliquot');
 
 INSERT INTO Pool (poolId, concentration, volume, name, alias, identificationBarcode, description, creationDate, platformType, lastModifier, creator, created, lastModified, qcPassed) VALUES
 (1, 8.25, NULL, 'IPO1', 'POOL_1', 'IPO1::POOL_1', NULL, '2017-07-20', 'ILLUMINA', 1, 1, '2017-07-20 10:01:00', '2017-07-20 10:01:00', NULL);

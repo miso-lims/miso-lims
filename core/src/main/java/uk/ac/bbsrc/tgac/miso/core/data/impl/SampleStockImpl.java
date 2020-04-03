@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -7,7 +8,6 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.data.BarcodableVisitor;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
@@ -15,8 +15,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 
 @Entity
-@Table(name = "SampleStock")
-@Inheritance(strategy = InheritanceType.JOINED)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorValue("Stock")
 public class SampleStockImpl extends DetailedSampleImpl implements SampleStock {
 
   private static final long serialVersionUID = 1L;

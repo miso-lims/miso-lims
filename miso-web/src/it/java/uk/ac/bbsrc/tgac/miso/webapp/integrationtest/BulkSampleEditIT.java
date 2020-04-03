@@ -38,8 +38,6 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
       SamColumns.THICKNESS, SamColumns.STAIN, SamColumns.PERCENT_TUMOUR, SamColumns.PERCENT_NECROSIS, SamColumns.MARKED_AREA,
       SamColumns.MARKED_AREA_PERCENT_TUMOUR);
 
-  private static final Set<String> curlsColumns = Sets.newHashSet();
-
   private static final Set<String> tissuePieceColumns = Sets.newHashSet(SamColumns.PIECE_TYPE, SamColumns.SLIDES_CONSUMED,
       SamColumns.REFERENCE_SLIDE);
 
@@ -387,26 +385,7 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
   }
 
   @Test
-  public void testEditCurlsSetup() throws Exception {
-    // Goal: ensure all expected fields are present, and no extra
-    Set<String> expectedHeadings = Sets.newHashSet();
-    expectedHeadings.addAll(commonColumns);
-    expectedHeadings.addAll(boxableColumns);
-    expectedHeadings.addAll(nonIdentityColumns);
-    expectedHeadings.addAll(curlsColumns);
-
-    BulkSamplePage page = getEditPage(Arrays.asList(getSampleId("Curls")));
-    HandsOnTable table = page.getTable();
-    List<String> headings = table.getColumnHeadings();
-    assertEquals(expectedHeadings.size(), headings.size());
-    for (String col : expectedHeadings) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
-    }
-    assertEquals(1, table.getRowCount());
-  }
-
-  @Test
-  public void testEditCurlsFields() throws Exception {
+  public void testEditTissuePieceFields() throws Exception {
     // Goal: ensure all editable fields can be changed, and all readOnly fields can not.
     BulkSamplePage page = getEditPage(Arrays.asList(getSampleId("Curls")));
     HandsOnTable table = page.getTable();
@@ -420,6 +399,9 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     editable.put(SamColumns.GROUP_ID, "changed");
     editable.put(SamColumns.GROUP_DESCRIPTION, "changed");
     editable.put(SamColumns.QC_STATUS, "Waiting: Path Report");
+    editable.put(SamColumns.PIECE_TYPE, "LCM Tube");
+    editable.put(SamColumns.SLIDES_CONSUMED, "2");
+    editable.put(SamColumns.REFERENCE_SLIDE, "SAM3 (TEST_0001_Bn_R_nn_1-1_SL01)");
 
     // assert not equals to start
     editable.forEach((k, v) -> assertNotEquals(v, table.getText(k, 0)));

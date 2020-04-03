@@ -1,16 +1,16 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.type.TissuePieceType;
 
 @Entity
-@Table(name = "SampleTissuePiece")
+@DiscriminatorValue("TissuePiece")
 public class SampleTissuePieceImpl extends SampleTissueProcessingImpl implements SampleTissuePiece {
 
   private static final long serialVersionUID = 1L;

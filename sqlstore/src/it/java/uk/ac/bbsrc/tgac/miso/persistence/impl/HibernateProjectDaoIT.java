@@ -89,7 +89,7 @@ public class HibernateProjectDaoIT extends AbstractDAOTest {
   @Test
   public void testListAll() throws Exception {
     List<Project> projects = projectDAO.listAll();
-    System.out.println(projects);
+    assertEquals(3, projects.size());
   }
 
   /**

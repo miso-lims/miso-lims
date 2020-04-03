@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -13,6 +14,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
+@DiscriminatorValue("DetailedLibraryAliquot")
 public class DetailedLibraryAliquot extends LibraryAliquot implements GroupIdentifiable {
 
   private static final long serialVersionUID = 1L;

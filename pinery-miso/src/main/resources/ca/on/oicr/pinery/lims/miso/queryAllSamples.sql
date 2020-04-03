@@ -8,8 +8,8 @@ SELECT s.alias NAME
         ,NULL sampleType_description
         ,tt.alias tissueType
         ,p.shortName project
-        ,sai.archived archived
-        ,sai.creationDate inLabCreationDate
+        ,s.archived archived
+        ,s.creationDate inLabCreationDate
         ,s.created created
         ,s.creator createdById
         ,s.lastModified modified
@@ -23,15 +23,15 @@ SELECT s.alias NAME
         ,NULL kitDescription
         ,NULL library_design_code
         ,DATE(rcpt.transferTime) receive_date
-        ,i.externalName external_name
-        ,i.donorSex sex
+        ,s.externalName external_name
+        ,s.donorSex sex
         ,tor.alias tissue_origin
         ,tm.alias tissue_preparation
-        ,st.region tissue_region
-        ,st.secondaryIdentifier tube_id
-        ,ss.strStatus str_result
-        ,sai.groupId group_id
-        ,sai.groupDescription group_id_description
+        ,s.region tissue_region
+        ,s.secondaryIdentifier tube_id
+        ,s.strStatus str_result
+        ,s.groupId group_id
+        ,s.groupDescription group_id_description
         ,sp.alias purpose
         ,qubit.results qubit_concentration
         ,nanodrop.results nanodrop_concentration
@@ -50,67 +50,58 @@ SELECT s.alias NAME
         ,NULL read_length
         ,NULL targeted_sequencing
         ,'Sample' miso_type
-        ,sai.preMigrationId premigration_id
+        ,s.preMigrationId premigration_id
         ,s.scientificName organism
         ,subp.alias subproject
         ,COALESCE(IF(rcpt.excludeFromPinery, NULL, rcpt.institute), IF(la.excludeFromPinery, NULL, it.alias)) institute
-        ,slide.initialSlides slides
-        ,slide.discards discards
+        ,s.initialSlides slides
+        ,s.discards discards
         ,stain.name stain
-        ,piece.slidesConsumed slides_consumed
+        ,s.slidesConsumed slides_consumed
         ,NULL pdac
-        ,sai.isSynthetic isSynthetic
+        ,s.isSynthetic isSynthetic
         ,NOT ISNULL(dist.recipient) distributed
         ,DATE(dist.transferTime) distribution_date
         ,s.initialVolume initial_volume
-        ,slide.percentTumour percent_tumour
-        ,slide.percentNecrosis percent_necrosis
-        ,slide.markedAreaSize marked_area_size
-        ,slide.markedAreaPercentTumour marked_area_percent_tumour
-        ,COALESCE(pieceRefSlide.name, ssRefSlide.name) reference_slide_id
-        ,sssc.targetCellRecovery target_cell_recovery
-        ,sssc.cellViability cell_viability
+        ,s.percentTumour percent_tumour
+        ,s.percentNecrosis percent_necrosis
+        ,s.markedAreaSize marked_area_size
+        ,s.markedAreaPercentTumour marked_area_percent_tumour
+        ,refSlide.name reference_slide_id
+        ,s.targetCellRecovery target_cell_recovery
+        ,s.cellViability cell_viability
         ,NULL spike_in
         ,NULL spike_in_dilution_factor
         ,NULL spike_in_volume_ul
         ,sct.alias sequencing_control_type
 FROM Sample s
-LEFT JOIN DetailedSample sai ON sai.sampleId = s.sampleId 
-LEFT JOIN DetailedQcStatus qpd ON qpd.detailedQcStatusId = sai.detailedQcStatusId 
-LEFT JOIN Sample parent ON parent.sampleId = sai.parentId 
-LEFT JOIN SampleClass sc ON sc.sampleClassId = sai.sampleClassId 
+LEFT JOIN DetailedQcStatus qpd ON qpd.detailedQcStatusId = s.detailedQcStatusId 
+LEFT JOIN Sample parent ON parent.sampleId = s.parentId 
+LEFT JOIN SampleClass sc ON sc.sampleClassId = s.sampleClassId 
 LEFT JOIN Project p ON p.projectId = s.project_projectId 
-LEFT JOIN Subproject subp ON subp.subprojectId = sai.subprojectId 
-LEFT JOIN Identity i ON i.sampleId = s.sampleId  
-LEFT JOIN SampleAliquot sa ON sa.sampleId = sai.sampleId 
-LEFT JOIN SamplePurpose sp ON sp.samplePurposeId = sa.samplePurposeId 
-LEFT JOIN SampleTissue st ON st.sampleId = s.sampleId 
-LEFT JOIN TissueType tt ON tt.tissueTypeId = st.tissueTypeId
-LEFT JOIN TissueOrigin tor ON tor.tissueOriginId = st.tissueOriginId 
-LEFT JOIN TissueMaterial tm ON tm.tissueMaterialId = st.tissueMaterialId
-LEFT JOIN Lab la ON st.labId = la.labId
+LEFT JOIN Subproject subp ON subp.subprojectId = s.subprojectId
+LEFT JOIN SamplePurpose sp ON sp.samplePurposeId = s.samplePurposeId 
+LEFT JOIN TissueType tt ON tt.tissueTypeId = s.tissueTypeId
+LEFT JOIN TissueOrigin tor ON tor.tissueOriginId = s.tissueOriginId 
+LEFT JOIN TissueMaterial tm ON tm.tissueMaterialId = s.tissueMaterialId
+LEFT JOIN Lab la ON s.labId = la.labId
 LEFT JOIN Institute it ON la.instituteId = it.instituteId
-LEFT JOIN SampleStock ss ON sai.sampleId = ss.sampleId
-LEFT JOIN SampleStockSingleCell sssc ON sssc.sampleId = ss.sampleId
-LEFT JOIN Sample ssRefSlide ON ssRefSlide.sampleId = ss.referenceSlideId
-LEFT JOIN SampleSlide slide ON slide.sampleId = s.sampleId
-LEFT JOIN Stain stain ON stain.stainId = slide.stain
-LEFT JOIN SampleTissuePiece piece ON piece.sampleId = s.sampleId
-LEFT JOIN Sample pieceRefSlide ON pieceRefSlide.sampleId = piece.referenceSlideId
+LEFT JOIN Sample refSlide ON refSlide.sampleId = s.referenceSlideId
+LEFT JOIN Stain stain ON stain.stainId = s.stain
 LEFT JOIN (
-	    SELECT sqc.sample_sampleId, MAX(sqc.qcId) AS qcId
-	    FROM (
-            SELECT sample_sampleId, type, MAX(date) AS maxDate
-	        FROM SampleQC
-	        JOIN QCType ON QCType.qcTypeId = SampleQC.type
-	        WHERE QCType.name = 'Qubit'
-	        GROUP By sample_sampleId, type
-	        ) maxQubitDates
-	    JOIN SampleQC sqc ON sqc.sample_sampleId = maxQubitDates.sample_sampleId
-	        AND sqc.date = maxQubitDates.maxDate
-	        AND sqc.type = maxQubitDates.type
-	    GROUP BY sqc.sample_sampleId
-		) newestQubit ON newestQubit.sample_sampleId = s.sampleId
+    SELECT sqc.sample_sampleId, MAX(sqc.qcId) AS qcId
+    FROM (
+        SELECT sample_sampleId, type, MAX(date) AS maxDate
+        FROM SampleQC
+        JOIN QCType ON QCType.qcTypeId = SampleQC.type
+        WHERE QCType.name = 'Qubit'
+        GROUP By sample_sampleId, type
+        ) maxQubitDates
+    JOIN SampleQC sqc ON sqc.sample_sampleId = maxQubitDates.sample_sampleId
+        AND sqc.date = maxQubitDates.maxDate
+        AND sqc.type = maxQubitDates.type
+    GROUP BY sqc.sample_sampleId
+) newestQubit ON newestQubit.sample_sampleId = s.sampleId
 LEFT JOIN SampleQC qubit ON qubit.qcId = newestQubit.qcId
 LEFT JOIN (
         SELECT sqc.sample_sampleId, MAX(sqc.qcId) AS qcId
@@ -143,34 +134,34 @@ LEFT JOIN (
         ) newestQpcr ON newestQpcr.sample_sampleId = s.sampleId
 LEFT JOIN SampleQC qpcr ON qpcr.qcId = newestQpcr.qcId
 LEFT JOIN (
-	    SELECT sqc.sample_sampleId, MAX(sqc.qcId) AS qcId
-	    FROM (
-            SELECT sample_sampleId, type, MAX(date) AS maxDate
-	        FROM SampleQC
-	        JOIN QCType ON QCType.qcTypeId = SampleQC.type
-	        WHERE QCType.name = 'RIN'
-	        GROUP By sample_sampleId, type
-	        ) maxRinDates
-	    JOIN SampleQC sqc ON sqc.sample_sampleId = maxRinDates.sample_sampleId
-	        AND sqc.date = maxRinDates.maxDate
-	        AND sqc.type = maxRinDates.type
-	    GROUP BY sqc.sample_sampleId
-		) newestRin ON newestRin.sample_sampleId = s.sampleId
+    SELECT sqc.sample_sampleId, MAX(sqc.qcId) AS qcId
+    FROM (
+        SELECT sample_sampleId, type, MAX(date) AS maxDate
+        FROM SampleQC
+        JOIN QCType ON QCType.qcTypeId = SampleQC.type
+        WHERE QCType.name = 'RIN'
+        GROUP By sample_sampleId, type
+        ) maxRinDates
+    JOIN SampleQC sqc ON sqc.sample_sampleId = maxRinDates.sample_sampleId
+        AND sqc.date = maxRinDates.maxDate
+        AND sqc.type = maxRinDates.type
+    GROUP BY sqc.sample_sampleId
+) newestRin ON newestRin.sample_sampleId = s.sampleId
 LEFT JOIN SampleQC rin ON rin.qcId = newestRin.qcId
 LEFT JOIN (
-	    SELECT sqc.sample_sampleId, MAX(sqc.qcId) AS qcId
-	    FROM (
-            SELECT sample_sampleId, type, MAX(date) AS maxDate
-	        FROM SampleQC
-	        JOIN QCType ON QCType.qcTypeId = SampleQC.type
-	        WHERE QCType.name = 'DV200'
-	        GROUP By sample_sampleId, type
-	        ) maxDv200Dates
-	    JOIN SampleQC sqc ON sqc.sample_sampleId = maxDv200Dates.sample_sampleId
-	        AND sqc.date = maxDv200Dates.maxDate
-	        AND sqc.type = maxDv200Dates.type
-	    GROUP BY sqc.sample_sampleId
-		) newestDv200 ON newestDv200.sample_sampleId = s.sampleId
+    SELECT sqc.sample_sampleId, MAX(sqc.qcId) AS qcId
+    FROM (
+        SELECT sample_sampleId, type, MAX(date) AS maxDate
+        FROM SampleQC
+        JOIN QCType ON QCType.qcTypeId = SampleQC.type
+        WHERE QCType.name = 'DV200'
+        GROUP By sample_sampleId, type
+        ) maxDv200Dates
+    JOIN SampleQC sqc ON sqc.sample_sampleId = maxDv200Dates.sample_sampleId
+        AND sqc.date = maxDv200Dates.maxDate
+        AND sqc.type = maxDv200Dates.type
+    GROUP BY sqc.sample_sampleId
+) newestDv200 ON newestDv200.sample_sampleId = s.sampleId
 LEFT JOIN SampleQC dv200 ON dv200.qcId = newestDv200.qcId
 LEFT JOIN BoxPosition pos ON pos.targetId = s.sampleId 
         AND pos.targetType = 'SAMPLE' 
@@ -203,7 +194,7 @@ SELECT l.alias NAME
         ,lt.description sampleType_description 
         ,NULL tissueType 
         ,sp.shortName project 
-        ,lai.archived archived 
+        ,l.archived archived 
         ,l.creationDate inLabCreationDate
         ,l.created created 
         ,l.creator createdById 
@@ -225,8 +216,8 @@ SELECT l.alias NAME
         ,NULL tissue_region 
         ,NULL tube_id 
         ,NULL str_result 
-        ,lai.groupId group_id 
-        ,lai.groupDescription group_id_description 
+        ,l.groupId group_id 
+        ,l.groupDescription group_id_description 
         ,NULL purpose 
         ,qubit.results qubit_concentration 
         ,NULL nanodrop_concentration 
@@ -245,7 +236,7 @@ SELECT l.alias NAME
         ,l.dnaSize readLength 
         ,NULL targeted_sequencing 
         ,'Library' miso_type 
-        ,lai.preMigrationId premigration_id 
+        ,l.preMigrationId premigration_id 
         ,NULL organism 
         ,NULL subproject
         ,IF(rcpt.excludeFromPinery, NULL, rcpt.institute) institute
@@ -272,10 +263,9 @@ SELECT l.alias NAME
 FROM Library l 
 LEFT JOIN Sample parent ON parent.sampleId = l.sample_sampleId
 LEFT JOIN Project sp ON sp.projectId = parent.project_projectId
-LEFT JOIN DetailedLibrary lai ON lai.libraryId = l.libraryId
 LEFT JOIN LibrarySpikeIn lsi ON lsi.spikeInId = l.spikeInId
 LEFT JOIN KitDescriptor kd ON kd.kitDescriptorId = l.kitDescriptorId
-LEFT JOIN LibraryDesignCode ldc ON lai.libraryDesignCodeId = ldc.libraryDesignCodeId
+LEFT JOIN LibraryDesignCode ldc ON l.libraryDesignCodeId = ldc.libraryDesignCodeId
 LEFT JOIN LibraryType lt ON lt.libraryTypeId = l.libraryType
 LEFT JOIN (
         SELECT lqc.library_libraryId, MAX(lqc.qcId) AS qcId
@@ -373,8 +363,8 @@ SELECT d.alias name
         ,NULL tissue_region 
         ,NULL tube_id 
         ,NULL str_result 
-        ,dla.groupId group_id 
-        ,dla.groupDescription group_id_description 
+        ,d.groupId group_id 
+        ,d.groupDescription group_id_description 
         ,NULL purpose 
         ,NULL qubit_concentration 
         ,NULL nanodrop_concentration 
@@ -422,9 +412,8 @@ LEFT JOIN LibraryAliquot laParent ON laParent.aliquotId = d.parentAliquotId
 JOIN Library lib ON lib.libraryId = d.libraryId 
 JOIN Sample s ON s.sampleId = lib.sample_sampleId
 JOIN Project sp ON sp.projectId = s.project_projectId
-JOIN LibraryType lt ON lt.libraryTypeId = lib.libraryType 
-LEFT JOIN DetailedLibraryAliquot dla ON dla.aliquotId = d.aliquotId 
-LEFT JOIN LibraryDesignCode ldc ON ldc.libraryDesignCodeId = dla.libraryDesignCodeId
+JOIN LibraryType lt ON lt.libraryTypeId = lib.libraryType
+LEFT JOIN LibraryDesignCode ldc ON ldc.libraryDesignCodeId = d.libraryDesignCodeId
 LEFT JOIN TargetedSequencing ts ON d.targetedSequencingId = ts.targetedSequencingId
 LEFT JOIN BoxPosition pos ON pos.targetId = d.aliquotId 
         AND pos.targetType = 'LIBRARY_ALIQUOT' 

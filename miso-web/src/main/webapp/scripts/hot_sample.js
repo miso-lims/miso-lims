@@ -838,17 +838,17 @@ HotTarget.sample = (function() {
                 + ' May be used for calculating extraction input per yield, for example.',
             type: 'dropdown',
             trimDropdown: false,
-            source: [],
+            source: ['(none)'],
             unpack: function(sam, flat, setCellMeta) {
               if (sam.referenceSlideId) {
                 var slide = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(sam.referenceSlideId), sam.relatedSlides);
                 flat.referenceSlideLabel = makeReferenceSlideLabel(slide);
               }
               if (sam.relatedSlides && sam.relatedSlides.length) {
-                setCellMeta('source', sam.relatedSlides.map(function(slide) {
+                setCellMeta('source', ['(none)'].concat(sam.relatedSlides.map(function(slide) {
                   return makeReferenceSlideLabel(slide);
-                }));
-                if (sam.relatedSlides.length === 1) {
+                })));
+                if (config.pageMode !== 'edit' && sam.relatedSlides.length === 1) {
                   flat.referenceSlideLabel = makeReferenceSlideLabel(sam.relatedSlides[0]);
                 }
               }

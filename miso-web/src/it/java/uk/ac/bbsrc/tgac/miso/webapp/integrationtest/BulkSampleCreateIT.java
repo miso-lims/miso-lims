@@ -54,7 +54,8 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
       SamColumns.MARKED_AREA_PERCENT_TUMOUR);
 
   // columns specific to creating curls
-  private static final Set<String> curlsColumns = Sets.newHashSet();
+  private static final Set<String> tissuePieceColumns = Sets.newHashSet(SamColumns.PIECE_TYPE, SamColumns.SLIDES_CONSUMED,
+      SamColumns.REFERENCE_SLIDE);
 
   // columns specific to creating single cells (tissue processing)
   private static final Set<String> singleCellColumns = Sets.newHashSet(SamColumns.INITIAL_CELL_CONC, SamColumns.DIGESTION);
@@ -469,16 +470,16 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Set<String> expectedHeadings = Sets.newHashSet();
     expectedHeadings.addAll(identityColumns);
     expectedHeadings.addAll(tissueColumns);
-    expectedHeadings.addAll(curlsColumns);
+    expectedHeadings.addAll(tissuePieceColumns);
 
-    BulkSamplePage page = getCreatePage(1, null, curlsClassId);
+    BulkSamplePage page = getCreatePage(1, null, tissuePieceClassId);
     assertTableSetup(page.getTable(), expectedHeadings, 1);
   }
 
   @Test
   public void testCreateOneCurlsNoProject() throws Exception {
     // Goal: ensure one Curls can be saved
-    BulkSamplePage page = getCreatePage(1, null, curlsClassId);
+    BulkSamplePage page = getCreatePage(1, null, tissuePieceClassId);
     HandsOnTable table = page.getTable();
 
     Map<String, String> curls = new LinkedHashMap<>();
@@ -505,6 +506,8 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     curls.put(SamColumns.TISSUE_MATERIAL, "FFPE");
     curls.put(SamColumns.REGION, "Medulla oblongata");
     curls.put(SamColumns.QC_STATUS, "Ready");
+    curls.put(SamColumns.PIECE_TYPE, "Curls");
+    curls.put(SamColumns.SLIDES_CONSUMED, "2");
 
     curls.forEach((k, v) -> table.enterText(k, 0, v));
     // need to enter this here, after project is entered otherwise identity lookup fails
@@ -525,7 +528,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
   @Test
   public void testCreateOneCurlsWithProject() throws Exception {
     // Goal: ensure one Curls associated with a predefined project can be saved
-    BulkSamplePage page = getCreatePage(1, projectId, curlsClassId);
+    BulkSamplePage page = getCreatePage(1, projectId, tissuePieceClassId);
     HandsOnTable table = page.getTable();
 
     Map<String, String> curls = new LinkedHashMap<>();
@@ -550,6 +553,8 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     curls.put(SamColumns.TISSUE_MATERIAL, "FFPE");
     curls.put(SamColumns.REGION, "Medulla oblongata");
     curls.put(SamColumns.QC_STATUS, "Ready");
+    curls.put(SamColumns.PIECE_TYPE, "Curls");
+    curls.put(SamColumns.SLIDES_CONSUMED, "2");
 
     curls.forEach((k, v) -> table.enterText(k, 0, v));
     // need to enter this here, after project is entered otherwise identity lookup fails

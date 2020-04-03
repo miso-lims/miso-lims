@@ -31,8 +31,7 @@ public class HibernateLibraryAliquotDao
     implements LibraryAliquotStore, HibernatePaginatedBoxableSource<LibraryAliquot> {
 
   // Make sure these match the HiberatePoolableElementViewDao
-  private final static String[] SEARCH_PROPERTIES = new String[] { "name", "identificationBarcode", "library.name", "library.alias",
-      "library.description" };
+  private final static String[] SEARCH_PROPERTIES = new String[] { "name", "alias", "identificationBarcode" };
   private final static List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("library"));
 
   @Autowired

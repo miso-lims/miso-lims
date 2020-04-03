@@ -1,6 +1,3 @@
--- fixes BeforeInsertPool trigger created in V0004
-DROP TRIGGER IF EXISTS BeforeInsertPool;
-
 SET FOREIGN_KEY_CHECKS=0;
 DELETE FROM Printer;
 DELETE FROM Submission_Experiment;
@@ -55,9 +52,7 @@ DELETE FROM Array;
 DELETE FROM ArrayModel;
 DELETE FROM LibraryQC;
 DELETE FROM LibraryAliquotChangeLog;
-DELETE FROM DetailedLibraryAliquot;
 DELETE FROM LibraryAliquot;
-DELETE FROM DetailedLibrary;
 DELETE FROM Library_Index;
 DELETE FROM Library_Note;
 DELETE FROM LibraryChangeLog;
@@ -66,17 +61,6 @@ DELETE FROM LibraryDesign;
 DELETE FROM LibraryDesignCode;
 DELETE FROM LibrarySpikeIn;
 DELETE FROM SampleQC;
-DELETE FROM SampleAliquotSingleCell;
-DELETE FROM SampleAliquot;
-DELETE FROM SampleStockSingleCell;
-DELETE FROM SampleStock;
-DELETE FROM SampleSlide;
-DELETE FROM SampleTissuePiece;
-DELETE FROM SampleSingleCell;
-DELETE FROM SampleTissueProcessing;
-DELETE FROM SampleTissue;
-DELETE FROM Identity;
-DELETE FROM DetailedSample;
 DELETE FROM Sample_Note;
 DELETE FROM SampleChangeLog;
 DELETE FROM Sample;

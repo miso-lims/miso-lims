@@ -1,25 +1,19 @@
 DELIMITER //
 
-DROP FUNCTION IF EXISTS getParentTissueId//
-CREATE FUNCTION getParentTissueId(pSampleId bigint(20)) RETURNS bigint(20)
+DROP FUNCTION IF EXISTS getParentIdByDiscriminator//
+CREATE FUNCTION getParentIdByDiscriminator(pSampleId bigint(20), pDiscriminator varchar(50)) RETURNS bigint(20)
 BEGIN
-  DECLARE vTissueId bigint(20);
-  SET vTissueId = pSampleId;
-  WHILE vTissueId IS NOT NULL AND NOT EXISTS (SELECT sampleId FROM SampleTissue WHERE sampleId = vTissueId) DO
-    SELECT parentId INTO vTissueId FROM DetailedSample WHERE sampleId = vTissueId;
+  DECLARE vSampleId bigint(20);
+  DECLARE vDiscriminator varchar(50);
+  SET vSampleId = pSampleId;
+  SELECT discriminator INTO vDiscriminator FROM Sample WHERE sampleId = pSampleId;
+  WHILE vSampleId IS NOT NULL AND vDiscriminator <> pDiscriminator DO
+    SELECT p.sampleId, p.discriminator INTO vSampleId, vDiscriminator
+    FROM Sample c
+    LEFT JOIN Sample p ON p.sampleId = c.parentId
+    WHERE c.sampleId = vSampleId;
   END WHILE;
-  RETURN vTissueId;
-END//
-
-DROP FUNCTION IF EXISTS getParentIdentityId//
-CREATE FUNCTION getParentIdentityId(pSampleId bigint(20)) RETURNS bigint(20)
-BEGIN
-  DECLARE vIdentityId bigint(20);
-  SET vIdentityId = pSampleId;
-  WHILE vIdentityId IS NOT NULL AND NOT EXISTS (SELECT sampleId FROM Identity WHERE sampleId = vIdentityId) DO
-    SELECT parentId INTO vIdentityId FROM DetailedSample WHERE sampleId = vIdentityId;
-  END WHILE;
-  RETURN vIdentityId;
+  RETURN vSampleId;
 END//
 
 DROP PROCEDURE IF EXISTS updateSampleHierarchy//
@@ -30,21 +24,21 @@ BEGIN
   
   DECLARE vDone BOOLEAN DEFAULT FALSE;
   DECLARE vChildId bigint(20);
-  DECLARE vCursor CURSOR FOR SELECT sampleId FROM DetailedSample WHERE parentId = pSampleId;
+  DECLARE vCursor CURSOR FOR SELECT sampleId FROM Sample WHERE parentId = pSampleId;
   DECLARE CONTINUE HANDLER FOR NOT FOUND SET vDone = TRUE;
   
   SELECT tissueId, identityId INTO vTissueId, vIdentityId FROM SampleHierarchy
-  WHERE sampleId = (SELECT parentId FROM DetailedSample WHERE sampleId = pSampleId);
+  WHERE sampleId = (SELECT parentId FROM Sample WHERE sampleId = pSampleId);
   
   IF vTissueId IS NULL THEN
-    SET vTissueId = getParentTissueId(pSampleId);
+    SET vTissueId = getParentIdByDiscriminator(pSampleId, 'Tissue');
   END IF;
   
   IF vIdentityId IS NULL THEN
     IF vTissueId IS NOT NULL THEN
-      SET vIdentityId = getParentIdentityId(vTissueId);
+      SET vIdentityId = getParentIdByDiscriminator(vTissueId, 'Identity');
     ELSE
-      SET vIdentityId = getParentIdentityId(pSampleId);
+      SET vIdentityId = getParentIdByDiscriminator(pSampleId, 'Identity');
     END IF;
   END IF;
   
