@@ -22,10 +22,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -122,19 +120,6 @@ public class EditBoxController {
     model.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDtoWithBoxables(box, contents)));
 
     return new ModelAndView("/WEB-INF/pages/editBox.jsp", model);
-  }
-
-  @PostMapping
-  public ModelAndView processSubmit(@ModelAttribute("box") Box box, ModelMap model, SessionStatus session) throws IOException {
-    // The user may have modified the box contents while editing the form. Update the contents.
-    if (box.isSaved()) {
-      Box original = boxService.get(box.getId());
-      box.setBoxPositions(original.getBoxPositions());
-    }
-    boxService.save(box);
-    session.setComplete();
-    model.clear();
-    return new ModelAndView("redirect:/miso/box/" + box.getId(), model);
   }
 
   private final class BulkCreateBoxBackend extends BulkCreateTableBackend<BoxDto> {
