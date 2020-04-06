@@ -72,6 +72,7 @@
       </bean>
     </constructor-arg>
     <constructor-arg ref="ldapAuthPopulator" />
+    <property name="userDetailsContextMapper" ref="ldapInetOrgPersonMapper" />
   </bean>
 
   <bean id="ldapUserSearch" class="org.springframework.security.ldap.search.FilterBasedLdapUserSearch">
