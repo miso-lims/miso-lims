@@ -94,7 +94,8 @@ public class LimsSecurityUtils {
       target.setFullName(person.getDisplayName());
       target.setEmail(person.getMail());
     } else {
-      target.setFullName(ldapUserDetails.getUsername());
+      throw new IllegalArgumentException(
+          "UserDetails is not an InetOrgPerson. Check AuthenticationProvider/UserDetailsContextMapper config");
     }
   }
 
