@@ -64,8 +64,12 @@ WarningTarget.poolelement = {
             }, {
               include: element.identityConsentLevel === 'Revoked',
               tableMessage: Constants.warningMessages.consentRevoked
+            }, {
+              include: !!element.sequencingControlTypeAlias,
+              tableMessage: 'Sequencing Control: ' + element.sequencingControlTypeAlias,
+              level: 'info'
             }];
       }
-    }
+    };
   }
 };

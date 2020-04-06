@@ -34,6 +34,7 @@ AS SELECT
     s.description AS sampleDescription,
     s.accession AS sampleAccession,
     s.sampleType AS sampleType,
+    s.sequencingControlTypeId AS sampleSequencingControlTypeId,
     p.projectId AS projectId,
     p.name AS projectName,
     p.shortName AS projectShortName,

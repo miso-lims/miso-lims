@@ -61,6 +61,7 @@ public class LibraryAliquotDto extends AbstractBoxableDto {
   private Integer proportion;
   private String subprojectAlias;
   private Boolean subprojectPriority;
+  private String sequencingControlTypeAlias;
 
   public Long getId() {
     return id;
@@ -376,6 +377,14 @@ public class LibraryAliquotDto extends AbstractBoxableDto {
 
   public void setIndexLabels(List<String> indexLabels) {
     this.indexLabels = indexLabels;
+  }
+
+  public String getSequencingControlTypeAlias() {
+    return sequencingControlTypeAlias;
+  }
+
+  public void setSequencingControlTypeAlias(String sequencingControlTypeAlias) {
+    this.sequencingControlTypeAlias = sequencingControlTypeAlias;
   }
 
 }
