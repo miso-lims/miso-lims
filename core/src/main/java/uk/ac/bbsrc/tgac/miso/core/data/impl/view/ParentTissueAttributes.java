@@ -3,11 +3,10 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl.view;
 import java.io.Serializable;
 
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import org.hibernate.annotations.Immutable;
 
@@ -15,21 +14,16 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 
 @Entity
+@Table(name = "Sample")
 @Immutable
-public class SampleHierarchyView implements Serializable {
+public class ParentTissueAttributes implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
   @Id
   private long sampleId;
-
-  private String externalName;
-
-  @Enumerated(EnumType.STRING)
-  private ConsentLevel consentLevel;
 
   @ManyToOne(targetEntity = TissueOriginImpl.class)
   @JoinColumn(name = "tissueOriginId")
@@ -45,22 +39,6 @@ public class SampleHierarchyView implements Serializable {
 
   public void setId(long id) {
     this.sampleId = id;
-  }
-
-  public String getExternalName() {
-    return externalName;
-  }
-
-  public void setExternalName(String externalName) {
-    this.externalName = externalName;
-  }
-
-  public ConsentLevel getConsentLevel() {
-    return consentLevel;
-  }
-
-  public void setConsentLevel(ConsentLevel consentLevel) {
-    this.consentLevel = consentLevel;
   }
 
   public TissueOrigin getTissueOrigin() {

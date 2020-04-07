@@ -53,9 +53,9 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
 
   private final static String[] SEARCH_PROPERTIES = new String[] { "alias", "identificationBarcode", "name" };
   private final static List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(
-      new AliasDescriptor("hierarchyAttributes", JoinType.LEFT_OUTER_JOIN),
-      new AliasDescriptor("hierarchyAttributes.tissueOrigin", JoinType.LEFT_OUTER_JOIN),
-      new AliasDescriptor("hierarchyAttributes.tissueType", JoinType.LEFT_OUTER_JOIN),
+      new AliasDescriptor("tissueAttributes", JoinType.LEFT_OUTER_JOIN),
+      new AliasDescriptor("tissueAttributes.tissueOrigin", JoinType.LEFT_OUTER_JOIN),
+      new AliasDescriptor("tissueAttributes.tissueType", JoinType.LEFT_OUTER_JOIN),
       new AliasDescriptor("sampleClass", JoinType.LEFT_OUTER_JOIN));
 
   @Value("${miso.detailed.sample.enabled}")

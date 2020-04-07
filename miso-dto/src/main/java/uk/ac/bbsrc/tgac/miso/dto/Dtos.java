@@ -192,9 +192,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolViewElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListTransferView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListWorksetView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentIdentityAttributes;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentTissueAttributes;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SampleHierarchyView;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQcControlRun;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQC;
@@ -409,11 +410,14 @@ public class Dtos {
         dto.setSubprojectAlias(detailed.getSubproject().getAlias());
         dto.setSubprojectPriority(detailed.getSubproject().getPriority());
       }
-      if (detailed.getHierarchyAttributes() != null) {
-        SampleHierarchyView attributes = detailed.getHierarchyAttributes();
-        setString(dto::setEffectiveTissueOriginLabel, maybeGetProperty(attributes.getTissueOrigin(), TissueOrigin::getAlias));
-        setString(dto::setEffectiveTissueTypeLabel, maybeGetProperty(attributes.getTissueType(), TissueType::getAlias));
-        setString(dto::setIdentityConsentLevel, maybeGetProperty(attributes.getConsentLevel(), ConsentLevel::getLabel));
+      if (detailed.getIdentityAttributes() != null) {
+        ParentIdentityAttributes identity = detailed.getIdentityAttributes();
+        setString(dto::setIdentityConsentLevel, maybeGetProperty(identity.getConsentLevel(), ConsentLevel::getLabel));
+      }
+      if (detailed.getTissueAttributes() != null) {
+        ParentTissueAttributes tissue = detailed.getTissueAttributes();
+        setString(dto::setEffectiveTissueOriginLabel, maybeGetProperty(tissue.getTissueOrigin(), TissueOrigin::getAlias));
+        setString(dto::setEffectiveTissueTypeLabel, maybeGetProperty(tissue.getTissueType(), TissueType::getAlias));
       }
     }
     return dto;
@@ -543,10 +547,10 @@ public class Dtos {
     setString(dto::setVolumeUsed, from.getVolumeUsed());
     setString(dto::setNgUsed, from.getNgUsed());
 
-    if (from.getHierarchyAttributes() != null) {
-      SampleHierarchyView attributes = from.getHierarchyAttributes();
-      setString(dto::setIdentityConsentLevel, maybeGetProperty(attributes.getConsentLevel(), ConsentLevel::getLabel));
-      setString(dto::setEffectiveExternalNames, attributes.getExternalName());
+    if (from.getIdentityAttributes() != null) {
+      ParentIdentityAttributes identity = from.getIdentityAttributes();
+      setString(dto::setIdentityConsentLevel, maybeGetProperty(identity.getConsentLevel(), ConsentLevel::getLabel));
+      setString(dto::setEffectiveExternalNames, identity.getExternalName());
     }
 
     return dto;
@@ -1216,11 +1220,14 @@ public class Dtos {
         dto.setSubprojectAlias(detailed.getSubproject().getAlias());
         dto.setSubprojectPriority(detailed.getSubproject().getPriority());
       }
-      if (detailed.getHierarchyAttributes() != null) {
-        SampleHierarchyView attributes = detailed.getHierarchyAttributes();
-        setString(dto::setEffectiveTissueOriginLabel, maybeGetProperty(attributes.getTissueOrigin(), TissueOrigin::getAlias));
-        setString(dto::setEffectiveTissueTypeLabel, maybeGetProperty(attributes.getTissueType(), TissueType::getAlias));
-        setString(dto::setIdentityConsentLevel, maybeGetProperty(attributes.getConsentLevel(), ConsentLevel::getLabel));
+      if (detailed.getIdentityAttributes() != null) {
+        ParentIdentityAttributes identity = detailed.getIdentityAttributes();
+        setString(dto::setIdentityConsentLevel, maybeGetProperty(identity.getConsentLevel(), ConsentLevel::getLabel));
+      }
+      if (detailed.getTissueAttributes() != null) {
+        ParentTissueAttributes tissue = detailed.getTissueAttributes();
+        setString(dto::setEffectiveTissueOriginLabel, maybeGetProperty(tissue.getTissueOrigin(), TissueOrigin::getAlias));
+        setString(dto::setEffectiveTissueTypeLabel, maybeGetProperty(tissue.getTissueType(), TissueType::getAlias));
       }
     }
     return dto;
@@ -1611,11 +1618,14 @@ public class Dtos {
             dto.setSubprojectAlias(detailed.getSubproject().getAlias());
             dto.setSubprojectPriority(detailed.getSubproject().getPriority());
           }
-          if (detailed.getHierarchyAttributes() != null) {
-            SampleHierarchyView attributes = detailed.getHierarchyAttributes();
-            setString(dto::setEffectiveTissueOriginLabel, maybeGetProperty(attributes.getTissueOrigin(), TissueOrigin::getAlias));
-            setString(dto::setEffectiveTissueTypeLabel, maybeGetProperty(attributes.getTissueType(), TissueType::getAlias));
-            setString(dto::setIdentityConsentLevel, maybeGetProperty(attributes.getConsentLevel(), ConsentLevel::getLabel));
+          if (detailed.getIdentityAttributes() != null) {
+            ParentIdentityAttributes identity = detailed.getIdentityAttributes();
+            setString(dto::setIdentityConsentLevel, maybeGetProperty(identity.getConsentLevel(), ConsentLevel::getLabel));
+          }
+          if (detailed.getTissueAttributes() != null) {
+            ParentTissueAttributes tissue = detailed.getTissueAttributes();
+            setString(dto::setEffectiveTissueOriginLabel, maybeGetProperty(tissue.getTissueOrigin(), TissueOrigin::getAlias));
+            setString(dto::setEffectiveTissueTypeLabel, maybeGetProperty(tissue.getTissueType(), TissueType::getAlias));
           }
         }
       }
@@ -1715,11 +1725,14 @@ public class Dtos {
         dto.setSubprojectAlias(detailed.getSubproject().getAlias());
         dto.setSubprojectPriority(detailed.getSubproject().getPriority());
       }
-      if (detailed.getHierarchyAttributes() != null) {
-        SampleHierarchyView attributes = detailed.getHierarchyAttributes();
-        setString(dto::setEffectiveTissueOriginLabel, maybeGetProperty(attributes.getTissueOrigin(), TissueOrigin::getAlias));
-        setString(dto::setEffectiveTissueTypeLabel, maybeGetProperty(attributes.getTissueType(), TissueType::getAlias));
-        setString(dto::setIdentityConsentLevel, maybeGetProperty(attributes.getConsentLevel(), ConsentLevel::getLabel));
+      if (detailed.getIdentityAttributes() != null) {
+        ParentIdentityAttributes identity = detailed.getIdentityAttributes();
+        setString(dto::setIdentityConsentLevel, maybeGetProperty(identity.getConsentLevel(), ConsentLevel::getLabel));
+      }
+      if (detailed.getTissueAttributes() != null) {
+        ParentTissueAttributes tissue = detailed.getTissueAttributes();
+        setString(dto::setEffectiveTissueOriginLabel, maybeGetProperty(tissue.getTissueOrigin(), TissueOrigin::getAlias));
+        setString(dto::setEffectiveTissueTypeLabel, maybeGetProperty(tissue.getTissueType(), TissueType::getAlias));
       }
     }
 

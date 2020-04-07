@@ -32,9 +32,9 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
   // Make sure these match the HiberateLibraryAliquotDao
   private static final String[] SEARCH_PROPERTIES = new String[] { "aliquotName", "aliquotAlias", "aliquotBarcode" };
   private final static List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("sample"),
-      new AliasDescriptor("sample.hierarchyAttributes", JoinType.LEFT_OUTER_JOIN),
-      new AliasDescriptor("hierarchyAttributes.tissueOrigin", JoinType.LEFT_OUTER_JOIN),
-      new AliasDescriptor("hierarchyAttributes.tissueType", JoinType.LEFT_OUTER_JOIN));
+      new AliasDescriptor("sample.tissueAttributes", JoinType.LEFT_OUTER_JOIN),
+      new AliasDescriptor("tissueAttributes.tissueOrigin", JoinType.LEFT_OUTER_JOIN),
+      new AliasDescriptor("tissueAttributes.tissueType", JoinType.LEFT_OUTER_JOIN));
 
   @Autowired
   private SessionFactory sessionFactory;

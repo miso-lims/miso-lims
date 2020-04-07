@@ -15,9 +15,9 @@ import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
@@ -28,7 +28,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListTransferView;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SampleHierarchyView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentIdentityAttributes;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentTissueAttributes;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -77,9 +78,15 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   private BigDecimal volumeUsed;
   private BigDecimal ngUsed;
 
-  @OneToOne
-  @JoinColumn(name = "sampleId")
-  private SampleHierarchyView hierarchyAttributes;
+  @ManyToOne
+  @JoinTable(name = "SampleHierarchy", joinColumns = { @JoinColumn(name = "sampleId") }, inverseJoinColumns = {
+      @JoinColumn(name = "identityId") })
+  private ParentIdentityAttributes identityAttributes;
+
+  @ManyToOne
+  @JoinTable(name = "SampleHierarchy", joinColumns = { @JoinColumn(name = "sampleId") }, inverseJoinColumns = {
+      @JoinColumn(name = "tissueId") })
+  private ParentTissueAttributes tissueAttributes;
 
   @Transient
   private Long identityId;
@@ -272,12 +279,23 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   }
 
   @Override
-  public SampleHierarchyView getHierarchyAttributes() {
-    return hierarchyAttributes;
+  public ParentIdentityAttributes getIdentityAttributes() {
+    return identityAttributes;
   }
 
-  public void setHierarchyAttributes(SampleHierarchyView hierarchyAttributes) {
-    this.hierarchyAttributes = hierarchyAttributes;
+  @Override
+  public void setIdentityAttributes(ParentIdentityAttributes identityAttributes) {
+    this.identityAttributes = identityAttributes;
+  }
+
+  @Override
+  public ParentTissueAttributes getTissueAttributes() {
+    return tissueAttributes;
+  }
+
+  @Override
+  public void setTissueAttributes(ParentTissueAttributes tissueAttributes) {
+    this.tissueAttributes = tissueAttributes;
   }
 
 }
