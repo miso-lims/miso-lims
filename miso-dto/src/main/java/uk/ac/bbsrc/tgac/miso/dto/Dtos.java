@@ -188,6 +188,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BarcodableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListContainerRunSequencerView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListContainerRunView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListContainerView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolViewElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListTransferView;
@@ -4072,6 +4075,25 @@ public class Dtos {
     SequencingControlType to = new SequencingControlType();
     setLong(to::setId, from.getId(), false);
     setString(to::setAlias, from.getAlias());
+    return to;
+  }
+
+  public static ListContainerViewDto asDto(@Nonnull ListContainerView from) {
+    ListContainerViewDto to = new ListContainerViewDto();
+    setLong(to::setId, from.getId(), true);
+    setString(to::setIdentificationBarcode, from.getIdentificationBarcode());
+    setString(to::setPlatform,
+        maybeGetProperty(maybeGetProperty(from.getModel(), SequencingContainerModel::getPlatformType), PlatformType::getKey));
+    setDateTimeString(to::setLastModified, from.getLastModified());
+
+    ListContainerRunView lastRun = from.getRuns().stream().max(Comparator.comparing(ListContainerRunView::getStartDate)).orElse(null);
+    if (lastRun != null) {
+      setLong(to::setLastRunId, lastRun.getId(), true);
+      setString(to::setLastRunName, lastRun.getName());
+      setString(to::setLastRunAlias, lastRun.getAlias());
+      setLong(to::setLastSequencerId, maybeGetProperty(lastRun.getSequencer(), ListContainerRunSequencerView::getId), true);
+      setString(to::setLastSequencerName, maybeGetProperty(lastRun.getSequencer(), ListContainerRunSequencerView::getName));
+    }
     return to;
   }
 

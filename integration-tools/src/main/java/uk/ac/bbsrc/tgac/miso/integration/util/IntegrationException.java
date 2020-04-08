@@ -33,6 +33,9 @@ package uk.ac.bbsrc.tgac.miso.integration.util;
  * @since 0.0.2
  */
 public class IntegrationException extends Exception {
+
+  private static final long serialVersionUID = 1L;
+
   public IntegrationException(String s) {
     super(s);
   }

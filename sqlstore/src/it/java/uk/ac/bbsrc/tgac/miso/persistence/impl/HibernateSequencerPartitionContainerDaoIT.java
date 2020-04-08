@@ -26,7 +26,6 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -50,10 +49,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.util.DateType;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.persistence.SecurityStore;
 
 public class HibernateSequencerPartitionContainerDaoIT extends AbstractDAOTest {
@@ -79,17 +74,6 @@ public class HibernateSequencerPartitionContainerDaoIT extends AbstractDAOTest {
 
     emptyUser.setId(1L);
     when(securityDao.getUserById(Matchers.anyLong())).thenReturn(emptyUser);
-  }
-
-  @Test
-  public void testListAll() throws IOException {
-    Collection<SequencerPartitionContainer> spcs = dao.listAll();
-    assertEquals(4, spcs.size());
-  }
-
-  @Test
-  public void testPCCount() throws IOException {
-    assertEquals(4, dao.count());
   }
 
   @Test
@@ -120,18 +104,6 @@ public class HibernateSequencerPartitionContainerDaoIT extends AbstractDAOTest {
   public void testListByRunIdNone() throws IOException {
     List<SequencerPartitionContainer> spcs = dao.listAllSequencerPartitionContainersByRunId(9999L);
     assertEquals(0, spcs.size());
-  }
-
-  @Test
-  public void testGetByPartitionId() throws IOException {
-    SequencerPartitionContainer spc = dao.getSequencerPartitionContainerByPartitionId(1L);
-    assertNotNull(spc);
-  }
-
-  @Test
-  public void testGetByPartitionIdNone() throws IOException {
-    SequencerPartitionContainer spc = dao.getSequencerPartitionContainerByPartitionId(9999L);
-    assertNull(spc);
   }
 
   @Test
@@ -195,105 +167,7 @@ public class HibernateSequencerPartitionContainerDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testListWithLimitAndOffset() throws IOException {
-    List<SequencerPartitionContainer> spcs = dao.list(1, 2, true, "id");
-    assertEquals(2, spcs.size());
-    assertEquals(2, spcs.get(0).getId());
-  }
-
-  @Test
-  public void testCountBySearch() throws IOException {
-    assertEquals(3, dao.count(PaginationFilter.query("C0")));
-  }
-
-  @Test
-  public void testCountByEmptySearch() throws IOException {
-    assertEquals(4L, dao.count(PaginationFilter.query("")));
-  }
-
-  @Test
-  public void testCountByBadSearch() throws IOException {
-    assertEquals(0L, dao.count(PaginationFilter.query("; DROP TABLE SequencerPartitionContainer;")));
-  }
-
-  @Test
-  public void testListBySearchWithLimit() throws IOException {
-    List<SequencerPartitionContainer> spcs = dao.list(2, 2, true, "id", PaginationFilter.query("C0"));
-    assertEquals(1, spcs.size());
-    assertEquals(4L, spcs.get(0).getId());
-  }
-
-  @Test
-  public void testListByEmptySearchWithLimit() throws IOException {
-    List<SequencerPartitionContainer> spcs = dao.list(0, 3, true, "id", PaginationFilter.query(""));
-    assertEquals(3L, spcs.size());
-  }
-
-  @Test
-  public void testListByBadSearchWithLimit() throws IOException {
-    List<SequencerPartitionContainer> spcs = dao.list(0, 2, true, "id",
-        PaginationFilter.query("; DROP TABLE SequencerPartitionContainer;"));
-    assertEquals(0L, spcs.size());
-  }
-
-  @Test
-  public void testListOffsetBadLimit() throws IOException {
-    exception.expect(IOException.class);
-    dao.list(5, -3, true, "id");
-  }
-
-  @Test
-  public void testListOffsetThreeWithThreeSamplesPerPageOrderLastMod() throws IOException {
-    List<SequencerPartitionContainer> spcs = dao.list(2, 2, false, "lastModified");
-    assertEquals(2, spcs.size());
-    assertEquals(2, spcs.get(0).getId());
-  }
-
-  @Test
   public void testGetModel() throws Exception {
     assertNotNull(dao.get(1L));
-  }
-
-  @Test
-  public void testSearch() throws IOException {
-    testSearch(PaginationFilter.query("Container"));
-  }
-
-  @Test
-  public void testSearchByEntered() throws IOException {
-    testSearch(PaginationFilter.date(LimsUtils.parseDate("2017-01-01"), LimsUtils.parseDate("2018-01-01"), DateType.ENTERED));
-  }
-
-  @Test
-  public void testSearchByCreator() throws IOException {
-    testSearch(PaginationFilter.user("admin", true));
-  }
-
-  @Test
-  public void testSearchByModifier() throws IOException {
-    testSearch(PaginationFilter.user("admin", false));
-  }
-
-  @Test
-  public void testSearchByPlatform() throws IOException {
-    testSearch(PaginationFilter.platformType(PlatformType.ILLUMINA));
-  }
-
-  @Test
-  public void testSearchByKitName() throws IOException {
-    testSearch(PaginationFilter.kitName("Test Kit"));
-  }
-
-  /**
-   * Verifies Hibernate mappings by ensuring that no exception is thrown by a search
-   * 
-   * @param filter the search filter
-   * @throws IOException
-   */
-  private void testSearch(PaginationFilter filter) throws IOException {
-    // verify Hibernate mappings by ensuring that no exception is thrown
-    assertNotNull(dao.list(err -> {
-      throw new RuntimeException(err);
-    }, 0, 10, true, "identificationBarcode", filter));
   }
 }
