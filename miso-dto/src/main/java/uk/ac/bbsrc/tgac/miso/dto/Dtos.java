@@ -2246,7 +2246,7 @@ public class Dtos {
     return dto;
   }
 
-  public static List<QcDto> asQcDtos(@Nonnull Collection<? extends QC> qcSubset) {
+  private static List<QcDto> asQcDtos(@Nonnull Collection<? extends QC> qcSubset) {
     return qcSubset.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 

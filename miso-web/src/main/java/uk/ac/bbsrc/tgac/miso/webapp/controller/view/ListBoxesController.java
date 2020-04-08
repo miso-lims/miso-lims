@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
 import java.io.IOException;
 import java.util.Comparator;
+import java.util.List;
 import java.util.SortedMap;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -32,9 +33,25 @@ public class ListBoxesController {
     return "Boxes";
   }
 
+  private static final String ALL_TAB = "All";
+
+  private static Comparator<String> TAB_SORTER = (o1, o2) -> {
+    if (ALL_TAB.equals(o1)) {
+      return -1;
+    } else if (ALL_TAB.equals(o2)) {
+      return 1;
+    } else {
+      return o1.compareTo(o2);
+    }
+  };
+
   @RequestMapping("/boxes")
   public ModelAndView listBoxes(ModelMap model) throws Exception {
-    return new TabbedListBoxPage("box", "boxUse", boxUseService.list().stream(), BoxUse::getAlias, BoxUse::getId).list(model);
+    List<BoxUse> uses = boxUseService.list();
+    BoxUse all = new BoxUse();
+    all.setAlias(ALL_TAB);
+    uses.add(0, all);
+    return new TabbedListBoxPage("box", "boxUse", uses.stream(), TAB_SORTER, BoxUse::getAlias, BoxUse::getId).list(model);
   }
 
   public class TabbedListBoxPage extends TabbedListItemsPage {
