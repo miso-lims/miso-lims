@@ -488,8 +488,8 @@ public class EditSampleController {
         }
         dto.setParentTissueSampleClassId(sample.getSampleClass().getId());
         dto.setProjectId(sample.getProject().getId());
-        if (sample.getHierarchyAttributes() != null && sample.getHierarchyAttributes().getConsentLevel() != null) {
-          dto.setIdentityConsentLevel(sample.getHierarchyAttributes().getConsentLevel().getLabel());
+        if (sample.getIdentityAttributes() != null && sample.getIdentityAttributes().getConsentLevel() != null) {
+          dto.setIdentityConsentLevel(sample.getIdentityAttributes().getConsentLevel().getLabel());
         }
         if (sample.getSubproject() != null) {
           dto.setSubprojectId(sample.getSubproject().getId());
