@@ -2,10 +2,12 @@
 
 Changes:
 
+  * Added an "All" tab to the Boxes list page
   * Allow editing sequencing control types
   * Indicate library aliquots that are sequencing controls on the Edit Pool page
   * Always show MISO error page instead of default Tomcat error page
   * Performance improvements
+  * Fixed LDAP user full name and email retrieval
 
 # 1.1.0
 

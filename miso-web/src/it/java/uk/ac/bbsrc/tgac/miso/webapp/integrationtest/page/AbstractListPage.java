@@ -145,6 +145,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String UNIQUE_DUAL_INDICES = "Unique Dual Indices";
     public static final String UNITS = "Units";
     public static final String UNKNOWN = "Unknown";
+    public static final String USE = "Use";
     public static final String USER_NAME = "User Name";
     public static final String VERIFIED = "Verified";
     public static final String VERSION = "Version";
