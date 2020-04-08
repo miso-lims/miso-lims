@@ -51,6 +51,7 @@
     <property name="userDetailsMapper" ref="ldapInetOrgPersonMapper" />
   </bean>
 
+  <!-- Retrieve user as InetOrgPerson as this has details need to populate db User table. Otherwise will be sparse LdapUserDetail. -->
   <bean id="ldapInetOrgPersonMapper" class="org.springframework.security.ldap.userdetails.InetOrgPersonContextMapper" />
 
   <bean id="ldapUserDetailsMapper" class="org.springframework.security.ldap.DefaultLdapUsernameToDnMapper">
@@ -72,6 +73,7 @@
       </bean>
     </constructor-arg>
     <constructor-arg ref="ldapAuthPopulator" />
+    <property name="userDetailsContextMapper" ref="ldapInetOrgPersonMapper" />
   </bean>
 
   <bean id="ldapUserSearch" class="org.springframework.security.ldap.search.FilterBasedLdapUserSearch">
