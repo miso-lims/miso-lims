@@ -9,6 +9,10 @@ Changes:
   * Performance improvements
   * Fixed LDAP user full name and email retrieval
 
+Upgrade Notes:
+
+  * Updated to Run Scanner 1.12.1
+
 # 1.1.0
 
 Changes:
