@@ -1,3 +1,4 @@
+-- flatten_samples
 DROP TRIGGER IF EXISTS DetailedSampleChange;
 DROP TRIGGER IF EXISTS SampleAliquotChange;
 DROP TRIGGER IF EXISTS SampleSlideChange;
@@ -288,3 +289,12 @@ END//
 DELIMITER ;
 CALL verifyDiscriminators();
 DROP PROCEDURE verifyDiscriminators;
+
+-- performance_improvements
+-- Disable "View does not exist" warnings
+SET sql_notes = 0;
+
+DROP VIEW IF EXISTS SampleHierarchyView;
+
+SET sql_notes = 1;
+

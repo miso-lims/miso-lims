@@ -2,6 +2,12 @@
 
 Changes:
 
+
+
+# 
+
+Changes:
+
   * Added an "All" tab to the Boxes list page
   * Allow editing sequencing control types
   * Indicate library aliquots that are sequencing controls on the Edit Pool page
