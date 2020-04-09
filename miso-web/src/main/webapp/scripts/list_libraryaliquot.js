@@ -33,9 +33,9 @@ ListTarget.libraryaliquot = {
     return Urls.rest.libraryAliquots.query;
   },
   createBulkActions: function(config, projectId) {
-    var actions = config.library ? HotTarget.libraryaliquot.getBulkActions(config).filter(function(action) {
+    var actions = config.library ? BulkTarget.libraryaliquot.getBulkActions(config).filter(function(action) {
       return action.allowOnLibraryPage;
-    }) : HotTarget.libraryaliquot.getBulkActions(config);
+    }) : BulkTarget.libraryaliquot.getBulkActions(config);
 
     if (config.worksetId) {
       actions.push(HotUtils.makeMoveFromWorkset('library aliquots', Urls.rest.worksets.moveLibraryAliquots(config.worksetId)));

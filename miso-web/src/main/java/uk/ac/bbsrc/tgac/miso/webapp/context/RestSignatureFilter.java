@@ -45,13 +45,13 @@ import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestExceptionHandler;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestExceptionHandler.RestError;
 
 /**
  * Authentication filter for REST requests. If authentication headers are found in the request, signature authentication will be 
@@ -109,7 +109,7 @@ public class RestSignatureFilter extends OncePerRequestFilter {
       checkSignature(request, response, filterChain);
     } catch (Exception e) {
       // Return JSON representation of any errors
-      RestError error = RestExceptionHandler.handleException(request, response, e);
+      ObjectNode error = RestExceptionHandler.handleException(request, response, e);
       response.setContentType("application/json");
       try (PrintWriter writer = response.getWriter()) {
         ObjectMapper mapper = new ObjectMapper();

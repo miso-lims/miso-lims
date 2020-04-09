@@ -26,7 +26,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class HandsOnTable extends AbstractElement {
 
-  private static final By columnHeadingsSelector = By.cssSelector("div.ht_master table.htCore span.colHeader");
+  private static final By columnHeadingsSelector = By.cssSelector("div.ht_master table.htCore span.colHeader:not(.cornerHeader)");
   private static final By inputRowsSelector = By.cssSelector("div.ht_master table.htCore tbody tr");
   private static final By lockedRowsSelector = By.cssSelector("div.ht_clone_left table.htCore tbody tr");
   private static final By inputCellSelector = By.tagName("td");
@@ -187,10 +187,26 @@ public class HandsOnTable extends AbstractElement {
         .build().perform();
   }
 
+  /**
+   * Use with old HOT interface (HotTargets) only. Those using the new bulk interface (BulkTargets) should
+   * implement BulkPage and use its save method instead
+   * 
+   * @param confirmRequired
+   * @return
+   */
+  @Deprecated
   public HandsOnTableSaveResult save() {
     return save(false);
   }
 
+  /**
+   * Use with old HOT interface (HotTargets) only. Those using the new bulk interface (BulkTargets) should
+   * implement BulkPage and use its save method instead
+   * 
+   * @param confirmRequired
+   * @return
+   */
+  @Deprecated
   public HandsOnTableSaveResult save(boolean confirmRequired) {
     saveButton.click();
     if (confirmRequired) {

@@ -94,8 +94,8 @@ FormTarget.libraryaliquot = (function($) {
           title: 'Size (bp)',
           data: 'dnaSize',
           type: 'int',
-          maxLength: 10,
-          min: 1
+          min: 1,
+          max: 10000000
         }, {
           title: 'Discarded',
           data: 'discarded',
@@ -141,13 +141,15 @@ FormTarget.libraryaliquot = (function($) {
           data: 'ngUsed',
           type: 'decimal',
           precision: 14,
-          scale: 10
+          scale: 10,
+          min: 0
         }, {
           title: 'Parent Volume Used',
           data: 'volumeUsed',
           type: 'decimal',
           precision: 14,
-          scale: 10
+          scale: 10,
+          min: 0
         }]
       }, {
         title: 'Details',

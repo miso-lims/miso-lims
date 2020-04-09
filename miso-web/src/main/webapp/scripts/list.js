@@ -145,11 +145,11 @@ ListUtils = (function($) {
       help: "Checks whether an item has the specified requisition ID"
     },
     "tissueOrigin": {
-      term: "origin",
+      term: "origin:CODE",
       help: "Checks whether an item has the specified tissue origin"
     },
     "tissueType": {
-      term: "tissueType",
+      term: "tissueType:CODE",
       help: "Checks whether an item has the specified tissue type"
     }
   };

@@ -196,7 +196,6 @@ public class PlainSampleITs extends AbstractIT {
 
     attrs.forEach((k, v) -> table.enterText(k, 0, v));
     HandsOnTableSaveResult result = table.save();
-    System.out.println("##### SAVE RESULT:\n" + result.printSummary());
     assertTrue("Library save", result.getItemsSaved() == 1);
     assertTrue("Server errors", result.getServerErrors().isEmpty());
     assertTrue("Save errors", result.getSaveErrors().isEmpty());
@@ -238,13 +237,10 @@ public class PlainSampleITs extends AbstractIT {
     attrs.put(LibraryAliquotColumns.CREATION_DATE, "2017-10-11");
 
     attrs.forEach((k, v) -> table.enterText(k, 0, v));
-    HandsOnTableSaveResult result = table.save();
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
-    assertTrue("Library aliquot save", result.getItemsSaved() == 1);
-    assertTrue("Server errors", result.getServerErrors().isEmpty());
-    assertTrue("Save errors", result.getSaveErrors().isEmpty());
-
-    Long savedId = Long.valueOf(table.getText(LibraryAliquotColumns.NAME, 0).substring(3));
+    Long savedId = Long.valueOf(savedTable.getText(LibraryAliquotColumns.NAME, 0).substring(3));
     LibraryAliquot saved = (LibraryAliquot) getSession().get(LibraryAliquot.class, savedId);
     assertTrue("Library aliquot name generation", saved.getName().contains("LDI"));
     assertTrue("Library aliquot barcode generation", !isStringEmptyOrNull(saved.getIdentificationBarcode()));

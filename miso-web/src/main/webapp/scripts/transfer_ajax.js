@@ -72,7 +72,7 @@ var Transfer = (function($) {
       setBulkActions(HotTarget.library.getBulkActions({}));
       break;
     case 'Library Aliquot':
-      setBulkActions(HotTarget.libraryaliquot.getBulkActions({}));
+      setBulkActions(BulkTarget.libraryaliquot.getBulkActions({}));
       break;
     case 'Pool':
       setBulkActions(HotTarget.pool.getBulkActions({}));

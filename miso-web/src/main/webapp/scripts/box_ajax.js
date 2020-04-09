@@ -460,7 +460,7 @@ Box.ui = {
       actions = actions.concat(HotTarget.library.getBulkActions({}));
       break;
     case 'LIBRARY_ALIQUOT':
-      actions = actions.concat(HotTarget.libraryaliquot.getBulkActions({}));
+      actions = actions.concat(BulkTarget.libraryaliquot.getBulkActions({}));
       break;
     case 'POOL':
       actions = actions.concat(HotTarget.pool.getBulkActions({}));

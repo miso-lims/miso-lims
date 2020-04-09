@@ -373,8 +373,13 @@ var HotUtils = {
                 var previous = icc['lastContents'][placeholder_i];
                 var placeholder = placeholders[placeholder_i];
                 var incrementedInt = parseInt(previous) + row_i + 1;
-                var incrementedString = previous.startsWith('0') ? ('0').repeat(previous.length - incrementedInt.toString().length) : '';
-                incrementedString += incrementedInt;
+                var incrementedString = incrementedInt.toString();
+                if (previous.startsWith('0')) {
+                  var zeroPadding = previous.length - incrementedInt.toString().length;
+                  if (zeroPadding > 0) {
+                    incrementedString = ('0').repeat(zeroPadding) + incrementedString;
+                  }
+                }
                 template = template.replace(placeholder, incrementedString);
               }
               newData.push([currentRow, currentCol, template]);
@@ -1344,7 +1349,7 @@ var HotUtils = {
               Utils.ajaxWithDialog('Searching', 'POST', categoryUrlFunction(category.name), items.map(function(s) {
                 return s.id;
               }), function(relations) {
-                var selectedActions = category.target.getBulkActions(category.config).filter(function(bulkAction) {
+                var selectedActions = category.getBulkActions(category.config).filter(function(bulkAction) {
                   return !!bulkAction;
                 }).map(function(bulkAction) {
                   return {
@@ -1548,13 +1553,13 @@ var HotUtils = {
     return Constants.isDetailedSample ? Constants.sampleCategories.map(function(category) {
       return {
         "name": category,
-        "target": HotTarget.sample,
+        "getBulkActions": HotTarget.sample.getBulkActions,
         "config": {},
         "index": Constants.sampleCategories.indexOf(category)
       };
     }) : [{
       "name": "Sample",
-      "target": HotTarget.sample,
+      "getBulkActions": HotTarget.sample.getBulkActions,
       "config": {},
       "index": Constants.sampleCategories.length
     }];
@@ -1564,7 +1569,7 @@ var HotUtils = {
     library: function() {
       return {
         "name": "Library",
-        "target": HotTarget.library,
+        "getBulkActions": HotTarget.library.getBulkActions,
         "config": {},
         "index": Constants.sampleCategories.length + 1
       };
@@ -1572,7 +1577,7 @@ var HotUtils = {
     libraryAliquot: function() {
       return {
         "name": "Library Aliquot",
-        "target": HotTarget.libraryaliquot,
+        "getBulkActions": BulkTarget.libraryaliquot.getBulkActions,
         "config": {},
         "index": Constants.sampleCategories.length + 2
       };
@@ -1580,7 +1585,7 @@ var HotUtils = {
     pool: function() {
       return {
         "name": "Pool",
-        "target": HotTarget.pool,
+        "getBulkActions": HotTarget.pool.getBulkActions,
         "config": {},
         "index": Constants.sampleCategories.length + 3
       };

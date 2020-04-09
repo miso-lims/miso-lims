@@ -142,6 +142,11 @@ public class EditLibraryAliquotController {
       config.putPOJO("box", newBox);
       config.put("pageMode", "propagate");
     }
+
+    @Override
+    protected boolean isNewInterface() {
+      return true;
+    }
   }
 
   private final class BulkPropagateAliquotBackend extends BulkPropagateTableBackend<LibraryAliquot, LibraryAliquotDto> {
@@ -181,7 +186,7 @@ public class EditLibraryAliquotController {
       }
       dto.setBox(newBox);
       if (item.getConcentration() != null) {
-        dto.setConcentration(item.getConcentration().toString());
+        dto.setConcentration(LimsUtils.toNiceString(item.getConcentration()));
         dto.setConcentrationUnits(item.getConcentrationUnits());
       }
       return dto;
@@ -196,6 +201,11 @@ public class EditLibraryAliquotController {
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.putPOJO("box", newBox);
       config.put("pageMode", "propagate");
+    }
+
+    @Override
+    protected boolean isNewInterface() {
+      return true;
     }
   }
 
@@ -231,6 +241,11 @@ public class EditLibraryAliquotController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.put("pageMode", "edit");
+    }
+
+    @Override
+    protected boolean isNewInterface() {
+      return true;
     }
   };
 

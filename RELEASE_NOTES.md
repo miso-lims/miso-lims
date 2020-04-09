@@ -2,7 +2,7 @@
 
 Changes:
 
-
+  * Improved performance of bulk library aliquot pages
 
 # 1.4.0
 

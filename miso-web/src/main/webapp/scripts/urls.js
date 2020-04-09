@@ -234,6 +234,13 @@ Urls = (function() {
     removeUsers: middleIdUrlFunction(groupRestBase, '/users/remove')
   };
 
+  // Handsontables
+  var hotRestBase = restBase + '/hot';
+  rest.hot = {
+    bulkImport: hotRestBase + '/import',
+    bulkExport: hotRestBase + '/spreadsheet'
+  };
+
   // Index Distance Tool
   var indexDistanceRestBase = restBase + '/indexdistance';
   rest.indexDistance = {
@@ -394,7 +401,8 @@ Urls = (function() {
     bulkDelete: libraryAliquotRestBase + '/bulk-delete',
     spreadsheet: libraryAliquotRestBase + '/spreadsheet',
     parents: idUrlFunction(libraryAliquotRestBase + '/parents'),
-    children: idUrlFunction(libraryAliquotRestBase + '/children')
+    children: idUrlFunction(libraryAliquotRestBase + '/children'),
+    bulkSave: libraryAliquotRestBase + '/bulk'
   };
 
   // Library Designs
