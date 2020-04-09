@@ -58,9 +58,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListContainerView;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.PartitionSpreadsheets;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
+import uk.ac.bbsrc.tgac.miso.core.service.ListContainerViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -69,6 +71,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.ContainerDto;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.ListContainerViewDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
@@ -81,6 +84,8 @@ public class ContainerRestController extends RestController {
   @Autowired
   private ContainerService containerService;
   @Autowired
+  private ListContainerViewService listContainerViewService;
+  @Autowired
   private SequencingContainerModelService containerModelService;
   @Autowired
   private IndexChecker indexChecker;
@@ -88,16 +93,16 @@ public class ContainerRestController extends RestController {
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
 
-  private final JQueryDataTableBackend<SequencerPartitionContainer, ContainerDto> jQueryBackend = new JQueryDataTableBackend<SequencerPartitionContainer, ContainerDto>() {
+  private final JQueryDataTableBackend<ListContainerView, ListContainerViewDto> jQueryBackend = new JQueryDataTableBackend<ListContainerView, ListContainerViewDto>() {
 
     @Override
-    protected ContainerDto asDto(SequencerPartitionContainer model) {
-      return Dtos.asDto(model, indexChecker);
+    protected ListContainerViewDto asDto(ListContainerView model) {
+      return Dtos.asDto(model);
     }
 
     @Override
-    protected PaginatedDataSource<SequencerPartitionContainer> getSource() throws IOException {
-      return containerService;
+    protected PaginatedDataSource<ListContainerView> getSource() throws IOException {
+      return listContainerViewService;
     }
 
   };
@@ -110,13 +115,14 @@ public class ContainerRestController extends RestController {
 
   @GetMapping(value = "/dt", produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<ContainerDto> dataTable(HttpServletRequest request) throws IOException {
+  public DataTablesResponseDto<ListContainerViewDto> dataTable(HttpServletRequest request) throws IOException {
     return jQueryBackend.get(request, advancedSearchParser);
   }
 
   @GetMapping(value = "/dt/platform/{platform}", produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<ContainerDto> dataTableByPlatform(@PathVariable("platform") String platform, HttpServletRequest request)
+  public DataTablesResponseDto<ListContainerViewDto> dataTableByPlatform(@PathVariable("platform") String platform,
+      HttpServletRequest request)
       throws IOException {
     PlatformType platformType = PlatformType.valueOf(platform);
     if (platformType == null) {

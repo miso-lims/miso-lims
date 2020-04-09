@@ -24,13 +24,11 @@
 package uk.ac.bbsrc.tgac.miso.persistence;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
-import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 /**
  * Defines a DAO interface for storing SequencerPartitionContainers
@@ -38,26 +36,11 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
  * @author Rob Davey
  * @since 0.1.6
  */
-public interface SequencerPartitionContainerStore extends PaginatedDataSource<SequencerPartitionContainer> {
+public interface SequencerPartitionContainerStore {
 
   public SequencerPartitionContainer save(SequencerPartitionContainer container) throws IOException;
 
   public SequencerPartitionContainer get(long id) throws IOException;
-
-  public List<SequencerPartitionContainer> listAll() throws IOException;
-
-  public int count() throws IOException;
-
-  /**
-   * Get the SequencerPartitionContainer that contains a given {@link SequencerPoolPartition}
-   * 
-   * @param partitionId
-   *          of type long
-   * @return SequencerPartitionContainer
-   * @throws java.io.IOException
-   *           when
-   */
-  SequencerPartitionContainer getSequencerPartitionContainerByPartitionId(long partitionId) throws IOException;
 
   /**
    * List all SequencerPartitionContainers given a parent Run ID
@@ -92,20 +75,8 @@ public interface SequencerPartitionContainerStore extends PaginatedDataSource<Se
    */
   List<SequencerPartitionContainer> listSequencerPartitionContainersByBarcode(String barcode) throws IOException;
 
-  /**
-   * List all SequencerPoolPartitions that are contained by a given {@link SequencerPartitionContainer}
-   * 
-   * @param sequencerPartitionContainerId
-   *          of type long
-   * @return Collection<? extends SequencerPoolPartition>
-   * @throws java.io.IOException
-   *           when
-   */
-  Collection<Partition> listPartitionsByContainerId(long sequencerPartitionContainerId) throws IOException;
-
   Partition getPartitionById(long partitionId);
 
-  public void update(Partition partition);
   public PoreVersion getPoreVersion(long id);
 
   public List<PoreVersion> listPoreVersions();

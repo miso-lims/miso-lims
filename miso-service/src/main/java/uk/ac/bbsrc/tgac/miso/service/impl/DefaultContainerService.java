@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,14 +35,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
-import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.persistence.SequencerPartitionContainerStore;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultContainerService
-    implements ContainerService, PaginatedDataSource<SequencerPartitionContainer> {
+public class DefaultContainerService implements ContainerService {
+
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -60,12 +57,6 @@ public class DefaultContainerService
   @Override
   public AuthorizationManager getAuthorizationManager() {
     return authorizationManager;
-  }
-
-
-  @Override
-  public List<SequencerPartitionContainer> list() throws IOException {
-    return containerDao.listAll();
   }
 
   @Override
@@ -308,11 +299,6 @@ public class DefaultContainerService
   }
 
   @Override
-  public PoreVersion getPoreVersion(long id) throws IOException {
-    return containerDao.getPoreVersion(id);
-  }
-
-  @Override
   public List<PoreVersion> listPoreVersions() throws IOException {
     return containerDao.listPoreVersions();
   }
@@ -339,14 +325,4 @@ public class DefaultContainerService
     return result;
   }
 
-  @Override
-  public long count(Consumer<String> errorHandler, PaginationFilter... filter) throws IOException {
-    return containerDao.count(errorHandler, filter);
-  }
-
-  @Override
-  public List<SequencerPartitionContainer> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
-      PaginationFilter... filter) throws IOException {
-    return containerDao.list(errorHandler, offset, limit, sortDir, sortCol, filter);
-  }
 }
