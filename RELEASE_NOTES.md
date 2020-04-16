@@ -2,6 +2,7 @@
 
 Changes:
 
+  * Allow deleting transfers
   * Prevent double-clicking save button on forms
   * Fixed broken freezer map links
 
