@@ -31,20 +31,12 @@
 
   <security:global-method-security secured-annotations="enabled" jsr250-annotations="enabled" />
 
-  <!-- don't want to have a SS filter here as the userless REST auth should have taken care of that -->
-  <security:http pattern="/miso/rest/**" security="none" />
-
-  <security:http pattern="/styles/**" security="none" />
-  <security:http pattern="/scripts/**" security="none" />
-
   <bean id="successHandler" class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
     <property name="defaultTargetUrl" value="/miso/mainMenu" />
   </bean>
   <bean id="failureHandler" class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
     <property name="defaultFailureUrl" value="/miso/login?login_error=1" />
   </bean>
-
-  <security:http pattern="/images/**" security="none" />
   
   <bean id="loginUrlEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
     <constructor-arg value="/miso/login" />
@@ -67,20 +59,26 @@
     <property name="authenticationFailureHandler" ref="failureHandler" />
     <property name="rememberMeServices" ref="rememberMeServices" />
   </bean>
-
+  
   <security:http entry-point-ref="loginUrlEntryPoint">
     <security:access-denied-handler error-page="/miso/accessDenied"/>
     <security:csrf disabled="true" />
     
+    <!-- auth for REST requests is handled by RestSignatureFilter via web.xml -->
+    <security:intercept-url pattern="/miso/rest/**" access="permitAll" />
+    <security:intercept-url pattern="/styles/**" access="permitAll" />
+    <security:intercept-url pattern="/scripts/**" access="permitAll" />
+    <security:intercept-url pattern="/images/**" access="permitAll" />
     <security:intercept-url pattern="/miso/login" access="permitAll" />
     <security:intercept-url pattern="/miso/accessDenied" access="permitAll" />
     <security:intercept-url pattern="/miso/error" access="permitAll" />
     <security:intercept-url pattern="/miso/constants.js" access="permitAll" />
+    <security:intercept-url pattern="/metrics" access="permitAll" />
     <security:intercept-url pattern="/miso/admin/**" access="hasRole('ROLE_ADMIN')" />
     <security:intercept-url pattern="/miso/mainMenu" access="hasRole('ROLE_INTERNAL')" />
     <security:intercept-url pattern="/freezermaps/**" access="hasRole('ROLE_INTERNAL')" />
 
-    <security:intercept-url pattern="/miso/**" access="hasRole('ROLE_INTERNAL')" />
+    <security:intercept-url pattern="/**" access="hasRole('ROLE_INTERNAL')" />
     
     <security:custom-filter position="FORM_LOGIN_FILTER" ref="loginFilter"/>
     <security:remember-me services-ref="rememberMeServices" key="miso" />
