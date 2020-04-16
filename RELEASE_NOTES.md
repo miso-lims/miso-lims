@@ -2,9 +2,9 @@
 
 Changes:
 
+  * Prevent double-clicking save button on forms
 
-
-# 
+# 1.2.0 
 
 Changes:
 
