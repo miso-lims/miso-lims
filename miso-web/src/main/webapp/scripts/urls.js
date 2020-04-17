@@ -212,7 +212,7 @@ Urls = (function() {
   };
 
   // Freezer Maps
-  var freezerMapUiBase = '/freezermap';
+  var freezerMapUiBase = '/freezermaps';
   ui.freezerMaps = {
     view: function(filename, anchor) {
       return freezerMapUiBase + '/' + filename + (anchor ? '#' + anchor : '');
