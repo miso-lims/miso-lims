@@ -2,6 +2,7 @@
 
 Changes:
 
+  * Prevent double-clicking save button on forms
   * Fixed broken freezer map links
 
 # 1.2.0 

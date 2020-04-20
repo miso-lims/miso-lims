@@ -116,7 +116,7 @@ FormUtils = (function($) {
 
       writeGeneralValidationBox(container);
       var sections = getFilteredSections(target, config, object);
-      var form = makeFormObject(containerId, sections, object, target, config);
+      var form = makeFormObject(containerId, saveId, sections, object, target, config);
 
       sections.forEach(function(section) {
         writeSection(container, section, object, form);
@@ -124,6 +124,7 @@ FormUtils = (function($) {
 
       if (saveId) {
         $('#' + saveId).click(function() {
+          Utils.ui.setDisabled('#' + saveId, true);
           form.save();
         });
       }
@@ -323,10 +324,11 @@ FormUtils = (function($) {
     }
   };
 
-  function makeFormObject(containerId, sections, object, target, config) {
+  function makeFormObject(containerId, saveId, sections, object, target, config) {
     var form;
     var original = {};
     var otherChanges = false;
+    var saveButtonSelector = '#' + saveId;
 
     function updateOriginal() {
       otherChanges = false;
@@ -456,6 +458,9 @@ FormUtils = (function($) {
         validateAndSave(containerId, object, target, sections, config, function(data) {
           if (containerId !== dialogFormId) {
             updateOriginal();
+          }
+          if (saveButtonSelector !== null) {
+            Utils.ui.setDisabled(saveButtonSelector, false);
           }
           if (postSaveCallback) {
             postSaveCallback(data);
