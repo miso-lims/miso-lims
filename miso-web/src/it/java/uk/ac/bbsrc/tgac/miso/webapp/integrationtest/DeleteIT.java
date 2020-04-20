@@ -118,7 +118,7 @@ public class DeleteIT extends AbstractIT {
 
   @Test
   public void testDeleteTransfer() {
-    testDelete(ListTarget.TRANSFERS, Tabs.INTERNAL, "2", Columns.ID, Transfer.class, 2L);
+    testDelete(ListTarget.TRANSFERS, Tabs.RECEIPT, "2", Columns.ID, Transfer.class, 2L);
   }
 
   @Test
