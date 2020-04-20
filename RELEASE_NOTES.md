@@ -2,9 +2,9 @@
 
 Changes:
 
+  * Fixed broken freezer map links
 
-
-# 
+# 1.2.0 
 
 Changes:
 
