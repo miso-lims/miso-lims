@@ -60,6 +60,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
@@ -113,6 +114,11 @@ public class DeleteIT extends AbstractIT {
   @Test
   public void testDeleteBox() {
     testDelete(ListTarget.BOXES, null, "BOX501", Columns.NAME, BoxImpl.class, 501L);
+  }
+
+  @Test
+  public void testDeleteTransfer() {
+    testDelete(ListTarget.TRANSFERS, Tabs.RECEIPT, "2", Columns.ID, Transfer.class, 2L);
   }
 
   @Test

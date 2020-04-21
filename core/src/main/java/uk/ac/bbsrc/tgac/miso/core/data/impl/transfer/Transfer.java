@@ -23,6 +23,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLoggable;
+import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
@@ -30,7 +31,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.TransferChangeLog;
 
 @Entity
-public class Transfer implements Identifiable, ChangeLoggable, Serializable {
+public class Transfer implements Identifiable, ChangeLoggable, Deletable, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -230,6 +231,28 @@ public class Transfer implements Identifiable, ChangeLoggable, Serializable {
 
   public boolean isDistribution() {
     return getRecipient() != null;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Transfer";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    if (isReceipt()) {
+      return getDeleteDescription("Receipt", getSenderLab().getAlias(), getRecipientGroup().getName());
+    } else if (isDistribution()) {
+      return getDeleteDescription("Distribution", getSenderGroup().getName(), getRecipient());
+    } else {
+      return getDeleteDescription("Internal", getSenderGroup().getName(), getRecipientGroup().getName());
+    }
+  }
+
+  private String getDeleteDescription(String transferType, String sender, String recipient) {
+    int itemCount = getSampleTransfers().size() + getLibraryTransfers().size() + getLibraryAliquotTransfers().size()
+        + getPoolTransfers().size();
+    return String.format("%s: %s → %s (%d items)", transferType, sender, recipient, itemCount);
   }
 
 }
