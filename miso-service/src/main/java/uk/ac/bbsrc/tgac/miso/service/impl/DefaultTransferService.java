@@ -52,6 +52,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.TransferService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
+import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.SaveDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TransferStore;
@@ -87,6 +88,8 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
   private ChangeLogService changeLogService;
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private DeletionStore deletionStore;
 
   @Override
   public List<Transfer> list() throws IOException {
@@ -495,6 +498,21 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
     validateAddition(managedTransfer, transferSample);
     transferStore.update(managedTransfer);
     sampleService.update(managedSample);
+  }
+
+  @Override
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
+  }
+
+  @Override
+  public AuthorizationManager getAuthorizationManager() {
+    return authorizationManager;
+  }
+
+  @Override
+  public void authorizeDeletion(Transfer object) throws IOException {
+    authorizationManager.throwIfNonAdminOrMatchingOwner(object.getCreator());
   }
 
 }

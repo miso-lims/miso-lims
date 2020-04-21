@@ -3,6 +3,7 @@
 Changes:
 
   * Added "Transfer List V2" sample spreadsheet download format
+  * Allow deleting transfers
   * Prevent double-clicking save button on forms
   * Fixed broken freezer map links
 

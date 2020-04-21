@@ -1,6 +1,6 @@
 ListTarget.transfer = (function() {
   return {
-    name: "Transfers",
+    name: 'Transfers',
     getUserManualUrl: function() {
       return Urls.external.userManual('transfers');
     },
@@ -8,7 +8,7 @@ ListTarget.transfer = (function() {
       return Urls.rest.transfers.datatable(config.tab);
     },
     createBulkActions: function(config, projectId) {
-      return [];
+      return [ListUtils.createBulkDeleteAction('Transfers', 'transfers', getLabel)];
     },
     createStaticActions: function(config, projectId) {
       return [{
@@ -84,6 +84,20 @@ ListTarget.transfer = (function() {
 
   function makeSummary(value, total, pending) {
     return value + '/' + total + ' (' + pending + ' pending)';
+  }
+
+  function getLabel(transfer) {
+    if (transfer.senderLabLabel) {
+      return makeLabel('Receipt', transfer.senderLabLabel, transfer.recipientGroupName, transfer.items);
+    } else if (transfer.recipient) {
+      return makeLabel('Distribution', transfer.senderGroupName, transfer.recipient, transfer.items);
+    } else {
+      return makeLabel('Internal', transfer.senderGroupName, transfer.recipientGroupName, transfer.items);
+    }
+  }
+
+  function makeLabel(transferType, sender, recipient, itemCount) {
+    return transferType + ': ' + sender + ' → ' + recipient + ' (' + itemCount + ' items)';
   }
 
 })();

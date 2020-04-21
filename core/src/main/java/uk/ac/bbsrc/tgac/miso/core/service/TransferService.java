@@ -12,7 +12,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 
-public interface TransferService extends ListService<Transfer>, SaveService<Transfer> {
+public interface TransferService extends DeleterService<Transfer>, ListService<Transfer>, SaveService<Transfer> {
 
   public long countPendingForUser(User user) throws IOException;
 
