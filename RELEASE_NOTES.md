@@ -2,6 +2,7 @@
 
 Changes:
 
+  * Added "Custody" attribute to Pinery samples
   * Prevent double-clicking save button on forms
   * Fixed broken freezer map links
 
