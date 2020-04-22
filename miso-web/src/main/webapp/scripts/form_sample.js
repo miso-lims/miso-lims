@@ -96,10 +96,13 @@ FormTarget.sample = (function($) {
                   include: !config.detailedSample || object.sampleCategory !== 'Identity'
                 }, {
                   title: 'Scientific Name',
-                  data: 'scientificName',
-                  type: 'text',
-                  maxLength: 255,
-                  required: true
+                  data: 'scientificNameId',
+                  type: 'dropdown',
+                  required: true,
+                  source: Constants.scientificNames,
+                  sortSource: Utils.sorting.standardSort('alias'),
+                  getItemLabel: Utils.array.getAlias,
+                  getItemValue: Utils.array.getId
                 }, {
                   title: 'Accession',
                   data: 'accession',

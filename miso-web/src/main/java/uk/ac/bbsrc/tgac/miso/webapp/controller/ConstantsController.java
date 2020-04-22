@@ -85,6 +85,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.SampleGroupService;
 import uk.ac.bbsrc.tgac.miso.core.service.SamplePurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
+import uk.ac.bbsrc.tgac.miso.core.service.ScientificNameService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingControlTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
@@ -189,6 +190,8 @@ public class ConstantsController {
   @Autowired
   private SequencingControlTypeService sequencingControlTypeService;
   @Autowired
+  private ScientificNameService scientificNameService;
+  @Autowired
   private IndexChecker indexChecker;
 
   @Value("${miso.autoGenerateIdentificationBarcodes}")
@@ -281,6 +284,7 @@ public class ConstantsController {
       addJsonArray(mapper, node, "attachmentCategories", attachmentCategoryService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "runPurposes", runPurposeService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "sequencingControlTypes", sequencingControlTypeService.list(), Dtos::asDto);
+      addJsonArray(mapper, node, "scientificNames", scientificNameService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "sampleSheetFormats", Arrays.asList(SampleSheet.values()), SampleSheet::name);
 
       Collection<IndexFamily> indexFamilies = indexFamilyService.list();

@@ -874,6 +874,16 @@ public class ListTablesIT extends AbstractIT {
     testColumnsSort(ListTarget.SEQUENCING_CONTROL_TYPES);
   }
 
+  @Test
+  public void testListScientificNamesSetup() throws Exception {
+    testPageSetup(ListTarget.SCIENTIFIC_NAMES, Sets.newHashSet(Columns.ALIAS));
+  }
+
+  @Test
+  public void testListScientificNamesColumnSort() throws Exception {
+    testColumnsSort(ListTarget.SCIENTIFIC_NAMES);
+  }
+
   private void testPageSetup(String listTarget, Set<String> targetColumns) {
     testPageSetup(listTarget, targetColumns, false);
   }

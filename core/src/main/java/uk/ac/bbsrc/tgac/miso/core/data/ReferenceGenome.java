@@ -4,10 +4,10 @@ import java.io.Serializable;
 
 public interface ReferenceGenome extends Aliasable, Deletable, Serializable {
 
-  void setAlias(String alias);
+  public void setAlias(String alias);
 
-  String getDefaultSciName();
+  public ScientificName getDefaultScientificName();
 
-  void setDefaultSciName(String defaultSciName);
+  public void setDefaultScientificName(ScientificName defaultScientificName);
 
 }

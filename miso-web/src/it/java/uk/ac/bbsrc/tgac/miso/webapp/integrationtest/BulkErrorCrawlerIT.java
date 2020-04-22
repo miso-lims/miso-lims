@@ -68,6 +68,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("lab/list");
     slugs.add("arraymodel/list");
     slugs.add("partitionqctype/list");
+    slugs.add("scientificname/list");
     slugs.add("referencegenome/list");
     slugs.add("studytype/list");
     slugs.add("workstation/list");
@@ -203,6 +204,8 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("arraymodel/bulk/edit?ids=1");
     slugs.add("partitionqctype/bulk/new?quantity=3");
     slugs.add("partitionqctype/bulk/edit?ids=2%2C3");
+    slugs.add("scientificname/bulk/new?quantity=3");
+    slugs.add("scientificname/bulk/edit?ids=1%2C2%2C3");
     slugs.add("referencegenome/bulk/new?quantity=3");
     slugs.add("referencegenome/bulk/edit?ids=1%2C2%2C3");
     slugs.add("studytype/bulk/new?quantity=3");

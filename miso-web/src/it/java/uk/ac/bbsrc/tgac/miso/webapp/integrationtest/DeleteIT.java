@@ -23,6 +23,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
 import uk.ac.bbsrc.tgac.miso.core.data.Printer;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleType;
+import uk.ac.bbsrc.tgac.miso.core.data.ScientificName;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingControlType;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
@@ -270,6 +271,11 @@ public class DeleteIT extends AbstractIT {
   @Test
   public void testDeletePartitionQcType() {
     testAdminDelete(ListTarget.PARTITION_QC_TYPE, null, "Failed: Sasquatch Problem", Columns.DESCRIPTION, PartitionQCType.class, 3L);
+  }
+
+  @Test
+  public void testDeleteScientificName() {
+    testAdminDelete(ListTarget.SCIENTIFIC_NAMES, null, "Delete me", Columns.ALIAS, ScientificName.class, 3L);
   }
 
   @Test

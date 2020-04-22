@@ -64,7 +64,7 @@ public class SampleDto extends AbstractBoxableDto implements ReceivableDto<Sampl
   private String projectName;
   private String projectAlias;
   private String projectShortName;
-  private String scientificName;
+  private Long scientificNameId;
   private String taxonIdentifier;
   private Long rootSampleClassId;
   private String initialVolume;
@@ -258,12 +258,12 @@ public class SampleDto extends AbstractBoxableDto implements ReceivableDto<Sampl
     this.projectShortName = projectShortName;
   }
 
-  public String getScientificName() {
-    return scientificName;
+  public Long getScientificNameId() {
+    return scientificNameId;
   }
 
-  public void setScientificName(String scientificName) {
-    this.scientificName = scientificName;
+  public void setScientificNameId(Long scientificNameId) {
+    this.scientificNameId = scientificNameId;
   }
 
   public String getTaxonIdentifier() {

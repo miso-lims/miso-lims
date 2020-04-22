@@ -25,9 +25,10 @@ ListTarget.referencegenome = {
       iSortPriority: 1
     }, {
       sTitle: 'Default Scientific Name',
-      mData: 'defaultScientificName',
+      mData: 'defaultScientificNameId',
       include: true,
-      iSortPriority: 0
+      iSortPriority: 0,
+      mRender: ListUtils.render.textFromId(Constants.scientificNames, 'alias', 'n/a')
     }];
   }
 };

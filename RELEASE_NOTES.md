@@ -2,10 +2,26 @@
 
 Changes:
 
+  * Changed scientific names into a controlled options list
   * Added "Transfer List V2" sample spreadsheet download format
   * Allow deleting transfers
   * Prevent double-clicking save button on forms
   * Fixed broken freezer map links
+
+Upgrade Notes:
+
+  * This update changes scientific names into a controlled options list. A scientific name option
+    will be created for each unique scientific name in your database. You may want to clean up any
+    misspelled or similar values before running the migration to limit the options that are created.
+    You can use the following queries for this.
+
+    ```
+    -- Find all values
+    SELECT DISTINCT scientificName FROM Sample;
+
+    -- Correct values (substitute your own 'Good Value' and 'Bad Value')
+    UPDATE Sample SET scientificName = 'Good Value' WHERE scientificName = 'Bad Value';
+    ```
 
 # 1.2.0 
 

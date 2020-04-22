@@ -59,6 +59,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
+import uk.ac.bbsrc.tgac.miso.core.service.ScientificNameService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingControlTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.StainService;
 import uk.ac.bbsrc.tgac.miso.core.service.TransferService;
@@ -74,7 +75,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
-import uk.ac.bbsrc.tgac.miso.core.util.TaxonomyUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.DetailedQcStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
@@ -132,6 +132,8 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   @Autowired
   private SequencingControlTypeService sequencingControlTypeService;
   @Autowired
+  private ScientificNameService scientificNameService;
+  @Autowired
   private FileAttachmentService fileAttachmentService;
   @Autowired
   private TransferService transferService;
@@ -141,9 +143,6 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
 
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
-
-  @Value("${miso.taxonLookup.enabled:false}")
-  private boolean taxonLookupEnabled;
 
   private Boolean uniqueExternalNameWithinProjectRequired = true;
 
@@ -669,6 +668,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     if (sample.getProject() != null) {
       sample.setProject(projectStore.get(sample.getProject().getId()));
     }
+    loadChildEntity(sample::setScientificName, sample.getScientificName(), scientificNameService, "scientificNameId");
     loadChildEntity(sample::setSequncingControlType, sample.getSequencingControlType(), sequencingControlTypeService,
         "sequencingControlTypeId");
     if (isDetailedSample(sample)) {
@@ -798,11 +798,6 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     validateVolumeUnits(sample.getVolume(), sample.getVolumeUnits(), errors);
     validateBarcodeUniqueness(sample, beforeChange, sampleStore::getByBarcode, errors, "sample");
     validateUnboxableFields(sample, errors);
-
-    if (taxonLookupEnabled && (beforeChange == null || !sample.getScientificName().equals(beforeChange.getScientificName()))
-        && (sample.getScientificName() == null || TaxonomyUtils.checkScientificNameAtNCBI(sample.getScientificName()) == null)) {
-      errors.add(new ValidationError("scientificName", "This scientific name is not of a known taxonomy"));
-    }
 
     if (isDetailedSample(sample)) {
       validateReferenceSlide((DetailedSample) sample, errors);

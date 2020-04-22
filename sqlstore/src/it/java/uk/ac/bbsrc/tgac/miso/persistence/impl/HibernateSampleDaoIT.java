@@ -23,6 +23,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.ScientificName;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
@@ -54,7 +55,6 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
   @Test
   public void testListAll() throws IOException {
     Collection<Sample> samples = dao.listAll();
-    samples.iterator().next().getScientificName().equals("Homo sapiens");
     assertEquals(21, samples.size());
   }
 
@@ -66,7 +66,8 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
     sample.setAlias("alias32LK");
     sample.setProject(dao.get(1L).getProject());
     sample.setSampleType("GENOMIC");
-    sample.setScientificName("Homo Sapiens");
+    ScientificName scientificName = (ScientificName) currentSession().get(ScientificName.class, 1L);
+    sample.setScientificName(scientificName);
     User user = new UserImpl();
     user.setId(1L);
     Date now = new Date();

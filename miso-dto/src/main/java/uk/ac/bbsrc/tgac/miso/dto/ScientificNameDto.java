@@ -1,10 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-public class ReferenceGenomeDto {
+public class ScientificNameDto {
 
   private Long id;
   private String alias;
-  private Long defaultScientificNameId;
 
   public Long getId() {
     return id;
@@ -20,14 +19,6 @@ public class ReferenceGenomeDto {
 
   public void setAlias(String alias) {
     this.alias = alias;
-  }
-
-  public Long getDefaultScientificNameId() {
-    return defaultScientificNameId;
-  }
-
-  public void setDefaultScientificNameId(Long defaultScientificNameId) {
-    this.defaultScientificNameId = defaultScientificNameId;
   }
 
 }

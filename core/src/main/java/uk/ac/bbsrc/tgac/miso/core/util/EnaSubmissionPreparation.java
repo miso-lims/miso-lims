@@ -282,7 +282,7 @@ public class EnaSubmissionPreparation {
 
       Element sampleName = xml.getOwnerDocument().createElementNS(null, "SAMPLE_NAME");
       Element sampleScientificName = xml.getOwnerDocument().createElementNS(null, "SCIENTIFIC_NAME");
-      sampleScientificName.setTextContent(sample.getScientificName());
+      sampleScientificName.setTextContent(sample.getScientificName().getAlias());
       sampleName.appendChild(sampleScientificName);
 
       // 2/11/2011 Antony Colles moved IF !=null statement, to help produce valid submission XML.

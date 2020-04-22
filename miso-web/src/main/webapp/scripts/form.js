@@ -467,6 +467,10 @@ FormUtils = (function($) {
           } else {
             window.location.href = target.getEditUrl(data, config);
           }
+        }, function() {
+          if (saveButtonSelector !== null) {
+            Utils.ui.setDisabled(saveButtonSelector, false);
+          }
         }, form);
       }
     };
@@ -551,7 +555,7 @@ FormUtils = (function($) {
     return (changeOrder[a] || 0) - (changeOrder[b] || 0);
   }
 
-  function validateAndSave(containerId, object, target, sections, config, postSaveCallback, form) {
+  function validateAndSave(containerId, object, target, sections, config, postSaveCallback, invalidCallback, form) {
     var selector = '#' + containerId;
     Validate.removeValidation(selector + ' .form-control');
     Validate.cleanFields(selector);
@@ -581,7 +585,7 @@ FormUtils = (function($) {
       } else {
         saveCallback();
       }
-    });
+    }, invalidCallback);
   }
 
   function addValidation(containerId, field) {
