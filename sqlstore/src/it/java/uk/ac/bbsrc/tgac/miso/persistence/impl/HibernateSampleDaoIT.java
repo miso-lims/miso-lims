@@ -129,7 +129,7 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
     assertEquals("GENOMIC", sample.getSampleType());
     assertTrue(sample.getQcPassed());
     assertEquals("TEST_0002_Bn_P_nn_1-1_D_1", sample.getAlias());
-    assertEquals("Homo sapiens", sample.getScientificName());
+    assertEquals("Homo sapiens", sample.getScientificName().getAlias());
     assertNull(sample.getTaxonIdentifier());
   }
 

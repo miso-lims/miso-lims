@@ -506,7 +506,7 @@ INSERT INTO Sample (sampleId, project_projectId, name, alias, description, ident
   'IPOT_identity1', 'UNKNOWN', 'THIS_PROJECT');
 
 -- Tissues
-INSERT INTO Sample (sampleId, project_projectId, name, alias, description, identificationBarcode, sampleType, scientificName, volume, volumeUnits, concentration, concentrationUnits, qcPassed, creator, created, lastModifier, lastModified,
+INSERT INTO Sample (sampleId, project_projectId, name, alias, description, identificationBarcode, sampleType, scientificNameId, volume, volumeUnits, concentration, concentrationUnits, qcPassed, creator, created, lastModifier, lastModified,
   nonStandardAlias, isSynthetic, sampleClassId, parentId, siblingNumber, groupId, groupDescription, detailedQcStatusId, detailedQcStatusNote, archived, discriminator,
   tissueOriginId, tissueTypeId, secondaryIdentifier, labId, region, passageNumber, tubeNumber, timesReceived, tissueMaterialId) VALUES
 (2, 3, 'SAM2', 'TEST_0001_Bn_R_nn_1-1', 'Tissue', '22222', 'GENOMIC', 1, 30, 'MICROLITRES', NULL, NULL, 1, 1, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00',
@@ -538,7 +538,7 @@ INSERT INTO Sample (sampleId, project_projectId, name, alias, description, ident
   3, 2, NULL, NULL, NULL, NULL, 1, 1, NULL);
 
 -- Slides
-INSERT INTO Sample (sampleId, project_projectId, name, alias, description, identificationBarcode, sampleType, scientificName, volume, volumeUnits, concentration, concentrationUnits, qcPassed, creator, created, lastModifier, lastModified,
+INSERT INTO Sample (sampleId, project_projectId, name, alias, description, identificationBarcode, sampleType, scientificNameId, volume, volumeUnits, concentration, concentrationUnits, qcPassed, creator, created, lastModifier, lastModified,
   nonStandardAlias, isSynthetic, sampleClassId, parentId, siblingNumber, groupId, groupDescription, detailedQcStatusId, detailedQcStatusNote, archived, discriminator,
   initialSlides, slides) VALUES
 (3, 3, 'SAM3', 'TEST_0001_Bn_R_nn_1-1_SL01', 'Slide', '33333', 'GENOMIC', 1, NULL, NULL, NULL, NULL, 1, 1, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00',
@@ -549,7 +549,7 @@ INSERT INTO Sample (sampleId, project_projectId, name, alias, description, ident
   3, 3);
 
 -- Tissue Pieces
-INSERT INTO Sample (sampleId, project_projectId, name, alias, description, identificationBarcode, sampleType, scientificName, volume, volumeUnits, concentration, concentrationUnits, qcPassed, creator, created, lastModifier, lastModified,
+INSERT INTO Sample (sampleId, project_projectId, name, alias, description, identificationBarcode, sampleType, scientificNameId, volume, volumeUnits, concentration, concentrationUnits, qcPassed, creator, created, lastModifier, lastModified,
   nonStandardAlias, isSynthetic, sampleClassId, parentId, siblingNumber, groupId, groupDescription, detailedQcStatusId, detailedQcStatusNote, archived, discriminator,
   tissuePieceType, slidesConsumed) VALUES
 (4, 3, 'SAM4', 'TEST_0001_Bn_R_nn_1-1_C01', 'Curls', '44444', 'GENOMIC', 1, NULL, NULL, NULL, NULL, 1, 1, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00',
@@ -563,7 +563,7 @@ INSERT INTO Sample (sampleId, project_projectId, name, alias, description, ident
   1, 1);
 
 -- Stocks
-INSERT INTO Sample (sampleId, project_projectId, name, alias, description, identificationBarcode, sampleType, scientificName, volume, volumeUnits, concentration, concentrationUnits, qcPassed, creator, created, lastModifier, lastModified,
+INSERT INTO Sample (sampleId, project_projectId, name, alias, description, identificationBarcode, sampleType, scientificNameId, volume, volumeUnits, concentration, concentrationUnits, qcPassed, creator, created, lastModifier, lastModified,
   nonStandardAlias, isSynthetic, sampleClassId, parentId, siblingNumber, groupId, groupDescription, detailedQcStatusId, detailedQcStatusNote, archived, discriminator,
   strStatus, dnaseTreated) VALUES
 (6, 3, 'SAM6', 'TEST_0001_Bn_R_nn_1-1_D_S1', 'gDNA stock', '66666', 'GENOMIC', 1, NULL, NULL, NULL, NULL, 1, 1, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00',
@@ -604,7 +604,7 @@ INSERT INTO Sample (sampleId, project_projectId, name, alias, description, ident
   'NOT_SUBMITTED', 0);
 
 -- Aliquots
-INSERT INTO Sample (sampleId, project_projectId, name, alias, description, identificationBarcode, sampleType, scientificName, volume, volumeUnits, concentration, concentrationUnits, qcPassed, creator, created, lastModifier, lastModified,
+INSERT INTO Sample (sampleId, project_projectId, name, alias, description, identificationBarcode, sampleType, scientificNameId, volume, volumeUnits, concentration, concentrationUnits, qcPassed, creator, created, lastModifier, lastModified,
   nonStandardAlias, isSynthetic, sampleClassId, parentId, siblingNumber, groupId, groupDescription, detailedQcStatusId, detailedQcStatusNote, archived, discriminator,
   samplePurposeId) VALUES
 (8, 3, 'SAM8', 'TEST_0001_Bn_R_nn_1-1_D_1', 'gDNA aliquot', '88888', 'GENOMIC', 1, NULL, NULL,NULL, NULL,  1, 1, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00',

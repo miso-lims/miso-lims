@@ -177,7 +177,7 @@ public class PlainSampleITs extends AbstractIT {
     Map<String, String> attrs = new LinkedHashMap<>();
     attrs.put(LibColumns.SAMPLE_ALIAS, "PRO1_S1000_test");
     attrs.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
-    attrs.put(SamColumns.SCIENTIFIC_NAME, "Hank");
+    attrs.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
     attrs.put(SamColumns.PROJECT, "PRO1");
     attrs.put(LibColumns.RECEIVE_DATE, "2017-11-28");
     attrs.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
@@ -196,7 +196,7 @@ public class PlainSampleITs extends AbstractIT {
 
     attrs.forEach((k, v) -> table.enterText(k, 0, v));
     HandsOnTableSaveResult result = table.save();
-
+    System.out.println("##### SAVE RESULT:\n" + result.printSummary());
     assertTrue("Library save", result.getItemsSaved() == 1);
     assertTrue("Server errors", result.getServerErrors().isEmpty());
     assertTrue("Save errors", result.getSaveErrors().isEmpty());
