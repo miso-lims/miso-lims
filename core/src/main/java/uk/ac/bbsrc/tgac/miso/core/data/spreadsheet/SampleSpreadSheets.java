@@ -41,16 +41,8 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
 
   TRANSFER_LIST("Transfer List", //
       Arrays.asList(SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME), //
-      Column.forString("Alias", Sample::getAlias),
-      Column.forString("Type", detailedSample(SampleStock.class, (sam -> {
-        if (sam.getSampleClass().getAlias().contains("DNA")) {
-          return "DNA";
-        } else if (sam.getSampleClass().getAlias().contains("RNA")) {
-          return "RNA";
-        } else {
-          return "Other";
-        }
-      }), "Other")), //
+      Column.forString("Alias", Sample::getAlias), //
+      Column.forString("Type", dnaOrRna()), //
       Column.forString("External Identifier", detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
       Column.forBigDecimal("VOL (uL)", Sample::getVolume), //
       Column.forBigDecimal("[] (ng/uL)", Sample::getConcentration), //
@@ -63,17 +55,27 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forString("Group Description", effectiveGroupIdProperty(GroupIdentifiable::getGroupDescription)), //
       Column.forString("Barcode", Sample::getIdentificationBarcode)
   ), //
+
+  TRANSFER_LIST_V2("Transfer List V2", //
+      Arrays.asList(SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME), //
+      Column.forString("Alias", Sample::getAlias), //
+      Column.forString("Class", dnaOrRna()), //
+      Column.forString("Origin", detailedSample(SampleTissue.class, st -> st.getTissueOrigin().getAlias(), "")), //
+      Column.forString("Type", detailedSample(SampleTissue.class, st -> st.getTissueType().getAlias(), "")), //
+      Column.forString("Material",
+          detailedSample(SampleTissue.class, st -> st.getTissueMaterial() != null ? st.getTissueMaterial().getAlias() : "", "")), //
+      Column.forString("External Identifier", detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
+      Column.forBigDecimal("VOL (uL)", Sample::getInitialVolume), //
+      Column.forBigDecimal("[] (ng/uL)", Sample::getConcentration), //
+      Column.forBigDecimal("Total (ng)",
+          (sam -> (sam.getVolume() != null && sam.getConcentration() != null) ? sam.getVolume().multiply(sam.getConcentration()) : null)), //
+      Column.forString("Group ID", effectiveGroupIdProperty(GroupIdentifiable::getGroupId)), //
+      Column.forString("Group Description", effectiveGroupIdProperty(GroupIdentifiable::getGroupDescription)), //
+      Column.forString("Barcode", Sample::getIdentificationBarcode)
+  ), //
   INITIAL_EXTRACTION_YIELDS("Initial Extraction Yields List", //
       Arrays.asList(SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME), //
-      Column.forString("Alias", Sample::getAlias), Column.forString("Type", detailedSample(SampleStock.class, (sam -> {
-        if (sam.getSampleClass().getAlias().contains("DNA")) {
-          return "DNA";
-        } else if (sam.getSampleClass().getAlias().contains("RNA")) {
-          return "RNA";
-        } else {
-          return "Other";
-        }
-      }), "Other")), //
+      Column.forString("Alias", Sample::getAlias), Column.forString("Type", dnaOrRna()), //
       Column.forString("External Identifier", detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
       Column.forBigDecimal("VOL (uL)", Sample::getInitialVolume), //
       Column.forBigDecimal("[] (ng/uL)", Sample::getConcentration), //
@@ -138,7 +140,7 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forString("Notes",
           sam -> sam.getNotes() == null ? "" : sam.getNotes().stream().map(Note::getText).collect(Collectors.joining("; ")))
       );
-  
+
   private static <S extends DetailedSample, T> Function<Sample, T> detailedSample(Class<S> clazz, Function<S, T> function, T defaultValue) {
     return s -> {
       if (clazz.isInstance(s)) {
@@ -152,6 +154,18 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       }
       return defaultValue;
     };
+  }
+
+  private static Function<Sample, String> dnaOrRna() {
+    return detailedSample(SampleStock.class, sam -> {
+      if (sam.getSampleClass().getAlias().contains("DNA")) {
+        return "DNA";
+      } else if (sam.getSampleClass().getAlias().contains("RNA")) {
+        return "RNA";
+      } else {
+        return "Other";
+      }
+    }, "Other");
   }
 
   private static Function<Sample, String> effectiveGroupIdProperty(Function<GroupIdentifiable, String> getter) {

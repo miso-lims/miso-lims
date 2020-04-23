@@ -111,3 +111,11 @@ to move the box to another freezer, the next dialog will allow you to either sca
 location from a dropdown. Subsequent dialogs will allow you to select more specific locations. Once you have made all
 of your selections, the changes will all be applied. Be sure to click the "Save" button at the top right of the page
 if you are done making changes.
+
+
+
+## Deleting Transfers
+
+To delete transfers, go to the Transfers list, check the checkbox(es) next to the transfer(s) that you wish to delete,
+and click the "Delete" button in the toolbar at the top of the table. A transfer can only be deleted by its creator or
+a MISO administrator.
