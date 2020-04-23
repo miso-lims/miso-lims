@@ -2,6 +2,12 @@
 
 Changes:
 
+
+
+# 1.3.0
+
+Changes:
+
   * Added "Transfer List V2" sample spreadsheet download format
   * Added "Custody" attribute to Pinery samples
   * Allow deleting transfers
