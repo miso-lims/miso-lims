@@ -6,7 +6,9 @@ INSERT INTO User (userId, active, admin, fullName, internal, loginName, roles, p
 INSERT INTO ScientificName(scientificNameId, alias) VALUES
 (1, 'Homo sapiens'),
 (2, 'Mus musculus'),
-(3, 'Delete me');
+(3, 'Delete me'),
+(4, 'Panthera tigris altaica'),
+(5, 'Rattus rat');
 
 INSERT INTO SequencingControlType (sequencingControlTypeId, alias) VALUES
 (1, 'Positive'),
