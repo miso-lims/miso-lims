@@ -3,7 +3,13 @@
 Changes:
 
   * Changed scientific names into a controlled options list
+
+# 1.3.0
+
+Changes:
+
   * Added "Transfer List V2" sample spreadsheet download format
+  * Added "Custody" attribute to Pinery samples
   * Allow deleting transfers
   * Prevent double-clicking save button on forms
   * Fixed broken freezer map links

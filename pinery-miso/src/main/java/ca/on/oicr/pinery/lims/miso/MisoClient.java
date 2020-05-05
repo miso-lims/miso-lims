@@ -965,7 +965,8 @@ public class MisoClient implements Lims {
           return extractBigDecimalString(rs, getSqlKey());
         }
       }, //
-      SEQUENCING_CONTROL_TYPE("sequencing_control_type", "Sequencing Control Type");
+      SEQUENCING_CONTROL_TYPE("sequencing_control_type", "Sequencing Control Type"), //
+      CUSTODY("custody", "Custody");
 
       private final String sqlKey;
       private final String attributeKey;
