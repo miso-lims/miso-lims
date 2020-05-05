@@ -385,8 +385,10 @@ HotTarget.sample = (function() {
               var projectId = sam.projectId;
               if (flatProperty === 'projectAlias') {
                 // sample's project has changed
-                projectId = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.aliasPredicate(flat.projectAlias),
-                    config.projects), 'id');
+                var label = Constants.isDetailedSample ? 'shortName' : 'name';
+                projectId = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(project) {
+                  return project[label] === flat.projectAlias;
+                }, config.projects), 'id');
               }
               var subprojectsSource = Constants.subprojects.filter(function(subp) {
                 return subp.parentProjectId == projectId;

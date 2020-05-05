@@ -43,6 +43,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
+import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
@@ -62,6 +63,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.core.service.ScientificNameService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingControlTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.StainService;
+import uk.ac.bbsrc.tgac.miso.core.service.SubprojectService;
 import uk.ac.bbsrc.tgac.miso.core.service.TransferService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
@@ -79,7 +81,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.DetailedQcStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleStore;
-import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissuePieceTypeDao;
@@ -110,8 +111,6 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   @Autowired
   private DetailedQcStatusDao detailedQcStatusDao;
   @Autowired
-  private SubprojectDao subProjectDao;
-  @Autowired
   private SamplePurposeDao samplePurposeDao;
   @Autowired
   private TissueMaterialDao tissueMaterialDao;
@@ -137,6 +136,8 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   private FileAttachmentService fileAttachmentService;
   @Autowired
   private TransferService transferService;
+  @Autowired
+  private SubprojectService subprojectService;
 
   @Autowired
   private NamingSchemeHolder namingSchemeHolder;
@@ -178,8 +179,8 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     this.detailedQcStatusDao = detailedQcStatusDao;
   }
 
-  public void setSubProjectDao(SubprojectDao subProjectDao) {
-    this.subProjectDao = subProjectDao;
+  public void setSubprojectService(SubprojectService subprojectService) {
+    this.subprojectService = subprojectService;
   }
 
   public void setSamplePurposeDao(SamplePurposeDao samplePurposeDao) {
@@ -680,7 +681,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
         detailed.setDetailedQcStatus(detailedQcStatusDao.get(detailed.getDetailedQcStatus().getId()));
       }
       if (detailed.getSubproject() != null && detailed.getSubproject().isSaved()) {
-        detailed.setSubproject(subProjectDao.getSubproject(detailed.getSubproject().getId()));
+        detailed.setSubproject(subprojectService.get(detailed.getSubproject().getId()));
       }
       if (isTissueProcessingSample(detailed)) {
         if (detailed instanceof SampleSlide) {
@@ -800,6 +801,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     validateUnboxableFields(sample, errors);
 
     if (isDetailedSample(sample)) {
+      validateSubproject(sample, beforeChange, errors);
       validateReferenceSlide((DetailedSample) sample, errors);
     }
 
@@ -809,6 +811,21 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
+    }
+  }
+
+  private void validateSubproject(Sample sample, Sample beforeChange, List<ValidationError> errors) throws IOException {
+    DetailedSample detailed = (DetailedSample) sample;
+    DetailedSample beforeDetailed = beforeChange == null ? null : (DetailedSample) beforeChange;
+    if (isChanged(DetailedSample::getSubproject, detailed, beforeDetailed)
+        || isChanged(Sample::getProject, detailed, beforeDetailed)) {
+      Set<Subproject> subprojects = subprojectService.getByProjectId(detailed.getProject().getId());
+      if (!subprojects.isEmpty() && detailed.getSubproject() == null) {
+        errors.add(new ValidationError("subproject", "Subproject must be specified"));
+      }
+    }
+    if (detailed.getSubproject() != null && detailed.getSubproject().getParentProject().getId() != detailed.getProject().getId()) {
+      errors.add(new ValidationError("subproject", "Subproject does not belong to the selected project"));
     }
   }
 
