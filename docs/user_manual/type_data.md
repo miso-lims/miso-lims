@@ -23,6 +23,17 @@ To delete items, go to the list page, check the checkboxes beside the items you 
 
 
 
+## Scientific Names
+
+Scientific name is the species that a sample came from. These are intended to match the taxon names in the NCBI Taxonomy
+Database, and if taxon lookup is enabled for your site (See [Site Configuration](../site_configuration/#taxon-lookup),
+this will be enforced.
+
+MISO administrators can add, edit, and delete scientific names using the standard interface. A scientific name can only
+be deleted if it is not used by any existing samples, and is not the default scientific name for any reference genomes.
+
+
+
 ## Reference Genomes
 
 Reference genome refers to a file that sequenced data will be aligned to. This is set at the project level, and can be

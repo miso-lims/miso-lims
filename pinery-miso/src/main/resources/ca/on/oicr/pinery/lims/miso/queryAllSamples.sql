@@ -51,7 +51,7 @@ SELECT s.alias NAME
         ,NULL targeted_sequencing
         ,'Sample' miso_type
         ,s.preMigrationId premigration_id
-        ,s.scientificName organism
+        ,sn.alias organism
         ,subp.alias subproject
         ,COALESCE(IF(rcpt.excludeFromPinery, NULL, rcpt.institute), IF(la.excludeFromPinery, NULL, it.alias)) institute
         ,s.initialSlides slides
@@ -89,6 +89,7 @@ LEFT JOIN Lab la ON s.labId = la.labId
 LEFT JOIN Institute it ON la.instituteId = it.instituteId
 LEFT JOIN Sample refSlide ON refSlide.sampleId = s.referenceSlideId
 LEFT JOIN Stain stain ON stain.stainId = s.stain
+LEFT JOIN ScientificName sn ON sn.scientificNameId = s.scientificNameId
 LEFT JOIN (
     SELECT sqc.sample_sampleId, MAX(sqc.qcId) AS qcId
     FROM (

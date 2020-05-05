@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ReferenceGenomeService;
+import uk.ac.bbsrc.tgac.miso.core.service.ScientificNameService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
@@ -30,6 +31,9 @@ public class DefaultReferenceGenomeService implements ReferenceGenomeService {
 
   @Autowired
   private DeletionStore deletionStore;
+
+  @Autowired
+  private ScientificNameService scientificNameService;
 
   @Override
   public DeletionStore getDeletionStore() {
@@ -63,6 +67,8 @@ public class DefaultReferenceGenomeService implements ReferenceGenomeService {
   @Override
   public long create(ReferenceGenome reference) throws IOException {
     authorizationManager.throwIfNonAdmin();
+    ValidationUtils.loadChildEntity(reference::setDefaultScientificName, reference.getDefaultScientificName(), scientificNameService,
+        "defaultScientificNameId");
     validateChange(reference, null);
     return referenceGenomeDao.create(reference);
   }
@@ -70,13 +76,15 @@ public class DefaultReferenceGenomeService implements ReferenceGenomeService {
   @Override
   public long update(ReferenceGenome reference) throws IOException {
     authorizationManager.throwIfNonAdmin();
+    ValidationUtils.loadChildEntity(reference::setDefaultScientificName, reference.getDefaultScientificName(), scientificNameService,
+        "defaultScientificNameId");
     ReferenceGenome managed = get(reference.getId());
     validateChange(reference, managed);
     applyChanges(managed, reference);
     return referenceGenomeDao.update(managed);
   }
 
-  private void validateChange(ReferenceGenome reference, ReferenceGenome beforeChange) {
+  private void validateChange(ReferenceGenome reference, ReferenceGenome beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
 
     if (ValidationUtils.isSetAndChanged(ReferenceGenome::getAlias, reference, beforeChange)
@@ -91,7 +99,7 @@ public class DefaultReferenceGenomeService implements ReferenceGenomeService {
 
   private void applyChanges(ReferenceGenome to, ReferenceGenome from) {
     to.setAlias(from.getAlias());
-    to.setDefaultSciName(from.getDefaultSciName());
+    to.setDefaultScientificName(from.getDefaultScientificName());
   }
 
   @Override

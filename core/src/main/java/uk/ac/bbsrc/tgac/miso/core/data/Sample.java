@@ -92,7 +92,7 @@ public interface Sample extends Attachable, Comparable<Sample>, Deletable, Hiera
    * 
    * @return String scientificName.
    */
-  public String getScientificName();
+  public ScientificName getScientificName();
 
   /**
    * Sets the scientificName of this Sample object. This should ideally match a taxon name of a species in the NCBI Taxonomy database.
@@ -100,7 +100,7 @@ public interface Sample extends Attachable, Comparable<Sample>, Deletable, Hiera
    * @param scientificName
    *          scientificName.
    */
-  public void setScientificName(String scientificName);
+  public void setScientificName(ScientificName scientificName);
 
   /**
    * Returns the taxonIdentifier of this Sample object. This should ideally match a taxon ID of a strain in the NCBI Taxonomy database.

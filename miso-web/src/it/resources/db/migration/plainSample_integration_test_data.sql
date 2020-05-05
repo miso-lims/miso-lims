@@ -9,6 +9,10 @@ INSERT INTO _Group (groupId, description, name) VALUES
 INSERT INTO User_Group (users_userId, groups_groupId)
 VALUES (3,1),(3,2),(1,1);
 
+INSERT INTO ScientificName(scientificNameId, alias) VALUES
+(1, 'Homo sapiens'),
+(2, 'Triticum aestivum');
+
 INSERT INTO StudyType (typeId, name) VALUES
 (1,'Other'),
 (12,'RNASeq'),
@@ -155,8 +159,8 @@ INSERT INTO Study (studyId, name, project_projectId, alias, studyTypeId, creator
 (1, 'STU1',  1, 'PLAIN Study One', 1, 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00');
 
 INSERT INTO Sample (sampleId, name, alias, description, identificationBarcode, sampleType, project_projectId,
-scientificName, volume, qcPassed, lastModifier, creator, created, lastModified, discriminator) VALUES
-(1, 'SAM1', 'PLAIN_S0001_1', 'Plain', 'SAM1::PLAIN_S0001_first', 'GENOMIC', 1, 'Triticum aestivum', NULL, 1, 1, 1, '2017-07-20 09:00:00', '2017-07-20 09:00:00', 'Sample');
+scientificNameId, volume, qcPassed, lastModifier, creator, created, lastModified, discriminator) VALUES
+(1, 'SAM1', 'PLAIN_S0001_1', 'Plain', 'SAM1::PLAIN_S0001_first', 'GENOMIC', 1, 2, NULL, 1, 1, 1, '2017-07-20 09:00:00', '2017-07-20 09:00:00', 'Sample');
 
 INSERT INTO Institute(instituteId, alias, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 'University Health Network',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00');

@@ -30,6 +30,10 @@ public class Pluralizer {
     return pluralize(count, "freezer", "freezers");
   }
 
+  public static String genomes(long count) {
+    return pluralize(count, "genome", "genomes");
+  }
+
   public static String groups(long count) {
     return pluralize(count, "group", "groups");
   }

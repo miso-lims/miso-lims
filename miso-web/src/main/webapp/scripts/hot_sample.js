@@ -410,23 +410,20 @@ HotTarget.sample = (function() {
                   Constants.subprojects), 'id');
             }
           },
-          HotUtils.makeColumnForText('Sci. Name', true, 'scientificName', {
-            validator: HotUtils.validator.requiredTextNoSpecialChars,
-            unpack: function(obj, flat, setCellMeta) {
-              flat.scientificName = obj.scientificName || config.defaultSciName || null;
-            },
-            depends: 'projectAlias',
-            update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
-              if (config.projects) {
-                var project = config.projects.find(function(proj) {
-                  return proj.shortName == flat.projectAlias;
-                });
-                if (project && project.defaultSciName) {
-                  setData(project.defaultSciName);
+          HotUtils.makeColumnForConstantsList('Sci. Name', true, 'scientificName', 'scientificNameId', 'id', 'alias',
+              Constants.scientificNames, true, {
+                depends: 'projectAlias',
+                update: function(sam, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+                  if (config.projects) {
+                    var project = config.projects.find(function(proj) {
+                      return proj.shortName == flat.projectAlias;
+                    });
+                    if (project && project.defaultSciName) {
+                      setData(project.defaultSciName);
+                    }
+                  }
                 }
-              }
-            }
-          }),
+              }, null, null, config.defaultSciName),
 
           // Detailed Sample
           // Identity columns

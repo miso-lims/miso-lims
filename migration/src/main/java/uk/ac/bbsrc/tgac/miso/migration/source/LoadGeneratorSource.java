@@ -29,6 +29,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.ScientificName;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
@@ -84,6 +85,7 @@ public class LoadGeneratorSource implements MigrationSource {
   private static final String OPT_SAMPLECLASS_TISSUE = "source.load-generator.tissueSampleClassId";
   private static final String OPT_SAMPLECLASS_STOCK = "source.load-generator.stockSampleClassId";
   private static final String OPT_SAMPLECLASS_ALIQUOT = "source.load-generator.aliquotSampleClassId";
+  private static final String OPT_SCIENTIFIC_NAME = "source.load-generator.scientificNameId";
   private static final String OPT_TISSUE_ORIGIN = "source.load-generator.tissueOriginId";
   private static final String OPT_TISSUE_TYPE = "source.load-generator.tissueTypeId";
   private static final String OPT_LIBRARY_TYPE = "source.load-generator.libraryTypeId";
@@ -110,6 +112,7 @@ public class LoadGeneratorSource implements MigrationSource {
   private final long tissueSampleClassId;
   private final long stockSampleClassId;
   private final long aliquotSampleClassId;
+  private final ScientificName scientificName = new ScientificName();
   private final long tissueOriginId;
   private final long tissueTypeId;
   private final long libraryTypeId;
@@ -148,6 +151,7 @@ public class LoadGeneratorSource implements MigrationSource {
     this.tissueSampleClassId = properties.getRequiredLong(OPT_SAMPLECLASS_TISSUE);
     this.stockSampleClassId = properties.getRequiredLong(OPT_SAMPLECLASS_STOCK);
     this.aliquotSampleClassId = properties.getRequiredLong(OPT_SAMPLECLASS_ALIQUOT);
+    this.scientificName.setId(properties.getRequiredLong(OPT_SCIENTIFIC_NAME));
     this.tissueOriginId = properties.getRequiredLong(OPT_TISSUE_ORIGIN);
     this.tissueTypeId = properties.getRequiredLong(OPT_TISSUE_TYPE);
     this.libraryTypeId = properties.getRequiredLong(OPT_LIBRARY_TYPE);
@@ -248,7 +252,6 @@ public class LoadGeneratorSource implements MigrationSource {
 
   private static final String ZERO_STRING = "0";
   private static final String IDENTITY_DESC = "identity";
-  private static final String SCIENTIFIC_NAME = "test";
 
   private SampleIdentity createIdentity(SampleClass sampleClass, Project project, int identityNum) {
     SampleIdentity sample = new SampleIdentityImpl();
@@ -260,7 +263,7 @@ public class LoadGeneratorSource implements MigrationSource {
     sample.setDescription(IDENTITY_DESC);
     sample.setSampleType(DEFAULT_SAMPLE_TYPE);
     sample.setProject(project);
-    sample.setScientificName(SCIENTIFIC_NAME);
+    sample.setScientificName(scientificName);
     sample.setSampleClass(sampleClass);
     sample.setExternalName(sample.getAlias());
 
@@ -274,7 +277,7 @@ public class LoadGeneratorSource implements MigrationSource {
     sample.setDescription(TISSUE_DESC);
     sample.setSampleType(DEFAULT_SAMPLE_TYPE);
     sample.setProject(project);
-    sample.setScientificName(SCIENTIFIC_NAME);
+    sample.setScientificName(scientificName);
     sample.setSampleClass(sampleClass);
     TissueOrigin to = new TissueOriginImpl();
     to.setId(tissueOriginId);
@@ -296,7 +299,7 @@ public class LoadGeneratorSource implements MigrationSource {
     sample.setDescription(STOCK_DESC);
     sample.setSampleType(DEFAULT_SAMPLE_TYPE);
     sample.setProject(project);
-    sample.setScientificName(SCIENTIFIC_NAME);
+    sample.setScientificName(scientificName);
     sample.setSampleClass(sampleClass);
     sample.setParent(parent);
     sample.setSiblingNumber(siblingNumber);
@@ -310,7 +313,7 @@ public class LoadGeneratorSource implements MigrationSource {
     sample.setDescription(ALIQUOT_DESC);
     sample.setSampleType(DEFAULT_SAMPLE_TYPE);
     sample.setProject(project);
-    sample.setScientificName(SCIENTIFIC_NAME);
+    sample.setScientificName(scientificName);
     sample.setQcPassed(true);
     sample.setSampleClass(sampleClass);
     sample.setParent(parent);

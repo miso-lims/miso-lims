@@ -479,7 +479,9 @@ public class EditSampleController {
       if (LimsUtils.isDetailedSample(item)) {
         DetailedSample sample = (DetailedSample) item;
         DetailedSampleDto dto = EditSampleController.getCorrectDetailedSampleDto(targetSampleClass);
-        dto.setScientificName(sample.getScientificName());
+        if (sample.getScientificName() != null) {
+          dto.setScientificNameId(sample.getScientificName().getId());
+        }
         dto.setSampleType(sample.getSampleType());
         dto.setParentId(sample.getId());
         dto.setParentAlias(sample.getAlias());
@@ -562,8 +564,8 @@ public class EditSampleController {
         config.put(Config.DEFAULT_SCI_NAME, defaultSciName);
       } else {
         config.putPOJO("project", Dtos.asDto(project));
-        if (project.getReferenceGenome() != null && project.getReferenceGenome().getDefaultSciName() != null) {
-          config.put(Config.DEFAULT_SCI_NAME, project.getReferenceGenome().getDefaultSciName());
+        if (project.getReferenceGenome() != null && project.getReferenceGenome().getDefaultScientificName() != null) {
+          config.put(Config.DEFAULT_SCI_NAME, project.getReferenceGenome().getDefaultScientificName().getAlias());
         } else {
           config.put(Config.DEFAULT_SCI_NAME, defaultSciName);
         }

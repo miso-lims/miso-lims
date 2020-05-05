@@ -12,6 +12,7 @@ DELETE FROM Box;
 DELETE FROM SequencerPartitionContainer_Partition;
 DELETE FROM _Partition;
 DELETE FROM Run_SequencerPartitionContainer;
+DELETE FROM ScientificName;
 DELETE FROM SequencerPartitionContainerChangeLog;
 DELETE FROM SequencerPartitionContainer;
 DELETE FROM SequencingContainerModel_InstrumentModel;
@@ -88,6 +89,9 @@ INSERT INTO `_Group` (groupId, description, name) VALUES
 
 INSERT INTO `User_Group` (`users_userId`, `groups_groupId`)
 VALUES (1,1);
+
+INSERT INTO ScientificName(scientificNameId, alias) VALUES
+(1, 'Homo sapiens');
 
 INSERT INTO InstrumentModel (instrumentModelId, platform, alias, numContainers, instrumentType) VALUES
   (1, 'ILLUMINA', 'Illumina HiSeq 2500', 1, 'SEQUENCER'),

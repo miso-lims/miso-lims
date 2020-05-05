@@ -84,6 +84,7 @@ DELETE FROM SamplePurpose;
 DELETE FROM SampleQC;
 DELETE FROM SampleType;
 DELETE FROM SampleValidRelationship;
+DELETE FROM ScientificName;
 DELETE FROM SequencerPartitionContainer;
 DELETE FROM SequencerPartitionContainerChangeLog;
 DELETE FROM SequencerPartitionContainer_Partition;

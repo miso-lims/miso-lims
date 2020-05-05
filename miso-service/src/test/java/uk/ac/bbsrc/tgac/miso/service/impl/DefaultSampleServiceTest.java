@@ -34,6 +34,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
+import uk.ac.bbsrc.tgac.miso.core.data.ScientificName;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
@@ -49,6 +50,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
+import uk.ac.bbsrc.tgac.miso.core.service.ScientificNameService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
@@ -106,6 +108,8 @@ public class DefaultSampleServiceTest {
   private NamingScheme namingScheme;
   @Mock
   private BoxService boxService;
+  @Mock
+  private ScientificNameService scientificNameService;
 
   @InjectMocks
   private DefaultSampleService sut;
@@ -399,7 +403,7 @@ public class DefaultSampleServiceTest {
     updated.setDescription("newDesc");
     updated.setSampleType("newType");
     updated.setQcPassed(true);
-    updated.setScientificName("newSciName");
+    updated.setScientificName(mockScientificName(2L, "newSciName"));
     updated.setTaxonIdentifier("newTaxonId");
     updated.setVolume(new BigDecimal("5.5"));
     updated.setVolumeUnits(VolumeUnit.MICROLITRES);
@@ -579,7 +583,8 @@ public class DefaultSampleServiceTest {
   private SampleTissue makeUnsavedChildTissue() throws IOException {
     SampleTissue sample = makeUnsavedParentTissue();
     sample.setSampleType("type");
-    sample.setScientificName("scientific");
+    ScientificName sn = mockScientificName(1L, "scientific");
+    sample.setScientificName(sn);
     mockShellProjectWithRealLookup(sample);
     return sample;
   }
@@ -597,7 +602,7 @@ public class DefaultSampleServiceTest {
   private SampleStock makeUnsavedChildStock() throws IOException {
     SampleStock sample = new SampleStockImpl();
     sample.setSampleType("type");
-    sample.setScientificName("scientific");
+    sample.setScientificName(mockScientificName(1L, "scientific"));
     sample.setLastModifier(mockUser());
     sample.setSampleClass(new SampleClassImpl());
     sample.getSampleClass().setId(30L);
@@ -645,6 +650,14 @@ public class DefaultSampleServiceTest {
     Mockito.when(authorizationManager.getCurrentUser()).thenReturn(user);
     Mockito.when(securityStore.getUserById(user.getId())).thenReturn(user);
     return user;
+  }
+
+  private ScientificName mockScientificName(long id, String alias) throws IOException {
+    ScientificName sn = new ScientificName();
+    sn.setId(id);
+    sn.setAlias(alias);
+    Mockito.when(scientificNameService.get(id)).thenReturn(sn);
+    return sn;
   }
 
   @Test

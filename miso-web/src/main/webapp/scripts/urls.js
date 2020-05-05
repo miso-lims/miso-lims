@@ -609,7 +609,7 @@ Urls = (function() {
   };
 
   // Reference Genomes
-  var referenceGenomeUiBase = baseUrl + '/refernecegenome';
+  var referenceGenomeUiBase = baseUrl + '/referencegenome';
   ui.referenceGenomes = {
     bulkEdit: referenceGenomeUiBase + '/bulk/edit'
   };
@@ -715,6 +715,18 @@ Urls = (function() {
   rest.sampleTypes = {
     create: sampleTypeRestBase,
     update: idUrlFunction(sampleTypeRestBase)
+  };
+
+  // Scientific Names
+  var scientificNameUiBase = baseUrl + '/scientificname';
+  ui.scientificNames = {
+    bulkEdit: scientificNameUiBase + '/bulk/edit'
+  };
+
+  var scientificNameRestBase = restBase + '/scientificnames';
+  rest.scientificNames = {
+    create: scientificNameRestBase,
+    update: idUrlFunction(scientificNameRestBase)
   };
 
   // Sequencing Control Types

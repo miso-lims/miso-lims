@@ -91,6 +91,7 @@
       <a href="<c:url value="/miso/lab/list"/>">Labs</a>
       <a href="<c:url value="/miso/arraymodel/list"/>">Array Models</a>
       <a href="<c:url value="/miso/partitionqctype/list"/>">Partition QC Types</a>
+      <a href="<c:url value="/miso/scientificname/list"/>">Scientific Names</a>
       <a href="<c:url value="/miso/referencegenome/list"/>">Reference Genomes</a>
       <a href="<c:url value="/miso/studytype/list"/>">Study Types</a>
       <a href="<c:url value="/miso/workstation/list"/>">Workstations</a>

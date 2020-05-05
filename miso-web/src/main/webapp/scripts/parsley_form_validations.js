@@ -39,7 +39,7 @@ var Validate = Validate || {
     });
   },
 
-  updateWarningOrSubmit: function(formSelector, extraValidationsFunction, submitMethod) {
+  updateWarningOrSubmit: function(formSelector, extraValidationsFunction, submitMethod, invalidCallback) {
     jQuery(formSelector).parsley().whenValidate().done(function() {
       jQuery(formSelector + ' .bs-callout-warning').addClass('hidden');
       // submit if form is valid
@@ -54,6 +54,9 @@ var Validate = Validate || {
       }
     }).fail(function() {
       jQuery(formSelector + ' .bs-callout-warning').removeClass('hidden');
+      if (invalidCallback) {
+        invalidCallback();
+      }
       return false;
     });
   },

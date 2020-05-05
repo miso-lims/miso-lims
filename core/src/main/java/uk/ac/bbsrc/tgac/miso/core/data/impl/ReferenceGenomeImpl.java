@@ -5,12 +5,15 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
+import uk.ac.bbsrc.tgac.miso.core.data.ScientificName;
 
 @Entity
 @Table(name = "ReferenceGenome")
@@ -27,7 +30,9 @@ public class ReferenceGenomeImpl implements ReferenceGenome {
   @Column(unique = true, nullable = false)
   private String alias;
 
-  private String defaultSciName;
+  @ManyToOne
+  @JoinColumn(name = "defaultScientificNameId")
+  private ScientificName defaultScientificName;
 
   @Override
   public long getId() {
@@ -73,13 +78,13 @@ public class ReferenceGenomeImpl implements ReferenceGenome {
   }
 
   @Override
-  public String getDefaultSciName() {
-    return defaultSciName;
+  public ScientificName getDefaultScientificName() {
+    return defaultScientificName;
   }
 
   @Override
-  public void setDefaultSciName(String defaultSciName) {
-    this.defaultSciName = defaultSciName;
+  public void setDefaultScientificName(ScientificName defaultSciName) {
+    this.defaultScientificName = defaultSciName;
   }
 
   @Override

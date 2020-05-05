@@ -96,7 +96,8 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
     assertEntityAttribute(SamColumns.ID_BARCODE, attributes, sample,
         s -> s.getIdentificationBarcode() == null ? "" : s.getIdentificationBarcode());
     assertEntityAttribute(SamColumns.SAMPLE_TYPE, attributes, sample, Sample::getSampleType);
-    assertEntityAttribute(SamColumns.SCIENTIFIC_NAME, attributes, sample, Sample::getScientificName);
+    assertEntityAttribute(SamColumns.SCIENTIFIC_NAME, attributes, sample,
+        s -> s.getScientificName() == null ? "" : s.getScientificName().getAlias());
     assertEntityAttribute(SamColumns.BOX_ALIAS, attributes, sample, s -> s.getBox() == null ? "" : s.getBox().getAlias());
     assertEntityAttribute(SamColumns.BOX_POSITION, attributes, sample, s -> s.getBoxPosition() == null ? "" : s.getBoxPosition());
     if (attributes.containsKey(SamColumns.RECEIVE_DATE)) {

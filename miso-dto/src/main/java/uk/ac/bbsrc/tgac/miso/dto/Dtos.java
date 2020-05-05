@@ -102,6 +102,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleType;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
+import uk.ac.bbsrc.tgac.miso.core.data.ScientificName;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingControlType;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
@@ -474,7 +475,7 @@ public class Dtos {
     dto.setProjectName(from.getProject().getName());
     dto.setProjectAlias(from.getProject().getAlias());
     dto.setProjectShortName(from.getProject().getShortName());
-    dto.setScientificName(from.getScientificName());
+    setId(dto::setScientificNameId, from.getScientificName());
     dto.setTaxonIdentifier(from.getTaxonIdentifier());
     setString(dto::setInitialVolume, from.getInitialVolume());
     setString(dto::setVolume, from.getVolume());
@@ -847,7 +848,7 @@ public class Dtos {
     to.setLocationBarcode(nullifyStringIfBlank(from.getLocationBarcode()));
     to.setSampleType(from.getSampleType());
     to.setQcPassed(from.getQcPassed());
-    to.setScientificName(from.getScientificName());
+    setObject(to::setScientificName, ScientificName::new, from.getScientificNameId());
     to.setTaxonIdentifier(from.getTaxonIdentifier());
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
@@ -2458,7 +2459,8 @@ public class Dtos {
     setObject(dto::setStatus, from.getStatus(), (progress) -> progress.getKey());
     if (from.getReferenceGenome() != null) {
       dto.setReferenceGenomeId(from.getReferenceGenome().getId());
-      dto.setDefaultSciName(from.getReferenceGenome().getDefaultSciName());
+      setString(dto::setDefaultSciName, maybeGetProperty(from.getReferenceGenome().getDefaultScientificName(),
+          ScientificName::getAlias));
     }
     setId(dto::setDefaultTargetedSequencingId, from.getDefaultTargetedSequencing());
     setBoolean(dto::setClinical, from.isClinical(), false);
@@ -2936,7 +2938,7 @@ public class Dtos {
     ReferenceGenomeDto dto = new ReferenceGenomeDto();
     setLong(dto::setId, from.getId(), true);
     setString(dto::setAlias, from.getAlias());
-    setString(dto::setDefaultScientificName, from.getDefaultSciName());
+    setId(dto::setDefaultScientificNameId, from.getDefaultScientificName());
     return dto;
   }
 
@@ -2944,7 +2946,7 @@ public class Dtos {
     ReferenceGenome to = new ReferenceGenomeImpl();
     setLong(to::setId, from.getId(), false);
     setString(to::setAlias, from.getAlias());
-    setString(to::setDefaultSciName, from.getDefaultScientificName());
+    setObject(to::setDefaultScientificName, ScientificName::new, from.getDefaultScientificNameId());
     return to;
   }
 
@@ -4094,6 +4096,20 @@ public class Dtos {
       setLong(to::setLastSequencerId, maybeGetProperty(lastRun.getSequencer(), ListContainerRunSequencerView::getId), true);
       setString(to::setLastSequencerName, maybeGetProperty(lastRun.getSequencer(), ListContainerRunSequencerView::getName));
     }
+    return to;
+  }
+
+  public static ScientificNameDto asDto(@Nonnull ScientificName from) {
+    ScientificNameDto to = new ScientificNameDto();
+    setLong(to::setId, from.getId(), true);
+    setString(to::setAlias, from.getAlias());
+    return to;
+  }
+
+  public static ScientificName to(@Nonnull ScientificNameDto from) {
+    ScientificName to = new ScientificName();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setAlias, from.getAlias());
     return to;
   }
 

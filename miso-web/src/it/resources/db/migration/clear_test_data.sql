@@ -117,4 +117,5 @@ DELETE FROM StudyType;
 DELETE FROM TissuePieceType;
 DELETE FROM Workstation;
 DELETE FROM SequencingControlType;
+DELETE FROM ScientificName;
 SET FOREIGN_KEY_CHECKS=1;

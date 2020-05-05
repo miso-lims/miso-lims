@@ -860,7 +860,7 @@ public class BulkLibraryIT extends AbstractIT {
 
   private void assertParentSampleAttributes(Map<String, String> attributes, DetailedLibrary library) {
     testLibraryAttribute(SamColumns.SAMPLE_TYPE, attributes, library, lib -> lib.getSample().getSampleType());
-    testLibraryAttribute(SamColumns.SCIENTIFIC_NAME, attributes, library, lib -> lib.getSample().getScientificName());
+    testLibraryAttribute(SamColumns.SCIENTIFIC_NAME, attributes, library, lib -> lib.getSample().getScientificName().getAlias());
     testLibraryAttribute(SamColumns.PROJECT, attributes, library, lib -> lib.getSample().getProject().getShortName());
     testLibraryAttribute(SamColumns.EXTERNAL_NAME, attributes, library, lib -> identityGetter.apply(lib).getExternalName());
     testLibraryAttribute(SamColumns.DONOR_SEX, attributes, library, lib -> identityGetter.apply(lib).getDonorSex().getLabel());

@@ -14,11 +14,12 @@ HotTarget.referencegenome = {
   fixUp: function(referencegenome, errorHandler) {
   },
   createColumns: function(config, create, data) {
-    return [HotUtils.makeColumnForText('Alias', true, 'alias', {
-      validator: HotUtils.validator.requiredText
-    }), HotUtils.makeColumnForText('Default Sci. Name', true, 'defaultScientificName', {
-      validator: HotUtils.validator.optionalTextNoSpecialChars
-    })];
+    return [
+        HotUtils.makeColumnForText('Alias', true, 'alias', {
+          validator: HotUtils.validator.requiredText
+        }),
+        HotUtils.makeColumnForConstantsList('Default Sci. Name', true, 'defaultScientificName', 'defaultScientificNameId', 'id', 'alias',
+            Constants.scientificNames, false)];
   },
 
   getBulkActions: function(config) {

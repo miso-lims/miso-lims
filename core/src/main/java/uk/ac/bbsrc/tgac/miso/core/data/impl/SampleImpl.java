@@ -72,6 +72,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.ScientificName;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingControlType;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
@@ -116,7 +117,11 @@ public class SampleImpl extends AbstractBoxable implements Sample {
   private String name;
   private String alias;
   private String description;
-  private String scientificName;
+
+  @ManyToOne
+  @JoinColumn(name = "scientificNameId")
+  private ScientificName scientificName;
+
   private String taxonIdentifier;
   private String sampleType;
   private Boolean qcPassed;
@@ -294,12 +299,12 @@ public class SampleImpl extends AbstractBoxable implements Sample {
   }
 
   @Override
-  public String getScientificName() {
+  public ScientificName getScientificName() {
     return scientificName;
   }
 
   @Override
-  public void setScientificName(String scientificName) {
+  public void setScientificName(ScientificName scientificName) {
     this.scientificName = scientificName;
   }
 

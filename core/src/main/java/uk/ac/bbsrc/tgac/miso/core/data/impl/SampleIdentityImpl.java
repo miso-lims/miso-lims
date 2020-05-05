@@ -17,6 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
+import uk.ac.bbsrc.tgac.miso.core.data.ScientificName;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -89,7 +90,7 @@ public class SampleIdentityImpl extends DetailedSampleImpl implements SampleIden
     private String description;
     private String sampleType;
     private Project project;
-    private String scientificName;
+    private ScientificName scientificName;
 
     private String externalName;
     private DonorSex donorSex;
@@ -130,7 +131,7 @@ public class SampleIdentityImpl extends DetailedSampleImpl implements SampleIden
       return this;
     }
 
-    public IdentityBuilder scientificName(String scientificName) {
+    public IdentityBuilder scientificName(ScientificName scientificName) {
       this.scientificName = scientificName;
       return this;
     }
@@ -153,7 +154,7 @@ public class SampleIdentityImpl extends DetailedSampleImpl implements SampleIden
     public Sample build() {
       checkArgument(project != null, "A Project must be provided to create a Sample.");
       checkArgument(!LimsUtils.isStringEmptyOrNull(sampleType), "Must provide a sampleType to create a Sample");
-      checkArgument(!LimsUtils.isStringEmptyOrNull(scientificName), "Must provide a scientificName to create a Sample");
+      checkArgument(scientificName != null, "Must provide a scientificName to create a Sample");
       checkArgument(rootSampleClass != null, "A root SampleClass must be provided to create an Identity Sample.");
 
       SampleIdentityImpl i = new SampleIdentityImpl();

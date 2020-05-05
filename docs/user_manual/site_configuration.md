@@ -57,9 +57,9 @@ Both validation and alias generation must be configured by your MISO administrat
 
 ## Taxon Lookup
 
-A [NCBI](https://www.ncbi.nlm.nih.gov/) service may be used to validate the scientific name entered for samples to
-ensure that the name is entered correctly. If this is enabled, you will not be able to save a sample until a valid
-scientific name is entered. You can browse the taxonomy database using NCBI's
+A [NCBI](https://www.ncbi.nlm.nih.gov/) service may be used to validate scientific names to ensure that the name is
+entered correctly. If this is enabled, you will not be able to save a scientific name unless it matches a species in
+the taxonomy database. You can browse the taxonomy database using NCBI's
 [Taxonomy Browser](https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi).
 
 
