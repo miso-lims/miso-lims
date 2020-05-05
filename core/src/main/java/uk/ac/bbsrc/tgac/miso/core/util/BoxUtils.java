@@ -4,6 +4,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 
 /**
  * Utility class to provide helpful functions for Box-related methods in MISO
@@ -164,6 +165,15 @@ public class BoxUtils {
     return makeLocationLabel(boxable.isDiscarded(),
         boxable.isDistributed(),
         boxable.getLocationBarcode(),
+        boxable.getBoxAlias(),
+        boxable.getBoxPosition(),
+        boxable.getBoxLocationBarcode());
+  }
+
+  public static String makeLocationLabel(PoolableElementView boxable) {
+    return makeLocationLabel(boxable.isDiscarded(),
+        boxable.isDistributed(),
+        null,
         boxable.getBoxAlias(),
         boxable.getBoxPosition(),
         boxable.getBoxLocationBarcode());
