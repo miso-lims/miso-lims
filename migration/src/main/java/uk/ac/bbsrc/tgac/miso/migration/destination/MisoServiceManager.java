@@ -95,6 +95,7 @@ import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSequencingOrderService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultStudyService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultStudyTypeService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSubprojectService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultTargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultUserService;
 
@@ -129,7 +130,7 @@ public class MisoServiceManager {
     addDependency(DefaultSampleService.class, HibernateSamplePurposeDao.class, DefaultSampleService::setSamplePurposeDao);
     addDependency(DefaultSampleService.class, DefaultSampleValidRelationshipService.class,
         DefaultSampleService::setSampleValidRelationshipService);
-    addDependency(DefaultSampleService.class, HibernateSubprojectDao.class, DefaultSampleService::setSubProjectDao);
+    addDependency(DefaultSampleService.class, DefaultSubprojectService.class, DefaultSampleService::setSubprojectService);
     addDependency(DefaultSampleService.class, HibernateTissueMaterialDao.class, DefaultSampleService::setTissueMaterialDao);
     addDependency(DefaultSampleService.class, HibernateTissueOriginDao.class, DefaultSampleService::setTissueOriginDao);
     addDependency(DefaultSampleService.class, HibernateTissueTypeDao.class, DefaultSampleService::setTissueTypeDao);
