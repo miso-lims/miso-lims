@@ -51,6 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.core.service.ScientificNameService;
+import uk.ac.bbsrc.tgac.miso.core.service.SubprojectService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
@@ -61,7 +62,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.SampleGroupDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SecurityStore;
-import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueTypeDao;
@@ -93,7 +93,7 @@ public class DefaultSampleServiceTest {
   @Mock
   private DetailedQcStatusDao detailedQcStatusDao;
   @Mock
-  private SubprojectDao subProjectDao;
+  private SubprojectService subProjectService;
   @Mock
   private SecurityStore securityStore;
   @Mock
