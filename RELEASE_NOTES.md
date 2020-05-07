@@ -3,6 +3,7 @@
 Changes:
 
   * Changed scientific names into a controlled options list
+  * Fixed missing locations on Library Aliquots list page
   * Fixed subproject options not showing up for some projects on bulk Create/Edit Samples page
   * Fixed subproject validation - if a project has subprojects, its samples must be assigned subprojects
 
