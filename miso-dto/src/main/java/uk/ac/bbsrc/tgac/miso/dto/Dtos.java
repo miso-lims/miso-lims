@@ -1700,6 +1700,7 @@ public class Dtos {
     dto.setLastModified(formatDateTime(from.getLastModified()));
     dto.setCreationDate(formatDate(from.getCreated()));
     dto.setIdentificationBarcode(from.getAliquotBarcode());
+    dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
     dto.setIndexIds(
         from.getIndices().stream().sorted(Comparator.comparingInt(Index::getPosition)).map(Index::getId).collect(Collectors.toList()));
     dto.setIndexLabels(from.getIndices().stream().sorted(Comparator.comparingInt(Index::getPosition)).map(Index::getLabel)

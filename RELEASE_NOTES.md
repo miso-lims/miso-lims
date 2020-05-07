@@ -3,6 +3,7 @@
 Changes:
 
   * Changed scientific names into a controlled options list
+  * Fixed missing locations on Library Aliquots list page
 
 # 1.3.0
 

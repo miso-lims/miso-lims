@@ -56,26 +56,23 @@ public class PoolableElementView implements Identifiable, Serializable, Comparab
   private LibraryAliquot aliquot;
 
   private String aliquotName;
-
   private String aliquotAlias;
-
   private Integer aliquotDnaSize;
-
   private BigDecimal aliquotConcentration;
 
   @Enumerated(EnumType.STRING)
   private ConcentrationUnit aliquotConcentrationUnits;
 
   private String aliquotBarcode;
-
   private BigDecimal aliquotVolume;
 
   @Enumerated(EnumType.STRING)
   private VolumeUnit aliquotVolumeUnits;
 
   private BigDecimal aliquotNgUsed;
-
   private BigDecimal aliquotVolumeUsed;
+  private boolean discarded;
+  private boolean distributed;
 
   @ManyToOne
   @JoinColumn(name = "libraryDesignCodeId")
@@ -90,23 +87,14 @@ public class PoolableElementView implements Identifiable, Serializable, Comparab
   private Date created;
 
   private Long libraryId;
-
   private String libraryName;
-
   private String libraryAlias;
-
   private String libraryDescription;
-
   private String libraryBarcode;
-
   private boolean libraryPaired;
-
   private boolean libraryLowQuality;
-  
   private Boolean libraryQcPassed;
-
   private String librarySelectionType;
-
   private String libraryStrategyType;
 
   // Note: @LazyToOne used because setting FetchType.LAZY prevents extensions from loading (DetailedSample)
@@ -116,15 +104,10 @@ public class PoolableElementView implements Identifiable, Serializable, Comparab
   private Sample sample;
 
   private Long sampleId;
-
   private String sampleName;
-
   private String sampleAlias;
-
   private String sampleDescription;
-
   private String sampleAccession;
-
   private String sampleType;
 
   @ManyToOne
@@ -132,17 +115,11 @@ public class PoolableElementView implements Identifiable, Serializable, Comparab
   private SequencingControlType sampleSequencingControlType;
 
   private Long projectId;
-
   private String projectName;
-
   private String projectShortName;
-
   private String projectAlias;
-
   private Long subprojectId;
-
   private String subprojectAlias;
-
   private Boolean subprojectPriority;
 
   @ManyToOne(targetEntity = UserImpl.class)
@@ -154,14 +131,11 @@ public class PoolableElementView implements Identifiable, Serializable, Comparab
   private User lastModifier;
 
   private Long targetedSequencingId;
-
   private String boxAlias;
-
   private String boxName;
-
   private String boxIdentificationBarcode;
-
   private String boxLocationBarcode;
+  private String boxPosition;
 
   @Enumerated(EnumType.STRING)
   private PlatformType platformType;
@@ -594,6 +568,22 @@ public class PoolableElementView implements Identifiable, Serializable, Comparab
     this.aliquotVolumeUnits = aliquotVolumeUnits;
   }
 
+  public boolean isDiscarded() {
+    return discarded;
+  }
+
+  public void setDiscarded(boolean discarded) {
+    this.discarded = discarded;
+  }
+
+  public boolean isDistributed() {
+    return distributed;
+  }
+
+  public void setDistributed(boolean distributed) {
+    this.distributed = distributed;
+  }
+
   public String getBoxAlias() {
     return boxAlias;
   }
@@ -624,6 +614,14 @@ public class PoolableElementView implements Identifiable, Serializable, Comparab
 
   public void setBoxLocationBarcode(String boxLocationBarcode) {
     this.boxLocationBarcode = boxLocationBarcode;
+  }
+
+  public String getBoxPosition() {
+    return boxPosition;
+  }
+
+  public void setBoxPosition(String boxPosition) {
+    this.boxPosition = boxPosition;
   }
 
   /**
