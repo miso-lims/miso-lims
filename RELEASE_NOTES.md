@@ -13,16 +13,6 @@ Changes:
   * Fixed subproject options not showing up for some projects on bulk Create/Edit Samples page
   * Fixed subproject validation - if a project has subprojects, its samples must be assigned subprojects
 
-# 1.3.0
-
-Changes:
-
-  * Added "Transfer List V2" sample spreadsheet download format
-  * Added "Custody" attribute to Pinery samples
-  * Allow deleting transfers
-  * Prevent double-clicking save button on forms
-  * Fixed broken freezer map links
-
 Upgrade Notes:
 
   * This update changes scientific names into a controlled options list. A scientific name option
@@ -37,6 +27,16 @@ Upgrade Notes:
     -- Correct values (substitute your own 'Good Value' and 'Bad Value')
     UPDATE Sample SET scientificName = 'Good Value' WHERE scientificName = 'Bad Value';
     ```
+
+# 1.3.0
+
+Changes:
+
+  * Added "Transfer List V2" sample spreadsheet download format
+  * Added "Custody" attribute to Pinery samples
+  * Allow deleting transfers
+  * Prevent double-clicking save button on forms
+  * Fixed broken freezer map links
 
 # 1.2.0 
 
