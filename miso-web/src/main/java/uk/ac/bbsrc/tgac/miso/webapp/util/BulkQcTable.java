@@ -42,8 +42,8 @@ public abstract class BulkQcTable extends BulkTableBackend<QcDto> {
                 .flatMap(WhineyFunction.rethrow(this::load))
                 .sorted(new Comparator<QcDto>() {
                   @Override
-                  public int compare(QcDto qcDto, QcDto t1) {
-                    return qcDto.getEntityAlias().compareTo(t1.getEntityAlias());
+                  public int compare(QcDto o1, QcDto o2) {
+                    return o1.getEntityAlias().compareTo(o2.getEntityAlias());
                   }
                 })
                 .collect(Collectors.toList()));
