@@ -2,7 +2,7 @@
 
 Changes:
 
-
+  * Bulk adding QCs now sorted by alias
 
 # 1.4.0
 
