@@ -40,12 +40,7 @@ public abstract class BulkQcTable extends BulkTableBackend<QcDto> {
     return prepare(model, create, verb + " " + qcTarget + " QCs",
         LimsUtils.parseIds(idString).stream()
                 .flatMap(WhineyFunction.rethrow(this::load))
-                .sorted(new Comparator<QcDto>() {
-                  @Override
-                  public int compare(QcDto o1, QcDto o2) {
-                    return o1.getEntityAlias().compareTo(o2.getEntityAlias());
-                  }
-                })
+                .sorted(Comparator.comparing(QcDto::getEntityAlias))
                 .collect(Collectors.toList()));
   }
 
