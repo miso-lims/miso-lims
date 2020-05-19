@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.util;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -37,8 +38,10 @@ public abstract class BulkQcTable extends BulkTableBackend<QcDto> {
   public final ModelAndView display(String idString, ModelMap model) throws IOException {
 
     return prepare(model, create, verb + " " + qcTarget + " QCs",
-        LimsUtils.parseIds(idString).stream().flatMap(WhineyFunction.rethrow(this::load))
-            .collect(Collectors.toList()));
+        LimsUtils.parseIds(idString).stream()
+                .flatMap(WhineyFunction.rethrow(this::load))
+                .sorted(Comparator.comparing(QcDto::getEntityAlias))
+                .collect(Collectors.toList()));
   }
 
   protected abstract Stream<QcDto> load(long ownerId) throws IOException;
