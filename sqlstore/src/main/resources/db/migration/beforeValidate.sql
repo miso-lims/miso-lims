@@ -11,6 +11,8 @@ BEGIN
   IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = (SELECT DATABASE()) AND table_name = 'flyway_schema_history') THEN
     -- V0800 was altered to remove use of a stored procedure that no longer exists
     UPDATE flyway_schema_history SET checksum = 1064873732 WHERE version = '0800' AND checksum = -1786810864;
+    -- V1000 was altered to fix an infinite loop when running on plain sample databases
+    UPDATE flyway_schema_history SET checksum = 330422399 WHERE version = '1000' AND checksum = 2041083449;
   END IF;
 END//
 
