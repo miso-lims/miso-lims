@@ -102,7 +102,11 @@ BEGIN
   DECLARE vTissueId bigint(20);
   SET vTissueId = pSampleId;
   WHILE vTissueId IS NOT NULL AND NOT EXISTS (SELECT sampleId FROM SampleTissue WHERE sampleId = vTissueId AND labId IS NOT NULL) DO
-    SELECT parentId INTO vTissueId FROM DetailedSample WHERE sampleId = vTissueId;
+    IF EXISTS (SELECT sampleId FROM DetailedSample WHERE sampleId = vTissueId) THEN
+      SELECT parentId INTO vTissueId FROM DetailedSample WHERE sampleId = vTissueId;
+    ELSE
+      SET vTissueId = NULL;
+    END IF;
   END WHILE;
   RETURN vTissueId;
 END//
