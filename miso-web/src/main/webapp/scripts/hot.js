@@ -842,12 +842,14 @@ var HotUtils = {
                               }
                             }
                             // set values from spreadsheet
+                            var changes = [];
                             columnData.forEach(function(column) {
                               var columnIndex = hotHeaders.indexOf(column.heading);
                               for (var rowIndex = 0; rowIndex < column.data.length; rowIndex++) {
-                                table.setDataAtCell(rowIndex, columnIndex, column.data[rowIndex], 'CopyPaste.paste');
+                                changes.push([rowIndex, columnIndex, column.data[rowIndex]]);
                               }
                             });
+                            table.setDataAtCell(changes, 'CopyPaste.paste');
                           }).fail(function(xhr, textStatus, errorThrown) {
                         dialog.dialog("close");
                         Utils.showAjaxErrorDialog(xhr, textStatus, errorThrown);

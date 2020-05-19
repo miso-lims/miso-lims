@@ -3,6 +3,7 @@
 Changes:
 
   * Bulk adding QCs now sorted by alias
+  * Improved performance of bulk table import function
   * Fixed V1000 migration hanging on plain sample databases
 
 # 1.4.0
