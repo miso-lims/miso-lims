@@ -234,6 +234,25 @@ var HotUtils = {
     });
     var anyInvalidCells = false;
     var sortFunctions = {};
+    var sortEmptyLast = function(sortOrder, sortNonEmpty) {
+      return function(value, nextValue) {
+        var val = null;
+        if (value) {
+          val = nextValue ? sortNonEmpty(value, nextValue) : -1;
+        } else if (nextValue) {
+          val = 1;
+        } else {
+          val = 0;
+        }
+        if (sortOrder === 'desc') {
+          val = val * -1;
+        }
+        return val;
+      };
+    };
+    var defaultSort = function(value, nextValue) {
+      return value.localeCompare(nextValue);
+    };
     var table = new Handsontable(hotContainer, {
       licenseKey: 'non-commercial-and-evaluation',
       fixedColumnsLeft: target.hasOwnProperty('getFixedColumns') ? target.getFixedColumns(config) : 1,
@@ -251,9 +270,7 @@ var HotUtils = {
       renderAllRows: true,
       columnSorting: {
         compareFunctionFactory: function(sortOrder, columnMeta) {
-          return sortFunctions[columnMeta.data] || function(value, nextValue) {
-            return value.localeCompare(nextValue);
-          };
+          return sortEmptyLast(sortOrder, sortFunctions[columnMeta.data] || defaultSort);
         }
       },
       cells: function(row, col, prop) {

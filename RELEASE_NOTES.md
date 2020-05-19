@@ -4,6 +4,7 @@ Changes:
 
   * Bulk adding QCs now sorted by alias
   * Improved performance of bulk table import function
+  * Fixed sorting bulk tables on columns containing empty cells
   * Fixed V1000 migration hanging on plain sample databases
 
 # 1.4.0
