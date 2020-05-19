@@ -2,14 +2,21 @@ BulkUtils = (function($) {
 
   /*
    * BulkTarget structure: {
-   *   getSaveUrl: required function() returning url for bulk save. POST is used for create and PUT for edits
-   *   getUserManualUrl: optional (recommended) function() returning url of specific user manual page to set on 'Help' link
-   *   getCustomActions: optional function() returning array of Custom Actions (see below) to make available while editing
-   *   getBulkActions: optional function(config) returning array of Bulk Actions (see below) to make available after successful save
-   *   getFixedColumns: optional function(config) returning int. Number of columns to freeze. Default: 0
+   *   getSaveUrl: required function() returning url for bulk save. POST is used for create and PUT
+   *       for edits
+   *   getUserManualUrl: optional (recommended) function() returning url of specific user manual
+   *       page to set on 'Help' link
+   *   getCustomActions: optional function() returning array of Custom Actions (see below) to make
+   *       available on the bulk edit page while editing
+   *   getBulkActions: optional function(config) returning array of Bulk Actions (see below) to
+   *       make available after successful save
+   *   getFixedColumns: optional function(config) returning int. Number of columns to freeze.
+   *       Default: 0
    *   getColumns: required function(config, limitedApi) returning array of columns (see below)
-   *   prepareData: optional function(data); allows manipulating source data prior to table creation
-   *   confirmSave: optional function(data) returning promise. Resolve promise to allow save, or fail to cancel
+   *   prepareData: optional function(data); allows manipulating source data prior to table
+   *       creation
+   *   confirmSave: optional function(data) returning promise. Resolve promise to allow save, or
+   *       fail to cancel
    * }
    * 
    * Custom Action structure: {
@@ -28,31 +35,38 @@ BulkUtils = (function($) {
    *   title: required string; column heading
    *   type: required string (text|read-only|int|decimal|date|dropdown); type of field
    *   data: required string; JSON property to use for value
-   *   getDisplayValue: optional function(object) returning string; generate a value to display in a read-only field instead of the
-   *       data value
+   *   getDisplayValue: optional function(object) returning string; generate a value to display in
+   *       a read-only field instead of the data value
    *   include: optional boolean (default: true); determines whether the column is displayed
-   *   omit: optional boolean (default: false); determines whether field is saved. Field is saved by default. If true, the data property
-   *       doesn't need to exist in the JSON, and won't be updated even if it does
-   *   source: array of objects or function(data, limitedApi); required for dropdown fields; Provides dropdown options
+   *   omit: optional boolean (default: false); determines whether field is saved. Field is saved
+   *       by default. If true, the data property doesn't need to exist in the JSON, and won't be
+   *       updated even if it does
+   *   source: array of objects or function(data, limitedApi); required for dropdown fields;
+   *       Provides dropdown options
    *   sortSource: optional function(a, b); sort function for dropdown options
-   *   getItemLabel: function(item) returning string; get the label for a dropdown option. If omitted and the item is a string, it is
-   *       used as the label; otherwise, an error is thrown
-   *   getItemValue: function(item) returning string; get the value for a dropdown option. If omitted, the item is used as the value
-   *   validationCache: optional string for dropdown columns; if set, any key found in the named cache will be marked valid
+   *   getItemLabel: function(item) returning string; get the label for a dropdown option. If
+   *       omitted and the item is a string, it is used as the label; otherwise, an error is thrown
+   *   getItemValue: function(item) returning string; get the value for a dropdown option. If
+   *       omitted, the item is used as the value
+   *   validationCache: optional string for dropdown columns; if set, any key found in the named
+   *       cache will be marked valid
    *   required: optional boolean (default: false); whether the field is required
    *   maxLength: optional integer; maximum number of characters for text input
    *   regex: optional regex string; validation regex for text input
-   *   initial: optional string; value to initialize field value to when missing. Affects new items only unless initializeOnEdit is set
-   *       to true
-   *   initializeOnEdit: optional boolean (default: false); if true, the initial value will also be used when editing existing items
+   *   initial: optional string; value to initialize field value to when missing. Affects new items
+   *       only unless initializeOnEdit is set to true
+   *   initializeOnEdit: optional boolean (default: false); if true, the initial value will also be
+   *       used when editing existing items
    *   min: optional int/decimal; minimum value for int or decimal input
    *   max: optional int/decimal; maximum value for int or decimal input
-   *   precision: optional int (default: 21); maximum precision (length, excluding the decimal) for decimal input
+   *   precision: optional int (default: 21); maximum precision (length, excluding the decimal) for
+   *       decimal input
    *   scale: optional int (default: 17); maximum scale (decimal places) for decimal input
-   *   onChange: function(rowIndex, newValue, api); action to take when the field is modified. See API object below
+   *   onChange: function(rowIndex, newValue, api); action to take when the field is modified. See
+   *       API object below
    *   sortable: optional boolean (default: true); whether the data can be sorted by this column
-   *   customSorting: optional array of custom sorts (see below); sorting configuration. Default will sort alphabetically with empty
-   *       values at the bottom
+   *   customSorting: optional array of custom sorts (see below); sorting configuration. Default
+   *       will sort alphabetically with empty values at the bottom
    * }
    * 
    * Custom Sort object: {
@@ -62,12 +76,18 @@ BulkUtils = (function($) {
    * 
    * API object: {
    *   getCache: function(cacheName); retrieve a named cache. Available in limited API
-   *   showError: function(message); display an error message above the table. Available in limited API
+   *   showError: function(message); display an error message above the table. Available in limited
+   *       API
    *   getRowCount: function()
    *   getValue: function(rowIndex, dataProperty)
    *   updateField: function(rowIndex, dataProperty, options). options may include
+   *       * 'value' (string)
    *       * 'source' (array of objects)
-   *   updateData: function(changes); update fields in bulk. Use this rather than multiple updateField calls to improve performance. changes is an array of arrays where the inner arrays have three elements - rowIndex, dataProperty, and newValue
+   *       * 'required' (boolean)
+   *       * 'disabled' (boolean)
+   *   updateData: function(changes); update fields in bulk. Use this rather than multiple
+   *       updateField calls to improve performance. changes is an array of arrays where the inner
+   *       arrays have three elements - rowIndex, dataProperty, and newValue
    * }
    * 
    */
