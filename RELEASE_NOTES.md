@@ -2,6 +2,7 @@
 
 Changes:
 
+  * Increased pool alias length limit from 50 to 255
   * Bulk adding QCs now sorted by alias
   * Improved performance of bulk table import function
   * Fixed sorting bulk tables on columns containing empty cells

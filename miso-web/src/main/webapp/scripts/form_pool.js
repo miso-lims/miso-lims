@@ -38,7 +38,7 @@ FormTarget.pool = (function($) {
           data: 'alias',
           type: 'text',
           required: true,
-          maxLength: 50
+          maxLength: 255
         }, {
           title: 'Description',
           data: 'description',
