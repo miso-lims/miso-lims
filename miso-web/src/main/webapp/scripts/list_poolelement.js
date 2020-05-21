@@ -59,54 +59,12 @@ ListTarget.poolelement = {
     }];
   },
   createStaticActions: function(config, projectId) {
-    return [{
-      name: 'Add',
-      handler: function() {
-        Utils.showDialog("Add Aliquots", "Search", [{
-          label: "Names, Aliases, or Barcodes",
-          type: "textarea",
-          property: "names",
-          rows: 15,
-          cols: 40,
-          required: true
-        }], function(result) {
-          var names = result.names.split(/[ \t\r\n]+/).filter(function(name) {
-            return name.length > 0;
-          });
-          if (names.length == 0) {
-            return;
-          }
-          Utils.ajaxWithDialog('Searching', 'POST', Urls.rest.libraryAliquots.query, names, function(aliquots) {
-            var dupes = [];
-            Pool.getAliquots().forEach(function(poolAli) {
-              if (aliquots.map(Utils.array.getId).indexOf(poolAli.id) !== -1) {
-                dupes.push(poolAli);
-              }
-            });
-            if (dupes.length) {
-              Utils.showOkDialog('Error', ['The following aliquots are already included in this pool:'].concat(dupes.map(function(aliquot) {
-                return '* ' + aliquot.name + ' (' + aliquot.alias + ')';
-              })));
-            } else {
-              Utils.showDialog('Edit Proportions', 'Add', aliquots.map(function(aliquot) {
-                return {
-                  label: aliquot.name + ' (' + aliquot.alias + ')',
-                  type: 'int',
-                  property: 'aliquot' + aliquot.id + 'Proportion',
-                  required: true,
-                  value: 1
-                };
-              }), function(proportionResults) {
-                Pool.addAliquots(aliquots.map(function(aliquot) {
-                  aliquot.proportion = proportionResults['aliquot' + aliquot.id + 'Proportion'];
-                  return aliquot;
-                }));
-              })
-            }
-          });
-        });
-      }
-    }];
+    return [ListUtils.createStaticAddAliquotsAction(Pool.getAliquots, function(selectedAliquots, proportionResults) {
+      Pool.addAliquots(selectedAliquots.map(function(aliquot) {
+        aliquot.proportion = proportionResults['aliquot' + aliquot.id + 'Proportion'];
+        return aliquot;
+      }));
+    })];
   },
   createColumns: function(config, projectId) {
     return [

@@ -2,7 +2,8 @@
 
 Changes:
 
-
+  * Added a step to the Add Aliquots dialog on the Edit Pool and Edit Pool Order pages to confirm which
+    aliquots to add
 
 # 1.5.0
 
