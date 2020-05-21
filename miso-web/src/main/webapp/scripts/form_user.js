@@ -83,6 +83,7 @@ FormTarget.user = (function($) {
       disabled: !config.isAdmin || config.isSelf
     }, {
       title: 'Internal?',
+      description: 'Only internal users can log into MISO',
       data: 'internal',
       type: 'checkbox',
       disabled: !config.isAdmin

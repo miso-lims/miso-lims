@@ -103,6 +103,10 @@ We suggest the following:
 5. Change the username and password for the database using the environmental variables
 6. Enable HTTPS (see [Configuring HTTPS](#configuring-https)).
 
+## Upgrading to new versions
+
+You can upgrade to a newer version of MISO simply by switching to a newer version of the Docker images. Be sure to check the release notes to see if there are any additional steps you should take for a particular version upgrade. A database migration will occur when you start up the Flyway container, so it is always best to backup your database before an upgrade. When you start up the new version, keep an eye on the output from the Flyway container to ensure that the migration completes successfully.
+
 ## Recipes
 
 We provide a number of solutions to common issues so you can construct your

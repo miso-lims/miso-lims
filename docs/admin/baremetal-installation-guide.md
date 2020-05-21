@@ -106,7 +106,9 @@ and populate it with the following information:
 
 Make sure the database path in `ROOT.xml` is correct for your install:
 
-    url="jdbc:mysql://your.database.server:3306/lims"
+    url="jdbc:mysql://your.database.server:3306/dbname"
+
+If you use MariaDB instead of MySQL, replace 'mysql' with 'mariadb' in the URL. 
 
 If your Tomcat install has the `autoDeploy="true"` flag set in `server.xml`, if
 you delete the `webapps/ROOT` directory and the `ROOT.war` file, Tomcat will

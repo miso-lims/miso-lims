@@ -2240,3 +2240,10 @@ ul.unformatted-list {
   float: right;
   margin-top: -4px;
 }
+
+.field-help-icon {
+  width: 12px;
+  height: 12px;
+  position: relative;
+  top: 2px;
+}
