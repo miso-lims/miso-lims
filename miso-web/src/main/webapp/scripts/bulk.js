@@ -978,7 +978,9 @@ BulkUtils = (function($) {
             row: error.row,
             col: colIndex
           });
-          sublist.append($('<li>').text('See comments in table'));
+          field.errors.forEach(function(error) {
+            sublist.append($('<li>').text(columns[colIndex].title + ': ' + error));
+          });
         } else {
           field.errors.forEach(function(error) {
             sublist.append($('<li>').text((field.field === 'GENERAL' ? '' : field.field + ': ') + error));
