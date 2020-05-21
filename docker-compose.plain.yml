@@ -66,7 +66,7 @@ services:
   nginx:
     image: nginx:1.15.12-alpine
     ports: 
-      - "8087:80"
+      - "80:80"
     volumes:
       - type: bind
         source: "./.docker/nginx/http.conf"

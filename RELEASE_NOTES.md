@@ -2,9 +2,15 @@
 
 Changes:
 
+
+
+# 1.5.0
+
+Changes:
+
   * Improved performance of bulk library aliquot pages
   * Increased pool alias length limit from 50 to 255
-  * Bulk adding QCs now sorted by alias
+  * Changed bulk QC pages to sort by target item alias by default
   * Improved performance of bulk table import function
   * Fixed sorting bulk tables on columns containing empty cells
   * Fixed V1000 migration hanging on plain sample databases
