@@ -2,6 +2,7 @@
 
 Changes:
 
+  * Improved performance of bulk library aliquot pages
   * Increased pool alias length limit from 50 to 255
   * Bulk adding QCs now sorted by alias
   * Improved performance of bulk table import function

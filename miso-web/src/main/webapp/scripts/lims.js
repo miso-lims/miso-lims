@@ -552,7 +552,35 @@ var Utils = Utils
         Utils.showOkDialog('Error', lines, errorCallback);
       },
 
-      ajaxWithDialog: function(title, method, url, data, callback, errorCallback) {
+      showWorkingDialog: function(title, workFunction) {
+        var dialogArea = document.getElementById('dialog');
+        while (dialogArea.hasChildNodes()) {
+          dialogArea.removeChild(dialogArea.lastChild);
+        }
+        var p = document.createElement('P');
+        p.appendChild(document.createTextNode('Working...'));
+        dialogArea.appendChild(p);
+
+        var dialog = jQuery('#dialog').dialog({
+          autoOpen: true,
+          height: 400,
+          width: 350,
+          title: title,
+          modal: true,
+          buttons: {},
+          closeOnEscape: false,
+          open: function(event, ui) {
+            jQuery(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+          }
+        });
+        // dialog doesn't appear without this delay for some reason...
+        setTimeout(function() {
+          workFunction();
+          dialog.dialog("close");
+        }, 100);
+      },
+
+      ajaxWithDialog: function(title, method, url, data, callback, errorCallback, manualErrorProcessing) {
         var dialogArea = document.getElementById('dialog');
         while (dialogArea.hasChildNodes()) {
           dialogArea.removeChild(dialogArea.lastChild);
@@ -585,7 +613,11 @@ var Utils = Utils
           },
           'error': function(xhr, textStatus, errorThrown) {
             dialog.dialog("close");
-            Utils.showAjaxErrorDialog(xhr, textStatus, errorThrown, errorCallback);
+            if (manualErrorProcessing) {
+              errorCallback(xhr, textStatus, errorThrown);
+            } else {
+              Utils.showAjaxErrorDialog(xhr, textStatus, errorThrown, errorCallback);
+            }
           }
         });
       },
@@ -1284,3 +1316,66 @@ Utils.notes = {
   },
 
 };
+
+Utils.decimalStrings = (function() {
+  return {
+    add: function(one, two) {
+      var oneDecimalPlaces = getDecimalPlaces(one);
+      var twoDecimalPlaces = getDecimalPlaces(two);
+      var shift = Math.max(oneDecimalPlaces, twoDecimalPlaces);
+      var sum = decimalStringToInt(one, oneDecimalPlaces, shift) + decimalStringToInt(two, twoDecimalPlaces, shift);
+      return intToDecimalString(sum, shift);
+    },
+
+    subtract: function(one, two) {
+      var oneDecimalPlaces = getDecimalPlaces(one);
+      var twoDecimalPlaces = getDecimalPlaces(two);
+      var shift = Math.max(oneDecimalPlaces, twoDecimalPlaces);
+      var difference = decimalStringToInt(one, oneDecimalPlaces, shift) - decimalStringToInt(two, twoDecimalPlaces, shift);
+      return intToDecimalString(difference, shift);
+    }
+  };
+
+  function decimalStringToInt(decimalString, decimalPlaces, decimalShift) {
+    if (decimalShift < decimalPlaces) {
+      throw new Error('Bad value for decimalShift');
+    }
+    return parseInt(decimalString.replace('.', '') + '0'.repeat(decimalShift - decimalPlaces));
+  }
+
+  function intToDecimalString(intValue, decimalShift) {
+    if (decimalShift === 0) {
+      return intValue.toString();
+    } else if (!decimalShift || decimalShift < 0) {
+      throw new Error('Bad value for decimalShift');
+    }
+    var negative = intValue < 0;
+    var abs = Math.abs(intValue)
+    var string = abs.toString();
+    if (decimalShift >= string.length) {
+      string = '0'.repeat(decimalShift - string.length + 1) + string;
+    }
+    var decimalPos = string.length - decimalShift;
+    string = string.substring(0, decimalPos) + '.' + string.substring(decimalPos);
+    var matches = string.match(/\.(\d*[1-9])?(0+)?$/);
+    if (matches[2]) {
+      if (matches[1]) {
+        string = string.substring(0, string.length - matches[2].length);
+      } else {
+        string = string.substring(0, string.length - (matches[2].length - 1));
+      }
+    }
+    if (string.endsWith('.')) {
+      string += '0';
+    }
+    if (negative) {
+      string = '-' + string;
+    }
+    return string;
+  }
+
+  function getDecimalPlaces(decimalString) {
+    var index = decimalString.indexOf('.');
+    return index === -1 ? 0 : decimalString.length - (index + 1);
+  }
+})();

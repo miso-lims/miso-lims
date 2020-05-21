@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestExceptionHandler.RestError;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Abstract class meant to be extended by all REST controllers. Adds exception handling for all exceptions
@@ -23,7 +23,7 @@ public abstract class RestController {
    * @return the RestError containing exception and HTTP response details
    */
   @ExceptionHandler
-  private @ResponseBody RestError handleError(HttpServletRequest request, HttpServletResponse response, Exception exception) {
+  private @ResponseBody ObjectNode handleError(HttpServletRequest request, HttpServletResponse response, Exception exception) {
     return RestExceptionHandler.handleException(request, response, exception);
   }
   

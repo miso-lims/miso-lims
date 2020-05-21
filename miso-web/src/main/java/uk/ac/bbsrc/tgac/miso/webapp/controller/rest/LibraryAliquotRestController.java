@@ -102,6 +102,16 @@ public class LibraryAliquotRestController extends RestController {
     return RestUtils.createObject("Library Aliquot", aliquotDto, Dtos::to, libraryAliquotService, ldi -> Dtos.asDto(ldi, false));
   }
 
+  @PostMapping("/bulk")
+  public @ResponseBody List<LibraryAliquotDto> bulkCreate(@RequestBody List<LibraryAliquotDto> dtos) throws IOException {
+    return RestUtils.bulkCreate("library aliquot", dtos, Dtos::to, libraryAliquotService, aliquot -> Dtos.asDto(aliquot, false));
+  }
+
+  @PutMapping("/bulk")
+  public @ResponseBody List<LibraryAliquotDto> bulkUpdate(@RequestBody List<LibraryAliquotDto> dtos) throws IOException {
+    return RestUtils.bulkUpdate("library aliquot", dtos, Dtos::to, libraryAliquotService, aliquot -> Dtos.asDto(aliquot, false));
+  }
+
   @PutMapping(value = "/{aliquotId}", headers = { "Content-type=application/json" })
   @ResponseBody
   public LibraryAliquotDto update(@PathVariable Long aliquotId, @RequestBody LibraryAliquotDto aliquotDto) throws IOException {

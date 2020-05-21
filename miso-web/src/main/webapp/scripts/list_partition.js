@@ -146,7 +146,9 @@ ListTarget.partition = {
           if (pool) {
             HotUtils.warnIfConsentRevoked(pool.pooledElements, function() {
               doAssign();
-            }, HotTarget.libraryaliquot.getLabel);
+            }, function(item) {
+              return item.name + ' (' + item.alias + ')';
+            });
           } else {
             doAssign();
           }

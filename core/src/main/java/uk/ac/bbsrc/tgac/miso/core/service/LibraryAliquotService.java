@@ -8,21 +8,21 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 public interface LibraryAliquotService extends PaginatedDataSource<LibraryAliquot>, BarcodableService<LibraryAliquot>,
-    DeleterService<LibraryAliquot>, SaveService<LibraryAliquot> {
+    DeleterService<LibraryAliquot>, BulkSaveService<LibraryAliquot> {
 
   @Override
-  default EntityType getEntityType() {
+  public default EntityType getEntityType() {
     return EntityType.LIBRARY_ALIQUOT;
   }
 
-  int count() throws IOException;
+  public int count() throws IOException;
 
-  List<LibraryAliquot> listByLibraryId(Long libraryId) throws IOException;
+  public List<LibraryAliquot> listByLibraryId(Long libraryId) throws IOException;
 
-  List<LibraryAliquot> listByIdList(List<Long> idList) throws IOException;
+  public List<LibraryAliquot> listByIdList(List<Long> idList) throws IOException;
 
-  List<LibraryAliquot> list() throws IOException;
+  public List<LibraryAliquot> list() throws IOException;
 
-  LibraryAliquot getByBarcode(String barcode) throws IOException;
+  public LibraryAliquot getByBarcode(String barcode) throws IOException;
 
 }

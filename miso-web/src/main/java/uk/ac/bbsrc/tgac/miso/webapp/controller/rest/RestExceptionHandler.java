@@ -1,8 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,14 +17,15 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.NestedServletException;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import uk.ac.bbsrc.tgac.miso.core.service.exception.BulkValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestExceptionHandler.RestError.DataFormat;
 
 /**
- * Class for handling exceptions ocurring in REST Controller classes
+ * Class for handling exceptions occurring in REST Controller classes
  */
 public class RestExceptionHandler {
   
@@ -34,19 +36,33 @@ public class RestExceptionHandler {
   }
   
   /**
-   * Collects information from an exception, sets an appropriate HTTP Status for the response, and forms a representation of the 
-   * error that may be returned to the client
+   * Collects information from an exception, sets an appropriate HTTP Status for the response, and forms a representation of the
+   * error that may be returned to the client. e.g.
+   * 
+   * <pre>
+   * {
+   *   requestUrl: URL,
+   *   detail: exception message,
+   *   code: HTTP status code,
+   *   message: HTTP status reason phrase,
+   *   dataFormat: {custom|validation|bulk validation},
+   *   data: format depends on dataFormat
+   * }
+   * </pre>
    * 
    * @param request HTTP request that caused the exception
    * @param response HTTP response that will be returned to the client
    * @param exception The exception that was thrown while handling a REST request
    * @return a representation of the error to return to the client
    */
-  public static RestError handleException(HttpServletRequest request, HttpServletResponse response, Exception exception) {
-    RestError error = new RestError();
-    error.setRequestUrl(request.getRequestURL().toString());
-    error.setDetail(exception.getLocalizedMessage());
-    
+  public static ObjectNode handleException(HttpServletRequest request, HttpServletResponse response, Exception exception) {
+    ObjectMapper mapper = new ObjectMapper();
+    ObjectNode error = mapper.createObjectNode();
+    error.put("requestUrl", request.getRequestURL().toString());
+    error.put("detail", exception.getLocalizedMessage());
+    Status status = null;
+    ObjectNode data = null;
+
     ResponseStatus rs = AnnotationUtils.findAnnotation(exception.getClass(), ResponseStatus.class);
     if (exception instanceof NestedServletException) {
       NestedServletException nested = (NestedServletException) exception;
@@ -56,136 +72,78 @@ public class RestExceptionHandler {
     }
     if (rs != null) {
       // Spring-annotated exception
-      error.setStatus(Status.fromStatusCode(rs.value().value()));
+      status = Status.fromStatusCode(rs.value().value());
     } else if (exception instanceof RestException) {
       // Customized REST exception with additional data fields
       RestException restException = (RestException) exception;
-      error.setStatus(restException.getStatus());
-      error.setData(restException.getData());
+      status = restException.getStatus();
+      data = makeDataMap(error, restException.getData());
+    } else if (exception instanceof BulkValidationException) {
+      BulkValidationException bulkValidationException = (BulkValidationException) exception;
+      status = Status.BAD_REQUEST;
+      addBulkValidationData(error, bulkValidationException);
+      error.put("dataFormat", "bulk validation");
     } else if (exception instanceof ValidationException) {
       ValidationException valException = (ValidationException) exception;
-      error.setStatus(Status.BAD_REQUEST);
-      error.setData(valException.getErrorsByField());
-      error.setDataFormat(DataFormat.VALIDATION);
+      status = Status.BAD_REQUEST;
+      data = makeDataMap(error, valException.getErrorsByField());
+      error.put("dataFormat", "validation");
     } else if (ExceptionUtils.getRootCause(exception) instanceof IOException
         && StringUtils.containsIgnoreCase(ExceptionUtils.getRootCauseMessage(exception), "Broken pipe")) {
       response.setStatus(Status.SERVICE_UNAVAILABLE.getStatusCode());
       return null;
     } else {
       // Unknown/unexpected exception
-      error.setStatus(Status.INTERNAL_SERVER_ERROR);
+          status = Status.INTERNAL_SERVER_ERROR;
     }
     
-    if (error.getStatus().getFamily() == Status.Family.SERVER_ERROR) {
-      if (error.getData() == null) {
-        error.setData(new HashMap<>());
+    error.put("code", status.getStatusCode());
+    error.put("message", status.getReasonPhrase());
+
+    if (status.getFamily() == Status.Family.SERVER_ERROR) {
+      if (data == null) {
+        data = error.putObject("data");
       }
-      error.getData().put("exceptionClass", exception.getClass().getName());
-      log.error(error.getStatus().getStatusCode() + " error handling REST request", exception);
+      data.put("exceptionClass", exception.getClass().getName());
+      log.error(status.getStatusCode() + " error handling REST request", exception);
     } else {
-      log.debug(error.getStatus().getStatusCode() + " error handling REST request", exception);
+      log.debug(status.getStatusCode() + " error handling REST request", exception);
     }
     
-    response.setStatus(error.getStatus().getStatusCode());
+    if (!error.has("dataFormat")) {
+      error.put("dataFormat", "custom");
+    }
+    response.setStatus(status.getStatusCode());
     
     return error;
   }
-  
-  /**
-   * Representation of an exception that ocurred while handling a REST request
-   */
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  public static class RestError {
-    
-    public enum DataFormat {
-      CUSTOM("custom"),
-      VALIDATION("validation");
 
-      private final String text;
+  private static ObjectNode makeDataMap(ObjectNode node, Map<String, String> data) {
+    if (data == null || data.isEmpty()) {
+      return null;
+    }
+    ObjectNode mapNode = node.putObject("data");
+    for (Entry<String, String> entry : data.entrySet()) {
+      mapNode.put(entry.getKey(), entry.getValue());
+    }
+    return mapNode;
+  }
 
-      private DataFormat(String text) {
-        this.text = text;
+  private static void addBulkValidationData(ObjectNode node, BulkValidationException exception) {
+    ArrayNode rows = node.putArray("data");
+    for (Entry<Integer, Map<String, List<String>>> entry : exception.getErrorsByRowAndField().entrySet()) {
+      ObjectNode rowNode = rows.addObject();
+      rowNode.put("row", entry.getKey());
+      ArrayNode fields = rowNode.putArray("fields");
+      for (Entry<String, List<String>> fieldErrors : entry.getValue().entrySet()) {
+        ObjectNode field = fields.addObject();
+        field.put("field", fieldErrors.getKey());
+        ArrayNode errors = field.putArray("errors");
+        for (String fieldError : fieldErrors.getValue()) {
+          errors.add(fieldError);
+        }
       }
-
-      public String getText() {
-        return text;
-      }
     }
-
-    private Status status;
-    private String detail;
-    private String requestUrl;
-    private String dataFormat = DataFormat.CUSTOM.getText();
-    private Map<String, String> data = new HashMap<>();
-    
-    public RestError() {
-      
-    }
-
-    @JsonIgnore
-    public Status getStatus() {
-      return status;
-    }
-
-    public void setStatus(Status status) {
-      this.status = status;
-    }
-    
-    /**
-     * @return the HTTP status code
-     */
-    public int getCode() {
-      return status.getStatusCode();
-    }
-    
-    /**
-     * @return the HTTP status message
-     */
-    public String getMessage() {
-      return status.getReasonPhrase();
-    }
-
-    public String getDetail() {
-      return detail;
-    }
-
-    public void setDetail(String detail) {
-      this.detail = detail;
-    }
-
-    /**
-     * @return the URL requested
-     */
-    public String getRequestUrl() {
-      return requestUrl;
-    }
-
-    public void setRequestUrl(String requestUrl) {
-      this.requestUrl = requestUrl;
-    }
-
-    /**
-     * @return the type of information that is included in the data map. May be "custom" or a more specific/useful format
-     */
-    public String getDataFormat() {
-      return dataFormat;
-    }
-
-    public void setDataFormat(DataFormat dataFormat) {
-      this.dataFormat = dataFormat.getText();
-    }
-
-    /**
-     * @return any additional error data
-     */
-    public Map<String, String> getData() {
-      return data;
-    }
-
-    public void setData(Map<String, String> data) {
-      this.data = data;
-    }
-    
   }
   
 }

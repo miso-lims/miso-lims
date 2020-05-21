@@ -7,14 +7,12 @@ import java.util.Collection;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.PageFactory;
 
 import com.google.common.base.Joiner;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 
-public class BulkLibraryAliquotPage extends HeaderFooterPage {
+public class BulkLibraryAliquotPage extends BulkPage {
 
   public static class LibraryAliquotColumns {
     public static final String NAME = "Name";
@@ -51,16 +49,20 @@ public class BulkLibraryAliquotPage extends HeaderFooterPage {
   private static final By POOL_TOGETHER_BUTTON_TEXT = By.linkText("Pool together");
   private static final By POOL_SEPARATELY_BUTTON_TEXT = By.linkText("Pool separately");
 
-  @FindBy(id = "bulkactions")
   private WebElement toolbar;
 
-  private final HandsOnTable table;
+  private HandsOnTable table;
 
   public BulkLibraryAliquotPage(WebDriver driver) {
     super(driver);
-    PageFactory.initElements(driver, this);
     waitWithTimeout().until(or(titleContains("Create Library Aliquots from "), titleContains("Edit Library Aliquots ")));
-    table = new HandsOnTable(driver);
+    refreshElements();
+  }
+
+  @Override
+  protected void refreshElements() {
+    table = new HandsOnTable(getDriver());
+    toolbar = getDriver().findElement(By.id("bulkactions"));
   }
 
   public static BulkLibraryAliquotPage getForEdit(WebDriver driver, String baseUrl, Collection<Long> aliquotIds) {
@@ -84,6 +86,7 @@ public class BulkLibraryAliquotPage extends HeaderFooterPage {
     return new BulkLibraryAliquotPage(driver);
   }
 
+  @Override
   public HandsOnTable getTable() {
     return table;
   }

@@ -16,6 +16,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public abstract class BulkTableBackend<Dto> {
 
+  private static final String OLD_JSP = "/WEB-INF/pages/handsontables.jsp";
+  private static final String NEW_JSP = "/WEB-INF/pages/bulkPage.jsp";
+
   private final String targetType;
   private final Class<? extends Dto> dtoClass;
 
@@ -40,16 +43,27 @@ public abstract class BulkTableBackend<Dto> {
     writeConfiguration(mapper, config);
     model.put("title", title);
     model.put("config", mapper.writeValueAsString(config));
-    model.put("targetType", "HotTarget." + targetType);
-    model.put("create", create);
+
+    if (isNewInterface()) {
+      model.put("target", targetType);
+    } else {
+      model.put("targetType", "HotTarget." + targetType);
+      model.put("create", create);
+      model.put("method", "Propagate");
+    }
+
     model.put("input",
         mapper.writerFor(mapper.getTypeFactory().constructCollectionType(List.class, dtoClass)).writeValueAsString(dtos));
-    model.put("method", "Propagate");
-    return new ModelAndView("/WEB-INF/pages/handsontables.jsp", model);
+    return new ModelAndView(isNewInterface() ? NEW_JSP : OLD_JSP, model);
   }
 
   /**
    * Pass arbitrary configuration data to the front end so that it can display the correct interface.
    */
   protected abstract void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException;
+
+  // TODO: remove this after migrating all targets to new interface
+  protected boolean isNewInterface() {
+    return false;
+  }
 }

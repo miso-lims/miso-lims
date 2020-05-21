@@ -2,9 +2,9 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
 import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
-import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtils.saveAndAssertSuccess;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,6 +21,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkLibraryAliquotPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkLibraryAliquotPage.LibraryAliquotColumns;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 
 public class BulkLibraryAliquotIT extends AbstractIT {
@@ -42,17 +43,21 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     login();
   }
 
+  private void testTableSetup(BulkPage page, Collection<String> expectedColumns, int expectedRows) {
+    HandsOnTable table = page.getTable();
+    List<String> headings = table.getColumnHeadings();
+    assertEquals(expectedColumns.size(), headings.size());
+    for (String col : expectedColumns) {
+      assertTrue("Check for column: '" + col + "'", headings.contains(col));
+    }
+    assertEquals(expectedRows, table.getRowCount());
+  }
+
   @Test
   public void testEditSetup() throws Exception {
     // Goal: ensure all expected fields are present and no extra
     BulkLibraryAliquotPage page = BulkLibraryAliquotPage.getForEdit(getDriver(), getBaseUrl(), Sets.newHashSet(304L, 305L));
-    HandsOnTable table = page.getTable();
-    List<String> headings = table.getColumnHeadings();
-    assertEquals(commonColumns.size(), headings.size());
-    for (String col : commonColumns) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
-    }
-    assertEquals(2, table.getRowCount());
+    testTableSetup(page, commonColumns, 2);
   }
 
   @Test
@@ -60,17 +65,12 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     // Goal: ensure all expected fields are present and no extra
     BulkLibraryAliquotPage page = BulkLibraryAliquotPage.getForPropagate(getDriver(), getBaseUrl(),
         Sets.newHashSet(304L));
-    HandsOnTable table = page.getTable();
-    List<String> headings = table.getColumnHeadings();
-    assertEquals(commonColumns.size() + propagateColumns.size(), headings.size());
-    for (String col : commonColumns) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
-    }
-    for (String col : propagateColumns) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
-    }
-    assertEquals(1, table.getRowCount());
+    Set<String> expectedColumns = Sets.newHashSet();
+    expectedColumns.addAll(commonColumns);
+    expectedColumns.addAll(propagateColumns);
+    testTableSetup(page, expectedColumns, 1);
 
+    HandsOnTable table = page.getTable();
     assertEquals("DILT_0001_nn_n_PE_304_WG", table.getText(LibraryAliquotColumns.PARENT_ALIAS, 0));
   }
 
@@ -79,17 +79,12 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     // Goal: ensure all expected fields are present and no extra
     BulkLibraryAliquotPage page = BulkLibraryAliquotPage.getForRepropagate(getDriver(), getBaseUrl(),
         Sets.newHashSet(304L));
-    HandsOnTable table = page.getTable();
-    List<String> headings = table.getColumnHeadings();
-    assertEquals(commonColumns.size() + propagateColumns.size(), headings.size());
-    for (String col : commonColumns) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
-    }
-    for (String col : propagateColumns) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
-    }
-    assertEquals(1, table.getRowCount());
+    Set<String> expectedColumns = Sets.newHashSet();
+    expectedColumns.addAll(commonColumns);
+    expectedColumns.addAll(propagateColumns);
+    testTableSetup(page, expectedColumns, 1);
 
+    HandsOnTable table = page.getTable();
     assertEquals("DILT_0001_nn_n_PE_304_WG", table.getText(LibraryAliquotColumns.PARENT_ALIAS, 0));
   }
 
@@ -102,8 +97,7 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     Set<String> targetedSequencings = table.getDropdownOptions(LibraryAliquotColumns.TARGETED_SEQUENCING, 0);
     assertTrue(targetedSequencings.contains("Test TarSeq One"));
     assertTrue(targetedSequencings.contains("Test TarSeq Two"));
-    assertTrue(targetedSequencings.contains("(None)"));
-    assertEquals("targeted sequencing size", 3, targetedSequencings.size()); // two plus "(None)"
+    assertEquals("targeted sequencing size", 2, targetedSequencings.size());
   }
 
   @Test
@@ -130,10 +124,11 @@ public class BulkLibraryAliquotIT extends AbstractIT {
 
     assertColumnValues(table, 0, attrs, "pre-save");
 
-    saveAndAssertSuccess(table);
-    assertColumnValues(table, 0, attrs, "post-save");
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
+    assertColumnValues(savedTable, 0, attrs, "post-save");
 
-    Long newId = getSavedId(table, 0);
+    Long newId = getSavedId(savedTable, 0);
     LibraryAliquot saved = (LibraryAliquot) getSession().get(LibraryAliquot.class, newId);
     assertLibraryAliquotAttributes(attrs, saved);
   }
@@ -154,10 +149,11 @@ public class BulkLibraryAliquotIT extends AbstractIT {
 
     assertColumnValues(table, 0, attrs, "pre-save");
 
-    saveAndAssertSuccess(table);
-    assertColumnValues(table, 0, attrs, "post-save");
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
+    assertColumnValues(savedTable, 0, attrs, "post-save");
 
-    Long newId = getSavedId(table, 0);
+    Long newId = getSavedId(savedTable, 0);
     LibraryAliquot saved = (LibraryAliquot) getSession().get(LibraryAliquot.class, newId);
     assertLibraryAliquotAttributes(attrs, saved);
   }
@@ -179,14 +175,15 @@ public class BulkLibraryAliquotIT extends AbstractIT {
 
     assertColumnValues(table, 0, attrs, "pre-save");
 
-    saveAndAssertSuccess(table);
-    assertColumnValues(table, 0, attrs, "post-save");
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
+    assertColumnValues(savedTable, 0, attrs, "post-save");
 
-    Long newId = getSavedId(table, 0);
+    Long newId = getSavedId(savedTable, 0);
     LibraryAliquot saved = (LibraryAliquot) getSession().get(LibraryAliquot.class, newId);
     assertLibraryAliquotAttributes(attrs, saved);
 
-    // chain edit library aliquotss
+    // chain edit library aliquots
     BulkLibraryAliquotPage page2 = page.chainEdit();
     HandsOnTable table2 = page2.getTable();
     assertColumnValues(table2, 0, attrs, "reload for edit");
@@ -196,8 +193,9 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     
     table2.enterText(LibraryAliquotColumns.VOLUME, 0, "10.5");
     attrs.put(LibraryAliquotColumns.VOLUME, "10.5");
-    saveAndAssertSuccess(table2);
-    assertColumnValues(table2, 0, attrs, "edit post-save");
+    assertTrue(page2.save(false));
+    HandsOnTable savedTable2 = page2.getTable();
+    assertColumnValues(savedTable2, 0, attrs, "edit post-save");
     LibraryAliquot saved2 = (LibraryAliquot) getSession().get(LibraryAliquot.class, newId);
     assertLibraryAliquotAttributes(attrs, saved2);
 
@@ -216,10 +214,11 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     fillRow(table, 0, attrs);
 
     assertColumnValues(table, 0, attrs, "pre-save");
-    saveAndAssertSuccess(table, false);
-    assertColumnValues(table, 0, attrs, "post-save");
+    assertTrue(page.save(true));
+    HandsOnTable savedTable = page.getTable();
+    assertColumnValues(savedTable, 0, attrs, "post-save");
 
-    Long newId = getSavedId(table, 0);
+    Long newId = getSavedId(savedTable, 0);
     LibraryAliquot saved = (LibraryAliquot) getSession().get(LibraryAliquot.class, newId);
     assertLibraryAliquotAttributes(attrs, saved);
 
@@ -238,10 +237,11 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     fillRow(table, 0, attrs);
 
     assertColumnValues(table, 0, attrs, "pre-save");
-    saveAndAssertSuccess(table);
-    assertColumnValues(table, 0, attrs, "post-save");
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
+    assertColumnValues(savedTable, 0, attrs, "post-save");
 
-    Long newId = getSavedId(table, 0);
+    Long newId = getSavedId(savedTable, 0);
     LibraryAliquot saved = (LibraryAliquot) getSession().get(LibraryAliquot.class, newId);
     assertLibraryAliquotAttributes(attrs, saved);
 
@@ -260,10 +260,11 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     fillRow(table, 0, attrs);
 
     assertColumnValues(table, 0, attrs, "pre-save");
-    saveAndAssertSuccess(table);
-    assertColumnValues(table, 0, attrs, "post-save");
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
+    assertColumnValues(savedTable, 0, attrs, "post-save");
 
-    Long newId = getSavedId(table, 0);
+    Long newId = getSavedId(savedTable, 0);
     LibraryAliquot saved = (LibraryAliquot) getSession().get(LibraryAliquot.class, newId);
     assertLibraryAliquotAttributes(attrs, saved);
 
@@ -288,15 +289,16 @@ public class BulkLibraryAliquotIT extends AbstractIT {
 
     assertColumnValues(table, 0, row0, "pre-save row 0");
     assertColumnValues(table, 1, row1, "pre-save row 1");
-    saveAndAssertSuccess(table, false);
-    assertColumnValues(table, 0, row0, "post-save row 0");
-    assertColumnValues(table, 1, row1, "post-save row 1");
+    assertTrue(page.save(true));
+    HandsOnTable savedTable = page.getTable();
+    assertColumnValues(savedTable, 0, row0, "post-save row 0");
+    assertColumnValues(savedTable, 1, row1, "post-save row 1");
 
-    Long newId0 = getSavedId(table, 0);
+    Long newId0 = getSavedId(savedTable, 0);
     LibraryAliquot saved0 = (LibraryAliquot) getSession().get(LibraryAliquot.class, newId0);
     assertLibraryAliquotAttributes(row0, saved0);
 
-    Long newId1 = getSavedId(table, 1);
+    Long newId1 = getSavedId(savedTable, 1);
     LibraryAliquot saved1 = (LibraryAliquot) getSession().get(LibraryAliquot.class, newId1);
     assertLibraryAliquotAttributes(row1, saved1);
 
@@ -320,10 +322,11 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     fillRow(table, 0, attrs);
 
     assertColumnValues(table, 0, attrs, "pre-save");
-    saveAndAssertSuccess(table);
-    assertColumnValues(table, 0, attrs, "post-save");
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
+    assertColumnValues(savedTable, 0, attrs, "post-save");
 
-    Long newId = getSavedId(table, 0);
+    Long newId = getSavedId(savedTable, 0);
     LibraryAliquot saved = (LibraryAliquot) getSession().get(LibraryAliquot.class, newId);
     assertLibraryAliquotAttributes(attrs, saved);
 
@@ -343,10 +346,11 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     fillRow(table, 0, attrs);
 
     assertColumnValues(table, 0, attrs, "pre-save");
-    saveAndAssertSuccess(table);
-    assertColumnValues(table, 0, attrs, "post-save");
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
+    assertColumnValues(savedTable, 0, attrs, "post-save");
 
-    Long newId = getSavedId(table, 0);
+    Long newId = getSavedId(savedTable, 0);
     LibraryAliquot saved = (LibraryAliquot) getSession().get(LibraryAliquot.class, newId);
     assertLibraryAliquotAttributes(attrs, saved);
 
@@ -366,10 +370,11 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     fillRow(table, 0, attrs);
 
     assertColumnValues(table, 0, attrs, "pre-save");
-    saveAndAssertSuccess(table);
-    assertColumnValues(table, 0, attrs, "post-save");
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
+    assertColumnValues(savedTable, 0, attrs, "post-save");
 
-    Long newId = getSavedId(table, 0);
+    Long newId = getSavedId(savedTable, 0);
     LibraryAliquot saved = (LibraryAliquot) getSession().get(LibraryAliquot.class, newId);
     assertLibraryAliquotAttributes(attrs, saved);
 
@@ -389,10 +394,11 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     fillRow(table, 0, attrs);
 
     assertColumnValues(table, 0, attrs, "pre-save");
-    saveAndAssertSuccess(table);
-    assertColumnValues(table, 0, attrs, "post-save");
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
+    assertColumnValues(savedTable, 0, attrs, "post-save");
 
-    Long newId = getSavedId(table, 0);
+    Long newId = getSavedId(savedTable, 0);
     LibraryAliquot saved = (LibraryAliquot) getSession().get(LibraryAliquot.class, newId);
     assertLibraryAliquotAttributes(attrs, saved);
 
