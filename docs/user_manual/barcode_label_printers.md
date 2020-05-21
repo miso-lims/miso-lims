@@ -1,8 +1,13 @@
 # Barcode Label Printers
 
 MISO pages can be printed to any printer that is installed on the computer you are using. No extra configuration is
-required to do this. Printing barcode labels to label printers does require some configuration, however. Brady and
-Zebra label printers are supported.
+required to do this. Printing barcode labels to label printers does require some configuration, however. All Brady and
+Zebra label printers should work with MISO, but the following models have been tested and confirmed to work. Let us
+know if you've used others and we can add them to the list.
+
+* Brady IP300
+* Zebra GX420t
+* Zebra ZM400
 
 
 ## Printers List
