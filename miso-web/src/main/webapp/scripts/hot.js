@@ -234,6 +234,25 @@ var HotUtils = {
     });
     var anyInvalidCells = false;
     var sortFunctions = {};
+    var sortEmptyLast = function(sortOrder, sortNonEmpty) {
+      return function(value, nextValue) {
+        var val = null;
+        if (value) {
+          val = nextValue ? sortNonEmpty(value, nextValue) : -1;
+        } else if (nextValue) {
+          val = 1;
+        } else {
+          val = 0;
+        }
+        if (sortOrder === 'desc') {
+          val = val * -1;
+        }
+        return val;
+      };
+    };
+    var defaultSort = function(value, nextValue) {
+      return value.localeCompare(nextValue);
+    };
     var table = new Handsontable(hotContainer, {
       licenseKey: 'non-commercial-and-evaluation',
       fixedColumnsLeft: target.hasOwnProperty('getFixedColumns') ? target.getFixedColumns(config) : 1,
@@ -251,9 +270,7 @@ var HotUtils = {
       renderAllRows: true,
       columnSorting: {
         compareFunctionFactory: function(sortOrder, columnMeta) {
-          return sortFunctions[columnMeta.data] || function(value, nextValue) {
-            return value.localeCompare(nextValue);
-          };
+          return sortEmptyLast(sortOrder, sortFunctions[columnMeta.data] || defaultSort);
         }
       },
       cells: function(row, col, prop) {
@@ -847,12 +864,14 @@ var HotUtils = {
                               }
                             }
                             // set values from spreadsheet
+                            var changes = [];
                             columnData.forEach(function(column) {
                               var columnIndex = hotHeaders.indexOf(column.heading);
                               for (var rowIndex = 0; rowIndex < column.data.length; rowIndex++) {
-                                table.setDataAtCell(rowIndex, columnIndex, column.data[rowIndex], 'CopyPaste.paste');
+                                changes.push([rowIndex, columnIndex, column.data[rowIndex]]);
                               }
                             });
+                            table.setDataAtCell(changes, 'CopyPaste.paste');
                           }).fail(function(xhr, textStatus, errorThrown) {
                         dialog.dialog("close");
                         Utils.showAjaxErrorDialog(xhr, textStatus, errorThrown);

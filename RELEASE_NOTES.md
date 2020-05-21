@@ -3,6 +3,11 @@
 Changes:
 
   * Improved performance of bulk library aliquot pages
+  * Increased pool alias length limit from 50 to 255
+  * Bulk adding QCs now sorted by alias
+  * Improved performance of bulk table import function
+  * Fixed sorting bulk tables on columns containing empty cells
+  * Fixed V1000 migration hanging on plain sample databases
 
 # 1.4.0
 
@@ -12,16 +17,6 @@ Changes:
   * Fixed missing locations on Library Aliquots list page
   * Fixed subproject options not showing up for some projects on bulk Create/Edit Samples page
   * Fixed subproject validation - if a project has subprojects, its samples must be assigned subprojects
-
-# 1.3.0
-
-Changes:
-
-  * Added "Transfer List V2" sample spreadsheet download format
-  * Added "Custody" attribute to Pinery samples
-  * Allow deleting transfers
-  * Prevent double-clicking save button on forms
-  * Fixed broken freezer map links
 
 Upgrade Notes:
 
@@ -38,6 +33,23 @@ Upgrade Notes:
     UPDATE Sample SET scientificName = 'Good Value' WHERE scientificName = 'Bad Value';
     ```
 
+Known Issues:
+
+  * V1000 migration hangs on plain sample databases
+# 1.3.0
+
+Changes:
+
+  * Added "Transfer List V2" sample spreadsheet download format
+  * Added "Custody" attribute to Pinery samples
+  * Allow deleting transfers
+  * Prevent double-clicking save button on forms
+  * Fixed broken freezer map links
+
+Known Issues:
+
+  * V1000 migration hangs on plain sample databases
+
 # 1.2.0 
 
 Changes:
@@ -52,6 +64,10 @@ Changes:
 Upgrade Notes:
 
   * Updated to Run Scanner 1.12.1
+
+Known Issues:
+
+  * V1000 migration hangs on plain sample databases
 
 # 1.1.0
 
@@ -79,6 +95,10 @@ Upgrade Notes:
   * Sequencing control types have been added, but the feature is not yet completed and they must be added to the database via
     SQL. It will be possible to edit these through the UI in the next release.
   * Updated to Pinery 2.12.0
+
+Known Issues:
+
+  * V1000 migration hangs on plain sample databases
 
 # 1.0.2
 
@@ -112,11 +132,19 @@ Upgrade Notes:
 
   * Updated to Pinery 2.11.0
 
+Known Issues:
+
+  * V1000 migration hangs on plain sample databases
+
 # 1.0.1
 
 Changes:
 
   * Added changelog entry when library aliquot alias is changed
+
+Known Issues:
+
+  * V1000 migration hangs on plain sample databases
 
 # 1.0.0
 
@@ -137,6 +165,7 @@ Changes:
 Known Issues:
 
   * Some samples may error on load.
+  * V1000 migration hangs on plain sample databases
 
 # 0.2.202
 
@@ -175,6 +204,10 @@ Upgrade Notes:
        time zone or depends on it being a different value. If you run MISO on its own Tomcat
        instance or in Docker, this is not an issue.
 
+Known Issues:
+
+  * V1000 migration hangs on plain sample databases
+
 # 0.2.201
 
 Changes:
@@ -188,6 +221,7 @@ Known Issues:
   * Transfer time and service record start and end times may save in incorrect time zone depending
     on configuration
   * Edit Sample page returned a server error in plain sample mode
+  * V1000 migration hangs on plain sample databases
 
 # 0.2.200
 
@@ -204,6 +238,7 @@ Known Issues:
   * Transfer time and service record start and end times may save in incorrect time zone depending
     on configuration
   * Edit Sample page returned a server error in plain sample mode
+  * V1000 migration hangs on plain sample databases
 
 # 0.2.199
 
@@ -257,6 +292,7 @@ Known Issues
   * Transfer time and service record start and end times may save in incorrect time zone depending
     on configuration
   * Edit Sample page returned a server error in plain sample mode
+  * V1000 migration hangs on plain sample databases
 
 # 0.2.198
 
@@ -330,6 +366,7 @@ Known Issues:
   * Transfer time and service record start and end times may save in incorrect time zone depending
     on configuration
   * Edit Sample page returned a server error in plain sample mode
+  * V1000 migration hangs on plain sample databases
 
 # 0.2.197
 
