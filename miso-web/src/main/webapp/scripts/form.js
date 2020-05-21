@@ -54,6 +54,7 @@ FormUtils = (function($) {
    *   makeControls: function(form) returning single or array of jQuery controls; required for special fields; set up special fields
    *   trackChanges: optional boolean (default: true); whether changes to the field should be tracked. This only affects the warning that
    *       appears when leaving a page with unsaved changes
+   *   description: optional string: information about field to display in help bubble
    * }
    * 
    * Form object: {
@@ -402,7 +403,9 @@ FormUtils = (function($) {
                 break;
               case 'required':
                 field.required = options.required;
-                $(inputSelector).closest('tr').children().first().text(getFieldLabelText(field));
+                var td = $(inputSelector).closest('tr').children().first();
+                td.text(getFieldLabelText(field));
+                addHelpBubble(td, field);
                 break;
               case 'source': {
                 if (field.type !== 'dropdown') {
@@ -721,11 +724,22 @@ FormUtils = (function($) {
   }
 
   function makeFieldLabel(field) {
-    return $('<td>').addClass('h').text(getFieldLabelText(field));
+    var td = $('<td>').addClass('h').text(getFieldLabelText(field));
+    addHelpBubble(td, field);
+    return td;
   }
 
   function getFieldLabelText(field) {
-    return field.title + ':' + (field.required ? '*' : '');
+    return field.title + ':' + (field.required ? '* ' : ' ');
+  }
+
+  function addHelpBubble(td, field) {
+    if (field.description) {
+      td.append($('<img>').attr('src', '/styles/images/question_mark.png').attr('title', field.description).addClass('field-help-icon')
+          .click(function() {
+            Utils.showOkDialog(field.title, [field.description])
+          }));
+    }
   }
 
   function makeFieldInput(containerId, field, object, form) {
