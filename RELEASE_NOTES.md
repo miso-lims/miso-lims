@@ -2,7 +2,8 @@
 
 Changes:
 
-
+  * Replaced the "Select in list" action in the Select by Names dialog with "Show in list," which will
+    filter the list to show only the selected items
 
 # 1.5.0
 

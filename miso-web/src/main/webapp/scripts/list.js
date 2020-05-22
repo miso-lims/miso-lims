@@ -37,7 +37,7 @@ ListUtils = (function($) {
   var searchTerms = {
     "id": {
       term: "id:#",
-      help: "Checks for an item with the specified ID."
+      help: "Checks for an item with the specified ID. Multiple IDs can be separated by commas."
     },
     "fulfilled": {
       term: "is:fulfilled",
@@ -281,6 +281,7 @@ ListUtils = (function($) {
       lastId: -1,
       element: document.createElement('SPAN')
     };
+    var jqTable = $('#' + elementId).html('');
     if (bulkActions.length > 0) {
       columns.unshift({
         "sTitle": "",
@@ -405,24 +406,13 @@ ListUtils = (function($) {
                   });
 
                   selectedActions.push({
-                    "name": "Select in list",
-                    "handler": function() {
-
-                      var state = ListState[elementId];
-                      state.lastId = -1;
-                      state.selected = items;
-                      var ids = items.map(function(item) {
-                        return item.id;
-                      });
-                      state.data.forEach(function(item) {
-                        var element = document.getElementById(elementId + "_toggle" + item.id);
-                        if (element) {
-                          element.checked = ids.indexOf(item.id) != -1;
-                        }
-                      });
-                      updateSelectedLabel(state);
+                    name: 'Show in list',
+                    handler: function() {
+                      var ids = items.map(Utils.array.getId).join(',');
+                      jqTable.dataTable().fnFilter('id:' + ids);
                     }
                   });
+
                   showActionDialog();
                 }, function() {
                   showSelect(names.join('\n'));
@@ -433,10 +423,8 @@ ListUtils = (function($) {
           }
         });
       }
-
     }
     var errorMessage = document.createElement('DIV');
-    var jqTable = $('#' + elementId).html('');
     var options = Utils.setSortFromPriority({
       'aoColumns': columns,
       'aLengthMenu': [10, 25, 50, 100, 200, 400, 1000],
@@ -461,7 +449,7 @@ ListUtils = (function($) {
       }
     });
     optionModifier(options, jqTable, errorMessage, columns);
-    jqTable.dataTable(options);
+    var dataTable = jqTable.dataTable(options);
     if (target.headerMessage) {
       makeHeaderMessage(target.headerMessage.text, target.headerMessage.level);
     }

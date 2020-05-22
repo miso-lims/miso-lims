@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.core.util;
 import java.util.Collection;
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.function.Consumer;
 
 import com.eaglegenomics.simlims.core.Group;
@@ -43,6 +44,8 @@ public interface PaginationFilterSink<T> {
   public void restrictPaginationByHealth(T item, EnumSet<HealthType> healths, Consumer<String> errorHandler);
 
   public void restrictPaginationById(T item, long id, Consumer<String> errorHandler);
+
+  public void restrictPaginationByIds(T item, List<Long> ids, Consumer<String> errorHandler);
 
   public void restrictPaginationByIndex(T item, String index, Consumer<String> errorHandler);
 
