@@ -789,6 +789,10 @@ ListUtils = (function($) {
               return;
             }
             Utils.ajaxWithDialog('Searching', 'POST', Urls.rest.libraryAliquots.query, names, function(aliquots) {
+              if (!aliquots || !aliquots.length) {
+                Utils.showOkDialog('Error', ['No aliquots found']);
+                return;
+              }
               var fields = aliquots.map(function(aliquot) {
                 return {
                   label: aliquot.name + ' (' + aliquot.alias + ')',
@@ -801,6 +805,10 @@ ListUtils = (function($) {
                 var selectedAliquots = aliquots.filter(function(aliquot) {
                   return results['include' + aliquot.id];
                 });
+                if (!selectedAliquots.length) {
+                  Utils.showOkDialog('Error', ['No aliquots selected']);
+                  return;
+                }
                 var dupes = [];
                 getAliquots().forEach(function(existing) {
                   if (selectedAliquots.map(Utils.array.getId).indexOf(existing.id) !== -1) {
