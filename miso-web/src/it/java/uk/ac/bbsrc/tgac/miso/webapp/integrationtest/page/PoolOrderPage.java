@@ -103,6 +103,10 @@ public class PoolOrderPage extends FormPage<PoolOrderPage.Field> {
     waitUntil(ExpectedConditions.stalenessOf(okButton));
     waitUntil(ExpectedConditions.visibilityOfElementLocated(okButtonSelector));
     okButton = getDriver().findElement(okButtonSelector);
+    okButton.click();
+    waitUntil(ExpectedConditions.stalenessOf(okButton));
+    waitUntil(ExpectedConditions.visibilityOfElementLocated(okButtonSelector));
+    okButton = getDriver().findElement(okButtonSelector);
     WebElement dialog = getDriver().findElement(dialogSelector);
     okButton.click();
     waitUntil(ExpectedConditions.invisibilityOf(dialog));
