@@ -258,6 +258,10 @@ INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identifica
   1,0,NULL,NULL,NULL,0, FALSE, 'Identity',
   '20_EXT20,EXT20','UNKNOWN', 'THIS_PROJECT');
 
+INSERT INTO SampleHierarchy(sampleId, identityId, tissueId) VALUES
+(15, 15, NULL),
+(20, 20, NULL);
+
 -- Tissues
 INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identificationBarcode`, `locationBarcode`, `sampleType`, `qcPassed`, `alias`, `project_projectId`, `scientificNameId`, `taxonIdentifier`, sequencingControlTypeId, `lastModifier`, `lastModified`, `creator`, `created`,
   `sampleClassId`, `archived`, `parentId`, `siblingNumber`, `preMigrationId`, isSynthetic, nonStandardAlias, discriminator,
@@ -272,17 +276,28 @@ INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identifica
   2,0,15,4,NULL,0, FALSE, 'Tissue',
   1, 1, 1, 3, NULL);
 
+INSERT INTO SampleHierarchy(sampleId, identityId, tissueId) VALUES
+(16, 15, 16),
+(17, 15, 17),
+(21, 15, 21);
+
 -- Stocks
 INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identificationBarcode`, `locationBarcode`, `sampleType`, `qcPassed`, `alias`, `project_projectId`, `scientificNameId`, `taxonIdentifier`, sequencingControlTypeId, `lastModifier`, `lastModified`, `creator`, `created`,
   `sampleClassId`, `archived`, `parentId`, `siblingNumber`, `preMigrationId`, isSynthetic, nonStandardAlias, discriminator) VALUES
 (18,NULL,'SAM18','stock1','SAM18::TEST_0001_STOCK_1','Freezer1_1','GENOMIC',TRUE,'TEST_0001_STOCK_1',1,1,NULL,NULL,1,'2016-07-07 13:31:19',1,'2016-07-07 13:31:19',
   3,0,17,1,NULL,0, FALSE, 'Stock');
 
+INSERT INTO SampleHierarchy(sampleId, identityId, tissueId) VALUES
+(18, 15, 17);
+
 -- Aliquots
 INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identificationBarcode`, `locationBarcode`, `sampleType`, `qcPassed`, `alias`, `project_projectId`, `scientificNameId`, `taxonIdentifier`, sequencingControlTypeId, `lastModifier`, `lastModified`, `creator`, `created`,
   `sampleClassId`, `archived`, `parentId`, `siblingNumber`, `preMigrationId`, isSynthetic, nonStandardAlias, discriminator) VALUES
 (19,NULL,'SAM19','aliquot1','SAM19::TEST_0001_ALIQUOT_1','Freezer1_1','GENOMIC',TRUE,'TEST_0001_ALIQUOT_1',1,1,NULL,1,1,'2016-07-07 13:31:21',1,'2016-07-07 13:31:21',
   4,0,18,1,NULL,0, FALSE, 'Aliquot');
+
+INSERT INTO SampleHierarchy(sampleId, identityId, tissueId) VALUES
+(19, 15, 17);
 
 INSERT INTO `SampleQC`(`sample_sampleId`, `creator`, `date`, `type`, `results`, kitDescriptorId, kitLot) 
 VALUES (1,1,'2015-08-27',3,5, NULL, NULL),

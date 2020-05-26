@@ -452,7 +452,7 @@ Box.ui = {
 
     switch (entityTypes[0]) {
     case 'SAMPLE':
-      actions = actions.concat(HotTarget.sample.getBulkActions({
+      actions = actions.concat(BulkTarget.sample.getBulkActions({
         sortLibraryPropagate: 'sampleBoxColumn'
       }));
       break;

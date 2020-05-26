@@ -123,7 +123,7 @@ FormTarget.sample = (function($) {
                     return item;
                   },
                   required: true
-                }, FormUtils.makeQcPassedField(!config.detailedSample), {
+                }, FormUtils.makeQcPassedField(!config.detailedSample), { // TODO: sort as on bulk page
                   title: 'QC Status',
                   data: 'detailedQcStatusId',
                   type: 'dropdown',
@@ -450,7 +450,7 @@ FormTarget.sample = (function($) {
               min: 0,
               max: 100
             }]
-          }, {
+          }, { // TODO: piece type field missing
             title: 'Tissue Pieces',
             include: config.detailedSample && object.sampleSubcategory === 'Tissue Piece',
             fields: [{
@@ -499,7 +499,8 @@ FormTarget.sample = (function($) {
               title: 'DNAse Treated',
               data: 'dnaseTreated',
               type: 'checkbox',
-              include: config.dnaseTreatable
+              include: config.dnaseTreatable,
+              required: true
             }, {
               title: 'Reference Slide',
               data: 'referenceSlideId',

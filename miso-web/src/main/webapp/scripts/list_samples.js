@@ -40,7 +40,7 @@ ListTarget.sample = {
     return Urls.rest.samples.query;
   },
   createBulkActions: function(config, projectId) {
-    var actions = HotTarget.sample.getBulkActions(config);
+    var actions = BulkTarget.sample.getBulkActions(config);
 
     if (config.worksetId) {
       actions.push(HotUtils.makeMoveFromWorkset('samples', Urls.rest.worksets.moveSamples(config.worksetId)));

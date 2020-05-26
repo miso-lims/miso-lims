@@ -2,15 +2,24 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page;
 
 import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 
 public abstract class BulkPage extends HeaderFooterPage {
+
+  private static final Logger log = LoggerFactory.getLogger(BulkPage.class);
 
   @FindBy(id = "ajaxLoader")
   private WebElement ajaxLoader;
@@ -38,6 +47,10 @@ public abstract class BulkPage extends HeaderFooterPage {
   protected abstract void refreshElements();
 
   public boolean save(boolean confirmRequired) {
+    return save(confirmRequired, false);
+  }
+
+  public boolean save(boolean confirmRequired, boolean failExpected) {
     saveButton.click();
     if (confirmRequired) {
       waitUntil(or(visibilityOf(dialog), visibilityOf(errors)));
@@ -50,6 +63,42 @@ public abstract class BulkPage extends HeaderFooterPage {
     waitUntil(invisibilityOf(ajaxLoader));
     if (successMessage.isDisplayed()) {
       refreshElements();
+    } else if (!failExpected) {
+      StringBuilder sb = new StringBuilder();
+      sb.append("Bulk table save failed.");
+      Map<Integer, Set<String>> validationErrors = getTable().getInvalidCellsByRow();
+      if (!validationErrors.isEmpty()) {
+        sb.append("\nFront-end validation errors:");
+        validationErrors.forEach((key, value) -> {
+          sb.append("\n  * Row ").append(key).append(": ").append(String.join(", ", value));
+        });
+      }
+      List<WebElement> otherErrors = getDriver().findElements(By.cssSelector("#errors *"));
+      if (!otherErrors.isEmpty()) {
+        sb.append("\nOther errors:");
+        List<Integer> indentTracker = new ArrayList<>();
+        for (int i = 0; i < otherErrors.size(); i++) {
+          WebElement line = otherErrors.get(i);
+          sb.append("\n");
+          if ("ul".equals(line.getTagName())) {
+            indentTracker.add(Integer.parseInt(line.getAttribute("childElementCount")));
+          } else {
+            for (int j = 1; j < indentTracker.size(); j++) {
+              sb.append("  ");
+            }
+            sb.append("* ").append(line.getText());
+            for (int j = indentTracker.size() - 1; j >= 0; j--) {
+              int val = indentTracker.get(j) - 1;
+              if (val == 0) {
+                indentTracker.remove(j);
+              } else {
+                indentTracker.set(j, val);
+              }
+            }
+          }
+        }
+      }
+      log.error(sb.toString());
     }
     return successMessage.isDisplayed();
   }

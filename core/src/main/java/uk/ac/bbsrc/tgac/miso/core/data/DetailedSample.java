@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentAttributes;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentIdentityAttributes;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentTissueAttributes;
 
@@ -103,12 +104,12 @@ public interface DetailedSample extends Sample, GroupIdentifiable {
 
   public void setNgUsed(BigDecimal ngUsed);
 
+  public ParentAttributes getParentAttributes();
+
+  public void setParentAttributes(ParentAttributes parentAttributes);
+
   public ParentIdentityAttributes getIdentityAttributes();
 
-  public void setIdentityAttributes(ParentIdentityAttributes identityAttributes);
-
   public ParentTissueAttributes getTissueAttributes();
-
-  public void setTissueAttributes(ParentTissueAttributes tissueAttributes);
 
 }

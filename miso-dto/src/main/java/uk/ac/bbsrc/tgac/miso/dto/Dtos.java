@@ -594,24 +594,12 @@ public class Dtos {
     to.setGroupId(nullifyStringIfBlank(from.getGroupId()));
     to.setGroupDescription(nullifyStringIfBlank(from.getGroupDescription()));
     to.setSynthetic(from.getSynthetic());
-    if (from.getSubprojectId() != null) {
-      Subproject subproject = new SubprojectImpl();
-      subproject.setId(from.getSubprojectId());
-      to.setSubproject(subproject);
-    }
     to.setCreationDate(LimsUtils.isStringEmptyOrNull(from.getCreationDate()) ? null : parseDate(from.getCreationDate()));
     if (from.getIdentityId() != null) {
       to.setIdentityId(from.getIdentityId());
     }
     to.setNonStandardAlias(from.getNonStandardAlias());
     to.setParent(getParent(from));
-    if (!LimsUtils.isStringEmptyOrNull(from.getExternalNames()) && to.getParent() != null) {
-      SampleIdentity identity = LimsUtils.getParent(SampleIdentity.class, to);
-      if (identity == null) {
-        throw new IllegalStateException("Missing Identity at root of hierarchy");
-      }
-      identity.setExternalName(from.getExternalNames());
-    }
     setBigDecimal(to::setVolumeUsed, from.getVolumeUsed());
     setBigDecimal(to::setNgUsed, from.getNgUsed());
     return to;
@@ -865,7 +853,8 @@ public class Dtos {
     to.setBoxPosition((SampleBoxPosition) makeBoxablePosition(from, (SampleImpl) to));
 
     setString(to::setRequisitionId, from.getRequisitionId());
-    setObject(to::setSequncingControlType, SequencingControlType::new, from.getSequencingControlTypeId());
+    setObject(to::setSequencingControlType, SequencingControlType::new, from.getSequencingControlTypeId());
+    to.setCreationReceiptInfo(toReceiptTransfer(from, to));
     return to;
   }
 

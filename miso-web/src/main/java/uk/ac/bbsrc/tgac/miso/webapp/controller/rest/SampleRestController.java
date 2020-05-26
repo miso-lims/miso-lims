@@ -73,7 +73,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
@@ -83,6 +82,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.DetailedSampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -186,12 +186,7 @@ public class SampleRestController extends RestController {
     RestUtils.validateDtoProvided("Sample", sampleDto);
     Sample sample = buildHierarchy(sampleDto);
     RestUtils.validateNewObject("Sample", sample);
-    TransferSample transferSample = Dtos.toReceiptTransfer(sampleDto, sample);
-    if (transferSample != null) {
-      Transfer transfer = transferSample.getTransfer();
-      timeZoneCorrector.toDbTime(transfer.getTransferTime(), transfer::setTransferTime);
-    }
-    long savedId = sampleService.create(sample, transferSample);
+    long savedId = sampleService.create(sample);
     return Dtos.asDto(sampleService.get(savedId), false);
   }
 
@@ -261,7 +256,16 @@ public class SampleRestController extends RestController {
           inferIntermediateSampleClassId(dto, topProcessingClassId, SampleTissueProcessing.CATEGORY_NAME,
               SampleTissue.CATEGORY_NAME, false));
     }
-    return Dtos.to(sampleDto);
+    Sample sample = Dtos.to(sampleDto);
+    fixReceiptDate(sample);
+    return sample;
+  }
+
+  private void fixReceiptDate(Sample sample) {
+    if (sample.getCreationReceiptInfo() != null) {
+      Transfer transfer = sample.getCreationReceiptInfo().getTransfer();
+      timeZoneCorrector.toDbTime(transfer.getTransferTime(), transfer::setTransferTime);
+    }
   }
 
   private Long inferIntermediateSampleClassId(DetailedSampleDto dto, Long childClassId,
@@ -465,6 +469,16 @@ public class SampleRestController extends RestController {
       samples.add(sample);
     }
     sampleService.bulkDelete(samples);
+  }
+
+  @PostMapping("/bulk")
+  public @ResponseBody List<SampleDto> bulkCreate(@RequestBody List<SampleDto> dtos) throws IOException {
+    return RestUtils.bulkCreate("Sample", dtos, WhineyFunction.rethrow(this::buildHierarchy), sampleService, sam -> Dtos.asDto(sam, true));
+  }
+
+  @PutMapping("/bulk")
+  public @ResponseBody List<SampleDto> bulkUpdate(@RequestBody List<SampleDto> dtos) throws IOException {
+    return RestUtils.bulkUpdate("Sample", dtos, WhineyFunction.rethrow(this::buildHierarchy), sampleService, sam -> Dtos.asDto(sam, true));
   }
 
 }

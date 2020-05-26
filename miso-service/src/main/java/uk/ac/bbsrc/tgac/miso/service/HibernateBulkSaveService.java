@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.service.BulkSaveService;
@@ -15,13 +15,15 @@ import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.util.HibernateSessionManager;
 
-public abstract class AbstractBulkSaveService<T extends Identifiable> extends AbstractSaveService<T> implements BulkSaveService<T> {
+@Transactional(rollbackFor = Exception.class)
+public interface HibernateBulkSaveService<T extends Identifiable> extends BulkSaveService<T> {
 
-  @Autowired
-  private HibernateSessionManager hibernateSessionManager;
+  public List<T> listByIdList(List<Long> ids) throws IOException;
+
+  public HibernateSessionManager getHibernateSessionManager();
 
   @Override
-  public List<T> bulkCreate(List<T> items) throws IOException {
+  public default List<T> bulkCreate(List<T> items) throws IOException {
     List<Long> savedIds = new ArrayList<>();
     Map<Integer, List<ValidationError>> errorsByRow = new HashMap<>();
     for (int i = 0; i < items.size(); i++) {
@@ -32,7 +34,7 @@ public abstract class AbstractBulkSaveService<T extends Identifiable> extends Ab
       }
     }
     if (errorsByRow.isEmpty()) {
-      hibernateSessionManager.flushAndClear();
+      getHibernateSessionManager().flushAndClear();
       return listByIdList(savedIds);
     } else {
       throw new BulkValidationException(errorsByRow);
@@ -40,7 +42,7 @@ public abstract class AbstractBulkSaveService<T extends Identifiable> extends Ab
   }
 
   @Override
-  public List<T> bulkUpdate(List<T> items) throws IOException {
+  public default List<T> bulkUpdate(List<T> items) throws IOException {
     List<Long> savedIds = new ArrayList<>();
     Map<Integer, List<ValidationError>> errorsByRow = new HashMap<>();
     for (int i = 0; i < items.size(); i++) {
@@ -51,13 +53,11 @@ public abstract class AbstractBulkSaveService<T extends Identifiable> extends Ab
       }
     }
     if (errorsByRow.isEmpty()) {
-      hibernateSessionManager.flushAndClear();
+      getHibernateSessionManager().flushAndClear();
       return listByIdList(savedIds);
     } else {
       throw new BulkValidationException(errorsByRow);
     }
   }
-
-  protected abstract List<T> listByIdList(List<Long> ids) throws IOException;
 
 }

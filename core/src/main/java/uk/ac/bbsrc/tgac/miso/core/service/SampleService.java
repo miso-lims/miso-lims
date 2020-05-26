@@ -7,12 +7,11 @@ import java.util.List;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 public interface SampleService
-    extends PaginatedDataSource<Sample>, BarcodableService<Sample>, DeleterService<Sample>, NoteService<Sample>, SaveService<Sample> {
+    extends PaginatedDataSource<Sample>, BarcodableService<Sample>, DeleterService<Sample>, NoteService<Sample>, BulkSaveService<Sample> {
 
   @Override
   public default EntityType getEntityType() {
@@ -41,14 +40,12 @@ public interface SampleService
    * @return
    * @throws IOException
    */
-  public Collection<Sample> listByIdList(List<Long> idList) throws IOException;
+  public List<Sample> listByIdList(List<Long> idList) throws IOException;
 
   public Sample save(Sample sample) throws IOException;
 
   public EntityReference getNextInProject(Sample sample);
 
   public EntityReference getPreviousInProject(Sample sample);
-
-  public long create(Sample sample, TransferSample transferSample) throws IOException;
 
 }

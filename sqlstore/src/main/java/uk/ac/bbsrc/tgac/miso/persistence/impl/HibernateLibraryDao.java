@@ -92,7 +92,8 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
 
   private final static String[] SEARCH_FIELDS = new String[] { "name", "alias", "description", "identificationBarcode" };
   private final static List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("sample"),
-      new AliasDescriptor("sample.tissueAttributes", JoinType.LEFT_OUTER_JOIN),
+      new AliasDescriptor("sample.parentAttributes", JoinType.LEFT_OUTER_JOIN),
+      new AliasDescriptor("parentAttributes.tissueAttributes", JoinType.LEFT_OUTER_JOIN),
       new AliasDescriptor("tissueAttributes.tissueOrigin", JoinType.LEFT_OUTER_JOIN),
       new AliasDescriptor("tissueAttributes.tissueType", JoinType.LEFT_OUTER_JOIN));
 

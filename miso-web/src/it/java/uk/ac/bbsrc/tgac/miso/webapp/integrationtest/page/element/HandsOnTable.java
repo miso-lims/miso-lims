@@ -124,26 +124,10 @@ public class HandsOnTable extends AbstractElement {
    * @return true if the cell is writable, false if it is read-only
    */
   public boolean isWritable(String columnHeading, int rowNum) {
-    WebElement cell = getCell(columnHeading, rowNum);
+    startEditing(columnHeading, rowNum);
+    boolean writable = findElementIfExists(activeCellEditorSelector) != null;
     cancelEditing();
-    if (!cell.getAttribute("class").contains("current")) {
-      cell.click();
-    }
-    new Actions(getDriver()).sendKeys(Keys.ENTER).build().perform();
-    WebElement cellEditor = findElementIfExists(activeCellEditorSelector);
-    if (cell.getAttribute("class").contains("htDimmed")) {
-      if (cellEditor == null) {
-        return false;
-      } else {
-        throw new IllegalStateException("Cell is dimmed, but an editor was found");
-      }
-    } else {
-      if (cellEditor == null) {
-        throw new IllegalStateException("Cell isn't dimmed, but no editor was found");
-      } else {
-        return true;
-      }
-    }
+    return writable;
   }
 
   public Set<String> getDropdownOptions(String columnHeading, int rowNum) {
@@ -179,6 +163,14 @@ public class HandsOnTable extends AbstractElement {
   private String getOptionLabelFromMenuRow(WebElement menuRow) {
     WebElement menuCell = menuRow.findElement(By.tagName("td"));
     return cleanAscii(menuCell.getText());
+  }
+
+  private void startEditing(String columnHeading, int rowNum) {
+    WebElement cell = getCell(columnHeading, rowNum);
+    cell.click();
+    new Actions(getDriver())
+        .sendKeys(Keys.F2)
+        .build().perform();
   }
 
   private void cancelEditing() {
@@ -271,7 +263,7 @@ public class HandsOnTable extends AbstractElement {
 
   public void waitForSearch(String resultColumnHeading, int rowNum) {
     WebElement resultField = getCell(resultColumnHeading, rowNum);
-    waitUntil(textDoesNotContain(resultField, "(...searching...)"));
+    waitUntil(textDoesNotContain(resultField, "searching..."));
   }
 
 }

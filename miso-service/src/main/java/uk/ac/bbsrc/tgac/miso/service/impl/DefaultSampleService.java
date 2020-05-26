@@ -85,10 +85,12 @@ import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissuePieceTypeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueTypeDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.util.HibernateSessionManager;
+import uk.ac.bbsrc.tgac.miso.service.HibernateBulkSaveService;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultSampleService implements SampleService, PaginatedDataSource<Sample> {
+public class DefaultSampleService implements HibernateBulkSaveService<Sample>, SampleService, PaginatedDataSource<Sample> {
 
   private static final Logger log = LoggerFactory.getLogger(DefaultSampleService.class);
 
@@ -138,6 +140,8 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   private TransferService transferService;
   @Autowired
   private SubprojectService subprojectService;
+  @Autowired
+  private HibernateSessionManager hibernateSessionManager;
 
   @Autowired
   private NamingSchemeHolder namingSchemeHolder;
@@ -238,11 +242,6 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
 
   @Override
   public long create(Sample sample) throws IOException {
-    return create(sample, null);
-  }
-
-  @Override
-  public long create(Sample sample, TransferSample transferSample) throws IOException {
     loadChildEntities(sample);
     boxService.throwIfBoxPositionIsFilled(sample);
     User changeUser = authorizationManager.getCurrentUser();
@@ -276,7 +275,6 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
         }
       }
     }
-
     // pre-save field generation
     sample.setName(generateTemporaryName());
     if (isStringEmptyOrNull(sample.getAlias()) && getNamingScheme(sample).hasSampleAliasGenerator()) {
@@ -295,13 +293,14 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     }
     LimsUtils.updateParentVolume(sample, null, changeUser);
     updateParentSlides(sample, null, changeUser);
-    validateChange(sample, transferSample, null);
+    validateChange(sample, null);
     long savedId = save(sample, true).getId();
     if (sample.getParent() != null) {
       sampleStore.update(sample.getParent());
     }
     boxService.updateBoxableLocation(sample);
-    if (transferSample != null) {
+    if (sample.getCreationReceiptInfo() != null) {
+      TransferSample transferSample = sample.getCreationReceiptInfo();
       Transfer transfer = transferSample.getTransfer();
       Transfer existingTransfer = transferService.listByProperties(transfer.getSenderLab(), transfer.getRecipientGroup(),
           sample.getProject(), transfer.getTransferTime()).stream()
@@ -671,7 +670,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       sample.setProject(projectStore.get(sample.getProject().getId()));
     }
     loadChildEntity(sample::setScientificName, sample.getScientificName(), scientificNameService, "scientificNameId");
-    loadChildEntity(sample::setSequncingControlType, sample.getSequencingControlType(), sequencingControlTypeService,
+    loadChildEntity(sample::setSequencingControlType, sample.getSequencingControlType(), sequencingControlTypeService,
         "sequencingControlTypeId");
     if (isDetailedSample(sample)) {
       DetailedSample detailed = (DetailedSample) sample;
@@ -768,7 +767,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     LimsUtils.updateParentVolume(sample, managed, changeUser);
     updateParentSlides(sample, managed, changeUser);
     loadChildEntities(sample);
-    validateChange(sample, null, managed);
+    validateChange(sample, managed);
     applyChanges(managed, sample);
     if (isDetailedSample(managed)) {
       DetailedSample detailedUpdated = (DetailedSample) managed;
@@ -793,9 +792,8 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     }
   }
 
-  private void validateChange(Sample sample, TransferSample receipt, Sample beforeChange) throws IOException {
+  private void validateChange(Sample sample, Sample beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
-
     validateConcentrationUnits(sample.getConcentration(), sample.getConcentrationUnits(), errors);
     validateVolumeUnits(sample.getVolume(), sample.getVolumeUnits(), errors);
     validateBarcodeUniqueness(sample, beforeChange, sampleStore::getByBarcode, errors, "sample");
@@ -806,8 +804,8 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       validateReferenceSlide((DetailedSample) sample, errors);
     }
 
-    if (receipt != null) {
-      validateReceiptTransfer(receipt, errors);
+    if (sample.getCreationReceiptInfo() != null) {
+      validateReceiptTransfer(sample.getCreationReceiptInfo(), errors);
     }
 
     if (!errors.isEmpty()) {
@@ -822,11 +820,11 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
         || isChanged(Sample::getProject, detailed, beforeDetailed)) {
       Set<Subproject> subprojects = subprojectService.getByProjectId(detailed.getProject().getId());
       if (!subprojects.isEmpty() && detailed.getSubproject() == null) {
-        errors.add(new ValidationError("subproject", "Subproject must be specified"));
+        errors.add(new ValidationError("subprojectId", "Subproject must be specified"));
       }
     }
     if (detailed.getSubproject() != null && detailed.getSubproject().getParentProject().getId() != detailed.getProject().getId()) {
-      errors.add(new ValidationError("subproject", "Subproject does not belong to the selected project"));
+      errors.add(new ValidationError("subprojectId", "Subproject does not belong to the selected project"));
     }
   }
 
@@ -895,7 +893,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
     target.setLocationBarcode(source.getLocationBarcode());
     target.setRequisitionId(source.getRequisitionId());
-    target.setSequncingControlType(source.getSequencingControlType());
+    target.setSequencingControlType(source.getSequencingControlType());
 
     if (isDetailedSample(target)) {
       DetailedSample dTarget = (DetailedSample) target;
@@ -1021,7 +1019,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   }
 
   @Override
-  public Collection<Sample> listByIdList(List<Long> idList) throws IOException {
+  public List<Sample> listByIdList(List<Long> idList) throws IOException {
     return sampleStore.getByIdList(idList);
   }
 
@@ -1157,6 +1155,11 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   @Override
   public EntityReference getPreviousInProject(Sample sample) {
     return sampleStore.getPreviousInProject(sample);
+  }
+
+  @Override
+  public HibernateSessionManager getHibernateSessionManager() {
+    return hibernateSessionManager;
   }
 
 }

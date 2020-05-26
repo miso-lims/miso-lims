@@ -31,6 +31,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -141,8 +142,14 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetDetailedSample() throws Exception {
-    Sample sample = dao.get(15L);
+    Sample sample = dao.get(18L);
     assertTrue(LimsUtils.isDetailedSample(sample));
+    DetailedSample detailed = (DetailedSample) sample;
+    assertNotNull(detailed.getTissueAttributes());
+    assertNotNull(detailed.getTissueAttributes().getTissueOrigin());
+    assertEquals("Test Origin", detailed.getTissueAttributes().getTissueOrigin().getAlias());
+    assertNotNull(detailed.getIdentityAttributes());
+    assertEquals(ConsentLevel.THIS_PROJECT, detailed.getIdentityAttributes().getConsentLevel());
   }
 
   @Test

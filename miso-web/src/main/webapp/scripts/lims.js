@@ -1110,6 +1110,12 @@ Utils.array = {
       return obj.name;
   },
 
+  get: function(property) {
+    return function(obj) {
+      return obj[property];
+    };
+  },
+
   /**
    * Gets values for a given key
    */

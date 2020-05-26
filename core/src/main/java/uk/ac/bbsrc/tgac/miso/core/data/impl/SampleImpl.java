@@ -77,6 +77,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencingControlType;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListTransferView;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcCorrespondingField;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
@@ -172,6 +173,9 @@ public class SampleImpl extends AbstractBoxable implements Sample {
   @ManyToOne
   @JoinColumn(name = "sequencingControlTypeId")
   private SequencingControlType sequencingControlType;
+
+  @Transient
+  private TransferSample creationReceiptInfo;
 
   @Override
   public EntityType getEntityType() {
@@ -603,7 +607,7 @@ public class SampleImpl extends AbstractBoxable implements Sample {
   }
 
   @Override
-  public void setSequncingControlType(SequencingControlType sequencingControlType) {
+  public void setSequencingControlType(SequencingControlType sequencingControlType) {
     this.sequencingControlType = sequencingControlType;
   }
 
@@ -624,6 +628,16 @@ public class SampleImpl extends AbstractBoxable implements Sample {
   @Override
   public <T> T visit(BarcodableVisitor<T> visitor) {
     return visitor.visitSample(this);
+  }
+
+  @Override
+  public TransferSample getCreationReceiptInfo() {
+    return creationReceiptInfo;
+  }
+
+  @Override
+  public void setCreationReceiptInfo(TransferSample creationReceiptInfo) {
+    this.creationReceiptInfo = creationReceiptInfo;
   }
 
 }

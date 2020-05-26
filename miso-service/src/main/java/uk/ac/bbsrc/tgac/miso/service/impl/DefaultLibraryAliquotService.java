@@ -6,9 +6,7 @@ import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -38,7 +36,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.TargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
-import uk.ac.bbsrc.tgac.miso.core.service.exception.BulkValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
@@ -52,11 +49,12 @@ import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAliquotStore;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.util.HibernateSessionManager;
+import uk.ac.bbsrc.tgac.miso.service.HibernateBulkSaveService;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
 public class DefaultLibraryAliquotService
-    implements LibraryAliquotService, PaginatedDataSource<LibraryAliquot> {
+    implements HibernateBulkSaveService<LibraryAliquot>, LibraryAliquotService, PaginatedDataSource<LibraryAliquot> {
 
   @Autowired
   private LibraryAliquotStore libraryAliquotDao;
@@ -173,44 +171,6 @@ public class DefaultLibraryAliquotService
     updateParent(aliquot.getParent());
     boxService.updateBoxableLocation(aliquot);
     return savedId;
-  }
-
-  @Override
-  public List<LibraryAliquot> bulkCreate(List<LibraryAliquot> aliquots) throws IOException {
-    List<Long> savedIds = new ArrayList<>();
-    Map<Integer, List<ValidationError>> errorsByRow = new HashMap<>();
-    for (int i = 0; i < aliquots.size(); i++) {
-      try {
-        savedIds.add(create(aliquots.get(i)));
-      } catch (ValidationException validationException) {
-        errorsByRow.put(i, validationException.getErrors());
-      }
-    }
-    if (errorsByRow.isEmpty()) {
-      hibernateSessionManager.flushAndClear();
-      return listByIdList(savedIds);
-    } else {
-      throw new BulkValidationException(errorsByRow);
-    }
-  }
-
-  @Override
-  public List<LibraryAliquot> bulkUpdate(List<LibraryAliquot> aliquots) throws IOException {
-    List<Long> savedIds = new ArrayList<>();
-    Map<Integer, List<ValidationError>> errorsByRow = new HashMap<>();
-    for (int i = 0; i < aliquots.size(); i++) {
-      try {
-        savedIds.add(update(aliquots.get(i)));
-      } catch (ValidationException validationException) {
-        errorsByRow.put(i, validationException.getErrors());
-      }
-    }
-    if (errorsByRow.isEmpty()) {
-      hibernateSessionManager.flushAndClear();
-      return listByIdList(savedIds);
-    } else {
-      throw new BulkValidationException(errorsByRow);
-    }
   }
 
   private NamingScheme getNamingScheme(LibraryAliquot aliquot) {
@@ -460,6 +420,11 @@ public class DefaultLibraryAliquotService
   public List<LibraryAliquot> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
       PaginationFilter... filter) throws IOException {
     return libraryAliquotDao.list(errorHandler, offset, limit, sortDir, sortCol, filter);
+  }
+
+  @Override
+  public HibernateSessionManager getHibernateSessionManager() {
+    return hibernateSessionManager;
   }
 
 }
