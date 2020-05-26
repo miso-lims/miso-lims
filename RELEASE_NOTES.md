@@ -2,7 +2,8 @@
 
 Changes:
 
-
+  * Fixed additional unnecessary sample aliquot parent being created when receiving sample aliquots
+    or libraries
 
 # 1.5.0
 
