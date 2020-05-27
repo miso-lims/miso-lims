@@ -124,7 +124,11 @@ public class AdvancedSearchParser {
           }
         case "id":
           try {
-            return PaginationFilter.id(Long.parseLong(parts[1]));
+            if (parts[1].contains(",")) {
+              return PaginationFilter.ids(LimsUtils.parseIds(parts[1]));
+            } else {
+              return PaginationFilter.id(Long.parseLong(parts[1]));
+            }
           } catch (NumberFormatException ex) {
             errorHandler.accept("Invalid ID: " + parts[1]);
             return null;

@@ -143,10 +143,12 @@ public class PoolPage extends FormPage<PoolPage.Field> {
     WebElement searchBox = dialogContainer.findElement(By.tagName("textarea"));
     searchBox.sendKeys(searchTermsAndProportions.keySet().stream().collect(Collectors.joining("\n")));
     clickOk();
-    waitUntil(or(textToBe(dialogTitleSelector, "Edit Proportions"), textToBe(dialogTitleSelector, "Error")));
+    waitUntil(or(textToBe(dialogTitleSelector, "Select Aliquots"), textToBe(dialogTitleSelector, "Error")));
     if ("Error".equals(getDriver().findElement(dialogTitleSelector).getText())) {
       return false;
     }
+    clickOk();
+    waitUntil(textToBe(dialogTitleSelector, "Edit Proportions"));
     List<WebElement> elements = dialogContainer.findElements(By.tagName("p"));
     for (WebElement element : elements) {
       Pattern p = Pattern.compile("^(LDI\\d+) \\((.*)\\)\\*:$");
