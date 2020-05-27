@@ -769,6 +769,76 @@ ListUtils = (function($) {
         }
       }
     },
+
+    createStaticAddAliquotsAction: function(getAliquots, callback) {
+      return {
+        name: 'Add',
+        handler: function() {
+          Utils.showDialog("Add Aliquots", "Search", [{
+            label: "Names, Aliases, or Barcodes",
+            type: "textarea",
+            property: "names",
+            rows: 15,
+            cols: 40,
+            required: true
+          }], function(result) {
+            var names = result.names.split(/[ \t\r\n]+/).filter(function(name) {
+              return name.length > 0;
+            });
+            if (names.length == 0) {
+              return;
+            }
+            Utils.ajaxWithDialog('Searching', 'POST', Urls.rest.libraryAliquots.query, names, function(aliquots) {
+              if (!aliquots || !aliquots.length) {
+                Utils.showOkDialog('Error', ['No aliquots found']);
+                return;
+              }
+              var fields = aliquots.map(function(aliquot) {
+                return {
+                  label: aliquot.name + ' (' + aliquot.alias + ')',
+                  property: 'include' + aliquot.id,
+                  type: 'checkbox',
+                  value: true
+                };
+              });
+              Utils.showDialog('Select Aliquots', 'Next', fields, function(results) {
+                var selectedAliquots = aliquots.filter(function(aliquot) {
+                  return results['include' + aliquot.id];
+                });
+                if (!selectedAliquots.length) {
+                  Utils.showOkDialog('Error', ['No aliquots selected']);
+                  return;
+                }
+                var dupes = [];
+                getAliquots().forEach(function(existing) {
+                  if (selectedAliquots.map(Utils.array.getId).indexOf(existing.id) !== -1) {
+                    dupes.push(existing);
+                  }
+                });
+                if (dupes.length) {
+                  Utils.showOkDialog('Error', ['The following aliquots are already included in this pool:'].concat(dupes.map(function(
+                      aliquot) {
+                    return '* ' + aliquot.name + ' (' + aliquot.alias + ')';
+                  })));
+                } else {
+                  Utils.showDialog('Edit Proportions', 'Add', selectedAliquots.map(function(aliquot) {
+                    return {
+                      label: aliquot.name + ' (' + aliquot.alias + ')',
+                      type: 'int',
+                      property: 'aliquot' + aliquot.id + 'Proportion',
+                      required: true,
+                      value: 1
+                    };
+                  }), function(proportionResults) {
+                    callback(selectedAliquots, proportionResults);
+                  })
+                }
+              });
+            });
+          });
+        }
+      };
+    },
     createBulkDeleteAction: function(pluralType, urlFragment, getLabel) {
       return {
         name: "Delete",
