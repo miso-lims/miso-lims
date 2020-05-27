@@ -55,7 +55,8 @@ items. These will be the same options as are available in the list page's toolba
 
 * **View Selected**: shows the name and alias of each selected item. You can click "OK" after viewing the list to
   return to the options menu with the samples still selected
-* **Select in list**: closes the dialog, but selects the items in the list so that you can continue to work with them
+* **Show in list**: closes the dialog, but filters the list to show only the selected items so that you can continue to
+  work with them
 
 This feature is useful if you have a list of names, aliases, or barcodes that you can copy from a spreadsheet, or if
 you have several barcoded items that you can scan into the dialog.
