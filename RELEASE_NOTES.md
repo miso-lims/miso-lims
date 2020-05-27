@@ -6,6 +6,8 @@ Changes:
     filter the list to show only the selected items
   * Added a step to the Add Aliquots dialog on the Edit Pool and Edit Pool Order pages to confirm which
     aliquots to add
+  * Fixed additional unnecessary sample aliquot parent being created when receiving sample aliquots
+    or libraries (detailed sample)
 
 # 1.5.0
 

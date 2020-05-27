@@ -205,12 +205,16 @@ public class SampleRestController extends RestController {
   public Sample buildHierarchy(SampleDto sampleDto) throws IOException {
     if (sampleDto instanceof SampleAliquotDto) {
       SampleAliquotDto dto = (SampleAliquotDto) sampleDto;
-      // Some hierarchies have two Aliquot levels
-      dto.setParentAliquotClassId(inferIntermediateSampleClassId(dto, dto.getSampleClassId(), SampleAliquot.CATEGORY_NAME,
-          SampleAliquot.CATEGORY_NAME, true));
-      Long topAliquotClassId = dto.getParentAliquotClassId() == null ? dto.getSampleClassId() : dto.getParentAliquotClassId();
       dto.setStockClassId(
-          inferIntermediateSampleClassId(dto, topAliquotClassId, SampleAliquot.CATEGORY_NAME, SampleStock.CATEGORY_NAME, false));
+          inferIntermediateSampleClassId(dto, dto.getSampleClassId(), SampleAliquot.CATEGORY_NAME, SampleStock.CATEGORY_NAME, true));
+      // Some hierarchies have two Aliquot levels
+      if (dto.getStockClassId() == null) {
+        dto.setParentAliquotClassId(inferIntermediateSampleClassId(dto, dto.getSampleClassId(), SampleAliquot.CATEGORY_NAME,
+            SampleAliquot.CATEGORY_NAME, false));
+        Long topAliquotClassId = dto.getParentAliquotClassId() == null ? dto.getSampleClassId() : dto.getParentAliquotClassId();
+        dto.setStockClassId(
+            inferIntermediateSampleClassId(dto, topAliquotClassId, SampleAliquot.CATEGORY_NAME, SampleStock.CATEGORY_NAME, false));
+      }
       if (dto.getParentId() == null) {
         // infer tissue processing class if necessary
         SampleClass processingClass = sampleClassService.getRequiredTissueProcessingClass(dto.getStockClassId());
