@@ -551,6 +551,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
 
   private DetailedSample createGhostParent(DetailedSample parent, DetailedSample child) throws IOException {
     parent.setProject(child.getProject());
+    parent.setSubproject(child.getSubproject());
     parent.setSampleType(child.getSampleType());
     parent.setScientificName(child.getScientificName());
     parent.setVolume(BigDecimal.ZERO);

@@ -8,6 +8,7 @@ Changes:
     aliquots to add
   * Fixed additional unnecessary sample aliquot parent being created when receiving sample aliquots
     or libraries (detailed sample)
+  * Fixed receiving samples with subproject
 
 # 1.5.0
 
