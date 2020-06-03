@@ -78,16 +78,6 @@ public class HandsontableUtils {
     }
   }
 
-  public static String getQcPassedString(Boolean qcPassed) {
-    if (qcPassed == null) {
-      return "Unknown";
-    } else if (qcPassed) {
-      return "True";
-    } else {
-      return "False";
-    }
-  }
-
   public static String emptyIfNull(BigDecimal value) {
     return value == null ? "" : StringUtils.strip(value.toPlainString(), "0");
   }
@@ -98,7 +88,17 @@ public class HandsontableUtils {
 
   public static String booleanString(Boolean value) {
     if (value == null) {
-      return "Unknown";
+      return null;
+    } else if (Boolean.TRUE.equals(value)) {
+      return "True";
+    } else {
+      return "False";
+    }
+  }
+
+  public static String booleanString(Boolean value, String nullValue) {
+    if (value == null) {
+      return nullValue;
     } else if (Boolean.TRUE.equals(value)) {
       return "True";
     } else {

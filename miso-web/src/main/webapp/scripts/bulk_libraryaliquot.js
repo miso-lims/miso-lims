@@ -18,7 +18,7 @@ BulkTarget.libraryaliquot = (function($) {
       return Urls.external.userManual('library_aliquots');
     },
     getCustomActions: function() {
-      return BulkUtils.actions.boxable;
+      return BulkUtils.actions.boxable();
     },
     getBulkActions: function(config) {
       return [
@@ -137,9 +137,10 @@ BulkTarget.libraryaliquot = (function($) {
     getColumns: function(config, api) {
       var columns = [{
         title: 'Parent Alias',
-        type: 'read-only',
+        type: 'text',
         data: 'parentAlias',
-        getDisplayValue: function(aliquot) {
+        disabled: true,
+        getData: function(aliquot) {
           return aliquot.parentAliquotAlias || aliquot.libraryAlias;
         },
         include: config.pageMode === 'propagate',
@@ -171,13 +172,7 @@ BulkTarget.libraryaliquot = (function($) {
             required: designCode ? designCode.targetedSequencingRequired : false
           });
         }
-      }, {
-        title: 'Size (bp)',
-        type: 'int',
-        data: 'dnaSize',
-        min: 1,
-        max: 10000000
-      });
+      }, BulkUtils.columns.librarySize);
 
       columns = columns.concat(BulkUtils.columns.concentration());
       columns = columns.concat(BulkUtils.columns.volume(false, config));
@@ -238,45 +233,6 @@ BulkTarget.libraryaliquot = (function($) {
 
   function getLabel(item) {
     return item.name + ' (' + item.alias + ')';
-  }
-
-  function fillBoxPositions(api, sort) {
-    var rowCount = api.getRowCount();
-    var freeByAlias = [];
-    var boxesByAlias = api.getCache('boxes');
-
-    for (var row = 0; row < rowCount; row++) {
-      var boxAlias = api.getValue(row, 'box');
-      if (boxAlias) {
-        freeByAlias[boxAlias] = freeByAlias[boxAlias] || boxesByAlias[boxAlias].emptyPositions.slice();
-        var pos = api.getValue(row, 'boxPosition');
-        if (pos) {
-          freeByAlias[boxAlias] = freeByAlias[boxAlias].filter(function(freePos) {
-            return freePos !== pos;
-          });
-        }
-      }
-    }
-    for ( var key in freeByAlias) {
-      freeByAlias[key].sort(sort);
-    }
-    var changes = [];
-    for (var row = 0; row < rowCount; row++) {
-      var boxAlias = api.getValue(row, 'box');
-      if (boxAlias && !api.getValue(row, 'boxPosition')) {
-        var free = freeByAlias[boxAlias];
-        if (free && free.length > 0) {
-          var pos = free.shift();
-          changes.push([row, 'boxPosition', pos]);
-          freeByAlias[boxAlias] = free.filter(function(freePos) {
-            return freePos !== pos;
-          });
-        }
-      }
-    }
-    if (changes.length) {
-      api.updateData(changes);
-    }
   }
 
 })(jQuery);

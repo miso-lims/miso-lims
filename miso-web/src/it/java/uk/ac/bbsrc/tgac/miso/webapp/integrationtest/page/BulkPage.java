@@ -12,6 +12,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +21,12 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 public abstract class BulkPage extends HeaderFooterPage {
 
   private static final Logger log = LoggerFactory.getLogger(BulkPage.class);
+
+  private static final By TOOLBAR = By.id("bulkactions");
+  private static final By DIALOG = By.id("dialog");
+  private static final By DIALOG_OK = By.id("ok");
+
+  private static final String ACTION_SORT = "Sort";
 
   @FindBy(id = "ajaxLoader")
   private WebElement ajaxLoader;
@@ -101,6 +108,26 @@ public abstract class BulkPage extends HeaderFooterPage {
       log.error(sb.toString());
     }
     return successMessage.isDisplayed();
+  }
+
+  public void sortTable(String sortOption) {
+    ClickAction(ACTION_SORT);
+    WebElement dialog = getDriver().findElement(DIALOG);
+    waitUntil(visibilityOf(dialog));
+    Select primarySort = new Select(getDriver().findElements(By.tagName("select")).get(0));
+    if (primarySort.getOptions().stream().noneMatch(opt -> sortOption.equals(opt.getText()))) {
+      throw new IllegalArgumentException(String.format("Sort option %s not found in dropdown", sortOption));
+    }
+    primarySort.selectByVisibleText(sortOption);
+    getDriver().findElement(DIALOG_OK).click();
+    waitUntil(invisibilityOf(dialog));
+    refreshElements();
+  }
+
+  private void ClickAction(String buttonText) {
+    WebElement toolbar = getDriver().findElement(TOOLBAR);
+    WebElement actionButton = toolbar.findElement(By.linkText(buttonText));
+    actionButton.click();
   }
 
 }

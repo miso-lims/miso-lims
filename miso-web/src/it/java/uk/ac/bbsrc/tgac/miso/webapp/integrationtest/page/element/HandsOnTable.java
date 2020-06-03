@@ -34,6 +34,9 @@ public class HandsOnTable extends AbstractElement {
   private static final By activeDropdownSelector = By.cssSelector("div.handsontableInputHolder:not([style*='z-index: -1'])");
   private static final By activeCellEditorSelector = By.cssSelector("div.handsontableInputHolder:not([style*='z-index: -1']) > textarea");
   private static final By dropdownOptionRowsSelector = By.cssSelector("div.ht_master table.htCore > tbody > tr");
+  private static final By sortButtonSelector = By.linkText("Sort");
+  private static final By dialogSelector = By.id("dialog");
+  private static final By dialogOkSelector = By.id("ok");
   private final List<String> columnHeadings;
   private final List<WebElement> inputRows;
   private final List<WebElement> lockedRows;
@@ -41,6 +44,9 @@ public class HandsOnTable extends AbstractElement {
 
   @FindBy(id = "hotContainer")
   private WebElement hotContainer;
+
+  @FindBy(id = "bulkactions")
+  private WebElement toolbar;
 
   @FindBy(id = "save")
   private WebElement saveButton;

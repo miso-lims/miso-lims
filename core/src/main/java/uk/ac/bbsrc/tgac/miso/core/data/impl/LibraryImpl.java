@@ -82,6 +82,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Workstation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListTransferView;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
@@ -239,6 +240,9 @@ public class LibraryImpl extends AbstractBoxable implements Library {
 
   @Transient
   private List<FileAttachment> pendingAttachmentDeletions;
+
+  @Transient
+  private TransferLibrary creationReceiptInfo;
 
   @Override
   public Boxable.EntityType getEntityType() {
@@ -586,19 +590,6 @@ public class LibraryImpl extends AbstractBoxable implements Library {
   }
 
   @Override
-  public IndexFamily getCurrentFamily() {
-    if (indices == null) {
-      return IndexFamily.NULL;
-    }
-    for (Index index : indices) {
-      if (index != null) {
-        return index.getFamily();
-      }
-    }
-    return IndexFamily.NULL;
-  }
-
-  @Override
   public QcTarget getQcTarget() {
     return QcTarget.Library;
   }
@@ -867,6 +858,16 @@ public class LibraryImpl extends AbstractBoxable implements Library {
   @Override
   public <T> T visit(BarcodableVisitor<T> visitor) {
     return visitor.visitLibrary(this);
+  }
+
+  @Override
+  public TransferLibrary getCreationReceiptInfo() {
+    return creationReceiptInfo;
+  }
+
+  @Override
+  public void setCreationReceiptInfo(TransferLibrary creationReceiptInfo) {
+    this.creationReceiptInfo = creationReceiptInfo;
   }
 
 }

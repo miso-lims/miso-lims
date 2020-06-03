@@ -74,10 +74,12 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleStore;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.util.HibernateSessionManager;
+import uk.ac.bbsrc.tgac.miso.service.HibernateBulkSaveService;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultLibraryService implements LibraryService, PaginatedDataSource<Library> {
+public class DefaultLibraryService implements HibernateBulkSaveService<Library>, LibraryService, PaginatedDataSource<Library> {
 
   protected static final Logger log = LoggerFactory.getLogger(DefaultLibraryService.class);
 
@@ -123,6 +125,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   private FileAttachmentService fileAttachmentService;
   @Autowired
   private TransferService transferService;
+  @Autowired
+  private HibernateSessionManager hibernateSessionManager;
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
 
@@ -186,11 +190,6 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
 
   @Override
   public long create(Library library) throws IOException {
-    return create(library, null);
-  }
-
-  @Override
-  public long create(Library library, TransferLibrary transferLibrary) throws IOException {
     if (library.getSample() != null && !library.getSample().isSaved()) {
       Long sampleId = sampleService.create(library.getSample());
       library.getSample().setId(sampleId);
@@ -221,7 +220,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     long savedId = save(library, true).getId();
     sampleStore.update(library.getParent());
     boxService.updateBoxableLocation(library);
-    if (transferLibrary != null) {
+    if (library.getCreationReceiptInfo() != null) {
+      TransferLibrary transferLibrary = library.getCreationReceiptInfo();
       Transfer transfer = transferLibrary.getTransfer();
       Transfer existingTransfer = transferService.listByProperties(transfer.getSenderLab(), transfer.getRecipientGroup(),
           library.getSample().getProject(), transfer.getTransferTime()).stream()
@@ -738,6 +738,11 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   public List<Library> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
       PaginationFilter... filter) throws IOException {
     return libraryDao.list(errorHandler, offset, limit, sortDir, sortCol, filter);
+  }
+
+  @Override
+  public HibernateSessionManager getHibernateSessionManager() {
+    return hibernateSessionManager;
   }
 
 }

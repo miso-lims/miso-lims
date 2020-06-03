@@ -719,7 +719,7 @@ public class BulkPoolIT extends AbstractIT {
     assertEntityAttribute(Columns.CREATE_DATE, attributes, pool, p -> LimsUtils.formatDate(p.getCreationDate()));
     assertEntityAttribute(Columns.CONCENTRATION, attributes, pool, p -> LimsUtils.toNiceString(p.getConcentration()));
     assertEntityAttribute(Columns.VOLUME, attributes, pool, p -> p.getVolume() == null ? null : LimsUtils.toNiceString(p.getVolume()));
-    assertEntityAttribute(Columns.QC_PASSED, attributes, pool, p -> getQcPassedString(p.getQcPassed()));
+    assertEntityAttribute(Columns.QC_PASSED, attributes, pool, p -> booleanString(p.getQcPassed()));
   }
 
   private static void assertPoolableElementViews(Pool pool, List<Long> ids, List<Integer> proportions) {

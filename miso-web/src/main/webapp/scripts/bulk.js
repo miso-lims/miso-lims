@@ -33,14 +33,14 @@ BulkUtils = (function($) {
    * 
    * Column structure: {
    *   title: required string; column heading
-   *   type: required string (text|read-only|int|decimal|date|time|dropdown); type of field
+   *   type: required string (text|int|decimal|date|time|dropdown); type of field
+   *   disabled: optional boolean (default: false); if true, the field is read-only
    *   data: required string; JSON property to use for value
-   *   getData: optional function(object) returning string; get value from object instead of mapping
-   *       normally
+   *   getData: optional function(object, limitedApi) returning string; get value from object
+   *       instead of mapping normally. This should return the value to display in the cell (for
+   *       a dropdown column, return the label rather than the value)
    *   setData: optional function(object, value, rowIndex, api); set value to object instead of
    *       doing regular mapping
-   *   getDisplayValue: optional function(object) returning string; generate a value to display in
-   *       a read-only field instead of the data value
    *   include: optional boolean (default: true); determines whether the column is displayed
    *   includeSaved: optional boolean (default: true); if false, the column will be hidden after
    *       save. Will have no effect if 'include' is false
@@ -59,8 +59,9 @@ BulkUtils = (function($) {
    *   required: optional boolean (default: false); whether the field is required
    *   maxLength: optional integer; maximum number of characters for text input
    *   regex: optional regex string; validation regex for text input
-   *   initial: optional string; value to initialize field value to when missing. Affects new items
-   *       only unless initializeOnEdit is set to true
+   *   initial: optional string; value to initialize field value to when missing. For dropdowns,
+   *       this should be the item label. Affects new items only unless initializeOnEdit is set to
+   *       true
    *   initializeOnEdit: optional boolean (default: false); if true, the initial value will also be
    *       used when editing existing items
    *   min: optional int/decimal; minimum value for int or decimal input
@@ -89,6 +90,8 @@ BulkUtils = (function($) {
    *       API
    *   getRowCount: function(); get number of rows in the table
    *   getValue: function(rowIndex, dataProperty); get a cell value
+   *   getValueObject: function(row, dataProperty): get the object represented by the current cell
+   *       value (for dropdown columns)
    *   getSourceData: function(rowIndex, dataProperty); get the backing data for a dropdown field
    *   updateField: function(rowIndex, dataProperty, options). options may include
    *       * 'value' (string)
@@ -99,6 +102,7 @@ BulkUtils = (function($) {
    *   updateData: function(changes); update fields in bulk. Use this rather than multiple
    *       updateField calls to improve performance. changes is an array of arrays where the inner
    *       arrays have three elements - rowIndex, dataProperty, and newValue
+   *   isSaved: function(); returns true if the data has been saved; else false
    * }
    * 
    */
@@ -155,8 +159,9 @@ BulkUtils = (function($) {
     columns: {
       name: {
         title: 'Name',
-        type: 'read-only',
-        data: 'name'
+        type: 'text',
+        data: 'name',
+        disabled: true
       },
 
       alias: function(config) {
@@ -247,13 +252,16 @@ BulkUtils = (function($) {
           source: config.recipientGroups,
           getItemLabel: Utils.array.getName,
           getItemValue: Utils.array.getId,
-          initial: config.recipientGroups.length === 1 ? config.recipientGroups[0] : null
+          initial: config.recipientGroups.length === 1 ? config.recipientGroups[0].name : null
         }, {
           title: 'Receipt Confirmed',
           type: 'dropdown',
           data: 'received',
           includeSaved: false,
           source: [{
+            label: 'Unknown',
+            value: null
+          }, {
             label: 'True',
             value: true
           }, {
@@ -272,6 +280,9 @@ BulkUtils = (function($) {
           data: 'receiptQcPassed',
           includeSaved: false,
           source: [{
+            label: 'Unknown',
+            value: null
+          }, {
             label: 'True',
             value: true
           }, {
@@ -447,7 +458,7 @@ BulkUtils = (function($) {
               getItemValue: function(item) {
                 return item.value;
               },
-              initial: false,
+              initial: 'False',
               onChange: function(rowIndex, newValue, api) {
                 if (newValue) {
                   var boxChanges = {
@@ -478,8 +489,9 @@ BulkUtils = (function($) {
         if (showEffectiveGroupId) {
           columns.push({
             title: 'Effective Group ID',
-            type: 'read-only',
+            type: 'text',
             data: 'effectiveGroupId',
+            disabled: true,
             include: Constants.isDetailedSample
           });
           groupId.onChange = function(rowIndex, newValue, api) {
@@ -527,7 +539,7 @@ BulkUtils = (function($) {
           },
           getItemValue: Utils.array.getName,
           required: true,
-          initial: 'NANOGRAMS_PER_MICROLITRE',
+          initial: 'ng/µL',
           initializeOnEdit: true
         }];
       },
@@ -549,7 +561,7 @@ BulkUtils = (function($) {
           },
           getItemValue: Utils.array.getName,
           required: true,
-          initial: 'MICROLITRES',
+          initial: 'µL',
           initializeOnEdit: true
         }];
 
@@ -599,25 +611,35 @@ BulkUtils = (function($) {
           getItemLabel: Utils.array.get('label'),
           getItemValue: Utils.array.get('value')
         };
+      },
+
+      librarySize: {
+        title: 'Size (bp)',
+        type: 'int',
+        data: 'dnaSize',
+        min: 1,
+        max: 10000000
       }
     },
 
     actions: {
-      boxable: [{
-        name: 'Fill Boxes by Row',
-        action: function(api) {
-          fillBoxPositions(api, function(a, b) {
-            return Utils.sorting.sortBoxPositions(a, b, true);
-          });
-        }
-      }, {
-        name: 'Fill Boxes by Column',
-        action: function(api) {
-          fillBoxPositions(api, function(a, b) {
-            return Utils.sorting.sortBoxPositions(a, b, false);
-          });
-        }
-      }]
+      boxable: function() {
+        return [{
+          name: 'Fill Boxes by Row',
+          action: function(api) {
+            fillBoxPositions(api, function(a, b) {
+              return Utils.sorting.sortBoxPositions(a, b, true);
+            });
+          }
+        }, {
+          name: 'Fill Boxes by Column',
+          action: function(api) {
+            fillBoxPositions(api, function(a, b) {
+              return Utils.sorting.sortBoxPositions(a, b, false);
+            });
+          }
+        }];
+      }
     }
 
   };
@@ -638,7 +660,7 @@ BulkUtils = (function($) {
         });
     addColumnHelp(columns);
 
-    var tableData = makeTableData(data, columns, config);
+    var tableData = makeTableData(data, columns, config, api);
     var cellMetas = processDropdownSources(columns, data, tableData, api);
     processFormatters(cellMetas, columns, data);
     var listeners = processOnChangeListeners(cellMetas, columns, tableData);
@@ -692,7 +714,7 @@ BulkUtils = (function($) {
         updateField(hot, columns, rowIndex, dataProperty, changes);
       };
       changes.forEach(function(change) {
-        if (listeners[change[1]]) {
+        if (listeners[change[1]] && change[3] !== change[2]) {
           listeners[change[1]](change[0], change[3], onChangeApi);
         }
       });
@@ -728,12 +750,11 @@ BulkUtils = (function($) {
   function makeHotColumn(column) {
     var base = {
       data: column.data,
-      allowEmpty: !column.required
+      allowEmpty: tableSaved || !column.required,
+      readOnly: column.disabled
     };
 
     switch (column.type) {
-    case 'read-only':
-      return makeReadOnlyColumn(column, base);
     case 'text':
       return makeTextColumn(column, base);
     case 'int':
@@ -749,12 +770,6 @@ BulkUtils = (function($) {
     default:
       throw new Error('Unknown field type: ' + column.type);
     }
-  }
-
-  function makeReadOnlyColumn(column, base) {
-    base.type = 'text';
-    base.readOnly = true;
-    return base;
   }
 
   function makeTextColumn(column, base) {
@@ -834,17 +849,21 @@ BulkUtils = (function($) {
     if (label === null || label === '') {
       return null;
     }
-    var item = source.find(function(sourceItem) {
+    var item = getSourceItemForLabel(source, label, column);
+    if (item === undefined) {
+      throw new Error('No matching item found in source');
+    }
+    return column.getItemValue ? column.getItemValue(item) : item;
+  }
+
+  function getSourceItemForLabel(source, label, column) {
+    return source.find(function(sourceItem) {
       if (column.getItemLabel) {
         return column.getItemLabel(sourceItem) === label;
       } else {
         return sourceItem === label;
       }
     });
-    if (item === undefined) {
-      throw new Error('No matching item found in source');
-    }
-    return column.getItemValue ? column.getItemValue(item) : item;
   }
 
   function makeApi() {
@@ -858,11 +877,15 @@ BulkUtils = (function($) {
 
       showError: function(message) {
         showError(message);
+      },
+
+      isSaved: function() {
+        return tableSaved;
       }
     };
   }
 
-  function makeTableData(data, columns, config) {
+  function makeTableData(data, columns, config, api) {
     var tableData = [];
     for (var i = 0; i < data.length; i++) {
       var rowData = {};
@@ -870,38 +893,38 @@ BulkUtils = (function($) {
         if (!column.data) {
           throw new Error('Missing data property for column definition: ' + column.title);
         }
-        if (column.type === 'read-only' && column.getDisplayValue) {
-          rowData[column.data] = column.getDisplayValue(data[i]);
-          return;
-        }
         var defaultValue = null;
         if (column.hasOwnProperty('initial') && !tableSaved && (column.initializeOnEdit || config.pageMode !== 'edit')) {
           defaultValue = column.initial;
         }
         if (column.getData) {
-          rowData[column.data] = column.getData(data[i]) || defaultValue;
-        } else if (data[i].hasOwnProperty(column.data) && data[i][column.data] !== null) {
-          if (column.type === 'dropdown') {
-            if (Array.isArray(column.source)) {
-              rowData[column.data] = getSourceLabelForValue(column.source, data[i][column.data], column);
-            } else {
-              // if dropdown source is a function value gets set later in processDropdownSources
-              rowData[column.data] = null;
-            }
-          } else {
-            rowData[column.data] = data[i][column.data];
-          }
+          rowData[column.data] = column.getData(data[i], api) || defaultValue;
         } else {
-          if (column.type === 'dropdown') {
-            if (Array.isArray(column.source)) {
-              if (defaultValue !== null) {
-                rowData[column.data] = getSourceLabelForValue(column.source, defaultValue, column);
+          var dataValue = Utils.getObjectField(data[i], column.data);
+          if (dataValue !== null && dataValue !== undefined) {
+            if (column.type === 'dropdown') {
+              if (Array.isArray(column.source)) {
+                rowData[column.data] = getSourceLabelForValue(column.source, dataValue, column);
               } else {
-                rowData[column.data] = getSourceLabelForValue(column.source, null, column);
+                // if dropdown source is a function value gets set later in processDropdownSources
+                rowData[column.data] = null;
               }
+            } else {
+              rowData[column.data] = dataValue;
             }
           } else {
-            rowData[column.data] = defaultValue;
+            if (column.type === 'dropdown') {
+              if (defaultValue !== null) {
+                rowData[column.data] = defaultValue;
+              } else if (Array.isArray(column.source)) {
+                rowData[column.data] = getSourceLabelForValue(column.source, null, column);
+              } else {
+                // if dropdown source is a function value gets set later in processDropdownSources
+                rowData[column.data] = null;
+              }
+            } else {
+              rowData[column.data] = defaultValue;
+            }
           }
         }
       });
@@ -1080,8 +1103,21 @@ BulkUtils = (function($) {
       return hot.getDataAtRowProp(row, dataProperty);
     };
 
+    api.getValueObject = function(row, dataProperty) {
+      // Note: currently only works for columns where the source is set individually per row
+      var colIndex = getColumnIndex(dataProperty, columns);
+      var column = columns[colIndex];
+      if (column.type !== 'dropdown') {
+        throw new Error('Cannot get value object for non-dropdown column: ' + dataProperty);
+      }
+      var sourceData = hot.getCellMeta(row, colIndex).sourceData;
+      var label = hot.getDataAtRowProp(row, dataProperty);
+      return label ? getSourceItemForLabel(sourceData, label, column) : null;
+    };
+
     api.getSourceData = function(row, dataProperty) {
-      return hot.getCellMeta(row, hot.propToCol(dataProperty)).sourceData;
+      var colIndex = getColumnIndex(dataProperty, columns);
+      return hot.getCellMeta(row, colIndex).sourceData;
     };
 
     api.updateField = function(rowIndex, dataProperty, options) {
@@ -1158,6 +1194,21 @@ BulkUtils = (function($) {
         return tableData[row][dataProperty];
       },
 
+      getValueObject: function(row, dataProperty) {
+        // Note: currently only works for columns where the source is set individually per row
+        var colIndex = getColumnIndex(dataProperty, columns);
+        var column = columns[colIndex];
+        if (column.type !== 'dropdown') {
+          throw new Error('Cannot get value object for non-dropdown column: ' + dataProperty);
+        }
+        var cellMeta = cellMetas.find(function(meta) {
+          return meta.row === row && meta.col === colIndex;
+        });
+        var sourceData = cellMeta.sourceData;
+        var label = tableData[row][dataProperty];
+        return getSourceItemForLabel(sourceData, label, column);
+      },
+
       getSourceData: function(rowIndex, dataProperty) {
         var colIndex = getColumnIndex(dataProperty, columns);
         var cellMeta = cellMetas.find(function(meta) {
@@ -1203,6 +1254,10 @@ BulkUtils = (function($) {
         changes.forEach(function(change) {
           tableData[change[0]][change[1]] = change[2];
         });
+      },
+
+      isSaved: function() {
+        return tableSaved;
       }
     };
 
@@ -1535,24 +1590,24 @@ BulkUtils = (function($) {
         if (column.omit) {
           continue;
         }
-        if (tableData[rowIndex][colIndex] === null || tableData[rowIndex][colIndex] === '') {
-          data[rowIndex][column.data] = null;
+        if (tableData[rowIndex][colIndex] === null || tableData[rowIndex][colIndex] === undefined || tableData[rowIndex][colIndex] === '') {
+          Utils.setObjectField(data[rowIndex], column.data, null);
           continue;
         }
         if (column.type === 'dropdown') {
           if (column.validationCache) {
-            data[rowIndex][column.data] = caches[column.validationCache][tableData[rowIndex][colIndex]];
+            Utils.setObjectField(data[rowIndex], column.data, caches[column.validationCache][tableData[rowIndex][colIndex]]);
           } else {
             var source = hot.getCellMeta(rowIndex, colIndex).sourceData;
             if ((!source || !source.length) && Array.isArray(column.source)) {
               source = column.source;
             }
-            data[rowIndex][column.data] = getSourceValueForLabel(source, tableData[rowIndex][colIndex], column);
+            Utils.setObjectField(data[rowIndex], column.data, getSourceValueForLabel(source, tableData[rowIndex][colIndex], column));
           }
         } else if (column.setData) {
           column.setData(data[rowIndex], tableData[rowIndex][colIndex], rowIndex, api);
         } else {
-          data[rowIndex][column.data] = tableData[rowIndex][colIndex];
+          Utils.setObjectField(data[rowIndex], column.data, tableData[rowIndex][colIndex]);
         }
       }
     }
@@ -1731,6 +1786,45 @@ BulkUtils = (function($) {
     if (itemPos && cached.emptyPositions.indexOf(itemPos) === -1) {
       cached.emptyPositions.push(itemPos);
       cached.emptyPositions.sort();
+    }
+  }
+
+  function fillBoxPositions(api, sort) {
+    var rowCount = api.getRowCount();
+    var freeByAlias = [];
+    var boxesByAlias = api.getCache('boxes');
+
+    for (var row = 0; row < rowCount; row++) {
+      var boxAlias = api.getValue(row, 'box');
+      if (boxAlias) {
+        freeByAlias[boxAlias] = freeByAlias[boxAlias] || boxesByAlias[boxAlias].emptyPositions.slice();
+        var pos = api.getValue(row, 'boxPosition');
+        if (pos) {
+          freeByAlias[boxAlias] = freeByAlias[boxAlias].filter(function(freePos) {
+            return freePos !== pos;
+          });
+        }
+      }
+    }
+    for ( var key in freeByAlias) {
+      freeByAlias[key].sort(sort);
+    }
+    var changes = [];
+    for (var row = 0; row < rowCount; row++) {
+      var boxAlias = api.getValue(row, 'box');
+      if (boxAlias && !api.getValue(row, 'boxPosition')) {
+        var free = freeByAlias[boxAlias];
+        if (free && free.length > 0) {
+          var pos = free.shift();
+          changes.push([row, 'boxPosition', pos]);
+          freeByAlias[boxAlias] = free.filter(function(freePos) {
+            return freePos !== pos;
+          });
+        }
+      }
+    }
+    if (changes.length) {
+      api.updateData(changes);
     }
   }
 

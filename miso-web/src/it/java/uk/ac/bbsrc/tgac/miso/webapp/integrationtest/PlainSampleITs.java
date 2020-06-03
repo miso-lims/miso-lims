@@ -27,7 +27,6 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkLibraryPage.LibColu
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.SamColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTableSaveResult;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.TestUtils;
 
 public class PlainSampleITs extends AbstractIT {
@@ -153,13 +152,10 @@ public class PlainSampleITs extends AbstractIT {
     attrs.put(LibColumns.SIZE, "321");
 
     attrs.forEach((k, v) -> table.enterText(k, 0, v));
-    HandsOnTableSaveResult result = table.save();
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
-    assertTrue("Library save", result.getItemsSaved() == 1);
-    assertTrue("Server errors", result.getServerErrors().isEmpty());
-    assertTrue("Save errors", result.getSaveErrors().isEmpty());
-
-    Long savedId = Long.valueOf(table.getText(LibColumns.NAME, 0).substring(3));
+    Long savedId = Long.valueOf(savedTable.getText(LibColumns.NAME, 0).substring(3));
     Library saved = (Library) getSession().get(LibraryImpl.class, savedId);
     assertTrue("Library name generation", saved.getName().contains("LIB"));
     assertTrue("Library barcode generation", !isStringEmptyOrNull(saved.getIdentificationBarcode()));
@@ -192,12 +188,10 @@ public class PlainSampleITs extends AbstractIT {
     attrs.put(LibColumns.SIZE, "321");
 
     attrs.forEach((k, v) -> table.enterText(k, 0, v));
-    HandsOnTableSaveResult result = table.save();
-    assertTrue("Library save", result.getItemsSaved() == 1);
-    assertTrue("Server errors", result.getServerErrors().isEmpty());
-    assertTrue("Save errors", result.getSaveErrors().isEmpty());
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
-    Long savedId = Long.valueOf(table.getText(LibColumns.NAME, 0).substring(3));
+    Long savedId = Long.valueOf(savedTable.getText(LibColumns.NAME, 0).substring(3));
     Library saved = (Library) getSession().get(LibraryImpl.class, savedId);
     assertTrue("Library name generation", saved.getName().contains("LIB"));
     assertTrue("Library barcode generation", !isStringEmptyOrNull(saved.getIdentificationBarcode()));
