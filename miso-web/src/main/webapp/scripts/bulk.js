@@ -652,8 +652,9 @@ BulkUtils = (function($) {
     var tableData = makeTableData(data, columns, config);
     var cellMetas = processDropdownSources(columns, data, tableData, api);
     processFormatters(cellMetas, columns, data);
+    var listeners = processOnChangeListeners(cellMetas, columns, tableData);
 
-    // Note: can never call udpateSettings else column header display bugs happen
+    // Note: can never call updateSettings else column header display bugs happen
     var hot = new Handsontable(hotContainer, {
       licenseKey: 'non-commercial-and-evaluation',
       fixedColumnsLeft: target.hasOwnProperty('getFixedColumns') ? target.getFixedColumns(config) : 1,
@@ -686,20 +687,24 @@ BulkUtils = (function($) {
       incrementAutofill(hot, start, end, rows);
     });
 
+    hot.addHook('afterChange', function(changes, source) {
+      // changes = [[row, prop, oldVal, newVal], ...]
+      changes.forEach(function(change) {
+        if (listeners[change[1]]) {
+          listeners[change[1]](change[0], change[3], api);
+        }
+      });
+    });
+    hot.validateCells();
+
     extendApi(api, hot, columns);
-    setupOnChangeListeners(hot, columns, api);
 
     if (tableSaved) {
       showBulkActions(target, config, data);
     } else {
       setupActions(hot, target, columns, api, config, data);
+      setupSave(hot, target, columns, api, config, data);
     }
-    setupSave(hot, target, columns, api, config, data);
-
-    // many changes when setting up onChange listeners sometimes messes up validation, so re-validate all
-    window.setTimeout(function() {
-      hot.validateCells();
-    }, 500);
   }
 
   function addColumnHelp(columns) {
@@ -926,17 +931,7 @@ BulkUtils = (function($) {
         var formatterName = column.getFormatter(data[rowIndex]);
         var formatter = getFormatter(formatterName, column);
         if (formatter != null) {
-          var cellMeta = cellMetas.find(function(meta) {
-            return meta.row === rowIndex && meta.col === colIndex;
-          });
-          if (!cellMeta) {
-            cellMeta = {
-              row: rowIndex,
-              col: colIndex
-            };
-            cellMetas.push(cellMeta);
-          }
-          cellMeta.renderer = formatter.renderer;
+          addCellMeta(cellMetas, rowIndex, colIndex, formatter, formatter.renderer);
           if (formatter.additionalAction) {
             additionalActions[formatterName] = formatter.additionalAction;
           }
@@ -946,6 +941,20 @@ BulkUtils = (function($) {
         action();
       });
     });
+  }
+
+  function addCellMeta(cellMetas, row, col, key, value) {
+    var cellMeta = cellMetas.find(function(meta) {
+      return meta.row === row && meta.col === col;
+    });
+    if (!cellMeta) {
+      cellMeta = {
+        row: row,
+        col: col
+      };
+      cellMetas.push(cellMeta);
+    }
+    cellMeta[key] = value;
   }
 
   function getFormatter(formatterName, column) {
@@ -1058,7 +1067,18 @@ BulkUtils = (function($) {
     return incrementedString;
   }
 
+  function getColumnIndex(dataProperty, columns) {
+    var colIndex = columns.findIndex(function(column) {
+      return column.data === dataProperty;
+    });
+    if (colIndex === -1) {
+      throw new Error('No column found for data property: ' + dataProperty);
+    }
+    return colIndex;
+  }
+
   function extendApi(api, hot, columns) {
+    // Note: make sure to mirrow capabilities here in processOnChangeListeners' tempApi
     api.showError = function(message) {
       showError(message, hot);
     };
@@ -1076,14 +1096,8 @@ BulkUtils = (function($) {
     };
 
     api.updateField = function(rowIndex, dataProperty, options) {
-      var column = columns.find(function(col) {
-        return col.data === dataProperty;
-      });
-      if (!column) {
-        throw new Error('No column found for data property: ' + dataProperty);
-      }
-      var colIndex = hot.propToCol(dataProperty);
-      var cellMeta = hot.getCellMeta(rowIndex, colIndex);
+      var colIndex = getColumnIndex(dataProperty, columns);
+      var column = columns[colIndex];
 
       var forceValidate = false;
       Object.keys(options).forEach(function(option) {
@@ -1147,37 +1161,104 @@ BulkUtils = (function($) {
     };
   }
 
-  function setupOnChangeListeners(hot, columns, api) {
-    var rowCount = hot.countRows();
-    var listeners = {};
-    // intercept setDataAtCell to apply entire column of changes at once for performance
-    var originalSetData = hot.setDataAtCell;
-    var dataChanges = [];
-    hot.setDataAtCell = function(rowIndex, colIndex, value) {
-      dataChanges.push([rowIndex, colIndex, value]);
+  function processOnChangeListeners(cellMetas, columns, tableData) {
+    var tempApi = {
+      // Note: this should have the same capabilities as the regular api (after extendApi)
+      // except working with the cellMeta and data before table creation
+      getCache: function(cacheName) {
+        if (!caches[cacheName]) {
+          caches[cacheName] = {};
+        }
+        return caches[cacheName];
+      },
+
+      showError: function(message) {
+        showError(message);
+      },
+
+      getRowCount: function() {
+        return tableData.length;
+      },
+
+      getValue: function(row, dataProperty) {
+        return tableData[row][dataProperty];
+      },
+
+      getSourceData: function(rowIndex, dataProperty) {
+        var colIndex = getColumnIndex(dataProperty, columns);
+        var cellMeta = cellMetas.find(function(meta) {
+          return meta.row === rowIndex && meta.col === colIndex;
+        });
+        return (cellMeta && cellMeta.sourceData) ? cellMeta.sourceData : null;
+      },
+
+      updateField: function(rowIndex, dataProperty, options) {
+        var colIndex = getColumnIndex(dataProperty, columns);
+        var column = columns[colIndex];
+
+        Object.keys(options).forEach(function(option) {
+          switch (option) {
+          case 'value':
+            tableData[rowIndex][dataProperty] = options.value;
+            break;
+          case 'source':
+            if (column.type !== 'dropdown') {
+              throw new Error('Can\'t update source of non-dropdown column: ' + dataProperty);
+            }
+            var labels = getDropdownOptionLabels(options.source, column.getItemLabel, column.sortSource);
+            addCellMeta(cellMetas, rowIndex, colIndex, 'source', labels);
+            addCellMeta(cellMetas, rowIndex, colIndex, 'sourceData', options.source);
+            break;
+          case 'required':
+            addCellMeta(cellMetas, rowIndex, colIndex, 'allowEmpty', !options.required);
+            break;
+          case 'disabled':
+            addCellMeta(cellMetas, rowIndex, colIndex, 'readOnly', options.disabled);
+            break;
+          case 'formatter':
+            var formatter = getFormatter(options.formatter, column);
+            if (formatter) {
+              addCellMeta(cellMEtas, rowIndex, colIndex, 'renderer', formatter.renderer);
+              if (formatter.additionalAction) {
+                formatter.additionalAction();
+              }
+            } else {
+              switch (column.type) {
+              case 'text':
+                addCellMeta(cellMetas, rowIndex, colIndex, 'renderer', Handsontable.renderers.TextRenderer);
+                break;
+              case 'dropdown':
+                addCellMeta(cellMetas, rowIndex, colIndex, 'renderer', Handsontable.renderers.AutocompleteRenderer);
+                break;
+              default:
+                throw new Error('Can\'t set formatter for ' + column.type + ' column: ' + dataProperty);
+              }
+            }
+            break;
+          default:
+            throw new Error('Invalid field update option: ' + option);
+          }
+        });
+      },
+
+      updateData: function(changes) {
+        // changes = [[row, prop, value]...]
+        changes.forEach(function(change) {
+          tableData[change[0]][change[1]] = change[2];
+        });
+      }
     };
+
+    var listeners = {};
     columns.forEach(function(column) {
       if (column.onChange) {
         listeners[column.data] = column.onChange;
-        for (var rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-          column.onChange(rowIndex, hot.getDataAtRowProp(rowIndex, column.data), api);
-        }
-        if (dataChanges.length) {
-          originalSetData(dataChanges);
-          dataChanges = [];
+        for (var rowIndex = 0; rowIndex < tableData.length; rowIndex++) {
+          column.onChange(rowIndex, tableData[rowIndex][column.data], tempApi);
         }
       }
     });
-    hot.setDataAtCell = originalSetData;
-
-    hot.addHook('afterChange', function(changes, source) {
-      // changes = [[row, prop, oldVal, newVal], ...]
-      changes.forEach(function(change) {
-        if (listeners[change[1]]) {
-          listeners[change[1]](change[0], change[3], api);
-        }
-      });
-    });
+    return listeners;
   }
 
   function setupActions(hot, target, columns, api, config, data) {
