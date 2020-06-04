@@ -2,6 +2,12 @@
 
 Changes:
 
+
+
+# 1.6.0
+
+Changes:
+
   * Improved performance of bulk sample pages
   * Replaced the "Select in list" action in the Select by Names dialog with "Show in list," which will
     filter the list to show only the selected items
