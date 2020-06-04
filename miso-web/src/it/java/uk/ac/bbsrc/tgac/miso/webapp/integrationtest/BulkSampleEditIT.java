@@ -15,6 +15,7 @@ import com.google.common.collect.Sets;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.SamColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtils;
 
 public class BulkSampleEditIT extends AbstractBulkSampleIT {
 
@@ -53,13 +54,7 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     expectedHeadings.addAll(identityColumns);
 
     BulkSamplePage page = getEditPage(Arrays.asList(getSampleId("Identity")));
-    HandsOnTable table = page.getTable();
-    List<String> headings = table.getColumnHeadings();
-    assertEquals(expectedHeadings.size(), headings.size());
-    for (String col : expectedHeadings) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
-    }
-    assertEquals(1, table.getRowCount());
+    HandsontableUtils.testTableSetup(page, expectedHeadings, 1);
   }
 
   @Test
@@ -118,10 +113,11 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     // make the changes
     editable.forEach((k, v) -> table.enterText(k, 0, v));
 
-    saveSingleAndAssertSuccess(table);
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
     // verify that the changes have been saved
-    assertAllForIdentity(editable, getIdForRow(table, 0), false);
+    assertAllForIdentity(editable, getIdForRow(savedTable, 0), false);
 
     // reload the page and edit again, setting optional fields to empty
     BulkSamplePage newPage = getEditPage(Arrays.asList(getSampleId("Identity")));
@@ -142,10 +138,11 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     // make the changes
     empty.forEach((k, v) -> newTable.enterText(k, 0, v));
 
-    saveSingleAndAssertSuccess(newTable);
+    assertTrue(newPage.save(false));
+    HandsOnTable newSavedTable = newPage.getTable();
 
     // verify that the changes have been saved
-    assertAllForIdentity(empty, getIdForRow(newTable, 0), false);
+    assertAllForIdentity(empty, getIdForRow(newSavedTable, 0), false);
   }
 
   @Test
@@ -158,13 +155,7 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     expectedHeadings.addAll(tissueColumns);
 
     BulkSamplePage page = getEditPage(Arrays.asList(getSampleId("Tissue")));
-    HandsOnTable table = page.getTable();
-    List<String> headings = table.getColumnHeadings();
-    assertEquals(expectedHeadings.size(), headings.size());
-    for (String col : expectedHeadings) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
-    }
-    assertEquals(1, table.getRowCount());
+    HandsontableUtils.testTableSetup(page, expectedHeadings, 1);
   }
 
   @Test
@@ -239,10 +230,11 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     table.enterText(SamColumns.BOX_SEARCH, 0, editable.get(SamColumns.BOX_ALIAS));
     table.enterText(SamColumns.BOX_POSITION, 0, editable.get(SamColumns.BOX_POSITION));
 
-    saveSingleAndAssertSuccess(table);
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
     // verify that the changes have been saved
-    assertAllForTissue(editable, getIdForRow(table, 0), false);
+    assertAllForTissue(editable, getIdForRow(savedTable, 0), false);
 
     // now, reload the page and empty all optional fields
     BulkSamplePage newPage = getEditPage(Arrays.asList(getSampleId("Tissue")));
@@ -261,9 +253,9 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     empty.put(SamColumns.PASSAGE_NUMBER, "");
     empty.put(SamColumns.TIMES_RECEIVED, "2");
     empty.put(SamColumns.TUBE_NUMBER, "2");
-    empty.put(SamColumns.LAB, "(None)");
+    empty.put(SamColumns.LAB, "");
     empty.put(SamColumns.SECONDARY_ID, "");
-    empty.put(SamColumns.TISSUE_MATERIAL, "(None)");
+    empty.put(SamColumns.TISSUE_MATERIAL, "");
     empty.put(SamColumns.REGION, "");
     empty.put(SamColumns.QC_STATUS, "Not Ready");
     empty.put(SamColumns.BOX_ALIAS, "");
@@ -273,10 +265,11 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
 
     empty.put(SamColumns.BOX_POSITION, "");
 
-    saveSingleAndAssertSuccess(newTable);
+    assertTrue(newPage.save(false));
+    HandsOnTable newSavedTable = newPage.getTable();
 
     // verify that the changes have been saved
-    assertAllForTissue(empty, getIdForRow(newTable, 0), false);
+    assertAllForTissue(empty, getIdForRow(newSavedTable, 0), false);
   }
 
   @Test
@@ -289,13 +282,7 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     expectedHeadings.addAll(slideColumns);
 
     BulkSamplePage page = getEditPage(Arrays.asList(getSampleId("Slide")));
-    HandsOnTable table = page.getTable();
-    List<String> headings = table.getColumnHeadings();
-    assertEquals(expectedHeadings.size(), headings.size());
-    for (String col : expectedHeadings) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
-    }
-    assertEquals(1, table.getRowCount());
+    HandsontableUtils.testTableSetup(page, expectedHeadings, 1);
   }
 
   @Test
@@ -352,10 +339,11 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     // make the changes
     editable.forEach((k, v) -> table.enterText(k, 0, v));
 
-    saveSingleAndAssertSuccess(table);
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
     // verify that the changes have been saved
-    assertAllForSlide(editable, getIdForRow(table, 0), false);
+    assertAllForSlide(editable, getIdForRow(savedTable, 0), false);
 
     // get the page again, and empty all optional fields
     BulkSamplePage newPage = getEditPage(Arrays.asList(getSampleId("Slide")));
@@ -372,16 +360,17 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     empty.put(SamColumns.SLIDES, "17");
     empty.put(SamColumns.DISCARDS, "3");
     empty.put(SamColumns.THICKNESS, "");
-    empty.put(SamColumns.STAIN, "(None)");
+    empty.put(SamColumns.STAIN, "");
     empty.put(SamColumns.QC_STATUS, "Not Ready");
 
     // make the changes
     empty.forEach((k, v) -> newTable.enterText(k, 0, v));
 
-    saveSingleAndAssertSuccess(newTable);
+    assertTrue(newPage.save(false));
+    HandsOnTable newSavedTable = newPage.getTable();
 
     // verify that the changes have been saved
-    assertAllForSlide(empty, getIdForRow(newTable, 0), false);
+    assertAllForSlide(empty, getIdForRow(newSavedTable, 0), false);
   }
 
   @Test
@@ -433,10 +422,11 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     // make the changes
     editable.forEach((k, v) -> table.enterText(k, 0, v));
 
-    saveSingleAndAssertSuccess(table);
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
     // verify that the changes have been saved
-    assertAllForTissueProcessing(editable, getIdForRow(table, 0), false);
+    assertAllForTissueProcessing(editable, getIdForRow(savedTable, 0), false);
 
     // get the page again, and empty all optional fields
     BulkSamplePage newPage = getEditPage(Arrays.asList(getSampleId("Curls")));
@@ -455,10 +445,11 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     // make the changes
     empty.forEach((k, v) -> newTable.enterText(k, 0, v));
 
-    saveSingleAndAssertSuccess(newTable);
+    assertTrue(newPage.save(false));
+    HandsOnTable newSavedTable = newPage.getTable();
 
     // verify that the changes have been saved
-    assertAllForTissueProcessing(empty, getIdForRow(newTable, 0), false);
+    assertAllForTissueProcessing(empty, getIdForRow(newSavedTable, 0), false);
   }
 
   @Test
@@ -471,13 +462,7 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     expectedHeadings.addAll(tissuePieceColumns);
 
     BulkSamplePage page = getEditPage(Arrays.asList(getSampleId("Tissue Piece")));
-    HandsOnTable table = page.getTable();
-    List<String> headings = table.getColumnHeadings();
-    assertEquals(expectedHeadings.size(), headings.size());
-    for (String col : expectedHeadings) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
-    }
-    assertEquals(1, table.getRowCount());
+    HandsontableUtils.testTableSetup(page, expectedHeadings, 1);
   }
 
   public Long getSampleId(String sampleClass) {

@@ -96,13 +96,10 @@ public class PlainSampleITs extends AbstractIT {
     attrs.put(SamColumns.QC_PASSED, "True");
 
     attrs.forEach((k, v) -> table.enterText(k, 0, v));
-    HandsOnTableSaveResult result = table.save();
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
-    assertTrue("Sample save", result.getItemsSaved() == 1);
-    assertTrue("Server errors", result.getServerErrors().isEmpty());
-    assertTrue("Save errors", result.getSaveErrors().isEmpty());
-
-    Long savedId = Long.valueOf(table.getText(SamColumns.NAME, 0).substring(3));
+    Long savedId = Long.valueOf(savedTable.getText(SamColumns.NAME, 0).substring(3));
     Sample saved = (Sample) getSession().get(SampleImpl.class, savedId);
     assertTrue("Sample name generation", saved.getName().contains("SAM"));
     assertTrue("Sample barcode generation", !isStringEmptyOrNull(saved.getIdentificationBarcode()));

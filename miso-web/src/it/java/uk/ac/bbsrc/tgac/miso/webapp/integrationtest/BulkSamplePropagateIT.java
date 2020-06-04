@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -51,13 +51,14 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.SAMPLE_CLASS, "Tissue");
 
     attrs.forEach((k, v) -> assertEquals("pre-save", v, table.getText(k, 0)));
-    saveSingleAndAssertSuccess(table);
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
-    attrs.put(SamColumns.ALIAS, table.getText(SamColumns.ALIAS, 0));
-    attrs.put(SamColumns.NAME, table.getText(SamColumns.NAME, 0));
-    attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
+    attrs.put(SamColumns.ALIAS, savedTable.getText(SamColumns.ALIAS, 0));
+    attrs.put(SamColumns.NAME, savedTable.getText(SamColumns.NAME, 0));
+    attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, savedTable.getText(k, 0)));
     // verify attributes against what got saved to the database
-    assertAllForTissue(attrs, getIdForRow(table, 0), true);
+    assertAllForTissue(attrs, getIdForRow(savedTable, 0), true);
   }
 
   @Test
@@ -86,13 +87,14 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.SAMPLE_CLASS, "Tissue Piece");
 
     attrs.forEach((k, v) -> assertEquals("pre-save", v, table.getText(k, 0)));
-    saveSingleAndAssertSuccess(table);
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
-    attrs.put(SamColumns.ALIAS, table.getText(SamColumns.ALIAS, 0));
-    attrs.put(SamColumns.NAME, table.getText(SamColumns.NAME, 0));
-    attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
+    attrs.put(SamColumns.ALIAS, savedTable.getText(SamColumns.ALIAS, 0));
+    attrs.put(SamColumns.NAME, savedTable.getText(SamColumns.NAME, 0));
+    attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, savedTable.getText(k, 0)));
     // verify attributes against what got saved to the database
-    assertAllForTissueProcessing(attrs, getIdForRow(table, 0), true);
+    assertAllForTissueProcessing(attrs, getIdForRow(savedTable, 0), true);
   }
 
   @Test
@@ -123,13 +125,14 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.SAMPLE_CLASS, "Slide");
 
     attrs.forEach((k, v) -> assertEquals("pre-save", v, table.getText(k, 0)));
-    saveSingleAndAssertSuccess(table);
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
-    attrs.put(SamColumns.ALIAS, table.getText(SamColumns.ALIAS, 0));
-    attrs.put(SamColumns.NAME, table.getText(SamColumns.NAME, 0));
-    attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
+    attrs.put(SamColumns.ALIAS, savedTable.getText(SamColumns.ALIAS, 0));
+    attrs.put(SamColumns.NAME, savedTable.getText(SamColumns.NAME, 0));
+    attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, savedTable.getText(k, 0)));
     // verify attributes against what got saved to the database
-    assertAllForTissueProcessing(attrs, getIdForRow(table, 0), true);
+    assertAllForTissueProcessing(attrs, getIdForRow(savedTable, 0), true);
   }
 
   @Test
@@ -159,13 +162,14 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.SAMPLE_CLASS, "cDNA (stock)");
 
     attrs.forEach((k, v) -> assertEquals("pre-save", v, table.getText(k, 0)));
-    saveSingleAndAssertSuccess(table);
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
-    attrs.put(SamColumns.ALIAS, table.getText(SamColumns.ALIAS, 0));
-    attrs.put(SamColumns.NAME, table.getText(SamColumns.NAME, 0));
-    attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
+    attrs.put(SamColumns.ALIAS, savedTable.getText(SamColumns.ALIAS, 0));
+    attrs.put(SamColumns.NAME, savedTable.getText(SamColumns.NAME, 0));
+    attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, savedTable.getText(k, 0)));
     // verify attributes against what got saved to the database
-    assertAllForStock(attrs, getIdForRow(table, 0), true, false);
+    assertAllForStock(attrs, getIdForRow(savedTable, 0), true, false);
   }
 
   @Test
@@ -196,13 +200,14 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.SAMPLE_CLASS, "whole RNA (stock)");
 
     attrs.forEach((k, v) -> assertEquals("pre-save", v, table.getText(k, 0)));
-    saveSingleAndAssertSuccess(table);
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
-    attrs.put(SamColumns.ALIAS, table.getText(SamColumns.ALIAS, 0));
-    attrs.put(SamColumns.NAME, table.getText(SamColumns.NAME, 0));
-    attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
+    attrs.put(SamColumns.ALIAS, savedTable.getText(SamColumns.ALIAS, 0));
+    attrs.put(SamColumns.NAME, savedTable.getText(SamColumns.NAME, 0));
+    attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, savedTable.getText(k, 0)));
     // verify attributes against what got saved to the database
-    assertAllForStock(attrs, getIdForRow(table, 0), true, true);
+    assertAllForStock(attrs, getIdForRow(savedTable, 0), true, true);
   }
 
   @Test
@@ -231,13 +236,14 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.SAMPLE_CLASS, "Tissue Piece");
 
     attrs.forEach((k, v) -> assertEquals("pre-save", v, table.getText(k, 0)));
-    saveSingleAndAssertSuccess(table);
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
-    attrs.put(SamColumns.ALIAS, table.getText(SamColumns.ALIAS, 0));
-    attrs.put(SamColumns.NAME, table.getText(SamColumns.NAME, 0));
-    attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
+    attrs.put(SamColumns.ALIAS, savedTable.getText(SamColumns.ALIAS, 0));
+    attrs.put(SamColumns.NAME, savedTable.getText(SamColumns.NAME, 0));
+    attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, savedTable.getText(k, 0)));
     // verify attributes against what got saved to the database
-    assertAllForTissueProcessing(attrs, getIdForRow(table, 0), true);
+    assertAllForTissueProcessing(attrs, getIdForRow(savedTable, 0), true);
   }
 
   @Test
@@ -266,13 +272,14 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.SAMPLE_CLASS, "gDNA (stock)");
 
     attrs.forEach((k, v) -> assertEquals("pre-save", v, table.getText(k, 0)));
-    saveSingleAndAssertSuccess(table);
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
-    attrs.put(SamColumns.ALIAS, table.getText(SamColumns.ALIAS, 0));
-    attrs.put(SamColumns.NAME, table.getText(SamColumns.NAME, 0));
-    attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
+    attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, savedTable.getText(k, 0)));
+    attrs.put(SamColumns.ALIAS, savedTable.getText(SamColumns.ALIAS, 0));
+    attrs.put(SamColumns.NAME, savedTable.getText(SamColumns.NAME, 0));
     // verify attributes against what got saved to the database
-    assertAllForStock(attrs, getIdForRow(table, 0), true, false);
+    assertAllForStock(attrs, getIdForRow(savedTable, 0), true, false);
   }
 
   @Test
@@ -299,13 +306,14 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.SAMPLE_CLASS, "cDNA (aliquot)");
 
     attrs.forEach((k, v) -> assertEquals("pre-save", v, table.getText(k, 0)));
-    saveSingleAndAssertSuccess(table);
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
-    attrs.put(SamColumns.ALIAS, table.getText(SamColumns.ALIAS, 0));
-    attrs.put(SamColumns.NAME, table.getText(SamColumns.NAME, 0));
-    attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
+    attrs.put(SamColumns.ALIAS, savedTable.getText(SamColumns.ALIAS, 0));
+    attrs.put(SamColumns.NAME, savedTable.getText(SamColumns.NAME, 0));
+    attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, savedTable.getText(k, 0)));
     // verify attributes against what got saved to the database
-    assertAllForAliquot(attrs, getIdForRow(table, 0), true, false);
+    assertAllForAliquot(attrs, getIdForRow(savedTable, 0), true, false);
   }
 
   @Test
@@ -332,13 +340,14 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.SAMPLE_CLASS, "whole RNA (aliquot)");
 
     attrs.forEach((k, v) -> assertEquals("pre-save", v, table.getText(k, 0)));
-    saveSingleAndAssertSuccess(table);
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
-    attrs.put(SamColumns.ALIAS, table.getText(SamColumns.ALIAS, 0));
-    attrs.put(SamColumns.NAME, table.getText(SamColumns.NAME, 0));
-    attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
+    attrs.put(SamColumns.ALIAS, savedTable.getText(SamColumns.ALIAS, 0));
+    attrs.put(SamColumns.NAME, savedTable.getText(SamColumns.NAME, 0));
+    attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, savedTable.getText(k, 0)));
     // verify attributes against what got saved to the database
-    assertAllForAliquot(attrs, getIdForRow(table, 0), true, true);
+    assertAllForAliquot(attrs, getIdForRow(savedTable, 0), true, true);
   }
 
   @Test
@@ -365,13 +374,14 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.SAMPLE_CLASS, "mRNA");
 
     attrs.forEach((k, v) -> assertEquals("pre-save", v, table.getText(k, 0)));
-    saveSingleAndAssertSuccess(table);
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
-    attrs.put(SamColumns.ALIAS, table.getText(SamColumns.ALIAS, 0));
-    attrs.put(SamColumns.NAME, table.getText(SamColumns.NAME, 0));
-    attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
+    attrs.put(SamColumns.ALIAS, savedTable.getText(SamColumns.ALIAS, 0));
+    attrs.put(SamColumns.NAME, savedTable.getText(SamColumns.NAME, 0));
+    attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, savedTable.getText(k, 0)));
     // verify attributes against what got saved to the database
-    assertAllForAliquot(attrs, getIdForRow(table, 0), true, true);
+    assertAllForAliquot(attrs, getIdForRow(savedTable, 0), true, true);
   }
 
   @Test

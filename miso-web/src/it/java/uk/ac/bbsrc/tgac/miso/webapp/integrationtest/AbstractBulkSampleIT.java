@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
 import static org.junit.Assert.*;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtils.*;
 
 import java.text.DateFormat;
@@ -37,7 +36,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.SamColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTableSaveResult;
 
 public abstract class AbstractBulkSampleIT extends AbstractIT {
 
@@ -61,30 +59,6 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   @Before
   public void setup() {
     login();
-  }
-
-  protected void saveSingleAndAssertSuccess(HandsOnTable table) {
-    HandsOnTableSaveResult result = table.save();
-
-    assertTrue("Server errors: " + result.getServerErrors().toString(), result.getServerErrors().isEmpty());
-    assertTrue("Save errors: " + result.getSaveErrors().toString(), result.getSaveErrors().isEmpty());
-    assertTrue("Sample save", result.getItemsSaved() == 1);
-
-    assertTrue("Sample name generation", table.getText(SamColumns.NAME, 0).contains("SAM"));
-    assertTrue("Sample alias generation", !isStringEmptyOrNull(table.getText(SamColumns.ALIAS, 0)));
-  }
-
-  protected void saveSeveralAndAssertAllSuccess(HandsOnTable table, int numRows) {
-    HandsOnTableSaveResult result = table.save();
-
-    assertTrue("Server errors: " + result.getServerErrors().toString(), result.getServerErrors().isEmpty());
-    assertTrue("Save errors: " + result.getSaveErrors().toString(), result.getSaveErrors().isEmpty());
-    assertTrue("Sample save", result.getItemsSaved() == numRows);
-
-    for (int i = 0; i < numRows; i++) {
-      assertTrue("Sample name generation", table.getText(SamColumns.NAME, i).contains("SAM"));
-      assertTrue("Sample alias generation", !isStringEmptyOrNull(table.getText(SamColumns.ALIAS, i)));
-    }
   }
 
   protected void assertPlainSampleAttributes(Map<String, String> attributes, Sample sample, boolean newlyCreated) {
@@ -161,11 +135,11 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
 
   protected void assertTissueAttributes(Map<String, String> attributes, SampleTissue sample) {
     assertEntityAttribute(SamColumns.TISSUE_MATERIAL, attributes, sample,
-        s -> s.getTissueMaterial() == null ? "(None)" : s.getTissueMaterial().getAlias());
+        s -> s.getTissueMaterial() == null ? "" : s.getTissueMaterial().getAlias());
     assertEntityAttribute(SamColumns.REGION, attributes, sample, s -> s.getRegion() == null ? "" : s.getRegion());
     assertEntityAttribute(SamColumns.SECONDARY_ID, attributes, sample,
         s -> s.getSecondaryIdentifier() == null ? "" : s.getSecondaryIdentifier());
-    assertEntityAttribute(SamColumns.LAB, attributes, sample, s -> s.getLab() == null ? "(None)" : s.getLab().getItemLabel());
+    assertEntityAttribute(SamColumns.LAB, attributes, sample, s -> s.getLab() == null ? "" : s.getLab().getItemLabel());
     assertEntityAttribute(SamColumns.TISSUE_ORIGIN, attributes, sample, s -> s.getTissueOrigin().getItemLabel());
     assertEntityAttribute(SamColumns.TISSUE_TYPE, attributes, sample, s -> s.getTissueType().getItemLabel());
     assertEntityAttribute(SamColumns.PASSAGE_NUMBER, attributes, sample,
@@ -179,7 +153,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
     assertEntityAttribute(SamColumns.DISCARDS, attributes, sample, s -> s.getDiscards() == null ? "" : s.getDiscards().toString());
     assertEntityAttribute(SamColumns.THICKNESS, attributes, sample,
         s -> s.getThickness() == null ? "" : sample.getThickness().toString());
-    assertEntityAttribute(SamColumns.STAIN, attributes, sample, s -> s.getStain() == null ? "(None)" : s.getStain().getName());
+    assertEntityAttribute(SamColumns.STAIN, attributes, sample, s -> s.getStain() == null ? "" : s.getStain().getName());
   }
 
   protected void assertLcmTubeAttributes(Map<String, String> attributes, SampleTissuePiece sample) {

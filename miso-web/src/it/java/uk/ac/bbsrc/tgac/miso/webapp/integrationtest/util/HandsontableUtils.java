@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -11,6 +13,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTableSaveResult;
 
@@ -20,6 +23,16 @@ public class HandsontableUtils {
 
   private HandsontableUtils() {
     throw new IllegalStateException("Util class not intended for instantiation");
+  }
+
+  public static void testTableSetup(BulkPage page, Collection<String> expectedColumns, int expectedRows) {
+    HandsOnTable table = page.getTable();
+    List<String> headings = table.getColumnHeadings();
+    assertEquals(expectedColumns.size(), headings.size());
+    for (String col : expectedColumns) {
+      assertTrue("Check for column: '" + col + "'", headings.contains(col));
+    }
+    assertEquals(expectedRows, table.getRowCount());
   }
 
   public static void assertColumnValues(HandsOnTable table, int rowNum, Map<String, String> attributes, String hintMessage) {

@@ -4,8 +4,11 @@ BulkTarget.libraryaliquot = (function($) {
   /*
    * Expected config: {
    *   pageMode: string {propagate, edit}
+   *   box: optional new box created to put items in
    * }
    */
+
+  var originalEffectiveGroupIdsByRow = {};
 
   return {
     getSaveUrl: function() {
@@ -15,21 +18,7 @@ BulkTarget.libraryaliquot = (function($) {
       return Urls.external.userManual('library_aliquots');
     },
     getCustomActions: function() {
-      return [{
-        name: 'Fill Boxes by Row',
-        action: function(api) {
-          fillBoxPositions(api, function(a, b) {
-            return Utils.sorting.sortBoxPositions(a, b, true);
-          });
-        }
-      }, {
-        name: 'Fill Boxes by Column',
-        action: function(api) {
-          fillBoxPositions(api, function(a, b) {
-            return Utils.sorting.sortBoxPositions(a, b, false);
-          });
-        }
-      }];
+      return BulkUtils.actions.boxable;
     },
     getBulkActions: function(config) {
       return [
@@ -146,305 +135,76 @@ BulkTarget.libraryaliquot = (function($) {
       return config.pageMode === 'propagate' ? 1 : 2;
     },
     getColumns: function(config, api) {
-      if (config.box) {
-        var cache = api.getCache('boxes');
-        cacheBox(cache, config.box);
-      }
-      return [
-          {
-            title: 'Parent Alias',
-            type: 'read-only',
-            data: 'parentAlias',
-            getDisplayValue: function(aliquot) {
-              return aliquot.parentAliquotAlias || aliquot.libraryAlias;
-            },
-            include: config.pageMode === 'propagate',
-            omit: true
-          },
-          {
-            title: 'Name',
-            type: 'read-only',
-            data: 'name'
-          },
-          {
-            title: 'Alias',
-            type: 'text',
-            data: 'alias',
-            required: config.pageMode === 'edit',
-            maxLength: 100
-          },
-          {
-            title: 'Matrix Barcode',
-            type: 'text',
-            data: 'identificationBarcode',
-            include: !Constants.automaticBarcodes,
-            maxLength: 255
-          },
-          {
-            title: 'Box Search',
-            type: 'text',
-            data: 'boxSearch',
-            omit: true,
-            sortable: false,
-            onChange: function(rowIndex, newValue, api) {
-              if (!newValue) {
-                return;
-              }
-              var applyChanges = function(source) {
-                var value;
-                if (!source.length) {
-                  value = null;
-                } else if (source.length === 1) {
-                  value = source[0].alias;
-                } else {
-                  value = 'SELECT';
-                  for (var i = 0; i < source.length; i++) {
-                    if (source[i].name.toLowerCase() === searchKey || source[i].alias.toLowerCase() == searchKey
-                        || (source[i].identificationBarcode && source[i].identificationBarcode.toLowerCase())) {
-                      value = source[i].alias;
-                    }
-                    break;
-                  }
-                }
-                api.updateField(rowIndex, 'box', {
-                  source: source,
-                  value: value
-                });
-              };
-              var searchCache = api.getCache('boxSearches');
-              var searchKey = newValue.toLowerCase();
-              if (searchCache[searchKey]) {
-                applyChanges(searchCache[searchKey]);
-                return;
-              }
-              api.updateField(rowIndex, 'box', {
-                source: [],
-                value: '(searching...)'
-              });
-              $.ajax({
-                url: Urls.rest.boxes.searchPartial + '?' + $.param({
-                  q: newValue,
-                  b: false
-                }),
-                dataType: "json"
-              }).success(function(data) {
-                searchCache[searchKey] = data;
-                var itemCache = api.getCache('boxes');
-                data.forEach(function(item) {
-                  cacheBox(itemCache, item);
-                });
-                applyChanges(data);
-              }).fail(function(response, textStatus, serverStatus) {
-                api.showError('Box search failed');
-              });
-            }
-          }, {
-            title: 'Box Alias',
-            type: 'dropdown',
-            data: 'box',
-            source: function(data, api) {
-              if (data.box) {
-                var cache = api.getCache('boxes');
-                cacheBox(cache, data.box, data.boxPosition);
-                return [data.box];
-              } else {
-                return [];
-              }
-            },
-            validationCache: 'boxes',
-            getItemLabel: Utils.array.getAlias,
-            onChange: function(rowIndex, newValue, api) {
-              if (newValue) {
-                var cache = api.getCache('boxes');
-                var box = cache[newValue];
-                if (box) {
-                  api.updateField(rowIndex, 'boxPosition', {
-                    source: box.emptyPositions,
-                    required: true,
-                    disabled: false
-                  });
-                  return;
-                }
-              }
-              api.updateField(rowIndex, 'boxPosition', {
-                source: [],
-                value: null,
-                required: false,
-                disabled: true
-              });
-            },
-            initial: config.box ? config.box.alias : null
-          }, {
-            title: 'Position',
-            type: 'dropdown',
-            data: 'boxPosition',
-            // source is initialized in box onChange
-            source: [],
-            customSorting: [{
-              name: 'Position (by rows)',
-              sort: function(a, b) {
-                return Utils.sorting.sortBoxPositions(a, b, true);
-              }
-            }, {
-              name: 'Position (by columns)',
-              sort: function(a, b) {
-                return Utils.sorting.sortBoxPositions(a, b, false);
-              }
-            }]
-          }, {
-            title: 'Discarded',
-            type: 'dropdown',
-            data: 'discarded',
-            required: true,
-            source: [{
-              label: 'False',
-              value: false
-            }, {
-              label: 'True',
-              value: true
-            }],
-            getItemLabel: function(item) {
-              return item.label;
-            },
-            getItemValue: function(item) {
-              return item.value;
-            },
-            initial: false,
-            onChange: function(rowIndex, newValue, api) {
-              if (newValue) {
-                var boxChanges = {
-                  disabled: newValue === 'True'
-                };
-                if (newValue === 'True') {
-                  api.updateField(rowIndex, 'boxPosition', {
-                    value: null
-                  });
-                  boxChanges.value = null;
-                }
-                api.updateField(rowIndex, 'box', boxChanges);
-              }
-            }
-          }, {
-            title: 'Effective Group ID',
-            type: 'read-only',
-            data: 'effectiveGroupId',
-            include: Constants.isDetailedSample
-          }, {
-            title: 'Group ID',
-            type: 'text',
-            data: 'groupId',
-            include: Constants.isDetailedSample,
-            maxLength: 100,
-            regex: Utils.validation.alphanumRegex
-          }, {
-            title: 'Group Desc.',
-            type: 'text',
-            data: 'groupDescription',
-            include: Constants.isDetailedSample,
-            maxLength: 255
-          }, {
-            title: 'Design Code',
-            type: 'dropdown',
-            data: 'libraryDesignCodeId',
-            include: Constants.isDetailedSample,
-            source: Constants.libraryDesignCodes,
-            getItemLabel: function(item) {
-              return item.code;
-            },
-            getItemValue: Utils.array.getId,
-            sortSource: Utils.sorting.standardSort('code'),
-            required: true,
-            onChange: function(rowIndex, newValue, api) {
-              var designCode = Utils.array.findFirstOrNull(function(designCode) {
-                return designCode.code === newValue;
-              }, Constants.libraryDesignCodes);
-              api.updateField(rowIndex, 'targetedSequencingId', {
-                required: designCode ? designCode.targetedSequencingRequired : false
-              });
-            }
-          }, {
-            title: 'Size (bp)',
-            type: 'int',
-            data: 'dnaSize',
-            min: 1,
-            max: 10000000
-          }, {
-            title: 'Conc.',
-            type: 'decimal',
-            data: 'concentration',
-            precision: 14,
-            scale: 10,
-            min: 0
-          }, {
-            title: 'Conc. Units',
-            type: 'dropdown',
-            data: 'concentrationUnits',
-            source: Constants.concentrationUnits,
-            getItemLabel: function(item) {
-              return Utils.decodeHtmlString(item.units);
-            },
-            getItemValue: Utils.array.getName,
-            required: true,
-            initial: 'NANOGRAMS_PER_MICROLITRE',
-            initializeOnEdit: true
-          }, {
-            title: 'Volume',
-            type: 'decimal',
-            data: 'volume',
-            precision: 14,
-            scale: 10
-          }, {
-            title: 'Vol. Units',
-            type: 'dropdown',
-            data: 'volumeUnits',
-            source: Constants.volumeUnits,
-            getItemLabel: function(item) {
-              return Utils.decodeHtmlString(item.units);
-            },
-            getItemValue: Utils.array.getName,
-            required: true,
-            initial: 'MICROLITRES',
-            initializeOnEdit: true
-          }, {
-            title: 'Parent ng Used',
-            type: 'decimal',
-            data: 'ngUsed',
-            precision: 14,
-            scale: 10,
-            min: 0
-          }, {
-            title: 'Parent Vol. Used',
-            type: 'decimal',
-            data: 'volumeUsed',
-            precision: 14,
-            scale: 10,
-            min: 0
-          }, {
-            title: 'Creation Date',
-            type: 'date',
-            data: 'creationDate',
-            required: true,
-            initial: Utils.getCurrentDate()
-          }, {
-            title: 'Targeted Sequencing',
-            type: 'dropdown',
-            data: 'targetedSequencingId',
-            include: Constants.isDetailedSample,
-            source: function(data, api) {
-              if (!data.libraryKitDescriptorId) {
-                return [];
-              }
-              return Constants.targetedSequencings.filter(function(tarseq) {
-                return tarseq.kitDescriptorIds.indexOf(data.libraryKitDescriptorId) !== -1;
-              });
-            },
-            sortSource: Utils.sorting.standardSort('alias'),
-            getItemLabel: Utils.array.getAlias,
-            getItemValue: Utils.array.getId
-          }];
+      var columns = [{
+        title: 'Parent Alias',
+        type: 'read-only',
+        data: 'parentAlias',
+        getDisplayValue: function(aliquot) {
+          return aliquot.parentAliquotAlias || aliquot.libraryAlias;
+        },
+        include: config.pageMode === 'propagate',
+        omit: true
+      }, BulkUtils.columns.name, BulkUtils.columns.alias(config)];
+
+      columns = columns.concat(BulkUtils.columns.boxable(config, api));
+      columns = columns.concat(BulkUtils.columns.groupId(true, function(rowIndex) {
+        return originalEffectiveGroupIdsByRow[rowIndex];
+      }));
+
+      columns.push({
+        title: 'Design Code',
+        type: 'dropdown',
+        data: 'libraryDesignCodeId',
+        include: Constants.isDetailedSample,
+        source: Constants.libraryDesignCodes,
+        getItemLabel: function(item) {
+          return item.code;
+        },
+        getItemValue: Utils.array.getId,
+        sortSource: Utils.sorting.standardSort('code'),
+        required: true,
+        onChange: function(rowIndex, newValue, api) {
+          var designCode = Utils.array.findFirstOrNull(function(designCode) {
+            return designCode.code === newValue;
+          }, Constants.libraryDesignCodes);
+          api.updateField(rowIndex, 'targetedSequencingId', {
+            required: designCode ? designCode.targetedSequencingRequired : false
+          });
+        }
+      }, {
+        title: 'Size (bp)',
+        type: 'int',
+        data: 'dnaSize',
+        min: 1,
+        max: 10000000
+      });
+
+      columns = columns.concat(BulkUtils.columns.concentration());
+      columns = columns.concat(BulkUtils.columns.volume(false, config));
+      columns = columns.concat(BulkUtils.columns.parentUsed);
+
+      columns.push(BulkUtils.columns.creationDate(true, true, 'library aliquot'), {
+        title: 'Targeted Sequencing',
+        type: 'dropdown',
+        data: 'targetedSequencingId',
+        include: Constants.isDetailedSample,
+        source: function(data, api) {
+          if (!data.libraryKitDescriptorId) {
+            return [];
+          }
+          return Constants.targetedSequencings.filter(function(tarseq) {
+            return tarseq.kitDescriptorIds.indexOf(data.libraryKitDescriptorId) !== -1;
+          });
+        },
+        sortSource: Utils.sorting.standardSort('alias'),
+        getItemLabel: Utils.array.getAlias,
+        getItemValue: Utils.array.getId
+      });
+      return columns;
     },
     prepareData: function(data) {
-      data.forEach(function(aliquot) {
+      data.forEach(function(aliquot, index) {
+        originalEffectiveGroupIdsByRow[index] = aliquot.effectiveGroupId;
         // prepare parent volumes for validation in confirmSave
         if (aliquot.parentVolume && aliquot.volumeUsed) {
           aliquot.parentVolume = Utils.decimalStrings.add(aliquot.parentVolume, aliquot.volumeUsed);
@@ -478,19 +238,6 @@ BulkTarget.libraryaliquot = (function($) {
 
   function getLabel(item) {
     return item.name + ' (' + item.alias + ')';
-  }
-
-  function cacheBox(cache, box, itemPos) {
-    var cached = cache[box.alias];
-    if (!cached) {
-      box.emptyPositions = Utils.getEmptyBoxPositions(box);
-      cache[box.alias] = box;
-      cached = box;
-    }
-    if (itemPos && cached.emptyPositions.indexOf(itemPos) === -1) {
-      cached.emptyPositions.push(itemPos);
-      cached.emptyPositions.sort();
-    }
   }
 
   function fillBoxPositions(api, sort) {

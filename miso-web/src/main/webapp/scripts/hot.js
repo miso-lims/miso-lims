@@ -1262,7 +1262,7 @@ var HotUtils = {
   },
 
   makeQcActions: function(qcTarget) {
-    return [null, {
+    return [{
       name: 'Add QCs',
       action: function(items) {
         Utils.showDialog('Add QCs', 'Add', [{
@@ -1572,13 +1572,13 @@ var HotUtils = {
     return Constants.isDetailedSample ? Constants.sampleCategories.map(function(category) {
       return {
         "name": category,
-        "getBulkActions": HotTarget.sample.getBulkActions,
+        "getBulkActions": BulkTarget.sample.getBulkActions,
         "config": {},
         "index": Constants.sampleCategories.indexOf(category)
       };
     }) : [{
       "name": "Sample",
-      "getBulkActions": HotTarget.sample.getBulkActions,
+      "getBulkActions": BulkTarget.sample.getBulkActions,
       "config": {},
       "index": Constants.sampleCategories.length
     }];

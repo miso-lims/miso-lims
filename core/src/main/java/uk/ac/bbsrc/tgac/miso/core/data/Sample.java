@@ -31,6 +31,7 @@ import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QualityControllable;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
 
@@ -267,6 +268,14 @@ public interface Sample extends Attachable, Comparable<Sample>, Deletable, Hiera
 
   public SequencingControlType getSequencingControlType();
 
-  public void setSequncingControlType(SequencingControlType sequencingControlType);
+  public void setSequencingControlType(SequencingControlType sequencingControlType);
+
+  /**
+   * @return information to be used for creating a receipt transfer during sample creation only. This field should
+   *         otherwise be null
+   */
+  public TransferSample getCreationReceiptInfo();
+
+  public void setCreationReceiptInfo(TransferSample creationReceiptInfo);
 
 }

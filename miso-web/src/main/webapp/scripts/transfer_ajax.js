@@ -66,7 +66,7 @@ var Transfer = (function($) {
 
     switch (itemTypes[0]) {
     case 'Sample':
-      setBulkActions(HotTarget.sample.getBulkActions({}));
+      setBulkActions(BulkTarget.sample.getBulkActions({}));
       break;
     case 'Library':
       setBulkActions(HotTarget.library.getBulkActions({}));

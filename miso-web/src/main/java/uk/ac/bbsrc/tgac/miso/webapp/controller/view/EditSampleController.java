@@ -140,9 +140,9 @@ public class EditSampleController {
   private Boolean detailedSample;
   @Value("${miso.defaults.sample.bulk.scientificname:}")
   private String defaultSciName;
-  @Value("${miso.defaults.sample.lcmtube.groupid:}")
+  @Value("${miso.defaults.sample.lcmtube.groupid:#{null}}")
   private String defaultLcmTubeGroupId;
-  @Value("${miso.defaults.sample.lcmtube.groupdescription:}")
+  @Value("${miso.defaults.sample.lcmtube.groupdescription:#{null}}")
   private String defaultLcmTubeGroupDesc;
 
   public void setProjectService(ProjectService projectService) {
@@ -409,6 +409,7 @@ public class EditSampleController {
       throw new RestException("Unknown category for sample class with ID " + target.getId(), Status.BAD_REQUEST);
     }
     detailedTemplate.setSampleClassId(target.getId());
+    detailedTemplate.setSampleClassAlias(target.getAlias());
     return detailedTemplate;
   }
 
@@ -434,7 +435,7 @@ public class EditSampleController {
 
     @Override
     protected Stream<Sample> load(List<Long> modelIds) throws IOException {
-      List<Sample> results = (List<Sample>) sampleService.listByIdList(modelIds);
+      List<Sample> results = sampleService.listByIdList(modelIds);
       for (Sample sample : results) {
         if (isDetailedSampleEnabled()) {
           if (sampleClass == null) {
@@ -458,6 +459,11 @@ public class EditSampleController {
       }
       config.put(Config.PAGE_MODE, Config.EDIT);
       addJsonArray(mapper, config, "projects", projectService.list(), Dtos::asDto);
+    }
+
+    @Override
+    protected boolean isNewInterface() {
+      return true;
     }
   }
 
@@ -530,6 +536,11 @@ public class EditSampleController {
       addJsonArray(mapper, config, Config.RECIPIENT_GROUPS, recipientGroups, Dtos::asDto);
       addJsonArray(mapper, config, Config.PROJECTS, projectService.list(), Dtos::asDto);
     }
+
+    @Override
+    protected boolean isNewInterface() {
+      return true;
+    }
   }
 
   private final class BulkCreateSampleBackend extends BulkCreateTableBackend<SampleDto> {
@@ -556,22 +567,20 @@ public class EditSampleController {
         config.put(Config.DNASE_TREATABLE, false);
       }
       config.put(Config.PAGE_MODE, Config.CREATE);
-      config.put(Config.HAS_PROJECT, project != null);
       config.put(Config.DEFAULT_LCM_TUBE_GROUP_ID, defaultLcmTubeGroupId);
       config.put(Config.DEFAULT_LCM_TUBE_GROUP_DESC, defaultLcmTubeGroupDesc);
-      if (project == null) {
-        addJsonArray(mapper, config, Config.PROJECTS, projectService.list(), Dtos::asDto);
-        config.put(Config.DEFAULT_SCI_NAME, defaultSciName);
-      } else {
+      addJsonArray(mapper, config, Config.PROJECTS, projectService.list(), Dtos::asDto);
+      config.put(Config.DEFAULT_SCI_NAME, defaultSciName);
+      if (project != null) {
         config.putPOJO("project", Dtos.asDto(project));
-        if (project.getReferenceGenome() != null && project.getReferenceGenome().getDefaultScientificName() != null) {
-          config.put(Config.DEFAULT_SCI_NAME, project.getReferenceGenome().getDefaultScientificName().getAlias());
-        } else {
-          config.put(Config.DEFAULT_SCI_NAME, defaultSciName);
-        }
       }
       config.putPOJO(Config.BOX, box);
       addJsonArray(mapper, config, "recipientGroups", recipientGroups, Dtos::asDto);
+    }
+
+    @Override
+    protected boolean isNewInterface() {
+      return true;
     }
   }
 

@@ -15,9 +15,10 @@ import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
@@ -28,6 +29,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListTransferView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentAttributes;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentIdentityAttributes;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentTissueAttributes;
 
@@ -78,15 +80,9 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   private BigDecimal volumeUsed;
   private BigDecimal ngUsed;
 
-  @ManyToOne
-  @JoinTable(name = "SampleHierarchy", joinColumns = { @JoinColumn(name = "sampleId") }, inverseJoinColumns = {
-      @JoinColumn(name = "identityId") })
-  private ParentIdentityAttributes identityAttributes;
-
-  @ManyToOne
-  @JoinTable(name = "SampleHierarchy", joinColumns = { @JoinColumn(name = "sampleId") }, inverseJoinColumns = {
-      @JoinColumn(name = "tissueId") })
-  private ParentTissueAttributes tissueAttributes;
+  @OneToOne
+  @PrimaryKeyJoinColumn
+  private ParentAttributes parentAttributes;
 
   @Transient
   private Long identityId;
@@ -279,23 +275,23 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   }
 
   @Override
-  public ParentIdentityAttributes getIdentityAttributes() {
-    return identityAttributes;
+  public ParentAttributes getParentAttributes() {
+    return parentAttributes;
   }
 
   @Override
-  public void setIdentityAttributes(ParentIdentityAttributes identityAttributes) {
-    this.identityAttributes = identityAttributes;
+  public void setParentAttributes(ParentAttributes parentAttributes) {
+    this.parentAttributes = parentAttributes;
+  }
+
+  @Override
+  public ParentIdentityAttributes getIdentityAttributes() {
+    return parentAttributes == null ? null : parentAttributes.getIdentityAttributes();
   }
 
   @Override
   public ParentTissueAttributes getTissueAttributes() {
-    return tissueAttributes;
-  }
-
-  @Override
-  public void setTissueAttributes(ParentTissueAttributes tissueAttributes) {
-    this.tissueAttributes = tissueAttributes;
+    return parentAttributes == null ? null : parentAttributes.getTissueAttributes();
   }
 
 }

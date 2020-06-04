@@ -4,11 +4,9 @@ import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Sets;
@@ -31,7 +29,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.SamColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTableSaveResult;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtils;
 
 public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
@@ -86,10 +84,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
   public void testSaveEmptyFail() throws Exception {
     // Goal: ensure save fails and error message is shown when trying to save with required fields empty
     BulkSamplePage page = getCreatePage(1, projectId, rAliquotClassId);
-    HandsOnTable table = page.getTable();
-    HandsOnTableSaveResult result = table.save();
-    assertEquals(0, result.getItemsSaved());
-    assertFalse(result.getSaveErrors().isEmpty());
+    assertFalse(page.save(false, true));
   }
 
   @Test
@@ -100,7 +95,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     expectedHeadings.addAll(tissueColumns);
 
     BulkSamplePage page = getCreatePage(1, null, tissueClassId);
-    assertTableSetup(page.getTable(), expectedHeadings, 1);
+    HandsontableUtils.testTableSetup(page, expectedHeadings, 1);
   }
 
   @Test
@@ -149,9 +144,8 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     assertEquals("B (Benign tumour)", table.getText(SamColumns.TISSUE_TYPE, 0));
 
     Set<String> materials = table.getDropdownOptions(SamColumns.TISSUE_MATERIAL, 0);
-    assertTrue(materials.size() >= 4); // 3 + (None)
+    assertTrue(materials.size() >= 3);
     assertTrue(materials.contains("FFPE"));
-    assertTrue(materials.contains("(None)"));
 
     table.enterText(SamColumns.TISSUE_MATERIAL, 0, "Fresh");
     assertEquals("Fresh Frozen", table.getText(SamColumns.TISSUE_MATERIAL, 0));
@@ -219,12 +213,11 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
     assertIdentityLookupWasSuccessful(table, 0);
 
-    saveSingleAndAssertSuccess(table);
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
-    tissue.put(SamColumns.ALIAS, table.getText(SamColumns.ALIAS, 0));
-    tissue.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     // verify attributes against what got saved to the database
-    assertAllForTissue(tissue, getIdForRow(table, 0), true);
+    assertAllForTissue(tissue, getIdForRow(savedTable, 0), true);
   }
 
   @Test
@@ -263,10 +256,10 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
     assertIdentityLookupWasSuccessful(table, 0);
 
-    saveSingleAndAssertSuccess(table);
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
-    tissue.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
-    String newId = table.getText(SamColumns.NAME, 0).substring(3, table.getText(SamColumns.NAME, 0).length());
+    String newId = savedTable.getText(SamColumns.NAME, 0).substring(3, savedTable.getText(SamColumns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
     Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
@@ -317,18 +310,18 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     assertIdentityLookupWasSuccessful(table, 0);
     assertIdentityLookupWasSuccessful(table, 1);
 
-    saveSeveralAndAssertAllSuccess(table, 2);
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
-    tissue.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
-    String newId = table.getText(SamColumns.NAME, 0).substring(3, table.getText(SamColumns.NAME, 0).length());
+    Long newId = getIdForRow(savedTable, 0);
 
     // verify attributes against what got saved to the database
     Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
-    SampleTissue created = (SampleTissue) getSession().get(SampleTissueImpl.class, Long.valueOf(newId));
+    SampleTissue created = (SampleTissue) getSession().get(SampleTissueImpl.class, newId);
 
     assertEquals("confirm project", predefined.getShortName(), created.getProject().getShortName());
-    String row0Alias = table.getText(SamColumns.ALIAS, 0);
-    String row1Alias = table.getText(SamColumns.ALIAS, 1);
+    String row0Alias = savedTable.getText(SamColumns.ALIAS, 0);
+    String row1Alias = savedTable.getText(SamColumns.ALIAS, 1);
     assertFalse("confirm alias generated", isStringEmptyOrNull(row0Alias));
     assertEquals("confirm same identity alias", row0Alias.substring(0, 9), row1Alias.substring(0, 9));
     // everything else should be the same as in testCreateOneTissueNoProject() since the `pack` methods do not differ
@@ -343,7 +336,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     expectedHeadings.addAll(slideColumns);
 
     BulkSamplePage page = getCreatePage(1, null, slideClassId);
-    assertTableSetup(page.getTable(), expectedHeadings, 1);
+    HandsontableUtils.testTableSetup(page, expectedHeadings, 1);
   }
 
   @Test
@@ -353,9 +346,8 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     HandsOnTable table = page.getTable();
 
     Set<String> stains = table.getDropdownOptions(SamColumns.STAIN, 0);
-    assertTrue(stains.size() > 3); // includes "(None)"
+    assertTrue(stains.size() > 1);
     assertTrue(stains.contains("Cresyl Violet"));
-    assertTrue(stains.contains("(None)"));
 
     table.enterText(SamColumns.STAIN, 0, "Cres");
     assertEquals("Cresyl Violet", table.getText(SamColumns.STAIN, 0));
@@ -402,13 +394,11 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
     assertIdentityLookupWasSuccessful(table, 0);
 
-    saveSingleAndAssertSuccess(table);
-
-    slide.put(SamColumns.ALIAS, table.getText(SamColumns.ALIAS, 0));
-    slide.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
     // verify attributes against what got saved to the database
-    assertAllForSlide(slide, getIdForRow(table, 0), true);
+    assertAllForSlide(slide, getIdForRow(savedTable, 0), true);
   }
 
   @Test
@@ -451,14 +441,14 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
     assertIdentityLookupWasSuccessful(table, 0);
 
-    saveSingleAndAssertSuccess(table);
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
-    slide.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
-    String newId = table.getText(SamColumns.NAME, 0).substring(3, table.getText(SamColumns.NAME, 0).length());
+    Long newId = getIdForRow(savedTable, 0);
 
     // verify attributes against what got saved to the database
     Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
-    SampleSlide created = (SampleSlide) getSession().get(SampleSlideImpl.class, Long.valueOf(newId));
+    SampleSlide created = (SampleSlide) getSession().get(SampleSlideImpl.class, newId);
 
     assertEquals("confirm project", predefined.getShortName(), created.getProject().getShortName());
     // everything else should be the same as in testCreateOneSlideNoProject()
@@ -473,7 +463,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     expectedHeadings.addAll(tissuePieceColumns);
 
     BulkSamplePage page = getCreatePage(1, null, tissuePieceClassId);
-    assertTableSetup(page.getTable(), expectedHeadings, 1);
+    HandsontableUtils.testTableSetup(page, expectedHeadings, 1);
   }
 
   @Test
@@ -516,13 +506,11 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
     assertIdentityLookupWasSuccessful(table, 0);
 
-    saveSingleAndAssertSuccess(table);
-
-    curls.put(SamColumns.ALIAS, table.getText(SamColumns.ALIAS, 0));
-    curls.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
     // verify attributes against what got saved to the database
-    assertAllForTissueProcessing(curls, getIdForRow(table, 0), true);
+    assertAllForTissueProcessing(curls, getIdForRow(savedTable, 0), true);
   }
 
   @Test
@@ -563,14 +551,14 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
     assertIdentityLookupWasSuccessful(table, 0);
 
-    saveSingleAndAssertSuccess(table);
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
-    curls.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
-    String newId = table.getText(SamColumns.NAME, 0).substring(3, table.getText(SamColumns.NAME, 0).length());
+    Long newId = getIdForRow(savedTable, 0);
 
     // verify attributes against what got saved to the database
     Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
-    SampleTissueProcessing created = (SampleTissueProcessing) getSession().get(SampleTissueProcessingImpl.class, Long.valueOf(newId));
+    SampleTissueProcessing created = (SampleTissueProcessing) getSession().get(SampleTissueProcessingImpl.class, newId);
 
     assertEquals("confirm project", predefined.getShortName(), created.getProject().getShortName());
     // everything else should be the same as in testCreateOneCurlsNoProject
@@ -585,7 +573,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     expectedHeadings.addAll(singleCellColumns);
 
     BulkSamplePage page = getCreatePage(1, null, singleCellClassId);
-    assertTableSetup(page.getTable(), expectedHeadings, 1);
+    HandsontableUtils.testTableSetup(page, expectedHeadings, 1);
   }
 
   @Test
@@ -628,13 +616,11 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
     assertIdentityLookupWasSuccessful(table, 0);
 
-    saveSingleAndAssertSuccess(table);
-
-    singleCell.put(SamColumns.ALIAS, table.getText(SamColumns.ALIAS, 0));
-    singleCell.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
     // verify attributes against what got saved to the database
-    assertAllForSingleCell(singleCell, getIdForRow(table, 0), true);
+    assertAllForSingleCell(singleCell, getIdForRow(savedTable, 0), true);
   }
 
   @Test
@@ -646,7 +632,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     expectedHeadings.addAll(stockColumns);
 
     BulkSamplePage page = getCreatePage(1, null, gStockClassId);
-    assertTableSetup(page.getTable(), expectedHeadings, 1);
+    HandsontableUtils.testTableSetup(page, expectedHeadings, 1);
   }
 
   @Test
@@ -704,13 +690,11 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
     assertIdentityLookupWasSuccessful(table, 0);
 
-    saveSingleAndAssertSuccess(table);
-
-    gDnaStock.put(SamColumns.ALIAS, table.getText(SamColumns.ALIAS, 0));
-    gDnaStock.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
     // verify attributes against what got saved to the database
-    assertAllForStock(gDnaStock, getIdForRow(table, 0), true, false);
+    assertAllForStock(gDnaStock, getIdForRow(savedTable, 0), true, false);
   }
 
   @Test
@@ -752,14 +736,12 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
     assertIdentityLookupWasSuccessful(table, 0);
 
-    saveSingleAndAssertSuccess(table);
-
-    gDnaStock.put(SamColumns.ALIAS, table.getText(SamColumns.ALIAS, 0));
-    gDnaStock.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
     // verify attributes against what got saved to the database
     Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
-    SampleStock created = (SampleStock) getSession().get(SampleStockImpl.class, Long.valueOf(getIdForRow(table, 0)));
+    SampleStock created = (SampleStock) getSession().get(SampleStockImpl.class, Long.valueOf(getIdForRow(savedTable, 0)));
 
     assertEquals("confirm project", predefined.getShortName(), created.getProject().getShortName());
     // everything else should be the same as in testCreateOneGdnaStockNoProject
@@ -776,7 +758,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     expectedHeadings.addAll(singleCellStockColumns);
 
     BulkSamplePage page = getCreatePage(1, null, singleCellStockClassId);
-    assertTableSetup(page.getTable(), expectedHeadings, 1);
+    HandsontableUtils.testTableSetup(page, expectedHeadings, 1);
   }
 
   @Test
@@ -824,13 +806,11 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
     assertIdentityLookupWasSuccessful(table, 0);
 
-    saveSingleAndAssertSuccess(table);
-
-    stock.put(SamColumns.ALIAS, table.getText(SamColumns.ALIAS, 0));
-    stock.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
     // verify attributes against what got saved to the database
-    assertAllForSingleCellStock(stock, getIdForRow(table, 0), true);
+    assertAllForSingleCellStock(stock, getIdForRow(savedTable, 0), true);
   }
 
   @Test
@@ -843,7 +823,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     expectedHeadings.addAll(rnaStockColumns);
 
     BulkSamplePage page = getCreatePage(1, null, rStockClassId);
-    assertTableSetup(page.getTable(), expectedHeadings, 1);
+    HandsontableUtils.testTableSetup(page, expectedHeadings, 1);
   }
 
   @Test
@@ -899,15 +879,13 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
     assertIdentityLookupWasSuccessful(table, 0);
 
-    saveSingleAndAssertSuccess(table);
-
-    rnaStock.put(SamColumns.ALIAS, table.getText(SamColumns.ALIAS, 0));
-    rnaStock.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
     // verify attributes against what got saved to the database
-    SampleStock created = (SampleStock) getSession().get(SampleStockImpl.class, getIdForRow(table, 0));
+    SampleStock created = (SampleStock) getSession().get(SampleStockImpl.class, getIdForRow(savedTable, 0));
 
-    assertAllForStock(rnaStock, getIdForRow(table, 0), true, true);
+    assertAllForStock(rnaStock, getIdForRow(savedTable, 0), true, true);
     assertRnaStockSampleAttributes(rnaStock, created);
   }
 
@@ -951,15 +929,13 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
     assertIdentityLookupWasSuccessful(table, 0);
 
-    saveSingleAndAssertSuccess(table);
-
-    rnaStock.put(SamColumns.ALIAS, table.getText(SamColumns.ALIAS, 0));
-    rnaStock.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
-    String newId = table.getText(SamColumns.NAME, 0).substring(3, table.getText(SamColumns.NAME, 0).length());
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
+    Long newId = getIdForRow(savedTable, 0);
 
     // verify attributes against what got saved to the database
     Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
-    SampleStock created = (SampleStock) getSession().get(SampleStockImpl.class, Long.valueOf(newId));
+    SampleStock created = (SampleStock) getSession().get(SampleStockImpl.class, newId);
 
     assertEquals("confirm project", predefined.getShortName(), created.getProject().getShortName());
     // everything else should be the same as in testCreateOneRnaStockNoProject
@@ -975,7 +951,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     expectedHeadings.addAll(aliquotColumns);
 
     BulkSamplePage page = getCreatePage(1, null, gAliquotClassId);
-    assertTableSetup(page.getTable(), expectedHeadings, 1);
+    HandsontableUtils.testTableSetup(page, expectedHeadings, 1);
   }
 
   @Test
@@ -1034,13 +1010,11 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
     assertIdentityLookupWasSuccessful(table, 0);
 
-    saveSingleAndAssertSuccess(table);
-
-    gDnaAliquot.put(SamColumns.ALIAS, table.getText(SamColumns.ALIAS, 0));
-    gDnaAliquot.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
     // verify attributes against what got saved to the database
-    assertAllForAliquot(gDnaAliquot, getIdForRow(table, 0), true, false);
+    assertAllForAliquot(gDnaAliquot, getIdForRow(savedTable, 0), true, false);
   }
 
   @Test
@@ -1083,15 +1057,13 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
     assertIdentityLookupWasSuccessful(table, 0);
 
-    saveSingleAndAssertSuccess(table);
-
-    gDnaAliquot.put(SamColumns.ALIAS, table.getText(SamColumns.ALIAS, 0));
-    gDnaAliquot.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
-    String newId = table.getText(SamColumns.NAME, 0).substring(3, table.getText(SamColumns.NAME, 0).length());
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
+    Long newId = getIdForRow(savedTable, 0);
 
     // verify attributes against what got saved to the database
     Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
-    SampleAliquot created = (SampleAliquot) getSession().get(SampleAliquotImpl.class, Long.valueOf(newId));
+    SampleAliquot created = (SampleAliquot) getSession().get(SampleAliquotImpl.class, newId);
 
     assertEquals("confirm project", predefined.getShortName(), created.getProject().getShortName());
     // everything else should be the same as in testCreateOneGdnaAliquotNoProject
@@ -1110,7 +1082,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     expectedHeadings.addAll(singleCellAliquotColumns);
 
     BulkSamplePage page = getCreatePage(1, null, singleCellAliquotClassId);
-    assertTableSetup(page.getTable(), expectedHeadings, 1);
+    HandsontableUtils.testTableSetup(page, expectedHeadings, 1);
   }
 
   @Test
@@ -1159,13 +1131,11 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
     assertIdentityLookupWasSuccessful(table, 0);
 
-    saveSingleAndAssertSuccess(table);
-
-    aliquot.put(SamColumns.ALIAS, table.getText(SamColumns.ALIAS, 0));
-    aliquot.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
     // verify attributes against what got saved to the database
-    assertAllForSingleCellAliquot(aliquot, getIdForRow(table, 0), true);
+    assertAllForSingleCellAliquot(aliquot, getIdForRow(savedTable, 0), true);
   }
 
   @Test
@@ -1179,7 +1149,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     expectedHeadings.addAll(aliquotColumns);
 
     BulkSamplePage page = getCreatePage(1, null, rAliquotClassId);
-    assertTableSetup(page.getTable(), expectedHeadings, 1);
+    HandsontableUtils.testTableSetup(page, expectedHeadings, 1);
   }
 
   @Test
@@ -1224,13 +1194,11 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
     assertIdentityLookupWasSuccessful(table, 0);
 
-    saveSingleAndAssertSuccess(table);
-
-    rnaAliquot.put(SamColumns.ALIAS, table.getText(SamColumns.ALIAS, 0));
-    rnaAliquot.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
     // verify attributes against what got saved to the database
-    assertAllForAliquot(rnaAliquot, getIdForRow(table, 0), true, true);
+    assertAllForAliquot(rnaAliquot, getIdForRow(savedTable, 0), true, true);
   }
 
   @Test
@@ -1274,15 +1242,14 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
     assertIdentityLookupWasSuccessful(table, 0);
 
-    saveSingleAndAssertSuccess(table);
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
-    rnaAliquot.put(SamColumns.ALIAS, table.getText(SamColumns.ALIAS, 0));
-    rnaAliquot.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
-    String newId = table.getText(SamColumns.NAME, 0).substring(3, table.getText(SamColumns.NAME, 0).length());
+    Long newId = getIdForRow(savedTable, 0);
 
     // verify attributes against what got saved to the database
     Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
-    SampleAliquot created = (SampleAliquot) getSession().get(SampleAliquotImpl.class, Long.valueOf(newId));
+    SampleAliquot created = (SampleAliquot) getSession().get(SampleAliquotImpl.class, newId);
 
     assertEquals("confirm project", predefined.getShortName(), created.getProject().getShortName());
     // everything else should be the same as in testCreateOneRnaAliquotNoProject
@@ -1292,7 +1259,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
   public void testCreateIdentitySetup() throws Exception {
     // Goal: ensure all expected fields are present and no extra
     BulkSamplePage page = getCreatePage(1, null, identityClassId);
-    assertTableSetup(page.getTable(), identityColumns, 1);
+    HandsontableUtils.testTableSetup(page, identityColumns, 1);
   }
 
   @Test
@@ -1347,8 +1314,6 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     assertEquals("note is writable", "writable note", table.getText(SamColumns.QC_NOTE, 0));
   }
 
-  // TODO: fix and re-enable (Sometimes selects project PRO1 instead of PRO2 - may be interference from other tests)
-  @Ignore
   @Test
   public void testCreateOneIdentityNoProject() throws Exception {
     // Goal: ensure one identity can be saved
@@ -1363,7 +1328,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     identity.put(SamColumns.PROJECT, "PRO2"); // different project so as not to mess with the SampleNumberPerProject generator
     identity.put(SamColumns.EXTERNAL_NAME, "ext2001"); // increment
     identity.put(SamColumns.DONOR_SEX, "Female");
-    identity.put(SamColumns.DONOR_SEX, ConsentLevel.ALL_PROJECTS.getLabel());
+    identity.put(SamColumns.CONSENT, ConsentLevel.ALL_PROJECTS.getLabel());
     identity.put(SamColumns.GROUP_ID, "");
     identity.put(SamColumns.GROUP_DESCRIPTION, "");
     identity.put(SamColumns.QC_STATUS, "Ready");
@@ -1371,12 +1336,11 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
     identity.forEach((k, v) -> table.enterText(k, 0, v));
 
-    saveSingleAndAssertSuccess(table);
-
-    identity.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
     // verify attributes against what got saved to the database
-    assertAllForIdentity(identity, getIdForRow(table, 0), true);
+    assertAllForIdentity(identity, getIdForRow(savedTable, 0), true);
   }
 
   @Test
@@ -1399,14 +1363,13 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
     identity.forEach((k, v) -> table.enterText(k, 0, v));
 
-    saveSingleAndAssertSuccess(table);
-
-    identity.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
-    String newId = table.getText(SamColumns.NAME, 0).substring(3, table.getText(SamColumns.NAME, 0).length());
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
+    Long newId = getIdForRow(savedTable, 0);
 
     // verify attributes on the Edit single Sample page
     Project predefined = (Project) getSession().get(ProjectImpl.class, 2L);
-    SampleIdentity created = (SampleIdentity) getSession().get(SampleIdentityImpl.class, Long.valueOf(newId));
+    SampleIdentity created = (SampleIdentity) getSession().get(SampleIdentityImpl.class, newId);
 
     assertEquals("confirm project", predefined.getShortName(), created.getProject().getShortName());
     // rest should be same as testCreateOneIdentityNoProject
@@ -1415,15 +1378,6 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
   private void assertIdentityLookupWasSuccessful(HandsOnTable table, int rowNum) {
     table.waitForSearch(SamColumns.IDENTITY_ALIAS, rowNum);
     assertEquals("identity lookup was successful", "First Receipt (PRO1)", table.getText(SamColumns.IDENTITY_ALIAS, 0));
-  }
-
-  private void assertTableSetup(HandsOnTable table, Set<String> expectedHeadings, int expectedRows) {
-    List<String> headings = table.getColumnHeadings();
-    assertEquals(expectedHeadings.size(), headings.size());
-    for (String col : expectedHeadings) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
-    }
-    assertEquals(expectedRows, table.getRowCount());
   }
 
 }

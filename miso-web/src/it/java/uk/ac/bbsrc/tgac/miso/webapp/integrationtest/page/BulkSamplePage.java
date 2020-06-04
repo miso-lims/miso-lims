@@ -8,17 +8,16 @@ import java.util.Collection;
 import java.util.List;
 
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.PageFactory;
 
 import com.google.common.base.Joiner;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 
-public class BulkSamplePage extends HeaderFooterPage {
+public class BulkSamplePage extends BulkPage {
 
   public static class SamColumns {
-    public static final String NAME = "Sample Name";
-    public static final String ALIAS = "Sample Alias";
+    public static final String NAME = "Name";
+    public static final String ALIAS = "Alias";
     public static final String DESCRIPTION = "Description";
     public static final String RECEIVE_DATE = "Date of Receipt";
     public static final String RECEIVE_TIME = "Time of Receipt";
@@ -45,7 +44,7 @@ public class BulkSamplePage extends HeaderFooterPage {
     public static final String EFFECTIVE_GROUP_ID = "Effective Group ID";
     public static final String GROUP_ID = "Group ID";
     public static final String GROUP_DESCRIPTION = "Group Desc.";
-    public static final String CREATION_DATE = "Date of Creation";
+    public static final String CREATION_DATE = "Creation Date";
     public static final String TISSUE_ORIGIN = "Tissue Origin";
     public static final String TISSUE_TYPE = "Tissue Type";
     public static final String PASSAGE_NUMBER = "Passage #";
@@ -73,7 +72,7 @@ public class BulkSamplePage extends HeaderFooterPage {
     public static final String VOLUME_UNITS = "Vol. Units";
     public static final String PARENT_NG_USED = "Parent ng Used";
     public static final String PARENT_VOLUME_USED = "Parent Vol. Used";
-    public static final String CONCENTRATION = "Concentration";
+    public static final String CONCENTRATION = "Conc.";
     public static final String CONCENTRATION_UNITS = "Conc. Units";
     public static final String QC_STATUS = "QC Status";
     public static final String DNASE_TREATED = "DNAse";
@@ -99,13 +98,17 @@ public class BulkSamplePage extends HeaderFooterPage {
   private static final String EDIT_URL_FORMAT = "%smiso/sample/bulk/edit?ids=%s";
   private static final String PROPAGATE_URL_FORMAT = "%smiso/sample/bulk/propagate?parentIds=%s&replicates=%s&sampleClassId=%s";
 
-  private final HandsOnTable table;
+  private HandsOnTable table;
 
   public BulkSamplePage(WebDriver driver) {
     super(driver);
-    PageFactory.initElements(driver, this);
     waitWithTimeout().until(or(titleContains("Create Samples "), titleContains("Edit Samples ")));
-    table = new HandsOnTable(driver);
+    refreshElements();
+  }
+
+  @Override
+  protected void refreshElements() {
+    table = new HandsOnTable(getDriver());
   }
 
   public static BulkSamplePage getForCreate(WebDriver driver, String baseUrl, Integer quantity, Long projectId, Long sampleClassId) {
@@ -132,6 +135,7 @@ public class BulkSamplePage extends HeaderFooterPage {
     return new BulkSamplePage(driver);
   }
 
+  @Override
   public HandsOnTable getTable() {
     return table;
   }

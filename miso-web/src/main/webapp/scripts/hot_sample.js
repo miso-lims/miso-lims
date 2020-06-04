@@ -1,5 +1,6 @@
 /**
  * Sample-specific Handsontable code
+ * Note: replaced by bulk_sample.js, but still involved in library receipt
  */
 HotTarget.sample = (function() {
 

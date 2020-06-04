@@ -684,7 +684,8 @@ Urls = (function() {
     projectArrayedDatatable: middleIdUrlFunction(sampleRestBase + '/dt/project', '/arrayed'),
     bulkDelete: sampleRestBase + '/bulk-delete',
     identitiesLookup: sampleRestBase + '/identitiesLookup',
-    spreadsheet: sampleRestBase + '/spreadsheet'
+    spreadsheet: sampleRestBase + '/spreadsheet',
+    bulkSave: sampleRestBase + '/bulk'
   };
 
   // Sample Classes
