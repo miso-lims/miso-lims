@@ -124,32 +124,21 @@ BulkUtils = (function($) {
   var tableSaved = false;
 
   var formatters = {
-    nonStandardAlias: {
-      type: 'text',
-      renderer: function(instance, td, row, col, prop, value, cellProperties) {
-        Handsontable.renderers.TextRenderer.apply(this, arguments);
-        td.classList.add('nonStandardAlias');
-        return td;
-      },
-      additionalAction: function() {
-        $(NON_STANDARD_ALIAS_NOTE).show();
+    standardText: function(instance, td, row, col, prop, value, cellProperties) {
+      // expected format values: nonStandardAlias, notification
+      Handsontable.renderers.TextRenderer.apply(this, arguments);
+      if (cellProperties.format) {
+        td.classList.add(cellProperties.format);
       }
+      return td;
     },
-    multipleOptions: {
-      type: 'dropdown',
-      renderer: function(instance, td, row, col, prop, value, cellProperties) {
-        Handsontable.renderers.AutocompleteRenderer.apply(this, arguments);
-        td.classList.add('multipleOptions');
-        return td;
+    standardDropdown: function(instance, td, row, col, prop, value, cellProperties) {
+      // expected format values: multipleOptions
+      Handsontable.renderers.AutocompleteRenderer.apply(this, arguments);
+      if (cellProperties.format) {
+        td.classList.add(cellProperties.format);
       }
-    },
-    notification: {
-      type: 'text',
-      renderer: function(instance, td, row, col, prop, value, cellProperties) {
-        Handsontable.renderers.TextRenderer.apply(this, arguments);
-        td.classList.add('notification');
-        return td;
-      }
+      return td;
     }
   };
 
@@ -689,12 +678,30 @@ BulkUtils = (function($) {
 
     hot.addHook('afterChange', function(changes, source) {
       // changes = [[row, prop, oldVal, newVal], ...]
+      // construct a new api for each afterChange call, so we can collect data changes to apply in bulk
+      var onChangeApi = makeApi();
+      extendApi(onChangeApi, hot, columns);
+      var dataChanges = [];
+      var storingChanges = true;
+      onChangeApi.updateField = function(rowIndex, dataProperty, changes) {
+        if (storingChanges && changes.hasOwnProperty('value')) {
+          var colIndex = getColumnIndex(dataProperty, columns);
+          dataChanges.push([rowIndex, colIndex, changes.value]);
+          changes.value = undefined;
+        }
+        updateField(hot, columns, rowIndex, dataProperty, changes);
+      };
       changes.forEach(function(change) {
         if (listeners[change[1]]) {
-          listeners[change[1]](change[0], change[3], api);
+          listeners[change[1]](change[0], change[3], onChangeApi);
         }
       });
+      storingChanges = false;
+      if (dataChanges.length) {
+        hot.setDataAtCell(dataChanges);
+      }
     });
+
     hot.validateCells();
 
     extendApi(api, hot, columns);
@@ -753,6 +760,7 @@ BulkUtils = (function($) {
   function makeTextColumn(column, base) {
     base.type = 'text';
     base.validator = textValidator(column);
+    base.renderer = formatters.standardText;
     return base;
   }
 
@@ -798,6 +806,7 @@ BulkUtils = (function($) {
     if (column.validationCache) {
       base.validator = acceptCachedValidator('boxes');
     }
+    base.renderer = formatters.standardDropdown;
     return base;
   }
 
@@ -926,20 +935,13 @@ BulkUtils = (function($) {
       if (!column.getFormatter) {
         return;
       }
-      var additionalActions = {};
       for (var rowIndex = 0; rowIndex < data.length; rowIndex++) {
         var formatterName = column.getFormatter(data[rowIndex]);
-        var formatter = getFormatter(formatterName, column);
-        if (formatter != null) {
-          addCellMeta(cellMetas, rowIndex, colIndex, formatter, formatter.renderer);
-          if (formatter.additionalAction) {
-            additionalActions[formatterName] = formatter.additionalAction;
-          }
+        addCellMeta(cellMetas, rowIndex, colIndex, 'format', formatterName);
+        if (formatterName === 'nonStandardAlias') {
+          $(NON_STANDARD_ALIAS_NOTE).show();
         }
       }
-      Object.values(additionalActions).forEach(function(action) {
-        action();
-      });
     });
   }
 
@@ -955,19 +957,6 @@ BulkUtils = (function($) {
       cellMetas.push(cellMeta);
     }
     cellMeta[key] = value;
-  }
-
-  function getFormatter(formatterName, column) {
-    if (formatterName === null) {
-      return null;
-    }
-    var formatter = formatters[formatterName];
-    if (!formatter) {
-      throw new Error('Invalid formatter: ' + formatterName);
-    } else if (formatter.type !== column.type) {
-      throw new Error('Type mismatch: ' + formatter.type + ' formatter on ' + column.type + ' column: ' + column.data);
-    }
-    return formatter;
   }
 
   function incrementAutofill(hot, start, end, rows) {
@@ -1078,7 +1067,7 @@ BulkUtils = (function($) {
   }
 
   function extendApi(api, hot, columns) {
-    // Note: make sure to mirrow capabilities here in processOnChangeListeners' tempApi
+    // Note: make sure to mirror capabilities here in processOnChangeListeners' tempApi
     api.showError = function(message) {
       showError(message, hot);
     };
@@ -1096,69 +1085,54 @@ BulkUtils = (function($) {
     };
 
     api.updateField = function(rowIndex, dataProperty, options) {
-      var colIndex = getColumnIndex(dataProperty, columns);
-      var column = columns[colIndex];
-
-      var forceValidate = false;
-      Object.keys(options).forEach(function(option) {
-        switch (option) {
-        case 'value':
-          // handled after everything else so validation is only triggered once
-          break;
-        case 'source':
-          if (column.type !== 'dropdown') {
-            throw new Error('Can\'t update source of non-dropdown column: ' + dataProperty);
-          }
-          var labels = getDropdownOptionLabels(options.source, column.getItemLabel, column.sortSource);
-          hot.setCellMeta(rowIndex, colIndex, 'source', labels);
-          hot.setCellMeta(rowIndex, colIndex, 'sourceData', options.source);
-          forceValidate = true;
-          break;
-        case 'required':
-          hot.setCellMeta(rowIndex, colIndex, 'allowEmpty', !options.required);
-          forceValidate = true;
-          break;
-        case 'disabled':
-          hot.setCellMeta(rowIndex, colIndex, 'readOnly', options.disabled);
-          break;
-        case 'formatter':
-          var formatter = getFormatter(options.formatter, column);
-          if (formatter) {
-            hot.setCellMeta(rowIndex, colIndex, 'renderer', formatter.renderer);
-            if (formatter.additionalAction) {
-              formatter.additionalAction();
-            }
-          } else {
-            switch (column.type) {
-            case 'text':
-              hot.setCellMeta(rowIndex, colIndex, 'renderer', Handsontable.renderers.TextRenderer);
-              break;
-            case 'dropdown':
-              hot.setCellMeta(rowIndex, colIndex, 'renderer', Handsontable.renderers.AutocompleteRenderer);
-              break;
-            default:
-              throw new Error('Can\'t set formatter for ' + column.type + ' column: ' + dataProperty);
-            }
-          }
-          break;
-        default:
-          throw new Error('Invalid field update option: ' + option);
-        }
-      });
-      if (options.hasOwnProperty('value')) {
-        hot.setDataAtCell(rowIndex, colIndex, options.value);
-      } else if (options.hasOwnProperty('formatter')) {
-        hot.render();
-      } else if (forceValidate) {
-        // Note: intended to be a private function, but it works and is more efficient than validating the entire row/column/table
-        hot._validateCells(null, [rowIndex], [colIndex]);
-      }
+      updateField(hot, columns, rowIndex, dataProperty, options);
     };
 
     api.updateData = function(changes) {
       // changes = [[row, prop, value]...]
       hot.setDataAtRowProp(changes);
     };
+  }
+
+  function updateField(hot, columns, rowIndex, dataProperty, options) {
+    var colIndex = getColumnIndex(dataProperty, columns);
+    var column = columns[colIndex];
+
+    var forceValidate = false;
+    Object.keys(options).forEach(function(option) {
+      switch (option) {
+      case 'value':
+        // handled after everything else so validation is only triggered once
+        break;
+      case 'source':
+        if (column.type !== 'dropdown') {
+          throw new Error('Can\'t update source of non-dropdown column: ' + dataProperty);
+        }
+        var labels = getDropdownOptionLabels(options.source, column.getItemLabel, column.sortSource);
+        hot.setCellMeta(rowIndex, colIndex, 'source', labels);
+        hot.setCellMeta(rowIndex, colIndex, 'sourceData', options.source);
+        forceValidate = true;
+        break;
+      case 'required':
+        hot.setCellMeta(rowIndex, colIndex, 'allowEmpty', !options.required);
+        forceValidate = true;
+        break;
+      case 'disabled':
+        hot.setCellMeta(rowIndex, colIndex, 'readOnly', options.disabled);
+        break;
+      case 'formatter':
+        hot.setCellMeta(rowIndex, colIndex, 'format', options.formatter);
+        break;
+      default:
+        throw new Error('Invalid field update option: ' + option);
+      }
+    });
+    if (options.hasOwnProperty('value') && options.value !== undefined) {
+      hot.setDataAtCell(rowIndex, colIndex, options.value);
+    } else if (forceValidate) {
+      // Note: intended to be a private function, but it works and is more efficient than validating the entire row/column/table
+      hot._validateCells(null, [rowIndex], [colIndex]);
+    }
   }
 
   function processOnChangeListeners(cellMetas, columns, tableData) {
@@ -1216,24 +1190,7 @@ BulkUtils = (function($) {
             addCellMeta(cellMetas, rowIndex, colIndex, 'readOnly', options.disabled);
             break;
           case 'formatter':
-            var formatter = getFormatter(options.formatter, column);
-            if (formatter) {
-              addCellMeta(cellMEtas, rowIndex, colIndex, 'renderer', formatter.renderer);
-              if (formatter.additionalAction) {
-                formatter.additionalAction();
-              }
-            } else {
-              switch (column.type) {
-              case 'text':
-                addCellMeta(cellMetas, rowIndex, colIndex, 'renderer', Handsontable.renderers.TextRenderer);
-                break;
-              case 'dropdown':
-                addCellMeta(cellMetas, rowIndex, colIndex, 'renderer', Handsontable.renderers.AutocompleteRenderer);
-                break;
-              default:
-                throw new Error('Can\'t set formatter for ' + column.type + ' column: ' + dataProperty);
-              }
-            }
+            addCellMeta(cellMetas, rowIndex, colIndex, 'format', options.formatter);
             break;
           default:
             throw new Error('Invalid field update option: ' + option);
