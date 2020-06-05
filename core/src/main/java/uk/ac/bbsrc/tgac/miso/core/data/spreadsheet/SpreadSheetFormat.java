@@ -11,22 +11,22 @@ public enum SpreadSheetFormat {
   EXCEL("Microsoft Excel", "xlsx", "application", "vnd.ms-excel") {
 
     @Override
-    public <T> byte[] generate(Stream<T> input, Spreadsheet<T> format) {
-      return input.collect(new ExcelCollector<>(format.columns()));
+    public <T> byte[] generate(Stream<T> input, boolean isDetailedSample, Spreadsheet<T> format) {
+      return input.collect(new ExcelCollector<>(getColumnsFiltered(format, isDetailedSample)));
     }
   },
   ODF("Open Document Format", "ods", "application", "vnd.oasis.opendocument.spreadsheet") {
     @Override
-    public <T> byte[] generate(Stream<T> input, Spreadsheet<T> format) {
-      return input.collect(new OpenDocumentCollector<>(format.columns()));
+    public <T> byte[] generate(Stream<T> input, boolean isDetailedSample, Spreadsheet<T> format) {
+      return input.collect(new OpenDocumentCollector<>(getColumnsFiltered(format, isDetailedSample)));
     }
   },
   CSV("Comma-delimited Data", "csv", "text", "csv") {
 
     @Override
-    public <T> byte[] generate(Stream<T> input, Spreadsheet<T> format) {
+    public <T> byte[] generate(Stream<T> input, boolean isDetailedSample, Spreadsheet<T> format) {
       StringBuilder builder = new StringBuilder();
-      List<Column<T>> columns = format.columns();
+      List<Column<T>> columns = getColumnsFiltered(format, isDetailedSample);
       builder.append(columns.stream().map(Column::name).collect(Collectors.joining(","))).append("\r\n");
 
       input.forEach(item -> {
@@ -67,6 +67,12 @@ public enum SpreadSheetFormat {
     return mediaType;
   }
 
-  public abstract <T> byte[] generate(Stream<T> input, Spreadsheet<T> format);
+  public abstract <T> byte[] generate(Stream<T> input, boolean isDetailedSample, Spreadsheet<T> format);
+
+  public <T> List<Column<T>> getColumnsFiltered(Spreadsheet<T> format, boolean isDetailedSample) {
+    return format.columns().stream()
+        .filter(col -> isDetailedSample || !col.isDetailedSampleOnly())
+        .collect(Collectors.toList());
+  }
 
 }

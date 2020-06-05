@@ -50,6 +50,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
 public interface Sample extends Attachable, Comparable<Sample>, Deletable, HierarchyEntity, Locatable, QualityControllable<SampleQC>,
     Serializable {
 
+  public static final String PLAIN_CATEGORY_NAME = "Plain";
+
   /**
    * Returns the accession of this Sample object.
    * 

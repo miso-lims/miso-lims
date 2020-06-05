@@ -14,7 +14,11 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 public abstract class Column<T> {
 
   public static <T> Column<T> forDate(String name, Function<T, Date> transform) {
-    return new Column<T>(name) {
+    return forDate(name, false, transform);
+  }
+
+  public static <T> Column<T> forDate(String name, boolean detailedSampleOnly, Function<T, Date> transform) {
+    return new Column<T>(name, detailedSampleOnly) {
 
       @Override
       void appendCsv(StringBuilder builder, T value) {
@@ -42,7 +46,11 @@ public abstract class Column<T> {
   }
 
   public static <T> Column<T> forDouble(String name, Function<T, Double> transform) {
-    return new Column<T>(name) {
+    return forDouble(name, false, transform);
+  }
+
+  public static <T> Column<T> forDouble(String name, boolean detailedSampleOnly, Function<T, Double> transform) {
+    return new Column<T>(name, detailedSampleOnly) {
 
       @Override
       void appendCsv(StringBuilder builder, T value) {
@@ -68,7 +76,11 @@ public abstract class Column<T> {
   }
 
   public static <T> Column<T> forInteger(String name, Function<T, Integer> transform) {
-    return new Column<T>(name) {
+    return forInteger(name, false, transform);
+  }
+
+  public static <T> Column<T> forInteger(String name, boolean detailedSampleOnly, Function<T, Integer> transform) {
+    return new Column<T>(name, detailedSampleOnly) {
 
       @Override
       void appendCsv(StringBuilder builder, T value) {
@@ -99,7 +111,11 @@ public abstract class Column<T> {
   }
 
   public static <T> Column<T> forBigDecimal(String name, Function<T, BigDecimal> transform) {
-    return new Column<T>(name) {
+    return forBigDecimal(name, false, transform);
+  }
+
+  public static <T> Column<T> forBigDecimal(String name, boolean detailedSampleOnly, Function<T, BigDecimal> transform) {
+    return new Column<T>(name, detailedSampleOnly) {
 
       @Override
       void appendCsv(StringBuilder builder, T value) {
@@ -130,7 +146,11 @@ public abstract class Column<T> {
   }
 
   public static <T> Column<T> forString(String name, Function<T, String> transform) {
-    return new Column<T>(name) {
+    return forString(name, false, transform);
+  }
+
+  public static <T> Column<T> forString(String name, boolean detailedSampleOnly, Function<T, String> transform) {
+    return new Column<T>(name, detailedSampleOnly) {
 
       @Override
       void appendCsv(StringBuilder builder, T value) {
@@ -166,16 +186,22 @@ public abstract class Column<T> {
   }
 
   private final String name;
+  private final boolean detailedSampleOnly;
 
-  public Column(String name) {
+  public Column(String name, boolean detailedSampleOnly) {
     super();
     this.name = name;
+    this.detailedSampleOnly = detailedSampleOnly;
   }
 
   abstract void appendCsv(StringBuilder builder, T value);
 
   public String name() {
     return name;
+  }
+
+  public boolean isDetailedSampleOnly() {
+    return detailedSampleOnly;
   }
 
   abstract void setExcel(XSSFCell cell, T value);

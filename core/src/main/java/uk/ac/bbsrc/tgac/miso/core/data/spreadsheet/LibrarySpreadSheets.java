@@ -29,8 +29,8 @@ public enum LibrarySpreadSheets implements Spreadsheet<Library> {
       Column.forString("Sample Barcode", library -> library.getSample().getIdentificationBarcode()), //
       Column.forString("Identity Name", detailedSample(SampleIdentity.class, SampleIdentity::getName, "")), //
       Column.forString("Identity Alias", detailedSample(SampleIdentity.class, SampleIdentity::getAlias, "")), //
-      Column.forString("External Identifier", detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
-      Column.forString("Secondary Identifier", detailedSample(SampleTissue.class, SampleTissue::getSecondaryIdentifier, "")), //
+      Column.forString("External Identifier", true, detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
+      Column.forString("Secondary Identifier", true, detailedSample(SampleTissue.class, SampleTissue::getSecondaryIdentifier, "")), //
       Column.forString("Location", BoxUtils::makeLocationLabel)), //
   POOL_PREPARATION("Pool Preparation", //
       Column.forString("Name", Library::getName), //

@@ -39,6 +39,7 @@ import javax.ws.rs.core.Response.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -123,6 +124,9 @@ public class LibraryRestController extends RestController {
   @Autowired
   private TimeZoneCorrector timeZoneCorrector;
 
+  @Value("${miso.detailed.sample.enabled}")
+  private Boolean detailedSample;
+
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
   }
@@ -186,7 +190,7 @@ public class LibraryRestController extends RestController {
   @PostMapping(value = "/spreadsheet")
   @ResponseBody
   public HttpEntity<byte[]> getSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response) {
-    return MisoWebUtils.generateSpreadsheet(request, libraryService::get, LibrarySpreadSheets::valueOf, response);
+    return MisoWebUtils.generateSpreadsheet(request, libraryService::get, detailedSample, LibrarySpreadSheets::valueOf, response);
   }
 
   private static Stream<Sample> getSample(Library library) {

@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -244,6 +245,9 @@ public class PoolRestController extends RestController {
   private LibraryService libraryService;
   @Autowired
   private LibraryAliquotService libraryAliquotService;
+
+  @Value("${miso.detailed.sample.enabled}")
+  private Boolean detailedSample;
 
   @GetMapping(value = "{poolId}", produces = "application/json")
   public @ResponseBody PoolDto getPoolById(@PathVariable long poolId) throws IOException {
@@ -490,7 +494,7 @@ public class PoolRestController extends RestController {
   @ResponseBody
   public HttpEntity<byte[]> getSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) {
-    return MisoWebUtils.generateSpreadsheet(request, poolService::get, PoolSpreadSheets::valueOf, response);
+    return MisoWebUtils.generateSpreadsheet(request, poolService::get, detailedSample, PoolSpreadSheets::valueOf, response);
   }
 
   @PostMapping(value = "/contents/spreadsheet")
@@ -501,6 +505,7 @@ public class PoolRestController extends RestController {
         .flatMap(
             WhineyFunction.rethrow(id -> poolService.get(id).getPoolContents().stream()))//
         .map(pe -> pe.getPoolableElementView().getAliquot()),
+        detailedSample,
         LibraryAliquotSpreadSheets::valueOf, response);
   }
 

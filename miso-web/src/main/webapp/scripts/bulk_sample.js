@@ -169,11 +169,13 @@ BulkTarget.sample = (function($) {
           });
         }
       }, HotUtils.printAction('sample'),
-          HotUtils.spreadsheetAction(Urls.rest.samples.spreadsheet, Constants.sampleSpreadsheets, function(samples, spreadsheet) {
+          HotUtils.spreadsheetAction(Urls.rest.samples.spreadsheet, Constants.sampleSpreadsheets.filter(function(sheet) {
+            return Constants.isDetailedSample || sheet.allowedClasses.indexOf('Plain') !== -1;
+          }), function(samples, spreadsheet) {
             var errors = [];
             var invalidSamples = [];
             samples.forEach(function(sample) {
-              if (!spreadsheet.sheet.allowedClasses.includes(getSampleClass(sample).sampleCategory)) {
+              if (!spreadsheet.sheet.allowedClasses.includes(getSampleCategory(sample))) {
                 invalidSamples.push(sample);
               }
             })
@@ -182,7 +184,7 @@ BulkTarget.sample = (function($) {
               errors.push("Allowed types: " + spreadsheet.sheet.allowedClasses.join(", "));
               errors.push("Invalid samples:")
               invalidSamples.forEach(function(sample) {
-                errors.push("* " + sample.alias + " (" + getSampleClass(sample).alias + ")");
+                errors.push("* " + sample.alias + " (" + getSampleCategory(sample) + ")");
               })
             }
             return errors;
@@ -1020,10 +1022,13 @@ BulkTarget.sample = (function($) {
     return 3;
   }
 
-  function getSampleClass(sample) {
+  function getSampleCategory(sample) {
+    if (!Constants.isDetailedSample) {
+      return 'Plain';
+    }
     return Constants.sampleClasses.find(function(sampleClass) {
       return sample.sampleClassId == sampleClass.id;
-    });
+    }).sampleCategory;
   }
 
   function getSampleClasses(samples) {

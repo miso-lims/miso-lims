@@ -182,7 +182,6 @@ public class EditSampleController {
     private static final String CREATE = "create";
     private static final String PROPAGATE = "propagate";
     private static final String EDIT = "edit";
-    private static final String HAS_PROJECT = "hasProject";
     private static final String PROJECTS = "projects";
     private static final String DNASE_TREATABLE = "dnaseTreatable";
     private static final String DEFAULT_SCI_NAME = "defaultSciName";

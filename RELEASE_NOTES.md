@@ -2,7 +2,7 @@
 
 Changes:
 
-
+  * Fixed Download action on Samples list to work in plain sample mode
 
 # 1.6.0
 

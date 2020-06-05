@@ -7,6 +7,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -50,10 +51,13 @@ public class HotRestController extends RestController {
 
   }
 
+  @Value("${miso.detailed.sample.enabled}")
+  private Boolean detailedSample;
+
   @PostMapping("/spreadsheet")
   public HttpEntity<byte[]> downloadSpreadsheet(@RequestParam(name = "format", required = true) String format,
       @RequestBody SpreadsheetDataDto dto, HttpServletResponse response) {
-    return MisoWebUtils.generateSpreadsheet(dto.getHeaders(), dto.getRows(), SpreadSheetFormat.valueOf(format), response);
+    return MisoWebUtils.generateSpreadsheet(dto.getHeaders(), dto.getRows(), detailedSample, SpreadSheetFormat.valueOf(format), response);
   }
 
   public static class ColumnDataDto {
