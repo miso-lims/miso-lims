@@ -60,7 +60,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -389,7 +388,7 @@ public class SampleRestController extends RestController {
 
         @Override
         public Stream<Library> find(Sample model, Consumer<String> emitError) {
-          Set<Library> children = RelationFinder.ChildrenSampleAdapter.searchChildrenLibraries((DetailedSample) model, libraryService)
+          Set<Library> children = RelationFinder.ChildrenSampleAdapter.searchChildrenLibraries(model, libraryService)
               .collect(Collectors.toSet());
           if (children.isEmpty()) {
             emitError.accept(String.format("%s (%s) has no %s.", model.getName(), model.getAlias(), category()));
@@ -408,7 +407,7 @@ public class SampleRestController extends RestController {
 
         @Override
         public Stream<LibraryAliquot> find(Sample model, Consumer<String> emitError) {
-          Set<LibraryAliquot> children = RelationFinder.ChildrenSampleAdapter.searchChildrenLibraries((DetailedSample) model, libraryService)
+          Set<LibraryAliquot> children = RelationFinder.ChildrenSampleAdapter.searchChildrenLibraries(model, libraryService)
               .flatMap(library -> library.getLibraryAliquots().stream()).collect(Collectors.toSet());
           if (children.isEmpty()) {
             emitError.accept(String.format("%s (%s) has no %s.", model.getName(), model.getAlias(), category()));
@@ -428,7 +427,7 @@ public class SampleRestController extends RestController {
         @Override
         public Stream<Pool> find(Sample model, Consumer<String> emitError) {
           Set<Pool> children = new HashSet<>();
-          for (LibraryAliquot aliquot : RelationFinder.ChildrenSampleAdapter.searchChildrenLibraries((DetailedSample) model, libraryService)
+          for (LibraryAliquot aliquot : RelationFinder.ChildrenSampleAdapter.searchChildrenLibraries(model, libraryService)
               .flatMap(library -> library.getLibraryAliquots().stream()).collect(Collectors.toList())) {
             try {
               children.addAll(poolService.listByLibraryAliquotId(aliquot.getId()));
