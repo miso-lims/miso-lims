@@ -93,4 +93,9 @@ public class DefaultScientificNameService extends AbstractSaveService<Scientific
     return result;
   }
 
+  @Override
+  public ScientificName getByAlias(String alias) throws IOException {
+    return scientificNameDao.getByAlias(alias);
+  }
+
 }

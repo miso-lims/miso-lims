@@ -9,7 +9,7 @@ public class ProjectDto {
   private String description;
   private String status;
   private Long referenceGenomeId;
-  private String defaultSciName;
+  private Long defaultSciNameId;
   private Long defaultTargetedSequencingId;
   private boolean clinical;
   private boolean secondaryNaming;
@@ -78,12 +78,12 @@ public class ProjectDto {
     this.referenceGenomeId = referenceGenomeId;
   }
 
-  public String getDefaultSciName() {
-    return defaultSciName;
+  public Long getDefaultSciNameId() {
+    return defaultSciNameId;
   }
 
-  public void setDefaultSciName(String defaultSciName) {
-    this.defaultSciName = defaultSciName;
+  public void setDefaultSciNameId(Long defaultSciNameId) {
+    this.defaultSciNameId = defaultSciNameId;
   }
 
   public Long getDefaultTargetedSequencingId() {

@@ -65,6 +65,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
+import uk.ac.bbsrc.tgac.miso.core.data.ScientificName;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
@@ -81,6 +82,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
+import uk.ac.bbsrc.tgac.miso.core.service.ScientificNameService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorkstationService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
@@ -130,7 +132,7 @@ public class EditLibraryController {
   private static class Config {
     private static final String SORTABLE_LOCATION = "sortableLocation";
     private static final String IS_LIBRARY_RECEIPT = "isLibraryReceipt";
-    private static final String DEFAULT_SCI_NAME = "defaultSciName";
+    private static final String DEFAULT_SCI_NAME_ID = "defaultSciNameId";
     private static final String PAGE_MODE = "pageMode";
     private static final String CREATE = "create";
     private static final String PROPAGATE = "propagate";
@@ -171,6 +173,8 @@ public class EditLibraryController {
   private WorkstationService workstationService;
   @Autowired
   private InstrumentService instrumentService;
+  @Autowired
+  private ScientificNameService scientificNameService;
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -445,8 +449,9 @@ public class EditLibraryController {
     }
 
     Set<Group> recipientGroups = authorizationManager.getCurrentUser().getGroups();
-
-    return new BulkReceiveLibraryBackend(libDto, quantity, project, aliquotClass, defaultSciName, libraryTemplateService, recipientGroups)
+    ScientificName sciName = scientificNameService.getByAlias(defaultSciName);
+    Long sciNameId = sciName == null ? null : sciName.getId();
+    return new BulkReceiveLibraryBackend(libDto, quantity, project, aliquotClass, sciNameId, libraryTemplateService, recipientGroups)
         .create(model);
   }
 
@@ -454,18 +459,18 @@ public class EditLibraryController {
 
     private final Project project;
     private final SampleClass aliquotClass;
-    private final String defaultSciName;
+    private final Long defaultSciNameId;
     private final BoxDto newBox;
     private final LibraryTemplateService libraryTemplateService;
     private final Set<Group> recipientGroups;
 
-    public BulkReceiveLibraryBackend(LibraryDto dto, Integer quantity, Project project, SampleClass aliquotClass, String defaultSciName,
+    public BulkReceiveLibraryBackend(LibraryDto dto, Integer quantity, Project project, SampleClass aliquotClass, Long defaultSciNameId,
         LibraryTemplateService libraryTemplateService, Set<Group> recipientGroups) {
       super("libraryReceipt", LibraryDto.class, "Libraries", dto, quantity);
       if (isDetailedSampleEnabled() && aliquotClass == null) throw new InvalidParameterException("Aliquot class cannot be null");
       this.project = project;
       this.aliquotClass = aliquotClass;
-      this.defaultSciName = defaultSciName;
+      this.defaultSciNameId = defaultSciNameId;
       this.libraryTemplateService = libraryTemplateService;
       this.recipientGroups = recipientGroups;
       newBox = dto.getBox();
@@ -497,7 +502,9 @@ public class EditLibraryController {
         templatesByProjectId.put(project.getId(),
             Dtos.asLibraryTemplateDtos(libraryTemplateService.listLibraryTemplatesForProject(project.getId())));
       }
-      config.put(Config.DEFAULT_SCI_NAME, defaultSciName);
+      if (defaultSciNameId != null) {
+        config.put(Config.DEFAULT_SCI_NAME_ID, defaultSciNameId);
+      }
       config.put(Config.SHOW_DESCRIPTION, showDescription);
       config.put(Config.SHOW_VOLUME, showVolume);
       config.put(Config.SHOW_LIBRARY_ALIAS, showLibraryAlias);

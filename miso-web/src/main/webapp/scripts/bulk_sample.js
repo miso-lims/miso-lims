@@ -420,11 +420,12 @@ BulkTarget.sample = (function($) {
         title: 'Sci. Name',
         type: 'dropdown',
         data: 'scientificNameId',
+        required: true,
         source: Constants.scientificNames,
         sortSource: Utils.sorting.standardSort('alias'),
         getItemLabel: Utils.array.getAlias,
         getItemValue: Utils.array.getId,
-        initial: config.project && config.project.defaultSciName ? config.project.defaultSciName : config.defaultSciName
+        initial: config.project && config.project.defaultSciNameId ? config.project.defaultSciNameId : config.defaultSciNameId
       }, {
         title: 'External Name',
         type: 'text',

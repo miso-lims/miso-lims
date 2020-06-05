@@ -2447,11 +2447,8 @@ public class Dtos {
     dto.setShortName(from.getShortName());
     dto.setDescription(from.getDescription());
     setObject(dto::setStatus, from.getStatus(), (progress) -> progress.getKey());
-    if (from.getReferenceGenome() != null) {
-      dto.setReferenceGenomeId(from.getReferenceGenome().getId());
-      setString(dto::setDefaultSciName, maybeGetProperty(from.getReferenceGenome().getDefaultScientificName(),
-          ScientificName::getAlias));
-    }
+    setId(dto::setReferenceGenomeId, from.getReferenceGenome());
+    setId(dto::setDefaultSciNameId, maybeGetProperty(from.getReferenceGenome(), ReferenceGenome::getDefaultScientificName));
     setId(dto::setDefaultTargetedSequencingId, from.getDefaultTargetedSequencing());
     setBoolean(dto::setClinical, from.isClinical(), false);
     setBoolean(dto::setSecondaryNaming, from.isSecondaryNaming(), false);

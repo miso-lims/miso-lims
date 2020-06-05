@@ -2,7 +2,8 @@
 
 Changes:
 
-
+  * Fixed scientific name to show as required on bulk sample pages
+  * Fixed scientific name on bulk sample pages to use default value from project or config
 
 # 1.6.0
 
@@ -16,6 +17,11 @@ Changes:
   * Fixed additional unnecessary sample aliquot parent being created when receiving sample aliquots
     or libraries (detailed sample)
   * Fixed receiving samples with subproject
+
+Known Issues:
+
+  * Scientific name is required, but not shown as required on bulk sample pages
+  * Default scientific name from project or config is not used on bulk sample pages
 
 # 1.5.0
 

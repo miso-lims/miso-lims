@@ -66,6 +66,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
+import uk.ac.bbsrc.tgac.miso.core.data.ScientificName;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
@@ -77,6 +78,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
+import uk.ac.bbsrc.tgac.miso.core.service.ScientificNameService;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
@@ -132,6 +134,8 @@ public class EditSampleController {
   @Autowired
   private SampleClassService sampleClassService;
   @Autowired
+  private ScientificNameService scientificNameService;
+  @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
   private IndexChecker indexChecker;
@@ -185,7 +189,7 @@ public class EditSampleController {
     private static final String HAS_PROJECT = "hasProject";
     private static final String PROJECTS = "projects";
     private static final String DNASE_TREATABLE = "dnaseTreatable";
-    private static final String DEFAULT_SCI_NAME = "defaultSciName";
+    private static final String DEFAULT_SCI_NAME_ID = "defaultSciNameId";
     private static final String DEFAULT_LCM_TUBE_GROUP_ID = "defaultLcmTubeGroupId";
     private static final String DEFAULT_LCM_TUBE_GROUP_DESC = "defaultLcmTubeGroupDescription";
     private static final String SOURCE_SAMPLE_CLASS = "sourceSampleClass";
@@ -570,7 +574,10 @@ public class EditSampleController {
       config.put(Config.DEFAULT_LCM_TUBE_GROUP_ID, defaultLcmTubeGroupId);
       config.put(Config.DEFAULT_LCM_TUBE_GROUP_DESC, defaultLcmTubeGroupDesc);
       addJsonArray(mapper, config, Config.PROJECTS, projectService.list(), Dtos::asDto);
-      config.put(Config.DEFAULT_SCI_NAME, defaultSciName);
+      ScientificName sciName = scientificNameService.getByAlias(defaultSciName);
+      if (sciName != null) {
+        config.put(Config.DEFAULT_SCI_NAME_ID, sciName.getId());
+      }
       if (project != null) {
         config.putPOJO("project", Dtos.asDto(project));
       }
