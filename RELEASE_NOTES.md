@@ -3,6 +3,7 @@
 Changes:
 
   * Fixed Edit button on Scientific Names list to link to the correct page
+  * Fixed Children action on Samples list to work in plain sample mode
 
 # 1.6.0
 
