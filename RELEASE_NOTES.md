@@ -2,6 +2,8 @@
 
 Changes:
 
+  * Fixed Edit button on Scientific Names list to link to the correct page
+  * Fixed Children action on Samples list to work in plain sample mode
   * Fixed Download action on Samples list to work in plain sample mode
 
 # 1.6.0
@@ -17,6 +19,11 @@ Changes:
     or libraries (detailed sample)
   * Fixed receiving samples with subproject
 
+Known Issues:
+
+  * Edit button on Scientific Names list links to Edit Run Purposes page instead of Edit Scientific
+    Names
+
 # 1.5.0
 
 Changes:
@@ -27,6 +34,11 @@ Changes:
   * Improved performance of bulk table import function
   * Fixed sorting bulk tables on columns containing empty cells
   * Fixed V1000 migration hanging on plain sample databases
+
+Known Issues:
+
+  * Edit button on Scientific Names list links to Edit Run Purposes page instead of Edit Scientific
+    Names
 
 # 1.4.0
 
