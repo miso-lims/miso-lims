@@ -26,7 +26,6 @@ import com.eaglegenomics.simlims.core.Group;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListTransferView;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
@@ -41,7 +40,6 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ListTransferViewDto;
 import uk.ac.bbsrc.tgac.miso.dto.TransferDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.component.TimeZoneCorrector;
 
 @Controller
 @RequestMapping("/rest/transfers")
@@ -59,8 +57,6 @@ public class TransferRestController extends RestController {
   private AuthorizationManager authorizationManager;
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
-  @Autowired
-  private TimeZoneCorrector timeZoneCorrector;
 
   private final JQueryDataTableBackend<ListTransferView, ListTransferViewDto> jQueryBackend = new JQueryDataTableBackend<ListTransferView, ListTransferViewDto>() {
 
@@ -91,12 +87,12 @@ public class TransferRestController extends RestController {
 
   @PostMapping
   public @ResponseBody TransferDto create(@RequestBody TransferDto dto) throws IOException {
-    return RestUtils.createObject("Transfer", dto, this::to, transferService, Dtos::asDto);
+    return RestUtils.createObject("Transfer", dto, Dtos::to, transferService, Dtos::asDto);
   }
 
   @PutMapping("/{id}")
   public @ResponseBody TransferDto update(@RequestBody TransferDto dto, @PathVariable long id) throws IOException {
-    TransferDto updated = RestUtils.updateObject("Transfer", id, dto, this::to, transferService, Dtos::asDto);
+    TransferDto updated = RestUtils.updateObject("Transfer", id, dto, Dtos::to, transferService, Dtos::asDto);
 
     Map<Long, Long> boxMoves = new HashMap<>();
     dto.getItems().forEach(item -> {
@@ -121,12 +117,6 @@ public class TransferRestController extends RestController {
     }
 
     return updated;
-  }
-
-  private Transfer to(TransferDto from) {
-    Transfer transfer = Dtos.to(from);
-    timeZoneCorrector.toDbTime(transfer.getTransferTime(), transfer::setTransferTime);
-    return transfer;
   }
 
   @PostMapping(value = "/bulk-delete")

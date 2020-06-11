@@ -64,7 +64,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibrarySpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
@@ -81,7 +80,6 @@ import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.component.TimeZoneCorrector;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 /**
@@ -120,8 +118,6 @@ public class LibraryRestController extends RestController {
   private SampleRestController sampleController;
   @Autowired
   private IndexChecker indexChecker;
-  @Autowired
-  private TimeZoneCorrector timeZoneCorrector;
 
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
@@ -152,10 +148,6 @@ public class LibraryRestController extends RestController {
         ((DetailedSample) sample).setSynthetic(true);
       }
       library.setSample(sample);
-    }
-    if (library.getCreationReceiptInfo() != null) {
-      Transfer transfer = library.getCreationReceiptInfo().getTransfer();
-      timeZoneCorrector.toDbTime(transfer.getTransferTime(), transfer::setTransferTime);
     }
     return library;
   }
