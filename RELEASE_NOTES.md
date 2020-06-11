@@ -6,6 +6,7 @@ Changes:
   * Fixed Edit button on Scientific Names list to link to the correct page
   * Fixed Children action on Samples list to work in plain sample mode
   * Fixed Receipt Confirmed and Receipt QC Passed validation on Create Samples page
+  * Fixed Fill Boxes actions on the bulk Create/Edit Sample and Library Aliquot pages
 
 # 1.6.0
 
@@ -26,6 +27,7 @@ Known Issues:
     Names
   * Receipt Confirmed and Receipt QC Passed fields do not validate on Create Samples page when cleared
     (unknown)
+  * Fill Boxes actions on the bulk Create/Edit Sample and Library Aliquot pages don't work
 
 # 1.5.0
 

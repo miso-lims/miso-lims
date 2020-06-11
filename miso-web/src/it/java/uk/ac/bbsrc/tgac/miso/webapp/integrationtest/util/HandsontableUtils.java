@@ -87,13 +87,7 @@ public class HandsontableUtils {
   }
 
   public static String booleanString(Boolean value) {
-    if (value == null) {
-      return null;
-    } else if (Boolean.TRUE.equals(value)) {
-      return "True";
-    } else {
-      return "False";
-    }
+    return booleanString(value, null);
   }
 
   public static String booleanString(Boolean value, String nullValue) {
