@@ -268,6 +268,7 @@ BulkUtils = (function($) {
             label: 'False',
             value: false
           }],
+          initial: 'True',
           getItemLabel: function(item) {
             return item.label;
           },
@@ -289,6 +290,7 @@ BulkUtils = (function($) {
             label: 'False',
             value: false
           }],
+          initial: 'True',
           getItemLabel: function(item) {
             return item.label;
           },
