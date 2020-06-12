@@ -59,9 +59,8 @@ public class RestExceptionHandler {
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode error = mapper.createObjectNode();
     error.put("requestUrl", request.getRequestURL().toString());
-    error.put("detail", exception.getLocalizedMessage());
+    String detailMessage = exception.getLocalizedMessage();
     Status status = null;
-    ObjectNode data = null;
 
     ResponseStatus rs = AnnotationUtils.findAnnotation(exception.getClass(), ResponseStatus.class);
     if (exception instanceof NestedServletException) {
@@ -77,7 +76,7 @@ public class RestExceptionHandler {
       // Customized REST exception with additional data fields
       RestException restException = (RestException) exception;
       status = restException.getStatus();
-      data = makeDataMap(error, restException.getData());
+      addDataMap(error, restException.getData());
     } else if (exception instanceof BulkValidationException) {
       BulkValidationException bulkValidationException = (BulkValidationException) exception;
       status = Status.BAD_REQUEST;
@@ -86,25 +85,23 @@ public class RestExceptionHandler {
     } else if (exception instanceof ValidationException) {
       ValidationException valException = (ValidationException) exception;
       status = Status.BAD_REQUEST;
-      data = makeDataMap(error, valException.getErrorsByField());
+      addDataMap(error, valException.getErrorsByField());
       error.put("dataFormat", "validation");
     } else if (ExceptionUtils.getRootCause(exception) instanceof IOException
         && StringUtils.containsIgnoreCase(ExceptionUtils.getRootCauseMessage(exception), "Broken pipe")) {
       response.setStatus(Status.SERVICE_UNAVAILABLE.getStatusCode());
-      return null;
+          return null;
     } else {
-      // Unknown/unexpected exception
+          // Unknown/unexpected exception
+          detailMessage = "An unexpected error has occurred";
           status = Status.INTERNAL_SERVER_ERROR;
     }
     
+    error.put("detail", detailMessage);
     error.put("code", status.getStatusCode());
     error.put("message", status.getReasonPhrase());
 
     if (status.getFamily() == Status.Family.SERVER_ERROR) {
-      if (data == null) {
-        data = error.putObject("data");
-      }
-      data.put("exceptionClass", exception.getClass().getName());
       log.error(status.getStatusCode() + " error handling REST request", exception);
     } else {
       log.debug(status.getStatusCode() + " error handling REST request", exception);
@@ -118,15 +115,14 @@ public class RestExceptionHandler {
     return error;
   }
 
-  private static ObjectNode makeDataMap(ObjectNode node, Map<String, String> data) {
+  private static void addDataMap(ObjectNode node, Map<String, String> data) {
     if (data == null || data.isEmpty()) {
-      return null;
+      return;
     }
     ObjectNode mapNode = node.putObject("data");
     for (Entry<String, String> entry : data.entrySet()) {
       mapNode.put(entry.getKey(), entry.getValue());
     }
-    return mapNode;
   }
 
   private static void addBulkValidationData(ObjectNode node, BulkValidationException exception) {
