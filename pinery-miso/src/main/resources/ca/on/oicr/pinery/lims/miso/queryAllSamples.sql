@@ -419,7 +419,7 @@ SELECT d.alias name
         ,NULL barcode_two 
         ,NULL umis
         ,NULL qpcr_percentage_human 
-        ,1 qcPassed 
+        ,d.qcPassed qcPassed 
         ,NULL detailedQcStatus 
         ,box.locationBarcode boxLocation 
         ,box.alias boxAlias 

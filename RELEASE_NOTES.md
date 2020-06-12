@@ -2,6 +2,7 @@
 
 Changes:
 
+  * Added QC Passed field to library aliquots
   * Improved performance of bulk library pages
   * Changed sample aliquot purpose to be optional (detailed sample)
   * Fixed Edit button on Scientific Names list to link to the correct page

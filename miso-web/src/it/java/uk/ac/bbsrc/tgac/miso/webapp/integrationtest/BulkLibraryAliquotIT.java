@@ -28,9 +28,10 @@ public class BulkLibraryAliquotIT extends AbstractIT {
       LibraryAliquotColumns.ID_BARCODE, LibraryAliquotColumns.BOX_SEARCH, LibraryAliquotColumns.BOX_ALIAS,
       LibraryAliquotColumns.BOX_POSITION, LibraryAliquotColumns.DISCARDED, LibraryAliquotColumns.EFFECTIVE_GROUP_ID,
       LibraryAliquotColumns.GROUP_ID, LibraryAliquotColumns.GROUP_DESCRIPTION, LibraryAliquotColumns.DESIGN_CODE,
-      LibraryAliquotColumns.SIZE, LibraryAliquotColumns.CONCENTRATION, LibraryAliquotColumns.CONCENTRATION_UNITS,
-      LibraryAliquotColumns.VOLUME, LibraryAliquotColumns.VOLUME_UNITS, LibraryAliquotColumns.NG_USED, LibraryAliquotColumns.VOLUME_USED,
-      LibraryAliquotColumns.CREATION_DATE, LibraryAliquotColumns.TARGETED_SEQUENCING);
+      LibraryAliquotColumns.QC_PASSED, LibraryAliquotColumns.SIZE, LibraryAliquotColumns.CONCENTRATION,
+      LibraryAliquotColumns.CONCENTRATION_UNITS, LibraryAliquotColumns.VOLUME, LibraryAliquotColumns.VOLUME_UNITS,
+      LibraryAliquotColumns.NG_USED, LibraryAliquotColumns.VOLUME_USED, LibraryAliquotColumns.CREATION_DATE,
+      LibraryAliquotColumns.TARGETED_SEQUENCING);
 
   private static final Set<String> propagateColumns = Sets.newHashSet(LibraryAliquotColumns.PARENT_ALIAS);
 
@@ -107,6 +108,7 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     attrs.put(LibraryAliquotColumns.CONCENTRATION, "3.45");
     attrs.put(LibraryAliquotColumns.CREATION_DATE, "2017-08-14");
     attrs.put(LibraryAliquotColumns.TARGETED_SEQUENCING, "Test TarSeq Two");
+    attrs.put(LibraryAliquotColumns.QC_PASSED, "True");
 
     fillRow(table, 0, attrs);
 
@@ -132,6 +134,7 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     attrs.put(LibraryAliquotColumns.CREATION_DATE, "2019-07-08");
     attrs.put(LibraryAliquotColumns.DESIGN_CODE, "EX");
     attrs.put(LibraryAliquotColumns.ALIAS, "DILT_0001_nn_n_PE_304_EX");
+    attrs.put(LibraryAliquotColumns.QC_PASSED, null);
 
     fillRow(table, 0, attrs);
 

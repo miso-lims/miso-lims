@@ -62,6 +62,7 @@ public class LibraryAliquotDto extends AbstractBoxableDto {
   private String subprojectAlias;
   private Boolean subprojectPriority;
   private String sequencingControlTypeAlias;
+  private Boolean qcPassed;
 
   public Long getId() {
     return id;
@@ -385,6 +386,14 @@ public class LibraryAliquotDto extends AbstractBoxableDto {
 
   public void setSequencingControlTypeAlias(String sequencingControlTypeAlias) {
     this.sequencingControlTypeAlias = sequencingControlTypeAlias;
+  }
+
+  public Boolean getQcPassed() {
+    return qcPassed;
+  }
+
+  public void setQcPassed(Boolean qcPassed) {
+    this.qcPassed = qcPassed;
   }
 
 }

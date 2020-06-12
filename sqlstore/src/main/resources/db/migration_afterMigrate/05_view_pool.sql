@@ -18,6 +18,7 @@ AS SELECT
     d.lastModifier AS lastModifier,
     d.preMigrationId AS preMigrationId,
     d.discarded AS discarded,
+    d.qcPassed AS aliquotQcPassed,
     dist.distributed AS distributed,
     l.libraryId AS libraryId,
     l.name AS libraryName,

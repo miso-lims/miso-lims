@@ -90,7 +90,7 @@ FormTarget.libraryaliquot = (function($) {
               required: designCode.targetedSequencingRequired
             });
           }
-        }, {
+        }, FormUtils.makeQcPassedField(true), {
           title: 'Size (bp)',
           data: 'dnaSize',
           type: 'int',
