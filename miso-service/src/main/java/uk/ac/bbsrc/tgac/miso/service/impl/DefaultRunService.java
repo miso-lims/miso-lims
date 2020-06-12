@@ -66,6 +66,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.KitDescriptorService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
@@ -133,6 +134,8 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   private KitDescriptorService kitDescriptorService;
   @Autowired
   private RunPartitionService runPartitionService;
+  @Autowired
+  private RunPartitionAliquotService runPartitionAliquotService;
   @Autowired
   private FileAttachmentService fileAttachmentService;
 
@@ -424,11 +427,13 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     }
   }
 
-  private void applyContainerChanges(Run target, Run source) {
+  private void applyContainerChanges(Run target, Run source) throws IOException {
     Iterator<RunPosition> iterator = target.getRunPositions().iterator();
     while (iterator.hasNext()) {
       RunPosition existingPos = iterator.next();
       if (source.getRunPositions().stream().noneMatch(rp -> isSamePosition(rp, existingPos))) {
+        runPartitionService.deleteForRunContainer(target, existingPos.getContainer());
+        runPartitionAliquotService.deleteForRunContainer(target, existingPos.getContainer());
         iterator.remove();
       }
     }

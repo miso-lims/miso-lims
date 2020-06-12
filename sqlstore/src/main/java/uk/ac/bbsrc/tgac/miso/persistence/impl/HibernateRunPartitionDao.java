@@ -1,9 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +14,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition.RunPartitionId;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.persistence.RunPartitionStore;
 
@@ -59,6 +62,20 @@ public class HibernateRunPartitionDao implements RunPartitionStore {
         RunPartition runPartition = get(run, partition);
         currentSession().delete(runPartition);
       }
+    }
+  }
+
+  @Override
+  public void deleteForRunContainer(Run run, SequencerPartitionContainer container) throws IOException {
+    @SuppressWarnings("unchecked")
+    List<RunPartition> items = currentSession().createCriteria(RunPartition.class)
+        .createAlias("partition", "partition")
+        .add(Restrictions.eq("run", run))
+        .add(Restrictions.eq("partition.sequencerPartitionContainer", container))
+        .list();
+
+    for (RunPartition item : items) {
+      currentSession().delete(item);
     }
   }
 

@@ -10,8 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
@@ -71,6 +73,16 @@ public class DefaultRunPartitionAliquotService implements RunPartitionAliquotSer
       managed.setLastModifier(user);
       runPartitionAliquotDao.update(managed);
     }
+  }
+
+  @Override
+  public void deleteForRunContainer(Run run, SequencerPartitionContainer container) throws IOException {
+    runPartitionAliquotDao.deleteForRunContainer(run, container);
+  }
+
+  @Override
+  public void deleteForPoolAliquot(Pool pool, long aliquotId) throws IOException {
+    runPartitionAliquotDao.deleteForPoolAliquot(pool, aliquotId);
   }
 
 }

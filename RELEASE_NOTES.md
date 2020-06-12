@@ -10,6 +10,7 @@ Changes:
   * Fixed Receipt Confirmed and Receipt QC Passed validation on Create Samples page
   * Fixed Fill Boxes actions on the bulk Create/Edit Sample and Library Aliquot pages
   * Fixed library receipt creating multiple ltransfers
+  * Fixed errors deleting containers
 
 Upgrade Notes:
 
