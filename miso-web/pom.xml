@@ -40,6 +40,8 @@
     <mysql.db>lims</mysql.db>
     <mysql.user>tgaclims</mysql.user>
     <mysql.pw>tgaclims</mysql.pw>
+    <db.params>autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useLegacyDatetimeCode=false</db.params>
+    <db.params.jndi>autoReconnect=true&amp;amp;zeroDateTimeBehavior=convertToNull&amp;amp;useUnicode=true&amp;amp;characterEncoding=UTF-8&amp;amp;useLegacyDatetimeCode=false</db.params.jndi>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
   <dependencies>
@@ -496,7 +498,7 @@
 	          </execution>
 	        </executions>
 	        <configuration>
-	          <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?autoReconnect=true</url>
+	          <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?${db.params}</url>
 	          <user>${mysql.user}</user>
 	          <password>${mysql.pw}</password>
 	          <locations>
@@ -521,7 +523,9 @@
                   <!-- 'start' by default. Specify 'run' to keep Tomcat running until stopped manually.
                   If you want test data, you can populate it manually using Docker:
                   
-                  sudo docker exec -i ${CONTAINER_ID} sh -c 'exec mysql -uroot -pabc123 -D lims' < ./src/it/resources/db/migration/clear_test_data.sql sudo docker exec -i ${CONTAINER_ID} sh -c 'exec mysql -uroot -pabc123 -D lims' < ./src/it/resources/db/migration/integration_test_data.sql (then refresh constants manually via admin My Account page) -->
+                  sudo docker exec -i ${CONTAINER_ID} sh -c 'exec mysql -uroot -pabc123 -D lims' < ./src/it/resources/db/migration/clear_test_data.sql; sudo docker exec -i ${CONTAINER_ID} sh -c 'exec mysql -uroot -pabc123 -D lims' < ./src/it/resources/db/migration/integration_test_data.sql
+                  
+                  (then refresh constants manually via admin My Account page) -->
                   <goal>${cargoInitGoal}</goal>
                 </goals>
               </execution>
@@ -544,12 +548,6 @@
 	            <systemProperties>
 	              <security.method>jdbc</security.method>
 	            </systemProperties>
-	            <dependencies>
-	              <dependency>
-	                <groupId>mysql</groupId>
-      				<artifactId>mysql-connector-java</artifactId>
-	              </dependency>
-	            </dependencies>
 	          </container>
 	          <configuration>
 	            <type>standalone</type>
@@ -569,7 +567,7 @@
 	                <jndiName>jdbc/MISODB</jndiName>
 	                <connectionType>javax.sql.Datasource</connectionType>
 	                <driverClass>com.mysql.jdbc.Driver</driverClass>
-	                <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?autoReconnect=true</url>
+	                <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?${db.params.jndi}</url>
 	                <username>${mysql.user}</username>
 	                <password>${mysql.pw}</password>
 	              </datasource>
@@ -593,7 +591,7 @@
               <systemPropertyVariables>
                 <!-- Make URLs available for tests -->
                 <miso.it.baseUrl>http://localhost:${miso.it.tomcat.servlet.port}/</miso.it.baseUrl>
-                <miso.it.mysql.url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?autoReconnect=true</miso.it.mysql.url>
+                <miso.it.mysql.url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?${db.params}</miso.it.mysql.url>
                 <miso.it.mysql.user>${mysql.user}</miso.it.mysql.user>
                 <miso.it.mysql.pw>${mysql.pw}</miso.it.mysql.pw>
               </systemPropertyVariables>
@@ -776,7 +774,7 @@
 	          </execution>
 	        </executions>
 	        <configuration>
-	          <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?autoReconnect=true</url>
+	          <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?${db.params}</url>
 	          <user>${mysql.user}</user>
 	          <password>${mysql.pw}</password>
 	          <locations>
@@ -821,12 +819,6 @@
 	            <systemProperties>
 	              <security.method>jdbc</security.method>
 	            </systemProperties>
-	            <dependencies>
-	              <dependency>
-	                <groupId>mysql</groupId>
-                    <artifactId>mysql-connector-java</artifactId>
-	              </dependency>
-	            </dependencies>
 	          </container>
 	          <configuration>
 	            <type>standalone</type>
@@ -846,7 +838,7 @@
 	                <jndiName>jdbc/MISODB</jndiName>
 	                <connectionType>javax.sql.Datasource</connectionType>
 	                <driverClass>com.mysql.jdbc.Driver</driverClass>
-	                <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?autoReconnect=true</url>
+	                <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?${db.params.jndi}</url>
 	                <username>${mysql.user}</username>
 	                <password>${mysql.pw}</password>
 	              </datasource>
@@ -870,7 +862,7 @@
               <systemPropertyVariables>
                 <!-- Make URLs available for tests -->
                 <miso.it.baseUrl>http://localhost:${miso.it.plain.tomcat.servlet.port}/</miso.it.baseUrl>
-                <miso.it.mysql.url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?autoReconnect=true</miso.it.mysql.url>
+                <miso.it.mysql.url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?${db.params}</miso.it.mysql.url>
                 <miso.it.mysql.user>${mysql.user}</miso.it.mysql.user>
                 <miso.it.mysql.pw>${mysql.pw}</miso.it.mysql.pw>
               </systemPropertyVariables>

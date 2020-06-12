@@ -71,7 +71,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
@@ -95,7 +94,6 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleTissuePieceDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueProcessingDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.component.TimeZoneCorrector;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
@@ -114,8 +112,6 @@ public class SampleRestController extends RestController {
   private ProjectService projectService;
   @Autowired
   private PoolService poolService;
-  @Autowired
-  private TimeZoneCorrector timeZoneCorrector;
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
@@ -255,16 +251,7 @@ public class SampleRestController extends RestController {
           inferIntermediateSampleClassId(dto, topProcessingClassId, SampleTissueProcessing.CATEGORY_NAME,
               SampleTissue.CATEGORY_NAME, false));
     }
-    Sample sample = Dtos.to(sampleDto);
-    fixReceiptDate(sample);
-    return sample;
-  }
-
-  private void fixReceiptDate(Sample sample) {
-    if (sample.getCreationReceiptInfo() != null) {
-      Transfer transfer = sample.getCreationReceiptInfo().getTransfer();
-      timeZoneCorrector.toDbTime(transfer.getTransferTime(), transfer::setTransferTime);
-    }
+    return Dtos.to(sampleDto);
   }
 
   private Long inferIntermediateSampleClassId(DetailedSampleDto dto, Long childClassId,

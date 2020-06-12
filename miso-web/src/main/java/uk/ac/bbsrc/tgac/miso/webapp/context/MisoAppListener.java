@@ -100,12 +100,12 @@ public class MisoAppListener implements ServletContextListener {
     MisoPropertyExporter exporter = (MisoPropertyExporter) context.getBean("propertyConfigurer");
     Map<String, String> misoProperties = exporter.getResolvedProperties();
 
-    // Set JVM time zone to configured DB time to ensure that generated timestamps are correct
-    String dbZone = getStringPropertyOrNull("miso.timeCorrection.dbZone", misoProperties);
-    if (dbZone == null) {
-      dbZone = "UTC";
+    // Set JVM time zone to configured UI time
+    String uiZone = getStringPropertyOrNull("miso.timeCorrection.uiZone", misoProperties);
+    if (uiZone == null) {
+      throw new IllegalArgumentException("miso.timeCorrection.uiZone not set");
     }
-    TimeZone.setDefault(TimeZone.getTimeZone(dbZone));
+    TimeZone.setDefault(TimeZone.getTimeZone(uiZone));
 
     log.info("Checking MISO storage paths...");
     String baseStoragePath = misoProperties.get("miso.baseDirectory");

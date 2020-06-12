@@ -47,10 +47,23 @@ up the server environments for testing. There is an automatic code formatting
 configuration available for Eclipse.
 
 ## Setting Up the Database Server
+
 The database server needs to have [MySQL 5.7](https://www.mysql.com/). The tool
 [Flyway](https://flywaydb.org/) must also be present to migrate the database as
 the application is developed, but it can be installed on a different server so
 long as it can access the database server.
+
+It is best to set a default timezone for MySQL. You can configure this in
+`my.cnf`. The simplest and recommended option is to set it to UTC by adding the
+following line:
+
+```
+default-time-zone='+00:00'
+```
+
+You could use a named timezone instead if you've populated the timezone tables.
+See the [MySQL docs](https://dev.mysql.com/doc/refman/5.7/en/time-zone-support.html)
+for more information.
 
 The default password in the following `IDENTIFIED BY` clauses should be
 changed.
@@ -98,7 +111,7 @@ and populate it with the following information:
       testOnBorrow="true"
       testOnReturn="true"
       validationQuery="select 1"
-      url="jdbc:mysql://localhost:3306/lims?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;useUnicode=true&amp;characterEncoding=UTF-8"
+      url="jdbc:mysql://localhost:3306/lims?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useLegacyDatetimeCode=false"
       username="tgaclims"
       password="tgaclims"/>
       <Parameter name="miso.propertiesFile" value="file:${catalina.home}/conf/Catalina/localhost/miso.properties" override="false"/>
@@ -132,12 +145,6 @@ define `miso.visionmate.servers` as specified in the properties file
 method for users to report issues using the "Report a problem" link in the header.
 * Update `miso.instanceName` to update the instance name displayed in the header.
 
-
-Download some supporting JARs:
-
-    cd $CATALINA_HOME/lib
-    curl -O https://search.maven.org/remotecontent?filepath=mysql/mysql-connector-java/5.1.10/mysql-connector-java-5.1.10.jar
-    curl -O https://artifacts.oicr.on.ca/artifactory/gsi-dependencies/uk/ac/ebi/fgpt/jndi-file-factory/1.0/jndi-file-factory-1.0.jar
 
 Append the following line to `$CATALINA_HOME/bin/setenv.sh` or, if you installed Tomcat through apt, `/etc/default/tomcat8`:
 
@@ -374,7 +381,7 @@ The same path should be used for `MISO_FILES_DIR` as is set for `miso.fileStorag
 and replacing `zeroDateTimeBehavior=convertToNull` with `zeroDateTimeBehavior=CONVERT_TO_NULL`:
 
 ```
-jdbc:mysql://localhost:3306/lims?autoReconnect=true&zeroDateTimeBehavior=CONVERT_TO_NULL&useUnicode=true&characterEncoding=UTF-8
+jdbc:mysql://localhost:3306/lims?autoReconnect=true&zeroDateTimeBehavior=CONVERT_TO_NULL&useUnicode=true&characterEncoding=UTF-8&useLegacyDatetimeCode=false
 ```
 
 ### If you have run into an issue with migration `V0320` with MariaDB:

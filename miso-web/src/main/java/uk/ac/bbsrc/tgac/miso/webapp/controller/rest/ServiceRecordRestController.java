@@ -21,7 +21,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.service.ServiceRecordService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ServiceRecordDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.component.TimeZoneCorrector;
 
 @Controller
 @RequestMapping("/rest/servicerecords")
@@ -29,8 +28,6 @@ public class ServiceRecordRestController extends RestController {
 
   @Autowired
   private ServiceRecordService serviceRecordService;
-  @Autowired
-  private TimeZoneCorrector timeZoneCorrector;
 
   @PostMapping(value = "/bulk-delete")
   @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -51,19 +48,12 @@ public class ServiceRecordRestController extends RestController {
 
   @PostMapping
   public @ResponseBody ServiceRecordDto create(@RequestBody ServiceRecordDto dto) throws IOException {
-    return RestUtils.createObject("Service record", dto, this::to, serviceRecordService, Dtos::asDto);
+    return RestUtils.createObject("Service record", dto, Dtos::to, serviceRecordService, Dtos::asDto);
   }
 
   @PutMapping("/{recordId}")
   public @ResponseBody ServiceRecordDto update(@PathVariable long recordId, @RequestBody ServiceRecordDto dto) throws IOException {
-    return RestUtils.updateObject("Service record", recordId, dto, this::to, serviceRecordService, Dtos::asDto);
-  }
-
-  private ServiceRecord to(ServiceRecordDto from) {
-    ServiceRecord record = Dtos.to(from);
-    timeZoneCorrector.toDbTime(record.getStartTime(), record::setStartTime);
-    timeZoneCorrector.toDbTime(record.getEndTime(), record::setEndTime);
-    return record;
+    return RestUtils.updateObject("Service record", recordId, dto, Dtos::to, serviceRecordService, Dtos::asDto);
   }
 
 }
