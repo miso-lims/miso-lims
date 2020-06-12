@@ -110,6 +110,8 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
       return "aliquotVolume";
     case "identificationBarcode":
       return "aliquotBarcode";
+    case "qcPassed":
+      return "aliquotQcPassed";
     case "library.id":
       return "libraryId";
     case "library.alias":
