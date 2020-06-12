@@ -8,18 +8,16 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.PageFactory;
 
 import com.google.common.base.Joiner;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 
-public class BulkLibraryPage extends HeaderFooterPage {
+public class BulkLibraryPage extends BulkPage {
 
   public static class LibColumns {
-    public static final String NAME = "Library Name";
-    public static final String ALIAS = "Library Alias";
+    public static final String NAME = "Name";
+    public static final String ALIAS = "Alias";
     public static final String SAMPLE_ALIAS = "Sample Alias";
     public static final String ID_BARCODE = "Matrix Barcode";
     public static final String BOX_SEARCH = "Box Search";
@@ -28,7 +26,7 @@ public class BulkLibraryPage extends HeaderFooterPage {
     public static final String DISCARDED = "Discarded";
     public static final String SAMPLE_LOCATION = "Sample Location";
     public static final String DESCRIPTION = "Description";
-    public static final String CREATION_DATE = "Date of Creation";
+    public static final String CREATION_DATE = "Creation Date";
     public static final String WORKSTATION = "Workstation";
     public static final String THERMAL_CYCLER = "Thermal Cycler";
     public static final String RECEIVE_DATE = "Date of Receipt";
@@ -72,21 +70,26 @@ public class BulkLibraryPage extends HeaderFooterPage {
     }
   };
 
+  public static final String SORT_SAMPLE_LOCATION_ROWS = "Sample Location (by rows)";
+  public static final String SORT_SAMPLE_LOCATION_COLS = "Sample Location (by columns)";
+
   private static final By EDIT_BUTTON_TEXT = By.linkText("Edit");
   private static final By PROPAGATE_BUTTON_TEXT = By.linkText("Make aliquots");
-  private static final By SORT_BY_SAMPLE_LOCATION_ROWS = By.id("sortSampleRows");
-  private static final By SORT_BY_SAMPLE_LOCATION_COLS = By.id("sortSampleColumns");
 
-  @FindBy(id = "bulkactions")
   private WebElement toolbar;
 
-  private final HandsOnTable table;
+  private HandsOnTable table;
 
   public BulkLibraryPage(WebDriver driver) {
     super(driver);
-    PageFactory.initElements(driver, this);
     waitWithTimeout().until(or(titleContains("Create Libraries "), titleContains("Edit Libraries ")));
-    table = new HandsOnTable(driver);
+    refreshElements();
+  }
+
+  @Override
+  protected void refreshElements() {
+    table = new HandsOnTable(getDriver());
+    toolbar = getDriver().findElement(By.id("bulkactions"));
   }
 
   public static BulkLibraryPage getForEdit(WebDriver driver, String baseUrl, Collection<Long> libraryIds) {
@@ -112,6 +115,7 @@ public class BulkLibraryPage extends HeaderFooterPage {
     return new BulkLibraryPage(driver);
   }
 
+  @Override
   public HandsOnTable getTable() {
     return table;
   }
@@ -127,14 +131,6 @@ public class BulkLibraryPage extends HeaderFooterPage {
     toolbar.findElement(PROPAGATE_BUTTON_TEXT).click();
     clickOk();
     return new BulkLibraryAliquotPage(getDriver());
-  }
-
-  public void sortBySampleLocationRows() {
-    toolbar.findElement(SORT_BY_SAMPLE_LOCATION_ROWS).click();
-  }
-
-  public void sortBySampleLocationColumns() {
-    toolbar.findElement(SORT_BY_SAMPLE_LOCATION_COLS).click();
   }
 
 }

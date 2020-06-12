@@ -65,7 +65,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibrarySpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
@@ -73,6 +72,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryAliquotDto;
@@ -138,22 +138,26 @@ public class LibraryRestController extends RestController {
   @ResponseBody
   public LibraryDto createLibrary(@RequestBody LibraryDto libraryDto) throws IOException {
     RestUtils.validateDtoProvided("Library", libraryDto);
-    Library library = Dtos.to(libraryDto);
-    if (libraryDto.getSample() != null) {
-      Sample sample = sampleController.buildHierarchy(libraryDto.getSample());
+    Library library = buildHierarchy(libraryDto);
+    RestUtils.validateNewObject("Library", library);
+    long savedId = libraryService.create(library);
+    return Dtos.asDto(libraryService.get(savedId), false);
+  }
+
+  private Library buildHierarchy(LibraryDto dto) throws IOException {
+    Library library = Dtos.to(dto);
+    if (dto.getSample() != null) {
+      Sample sample = sampleController.buildHierarchy(dto.getSample());
       if (LimsUtils.isDetailedSample(sample)) {
         ((DetailedSample) sample).setSynthetic(true);
       }
       library.setSample(sample);
     }
-    RestUtils.validateNewObject("Library", library);
-    TransferLibrary transferLibrary = Dtos.toReceiptTransfer(libraryDto, library);
-    if (transferLibrary != null) {
-      Transfer transfer = transferLibrary.getTransfer();
+    if (library.getCreationReceiptInfo() != null) {
+      Transfer transfer = library.getCreationReceiptInfo().getTransfer();
       timeZoneCorrector.toDbTime(transfer.getTransferTime(), transfer::setTransferTime);
     }
-    long savedId = libraryService.create(library, transferLibrary);
-    return Dtos.asDto(libraryService.get(savedId), false);
+    return library;
   }
 
   @PutMapping(value = "/{id}")
@@ -300,6 +304,18 @@ public class LibraryRestController extends RestController {
       libraries.add(library);
     }
     libraryService.bulkDelete(libraries);
+  }
+
+  @PostMapping("/bulk")
+  public @ResponseBody List<LibraryDto> bulkCreate(@RequestBody List<LibraryDto> dtos) throws IOException {
+    return RestUtils.bulkCreate("Library", dtos, WhineyFunction.rethrow(this::buildHierarchy), libraryService,
+        lib -> Dtos.asDto(lib, false));
+  }
+
+  @PutMapping("/bulk")
+  public @ResponseBody List<LibraryDto> bulkUpdate(@RequestBody List<LibraryDto> dtos) throws IOException {
+    return RestUtils.bulkUpdate("Library", dtos, WhineyFunction.rethrow(this::buildHierarchy), libraryService,
+        lib -> Dtos.asDto(lib, false));
   }
 
 }

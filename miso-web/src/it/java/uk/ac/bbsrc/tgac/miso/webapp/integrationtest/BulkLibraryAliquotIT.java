@@ -4,8 +4,6 @@ import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -21,8 +19,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkLibraryAliquotPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkLibraryAliquotPage.LibraryAliquotColumns;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtils;
 
 public class BulkLibraryAliquotIT extends AbstractIT {
 
@@ -43,21 +41,11 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     login();
   }
 
-  private void testTableSetup(BulkPage page, Collection<String> expectedColumns, int expectedRows) {
-    HandsOnTable table = page.getTable();
-    List<String> headings = table.getColumnHeadings();
-    assertEquals(expectedColumns.size(), headings.size());
-    for (String col : expectedColumns) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
-    }
-    assertEquals(expectedRows, table.getRowCount());
-  }
-
   @Test
   public void testEditSetup() throws Exception {
     // Goal: ensure all expected fields are present and no extra
     BulkLibraryAliquotPage page = BulkLibraryAliquotPage.getForEdit(getDriver(), getBaseUrl(), Sets.newHashSet(304L, 305L));
-    testTableSetup(page, commonColumns, 2);
+    HandsontableUtils.testTableSetup(page, commonColumns, 2);
   }
 
   @Test
@@ -68,7 +56,7 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     Set<String> expectedColumns = Sets.newHashSet();
     expectedColumns.addAll(commonColumns);
     expectedColumns.addAll(propagateColumns);
-    testTableSetup(page, expectedColumns, 1);
+    HandsontableUtils.testTableSetup(page, expectedColumns, 1);
 
     HandsOnTable table = page.getTable();
     assertEquals("DILT_0001_nn_n_PE_304_WG", table.getText(LibraryAliquotColumns.PARENT_ALIAS, 0));
@@ -82,7 +70,7 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     Set<String> expectedColumns = Sets.newHashSet();
     expectedColumns.addAll(commonColumns);
     expectedColumns.addAll(propagateColumns);
-    testTableSetup(page, expectedColumns, 1);
+    HandsontableUtils.testTableSetup(page, expectedColumns, 1);
 
     HandsOnTable table = page.getTable();
     assertEquals("DILT_0001_nn_n_PE_304_WG", table.getText(LibraryAliquotColumns.PARENT_ALIAS, 0));

@@ -29,7 +29,7 @@ BulkTarget.sample = (function($) {
       return Urls.external.userManual('samples');
     },
     getCustomActions: function() {
-      return BulkUtils.actions.boxable;
+      return BulkUtils.actions.boxable();
     },
     getBulkActions: function(config) {
       var actions = [{
@@ -281,12 +281,14 @@ BulkTarget.sample = (function($) {
           // parent columns go at start if propagating, or after the sample name and alias if editing
           var parentColumns = [{
             title: 'Parent Alias',
-            type: 'read-only',
-            data: 'parentAlias'
+            type: 'text',
+            data: 'parentAlias',
+            disabled: true
           }, {
             title: 'Parent Location',
-            type: 'read-only',
+            type: 'text',
             data: 'parentBoxPositionLabel',
+            disabled: true,
             customSorting: [{
               name: 'Parent Location (by rows)',
               sort: function(a, b) {
@@ -300,10 +302,11 @@ BulkTarget.sample = (function($) {
             }]
           }, {
             title: 'Parent Sample Class',
-            type: 'read-only',
+            type: 'text',
             data: 'parentTissueSampleClassAlias',
+            disabled: true,
             include: config.pageMode === 'propagate',
-            getDisplayValue: function(sample) {
+            getData: function(sample) {
               return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(item) {
                 return item.id == sample.parentTissueSampleClassId;
               }, Constants.sampleClasses), 'alias');
@@ -431,6 +434,7 @@ BulkTarget.sample = (function($) {
         data: 'externalName',
         include: show['Identity'],
         includeSaved: isTargetIdentity(config),
+        required: true,
         onChange: function(rowIndex, newValue, api) {
           if (isTargetIdentity(config)) {
             return;
@@ -562,9 +566,14 @@ BulkTarget.sample = (function($) {
         initial: 'This Project'
       }, {
         title: 'Sample Class',
-        type: 'read-only',
-        data: 'sampleClassAlias',
-        include: Constants.isDetailedSample
+        type: 'text',
+        disabled: true,
+        data: 'sampleClassId',
+        include: Constants.isDetailedSample,
+        getData: function(sample) {
+          return Utils.array.findUniqueOrThrow(Utils.array.idPredicate(sample.sampleClassId), Constants.sampleClasses).alias;
+        },
+        omit: true
       }, {
         title: 'Piece Type',
         type: 'dropdown',

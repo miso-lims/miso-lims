@@ -1471,6 +1471,7 @@ public class Dtos {
     setBoolean(to::setUmis, from.getUmis(), false);
     setObject(to::setWorkstation, Workstation::new, from.getWorkstationId());
     setObject(to::setThermalCycler, InstrumentImpl::new, from.getThermalCyclerId());
+    to.setCreationReceiptInfo(toReceiptTransfer(from, to));
     return to;
   }
 
@@ -4038,7 +4039,7 @@ public class Dtos {
     return to;
   }
 
-  public static <T extends Boxable, R extends TransferItem<T>> R toReceiptTransfer(@Nonnull ReceivableDto<T, R> from, @Nonnull T item) {
+  private static <T extends Boxable, R extends TransferItem<T>> R toReceiptTransfer(@Nonnull ReceivableDto<T, R> from, @Nonnull T item) {
     if (isStringEmptyOrNull(from.getReceivedTime())) {
       return null;
     }

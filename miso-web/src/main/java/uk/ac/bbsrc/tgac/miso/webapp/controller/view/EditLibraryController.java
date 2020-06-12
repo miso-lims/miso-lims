@@ -128,7 +128,6 @@ public class EditLibraryController {
   }
 
   private static class Config {
-    private static final String SORTABLE_LOCATION = "sortableLocation";
     private static final String IS_LIBRARY_RECEIPT = "isLibraryReceipt";
     private static final String DEFAULT_SCI_NAME = "defaultSciName";
     private static final String PAGE_MODE = "pageMode";
@@ -271,7 +270,6 @@ public class EditLibraryController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-      config.put(Config.SORTABLE_LOCATION, true);
       config.put(Config.PAGE_MODE, Config.EDIT);
       config.put(Config.SAMPLE_ALIAS_MAYBE_REQUIRED, !alwaysGenerateSampleAliases());
       config.put(Config.LIBRARY_ALIAS_MAYBE_REQUIRED, !alwaysGenerateLibraryAliases());
@@ -282,7 +280,11 @@ public class EditLibraryController {
       config.put(Config.SHOW_DESCRIPTION, showDescription);
       config.put(Config.SHOW_VOLUME, showVolume);
       config.put(Config.SHOW_LIBRARY_ALIAS, showLibraryAlias);
-      config.put(Config.SORTABLE_LOCATION, true);
+    }
+
+    @Override
+    protected boolean isNewInterface() {
+      return true;
     }
   };
 
@@ -388,10 +390,14 @@ public class EditLibraryController {
       config.put(Config.SHOW_DESCRIPTION, showDescription);
       config.put(Config.SHOW_VOLUME, showVolume);
       config.put(Config.SHOW_LIBRARY_ALIAS, showLibraryAlias);
-      config.put(Config.SORTABLE_LOCATION, true);
       MisoWebUtils.addJsonArray(mapper, config, "workstations", workstationService.list(), Dtos::asDto);
       MisoWebUtils.addJsonArray(mapper, config, "thermalCyclers", instrumentService.listByType(InstrumentType.THERMAL_CYCLER),
           Dtos::asDto);
+    }
+
+    @Override
+    protected boolean isNewInterface() {
+      return true;
     }
 
   }
@@ -461,7 +467,7 @@ public class EditLibraryController {
 
     public BulkReceiveLibraryBackend(LibraryDto dto, Integer quantity, Project project, SampleClass aliquotClass, String defaultSciName,
         LibraryTemplateService libraryTemplateService, Set<Group> recipientGroups) {
-      super("libraryReceipt", LibraryDto.class, "Libraries", dto, quantity);
+      super("library", LibraryDto.class, "Libraries", dto, quantity);
       if (isDetailedSampleEnabled() && aliquotClass == null) throw new InvalidParameterException("Aliquot class cannot be null");
       this.project = project;
       this.aliquotClass = aliquotClass;
@@ -501,7 +507,6 @@ public class EditLibraryController {
       config.put(Config.SHOW_DESCRIPTION, showDescription);
       config.put(Config.SHOW_VOLUME, showVolume);
       config.put(Config.SHOW_LIBRARY_ALIAS, showLibraryAlias);
-      config.put(Config.SORTABLE_LOCATION, false);
       config.put(Config.PAGE_MODE, Config.CREATE);
       config.put(Config.IS_LIBRARY_RECEIPT, true);
       config.putPOJO(Config.BOX, newBox);
@@ -509,6 +514,11 @@ public class EditLibraryController {
       config.put(Config.SAMPLE_ALIAS_MAYBE_REQUIRED, !alwaysGenerateSampleAliases());
       config.put(Config.LIBRARY_ALIAS_MAYBE_REQUIRED, !alwaysGenerateLibraryAliases());
       MisoWebUtils.addJsonArray(mapper, config, "recipientGroups", recipientGroups, Dtos::asDto);
+    }
+
+    @Override
+    protected boolean isNewInterface() {
+      return true;
     }
 
   }
