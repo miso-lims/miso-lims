@@ -3,6 +3,7 @@
 Changes:
 
   * Improved performance of bulk library pages
+  * Changed sample aliquot purpose to be optional (detailed sample)
   * Fixed Edit button on Scientific Names list to link to the correct page
   * Fixed Children action on Samples list to work in plain sample mode
   * Fixed Receipt Confirmed and Receipt QC Passed validation on Create Samples page

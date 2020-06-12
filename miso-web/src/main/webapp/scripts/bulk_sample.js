@@ -901,7 +901,6 @@ BulkTarget.sample = (function($) {
         data: 'samplePurposeId',
         include: show['Aliquot'] && !config.isLibraryReceipt,
         includeSaved: isTargetAliquot(config),
-        required: true,
         source: function(sample, api) {
           return Constants.samplePurposes.filter(function(item) {
             return !item.archived || sample.samplePurposeId === item.id;
