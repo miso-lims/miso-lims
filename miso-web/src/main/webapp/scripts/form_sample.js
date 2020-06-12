@@ -546,8 +546,7 @@ FormTarget.sample = (function($) {
               },
               getItemValue: function(item) {
                 return item.id;
-              },
-              required: true
+              }
             }, {
               title: 'Input into Library',
               data: 'inputIntoLibrary',
