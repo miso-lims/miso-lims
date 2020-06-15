@@ -125,27 +125,24 @@ public class MisoWebUtils {
   }
 
   public static <T> HttpEntity<byte[]> generateSpreadsheet(SpreadsheetRequest request, WhineyFunction<Long, T> fetcher,
-      Function<String, Spreadsheet<T>> formatLibrary,
-      HttpServletResponse response) {
+      boolean detailedSample, Function<String, Spreadsheet<T>> formatLibrary, HttpServletResponse response) {
     Stream<T> input = request.getIds().stream().map(WhineyFunction.rethrow(fetcher));
-    return generateSpreadsheet(request, input, formatLibrary, response);
+    return generateSpreadsheet(request, input, detailedSample, formatLibrary, response);
   }
 
   public static <T> HttpEntity<byte[]> generateSpreadsheet(SpreadsheetRequest request, Stream<T> input,
-      Function<String, Spreadsheet<T>> formatLibrary,
-      HttpServletResponse response) {
+      boolean detailedSample, Function<String, Spreadsheet<T>> formatLibrary, HttpServletResponse response) {
     Spreadsheet<T> spreadsheet = formatLibrary.apply(request.getSheet());
     SpreadSheetFormat formatter = SpreadSheetFormat.valueOf(request.getFormat());
     HttpHeaders headers = makeHttpHeaders(spreadsheet, formatter, response);
-    return new HttpEntity<>(formatter.generate(input, spreadsheet), headers);
+    return new HttpEntity<>(formatter.generate(input, detailedSample, spreadsheet), headers);
   }
 
   public static HttpEntity<byte[]> generateSpreadsheet(List<String> headers, List<List<String>> data,
-      SpreadSheetFormat formatter,
-      HttpServletResponse response) {
+      boolean detailedSample, SpreadSheetFormat formatter, HttpServletResponse response) {
     Spreadsheet<List<String>> spreadsheet = new HandsontableSpreadsheet(headers);
     HttpHeaders httpHeaders = makeHttpHeaders(spreadsheet, formatter, response);
-    return new HttpEntity<>(formatter.generate(data.stream(), spreadsheet), httpHeaders);
+    return new HttpEntity<>(formatter.generate(data.stream(), detailedSample, spreadsheet), httpHeaders);
   }
 
   private static <T> HttpHeaders makeHttpHeaders(Spreadsheet<T> spreadsheet, SpreadSheetFormat formatter, HttpServletResponse response) {

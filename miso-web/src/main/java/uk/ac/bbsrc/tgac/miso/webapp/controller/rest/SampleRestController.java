@@ -330,7 +330,7 @@ public class SampleRestController extends RestController {
   @PostMapping(value = "/spreadsheet")
   @ResponseBody
   public HttpEntity<byte[]> getSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response) {
-    return MisoWebUtils.generateSpreadsheet(request, sampleService::get, SampleSpreadSheets::valueOf, response);
+    return MisoWebUtils.generateSpreadsheet(request, sampleService::get, detailedSample, SampleSpreadSheets::valueOf, response);
   }
 
   private final RelationFinder<Sample> parentFinder = (new RelationFinder<Sample>() {

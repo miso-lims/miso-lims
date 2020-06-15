@@ -13,6 +13,7 @@ import javax.ws.rs.core.Response.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -85,6 +86,9 @@ public class LibraryAliquotRestController extends RestController {
   @Autowired
   private IndexChecker indexChecker;
 
+  @Value("${miso.detailed.sample.enabled}")
+  private Boolean detailedSample;
+
   public void setLibraryAliquotService(LibraryAliquotService libraryAliquotService) {
     this.libraryAliquotService = libraryAliquotService;
   }
@@ -150,7 +154,8 @@ public class LibraryAliquotRestController extends RestController {
   @ResponseBody
   public HttpEntity<byte[]> getSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) {
-    return MisoWebUtils.generateSpreadsheet(request, libraryAliquotService::get, LibraryAliquotSpreadSheets::valueOf, response);
+    return MisoWebUtils.generateSpreadsheet(request, libraryAliquotService::get, detailedSample, LibraryAliquotSpreadSheets::valueOf,
+        response);
   }
 
   private static Stream<Sample> getSample(LibraryAliquot aliquot) {

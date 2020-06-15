@@ -6,6 +6,7 @@ Changes:
   * Changed sample aliquot purpose to be optional (detailed sample)
   * Fixed Edit button on Scientific Names list to link to the correct page
   * Fixed Children action on Samples list to work in plain sample mode
+  * Fixed Download action on Samples list to work in plain sample mode
   * Fixed Receipt Confirmed and Receipt QC Passed validation on Create Samples page
   * Fixed Fill Boxes actions on the bulk Create/Edit Sample and Library Aliquot pages
   * Fixed library receipt creating multiple ltransfers
@@ -44,14 +45,11 @@ Known Issues:
 
   * Edit button on Scientific Names list links to Edit Run Purposes page instead of Edit Scientific
     Names
-<<<<<<< HEAD
   * Receipt Confirmed and Receipt QC Passed fields do not validate on Create Samples page when cleared
     (unknown)
   * Fill Boxes actions on the bulk Create/Edit Sample and Library Aliquot pages don't work
-=======
   * When bulk receiving libraries with the same receipt information, the libraries may be broken into
     multiple transfers, and the transfers' receipt time may be modified incorrectly 
->>>>>>> 7cba8b69c... GLT-3275: fixed timezone conversion issues
 
 # 1.5.0
 

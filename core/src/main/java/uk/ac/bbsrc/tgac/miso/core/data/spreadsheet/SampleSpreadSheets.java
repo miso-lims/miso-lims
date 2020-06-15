@@ -24,13 +24,13 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public enum SampleSpreadSheets implements Spreadsheet<Sample> {
   TRACKING_LIST("Tracking List", //
-      Arrays.asList(SampleIdentity.CATEGORY_NAME, SampleTissue.CATEGORY_NAME,
+      Arrays.asList(Sample.PLAIN_CATEGORY_NAME, SampleIdentity.CATEGORY_NAME, SampleTissue.CATEGORY_NAME,
           SampleTissueProcessing.CATEGORY_NAME, SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME), //
       Column.forString("Name", Sample::getName), //
       Column.forString("Alias", Sample::getAlias), //
       Column.forString("Barcode", Sample::getIdentificationBarcode), //
-      Column.forString("External Identifier", detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
-      Column.forString("Secondary Identifier", detailedSample(SampleTissue.class, SampleTissue::getSecondaryIdentifier, "")), //
+      Column.forString("External Identifier", true, detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
+      Column.forString("Secondary Identifier", true, detailedSample(SampleTissue.class, SampleTissue::getSecondaryIdentifier, "")), //
       Column.forString("Location", BoxUtils::makeLocationLabel)),
   
   BIOBANK_TRANSFER_LIST("BioBank Transfer List", //
@@ -40,7 +40,7 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forString("Tissue Origin", detailedSample(SampleTissue.class, st -> st.getTissueOrigin().getAlias(), ""))),
 
   TRANSFER_LIST("Transfer List", //
-      Arrays.asList(SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME), //
+      Arrays.asList(Sample.PLAIN_CATEGORY_NAME, SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME), //
       Column.forString("Alias", Sample::getAlias), //
       Column.forString("Type", dnaOrRna()), //
       Column.forString("External Identifier", detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
@@ -48,11 +48,11 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forBigDecimal("[] (ng/uL)", Sample::getConcentration), //
       Column.forBigDecimal("Total (ng)",
           (sam -> (sam.getVolume() != null && sam.getConcentration() != null) ? sam.getVolume().multiply(sam.getConcentration()) : null)), //
-      Column.forString("Subproject",
+      Column.forString("Subproject", true,
           (sam-> (LimsUtils.isDetailedSample(sam) && ((DetailedSample) sam).getSubproject() != null ? 
               ((DetailedSample) sam).getSubproject().getAlias() : ""))), //
-      Column.forString("Group ID", effectiveGroupIdProperty(GroupIdentifiable::getGroupId)), //
-      Column.forString("Group Description", effectiveGroupIdProperty(GroupIdentifiable::getGroupDescription)), //
+      Column.forString("Group ID", true, effectiveGroupIdProperty(GroupIdentifiable::getGroupId)), //
+      Column.forString("Group Description", true, effectiveGroupIdProperty(GroupIdentifiable::getGroupDescription)), //
       Column.forString("Barcode", Sample::getIdentificationBarcode)
   ), //
 
@@ -108,7 +108,7 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
           : sam.getQCs().stream().map(qc -> qc.getType().getAlias() + ": " + LimsUtils.toNiceString(qc.getResults()))
               .collect(Collectors.joining("; ")))), //
   RNA_LIBRARY_PREPARATION("RNA Library Preparation", //
-      Arrays.asList(SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME), //
+      Arrays.asList(Sample.PLAIN_CATEGORY_NAME, SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME), //
       Column.forString("Name", Sample::getName), //
       Column.forString("Project", sample -> sample.getProject().getShortName()), //
       Column.forString("Alias", Sample::getAlias), //
@@ -121,11 +121,11 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forBigDecimal("DV200", sam -> qcValue(sam, "DV200")), //
       Column.forBigDecimal("RIN", sam -> qcValue(sam, "RIN")), //
       Column.forString("QC Status", qcStatusFunction()), //
-      Column.forString("QC Status Note", detailedSample(DetailedSample.class, DetailedSample::getDetailedQcStatusNote, "")), //
+      Column.forString("QC Status Note", true, detailedSample(DetailedSample.class, DetailedSample::getDetailedQcStatusNote, "")), //
       Column.forString("Notes",
           sam -> sam.getNotes() == null ? "" : sam.getNotes().stream().map(Note::getText).collect(Collectors.joining("; ")))), //
   DNA_LIBRARY_PREPARATION("DNA Library Preparation", //
-      Arrays.asList(SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME), //
+      Arrays.asList(Sample.PLAIN_CATEGORY_NAME, SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME), //
       Column.forString("Name", Sample::getName), //
       Column.forString("Project", sample -> sample.getProject().getShortName()), //
       Column.forString("Alias", Sample::getAlias), //
@@ -136,7 +136,7 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forBigDecimal("Volume", Sample::getVolume), //
       Column.forString("Volume Units", sam -> sam.getVolumeUnits() == null ? "" : sam.getVolumeUnits().getRawLabel()), //
       Column.forString("QC Status", qcStatusFunction()), //
-      Column.forString("QC Status Note", detailedSample(DetailedSample.class, DetailedSample::getDetailedQcStatusNote, "")), //
+      Column.forString("QC Status Note", true, detailedSample(DetailedSample.class, DetailedSample::getDetailedQcStatusNote, "")), //
       Column.forString("Notes",
           sam -> sam.getNotes() == null ? "" : sam.getNotes().stream().map(Note::getText).collect(Collectors.joining("; ")))
       );
