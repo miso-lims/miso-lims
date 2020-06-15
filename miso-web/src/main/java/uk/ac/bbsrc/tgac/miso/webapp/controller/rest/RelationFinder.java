@@ -163,9 +163,14 @@ public abstract class RelationFinder<M extends Identifiable> {
           .flatMap(child -> Stream.concat(Stream.of(child).filter(targetChildClass::isInstance), searchChildren(targetChildClass, child)));
     }
 
-    public static Stream<Library> searchChildrenLibraries(DetailedSample model, LibraryService libraryService) {
+    public static Stream<Library> searchChildrenLibraries(Sample model, LibraryService libraryService) {
       try {
-        return Stream.concat(libraryService.listBySampleId(model.getId()).stream(), model.getChildren().stream().flatMap(child -> searchChildrenLibraries(child, libraryService)));
+        Stream<Library> libraries = libraryService.listBySampleId(model.getId()).stream();
+        if (LimsUtils.isDetailedSample(model)) {
+          libraries = Stream.concat(libraries,
+              ((DetailedSample) model).getChildren().stream().flatMap(child -> searchChildrenLibraries(child, libraryService)));
+        }
+        return libraries;
       } catch (IOException e) {
         log.error("Failed to get child libraries.", e);
         throw new RestException("Error fetching library information", Status.INTERNAL_SERVER_ERROR);

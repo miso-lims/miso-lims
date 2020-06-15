@@ -457,7 +457,7 @@ Box.ui = {
       }));
       break;
     case 'LIBRARY':
-      actions = actions.concat(HotTarget.library.getBulkActions({}));
+      actions = actions.concat(BulkTarget.library.getBulkActions({}));
       break;
     case 'LIBRARY_ALIQUOT':
       actions = actions.concat(BulkTarget.libraryaliquot.getBulkActions({}));

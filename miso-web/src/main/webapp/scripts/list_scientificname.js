@@ -8,7 +8,7 @@ ListTarget.scientificname = {
   },
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {
-    var actions = HotTarget.runpurpose.getBulkActions(config);
+    var actions = HotTarget.scientificname.getBulkActions(config);
     if (config.isAdmin) {
       actions.push(ListUtils.createBulkDeleteAction('Scientific Names', 'scientificnames', Utils.array.getAlias));
     }

@@ -1588,7 +1588,7 @@ var HotUtils = {
     library: function() {
       return {
         "name": "Library",
-        "getBulkActions": HotTarget.library.getBulkActions,
+        "getBulkActions": BulkTarget.library.getBulkActions,
         "config": {},
         "index": Constants.sampleCategories.length + 1
       };

@@ -95,9 +95,9 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
     assertEntityAttribute(SamColumns.RECEIVED_BY, attributes, receipt,
         s -> s == null ? "" : s.getTransfer().getRecipientGroup().getName());
     assertEntityAttribute(SamColumns.RECEIPT_CONFIRMED, attributes, receipt,
-        s -> s == null ? "" : booleanString(s.isReceived()));
+        s -> s == null ? "" : booleanString(s.isReceived(), "Unknown"));
     assertEntityAttribute(SamColumns.RECEIPT_QC_PASSED, attributes, receipt,
-        s -> s == null ? "" : booleanString(s.isQcPassed()));
+        s -> s == null ? "" : booleanString(s.isQcPassed(), "Unknown"));
     assertEntityAttribute(SamColumns.RECEIPT_QC_NOTE, attributes, receipt,
         s -> s == null ? "" : emptyIfNull(s.getQcNote()));
   }
@@ -182,7 +182,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   }
 
   protected void assertRnaStockSampleAttributes(Map<String, String> attributes, SampleStock sample) {
-    assertEntityAttribute(SamColumns.DNASE_TREATED, attributes, sample, s -> getQcPassedString(s.getDNAseTreated()));
+    assertEntityAttribute(SamColumns.DNASE_TREATED, attributes, sample, s -> booleanString(s.getDNAseTreated()));
   }
 
   protected void assertAliquotAttributes(Map<String, String> attributes, SampleAliquot sample) {

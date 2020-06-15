@@ -33,7 +33,7 @@ ListTarget.library = {
     return Urls.rest.libraries.query;
   },
   createBulkActions: function(config, projectId) {
-    var actions = HotTarget.library.getBulkActions(config);
+    var actions = BulkTarget.library.getBulkActions(config);
 
     if (config.worksetId) {
       actions.push(HotUtils.makeMoveFromWorkset('libraries', Urls.rest.worksets.moveLibraries(config.worksetId)));

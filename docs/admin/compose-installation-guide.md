@@ -462,6 +462,7 @@ This docker-compose file is installed on a production machine called `miso-lims`
 in the `miso` user's home directory.
 
 This environment:
+
 * mounts the database, MISO logs, and MISO files from the local filesystem. We
   made the directories `db`, `logs` and `files` to bind to.
 * has site-specific migrations in `V9000__institution-custom.sql`

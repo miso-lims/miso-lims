@@ -2,8 +2,32 @@
 
 Changes:
 
+  * Improved performance of bulk library pages
+  * Changed sample aliquot purpose to be optional (detailed sample)
+  * Fixed Edit button on Scientific Names list to link to the correct page
+  * Fixed Children action on Samples list to work in plain sample mode
+  * Fixed Receipt Confirmed and Receipt QC Passed validation on Create Samples page
+  * Fixed Fill Boxes actions on the bulk Create/Edit Sample and Library Aliquot pages
+  * Fixed library receipt creating multiple ltransfers
   * Fixed scientific name to show as required on bulk sample pages
   * Fixed scientific name on bulk sample pages to use default value from project or config
+
+Upgrade Notes:
+
+  * The connection parameter `useLegacyDatetimeCode=false` should be added to the datasource URL in your
+    `ROOT.xml`
+  * The `miso.timeCorrection.dbZone` property has been removed from `miso.properties`. Database timezone
+    no longer needs to be specified in the MISO config. You may need to update your MySQL config (my.cnf)
+    to specify a default timezone instead. You could add the following line to set it to UTC for example:
+    `default-time-zone='+00:00'`. You could use a named timezone instead if you've populated the timezone
+    tables. See the [MySQL docs](https://dev.mysql.com/doc/refman/5.7/en/time-zone-support.html) for more
+    information.
+  * The `miso.timeCorrection.uiZone` property is now required in `miso.properties`. See 'TZ database name'
+    column on [this Wikipedia page](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) for
+    appropriate values
+  * The following supporting JARs are not needed and can be removed from ${CATALINA_HOME}/lib
+    * mysql-connector-java-5.1.10.jar
+    * jndi-file-factory-1.0.jar
 
 # 1.6.0
 
@@ -22,6 +46,13 @@ Known Issues:
 
   * Scientific name is required, but not shown as required on bulk sample pages
   * Default scientific name from project or config is not used on bulk sample pages
+  * Edit button on Scientific Names list links to Edit Run Purposes page instead of Edit Scientific
+    Names
+  * Receipt Confirmed and Receipt QC Passed fields do not validate on Create Samples page when cleared
+    (unknown)
+  * Fill Boxes actions on the bulk Create/Edit Sample and Library Aliquot pages don't work
+  * When bulk receiving libraries with the same receipt information, the libraries may be broken into
+    multiple transfers, and the transfers' receipt time may be modified incorrectly 
 
 # 1.5.0
 
@@ -33,6 +64,11 @@ Changes:
   * Improved performance of bulk table import function
   * Fixed sorting bulk tables on columns containing empty cells
   * Fixed V1000 migration hanging on plain sample databases
+
+Known Issues:
+
+  * Edit button on Scientific Names list links to Edit Run Purposes page instead of Edit Scientific
+    Names
 
 # 1.4.0
 
