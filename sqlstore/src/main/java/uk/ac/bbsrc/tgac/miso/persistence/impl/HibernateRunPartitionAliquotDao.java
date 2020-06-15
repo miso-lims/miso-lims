@@ -90,15 +90,17 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
         .add(Restrictions.eq("partition.pool", pool))
         .list();
 
-    @SuppressWarnings("unchecked")
-    List<RunPartitionAliquot> items = currentSession().createCriteria(RunPartitionAliquot.class)
-        .createAlias("partition", "partition")
-        .add(Restrictions.in("run", runs))
-        .add(Restrictions.eq("aliquot.aliquotId", aliquotId))
-        .list();
+    if (!runs.isEmpty()) {
+      @SuppressWarnings("unchecked")
+      List<RunPartitionAliquot> items = currentSession().createCriteria(RunPartitionAliquot.class)
+          .createAlias("partition", "partition")
+          .add(Restrictions.in("run", runs))
+          .add(Restrictions.eq("aliquot.aliquotId", aliquotId))
+          .list();
 
-    for (RunPartitionAliquot item : items) {
-      currentSession().delete(item);
+      for (RunPartitionAliquot item : items) {
+        currentSession().delete(item);
+      }
     }
   }
 
