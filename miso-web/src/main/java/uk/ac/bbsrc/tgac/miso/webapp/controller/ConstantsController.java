@@ -288,7 +288,6 @@ public class ConstantsController {
       addJsonArray(mapper, node, "sampleSheetFormats", Arrays.asList(SampleSheet.values()), SampleSheet::name);
 
       Collection<IndexFamily> indexFamilies = indexFamilyService.list();
-      indexFamilies.add(IndexFamily.NULL);
       addJsonArray(mapper, node, "indexFamilies", indexFamilies, Dtos::asDto);
       addJsonArray(mapper, node, "qcTypes", qcService.listQcTypes(), Dtos::asDto);
       addJsonArray(mapper, node, "qcTargets", Arrays.asList(QcTarget.values()), Dtos::asDto);

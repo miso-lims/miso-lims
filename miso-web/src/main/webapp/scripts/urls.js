@@ -368,7 +368,8 @@ Urls = (function() {
     datatable: libraryRestBase + '/dt',
     projectDatatable: idUrlFunction(libraryRestBase + '/dt/project'),
     bulkDelete: libraryRestBase + '/bulk-delete',
-    spreadsheet: libraryRestBase + '/spreadsheet'
+    spreadsheet: libraryRestBase + '/spreadsheet',
+    bulkSave: libraryRestBase + '/bulk'
   };
 
   // Library Aliquots

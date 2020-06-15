@@ -34,6 +34,7 @@ import com.eaglegenomics.simlims.core.Note;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QualityControllable;
 import uk.ac.bbsrc.tgac.miso.core.data.type.DilutionFactor;
@@ -269,8 +270,6 @@ public interface Library extends Attachable, Comparable<Library>, Deletable, Hie
 
   public boolean isLowQuality();
 
-  public IndexFamily getCurrentFamily();
-
   public Integer getDnaSize();
 
   public void setDnaSize(Integer dnaSize);
@@ -359,5 +358,13 @@ public interface Library extends Attachable, Comparable<Library>, Deletable, Hie
   public Instrument getThermalCycler();
 
   public void setThermalCycler(Instrument thermalCycler);
+
+  /**
+   * @return information to be used for creating a receipt transfer during library creation only. This field should
+   *         otherwise be null
+   */
+  public TransferLibrary getCreationReceiptInfo();
+
+  public void setCreationReceiptInfo(TransferLibrary creationReceiptInfo);
 
 }

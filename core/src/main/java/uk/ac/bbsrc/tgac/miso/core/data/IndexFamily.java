@@ -52,23 +52,6 @@ public class IndexFamily implements Deletable, Nameable, Serializable {
 
   private static final long UNSAVED_ID = 0L;
 
-  // TODO: this is intended to be immutable, but it is not
-  public static final IndexFamily NULL = new IndexFamily();
-
-  static {
-    NULL.setId(0L);
-    NULL.setName("No indices");
-    NULL.setArchived(false);
-    NULL.setFake(false);
-    Index index = new Index();
-    index.setFamily(NULL);
-    index.setId(0L);
-    index.setName("No index");
-    index.setPosition(1);
-    index.setSequence(null);
-    NULL.getIndices().add(index);
-  }
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long indexFamilyId = UNSAVED_ID;

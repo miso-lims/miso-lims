@@ -59,10 +59,6 @@ FROM tomcat:8.5.38-alpine as webapp
 ARG MYSQL_JBDC_VERSION=8.0.15
 
 COPY ./.docker/tomcat/setenv.sh /usr/local/tomcat/bin/
-
-RUN wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/${MYSQL_JBDC_VERSION}/mysql-connector-java-${MYSQL_JBDC_VERSION}.jar -O /usr/local/tomcat/lib/mysql-connector-java-${MYSQL_JBDC_VERSION}.jar && \
-  wget https://artifacts.oicr.on.ca/artifactory/gsi-dependencies/uk/ac/ebi/fgpt/jndi-file-factory/1.0/jndi-file-factory-1.0.jar -O /usr/local/tomcat/lib/jndi-file-factory-1.0.jar
-
 COPY ./.docker/tomcat/logging.properties ${CATALINA_HOME}/conf/
 COPY ./.docker/tomcat/ROOT.xml ${CATALINA_HOME}/conf/Catalina/localhost/
 

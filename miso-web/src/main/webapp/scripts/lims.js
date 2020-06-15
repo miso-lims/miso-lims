@@ -835,7 +835,25 @@ var Utils = Utils
           }
         }
         return free;
+      },
+
+      getObjectField: function(object, dataProperty) {
+        return dataProperty.split('.').reduce(function(accumulator, currentValue) {
+          return accumulator && accumulator.hasOwnProperty(currentValue) ? accumulator[currentValue] : null;
+        }, object);
+      },
+
+      setObjectField: function(object, dataProperty, value) {
+        dataProperty.split('.').reduce(function(accumulator, currentValue, index, array) {
+          if (index === array.length - 1) {
+            accumulator[currentValue] = value;
+          } else if (!accumulator[currentValue]) {
+            accumulator[currentValue] = {};
+          }
+          return accumulator[currentValue];
+        }, object);
       }
+
     };
 
 Utils.timer = {

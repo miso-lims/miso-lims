@@ -47,10 +47,23 @@ up the server environments for testing. There is an automatic code formatting
 configuration available for Eclipse.
 
 ## Setting Up the Database Server
+
 The database server needs to have [MySQL 5.7](https://www.mysql.com/). The tool
 [Flyway](https://flywaydb.org/) must also be present to migrate the database as
 the application is developed, but it can be installed on a different server so
 long as it can access the database server.
+
+It is best to set a default timezone for MySQL. You can configure this in
+`my.cnf`. The simplest and recommended option is to set it to UTC by adding the
+following line:
+
+```
+default-time-zone='+00:00'
+```
+
+You could use a named timezone instead if you've populated the timezone tables.
+See the [MySQL docs](https://dev.mysql.com/doc/refman/5.7/en/time-zone-support.html)
+for more information.
 
 The default password in the following `IDENTIFIED BY` clauses should be
 changed.
@@ -83,7 +96,7 @@ Create a file called `ROOT.xml` in the following directory
 `$CATALINA_HOME/conf/Catalina/localhost`, creating the directory if necessary,
 and populate it with the following information:
 
-    <Context path="/ROOT" docBase="${catalina.home}/webapps/ROOT">
+    <Context path="/ROOT" docBase="${catalina.home}/webapps/ROOT" reloadable="false">
       <Resources allowLinking="true"/>
       <Resource name="jdbc/MISODB" type="javax.sql.DataSource"
       driverClassName="com.mysql.jdbc.Driver"
@@ -98,7 +111,7 @@ and populate it with the following information:
       testOnBorrow="true"
       testOnReturn="true"
       validationQuery="select 1"
-      url="jdbc:mysql://localhost:3306/lims?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;useUnicode=true&amp;characterEncoding=UTF-8"
+      url="jdbc:mysql://localhost:3306/lims?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useLegacyDatetimeCode=false"
       username="tgaclims"
       password="tgaclims"/>
       <Parameter name="miso.propertiesFile" value="file:${catalina.home}/conf/Catalina/localhost/miso.properties" override="false"/>
@@ -108,14 +121,7 @@ Make sure the database path in `ROOT.xml` is correct for your install:
 
     url="jdbc:mysql://your.database.server:3306/dbname"
 
-If you use MariaDB instead of MySQL, replace 'mysql' with 'mariadb' in the URL. 
-
-If your Tomcat install has the `autoDeploy="true"` flag set in `server.xml`, if
-you delete the `webapps/ROOT` directory and the `ROOT.war` file, Tomcat will
-delete the context `ROOT.xml` file. Either set autoDeploy to false, and
-manually deploy your webapp, or make the `ROOT.xml` file undeletable by using
-`chattr +i` (`chattr -i` will undo this operation). [Upstream
-bug](https://issues.apache.org/bugzilla/show_bug.cgi?id=40050)
+If you use MariaDB instead of MySQL, replace 'mysql' with 'mariadb' in the URL.
 
 Copy `$MISO_SRC/miso-web/src/main/resources/miso.properties` to
 `$CATALINA_HOME/conf/Catalina/localhost/miso.properties`. Review and edit
@@ -132,12 +138,6 @@ define `miso.visionmate.servers` as specified in the properties file
 method for users to report issues using the "Report a problem" link in the header.
 * Update `miso.instanceName` to update the instance name displayed in the header.
 
-
-Download some supporting JARs:
-
-    cd $CATALINA_HOME/lib
-    curl -O https://search.maven.org/remotecontent?filepath=mysql/mysql-connector-java/5.1.10/mysql-connector-java-5.1.10.jar
-    curl -O https://artifacts.oicr.on.ca/artifactory/gsi-dependencies/uk/ac/ebi/fgpt/jndi-file-factory/1.0/jndi-file-factory-1.0.jar
 
 Append the following line to `$CATALINA_HOME/bin/setenv.sh` or, if you installed Tomcat through apt, `/etc/default/tomcat8`:
 
@@ -374,7 +374,7 @@ The same path should be used for `MISO_FILES_DIR` as is set for `miso.fileStorag
 and replacing `zeroDateTimeBehavior=convertToNull` with `zeroDateTimeBehavior=CONVERT_TO_NULL`:
 
 ```
-jdbc:mysql://localhost:3306/lims?autoReconnect=true&zeroDateTimeBehavior=CONVERT_TO_NULL&useUnicode=true&characterEncoding=UTF-8
+jdbc:mysql://localhost:3306/lims?autoReconnect=true&zeroDateTimeBehavior=CONVERT_TO_NULL&useUnicode=true&characterEncoding=UTF-8&useLegacyDatetimeCode=false
 ```
 
 ### If you have run into an issue with migration `V0320` with MariaDB:

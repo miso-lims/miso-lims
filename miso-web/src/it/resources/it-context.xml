@@ -27,14 +27,8 @@
                            http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
   
   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" />
-  
-  <bean id="timeShiftInterceptor" class="uk.ac.bbsrc.tgac.miso.persistence.impl.util.TimeShiftingInterceptor">
-    <constructor-arg name="dbZone" value="UTC" />
-    <constructor-arg name="uiZone" value="Canada/Eastern" />
-  </bean>
 
   <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
-    <property name="entityInterceptor" ref="timeShiftInterceptor" />
     <property name="dataSource" ref="dataSource" />
     <property name="packagesToScan">
       <list>
