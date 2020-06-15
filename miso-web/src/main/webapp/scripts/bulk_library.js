@@ -13,6 +13,7 @@ BulkTarget.library = (function($) {
    *   recipientGroups
    *   workstations: array
    *   templatesByProjectId: map
+   *   sops: array
    */
 
   var originalDataByRow = {};
@@ -130,7 +131,7 @@ BulkTarget.library = (function($) {
       }, BulkUtils.columns.name];
 
       if (config.showLibraryAlias) {
-        columns.push(BulkUtils.columns.alias(config));
+        columns.push(BulkUtils.columns.generatedAlias(config));
       }
 
       if (config.isLibraryReceipt) {
@@ -246,7 +247,11 @@ BulkTarget.library = (function($) {
         };
       }
 
-      columns.push(BulkUtils.columns.creationDate(!config.isLibraryReceipt, config.pageMode == 'propagate', 'library'), {
+      columns.push(BulkUtils.columns.creationDate(!config.isLibraryReceipt, config.pageMode == 'propagate', 'library'));
+      if (!config.isLibraryReceipt) {
+        columns.push(BulkUtils.columns.sop(config.sops));
+      }
+      columns.push({
         title: 'Workstation',
         type: 'dropdown',
         data: 'workstationId',

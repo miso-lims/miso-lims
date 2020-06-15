@@ -40,8 +40,8 @@
     <mysql.db>lims</mysql.db>
     <mysql.user>tgaclims</mysql.user>
     <mysql.pw>tgaclims</mysql.pw>
-    <db.params>autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useLegacyDatetimeCode=false</db.params>
-    <db.params.jndi>autoReconnect=true&amp;amp;zeroDateTimeBehavior=convertToNull&amp;amp;useUnicode=true&amp;amp;characterEncoding=UTF-8&amp;amp;useLegacyDatetimeCode=false</db.params.jndi>
+    <db.params>autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useLegacyDatetimeCode=false&amp;useSSL=false</db.params>
+    <db.params.jndi>autoReconnect=true&amp;amp;zeroDateTimeBehavior=convertToNull&amp;amp;useUnicode=true&amp;amp;characterEncoding=UTF-8&amp;amp;useLegacyDatetimeCode=false&amp;amp;useSSL=false</db.params.jndi>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
   <dependencies>

@@ -8,7 +8,8 @@ FormTarget.run = (function($) {
    *   isAdmin: boolean,
    *   isRunApprover: boolean,
    *   userId: integer (if isRunApprover),
-   *   userFullName: string (if isRunApprover)
+   *   userFullName: string (if isRunApprover),
+   *   sops: array
    * }
    */
 
@@ -74,7 +75,7 @@ FormTarget.run = (function($) {
           getLink: function(run) {
             return Urls.ui.instruments.edit(run.instrumentId);
           }
-        }, {
+        }].concat(FormUtils.makeSopFields(object, config.sops)).concat([{
           title: 'Sequencing Parameters',
           data: 'sequencingParametersId',
           type: 'dropdown',
@@ -271,7 +272,7 @@ FormTarget.run = (function($) {
           getDisplayValue: function(run) {
             return run.dataApproverName || 'n/a';
           }
-        }]
+        }])
       }];
     }
   }

@@ -51,6 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocationMap;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
@@ -291,6 +292,11 @@ public class DeleteIT extends AbstractIT {
   @Test
   public void testDeleteWorkstation() {
     testAdminDelete(ListTarget.WORKSTATIONS, null, "Workstation 3", Columns.ALIAS, Workstation.class, 3L);
+  }
+
+  @Test
+  public void testDeleteSop() {
+    testAdminDelete(ListTarget.SOPS, Tabs.LIBRARY, "SOP to delete", Columns.ALIAS, Sop.class, 5L);
   }
 
   @Test

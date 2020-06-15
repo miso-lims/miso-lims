@@ -23,8 +23,11 @@
 
 package uk.ac.bbsrc.tgac.miso;
 
+import java.util.TimeZone;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -36,8 +39,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public abstract class AbstractDAOTest {
 
+  public static final TimeZone UTC = TimeZone.getTimeZone("UTC");
+
   @Autowired
   private SessionFactory sessionFactory;
+
+  @BeforeClass
+  public static void setupAbstractClass() {
+    TimeZone.setDefault(UTC);
+  }
 
   protected SessionFactory getSessionFactory() {
     return sessionFactory;

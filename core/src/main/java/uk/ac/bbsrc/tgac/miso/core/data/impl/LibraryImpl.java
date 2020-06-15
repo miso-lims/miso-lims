@@ -227,6 +227,10 @@ public class LibraryImpl extends AbstractBoxable implements Library {
 
   private boolean umis;
 
+  @ManyToOne
+  @JoinColumn(name = "sopId")
+  private Sop sop;
+
   @Immutable
   @ManyToMany
   @JoinTable(name = "Transfer_Library", joinColumns = { @JoinColumn(name = "libraryId") }, inverseJoinColumns = {
@@ -645,6 +649,7 @@ public class LibraryImpl extends AbstractBoxable implements Library {
         .append(qcPassed)
         .append(kitDescriptor)
         .append(kitLot)
+        .append(sop)
         .toHashCode();
   }
 
@@ -673,6 +678,7 @@ public class LibraryImpl extends AbstractBoxable implements Library {
         .append(qcPassed, other.qcPassed)
         .append(kitDescriptor, other.kitDescriptor)
         .append(kitLot, other.kitLot)
+        .append(sop, other.sop)
         .isEquals();
   }
 
@@ -868,6 +874,16 @@ public class LibraryImpl extends AbstractBoxable implements Library {
   @Override
   public void setCreationReceiptInfo(TransferLibrary creationReceiptInfo) {
     this.creationReceiptInfo = creationReceiptInfo;
+  }
+
+  @Override
+  public Sop getSop() {
+    return sop;
+  }
+
+  @Override
+  public void setSop(Sop sop) {
+    this.sop = sop;
   }
 
 }

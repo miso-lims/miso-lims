@@ -7,7 +7,8 @@ FormTarget.library = (function($) {
    * Expected config {
    *   detailedSample: boolean,
    *   workstations: array,
-   *   thermalCyclers: array
+   *   thermalCyclers: array,
+   *   sops: array
    * }
    */
 
@@ -74,7 +75,7 @@ FormTarget.library = (function($) {
           title: 'Creation Date',
           data: 'creationDate',
           type: 'date'
-        }, {
+        }].concat(FormUtils.makeSopFields(object, config.sops)).concat([{
           title: 'Workstation',
           data: 'workstationId',
           type: 'dropdown',
@@ -384,7 +385,7 @@ FormTarget.library = (function($) {
           type: 'decimal',
           precision: 14,
           scale: 10
-        }]
+        }])
       }, {
         title: 'Details',
         include: config.detailedSample,

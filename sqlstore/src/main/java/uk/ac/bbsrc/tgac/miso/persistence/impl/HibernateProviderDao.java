@@ -1,6 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -58,6 +60,17 @@ public abstract class HibernateProviderDao<T> implements ProviderDao<T> {
     return entityClass.cast(currentSession().createCriteria(entityClass)
         .add(Restrictions.eq(property, value))
         .uniqueResult());
+  }
+
+  protected List<T> listByIdList(String idProperty, Collection<Long> ids) {
+    if (ids == null || ids.isEmpty()) {
+      return Collections.emptyList();
+    }
+    @SuppressWarnings("unchecked")
+    List<T> results = currentSession().createCriteria(entityClass)
+        .add(Restrictions.in(idProperty, ids))
+        .list();
+    return results;
   }
 
   protected <U> long getUsageBy(Class<U> user, String property, T value) {

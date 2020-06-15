@@ -82,6 +82,7 @@ public class SampleDto extends AbstractBoxableDto implements ReceivableDto<Sampl
   private String requisitionId;
   private Long sequencingControlTypeId;
   private int libraryCount = 0;
+  private Long sopId;
 
   public Long getId() {
     return id;
@@ -396,6 +397,14 @@ public class SampleDto extends AbstractBoxableDto implements ReceivableDto<Sampl
 
   public void setSequencingControlTypeId(Long sequencingControlTypeId) {
     this.sequencingControlTypeId = sequencingControlTypeId;
+  }
+
+  public Long getSopId() {
+    return sopId;
+  }
+
+  public void setSopId(Long sopId) {
+    this.sopId = sopId;
   }
 
 }

@@ -124,6 +124,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String SHORT_NAME = "Short Name";
     public static final String SIZE = "Size";
     public static final String SIZE_BP = "Size (bp)";
+    public static final String SOP = "SOP";
     public static final String SORT = "";
     public static final String START_DATE = "Start Date";
     public static final String STARTED = "Started";
@@ -202,6 +203,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String SCIENTIFIC_NAMES = "scientificname/list";
     public static final String SEQUENCING_CONTROL_TYPES = "sequencingcontroltype/list";
     public static final String SEQUENCING_PARAMETERS = "sequencingparameters/list";
+    public static final String SOPS = "sop/list";
     public static final String STAINS = "stain/list";
     public static final String STAIN_CATEGORIES = "staincategory/list";
     public static final String STORAGE_LOCATIONS = "storagelocations";

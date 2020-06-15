@@ -18,11 +18,14 @@ public class ListTabbedPage extends AbstractListPage {
 
   public static class Tabs {
     public static final String ALL = "All";
+    public static final String ARRAY_SCANNER = "Array Scanner";
     public static final String CLUSTERING = "Clustering";
-    public static final String EXTRACTION = "Extraction";
     public static final String DISTRIBUTION = "Distribution";
     public static final String DNA = "DNA";
+    public static final String DRAFT = "Draft";
+    public static final String EXTRACTION = "Extraction";
     public static final String FREEZERS = "Freezers";
+    public static final String FULFILLED = "Fulfilled";
     public static final String ILLUMINA = "Illumina";
     public static final String INTERNAL = "Internal";
     public static final String LIBRARIES = "Libraries";
@@ -30,22 +33,21 @@ public class ListTabbedPage extends AbstractListPage {
     public static final String LS454 = "LS454";
     public static final String MINE = "Mine";
     public static final String MULTIPLEXING = "Multiplexing";
+    public static final String OTHER = "Other";
+    public static final String OUTSTANDING = "Outstanding";
     public static final String OXFORD_NANOPORE = "OxfordNanopore";
     public static final String PACBIO = "PacBio";
     public static final String PENDING = "Pending";
     public static final String RECEIPT = "Receipt";
     public static final String RNA = "RNA";
     public static final String ROOMS = "Rooms";
+    public static final String RUN = "Run";
+    public static final String SAMPLE = "Sample";
+    public static final String SEQUENCER = "Sequencer";
     public static final String SEQUENCING = "Sequencing";
     public static final String SOLID = "Solid";
     public static final String STORAGE = "Storage";
     public static final String TISSUE = "Tissue";
-    public static final String OUTSTANDING = "Outstanding";
-    public static final String FULFILLED = "Fulfilled";
-    public static final String DRAFT = "Draft";
-    public static final String SEQUENCER = "Sequencer";
-    public static final String ARRAY_SCANNER = "Array Scanner";
-    public static final String OTHER = "Other";
   }
 
   @FindBy(className = "dataTables_wrapper")

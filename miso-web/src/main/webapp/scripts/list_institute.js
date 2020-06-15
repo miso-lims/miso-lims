@@ -64,7 +64,7 @@ ListTarget.institute = {
     }, {
       sTitle: 'Archived',
       mData: 'archived',
-      mRender: ListUtils.render.booleanChecks
+      mRender: ListUtils.render.archived
     }];
   }
 };

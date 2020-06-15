@@ -62,6 +62,10 @@ public abstract class AbstractHibernateSaveDaoTest<T extends Identifiable, D ext
 
   public abstract D constructTestSubject();
 
+  protected D getTestSubject() {
+    return sut;
+  }
+
   @Before
   public void setup() {
     this.sut = constructTestSubject();

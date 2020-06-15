@@ -37,7 +37,8 @@ FOR EACH ROW
     makeChangeMessage('design code', (SELECT code FROM LibraryDesignCode WHERE libraryDesignCodeId = OLD.libraryDesignCodeId), (SELECT code FROM LibraryDesignCode WHERE libraryDesignCodeId = NEW.libraryDesignCodeId)),
     makeChangeMessage('design', (SELECT name FROM LibraryDesign WHERE libraryDesignId = OLD.libraryDesign), (SELECT name FROM LibraryDesign WHERE libraryDesignId = NEW.libraryDesign)),
     makeChangeMessage('group description', OLD.groupDescription, NEW.groupDescription),
-    makeChangeMessage('group id', OLD.groupId, NEW.groupId)
+    makeChangeMessage('group id', OLD.groupId, NEW.groupId),
+    makeChangeMessage('SOP', (SELECT CONCAT(alias, ' (', version, ')') FROM Sop WHERE sopId = OLD.sopId), (SELECT CONCAT(alias, ' (', version, ')') FROM Sop WHERE sopId = NEW.sopId))
   );
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message, changeTime) VALUES (
@@ -73,7 +74,8 @@ FOR EACH ROW
         makeChangeColumn('libraryDesign', OLD.libraryDesign, NEW.libraryDesign),
         makeChangeColumn('libraryDesignCodeId', OLD.libraryDesignCodeId, NEW.libraryDesignCodeId),
         makeChangeColumn('groupId', OLD.groupId, NEW.groupId),
-        makeChangeColumn('groupDescription', OLD.groupDescription, NEW.groupDescription)
+        makeChangeColumn('groupDescription', OLD.groupDescription, NEW.groupDescription),
+        makeChangeColumn('sopId', OLD.sopId, NEW.sopId)
   ), ''),
       NEW.lastModifier,
       log_message,

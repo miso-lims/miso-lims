@@ -88,6 +88,7 @@ public class BulkSamplePage extends BulkPage {
     public static final String CELL_VIABILITY = "Cell Viability";
     public static final String LOADING_CELL_CONC = "Loading Cell Conc.";
     public static final String INPUT_INTO_LIBRARY = "Input into Library";
+    public static final String SOP = "SOP";
 
     private SamColumns() {
       throw new IllegalStateException("Util class not intended for instantiation");

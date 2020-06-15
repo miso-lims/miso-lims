@@ -71,6 +71,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
+import uk.ac.bbsrc.tgac.miso.core.service.SopService;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
@@ -138,6 +139,8 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   private RunPartitionAliquotService runPartitionAliquotService;
   @Autowired
   private FileAttachmentService fileAttachmentService;
+  @Autowired
+  private SopService sopService;
 
   @Override
   public List<Run> list() throws IOException {
@@ -329,6 +332,7 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
         position.setContainer(containerService.get(position.getContainer().getId()));
       }
     }
+    loadChildEntity(run::setSop, run.getSop(), sopService, "sopId");
   }
 
   private void validateChanges(Run before, Run changed) throws IOException {
@@ -416,6 +420,7 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     target.setSequencingKitLot(source.getSequencingKitLot());
     target.setDataApproved(source.isDataApproved());
     target.setDataApprover(target.isDataApproved() == null ? null : source.getDataApprover());
+    target.setSop(source.getSop());
     if (isIlluminaRun(target)) {
       applyIlluminaChanges((IlluminaRun) target, (IlluminaRun) source);
     } else if (isLS454Run(target)) {

@@ -59,6 +59,7 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
@@ -172,6 +173,10 @@ public abstract class Run
   @OneToOne
   @JoinColumn(name = "runId", updatable = false, insertable = false)
   private RunProjectView runProjectView;
+
+  @ManyToOne
+  @JoinColumn(name = "sopId")
+  private Sop sop;
 
   /**
    * Construct a new Run with a default empty SecurityProfile
@@ -498,6 +503,14 @@ public abstract class Run
 
   public String getProjectsLabel() {
     return runProjectView == null ? null : runProjectView.getProjects();
+  }
+
+  public Sop getSop() {
+    return sop;
+  }
+
+  public void setSop(Sop sop) {
+    this.sop = sop;
   }
 
 }

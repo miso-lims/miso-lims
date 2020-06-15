@@ -64,6 +64,7 @@ public class BulkLibraryPage extends BulkPage {
     public static final String SPIKE_IN_DILUTION = "Spike-In Dilution Factor";
     public static final String SPIKE_IN_VOL = "Spike-In Volume";
     public static final String TEMPLATE = "Template";
+    public static final String SOP = "SOP";
 
     private LibColumns() {
       throw new IllegalStateException("Util class not intended for instantiation");

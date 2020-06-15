@@ -94,6 +94,7 @@ DELETE FROM SequencingControlType;
 DELETE FROM SequencingOrder;
 DELETE FROM SequencingParameters;
 DELETE FROM ServiceRecord;
+DELETE FROM Sop;
 DELETE FROM Stain;
 DELETE FROM StainCategory;
 DELETE FROM StorageLocation;

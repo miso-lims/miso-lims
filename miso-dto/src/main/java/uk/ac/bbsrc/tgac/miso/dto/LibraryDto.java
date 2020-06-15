@@ -80,6 +80,7 @@ public class LibraryDto extends AbstractBoxableDto implements ReceivableDto<Libr
   private boolean umis;
   private Long workstationId;
   private Long thermalCyclerId;
+  private Long sopId;
 
   public String getAlias() {
     return alias;
@@ -528,6 +529,14 @@ public class LibraryDto extends AbstractBoxableDto implements ReceivableDto<Libr
   @Override
   public Function<Transfer, Set<TransferLibrary>> getTransferItemsFunction() {
     return Transfer::getLibraryTransfers;
+  }
+
+  public Long getSopId() {
+    return sopId;
+  }
+
+  public void setSopId(Long sopId) {
+    this.sopId = sopId;
   }
 
 }

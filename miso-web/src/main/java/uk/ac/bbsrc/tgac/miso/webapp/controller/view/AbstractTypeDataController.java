@@ -27,16 +27,25 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
 
 public abstract class AbstractTypeDataController<T extends Identifiable, R> {
 
+  private static final String OLD_JSP = "/WEB-INF/pages/handsontables.jsp";
+  private static final String NEW_JSP = "/WEB-INF/pages/bulkPage.jsp";
+
   private final ObjectMapper mapper = new ObjectMapper();
 
   private final String pluralType;
   private final String listTarget;
   private final String hotTarget;
+  private final boolean newInterface;
 
   public AbstractTypeDataController(String pluralType, String listTarget, String hotTarget) {
+    this(pluralType, listTarget, hotTarget, false);
+  }
+
+  public AbstractTypeDataController(String pluralType, String listTarget, String hotTarget, boolean newInterface) {
     this.pluralType = pluralType;
     this.listTarget = listTarget;
     this.hotTarget = hotTarget;
+    this.newInterface = newInterface;
   }
 
   protected final ModelAndView bulkCreate(Integer quantity, ModelMap model) throws IOException {
@@ -57,7 +66,7 @@ public abstract class AbstractTypeDataController<T extends Identifiable, R> {
     addHotAttributes("Create " + pluralType, config, true, model);
 
     model.put("input", mapper.writeValueAsString(Collections.nCopies(quantity, makeDto())));
-    return new ModelAndView("/WEB-INF/pages/handsontables.jsp", model);
+    return new ModelAndView(newInterface ? NEW_JSP : OLD_JSP, model);
   }
 
   protected final ModelAndView bulkEdit(String idString, ModelMap model) throws IOException {
@@ -85,7 +94,7 @@ public abstract class AbstractTypeDataController<T extends Identifiable, R> {
     }
     model.put("input", mapper.writeValueAsString(items.stream().map(this::toDto).collect(Collectors.toList())));
 
-    return new ModelAndView("/WEB-INF/pages/handsontables.jsp", model);
+    return new ModelAndView(newInterface ? NEW_JSP : OLD_JSP, model);
   }
 
   protected final ModelAndView listStatic(Collection<T> items, ModelMap model) throws IOException {
@@ -107,8 +116,12 @@ public abstract class AbstractTypeDataController<T extends Identifiable, R> {
   private void addHotAttributes(String title, ObjectNode config, boolean create, ModelMap model) throws JsonProcessingException {
     model.put("title", title);
     model.put("config", mapper.writeValueAsString(config));
-    model.put("targetType", "HotTarget." + hotTarget);
-    model.put("create", create);
+    if (newInterface) {
+      model.put("target", hotTarget);
+    } else {
+      model.put("targetType", "HotTarget." + hotTarget);
+      model.put("create", create);
+    }
   }
 
   /**

@@ -47,21 +47,21 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
       SamColumns.TIMES_RECEIVED, SamColumns.TUBE_NUMBER, SamColumns.SECONDARY_ID, SamColumns.TISSUE_MATERIAL, SamColumns.REGION);
 
   // columns specific to creating Slides
-  private static final Set<String> slideColumns = Sets.newHashSet(SamColumns.SLIDES, SamColumns.DISCARDS, SamColumns.THICKNESS,
-      SamColumns.STAIN, SamColumns.PERCENT_TUMOUR, SamColumns.PERCENT_NECROSIS, SamColumns.MARKED_AREA,
+  private static final Set<String> slideColumns = Sets.newHashSet(SamColumns.SOP, SamColumns.SLIDES, SamColumns.DISCARDS,
+      SamColumns.THICKNESS, SamColumns.STAIN, SamColumns.PERCENT_TUMOUR, SamColumns.PERCENT_NECROSIS, SamColumns.MARKED_AREA,
       SamColumns.MARKED_AREA_PERCENT_TUMOUR);
 
   // columns specific to creating curls
-  private static final Set<String> tissuePieceColumns = Sets.newHashSet(SamColumns.PIECE_TYPE, SamColumns.SLIDES_CONSUMED,
+  private static final Set<String> tissuePieceColumns = Sets.newHashSet(SamColumns.SOP, SamColumns.PIECE_TYPE, SamColumns.SLIDES_CONSUMED,
       SamColumns.REFERENCE_SLIDE);
 
   // columns specific to creating single cells (tissue processing)
-  private static final Set<String> singleCellColumns = Sets.newHashSet(SamColumns.INITIAL_CELL_CONC, SamColumns.DIGESTION);
+  private static final Set<String> singleCellColumns = Sets.newHashSet(SamColumns.SOP, SamColumns.INITIAL_CELL_CONC, SamColumns.DIGESTION);
 
   // columns specific to creating stocks
-  private static final Set<String> stockColumns = Sets.newHashSet(SamColumns.STR_STATUS, SamColumns.VOLUME, SamColumns.VOLUME_UNITS,
-      SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS, SamColumns.PARENT_NG_USED, SamColumns.PARENT_VOLUME_USED,
-      SamColumns.REFERENCE_SLIDE);
+  private static final Set<String> stockColumns = Sets.newHashSet(SamColumns.SOP, SamColumns.STR_STATUS, SamColumns.VOLUME,
+      SamColumns.VOLUME_UNITS, SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS, SamColumns.PARENT_NG_USED,
+      SamColumns.PARENT_VOLUME_USED, SamColumns.REFERENCE_SLIDE);
 
   // columns specific to creating RNA stocks
   private static final Set<String> rnaStockColumns = Sets.newHashSet(SamColumns.DNASE_TREATED);
@@ -70,7 +70,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
       SamColumns.LOADING_CELL_CONC, SamColumns.PARENT_NG_USED, SamColumns.PARENT_VOLUME_USED);
 
   // columns specific to creating aliquots
-  private static final Set<String> aliquotColumns = Sets.newHashSet(SamColumns.PURPOSE, SamColumns.PARENT_NG_USED,
+  private static final Set<String> aliquotColumns = Sets.newHashSet(SamColumns.SOP, SamColumns.PURPOSE, SamColumns.PARENT_NG_USED,
       SamColumns.PARENT_VOLUME_USED);
 
   private static final Set<String> singleCellAliquotColumns = Sets.newHashSet(SamColumns.INPUT_INTO_LIBRARY, SamColumns.PARENT_NG_USED,

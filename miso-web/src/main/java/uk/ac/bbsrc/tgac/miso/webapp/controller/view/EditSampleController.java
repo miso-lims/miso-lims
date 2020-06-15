@@ -66,6 +66,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
@@ -77,6 +78,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
+import uk.ac.bbsrc.tgac.miso.core.service.SopService;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
@@ -132,6 +134,8 @@ public class EditSampleController {
   @Autowired
   private SampleClassService sampleClassService;
   @Autowired
+  private SopService sopService;
+  @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
   private IndexChecker indexChecker;
@@ -183,6 +187,7 @@ public class EditSampleController {
     private static final String PROPAGATE = "propagate";
     private static final String EDIT = "edit";
     private static final String PROJECTS = "projects";
+    private static final String SOPS = "sops";
     private static final String DNASE_TREATABLE = "dnaseTreatable";
     private static final String DEFAULT_SCI_NAME = "defaultSciName";
     private static final String DEFAULT_LCM_TUBE_GROUP_ID = "defaultLcmTubeGroupId";
@@ -233,6 +238,7 @@ public class EditSampleController {
     ObjectNode formConfig = mapper.createObjectNode();
     formConfig.put("detailedSample", isDetailedSampleEnabled());
     MisoWebUtils.addJsonArray(mapper, formConfig, "projects", projectService.list(), Dtos::asDto);
+    MisoWebUtils.addJsonArray(mapper, formConfig, Config.SOPS, sopService.listByCategory(SopCategory.SAMPLE), Dtos::asDto);
     if (LimsUtils.isDetailedSample(sample)) {
       DetailedSample detailed = (DetailedSample) sample;
       formConfig.put("dnaseTreatable", detailed.getSampleClass().getDNAseTreatable());
@@ -457,7 +463,8 @@ public class EditSampleController {
         config.put(Config.DNASE_TREATABLE, false);
       }
       config.put(Config.PAGE_MODE, Config.EDIT);
-      addJsonArray(mapper, config, "projects", projectService.list(), Dtos::asDto);
+      addJsonArray(mapper, config, Config.PROJECTS, projectService.list(), Dtos::asDto);
+      addJsonArray(mapper, config, Config.SOPS, sopService.listByCategory(SopCategory.SAMPLE), Dtos::asDto);
     }
 
     @Override
@@ -534,6 +541,7 @@ public class EditSampleController {
       config.put(Config.DEFAULT_LCM_TUBE_GROUP_DESC, defaultLcmTubeGroupDesc);
       addJsonArray(mapper, config, Config.RECIPIENT_GROUPS, recipientGroups, Dtos::asDto);
       addJsonArray(mapper, config, Config.PROJECTS, projectService.list(), Dtos::asDto);
+      addJsonArray(mapper, config, Config.SOPS, sopService.listByCategory(SopCategory.SAMPLE), Dtos::asDto);
     }
 
     @Override
@@ -575,6 +583,7 @@ public class EditSampleController {
       }
       config.putPOJO(Config.BOX, box);
       addJsonArray(mapper, config, "recipientGroups", recipientGroups, Dtos::asDto);
+      addJsonArray(mapper, config, Config.SOPS, sopService.listByCategory(SopCategory.SAMPLE), Dtos::asDto);
     }
 
     @Override
