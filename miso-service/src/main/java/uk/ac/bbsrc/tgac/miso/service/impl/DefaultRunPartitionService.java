@@ -11,6 +11,7 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.service.PartitionQcTypeService;
@@ -69,5 +70,10 @@ public class DefaultRunPartitionService implements RunPartitionService {
     Run managed = runService.get(run.getId());
     authorizationManager.throwIfNonAdminOrMatchingOwner(managed.getCreator());
     runPartitionDao.deleteForRun(managed);
+  }
+
+  @Override
+  public void deleteForRunContainer(Run run, SequencerPartitionContainer container) throws IOException {
+    runPartitionDao.deleteForRunContainer(run, container);
   }
 }

@@ -5,6 +5,7 @@ import java.io.IOException;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 
 public interface RunPartitionStore {
 
@@ -15,5 +16,7 @@ public interface RunPartitionStore {
   public void update(RunPartition runPartition) throws IOException;
 
   public void deleteForRun(Run run) throws IOException;
+
+  public void deleteForRunContainer(Run run, SequencerPartitionContainer container) throws IOException;
 
 }
