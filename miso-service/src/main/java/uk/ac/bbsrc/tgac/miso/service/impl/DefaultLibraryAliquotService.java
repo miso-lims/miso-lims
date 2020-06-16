@@ -284,6 +284,7 @@ public class DefaultLibraryAliquotService
     target.setNgUsed(source.getNgUsed());
     target.setVolumeUsed(source.getVolumeUsed());
     target.setCreationDate(source.getCreationDate());
+    target.setQcPassed(source.getQcPassed());
 
     if (isDetailedLibraryAliquot(target)) {
       DetailedLibraryAliquot dTarget = (DetailedLibraryAliquot) target;
