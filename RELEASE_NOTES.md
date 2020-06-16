@@ -10,6 +10,8 @@ Changes:
   * Fixed Receipt Confirmed and Receipt QC Passed validation on Create Samples page
   * Fixed Fill Boxes actions on the bulk Create/Edit Sample and Library Aliquot pages
   * Fixed library receipt creating multiple ltransfers
+  * Fixed scientific name to show as required on bulk sample pages
+  * Fixed scientific name on bulk sample pages to use default value from project or config
 
 Upgrade Notes:
 
@@ -43,6 +45,8 @@ Changes:
 
 Known Issues:
 
+  * Scientific name is required, but not shown as required on bulk sample pages
+  * Default scientific name from project or config is not used on bulk sample pages
   * Edit button on Scientific Names list links to Edit Run Purposes page instead of Edit Scientific
     Names
   * Receipt Confirmed and Receipt QC Passed fields do not validate on Create Samples page when cleared

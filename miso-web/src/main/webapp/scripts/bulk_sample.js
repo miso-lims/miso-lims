@@ -425,6 +425,7 @@ BulkTarget.sample = (function($) {
         title: 'Sci. Name',
         type: 'dropdown',
         data: 'scientificNameId',
+        required: true,
         source: Constants.scientificNames,
         sortSource: Utils.sorting.standardSort('alias'),
         getItemLabel: Utils.array.getAlias,
