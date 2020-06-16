@@ -149,8 +149,8 @@ public class LibraryAliquot extends AbstractBoxable
   private LibraryAliquotBoxPosition boxPosition;
 
   private BigDecimal ngUsed;
-
   private BigDecimal volumeUsed;
+  private Boolean qcPassed;
 
   @OneToMany(targetEntity = LibraryAliquotChangeLog.class, mappedBy = "libraryAliquot", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
@@ -315,7 +315,8 @@ public class LibraryAliquot extends AbstractBoxable
         LibraryAliquot::getCreationDate,
         LibraryAliquot::getCreator,
         LibraryAliquot::getLibrary,
-        LibraryAliquot::getTargetedSequencing);
+        LibraryAliquot::getTargetedSequencing,
+        LibraryAliquot::getQcPassed);
   }
 
   @CoverageIgnore
@@ -327,7 +328,8 @@ public class LibraryAliquot extends AbstractBoxable
         creationDate,
         creator,
         library,
-        targetedSequencing);
+        targetedSequencing,
+        qcPassed);
   }
 
   @Override
@@ -414,6 +416,14 @@ public class LibraryAliquot extends AbstractBoxable
   @Override
   public void setVolumeUsed(BigDecimal volumeUsed) {
     this.volumeUsed = volumeUsed;
+  }
+
+  public Boolean getQcPassed() {
+    return qcPassed;
+  }
+
+  public void setQcPassed(Boolean qcPassed) {
+    this.qcPassed = qcPassed;
   }
 
   @Override

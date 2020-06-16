@@ -43,6 +43,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolableElementViewService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
@@ -89,6 +90,8 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   private IndexChecker indexChecker;
   @Autowired
   private PoolOrderService poolOrderService;
+  @Autowired
+  private RunPartitionAliquotService runPartitionAliquotService;
 
   public void setAutoGenerateIdBarcodes(boolean autoGenerateIdBarcodes) {
     this.autoGenerateIdBarcodes = autoGenerateIdBarcodes;
@@ -392,6 +395,13 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   }
 
   private void loadPoolElements(Pool source, Pool target) throws IOException {
+    Set<PoolableElementView> removals = target.getPoolContents().stream()
+        .filter(notInOther(source.getPoolContents()))
+        .map(PoolElement::getPoolableElementView)
+        .collect(Collectors.toSet());
+    for (PoolableElementView aliquot : removals) {
+      runPartitionAliquotService.deleteForPoolAliquot(target, aliquot.getAliquotId());
+    }
     loadPoolElements(source.getPoolContents(), target);
   }
 

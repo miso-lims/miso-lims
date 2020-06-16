@@ -1655,6 +1655,7 @@ public class Dtos {
     }
     dto.setDiscarded(from.isDiscarded());
     setDateTimeString(dto::setLastModified, from.getLastModified());
+    setBoolean(dto::setQcPassed, from.getQcPassed(), true);
     return dto;
   }
 
@@ -1712,6 +1713,7 @@ public class Dtos {
     dto.setSampleName(from.getSampleName());
     dto.setSampleAlias(from.getSampleAlias());
     setString(dto::setSequencingControlTypeAlias, maybeGetProperty(from.getSampleSequencingControlType(), SequencingControlType::getAlias));
+    setBoolean(dto::setQcPassed, from.getAliquotQcPassed(), true);
 
     Sample sample = from.getSample();
     if (isDetailedSample(sample)) {
@@ -1771,6 +1773,7 @@ public class Dtos {
     }
     to.setBoxPosition((LibraryAliquotBoxPosition) makeBoxablePosition(from, to));
     to.setDiscarded(from.isDiscarded());
+    setBoolean(to::setQcPassed, from.getQcPassed(), true);
     return to;
   }
 

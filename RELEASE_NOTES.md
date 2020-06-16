@@ -2,8 +2,10 @@
 
 Changes:
 
+  * Added QC Passed field to library aliquots
   * Improved performance of bulk library pages
   * Changed sample aliquot purpose to be optional (detailed sample)
+  * Modified library Tracking List downloads to include index names
   * Fixed Edit button on Scientific Names list to link to the correct page
   * Fixed Children action on Samples list to work in plain sample mode
   * Fixed Download action on Samples list to work in plain sample mode
@@ -12,6 +14,7 @@ Changes:
   * Fixed library receipt creating multiple ltransfers
   * Fixed scientific name to show as required on bulk sample pages
   * Fixed scientific name on bulk sample pages to use default value from project or config
+  * Fixed errors deleting containers
 
 Upgrade Notes:
 

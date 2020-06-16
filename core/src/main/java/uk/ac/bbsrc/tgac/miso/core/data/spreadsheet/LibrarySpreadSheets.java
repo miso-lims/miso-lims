@@ -1,10 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.core.data.spreadsheet;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
@@ -21,8 +19,9 @@ public enum LibrarySpreadSheets implements Spreadsheet<Library> {
       Column.forString("Alias", Library::getAlias), //
       Column.forString("Barcode", Library::getIdentificationBarcode), //
       Column.forString("Library Type", library -> library.getLibraryType().getDescription()), //
-      Column.forString("Index(es)", LibrarySpreadSheets::listIndices), //
+      Column.forString("i7 Index Name", listIndexName(1)), //
       Column.forString("i7 Index", listIndex(1)), //
+      Column.forString("i5 Index Name", listIndexName(2)), //
       Column.forString("i5 Index", listIndex(2)), //
       Column.forString("Sample Name", library -> library.getSample().getName()), //
       Column.forString("Sample Alias", library -> library.getSample().getAlias()), //
@@ -75,14 +74,15 @@ public enum LibrarySpreadSheets implements Spreadsheet<Library> {
     };
   }
 
-  private static String listIndices(Library library) {
-    return library.getIndices().stream().sorted(Comparator.comparingInt(Index::getPosition)).map(Index::getSequence)
-        .collect(Collectors.joining(", "));
-  }
-
   private static Function<Library, String> listIndex(int position) {
     return library -> library.getIndices().stream().filter(i -> i.getPosition() == position)
         .map(Index::getSequence)
+        .findFirst().orElse("");
+  }
+
+  private static Function<Library, String> listIndexName(int position) {
+    return library -> library.getIndices().stream().filter(i -> i.getPosition() == position)
+        .map(Index::getName)
         .findFirst().orElse("");
   }
 
