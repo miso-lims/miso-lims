@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -31,7 +32,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -899,6 +903,36 @@ public class BoxRestController extends RestController {
 
       rowIndex++;
     }
+  }
+
+  @GetMapping("/{boxId}/fragmentAnalyser")
+  public HttpEntity<byte[]> createFragmentAnalyserSheet(@PathVariable("boxId") Long boxId, HttpServletResponse response)
+      throws IOException {
+    Box box = getBox(boxId);
+    if (box.getSize().getRows() != 8 || box.getSize().getColumns() != 12) {
+      throw new RestException("Invalid box size for fragment analyzer. Must be 8 x 12", Status.BAD_REQUEST);
+    }
+    Map<String, String> aliasByPosition = boxService.getBoxContents(boxId).stream()
+        .collect(Collectors.toMap(BoxableView::getBoxPosition, BoxableView::getAlias));
+    StringBuilder sb = new StringBuilder();
+    for (int row = 0; row < 8; row++) {
+      for (int col = 0; col < 12; col++) {
+        String pos = BoxUtils.getPositionString(row, col);
+        sb.append(pos).append("\t");
+        if (col == 11 && row == 7) {
+          sb.append("Ladder");
+        } else {
+          sb.append(aliasByPosition.containsKey(pos) ? aliasByPosition.get(pos) : "EMPTY").append("\n");
+        }
+      }
+    }
+    String sheet = sb.toString();
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.TEXT_PLAIN);
+    response.setHeader("Content-Disposition",
+        String.format("attachment; filename=FA-%s.txt", box.getAlias().replace(' ', '_')));
+    return new HttpEntity<>(sheet.getBytes(), headers);
   }
 
 }
