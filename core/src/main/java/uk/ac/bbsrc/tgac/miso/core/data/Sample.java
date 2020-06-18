@@ -30,6 +30,7 @@ import java.util.Collection;
 import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QualityControllable;
@@ -279,5 +280,9 @@ public interface Sample extends Attachable, Comparable<Sample>, Deletable, Hiera
   public TransferSample getCreationReceiptInfo();
 
   public void setCreationReceiptInfo(TransferSample creationReceiptInfo);
+
+  public Sop getSop();
+
+  public void setSop(Sop sop);
 
 }

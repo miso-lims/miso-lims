@@ -77,13 +77,13 @@ ListTarget.samplevalidrelationship = (function($) {
         },
         include: true,
         bSortable: false,
-        mRender: ListUtils.render.booleanChecks
+        mRender: ListUtils.render.archived
       }, {
         sTitle: 'Relationship Archived',
         mData: 'archived',
         include: true,
         iSortPriority: 0,
-        mRender: ListUtils.render.booleanChecks
+        mRender: ListUtils.render.archived
       }];
     }
   };

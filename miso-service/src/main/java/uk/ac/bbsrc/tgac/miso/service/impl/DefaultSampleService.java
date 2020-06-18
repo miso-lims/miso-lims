@@ -62,6 +62,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.core.service.ScientificNameService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingControlTypeService;
+import uk.ac.bbsrc.tgac.miso.core.service.SopService;
 import uk.ac.bbsrc.tgac.miso.core.service.StainService;
 import uk.ac.bbsrc.tgac.miso.core.service.SubprojectService;
 import uk.ac.bbsrc.tgac.miso.core.service.TransferService;
@@ -140,6 +141,8 @@ public class DefaultSampleService implements HibernateBulkSaveService<Sample>, S
   private TransferService transferService;
   @Autowired
   private SubprojectService subprojectService;
+  @Autowired
+  private SopService sopService;
   @Autowired
   private HibernateSessionManager hibernateSessionManager;
 
@@ -672,6 +675,7 @@ public class DefaultSampleService implements HibernateBulkSaveService<Sample>, S
     loadChildEntity(sample::setScientificName, sample.getScientificName(), scientificNameService, "scientificNameId");
     loadChildEntity(sample::setSequencingControlType, sample.getSequencingControlType(), sequencingControlTypeService,
         "sequencingControlTypeId");
+    loadChildEntity(sample::setSop, sample.getSop(), sopService, "sopId");
     if (isDetailedSample(sample)) {
       DetailedSample detailed = (DetailedSample) sample;
       if (detailed.getSampleClass() != null && detailed.getSampleClass().isSaved()) {
@@ -894,6 +898,7 @@ public class DefaultSampleService implements HibernateBulkSaveService<Sample>, S
     target.setLocationBarcode(source.getLocationBarcode());
     target.setRequisitionId(source.getRequisitionId());
     target.setSequencingControlType(source.getSequencingControlType());
+    target.setSop(source.getSop());
 
     if (isDetailedSample(target)) {
       DetailedSample dTarget = (DetailedSample) target;

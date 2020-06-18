@@ -15,6 +15,7 @@ BulkTarget.sample = (function($) {
    *   defaultLcmTubeGroupId: string
    *   defaultLcmTubeGroupDescription: string
    *   sortLibraryPropagate: string; column for default sort when propagating libraries
+   *   sops: array
    * }
    */
 
@@ -277,7 +278,7 @@ BulkTarget.sample = (function($) {
       var columns = [];
 
       if (!config.isLibraryReceipt) {
-        columns.push(BulkUtils.columns.name, BulkUtils.columns.alias(config));
+        columns.push(BulkUtils.columns.name, BulkUtils.columns.generatedAlias(config));
 
         if (Constants.isDetailedSample) {
           // parent columns go at start if propagating, or after the sample name and alias if editing
@@ -607,6 +608,10 @@ BulkTarget.sample = (function($) {
           }
         }
       });
+
+      if (!Constants.isDetailedSample || (!isTargetIdentity(config) && !isTargetTissue(config))) {
+        columns.push(BulkUtils.columns.sop(config.sops));
+      }
 
       if (Constants.isDetailedSample && !config.isLibraryReceipt) {
         var showEffective = !isTargetIdentity(config) && config.pageMode === 'edit';
@@ -976,6 +981,10 @@ BulkTarget.sample = (function($) {
         deferred.resolve();
       }
       return deferred.promise();
+    },
+
+    detailedQcStatusSort: function(a, b) {
+      return statusToInt(a) - statusToInt(b);
     }
   };
 

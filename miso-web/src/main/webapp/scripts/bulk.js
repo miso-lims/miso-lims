@@ -164,7 +164,17 @@ BulkUtils = (function($) {
         disabled: true
       },
 
-      alias: function(config) {
+      simpleAlias: function(maxLength) {
+        return {
+          title: 'Alias',
+          type: 'text',
+          data: 'alias',
+          required: true,
+          maxLength: maxLength
+        }
+      },
+
+      generatedAlias: function(config) {
         return {
           title: 'Alias',
           type: 'text',
@@ -621,6 +631,43 @@ BulkUtils = (function($) {
         data: 'dnaSize',
         min: 1,
         max: 10000000
+      },
+
+      archived: function() {
+        return {
+          title: 'Archived',
+          type: 'dropdown',
+          data: 'archived',
+          source: [{
+            label: 'True',
+            value: true
+          }, {
+            label: 'False',
+            value: false
+          }],
+          initial: 'False',
+          getItemLabel: Utils.array.get('label'),
+          getItemValue: Utils.array.get('value')
+        };
+      },
+
+      sop: function(sops) {
+        return {
+          title: 'SOP',
+          type: 'dropdown',
+          data: 'sopId',
+          include: sops && sops.length,
+          source: function(item) {
+            return sops.filter(function(sop) {
+              return !sop.archived || item.sopId === sop.id;
+            });
+          },
+          sortSource: Utils.sorting.standardSort('alias'),
+          getItemLabel: function(item) {
+            return item.alias + ' v.' + item.version;
+          },
+          getItemValue: Utils.array.getId
+        };
       }
     },
 
@@ -641,6 +688,17 @@ BulkUtils = (function($) {
             });
           }
         }];
+      },
+
+      edit: function(url) {
+        return {
+          name: 'Edit',
+          action: function(items) {
+            window.location = url + '?' + $.param({
+              ids: items.map(Utils.array.getId).join(',')
+            });
+          }
+        };
       }
     }
 

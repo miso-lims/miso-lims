@@ -59,6 +59,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.LibrarySpikeInService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryStrategyService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.core.service.SopService;
 import uk.ac.bbsrc.tgac.miso.core.service.TransferService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorkstationService;
@@ -125,6 +126,8 @@ public class DefaultLibraryService implements HibernateBulkSaveService<Library>,
   private FileAttachmentService fileAttachmentService;
   @Autowired
   private TransferService transferService;
+  @Autowired
+  private SopService sopService;
   @Autowired
   private HibernateSessionManager hibernateSessionManager;
   @Value("${miso.autoGenerateIdentificationBarcodes}")
@@ -445,6 +448,7 @@ public class DefaultLibraryService implements HibernateBulkSaveService<Library>,
     if (library.getThermalCycler() != null) {
       library.setThermalCycler(instrumentService.get(library.getThermalCycler().getId()));
     }
+    loadChildEntity(library::setSop, library.getSop(), sopService, "sopId");
     if (isDetailedLibrary(library)) {
       DetailedLibrary lai = (DetailedLibrary) library;
       if (lai.getLibraryDesignCode() != null) {
@@ -513,6 +517,7 @@ public class DefaultLibraryService implements HibernateBulkSaveService<Library>,
     target.setUmis(source.getUmis());
     target.setWorkstation(source.getWorkstation());
     target.setThermalCycler(source.getThermalCycler());
+    target.setSop(source.getSop());
 
     if (isDetailedLibrary(target)) {
       DetailedLibrary dSource = (DetailedLibrary) source;

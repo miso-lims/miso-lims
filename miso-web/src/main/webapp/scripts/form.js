@@ -282,6 +282,42 @@ FormUtils = (function($) {
       }];
     },
 
+    makeSopFields: function(object, sops) {
+      return [{
+        title: 'SOP',
+        data: 'sopId',
+        type: 'dropdown',
+        source: sops.filter(function(sop) {
+          return !sop.archived || object.sopId === sop.id;
+        }),
+        sortSource: Utils.sorting.standardSort('alias'),
+        getItemLabel: function(item) {
+          return item.alias + ' v.' + item.version;
+        },
+        getItemValue: Utils.array.getId,
+        include: sops && sops.length,
+        onChange: function(newValue, form) {
+          var sop = newValue ? Utils.array.findUniqueOrThrow(Utils.array.idPredicate(newValue), sops) : null;
+          form.updateField('sopLink', {
+            label: sop ? 'View SOP' : null,
+            link: sop ? sop.url : null
+          });
+        }
+      }, {
+        title: '',
+        data: 'sopLink',
+        omit: true,
+        type: 'read-only',
+        getDisplayValue: function(item) {
+          return item.sopId ? 'View SOP' : null;
+        },
+        getLink: function(item) {
+          return item.sopId ? Utils.array.findUniqueOrThrow(Utils.array.idPredicate(item.sopId), sops).url : null;
+        },
+        openNewTab: true
+      }];
+    },
+
     setTableData: function(listTarget, config, containerId, data, form) {
       var listId = containerId + 'Table';
       if (initializedTables.indexOf(containerId) !== -1) {
@@ -428,7 +464,7 @@ FormUtils = (function($) {
                 if (field.type !== 'read-only' || !field.getDisplayValue) {
                   throw new Error('Cannot set label for field \'' + field.title + '\'');
                 }
-                $('#' + makeInputId(containerId, field.data) + 'Label').text(options.label);
+                $('#' + makeInputId(containerId, field.data) + 'Label').text(options.label || '');
                 cascade = true;
                 break;
               }
@@ -730,7 +766,7 @@ FormUtils = (function($) {
   }
 
   function getFieldLabelText(field) {
-    return field.title + ':' + (field.required ? '* ' : ' ');
+    return (field.title ? (field.title + ':') : '') + (field.required ? '* ' : ' ');
   }
 
   function addHelpBubble(td, field) {

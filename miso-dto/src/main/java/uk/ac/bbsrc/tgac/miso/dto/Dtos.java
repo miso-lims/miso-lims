@@ -166,6 +166,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingOrderImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocationMap;
@@ -487,6 +489,7 @@ public class Dtos {
     setString(dto::setRequisitionId, from.getRequisitionId());
     dto.setLibraryCount(libraryCount);
     setId(dto::setSequencingControlTypeId, from.getSequencingControlType());
+    setId(dto::setSopId, from.getSop());
 
     return dto;
 
@@ -854,6 +857,7 @@ public class Dtos {
 
     setString(to::setRequisitionId, from.getRequisitionId());
     setObject(to::setSequencingControlType, SequencingControlType::new, from.getSequencingControlTypeId());
+    setObject(to::setSop, Sop::new, from.getSopId());
     to.setCreationReceiptInfo(toReceiptTransfer(from, to));
     return to;
   }
@@ -1396,6 +1400,7 @@ public class Dtos {
     setBoolean(dto::setUmis, from.getUmis(), false);
     setId(dto::setWorkstationId, from.getWorkstation());
     setId(dto::setThermalCyclerId, from.getThermalCycler());
+    setId(dto::setSopId, from.getSop());
 
     return dto;
   }
@@ -1471,6 +1476,7 @@ public class Dtos {
     setBoolean(to::setUmis, from.getUmis(), false);
     setObject(to::setWorkstation, Workstation::new, from.getWorkstationId());
     setObject(to::setThermalCycler, InstrumentImpl::new, from.getThermalCyclerId());
+    setObject(to::setSop, Sop::new, from.getSopId());
     to.setCreationReceiptInfo(toReceiptTransfer(from, to));
     return to;
   }
@@ -1942,6 +1948,7 @@ public class Dtos {
     setBoolean(dto::setDataApproved, from.isDataApproved(), true);
     setId(dto::setDataApproverId, from.getDataApprover());
     setString(dto::setDataApproverName, maybeGetProperty(from.getDataApprover(), User::getFullName));
+    setId(dto::setSopId, from.getSop());
 
     dto.setProjectsLabel(from.getProjectsLabel());
 
@@ -2007,6 +2014,7 @@ public class Dtos {
     setString(to::setFilePath, dto.getRunPath());
     setBoolean(to::setDataApproved, dto.isDataApproved(), true);
     setObject(to::setDataApprover, UserImpl::new, dto.getDataApproverId());
+    setObject(to::setSop, Sop::new, dto.getSopId());
     return to;
   }
 
@@ -4104,6 +4112,28 @@ public class Dtos {
     ScientificName to = new ScientificName();
     setLong(to::setId, from.getId(), false);
     setString(to::setAlias, from.getAlias());
+    return to;
+  }
+
+  public static SopDto asDto(@Nonnull Sop from) {
+    SopDto to = new SopDto();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setAlias, from.getAlias());
+    setString(to::setVersion, from.getVersion());
+    setString(to::setCategory, maybeGetProperty(from.getCategory(), SopCategory::name));
+    setString(to::setUrl, from.getUrl());
+    setBoolean(to::setArchived, from.isArchived(), false);
+    return to;
+  }
+
+  public static Sop to(@Nonnull SopDto from) {
+    Sop to = new Sop();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setAlias, from.getAlias());
+    setString(to::setVersion, from.getVersion());
+    setObject(to::setCategory, from.getCategory(), SopCategory::valueOf);
+    setString(to::setUrl, from.getUrl());
+    setBoolean(to::setArchived, from.isArchived(), false);
     return to;
   }
 

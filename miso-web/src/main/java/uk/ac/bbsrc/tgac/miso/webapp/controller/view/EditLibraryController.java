@@ -68,6 +68,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
@@ -81,6 +82,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
+import uk.ac.bbsrc.tgac.miso.core.service.SopService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorkstationService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
@@ -171,6 +173,8 @@ public class EditLibraryController {
   @Autowired
   private InstrumentService instrumentService;
   @Autowired
+  private SopService sopService;
+  @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
   private NamingSchemeHolder namingSchemeHolder;
@@ -250,6 +254,7 @@ public class EditLibraryController {
     MisoWebUtils.addJsonArray(mapper, formConfig, "workstations", workstationService.list(), Dtos::asDto);
     MisoWebUtils.addJsonArray(mapper, formConfig, "thermalCyclers", instrumentService.listByType(InstrumentType.THERMAL_CYCLER),
         Dtos::asDto);
+    MisoWebUtils.addJsonArray(mapper, formConfig, "sops", sopService.listByCategory(SopCategory.LIBRARY), Dtos::asDto);
     model.put("formConfig", mapper.writeValueAsString(formConfig));
 
     return new ModelAndView("/WEB-INF/pages/editLibrary.jsp", model);
@@ -276,6 +281,7 @@ public class EditLibraryController {
       MisoWebUtils.addJsonArray(mapper, config, "workstations", workstationService.list(), Dtos::asDto);
       MisoWebUtils.addJsonArray(mapper, config, "thermalCyclers", instrumentService.listByType(InstrumentType.THERMAL_CYCLER),
           Dtos::asDto);
+      MisoWebUtils.addJsonArray(mapper, config, "sops", sopService.listByCategory(SopCategory.LIBRARY), Dtos::asDto);
 
       config.put(Config.SHOW_DESCRIPTION, showDescription);
       config.put(Config.SHOW_VOLUME, showVolume);
@@ -393,6 +399,7 @@ public class EditLibraryController {
       MisoWebUtils.addJsonArray(mapper, config, "workstations", workstationService.list(), Dtos::asDto);
       MisoWebUtils.addJsonArray(mapper, config, "thermalCyclers", instrumentService.listByType(InstrumentType.THERMAL_CYCLER),
           Dtos::asDto);
+      MisoWebUtils.addJsonArray(mapper, config, "sops", sopService.listByCategory(SopCategory.LIBRARY), Dtos::asDto);
     }
 
     @Override

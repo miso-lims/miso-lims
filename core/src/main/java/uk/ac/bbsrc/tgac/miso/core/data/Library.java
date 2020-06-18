@@ -32,6 +32,7 @@ import java.util.List;
 import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
@@ -366,5 +367,9 @@ public interface Library extends Attachable, Comparable<Library>, Deletable, Hie
   public TransferLibrary getCreationReceiptInfo();
 
   public void setCreationReceiptInfo(TransferLibrary creationReceiptInfo);
+
+  public Sop getSop();
+
+  public void setSop(Sop sop);
 
 }

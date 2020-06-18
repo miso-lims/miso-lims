@@ -43,6 +43,7 @@ public class RunDto {
   private Long dataApproverId;
   private String dataApproverName;
   private String projectsLabel;
+  private Long sopId;
 
   public Long getId() {
     return id;
@@ -242,6 +243,14 @@ public class RunDto {
 
   public void setProjectsLabel(String projectsLabel) {
     this.projectsLabel = projectsLabel;
+  }
+
+  public Long getSopId() {
+    return sopId;
+  }
+
+  public void setSopId(Long sopId) {
+    this.sopId = sopId;
   }
 
 }

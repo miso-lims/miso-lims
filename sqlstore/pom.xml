@@ -39,6 +39,7 @@
     <mysql.db>lims</mysql.db>
     <mysql.user>tgaclims</mysql.user>
     <mysql.pw>tgaclims</mysql.pw>
+    <mysql.params>autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useLegacyDatetimeCode=false&amp;useSSL=false</mysql.params>
   </properties>
   <dependencies>
     <dependency>
@@ -350,7 +351,7 @@
 	          </execution>
 	        </executions>
 	        <configuration>
-	          <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?autoReconnect=true</url>
+	          <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?${mysql.params}</url>
 	          <user>${mysql.user}</user>
 	          <password>${mysql.pw}</password>
 	          <locations>
@@ -381,7 +382,7 @@
             <configuration>
               <systemPropertyVariables>
                 <!-- Make config available for tests -->
-                <miso.it.mysql.url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?autoReconnect=true</miso.it.mysql.url>
+                <miso.it.mysql.url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?${mysql.params}</miso.it.mysql.url>
                 <miso.it.mysql.user>${mysql.user}</miso.it.mysql.user>
                 <miso.it.mysql.pw>${mysql.pw}</miso.it.mysql.pw>
               </systemPropertyVariables>

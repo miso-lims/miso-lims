@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Group;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
@@ -390,6 +391,11 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   @Override
   public default void restrictPaginationByTissueType(Criteria item, String type, Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s has no tissue type", getFriendlyName()));
+  }
+
+  @Override
+  public default void restrictPaginationByCategory(Criteria item, SopCategory category, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s has no category", getFriendlyName()));
   }
 
 }

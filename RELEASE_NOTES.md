@@ -3,6 +3,8 @@
 Changes:
 
   * Added QC Passed field to library aliquots
+  * Added sample, library, and run SOPs
+  * Added Tissue Piece Type field to Edit Sample page (detailed sample)
   * Improved performance of bulk library pages
   * Changed sample aliquot purpose to be optional (detailed sample)
   * Modified library Tracking List downloads to include index names
@@ -12,7 +14,7 @@ Changes:
   * Fixed Download action on Samples list to work in plain sample mode
   * Fixed Receipt Confirmed and Receipt QC Passed validation on Create Samples page
   * Fixed Fill Boxes actions on the bulk Create/Edit Sample and Library Aliquot pages
-  * Fixed library receipt creating multiple ltransfers
+  * Fixed library receipt creating multiple transfers
   * Fixed scientific name to show as required on bulk sample pages
   * Fixed scientific name on bulk sample pages to use default value from project or config
   * Fixed errors deleting containers

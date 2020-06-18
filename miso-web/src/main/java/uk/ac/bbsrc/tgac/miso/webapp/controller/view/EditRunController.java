@@ -57,6 +57,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
@@ -66,6 +67,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
+import uk.ac.bbsrc.tgac.miso.core.service.SopService;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -74,6 +76,7 @@ import uk.ac.bbsrc.tgac.miso.dto.RunPartitionAliquotDto;
 import uk.ac.bbsrc.tgac.miso.webapp.context.ExternalUriBuilder;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.JsonArrayCollector;
+import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.util.RunMetricsSource;
 
 @Controller
@@ -103,6 +106,8 @@ public class EditRunController {
   private InstrumentService instrumentService;
   @Autowired
   private ExperimentService experimentService;
+  @Autowired
+  private SopService sopService;
   @Autowired
   private IssueTrackerManager issueTrackerManager;
   @Autowired
@@ -223,6 +228,7 @@ public class EditRunController {
     } else {
       formConfig.put("isRunApprover", false);
     }
+    MisoWebUtils.addJsonArray(mapper, formConfig, "sops", sopService.listByCategory(SopCategory.RUN), Dtos::asDto);
     model.put("formConfig", mapper.writeValueAsString(formConfig));
 
     return new ModelAndView("/WEB-INF/pages/editRun.jsp", model);

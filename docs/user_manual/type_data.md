@@ -245,12 +245,27 @@ there are no stains associated with it.
 ## Sequencing Control Types
 
 A sample can be marked as a control for sequencing, and you can define the available control types how you like. It
-may make sense to have "Positive" and "Negative" control types, or other types may also make sense. In plain sample mode, any sample can be marked as a control. In detailed sample mode, the option is available for aliquot samples.
+may make sense to have "Positive" and "Negative" control types, or other types may also make sense. In plain sample
+mode, any sample can be marked as a control. In detailed sample mode, the option is available for aliquot samples.
 This option can only be changed on the single Edit Sample page - it does not appear on the bulk Create/Edit Samples
 pages.
 
 MISO administrators can add, edit, and delete sequencing control types using the standard interface. A sequencing
 control type can only be deleted if the option has not been used by any existing samples.
+
+
+
+## Standard Operating Procedures
+
+Standard operating procedures (SOPs) describe the process that was followed to prepare samples or libraries, or to
+perform a sequencing run. An SOP in MISO has a name and version, and links to the actual SOP in another system.
+
+MISO administrators can add, edit, and delete library types using the standard interface. An SOP can only be deleted if
+it has not been used for any existing samples, libraries, or runs.
+
+When editing SOPs in MISO, keep in mind that your changes will affect existing items that are already using the SOP.
+When a new version of an SOP is created, the old one should be archived in MISO, and a new one created with the same
+name and the new version. This way, you continue to track which version of an SOP was used to prepare older items.
 
 
 

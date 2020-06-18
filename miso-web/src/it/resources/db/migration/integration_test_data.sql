@@ -3,6 +3,14 @@ INSERT INTO User (userId, active, admin, fullName, internal, loginName, roles, p
 (3,1,0,'user',1,'user','ROLE_INTERNAL','{bcrypt}$2a$10$vqYii//w2shSZnt/4uNyIeeU4FGQIB4QJeisv9l16xVRQ1lTOghIO','user@user.user'), -- password 'user'
 (4,1,0,'Harry Henderson', 1, 'hhenderson', 'ROLE_INTERNAL', '{bcrypt}$2a$10$vqYii//w2shSZnt/4uNyIeeU4FGQIB4QJeisv9l16xVRQ1lTOghIO', 'hhenderson@somewhere.maybe');
 
+INSERT INTO Sop(sopId, alias, version, category, url, archived) VALUES
+(1, 'Sample SOP 1', '1.0', 'SAMPLE', 'http://sops.test.com/sample/1/1', FALSE),
+(2, 'Sample SOP 2', '1.0', 'SAMPLE', 'http://sops.test.com/sample/2/1', FALSE),
+(3, 'Library SOP 1', '1.0', 'LIBRARY', 'http://sops.test.com/library/1/1', FALSE),
+(4, 'Library SOP 1', '2.0', 'LIBRARY', 'http://sops.test.com/library/1/2', FALSE),
+(5, 'SOP to delete', '1.0', 'LIBRARY', 'http://sops.test.com/library/x/1', TRUE),
+(6, 'Run SOP 1', '1.0', 'RUN', 'http://sops.test.com/run/1/1', FALSE);
+
 INSERT INTO ScientificName(scientificNameId, alias) VALUES
 (1, 'Homo sapiens'),
 (2, 'Mus musculus'),

@@ -40,7 +40,7 @@ public class ValidationError implements Serializable {
   }
 
   public static ValidationError forDuplicate(String typeLabel, String property, String propertyLabel) {
-    return new ValidationError(property, String.format("There is already a %s with this %s", typeLabel, propertyLabel));
+    return new ValidationError(property, String.format("There is already a(n) %s with this %s", typeLabel, propertyLabel));
   }
 
   /**

@@ -52,6 +52,7 @@ public class ListTablesIT extends AbstractIT {
     tabs.put(ListTarget.POOL_ORDERS, Sets.newHashSet(Tabs.OUTSTANDING, Tabs.FULFILLED, Tabs.DRAFT));
     tabs.put(ListTarget.TRANSFERS, Sets.newHashSet(Tabs.PENDING, Tabs.RECEIPT, Tabs.INTERNAL, Tabs.DISTRIBUTION));
     tabs.put(ListTarget.INSTRUMENTS, Sets.newHashSet(Tabs.SEQUENCER, Tabs.ARRAY_SCANNER, Tabs.OTHER));
+    tabs.put(ListTarget.SOPS, Sets.newHashSet(Tabs.LIBRARY, Tabs.RUN, Tabs.SAMPLE));
     tabsForTarget = Collections.unmodifiableMap(tabs);
   }
 
@@ -74,6 +75,7 @@ public class ListTablesIT extends AbstractIT {
     preferredTab.put(ListTarget.POOL_ORDERS, Tabs.OUTSTANDING);
     preferredTab.put(ListTarget.TRANSFERS, Tabs.RECEIPT);
     preferredTab.put(ListTarget.INSTRUMENTS, Tabs.SEQUENCER);
+    preferredTab.put(ListTarget.SOPS, Tabs.SAMPLE);
     sortOnTab = Collections.unmodifiableMap(preferredTab);
   }
 
@@ -882,6 +884,16 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListScientificNamesColumnSort() throws Exception {
     testColumnsSort(ListTarget.SCIENTIFIC_NAMES);
+  }
+
+  @Test
+  public void testListSopsSetup() throws Exception {
+    testTabbedPageSetup(ListTarget.SOPS, Sets.newHashSet(Columns.ALIAS, Columns.VERSION, Columns.SOP, Columns.ARCHIVED));
+  }
+
+  @Test
+  public void testListSopsColumnSort() throws Exception {
+    testTabbedColumnsSort(ListTarget.SOPS);
   }
 
   private void testPageSetup(String listTarget, Set<String> targetColumns) {

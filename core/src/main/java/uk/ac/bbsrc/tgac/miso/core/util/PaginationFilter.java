@@ -14,6 +14,7 @@ import com.eaglegenomics.simlims.core.Group;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
@@ -448,6 +449,16 @@ public abstract interface PaginationFilter {
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
         sink.restrictPaginationByTissueType(item, type, errorHandler);
+      }
+    };
+  }
+
+  public static PaginationFilter category(SopCategory category) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByCategory(item, category, errorHandler);
       }
     };
   }

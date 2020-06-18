@@ -7,7 +7,8 @@ FormTarget.sample = (function($) {
    * Expected config {
    *   detailedSample: boolean,
    *   dnaseTreatable: boolean,
-   *   projects: array
+   *   projects: array,
+   *   sops: array
    * }
    */
 
@@ -123,12 +124,13 @@ FormTarget.sample = (function($) {
                     return item;
                   },
                   required: true
-                }, FormUtils.makeQcPassedField(!config.detailedSample), { // TODO: sort as on bulk page
+                }, FormUtils.makeQcPassedField(!config.detailedSample), {
                   title: 'QC Status',
                   data: 'detailedQcStatusId',
                   type: 'dropdown',
                   nullLabel: 'Not Ready',
-                  source: Constants.detailedQcStatuses.sort(Utils.sorting.standardSort('description')),
+                  source: Constants.detailedQcStatuses,
+                  sortSource: BulkTarget.sample.detailedQcStatusSort,
                   getItemLabel: function(item) {
                     return item.description;
                   },
@@ -212,7 +214,8 @@ FormTarget.sample = (function($) {
                   getItemValue: Utils.array.getId,
                   nullLabel: 'n/a',
                   include: !Constants.isDetailedSample || object.sampleCategory === 'Aliquot'
-                }]
+                }].concat((!Constants.isDetailedSample || (object.sampleCategory !== 'Identity' && object.sampleCategory !== 'Tissue'))
+                ? FormUtils.makeSopFields(object, config.sops) : [])
           }, {
             title: 'Identity',
             include: config.detailedSample && object.sampleCategory === 'Identity',
@@ -450,10 +453,19 @@ FormTarget.sample = (function($) {
               min: 0,
               max: 100
             }]
-          }, { // TODO: piece type field missing
-            title: 'Tissue Pieces',
+          }, {
+            title: 'Tissue Piece',
             include: config.detailedSample && object.sampleSubcategory === 'Tissue Piece',
             fields: [{
+              title: 'Piece Type',
+              type: 'dropdown',
+              data: 'tissuePieceTypeId',
+              required: true,
+              source: Constants.tissuePieceTypes,
+              sortSource: Utils.sorting.standardSort('name'),
+              getItemLabel: Utils.array.getName,
+              getItemValue: Utils.array.getId
+            }, {
               title: 'Slides Consumed',
               data: 'slidesConsumed',
               type: 'int',

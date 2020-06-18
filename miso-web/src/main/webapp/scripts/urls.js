@@ -796,6 +796,18 @@ Urls = (function() {
     update: idUrlFunction(serviceRecordRestBase)
   };
 
+  // SOPs
+  var sopUiBase = baseUrl + '/sop';
+  ui.sops = {
+    bulkEdit: sopUiBase + '/bulk/edit'
+  };
+
+  var sopRestBase = restBase + '/sops';
+  rest.sops = {
+    bulkSave: sopRestBase + '/bulk',
+    categoryDatatable: idUrlFunction(sopRestBase + '/dt/category')
+  };
+
   // Stains
   var stainUiBase = baseUrl + '/stain';
   ui.stains = {

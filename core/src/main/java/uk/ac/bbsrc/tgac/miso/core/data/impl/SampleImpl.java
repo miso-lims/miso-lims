@@ -174,6 +174,10 @@ public class SampleImpl extends AbstractBoxable implements Sample {
   @JoinColumn(name = "sequencingControlTypeId")
   private SequencingControlType sequencingControlType;
 
+  @ManyToOne
+  @JoinColumn(name = "sopId")
+  private Sop sop;
+
   @Transient
   private TransferSample creationReceiptInfo;
 
@@ -448,6 +452,7 @@ public class SampleImpl extends AbstractBoxable implements Sample {
         .append(scientificName)
         .append(taxonIdentifier)
         .append(sequencingControlType)
+        .append(sop)
         .toHashCode();
   }
 
@@ -471,6 +476,7 @@ public class SampleImpl extends AbstractBoxable implements Sample {
         .append(scientificName, other.scientificName)
         .append(taxonIdentifier, other.taxonIdentifier)
         .append(sequencingControlType, other.sequencingControlType)
+        .append(sop, other.sop)
         .isEquals();
   }
 
@@ -638,6 +644,16 @@ public class SampleImpl extends AbstractBoxable implements Sample {
   @Override
   public void setCreationReceiptInfo(TransferSample creationReceiptInfo) {
     this.creationReceiptInfo = creationReceiptInfo;
+  }
+
+  @Override
+  public Sop getSop() {
+    return sop;
+  }
+
+  @Override
+  public void setSop(Sop sop) {
+    this.sop = sop;
   }
 
 }

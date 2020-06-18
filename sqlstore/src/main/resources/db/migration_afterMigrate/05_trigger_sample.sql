@@ -66,7 +66,8 @@ FOR EACH ROW
     makeChangeMessage('target cell recovery', decimalToString(OLD.targetCellRecovery), decimalToString(NEW.targetCellRecovery)),
     makeChangeMessage('cell viability', decimalToString(OLD.cellViability), decimalToString(NEW.cellViability)),
     makeChangeMessage('loading cell concentration', decimalToString(OLD.loadingCellConcentration), decimalToString(NEW.loadingCellConcentration)),
-    makeChangeMessage('input into library', decimalToString(OLD.inputIntoLibrary), decimalToString(NEW.inputIntoLibrary))
+    makeChangeMessage('input into library', decimalToString(OLD.inputIntoLibrary), decimalToString(NEW.inputIntoLibrary)),
+    makeChangeMessage('SOP', (SELECT CONCAT(alias, ' (', version, ')') FROM Sop WHERE sopId = OLD.sopId), (SELECT CONCAT(alias, ' (', version, ')') FROM Sop WHERE sopId = NEW.sopId))
   );
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime) VALUES (
@@ -131,7 +132,8 @@ FOR EACH ROW
         makeChangeColumn('targetCellRecovery', OLD.targetCellRecovery, NEW.targetCellRecovery),
         makeChangeColumn('cellViability', OLD.cellViability, NEW.cellViability),
         makeChangeColumn('loadingCellConcentration', OLD.loadingCellConcentration, NEW.loadingCellConcentration),
-        makeChangeColumn('inputIntoLibrary', OLD.inputIntoLibrary, NEW.inputIntoLibrary)
+        makeChangeColumn('inputIntoLibrary', OLD.inputIntoLibrary, NEW.inputIntoLibrary),
+        makeChangeColumn('sopId', OLD.sopId, NEW.sopId)
   ), ''),
       NEW.lastModifier,
       log_message,
