@@ -80,6 +80,9 @@
       </a>
       <div id="actionsmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
         <a onclick="Box.ui.exportBox(${box.id});" href="javascript:void(0);" class="add">Export Box to Excel</a>
+        <c:if test="${fragmentAnalyserCompatible}">
+          <a onclick="Box.ui.exportFragmentAnalyser(${box.id});" href="javascript:void(0);">Export Fragment Analyser Sheet</a>
+        </c:if>
         <a onclick="Box.ui.discardAllContents(${box.id});" href="javascript:void(0);" class="add">Discard All Contents</a>
         <c:if test="${(scannerEnabled) && (box.size.scannable)}">
           <c:forEach items="${scannerNames}" var="scannerName">

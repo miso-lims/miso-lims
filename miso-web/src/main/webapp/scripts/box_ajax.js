@@ -517,7 +517,19 @@ Box.ui = {
       // REST endpoint will return a JSON object with the spreadsheet filename's hashCode inside
       // Send the hashCode to the DownloadController to download the spreadsheet
       Utils.page.pageRedirect(Urls.download.boxSpreadsheet(json.hashCode));
-    })
+    });
+  },
+  
+  exportFragmentAnalyser:  function(boxId) {
+    if (Box.boxJSON.items.some(function(item) {
+      return item.coordinates === 'H12';
+    })) {
+      Utils.showConfirmDialog('Warning', 'OK', ['The item in position H12 will not be included in the sheet because Fragment Analyser requires H12 for ladder. Generate sheet anyway?'], function() {
+        Utils.ajaxDownloadWithDialog(Urls.rest.boxes.fragmentAnalyserSheet(boxId));
+      })
+    } else {
+      Utils.ajaxDownloadWithDialog(Urls.rest.boxes.fragmentAnalyserSheet(boxId));
+    }
   },
 
   getItemAtPosition: function(coordinates) {

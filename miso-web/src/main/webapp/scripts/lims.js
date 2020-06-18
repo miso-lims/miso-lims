@@ -643,7 +643,7 @@ var Utils = Utils
           }
         });
         var request = new XMLHttpRequest(); // xhr because jQuery.ajax doesn't support blob response
-        request.open('POST', url);
+        request.open(data ? 'POST' : 'GET', url);
         request.responseType = 'blob';
         request.setRequestHeader('Content-Type', 'application/json; charset=utf8');
         request.onreadystatechange = function() {
@@ -657,7 +657,11 @@ var Utils = Utils
             }
           }
         }
-        request.send(JSON.stringify(data));
+        if (data) {
+          request.send(JSON.stringify(data));
+        } else {
+          request.send();
+        }
       },
       printSelectDialog: function(callback) {
         Utils.ajaxWithDialog('Getting Printers', 'GET', window.location.origin + '/miso/rest/printers', null, function(printers) {

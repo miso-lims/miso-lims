@@ -106,6 +106,9 @@ public class EditBoxController {
   public ModelAndView setupForm(@PathVariable Long boxId, ModelMap model) throws IOException {
     Box box = boxService.get(boxId);
     if (box == null) throw new NotFoundException("No box found for ID " + boxId.toString());
+    if (box.getSize().getRows() == 8 && box.getSize().getColumns() == 12) {
+      model.put("fragmentAnalyserCompatible", true);
+    }
     model.put("title", "Box " + box.getId());
     model.put(MODEL_ATTR_PAGEMODE, "edit");
     return setupForm(box, model);
