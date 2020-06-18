@@ -124,7 +124,6 @@ BulkUtils = (function($) {
   var INTEGER_REGEXP = new RegExp('^-?\\d+$');
 
   var caches = {};
-  var commentLocations = [];
   var tableSaved = false;
 
   var formatters = {
@@ -684,7 +683,6 @@ BulkUtils = (function($) {
       data: tableData,
       maxRows: data.length,
       renderAllRows: true,
-      comments: true,
       cells: function(row, col, prop) {
         // Note: this is to permanently disable the table. To undo, we'd have to track which cells should
         // remain read-only as this function overrides future changes too
@@ -1094,7 +1092,7 @@ BulkUtils = (function($) {
   function extendApi(api, hot, columns) {
     // Note: make sure to mirror capabilities here in processOnChangeListeners' tempApi
     api.showError = function(message) {
-      showError(message, hot);
+      showError(message);
     };
 
     api.getRowCount = function() {
@@ -1543,7 +1541,7 @@ BulkUtils = (function($) {
     $(SAVE).click(
         function() {
           showLoading(true, false);
-          clearMessages(hot);
+          clearMessages();
           hot.validateCells(function(valid) {
             if (!valid) {
               showError('Please fix highlighted cells. See the Quick Help section '
@@ -1616,7 +1614,7 @@ BulkUtils = (function($) {
   }
 
   function rebuildTable(hot, target, config, data) {
-    clearMessages(hot);
+    clearMessages();
     $(ACTION_BAR).empty();
     $(SAVE).off('click');
     hot.destroy();
@@ -1637,8 +1635,8 @@ BulkUtils = (function($) {
     }
   }
 
-  function showSuccess(message, hot) {
-    clearMessages(hot);
+  function showSuccess(message) {
+    clearMessages();
     $(SUCCESS_MESSAGE).text(message);
     $(SUCCESS_CONTAINER).removeClass('hidden');
   }
@@ -1657,15 +1655,14 @@ BulkUtils = (function($) {
     }
   }
 
-  function showError(message, hot) {
-    clearMessages(hot);
+  function showError(message) {
+    clearMessages();
     $(ERRORS_BOX).append($('<p>').text(message));
     $(ERRORS_CONTAINER).removeClass('hidden');
   }
 
   function showValidationErrors(message, errors, hot, columns) {
-    clearMessages(hot);
-    var comments = hot.getPlugin('comments');
+    clearMessages();
     $(ERRORS_BOX).append($('<p>').text(message));
     var list = $('<ul>');
     errors.forEach(function(error) {
@@ -1679,11 +1676,7 @@ BulkUtils = (function($) {
           });
         }
         if (colIndex !== -1) {
-          comments.setCommentAtCell(error.row, colIndex, field.errors.join('\n'));
-          commentLocations.push({
-            row: error.row,
-            col: colIndex
-          });
+          hot.setCellMeta(error.row, colIndex, 'valid', false);
           field.errors.forEach(function(error) {
             sublist.append($('<li>').text(columns[colIndex].title + ': ' + error));
           });
@@ -1695,18 +1688,12 @@ BulkUtils = (function($) {
         list.append(sublist);
       });
     });
+    hot.render();
     $(ERRORS_BOX).append(list)
     $(ERRORS_CONTAINER).removeClass('hidden');
   }
 
-  function clearMessages(hot) {
-    if (hot) {
-      var comments = hot.getPlugin('comments');
-      commentLocations.forEach(function(location) {
-        comments.removeCommentAtCell(location.row, location.col);
-      });
-      commentLocations = [];
-    }
+  function clearMessages() {
     $(SUCCESS_CONTAINER).addClass('hidden');
     $(ERRORS_CONTAINER).addClass('hidden');
     $(SUCCESS_MESSAGE).empty();
