@@ -1,1 +1,0 @@
-ALTER TABLE LibraryAliquot ADD COLUMN qcPassed BOOLEAN;

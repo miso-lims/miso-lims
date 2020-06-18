@@ -2,6 +2,12 @@
 
 Changes:
 
+
+
+# 1.7.0
+
+Changes:
+
   * Added QC Passed field to library aliquots
   * Added sample, library, and run SOPs
   * Added Tissue Piece Type field to Edit Sample page (detailed sample)
