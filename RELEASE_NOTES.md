@@ -2,6 +2,12 @@
 
 Changes:
 
+
+
+# 1.7.1
+
+Changes:
+
   * Fixed error saving runs with metrics
 
 # 1.7.0
