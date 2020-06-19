@@ -2,7 +2,7 @@
 
 Changes:
 
-
+  * Fixed error saving runs with metrics
 
 # 1.7.0
 
@@ -41,6 +41,10 @@ Upgrade Notes:
   * The following supporting JARs are not needed and can be removed from ${CATALINA_HOME}/lib
     * mysql-connector-java-5.1.10.jar
     * jndi-file-factory-1.0.jar
+
+Known Issues:
+
+  * Error saving runs with metrics
 
 # 1.6.0
 

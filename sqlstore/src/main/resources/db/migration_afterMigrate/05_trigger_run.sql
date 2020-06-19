@@ -30,7 +30,7 @@ FOR EACH ROW
         makeChangeColumn('description', OLD.description, NEW.description),
         makeChangeColumn('filePath', OLD.filePath, NEW.filePath),
         makeChangeColumn('health', OLD.health, NEW.health),
-        makeChangeColumn('metrics', OLD.metrics, NEW.metrics),
+        CASE WHEN (NEW.metrics IS NULL) <> (OLD.metrics IS NULL) OR NEW.metrics <> OLD.metrics THEN 'metrics' END,
         makeChangeColumn('startDate', OLD.startDate, NEW.startDate),
         makeChangeColumn('sequencingParameters_parametersId', OLD.sequencingParameters_parametersId, NEW.sequencingParameters_parametersId),
         makeChangeColumn('instrumentId', OLD.instrumentId, NEW.instrumentId),
