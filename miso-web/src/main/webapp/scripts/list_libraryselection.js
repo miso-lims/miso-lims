@@ -19,7 +19,7 @@ ListTarget.libraryselection = {
     return actions;
   },
   createStaticActions: function(config, projectId) {
-    return config.isAdmin ? [ListUtils.createStaticAddAction('Library Selection Types', 'libraryselection')] : [];
+    return config.isAdmin ? [ListUtils.createStaticAddAction('Library Selection Types', Urls.ui.librarySelections.bulkCreate, true)] : [];
   },
   createColumns: function(config, projectId) {
     return [{

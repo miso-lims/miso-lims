@@ -19,7 +19,7 @@ ListTarget.librarystrategy = {
     return actions;
   },
   createStaticActions: function(config, projectId) {
-    return config.isAdmin ? [ListUtils.createStaticAddAction('Library Strategy Types', 'librarystrategy')] : [];
+    return config.isAdmin ? [ListUtils.createStaticAddAction('Library Strategy Types', Urls.ui.libraryStrategies.bulkCreate, true)] : [];
   },
   createColumns: function(config, projectId) {
     return [{

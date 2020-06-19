@@ -1,11 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.parseIds;
+import static uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils.*;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -209,17 +212,21 @@ public class EditLibraryAliquotController {
     }
   }
 
-  @GetMapping(value = "/bulk/propagate")
-  public ModelAndView propagate(@RequestParam("ids") String libraryIds,
-      @RequestParam(value = "boxId", required = false) Long boxId, ModelMap model) throws IOException {
+  @PostMapping(value = "/bulk/propagate")
+  public ModelAndView propagate(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
+    String libraryIds = getStringInput("ids", form, true);
+    Long boxId = getLongInput("boxId", form, false);
+
     BulkPropagateLibraryBackend bulkPropagateBackend = new BulkPropagateLibraryBackend(
         boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null);
     return bulkPropagateBackend.propagate(libraryIds, model);
   }
 
-  @GetMapping(value = "/bulk/repropagate")
-  public ModelAndView repropagate(@RequestParam("ids") String aliquotIds,
-      @RequestParam(value = "boxId", required = false) Long boxId, ModelMap model) throws IOException {
+  @PostMapping(value = "/bulk/repropagate")
+  public ModelAndView repropagate(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
+    String aliquotIds = getStringInput("ids", form, true);
+    Long boxId = getLongInput("boxId", form, false);
+
     BulkPropagateAliquotBackend bulkPropagateBackend = new BulkPropagateAliquotBackend(
         boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null);
     return bulkPropagateBackend.propagate(aliquotIds, model);
@@ -249,9 +256,10 @@ public class EditLibraryAliquotController {
     }
   };
 
-  @GetMapping(value = "/bulk/edit")
-  public ModelAndView bulkEdit(@RequestParam("ids") String aliquotIds, ModelMap model) throws IOException {
-    return bulkEditBackend.edit(aliquotIds, model);
+  @PostMapping(value = "/bulk/edit")
+  public ModelAndView bulkEdit(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
+    String ids = getStringInput("ids", form, true);
+    return bulkEditBackend.edit(ids, model);
   }
 
   private final class BulkMergeBackend extends BulkMergeTableBackend<PoolDto> {

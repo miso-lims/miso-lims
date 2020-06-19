@@ -52,6 +52,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.Spreadsheet;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.util
@@ -161,6 +162,62 @@ public class MisoWebUtils {
       V dto = toDto.apply(item);
       JsonNode itemNode = mapper.valueToTree(dto);
       array.add(itemNode);
+    }
+  }
+
+  /**
+   * Retrieves a String value from form data
+   * 
+   * @param key
+   * @param formData
+   * @return the value mapped to the provided key if it is set and not empty; otherwise null
+   */
+  public static String getStringInput(String key, Map<String, String> formData, boolean required) {
+    String stringValue = formData.get(key);
+    if (stringValue == null || stringValue.isEmpty()) {
+      if (required) {
+        throw new ClientErrorException(String.format("Missing parameter '%s'", key));
+      }
+      return null;
+    }
+    return stringValue;
+  }
+
+  /**
+   * Validates and retrieves a Long value from form data
+   * 
+   * @param key
+   * @param formData
+   * @param required
+   * @return the value mapped to the provided key if it is set and not empty; otherwise null
+   * @throws ClientErrorException if the value is required and missing or empty, or if the value is set and non-empty, but is not a valid
+   *           Long
+   */
+  public static Long getLongInput(String key, Map<String, String> formData, boolean required) {
+    String stringValue = getStringInput(key, formData, required);
+    try {
+      return stringValue == null ? null : new Long(stringValue);
+    } catch (NumberFormatException e) {
+      throw new ClientErrorException(String.format("Invalid value for parameter '%s'", key), e);
+    }
+  }
+
+  /**
+   * Validates and retrieves an Integer value from form data
+   * 
+   * @param key
+   * @param formData
+   * @param required
+   * @return the value mapped to the provided key if it is set and not empty; otherwise null
+   * @throws ClientErrorException if the value is required and missing or empty, or if the value is set and non-empty, but is not a valid
+   *           Integer
+   */
+  public static Integer getIntegerInput(String key, Map<String, String> formData, boolean required) {
+    String stringValue = getStringInput(key, formData, required);
+    try {
+      return stringValue == null ? null : new Integer(stringValue);
+    } catch (NumberFormatException e) {
+      throw new ClientErrorException(String.format("Invalid value for parameter '%s'", key), e);
     }
   }
 

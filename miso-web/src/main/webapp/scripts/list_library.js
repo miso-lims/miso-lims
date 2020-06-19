@@ -81,7 +81,7 @@ ListTarget.library = {
             getLabel: Utils.array.getAlias
           });
         }
-        HotUtils.showDialogForBoxCreation('Receive Libraries', 'Receive', fields, Urls.ui.libraries.bulkReceive, function(result) {
+        BulkUtils.showDialogForBoxCreation('Receive Libraries', 'Receive', fields, Urls.ui.libraries.bulkReceive, function(result) {
           if (result.quantity < 1) {
             Utils.showOkDialog('Receive Libraries', ["That's a peculiar number of libraries to receive."]);
             return;

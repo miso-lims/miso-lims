@@ -15,7 +15,7 @@ ListTarget.staincategory = {
     return actions;
   },
   createStaticActions: function(config, projectId) {
-    return config.isAdmin ? [ListUtils.createStaticAddAction('Stain Categories', 'staincategory')] : [];
+    return config.isAdmin ? [ListUtils.createStaticAddAction('Stain Categories', Urls.ui.stainCategories.bulkCreate, true)] : [];
   },
   createColumns: function(config, projectId) {
     return [{

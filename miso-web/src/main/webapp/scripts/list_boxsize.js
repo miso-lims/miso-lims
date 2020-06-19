@@ -17,7 +17,7 @@ ListTarget.boxsize = {
     return actions;
   },
   createStaticActions: function(config, projectId) {
-    return config.isAdmin ? [ListUtils.createStaticAddAction('Box Sizes', 'boxsize')] : [];
+    return config.isAdmin ? [ListUtils.createStaticAddAction('Box Sizes', Urls.ui.boxSizes.bulkCreate, true)] : [];
   },
   createColumns: function(config, projectId) {
     return [{

@@ -703,7 +703,7 @@ ListUtils = (function($) {
       label: 'Create New Box',
       value: false
     },
-    createStaticAddAction: function(pluralType, urlFragment) {
+    createStaticAddAction: function(pluralType, url, useGet) {
       return {
         name: 'Add',
         handler: function() {
@@ -719,9 +719,14 @@ ListUtils = (function($) {
               Utils.showOkDialog('Create ' + pluralType, ["Quantity must be 1 or more."]);
               return;
             }
-            window.location = '/miso/' + urlFragment + '/bulk/new?' + jQuery.param({
+            var params = {
               quantity: result.quantity,
-            });
+            };
+            if (useGet) {
+              window.location = url + jQuery.param(params);
+            } else {
+              Utils.page.post(url, params);
+            }
           });
         }
       }

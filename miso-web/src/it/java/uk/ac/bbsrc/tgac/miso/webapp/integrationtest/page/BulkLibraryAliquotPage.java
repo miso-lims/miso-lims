@@ -10,6 +10,7 @@ import org.openqa.selenium.WebElement;
 
 import com.google.common.base.Joiner;
 
+import uk.ac.bbsrc.tgac.miso.core.util.MapBuilder;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 
 public class BulkLibraryAliquotPage extends BulkPage {
@@ -68,22 +69,22 @@ public class BulkLibraryAliquotPage extends BulkPage {
 
   public static BulkLibraryAliquotPage getForEdit(WebDriver driver, String baseUrl, Collection<Long> aliquotIds) {
     String ids = Joiner.on(',').join(aliquotIds);
-    String url = baseUrl + "miso/libraryaliquot/bulk/edit?ids=" + ids;
-    driver.get(url);
+    String url = baseUrl + "miso/libraryaliquot/bulk/edit";
+    postData(driver, url, new MapBuilder<String, String>().put("ids", ids).build());
     return new BulkLibraryAliquotPage(driver);
   }
 
   public static BulkLibraryAliquotPage getForPropagate(WebDriver driver, String baseUrl, Collection<Long> libraryIds) {
     String ids = Joiner.on(',').join(libraryIds);
-    String url = baseUrl + "miso/libraryaliquot/bulk/propagate?ids=" + ids;
-    driver.get(url);
+    String url = baseUrl + "miso/libraryaliquot/bulk/propagate";
+    postData(driver, url, new MapBuilder<String, String>().put("ids", ids).build());
     return new BulkLibraryAliquotPage(driver);
   }
 
   public static BulkLibraryAliquotPage getForRepropagate(WebDriver driver, String baseUrl, Collection<Long> aliquotIds) {
     String ids = Joiner.on(',').join(aliquotIds);
-    String url = baseUrl + "miso/libraryaliquot/bulk/repropagate?ids=" + ids;
-    driver.get(url);
+    String url = baseUrl + "miso/libraryaliquot/bulk/repropagate";
+    postData(driver, url, new MapBuilder<String, String>().put("ids", ids).build());
     return new BulkLibraryAliquotPage(driver);
   }
 

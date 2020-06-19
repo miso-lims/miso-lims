@@ -89,7 +89,7 @@ ListTarget.sample = {
             getLabel: Utils.array.getAlias
           });
         }
-        HotUtils.showDialogForBoxCreation('Create Samples', 'Create', fields, Urls.ui.samples.bulkCreate, function(result) {
+        BulkUtils.showDialogForBoxCreation('Create Samples', 'Create', fields, Urls.ui.samples.bulkCreate, function(result) {
           if (result.quantity < 1) {
             Utils.showOkDialog('Create Samples', ["That's a peculiar number of samples to create."]);
             return;

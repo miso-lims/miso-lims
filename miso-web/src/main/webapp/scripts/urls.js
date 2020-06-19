@@ -37,6 +37,7 @@ Urls = (function() {
   // Array Models
   var arrayModelUiBase = baseUrl + '/arraymodel';
   ui.arrayModels = {
+    bulkCreate: arrayModelUiBase + '/bulk/new',
     bulkEdit: arrayModelUiBase + '/bulk/edit'
   };
 
@@ -122,6 +123,7 @@ Urls = (function() {
   // Box Sizes
   var boxSizeUiBase = baseUrl + '/boxsize';
   ui.boxSizes = {
+    bulkCreate: boxSizeUiBase + '/bulk/new',
     bulkEdit: boxSizeUiBase + '/bulk/edit'
   };
 
@@ -134,6 +136,7 @@ Urls = (function() {
   // Box Uses
   var boxUseUiBase = baseUrl + '/boxuses';
   ui.boxUses = {
+    bulkCreate: boxUseUiBase + '/bulk/new',
     bulkEdit: boxUseUiBase + '/bulk/edit'
   };
 
@@ -164,6 +167,7 @@ Urls = (function() {
   // Container Models
   var containerModelUiBase = baseUrl + '/containermodel';
   ui.containerModels = {
+    bulkCreate: containerModelUiBase + '/bulk/new',
     bulkEdit: containerModelUiBase + '/bulk/edit'
   };
 
@@ -183,6 +187,7 @@ Urls = (function() {
   // Detailed QC Statuses
   var detailedQcStatusUiBase = baseUrl + '/detailedqcstatus';
   ui.detailedQcStatuses = {
+    bulkCreate: detailedQcStatusUiBase + '/bulk/new',
     bulkEdit: detailedQcStatusUiBase + '/bulk/edit'
   };
 
@@ -410,6 +415,7 @@ Urls = (function() {
   // Library Designs
   var libraryDesignUiBase = baseUrl + '/librarydesign';
   ui.libraryDesigns = {
+    bulkCreate: libraryDesignUiBase + '/bulk/new',
     bulkEdit: libraryDesignUiBase + '/bulk/edit'
   };
 
@@ -422,6 +428,7 @@ Urls = (function() {
   // Library Design Codes
   var libraryDesignCodeUiBase = baseUrl + '/librarydesigncode';
   ui.libraryDesignCodes = {
+    bulkCreate: libraryDesignCodeUiBase + '/bulk/new',
     bulkEdit: libraryDesignCodeUiBase + '/bulk/edit'
   };
   var libraryDesignCodeRestBase = restBase + '/librarydesigncodes';
@@ -433,6 +440,7 @@ Urls = (function() {
   // Library Selections
   var librarySelectionUiBase = baseUrl + '/libraryselection';
   ui.librarySelections = {
+    bulkCreate: librarySelectionUiBase + '/bulk/new',
     bulkEdit: librarySelectionUiBase + '/bulk/edit'
   };
 
@@ -445,6 +453,7 @@ Urls = (function() {
   // Library Spike-Ins
   var librarySpikeInUiBase = baseUrl + '/libraryspikein';
   ui.librarySpikeIns = {
+    bulkCreate: librarySpikeInUiBase + '/bulk/new',
     bulkEdit: librarySpikeInUiBase + '/bulk/edit'
   };
 
@@ -457,6 +466,7 @@ Urls = (function() {
   // Library Strategies
   var libraryStrategyUiBase = baseUrl + '/librarystrategy';
   ui.libraryStrategies = {
+    bulkCreate: libraryStrategyUiBase + '/bulk/new',
     bulkEdit: libraryStrategyUiBase + '/bulk/edit'
   };
 
@@ -491,6 +501,7 @@ Urls = (function() {
   // Library Types
   var libraryTypeUiBase = baseUrl + '/librarytype';
   ui.libraryTypes = {
+    bulkCreate: libraryTypeUiBase + '/bulk/new',
     bulkEdit: libraryTypeUiBase + '/bulk/edit'
   };
 
@@ -509,6 +520,7 @@ Urls = (function() {
   // Partition QC Types
   var partitionQcTypeUiBase = baseUrl + '/partitionqctype';
   ui.partitionQcTypes = {
+    bulkCreate: partitionQcTypeUiBase + '/bulk/new',
     bulkEdit: partitionQcTypeUiBase + '/bulk/edit'
   };
 
@@ -621,6 +633,7 @@ Urls = (function() {
   // Reference Genomes
   var referenceGenomeUiBase = baseUrl + '/referencegenome';
   ui.referenceGenomes = {
+    bulkCreate: referenceGenomeUiBase + '/bulk/new',
     bulkEdit: referenceGenomeUiBase + '/bulk/edit'
   };
 
@@ -654,9 +667,10 @@ Urls = (function() {
   };
 
   // Run Purposes
-  var runPurposeBase = baseUrl + '/runpurpose';
+  var runPurposeUiBase = baseUrl + '/runpurpose';
   ui.runPurposes = {
-    bulkEdit: runPurposeBase + '/bulk/edit'
+    bulkCreate: runPurposeUiBase + '/bulk/new',
+    bulkEdit: runPurposeUiBase + '/bulk/edit'
   };
 
   var runPurposeRestBase = restBase + '/runpurposes';
@@ -719,6 +733,7 @@ Urls = (function() {
   // Sample Types
   var sampleTypeUiBase = baseUrl + '/sampletype';
   ui.sampleTypes = {
+    bulkCreate: sampleTypeUiBase + '/bulk/new',
     bulkEdit: sampleTypeUiBase + '/bulk/edit'
   };
 
@@ -731,6 +746,7 @@ Urls = (function() {
   // Scientific Names
   var scientificNameUiBase = baseUrl + '/scientificname';
   ui.scientificNames = {
+    bulkCreate: scientificNameUiBase + '/bulk/new',
     bulkEdit: scientificNameUiBase + '/bulk/edit'
   };
 
@@ -743,6 +759,7 @@ Urls = (function() {
   // Sequencing Control Types
   var sequencingControlTypeUiBase = baseUrl + '/sequencingcontroltype';
   ui.sequencingControlTypes = {
+    bulkCreate: sequencingControlTypeUiBase + '/bulk/new',
     bulkEdit: sequencingControlTypeUiBase + '/bulk/edit'
   };
 
@@ -775,6 +792,7 @@ Urls = (function() {
   // Sequencing Parameters
   var sequencingParametersUiBase = baseUrl + '/sequencingparameters';
   ui.sequencingParameters = {
+    bulkCreate: sequencingParametersUiBase + '/bulk/new',
     bulkEdit: sequencingParametersUiBase + '/bulk/edit'
   };
 
@@ -799,6 +817,7 @@ Urls = (function() {
   // SOPs
   var sopUiBase = baseUrl + '/sop';
   ui.sops = {
+    bulkCreate: sopUiBase + '/bulk/new',
     bulkEdit: sopUiBase + '/bulk/edit'
   };
 
@@ -811,6 +830,7 @@ Urls = (function() {
   // Stains
   var stainUiBase = baseUrl + '/stain';
   ui.stains = {
+    bulkCreate: stainUiBase + '/bulk/new',
     bulkEdit: stainUiBase + '/bulk/edit'
   };
 
@@ -823,6 +843,7 @@ Urls = (function() {
   // Stain Categories
   var stainCategoryUiBase = baseUrl + '/staincategory';
   ui.stainCategories = {
+    bulkCreate: stainCategoryUiBase + '/bulk/new',
     bulkEdit: stainCategoryUiBase + '/bulk/edit'
   };
 
@@ -880,6 +901,7 @@ Urls = (function() {
   // Study Types
   var studyTypeUiBase = baseUrl + '/studytype';
   ui.studyTypes = {
+    bulkCreate: studyTypeUiBase + '/bulk/new',
     bulkEdit: studyTypeUiBase + '/bulk/edit'
   };
 
@@ -918,6 +940,7 @@ Urls = (function() {
   // Targeted Sequencings
   var targetedSequencingUiBase = baseUrl + '/targetedsequencing';
   ui.targetedSequencings = {
+    bulkCreate: targetedSequencingUiBase + '/bulk/new',
     bulkEdit: targetedSequencingUiBase + '/bulk/edit'
   };
 
@@ -963,12 +986,14 @@ Urls = (function() {
   };
   var tissuePieceTypesUiBase = baseUrl + '/tissuepiecetype';
   ui.tissuePieceTypes = {
+    bulkCreate: tissuePieceTypesUiBase + '/bulk/new',
     bulkEdit: tissuePieceTypesUiBase + '/bulk/edit',
   };
 
   // Tissue Types
   var tissueTypeUiBase = baseUrl + '/tissuetype';
   ui.tissueTypes = {
+    bulkCreate: tissueTypeUiBase + '/bulk/new',
     bulkEdit: tissueTypeUiBase + '/bulk/edit'
   };
 

@@ -19,7 +19,7 @@ ListTarget.studytype = {
     return actions;
   },
   createStaticActions: function(config, projectId) {
-    return config.isAdmin ? [ListUtils.createStaticAddAction('Study Types', 'studytype')] : [];
+    return config.isAdmin ? [ListUtils.createStaticAddAction('Study Types', Urls.ui.studyTypes.bulkCreate, true)] : [];
   },
   createColumns: function(config, projectId) {
     return [{

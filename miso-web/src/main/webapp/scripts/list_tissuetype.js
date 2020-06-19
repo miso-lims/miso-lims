@@ -17,7 +17,7 @@ ListTarget.tissuetype = {
     return actions;
   },
   createStaticActions: function(config, projectId) {
-    return config.isAdmin ? [ListUtils.createStaticAddAction('Tissue Types', 'tissuetype')] : [];
+    return config.isAdmin ? [ListUtils.createStaticAddAction('Tissue Types', Urls.ui.tissueTypes.bulkCreate, true)] : [];
   },
   createColumns: function(config, projectId) {
     return [{
