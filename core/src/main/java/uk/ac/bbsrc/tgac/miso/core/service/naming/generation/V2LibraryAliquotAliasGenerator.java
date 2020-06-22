@@ -23,7 +23,7 @@ public class V2LibraryAliquotAliasGenerator implements NameGenerator<LibraryAliq
   @Override
   public String generate(LibraryAliquot aliquot) throws MisoNamingException, IOException {
     if (!isDetailedLibraryAliquot(aliquot)) {
-      throw new IllegalArgumentException("Can only generate an alias for detailed library aliquots");
+      throw new MisoNamingException("Can only generate an alias for detailed library aliquots");
     }
     Library library = aliquot.getLibrary();
     String partialAlias = library.getAlias() + "-";

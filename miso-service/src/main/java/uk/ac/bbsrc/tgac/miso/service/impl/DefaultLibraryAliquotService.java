@@ -101,16 +101,23 @@ public class DefaultLibraryAliquotService
       // post-save field generation
       boolean needsUpdate = false;
       if (hasTemporaryName(managed)) {
-        managed.setName(namingScheme.generateNameFor(managed));
+        try {
+          managed.setName(namingScheme.generateNameFor(managed));
+        } catch (MisoNamingException e) {
+          throw new ValidationException(new ValidationError("name", e.getMessage()));
+        }
         validateNameOrThrow(managed, namingScheme);
         needsUpdate = true;
       }
       if (hasTemporaryAlias(managed)) {
-        String generatedAlias = namingScheme.generateLibraryAliquotAlias(managed);
-        managed.setAlias(generatedAlias);
+        try {
+          managed.setAlias(namingScheme.generateLibraryAliquotAlias(managed));
+        } catch (MisoNamingException e) {
+          throw new ValidationException(new ValidationError("name", e.getMessage()));
+        }
         if (isDetailedLibraryAliquot(managed)) {
           // generation of non-standard aliases is allowed
-          ((DetailedLibraryAliquot) managed).setNonStandardAlias(!namingScheme.validateLibraryAliquotAlias(generatedAlias).isValid());
+          ((DetailedLibraryAliquot) managed).setNonStandardAlias(!namingScheme.validateLibraryAliquotAlias(managed.getAlias()).isValid());
         } else {
           validateAlias(managed, namingScheme);
         }
@@ -123,8 +130,6 @@ public class DefaultLibraryAliquotService
       }
       if (needsUpdate) libraryAliquotDao.save(managed);
       return managed;
-    } catch (MisoNamingException e) {
-      throw new IllegalArgumentException("Name generator failed to generate valid name");
     } catch (ConstraintViolationException e) {
       // Send the nested root cause message to the user, since it contains the actual error.
       throw new ConstraintViolationException(e.getMessage() + " " + ExceptionUtils.getRootCauseMessage(e), e.getSQLException(),
