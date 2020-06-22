@@ -80,7 +80,7 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements Hiber
   protected void applyChanges(Sop to, Sop from) throws IOException {
     to.setAlias(from.getAlias());
     to.setVersion(from.getVersion());
-    to.setUrl(from.getVersion());
+    to.setUrl(from.getUrl());
     to.setArchived(from.isArchived());
   }
 

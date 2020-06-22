@@ -2,13 +2,17 @@
 
 Changes:
 
-
+  * Fixed URL not saving correctly when editing SOPs
 
 # 1.7.1
 
 Changes:
 
   * Fixed error saving runs with metrics
+
+Known Issues:
+
+  * When editing SOPs, the URL is not saved correctly
 
 # 1.7.0
 
@@ -51,6 +55,7 @@ Upgrade Notes:
 Known Issues:
 
   * Error saving runs with metrics
+  * When editing SOPs, the URL is not saved correctly
 
 # 1.6.0
 
