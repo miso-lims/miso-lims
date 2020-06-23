@@ -14,9 +14,11 @@ HotTarget.boxsize = {
   fixUp: function(boxsize, errorHandler) {
   },
   createColumns: function(config, create, data) {
-    return [HotUtils.makeColumnForInt('Rows', true, 'rows', HotUtils.validator.integer(true, 1)),
+    return [
+        HotUtils.makeColumnForInt('Rows', true, 'rows', HotUtils.validator.integer(true, 1)),
         HotUtils.makeColumnForInt('Columns', true, 'columns', HotUtils.validator.integer(true, 1)),
-        HotUtils.makeColumnForBoolean('Scannable', true, 'scannable', true)];
+        HotUtils.makeColumnForConstantsList('Box Type', true, 'boxType', 'boxType', 'name', 'label', config.boxTypes, true, null, null,
+            null, 'Box'), HotUtils.makeColumnForBoolean('Scannable', true, 'scannable', true)];
   },
 
   getBulkActions: function(config) {

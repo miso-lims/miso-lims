@@ -1036,30 +1036,6 @@ div.flashinfo {
     width: 300px;
 }
 
-.popup {
-    position: absolute;
-    display: none;
-    z-index: 1;
-    border-collapse: collapse;
-    background-color: white;
-    font: 10px Verdana, arial, sans-serif;
-    border: 1px solid lightgray;
-    margin: 5px 5px 5px 0;
-    padding: 5px 5px 5px 0;
-}
-
-ul.popup-bullets {
-    margin: 1em 0;
-}
-
-ul.popup-bullets li {
-    margin-left: -2.5em;
-    margin-bottom: 0.5em;
-    background: url(images/bullet.gif) left no-repeat;
-    padding-left: 1em;
-    list-style: none;
-}
-
 .breadcrumbs {
     background: #ffffff;
     margin-bottom: 20px;
@@ -2046,6 +2022,7 @@ button.disabled {
     top: 0px;
     left: 0px;
     background: rgba(0, 0, 0, 0.75);
+    z-index: 1;
 }
 
 .popup-inner {

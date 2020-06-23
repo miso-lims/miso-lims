@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxSize.BoxType;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
@@ -366,6 +367,11 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
                 Restrictions.ilike("location5.alias", freezer, MatchMode.START)),
             Restrictions.and(Restrictions.eq("location6.locationUnit", LocationUnit.FREEZER),
                 Restrictions.ilike("location6.alias", freezer, MatchMode.START))));
+  }
+
+  @Override
+  public void restrictPaginationByBoxType(Criteria criteria, BoxType boxType, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.eq("size.boxType", boxType));
   }
 
 }

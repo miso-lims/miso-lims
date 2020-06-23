@@ -42,6 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxSize.BoxType;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
@@ -1504,6 +1505,7 @@ public class Dtos {
       dto.setRows(from.getSize().getRows());
       dto.setCols(from.getSize().getColumns());
       dto.setScannable(from.getSize().getScannable());
+      dto.setSizeLabel(from.getSize().getLabel());
     }
     if (includePositions) {
       dto.setItems(from.getBoxPositions().values().stream().map(Dtos::asDto).collect(Collectors.toList()));
@@ -3751,9 +3753,9 @@ public class Dtos {
     setInteger(to::setRows, from.getRows(), true);
     setInteger(to::setColumns, from.getColumns(), true);
     setBoolean(to::setScannable, from.getScannable(), false);
+    setString(to::setBoxType, maybeGetProperty(from.getBoxType(), BoxType::name));
     if (from.isSaved()) {
-      to.setRowsByColumns(from.getRowsByColumns());
-      to.setRowsByColumnsWithScan(from.getRowsByColumnsWithScan());
+      to.setLabel(from.getLabel());
     }
     return to;
   }
@@ -3764,6 +3766,7 @@ public class Dtos {
     setInteger(to::setRows, from.getRows(), true);
     setInteger(to::setColumns, from.getColumns(), true);
     setBoolean(to::setScannable, from.isScannable(), false);
+    setObject(to::setBoxType, from.getBoxType(), BoxType::valueOf);
     return to;
   }
 
