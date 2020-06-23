@@ -15,7 +15,7 @@ ListTarget.arraymodel = {
     return actions;
   },
   createStaticActions: function(config, projectId) {
-    return config.isAdmin ? [ListUtils.createStaticAddAction('Array Models', Urls.ui.arraymodels.bulkCreate, true)] : [];
+    return config.isAdmin ? [ListUtils.createStaticAddAction('Array Models', Urls.ui.arrayModels.bulkCreate, true)] : [];
   },
   createColumns: function(config, projectId) {
     return [{

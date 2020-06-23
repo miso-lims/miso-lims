@@ -723,7 +723,7 @@ ListUtils = (function($) {
               quantity: result.quantity,
             };
             if (useGet) {
-              window.location = url + jQuery.param(params);
+              window.location = url + '?' + jQuery.param(params);
             } else {
               Utils.page.post(url, params);
             }
