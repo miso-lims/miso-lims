@@ -1102,8 +1102,8 @@ BulkUtils = (function($) {
     var columnCount = rows[0].length;
     for (var cols_i = 0; cols_i < columnCount; cols_i++) {
       var secondNumbers = [];
-      var value1 = rows[0][cols_i];
-      var value2 = rows[1][cols_i];
+      var value1 = '' + rows[0][cols_i];
+      var value2 = '' + rows[1][cols_i];
       var numbersInCell1 = value1.match(/\d+/g);
       var numbersInCell2 = value2.match(/\d+/g);
       if (!numbersInCell1 || !numbersInCell2 || numbersInCell1.length !== numbersInCell2.length) {
