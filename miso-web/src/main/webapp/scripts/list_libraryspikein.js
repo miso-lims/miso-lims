@@ -15,7 +15,7 @@ ListTarget.libraryspikein = {
     return actions;
   },
   createStaticActions: function(config, projectId) {
-    return config.isAdmin ? [ListUtils.createStaticAddAction('Library Spike-Ins', 'libraryspikein')] : [];
+    return config.isAdmin ? [ListUtils.createStaticAddAction('Library Spike-Ins', Urls.ui.librarySpikeIns.bulkCreate, true)] : [];
   },
   createColumns: function(config, projectId) {
     return [{

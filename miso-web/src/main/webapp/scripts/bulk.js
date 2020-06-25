@@ -693,11 +693,32 @@ BulkUtils = (function($) {
         return {
           name: 'Edit',
           action: function(items) {
-            window.location = url + '?' + $.param({
+            Utils.page.post(url, {
               ids: items.map(Utils.array.getId).join(',')
             });
           }
         };
+      },
+
+      showDialogForBoxCreation: function(title, okButton, fields, pageURL, generateParams, getItemCount) {
+        fields.push(ListUtils.createBoxField);
+        Utils.showDialog(title, okButton, fields, function(result) {
+          var params = generateParams(result);
+          if (params == null) {
+            return;
+          }
+          var loadPage = function() {
+            Utils.page.post(pageURL, params);
+          }
+          if (result.createBox) {
+            Utils.createBoxDialog(result, getItemCount, function(newBox) {
+              params.boxId = newBox.id;
+              loadPage();
+            });
+          } else {
+            loadPage();
+          }
+        });
       }
     }
 

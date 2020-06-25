@@ -15,7 +15,7 @@ ListTarget.referencegenome = {
     return actions;
   },
   createStaticActions: function(config, projectId) {
-    return config.isAdmin ? [ListUtils.createStaticAddAction('Reference Genomes', 'referencegenome')] : [];
+    return config.isAdmin ? [ListUtils.createStaticAddAction('Reference Genomes', Urls.ui.referenceGenomes.bulkCreate, true)] : [];
   },
   createColumns: function(config, projectId) {
     return [{

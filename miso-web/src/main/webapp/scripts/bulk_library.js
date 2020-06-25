@@ -29,39 +29,23 @@ BulkTarget.library = (function($) {
       return BulkUtils.actions.boxable();
     },
     getBulkActions: function(config) {
-      return [{
-        name: 'Edit',
-        action: function(items) {
-          window.location = Urls.ui.libraries.bulkEdit + '?' + jQuery.param({
-            ids: items.map(Utils.array.getId).join(',')
-          });
-        }
-      }, {
-        name: 'Make aliquots',
-        action: function(items) {
-          HotUtils.warnIfConsentRevoked(items, function() {
-            var fields = [ListUtils.createBoxField];
-            Utils.showDialog('Make Aliquots', 'Create', fields, function(result) {
-              var params = {
-                ids: items.map(Utils.array.getId).join(',')
-              }
-              var loadPage = function() {
-                window.location = Urls.ui.libraryAliquots.bulkPropagate + '?' + jQuery.param(params);
-              }
-              if (result.createBox) {
-                Utils.createBoxDialog(result, function(result) {
-                  return items.length;
-                }, function(newBox) {
-                  params['boxId'] = newBox.id;
-                  loadPage();
-                });
-              } else {
-                loadPage();
-              }
-            });
-          });
-        }
-      }, HotUtils.printAction('library'),
+      return [
+          BulkUtils.actions.edit(Urls.ui.libraries.bulkEdit),
+          {
+            name: 'Make aliquots',
+            action: function(items) {
+              HotUtils.warnIfConsentRevoked(items, function() {
+                BulkUtils.actions.showDialogForBoxCreation('Make Aliquots', 'Create', [], Urls.ui.libraryAliquots.bulkRepropagate,
+                    function(result) {
+                      return {
+                        ids: items.map(Utils.array.getId).join(',')
+                      };
+                    }, function(result) {
+                      return items.length;
+                    });
+              });
+            }
+          }, HotUtils.printAction('library'),
           HotUtils.spreadsheetAction(Urls.rest.libraries.spreadsheet, Constants.librarySpreadsheets, function(libraries, spreadsheet) {
             var errors = [];
             return errors;

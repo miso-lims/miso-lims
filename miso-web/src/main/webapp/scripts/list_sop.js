@@ -15,7 +15,7 @@ ListTarget.sop = {
     return actions;
   },
   createStaticActions: function(config, projectId) {
-    return config.isAdmin ? [ListUtils.createStaticAddAction('SOPs', 'sop')] : [];
+    return config.isAdmin ? [ListUtils.createStaticAddAction('SOPs', Urls.ui.sops.bulkCreate)] : [];
   },
   createColumns: function(config, projectId) {
     return [{

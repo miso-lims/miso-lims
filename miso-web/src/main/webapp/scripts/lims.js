@@ -1111,6 +1111,20 @@ Utils.page = {
 
   pageRedirect: function(url) {
     window.location = url;
+  },
+
+  post: function(url, params) {
+    var form = jQuery('<form>').attr('action', url).attr('method', 'POST').css('display', 'none');
+    Object.keys(params).forEach(function(key) {
+      form.append(jQuery('<input>').attr({
+        type: 'hidden',
+        id: key,
+        name: key,
+        value: params[key]
+      }));
+    });
+    form.appendTo(document.body);
+    form.submit();
   }
 };
 

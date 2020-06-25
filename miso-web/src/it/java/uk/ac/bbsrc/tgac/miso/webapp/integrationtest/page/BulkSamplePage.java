@@ -11,6 +11,7 @@ import org.openqa.selenium.WebDriver;
 
 import com.google.common.base.Joiner;
 
+import uk.ac.bbsrc.tgac.miso.core.util.MapBuilder;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 
 public class BulkSamplePage extends BulkPage {
@@ -95,10 +96,6 @@ public class BulkSamplePage extends BulkPage {
     }
   };
 
-  private static final String CREATE_URL_FORMAT = "%smiso/sample/bulk/new?quantity=%d&projectId=%s&sampleClassId=%s";
-  private static final String EDIT_URL_FORMAT = "%smiso/sample/bulk/edit?ids=%s";
-  private static final String PROPAGATE_URL_FORMAT = "%smiso/sample/bulk/propagate?parentIds=%s&replicates=%s&sampleClassId=%s";
-
   private HandsOnTable table;
 
   public BulkSamplePage(WebDriver driver) {
@@ -113,16 +110,23 @@ public class BulkSamplePage extends BulkPage {
   }
 
   public static BulkSamplePage getForCreate(WebDriver driver, String baseUrl, Integer quantity, Long projectId, Long sampleClassId) {
-    String url = String.format(CREATE_URL_FORMAT, baseUrl, quantity, (projectId == null ? "" : projectId.toString()),
-        (sampleClassId == null ? "" : sampleClassId.toString()));
-    driver.get(url);
+    String url = baseUrl + "miso/sample/bulk/new";
+    MapBuilder<String, String> params = new MapBuilder<String, String>()
+        .put("quantity", quantity.toString());
+    if (projectId != null) {
+      params.put("projectId", projectId.toString());
+    }
+    if (sampleClassId != null) {
+      params.put("sampleClassId", sampleClassId.toString());
+    }
+    postData(driver, url, params.build());
     return new BulkSamplePage(driver);
   }
 
   public static BulkSamplePage getForEdit(WebDriver driver, String baseUrl, Collection<Long> sampleIds) {
     String ids = Joiner.on(',').join(sampleIds);
-    String url = String.format(EDIT_URL_FORMAT, baseUrl, ids);
-    driver.get(url);
+    String url = baseUrl + "miso/sample/bulk/edit";
+    postData(driver, url, new MapBuilder<String, String>().put("ids", ids).build());
     return new BulkSamplePage(driver);
   }
 
@@ -130,9 +134,14 @@ public class BulkSamplePage extends BulkPage {
       Long sampleClassId) {
     String ids = Joiner.on(',').join(parentIds);
     String replicatesString = Joiner.on(',').join(replicates);
-    String url = String.format(PROPAGATE_URL_FORMAT, baseUrl, ids, replicatesString,
-        (sampleClassId == null ? "" : sampleClassId.toString()));
-    driver.get(url);
+    String url = baseUrl + "miso/sample/bulk/propagate";
+    MapBuilder<String, String> params = new MapBuilder<String, String>()
+        .put("parentIds", ids)
+        .put("replicates", replicatesString);
+    if (sampleClassId != null) {
+      params.put("sampleClassId", sampleClassId.toString());
+    }
+    postData(driver, url, params.build());
     return new BulkSamplePage(driver);
   }
 

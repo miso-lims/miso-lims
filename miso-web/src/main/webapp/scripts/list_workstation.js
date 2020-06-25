@@ -12,7 +12,7 @@ ListTarget.workstation = {
     return actions;
   },
   createStaticActions: function(config, projectId) {
-    return config.isAdmin ? [ListUtils.createStaticAddAction('Workstations', 'workstation')] : [];
+    return config.isAdmin ? [ListUtils.createStaticAddAction('Workstations', Urls.ui.workstations.bulkCreate, true)] : [];
   },
   createColumns: function(config, projectId) {
     return [{

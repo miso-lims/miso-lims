@@ -19,7 +19,7 @@ ListTarget.sampletype = {
     return actions;
   },
   createStaticActions: function(config, projectId) {
-    return config.isAdmin ? [ListUtils.createStaticAddAction('Sample Types', 'sampletype')] : [];
+    return config.isAdmin ? [ListUtils.createStaticAddAction('Sample Types', Urls.ui.sampleTypes.bulkCreate, true)] : [];
   },
   createColumns: function(config, projectId) {
     return [{

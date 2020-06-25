@@ -1,10 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
+import static uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils.*;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
@@ -52,6 +55,11 @@ public abstract class AbstractTypeDataController<T extends Identifiable, R> {
     return bulkCreate(quantity, model, null);
   }
 
+  protected final ModelAndView bulkCreate(Map<String, String> formData, ModelMap model) throws IOException {
+    Integer quantity = getIntegerInput("quantity", formData, true);
+    return bulkCreate(quantity, model, null);
+  }
+
   protected final ModelAndView bulkCreate(Integer quantity, ModelMap model, BiConsumer<ObjectNode, ObjectMapper> configurer)
       throws IOException {
     if (quantity == null || quantity <= 0) {
@@ -70,6 +78,11 @@ public abstract class AbstractTypeDataController<T extends Identifiable, R> {
   }
 
   protected final ModelAndView bulkEdit(String idString, ModelMap model) throws IOException {
+    return bulkEdit(idString, model, null);
+  }
+
+  protected final ModelAndView bulkEdit(Map<String, String> formData, ModelMap model) throws IOException {
+    String idString = getStringInput("ids", formData, true);
     return bulkEdit(idString, model, null);
   }
 

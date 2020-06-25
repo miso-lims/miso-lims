@@ -17,7 +17,7 @@ ListTarget.librarytype = {
     return actions;
   },
   createStaticActions: function(config, projectId) {
-    return config.isAdmin ? [ListUtils.createStaticAddAction('Library Types', 'librarytype')] : [];
+    return config.isAdmin ? [ListUtils.createStaticAddAction('Library Types', Urls.ui.libraryTypes.bulkCreate, true)] : [];
   },
   createColumns: function(config, projectId) {
     return [{

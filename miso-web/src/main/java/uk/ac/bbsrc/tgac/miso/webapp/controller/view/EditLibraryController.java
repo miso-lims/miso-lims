@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.getParent;
+import static uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils.*;
 
 import java.io.IOException;
 import java.security.InvalidParameterException;
@@ -46,6 +47,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -103,7 +105,6 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
-import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -251,10 +252,10 @@ public class EditLibraryController {
 
     ObjectNode formConfig = mapper.createObjectNode();
     formConfig.put("detailedSample", isDetailedSampleEnabled());
-    MisoWebUtils.addJsonArray(mapper, formConfig, "workstations", workstationService.list(), Dtos::asDto);
-    MisoWebUtils.addJsonArray(mapper, formConfig, "thermalCyclers", instrumentService.listByType(InstrumentType.THERMAL_CYCLER),
+    addJsonArray(mapper, formConfig, "workstations", workstationService.list(), Dtos::asDto);
+    addJsonArray(mapper, formConfig, "thermalCyclers", instrumentService.listByType(InstrumentType.THERMAL_CYCLER),
         Dtos::asDto);
-    MisoWebUtils.addJsonArray(mapper, formConfig, "sops", sopService.listByCategory(SopCategory.LIBRARY), Dtos::asDto);
+    addJsonArray(mapper, formConfig, "sops", sopService.listByCategory(SopCategory.LIBRARY), Dtos::asDto);
     model.put("formConfig", mapper.writeValueAsString(formConfig));
 
     return new ModelAndView("/WEB-INF/pages/editLibrary.jsp", model);
@@ -278,10 +279,10 @@ public class EditLibraryController {
       config.put(Config.PAGE_MODE, Config.EDIT);
       config.put(Config.SAMPLE_ALIAS_MAYBE_REQUIRED, !alwaysGenerateSampleAliases());
       config.put(Config.LIBRARY_ALIAS_MAYBE_REQUIRED, !alwaysGenerateLibraryAliases());
-      MisoWebUtils.addJsonArray(mapper, config, "workstations", workstationService.list(), Dtos::asDto);
-      MisoWebUtils.addJsonArray(mapper, config, "thermalCyclers", instrumentService.listByType(InstrumentType.THERMAL_CYCLER),
+      addJsonArray(mapper, config, "workstations", workstationService.list(), Dtos::asDto);
+      addJsonArray(mapper, config, "thermalCyclers", instrumentService.listByType(InstrumentType.THERMAL_CYCLER),
           Dtos::asDto);
-      MisoWebUtils.addJsonArray(mapper, config, "sops", sopService.listByCategory(SopCategory.LIBRARY), Dtos::asDto);
+      addJsonArray(mapper, config, "sops", sopService.listByCategory(SopCategory.LIBRARY), Dtos::asDto);
 
       config.put(Config.SHOW_DESCRIPTION, showDescription);
       config.put(Config.SHOW_VOLUME, showVolume);
@@ -396,10 +397,10 @@ public class EditLibraryController {
       config.put(Config.SHOW_DESCRIPTION, showDescription);
       config.put(Config.SHOW_VOLUME, showVolume);
       config.put(Config.SHOW_LIBRARY_ALIAS, showLibraryAlias);
-      MisoWebUtils.addJsonArray(mapper, config, "workstations", workstationService.list(), Dtos::asDto);
-      MisoWebUtils.addJsonArray(mapper, config, "thermalCyclers", instrumentService.listByType(InstrumentType.THERMAL_CYCLER),
+      addJsonArray(mapper, config, "workstations", workstationService.list(), Dtos::asDto);
+      addJsonArray(mapper, config, "thermalCyclers", instrumentService.listByType(InstrumentType.THERMAL_CYCLER),
           Dtos::asDto);
-      MisoWebUtils.addJsonArray(mapper, config, "sops", sopService.listByCategory(SopCategory.LIBRARY), Dtos::asDto);
+      addJsonArray(mapper, config, "sops", sopService.listByCategory(SopCategory.LIBRARY), Dtos::asDto);
     }
 
     @Override
@@ -409,39 +410,42 @@ public class EditLibraryController {
 
   }
 
-  @GetMapping(value = "/bulk/propagate")
-  public ModelAndView propagateFromSamples(@RequestParam("ids") String sampleIds, @RequestParam("replicates") String replicates,
-      @RequestParam(name = "sort", required = false) String sort, @RequestParam(name = "boxId", required = false) Long boxId,
-      ModelMap model) throws IOException {
+  @PostMapping(value = "/bulk/propagate")
+  public ModelAndView propagateFromSamples(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
+    String sampleIds = getStringInput("ids", form, true);
+    String replicates = getStringInput("replicates", form, true);
+    String sort = getStringInput("sort", form, false);
+    Long boxId = getLongInput("boxId", form, false);
+
     BoxDto newBox = boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null;
     return new LibraryBulkPropagateBackend(newBox, sort)
         .propagate(sampleIds, replicates, model);
   }
 
-  @GetMapping(value = "/bulk/edit")
-  public ModelAndView editBulkLibraries(@RequestParam("ids") String libraryIds, ModelMap model) throws IOException {
+  @PostMapping(value = "/bulk/edit")
+  public ModelAndView editBulkLibraries(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
+    String libraryIds = getStringInput("ids", form, true);
     return libraryBulkEditBackend.edit(libraryIds, model);
   }
 
-  @GetMapping(value = "/bulk/receive")
-  public ModelAndView receiveBulkLibraries(@RequestParam("quantity") Integer quantity,
-      @RequestParam(value = "sampleClassId", required = false) Long aliquotClassId,
-      @RequestParam(value = "projectId", required = false) Long projectId,
-      @RequestParam(value = "boxId", required = false) Long boxId,
-      ModelMap model) throws IOException {
+  @PostMapping(value = "/bulk/receive")
+  public ModelAndView receiveBulkLibraries(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
+    Integer quantity = getIntegerInput("quantity", form, true);
+    Long aliquotClassId = getLongInput("sampleClassId", form, isDetailedSampleEnabled());
+    Long projectId = getLongInput("projectId", form, false);
+    Long boxId = getLongInput("boxId", form, false);
 
     LibraryDto libDto = null;
     Project project = null;
     if (projectId != null) {
       project = projectService.get(projectId);
-      if (project == null) throw new InvalidParameterException("No project found for ID " + projectId.toString());
+      if (project == null) throw new ClientErrorException("No project found for ID " + projectId);
     }
 
     SampleClass aliquotClass = null;
     if (isDetailedSampleEnabled()) {
-      if (aliquotClassId == null) throw new InvalidParameterException("Sample Class ID is required");
       aliquotClass = sampleClassService.get(aliquotClassId);
-      if (aliquotClass == null) throw new InvalidParameterException("Requested sample class not found");
+      if (aliquotClass == null) throw new ClientErrorException("No sample class found for ID " + aliquotClassId);
       DetailedLibraryDto detailedDto = new DetailedLibraryDto();
       libDto = detailedDto;
       SampleAliquotDto samDto = SampleAliquotSingleCell.SUBCATEGORY_NAME.equals(aliquotClass.getAlias()) ? new SampleAliquotSingleCellDto()
@@ -520,7 +524,7 @@ public class EditLibraryController {
       config.putPOJO(Config.TEMPLATES, templatesByProjectId);
       config.put(Config.SAMPLE_ALIAS_MAYBE_REQUIRED, !alwaysGenerateSampleAliases());
       config.put(Config.LIBRARY_ALIAS_MAYBE_REQUIRED, !alwaysGenerateLibraryAliases());
-      MisoWebUtils.addJsonArray(mapper, config, "recipientGroups", recipientGroups, Dtos::asDto);
+      addJsonArray(mapper, config, "recipientGroups", recipientGroups, Dtos::asDto);
     }
 
     @Override
