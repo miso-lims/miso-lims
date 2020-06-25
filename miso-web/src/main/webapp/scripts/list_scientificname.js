@@ -15,7 +15,7 @@ ListTarget.scientificname = {
     return actions;
   },
   createStaticActions: function(config, projectId) {
-    return config.isAdmin ? [ListUtils.createStaticAddAction('Scientific Names', 'scientificname')] : [];
+    return config.isAdmin ? [ListUtils.createStaticAddAction('Scientific Names', Urls.ui.scientificNames.bulkCreate, true)] : [];
   },
   createColumns: function(config, projectId) {
     return [{

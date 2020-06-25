@@ -17,7 +17,7 @@ ListTarget.librarydesigncode = {
     return actions;
   },
   createStaticActions: function(config, projectId) {
-    return config.isAdmin ? [ListUtils.createStaticAddAction('Library Design Codes', 'librarydesigncode')] : [];
+    return config.isAdmin ? [ListUtils.createStaticAddAction('Library Design Codes', Urls.ui.libraryDesignCodes.bulkCreate, true)] : [];
   },
   createColumns: function(config, projectId) {
     return [{

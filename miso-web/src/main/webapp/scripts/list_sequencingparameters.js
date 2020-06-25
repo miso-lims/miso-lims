@@ -17,7 +17,7 @@ ListTarget.sequencingparameters = {
     return actions;
   },
   createStaticActions: function(config, projectId) {
-    return config.isAdmin ? [ListUtils.createStaticAddAction('Sequencing Parameters', 'sequencingparameters')] : [];
+    return config.isAdmin ? [ListUtils.createStaticAddAction('Sequencing Parameters', Urls.ui.sequencingParameters.bulkCreate, true)] : [];
   },
   createColumns: function(config, projectId) {
     return [{

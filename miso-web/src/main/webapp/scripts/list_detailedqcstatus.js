@@ -17,7 +17,7 @@ ListTarget.detailedqcstatus = {
     return actions;
   },
   createStaticActions: function(config, projectId) {
-    return config.isAdmin ? [ListUtils.createStaticAddAction('Detailed QC Statuses', 'detailedqcstatus')] : [];
+    return config.isAdmin ? [ListUtils.createStaticAddAction('Detailed QC Statuses', Urls.ui.detailedQcStatuses.bulkCreate, true)] : [];
   },
   createColumns: function(config, projectId) {
     return [{

@@ -93,7 +93,7 @@ public class BulkLibraryIT extends AbstractIT {
   public void testReceiveDnaSetup() throws Exception {
     // Goal: ensure all expected fields are present and no extra
     // test for gDNA aliquot parent
-    BulkLibraryPage page = BulkLibraryPage.getForReceive(getDriver(), getBaseUrl(), 2, null, 15);
+    BulkLibraryPage page = BulkLibraryPage.getForReceive(getDriver(), getBaseUrl(), 2, null, 15L);
     Set<String> expectedColumns = Sets.newHashSet();
     expectedColumns.addAll(commonColumns);
     expectedColumns.addAll(receiptColumns);
@@ -105,7 +105,7 @@ public class BulkLibraryIT extends AbstractIT {
 
   @Test
   public void testReceiveRnaSetup() throws Exception {
-    BulkLibraryPage page = BulkLibraryPage.getForReceive(getDriver(), getBaseUrl(), 3, null, 19);
+    BulkLibraryPage page = BulkLibraryPage.getForReceive(getDriver(), getBaseUrl(), 3, null, 19L);
     Set<String> expectedColumns = Sets.newHashSet();
     expectedColumns.addAll(commonColumns);
     expectedColumns.addAll(receiptColumns);
@@ -488,7 +488,7 @@ public class BulkLibraryIT extends AbstractIT {
 
   @Test
   public void testReceipt() {
-    BulkLibraryPage page = BulkLibraryPage.getForReceive(getDriver(), getBaseUrl(), 1, null, 15);
+    BulkLibraryPage page = BulkLibraryPage.getForReceive(getDriver(), getBaseUrl(), 1, null, 15L);
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = Maps.newLinkedHashMap();

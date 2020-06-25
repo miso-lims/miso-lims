@@ -2,7 +2,7 @@
 
 Changes:
 
-
+  * Fixed "Request header is too large" error limitting number of items that can be bulk created/edited
 
 # 1.7.1
 

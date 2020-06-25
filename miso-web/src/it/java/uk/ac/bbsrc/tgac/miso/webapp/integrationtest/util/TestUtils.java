@@ -1,10 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.logging.LogEntries;
@@ -33,44 +36,83 @@ public class TestUtils {
     String url = String.format("%smiso/%s", baseUrl, urlSlug);
     try {
       driver.get(url);
-      // confirm that page contains logo
-      if (driver.findElements(By.id("misologo")).isEmpty()) {
-        log.error("/miso/{}: Page is completely empty. Is resource correct?", urlSlug);
-        return true;
-      }
-
-      // check if it's an unhandled error page (JSP exception probably)
-      List<WebElement> exceptionMessages = driver.findElements(By.id("exceptionMessage"));
-      if (!exceptionMessages.isEmpty()) {
-        log.error("/miso/{}: Stack trace on page - {}", urlSlug, stringifyMessages(exceptionMessages));
-        return true;
-      }
-
-      // check if it's a handled error page (Java exception)
-      List<WebElement> errorMessageElements = driver.findElements(By.id("flasherror"));
-      if (!errorMessageElements.isEmpty()) {
-        log.error("/miso/{}: Returned error page - {}", urlSlug, stringifyMessages(errorMessageElements));
-        return true;
-      }
-
-      // check for JS errors
-      LogEntries logs = driver.manage().logs().get(LogType.BROWSER);
-      for (LogEntry entry : logs) {
-        if (entry.getLevel() == Level.SEVERE) {
-          log.error("/miso/{}: Javascript error - {}", urlSlug, entry.getMessage());
-          return true;
-        }
-      }
-
-      return false;
+      return doChecks(driver, urlSlug);
     } catch (Exception e) {
       log.error("/miso/{}: Exception thrown while checking for errors", urlSlug, e);
       return true;
     }
   }
 
+  public static boolean checkForErrors(WebDriver driver, String baseUrl, String urlSlug, BiConsumer<WebDriver, String> factoryMethod) {
+    try {
+      factoryMethod.accept(driver, baseUrl);
+      return doChecks(driver, urlSlug);
+    } catch (Exception e) {
+      log.error("{}: Exception thrown while checking for errors", urlSlug, e);
+      return true;
+    }
+  }
+
+  public static boolean checkForErrors(WebDriver driver, String baseUrl, String urlSlug, Map<String, String> formData) {
+    String url = String.format("%smiso/%s", baseUrl, urlSlug);
+    try {
+      postData(driver, url, formData);
+      return doChecks(driver, urlSlug);
+    } catch (Exception e) {
+      log.error("/miso/{}: Exception thrown while checking for errors", urlSlug, e);
+      return true;
+    }
+  }
+
+  private static boolean doChecks(WebDriver driver, String urlSlug) {
+    if (!driver.getCurrentUrl().contains("/miso/" + urlSlug)) {
+      log.error("/miso/{}: Navigation failed", urlSlug);
+    }
+
+    // confirm that page contains logo
+    if (driver.findElements(By.id("misologo")).isEmpty()) {
+      log.error("/miso/{}: Page is completely empty. Is resource correct?", urlSlug);
+      return true;
+    }
+
+    // check if it's an unhandled error page (JSP exception probably)
+    List<WebElement> exceptionMessages = driver.findElements(By.id("exceptionMessage"));
+    if (!exceptionMessages.isEmpty()) {
+      log.error("/miso/{}: Stack trace on page - {}", urlSlug, stringifyMessages(exceptionMessages));
+      return true;
+    }
+
+    // check if it's a handled error page (Java exception)
+    List<WebElement> errorMessageElements = driver.findElements(By.id("flasherror"));
+    if (!errorMessageElements.isEmpty()) {
+      log.error("/miso/{}: Returned error page - {}", urlSlug, stringifyMessages(errorMessageElements));
+      return true;
+    }
+
+    // check for JS errors
+    LogEntries logs = driver.manage().logs().get(LogType.BROWSER);
+    for (LogEntry entry : logs) {
+      if (entry.getLevel() == Level.SEVERE) {
+        log.error("/miso/{}: Javascript error - {}", urlSlug, entry.getMessage());
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   private static String stringifyMessages(List<WebElement> elements) {
     return elements.stream().map(item -> item.getText().trim()).collect(Collectors.joining("\n"));
+  }
+
+  public static void postData(WebDriver driver, String url, Map<String, String> parameters) {
+    StringBuilder sb = new StringBuilder("Utils.page.post('")
+        .append(url)
+        .append("', {")
+        .append(parameters.entrySet().stream().map(entry -> entry.getKey() + ": '" + entry.getValue() + "'")
+            .collect(Collectors.joining(", ")))
+        .append("});");
+    ((JavascriptExecutor) driver).executeScript(sb.toString());
   }
 
 }

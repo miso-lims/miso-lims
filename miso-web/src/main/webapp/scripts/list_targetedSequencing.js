@@ -54,7 +54,7 @@ ListTarget.targetedsequencing = {
     }
   },
   createStaticActions: function(config) {
-    return config.isAdmin ? [ListUtils.createStaticAddAction('Targeted Sequencings', 'targetedsequencing')] : [];
+    return config.isAdmin ? [ListUtils.createStaticAddAction('Targeted Sequencings', Urls.ui.targetedSequencings.bulkCreate, true)] : [];
   },
   createColumns: function(config) {
     return [{

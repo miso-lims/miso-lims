@@ -17,7 +17,7 @@ ListTarget.partitionqctype = {
     return actions;
   },
   createStaticActions: function(config, projectId) {
-    return config.isAdmin ? [ListUtils.createStaticAddAction('Partition QC Types', 'partitionqctype')] : [];
+    return config.isAdmin ? [ListUtils.createStaticAddAction('Partition QC Types', Urls.ui.partitionQcTypes.bulkCreate, true)] : [];
   },
   createColumns: function(config, projectId) {
     return [{

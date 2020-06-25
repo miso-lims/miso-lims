@@ -15,7 +15,8 @@ ListTarget.sequencingcontroltype = {
     return actions;
   },
   createStaticActions: function(config, projectId) {
-    return config.isAdmin ? [ListUtils.createStaticAddAction('Sequencing Control Types', 'sequencingcontroltype')] : [];
+    return config.isAdmin ? [ListUtils.createStaticAddAction('Sequencing Control Types', Urls.ui.sequencingControlTypes.bulkCreate, true)]
+        : [];
   },
   createColumns: function(config, projectId) {
     return [{

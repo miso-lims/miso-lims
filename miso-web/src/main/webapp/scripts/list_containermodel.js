@@ -58,7 +58,7 @@ ListTarget.containermodel = {
         }
       }];
     } else {
-      return config.isAdmin ? [ListUtils.createStaticAddAction('Container Models', 'containermodel')] : [];
+      return config.isAdmin ? [ListUtils.createStaticAddAction('Container Models', Urls.ui.containerModels.bulkCreate, true)] : [];
     }
   },
   createColumns: function(config, projectId) {

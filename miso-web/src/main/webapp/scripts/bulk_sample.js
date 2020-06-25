@@ -33,143 +33,144 @@ BulkTarget.sample = (function($) {
       return BulkUtils.actions.boxable();
     },
     getBulkActions: function(config) {
-      var actions = [{
-        name: "Edit",
-        action: function(samples) {
+      var actions = [
+          {
+            name: "Edit",
+            action: function(samples) {
 
-          if (samples.some(function(sample) {
-            return sample.sampleClassId;
-          }) && !Constants.isDetailedSample) {
-            alert("There's detailed samples, but MISO is not configured for this.");
-            return;
-          }
+              if (samples.some(function(sample) {
+                return sample.sampleClassId;
+              }) && !Constants.isDetailedSample) {
+                Utils.showOkDialog("Error", ["There are detailed samples, but MISO is not configured for this."]);
+                return;
+              }
 
-          var classes = getSampleClasses(samples);
-          var classesAliases = Utils.array.deduplicateString(classes.map(function(sampleClass) {
-            return sampleClass.alias;
-          }));
-          if (classesAliases.length > 1) {
-            alert("You have selected samples of classes " + classesAliases.join(" & ") + ". Please select samples from only one class.");
-            return;
-          }
-
-          window.location = Urls.ui.samples.bulkEdit + "?" + jQuery.param({
-            ids: samples.map(Utils.array.getId).join(',')
-          });
-        }
-
-      }, {
-        name: "Propagate",
-        action: function(samples) {
-          HotUtils.warnIfConsentRevoked(samples, function() {
-            var idsString = samples.map(Utils.array.getId).join(",");
-            var classes = getSampleClasses(samples);
-
-            // In the case of plain samples, this will be empty, which is fine.
-            var targets = Utils.array.removeArchived(getChildSampleClasses(classes)).filter(function(sampleClass) {
-              return sampleClass.directCreationAllowed;
-            }).sort(Utils.sorting.sampleClassComparator).map(function(sampleClass) {
-
-              return {
-                name: sampleClass.alias,
-                action: function(replicates, newBoxId) {
-                  window.location = Urls.ui.samples.bulkPropagate + "?" + jQuery.param({
-                    boxId: newBoxId,
-                    parentIds: idsString,
-                    replicates: replicates,
-                    sampleClassId: sampleClass.id
-                  });
-                }
-              };
-            });
-            if (!Constants.isDetailedSample || classes.every(function(sampleClass) {
-              return sampleClass.sampleCategory == "Aliquot";
-            })) {
-              targets.push({
-                name: "Library",
-                action: function(replicates, newBoxId) {
-                  var params = {
-                    boxId: newBoxId,
-                    ids: idsString,
-                    replicates: replicates
-                  }
-                  if (config.sortLibraryPropagate) {
-                    params.sort = config.sortLibraryPropagate;
-                  }
-                  window.location = Urls.ui.libraries.bulkPropagate + "?" + jQuery.param(params);
-                }
+              var classes = getSampleClasses(samples);
+              var classesAliases = Utils.array.deduplicateString(classes.map(function(sampleClass) {
+                return sampleClass.alias;
+              }));
+              if (classesAliases.length > 1) {
+                Utils.showOkDialog("Error", ["You have selected samples of classes " + classesAliases.join(" & ")
+                    + ". Please select samples from only one class."]);
+                return;
+              }
+              Utils.page.post(Urls.ui.samples.bulkEdit, {
+                ids: samples.map(Utils.array.getId).join(',')
               });
             }
 
-            if (targets.length == 0) {
-              alert("No propagation is possible from the samples.");
-              return;
-            }
+          }, {
+            name: "Propagate",
+            action: function(samples) {
+              HotUtils.warnIfConsentRevoked(samples, function() {
+                var idsString = samples.map(Utils.array.getId).join(",");
+                var classes = getSampleClasses(samples);
 
-            Utils.showDialog(targets.length > 1 ? 'Propagate Samples' : ('Propagate to ' + targets[0].name), 'Propagate', [{
-              property: 'replicates',
-              type: 'int',
-              label: 'Replicates',
-              value: 1,
-              required: true
-            }, (samples.length > 1 ? {
-              property: 'customReplication',
-              type: 'checkbox',
-              label: 'Specify replicates per sample',
-              value: false
-            } : null), (targets.length > 1 ? {
-              property: 'target',
-              type: 'select',
-              label: 'To',
-              values: targets,
-              getLabel: Utils.array.getName
-            } : null), ListUtils.createBoxField].filter(function(x) {
-              return !!x;
-            }), function(result) {
-              var loadPage = function(boxId, replicates) {
-                (result.target || targets[0]).action(replicates, boxId);
-              };
-              var createBox = function(sampleCount, replicates) {
-                Utils.createBoxDialog(result, function(result) {
-                  return sampleCount;
-                }, function(newBox) {
-                  loadPage(newBox.id, replicates);
+                // In the case of plain samples, this will be empty, which is fine.
+                var targets = Utils.array.removeArchived(getChildSampleClasses(classes)).filter(function(sampleClass) {
+                  return sampleClass.directCreationAllowed;
+                }).sort(Utils.sorting.sampleClassComparator).map(function(sampleClass) {
+
+                  return {
+                    name: sampleClass.alias,
+                    action: function(replicates, newBoxId) {
+                      Utils.page.post(Urls.ui.samples.bulkPropagate, {
+                        boxId: newBoxId,
+                        parentIds: idsString,
+                        replicates: replicates,
+                        sampleClassId: sampleClass.id
+                      });
+                    }
+                  };
                 });
-              };
-              if (result.customReplication) {
-                var replicateFields = [];
-                for (var i = 0; i < samples.length; i++) {
-                  replicateFields.push({
-                    property: 'replicates' + i,
-                    type: 'int',
-                    label: samples[i].alias,
-                    value: result.replicates,
-                    required: true
+                if (!Constants.isDetailedSample || classes.every(function(sampleClass) {
+                  return sampleClass.sampleCategory == "Aliquot";
+                })) {
+                  targets.push({
+                    name: "Library",
+                    action: function(replicates, newBoxId) {
+                      var params = {
+                        boxId: newBoxId,
+                        ids: idsString,
+                        replicates: replicates
+                      }
+                      if (config.sortLibraryPropagate) {
+                        params.sort = config.sortLibraryPropagate;
+                      }
+                      Utils.page.post(Urls.ui.libraries.bulkPropagate, params)
+                    }
                   });
                 }
-                Utils.showDialog('Propagate Samples - Replicates', 'OK', replicateFields, function(replicatesResult) {
-                  var replicates = [];
-                  for ( var key in replicatesResult) {
-                    replicates.push(replicatesResult[key]);
-                  }
-                  var replicatesString = replicates.join(',');
-                  if (result.createBox) {
-                    createBox(replicates.reduce(function(total, num) {
-                      return total + num;
-                    }), replicatesString);
+
+                if (targets.length == 0) {
+                  Utils.showOkDialog("Error", ["No propagation is possible from the selected samples."]);
+                  return;
+                }
+
+                Utils.showDialog(targets.length > 1 ? 'Propagate Samples' : ('Propagate to ' + targets[0].name), 'Propagate', [{
+                  property: 'replicates',
+                  type: 'int',
+                  label: 'Replicates',
+                  value: 1,
+                  required: true
+                }, (samples.length > 1 ? {
+                  property: 'customReplication',
+                  type: 'checkbox',
+                  label: 'Specify replicates per sample',
+                  value: false
+                } : null), (targets.length > 1 ? {
+                  property: 'target',
+                  type: 'select',
+                  label: 'To',
+                  values: targets,
+                  getLabel: Utils.array.getName
+                } : null), ListUtils.createBoxField].filter(function(x) {
+                  return !!x;
+                }), function(result) {
+                  var loadPage = function(boxId, replicates) {
+                    (result.target || targets[0]).action(replicates, boxId);
+                  };
+                  var createBox = function(sampleCount, replicates) {
+                    Utils.createBoxDialog(result, function(result) {
+                      return sampleCount;
+                    }, function(newBox) {
+                      loadPage(newBox.id, replicates);
+                    });
+                  };
+                  if (result.customReplication) {
+                    var replicateFields = [];
+                    for (var i = 0; i < samples.length; i++) {
+                      replicateFields.push({
+                        property: 'replicates' + i,
+                        type: 'int',
+                        label: samples[i].alias,
+                        value: result.replicates,
+                        required: true
+                      });
+                    }
+                    Utils.showDialog('Propagate Samples - Replicates', 'OK', replicateFields, function(replicatesResult) {
+                      var replicates = [];
+                      for ( var key in replicatesResult) {
+                        replicates.push(replicatesResult[key]);
+                      }
+                      var replicatesString = replicates.join(',');
+                      if (result.createBox) {
+                        createBox(replicates.reduce(function(total, num) {
+                          return total + num;
+                        }), replicatesString);
+                      } else {
+                        loadPage(null, replicatesString);
+                      }
+                    });
+                  } else if (result.createBox) {
+                    createBox(result.replicates * samples.length, result.replicates);
                   } else {
-                    loadPage(null, replicatesString);
+                    loadPage(null, result.replicates);
                   }
                 });
-              } else if (result.createBox) {
-                createBox(result.replicates * samples.length, result.replicates);
-              } else {
-                loadPage(null, result.replicates);
-              }
-            });
-          });
-        }
-      }, HotUtils.printAction('sample'),
+              });
+            }
+          }, HotUtils.printAction('sample'),
           HotUtils.spreadsheetAction(Urls.rest.samples.spreadsheet, Constants.sampleSpreadsheets.filter(function(sheet) {
             return Constants.isDetailedSample || sheet.allowedClasses.indexOf('Plain') !== -1;
           }), function(samples, spreadsheet) {

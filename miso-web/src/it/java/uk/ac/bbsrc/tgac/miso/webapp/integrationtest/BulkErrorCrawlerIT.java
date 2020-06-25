@@ -2,18 +2,30 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 import org.junit.Test;
+import org.openqa.selenium.WebDriver;
 
+import com.google.common.collect.Lists;
+
+import uk.ac.bbsrc.tgac.miso.core.util.MapBuilder;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkLibraryAliquotPage;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkLibraryPage;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.TestUtils;
 
 public class BulkErrorCrawlerIT extends AbstractIT {
   
   private static final Set<String> urlSlugs;
   private static final Set<String> adminSlugs;
+  private static final Map<String, Map<String, String>> postPages;
+  private static final Map<String, BiConsumer<WebDriver, String>> factoryPages;
 
   static {
     Set<String> slugs = new HashSet<>();
@@ -150,18 +162,10 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("user/3");
 
     // Bulk pages
-    slugs.add("sample/bulk/new?quantity=5&projectId=&sampleClassId=15");
-    slugs.add("sample/bulk/edit?ids=302%2C202");
-    slugs.add("sample/bulk/propagate?boxId=&parentIds=302%2C202&replicates=1&sampleClassId=11");
     slugs.add("qc/bulk/addFrom/Sample?entityIds=4445%2C4446&copies=1&controls=1");
     slugs.add("qc/bulk/editFrom/Sample?entityIds=2201&addControls=0");
-    slugs.add("library/bulk/propagate?boxId=&ids=304%2C305&replicates=1");
-    slugs.add("library/bulk/edit?ids=601%2C602%2C603%2C604");
     slugs.add("qc/bulk/addFrom/Library?entityIds=601%2C602%2C603&copies=1&controls=1");
     slugs.add("qc/bulk/editFrom/Library?entityIds=2201&addControls=0");
-    slugs.add("libraryaliquot/bulk/propagate?ids=601%2C602%2C603");
-    slugs.add("libraryaliquot/bulk/edit?ids=901%2C902");
-    slugs.add("libraryaliquot/bulk/repropagate?ids=901%2C902");
     slugs.add("libraryaliquot/bulk/merge?ids=901%2C902");
     slugs.add("libraryaliquot/bulk/pool-separate?ids=901%2C902");
     slugs.add("libraryaliquot/bulk/pool?ids=901%2C902&quantity=2");
@@ -213,8 +217,6 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("studytype/bulk/edit?ids=2%2C4");
     slugs.add("workstation/bulk/new?quantity=2");
     slugs.add("workstation/bulk/edit?ids=1%2C2");
-    slugs.add("sop/bulk/new?quantity=2");
-    slugs.add("sop/bulk/edit?ids=1%2C2");
 
     slugs.add("tissuematerial/bulk/new?quantity=3");
     slugs.add("tissuematerial/bulk/edit?ids=1%2C2%2C3");
@@ -254,6 +256,27 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     moreSlugs.add("admin/group/1");
 
     adminSlugs = Collections.unmodifiableSet(moreSlugs);
+
+    factoryPages = Collections.unmodifiableMap(new MapBuilder<String, BiConsumer<WebDriver, String>>()
+        .put("sample/bulk/new", (driver, baseUrl) -> BulkSamplePage.getForCreate(driver, baseUrl, 5, null, 15L))
+        .put("sample/bulk/edit", (driver, baseUrl) -> BulkSamplePage.getForEdit(driver, baseUrl, Lists.newArrayList(302L, 202L)))
+        .put("sample/bulk/propagate",
+            (driver, baseUrl) -> BulkSamplePage.getForPropagate(driver, baseUrl, Arrays.asList(302L, 202L), Arrays.asList(1), 11L))
+        .put("library/bulk/propagate",
+            (driver, baseUrl) -> BulkLibraryPage.getForPropagate(driver, baseUrl, Arrays.asList(304L, 305L), Arrays.asList(1)))
+        .put("library/bulk/edit", (driver, baseUrl) -> BulkLibraryPage.getForEdit(driver, baseUrl, Arrays.asList(601L, 602L, 603L, 604L)))
+        .put("library/bulk/receive", (driver, baseUrl) -> BulkLibraryPage.getForReceive(driver, baseUrl, 3, null, 15L))
+        .put("libraryaliquot/bulk/propagate",
+            (driver, baseUrl) -> BulkLibraryAliquotPage.getForPropagate(driver, baseUrl, Arrays.asList(601L, 602L, 603L)))
+        .put("libraryaliquot/bulk/edit", (driver, baseUrl) -> BulkLibraryAliquotPage.getForEdit(driver, baseUrl, Arrays.asList(901L, 902L)))
+        .put("libraryaliquot/bulk/repropagate",
+            (driver, baseUrl) -> BulkLibraryAliquotPage.getForRepropagate(driver, baseUrl, Arrays.asList(901L, 902L)))
+        .build());
+
+    postPages = Collections.unmodifiableMap(new MapBuilder<String, Map<String, String>>()
+        .put("sop/bulk/new", Collections.unmodifiableMap(new MapBuilder<String, String>().put("quantity", "2").build()))
+        .put("sop/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
+        .build());
   }
 
   @Test
@@ -270,6 +293,24 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     loginAdmin();
     long errors = adminSlugs.stream()
         .filter(slug -> TestUtils.checkForErrors(getDriver(), getBaseUrl(), slug))
+        .count();
+    assertEquals(0L, errors);
+  }
+
+  @Test
+  public void testFactoryPages() {
+    login();
+    long errors = factoryPages.entrySet().stream()
+        .filter(page -> TestUtils.checkForErrors(getDriver(), getBaseUrl(), page.getKey(), page.getValue()))
+        .count();
+    assertEquals(0L, errors);
+  }
+
+  @Test
+  public void testPostPages() {
+    login();
+    long errors = postPages.entrySet().stream()
+        .filter(page -> TestUtils.checkForErrors(getDriver(), getBaseUrl(), page.getKey(), page.getValue()))
         .count();
     assertEquals(0L, errors);
   }

@@ -15,7 +15,7 @@ ListTarget.boxuse = {
     return actions;
   },
   createStaticActions: function(config, projectId) {
-    return config.isAdmin ? [ListUtils.createStaticAddAction('Box Uses', 'boxuse')] : [];
+    return config.isAdmin ? [ListUtils.createStaticAddAction('Box Uses', Urls.ui.boxUses.bulkCreate, true)] : [];
   },
   createColumns: function(config, projectId) {
     return [{

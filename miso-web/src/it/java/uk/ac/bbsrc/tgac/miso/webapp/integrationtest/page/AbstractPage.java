@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page;
 import static org.openqa.selenium.support.ui.ExpectedConditions.stalenessOf;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
@@ -14,6 +15,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.AbstractElement;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.TestUtils;
 
 public abstract class AbstractPage extends AbstractElement {
 
@@ -124,6 +126,10 @@ public abstract class AbstractPage extends AbstractElement {
     return getDriver().findElements(By.cssSelector("#dialog p")).stream()
         .map(WebElement::getText)
         .collect(Collectors.toList());
+  }
+
+  protected static void postData(WebDriver driver, String url, Map<String, String> parameters) {
+    TestUtils.postData(driver, url, parameters);
   }
 
 }

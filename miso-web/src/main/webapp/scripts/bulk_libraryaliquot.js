@@ -21,23 +21,17 @@ BulkTarget.libraryaliquot = (function($) {
       return BulkUtils.actions.boxable();
     },
     getBulkActions: function(config) {
+      var editAction = BulkUtils.actions.edit(Urls.ui.libraryAliquots.bulkEdit);
+      editAction.allowOnLibraryPage = true;
+
       return [
-          {
-            name: 'Edit',
-            action: function(items) {
-              window.location = Urls.ui.libraryAliquots.bulkEdit + '?' + jQuery.param({
-                ids: items.map(Utils.array.getId).join(',')
-              });
-            },
-            allowOnLibraryPage: true
-          },
+          editAction,
           {
             name: 'Propagate',
             action: function(items) {
               HotUtils.warnIfConsentRevoked(items, function() {
-                var fields = [];
-                HotUtils.showDialogForBoxCreation('Create Library Aliquots', 'Create', fields, Urls.ui.libraryAliquots.bulkRepropagate,
-                    function(result) {
+                BulkUtils.actions.showDialogForBoxCreation('Create Library Aliquots', 'Create', [],
+                    Urls.ui.libraryAliquots.bulkRepropagate, function(result) {
                       return {
                         ids: items.map(Utils.array.getId).join(',')
                       };
@@ -105,7 +99,6 @@ BulkTarget.libraryaliquot = (function($) {
                 }];
                 HotUtils.showDialogForBoxCreation('Create Pools', 'Create', fields, Urls.ui.libraryAliquots.bulkPoolCustom,
                     function(result) {
-                      console.log(result);
                       return {
                         ids: items.map(Utils.array.getId).join(','),
                         quantity: result.quantity

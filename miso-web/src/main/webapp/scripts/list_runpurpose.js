@@ -15,7 +15,7 @@ ListTarget.runpurpose = {
     return actions;
   },
   createStaticActions: function(config, projectId) {
-    return config.isAdmin ? [ListUtils.createStaticAddAction('Run Purposes', 'runpurpose')] : [];
+    return config.isAdmin ? [ListUtils.createStaticAddAction('Run Purposes', Urls.ui.runPurposes.bulkCreate, true)] : [];
   },
   createColumns: function(config, projectId) {
     return [{

@@ -23,13 +23,14 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
-import static uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils.addJsonArray;
+import static uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -43,6 +44,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -308,8 +310,9 @@ public class EditSampleController {
    * Used to edit samples with ids from given {sampleIds}.
    * Sends Dtos objects which will then be used for editing in grid.
    */
-  @GetMapping(value = "/bulk/edit")
-  public ModelAndView editBulkSamples(@RequestParam("ids") String sampleIds, ModelMap model) throws IOException {
+  @PostMapping(value = "/bulk/edit")
+  public ModelAndView editBulkSamples(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
+    String sampleIds = getStringInput("ids", form, true);
     return new BulkEditSampleBackend().edit(sampleIds, model);
   }
 
@@ -318,10 +321,14 @@ public class EditSampleController {
    * 
    * Sends Dtos objects which will then be used for editing in grid.
    */
-  @GetMapping(value = "/bulk/propagate")
-  public ModelAndView propagateBulkSamples(@RequestParam("parentIds") String parentIds, @RequestParam("sampleClassId") Long sampleClassId,
-      @RequestParam("replicates") String replicates, @RequestParam(value = "boxId", required = false) Long boxId, ModelMap model)
+  @PostMapping(value = "/bulk/propagate")
+  public ModelAndView propagateBulkSamples(@RequestParam Map<String, String> form, ModelMap model)
       throws IOException {
+    String parentIds = getStringInput("parentIds", form, true);
+    String replicates = getStringInput("replicates", form, true);
+    Long sampleClassId = getLongInput("sampleClassId", form, true);
+    Long boxId = getLongInput("boxId", form, false);
+
     Set<Group> recipientGroups = authorizationManager.getCurrentUser().getGroups();
     BulkPropagateSampleBackend bulkPropagateSampleBackend = new BulkPropagateSampleBackend(sampleClassService.get(sampleClassId),
         (boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null), recipientGroups);
@@ -336,11 +343,13 @@ public class EditSampleController {
    * </ul>
    * Sends Dtos objects which will then be used for editing in grid.
    */
-  @GetMapping(value = "/bulk/new")
-  public ModelAndView createBulkSamples(@RequestParam("quantity") Integer quantity,
-      @RequestParam(value = "sampleClassId", required = false) Long sampleClassId,
-      @RequestParam(value = "projectId", required = false) Long projectId, @RequestParam(value = "boxId", required = false) Long boxId,
-      ModelMap model) throws IOException {
+  @PostMapping(value = "/bulk/new")
+  public ModelAndView createBulkSamples(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
+    Integer quantity = getIntegerInput("quantity", form, true);
+    Long sampleClassId = getLongInput("sampleClassId", form, isDetailedSampleEnabled());
+    Long projectId = getLongInput("projectId", form, false);
+    Long boxId = getLongInput("boxId", form, false);
+
     if (quantity == null || quantity <= 0) throw new RestException("Must specify quantity of samples to create", Status.BAD_REQUEST);
 
     final SampleDto template;
