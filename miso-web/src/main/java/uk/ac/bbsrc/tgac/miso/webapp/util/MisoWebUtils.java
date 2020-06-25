@@ -215,7 +215,7 @@ public class MisoWebUtils {
   public static Integer getIntegerInput(String key, Map<String, String> formData, boolean required) {
     String stringValue = getStringInput(key, formData, required);
     try {
-      return stringValue == null ? null : new Integer(stringValue);
+      return stringValue == null ? null : Integer.parseInt(stringValue);
     } catch (NumberFormatException e) {
       throw new ClientErrorException(String.format("Invalid value for parameter '%s'", key), e);
     }
