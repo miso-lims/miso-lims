@@ -2,8 +2,9 @@
 
 Changes:
 
-  * Fixed URL not saving correctly when editing SOPs
+  * improved performance of bulk library save
   * Fixed "Request header is too large" error limitting number of items that can be bulk created/edited
+  * Fixed URL not saving correctly when editing SOPs
 
 # 1.7.1
 

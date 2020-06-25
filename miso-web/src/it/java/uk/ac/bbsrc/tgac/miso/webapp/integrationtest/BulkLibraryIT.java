@@ -770,7 +770,7 @@ public class BulkLibraryIT extends AbstractIT {
       if (lib.getIndices() == null || lib.getIndices().isEmpty()) {
         return null;
       }
-      return lib.getIndices().get(0).getFamily().getName();
+      return lib.getIndices().iterator().next().getFamily().getName();
     });
     testLibraryAttribute(LibColumns.INDEX_1, attributes, library, indexGetter(1));
     testLibraryAttribute(LibColumns.INDEX_2, attributes, library, indexGetter(2));

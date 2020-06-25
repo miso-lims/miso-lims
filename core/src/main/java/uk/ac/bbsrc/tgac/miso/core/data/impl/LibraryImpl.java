@@ -72,7 +72,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
-import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
@@ -147,12 +146,12 @@ public class LibraryImpl extends AbstractBoxable implements Library {
   @JoinTable(name = "Library_Index", joinColumns = {
       @JoinColumn(name = "library_libraryId", nullable = false) }, inverseJoinColumns = {
           @JoinColumn(name = "index_indexId", nullable = false) })
-  private List<Index> indices = new ArrayList<>();
+  private Set<Index> indices;
 
   @OneToMany(targetEntity = LibraryQC.class, mappedBy = "library", cascade = CascadeType.ALL)
   private final Collection<LibraryQC> libraryQCs = new TreeSet<>();
 
-  @OneToMany(targetEntity = LibraryAliquot.class, mappedBy = "library", cascade = CascadeType.ALL)
+  @OneToMany(targetEntity = LibraryAliquot.class, mappedBy = "library")
   private final Collection<LibraryAliquot> libraryAliquots = new HashSet<>();
 
   @ManyToOne(targetEntity = SampleImpl.class)
@@ -360,36 +359,11 @@ public class LibraryImpl extends AbstractBoxable implements Library {
   }
 
   @Override
-  public List<Index> getIndices() {
+  public Set<Index> getIndices() {
+    if (indices == null) {
+      indices = new HashSet<>();
+    }
     return indices;
-  }
-
-  @Override
-  public void setIndices(List<Index> originalIndices) {
-    List<Index> indices = new ArrayList<>();
-    for (Index index : originalIndices) {
-      if (index != null) {
-        indices.add(index);
-      }
-    }
-    Index.sort(indices);
-    IndexFamily current = null;
-    for (Index index : indices) {
-      if (index == null) continue;
-      if (current == null) {
-        current = index.getFamily();
-      } else {
-        if (current.getId() != index.getFamily().getId()) {
-          throw new IllegalArgumentException(String.format(
-              "Indices not all from the same family. (%d:%s vs %d:%s)",
-              current.getId(),
-              current.getName(),
-              index.getFamily().getId(),
-              index.getFamily().getName()));
-        }
-      }
-    }
-    this.indices = indices;
   }
 
   @Override

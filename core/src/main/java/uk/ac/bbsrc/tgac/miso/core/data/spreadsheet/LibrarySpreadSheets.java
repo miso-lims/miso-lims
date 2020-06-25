@@ -42,7 +42,7 @@ public enum LibrarySpreadSheets implements Spreadsheet<Library> {
       Column.forString("Index 1", listIndex(1)), //
       Column.forString("Index 2", listIndex(2)), //
       Column.forString("Index Family",
-          lib -> lib.getIndices() == null || lib.getIndices().isEmpty() ? "" : lib.getIndices().get(0).getFamily().getName())), //
+          lib -> lib.getIndices() == null || lib.getIndices().isEmpty() ? "" : lib.getIndices().iterator().next().getFamily().getName())), //
   DILUTION_PREPARATION("Dilution Preparation", //
       Column.forString("Name", Library::getName), //
       Column.forString("Alias", Library::getAlias), //
@@ -56,7 +56,7 @@ public enum LibrarySpreadSheets implements Spreadsheet<Library> {
       Column.forString("Index 1", listIndex(1)), //
       Column.forString("Index 2", listIndex(2)), //
       Column.forString("Index Family",
-          lib -> lib.getIndices() == null || lib.getIndices().isEmpty() ? "" : lib.getIndices().get(0).getFamily().getName()));
+          lib -> lib.getIndices() == null || lib.getIndices().isEmpty() ? "" : lib.getIndices().iterator().next().getFamily().getName()));
 
   private static <S extends DetailedSample, T> Function<Library, T> detailedSample(Class<S> clazz, Function<S, T> function,
       T defaultValue) {

@@ -27,7 +27,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 import com.eaglegenomics.simlims.core.Note;
 
@@ -210,14 +210,9 @@ public interface Library extends Attachable, Comparable<Library>, Deletable, Hie
   public void setLibraryStrategyType(LibraryStrategyType libraryStrategyType);
 
   /**
-   * Returns the position-indexed list of Indices for this Library object.
+   * Returns the indices for this Library object.
    */
-  public List<Index> getIndices();
-
-  /**
-   * Sets the position-indexed list of Indices for this Library object.
-   */
-  public void setIndices(List<Index> indices);
+  public Set<Index> getIndices();
 
   /**
    * Returns the platformType of this Library object.

@@ -399,7 +399,7 @@ public class LibraryPageIT extends AbstractIT {
     assertAttribute(Field.STRATEGY, expectedValues,
         nullValueOrGet(lib.getLibraryStrategyType(), LibraryStrategyType::getName, "None"));
     assertAttribute(Field.INDEX_FAMILY, expectedValues,
-        lib.getIndices() == null || lib.getIndices().isEmpty() ? "No indices" : lib.getIndices().get(0).getFamily().getName());
+        lib.getIndices() == null || lib.getIndices().isEmpty() ? "No indices" : lib.getIndices().iterator().next().getFamily().getName());
     if (expectedValues.containsKey(Field.INDEX_1)) {
       assertAttribute(Field.INDEX_1, expectedValues, getIndexString(lib, 1));
     }
