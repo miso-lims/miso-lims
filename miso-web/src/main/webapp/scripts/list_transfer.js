@@ -35,7 +35,8 @@ ListTarget.transfer = (function() {
       return [ListUtils.idHyperlinkColumn('ID', Urls.ui.transfers.edit, 'id', Utils.array.getId, 0, true), {
         sTitle: 'Items',
         mData: 'items',
-        include: true
+        include: true,
+        bSortable: false
       }, {
         sTitle: 'Sender',
         mData: function(full, type) {

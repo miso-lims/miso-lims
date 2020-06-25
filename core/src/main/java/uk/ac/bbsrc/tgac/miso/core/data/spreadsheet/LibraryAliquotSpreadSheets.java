@@ -51,7 +51,7 @@ public enum LibraryAliquotSpreadSheets implements Spreadsheet<LibraryAliquot> {
       Column.forString("Index 2", listIndex(2)), //
       Column.forString("Index Family",
           aliquot -> aliquot.getLibrary().getIndices() == null || aliquot.getLibrary().getIndices().isEmpty() ? ""
-              : aliquot.getLibrary().getIndices().get(0).getFamily().getName())), //
+              : aliquot.getLibrary().getIndices().iterator().next().getFamily().getName())), //
   DILUTION_PREPARATION("Dilution Preparation", //
       Column.forString("Name", LibraryAliquot::getName), //
       Column.forString("Alias", LibraryAliquot::getAlias), //
@@ -67,7 +67,7 @@ public enum LibraryAliquotSpreadSheets implements Spreadsheet<LibraryAliquot> {
       Column.forString("Index 2", listIndex(2)), //
       Column.forString("Index Family",
           aliquot -> aliquot.getLibrary().getIndices() == null || aliquot.getLibrary().getIndices().isEmpty() ? ""
-              : aliquot.getLibrary().getIndices().get(0).getFamily().getName()));
+              : aliquot.getLibrary().getIndices().iterator().next().getFamily().getName()));
 
   private static <S extends DetailedSample, T> Function<LibraryAliquot, T> detailedSample(Class<S> clazz, Function<S, T> function,
       T defaultValue) {

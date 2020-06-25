@@ -936,7 +936,8 @@ public class ValueTypeLookup {
         }
         resolvedIndices.add(resolvedIndex);
       }
-      library.setIndices(resolvedIndices);
+      library.getIndices().clear();
+      library.getIndices().addAll(resolvedIndices);
     }
     for (LibraryQC qc : library.getQCs()) {
       QcType type = resolveForLibrary(qc.getType());

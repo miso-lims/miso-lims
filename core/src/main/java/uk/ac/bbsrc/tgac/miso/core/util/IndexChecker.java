@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.util;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -87,33 +88,33 @@ public class IndexChecker {
 
   public Set<String> getDuplicateIndicesSequences(PoolOrder order) {
     if (order == null) return Collections.emptySet();
-    List<List<Index>> indices = getIndexSequences(order);
+    List<Set<Index>> indices = getIndexSequences(order);
     return getIndexSequencesWithTooFewMismatches(indices, errorMismatches);
   }
 
   public Set<String> getNearDuplicateIndicesSequences(PoolOrder order) {
     if (order == null) return Collections.emptySet();
-    List<List<Index>> indices = getIndexSequences(order);
+    List<Set<Index>> indices = getIndexSequences(order);
     return getIndexSequencesWithTooFewMismatches(indices, warningMismatches);
   }
 
   public Set<String> getDuplicateIndicesSequences(List<LibraryAliquot> aliquots) {
     if (aliquots == null) return Collections.emptySet();
-    List<List<Index>> indices = getIndexSequences(aliquots);
+    List<Set<Index>> indices = getIndexSequences(aliquots);
     return getIndexSequencesWithTooFewMismatches(indices, errorMismatches);
   }
 
   public Set<String> getNearDuplicateIndicesSequences(List<LibraryAliquot> aliquots) {
     if (aliquots == null) return Collections.emptySet();
-    List<List<Index>> indices = getIndexSequences(aliquots);
+    List<Set<Index>> indices = getIndexSequences(aliquots);
     return getIndexSequencesWithTooFewMismatches(indices, warningMismatches);
   }
 
-  private static Set<String> getIndexSequencesWithTooFewMismatches(List<List<Index>> indices, int mismatchesThreshold) {
+  private static Set<String> getIndexSequencesWithTooFewMismatches(List<? extends Collection<Index>> indices, int mismatchesThreshold) {
     Set<String> nearMatchSequences = new HashSet<>();
     // Real sequence → name the front end expects
     Map<String, String> knownSequences = new HashMap<>();
-    for (List<Index> indexGroup : indices) {
+    for (Collection<Index> indexGroup : indices) {
       String name = indexGroup.stream().sorted(Comparator.comparingInt(Index::getPosition)).map(Index::getSequence)
           .collect(Collectors.joining("-"));
       for (String sequence : getCombinedIndexSequences(indexGroup)) {
@@ -134,7 +135,7 @@ public class IndexChecker {
     return nearMatchSequences;
   }
 
-  private static List<String> getCombinedIndexSequences(List<Index> indices) {
+  private static List<String> getCombinedIndexSequences(Collection<Index> indices) {
     if (indices.isEmpty()) {
       return Collections.singletonList("");
     }
@@ -166,12 +167,12 @@ public class IndexChecker {
         .collect(Collectors.toList());
   }
 
-  private static List<List<Index>> getIndexSequences(PoolOrder pool) {
+  private static List<Set<Index>> getIndexSequences(PoolOrder pool) {
     return pool.getOrderLibraryAliquots().stream().map(ola -> ola.getAliquot().getLibrary().getIndices())
         .collect(Collectors.toList());
   }
 
-  private static List<List<Index>> getIndexSequences(List<LibraryAliquot> aliquots) {
+  private static List<Set<Index>> getIndexSequences(List<LibraryAliquot> aliquots) {
     return aliquots.stream().map(la -> la.getLibrary().getIndices())
         .collect(Collectors.toList());
   }

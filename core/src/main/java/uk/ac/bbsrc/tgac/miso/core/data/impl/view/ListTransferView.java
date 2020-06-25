@@ -1,12 +1,18 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl.view;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Predicate;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -19,6 +25,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 
 @Entity
+@Table(name = "Transfer")
 @Immutable
 public class ListTransferView implements Identifiable, Serializable {
 
@@ -44,14 +51,20 @@ public class ListTransferView implements Identifiable, Serializable {
   @JoinColumn(name = "recipientGroupId")
   private Group recipientGroup;
 
-  private int items;
-  private int received;
-  private int receiptPending;
-  private int qcPassed;
-  private int qcPending;
-
   @Temporal(TemporalType.TIMESTAMP)
   private Date lastModified;
+
+  @OneToMany(mappedBy = "transfer")
+  private Set<ListTransferViewSample> samples;
+
+  @OneToMany(mappedBy = "transfer")
+  private Set<ListTransferViewLibrary> libraries;
+
+  @OneToMany(mappedBy = "transfer")
+  private Set<ListTransferViewLibraryAliquot> libraryAliquots;
+
+  @OneToMany(mappedBy = "transfer")
+  private Set<ListTransferViewPool> pools;
 
   @Override
   public long getId() {
@@ -103,46 +116,6 @@ public class ListTransferView implements Identifiable, Serializable {
     this.recipientGroup = recipientGroup;
   }
 
-  public int getItems() {
-    return items;
-  }
-
-  public void setItems(int items) {
-    this.items = items;
-  }
-
-  public int getReceived() {
-    return received;
-  }
-
-  public void setReceived(int received) {
-    this.received = received;
-  }
-
-  public int getReceiptPending() {
-    return receiptPending;
-  }
-
-  public void setReceiptPending(int receiptPending) {
-    this.receiptPending = receiptPending;
-  }
-
-  public int getQcPassed() {
-    return qcPassed;
-  }
-
-  public void setQcPassed(int qcPassed) {
-    this.qcPassed = qcPassed;
-  }
-
-  public int getQcPending() {
-    return qcPending;
-  }
-
-  public void setQcPending(int qcPending) {
-    this.qcPending = qcPending;
-  }
-
   public Date getLastModified() {
     return lastModified;
   }
@@ -162,6 +135,63 @@ public class ListTransferView implements Identifiable, Serializable {
 
   public boolean isDistribution() {
     return getRecipient() != null;
+  }
+
+  public Set<ListTransferViewSample> getSamples() {
+    if (samples == null) {
+      samples = new HashSet<>();
+    }
+    return samples;
+  }
+
+  public Set<ListTransferViewLibrary> getLibraries() {
+    if (libraries == null) {
+      libraries = new HashSet<>();
+    }
+    return libraries;
+  }
+
+  public Set<ListTransferViewLibraryAliquot> getLibraryAliquots() {
+    if (libraryAliquots == null) {
+      libraryAliquots = new HashSet<>();
+    }
+    return libraryAliquots;
+  }
+
+  public Set<ListTransferViewPool> getPools() {
+    if (pools == null) {
+      pools = new HashSet<>();
+    }
+    return pools;
+  }
+
+  public long getItems() {
+    return countAllItems(item -> true);
+  }
+
+  public long getReceived() {
+    return countAllItems(item -> Boolean.TRUE.equals(item.isReceived()));
+  }
+
+  public long getReceiptPending() {
+    return countAllItems(item -> item.isReceived() == null);
+  }
+
+  public long getQcPassed() {
+    return countAllItems(item -> Boolean.TRUE.equals(item.isQcPassed()));
+  }
+
+  public long getQcPending() {
+    return countAllItems(item -> item.isQcPassed() == null);
+  }
+
+  private long countAllItems(Predicate<ListTransferViewItem> predicate) {
+    return countItems(getSamples(), predicate) + countItems(getLibraries(), predicate)
+        + countItems(getLibraryAliquots(), predicate) + countItems(getPools(), predicate);
+  }
+
+  private static long countItems(Collection<? extends ListTransferViewItem> items, Predicate<ListTransferViewItem> predicate) {
+    return items.stream().filter(predicate).count();
   }
 
 }

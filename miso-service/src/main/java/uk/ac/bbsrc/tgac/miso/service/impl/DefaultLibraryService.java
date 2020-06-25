@@ -18,8 +18,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.exception.ConstraintViolationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -81,8 +79,6 @@ import uk.ac.bbsrc.tgac.miso.service.HibernateBulkSaveService;
 @Transactional(rollbackFor = Exception.class)
 @Service
 public class DefaultLibraryService implements HibernateBulkSaveService<Library>, LibraryService, PaginatedDataSource<Library> {
-
-  protected static final Logger log = LoggerFactory.getLogger(DefaultLibraryService.class);
 
   @Autowired
   private LibraryStore libraryDao;
@@ -250,15 +246,15 @@ public class DefaultLibraryService implements HibernateBulkSaveService<Library>,
     Library managed = get(library.getId());
     User changeUser = authorizationManager.getCurrentUser();
     managed.setChangeDetails(changeUser);
-    List<Index> originalIndices = new ArrayList<>(managed.getIndices());
+    Set<Index> originalIndices = new HashSet<>(managed.getIndices());
     maybeRemoveFromBox(library, managed);
     boxService.throwIfBoxPositionIsFilled(library);
     library.setSample(sampleService.get(library.getSample().getId()));
     LimsUtils.updateParentVolume(library, managed, changeUser);
     boolean validateAliasUniqueness = !managed.getAlias().equals(library.getAlias());
+    loadChildEntities(library);
     validateChange(library, managed);
     applyChanges(managed, library);
-    loadChildEntities(managed);
     makeChangeLogForIndices(originalIndices, managed.getIndices(), managed);
     Library saved = save(managed, validateAliasUniqueness);
     sampleStore.update(library.getParent());
@@ -367,7 +363,7 @@ public class DefaultLibraryService implements HibernateBulkSaveService<Library>,
    * @param indices
    * @return
    */
-  private Set<String> stringifyIndices(List<Index> indices) {
+  private Set<String> stringifyIndices(Collection<Index> indices) {
     Set<String> original = new HashSet<>();
     for (Index index : indices) {
       if (index != null && index.isSaved()) {
@@ -385,7 +381,7 @@ public class DefaultLibraryService implements HibernateBulkSaveService<Library>,
    * @param target
    * @throws IOException
    */
-  private void makeChangeLogForIndices(List<Index> originalIndices, List<Index> updatedIndices, Library target) throws IOException {
+  private void makeChangeLogForIndices(Set<Index> originalIndices, Set<Index> updatedIndices, Library target) throws IOException {
 
     Set<String> original = stringifyIndices(originalIndices);
     Set<String> updated = stringifyIndices(updatedIndices);
@@ -435,12 +431,11 @@ public class DefaultLibraryService implements HibernateBulkSaveService<Library>,
     }
     List<Index> managedIndices = new ArrayList<>();
     for (Index index : library.getIndices()) {
-      if (index != null && index.isSaved()) {
-        Index managedIndex = indexService.get(index.getId());
-        if (managedIndex != null) managedIndices.add(managedIndex);
-      }
+      Index managedIndex = indexService.get(index.getId());
+      if (managedIndex != null) managedIndices.add(managedIndex);
     }
-    library.setIndices(managedIndices);
+    library.getIndices().clear();
+    library.getIndices().addAll(managedIndices);
     if (library.getKitDescriptor() != null) {
       library.setKitDescriptor(kitService.get(library.getKitDescriptor().getId()));
     }
@@ -503,12 +498,8 @@ public class DefaultLibraryService implements HibernateBulkSaveService<Library>,
     target.setLibraryStrategyType(source.getLibraryStrategyType());
     target.setQcPassed(source.getQcPassed());
 
-    target.setIndices(source.getIndices());
-    if (source.getKitDescriptor() != null) {
-      target.setKitDescriptor(source.getKitDescriptor());
-    } else {
-      target.setKitDescriptor(null);
-    }
+    applySetChanges(target.getIndices(), source.getIndices());
+    target.setKitDescriptor(source.getKitDescriptor());
     target.setKitLot(source.getKitLot());
     target.setSpikeIn(source.getSpikeIn());
     if (target.getSpikeIn() == null) {
@@ -566,9 +557,36 @@ public class DefaultLibraryService implements HibernateBulkSaveService<Library>,
         errors.add(new ValidationError("spikeInVolume", "Spike-in volume must be specified"));
       }
     }
+    validateIndices(library, errors);
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
+    }
+  }
+
+  private static void validateIndices(Library library, List<ValidationError> errors) {
+    Set<Index> indices = library.getIndices();
+    switch (indices.size()) {
+    case 0:
+      break;
+    case 1:
+      if (indices.iterator().next().getPosition() != 1) {
+        errors.add(new ValidationError("Invalid index position"));
+      }
+      break;
+    case 2:
+      if (indices.stream().noneMatch(index -> index.getPosition() == 1) || indices.stream().noneMatch(index -> index.getPosition() == 2)) {
+        errors.add(new ValidationError("Invalid index positions"));
+      }
+      if (indices.stream().map(index -> index.getFamily().getId()).distinct().count() > 1) {
+        errors.add(new ValidationError("Indices must belong to the same family"));
+      }
+      break;
+    default:
+      errors.add(new ValidationError("A library can only have a maximum of 2 indices"));
+    }
+    if (indices.stream().anyMatch(index -> index.getFamily().getPlatformType() != library.getPlatformType())) {
+      errors.add(new ValidationError("Library platform and index family are incompatible"));
     }
   }
 
