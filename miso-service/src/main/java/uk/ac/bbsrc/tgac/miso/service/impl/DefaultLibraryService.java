@@ -151,16 +151,23 @@ public class DefaultLibraryService implements HibernateBulkSaveService<Library>,
       // post-save field generation
       boolean needsUpdate = false;
       if (hasTemporaryName(library)) {
-        managed.setName(namingScheme.generateNameFor(managed));
+        try {
+          managed.setName(namingScheme.generateNameFor(managed));
+        } catch (MisoNamingException e) {
+          throw new ValidationException(new ValidationError("name", e.getMessage()));
+        }
         validateNameOrThrow(managed, namingScheme);
         needsUpdate = true;
       }
       if (hasTemporaryAlias(library)) {
-        String generatedAlias = namingScheme.generateLibraryAlias(managed);
-        managed.setAlias(generatedAlias);
+        try {
+          managed.setAlias(namingScheme.generateLibraryAlias(managed));
+        } catch (MisoNamingException e) {
+          throw new ValidationException(new ValidationError("alias", e.getMessage()));
+        }
         if (isDetailedLibrary(managed)) {
           // generation of non-standard aliases is allowed
-          ((DetailedLibrary) managed).setNonStandardAlias(!namingScheme.validateLibraryAlias(generatedAlias).isValid());
+          ((DetailedLibrary) managed).setNonStandardAlias(!namingScheme.validateLibraryAlias(managed.getAlias()).isValid());
         } else {
           validateAliasOrThrow(managed, namingScheme);
         }
@@ -178,8 +185,6 @@ public class DefaultLibraryService implements HibernateBulkSaveService<Library>,
         validateAliasUniqueness(managed, namingScheme);
       }
       return managed;
-    } catch (MisoNamingException e) {
-      throw new IllegalArgumentException(e.getMessage(), e);
     } catch (ConstraintViolationException e) {
       // Send the nested root cause message to the user, since it contains the actual error.
       throw new ConstraintViolationException(e.getMessage() + " " + ExceptionUtils.getRootCauseMessage(e), e.getSQLException(),

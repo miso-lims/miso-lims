@@ -8,6 +8,15 @@ FormTarget.sampleclass = (function($) {
    * }
    */
 
+  var fieldDescriptions = {
+    suffix: 'Code to include as part of the alias if using the OICR naming scheme.',
+    v2NamingCode: 'Code to include as part of the alias if using the V2 naming scheme. Only used for '
+        + 'stock and tissue processing classes. Exception: V2 naming codes for tissue piece types are '
+        + 'defined in the individual tissue piece type.',
+    directCreationAllowed: 'If checked, this sample class can be used for receipt and propagation; '
+        + 'otherwise, the class can only be used as part of the hierarchy when receiving libraries.'
+  };
+
   return {
     getUserManualUrl: function() {
       return Urls.external.userManual('type_data', 'sample-classes-and-categories');
@@ -64,19 +73,22 @@ FormTarget.sampleclass = (function($) {
       getDisplayValue: function(sampleClass) {
         return sampleClass.suffix || 'n/a';
       },
-      type: 'read-only'
+      type: 'read-only',
+      description: fieldDescriptions.suffix
     }, {
       title: 'V2 Naming Code',
       data: 'v2NamingCode',
       getDisplayValue: function(sampleClass) {
         return sampleClass.v2NamingCode || 'n/a';
       },
-      type: 'read-only'
+      type: 'read-only',
+      description: fieldDescriptions.v2NamingCode
     }, {
-      title: 'Receipt Allowed?',
+      title: 'Direct Creation Allowed?',
       data: 'directCreationAllowed',
       type: 'checkbox',
-      disabled: true
+      disabled: true,
+      description: fieldDescriptions.directCreationAllowed
     }, {
       title: 'DNase Treatable?',
       data: 'dnaseTreatable',
@@ -132,16 +144,19 @@ FormTarget.sampleclass = (function($) {
           title: 'Suffix',
           data: 'suffix',
           type: 'text',
-          maxLength: 5
+          maxLength: 5,
+          description: fieldDescriptions.suffix
         }, {
           title: 'V2 Naming Code',
           data: 'v2NamingCode',
           type: 'text',
-          maxLength: 2
+          maxLength: 2,
+          description: fieldDescriptions.v2NamingCode
         }, {
           title: 'Direct Creation Allowed?',
           data: 'directCreationAllowed',
-          type: 'checkbox'
+          type: 'checkbox',
+          description: fieldDescriptions.directCreationAllowed
         }, {
           title: 'DNase Treatable?',
           data: 'dnaseTreatable',
