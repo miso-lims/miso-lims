@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
@@ -21,13 +22,11 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.SaveDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SopDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.util.HibernateSessionManager;
 import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
-import uk.ac.bbsrc.tgac.miso.service.HibernateBulkSaveService;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class DefaultSopService extends AbstractSaveService<Sop> implements HibernateBulkSaveService<Sop>, SopService {
+public class DefaultSopService extends AbstractSaveService<Sop> implements SopService {
 
   @Autowired
   private SopDao sopDao;
@@ -36,7 +35,7 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements Hiber
   @Autowired
   private DeletionStore deletionStore;
   @Autowired
-  private HibernateSessionManager hibernateSessionManager;
+  private TransactionTemplate transactionTemplate;
 
   @Override
   public DeletionStore getDeletionStore() {
@@ -108,11 +107,6 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements Hiber
   }
 
   @Override
-  public HibernateSessionManager getHibernateSessionManager() {
-    return hibernateSessionManager;
-  }
-
-  @Override
   public long count(Consumer<String> errorHandler, PaginationFilter... filter) throws IOException {
     return sopDao.count(errorHandler, filter);
   }
@@ -121,6 +115,11 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements Hiber
   public List<Sop> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol, PaginationFilter... filter)
       throws IOException {
     return sopDao.list(offset, limit, sortDir, sortCol, filter);
+  }
+
+  @Override
+  public TransactionTemplate getTransactionTemplate() {
+    return transactionTemplate;
   }
 
 }

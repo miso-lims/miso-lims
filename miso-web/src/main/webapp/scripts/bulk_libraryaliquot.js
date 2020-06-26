@@ -14,6 +14,9 @@ BulkTarget.libraryaliquot = (function($) {
     getSaveUrl: function() {
       return Urls.rest.libraryAliquots.bulkSave;
     },
+    getSaveProgressUrl: function(operationId) {
+      return Urls.rest.libraryAliquots.bulkSaveProgress(operationId);
+    },
     getUserManualUrl: function() {
       return Urls.external.userManual('library_aliquots');
     },

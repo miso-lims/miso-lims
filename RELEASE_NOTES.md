@@ -2,7 +2,8 @@
 
 Changes:
 
-  * improved performance of bulk library save
+  * Improved performance of bulk library save
+  * Added progress bar to dialog shown during bulk save
   * Fixed "Request header is too large" error limitting number of items that can be bulk created/edited
   * Fixed URL not saving correctly when editing SOPs
 

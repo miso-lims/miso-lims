@@ -375,7 +375,8 @@ Urls = (function() {
     projectDatatable: idUrlFunction(libraryRestBase + '/dt/project'),
     bulkDelete: libraryRestBase + '/bulk-delete',
     spreadsheet: libraryRestBase + '/spreadsheet',
-    bulkSave: libraryRestBase + '/bulk'
+    bulkSave: libraryRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(libraryRestBase + '/bulk')
   };
 
   // Library Aliquots
@@ -409,7 +410,8 @@ Urls = (function() {
     spreadsheet: libraryAliquotRestBase + '/spreadsheet',
     parents: idUrlFunction(libraryAliquotRestBase + '/parents'),
     children: idUrlFunction(libraryAliquotRestBase + '/children'),
-    bulkSave: libraryAliquotRestBase + '/bulk'
+    bulkSave: libraryAliquotRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(libraryAliquotRestBase + '/bulk')
   };
 
   // Library Designs
@@ -701,7 +703,8 @@ Urls = (function() {
     bulkDelete: sampleRestBase + '/bulk-delete',
     identitiesLookup: sampleRestBase + '/identitiesLookup',
     spreadsheet: sampleRestBase + '/spreadsheet',
-    bulkSave: sampleRestBase + '/bulk'
+    bulkSave: sampleRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(sampleRestBase + '/bulk')
   };
 
   // Sample Classes
@@ -824,6 +827,7 @@ Urls = (function() {
   var sopRestBase = restBase + '/sops';
   rest.sops = {
     bulkSave: sopRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(sopRestBase + '/bulk'),
     categoryDatatable: idUrlFunction(sopRestBase + '/dt/category')
   };
 

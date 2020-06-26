@@ -1051,6 +1051,14 @@ Utils.ui = {
 
   updateHelpLink: function(url) {
     jQuery('#userManualLink').attr('href', url ? url : Urls.external.userManual());
+  },
+
+  makeProgressBar: function(id) {
+    return jQuery('<div>').addClass('progress-bar').append(jQuery('<div>').attr('id', id).addClass('progress-bar-progress'));
+  },
+
+  setProgressBarProgress: function(id, percent) {
+    jQuery('#' + id).css('width', percent + '%');
   }
 };
 

@@ -110,6 +110,8 @@ BulkUtils = (function($) {
   var DEFAULT_DECIMAL_PRECISION = 21;
   var DEFAULT_DECIMAL_SCALE = 17;
 
+  var TERRIBLY_WRONG_MESSAGE = 'Something went terribly wrong. Please file a ticket with a screenshot or copy-paste of the data that you were trying to save.';
+
   CONTAINER_ID = 'hotContainer';
   SAVE = '#save';
   LOADER = '#ajaxLoader';
@@ -1632,24 +1634,89 @@ BulkUtils = (function($) {
             updateSourceData(data, hot, columns, api);
 
             $.when(target.confirmSave ? target.confirmSave(data, config) : null).then(function() {
-              var method = config.pageMode === 'edit' ? 'PUT' : 'POST';
-              Utils.ajaxWithDialog('Saving', method, target.getSaveUrl(), data, function(savedData) {
-                Utils.showWorkingDialog('Saving', function() {
-                  tableSaved = true;
-                  rebuildTable(hot, target, config, savedData);
-                  showSuccess('Saved ' + savedData.length + ' items');
-                  showLoading(false, false);
-                });
-              }, function(response, textStatus, errorThrown) {
-                showSaveError(response, hot, columns);
-                showLoading(false, true);
-              }, true);
+              saveWithProgressDialog(hot, target, columns, config, data);
             }).fail(function() {
               showError('Save cancelled');
               showLoading(false, true);
             });
           });
         });
+  }
+
+  function saveWithProgressDialog(hot, target, columns, config, data) {
+    var dialogArea = $('#dialog');
+    dialogArea.empty();
+    dialogArea.append($('<p>').text('Processed ').append($('<span>').attr('id', 'dialogProgressText').text('0/' + data.length)));
+    dialogArea.append(Utils.ui.makeProgressBar('dialogProgressBar'));
+
+    var dialog = jQuery('#dialog').dialog({
+      autoOpen: true,
+      height: 400,
+      width: 350,
+      title: 'Saving',
+      modal: true,
+      buttons: {},
+      closeOnEscape: false,
+      open: function(event, ui) {
+        jQuery(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+      }
+    });
+    jQuery.ajax({
+      dataType: 'json',
+      type: config.pageMode === 'edit' ? 'PUT' : 'POST',
+      url: target.getSaveUrl(),
+      data: data == null ? undefined : JSON.stringify(data),
+      contentType: 'application/json; charset=utf8'
+    }).success(function(data) {
+      var updateProgress = function(update) {
+        $('#dialogProgressText').text(update.completedUnits + '/' + update.totalUnits);
+        var percentComplete = update.completedUnits * 100 / update.totalUnits;
+        Utils.ui.setProgressBarProgress('dialogProgressBar', percentComplete);
+
+        switch (update.status) {
+        case 'running':
+          window.setTimeout(function() {
+            $.ajax({
+              dataType: 'json',
+              type: 'GET',
+              url: target.getSaveProgressUrl(update.operationId),
+              contentType: 'application/json; charset=utf8'
+            }).success(function(progressData) {
+              updateProgress(progressData);
+            }).fail(function(response, textStatus, serverStatus) {
+              // progress request failed (operation status unknown)
+              showSaveError(response, hot, columns);
+              showLoading(false, false);
+              dialog.dialog('close');
+            });
+          }, 2000);
+          break;
+        case 'completed':
+          tableSaved = true;
+          rebuildTable(hot, target, config, update.data);
+          showSuccess('Saved ' + update.totalUnits + ' items');
+          showLoading(false, false);
+          dialog.dialog('close');
+          break;
+        case 'failed':
+          showSaveFailure(update, hot, columns);
+          showLoading(false, true);
+          dialog.dialog('close');
+          break;
+        default:
+          showError(TERRIBLY_WRONG_MESSAGE);
+          showLoading(false, false);
+          dialog.dialog('close');
+          throw new Error('Unexpected operation status: ' + update.status);
+        }
+      };
+      updateProgress(data);
+    }).fail(function(response, textStatus, serverStatus) {
+      // initial save request failed
+      showSaveError(response, hot, columns);
+      showLoading(false, true);
+      dialog.dialog('close');
+    });
   }
 
   function showLoading(loading, allowSave) {
@@ -1726,11 +1793,24 @@ BulkUtils = (function($) {
       responseData = JSON.parse(response.responseText);
     }
     if (!responseData || !responseData.detail) {
-      showError('Something went terribly wrong. Please file a ticket with a screenshot or copy-paste of the data that you were trying to save.');
+      showError(TERRIBLY_WRONG_MESSAGE);
     } else if (responseData.dataFormat === 'bulk validation') {
       showValidationErrors(responseData.detail, responseData.data, hot, columns);
     } else {
       showError(responseData.detail);
+    }
+  }
+
+  function showSaveFailure(update, hot, columns) {
+    if (update.status !== 'failed') {
+      throw new Error('Update is not failure');
+    }
+    if (update.data) {
+      showValidationErrors(update.detail, update.data, hot, columns);
+    } else if (update.detail) {
+      showError(update.detail);
+    } else {
+      showError(TERRIBLY_WRONG_MESSAGE);
     }
   }
 

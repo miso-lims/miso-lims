@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.annotations.VisibleForTesting;
@@ -48,13 +49,10 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAliquotStore;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryStore;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.util.HibernateSessionManager;
-import uk.ac.bbsrc.tgac.miso.service.HibernateBulkSaveService;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultLibraryAliquotService
-    implements HibernateBulkSaveService<LibraryAliquot>, LibraryAliquotService, PaginatedDataSource<LibraryAliquot> {
+public class DefaultLibraryAliquotService implements LibraryAliquotService, PaginatedDataSource<LibraryAliquot> {
 
   @Autowired
   private LibraryAliquotStore libraryAliquotDao;
@@ -81,7 +79,7 @@ public class DefaultLibraryAliquotService
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
   @Autowired
-  private HibernateSessionManager hibernateSessionManager;
+  private TransactionTemplate transactionTemplate;
 
   @Override
   public LibraryAliquot get(long id) throws IOException {
@@ -429,8 +427,8 @@ public class DefaultLibraryAliquotService
   }
 
   @Override
-  public HibernateSessionManager getHibernateSessionManager() {
-    return hibernateSessionManager;
+  public TransactionTemplate getTransactionTemplate() {
+    return transactionTemplate;
   }
 
 }
