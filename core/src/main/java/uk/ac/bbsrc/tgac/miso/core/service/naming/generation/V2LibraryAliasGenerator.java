@@ -25,7 +25,7 @@ public class V2LibraryAliasGenerator implements NameGenerator<Library> {
   @Override
   public String generate(Library library) throws MisoNamingException, IOException {
     if (!isDetailedLibrary(library)) {
-      throw new IllegalArgumentException("Can only generate an alias for detailed libraries");
+      throw new MisoNamingException("Can only generate an alias for detailed libraries");
     }
     DetailedSample tissue = getParent(SampleTissue.class, (DetailedSample) library.getSample());
     String partialAlias = tissue.getAlias() + "_LB";

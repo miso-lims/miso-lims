@@ -40,7 +40,7 @@ public class V2SampleAliasGenerator implements NameGenerator<Sample> {
   @Override
   public String generate(Sample sample) throws MisoNamingException, IOException {
     if (!LimsUtils.isDetailedSample(sample)) {
-      throw new IllegalArgumentException("Can only generate an alias for detailed samples");
+      throw new MisoNamingException("Can only generate an alias for detailed samples");
     }
     DetailedSample detailed = (DetailedSample) sample;
 
@@ -56,9 +56,9 @@ public class V2SampleAliasGenerator implements NameGenerator<Sample> {
     }
   }
 
-  private String generateIdentityAlias(DetailedSample sample) throws IOException {
+  private String generateIdentityAlias(DetailedSample sample) throws IOException, MisoNamingException {
     if (sample.getProject().getShortName() == null) {
-      throw new NullPointerException("Project shortname required to generate Identity alias");
+      throw new MisoNamingException("Project shortname required to generate Identity alias");
     }
     String partialAlias = sample.getProject().getShortName() + UNDERSCORE;
     String number = sampleNumberPerProjectService.nextNumber(sample.getProject(), partialAlias);
@@ -70,17 +70,17 @@ public class V2SampleAliasGenerator implements NameGenerator<Sample> {
     return constructAlias(identity.getAlias(), UNDERSCORE, 2);
   }
 
-  private String generateLevel3Alias(DetailedSample sample) throws IOException {
+  private String generateLevel3Alias(DetailedSample sample) throws IOException, MisoNamingException {
     DetailedSample tissue = getParent(SampleTissue.class, sample);
     if (isTissuePieceSample(sample)) {
       SampleTissuePiece tissuePiece = (SampleTissuePiece) sample;
       if (isStringEmptyOrNull(tissuePiece.getTissuePieceType().getV2NamingCode())) {
-        throw new IllegalArgumentException("Tissue piece type is missing V2 naming code");
+        throw new MisoNamingException("Tissue piece type is missing V2 naming code");
       }
       return constructAlias(tissue.getAlias(), UNDERSCORE, tissuePiece.getTissuePieceType().getV2NamingCode(), 2);
     } else {
       if (isStringEmptyOrNull(sample.getSampleClass().getV2NamingCode())) {
-        throw new IllegalArgumentException("Sample class is missing V2 naming code");
+        throw new MisoNamingException("Sample class is missing V2 naming code");
       }
       return constructAlias(tissue.getAlias(), UNDERSCORE, sample.getSampleClass().getV2NamingCode(), 2);
     }

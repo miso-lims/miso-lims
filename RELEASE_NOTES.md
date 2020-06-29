@@ -3,6 +3,7 @@
 Changes:
 
   * Added box type attribute to box sizes for specifying whether the item is a storage box or plate
+  * Fixed URL not saving correctly when editing SOPs
   * Fixed "Request header is too large" error limitting number of items that can be bulk created/edited
 
 # 1.7.1
@@ -10,6 +11,10 @@ Changes:
 Changes:
 
   * Fixed error saving runs with metrics
+
+Known Issues:
+
+  * When editing SOPs, the URL is not saved correctly
 
 # 1.7.0
 
@@ -52,6 +57,7 @@ Upgrade Notes:
 Known Issues:
 
   * Error saving runs with metrics
+  * When editing SOPs, the URL is not saved correctly
 
 # 1.6.0
 
