@@ -39,10 +39,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
  * Indices represent adapter sequences that can be prepended to sequencable material in order to facilitate multiplexing.
@@ -156,26 +156,16 @@ public class Index implements Deletable, Nameable, Serializable {
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(9, 39)
-        .append(family)
-        .append(name)
-        .append(sequence)
-        .append(position)
-        .toHashCode();
+    return LimsUtils.hashCodeByIdFirst(this, family, name, sequence, position);
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
-    Index other = (Index) obj;
-    return new EqualsBuilder()
-        .append(family, other.family)
-        .append(name, other.name)
-        .append(sequence, other.sequence)
-        .append(position, other.position)
-        .isEquals();
+    return LimsUtils.equalsByIdFirst(this, obj,
+        Index::getFamily,
+        Index::getName,
+        Index::getSequence,
+        Index::getPosition);
   }
 
   @Override

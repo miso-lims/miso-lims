@@ -11,11 +11,11 @@ public class ListTransferViewDto {
   private String recipient;
   private Long recipientGroupId;
   private String recipientGroupName;
-  private int items;
-  private int received;
-  private int receiptPending;
-  private int qcPassed;
-  private int qcPending;
+  private long items;
+  private long received;
+  private long receiptPending;
+  private long qcPassed;
+  private long qcPending;
   private String lastModified;
 
   public long getId() {
@@ -90,43 +90,43 @@ public class ListTransferViewDto {
     this.recipientGroupName = recipientGroupName;
   }
 
-  public int getItems() {
+  public long getItems() {
     return items;
   }
 
-  public void setItems(int items) {
+  public void setItems(long items) {
     this.items = items;
   }
 
-  public int getReceived() {
+  public long getReceived() {
     return received;
   }
 
-  public void setReceived(int received) {
+  public void setReceived(long received) {
     this.received = received;
   }
 
-  public int getReceiptPending() {
+  public long getReceiptPending() {
     return receiptPending;
   }
 
-  public void setReceiptPending(int receiptPending) {
+  public void setReceiptPending(long receiptPending) {
     this.receiptPending = receiptPending;
   }
 
-  public int getQcPassed() {
+  public long getQcPassed() {
     return qcPassed;
   }
 
-  public void setQcPassed(int qcPassed) {
+  public void setQcPassed(long qcPassed) {
     this.qcPassed = qcPassed;
   }
 
-  public int getQcPending() {
+  public long getQcPending() {
     return qcPending;
   }
 
-  public void setQcPending(int qcPending) {
+  public void setQcPending(long qcPending) {
     this.qcPending = qcPending;
   }
 

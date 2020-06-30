@@ -172,7 +172,7 @@ public class PoolableElementView implements Identifiable, Serializable, Comparab
     
     Library lib = aliquot.getLibrary();
     if (lib != null) {
-      v.setIndices(lib.getIndices());
+      v.setIndices(new ArrayList<>(lib.getIndices()));
       v.setLibraryAlias(lib.getAlias());
       v.setLibraryBarcode(lib.getIdentificationBarcode());
       v.setLibraryDescription(lib.getDescription());

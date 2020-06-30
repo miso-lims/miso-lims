@@ -8,6 +8,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -88,7 +89,19 @@ public class HibernateListTransferViewDao implements ListTransferViewDao, Hibern
 
   @Override
   public void restrictPaginationByPending(Criteria criteria, Consumer<String> errorHandler) {
-    criteria.add(Restrictions.or(Restrictions.gt("receiptPending", 0), Restrictions.gt("qcPending", 0)));
+    criteria.createAlias("samples", "sample", JoinType.LEFT_OUTER_JOIN)
+        .createAlias("libraries", "library", JoinType.LEFT_OUTER_JOIN)
+        .createAlias("libraryAliquots", "aliquot", JoinType.LEFT_OUTER_JOIN)
+        .createAlias("pools", "pool", JoinType.LEFT_OUTER_JOIN)
+        .add(Restrictions.or(
+            Restrictions.and(Restrictions.isNotEmpty("samples"),
+                Restrictions.or(Restrictions.isNull("sample.received"), Restrictions.isNull("sample.qcPassed"))),
+            Restrictions.and(Restrictions.isNotEmpty("libraries"),
+                Restrictions.or(Restrictions.isNull("library.received"), Restrictions.isNull("library.qcPassed"))),
+            Restrictions.and(Restrictions.isNotEmpty("libraryAliquots"),
+                Restrictions.or(Restrictions.isNull("aliquot.received"), Restrictions.isNull("aliquot.qcPassed"))),
+            Restrictions.and(Restrictions.isNotEmpty("pools"),
+                Restrictions.or(Restrictions.isNull("pool.received"), Restrictions.isNull("pool.qcPassed")))));
   }
 
   @Override

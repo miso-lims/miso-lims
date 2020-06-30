@@ -1358,8 +1358,9 @@ public class Dtos {
     }
     setString(dto::setKitLot, from.getKitLot());
     if (!from.getIndices().isEmpty()) {
-      dto.setIndexFamilyId(from.getIndices().get(0).getFamily().getId());
-      dto.setIndexFamilyName(from.getIndices().get(0).getFamily().getName());
+      IndexFamily family = from.getIndices().iterator().next().getFamily();
+      dto.setIndexFamilyId(family.getId());
+      dto.setIndexFamilyName(family.getName());
       for (Index index : from.getIndices()) {
         switch (index.getPosition()) {
         case 1:
@@ -1444,16 +1445,14 @@ public class Dtos {
     }
     to.setQcPassed(from.getQcPassed());
     if (from.getIndex1Id() != null) {
-      List<Index> indices = new ArrayList<>();
       Index tb1 = new Index();
       tb1.setId(from.getIndex1Id());
-      indices.add(tb1);
+      to.getIndices().add(tb1);
       if (from.getIndex2Id() != null) {
         Index tb2 = new Index();
         tb2.setId(from.getIndex2Id());
-        indices.add(tb2);
+        to.getIndices().add(tb2);
       }
-      to.setIndices(indices);
     }
     setBigDecimal(to::setInitialVolume, from.getInitialVolume());
     setBigDecimal(to::setVolume, from.getVolume());
@@ -3988,11 +3987,11 @@ public class Dtos {
     setString(to::setRecipient, from.getRecipient());
     setId(to::setRecipientGroupId, from.getRecipientGroup());
     setString(to::setRecipientGroupName, maybeGetProperty(from.getRecipientGroup(), Group::getName));
-    setInteger(to::setItems, from.getItems(), false);
-    setInteger(to::setReceived, from.getReceived(), false);
-    setInteger(to::setReceiptPending, from.getReceiptPending(), false);
-    setInteger(to::setQcPassed, from.getQcPassed(), false);
-    setInteger(to::setQcPending, from.getQcPending(), false);
+    setLong(to::setItems, from.getItems(), false);
+    setLong(to::setReceived, from.getReceived(), false);
+    setLong(to::setReceiptPending, from.getReceiptPending(), false);
+    setLong(to::setQcPassed, from.getQcPassed(), false);
+    setLong(to::setQcPending, from.getQcPending(), false);
     setDateTimeString(to::setLastModified, from.getLastModified());
     return to;
   }
