@@ -101,6 +101,7 @@ public class DefaultBoxSizeService implements BoxSizeService {
     to.setRows(from.getRows());
     to.setColumns(from.getColumns());
     to.setScannable(from.getScannable());
+    to.setBoxType(from.getBoxType());
   }
 
   @Override

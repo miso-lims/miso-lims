@@ -11,6 +11,7 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import uk.ac.bbsrc.tgac.miso.core.data.BoxSize.BoxType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
@@ -146,6 +147,13 @@ public class AdvancedSearchParser {
           return PaginationFilter.institute(parts[1]);
         case "box":
           return PaginationFilter.box(parts[1]);
+        case "boxType":
+          try {
+            return PaginationFilter.boxType(BoxType.valueOf(parts[1].toUpperCase()));
+          } catch (IllegalArgumentException e) {
+            errorHandler.accept("Invalid box type: " + parts[1]);
+            return null;
+          }
         case "kitname":
           return PaginationFilter.kitName(parts[1]);
         case "subproject":

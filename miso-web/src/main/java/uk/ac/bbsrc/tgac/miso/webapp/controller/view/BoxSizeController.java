@@ -10,7 +10,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxSize.BoxType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxSizeService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
@@ -44,6 +49,16 @@ public class BoxSizeController extends AbstractTypeDataController<BoxSize, BoxSi
   @GetMapping("/bulk/edit")
   public ModelAndView edit(@RequestParam("ids") String idString, ModelMap model) throws IOException {
     return bulkEdit(idString, model);
+  }
+
+  @Override
+  protected void addHotConfig(ObjectNode config, ObjectMapper mapper) throws IOException {
+    ArrayNode boxTypes = config.putArray("boxTypes");
+    for (BoxType boxType : BoxType.values()) {
+      ObjectNode dto = boxTypes.addObject();
+      dto.put("name", boxType.name());
+      dto.put("label", boxType.getLabel());
+    }
   }
 
   @Override

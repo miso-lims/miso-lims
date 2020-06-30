@@ -38,7 +38,7 @@ HotTarget.box = (function(box) {
         validator: HotUtils.validator.optionalTextNoSpecialChars
       }), HotUtils.makeColumnForConstantsList('Box Use', true, 'use', 'useId', 'id', 'alias', Constants.boxUses, true, {
         validator: HotUtils.validator.requiredAutocomplete
-      }), HotUtils.makeColumnForConstantsList('Box Size', create, 'size', 'sizeId', 'id', 'rowsByColumns', Constants.boxSizes, true, {
+      }), HotUtils.makeColumnForConstantsList('Box Size', create, 'size', 'sizeId', 'id', 'label', Constants.boxSizes, true, {
         validator: HotUtils.validator.requiredAutocomplete
       }), HotUtils.makeColumnForText('Location', true, 'locationBarcode', {
         validator: HotUtils.validator.optionalTextNoSpecialChars
