@@ -209,7 +209,7 @@ public enum PrintableField implements PrintableText {
 
         @Override
         public String visitBox(Box box) {
-          return box.getSize().getRowsByColumns();
+          return box.getSize().getLabel();
         }
 
         @Override

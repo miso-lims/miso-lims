@@ -47,7 +47,7 @@ public class BoxPageIT extends AbstractIT {
     unsaved.put(Field.BARCODE, "newbarcode");
     unsaved.put(Field.DESCRIPTION, "Test");
     unsaved.put(Field.USE, "Storage");
-    unsaved.put(Field.SIZE, "10 × 10");
+    unsaved.put(Field.SIZE, "10×10 Storage");
     unsaved.put(Field.LOCATION, "Here");
     page.setFields(unsaved);
 
@@ -62,7 +62,7 @@ public class BoxPageIT extends AbstractIT {
     assertEquals("confirm box barcode", unsaved.get(Field.BARCODE), box.getIdentificationBarcode());
     assertEquals("confirm box description", unsaved.get(Field.DESCRIPTION), box.getDescription());
     assertEquals("confirm box use", unsaved.get(Field.USE), box.getUse().getAlias());
-    assertEquals("confirm box size", unsaved.get(Field.SIZE), box.getSize().getRowsByColumns());
+    assertEquals("confirm box size", unsaved.get(Field.SIZE), box.getSize().getLabel());
     assertEquals("confirm box location", unsaved.get(Field.LOCATION), box.getLocationBarcode());
   }
 

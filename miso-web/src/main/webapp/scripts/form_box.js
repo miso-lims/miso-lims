@@ -66,18 +66,14 @@ FormTarget.box = (function($) {
           data: 'sizeId',
           type: 'dropdown',
           source: Constants.boxSizes,
-          getItemLabel: function(boxSize) {
-            return boxSize.rowsByColumnsWithScan;
-          },
+          getItemLabel: Utils.array.get('label'),
           getItemValue: Utils.array.getId,
           required: true,
           include: config.isNew
         }, {
           title: 'Box Size',
           data: 'sizeId',
-          getDisplayValue: function(box) {
-            return box.rows + ' × ' + box.cols + ' (can ' + (box.scannable ? '' : 'not ') + 'be scanned by your lab\'s bulk scanner)';
-          },
+          getDisplayValue: Utils.array.get('sizeLabel'),
           type: 'read-only',
           include: !config.isNew
         }, {

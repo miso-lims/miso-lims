@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 
 import com.eaglegenomics.simlims.core.Group;
 
+import uk.ac.bbsrc.tgac.miso.core.data.BoxSize.BoxType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
@@ -21,6 +22,8 @@ public interface PaginationFilterSink<T> {
   public void restrictPaginationByArrayed(T item, boolean isArrayed, Consumer<String> errorHandler);
 
   public void restrictPaginationByBox(T item, String name, Consumer<String> errorHandler);
+
+  public void restrictPaginationByBoxType(T item, BoxType boxType, Consumer<String> errorHandler);
 
   public void restrictPaginationByBoxUse(T item, long id, Consumer<String> errorHandler);
 

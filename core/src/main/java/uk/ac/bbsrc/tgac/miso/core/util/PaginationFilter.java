@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import com.eaglegenomics.simlims.core.Group;
 
+import uk.ac.bbsrc.tgac.miso.core.data.BoxSize.BoxType;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
@@ -49,6 +50,16 @@ public abstract interface PaginationFilter {
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
         sink.restrictPaginationByBox(item, name, errorHandler);
+      }
+    };
+  }
+
+  public static PaginationFilter boxType(BoxType boxType) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByBoxType(item, boxType, errorHandler);
       }
     };
   }

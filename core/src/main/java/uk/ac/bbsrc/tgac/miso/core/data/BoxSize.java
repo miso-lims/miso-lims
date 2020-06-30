@@ -1,21 +1,39 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
 @Table(name = "BoxSize")
 public class BoxSize implements Deletable, Identifiable, Serializable {
+
+  public enum BoxType {
+    STORAGE("Storage"), PLATE("Plate");
+
+    private final String label;
+
+    private BoxType(String label) {
+      this.label = label;
+    }
+
+    public String getLabel() {
+      return label;
+    }
+  }
 
   private static final long serialVersionUID = 1L;
 
@@ -30,6 +48,8 @@ public class BoxSize implements Deletable, Identifiable, Serializable {
   @Column(name = "boxSizeColumns")
   private Integer boxSizeColumns;
   private boolean scannable;
+  @Enumerated(EnumType.STRING)
+  private BoxType boxType;
 
   @Override
   public long getId() {
@@ -57,17 +77,9 @@ public class BoxSize implements Deletable, Identifiable, Serializable {
     this.boxSizeColumns = columns;
   }
 
-  /**
-   * Creates a String of number of boxSizeRows x number of boxSizeColumns.
-   * 
-   * @return String getRowsByColumns
-   */
-  public String getRowsByColumns() {
-    return Integer.toString(boxSizeRows) + " × " + Integer.toString(boxSizeColumns);
-  }
-
-  public String getRowsByColumnsWithScan() {
-    return getRowsByColumns() + (getScannable() ? " scannable" : "");
+  public String getLabel() {
+    return Integer.toString(boxSizeRows) + "×" + Integer.toString(boxSizeColumns)
+        + " " + getBoxType().getLabel() + (getScannable() ? " (scannable)" : "");
   }
 
   /**
@@ -84,32 +96,31 @@ public class BoxSize implements Deletable, Identifiable, Serializable {
     this.scannable = scannable;
   }
 
+  public BoxType getBoxType() {
+    return boxType;
+  }
+
+  public void setBoxType(BoxType boxType) {
+    this.boxType = boxType;
+  }
+
   public Stream<String> positionStream() {
     return IntStream.range(0, boxSizeRows * boxSizeColumns).mapToObj(x -> BoxUtils.getPositionString(x / boxSizeColumns, x % boxSizeColumns));
   }
 
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + boxSizeColumns;
-    result = prime * result + (int) (id ^ (id >>> 32));
-    result = prime * result + boxSizeRows;
-    result = prime * result + (scannable ? 1231 : 1237);
-    return result;
+    return Objects.hash(id, boxSizeColumns, boxSizeRows, scannable, boxType);
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
-    BoxSize other = (BoxSize) obj;
-    if (boxSizeColumns != other.boxSizeColumns) return false;
-    if (id != other.id) return false;
-    if (boxSizeRows != other.boxSizeRows) return false;
-    if (scannable != other.scannable) return false;
-    return true;
+    return LimsUtils.equals(this, obj,
+        BoxSize::getId,
+        BoxSize::getColumns,
+        BoxSize::getRows,
+        BoxSize::getScannable,
+        BoxSize::getBoxType);
   }
 
   @Override
@@ -124,7 +135,7 @@ public class BoxSize implements Deletable, Identifiable, Serializable {
 
   @Override
   public String getDeleteDescription() {
-    return getRowsByColumnsWithScan();
+    return getLabel();
   }
 
 }
