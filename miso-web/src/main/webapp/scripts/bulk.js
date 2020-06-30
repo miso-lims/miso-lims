@@ -803,6 +803,43 @@ BulkUtils = (function($) {
       }
     });
 
+    hot.addHook('beforePaste', function(data, coords) {
+      // data = array of arrays (rows) e.g. [[top-left, top-right][bottom-left, bottom-right]]
+      // coords = [{startRow: 0, startCol: 0, endRow: 1, endCol: 2}]
+      // Note: coords only represents the range that was selected before pasting. pasted values may exceed this range
+      if (coords.length !== 1 || !data.length || !data[0] || !data[0].length) {
+        // not sure what data looks like with multiple ranges, but probably not useful anyway
+        return;
+      }
+      for (var col = coords[0].startCol; col < data[0].length + coords[0].startCol; col++) {
+        var column = columns[col];
+        if (column.type !== 'dropdown') {
+          continue;
+        }
+        var colSource = hot.getSettings().columns[col].source;
+        for (var row = coords[0].startRow; row < data.length + coords[0].startRow; row++) {
+          var cellSource = hot.getCellMeta(row, col).source || colSource;
+          if (!cellSource || !cellSource.length) {
+            continue;
+          }
+          var pastedValue = data[row - coords[0].startRow][col - coords[0].startCol];
+          if (cellSource.indexOf(pastedValue) === -1) {
+            var matches = cellSource.filter(function(item) {
+              return item.includes(pastedValue);
+            });
+            if (matches.length > 1) {
+              matches = cellSource.filter(function(item) {
+                return item.startsWith(pastedValue);
+              });
+            }
+            if (matches.length === 1) {
+              data[row - coords[0].startRow][col - coords[0].startCol] = matches[0];
+            }
+          }
+        }
+      }
+    });
+
     hot.validateCells();
 
     extendApi(api, hot, columns);
