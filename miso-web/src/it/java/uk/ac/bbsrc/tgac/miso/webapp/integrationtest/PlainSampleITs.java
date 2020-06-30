@@ -35,7 +35,7 @@ public class PlainSampleITs extends AbstractIT {
       SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS, SamColumns.BOX_POSITION, SamColumns.DISCARDED, SamColumns.RECEIVE_DATE,
       SamColumns.RECEIVE_TIME, SamColumns.RECEIVED_FROM, SamColumns.RECEIVED_BY, SamColumns.RECEIPT_CONFIRMED, SamColumns.RECEIPT_QC_PASSED,
       SamColumns.RECEIPT_QC_NOTE, SamColumns.REQUISITION_ID, SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT,
-      SamColumns.QC_PASSED);
+      SamColumns.VOLUME, SamColumns.VOLUME_UNITS, SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS, SamColumns.QC_PASSED);
 
   private static final Set<String> libraryColumns = Sets.newHashSet(LibColumns.NAME, LibColumns.SAMPLE_ALIAS, LibColumns.SAMPLE_LOCATION,
       LibColumns.BOX_SEARCH, LibColumns.BOX_ALIAS, LibColumns.BOX_POSITION, LibColumns.DISCARDED, LibColumns.CREATION_DATE,

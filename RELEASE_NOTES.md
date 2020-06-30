@@ -3,6 +3,7 @@
 Changes:
 
   * improved performance of bulk library save
+  * Added volume and concentration fields to plain sample bulk create/edit tables
   * Fixed "Request header is too large" error limitting number of items that can be bulk created/edited
   * Fixed URL not saving correctly when editing SOPs
 

@@ -821,9 +821,11 @@ BulkTarget.sample = (function($) {
         getItemValue: Utils.array.get('value')
       });
 
-      if ((show['Stock'] || show['Aliquot']) && !config.isLibraryReceipt) {
+      if ((!Constants.isDetailedSample || show['Stock'] || show['Aliquot']) && !config.isLibraryReceipt) {
         columns = columns.concat(BulkUtils.columns.volume(true, config));
-        columns = columns.concat(BulkUtils.columns.parentUsed);
+        if (Constants.isDetailedSample) {
+          columns = columns.concat(BulkUtils.columns.parentUsed);
+        }
         columns = columns.concat(BulkUtils.columns.concentration());
       }
 
