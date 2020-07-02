@@ -3,17 +3,21 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response.Status;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
-import uk.ac.bbsrc.tgac.miso.core.service.BulkSaveService;
 import uk.ac.bbsrc.tgac.miso.core.service.DeleterService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SaveService;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.BulkValidationException;
 
 public class RestUtils {
 
@@ -92,40 +96,21 @@ public class RestUtils {
     return object;
   }
 
-  public static <T, R extends Identifiable> List<T> bulkCreate(String type, List<T> dtos, Function<T, R> toObject,
-      BulkSaveService<R> service, Function<R, T> toDto) throws IOException {
-    List<R> items = new ArrayList<>();
-    for (T dto : dtos) {
-      if (dto == null) {
-        throw new RestException(String.format("Cannot save null %s", type), Status.BAD_REQUEST);
+  public static void addBulkValidationData(ObjectNode node, BulkValidationException exception) {
+    ArrayNode rows = node.putArray("data");
+    for (Entry<Integer, Map<String, List<String>>> entry : exception.getErrorsByRowAndField().entrySet()) {
+      ObjectNode rowNode = rows.addObject();
+      rowNode.put("row", entry.getKey());
+      ArrayNode fields = rowNode.putArray("fields");
+      for (Entry<String, List<String>> fieldErrors : entry.getValue().entrySet()) {
+        ObjectNode field = fields.addObject();
+        field.put("field", fieldErrors.getKey());
+        ArrayNode errors = field.putArray("errors");
+        for (String fieldError : fieldErrors.getValue()) {
+          errors.add(fieldError);
+        }
       }
-      R item = toObject.apply(dto);
-      if (item.isSaved()) {
-        throw new RestException("One or more of these items are already saved", Status.BAD_REQUEST);
-      }
-      items.add(item);
     }
-    List<R> saved = service.bulkCreate(items);
-    return saved.stream().map(toDto).collect(Collectors.toList());
-  }
-
-  public static <T, R extends Identifiable> List<T> bulkUpdate(String type, List<T> dtos, Function<T, R> toObject,
-      BulkSaveService<R> service, Function<R, T> toDto) throws IOException {
-    List<R> items = new ArrayList<>();
-    for (T dto : dtos) {
-      if (dto == null) {
-        throw new RestException("Cannot save null item", Status.BAD_REQUEST);
-      }
-      R item = toObject.apply(dto);
-      if (!item.isSaved()) {
-        throw new RestException("Cannot update unsaved item", Status.BAD_REQUEST);
-      } else if (service.get(item.getId()) == null) {
-        throw new RestException(String.format("No %s found with ID: %d", type, item.getId()), Status.BAD_REQUEST);
-      }
-      items.add(item);
-    }
-    List<R> saved = service.bulkUpdate(items);
-    return saved.stream().map(toDto).collect(Collectors.toList());
   }
 
 }

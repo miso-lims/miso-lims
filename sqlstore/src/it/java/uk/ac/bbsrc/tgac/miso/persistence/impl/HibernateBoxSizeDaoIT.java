@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxSize.BoxType;
 
 public class HibernateBoxSizeDaoIT extends AbstractDAOTest {
 
@@ -43,6 +44,7 @@ public class HibernateBoxSizeDaoIT extends AbstractDAOTest {
     BoxSize boxSize = new BoxSize();
     boxSize.setRows(rows);
     boxSize.setColumns(cols);
+    boxSize.setBoxType(BoxType.STORAGE);
     long savedId = sut.create(boxSize);
 
     clearSession();

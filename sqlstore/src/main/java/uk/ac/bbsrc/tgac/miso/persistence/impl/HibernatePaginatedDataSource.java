@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Group;
 
+import uk.ac.bbsrc.tgac.miso.core.data.BoxSize.BoxType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
@@ -182,7 +183,12 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
-  default void restrictPaginationByBoxUse(Criteria criteria, long id, Consumer<String> errorHandler) {
+  public default void restrictPaginationByBoxType(Criteria criteria, BoxType boxType, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s has no box type.", getFriendlyName()));
+  }
+
+  @Override
+  public default void restrictPaginationByBoxUse(Criteria criteria, long id, Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s has no use.", getFriendlyName()));
   }
 

@@ -790,9 +790,7 @@ var Utils = Utils
           type: 'select',
           label: 'Box Size',
           values: Constants.boxSizes,
-          getLabel: function(boxSize) {
-            return boxSize.scannable ? boxSize.rowsByColumns + " (Scannable)" : boxSize.rowsByColumns;
-          },
+          getLabel: Utils.array.get('label'),
           required: true
         }, {
           property: 'matrixBarcode',
@@ -1051,6 +1049,14 @@ Utils.ui = {
 
   updateHelpLink: function(url) {
     jQuery('#userManualLink').attr('href', url ? url : Urls.external.userManual());
+  },
+
+  makeProgressBar: function(id) {
+    return jQuery('<div>').addClass('progress-bar').append(jQuery('<div>').attr('id', id).addClass('progress-bar-progress'));
+  },
+
+  setProgressBarProgress: function(id, percent) {
+    jQuery('#' + id).css('width', percent + '%');
   }
 };
 

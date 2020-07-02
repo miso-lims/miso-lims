@@ -59,6 +59,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -72,6 +73,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
+import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
@@ -94,6 +96,7 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleTissuePieceDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueProcessingDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
@@ -117,6 +120,10 @@ public class SampleRestController extends RestController {
   private Boolean detailedSample;
   @Autowired
   private IndexChecker indexChecker;
+  @Autowired
+  private AsyncOperationManager asyncOperationManager;
+  @Autowired
+  private AuthorizationManager authorizationManager;
 
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
@@ -458,13 +465,21 @@ public class SampleRestController extends RestController {
   }
 
   @PostMapping("/bulk")
-  public @ResponseBody List<SampleDto> bulkCreate(@RequestBody List<SampleDto> dtos) throws IOException {
-    return RestUtils.bulkCreate("Sample", dtos, WhineyFunction.rethrow(this::buildHierarchy), sampleService, sam -> Dtos.asDto(sam, true));
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<SampleDto> dtos) throws IOException {
+    return asyncOperationManager.startAsyncBulkCreate("Sample", dtos, WhineyFunction.rethrow(this::buildHierarchy), sampleService);
   }
 
   @PutMapping("/bulk")
-  public @ResponseBody List<SampleDto> bulkUpdate(@RequestBody List<SampleDto> dtos) throws IOException {
-    return RestUtils.bulkUpdate("Sample", dtos, WhineyFunction.rethrow(this::buildHierarchy), sampleService, sam -> Dtos.asDto(sam, true));
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<SampleDto> dtos) throws IOException {
+    return asyncOperationManager.startAsyncBulkUpdate("Sample", dtos, WhineyFunction.rethrow(this::buildHierarchy), sampleService);
+  }
+
+  @GetMapping("/bulk/{uuid}")
+  public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
+    return asyncOperationManager.getAsyncProgress(uuid, Sample.class, sampleService, authorizationManager,
+        ali -> Dtos.asDto(ali, false));
   }
 
 }

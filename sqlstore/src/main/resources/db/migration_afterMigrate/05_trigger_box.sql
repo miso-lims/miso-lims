@@ -7,19 +7,22 @@ FOR EACH ROW
   BEGIN
   DECLARE log_message varchar(500) CHARACTER SET utf8;
   SET log_message = CONCAT_WS(', ',
-    CASE WHEN NEW.alias <> OLD.alias THEN CONCAT('alias: ', OLD.alias, ' → ', NEW.alias) END,
-    CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN CONCAT('barcode: ', COALESCE(OLD.identificationBarcode, 'n/a'), ' → ', COALESCE(NEW.identificationBarcode, 'n/a')) END,
-    CASE WHEN (NEW.locationBarcode IS NULL) <> (OLD.locationBarcode IS NULL) OR NEW.locationBarcode <> OLD.locationBarcode THEN CONCAT('location: ', COALESCE(OLD.locationBarcode, 'n/a'), ' → ', COALESCE(NEW.locationBarcode, 'n/a')) END,
-    CASE WHEN (NEW.description IS NULL) <> (OLD.description IS NULL) OR NEW.description <> OLD.description THEN CONCAT('description: ', COALESCE(OLD.description, 'n/a'), ' → ', COALESCE(NEW.description, 'n/a')) END
+    makeChangeMessage('alias', OLD.alias, NEW.alias),
+    makeChangeMessage('barcode', OLD.identificationBarcode, NEW.identificationBarcode),
+    makeChangeMessage('location', OLD.locationBarcode, NEW.locationBarcode),
+    makeChangeMessage('description', OLD.description, NEW.description),
+    makeChangeMessage('use', (SELECT alias FROM BoxUse WHERE boxUseId = OLD.boxUseId), (SELECT alias FROM BoxUse WHERE boxUseId = NEW.boxUseId))
   );
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO BoxChangeLog(boxId, columnsChanged, userId, message, changeTime) VALUES (
       New.boxId,
       COALESCE(CONCAT_WS(',',
-        CASE WHEN NEW.alias <> OLD.alias THEN 'alias' END,
-        CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN 'identificationBarcode' END,
-        CASE WHEN (NEW.locationBarcode IS NULL) <> (OLD.locationBarcode IS NULL) OR NEW.locationBarcode <> OLD.locationBarcode THEN 'locationBarcode' END,
-        CASE WHEN (NEW.description IS NULL) <> (OLD.description IS NULL) OR NEW.description <> OLD.description THEN 'description' END), ''),
+        makeChangeColumn('alias', NEW.alias, OLD.alias),
+        makeChangeColumn('identificationBarcode', NEW.identificationBarcode, OLD.identificationBarcode),
+        makeChangeColumn('locationBarcode', NEW.locationBarcode, OLD.locationBarcode),
+        makeChangeColumn('description', NEW.description, OLD.description),
+        makeChangeColumn('boxUseId', NEW.boxUseId, OLD.boxUseId)
+      ), ''),
       NEW.lastModifier,
       log_message,
       NEW.lastModified

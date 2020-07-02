@@ -136,7 +136,7 @@ ListTarget.box = {
           "mData": "sizeId",
           "include": true,
           "iSortPriority": 0,
-          "mRender": ListUtils.render.textFromId(Constants.boxSizes, 'rowsByColumns')
+          "mRender": ListUtils.render.textFromId(Constants.boxSizes, 'label')
         }, {
           "sTitle": "Use",
           "mData": "useId",
@@ -147,6 +147,6 @@ ListTarget.box = {
   },
   searchTermSelector: function(searchTerms) {
     return [searchTerms['id'], searchTerms['entered'], searchTerms['changed'], searchTerms['creator'], searchTerms['changedby'],
-        searchTerms['freezer']];
+        searchTerms['boxType'], searchTerms['freezer']];
   }
 };

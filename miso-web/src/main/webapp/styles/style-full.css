@@ -1,3 +1,10 @@
+:root {
+    --grey-dark: #A9A9A9;
+    --grey-light: #CDCDCD;
+    --purple-dark: #404087;
+    --purple-light: #F0F0FF;
+}
+
 html {
     text-align: center;
     background: #F3F3F3;
@@ -20,9 +27,9 @@ h1 {
     margin: 0 0 0 -2px;
     color: #666666;
     text-align: center;
-    background-color: #F0F0FF;
-    border-bottom: 1px solid darkgray;
-    border-right: 1px solid darkgray;
+    background-color: var(--purple-light);
+    border-bottom: 1px solid var(--grey-dark);
+    border-right: 1px solid var(--grey-dark);
 }
 
 h2 {
@@ -65,29 +72,19 @@ pre.wrap {
 }
 
 a {
-    color: #404087;
+    color: var(--purple-dark);
     text-decoration: underline;
 }
 
 .disabled {
     opacity: .4;
-    color: darkgray;
+    color: var(--grey-dark);
 }
 
 .misoicon {
     text-align: center !important;
     cursor: pointer;
     margin: -1px !important;
-}
-
-.misoicon-hover {
-    /*
-    background: url("images/ui-bg_glass_75_dadada_1x400.png") repeat-x scroll 50% 50% #DADADA;
-    border: 1px solid #999999;
-    */
-    background-color: #DADADA !important;
-    font-weight: normal;
-    margin: -1px;
 }
 
 .misoicon span {
@@ -164,7 +161,7 @@ div.menu a {
 }
 
 div.menu a:hover {
-   color: #F0F0FF;
+   color: var(--purple-light);
    background-color: #444;
 }
 
@@ -174,7 +171,7 @@ div.menu a.submenu {
 }
 
 table.list {
-    background-color: #CDCDCD;
+    background-color: var(--grey-light);
     margin: 10px 0pt 15px;
     font-size: 8pt;
     width: 100%;
@@ -276,8 +273,6 @@ table.listtraf tbody td {
 }
 
 table.in {
-    /* width:96%;
- border:1px solid #CCCCFF; */
     border-collapse: collapse;
     width: 100%;
 }
@@ -288,7 +283,6 @@ table.in td.h {
 }
 
 table.in td {
-    /* border:1px solid #CCCCFF; */
     padding: 3px;
 }
 
@@ -326,8 +320,8 @@ table.minimal {
 }
 
 table.minimal tr {
-    border-top: 1px solid #CDCDCD;
-    border-bottom: 1px solid #CDCDCD;
+    border-top: 1px solid var(--grey-light);
+    border-bottom: 1px solid var(--grey-light);
 }
 
 .right {
@@ -341,7 +335,7 @@ table.containerSummary {
 }
 
 table.containerSummary td.smallbox {
-    border: 1px solid #CDCDCD;
+    border: 1px solid var(--grey-light);
     width: 10px;
     height: 10px;
     text-align: center;
@@ -410,10 +404,10 @@ table.containerSummary td.partitionOccupied {
     /*width: 220px;
     background: url(images/green_vr.gif) repeat-y right;
     */
-    background-color: #F0F0FF;
-    border-bottom: 1px solid darkgray;
-    border-left: 1px solid lightgray;
-    border-right: 1px solid darkgray;
+    background-color: var(--purple-light);
+    border-bottom: 1px solid var(--grey-dark);
+    border-left: 1px solid var(--grey-light);
+    border-right: 1px solid var(--grey-dark);
     float: left;
     margin-left: -100%;
     padding: 5px 0 5px 10px;
@@ -460,7 +454,7 @@ h1.h_Running {
 .exppreview {
     background-color: #FFFFFF;
     font: 10px Verdana, arial, sans-serif;
-    border: 1px solid lightgray;
+    border: 1px solid var(--grey-light);
     margin: 5px;
     padding: 5px;
     width: 94%;
@@ -473,7 +467,7 @@ h1.h_Running {
 
 div.simplebox {
     font: 10px Verdana, arial, sans-serif;
-    border: 1px solid lightgray;
+    border: 1px solid var(--grey-light);
     margin: 5px;
     padding: 5px;
 }
@@ -489,7 +483,7 @@ a.listbox {
 
 .boxlistbox {
     font: 10px Verdana, arial, sans-serif;
-    border: 1px solid lightgray;
+    border: 1px solid var(--grey-light);
     margin: 5px;
     padding: 5px;
     cursor: pointer;
@@ -497,7 +491,7 @@ a.listbox {
 
 .boxlistboxhighlight {
     font: 10px Verdana, arial, sans-serif;
-    border: 1px solid lightgray;
+    border: 1px solid var(--grey-light);
     margin: 5px;
     padding: 5px;
     background-color: #F0F0F6;
@@ -512,7 +506,7 @@ a.dashboardresult {
 
 .dashboard, .tile {
     font: 10px Verdana, arial, sans-serif;
-    border: 1px solid lightgray;
+    border: 1px solid var(--grey-light);
     margin: 5px;
     padding: 5px; /* width: 94%; */
     cursor: pointer;
@@ -539,7 +533,7 @@ a.dashboardresult {
 
 .dashboardhighlight {
     font: 10px Verdana, arial, sans-serif;
-    border: 1px solid lightgray;
+    border: 1px solid var(--grey-light);
     margin: 5px;
     padding: 5px; /* width: 94%; */
     cursor: pointer;
@@ -560,7 +554,7 @@ a.dashboardresult {
 
 .autocompletebox {
     font: 10px Verdana, arial, sans-serif;
-    border: 1px solid lightgray;
+    border: 1px solid var(--grey-light);
     margin: 5px;
     padding: 5px;
     width: 96%;
@@ -573,7 +567,7 @@ a.dashboardresult {
 
 .autocompleteboxhighlight {
     font: 10px Verdana, arial, sans-serif;
-    border: 1px solid lightgray;
+    border: 1px solid var(--grey-light);
     margin: 5px;
     padding: 5px;
     width: 96%;
@@ -587,7 +581,7 @@ a.dashboardresult {
 }
 
 .divhighlight {
-    border: 1px solid lightgray;
+    border: 1px solid var(--grey-light);
     margin: 5px;
     padding: 5px;
     background-color: #FFFFFF;
@@ -633,8 +627,8 @@ div.checklist {
 }
 
 .widget_title {
-    background-color: #F0F0FF;
-    border: 1px solid lightgray;
+    background-color: var(--purple-light);
+    border: 1px solid var(--grey-light);
     border-bottom: 0px;
     padding-top: 5px;
     padding-left: 5px;
@@ -658,7 +652,7 @@ div.checklist {
 }
 
 .widget {
-    border: 1px solid lightgray;
+    border: 1px solid var(--grey-light);
     padding-top: 0px;
     padding-left: 5px;
     padding-right: 5px;
@@ -917,6 +911,34 @@ fieldset.dialog input.text {
     padding: .2em;
 }
 
+.progress-bar {
+    width: 100%;
+    background-color: var(--grey-light);
+    border: 1px solid var(--purple-dark);
+}
+
+.progress-bar-progress {
+    height: 16px;
+    width: 0%;
+    background-color: var(--purple-dark);
+    background-image: repeating-linear-gradient(
+    45deg,
+    var(--purple-dark),
+    var(--purple-dark) 10px,
+    var(--purple-light) 10px,
+    var(--purple-light) 20px
+  );
+  border: 1px solid var(--purple-dark);
+  background-size: 200% 300%;
+  animation: progress-stripes 1s linear infinite;
+}
+
+@keyframes progress-stripes {
+  100% {
+    background-position: 0px -28px;
+  }
+}
+
 .elementList {
     border: 1px solid #DDDDDD;
     height: 100%;
@@ -992,8 +1014,8 @@ fieldset.dialog input.text {
     padding: 1em;
     margin-left: auto;
     margin-right: auto;
-    border: 1px solid darkgray;
-    background-color: #F0F0FF;
+    border: 1px solid var(--grey-dark);
+    background-color: var(--purple-light);
     color: #666666;
 }
 
@@ -1034,30 +1056,6 @@ div.flashinfo {
     top: 0px;
     left: 0px;
     width: 300px;
-}
-
-.popup {
-    position: absolute;
-    display: none;
-    z-index: 1;
-    border-collapse: collapse;
-    background-color: white;
-    font: 10px Verdana, arial, sans-serif;
-    border: 1px solid lightgray;
-    margin: 5px 5px 5px 0;
-    padding: 5px 5px 5px 0;
-}
-
-ul.popup-bullets {
-    margin: 1em 0;
-}
-
-ul.popup-bullets li {
-    margin-left: -2.5em;
-    margin-bottom: 0.5em;
-    background: url(images/bullet.gif) left no-repeat;
-    padding-left: 1em;
-    list-style: none;
 }
 
 .breadcrumbs {
@@ -1127,7 +1125,7 @@ ul.popup-bullets li {
     border-collapse: collapse;
     background-color: white;
     font: 10px Verdana, arial, sans-serif;
-    border: 1px solid lightgray;
+    border: 1px solid var(--grey-light);
     margin: 75px 5px 5px 0;
     padding: 5px;
 }
@@ -1139,7 +1137,7 @@ span.counter {
 
 #trafdiv {
     background-color: #F8F8F8;
-    border: 1px solid lightgray;
+    border: 1px solid var(--grey-light);
     float: right;
     margin: 10px 10px -50px 0;
     cursor: pointer;
@@ -1156,7 +1154,7 @@ span.counter {
 
 #traftrigger {
     background-color: #F8F8F8;
-    border: 1px solid lightgray;
+    border: 1px solid var(--grey-light);
     padding: 5px;
     float: right;
     margin: -28px 10px 0px 0;
@@ -1166,7 +1164,7 @@ span.counter {
 
 .experimentwizard {
     background-color: #F8F8F8;
-    border: 1px solid lightgray;
+    border: 1px solid var(--grey-light);
     margin: 10px;
     padding: 10px;
 }
@@ -1197,7 +1195,7 @@ div.experimentwizard li {
     display: block;
     margin: 0 1px 0 0;
     padding: 4px 10px;
-    width: 120px; /* background: lightgray;*/
+    width: 120px;
     color: #333333;
     text-align: right;
     text-decoration: none;
@@ -1205,7 +1203,7 @@ div.experimentwizard li {
 }
 
 .sddm li a.disabled {
-	color: darkgray;
+	color: var(--grey-dark);
 }
 
 .sddm div.run {
@@ -1558,7 +1556,7 @@ table.overviewSummary {
 }
 
 table.overviewSummary td.smallbox {
-    border: 1px solid #CDCDCD;
+    border: 1px solid var(--grey-light);
     width: 5px;
     height: 5px;
     text-align: center;
@@ -1592,7 +1590,7 @@ table.overviewSummary td.partitionOccupied {
 }
 
 .basebox:hover {
-    fill: lightgray;
+    fill: var(--grey-light);
     opacity: 0.5;
 
 }
@@ -1862,7 +1860,7 @@ img.center {
 .big-important {
   color: #6565d8;
   border-color: #6565d8;
-  background-color: #F0F0FF;
+  background-color: var(--purple-light);
 }
 
 .big-info {
@@ -1951,7 +1949,7 @@ button.disabled {
 }
 
 .handsontable td.multipleOptions {
-  background-color: #F0F0FF !important;
+  background-color: var(--purple-light) !important;
 }
 
 .handsontable td.notification {
@@ -2046,6 +2044,7 @@ button.disabled {
     top: 0px;
     left: 0px;
     background: rgba(0, 0, 0, 0.75);
+    z-index: 1;
 }
 
 .popup-inner {
@@ -2191,9 +2190,9 @@ div#inputError {
 }
 
 .storageComponent, .storageComponent td {
-  border: 1px solid darkgrey;
+  border: 1px solid var(--grey-dark);
   border-collapse: collapse;
-  background: lightgrey;
+  background: var(--grey-light);
 }
 
 .storageComponent td {

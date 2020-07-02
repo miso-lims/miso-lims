@@ -16,6 +16,7 @@ public class BoxDto {
   private Integer rows;
   private Boolean scannable;
   private Long sizeId;
+  private String sizeLabel;
   private Long useId;
   private String useAlias;
   private String identificationBarcode;
@@ -113,6 +114,14 @@ public class BoxDto {
 
   public void setSizeId(Long sizeId) {
     this.sizeId = sizeId;
+  }
+
+  public String getSizeLabel() {
+    return sizeLabel;
+  }
+
+  public void setSizeLabel(String sizeLabel) {
+    this.sizeLabel = sizeLabel;
   }
 
   public void setUseId(Long useId) {

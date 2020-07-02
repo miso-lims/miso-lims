@@ -107,6 +107,10 @@ ListUtils = (function($) {
       term: "box:NAME",
       help: "Checks if an item is located in a particular box.  The name can either be the partial name or partial alias of the box."
     },
+    "boxType": {
+      term: "boxType:NAME",
+      help: "Checks whether the box is of the specified type - 'storage' or 'plate'."
+    },
     "freezer": {
       term: "freezer:NAME",
       help: "Checks if an item is located in a particular freezer. This is a partial match."
@@ -160,8 +164,8 @@ ListUtils = (function($) {
     }).join('<br/>');
   };
 
-  var makeSearchTooltip = function(searchDivId, target) {
-    var searchTooltipId = "searchHelpTooltip_" + target.name.replace(/\s/g, '');
+  var makeSearchTooltip = function(tableId, searchDivId, target) {
+    var searchTooltipId = tableId + "_searchHelpTooltip";
 
     $("#" + searchDivId).append(
         '<div id="' + searchTooltipId + '" class="tooltip">'
@@ -254,9 +258,9 @@ ListUtils = (function($) {
     });
   };
 
-  var makeSearchPopup = function(parentId, triggerId, target) {
-    var popupId = "searchHelpPopup_" + target.name.replace(/\s/g, '');
-    var popupCloseId = "searchHelpPopupClose_" + target.name.replace(/\s/g, '');
+  var makeSearchPopup = function(tableId, parentId, triggerId, target) {
+    var popupId = tableId + "_searchHelpPopup";
+    var popupCloseId = tableId + "_searchHelpPopupClose";
 
     makePopupElement(parentId, popupId, popupCloseId, target);
     registerPopupOpen(triggerId, popupId);
@@ -456,8 +460,8 @@ ListUtils = (function($) {
     if (target.hasOwnProperty("searchTermSelector")) {
       var searchDivId = elementId + '_filter';
 
-      var tooltipId = makeSearchTooltip(searchDivId, target);
-      makeSearchPopup(searchDivId, tooltipId, target);
+      var tooltipId = makeSearchTooltip(elementId, searchDivId, target);
+      makeSearchPopup(elementId, searchDivId, tooltipId, target);
     }
     var filterbox = $('#' + elementId + '_filter :input');
     filterbox.unbind();

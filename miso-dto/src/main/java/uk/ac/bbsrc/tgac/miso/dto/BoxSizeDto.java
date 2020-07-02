@@ -6,8 +6,8 @@ public class BoxSizeDto {
   private Integer rows;
   private Integer columns;
   private boolean scannable;
-  private String rowsByColumns;
-  private String rowsByColumnsWithScan;
+  private String boxType;
+  private String label;
 
   public Long getId() {
     return id;
@@ -41,20 +41,20 @@ public class BoxSizeDto {
     this.scannable = scannable;
   }
 
-  public String getRowsByColumns() {
-    return rowsByColumns;
+  public String getBoxType() {
+    return boxType;
   }
 
-  public void setRowsByColumns(String rowsByColumns) {
-    this.rowsByColumns = rowsByColumns;
+  public void setBoxType(String boxType) {
+    this.boxType = boxType;
   }
 
-  public String getRowsByColumnsWithScan() {
-    return rowsByColumnsWithScan;
+  public String getLabel() {
+    return label;
   }
 
-  public void setRowsByColumnsWithScan(String rowsByColumnsWithScan) {
-    this.rowsByColumnsWithScan = rowsByColumnsWithScan;
+  public void setLabel(String label) {
+    this.label = label;
   }
 
 }
