@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.NestedServletException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.service.exception.BulkValidationException;
@@ -80,7 +78,7 @@ public class RestExceptionHandler {
     } else if (exception instanceof BulkValidationException) {
       BulkValidationException bulkValidationException = (BulkValidationException) exception;
       status = Status.BAD_REQUEST;
-      addBulkValidationData(error, bulkValidationException);
+      RestUtils.addBulkValidationData(error, bulkValidationException);
       error.put("dataFormat", "bulk validation");
     } else if (exception instanceof ValidationException) {
       ValidationException valException = (ValidationException) exception;
@@ -122,23 +120,6 @@ public class RestExceptionHandler {
     ObjectNode mapNode = node.putObject("data");
     for (Entry<String, String> entry : data.entrySet()) {
       mapNode.put(entry.getKey(), entry.getValue());
-    }
-  }
-
-  private static void addBulkValidationData(ObjectNode node, BulkValidationException exception) {
-    ArrayNode rows = node.putArray("data");
-    for (Entry<Integer, Map<String, List<String>>> entry : exception.getErrorsByRowAndField().entrySet()) {
-      ObjectNode rowNode = rows.addObject();
-      rowNode.put("row", entry.getKey());
-      ArrayNode fields = rowNode.putArray("fields");
-      for (Entry<String, List<String>> fieldErrors : entry.getValue().entrySet()) {
-        ObjectNode field = fields.addObject();
-        field.put("field", fieldErrors.getKey());
-        ArrayNode errors = field.putArray("errors");
-        for (String fieldError : fieldErrors.getValue()) {
-          errors.add(fieldError);
-        }
-      }
     }
   }
   

@@ -54,6 +54,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -66,6 +67,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibrarySpreadSheets;
+import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
@@ -81,6 +83,7 @@ import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 /**
@@ -118,7 +121,11 @@ public class LibraryRestController extends RestController {
   @Autowired
   private SampleRestController sampleController;
   @Autowired
+  private AuthorizationManager authorizationManager;
+  @Autowired
   private IndexChecker indexChecker;
+  @Autowired
+  private AsyncOperationManager asyncOperationManager;
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
@@ -303,15 +310,20 @@ public class LibraryRestController extends RestController {
   }
 
   @PostMapping("/bulk")
-  public @ResponseBody List<LibraryDto> bulkCreate(@RequestBody List<LibraryDto> dtos) throws IOException {
-    return RestUtils.bulkCreate("Library", dtos, WhineyFunction.rethrow(this::buildHierarchy), libraryService,
-        lib -> Dtos.asDto(lib, false));
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<LibraryDto> dtos) throws IOException {
+    return asyncOperationManager.startAsyncBulkCreate("Library", dtos, WhineyFunction.rethrow(this::buildHierarchy), libraryService);
   }
 
   @PutMapping("/bulk")
-  public @ResponseBody List<LibraryDto> bulkUpdate(@RequestBody List<LibraryDto> dtos) throws IOException {
-    return RestUtils.bulkUpdate("Library", dtos, WhineyFunction.rethrow(this::buildHierarchy), libraryService,
-        lib -> Dtos.asDto(lib, false));
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<LibraryDto> dtos) throws IOException {
+    return asyncOperationManager.startAsyncBulkUpdate("Library", dtos, WhineyFunction.rethrow(this::buildHierarchy), libraryService);
+  }
+
+  @GetMapping("/bulk/{uuid}")
+  public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
+    return asyncOperationManager.getAsyncProgress(uuid, Library.class, libraryService, authorizationManager, lib -> Dtos.asDto(lib, false));
   }
 
 }

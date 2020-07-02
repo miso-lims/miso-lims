@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -40,6 +41,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibraryAliquotSpreadSheets;
+import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolableElementViewService;
@@ -54,6 +56,7 @@ import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
@@ -85,6 +88,10 @@ public class LibraryAliquotRestController extends RestController {
   private PoolService poolService;
   @Autowired
   private IndexChecker indexChecker;
+  @Autowired
+  private AsyncOperationManager asyncOperationManager;
+  @Autowired
+  private AuthorizationManager authorizationManager;
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
@@ -106,21 +113,29 @@ public class LibraryAliquotRestController extends RestController {
     return RestUtils.createObject("Library Aliquot", aliquotDto, Dtos::to, libraryAliquotService, ldi -> Dtos.asDto(ldi, false));
   }
 
-  @PostMapping("/bulk")
-  public @ResponseBody List<LibraryAliquotDto> bulkCreate(@RequestBody List<LibraryAliquotDto> dtos) throws IOException {
-    return RestUtils.bulkCreate("library aliquot", dtos, Dtos::to, libraryAliquotService, aliquot -> Dtos.asDto(aliquot, false));
-  }
-
-  @PutMapping("/bulk")
-  public @ResponseBody List<LibraryAliquotDto> bulkUpdate(@RequestBody List<LibraryAliquotDto> dtos) throws IOException {
-    return RestUtils.bulkUpdate("library aliquot", dtos, Dtos::to, libraryAliquotService, aliquot -> Dtos.asDto(aliquot, false));
-  }
-
   @PutMapping(value = "/{aliquotId}", headers = { "Content-type=application/json" })
   @ResponseBody
   public LibraryAliquotDto update(@PathVariable Long aliquotId, @RequestBody LibraryAliquotDto aliquotDto) throws IOException {
     return RestUtils.updateObject("Library Aliquot", aliquotId, aliquotDto, Dtos::to, libraryAliquotService,
         ldi -> Dtos.asDto(ldi, false));
+  }
+
+  @PostMapping("/bulk")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<LibraryAliquotDto> dtos) throws IOException {
+    return asyncOperationManager.startAsyncBulkCreate("Library Aliquot", dtos, Dtos::to, libraryAliquotService);
+  }
+
+  @PutMapping("/bulk")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<LibraryAliquotDto> dtos) throws IOException {
+    return asyncOperationManager.startAsyncBulkUpdate("Library Aliquot", dtos, Dtos::to, libraryAliquotService);
+  }
+
+  @GetMapping("/bulk/{uuid}")
+  public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
+    return asyncOperationManager.getAsyncProgress(uuid, LibraryAliquot.class, libraryAliquotService, authorizationManager,
+        ali -> Dtos.asDto(ali, false));
   }
 
   @GetMapping(value = "/dt", produces = "application/json")

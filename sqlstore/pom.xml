@@ -208,10 +208,10 @@
     </plugins>
     <pluginManagement>
     	<plugins>
-    		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-    		<plugin>
-    			<groupId>org.eclipse.m2e</groupId>
-    			<artifactId>lifecycle-mapping</artifactId>
+	   		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+	   		<plugin>
+	   			<groupId>org.eclipse.m2e</groupId>
+	   			<artifactId>lifecycle-mapping</artifactId>
     			<version>1.0.0</version>
     			<configuration>
     				<lifecycleMappingMetadata>
@@ -236,6 +236,34 @@
     					</pluginExecutions>
     				</lifecycleMappingMetadata>
     			</configuration>
+    		</plugin>
+    		<plugin>
+    		  <groupId>io.fabric8</groupId>
+              <artifactId>docker-maven-plugin</artifactId>
+              <version>0.21.0</version>
+              <configuration>
+              <removeVolumes>true</removeVolumes>
+                <images>
+                  <image>
+                    <name>mysql:5.7</name>
+                    <alias>mysql</alias>
+                    <run>
+                      <env>
+                        <MYSQL_ROOT_PASSWORD>abc123</MYSQL_ROOT_PASSWORD>
+                        <MYSQL_USER>${mysql.user}</MYSQL_USER>
+                        <MYSQL_PASSWORD>${mysql.pw}</MYSQL_PASSWORD>
+                        <MYSQL_DATABASE>${mysql.db}</MYSQL_DATABASE>
+                      </env>
+                      <ports>
+                        <port>${mysql.port}:3306</port>
+                      </ports>
+                      <wait>
+                        <time>30000</time>
+                      </wait>
+                    </run>
+                  </image>
+                </images>
+              </configuration>
     		</plugin>
     	</plugins>
     </pluginManagement>
@@ -290,35 +318,6 @@
 	        <!-- Start MySQL Docker container -->
             <groupId>io.fabric8</groupId>
             <artifactId>docker-maven-plugin</artifactId>
-            <version>0.21.0</version>
-            <configuration>
-            <removeVolumes>true</removeVolumes>
-              <images>
-                <image>
-                  <name>mysql:5.7</name>
-                  <alias>mysql</alias>
-                  <run>
-                    <env>
-                      <MYSQL_ROOT_PASSWORD>abc123</MYSQL_ROOT_PASSWORD>
-                      <MYSQL_USER>${mysql.user}</MYSQL_USER>
-                      <MYSQL_PASSWORD>${mysql.pw}</MYSQL_PASSWORD>
-                      <MYSQL_DATABASE>${mysql.db}</MYSQL_DATABASE>
-                    </env>
-                    <ports>
-                      <port>${mysql.port}:3306</port>
-                    </ports>
-                    <wait>
-                      <tcp>
-                        <ports>
-                          <port>3306</port>
-                        </ports>
-                      </tcp>
-                      <time>30000</time>
-                    </wait>
-                  </run>
-                </image>
-              </images>
-            </configuration>
             <executions>
               <execution>
                 <id>start</id>
@@ -387,6 +386,40 @@
                 <miso.it.mysql.pw>${mysql.pw}</miso.it.mysql.pw>
               </systemPropertyVariables>
               <skipTests>${skipITs}</skipTests>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <!-- Waiting for port doesn't work on Mac -->
+      <id>not-mac</id>
+      <activation>
+        <os>
+          <family>!mac</family>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>io.fabric8</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <configuration>
+              <images>
+                <image>
+                  <name>mysql:5.7</name>
+                  <alias>mysql</alias>
+                  <run>
+                    <wait>
+                      <tcp>
+                        <ports>
+                          <port>3306</port>
+                        </ports>
+                      </tcp>
+                    </wait>
+                  </run>
+                </image>
+              </images>
             </configuration>
           </plugin>
         </plugins>

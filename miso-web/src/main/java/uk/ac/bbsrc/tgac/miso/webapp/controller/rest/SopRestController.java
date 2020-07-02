@@ -18,8 +18,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
+import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.SopService;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -27,6 +30,7 @@ import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SopDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/sops")
@@ -36,6 +40,10 @@ public class SopRestController {
   private SopService sopService;
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
+  @Autowired
+  private AsyncOperationManager asyncOperationManager;
+  @Autowired
+  private AuthorizationManager authorizationManager;
 
   private final JQueryDataTableBackend<Sop, SopDto> datatable = new JQueryDataTableBackend<Sop, SopDto>() {
 
@@ -64,13 +72,20 @@ public class SopRestController {
   }
 
   @PostMapping("/bulk")
-  public @ResponseBody List<SopDto> bulkCreate(@RequestBody List<SopDto> dtos) throws IOException {
-    return RestUtils.bulkCreate("SOP", dtos, Dtos::to, sopService, Dtos::asDto);
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<SopDto> dtos) throws IOException {
+    return asyncOperationManager.startAsyncBulkCreate("SOP", dtos, Dtos::to, sopService);
   }
 
   @PutMapping("/bulk")
-  public @ResponseBody List<SopDto> bulkUpdate(@RequestBody List<SopDto> dtos) throws IOException {
-    return RestUtils.bulkUpdate("SOP", dtos, Dtos::to, sopService, Dtos::asDto);
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<SopDto> dtos) throws IOException {
+    return asyncOperationManager.startAsyncBulkUpdate("SOP", dtos, Dtos::to, sopService);
+  }
+
+  @GetMapping("/bulk/{uuid}")
+  public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
+    return asyncOperationManager.getAsyncProgress(uuid, Sop.class, sopService, authorizationManager, Dtos::asDto);
   }
 
   @PostMapping(value = "/bulk-delete")
