@@ -12,6 +12,9 @@ BulkTarget.sop = (function() {
     getSaveUrl: function() {
       return Urls.rest.sops.bulkSave;
     },
+    getSaveProgressUrl: function(operationId) {
+      return Urls.rest.sops.bulkSaveProgress(operationId);
+    },
     getUserManualUrl: function() {
       return Urls.external.userManual('type_data', 'standard-operating-procedures');
     },

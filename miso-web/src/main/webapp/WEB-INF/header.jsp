@@ -146,14 +146,6 @@
 
     jQuery(document).ready(function () {
       Utils.ui.updateHelpLink();
-      jQuery('.misoicon').hover(
-        function () {
-          jQuery(this).addClass('misoicon-hover');
-        },
-        function () {
-          jQuery(this).removeClass('misoicon-hover');
-        }
-      );
     });
   </script>
 </sec:authorize>

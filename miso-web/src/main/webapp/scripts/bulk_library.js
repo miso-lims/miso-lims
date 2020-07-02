@@ -22,6 +22,9 @@ BulkTarget.library = (function($) {
     getSaveUrl: function() {
       return Urls.rest.libraries.bulkSave;
     },
+    getSaveProgressUrl: function(operationId) {
+      return Urls.rest.libraries.bulkSaveProgress(operationId);
+    },
     getUserManualUrl: function() {
       return Urls.external.userManual('samples');
     },

@@ -26,6 +26,9 @@ BulkTarget.sample = (function($) {
     getSaveUrl: function() {
       return Urls.rest.samples.bulkSave;
     },
+    getSaveProgressUrl: function(operationId) {
+      return Urls.rest.samples.bulkSaveProgress(operationId);
+    },
     getUserManualUrl: function() {
       return Urls.external.userManual('samples');
     },

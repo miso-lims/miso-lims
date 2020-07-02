@@ -2,8 +2,9 @@
 
 Changes:
 
+  * Improved performance of bulk library save
+  * Added progress bar to dialog shown during bulk save
   * Added box type attribute to box sizes for specifying whether the item is a storage box or plate
-  * improved performance of bulk library save
   * Fixed "Request header is too large" error limitting number of items that can be bulk created/edited
   * Fixed URL not saving correctly when editing SOPs
 

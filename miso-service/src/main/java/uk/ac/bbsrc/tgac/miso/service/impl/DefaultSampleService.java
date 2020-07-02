@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
@@ -86,12 +87,10 @@ import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissuePieceTypeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueTypeDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.util.HibernateSessionManager;
-import uk.ac.bbsrc.tgac.miso.service.HibernateBulkSaveService;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultSampleService implements HibernateBulkSaveService<Sample>, SampleService, PaginatedDataSource<Sample> {
+public class DefaultSampleService implements SampleService, PaginatedDataSource<Sample> {
 
   private static final Logger log = LoggerFactory.getLogger(DefaultSampleService.class);
 
@@ -144,8 +143,7 @@ public class DefaultSampleService implements HibernateBulkSaveService<Sample>, S
   @Autowired
   private SopService sopService;
   @Autowired
-  private HibernateSessionManager hibernateSessionManager;
-
+  private TransactionTemplate transactionTemplate;
   @Autowired
   private NamingSchemeHolder namingSchemeHolder;
 
@@ -1163,8 +1161,8 @@ public class DefaultSampleService implements HibernateBulkSaveService<Sample>, S
   }
 
   @Override
-  public HibernateSessionManager getHibernateSessionManager() {
-    return hibernateSessionManager;
+  public TransactionTemplate getTransactionTemplate() {
+    return transactionTemplate;
   }
 
 }
