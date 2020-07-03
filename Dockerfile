@@ -54,19 +54,18 @@ ENTRYPOINT ["/run-flyway"]
 ## Tomcat webapp
 #######################################################
 
-FROM tomcat:8.5.38-alpine as webapp
-
-ARG MYSQL_JBDC_VERSION=8.0.15
+FROM tomcat:8.5.56-jdk8-openjdk-slim as webapp
 
 COPY ./.docker/tomcat/setenv.sh /usr/local/tomcat/bin/
 COPY ./.docker/tomcat/logging.properties ${CATALINA_HOME}/conf/
 COPY ./.docker/tomcat/ROOT.xml ${CATALINA_HOME}/conf/Catalina/localhost/
 
-RUN mkdir -p /storage/miso/log && rm -r ${CATALINA_HOME}/webapps/ROOT*
+RUN mkdir -p /storage/miso/log
 COPY --from=builder /miso-lims/miso-web/src/main/resources/miso.properties  ${CATALINA_HOME}/conf/Catalina/localhost
 COPY --from=builder /miso-lims/miso-web/src/main/resources/security.properties /storage/miso/
 COPY --from=builder /miso-lims/miso-web/src/main/resources/submission.properties /storage/miso/
 
+COPY --from=builder /miso-lims/miso-web/target/ROOT/WEB-INF/lib/mysql-connector-java-*.jar ${CATALINA_HOME}/lib/
 COPY --from=builder /miso-lims/miso-web/target/ROOT.war ${CATALINA_HOME}/webapps/
 
 ENV MISO_DB_USER tgaclims

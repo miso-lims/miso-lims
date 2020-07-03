@@ -2,7 +2,7 @@
 
 Changes:
 
-
+  * Fixed Docker webapp build
 
 # 1.8.0
 
@@ -16,6 +16,10 @@ Changes:
   * Fixed "Request header is too large" error limitting number of items that can be bulk created/edited
   * Fixed URL not saving correctly when editing SOPs
 
+Known Issues:
+
+  * Docker webapp does not build correctly
+
 # 1.7.1
 
 Changes:
@@ -25,6 +29,7 @@ Changes:
 Known Issues:
 
   * When editing SOPs, the URL is not saved correctly
+  * Docker webapp does not build correctly
 
 # 1.7.0
 
@@ -68,6 +73,7 @@ Known Issues:
 
   * Error saving runs with metrics
   * When editing SOPs, the URL is not saved correctly
+  * Docker webapp does not build correctly
 
 # 1.6.0
 
