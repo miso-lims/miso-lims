@@ -38,14 +38,14 @@ BulkTarget.library = (function($) {
             name: 'Make aliquots',
             action: function(items) {
               HotUtils.warnIfConsentRevoked(items, function() {
-                BulkUtils.actions.showDialogForBoxCreation('Make Aliquots', 'Create', [], Urls.ui.libraryAliquots.bulkRepropagate,
-                    function(result) {
-                      return {
-                        ids: items.map(Utils.array.getId).join(',')
-                      };
-                    }, function(result) {
-                      return items.length;
-                    });
+                BulkUtils.actions.showDialogForBoxCreation('Make Aliquots', 'Create', [], Urls.ui.libraryAliquots.bulkPropagate, function(
+                    result) {
+                  return {
+                    ids: items.map(Utils.array.getId).join(',')
+                  };
+                }, function(result) {
+                  return items.length;
+                });
               });
             }
           }, HotUtils.printAction('library'),

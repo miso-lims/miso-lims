@@ -2,6 +2,7 @@
 
 Changes:
 
+  * Fixed "Make Aliquots" button to link to the correct page
   * Fixed Docker webapp build
 
 # 1.8.0
@@ -18,6 +19,7 @@ Changes:
 
 Known Issues:
 
+  * "Make Aliquots" button links to the wrong page
   * Docker webapp does not build correctly
 
 # 1.7.1
