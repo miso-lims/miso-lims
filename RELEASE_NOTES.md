@@ -2,7 +2,7 @@
 
 Changes:
 
-
+  * Fixed "Make Aliquots" button to link to the correct page
 
 # 1.8.0
 
@@ -15,6 +15,10 @@ Changes:
   * Improved performance of bulk library save
   * Fixed "Request header is too large" error limitting number of items that can be bulk created/edited
   * Fixed URL not saving correctly when editing SOPs
+
+Known Issues:
+
+  * "Make Aliquots" button links to the wrong page
 
 # 1.7.1
 
