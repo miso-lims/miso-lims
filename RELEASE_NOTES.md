@@ -3,6 +3,7 @@
 Changes:
 
   * Fixed "Make Aliquots" button to link to the correct page
+  * Fixed Docker webapp build
 
 # 1.8.0
 
@@ -19,6 +20,7 @@ Changes:
 Known Issues:
 
   * "Make Aliquots" button links to the wrong page
+  * Docker webapp does not build correctly
 
 # 1.7.1
 
@@ -29,6 +31,7 @@ Changes:
 Known Issues:
 
   * When editing SOPs, the URL is not saved correctly
+  * Docker webapp does not build correctly
 
 # 1.7.0
 
@@ -72,6 +75,7 @@ Known Issues:
 
   * Error saving runs with metrics
   * When editing SOPs, the URL is not saved correctly
+  * Docker webapp does not build correctly
 
 # 1.6.0
 
