@@ -380,7 +380,7 @@ public class LibraryAliquot extends AbstractBoxable
 
   @Override
   public String getLocationBarcode() {
-    return identificationBarcode;
+    return null;
   }
 
   @Override
