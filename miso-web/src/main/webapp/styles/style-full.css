@@ -1,8 +1,8 @@
 :root {
     --grey-dark: #A9A9A9;
     --grey-light: #CDCDCD;
-    --purple-dark: var(--purple-dark);
-    --purple-light: var(--purple-light);
+    --purple-dark: #404087;
+    --purple-light: #F0F0FF;
 }
 
 html {
