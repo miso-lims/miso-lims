@@ -66,9 +66,6 @@
   <!-- unicode regexs for il8n validation -->
   <script type="text/javascript" src="<c:url value='/scripts/xregexp-all-min.js'/>"></script>
 
-  <!-- D3.js for Graphics -->
-  <script type="text/javascript" src="<c:url value='/scripts/d3v2/d3.v2.min.js'/>"></script>
-
   <!-- high charts -->
   <script type="text/javascript" src="<c:url value='/scripts/highcharts/highcharts.js'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/highcharts/highcharts-more.js'/>"></script>
