@@ -2,6 +2,7 @@
 
 Changes:
 
+  * Added project REB number and expiry fields
   * Fixed library aliquot "Location" column showing barcode in some cases
 
 # 1.8.1

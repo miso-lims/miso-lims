@@ -85,6 +85,17 @@ FormTarget.project = (function($) {
           required: config.naming.primary.shortNameRequired,
           disabled: !config.naming.primary.shortNameModifiable
         }, {
+          title: 'REB Number',
+          description: 'Research ethics board approval number',
+          data: 'rebNumber',
+          type: 'text',
+          maxLength: 50
+        }, {
+          title: 'REB Expiry',
+          description: 'Expiry date of research ethics board approval',
+          data: 'rebExpiry',
+          type: 'date'
+        }, {
           title: 'Description',
           data: 'description',
           type: 'text',

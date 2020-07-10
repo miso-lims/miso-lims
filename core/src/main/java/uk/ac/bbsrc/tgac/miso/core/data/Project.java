@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Date;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
@@ -142,5 +143,13 @@ public interface Project extends Comparable<Project>, Deletable, Nameable, Seria
   public boolean isSecondaryNaming();
 
   public void setSecondaryNaming(boolean secondaryNaming);
+
+  public String getRebNumber();
+
+  public void setRebNumber(String rebNumber);
+
+  public Date getRebExpiry();
+
+  public void setRebExpiry(Date rebExpiry);
 
 }

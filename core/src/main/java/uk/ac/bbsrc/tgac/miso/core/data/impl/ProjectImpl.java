@@ -83,6 +83,10 @@ public class ProjectImpl implements Project {
   private String name = "";
   private String alias = "";
   private String shortName;
+  private String rebNumber;
+
+  @Temporal(TemporalType.DATE)
+  private Date rebExpiry;
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "creator", nullable = false, updatable = false)
@@ -423,6 +427,26 @@ public class ProjectImpl implements Project {
   @Override
   public void setSecondaryNaming(boolean secondaryNaming) {
     this.secondaryNaming = secondaryNaming;
+  }
+
+  @Override
+  public String getRebNumber() {
+    return rebNumber;
+  }
+
+  @Override
+  public void setRebNumber(String rebNumber) {
+    this.rebNumber = rebNumber;
+  }
+
+  @Override
+  public Date getRebExpiry() {
+    return rebExpiry;
+  }
+
+  @Override
+  public void setRebExpiry(Date rebExpiry) {
+    this.rebExpiry = rebExpiry;
   }
 
 }

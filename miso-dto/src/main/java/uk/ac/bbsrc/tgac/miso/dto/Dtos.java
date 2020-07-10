@@ -2468,6 +2468,8 @@ public class Dtos {
     setId(dto::setDefaultTargetedSequencingId, from.getDefaultTargetedSequencing());
     setBoolean(dto::setClinical, from.isClinical(), false);
     setBoolean(dto::setSecondaryNaming, from.isSecondaryNaming(), false);
+    setString(dto::setRebNumber, from.getRebNumber());
+    setDateString(dto::setRebExpiry, from.getRebExpiry());
     return dto;
   }
 
@@ -2488,6 +2490,8 @@ public class Dtos {
     setObject(to::setDefaultTargetedSequencing, TargetedSequencing::new, dto.getDefaultTargetedSequencingId());
     setBoolean(to::setClinical, dto.isClinical(), false);
     setBoolean(to::setSecondaryNaming, dto.isSecondaryNaming(), false);
+    setString(to::setRebNumber, dto.getRebNumber());
+    setDate(to::setRebExpiry, dto.getRebExpiry());
     return to;
   }
 

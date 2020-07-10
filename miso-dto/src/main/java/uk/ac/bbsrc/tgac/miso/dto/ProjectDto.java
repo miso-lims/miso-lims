@@ -13,6 +13,8 @@ public class ProjectDto {
   private Long defaultTargetedSequencingId;
   private boolean clinical;
   private boolean secondaryNaming;
+  private String rebNumber;
+  private String rebExpiry;
 
   public long getId() {
     return id;
@@ -108,5 +110,21 @@ public class ProjectDto {
 
   public void setSecondaryNaming(boolean secondaryNaming) {
     this.secondaryNaming = secondaryNaming;
+  }
+
+  public String getRebNumber() {
+    return rebNumber;
+  }
+
+  public void setRebNumber(String rebNumber) {
+    this.rebNumber = rebNumber;
+  }
+
+  public String getRebExpiry() {
+    return rebExpiry;
+  }
+
+  public void setRebExpiry(String rebExpiry) {
+    this.rebExpiry = rebExpiry;
   }
 }
