@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.persistence;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcControlRun;
@@ -16,6 +17,8 @@ public interface QcTargetStore {
   public QualityControlEntity getEntity(long id) throws IOException;
 
   public Collection<? extends QC> listForEntity(long id) throws IOException;
+
+  public List<? extends QC> listByIdList(List<Long> ids) throws IOException;
 
   public long save(QC qc) throws IOException;
 

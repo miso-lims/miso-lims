@@ -83,7 +83,7 @@ BulkTarget.library = (function($) {
 
           HotUtils.makeParents(Urls.rest.libraries.parents, HotUtils.relationCategoriesForDetailed()),
           HotUtils.makeChildren(Urls.rest.libraries.children, [HotUtils.relations.libraryAliquot(), HotUtils.relations.pool()])].concat(
-          HotUtils.makeQcActions("Library")).concat(
+          BulkUtils.actions.qc('Library')).concat(
           [
               config.worksetId ? HotUtils.makeRemoveFromWorkset('libraries', Urls.rest.worksets.removeLibraries(config.worksetId))
                   : HotUtils.makeAddToWorkset('libraries', 'libraryIds', Urls.rest.worksets.addLibraries),

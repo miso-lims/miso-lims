@@ -35,7 +35,7 @@ ListTarget.container = {
   },
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {
-    var actions = HotUtils.makeQcActions('Container');
+    var actions = BulkUtils.actions.qc('Container');
     if (config.runId) {
       actions.push({
         name: "Remove",

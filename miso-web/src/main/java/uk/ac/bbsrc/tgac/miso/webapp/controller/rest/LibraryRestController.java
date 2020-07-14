@@ -67,7 +67,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibrarySpreadSheets;
-import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
@@ -120,8 +119,6 @@ public class LibraryRestController extends RestController {
   private PoolService poolService;
   @Autowired
   private SampleRestController sampleController;
-  @Autowired
-  private AuthorizationManager authorizationManager;
   @Autowired
   private IndexChecker indexChecker;
   @Autowired
@@ -323,7 +320,7 @@ public class LibraryRestController extends RestController {
 
   @GetMapping("/bulk/{uuid}")
   public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
-    return asyncOperationManager.getAsyncProgress(uuid, Library.class, libraryService, authorizationManager, lib -> Dtos.asDto(lib, false));
+    return asyncOperationManager.getAsyncProgress(uuid, Library.class, libraryService, lib -> Dtos.asDto(lib, false));
   }
 
   @GetMapping(value = "/dt/workset/{id}", produces = { "application/json" })

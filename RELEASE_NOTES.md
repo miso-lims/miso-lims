@@ -2,6 +2,7 @@
 
 Changes:
 
+  * Improved performance of bulk QC pages
   * Advanced search now works in tables on Edit Workset page
   * Added back missing "Check QCs" button on bulk library pages
   * Fixed receiving libraries from the Edit Project page

@@ -30,6 +30,7 @@ public class BulkQcEditTable extends BulkQcTable {
   protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
     super.writeConfiguration(mapper, config);
     config.put("addControls", addControls);
+    config.put("pageMode", "edit");
   }
 
 }

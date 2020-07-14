@@ -2,9 +2,13 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QC;
@@ -74,6 +78,18 @@ public abstract class HibernateQcStore<T extends QC> implements QcTargetStore {
   public long updateControlRun(QcControlRun controlRun) throws IOException {
     currentSession().update(controlRun);
     return controlRun.getId();
+  }
+
+  @Override
+  public List<T> listByIdList(List<Long> ids) throws IOException {
+    if (ids.isEmpty()) {
+      return Collections.emptyList();
+    }
+    Criteria criteria = currentSession().createCriteria(qcClass);
+    criteria.add(Restrictions.in("id", ids));
+    @SuppressWarnings("unchecked")
+    List<T> records = criteria.list();
+    return records;
   }
 
 }

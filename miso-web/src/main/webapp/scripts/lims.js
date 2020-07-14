@@ -850,10 +850,18 @@ var Utils = Utils
           if (index === array.length - 1) {
             accumulator[currentValue] = value;
           } else if (!accumulator[currentValue]) {
-            accumulator[currentValue] = {};
+            if (array.length > index + 1 && Utils.isIntegerString(array[index + 1])) {
+              accumulator[currentValue] = [];
+            } else {
+              accumulator[currentValue] = {};
+            }
           }
           return accumulator[currentValue];
         }, object);
+      },
+
+      isIntegerString: function(string) {
+        return /^-?\d+$/.test(string);
       }
 
     };

@@ -27,7 +27,7 @@ public abstract class BulkQcTable extends BulkTableBackend<QcDto> {
   private final String verb;
 
   public BulkQcTable(QcTarget qcTarget, boolean create, QualityControlService qcService, InstrumentService instrumentService, String verb) {
-    super("qc('" + qcTarget.name() + "')", QcDto.class);
+    super("qc", QcDto.class);
     this.qcTarget = qcTarget;
     this.create = create;
     this.qcService = qcService;
@@ -49,6 +49,12 @@ public abstract class BulkQcTable extends BulkTableBackend<QcDto> {
   @Override
   protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
     config.putPOJO("instruments", instrumentService.list().stream().map(Dtos::asDto).collect(Collectors.toList()));
+    config.put("qcTarget", qcTarget.getLabel());
+  }
+
+  @Override
+  protected boolean isNewInterface() {
+    return true;
   }
 
 }

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -29,6 +30,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.TransferChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
 public class Transfer implements Identifiable, ChangeLoggable, Deletable, Serializable {
@@ -253,6 +255,21 @@ public class Transfer implements Identifiable, ChangeLoggable, Deletable, Serial
     int itemCount = getSampleTransfers().size() + getLibraryTransfers().size() + getLibraryAliquotTransfers().size()
         + getPoolTransfers().size();
     return String.format("%s: %s → %s (%d items)", transferType, sender, recipient, itemCount);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(recipient, recipientGroup, senderGroup, senderLab, transferTime);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return LimsUtils.equals(this, obj,
+        Transfer::getRecipient,
+        Transfer::getRecipientGroup,
+        Transfer::getSenderGroup,
+        Transfer::getSenderLab,
+        Transfer::getTransferTime);
   }
 
 }

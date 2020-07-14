@@ -15,8 +15,10 @@ BulkUtils = (function($) {
    *   getColumns: required function(config, limitedApi) returning array of columns (see below)
    *   prepareData: optional function(data, config); allows manipulating source data prior to table
    *       creation
-   *   confirmSave: optional function(data, config) returning promise. Resolve promise to allow
-   *       save, or fail to cancel
+   *   confirmSave: optional function(data, config) May return a promise while performing
+   *       asynchronous work or to control whether saving is allowed to proceed. Resolve promise
+   *       to allow save, or fail to cancel. If anything else (or nothing) is returned, saving will
+   *       proceed
    * }
    * 
    * Custom Action structure: {
@@ -49,7 +51,9 @@ BulkUtils = (function($) {
    *       updated even if it does
    *   source: array of objects or function(data, limitedApi); required for dropdown fields;
    *       Provides dropdown options
-   *   sortSource: optional function(a, b); sort function for dropdown options
+   *   sortSource: optional boolean or function(a, b) (default: false); if true, the dropdown
+   *       options will be sorted alphabetically by item label (see getItemLabel). To sort by
+   *       anything else, provide a sort function
    *   getItemLabel: function(item) returning string; get the label for a dropdown option. If
    *       omitted and the item is a string, it is used as the label; otherwise, an error is thrown
    *   getItemValue: function(item) returning string; get the value for a dropdown option. If
@@ -99,6 +103,7 @@ BulkUtils = (function($) {
    *       * 'required' (boolean)
    *       * 'disabled' (boolean)
    *       * 'formatter' (string)
+   *       * 'type' (string; only 'decimal' and 'dropdown' supported)
    *   updateData: function(changes); update fields in bulk. Use this rather than multiple
    *       updateField calls to improve performance. changes is an array of arrays where the inner
    *       arrays have three elements - rowIndex, dataProperty, and newValue
@@ -702,6 +707,56 @@ BulkUtils = (function($) {
         };
       },
 
+      qc: function(qcTarget) {
+        return [{
+          name: 'Add QCs',
+          action: function(items) {
+            Utils.showDialog('Add QCs', 'Add', [{
+              property: 'copies',
+              type: 'int',
+              label: 'QCs per ' + qcTarget,
+              value: 1
+            }, {
+              property: 'controls',
+              type: 'int',
+              label: 'Controls per QC',
+              value: 1
+            }], function(result) {
+              if (!Number.isInteger(result.copies) || result.copies < 1) {
+                Utils.showOkDialog('Error', ['Invalid number of QCs entered']);
+              } else if (!Number.isInteger(result.controls) || result.controls < 0) {
+                Utils.showOkDialog('Error', ['Invalid number of controls entered']);
+              } else {
+                Utils.page.post(Urls.ui.qcs.bulkAddFrom(qcTarget), {
+                  entityIds: items.map(Utils.array.getId).join(','),
+                  copies: result.copies,
+                  controls: result.controls
+                });
+              }
+            });
+          }
+        }, {
+          name: 'Edit QCs',
+          action: function(items) {
+            Utils.showDialog('Edit QCs', 'Edit', [{
+              property: 'controls',
+              type: 'int',
+              label: 'Add controls per QC',
+              value: 0
+            }], function(result) {
+              if (!Number.isInteger(result.controls) || result.controls < 0) {
+                Utils.showOkDialog('Error', ['Invalid number of controls entered']);
+                return;
+              }
+              Utils.page.post(Urls.ui.qcs.bulkEditFrom(qcTarget), {
+                entityIds: items.map(Utils.array.getId).join(','),
+                addControls: result.controls
+              });
+            });
+          }
+        }];
+      },
+
       showDialogForBoxCreation: function(title, okButton, fields, pageURL, generateParams, getItemCount) {
         fields.push(ListUtils.createBoxField);
         Utils.showDialog(title, okButton, fields, function(result) {
@@ -944,9 +999,12 @@ BulkUtils = (function($) {
   }
 
   function getDropdownOptionLabels(source, getItemLabel, sortSource) {
-    var sorted = sortSource ? source.sort(sortSource) : source;
+    var sorted = typeof sortSource === 'function' ? source.sort(sortSource) : source;
     // map or copy the array to avoid modifying the original
     var labels = getItemLabel ? source.map(getItemLabel) : source.slice();
+    if (sortSource === true) {
+      labels = labels.sort();
+    }
     return labels;
   }
 
@@ -1251,15 +1309,15 @@ BulkUtils = (function($) {
   function updateField(hot, columns, rowIndex, dataProperty, options) {
     var colIndex = getColumnIndex(dataProperty, columns);
     var column = columns[colIndex];
-
     var forceValidate = false;
+
     Object.keys(options).forEach(function(option) {
       switch (option) {
       case 'value':
         // handled after everything else so validation is only triggered once
         break;
       case 'source':
-        if (column.type !== 'dropdown') {
+        if (hot.getCellMeta(rowIndex, colIndex).type !== 'dropdown') {
           throw new Error('Can\'t update source of non-dropdown column: ' + dataProperty);
         }
         var labels = getDropdownOptionLabels(options.source, column.getItemLabel, column.sortSource);
@@ -1277,16 +1335,62 @@ BulkUtils = (function($) {
       case 'formatter':
         hot.setCellMeta(rowIndex, colIndex, 'format', options.formatter);
         break;
+      case 'type':
+        switch (options.type) {
+        case 'decimal':
+          // validator changes handled below
+          hot.setCellMeta(rowIndex, colIndex, 'type', 'text');
+          hot.setCellMeta(rowIndex, colIndex, 'renderer', 'text');
+          hot.setCellMeta(rowIndex, colIndex, 'editor', 'text');
+          break;
+        case 'dropdown':
+          hot.setCellMeta(rowIndex, colIndex, 'validator', 'autocomplete');
+          hot.setCellMeta(rowIndex, colIndex, 'type', 'dropdown');
+          hot.setCellMeta(rowIndex, colIndex, 'renderer', formatters.standardDropdown);
+          // Note: if 'dropdown' alias is specified for editor, initial validation doesn't work properly (probably a Handsontable bug)
+          hot.setCellMeta(rowIndex, colIndex, 'editor', Handsontable.editors.DropdownEditor);
+          forceValidate = true;
+          break;
+        default:
+          throw new Error('Cannot change field type to ' + options.type);
+        }
+        break;
+      case 'precision':
+      case 'scale':
+        if ((options.type && options.type !== 'decimal') || (!options.type && hot.getCellMeta(rowIndex, colIndex).type !== 'decimal')) {
+          throw new Error('Cannot change precision or scale of non-decimal column: ' + dataProperty);
+        }
+        // validator changes handled below
+        break;
       default:
         throw new Error('Invalid field update option: ' + option);
       }
     });
+
+    if (needsDecimalValidator(options)) {
+      hot.setCellMeta(rowIndex, colIndex, 'validator', makeDecimalValidator(options, column));
+      forceValidate = true;
+    }
+
     if (options.hasOwnProperty('value') && options.value !== undefined) {
       hot.setDataAtCell(rowIndex, colIndex, options.value);
     } else if (forceValidate) {
       // Note: intended to be a private function, but it works and is more efficient than validating the entire row/column/table
       hot._validateCells(null, [rowIndex], [colIndex]);
     }
+  }
+
+  function needsDecimalValidator(options) {
+    return options.type === 'decimal' || options.hasOwnProperty('precision') || options.hasOwnProperty('scale');
+  }
+
+  function makeDecimalValidator(options, column) {
+    return decimalValidator({
+      precision: options.precision || column.precision,
+      scale: options.scale || column.scale,
+      min: column.min,
+      max: column.max
+    });
   }
 
   function processOnChangeListeners(cellMetas, columns, tableData) {
@@ -1342,11 +1446,13 @@ BulkUtils = (function($) {
         Object.keys(options).forEach(function(option) {
           switch (option) {
           case 'value':
-            tableData[rowIndex][dataProperty] = options.value;
+            if (options.value !== undefined) {
+              tableData[rowIndex][dataProperty] = options.value;
+            }
             break;
           case 'source':
-            if (column.type !== 'dropdown') {
-              throw new Error('Can\'t update source of non-dropdown column: ' + dataProperty);
+            if (column.type !== 'dropdown' && (!options.type || options.type !== 'dropdown')) {
+              throw new Error('Can\'t update source of non-dropdown field: ' + dataProperty);
             }
             var labels = getDropdownOptionLabels(options.source, column.getItemLabel, column.sortSource);
             addCellMeta(cellMetas, rowIndex, colIndex, 'source', labels);
@@ -1361,8 +1467,37 @@ BulkUtils = (function($) {
           case 'formatter':
             addCellMeta(cellMetas, rowIndex, colIndex, 'format', options.formatter);
             break;
+          case 'type':
+            switch (options.type) {
+            case 'decimal':
+              addCellMeta(cellMetas, rowIndex, colIndex, 'type', 'text');
+              addCellMeta(cellMetas, rowIndex, colIndex, 'renderer', 'text');
+              addCellMeta(cellMetas, rowIndex, colIndex, 'editor', 'text');
+              // validator changes handled below
+              break;
+            case 'dropdown':
+              addCellMeta(cellMetas, rowIndex, colIndex, 'type', 'dropdown');
+              addCellMeta(cellMetas, rowIndex, colIndex, 'renderer', formatters.standardDropdown);
+              addCellMeta(cellMetas, rowIndex, colIndex, 'editor', Handsontable.editors.DropdownEditor);
+              addCellMeta(cellMetas, rowIndex, colIndex, 'validator', 'autocomplete');
+              break;
+            default:
+              throw new Error('Cannot change field type to ' + options.type);
+            }
+            break;
+          case 'precision':
+          case 'scale':
+            if ((options.type && options.type !== 'decimal') || (!options.type && hot.getCellMeta(rowIndex, colIndex).type !== 'decimal')) {
+              throw new Error('Cannot change precision or scale of non-decimal column: ' + dataProperty);
+            }
+            // validator changes handled below
+            break;
           default:
             throw new Error('Invalid field update option: ' + option);
+          }
+
+          if (needsDecimalValidator(options)) {
+            addCellMeta(cellMetas, rowIndex, colIndex, 'validator', makeDecimalValidator(options, column));
           }
         });
       },
@@ -1777,7 +1912,8 @@ BulkUtils = (function($) {
           Utils.setObjectField(data[rowIndex], column.data, null);
           continue;
         }
-        if (column.type === 'dropdown') {
+        var cellMeta = hot.getCellMeta(rowIndex, colIndex);
+        if (cellMeta.type === 'dropdown') {
           if (column.validationCache) {
             Utils.setObjectField(data[rowIndex], column.data, caches[column.validationCache][tableData[rowIndex][colIndex]]);
           } else {
@@ -1915,11 +2051,11 @@ BulkUtils = (function($) {
   }
 
   function decimalValidator(column) {
-    var precision = column.precision || DEFAULT_DECIMAL_PRECISION;
-    var scale = column.scale || DEFAULT_DECIMAL_SCALE;
+    var precision = column.precision === undefined ? DEFAULT_DECIMAL_PRECISION : column.precision;
+    var scale = column.scale === undefined ? DEFAULT_DECIMAL_SCALE : column.scale;
     var max = Math.pow(10, precision - scale) - Math.pow(0.1, scale);
-    var min = column.hasOwnProperty('min') ? column.min : max * -1;
-    max = column.hasOwnProperty('max') ? column.max : max;
+    var min = column.min === undefined ? max * -1 : column.min;
+    max = column.max === undefined ? max : column.max;
     var pattern = '^\\d{0,' + (precision - scale) + '}';
     if (scale > 0) {
       pattern += '(?:\\.\\d{1,' + scale + '})?';

@@ -17,6 +17,7 @@ import com.google.common.collect.Lists;
 import uk.ac.bbsrc.tgac.miso.core.util.MapBuilder;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkLibraryAliquotPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkLibraryPage;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkQCPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.TestUtils;
 
@@ -162,10 +163,6 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("user/3");
 
     // Bulk pages
-    slugs.add("qc/bulk/addFrom/Sample?entityIds=4445%2C4446&copies=1&controls=1");
-    slugs.add("qc/bulk/editFrom/Sample?entityIds=2201&addControls=0");
-    slugs.add("qc/bulk/addFrom/Library?entityIds=601%2C602%2C603&copies=1&controls=1");
-    slugs.add("qc/bulk/editFrom/Library?entityIds=2201&addControls=0");
     slugs.add("libraryaliquot/bulk/merge?ids=901%2C902");
     slugs.add("libraryaliquot/bulk/pool-separate?ids=901%2C902");
     slugs.add("libraryaliquot/bulk/pool?ids=901%2C902&quantity=2");
@@ -271,6 +268,11 @@ public class BulkErrorCrawlerIT extends AbstractIT {
         .put("libraryaliquot/bulk/edit", (driver, baseUrl) -> BulkLibraryAliquotPage.getForEdit(driver, baseUrl, Arrays.asList(901L, 902L)))
         .put("libraryaliquot/bulk/repropagate",
             (driver, baseUrl) -> BulkLibraryAliquotPage.getForRepropagate(driver, baseUrl, Arrays.asList(901L, 902L)))
+        .put("qc/bulk/addFrom/Sample", (driver, baseUrl) -> BulkQCPage.getForAddSample(driver, baseUrl, Arrays.asList(2201L, 4447L), 1, 1))
+        .put("qc/bulk/editFrom/Sample", (driver, baseUrl) -> BulkQCPage.getForEditSample(driver, baseUrl, Arrays.asList(2201L), 1))
+        .put("qc/bulk/addFrom/Library",
+            (driver, baseUrl) -> BulkQCPage.getForAddLibrary(driver, baseUrl, Arrays.asList(601L, 602L, 603L), 1, 1))
+        .put("qc/bulk/editFrom/Library", (driver, baseUrl) -> BulkQCPage.getForEditLibrary(driver, baseUrl, Arrays.asList(2201L), 1))
         .build());
 
     postPages = Collections.unmodifiableMap(new MapBuilder<String, Map<String, String>>()

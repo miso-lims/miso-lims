@@ -71,7 +71,7 @@ public class DefaultWorkflowExecutor implements WorkflowExecutor {
 
   @Override
   public QC save(QC qc) throws IOException {
-    return qualityControlService.save(qc);
+    return qualityControlService.create(qc);
   }
 
   @Override
