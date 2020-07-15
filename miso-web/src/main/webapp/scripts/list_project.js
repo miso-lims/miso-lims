@@ -86,20 +86,30 @@ ListTarget.project = {
     }
   },
   createColumns: function(config, projectId) {
-    return [ListUtils.idHyperlinkColumn("Name", Urls.ui.projects.edit, "id", Utils.array.getName, 0, true),
-        ListUtils.labelHyperlinkColumn("Alias", Urls.ui.projects.edit, Utils.array.getId, "alias", 1, true),
-        ListUtils.labelHyperlinkColumn("Short Name", Urls.ui.projects.edit, Utils.array.getId, "shortName", 0, true),
-
-        {
-          "sTitle": "Description",
-          "mData": "description",
-          "include": true,
-          "iSortPriority": 0
+    return [{
+      sTitle: 'ID',
+      mData: 'id',
+      bVisible: false
+    }, {
+      sTitle: 'Name',
+      mData: 'name',
+      iSortPriority: 0,
+      iDatSort: 0, // Use ID for sorting,
+      mRender: Warning.tableWarningRenderer(WarningTarget.project, function(project) {
+        return Urls.ui.projects.edit(project.id);
+      }),
+      sClass: 'nowrap'
+    }, ListUtils.labelHyperlinkColumn('Alias', Urls.ui.projects.edit, Utils.array.getId, 'alias', 1, true),
+        ListUtils.labelHyperlinkColumn('Short Name', Urls.ui.projects.edit, Utils.array.getId, 'shortName', 0, true), {
+          sTitle: 'Description',
+          mData: 'description',
+          include: true,
+          iSortPriority: 0
         }, {
-          "sTitle": "Status",
-          "mData": "status",
-          "include": true,
-          "iSortPriority": 0
+          sTitle: 'Status',
+          mData: 'status',
+          include: true,
+          iSortPriority: 0
         }];
   }
 };

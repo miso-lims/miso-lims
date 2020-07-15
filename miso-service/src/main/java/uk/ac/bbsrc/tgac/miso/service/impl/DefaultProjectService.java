@@ -196,6 +196,8 @@ public class DefaultProjectService implements ProjectService {
     original.setDefaultTargetedSequencing(project.getDefaultTargetedSequencing());
     original.setShortName(project.getShortName());
     original.setClinical(project.isClinical());
+    original.setRebNumber(project.getRebNumber());
+    original.setRebExpiry(project.getRebExpiry());
   }
 
   public void setNamingSchemeHolder(NamingSchemeHolder namingSchemeHolder) {
