@@ -4,6 +4,7 @@ Changes:
 
   * Added project REB number and expiry fields
   * Fixed library aliquot "Location" column showing barcode in some cases
+  * Fixed error creating stock sample classes (detailed sample)
 
 # 1.8.1
 
