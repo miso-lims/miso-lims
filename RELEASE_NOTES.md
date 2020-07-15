@@ -3,6 +3,7 @@
 Changes:
 
   * Fixed library aliquot "Location" column showing barcode in some cases
+  * Fixed error retrieving favicon.ico, which sometimes caused strange redirects after login
 
 # 1.8.1
 
