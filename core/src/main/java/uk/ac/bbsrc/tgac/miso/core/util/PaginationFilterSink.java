@@ -97,4 +97,6 @@ public interface PaginationFilterSink<T> {
 
   public void restrictPaginationByTissueType(T item, String type, Consumer<String> errorHandler);
 
+  public void restrictPaginationByWorksetId(T item, long worksetId, Consumer<String> errorHandler);
+
 }

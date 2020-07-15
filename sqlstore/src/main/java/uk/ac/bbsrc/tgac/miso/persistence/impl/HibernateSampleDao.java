@@ -35,10 +35,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.BoxStore;
@@ -444,6 +441,15 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
         .setProjection(EntityReference.makeProjectionList("id", "name"))
         .setResultTransformer(EntityReference.RESULT_TRANSFORMER)
         .uniqueResult();
+  }
+
+  public void restrictPaginationByWorksetId(Criteria criteria, long worksetId, Consumer<String> errorHandler) {
+    DetachedCriteria subquery = DetachedCriteria.forClass(PoolImpl.class)
+            .createAlias("worksetElements", "element")
+            .createAlias("element.worksetElementView", "view")
+            .add(Restrictions.eq("id", worksetId))
+            .setProjection(Projections.property("view.sampleId"));
+    criteria.add(Property.forName("id").in(subquery));
   }
 
 }
