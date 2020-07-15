@@ -71,13 +71,18 @@ ListTarget.library = {
           value: 1
         }];
         if (Constants.isDetailedSample) {
+          var aliquotClasses = Utils.array.removeArchived(Constants.sampleClasses).filter(function(sampleClass) {
+            return sampleClass.sampleCategory === 'Aliquot';
+          }).sort(Utils.sorting.sampleClassComparator);
+          if (!aliquotClasses.length) {
+            Utils.showOkDialog('Error', ['An aliquot sample class is required to create libraries, but none were found.']);
+            return;
+          }
           fields.unshift({
             property: 'sampleClass',
             type: 'select',
             label: 'Aliquot Class',
-            values: Utils.array.removeArchived(Constants.sampleClasses).filter(function(sampleClass) {
-              return sampleClass.sampleCategory === 'Aliquot';
-            }).sort(Utils.sorting.sampleClassComparator),
+            values: aliquotClasses,
             getLabel: Utils.array.getAlias
           });
         }
