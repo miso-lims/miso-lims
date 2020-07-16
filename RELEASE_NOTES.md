@@ -2,6 +2,12 @@
 
 Changes:
 
+
+
+# 1.9.0
+
+Changes:
+
   * Added project REB number and expiry fields
   * Fixed library aliquot "Location" column showing barcode in some cases
   * Fixed error retrieving favicon.ico, which sometimes caused strange redirects after login
