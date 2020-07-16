@@ -704,7 +704,10 @@ Urls = (function() {
     identitiesLookup: sampleRestBase + '/identitiesLookup',
     spreadsheet: sampleRestBase + '/spreadsheet',
     bulkSave: sampleRestBase + '/bulk',
-    bulkSaveProgress: idUrlFunction(sampleRestBase + '/bulk')
+    bulkSaveProgress: idUrlFunction(sampleRestBase + '/bulk'),
+    worksetDatatable: function(worksetId) {
+      return sampleRestBase + '/dt/workset/' + worksetId;
+    },
   };
 
   // Sample Classes
