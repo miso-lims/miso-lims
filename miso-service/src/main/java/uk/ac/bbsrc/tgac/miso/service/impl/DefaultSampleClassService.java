@@ -234,7 +234,7 @@ public class DefaultSampleClassService extends AbstractSaveService<SampleClass> 
       break;
     case SampleStock.CATEGORY_NAME:
       allowedParents = Sets.newHashSet(SampleTissue.CATEGORY_NAME, SampleTissueProcessing.CATEGORY_NAME, SampleStock.CATEGORY_NAME);
-      if (SampleStockSingleCell.SUBCATEGORY_NAME.contentEquals(sampleClass.getSampleSubcategory())) {
+      if (SampleStockSingleCell.SUBCATEGORY_NAME.equals(sampleClass.getSampleSubcategory())) {
         // Single Cell Stocks need to be parented to a Single Cell (tissue processing) class instead of a tissue class
         if (sampleClass.getParentRelationships().stream()
             .filter(relationship -> SampleTissueProcessing.CATEGORY_NAME.equals(relationship.getParent().getSampleCategory())

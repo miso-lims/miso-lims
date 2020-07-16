@@ -52,10 +52,14 @@
   processed into library aliquots, which are then Pooled and sequenced.
 </div>
 
+<div id="warnings"></div>
+
 <form:form id="projectForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
 <script type="text/javascript">
   jQuery(document).ready(function () {
-    FormUtils.createForm('projectForm', 'save', ${projectDto}, 'project', ${formConfig});
+    var projectDto = ${projectDto};
+    Warning.generateHeaderWarnings('warnings', WarningTarget.project, projectDto);
+    FormUtils.createForm('projectForm', 'save', projectDto, 'project', ${formConfig});
     Utils.ui.updateHelpLink(FormTarget.project.getUserManualUrl());
   });
 </script>
