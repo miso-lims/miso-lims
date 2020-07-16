@@ -879,6 +879,7 @@ public class MisoClient implements Lims {
         @Override
         public String extractStringValueFrom(ResultSet rs) throws SQLException {
           boolean umis = rs.getBoolean(getSqlKey());
+          if (rs.wasNull()) return null;
           return umis ? "True" : "False";
         }
       }, //
