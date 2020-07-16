@@ -4,6 +4,7 @@ Changes:
 
   * Added project REB number and expiry fields
   * Fixed library aliquot "Location" column showing barcode in some cases
+  * Fixed error retrieving favicon.ico, which sometimes caused strange redirects after login
   * Fixed error creating stock sample classes (detailed sample)
   * Fixed bug where UMIs were reported incorrectly in Pinery's sample provenance
 

@@ -88,7 +88,7 @@
   <script type="text/javascript" src="<c:url value='/scripts/header_script.js'/>?version=${miso:version()}"></script>
 
 
-  <link rel="shortcut icon" href="<c:url value='/styles/images/favicon.ico'/>" type="image/x-icon"/>
+  <link rel="shortcut icon" href="<c:url value='/favicon.ico'/>" type="image/x-icon"/>
 
     <!--IE check-->
     <script type="text/javascript">
