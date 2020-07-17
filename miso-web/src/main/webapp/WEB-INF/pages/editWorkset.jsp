@@ -49,7 +49,7 @@
 </script>
 
 <c:if test="${pageMode eq 'edit'}">
-  <miso:list-section-ajax id="list_samples" name="Samples" target="sample" config="{isAdmin: ${miso:isAdmin()}}"/>
+  <miso:list-section-ajax id="list_samples" name="Samples" target="sample" config="{worksetId: ${worksetId}}"/>
   <miso:list-section id="list_libraries" name="Libraries" target="library" items="${libraries}" config="{worksetId: ${worksetId}}"/>
   <miso:list-section id="list_libraryAliquots" name="Library Aliquots" target="libraryaliquot" items="${libraryAliquots}" config="{worksetId: ${worksetId}}"/>
 </c:if>
