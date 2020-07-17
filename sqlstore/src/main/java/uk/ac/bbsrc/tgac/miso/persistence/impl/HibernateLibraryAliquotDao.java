@@ -214,13 +214,4 @@ public class HibernateLibraryAliquotDao
     List<LibraryAliquot> records = criteria.list();
     return records;
   }
-
-  @Override
-  public void restrictPaginationByWorksetId(Criteria criteria, long worksetId, Consumer<String> errorHandler) {
-    DetachedCriteria subquery = DetachedCriteria.forClass(Workset.class)
-            .createAlias("libraryAliquots", "libraryaliquot")
-            .add(Restrictions.eq("id", worksetId))
-            .setProjection(Projections.property("libraryaliquot.id"));
-    criteria.add(Property.forName("id").in(subquery));
-  }
 }
