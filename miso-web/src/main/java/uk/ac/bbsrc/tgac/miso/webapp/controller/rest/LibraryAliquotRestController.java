@@ -278,4 +278,10 @@ public class LibraryAliquotRestController extends RestController {
     libraryAliquotService.bulkDelete(aliquots);
   }
 
+  @GetMapping(value = "/dt/workset/{id}", produces = { "application/json" })
+  @ResponseBody
+  public DataTablesResponseDto<LibraryAliquotDto> getDTLibraryAliquotsByWorkset(@PathVariable("id") Long id, HttpServletRequest request)
+          throws IOException {
+    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.workset(id));
+  }
 }

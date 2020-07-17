@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -212,5 +213,14 @@ public class HibernateLibraryAliquotDao
     @SuppressWarnings("unchecked")
     List<LibraryAliquot> records = criteria.list();
     return records;
+  }
+
+  @Override
+  public void restrictPaginationByWorksetId(Criteria criteria, long worksetId, Consumer<String> errorHandler) {
+    DetachedCriteria subquery = DetachedCriteria.forClass(Workset.class)
+            .createAlias("libraryAliquots", "libraryaliquot")
+            .add(Restrictions.eq("id", worksetId))
+            .setProjection(Projections.property("libraryaliquot.id"));
+    criteria.add(Property.forName("id").in(subquery));
   }
 }

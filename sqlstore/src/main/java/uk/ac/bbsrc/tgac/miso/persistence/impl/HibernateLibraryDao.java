@@ -13,11 +13,7 @@ import java.util.function.Consumer;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
+import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
@@ -432,5 +429,15 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   public String getFriendlyName() {
     return "Library";
   }
+
+  @Override
+  public void restrictPaginationByWorksetId(Criteria criteria, long worksetId, Consumer<String> errorHandler) {
+    DetachedCriteria subquery = DetachedCriteria.forClass(Workset.class)
+            .createAlias("libraries", "library")
+            .add(Restrictions.eq("id", worksetId))
+            .setProjection(Projections.property("library.id"));
+    criteria.add(Property.forName("id").in(subquery));
+  }
+
 
 }

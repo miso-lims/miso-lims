@@ -376,7 +376,10 @@ Urls = (function() {
     bulkDelete: libraryRestBase + '/bulk-delete',
     spreadsheet: libraryRestBase + '/spreadsheet',
     bulkSave: libraryRestBase + '/bulk',
-    bulkSaveProgress: idUrlFunction(libraryRestBase + '/bulk')
+    bulkSaveProgress: idUrlFunction(libraryRestBase + '/bulk'),
+    worksetDatatable: function(worksetId) {
+      return libraryRestBase + '/dt/workset/' + worksetId;
+    },
   };
 
   // Library Aliquots
@@ -411,7 +414,10 @@ Urls = (function() {
     parents: idUrlFunction(libraryAliquotRestBase + '/parents'),
     children: idUrlFunction(libraryAliquotRestBase + '/children'),
     bulkSave: libraryAliquotRestBase + '/bulk',
-    bulkSaveProgress: idUrlFunction(libraryAliquotRestBase + '/bulk')
+    bulkSaveProgress: idUrlFunction(libraryAliquotRestBase + '/bulk'),
+    worksetDatatable: function(worksetId) {
+      return libraryAliquotRestBase + '/dt/workset/' + worksetId;
+    },
   };
 
   // Library Designs
