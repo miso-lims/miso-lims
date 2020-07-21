@@ -31,36 +31,15 @@ ListTarget.qctype = {
   },
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {
-    var actions = HotTarget.qctype.getBulkActions(config);
-    if (config.isAdmin) {
-      actions.push(ListUtils.createBulkDeleteAction("QC Types", "qctypes", function(qcType) {
-        return qcType.name + ' (' + qcType.qcTarget + ' QC)';
-      }));
-    }
-    return actions;
+    return config.isAdmin ? [ListUtils.createBulkDeleteAction("QC Types", "qctypes", function(qcType) {
+      return qcType.name + ' (' + qcType.qcTarget + ' QC)';
+    })] : [];
   },
   createStaticActions: function(config, projectId) {
     return config.isAdmin ? [{
       "name": "Add",
       "handler": function() {
-
-        Utils.showDialog('Create QC Types', 'Create', [{
-          property: 'quantity',
-          type: 'int',
-          label: 'Quantity',
-          value: 1
-        }], function(result) {
-          if (result.quantity < 1) {
-            Utils.showOkDialog('Create QC Types', ["That's a peculiar number of qctypes to create."]);
-            return;
-          } else if (result.quantity === 1) {
-            window.location = Urls.ui.qcTypes.create;
-          } else {
-            window.location = Urls.ui.qcTypes.bulkCreate + '?' + jQuery.param({
-              quantity: result.quantity,
-            });
-          }
-        });
+        window.location = Urls.ui.qcTypes.create;
       }
     }] : [];
   },

@@ -3,6 +3,8 @@
 Changes:
 
   * Improved performance of bulk QC pages
+  * Removed bulk Create/Edit QC Types pages - QC Types can now only be created and modified using the
+    single Create/Edit QC Type page
   * Advanced search now works in tables on Edit Workset page
   * Added back missing "Check QCs" button on bulk library pages
   * Fixed receiving libraries from the Edit Project page

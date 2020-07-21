@@ -171,7 +171,6 @@ public class BulkErrorCrawlerIT extends AbstractIT {
 
     slugs.add("librarytemplate/bulk/edit?ids=1");
     slugs.add("index/bulk/edit?ids=1%2C2%2C3%2C4");
-    slugs.add("qctype/bulk/edit?ids=102%2C103");
     slugs.add("attachmentcategories/bulk/new?quantity=3");
     slugs.add("attachmentcategories/bulk/edit?ids=1%2C2%2C3");
     slugs.add("sampletype/bulk/new?quantity=3");

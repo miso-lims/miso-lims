@@ -623,9 +623,7 @@ Urls = (function() {
   var qcTypeUiBase = baseUrl + '/qctype';
   ui.qcTypes = {
     create: qcTypeUiBase + '/new',
-    edit: idUrlFunction(qcTypeUiBase),
-    bulkCreate: qcTypeUiBase + '/bulk/new',
-    bulkEdit: qcTypeUiBase + '/bulk/edit'
+    edit: idUrlFunction(qcTypeUiBase)
   };
 
   var qcTypeRestBase = restBase + '/qctypes';

@@ -448,13 +448,10 @@ Some QC types may be linked to one of the target's fields. For example, a "Volum
 might be linked to a sample's volume. These QCs can be set to auto-update the field, so that when a new QC is entered,
 the item's related field is updated automatically.
 
-MISO administrators can add, edit, and delete QC types using the standard interface. A QC type can only be deleted if
-there are no existing QCs of the type.
-
-In addition to the bulk Create/Edit QC Types page, there is a single Create/Edit QC Type page. The single Create/Edit
-page allows you to make all the same changes to a QC type as the bulk page, and also allows you to manage the QC type's
-kits and controls. To get to the single Create QC Type page, enter "1" for the quantity when adding a QC type. To get to
-the Edit QC Type page, click the name of the QC you wish to edit on the QC Types list page.
+MISO administrators can create, modify, and delete QC types. To create a QC type, click the "Add" button in the toolbar
+of the QC Types list page. To edit an existing QC type, click on its name on the QC Types list page. QC types can be
+deleted using the standard interface. A QC type can only be deleted if there are no existing QCs of the type; however,
+a QC type can be marked as archived to prevent creating any more QCs of the type.
 
 The Kits table near the bottom of the single Create/Edit QC Type page allows you to manage the QC type's kits. To add a
 kit, click the "Add" button in the toolbar. In the dialog that appears, enter a kit name or part number to search for
