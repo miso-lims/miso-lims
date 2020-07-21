@@ -495,10 +495,9 @@ public class EditLibraryController {
         config.put("dnaseTreatable", aliquotClass.hasPathToDnaseTreatable(sampleValidRelationshipService.getAll()));
       }
       config.put(Config.PAGE_MODE, Config.CREATE);
-      config.put("hasProject", project != null);
       Map<Long, List<LibraryTemplateDto>> templatesByProjectId = new HashMap<>();
+      addJsonArray(mapper, config, "projects", projectService.list(), Dtos::asDto);
       if (project == null) {
-        projectService.list().stream().map(Dtos::asDto).forEach(config.putArray("projects")::addPOJO);
         List<LibraryTemplate> templates = libraryTemplateService.list();
         for (LibraryTemplate template : templates) {
           LibraryTemplateDto dto = Dtos.asDto(template);
