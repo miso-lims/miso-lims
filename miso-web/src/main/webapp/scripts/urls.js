@@ -377,9 +377,7 @@ Urls = (function() {
     spreadsheet: libraryRestBase + '/spreadsheet',
     bulkSave: libraryRestBase + '/bulk',
     bulkSaveProgress: idUrlFunction(libraryRestBase + '/bulk'),
-    worksetDatatable: function(worksetId) {
-      return libraryRestBase + '/dt/workset/' + worksetId;
-    },
+    worksetDatatable: idUrlFunction(libraryRestBase + '/dt/workset')
   };
 
   // Library Aliquots
@@ -415,9 +413,7 @@ Urls = (function() {
     children: idUrlFunction(libraryAliquotRestBase + '/children'),
     bulkSave: libraryAliquotRestBase + '/bulk',
     bulkSaveProgress: idUrlFunction(libraryAliquotRestBase + '/bulk'),
-    worksetDatatable: function(worksetId) {
-      return libraryAliquotRestBase + '/dt/workset/' + worksetId;
-    },
+    worksetDatatable: idUrlFunction(libraryAliquotRestBase + '/dt/workset')
   };
 
   // Library Designs
@@ -711,9 +707,7 @@ Urls = (function() {
     spreadsheet: sampleRestBase + '/spreadsheet',
     bulkSave: sampleRestBase + '/bulk',
     bulkSaveProgress: idUrlFunction(sampleRestBase + '/bulk'),
-    worksetDatatable: function(worksetId) {
-      return sampleRestBase + '/dt/workset/' + worksetId;
-    },
+    worksetDatatable: idUrlFunction(sampleRestBase + '/dt/workset')
   };
 
   // Sample Classes
