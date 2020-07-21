@@ -29,7 +29,34 @@ BulkTarget.library = (function($) {
       return Urls.external.userManual('samples');
     },
     getCustomActions: function() {
-      return BulkUtils.actions.boxable();
+      return BulkUtils.actions.boxable().concat(
+          {
+            name: 'Check QCs',
+            action: function(api) {
+              Utils.showDialog('QC Criteria', 'Check', [{
+                label: 'Concentration',
+                type: 'compare',
+                property: 'concentrationComparator',
+              }, {
+                label: 'Volume',
+                type: 'compare',
+                property: 'volumeComparator',
+              }, {
+                label: 'Size',
+                type: 'compare',
+                property: 'sizeComparator',
+              }], function(output) {
+                var rowCount = api.getRowCount();
+                var changes = [];
+                for (var row = 0; row < rowCount; row++) {
+                  var pass = output.concentrationComparator(api.getValue(row, 'concentration'))
+                      && output.volumeComparator(api.getValue(row, 'volume')) && output.sizeComparator(api.getValue(row, 'dnaSize'))
+                  changes.push([row, 'qcPassed', pass ? 'True' : 'False']);
+                }
+                api.updateData(changes);
+              });
+            }
+          });
     },
     getBulkActions: function(config) {
       return [

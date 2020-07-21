@@ -3,6 +3,7 @@
 Changes:
 
   * Advanced search now works in tables on Edit Workset page
+  * Added back missing "Check QCs" button on bulk library pages
   * Fixed receiving libraries from the Edit Project page
 
 # 1.9.0
@@ -18,6 +19,7 @@ Changes:
 Known Issues:
 
   * Page hangs while trying to receive libraries from the Edit Project page
+  * "Check QCs" button is missing from bulk library pages
 
 # 1.8.1
 
@@ -29,6 +31,7 @@ Changes:
 Known Issues:
 
   * Page hangs while trying to receive libraries from the Edit Project page
+  * "Check QCs" button is missing from bulk library pages
 
 # 1.8.0
 
@@ -47,6 +50,7 @@ Known Issues:
   * "Make Aliquots" button links to the wrong page
   * Docker webapp does not build correctly
   * Page hangs while trying to receive libraries from the Edit Project page
+  * "Check QCs" button is missing from bulk library pages
 
 # 1.7.1
 
@@ -59,6 +63,7 @@ Known Issues:
   * When editing SOPs, the URL is not saved correctly
   * Docker webapp does not build correctly
   * Page hangs while trying to receive libraries from the Edit Project page
+  * "Check QCs" button is missing from bulk library pages
 
 # 1.7.0
 
@@ -104,6 +109,7 @@ Known Issues:
   * When editing SOPs, the URL is not saved correctly
   * Docker webapp does not build correctly
   * Page hangs while trying to receive libraries from the Edit Project page
+  * "Check QCs" button is missing from bulk library pages
 
 # 1.6.0
 
