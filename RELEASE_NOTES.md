@@ -3,7 +3,7 @@
 Changes:
 
   * Advanced search now works in tables on Edit Workset page
-
+  * Fixed receiving libraries from the Edit Project page
 
 # 1.9.0
 
@@ -15,12 +15,20 @@ Changes:
   * Fixed error creating stock sample classes (detailed sample)
   * Fixed bug where UMIs were reported incorrectly in Pinery's sample provenance
 
+Known Issues:
+
+  * Page hangs while trying to receive libraries from the Edit Project page
+
 # 1.8.1
 
 Changes:
 
   * Fixed "Make Aliquots" button to link to the correct page
   * Fixed Docker webapp build
+
+Known Issues:
+
+  * Page hangs while trying to receive libraries from the Edit Project page
 
 # 1.8.0
 
@@ -38,6 +46,7 @@ Known Issues:
 
   * "Make Aliquots" button links to the wrong page
   * Docker webapp does not build correctly
+  * Page hangs while trying to receive libraries from the Edit Project page
 
 # 1.7.1
 
@@ -49,6 +58,7 @@ Known Issues:
 
   * When editing SOPs, the URL is not saved correctly
   * Docker webapp does not build correctly
+  * Page hangs while trying to receive libraries from the Edit Project page
 
 # 1.7.0
 
@@ -93,6 +103,7 @@ Known Issues:
   * Error saving runs with metrics
   * When editing SOPs, the URL is not saved correctly
   * Docker webapp does not build correctly
+  * Page hangs while trying to receive libraries from the Edit Project page
 
 # 1.6.0
 
