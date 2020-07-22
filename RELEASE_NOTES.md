@@ -2,6 +2,7 @@
 
 Changes:
 
+  * Advanced search now works in tables on Edit Workset page
 
 
 # 1.9.0
