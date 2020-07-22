@@ -2,12 +2,15 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -32,25 +35,24 @@ public class HibernateContainerQCDaoIT extends AbstractDAOTest {
   @Test
   public void testSave() throws Exception {
     ContainerQC qc = new ContainerQC();
-    SequencerPartitionContainer container = new SequencerPartitionContainerImpl();
-    container.setId(3L);
+    SequencerPartitionContainer container = (SequencerPartitionContainer) currentSession().get(SequencerPartitionContainerImpl.class, 3L);
+    QcType qcType = (QcType) currentSession().get(QcType.class, 1L);
+    User user = (User) currentSession().get(UserImpl.class, 1L);
     qc.setContainer(container);
-    qc.setType(new QcType());
-    qc.getType().setId(1L);
-    qc.setCreator(new UserImpl());
-    qc.getCreator().setId(1L);
+    qc.setType(qcType);
+    qc.setResults(new BigDecimal("12"));
+    qc.setCreator(user);
     qc.setCreationTime(new Date());
     qc.setLastModified(new Date());
     long id = sut.save(qc);
 
-    sessionFactory.getCurrentSession().flush();
-    sessionFactory.getCurrentSession().clear();
+    clearSession();
 
-    ContainerQC saved = (ContainerQC) sut.get(id);
+    ContainerQC saved = (ContainerQC) currentSession().get(ContainerQC.class, id);
     assertNotNull(saved);
     assertEquals(qc.getContainer().getId(), saved.getContainer().getId());
     assertEquals(qc.getType().getId(), saved.getType().getId());
-    assertEquals(qc.getResults(), saved.getResults());
+    assertEquals(qc.getResults().compareTo(saved.getResults()), 0);
   }
 
 }

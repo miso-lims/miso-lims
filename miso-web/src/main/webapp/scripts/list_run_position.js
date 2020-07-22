@@ -26,7 +26,7 @@ ListTarget.run_position = {
   createUrl: null,
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {
-    var actions = HotUtils.makeQcActions('Container');
+    var actions = BulkUtils.actions.qc('Container');
     actions.push({
       name: "Remove",
       action: function(containers) {

@@ -36,9 +36,6 @@ public class HibernatePoolQcDaoIT extends AbstractDAOTest {
   @InjectMocks
   private HibernatePoolQCDao dao;
   
-  //Auto-increment sequence doesn't roll back with transactions, so must be tracked
-   private static long nextAutoIncrementId = 4L;
-  
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
@@ -47,7 +44,7 @@ public class HibernatePoolQcDaoIT extends AbstractDAOTest {
   
   @Test
   public void testGet() throws IOException {
-    PoolQC qc = (PoolQC) dao.get(1L);
+    PoolQC qc = dao.get(1L);
     assertNotNull(qc);
     assertEquals(1L, qc.getId());
     assertEquals("admin", qc.getCreator().getLoginName());
@@ -70,31 +67,31 @@ public class HibernatePoolQcDaoIT extends AbstractDAOTest {
   
   @Test
   public void testSaveNew() throws IOException {
-    long autoIncrementId = nextAutoIncrementId;
     PoolQC qc = new PoolQC();
-    Pool pool = new PoolImpl();
-    pool.setId(1L);
+    Pool pool = (Pool) currentSession().get(PoolImpl.class, 1L);
+    QcType qcType = (QcType) currentSession().get(QcType.class, 8L);
+    User user = (User) currentSession().get(UserImpl.class, 1L);
     qc.setPool(pool);
-    User mockUser = new UserImpl();
-    mockUser.setId(1L);
-    qc.setCreator(mockUser);
+    qc.setCreator(user);
     qc.setDate(new Date());
-    QcType type = new QcType();
-    type.setId(8L);
-    qc.setType(type);
+    qc.setType(qcType);
+    qc.setResults(new BigDecimal("12"));
     qc.setCreationTime(new Date());
     qc.setLastModified(new Date());
-    assertNull(dao.get(autoIncrementId));
-    assertEquals(autoIncrementId, dao.save(qc));
-    PoolQC saved = (PoolQC) dao.get(autoIncrementId);
-    nextAutoIncrementId++;
-    assertEquals(qc.getCreator(), saved.getCreator());
+    long id = dao.save(qc);
+
+    clearSession();
+
+    PoolQC saved = (PoolQC) currentSession().get(PoolQC.class, id);
+    assertNotNull(saved);
+    assertEquals(qc.getPool().getId(), saved.getPool().getId());
     assertEquals(qc.getType().getId(), saved.getType().getId());
+    assertEquals(qc.getResults().compareTo(saved.getResults()), 0);
   }
   
   @Test
   public void testSaveUpdate() throws IOException {
-    PoolQC qc = (PoolQC) dao.get(1L);
+    PoolQC qc = dao.get(1L);
     assertNotNull(qc);
     User mockUser = new UserImpl();
     mockUser.setId(1L);
@@ -108,7 +105,7 @@ public class HibernatePoolQcDaoIT extends AbstractDAOTest {
     type.setId(101L);
     qc.setType(type);
     assertEquals(1L, dao.save(qc));
-    PoolQC saved = (PoolQC) dao.get(1L);
+    PoolQC saved = dao.get(1L);
     assertEquals(qc.getCreator(), saved.getCreator());
     assertEquals(qc.getResults(), saved.getResults());
   }
