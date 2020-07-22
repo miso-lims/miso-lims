@@ -326,4 +326,11 @@ public class LibraryRestController extends RestController {
     return asyncOperationManager.getAsyncProgress(uuid, Library.class, libraryService, authorizationManager, lib -> Dtos.asDto(lib, false));
   }
 
+  @GetMapping(value = "/dt/workset/{id}", produces = { "application/json" })
+  @ResponseBody
+  public DataTablesResponseDto<LibraryDto> getDTLibrariesByWorkset(@PathVariable("id") Long id, HttpServletRequest request)
+    throws IOException {
+    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.workset(id));
+  }
+
 }

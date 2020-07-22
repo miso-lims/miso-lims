@@ -27,7 +27,12 @@ ListTarget.libraryaliquot = {
     return Urls.external.userManual('library_aliquots');
   },
   createUrl: function(config, projectId) {
-    return projectId ? Urls.rest.libraryAliquots.projectDatatable(projectId) : Urls.rest.libraryAliquots.datatable;
+    if (projectId) {
+      return Urls.rest.libraryAliquots.projectDatatable(projectId);
+    } else if (config.worksetId) {
+      return Urls.rest.libraryAliquots.worksetDatatable(config.worksetId);
+    }
+    return Urls.rest.libraryAliquots.datatable;
   },
   getQueryUrl: function() {
     return Urls.rest.libraryAliquots.query;

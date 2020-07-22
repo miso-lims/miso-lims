@@ -316,6 +316,15 @@ public abstract interface PaginationFilter {
     };
   }
 
+  public static PaginationFilter workset(final long worksetId) {
+    return new PaginationFilter() {
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByWorksetId(item, worksetId, errorHandler);
+      }
+    };
+  }
+
   public static PaginationFilter pool(final Pool pool) {
     if (pool.getId() == PoolImpl.UNSAVED_ID) {
       throw new IllegalArgumentException("Cannot filter by unsaved pool.");

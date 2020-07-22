@@ -33,6 +33,8 @@ ListTarget.sample = {
       } else {
         return Urls.rest.samples.projectDatatable(projectId);
       }
+    } else if (config.worksetId) {
+        return Urls.rest.samples.worksetDatatable(config.worksetId);
     }
     return Urls.rest.samples.datatable;
   },

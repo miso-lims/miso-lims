@@ -27,7 +27,12 @@ ListTarget.library = {
     return Urls.external.userManual('libraries');
   },
   createUrl: function(config, projectId) {
-    return projectId ? Urls.rest.libraries.projectDatatable(projectId) : Urls.rest.libraries.datatable;
+    if (projectId) {
+      return Urls.rest.libraries.projectDatatable(projectId);
+    } else if (config.worksetId) {
+      return Urls.rest.libraries.worksetDatatable(config.worksetId);
+    }
+    return Urls.rest.libraries.datatable;
   },
   getQueryUrl: function() {
     return Urls.rest.libraries.query;
