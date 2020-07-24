@@ -206,17 +206,8 @@ for more information on the types of data that can be added at this stage.
 
 The
 [miso.properties](https://github.com/miso-lims/miso-lims/blob/master/miso-web/src/main/resources/internal/miso.properties)
-file has plenty of options to configure for site-specific use. Some important
-options include:
-
-* `miso.detailed.sample.enabled` : turns detailed sample mode on and off
-* `miso.instanceName` : displays an instance name in the header on the webapp
-  (to distinguish prod and stage, for example).
-* `miso.naming.scheme` : turns on/off various validation options for
-  naming samples.
-  The most rigorous naming validation scheme is `oicr`. See
-  [Naming schemes](../baremetal-installation-guide/#naming-schemes)
-  for more information.
+file has plenty of options to configure for site-specific use. See [Site Configuration](../site-configuration) for more
+information.
 
 This file should be mounted in the webapp container at
 `/usr/local/tomcat/conf/Catalina/localhost/miso.properties`.

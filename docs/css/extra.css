@@ -74,6 +74,9 @@ a {
   color: #666666;
 }
 
+table {
+  margin-bottom: 24px;
+}
 
 #index-checker-container {
   display: flex;

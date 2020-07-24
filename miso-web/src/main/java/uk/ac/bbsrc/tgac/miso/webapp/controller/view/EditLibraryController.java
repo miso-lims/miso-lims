@@ -194,11 +194,11 @@ public class EditLibraryController {
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
-  @Value("${miso.display.library.bulk.libraryalias}")
+  @Value("${miso.display.library.bulk.libraryalias:true}")
   private Boolean showLibraryAlias;
-  @Value("${miso.display.library.bulk.description}")
+  @Value("${miso.display.library.bulk.description:true}")
   private Boolean showDescription;
-  @Value("${miso.display.library.bulk.volume}")
+  @Value("${miso.display.library.bulk.volume:true}")
   private Boolean showVolume;
   @Value("${miso.defaults.sample.bulk.scientificname:}")
   private String defaultSciName;
