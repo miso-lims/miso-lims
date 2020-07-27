@@ -106,7 +106,7 @@ MISO Naming Schemes are used to validate and generate entity String fields. They
 ### `miso.naming.scheme`\*
 
 May be `default`, `oicr`, or `v2`, which have the default configurations shown below. The naming scheme can optionally
-be customized further using the other `miso.naming...` properties as detailed below. Only them `default` scheme supports
+be customized further using the other `miso.naming...` properties as detailed below. Only the `default` scheme supports
 plain sample mode. For detailed sample mode, `v2` is recommended.
 
 |                             | default                      | oicr                          | v2                   |

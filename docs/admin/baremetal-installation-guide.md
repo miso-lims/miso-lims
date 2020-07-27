@@ -194,8 +194,9 @@ If using JDBC, once running, you should change the passwords of the `admin` and
 [Run Scanner](https://github.com/miso-lims/runscanner) is a webservice that scans the paths containing sequencer output.
 It is not required for a functioning MISO install, but without it, sequencer runs must be added manually.
 
-Please see the [Run Scanner readme](https://github.com/miso-lims/runscanner/blob/master/README.md) for setup
-instructions.
+Please see the
+[Run Scanner Installation and Setup Guide](https://miso-lims.readthedocs.io/projects/runscanner/en/latest/installation/)
+for setup instructions.
 
 Once complete, edit `$CATALINA_HOME/conf/Catalina/localhost/miso.properties` of the MISO Tomcat server and set
 `miso.runscanner.urls` to the URL of the Run Scanner instance. It is possible to set up multiple run scanners managing
