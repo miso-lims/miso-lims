@@ -1,0 +1,1 @@
+UPDATE Printer SET layout = REPLACE(layout, '"2barcode"', '"2dbarcode"');
