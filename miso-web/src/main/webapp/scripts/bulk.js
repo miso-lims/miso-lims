@@ -657,7 +657,7 @@ BulkUtils = (function($) {
         };
       },
 
-      sop: function(sops) {
+      sop: function(sops, required) {
         return {
           title: 'SOP',
           type: 'dropdown',
@@ -672,7 +672,8 @@ BulkUtils = (function($) {
           getItemLabel: function(item) {
             return item.alias + ' v.' + item.version;
           },
-          getItemValue: Utils.array.getId
+          getItemValue: Utils.array.getId,
+          required: !!required
         };
       }
     },

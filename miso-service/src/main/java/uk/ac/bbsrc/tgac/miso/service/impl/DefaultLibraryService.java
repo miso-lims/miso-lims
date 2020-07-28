@@ -31,6 +31,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
@@ -38,10 +39,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
+import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
@@ -193,7 +196,9 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
 
   @Override
   public long create(Library library) throws IOException {
+    boolean libraryReceipt = false;
     if (library.getSample() != null && !library.getSample().isSaved()) {
+      libraryReceipt = true;
       Long sampleId = sampleService.create(library.getSample());
       library.getSample().setId(sampleId);
     }
@@ -219,7 +224,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
 
     LimsUtils.updateParentVolume(library, null, changeUser);
 
-    validateChange(library, null);
+    validateChange(library, null, libraryReceipt);
     long savedId = save(library, true).getId();
     sampleStore.update(library.getParent());
     boxService.updateBoxableLocation(library);
@@ -252,7 +257,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     LimsUtils.updateParentVolume(library, managed, changeUser);
     boolean validateAliasUniqueness = !managed.getAlias().equals(library.getAlias());
     loadChildEntities(library);
-    validateChange(library, managed);
+    validateChange(library, managed, false);
     applyChanges(managed, library);
     makeChangeLogForIndices(originalIndices, managed.getIndices(), managed);
     Library saved = save(managed, validateAliasUniqueness);
@@ -537,7 +542,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     }
   }
 
-  private void validateChange(Library library, Library beforeChange) throws IOException {
+  private void validateChange(Library library, Library beforeChange, boolean libraryReceipt) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
 
     validateConcentrationUnits(library.getConcentration(), library.getConcentrationUnits(), errors);
@@ -546,6 +551,32 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     validateUnboxableFields(library, errors);
     if (isDetailedLibrary(library) && beforeChange != null) {
       validateTargetedSequencing(((DetailedLibrary) library).getLibraryDesignCode(), beforeChange.getLibraryAliquots(), errors);
+    }
+
+    // Fields required on either of these conditions
+    // 1. editing and value was previously set
+    // 2. propagating (not library receipt), and options exist
+    if (beforeChange != null) {
+      if (beforeChange.getThermalCycler() != null && library.getThermalCycler() == null) {
+        addRequiredError(errors, "thermalCyclerId");
+      }
+      if (beforeChange.getKitLot() != null && library.getKitLot() == null) {
+        addRequiredError(errors, "kitLot");
+      }
+      if (beforeChange.getSop() != null && library.getSop() == null) {
+        addRequiredError(errors, "sopId");
+      }
+    } else if (!libraryReceipt) {
+      if (library.getThermalCycler() == null
+          && instrumentService.listByType(InstrumentType.THERMAL_CYCLER).stream().anyMatch(Instrument::isActive)) {
+        addRequiredError(errors, "thermalCyclerId");
+      }
+      if (library.getKitLot() == null) {
+        addRequiredError(errors, "kitLot");
+      }
+      if (library.getSop() == null && sopService.listByCategory(SopCategory.LIBRARY).stream().anyMatch(sop -> !sop.isArchived())) {
+        addRequiredError(errors, "sopId");
+      }
     }
 
     if (library.getSpikeIn() != null) {
@@ -561,6 +592,10 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }
+  }
+
+  private static void addRequiredError(List<ValidationError> errors, String property) {
+    errors.add(new ValidationError(property, "Must be specified"));
   }
 
   private static void validateIndices(Library library, List<ValidationError> errors) {

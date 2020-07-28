@@ -11,6 +11,7 @@ BulkTarget.library = (function($) {
    *   showDescription: boolean
    *   showVolume: boolean
    *   recipientGroups
+   *   thermalCyclers: array
    *   workstations: array
    *   templatesByProjectId: map
    *   sops: array
@@ -263,7 +264,7 @@ BulkTarget.library = (function($) {
 
       columns.push(BulkUtils.columns.creationDate(!config.isLibraryReceipt, config.pageMode == 'propagate', 'library'));
       if (!config.isLibraryReceipt) {
-        columns.push(BulkUtils.columns.sop(config.sops));
+        columns.push(BulkUtils.columns.sop(config.sops, config.pageMode === 'propagate'));
       }
       columns.push({
         title: 'Workstation',
@@ -282,7 +283,8 @@ BulkTarget.library = (function($) {
         source: config.thermalCyclers,
         sortSource: Utils.sorting.standardSort('name'),
         getItemLabel: Utils.array.getName,
-        getItemValue: Utils.array.getId
+        getItemValue: Utils.array.getId,
+        required: config.pageMode === 'propagate' && config.thermalCyclers && config.thermalCyclers.length
       });
 
       columns = columns.concat(BulkUtils.columns.groupId(!config.isLibraryReceipt, function(rowIndex) {
@@ -567,7 +569,9 @@ BulkTarget.library = (function($) {
               }, {
                 title: 'Kit Lot',
                 type: 'text',
-                data: 'kitLot'
+                data: 'kitLot',
+                include: !config.isLibraryReceipt,
+                required: config.pageMode === 'propagate'
               }, BulkUtils.columns.qcPassed(true), BulkUtils.columns.librarySize);
 
       if (config.showVolume) {
