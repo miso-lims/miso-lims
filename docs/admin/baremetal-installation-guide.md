@@ -55,9 +55,10 @@ long as it can access the database server.
 
 It is best to set a default timezone for MySQL. You can configure this in
 `my.cnf`. The simplest and recommended option is to set it to UTC by adding the
-following line:
+following lines:
 
 ```
+[mysqld]
 default-time-zone='+00:00'
 ```
 
@@ -124,20 +125,8 @@ Make sure the database path in `ROOT.xml` is correct for your install:
 If you use MariaDB instead of MySQL, replace 'mysql' with 'mariadb' in the URL.
 
 Copy `$MISO_SRC/miso-web/src/main/resources/miso.properties` to
-`$CATALINA_HOME/conf/Catalina/localhost/miso.properties`. Review and edit
-this file as appropriate (see [Naming Schemes](#naming-schemes) below).
-
-* The naming schemes will determine how MISO checks if object names (especially
-samples, libraries) are valid. If you do not want to use one of the supplied
-ones (default standard, OICR's standard, or no checks), you will have to write
-one or more specific to your organisation. See [Naming Schemes](#naming-schemes)
-below for more information.
-* Optional: If using any bulk barcode scanners (only VisionMate is supported at present),
-define `miso.visionmate.servers` as specified in the properties file
-* Optional: Update `miso.bugUrl` to the URL for your internal issue tracker or other
-method for users to report issues using the "Report a problem" link in the header.
-* Update `miso.instanceName` to update the instance name displayed in the header.
-
+`$CATALINA_HOME/conf/Catalina/localhost/miso.properties`. This file contains site-specific configuration that you should
+review and modify as appropriate. See [Site Configuration](../site-configuration) for more information.
 
 Append the following line to `$CATALINA_HOME/bin/setenv.sh` or, if you installed Tomcat through apt, `/etc/default/tomcat8`:
 
@@ -145,7 +134,9 @@ Append the following line to `$CATALINA_HOME/bin/setenv.sh` or, if you installed
 
 (Update the security method if you are using LDAP or Active Directory LDAP.)
 
-Create the directory `/storage/miso` and subdirectories `/storage/miso/log` and `/storage/miso/files`.
+Create the directory `/storage/miso` and subdirectories `/storage/miso/log` and `/storage/miso/files`. Note that these
+directories can be changed in `miso.properties`, so if you changed them, make sure to create the directories you
+specified instead.
 
     mkdir -p /storage/miso/log
     mkdir -p /storage/miso/files
@@ -163,23 +154,22 @@ the `/storage/miso/` directory:
 | `submission.properties`   | properties to set the submission environment.              |
 
 ## Security Environment (updating `/storage/miso/security.properties`)
+
 MISO can use either LDAP (`ldap`), Active Directory LDAP (`ad`), or JDBC
 (`jdbc`) as an authentication mechanism. This is set by the `-Dsecurity.method`
 noted in the previous section, and the same value must be set in `security.properties`.
 
-If you are using JDBC (aka storing usernames and passwords in the database), set the
-security method to `jdbc`.
-No additional configuration is necessary.
+If you are using JDBC (i.e. storing usernames and passwords in the MISO database), set the security method to `jdbc`. No
+additional configuration is necessary.
 
-For using LDAP, set the security method to `ldap`. Additional settings are
-needed for LDAP in the `security.properties`. Talk to your LDAP administrator.
+For using LDAP, set the security method to `ldap`. Additional settings are needed for LDAP in the `security.properties`.
+Talk to your LDAP administrator.
 
-To use Active Directory, a specific kind of LDAP, set the security method to `ad`.
-Some active directory settings are needed in addition to the LDAP settings in the
-`security.properties` file.
+To use Active Directory, a specific kind of LDAP, set the security method to `ad`. Some active directory settings are
+needed in addition to the LDAP settings in the `security.properties` file.
 
 The search for a user is done against `userPrincipalName` which takes the form of
-an email address. To login the user will type their username and to do the lookup
+an email address. To log in, the user will type their username and to do the lookup
 their username will be added to the domain specified in the property
 `security.ad.emailDomain`.
 
@@ -198,137 +188,20 @@ prefix.
 If using JDBC, once running, you should change the passwords of the `admin` and
 `notification` accounts.
 
-## Naming Schemes
-
-(updating `$CATALINA_HOME/conf/Catalina/localhost/miso.properties`)
-MISO Naming Schemes are used to validate and generate entity String fields. They are
-used for all `name` fields, and some `alias` fields. You may configure a base naming
-scheme, and customize it by switching validators and generators in `miso.properties` in
-`$CATALINA_HOME/conf/Catalina/localhost/`.
-
-The options for `miso.naming.scheme` are `default`, `oicr`, and `v2`, which have the
-default configurations shown below. Only `default` supports plain sample mode. For detailed
-sample mode, `v2` is recommended.
-
-|                             | default                      | oicr                          | v2                   |
-|-----------------------------|------------------------------|-------------------------------|----------------------|
-| Name generator              | DefaultNameGenerator         | DefaultNameGenerator          | DefaultNameGenerator |
-| Name Validator              | DefaultNameValidator         | DefaultNameValidator          | DefaultNameValidator |
-| Sample Alias Generator      | none                         | OicrSampleAliasGenerator      | V2SampleAliasGenerator |
-| Sample Alias Validator      | DefaultSampleAliasValidator  | OicrSampleAliasValidator      | V2SampleAliasValidator |
-| Library Alias Generator     | DefaultLibraryAliasGenerator | OicrLibraryAliasGenerator     | V2LibraryAliasGenerator |
-| Library Alias Validator     | DefaultLibraryAliasValidator | OicrLibraryAliasValidator     | V2LibraryAliasValidator |
-| Library Aliquot Alias Generator | DefaultLibraryAliquotAliasGenerator | OicrLibraryAliquotAliasGenerator | V2LibraryAliquotAliasGenerator |
-| Library Aliquot Alias Validator | DefaultLibraryAliquotAliasValidator | OicrLibraryAliasValidator | V2LibraryAliquotAliasValidator |
-| Project ShortName Validator | AllowAnythingValidator       | OicrProjectShortNameValidator | OicrProjectShortNameValidator |
-| Configurable components     | all                          | none                          | none |
-
-If the naming scheme you’ve selected has configurable components, you may configure them
-as follows.
-
-### `miso.naming.generator.nameable.name`
-
-| Option    | Example     |
-|-----------|-------------|
-| default   | SAM1        |
-| classname | SampleImpl1 |
-
-### `miso.naming.generator.sample.alias`
-
-| Option  | Example               | Note                             |
-|---------|-----------------------|----------------------------------|
-| oicr    | PROJ_0001_Ad_P_nn_1-1 | for use with DetailedSample only |
-| v2      | PROJ_0001_02_SG03_04  | for use with DetailedSample only |
-
-### `miso.naming.generator.library.alias`
-
-| Option  | Example                  | Note                                                                                                     |
-|---------|--------------------------|----------------------------------------------------------------------------------------------------------|
-| default | XX_LYY-1                 | XX and YY taken from sample alias - depends on sample alias passing default validator with default regex |
-| oicr    | PROJ_0001_Ad_P_PE_300_WG | For use with DetailedSample only. Depends on sample alias passing oicr validator                         |
-| v2      | PROJ_0001_02_LB05        | For use with DetailedSample only. Depends on tissue alias passing v2 validator                           |
-
-### `miso.naming.generator.libraryaliquot.alias`
-
-| Option  | Example                  | Note                                                                             |
-|---------|--------------------------|----------------------------------------------------------------------------------|
-| default | XX_LYY-1                 | This generator just copies the library's alias                                   |
-| oicr    | PROJ_0001_Ad_P_PE_300_WG | For use with DetailedSample only. Depends on sample alias passing oicr validator |
-| v2      | PROJ_0001_02_LB05-06     | For use with DetailedSample only. Depends on library alias passing v2 validator  |
-
-### `miso.naming.validator.nameable.name`
-
-| Option   | Detail                                       | Allow null | Allow duplicates | Custom Regex | Custom Duplication |
-|----------|----------------------------------------------|------------|------------------|--------------|--------------------|
-| default  | Matches 'default' generator, or custom regex | no         | no               | yes          | yes                |
-| allowany | Only checks that the name is not null        | no         | yes              | no           | no                 |
-
-### `miso.naming.validator.sample.alias`
-
-| Option   | Detail                                         | Allow null | Allow duplicates | Custom Regex | Custom Duplication |
-|----------|------------------------------------------------|------------|------------------|--------------|--------------------|
-| default  | Default regex: `([A-z0-9]+)_S([A-z0-9]+)_(.*)` | no         | no               | yes          | no                 |
-| allowany | Only checks that the alias is not null         | no         | yes              | no           | no                 |
-| oicr     | Matches 'oicr' generator                       | no         | no               | no           | no                 |
-| v2       | Matches 'v2' generator                         | no         | no               | no           | no                 |
-
-### `miso.naming.validator.library.alias`
-
-| Option   | Detail                                 | Allow null | Allow duplicates | Custom Regex | Custom Duplication |
-|----------|----------------------------------------|------------|------------------|--------------|--------------------|
-| default  | Matches 'default' generator            | no         | no               | yes          | no                 |
-| allowany | Only checks that the alias is not null | no         | yes              | no           | no                 |
-| oicr     | Matches 'oicr' generator               | no         | no               | no           | no                 |
-| v2       | Matches 'v2' generator                 | no         | no               | no           | no                 |
-
-### `miso.naming.validator.libraryaliquot.alias`
-
-| Option   | Detail                                 | Allow null | Allow duplicates | Custom Regex | Custom Duplication |
-|----------|----------------------------------------|------------|------------------|--------------|--------------------|
-| default  | Matches 'default' generator            | no         | yes              | yes          | yes                |
-| allowany | Only checks that the alias is not null | no         | yes              | no           | no                 |
-| oicr     | Matches 'oicr' generator               | no         | no               | no           | no                 |
-| v2       | Matches 'v2' generator                 | no         | no               | no           | no                 |
-
-### `miso.naming.validator.project.shortName`
-
-| Option   | Detail                                 | Allow null | Allow duplicates | Custom Regex | Custom Duplication |
-|----------|----------------------------------------|------------|------------------|--------------|--------------------|
-| allowany | Optional field, no format specified    | yes        | yes              | no           | no                 |
-| oicr     | 3-5 characters, CAPS and numbers only  | no         | no               | no           | no                 |
-
-If a validator accepts custom regex, it can be configured via `<base property>.regex`.
-e.g. `miso.naming.validator.nameable.name.regex:.*` to allow any name. A custom validator
-must be specified for this property to be enabled - the naming scheme’s default validator
-will not be altered.
-
-If a validator accepts custom duplication, that can be configured via
-`<base property>.duplicates`. e.g. `miso.naming.validator.library.alias.duplicates:true`
-to allow duplicate library aliases. A custom validator must be specified for this
-property to be enabled - the naming scheme’s default validator will not be altered.
-
-### Secondary Naming Scheme
-
-It is possible to configure a second naming scheme using the same properties above, except replacing `naming` with `naming2`,
-e.g. `miso.naming2.scheme=v2`. When two naming schemes are configured, an extra field called "Use Secondary Naming Scheme"
-is shown on the Edit Project page. If unselected, the primary naming scheme will be used for the project; if selected, the
-secondary scheme is used instead. The secondary scheme will only ever be used for items that are tied to a single project. This
-includes samples, libraries, and library aliquots. Other items, such as pools, boxes, and studies will always use the primary
-naming scheme. When using two naming schemes, it is ideal to use the same name generator (`nameable.name`) in both in order
-to maintain consistent names throughout MISO.
-
-If you are switching to a new naming scheme and want it to be the default for new projects, you can make your current naming
-scheme secondary and the new one primary. Set all existing projects to use the secondary naming scheme, and they will continue
-to use the old scheme. This way, you don't have to select "Use Secondary Naming Scheme" for every new project.
 
 # Setting Up the Run Scanner
-[Run Scanner](https://github.com/miso-lims/runscanner) is a webservice that scans the paths containing
-sequencer output. It is not required for a functioning MISO install, but
-without it, sequencer runs must be added manually.
 
-Please see the Run Scanner readme for setup instructions.
+[Run Scanner](https://github.com/miso-lims/runscanner) is a webservice that scans the paths containing sequencer output.
+It is not required for a functioning MISO install, but without it, sequencer runs must be added manually.
 
-Once complete, edit `$CATALINA_HOME/conf/Catalina/localhost/miso.properties` of the MISO Tomcat server and set `miso.runscanner.urls` to the URL of the Run Scanner instance. It is possible to set up multiple run scanners managing different sequencers and add all the URLs to `miso.properties`. If you are adding Run Scanner to a previously-established MISO environment, restart MISO.
+Please see the
+[Run Scanner Installation and Setup Guide](https://miso-lims.readthedocs.io/projects/runscanner/en/latest/installation/)
+for setup instructions.
+
+Once complete, edit `$CATALINA_HOME/conf/Catalina/localhost/miso.properties` of the MISO Tomcat server and set
+`miso.runscanner.urls` to the URL of the Run Scanner instance. It is possible to set up multiple run scanners managing
+different sequencers and add all the URLs to `miso.properties`. If you are adding Run Scanner to a
+previously-established MISO environment, restart MISO.
 
 
 # Building the Application
@@ -342,8 +215,8 @@ There will be an important build artefact: `miso-web/target/ROOT.war`
 
 # Releasing and Upgrading
 
-Prior to release, ensure that you have followed the instructions in the
-above and have WAR files for both MISO (`ROOT.war`) and, if desired, [Run Scanner](https://github.com/miso-lims/runscanner)(`runscanner-*.war`).
+Prior to release, ensure that you have followed the instructions in the above and have WAR files for both MISO
+(`ROOT.war`) and, if desired, [Run Scanner](https://github.com/miso-lims/runscanner)(`runscanner-*.war`).
 
 To install or upgrade, perform the following steps:
 
