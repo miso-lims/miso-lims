@@ -6,6 +6,7 @@ Changes:
   * Added back missing "Check QCs" button on bulk library pages
   * Fixed receiving libraries from the Edit Project page
   * Fixed error when attempting to configure multiple Run Scanners
+  * Fixed broken links to create/edit box uses
 
 # 1.9.0
 
