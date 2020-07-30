@@ -18,7 +18,7 @@ HotTarget.boxsize = {
         HotUtils.makeColumnForInt('Rows', true, 'rows', HotUtils.validator.integer(true, 1)),
         HotUtils.makeColumnForInt('Columns', true, 'columns', HotUtils.validator.integer(true, 1)),
         HotUtils.makeColumnForConstantsList('Box Type', true, 'boxType', 'boxType', 'name', 'label', config.boxTypes, true, null, null,
-            null, 'Box'), HotUtils.makeColumnForBoolean('Scannable', true, 'scannable', true)];
+            null, 'Storage'), HotUtils.makeColumnForBoolean('Scannable', true, 'scannable', true)];
   },
 
   getBulkActions: function(config) {

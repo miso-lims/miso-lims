@@ -22,19 +22,16 @@ ListTarget.boxsize = {
   createColumns: function(config, projectId) {
     return [{
       sTitle: 'Rows',
-      mData: 'rows',
-      include: true,
-      iSortPriority: 0
+      mData: 'rows'
     }, {
       sTitle: 'Columns',
-      mData: 'columns',
-      include: true,
-      iSortPriority: 0
+      mData: 'columns'
+    }, {
+      sTitle: 'Type',
+      mData: 'boxTypeLabel'
     }, {
       sTitle: 'Scannable',
       mData: 'scannable',
-      include: true,
-      iSortPriority: 0,
       mRender: ListUtils.render.booleanChecks
     }];
   }
