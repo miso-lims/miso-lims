@@ -66,30 +66,27 @@ ListTarget.qc = function(qcTarget) {
     createColumns: function(config, projectId) {
       return [{
         "sTitle": "Method",
-        "mData": "type.name",
-        "include": true,
-        "iSortPriority": 0
+        "mData": "qcTypeId",
+        "mRender": function(data, type, full) {
+          return Utils.array.findUniqueOrThrow(Utils.array.idPredicate(data), Constants.qcTypes).name;
+        },
       }, {
         "sTitle": "Creator",
-        "mData": "creator",
-        "include": true,
-        "iSortPriority": 0
+        "mData": "creator"
       }, {
         "sTitle": "Date",
         "mData": "date",
-        "include": true,
         "iSortPriority": 1
       }, {
         "sTitle": "Results",
         "mData": "results",
-        "include": true,
-        "iSortPriority": 0,
         "mRender": function(data, type, full) {
           if (type === 'display') {
-            if (full.type.precisionAfterDecimal < 0) {
+            var qcType = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(full.qcTypeId), Constants.qcTypes);
+            if (qcType.precisionAfterDecimal < 0) {
               return ListUtils.render.booleanChecks(!!data, type, full);
             } else {
-              return data + " " + full.type.units;
+              return data + " " + qcType.units;
             }
           } else {
             return data;
