@@ -1,10 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl.view;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import javax.persistence.MappedSuperclass;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @MappedSuperclass
 public abstract class ListTransferViewItem implements Serializable {
@@ -37,6 +39,20 @@ public abstract class ListTransferViewItem implements Serializable {
 
   public void setQcPassed(Boolean qcPassed) {
     this.qcPassed = qcPassed;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(received, qcPassed, getItemId(), getTransfer());
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return LimsUtils.equals(this, obj,
+        ListTransferViewItem::isReceived,
+        ListTransferViewItem::isQcPassed,
+        ListTransferViewItem::getItemId,
+        ListTransferViewItem::getTransfer);
   }
 
 }

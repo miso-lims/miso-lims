@@ -3,17 +3,16 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page;
 import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 
 import java.util.Collection;
+import java.util.Map;
 
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.PageFactory;
 
 import com.google.common.base.Joiner;
 
+import uk.ac.bbsrc.tgac.miso.core.util.MapBuilder;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 
-public class BulkQCPage extends HeaderFooterPage {
+public class BulkQCPage extends BulkPage {
 
   public static class QcColumns {
     public static final String SAMPLE_ALIAS = "Sample Alias";
@@ -33,61 +32,78 @@ public class BulkQCPage extends HeaderFooterPage {
     }
   };
 
-  @FindBy(id = "bulkactions")
-  private WebElement toolbar;
-
-  private final HandsOnTable table;
+  private HandsOnTable table;
 
   public BulkQCPage(WebDriver driver) {
     super(driver);
-    PageFactory.initElements(driver, this);
     waitWithTimeout().until(or(titleContains("Add Sample QCs "), titleContains("Edit Sample QCs "), titleContains("Add Library QCs "),
         titleContains("Edit Library QCs "), titleContains("Add Pool QCs "), titleContains("Edit Pool QCs ")));
-    table = new HandsOnTable(driver);
+    refreshElements();
+  }
+
+  @Override
+  protected void refreshElements() {
+    table = new HandsOnTable(getDriver());
   }
 
   public static BulkQCPage getForEditSample(WebDriver driver, String baseUrl, Collection<Long> sampleIds, int addControls) {
-    String ids = Joiner.on(',').join(sampleIds);
-    String url = baseUrl + "miso/qc/bulk/editFrom/Sample?entityIds=" + ids + "&addControls=" + addControls;
-    driver.get(url);
+    Map<String, String> params = new MapBuilder<String, String>()
+        .put("entityIds", Joiner.on(',').join(sampleIds))
+        .put("addControls", Integer.toString(addControls))
+        .build();
+    postData(driver, baseUrl + "miso/qc/bulk/editFrom/Sample", params);
     return new BulkQCPage(driver);
   }
 
   public static BulkQCPage getForAddSample(WebDriver driver, String baseUrl, Collection<Long> sampleIds, int copies, int controls) {
-    String ids = Joiner.on(',').join(sampleIds);
-    String url = baseUrl + "miso/qc/bulk/addFrom/Sample?entityIds=" + ids + "&copies=" + copies + "&controls=" + controls;
-    driver.get(url);
+    Map<String, String> params = new MapBuilder<String, String>()
+        .put("entityIds", Joiner.on(',').join(sampleIds))
+        .put("copies", Integer.toString(copies))
+        .put("controls", Integer.toString(controls))
+        .build();
+    postData(driver, baseUrl + "miso/qc/bulk/addFrom/Sample", params);
     return new BulkQCPage(driver);
   }
 
   public static BulkQCPage getForEditLibrary(WebDriver driver, String baseUrl, Collection<Long> libraryIds, int addControls) {
-    String ids = Joiner.on(',').join(libraryIds);
-    String url = baseUrl + "miso/qc/bulk/editFrom/Library?entityIds=" + ids + "&addControls=" + addControls;
-    driver.get(url);
+    Map<String, String> params = new MapBuilder<String, String>()
+        .put("entityIds", Joiner.on(',').join(libraryIds))
+        .put("addControls", Integer.toString(addControls))
+        .build();
+    postData(driver, baseUrl + "miso/qc/bulk/editFrom/Library", params);
     return new BulkQCPage(driver);
   }
 
   public static BulkQCPage getForAddLibrary(WebDriver driver, String baseUrl, Collection<Long> libraryIds, int copies, int controls) {
-    String ids = Joiner.on(',').join(libraryIds);
-    String url = baseUrl + "miso/qc/bulk/addFrom/Library?entityIds=" + ids + "&copies=" + copies + "&controls=" + controls;
-    driver.get(url);
+    Map<String, String> params = new MapBuilder<String, String>()
+        .put("entityIds", Joiner.on(',').join(libraryIds))
+        .put("copies", Integer.toString(copies))
+        .put("controls", Integer.toString(controls))
+        .build();
+    postData(driver, baseUrl + "miso/qc/bulk/addFrom/Library", params);
     return new BulkQCPage(driver);
   }
 
   public static BulkQCPage getForEditPool(WebDriver driver, String baseUrl, Collection<Long> poolIds, int addControls) {
-    String ids = Joiner.on(',').join(poolIds);
-    String url = baseUrl + "miso/qc/bulk/editFrom/Pool?entityIds=" + ids + "&addControls=" + addControls;
-    driver.get(url);
+    Map<String, String> params = new MapBuilder<String, String>()
+        .put("entityIds", Joiner.on(',').join(poolIds))
+        .put("addControls", Integer.toString(addControls))
+        .build();
+    postData(driver, baseUrl + "miso/qc/bulk/editFrom/Pool", params);
     return new BulkQCPage(driver);
   }
 
   public static BulkQCPage getForAddPool(WebDriver driver, String baseUrl, Collection<Long> poolIds, int copies, int controls) {
-    String ids = Joiner.on(',').join(poolIds);
-    String url = baseUrl + "miso/qc/bulk/addFrom/Pool?entityIds=" + ids + "&copies=" + copies + "&controls=" + controls;
-    driver.get(url);
+    Map<String, String> params = new MapBuilder<String, String>()
+        .put("entityIds", Joiner.on(',').join(poolIds))
+        .put("copies", Integer.toString(copies))
+        .put("controls", Integer.toString(controls))
+        .build();
+    postData(driver, baseUrl + "miso/qc/bulk/addFrom/Pool", params);
     return new BulkQCPage(driver);
   }
 
+  @Override
   public HandsOnTable getTable() {
     return table;
   }

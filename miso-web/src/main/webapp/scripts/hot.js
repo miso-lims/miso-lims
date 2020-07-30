@@ -1261,56 +1261,6 @@ var HotUtils = {
     };
   },
 
-  makeQcActions: function(qcTarget) {
-    return [{
-      name: 'Add QCs',
-      action: function(items) {
-        Utils.showDialog('Add QCs', 'Add', [{
-          property: 'copies',
-          type: 'int',
-          label: 'QCs per ' + qcTarget,
-          value: 1
-        }, {
-          property: 'controls',
-          type: 'int',
-          label: 'Controls per QC',
-          value: 1
-        }], function(result) {
-          if (!Number.isInteger(result.copies) || result.copies < 1) {
-            Utils.showOkDialog('Error', ['Invalid number of QCs entered']);
-          } else if (!Number.isInteger(result.controls) || result.controls < 0) {
-            Utils.showOkDialog('Error', ['Invalid number of controls entered']);
-          } else {
-            window.location = Urls.ui.qcs.bulkAddFrom(qcTarget) + '?' + jQuery.param({
-              entityIds: items.map(Utils.array.getId).join(','),
-              copies: result.copies,
-              controls: result.controls
-            });
-          }
-        });
-      }
-    }, {
-      name: 'Edit QCs',
-      action: function(items) {
-        Utils.showDialog('Edit QCs', 'Edit', [{
-          property: 'controls',
-          type: 'int',
-          label: 'Add controls per QC',
-          value: 0
-        }], function(result) {
-          if (!Number.isInteger(result.controls) || result.controls < 0) {
-            Utils.showOkDialog('Error', ['Invalid number of controls entered']);
-            return;
-          }
-          window.location = Urls.ui.qcs.bulkEditFrom(qcTarget) + '?' + jQuery.param({
-            entityIds: items.map(Utils.array.getId).join(','),
-            addControls: result.controls
-          });
-        });
-      }
-    }, ];
-  },
-
   makeParents: function(parentsByCategoryUrlFunction, parentCategories) {
     return HotUtils.makeRelations(parentsByCategoryUrlFunction, 'Parents', parentCategories, true);
   },

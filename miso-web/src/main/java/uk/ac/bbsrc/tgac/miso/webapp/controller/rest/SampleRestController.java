@@ -73,7 +73,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
-import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
@@ -122,8 +121,6 @@ public class SampleRestController extends RestController {
   private IndexChecker indexChecker;
   @Autowired
   private AsyncOperationManager asyncOperationManager;
-  @Autowired
-  private AuthorizationManager authorizationManager;
 
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
@@ -485,7 +482,7 @@ public class SampleRestController extends RestController {
 
   @GetMapping("/bulk/{uuid}")
   public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
-    return asyncOperationManager.getAsyncProgress(uuid, Sample.class, sampleService, authorizationManager,
+    return asyncOperationManager.getAsyncProgress(uuid, Sample.class, sampleService,
         ali -> Dtos.asDto(ali, false));
   }
 

@@ -202,7 +202,7 @@ BulkTarget.sample = (function($) {
       actions.push(HotUtils.makeChildren(Urls.rest.samples.children, HotUtils.relationCategoriesForDetailed().concat(
           [HotUtils.relations.library(), HotUtils.relations.libraryAliquot(), HotUtils.relations.pool()])));
 
-      actions = actions.concat(HotUtils.makeQcActions("Sample"));
+      actions = actions.concat(BulkUtils.actions.qc('Sample'));
 
       if (config && config.worksetId) {
         actions.push(HotUtils.makeRemoveFromWorkset('samples', Urls.rest.worksets.removeSamples(config.worksetId)));

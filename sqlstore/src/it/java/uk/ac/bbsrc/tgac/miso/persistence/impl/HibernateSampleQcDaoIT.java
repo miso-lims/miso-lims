@@ -39,7 +39,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
@@ -90,20 +93,25 @@ public class HibernateSampleQcDaoIT extends AbstractDAOTest {
 
   @Test
   public void testSaveNew() throws IOException {
-    SampleQC newSampleQC = new SampleQC();
-    newSampleQC.setSample(new SampleImpl());
-    newSampleQC.getSample().setId(1L);
-    newSampleQC.setType(new QcType());
-    newSampleQC.getType().setId(1L);
-    newSampleQC.setCreator(new UserImpl());
-    newSampleQC.getCreator().setId(1L);
-    newSampleQC.setCreationTime(new Date());
-    newSampleQC.setLastModified(new Date());
-    long id = dao.save(newSampleQC);
+    SampleQC qc = new SampleQC();
+    Sample sample = (Sample) currentSession().get(SampleImpl.class, 1L);
+    QcType qcType = (QcType) currentSession().get(QcType.class, 1L);
+    User user = (User) currentSession().get(UserImpl.class, 1L);
+    qc.setSample(sample);
+    qc.setType(qcType);
+    qc.setResults(new BigDecimal("12"));
+    qc.setCreator(user);
+    qc.setCreationTime(new Date());
+    qc.setLastModified(new Date());
+    long id = dao.save(qc);
 
-    SampleQC savedSampleQC = dao.get(id);
-    assertEquals(newSampleQC, savedSampleQC);
-    assertEquals(newSampleQC.getCreator(), savedSampleQC.getCreator());
+    clearSession();
+
+    SampleQC saved = (SampleQC) currentSession().get(SampleQC.class, id);
+    assertNotNull(saved);
+    assertEquals(qc.getSample().getId(), saved.getSample().getId());
+    assertEquals(qc.getType().getId(), saved.getType().getId());
+    assertEquals(qc.getResults().compareTo(saved.getResults()), 0);
   }
 
   @Test

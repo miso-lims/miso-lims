@@ -1,7 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
+import static uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils.*;
+
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -9,8 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -24,6 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.QualityControlService;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.QcDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkQcAddTable;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkQcEditTable;
@@ -37,17 +41,23 @@ public class QcController {
   @Autowired
   private InstrumentService instrumentService;
 
-  @RequestMapping(value = "/bulk/addFrom/{qcTarget}", method = RequestMethod.GET)
-  public ModelAndView addBulk(@PathVariable("qcTarget") String qcTarget, @RequestParam("entityIds") String entityIds,
-      @RequestParam("copies") int copies, @RequestParam("controls") int controls, ModelMap model) throws IOException {
-    return new BulkQcAddTable(QcTarget.valueOf(qcTarget), qcService, instrumentService, copies, controls).display(entityIds, model);
+  @PostMapping("/bulk/addFrom/{qcTarget}")
+  public ModelAndView addBulk(@PathVariable("qcTarget") String qcTargetLabel, @RequestParam Map<String, String> form, ModelMap model)
+      throws IOException {
+    QcTarget qcTarget = getQcTarget(qcTargetLabel);
+    String entityIds = getStringInput("entityIds", form, true);
+    int copies = getIntegerInput("copies", form, true);
+    int controls = getIntegerInput("controls", form, true);
+    return new BulkQcAddTable(qcTarget, qcService, instrumentService, copies, controls).display(entityIds, model);
   }
 
-  @RequestMapping(value = "/bulk/edit/{qcTarget}", method = RequestMethod.GET)
-  public ModelAndView editBulk(@PathVariable("qcTarget") String qcTargetName, @RequestParam("ids") String qcIds,
-      @RequestParam("addControls") int addControls, ModelMap model) throws IOException {
-    QcTarget qcTarget = QcTarget.valueOf(qcTargetName);
-    return new BulkEditTableBackend<QC, QcDto>("qc('" + qcTarget.name() + "')", QcDto.class, "QCs") {
+  @PostMapping("/bulk/edit/{qcTarget}")
+  public ModelAndView editBulk(@PathVariable("qcTarget") String qcTargetLabel, @RequestParam Map<String, String> form, ModelMap model)
+      throws IOException {
+    QcTarget qcTarget = getQcTarget(qcTargetLabel);
+    String qcIds = getStringInput("ids", form, true);
+    int addControls = getIntegerInput("addControls", form, true);
+    return new BulkEditTableBackend<QC, QcDto>("qc", QcDto.class, "QCs") {
 
       @Override
       protected QcDto asDto(QC model) {
@@ -61,17 +71,34 @@ public class QcController {
 
       @Override
       protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-        config.put("edit", true);
         config.putPOJO("instruments", instrumentService.list().stream().map(Dtos::asDto).collect(Collectors.toList()));
         config.put("addControls", addControls);
+        config.put("pageMode", "edit");
+        config.put("qcTarget", qcTarget.getLabel());
+      }
+
+      @Override
+      protected boolean isNewInterface() {
+        return true;
       }
     }.edit(qcIds, model);
   }
 
-  @RequestMapping(value = "/bulk/editFrom/{qcTarget}", method = RequestMethod.GET)
-  public ModelAndView editBulkFrom(@PathVariable("qcTarget") String qcTarget, @RequestParam("entityIds") String entityIds,
-      @RequestParam("addControls") int addControls, ModelMap model) throws IOException {
-    return new BulkQcEditTable(QcTarget.valueOf(qcTarget), qcService, instrumentService, addControls).display(entityIds, model);
+  @PostMapping("/bulk/editFrom/{qcTarget}")
+  public ModelAndView editBulkFrom(@PathVariable("qcTarget") String qcTargetLabel, @RequestParam Map<String, String> form, ModelMap model)
+      throws IOException {
+    QcTarget qcTarget = getQcTarget(qcTargetLabel);
+    String entityIds = getStringInput("entityIds", form, true);
+    int addControls = getIntegerInput("addControls", form, true);
+    return new BulkQcEditTable(qcTarget, qcService, instrumentService, addControls).display(entityIds, model);
+  }
+
+  private QcTarget getQcTarget(String label) {
+    try {
+      return QcTarget.valueOf(label);
+    } catch (IllegalArgumentException | NullPointerException e) {
+      throw new ClientErrorException("Invalid QC Target: " + label);
+    }
   }
 
 }

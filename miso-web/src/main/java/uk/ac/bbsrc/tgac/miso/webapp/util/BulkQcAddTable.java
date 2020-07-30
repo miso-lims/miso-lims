@@ -36,6 +36,7 @@ public class BulkQcAddTable extends BulkQcTable {
   @Override
   protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
     super.writeConfiguration(mapper, config);
-    config.put("controlCount", controls);
+    config.put("addControls", controls);
+    config.put("pageMode", "create");
   }
 }

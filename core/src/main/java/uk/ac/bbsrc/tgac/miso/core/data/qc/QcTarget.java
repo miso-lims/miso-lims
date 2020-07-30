@@ -9,7 +9,7 @@ public enum QcTarget {
   Sample("Sample", QcCorrespondingField.NONE, QcCorrespondingField.CONCENTRATION, QcCorrespondingField.VOLUME), //
   Pool("Pool", QcCorrespondingField.NONE, QcCorrespondingField.CONCENTRATION, QcCorrespondingField.VOLUME), //
   Run("Run", QcCorrespondingField.NONE), //
-  Container("Sequencing Container", QcCorrespondingField.NONE);
+  Container("Container", QcCorrespondingField.NONE);
 
   private final String label;
   private final List<QcCorrespondingField> correspondingFields;

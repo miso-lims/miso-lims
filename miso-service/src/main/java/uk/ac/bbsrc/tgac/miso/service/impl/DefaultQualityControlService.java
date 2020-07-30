@@ -6,9 +6,15 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import org.hibernate.TransactionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -26,12 +32,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQcControlRun;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.BulkQcSaveOperation;
+import uk.ac.bbsrc.tgac.miso.core.service.BulkSaveService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.KitDescriptorService;
 import uk.ac.bbsrc.tgac.miso.core.service.QcTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.QualityControlService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
+import uk.ac.bbsrc.tgac.miso.core.util.ThrowingFunction;
 import uk.ac.bbsrc.tgac.miso.persistence.ChangeLoggableStore;
 import uk.ac.bbsrc.tgac.miso.persistence.ContainerQcStore;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryQcStore;
@@ -63,13 +72,15 @@ public class DefaultQualityControlService implements QualityControlService {
   private ChangeLoggableStore changeLoggableStore;
   @Autowired
   private InstrumentService instrumentService;
+  @Autowired
+  private TransactionTemplate transactionTemplate;
 
   @Override
-  public QC createQC(QC qc) throws IOException {
+  public QC create(QC qc) throws IOException {
+    loadChildEntities(qc);
     QcTargetStore handler = getHandler(qc.getType().getQcTarget());
 
     QualityControlEntity entity = handler.getEntity(qc.getEntity().getId());
-    loadChildEntities(qc);
     validateChange(qc, null);
 
     User user = authorizationManager.getCurrentUser();
@@ -94,7 +105,8 @@ public class DefaultQualityControlService implements QualityControlService {
   }
 
   @Override
-  public QC updateQc(QC qc) throws IOException {
+  public QC update(QC qc) throws IOException {
+    loadChildEntities(qc);
     QcTargetStore handler = getHandler(qc.getType().getQcTarget());
 
     QualityControlEntity entity = handler.getEntity(qc.getEntity().getId());
@@ -104,7 +116,6 @@ public class DefaultQualityControlService implements QualityControlService {
     if (managed.getType().getId() != qc.getType().getId()) {
       throw new IllegalArgumentException("QC type has changed");
     }
-    loadChildEntities(qc);
     validateChange(qc, managed);
     applyChanges(managed, qc);
 
@@ -275,8 +286,60 @@ public class DefaultQualityControlService implements QualityControlService {
   }
 
   @Override
-  public QC save(QC qc) throws IOException {
-    return createQC(qc);
+  public List<? extends QC> listByIdList(QcTarget qcTarget, List<Long> ids) throws IOException {
+    QcTargetStore handler = getHandler(qcTarget);
+    return handler.listByIdList(ids);
+  }
+
+  @Override
+  public BulkQcSaveOperation startBulkCreate(List<QC> items) throws IOException {
+    return startBulkOperation(items, this::create);
+  }
+
+  @Override
+  public BulkQcSaveOperation startBulkUpdate(List<QC> items) throws IOException {
+    return startBulkOperation(items, this::update);
+  }
+
+  private BulkQcSaveOperation startBulkOperation(List<QC> items, ThrowingFunction<QC, QC, IOException> action) throws IOException {
+    QcTarget qcTarget = qcTypeService.get(items.get(0).getType().getId()).getQcTarget();
+    BulkQcSaveOperation operation = new BulkQcSaveOperation(qcTarget, items, authorizationManager.getCurrentUser());
+
+    // Authentication is tied to the thread, so use this same auth in the new thread
+    Authentication auth = SecurityContextHolder.getContextHolderStrategy().getContext().getAuthentication();
+    Thread thread = new Thread(() -> {
+      SecurityContextHolder.getContextHolderStrategy().getContext().setAuthentication(auth);
+      transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+
+        @Override
+        protected void doInTransactionWithoutResult(TransactionStatus status) {
+          while (!operation.isComplete()) {
+            try {
+              QC item = operation.getNextItem();
+              QC saved = action.apply(item);
+              operation.addSuccess(saved.getId());
+            } catch (ValidationException e) {
+              operation.addFailure(e);
+            } catch (Exception e) {
+              operation.setFailed(e);
+            }
+          }
+          if (!operation.isSuccess()) {
+            // Need to throw exception to roll back the transaction
+            Exception exception = operation.getException();
+            if (exception instanceof RuntimeException) {
+              throw (RuntimeException) exception;
+            } else {
+              throw new TransactionException("Transaction failed", operation.getException());
+            }
+          }
+        }
+      });
+
+    });
+    thread.setUncaughtExceptionHandler(BulkSaveService.EXCEPTION_LOGGER);
+    thread.start();
+    return operation;
   }
 
 }

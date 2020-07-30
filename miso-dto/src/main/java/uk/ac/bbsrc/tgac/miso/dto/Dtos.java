@@ -2254,7 +2254,7 @@ public class Dtos {
     dto.setId(from.getId());
     dto.setDate(formatDate(from.getDate()));
     dto.setCreator(from.getCreator().getFullName());
-    dto.setType(asDto(from.getType()));
+    setId(dto::setQcTypeId, from.getType());
     setString(dto::setResults, from.getResults());
     dto.setEntityId(from.getEntity().getId());
     dto.setEntityAlias(from.getEntity().getAlias());
@@ -2272,29 +2272,29 @@ public class Dtos {
 
   public static QC to(@Nonnull QcDto dto) {
     QC to;
-    switch (dto.getType().getQcTarget()) {
-    case Library:
+    switch (dto.getQcTarget()) {
+    case "Library":
       LibraryQC newLibraryQc = new LibraryQC();
       Library ownerLibrary = new LibraryImpl();
       ownerLibrary.setId(dto.getEntityId());
       newLibraryQc.setLibrary(ownerLibrary);
       to = newLibraryQc;
       break;
-    case Sample:
+    case "Sample":
       SampleQC newSampleQc = new SampleQC();
       Sample ownerSample = new SampleImpl();
       ownerSample.setId(dto.getEntityId());
       newSampleQc.setSample(ownerSample);
       to = newSampleQc;
       break;
-    case Pool:
+    case "Pool":
       PoolQC newPoolQc = new PoolQC();
       Pool ownerPool = new PoolImpl();
       ownerPool.setId(dto.getEntityId());
       newPoolQc.setPool(ownerPool);
       to = newPoolQc;
       break;
-    case Container:
+    case "Container":
       ContainerQC newContainerQc = new ContainerQC();
       SequencerPartitionContainer ownerContainer = new SequencerPartitionContainerImpl();
       ownerContainer.setId(dto.getEntityId());
@@ -2302,19 +2302,19 @@ public class Dtos {
       to = newContainerQc;
       break;
     default:
-      throw new IllegalArgumentException("No such QC target: " + dto.getType().getQcTarget());
+      throw new IllegalArgumentException("No such QC target: " + dto.getQcTarget());
     }
     if (dto.getId() != null) {
       to.setId(dto.getId());
     }
     to.setDate(parseDate(dto.getDate()));
     setBigDecimal(to::setResults, dto.getResults());
-    to.setType(to(dto.getType()));
+    setObject(to::setType, QcType::new, dto.getQcTypeId());
     to.setDescription(dto.getDescription());
     setObject(to::setInstrument, InstrumentImpl::new, dto.getInstrumentId());
     setObject(to::setKit, KitDescriptor::new, dto.getKitDescriptorId());
     setString(to::setKitLot, dto.getKitLot());
-    addQcControlRuns(dto.getControls(), to);
+    addQcControlRuns(dto.getControls(), to, QcTarget.valueOf(dto.getQcTarget()));
     return to;
   }
 
@@ -2327,7 +2327,7 @@ public class Dtos {
     return to;
   }
 
-  private static void addQcControlRuns(@Nonnull Collection<QcControlRunDto> list, QC qc) {
+  private static void addQcControlRuns(@Nonnull Collection<QcControlRunDto> list, QC qc, QcTarget qcTarget) {
     if (list == null) {
       return;
     }
@@ -2335,7 +2335,7 @@ public class Dtos {
     for (QcControlRunDto from : list) {
       QcControlRun to = null;
 
-      switch (qc.getType().getQcTarget()) {
+      switch (qcTarget) {
       case Container:
         ContainerQcControlRun containerQcControlRun = new ContainerQcControlRun();
         containerQcControlRun.setQc((ContainerQC) qc);
@@ -2364,7 +2364,7 @@ public class Dtos {
         break;
       default:
         throw new IllegalArgumentException(
-            "Unhandled QC target: " + qc.getType().getQcTarget() == null ? "null" : qc.getType().getQcTarget().getLabel());
+            "Unhandled QC target: " + qcTarget == null ? "null" : qcTarget.getLabel());
       }
       setLong(to::setId, from.getId(), false);
       setObject(to::setControl, QcControl::new, from.getControlId());

@@ -10,7 +10,8 @@ public class QcDto {
   private Long entityId;
   private Long id;
   private String results;
-  private QcTypeDto type;
+  private Long qcTypeId;
+  private String qcTarget;
   private String description;
   private Long instrumentId;
   private Long kitDescriptorId;
@@ -41,10 +42,6 @@ public class QcDto {
     return results;
   }
 
-  public QcTypeDto getType() {
-    return type;
-  }
-
   public String getDescription() {
     return description;
   }
@@ -73,12 +70,24 @@ public class QcDto {
     this.results = results;
   }
 
-  public void setType(QcTypeDto type) {
-    this.type = type;
-  }
-
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  public Long getQcTypeId() {
+    return qcTypeId;
+  }
+
+  public void setQcTypeId(Long qcTypeId) {
+    this.qcTypeId = qcTypeId;
+  }
+
+  public String getQcTarget() {
+    return qcTarget;
+  }
+
+  public void setQcTarget(String qcTarget) {
+    this.qcTarget = qcTarget;
   }
 
   public Long getInstrumentId() {

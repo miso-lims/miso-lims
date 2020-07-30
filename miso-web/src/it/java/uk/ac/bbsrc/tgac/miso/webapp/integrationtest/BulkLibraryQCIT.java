@@ -10,12 +10,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -27,11 +24,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkQCPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkQCPage.QcColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTableSaveResult;
 
 public class BulkLibraryQCIT extends AbstractIT {
-
-  private static final Logger log = LoggerFactory.getLogger(BulkLibraryQCIT.class);
 
   private static final Set<String> qcColumns = Sets.newHashSet(QcColumns.LIBRARY_ALIAS, QcColumns.DATE, QcColumns.TYPE,
       QcColumns.INSTRUMENT, QcColumns.KIT, QcColumns.KIT_LOT, QcColumns.RESULT, QcColumns.UNITS, QcColumns.DESCRIPTION);
@@ -99,13 +93,9 @@ public class BulkLibraryQCIT extends AbstractIT {
     assertFalse(table.isWritable(QcColumns.UNITS, 0));
 
     assertColumnValues(table, 0, attrs, "pre-save");
-    saveAndAssertSuccess(table);
-    assertColumnValues(table, 0, attrs, "post-save");
+    assertTrue(page.save(false));
 
-    Criteria c = getSession().createCriteria(LibraryQC.class);
-    c.addOrder(Order.desc("qcId"));
-    c.setMaxResults(1);
-    LibraryQC saved = (LibraryQC) c.uniqueResult();
+    LibraryQC saved = getLatestQc();
     assertQCAttributes(attrs, saved);
   }
 
@@ -126,13 +116,9 @@ public class BulkLibraryQCIT extends AbstractIT {
     assertFalse(table.isWritable(QcColumns.TYPE, 0));
 
     assertColumnValues(table, 0, attrs, "pre-save");
-    saveAndAssertSuccess(table);
-    assertColumnValues(table, 0, attrs, "post-save");
+    assertTrue(page.save(false));
 
-    Criteria c = getSession().createCriteria(LibraryQC.class);
-    c.addOrder(Order.desc("qcId"));
-    c.setMaxResults(1);
-    LibraryQC saved = (LibraryQC) c.uniqueResult();
+    LibraryQC saved = getLatestQc();
     assertQCAttributes(attrs, saved);
   }
 
@@ -153,13 +139,9 @@ public class BulkLibraryQCIT extends AbstractIT {
     assertFalse(table.isWritable(QcColumns.UNITS, 0));
 
     assertColumnValues(table, 0, attrs, "pre-save");
-    saveAndAssertSuccess(table);
-    assertColumnValues(table, 0, attrs, "post-save");
+    assertTrue(page.save(false));
 
-    Criteria c = getSession().createCriteria(LibraryQC.class);
-    c.addOrder(Order.desc("qcId"));
-    c.setMaxResults(1);
-    LibraryQC saved = (LibraryQC) c.uniqueResult();
+    LibraryQC saved = getLatestQc();
     assertQCAttributes(attrs, saved);
     
     assertEquals(String.format("Expected volume to be updated to %s, instead got %f", "10.43", saved.getLibrary().getVolume()), 0,
@@ -185,13 +167,9 @@ public class BulkLibraryQCIT extends AbstractIT {
     assertFalse(table.isWritable(QcColumns.UNITS, 0));
 
     assertColumnValues(table, 0, attrs, "pre-save");
-    saveAndAssertSuccess(table);
-    assertColumnValues(table, 0, attrs, "post-save");
+    assertTrue(page.save(false));
 
-    Criteria c = getSession().createCriteria(LibraryQC.class);
-    c.addOrder(Order.desc("qcId"));
-    c.setMaxResults(1);
-    LibraryQC saved = (LibraryQC) c.uniqueResult();
+    LibraryQC saved = getLatestQc();
     assertQCAttributes(attrs, saved);
     
     assertEquals(
@@ -199,18 +177,6 @@ public class BulkLibraryQCIT extends AbstractIT {
         saved.getLibrary().getConcentration().compareTo(new BigDecimal("24.78")));
     assertEquals(String.format("Expected concentration units to be updated to %s, instead got %s", ConcentrationUnit.NANOMOLAR.getUnits(),
         saved.getLibrary().getConcentrationUnits().getUnits()), ConcentrationUnit.NANOMOLAR, saved.getLibrary().getConcentrationUnits());
-  }
-  
-  private void saveAndAssertSuccess(HandsOnTable table) {
-    HandsOnTableSaveResult result = table.save();
-
-    if (result.getItemsSaved() != table.getRowCount()) {
-      log.error(result.printSummary());
-    }
-
-    assertEquals("Save count", table.getRowCount(), result.getItemsSaved());
-    assertTrue("Server error messages", result.getServerErrors().isEmpty());
-    assertTrue("Save error messages", result.getSaveErrors().isEmpty());
   }
 
   private void fillRow(HandsOnTable table, int rowNum, Map<String, String> attributes) {
@@ -249,5 +215,12 @@ public class BulkLibraryQCIT extends AbstractIT {
 
   private String cleanNullValues(String key, String value) {
     return value == null || value.isEmpty() ? null : value;
+  }
+
+  private LibraryQC getLatestQc() {
+    return (LibraryQC) getSession().createCriteria(LibraryQC.class)
+        .addOrder(Order.desc("qcId"))
+        .setMaxResults(1)
+        .uniqueResult();
   }
 }

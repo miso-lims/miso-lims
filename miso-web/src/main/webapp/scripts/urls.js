@@ -615,17 +615,15 @@ Urls = (function() {
 
   var qcRestBase = restBase + '/qcs';
   rest.qcs = {
-    create: qcRestBase,
-    update: idUrlFunction(qcRestBase)
+    bulkSave: qcRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(qcRestBase + '/bulk')
   };
 
   // QC Types
   var qcTypeUiBase = baseUrl + '/qctype';
   ui.qcTypes = {
     create: qcTypeUiBase + '/new',
-    edit: idUrlFunction(qcTypeUiBase),
-    bulkCreate: qcTypeUiBase + '/bulk/new',
-    bulkEdit: qcTypeUiBase + '/bulk/edit'
+    edit: idUrlFunction(qcTypeUiBase)
   };
 
   var qcTypeRestBase = restBase + '/qctypes';

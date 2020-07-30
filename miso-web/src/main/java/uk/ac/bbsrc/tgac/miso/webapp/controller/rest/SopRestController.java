@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
-import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.SopService;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -42,8 +41,6 @@ public class SopRestController {
   private AdvancedSearchParser advancedSearchParser;
   @Autowired
   private AsyncOperationManager asyncOperationManager;
-  @Autowired
-  private AuthorizationManager authorizationManager;
 
   private final JQueryDataTableBackend<Sop, SopDto> datatable = new JQueryDataTableBackend<Sop, SopDto>() {
 
@@ -85,7 +82,7 @@ public class SopRestController {
 
   @GetMapping("/bulk/{uuid}")
   public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
-    return asyncOperationManager.getAsyncProgress(uuid, Sop.class, sopService, authorizationManager, Dtos::asDto);
+    return asyncOperationManager.getAsyncProgress(uuid, Sop.class, sopService, Dtos::asDto);
   }
 
   @PostMapping(value = "/bulk-delete")

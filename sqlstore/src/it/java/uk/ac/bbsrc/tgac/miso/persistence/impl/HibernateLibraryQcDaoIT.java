@@ -6,6 +6,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -15,6 +16,8 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -53,19 +56,24 @@ public class HibernateLibraryQcDaoIT extends AbstractDAOTest {
   @Test
   public void testSave() throws IOException {
     LibraryQC qc = new LibraryQC();
-    Library library = new LibraryImpl();
-    library.setId(3L);
+    Library library = (Library) currentSession().get(LibraryImpl.class, 3L);
+    QcType qcType = (QcType) currentSession().get(QcType.class, 1L);
+    User user = (User) currentSession().get(UserImpl.class, 1L);
     qc.setLibrary(library);
-    qc.setType(new QcType());
-    qc.getType().setId(1L);
-    qc.setCreator(new UserImpl());
-    qc.getCreator().setId(1L);
+    qc.setType(qcType);
+    qc.setResults(new BigDecimal("12"));
+    qc.setCreator(user);
     qc.setCreationTime(new Date());
     qc.setLastModified(new Date());
     long id = dao.save(qc);
 
-    LibraryQC saved = dao.get(id);
-    assertEquals(qc, saved);
+    clearSession();
+
+    LibraryQC saved = (LibraryQC) currentSession().get(LibraryQC.class, id);
+    assertNotNull(saved);
+    assertEquals(qc.getLibrary().getId(), saved.getLibrary().getId());
+    assertEquals(qc.getType().getId(), saved.getType().getId());
+    assertEquals(qc.getResults().compareTo(saved.getResults()), 0);
   }
 
   /**

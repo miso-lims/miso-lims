@@ -41,7 +41,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibraryAliquotSpreadSheets;
-import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolableElementViewService;
@@ -90,8 +89,6 @@ public class LibraryAliquotRestController extends RestController {
   private IndexChecker indexChecker;
   @Autowired
   private AsyncOperationManager asyncOperationManager;
-  @Autowired
-  private AuthorizationManager authorizationManager;
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
@@ -134,7 +131,7 @@ public class LibraryAliquotRestController extends RestController {
 
   @GetMapping("/bulk/{uuid}")
   public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
-    return asyncOperationManager.getAsyncProgress(uuid, LibraryAliquot.class, libraryAliquotService, authorizationManager,
+    return asyncOperationManager.getAsyncProgress(uuid, LibraryAliquot.class, libraryAliquotService,
         ali -> Dtos.asDto(ali, false));
   }
 
