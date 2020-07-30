@@ -28,11 +28,11 @@ public class HandsontableUtils {
   public static void testTableSetup(BulkPage page, Collection<String> expectedColumns, int expectedRows) {
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
-    assertEquals(expectedColumns.size(), headings.size());
     for (String col : expectedColumns) {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
     }
-    assertEquals(expectedRows, table.getRowCount());
+    assertEquals("Column count", expectedColumns.size(), headings.size());
+    assertEquals("Row count", expectedRows, table.getRowCount());
   }
 
   public static void assertColumnValues(HandsOnTable table, int rowNum, Map<String, String> attributes, String hintMessage) {

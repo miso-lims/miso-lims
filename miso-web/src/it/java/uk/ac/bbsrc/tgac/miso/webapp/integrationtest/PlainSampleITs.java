@@ -149,6 +149,7 @@ public class PlainSampleITs extends AbstractIT {
     attrs.put(LibColumns.INDEX_1, "A01 (AAACCC)");
     attrs.put(LibColumns.INDEX_2, "B01 (AAATTT)");
     attrs.put(LibColumns.KIT_DESCRIPTOR, "Test Kit");
+    attrs.put(LibColumns.KIT_LOT, "20200730");
     attrs.put(LibColumns.QC_PASSED, "True");
     attrs.put(LibColumns.SIZE, "321");
 

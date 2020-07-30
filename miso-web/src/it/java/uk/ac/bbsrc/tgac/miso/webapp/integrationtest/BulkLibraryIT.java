@@ -40,16 +40,16 @@ public class BulkLibraryIT extends AbstractIT {
       LibColumns.BOX_SEARCH, LibColumns.BOX_ALIAS, LibColumns.BOX_POSITION, LibColumns.DISCARDED, LibColumns.DESCRIPTION,
       LibColumns.GROUP_ID, LibColumns.GROUP_DESC, LibColumns.DESIGN, LibColumns.CODE, LibColumns.PLATFORM, LibColumns.LIBRARY_TYPE,
       LibColumns.SELECTION, LibColumns.STRATEGY, LibColumns.INDEX_FAMILY, LibColumns.INDEX_1, LibColumns.INDEX_2, LibColumns.UMIS,
-      LibColumns.KIT_DESCRIPTOR, LibColumns.KIT_LOT, LibColumns.QC_PASSED, LibColumns.SIZE, LibColumns.VOLUME, LibColumns.VOLUME_UNITS,
+      LibColumns.KIT_DESCRIPTOR, LibColumns.QC_PASSED, LibColumns.SIZE, LibColumns.VOLUME, LibColumns.VOLUME_UNITS,
       LibColumns.CONCENTRATION, LibColumns.CONCENTRATION_UNITS, LibColumns.SPIKE_IN, LibColumns.SPIKE_IN_DILUTION, LibColumns.SPIKE_IN_VOL);
 
   private static final Set<String> editColumns = Sets.newHashSet(LibColumns.EFFECTIVE_GROUP_ID, LibColumns.CREATION_DATE,
       LibColumns.SOP, LibColumns.WORKSTATION, LibColumns.THERMAL_CYCLER, LibColumns.INITIAL_VOLUME, LibColumns.PARENT_NG_USED,
-      LibColumns.PARENT_VOLUME_USED);
+      LibColumns.PARENT_VOLUME_USED, LibColumns.KIT_LOT);
 
   private static final Set<String> propagateColumns = Sets.newHashSet(LibColumns.SAMPLE_ALIAS, LibColumns.SAMPLE_LOCATION,
       LibColumns.EFFECTIVE_GROUP_ID, LibColumns.CREATION_DATE, LibColumns.SOP, LibColumns.WORKSTATION, LibColumns.THERMAL_CYCLER,
-      LibColumns.PARENT_NG_USED, LibColumns.PARENT_VOLUME_USED);
+      LibColumns.PARENT_NG_USED, LibColumns.PARENT_VOLUME_USED, LibColumns.KIT_LOT);
 
   private static final Set<String> receiptColumns = Sets.newHashSet(SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT,
       SamColumns.SUBPROJECT, SamColumns.EXTERNAL_NAME, SamColumns.IDENTITY_ALIAS, SamColumns.DONOR_SEX, SamColumns.CONSENT,
@@ -234,6 +234,7 @@ public class BulkLibraryIT extends AbstractIT {
     Map<String, String> attrs = Maps.newLinkedHashMap();
     attrs.put(LibColumns.ID_BARCODE, "LIBT_PROP1");
     attrs.put(LibColumns.DESCRIPTION, "LIBT propagate test");
+    attrs.put(LibColumns.SOP, "Library SOP 1 v.2.0");
     attrs.put(LibColumns.DESIGN, "WG");
     attrs.put(LibColumns.PLATFORM, "Illumina");
     attrs.put(LibColumns.LIBRARY_TYPE, "Paired End");
@@ -241,6 +242,7 @@ public class BulkLibraryIT extends AbstractIT {
     attrs.put(LibColumns.INDEX_1, "A01 (AAACCC)");
     attrs.put(LibColumns.INDEX_2, "B01 (AAATTT)");
     attrs.put(LibColumns.KIT_DESCRIPTOR, "Test Kit");
+    attrs.put(LibColumns.KIT_LOT, "20200728");
     attrs.put(LibColumns.QC_PASSED, "True");
     attrs.put(LibColumns.SIZE, "123");
     attrs.put(LibColumns.VOLUME, "6.66");
@@ -269,6 +271,7 @@ public class BulkLibraryIT extends AbstractIT {
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = Maps.newLinkedHashMap();
+    attrs.put(LibColumns.SOP, "Library SOP 1 v.2.0");
     attrs.put(LibColumns.CODE, "WG");
     attrs.put(LibColumns.PLATFORM, "Illumina");
     attrs.put(LibColumns.LIBRARY_TYPE, "Paired End");
@@ -276,6 +279,7 @@ public class BulkLibraryIT extends AbstractIT {
     attrs.put(LibColumns.STRATEGY, "AMPLICON");
     attrs.put(LibColumns.INDEX_FAMILY, NO_INDEX_FAMILY);
     attrs.put(LibColumns.KIT_DESCRIPTOR, "Test Kit");
+    attrs.put(LibColumns.KIT_LOT, "20200728");
     attrs.put(LibColumns.SIZE, "205");
     attrs.put(LibColumns.QC_PASSED, "");
 
@@ -547,6 +551,7 @@ public class BulkLibraryIT extends AbstractIT {
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = Maps.newLinkedHashMap();
+    attrs.put(LibColumns.SOP, "Library SOP 1 v.2.0");
     attrs.put(LibColumns.CODE, "WG");
     attrs.put(LibColumns.PLATFORM, "Illumina");
     attrs.put(LibColumns.LIBRARY_TYPE, "Paired End");
@@ -554,6 +559,7 @@ public class BulkLibraryIT extends AbstractIT {
     attrs.put(LibColumns.STRATEGY, "AMPLICON");
     attrs.put(LibColumns.INDEX_FAMILY, NO_INDEX_FAMILY);
     attrs.put(LibColumns.KIT_DESCRIPTOR, "Test Kit");
+    attrs.put(LibColumns.KIT_LOT, "20200728");
     attrs.put(LibColumns.SIZE, "207");
     attrs.put(LibColumns.QC_PASSED, "");
     fillRow(table, 0, attrs);
