@@ -14,7 +14,8 @@ BulkUtils = (function($) {
    *       Default: 0
    *   getColumns: required function(config, limitedApi) returning array of columns (see below)
    *   prepareData: optional function(data, config); allows manipulating source data prior to table
-   *       creation
+   *       creation. Note that this may be called multiple times, including when the table is first
+   *       built, and whenever it is rebuilt (for sorting, showing data after save, etc.).
    *   confirmSave: optional function(data, config) May return a promise while performing
    *       asynchronous work or to control whether saving is allowed to proceed. Resolve promise
    *       to allow save, or fail to cancel. If anything else (or nothing) is returned, saving will
