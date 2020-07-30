@@ -134,7 +134,7 @@ Urls = (function() {
   };
 
   // Box Uses
-  var boxUseUiBase = baseUrl + '/boxuses';
+  var boxUseUiBase = baseUrl + '/boxuse';
   ui.boxUses = {
     bulkCreate: boxUseUiBase + '/bulk/new',
     bulkEdit: boxUseUiBase + '/bulk/edit'
