@@ -76,11 +76,11 @@ var Utils = Utils
             iPos: index
           };
         }, {
-          iSortPriority: -1,
-          bSortDirection: false,
-          iPos: 0
+          iSortPriority: -1
         })
-        table.aaSorting = [[info.iPos, info.bSortDirection ? "asc" : "desc"]];
+        if (info.iSortPriority > -1) {
+          table.aaSorting = [[info.iPos, info.bSortDirection ? "asc" : "desc"]];
+        }
         return table;
       },
 

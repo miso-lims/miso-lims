@@ -7,6 +7,7 @@ public class BoxSizeDto {
   private Integer columns;
   private boolean scannable;
   private String boxType;
+  private String boxTypeLabel;
   private String label;
 
   public Long getId() {
@@ -47,6 +48,14 @@ public class BoxSizeDto {
 
   public void setBoxType(String boxType) {
     this.boxType = boxType;
+  }
+
+  public String getBoxTypeLabel() {
+    return boxTypeLabel;
+  }
+
+  public void setBoxTypeLabel(String boxTypeLabel) {
+    this.boxTypeLabel = boxTypeLabel;
   }
 
   public String getLabel() {

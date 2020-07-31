@@ -502,7 +502,7 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListBoxSizesSetup() throws Exception {
-    testPageSetup(ListTarget.BOX_SIZES, Sets.newHashSet(Columns.ROWS, Columns.COLUMNS, Columns.SCANNABLE));
+    testPageSetup(ListTarget.BOX_SIZES, Sets.newHashSet(Columns.ROWS, Columns.COLUMNS, Columns.TYPE, Columns.SCANNABLE));
   }
 
   @Test

@@ -3757,6 +3757,7 @@ public class Dtos {
     setInteger(to::setColumns, from.getColumns(), true);
     setBoolean(to::setScannable, from.getScannable(), false);
     setString(to::setBoxType, maybeGetProperty(from.getBoxType(), BoxType::name));
+    setString(to::setBoxTypeLabel, maybeGetProperty(from.getBoxType(), BoxType::getLabel));
     if (from.isSaved()) {
       to.setLabel(from.getLabel());
     }
