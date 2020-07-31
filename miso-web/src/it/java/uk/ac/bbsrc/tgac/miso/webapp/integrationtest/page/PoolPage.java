@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page;
 
+import static org.junit.Assert.assertTrue;
 import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 
 import java.util.List;
@@ -16,7 +17,6 @@ import org.openqa.selenium.support.PageFactory;
 
 import com.google.common.base.Functions;
 
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.ButtonText;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.Columns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.NotesSection;
@@ -68,6 +68,8 @@ public class PoolPage extends FormPage<PoolPage.Field> {
   } // end Field enum
 
   private static final String NEW_TITLE_PREFIX = "New Pool ";
+  private static final String EDIT_TITLE_PREFIX = "Pool ";
+  private static final String FORM_ID = "poolForm";
   private static final String ALIQUOTS_TABLE_WRAPPER = "listAliquots_wrapper";
 
   @FindBy(id = "save")
@@ -82,12 +84,16 @@ public class PoolPage extends FormPage<PoolPage.Field> {
 
   private DataTable aliquotsTable = null;
 
-  public PoolPage(WebDriver driver) {
-    super(driver, "poolForm");
+  private PoolPage(WebDriver driver, boolean isNew) {
+    super(driver, FORM_ID);
     PageFactory.initElements(driver, this);
-    waitWithTimeout().until(or(titleContains("Pool "), titleContains(NEW_TITLE_PREFIX)));
-    boolean isNew = driver.getTitle().startsWith(NEW_TITLE_PREFIX);
-    notesSection = isNew ? null : new NotesSection<>(driver, PoolPage::new);
+    if (isNew) {
+      assertTrue(driver.getTitle().startsWith(NEW_TITLE_PREFIX));
+      notesSection = null;
+    } else {
+      assertTrue(driver.getTitle().startsWith(EDIT_TITLE_PREFIX));
+      notesSection = new NotesSection<>(driver, d -> new PoolPage(d, false));
+    }
     if (findElementIfExists(By.id(ALIQUOTS_TABLE_WRAPPER)) != null) {
       aliquotsTable = new DataTable(driver, ALIQUOTS_TABLE_WRAPPER);
     }
@@ -95,12 +101,12 @@ public class PoolPage extends FormPage<PoolPage.Field> {
 
   public static PoolPage getForCreate(WebDriver driver, String baseUrl) {
     driver.get(baseUrl + "miso/pool/new");
-    return new PoolPage(driver);
+    return new PoolPage(driver, true);
   }
 
   public static PoolPage getForEdit(WebDriver driver, String baseUrl, long poolId) {
     driver.get(baseUrl + "miso/pool/" + poolId);
-    return new PoolPage(driver);
+    return new PoolPage(driver, false);
   }
 
   public PoolPage save(boolean confirmMissingBarcode) {
@@ -112,17 +118,7 @@ public class PoolPage extends FormPage<PoolPage.Field> {
       waitUntil(invisibilityOf(okButton));
     }
     waitForPageRefresh(html);
-    return new PoolPage(getDriver());
-  }
-
-  public PoolPage addSelectedAliquots() {
-    clickLinkButtonAndGetUrl(ButtonText.ADD, null, false);
-    return new PoolPage(getDriver());
-  }
-
-  public PoolPage removeSelectedAliquots() {
-    clickLinkButtonAndGetUrl(ButtonText.REMOVE, null, false);
-    return new PoolPage(getDriver());
+    return new PoolPage(getDriver(), false);
   }
 
   public NotesSection<PoolPage> getNotesSection() {
