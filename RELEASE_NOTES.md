@@ -2,7 +2,7 @@
 
 Changes:
 
-
+  * Fixed errors with tissue processing classes with no subcategory
 
 # 1.10.0
 
@@ -21,6 +21,10 @@ Changes:
   * Fixed error when attempting to configure multiple Run Scanners
   * Fixed broken links to create/edit box uses
 
+Known Issues:
+
+  * Tissue processing classes with no subcategory cause errors
+
 # 1.9.0
 
 Changes:
@@ -36,6 +40,7 @@ Known Issues:
   * Page hangs while trying to receive libraries from the Edit Project page
   * "Check QCs" button is missing from bulk library pages
   * Buttons to add/edit box uses link to the wrong URL
+  * Tissue processing classes with no subcategory cause errors
 
 # 1.8.1
 
@@ -49,6 +54,7 @@ Known Issues:
   * Page hangs while trying to receive libraries from the Edit Project page
   * "Check QCs" button is missing from bulk library pages
   * Buttons to add/edit box uses link to the wrong URL
+  * Tissue processing classes with no subcategory cause errors
 
 # 1.8.0
 
@@ -69,6 +75,7 @@ Known Issues:
   * Page hangs while trying to receive libraries from the Edit Project page
   * "Check QCs" button is missing from bulk library pages
   * Buttons to add/edit box uses link to the wrong URL
+  * Tissue processing classes with no subcategory cause errors
 
 # 1.7.1
 
@@ -83,6 +90,7 @@ Known Issues:
   * Page hangs while trying to receive libraries from the Edit Project page
   * "Check QCs" button is missing from bulk library pages
   * Buttons to add/edit box uses link to the wrong URL
+  * Tissue processing classes with no subcategory cause errors
 
 # 1.7.0
 
@@ -130,6 +138,7 @@ Known Issues:
   * Page hangs while trying to receive libraries from the Edit Project page
   * "Check QCs" button is missing from bulk library pages
   * Buttons to add/edit box uses link to the wrong URL
+  * Tissue processing classes with no subcategory cause errors
 
 # 1.6.0
 
@@ -156,6 +165,7 @@ Known Issues:
   * When bulk receiving libraries with the same receipt information, the libraries may be broken into
     multiple transfers, and the transfers' receipt time may be modified incorrectly 
   * Buttons to add/edit box uses link to the wrong URL
+  * Tissue processing classes with no subcategory cause errors
 
 # 1.5.0
 
@@ -173,6 +183,7 @@ Known Issues:
   * Edit button on Scientific Names list links to Edit Run Purposes page instead of Edit Scientific
     Names
   * Buttons to add/edit box uses link to the wrong URL
+  * Tissue processing classes with no subcategory cause errors
 
 # 1.4.0
 
@@ -202,6 +213,7 @@ Known Issues:
 
   * V1000 migration hangs on plain sample databases
   * Buttons to add/edit box uses link to the wrong URL
+  * Tissue processing classes with no subcategory cause errors
 
 # 1.3.0
 
@@ -217,6 +229,7 @@ Known Issues:
 
   * V1000 migration hangs on plain sample databases
   * Buttons to add/edit box uses link to the wrong URL
+  * Tissue processing classes with no subcategory cause errors
 
 # 1.2.0 
 
@@ -237,6 +250,7 @@ Known Issues:
 
   * V1000 migration hangs on plain sample databases
   * Buttons to add/edit box uses link to the wrong URL
+  * Tissue processing classes with no subcategory cause errors
 
 # 1.1.0
 

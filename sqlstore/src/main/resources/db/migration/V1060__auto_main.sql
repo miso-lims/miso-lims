@@ -166,6 +166,10 @@ JOIN SampleTissue st ON st.sampleId = s.sampleId
 SET s.discriminator = 'Tissue';
 
 UPDATE Sample s
+JOIN SampleTissueProcessing stp ON stp.smapleId = s.sampleId
+SET s.discriminator = 'TissueProcessing'
+
+UPDATE Sample s
 JOIN SampleSlide ss ON ss.sampleId = s.sampleId
 SET s.discriminator = 'Slide';
 

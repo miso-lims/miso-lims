@@ -13,6 +13,8 @@ BEGIN
     UPDATE flyway_schema_history SET checksum = 1064873732 WHERE version = '0800' AND checksum = -1786810864;
     -- V1000 was altered to fix an infinite loop when running on plain sample databases
     UPDATE flyway_schema_history SET checksum = 330422399 WHERE version = '1000' AND checksum = 2041083449;
+    -- V1060 was altered to fix an error migrating tissue processing classes with no subcategory
+    UPDATE flyway_schema_history SET checksum = 578401777 WHERE version = '1060' AND checksum = 2053829452;
   END IF;
 END//
 
