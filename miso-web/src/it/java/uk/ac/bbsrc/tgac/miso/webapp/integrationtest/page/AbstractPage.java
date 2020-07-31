@@ -25,6 +25,9 @@ public abstract class AbstractPage extends AbstractElement {
 
   protected AbstractPage(WebDriver driver) {
     super(driver);
+    if (TestUtils.checkCurrentPageForErrors(getDriver())) {
+      throw new IllegalStateException("Errors detected on page load");
+    }
   }
 
   protected static void waitExplicitly(long millis) {

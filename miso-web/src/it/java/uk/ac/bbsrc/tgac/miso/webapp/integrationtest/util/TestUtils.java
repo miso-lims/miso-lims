@@ -64,28 +64,39 @@ public class TestUtils {
     }
   }
 
+  public static boolean checkCurrentPageForErrors(WebDriver driver) {
+    return doChecks(driver, null);
+  }
+
   private static boolean doChecks(WebDriver driver, String urlSlug) {
-    if (!driver.getCurrentUrl().contains("/miso/" + urlSlug)) {
-      log.error("/miso/{}: Navigation failed", urlSlug);
+    String url = null;
+    if (urlSlug == null) {
+      url = driver.getCurrentUrl();
+    } else {
+      url = "/miso/" + urlSlug;
+      if (!driver.getCurrentUrl().contains(url)) {
+        log.error("{}: Navigation failed", url);
+        return true;
+      }
     }
 
     // confirm that page contains logo
     if (driver.findElements(By.id("misologo")).isEmpty()) {
-      log.error("/miso/{}: Page is completely empty. Is resource correct?", urlSlug);
+      log.error("{}: Page is completely empty. Is resource correct?", url);
       return true;
     }
 
     // check if it's an unhandled error page (JSP exception probably)
     List<WebElement> exceptionMessages = driver.findElements(By.id("exceptionMessage"));
     if (!exceptionMessages.isEmpty()) {
-      log.error("/miso/{}: Stack trace on page - {}", urlSlug, stringifyMessages(exceptionMessages));
+      log.error("{}: Stack trace on page - {}", url, stringifyMessages(exceptionMessages));
       return true;
     }
 
     // check if it's a handled error page (Java exception)
     List<WebElement> errorMessageElements = driver.findElements(By.id("flasherror"));
     if (!errorMessageElements.isEmpty()) {
-      log.error("/miso/{}: Returned error page - {}", urlSlug, stringifyMessages(errorMessageElements));
+      log.error("{}: Returned error page - {}", url, stringifyMessages(errorMessageElements));
       return true;
     }
 
@@ -93,7 +104,7 @@ public class TestUtils {
     LogEntries logs = driver.manage().logs().get(LogType.BROWSER);
     for (LogEntry entry : logs) {
       if (entry.getLevel() == Level.SEVERE) {
-        log.error("/miso/{}: Javascript error - {}", urlSlug, entry.getMessage());
+        log.error("{}: Javascript error - {}", url, entry.getMessage());
         return true;
       }
     }
