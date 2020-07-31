@@ -94,7 +94,8 @@ FormTarget.sample = (function($) {
                   type: 'text',
                   maxLength: 50,
                   regex: Utils.validation.alphanumRegex,
-                  include: !config.detailedSample || object.sampleCategory !== 'Identity'
+                  include: !config.detailedSample || object.sampleCategory !== 'Identity',
+                  description: 'ID of a requisition form stored in a separate system'
                 }, {
                   title: 'Scientific Name',
                   data: 'scientificNameId',
@@ -216,7 +217,8 @@ FormTarget.sample = (function($) {
                   include: !Constants.isDetailedSample || object.sampleCategory === 'Aliquot'
                 }].concat((!Constants.isDetailedSample || (object.sampleCategory !== 'Identity' && object.sampleCategory !== 'Tissue'))
                 ? FormUtils.makeSopFields(object, config.sops) : [])
-          }, {
+          },
+          {
             title: 'Identity',
             include: config.detailedSample && object.sampleCategory === 'Identity',
             fields: [{
@@ -224,7 +226,8 @@ FormTarget.sample = (function($) {
               data: 'externalName',
               type: 'text',
               required: true,
-              maxLength: 255
+              maxLength: 255,
+              description: 'Name or other identifier for the donor or organism in an external system'
             }, {
               title: 'Sex',
               data: 'donorSex',
@@ -240,7 +243,8 @@ FormTarget.sample = (function($) {
               source: Constants.consentLevels,
               initial: 'This Project'
             }]
-          }, {
+          },
+          {
             title: 'Details',
             include: config.detailedSample,
             fields: [{
@@ -306,85 +310,99 @@ FormTarget.sample = (function($) {
               data: 'creationDate',
               type: 'date'
             }]
-          }, {
+          },
+          {
             title: 'Tissue',
             include: config.detailedSample && object.sampleCategory === 'Tissue',
-            fields: [{
-              title: 'Tissue Origin',
-              data: 'tissueOriginId',
-              type: 'dropdown',
-              source: Constants.tissueOrigins.sort(Utils.sorting.standardSortWithException('alias', 'nn')),
-              getItemLabel: function(item) {
-                return item.alias + ' (' + item.description + ')';
-              },
-              getItemValue: function(item) {
-                return item.id;
-              },
-              required: true
-            }, {
-              title: 'Tissue Type',
-              data: 'tissueTypeId',
-              type: 'dropdown',
-              source: Constants.tissueTypes.sort(Utils.sorting.standardSortWithException('alias', 'n')),
-              getItemLabel: function(item) {
-                return item.label;
-              },
-              getItemValue: function(item) {
-                return item.id;
-              },
-              required: true
-            }, {
-              title: 'Passage Number',
-              data: 'passageNumber',
-              type: 'int',
-              min: 1
-            }, {
-              title: 'Times Received',
-              data: 'timesReceived',
-              type: 'int',
-              min: 1
-            }, {
-              title: 'Tube Number',
-              data: 'tubeNumber',
-              type: 'int',
-              min: 1
-            }, {
-              title: 'Tissue Material',
-              data: 'tissueMaterialId',
-              type: 'dropdown',
-              nullLabel: 'Unknown',
-              source: Constants.tissueMaterials,
-              getItemLabel: function(item) {
-                return item.alias;
-              },
-              getItemValue: function(item) {
-                return item.id;
-              }
-            }, {
-              title: 'Region',
-              data: 'region',
-              type: 'text',
-              maxLength: 255
-            }, {
-              title: 'Secondary Identifier',
-              data: 'secondaryIdentifier',
-              type: 'text',
-              maxLength: 255
-            }, {
-              title: 'Lab',
-              data: 'labId',
-              type: 'dropdown',
-              nullLabel: 'n/a',
-              source: Constants.labs.sort(Utils.sorting.standardSort('alias')),
-              getItemLabel: function(item) {
-                return item.label;
-              },
-              getItemValue: function(item) {
-                return item.id;
-              },
-              include: !!object.lab
-            }]
-          }, {
+            fields: [
+                {
+                  title: 'Tissue Origin',
+                  data: 'tissueOriginId',
+                  type: 'dropdown',
+                  source: Constants.tissueOrigins.sort(Utils.sorting.standardSortWithException('alias', 'nn')),
+                  getItemLabel: function(item) {
+                    return item.alias + ' (' + item.description + ')';
+                  },
+                  getItemValue: function(item) {
+                    return item.id;
+                  },
+                  required: true
+                },
+                {
+                  title: 'Tissue Type',
+                  data: 'tissueTypeId',
+                  type: 'dropdown',
+                  source: Constants.tissueTypes.sort(Utils.sorting.standardSortWithException('alias', 'n')),
+                  getItemLabel: function(item) {
+                    return item.label;
+                  },
+                  getItemValue: function(item) {
+                    return item.id;
+                  },
+                  required: true
+                },
+                {
+                  title: 'Passage Number',
+                  data: 'passageNumber',
+                  type: 'int',
+                  min: 1
+                },
+                {
+                  title: 'Times Received',
+                  data: 'timesReceived',
+                  type: 'int',
+                  min: 1
+                },
+                {
+                  title: 'Tube Number',
+                  data: 'tubeNumber',
+                  type: 'int',
+                  min: 1
+                },
+                {
+                  title: 'Tissue Material',
+                  data: 'tissueMaterialId',
+                  type: 'dropdown',
+                  nullLabel: 'Unknown',
+                  source: Constants.tissueMaterials,
+                  getItemLabel: function(item) {
+                    return item.alias;
+                  },
+                  getItemValue: function(item) {
+                    return item.id;
+                  }
+                },
+                {
+                  title: 'Region',
+                  data: 'region',
+                  type: 'text',
+                  maxLength: 255
+                },
+                {
+                  title: 'Secondary Identifier',
+                  data: 'secondaryIdentifier',
+                  type: 'text',
+                  maxLength: 255,
+                  description: 'Identifier for the tissue sample in an external system'
+                },
+                {
+                  title: 'Lab',
+                  data: 'labId',
+                  type: 'dropdown',
+                  nullLabel: 'n/a',
+                  source: Constants.labs.sort(Utils.sorting.standardSort('alias')),
+                  getItemLabel: function(item) {
+                    return item.label;
+                  },
+                  getItemValue: function(item) {
+                    return item.id;
+                  },
+                  include: !!object.lab,
+                  description: 'The external lab that a tissue came from. This field is intended for historical data only as the lab should '
+                      + 'normally be recorded in a receipt transfer instead'
+                }]
+          },
+          {
             title: 'Slide',
             include: config.detailedSample && object.sampleSubcategory === 'Slide',
             fields: [{
@@ -453,35 +471,41 @@ FormTarget.sample = (function($) {
               min: 0,
               max: 100
             }]
-          }, {
+          },
+          {
             title: 'Tissue Piece',
             include: config.detailedSample && object.sampleSubcategory === 'Tissue Piece',
-            fields: [{
-              title: 'Piece Type',
-              type: 'dropdown',
-              data: 'tissuePieceTypeId',
-              required: true,
-              source: Constants.tissuePieceTypes,
-              sortSource: Utils.sorting.standardSort('name'),
-              getItemLabel: Utils.array.getName,
-              getItemValue: Utils.array.getId
-            }, {
-              title: 'Slides Consumed',
-              data: 'slidesConsumed',
-              type: 'int',
-              min: 0,
-              required: true
-            }, {
-              title: 'Reference Slide',
-              data: 'referenceSlideId',
-              type: 'dropdown',
-              source: object.relatedSlides,
-              getItemLabel: function(item) {
-                return item.name + ' (' + item.alias + ')';
-              },
-              getItemValue: Utils.array.getId,
-              sortSource: Utils.sorting.standardSort('id')
-            }]
+            fields: [
+                {
+                  title: 'Piece Type',
+                  type: 'dropdown',
+                  data: 'tissuePieceTypeId',
+                  required: true,
+                  source: Constants.tissuePieceTypes,
+                  sortSource: Utils.sorting.standardSort('name'),
+                  getItemLabel: Utils.array.getName,
+                  getItemValue: Utils.array.getId
+                },
+                {
+                  title: 'Slides Consumed',
+                  data: 'slidesConsumed',
+                  type: 'int',
+                  min: 0,
+                  required: true
+                },
+                {
+                  title: 'Reference Slide',
+                  data: 'referenceSlideId',
+                  type: 'dropdown',
+                  source: object.relatedSlides,
+                  getItemLabel: function(item) {
+                    return item.name + ' (' + item.alias + ')';
+                  },
+                  getItemValue: Utils.array.getId,
+                  sortSource: Utils.sorting.standardSort('id'),
+                  description: 'Indicates a slide whose attributes such as marked area and % tumour are relevant to this sample.'
+                      + ' May be used for calculating extraction input per yield, for example.'
+                }]
           }, {
             title: 'Single Cell',
             include: config.detailedSample && object.sampleSubcategory === 'Single Cell',
@@ -506,7 +530,8 @@ FormTarget.sample = (function($) {
               data: 'strStatus',
               type: 'dropdown',
               source: Constants.strStatuses,
-              required: true
+              required: true,
+              description: 'Status of short tandem repeat analysis'
             }, {
               title: 'DNAse Treated',
               data: 'dnaseTreated',

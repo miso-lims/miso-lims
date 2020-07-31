@@ -440,6 +440,7 @@ BulkTarget.sample = (function($) {
         title: 'External Name',
         type: 'text',
         data: 'externalName',
+        description: 'Name or other identifier for the donor or organism in an external system',
         include: show['Identity'],
         includeSaved: isTargetIdentity(config),
         required: true,
@@ -685,7 +686,8 @@ BulkTarget.sample = (function($) {
         data: 'secondaryIdentifier',
         include: show['Tissue'] && !config.isLibraryReceipt,
         includeSaved: isTargetTissue(config),
-        maxLength: 255
+        maxLength: 255,
+        description: 'Identifier for the tissue sample in an external system'
       }, {
         title: 'Material',
         type: 'dropdown',
@@ -805,7 +807,8 @@ BulkTarget.sample = (function($) {
         include: show['Stock'] && !config.isLibraryReceipt,
         includeSaved: isTargetStock(config),
         required: true,
-        source: Constants.strStatuses
+        source: Constants.strStatuses,
+        description: 'Status of short tandem repeat analysis'
       }, {
         title: 'DNAse',
         type: 'dropdown',
