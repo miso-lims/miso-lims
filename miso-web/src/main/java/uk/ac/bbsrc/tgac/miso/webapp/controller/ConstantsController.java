@@ -200,6 +200,8 @@ public class ConstantsController {
   private Boolean detailedSample;
   @Value("${miso.genomeFolder:}")
   private String genomeFolder;
+  @Value("${miso.test.lockConstants:false}")
+  private boolean locked;
 
   @Resource
   private Boolean boxScannerEnabled;
@@ -402,6 +404,9 @@ public class ConstantsController {
 
   @Scheduled(fixedDelay = 900_000)
   public synchronized void refreshConstants() {
+    if (constantsJs != null && locked) {
+      return;
+    }
     final ScheduledFuture<?> current = future;
     if (current != null && !current.isDone()) {
       current.cancel(false);
