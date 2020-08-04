@@ -332,26 +332,30 @@ BulkTarget.library = (function($) {
 
               if (Constants.isDetailedSample) {
                 if (template && template.designId) {
-                  var design = getPropertyForItemId(Constants.libraryDesigns, template.designId, 'name');
+                  var designName = getPropertyForItemId(Constants.libraryDesigns, template.designId, 'name');
                   api.updateField(rowIndex, 'libraryDesignId', {
-                    value: design,
+                    value: designName,
                     disabled: true
                   });
                   // design change will trigger code, selection, and strategy updates
                 } else if (template && (template.designCodeId || template.selectionId || template.strategyId)) {
+                  var selectedDesignName = api.getValue(rowIndex, 'libraryDesignId');
                   api.updateField(rowIndex, 'libraryDesignId', {
                     value: null,
                     disabled: true
                   });
                   // design change will trigger code, selection, and strategy updates
+                  // .. but null > null doesn't trigger
+                  if (!selectedDesignName) {
+                    var design = api.getValueObject(rowIndex, 'libraryDesignId');
+                    updateDesignFields(rowIndex, api, template, design);
+                  }
                 } else {
                   api.updateField(rowIndex, 'libraryDesignId', {
                     disabled: false
                   });
                   var design = api.getValueObject(rowIndex, 'libraryDesignId');
-                  updateDesignCode(rowIndex, api, template, design);
-                  updateSelection(rowIndex, api, template, design);
-                  updateStrategy(rowIndex, api, template, design);
+                  updateDesignFields(rowIndex, api, template, design)
                 }
               } else {
                 updateFromTemplate(rowIndex, 'librarySelectionTypeId', api, template, 'selectionId', Constants.librarySelections, 'id',
@@ -398,9 +402,7 @@ BulkTarget.library = (function($) {
               if (!api.isSaved()) {
                 var design = api.getValueObject(rowIndex, 'libraryDesignId');
                 var template = config.templatesByProjectId ? api.getValueObject(rowIndex, 'template') : null;
-                updateDesignCode(rowIndex, api, template, design);
-                updateSelection(rowIndex, api, template, design);
-                updateStrategy(rowIndex, api, template, design);
+                updateDesignFields(rowIndex, api, template, design)
               }
             }
           }, {
@@ -671,17 +673,11 @@ BulkTarget.library = (function($) {
     return item[property];
   }
 
-  function updateDesignCode(rowIndex, api, template, design) {
+  function updateDesignFields(rowIndex, api, template, design) {
     updateFromDesignOrTemplate(rowIndex, api, 'libraryDesignCodeId', design, 'designCodeLabel', template, 'designCodeId',
         Constants.libraryDesignCodes, 'code');
-  }
-
-  function updateSelection(rowIndex, api, template, design) {
     updateFromDesignOrTemplate(rowIndex, api, 'librarySelectionTypeId', design, 'selectionName', template, 'selectionId',
         Constants.librarySelections, 'name');
-  }
-
-  function updateStrategy(rowIndex, api, template, design) {
     updateFromDesignOrTemplate(rowIndex, api, 'libraryStrategyTypeId', design, 'strategyName', template, 'strategyId',
         Constants.libraryStrategies, 'name');
   }
