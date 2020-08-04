@@ -2,7 +2,13 @@
 
 Changes:
 
+  * Fixed errors with tissue processing classes with no subcategory
 
+Known Issues:
+
+  * Page hangs while trying to receive libraries from the Edit Project page
+  * "Check QCs" button is missing from bulk library pages
+  * Buttons to add/edit box uses link to the wrong URL
 
 # 1.9.0
 
@@ -14,12 +20,26 @@ Changes:
   * Fixed error creating stock sample classes (detailed sample)
   * Fixed bug where UMIs were reported incorrectly in Pinery's sample provenance
 
+Known Issues:
+
+  * Page hangs while trying to receive libraries from the Edit Project page
+  * "Check QCs" button is missing from bulk library pages
+  * Buttons to add/edit box uses link to the wrong URL
+  * Tissue processing classes with no subcategory cause errors
+
 # 1.8.1
 
 Changes:
 
   * Fixed "Make Aliquots" button to link to the correct page
   * Fixed Docker webapp build
+
+Known Issues:
+
+  * Page hangs while trying to receive libraries from the Edit Project page
+  * "Check QCs" button is missing from bulk library pages
+  * Buttons to add/edit box uses link to the wrong URL
+  * Tissue processing classes with no subcategory cause errors
 
 # 1.8.0
 
@@ -37,6 +57,10 @@ Known Issues:
 
   * "Make Aliquots" button links to the wrong page
   * Docker webapp does not build correctly
+  * Page hangs while trying to receive libraries from the Edit Project page
+  * "Check QCs" button is missing from bulk library pages
+  * Buttons to add/edit box uses link to the wrong URL
+  * Tissue processing classes with no subcategory cause errors
 
 # 1.7.1
 
@@ -48,6 +72,10 @@ Known Issues:
 
   * When editing SOPs, the URL is not saved correctly
   * Docker webapp does not build correctly
+  * Page hangs while trying to receive libraries from the Edit Project page
+  * "Check QCs" button is missing from bulk library pages
+  * Buttons to add/edit box uses link to the wrong URL
+  * Tissue processing classes with no subcategory cause errors
 
 # 1.7.0
 
@@ -92,6 +120,10 @@ Known Issues:
   * Error saving runs with metrics
   * When editing SOPs, the URL is not saved correctly
   * Docker webapp does not build correctly
+  * Page hangs while trying to receive libraries from the Edit Project page
+  * "Check QCs" button is missing from bulk library pages
+  * Buttons to add/edit box uses link to the wrong URL
+  * Tissue processing classes with no subcategory cause errors
 
 # 1.6.0
 
@@ -117,6 +149,8 @@ Known Issues:
   * Fill Boxes actions on the bulk Create/Edit Sample and Library Aliquot pages don't work
   * When bulk receiving libraries with the same receipt information, the libraries may be broken into
     multiple transfers, and the transfers' receipt time may be modified incorrectly 
+  * Buttons to add/edit box uses link to the wrong URL
+  * Tissue processing classes with no subcategory cause errors
 
 # 1.5.0
 
@@ -133,6 +167,8 @@ Known Issues:
 
   * Edit button on Scientific Names list links to Edit Run Purposes page instead of Edit Scientific
     Names
+  * Buttons to add/edit box uses link to the wrong URL
+  * Tissue processing classes with no subcategory cause errors
 
 # 1.4.0
 
@@ -161,6 +197,9 @@ Upgrade Notes:
 Known Issues:
 
   * V1000 migration hangs on plain sample databases
+  * Buttons to add/edit box uses link to the wrong URL
+  * Tissue processing classes with no subcategory cause errors
+
 # 1.3.0
 
 Changes:
@@ -174,6 +213,8 @@ Changes:
 Known Issues:
 
   * V1000 migration hangs on plain sample databases
+  * Buttons to add/edit box uses link to the wrong URL
+  * Tissue processing classes with no subcategory cause errors
 
 # 1.2.0 
 
@@ -193,6 +234,8 @@ Upgrade Notes:
 Known Issues:
 
   * V1000 migration hangs on plain sample databases
+  * Buttons to add/edit box uses link to the wrong URL
+  * Tissue processing classes with no subcategory cause errors
 
 # 1.1.0
 
