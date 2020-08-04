@@ -25,6 +25,18 @@ Known Issues:
 
   * Tissue processing classes with no subcategory cause errors
 
+# 1.9.1
+
+Changes:
+
+  * Fixed errors with tissue processing classes with no subcategory
+
+Known Issues:
+
+  * Page hangs while trying to receive libraries from the Edit Project page
+  * "Check QCs" button is missing from bulk library pages
+  * Buttons to add/edit box uses link to the wrong URL
+
 # 1.9.0
 
 Changes:
