@@ -320,11 +320,6 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
   }
 
   @Override
-  public String propertyForId() {
-    return "boxId";
-  }
-
-  @Override
   public String propertyForSortColumn(String original) {
     switch (original) {
     case "sizeId":

@@ -97,8 +97,13 @@ public class HibernateSequencingOrderCompletionDao implements SequencingOrderCom
   }
 
   @Override
-  public String propertyForId() {
-    return null;
+  public void restrictPaginationById(Criteria criteria, long id, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s cannot be filtered by ID", getFriendlyName()));
+  }
+
+  @Override
+  public void restrictPaginationByIds(Criteria criteria, List<Long> ids, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s cannot be filtered by ID", getFriendlyName()));
   }
 
   @Override

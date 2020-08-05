@@ -279,11 +279,6 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   }
 
   @Override
-  public String propertyForId() {
-    return "runId";
-  }
-
-  @Override
   public String propertyForUser(boolean creator) {
     return creator ? "creator" : "lastModifier";
   }

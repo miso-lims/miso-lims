@@ -182,11 +182,6 @@ public class HibernateLibraryAliquotDao
   }
 
   @Override
-  public String propertyForId() {
-    return "aliquotId";
-  }
-
-  @Override
   public String propertyForUser(boolean creator) {
     return creator ? "creator" : "lastModifier";
   }

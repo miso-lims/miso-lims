@@ -147,7 +147,7 @@ ListTarget.library_template = {
     }
 
     return [
-        ListUtils.labelHyperlinkColumn('Alias', Urls.ui.libraryTemplates.edit, Utils.array.getId, 'alias', 0, true),
+        ListUtils.labelHyperlinkColumn('Alias', Urls.ui.libraryTemplates.edit, Utils.array.getId, 'alias', 1, true),
         {
           "sTitle": "Library Design",
           "mData": "designId",

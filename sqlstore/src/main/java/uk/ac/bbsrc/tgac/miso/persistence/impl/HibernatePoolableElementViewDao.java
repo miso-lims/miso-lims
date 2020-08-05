@@ -10,7 +10,11 @@ import java.util.function.Consumer;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.*;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.hibernate.type.LongType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -174,11 +178,6 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
     default:
       return null;
     }
-  }
-
-  @Override
-  public String propertyForId() {
-    return "aliquotId";
   }
 
   @Override

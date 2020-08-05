@@ -73,11 +73,6 @@ public class HibernateListWorksetViewDao implements ListWorksetViewStore, Hibern
   }
 
   @Override
-  public String propertyForId() {
-    return "worksetId";
-  }
-
-  @Override
   public String propertyForSortColumn(String original) {
     return original;
   }

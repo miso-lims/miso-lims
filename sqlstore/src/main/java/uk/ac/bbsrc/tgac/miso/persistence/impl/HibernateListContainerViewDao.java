@@ -76,11 +76,6 @@ public class HibernateListContainerViewDao implements ListContainerViewDao, Hibe
   }
 
   @Override
-  public String propertyForId() {
-    return "containerId";
-  }
-
-  @Override
   public String propertyForSortColumn(String original) {
     return original;
   }

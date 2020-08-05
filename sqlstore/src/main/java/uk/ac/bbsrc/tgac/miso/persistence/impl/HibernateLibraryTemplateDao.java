@@ -90,11 +90,6 @@ public class HibernateLibraryTemplateDao implements LibraryTemplateStore, Hibern
   }
 
   @Override
-  public String propertyForId() {
-    return "libraryTemplateId";
-  }
-
-  @Override
   public String propertyForSortColumn(String original) {
     return original;
   }

@@ -162,11 +162,6 @@ public class HibernateInstrumentModelDao extends HibernateSaveDao<InstrumentMode
   }
 
   @Override
-  public String propertyForId() {
-    return "instrumentModelId";
-  }
-
-  @Override
   public String propertyForSortColumn(String original) {
     return original;
   }

@@ -98,11 +98,6 @@ public class HibernateSopDao extends HibernateSaveDao<Sop> implements HibernateP
   }
 
   @Override
-  public String propertyForId() {
-    return "sopId";
-  }
-
-  @Override
   public String propertyForSortColumn(String original) {
     return original;
   }
