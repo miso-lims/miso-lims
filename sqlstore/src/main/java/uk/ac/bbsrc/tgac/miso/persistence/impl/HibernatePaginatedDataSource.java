@@ -102,7 +102,7 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
     }
 
     Criteria idCriteria = null;
-    if (filters.length == 0 && !sortProperty.contains(".")) {
+    if (filters.length == 0 && (sortProperty == null || !sortProperty.contains("."))) {
       // Faster method
       ProjectionList projections = Projections.projectionList().add(Projections.property("id"));
       if (primaryOrder != null) {
@@ -152,7 +152,10 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
     }
     // We do this in two steps to make a smaller query that that the database can optimise
     Criteria criteria = createPaginationCriteria();
-    criteria.addOrder(primaryOrder);
+    if (primaryOrder != null) {
+      criteria.addOrder(primaryOrder);
+    }
+    criteria.addOrder(idOrder);
     criteria.add(Restrictions.in("id", ids));
 
     @SuppressWarnings("unchecked")

@@ -386,6 +386,7 @@
                 <miso.it.mysql.pw>${mysql.pw}</miso.it.mysql.pw>
               </systemPropertyVariables>
               <skipTests>${skipITs}</skipTests>
+              <trimStackTrace>false</trimStackTrace>
             </configuration>
           </plugin>
         </plugins>

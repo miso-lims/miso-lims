@@ -597,6 +597,7 @@
                 <miso.it.mysql.pw>${mysql.pw}</miso.it.mysql.pw>
               </systemPropertyVariables>
               <skipTests>${skipITs}</skipTests>
+              <trimStackTrace>false</trimStackTrace>
               <excludes>
                 <exclude>**/PlainSampleITs.java</exclude>
               </excludes>
@@ -839,6 +840,7 @@
                 <miso.it.mysql.pw>${mysql.pw}</miso.it.mysql.pw>
               </systemPropertyVariables>
               <skipITs>false</skipITs>
+              <trimStackTrace>false</trimStackTrace>
               <excludes>
                 <exclude>**/*IT.java</exclude>
               </excludes>
