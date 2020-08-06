@@ -14,7 +14,6 @@ public class SamplePage extends FormPage<SamplePage.Field> {
     ALIAS(By.id("sampleForm_alias")), //
     PROJECT(By.id("sampleForm_project")), //
     DESCRIPTION(By.id("sampleForm_description")), //
-    RECEIVED_DATE(By.id("sampleForm_receiveddatepicker")), //
     SCIENTIFIC_NAME(By.id("sampleForm_scientificName")), //
     SAMPLE_TYPE(By.id("sampleForm_sampleTypes")), //
     DETAILED_QC_STATUS(By.id("sampleForm_detailedQcStatus")), //

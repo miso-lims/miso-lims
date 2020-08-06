@@ -84,11 +84,6 @@ FormTarget.sample = (function($) {
                   type: 'text',
                   maxLength: 255
                 }, {
-                  title: 'Date of Receipt',
-                  data: 'receivedDate',
-                  type: 'date',
-                  include: !config.detailedSample || object.sampleCategory !== 'Identity'
-                }, {
                   title: 'Requisition ID',
                   data: 'requisitionId',
                   type: 'text',
