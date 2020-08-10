@@ -119,12 +119,14 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
       idCriteria = createPaginationCriteria().setProjection(projections);
     }
 
+    Order idOrder = null;
     if (primaryOrder != null) {
       idCriteria.addOrder(primaryOrder);
+      idOrder = Order.asc("id");
+    } else {
+      idOrder = sortDir ? Order.asc("id") : Order.desc("id");
     }
-
     // Always add second sort by IDs to ensure consistent order between pages (primary sort may not be deterministic)
-    Order idOrder = sortDir ? Order.asc("id") : Order.desc("id");
     idCriteria.addOrder(idOrder);
 
     for (PaginationFilter filter : filters) {
