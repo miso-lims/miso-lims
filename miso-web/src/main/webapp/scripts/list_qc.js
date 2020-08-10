@@ -53,11 +53,11 @@ ListTarget.qc = function(qcTarget) {
             } else if (!Number.isInteger(result.controls) || result.controls < 0) {
               Utils.showOkDialog('Error', ['Invalid number of controls entered']);
             } else {
-              window.location = Urls.ui.qcs.bulkAddFrom(qcTarget) + '?' + jQuery.param({
-                entityIds: config.entityId,
+              Utils.page.post(Urls.ui.qcs.bulkAddFrom(qcTarget),
+                {entityIds: config.entityId,
                 copies: result.copies,
-                controls: result.controls
-              });
+                controls: result.controls}
+              );
             }
           });
         }
