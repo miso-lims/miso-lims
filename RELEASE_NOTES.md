@@ -5,7 +5,7 @@ Changes:
   * Fixed errors with tissue processing classes with no subcategory
   * Fixed library design code, selection, and strategy not always being selected correctly when choosing a
     library template
-  * Fixed error on Adding QC from Edit Pool page
+  * Fixed error on Adding QC from Edit Sample, Library, Container, Pool pages
 
 # 1.10.1
 
@@ -15,7 +15,7 @@ Changes:
 
 Known Issues:
 
-  * Server Error adding QCs to Pool from Edit Pool page
+  * Server Error adding QCs from Edit Sample, Library, Container, Pool pages
 
 # 1.10.0
 
@@ -37,7 +37,7 @@ Changes:
 Known Issues:
 
   * Tissue processing classes with no subcategory cause errors
-  * Server error on adding QCs to Pool from Edit Pool page
+  * Server error on adding QCs to Sample, Library, Container, Pool from Edit pages
 
 # 1.9.1
 
