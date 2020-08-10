@@ -211,7 +211,7 @@ BulkTarget.libraryaliquot = (function($) {
       var deferred = jQuery.Deferred();
 
       var overused = data.filter(function(aliquot, index) {
-        return parentVolumesByRow.hasOwnProperty(index)
+        return aliquot.volumeUsed && parentVolumesByRow.hasOwnProperty(index)
             && Utils.decimalStrings.subtract(parentVolumesByRow[index], aliquot.volumeUsed).startsWith('-');
       }).length;
 
