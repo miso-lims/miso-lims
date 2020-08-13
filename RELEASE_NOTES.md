@@ -3,6 +3,7 @@
 Changes:
 
   * Added transfer request name field to transfers
+  * Fixed editing QC date and description
   * Fixed errors with tissue processing classes with no subcategory
   * Fixed library design code, selection, and strategy not always being selected correctly when choosing a
     library template
