@@ -157,11 +157,6 @@ public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginat
   }
 
   @Override
-  public String propertyForId() {
-    return "id";
-  }
-
-  @Override
   public String propertyForSortColumn(String original) {
     switch (original) {
     case "platformType":

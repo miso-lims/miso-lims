@@ -217,11 +217,6 @@ public class HibernateKitDao implements KitStore, HibernatePaginatedDataSource<K
   }
 
   @Override
-  public String propertyForId() {
-    return "kitDescriptorId";
-  }
-
-  @Override
   public String propertyForSortColumn(String original) {
     return original;
   }

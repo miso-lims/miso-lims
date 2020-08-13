@@ -73,11 +73,6 @@ public class HibernateListTransferViewDao implements ListTransferViewDao, Hibern
   }
 
   @Override
-  public String propertyForId() {
-    return "transferId";
-  }
-
-  @Override
   public String propertyForSortColumn(String original) {
     return original;
   }

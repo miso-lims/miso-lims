@@ -70,11 +70,6 @@ public class HibernateTargetedSequencingDao extends HibernateSaveDao<TargetedSeq
   }
 
   @Override
-  public String propertyForId() {
-    return "targetedSequencingId";
-  }
-
-  @Override
   public String propertyForSortColumn(String original) {
     return original;
   }

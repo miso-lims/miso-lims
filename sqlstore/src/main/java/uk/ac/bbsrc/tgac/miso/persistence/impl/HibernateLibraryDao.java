@@ -13,7 +13,13 @@ import java.util.function.Consumer;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.*;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -371,11 +377,6 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
     default:
       return null;
     }
-  }
-
-  @Override
-  public String propertyForId() {
-    return "libraryId";
   }
 
   @Override

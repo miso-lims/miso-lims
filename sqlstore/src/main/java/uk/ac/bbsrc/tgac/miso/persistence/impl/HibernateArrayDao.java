@@ -178,11 +178,6 @@ public class HibernateArrayDao implements ArrayStore, HibernatePaginatedDataSour
   }
 
   @Override
-  public String propertyForId() {
-    return "id";
-  }
-
-  @Override
   public String propertyForSortColumn(String original) {
     if ("arrayModelId".equals(original)) {
       return "arrayModel.id";

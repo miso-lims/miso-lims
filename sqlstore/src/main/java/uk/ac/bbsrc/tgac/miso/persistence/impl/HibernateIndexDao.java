@@ -79,11 +79,6 @@ public class HibernateIndexDao extends HibernateSaveDao<Index> implements IndexS
   }
 
   @Override
-  public String propertyForId() {
-    return "indexId";
-  }
-
-  @Override
   public String propertyForSortColumn(String original) {
     return original;
   }

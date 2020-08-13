@@ -273,6 +273,22 @@ ListUtils = (function($) {
         $('<p>').attr('id', 'headerMessage').addClass('big big-' + (level || 'info')).css('margin-top', '.25em').text(text));
   };
 
+  var setSortFromPriority = function(table) {
+    var info = table.aoColumns.reduce(function(acc, curr, index) {
+      return !curr.hasOwnProperty('iSortPriority') || acc.iSortPriority > curr.iSortPriority ? acc : {
+        iSortPriority: curr.iSortPriority,
+        bSortDirection: !!curr.bSortDirection,
+        iPos: index
+      };
+    }, {
+      iSortPriority: 0
+    })
+    if (info.iSortPriority > 0) { // Note: if unspecified, table defaults to sorting by column 0 ascending
+      table.aaSorting = [[info.iPos, info.bSortDirection ? "asc" : "desc"]];
+    }
+    return table;
+  };
+
   var initTable = function(elementId, target, projectId, config, optionModifier, selectAll) {
     var staticActions = target.createStaticActions(config, projectId);
     var bulkActions = target.createBulkActions(config, projectId);
@@ -429,7 +445,7 @@ ListUtils = (function($) {
       }
     }
     var errorMessage = document.createElement('DIV');
-    var options = Utils.setSortFromPriority({
+    var options = setSortFromPriority({
       'aoColumns': columns,
       'aLengthMenu': [10, 25, 50, 100, 200, 400, 1000],
       'bJQueryUI': true,

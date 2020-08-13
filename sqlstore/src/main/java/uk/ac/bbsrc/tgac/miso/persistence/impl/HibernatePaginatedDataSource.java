@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import javax.persistence.Table;
 
@@ -18,6 +19,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
@@ -94,21 +96,38 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
 
     if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must not be less than zero");
     String sortProperty = propertyForSortColumn(sortCol);
-    Order order = sortDir ? Order.asc(sortProperty) : Order.desc(sortProperty);
+    Order primaryOrder = null;
+    if (sortProperty != null && !"id".equals(sortProperty)) {
+      primaryOrder = sortDir ? Order.asc(sortProperty) : Order.desc(sortProperty);
+    }
 
     Criteria idCriteria = null;
-    if (filters.length == 0 && !sortProperty.contains(".")) {
+    if (filters.length == 0 && (sortProperty == null || !sortProperty.contains("."))) {
       // Faster method
-      idCriteria = currentSession().createCriteria(getRealClass())
-          .setProjection(Projections.projectionList().add(Projections.property("id")).add(Projections.property(sortProperty)));
+      ProjectionList projections = Projections.projectionList().add(Projections.property("id"));
+      if (primaryOrder != null) {
+        projections.add(Projections.property(sortProperty));
+      }
+      idCriteria = currentSession().createCriteria(getRealClass()).setProjection(projections);
     } else {
       // We need to keep both the id column and the sort column in the result set for the database to provide us with sorted, duplicate-free
       // results. We will throw the sort property out later.
-      idCriteria = createPaginationCriteria()
-          .setProjection(Projections.projectionList().add(Projections.groupProperty("id")).add(Projections.groupProperty(sortProperty)));
+      ProjectionList projections = Projections.projectionList().add(Projections.groupProperty("id"));
+      if (primaryOrder != null) {
+        projections.add(Projections.groupProperty(sortProperty));
+      }
+      idCriteria = createPaginationCriteria().setProjection(projections);
     }
 
-    idCriteria.addOrder(order);
+    Order idOrder = null;
+    if (primaryOrder != null) {
+      idCriteria.addOrder(primaryOrder);
+      idOrder = Order.asc("id");
+    } else {
+      idOrder = sortDir ? Order.asc("id") : Order.desc("id");
+    }
+    // Always add second sort by IDs to ensure consistent order between pages (primary sort may not be deterministic)
+    idCriteria.addOrder(idOrder);
 
     for (PaginationFilter filter : filters) {
       filter.apply(this, idCriteria, errorHandler);
@@ -119,15 +138,27 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
       idCriteria.setMaxResults(limit);
     }
 
-    @SuppressWarnings("unchecked")
-    List<Object[]> ids = idCriteria.list();
+    // IDs are usually Longs, but could be composite ID classes, or something else
+    List<Object> ids;
+    if (primaryOrder == null) {
+      @SuppressWarnings("unchecked")
+      List<Object> idResults = idCriteria.list();
+      ids = idResults;
+    } else {
+      @SuppressWarnings("unchecked")
+      List<Object[]> idResults = idCriteria.list();
+      ids = idResults.stream().map(x -> x[0]).collect(Collectors.toList());
+    }
     if (ids.isEmpty()) {
       return Collections.emptyList();
     }
     // We do this in two steps to make a smaller query that that the database can optimise
     Criteria criteria = createPaginationCriteria();
-    criteria.addOrder(order);
-    criteria.add(Restrictions.in("id", ids.stream().map(x -> x[0]).toArray()));
+    if (primaryOrder != null) {
+      criteria.addOrder(primaryOrder);
+    }
+    criteria.addOrder(idOrder);
+    criteria.add(Restrictions.in("id", ids));
 
     @SuppressWarnings("unchecked")
     List<T> records = criteria.list();
@@ -146,13 +177,6 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
    */
 
   public abstract String propertyForDate(Criteria criteria, DateType type);
-
-  /**
-   * The property name for the ID field
-   * 
-   * @return the name of the property, or null if search by ID shouldn't be allowed
-   */
-  public abstract String propertyForId();
 
   /**
    * Determine the correct Hibernate property given the user-supplied sort column.
@@ -249,22 +273,12 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
 
   @Override
   public default void restrictPaginationById(Criteria criteria, long id, Consumer<String> errorHandler) {
-    String property = propertyForId();
-    if (property == null) {
-      errorHandler.accept(String.format("%s cannot be filtered by ID", getFriendlyName()));
-    } else {
-      criteria.add(Restrictions.eq(property, id));
-    }
+    criteria.add(Restrictions.eq("id", id));
   }
 
   @Override
-  default void restrictPaginationByIds(Criteria criteria, List<Long> ids, Consumer<String> errorHandler) {
-    String property = propertyForId();
-    if (property == null) {
-      errorHandler.accept(String.format("%s cannot be filtered by ID", getFriendlyName()));
-    } else {
-      criteria.add(Restrictions.in("id", ids));
-    }
+  public default void restrictPaginationByIds(Criteria criteria, List<Long> ids, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.in("id", ids));
   }
 
   @Override

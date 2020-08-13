@@ -68,22 +68,6 @@ var Utils = Utils
         return values;
       },
 
-      setSortFromPriority: function(table) {
-        var info = table.aoColumns.reduce(function(acc, curr, index) {
-          return !curr.hasOwnProperty('iSortPriority') || acc.iSortPriority > curr.iSortPriority ? acc : {
-            iSortPriority: curr.iSortPriority,
-            bSortDirection: !!curr.bSortDirection,
-            iPos: index
-          };
-        }, {
-          iSortPriority: -1
-        })
-        if (info.iSortPriority > -1) {
-          table.aaSorting = [[info.iPos, info.bSortDirection ? "asc" : "desc"]];
-        }
-        return table;
-      },
-
       checkCommonSampleClasses: function(jqueryDataTableData, getSampleClassFromObject, selectedIdsArray, errorText) {
         var sampleClasses = jqueryDataTableData.aaData.filter(function(x) {
           return selectedIdsArray.indexOf(x.id) != -1;

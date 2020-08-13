@@ -105,11 +105,6 @@ public class HibernatePrinterDao implements PrinterStore, HibernatePaginatedData
   }
 
   @Override
-  public String propertyForId() {
-    return "printerId";
-  }
-
-  @Override
   public String propertyForSortColumn(String original) {
     switch (original) {
     case "available":
