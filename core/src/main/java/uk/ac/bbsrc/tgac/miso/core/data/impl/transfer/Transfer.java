@@ -43,6 +43,8 @@ public class Transfer implements Identifiable, ChangeLoggable, Deletable, Serial
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long transferId;
 
+  private String transferRequestName;
+
   @Temporal(TemporalType.TIMESTAMP)
   private Date transferTime;
 
@@ -97,6 +99,14 @@ public class Transfer implements Identifiable, ChangeLoggable, Deletable, Serial
   @Override
   public void setId(long id) {
     this.transferId = id;
+  }
+
+  public String getTransferRequestName() {
+    return transferRequestName;
+  }
+
+  public void setTransferRequestName(String transferRequestName) {
+    this.transferRequestName = transferRequestName;
   }
 
   public Date getTransferTime() {
@@ -259,7 +269,7 @@ public class Transfer implements Identifiable, ChangeLoggable, Deletable, Serial
 
   @Override
   public int hashCode() {
-    return Objects.hash(recipient, recipientGroup, senderGroup, senderLab, transferTime);
+    return Objects.hash(recipient, recipientGroup, senderGroup, senderLab, transferTime, transferRequestName);
   }
 
   @Override
@@ -269,7 +279,8 @@ public class Transfer implements Identifiable, ChangeLoggable, Deletable, Serial
         Transfer::getRecipientGroup,
         Transfer::getSenderGroup,
         Transfer::getSenderLab,
-        Transfer::getTransferTime);
+        Transfer::getTransferTime,
+        Transfer::getTransferRequestName);
   }
 
 }
