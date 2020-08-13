@@ -325,7 +325,7 @@ BulkTarget.library = (function($) {
                 if (template.volumeUnits) {
                   var unit = Utils.array.findUniqueOrThrow(Utils.array.namePredicate(template.volumeUnits), Constants.volumeUnits);
                   api.updateField(rowIndex, 'volumeUnits', {
-                    value: unit.units
+                    value: Utils.decodeHtmlString(unit.units)
                   });
                 }
               }
