@@ -9,6 +9,7 @@ BulkTarget.libraryaliquot = (function($) {
    */
 
   var originalEffectiveGroupIdsByRow = {};
+  var parentVolumesByRow = {};
 
   return {
     getSaveUrl: function() {
@@ -197,17 +198,21 @@ BulkTarget.libraryaliquot = (function($) {
       data.forEach(function(aliquot, index) {
         originalEffectiveGroupIdsByRow[index] = aliquot.effectiveGroupId;
         // prepare parent volumes for validation in confirmSave
-        if (aliquot.parentVolume && aliquot.volumeUsed) {
-          aliquot.parentVolume = Utils.decimalStrings.add(aliquot.parentVolume, aliquot.volumeUsed);
+        if (aliquot.parentVolume !== undefined && aliquot.parentVolume !== null) {
+          if (aliquot.volumeUsed) {
+            parentVolumesByRow[index] = Utils.decimalStrings.add(aliquot.parentVolume, aliquot.volumeUsed);
+          } else {
+            parentVolumesByRow[index] = aliquot.parentVolume;
+          }
         }
       });
     },
     confirmSave: function(data) {
       var deferred = jQuery.Deferred();
 
-      var overused = data.filter(function(aliquot) {
-        return aliquot.volumeUsed && aliquot.parentVolume
-            && Utils.decimalStrings.subtract(aliquot.parentVolume, aliquot.volumeUsed).startsWith('-');
+      var overused = data.filter(function(aliquot, index) {
+        return aliquot.volumeUsed && parentVolumesByRow.hasOwnProperty(index)
+            && Utils.decimalStrings.subtract(parentVolumesByRow[index], aliquot.volumeUsed).startsWith('-');
       }).length;
 
       if (overused) {
