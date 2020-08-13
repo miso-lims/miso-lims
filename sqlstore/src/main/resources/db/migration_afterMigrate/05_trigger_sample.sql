@@ -30,7 +30,7 @@ FOR EACH ROW
     makeChangeMessage('group id', OLD.groupId, NEW.groupId),
     makeChangeMessage('parent', (SELECT name FROM Sample WHERE sampleId = OLD.parentId), (SELECT name FROM Sample WHERE sampleId = NEW.parentId)),
     makeChangeMessage('QC Status', (SELECT description FROM DetailedQcStatus WHERE detailedQcStatusId = OLD.detailedQcStatusId), (SELECT description FROM DetailedQcStatus WHERE detailedQcStatusId = NEW.detailedQcStatusId)),
-    makeChangeMessage('QC Status Not', OLD.detailedQcStatusNote, NEW.detailedQcStatusNote),
+    makeChangeMessage('QC Status Note', OLD.detailedQcStatusNote, NEW.detailedQcStatusNote),
     makeChangeMessage('class', (SELECT alias FROM SampleClass WHERE sampleClassId = OLD.sampleClassId), (SELECT alias FROM SampleClass WHERE sampleClassId = NEW.sampleClassId)),
     makeChangeMessage('subproject', (SELECT alias FROM Subproject WHERE subprojectId = OLD.subprojectId), (SELECT alias FROM Subproject WHERE subprojectId = NEW.subprojectId)),
     makeChangeMessage('volume used', decimalToString(OLD.volumeUsed), decimalToString(NEW.volumeUsed)),

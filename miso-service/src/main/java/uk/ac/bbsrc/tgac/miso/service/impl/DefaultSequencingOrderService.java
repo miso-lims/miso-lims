@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -22,6 +23,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
@@ -80,15 +82,29 @@ public class DefaultSequencingOrderService implements SequencingOrderService {
     seqOrder.setPurpose(runPurposeService.get(seqOrder.getPurpose().getId()));
     seqOrder.setCreatedBy(user);
     seqOrder.setUpdatedBy(user);
+    validateChange(seqOrder, null);
     return sequencingOrderDao.create(seqOrder);
   }
 
   @Override
   public long update(SequencingOrder seqOrder) throws IOException {
-    User user = authorizationManager.getCurrentUser();
-    seqOrder.setUpdatedBy(user);
-    sequencingOrderDao.update(seqOrder);
-    return seqOrder.getId();
+    SequencingOrder managed = sequencingOrderDao.get(seqOrder.getId());
+    managed.setPartitions(seqOrder.getPartitions());
+    managed.setUpdatedBy(authorizationManager.getCurrentUser());
+    validateChange(managed, seqOrder);
+    return sequencingOrderDao.update(managed);
+  }
+
+  private void validateChange(SequencingOrder order, SequencingOrder beforeChange) {
+    List<ValidationError> errors = new ArrayList<>();
+
+    if (order.getPartitions() < 1) {
+      errors.add(new ValidationError("partitions", "Must be 1 or greater"));
+    }
+
+    if (!errors.isEmpty()) {
+      throw new ValidationException(errors);
+    }
   }
 
   @Override

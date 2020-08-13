@@ -13,6 +13,7 @@ public class SequencingOrderDto {
   private String description;
   private Long purposeId;
   private String purposeAlias;
+  private Long containerModelId;
 
 
   public Long getId() {
@@ -101,6 +102,14 @@ public class SequencingOrderDto {
 
   public void setPurposeAlias(String purposeAlias) {
     this.purposeAlias = purposeAlias;
+  }
+
+  public Long getContainerModelId() {
+    return containerModelId;
+  }
+
+  public void setContainerModelId(Long containerModelId) {
+    this.containerModelId = containerModelId;
   }
 
 }

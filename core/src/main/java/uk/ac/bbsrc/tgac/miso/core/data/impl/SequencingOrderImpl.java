@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,6 +20,7 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
 @Table(name = "SequencingOrder")
@@ -64,6 +66,10 @@ public class SequencingOrderImpl implements SequencingOrder, Serializable {
   @ManyToOne
   @JoinColumn(name = "purposeId")
   private RunPurpose purpose;
+
+  @ManyToOne
+  @JoinColumn(name = "sequencingContainerModelId")
+  private SequencingContainerModel containerModel;
 
   @Override
   public long getId() {
@@ -166,6 +172,16 @@ public class SequencingOrderImpl implements SequencingOrder, Serializable {
   }
 
   @Override
+  public SequencingContainerModel getContainerModel() {
+    return containerModel;
+  }
+
+  @Override
+  public void setContainerModel(SequencingContainerModel containerModel) {
+    this.containerModel = containerModel;
+  }
+
+  @Override
   public String getDeleteType() {
     return "Sequencing Order";
   }
@@ -184,38 +200,18 @@ public class SequencingOrderImpl implements SequencingOrder, Serializable {
 
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((description == null) ? 0 : description.hashCode());
-    result = prime * result + ((parameters == null) ? 0 : parameters.hashCode());
-    result = prime * result + ((partitions == null) ? 0 : partitions.hashCode());
-    result = prime * result + ((pool == null) ? 0 : pool.hashCode());
-    result = prime * result + ((purpose == null) ? 0 : purpose.hashCode());
-    return result;
+    return Objects.hash(description, parameters, partitions, pool, purpose, containerModel);
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
-    SequencingOrderImpl other = (SequencingOrderImpl) obj;
-    if (description == null) {
-      if (other.description != null) return false;
-    } else if (!description.equals(other.description)) return false;
-    if (parameters == null) {
-      if (other.parameters != null) return false;
-    } else if (!parameters.equals(other.parameters)) return false;
-    if (partitions == null) {
-      if (other.partitions != null) return false;
-    } else if (!partitions.equals(other.partitions)) return false;
-    if (pool == null) {
-      if (other.pool != null) return false;
-    } else if (!pool.equals(other.pool)) return false;
-    if (purpose == null) {
-      if (other.purpose != null) return false;
-    } else if (!purpose.equals(other.purpose)) return false;
-    return true;
+    return LimsUtils.equals(this, obj,
+        SequencingOrderImpl::getDescription,
+        SequencingOrderImpl::getSequencingParameter,
+        SequencingOrderImpl::getPartitions,
+        SequencingOrderImpl::getPool,
+        SequencingOrderImpl::getPurpose,
+        SequencingOrderImpl::getContainerModel);
   }
 
 }

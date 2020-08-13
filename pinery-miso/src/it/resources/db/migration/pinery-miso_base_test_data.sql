@@ -9,7 +9,6 @@ DELETE FROM Transfer;
 DELETE FROM BoxPosition;
 DELETE FROM BoxChangeLog;
 DELETE FROM Box;
-DELETE FROM SequencerPartitionContainer_Partition;
 DELETE FROM _Partition;
 DELETE FROM Run_SequencerPartitionContainer;
 DELETE FROM ScientificName;

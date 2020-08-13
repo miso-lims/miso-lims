@@ -5,9 +5,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -28,12 +27,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLoggable;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.Timestamped;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolOrderChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
 public class PoolOrder implements Deletable, Identifiable, Serializable, Timestamped, ChangeLoggable {
@@ -85,6 +84,10 @@ public class PoolOrder implements Deletable, Identifiable, Serializable, Timesta
   private SequencingParameters parameters;
 
   private Integer partitions;
+
+  @ManyToOne
+  @JoinColumn(name = "sequencingContainerModelId")
+  private SequencingContainerModel containerModel;
 
   private boolean draft = false;
 
@@ -174,6 +177,14 @@ public class PoolOrder implements Deletable, Identifiable, Serializable, Timesta
 
   public void setPartitions(Integer partitions) {
     this.partitions = partitions;
+  }
+
+  public SequencingContainerModel getContainerModel() {
+    return containerModel;
+  }
+
+  public void setContainerModel(SequencingContainerModel containerModel) {
+    this.containerModel = containerModel;
   }
 
   public boolean isDraft() {
@@ -287,65 +298,27 @@ public class PoolOrder implements Deletable, Identifiable, Serializable, Timesta
 
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((alias == null) ? 0 : alias.hashCode());
-    result = prime * result + ((description == null) ? 0 : description.hashCode());
-    result = prime * result + (draft ? 1231 : 1237);
-    result = prime * result + ((orderLibraryAliquots == null) ? 0 : orderLibraryAliquots.hashCode());
-    result = prime * result + ((parameters == null) ? 0 : parameters.hashCode());
-    result = prime * result + ((partitions == null) ? 0 : partitions.hashCode());
-    result = prime * result + ((pool == null) ? 0 : pool.hashCode());
-    result = prime * result + ((purpose == null) ? 0 : purpose.hashCode());
-    result = prime * result + ((sequencingOrder == null) ? 0 : sequencingOrder.hashCode());
-    return result;
+    return Objects.hash(alias, description, draft, orderLibraryAliquots, parameters, partitions, containerModel, pool, purpose,
+        sequencingOrder);
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
-    PoolOrder other = (PoolOrder) obj;
-    if (alias == null) {
-      if (other.alias != null) return false;
-    } else if (!alias.equals(other.alias)) return false;
-    if (description == null) {
-      if (other.description != null) return false;
-    } else if (!description.equals(other.description)) return false;
-    if (draft != other.draft) return false;
-    if (orderLibraryAliquots == null) {
-      if (other.orderLibraryAliquots != null) return false;
-    } else if (!orderLibraryAliquots.equals(other.orderLibraryAliquots)) return false;
-    if (parameters == null) {
-      if (other.parameters != null) return false;
-    } else if (!parameters.equals(other.parameters)) return false;
-    if (partitions == null) {
-      if (other.partitions != null) return false;
-    } else if (!partitions.equals(other.partitions)) return false;
-    if (pool == null) {
-      if (other.pool != null) return false;
-    } else if (!pool.equals(other.pool)) return false;
-    if (purpose == null) {
-      if (other.purpose != null) return false;
-    } else if (!purpose.equals(other.purpose)) return false;
-    if (sequencingOrder == null) {
-      if (other.sequencingOrder != null) return false;
-    } else if (!sequencingOrder.equals(other.sequencingOrder)) return false;
-    return true;
+    return LimsUtils.equals(this, obj,
+        PoolOrder::getAlias,
+        PoolOrder::getDescription,
+        PoolOrder::isDraft,
+        PoolOrder::getOrderLibraryAliquots,
+        PoolOrder::getParameters,
+        PoolOrder::getPartitions,
+        PoolOrder::getContainerModel,
+        PoolOrder::getPool,
+        PoolOrder::getPurpose,
+        PoolOrder::getSequencingOrder);
   }
 
   public String getLongestIndex() {
-    Map<Integer, Integer> lengths = orderLibraryAliquots.stream()
-            .flatMap(element -> element.getAliquot().getLibrary().getIndices().stream())
-            .collect(Collectors.toMap(Index::getPosition, index -> index.getSequence().length(), Integer::max));
-    if (lengths.isEmpty()) {
-      return "0";
-    }
-    return lengths.entrySet().stream()
-            .sorted((a, b) -> a.getKey().compareTo(b.getKey()))
-            .map(Map.Entry<Integer, Integer>::getValue)
-            .map(length -> length.toString())
-            .collect(Collectors.joining(","));
+    return LimsUtils.getLongestIndex(orderLibraryAliquots.stream()
+        .flatMap(element -> element.getAliquot().getLibrary().getIndices().stream()));
   }
 }

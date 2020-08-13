@@ -87,7 +87,6 @@ DELETE FROM SampleValidRelationship;
 DELETE FROM ScientificName;
 DELETE FROM SequencerPartitionContainer;
 DELETE FROM SequencerPartitionContainerChangeLog;
-DELETE FROM SequencerPartitionContainer_Partition;
 DELETE FROM SequencingContainerModel;
 DELETE FROM SequencingContainerModel_InstrumentModel;
 DELETE FROM SequencingControlType;

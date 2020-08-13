@@ -84,12 +84,11 @@ public class ListPoolViewElement implements Serializable {
   @Id
   private long aliquotId;
 
+  private String name;
+  private String alias;
   private long libraryId;
-
   private long projectId;
-
   private boolean lowQuality;
-
   private Long dnaSize;
 
   @ManyToMany(targetEntity = Index.class)
@@ -118,6 +117,22 @@ public class ListPoolViewElement implements Serializable {
 
   public void setAliquotId(long aliquotId) {
     this.aliquotId = aliquotId;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getAlias() {
+    return alias;
+  }
+
+  public void setAlias(String alias) {
+    this.alias = alias;
   }
 
   public long getLibraryId() {

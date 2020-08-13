@@ -55,8 +55,7 @@ public class ListContainerView implements Serializable {
 
   @OneToMany(targetEntity = PartitionImpl.class)
   @OrderBy("partitionNumber")
-  @JoinTable(name = "SequencerPartitionContainer_Partition", joinColumns = {
-      @JoinColumn(name = "container_containerId") }, inverseJoinColumns = { @JoinColumn(name = "partitions_partitionId") })
+  @JoinColumn(name = "containerId")
   private List<Partition> partitions;
 
   @ManyToMany

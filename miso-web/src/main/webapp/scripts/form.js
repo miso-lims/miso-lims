@@ -616,7 +616,7 @@ FormUtils = (function($) {
 
     Validate.updateWarningOrSubmit(selector, null, function() {
       var saveCallback = function() {
-        save(containerId, object, target, config, postSaveCallback);
+        save(containerId, object, target, config, postSaveCallback, invalidCallback);
       };
 
       if (target.confirmSave) {
@@ -687,7 +687,7 @@ FormUtils = (function($) {
     }
   }
 
-  function save(containerId, object, target, config, postSaveCallback) {
+  function save(containerId, object, target, config, postSaveCallback, invalidCallback) {
     $.ajax({
       url: target.getSaveUrl(object, config),
       type: target.getSaveMethod(object),
@@ -701,6 +701,7 @@ FormUtils = (function($) {
         Utils.showAjaxErrorDialog(response, textStatus, serverStatus);
       } else {
         Validate.displayErrors(JSON.parse(response.responseText), containerId);
+        invalidCallback();
       }
     });
   }

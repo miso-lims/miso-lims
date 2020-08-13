@@ -41,8 +41,7 @@ public enum HealthType {
   Failed("Failed", 0, true, true), //
   Started("Started", -1, true, false), //
   Stopped("Stopped", -1, true, true), //
-  Running("Running", -1, true, false), //
-  Requested("Requested", 1, false, false);
+  Running("Running", -1, true, false);
 
   public static final Comparator<HealthType> COMPARATOR = new Comparator<HealthType>() {
     @Override
@@ -81,9 +80,7 @@ public enum HealthType {
   public static ArrayList<String> getKeys() {
     ArrayList<String> keys = new ArrayList<>();
     for (HealthType h : HealthType.values()) {
-      if (h != Requested) {
-        keys.add(h.getKey());
-      }
+      keys.add(h.getKey());
     }
     return keys;
   }

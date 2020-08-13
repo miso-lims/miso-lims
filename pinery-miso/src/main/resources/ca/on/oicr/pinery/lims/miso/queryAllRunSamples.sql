@@ -8,8 +8,7 @@ SELECT DISTINCT Run.runId
   ,rp.alias run_purpose
 FROM SequencingContainerModel scm
 JOIN SequencerPartitionContainer spc ON scm.sequencingContainerModelId = spc.sequencingContainerModelId
-JOIN SequencerPartitionContainer_Partition spcp ON spcp.container_containerId = spc.containerId
-JOIN _Partition part ON part.partitionId = spcp.partitions_partitionId
+JOIN _Partition part ON part.containerId = spc.containerId
 JOIN Pool pool ON pool.poolId = part.pool_poolId 
 JOIN Pool_LibraryAliquot ele ON ele.poolId = pool.poolId 
 JOIN LibraryAliquot ld ON ld.aliquotId = ele.aliquotId 

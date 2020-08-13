@@ -98,11 +98,14 @@ ListTarget.sequencingordercompletion = {
       "iSortPriority": 0,
       "include": !config.poolId
     }, {
+      sTitle: 'Container Model',
+      mData: 'containerModelAlias',
+      mRender: ListUtils.render.naIfNull
+    }, {
       "sTitle": "Sequencing Parameters",
       "mData": "parameters.name",
       "iSortPriority": 0,
       "include": true
-
     }, {
       "sTitle": "Completed",
       "mData": "completed",

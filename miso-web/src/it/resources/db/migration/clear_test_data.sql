@@ -20,7 +20,6 @@ DELETE FROM Workset;
 DELETE FROM BoxPosition;
 DELETE FROM BoxChangeLog;
 DELETE FROM Box;
-DELETE FROM SequencerPartitionContainer_Partition;
 DELETE FROM Run_Partition;
 DELETE FROM Run_Partition_LibraryAliquot;
 DELETE FROM _Partition;

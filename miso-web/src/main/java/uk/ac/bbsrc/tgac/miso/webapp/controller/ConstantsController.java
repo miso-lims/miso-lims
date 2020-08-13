@@ -402,9 +402,8 @@ public class ConstantsController {
     }
   }
 
-  @Scheduled(fixedDelay = 900_000)
-  public synchronized void refreshConstants() {
-    if (constantsJs != null && locked) {
+  public synchronized void refreshConstants(boolean overrideLock) {
+    if (constantsJs != null && locked && !overrideLock) {
       return;
     }
     final ScheduledFuture<?> current = future;
@@ -414,6 +413,11 @@ public class ConstantsController {
     // This will wait a few seconds after a save of an institute default; if another save comes along, it will cancel and wait again. If
     // nothing saves again, it will rebuild the constants string.
     future = executor.schedule(this::rebuildConstants, 15, TimeUnit.SECONDS);
+  }
+
+  @Scheduled(fixedDelay = 900_000)
+  public synchronized void refreshConstants() {
+    refreshConstants(false);
   }
 
 }

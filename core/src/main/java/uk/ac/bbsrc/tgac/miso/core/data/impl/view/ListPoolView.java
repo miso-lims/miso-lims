@@ -33,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferPool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
 @Immutable
@@ -387,6 +388,11 @@ public class ListPoolView implements Aliasable, Nameable, Serializable, Timestam
       transfers = new ArrayList<>();
     }
     return transfers;
+  }
+
+  public String getLongestIndex() {
+    return LimsUtils.getLongestIndex(getElements().stream()
+        .flatMap(element -> element.getIndices().stream()));
   }
 
 }

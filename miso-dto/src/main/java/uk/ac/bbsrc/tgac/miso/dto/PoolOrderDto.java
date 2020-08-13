@@ -45,6 +45,7 @@ public class PoolOrderDto {
   private Long parametersId;
   private String parametersName;
   private Integer partitions;
+  private Long containerModelId;
   private boolean draft;
   private List<OrderAliquotDto> orderAliquots;
   private boolean duplicateIndices;
@@ -119,6 +120,14 @@ public class PoolOrderDto {
 
   public void setPartitions(Integer partitions) {
     this.partitions = partitions;
+  }
+
+  public Long getContainerModelId() {
+    return containerModelId;
+  }
+
+  public void setContainerModelId(Long containerModelId) {
+    this.containerModelId = containerModelId;
   }
 
   public boolean isDraft() {

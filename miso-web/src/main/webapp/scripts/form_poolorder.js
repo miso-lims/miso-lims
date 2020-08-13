@@ -70,6 +70,10 @@ FormTarget.poolorder = (function($) {
             ['platform', 'instrumentModel', 'parametersId', 'partitions'].forEach(function(field) {
               form.updateField(field, opts);
             });
+            form.updateField('containerModelId', {
+              disabled: !newValue,
+              required: newValue && (!object.id || !!object.containerModelId)
+            });
           }
         }, {
           title: 'Platform',
@@ -110,17 +114,47 @@ FormTarget.poolorder = (function($) {
           getItemValue: Utils.array.getId,
           nullLabel: 'Unspecified',
           onChange: function(newValue, form) {
-            var source = !newValue ? [] : Constants.sequencingParameters.filter(function(params) {
-              return params.instrumentModelId == newValue;
-            });
-            var options = {
-              source: source
+            if (newValue) {
+              // Update container models
+              var selected = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(newValue), Constants.instrumentModels);
+              var containerModelOptions = {
+                source: selected.containerModels
+              };
+              if (object.containerModelId && selected.containerModels.find(Utils.array.idPredicate(object.containerModelId))) {
+                containerModelOptions.value = object.containerModelId;
+              }
+              form.updateField('containerModelId', containerModelOptions);
+
+              // Update sequencing parameters
+              var paramSource = Constants.sequencingParameters.filter(function(params) {
+                return params.instrumentModelId == newValue;
+              });
+              var paramOptions = {
+                source: paramSource
+              };
+              if (object.parametersId && paramSource.find(Utils.array.idPredicate(object.parametersId))) {
+                paramOptions.value = object.parametersId;
+              }
+              form.updateField('parametersId', paramOptions);
+            } else {
+              form.updateField('parametersId', {
+                source: []
+              });
+              form.updateField('containerModelId', {
+                source: []
+              });
             }
-            if (object.parametersId && source.some(Utils.array.idPredicate(object.parametersId))) {
-              options.value = object.parametersId;
-            }
-            form.updateField('parametersId', options)
           }
+        }, {
+          title: 'Container Model',
+          data: 'containerModelId',
+          type: 'dropdown',
+          source: [],
+          sortSource: Utils.sorting.standardSort('alias'),
+          getItemLabel: Utils.array.getAlias,
+          getItemValue: Utils.array.getId,
+          nullLabel: object.containerModelId ? undefined : 'Unspecified',
+          required: !object.id || !!object.containerModelId
         }, {
           title: 'Sequencing Parameters',
           data: 'parametersId',
@@ -376,6 +410,7 @@ FormTarget.poolorder = (function($) {
     var sequencingOrder = {
       purposeId: purpose.id,
       purposeAlias: purpose.alias,
+      containerModelId: form.get('containerModelId'),
       parameters: Utils.array.findUniqueOrThrow(Utils.array.idPredicate(form.get('parametersId')), Constants.sequencingParameters),
       partitions: form.get('partitions'),
       pool: {

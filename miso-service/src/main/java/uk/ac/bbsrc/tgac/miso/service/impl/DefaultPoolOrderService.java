@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
@@ -24,6 +26,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
+import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
@@ -44,33 +47,28 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
 
   @Autowired
   private PoolOrderDao poolOrderDao;
-
   @Autowired
   private DeletionStore deletionStore;
-
   @Autowired
   private AuthorizationManager authorizationManager;
 
   @Autowired
   private SequencingParametersService sequencingParametersService;
-
   @Autowired
   private RunPurposeService runPurposeService;
-
   @Autowired
   private LibraryAliquotService libraryAliquotService;
-
   @Autowired
   private PoolService poolService;
-
   @Autowired
   private SequencingOrderService sequencingOrderService;
+  @Autowired
+  private SequencingContainerModelService containerModelService;
+  @Autowired
+  private ChangeLogService changeLogService;
 
   @Autowired
   private IndexChecker indexChecker;
-
-  @Autowired
-  private ChangeLogService changeLogService;
 
   @Override
   public DeletionStore getDeletionStore() {
@@ -95,6 +93,7 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
   protected void loadChildEntities(PoolOrder object) throws IOException {
     loadChildEntity(object.getParameters(), object::setParameters, sequencingParametersService);
     loadChildEntity(object.getPurpose(), object::setPurpose, runPurposeService);
+    loadChildEntity(object.getContainerModel(), object::setContainerModel, containerModelService);
     for (OrderLibraryAliquot orderAliquot : object.getOrderLibraryAliquots()) {
       orderAliquot.setAliquot(libraryAliquotService.get(orderAliquot.getAliquot().getId()));
     }
@@ -126,22 +125,37 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
           }
         }
         if (object.getSequencingOrder() != null) {
-          if (object.getSequencingOrder().getPurpose().getId() != object.getPurpose().getId()
-              || object.getSequencingOrder().getSequencingParameter().getId() != object.getParameters().getId()
-              || !object.getSequencingOrder().getPartitions().equals(object.getPartitions())
-              || object.getSequencingOrder().getPool().getId() != object.getPool().getId()) {
+          SequencingOrder seqOrder = object.getSequencingOrder();
+          if (seqOrder.getPurpose().getId() != object.getPurpose().getId()
+              || seqOrder.getSequencingParameter().getId() != object.getParameters().getId()
+              || !seqOrder.getPartitions().equals(object.getPartitions())
+              || seqOrder.getPool().getId() != object.getPool().getId()
+              || (object.getContainerModel() != null
+                  && (seqOrder.getContainerModel() == null
+                      || seqOrder.getContainerModel().getId() != object.getContainerModel().getId()))) {
             errors.add(new ValidationError("Sequencing order does not match the pool order"));
           }
         }
       }
       preventFulfilledChange("partitions", PoolOrder::getPartitions, object, beforeChange, errors);
       preventFulfilledChange("parametersId", PoolOrder::getParameters, object, beforeChange, errors);
+      preventFulfilledChange("containerModelId", PoolOrder::getContainerModel, object, beforeChange, errors);
       preventFulfilledChange("description", PoolOrder::getDescription, object, beforeChange, errors);
       preventFulfilledChange("alias", PoolOrder::getAlias, object, beforeChange, errors);
       preventFulfilledChange("purposeId", PoolOrder::getPurpose, object, beforeChange, errors);
       if (!allMatch(object.getOrderLibraryAliquots(), beforeChange.getOrderLibraryAliquots())) {
         errors.add(new ValidationError("Aliquots cannot be changed after the order is fulfilled"));
       }
+    }
+
+    // Container model must be specified except for legacy orders (from before container model was added to orders)
+    if ((beforeChange == null || beforeChange.getContainerModel() != null) && object.getContainerModel() == null) {
+      errors.add(ValidationUtils.makeNoNullError("containerModelId"));
+    }
+    // Container model and seq params must be linked to same instrument model
+    if (object.getContainerModel() != null && object.getParameters().getInstrumentModel().getContainerModels().stream()
+        .noneMatch(model -> model.getId() == object.getContainerModel().getId())) {
+      errors.add(new ValidationError("containerModelId", "Not compatible with the selected sequencing parameters"));
     }
 
     PlatformType orderPlatform = object.getParameters() == null ? null : object.getParameters().getInstrumentModel().getPlatformType();
@@ -159,7 +173,9 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
       errors.add(new ValidationError("Non-draft order must include at least one library aliquot"));
     }
 
-    if(strictPools) validateNoNewDuplicateIndices(object, beforeChange, errors);
+    if (strictPools) {
+      validateNoNewDuplicateIndices(object, beforeChange, errors);
+    }
   }
 
   private void validateNoNewDuplicateIndices(PoolOrder object, PoolOrder beforeChange, List<ValidationError> errors){
@@ -210,45 +226,10 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
 
   @Override
   protected void applyChanges(PoolOrder to, PoolOrder from) throws IOException {
-    // Properties not changelogged here are caught by SQL triggers
     to.setPartitions(from.getPartitions());
-
-    if (from.getParameters() == null && to.getParameters() != null) {
-      changeLogService.create(
-              to.createChangeLog("Sequencing Parameters deleted.",
-                      "parametersId",
-                      authorizationManager.getCurrentUser())
-      );
-    } else if(to.getParameters() == null && from.getParameters() != null){
-      changeLogService.create(
-              to.createChangeLog("New Sequencing Parameters:"
-                      + from.getParameters().getInstrumentModel().getAlias()
-                      + ", " + from.getParameters().getName(),
-                      "parametersId",
-                      authorizationManager.getCurrentUser())
-      );
-    } else if(to.getParameters() != null && from.getParameters() != null
-            && !to.getParameters().equals(from.getParameters())) {
-      changeLogService.create(
-              to.createChangeLog("Changed Sequencing Parameters: "
-                              + to.getParameters().getInstrumentModel().getAlias()
-                              + ", " + to.getParameters().getName()+ " to "
-                              + from.getParameters().getInstrumentModel().getAlias()
-                              + ", " + from.getParameters().getName(),
-                      "parametersId",
-                      authorizationManager.getCurrentUser())
-      );
-    }
+    to.setContainerModel(from.getContainerModel());
     to.setParameters(from.getParameters());
     to.setAlias(from.getAlias());
-
-    if(!to.getPurpose().getAlias().equals(from.getPurpose().getAlias())) changeLogService.create(
-            to.createChangeLog("Changed Purpose: "
-                            + to.getPurpose().getAlias()
-                            + " to " + from.getPurpose().getAlias(),
-                    "purposeId",
-                    authorizationManager.getCurrentUser())
-    );
     to.setPurpose(from.getPurpose());
     to.setDescription(from.getDescription());
     to.setDraft(from.isDraft());
@@ -257,17 +238,14 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
     // add to TO if library isn't in TO
     // update proportion in TO if different in FROM
     Set<Long> fromIds = new HashSet<>();
-    for (OrderLibraryAliquot fromOrderAli : from.getOrderLibraryAliquots()){
+    for (OrderLibraryAliquot fromOrderAli : from.getOrderLibraryAliquots()) {
       fromIds.add(fromOrderAli.getAliquot().getId());
     }
     Set<OrderLibraryAliquot> removed = new HashSet<>();
-    for (OrderLibraryAliquot toOrderAli : to.getOrderLibraryAliquots()){
-      if(!fromIds.contains(toOrderAli.getAliquot().getId())){
-        changeLogService.create(
-                to.createChangeLog("Removed Library Aliquot: " + toOrderAli.getAliquot().getAlias(),
-                        "aliquotId",
-                        authorizationManager.getCurrentUser())
-        );
+    List<String> aliquotChangeMessages = new ArrayList<>();
+    for (OrderLibraryAliquot toOrderAli : to.getOrderLibraryAliquots()) {
+      if (!fromIds.contains(toOrderAli.getAliquot().getId())) {
+        aliquotChangeMessages.add("Removed library aliquot: " + toOrderAli.getAliquot().getAlias());
         removed.add(toOrderAli);
       }
     }
@@ -278,45 +256,22 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
           .filter(lib -> lib.getAliquot().getId() == fromOrderAli.getAliquot().getId())
           .findFirst().orElse(null);
       if (toOrderAli == null) {
-        changeLogService.create(
-                to.createChangeLog("Added Library Aliquot: " + fromOrderAli.getAliquot().getAlias(),
-                        "aliquotId",
-                        authorizationManager.getCurrentUser())
-        );
+        aliquotChangeMessages.add("Added library aliquot: " + fromOrderAli.getAliquot().getAlias());
         to.getOrderLibraryAliquots().add(fromOrderAli);
       } else {
-        if(toOrderAli.getProportion() != fromOrderAli.getProportion()) changeLogService.create(
-                to.createChangeLog(fromOrderAli.getAliquot().getAlias() + " proportion changed: "
-                                + toOrderAli.getProportion() + " to " + fromOrderAli.getProportion(),
-                        "aliquotId",
-                        authorizationManager.getCurrentUser())
-        );
-        toOrderAli.setProportion(fromOrderAli.getProportion());
+        if (toOrderAli.getProportion() != fromOrderAli.getProportion()) {
+          aliquotChangeMessages.add(fromOrderAli.getAliquot().getAlias() + " proportion changed: "
+              + toOrderAli.getProportion() + " to " + fromOrderAli.getProportion());
+          toOrderAli.setProportion(fromOrderAli.getProportion());
+        }
       }
     }
-
-    if(from.getPool() == null && to.getPool() != null){
-      changeLogService.create(to.createChangeLog("Pool unlinked.",
-              "poolId",
-              authorizationManager.getCurrentUser()));
-    }else if(to.getPool() == null && from.getPool() != null){
-      changeLogService.create(
-              to.createChangeLog("Associated pool: " + from.getPool().getAlias(),
-                      "poolId",
-                      authorizationManager.getCurrentUser()));
+    if (!aliquotChangeMessages.isEmpty()) {
+      changeLogService
+          .create(to.createChangeLog(String.join("\n", aliquotChangeMessages), "library aliquots", authorizationManager.getCurrentUser()));
     }
+
     to.setPool(from.getPool());
-
-    if(from.getSequencingOrder() == null && to.getSequencingOrder() != null){
-      changeLogService.create(to.createChangeLog("Sequencing order unlinked.",
-              "sequencingOrderId",
-              authorizationManager.getCurrentUser()));
-    }else if(to.getSequencingOrder() == null && from.getSequencingOrder() != null){
-      changeLogService.create(
-              to.createChangeLog("Associated sequencing order.",
-                      "sequencingOrderId",
-                      authorizationManager.getCurrentUser()));
-    }
     to.setSequencingOrder(from.getSequencingOrder());
   }
 

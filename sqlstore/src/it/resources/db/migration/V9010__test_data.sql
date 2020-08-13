@@ -592,40 +592,6 @@ VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
 (3, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:53'),
 (4, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:55');
 
-INSERT INTO `_Partition` (`partitionId`, `partitionNumber`, `pool_poolId`)
-VALUES (1,1,1),
-(2,2,NULL),
-(3,3,NULL),
-(4,4,NULL),
-(5,5,NULL),
-(6,6,NULL),
-(7,7,NULL),
-(8,8,NULL),
-(9,1,NULL),
-(10,2,NULL),
-(11,3,NULL),
-(12,4,NULL),
-(13,5,NULL),
-(14,6,NULL),
-(15,7,NULL),
-(16,8,NULL),
-(17,1,NULL),
-(18,2,NULL),
-(19,3,NULL),
-(20,4,NULL),
-(21,5,NULL),
-(22,6,NULL),
-(23,7,NULL),
-(24,8,NULL),
-(25,1,NULL),
-(26,2,NULL),
-(27,3,NULL),
-(28,4,NULL),
-(29,5,NULL),
-(30,6,NULL),
-(31,7,NULL),
-(32,8,NULL);
-
 INSERT INTO SequencingContainerModel (sequencingContainerModelId, alias, identificationBarcode, partitionCount, platformType, fallback) VALUES
 (1, 'Generic 8-Lane Illumina Flow Cell', NULL, 8, 'ILLUMINA', 1),
 (2, 'Generic 2-Lane Illumina Flow Cell', NULL, 2, 'ILLUMINA', 1),
@@ -642,17 +608,17 @@ VALUES (1,'C0JHTACXX',1,1,'2016-07-07 13:30:47',1,'2016-07-07 13:30:47'),
 (3,'C075RACXX',1,1,'2016-07-07 13:30:51',1,'2016-07-07 13:30:51'),
 (4,'C0KY7ACXX',1,1,'2016-07-07 13:30:53',1,'2016-07-07 13:30:53');
 
+INSERT INTO _Partition (containerId, partitionId, partitionNumber, pool_poolId) VALUES
+(1,1,1,1), (1,2,2,NULL), (1,3,3,NULL), (1,4,4,NULL), (1,5,5,NULL), (1,6,6,NULL), (1,7,7,NULL), (1,8,8,NULL),
+(2,9,1,NULL), (2,10,2,NULL), (2,11,3,NULL), (2,12,4,NULL), (2,13,5,NULL), (2,14,6,NULL), (2,15,7,NULL), (2,16,8,NULL),
+(3,17,1,NULL), (3,18,2,NULL), (3,19,3,NULL), (3,20,4,NULL), (3,21,5,NULL), (3,22,6,NULL), (3,23,7,NULL), (3,24,8,NULL),
+(4,25,1,NULL), (4,26,2,NULL), (4,27,3,NULL), (4,28,4,NULL), (4,29,5,NULL), (4,30,6,NULL), (4,31,7,NULL), (4,32,8,NULL);
+
 INSERT INTO `SequencerPartitionContainerChangeLog`(`containerId`, `columnsChanged`, `userId`, `message`, `changeTime`)
 VALUES (1, 'identificationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:47'),
 (2, 'identificationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:49'),
 (3, 'identificationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:51'),
 (4, 'identificationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:53');
-
-INSERT INTO `SequencerPartitionContainer_Partition`(`container_containerId`, `partitions_partitionId`) VALUES
-(1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),
-(2,9),(2,10),(2,11),(2,12),(2,13),(2,14),(2,15),(2,16),
-(3,17),(3,18),(3,19),(3,20),(3,21),(3,22),(3,23),(3,24),
-(4,25),(4,26),(4,27),(4,28),(4,29),(4,30),(4,31),(4,32);
 
 INSERT INTO `Run_SequencerPartitionContainer`(`Run_runId`, `containers_containerId`) 
 VALUES (1,1),(2,2),(3,3),(4,4);

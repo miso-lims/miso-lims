@@ -15,27 +15,30 @@ HotTarget.sequencingorder = (function() {
     fixUp: function(lib, errorHandler) {
     },
     createColumns: function(config, create, data) {
-      return [{
-        header: 'Pool Name',
-        data: 'poolName',
-        readOnly: true,
-        include: true,
-        unpack: function(order, flat, setCellMeta) {
-          flat.poolName = order.pool.name;
-        },
-        pack: function(order, flat, errorHandler) {
-        }
-      }, {
-        header: 'Pool Alias',
-        data: 'poolAlias',
-        readOnly: true,
-        include: true,
-        unpack: function(order, flat, setCellMeta) {
-          flat.poolAlias = order.pool.alias;
-        },
-        pack: function(order, flat, errorHandler) {
-        }
-      }, HotUtils.makeColumnForConstantsList('Purpose', true, 'purposeAlias', 'purposeId', 'id', 'alias', Constants.runPurposes, true, {}),
+      return [
+          {
+            header: 'Pool Name',
+            data: 'poolName',
+            readOnly: true,
+            include: true,
+            unpack: function(order, flat, setCellMeta) {
+              flat.poolName = order.pool.name;
+            },
+            pack: function(order, flat, errorHandler) {
+            }
+          },
+          {
+            header: 'Pool Alias',
+            data: 'poolAlias',
+            readOnly: true,
+            include: true,
+            unpack: function(order, flat, setCellMeta) {
+              flat.poolAlias = order.pool.alias;
+            },
+            pack: function(order, flat, errorHandler) {
+            }
+          },
+          HotUtils.makeColumnForConstantsList('Purpose', true, 'purposeAlias', 'purposeId', 'id', 'alias', Constants.runPurposes, true, {}),
           {
             header: 'Description',
             data: 'description',
@@ -46,7 +49,8 @@ HotTarget.sequencingorder = (function() {
             pack: function(order, flat, errorHandler) {
               order.description = flat.description;
             }
-          }, {
+          },
+          {
             header: 'Instrument Model',
             data: 'instrumentModel',
             type: 'dropdown',
@@ -68,6 +72,41 @@ HotTarget.sequencingorder = (function() {
               setOptions({
                 source: instrumentModels
               });
+            }
+          },
+          {
+            header: 'Container Model',
+            data: 'containerModel',
+            type: 'dropdown',
+            trimDropdown: false,
+            source: [''],
+            include: true,
+            unpack: function(order, flat, setCellMeta) {
+              if (order.containerModelId) {
+                flat.containerModel = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(order.containerModelId),
+                    Constants.containerModels).array;
+              }
+            },
+            pack: function(order, flat, errorHandler) {
+              if (flat.containerModel) {
+                order.containerModelId = Utils.array.findUniqueOrThrow(Utils.array.aliasPredicate(flat.containerModel),
+                    Constants.containerModels).id;
+              }
+            },
+            depends: ['*start', 'instrumentModel'],
+            update: function(order, flat, flatProperty, value, setReadOnly, setOptions, setData) {
+              var source = [];
+              if (flat.instrumentModel) {
+                var selectedInstrumentModel = Constants.instrumentModels.find(Utils.array.aliasPredicate(flat.instrumentModel));
+                if (selectedInstrumentModel) {
+                  source = selectedInstrumentModel.containerModels.map(Utils.array.getAlias);
+                }
+              }
+              setOptions({
+                source: source,
+                validator: HotUtils.validator[(order.id && !order.containerModelId) ? 'requiredEmpty' : 'requiredAutocomplete']
+              });
+              setReadOnly(order.id && !order.containerModelId);
             }
           }, {
             header: 'Sequencing Parameters',

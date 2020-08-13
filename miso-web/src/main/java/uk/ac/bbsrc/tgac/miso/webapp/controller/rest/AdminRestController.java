@@ -161,7 +161,7 @@ public class AdminRestController extends DefaultRestController {
   @ResponseBody
   @ResponseStatus(HttpStatus.OK)
   public int refreshConstants() throws IOException {
-    constantsController.refreshConstants();
+    constantsController.refreshConstants(true);
     return 0;
   }
 

@@ -5,6 +5,7 @@ import java.util.Date;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 
 public interface SequencingOrder extends Deletable {
 
@@ -43,5 +44,9 @@ public interface SequencingOrder extends Deletable {
   public RunPurpose getPurpose();
 
   public void setPurpose(RunPurpose purpose);
+
+  public SequencingContainerModel getContainerModel();
+
+  public void setContainerModel(SequencingContainerModel containerModel);
 
 }

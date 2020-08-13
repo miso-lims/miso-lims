@@ -22,12 +22,13 @@ public class BulkSequencingOrderPage extends HeaderFooterPage {
     public static final String ALIAS = "Pool Alias";
     public static final String PURPOSE = "Purpose";
     public static final String INSTRUMENT_MODEL = "Instrument Model";
+    public static final String CONTAINER_MODEL = "Container Model";
     public static final String PARAMETERS = "Sequencing Parameters";
     public static final String PARTITIONS = "Partitions";
     public static final String DESCRIPTION = "Description";
 
     public static List<String> all() {
-      return Lists.newArrayList(NAME, ALIAS, PURPOSE, INSTRUMENT_MODEL, PARAMETERS, PARTITIONS, DESCRIPTION);
+      return Lists.newArrayList(NAME, ALIAS, PURPOSE, INSTRUMENT_MODEL, CONTAINER_MODEL, PARAMETERS, PARTITIONS, DESCRIPTION);
     }
 
     private Columns() {

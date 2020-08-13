@@ -49,26 +49,15 @@ FOR EACH ROW
       END
     );
     SET new_container_serial = COALESCE(
-      (SELECT spc.identificationBarcode FROM SequencerPartitionContainer spc
-        JOIN SequencerPartitionContainer_Partition sp ON spc.containerId = sp.container_containerId
-        WHERE sp.partitions_partitionId = NEW.partitionId),
+      (SELECT identificationBarcode FROM SequencerPartitionContainer WHERE containerId = NEW.containerId),
       'unknown');
-    SELECT spc.lastModifier INTO last_modifier FROM SequencerPartitionContainer spc
-      JOIN SequencerPartitionContainer_Partition spcp ON spcp.container_containerId = spc.containerId
-      WHERE spcp.partitions_partitionId = OLD.partitionId;
-    SELECT spc.lastModified INTO last_modified FROM SequencerPartitionContainer spc
-      JOIN SequencerPartitionContainer_Partition spcp ON spcp.container_containerId = spc.containerId
-      WHERE spcp.partitions_partitionId = OLD.partitionId; 
+    SELECT spc.lastModifier, spc.lastModified INTO last_modifier, last_modified
+      FROM SequencerPartitionContainer spc
+      WHERE spc.containerId = NEW.containerId; 
     
     IF log_message IS NOT NULL AND log_message <> '' THEN
-      INSERT INTO SequencerPartitionContainerChangeLog(containerId, columnsChanged, userId, message, changeTime) VALUES (
-        (SELECT spcp.container_containerId FROM SequencerPartitionContainer_Partition spcp
-         WHERE spcp.partitions_partitionId = OLD.partitionId),
-         'pool',
-         last_modifier,
-         log_message,
-         last_modified
-      );
+      INSERT INTO SequencerPartitionContainerChangeLog(containerId, columnsChanged, userId, message, changeTime)
+      VALUES (NEW.containerId, 'pool', last_modifier, log_message, last_modified);
       
       INSERT INTO RunChangeLog(runId, columnsChanged, userId, message, changeTime)
         SELECT rspc.run_runId,
@@ -78,8 +67,7 @@ FOR EACH ROW
           last_modified
         FROM Run_SequencerPartitionContainer rspc
         JOIN SequencerPartitionContainer spc ON spc.containerId = rspc.containers_containerId
-        JOIN SequencerPartitionContainer_Partition spcp ON spcp.container_containerId = spc.containerId
-        WHERE spcp.partitions_partitionId = OLD.partitionId;
+        WHERE spc.containerId = NEW.containerId;
     END IF;
 
     IF (NEW.pool_poolId IS NOT NULL) AND ((OLD.pool_poolId IS NULL) OR ((OLD.pool_poolId IS NOT NULL) AND (OLD.pool_poolId <> NEW.pool_poolId))) THEN

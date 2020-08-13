@@ -56,6 +56,7 @@ public class BulkSequencingOrderIT extends AbstractIT {
     Map<String, String> changes = Maps.newLinkedHashMap();
     changes.put(Columns.PURPOSE, "Production");
     changes.put(Columns.INSTRUMENT_MODEL, "Illumina HiSeq 2500");
+    changes.put(Columns.CONTAINER_MODEL, "Generic 8-Lane Illumina Flow Cell");
     changes.put(Columns.PARAMETERS, "1x151");
     changes.put(Columns.PARTITIONS, "3");
     changes.put(Columns.DESCRIPTION, "test");

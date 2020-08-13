@@ -8,16 +8,13 @@ FOR EACH ROW
 	DECLARE log_message varchar(500) CHARACTER SET utf8;
 	DECLARE log_columns varchar(500) CHARACTER SET utf8;
     SELECT
-      identificationBarcode,
-      container_containerId,
-      partitionNumber
+      spc.identificationBarcode,
+      spc.containerId,
+      part.partitionNumber
     INTO @container, @containerId, @partitionNumber
-    FROM SequencerPartitionContainer
-      JOIN SequencerPartitionContainer_Partition
-        ON SequencerPartitionContainer.containerId = SequencerPartitionContainer_Partition.container_containerId
-      JOIN _Partition
-        ON SequencerPartitionContainer_Partition.partitions_partitionId = _Partition.partitionId
-    WHERE partitions_partitionId = NEW.partitionId;
+    FROM _Partition part
+    JOIN SequencerPartitionContainer spc ON spc.containerId = part.containerId
+    WHERE part.partitionId = NEW.partitionId;
     
     SET log_message = CONCAT_WS(', ',
         CASE WHEN (NEW.partitionQcTypeId IS NULL) <> (OLD.partitionQcTypeId IS NULL) OR NEW.partitionQcTypeId <> OLD.partitionQcTypeId THEN CONCAT('QC for ', @container, '-', @partitionNumber, ': ', COALESCE((SELECT description FROM PartitionQCType WHERE partitionQcTypeId = OLD.partitionQcTypeId), 'n/a'), ' → ', COALESCE((SELECT description FROM PartitionQCType WHERE partitionQcTypeId = NEW.partitionQcTypeId), 'n/a')) END,
@@ -37,14 +34,11 @@ DROP TRIGGER IF EXISTS RunPartitionLibraryAliquotInsert//
 CREATE TRIGGER RunPartitionLibraryAliquotInsert AFTER INSERT ON Run_Partition_LibraryAliquot
 FOR EACH ROW
   BEGIN
-	SELECT identificationBarcode, partitionNumber
+	SELECT spc.identificationBarcode, part.partitionNumber
 	INTO @container, @partitionNumber
-	FROM SequencerPartitionContainer
-      JOIN SequencerPartitionContainer_Partition
-        ON SequencerPartitionContainer.containerId = SequencerPartitionContainer_Partition.container_containerId
-      JOIN _Partition
-        ON SequencerPartitionContainer_Partition.partitions_partitionId = _Partition.partitionId
-    WHERE partitions_partitionId = NEW.partitionId;
+	FROM _Partition part
+	JOIN SequencerPartitionContainer spc ON spc.containerId = part.containerId
+	WHERE part.partitionId = NEW.partitionId;
     INSERT INTO RunChangeLog(runId, columnsChanged, userId, message) VALUES (
       NEW.runId,
       'aliquot purpose',
@@ -60,16 +54,13 @@ FOR EACH ROW
 	DECLARE log_message varchar(500) CHARACTER SET utf8;
 	DECLARE log_columns varchar(500) CHARACTER SET utf8;
     SELECT
-      identificationBarcode,
-      container_containerId,
-      partitionNumber
+      spc.identificationBarcode,
+      spc.containerId,
+      part.partitionNumber
     INTO @container, @containerId, @partitionNumber
-    FROM SequencerPartitionContainer
-      JOIN SequencerPartitionContainer_Partition
-        ON SequencerPartitionContainer.containerId = SequencerPartitionContainer_Partition.container_containerId
-      JOIN _Partition
-        ON SequencerPartitionContainer_Partition.partitions_partitionId = _Partition.partitionId
-    WHERE partitions_partitionId = NEW.partitionId;
+	FROM _Partition part
+	JOIN SequencerPartitionContainer spc ON spc.containerId = part.containerId
+	WHERE part.partitionId = NEW.partitionId;
     
     SET log_message = CONCAT_WS(', ',
         CASE WHEN NEW.purposeId <> OLD.purposeId THEN CONCAT('Purpose for ', @container, '-', @partitionNumber, '-', (SELECT alias FROM LibraryAliquot WHERE aliquotId = NEW.aliquotId), ': ', (SELECT alias FROM RunPurpose WHERE purposeId = OLD.purposeId), ' → ', (SELECT alias FROM RunPurpose WHERE purposeId = NEW.purposeId)) END);

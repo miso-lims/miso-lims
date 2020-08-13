@@ -107,7 +107,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.ScientificName;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingControlType;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrderCompletion;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
@@ -203,6 +202,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentIdentityAttributes;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentTissueAttributes;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SequencingOrderSummaryView;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQcControlRun;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQC;
@@ -1252,6 +1252,7 @@ public class Dtos {
     SequencingOrderDto dto = new SequencingOrderDto();
     dto.setId(from.getId());
     dto.setPool(asDto(from.getPool(), false, false, indexChecker));
+    setId(dto::setContainerModelId, from.getContainerModel());
     dto.setParameters(asDto(from.getSequencingParameter()));
     dto.setPartitions(from.getPartitions());
     dto.setCreationDate(formatDateTime(from.getCreationDate()));
@@ -1272,6 +1273,7 @@ public class Dtos {
     SequencingOrder to = new SequencingOrderImpl();
     if (from.getId() != null) to.setId(from.getId());
     to.setPool(to(from.getPool()));
+    setObject(to::setContainerModel, SequencingContainerModel::new, from.getContainerModelId());
     to.setSequencingParameters(to(from.getParameters()));
     to.setPartitions(from.getPartitions());
     to.setDescription(from.getDescription());
@@ -1892,6 +1894,8 @@ public class Dtos {
     to.setPooledElements(from.getElements().stream()
         .map(element -> {
           LibraryAliquotDto dto = new LibraryAliquotDto();
+          setString(dto::setName, element.getName());
+          setString(dto::setAlias, element.getAlias());
           if (element.getConsentLevel() != null) {
             dto.setIdentityConsentLevel(element.getConsentLevel().getLabel());
           }
@@ -1899,6 +1903,7 @@ public class Dtos {
         })
         .collect(Collectors.toSet()));
     to.setHasLowQualityLibraries(from.hasLowQualityMembers());
+    setString(to::setLongestIndex, from.getLongestIndex());
     return to;
   }
 
@@ -2377,16 +2382,17 @@ public class Dtos {
     return qcTypeSubset.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
-  public static SequencingOrderCompletionDto asDto(@Nonnull SequencingOrderCompletion from, IndexChecker indexChecker) {
+  public static SequencingOrderCompletionDto asDto(@Nonnull SequencingOrderSummaryView from, IndexChecker indexChecker) {
     SequencingOrderCompletionDto dto = new SequencingOrderCompletionDto();
-    dto.setId(from.getPool().getId() + "_" + from.getSequencingParameters().getId());
-    dto.setPool(asDto(from.getPool(), false, false, indexChecker));
-    dto.setParameters(asDto(from.getSequencingParameters()));
-    dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
+    setString(dto::setId, from.getId());
+    dto.setPool(asDto(from.getPool(), indexChecker));
+    setString(dto::setContainerModelAlias, maybeGetProperty(from.getContainerModel(), SequencingContainerModel::getAlias));
+    dto.setParameters(asDto(from.getParameters()));
+    setDateTimeString(dto::setLastUpdated, from.getLastUpdated());
     dto.setRemaining(from.getRemaining());
     dto.setCompleted(from.get(HealthType.Completed));
     dto.setFailed(from.get(HealthType.Failed));
-    dto.setRequested(from.get(HealthType.Requested));
+    dto.setRequested(from.getRequested());
     dto.setRunning(from.get(HealthType.Running));
     dto.setStarted(from.get(HealthType.Started));
     dto.setStopped(from.get(HealthType.Stopped));
@@ -3782,6 +3788,7 @@ public class Dtos {
     setLong(to::setPurposeId, maybeGetProperty(from.getPurpose(), RunPurpose::getId), true);
     setString(to::setPurposeAlias, maybeGetProperty(from.getPurpose(), RunPurpose::getAlias));
     setInteger(to::setPartitions, from.getPartitions(), true);
+    setId(to::setContainerModelId, from.getContainerModel());
     setId(to::setParametersId, from.getParameters());
     setString(to::setParametersName, maybeGetProperty(from.getParameters(), SequencingParameters::getName));
     setBoolean(to::setDraft, from.isDraft(), false);
@@ -3822,6 +3829,7 @@ public class Dtos {
     setString(to::setDescription, from.getDescription());
     setObject(to::setPurpose, RunPurpose::new, from.getPurposeId());
     setInteger(to::setPartitions, from.getPartitions(), true);
+    setObject(to::setContainerModel, SequencingContainerModel::new, from.getContainerModelId());
     setObject(to::setParameters, SequencingParameters::new, from.getParametersId());
     setBoolean(to::setDraft, from.isDraft(), false);
     if (from.getOrderAliquots() != null) {
