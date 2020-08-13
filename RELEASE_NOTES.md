@@ -7,12 +7,17 @@ Changes:
     library template
   * Fixed an issue that could cause inconsistent sorting on list pages (affected Library Templates and
     possibly other pages)
+  * Fixed error on Adding QC from Edit Sample, Library, Container, Pool pages
 
 # 1.10.1
 
 Changes:
 
   * Fixed errors with tissue processing classes with no subcategory
+
+Known Issues:
+
+  * Server Error adding QCs from Edit Sample, Library, Container, Pool pages
 
 # 1.10.0
 
@@ -34,6 +39,7 @@ Changes:
 Known Issues:
 
   * Tissue processing classes with no subcategory cause errors
+  * Server error on adding QCs to Sample, Library, Container, Pool from Edit pages
 
 # 1.9.1
 
