@@ -334,6 +334,7 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
   @Override
   protected void applyChanges(Transfer to, Transfer from) throws IOException {
     to.setTransferTime(from.getTransferTime());
+    to.setTransferRequestName(from.getTransferRequestName());
     to.setSenderGroup(from.getSenderGroup());
     to.setSenderLab(from.getSenderLab());
     to.setRecipient(from.getRecipient());

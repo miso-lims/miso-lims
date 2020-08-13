@@ -5,6 +5,7 @@ import java.util.List;
 public class TransferDto {
 
   private Long id;
+  private String transferRequestName;
   private String transferTime;
   private Long senderLabId;
   private String senderLabLabel;
@@ -21,6 +22,14 @@ public class TransferDto {
 
   public void setId(Long id) {
     this.id = id;
+  }
+
+  public String getTransferRequestName() {
+    return transferRequestName;
+  }
+
+  public void setTransferRequestName(String transferRequestName) {
+    this.transferRequestName = transferRequestName;
   }
 
   public String getTransferTime() {

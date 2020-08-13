@@ -37,6 +37,12 @@ FormTarget.transfer = (function($) {
             return transfer.id || 'Unsaved';
           }
         }, {
+          title: 'Transfer Request Name',
+          data: 'transferRequestName',
+          type: 'text',
+          maxLength: 100,
+          description: 'Name or ID of a transfer request stored in a separate system'
+        }, {
           title: 'Transfer Time',
           data: 'transferTime',
           type: 'datetime',

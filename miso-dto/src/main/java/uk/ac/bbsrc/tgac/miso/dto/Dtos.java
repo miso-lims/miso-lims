@@ -3880,6 +3880,7 @@ public class Dtos {
   public static TransferDto asDto(@Nonnull Transfer from) {
     TransferDto to = new TransferDto();
     setLong(to::setId, from.getId(), true);
+    setString(to::setTransferRequestName, from.getTransferRequestName());
     setDateTimeString(to::setTransferTime, from.getTransferTime());
     setId(to::setSenderLabId, from.getSenderLab());
     setString(to::setSenderLabLabel, maybeGetProperty(from.getSenderLab(), Lab::getItemLabel));
@@ -3916,6 +3917,7 @@ public class Dtos {
   public static Transfer to(@Nonnull TransferDto from) {
     Transfer to = new Transfer();
     setLong(to::setId, from.getId(), false);
+    setString(to::setTransferRequestName, from.getTransferRequestName());
     setDateTime(to::setTransferTime, from.getTransferTime());
     setObject(to::setSenderLab, LabImpl::new, from.getSenderLabId());
     setObject(to::setSenderGroup, Group::new, from.getSenderGroupId());
