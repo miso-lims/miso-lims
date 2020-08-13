@@ -8,6 +8,7 @@ Changes:
   * Fixed an issue that could cause inconsistent sorting on list pages (affected Library Templates and
     possibly other pages)
   * Fixed error on Adding QC from Edit Sample, Library, Container, Pool pages
+  * Fixed setting volume units from library template
 
 # 1.10.1
 
