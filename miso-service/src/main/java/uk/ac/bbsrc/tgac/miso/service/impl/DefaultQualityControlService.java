@@ -187,6 +187,8 @@ public class DefaultQualityControlService implements QualityControlService {
     to.setInstrument(from.getInstrument());
     to.setKit(from.getKit());
     to.setKitLot(from.getKitLot());
+    to.setDescription(from.getDescription());
+    to.setDate(from.getDate());
   }
 
   private void validateChange(QC qc, QC beforeChange) throws IOException {
