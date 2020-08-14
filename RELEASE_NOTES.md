@@ -2,6 +2,12 @@
 
 Changes:
 
+
+
+# 1.11.0
+
+Changes:
+
   * Added transfer request name field to transfers
   * Fixed editing QC date and description
   * Fixed errors with tissue processing classes with no subcategory
