@@ -1709,33 +1709,19 @@ BulkUtils = (function($) {
                                 .concat(errorCols.map(function(errorCol) {
                                   return "* " + errorCol;
                                 })));
-                            return;
+                            return true;
                           }
                           if (maxRowLength > hot.countRows()) {
                             Utils.showOkDialog('Error', ['The spreadsheet contains ' + maxRowLength + ' rows, but the table only contains '
                                 + hot.countRows()]);
-                            return;
+                            return true;
                           }
-                          // validate read-only cells
-                          for (var colI = 0; colI < columnData.length; colI++) {
-                            var columnIndex = hotHeaders.indexOf(columnData[colI].heading);
-                            for (var rowIndex = 0; rowIndex < columnData[colI].data.length; rowIndex++) {
-                              var cellValue = hot.getDataAtCell(rowIndex, columnIndex);
-                              var importValue = columnData[colI].data[rowIndex];
-                              if (hot.getCellMeta(rowIndex, columnIndex).readOnly
-                                  && (!!importValue != !!cellValue || (!!importValue && !!cellValue && importValue != cellValue))) {
-                                Utils.showOkDialog('Error',
-                                    ['Values in read-only column \'' + columnData[colI].heading + '\' do not match']);
-                                return;
-                              }
-                            }
-                          }
+
                           // set values from spreadsheet
                           var changes = [];
                           columnData.forEach(function(column) {
                             var columnIndex = hotHeaders.indexOf(column.heading);
                             for (var rowIndex = 0; rowIndex < column.data.length; rowIndex++) {
-                              // hot.setDataAtCell(rowIndex, columnIndex, column.data[rowIndex], 'CopyPaste.paste');
                               changes.push([rowIndex, columnIndex, column.data[rowIndex]]);
                             }
                           });
