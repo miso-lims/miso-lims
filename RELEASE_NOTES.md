@@ -2,7 +2,7 @@
 
 Changes:
 
-
+  * Export latest transfer request name via Pinery
 
 # 1.11.0
 
