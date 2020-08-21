@@ -153,8 +153,7 @@ FormTarget.poolorder = (function($) {
           sortSource: Utils.sorting.standardSort('alias'),
           getItemLabel: Utils.array.getAlias,
           getItemValue: Utils.array.getId,
-          nullLabel: object.containerModelId ? undefined : 'Unspecified',
-          required: !object.id || !!object.containerModelId
+          nullLabel: object.containerModelId ? undefined : 'Unspecified'
         }, {
           title: 'Sequencing Parameters',
           data: 'parametersId',

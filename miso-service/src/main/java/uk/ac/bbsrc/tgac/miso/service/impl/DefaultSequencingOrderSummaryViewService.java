@@ -33,7 +33,7 @@ public class DefaultSequencingOrderSummaryViewService implements SequencingOrder
 
   @Override
   public List<SequencingOrderSummaryView> listByPoolId(Long poolId) throws IOException {
-    return sequencingOrderSummaryViewDao.list(0, 0, false, "remaining", PaginationFilter.pool(poolId));
+    return sequencingOrderSummaryViewDao.list(0, 0, false, "lastUpdated", PaginationFilter.pool(poolId));
   }
 
 }

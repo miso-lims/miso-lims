@@ -31,6 +31,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String CONCENTRATION = "Concentration";
     public static final String CONCENTRATION_UNITS = "Conc. Units";
     public static final String CONTAINER = "Container";
+    public static final String CONTAINER_MODEL = "Container Model";
     public static final String CORRESPONDING_FIELD = "Corresponding Field";
     public static final String CREATION_DATE = "Creation Date";
     public static final String CREATOR = "Creator";

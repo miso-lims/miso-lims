@@ -28,7 +28,7 @@ public class HibernateSequencingOrderSummaryViewDao
   private static final String[] SEARCH_PROPERTIES = new String[] { "pool.alias", "pool.name", "pool.identificationBarcode",
       "pool.description" };
   private static final List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("pool"),
-      new AliasDescriptor("parameters"));
+      new AliasDescriptor("parameters"), new AliasDescriptor("containerModel", JoinType.LEFT_OUTER_JOIN));
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -79,7 +79,12 @@ public class HibernateSequencingOrderSummaryViewDao
 
   @Override
   public String propertyForSortColumn(String original) {
-    return original;
+    switch (original) {
+    case "containerModelAlias":
+      return "containerModel.alias";
+    default:
+      return original;
+    }
   }
 
   @Override

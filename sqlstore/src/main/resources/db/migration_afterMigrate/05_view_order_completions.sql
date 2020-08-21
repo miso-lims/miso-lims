@@ -45,7 +45,7 @@ LEFT JOIN PartitionQCType qct ON qct.partitionQcTypeId = rpqc.partitionQcTypeId
 WHERE part.pool_poolId IS NOT NULL
 AND (qct.orderFulfilled IS NULL OR qct.orderFulfilled = TRUE);
 
--- Fulfilled (loaded or completed)
+-- Fulfilled (loaded or health NOT failed/unknown)
 -- join via orderSummaryId for matching pool+containerModel+params
 CREATE OR REPLACE VIEW SequencingOrderFulfillmentView AS
 SELECT
@@ -59,7 +59,7 @@ LEFT JOIN Run_Partition rpqc ON rpqc.runId = run.runId AND rpqc.partitionId = pa
 LEFT JOIN PartitionQCType qct ON qct.partitionQcTypeId = rpqc.partitionQcTypeId
 WHERE part.pool_poolId IS NOT NULL
 AND (qct.orderFulfilled IS NULL OR qct.orderFulfilled = TRUE)
-AND (run.health IS NULL OR run.health = 'Completed')
+AND (run.health IS NULL OR (run.health <> 'Failed' AND run.health <> 'Unknown'))
 GROUP BY part.pool_poolId, spc.sequencingContainerModelId, run.sequencingParameters_parametersId;
 
 -- fulfilled, ignoring containerModel
@@ -76,5 +76,5 @@ LEFT JOIN Run_Partition rpqc ON rpqc.runId = run.runId AND rpqc.partitionId = pa
 LEFT JOIN PartitionQCType qct ON qct.partitionQcTypeId = rpqc.partitionQcTypeId
 WHERE part.pool_poolId IS NOT NULL
 AND (qct.orderFulfilled IS NULL OR qct.orderFulfilled = TRUE)
-AND (run.health IS NULL OR run.health = 'Completed')
+AND (run.health IS NULL OR (run.health <> 'Failed' AND run.health <> 'Unknown'))
 GROUP BY part.pool_poolId, run.sequencingParameters_parametersId;

@@ -148,10 +148,21 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
       }
     }
 
-    // Container model must be specified except for legacy orders (from before container model was added to orders)
-    if ((beforeChange == null || beforeChange.getContainerModel() != null) && object.getContainerModel() == null) {
-      errors.add(ValidationUtils.makeNoNullError("containerModelId"));
+    // if any sequencing requirements are specified, all are required
+    if (object.getContainerModel() != null || object.getParameters() != null || object.getPartitions() != null) {
+      // exception: container model not required for legacy orders (from before container model was added to orders)
+      if ((beforeChange == null || beforeChange.getContainerModel() != null) && object.getContainerModel() == null) {
+        errors.add(ValidationUtils.makeNoNullError("containerModelId"));
+      }
+      if (object.getParameters() == null) {
+        errors.add(ValidationUtils.makeNoNullError("parametersId"));
+      }
+      if (object.getPartitions() == null) {
+        errors.add(ValidationUtils.makeNoNullError("partitions"));
+      }
     }
+
+
     // Container model and seq params must be linked to same instrument model
     if (object.getContainerModel() != null && object.getParameters().getInstrumentModel().getContainerModels().stream()
         .noneMatch(model -> model.getId() == object.getContainerModel().getId())) {
