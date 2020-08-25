@@ -559,8 +559,10 @@ var Utils = Utils
         });
         // dialog doesn't appear without this delay for some reason...
         setTimeout(function() {
-          workFunction();
-          dialog.dialog("close");
+          var dialogChanged = workFunction();
+          if (!dialogChanged) {
+            dialog.dialog("close");
+          }
         }, 100);
       },
 

@@ -9,7 +9,6 @@ import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -52,6 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.SampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.core.service.ScientificNameService;
 import uk.ac.bbsrc.tgac.miso.core.service.SubprojectService;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
@@ -484,7 +484,7 @@ public class DefaultSampleServiceTest {
         .thenReturn(idSet);
     Sample newSample = new SampleImpl();
     newSample.setProject(project);
-    exception.expect(ConstraintViolationException.class);
+    exception.expect(ValidationException.class);
     sut.confirmExternalNameUniqueForProjectIfRequired("String1", newSample);
   }
 

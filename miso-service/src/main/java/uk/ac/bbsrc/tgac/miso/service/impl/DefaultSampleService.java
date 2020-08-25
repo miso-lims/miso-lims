@@ -271,8 +271,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
         validateHierarchy(detailed);
       } else {
         if (isUniqueExternalNameWithinProjectRequired() && isExternalNameDuplicatedInProject(sample)) {
-          throw new IllegalArgumentException("Sample with external name '" + ((SampleIdentity) sample).getExternalName()
-              + "' already exists in project " + sample.getProject().getShortName());
+          throw makeDuplicateExternalNameError(((SampleIdentity) sample).getExternalName());
         }
       }
     }
@@ -315,6 +314,11 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       }
     }
     return savedId;
+  }
+
+  private ValidationException makeDuplicateExternalNameError(String externalName) {
+    return new ValidationException(new ValidationError("externalName",
+        String.format("Sample with external name or alias '%s' already exists in this project", externalName)));
   }
 
   private NamingScheme getNamingScheme(Sample sample) {
@@ -504,13 +508,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     if (!matches.isEmpty()) {
       for (SampleIdentity match : matches) {
         if (match.getId() != sample.getId()) {
-          Set<String> matchExtNames = SampleIdentityImpl.getSetFromString(match.getExternalName());
-          Set<String> newExtNames = SampleIdentityImpl.getSetFromString(newExternalName);
-          newExtNames.retainAll(matchExtNames);
-          throw new ConstraintViolationException(
-              "Duplicate external names not allowed within a project: External name \"" + String.join(",", newExtNames)
-                  + "\" is already associated with Identity " + match.getAlias() + " (" + match.getExternalName() + ")",
-              null, "externalName");
+          throw makeDuplicateExternalNameError(newExternalName);
         }
       }
     }
