@@ -2,6 +2,7 @@
 
 Changes:
 
+  * Export latest transfer request name via Pinery
   * Fixed error where importing into bulk tables would fail with no error message
 
 # 1.11.0

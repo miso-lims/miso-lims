@@ -75,6 +75,7 @@ SELECT s.alias NAME
         ,NULL spike_in_volume_ul
         ,sct.alias sequencing_control_type
         ,custody.recipient AS custody
+        ,custody.transferRequestName AS latest_transfer_request
 FROM Sample s
 LEFT JOIN DetailedQcStatus qpd ON qpd.detailedQcStatusId = s.detailedQcStatusId 
 LEFT JOIN Sample parent ON parent.sampleId = s.parentId 
@@ -184,7 +185,8 @@ LEFT JOIN (
 ) dist ON dist.sampleId = s.sampleId
 LEFT JOIN SequencingControlType sct ON sct.sequencingControlTypeId = s.sequencingControlTypeId
 LEFT JOIN (
-  SELECT xfer.transferId, xfers.sampleId, xfer.transferTime, COALESCE(rg.name, xfer.recipient) AS recipient
+  SELECT xfer.transferId, xfers.sampleId, xfer.transferTime, COALESCE(rg.name, xfer.recipient) AS recipient,
+    xfer.transferRequestName
   FROM Transfer_Sample xfers
   JOIN Transfer xfer ON xfer.transferId = xfers.transferId
   LEFT JOIN _Group rg ON rg.groupId = xfer.recipientGroupId
@@ -284,6 +286,7 @@ SELECT l.alias NAME
         ,l.spikeInVolume spike_in_volume_ul
         ,NULL sequencing_control_type
         ,custody.recipient AS custody
+        ,custody.transferRequestName AS latest_transfer_request
 FROM Library l 
 LEFT JOIN Sample parent ON parent.sampleId = l.sample_sampleId
 LEFT JOIN Project sp ON sp.projectId = parent.project_projectId
@@ -353,7 +356,8 @@ LEFT JOIN (
   WHERE xfer.recipient IS NOT NULL
 ) dist ON dist.libraryId = l.libraryId
 LEFT JOIN (
-  SELECT xfer.transferId, xferl.libraryId, xfer.transferTime, COALESCE(rg.name, xfer.recipient) AS recipient
+  SELECT xfer.transferId, xferl.libraryId, xfer.transferTime, COALESCE(rg.name, xfer.recipient) AS recipient,
+    xfer.transferRequestName
   FROM Transfer_Library xferl
   JOIN Transfer xfer ON xfer.transferId = xferl.transferId
   LEFT JOIN _Group rg ON rg.groupId = xfer.recipientGroupId
@@ -453,6 +457,7 @@ SELECT d.alias name
         ,NULL spike_in_volume_ul
         ,NULL sequencing_control_type
         ,custody.recipient AS custody
+        ,custody.transferRequestName AS latest_transfer_request
 FROM LibraryAliquot d 
 LEFT JOIN LibraryAliquot laParent ON laParent.aliquotId = d.parentAliquotId
 JOIN Library lib ON lib.libraryId = d.libraryId 
@@ -479,7 +484,8 @@ LEFT JOIN (
   WHERE xfer.recipient IS NOT NULL
 ) dist ON dist.aliquotId = d.aliquotId
 LEFT JOIN (
-  SELECT xfer.transferId, xferl.aliquotId, xfer.transferTime, COALESCE(rg.name, xfer.recipient) AS recipient
+  SELECT xfer.transferId, xferl.aliquotId, xfer.transferTime, COALESCE(rg.name, xfer.recipient) AS recipient,
+    xfer.transferRequestName
   FROM Transfer_LibraryAliquot xferl
   JOIN Transfer xfer ON xfer.transferId = xferl.transferId
   LEFT JOIN _Group rg ON rg.groupId = xfer.recipientGroupId
