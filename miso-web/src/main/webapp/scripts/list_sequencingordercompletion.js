@@ -165,6 +165,7 @@ ListTarget.sequencingordercompletion = {
     }, {
       "sTitle": "Remaining",
       "mData": "remaining",
+      "bSortable": false,
       "iSortPriority": 0,
       "include": true,
       "mRender": function(data, type, full) {
