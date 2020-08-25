@@ -14,8 +14,7 @@ SELECT p.partitionId
   ,pool.lastModified AS pool_modified
 FROM _Partition AS p
 LEFT JOIN Pool pool ON pool.poolId = p.pool_poolId
-JOIN SequencerPartitionContainer_Partition AS spc_p ON spc_p.partitions_partitionId = p.partitionId
-JOIN Run_SequencerPartitionContainer AS r_spc ON r_spc.containers_containerId = spc_p.container_containerId
+JOIN Run_SequencerPartitionContainer AS r_spc ON r_spc.containers_containerId = p.containerId
 LEFT JOIN Run_Partition rpq ON rpq.runId = r_spc.Run_runId AND rpq.partitionId = p.partitionId
 LEFT JOIN PartitionQCType pqt ON pqt.partitionQcTypeId = rpq.partitionQcTypeId
 LEFT JOIN RunPurpose rp ON rp.purposeId = rpq.purposeId

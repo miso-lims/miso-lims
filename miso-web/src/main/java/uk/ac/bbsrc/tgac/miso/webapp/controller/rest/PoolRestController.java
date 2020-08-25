@@ -87,7 +87,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.ListPoolViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
-import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderCompletionService;
+import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderSummaryViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.core.util.IlluminaExperiment;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
@@ -238,7 +238,7 @@ public class PoolRestController extends RestController {
   @Autowired
   private PoolableElementViewService poolableElementViewService;
   @Autowired
-  private SequencingOrderCompletionService sequencingOrderCompletionService;
+  private SequencingOrderSummaryViewService sequencingOrderCompletionService;
   @Autowired
   private SequencingParametersService sequencingParametersService;
   @Autowired

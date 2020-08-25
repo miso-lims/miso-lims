@@ -33,7 +33,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -67,9 +66,7 @@ public class PartitionImpl implements Partition {
   private Integer partitionNumber;
 
   @ManyToOne(targetEntity = SequencerPartitionContainerImpl.class)
-  @JoinTable(name = "SequencerPartitionContainer_Partition", joinColumns = {
-      @JoinColumn(name = "partitions_partitionId") }, inverseJoinColumns = {
-          @JoinColumn(name = "container_containerId") })
+  @JoinColumn(name = "containerId")
   private SequencerPartitionContainer sequencerPartitionContainer = null;
 
   @ManyToOne(targetEntity = PoolImpl.class)

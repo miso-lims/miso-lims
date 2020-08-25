@@ -28,7 +28,6 @@ BEGIN
     UNION SELECT 'Pool_Elements',COUNT(*) FROM Pool_Elements
     UNION SELECT 'Pools',COUNT(*) FROM Pool
     UNION SELECT 'Partitions',COUNT(*) FROM _Partition
-    UNION SELECT 'SequencerPartitionContainer_Partitions',COUNT(*) FROM SequencerPartitionContainer_Partition
     UNION SELECT 'SequencerPartitionContainers',COUNT(*) FROM SequencerPartitionContainer
     UNION SELECT 'Run_SequencerPartitionContainers',COUNT(*) FROM Run_SequencerPartitionContainer
     UNION SELECT 'Runs',COUNT(*) FROM Run
@@ -42,7 +41,6 @@ BEGIN
     
     DELETE FROM SequencerPartitionContainerChangeLog;
     DELETE FROM Run_SequencerPartitionContainer;
-    DELETE FROM SequencerPartitionContainer_Partition;
     DELETE FROM SequencerPartitionContainer;
     DELETE FROM _Partition;
     DELETE FROM RunChangeLog;

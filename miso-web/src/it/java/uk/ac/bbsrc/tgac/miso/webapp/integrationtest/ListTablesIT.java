@@ -258,8 +258,8 @@ public class ListTablesIT extends AbstractIT {
   public void testListOrdersSetup() throws Exception {
     login();
     Set<String> ordersColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.PURPOSE, Columns.ORDER_DESCRIPTION,
-        Columns.POOL_DESCRIPTION, Columns.INSTRUMENT_MODEL, Columns.LONGEST_INDEX, Columns.SEQUENCING_PARAMETERS, Columns.REMAINING,
-        Columns.LAST_MODIFIED);
+        Columns.POOL_DESCRIPTION, Columns.INSTRUMENT_MODEL, Columns.LONGEST_INDEX, Columns.CONTAINER_MODEL, Columns.SEQUENCING_PARAMETERS,
+        Columns.REMAINING, Columns.LAST_MODIFIED);
     for (String pageName : new String[] { ListTarget.ORDERS_ALL,  ListTarget.ORDERS_OUTSTANDING,  ListTarget.ORDERS_IN_PROGRESS }) {
       // this one is special because the number of order completion states is variable
       ListTabbedPage page = getTabbedList(pageName);

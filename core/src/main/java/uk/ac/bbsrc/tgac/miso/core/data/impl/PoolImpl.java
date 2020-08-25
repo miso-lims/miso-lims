@@ -31,8 +31,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -68,7 +66,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
@@ -517,17 +514,8 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   @Override
   public String getLongestIndex() {
-    Map<Integer, Integer> lengths = poolElements.stream()
-        .flatMap(element -> element.getPoolableElementView().getIndices().stream())
-        .collect(Collectors.toMap(Index::getPosition, index -> index.getSequence().length(), Integer::max));
-    if (lengths.isEmpty()) {
-      return "0";
-    }
-    return lengths.entrySet().stream()
-        .sorted((a, b) -> a.getKey().compareTo(b.getKey()))
-        .map(Entry<Integer, Integer>::getValue)
-        .map(length -> length.toString())
-        .collect(Collectors.joining(","));
+    return LimsUtils.getLongestIndex(poolElements.stream()
+        .flatMap(element -> element.getPoolableElementView().getIndices().stream()));
   }
 
   @Override

@@ -7,6 +7,7 @@ public class SequencingOrderCompletionDto {
   private String lastUpdated;
   private int loaded;
   private SequencingParametersDto parameters;
+  private String containerModelAlias;
   private PoolDto pool;
   private int remaining;
   private int requested;
@@ -91,6 +92,14 @@ public class SequencingOrderCompletionDto {
 
   public void setParameters(SequencingParametersDto parameters) {
     this.parameters = parameters;
+  }
+
+  public String getContainerModelAlias() {
+    return containerModelAlias;
+  }
+
+  public void setContainerModelAlias(String containerModelAlias) {
+    this.containerModelAlias = containerModelAlias;
   }
 
   public void setPool(PoolDto pool) {

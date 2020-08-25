@@ -277,11 +277,8 @@ INSERT INTO BoxPosition (boxId, targetId, targetType, position) VALUES
 INSERT INTO SequencerPartitionContainer (containerId, identificationBarcode, sequencingContainerModelId, lastModifier, creator, created, lastModified) VALUES
 (1, 'MISEQXX', 1, 1, 1, '2017-07-20 13:30:01', '2017-07-20 13:30:01');
 
-INSERT INTO `_Partition` (partitionId, partitionNumber, pool_poolId) VALUES 
-(1, 1, 1);
-
-INSERT INTO SequencerPartitionContainer_Partition (container_containerId, partitions_partitionId) VALUES
-(1, 1);
+INSERT INTO `_Partition` (containerId, partitionId, partitionNumber, pool_poolId) VALUES 
+(1, 1, 1, 1);
 
 INSERT INTO Run (runId, name, alias, instrumentId, startDate, completionDate, health, creator, created, lastModifier, lastModified) VALUES
 (1, 'RUN1', 'MiSeq_Run_1', 2, '2017-08-02', '2017-08-03', 'Completed', 1, '2017-08-02 10:03:02', 1, '2017-08-03 10:03:02');

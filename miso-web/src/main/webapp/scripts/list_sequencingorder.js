@@ -43,6 +43,10 @@ ListTarget.sequencingorder = {
           property: "count",
           value: 1
         }], function(results) {
+          if (isNaN(results.count) || results.count < 1) {
+            Utils.showOkDialog('Error', ['Number to add must be 1 or greater.']);
+            return;
+          }
           var updateNext = function(index) {
             if (index >= orders.length) {
               Utils.page.pageReload();
@@ -91,6 +95,10 @@ ListTarget.sequencingorder = {
       "mData": "parameters.instrumentModelAlias",
       "include": true,
       "iSortPriority": 1
+    }, {
+      sTitle: 'Container Model',
+      mData: 'containerModelId',
+      mRender: ListUtils.render.textFromId(Constants.containerModels, 'alias', 'n/a')
     }, {
       "sTitle": "Sequencing Parameters",
       "mData": "parameters.id",

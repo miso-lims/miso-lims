@@ -95,6 +95,8 @@ SELECT
   link.poolId,
   lib.libraryId,
   la.aliquotId,
+  la.name,
+  la.alias,
   la.dnaSize,
   lib.lowQuality,
   sam.project_projectId AS projectId,

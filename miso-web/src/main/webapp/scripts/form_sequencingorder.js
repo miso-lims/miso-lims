@@ -37,6 +37,14 @@ FormTarget.sequencingorder = (function($) {
             return order.parameters.name + ' (' + order.parameters.instrumentModelAlias + ')';
           }
         }, {
+          title: 'Container Model',
+          data: 'containerModelId',
+          omit: true,
+          type: 'read-only',
+          getDisplayValue: function(order) {
+            return Utils.array.findUniqueOrThrow(Utils.array.idPredicate(order.containerModelId), Constants.containerModels).alias;
+          }
+        }, {
           title: 'Partitions Required',
           data: 'partitions',
           type: 'read-only'

@@ -27,15 +27,15 @@ import org.springframework.web.util.UriComponentsBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrderCompletion;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SequencingOrderSummaryView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
-import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderCompletionService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderService;
+import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderSummaryViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -58,7 +58,7 @@ public class SequencingOrderRestController extends RestController {
   @Autowired
   private SequencingParametersService sequencingParametersService;
   @Autowired
-  private SequencingOrderCompletionService sequencingOrderCompletionService;
+  private SequencingOrderSummaryViewService sequencingOrderSummaryViewService;
   @Autowired
   private PoolService poolService;
   @Autowired
@@ -68,15 +68,15 @@ public class SequencingOrderRestController extends RestController {
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
 
-  private final JQueryDataTableBackend<SequencingOrderCompletion, SequencingOrderCompletionDto> jQueryBackend = new JQueryDataTableBackend<SequencingOrderCompletion, SequencingOrderCompletionDto>() {
+  private final JQueryDataTableBackend<SequencingOrderSummaryView, SequencingOrderCompletionDto> jQueryBackend = new JQueryDataTableBackend<SequencingOrderSummaryView, SequencingOrderCompletionDto>() {
 
     @Override
-    protected PaginatedDataSource<SequencingOrderCompletion> getSource() throws IOException {
-      return sequencingOrderCompletionService;
+    protected PaginatedDataSource<SequencingOrderSummaryView> getSource() throws IOException {
+      return sequencingOrderSummaryViewService;
     }
 
     @Override
-    protected SequencingOrderCompletionDto asDto(SequencingOrderCompletion model) {
+    protected SequencingOrderCompletionDto asDto(SequencingOrderSummaryView model) {
       return Dtos.asDto(model, indexChecker);
     }
   };
@@ -188,14 +188,14 @@ public class SequencingOrderRestController extends RestController {
 
   private PoolPickerResponse getPoolPickerWithFilters(Integer limit, PaginationFilter... filters) throws IOException {
     PoolPickerResponse ppr = new PoolPickerResponse();
-    ppr.populate(sequencingOrderCompletionService, true, "lastUpdated", limit,
+    ppr.populate(sequencingOrderSummaryViewService, true, "lastUpdated", limit,
         this::orderTransform,
         filters);
     return ppr;
   }
 
-  private PoolPickerEntry orderTransform(SequencingOrderCompletion order) {
-    PoolDto poolDto = Dtos.asDto(order.getPool(), true, false, indexChecker);
+  private PoolPickerEntry orderTransform(SequencingOrderSummaryView order) {
+    PoolDto poolDto = Dtos.asDto(order.getPool(), indexChecker);
     SequencingOrderCompletionDto socDto = Dtos.asDto(order, indexChecker);
     return new PoolPickerEntry(poolDto,
         Collections.singletonList(socDto));

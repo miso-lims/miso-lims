@@ -27,6 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 
 public class ValidationUtils {
+
   private ValidationUtils() {
     throw new IllegalStateException("Static util class not intended for instantiation");
   }
@@ -150,6 +151,10 @@ public class ValidationUtils {
     return new ValidationException(original.getErrors().stream()
         .map(err -> new ValidationError(String.format("Parent %s: %s", err.getProperty(), err.getMessage())))
         .collect(Collectors.toList()));
+  }
+
+  public static ValidationError makeNoNullError(String property) {
+    return new ValidationError(property, "Must be specified");
   }
 
 }
