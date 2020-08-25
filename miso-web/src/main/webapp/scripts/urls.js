@@ -361,7 +361,10 @@ Urls = (function() {
     edit: idUrlFunction(libraryUiBase),
     bulkReceive: libraryUiBase + '/bulk/receive',
     bulkEdit: libraryUiBase + '/bulk/edit',
-    bulkPropagate: libraryUiBase + '/bulk/propagate'
+    bulkPropagate: libraryUiBase + '/bulk/propagate',
+    batch: function(id) {
+      return libraryUiBase + '/batch/' + encodeURIComponent(id);
+    }
   };
 
   var libraryRestBase = restBase + '/libraries';
@@ -373,6 +376,7 @@ Urls = (function() {
     query: libraryRestBase + '/query',
     datatable: libraryRestBase + '/dt',
     projectDatatable: idUrlFunction(libraryRestBase + '/dt/project'),
+    batchDatatable: idUrlFunction(libraryRestBase + '/dt/batch'),
     bulkDelete: libraryRestBase + '/bulk-delete',
     spreadsheet: libraryRestBase + '/spreadsheet',
     bulkSave: libraryRestBase + '/bulk',

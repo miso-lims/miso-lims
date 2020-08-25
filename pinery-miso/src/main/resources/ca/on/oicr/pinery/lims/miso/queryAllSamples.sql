@@ -76,6 +76,7 @@ SELECT s.alias NAME
         ,sct.alias sequencing_control_type
         ,custody.recipient AS custody
         ,custody.transferRequestName AS latest_transfer_request
+        ,NULL batch_id
 FROM Sample s
 LEFT JOIN DetailedQcStatus qpd ON qpd.detailedQcStatusId = s.detailedQcStatusId 
 LEFT JOIN Sample parent ON parent.sampleId = s.parentId 
@@ -258,7 +259,7 @@ SELECT l.alias NAME
         ,box.alias boxAlias 
         ,pos.position boxPosition 
         ,l.paired paired 
-        ,l.dnaSize readLength 
+        ,l.dnaSize read_length 
         ,NULL targeted_sequencing 
         ,'Library' miso_type 
         ,l.preMigrationId premigration_id 
@@ -287,6 +288,11 @@ SELECT l.alias NAME
         ,NULL sequencing_control_type
         ,custody.recipient AS custody
         ,custody.transferRequestName AS latest_transfer_request
+        ,IF(
+            l.creationDate IS NULL OR l.sopId IS NULL OR l.kitLot IS NULL,
+            NULL,
+            CONCAT(DATE_FORMAT(l.creationDate, '%Y-%m-%d'), '_u', l.creator, '_s', l.sopId, '_k', l.kitDescriptorId, '-', l.kitLot)
+        ) batch_id
 FROM Library l 
 LEFT JOIN Sample parent ON parent.sampleId = l.sample_sampleId
 LEFT JOIN Project sp ON sp.projectId = parent.project_projectId
@@ -429,7 +435,7 @@ SELECT d.alias name
         ,box.alias boxAlias 
         ,pos.position boxPosition 
         ,lib.paired paired 
-        ,d.dnaSize readLength 
+        ,d.dnaSize read_length 
         ,ts.alias targeted_sequencing 
         ,'Library Aliquot' miso_type 
         ,d.preMigrationId premigration_id 
@@ -458,6 +464,7 @@ SELECT d.alias name
         ,NULL sequencing_control_type
         ,custody.recipient AS custody
         ,custody.transferRequestName AS latest_transfer_request
+        ,NULL batch_id
 FROM LibraryAliquot d 
 LEFT JOIN LibraryAliquot laParent ON laParent.aliquotId = d.parentAliquotId
 JOIN Library lib ON lib.libraryId = d.libraryId 

@@ -32,6 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
 import uk.ac.bbsrc.tgac.miso.core.data.Workset;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryBatch;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
@@ -440,5 +441,23 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
     criteria.add(Property.forName("id").in(subquery));
   }
 
+  @Override
+  public void restrictPaginationByBatchId(Criteria criteria, String batchId, Consumer<String> errorHandler) {
+    LibraryBatch batch = null;
+    try {
+      batch = new LibraryBatch(batchId);
+    } catch (IllegalArgumentException e) {
+      errorHandler.accept("Invalid batch ID");
+      return;
+    }
+    criteria.createAlias("creator", "creator")
+        .createAlias("sop", "sop")
+        .createAlias("kitDescriptor", "kitDescriptor")
+        .add(Restrictions.eq("creationDate", batch.getDate()))
+        .add(Restrictions.eq("creator.id", batch.getUserId()))
+        .add(Restrictions.eq("sop.id", batch.getSopId()))
+        .add(Restrictions.eq("kitDescriptor.id", batch.getKitId()))
+        .add(Restrictions.eq("kitLot", batch.getKitLot()));
+  }
 
 }

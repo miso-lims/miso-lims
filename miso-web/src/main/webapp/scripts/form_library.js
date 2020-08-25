@@ -52,6 +52,16 @@ FormTarget.library = (function($) {
             return Urls.ui.samples.edit(library.parentSampleId);
           }
         }, {
+          title: 'Batch',
+          data: 'batchId',
+          type: 'read-only',
+          getDisplayValue: function(library) {
+            return library.batchId || 'n/a';
+          },
+          getLink: function(library) {
+            return library.batchId ? Urls.ui.libraries.batch(library.batchId) : null;
+          }
+        }, {
           title: 'Alias',
           data: 'alias',
           type: 'text',
@@ -346,7 +356,8 @@ FormTarget.library = (function($) {
           title: 'Kit Lot',
           data: 'kitLot',
           type: 'text',
-          maxLength: 100
+          maxLength: 100,
+          regex: Utils.validation.uriComponentRegex
         }, {
           title: 'Spike-In',
           data: 'spikeInId',

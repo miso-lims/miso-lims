@@ -573,7 +573,8 @@ BulkTarget.library = (function($) {
                 type: 'text',
                 data: 'kitLot',
                 include: !config.isLibraryReceipt,
-                required: config.pageMode === 'propagate'
+                required: config.pageMode === 'propagate',
+                regex: Utils.validation.uriComponentRegex
               }, BulkUtils.columns.qcPassed(true), BulkUtils.columns.librarySize);
 
       if (config.showVolume) {

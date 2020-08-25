@@ -135,6 +135,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryBatch;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderLibraryAliquot;
@@ -1405,6 +1406,7 @@ public class Dtos {
     setId(dto::setWorkstationId, from.getWorkstation());
     setId(dto::setThermalCyclerId, from.getThermalCycler());
     setId(dto::setSopId, from.getSop());
+    setString(dto::setBatchId, from.getBatchId());
 
     return dto;
   }
@@ -4151,6 +4153,17 @@ public class Dtos {
     setObject(to::setCategory, from.getCategory(), SopCategory::valueOf);
     setString(to::setUrl, from.getUrl());
     setBoolean(to::setArchived, from.isArchived(), false);
+    return to;
+  }
+
+  public static LibraryBatchDto asDto(@Nonnull LibraryBatch from) {
+    LibraryBatchDto to = new LibraryBatchDto();
+    setString(to::setBatchId, from.getBatchId());
+    setDateString(to::setDate, from.getDate());
+    setLong(to::setUserId, from.getUserId(), false);
+    setLong(to::setSopId, from.getSopId(), false);
+    setLong(to::setKitId, from.getKitId(), false);
+    setString(to::setKitLot, from.getKitLot());
     return to;
   }
 

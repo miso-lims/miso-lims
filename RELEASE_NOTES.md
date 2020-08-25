@@ -2,6 +2,7 @@
 
 Changes:
 
+  * Added library batches for grouping libraries created together
   * Changed pool and sequencing orders to specify container model
   * Export latest transfer request name via Pinery
   * Fixed error where importing into bulk tables would fail with no error message
