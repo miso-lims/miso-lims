@@ -49,7 +49,7 @@
   <button id="save" type="button" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
 <div class="right fg-toolbar ui-helper-clearfix paging_full_numbers">
-  <c:if test="${box.id != 0 && not empty box.identificationBarcode}"><span class="ui-button ui-state-default" onclick="Utils.printDialog('box', [${box.id}]);">Print Barcode</span></c:if>
+  <c:if test="${box.id != 0}"><span class="ui-button ui-state-default" onclick="Utils.printDialog('box', [${box.id}]);">Print Barcode</span></c:if>
 </div>
 
 <div class="sectionDivider"  onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
