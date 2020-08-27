@@ -42,7 +42,7 @@
   <button type="button" id="save" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
 <div class="right fg-toolbar ui-helper-clearfix paging_full_numbers">
-  <c:if test="${container.id != 0 && not empty container.identificationBarcode}"><span class="ui-button ui-state-default" onclick="Utils.printDialog('container', [${container.id}]);">Print Barcode</span></c:if>
+  <c:if test="${container.id != 0}"><span class="ui-button ui-state-default" onclick="Utils.printDialog('container', [${container.id}]);">Print Barcode</span></c:if>
 </div>
 
 <form:form id="containerForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>

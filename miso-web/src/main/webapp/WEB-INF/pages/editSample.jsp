@@ -43,7 +43,7 @@
   <button id="save" type="button" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
 <div class="right fg-toolbar ui-helper-clearfix paging_full_numbers">
-  <c:if test="${sample.id != 0 && not empty sample.identificationBarcode}"><span class="ui-button ui-state-default" onclick="Utils.printDialog('sample', [${sample.id}]);">Print Barcode</span></c:if>
+  <span class="ui-button ui-state-default" onclick="Utils.printDialog('sample', [${sample.id}]);">Print Barcode</span>
 </div>
 
 <c:if test="${not empty sample.project}">

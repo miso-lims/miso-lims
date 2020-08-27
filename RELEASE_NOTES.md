@@ -4,6 +4,7 @@ Changes:
 
   * Added library batches for grouping libraries created together
   * Changed pool and sequencing orders to specify container model
+  * Show 'Print Barcode' button on Edit pages even if the item does not have a barcode assigned
   * Export latest transfer request name via Pinery
   * Fixed error creating printers
   * Fixed error where importing into bulk tables would fail with no error message
