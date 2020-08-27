@@ -361,7 +361,8 @@ BulkTarget.sample = (function($) {
           }
           return source;
         },
-        sortSource: Utils.sorting.standardSortItems
+        sortSource: Utils.sorting.standardSortItems,
+        initial: config.targetSampleClass.defaultSampleType
       }, {
         title: 'Project',
         type: 'dropdown',

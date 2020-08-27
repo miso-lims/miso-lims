@@ -27,6 +27,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleType;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 
 @Entity
@@ -74,6 +75,10 @@ public class SampleClassImpl implements SampleClass {
   private Date lastUpdated;
 
   private boolean dnaseTreatable = false;
+
+  @ManyToOne
+  @JoinColumn(name = "defaultSampleTypeId")
+  private SampleType defaultSampleType;
 
   @OneToMany(targetEntity = SampleValidRelationshipImpl.class, mappedBy = "child", cascade = CascadeType.ALL)
   private Set<SampleValidRelationship> parentRelationships;
@@ -289,6 +294,16 @@ public class SampleClassImpl implements SampleClass {
       childRelationships = new HashSet<>();
     }
     return childRelationships;
+  }
+
+  @Override
+  public SampleType getDefaultSampleType() {
+    return defaultSampleType;
+  }
+
+  @Override
+  public void setDefaultSampleType(SampleType sampleType) {
+    this.defaultSampleType = sampleType;
   }
 
 }

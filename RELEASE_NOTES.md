@@ -3,6 +3,9 @@
 Changes:
 
   * Added library batches for grouping libraries created together
+  * Added a 'default sample type' field to sample classes. This will now be used when receiving or
+    propagating samples. Default sample type will no longer be inherited from the parent sample when
+    propagating (detailed sample)
   * Changed pool and sequencing orders to specify container model
   * Export latest transfer request name via Pinery
   * Fixed error where importing into bulk tables would fail with no error message

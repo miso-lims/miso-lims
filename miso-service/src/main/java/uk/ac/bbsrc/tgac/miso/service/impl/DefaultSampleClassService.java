@@ -27,6 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
+import uk.ac.bbsrc.tgac.miso.core.service.SampleTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
@@ -45,6 +46,8 @@ public class DefaultSampleClassService extends AbstractSaveService<SampleClass> 
   private SampleClassDao sampleClassDao;
   @Autowired
   private SampleValidRelationshipService sampleValidRelationshipService;
+  @Autowired
+  private SampleTypeService sampleTypeService;
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -169,6 +172,9 @@ public class DefaultSampleClassService extends AbstractSaveService<SampleClass> 
     }
     object.getParentRelationships().clear();
     object.getParentRelationships().addAll(parents);
+    if (object.getDefaultSampleType() != null) {
+      object.setDefaultSampleType(sampleTypeService.getByName(object.getDefaultSampleType().getName()));
+    }
   }
 
   @Override
@@ -307,6 +313,7 @@ public class DefaultSampleClassService extends AbstractSaveService<SampleClass> 
     to.setSampleSubcategory(from.getSampleSubcategory());
     to.setSuffix(from.getSuffix());
     to.setV2NamingCode(from.getV2NamingCode());
+    to.setDefaultSampleType(from.getDefaultSampleType());
 
     User currentUser = authorizationManager.getCurrentUser();
     for (Iterator<SampleValidRelationship> iterator = to.getParentRelationships().iterator(); iterator.hasNext();) {

@@ -1124,7 +1124,9 @@ BulkUtils = (function($) {
             source: labels,
             sourceData: source
           });
-          tableData[rowIndex][column.data] = getSourceLabelForValue(source, data[rowIndex][column.data], column);
+          if (!tableData[rowIndex][column.data]) {
+            tableData[rowIndex][column.data] = getSourceLabelForValue(source, data[rowIndex][column.data], column);
+          }
         }
       }
     });

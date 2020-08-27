@@ -351,6 +351,7 @@ public class Dtos {
     setLong(dto::setCreatedById, maybeGetProperty(from.getCreator(), User::getId), true);
     setLong(dto::setUpdatedById, maybeGetProperty(from.getLastModifier(), User::getId), true);
     dto.setDNAseTreatable(from.getDNAseTreatable());
+    setString(dto::setDefaultSampleType, maybeGetProperty(from.getDefaultSampleType(), SampleType::getName));
     dto.setParentRelationships(from.getParentRelationships().stream().map(Dtos::asDto).collect(Collectors.toList()));
     dto.setChildRelationships(from.getChildRelationships().stream().map(Dtos::asDto).collect(Collectors.toList()));
     return dto;
@@ -371,6 +372,11 @@ public class Dtos {
     to.setArchived(from.isArchived());
     to.setDirectCreationAllowed(from.isDirectCreationAllowed());
     to.setDNAseTreatable(from.getDNAseTreatable());
+    setObject(to::setDefaultSampleType, from.getDefaultSampleType(), name -> {
+      SampleType st = new SampleType();
+      st.setName(name);
+      return st;
+    });
     if (from.getParentRelationships() != null) {
       to.getParentRelationships().addAll(from.getParentRelationships().stream().map(Dtos::to).collect(Collectors.toSet()));
     }
