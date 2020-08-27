@@ -200,7 +200,13 @@ BulkTarget.library = (function($) {
             var originalOnChange = samCol.onChange;
             samCol.onChange = function(rowIndex, newValue, api) {
               originalOnChange(rowIndex, newValue, interceptApi(api));
-            }
+            };
+          }
+          if (typeof samCol.source === 'function') {
+            var originalSource = samCol.source;
+            samCol.source = function(library, api) {
+              return originalSource(library.sample, interceptApi(api));
+            };
           }
         });
 
