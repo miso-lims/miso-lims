@@ -32,7 +32,7 @@ import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
@@ -2801,7 +2801,7 @@ public class Dtos {
     dto.setHeight(from.getHeight());
     dto.setWidth(from.getWidth());
     try {
-      dto.setLayout(new ObjectMapper().readValue(from.getLayout(), ObjectNode.class));
+      dto.setLayout(new ObjectMapper().readValue(from.getLayout(), ArrayNode.class));
     } catch (IOException e) {
       log.error("Corrupt printer contents", e);
     }

@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class PrinterDto {
@@ -9,7 +10,7 @@ public class PrinterDto {
   private String driver;
   private double height;
   private long id;
-  private ObjectNode layout;
+  private ArrayNode layout;
   private String name;
   private double width;
 
@@ -33,7 +34,7 @@ public class PrinterDto {
     return id;
   }
 
-  public ObjectNode getLayout() {
+  public ArrayNode getLayout() {
     return layout;
   }
 
@@ -73,7 +74,7 @@ public class PrinterDto {
     this.id = id;
   }
 
-  public void setLayout(ObjectNode layout) {
+  public void setLayout(ArrayNode layout) {
     this.layout = layout;
   }
 
