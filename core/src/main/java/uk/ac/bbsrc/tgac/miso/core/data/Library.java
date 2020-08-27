@@ -367,4 +367,6 @@ public interface Library extends Attachable, Comparable<Library>, Deletable, Hie
 
   public void setSop(Sop sop);
 
+  public String getBatchId();
+
 }

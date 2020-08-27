@@ -180,6 +180,13 @@ public class LibraryRestController extends RestController {
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.project(id));
   }
 
+  @GetMapping(value = "/dt/batch/{batchId:.+}", produces = "application/json")
+  @ResponseBody
+  public DataTablesResponseDto<LibraryDto> getLibrariesForBatch(@PathVariable("batchId") String batchId, HttpServletRequest request)
+      throws IOException {
+    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.batchId(batchId));
+  }
+
   @PostMapping(value = "/query", produces = { "application/json" })
   @ResponseBody
   public List<LibraryDto> getLibariesInBulk(@RequestBody List<String> names, HttpServletRequest request) {

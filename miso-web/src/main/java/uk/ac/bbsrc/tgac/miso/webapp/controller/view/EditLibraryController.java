@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.Group;
+import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -68,14 +70,19 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryBatch;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
+import uk.ac.bbsrc.tgac.miso.core.service.KitDescriptorService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryTemplateService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
@@ -85,6 +92,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.core.service.SopService;
+import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorkstationService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
@@ -96,6 +104,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.BoxDto;
 import uk.ac.bbsrc.tgac.miso.dto.DetailedLibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.LibraryBatchDto;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryTemplateDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
@@ -175,6 +184,10 @@ public class EditLibraryController {
   private InstrumentService instrumentService;
   @Autowired
   private SopService sopService;
+  @Autowired
+  private KitDescriptorService kitDescriptorService;
+  @Autowired
+  private UserService userService;
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -532,5 +545,33 @@ public class EditLibraryController {
     }
 
   }
+
+  @GetMapping("/batch/{batchId:.+}")
+  public ModelAndView getBatchPage(@PathVariable String batchId, ModelMap model) throws IOException {
+    LibraryBatch batch = null;
+    try {
+      batch = new LibraryBatch(batchId);
+    } catch (IllegalArgumentException e) {
+      throw new ClientErrorException("Invalid batch ID");
+    }
+    User user = userService.get(batch.getUserId());
+    Sop sop = sopService.get(batch.getSopId());
+    KitDescriptor kit = kitDescriptorService.get(batch.getKitId());
+    if (user == null || sop == null || kit == null || kit.getKitType() != KitType.LIBRARY) {
+      throw new ClientErrorException("Invalid batch ID");
+    }
+    LibraryBatchDto batchDto = Dtos.asDto(batch);
+    batchDto.setUsername(user.getLoginName());
+    batchDto.setSopLabel(sop.getAlias() + "v." + sop.getVersion());
+    batchDto.setSopUrl(sop.getUrl());
+    batchDto.setKitName(kit.getName());
+    
+    ObjectMapper mapper = new ObjectMapper();
+    model.put("batchId", StringEscapeUtils.escapeJavaScript(batchId));
+    model.put("batchDto", mapper.writeValueAsString(batchDto));
+
+    return new ModelAndView("/WEB-INF/pages/editLibraryBatch.jsp", model);
+  }
+
 
 }

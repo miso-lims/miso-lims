@@ -81,6 +81,7 @@ public class LibraryDto extends AbstractBoxableDto implements ReceivableDto<Libr
   private Long workstationId;
   private Long thermalCyclerId;
   private Long sopId;
+  private String batchId;
 
   public String getAlias() {
     return alias;
@@ -537,6 +538,14 @@ public class LibraryDto extends AbstractBoxableDto implements ReceivableDto<Libr
 
   public void setSopId(Long sopId) {
     this.sopId = sopId;
+  }
+
+  public String getBatchId() {
+    return batchId;
+  }
+
+  public void setBatchId(String batchId) {
+    this.batchId = batchId;
   }
 
 }

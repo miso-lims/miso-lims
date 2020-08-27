@@ -44,6 +44,16 @@ public abstract interface PaginationFilter {
     };
   }
 
+  public static PaginationFilter batchId(String batchId) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByBatchId(item, batchId, errorHandler);
+      }
+    };
+  }
+
   public static PaginationFilter box(String name) {
     return new PaginationFilter() {
 

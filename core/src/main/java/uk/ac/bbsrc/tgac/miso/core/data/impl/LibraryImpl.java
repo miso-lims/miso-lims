@@ -860,4 +860,9 @@ public class LibraryImpl extends AbstractBoxable implements Library {
     this.sop = sop;
   }
 
+  @Override
+  public String getBatchId() {
+    return LibraryBatch.generateId(this);
+  }
+
 }

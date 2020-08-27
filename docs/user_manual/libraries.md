@@ -217,6 +217,21 @@ clicking "Save" again.
 
 
 
+## Batches
+
+A library batch is a set of libraries that were created together. Batches are created automatically and group libraries
+based on creation date, creator, SOP, kit, and kit lot. If any of these things were not specified on the library, it
+will not be included in a batch. If additional libraries are later created with all of these attributes matching an
+existing batch, the new libraries will be included in the existing batch as well. Changing any of these attributes will
+also change the batch that a library is included in.
+
+Batch IDs are created using identifiers from all of the grouping attributes, and will look similar to
+"2020-08-25_u1_s5_k123-00004567." The Edit Library page shows the library's batch ID if applicable. Clicking on the
+batch ID will take you to the Library Batch page, which includes summary information and a list of all libraries in the
+batch.
+
+
+
 ## Notes
 
 The single Edit Library page includes a Notes section. Notes can be used to record additional library information that

@@ -131,6 +131,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("box/1");
     slugs.add("transfer/new");
     slugs.add("transfer/1");
+    slugs.add("library/batch/2017-07-24_u1_s3_k1-KITLOTONE");
 
     slugs.add("container/new/2");
     slugs.add("container/1"); // Illumina

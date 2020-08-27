@@ -192,17 +192,22 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   public abstract String propertyForUser(boolean creator);
 
   @Override
-  default void restrictPaginationByArchived(Criteria criteria, boolean isArchived, Consumer<String> errorHandler) {
+  public default void restrictPaginationByArchived(Criteria criteria, boolean isArchived, Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s is not archivable.", getFriendlyName()));
   }
 
   @Override
-  default void restrictPaginationByArrayed(Criteria criteria, boolean isArrayed, Consumer<String> errorHandler) {
+  public default void restrictPaginationByArrayed(Criteria criteria, boolean isArrayed, Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s cannot be arrayed.", getFriendlyName()));
   }
 
   @Override
-  default void restrictPaginationByBox(Criteria criteria, String name, Consumer<String> errorHandler) {
+  public default void restrictPaginationByBatchId(Criteria criteria, String batchId, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s does not have batches.", getFriendlyName()));
+  }
+
+  @Override
+  public default void restrictPaginationByBox(Criteria criteria, String name, Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s cannot be boxed.", getFriendlyName()));
   }
 
