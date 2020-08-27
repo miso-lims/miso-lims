@@ -1,3 +1,4 @@
+-- order_container_model
 ALTER TABLE SequencingOrder ADD COLUMN sequencingContainerModelId bigint(20);
 ALTER TABLE SequencingOrder ADD CONSTRAINT fk_sequencingOrder_sequencingContainerModel
 FOREIGN KEY (sequencingContainerModelId) REFERENCES SequencingContainerModel(sequencingContainerModelId);
@@ -25,3 +26,4 @@ DROP VIEW IF EXISTS SequencingOrderCompletion;
 DROP VIEW IF EXISTS SequencingOrderCompletion_Items;
 
 DELETE FROM SequencingOrder WHERE partitions < 1;
+

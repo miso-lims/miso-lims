@@ -2,6 +2,12 @@
 
 Changes:
 
+
+
+# 1.12.0
+
+Changes:
+
   * Added library batches for grouping libraries created together
   * Changed pool and sequencing orders to specify container model
   * Show 'Print Barcode' button on Edit pages even if the item does not have a barcode assigned
