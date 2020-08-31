@@ -68,6 +68,13 @@ FormTarget.sampleclass = (function($) {
       },
       type: 'read-only'
     }, {
+      title: 'Default Sample Type',
+      data: 'defaultSampleType',
+      getDisplayValue: function(sampleClass) {
+        return sampleClass.defaultSampleType || 'n/a'
+      },
+      type: 'read-only'
+    }, {
       title: 'Suffix',
       data: 'suffix',
       getDisplayValue: function(sampleClass) {
@@ -139,6 +146,12 @@ FormTarget.sampleclass = (function($) {
           data: 'sampleSubcategory',
           type: 'dropdown',
           source: object.sampleCategory ? Constants.sampleSubcategories[object.sampleCategory] : [],
+          nullLabel: 'n/a'
+        }, {
+          title: 'Default Sample Type',
+          data: 'defaultSampleType',
+          type: 'dropdown',
+          source: Constants.sampleTypes,
           nullLabel: 'n/a'
         }, {
           title: 'Suffix',

@@ -20,6 +20,7 @@ public class SampleClassDto {
   private Long updatedById;
   private String lastUpdated;
   private boolean dnaseTreatable;
+  private String defaultSampleType;
   private List<SampleValidRelationshipDto> parentRelationships;
   private List<SampleValidRelationshipDto> childRelationships;
 
@@ -117,6 +118,14 @@ public class SampleClassDto {
 
   public void setDNAseTreatable(boolean dnaseTreatable) {
     this.dnaseTreatable = dnaseTreatable;
+  }
+
+  public String getDefaultSampleType() {
+    return defaultSampleType;
+  }
+
+  public void setDefaultSampleType(String defaultSampleType) {
+    this.defaultSampleType = defaultSampleType;
   }
 
   public String getSampleSubcategory() {

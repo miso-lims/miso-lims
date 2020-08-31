@@ -69,4 +69,8 @@ public interface SampleClass extends Deletable, Identifiable, Serializable, Time
 
   public Set<SampleValidRelationship> getChildRelationships();
 
+  public SampleType getDefaultSampleType();
+
+  public void setDefaultSampleType(SampleType sampleType);
+
 }

@@ -47,6 +47,11 @@ public class DefaultSampleTypeService implements SampleTypeService {
   }
 
   @Override
+  public SampleType getByName(String name) throws IOException {
+    return sampleTypeDao.getByName(name);
+  }
+
+  @Override
   public long create(SampleType sampleType) throws IOException {
     authorizationManager.throwIfNonAdmin();
     validateChange(sampleType, null);

@@ -503,7 +503,6 @@ public class EditSampleController {
         if (sample.getScientificName() != null) {
           dto.setScientificNameId(sample.getScientificName().getId());
         }
-        dto.setSampleType(sample.getSampleType());
         dto.setParentId(sample.getId());
         dto.setParentAlias(sample.getAlias());
         if (sample.getBox() != null) {
