@@ -2,16 +2,15 @@
 
 Changes:
 
-
+  * Added a 'default sample type' field to sample classes. This will now be used when receiving or
+    propagating samples. Default sample type will no longer be inherited from the parent sample when
+    propagating (detailed sample)
 
 # 1.12.0
 
 Changes:
 
   * Added library batches for grouping libraries created together
-  * Added a 'default sample type' field to sample classes. This will now be used when receiving or
-    propagating samples. Default sample type will no longer be inherited from the parent sample when
-    propagating (detailed sample)
   * Changed pool and sequencing orders to specify container model
   * Show 'Print Barcode' button on Edit pages even if the item does not have a barcode assigned
   * Export latest transfer request name via Pinery
