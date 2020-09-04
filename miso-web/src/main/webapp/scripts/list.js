@@ -473,7 +473,7 @@ ListUtils = (function($) {
     if (target.headerMessage) {
       makeHeaderMessage(target.headerMessage.text, target.headerMessage.level);
     }
-    if (target.hasOwnProperty("searchTermSelector")) {
+    if (options.sAjaxSource && target.hasOwnProperty("searchTermSelector")) {
       var searchDivId = elementId + '_filter';
 
       var tooltipId = makeSearchTooltip(elementId, searchDivId, target);
