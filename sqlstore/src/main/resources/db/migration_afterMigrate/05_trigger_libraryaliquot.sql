@@ -61,7 +61,7 @@ FOR EACH ROW
     NEW.aliquotId,
     '',
     NEW.lastModifier,
-    CONCAT('Library aliquot created.'),
+    'Library aliquot created.',
     NEW.lastUpdated)//
 
 DELIMITER ;

@@ -3,33 +3,42 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.WorksetChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListWorksetView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetItem;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetLibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetSample;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
-import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.ListWorksetViewStore;
 import uk.ac.bbsrc.tgac.miso.persistence.WorksetStore;
 
@@ -47,6 +56,8 @@ public class DefaultWorksetService implements WorksetService {
   private LibraryService libraryService;
   @Autowired
   private LibraryAliquotService libraryAliquotService;
+  @Autowired
+  private ChangeLogService changeLogService;
   @Autowired
   private DeletionStore deletionStore;
   @Autowired
@@ -118,9 +129,9 @@ public class DefaultWorksetService implements WorksetService {
 
   @Override
   public long create(Workset workset) throws IOException {
-    loadMembers(workset);
-    validateChange(workset, null);
     workset.setChangeDetails(authorizationManager.getCurrentUser());
+    loadMembers(workset, workset.getLastModified());
+    validateChange(workset, null);
     return worksetStore.save(workset);
   }
 
@@ -133,51 +144,31 @@ public class DefaultWorksetService implements WorksetService {
     return worksetStore.save(managed);
   }
 
-  private void loadMembers(Workset newWorkflow) {
-    newWorkflow.setSamples(loadMembers("Sample", newWorkflow.getSamples(), WhineyFunction.rethrow(id -> sampleService.get(id))));
-    newWorkflow.setLibraries(loadMembers("Library", newWorkflow.getLibraries(), WhineyFunction.rethrow(id -> libraryService.get(id))));
-    newWorkflow.setLibraryAliquots(
-        loadMembers("Library Aliquot", newWorkflow.getLibraryAliquots(), WhineyFunction.rethrow(id -> libraryAliquotService.get(id))));
+  private void loadMembers(Workset newWorkset, Date timestamp) throws IOException {
+    loadMembers(newWorkset, newWorkset.getWorksetSamples(), sampleService, timestamp);
+    loadMembers(newWorkset, newWorkset.getWorksetLibraries(), libraryService, timestamp);
+    loadMembers(newWorkset, newWorkset.getWorksetLibraryAliquots(), libraryAliquotService, timestamp);
   }
 
-  private <T extends Identifiable> Set<T> loadMembers(String typeName, Collection<T> items, Function<Long, T> getter) {
-    Set<T> members = new HashSet<>();
-    for (T item : items) {
-      T member = getter.apply(item.getId());
-      if (member == null) {
-        throw new IllegalArgumentException(String.format("%s %d not found", typeName, item.getId()));
+  private <T extends Boxable, J extends WorksetItem<T>> void loadMembers(Workset workset, Collection<J> worksetItems,
+      ProviderService<T> service, Date timestamp) throws IOException {
+    for (J worksetItem : worksetItems) {
+      T item = null;
+      if (worksetItem.getItem() != null && worksetItem.getItem().isSaved()) {
+        item = service.get(worksetItem.getItem().getId());
       }
-      members.add(member);
+      if (item == null) {
+        throw new IllegalArgumentException("Workset item must be an existing item");
+      }
+      worksetItem.setItem(item);
+      worksetItem.setWorkset(workset);
+      worksetItem.setAddedTime(timestamp);
     }
-    return members;
   }
 
   private void applyChanges(Workset from, Workset to) throws IOException {
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
-    applyMemberChanges(from, to);
-  }
-
-  private void applyMemberChanges(Workset changed, Workset managed) {
-    applyMemberChanges(changed.getSamples(), managed.getSamples(), WhineyFunction.rethrow(ids -> sampleService.listByIdList(ids)));
-    applyMemberChanges(changed.getLibraries(), managed.getLibraries(), WhineyFunction.rethrow(ids -> libraryService.listByIdList(ids)));
-    applyMemberChanges(changed.getLibraryAliquots(), managed.getLibraryAliquots(), WhineyFunction.rethrow(ids -> libraryAliquotService.listByIdList(ids)));
-  }
-
-  private <T extends Identifiable> void applyMemberChanges(Set<T> changed, Set<T> managed,
-      Function<List<Long>, Collection<T>> getter) {
-    Set<Long> oldIds = managed.stream().map(Identifiable::getId).collect(Collectors.toSet());
-    Set<Long> newIds = changed.stream().map(Identifiable::getId).collect(Collectors.toSet());
-    Set<Long> removed = oldIds.stream().filter(id -> !newIds.contains(id)).collect(Collectors.toSet());
-    List<Long> added = newIds.stream().filter(id -> !oldIds.contains(id)).collect(Collectors.toList());
-
-    managed.removeIf(item -> removed.contains(Long.valueOf(item.getId())));
-
-    Collection<T> addedMembers = getter.apply(added);
-    if (addedMembers.size() != added.size()) {
-      throw new IllegalArgumentException("One or more added items not found");
-    }
-    managed.addAll(addedMembers);
   }
 
   private void validateChange(Workset workset, Workset beforeChange) throws IOException {
@@ -209,35 +200,132 @@ public class DefaultWorksetService implements WorksetService {
   }
 
   @Override
+  public void addSamples(Workset workset, Collection<Sample> items) throws IOException {
+    addItems(workset, null, items, Workset::getWorksetSamples, WorksetSample::new, sampleService, Pluralizer.samples(items.size()));
+  }
+
+  @Override
+  public void addLibraries(Workset workset, Collection<Library> items) throws IOException {
+    addItems(workset, null, items, Workset::getWorksetLibraries, WorksetLibrary::new, libraryService, Pluralizer.libraries(items.size()));
+  }
+
+  @Override
+  public void addLibraryAliquots(Workset workset, Collection<LibraryAliquot> items) throws IOException {
+    addItems(workset, null, items, Workset::getWorksetLibraryAliquots, WorksetLibraryAliquot::new, libraryAliquotService,
+        Pluralizer.libraryAliquots(items.size()));
+  }
+
+  @Override
+  public void removeSamples(Workset workset, Collection<Sample> items) throws IOException {
+    removeItems(workset, null, items, Workset::getWorksetSamples, Pluralizer.samples(items.size()));
+  }
+
+  @Override
+  public void removeLibraries(Workset workset, Collection<Library> items) throws IOException {
+    removeItems(workset, null, items, Workset::getWorksetLibraries, Pluralizer.libraries(items.size()));
+  }
+
+  @Override
+  public void removeLibraryAliquots(Workset workset, Collection<LibraryAliquot> items) throws IOException {
+    removeItems(workset, null, items, Workset::getWorksetLibraryAliquots, Pluralizer.libraryAliquots(items.size()));
+  }
+
+  @Override
   public void moveSamples(Workset from, Workset to, Collection<Sample> items) throws IOException {
-    moveItems(from, to, items, Workset::getSamples, "samples");
+    moveItems(from, to, items, Pluralizer.samples(items.size()), Workset::getWorksetSamples, WorksetSample::new, sampleService);
   }
 
   @Override
   public void moveLibraries(Workset from, Workset to, Collection<Library> items) throws IOException {
-    moveItems(from, to, items, Workset::getLibraries, "libraries");
+    moveItems(from, to, items, Pluralizer.libraries(items.size()), Workset::getWorksetLibraries, WorksetLibrary::new, libraryService);
   }
 
   @Override
   public void moveLibraryAliquots(Workset from, Workset to, Collection<LibraryAliquot> items) throws IOException {
-    moveItems(from, to, items, Workset::getLibraryAliquots, "library aliquots");
+    moveItems(from, to, items, Pluralizer.libraryAliquots(items.size()), Workset::getWorksetLibraryAliquots, WorksetLibraryAliquot::new,
+        libraryAliquotService);
   }
 
-  public <T extends Identifiable> void moveItems(Workset from, Workset to, Collection<T> items, Function<Workset, Set<T>> getter,
-      String pluralTypeLabel) throws IOException {
-    if (from.getId() == to.getId()) {
-      throw new ValidationException(String.format("Trying to move %s from the same workset", pluralTypeLabel));
+  private <T extends Boxable, J extends WorksetItem<T>> void addItems(Workset toWorkset, Workset fromWorkset, Collection<T> items,
+      Function<Workset, Set<J>> getter, Supplier<J> constructor, ProviderService<T> service, String typeLabel)
+      throws IOException {
+    Date now = new Date();
+    Set<J> worksetItems = getter.apply(toWorkset);
+    for (T item : items) {
+      T managedItem = service.get(item.getId());
+      if (managedItem == null) {
+        throw new ValidationException(String.format("%s %d not found", item.getEntityType().getLabel(), item.getId()));
+      }
+      if (worksetItems.stream().anyMatch(worksetItem -> worksetItem.getItem().getId() == managedItem.getId())) {
+        throw new ValidationException(String.format("Workset already contains %s (%s)", managedItem.getAlias(), managedItem.getName()));
+      }
+      worksetItems.add(makeWorksetItem(constructor, managedItem, toWorkset, now));
     }
-    Set<T> sourceItems = getter.apply(from);
-    int initialSize = sourceItems.size();
-    Set<Long> itemIds = items.stream().map(Identifiable::getId).collect(Collectors.toSet());
-    sourceItems.removeIf(item -> itemIds.contains(item.getId()));
-    if (initialSize - sourceItems.size() != items.size()) {
-      throw new ValidationException(String.format("Not all %s were found in source workset", pluralTypeLabel));
+    toWorkset.setChangeDetails(authorizationManager.getCurrentUser());
+    worksetStore.save(toWorkset);
+    String actionMessage = fromWorkset == null ? String.format("Added %s", typeLabel)
+        : String.format("Added %s from workset '%s'", typeLabel, fromWorkset.getAlias());
+    addChangeLogForItems(toWorkset, items, actionMessage, typeLabel);
+  }
+
+  private <T extends Boxable, J extends WorksetItem<T>> void removeItems(Workset fromWorkset, Workset toWorkset, Collection<T> items,
+      Function<Workset, Set<J>> getter, String typeLabel) throws IOException {
+    Set<J> worksetItems = getter.apply(fromWorkset);
+    for (T item : items) {
+      if (!worksetItems.removeIf(worksetItem -> worksetItem.getItem().getId() == item.getId())) {
+        throw new ValidationException(String.format("%s %s not found in workset", item.getEntityType().getLabel(), item.getId()));
+      }
     }
-    getter.apply(to).addAll(items);
-    worksetStore.save(to);
-    worksetStore.save(from);
+    fromWorkset.setChangeDetails(authorizationManager.getCurrentUser());
+    worksetStore.save(fromWorkset);
+    String actionMessage = toWorkset == null ? String.format("Removed %s", typeLabel)
+        : String.format("Removed %s to workset '%s'", typeLabel, toWorkset.getAlias());
+    addChangeLogForItems(fromWorkset, items, actionMessage, typeLabel);
+  }
+
+  private <T extends Boxable, J extends WorksetItem<T>> void moveItems(Workset from, Workset to, Collection<T> items,
+      String typeLabel, Function<Workset, Set<J>> getter, Supplier<J> constructor, ProviderService<T> service) throws IOException {
+    removeItems(from, to, items, getter, typeLabel);
+    addItems(to, from, items, getter, constructor, service, typeLabel);
+  }
+
+  private static <T extends Boxable, J extends WorksetItem<T>> J makeWorksetItem(Supplier<J> constructor, T item, Workset workset,
+      Date addedTime) {
+    J worksetItem = constructor.get();
+    worksetItem.setItem(item);
+    worksetItem.setWorkset(workset);
+    worksetItem.setAddedTime(addedTime);
+    return worksetItem;
+  }
+
+  private <T extends Boxable> void addChangeLogForItems(Workset workset, Collection<T> items, String actionMessage, String typeLabel)
+      throws IOException {
+    String message = String.format("%s: %s", actionMessage, items.stream()
+        .map(item -> String.format("%s (%s)", item.getAlias(), item.getName()))
+        .collect(Collectors.joining(", ")));
+
+    WorksetChangeLog change = new WorksetChangeLog();
+    change.setWorkset(workset);
+    change.setTime(workset.getLastModified());
+    change.setUser(authorizationManager.getCurrentUser());
+    change.setColumnsChanged(typeLabel);
+    change.setSummary(message);
+    changeLogService.create(change);
+  }
+
+  @Override
+  public Map<Long, Date> getSampleAddedTimes(long worksetId) throws IOException {
+    return worksetStore.getSampleAddedTimes(worksetId);
+  }
+
+  @Override
+  public Map<Long, Date> getLibraryAddedTimes(long worksetId) throws IOException {
+    return worksetStore.getLibraryAddedTimes(worksetId);
+  }
+
+  @Override
+  public Map<Long, Date> getLibraryAliquotAddedTimes(long worksetId) throws IOException {
+    return worksetStore.getLibraryAliquotAddedTimes(worksetId);
   }
 
 }

@@ -63,6 +63,7 @@ public class LibraryAliquotDto extends AbstractBoxableDto {
   private Boolean subprojectPriority;
   private String sequencingControlTypeAlias;
   private Boolean qcPassed;
+  private String worksetAddedTime;
 
   public Long getId() {
     return id;
@@ -394,6 +395,14 @@ public class LibraryAliquotDto extends AbstractBoxableDto {
 
   public void setQcPassed(Boolean qcPassed) {
     this.qcPassed = qcPassed;
+  }
+
+  public String getWorksetAddedTime() {
+    return worksetAddedTime;
+  }
+
+  public void setWorksetAddedTime(String worksetAddedTime) {
+    this.worksetAddedTime = worksetAddedTime;
   }
 
 }

@@ -1,9 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.persistence;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Workset;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 
 public interface WorksetStore {
 
@@ -18,5 +20,11 @@ public interface WorksetStore {
   public List<Workset> listByLibraryAliquot(long aliquotId) throws IOException;
 
   public long save(Workset workset) throws IOException;
+
+  public Map<Long, Date> getSampleAddedTimes(long worksetId) throws IOException;
+
+  public Map<Long, Date> getLibraryAddedTimes(long worksetId) throws IOException;
+
+  public Map<Long, Date> getLibraryAliquotAddedTimes(long worksetId) throws IOException;
 
 }

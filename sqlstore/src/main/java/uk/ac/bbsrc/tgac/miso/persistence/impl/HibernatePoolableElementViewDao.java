@@ -21,9 +21,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.PoolableElementViewDao;
@@ -271,9 +271,10 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
   @Override
   public void restrictPaginationByWorksetId(Criteria criteria, long worksetId, Consumer<String> errorHandler) {
     DetachedCriteria subquery = DetachedCriteria.forClass(Workset.class)
-            .createAlias("libraryAliquots", "libraryaliquot")
-            .add(Restrictions.eq("id", worksetId))
-            .setProjection(Projections.property("libraryaliquot.id"));
+        .createAlias("worksetLibraryAliquots", "worksetLibraryAliquot")
+        .createAlias("worksetLibraryAliquot.item", "libraryaliquot")
+        .add(Restrictions.eq("id", worksetId))
+        .setProjection(Projections.property("libraryaliquot.id"));
     criteria.add(Property.forName("id").in(subquery));
   }
 }

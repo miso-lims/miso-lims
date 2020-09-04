@@ -6,6 +6,7 @@ import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -24,10 +25,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.HierarchyEntity;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
@@ -405,8 +406,7 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
   public void beforeDelete(LibraryAliquot object) throws IOException {
     List<Workset> worksets = worksetService.listByLibraryAliquot(object.getId());
     for (Workset workset : worksets) {
-      workset.getLibraryAliquots().removeIf(ldi -> ldi.getId() == object.getId());
-      worksetService.update(workset);
+      worksetService.removeLibraryAliquots(workset, Collections.singleton(object));
     }
     Box box = object.getBox();
     if (box != null) {

@@ -120,7 +120,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
-import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.Workstation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
@@ -204,6 +203,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentTissueAttributes;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SequencingOrderSummaryView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetItem;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetLibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetSample;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQcControlRun;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQC;
@@ -3566,52 +3570,47 @@ public class Dtos {
 
   public static WorksetDto asDto(@Nonnull Workset from) {
     WorksetDto dto = new WorksetDto();
-    dto.setId(from.getId());
-    dto.setAlias(from.getAlias());
-    dto.setDescription(from.getDescription());
-    if (!from.getSamples().isEmpty()) {
-      dto.setSampleIds(from.getSamples().stream().map(Identifiable::getId).collect(Collectors.toList()));
-    }
-    if (!from.getLibraries().isEmpty()) {
-      dto.setLibraryIds(from.getLibraries().stream().map(Identifiable::getId).collect(Collectors.toList()));
-    }
-    if (!from.getLibraryAliquots().isEmpty()) {
-      dto.setLibraryAliquotIds(from.getLibraryAliquots().stream().map(Identifiable::getId).collect(Collectors.toList()));
-    }
+    setLong(dto::setId, from.getId(), true);
+    setString(dto::setAlias, from.getAlias());
+    setString(dto::setDescription, from.getDescription());
+    setWorksetItemIds(from.getWorksetSamples(), dto::setSampleIds);
+    setWorksetItemIds(from.getWorksetLibraries(), dto::setLibraryIds);
+    setWorksetItemIds(from.getWorksetLibraryAliquots(), dto::setLibraryAliquotIds);
     dto.setCreator(from.getCreator().getFullName());
     dto.setLastModified(formatDateTime(from.getLastModified()));
     return dto;
   }
 
+  private static void setWorksetItemIds(Collection<? extends WorksetItem<?>> worksetItems, Consumer<List<Long>> setter) {
+    if (!worksetItems.isEmpty()) {
+      setter.accept(worksetItems.stream()
+          .map(worksetItem -> worksetItem.getItem().getId())
+          .collect(Collectors.toList()));
+    }
+  }
+
   public static Workset to(@Nonnull WorksetDto from) {
     Workset workset = new Workset();
-    if (from.getId() != null) {
-      workset.setId(from.getId());
-    }
-    workset.setAlias(from.getAlias());
-    workset.setDescription(from.getDescription());
-    if (from.getSampleIds() != null && !from.getSampleIds().isEmpty()) {
-      workset.setSamples(from.getSampleIds().stream().map(id -> {
-        Sample s = new SampleImpl();
-        s.setId(id);
-        return s;
-      }).collect(Collectors.toSet()));
-    }
-    if (from.getLibraryIds() != null && !from.getLibraryIds().isEmpty()) {
-      workset.setLibraries(from.getLibraryIds().stream().map(id -> {
-        Library l = new LibraryImpl();
-        l.setId(id);
-        return l;
-      }).collect(Collectors.toSet()));
-    }
-    if (from.getLibraryAliquotIds() != null && !from.getLibraryAliquotIds().isEmpty()) {
-      workset.setLibraryAliquots(from.getLibraryAliquotIds().stream().map(id -> {
-        LibraryAliquot d = new LibraryAliquot();
-        d.setId(id);
-        return d;
-      }).collect(Collectors.toSet()));
-    }
+    setLong(workset::setId, from.getId(), false);
+    setString(workset::setAlias, from.getAlias());
+    setString(workset::setDescription, from.getDescription());
+    setWorksetItems(workset::setWorksetSamples, from.getSampleIds(), WorksetSample::new, SampleImpl::new);
+    setWorksetItems(workset::setWorksetLibraries, from.getLibraryIds(), WorksetLibrary::new, LibraryImpl::new);
+    setWorksetItems(workset::setWorksetLibraryAliquots, from.getLibraryAliquotIds(), WorksetLibraryAliquot::new, LibraryAliquot::new);
     return workset;
+  }
+
+  private static <T extends Boxable, J extends WorksetItem<T>> void setWorksetItems(Consumer<Set<J>> setter, List<Long> ids,
+      Supplier<J> worksetItemConstructor, Supplier<T> itemConstructor) {
+    if (ids != null && !ids.isEmpty()) {
+      setter.accept(ids.stream().map(id -> {
+        J worksetItem = worksetItemConstructor.get();
+        T item = itemConstructor.get();
+        item.setId(id);
+        worksetItem.setItem(item);
+        return worksetItem;
+      }).collect(Collectors.toSet()));
+    }
   }
 
   public static LibraryTemplate to(@Nonnull LibraryTemplateDto from) {

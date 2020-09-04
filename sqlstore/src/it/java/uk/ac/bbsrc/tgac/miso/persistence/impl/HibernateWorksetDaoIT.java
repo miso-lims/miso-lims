@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
@@ -11,8 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetSample;
 
 public class HibernateWorksetDaoIT extends AbstractDAOTest {
 
@@ -34,8 +36,8 @@ public class HibernateWorksetDaoIT extends AbstractDAOTest {
     assertEquals(1L, workset.getId());
     assertEquals("test", workset.getAlias());
     assertEquals("test workset", workset.getDescription());
-    assertNotNull(workset.getSamples());
-    assertEquals(3, workset.getSamples().size());
+    assertNotNull(workset.getWorksetSamples());
+    assertEquals(3, workset.getWorksetSamples().size());
   }
 
   @Test
@@ -58,30 +60,35 @@ public class HibernateWorksetDaoIT extends AbstractDAOTest {
   @Test
   public void testSaveSampleAddition() {
     Workset workset = sut.get(1L);
-    Sample addition = (Sample) sessionFactory.getCurrentSession().get(SampleImpl.class, 4L);
-    assertEquals(3, workset.getSamples().size());
-    workset.getSamples().add(addition);
+    assertEquals(3, workset.getWorksetSamples().size());
+
+    Sample sample = (Sample) sessionFactory.getCurrentSession().get(SampleImpl.class, 4L);
+    WorksetSample addition = new WorksetSample();
+    addition.setItem(sample);
+    addition.setWorkset(workset);
+    addition.setAddedTime(new Date());
+    workset.getWorksetSamples().add(addition);
     sut.save(workset);
 
     sessionFactory.getCurrentSession().flush();
     sessionFactory.getCurrentSession().clear();
 
     Workset saved = sut.get(1L);
-    assertEquals(4, saved.getSamples().size());
+    assertEquals(4, saved.getWorksetSamples().size());
   }
 
   @Test
   public void testSaveSampleRemoval() {
     Workset workset = sut.get(1L);
-    Sample removal = workset.getSamples().iterator().next();
-    workset.getSamples().remove(removal);
+    WorksetSample removal = workset.getWorksetSamples().iterator().next();
+    workset.getWorksetSamples().remove(removal);
     sut.save(workset);
 
     sessionFactory.getCurrentSession().flush();
     sessionFactory.getCurrentSession().clear();
 
     Workset saved = sut.get(1L);
-    assertEquals(2, saved.getSamples().size());
+    assertEquals(2, saved.getWorksetSamples().size());
   }
 
   @Test

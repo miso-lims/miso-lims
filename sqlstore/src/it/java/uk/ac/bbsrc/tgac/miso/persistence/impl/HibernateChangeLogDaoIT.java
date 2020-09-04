@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Date;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,6 +23,8 @@ import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
 
 public class HibernateChangeLogDaoIT extends AbstractDAOTest {
 
@@ -48,47 +51,54 @@ public class HibernateChangeLogDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testListAll() throws Exception {
-    Collection<ChangeLog> list = sut.listAll("sample");
-    assertNotNull(list);
-    assertEquals(19, list.size());
-  }
-
-  @Test
-  public void testListAllById() throws Exception {
-    Collection<ChangeLog> list = sut.listAllById("sample", 1L);
-    assertNotNull(list);
-    assertEquals(3, list.size());
-  }
-
-  @Test
   public void testDeleteAllById() throws Exception {
-    assertEquals(3, sut.listAllById("sample", 1L).size());
+    Collection<ChangeLog> list = listSampleChangelogs(1L);
+    assertEquals(3, list.size());
     sut.deleteAllById("sample", 1L);
-    Collection<ChangeLog> list = sut.listAllById("sample", 1L);
-    assertNotNull(list);
-    assertEquals(0, list.size());
+    Collection<ChangeLog> newList = listSampleChangelogs(1L);
+    ;
+    assertNotNull(newList);
+    assertEquals(0, newList.size());
+  }
+
+  private Collection<ChangeLog> listSampleChangelogs(long libraryId) {
+    @SuppressWarnings("unchecked")
+    Collection<ChangeLog> list = currentSession().createCriteria(SampleChangeLog.class)
+        .createAlias("sample", "sample")
+        .add(Restrictions.eq("sample.id", libraryId))
+        .list();
+    return list;
   }
 
   @Test
   public void testCreate() throws Exception {
-    Collection<ChangeLog> list = sut.listAllById("library", 1L);
+    long libraryId = 1L;
+    Collection<ChangeLog> list = listLibraryChangelogs(libraryId);
     assertNotNull(list);
     assertEquals(1, list.size());
 
-    Library library = libraryDao.get(1L);
+    Library library = libraryDao.get(libraryId);
     ChangeLog changeLog = library.createChangeLog("Things have changed.", "Columns that have changed.", user);
 
     sut.create(changeLog);
-    Collection<ChangeLog> newList = sut.listAllById("library", 1L);
+    Collection<ChangeLog> newList = listLibraryChangelogs(libraryId);
     assertNotNull(newList);
     assertEquals(2, newList.size());
+  }
+
+  private Collection<ChangeLog> listLibraryChangelogs(long libraryId) {
+    @SuppressWarnings("unchecked")
+    Collection<ChangeLog> list = currentSession().createCriteria(LibraryChangeLog.class)
+        .createAlias("library", "library")
+        .add(Restrictions.eq("library.id", libraryId))
+        .list();
+    return list;
   }
 
   @Test
   public void testMapping() throws Exception {
     // (7, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:01')
-    Collection<ChangeLog> list = sut.listAllById("sample", 7L);
+    Collection<ChangeLog> list = listSampleChangelogs(7L);
     assertNotNull(list);
     assertEquals(1, list.size());
     ChangeLog cl = list.iterator().next();

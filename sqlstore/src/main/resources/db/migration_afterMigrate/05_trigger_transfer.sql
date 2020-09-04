@@ -38,7 +38,7 @@ FOR EACH ROW
     NEW.transferId,
     '',
     NEW.lastModifier,
-    CONCAT('Transfer created.'),
+    'Transfer created.',
     NEW.lastModified)//
 
 DELIMITER ;

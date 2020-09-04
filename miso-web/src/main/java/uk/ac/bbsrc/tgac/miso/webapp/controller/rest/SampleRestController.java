@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -78,7 +79,9 @@ import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
@@ -114,6 +117,8 @@ public class SampleRestController extends RestController {
   private ProjectService projectService;
   @Autowired
   private PoolService poolService;
+  @Autowired
+  private WorksetService worksetService;
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
@@ -174,7 +179,14 @@ public class SampleRestController extends RestController {
   @ResponseBody
   public DataTablesResponseDto<SampleDto> getDTSamplesByWorkset(@PathVariable("id") Long id, HttpServletRequest request)
     throws IOException {
-    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.workset(id));
+    DataTablesResponseDto<SampleDto> response = jQueryBackend.get(request, advancedSearchParser, PaginationFilter.workset(id));
+    if (!response.getAaData().isEmpty()) {
+      Map<Long, Date> addedTimes = worksetService.getSampleAddedTimes(id);
+      for (SampleDto dto : response.getAaData()) {
+        dto.setWorksetAddedTime(LimsUtils.formatDateTime(addedTimes.get(dto.getId())));
+      }
+    }
+    return response;
   }
 
   @GetMapping(value = "/dt/project/{id}/arrayed", produces = { "application/json" })
