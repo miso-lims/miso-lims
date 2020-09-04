@@ -56,7 +56,6 @@ public class HibernateChangeLogDaoIT extends AbstractDAOTest {
     assertEquals(3, list.size());
     sut.deleteAllById("sample", 1L);
     Collection<ChangeLog> newList = listSampleChangelogs(1L);
-    ;
     assertNotNull(newList);
     assertEquals(0, newList.size());
   }
