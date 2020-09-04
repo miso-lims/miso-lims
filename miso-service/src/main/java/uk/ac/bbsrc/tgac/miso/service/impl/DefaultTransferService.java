@@ -459,8 +459,11 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
     transfer.getLibraryTransfers().forEach(action);
     transfer.getLibraryAliquotTransfers().forEach(action);
     transfer.getPoolTransfers().forEach(action);
+  }
 
-    transfer.setChangeDetails(authorizationManager.getCurrentUser());
+  @Override
+  protected void beforeSave(Transfer object) throws IOException {
+    object.setChangeDetails(authorizationManager.getCurrentUser());
   }
 
   @Override
