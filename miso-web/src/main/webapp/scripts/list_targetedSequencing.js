@@ -33,7 +33,7 @@ ListTarget.targetedsequencing = {
   createBulkActions: function(config) {
     if (config.kitDescriptorId) {
       return !config.isAdmin ? [] : [{
-        'name': config.add ? 'Add' : 'Remove',
+        'name': config.add ? 'Associate' : 'Dissociate',
         'action': function(tarseqs) {
           var doAction = function() {
             var data = {};
