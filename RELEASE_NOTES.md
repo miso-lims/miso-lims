@@ -2,7 +2,7 @@
 
 Changes:
 
-
+  * Make button labels clearer for associating targeted sequencings with kit descriptors
 
 # 1.13.0
 
