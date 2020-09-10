@@ -1,3 +1,9 @@
+-- default_sample_type
+ALTER TABLE SampleClass ADD COLUMN defaultSampleTypeId bigint(20);
+ALTER TABLE SampleClass ADD CONSTRAINT fk_sampleClass_defaultSampleType
+  FOREIGN KEY (defaultSampleTypeId) REFERENCES SampleType (typeId);
+
+-- workset_changelog
 CREATE TABLE WorksetChangeLog (
   worksetChangeLogId bigint(20) NOT NULL AUTO_INCREMENT,
   worksetId bigint(20) NOT NULL,
@@ -18,3 +24,4 @@ ALTER TABLE Workset_Library ADD COLUMN addedTime TIMESTAMP NULL DEFAULT NULL;
 ALTER TABLE Workset_LibraryAliquot ADD COLUMN addedTime TIMESTAMP NULL DEFAULT NULL;
 
 UPDATE Workset SET description = NULL WHERE description = '';
+
