@@ -526,7 +526,7 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
     BoxPosition bp = box.getBoxPositions().get(boxable.getBoxPosition());
     if (bp == null) return;
     if (!bp.getBoxableId().equals(new BoxableId(boxable.getEntityType(), boxable.getId()))) {
-      throw new IllegalArgumentException("Box position '" + boxable.getBoxPosition() + "' in box '" + box.getAlias() + "' is not empty");
+      throw new ValidationException(new ValidationError("boxPosition", "Position is not available"));
     }
   }
 
