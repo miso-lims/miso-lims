@@ -31,10 +31,10 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
-import uk.ac.bbsrc.tgac.miso.core.data.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryBatch;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
@@ -435,9 +435,10 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   @Override
   public void restrictPaginationByWorksetId(Criteria criteria, long worksetId, Consumer<String> errorHandler) {
     DetachedCriteria subquery = DetachedCriteria.forClass(Workset.class)
-            .createAlias("libraries", "library")
-            .add(Restrictions.eq("id", worksetId))
-            .setProjection(Projections.property("library.id"));
+        .createAlias("worksetLibraries", "worksetLibrary")
+        .createAlias("worksetLibrary.item", "library")
+        .add(Restrictions.eq("id", worksetId))
+        .setProjection(Projections.property("library.id"));
     criteria.add(Property.forName("id").in(subquery));
   }
 

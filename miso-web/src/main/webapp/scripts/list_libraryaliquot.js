@@ -177,6 +177,13 @@ ListTarget.libraryaliquot = {
       "mData": "lastModified",
       "include": true,
       "iSortPriority": 2
+    }, {
+      "sTitle": "Added",
+      "mData": "worksetAddedTime",
+      "sDefaultContent": "n/a",
+      "mRender": ListUtils.render.naIfNull,
+      "include": config.worksetId,
+      "bSortable": false
     }];
   },
   searchTermSelector: function(searchTerms) {

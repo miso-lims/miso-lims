@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Workset;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.WorksetPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.WorksetPage.Field;

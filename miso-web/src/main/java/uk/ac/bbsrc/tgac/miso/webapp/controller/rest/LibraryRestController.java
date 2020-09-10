@@ -26,8 +26,10 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -69,6 +71,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibrarySpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -117,6 +120,8 @@ public class LibraryRestController extends RestController {
   private LibraryService libraryService;
   @Autowired
   private PoolService poolService;
+  @Autowired
+  private WorksetService worksetService;
   @Autowired
   private SampleRestController sampleController;
   @Autowired
@@ -334,7 +339,14 @@ public class LibraryRestController extends RestController {
   @ResponseBody
   public DataTablesResponseDto<LibraryDto> getDTLibrariesByWorkset(@PathVariable("id") Long id, HttpServletRequest request)
     throws IOException {
-    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.workset(id));
+    DataTablesResponseDto<LibraryDto> response = jQueryBackend.get(request, advancedSearchParser, PaginationFilter.workset(id));
+    if (!response.getAaData().isEmpty()) {
+      Map<Long, Date> addedTimes = worksetService.getLibraryAddedTimes(id);
+      for (LibraryDto dto : response.getAaData()) {
+        dto.setWorksetAddedTime(LimsUtils.formatDateTime(addedTimes.get(dto.getId())));
+      }
+    }
+    return response;
   }
 
 }

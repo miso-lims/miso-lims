@@ -2,7 +2,9 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -44,7 +46,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibraryAliquotSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolableElementViewService;
+import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
@@ -85,6 +89,8 @@ public class LibraryAliquotRestController extends RestController {
   private PoolableElementViewService poolableElementViewService;
   @Autowired
   private PoolService poolService;
+  @Autowired
+  private WorksetService worksetService;
   @Autowired
   private IndexChecker indexChecker;
   @Autowired
@@ -279,6 +285,13 @@ public class LibraryAliquotRestController extends RestController {
   @ResponseBody
   public DataTablesResponseDto<LibraryAliquotDto> getDTLibraryAliquotsByWorkset(@PathVariable("id") Long id, HttpServletRequest request)
           throws IOException {
-    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.workset(id));
+    DataTablesResponseDto<LibraryAliquotDto> response = jQueryBackend.get(request, advancedSearchParser, PaginationFilter.workset(id));
+    if (!response.getAaData().isEmpty()) {
+      Map<Long, Date> addedTimes = worksetService.getLibraryAliquotAddedTimes(id);
+      for (LibraryAliquotDto dto : response.getAaData()) {
+        dto.setWorksetAddedTime(LimsUtils.formatDateTime(addedTimes.get(dto.getId())));
+      }
+    }
+    return response;
   }
 }

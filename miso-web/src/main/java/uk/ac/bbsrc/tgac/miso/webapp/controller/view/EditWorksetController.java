@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
 import java.io.IOException;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.NotFoundException;
@@ -13,7 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Workset;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 
@@ -26,10 +25,8 @@ public class EditWorksetController {
   private static final String MODEL_ATTR_TITLE = "title";
   private static final String MODEL_ATTR_PAGEMODE = "pageMode";
   private static final String MODEL_ATTR_ID = "worksetId";
+  private static final String MODEL_ATTR_WORKSET = "workset";
   private static final String MODEL_ATTR_JSON = "worksetJson";
-  private static final String MODEL_ATTR_SAMPLES = "samples";
-  private static final String MODEL_ATTR_LIBRARIES = "libraries";
-  private static final String MODEL_ATTR_LIBRARY_ALIQUOTS = "libraryAliquots";
 
   @Autowired
   private WorksetService worksetService;
@@ -50,12 +47,9 @@ public class EditWorksetController {
       throw new NotFoundException("Workset not found");
     }
     model.addAttribute(MODEL_ATTR_ID, worksetId);
+    model.addAttribute(MODEL_ATTR_WORKSET, workset);
     ObjectMapper mapper = new ObjectMapper();
     model.addAttribute(MODEL_ATTR_JSON, mapper.writer().writeValueAsString(Dtos.asDto(workset)));
-    model.addAttribute(MODEL_ATTR_SAMPLES, workset.getSamples().stream().map(s -> Dtos.asDto(s, false)).collect(Collectors.toList()));
-    model.addAttribute(MODEL_ATTR_LIBRARIES, workset.getLibraries().stream().map(l -> Dtos.asDto(l, false)).collect(Collectors.toList()));
-    model.addAttribute(MODEL_ATTR_LIBRARY_ALIQUOTS,
-        workset.getLibraryAliquots().stream().map(d -> Dtos.asDto(d, false)).collect(Collectors.toList()));
     return new ModelAndView(JSP, model);
   }
 

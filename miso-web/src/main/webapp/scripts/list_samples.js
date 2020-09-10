@@ -34,7 +34,7 @@ ListTarget.sample = {
         return Urls.rest.samples.projectDatatable(projectId);
       }
     } else if (config.worksetId) {
-        return Urls.rest.samples.worksetDatatable(config.worksetId);
+      return Urls.rest.samples.worksetDatatable(config.worksetId);
     }
     return Urls.rest.samples.datatable;
   },
@@ -175,6 +175,13 @@ ListTarget.sample = {
       "mData": "lastModified",
       "include": Constants.isDetailedSample,
       "iSortPriority": 2
+    }, {
+      "sTitle": "Added",
+      "mData": "worksetAddedTime",
+      "sDefaultContent": "n/a",
+      "mRender": ListUtils.render.naIfNull,
+      "include": config.worksetId,
+      "bSortable": false
     }];
   },
   searchTermSelector: function(searchTerms) {

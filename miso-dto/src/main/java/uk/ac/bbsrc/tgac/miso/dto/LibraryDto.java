@@ -82,6 +82,7 @@ public class LibraryDto extends AbstractBoxableDto implements ReceivableDto<Libr
   private Long thermalCyclerId;
   private Long sopId;
   private String batchId;
+  private String worksetAddedTime;
 
   public String getAlias() {
     return alias;
@@ -546,6 +547,14 @@ public class LibraryDto extends AbstractBoxableDto implements ReceivableDto<Libr
 
   public void setBatchId(String batchId) {
     this.batchId = batchId;
+  }
+
+  public String getWorksetAddedTime() {
+    return worksetAddedTime;
+  }
+
+  public void setWorksetAddedTime(String worksetAddedTime) {
+    this.worksetAddedTime = worksetAddedTime;
   }
 
 }

@@ -83,6 +83,7 @@ public class SampleDto extends AbstractBoxableDto implements ReceivableDto<Sampl
   private Long sequencingControlTypeId;
   private int libraryCount = 0;
   private Long sopId;
+  private String worksetAddedTime;
 
   public Long getId() {
     return id;
@@ -405,6 +406,14 @@ public class SampleDto extends AbstractBoxableDto implements ReceivableDto<Sampl
 
   public void setSopId(Long sopId) {
     this.sopId = sopId;
+  }
+
+  public String getWorksetAddedTime() {
+    return worksetAddedTime;
+  }
+
+  public void setWorksetAddedTime(String worksetAddedTime) {
+    this.worksetAddedTime = worksetAddedTime;
   }
 
 }
