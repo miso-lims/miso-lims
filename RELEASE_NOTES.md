@@ -5,6 +5,7 @@ Changes:
   * Added a 'default sample type' field to sample classes. This will now be used when receiving or
     propagating samples. Default sample type will no longer be inherited from the parent sample when
     propagating (detailed sample)
+  * Fixed Identity Search tool javascript error
   * Added workset changelogs
   * Added a field to record when each item was added to a workset. This is displayed in the list on
     the Edit Workset page
