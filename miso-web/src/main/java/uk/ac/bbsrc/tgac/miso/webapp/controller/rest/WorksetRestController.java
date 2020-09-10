@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
+import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,9 +26,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
-import uk.ac.bbsrc.tgac.miso.core.data.Workset;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListWorksetView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetItem;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetLibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetSample;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
@@ -38,7 +46,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.TriConsumer;
-import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ListWorksetViewDto;
@@ -109,8 +116,8 @@ public class WorksetRestController extends RestController {
   public void addSamples(@PathVariable(value = "worksetId", required = true) long worksetId, @RequestBody List<Long> sampleIds)
       throws IOException {
     Workset workset = getWorkset(worksetId);
-    addByIds("Sample", workset.getSamples(), sampleIds, WhineyFunction.rethrow(sampleService::get));
-    worksetService.update(workset);
+    List<Sample> items = loadItems("Sample", sampleIds, sampleService);
+    worksetService.addSamples(workset, items);
   }
 
   @PostMapping(value = "/{worksetId}/libraries")
@@ -118,8 +125,8 @@ public class WorksetRestController extends RestController {
   public void addLibraries(@PathVariable(value = "worksetId", required = true) long worksetId, @RequestBody List<Long> libraryIds)
       throws IOException {
     Workset workset = getWorkset(worksetId);
-    addByIds("Library", workset.getLibraries(), libraryIds, WhineyFunction.rethrow(libraryService::get));
-    worksetService.update(workset);
+    List<Library> items = loadItems("Library", libraryIds, libraryService);
+    worksetService.addLibraries(workset, items);
   }
 
   @PostMapping(value = "/{worksetId}/libraryaliquots")
@@ -127,8 +134,8 @@ public class WorksetRestController extends RestController {
   public void addLibraryAliquots(@PathVariable(value = "worksetId", required = true) long worksetId, @RequestBody List<Long> aliquotIds)
       throws IOException {
     Workset workset = getWorkset(worksetId);
-    addByIds("Library aliquot", workset.getLibraryAliquots(), aliquotIds, WhineyFunction.rethrow(libraryAliquotService::get));
-    worksetService.update(workset);
+    List<LibraryAliquot> items = loadItems("Library aliquot", aliquotIds, libraryAliquotService);
+    worksetService.addLibraryAliquots(workset, items);
   }
 
   @DeleteMapping("/{worksetId}/samples")
@@ -136,8 +143,8 @@ public class WorksetRestController extends RestController {
   public void removeSamples(@PathVariable(value = "worksetId", required = true) long worksetId, @RequestBody List<Long> sampleIds)
       throws IOException {
     Workset workset = getWorkset(worksetId);
-    removeByIds("Sample", workset.getSamples(), sampleIds);
-    worksetService.update(workset);
+    List<Sample> items = loadItems("Sample", sampleIds, sampleService);
+    worksetService.removeSamples(workset, items);
   }
 
   @DeleteMapping("/{worksetId}/libraries")
@@ -145,8 +152,8 @@ public class WorksetRestController extends RestController {
   public void removeLibraries(@PathVariable(value = "worksetId", required = true) long worksetId, @RequestBody List<Long> libraryIds)
       throws IOException {
     Workset workset = getWorkset(worksetId);
-    removeByIds("Library", workset.getLibraries(), libraryIds);
-    worksetService.update(workset);
+    List<Library> items = loadItems("Library", libraryIds, libraryService);
+    worksetService.removeLibraries(workset, items);
   }
 
   @DeleteMapping("/{worksetId}/libraryaliquots")
@@ -154,8 +161,8 @@ public class WorksetRestController extends RestController {
   public void removeLibraryAliquots(@PathVariable(value = "worksetId", required = true) long worksetId, @RequestBody List<Long> aliquotIds)
       throws IOException {
     Workset workset = getWorkset(worksetId);
-    removeByIds("Library aliquot", workset.getLibraryAliquots(), aliquotIds);
-    worksetService.update(workset);
+    List<LibraryAliquot> items = loadItems("Library aliquot", aliquotIds, libraryAliquotService);
+    worksetService.removeLibraryAliquots(workset, items);
   }
 
   private Workset getWorkset(long id) throws IOException {
@@ -166,22 +173,17 @@ public class WorksetRestController extends RestController {
     return workset;
   }
 
-  private <T extends Identifiable> void addByIds(String typeName, Collection<T> collection, List<Long> ids, Function<Long, T> getter) {
+  private <T extends Boxable, J extends WorksetItem<T>> List<T> loadItems(String typeName, List<Long> ids, ProviderService<T> service)
+      throws IOException {
+    List<T> items = new ArrayList<>();
     for (Long id : ids) {
-      T item = getter.apply(id);
+      T item = service.get(id);
       if (item == null) {
         throw new RestException(String.format("%s %d not found", typeName, id), Status.BAD_REQUEST);
       }
-      collection.add(item);
+      items.add(item);
     }
-  }
-
-  private <T extends Identifiable> void removeByIds(String typeName, Collection<T> collection, Collection<Long> ids) {
-    for (Long id : ids) {
-      if (!collection.removeIf(item -> item.getId() == id.longValue())) {
-        throw new RestException(String.format("%s %d not found in workset", typeName, id), Status.BAD_REQUEST);
-      }
-    }
+    return items;
   }
 
   @PostMapping(value = "/bulk-delete")
@@ -237,12 +239,21 @@ public class WorksetRestController extends RestController {
       if (child == null) {
         throw new RestException("No workset found with ID: " + id, Status.BAD_REQUEST);
       }
-      workset.getSamples().addAll(child.getSamples());
-      workset.getLibraries().addAll(child.getLibraries());
-      workset.getLibraryAliquots().addAll(child.getLibraryAliquots());
+      copyWorksetItems(child.getWorksetSamples(), workset.getWorksetSamples(), WorksetSample::new);
+      copyWorksetItems(child.getWorksetLibraries(), workset.getWorksetLibraries(), WorksetLibrary::new);
+      copyWorksetItems(child.getWorksetLibraryAliquots(), workset.getWorksetLibraryAliquots(), WorksetLibraryAliquot::new);
     }
     worksetService.create(workset);
     return Dtos.asDto(workset);
+  }
+
+  private static <T extends Boxable, J extends WorksetItem<T>> void copyWorksetItems(Set<J> source, Set<J> destination,
+      Supplier<J> constructor) {
+    destination.addAll(source.stream().map(sourceItem -> {
+      J worksetItem = constructor.get();
+      worksetItem.setItem(sourceItem.getItem());
+      return worksetItem;
+    }).collect(Collectors.toList()));
   }
 
   public static class MoveItemsDto {
@@ -283,7 +294,7 @@ public class WorksetRestController extends RestController {
     moveItems(worksetId, dto, "Library aliquot", libraryAliquotService, worksetService::moveLibraryAliquots);
   }
 
-  private <T extends Identifiable> void moveItems(long sourceWorksetId, MoveItemsDto dto, String itemTypeName, ProviderService<T> service,
+  private <T extends Boxable> void moveItems(long sourceWorksetId, MoveItemsDto dto, String itemTypeName, ProviderService<T> service,
       TriConsumer<Workset, Workset, Collection<T>> moveFunction) throws IOException {
     Workset sourceWorkset = worksetService.get(sourceWorksetId);
     if (sourceWorkset == null) {
@@ -298,14 +309,7 @@ public class WorksetRestController extends RestController {
     if (targetWorkset == null) {
       throw new ClientErrorException(String.format("Target workset %d not found", dto.getTargetWorksetId()));
     }
-    List<T> items = new ArrayList<>();
-    for (Long id : dto.getItemIds()) {
-      T item = service.get(id);
-      if (item == null) {
-        throw new ClientErrorException(String.format("%s %d not found", itemTypeName, id));
-      }
-      items.add(item);
-    }
+    List<T> items = loadItems(itemTypeName, dto.getItemIds(), service);
     moveFunction.accept(sourceWorkset, targetWorkset, items);
   }
 

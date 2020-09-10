@@ -116,6 +116,7 @@ DELETE FROM Transfer_Sample;
 DELETE FROM User;
 DELETE FROM User_Group;
 DELETE FROM Workset;
+DELETE FROM WorksetChangeLog;
 DELETE FROM Workset_Library;
 DELETE FROM Workset_LibraryAliquot;
 DELETE FROM Workset_Sample;

@@ -2,11 +2,8 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -24,7 +21,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
-import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -55,7 +51,6 @@ public class HibernateKitDaoIT extends AbstractDAOTest {
     MockitoAnnotations.initMocks(this);
     dao.setSessionFactory(sessionFactory);
     user.setId(1L);
-    when(changeLogDAO.listAllById(anyString(), anyLong())).thenReturn(new ArrayList<ChangeLog>());
   }
 
   @Test

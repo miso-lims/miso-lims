@@ -2,15 +2,11 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static com.google.common.base.Preconditions.*;
 
-import java.io.IOException;
 import java.util.Date;
-import java.util.List;
 
-import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,26 +37,6 @@ public class HibernateChangeLogDao implements ChangeLogStore {
 
   private Session currentSession() {
     return sessionFactory.getCurrentSession();
-  }
-
-  @Override
-  public List<ChangeLog> listAll(String type) {
-    ChangeLogType changeLogType = ChangeLogType.get(type);
-    Criteria criteria = currentSession().createCriteria(changeLogType.getClazz());
-    @SuppressWarnings("unchecked")
-    List<ChangeLog> results = criteria.list();
-    return results;
-  }
-
-  @Override
-  public List<ChangeLog> listAllById(String type, long id) throws IOException {
-    ChangeLogType changeLogType = ChangeLogType.get(type);
-    Criteria criteria = currentSession().createCriteria(changeLogType.getClazz());
-    criteria.createAlias(changeLogType.getChangeLogEntityReferenceName(), "entityReference");
-    criteria.add(Restrictions.eq("entityReference.id", id));
-    @SuppressWarnings("unchecked")
-    List<ChangeLog> results = criteria.list();
-    return results;
   }
 
   @Override

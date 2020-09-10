@@ -1,17 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.core.service;
 
 import java.io.IOException;
-import java.util.Collection;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 
 public interface ChangeLogService {
-
-  public Collection<ChangeLog> listAll(String type) throws IOException;
-
-  public Collection<ChangeLog> listAllById(String type, long id) throws IOException;
-
-  public void deleteAllById(String type, long id) throws IOException;
 
   /**
    * Create a change log from a provided ChangeLog object.

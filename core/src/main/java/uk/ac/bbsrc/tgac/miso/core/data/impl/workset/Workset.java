@@ -1,31 +1,35 @@
-package uk.ac.bbsrc.tgac.miso.core.data;
+package uk.ac.bbsrc.tgac.miso.core.data.impl.workset;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLoggable;
+import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.WorksetChangeLog;
 
 @Entity
-public class Workset implements Serializable, Aliasable, Timestamped, Deletable {
+public class Workset implements Serializable, Aliasable, ChangeLoggable, Deletable {
 
   private static final long serialVersionUID = 1L;
 
@@ -40,20 +44,14 @@ public class Workset implements Serializable, Aliasable, Timestamped, Deletable 
 
   private String description;
 
-  @ManyToMany(targetEntity = SampleImpl.class)
-  @JoinTable(name = "Workset_Sample", joinColumns = { @JoinColumn(name = "worksetId") }, inverseJoinColumns = {
-      @JoinColumn(name = "sampleId") })
-  private Set<Sample> samples;
+  @OneToMany(mappedBy = "workset", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<WorksetSample> worksetSamples;
 
-  @ManyToMany(targetEntity = LibraryImpl.class)
-  @JoinTable(name = "Workset_Library", joinColumns = { @JoinColumn(name = "worksetId") }, inverseJoinColumns = {
-      @JoinColumn(name = "libraryId") })
-  private Set<Library> libraries;
+  @OneToMany(mappedBy = "workset", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<WorksetLibrary> worksetLibraries;
 
-  @ManyToMany(targetEntity = LibraryAliquot.class)
-  @JoinTable(name = "Workset_LibraryAliquot", joinColumns = { @JoinColumn(name = "worksetId") }, inverseJoinColumns = {
-      @JoinColumn(name = "aliquotId") })
-  private Set<LibraryAliquot> libraryAliquots;
+  @OneToMany(mappedBy = "workset", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<WorksetLibraryAliquot> worksetLibraryAliquots;
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "creator", nullable = false, updatable = false)
@@ -70,6 +68,9 @@ public class Workset implements Serializable, Aliasable, Timestamped, Deletable 
   @Column(nullable = false)
   @Temporal(TemporalType.TIMESTAMP)
   private Date lastModified;
+
+  @OneToMany(targetEntity = WorksetChangeLog.class, mappedBy = "workset", cascade = CascadeType.REMOVE)
+  private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @Override
   public long getId() {
@@ -98,37 +99,37 @@ public class Workset implements Serializable, Aliasable, Timestamped, Deletable 
     this.description = description;
   }
 
-  public Set<Sample> getSamples() {
-    if (samples == null) {
-      samples = new HashSet<>();
+  public Set<WorksetSample> getWorksetSamples() {
+    if (worksetSamples == null) {
+      worksetSamples = new HashSet<>();
     }
-    return samples;
+    return worksetSamples;
   }
 
-  public void setSamples(Set<Sample> samples) {
-    this.samples = samples;
+  public void setWorksetSamples(Set<WorksetSample> worksetSamples) {
+    this.worksetSamples = worksetSamples;
   }
 
-  public Set<Library> getLibraries() {
-    if (libraries == null) {
-      libraries = new HashSet<>();
+  public Set<WorksetLibrary> getWorksetLibraries() {
+    if (worksetLibraries == null) {
+      worksetLibraries = new HashSet<>();
     }
-    return libraries;
+    return worksetLibraries;
   }
 
-  public void setLibraries(Set<Library> libraries) {
-    this.libraries = libraries;
+  public void setWorksetLibraries(Set<WorksetLibrary> worksetLibraries) {
+    this.worksetLibraries = worksetLibraries;
   }
 
-  public Set<LibraryAliquot> getLibraryAliquots() {
-    if (libraryAliquots == null) {
-      libraryAliquots = new HashSet<>();
+  public Set<WorksetLibraryAliquot> getWorksetLibraryAliquots() {
+    if (worksetLibraryAliquots == null) {
+      worksetLibraryAliquots = new HashSet<>();
     }
-    return libraryAliquots;
+    return worksetLibraryAliquots;
   }
 
-  public void setLibraryAliquots(Set<LibraryAliquot> aliquots) {
-    this.libraryAliquots = aliquots;
+  public void setWorksetLibraryAliquots(Set<WorksetLibraryAliquot> worksetLibraryAliquots) {
+    this.worksetLibraryAliquots = worksetLibraryAliquots;
   }
 
   @Override
@@ -184,6 +185,22 @@ public class Workset implements Serializable, Aliasable, Timestamped, Deletable 
   @Override
   public String getDeleteDescription() {
     return getAlias();
+  }
+
+  @Override
+  public Collection<ChangeLog> getChangeLog() {
+    return changeLog;
+  }
+
+  @Override
+  public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
+    WorksetChangeLog change = new WorksetChangeLog();
+    change.setWorkset(this);
+    change.setSummary(summary);
+    change.setColumnsChanged(columnsChanged);
+    change.setUser(user);
+    change.setTime(new Date());
+    return change;
   }
 
 }

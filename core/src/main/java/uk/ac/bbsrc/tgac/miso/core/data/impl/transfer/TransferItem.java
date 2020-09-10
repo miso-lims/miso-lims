@@ -47,10 +47,6 @@ public abstract class TransferItem<T extends Boxable> implements Serializable {
     this.qcNote = qcNote;
   }
 
-  public static long getSerialversionuid() {
-    return serialVersionUID;
-  }
-
   public abstract T getItem();
 
   public abstract void setItem(T item);
