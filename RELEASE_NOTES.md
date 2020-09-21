@@ -3,6 +3,7 @@
 Changes:
 
   * Make button labels clearer for associating targeted sequencings with kit descriptors
+  * Prevent entry of tabs and line breaks in most fields
 
 # 1.13.0
 

@@ -1057,7 +1057,7 @@ Utils.ui = {
 Utils.validation = {
   dateRegex: '^(19|20)[0-9]{2}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$',
   dateTimeRegex: '^(19|20)[0-9]{2}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]) ([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$',
-  sanitizeRegex: '^[^<>&]*$',
+  sanitizeRegex: '^[^<>&\\t\\n\\r]*$',
   uriComponentRegex: '[^<>&%;\/\\\\]*$', // problem characters even when encoded in URI components: %;\/
   alphanumRegex: '^[-_\\w]*$',
   unicodeWordRegex: '^[\\p{L}0-9_\\^\\-\\.\\s]+$',
