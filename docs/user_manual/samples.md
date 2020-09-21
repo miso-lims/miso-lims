@@ -203,3 +203,20 @@ click the "Delete" button in the toolbar at the top of the table. A sample can o
 A sample's children may include libraries or, if your site uses detailed sample mode, other samples. Any children must
 be deleted before the sample can be deleted. A sample can only be deleted by its creator or a MISO administrator.
 
+
+
+## Consent
+
+Note: This item only applies if your site uses [detailed sample mode](../site_configuration/#detailed-sample-mode).
+
+Identity samples have a consent field that has the following options.
+
+* This Project: Consent has been granted to use this identity's samples only within the project that the identity
+  belongs to. This is the default option.
+* All Projects: Consent has been granted to use this identity's samples for any projects.
+* Revoked: Consent to use this identity's samples has been revoked.
+
+If consent has been revoked, a warning icon and/or message will appear on any page where the sample is displayed. The
+warning will also be shown for related items including child samples, libraries, library aliquots, pools, and sequencing
+container partitions. An additional warning dialog will be shown when trying to propagate from any of the affected
+items.
