@@ -45,7 +45,7 @@ BEGIN
 END//
 
 DROP FUNCTION IF EXISTS makeChangeMessage//
-CREATE FUNCTION makeChangeMessage(fieldName varchar(255), beforeVal varchar(255), afterVal varchar(255)) RETURNS varchar(255)
+CREATE FUNCTION makeChangeMessage(fieldName varchar(255), beforeVal varchar(255), afterVal varchar(255)) RETURNS longtext
 BEGIN
   IF isChanged(beforeVal, afterVal) THEN
     RETURN CONCAT(fieldName, ': ', COALESCE(beforeVal, 'n/a'), ' → ', COALESCE(afterVal, 'n/a'));
