@@ -4,6 +4,7 @@ Changes:
 
   * Make button labels clearer for associating targeted sequencings with kit descriptors
   * Prevent entry of tabs and line breaks in most fields
+  * Fix search (by alias) on Library Templates list page
 
 # 1.13.0
 

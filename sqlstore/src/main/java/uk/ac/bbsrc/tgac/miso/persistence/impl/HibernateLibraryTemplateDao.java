@@ -25,7 +25,7 @@ public class HibernateLibraryTemplateDao implements LibraryTemplateStore, Hibern
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateLibraryTemplateDao.class);
 
-  private static final String[] SEARCH_PROPERTIES = new String[] {};
+  private static final String[] SEARCH_PROPERTIES = new String[] { "alias" };
 
 
   @Autowired
