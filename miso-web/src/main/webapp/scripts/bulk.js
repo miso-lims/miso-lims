@@ -632,6 +632,40 @@ BulkUtils = (function($) {
         };
       },
 
+      detailedQcStatus: function() {
+        return [{
+          title: 'QC Status',
+          type: 'dropdown',
+          data: 'detailedQcStatusId',
+          required: true,
+          source: [{
+            id: null,
+            description: 'Not Ready'
+          }].concat(Constants.detailedQcStatuses),
+          sortSource: Utils.sorting.detailedQcStatusSort,
+          getItemLabel: Utils.array.get('description'),
+          getItemValue: Utils.array.getId,
+          initial: '', // user must explicitly choose if not ready (null)
+          onChange: function(rowIndex, newValue, api) {
+            var status = Constants.detailedQcStatuses.find(function(item) {
+              return item.description === newValue;
+            });
+            var changes = {
+              required: status && status.noteRequired,
+              disabled: !status || !status.noteRequired
+            };
+            if (!status || !status.noteRequired) {
+              changes.value = null;
+            }
+            api.updateField(rowIndex, 'detailedQcStatusNote', changes);
+          }
+        }, {
+          title: 'QC Note',
+          type: 'text',
+          data: 'detailedQcStatusNote'
+        }];
+      },
+
       librarySize: {
         title: 'Size (bp)',
         type: 'int',

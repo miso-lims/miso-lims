@@ -121,13 +121,7 @@ ListTarget.libraryaliquot = {
       "include": Constants.isDetailedSample,
       "mRender": ListUtils.render.naIfNull,
       "iSortPriority": 0
-    }, {
-      "sTitle": "QC",
-      "mData": "qcPassed",
-      "include": true,
-      "iSortPriority": 0,
-      "mRender": ListUtils.render.booleanChecks
-    }, {
+    }, ListUtils.columns.detailedQcStatus, {
       "sTitle": "Design",
       "mData": "libraryDesignCodeId",
       "include": Constants.isDetailedSample,

@@ -1324,6 +1324,20 @@ Utils.sorting = {
   sampleClassComparator: function(a, b) {
     return (Constants.sampleCategories.indexOf(a.sampleCategory) - Constants.sampleCategories.indexOf(b.sampleCategory))
         || a.alias.localeCompare(b.alias);
+  },
+
+  detailedQcStatusSort: function(a, b) {
+    var statusToInt = function(status) {
+      if (status.description === 'Not Ready') {
+        return 0;
+      } else if (status.status === true) {
+        return 1;
+      } else if (status.status === false) {
+        return 2;
+      }
+      return 3;
+    }
+    return statusToInt(a) - statusToInt(b);
   }
 };
 

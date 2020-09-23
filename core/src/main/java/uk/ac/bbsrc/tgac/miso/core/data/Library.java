@@ -36,6 +36,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.DetailedQcItem;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QualityControllable;
 import uk.ac.bbsrc.tgac.miso.core.data.type.DilutionFactor;
@@ -53,8 +54,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface Library extends Attachable, Comparable<Library>, Deletable, HierarchyEntity, Locatable, QualityControllable<LibraryQC>,
-    Serializable {
+public interface Library extends Attachable, Comparable<Library>, Deletable, DetailedQcItem, HierarchyEntity, Locatable,
+    QualityControllable<LibraryQC>, Serializable {
 
   /** Field UNSAVED_ID */
   public static final long UNSAVED_ID = 0L;
@@ -239,22 +240,6 @@ public interface Library extends Attachable, Comparable<Library>, Deletable, Hie
   public BigDecimal getConcentration();
 
   public void setConcentration(BigDecimal concentration);
-
-  /**
-   * Returns the qcPassed of this Library object.
-   * 
-   * @return Boolean qcPassed.
-   */
-  public Boolean getQcPassed();
-
-  /**
-   * Sets the qcPassed attribute of this Library object. This should be true when a suitable QC has been carried out that passes a given
-   * result.
-   * 
-   * @param qcPassed
-   *          qcPassed.
-   */
-  public void setQcPassed(Boolean qcPassed);
 
   @Override
   public Collection<ChangeLog> getChangeLog();

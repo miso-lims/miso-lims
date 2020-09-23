@@ -78,7 +78,7 @@ ListTarget.poolelement = {
           mData: 'name',
           include: true,
           iSortPriority: 1,
-          iDataSort: 0, // Use ID for sorting
+          iDataSort: 1, // Use ID for sorting
           mRender: Warning.tableWarningRenderer(WarningTarget.poolelement.makeTarget(config.duplicateIndicesSequences,
               config.nearDuplicateIndicesSequences), function(aliquot) {
             return Urls.ui.libraryAliquots.edit(aliquot.id);
@@ -161,13 +161,6 @@ ListTarget.poolelement = {
           include: true,
           iSortPriority: 0,
           sClass: 'noPrint'
-        }, {
-          sTitle: "QC Passed",
-          mData: "libraryQcPassed",
-          include: true,
-          iSortPriority: 0,
-          mRender: ListUtils.render.booleanChecks,
-          bSortable: false
-        }];
+        }, ListUtils.columns.detailedQcStatus];
   }
 };

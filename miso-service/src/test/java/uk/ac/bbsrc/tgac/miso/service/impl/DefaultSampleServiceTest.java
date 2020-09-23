@@ -24,6 +24,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
 
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
@@ -35,6 +36,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.ScientificName;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
@@ -46,6 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
+import uk.ac.bbsrc.tgac.miso.core.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
@@ -56,7 +59,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.persistence.DetailedQcStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleGroupDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
@@ -91,8 +93,6 @@ public class DefaultSampleServiceTest {
   @Mock
   private TissueTypeDao tissueTypeDao;
   @Mock
-  private DetailedQcStatusDao detailedQcStatusDao;
-  @Mock
   private SubprojectService subProjectService;
   @Mock
   private SecurityStore securityStore;
@@ -110,6 +110,8 @@ public class DefaultSampleServiceTest {
   private BoxService boxService;
   @Mock
   private ScientificNameService scientificNameService;
+  @Mock
+  private DetailedQcStatusService detailedQcStatusService;
 
   @InjectMocks
   private DefaultSampleService sut;
@@ -402,7 +404,7 @@ public class DefaultSampleServiceTest {
     updated.setAlias("newAlias");
     updated.setDescription("newDesc");
     updated.setSampleType("newType");
-    updated.setQcPassed(true);
+    updated.setDetailedQcStatus(mockDetailedQcStatus(5L, "Ready"));
     updated.setScientificName(mockScientificName(2L, "newSciName"));
     updated.setTaxonIdentifier("newTaxonId");
     updated.setVolume(new BigDecimal("5.5"));
@@ -420,7 +422,7 @@ public class DefaultSampleServiceTest {
     assertEquals("Sample sampleType should be modifiable", updated.getSampleType(), result.getSampleType());
     assertEquals("Sample description should be modifiable", updated.getDescription(), result.getDescription());
     assertEquals("Sample sampleType should be modifiable", updated.getSampleType(), result.getSampleType());
-    assertEquals("Sample qcPassed should be modifiable", updated.getQcPassed(), result.getQcPassed());
+    assertEquals("Sample detailedQcStatus should be modifiable", updated.getDetailedQcStatus(), result.getDetailedQcStatus());
     assertEquals("Sample scientificName should be modifiable", updated.getScientificName(), result.getScientificName());
     assertEquals("Sample taxonIdentifier should be modifiable", updated.getTaxonIdentifier(), result.getTaxonIdentifier());
     assertEquals("Sample volume should be modifiable", updated.getVolume(), result.getVolume());
@@ -658,6 +660,14 @@ public class DefaultSampleServiceTest {
     sn.setAlias(alias);
     Mockito.when(scientificNameService.get(id)).thenReturn(sn);
     return sn;
+  }
+
+  private DetailedQcStatus mockDetailedQcStatus(long id, String description) throws IOException {
+    DetailedQcStatus status = new DetailedQcStatusImpl();
+    status.setId(id);
+    status.setDescription(description);
+    Mockito.when(detailedQcStatusService.get(id)).thenReturn(status);
+    return status;
   }
 
   @Test

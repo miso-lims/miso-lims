@@ -71,6 +71,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -122,7 +123,10 @@ public class LibraryImpl extends AbstractBoxable implements Library {
   @Column(name = "platformType", nullable = false)
   private PlatformType platformType;
 
-  private Boolean qcPassed;
+  @ManyToOne(targetEntity = DetailedQcStatusImpl.class)
+  @JoinColumn(name = "detailedQcStatusId")
+  private DetailedQcStatus detailedQcStatus;
+  private String detailedQcStatusNote;
 
   @Column(nullable = false)
   private boolean lowQuality = false;
@@ -458,13 +462,23 @@ public class LibraryImpl extends AbstractBoxable implements Library {
   }
 
   @Override
-  public Boolean getQcPassed() {
-    return qcPassed;
+  public DetailedQcStatus getDetailedQcStatus() {
+    return detailedQcStatus;
   }
 
   @Override
-  public void setQcPassed(Boolean qcPassed) {
-    this.qcPassed = qcPassed;
+  public void setDetailedQcStatus(DetailedQcStatus detailedQcStatus) {
+    this.detailedQcStatus = detailedQcStatus;
+  }
+
+  @Override
+  public String getDetailedQcStatusNote() {
+    return detailedQcStatusNote;
+  }
+
+  @Override
+  public void setDetailedQcStatusNote(String detailedQcStatusNote) {
+    this.detailedQcStatusNote = detailedQcStatusNote;
   }
 
   @Override
@@ -620,7 +634,8 @@ public class LibraryImpl extends AbstractBoxable implements Library {
         .append(lowQuality)
         .append(paired)
         .append(platformType)
-        .append(qcPassed)
+        .append(detailedQcStatus)
+        .append(detailedQcStatusNote)
         .append(kitDescriptor)
         .append(kitLot)
         .append(sop)
@@ -649,7 +664,8 @@ public class LibraryImpl extends AbstractBoxable implements Library {
         .append(lowQuality, other.lowQuality)
         .append(paired, other.paired)
         .append(platformType, other.platformType)
-        .append(qcPassed, other.qcPassed)
+        .append(detailedQcStatus, other.detailedQcStatus)
+        .append(detailedQcStatusNote, other.detailedQcStatusNote)
         .append(kitDescriptor, other.kitDescriptor)
         .append(kitLot, other.kitLot)
         .append(sop, other.sop)

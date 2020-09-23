@@ -70,6 +70,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.BarcodableVisitor;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.ScientificName;
@@ -125,7 +126,6 @@ public class SampleImpl extends AbstractBoxable implements Sample {
 
   private String taxonIdentifier;
   private String sampleType;
-  private Boolean qcPassed;
   private String identificationBarcode;
   private String locationBarcode;
   private BigDecimal initialVolume;
@@ -135,6 +135,11 @@ public class SampleImpl extends AbstractBoxable implements Sample {
   @Enumerated(EnumType.STRING)
   private ConcentrationUnit concentrationUnits;
   private String requisitionId;
+
+  @ManyToOne(targetEntity = DetailedQcStatusImpl.class)
+  @JoinColumn(name = "detailedQcStatusId")
+  private DetailedQcStatus detailedQcStatus;
+  private String detailedQcStatusNote;
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "creator", nullable = false, updatable = false)
@@ -367,18 +372,8 @@ public class SampleImpl extends AbstractBoxable implements Sample {
   }
 
   @Override
-  public Boolean getQcPassed() {
-    return qcPassed;
-  }
-
-  @Override
   public void setSampleType(String sampleType) {
     this.sampleType = nullifyStringIfBlank(sampleType);
-  }
-
-  @Override
-  public void setQcPassed(Boolean qcPassed) {
-    this.qcPassed = qcPassed;
   }
 
   @Override
@@ -447,7 +442,8 @@ public class SampleImpl extends AbstractBoxable implements Sample {
         .append(identificationBarcode)
         .append(locationBarcode)
         .append(project)
-        .append(qcPassed)
+        .append(detailedQcStatus)
+        .append(detailedQcStatusNote)
         .append(sampleType)
         .append(scientificName)
         .append(taxonIdentifier)
@@ -471,7 +467,8 @@ public class SampleImpl extends AbstractBoxable implements Sample {
         .append(identificationBarcode, other.identificationBarcode)
         .append(locationBarcode, other.locationBarcode)
         .append(project, other.project)
-        .append(qcPassed, other.qcPassed)
+        .append(detailedQcStatus, other.detailedQcStatus)
+        .append(detailedQcStatusNote, other.detailedQcStatusNote)
         .append(sampleType, other.sampleType)
         .append(scientificName, other.scientificName)
         .append(taxonIdentifier, other.taxonIdentifier)
@@ -597,6 +594,26 @@ public class SampleImpl extends AbstractBoxable implements Sample {
   @Override
   public void setRequisitionId(String requisitionId) {
     this.requisitionId = requisitionId;
+  }
+
+  @Override
+  public DetailedQcStatus getDetailedQcStatus() {
+    return detailedQcStatus;
+  }
+
+  @Override
+  public void setDetailedQcStatus(DetailedQcStatus detailedQcStatus) {
+    this.detailedQcStatus = detailedQcStatus;
+  }
+
+  @Override
+  public String getDetailedQcStatusNote() {
+    return detailedQcStatusNote;
+  }
+
+  @Override
+  public void setDetailedQcStatusNote(String detailedQcStatusNote) {
+    this.detailedQcStatusNote = detailedQcStatusNote;
   }
 
   @Override

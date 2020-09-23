@@ -288,7 +288,8 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
     target.setNgUsed(source.getNgUsed());
     target.setVolumeUsed(source.getVolumeUsed());
     target.setCreationDate(source.getCreationDate());
-    target.setQcPassed(source.getQcPassed());
+    target.setDetailedQcStatus(source.getDetailedQcStatus());
+    target.setDetailedQcStatusNote(source.getDetailedQcStatusNote());
 
     if (isDetailedLibraryAliquot(target)) {
       DetailedLibraryAliquot dTarget = (DetailedLibraryAliquot) target;

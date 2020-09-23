@@ -84,7 +84,7 @@ public class HibernateDetailedQcStatusDaoIT extends AbstractDAOTest {
   public void testGetUsage() throws IOException {
     DetailedQcStatus status = (DetailedQcStatus) getSessionFactory().getCurrentSession().get(DetailedQcStatusImpl.class, 1L);
     assertEquals("Passed", status.getDescription());
-    assertEquals(0L, sut.getUsage(status));
+    assertEquals(21L, sut.getUsage(status));
   }
 
 }

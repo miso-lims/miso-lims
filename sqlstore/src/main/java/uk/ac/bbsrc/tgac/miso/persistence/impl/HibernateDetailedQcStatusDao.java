@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.DetailedQcStatusDao;
 
 @Repository
@@ -64,7 +64,7 @@ public class HibernateDetailedQcStatusDao implements DetailedQcStatusDao {
 
   @Override
   public long getUsage(DetailedQcStatus detailedQcStatus) {
-    return (long) currentSession().createCriteria(DetailedSampleImpl.class)
+    return (long) currentSession().createCriteria(SampleImpl.class)
         .add(Restrictions.eq("detailedQcStatus", detailedQcStatus))
         .setProjection(Projections.rowCount()).uniqueResult();
   }

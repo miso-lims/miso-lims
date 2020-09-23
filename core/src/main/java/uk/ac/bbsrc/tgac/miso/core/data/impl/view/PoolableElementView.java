@@ -27,6 +27,7 @@ import org.hibernate.annotations.LazyToOneOption;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -35,16 +36,18 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingControlType;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.DetailedQcItem;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @Entity
 @Immutable
 @Table(name = "PoolableElementView")
-public class PoolableElementView implements Identifiable, Serializable, Comparable<PoolableElementView> {
+public class PoolableElementView implements DetailedQcItem, Identifiable, Serializable, Comparable<PoolableElementView> {
 
   private static final long serialVersionUID = 1L;
 
@@ -71,9 +74,13 @@ public class PoolableElementView implements Identifiable, Serializable, Comparab
 
   private BigDecimal aliquotNgUsed;
   private BigDecimal aliquotVolumeUsed;
-  private Boolean aliquotQcPassed;
   private boolean discarded;
   private boolean distributed;
+
+  @ManyToOne(targetEntity = DetailedQcStatusImpl.class)
+  @JoinColumn(name = "detailedQcStatusId")
+  private DetailedQcStatus detailedQcStatus;
+  private String detailedQcStatusNote;
 
   @ManyToOne
   @JoinColumn(name = "libraryDesignCodeId")
@@ -94,7 +101,6 @@ public class PoolableElementView implements Identifiable, Serializable, Comparab
   private String libraryBarcode;
   private boolean libraryPaired;
   private boolean libraryLowQuality;
-  private Boolean libraryQcPassed;
   private String librarySelectionType;
   private String libraryStrategyType;
 
@@ -289,12 +295,24 @@ public class PoolableElementView implements Identifiable, Serializable, Comparab
     this.aliquotVolumeUsed = aliquotVolumeUsed;
   }
 
-  public Boolean getAliquotQcPassed() {
-    return aliquotQcPassed;
+  @Override
+  public DetailedQcStatus getDetailedQcStatus() {
+    return detailedQcStatus;
   }
 
-  public void setAliquotQcPassed(Boolean aliquotQcPassed) {
-    this.aliquotQcPassed = aliquotQcPassed;
+  @Override
+  public void setDetailedQcStatus(DetailedQcStatus detailedQcStatus) {
+    this.detailedQcStatus = detailedQcStatus;
+  }
+
+  @Override
+  public String getDetailedQcStatusNote() {
+    return detailedQcStatusNote;
+  }
+
+  @Override
+  public void setDetailedQcStatusNote(String detailedQcStatusNote) {
+    this.detailedQcStatusNote = detailedQcStatusNote;
   }
 
   public LibraryDesignCode getAliquotDesignCode() {
@@ -646,14 +664,6 @@ public class PoolableElementView implements Identifiable, Serializable, Comparab
     this.sample = sample;
   }
 
-  public Boolean getLibraryQcPassed() {
-    return libraryQcPassed;
-  }
-
-  public void setLibraryQcPassed(Boolean libraryQcPassed) {
-    this.libraryQcPassed = libraryQcPassed;
-  }
-
   public List<TransferLibraryAliquot> getTransfers() {
     if (transfers == null) {
       transfers = new ArrayList<>();
@@ -680,7 +690,8 @@ public class PoolableElementView implements Identifiable, Serializable, Comparab
     result = prime * result + ((aliquotNgUsed == null) ? 0 : aliquotNgUsed.hashCode());
     result = prime * result + ((aliquotVolume == null) ? 0 : aliquotVolume.hashCode());
     result = prime * result + ((aliquotVolumeUsed == null) ? 0 : aliquotVolumeUsed.hashCode());
-    result = prime * result + ((aliquotQcPassed == null) ? 0 : aliquotQcPassed.hashCode());
+    result = prime * result + ((detailedQcStatus == null) ? 0 : detailedQcStatus.hashCode());
+    result = prime * result + ((detailedQcStatusNote == null) ? 0 : detailedQcStatusNote.hashCode());
     result = prime * result + ((indices == null) ? 0 : indices.hashCode());
     result = prime * result + ((lastModified == null) ? 0 : lastModified.hashCode());
     result = prime * result + ((lastModifier == null) ? 0 : lastModifier.hashCode());
@@ -758,9 +769,12 @@ public class PoolableElementView implements Identifiable, Serializable, Comparab
     if (aliquotVolumeUsed == null) {
       if (other.aliquotVolumeUsed != null) return false;
     } else if (!aliquotVolumeUsed.equals(other.aliquotVolumeUsed)) return false;
-    if (aliquotQcPassed == null) {
-      if (other.aliquotQcPassed != null) return false;
-    } else if (!aliquotQcPassed.equals(other.aliquotQcPassed)) return false;
+    if (detailedQcStatus == null) {
+      if (other.detailedQcStatus != null) return false;
+    } else if (!detailedQcStatus.equals(other.detailedQcStatus)) return false;
+    if (detailedQcStatusNote == null) {
+      if (other.detailedQcStatusNote != null) return false;
+    } else if (!detailedQcStatusNote.equals(other.detailedQcStatusNote)) return false;
     if (indices == null) {
       if (other.indices != null) return false;
     } else if (!indices.equals(other.indices)) return false;

@@ -120,98 +120,65 @@ FormTarget.sample = (function($) {
                     return item;
                   },
                   required: true
-                }, FormUtils.makeQcPassedField(!config.detailedSample), {
-                  title: 'QC Status',
-                  data: 'detailedQcStatusId',
-                  type: 'dropdown',
-                  nullLabel: 'Not Ready',
-                  source: Constants.detailedQcStatuses,
-                  sortSource: BulkTarget.sample.detailedQcStatusSort,
-                  getItemLabel: function(item) {
-                    return item.description;
-                  },
-                  getItemValue: function(item) {
-                    return item.id;
-                  },
-                  required: false,
-                  include: config.detailedSample,
-                  onChange: function(newValue, form) {
-                    var noteRequired = newValue ? Utils.array.findUniqueOrThrow(function(item) {
-                      return item.id === Number(newValue);
-                    }, Constants.detailedQcStatuses).noteRequired : false;
-                    var updates = {
-                      disabled: !noteRequired,
-                      required: noteRequired
-                    }
-                    if (!noteRequired) {
-                      updates.value = null;
-                    }
-                    form.updateField('detailedQcStatusNote', updates);
-                  }
-                }, {
-                  title: 'QC Status Note',
-                  data: 'detailedQcStatusNote',
-                  type: 'text',
-                  maxLength: 500,
-                  include: config.detailedSample
-                }, {
-                  title: 'Discarded',
-                  data: 'discarded',
-                  type: 'checkbox',
-                  onChange: function(newValue, form) {
-                    form.updateField('volume', {
-                      disabled: newValue
-                    });
-                  }
-                }, {
-                  title: 'Initial Volume',
-                  data: 'initialVolume',
-                  type: 'decimal',
-                  precision: 14,
-                  scale: 10
-                }, {
-                  title: 'Volume',
-                  data: 'volume',
-                  type: 'decimal',
-                  precision: 14,
-                  scale: 10
-                }, FormUtils.makeUnitsField(object, 'volume'), {
-                  title: 'Parent ng Used',
-                  data: 'ngUsed',
-                  type: 'decimal',
-                  precision: 14,
-                  scale: 10,
-                  include: config.detailedSample && (object.sampleCategory === 'Stock' || object.sampleCategory === 'Aliquot')
-                }, {
-                  title: 'Parent Volume Used',
-                  data: 'volumeUsed',
-                  type: 'decimal',
-                  precision: 14,
-                  scale: 10,
-                  include: config.detailedSample && (object.sampleCategory === 'Stock' || object.sampleCategory === 'Aliquot')
-                }, {
-                  title: 'Concentration',
-                  data: 'concentration',
-                  type: 'decimal',
-                  precision: 14,
-                  scale: 10
-                }, FormUtils.makeUnitsField(object, 'concentration'), {
-                  title: 'Location',
-                  data: 'locationBarcode',
-                  type: 'text',
-                  maxLength: 255
-                }, FormUtils.makeBoxLocationField(), {
-                  title: 'Sequencing Control Type',
-                  data: 'sequencingControlTypeId',
-                  type: 'dropdown',
-                  source: Constants.sequencingControlTypes,
-                  sortSource: Utils.sorting.standardSort('alias'),
-                  getItemLabel: Utils.array.getAlias,
-                  getItemValue: Utils.array.getId,
-                  nullLabel: 'n/a',
-                  include: !Constants.isDetailedSample || object.sampleCategory === 'Aliquot'
-                }].concat((!Constants.isDetailedSample || (object.sampleCategory !== 'Identity' && object.sampleCategory !== 'Tissue'))
-                ? FormUtils.makeSopFields(object, config.sops) : [])
+                }].concat(FormUtils.makeDetailedQcStatusFields()).concat([{
+              title: 'Discarded',
+              data: 'discarded',
+              type: 'checkbox',
+              onChange: function(newValue, form) {
+                form.updateField('volume', {
+                  disabled: newValue
+                });
+              }
+            }, {
+              title: 'Initial Volume',
+              data: 'initialVolume',
+              type: 'decimal',
+              precision: 14,
+              scale: 10
+            }, {
+              title: 'Volume',
+              data: 'volume',
+              type: 'decimal',
+              precision: 14,
+              scale: 10
+            }, FormUtils.makeUnitsField(object, 'volume'), {
+              title: 'Parent ng Used',
+              data: 'ngUsed',
+              type: 'decimal',
+              precision: 14,
+              scale: 10,
+              include: config.detailedSample && (object.sampleCategory === 'Stock' || object.sampleCategory === 'Aliquot')
+            }, {
+              title: 'Parent Volume Used',
+              data: 'volumeUsed',
+              type: 'decimal',
+              precision: 14,
+              scale: 10,
+              include: config.detailedSample && (object.sampleCategory === 'Stock' || object.sampleCategory === 'Aliquot')
+            }, {
+              title: 'Concentration',
+              data: 'concentration',
+              type: 'decimal',
+              precision: 14,
+              scale: 10
+            }, FormUtils.makeUnitsField(object, 'concentration'), {
+              title: 'Location',
+              data: 'locationBarcode',
+              type: 'text',
+              maxLength: 255
+            }, FormUtils.makeBoxLocationField(), {
+              title: 'Sequencing Control Type',
+              data: 'sequencingControlTypeId',
+              type: 'dropdown',
+              source: Constants.sequencingControlTypes,
+              sortSource: Utils.sorting.standardSort('alias'),
+              getItemLabel: Utils.array.getAlias,
+              getItemValue: Utils.array.getId,
+              nullLabel: 'n/a',
+              include: !Constants.isDetailedSample || object.sampleCategory === 'Aliquot'
+            }]).concat(
+                (!Constants.isDetailedSample || (object.sampleCategory !== 'Identity' && object.sampleCategory !== 'Tissue')) ? FormUtils
+                    .makeSopFields(object, config.sops) : [])
           },
           {
             title: 'Identity',

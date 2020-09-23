@@ -31,10 +31,6 @@ public interface DetailedSample extends Sample, GroupIdentifiable {
 
   void setArchived(Boolean archived);
 
-  DetailedQcStatus getDetailedQcStatus();
-
-  void setDetailedQcStatus(DetailedQcStatus detailedQcStatus);
-
   /**
    * @return the number of this Sample amongst Samples of the same SampleClass sharing the same parent
    */
@@ -70,10 +66,6 @@ public interface DetailedSample extends Sample, GroupIdentifiable {
   Long getPreMigrationId();
   
   void setPreMigrationId(Long preMigrationId);
-
-  String getDetailedQcStatusNote();
-
-  void setDetailedQcStatusNote(String detailedQcStatusNote);
 
   /**
    * Transient field for storing the ID of the identity which will be at the root of the hierarchy for this Detailed Sample

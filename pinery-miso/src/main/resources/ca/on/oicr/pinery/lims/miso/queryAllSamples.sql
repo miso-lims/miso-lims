@@ -41,7 +41,7 @@ SELECT s.alias NAME
         ,NULL barcode_two
         ,NULL umis
         ,qpcr.results qpcr_percentage_human
-        ,s.qcPassed qcPassed
+        ,qpd.status qcPassed
         ,qpd.description detailedQcStatus
         ,box.locationBarcode boxLocation
         ,box.alias boxAlias
@@ -253,8 +253,8 @@ SELECT l.alias NAME
         ,bc2.sequence barcode_two
         ,l.umis
         ,NULL qpcr_percentage_human 
-        ,l.qcPassed qcPassed 
-        ,NULL detailedQcStatus 
+        ,qpd.status qcPassed
+        ,qpd.description detailedQcStatus
         ,box.locationBarcode boxLocation 
         ,box.alias boxAlias 
         ,pos.position boxPosition 
@@ -296,6 +296,7 @@ SELECT l.alias NAME
 FROM Library l 
 LEFT JOIN Sample parent ON parent.sampleId = l.sample_sampleId
 LEFT JOIN Project sp ON sp.projectId = parent.project_projectId
+LEFT JOIN DetailedQcStatus qpd ON qpd.detailedQcStatusId = l.detailedQcStatusId 
 LEFT JOIN LibrarySpikeIn lsi ON lsi.spikeInId = l.spikeInId
 LEFT JOIN KitDescriptor kd ON kd.kitDescriptorId = l.kitDescriptorId
 LEFT JOIN LibraryDesignCode ldc ON l.libraryDesignCodeId = ldc.libraryDesignCodeId
@@ -429,8 +430,8 @@ SELECT d.alias name
         ,NULL barcode_two 
         ,NULL umis
         ,NULL qpcr_percentage_human 
-        ,d.qcPassed qcPassed 
-        ,NULL detailedQcStatus 
+        ,qpd.status qcPassed
+        ,qpd.description detailedQcStatus
         ,box.locationBarcode boxLocation 
         ,box.alias boxAlias 
         ,pos.position boxPosition 
@@ -470,6 +471,7 @@ LEFT JOIN LibraryAliquot laParent ON laParent.aliquotId = d.parentAliquotId
 JOIN Library lib ON lib.libraryId = d.libraryId 
 JOIN Sample s ON s.sampleId = lib.sample_sampleId
 JOIN Project sp ON sp.projectId = s.project_projectId
+LEFT JOIN DetailedQcStatus qpd ON qpd.detailedQcStatusId = d.detailedQcStatusId 
 JOIN LibraryType lt ON lt.libraryTypeId = lib.libraryType
 LEFT JOIN LibraryDesignCode ldc ON ldc.libraryDesignCodeId = d.libraryDesignCodeId
 LEFT JOIN TargetedSequencing ts ON d.targetedSequencingId = ts.targetedSequencingId

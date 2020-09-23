@@ -149,13 +149,7 @@ ListTarget.sample = {
       "mData": "sampleType",
       "include": !Constants.isDetailedSample,
       "iSortPriority": 0
-    }, {
-      "sTitle": "QC",
-      "mData": "qcPassed",
-      "mRender": ListUtils.render.booleanChecks,
-      "include": true,
-      "iSortPriority": 0
-    }, {
+    }, ListUtils.columns.detailedQcStatus, {
       "sTitle": "Location",
       "mData": "locationLabel",
       "bSortable": false,

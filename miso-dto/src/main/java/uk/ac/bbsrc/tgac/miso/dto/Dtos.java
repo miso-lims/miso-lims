@@ -481,9 +481,8 @@ public class Dtos {
       dto.setBoxPosition(from.getBoxPosition());
     }
     dto.setSampleType(from.getSampleType());
-    if (from.getQcPassed() != null) {
-      dto.setQcPassed(from.getQcPassed());
-    }
+    setId(dto::setDetailedQcStatusId, from.getDetailedQcStatus());
+    setString(dto::setDetailedQcStatusNote, from.getDetailedQcStatusNote());
     dto.setAlias(from.getAlias());
     dto.setProjectId(from.getProject().getId());
     dto.setProjectName(from.getProject().getName());
@@ -526,9 +525,6 @@ public class Dtos {
     dto.setSampleClassAlias(from.getSampleClass().getAlias());
     dto.setSampleCategory(from.getSampleClass().getSampleCategory());
     dto.setSampleSubcategory(from.getSampleClass().getSampleSubcategory());
-    if (from.getDetailedQcStatus() != null) {
-      dto.setDetailedQcStatusId(from.getDetailedQcStatus().getId());
-    }
     if (from.getSubproject() != null) {
       dto.setSubprojectId(from.getSubproject().getId());
       dto.setSubprojectAlias(from.getSubproject().getAlias());
@@ -559,10 +555,6 @@ public class Dtos {
     }
     setDateString(dto::setCreationDate, from.getCreationDate());
     dto.setNonStandardAlias(from.hasNonStandardAlias());
-    if (from.getDetailedQcStatus() != null) {
-      dto.setDetailedQcStatusId(from.getDetailedQcStatus().getId());
-    }
-    dto.setDetailedQcStatusNote(from.getDetailedQcStatusNote());
     setString(dto::setVolumeUsed, from.getVolumeUsed());
     setString(dto::setNgUsed, from.getNgUsed());
 
@@ -590,12 +582,6 @@ public class Dtos {
     } else {
       to = new DetailedSampleImpl();
     }
-    if (from.getDetailedQcStatusId() != null) {
-      DetailedQcStatus detailedQcStatus = new DetailedQcStatusImpl();
-      detailedQcStatus.setId(from.getDetailedQcStatusId());
-      to.setDetailedQcStatus(detailedQcStatus);
-    }
-    to.setDetailedQcStatusNote(from.getDetailedQcStatusNote());
     if (from.getSubprojectId() != null) {
       Subproject subproject = new SubprojectImpl();
       subproject.setId(from.getSubprojectId());
@@ -850,7 +836,8 @@ public class Dtos {
     to.setIdentificationBarcode(nullifyStringIfBlank(from.getIdentificationBarcode()));
     to.setLocationBarcode(nullifyStringIfBlank(from.getLocationBarcode()));
     to.setSampleType(from.getSampleType());
-    to.setQcPassed(from.getQcPassed());
+    setObject(to::setDetailedQcStatus, DetailedQcStatusImpl::new, from.getDetailedQcStatusId());
+    setString(to::setDetailedQcStatusNote, from.getDetailedQcStatusNote());
     setObject(to::setScientificName, ScientificName::new, from.getScientificNameId());
     to.setTaxonIdentifier(from.getTaxonIdentifier());
     to.setAlias(from.getAlias());
@@ -1359,7 +1346,8 @@ public class Dtos {
       dto.setLibraryTypeId(from.getLibraryType().getId());
       dto.setLibraryTypeAlias(from.getLibraryType().getDescription());
     }
-    dto.setQcPassed(from.getQcPassed());
+    setId(dto::setDetailedQcStatusId, from.getDetailedQcStatus());
+    setString(dto::setDetailedQcStatusNote, from.getDetailedQcStatusNote());
     dto.setLowQuality(from.isLowQuality());
     dto.setPaired(from.getPaired());
     if (from.getPlatformType() != null) {
@@ -1457,7 +1445,8 @@ public class Dtos {
       if (from.getLibraryTypeAlias() != null) type.setDescription(from.getLibraryTypeAlias());
       to.setLibraryType(type);
     }
-    to.setQcPassed(from.getQcPassed());
+    setObject(to::setDetailedQcStatus, DetailedQcStatusImpl::new, from.getDetailedQcStatusId());
+    setString(to::setDetailedQcStatusNote, from.getDetailedQcStatusNote());
     if (from.getIndex1Id() != null) {
       Index tb1 = new Index();
       tb1.setId(from.getIndex1Id());
@@ -1614,7 +1603,6 @@ public class Dtos {
       setString(dto::setLibraryAlias, library.getAlias());
       setId(dto::setLibraryKitDescriptorId, library.getKitDescriptor());
       setBoolean(dto::setLibraryLowQuality, library.isLowQuality(), false);
-      setBoolean(dto::setLibraryQcPassed, library.getQcPassed(), true);
       setString(dto::setLibraryPlatformType, library.getPlatformType().getKey());
       if (library.getIndices() != null && !library.getIndices().isEmpty()) {
         dto.setIndexIds(library.getIndices().stream().sorted(Comparator.comparingInt(Index::getPosition)).map(Index::getId)
@@ -1676,7 +1664,8 @@ public class Dtos {
     }
     dto.setDiscarded(from.isDiscarded());
     setDateTimeString(dto::setLastModified, from.getLastModified());
-    setBoolean(dto::setQcPassed, from.getQcPassed(), true);
+    setId(dto::setDetailedQcStatusId, from.getDetailedQcStatus());
+    setString(dto::setDetailedQcStatusNote, from.getDetailedQcStatusNote());
     return dto;
   }
 
@@ -1728,13 +1717,13 @@ public class Dtos {
     dto.setLibraryName(from.getLibraryName());
     dto.setLibraryAlias(from.getLibraryAlias());
     dto.setLibraryLowQuality(from.isLibraryLowQuality());
-    dto.setLibraryQcPassed(from.getLibraryQcPassed());
     dto.setLibraryPlatformType(from.getPlatformType().getKey());
     dto.setSampleId(from.getSampleId());
     dto.setSampleName(from.getSampleName());
     dto.setSampleAlias(from.getSampleAlias());
     setString(dto::setSequencingControlTypeAlias, maybeGetProperty(from.getSampleSequencingControlType(), SequencingControlType::getAlias));
-    setBoolean(dto::setQcPassed, from.getAliquotQcPassed(), true);
+    setId(dto::setDetailedQcStatusId, from.getDetailedQcStatus());
+    setString(dto::setDetailedQcStatusNote, from.getDetailedQcStatusNote());
 
     Sample sample = from.getSample();
     if (isDetailedSample(sample)) {
@@ -1794,7 +1783,8 @@ public class Dtos {
     }
     to.setBoxPosition((LibraryAliquotBoxPosition) makeBoxablePosition(from, to));
     to.setDiscarded(from.isDiscarded());
-    setBoolean(to::setQcPassed, from.getQcPassed(), true);
+    setObject(to::setDetailedQcStatus, DetailedQcStatusImpl::new, from.getDetailedQcStatusId());
+    setString(to::setDetailedQcStatusNote, from.getDetailedQcStatusNote());
     return to;
   }
 

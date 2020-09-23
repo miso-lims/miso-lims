@@ -31,7 +31,8 @@ public class BulkLibraryAliquotPage extends BulkPage {
     public static final String GROUP_ID = "Group ID";
     public static final String GROUP_DESCRIPTION = "Group Desc.";
     public static final String DESIGN_CODE = "Design Code";
-    public static final String QC_PASSED = "QC Passed?";
+    public static final String QC_STATUS = "QC Status";
+    public static final String QC_NOTE = "QC Note";
     public static final String SIZE = "Size (bp)";
     public static final String CONCENTRATION = "Conc.";
     public static final String CONCENTRATION_UNITS = "Conc. Units";

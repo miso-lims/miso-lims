@@ -1,7 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
 public class DetailedSampleDto extends SampleDto {
 
   private Long parentId;
@@ -12,8 +10,6 @@ public class DetailedSampleDto extends SampleDto {
   private String sampleClassAlias;
   private String sampleCategory;
   private String sampleSubcategory;
-  private Long detailedQcStatusId;
-  private String detailedQcStatusNote;
   private Long subprojectId;
   private String subprojectAlias;
   private Boolean subprojectPriority;
@@ -62,15 +58,6 @@ public class DetailedSampleDto extends SampleDto {
 
   public void setParentTissueSampleClassId(Long parentSampleClassId) {
     this.parentTissueSampleClassId = parentSampleClassId;
-  }
-
-  public Long getDetailedQcStatusId() {
-    return detailedQcStatusId;
-  }
-
-  @JsonInclude(JsonInclude.Include.ALWAYS)
-  public void setDetailedQcStatusId(Long detailedQcStatusId) {
-    this.detailedQcStatusId = detailedQcStatusId;
   }
 
   public Long getSubprojectId() {
@@ -151,14 +138,6 @@ public class DetailedSampleDto extends SampleDto {
 
   public void setNonStandardAlias(boolean nonStandardAlias) {
     this.nonStandardAlias = nonStandardAlias;
-  }
-
-  public String getDetailedQcStatusNote() {
-    return detailedQcStatusNote;
-  }
-
-  public void setDetailedQcStatusNote(String detailedQcStatusNote) {
-    this.detailedQcStatusNote = detailedQcStatusNote;
   }
 
   public Long getIdentityId() {

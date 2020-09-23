@@ -35,20 +35,21 @@ public class PlainSampleITs extends AbstractIT {
       SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS, SamColumns.BOX_POSITION, SamColumns.DISCARDED, SamColumns.RECEIVE_DATE,
       SamColumns.RECEIVE_TIME, SamColumns.RECEIVED_FROM, SamColumns.RECEIVED_BY, SamColumns.RECEIPT_CONFIRMED, SamColumns.RECEIPT_QC_PASSED,
       SamColumns.RECEIPT_QC_NOTE, SamColumns.REQUISITION_ID, SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT,
-      SamColumns.VOLUME, SamColumns.VOLUME_UNITS, SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS, SamColumns.QC_PASSED);
+      SamColumns.VOLUME, SamColumns.VOLUME_UNITS, SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS, SamColumns.QC_STATUS,
+      SamColumns.QC_NOTE);
 
   private static final Set<String> libraryColumns = Sets.newHashSet(LibColumns.NAME, LibColumns.SAMPLE_ALIAS, LibColumns.SAMPLE_LOCATION,
       LibColumns.BOX_SEARCH, LibColumns.BOX_ALIAS, LibColumns.BOX_POSITION, LibColumns.DISCARDED, LibColumns.CREATION_DATE,
       LibColumns.WORKSTATION, LibColumns.THERMAL_CYCLER, LibColumns.PLATFORM, LibColumns.LIBRARY_TYPE, LibColumns.SELECTION,
       LibColumns.STRATEGY, LibColumns.INDEX_FAMILY, LibColumns.INDEX_1, LibColumns.INDEX_2, LibColumns.UMIS, LibColumns.KIT_DESCRIPTOR,
-      LibColumns.KIT_LOT, LibColumns.QC_PASSED, LibColumns.SIZE, LibColumns.CONCENTRATION, LibColumns.CONCENTRATION_UNITS,
-      LibColumns.SPIKE_IN, LibColumns.SPIKE_IN_DILUTION, LibColumns.SPIKE_IN_VOL);
+      LibColumns.KIT_LOT, LibColumns.QC_STATUS, LibColumns.QC_NOTE, LibColumns.SIZE, LibColumns.CONCENTRATION,
+      LibColumns.CONCENTRATION_UNITS, LibColumns.SPIKE_IN, LibColumns.SPIKE_IN_DILUTION, LibColumns.SPIKE_IN_VOL);
 
   private static final Set<String> libraryAliquotColumns = Sets.newHashSet(LibraryAliquotColumns.NAME, LibraryAliquotColumns.ALIAS,
       LibraryAliquotColumns.PARENT_ALIAS, LibraryAliquotColumns.BOX_SEARCH, LibraryAliquotColumns.BOX_ALIAS,
-      LibraryAliquotColumns.BOX_POSITION, LibraryAliquotColumns.DISCARDED, LibraryAliquotColumns.QC_PASSED, LibraryAliquotColumns.SIZE,
-      LibraryAliquotColumns.CONCENTRATION, LibraryAliquotColumns.CONCENTRATION_UNITS, LibraryAliquotColumns.VOLUME,
-      LibraryAliquotColumns.VOLUME_UNITS, LibraryAliquotColumns.NG_USED, LibraryAliquotColumns.VOLUME_USED,
+      LibraryAliquotColumns.BOX_POSITION, LibraryAliquotColumns.DISCARDED, LibraryAliquotColumns.QC_STATUS, LibraryAliquotColumns.QC_NOTE,
+      LibraryAliquotColumns.SIZE, LibraryAliquotColumns.CONCENTRATION, LibraryAliquotColumns.CONCENTRATION_UNITS,
+      LibraryAliquotColumns.VOLUME, LibraryAliquotColumns.VOLUME_UNITS, LibraryAliquotColumns.NG_USED, LibraryAliquotColumns.VOLUME_USED,
       LibraryAliquotColumns.CREATION_DATE);
 
   @Override
@@ -93,7 +94,7 @@ public class PlainSampleITs extends AbstractIT {
     attrs.put(SamColumns.SAMPLE_TYPE, "TRANSCRIPTOMIC");
     attrs.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
     attrs.put(SamColumns.PROJECT, "PRO1");
-    attrs.put(SamColumns.QC_PASSED, "True");
+    attrs.put(SamColumns.QC_STATUS, "Ready");
 
     attrs.forEach((k, v) -> table.enterText(k, 0, v));
     assertTrue(page.save(false));
@@ -150,7 +151,7 @@ public class PlainSampleITs extends AbstractIT {
     attrs.put(LibColumns.INDEX_2, "B01 (AAATTT)");
     attrs.put(LibColumns.KIT_DESCRIPTOR, "Test Kit");
     attrs.put(LibColumns.KIT_LOT, "20200730");
-    attrs.put(LibColumns.QC_PASSED, "True");
+    attrs.put(LibColumns.QC_STATUS, "Ready");
     attrs.put(LibColumns.SIZE, "321");
 
     attrs.forEach((k, v) -> table.enterText(k, 0, v));
@@ -186,7 +187,7 @@ public class PlainSampleITs extends AbstractIT {
     attrs.put(LibColumns.STRATEGY, "WGS");
     attrs.put(LibColumns.INDEX_FAMILY, "No indices");
     attrs.put(LibColumns.KIT_DESCRIPTOR, "Test Kit");
-    attrs.put(LibColumns.QC_PASSED, "True");
+    attrs.put(LibColumns.QC_STATUS, "Ready");
     attrs.put(LibColumns.SIZE, "321");
 
     attrs.forEach((k, v) -> table.enterText(k, 0, v));

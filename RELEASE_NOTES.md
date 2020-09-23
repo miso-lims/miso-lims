@@ -2,9 +2,17 @@
 
 Changes:
 
+  * Changed plain samples, libraries, and library aliquots to use detailed QC status instead of the
+    simpler QC Passed field
   * Make button labels clearer for associating targeted sequencings with kit descriptors
   * Prevent entry of tabs and line breaks in most fields
   * Fix search (by alias) on Library Templates list page
+
+Upgrade Notes:
+
+  * If they did not already exist, detailed QC statuses "Ready," and "Failed: QC" have been added.
+    These have been applied to items that previously had QC Passed set to true and false,
+    respectively. You can modify these default options and/or add other options if you wish.
 
 # 1.13.0
 

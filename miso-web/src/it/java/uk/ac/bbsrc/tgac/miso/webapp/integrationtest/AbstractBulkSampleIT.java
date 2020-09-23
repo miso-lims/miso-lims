@@ -77,6 +77,8 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
     if (attributes.containsKey(SamColumns.RECEIVE_DATE)) {
       assertReceiptAttributes(attributes, sample);
     }
+    assertEntityAttribute(SamColumns.QC_STATUS, attributes, sample,
+        s -> (s.getDetailedQcStatus() == null ? "Not Ready" : s.getDetailedQcStatus().getDescription()));
   }
 
   protected void assertReceiptAttributes(Map<String, String> attributes, Sample sample) {
@@ -111,8 +113,6 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   }
 
   protected void assertDetailedSampleAttributes(Map<String, String> attributes, DetailedSample sample) {
-    assertEntityAttribute(SamColumns.QC_STATUS, attributes, sample,
-        s -> (s.getDetailedQcStatus() == null ? "Not Ready" : s.getDetailedQcStatus().getDescription()));
     if (!sample.getSampleClass().getSampleCategory().equals(SampleIdentity.CATEGORY_NAME)) {
       assertNotNull("parent is not null", sample.getParent());
     }

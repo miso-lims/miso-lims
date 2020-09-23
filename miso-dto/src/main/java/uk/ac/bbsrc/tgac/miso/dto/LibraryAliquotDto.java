@@ -42,7 +42,6 @@ public class LibraryAliquotDto extends AbstractBoxableDto {
   private String libraryAlias;
   private Long libraryKitDescriptorId;
   private boolean libraryLowQuality;
-  private Boolean libraryQcPassed;
   private String libraryPlatformType;
   private Long parentAliquotId;
   private List<Long> parentAliquotIds;
@@ -62,7 +61,8 @@ public class LibraryAliquotDto extends AbstractBoxableDto {
   private String subprojectAlias;
   private Boolean subprojectPriority;
   private String sequencingControlTypeAlias;
-  private Boolean qcPassed;
+  private Long detailedQcStatusId;
+  private String detailedQcStatusNote;
   private String worksetAddedTime;
 
   public Long getId() {
@@ -210,14 +210,6 @@ public class LibraryAliquotDto extends AbstractBoxableDto {
 
   public void setLibraryLowQuality(boolean libraryLowQuality) {
     this.libraryLowQuality = libraryLowQuality;
-  }
-
-  public Boolean getLibraryQcPassed() {
-    return libraryQcPassed;
-  }
-
-  public void setLibraryQcPassed(Boolean libraryQcPassed) {
-    this.libraryQcPassed = libraryQcPassed;
   }
 
   public String getLibraryPlatformType() {
@@ -389,12 +381,20 @@ public class LibraryAliquotDto extends AbstractBoxableDto {
     this.sequencingControlTypeAlias = sequencingControlTypeAlias;
   }
 
-  public Boolean getQcPassed() {
-    return qcPassed;
+  public Long getDetailedQcStatusId() {
+    return detailedQcStatusId;
   }
 
-  public void setQcPassed(Boolean qcPassed) {
-    this.qcPassed = qcPassed;
+  public void setDetailedQcStatusId(Long detailedQcStatusId) {
+    this.detailedQcStatusId = detailedQcStatusId;
+  }
+
+  public String getDetailedQcStatusNote() {
+    return detailedQcStatusNote;
+  }
+
+  public void setDetailedQcStatusNote(String detailedQcStatusNote) {
+    this.detailedQcStatusNote = detailedQcStatusNote;
   }
 
   public String getWorksetAddedTime() {
