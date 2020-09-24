@@ -11,7 +11,7 @@ DROP TRIGGER IF EXISTS ProjectChange//
 CREATE TRIGGER ProjectChange BEFORE UPDATE ON Project
 FOR EACH ROW
   BEGIN
-  DECLARE log_message varchar(500) CHARACTER SET utf8;
+  DECLARE log_message longtext CHARACTER SET utf8;
   SET log_message = CONCAT_WS(', ',
         CASE WHEN (NEW.alias IS NULL) <> (OLD.alias IS NULL) OR NEW.alias <> OLD.alias THEN CONCAT('alias: ', COALESCE(OLD.alias, 'n/a'), ' → ', COALESCE(NEW.alias, 'n/a')) END,
         CASE WHEN (NEW.shortName IS NULL) <> (OLD.shortName IS NULL) OR NEW.shortName <> OLD.shortName THEN CONCAT('short name: ', COALESCE(OLD.shortName, 'n/a'), ' → ', COALESCE(NEW.shortName, 'n/a')) END,

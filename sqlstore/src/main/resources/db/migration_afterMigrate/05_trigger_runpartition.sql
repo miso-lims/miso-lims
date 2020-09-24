@@ -5,7 +5,7 @@ DROP TRIGGER IF EXISTS RunPartitionUpdate//
 CREATE TRIGGER RunPartitionUpdate BEFORE UPDATE ON Run_Partition
 FOR EACH ROW
   BEGIN
-	DECLARE log_message varchar(500) CHARACTER SET utf8;
+	DECLARE log_message longtext CHARACTER SET utf8;
 	DECLARE log_columns varchar(500) CHARACTER SET utf8;
     SELECT
       spc.identificationBarcode,
@@ -51,7 +51,7 @@ DROP TRIGGER IF EXISTS RunPartitionLibraryAliquotUpdate//
 CREATE TRIGGER RunPartitionLibraryAliquotUpdate BEFORE UPDATE ON Run_Partition_LibraryAliquot
 FOR EACH ROW
   BEGIN
-	DECLARE log_message varchar(500) CHARACTER SET utf8;
+	DECLARE log_message longtext CHARACTER SET utf8;
 	DECLARE log_columns varchar(500) CHARACTER SET utf8;
     SELECT
       spc.identificationBarcode,

@@ -5,7 +5,7 @@ DROP TRIGGER IF EXISTS PoolChange//
 CREATE TRIGGER PoolChange BEFORE UPDATE ON Pool
 FOR EACH ROW
   BEGIN
-  DECLARE log_message varchar(500) CHARACTER SET utf8;
+  DECLARE log_message longtext CHARACTER SET utf8;
   SET log_message = CONCAT_WS(', ',
         CASE WHEN (NEW.alias IS NULL) <> (OLD.alias IS NULL) OR NEW.alias <> OLD.alias THEN CONCAT('alias: ', COALESCE(OLD.alias, 'n/a'), ' → ', COALESCE(NEW.alias, 'n/a')) END,
         CASE WHEN (NEW.description IS NULL) <> (OLD.description IS NULL) OR NEW.description <> OLD.description THEN CONCAT('description: ', COALESCE(OLD.description, 'n/a'), ' → ', COALESCE(NEW.description, 'n/a')) END,
