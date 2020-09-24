@@ -39,6 +39,7 @@ SELECT s.alias NAME
         ,dv200.results dv200
         ,NULL barcode
         ,NULL barcode_two
+        ,NULL barcode_kit
         ,NULL umis
         ,qpcr.results qpcr_percentage_human
         ,s.qcPassed qcPassed
@@ -251,6 +252,7 @@ SELECT l.alias NAME
         ,NULL dv200
         ,bc1.sequence barcode 
         ,bc2.sequence barcode_two
+        ,bc1.indexFamily barcode_kit
         ,l.umis
         ,NULL qpcr_percentage_human 
         ,l.qcPassed qcPassed 
@@ -332,9 +334,11 @@ LEFT JOIN (
 LEFT JOIN LibraryQC pdac ON pdac.qcId = newestPdac.qcId
 LEFT JOIN ( 
         SELECT library_libraryId 
-                ,sequence 
+                ,sequence
+                ,IndexFamily.name indexFamily
         FROM Library_Index 
-        INNER JOIN Indices ON Indices.indexId = Library_Index.index_indexId 
+        INNER JOIN Indices ON Indices.indexId = Library_Index.index_indexId
+        JOIN IndexFamily ON IndexFamily.indexFamilyId = Indices.indexFamilyId
         WHERE position = 1 
         ) bc1 ON bc1.library_libraryId = l.libraryId 
 LEFT JOIN ( 
@@ -427,6 +431,7 @@ SELECT d.alias name
         ,NULL dv200 
         ,NULL barcode 
         ,NULL barcode_two 
+        ,NULL barcode_kit
         ,NULL umis
         ,NULL qpcr_percentage_human 
         ,d.qcPassed qcPassed 
