@@ -238,30 +238,30 @@ VALUES (1,'Identity','Identity',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00')
 (4,'Aliquot','Aliquot',1,'2017-05-31 14:57:00',1,'2017-05-31 14:57:00');
 
 -- Plain Samples
-INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identificationBarcode`, `locationBarcode`, `sampleType`, `qcPassed`, `alias`, `project_projectId`, `scientificNameId`, `taxonIdentifier`, sequencingControlTypeId, `lastModifier`, `lastModified`, `creator`, `created`, discriminator) VALUES
-(1,NULL,'SAM1','Inherited from TEST_0001','SAM1::TEST_0001_Bn_P_nn_1-1_D_1','Freezer1_1','GENOMIC',TRUE,'TEST_0001_Bn_P_nn_1-1_D_1',1,1,NULL,NULL,1,'2016-07-07 13:30:47',1,'2016-07-07 13:30:47', 'Sample'),
-(2,NULL,'SAM2','Inherited from TEST_0001','SAM2::TEST_0001_Bn_R_nn_1-1_D_1','Freezer1_2','GENOMIC',TRUE,'TEST_0001_Bn_R_nn_1-1_D_1',1,1,NULL,NULL,1,'2016-07-07 13:30:48',1,'2016-07-07 13:30:48', 'Sample'),
-(3,NULL,'SAM3','Inherited from TEST_0002','SAM3::TEST_0002_Bn_P_nn_1-1_D_1','Freezer1_3','GENOMIC',TRUE,'TEST_0002_Bn_P_nn_1-1_D_1',1,1,NULL,NULL,1,'2016-07-07 13:30:49',1,'2016-07-07 13:30:49', 'Sample'),
-(4,NULL,'SAM4','Inherited from TEST_0002','SAM4::TEST_0002_Bn_R_nn_1-1_D_1','Freezer1_4','GENOMIC',TRUE,'TEST_0002_Bn_R_nn_1-1_D_1',1,1,NULL,NULL,1,'2016-07-07 13:30:51',1,'2016-07-07 13:30:51', 'Sample'),
-(5,NULL,'SAM5','Inherited from TEST_0003','SAM5::TEST_0003_Bn_P_nn_1-1_D_1','Freezer1_5','GENOMIC',TRUE,'TEST_0003_Bn_P_nn_1-1_D_1',1,1,NULL,NULL,1,'2016-07-07 13:30:53',1,'2016-07-07 13:30:53', 'Sample'),
-(6,NULL,'SAM6','Inherited from TEST_0003','SAM6::TEST_0003_Bn_R_nn_1-1_D_1','Freezer1_6','GENOMIC',TRUE,'TEST_0003_Bn_R_nn_1-1_D_1',1,1,NULL,NULL,1,'2016-07-07 13:30:55',1,'2016-07-07 13:30:55', 'Sample'),
-(7,NULL,'SAM7','Inherited from TEST_0004','SAM7::TEST_0004_Bn_P_nn_1-1_D_1','Freezer1_7','GENOMIC',TRUE,'TEST_0004_Bn_P_nn_1-1_D_1',1,1,NULL,NULL,1,'2016-07-07 13:30:57',1,'2016-07-07 13:30:57', 'Sample'),
-(8,NULL,'SAM8','Inherited from TEST_0004','SAM8::TEST_0004_Bn_R_nn_1-1_D_1','Freezer1_8','GENOMIC',TRUE,'TEST_0004_Bn_R_nn_1-1_D_1',1,1,NULL,NULL,1,'2016-07-07 13:30:59',1,'2016-07-07 13:30:59', 'Sample'),
-(9,NULL,'SAM9','Inherited from TEST_0005','SAM9::TEST_0005_Bn_P_nn_1-1_D_1','Freezer1_9','GENOMIC',TRUE,'TEST_0005_Bn_P_nn_1-1_D_1',1,1,NULL,NULL,1,'2016-07-07 13:31:01',1,'2016-07-07 13:31:01', 'Sample'),
-(10,NULL,'SAM10','Inherited from TEST_0005','SAM10::TEST_0005_Bn_R_nn_1-1_D_1','Freezer1_10','GENOMIC',TRUE,'TEST_0005_Bn_R_nn_1-1_D_1',1,1,NULL,NULL,1,'2016-07-07 13:31:03',1,'2016-07-07 13:31:03', 'Sample'),
-(11,NULL,'SAM11','Inherited from TEST_0006','SAM11::TEST_0006_Bn_P_nn_1-1_D_1','Freezer1_11','GENOMIC',TRUE,'TEST_0006_Bn_P_nn_1-1_D_1',1,1,NULL,NULL,1,'2016-07-07 13:31:05',1,'2016-07-07 13:31:05', 'Sample'),
-(12,NULL,'SAM12','Inherited from TEST_0006','SAM12::TEST_0006_Bn_R_nn_1-1_D_1','Freezer1_12','GENOMIC',TRUE,'TEST_0006_Bn_R_nn_1-1_D_1',1,1,NULL,NULL,1,'2016-07-07 13:31:07',1,'2016-07-07 13:31:07', 'Sample'),
-(13,NULL,'SAM13','Inherited from TEST_0007','SAM13::TEST_0007_Bn_P_nn_1-1_D_1','Freezer1_13','GENOMIC',TRUE,'TEST_0007_Bn_P_nn_1-1_D_1',1,1,NULL,NULL,1,'2016-07-07 13:31:09',1,'2016-07-07 13:31:09', 'Sample'),
-(14,NULL,'SAM14','Inherited from TEST_0007','SAM14::TEST_0007_Bn_R_nn_1-1_D_1','Freezer1_14','GENOMIC',TRUE,'TEST_0007_Bn_R_nn_1-1_D_1',1,1,NULL,NULL,1,'2016-07-07 13:31:11',1,'2016-07-07 13:31:11', 'Sample');
+INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identificationBarcode`, `locationBarcode`, `sampleType`, `detailedQcStatusId`, `alias`, `project_projectId`, `scientificNameId`, `taxonIdentifier`, sequencingControlTypeId, `lastModifier`, `lastModified`, `creator`, `created`, discriminator) VALUES
+(1,NULL,'SAM1','Inherited from TEST_0001','SAM1::TEST_0001_Bn_P_nn_1-1_D_1','Freezer1_1','GENOMIC',1,'TEST_0001_Bn_P_nn_1-1_D_1',1,1,NULL,NULL,1,'2016-07-07 13:30:47',1,'2016-07-07 13:30:47', 'Sample'),
+(2,NULL,'SAM2','Inherited from TEST_0001','SAM2::TEST_0001_Bn_R_nn_1-1_D_1','Freezer1_2','GENOMIC',1,'TEST_0001_Bn_R_nn_1-1_D_1',1,1,NULL,NULL,1,'2016-07-07 13:30:48',1,'2016-07-07 13:30:48', 'Sample'),
+(3,NULL,'SAM3','Inherited from TEST_0002','SAM3::TEST_0002_Bn_P_nn_1-1_D_1','Freezer1_3','GENOMIC',1,'TEST_0002_Bn_P_nn_1-1_D_1',1,1,NULL,NULL,1,'2016-07-07 13:30:49',1,'2016-07-07 13:30:49', 'Sample'),
+(4,NULL,'SAM4','Inherited from TEST_0002','SAM4::TEST_0002_Bn_R_nn_1-1_D_1','Freezer1_4','GENOMIC',1,'TEST_0002_Bn_R_nn_1-1_D_1',1,1,NULL,NULL,1,'2016-07-07 13:30:51',1,'2016-07-07 13:30:51', 'Sample'),
+(5,NULL,'SAM5','Inherited from TEST_0003','SAM5::TEST_0003_Bn_P_nn_1-1_D_1','Freezer1_5','GENOMIC',1,'TEST_0003_Bn_P_nn_1-1_D_1',1,1,NULL,NULL,1,'2016-07-07 13:30:53',1,'2016-07-07 13:30:53', 'Sample'),
+(6,NULL,'SAM6','Inherited from TEST_0003','SAM6::TEST_0003_Bn_R_nn_1-1_D_1','Freezer1_6','GENOMIC',1,'TEST_0003_Bn_R_nn_1-1_D_1',1,1,NULL,NULL,1,'2016-07-07 13:30:55',1,'2016-07-07 13:30:55', 'Sample'),
+(7,NULL,'SAM7','Inherited from TEST_0004','SAM7::TEST_0004_Bn_P_nn_1-1_D_1','Freezer1_7','GENOMIC',1,'TEST_0004_Bn_P_nn_1-1_D_1',1,1,NULL,NULL,1,'2016-07-07 13:30:57',1,'2016-07-07 13:30:57', 'Sample'),
+(8,NULL,'SAM8','Inherited from TEST_0004','SAM8::TEST_0004_Bn_R_nn_1-1_D_1','Freezer1_8','GENOMIC',1,'TEST_0004_Bn_R_nn_1-1_D_1',1,1,NULL,NULL,1,'2016-07-07 13:30:59',1,'2016-07-07 13:30:59', 'Sample'),
+(9,NULL,'SAM9','Inherited from TEST_0005','SAM9::TEST_0005_Bn_P_nn_1-1_D_1','Freezer1_9','GENOMIC',1,'TEST_0005_Bn_P_nn_1-1_D_1',1,1,NULL,NULL,1,'2016-07-07 13:31:01',1,'2016-07-07 13:31:01', 'Sample'),
+(10,NULL,'SAM10','Inherited from TEST_0005','SAM10::TEST_0005_Bn_R_nn_1-1_D_1','Freezer1_10','GENOMIC',1,'TEST_0005_Bn_R_nn_1-1_D_1',1,1,NULL,NULL,1,'2016-07-07 13:31:03',1,'2016-07-07 13:31:03', 'Sample'),
+(11,NULL,'SAM11','Inherited from TEST_0006','SAM11::TEST_0006_Bn_P_nn_1-1_D_1','Freezer1_11','GENOMIC',1,'TEST_0006_Bn_P_nn_1-1_D_1',1,1,NULL,NULL,1,'2016-07-07 13:31:05',1,'2016-07-07 13:31:05', 'Sample'),
+(12,NULL,'SAM12','Inherited from TEST_0006','SAM12::TEST_0006_Bn_R_nn_1-1_D_1','Freezer1_12','GENOMIC',1,'TEST_0006_Bn_R_nn_1-1_D_1',1,1,NULL,NULL,1,'2016-07-07 13:31:07',1,'2016-07-07 13:31:07', 'Sample'),
+(13,NULL,'SAM13','Inherited from TEST_0007','SAM13::TEST_0007_Bn_P_nn_1-1_D_1','Freezer1_13','GENOMIC',1,'TEST_0007_Bn_P_nn_1-1_D_1',1,1,NULL,NULL,1,'2016-07-07 13:31:09',1,'2016-07-07 13:31:09', 'Sample'),
+(14,NULL,'SAM14','Inherited from TEST_0007','SAM14::TEST_0007_Bn_R_nn_1-1_D_1','Freezer1_14','GENOMIC',1,'TEST_0007_Bn_R_nn_1-1_D_1',1,1,NULL,NULL,1,'2016-07-07 13:31:11',1,'2016-07-07 13:31:11', 'Sample');
 
   -- Identities
-INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identificationBarcode`, `locationBarcode`, `sampleType`, `qcPassed`, `alias`, `project_projectId`, `scientificNameId`, `taxonIdentifier`, sequencingControlTypeId, `lastModifier`, `lastModified`, `creator`, `created`,
+INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identificationBarcode`, `locationBarcode`, `sampleType`, `detailedQcStatusId`, `alias`, `project_projectId`, `scientificNameId`, `taxonIdentifier`, sequencingControlTypeId, `lastModifier`, `lastModified`, `creator`, `created`,
   `sampleClassId`, `archived`, `parentId`, `siblingNumber`, `preMigrationId`, isSynthetic, nonStandardAlias, discriminator,
   externalName, donorSex, consentLevel) VALUES
-(15,NULL,'SAM15','identity1','SAM15::TEST_0001_IDENTITY_1','Freezer1_1','GENOMIC',TRUE,'TEST_0001_IDENTITY_1',1,1,NULL,NULL,1,'2016-07-07 13:31:13',1,'2016-07-07 13:31:13',
+(15,NULL,'SAM15','identity1','SAM15::TEST_0001_IDENTITY_1','Freezer1_1','GENOMIC',1,'TEST_0001_IDENTITY_1',1,1,NULL,NULL,1,'2016-07-07 13:31:13',1,'2016-07-07 13:31:13',
   1,0,NULL,NULL,NULL,0, FALSE, 'Identity',
   '15_EXT15,EXT15','UNKNOWN', 'THIS_PROJECT'),
-(20,NULL,'SAM20','identity2','SAM20::TEST_0002_IDENTITY_2','Freezer1_1','GENOMIC',TRUE,'TEST_0002_IDENTITY_2',1,1,NULL,NULL,1,'2018-02-22 14:34:00',1,'2018-02-22 14:34:00',
+(20,NULL,'SAM20','identity2','SAM20::TEST_0002_IDENTITY_2','Freezer1_1','GENOMIC',1,'TEST_0002_IDENTITY_2',1,1,NULL,NULL,1,'2018-02-22 14:34:00',1,'2018-02-22 14:34:00',
   1,0,NULL,NULL,NULL,0, FALSE, 'Identity',
   '20_EXT20,EXT20','UNKNOWN', 'THIS_PROJECT');
 
@@ -270,16 +270,16 @@ INSERT INTO SampleHierarchy(sampleId, identityId, tissueId) VALUES
 (20, 20, NULL);
 
 -- Tissues
-INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identificationBarcode`, `locationBarcode`, `sampleType`, `qcPassed`, `alias`, `project_projectId`, `scientificNameId`, `taxonIdentifier`, sequencingControlTypeId, `lastModifier`, `lastModified`, `creator`, `created`,
+INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identificationBarcode`, `locationBarcode`, `sampleType`, `detailedQcStatusId`, `alias`, `project_projectId`, `scientificNameId`, `taxonIdentifier`, sequencingControlTypeId, `lastModifier`, `lastModified`, `creator`, `created`,
   `sampleClassId`, `archived`, `parentId`, `siblingNumber`, `preMigrationId`, isSynthetic, nonStandardAlias, discriminator,
   tissueOriginId, tissueTypeId, timesReceived, tubeNumber, labId) VALUES
-(16,NULL,'SAM16','tissue1','SAM16::TEST_0001_TISSUE_1','Freezer1_1','GENOMIC',TRUE,'TEST_0001_TISSUE_1',1,1,NULL,NULL,1,'2016-07-07 13:31:15',1,'2016-07-07 13:31:15',
+(16,NULL,'SAM16','tissue1','SAM16::TEST_0001_TISSUE_1','Freezer1_1','GENOMIC',1,'TEST_0001_TISSUE_1',1,1,NULL,NULL,1,'2016-07-07 13:31:15',1,'2016-07-07 13:31:15',
   2,0,15,1,NULL,1, FALSE, 'Tissue',
   1, 1, 1, 1, 2),
-(17,NULL,'SAM17','tissue2','SAM17::TEST_0001_TISSUE_2','Freezer1_1','GENOMIC',TRUE,'TEST_0001_TISSUE_2',1,1,NULL,NULL,1,'2016-07-07 13:31:17',1,'2016-07-07 13:31:17',
+(17,NULL,'SAM17','tissue2','SAM17::TEST_0001_TISSUE_2','Freezer1_1','GENOMIC',1,'TEST_0001_TISSUE_2',1,1,NULL,NULL,1,'2016-07-07 13:31:17',1,'2016-07-07 13:31:17',
   2,0,15,2,1,0, FALSE, 'Tissue',
   1, 1, 1, 2, NULL),
-(21,NULL,'SAM21','tissue4','SAM21::TEST_0001_TISSUE_4','Freezer1_1','GENOMIC',TRUE,'TEST_0001_TISSUE_4',1,1,NULL,NULL,1,'2016-07-07 13:31:17',1,'2016-07-07 13:31:17',
+(21,NULL,'SAM21','tissue4','SAM21::TEST_0001_TISSUE_4','Freezer1_1','GENOMIC',1,'TEST_0001_TISSUE_4',1,1,NULL,NULL,1,'2016-07-07 13:31:17',1,'2016-07-07 13:31:17',
   2,0,15,4,NULL,0, FALSE, 'Tissue',
   1, 1, 1, 3, NULL);
 
@@ -289,18 +289,18 @@ INSERT INTO SampleHierarchy(sampleId, identityId, tissueId) VALUES
 (21, 15, 21);
 
 -- Stocks
-INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identificationBarcode`, `locationBarcode`, `sampleType`, `qcPassed`, `alias`, `project_projectId`, `scientificNameId`, `taxonIdentifier`, sequencingControlTypeId, `lastModifier`, `lastModified`, `creator`, `created`, sopId,
+INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identificationBarcode`, `locationBarcode`, `sampleType`, `detailedQcStatusId`, `alias`, `project_projectId`, `scientificNameId`, `taxonIdentifier`, sequencingControlTypeId, `lastModifier`, `lastModified`, `creator`, `created`, sopId,
   `sampleClassId`, `archived`, `parentId`, `siblingNumber`, `preMigrationId`, isSynthetic, nonStandardAlias, discriminator) VALUES
-(18,NULL,'SAM18','stock1','SAM18::TEST_0001_STOCK_1','Freezer1_1','GENOMIC',TRUE,'TEST_0001_STOCK_1',1,1,NULL,NULL,1,'2016-07-07 13:31:19',1,'2016-07-07 13:31:19', 1,
+(18,NULL,'SAM18','stock1','SAM18::TEST_0001_STOCK_1','Freezer1_1','GENOMIC',1,'TEST_0001_STOCK_1',1,1,NULL,NULL,1,'2016-07-07 13:31:19',1,'2016-07-07 13:31:19', 1,
   3,0,17,1,NULL,0, FALSE, 'Stock');
 
 INSERT INTO SampleHierarchy(sampleId, identityId, tissueId) VALUES
 (18, 15, 17);
 
 -- Aliquots
-INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identificationBarcode`, `locationBarcode`, `sampleType`, `qcPassed`, `alias`, `project_projectId`, `scientificNameId`, `taxonIdentifier`, sequencingControlTypeId, `lastModifier`, `lastModified`, `creator`, `created`,
+INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identificationBarcode`, `locationBarcode`, `sampleType`, `detailedQcStatusId`, `alias`, `project_projectId`, `scientificNameId`, `taxonIdentifier`, sequencingControlTypeId, `lastModifier`, `lastModified`, `creator`, `created`,
   `sampleClassId`, `archived`, `parentId`, `siblingNumber`, `preMigrationId`, isSynthetic, nonStandardAlias, discriminator) VALUES
-(19,NULL,'SAM19','aliquot1','SAM19::TEST_0001_ALIQUOT_1','Freezer1_1','GENOMIC',TRUE,'TEST_0001_ALIQUOT_1',1,1,NULL,1,1,'2016-07-07 13:31:21',1,'2016-07-07 13:31:21',
+(19,NULL,'SAM19','aliquot1','SAM19::TEST_0001_ALIQUOT_1','Freezer1_1','GENOMIC',1,'TEST_0001_ALIQUOT_1',1,1,NULL,1,1,'2016-07-07 13:31:21',1,'2016-07-07 13:31:21',
   4,0,18,1,NULL,0, FALSE, 'Aliquot');
 
 INSERT INTO SampleHierarchy(sampleId, identityId, tissueId) VALUES
@@ -373,22 +373,22 @@ INSERT INTO `LibraryDesign`(`libraryDesignId`, `name`, `sampleClassId`, `library
 VALUES (1, 'DESIGN1', 1, 1, 1, 1), 
 (2, 'DESIGN2', 2, 1, 1, 1);
 
-INSERT INTO `Library`(`libraryId`, `name`, `description`, `accession`, `sample_sampleId`, `identificationBarcode`, `locationBarcode`, `libraryType`, `concentration`, `creationDate`, `platformType`, `alias`, `paired`, `librarySelectionType`, `libraryStrategyType`, `qcPassed`, `lastModifier`, `lastModified`, `creator`, `created`, `kitDescriptorId`, workstationId, discriminator, libraryDesignCodeId, archived, nonStandardAlias, sopId) VALUES
-(1,'LIB1','Inherited from TEST_0001',NULL,1,'LIB1::TEST_0001_Bn_P_PE_300_WG','LIBRARY_INBOX_A01',3,0,'2015-08-27','ILLUMINA','TEST_0001_Bn_P_PE_300_WG',1,1,1,TRUE,1,'2016-07-07 13:30:49',1,'2016-07-07 13:30:49', 1, 1, 'DetailedLibrary', 1, FALSE, FALSE, 3),
-(2,'LIB2','Inherited from TEST_0001',NULL,2,'LIB2::TEST_0001_Bn_R_PE_300_WG','LIBRARY_INBOX_A02',3,0,'2015-08-27','ILLUMINA','TEST_0001_Bn_R_PE_300_WG',1,1,1,TRUE,1,'2016-07-07 13:30:51',1,'2016-07-07 13:30:51', NULL, 1, 'Library', NULL, NULL, NULL, NULL),
-(3,'LIB3','Inherited from TEST_0002',NULL,3,'LIB3::TEST_0002_Bn_P_PE_300_WG','LIBRARY_INBOX_A03',3,0,'2015-08-27','ILLUMINA','TEST_0002_Bn_P_PE_300_WG',1,1,1,TRUE,1,'2016-07-07 13:30:53',1,'2016-07-07 13:30:53', NULL, 1, 'Library', NULL, NULL, NULL, NULL),
-(4,'LIB4','Inherited from TEST_0002',NULL,4,'LIB4::TEST_0002_Bn_R_PE_300_WG','LIBRARY_INBOX_A04',3,0,'2015-08-27','ILLUMINA','TEST_0002_Bn_R_PE_300_WG',1,1,1,TRUE,1,'2016-07-07 13:30:55',1,'2016-07-07 13:30:55', NULL, 1, 'Library', NULL, NULL, NULL, NULL),
-(5,'LIB5','Inherited from TEST_0003',NULL,5,'LIB5::TEST_0003_Bn_P_PE_300_WG','LIBRARY_INBOX_A05',3,0,'2015-08-27','ILLUMINA','TEST_0003_Bn_P_PE_300_WG',1,1,1,TRUE,1,'2016-07-07 13:30:57',1,'2016-07-07 13:30:57', NULL, NULL, 'Library', NULL, NULL, NULL, NULL),
-(6,'LIB6','Inherited from TEST_0003',NULL,6,'LIB6::TEST_0003_Bn_R_PE_300_WG','LIBRARY_INBOX_A06',3,0,'2015-08-27','ILLUMINA','TEST_0003_Bn_R_PE_300_WG',1,1,1,TRUE,1,'2016-07-07 13:30:59',1,'2016-07-07 13:30:59', NULL, NULL, 'Library', NULL, NULL, NULL, NULL),
-(7,'LIB7','Inherited from TEST_0004',NULL,7,'LIB7::TEST_0004_Bn_P_PE_300_WG','LIBRARY_INBOX_A07',3,0,'2015-08-27','ILLUMINA','TEST_0004_Bn_P_PE_300_WG',1,1,1,TRUE,1,'2016-07-07 13:31:01',1,'2016-07-07 13:31:01', NULL, NULL, 'Library', NULL, NULL, NULL, NULL),
-(8,'LIB8','Inherited from TEST_0004',NULL,8,'LIB8::TEST_0004_Bn_R_PE_300_WG','LIBRARY_INBOX_A08',3,0,'2015-08-27','ILLUMINA','TEST_0004_Bn_R_PE_300_WG',1,1,1,TRUE,1,'2016-07-07 13:31:03',1,'2016-07-07 13:31:03', NULL, NULL, 'Library', NULL, NULL, NULL, NULL),
-(9,'LIB9','Inherited from TEST_0005',NULL,9,'LIB9::TEST_0005_Bn_P_PE_300_WG','LIBRARY_INBOX_A09',3,0,'2015-08-27','ILLUMINA','TEST_0005_Bn_P_PE_300_WG',1,1,1,TRUE,1,'2016-07-07 13:31:05',1,'2016-07-07 13:31:05', NULL, NULL, 'Library', NULL, NULL, NULL, NULL),
-(10,'LIB10','Inherited from TEST_0005',NULL,10,'LIB10::TEST_0005_Bn_R_PE_300_WG','LIBRARY_INBOX_A10',3,0,'2015-08-27','ILLUMINA','TEST_0005_Bn_R_PE_300_WG',1,1,1,TRUE,1,'2016-07-07 13:31:07',1,'2016-07-07 13:31:07', NULL, NULL, 'Library', NULL, NULL, NULL, NULL),
-(11,'LIB11','Inherited from TEST_0006',NULL,11,'LIB11::TEST_0006_Bn_P_PE_300_WG','LIBRARY_INBOX_B01',3,0,'2015-08-27','ILLUMINA','TEST_0006_Bn_P_PE_300_WG',1,1,1,TRUE,1,'2016-07-07 13:31:09',1,'2016-07-07 13:31:09', NULL, NULL, 'Library', NULL, NULL, NULL, NULL),
-(12,'LIB12','Inherited from TEST_0006',NULL,12,'LIB12::TEST_0006_Bn_R_PE_300_WG','LIBRARY_INBOX_B02',3,0,'2015-08-27','ILLUMINA','TEST_0006_Bn_R_PE_300_WG',1,1,1,TRUE,1,'2016-07-07 13:31:11',1,'2016-07-07 13:31:11', NULL, NULL, 'Library', NULL, NULL, NULL, NULL),
-(13,'LIB13','Inherited from TEST_0007',NULL,13,'LIB13::TEST_0007_Bn_P_PE_300_WG','LIBRARY_INBOX_B03',3,0,'2015-08-27','ILLUMINA','TEST_0007_Bn_P_PE_300_WG',1,1,1,TRUE,1,'2016-07-07 13:31:13',1,'2016-07-07 13:31:13', NULL, NULL, 'Library', NULL, NULL, NULL, NULL),
-(14,'LIB14','Inherited from TEST_0007',NULL,14,'LIB14::TEST_0007_Bn_R_PE_300_WG','LIBRARY_INBOX_B04',3,0,'2015-08-27','ILLUMINA','TEST_0007_Bn_R_PE_300_WG',1,1,1,TRUE,1,'2016-07-07 13:31:15',1,'2016-07-07 13:31:15', NULL, NULL, 'Library', NULL, NULL, NULL, NULL),
-(15,'LIB15',NULL,NULL,19,'LIB15::TEST_0001_ALIQUOT_1_PE_300_WG',NULL,3,0,'2018-02-15','ILLUMINA','TEST_0001_ALIQUOT_1_PE_300_WG',1,1,1,TRUE,1,'2016-07-07 13:31:15',1,'2016-07-07 13:31:15', NULL, NULL, 'Library', NULL, NULL, NULL, NULL);
+INSERT INTO `Library`(`libraryId`, `name`, `description`, `accession`, `sample_sampleId`, `identificationBarcode`, `locationBarcode`, `libraryType`, `concentration`, `creationDate`, `platformType`, `alias`, `paired`, `librarySelectionType`, `libraryStrategyType`, `detailedQcStatusId`, `lastModifier`, `lastModified`, `creator`, `created`, `kitDescriptorId`, workstationId, discriminator, libraryDesignCodeId, archived, nonStandardAlias, sopId) VALUES
+(1,'LIB1','Inherited from TEST_0001',NULL,1,'LIB1::TEST_0001_Bn_P_PE_300_WG','LIBRARY_INBOX_A01',3,0,'2015-08-27','ILLUMINA','TEST_0001_Bn_P_PE_300_WG',1,1,1,1,1,'2016-07-07 13:30:49',1,'2016-07-07 13:30:49', 1, 1, 'DetailedLibrary', 1, FALSE, FALSE, 3),
+(2,'LIB2','Inherited from TEST_0001',NULL,2,'LIB2::TEST_0001_Bn_R_PE_300_WG','LIBRARY_INBOX_A02',3,0,'2015-08-27','ILLUMINA','TEST_0001_Bn_R_PE_300_WG',1,1,1,1,1,'2016-07-07 13:30:51',1,'2016-07-07 13:30:51', NULL, 1, 'Library', NULL, NULL, NULL, NULL),
+(3,'LIB3','Inherited from TEST_0002',NULL,3,'LIB3::TEST_0002_Bn_P_PE_300_WG','LIBRARY_INBOX_A03',3,0,'2015-08-27','ILLUMINA','TEST_0002_Bn_P_PE_300_WG',1,1,1,1,1,'2016-07-07 13:30:53',1,'2016-07-07 13:30:53', NULL, 1, 'Library', NULL, NULL, NULL, NULL),
+(4,'LIB4','Inherited from TEST_0002',NULL,4,'LIB4::TEST_0002_Bn_R_PE_300_WG','LIBRARY_INBOX_A04',3,0,'2015-08-27','ILLUMINA','TEST_0002_Bn_R_PE_300_WG',1,1,1,1,1,'2016-07-07 13:30:55',1,'2016-07-07 13:30:55', NULL, 1, 'Library', NULL, NULL, NULL, NULL),
+(5,'LIB5','Inherited from TEST_0003',NULL,5,'LIB5::TEST_0003_Bn_P_PE_300_WG','LIBRARY_INBOX_A05',3,0,'2015-08-27','ILLUMINA','TEST_0003_Bn_P_PE_300_WG',1,1,1,1,1,'2016-07-07 13:30:57',1,'2016-07-07 13:30:57', NULL, NULL, 'Library', NULL, NULL, NULL, NULL),
+(6,'LIB6','Inherited from TEST_0003',NULL,6,'LIB6::TEST_0003_Bn_R_PE_300_WG','LIBRARY_INBOX_A06',3,0,'2015-08-27','ILLUMINA','TEST_0003_Bn_R_PE_300_WG',1,1,1,1,1,'2016-07-07 13:30:59',1,'2016-07-07 13:30:59', NULL, NULL, 'Library', NULL, NULL, NULL, NULL),
+(7,'LIB7','Inherited from TEST_0004',NULL,7,'LIB7::TEST_0004_Bn_P_PE_300_WG','LIBRARY_INBOX_A07',3,0,'2015-08-27','ILLUMINA','TEST_0004_Bn_P_PE_300_WG',1,1,1,1,1,'2016-07-07 13:31:01',1,'2016-07-07 13:31:01', NULL, NULL, 'Library', NULL, NULL, NULL, NULL),
+(8,'LIB8','Inherited from TEST_0004',NULL,8,'LIB8::TEST_0004_Bn_R_PE_300_WG','LIBRARY_INBOX_A08',3,0,'2015-08-27','ILLUMINA','TEST_0004_Bn_R_PE_300_WG',1,1,1,1,1,'2016-07-07 13:31:03',1,'2016-07-07 13:31:03', NULL, NULL, 'Library', NULL, NULL, NULL, NULL),
+(9,'LIB9','Inherited from TEST_0005',NULL,9,'LIB9::TEST_0005_Bn_P_PE_300_WG','LIBRARY_INBOX_A09',3,0,'2015-08-27','ILLUMINA','TEST_0005_Bn_P_PE_300_WG',1,1,1,1,1,'2016-07-07 13:31:05',1,'2016-07-07 13:31:05', NULL, NULL, 'Library', NULL, NULL, NULL, NULL),
+(10,'LIB10','Inherited from TEST_0005',NULL,10,'LIB10::TEST_0005_Bn_R_PE_300_WG','LIBRARY_INBOX_A10',3,0,'2015-08-27','ILLUMINA','TEST_0005_Bn_R_PE_300_WG',1,1,1,1,1,'2016-07-07 13:31:07',1,'2016-07-07 13:31:07', NULL, NULL, 'Library', NULL, NULL, NULL, NULL),
+(11,'LIB11','Inherited from TEST_0006',NULL,11,'LIB11::TEST_0006_Bn_P_PE_300_WG','LIBRARY_INBOX_B01',3,0,'2015-08-27','ILLUMINA','TEST_0006_Bn_P_PE_300_WG',1,1,1,1,1,'2016-07-07 13:31:09',1,'2016-07-07 13:31:09', NULL, NULL, 'Library', NULL, NULL, NULL, NULL),
+(12,'LIB12','Inherited from TEST_0006',NULL,12,'LIB12::TEST_0006_Bn_R_PE_300_WG','LIBRARY_INBOX_B02',3,0,'2015-08-27','ILLUMINA','TEST_0006_Bn_R_PE_300_WG',1,1,1,1,1,'2016-07-07 13:31:11',1,'2016-07-07 13:31:11', NULL, NULL, 'Library', NULL, NULL, NULL, NULL),
+(13,'LIB13','Inherited from TEST_0007',NULL,13,'LIB13::TEST_0007_Bn_P_PE_300_WG','LIBRARY_INBOX_B03',3,0,'2015-08-27','ILLUMINA','TEST_0007_Bn_P_PE_300_WG',1,1,1,1,1,'2016-07-07 13:31:13',1,'2016-07-07 13:31:13', NULL, NULL, 'Library', NULL, NULL, NULL, NULL),
+(14,'LIB14','Inherited from TEST_0007',NULL,14,'LIB14::TEST_0007_Bn_R_PE_300_WG','LIBRARY_INBOX_B04',3,0,'2015-08-27','ILLUMINA','TEST_0007_Bn_R_PE_300_WG',1,1,1,1,1,'2016-07-07 13:31:15',1,'2016-07-07 13:31:15', NULL, NULL, 'Library', NULL, NULL, NULL, NULL),
+(15,'LIB15',NULL,NULL,19,'LIB15::TEST_0001_ALIQUOT_1_PE_300_WG',NULL,3,0,'2018-02-15','ILLUMINA','TEST_0001_ALIQUOT_1_PE_300_WG',1,1,1,1,1,'2016-07-07 13:31:15',1,'2016-07-07 13:31:15', NULL, NULL, 'Library', NULL, NULL, NULL, NULL);
 
 INSERT INTO `LibraryChangeLog`(`libraryId`, `columnsChanged`, `userId`, `message`, `changeTime`)
 VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),

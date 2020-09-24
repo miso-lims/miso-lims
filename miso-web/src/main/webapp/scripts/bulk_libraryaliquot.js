@@ -169,8 +169,10 @@ BulkTarget.libraryaliquot = (function($) {
             required: designCode ? designCode.targetedSequencingRequired : false
           });
         }
-      }, BulkUtils.columns.qcPassed(true), BulkUtils.columns.librarySize);
+      });
 
+      columns = columns.concat(BulkUtils.columns.detailedQcStatus());
+      columns.push(BulkUtils.columns.librarySize);
       columns = columns.concat(BulkUtils.columns.concentration());
       columns = columns.concat(BulkUtils.columns.volume(false, config));
       columns = columns.concat(BulkUtils.columns.parentUsed);

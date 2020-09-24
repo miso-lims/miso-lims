@@ -58,7 +58,8 @@ public class SampleDto extends AbstractBoxableDto implements ReceivableDto<Sampl
   private Boolean received;
   private Boolean receiptQcPassed;
   private String receiptQcNote;
-  private Boolean qcPassed;
+  private Long detailedQcStatusId;
+  private String detailedQcStatusNote;
   private String alias;
   private Long projectId;
   private String projectName;
@@ -211,13 +212,20 @@ public class SampleDto extends AbstractBoxableDto implements ReceivableDto<Sampl
     this.receiptQcNote = receiptQcNote;
   }
 
-  public Boolean getQcPassed() {
-    return qcPassed;
+  public Long getDetailedQcStatusId() {
+    return detailedQcStatusId;
   }
 
-  @JsonInclude(JsonInclude.Include.ALWAYS)
-  public void setQcPassed(Boolean qcPassed) {
-    this.qcPassed = qcPassed;
+  public void setDetailedQcStatusId(Long detailedQcStatusId) {
+    this.detailedQcStatusId = detailedQcStatusId;
+  }
+
+  public String getDetailedQcStatusNote() {
+    return detailedQcStatusNote;
+  }
+
+  public void setDetailedQcStatusNote(String detailedQcStatusNote) {
+    this.detailedQcStatusNote = detailedQcStatusNote;
   }
 
   public String getAlias() {

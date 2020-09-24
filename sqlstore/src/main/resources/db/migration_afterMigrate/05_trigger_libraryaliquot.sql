@@ -21,7 +21,8 @@ FOR EACH ROW
       makeChangeMessage('design code', (SELECT code FROM LibraryDesignCode WHERE libraryDesignCodeId = OLD.libraryDesignCodeId), (SELECT code FROM LibraryDesignCode WHERE libraryDesignCodeId = NEW.libraryDesignCodeId)),
       makeChangeMessage('discarded', booleanToString(OLD.discarded), booleanToString(NEW.discarded)),
       makeChangeMessage('size', OLD.dnaSize, NEW.dnaSize),
-      makeChangeMessage('QC passed', OLD.qcPassed, NEW.qcPassed),
+      makeChangeMessage('QC Status', (SELECT description FROM DetailedQcStatus WHERE detailedQcStatusId = OLD.detailedQcStatusId), (SELECT description FROM DetailedQcStatus WHERE detailedQcStatusId = NEW.detailedQcStatusId)),
+      makeChangeMessage('QC Status Note', OLD.detailedQcStatusNote, NEW.detailedQcStatusNote),
       makeChangeMessage('group id', OLD.groupId, NEW.groupId),
       makeChangeMessage('group description', OLD.groupDescription, NEW.groupDescription)
     );
@@ -43,7 +44,8 @@ FOR EACH ROW
           makeChangeColumn('libraryDesignCodeId', OLD.libraryDesignCodeId, NEW.libraryDesignCodeId),
           makeChangeColumn('discarded', OLD.discarded, NEW.discarded),
           makeChangeColumn('dnaSize', OLD.dnaSize, NEW.dnaSize),
-          makeChangeColumn('qcPassed', OLD.qcPassed, NEW.qcPassed),
+          makeChangeColumn('detailedQcStatusId', OLD.detailedQcStatusId, NEW.detailedQcStatusId),
+          makeChangeColumn('detailedQcStatusNote', OLD.detailedQcStatusNote, NEW.detailedQcStatusNote),
           makeChangeColumn('groupId', OLD.groupId, NEW.groupId),
           makeChangeColumn('groupDescription', OLD.groupDescription, NEW.groupDescription)
         ), ''),

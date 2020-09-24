@@ -314,7 +314,6 @@ public class LoadGeneratorSource implements MigrationSource {
     sample.setSampleType(DEFAULT_SAMPLE_TYPE);
     sample.setProject(project);
     sample.setScientificName(scientificName);
-    sample.setQcPassed(true);
     sample.setSampleClass(sampleClass);
     sample.setParent(parent);
     sample.setSiblingNumber(siblingNumber);
@@ -353,7 +352,6 @@ public class LoadGeneratorSource implements MigrationSource {
     lib.setLibraryType(lt);
     lib.setPlatformType("Illumina");
     lib.setPaired(true);
-    lib.setQcPassed(true);
 
     LibrarySelectionType sel = new LibrarySelectionType();
     sel.setId(librarySelectionTypeId);

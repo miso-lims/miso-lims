@@ -23,7 +23,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
@@ -49,11 +48,6 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   @ManyToOne(targetEntity = SampleClassImpl.class)
   @JoinColumn(name = "sampleClassId", nullable = false)
   private SampleClass sampleClass;
-
-  @ManyToOne(targetEntity = DetailedQcStatusImpl.class)
-  @JoinColumn(name = "detailedQcStatusId")
-  private DetailedQcStatus detailedQcStatus;
-  private String detailedQcStatusNote;
 
   @ManyToOne(targetEntity = SubprojectImpl.class)
   @JoinColumn(name = "subprojectId")
@@ -138,16 +132,6 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   }
 
   @Override
-  public DetailedQcStatus getDetailedQcStatus() {
-    return detailedQcStatus;
-  }
-
-  @Override
-  public void setDetailedQcStatus(DetailedQcStatus detailedQcStatus) {
-    this.detailedQcStatus = detailedQcStatus;
-  }
-
-  @Override
   public Integer getSiblingNumber() {
     return siblingNumber;
   }
@@ -197,16 +181,6 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   @Override
   public void setNonStandardAlias(boolean nonStandardAlias) {
     this.nonStandardAlias = nonStandardAlias;
-  }
-
-  @Override
-  public String getDetailedQcStatusNote() {
-    return detailedQcStatusNote;
-  }
-
-  @Override
-  public void setDetailedQcStatusNote(String detailedQcStatusNote) {
-    this.detailedQcStatusNote = detailedQcStatusNote;
   }
   
   @Override

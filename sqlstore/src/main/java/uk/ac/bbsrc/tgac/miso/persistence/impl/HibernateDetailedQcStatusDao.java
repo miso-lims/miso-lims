@@ -13,7 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.DetailedQcStatusDao;
 
 @Repository
@@ -63,8 +65,22 @@ public class HibernateDetailedQcStatusDao implements DetailedQcStatusDao {
   }
 
   @Override
-  public long getUsage(DetailedQcStatus detailedQcStatus) {
-    return (long) currentSession().createCriteria(DetailedSampleImpl.class)
+  public long getUsageBySamples(DetailedQcStatus detailedQcStatus) {
+    return getUsageBy(detailedQcStatus, SampleImpl.class);
+  }
+
+  @Override
+  public long getUsageByLibraries(DetailedQcStatus detailedQcStatus) {
+    return getUsageBy(detailedQcStatus, LibraryImpl.class);
+  }
+
+  @Override
+  public long getUsageByLibraryAliquots(DetailedQcStatus detailedQcStatus) {
+    return getUsageBy(detailedQcStatus, LibraryAliquot.class);
+  }
+
+  private long getUsageBy(DetailedQcStatus detailedQcStatus, Class<?> user) {
+    return (long) currentSession().createCriteria(user)
         .add(Restrictions.eq("detailedQcStatus", detailedQcStatus))
         .setProjection(Projections.rowCount()).uniqueResult();
   }

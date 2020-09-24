@@ -56,6 +56,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
+import uk.ac.bbsrc.tgac.miso.core.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
 import uk.ac.bbsrc.tgac.miso.core.service.LabService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
@@ -80,7 +81,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
-import uk.ac.bbsrc.tgac.miso.persistence.DetailedQcStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleStore;
@@ -112,7 +112,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   @Autowired
   private TissueTypeDao tissueTypeDao;
   @Autowired
-  private DetailedQcStatusDao detailedQcStatusDao;
+  private DetailedQcStatusService detailedQcStatusService;
   @Autowired
   private SamplePurposeDao samplePurposeDao;
   @Autowired
@@ -181,8 +181,8 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     this.tissueTypeDao = tissueTypeDao;
   }
 
-  public void setDetailedQcStatusDao(DetailedQcStatusDao detailedQcStatusDao) {
-    this.detailedQcStatusDao = detailedQcStatusDao;
+  public void setDetailedQcStatusService(DetailedQcStatusService detailedQcStatusService) {
+    this.detailedQcStatusService = detailedQcStatusService;
   }
 
   public void setSubprojectService(SubprojectService subprojectService) {
@@ -359,9 +359,6 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
    * @throws IOException
    */
   private Sample save(Sample sample, boolean validateAliasUniqueness) throws IOException {
-    if (sample instanceof DetailedSample && ((DetailedSample) sample).getDetailedQcStatus() != null) {
-      ((DetailedSample) sample).setQcPassed(((DetailedSample) sample).getDetailedQcStatus().getStatus());
-    }
     NamingScheme namingScheme = getNamingScheme(sample);
     try {
       Long newId = sample.getId();
@@ -679,7 +676,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
         detailed.setSampleClass(sampleClassService.get(detailed.getSampleClass().getId()));
       }
       if (detailed.getDetailedQcStatus() != null && detailed.getDetailedQcStatus().isSaved()) {
-        detailed.setDetailedQcStatus(detailedQcStatusDao.get(detailed.getDetailedQcStatus().getId()));
+        detailed.setDetailedQcStatus(detailedQcStatusService.get(detailed.getDetailedQcStatus().getId()));
       }
       if (detailed.getSubproject() != null && detailed.getSubproject().isSaved()) {
         detailed.setSubproject(subprojectService.get(detailed.getSubproject().getId()));
@@ -896,6 +893,8 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     target.setRequisitionId(source.getRequisitionId());
     target.setSequencingControlType(source.getSequencingControlType());
     target.setSop(source.getSop());
+    target.setDetailedQcStatus(source.getDetailedQcStatus());
+    target.setDetailedQcStatusNote(nullifyStringIfBlank(source.getDetailedQcStatusNote()));
 
     if (isDetailedSample(target)) {
       DetailedSample dTarget = (DetailedSample) target;
@@ -905,9 +904,6 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       dTarget.setGroupId(dSource.getGroupId());
       dTarget.setCreationDate(dSource.getCreationDate());
 
-      dTarget.setDetailedQcStatus(dSource.getDetailedQcStatus());
-      dTarget.setDetailedQcStatusNote(nullifyStringIfBlank(dSource.getDetailedQcStatusNote()));
-      dTarget.setQcPassed(dSource.getQcPassed());
       dTarget.setSubproject(dSource.getSubproject());
       dTarget.setVolumeUsed(dSource.getVolumeUsed());
       dTarget.setNgUsed(dSource.getNgUsed());
@@ -924,8 +920,6 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       } else if (isStockSample(target)) {
         applyStockChanges((SampleStock) target, (SampleStock) source);
       }
-    } else {
-      target.setQcPassed(source.getQcPassed());
     }
   }
 

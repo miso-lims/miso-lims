@@ -52,7 +52,8 @@ public class BulkLibraryPage extends BulkPage {
     public static final String UMIS = "Has UMIs";
     public static final String KIT_DESCRIPTOR = "Kit";
     public static final String KIT_LOT = "Kit Lot";
-    public static final String QC_PASSED = "QC Passed?";
+    public static final String QC_STATUS = "QC Status";
+    public static final String QC_NOTE = "QC Note";
     public static final String SIZE = "Size (bp)";
     public static final String INITIAL_VOLUME = "Initial Volume";
     public static final String VOLUME = "Volume";

@@ -283,7 +283,7 @@ FormTarget.library = (function($) {
           title: 'Has UMIs',
           data: 'umis',
           type: 'checkbox'
-        }, FormUtils.makeQcPassedField(true), {
+        }].concat(FormUtils.makeDetailedQcStatusFields()).concat([{
           title: 'Low Quality Sequencing',
           data: 'lowQuality',
           type: 'checkbox',
@@ -396,7 +396,7 @@ FormTarget.library = (function($) {
           type: 'decimal',
           precision: 14,
           scale: 10
-        }])
+        }]))
       }, {
         title: 'Details',
         include: config.detailedSample,

@@ -9,6 +9,10 @@ INSERT INTO _Group (groupId, description, name) VALUES
 INSERT INTO User_Group (users_userId, groups_groupId)
 VALUES (3,1),(3,2),(1,1);
 
+INSERT INTO DetailedQcStatus (DetailedQcStatusId, status, description, noteRequired, createdBy, creationDate, updatedBy, lastUpdated) VALUES
+(1,TRUE,  'Ready',                  0,1,'2016-09-26 15:55:44',1,'2016-09-26 15:55:44'),
+(2,FALSE, 'Failed: QC',             0,1,'2016-09-26 15:55:44',1,'2016-09-26 15:55:44');
+
 INSERT INTO ScientificName(scientificNameId, alias) VALUES
 (1, 'Homo sapiens'),
 (2, 'Triticum aestivum');
@@ -159,8 +163,9 @@ INSERT INTO Study (studyId, name, project_projectId, alias, studyTypeId, creator
 (1, 'STU1',  1, 'PLAIN Study One', 1, 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00');
 
 INSERT INTO Sample (sampleId, name, alias, description, identificationBarcode, sampleType, project_projectId,
-scientificNameId, volume, qcPassed, lastModifier, creator, created, lastModified, discriminator) VALUES
-(1, 'SAM1', 'PLAIN_S0001_1', 'Plain', 'SAM1::PLAIN_S0001_first', 'GENOMIC', 1, 2, NULL, 1, 1, 1, '2017-07-20 09:00:00', '2017-07-20 09:00:00', 'Sample');
+scientificNameId, volume, detailedQcStatusId, lastModifier, creator, created, lastModified, discriminator) VALUES
+(1, 'SAM1', 'PLAIN_S0001_1', 'Plain', 'SAM1::PLAIN_S0001_first', 'GENOMIC', 1,
+  2, NULL, 1, 1, 1, '2017-07-20 09:00:00', '2017-07-20 09:00:00', 'Sample');
 
 INSERT INTO Institute(instituteId, alias, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 'University Health Network',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00');
@@ -176,10 +181,11 @@ INSERT INTO Transfer_Sample(transferId, sampleId, received, qcPassed, qcNote) VA
 (1, 1, TRUE, TRUE, NULL);
 
 INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, sample_sampleId, platformType,
-  libraryType, librarySelectionType, libraryStrategyType, creationDate, creator, created, lastModifier, lastModified, qcPassed, dnaSize,
+  libraryType, librarySelectionType, libraryStrategyType, creationDate, creator, created, lastModifier, lastModified, detailedQcStatusId, dnaSize,
   volume, volumeUnits, concentration, concentrationUnits, locationBarcode, kitDescriptorId, discriminator) VALUES
-  (1, 'LIB1', 'PLAIN_L0001-1_1', 'LIB1::PLAIN_L0001-1_1', 'plain lib', 1, 'ILLUMINA', 1, 3, 1,  '2016-11-07', 
-    1, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00', 1, 300, 5.0, 'MICROLITRES', 2.75, 'NANOGRAMS_PER_MICROLITRE', NULL, 1, 'Library');
+  (1, 'LIB1', 'PLAIN_L0001-1_1', 'LIB1::PLAIN_L0001-1_1', 'plain lib', 1, 'ILLUMINA',
+    1, 3, 1,  '2016-11-07', 1, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00', 1, 300,
+    5.0, 'MICROLITRES', 2.75, 'NANOGRAMS_PER_MICROLITRE', NULL, 1, 'Library');
 
 INSERT INTO Library_Index(library_libraryId, index_indexId) VALUES
   (1, 5);

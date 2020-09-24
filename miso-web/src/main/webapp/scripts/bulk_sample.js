@@ -879,41 +879,13 @@ BulkTarget.sample = (function($) {
         getItemValue: Utils.array.getId,
         description: 'Indicates a slide whose attributes such as marked area and % tumour are relevant to this sample.'
             + ' May be used for calculating extraction input per yield, for example.',
-      }, BulkUtils.columns.qcPassed(!Constants.isDetailedSample && !config.isLibraryReceipt), {
-        title: 'QC Status',
-        type: 'dropdown',
-        data: 'detailedQcStatusId',
-        include: Constants.isDetailedSample && !config.isLibraryReceipt,
-        required: true,
-        source: [{
-          id: null,
-          description: 'Not Ready'
-        }].concat(Constants.detailedQcStatuses),
-        sortSource: function(a, b) {
-          return statusToInt(a) - statusToInt(b);
-        },
-        getItemLabel: Utils.array.get('description'),
-        getItemValue: Utils.array.getId,
-        initial: '', // user must explicitly choose if not ready (null)
-        onChange: function(rowIndex, newValue, api) {
-          var status = Constants.detailedQcStatuses.find(function(item) {
-            return item.description === newValue;
-          });
-          var changes = {
-            required: status && status.noteRequired,
-            disabled: !status || !status.noteRequired
-          };
-          if (status && !status.noteRequired) {
-            changes.value = null;
-          }
-          api.updateField(rowIndex, 'detailedQcStatusNote', changes);
-        }
-      }, {
-        title: 'QC Note',
-        type: 'text',
-        data: 'detailedQcStatusNote',
-        include: Constants.isDetailedSample && !config.isLibraryReceipt
-      }, {
+      });
+
+      if (!config.isLibraryReceipt) {
+        columns = columns.concat(BulkUtils.columns.detailedQcStatus());
+      }
+
+      columns.push({
         title: 'Purpose',
         type: 'dropdown',
         data: 'samplePurposeId',
@@ -991,10 +963,6 @@ BulkTarget.sample = (function($) {
         deferred.resolve();
       }
       return deferred.promise();
-    },
-
-    detailedQcStatusSort: function(a, b) {
-      return statusToInt(a) - statusToInt(b);
     }
   };
 
@@ -1037,17 +1005,6 @@ BulkTarget.sample = (function($) {
   function isTarget(config, category, subcategory) {
     return config && config.targetSampleClass && config.targetSampleClass.sampleCategory === category
         && (!subcategory || config.targetSampleClass.sampleSubcategory === subcategory);
-  }
-
-  function statusToInt(status) {
-    if (status.description === 'Not Ready') {
-      return 0;
-    } else if (status.status === true) {
-      return 1;
-    } else if (status.status === false) {
-      return 2;
-    }
-    return 3;
   }
 
   function getSampleCategory(sample) {

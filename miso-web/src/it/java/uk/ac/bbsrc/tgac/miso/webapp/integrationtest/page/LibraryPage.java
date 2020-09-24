@@ -29,7 +29,8 @@ public class LibraryPage extends FormPage<LibraryPage.Field> {
     INDEX_FAMILY(By.id("libraryForm_indexFamilyId")), //
     INDEX_1(By.id("libraryForm_index1Id")), //
     INDEX_2(By.id("libraryForm_index2Id")), //
-    QC_PASSED(By.id("libraryForm_qcPassed")), //
+    DETAILED_QC_STATUS(By.id("libraryForm_detailedQcStatusId")), //
+    QC_STATUS_NOTE(By.id("libraryForm_detailedQcStatusNote")), //
     LOW_QUALITY(By.id("libraryForm_lowQuality")), //
     SIZE(By.id("libraryForm_dnaSize")), //
     VOLUME(By.id("libraryForm_volume")), //

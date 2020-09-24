@@ -30,6 +30,22 @@ BulkTarget.library = (function($) {
       return Urls.external.userManual('samples');
     },
     getCustomActions: function() {
+
+      function findDefaultStatus(pass, defaultText) {
+        var potential = Constants.detailedQcStatuses.filter(function(item) {
+          return item.status === pass && item.noteRequired === false;
+        });
+        if (potential.length === 1) {
+          return potential[0];
+        }
+        return potential.find(function(item) {
+          return item.description === defaultText;
+        });
+      }
+
+      var defaultPassStatus = findDefaultStatus(true, 'Ready');
+      var defaultFailStatus = findDefaultStatus(false, 'Failed: QC');
+
       return BulkUtils.actions.boxable().concat(
           {
             name: 'Check QCs',
@@ -46,13 +62,33 @@ BulkTarget.library = (function($) {
                 label: 'Size',
                 type: 'compare',
                 property: 'sizeComparator',
+              }, {
+                label: 'Status for Pass',
+                type: 'select',
+                property: 'passStatus',
+                values: Constants.detailedQcStatuses.filter(function(item) {
+                  return item.status === true;
+                }).map(function(item) {
+                  return item.description;
+                }),
+                value: defaultPassStatus ? defaultPassStatus.description : undefined
+              }, {
+                label: 'Status for Fail',
+                type: 'select',
+                property: 'failStatus',
+                values: Constants.detailedQcStatuses.filter(function(item) {
+                  return item.status === false;
+                }).map(function(item) {
+                  return item.description;
+                }),
+                value: defaultFailStatus ? defaultFailStatus.description : undefined
               }], function(output) {
                 var rowCount = api.getRowCount();
                 var changes = [];
                 for (var row = 0; row < rowCount; row++) {
                   var pass = output.concentrationComparator(api.getValue(row, 'concentration'))
                       && output.volumeComparator(api.getValue(row, 'volume')) && output.sizeComparator(api.getValue(row, 'dnaSize'))
-                  changes.push([row, 'qcPassed', pass ? 'True' : 'False']);
+                  changes.push([row, 'detailedQcStatusId', pass ? output.passStatus : output.failStatus]);
                 }
                 api.updateData(changes);
               });
@@ -581,7 +617,10 @@ BulkTarget.library = (function($) {
                 include: !config.isLibraryReceipt,
                 required: config.pageMode === 'propagate',
                 regex: Utils.validation.uriComponentRegex
-              }, BulkUtils.columns.qcPassed(true), BulkUtils.columns.librarySize);
+              });
+
+      columns = columns.concat(BulkUtils.columns.detailedQcStatus());
+      columns.push(BulkUtils.columns.librarySize);
 
       if (config.showVolume) {
         columns = columns.concat(BulkUtils.columns.volume(true, config));

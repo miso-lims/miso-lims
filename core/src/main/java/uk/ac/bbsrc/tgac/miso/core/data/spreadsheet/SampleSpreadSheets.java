@@ -181,14 +181,7 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
   }
 
   private static Function<Sample, String> qcStatusFunction() {
-    return s -> {
-      if (LimsUtils.isDetailedSample(s)) {
-        return detailedSample(DetailedSample.class,
-            ds -> ds.getDetailedQcStatus() == null ? "Not Ready" : ds.getDetailedQcStatus().getDescription(), "").apply(s);
-      } else {
-        return qcPassedLabel(s.getQcPassed());
-      }
-    };
+    return s -> s.getDetailedQcStatus() == null ? "Not Ready" : s.getDetailedQcStatus().getDescription();
   }
 
   private static BigDecimal qcValue(Sample sample, String qcTypeName) {
@@ -196,13 +189,6 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
         .filter(qc -> qcTypeName.equals(qc.getType().getName()))
         .max(Comparator.comparing(QC::getDate))
         .map(QC::getResults).orElse(null);
-  }
-
-  private static String qcPassedLabel(Boolean qcPassed) {
-    if (qcPassed == null) {
-      return "Unknown";
-    }
-    return qcPassed ? "Passed" : "Failed";
   }
 
   private final List<Column<Sample>> columns;

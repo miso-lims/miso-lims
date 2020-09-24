@@ -49,7 +49,8 @@ public class LibraryDto extends AbstractBoxableDto implements ReceivableDto<Libr
   private Long parentSampleClassId;
   private Long projectId;
   private String platformType;
-  private Boolean qcPassed;
+  private Long detailedQcStatusId;
+  private String detailedQcStatusNote;
   private Long index1Id;
   private Long index2Id;
   private String index1Label;
@@ -205,10 +206,6 @@ public class LibraryDto extends AbstractBoxableDto implements ReceivableDto<Libr
     return platformType;
   }
 
-  public Boolean getQcPassed() {
-    return qcPassed;
-  }
-
   public List<QcDto> getQcs() {
     return qcs;
   }
@@ -332,11 +329,6 @@ public class LibraryDto extends AbstractBoxableDto implements ReceivableDto<Libr
 
   public void setPlatformType(String platformType) {
     this.platformType = platformType;
-  }
-
-  @JsonInclude(JsonInclude.Include.ALWAYS)
-  public void setQcPassed(Boolean qcPassed) {
-    this.qcPassed = qcPassed;
   }
 
   public void setQcs(List<QcDto> qcs) {
@@ -555,6 +547,22 @@ public class LibraryDto extends AbstractBoxableDto implements ReceivableDto<Libr
 
   public void setWorksetAddedTime(String worksetAddedTime) {
     this.worksetAddedTime = worksetAddedTime;
+  }
+
+  public Long getDetailedQcStatusId() {
+    return detailedQcStatusId;
+  }
+
+  public void setDetailedQcStatusId(Long detailedQcStatusId) {
+    this.detailedQcStatusId = detailedQcStatusId;
+  }
+
+  public String getDetailedQcStatusNote() {
+    return detailedQcStatusNote;
+  }
+
+  public void setDetailedQcStatusNote(String detailedQcStatusNote) {
+    this.detailedQcStatusNote = detailedQcStatusNote;
   }
 
 }

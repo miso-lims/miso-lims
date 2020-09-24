@@ -57,7 +57,7 @@ public class LibraryPageIT extends AbstractIT {
     fields.put(Field.INDEX_FAMILY, "Dual Index 6bp");
     fields.put(Field.INDEX_1, "A01 (AAACCC)");
     fields.put(Field.INDEX_2, "B01 (AAATTT)");
-    fields.put(Field.QC_PASSED, "False");
+    fields.put(Field.DETAILED_QC_STATUS, "Failed: QC");
     fields.put(Field.LOW_QUALITY, "false");
     fields.put(Field.SIZE, "251");
     fields.put(Field.VOLUME, "2.5");
@@ -80,7 +80,7 @@ public class LibraryPageIT extends AbstractIT {
     changes.put(Field.STRATEGY, "RNA-Seq");
     changes.put(Field.INDEX_FAMILY, "Single Index 6bp");
     changes.put(Field.INDEX_1, "Index 01 (AAAAAA)");
-    changes.put(Field.QC_PASSED, "True");
+    changes.put(Field.DETAILED_QC_STATUS, "Ready");
     changes.put(Field.LOW_QUALITY, "true");
     changes.put(Field.SIZE, "151");
     changes.put(Field.VOLUME, "0.5");
@@ -126,7 +126,7 @@ public class LibraryPageIT extends AbstractIT {
     fields.put(Field.INDEX_FAMILY, "Dual Index 6bp");
     fields.put(Field.INDEX_1, "A01 (AAACCC)");
     fields.put(Field.INDEX_2, "B01 (AAATTT)");
-    fields.put(Field.QC_PASSED, "False");
+    fields.put(Field.DETAILED_QC_STATUS, "Failed: QC");
     fields.put(Field.LOW_QUALITY, "false");
     fields.put(Field.SIZE, "252");
     fields.put(Field.VOLUME, "4.0");
@@ -146,7 +146,7 @@ public class LibraryPageIT extends AbstractIT {
     changes.put(Field.SELECTION, "None");
     changes.put(Field.STRATEGY, "None");
     changes.put(Field.INDEX_FAMILY, "No indices");
-    changes.put(Field.QC_PASSED, "Unknown");
+    changes.put(Field.DETAILED_QC_STATUS, "Not Ready");
     changes.put(Field.SIZE, null);
     changes.put(Field.VOLUME, null);
     changes.put(Field.LOCATION, null);
@@ -189,7 +189,7 @@ public class LibraryPageIT extends AbstractIT {
     fields.put(Field.STRATEGY, "None");
     fields.put(Field.INDEX_FAMILY, "No indices");
     fields.put(Field.INDEX_1, "None");
-    fields.put(Field.QC_PASSED, "Unknown");
+    fields.put(Field.DETAILED_QC_STATUS, "Not Ready");
     fields.put(Field.LOW_QUALITY, "false");
     fields.put(Field.SIZE, null);
     fields.put(Field.VOLUME, null);
@@ -207,7 +207,7 @@ public class LibraryPageIT extends AbstractIT {
     changes.put(Field.DESCRIPTION, "lib_110003_desc");
     changes.put(Field.DESIGN, "WG");
     changes.put(Field.INDEX_FAMILY, "No indices");
-    changes.put(Field.QC_PASSED, "True");
+    changes.put(Field.DETAILED_QC_STATUS, "Ready");
     changes.put(Field.SIZE, "253");
     changes.put(Field.VOLUME, "1000.12");
     changes.put(Field.LOCATION, "lib_110003_location");
@@ -406,9 +406,9 @@ public class LibraryPageIT extends AbstractIT {
     if (expectedValues.containsKey(Field.INDEX_2)) {
       assertAttribute(Field.INDEX_2, expectedValues, getIndexString(lib, 2));
     }
-    String qcPassed = replaceIfNull(nullOrToString(lib.getQcPassed()), "Unknown");
-    qcPassed = qcPassed.substring(0, 1).toUpperCase() + qcPassed.substring(1);
-    assertAttribute(Field.QC_PASSED, expectedValues, qcPassed);
+    assertAttribute(Field.DETAILED_QC_STATUS, expectedValues,
+        replaceIfNull(lib.getDetailedQcStatus() == null ? null : lib.getDetailedQcStatus().getDescription(), "Not Ready"));
+    assertAttribute(Field.QC_STATUS_NOTE, expectedValues, lib.getDetailedQcStatusNote());
     assertAttribute(Field.LOW_QUALITY, expectedValues, Boolean.toString(lib.isLowQuality()));
     assertAttribute(Field.SIZE, expectedValues, nullOrToString(lib.getDnaSize()));
     assertAttribute(Field.VOLUME, expectedValues, LimsUtils.toNiceString(lib.getVolume()));

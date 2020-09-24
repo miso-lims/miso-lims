@@ -67,12 +67,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.HierarchyEntity;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryAliquotBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryAliquotChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListTransferView;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.DetailedQcItem;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -82,7 +84,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 @DiscriminatorColumn(name = "discriminator")
 @DiscriminatorValue("LibraryAliquot")
 public class LibraryAliquot extends AbstractBoxable
-    implements Comparable<LibraryAliquot>, Deletable, HierarchyEntity, Serializable {
+    implements Comparable<LibraryAliquot>, Deletable, DetailedQcItem, HierarchyEntity, Serializable {
 
   private static final long serialVersionUID = 1L;
   public static final Long UNSAVED_ID = 0L;
@@ -150,7 +152,11 @@ public class LibraryAliquot extends AbstractBoxable
 
   private BigDecimal ngUsed;
   private BigDecimal volumeUsed;
-  private Boolean qcPassed;
+
+  @ManyToOne(targetEntity = DetailedQcStatusImpl.class)
+  @JoinColumn(name = "detailedQcStatusId")
+  private DetailedQcStatus detailedQcStatus;
+  private String detailedQcStatusNote;
 
   @OneToMany(targetEntity = LibraryAliquotChangeLog.class, mappedBy = "libraryAliquot", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
@@ -316,7 +322,8 @@ public class LibraryAliquot extends AbstractBoxable
         LibraryAliquot::getCreator,
         LibraryAliquot::getLibrary,
         LibraryAliquot::getTargetedSequencing,
-        LibraryAliquot::getQcPassed);
+        LibraryAliquot::getDetailedQcStatus,
+        LibraryAliquot::getDetailedQcStatusNote);
   }
 
   @CoverageIgnore
@@ -329,7 +336,8 @@ public class LibraryAliquot extends AbstractBoxable
         creator,
         library,
         targetedSequencing,
-        qcPassed);
+        detailedQcStatus,
+        detailedQcStatusNote);
   }
 
   @Override
@@ -418,12 +426,24 @@ public class LibraryAliquot extends AbstractBoxable
     this.volumeUsed = volumeUsed;
   }
 
-  public Boolean getQcPassed() {
-    return qcPassed;
+  @Override
+  public DetailedQcStatus getDetailedQcStatus() {
+    return detailedQcStatus;
   }
 
-  public void setQcPassed(Boolean qcPassed) {
-    this.qcPassed = qcPassed;
+  @Override
+  public void setDetailedQcStatus(DetailedQcStatus detailedQcStatus) {
+    this.detailedQcStatus = detailedQcStatus;
+  }
+
+  @Override
+  public String getDetailedQcStatusNote() {
+    return detailedQcStatusNote;
+  }
+
+  @Override
+  public void setDetailedQcStatusNote(String detailedQcStatusNote) {
+    this.detailedQcStatusNote = detailedQcStatusNote;
   }
 
   @Override

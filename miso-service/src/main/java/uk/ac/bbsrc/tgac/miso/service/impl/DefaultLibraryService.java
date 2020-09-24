@@ -501,7 +501,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     target.setLibraryType(source.getLibraryType());
     target.setLibrarySelectionType(source.getLibrarySelectionType());
     target.setLibraryStrategyType(source.getLibraryStrategyType());
-    target.setQcPassed(source.getQcPassed());
+    target.setDetailedQcStatus(source.getDetailedQcStatus());
+    target.setDetailedQcStatusNote(source.getDetailedQcStatusNote());
 
     applySetChanges(target.getIndices(), source.getIndices());
     target.setKitDescriptor(source.getKitDescriptor());

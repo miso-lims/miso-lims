@@ -211,6 +211,42 @@ FormUtils = (function($) {
       };
     },
 
+    makeDetailedQcStatusFields: function() {
+      return [{
+        title: 'QC Status',
+        data: 'detailedQcStatusId',
+        type: 'dropdown',
+        nullLabel: 'Not Ready',
+        source: Constants.detailedQcStatuses,
+        sortSource: Utils.sorting.detailedQcStatusSort,
+        getItemLabel: function(item) {
+          return item.description;
+        },
+        getItemValue: function(item) {
+          return item.id;
+        },
+        required: false,
+        onChange: function(newValue, form) {
+          var noteRequired = newValue ? Utils.array.findUniqueOrThrow(function(item) {
+            return item.id === Number(newValue);
+          }, Constants.detailedQcStatuses).noteRequired : false;
+          var updates = {
+            disabled: !noteRequired,
+            required: noteRequired
+          }
+          if (!noteRequired) {
+            updates.value = null;
+          }
+          form.updateField('detailedQcStatusNote', updates);
+        }
+      }, {
+        title: 'QC Status Note',
+        data: 'detailedQcStatusNote',
+        type: 'text',
+        maxLength: 500
+      }];
+    },
+
     makeUnitsField: function(object, unitType) {
       var unit = units[unitType];
       if (!unit) {

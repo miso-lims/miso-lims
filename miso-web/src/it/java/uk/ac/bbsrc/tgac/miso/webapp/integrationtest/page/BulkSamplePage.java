@@ -75,11 +75,10 @@ public class BulkSamplePage extends BulkPage {
     public static final String PARENT_VOLUME_USED = "Parent Vol. Used";
     public static final String CONCENTRATION = "Conc.";
     public static final String CONCENTRATION_UNITS = "Conc. Units";
-    public static final String QC_STATUS = "QC Status";
     public static final String DNASE_TREATED = "DNAse";
+    public static final String QC_STATUS = "QC Status";
     public static final String QC_NOTE = "QC Note";
     public static final String PURPOSE = "Purpose";
-    public static final String QC_PASSED = "QC Passed?";
     public static final String PARENT_ALIAS = "Parent Alias";
     public static final String PARENT_LOCATION = "Parent Location";
     public static final String PARENT_SAMPLE_CLASS = "Parent Sample Class";

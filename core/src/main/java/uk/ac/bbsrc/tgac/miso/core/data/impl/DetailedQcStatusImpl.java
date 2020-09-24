@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.util.Date;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,6 +19,7 @@ import javax.persistence.UniqueConstraint;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
 @Table(name = "DetailedQcStatus", uniqueConstraints = @UniqueConstraint(columnNames = { "status", "description" }))
@@ -141,6 +143,19 @@ public class DetailedQcStatusImpl implements DetailedQcStatus {
     return "DetailedQcStatusImpl [detailedQcStatusId=" + detailedQcStatusId + ", status=" + status + ", description=" + description
         + ", noteRequired=" + noteRequired + ", createdBy=" + createdBy + ", creationDate=" + creationDate + ", updatedBy=" + updatedBy 
         + ", lastUpdated=" + lastUpdated + "]"; 
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(status, description, noteRequired);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return LimsUtils.equals(this, obj,
+        DetailedQcStatusImpl::getStatus,
+        DetailedQcStatusImpl::getDescription,
+        DetailedQcStatusImpl::getNoteRequired);
   }
 
   @Override

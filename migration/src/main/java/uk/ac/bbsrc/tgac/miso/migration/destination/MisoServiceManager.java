@@ -68,6 +68,7 @@ import uk.ac.bbsrc.tgac.miso.service.impl.DefaultBoxSizeService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultBoxUseService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultContainerService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultDetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultIndexService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultInstrumentModelService;
@@ -125,7 +126,7 @@ public class MisoServiceManager {
     addDependency(DefaultSampleService.class, MigrationAuthorizationManager.class, DefaultSampleService::setAuthorizationManager);
     addDependency(DefaultSampleService.class, NamingSchemeHolder.class, DefaultSampleService::setNamingSchemeHolder);
     addDependency(DefaultSampleService.class, HibernateProjectDao.class, DefaultSampleService::setProjectStore);
-    addDependency(DefaultSampleService.class, HibernateDetailedQcStatusDao.class, DefaultSampleService::setDetailedQcStatusDao);
+    addDependency(DefaultSampleService.class, DefaultDetailedQcStatusService.class, DefaultSampleService::setDetailedQcStatusService);
     addDependency(DefaultSampleService.class, DefaultSampleClassService.class, DefaultSampleService::setSampleClassService);
     addDependency(DefaultSampleService.class, HibernateSamplePurposeDao.class, DefaultSampleService::setSamplePurposeDao);
     addDependency(DefaultSampleService.class, DefaultSampleValidRelationshipService.class,

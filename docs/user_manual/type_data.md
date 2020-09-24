@@ -211,11 +211,9 @@ institute, you will first have to delete all of its labs.
 
 ## Detailed QC Status
 
-Note: This item only applies if your site uses [detailed sample mode](../site_configuration/#detailed-sample-mode).
-
-In plain sample mode, samples have a "QC Passed?" field that can be set to true (passed), false (failed), or unknown.
-Detailed sample mode expands upon this with detailed QC status. A detailed QC status does specify a QC status of
-passed, failed, or unknown, but also provides more specific information about the reason. Here are some examples:
+Detailed QC statuses are the options available for the "QC Status" field on samples, libraries, and library aliquots.
+Values specify a status of passed, failed, or unknown, and also provide more specific information about the reason. Here
+are some examples:
 
 * "Okd by Collaborator" (QC status: passed) - may indicate that a collaborator has approved use of the sample despite
   other QC checks
@@ -223,6 +221,9 @@ passed, failed, or unknown, but also provides more specific information about th
   been performed yet
 * "Refused Consent" (QC status: failed) - indicates that while the sample may have passed QC, the donor has revoked
   consent for it to be used
+
+Some detailed QC statuses require a note, which means that when selecting the status, the user must also type in a note
+detailing why the option was chosen.
 
 MISO administrators can add, edit, and delete detailed QC statuses using the standard interface. A detailed QC status
 can only be deleted if the status has not been used by any existing samples.

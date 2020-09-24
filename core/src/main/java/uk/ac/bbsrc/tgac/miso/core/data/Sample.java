@@ -33,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.DetailedQcItem;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QualityControllable;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
 
@@ -48,8 +49,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface Sample extends Attachable, Comparable<Sample>, Deletable, HierarchyEntity, Locatable, QualityControllable<SampleQC>,
-    Serializable {
+public interface Sample extends Attachable, Comparable<Sample>, Deletable, DetailedQcItem, HierarchyEntity, Locatable,
+    QualityControllable<SampleQC>, Serializable {
 
   public static final String PLAIN_CATEGORY_NAME = "Plain";
 
@@ -183,28 +184,12 @@ public interface Sample extends Attachable, Comparable<Sample>, Deletable, Hiera
   public void setSampleType(String string);
 
   /**
-   * Returns the qcPassed of this Sample object.
-   * 
-   * @return Boolean qcPassed.
-   */
-  public Boolean getQcPassed();
-
-  /**
-   * Sets the qcPassed attribute of this Sample object. This should be true when a suitable QC has been carried out that passes a given
-   * result.
-   * 
-   * @param qcPassed
-   *          qcPassed.
-   */
-  public void setQcPassed(Boolean qcPassed);
-
-  /**
    * Registers a collection of QCs to this Sample object.
    * 
    * @param qcs
    *          qcs.
    */
-  void setQCs(Collection<SampleQC> qcs);
+  public void setQCs(Collection<SampleQC> qcs);
 
   public void setBoxPosition(SampleBoxPosition boxPosition);
 

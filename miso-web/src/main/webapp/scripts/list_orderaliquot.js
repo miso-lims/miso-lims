@@ -47,36 +47,38 @@ ListTarget.orderaliquot = {
     })];
   },
   createColumns: function(config, projectId) {
+    var qcColumn = ListUtils.columns.detailedQcStatus;
+    qcColumn.mData = 'aliquot.detailedQcStatusId';
+
     return [
         {
-          'sTitle': 'Name',
-          'mData': 'aliquot.id', // for sorting purposes
-          'include': true,
-          'iSortPriority': 1,
-          "mRender": function(data, type, full) {
-            if (type === 'display') {
-              return '<a href="' + Urls.ui.libraryAliquots.edit(data) + '">' + full.aliquot.name + '</a>';
-            }
-            return data;
-          }
+          'sTitle': 'ID',
+          'mData': 'id',
+          'bVisible': false
         },
-        ListUtils.labelHyperlinkColumn("Alias", Urls.ui.libraryAliquots.edit, function(orderAliquot) {
-          return orderAliquot.aliquot.id;
-        }, "aliquot.alias", 0, true),
         {
+          'sTitle': 'Name',
+          'mData': 'aliquot.name',
+          'iSortPriority': 1,
+          'iDataSort': 1, // Use ID for sorting
+          'mRender': Warning.tableWarningRenderer(WarningTarget.orderaliquot.makeTarget(config.duplicateSequences,
+              config.nearDuplicateIndices), function(item) {
+            return Urls.ui.libraryAliquots.edit(item.aliquot.id);
+          }),
+          'sClass': 'nowrap'
+        }, ListUtils.labelHyperlinkColumn("Alias", Urls.ui.libraryAliquots.edit, function(orderAliquot) {
+          return orderAliquot.aliquot.id;
+        }, "aliquot.alias", 0, true), {
           'sTitle': 'Proportion',
           'sType': 'numeric',
           'mData': 'proportion',
           'include': !config.add,
           'iSortPriority': 0
-        },
-        ListUtils.idHyperlinkColumn("Sample Name", Urls.ui.samples.edit, "aliquot.sampleId", function(orderAli) {
+        }, ListUtils.idHyperlinkColumn("Sample Name", Urls.ui.samples.edit, "aliquot.sampleId", function(orderAli) {
           return orderAli.aliquot.sampleId;
-        }, 0, true, "noPrint"),
-        ListUtils.labelHyperlinkColumn("Sample Alias", Urls.ui.samples.edit, function(orderAli) {
+        }, 0, true, "noPrint"), ListUtils.labelHyperlinkColumn("Sample Alias", Urls.ui.samples.edit, function(orderAli) {
           return orderAli.aliquot.sampleId;
-        }, "aliquot.sampleAlias", 0, true),
-        {
+        }, "aliquot.sampleAlias", 0, true), {
           'sTitle': 'Indices',
           'mData': 'aliquot.indexIds',
           'include': true,
@@ -98,26 +100,11 @@ ListTarget.orderaliquot = {
               return index.label;
             }).join(', ');
           }
-        },
-        {
-          "sTitle": "Description",
-          "mData": null,
-          "mRender": Warning.tableWarningRenderer(WarningTarget.orderaliquot.makeTarget(config.duplicateSequences,
-              config.nearDuplicateIndices)),
-          "include": true,
-          "iSortPriority": 0
         }, {
           'sTitle': 'Last Modified',
           'mData': 'aliquot.lastModified',
           'include': true,
           'iSortPriority': 0
-        }, {
-          "sTitle": "QC Passed",
-          "mData": "aliquot.libraryQcPassed",
-          "include": true,
-          "iSortPriority": 0,
-          "mRender": ListUtils.render.booleanChecks,
-          "bSortable": false
-        }];
+        }, qcColumn];
   }
 };

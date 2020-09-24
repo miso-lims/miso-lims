@@ -676,6 +676,23 @@ ListUtils = (function($) {
         }
       };
     },
+    columns: {
+      detailedQcStatus: {
+        sTitle: 'QC',
+        mData: 'detailedQcStatusId',
+        sDefaultContent: '',
+        mRender: function(data, type, full) {
+          if (data) {
+            var detailedQcStatus = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(data), Constants.detailedQcStatuses);
+            if (typeof detailedQcStatus.status === 'boolean') {
+              return detailedQcStatus.status ? '✔' : '✘';
+            }
+          }
+          return '?';
+        },
+        bSortable: false
+      }
+    },
     render: {
       archived: function(data, type, full) {
         return data ? "🗄" : "";

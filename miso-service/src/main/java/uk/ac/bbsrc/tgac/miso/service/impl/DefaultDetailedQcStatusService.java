@@ -102,9 +102,17 @@ public class DefaultDetailedQcStatusService implements DetailedQcStatusService {
   @Override
   public ValidationResult validateDeletion(DetailedQcStatus object) throws IOException {
     ValidationResult result = new ValidationResult();
-    long usage = detailedQcStatusDao.getUsage(object);
-    if (usage > 0L) {
-      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.samples(usage)));
+    long samUsage = detailedQcStatusDao.getUsageBySamples(object);
+    if (samUsage > 0L) {
+      result.addError(ValidationError.forDeletionUsage(object, samUsage, Pluralizer.samples(samUsage)));
+    }
+    long libUsage = detailedQcStatusDao.getUsageByLibraries(object);
+    if (libUsage > 0L) {
+      result.addError(ValidationError.forDeletionUsage(object, libUsage, Pluralizer.libraries(libUsage)));
+    }
+    long aliUsage = detailedQcStatusDao.getUsageByLibraryAliquots(object);
+    if (aliUsage > 0L) {
+      result.addError(ValidationError.forDeletionUsage(object, aliUsage, Pluralizer.libraryAliquots(aliUsage)));
     }
     return result;
   }

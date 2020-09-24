@@ -74,6 +74,7 @@
       <a href="<c:url value="/miso/indexfamily/list"/>">Index Families</a>
       <a href="<c:url value="/miso/qctype/list"/>">QC Types</a>
       <a href="<c:url value="/miso/attachmentcategories/list"/>">Attachment Categories</a>
+      <a href="<c:url value="/miso/detailedqcstatus/list"/>">Detailed QC Statuses</a>
       <a href="<c:url value="/miso/sampletype/list"/>">Sample Types</a>
       <a href="<c:url value="/miso/sequencingcontroltype/list"/>">Sequencing Control Types</a>
       <a href="<c:url value="/miso/librarytype/list"/>">Library Types</a>
@@ -112,7 +113,6 @@
         <a href="<c:url value="/miso/subproject/list"/>">Subprojects</a>
         <a href="<c:url value="/miso/stain/list"/>">Stains</a>
         <a href="<c:url value="/miso/staincategory/list"/>">Stain Categories</a>
-        <a href="<c:url value="/miso/detailedqcstatus/list"/>">Detailed QC Statuses</a>
         <a href="<c:url value="/miso/librarydesigncode/list"/>">Library Design Codes</a>
         <a href="<c:url value="/miso/librarydesign/list"/>">Library Designs</a>
       </div>

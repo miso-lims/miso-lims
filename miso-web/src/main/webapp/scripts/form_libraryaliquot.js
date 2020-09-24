@@ -90,7 +90,7 @@ FormTarget.libraryaliquot = (function($) {
               required: designCode.targetedSequencingRequired
             });
           }
-        }, FormUtils.makeQcPassedField(true), {
+        }].concat(FormUtils.makeDetailedQcStatusFields()).concat([{
           title: 'Size (bp)',
           data: 'dnaSize',
           type: 'int',
@@ -150,7 +150,7 @@ FormTarget.libraryaliquot = (function($) {
           precision: 14,
           scale: 10,
           min: 0
-        }]
+        }])
       }, {
         title: 'Details',
         include: config.detailedSample,
