@@ -144,7 +144,7 @@ public class BulkLibraryIT extends AbstractIT {
     assertTrue(strategies.contains("OTHER"));
 
     Set<String> qcValues = table.getDropdownOptions(LibColumns.QC_STATUS, 0);
-    assertEquals(9, qcValues.size());
+    assertEquals(10, qcValues.size());
     assertTrue(qcValues.contains("Ready"));
     assertTrue(qcValues.contains("Failed: QC"));
   }
@@ -281,7 +281,7 @@ public class BulkLibraryIT extends AbstractIT {
     attrs.put(LibColumns.KIT_DESCRIPTOR, "Test Kit");
     attrs.put(LibColumns.KIT_LOT, "20200728");
     attrs.put(LibColumns.SIZE, "205");
-    attrs.put(LibColumns.QC_STATUS, "");
+    attrs.put(LibColumns.QC_STATUS, "Not Ready");
 
     fillRow(table, 0, attrs);
     fillRow(table, 1, attrs);
@@ -450,7 +450,7 @@ public class BulkLibraryIT extends AbstractIT {
     attrs.put(LibColumns.INDEX_1, "");
     attrs.put(LibColumns.INDEX_2, "");
     attrs.put(LibColumns.KIT_DESCRIPTOR, "Test Kit");
-    attrs.put(LibColumns.QC_STATUS, "");
+    attrs.put(LibColumns.QC_STATUS, "Not Ready");
     attrs.put(LibColumns.SIZE, null);
     attrs.put(LibColumns.VOLUME, null);
     attrs.put(LibColumns.CONCENTRATION, null);
@@ -561,7 +561,7 @@ public class BulkLibraryIT extends AbstractIT {
     attrs.put(LibColumns.KIT_DESCRIPTOR, "Test Kit");
     attrs.put(LibColumns.KIT_LOT, "20200728");
     attrs.put(LibColumns.SIZE, "207");
-    attrs.put(LibColumns.QC_STATUS, "");
+    attrs.put(LibColumns.QC_STATUS, "Not Ready");
     fillRow(table, 0, attrs);
     assertColumnValues(table, 0, attrs, "pre-save");
 

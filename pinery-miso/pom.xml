@@ -192,11 +192,6 @@
                       <port>mysql.port:3306</port>
                     </ports>
                     <wait>
-                      <tcp>
-                        <ports>
-                          <port>3306</port>
-                        </ports>
-                      </tcp>
                       <time>30000</time>
                     </wait>
                   </run>
@@ -267,6 +262,40 @@
                 <miso.it.mysql.pw>${mysql.pw}</miso.it.mysql.pw>
               </systemPropertyVariables>
               <skipTests>${skipITs}</skipTests>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <!-- Waiting for port doesn't work on Mac -->
+      <id>not-mac</id>
+      <activation>
+        <os>
+          <family>!mac</family>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>io.fabric8</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <configuration>
+              <images>
+                <image>
+                  <name>mysql:5.7</name>
+                  <alias>mysql</alias>
+                  <run>
+                    <wait>
+                      <tcp>
+                        <ports>
+                          <port>3306</port>
+                        </ports>
+                      </tcp>
+                    </wait>
+                  </run>
+                </image>
+              </images>
             </configuration>
           </plugin>
         </plugins>

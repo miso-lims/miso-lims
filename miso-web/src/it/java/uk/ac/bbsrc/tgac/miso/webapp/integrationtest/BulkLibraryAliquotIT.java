@@ -161,6 +161,7 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     attrs.put(LibraryAliquotColumns.VOLUME, "9.77");
     attrs.put(LibraryAliquotColumns.CREATION_DATE, "2017-08-14");
     attrs.put(LibraryAliquotColumns.TARGETED_SEQUENCING, "Test TarSeq One");
+    attrs.put(LibraryAliquotColumns.QC_STATUS, "Not Ready");
 
     fillRow(table, 0, attrs);
 
@@ -201,6 +202,7 @@ public class BulkLibraryAliquotIT extends AbstractIT {
 
     Map<String, String> attrs = Maps.newLinkedHashMap();
     attrs.put(LibraryAliquotColumns.VOLUME_USED, "100.01");
+    attrs.put(LibraryAliquotColumns.QC_STATUS, "Not Ready");
 
     fillRow(table, 0, attrs);
 
@@ -224,6 +226,7 @@ public class BulkLibraryAliquotIT extends AbstractIT {
 
     Map<String, String> attrs = Maps.newLinkedHashMap();
     attrs.put(LibraryAliquotColumns.VOLUME_USED, "99.99");
+    attrs.put(LibraryAliquotColumns.QC_STATUS, "Not Ready");
 
     fillRow(table, 0, attrs);
 
@@ -247,6 +250,7 @@ public class BulkLibraryAliquotIT extends AbstractIT {
 
     Map<String, String> attrs = Maps.newLinkedHashMap();
     attrs.put(LibraryAliquotColumns.VOLUME_USED, "10.1");
+    attrs.put(LibraryAliquotColumns.QC_STATUS, "Not Ready");
 
     fillRow(table, 0, attrs);
 
@@ -271,9 +275,11 @@ public class BulkLibraryAliquotIT extends AbstractIT {
 
     Map<String, String> row0 = Maps.newLinkedHashMap();
     row0.put(LibraryAliquotColumns.VOLUME_USED, "12.34");
+    row0.put(LibraryAliquotColumns.QC_STATUS, "Not Ready");
 
     Map<String, String> row1 = Maps.newLinkedHashMap();
     row1.put(LibraryAliquotColumns.VOLUME_USED, "110.2");
+    row1.put(LibraryAliquotColumns.QC_STATUS, "Not Ready");
 
     fillRow(table, 0, row0);
     fillRow(table, 1, row1);

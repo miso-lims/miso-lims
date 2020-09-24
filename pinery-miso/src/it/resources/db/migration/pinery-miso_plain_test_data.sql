@@ -4,7 +4,7 @@ INSERT INTO Project(projectId, name, alias, shortName, created, description,
   (2, 'PRO2', 'Project Two', 'PRO2', '2017-06-27', 'integration test project two', 'ACTIVE', 1, '2017-06-27 14:11:00', 1, 1, TRUE);
 
 INSERT INTO Sample (sampleId, name, alias, description, identificationBarcode, sampleType, project_projectId,
-scientificNameId, volume, qcPassed, lastModifier, creator, created, lastModified, discriminator) VALUES
+scientificNameId, volume, detailedQcStatusId, lastModifier, creator, created, lastModified, discriminator) VALUES
 (1, 'SAM1', 'TEST_0001', 'Identity', '11111', 'GENOMIC', 1, 1, NULL, 1, 1, 1, '2016-07-20 09:00:00', '2016-07-20 09:00:00', 'Sample'),
 (2, 'SAM2', 'TEST_0001_Bn_R_nn_1-1', 'Tissue', '22222', 'GENOMIC', 1, 1, 30, 1, 1, 1, '2016-07-20 09:01:00', '2016-07-20 09:01:00', 'Sample'),
 (3, 'SAM3', 'TEST_0001_Bn_R_nn_1-1_SL01', 'Slide', '33333', 'GENOMIC', 1, 1, NULL, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00', 'Sample'),
@@ -34,7 +34,7 @@ INSERT INTO SampleChangeLog(sampleId, columnsChanged, message, userId, changeTim
 (2,'two','change twotwo',1,'2016-07-20 09:00:01');
 
 INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, sample_sampleId, platformType,
-  libraryType, librarySelectionType, libraryStrategyType, creationDate, creator, created, lastModifier, lastModified, qcPassed, dnaSize,
+  libraryType, librarySelectionType, libraryStrategyType, creationDate, creator, created, lastModifier, lastModified, detailedQcStatusId, dnaSize,
   volume, concentration, locationBarcode, kitDescriptorId, discriminator) VALUES
   (1, 'LIB1', 'TEST_0001_Bn_R_PE_300_WG', '11211', 'description lib 1', 8, 'ILLUMINA', 1, 3, 1,  '2016-11-07', 1, '2017-07-20 09:01:00',
     1, '2017-07-20 09:01:00', 1, 300, 5.0, 2.75, NULL, 1, 'Library');
