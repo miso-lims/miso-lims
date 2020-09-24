@@ -229,6 +229,7 @@ public class PlainSampleITs extends AbstractIT {
     attrs.put(LibraryAliquotColumns.CONCENTRATION, "2.2");
     attrs.put(LibraryAliquotColumns.VOLUME, "22");
     attrs.put(LibraryAliquotColumns.CREATION_DATE, "2017-10-11");
+    attrs.put(LibraryAliquotColumns.QC_STATUS, "Not Ready");
 
     attrs.forEach((k, v) -> table.enterText(k, 0, v));
     assertTrue(page.save(false));
