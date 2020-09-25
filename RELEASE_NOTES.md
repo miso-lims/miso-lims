@@ -6,6 +6,7 @@ Changes:
     simpler QC Passed field
   * Make button labels clearer for associating targeted sequencings with kit descriptors
   * Prevent entry of tabs and line breaks in most fields
+  * Export index family name via Pinery
   * Fix search (by alias) on Library Templates list page
 
 Upgrade Notes:

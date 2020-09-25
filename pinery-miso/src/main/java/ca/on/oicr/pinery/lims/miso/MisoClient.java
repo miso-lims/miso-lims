@@ -823,6 +823,7 @@ public class MisoClient implements Lims {
       },
       BARCODE("barcode", "Barcode"),
       BARCODE_TWO("barcode_two", "Barcode Two"),
+      BARCODE_KIT("barcode_kit", "Barcode Kit"),
       READ_LENGTH("read_length", "Read Length") {
         private static final String PAIRED_KEY = "paired";
 
