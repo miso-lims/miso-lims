@@ -1,3 +1,4 @@
+-- library_detailed_qc
 SELECT userId INTO @admin FROM User WHERE loginName = 'admin';
 SET @ready = 'Ready';
 SET @failed = 'Failed: QC';
@@ -46,3 +47,4 @@ UPDATE Sample SET detailedQcStatusId = @readyId WHERE detailedQcStatusId IS NULL
 UPDATE Sample SET detailedQcStatusId = @failedId WHERE detailedQcStatusId IS NULL AND qcPassed = FALSE;
 
 ALTER TABLE Sample DROP COLUMN qcPassed;
+

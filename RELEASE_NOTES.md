@@ -2,12 +2,19 @@
 
 Changes:
 
+
+
+# 1.14.0
+
+Changes:
+
   * Changed plain samples, libraries, and library aliquots to use detailed QC status instead of the
     simpler QC Passed field
   * Make button labels clearer for associating targeted sequencings with kit descriptors
   * Prevent entry of tabs and line breaks in most fields
   * Export index family name via Pinery
-  * Fix search (by alias) on Library Templates list page
+  * Fixed search (by alias) on Library Templates list page
+  * Fixed error writing changelogs with long messages
 
 Upgrade Notes:
 
