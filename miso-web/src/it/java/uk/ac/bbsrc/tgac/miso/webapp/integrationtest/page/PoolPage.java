@@ -32,7 +32,7 @@ public class PoolPage extends FormPage<PoolPage.Field> {
     PLATFORM(By.id("poolForm_platformType"), By.id("poolForm_platformTypeLabel")), //
     CONCENTRATION(By.id("poolForm_concentration")), //
     CREATE_DATE(By.id("poolForm_creationDate")), //
-    QC_PASSED(By.id("poolForm_qcPassed")), //
+    QC_STATUS(By.id("poolForm_qcPassed")), //
     VOLUME(By.id("poolForm_volume")), //
     DISCARDED(By.id("poolForm_discarded")), //
     DISTRIBUTED(By.id("poolForm_distributed")), //

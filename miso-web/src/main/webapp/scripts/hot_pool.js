@@ -231,7 +231,34 @@ HotTarget.pool = (function() {
           });
           obj['volumeUnits'] = !!units ? units.name : null;
         }
-      }, HotUtils.makeColumnForBoolean('QC Passed?', true, 'qcPassed', false)];
+      }, {
+        header: 'QC Status',
+        data: 'qcPassed',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: ['Not Ready', 'Ready', 'Failed'],
+        include: true,
+        unpack: function(obj, flat, setCellMeta) {
+          if (obj.qcPassed === true) {
+            flat.qcPassed = 'Ready';
+          } else if (obj.qcPassed === false) {
+            flat.qcPassed = 'Failed';
+          } else {
+            flat.qcPassed = 'Not Ready';
+          }
+        },
+        pack: function(obj, flat, errorHandler) {
+          if (flat.qcPassed === 'Ready') {
+            obj.qcPassed = true;
+          } else if (flat.qcPassed === 'Failed') {
+            obj.qcPassed = false;
+          } else if (flat.qcPassed === 'Not Ready') {
+            obj.qcPassed = null;
+          } else {
+            errorHandler(headerName + ' is missing');
+          }
+        }
+      }];
 
       var spliceIndex = columns.indexOf(columns.filter(function(column) {
         return column.data === 'identificationBarcode';

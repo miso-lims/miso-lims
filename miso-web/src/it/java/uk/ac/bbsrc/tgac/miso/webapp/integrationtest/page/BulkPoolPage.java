@@ -31,7 +31,7 @@ public class BulkPoolPage extends HeaderFooterPage {
     public static final String CONCENTRATION_UNITS = "Conc. Units";
     public static final String VOLUME = "Volume";
     public static final String VOLUME_UNITS = "Vol. Units";
-    public static final String QC_PASSED = "QC Passed?";
+    public static final String QC_STATUS = "QC Status";
     public static final String READY_TO_RUN = "Ready to Run?";
 
     public static final String LIBRARY_ALIQUOT_NAME = "Library Aliquot Name";
