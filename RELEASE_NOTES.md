@@ -2,7 +2,8 @@
 
 Changes:
 
-
+  * Fixed project validation when receiving samples or libraries from the Edit Project page for a
+    project that is not marked as active
 
 # 1.14.0
 
