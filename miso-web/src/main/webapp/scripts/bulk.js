@@ -76,6 +76,7 @@ BulkUtils = (function($) {
    *   scale: optional int (default: 17); maximum scale (decimal places) for decimal input
    *   onChange: function(rowIndex, newValue, api); action to take when the field is modified. See
    *       API object below
+   *   initOnChange: optional boolean (default: true); whether to run onChange action on table init
    *   sortable: optional boolean (default: true); whether the data can be sorted by this column
    *   customSorting: optional array of custom sorts (see below); sorting configuration. Default
    *       will sort alphabetically with empty values at the bottom
@@ -334,19 +335,21 @@ BulkUtils = (function($) {
         maxLength: 255
       },
 
+      matrixBarcode: {
+        title: 'Matrix Barcode',
+        type: 'text',
+        data: 'identificationBarcode',
+        include: !Constants.automaticBarcodes,
+        maxLength: 255
+      },
+
       boxable: function(config, api) {
         if (config.box) {
           var cache = api.getCache('boxes');
           cacheBox(cache, config.box);
         }
         return [
-            {
-              title: 'Matrix Barcode',
-              type: 'text',
-              data: 'identificationBarcode',
-              include: !Constants.automaticBarcodes,
-              maxLength: 255
-            },
+            BulkUtils.columns.matrixBarcode,
             {
               title: 'Box Search',
               type: 'text',
@@ -1557,7 +1560,9 @@ BulkUtils = (function($) {
       if (column.onChange) {
         listeners[column.data] = column.onChange;
         for (var rowIndex = 0; rowIndex < tableData.length; rowIndex++) {
-          column.onChange(rowIndex, tableData[rowIndex][column.data], tempApi);
+          if (column.initOnChange !== false) {
+            column.onChange(rowIndex, tableData[rowIndex][column.data], tempApi);
+          }
         }
       }
     });

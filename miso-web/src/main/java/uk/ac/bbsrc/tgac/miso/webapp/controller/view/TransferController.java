@@ -43,6 +43,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
+import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
 import uk.ac.bbsrc.tgac.miso.webapp.util.TabbedListItemsPage;
 
 @Controller
@@ -84,7 +85,7 @@ public class TransferController {
     addItems("library aliquot", libraryAliquotIdString, libraryAliquotService, TransferLibraryAliquot::new,
         transfer::getLibraryAliquotTransfers);
     addItems("pool", poolIdString, poolService, TransferPool::new, transfer::getPoolTransfers);
-    return setupForm(transfer, "create", true, false, model);
+    return setupForm(transfer, PageMode.CREATE.getLabel(), true, false, model);
   }
 
   private <T extends Boxable, U extends TransferItem<T>> void addItems(String typeName, String idString, ProviderService<T> service,
@@ -119,14 +120,14 @@ public class TransferController {
     boolean editSend = user.isAdmin()
         || (transfer.getSenderGroup() != null && userHasGroup(user, transfer.getSenderGroup()))
         || (editReceipt && transfer.getSenderGroup() == null);
-    return setupForm(transfer, "edit", editSend, editReceipt, model);
+    return setupForm(transfer, PageMode.EDIT.getLabel(), editSend, editReceipt, model);
   }
 
   public ModelAndView setupForm(Transfer transfer, String pageMode, boolean editSend, boolean editReceipt, ModelMap model)
       throws IOException {
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode formConfig = mapper.createObjectNode();
-    formConfig.put("pageMode", pageMode);
+    formConfig.put(PageMode.PROPERTY, pageMode);
     formConfig.put("editSend", editSend);
     formConfig.put("editReceipt", editReceipt);
 
@@ -157,7 +158,6 @@ public class TransferController {
     itemsListConfig.put("editSend", editSend);
     itemsListConfig.put("editReceipt", editReceipt);
 
-    model.put("pageMode", pageMode);
     model.put("transfer", transfer);
     model.put("transferDto", mapper.writeValueAsString(Dtos.asDto(transfer)));
     model.put("formConfig", mapper.writeValueAsString(formConfig));

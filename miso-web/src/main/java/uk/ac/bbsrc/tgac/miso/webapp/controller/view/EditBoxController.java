@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
-import java.beans.PropertyEditorSupport;
+import static uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils.getStringInput;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -17,11 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -31,7 +31,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.dto.BoxDto;
@@ -40,13 +39,12 @@ import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
+import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
 
 @Controller
 @RequestMapping("/box")
 public class EditBoxController {
   protected static final Logger log = LoggerFactory.getLogger(EditBoxController.class);
-
-  private static final String MODEL_ATTR_PAGEMODE = "pageMode";
 
   @Autowired
   private BoxService boxService;
@@ -71,18 +69,6 @@ public class EditBoxController {
     return boxScanners.keySet();
   }
 
-  @InitBinder
-  public void includeForeignKeys(WebDataBinder binder) {
-    binder.registerCustomEditor(StorageLocation.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String text) throws IllegalArgumentException {
-        StorageLocation location = new StorageLocation();
-        location.setId(Long.valueOf(text));
-        setValue(location);
-      }
-    });
-  }
-
   @GetMapping(value = "/bulk/new")
   public ModelAndView newBoxes(@RequestParam("quantity") Integer quantity, ModelMap model) throws IOException {
     if (quantity == null || quantity <= 0) throw new RestException("Must specify quantity of boxes to create", Status.BAD_REQUEST);
@@ -90,15 +76,16 @@ public class EditBoxController {
     return new BulkCreateBoxBackend(quantity).create(model);
   }
 
-  @GetMapping(value = "/bulk/edit")
-  public ModelAndView editBoxes(@RequestParam("ids") String boxIds, ModelMap model) throws IOException {
+  @PostMapping(value = "/bulk/edit")
+  public ModelAndView editBoxes(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
+    String boxIds = getStringInput("ids", form, true);
     return new BulkEditBoxBackend().edit(boxIds, model);
   }
 
   @GetMapping(value = "/new")
   public ModelAndView newBox(ModelMap model) throws IOException {
     model.put("title", "New Box");
-    model.put(MODEL_ATTR_PAGEMODE, "create");
+    model.put(PageMode.PROPERTY, PageMode.CREATE.getLabel());
     return setupForm(new BoxImpl(), model);
   }
 
@@ -110,7 +97,7 @@ public class EditBoxController {
       model.put("fragmentAnalyserCompatible", true);
     }
     model.put("title", "Box " + box.getId());
-    model.put(MODEL_ATTR_PAGEMODE, "edit");
+    model.put(PageMode.PROPERTY, PageMode.EDIT.getLabel());
     return setupForm(box, model);
   }
 
@@ -132,7 +119,12 @@ public class EditBoxController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-      // No configuration required for box HandsOnTable
+      // No configuration required
+    }
+
+    @Override
+    protected boolean isNewInterface() {
+      return true;
     }
   }
 
@@ -154,7 +146,12 @@ public class EditBoxController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
-      // No configuration required for box HandsOnTable
+      config.put(PageMode.PROPERTY, PageMode.EDIT.getLabel());
+    }
+
+    @Override
+    protected boolean isNewInterface() {
+      return true;
     }
   }
 }

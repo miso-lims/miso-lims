@@ -19,6 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.service.QcTypeService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.QcTypeDto;
+import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
 
 @Controller
 @RequestMapping("/qctype")
@@ -64,7 +65,7 @@ public class QcTypeController extends AbstractInstituteDefaultsController<QcType
   @GetMapping("/new")
   public ModelAndView create(ModelMap model) throws IOException {
     model.put("title", "New QC Type");
-    model.put("pageMode", "create");
+    model.put(PageMode.PROPERTY, PageMode.CREATE.getLabel());
     return setupForm(new QcType(), model);
   }
 
@@ -75,7 +76,7 @@ public class QcTypeController extends AbstractInstituteDefaultsController<QcType
       throw new NotFoundException("No QC Type found for ID: " + qcTypeId);
     }
     model.put("title", "QC Type " + qcType.getId());
-    model.put("pageMode", "edit");
+    model.put(PageMode.PROPERTY, PageMode.EDIT.getLabel());
     return setupForm(qcType, model);
   }
 

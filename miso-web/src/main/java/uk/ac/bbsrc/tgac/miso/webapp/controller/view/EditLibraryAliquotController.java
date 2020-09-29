@@ -50,6 +50,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkMergeTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkTableBackend;
+import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
 
 @Controller
 @RequestMapping("/libraryaliquot")
@@ -143,7 +144,6 @@ public class EditLibraryAliquotController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.putPOJO("box", newBox);
-      config.put("pageMode", "propagate");
     }
 
     @Override
@@ -203,7 +203,6 @@ public class EditLibraryAliquotController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.putPOJO("box", newBox);
-      config.put("pageMode", "propagate");
     }
 
     @Override
@@ -247,7 +246,7 @@ public class EditLibraryAliquotController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
-      config.put("pageMode", "edit");
+      // no config required
     }
 
     @Override
@@ -311,7 +310,6 @@ public class EditLibraryAliquotController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.putPOJO("box", newBox);
-      config.put("pageMode", "create");
     }
   }
 
@@ -352,14 +350,13 @@ public class EditLibraryAliquotController {
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
       aliquots.forEach(config.putArray("aliquotsToPool")::addPOJO);
       config.putPOJO("box", newBox);
-      config.put("pageMode", "create");
     }
 
     public ModelAndView create(ModelMap model) throws IOException {
       PoolDto dto = new PoolDto();
       dto.setPlatformType(this.platformType.name());
       dto.setBox(newBox);
-      return prepare(model, true, "Create Pools from Library Aliquots", Collections.nCopies(poolQuantity, dto));
+      return prepare(model, PageMode.CREATE, "Create Pools from Library Aliquots", Collections.nCopies(poolQuantity, dto));
     }
 
   }
@@ -407,7 +404,6 @@ public class EditLibraryAliquotController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.putPOJO("box", newBox);
-      config.put("pageMode", "propagate");
     }
   }
 

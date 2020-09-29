@@ -81,6 +81,7 @@ import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkTableBackend;
+import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -121,9 +122,6 @@ public class EditPoolController {
 
   private static class Config {
     private static final String BOX = "box";
-    private static final String PAGE_MODE = "pageMode";
-    private static final String EDIT = "edit";
-    private static final String CREATE = "create";
   }
 
   @GetMapping(value = "/new")
@@ -195,7 +193,7 @@ public class EditPoolController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
-      config.put(Config.PAGE_MODE, Config.EDIT);
+      // no config required
     }
   };
 
@@ -288,7 +286,6 @@ public class EditPoolController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
       config.putPOJO(Config.BOX, newBox);
-      config.put(Config.PAGE_MODE, Config.CREATE);
     }
 
     public ModelAndView merge(String parentIdsString, String proportionsString, ModelMap model) throws IOException {
@@ -302,7 +299,7 @@ public class EditPoolController {
 
       dtos.set(0, newDto);
 
-      return prepare(model, true, "Merge Pools", dtos);
+      return prepare(model, PageMode.PROPAGATE, "Merge Pools", dtos);
     }
 
     private static List<Integer> parseProportions(String proportionsString) {

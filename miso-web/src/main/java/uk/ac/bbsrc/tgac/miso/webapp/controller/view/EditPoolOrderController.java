@@ -25,6 +25,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PoolOrderDto;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
+import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
 
 @Controller
 @RequestMapping("/poolorder")
@@ -42,7 +43,7 @@ public class EditPoolOrderController {
   @GetMapping("/new")
   public ModelAndView create(@RequestParam(name = "aliquotIds", required = false) String aliquotIds, ModelMap model) throws IOException {
     model.put("title", "New Pool Order");
-    model.put("pageMode", "create");
+    model.put(PageMode.PROPERTY, PageMode.CREATE.getLabel());
     PoolOrder order = new PoolOrder();
     if (aliquotIds != null) {
       for (Long aliquotId : LimsUtils.parseIds(aliquotIds)) {
@@ -65,7 +66,7 @@ public class EditPoolOrderController {
       throw new NotFoundException("Pool order not found");
     }
     model.put("title", "Pool Order " + orderId);
-    model.put("pageMode", "edit");
+    model.put(PageMode.PROPERTY, PageMode.EDIT.getLabel());
     return orderPage(order, model);
   }
 

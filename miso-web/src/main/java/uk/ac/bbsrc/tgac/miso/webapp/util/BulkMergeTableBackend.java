@@ -39,7 +39,7 @@ public abstract class BulkMergeTableBackend<Dto> extends BulkTableBackend<Dto> {
    */
   public final ModelAndView propagate(String idString, ModelMap model) throws IOException {
     List<Long> ids = LimsUtils.parseIds(idString);
-    return prepare(model, true, "Create " + name + " from " + parentName,
+    return prepare(model, PageMode.PROPAGATE, "Create " + name + " from " + parentName,
         Collections.singletonList(createDtoFromParents(ids)));
   }
 

@@ -27,6 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
+import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
 
 public abstract class AbstractTypeDataController<T extends Identifiable, R> {
 
@@ -66,12 +67,12 @@ public abstract class AbstractTypeDataController<T extends Identifiable, R> {
       throw new RestException("Must specify quantity to create", Status.BAD_REQUEST);
     }
     ObjectNode config = makeBaseConfig();
-    config.put("pageMode", "create");
+    config.put(PageMode.PROPERTY, PageMode.CREATE.getLabel());
     addHotConfig(config, mapper);
     if (configurer != null) {
       configurer.accept(config, mapper);
     }
-    addHotAttributes("Create " + pluralType, config, true, model);
+    addHotAttributes("Create " + pluralType, config, PageMode.CREATE, model);
 
     model.put("input", mapper.writeValueAsString(Collections.nCopies(quantity, makeDto())));
     return new ModelAndView(newInterface ? NEW_JSP : OLD_JSP, model);
@@ -89,12 +90,11 @@ public abstract class AbstractTypeDataController<T extends Identifiable, R> {
   protected final ModelAndView bulkEdit(String idString, ModelMap model, BiConsumer<ObjectNode, ObjectMapper> configurer)
       throws IOException {
     ObjectNode config = makeBaseConfig();
-    config.put("pageMode", "edit");
     addHotConfig(config, mapper);
     if (configurer != null) {
       configurer.accept(config, mapper);
     }
-    addHotAttributes("Edit " + pluralType, config, false, model);
+    addHotAttributes("Edit " + pluralType, config, PageMode.EDIT, model);
 
     List<Long> ids = LimsUtils.parseIds(idString);
     List<T> items = new ArrayList<>();
@@ -126,14 +126,15 @@ public abstract class AbstractTypeDataController<T extends Identifiable, R> {
     return config;
   }
 
-  private void addHotAttributes(String title, ObjectNode config, boolean create, ModelMap model) throws JsonProcessingException {
+  private void addHotAttributes(String title, ObjectNode config, PageMode pageMode, ModelMap model) throws JsonProcessingException {
     model.put("title", title);
     model.put("config", mapper.writeValueAsString(config));
     if (newInterface) {
       model.put("target", hotTarget);
+      model.put(PageMode.PROPERTY, pageMode.getLabel());
     } else {
       model.put("targetType", "HotTarget." + hotTarget);
-      model.put("create", create);
+      model.put("create", pageMode != PageMode.EDIT);
     }
   }
 

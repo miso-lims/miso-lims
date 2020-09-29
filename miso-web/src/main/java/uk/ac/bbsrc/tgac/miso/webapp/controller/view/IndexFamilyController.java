@@ -19,6 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.IndexFamilyService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.IndexFamilyDto;
+import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
 
 @Controller
 @RequestMapping("/indexfamily")
@@ -62,7 +63,7 @@ public class IndexFamilyController extends AbstractTypeDataController<IndexFamil
   @GetMapping("/new")
   public ModelAndView create(ModelMap model) throws IOException {
     model.put("title", "New Index Family");
-    model.put("pageMode", "create");
+    model.put(PageMode.PROPERTY, PageMode.CREATE.getLabel());
     return indexFamilyPage(new IndexFamily(), model);
   }
 
@@ -73,7 +74,7 @@ public class IndexFamilyController extends AbstractTypeDataController<IndexFamil
       throw new NotFoundException("No index family found for ID: " + id);
     }
     model.put("title", "Index Family " + id);
-    model.put("pageMode", "edit");
+    model.put(PageMode.PROPERTY, PageMode.EDIT.getLabel());
     return indexFamilyPage(family, model);
   }
 

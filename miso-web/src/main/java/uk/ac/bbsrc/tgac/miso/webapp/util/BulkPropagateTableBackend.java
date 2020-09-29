@@ -58,7 +58,7 @@ public abstract class BulkPropagateTableBackend<ParentModel extends Identifiable
     List<Long> ids = LimsUtils.parseIds(idString);
     List<Dto> dtos = loadParents(ids).map(this::createDtoFromParent).flatMap(dto -> Stream.generate(() -> dto).limit(replicates))
         .collect(Collectors.toList());
-    return prepare(model, true, "Create " + name + " from " + parentName, dtos);
+    return prepare(model, PageMode.PROPAGATE, "Create " + name + " from " + parentName, dtos);
   }
 
   /**
@@ -79,7 +79,7 @@ public abstract class BulkPropagateTableBackend<ParentModel extends Identifiable
     List<Dto> dtos = loadParents(ids)
         .flatMap(parent -> Stream.generate(() -> parent).limit(replicates.get(ids.indexOf(parent.getId())))).map(this::createDtoFromParent)
         .collect(Collectors.toList());
-    return prepare(model, true, "Create " + name + " from " + parentName, dtos);
+    return prepare(model, PageMode.PROPAGATE, "Create " + name + " from " + parentName, dtos);
   }
 
   protected static List<Integer> parseReplicates(String replicatesString) {

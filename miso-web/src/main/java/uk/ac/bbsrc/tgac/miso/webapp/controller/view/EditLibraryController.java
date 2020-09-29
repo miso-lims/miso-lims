@@ -142,10 +142,6 @@ public class EditLibraryController {
   private static class Config {
     private static final String IS_LIBRARY_RECEIPT = "isLibraryReceipt";
     private static final String DEFAULT_SCI_NAME = "defaultSciName";
-    private static final String PAGE_MODE = "pageMode";
-    private static final String CREATE = "create";
-    private static final String PROPAGATE = "propagate";
-    private static final String EDIT = "edit";
     private static final String SHOW_LIBRARY_ALIAS = "showLibraryAlias";
     private static final String SHOW_DESCRIPTION = "showDescription";
     private static final String SHOW_VOLUME = "showVolume";
@@ -289,7 +285,6 @@ public class EditLibraryController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-      config.put(Config.PAGE_MODE, Config.EDIT);
       config.put(Config.SAMPLE_ALIAS_MAYBE_REQUIRED, !alwaysGenerateSampleAliases());
       config.put(Config.LIBRARY_ALIAS_MAYBE_REQUIRED, !alwaysGenerateLibraryAliases());
       addJsonArray(mapper, config, "workstations", workstationService.list(), Dtos::asDto);
@@ -404,7 +399,6 @@ public class EditLibraryController {
         config.put(Config.SORT, sort);
       }
       config.putPOJO(Config.BOX, newBox);
-      config.put(Config.PAGE_MODE, Config.PROPAGATE);
       config.put(Config.SAMPLE_ALIAS_MAYBE_REQUIRED, !alwaysGenerateSampleAliases());
       config.put(Config.LIBRARY_ALIAS_MAYBE_REQUIRED, !alwaysGenerateLibraryAliases());
       config.put(Config.SHOW_DESCRIPTION, showDescription);
@@ -507,7 +501,6 @@ public class EditLibraryController {
         config.putPOJO("targetSampleClass", Dtos.asDto(aliquotClass));
         config.put("dnaseTreatable", aliquotClass.hasPathToDnaseTreatable(sampleValidRelationshipService.getAll()));
       }
-      config.put(Config.PAGE_MODE, Config.CREATE);
       Map<Long, List<LibraryTemplateDto>> templatesByProjectId = new HashMap<>();
       addJsonArray(mapper, config, "projects", projectService.list(), Dtos::asDto);
       if (project == null) {
@@ -530,7 +523,6 @@ public class EditLibraryController {
       config.put(Config.SHOW_DESCRIPTION, showDescription);
       config.put(Config.SHOW_VOLUME, showVolume);
       config.put(Config.SHOW_LIBRARY_ALIAS, showLibraryAlias);
-      config.put(Config.PAGE_MODE, Config.CREATE);
       config.put(Config.IS_LIBRARY_RECEIPT, true);
       config.putPOJO(Config.BOX, newBox);
       config.putPOJO(Config.TEMPLATES, templatesByProjectId);

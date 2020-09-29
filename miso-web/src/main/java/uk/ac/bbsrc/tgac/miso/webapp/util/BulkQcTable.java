@@ -37,7 +37,7 @@ public abstract class BulkQcTable extends BulkTableBackend<QcDto> {
 
   public final ModelAndView display(String idString, ModelMap model) throws IOException {
 
-    return prepare(model, create, verb + " " + qcTarget + " QCs",
+    return prepare(model, create ? PageMode.CREATE : PageMode.EDIT, verb + " " + qcTarget + " QCs",
         LimsUtils.parseIds(idString).stream()
                 .flatMap(WhineyFunction.rethrow(this::load))
                 .sorted(Comparator.comparing(QcDto::getEntityAlias))

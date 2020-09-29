@@ -48,6 +48,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableMap;
 
 import net.sf.json.JSONObject;
@@ -85,6 +86,7 @@ import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/boxes")
@@ -104,15 +106,15 @@ public class BoxRestController extends RestController {
 
   @Autowired
   private SampleService sampleService;
-
   @Autowired
   private LibraryService libraryService;
-
   @Autowired
   private LibraryAliquotService libraryAliquotService;
-
   @Autowired
   private StorageLocationService storageLocationService;
+
+  @Autowired
+  private AsyncOperationManager asyncOperationManager;
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSampleEnabled;
@@ -812,6 +814,23 @@ public class BoxRestController extends RestController {
       box.setBoxPositions(original.getBoxPositions());
       return box;
     }, boxService, box -> Dtos.asDto(box, false));
+  }
+
+  @PostMapping("/bulk")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<BoxDto> dtos) throws IOException {
+    return asyncOperationManager.startAsyncBulkCreate("Box", dtos, Dtos::to, boxService);
+  }
+
+  @PutMapping("/bulk")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<BoxDto> dtos) throws IOException {
+    return asyncOperationManager.startAsyncBulkUpdate("Box", dtos, Dtos::to, boxService);
+  }
+
+  @GetMapping("/bulk/{uuid}")
+  public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
+    return asyncOperationManager.getAsyncProgress(uuid, Box.class, boxService, box -> Dtos.asDto(box, false));
   }
 
   @PostMapping(value = "/bulk-delete")

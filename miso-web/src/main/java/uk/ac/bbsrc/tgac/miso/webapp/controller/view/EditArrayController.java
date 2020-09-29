@@ -20,6 +20,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.ArrayModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
 
 @Controller
 @RequestMapping("/array")
@@ -27,7 +28,6 @@ public class EditArrayController {
 
   private static final String JSP = "/WEB-INF/pages/editArray.jsp";
 
-  private static final String MODEL_ATTR_PAGEMODE = "pageMode";
   private static final String MODEL_ATTR_MODELS = "arrayModels";
   private static final String MODEL_ATTR_JSON = "arrayJson";
   private static final String MODEL_ATTR_ARRAYRUNS = "arrayRuns";
@@ -43,7 +43,7 @@ public class EditArrayController {
 
   @RequestMapping("/new")
   public ModelAndView newArray(ModelMap model) throws IOException {
-    model.addAttribute(MODEL_ATTR_PAGEMODE, "create");
+    model.addAttribute(PageMode.PROPERTY, PageMode.CREATE.getLabel());
     List<ArrayModel> models = arrayModelService.list();
     ObjectMapper mapper = new ObjectMapper();
     model.addAttribute(MODEL_ATTR_MODELS, mapper.writeValueAsString(models.stream().map(Dtos::asDto).collect(Collectors.toList())));
@@ -52,7 +52,7 @@ public class EditArrayController {
 
   @RequestMapping("/{arrayId}")
   public ModelAndView setupForm(@PathVariable(name = "arrayId", required = true) long arrayId, ModelMap model) throws IOException {
-    model.addAttribute(MODEL_ATTR_PAGEMODE, "edit");
+    model.addAttribute(PageMode.PROPERTY, PageMode.EDIT.getLabel());
     Array array = arrayService.get(arrayId);
     if (array == null) {
       throw new NotFoundException("Array not found");

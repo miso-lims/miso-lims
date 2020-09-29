@@ -36,7 +36,7 @@ public abstract class BulkEditTableBackend<Model, Dto> extends BulkTableBackend<
    */
   public final ModelAndView edit(String idString, ModelMap model) throws IOException {
     List<Long> ids = LimsUtils.parseIds(idString);
-    return prepare(model, false, "Edit " + name, load(ids).map(this::asDto).collect(Collectors.toList()));
+    return prepare(model, PageMode.EDIT, "Edit " + name, load(ids).map(this::asDto).collect(Collectors.toList()));
   }
 
   /**

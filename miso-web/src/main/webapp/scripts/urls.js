@@ -87,6 +87,8 @@ Urls = (function() {
 
   var boxRestBase = restBase + '/boxes';
   rest.boxes = {
+    bulkSave: boxRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(boxRestBase + '/bulk'),
     create: boxRestBase,
     update: idUrlFunction(boxRestBase),
     updatePosition: function(boxId, position) {

@@ -184,10 +184,6 @@ public class EditSampleController {
   }
 
   private static class Config {
-    private static final String PAGE_MODE = "pageMode";
-    private static final String CREATE = "create";
-    private static final String PROPAGATE = "propagate";
-    private static final String EDIT = "edit";
     private static final String PROJECTS = "projects";
     private static final String SOPS = "sops";
     private static final String DNASE_TREATABLE = "dnaseTreatable";
@@ -471,7 +467,6 @@ public class EditSampleController {
       } else {
         config.put(Config.DNASE_TREATABLE, false);
       }
-      config.put(Config.PAGE_MODE, Config.EDIT);
       addJsonArray(mapper, config, Config.PROJECTS, projectService.list(), Dtos::asDto);
       addJsonArray(mapper, config, Config.SOPS, sopService.listByCategory(SopCategory.SAMPLE), Dtos::asDto);
     }
@@ -540,7 +535,6 @@ public class EditSampleController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-      config.put(Config.PAGE_MODE, Config.PROPAGATE);
       config.put(Config.DNASE_TREATABLE, targetSampleClass.getDNAseTreatable());
       config.putPOJO(Config.TARGET_SAMPLE_CLASS, Dtos.asDto(targetSampleClass));
       config.putPOJO(Config.SOURCE_SAMPLE_CLASS, Dtos.asDto(sourceSampleClass));
@@ -581,7 +575,6 @@ public class EditSampleController {
       } else {
         config.put(Config.DNASE_TREATABLE, false);
       }
-      config.put(Config.PAGE_MODE, Config.CREATE);
       config.put(Config.DEFAULT_LCM_TUBE_GROUP_ID, defaultLcmTubeGroupId);
       config.put(Config.DEFAULT_LCM_TUBE_GROUP_DESC, defaultLcmTubeGroupDesc);
       addJsonArray(mapper, config, Config.PROJECTS, projectService.list(), Dtos::asDto);

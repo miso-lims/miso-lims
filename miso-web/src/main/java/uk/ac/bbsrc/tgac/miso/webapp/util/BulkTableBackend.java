@@ -31,15 +31,16 @@ public abstract class BulkTableBackend<Dto> {
   /**
    * 
    * @param model ModelMap
-   * @param create indicates whether the IDs exist in the database already or if they will be created on save
+   * @param pageMode operation being performed
    * @param title page title
    * @param dtos
    * @return
    * @throws IOException
    */
-  protected final ModelAndView prepare(ModelMap model, boolean create, String title, List<Dto> dtos) throws IOException {
+  protected final ModelAndView prepare(ModelMap model, PageMode pageMode, String title, List<Dto> dtos) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode config = mapper.createObjectNode();
+    config.put(PageMode.PROPERTY, pageMode.getLabel());
     writeConfiguration(mapper, config);
     model.put("title", title);
     model.put("config", mapper.writeValueAsString(config));
@@ -48,7 +49,7 @@ public abstract class BulkTableBackend<Dto> {
       model.put("target", targetType);
     } else {
       model.put("targetType", "HotTarget." + targetType);
-      model.put("create", create);
+      model.put("create", pageMode != PageMode.EDIT);
       model.put("method", "Propagate");
     }
 
