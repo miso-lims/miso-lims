@@ -6,21 +6,49 @@ ListTarget.runaliquot = {
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {
     return [{
+      name: 'Set QC',
+      action: function(aliquots) {
+        var fields = [{
+          label: 'Status',
+          type: 'select',
+          property: 'qcPassed',
+          values: [true, false, null],
+          getLabel: function(value) {
+            if (value === true) {
+              return 'Passed';
+            } else if (value === false) {
+              return 'Failed';
+            } else {
+              return 'Pending';
+            }
+          }
+        }, {
+          label: 'Note',
+          type: 'text',
+          property: 'qcNote'
+        }];
+        Utils.showDialog('Set QC', 'OK', fields, function(output) {
+          aliquots.forEach(function(aliquot) {
+            aliquot.qcPassed = output.qcPassed;
+            aliquot.qcNote = output.qcNote ? output.qcNote : null;
+          });
+          Utils.ajaxWithDialog('Setting QC', 'PUT', Urls.rest.runs.updateAliquots(config.runId), aliquots, Utils.page.pageReload);
+        });
+      }
+    }, {
       name: 'Set Purpose',
       action: function(aliquots) {
-        Utils.showWizardDialog("Set Purpose", Constants.runPurposes.sort(Utils.sorting.standardSort('alias')).map(
-            function(purpose) {
-              return {
-                name: purpose.alias,
-                handler: function() {
-                  aliquots.forEach(function(aliquot) {
-                    aliquot.runPurposeId = purpose.id;
-                  });
-                  Utils.ajaxWithDialog('Setting Purpose', 'PUT', Urls.rest.runs.setAliquotPurposes(config.runId), aliquots,
-                      Utils.page.pageReload);
-                }
-              }
-            }));
+        Utils.showWizardDialog("Set Purpose", Constants.runPurposes.sort(Utils.sorting.standardSort('alias')).map(function(purpose) {
+          return {
+            name: purpose.alias,
+            handler: function() {
+              aliquots.forEach(function(aliquot) {
+                aliquot.runPurposeId = purpose.id;
+              });
+              Utils.ajaxWithDialog('Setting Purpose', 'PUT', Urls.rest.runs.updateAliquots(config.runId), aliquots, Utils.page.pageReload);
+            }
+          }
+        }));
       }
     }];
   },
@@ -41,6 +69,15 @@ ListTarget.runaliquot = {
     }, "aliquotName", 0, true), ListUtils.labelHyperlinkColumn("Alias", Urls.ui.libraryAliquots.edit, function(item) {
       return item.aliquotId;
     }, "aliquotAlias", 0, true), {
+      sTitle: "QC Status",
+      mData: "qcPassed",
+      sDefaultContent: '',
+      mRender: ListUtils.render.booleanChecks
+    }, {
+      sTitle: "QC Note",
+      mData: 'qcNote',
+      sDefaultContent: ''
+    }, {
       sTitle: "Purpose",
       mData: "runPurposeId",
       include: true,

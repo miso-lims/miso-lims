@@ -2,6 +2,8 @@
 
 Changes:
 
+  * Added run-library-level QC status, which can be set on the Library Aliquots table on the Edit
+    Run page to indicate status of individual library aliquot data after a run
   * Updated terminology for pool QC status to be more consistent with sample, library, and library
     aliquot QC status:
     * QC Passed? -> QC Status

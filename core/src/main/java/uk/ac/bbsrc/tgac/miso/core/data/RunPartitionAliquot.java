@@ -95,6 +95,10 @@ public class RunPartitionAliquot implements Serializable {
   @JoinColumn(name = "purposeId")
   private RunPurpose purpose;
 
+  private Boolean qcPassed;
+
+  private String qcNote;
+
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier")
   private User lastModifier;
@@ -142,6 +146,22 @@ public class RunPartitionAliquot implements Serializable {
 
   public void setPurpose(RunPurpose purpose) {
     this.purpose = purpose;
+  }
+
+  public Boolean getQcPassed() {
+    return qcPassed;
+  }
+
+  public void setQcPassed(Boolean qcPassed) {
+    this.qcPassed = qcPassed;
+  }
+
+  public String getQcNote() {
+    return qcNote;
+  }
+
+  public void setQcNote(String qcNote) {
+    this.qcNote = qcNote;
   }
 
   public User getLastModifier() {
