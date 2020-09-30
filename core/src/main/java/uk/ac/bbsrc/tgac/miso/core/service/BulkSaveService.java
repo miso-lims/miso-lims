@@ -65,6 +65,7 @@ public interface BulkSaveService<T extends Identifiable> extends SaveService<T> 
               operation.setFailed(e);
             }
           }
+          
           if (!operation.isSuccess()) {
             // Need to throw exception to roll back the transaction
             Exception exception = operation.getException();

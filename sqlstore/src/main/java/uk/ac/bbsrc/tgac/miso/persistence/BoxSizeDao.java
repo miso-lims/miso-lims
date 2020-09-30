@@ -1,19 +1,14 @@
 package uk.ac.bbsrc.tgac.miso.persistence;
 
+import java.io.IOException;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 
-public interface BoxSizeDao {
+public interface BoxSizeDao extends SaveDao<BoxSize> {
 
-  public BoxSize get(long id);
+  public long getUsage(BoxSize boxSize) throws IOException;
 
-  public List<BoxSize> list();
-
-  public long create(BoxSize boxSize);
-
-  public long update(BoxSize boxSize);
-
-  public long getUsage(BoxSize boxSize);
+  public List<BoxSize> listByIdList(List<Long> idList) throws IOException;
 
 }

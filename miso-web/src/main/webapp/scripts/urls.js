@@ -131,8 +131,8 @@ Urls = (function() {
 
   var boxSizeRestBase = restBase + '/boxsizes';
   rest.boxSizes = {
-    create: boxSizeRestBase,
-    update: idUrlFunction(boxSizeRestBase)
+    bulkSave: boxSizeRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(boxSizeRestBase + '/bulk')
   };
 
   // Box Uses
