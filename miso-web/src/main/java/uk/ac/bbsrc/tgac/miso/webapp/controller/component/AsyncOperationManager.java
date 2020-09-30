@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -31,6 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.exception.BulkValidationException;
 import uk.ac.bbsrc.tgac.miso.core.util.ThrowingFunction;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.QcDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestUtils;
 
@@ -41,20 +43,40 @@ public class AsyncOperationManager {
   private QualityControlService qualityControlService;
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private ConstantsController constantsController;
 
   private final ConcurrentHashMap<String, BulkSaveOperation<?>> asyncOperations = new ConcurrentHashMap<>();
 
   public <T, R extends Identifiable> ObjectNode startAsyncBulkCreate(String type, List<T> dtos, Function<T, R> toObject,
       BulkSaveService<R> service) throws IOException {
-    return startAsyncBulkCreate(type, dtos, toObject, service::startBulkCreate);
+    return startAsyncBulkCreate(type, dtos, toObject, service, false);
+  }
+
+  public <T, R extends Identifiable> ObjectNode startAsyncBulkCreate(String type, List<T> dtos, Function<T, R> toObject,
+      BulkSaveService<R> service, boolean updateConstants) throws IOException {
+    List<R> items = validateBulkCreate(type, dtos, toObject);
+    Consumer<BulkSaveOperation<R>> callback = null;
+    if (updateConstants) {
+      callback = operation -> {
+        if (operation.isSuccess()) {
+          constantsController.refreshConstants();
+        }
+      };
+    }
+    BulkSaveOperation<R> operation = service.startBulkCreate(items, callback);
+    String uuid = addAsyncOperation(operation);
+    return makeRunningProgress(uuid, operation);
   }
 
   public ObjectNode startAsyncBulkQcCreate(List<QcDto> dtos) throws IOException {
-    return startAsyncBulkCreate("QC", dtos, Dtos::to, qualityControlService::startBulkCreate);
+    List<QC> items = validateBulkCreate("QC", dtos, Dtos::to);
+    BulkSaveOperation<QC> operation = qualityControlService.startBulkCreate(items);
+    String uuid = addAsyncOperation(operation);
+    return makeRunningProgress(uuid, operation);
   }
 
-  private <T, R extends Identifiable> ObjectNode startAsyncBulkCreate(String type, List<T> dtos, Function<T, R> toObject,
-      ThrowingFunction<List<R>, BulkSaveOperation<R>, IOException> serviceMethod) throws IOException {
+  private <T, R extends Identifiable> List<R> validateBulkCreate(String type, List<T> dtos, Function<T, R> toObject) throws IOException {
     List<R> items = new ArrayList<>();
     for (T dto : dtos) {
       if (dto == null) {
@@ -66,20 +88,36 @@ public class AsyncOperationManager {
       }
       items.add(item);
     }
-    BulkSaveOperation<R> operation = serviceMethod.apply(items);
-    String uuid = addAsyncOperation(operation);
-    return makeRunningProgress(uuid, operation);
+    return items;
   }
 
   public <T, R extends Identifiable> ObjectNode startAsyncBulkUpdate(String type, List<T> dtos, Function<T, R> toObject,
       BulkSaveService<R> service) throws IOException {
-    return startAsyncBulkUpdate(type, dtos, toObject, service::get, service::startBulkUpdate);
+    return startAsyncBulkUpdate(type, dtos, toObject, service, false);
+  }
+
+  public <T, R extends Identifiable> ObjectNode startAsyncBulkUpdate(String type, List<T> dtos, Function<T, R> toObject,
+      BulkSaveService<R> service, boolean updateConstants) throws IOException {
+    List<R> items = validateBulkUpdate(type, dtos, toObject, service::get);
+    Consumer<BulkSaveOperation<R>> callback = null;
+    if (updateConstants) {
+      callback = operation -> {
+        if (operation.isSuccess()) {
+          constantsController.refreshConstants();
+        }
+      };
+    }
+    BulkSaveOperation<R> operation = service.startBulkUpdate(items, callback);
+    String uuid = addAsyncOperation(operation);
+    return makeRunningProgress(uuid, operation);
   }
 
   public <T, R extends Identifiable> ObjectNode startAsyncBulkQcUpdate(List<QcDto> dtos) throws IOException {
     final QcTarget qcTarget = getQcTarget(dtos.get(0).getQcTarget());
-    return startAsyncBulkUpdate("QC", dtos, Dtos::to, id -> qualityControlService.get(qcTarget, id),
-        qualityControlService::startBulkUpdate);
+    List<QC> items = validateBulkUpdate("QC", dtos, Dtos::to, id -> qualityControlService.get(qcTarget, id));
+    BulkSaveOperation<QC> operation = qualityControlService.startBulkUpdate(items);
+    String uuid = addAsyncOperation(operation);
+    return makeRunningProgress(uuid, operation);
   }
 
   private QcTarget getQcTarget(String label) {
@@ -90,9 +128,8 @@ public class AsyncOperationManager {
     }
   }
 
-  private <T, R extends Identifiable> ObjectNode startAsyncBulkUpdate(String type, List<T> dtos, Function<T, R> toObject,
-      ThrowingFunction<Long, R, IOException> getItem, ThrowingFunction<List<R>, BulkSaveOperation<R>, IOException> serviceMethod)
-      throws IOException {
+  private <T, R extends Identifiable> List<R> validateBulkUpdate(String type, List<T> dtos, Function<T, R> toObject,
+      ThrowingFunction<Long, R, IOException> getItem) throws IOException {
     List<R> items = new ArrayList<>();
     for (T dto : dtos) {
       if (dto == null) {
@@ -106,9 +143,7 @@ public class AsyncOperationManager {
       }
       items.add(item);
     }
-    BulkSaveOperation<R> operation = serviceMethod.apply(items);
-    String uuid = addAsyncOperation(operation);
-    return makeRunningProgress(uuid, operation);
+    return items;
   }
 
   public <T, R extends Identifiable> ObjectNode getAsyncProgress(String uuid, Class<R> itemClass, BulkSaveService<R> service,

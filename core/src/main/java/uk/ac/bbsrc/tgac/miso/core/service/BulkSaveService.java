@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.hibernate.TransactionException;
 import org.slf4j.LoggerFactory;
@@ -35,15 +36,16 @@ public interface BulkSaveService<T extends Identifiable> extends SaveService<T> 
 
   public List<T> listByIdList(List<Long> ids) throws IOException;
 
-  public default BulkSaveOperation<T> startBulkCreate(List<T> items) throws IOException {
-    return startBulkOperation(items, this::create);
+  public default BulkSaveOperation<T> startBulkCreate(List<T> items, Consumer<BulkSaveOperation<T>> callback) throws IOException {
+    return startBulkOperation(items, this::create, callback);
   }
 
-  public default BulkSaveOperation<T> startBulkUpdate(List<T> items) throws IOException {
-    return startBulkOperation(items, this::update);
+  public default BulkSaveOperation<T> startBulkUpdate(List<T> items, Consumer<BulkSaveOperation<T>> callback) throws IOException {
+    return startBulkOperation(items, this::update, callback);
   }
 
-  public default BulkSaveOperation<T> startBulkOperation(List<T> items, ThrowingFunction<T, Long, IOException> action) throws IOException {
+  public default BulkSaveOperation<T> startBulkOperation(List<T> items, ThrowingFunction<T, Long, IOException> action,
+      Consumer<BulkSaveOperation<T>> callback) throws IOException {
     BulkSaveOperation<T> operation = new BulkSaveOperation<>(items, getAuthorizationManager().getCurrentUser());
     // Authentication is tied to the thread, so use this same auth in the new thread
     Authentication auth = SecurityContextHolder.getContextHolderStrategy().getContext().getAuthentication();
@@ -71,6 +73,9 @@ public interface BulkSaveService<T extends Identifiable> extends SaveService<T> 
             } else {
               throw new TransactionException("Transaction failed", operation.getException());
             }
+          }
+          if (callback != null) {
+            callback.accept(operation);
           }
         }
       });

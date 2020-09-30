@@ -5,7 +5,7 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 
-public interface BoxUseService extends DeleterService<BoxUse>, SaveService<BoxUse> {
+public interface BoxUseService extends DeleterService<BoxUse>, BulkSaveService<BoxUse> {
 
   public List<BoxUse> list() throws IOException;
 

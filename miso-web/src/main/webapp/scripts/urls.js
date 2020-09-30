@@ -144,8 +144,8 @@ Urls = (function() {
 
   var boxUseRestBase = restBase + '/boxuses';
   rest.boxUses = {
-    create: boxUseRestBase,
-    update: idUrlFunction(boxUseRestBase)
+    bulkSave: boxUseRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(boxUseRestBase + '/bulk')
   };
 
   // Containers

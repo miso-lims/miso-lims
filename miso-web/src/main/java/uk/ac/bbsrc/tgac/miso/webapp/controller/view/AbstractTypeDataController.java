@@ -128,14 +128,14 @@ public abstract class AbstractTypeDataController<T extends Identifiable, R> {
 
   private void addHotAttributes(String title, ObjectNode config, PageMode pageMode, ModelMap model) throws JsonProcessingException {
     model.put("title", title);
-    model.put("config", mapper.writeValueAsString(config));
     if (newInterface) {
       model.put("target", hotTarget);
-      model.put(PageMode.PROPERTY, pageMode.getLabel());
+      config.put(PageMode.PROPERTY, pageMode.getLabel());
     } else {
       model.put("targetType", "HotTarget." + hotTarget);
       model.put("create", pageMode != PageMode.EDIT);
     }
+    model.put("config", mapper.writeValueAsString(config));
   }
 
   /**

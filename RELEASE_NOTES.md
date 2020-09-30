@@ -11,7 +11,7 @@ Changes:
     * False -> Failed
     * Unknown -> Not Ready
   * Added Run-Library Metrics page for Dashi integration
-  * Improved performance of bulk box pages
+  * Improved performance of bulk box and box use pages
   * Fixed project validation when receiving samples or libraries from the Edit Project page for a
     project that is not marked as active
 

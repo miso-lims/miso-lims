@@ -3,6 +3,7 @@ BulkTarget.box = (function($) {
 
   /*
    * Expected config: {
+   *   pageMode: string {create, edit}
    * }
    */
 

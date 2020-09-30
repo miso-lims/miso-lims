@@ -8,7 +8,7 @@ ListTarget.boxuse = {
   },
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {
-    var actions = HotTarget.boxuse.getBulkActions(config);
+    var actions = BulkTarget.boxuse.getBulkActions(config);
     if (config.isAdmin) {
       actions.push(ListUtils.createBulkDeleteAction('Box Uses', 'boxuses', Utils.array.getAlias));
     }

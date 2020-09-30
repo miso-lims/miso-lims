@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -30,6 +31,8 @@ public class DefaultBoxUseService implements BoxUseService {
 
   @Autowired
   private DeletionStore deletionStore;
+  @Autowired
+  private TransactionTemplate transactionTemplate;
 
   public void setBoxUseDao(BoxUseDao boxUseDao) {
     this.boxUseDao = boxUseDao;
@@ -74,7 +77,7 @@ public class DefaultBoxUseService implements BoxUseService {
     return boxUseDao.update(managed);
   }
 
-  private void validateChange(BoxUse boxUse, BoxUse beforeChange) {
+  private void validateChange(BoxUse boxUse, BoxUse beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
 
     if (ValidationUtils.isSetAndChanged(BoxUse::getAlias, boxUse, beforeChange) && boxUseDao.getByAlias(boxUse.getAlias()) != null) {
@@ -103,6 +106,16 @@ public class DefaultBoxUseService implements BoxUseService {
       result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.boxes(usage)));
     }
     return result;
+  }
+
+  @Override
+  public TransactionTemplate getTransactionTemplate() {
+    return transactionTemplate;
+  }
+
+  @Override
+  public List<BoxUse> listByIdList(List<Long> ids) throws IOException {
+    return boxUseDao.listByIdList(ids);
   }
 
 }
