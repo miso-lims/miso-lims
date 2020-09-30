@@ -126,4 +126,14 @@ public class TestUtils {
     ((JavascriptExecutor) driver).executeScript(sb.toString());
   }
 
+  public static String qcPassedToString(Boolean qcStatus) {
+    if (qcStatus == null) {
+      return "Not Ready";
+    } else if (qcStatus) {
+      return "Ready";
+    } else {
+      return "Failed";
+    }
+  }
+
 }

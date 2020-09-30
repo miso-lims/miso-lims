@@ -2,6 +2,12 @@
 
 Changes:
 
+  * Updated terminology for pool QC status to be more consistent with sample, library, and library
+    aliquot QC status:
+    * QC Passed? -> QC Status
+    * True -> Ready
+    * False -> Failed
+    * Unknown -> Not Ready
   * Fixed project validation when receiving samples or libraries from the Edit Project page for a
     project that is not marked as active
 

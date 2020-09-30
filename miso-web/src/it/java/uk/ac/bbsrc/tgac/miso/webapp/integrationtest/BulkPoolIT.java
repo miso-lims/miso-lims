@@ -31,12 +31,13 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListPoolsPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.TestUtils;
 
 public class BulkPoolIT extends AbstractIT {
 
   private static final Set<String> commonColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.BARCODE, Columns.BOX_SEARCH,
       Columns.BOX_ALIAS, Columns.BOX_POSITION, Columns.DISCARDED, Columns.CREATE_DATE, Columns.CONCENTRATION, Columns.CONCENTRATION_UNITS,
-      Columns.VOLUME, Columns.VOLUME_UNITS, Columns.QC_PASSED, Columns.DESCRIPTION);
+      Columns.VOLUME, Columns.VOLUME_UNITS, Columns.QC_STATUS, Columns.DESCRIPTION);
 
   private static final Set<String> libraryAliquotsToPoolColumns = Sets.newHashSet(Columns.LIBRARY_ALIQUOT_NAME, Columns.LIBRARY_ALIAS,
       Columns.LIBRARY_SIZE, Columns.POOL);
@@ -146,11 +147,11 @@ public class BulkPoolIT extends AbstractIT {
     BulkPoolPage page = BulkPoolPage.getForEdit(getDriver(), getBaseUrl(), Sets.newHashSet(200001L));
     HandsOnTable table = page.getTable();
 
-    Set<String> qcValues = table.getDropdownOptions(Columns.QC_PASSED, 0);
+    Set<String> qcValues = table.getDropdownOptions(Columns.QC_STATUS, 0);
     assertEquals(3, qcValues.size());
-    assertTrue(qcValues.contains("True"));
-    assertTrue(qcValues.contains("False"));
-    assertTrue(qcValues.contains("Unknown"));
+    assertTrue(qcValues.contains("Ready"));
+    assertTrue(qcValues.contains("Failed"));
+    assertTrue(qcValues.contains("Not Ready"));
   }
 
   @Test
@@ -166,7 +167,7 @@ public class BulkPoolIT extends AbstractIT {
     attrs.put(Columns.CREATE_DATE, "2017-08-15");
     attrs.put(Columns.CONCENTRATION, "6.5");
     attrs.put(Columns.VOLUME, "12.0");
-    attrs.put(Columns.QC_PASSED, "False");
+    attrs.put(Columns.QC_STATUS, "Failed");
     assertColumnValues(table, 0, attrs, "loaded");
 
     // make changes
@@ -176,7 +177,7 @@ public class BulkPoolIT extends AbstractIT {
     changes.put(Columns.CREATE_DATE, "2016-07-14");
     changes.put(Columns.CONCENTRATION, "7.0");
     changes.put(Columns.VOLUME, "6.78");
-    changes.put(Columns.QC_PASSED, "True");
+    changes.put(Columns.QC_STATUS, "Ready");
     fillRow(table, 0, changes);
     
     // unchanged
@@ -203,14 +204,14 @@ public class BulkPoolIT extends AbstractIT {
     attrs.put(Columns.CREATE_DATE, "2017-08-15");
     attrs.put(Columns.CONCENTRATION, "6.5");
     attrs.put(Columns.VOLUME, null);
-    attrs.put(Columns.QC_PASSED, "Unknown");
+    attrs.put(Columns.QC_STATUS, "Not Ready");
     assertColumnValues(table, 0, attrs, "loaded");
 
     // make changes
     Map<String, String> changes = Maps.newLinkedHashMap();
     changes.put(Columns.BARCODE, "ipobar200002");
     changes.put(Columns.VOLUME, "3.33");
-    changes.put(Columns.QC_PASSED, "True");
+    changes.put(Columns.QC_STATUS, "Ready");
     fillRow(table, 0, changes);
 
     // unchanged
@@ -240,14 +241,14 @@ public class BulkPoolIT extends AbstractIT {
     attrs.put(Columns.CREATE_DATE, "2017-08-15");
     attrs.put(Columns.CONCENTRATION, "6.5");
     attrs.put(Columns.VOLUME, "7.92");
-    attrs.put(Columns.QC_PASSED, "True");
+    attrs.put(Columns.QC_STATUS, "Ready");
     assertColumnValues(table, 0, attrs, "loaded");
 
     // make changes
     Map<String, String> changes = Maps.newLinkedHashMap();
     changes.put(Columns.BARCODE, null);
     changes.put(Columns.VOLUME, null);
-    changes.put(Columns.QC_PASSED, "Unknown");
+    changes.put(Columns.QC_STATUS, "Not Ready");
     fillRow(table, 0, changes);
 
     // unchanged
@@ -276,7 +277,7 @@ public class BulkPoolIT extends AbstractIT {
     attrs.put(Columns.BARCODE, null);
     attrs.put(Columns.CONCENTRATION, null);
     attrs.put(Columns.VOLUME, null);
-    attrs.put(Columns.QC_PASSED, "Unknown");
+    attrs.put(Columns.QC_STATUS, "Not Ready");
     assertColumnValues(table, 0, attrs, "default values");
 
     // enter pool data
@@ -286,7 +287,7 @@ public class BulkPoolIT extends AbstractIT {
     attrs.put(Columns.CREATE_DATE, "2017-08-01");
     attrs.put(Columns.CONCENTRATION, "1.23");
     attrs.put(Columns.VOLUME, "4.56");
-    attrs.put(Columns.QC_PASSED, "True");
+    attrs.put(Columns.QC_STATUS, "Ready");
     fillRow(table, 0, attrs);
     assertColumnValues(table, 0, attrs, "changes pre-save");
 
@@ -313,7 +314,7 @@ public class BulkPoolIT extends AbstractIT {
     row0.put(Columns.BARCODE, null);
     row0.put(Columns.CONCENTRATION, null);
     row0.put(Columns.VOLUME, null);
-    row0.put(Columns.QC_PASSED, "Unknown");
+    row0.put(Columns.QC_STATUS, "Not Ready");
     row0.put(Columns.CONCENTRATION, "4.0");
     row0.put(Columns.CONCENTRATION_UNITS, "ng/L");
     assertColumnValues(table, 0, row0, "row 0 default values");
@@ -331,7 +332,7 @@ public class BulkPoolIT extends AbstractIT {
     row0.put(Columns.CONCENTRATION, "1.23");
     row0.put(Columns.CONCENTRATION_UNITS, "ng/&#181;L");
     row0.put(Columns.VOLUME, "4.56");
-    row0.put(Columns.QC_PASSED, "True");
+    row0.put(Columns.QC_STATUS, "Ready");
     fillRow(table, 0, row0);
     row0.put(Columns.CONCENTRATION_UNITS, "ng/L");
     assertColumnValues(table, 0, row0, "row 0 changes pre-save");
@@ -343,7 +344,7 @@ public class BulkPoolIT extends AbstractIT {
     row1.put(Columns.CONCENTRATION, "1.25");
     row1.put(Columns.CONCENTRATION_UNITS, "ng/&#181;L");
     row1.put(Columns.VOLUME, "4.53");
-    row1.put(Columns.QC_PASSED, "True");
+    row1.put(Columns.QC_STATUS, "Ready");
     fillRow(table, 1, row1);
     row1.put(Columns.CONCENTRATION_UNITS, "ng/L");
     assertColumnValues(table, 1, row1, "row 1 changes pre-save");
@@ -380,7 +381,7 @@ public class BulkPoolIT extends AbstractIT {
     row0.put(Columns.CREATE_DATE, "2018-05-18");
     row0.put(Columns.CONCENTRATION, "1.23");
     row0.put(Columns.VOLUME, "4.56");
-    row0.put(Columns.QC_PASSED, "True");
+    row0.put(Columns.QC_STATUS, "Ready");
     fillRow(table, 0, row0);
     assertColumnValues(table, 0, row0, "row 0 changes pre-save");
 
@@ -575,7 +576,7 @@ public class BulkPoolIT extends AbstractIT {
     attrs.put(Columns.CREATE_DATE, "2017-08-15");
     attrs.put(Columns.CONCENTRATION, "6.5");
     attrs.put(Columns.VOLUME, "7.92");
-    attrs.put(Columns.QC_PASSED, "True");
+    attrs.put(Columns.QC_STATUS, "Ready");
     assertColumnValues(table, 0, attrs, "loaded for first edit");
 
     // change 1
@@ -618,7 +619,7 @@ public class BulkPoolIT extends AbstractIT {
     attrs.put(Columns.BARCODE, null);
     attrs.put(Columns.CONCENTRATION, null);
     attrs.put(Columns.VOLUME, null);
-    attrs.put(Columns.QC_PASSED, "Unknown");
+    attrs.put(Columns.QC_STATUS, "Not Ready");
     assertColumnValues(table, 0, attrs, "default values");
 
     // enter pool data
@@ -628,7 +629,7 @@ public class BulkPoolIT extends AbstractIT {
     attrs.put(Columns.CREATE_DATE, "2017-08-01");
     attrs.put(Columns.CONCENTRATION, "1.23");
     attrs.put(Columns.VOLUME, "4.56");
-    attrs.put(Columns.QC_PASSED, "True");
+    attrs.put(Columns.QC_STATUS, "Ready");
     fillRow(table, 0, attrs);
     assertColumnValues(table, 0, attrs, "creation pre-save");
 
@@ -696,7 +697,7 @@ public class BulkPoolIT extends AbstractIT {
     changes.put(Columns.CREATE_DATE, "2016-07-14");
     changes.put(Columns.CONCENTRATION, "7.0");
     changes.put(Columns.VOLUME, "6.78");
-    changes.put(Columns.QC_PASSED, "True");
+    changes.put(Columns.QC_STATUS, "Ready");
     fillRow(table, 0, changes);
 
     assertColumnValues(table, 0, changes, "changes pre-save");
@@ -719,7 +720,7 @@ public class BulkPoolIT extends AbstractIT {
     assertEntityAttribute(Columns.CREATE_DATE, attributes, pool, p -> LimsUtils.formatDate(p.getCreationDate()));
     assertEntityAttribute(Columns.CONCENTRATION, attributes, pool, p -> LimsUtils.toNiceString(p.getConcentration()));
     assertEntityAttribute(Columns.VOLUME, attributes, pool, p -> p.getVolume() == null ? null : LimsUtils.toNiceString(p.getVolume()));
-    assertEntityAttribute(Columns.QC_PASSED, attributes, pool, p -> booleanString(p.getQcPassed(), "Unknown"));
+    assertEntityAttribute(Columns.QC_STATUS, attributes, pool, p -> TestUtils.qcPassedToString(p.getQcPassed()));
   }
 
   private static void assertPoolableElementViews(Pool pool, List<Long> ids, List<Integer> proportions) {
