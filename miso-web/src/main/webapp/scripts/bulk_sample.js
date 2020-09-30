@@ -371,7 +371,7 @@ BulkTarget.sample = (function($) {
         disabled: !!config.project,
         source: function(sample, api) {
           return config.projects.filter(function(project) {
-            return project.status === 'Active' || project.id === sample.projectId;
+            return project.status === 'Active' || project.id === sample.projectId || (config.project && project.id === config.project.id);
           });
         },
         sortSource: Utils.sorting.standardSort(Constants.isDetailedSample ? 'shortName' : 'id'),
