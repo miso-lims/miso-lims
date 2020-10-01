@@ -59,7 +59,9 @@ public class DefaultRunPartitionAliquotService implements RunPartitionAliquotSer
 
   private void save(RunPartitionAliquot runPartitionAliquot) throws IOException {
     RunPartitionAliquot managed = get(runPartitionAliquot.getRun(), runPartitionAliquot.getPartition(), runPartitionAliquot.getAliquot());
-    runPartitionAliquot.setPurpose(runPurposeService.get(runPartitionAliquot.getPurpose().getId()));
+    if (runPartitionAliquot.getPurpose() != null) {
+      runPartitionAliquot.setPurpose(runPurposeService.get(runPartitionAliquot.getPurpose().getId()));
+    }
     User user = authorizationManager.getCurrentUser();
 
     if (managed == null) {
@@ -70,6 +72,8 @@ public class DefaultRunPartitionAliquotService implements RunPartitionAliquotSer
       runPartitionAliquotDao.create(runPartitionAliquot);
     } else {
       managed.setPurpose(runPartitionAliquot.getPurpose());
+      managed.setQcPassed(runPartitionAliquot.getQcPassed());
+      managed.setQcNote(runPartitionAliquot.getQcNote());
       managed.setLastModifier(user);
       runPartitionAliquotDao.update(managed);
     }

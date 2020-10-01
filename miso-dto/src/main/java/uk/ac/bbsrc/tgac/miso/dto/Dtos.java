@@ -4024,6 +4024,8 @@ public class Dtos {
     setString(to::setAliquotName, maybeGetProperty(from.getAliquot(), LibraryAliquot::getName));
     setString(to::setAliquotAlias, maybeGetProperty(from.getAliquot(), LibraryAliquot::getAlias));
     setId(to::setRunPurposeId, from.getPurpose());
+    setBoolean(to::setQcPassed, from.getQcPassed(), true);
+    setString(to::setQcNote, from.getQcNote());
     return to;
   }
 
@@ -4034,6 +4036,8 @@ public class Dtos {
     setObject(to::setPartition, PartitionImpl::new, from.getPartitionId());
     setObject(to::setAliquot, LibraryAliquot::new, from.getAliquotId());
     setObject(to::setPurpose, RunPurpose::new, from.getRunPurposeId());
+    setBoolean(to::setQcPassed, from.getQcPassed(), true);
+    setString(to::setQcNote, from.getQcNote());
     return to;
   }
 

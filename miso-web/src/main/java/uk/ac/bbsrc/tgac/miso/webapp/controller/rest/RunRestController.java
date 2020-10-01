@@ -368,9 +368,9 @@ public class RunRestController extends RestController {
     }
   }
 
-  @PutMapping("/{runId}/aliquot-purposes")
+  @PutMapping("/{runId}/aliquots")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void setAliquotPurposes(@PathVariable long runId, @RequestBody List<RunPartitionAliquotDto> dtos) throws IOException {
+  public void saveAliquots(@PathVariable long runId, @RequestBody List<RunPartitionAliquotDto> dtos) throws IOException {
     RestUtils.retrieve("Run", runId, runService);
     List<RunPartitionAliquot> runPartitionAliquots = dtos.stream().map(Dtos::to).collect(Collectors.toList());
     runPartitionAliquotService.save(runPartitionAliquots);

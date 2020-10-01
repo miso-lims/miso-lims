@@ -666,7 +666,7 @@ Urls = (function() {
     platformDatatable: idUrlFunction(runRestBase + '/dt/platform'),
     setPartitionQcs: middleIdUrlFunction(runRestBase, '/qc'),
     setPartitionPurposes: middleIdUrlFunction(runRestBase, '/partition-purposes'),
-    setAliquotPurposes: middleIdUrlFunction(runRestBase, '/aliquot-purposes'),
+    updateAliquots: middleIdUrlFunction(runRestBase, '/aliquots'),
     addContainer: middleIdUrlFunction(runRestBase, '/add'),
     removeContainers: middleIdUrlFunction(runRestBase, '/remove'),
     potentialExperiments: middleIdUrlFunction(runRestBase, '/potentialExperiments')
