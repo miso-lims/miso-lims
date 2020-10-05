@@ -18,6 +18,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.PartitionQcTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.persistence.RunPartitionStore;
 
 @Service
@@ -50,6 +51,10 @@ public class DefaultRunPartitionService implements RunPartitionService {
 
     ValidationUtils.loadChildEntity(runPartition::setPurpose, runPartition.getPurpose(), runPurposeService, "runPurposeId");
     ValidationUtils.loadChildEntity(runPartition::setQcType, runPartition.getQcType(), partitionQcTypeService, "qcType");
+
+    if (runPartition.getQcType().isNoteRequired() && runPartition.getNotes() == null) {
+      throw new ValidationException("A note is required for the selected partition QC status");
+    }
 
     if (managed == null) {
       runPartition.setRun(runService.get(runPartition.getRun().getId()));

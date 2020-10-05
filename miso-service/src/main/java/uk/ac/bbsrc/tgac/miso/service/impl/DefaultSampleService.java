@@ -796,6 +796,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     validateVolumeUnits(sample.getVolume(), sample.getVolumeUnits(), errors);
     validateBarcodeUniqueness(sample, beforeChange, sampleStore::getByBarcode, errors, "sample");
     validateUnboxableFields(sample, errors);
+    validateDetailedQcStatus(sample, errors);
 
     if (isDetailedSample(sample)) {
       validateSubproject(sample, beforeChange, errors);

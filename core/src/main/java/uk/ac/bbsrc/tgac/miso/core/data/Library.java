@@ -36,7 +36,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.DetailedQcItem;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QualityControllable;
 import uk.ac.bbsrc.tgac.miso.core.data.type.DilutionFactor;
@@ -54,7 +53,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface Library extends Attachable, Comparable<Library>, Deletable, DetailedQcItem, HierarchyEntity, Locatable,
+public interface Library extends Attachable, Comparable<Library>, Deletable, HierarchyEntity, Locatable,
     QualityControllable<LibraryQC>, Serializable {
 
   /** Field UNSAVED_ID */

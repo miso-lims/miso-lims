@@ -57,6 +57,15 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
   }
 
   @Override
+  public List<RunPartitionAliquot> listByAliquotId(long aliquotId) throws IOException {
+    @SuppressWarnings("unchecked")
+    List<RunPartitionAliquot> results = currentSession().createCriteria(RunPartitionAliquot.class)
+        .add(Restrictions.eq("aliquot.aliquotId", aliquotId))
+        .list();
+    return results;
+  }
+
+  @Override
   public void create(RunPartitionAliquot runPartitionAliquot) throws IOException {
     currentSession().save(runPartitionAliquot);
   }

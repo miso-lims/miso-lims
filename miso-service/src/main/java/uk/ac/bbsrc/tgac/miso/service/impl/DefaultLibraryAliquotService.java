@@ -308,6 +308,7 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
     validateBarcodeUniqueness(aliquot, beforeChange, libraryAliquotDao::getByBarcode, errors, "library aliquot");
     validateTargetedSequencing(aliquot, errors);
     validateUnboxableFields(aliquot, errors);
+    validateDetailedQcStatus(aliquot, errors);
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);

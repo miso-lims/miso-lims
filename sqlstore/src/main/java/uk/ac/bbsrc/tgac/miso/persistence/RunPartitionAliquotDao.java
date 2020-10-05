@@ -16,6 +16,8 @@ public interface RunPartitionAliquotDao {
 
   public List<RunPartitionAliquot> listByRunId(long runId) throws IOException;
 
+  public List<RunPartitionAliquot> listByAliquotId(long aliquotId) throws IOException;
+
   public void create(RunPartitionAliquot runPartitionAliquot) throws IOException;
 
   public void update(RunPartitionAliquot runPartitionAliquot) throws IOException;

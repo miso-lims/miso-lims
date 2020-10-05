@@ -33,7 +33,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.DetailedQcItem;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QualityControllable;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
 
@@ -49,7 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface Sample extends Attachable, Comparable<Sample>, Deletable, DetailedQcItem, HierarchyEntity, Locatable,
+public interface Sample extends Attachable, Comparable<Sample>, Deletable, HierarchyEntity, Locatable,
     QualityControllable<SampleQC>, Serializable {
 
   public static final String PLAIN_CATEGORY_NAME = "Plain";

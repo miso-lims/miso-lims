@@ -16,6 +16,10 @@ public interface RunPartitionAliquotService {
 
   public List<RunPartitionAliquot> listByRunId(long runId) throws IOException;
 
+  public List<RunPartitionAliquot> listByAliquotId(long aliquotId) throws IOException;
+
+  public void save(RunPartitionAliquot runPartitionAliquot) throws IOException;
+
   public void save(List<RunPartitionAliquot> runPartitionAliquots) throws IOException;
 
   public void deleteForRunContainer(Run run, SequencerPartitionContainer container) throws IOException;

@@ -10,6 +10,7 @@ Changes:
     * True -> Ready
     * False -> Failed
     * Unknown -> Not Ready
+  * Added Run-Library Metrics page for Dashi integration
   * Fixed project validation when receiving samples or libraries from the Edit Project page for a
     project that is not marked as active
 
