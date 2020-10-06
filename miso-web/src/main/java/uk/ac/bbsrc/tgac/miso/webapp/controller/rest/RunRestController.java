@@ -97,6 +97,7 @@ import uk.ac.bbsrc.tgac.miso.dto.StudyDto;
 import uk.ac.bbsrc.tgac.miso.dto.request.DetailedQcStatusUpdateDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ServerErrorException;
 
 /**
  * A controller to handle all REST requests for Runs
@@ -578,9 +579,7 @@ public class RunRestController extends RestController {
 
     RunPartition runPartition = runPartitionService.get(run, partition);
     if (runPartition == null) {
-      runPartition = new RunPartition();
-      runPartition.setRun(run);
-      runPartition.setPartition(partition);
+      throw new ServerErrorException(String.format("No RunPartition found for run %d, partition %d", run.getId(), partition.getId()));
     }
     runPartition.setQcType(status);
     runPartition.setNotes(dto.getNote());
