@@ -1954,6 +1954,7 @@ public class Dtos {
     setId(dto::setDataApproverId, from.getDataApprover());
     setString(dto::setDataApproverName, maybeGetProperty(from.getDataApprover(), User::getFullName));
     setId(dto::setSopId, from.getSop());
+    setString(dto::setDataManglingPolicy, maybeGetProperty(from.getDataManglingPolicy(), InstrumentDataManglingPolicy::name));
 
     dto.setProjectsLabel(from.getProjectsLabel());
 
@@ -2020,6 +2021,7 @@ public class Dtos {
     setBoolean(to::setDataApproved, dto.isDataApproved(), true);
     setObject(to::setDataApprover, UserImpl::new, dto.getDataApproverId());
     setObject(to::setSop, Sop::new, dto.getSopId());
+    setObject(to::setDataManglingPolicy, dto.getDataManglingPolicy(), InstrumentDataManglingPolicy::valueOf);
     return to;
   }
 

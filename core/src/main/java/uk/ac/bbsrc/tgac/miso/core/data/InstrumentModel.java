@@ -45,7 +45,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 /**
- * A Platform describes metadata about potentially any hardware item, but is usully linked to a sequencer implementation.
+ * A Platform describes metadata about potentially any hardware item, but is usually linked to a sequencer implementation.
  * 
  * @author Rob Davey
  * @since 0.0.2
