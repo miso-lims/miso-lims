@@ -33,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -52,6 +53,8 @@ public class RunLibraryController {
   private static final Pattern ALIQUOT_NAME_PATTERN = Pattern.compile("LDI(\\d+)");
 
   @Autowired
+  private LibraryAliquotService libraryAliquotService;
+  @Autowired
   private RunPartitionService runPartitionService;
   @Autowired
   private RunPartitionAliquotService runPartitionAliquotService;
@@ -63,7 +66,21 @@ public class RunLibraryController {
     List<RunLibraryQCTableRowDto> rows = new ArrayList<>();
     for (RunLibraryQcTableRequestLibraryDto item : data.getLibraryAliquots()) {
       long aliquotId = getAliquotIdFromName(item.getName());
-      List<RunPartitionAliquot> runLibs = runPartitionAliquotService.listByAliquotId(aliquotId).stream()
+      LibraryAliquot libraryAliquot = libraryAliquotService.get(aliquotId);
+      if (libraryAliquot == null) {
+        throw new ClientErrorException(String.format("Library aliquot %s not found", item.getName()));
+      }
+      List<RunPartitionAliquot> runLibs = runPartitionAliquotService.listByAliquotId(aliquotId);
+      // RunPartitionAliquots may not already exist for all relationships, so we need to construct some of them
+      List<RunPartition> runParts = runPartitionService.listByAliquot(libraryAliquot);
+      for (RunPartition runPart : runParts) {
+        if (runLibs.stream().noneMatch(runLib -> runLib.getRun().getId() == runPart.getRun().getId()
+            && runLib.getPartition().getId() == runPart.getPartition().getId())) {
+          runLibs.add(new RunPartitionAliquot(runPart.getRun(), runPart.getPartition(), libraryAliquot));
+        }
+      }
+
+      runLibs = runLibs.stream()
           .filter(runLib -> item.getRunId() == null ? true : runLib.getRun().getId() == item.getRunId().longValue())
           .filter(runLib -> item.getPartition() == null ? true : runLib.getPartition().getPartitionNumber().equals(item.getPartition()))
           .collect(Collectors.toList());

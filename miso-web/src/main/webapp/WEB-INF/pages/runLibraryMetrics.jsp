@@ -39,7 +39,6 @@
 
 <script type="text/javascript">
 jQuery(document).ready(function () {
-  // TODO: Utils.ui.updateHelpLink(Urls.external.userManual(''));
   RunLibraryMetrics.buildTable(${tableData});
 });
 </script>

@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.service.PartitionQcTypeService;
@@ -42,6 +44,11 @@ public class DefaultRunPartitionService implements RunPartitionService {
   public RunPartition get(Run run, Partition partition) throws IOException {
     Run managedRun = runService.get(run.getId());
     return runPartitionDao.get(managedRun, partition);
+  }
+
+  @Override
+  public List<RunPartition> listByAliquot(LibraryAliquot aliquot) throws IOException {
+    return runPartitionDao.listByAliquot(aliquot);
   }
 
   @Override
