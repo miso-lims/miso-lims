@@ -6,17 +6,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class RunLibraryQcTableRequestLibraryDto {
 
-  private long id;
+  private String name;
   private Long runId;
   private Integer partition;
   private List<RunLibraryQcTableRequestMetricDto> metrics;
 
-  public long getId() {
-    return id;
+  public String getName() {
+    return name;
   }
 
-  public void setId(long id) {
-    this.id = id;
+  public void setName(String name) {
+    this.name = name;
   }
 
   @JsonProperty("run_id")

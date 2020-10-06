@@ -159,7 +159,7 @@ public class RunRestController extends RestController {
     }
   }
 
-  public static class RunLibaryQcStatusUpdateRequest {
+  public static class RunLibraryQcStatusUpdateRequest {
 
     private Boolean qcPassed;
     private String note;
@@ -602,7 +602,7 @@ public class RunRestController extends RestController {
   @PutMapping("/{runIdId}/partitions/{partitionId}/libraryaliquots/{aliquotId}/qc-status")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public @ResponseBody void updateRunLibraryQcStatus(@PathVariable long runId, @PathVariable long partitionId,
-      @PathVariable long aliquotId, @RequestBody RunLibaryQcStatusUpdateRequest dto) throws IOException {
+      @PathVariable long aliquotId, @RequestBody RunLibraryQcStatusUpdateRequest dto) throws IOException {
     Run run = RestUtils.retrieve("Run", runId, runService);
     Partition partition = findPartitionInRun(run, partitionId);
     PoolableElementView poolableElementView = partition.getPool().getPoolContents().stream()

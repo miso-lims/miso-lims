@@ -404,7 +404,7 @@ public class DefaultSampleServiceTest {
     updated.setAlias("newAlias");
     updated.setDescription("newDesc");
     updated.setSampleType("newType");
-    updated.setDetailedQcStatus(mockDetailedQcStatus(5L, "Ready"));
+    updated.setDetailedQcStatus(mockDetailedQcStatus(5L, "Ready", false));
     updated.setScientificName(mockScientificName(2L, "newSciName"));
     updated.setTaxonIdentifier("newTaxonId");
     updated.setVolume(new BigDecimal("5.5"));
@@ -662,10 +662,11 @@ public class DefaultSampleServiceTest {
     return sn;
   }
 
-  private DetailedQcStatus mockDetailedQcStatus(long id, String description) throws IOException {
+  private DetailedQcStatus mockDetailedQcStatus(long id, String description, boolean noteRequired) throws IOException {
     DetailedQcStatus status = new DetailedQcStatusImpl();
     status.setId(id);
     status.setDescription(description);
+    status.setNoteRequired(noteRequired);
     Mockito.when(detailedQcStatusService.get(id)).thenReturn(status);
     return status;
   }

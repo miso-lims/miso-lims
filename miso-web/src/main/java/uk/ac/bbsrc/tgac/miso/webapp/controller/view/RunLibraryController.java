@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -43,11 +43,13 @@ import uk.ac.bbsrc.tgac.miso.dto.dashi.RunLibraryQcTableRequestDto;
 import uk.ac.bbsrc.tgac.miso.dto.dashi.RunLibraryQcTableRequestLibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.dashi.RunLibraryQcTableRequestMetricDto;
 import uk.ac.bbsrc.tgac.miso.dto.dashi.RunLibraryQcTableRowMetricDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
 
 @Controller
 @RequestMapping("/runlibraries")
 public class RunLibraryController {
+
+  private static final Pattern ALIQUOT_NAME_PATTERN = Pattern.compile("LDI(\\d+)");
 
   @Autowired
   private RunPartitionService runPartitionService;
@@ -60,12 +62,13 @@ public class RunLibraryController {
     RunLibraryQcTableRequestDto data = validateRunLibraryQcTableRequest(form, mapper);
     List<RunLibraryQCTableRowDto> rows = new ArrayList<>();
     for (RunLibraryQcTableRequestLibraryDto item : data.getLibraryAliquots()) {
-      List<RunPartitionAliquot> runLibs = runPartitionAliquotService.listByAliquotId(item.getId()).stream()
+      long aliquotId = getAliquotIdFromName(item.getName());
+      List<RunPartitionAliquot> runLibs = runPartitionAliquotService.listByAliquotId(aliquotId).stream()
           .filter(runLib -> item.getRunId() == null ? true : runLib.getRun().getId() == item.getRunId().longValue())
           .filter(runLib -> item.getPartition() == null ? true : runLib.getPartition().getPartitionNumber().equals(item.getPartition()))
           .collect(Collectors.toList());
       if (runLibs.isEmpty()) {
-        throw new RestException("No matching run-libraries", Status.BAD_REQUEST);
+        throw new ClientErrorException("No matching run-libraries");
       }
       rows.add(makeQcTableRow(runLibs, item.getMetrics()));
     }
@@ -74,37 +77,46 @@ public class RunLibraryController {
     return new ModelAndView("/WEB-INF/pages/runLibraryMetrics.jsp", model);
   }
 
+  private static long getAliquotIdFromName(String name) {
+    Matcher m = ALIQUOT_NAME_PATTERN.matcher(name);
+    if (!m.matches()) {
+      throw new ClientErrorException("Invalid library aliquot name: " + name);
+    }
+    return Long.parseLong(m.group(1));
+  }
+
   private static RunLibraryQcTableRequestDto validateRunLibraryQcTableRequest(Map<String, String> form, ObjectMapper mapper)
       throws IOException {
     RunLibraryQcTableRequestDto data = null;
     if (form.containsKey("data")) {
       try {
-        data = mapper.readerFor(RunLibraryQcTableRequestDto.class).readValue(form.get("data"));
+        String json = form.get("data");
+        data = mapper.readValue(json, RunLibraryQcTableRequestDto.class);
       } catch (JsonProcessingException e) {
-        throw new RestException("Invalid request data", Status.BAD_REQUEST);
+        throw new ClientErrorException("Invalid request data", e);
       }
     }
 
     if (data == null) {
-      throw new RestException("Request data missing", Status.BAD_REQUEST);
+      throw new ClientErrorException("Request data missing");
     } else if (data.getLibraryAliquots() == null || data.getLibraryAliquots().isEmpty()) {
-      throw new RestException("No library aliquots specified", Status.BAD_REQUEST);
+      throw new ClientErrorException("No library aliquots specified");
     }
     RunLibraryQcTableRequestLibraryDto template = data.getLibraryAliquots().get(0);
     for (RunLibraryQcTableRequestLibraryDto lib : data.getLibraryAliquots()) {
       if (lib.getMetrics() == null || lib.getMetrics().isEmpty()) {
-        throw new RestException("No metrics specified", Status.BAD_REQUEST);
+        throw new ClientErrorException("No metrics specified");
       } else if (lib.getMetrics().size() != template.getMetrics().size()) {
-        throw new RestException("Inconsistent metrics specified", Status.BAD_REQUEST);
+        throw new ClientErrorException("Inconsistent metrics specified");
       }
       for (int i = 0; i < lib.getMetrics().size(); i++) {
         RunLibraryQcTableRequestMetricDto m1 = lib.getMetrics().get(i);
         RunLibraryQcTableRequestMetricDto m2 = template.getMetrics().get(i);
         if (m1.getTitle() == null || m1.getThresholdType() == null) {
-          throw new RestException("Invalid metrics specified", Status.BAD_REQUEST);
+          throw new ClientErrorException("Invalid metrics specified");
         } else if (!m1.getTitle().equals(m2.getTitle()) || !m1.getThresholdType().equals(m2.getThresholdType())
             || m1.getThreshold() != m2.getThreshold()) {
-              throw new RestException("Inconsistent metrics specified", Status.BAD_REQUEST);
+              throw new ClientErrorException("Inconsistent metrics specified");
         }
       }
     }
