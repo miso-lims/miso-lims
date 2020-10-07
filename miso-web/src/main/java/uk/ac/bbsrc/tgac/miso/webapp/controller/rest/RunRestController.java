@@ -359,8 +359,9 @@ public class RunRestController extends RestController {
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
   public void setQc(@PathVariable Long runId, @RequestBody RunPartitionQCRequest request) throws IOException {
     Run run = RestUtils.retrieve("Run", runId, runService);
-    PartitionQCType qcType = partitionQcTypeService.list().stream().filter(qt -> qt.getId() == request.getQcTypeId()).findAny()
-        .orElseThrow(() -> new RestException(Status.BAD_REQUEST));
+    PartitionQCType qcType = partitionQcTypeService.list().stream().filter(qt -> qt.getId() == request.getQcTypeId().longValue()).findAny()
+        .orElseThrow(
+            () -> new RestException(String.format("No partition QC type found with ID: %d", request.getQcTypeId()), Status.BAD_REQUEST));
     run.getSequencerPartitionContainers().stream()//
         .flatMap(container -> container.getPartitions().stream())//
         .filter(partition -> request.partitionIds.contains(partition.getId()))//
