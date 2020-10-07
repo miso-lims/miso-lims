@@ -50,6 +50,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
+import uk.ac.bbsrc.tgac.miso.core.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
@@ -91,6 +92,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   private AuthorizationManager authorizationManager;
   @Autowired
   private NamingSchemeHolder namingSchemeHolder;
+  @Autowired
+  private DetailedQcStatusService detailedQcStatusService;
   @Autowired
   private LibraryTypeService libraryTypeService;
   @Autowired
@@ -454,6 +457,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
       library.setThermalCycler(instrumentService.get(library.getThermalCycler().getId()));
     }
     loadChildEntity(library::setSop, library.getSop(), sopService, "sopId");
+    loadChildEntity(library::setDetailedQcStatus, library.getDetailedQcStatus(), detailedQcStatusService, "detailedQcStatusId");
     if (isDetailedLibrary(library)) {
       DetailedLibrary lai = (DetailedLibrary) library;
       if (lai.getLibraryDesignCode() != null) {
