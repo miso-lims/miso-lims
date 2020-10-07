@@ -56,7 +56,6 @@ public class BulkSaveOperation<T extends Identifiable> {
     assertAwaitingResult();
     savedIds.add(savedId);
     progress++;
-    maybeSetCompletionTime();
     awaitingItemResult = false;
   }
 
@@ -64,20 +63,21 @@ public class BulkSaveOperation<T extends Identifiable> {
     assertAwaitingResult();
     errorsByRow.put(progress, e.getErrors());
     progress++;
-    maybeSetCompletionTime();
     awaitingItemResult = false;
   }
 
   public synchronized void setFailed(Exception e) {
-    assertAwaitingResult();
     failureException = e;
     progress = totalCount;
-    maybeSetCompletionTime();
     awaitingItemResult = false;
   }
 
   public synchronized boolean isComplete() {
-    return progress == totalCount;
+    return completionTime != null;
+  }
+
+  public synchronized boolean hasMore() {
+    return progress < totalCount;
   }
 
   public synchronized LocalDateTime getCompletionTime() {
@@ -93,17 +93,24 @@ public class BulkSaveOperation<T extends Identifiable> {
   }
 
   public synchronized boolean isSuccess() {
-    assertComplete();
+    if (hasMore()) {
+      throw new IllegalStateException("Operation has not completed");
+    }
     return failureException == null && errorsByRow.isEmpty();
   }
 
   public synchronized List<Long> getSavedIds() {
-    assertComplete();
+    if (!isComplete()) {
+      throw new IllegalStateException("Operation has not completed");
+    }
     return savedIds;
   }
 
+  public synchronized boolean isFailed() {
+    return failureException != null || !errorsByRow.isEmpty();
+  }
+
   public synchronized Exception getException() {
-    assertComplete();
     if (failureException != null) {
       return failureException;
     } else if (!errorsByRow.isEmpty()) {
@@ -119,16 +126,8 @@ public class BulkSaveOperation<T extends Identifiable> {
     }
   }
 
-  private synchronized void assertComplete() {
-    if (!isComplete()) {
-      throw new IllegalStateException("Operation has not completed");
-    }
-  }
-
-  private void maybeSetCompletionTime() {
-    if (isComplete()) {
-      completionTime = LocalDateTime.now();
-    }
+  public synchronized void setComplete() {
+    completionTime = LocalDateTime.now();
   }
 
 }
