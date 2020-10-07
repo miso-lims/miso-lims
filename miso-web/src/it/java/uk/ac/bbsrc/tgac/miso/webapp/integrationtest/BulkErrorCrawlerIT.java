@@ -167,8 +167,6 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("libraryaliquot/bulk/merge?ids=901%2C902");
     slugs.add("libraryaliquot/bulk/pool-separate?ids=901%2C902");
     slugs.add("libraryaliquot/bulk/pool?ids=901%2C902&quantity=2");
-    slugs.add("box/bulk/new?quantity=5");
-    slugs.add("box/bulk/edit?ids=500%2C501");
 
     slugs.add("librarytemplate/bulk/edit?ids=1");
     slugs.add("index/bulk/edit?ids=1%2C2%2C3%2C4");
@@ -194,10 +192,6 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("sequencingparameters/bulk/edit?ids=2%2C4");
     slugs.add("containermodel/bulk/new?quantity=3");
     slugs.add("containermodel/bulk/edit?ids=1%2C2");
-    slugs.add("boxsize/bulk/new?quantity=3");
-    slugs.add("boxsize/bulk/edit?ids=1%2C2");
-    slugs.add("boxuse/bulk/new?quantity=3");
-    slugs.add("boxuse/bulk/edit?ids=6%2C5");
     slugs.add("institute/bulk/new?quantity=3");
     slugs.add("institute/bulk/edit?ids=1");
     slugs.add("lab/bulk/new?quantity=3");
@@ -276,6 +270,12 @@ public class BulkErrorCrawlerIT extends AbstractIT {
         .build());
 
     postPages = Collections.unmodifiableMap(new MapBuilder<String, Map<String, String>>()
+        .put("box/bulk/new", Collections.unmodifiableMap(new MapBuilder<String, String>().put("quantity", "5").build()))
+        .put("box/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "500,501").build()))
+        .put("boxuse/bulk/new", Collections.unmodifiableMap(new MapBuilder<String, String>().put("quantity", "3").build()))
+        .put("boxuse/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "6,5").build()))
+        .put("boxsize/bulk/new", Collections.unmodifiableMap(new MapBuilder<String, String>().put("quantity", "3").build()))
+        .put("boxsize/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
         .put("sop/bulk/new", Collections.unmodifiableMap(new MapBuilder<String, String>().put("quantity", "2").build()))
         .put("sop/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
         .build());

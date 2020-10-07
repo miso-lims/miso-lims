@@ -4,6 +4,7 @@ BulkTarget.boxsize = (function($) {
   /*
    * Expected config: {
    *   pageMode: string {create, edit}
+   *   isAdmin: boolean
    * }
    */
 
@@ -18,7 +19,7 @@ BulkTarget.boxsize = (function($) {
       return Urls.external.userManual('type_data', 'box-sizes');
     },
     getBulkActions: function(config) {
-      return [BulkUtils.actions.edit(Urls.ui.boxSizes.bulkEdit)];
+      return !config.isAdmin ? [] : [BulkUtils.actions.edit(Urls.ui.boxSizes.bulkEdit)];
     },
     getColumns: function(config, api) {
       return [{
