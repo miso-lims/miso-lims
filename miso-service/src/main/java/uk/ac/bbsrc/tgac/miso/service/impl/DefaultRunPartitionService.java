@@ -59,7 +59,7 @@ public class DefaultRunPartitionService implements RunPartitionService {
     ValidationUtils.loadChildEntity(runPartition::setPurpose, runPartition.getPurpose(), runPurposeService, "runPurposeId");
     ValidationUtils.loadChildEntity(runPartition::setQcType, runPartition.getQcType(), partitionQcTypeService, "qcType");
 
-    if (runPartition.getQcType().isNoteRequired() && runPartition.getNotes() == null) {
+    if (runPartition.getQcType() != null && runPartition.getQcType().isNoteRequired() && runPartition.getNotes() == null) {
       throw new ValidationException("A note is required for the selected partition QC status");
     }
 
