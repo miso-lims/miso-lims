@@ -87,6 +87,8 @@ Urls = (function() {
 
   var boxRestBase = restBase + '/boxes';
   rest.boxes = {
+    bulkSave: boxRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(boxRestBase + '/bulk'),
     create: boxRestBase,
     update: idUrlFunction(boxRestBase),
     updatePosition: function(boxId, position) {
@@ -129,8 +131,8 @@ Urls = (function() {
 
   var boxSizeRestBase = restBase + '/boxsizes';
   rest.boxSizes = {
-    create: boxSizeRestBase,
-    update: idUrlFunction(boxSizeRestBase)
+    bulkSave: boxSizeRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(boxSizeRestBase + '/bulk')
   };
 
   // Box Uses
@@ -142,8 +144,8 @@ Urls = (function() {
 
   var boxUseRestBase = restBase + '/boxuses';
   rest.boxUses = {
-    create: boxUseRestBase,
-    update: idUrlFunction(boxUseRestBase)
+    bulkSave: boxUseRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(boxUseRestBase + '/bulk')
   };
 
   // Containers

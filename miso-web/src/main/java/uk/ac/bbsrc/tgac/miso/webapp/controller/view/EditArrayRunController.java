@@ -23,6 +23,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentDto;
+import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
 
 @Controller
 @RequestMapping("/arrayrun")
@@ -31,7 +32,6 @@ public class EditArrayRunController {
   private static final String JSP = "/WEB-INF/pages/editArrayRun.jsp";
 
   private static final String MODEL_ATTR_TITLE = "title";
-  private static final String MODEL_ATTR_PAGEMODE = "pageMode";
   private static final String MODEL_ATTR_SCANNERS = "arrayScanners";
   private static final String MODEL_ATTR_JSON = "arrayRunJson";
   private static final String MODEL_ATTR_RUN = "arrayRun";
@@ -50,7 +50,7 @@ public class EditArrayRunController {
   @RequestMapping("/new")
   public ModelAndView newArrayRun(ModelMap model) throws IOException {
     model.addAttribute(MODEL_ATTR_TITLE, "New Array Run");
-    model.addAttribute(MODEL_ATTR_PAGEMODE, "create");
+    model.addAttribute(PageMode.PROPERTY, PageMode.CREATE.getLabel());
 
     ObjectMapper mapper = new ObjectMapper();
     model.addAttribute(MODEL_ATTR_SCANNERS, mapper.writeValueAsString(getArrayScannerDtos()));
@@ -65,7 +65,7 @@ public class EditArrayRunController {
       throw new NotFoundException("Array Run not found");
     }
     model.addAttribute(MODEL_ATTR_TITLE, "Array Run " + arrayRunId);
-    model.addAttribute(MODEL_ATTR_PAGEMODE, "edit");
+    model.addAttribute(PageMode.PROPERTY, PageMode.EDIT.getLabel());
 
     ObjectMapper mapper = new ObjectMapper();
     model.addAttribute(MODEL_ATTR_JSON, mapper.writer().writeValueAsString(Dtos.asDto(run)));

@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.google.common.base.Functions;
 import com.google.common.collect.Sets;
@@ -59,24 +60,27 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
 
   @Autowired
   private StorageLocationService storageLocationService;
-
   @Autowired
   private BoxStore boxStore;
-
   @Autowired
   private BoxUseService boxUseService;
-
   @Autowired
   private BoxSizeService boxSizeService;
-
   @Autowired
   private ChangeLogService changeLogService;
 
   @Autowired
   private NamingSchemeHolder namingSchemeHolder;
+  @Autowired
+  private TransactionTemplate transactionTemplate;
 
   @Autowired
   private DeletionStore deletionStore;
+
+  @Override
+  public TransactionTemplate getTransactionTemplate() {
+    return transactionTemplate;
+  }
 
   private void addBoxContentsChangeLog(Box box, String message) throws IOException {
     BoxChangeLog changeLog = new BoxChangeLog();

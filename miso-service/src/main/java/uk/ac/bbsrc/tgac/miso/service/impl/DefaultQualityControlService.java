@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.TransactionException;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,11 +33,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQcControlRun;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BulkQcSaveOperation;
-import uk.ac.bbsrc.tgac.miso.core.service.BulkSaveService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.KitDescriptorService;
 import uk.ac.bbsrc.tgac.miso.core.service.QcTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.QualityControlService;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.BulkValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.util.ThrowingFunction;
@@ -306,40 +306,44 @@ public class DefaultQualityControlService implements QualityControlService {
   private BulkQcSaveOperation startBulkOperation(List<QC> items, ThrowingFunction<QC, QC, IOException> action) throws IOException {
     QcTarget qcTarget = qcTypeService.get(items.get(0).getType().getId()).getQcTarget();
     BulkQcSaveOperation operation = new BulkQcSaveOperation(qcTarget, items, authorizationManager.getCurrentUser());
-
     // Authentication is tied to the thread, so use this same auth in the new thread
     Authentication auth = SecurityContextHolder.getContextHolderStrategy().getContext().getAuthentication();
     Thread thread = new Thread(() -> {
       SecurityContextHolder.getContextHolderStrategy().getContext().setAuthentication(auth);
-      transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+      try {
+        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
 
-        @Override
-        protected void doInTransactionWithoutResult(TransactionStatus status) {
-          while (!operation.isComplete()) {
-            try {
-              QC item = operation.getNextItem();
-              QC saved = action.apply(item);
-              operation.addSuccess(saved.getId());
-            } catch (ValidationException e) {
-              operation.addFailure(e);
-            } catch (Exception e) {
-              operation.setFailed(e);
+          @Override
+          protected void doInTransactionWithoutResult(TransactionStatus status) {
+            while (operation.hasMore()) {
+              try {
+                QC item = operation.getNextItem();
+                QC saved = action.apply(item);
+                operation.addSuccess(saved.getId());
+              } catch (ValidationException e) {
+                operation.addFailure(e);
+                status.setRollbackOnly();
+              } catch (Exception e) {
+                operation.setFailed(e);
+                status.setRollbackOnly();
+              }
             }
           }
-          if (!operation.isSuccess()) {
-            // Need to throw exception to roll back the transaction
-            Exception exception = operation.getException();
-            if (exception instanceof RuntimeException) {
-              throw (RuntimeException) exception;
-            } else {
-              throw new TransactionException("Transaction failed", operation.getException());
-            }
-          }
+        });
+      } catch (Exception e) {
+        // Exception during transaction commit
+        operation.setFailed(e);
+      }
+
+      if (operation.isFailed()) {
+        Exception exception = operation.getException();
+        if (!(exception instanceof BulkValidationException)) {
+          LoggerFactory.getLogger(DefaultQualityControlService.class).error("Bulk save failed", exception);
         }
-      });
-
+      }
+      operation.setComplete();
     });
-    thread.setUncaughtExceptionHandler(BulkSaveService.EXCEPTION_LOGGER);
+
     thread.start();
     return operation;
   }

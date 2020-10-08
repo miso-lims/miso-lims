@@ -20,11 +20,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocationMap;
 import uk.ac.bbsrc.tgac.miso.core.service.StorageLocationMapService;
 import uk.ac.bbsrc.tgac.miso.core.service.StorageLocationService;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocationMap;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
+import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
 
 @Controller
 @RequestMapping("/freezer")
@@ -32,7 +33,6 @@ public class EditFreezerController {
 
   private static final String JSP = "/WEB-INF/pages/editFreezer.jsp";
 
-  private static final String MODEL_ATTR_PAGEMODE = "pageMode";
   private static final String MODEL_ATTR_JSON = "freezerJson";
 
   @Autowired
@@ -57,7 +57,7 @@ public class EditFreezerController {
 
   @GetMapping("/new")
   public ModelAndView newStorageLocation(ModelMap model) {
-    model.addAttribute(MODEL_ATTR_PAGEMODE, "create");
+    model.addAttribute(PageMode.PROPERTY, PageMode.CREATE.getLabel());
     model.put("title", "New Freezer");
     return new ModelAndView(JSP, model);
   }
@@ -79,7 +79,7 @@ public class EditFreezerController {
     if (freezer == null || freezer.getLocationUnit() != LocationUnit.FREEZER) {
       throw new RestException("Freezer not found");
     }
-    model.addAttribute(MODEL_ATTR_PAGEMODE, "edit");
+    model.addAttribute(PageMode.PROPERTY, PageMode.EDIT.getLabel());
     ObjectMapper mapper = new ObjectMapper();
     model.put("title", "Freezer " + freezer.getId());
     model.put("freezer", freezer);

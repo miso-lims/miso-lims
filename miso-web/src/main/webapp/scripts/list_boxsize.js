@@ -8,7 +8,7 @@ ListTarget.boxsize = {
   },
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {
-    var actions = HotTarget.boxsize.getBulkActions(config);
+    var actions = BulkTarget.boxsize.getBulkActions(config);
     if (config.isAdmin) {
       actions.push(ListUtils.createBulkDeleteAction('Box Sizes', 'boxsizes', function(size) {
         return size.rows + ' × ' + size.columns + (size.scannable ? ' scannable' : '');

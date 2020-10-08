@@ -20,6 +20,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleClassDto;
+import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
 
 @Controller
 @RequestMapping("/sampleclass")
@@ -62,7 +63,7 @@ public class SampleClassController extends AbstractTypeDataController<SampleClas
 
   @GetMapping("/new")
   public ModelAndView create(ModelMap model) throws IOException {
-    model.put("pageMode", "create");
+    model.put(PageMode.PROPERTY, PageMode.CREATE.getLabel());
     model.put("title", "New Sample Class");
     return sampleClassPage(new SampleClassImpl(), model);
   }
@@ -73,7 +74,7 @@ public class SampleClassController extends AbstractTypeDataController<SampleClas
     if (sampleClass == null) {
       throw new NotFoundException("No sample class found for ID: " + id);
     }
-    model.put("pageMode", "edit");
+    model.put(PageMode.PROPERTY, PageMode.EDIT.getLabel());
     model.put("title", "Sample Class " + id);
     return sampleClassPage(sampleClass, model);
   }

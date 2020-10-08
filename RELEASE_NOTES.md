@@ -12,6 +12,7 @@ Changes:
     * Unknown -> Not Ready
   * Added Run-Library Metrics page for Dashi integration
   * Allow setting index sequencing strategy (normal or reverse compliment i5) for individual runs
+  * Improved performance of bulk box, box use, and box size pages
   * Fixed project validation when receiving samples or libraries from the Edit Project page for a
     project that is not marked as active
 

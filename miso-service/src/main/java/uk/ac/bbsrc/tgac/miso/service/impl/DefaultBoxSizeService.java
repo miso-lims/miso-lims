@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -30,6 +31,8 @@ public class DefaultBoxSizeService implements BoxSizeService {
 
   @Autowired
   private DeletionStore deletionStore;
+  @Autowired
+  private TransactionTemplate transactionTemplate;
 
   public void setBoxSizeDao(BoxSizeDao boxSizeDao) {
     this.boxSizeDao = boxSizeDao;
@@ -74,7 +77,7 @@ public class DefaultBoxSizeService implements BoxSizeService {
     return boxSizeDao.update(managed);
   }
 
-  private void validateChange(BoxSize boxSize, BoxSize beforeChange) {
+  private void validateChange(BoxSize boxSize, BoxSize beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
     
     long usage = 0L;
@@ -117,6 +120,16 @@ public class DefaultBoxSizeService implements BoxSizeService {
       result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.boxes(usage)));
     }
     return result;
+  }
+
+  @Override
+  public TransactionTemplate getTransactionTemplate() {
+    return transactionTemplate;
+  }
+
+  @Override
+  public List<BoxSize> listByIdList(List<Long> ids) throws IOException {
+    return boxSizeDao.listByIdList(ids);
   }
 
 }

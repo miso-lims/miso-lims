@@ -35,7 +35,7 @@ ListTarget.box = {
   },
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {
-    return HotTarget.box.getBulkActions(config).concat(
+    return BulkTarget.box.getBulkActions(config).concat(
         [
             HotUtils.printAction('box'),
             {

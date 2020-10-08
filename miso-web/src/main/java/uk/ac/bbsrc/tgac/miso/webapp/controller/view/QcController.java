@@ -73,7 +73,6 @@ public class QcController {
       protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
         config.putPOJO("instruments", instrumentService.list().stream().map(Dtos::asDto).collect(Collectors.toList()));
         config.put("addControls", addControls);
-        config.put("pageMode", "edit");
         config.put("qcTarget", qcTarget.getLabel());
       }
 

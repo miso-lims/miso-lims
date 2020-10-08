@@ -58,6 +58,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkTableBackend;
+import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
 
 @Controller
 @RequestMapping("/librarytemplate")
@@ -140,7 +141,7 @@ public class EditLibraryTemplateController {
       }
       template.getProjects().add(project);
     }
-    model.put("pageMode", "create");
+    model.put(PageMode.PROPERTY, PageMode.CREATE.getLabel());
     model.put("title", "New Library Template");
     return libraryTemplatePage(template, model);
   }
@@ -148,7 +149,7 @@ public class EditLibraryTemplateController {
   @GetMapping("/{templateId}")
   public ModelAndView edit(@PathVariable long templateId, ModelMap model) throws IOException {
     LibraryTemplate template = getTemplate(templateId);
-    model.put("pageMode", "edit");
+    model.put(PageMode.PROPERTY, PageMode.EDIT.getLabel());
     model.put("title", "Library Template " + templateId);
     return libraryTemplatePage(template, model);
   }
@@ -219,7 +220,6 @@ public class EditLibraryTemplateController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-      config.put("pageMode", "create");
       config.set("libraryTemplate", mapper.valueToTree(Dtos.asDto(libraryTemplate)));
       config.set("indexFamily", mapper.valueToTree(Dtos.asDto(libraryTemplate.getIndexFamily())));
     }
@@ -244,7 +244,6 @@ public class EditLibraryTemplateController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-      config.put("pageMode", "edit");
       config.set("libraryTemplate", mapper.valueToTree(Dtos.asDto(libraryTemplate)));
       config.set("indexFamily", mapper.valueToTree(Dtos.asDto(libraryTemplate.getIndexFamily())));
     }
@@ -255,7 +254,7 @@ public class EditLibraryTemplateController {
           .map(position -> new LibraryTemplateIndexDto(position, libraryTemplate.getIndexOnes().get(position),
               libraryTemplate.getIndexTwos().get(position)))
           .collect(Collectors.toList());
-      return prepare(model, false, "Edit Library Template Indices", dtos);
+      return prepare(model, PageMode.EDIT, "Edit Library Template Indices", dtos);
     }
 
   }

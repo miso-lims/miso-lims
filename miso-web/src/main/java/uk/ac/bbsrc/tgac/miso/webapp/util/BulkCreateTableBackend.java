@@ -24,7 +24,7 @@ public abstract class BulkCreateTableBackend<Dto> extends BulkTableBackend<Dto> 
   }
 
   public final ModelAndView create(ModelMap model) throws IOException {
-    return prepare(model, true, "Create " + name, Collections.nCopies(quantity, dto));
+    return prepare(model, PageMode.CREATE, "Create " + name, Collections.nCopies(quantity, dto));
   }
 
 }

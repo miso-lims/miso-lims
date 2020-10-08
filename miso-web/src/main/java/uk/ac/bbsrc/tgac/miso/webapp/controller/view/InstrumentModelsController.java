@@ -20,6 +20,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentModelDto;
 import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPageWithAuthorization;
+import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
 
 @Controller
 @RequestMapping("/instrumentmodel")
@@ -38,7 +39,7 @@ public class InstrumentModelsController {
   @GetMapping("/new")
   public ModelAndView create(ModelMap model) throws JsonProcessingException {
     model.put("title", "New Instrument Model");
-    model.put("pageMode", "create");
+    model.put(PageMode.PROPERTY, PageMode.CREATE.getLabel());
     InstrumentModel instrumentModel = new InstrumentModel();
     return instrumentModelPage(instrumentModel, model);
   }
@@ -50,7 +51,7 @@ public class InstrumentModelsController {
       throw new NotFoundException("Instrument model not found");
     }
     model.put("title", "Instrument Model " + id);
-    model.put("pageMode", "edit");
+    model.put(PageMode.PROPERTY, PageMode.EDIT.getLabel());
     model.put("instrumentType", instrumentModel.getInstrumentType().name());
     return instrumentModelPage(instrumentModel, model);
   }
