@@ -18,7 +18,8 @@ FOR EACH ROW
     makeChangeMessage('sequencer', (SELECT name FROM Instrument WHERE instrumentId = OLD.instrumentId), (SELECT name FROM Instrument WHERE instrumentId = NEW.instrumentId)),
     makeChangeMessage('data approved', booleanToString(OLD.dataApproved), booleanToString(NEW.dataApproved)),
     makeChangeMessage('data approver', (SELECT fullName FROM User WHERE userId = OLD.dataApproverId), (SELECT fullName FROM User WHERE userId = NEW.dataApproverId)),
-    makeChangeMessage('SOP', (SELECT CONCAT(alias, ' (', version, ')') FROM Sop WHERE sopId = OLD.sopId), (SELECT CONCAT(alias, ' (', version, ')') FROM Sop WHERE sopId = NEW.sopId))
+    makeChangeMessage('SOP', (SELECT CONCAT(alias, ' (', version, ')') FROM Sop WHERE sopId = OLD.sopId), (SELECT CONCAT(alias, ' (', version, ')') FROM Sop WHERE sopId = NEW.sopId)),
+    makeChangeMessage('index sequencing', OLD.dataManglingPolicy, NEW.dataManglingPolicy)
   );
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO RunChangeLog(runId, columnsChanged, userId, message, changeTime) VALUES (
@@ -36,7 +37,8 @@ FOR EACH ROW
         makeChangeColumn('instrumentId', OLD.instrumentId, NEW.instrumentId),
         makeChangeColumn('dataApproved', OLD.dataApproved, NEW.dataApproved),
         makeChangeColumn('dataApproverId', OLD.dataApproverId, NEW.dataApproverId),
-        makeChangeColumn('sopId', OLD.sopId, NEW.sopId)
+        makeChangeColumn('sopId', OLD.sopId, NEW.sopId),
+        makeChangeColumn('dataManglingPolicy', OLD.dataManglingPolicy, NEW.dataManglingPolicy)
       ), ''),
       NEW.lastModifier,
       log_message,

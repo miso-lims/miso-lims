@@ -44,6 +44,7 @@ public class RunDto {
   private String dataApproverName;
   private String projectsLabel;
   private Long sopId;
+  private String dataManglingPolicy;
 
   public Long getId() {
     return id;
@@ -251,6 +252,14 @@ public class RunDto {
 
   public void setSopId(Long sopId) {
     this.sopId = sopId;
+  }
+
+  public String getDataManglingPolicy() {
+    return dataManglingPolicy;
+  }
+
+  public void setDataManglingPolicy(String dataManglingPolicy) {
+    this.dataManglingPolicy = dataManglingPolicy;
   }
 
 }

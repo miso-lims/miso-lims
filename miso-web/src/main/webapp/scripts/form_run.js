@@ -134,6 +134,18 @@ FormTarget.run = (function($) {
             return item.value;
           }
         }, {
+          title: 'Index Sequencing',
+          data: 'dataManglingPolicy',
+          type: 'dropdown',
+          source: Constants.dataManglingPolicies,
+          getItemLabel: function(item) {
+            return item.label;
+          },
+          getItemValue: function(item) {
+            return item.value;
+          },
+          nullLabel: 'Instrument Default'
+        }, {
           title: 'Number of Cycles',
           include: object.platformType === 'Illumina',
           data: 'numCycles',

@@ -4,7 +4,7 @@ SELECT DISTINCT Run.runId
   ,bc1.sequence barcode
   ,bc2.sequence barcode_two
   ,tr.alias targeted_sequencing 
-  ,im.dataManglingPolicy dataManglingPolicy
+  ,COALESCE(Run.dataManglingPolicy, im.dataManglingPolicy) dataManglingPolicy
   ,rp.alias run_purpose
 FROM SequencingContainerModel scm
 JOIN SequencerPartitionContainer spc ON scm.sequencingContainerModelId = spc.sequencingContainerModelId
