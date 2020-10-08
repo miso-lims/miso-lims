@@ -74,7 +74,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryAliquotBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryAliquotChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListTransferView;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.DetailedQcItem;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -84,7 +83,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 @DiscriminatorColumn(name = "discriminator")
 @DiscriminatorValue("LibraryAliquot")
 public class LibraryAliquot extends AbstractBoxable
-    implements Comparable<LibraryAliquot>, Deletable, DetailedQcItem, HierarchyEntity, Serializable {
+    implements Comparable<LibraryAliquot>, Deletable, HierarchyEntity, Serializable {
 
   private static final long serialVersionUID = 1L;
   public static final Long UNSAVED_ID = 0L;

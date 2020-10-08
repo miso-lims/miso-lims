@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.HierarchyEntity;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
@@ -24,6 +25,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 
 public class ValidationUtils {
@@ -65,6 +67,20 @@ public class ValidationUtils {
     if (item.getBox() != null) {
       if (item.isDiscarded()) errors.add(new ValidationError("Discarded item cannot be added to a box"));
       if (item.getDistributionTransfer() != null) errors.add(new ValidationError("Distributed item cannot be added to a box"));
+    }
+  }
+
+  public static void validateDetailedQcStatus(HierarchyEntity item, Collection<ValidationError> errors) {
+    if (item.getDetailedQcStatus() == null) {
+      if (item.getDetailedQcStatusNote() != null) {
+        errors.add(new ValidationError("detailedQcStatusNote", "Note cannot be specified without status"));
+      }
+    } else if (item.getDetailedQcStatus().getNoteRequired()) {
+      if (LimsUtils.isStringEmptyOrNull(item.getDetailedQcStatusNote())) {
+        errors.add(new ValidationError("detailedQcStatusNote", "Note must be specified for the selected status"));
+      }
+    } else if (item.getDetailedQcStatusNote() != null) {
+      errors.add(new ValidationError("detailedQcStatusNote", "Note cannot be specified for the selected status"));
     }
   }
 

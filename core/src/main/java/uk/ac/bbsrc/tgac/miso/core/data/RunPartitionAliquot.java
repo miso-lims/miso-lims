@@ -107,6 +107,12 @@ public class RunPartitionAliquot implements Serializable {
     // Default constructor
   }
 
+  public RunPartitionAliquot(Run run, Partition partition, LibraryAliquot aliquot) {
+    this.run = run;
+    this.partition = partition;
+    this.aliquot = aliquot;
+  }
+
   public RunPartitionAliquot(Run run, Partition partition, PoolableElementView aliquot) {
     this.run = run;
     this.partition = partition;

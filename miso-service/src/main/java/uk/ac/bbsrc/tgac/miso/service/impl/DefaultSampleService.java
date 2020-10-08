@@ -670,13 +670,11 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     loadChildEntity(sample::setSequencingControlType, sample.getSequencingControlType(), sequencingControlTypeService,
         "sequencingControlTypeId");
     loadChildEntity(sample::setSop, sample.getSop(), sopService, "sopId");
+    loadChildEntity(sample::setDetailedQcStatus, sample.getDetailedQcStatus(), detailedQcStatusService, "detailedQcStatusId");
     if (isDetailedSample(sample)) {
       DetailedSample detailed = (DetailedSample) sample;
       if (detailed.getSampleClass() != null && detailed.getSampleClass().isSaved()) {
         detailed.setSampleClass(sampleClassService.get(detailed.getSampleClass().getId()));
-      }
-      if (detailed.getDetailedQcStatus() != null && detailed.getDetailedQcStatus().isSaved()) {
-        detailed.setDetailedQcStatus(detailedQcStatusService.get(detailed.getDetailedQcStatus().getId()));
       }
       if (detailed.getSubproject() != null && detailed.getSubproject().isSaved()) {
         detailed.setSubproject(subprojectService.get(detailed.getSubproject().getId()));
@@ -796,6 +794,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     validateVolumeUnits(sample.getVolume(), sample.getVolumeUnits(), errors);
     validateBarcodeUniqueness(sample, beforeChange, sampleStore::getByBarcode, errors, "sample");
     validateUnboxableFields(sample, errors);
+    validateDetailedQcStatus(sample, errors);
 
     if (isDetailedSample(sample)) {
       validateSubproject(sample, beforeChange, errors);

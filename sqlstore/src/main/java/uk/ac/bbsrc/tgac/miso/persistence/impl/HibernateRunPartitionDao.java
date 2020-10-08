@@ -15,6 +15,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition.RunPartitionId;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.persistence.RunPartitionStore;
 
@@ -25,13 +26,16 @@ public class HibernateRunPartitionDao implements RunPartitionStore {
   @Autowired
   private SessionFactory sessionFactory;
 
-  @Override
-  public void create(RunPartition runPartition) throws IOException {
-    currentSession().save(runPartition);
-  }
-
   public Session currentSession() {
     return getSessionFactory().getCurrentSession();
+  }
+
+  public SessionFactory getSessionFactory() {
+    return sessionFactory;
+  }
+
+  public void setSessionFactory(SessionFactory sessionFactory) {
+    this.sessionFactory = sessionFactory;
   }
 
   @Override
@@ -42,12 +46,22 @@ public class HibernateRunPartitionDao implements RunPartitionStore {
     return (RunPartition) currentSession().get(RunPartition.class, id);
   }
 
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
+  @Override
+  public List<RunPartition> listByAliquot(LibraryAliquot aliquot) throws IOException {
+    @SuppressWarnings("unchecked")
+    List<RunPartition> results = currentSession().createCriteria(RunPartition.class)
+        .createAlias("partition", "partition")
+        .createAlias("partition.pool", "pool")
+        .createAlias("pool.poolElements", "poolElement")
+        .createAlias("poolElement.poolableElementView", "poolableElementView")
+        .add(Restrictions.eq("poolableElementView.id", aliquot.getId()))
+        .list();
+    return results;
   }
 
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
+  @Override
+  public void create(RunPartition runPartition) throws IOException {
+    currentSession().save(runPartition);
   }
 
   @Override

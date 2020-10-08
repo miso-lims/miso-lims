@@ -51,13 +51,19 @@ public class DefaultRunPartitionAliquotService implements RunPartitionAliquotSer
   }
 
   @Override
+  public List<RunPartitionAliquot> listByAliquotId(long aliquotId) throws IOException {
+    return runPartitionAliquotDao.listByAliquotId(aliquotId);
+  }
+
+  @Override
   public void save(List<RunPartitionAliquot> runPartitionAliquots) throws IOException {
     for (RunPartitionAliquot runPartitionAliquot : runPartitionAliquots) {
       save(runPartitionAliquot);
     }
   }
 
-  private void save(RunPartitionAliquot runPartitionAliquot) throws IOException {
+  @Override
+  public void save(RunPartitionAliquot runPartitionAliquot) throws IOException {
     RunPartitionAliquot managed = get(runPartitionAliquot.getRun(), runPartitionAliquot.getPartition(), runPartitionAliquot.getAliquot());
     if (runPartitionAliquot.getPurpose() != null) {
       runPartitionAliquot.setPurpose(runPurposeService.get(runPartitionAliquot.getPurpose().getId()));

@@ -371,6 +371,7 @@ Urls = (function() {
   rest.libraries = {
     create: libraryRestBase,
     update: idUrlFunction(libraryRestBase),
+    updateQcStatus: middleIdUrlFunction(libraryRestBase, '/qc-status'),
     parents: idUrlFunction(libraryRestBase + '/parents'),
     children: idUrlFunction(libraryRestBase + '/children'),
     query: libraryRestBase + '/query',
@@ -411,6 +412,7 @@ Urls = (function() {
     query: libraryAliquotRestBase + '/query',
     create: libraryAliquotRestBase,
     update: idUrlFunction(libraryAliquotRestBase),
+    updateQcStatus: middleIdUrlFunction(libraryAliquotRestBase, '/qc-status'),
     bulkDelete: libraryAliquotRestBase + '/bulk-delete',
     spreadsheet: libraryAliquotRestBase + '/spreadsheet',
     parents: idUrlFunction(libraryAliquotRestBase + '/parents'),
@@ -551,6 +553,7 @@ Urls = (function() {
   rest.pools = {
     create: poolRestBase,
     update: idUrlFunction(poolRestBase),
+    updateQcStatus: middleIdUrlFunction(poolRestBase, '/qc-status'),
     parents: idUrlFunction(poolRestBase + '/parents'),
     query: poolRestBase + '/query',
     search: poolRestBase + '/search',
@@ -660,6 +663,13 @@ Urls = (function() {
   rest.runs = {
     create: runRestBase,
     update: idUrlFunction(runRestBase),
+    updateStatus: middleIdUrlFunction(runRestBase, '/status'),
+    updatePartitionQcStatus: function(runId, partitionNumber) {
+      return runRestBase + '/' + runId + '/partitions/' + partitionNumber + '/qc-status';
+    },
+    updateLibraryQcStatus: function(runId, partitionNumber, aliquotId) {
+      return runRestBase + '/' + runId + '/partitions/' + partitionNumber + '/libraryaliquots/' + aliquotId + '/qc-status';
+    },
     datatable: runRestBase + '/dt',
     projectDatatable: idUrlFunction(runRestBase + '/dt/project'),
     sequencerDatatable: idUrlFunction(runRestBase + '/dt/sequencer'),
@@ -698,6 +708,7 @@ Urls = (function() {
   rest.samples = {
     create: sampleRestBase,
     update: idUrlFunction(sampleRestBase),
+    updateQcStatus: middleIdUrlFunction(sampleRestBase, '/qc-status'),
     parents: idUrlFunction(sampleRestBase + '/parents'),
     children: idUrlFunction(sampleRestBase + '/children'),
     query: sampleRestBase + '/query',

@@ -1014,7 +1014,7 @@ Utils.ui = {
   },
 
   setDisabled: function(selector, disabled) {
-    var element = jQuery(selector);
+    var element = typeof selector === 'string' ? jQuery(selector) : selector;
     element.prop('disabled', disabled);
     if (disabled) {
       element.addClass('disabled');

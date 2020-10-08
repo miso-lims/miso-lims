@@ -32,6 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
+import uk.ac.bbsrc.tgac.miso.core.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
@@ -69,6 +70,8 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
   private LibraryDesignCodeService libraryDesignCodeService;
   @Autowired
   private TargetedSequencingService targetedSequencingService;
+  @Autowired
+  private DetailedQcStatusService detailedQcStatusService;
   @Autowired
   private PoolService poolService;
   @Autowired
@@ -252,6 +255,7 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
     if (aliquot.getTargetedSequencing() != null) {
       aliquot.setTargetedSequencing(targetedSequencingService.get(aliquot.getTargetedSequencing().getId()));
     }
+    loadChildEntity(aliquot::setDetailedQcStatus, aliquot.getDetailedQcStatus(), detailedQcStatusService, "detailedQcStatusId");
 
     if (isDetailedLibraryAliquot(aliquot)) {
       DetailedLibraryAliquot detailed = (DetailedLibraryAliquot) aliquot;
@@ -308,6 +312,7 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
     validateBarcodeUniqueness(aliquot, beforeChange, libraryAliquotDao::getByBarcode, errors, "library aliquot");
     validateTargetedSequencing(aliquot, errors);
     validateUnboxableFields(aliquot, errors);
+    validateDetailedQcStatus(aliquot, errors);
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);

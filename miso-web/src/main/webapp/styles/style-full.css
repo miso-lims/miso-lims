@@ -3,6 +3,7 @@
     --grey-light: #CDCDCD;
     --purple-dark: #404087;
     --purple-light: #F0F0FF;
+    --error-background: #FFE3E3;
 }
 
 html {
@@ -405,7 +406,7 @@ div.sectionDivider a {
 
 div.flasherror {
     background: url(images/exclamation.png) 8px 50% no-repeat;
-    background-color: #ffe3e3;
+    background-color: var(--error-background);
     border-color: #dd0000;
     color: #880000;
     padding: 4px 4px 4px 30px;
@@ -596,7 +597,7 @@ input.parsley-error,
 select.parsley-error,
 textarea.parsley-error {
   color: #B94A48;
-  background-color: #F2DEDE;
+  background-color: var(--error-background);
   border: 1px solid #EED3D7;
 }
 
@@ -709,7 +710,7 @@ img.center {
 .big-error {
   color: #B94A48;
   border-color: #B94A48;
-  background-color: #ffe3e3;
+  background-color: var(--error-background);
 }
 
 .big-important {
@@ -745,7 +746,7 @@ button.disabled {
 }
 
 .handsontable td.htInvalid {
-  background-color: #f2dede !important; /*gives priority over td.area selection background*/
+  background-color: var(--error-background) !important; /*gives priority over td.area selection background*/
 }
 
 .handsontable .htAutocompleteArrow {
@@ -1058,4 +1059,26 @@ ul.unformatted-list {
   height: 12px;
   position: relative;
   top: 2px;
+}
+
+#metricsTable {
+  margin-top: 3px;
+}
+
+#metricsTable, #metricsTable > thead > tr > th, #metricsTable > tbody > tr > td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  padding: 4px;
+}
+
+#metricsTable td.failed {
+  background-color: var(--error-background);
+}
+
+#metricsTable select {
+  width: 250px;
+}
+
+#metricsTable input {
+  width: 242px;
 }

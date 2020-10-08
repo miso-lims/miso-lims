@@ -1591,12 +1591,29 @@ public class Dtos {
 
   public static LibraryAliquotDto asDto(@Nonnull LibraryAliquot from, boolean includeBoxPositions) {
     LibraryAliquotDto dto = null;
+    Library library = from.getLibrary();
+    Sample sample = library == null ? null : library.getSample();
     if (isDetailedLibraryAliquot(from)) {
-      dto = asDetailedDto((DetailedLibraryAliquot) from);
+      DetailedLibraryAliquotDto detailedDto = asDetailedDto((DetailedLibraryAliquot) from);
+      DetailedSample detailed = (DetailedSample) sample;
+      if (detailed.getSubproject() != null) {
+        detailedDto.setSubprojectAlias(detailed.getSubproject().getAlias());
+        detailedDto.setSubprojectPriority(detailed.getSubproject().getPriority());
+      }
+      if (detailed.getIdentityAttributes() != null) {
+        ParentIdentityAttributes identity = detailed.getIdentityAttributes();
+        setString(detailedDto::setIdentityConsentLevel, maybeGetProperty(identity.getConsentLevel(), ConsentLevel::getLabel));
+        setString(detailedDto::setEffectiveExternalNames, identity.getExternalName());
+      }
+      if (detailed.getTissueAttributes() != null) {
+        ParentTissueAttributes tissue = detailed.getTissueAttributes();
+        setString(detailedDto::setEffectiveTissueOriginLabel, maybeGetProperty(tissue.getTissueOrigin(), TissueOrigin::getAlias));
+        setString(detailedDto::setEffectiveTissueTypeLabel, maybeGetProperty(tissue.getTissueType(), TissueType::getAlias));
+      }
+      dto = detailedDto;
     } else {
       dto = new LibraryAliquotDto();
     }
-    Library library = from.getLibrary();
     if (library != null) {
       setLong(dto::setLibraryId, library.getId(), true);
       setString(dto::setLibraryName, library.getName());
@@ -1610,27 +1627,10 @@ public class Dtos {
         dto.setIndexLabels(library.getIndices().stream().sorted(Comparator.comparingInt(Index::getPosition)).map(Index::getLabel)
             .collect(Collectors.toList()));
       }
-      Sample sample = library.getSample();
       if (sample != null) {
         setLong(dto::setSampleId, sample.getId(), true);
         setString(dto::setSampleName, sample.getName());
         setString(dto::setSampleAlias, sample.getAlias());
-        if (isDetailedSample(sample)) {
-          DetailedSample detailed = (DetailedSample) sample;
-          if (detailed.getSubproject() != null) {
-            dto.setSubprojectAlias(detailed.getSubproject().getAlias());
-            dto.setSubprojectPriority(detailed.getSubproject().getPriority());
-          }
-          if (detailed.getIdentityAttributes() != null) {
-            ParentIdentityAttributes identity = detailed.getIdentityAttributes();
-            setString(dto::setIdentityConsentLevel, maybeGetProperty(identity.getConsentLevel(), ConsentLevel::getLabel));
-          }
-          if (detailed.getTissueAttributes() != null) {
-            ParentTissueAttributes tissue = detailed.getTissueAttributes();
-            setString(dto::setEffectiveTissueOriginLabel, maybeGetProperty(tissue.getTissueOrigin(), TissueOrigin::getAlias));
-            setString(dto::setEffectiveTissueTypeLabel, maybeGetProperty(tissue.getTissueType(), TissueType::getAlias));
-          }
-        }
       }
     }
     if (from.getParentAliquot() != null) {
@@ -1685,9 +1685,24 @@ public class Dtos {
 
   public static LibraryAliquotDto asDto(@Nonnull PoolableElementView from) {
     LibraryAliquotDto dto = null;
-    if (from.getAliquotDesignCode() != null) {
+    if (isDetailedSample(from.getSample())) {
       DetailedLibraryAliquotDto detailedDto = new DetailedLibraryAliquotDto();
       setId(detailedDto::setLibraryDesignCodeId, from.getAliquotDesignCode());
+      DetailedSample detailed = (DetailedSample) from.getSample();
+      if (detailed.getSubproject() != null) {
+        detailedDto.setSubprojectAlias(detailed.getSubproject().getAlias());
+        detailedDto.setSubprojectPriority(detailed.getSubproject().getPriority());
+      }
+      if (detailed.getIdentityAttributes() != null) {
+        ParentIdentityAttributes identity = detailed.getIdentityAttributes();
+        setString(detailedDto::setIdentityConsentLevel, maybeGetProperty(identity.getConsentLevel(), ConsentLevel::getLabel));
+        setString(detailedDto::setEffectiveExternalNames, identity.getExternalName());
+      }
+      if (detailed.getTissueAttributes() != null) {
+        ParentTissueAttributes tissue = detailed.getTissueAttributes();
+        setString(detailedDto::setEffectiveTissueOriginLabel, maybeGetProperty(tissue.getTissueOrigin(), TissueOrigin::getAlias));
+        setString(detailedDto::setEffectiveTissueTypeLabel, maybeGetProperty(tissue.getTissueType(), TissueType::getAlias));
+      }
       dto = detailedDto;
     } else {
       dto = new LibraryAliquotDto();
@@ -1724,24 +1739,6 @@ public class Dtos {
     setString(dto::setSequencingControlTypeAlias, maybeGetProperty(from.getSampleSequencingControlType(), SequencingControlType::getAlias));
     setId(dto::setDetailedQcStatusId, from.getDetailedQcStatus());
     setString(dto::setDetailedQcStatusNote, from.getDetailedQcStatusNote());
-
-    Sample sample = from.getSample();
-    if (isDetailedSample(sample)) {
-      DetailedSample detailed = (DetailedSample) sample;
-      if (detailed.getSubproject() != null) {
-        dto.setSubprojectAlias(detailed.getSubproject().getAlias());
-        dto.setSubprojectPriority(detailed.getSubproject().getPriority());
-      }
-      if (detailed.getIdentityAttributes() != null) {
-        ParentIdentityAttributes identity = detailed.getIdentityAttributes();
-        setString(dto::setIdentityConsentLevel, maybeGetProperty(identity.getConsentLevel(), ConsentLevel::getLabel));
-      }
-      if (detailed.getTissueAttributes() != null) {
-        ParentTissueAttributes tissue = detailed.getTissueAttributes();
-        setString(dto::setEffectiveTissueOriginLabel, maybeGetProperty(tissue.getTissueOrigin(), TissueOrigin::getAlias));
-        setString(dto::setEffectiveTissueTypeLabel, maybeGetProperty(tissue.getTissueType(), TissueType::getAlias));
-      }
-    }
 
     if (from.getAliquot() != null) {
       List<Long> parentAliquotIds = new ArrayList<>();
@@ -1895,7 +1892,7 @@ public class Dtos {
     to.setPrioritySubprojectAliases(from.getPrioritySubprojectAliases());
     to.setPooledElements(from.getElements().stream()
         .map(element -> {
-          LibraryAliquotDto dto = new LibraryAliquotDto();
+          DetailedLibraryAliquotDto dto = new DetailedLibraryAliquotDto();
           setString(dto::setName, element.getName());
           setString(dto::setAlias, element.getAlias());
           if (element.getConsentLevel() != null) {
