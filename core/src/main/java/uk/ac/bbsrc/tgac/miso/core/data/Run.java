@@ -178,6 +178,9 @@ public abstract class Run
   @JoinColumn(name = "sopId")
   private Sop sop;
 
+  @Enumerated(EnumType.STRING)
+  private InstrumentDataManglingPolicy dataManglingPolicy;
+
   /**
    * Construct a new Run with a default empty SecurityProfile
    */
@@ -511,6 +514,14 @@ public abstract class Run
 
   public void setSop(Sop sop) {
     this.sop = sop;
+  }
+
+  public InstrumentDataManglingPolicy getDataManglingPolicy() {
+    return dataManglingPolicy;
+  }
+
+  public void setDataManglingPolicy(InstrumentDataManglingPolicy dataManglingPolicy) {
+    this.dataManglingPolicy = dataManglingPolicy;
   }
 
 }

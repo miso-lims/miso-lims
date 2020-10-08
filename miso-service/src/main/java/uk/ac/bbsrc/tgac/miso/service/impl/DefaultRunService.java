@@ -421,6 +421,7 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     target.setDataApproved(source.isDataApproved());
     target.setDataApprover(target.isDataApproved() == null ? null : source.getDataApprover());
     target.setSop(source.getSop());
+    target.setDataManglingPolicy(source.getDataManglingPolicy());
     if (isIlluminaRun(target)) {
       applyIlluminaChanges((IlluminaRun) target, (IlluminaRun) source);
     } else if (isLS454Run(target)) {
