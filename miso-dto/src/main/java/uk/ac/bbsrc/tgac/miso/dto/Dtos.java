@@ -196,13 +196,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListContainerRunView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListContainerView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolViewElement;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListTransferView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListWorksetView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentIdentityAttributes;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentTissueAttributes;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SequencingOrderSummaryView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetItem;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetLibrary;
@@ -4004,6 +4004,7 @@ public class Dtos {
     setLong(to::setQcPassed, from.getQcPassed(), false);
     setLong(to::setQcPending, from.getQcPending(), false);
     setDateTimeString(to::setLastModified, from.getLastModified());
+    setString(to::setProjects, from.getProjectLabels().stream().collect(Collectors.joining(", ")));
     return to;
   }
 

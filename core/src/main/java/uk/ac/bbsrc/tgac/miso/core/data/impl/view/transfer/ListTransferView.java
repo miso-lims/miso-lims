@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.core.data.impl.view;
+package uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -163,6 +165,13 @@ public class ListTransferView implements Identifiable, Serializable {
       pools = new HashSet<>();
     }
     return pools;
+  }
+
+  public Set<String> getProjectLabels() {
+    return Stream.of(getSamples(), getLibraries(), getLibraryAliquots(), getPools())
+        .flatMap(Collection::stream)
+        .map(ListTransferViewItem::getProjectLabel)
+        .collect(Collectors.toSet());
   }
 
   public long getItems() {

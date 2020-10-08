@@ -2,7 +2,7 @@
 
 Changes:
 
-
+  * Show projects included in transfers on Transfers list page
 
 # 1.15.1
 

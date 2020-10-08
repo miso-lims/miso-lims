@@ -27,10 +27,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListTransferView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentAttributes;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentIdentityAttributes;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentTissueAttributes;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferView;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)

@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.core.data.impl.view;
+package uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -15,16 +15,16 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
-@Table(name = "Transfer_Library")
+@Table(name = "Transfer_LibraryAliquot")
 @Immutable
-public class ListTransferViewLibrary extends ListTransferViewItem {
+public class ListTransferViewLibraryAliquot extends ListTransferViewItem {
 
-  public static class ListTransferViewLibraryId implements Serializable {
+  public static class ListTransferViewLibraryAliquotId implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private Transfer transfer;
-    private long libraryId;
+    private long aliquotId;
 
     public Transfer getTransfer() {
       return transfer;
@@ -34,24 +34,24 @@ public class ListTransferViewLibrary extends ListTransferViewItem {
       this.transfer = transfer;
     }
 
-    public long getLibraryId() {
-      return libraryId;
+    public long getAliquotId() {
+      return aliquotId;
     }
 
-    public void setLibraryId(long libraryId) {
-      this.libraryId = libraryId;
+    public void setAliquotId(long libraryId) {
+      this.aliquotId = libraryId;
     }
 
     @Override
     public int hashCode() {
-      return Objects.hash(transfer, libraryId);
+      return Objects.hash(transfer, aliquotId);
     }
 
     @Override
     public boolean equals(Object obj) {
       return LimsUtils.equals(this, obj,
-          ListTransferViewLibraryId::getTransfer,
-          ListTransferViewLibraryId::getLibraryId);
+          ListTransferViewLibraryAliquotId::getTransfer,
+          ListTransferViewLibraryAliquotId::getAliquotId);
     }
 
   }
@@ -64,7 +64,11 @@ public class ListTransferViewLibrary extends ListTransferViewItem {
   private Transfer transfer;
 
   @Id
-  private long libraryId;
+  private long aliquotId;
+
+  @ManyToOne
+  @JoinColumn(name = "aliquotId")
+  private ListTransferViewLibraryAliquotParent aliquot;
 
   @Override
   public Transfer getTransfer() {
@@ -78,12 +82,25 @@ public class ListTransferViewLibrary extends ListTransferViewItem {
 
   @Override
   public long getItemId() {
-    return libraryId;
+    return aliquotId;
   }
 
   @Override
   public void setItemId(long id) {
-    this.libraryId = id;
+    this.aliquotId = id;
+  }
+
+  public ListTransferViewLibraryAliquotParent getAliquot() {
+    return aliquot;
+  }
+
+  public void setAliquot(ListTransferViewLibraryAliquotParent aliquot) {
+    this.aliquot = aliquot;
+  }
+
+  @Override
+  public ListTransferViewProject getProject() {
+    return getAliquot().getLibrary().getSample().getProject();
   }
 
 }

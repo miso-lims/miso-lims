@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.core.data.impl.view;
+package uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -15,16 +15,16 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
-@Table(name = "Transfer_Pool")
+@Table(name = "Transfer_Sample")
 @Immutable
-public class ListTransferViewPool extends ListTransferViewItem {
+public class ListTransferViewSample extends ListTransferViewItem {
 
-  public static class ListTransferViewPoolId implements Serializable {
+  public static class ListTransferViewSampleId implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private Transfer transfer;
-    private long poolId;
+    private long sampleId;
 
     public Transfer getTransfer() {
       return transfer;
@@ -34,24 +34,24 @@ public class ListTransferViewPool extends ListTransferViewItem {
       this.transfer = transfer;
     }
 
-    public long getPoolId() {
-      return poolId;
+    public long getSampleId() {
+      return sampleId;
     }
 
-    public void setPoolId(long poolId) {
-      this.poolId = poolId;
+    public void setSampleId(long sampleId) {
+      this.sampleId = sampleId;
     }
 
     @Override
     public int hashCode() {
-      return Objects.hash(transfer, poolId);
+      return Objects.hash(transfer, sampleId);
     }
 
     @Override
     public boolean equals(Object obj) {
       return LimsUtils.equals(this, obj,
-          ListTransferViewPoolId::getTransfer,
-          ListTransferViewPoolId::getPoolId);
+          ListTransferViewSampleId::getTransfer,
+          ListTransferViewSampleId::getSampleId);
     }
 
   }
@@ -64,7 +64,11 @@ public class ListTransferViewPool extends ListTransferViewItem {
   private Transfer transfer;
 
   @Id
-  private long poolId;
+  private long sampleId;
+
+  @ManyToOne
+  @JoinColumn(name = "sampleId")
+  private ListTransferViewSampleParent sample;
 
   @Override
   public Transfer getTransfer() {
@@ -78,12 +82,25 @@ public class ListTransferViewPool extends ListTransferViewItem {
 
   @Override
   public long getItemId() {
-    return poolId;
+    return sampleId;
   }
 
   @Override
   public void setItemId(long id) {
-    this.poolId = id;
+    this.sampleId = id;
+  }
+
+  public ListTransferViewSampleParent getSample() {
+    return sample;
+  }
+
+  public void setSample(ListTransferViewSampleParent sample) {
+    this.sample = sample;
+  }
+
+  @Override
+  public ListTransferViewProject getProject() {
+    return getSample().getProject();
   }
 
 }
