@@ -2,7 +2,8 @@
 
 Changes:
 
-
+  * Fixed errors updating QC status of some items on Run-Library Metrics page
+  * Fixed Effective QC Status column not updating after setting QC on Run-Library Metrics page
 
 # 1.15.0
 

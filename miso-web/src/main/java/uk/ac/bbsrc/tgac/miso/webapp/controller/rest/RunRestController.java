@@ -570,7 +570,7 @@ public class RunRestController extends RestController {
     return Dtos.asDto(saved);
   }
 
-  @PutMapping("/{runIdId}/partitions/{partitionId}/qc-status")
+  @PutMapping("/{runId}/partitions/{partitionId}/qc-status")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public @ResponseBody void updateRunPartitionQcStatus(@PathVariable long runId, @PathVariable long partitionId,
       @RequestBody DetailedQcStatusUpdateDto dto) throws IOException {
@@ -599,7 +599,7 @@ public class RunRestController extends RestController {
     return partition;
   }
 
-  @PutMapping("/{runIdId}/partitions/{partitionId}/libraryaliquots/{aliquotId}/qc-status")
+  @PutMapping("/{runId}/partitions/{partitionId}/libraryaliquots/{aliquotId}/qc-status")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public @ResponseBody void updateRunLibraryQcStatus(@PathVariable long runId, @PathVariable long partitionId,
       @PathVariable long aliquotId, @RequestBody RunLibraryQcStatusUpdateRequest dto) throws IOException {

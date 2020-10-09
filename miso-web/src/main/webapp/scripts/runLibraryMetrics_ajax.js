@@ -49,8 +49,10 @@ var RunLibraryMetrics = (function($) {
           }
           row.append(metricCell);
         });
-        row.append(makeEffectiveQcCell(rowData));
-        row.append(makeQcCell(rowData));
+        var effectiveQcCell = $('<td>');
+        updateEffectiveQcCell(rowData, effectiveQcCell)
+        row.append(effectiveQcCell);
+        row.append(makeQcCell(rowData, effectiveQcCell));
         tbody.append(row);
       });
       table.append(tbody);
@@ -91,8 +93,8 @@ var RunLibraryMetrics = (function($) {
     }
   }
 
-  function makeEffectiveQcCell(rowData) {
-    var cell = $('<td>');
+  function updateEffectiveQcCell(rowData, cell) {
+    cell.removeClass('failed');
     var status = 'Pending';
     for (var i = 0; i < rowData.qcNodes.length; i++) {
       var qcNode = rowData.qcNodes[i];
@@ -107,11 +109,12 @@ var RunLibraryMetrics = (function($) {
     return cell.text(status);
   }
 
-  function makeQcCell(rowData) {
+  function makeQcCell(rowData, effectiveQcCell) {
     var cell = $('<td>');
     var table = $('<table>');
 
     var controls = {
+      effectiveQc: effectiveQcCell,
       node: $('<select>').append(rowData.qcNodes.map(function(qcNode, i) {
         return makeSelectOption(i, qcNode.typeLabel + ' ' + qcNode.label);
       })).val(rowData.qcNodes.length - 1),
@@ -123,7 +126,7 @@ var RunLibraryMetrics = (function($) {
     controls.node.change(function() {
       var i = Number.parseInt($(this).val());
       var qcNode = rowData.qcNodes[i];
-      updateQcCell(controls, qcNode);
+      updateQcCell(controls, qcNode, rowData);
     }).change();
 
     appendQcNodeTableRow(table, 'Item:', controls.node);
@@ -144,7 +147,7 @@ var RunLibraryMetrics = (function($) {
     return option;
   }
 
-  function updateQcCell(controls, qcNode) {
+  function updateQcCell(controls, qcNode, rowData) {
     controls.name.empty();
     if (qcNode.name) {
       controls.name.append($('<a>').attr('href', getNodeUrl(qcNode)).text(qcNode.name));
@@ -159,13 +162,13 @@ var RunLibraryMetrics = (function($) {
 
     switch (qcNode.entityType) {
     case 'Sample':
-      updateQcCellDetailedQcStatus(controls, qcNode, Urls.rest.samples.updateQcStatus(qcNode.id));
+      updateQcCellDetailedQcStatus(controls, qcNode, rowData, Urls.rest.samples.updateQcStatus(qcNode.id));
       break;
     case 'Library':
-      updateQcCellDetailedQcStatus(controls, qcNode, Urls.rest.libraries.updateQcStatus(qcNode.id));
+      updateQcCellDetailedQcStatus(controls, qcNode, rowData, Urls.rest.libraries.updateQcStatus(qcNode.id));
       break;
     case 'Library Aliquot':
-      updateQcCellDetailedQcStatus(controls, qcNode, Urls.rest.libraryAliquots.updateQcStatus(qcNode.id));
+      updateQcCellDetailedQcStatus(controls, qcNode, rowData, Urls.rest.libraryAliquots.updateQcStatus(qcNode.id));
       break;
     case 'Pool':
       controls.status.append(poolQcOptions.map(function(item, i) {
@@ -174,10 +177,11 @@ var RunLibraryMetrics = (function($) {
       }));
       controls.apply.click(function() {
         var selectedStatus = poolQcOptions[controls.status.val()].value;
-        Utils.ajaxWithDialog('Setting Status', 'PUT', Urls.rest.pools.updateQcStatus(qcNode.id) + $.param({
+        Utils.ajaxWithDialog('Setting Status', 'PUT', Urls.rest.pools.updateQcStatus(qcNode.id) + '?' + $.param({
           qcPassed: selectedStatus
         }), null, function(response) {
           qcNode.qcPassed = selectedStatus;
+          updateEffectiveQcCell(rowData, controls.effectiveQc);
         });
       });
       break;
@@ -187,10 +191,22 @@ var RunLibraryMetrics = (function($) {
       }));
       controls.apply.click(function() {
         var selectedStatus = controls.status.val();
-        Utils.ajaxWithDialog('Setting Status', 'PUT', Urls.rest.runs.updateStatus(qcNode.id) + $.param({
+        Utils.ajaxWithDialog('Setting Status', 'PUT', Urls.rest.runs.updateStatus(qcNode.id) + '?' + $.param({
           status: selectedStatus
         }), null, function(response) {
           qcNode.runStatus = selectedStatus;
+          switch (selectedStatus) {
+          case 'Completed':
+            qcNode.qcPassed = true;
+            break;
+          case 'Failed':
+            qcNode.qcPassed = false;
+            break;
+          default:
+            qcNode.qcPassed = null;
+            break;
+          }
+          updateEffectiveQcCell(rowData, controls.effectiveQc);
         });
       });
       break;
@@ -224,6 +240,7 @@ var RunLibraryMetrics = (function($) {
             function(response) {
               qcNode.qcStatusId = update.qcStatusId;
               qcNode.note = update.note;
+              updateEffectiveQcCell(rowData, controls.effectiveQc);
             });
       });
       break;
@@ -242,6 +259,7 @@ var RunLibraryMetrics = (function($) {
             update, function(response) {
               qcNode.qcPassed = update.qcPassed;
               qcNode.note = update.note;
+              updateEffectiveQcCell(rowData, controls.effectiveQc);
             });
       });
       break;
@@ -251,7 +269,7 @@ var RunLibraryMetrics = (function($) {
     controls.note.val(qcNode.qcNote);
   }
 
-  function updateQcCellDetailedQcStatus(controls, qcNode, updateUrl) {
+  function updateQcCellDetailedQcStatus(controls, qcNode, rowData, updateUrl) {
     controls.status.append(makeSelectOption(0, 'Not Ready', !qcNode.qcStatusId));
     controls.status.append(Constants.detailedQcStatuses.map(function(item) {
       return makeSelectOption(item.id, item.description, qcNode.qcStatusId === item.id);
@@ -277,6 +295,9 @@ var RunLibraryMetrics = (function($) {
       Utils.ajaxWithDialog('Setting Status', 'PUT', updateUrl, update, function(response) {
         qcNode.qcStatusId = update.qcStatusId;
         qcNode.qcNote = update.note;
+        qcNode.qcPassed = qcNode.qcStatusId === null ? null : Utils.array.findUniqueOrThrow(Utils.array.idPredicate(qcNode.qcStatusId),
+            Constants.detailedQcStatuses).status;
+        updateEffectiveQcCell(rowData, controls.effectiveQc);
       });
     });
   }
