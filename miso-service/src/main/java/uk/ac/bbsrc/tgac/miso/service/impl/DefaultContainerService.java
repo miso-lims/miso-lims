@@ -26,6 +26,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.BarcodableReferenceService;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.service.KitDescriptorService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
@@ -53,6 +54,8 @@ public class DefaultContainerService implements ContainerService {
   private KitDescriptorService kitService;
   @Autowired
   private SequencingContainerModelService containerModelService;
+  @Autowired
+  private BarcodableReferenceService barcodableReferenceService;
 
   @Override
   public AuthorizationManager getAuthorizationManager() {
@@ -119,10 +122,7 @@ public class DefaultContainerService implements ContainerService {
       errors.add(new ValidationError("identificationBarcode", "Required"));
     }
 
-    if ((beforeChange == null || !container.getIdentificationBarcode().equals(beforeChange.getIdentificationBarcode()))
-        && !listByBarcode(container.getIdentificationBarcode()).isEmpty()) {
-      errors.add(new ValidationError("identificationBarcode", "There is already a container with this serial number"));
-    }
+    ValidationUtils.validateBarcodeUniqueness(container, beforeChange, barcodableReferenceService, errors);
 
     if (container.getClusteringKit() != null && container.getClusteringKit().getKitType() != KitType.CLUSTERING) {
       errors.add(new ValidationError("clusteringKitId", "Must be a clustering kit"));

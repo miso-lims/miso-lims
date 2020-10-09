@@ -20,13 +20,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.HierarchyEntity;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BarcodableReference;
+import uk.ac.bbsrc.tgac.miso.core.service.BarcodableReferenceService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 
 public class ValidationUtils {
 
@@ -34,13 +35,15 @@ public class ValidationUtils {
     throw new IllegalStateException("Static util class not intended for instantiation");
   }
 
-  public static <T extends Barcodable> void validateBarcodeUniqueness(T barcodable, T beforeChange,
-      WhineyFunction<String, T> lookupByBarcode,
-      Collection<ValidationError> errors, String typeLabel) throws IOException {
+  public static <T extends Barcodable> void validateBarcodeUniqueness(T barcodable, T beforeChange, BarcodableReferenceService service,
+      Collection<ValidationError> errors) throws IOException {
     if (barcodable.getIdentificationBarcode() != null
-        && (beforeChange == null || !barcodable.getIdentificationBarcode().equals(beforeChange.getIdentificationBarcode()))
-        && lookupByBarcode.apply(barcodable.getIdentificationBarcode()) != null) {
-      errors.add(new ValidationError("identificationBarcode", String.format("There is already a %s with this barcode", typeLabel)));
+        && (beforeChange == null || !barcodable.getIdentificationBarcode().equals(beforeChange.getIdentificationBarcode()))) {
+      BarcodableReference ref = service.checkForExisting(barcodable.getIdentificationBarcode());
+      if (ref != null) {
+        errors.add(new ValidationError("identificationBarcode",
+            String.format("%s '%s' already has this barcode", ref.getEntityType(), ref.getFullLabel())));
+      }
     }
   }
 

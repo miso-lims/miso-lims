@@ -48,6 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.BarcodableReferenceService;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.core.service.DetailedQcStatusService;
@@ -130,6 +131,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   private TransferService transferService;
   @Autowired
   private SopService sopService;
+  @Autowired
+  private BarcodableReferenceService barcodableReferenceService;
   @Autowired
   private TransactionTemplate transactionTemplate;
   @Value("${miso.autoGenerateIdentificationBarcodes}")
@@ -553,7 +556,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
 
     validateConcentrationUnits(library.getConcentration(), library.getConcentrationUnits(), errors);
     validateVolumeUnits(library.getVolume(), library.getVolumeUnits(), errors);
-    validateBarcodeUniqueness(library, beforeChange, libraryDao::getByBarcode, errors, "library");
+    validateBarcodeUniqueness(library, beforeChange, barcodableReferenceService, errors);
     validateUnboxableFields(library, errors);
     validateDetailedQcStatus(library, errors);
     if (isDetailedLibrary(library) && beforeChange != null) {

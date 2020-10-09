@@ -61,4 +61,5 @@ public class DefaultBarcodableViewService implements BarcodableViewService {
 
     return barcodable;
   }
+
 }

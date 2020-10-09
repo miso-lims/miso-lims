@@ -34,6 +34,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.BarcodableReferenceService;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxSizeService;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxUseService;
@@ -59,15 +60,17 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
   private Boolean autoGenerateIdBarcodes;
 
   @Autowired
-  private StorageLocationService storageLocationService;
-  @Autowired
   private BoxStore boxStore;
+  @Autowired
+  private StorageLocationService storageLocationService;
   @Autowired
   private BoxUseService boxUseService;
   @Autowired
   private BoxSizeService boxSizeService;
   @Autowired
   private ChangeLogService changeLogService;
+  @Autowired
+  private BarcodableReferenceService barcodableReferenceService;
 
   @Autowired
   private NamingSchemeHolder namingSchemeHolder;
@@ -359,7 +362,7 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
       }
     }
 
-    validateBarcodeUniqueness(box, beforeChange, boxStore::getBoxByBarcode, errors, "box");
+    validateBarcodeUniqueness(box, beforeChange, barcodableReferenceService, errors);
 
     if (box.getStorageLocation() != null) {
       if (box.getStorageLocation().getLocationUnit().getBoxStorageAmount() == BoxStorageAmount.NONE) {

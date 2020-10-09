@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
+import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,6 +14,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.BarcodableReferenceService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
@@ -32,6 +35,8 @@ public class DefaultSequencingContainerModelService extends AbstractSaveService<
   private SequencingContainerModelStore containerModelDao;
   @Autowired
   private InstrumentModelService instrumentModelService;
+  @Autowired
+  private BarcodableReferenceService barcodableReferenceService;
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -62,8 +67,9 @@ public class DefaultSequencingContainerModelService extends AbstractSaveService<
   @Override
   protected void collectValidationErrors(SequencingContainerModel model, SequencingContainerModel beforeChange,
       List<ValidationError> errors) throws IOException {
+    validateBarcodeUniqueness(model, beforeChange, barcodableReferenceService, errors);
     long usage = beforeChange == null ? 0 : containerModelDao.getUsage(beforeChange);
-    if (ValidationUtils.isSetAndChanged(SequencingContainerModel::getPlatformType, model, beforeChange)) {
+    if (isSetAndChanged(SequencingContainerModel::getPlatformType, model, beforeChange)) {
       if (usage > 0) {
         errors.add(new ValidationError("platform",
             String.format("Cannot change because the container model is used by %d existing sequencing containers.", usage)));
@@ -73,7 +79,7 @@ public class DefaultSequencingContainerModelService extends AbstractSaveService<
             "Cannot change because the container model is linked to %d instrument models", model.getInstrumentModels().size())));
       }
     }
-    if (ValidationUtils.isSetAndChanged(SequencingContainerModel::getPartitionCount, model, beforeChange)
+    if (isSetAndChanged(SequencingContainerModel::getPartitionCount, model, beforeChange)
         && !model.getInstrumentModels().isEmpty()) {
       errors.add(new ValidationError("partitionCount",
           String.format("Cannot change because the container model is used by %d existing sequencing containers.", usage)));
