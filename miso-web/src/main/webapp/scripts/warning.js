@@ -98,7 +98,31 @@ var Warning = (function($) {
         errorP.innerText = "⚠ " + warning.tileMessage;
         return errorP;
       });
+    },
+
+    common: {
+      qcFailure: function(item) {
+        return {
+          include: !!item.detailedQcStatusId && getDetailedQcStatus(item.detailedQcStatusId).status === false,
+          headerMessage: 'QC failed',
+          tableMessage: 'QC failed',
+          level: 'error'
+        };
+      },
+      effectiveQcFailure: function(item) {
+        return {
+          include: !!item.effectiveQcFailureId,
+          headerMessage: !item.effectiveQcFailureId ? null
+              : (item.effectiveQcFailureLevel + ' level QC status: ' + getDetailedQcStatus(item.effectiveQcFailureId).description),
+          tableMessage: !item.effectiveQcFailureId ? null : (item.effectiveQcFailureLevel + ' level QC failure'),
+          level: 'error'
+        };
+      }
     }
+  }
+
+  function getDetailedQcStatus(id) {
+    return Utils.array.findUniqueOrThrow(Utils.array.idPredicate(id), Constants.detailedQcStatuses)
   }
 
   function getWarnings(target, item, messageProperty) {

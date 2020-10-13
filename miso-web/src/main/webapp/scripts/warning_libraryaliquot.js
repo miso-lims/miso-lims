@@ -32,6 +32,6 @@ WarningTarget.libraryaliquot = {
       include: aliquot.identityConsentLevel === 'Revoked',
       headerMessage: 'Donor has revoked consent',
       tableMessage: Constants.warningMessages.consentRevoked
-    }];
+    }, Warning.common.qcFailure(aliquot), Warning.common.effectiveQcFailure(aliquot)];
   },
 };

@@ -68,7 +68,7 @@ WarningTarget.poolelement = {
               include: !!element.sequencingControlTypeAlias,
               tableMessage: 'Sequencing Control: ' + element.sequencingControlTypeAlias,
               level: 'info'
-            }];
+            }, Warning.common.qcFailure(element), Warning.common.effectiveQcFailure(element)];
       }
     };
   }

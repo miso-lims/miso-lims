@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-public class DetailedSampleDto extends SampleDto {
+public class DetailedSampleDto extends SampleDto implements UpstreamQcFailableDto {
 
   private Long parentId;
   private String parentAlias;
@@ -24,6 +24,8 @@ public class DetailedSampleDto extends SampleDto {
   private String effectiveGroupIdSample;
   private String effectiveTissueOriginLabel;
   private String effectiveTissueTypeLabel;
+  private Long effectiveQcFailureId;
+  private String effectiveQcFailureLevel;
   private String creationDate;
   private String volumeUsed;
   private String ngUsed;
@@ -226,6 +228,26 @@ public class DetailedSampleDto extends SampleDto {
 
   public void setEffectiveTissueTypeLabel(String effectiveTissueTypeLabel) {
     this.effectiveTissueTypeLabel = effectiveTissueTypeLabel;
+  }
+
+  @Override
+  public Long getEffectiveQcFailureId() {
+    return effectiveQcFailureId;
+  }
+
+  @Override
+  public void setEffectiveQcFailureId(Long effectiveQcFailureId) {
+    this.effectiveQcFailureId = effectiveQcFailureId;
+  }
+
+  @Override
+  public String getEffectiveQcFailureLevel() {
+    return effectiveQcFailureLevel;
+  }
+
+  @Override
+  public void setEffectiveQcFailureLevel(String effectiveQcFailureLevel) {
+    this.effectiveQcFailureLevel = effectiveQcFailureLevel;
   }
 
 }
