@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.core.data.impl.view;
+package uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -24,6 +24,13 @@ public abstract class ListTransferViewItem implements Serializable {
   public abstract long getItemId();
 
   public abstract void setItemId(long id);
+
+  public abstract ListTransferViewProject getProject();
+
+  public String getProjectLabel() {
+    ListTransferViewProject project = getProject();
+    return project.getShortName() == null ? project.getName() : project.getShortName();
+  }
 
   public Boolean isReceived() {
     return received;

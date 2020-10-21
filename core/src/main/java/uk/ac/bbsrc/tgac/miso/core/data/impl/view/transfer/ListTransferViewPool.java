@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.core.data.impl.view;
+package uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -15,16 +15,29 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
-@Table(name = "Transfer_LibraryAliquot")
+@Table(name = "Transfer_Pool")
 @Immutable
-public class ListTransferViewLibraryAliquot extends ListTransferViewItem {
+public class ListTransferViewPool extends ListTransferViewItem {
 
-  public static class ListTransferViewLibraryAliquotId implements Serializable {
+  private static final ListTransferViewProject PROJECT_PLACEHOLDER = new ListTransferViewProject() {
+
+    private static final long serialVersionUID = 1L;
+
+    private static final String SHORT_NAME = "Undetermined (pool)";
+
+    @Override
+    public String getShortName() {
+      return SHORT_NAME;
+    }
+
+  };
+
+  public static class ListTransferViewPoolId implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private Transfer transfer;
-    private long aliquotId;
+    private long poolId;
 
     public Transfer getTransfer() {
       return transfer;
@@ -34,24 +47,24 @@ public class ListTransferViewLibraryAliquot extends ListTransferViewItem {
       this.transfer = transfer;
     }
 
-    public long getAliquotId() {
-      return aliquotId;
+    public long getPoolId() {
+      return poolId;
     }
 
-    public void setAliquotId(long libraryId) {
-      this.aliquotId = libraryId;
+    public void setPoolId(long poolId) {
+      this.poolId = poolId;
     }
 
     @Override
     public int hashCode() {
-      return Objects.hash(transfer, aliquotId);
+      return Objects.hash(transfer, poolId);
     }
 
     @Override
     public boolean equals(Object obj) {
       return LimsUtils.equals(this, obj,
-          ListTransferViewLibraryAliquotId::getTransfer,
-          ListTransferViewLibraryAliquotId::getAliquotId);
+          ListTransferViewPoolId::getTransfer,
+          ListTransferViewPoolId::getPoolId);
     }
 
   }
@@ -64,7 +77,7 @@ public class ListTransferViewLibraryAliquot extends ListTransferViewItem {
   private Transfer transfer;
 
   @Id
-  private long aliquotId;
+  private long poolId;
 
   @Override
   public Transfer getTransfer() {
@@ -78,12 +91,17 @@ public class ListTransferViewLibraryAliquot extends ListTransferViewItem {
 
   @Override
   public long getItemId() {
-    return aliquotId;
+    return poolId;
   }
 
   @Override
   public void setItemId(long id) {
-    this.aliquotId = id;
+    this.poolId = id;
+  }
+
+  @Override
+  public ListTransferViewProject getProject() {
+    return PROJECT_PLACEHOLDER;
   }
 
 }

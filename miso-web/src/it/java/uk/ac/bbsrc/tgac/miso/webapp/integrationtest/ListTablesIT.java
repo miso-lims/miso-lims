@@ -696,7 +696,7 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListTransfersSetup() throws Exception {
-    testTabbedPageSetup(ListTarget.TRANSFERS, Sets.newHashSet(Columns.SORT, Columns.ID, Columns.ITEMS, Columns.SENDER,
+    testTabbedPageSetup(ListTarget.TRANSFERS, Sets.newHashSet(Columns.SORT, Columns.ID, Columns.ITEMS, Columns.PROJECTS, Columns.SENDER,
         Columns.RECIPIENT, Columns.TRANSFER_TIME, Columns.RECEIVED, Columns.QC_PASSED, Columns.LAST_MODIFIED));
   }
 

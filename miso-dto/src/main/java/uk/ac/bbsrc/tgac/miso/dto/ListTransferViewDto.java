@@ -17,6 +17,7 @@ public class ListTransferViewDto {
   private long qcPassed;
   private long qcPending;
   private String lastModified;
+  private String projects;
 
   public long getId() {
     return id;
@@ -136,6 +137,14 @@ public class ListTransferViewDto {
 
   public void setLastModified(String lastModified) {
     this.lastModified = lastModified;
+  }
+
+  public String getProjects() {
+    return projects;
+  }
+
+  public void setProjects(String projects) {
+    this.projects = projects;
   }
 
 }

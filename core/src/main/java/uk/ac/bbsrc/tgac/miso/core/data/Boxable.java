@@ -18,7 +18,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryAliquotBoxPositio
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListTransferView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferView;
 
 /**
  * This interface simply describes an object that can be placed into a box. i.e. Sample, Library

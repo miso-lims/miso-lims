@@ -26,7 +26,7 @@ import com.eaglegenomics.simlims.core.Group;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListTransferView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferView;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.ListTransferViewService;
