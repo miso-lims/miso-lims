@@ -642,6 +642,7 @@ textarea.parsley-error {
 .warning-icon {
   font-size: 150%;
   font-weight: bold;
+  vertical-align: sub;
 }
 
 .hidden {

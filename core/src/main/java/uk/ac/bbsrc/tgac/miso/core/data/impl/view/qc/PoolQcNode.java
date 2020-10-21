@@ -1,0 +1,117 @@
+package uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.Immutable;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
+
+@Entity
+@Table(name = "Pool")
+@Immutable
+public class PoolQcNode implements QcNode {
+
+  private static final long serialVersionUID = 1L;
+
+  @Id
+  @Column(name = "poolId")
+  private long id;
+
+  private String name;
+
+  private String alias;
+
+  private Boolean qcPassed;
+
+  @Transient
+  private List<RunQcNode> runs;
+
+  @Override
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(long id) {
+    this.id = id;
+  }
+
+  @Override
+  public String getEntityType() {
+    return EntityType.POOL.getLabel();
+  }
+
+  @Override
+  public String getTypeLabel() {
+    return EntityType.POOL.getLabel();
+  }
+
+  @Override
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getAlias() {
+    return alias;
+  }
+
+  public void setAlias(String alias) {
+    this.alias = alias;
+  }
+
+  @Override
+  public String getLabel() {
+    return getAlias();
+  }
+
+  @Override
+  public Boolean getQcPassed() {
+    return qcPassed;
+  }
+
+  public void setQcPassed(Boolean qcPassed) {
+    this.qcPassed = qcPassed;
+  }
+
+  @Override
+  public Long getQcStatusId() {
+    return null;
+  }
+
+  @Override
+  public String getQcNote() {
+    return null;
+  }
+
+  public List<RunQcNode> getRuns() {
+    if (runs == null) {
+      runs = new ArrayList<>();
+    }
+    return runs;
+  }
+
+  public void setRuns(List<RunQcNode> runs) {
+    this.runs = runs;
+  }
+
+  @Override
+  public String getRunStatus() {
+    return null;
+  }
+
+  @Override
+  public List<RunQcNode> getChildren() {
+    return getRuns();
+  }
+
+}

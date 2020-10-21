@@ -576,7 +576,8 @@ public class RunRestController extends RestController {
       @RequestBody DetailedQcStatusUpdateDto dto) throws IOException {
     Run run = RestUtils.retrieve("Run", runId, runService);
     Partition partition = findPartitionInRun(run, partitionId);
-    PartitionQCType status = RestUtils.retrieve("Partition QC status", dto.getQcStatusId(), partitionQcTypeService, Status.BAD_REQUEST);
+    PartitionQCType status = dto.getQcStatusId() == null ? null
+        : RestUtils.retrieve("Partition QC status", dto.getQcStatusId(), partitionQcTypeService, Status.BAD_REQUEST);
 
     RunPartition runPartition = runPartitionService.get(run, partition);
     if (runPartition == null) {

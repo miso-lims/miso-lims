@@ -2,28 +2,6 @@ var RunLibraryMetrics = (function($) {
 
   var tableSelector = '#metricsTable';
 
-  var poolQcOptions = [{
-    value: null,
-    label: 'Not Ready'
-  }, {
-    value: true,
-    label: 'Ready'
-  }, {
-    value: false,
-    label: 'Failed'
-  }];
-
-  var runLibraryQcOptions = [{
-    value: null,
-    label: 'Pending'
-  }, {
-    value: true,
-    label: 'Passed'
-  }, {
-    value: false,
-    label: 'Failed'
-  }];
-
   return {
     buildTable: function(data) {
       var table = $(tableSelector);
@@ -171,12 +149,12 @@ var RunLibraryMetrics = (function($) {
       updateQcCellDetailedQcStatus(controls, qcNode, rowData, Urls.rest.libraryAliquots.updateQcStatus(qcNode.id));
       break;
     case 'Pool':
-      controls.status.append(poolQcOptions.map(function(item, i) {
+      controls.status.append(QcHierarchy.poolQcOptions.map(function(item, i) {
         var qcPassed = qcNode.qcPassed === undefined ? null : qcNode.qcPassed;
         return makeSelectOption(i, item.label, qcPassed === item.value);
       }));
       controls.apply.click(function() {
-        var selectedStatus = poolQcOptions[controls.status.val()].value;
+        var selectedStatus = QcHierarchy.poolQcOptions[controls.status.val()].value;
         Utils.ajaxWithDialog('Setting Status', 'PUT', Urls.rest.pools.updateQcStatus(qcNode.id) + '?' + $.param({
           qcPassed: selectedStatus
         }), null, function(response) {
@@ -245,14 +223,14 @@ var RunLibraryMetrics = (function($) {
       });
       break;
     case 'RunPartitionLibrary':
-      controls.status.append(runLibraryQcOptions.map(function(item, i) {
+      controls.status.append(QcHierarchy.runLibraryQcOptions.map(function(item, i) {
         var qcPassed = qcNode.qcPassed === undefined ? null : qcNode.qcPassed;
         return makeSelectOption(i, item.label, qcPassed === item.value);
       }));
       Utils.ui.setDisabled(controls.note, false);
       controls.apply.click(function() {
         var update = {
-          qcPassed: runLibraryQcOptions[controls.status.val()].value,
+          qcPassed: QcHierarchy.runLibraryQcOptions[controls.status.val()].value,
           note: controls.note.val() || null
         };
         Utils.ajaxWithDialog('Setting Status', 'PUT', Urls.rest.runs.updateLibraryQcStatus(qcNode.ids[0], qcNode.ids[1], qcNode.ids[2]),

@@ -202,6 +202,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentTissueAttributes;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SequencingOrderSummaryView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.QcNode;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.SampleQcNode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetItem;
@@ -245,6 +247,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.PoolOrderDto.OrderAliquotDto;
+import uk.ac.bbsrc.tgac.miso.dto.dashi.QcHierarchyNodeDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.IlluminaRunDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.IonTorrentRunDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.Ls454RunDto;
@@ -4164,6 +4167,39 @@ public class Dtos {
     setLong(to::setKitId, from.getKitId(), false);
     setString(to::setKitLot, from.getKitLot());
     return to;
+  }
+
+  public static QcHierarchyNodeDto asHierarchyDto(SampleQcNode from) {
+    QcHierarchyNodeDto dto = new QcHierarchyNodeDto();
+    convertIntoDto(from, dto);
+    addChildren(from, dto);
+    return dto;
+  }
+
+  private static <T extends QcNodeDto> void convertIntoDto(QcNode from, T to) {
+    setLong(to::setId, from.getId(), true);
+    to.setIds(from.getIds());
+    setString(to::setEntityType, from.getEntityType());
+    setString(to::setTypeLabel, from.getTypeLabel());
+    setString(to::setName, from.getName());
+    setString(to::setLabel, from.getLabel());
+    setBoolean(to::setQcPassed, from.getQcPassed(), true);
+    setLong(to::setQcStatusId, from.getQcStatusId(), true);
+    setString(to::setRunStatus, from.getRunStatus());
+    setString(to::setQcNote, from.getQcNote());
+  }
+
+  private static void addChildren(QcNode from, QcHierarchyNodeDto to) {
+    if (from.getChildren() != null && !from.getChildren().isEmpty()) {
+      List<QcHierarchyNodeDto> childDtos = new ArrayList<>();
+      for (QcNode child : from.getChildren()) {
+        QcHierarchyNodeDto childDto = new QcHierarchyNodeDto();
+        convertIntoDto(child, childDto);
+        childDtos.add(childDto);
+        addChildren(child, childDto);
+      }
+      to.setChildren(childDtos);
+    }
   }
 
   private static void setBigDecimal(@Nonnull Consumer<BigDecimal> setter, String value) {

@@ -76,6 +76,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
+import uk.ac.bbsrc.tgac.miso.core.service.QcNodeService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
@@ -137,6 +138,8 @@ public class EditSampleController {
   private SampleClassService sampleClassService;
   @Autowired
   private SopService sopService;
+  @Autowired
+  private QcNodeService qcNodeService;
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -591,6 +594,11 @@ public class EditSampleController {
     protected boolean isNewInterface() {
       return true;
     }
+  }
+
+  @GetMapping("/{id}/qc-hierarchy")
+  public ModelAndView getQcHierarchy(@PathVariable long id, ModelMap model) throws IOException {
+    return MisoWebUtils.getQcHierarchy("Sample", id, qcNodeService::getForSample, model);
   }
 
 }

@@ -1,0 +1,115 @@
+package uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.Immutable;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+
+@Entity
+@Table(name = "LibraryAliquot")
+@Immutable
+public class LibraryAliquotQcNode extends DetailedQcNode {
+
+  private static final long serialVersionUID = 1L;
+
+  @Id
+  @Column(name = "aliquotId")
+  private long id;
+
+  private Long libraryId;
+
+  private Long parentAliquotId;
+
+  @Transient
+  private List<LibraryAliquotQcNode> childAliquots;
+
+  @Transient
+  private List<PoolQcNode> pools;
+
+  @Override
+  public Long getId() {
+    return id;
+  }
+
+  @Override
+  public void setId(long id) {
+    this.id = id;
+  }
+
+  public Long getLibraryId() {
+    return libraryId;
+  }
+
+  public void setLibraryId(Long libraryId) {
+    this.libraryId = libraryId;
+  }
+
+  public Long getParentAliquotId() {
+    return parentAliquotId;
+  }
+
+  public void setParentAliquotId(Long parentAliquotId) {
+    this.parentAliquotId = parentAliquotId;
+  }
+
+  public List<LibraryAliquotQcNode> getChildAliquots() {
+    if (childAliquots == null) {
+      childAliquots = new ArrayList<>();
+    }
+    return childAliquots;
+  }
+
+  public void setChildAliquots(List<LibraryAliquotQcNode> childAliquots) {
+    this.childAliquots = childAliquots;
+  }
+
+  public List<PoolQcNode> getPools() {
+    if (pools == null) {
+      pools = new ArrayList<>();
+    }
+    return pools;
+  }
+
+  public void setPools(List<PoolQcNode> pools) {
+    this.pools = pools;
+  }
+
+  @Override
+  public List<? extends QcNode> getChildren() {
+    List<QcNode> all = new ArrayList<>();
+    all.addAll(getChildAliquots());
+    all.addAll(getPools());
+    return all;
+  }
+
+  @Override
+  public String getEntityType() {
+    return EntityType.LIBRARY_ALIQUOT.getLabel();
+  }
+
+  @Override
+  public String getTypeLabel() {
+    return EntityType.LIBRARY_ALIQUOT.getLabel();
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return LimsUtils.equals(this, obj, LibraryAliquotQcNode::getId);
+  }
+
+}

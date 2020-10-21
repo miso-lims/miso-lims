@@ -2,6 +2,8 @@
 
 Changes:
 
+  * Added QC Hierarchy page, linked from the Edit Sample, Library, and Library Aliquot pages, and
+    from the Library Aliquots table on the Edit Run page
   * Show projects included in transfers on Transfers list page
   * Prevent duplicate barcodes between different item types (e.g. samples and libraries)
   * Fixed setting partition QC on Run-Library metrics page
