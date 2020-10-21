@@ -4,6 +4,7 @@ Changes:
 
   * Show projects included in transfers on Transfers list page
   * Prevent duplicate barcodes between different item types (e.g. samples and libraries)
+  * Fixed setting partition QC on Run-Library metrics page
 
 # 1.15.1
 

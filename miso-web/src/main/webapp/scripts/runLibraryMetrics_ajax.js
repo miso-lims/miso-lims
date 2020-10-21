@@ -218,7 +218,7 @@ var RunLibraryMetrics = (function($) {
         var selectedId = Number.parseInt($(this).val());
         var selected = null;
         if (selectedId) {
-          selected = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(qcNode.qcStatusId), Constants.partitionQcTypes);
+          selected = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(selectedId), Constants.partitionQcTypes);
           Utils.ui.setDisabled(controls.note, !selected.noteRequired);
         } else {
           Utils.ui.setDisabled(controls.note, true)
