@@ -38,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.BarcodableReferenceService;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
@@ -92,6 +93,8 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   private PoolOrderService poolOrderService;
   @Autowired
   private RunPartitionAliquotService runPartitionAliquotService;
+  @Autowired
+  private BarcodableReferenceService barcodableReferenceService;
 
   public void setAutoGenerateIdBarcodes(boolean autoGenerateIdBarcodes) {
     this.autoGenerateIdBarcodes = autoGenerateIdBarcodes;
@@ -349,7 +352,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
 
     validateConcentrationUnits(pool.getConcentration(), pool.getConcentrationUnits(), errors);
     validateVolumeUnits(pool.getVolume(), pool.getVolumeUnits(), errors);
-    validateBarcodeUniqueness(pool, beforeChange, poolStore::getByBarcode, errors, "pool");
+    validateBarcodeUniqueness(pool, beforeChange, barcodableReferenceService, errors);
     validateUnboxableFields(pool, errors);
 
     if (strictPools && !pool.isMergeChild()) {

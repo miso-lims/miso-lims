@@ -55,6 +55,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.BarcodableReferenceService;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
@@ -143,6 +144,8 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   private SubprojectService subprojectService;
   @Autowired
   private SopService sopService;
+  @Autowired
+  private BarcodableReferenceService barcodableReferenceService;
   @Autowired
   private TransactionTemplate transactionTemplate;
   @Autowired
@@ -792,7 +795,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     List<ValidationError> errors = new ArrayList<>();
     validateConcentrationUnits(sample.getConcentration(), sample.getConcentrationUnits(), errors);
     validateVolumeUnits(sample.getVolume(), sample.getVolumeUnits(), errors);
-    validateBarcodeUniqueness(sample, beforeChange, sampleStore::getByBarcode, errors, "sample");
+    validateBarcodeUniqueness(sample, beforeChange, barcodableReferenceService, errors);
     validateUnboxableFields(sample, errors);
     validateDetailedQcStatus(sample, errors);
 

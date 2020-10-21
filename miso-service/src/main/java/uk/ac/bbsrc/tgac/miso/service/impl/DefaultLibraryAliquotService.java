@@ -31,6 +31,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.BarcodableReferenceService;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
@@ -78,6 +79,8 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
   private BoxService boxService;
   @Autowired
   private WorksetService worksetService;
+  @Autowired
+  private BarcodableReferenceService barcodableReferenceService;
   @Autowired
   private LibraryStore libraryStore;
   @Value("${miso.autoGenerateIdentificationBarcodes}")
@@ -309,7 +312,7 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
 
     validateConcentrationUnits(aliquot.getConcentration(), aliquot.getConcentrationUnits(), errors);
     validateVolumeUnits(aliquot.getVolume(), aliquot.getVolumeUnits(), errors);
-    validateBarcodeUniqueness(aliquot, beforeChange, libraryAliquotDao::getByBarcode, errors, "library aliquot");
+    validateBarcodeUniqueness(aliquot, beforeChange, barcodableReferenceService, errors);
     validateTargetedSequencing(aliquot, errors);
     validateUnboxableFields(aliquot, errors);
     validateDetailedQcStatus(aliquot, errors);
