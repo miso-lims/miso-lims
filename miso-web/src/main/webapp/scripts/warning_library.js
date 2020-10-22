@@ -40,7 +40,7 @@ WarningTarget.library = {
       include: library.lowQuality,
       headerMessage: 'Low Quality Library',
       tableMessage: Constants.warningMessages.lowQualityLibraries
-    }];
+    }, Warning.common.qcFailure(library), Warning.common.effectiveQcFailure(library)];
   }
 
 };

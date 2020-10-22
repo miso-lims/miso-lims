@@ -11,6 +11,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import com.google.common.base.Predicates;
 
@@ -144,6 +145,7 @@ public class DataTable extends AbstractElement {
   }
 
   private Stream<WebElement> getColumnCellsStream(String columnHeading) {
+    waitWithTimeout().until(ExpectedConditions.invisibilityOf(processing));
     if (table.findElements(rowSelector).isEmpty()) {
       return Stream.empty();
     }
@@ -165,6 +167,7 @@ public class DataTable extends AbstractElement {
   public List<String> getColumnValues(String columnHeading) {
     return getColumnCellsStream(columnHeading)
         .map(WebElement::getText)
+        .map(text -> text.replace("⚠", "").trim())
         .collect(Collectors.toList());
   }
 

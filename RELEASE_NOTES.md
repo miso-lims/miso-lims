@@ -3,6 +3,8 @@
 Changes:
 
   * Show projects included in transfers on Transfers list page
+  * Show warnings for samples, libraries, and library aliquots with failing QC status, and those with
+    parents that have failing QC status
   * Prevent duplicate barcodes between different item types (e.g. samples and libraries)
   * Fixed setting partition QC on Run-Library metrics page
 

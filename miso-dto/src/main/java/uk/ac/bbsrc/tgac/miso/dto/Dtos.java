@@ -437,6 +437,7 @@ public class Dtos {
         setString(dto::setEffectiveTissueOriginLabel, maybeGetProperty(tissue.getTissueOrigin(), TissueOrigin::getAlias));
         setString(dto::setEffectiveTissueTypeLabel, maybeGetProperty(tissue.getTissueType(), TissueType::getAlias));
       }
+      setEffectiveQcFailure(from, dto);
     }
     return dto;
   }
@@ -563,8 +564,21 @@ public class Dtos {
       setString(dto::setIdentityConsentLevel, maybeGetProperty(identity.getConsentLevel(), ConsentLevel::getLabel));
       setString(dto::setEffectiveExternalNames, identity.getExternalName());
     }
+    setEffectiveQcFailure(from, dto);
 
     return dto;
+  }
+
+  private static void setEffectiveQcFailure(HierarchyEntity from, UpstreamQcFailableDto to) {
+    HierarchyEntity failure = from.getFailingParent();
+    if (failure != null) {
+      to.setEffectiveQcFailureId(failure.getDetailedQcStatus().getId());
+      if (failure.getEntityType() == EntityType.SAMPLE && isDetailedSample((Sample) failure)) {
+        to.setEffectiveQcFailureLevel(((DetailedSample) failure).getSampleClass().getSampleCategory());
+      } else {
+        to.setEffectiveQcFailureLevel(failure.getEntityType().getLabel());
+      }
+    }
   }
 
   private static DetailedSample toDetailedSample(@Nonnull DetailedSampleDto from) {
@@ -1405,6 +1419,7 @@ public class Dtos {
     setId(dto::setThermalCyclerId, from.getThermalCycler());
     setId(dto::setSopId, from.getSop());
     setString(dto::setBatchId, from.getBatchId());
+    setEffectiveQcFailure(from, dto);
 
     return dto;
   }
@@ -1666,6 +1681,7 @@ public class Dtos {
     setDateTimeString(dto::setLastModified, from.getLastModified());
     setId(dto::setDetailedQcStatusId, from.getDetailedQcStatus());
     setString(dto::setDetailedQcStatusNote, from.getDetailedQcStatusNote());
+    setEffectiveQcFailure(from, dto);
     return dto;
   }
 
@@ -1747,6 +1763,7 @@ public class Dtos {
       }
       dto.setParentAliquotIds(parentAliquotIds);
     }
+    setEffectiveQcFailure(from.getAliquot(), dto);
 
     return dto;
   }

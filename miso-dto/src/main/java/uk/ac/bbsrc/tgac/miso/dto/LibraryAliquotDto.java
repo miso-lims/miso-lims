@@ -18,7 +18,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
     @JsonSubTypes.Type(value = DetailedLibraryAliquotDto.class, name = "Detailed"),
     @JsonSubTypes.Type(value = LibraryAliquotDto.class, name = "Plain") })
 @JsonTypeName(value = "Plain")
-public class LibraryAliquotDto extends AbstractBoxableDto {
+public class LibraryAliquotDto extends AbstractBoxableDto implements UpstreamQcFailableDto {
 
   private Long id;
   private String name;
@@ -61,6 +61,8 @@ public class LibraryAliquotDto extends AbstractBoxableDto {
   private Long detailedQcStatusId;
   private String detailedQcStatusNote;
   private String worksetAddedTime;
+  private Long effectiveQcFailureId;
+  private String effectiveQcFailureLevel;
 
   public Long getId() {
     return id;
@@ -376,6 +378,26 @@ public class LibraryAliquotDto extends AbstractBoxableDto {
 
   public void setWorksetAddedTime(String worksetAddedTime) {
     this.worksetAddedTime = worksetAddedTime;
+  }
+
+  @Override
+  public Long getEffectiveQcFailureId() {
+    return effectiveQcFailureId;
+  }
+
+  @Override
+  public void setEffectiveQcFailureId(Long effectiveQcFailureId) {
+    this.effectiveQcFailureId = effectiveQcFailureId;
+  }
+
+  @Override
+  public String getEffectiveQcFailureLevel() {
+    return effectiveQcFailureLevel;
+  }
+
+  @Override
+  public void setEffectiveQcFailureLevel(String effectiveQcFailureLevel) {
+    this.effectiveQcFailureLevel = effectiveQcFailureLevel;
   }
 
 }

@@ -24,7 +24,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
     @JsonSubTypes.Type(value = DetailedLibraryDto.class, name = "Detailed"),
     @JsonSubTypes.Type(value = LibraryDto.class, name = "Plain") })
 @JsonTypeName(value = "Plain")
-public class LibraryDto extends AbstractBoxableDto implements ReceivableDto<Library, TransferLibrary> {
+public class LibraryDto extends AbstractBoxableDto implements ReceivableDto<Library, TransferLibrary>, UpstreamQcFailableDto {
 
   private String alias;
   private String concentration;
@@ -84,6 +84,8 @@ public class LibraryDto extends AbstractBoxableDto implements ReceivableDto<Libr
   private Long sopId;
   private String batchId;
   private String worksetAddedTime;
+  private Long effectiveQcFailureId;
+  private String effectiveQcFailureLevel;
 
   public String getAlias() {
     return alias;
@@ -563,6 +565,26 @@ public class LibraryDto extends AbstractBoxableDto implements ReceivableDto<Libr
 
   public void setDetailedQcStatusNote(String detailedQcStatusNote) {
     this.detailedQcStatusNote = detailedQcStatusNote;
+  }
+
+  @Override
+  public Long getEffectiveQcFailureId() {
+    return effectiveQcFailureId;
+  }
+
+  @Override
+  public void setEffectiveQcFailureId(Long effectiveQcFailureId) {
+    this.effectiveQcFailureId = effectiveQcFailureId;
+  }
+
+  @Override
+  public String getEffectiveQcFailureLevel() {
+    return effectiveQcFailureLevel;
+  }
+
+  @Override
+  public void setEffectiveQcFailureLevel(String effectiveQcFailureLevel) {
+    this.effectiveQcFailureLevel = effectiveQcFailureLevel;
   }
 
 }

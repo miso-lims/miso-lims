@@ -80,6 +80,7 @@ public class EditLibraryAliquotController {
     if (aliquot == null) {
       throw new NotFoundException("Library aliquot not found");
     }
+    model.put("title", "Library Aliquot " + aliquot.getId());
 
     ObjectMapper mapper = new ObjectMapper();
     model.put("aliquot", aliquot);

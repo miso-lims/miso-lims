@@ -36,6 +36,6 @@ WarningTarget.sample = {
       include: sample.synthetic,
       headerMessage: 'This entity does not exist except for sample tracking purposes!',
       level: 'info'
-    }];
+    }, Warning.common.qcFailure(sample), Warning.common.effectiveQcFailure(sample)];
   }
 };
