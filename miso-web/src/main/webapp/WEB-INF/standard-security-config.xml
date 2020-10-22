@@ -59,12 +59,19 @@
     <property name="authenticationFailureHandler" ref="failureHandler" />
     <property name="rememberMeServices" ref="rememberMeServices" />
   </bean>
+
+  <bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
+  <bean id="httpSessionSecurityContextRepository" class="org.springframework.security.web.context.HttpSessionSecurityContextRepository" />
+  <bean id="restSignatureFilter" class="uk.ac.bbsrc.tgac.miso.webapp.context.RestSignatureFilter">
+    <constructor-arg ref="httpSessionSecurityContextRepository" />
+  </bean>
   
   <security:http entry-point-ref="loginUrlEntryPoint">
+    <security:custom-filter ref="restSignatureFilter" after="SESSION_MANAGEMENT_FILTER"/>
     <security:access-denied-handler error-page="/miso/accessDenied"/>
     <security:csrf disabled="true" />
     
-    <!-- auth for REST requests is handled by RestSignatureFilter via web.xml -->
+    <!-- auth for REST requests is handled by RestSignatureFilter -->
     <security:intercept-url pattern="/miso/rest/**" access="permitAll" />
     <security:intercept-url pattern="/favicon.ico" access="permitAll" />
     <security:intercept-url pattern="/styles/**" access="permitAll" />
@@ -85,13 +92,5 @@
     <security:remember-me services-ref="rememberMeServices" key="miso" />
     <security:logout logout-success-url="/miso/login" />
   </security:http>
-
-  <bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
-
-  <bean id="httpSessionSecurityContextRepository" class="org.springframework.security.web.context.HttpSessionSecurityContextRepository" />
-
-  <bean id="restSignatureFilter" class="uk.ac.bbsrc.tgac.miso.webapp.context.RestSignatureFilter">
-    <constructor-arg ref="httpSessionSecurityContextRepository" />
-  </bean>
   
 </beans>

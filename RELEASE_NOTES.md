@@ -1,5 +1,8 @@
 # Unreleased
 
+  * Fixed remember-me token not being checked during REST requests (during saves, searches, etc.),
+    causing the requests to fail authentication if the session had timed out
+
 Changes:
 
 
