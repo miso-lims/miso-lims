@@ -2,6 +2,12 @@
 
 Changes:
 
+
+
+# 1.16.0
+
+Changes:
+
   * Added QC Hierarchy page, linked from the Edit Sample, Library, and Library Aliquot pages, and
     from the Library Aliquots table on the Edit Run page
   * Show projects included in transfers on Transfers list page
