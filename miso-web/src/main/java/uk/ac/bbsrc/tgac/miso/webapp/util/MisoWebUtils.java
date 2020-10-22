@@ -40,17 +40,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.acls.model.NotFoundException;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.SampleQcNode;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.HandsontableSpreadsheet;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.Spreadsheet;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.ThrowingFunction;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
 
@@ -219,6 +225,22 @@ public class MisoWebUtils {
     } catch (NumberFormatException e) {
       throw new ClientErrorException(String.format("Invalid value for parameter '%s'", key), e);
     }
+  }
+  
+  public static ModelAndView getQcHierarchy(String entityType, long id, ThrowingFunction<Long, SampleQcNode, IOException> getter,
+      ModelMap model) throws IOException {
+    SampleQcNode hierarchy = getter.apply(id);
+    if (hierarchy == null) {
+      throw new NotFoundException(String.format("No %s found with ID %d", entityType, id));
+    }
+
+    ObjectMapper mapper = new ObjectMapper();
+    model.put("title", String.format("%s %d Hierarchy", hierarchy.getEntityType(), hierarchy.getId()));
+    model.put("selectedType", entityType);
+    model.put("selectedId", id);
+    model.put("hierarchy", mapper.writeValueAsString(Dtos.asHierarchyDto(hierarchy)));
+
+    return new ModelAndView("/WEB-INF/pages/qcHierarchy.jsp", model);
   }
 
 }

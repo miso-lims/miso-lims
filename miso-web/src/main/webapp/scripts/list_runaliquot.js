@@ -78,6 +78,17 @@ ListTarget.runaliquot = {
       mData: 'qcNote',
       sDefaultContent: ''
     }, {
+      sTitle: 'Hierarchy',
+      mData: function(full) {
+        return full.runId + '-' + full.partitionId + '-' + full.aliquotId;
+      },
+      mRender: function(data, type, full) {
+        if (type === 'display') {
+          return '<a href="' + Urls.ui.runLibraries.qcHierarchy(data) + '">View</a>'
+        }
+        return data;
+      }
+    }, {
       sTitle: "Purpose",
       mData: "runPurposeId",
       include: true,

@@ -2,6 +2,8 @@
 
 Changes:
 
+  * Added QC Hierarchy page, linked from the Edit Sample, Library, and Library Aliquot pages, and
+    from the Library Aliquots table on the Edit Run page
   * Show projects included in transfers on Transfers list page
   * Show warnings for samples, libraries, and library aliquots with failing QC status, and those with
     parents that have failing QC status

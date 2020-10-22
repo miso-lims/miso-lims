@@ -12,6 +12,7 @@
   <button id="save" type="button" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
 <div class="right fg-toolbar ui-helper-clearfix paging_full_numbers">
+  <span class="ui-button ui-state-default" onclick="Utils.page.pageRedirect(Urls.ui.libraryAliquots.qcHierarchy(${aliquot.id}));">QC Hierarchy</span>
   <span class="ui-button ui-state-default" onclick="Utils.printDialog('libraryaliquot', [${aliquot.id}]);">Print Barcode</span>
 </div>
 

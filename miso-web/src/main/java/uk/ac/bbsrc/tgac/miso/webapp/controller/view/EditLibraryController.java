@@ -87,6 +87,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryTemplateService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
+import uk.ac.bbsrc.tgac.miso.core.service.QcNodeService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
@@ -114,6 +115,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
+import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -184,6 +186,8 @@ public class EditLibraryController {
   private KitDescriptorService kitDescriptorService;
   @Autowired
   private UserService userService;
+  @Autowired
+  private QcNodeService qcNodeService;
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -565,5 +569,9 @@ public class EditLibraryController {
     return new ModelAndView("/WEB-INF/pages/editLibraryBatch.jsp", model);
   }
 
+  @GetMapping("/{id}/qc-hierarchy")
+  public ModelAndView getQcHierarchy(@PathVariable long id, ModelMap model) throws IOException {
+    return MisoWebUtils.getQcHierarchy("Library", id, qcNodeService::getForLibrary, model);
+  }
 
 }

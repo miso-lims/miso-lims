@@ -1,13 +1,11 @@
-package uk.ac.bbsrc.tgac.miso.dto.dashi;
+package uk.ac.bbsrc.tgac.miso.dto;
 
-import java.util.List;
-
-public class RunLibraryQcTableQcNodeDto {
+public class QcNodeDto {
 
   private String entityType;
   private String typeLabel;
   private Long id;
-  private List<Long> ids; // used for runPartitions and runPartitionAliquots. IDs are in same order as entity type name
+  private Long[] ids; // used for runPartitions and runPartitionAliquots. IDs are in same order as entity type name
   private String name;
   private String label;
   private Boolean qcPassed;
@@ -39,11 +37,11 @@ public class RunLibraryQcTableQcNodeDto {
     this.id = id;
   }
 
-  public List<Long> getIds() {
+  public Long[] getIds() {
     return ids;
   }
 
-  public void setIds(List<Long> ids) {
+  public void setIds(Long[] ids) {
     this.ids = ids;
   }
 

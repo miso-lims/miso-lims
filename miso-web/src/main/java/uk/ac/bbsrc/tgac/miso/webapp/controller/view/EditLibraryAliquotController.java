@@ -35,6 +35,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.core.service.QcNodeService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.AlphanumericComparator;
@@ -50,6 +51,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkMergeTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkTableBackend;
+import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
 
 @Controller
@@ -71,6 +73,8 @@ public class EditLibraryAliquotController {
   private LibraryService libraryService;
   @Autowired
   private BoxService boxService;
+  @Autowired
+  private QcNodeService qcNodeService;
   @Autowired
   private IndexChecker indexChecker;
 
@@ -414,6 +418,11 @@ public class EditLibraryAliquotController {
     BulkPropagateBackend bulkPropagateBackend = new BulkPropagateBackend(
         (boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null));
     return bulkPropagateBackend.propagate(aliquotIds, model);
+  }
+
+  @GetMapping("/{id}/qc-hierarchy")
+  public ModelAndView getQcHierarchy(@PathVariable long id, ModelMap model) throws IOException {
+    return MisoWebUtils.getQcHierarchy("Library Aliquot", id, qcNodeService::getForLibraryAliquot, model);
   }
 
 }

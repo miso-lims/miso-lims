@@ -1,0 +1,124 @@
+package uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.Immutable;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
+
+@Entity
+@Table(name = "Sample")
+@Immutable
+public class SampleQcNode extends DetailedQcNode {
+
+  private static final long serialVersionUID = 1L;
+
+  @Id
+  @Column(name = "sampleId")
+  private long id;
+
+  private Long parentId;
+
+  @ManyToOne(targetEntity = SampleClassImpl.class)
+  @JoinColumn(name = "sampleClassId")
+  private SampleClass sampleClass;
+
+  private String externalName;
+
+  @Transient
+  private List<SampleQcNode> childSamples;
+
+  @Transient
+  private List<LibraryQcNode> libraries;
+
+  @Override
+  public Long getId() {
+    return id;
+  }
+
+  @Override
+  public void setId(long id) {
+    this.id = id;
+  }
+
+  public Long getParentId() {
+    return parentId;
+  }
+
+  public void setParentId(Long parentId) {
+    this.parentId = parentId;
+  }
+
+  public SampleClass getSampleClass() {
+    return sampleClass;
+  }
+
+  public void setSampleClass(SampleClass sampleClass) {
+    this.sampleClass = sampleClass;
+  }
+
+  public String getExternalName() {
+    return externalName;
+  }
+
+  public void setExternalName(String externalName) {
+    this.externalName = externalName;
+  }
+
+  @Override
+  public String getLabel() {
+    return getExternalName() == null ? getAlias() : String.format("%s (%s)", getAlias(), getExternalName());
+  }
+
+  public List<SampleQcNode> getChildSamples() {
+    if (childSamples == null) {
+      childSamples = new ArrayList<>();
+    }
+    return childSamples;
+  }
+
+  public void setChildSamples(List<SampleQcNode> childSamples) {
+    this.childSamples = childSamples;
+  }
+
+  public List<LibraryQcNode> getLibraries() {
+    if (libraries == null) {
+      libraries = new ArrayList<>();
+    }
+    return libraries;
+  }
+
+  public void setLibraries(List<LibraryQcNode> libraries) {
+    this.libraries = libraries;
+  }
+
+  @Override
+  public List<? extends DetailedQcNode> getChildren() {
+    List<DetailedQcNode> all = new ArrayList<>();
+    all.addAll(getChildSamples());
+    all.addAll(getLibraries());
+    return all;
+  }
+
+  @Override
+  public String getEntityType() {
+    return EntityType.SAMPLE.getLabel();
+  }
+
+  @Override
+  public String getTypeLabel() {
+    return getSampleClass() == null ? EntityType.SAMPLE.getLabel() : getSampleClass().getAlias();
+  }
+
+}

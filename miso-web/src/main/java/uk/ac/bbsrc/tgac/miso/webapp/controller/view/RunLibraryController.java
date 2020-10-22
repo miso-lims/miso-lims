@@ -10,8 +10,11 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,7 +22,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.HierarchyEntity;
@@ -31,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.SampleQcNode;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
@@ -38,12 +41,13 @@ import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.QcNodeDto;
 import uk.ac.bbsrc.tgac.miso.dto.dashi.RunLibraryQCTableRowDto;
-import uk.ac.bbsrc.tgac.miso.dto.dashi.RunLibraryQcTableQcNodeDto;
 import uk.ac.bbsrc.tgac.miso.dto.dashi.RunLibraryQcTableRequestDto;
 import uk.ac.bbsrc.tgac.miso.dto.dashi.RunLibraryQcTableRequestLibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.dashi.RunLibraryQcTableRequestMetricDto;
 import uk.ac.bbsrc.tgac.miso.dto.dashi.RunLibraryQcTableRowMetricDto;
+import uk.ac.bbsrc.tgac.miso.persistence.QcNodeDao;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
 
 @Controller
@@ -58,6 +62,8 @@ public class RunLibraryController {
   private RunPartitionService runPartitionService;
   @Autowired
   private RunPartitionAliquotService runPartitionAliquotService;
+  @Autowired
+  private QcNodeDao qcNodeDao;
 
   @PostMapping("/metrics")
   public ModelAndView getRunLibraryQcTable(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
@@ -146,7 +152,7 @@ public class RunLibraryController {
     LibraryAliquot libraryAliquot = runLibs.get(0).getAliquot();
     row.setLibraryAliquot(Dtos.asDto(libraryAliquot, false));
     row.setMetrics(metrics.stream().map(RunLibraryQcTableRowMetricDto::fromRequestDto).collect(Collectors.toList()));
-    List<RunLibraryQcTableQcNodeDto> qcNodes = new LinkedList<>();
+    List<QcNodeDto> qcNodes = new LinkedList<>();
     for (HierarchyEntity current = libraryAliquot; current != null; current = current.getParent()) {
       qcNodes.add(0, makeQcNode(current));
     }
@@ -166,8 +172,8 @@ public class RunLibraryController {
     return row;
   }
 
-  private static RunLibraryQcTableQcNodeDto makeQcNode(HierarchyEntity hierarchyEntity) {
-    RunLibraryQcTableQcNodeDto node = new RunLibraryQcTableQcNodeDto();
+  private static QcNodeDto makeQcNode(HierarchyEntity hierarchyEntity) {
+    QcNodeDto node = new QcNodeDto();
     node.setEntityType(hierarchyEntity.getEntityType().getLabel());
     node.setTypeLabel(getTypeLabel(hierarchyEntity));
     node.setId(hierarchyEntity.getId());
@@ -198,8 +204,8 @@ public class RunLibraryController {
     }
   }
 
-  private static RunLibraryQcTableQcNodeDto makeQcNode(Pool pool) {
-    RunLibraryQcTableQcNodeDto node = new RunLibraryQcTableQcNodeDto();
+  private static QcNodeDto makeQcNode(Pool pool) {
+    QcNodeDto node = new QcNodeDto();
     node.setEntityType("Pool");
     node.setTypeLabel("Pool");
     node.setId(pool.getId());
@@ -209,8 +215,8 @@ public class RunLibraryController {
     return node;
   }
 
-  private static RunLibraryQcTableQcNodeDto makeQcNode(Run run) {
-    RunLibraryQcTableQcNodeDto node = new RunLibraryQcTableQcNodeDto();
+  private static QcNodeDto makeQcNode(Run run) {
+    QcNodeDto node = new QcNodeDto();
     node.setEntityType("Run");
     node.setTypeLabel("Run");
     node.setId(run.getId());
@@ -225,15 +231,15 @@ public class RunLibraryController {
     return node;
   }
 
-  private static RunLibraryQcTableQcNodeDto makeQcNode(RunPartition runPartition) {
+  private static QcNodeDto makeQcNode(RunPartition runPartition) {
     Run run = runPartition.getRun();
     Partition partition = runPartition.getPartition();
     PlatformType platform = run.getPlatformType();
 
-    RunLibraryQcTableQcNodeDto node = new RunLibraryQcTableQcNodeDto();
+    QcNodeDto node = new QcNodeDto();
     node.setEntityType("RunPartition");
     node.setTypeLabel(runPartition.getRun().getPlatformType().getPartitionName());
-    node.setIds(Lists.newArrayList(run.getId(), partition.getId()));
+    node.setIds(new Long[] { run.getId(), partition.getId() });
     RunPosition runPosition = runPartition.getRun().getRunPositions().stream()
         .filter(runPos -> runPos.getContainer().getId() == runPartition.getPartition().getSequencerPartitionContainer().getId())
         .findFirst().orElseThrow(() -> new IllegalStateException("No run position found matching partition container"));
@@ -246,16 +252,16 @@ public class RunLibraryController {
     return node;
   }
 
-  private static RunLibraryQcTableQcNodeDto makeQcNode(RunPartitionAliquot runLib) {
+  private static QcNodeDto makeQcNode(RunPartitionAliquot runLib) {
     Run run = runLib.getRun();
     Partition partition = runLib.getPartition();
     LibraryAliquot libraryAliquot = runLib.getAliquot();
     PlatformType platform = run.getPlatformType();
 
-    RunLibraryQcTableQcNodeDto node = new RunLibraryQcTableQcNodeDto();
+    QcNodeDto node = new QcNodeDto();
     node.setEntityType("RunPartitionLibrary");
     node.setTypeLabel("Run-Library");
-    node.setIds(Lists.newArrayList(run.getId(), partition.getId(), libraryAliquot.getId()));
+    node.setIds(new Long[] { run.getId(), partition.getId(), libraryAliquot.getId() });
     RunPosition runPosition = runLib.getRun().getRunPositions().stream()
         .filter(runPos -> runPos.getContainer().getId() == runLib.getPartition().getSequencerPartitionContainer().getId())
         .findFirst().orElseThrow(() -> new IllegalStateException("No run position found matching partition container"));
@@ -265,6 +271,23 @@ public class RunLibraryController {
     node.setQcPassed(runLib.getQcPassed());
     node.setQcNote(runLib.getQcNote());
     return node;
+  }
+
+  @GetMapping("/{runId}-{partitionId}-{aliquotId}/qc-hierarchy")
+  public ModelAndView getQcHierarchy(@PathVariable long runId, @PathVariable long partitionId, @PathVariable long aliquotId, ModelMap model)
+      throws IOException {
+    SampleQcNode hierarchy = qcNodeDao.getForRunLibrary(runId, partitionId, aliquotId);
+    if (hierarchy == null) {
+      throw new NotFoundException("Run-library not found");
+    }
+
+    ObjectMapper mapper = new ObjectMapper();
+    model.put("title", "Run-Library Hierarchy");
+    model.put("selectedType", "RunPartitionLibrary");
+    model.put("selectedId", "[" + runId + ", " + partitionId + ", " + aliquotId + "]");
+    model.put("hierarchy", mapper.writeValueAsString(Dtos.asHierarchyDto(hierarchy)));
+
+    return new ModelAndView("/WEB-INF/pages/qcHierarchy.jsp", model);
   }
 
 }

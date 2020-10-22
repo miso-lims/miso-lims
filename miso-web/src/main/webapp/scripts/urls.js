@@ -366,7 +366,8 @@ Urls = (function() {
     bulkPropagate: libraryUiBase + '/bulk/propagate',
     batch: function(id) {
       return libraryUiBase + '/batch/' + encodeURIComponent(id);
-    }
+    },
+    qcHierarchy: middleIdUrlFunction(libraryUiBase, '/qc-hierarchy')
   };
 
   var libraryRestBase = restBase + '/libraries';
@@ -396,7 +397,8 @@ Urls = (function() {
     bulkRepropagate: libraryAliquotUiBase + '/bulk/repropagate',
     bulkPoolTogether: libraryAliquotUiBase + '/bulk/merge',
     bulkPoolSeparate: libraryAliquotUiBase + '/bulk/pool-separate',
-    bulkPoolCustom: libraryAliquotUiBase + '/bulk/pool'
+    bulkPoolCustom: libraryAliquotUiBase + '/bulk/pool',
+    qcHierarchy: middleIdUrlFunction(libraryAliquotUiBase, '/qc-hierarchy')
   };
 
   var libraryAliquotRestBase = restBase + '/libraryaliquots';
@@ -684,6 +686,12 @@ Urls = (function() {
     potentialExperiments: middleIdUrlFunction(runRestBase, '/potentialExperiments')
   };
 
+  // Run-Libraries
+  var runLibraryUiBase = baseUrl + '/runlibraries';
+  ui.runLibraries = {
+    qcHierarchy: middleIdUrlFunction(runLibraryUiBase, '/qc-hierarchy')
+  };
+
   // Run Purposes
   var runPurposeUiBase = baseUrl + '/runpurpose';
   ui.runPurposes = {
@@ -703,7 +711,8 @@ Urls = (function() {
     edit: idUrlFunction(sampleUiBase),
     bulkCreate: sampleUiBase + '/bulk/new',
     bulkEdit: sampleUiBase + '/bulk/edit',
-    bulkPropagate: sampleUiBase + '/bulk/propagate'
+    bulkPropagate: sampleUiBase + '/bulk/propagate',
+    qcHierarchy: middleIdUrlFunction(sampleUiBase, '/qc-hierarchy')
   };
 
   var sampleRestBase = restBase + '/samples';
