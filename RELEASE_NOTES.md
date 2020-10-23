@@ -5,14 +5,16 @@ Changes:
   * Detailed sample: changed the bulk sample pages to allow creating/editing samples of multiple sample
     classes at once. The tables are now limited to a single sample category (e.g. tissue or stock), and
     fields not applicable to the selected sample class for a particular row will be disabled.
+  * Added an editor for printer labels
   * Added "Match Parent Position" action to bulk sample (detailed sample mode only) and bulk library
     tables to copy the parent items' box positions
+  * Updated Pinery-MISO to include pool and run-library QC status, and to show "Failed" status on
+    samples instead of "Not Ready" when approriate
   * Fixed an issue that allowed login to time out during bulk save
   * Fixed remember-me token not being checked during REST requests (during saves, searches, etc.),
     causing the requests to fail authentication if the session had timed out
   * Fixed Initial Extraction Yields List sample download format to use initial volume instead of
     current volume for calculating total yield
-  * Added an editor for printer labels
 
 Upgrade Notes:
 

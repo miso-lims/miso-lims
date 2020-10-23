@@ -8,6 +8,7 @@ SELECT p.partitionId
   ,pool.alias AS pool_name
   ,pool.identificationBarcode AS pool_barcode
   ,pool.description AS pool_description
+  ,pool.qcPassed AS pool_qc_passed
   ,pool.creator AS pool_createdById
   ,pool.created AS pool_created
   ,pool.lastModifier AS pool_modifiedById
