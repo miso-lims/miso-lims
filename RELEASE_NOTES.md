@@ -1,5 +1,6 @@
 # Unreleased
 
+  * Fixed an issue that allowed login to time out during bulk save
   * Fixed remember-me token not being checked during REST requests (during saves, searches, etc.),
     causing the requests to fail authentication if the session had timed out
 

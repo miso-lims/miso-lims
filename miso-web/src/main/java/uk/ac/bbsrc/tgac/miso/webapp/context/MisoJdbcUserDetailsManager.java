@@ -65,7 +65,7 @@ public class MisoJdbcUserDetailsManager extends JdbcUserDetailsManager {
                 String s1 = new String(rbytes);
                 String[] roles = s1.split(",");
                 for (String role : roles) {
-                  log.info("Found role " + role + " for " + rs.getString("username"));
+                  log.debug("Found role " + role + " for " + rs.getString("username"));
                   SimpleGrantedAuthority authority = new SimpleGrantedAuthority(role);
                   roleList.add(authority);
                 }

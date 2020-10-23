@@ -89,12 +89,14 @@ public class RestSignatureFilter extends OncePerRequestFilter {
   }
   
   @Override
+  protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+    return !request.getRequestURI().startsWith("/miso/rest/");
+  }
+
+  @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
     try {
-      if (!request.getRequestURI().startsWith("/miso/rest/")) {
-        filterChain.doFilter(request, response);
-      }
       if (request.getHeader(SignatureHelper.USER_HEADER) == null) {
         if (checkFormLogin(request, response, filterChain)) {
           // Already logged in via form

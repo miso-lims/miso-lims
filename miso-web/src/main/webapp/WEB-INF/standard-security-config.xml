@@ -67,12 +67,10 @@
   </bean>
   
   <security:http entry-point-ref="loginUrlEntryPoint">
-    <security:custom-filter ref="restSignatureFilter" after="SESSION_MANAGEMENT_FILTER"/>
+  	<security:custom-filter ref="restSignatureFilter" after="SESSION_MANAGEMENT_FILTER"/>
     <security:access-denied-handler error-page="/miso/accessDenied"/>
     <security:csrf disabled="true" />
     
-    <!-- auth for REST requests is handled by RestSignatureFilter -->
-    <security:intercept-url pattern="/miso/rest/**" access="permitAll" />
     <security:intercept-url pattern="/favicon.ico" access="permitAll" />
     <security:intercept-url pattern="/styles/**" access="permitAll" />
     <security:intercept-url pattern="/scripts/**" access="permitAll" />
