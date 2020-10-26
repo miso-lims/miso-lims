@@ -1886,7 +1886,7 @@ BulkUtils = (function($) {
               updateProgress(progressData);
             }).fail(function(response, textStatus, serverStatus) {
               // progress request failed (operation status unknown)
-              showSaveError(response, hot, columns);
+              showSaveError(response, hot, columns, 'Failed to verify save status - operation may still be in progress or completed.');
               showLoading(false, false);
               dialog.dialog('close');
             });
@@ -1989,17 +1989,17 @@ BulkUtils = (function($) {
     $(SUCCESS_CONTAINER).removeClass('hidden');
   }
 
-  function showSaveError(response, hot, columns) {
+  function showSaveError(response, hot, columns, additionalMessage) {
     var responseData = null;
     if (response && response.responseText) {
       responseData = JSON.parse(response.responseText);
     }
     if (!responseData || !responseData.detail) {
-      showError(TERRIBLY_WRONG_MESSAGE);
+      showError(TERRIBLY_WRONG_MESSAGE, additionalMessage);
     } else if (responseData.dataFormat === 'bulk validation') {
       showValidationErrors(responseData.detail, responseData.data, hot, columns);
     } else {
-      showError(responseData.detail);
+      showError(responseData.detail, additionalMessage);
     }
   }
 
@@ -2016,9 +2016,12 @@ BulkUtils = (function($) {
     }
   }
 
-  function showError(message) {
+  function showError(message, additionalMessage) {
     clearMessages();
     $(ERRORS_BOX).append($('<p>').text(message));
+    if (additionalMessage) {
+      $(ERRORS_BOX).append($('<p>').text(additionalMessage));
+    }
     $(ERRORS_CONTAINER).removeClass('hidden');
   }
 

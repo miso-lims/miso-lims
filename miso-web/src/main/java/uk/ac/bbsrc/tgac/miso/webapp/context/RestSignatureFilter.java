@@ -89,6 +89,11 @@ public class RestSignatureFilter extends OncePerRequestFilter {
   }
   
   @Override
+  protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+    return !request.getRequestURI().startsWith("/miso/rest/");
+  }
+
+  @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
     try {
