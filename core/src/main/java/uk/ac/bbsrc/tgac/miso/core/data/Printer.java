@@ -21,6 +21,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionLikeType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.common.base.Charsets;
 
@@ -33,6 +34,8 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.LabelElement;
 @Table(name = "Printer")
 public class Printer implements Deletable, Serializable {
 
+  private static final CollectionLikeType LAYOUT_TYPE = TypeFactory.defaultInstance().constructCollectionLikeType(List.class,
+      LabelElement.class);
   private static final ObjectMapper MAPPER = new ObjectMapper();
   private static final long serialVersionUID = 1L;
 
@@ -65,6 +68,10 @@ public class Printer implements Deletable, Serializable {
   private long printerId = UNSAVED_ID;
 
   private double width;
+
+  public void changeLayout(List<LabelElement> elements) throws IOException, JsonParseException, JsonMappingException {
+    layout = MAPPER.writerFor(LAYOUT_TYPE).writeValueAsString(elements);
+  }
 
   public Backend getBackend() {
     return backend;
@@ -118,12 +125,16 @@ public class Printer implements Deletable, Serializable {
     return getId() != UNSAVED_ID;
   }
 
+  public List<LabelElement> parseLayout() throws IOException, JsonParseException, JsonMappingException {
+    return MAPPER.readValue(layout,
+        LAYOUT_TYPE);
+  }
+
   public long printBarcode(User user, int copies, Stream<Barcodable> barcodables)
       throws JsonParseException, JsonMappingException, IOException {
     AtomicLong counter = new AtomicLong();
     if (layoutCache == null) {
-      layoutCache = MAPPER.readValue(layout,
-          TypeFactory.defaultInstance().constructCollectionLikeType(List.class, LabelElement.class));
+      layoutCache = parseLayout();
     }
     backend.print(barcodables//
         .map(b -> {

@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
@@ -38,6 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.PrinterService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.LabelElement;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
@@ -100,6 +103,35 @@ public class PrinterRestController extends RestController {
     }
   }
 
+  public static class DuplicateRequest {
+    private double height;
+    private String name;
+    private double width;
+
+    public double getHeight() {
+      return height;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public double getWidth() {
+      return width;
+    }
+
+    public void setHeight(double height) {
+      this.height = height;
+    }
+
+    public void setName(String name) {
+      this.name = name;
+    }
+
+    public void setWidth(double width) {
+      this.width = width;
+    }
+  }
   public static class PrintRequest {
     private int copies;
     private List<Long> ids;
@@ -142,6 +174,9 @@ public class PrinterRestController extends RestController {
   private static final Logger log = LoggerFactory.getLogger(PrinterRestController.class);
 
   @Autowired
+  private AdvancedSearchParser advancedSearchParser;
+
+  @Autowired
   private AuthorizationManager authorizationManager;
 
   @Autowired
@@ -149,12 +184,6 @@ public class PrinterRestController extends RestController {
 
   @Autowired
   private ContainerService containerService;
-
-  @Autowired
-  private LibraryAliquotService libraryAliquotService;
-
-  @Autowired
-  private AdvancedSearchParser advancedSearchParser;
 
   private final JQueryDataTableBackend<Printer, PrinterDto> jQueryBackend = new JQueryDataTableBackend<Printer, PrinterDto>() {
 
@@ -169,6 +198,9 @@ public class PrinterRestController extends RestController {
     }
 
   };
+
+  @Autowired
+  private LibraryAliquotService libraryAliquotService;
 
   @Autowired
   private LibraryService libraryService;
@@ -243,11 +275,28 @@ public class PrinterRestController extends RestController {
     setState(printerIds, false);
   }
 
+  @PostMapping(value = "{printerId}/duplicate", headers = { "Content-type=application/json" })
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @ResponseBody
+  public void duplicate(@PathVariable("printerId") Long printerId, @RequestBody DuplicateRequest request)
+      throws JsonParseException, JsonMappingException, IOException {
+    Printer printer = printerService.get(printerId);
+    if (printer == null) {
+      throw new RestException("No printer found with ID: " + printerId, Status.NOT_FOUND);
+    }
+    printer.setId(0);
+    printer.setName(request.getName());
+    printer.setWidth(request.getWidth());
+    printer.setHeight(request.getHeight());
+    printerService.create(printer);
+  }
+
   @PutMapping(value = "/enable", headers = { "Content-type=application/json" })
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void enable(@RequestBody List<Long> printerIds) throws IOException {
     setState(printerIds, true);
   }
+
   @GetMapping(value = "{printerId}", produces = "application/json")
   public @ResponseBody PrinterDto get(@PathVariable Long printerId) throws IOException {
     Printer printer = printerService.get(printerId);
@@ -255,6 +304,17 @@ public class PrinterRestController extends RestController {
       throw new RestException("No printer found with ID: " + printerId, Status.NOT_FOUND);
     }
     return Dtos.asDto(printer);
+  }
+
+  @GetMapping(value = "{printerId}/layout", headers = { "Content-type=application/json" })
+  @ResponseBody
+  public List<LabelElement> getLayout(@PathVariable("printerId") Long printerId)
+      throws JsonParseException, JsonMappingException, IOException {
+    Printer printer = printerService.get(printerId);
+    if (printer == null) {
+      throw new RestException("No printer found with ID: " + printerId, Status.NOT_FOUND);
+    }
+    return printer.parseLayout();
   }
 
   @GetMapping(headers = { "Content-type=application/json" })
@@ -279,6 +339,19 @@ public class PrinterRestController extends RestController {
     }
   }
 
+  @PutMapping(value = "{printerId}/layout", headers = { "Content-type=application/json" })
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @ResponseBody
+  public void setLayout(@PathVariable("printerId") Long printerId, @RequestBody List<LabelElement> layout)
+      throws JsonParseException, JsonMappingException, IOException {
+    Printer printer = printerService.get(printerId);
+    if (printer == null) {
+      throw new RestException("No printer found with ID: " + printerId, Status.NOT_FOUND);
+    }
+    printer.changeLayout(layout);
+    printerService.update(printer);
+  }
+
   public void setPrinterService(PrinterService printerService) {
     this.printerService = printerService;
   }
@@ -297,7 +370,6 @@ public class PrinterRestController extends RestController {
       }
     }
   }
-
 
   @PostMapping(value = "{printerId}", headers = { "Content-type=application/json" })
   @ResponseBody

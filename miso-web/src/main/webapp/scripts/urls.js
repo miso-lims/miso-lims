@@ -597,6 +597,8 @@ Urls = (function() {
     create: printerRestBase,
     enable: printerRestBase + '/enable',
     disable: printerRestBase + '/disable',
+    layout: middleIdUrlFunction(printerRestBase, '/layout'),
+    duplicate: middleIdUrlFunction(printerRestBase, '/duplicate'),
     printBoxContents: middleIdUrlFunction(printerRestBase, '/boxcontents'),
     printBoxPositions: middleIdUrlFunction(printerRestBase, '/boxpositions')
   };

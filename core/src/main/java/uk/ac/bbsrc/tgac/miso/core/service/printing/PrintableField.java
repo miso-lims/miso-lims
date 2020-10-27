@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.service.printing;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -7,6 +8,8 @@ import java.util.stream.Stream;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringEscapeUtils;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -295,6 +298,13 @@ public enum PrintableField implements PrintableText {
     final ObjectNode node = JsonNodeFactory.instance.objectNode();
     node.put("use", name());
     return node;
+  }
+
+  @Override
+  public final void asJson(JsonGenerator generator) throws IOException, JsonProcessingException {
+    generator.writeStartObject();
+    generator.writeStringField("use", name());
+    generator.writeEndObject();
   }
 
   @Override
