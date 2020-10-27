@@ -2,7 +2,14 @@
 
 Changes:
 
+  * Added transfer notifications. From the Edit Transfer page, you can now send email notifications to
+    transfer recipients or other interested parties.
 
+Upgrade Notes:
+
+  * Several settings have been added to `miso.properties` to support sending email from MISO for transfer notifications.
+    If you wish to enable this feature, see the documentation for more info:
+    [Site Configuration](https://miso-lims.readthedocs.io/projects/docs/en/latest/admin/site-configuration/#storage-directories).
 
 # 1.17.0
 
@@ -43,7 +50,7 @@ Upgrade Notes:
     -- Add missing subcategory
     -- substitute the correct sampleClassId and subcategory (may be 'RNA (stock)' or 'RNA (aliquot)')
     UPDATE SampleClass SET sampleSubcategory = 'RNA (stock)' WHERE sampleClassId = 123;
-    
+
     -- Remove incorrect subcategory; substitute correct sampleClassId
     UPDATE SampleClass SET sampleSubcategory = NULL WHERE sampleClassId = 123;
 
@@ -334,7 +341,7 @@ Known Issues:
     (unknown)
   * Fill Boxes actions on the bulk Create/Edit Sample and Library Aliquot pages don't work
   * When bulk receiving libraries with the same receipt information, the libraries may be broken into
-    multiple transfers, and the transfers' receipt time may be modified incorrectly 
+    multiple transfers, and the transfers' receipt time may be modified incorrectly
   * Buttons to add/edit box uses link to the wrong URL
   * Tissue processing classes with no subcategory cause errors
 
@@ -402,7 +409,7 @@ Known Issues:
   * Buttons to add/edit box uses link to the wrong URL
   * Tissue processing classes with no subcategory cause errors
 
-# 1.2.0 
+# 1.2.0
 
 Changes:
 

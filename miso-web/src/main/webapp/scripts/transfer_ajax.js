@@ -1,9 +1,11 @@
 var Transfer = (function($) {
 
   var itemsListId = 'listItems';
+  var notificationsListId = 'listNotifications';
 
   var form = null;
   var itemsListConfig = {};
+  var notificationsListConfig = {};
 
   return {
 
@@ -37,6 +39,24 @@ var Transfer = (function($) {
     updateItems: function(updatedItems) {
       var items = removeByTypeAndId(Transfer.getItems(), updatedItems).concat(updatedItems);
       Transfer.setItems(items);
+    },
+
+    setNotificationsListConfig: function(config) {
+      notificationsListConfig = config;
+    },
+
+    setNotifications: function(notifications) {
+      FormUtils.setTableData(ListTarget.transfernotification, notificationsListConfig, notificationsListId, notifications, null);
+    },
+
+    getNotifications: function() {
+      return FormUtils.getTableData(notificationsListId);
+    },
+
+    addNotification: function(notification) {
+      var notifications = Transfer.getNotifications();
+      notifications.push(notification);
+      Transfer.setNotifications(notifications);
     }
 
   };

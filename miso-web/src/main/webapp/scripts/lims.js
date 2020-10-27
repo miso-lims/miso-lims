@@ -433,13 +433,23 @@ var Utils = Utils
           id: "ok",
           text: okButton,
           click: function() {
-            var badFields = fields.filter(function(field) {
+            var missingFields = fields.filter(function(field) {
               return field.required && !output[field.property];
             }).map(function(field) {
               return field.label;
             });
-            if (badFields.length) {
-              alert("You must fill out the following fields: " + badFields.join(", "));
+            if (missingFields.length) {
+              alert("You must fill out the following fields: " + missingFields.join(", "));
+              return;
+            }
+            var invalidFields = fields.filter(function(field) {
+              var value = output[field.property];
+              return field.regex && value && !new RegExp(field.regex).test(value);
+            }).map(function(field) {
+              return field.label;
+            })
+            if (invalidFields.length) {
+              alert("The following fields are invalid: " + invalidFields.join(", "));
               return;
             }
             dialog.dialog("close");
@@ -1062,6 +1072,7 @@ Utils.validation = {
   alphanumRegex: '^[-_\\w]*$',
   unicodeWordRegex: '^[\\p{L}0-9_\\^\\-\\.\\s]+$',
   _unicodeWord: XRegExp('^[\\p{L}0-9_\\^\\-\\.\\s]+$'),
+  emailRegex: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
 
   isNullCheck: function(value) {
     return (value === "" || value === " " || value === "undefined" || value === "&nbsp;" || value === undefined);

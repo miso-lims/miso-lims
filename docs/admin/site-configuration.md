@@ -98,6 +98,60 @@ Username to use for HTTP basic authentication to JIRA.
 
 Password to use for HTTP basic authentication to JIRA.
 
+## Email Notifications
+
+These settings are used for sending transfer notifications and may be used for other notifications in the future.
+
+### `miso.smtp.host`
+
+FQDN of SMTP server to send mail through. If host is unspecified, notifications will not be available.
+
+### `miso.smtp.port`
+
+Port to use for sending email via SMTP. Defaults to 25 if not specified.
+
+### `miso.smtp.ssl`
+
+Whether or not to use SSL for SMTP (true/false). Defaults to false if unspecified.
+
+### `miso.smtp.username`
+
+Username for SMTP authentication. Authentication will not be performed if unspecified.
+
+### `miso.smtp.password`
+
+Password for SMTP authentication. Authentication will not be performed if unspecified.
+
+### `miso.smtp.fromAddress`
+
+Email address to display for sender of outgoing mail.
+
+### `miso.smtp.fromName`
+
+Name to display for sender of outgoing mail. Defaults to "MISO" if unspecified.
+
+### `miso.smtp.holdMinutes`
+
+Minimum number of minutes to wait before sending notifications. This allows time for the user to catch mistakes and
+revise the data or cancel the notification before it is sent.
+
+### `miso.smtp.throttleMinutes`
+
+Defines the time window for throttling outgoing email. Defaults to 60 (minutes) if unspecified.
+
+### `miso.smtp.throttleLimit`
+
+Number of emails that can be sent within the throttle window. Defaults to 25 if unspecified.
+
+### `miso.smtp.internalDomain`
+
+Emails to this domain, if specified, will be considered internal. Internal emails will contain links to MISO entries.
+
+### `miso.internalBaseUrl`
+
+MISO base URL (e.g. "https://miso.example.org"), used for generating links in emails to internal recipients. If
+unspecified, emails will not contain links to MISO entries.
+
 ## Naming Schemes
 
 MISO Naming Schemes are used to validate and generate entity String fields. They are used for all `name` fields, some
