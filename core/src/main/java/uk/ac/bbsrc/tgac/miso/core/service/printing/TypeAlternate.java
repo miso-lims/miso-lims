@@ -1,9 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.core.service.printing;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -27,11 +30,6 @@ public final class TypeAlternate implements PrintableText {
 
   public TypeAlternate(Map<Barcodable.EntityType, PrintableText> options) {
     this.options = options;
-  }
-
-  @Override
-  public Pair<FontStyle, String> line(Barcodable barcodable) {
-    return alternateFor(barcodable).line(barcodable);
   }
 
   private PrintableText alternateFor(Barcodable barcodable) {
@@ -80,6 +78,30 @@ public final class TypeAlternate implements PrintableText {
   }
 
   @Override
+  public JsonNode asJson() {
+    final ObjectNode node = JsonNodeFactory.instance.objectNode();
+    for (Entry<Barcodable.EntityType, PrintableText> option : options.entrySet()) {
+      node.set(option.getKey().name(), option.getValue().asJson());
+    }
+    return node;
+  }
+
+  @Override
+  public void asJson(JsonGenerator generator) throws IOException, JsonProcessingException {
+    generator.writeStartObject();
+    for (final Map.Entry<EntityType, PrintableText> entry : options.entrySet()) {
+      generator.writeFieldName(entry.getKey().name());
+      entry.getValue().asJson(generator);
+    }
+    generator.writeEndObject();
+  }
+
+  @Override
+  public Pair<FontStyle, String> line(Barcodable barcodable) {
+    return alternateFor(barcodable).line(barcodable);
+  }
+
+  @Override
   public Stream<Pair<FontStyle, String>> lines(Barcodable barcodable) {
     return alternateFor(barcodable).lines(barcodable);
   }
@@ -87,15 +109,6 @@ public final class TypeAlternate implements PrintableText {
   @Override
   public String text(Barcodable barcodable) {
     return alternateFor(barcodable).text(barcodable);
-  }
-
-  @Override
-  public JsonNode asJson() {
-    final ObjectNode node = JsonNodeFactory.instance.objectNode();
-    for (Entry<Barcodable.EntityType, PrintableText> option : options.entrySet()) {
-      node.set(option.getKey().name(), option.getValue().asJson());
-    }
-    return node;
   }
 
 }

@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.ObjectCodec;
@@ -34,6 +35,11 @@ public class PrintableTextDeserializer extends JsonDeserializer<PrintableText> {
     @Override
     public JsonNode asJson() {
       return JsonNodeFactory.instance.textNode(text);
+    }
+
+    @Override
+    public void asJson(JsonGenerator generator) throws IOException, JsonProcessingException {
+      generator.writeString(text);
     }
 
     @Override
@@ -66,6 +72,15 @@ public class PrintableTextDeserializer extends JsonDeserializer<PrintableText> {
         results.add(field.asJson());
       }
       return results;
+    }
+
+    @Override
+    public void asJson(JsonGenerator generator) throws IOException, JsonProcessingException {
+      generator.writeStartArray();
+      for (final PrintableText field : fields) {
+        field.asJson(generator);
+      }
+      generator.writeEndArray();
     }
 
     @Override

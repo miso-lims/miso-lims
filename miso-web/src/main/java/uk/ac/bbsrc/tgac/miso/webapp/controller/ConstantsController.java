@@ -99,6 +99,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.TissuePieceTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.TissueTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.PrintableField;
 import uk.ac.bbsrc.tgac.miso.core.util.IlluminaExperiment;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.SampleSheet;
@@ -304,6 +305,7 @@ public class ConstantsController {
       addJsonArray(mapper, node, "poolSpreadsheets", Arrays.asList(PoolSpreadSheets.values()), Dtos::asDto);
       addJsonArray(mapper, node, "partitionSpreadsheets", Arrays.asList(PartitionSpreadsheets.values()), Dtos::asDto);
       addJsonArray(mapper, node, "workflows", Arrays.asList(WorkflowName.values()), Dtos::asDto);
+      addJsonArray(mapper, node, "printableFields", Arrays.asList(PrintableField.values()), PrintableField::name);
 
       ArrayNode platformTypes = node.putArray("platformTypes");
       Collection<PlatformType> activePlatformTypes = instrumentModelService.listActivePlatformTypes();

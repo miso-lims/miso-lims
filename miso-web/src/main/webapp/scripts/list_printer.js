@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 ListTarget.printer = {
   name: "Printers",
   getUserManualUrl: function() {
@@ -35,7 +12,6 @@ ListTarget.printer = {
       "name": "Enable",
       "action": function(items) {
         Utils.ajaxWithDialog('Enabling Printer', 'PUT', Urls.rest.printers.enable, items.map(Utils.array.getId), Utils.page.pageReload);
-
       }
     }, {
       "name": "Disable",
@@ -43,7 +19,74 @@ ListTarget.printer = {
         Utils.ajaxWithDialog('Disabling Printer', 'PUT', Urls.rest.printers.disable, items.map(Utils.array.getId), Utils.page.pageReload);
 
       }
-    }, ListUtils.createBulkDeleteAction("Printers", 'printers', Utils.array.getName)];
+    }, {
+      "name": "Duplicate",
+      "action": function(items) {
+        if (items.length > 1) {
+          Utils.showOkDialog('Duplicate Printer', ['One at a time please.']);
+        }
+        Utils.showDialog('Duplicate Printer', 'Duplicate', [{
+          type: "text",
+          label: "New Name",
+          required: true,
+          property: "name"
+        }, {
+          type: "float",
+          label: "Width (mm)",
+          property: "width",
+          required: true,
+          value: items[0].width
+        }, {
+          type: "float",
+          label: "Height (mm)",
+          property: "height",
+          required: true,
+          value: items[0].height
+        }], function(settings) {
+          if (!settings.name) {
+            Utils.showOkDialog('Create Printer', ['A printer needs a name.']);
+            return;
+          }
+          Utils.ajaxWithDialog('Saving Printer', 'POST', Urls.rest.printers.duplicate(items[0].id), {
+            "height": settings.height,
+            "name": settings.name,
+            "width": settings.width,
+          }, Utils.page.pageReload);
+        });
+      }
+    }, ListUtils.createBulkDeleteAction("Printers", 'printers', Utils.array.getName), {
+      "name": "Edit Label Design",
+      "action": function(items) {
+        function loadLayout(printerId) {
+          Utils.ajaxWithDialog('Getting Label Layout', 'GET', Urls.rest.printers.layout(printerId), null, function(layout) {
+            var width = items[0].width;
+            var height = items[0].height;
+            for (var i = 1; i < items.length; i++) {
+              width = Math.min(items[i].width, width);
+              height = Math.min(items[i].height, height);
+            }
+            printerLabelEditor(layout, width, height, function(updatedLayout) {
+              items.forEach(function(printer) {
+                Utils.ajaxWithDialog('Saving Label Layout', 'PUT', Urls.rest.printers.layout(printer.id), updatedLayout, function() {
+                });
+              });
+            });
+          });
+        }
+        if (items.length == 1) {
+          loadLayout(items[0].id);
+        } else {
+          Utils.showWizardDialog('Start with label', items.map(function(printer) {
+            return {
+              name: "Use Label from " + printer.name,
+              handler: function() {
+                loadLayout(printer.id);
+              }
+            };
+          }));
+        }
+      }
+    }];
   },
   createStaticActions: function(config, projectId) {
     if (config.isAdmin) {
@@ -53,6 +96,7 @@ ListTarget.printer = {
           Utils.showDialog('Add Printer', 'Next', [{
             type: "text",
             label: "Name",
+            required: true,
             property: "name"
           }, {
             type: "select",
@@ -60,17 +104,15 @@ ListTarget.printer = {
             property: "driver",
             values: Constants.printerDrivers.map(Utils.array.getName)
           }, {
-            type: "text",
+            type: "float",
             label: "Width (mm)",
+            required: true,
             property: "width",
           }, {
-            type: "text",
+            type: "float",
             label: "Height (mm)",
+            required: true,
             property: "height",
-          }, {
-            type: "text",
-            label: "Layout",
-            property: "layout",
           }, {
             type: "select",
             label: "Backend",
@@ -84,13 +126,6 @@ ListTarget.printer = {
               Utils.showOkDialog('Create Printer', ['A printer needs a name.']);
               return;
             }
-            var layout;
-            try {
-              layout = JSON.parse(printer.layout);
-            } catch (e) {
-              Utils.showOkDialog('Create Printer', ['Layout must be valid JSON.']);
-              return;
-            }
             var save = function(printerConfig) {
 
               Utils.ajaxWithDialog('Saving Printer', 'POST', Urls.rest.printers.create, {
@@ -100,7 +135,7 @@ ListTarget.printer = {
                 "configuration": printerConfig,
                 "driver": printer.driver,
                 "height": printer.height,
-                "layout": layout,
+                "layout": [],
                 "name": printer.name,
                 "width": printer.width,
               }, Utils.page.pageReload);
