@@ -4,12 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -18,7 +13,8 @@ public enum LibrarySpreadSheets implements Spreadsheet<Library> {
       Column.forString("Name", Library::getName), //
       Column.forString("Alias", Library::getAlias), //
       Column.forString("Barcode", Library::getIdentificationBarcode), //
-      Column.forString("Library Type", library -> library.getLibraryType().getDescription()), //
+      Column.forString("Library Type", library -> library.getLibraryType().getDescription()),
+      Column.forString("Library Design", library -> LimsUtils.isDetailedLibrary(library)? ((DetailedLibrary)library).getLibraryDesignCode().toString(): ""), //
       Column.forString("i7 Index Name", listIndexName(1)), //
       Column.forString("i7 Index", listIndex(1)), //
       Column.forString("i5 Index Name", listIndexName(2)), //
