@@ -6,12 +6,8 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -25,6 +21,7 @@ public enum LibraryAliquotSpreadSheets implements Spreadsheet<LibraryAliquot> {
       Column.forString("Library Alias", libraryAliquot -> libraryAliquot.getLibrary().getAlias()), //
       Column.forString("Library Barcode", libraryAliquot -> libraryAliquot.getLibrary().getIdentificationBarcode()), //
       Column.forString("Library Type", libraryAliquot -> libraryAliquot.getLibrary().getLibraryType().getDescription()), //
+      Column.forString("Library Design", true, libraryAliquot -> ((DetailedLibraryAliquot)libraryAliquot).getLibraryDesignCode().getCode()), //
       Column.forString("Index(es)", LibraryAliquotSpreadSheets::listIndices), //
       Column.forString("i7 Index", listIndex(1)), //
       Column.forString("i5 Index", listIndex(2)), //
