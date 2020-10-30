@@ -21,7 +21,7 @@ public enum LibraryAliquotSpreadSheets implements Spreadsheet<LibraryAliquot> {
       Column.forString("Library Alias", libraryAliquot -> libraryAliquot.getLibrary().getAlias()), //
       Column.forString("Library Barcode", libraryAliquot -> libraryAliquot.getLibrary().getIdentificationBarcode()), //
       Column.forString("Library Type", libraryAliquot -> libraryAliquot.getLibrary().getLibraryType().getDescription()), //
-      Column.forString("Library Design", libraryAliquot -> LimsUtils.isDetailedLibraryAliquot(libraryAliquot)? ((DetailedLibraryAliquot)libraryAliquot).getLibraryDesignCode().getCode(): ""), //
+      Column.forString("Library Design", true, libraryAliquot -> ((DetailedLibraryAliquot)libraryAliquot).getLibraryDesignCode().getCode()), //
       Column.forString("Index(es)", LibraryAliquotSpreadSheets::listIndices), //
       Column.forString("i7 Index", listIndex(1)), //
       Column.forString("i5 Index", listIndex(2)), //

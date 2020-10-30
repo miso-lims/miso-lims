@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import uk.ac.bbsrc.tgac.miso.core.data.*;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -14,7 +15,7 @@ public enum LibrarySpreadSheets implements Spreadsheet<Library> {
       Column.forString("Alias", Library::getAlias), //
       Column.forString("Barcode", Library::getIdentificationBarcode), //
       Column.forString("Library Type", library -> library.getLibraryType().getDescription()),
-      Column.forString("Library Design", library -> LimsUtils.isDetailedLibrary(library)? ((DetailedLibrary)library).getLibraryDesignCode().getCode(): ""), //
+      Column.forString("Library Design", true, library -> ((DetailedLibrary)library).getLibraryDesignCode().getCode()), //
       Column.forString("i7 Index Name", listIndexName(1)), //
       Column.forString("i7 Index", listIndex(1)), //
       Column.forString("i5 Index Name", listIndexName(2)), //
