@@ -14,7 +14,7 @@ public enum LibrarySpreadSheets implements Spreadsheet<Library> {
       Column.forString("Alias", Library::getAlias), //
       Column.forString("Barcode", Library::getIdentificationBarcode), //
       Column.forString("Library Type", library -> library.getLibraryType().getDescription()),
-      Column.forString("Library Design", library -> LimsUtils.isDetailedLibrary(library)? ((DetailedLibrary)library).getLibraryDesignCode().toString(): ""), //
+      Column.forString("Library Design", library -> LimsUtils.isDetailedLibrary(library)? ((DetailedLibrary)library).getLibraryDesignCode().getCode(): ""), //
       Column.forString("i7 Index Name", listIndexName(1)), //
       Column.forString("i7 Index", listIndex(1)), //
       Column.forString("i5 Index Name", listIndexName(2)), //
