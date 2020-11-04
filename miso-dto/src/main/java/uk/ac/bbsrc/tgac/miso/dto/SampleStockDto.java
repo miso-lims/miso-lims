@@ -12,7 +12,6 @@ public class SampleStockDto extends SampleTissueDto {
   private Long tissueProcessingClassId;
   private String concentration;
   private String strStatus;
-  private Boolean dnaseTreated;
   private Long referenceSlideId;
   private List<SampleDto> relatedSlides;
 
@@ -40,14 +39,6 @@ public class SampleStockDto extends SampleTissueDto {
 
   public void setStrStatus(String strStatus) {
     this.strStatus = strStatus;
-  }
-
-  public Boolean getDnaseTreated() {
-    return dnaseTreated;
-  }
-
-  public void setDnaseTreated(Boolean dnaseTreated) {
-    this.dnaseTreated = dnaseTreated;
   }
 
   public Long getReferenceSlideId() {

@@ -13,16 +13,19 @@ import org.junit.Before;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotRna;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStockRna;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotRnaImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotSingleCellImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleSingleCellImpl;
@@ -181,8 +184,8 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
     assertEntityAttribute(SamColumns.LOADING_CELL_CONC, attributes, sample, s -> emptyIfNull(s.getLoadingCellConcentration()));
   }
 
-  protected void assertRnaStockSampleAttributes(Map<String, String> attributes, SampleStock sample) {
-    assertEntityAttribute(SamColumns.DNASE_TREATED, attributes, sample, s -> booleanString(s.getDNAseTreated()));
+  protected void assertRnaStockSampleAttributes(Map<String, String> attributes, SampleStockRna sample) {
+    assertEntityAttribute(SamColumns.DNASE_TREATED, attributes, sample, s -> booleanString(s.getDnaseTreated()));
   }
 
   protected void assertAliquotAttributes(Map<String, String> attributes, SampleAliquot sample) {
@@ -260,7 +263,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
     }
   }
 
-  protected void assertAllForStock(Map<String, String> stock, Long sampleId, boolean newlyCreated, boolean isRNA) {
+  protected void assertAllForStock(Map<String, String> stock, Long sampleId, boolean newlyCreated) {
     SampleStock target = (SampleStock) getSession().get(SampleStockImpl.class, sampleId);
 
     assertPlainSampleAttributes(stock, target, newlyCreated);
@@ -268,9 +271,23 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
     assertStockAttributes(stock, target);
     assertAnalyteAttributes(stock, target);
 
-    if (isRNA) {
-      assertRnaStockSampleAttributes(stock, target);
+    if (newlyCreated) {
+      SampleTissue tissueParent = LimsUtils.getParent(SampleTissue.class, target);
+      assertTissueAttributes(stock, tissueParent);
+
+      SampleIdentity identityAncestor = LimsUtils.getParent(SampleIdentity.class, target);
+      assertIdentityAttributes(stock, identityAncestor);
     }
+  }
+
+  protected void assertAllForRnaStock(Map<String, String> stock, Long sampleId, boolean newlyCreated) {
+    SampleStockRna target = (SampleStockRna) getSession().get(SampleStockImpl.class, sampleId);
+
+    assertPlainSampleAttributes(stock, target, newlyCreated);
+    assertDetailedSampleAttributes(stock, target);
+    assertStockAttributes(stock, target);
+    assertRnaStockSampleAttributes(stock, target);
+    assertAnalyteAttributes(stock, target);
 
     if (newlyCreated) {
       SampleTissue tissueParent = LimsUtils.getParent(SampleTissue.class, target);
@@ -302,7 +319,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
     }
   }
 
-  protected void assertAllForAliquot(Map<String, String> aliquot, Long sampleId, boolean newlyCreated, boolean isRNA) {
+  protected void assertAllForAliquot(Map<String, String> aliquot, Long sampleId, boolean newlyCreated) {
     SampleAliquot target = (SampleAliquot) getSession().get(SampleAliquotImpl.class, sampleId);
 
     assertPlainSampleAttributes(aliquot, target, newlyCreated);
@@ -313,9 +330,25 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
     if (newlyCreated) {
       SampleStock stockParent = LimsUtils.getParent(SampleStock.class, target);
       assertStockAttributes(aliquot, stockParent);
-      if (isRNA) {
-        assertRnaStockSampleAttributes(aliquot, stockParent);
-      }
+
+      SampleTissue tissueParent = LimsUtils.getParent(SampleTissue.class, target);
+      assertTissueAttributes(aliquot, tissueParent);
+    }
+  }
+
+  protected void assertAllForRnaAliquot(Map<String, String> aliquot, Long sampleId, boolean newlyCreated) {
+    SampleAliquotRna target = (SampleAliquotRna) getSession().get(SampleAliquotRnaImpl.class, sampleId);
+    assertNotNull(target);
+
+    assertPlainSampleAttributes(aliquot, target, newlyCreated);
+    assertDetailedSampleAttributes(aliquot, target);
+    assertAnalyteAttributes(aliquot, target);
+    assertAliquotAttributes(aliquot, target);
+
+    if (newlyCreated) {
+      SampleStockRna stockParent = LimsUtils.getParent(SampleStockRna.class, target);
+      assertStockAttributes(aliquot, stockParent);
+      assertRnaStockSampleAttributes(aliquot, stockParent);
 
       SampleTissue tissueParent = LimsUtils.getParent(SampleTissue.class, target);
       assertTissueAttributes(aliquot, tissueParent);

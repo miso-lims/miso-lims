@@ -9,20 +9,24 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.SamColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 
 public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
 
-  private BulkSamplePage getPropagatePage(List<Long> parentIds, Integer quantity, Long sampleClassId) {
-    return BulkSamplePage.getForPropagate(getDriver(), getBaseUrl(), parentIds, Arrays.asList(quantity), sampleClassId);
+  private BulkSamplePage getPropagatePage(List<Long> parentIds, Integer quantity, String sampleCategory) {
+    return BulkSamplePage.getForPropagate(getDriver(), getBaseUrl(), parentIds, Arrays.asList(quantity), sampleCategory);
   }
 
   @Test
   public void testPropagateTissueFromIdentity() {
     // goal: ensure one tissue can be propagated from one identity
-    BulkSamplePage page = getPropagatePage(Arrays.asList(4441L), 1, tissueClassId);
+    BulkSamplePage page = getPropagatePage(Arrays.asList(4441L), 1, SampleTissue.CATEGORY_NAME);
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new LinkedHashMap<>();
@@ -64,13 +68,14 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
   @Test
   public void testPropagateTissuePieceFromSlide() {
     // goal: ensure one curls can be propagated from one slide
-    BulkSamplePage page = getPropagatePage(Arrays.asList(4443L), 1, tissuePieceClassId);
+    BulkSamplePage page = getPropagatePage(Arrays.asList(4443L), 1, SampleTissueProcessing.CATEGORY_NAME);
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new LinkedHashMap<>();
     attrs.put(SamColumns.DESCRIPTION, "Description");
     attrs.put(SamColumns.CREATION_DATE, "2017-07-17");
     attrs.put(SamColumns.ID_BARCODE, "4440-Curls");
+    attrs.put(SamColumns.SAMPLE_CLASS, "Tissue Piece");
     attrs.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     attrs.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
     attrs.put(SamColumns.GROUP_ID, "1");
@@ -100,13 +105,14 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
   @Test
   public void testPropagateSlideFromTissue() {
     // goal: ensure one slide can be propagated from one tissue
-    BulkSamplePage page = getPropagatePage(Arrays.asList(4442L), 1, slideClassId);
+    BulkSamplePage page = getPropagatePage(Arrays.asList(4442L), 1, SampleTissueProcessing.CATEGORY_NAME);
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new LinkedHashMap<>();
     attrs.put(SamColumns.DESCRIPTION, "Description");
     attrs.put(SamColumns.CREATION_DATE, "2017-07-17");
     attrs.put(SamColumns.ID_BARCODE, "PROP-Slide");
+    attrs.put(SamColumns.SAMPLE_CLASS, "Slide");
     attrs.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     attrs.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
     attrs.put(SamColumns.GROUP_ID, "1");
@@ -138,13 +144,14 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
   @Test
   public void testPropagateCdnaStockFromTissue() {
     // goal: ensure one cDNA stock can be propagated from one tissue
-    BulkSamplePage page = getPropagatePage(Arrays.asList(4442L), 1, cStockClassId);
+    BulkSamplePage page = getPropagatePage(Arrays.asList(4442L), 1, SampleStock.CATEGORY_NAME);
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new LinkedHashMap<>();
     attrs.put(SamColumns.DESCRIPTION, "Description");
     attrs.put(SamColumns.CREATION_DATE, "2017-07-17");
     attrs.put(SamColumns.ID_BARCODE, "PROP-CDNA");
+    attrs.put(SamColumns.SAMPLE_CLASS, "cDNA (stock)");
     attrs.put(SamColumns.SAMPLE_TYPE, "TRANSCRIPTOMIC");
     attrs.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
     attrs.put(SamColumns.GROUP_ID, "1");
@@ -169,19 +176,20 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.NAME, savedTable.getText(SamColumns.NAME, 0));
     attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, savedTable.getText(k, 0)));
     // verify attributes against what got saved to the database
-    assertAllForStock(attrs, getIdForRow(savedTable, 0), true, false);
+    assertAllForStock(attrs, getIdForRow(savedTable, 0), true);
   }
 
   @Test
   public void testPropagateRnaStockFromTissue() {
     // goal: ensure one whole RNA stock can be propagated from one tissue
-    BulkSamplePage page = getPropagatePage(Arrays.asList(4442L), 1, rStockClassId);
+    BulkSamplePage page = getPropagatePage(Arrays.asList(4442L), 1, SampleStock.CATEGORY_NAME);
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new LinkedHashMap<>();
     attrs.put(SamColumns.DESCRIPTION, "Description");
     attrs.put(SamColumns.CREATION_DATE, "2017-07-17");
     attrs.put(SamColumns.ID_BARCODE, "PROP-RNASTOCK");
+    attrs.put(SamColumns.SAMPLE_CLASS, "whole RNA (stock)");
     attrs.put(SamColumns.SAMPLE_TYPE, "TRANSCRIPTOMIC");
     attrs.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
     attrs.put(SamColumns.GROUP_ID, "1");
@@ -207,19 +215,20 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.NAME, savedTable.getText(SamColumns.NAME, 0));
     attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, savedTable.getText(k, 0)));
     // verify attributes against what got saved to the database
-    assertAllForStock(attrs, getIdForRow(savedTable, 0), true, true);
+    assertAllForRnaStock(attrs, getIdForRow(savedTable, 0), true);
   }
 
   @Test
   public void testPropagateLcmTubeFromSlide() {
     // goal: ensure one LCM Tube can be propagated from one slide
-    BulkSamplePage page = getPropagatePage(Arrays.asList(4443L), 1, lcmTubeClassId);
+    BulkSamplePage page = getPropagatePage(Arrays.asList(4443L), 1, SampleTissueProcessing.CATEGORY_NAME);
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new LinkedHashMap<>();
     attrs.put(SamColumns.DESCRIPTION, "Description");
     attrs.put(SamColumns.CREATION_DATE, "2017-07-17");
     attrs.put(SamColumns.ID_BARCODE, "PROP-LCM");
+    attrs.put(SamColumns.SAMPLE_CLASS, "Tissue Piece");
     attrs.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     attrs.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
     attrs.put(SamColumns.GROUP_ID, "1");
@@ -249,13 +258,14 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
   @Test
   public void testPropagateGdnaStockFromLcmTube() {
     // goal: ensure one gDNA stock can be propagated from one LCM Tube
-    BulkSamplePage page = getPropagatePage(Arrays.asList(4444L), 1, gStockClassId);
+    BulkSamplePage page = getPropagatePage(Arrays.asList(4444L), 1, SampleStock.CATEGORY_NAME);
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new LinkedHashMap<>();
     attrs.put(SamColumns.DESCRIPTION, "Description");
     attrs.put(SamColumns.CREATION_DATE, "");
     attrs.put(SamColumns.ID_BARCODE, "PROP-GDNA");
+    attrs.put(SamColumns.SAMPLE_CLASS, "gDNA (stock)");
     attrs.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     attrs.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
     attrs.put(SamColumns.GROUP_ID, "1");
@@ -279,19 +289,20 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.ALIAS, savedTable.getText(SamColumns.ALIAS, 0));
     attrs.put(SamColumns.NAME, savedTable.getText(SamColumns.NAME, 0));
     // verify attributes against what got saved to the database
-    assertAllForStock(attrs, getIdForRow(savedTable, 0), true, false);
+    assertAllForStock(attrs, getIdForRow(savedTable, 0), true);
   }
 
   @Test
   public void testPropagateCdnaAliquotFromStock() {
     // goal: ensure one cDNA aliquot can be propagated from one cDNA stock
-    BulkSamplePage page = getPropagatePage(Arrays.asList(4445L), 1, cAliquotClassId);
+    BulkSamplePage page = getPropagatePage(Arrays.asList(4445L), 1, SampleAliquot.CATEGORY_NAME);
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new LinkedHashMap<>();
     attrs.put(SamColumns.DESCRIPTION, "Description");
     attrs.put(SamColumns.CREATION_DATE, "2017-07-17");
     attrs.put(SamColumns.ID_BARCODE, "PROP-CDNA-ALIQUOT");
+    attrs.put(SamColumns.SAMPLE_CLASS, "cDNA (aliquot)");
     attrs.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     attrs.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
     attrs.put(SamColumns.GROUP_ID, "1");
@@ -303,7 +314,6 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     // add in fields that are read-only
     attrs.put(SamColumns.PARENT_ALIAS, "PROP_0001_nn_n_1-1_D_S1");
     attrs.put(SamColumns.PARENT_SAMPLE_CLASS, "cDNA (stock)");
-    attrs.put(SamColumns.SAMPLE_CLASS, "cDNA (aliquot)");
 
     attrs.forEach((k, v) -> assertEquals("pre-save", v, table.getText(k, 0)));
     assertTrue(page.save(false));
@@ -313,19 +323,20 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.NAME, savedTable.getText(SamColumns.NAME, 0));
     attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, savedTable.getText(k, 0)));
     // verify attributes against what got saved to the database
-    assertAllForAliquot(attrs, getIdForRow(savedTable, 0), true, false);
+    assertAllForAliquot(attrs, getIdForRow(savedTable, 0), true);
   }
 
   @Test
   public void testPropagateWholeRnaAliquotFromStock() {
     // goal: ensure one whole RNA aliquot can be propagated from one whole RNA stock
-    BulkSamplePage page = getPropagatePage(Arrays.asList(4446L), 1, rAliquotClassId);
+    BulkSamplePage page = getPropagatePage(Arrays.asList(4446L), 1, SampleAliquot.CATEGORY_NAME);
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new LinkedHashMap<>();
     attrs.put(SamColumns.DESCRIPTION, "Description");
     attrs.put(SamColumns.CREATION_DATE, "2017-07-17");
     attrs.put(SamColumns.ID_BARCODE, "PROP-RNA-ALIQUOT");
+    attrs.put(SamColumns.SAMPLE_CLASS, "whole RNA (aliquot)");
     attrs.put(SamColumns.SAMPLE_TYPE, "TRANSCRIPTOMIC");
     attrs.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
     attrs.put(SamColumns.GROUP_ID, "1");
@@ -347,19 +358,20 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.NAME, savedTable.getText(SamColumns.NAME, 0));
     attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, savedTable.getText(k, 0)));
     // verify attributes against what got saved to the database
-    assertAllForAliquot(attrs, getIdForRow(savedTable, 0), true, true);
+    assertAllForRnaAliquot(attrs, getIdForRow(savedTable, 0), true);
   }
 
   @Test
   public void testPropagateMrnaFromAliquot() {
     // goal: ensure one mRNA can be propagated from one whole RNA aliquot
-    BulkSamplePage page = getPropagatePage(Arrays.asList(4447L), 1, mRnaClassId);
+    BulkSamplePage page = getPropagatePage(Arrays.asList(4447L), 1, SampleAliquot.CATEGORY_NAME);
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new LinkedHashMap<>();
     attrs.put(SamColumns.DESCRIPTION, "Description");
     attrs.put(SamColumns.CREATION_DATE, "2017-07-17");
     attrs.put(SamColumns.ID_BARCODE, "PROP-MRNA");
+    attrs.put(SamColumns.SAMPLE_CLASS, "mRNA");
     attrs.put(SamColumns.SAMPLE_TYPE, "TRANSCRIPTOMIC");
     attrs.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
     attrs.put(SamColumns.GROUP_ID, "1");
@@ -381,13 +393,13 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.NAME, savedTable.getText(SamColumns.NAME, 0));
     attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, savedTable.getText(k, 0)));
     // verify attributes against what got saved to the database
-    assertAllForAliquot(attrs, getIdForRow(savedTable, 0), true, true);
+    assertAllForRnaAliquot(attrs, getIdForRow(savedTable, 0), true);
   }
 
   @Test
   public void testPropagateSpecifiedReplicates() {
     BulkSamplePage page = BulkSamplePage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100003L, 110003L, 120003L),
-        Arrays.asList(1, 2, 3), 15L);
+        Arrays.asList(1, 2, 3), SampleAliquot.CATEGORY_NAME);
     HandsOnTable table = page.getTable();
     assertEquals(6, table.getRowCount());
     assertEquals("1IPO_0001_Ly_P_1-1_D_S1", table.getText(SamColumns.PARENT_ALIAS, 0));

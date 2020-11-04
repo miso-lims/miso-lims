@@ -97,11 +97,6 @@ FormTarget.sampleclass = (function($) {
       disabled: true,
       description: fieldDescriptions.directCreationAllowed
     }, {
-      title: 'DNase Treatable?',
-      data: 'dnaseTreatable',
-      type: 'checkbox',
-      disabled: true
-    }, {
       title: 'Archived',
       data: 'archived',
       type: 'checkbox',
@@ -170,10 +165,6 @@ FormTarget.sampleclass = (function($) {
           data: 'directCreationAllowed',
           type: 'checkbox',
           description: fieldDescriptions.directCreationAllowed
-        }, {
-          title: 'DNase Treatable?',
-          data: 'dnaseTreatable',
-          type: 'checkbox'
         }, {
           title: 'Archived',
           data: 'archived',

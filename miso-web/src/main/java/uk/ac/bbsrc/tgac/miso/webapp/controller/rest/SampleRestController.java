@@ -238,11 +238,11 @@ public class SampleRestController extends RestController {
         if (processingClass != null) {
           dto.setTissueProcessingClassId(processingClass.getId());
           // infer tissue class
-          dto.setParentTissueSampleClassId(inferIntermediateSampleClassId(dto, dto.getTissueProcessingClassId(),
+          dto.setParentSampleClassId(inferIntermediateSampleClassId(dto, dto.getTissueProcessingClassId(),
               SampleTissueProcessing.CATEGORY_NAME, SampleTissue.CATEGORY_NAME, false));
         } else {
           // infer tissue class
-          dto.setParentTissueSampleClassId(inferIntermediateSampleClassId(dto, dto.getStockClassId(),
+          dto.setParentSampleClassId(inferIntermediateSampleClassId(dto, dto.getStockClassId(),
               SampleStock.CATEGORY_NAME, SampleTissue.CATEGORY_NAME, false));
         }
       }
@@ -253,12 +253,12 @@ public class SampleRestController extends RestController {
       if (processingClass != null) {
         dto.setTissueProcessingClassId(processingClass.getId());
         // infer tissue class
-        dto.setParentTissueSampleClassId(
+        dto.setParentSampleClassId(
             inferIntermediateSampleClassId(dto, dto.getTissueProcessingClassId(), SampleTissueProcessing.CATEGORY_NAME,
                 SampleTissue.CATEGORY_NAME, false));
       } else {
         // infer tissue class
-        dto.setParentTissueSampleClassId(
+        dto.setParentSampleClassId(
             inferIntermediateSampleClassId(dto, dto.getSampleClassId(), SampleStock.CATEGORY_NAME,
                 SampleTissue.CATEGORY_NAME, false));
       }
@@ -274,7 +274,7 @@ public class SampleRestController extends RestController {
           topProcessingClassId = lcmDto.getParentSlideClassId();
         }
       }
-      dto.setParentTissueSampleClassId(
+      dto.setParentSampleClassId(
           inferIntermediateSampleClassId(dto, topProcessingClassId, SampleTissueProcessing.CATEGORY_NAME,
               SampleTissue.CATEGORY_NAME, false));
     }

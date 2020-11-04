@@ -5,7 +5,7 @@ public class DetailedSampleDto extends SampleDto implements UpstreamQcFailableDt
   private Long parentId;
   private String parentAlias;
   private String parentBoxPositionLabel;
-  private Long parentTissueSampleClassId;
+  private Long parentSampleClassId;
   private Long sampleClassId;
   private String sampleClassAlias;
   private String sampleCategory;
@@ -54,12 +54,12 @@ public class DetailedSampleDto extends SampleDto implements UpstreamQcFailableDt
     this.parentBoxPositionLabel = parentBoxPositionLabel;
   }
 
-  public Long getParentTissueSampleClassId() {
-    return parentTissueSampleClassId;
+  public Long getParentSampleClassId() {
+    return parentSampleClassId;
   }
 
-  public void setParentTissueSampleClassId(Long parentSampleClassId) {
-    this.parentTissueSampleClassId = parentSampleClassId;
+  public void setParentSampleClassId(Long parentSampleClassId) {
+    this.parentSampleClassId = parentSampleClassId;
   }
 
   public Long getSubprojectId() {

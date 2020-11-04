@@ -24,8 +24,6 @@ public class SampleStockImpl extends DetailedSampleImpl implements SampleStock {
   @Enumerated(EnumType.STRING)
   private StrStatus strStatus = StrStatus.NOT_SUBMITTED;
 
-  private Boolean dnaseTreated;
-
   @ManyToOne(targetEntity = SampleSlideImpl.class)
   @JoinColumn(name = "referenceSlideId")
   private SampleSlide referenceSlide;
@@ -46,16 +44,6 @@ public class SampleStockImpl extends DetailedSampleImpl implements SampleStock {
   }
 
   @Override
-  public Boolean getDNAseTreated() {
-    return dnaseTreated;
-  }
-
-  @Override
-  public void setDNAseTreated(Boolean dnaseTreated) {
-    this.dnaseTreated = dnaseTreated;
-  }
-
-  @Override
   public SampleSlide getReferenceSlide() {
     return referenceSlide;
   }
@@ -67,7 +55,7 @@ public class SampleStockImpl extends DetailedSampleImpl implements SampleStock {
 
   @Override
   public String toString() {
-    return "SampleStockImpl [strStatus=" + strStatus + ", dnaseTreated=" + dnaseTreated + "]";
+    return "SampleStockImpl [strStatus=" + strStatus + "]";
   }
 
   @Override

@@ -2,7 +2,6 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -58,12 +57,6 @@ public interface SampleClass extends Deletable, Identifiable, Serializable, Time
   public boolean isDirectCreationAllowed();
 
   public void setDirectCreationAllowed(boolean directCreationAllowed);
-
-  public boolean getDNAseTreatable();
-
-  public void setDNAseTreatable(boolean treatable);
-
-  public boolean hasPathToDnaseTreatable(Collection<SampleValidRelationship> relationships);
 
   public Set<SampleValidRelationship> getParentRelationships();
 

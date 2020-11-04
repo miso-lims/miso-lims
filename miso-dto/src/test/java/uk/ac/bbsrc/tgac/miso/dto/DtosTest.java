@@ -30,7 +30,7 @@ public class DtosTest {
   public void testToStockWithNewParents() {
     SampleStockDto dto = new SampleStockDto();
     dto.setRootSampleClassId(1L);
-    dto.setParentTissueSampleClassId(2L);
+    dto.setParentSampleClassId(2L);
     dto.setSampleClassId(3L);
     dto.setExternalName("externalName");
     dto.setTissueOriginId(4L);
@@ -63,7 +63,7 @@ public class DtosTest {
   public void testToAliquotWithNewParents() {
     SampleAliquotDto dto = new SampleAliquotDto();
     dto.setRootSampleClassId(1L);
-    dto.setParentTissueSampleClassId(2L);
+    dto.setParentSampleClassId(2L);
     dto.setSampleClassId(4L);
     dto.setExternalName("externalName");
     dto.setTissueOriginId(4L);
@@ -102,7 +102,7 @@ public class DtosTest {
   public void testToAliquotWithExistingParent() {
     SampleAliquotDto dto = new SampleAliquotDto();
     dto.setRootSampleClassId(1L);
-    dto.setParentTissueSampleClassId(2L);
+    dto.setParentSampleClassId(2L);
     dto.setSampleClassId(3L);
     dto.setExternalName("externalName");
     dto.setTissueOriginId(4L);

@@ -1162,7 +1162,8 @@ BulkUtils = (function($) {
             sourceData: source
           });
           if (!tableData[rowIndex][column.data]) {
-            tableData[rowIndex][column.data] = getSourceLabelForValue(source, data[rowIndex][column.data], column);
+            var dataValue = Utils.getObjectField(data[rowIndex], column.data);
+            tableData[rowIndex][column.data] = getSourceLabelForValue(source, dataValue, column);
           }
         }
       }
@@ -1296,11 +1297,14 @@ BulkUtils = (function($) {
     return incrementedString;
   }
 
-  function getColumnIndex(dataProperty, columns) {
+  function getColumnIndex(dataProperty, columns, nullOk) {
     var colIndex = columns.findIndex(function(column) {
       return column.data === dataProperty;
     });
     if (colIndex === -1) {
+      if (nullOk) {
+        return null;
+      }
       throw new Error('No column found for data property: ' + dataProperty);
     }
     return colIndex;
@@ -1481,13 +1485,18 @@ BulkUtils = (function($) {
       },
 
       updateField: function(rowIndex, dataProperty, options) {
-        var colIndex = getColumnIndex(dataProperty, columns);
+        var colIndex = getColumnIndex(dataProperty, columns, tableSaved);
+        if (colIndex === null) {
+          // Column not shown after save - ignore updates
+          return;
+        }
         var column = columns[colIndex];
 
         Object.keys(options).forEach(function(option) {
           switch (option) {
           case 'value':
-            if (options.value !== undefined) {
+            // ignore value updates when showing saved data
+            if (!tableSaved && options.value !== undefined) {
               tableData[rowIndex][dataProperty] = options.value;
             }
             break;

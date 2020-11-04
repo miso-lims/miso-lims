@@ -10,7 +10,8 @@ public interface SampleStock extends DetailedSample {
 
   public static String CATEGORY_NAME = "Stock";
 
-  public static final List<String> SUBCATEGORIES = Collections.unmodifiableList(Arrays.asList(SampleStockSingleCell.SUBCATEGORY_NAME));
+  public static final List<String> SUBCATEGORIES = Collections
+      .unmodifiableList(Arrays.asList(SampleStockSingleCell.SUBCATEGORY_NAME, SampleStockRna.SUBCATEGORY_NAME));
 
   /**
    * @return the short tandem repeat QC status for this SampleAnalyte
@@ -33,10 +34,6 @@ public interface SampleStock extends DetailedSample {
    *           if no StrStatus with the requested label exists
    */
   public void setStrStatus(String strStatus);
-
-  public Boolean getDNAseTreated();
-
-  public void setDNAseTreated(Boolean dnaseTreated);
 
   public SampleSlide getReferenceSlide();
 

@@ -8,7 +8,8 @@ public interface SampleAliquot extends DetailedSample {
 
   public static String CATEGORY_NAME = "Aliquot";
 
-  public static final List<String> SUBCATEGORIES = Collections.unmodifiableList(Arrays.asList(SampleAliquotSingleCell.SUBCATEGORY_NAME));
+  public static final List<String> SUBCATEGORIES = Collections
+      .unmodifiableList(Arrays.asList(SampleAliquotSingleCell.SUBCATEGORY_NAME, SampleAliquotRna.SUBCATEGORY_NAME));
 
   SamplePurpose getSamplePurpose();
 

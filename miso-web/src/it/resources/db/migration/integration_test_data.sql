@@ -82,26 +82,26 @@ INSERT INTO ReferenceGenome (referenceGenomeId, alias, defaultScientificNameId) 
 (3, 'Human hg18 random', 1),
 (4, 'Sasquatch sg12 random', NULL);
 
-INSERT INTO SampleClass (sampleClassId, alias, sampleCategory, sampleSubcategory, suffix, dnaseTreatable, createdBy, creationDate, updatedBy, lastUpdated) VALUES
-(1, 'Identity',             'Identity',          NULL,                    NULL,  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(23, 'Tissue',              'Tissue',            NULL,                    NULL,  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(24, 'Slide',               'Tissue Processing', 'Slide',                 'SL',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(10, 'Tissue Piece',        'Tissue Processing', 'Tissue Piece',          'LCM', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(11, 'gDNA (stock)',        'Stock',             NULL,                    'D_S', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(12, 'gDNA_wga (stock)',    'Stock',             NULL,                    'D_S', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(13, 'whole RNA (stock)',   'Stock',             NULL,                    'R_S', 1, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(14, 'cDNA (stock)',        'Stock',             NULL,                    'D_S', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(15, 'gDNA (aliquot)',      'Aliquot',           NULL,                    'D_',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(16, 'gDNA_wga (aliquot)',  'Aliquot',           NULL,                    'D_',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(17, 'whole RNA (aliquot)', 'Aliquot',           NULL,                    'R_',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(18, 'smRNA',               'Aliquot',           NULL,                    'SM_', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(19, 'mRNA',                'Aliquot',           NULL,                    'MR_', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(20, 'rRNA_depleted',       'Aliquot',           NULL,                    'WT_', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(21, 'cDNA (aliquot)',      'Aliquot',           NULL,                    'D_',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(25, 'Single Cell',         'Tissue Processing', 'Single Cell',           'SC',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(26, 'Single Cell DNA (stock)',   'Stock',       'Single Cell (stock)',   'D_S', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(27, 'Single Cell DNA (aliquot)', 'Aliquot',     'Single Cell (aliquot)', 'D_',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(28, 'Unused', 'Aliquot', NULL, NULL, 0, 1, '2020-02-28 20:08:00', 1, '2020-02-28 20:08:00');
+INSERT INTO SampleClass (sampleClassId, alias, sampleCategory, sampleSubcategory, suffix, createdBy, creationDate, updatedBy, lastUpdated) VALUES
+(1, 'Identity',             'Identity',          NULL,                    NULL,  1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(23, 'Tissue',              'Tissue',            NULL,                    NULL,  1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(24, 'Slide',               'Tissue Processing', 'Slide',                 'SL',  1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(10, 'Tissue Piece',        'Tissue Processing', 'Tissue Piece',          'LCM', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(11, 'gDNA (stock)',        'Stock',             NULL,                    'D_S', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(12, 'gDNA_wga (stock)',    'Stock',             NULL,                    'D_S', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(13, 'whole RNA (stock)',   'Stock',             'RNA (stock)',           'R_S', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(14, 'cDNA (stock)',        'Stock',             NULL,                    'D_S', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(15, 'gDNA (aliquot)',      'Aliquot',           NULL,                    'D_',  1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(16, 'gDNA_wga (aliquot)',  'Aliquot',           NULL,                    'D_',  1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(17, 'whole RNA (aliquot)', 'Aliquot',           'RNA (aliquot)',         'R_',  1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(18, 'smRNA',               'Aliquot',           'RNA (aliquot)',         'SM_', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(19, 'mRNA',                'Aliquot',           'RNA (aliquot)',         'MR_', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(20, 'rRNA_depleted',       'Aliquot',           'RNA (aliquot)',         'WT_', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(21, 'cDNA (aliquot)',      'Aliquot',           NULL,                    'D_',  1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(25, 'Single Cell',         'Tissue Processing', 'Single Cell',           'SC',  1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(26, 'Single Cell DNA (stock)',   'Stock',       'Single Cell (stock)',   'D_S', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(27, 'Single Cell DNA (aliquot)', 'Aliquot',     'Single Cell (aliquot)', 'D_',  1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(28, 'Unused', 'Aliquot', NULL, NULL, 1, '2020-02-28 20:08:00', 1, '2020-02-28 20:08:00');
 
 INSERT INTO SampleValidRelationship (parentId, childId, createdBy, creationDate, updatedBy, lastUpdated, archived) VALUES
 (10, 11, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00', 0),
@@ -580,7 +580,7 @@ INSERT INTO Sample (sampleId, project_projectId, name, alias, description, ident
   FALSE, FALSE, 11, 5, 1, '7357', 'TEST', 1, NULL, 0, 'Stock',
   'SUBMITTED', 0),
 (7, 3, 'SAM7', 'TEST_0001_Bn_R_nn_1-1_R_S1', 'whole RNA stock', '77777', 'GENOMIC', 1, NULL, NULL, NULL, NULL, 1, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00',
-  FALSE, FALSE, 13, 2, 1, '7357', 'TEST', 1, NULL, 0, 'Stock',
+  FALSE, FALSE, 13, 2, 1, '7357', 'TEST', 1, NULL, 0, 'StockRna',
   'NOT_SUBMITTED', 0),
 (10, 3, 'SAM10', 'TEST_0001_Bn_R_nn_1-1_D_S2', 'cDNA stock', '10101', 'GENOMIC', 1, NULL, NULL, NULL, NULL, 1, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00',
   FALSE, FALSE, 14, 7, 2, '7357', 'TEST', 1, NULL, 0, 'Stock',
@@ -621,19 +621,19 @@ INSERT INTO Sample (sampleId, project_projectId, name, alias, description, ident
   FALSE, FALSE, 15, 6, 1, '7357', 'TEST', 1, NULL, 0, 'Aliquot',
   9),
 (9, 3, 'SAM9', 'TEST_0001_Bn_R_nn_1-1_R_1', 'whole RNA aliquot', '99999', 'GENOMIC', 1, NULL, NULL, NULL, NULL, 1, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00',
-  FALSE, FALSE, 17, 7, 1, '7357', 'TEST', 1, NULL, 0, 'Aliquot',
+  FALSE, FALSE, 17, 7, 1, '7357', 'TEST', 1, NULL, 0, 'AliquotRna',
   3),
 (11, 3, 'SAM11', 'TEST_0001_Bn_R_nn_1-1_D_2', 'cDNA aliquot', '11011', 'GENOMIC', 1, NULL, NULL, NULL, NULL, 1, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00',
   FALSE, FALSE, 21, 10, 2, '7357', 'TEST', 1, NULL, 0, 'Aliquot',
   4),
 (12, 3, 'SAM12', 'TEST_0001_Bn_R_nn_1-1_R_1_SM_1', 'smRNA', '12121', 'GENOMIC', 1, NULL, NULL, NULL, NULL, 3, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00',
-  FALSE, FALSE, 18, 9, 1, '7357', 'TEST', 1, NULL, 0, 'Aliquot',
+  FALSE, FALSE, 18, 9, 1, '7357', 'TEST', 1, NULL, 0, 'AliquotRna',
   6),
 (13, 3, 'SAM13', 'TEST_0001_Bn_R_nn_1-1_R_1_MR_1', 'mRNA', '13131', 'GENOMIC', 1, NULL, NULL, NULL, NULL, 1, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00',
-  FALSE, FALSE, 19, 9, 1, '7357', 'TEST', 1, NULL, 0, 'Aliquot',
+  FALSE, FALSE, 19, 9, 1, '7357', 'TEST', 1, NULL, 0, 'AliquotRna',
   7),
 (14, 3, 'SAM14', 'TEST_0001_Bn_R_nn_1-1_R_1_WT_1', 'rRNA_depleted', '14141', 'GENOMIC', 1, NULL, NULL, NULL, NULL, 1, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00',
-  FALSE, FALSE, 20, 9, 1, '7357', 'TEST', 1, NULL, 0, 'Aliquot',
+  FALSE, FALSE, 20, 9, 1, '7357', 'TEST', 1, NULL, 0, 'AliquotRna',
   3),
 (204, 200, 'SAM204', 'SORT_0001_nn_n_1-1_D_1', NULL, NULL, 'GENOMIC', 1, NULL, NULL, NULL, NULL, 1, '2017-08-09 11:51:00', 1, '2017-08-09 11:51:00',
   FALSE, FALSE, 15, 203, NULL, NULL, NULL, 1, NULL, 0, 'Aliquot',
@@ -657,7 +657,7 @@ INSERT INTO Sample (sampleId, project_projectId, name, alias, description, ident
   FALSE, FALSE, 23, 4441, 1, NULL, NULL, NULL, NULL, 0, 'Aliquot',
   NULL),
 (4447, 4440, 'SAM4447', 'PROP_0001_nn_n_1-1_R_1', NULL, NULL, 'GENOMIC', 1, NULL, NULL, NULL, NULL, 1, '2017-10-26 14:40:00', 1, '2017-10-26 14:40:00',
-  FALSE, FALSE, 17, 4446, 1, NULL, NULL, NULL, NULL, 0, 'Aliquot',
+  FALSE, FALSE, 17, 4446, 1, NULL, NULL, NULL, NULL, 0, 'AliquotRna',
   3),
 (100004, 100001, 'SAM100004', 'LIBT_0001_Ly_P_1-1_D1', NULL, NULL, 'GENOMIC', 1, NULL, NULL, NULL, NULL, 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00',
   FALSE, FALSE, 15, 100003, NULL, NULL, NULL, 1, NULL, 0, 'Aliquot',
@@ -1231,3 +1231,7 @@ INSERT INTO Submission_Experiment(submission_submissionId, experiments_experimen
 
 INSERT INTO Printer(printerId, name, driver, backend, configuration, enabled, width, height, layout) VALUES
 (1, 'Printer', 'BRADY', 'BRADY_FTP', '{"host:"127.0.0.1","pin":"0000"}', TRUE, 25, 25, '[{"element":"text", "contents":{"use":"ALIAS"}}]');
+
+-- Keep this at bottom - checked to verify that script has completed and constants all loaded
+INSERT INTO AttachmentCategory(categoryId, alias) VALUES
+(4, 'last entry');

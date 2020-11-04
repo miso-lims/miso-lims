@@ -77,6 +77,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStockRna;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
@@ -268,6 +269,11 @@ public class LimsUtils {
   public static boolean isStockSingleCellSample(Sample sample) {
     if (!isDetailedSample(sample)) return false;
     return sample instanceof SampleStockSingleCell;
+  }
+
+  public static boolean isStockRnaSample(Sample sample) {
+    if (!isDetailedSample(sample)) return false;
+    return sample instanceof SampleStockRna;
   }
 
   public static boolean isAliquotSample(Sample sample) {

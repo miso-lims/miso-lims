@@ -6,7 +6,6 @@ FormTarget.sample = (function($) {
   /*
    * Expected config {
    *   detailedSample: boolean,
-   *   dnaseTreatable: boolean,
    *   projects: array,
    *   sops: array
    * }
@@ -498,7 +497,7 @@ FormTarget.sample = (function($) {
               title: 'DNAse Treated',
               data: 'dnaseTreated',
               type: 'checkbox',
-              include: config.dnaseTreatable,
+              include: object.sampleSubcategory === 'RNA (stock)',
               required: true
             }, {
               title: 'Reference Slide',
