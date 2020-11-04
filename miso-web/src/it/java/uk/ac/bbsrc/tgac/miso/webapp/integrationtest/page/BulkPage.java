@@ -77,7 +77,11 @@ public abstract class BulkPage extends HeaderFooterPage {
       if (!validationErrors.isEmpty()) {
         sb.append("\nFront-end validation errors:");
         validationErrors.forEach((key, value) -> {
-          sb.append("\n  * Row ").append(key).append(": ").append(String.join(", ", value));
+          sb.append("\n  * Row ").append(key).append(":");
+          value.forEach(field -> {
+            String text = getTable().getText(field, key);
+            sb.append("\n    * ").append(field).append(": '").append(text).append("'");
+          });
         });
       }
       List<WebElement> otherErrors = getDriver().findElements(By.cssSelector("#errors *"));

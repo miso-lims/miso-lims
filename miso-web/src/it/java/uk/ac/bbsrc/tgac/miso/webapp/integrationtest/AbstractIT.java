@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.util.TimeZone;
@@ -15,12 +15,15 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.CapabilityType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -37,12 +40,16 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 @ContextConfiguration("/it-context.xml")
 public abstract class AbstractIT {
 
+  private static final Logger log = LoggerFactory.getLogger(AbstractIT.class);
+
   public static final TimeZone EASTERN_TIME_ZONE = TimeZone.getTimeZone("Canada/Eastern");
 
   private static final String SCRIPT_DIR = System.getProperty("basedir") + "/src/it/resources/db/migration/";
   private static final String CLEAR_DATA_SCRIPT = "clear_test_data.sql";
   private static final String PLAIN_SCRIPT = "plainSample_integration_test_data.sql";
   private static final String DETAILED_SCRIPT = "integration_test_data.sql";
+
+  private static Boolean constantsComplete = false;
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -64,7 +71,7 @@ public abstract class AbstractIT {
     ChromeOptions opts = new ChromeOptions();
     opts.setHeadless(true);
     // large width is important so that all columns of handsontables get rendered
-    opts.addArguments("--disable-gpu", "--window-size=5000x1440");
+    opts.addArguments("--disable-gpu", "--window-size=6000x1440");
     LoggingPreferences loggingPrefs = new LoggingPreferences();
     loggingPrefs.enable(LogType.BROWSER, Level.ALL);
     opts.setCapability(CapabilityType.LOGGING_PREFS, loggingPrefs);
@@ -116,12 +123,41 @@ public abstract class AbstractIT {
     LoginPage loginPage = LoginPage.get(getDriver(), getBaseUrl());
     HomePage homePage = loginPage.loginValidUser("user", "user");
     assertNotNull(homePage);
+    verifyConstants();
   }
 
   protected final void loginAdmin() {
     LoginPage loginPage = LoginPage.get(getDriver(), getBaseUrl());
     HomePage homePage = loginPage.loginValidUser("admin", "admin");
     assertNotNull(homePage);
+    verifyConstants();
+  }
+
+  private void verifyConstants() {
+    if (!constantsComplete()) {
+      log.warn("Missing data in constants.js - refreshing");
+      ((JavascriptExecutor) getDriver()).executeScript("jQuery.ajax({type: 'POST', url: '/miso/rest/admin/constants/refresh'})");
+      for (int attempt = 0; attempt < 5; attempt++) {
+        try {
+          Thread.sleep(30000);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+        getDriver().navigate().refresh();
+        if (constantsComplete()) {
+          break;
+        }
+      }
+      assertTrue("Attempts to refresh constants failed", constantsComplete());
+    }
+  }
+
+  private Boolean constantsComplete() {
+    if (!constantsComplete) {
+      constantsComplete = (Boolean) ((JavascriptExecutor) getDriver())
+          .executeScript("return Constants.attachmentCategories.some(cat => cat.alias === 'last entry');");
+    }
+    return constantsComplete;
   }
 
 }
