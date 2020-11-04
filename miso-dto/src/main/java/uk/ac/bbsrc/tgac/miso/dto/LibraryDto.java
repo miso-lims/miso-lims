@@ -74,6 +74,7 @@ public class LibraryDto extends AbstractBoxableDto implements ReceivableDto<Libr
   private Boolean received;
   private Boolean receiptQcPassed;
   private String receiptQcNote;
+  private String sampleBoxPosition;
   private String sampleBoxPositionLabel;
   private Long spikeInId;
   private String spikeInVolume;
@@ -435,6 +436,14 @@ public class LibraryDto extends AbstractBoxableDto implements ReceivableDto<Libr
   @Override
   public void setReceiptQcNote(String receiptQcNote) {
     this.receiptQcNote = receiptQcNote;
+  }
+
+  public String getSampleBoxPosition() {
+    return sampleBoxPosition;
+  }
+
+  public void setSampleBoxPosition(String sampleBoxPosition) {
+    this.sampleBoxPosition = sampleBoxPosition;
   }
 
   public String getSampleBoxPositionLabel() {

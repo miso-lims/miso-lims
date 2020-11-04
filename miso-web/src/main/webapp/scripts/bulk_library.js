@@ -18,6 +18,7 @@ BulkTarget.library = (function($) {
    */
 
   var originalDataByRow = {};
+  var parentLocationsByRow = null;
 
   return {
     getSaveUrl: function() {
@@ -29,7 +30,7 @@ BulkTarget.library = (function($) {
     getUserManualUrl: function() {
       return Urls.external.userManual('samples');
     },
-    getCustomActions: function() {
+    getCustomActions: function(config) {
 
       function findDefaultStatus(pass, defaultText) {
         var potential = Constants.detailedQcStatuses.filter(function(item) {
@@ -46,7 +47,7 @@ BulkTarget.library = (function($) {
       var defaultPassStatus = findDefaultStatus(true, 'Ready');
       var defaultFailStatus = findDefaultStatus(false, 'Failed: QC');
 
-      return BulkUtils.actions.boxable().concat(
+      return BulkUtils.actions.boxable(config.pageMode === 'propagate', parentLocationsByRow).concat(
           {
             name: 'Check QCs',
             action: function(api) {
@@ -129,6 +130,7 @@ BulkTarget.library = (function($) {
               }), HotUtils.makeTransferAction('libraryIds')]);
     },
     prepareData: function(data, config) {
+      parentLocationsByRow = {};
       data.forEach(function(library, index) {
         originalDataByRow[index] = {
           effectiveGroupId: library.effectiveGroupId,
@@ -136,6 +138,9 @@ BulkTarget.library = (function($) {
           libraryTypeId: library.libraryTypeId,
           indexFamilyId: library.indexFamilyId
         };
+        if (library.sampleBoxPosition) {
+          parentLocationsByRow[index] = library.sampleBoxPosition;
+        }
       });
     },
     getFixedColumns: function(config) {

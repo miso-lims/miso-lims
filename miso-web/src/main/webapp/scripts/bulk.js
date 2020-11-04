@@ -6,8 +6,8 @@ BulkUtils = (function($) {
    *       for edits
    *   getUserManualUrl: optional (recommended) function() returning url of specific user manual
    *       page to set on 'Help' link
-   *   getCustomActions: optional function() returning array of Custom Actions (see below) to make
-   *       available on the bulk edit page while editing
+   *   getCustomActions: optional function(config) returning array of Custom Actions (see below) to
+   *       make available on the bulk edit page while editing
    *   getBulkActions: optional function(config) returning array of Bulk Actions (see below) to
    *       make available after successful save
    *   getFixedColumns: optional function(config) returning int. Number of columns to freeze.
@@ -717,8 +717,8 @@ BulkUtils = (function($) {
     },
 
     actions: {
-      boxable: function() {
-        return [{
+      boxable: function(allowMatchParentPos, parentLocationsByRow) {
+        var actions = [{
           name: 'Fill Boxes by Row',
           action: function(api) {
             fillBoxPositions(api, function(a, b) {
@@ -733,6 +733,38 @@ BulkUtils = (function($) {
             });
           }
         }];
+
+        if (allowMatchParentPos && parentLocationsByRow && Object.keys(parentLocationsByRow).length) {
+          actions.push({
+            name: 'Match Parent Positions',
+            action: function(api) {
+              var updates = []; // row, prop, val
+              var missingBoxes = false;
+              for (var row = 0; row < api.getRowCount(); row++) {
+                if (parentLocationsByRow[row]) {
+                  if (api.getValue(row, 'box')) {
+                    updates.push([row, 'boxPosition', parentLocationsByRow[row]]);
+                  } else {
+                    missingBoxes = true;
+                  }
+                }
+              }
+              if (updates.length) {
+                api.updateData(updates);
+              }
+              if (missingBoxes) {
+                var messages = [];
+                if (updates.length) {
+                  messages.push('Only some of the box positions were matched.');
+                }
+                messages.push('You must choose a box before the position can be set.')
+                Utils.showOkDialog('Warning', messages);
+              }
+            }
+          });
+        }
+
+        return actions;
       },
 
       edit: function(url) {
@@ -1579,7 +1611,7 @@ BulkUtils = (function($) {
   }
 
   function setupActions(hot, target, columns, api, config, data) {
-    var actions = target.getCustomActions ? target.getCustomActions() : [];
+    var actions = target.getCustomActions ? target.getCustomActions(config) : [];
     actions.push(makeSortAction(hot, target, columns, api, config, data), makeImportAction(hot), makeExportAction(hot));
     $(ACTION_BAR).empty().append(
         actions.map(function(customAction) {

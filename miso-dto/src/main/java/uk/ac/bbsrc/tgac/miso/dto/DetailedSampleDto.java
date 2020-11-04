@@ -4,6 +4,7 @@ public class DetailedSampleDto extends SampleDto implements UpstreamQcFailableDt
 
   private Long parentId;
   private String parentAlias;
+  private String parentBoxPosition;
   private String parentBoxPositionLabel;
   private Long parentSampleClassId;
   private Long sampleClassId;
@@ -44,6 +45,14 @@ public class DetailedSampleDto extends SampleDto implements UpstreamQcFailableDt
 
   public void setParentAlias(String parentAlias) {
     this.parentAlias = parentAlias;
+  }
+
+  public String getParentBoxPosition() {
+    return parentBoxPosition;
+  }
+
+  public void setParentBoxPosition(String parentBoxPosition) {
+    this.parentBoxPosition = parentBoxPosition;
   }
 
   public String getParentBoxPositionLabel() {

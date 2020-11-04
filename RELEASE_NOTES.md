@@ -5,6 +5,8 @@ Changes:
   * Detailed sample: changed the bulk sample pages to allow creating/editing samples of multiple sample
     classes at once. The tables are now limited to a single sample category (e.g. tissue or stock), and
     fields not applicable to the selected sample class for a particular row will be disabled.
+  * Added "Match Parent Position" action to bulk sample (detailed sample mode only) and bulk library
+    tables to copy the parent items' box positions
   * Fixed an issue that allowed login to time out during bulk save
   * Fixed remember-me token not being checked during REST requests (during saves, searches, etc.),
     causing the requests to fail authentication if the session had timed out
