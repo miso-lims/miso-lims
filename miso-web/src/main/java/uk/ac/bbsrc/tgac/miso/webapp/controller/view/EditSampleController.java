@@ -58,15 +58,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -80,7 +75,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.QcNodeService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
-import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.core.service.SopService;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
@@ -92,15 +86,10 @@ import uk.ac.bbsrc.tgac.miso.dto.DetailedSampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
-import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotSingleCellDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleIdentityDto;
-import uk.ac.bbsrc.tgac.miso.dto.SampleSingleCellDto;
-import uk.ac.bbsrc.tgac.miso.dto.SampleSlideDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleStockDto;
-import uk.ac.bbsrc.tgac.miso.dto.SampleStockSingleCellDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueDto;
-import uk.ac.bbsrc.tgac.miso.dto.SampleTissuePieceDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueProcessingDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
@@ -122,8 +111,6 @@ public class EditSampleController {
   private SampleService sampleService;
   @Autowired
   private LibraryService libraryService;
-  @Autowired
-  private SampleValidRelationshipService sampleValidRelationshipService;
   @Autowired
   private PoolService poolService;
   @Autowired
@@ -162,10 +149,6 @@ public class EditSampleController {
     this.sampleService = sampleService;
   }
 
-  public void setSampleValidRelationshipService(SampleValidRelationshipService sampleValidRelationshipService) {
-    this.sampleValidRelationshipService = sampleValidRelationshipService;
-  }
-
   public void setPoolService(PoolService poolService) {
     this.poolService = poolService;
   }
@@ -189,12 +172,11 @@ public class EditSampleController {
   private static class Config {
     private static final String PROJECTS = "projects";
     private static final String SOPS = "sops";
-    private static final String DNASE_TREATABLE = "dnaseTreatable";
     private static final String DEFAULT_SCI_NAME = "defaultSciName";
     private static final String DEFAULT_LCM_TUBE_GROUP_ID = "defaultLcmTubeGroupId";
     private static final String DEFAULT_LCM_TUBE_GROUP_DESC = "defaultLcmTubeGroupDescription";
-    private static final String SOURCE_SAMPLE_CLASS = "sourceSampleClass";
-    private static final String TARGET_SAMPLE_CLASS = "targetSampleClass";
+    private static final String SOURCE_CATEGORY = "sourceCategory";
+    private static final String TARGET_CATEGORY = "targetCategory";
     private static final String BOX = "box";
     private static final String RECIPIENT_GROUPS = "recipientGroups";
   }
@@ -240,18 +222,14 @@ public class EditSampleController {
     formConfig.put("detailedSample", isDetailedSampleEnabled());
     MisoWebUtils.addJsonArray(mapper, formConfig, "projects", projectService.list(), Dtos::asDto);
     MisoWebUtils.addJsonArray(mapper, formConfig, Config.SOPS, sopService.listByCategory(SopCategory.SAMPLE), Dtos::asDto);
-    if (LimsUtils.isDetailedSample(sample)) {
-      DetailedSample detailed = (DetailedSample) sample;
-      formConfig.put("dnaseTreatable", detailed.getSampleClass().getDNAseTreatable());
-    }
     model.put("formConfig", mapper.writeValueAsString(formConfig));
 
     return new ModelAndView("/WEB-INF/pages/editSample.jsp", model);
   }
 
   private void setRelatedSlideDtos(Sample sample, SampleDto dto) {
-    if (dto instanceof SampleTissuePieceDto) {
-      ((SampleTissuePieceDto) dto).setRelatedSlides(getRelatedSlideDtos((DetailedSample) sample));
+    if (dto instanceof SampleTissueProcessingDto) {
+      ((SampleTissueProcessingDto) dto).setRelatedSlides(getRelatedSlideDtos((DetailedSample) sample));
     } else if (dto instanceof SampleStockDto) {
       ((SampleStockDto) dto).setRelatedSlides(getRelatedSlideDtos((DetailedSample) sample));
     }
@@ -325,11 +303,15 @@ public class EditSampleController {
       throws IOException {
     String parentIds = getStringInput("parentIds", form, true);
     String replicates = getStringInput("replicates", form, true);
-    Long sampleClassId = getLongInput("sampleClassId", form, true);
+    String targetCategory = getStringInput("targetCategory", form, isDetailedSampleEnabled());
     Long boxId = getLongInput("boxId", form, false);
 
+    if (isDetailedSampleEnabled()) {
+      confirmClassesExist(targetCategory);
+    }
+
     Set<Group> recipientGroups = authorizationManager.getCurrentUser().getGroups();
-    BulkPropagateSampleBackend bulkPropagateSampleBackend = new BulkPropagateSampleBackend(sampleClassService.get(sampleClassId),
+    BulkPropagateSampleBackend bulkPropagateSampleBackend = new BulkPropagateSampleBackend(targetCategory,
         (boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null), recipientGroups);
     return bulkPropagateSampleBackend.propagate(parentIds, replicates, model);
   }
@@ -345,26 +327,20 @@ public class EditSampleController {
   @PostMapping(value = "/bulk/new")
   public ModelAndView createBulkSamples(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
     Integer quantity = getIntegerInput("quantity", form, true);
-    Long sampleClassId = getLongInput("sampleClassId", form, isDetailedSampleEnabled());
+    String targetCategory = getStringInput("targetCategory", form, isDetailedSampleEnabled());
     Long projectId = getLongInput("projectId", form, false);
     Long boxId = getLongInput("boxId", form, false);
 
     if (quantity == null || quantity <= 0) throw new RestException("Must specify quantity of samples to create", Status.BAD_REQUEST);
 
     final SampleDto template;
-    final SampleClass target;
 
-    if (sampleClassId != null) {
+    if (isDetailedSampleEnabled()) {
       // create new detailed samples
-      target = sampleClassService.get(sampleClassId);
-      if (target == null || target.getSampleCategory() == null) {
-        throw new RestException("Cannot find sample class with ID " + sampleClassId, Status.NOT_FOUND);
-      }
-      template = getCorrectDetailedSampleDto(target);
+      confirmClassesExist(targetCategory);
+      template = getCorrectDetailedSampleDto(targetCategory);
     } else {
-      if (detailedSample) throw new RestException("Must specify sample class of samples to create", Status.BAD_REQUEST);
       template = new SampleDto();
-      target = null;
     }
     final Project project;
     if (projectId == null) {
@@ -380,54 +356,36 @@ public class EditSampleController {
 
     Set<Group> recipientGroups = authorizationManager.getCurrentUser().getGroups();
 
-    return new BulkCreateSampleBackend(template.getClass(), template, quantity, project, target, recipientGroups).create(model);
+    return new BulkCreateSampleBackend(template.getClass(), template, quantity, project, targetCategory, recipientGroups).create(model);
   }
 
-  private static DetailedSampleDto getCorrectDetailedSampleDto(SampleClass target) {
-    // need to instantiate the correct DetailedSampleDto class to get the correct fields
-    final DetailedSampleDto detailedTemplate;
-    switch (target.getSampleCategory()) {
-    case SampleIdentity.CATEGORY_NAME:
-      detailedTemplate = new SampleIdentityDto();
-      break;
-    case SampleTissue.CATEGORY_NAME:
-      detailedTemplate = new SampleTissueDto();
-      break;
-    case SampleTissueProcessing.CATEGORY_NAME:
-      if (SampleSlide.SUBCATEGORY_NAME.equals(target.getSampleSubcategory())) {
-        detailedTemplate = new SampleSlideDto();
-      } else if (SampleTissuePiece.SUBCATEGORY_NAME.equals(target.getSampleSubcategory())) {
-        detailedTemplate = new SampleTissuePieceDto();
-      } else if (SampleSingleCell.SUBCATEGORY_NAME.equals(target.getSampleSubcategory())) {
-        detailedTemplate = new SampleSingleCellDto();
-      } else {
-        detailedTemplate = new SampleTissueProcessingDto();
-      }
-      break;
-    case SampleStock.CATEGORY_NAME:
-      if (SampleStockSingleCell.SUBCATEGORY_NAME.equals(target.getSampleSubcategory())) {
-        detailedTemplate = new SampleStockSingleCellDto();
-      } else {
-        detailedTemplate = new SampleStockDto();
-      }
-      break;
-    case SampleAliquot.CATEGORY_NAME:
-      if (SampleAliquotSingleCell.SUBCATEGORY_NAME.equals(target.getSampleSubcategory())) {
-        detailedTemplate = new SampleAliquotSingleCellDto();
-      } else {
-        detailedTemplate = new SampleAliquotDto();
-      }
-      break;
-    default:
-      throw new RestException("Unknown category for sample class with ID " + target.getId(), Status.BAD_REQUEST);
+  private void confirmClassesExist(String targetCategory) throws IOException {
+    List<SampleClass> categoryClasses = sampleClassService.listByCategory(targetCategory);
+    if (categoryClasses.isEmpty()) {
+      throw new RestException(String.format("No classes available for category '%s'", targetCategory), Status.BAD_REQUEST);
     }
-    detailedTemplate.setSampleClassId(target.getId());
-    detailedTemplate.setSampleClassAlias(target.getAlias());
-    return detailedTemplate;
+  }
+
+  private static DetailedSampleDto getCorrectDetailedSampleDto(String sampleCategory) {
+    // need to instantiate the correct DetailedSampleDto class to get the correct fields
+    switch (sampleCategory) {
+    case SampleIdentity.CATEGORY_NAME:
+      return new SampleIdentityDto();
+    case SampleTissue.CATEGORY_NAME:
+      return new SampleTissueDto();
+    case SampleTissueProcessing.CATEGORY_NAME:
+      return new SampleTissueProcessingDto();
+    case SampleStock.CATEGORY_NAME:
+      return new SampleStockDto();
+    case SampleAliquot.CATEGORY_NAME:
+      return new SampleAliquotDto();
+    default:
+      throw new RestException("Unknown sample category : " + sampleCategory, Status.BAD_REQUEST);
+    }
   }
 
   private final class BulkEditSampleBackend extends BulkEditTableBackend<Sample, SampleDto> {
-    private SampleClass sampleClass = null;
+    private String targetCategory = null;
 
     private BulkEditSampleBackend() {
       super("sample", SampleDto.class, "Samples");
@@ -451,10 +409,10 @@ public class EditSampleController {
       List<Sample> results = sampleService.listByIdList(modelIds);
       for (Sample sample : results) {
         if (isDetailedSampleEnabled()) {
-          if (sampleClass == null) {
-            sampleClass = ((DetailedSample) sample).getSampleClass();
-          } else if (((DetailedSample) sample).getSampleClass().getId() != sampleClass.getId()) {
-            throw new IOException("Can only bulk edit samples when samples all have the same class.");
+          if (targetCategory == null) {
+            targetCategory = ((DetailedSample) sample).getSampleClass().getSampleCategory();
+          } else if (!targetCategory.equals(((DetailedSample) sample).getSampleClass().getSampleCategory())) {
+            throw new IOException("Can only bulk edit samples when samples all have the same category.");
           }
         }
       }
@@ -463,13 +421,7 @@ public class EditSampleController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-      if (sampleClass != null) {
-        config.putPOJO(Config.TARGET_SAMPLE_CLASS, Dtos.asDto(sampleClass));
-        config.putPOJO(Config.SOURCE_SAMPLE_CLASS, Dtos.asDto(sampleClass));
-        config.put(Config.DNASE_TREATABLE, sampleClass.getDNAseTreatable());
-      } else {
-        config.put(Config.DNASE_TREATABLE, false);
-      }
+      config.put(Config.TARGET_CATEGORY, targetCategory);
       addJsonArray(mapper, config, Config.PROJECTS, projectService.list(), Dtos::asDto);
       addJsonArray(mapper, config, Config.SOPS, sopService.listByCategory(SopCategory.SAMPLE), Dtos::asDto);
     }
@@ -481,14 +433,14 @@ public class EditSampleController {
   }
 
   private final class BulkPropagateSampleBackend extends BulkPropagateTableBackend<Sample, SampleDto> {
-    private SampleClass sourceSampleClass;
-    private final SampleClass targetSampleClass;
+    private String sourceCategory;
+    private final String targetCategory;
     private final BoxDto newBox;
     private final Set<Group> recipientGroups;
 
-    private BulkPropagateSampleBackend(SampleClass targetSampleClass, BoxDto newBox, Set<Group> recipientGroups) {
+    private BulkPropagateSampleBackend(String targetCategory, BoxDto newBox, Set<Group> recipientGroups) {
       super("sample", SampleDto.class, "Samples", "Samples");
-      this.targetSampleClass = targetSampleClass;
+      this.targetCategory = targetCategory;
       this.newBox = newBox;
       this.recipientGroups = recipientGroups;
     }
@@ -497,7 +449,7 @@ public class EditSampleController {
     protected SampleDto createDtoFromParent(Sample item) {
       if (LimsUtils.isDetailedSample(item)) {
         DetailedSample sample = (DetailedSample) item;
-        DetailedSampleDto dto = EditSampleController.getCorrectDetailedSampleDto(targetSampleClass);
+        DetailedSampleDto dto = EditSampleController.getCorrectDetailedSampleDto(targetCategory);
         if (sample.getScientificName() != null) {
           dto.setScientificNameId(sample.getScientificName().getId());
         }
@@ -506,7 +458,7 @@ public class EditSampleController {
         if (sample.getBox() != null) {
           dto.setParentBoxPositionLabel(BoxUtils.makeBoxPositionLabel(sample.getBox().getAlias(), sample.getBoxPosition()));
         }
-        dto.setParentTissueSampleClassId(sample.getSampleClass().getId());
+        dto.setParentSampleClassId(sample.getSampleClass().getId());
         dto.setProjectId(sample.getProject().getId());
         if (sample.getIdentityAttributes() != null && sample.getIdentityAttributes().getConsentLevel() != null) {
           dto.setIdentityConsentLevel(sample.getIdentityAttributes().getConsentLevel().getLabel());
@@ -518,11 +470,9 @@ public class EditSampleController {
         }
         dto.setGroupId(sample.getGroupId());
         dto.setGroupDescription(sample.getGroupDescription());
-        sourceSampleClass = sample.getSampleClass();
         dto.setBox(newBox);
-        if (targetSampleClass.getSampleCategory().equals(SampleStock.CATEGORY_NAME)
-            || (targetSampleClass.getSampleCategory().equals(SampleTissueProcessing.CATEGORY_NAME)
-                && targetSampleClass.getSampleSubcategory().equals(SampleTissuePiece.SUBCATEGORY_NAME))) {
+        if (SampleStock.CATEGORY_NAME.equals(targetCategory)
+            || (SampleTissueProcessing.CATEGORY_NAME.equals(targetCategory))) {
           setRelatedSlideDtos(sample, dto);
         }
         return dto;
@@ -533,14 +483,25 @@ public class EditSampleController {
 
     @Override
     protected Stream<Sample> loadParents(List<Long> parentIds) throws IOException {
-      return sampleService.listByIdList(parentIds).stream().sorted(new AliasComparator<>());
+      List<Sample> parents = sampleService.listByIdList(parentIds);
+      if (isDetailedSampleEnabled()) {
+        for (Sample parent : parents) {
+          DetailedSample detailed = (DetailedSample) parent;
+          if (sourceCategory == null) {
+            sourceCategory = detailed.getSampleClass().getSampleCategory();
+          } else if (!sourceCategory.equals(detailed.getSampleClass().getSampleCategory())) {
+            throw new RestException("Parents must all be of the same sample category", Status.BAD_REQUEST);
+          }
+        }
+        sourceCategory = ((DetailedSample) parents.get(0)).getSampleClass().getSampleCategory();
+      }
+      return parents.stream().sorted(new AliasComparator<>());
     }
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-      config.put(Config.DNASE_TREATABLE, targetSampleClass.getDNAseTreatable());
-      config.putPOJO(Config.TARGET_SAMPLE_CLASS, Dtos.asDto(targetSampleClass));
-      config.putPOJO(Config.SOURCE_SAMPLE_CLASS, Dtos.asDto(sourceSampleClass));
+      config.put(Config.SOURCE_CATEGORY, sourceCategory);
+      config.put(Config.TARGET_CATEGORY, targetCategory);
       config.putPOJO(Config.BOX, newBox);
       config.put(Config.DEFAULT_LCM_TUBE_GROUP_ID, defaultLcmTubeGroupId);
       config.put(Config.DEFAULT_LCM_TUBE_GROUP_DESC, defaultLcmTubeGroupDesc);
@@ -556,15 +517,15 @@ public class EditSampleController {
   }
 
   private final class BulkCreateSampleBackend extends BulkCreateTableBackend<SampleDto> {
-    private final SampleClass targetSampleClass;
+    private final String targetCategory;
     private final Project project;
     private final BoxDto box;
     private final Set<Group> recipientGroups;
 
     public BulkCreateSampleBackend(Class<? extends SampleDto> dtoClass, SampleDto dto, Integer quantity, Project project,
-        SampleClass sampleClass, Set<Group> recipientGroups) {
+        String targetCategory, Set<Group> recipientGroups) {
       super("sample", dtoClass, "Samples", dto, quantity);
-      targetSampleClass = sampleClass;
+      this.targetCategory = targetCategory;
       this.project = project;
       box = dto.getBox();
       this.recipientGroups = recipientGroups;
@@ -572,12 +533,7 @@ public class EditSampleController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-      if (targetSampleClass != null) {
-        config.putPOJO(Config.TARGET_SAMPLE_CLASS, Dtos.asDto(targetSampleClass));
-        config.put(Config.DNASE_TREATABLE, targetSampleClass.hasPathToDnaseTreatable(sampleValidRelationshipService.getAll()));
-      } else {
-        config.put(Config.DNASE_TREATABLE, false);
-      }
+      config.put(Config.TARGET_CATEGORY, targetCategory);
       config.put(Config.DEFAULT_LCM_TUBE_GROUP_ID, defaultLcmTubeGroupId);
       config.put(Config.DEFAULT_LCM_TUBE_GROUP_DESC, defaultLcmTubeGroupDesc);
       addJsonArray(mapper, config, Config.PROJECTS, projectService.list(), Dtos::asDto);

@@ -5,10 +5,10 @@ BulkTarget.sample = (function($) {
    * Expected config: {
    *   pageMode: string {create, propagate, edit}
    *   box: optional new box created to put items in
-   *   sourceSampleClass: required if propagating; class of parent samples
-   *   targetSampleClass: required if detailed sample; class being created
-   *   dnaseTreatable: true if the DNAse column should be shown
+   *   sourceCategory: required for detailed sample propagate
+   *   targetCategory: required for detailed sample create/propagate/edit; not required for library receipt
    *   isLibraryReceipt: optional boolean (default: false)
+   *   targetSampleClass: required for library receipt
    *   recipientGroups: groups to include in Received By column
    *   project: project to create sample in,
    *   projects: all projects
@@ -21,6 +21,8 @@ BulkTarget.sample = (function($) {
 
   var originalProjectIdsBySampleId = {};
   var originalEffectiveGroupIdsByRow = {};
+  var showLabColumn = false;
+  var editSubcategories = [];
 
   return {
     getSaveUrl: function() {
@@ -40,7 +42,6 @@ BulkTarget.sample = (function($) {
           {
             name: "Edit",
             action: function(samples) {
-
               if (samples.some(function(sample) {
                 return sample.sampleClassId;
               }) && !Constants.isDetailedSample) {
@@ -48,13 +49,12 @@ BulkTarget.sample = (function($) {
                 return;
               }
 
-              var classes = getSampleClasses(samples);
-              var classesAliases = Utils.array.deduplicateString(classes.map(function(sampleClass) {
-                return sampleClass.alias;
+              var categories = Utils.array.deduplicateString(getSampleClasses(samples).map(function(sampleClass) {
+                return sampleClass.sampleCategory;
               }));
-              if (classesAliases.length > 1) {
-                Utils.showOkDialog("Error", ["You have selected samples of classes " + classesAliases.join(" & ")
-                    + ". Please select samples from only one class."]);
+              if (categories.length > 1) {
+                Utils.showOkDialog("Error", ["You have selected samples of categories " + categories.join(" & ")
+                    + ". Please select samples from only one category."]);
                 return;
               }
               Utils.page.post(Urls.ui.samples.bulkEdit, {
@@ -62,33 +62,37 @@ BulkTarget.sample = (function($) {
               });
             }
 
-          }, {
+          },
+          {
             name: "Propagate",
             action: function(samples) {
               HotUtils.warnIfConsentRevoked(samples, function() {
                 var idsString = samples.map(Utils.array.getId).join(",");
                 var classes = getSampleClasses(samples);
+                var sourceCategories = Utils.array.deduplicateString(classes.map(function(sampleClass) {
+                  return sampleClass.sampleCategory;
+                }));
+                if (sourceCategories.length > 1) {
+                  Utils.showOkDialog("Error", ["You have selected samples of categories " + sourceCategories.join(" & ")
+                      + ". Please select samples from only one category."]);
+                  return;
+                }
 
                 // In the case of plain samples, this will be empty, which is fine.
-                var targets = Utils.array.removeArchived(getChildSampleClasses(classes)).filter(function(sampleClass) {
-                  return sampleClass.directCreationAllowed;
-                }).sort(Utils.sorting.sampleClassComparator).map(function(sampleClass) {
-
+                var targets = getCommonChildCategories(classes).map(function(category) {
                   return {
-                    name: sampleClass.alias,
+                    name: category,
                     action: function(replicates, newBoxId) {
                       Utils.page.post(Urls.ui.samples.bulkPropagate, {
                         boxId: newBoxId,
                         parentIds: idsString,
                         replicates: replicates,
-                        sampleClassId: sampleClass.id
+                        targetCategory: category
                       });
                     }
                   };
                 });
-                if (!Constants.isDetailedSample || classes.every(function(sampleClass) {
-                  return sampleClass.sampleCategory == "Aliquot";
-                })) {
+                if (!Constants.isDetailedSample || sourceCategories[0] === 'Aliquot') {
                   targets.push({
                     name: "Library",
                     action: function(replicates, newBoxId) {
@@ -221,10 +225,32 @@ BulkTarget.sample = (function($) {
         originalEffectiveGroupIdsByRow[index] = sample.effectiveGroupId;
         if (config.pageMode === 'edit') {
           originalProjectIdsBySampleId[sample.id] = sample.projectId;
-        } else if (sample.relatedSlides && sample.relatedSlides.length === 1) {
-          sample.referenceSlideId = sample.relatedSlides[0].id;
+        } else {
+          if (Constants.isDetailedSample) {
+            if (sample.relatedSlides && sample.relatedSlides.length === 1) {
+              sample.referenceSlideId = sample.relatedSlides[0].id;
+            }
+            if (config.targetSampleClass) {
+              sample.sampleClassId = config.targetSampleClass.id;
+            } else {
+              var sampleClassOptions = getSampleClassOptions(config.targetSampleClass, config.targetCategory, sample.parentSampleClassId);
+              if (sampleClassOptions.length === 1) {
+                sample.sampleClassId = sampleClassOptions[0].id;
+              }
+            }
+          }
+        }
+        if (sample.labId) {
+          showLabColumn = true;
         }
       });
+      if (config.pageMode === 'edit' && Constants.isDetailedSample) {
+        editSubcategories = getSampleClasses(data).filter(function(sampleClass) {
+          return sampleClass.sampleSubcategory;
+        }).map(function(sampleClass) {
+          return sampleClass.sampleSubcategory;
+        });
+      }
     },
     getFixedColumns: function(config) {
       switch (config.pageMode) {
@@ -237,8 +263,7 @@ BulkTarget.sample = (function($) {
       }
     },
     getColumns: function(config, api) {
-      var targetCategory = (config.targetSampleClass ? config.targetSampleClass.sampleCategory : null);
-      var sourceCategory = (config.sourceSampleClass ? config.sourceSampleClass.sampleCategory : null);
+      var targetCategory = config.isLibraryReceipt ? 'Aliquot' : config.targetCategory;
       // (Detailed sample) Columns to show
       var show = {};
 
@@ -250,20 +275,20 @@ BulkTarget.sample = (function($) {
         show[progression[i]] = false;
       }
       // Determine the indices of the first and less steps in the progression.
-      var endProgression = targetCategory == null ? -1 : progression.indexOf(targetCategory);
+      var endProgression = targetCategory ? progression.indexOf(targetCategory) : -1;
       var startProgression;
       if (!Constants.isDetailedSample) {
         startProgression = -1;
-      } else if (config.pageMode == 'create') {
+      } else if (config.isLibraryReceipt || config.pageMode == 'create') {
         startProgression = 0;
       } else if (config.pageMode == 'edit') {
         startProgression = endProgression;
       } else {
-        startProgression = progression.indexOf(sourceCategory);
+        startProgression = progression.indexOf(config.sourceCategory);
         // Increment to display columns of next category in progression unless
         // source and target category are the same (happens during
         // editing or propagation within a category).
-        if (progression.indexOf(targetCategory) > progression.indexOf(sourceCategory)) {
+        if (progression.indexOf(targetCategory) > startProgression) {
           startProgression += 1;
         }
       }
@@ -271,13 +296,8 @@ BulkTarget.sample = (function($) {
       for (i = startProgression; i <= endProgression && i != -1; i++) {
         show[progression[i]] = true;
       }
-      // If we aren't starting or finished with a tissue processing, hide those
-      // columns since we don't really want to show tissue processing unless the
-      // user specifically requested it.
-      if (sourceCategory != 'Tissue Processing' && targetCategory != 'Tissue Processing' && config.targetSampleClass
-          && (!config.targetSampleClass.sampleSubcategory || !config.targetSampleClass.sampleSubcategory.startsWith('Single Cell'))) {
-        show['Tissue Processing'] = false;
-      }
+
+      var sampleClassOptions = Constants.isDetailedSample ? getSampleClassOptions(config.targetSampleClass, targetCategory) : null;
 
       var columns = [];
 
@@ -310,26 +330,26 @@ BulkTarget.sample = (function($) {
           }, {
             title: 'Parent Sample Class',
             type: 'text',
-            data: 'parentTissueSampleClassAlias',
+            data: 'parentSampleClassAlias',
             disabled: true,
             include: config.pageMode === 'propagate',
             getData: function(sample) {
               return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(item) {
-                return item.id == sample.parentTissueSampleClassId;
+                return item.id == sample.parentSampleClassId;
               }, Constants.sampleClasses), 'alias');
             },
             omit: true
           }];
           if (config.pageMode === 'propagate') {
             columns = parentColumns.concat(columns);
-          } else if (config.pageMode === 'edit' && !isTargetIdentity(config)) {
+          } else if (config.pageMode === 'edit' && targetCategory !== 'Identity') {
             columns = columns.concat(parentColumns);
           }
         }
 
         columns.push(BulkUtils.columns.description);
 
-        if (config.pageMode === 'create' && (!Constants.isDetailedSample || !isTargetIdentity(config))) {
+        if (config.pageMode === 'create' && (!Constants.isDetailedSample || targetCategory !== 'Identity')) {
           columns = columns.concat(BulkUtils.columns.receipt(config));
         }
       }
@@ -338,32 +358,17 @@ BulkTarget.sample = (function($) {
         title: 'Requisition ID',
         type: 'text',
         data: 'requisitionId',
-        include: (!Constants.isDetailedSample || !isTargetIdentity(config)) && !config.isLibraryReceipt,
+        include: (!Constants.isDetailedSample || targetCategory !== 'Identity') && !config.isLibraryReceipt,
         regex: Utils.validation.alphanumRegex,
         maxLength: 50,
         description: 'ID of a requisition form stored in a separate system'
       });
 
-      if (!isTargetIdentity(config) && !config.isLibraryReceipt) {
+      if (targetCategory !== 'Identity' && !config.isLibraryReceipt) {
         columns = columns.concat(BulkUtils.columns.boxable(config, api));
       }
 
       columns.push({
-        title: 'Sample Type',
-        type: 'dropdown',
-        data: 'sampleType',
-        required: true,
-        source: function(data, api) {
-          // include current sample type in-case archived
-          var source = Constants.sampleTypes;
-          if (data.sampleType && source.indexOf(data.sampleType) === -1) {
-            source = source.concat([data.sampleType]);
-          }
-          return source;
-        },
-        sortSource: Utils.sorting.standardSortItems,
-        initial: Constants.isDetailedSample ? config.targetSampleClass.defaultSampleType : undefined
-      }, {
         title: 'Project',
         type: 'dropdown',
         data: 'projectId',
@@ -428,6 +433,66 @@ BulkTarget.sample = (function($) {
         getItemLabel: Utils.array.getAlias,
         getItemValue: Utils.array.getId
       }, {
+        title: 'Sample Class',
+        type: 'dropdown',
+        disabled: config.pageMode === 'edit' || config.isLibraryReceipt,
+        data: 'sampleClassId',
+        include: Constants.isDetailedSample,
+        required: true,
+        source: function(data, limitedApi) {
+          if (data.parentSampleClassId) {
+            return filterSampleClassesByParentId(sampleClassOptions, data.parentSampleClassId);
+          } else {
+            return sampleClassOptions;
+          }
+        },
+        getItemLabel: Utils.array.getAlias,
+        getItemValue: Utils.array.getId,
+        sortSource: true,
+        onChange: function(rowIndex, newValue, api) {
+          var selected = null;
+          if (newValue) {
+            selected = Utils.array.findFirstOrNull(Utils.array.aliasPredicate(newValue), Constants.sampleClasses);
+          }
+          if (selected) {
+            // enable/disable columns based on sampleSubcategory
+            columns.filter(function(column) {
+              return (!column.hasOwnProperty('include') || column.include) && column.sampleSubcategory;
+            }).forEach(
+                function(column) {
+                  var subcategoryMatch = (Array.isArray(column.sampleSubcategory) && column.sampleSubcategory
+                      .indexOf(selected.sampleSubcategory) !== -1)
+                      || (typeof column.sampleSubcategory === 'string' && column.sampleSubcategory === selected.sampleSubcategory);
+                  // for library receipt, need to correct since 'sample.' gets added again on updateField calls
+                  var dataField = config.isLibraryReceipt ? column.data.replace('sample.', '') : column.data;
+                  api.updateField(rowIndex, dataField, {
+                    disabled: !subcategoryMatch,
+                    required: subcategoryMatch ? column.required : false,
+                    value: subcategoryMatch ? undefined : null
+                  });
+                });
+            if (selected.defaultSampleType && config.pageMode !== 'edit') {
+              api.updateField(rowIndex, 'sampleType', {
+                value: selected.defaultSampleType
+              });
+            }
+          }
+        }
+      }, {
+        title: 'Sample Type',
+        type: 'dropdown',
+        data: 'sampleType',
+        required: true,
+        source: function(data, api) {
+          // include current sample type in-case archived
+          var source = Constants.sampleTypes;
+          if (data.sampleType && source.indexOf(data.sampleType) === -1) {
+            source = source.concat([data.sampleType]);
+          }
+          return source;
+        },
+        sortSource: Utils.sorting.standardSortItems
+      }, {
         title: 'Sci. Name',
         type: 'dropdown',
         data: 'scientificNameId',
@@ -443,10 +508,10 @@ BulkTarget.sample = (function($) {
         data: 'externalName',
         description: 'Name or other identifier for the donor or organism in an external system',
         include: show['Identity'],
-        includeSaved: isTargetIdentity(config),
+        includeSaved: targetCategory === 'Identity',
         required: true,
         onChange: function(rowIndex, newValue, api) {
-          if (isTargetIdentity(config)) {
+          if (targetCategory === 'Identity') {
             return;
           } else if (!newValue) {
             api.updateField(rowIndex, 'identityId', {
@@ -522,7 +587,7 @@ BulkTarget.sample = (function($) {
         title: 'Identity Alias',
         type: 'dropdown',
         data: 'identityId',
-        include: show['Identity'] && !isTargetIdentity(config),
+        include: show['Identity'] && targetCategory !== 'Identity',
         includeSaved: false,
         required: true,
         source: [],
@@ -561,7 +626,7 @@ BulkTarget.sample = (function($) {
         type: 'dropdown',
         data: 'donorSex',
         include: show['Identity'],
-        includeSaved: isTargetIdentity(config),
+        includeSaved: targetCategory === 'Identity',
         required: true,
         source: Constants.donorSexes,
         initial: 'Unknown'
@@ -570,26 +635,16 @@ BulkTarget.sample = (function($) {
         type: 'dropdown',
         data: 'consentLevel',
         include: show['Identity'],
-        includeSaved: isTargetIdentity(config),
+        includeSaved: targetCategory === 'Identity',
         required: true,
         source: Constants.consentLevels,
         initial: 'This Project'
       }, {
-        title: 'Sample Class',
-        type: 'text',
-        disabled: true,
-        data: 'sampleClassId',
-        include: Constants.isDetailedSample,
-        getData: function(sample) {
-          return Utils.array.findUniqueOrThrow(Utils.array.idPredicate(sample.sampleClassId), Constants.sampleClasses).alias;
-        },
-        omit: true
-      }, {
         title: 'Piece Type',
         type: 'dropdown',
         data: 'tissuePieceTypeId',
-        include: show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory === 'Tissue Piece',
-        includeSaved: isTargetTissuePiece(config),
+        include: targetCategory === 'Tissue Processing',
+        sampleSubcategory: 'Tissue Piece',
         required: true,
         source: Constants.tissuePieceTypes,
         sortSource: Utils.sorting.standardSort('name'),
@@ -615,12 +670,12 @@ BulkTarget.sample = (function($) {
         }
       });
 
-      if (!Constants.isDetailedSample || (!isTargetIdentity(config) && !isTargetTissue(config))) {
+      if (!Constants.isDetailedSample || (targetCategory !== 'Identity' && targetCategory !== 'Tissue')) {
         columns.push(BulkUtils.columns.sop(config.sops));
       }
 
       if (Constants.isDetailedSample && !config.isLibraryReceipt) {
-        var showEffective = !isTargetIdentity(config) && config.pageMode === 'edit';
+        var showEffective = targetCategory !== 'Identity' && config.pageMode === 'edit';
         columns = columns.concat(BulkUtils.columns.groupId(showEffective, function(rowIndex) {
           return originalEffectiveGroupIdsByRow[rowIndex];
         }));
@@ -632,7 +687,7 @@ BulkTarget.sample = (function($) {
         type: 'dropdown',
         data: 'tissueOriginId',
         include: show['Tissue'],
-        includeSaved: isTargetTissue(config),
+        includeSaved: targetCategory === 'Tissue',
         required: true,
         source: Constants.tissueOrigins,
         sortSource: Utils.sorting.standardSort('alias'),
@@ -643,7 +698,7 @@ BulkTarget.sample = (function($) {
         type: 'dropdown',
         data: 'tissueTypeId',
         include: show['Tissue'],
-        includeSaved: isTargetTissue(config),
+        includeSaved: targetCategory === 'Tissue',
         required: true,
         source: Constants.tissueTypes,
         sortSource: Utils.sorting.standardSort('alias'),
@@ -654,27 +709,27 @@ BulkTarget.sample = (function($) {
         type: 'int',
         data: 'passageNumber',
         include: show['Tissue'],
-        includeSaved: isTargetTissue(config),
+        includeSaved: targetCategory === 'Tissue',
         min: 1
       }, {
         title: 'Times Received',
         type: 'int',
         data: 'timesReceived',
         include: show['Tissue'],
-        includeSaved: isTargetTissue(config),
+        includeSaved: targetCategory === 'Tissue',
         min: 1
       }, {
         title: 'Tube Number',
         type: 'int',
         data: 'tubeNumber',
         include: show['Tissue'],
-        includeSaved: isTargetTissue(config),
+        includeSaved: targetCategory === 'Tissue',
         min: 1
       }, {
         title: 'Lab',
         type: 'dropdown',
         data: 'labId',
-        include: show['Tissue'] && !config.isLibraryReceipt && config.pageMode === 'edit',
+        include: showLabColumn,
         source: Constants.labs,
         sortSource: Utils.sorting.standardSort('label'),
         getItemLabel: Utils.array.get('label'),
@@ -686,7 +741,7 @@ BulkTarget.sample = (function($) {
         type: 'text',
         data: 'secondaryIdentifier',
         include: show['Tissue'] && !config.isLibraryReceipt,
-        includeSaved: isTargetTissue(config),
+        includeSaved: targetCategory === 'Tissue',
         maxLength: 255,
         description: 'Identifier for the tissue sample in an external system'
       }, {
@@ -694,7 +749,7 @@ BulkTarget.sample = (function($) {
         type: 'dropdown',
         data: 'tissueMaterialId',
         include: show['Tissue'],
-        includeSaved: isTargetTissue(config),
+        includeSaved: targetCategory === 'Tissue',
         source: Constants.tissueMaterials,
         sortSource: Utils.sorting.standardSort('alias'),
         getItemLabel: Utils.array.getAlias,
@@ -704,40 +759,45 @@ BulkTarget.sample = (function($) {
         type: 'text',
         data: 'region',
         include: show['Tissue'],
-        includeSaved: isTargetTissue(config),
+        includeSaved: targetCategory === 'Tissue',
         maxLength: 255
       }, {
         title: 'Initial Slides',
         type: 'int',
         data: 'initialSlides',
-        include: config.pageMode === 'edit' && isTargetSlide(config),
+        include: config.pageMode === 'edit' && targetCategory === 'Tissue Processing',
+        sampleSubcategory: 'Slide',
         required: true,
         min: 0
       }, {
         title: 'Slides',
         type: 'int',
         data: 'slides',
-        include: isTargetSlide(config),
+        include: targetCategory === 'Tissue Processing',
+        sampleSubcategory: 'Slide',
         required: true,
         min: 0
       }, {
         title: 'Discards',
         type: 'int',
         data: 'discards',
-        include: isTargetSlide(config),
+        include: targetCategory === 'Tissue Processing',
+        sampleSubcategory: 'Slide',
         required: true,
         min: 0
       }, {
         title: 'Thickness',
         type: 'int',
         data: 'thickness',
-        include: isTargetSlide(config),
+        include: targetCategory === 'Tissue Processing',
+        sampleSubcategory: 'Slide',
         min: 1
       }, {
         title: 'Stain',
         type: 'dropdown',
         data: 'stainId',
-        include: isTargetSlide(config),
+        include: targetCategory === 'Tissue Processing',
+        sampleSubcategory: 'Slide',
         source: Constants.stains,
         sortSource: Utils.sorting.standardSort('name'),
         getItemLabel: Utils.array.getName,
@@ -746,7 +806,8 @@ BulkTarget.sample = (function($) {
         title: '% Tumour',
         type: 'decimal',
         data: 'percentTumour',
-        include: isTargetSlide(config),
+        include: targetCategory === 'Tissue Processing',
+        sampleSubcategory: 'Slide',
         precision: 11,
         scale: 8,
         min: 0,
@@ -755,7 +816,8 @@ BulkTarget.sample = (function($) {
         title: '% Necrosis',
         type: 'decimal',
         data: 'percentNecrosis',
-        include: isTargetSlide(config),
+        include: targetCategory === 'Tissue Processing',
+        sampleSubcategory: 'Slide',
         precision: 11,
         scale: 8,
         min: 0,
@@ -764,7 +826,8 @@ BulkTarget.sample = (function($) {
         title: 'Marked Area (mm²)',
         type: 'decimal',
         data: 'markedArea',
-        include: isTargetSlide(config),
+        include: targetCategory === 'Tissue Processing',
+        sampleSubcategory: 'Slide',
         precision: 11,
         scale: 8,
         min: 0
@@ -772,7 +835,8 @@ BulkTarget.sample = (function($) {
         title: 'Marked Area % Tumour',
         type: 'decimal',
         data: 'markedAreaPercentTumour',
-        include: isTargetSlide(config),
+        include: targetCategory === 'Tissue Processing',
+        sampleSubcategory: 'Slide',
         precision: 11,
         scale: 8,
         min: 0,
@@ -781,32 +845,33 @@ BulkTarget.sample = (function($) {
         title: 'Slides Consumed',
         type: 'int',
         data: 'slidesConsumed',
-        include: isTargetTissuePiece(config),
+        include: targetCategory === 'Tissue Processing',
+        sampleSubcategory: 'Tissue Piece',
         required: true,
         min: 0
       }, {
         title: 'Initial Cell Conc.',
         type: 'decimal',
         data: 'initialCellConcentration',
-        include: show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory
-            && config.targetSampleClass.sampleSubcategory.startsWith('Single Cell'),
-        includeSaved: isTargetSingleCell(config),
+        include: show['Tissue Processing'],
+        sampleSubcategory: ['Single Cell', 'Single Cell (stock)', 'Single Cell (aliquot)'],
+        includeSaved: targetCategory === 'Tissue Processing',
         precision: 14,
         scale: 10
       }, {
         title: 'Digestion',
         type: 'text',
         data: 'digestion',
-        include: show['Tissue Processing'] && config.targetSampleClass.sampleSubcategory
-            && config.targetSampleClass.sampleSubcategory.startsWith('Single Cell'),
-        includeSaved: isTargetSingleCell(config),
+        include: show['Tissue Processing'],
+        sampleSubcategory: ['Single Cell', 'Single Cell (stock)', 'Single Cell (aliquot)'],
+        includeSaved: targetCategory === 'Tissue Processing',
         required: true
       }, {
         title: 'STR Status',
         type: 'dropdown',
         data: 'strStatus',
         include: show['Stock'] && !config.isLibraryReceipt,
-        includeSaved: isTargetStock(config),
+        includeSaved: targetCategory === 'Stock',
         required: true,
         source: Constants.strStatuses,
         description: 'Status of short tandem repeat analysis'
@@ -814,8 +879,9 @@ BulkTarget.sample = (function($) {
         title: 'DNAse',
         type: 'dropdown',
         data: 'dnaseTreated',
-        include: Constants.isDetailedSample && config.dnaseTreatable,
-        includeSaved: isTargetStock(config),
+        include: show['Stock'],
+        sampleSubcategory: ['RNA (stock)', 'RNA (aliquot)'],
+        includeSaved: targetCategory === 'Stock',
         required: true,
         source: [{
           label: 'True',
@@ -840,46 +906,31 @@ BulkTarget.sample = (function($) {
         title: 'Target Cell Recovery',
         type: 'decimal',
         data: 'targetCellRecovery',
-        include: show['Stock'] && config.targetSampleClass.sampleSubcategory
-            && config.targetSampleClass.sampleSubcategory.startsWith('Single Cell'),
-        includeSaved: isTargetStockSingleCell,
+        include: show['Stock'],
+        sampleSubcategory: ['Single Cell (stock)', 'Single Cell (aliquot)'],
+        includeSaved: targetCategory === 'Stock',
         precision: 14,
         scale: 10
       }, {
         title: 'Cell Viability',
         type: 'decimal',
         data: 'cellViability',
-        include: show['Stock'] && config.targetSampleClass.sampleSubcategory
-            && config.targetSampleClass.sampleSubcategory.startsWith('Single Cell'),
-        includeSaved: isTargetStockSingleCell,
+        include: show['Stock'],
+        sampleSubcategory: ['Single Cell (stock)', 'Single Cell (aliquot)'],
+        includeSaved: targetCategory === 'Stock',
         precision: 14,
         scale: 10
       }, {
         title: 'Loading Cell Conc.',
         type: 'decimal',
         data: 'loadingCellConcentration',
-        include: show['Stock'] && config.targetSampleClass.sampleSubcategory
-            && config.targetSampleClass.sampleSubcategory.startsWith('Single Cell'),
-        includeSaved: isTargetStockSingleCell,
+        include: show['Stock'],
+        sampleSubcategory: ['Single Cell (stock)', 'Single Cell (aliquot)'],
+        includeSaved: targetCategory === 'Stock',
         precision: 14,
         scale: 10
-      }, {
-        title: 'Reference Slide',
-        type: 'dropdown',
-        data: 'referenceSlideId',
-        include: (isTargetTissuePiece(config) || show['Stock']) && !config.isLibraryReceipt,
-        includeSaved: isTargetTissuePiece(config) || isTargetStock(config),
-        source: function(data, api) {
-          return data.relatedSlides || [];
-        },
-        sortSource: Utils.sorting.standardSort('id'),
-        getItemLabel: function(item) {
-          return item.name + ' (' + item.alias + ')';
-        },
-        getItemValue: Utils.array.getId,
-        description: 'Indicates a slide whose attributes such as marked area and % tumour are relevant to this sample.'
-            + ' May be used for calculating extraction input per yield, for example.',
-      });
+      }, referenceSlideColumn(config.pageMode !== 'create' && targetCategory === 'Tissue Processing', 'Tissue Piece'),
+          referenceSlideColumn(config.pageMode !== 'create' && targetCategory === 'Stock'));
 
       if (!config.isLibraryReceipt) {
         columns = columns.concat(BulkUtils.columns.detailedQcStatus());
@@ -890,7 +941,7 @@ BulkTarget.sample = (function($) {
         type: 'dropdown',
         data: 'samplePurposeId',
         include: show['Aliquot'] && !config.isLibraryReceipt,
-        includeSaved: isTargetAliquot(config),
+        includeSaved: targetCategory === 'Aliquot',
         source: function(sample, api) {
           return Constants.samplePurposes.filter(function(item) {
             return !item.archived || sample.samplePurposeId === item.id;
@@ -903,18 +954,46 @@ BulkTarget.sample = (function($) {
         title: 'Input into Library',
         type: 'decimal',
         data: 'inputIntoLibrary',
-        include: show['Aliquot'] && config.targetSampleClass.sampleSubcategory
-            && config.targetSampleClass.sampleSubcategory.startsWith('Single Cell'),
-        includeSaved: isTargetAliquotSingleCell(config),
+        include: show['Aliquot'],
+        sampleSubcategory: 'Single Cell (aliquot)',
+        includeSaved: targetCategory === 'Aliquot',
         precision: 14,
         scale: 10
       });
+
+      if (Constants.isDetailedSample) {
+        function filterBySubcategory(subcategories) {
+          columns = columns.filter(function(column) {
+            if (!column.sampleSubcategory) {
+              return true;
+            } else if (Array.isArray(column.sampleSubcategory)) {
+              return column.sampleSubcategory.some(function(columnSubcategory) {
+                return subcategories.indexOf(columnSubcategory) !== -1;
+              });
+            } else {
+              return subcategories.indexOf(column.sampleSubcategory) !== -1;
+            }
+          });
+        }
+
+        if (config.targetSampleClass) {
+          filterBySubcategory(config.targetSampleClass.sampleSubcategory ? [config.targetSampleClass.sampleSubcategory] : []);
+        } else if (config.pageMode === 'edit') {
+          filterBySubcategory(editSubcategories);
+        }
+      }
 
       return columns;
     },
 
     confirmSave: function(data, config) {
       var deferred = $.Deferred();
+      if (Constants.isDetailedSample) {
+        data.forEach(function(sample) {
+          var sampleClass = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(sample.sampleClassId), Constants.sampleClasses);
+          sample.type = sampleClass.sampleSubcategory || sampleClass.sampleCategory;
+        });
+      }
       if (config.pageMode === 'edit') {
         var changed = data.filter(function(sample) {
           return sample.projectId !== originalProjectIdsBySampleId[sample.id];
@@ -966,47 +1045,6 @@ BulkTarget.sample = (function($) {
     }
   };
 
-  function isTargetIdentity(config) {
-    return isTarget(config, 'Identity');
-  }
-
-  function isTargetTissue(config) {
-    return isTarget(config, 'Tissue');
-  }
-
-  function isTargetSlide(config) {
-    return isTarget(config, 'Tissue Processing', 'Slide');
-  }
-
-  function isTargetTissuePiece(config) {
-    return isTarget(config, 'Tissue Processing', 'Tissue Piece');
-  }
-
-  function isTargetSingleCell(config) {
-    return isTarget(config, 'Tissue Processing', 'Single Cell');
-  }
-
-  function isTargetStock(config) {
-    return isTarget(config, 'Stock');
-  }
-
-  function isTargetStockSingleCell(config) {
-    return isTarget(config, 'Stock', 'Single Cell (stock)');
-  }
-
-  function isTargetAliquot(config) {
-    return isTarget(config, 'Aliquot');
-  }
-
-  function isTargetAliquotSingleCell(config) {
-    return isTarget(config, 'Aliquot', 'Single Cell (aliquot)');
-  }
-
-  function isTarget(config, category, subcategory) {
-    return config && config.targetSampleClass && config.targetSampleClass.sampleCategory === category
-        && (!subcategory || config.targetSampleClass.sampleSubcategory === subcategory);
-  }
-
   function getSampleCategory(sample) {
     if (!Constants.isDetailedSample) {
       return 'Plain';
@@ -1025,18 +1063,68 @@ BulkTarget.sample = (function($) {
     });
   }
 
-  /**
-   * Returns an array of sample classes that correspond to given sample class IDs (of parent samples)
-   */
-  function getChildSampleClasses(sampleClasses) {
-    if (sampleClasses.length == 0) {
-      return [];
+  function getCommonChildCategories(sampleClasses) {
+    var childCategoriesPerClass = sampleClasses.map(function(includedClass) {
+      return Constants.sampleClasses.filter(
+          function(sampleClass) {
+            return Constants.sampleValidRelationships.some(function(relationship) {
+              return relationship.parentId === includedClass.id && relationship.childId === sampleClass.id
+                  && sampleClass.archived === false && relationship.archived === false;
+            });
+          }).map(function(sampleClass) {
+        return sampleClass.sampleCategory;
+      });
+    });
+
+    return ['Identity', 'Tissue', 'Tissue Processing', 'Stock', 'Aliquot'].filter(function(category) {
+      return childCategoriesPerClass.every(function(childCategories) {
+        return childCategories.indexOf(category) !== -1;
+      });
+    });
+  }
+
+  function referenceSlideColumn(include, sampleSubcategory) {
+    var col = {
+      title: 'Reference Slide',
+      type: 'dropdown',
+      data: 'referenceSlideId',
+      include: include,
+      source: function(data, api) {
+        return data.relatedSlides || [];
+      },
+      sortSource: Utils.sorting.standardSort('id'),
+      getItemLabel: function(item) {
+        return item.name + ' (' + item.alias + ')';
+      },
+      getItemValue: Utils.array.getId,
+      description: 'Indicates a slide whose attributes such as marked area and % tumour are relevant to this sample.'
+          + ' May be used for calculating extraction input per yield, for example.',
+    };
+    if (sampleSubcategory) {
+      col.sampleSubcategory = sampleSubcategory;
     }
-    return Constants.sampleClasses.filter(function(childClass) {
-      return sampleClasses.every(function(parentClass) {
-        return Constants.sampleValidRelationships.some(function(svr) {
-          return svr.parentId == parentClass.id && svr.childId == childClass.id && !svr.archived;
-        });
+    return col;
+  }
+
+  function getSampleClassOptions(targetSampleClass, targetCategory, parentSampleClassId) {
+    var options = null;
+    if (targetSampleClass) {
+      options = [targetSampleClass];
+    } else {
+      options = Constants.sampleClasses.filter(function(sampleClass) {
+        return sampleClass.sampleCategory === targetCategory && !sampleClass.archived && sampleClass.directCreationAllowed;
+      });
+    }
+    if (parentSampleClassId) {
+      options = filterSampleClassesByParentId(options, parentSampleClassId);
+    }
+    return options;
+  }
+
+  function filterSampleClassesByParentId(sampleClasses, parentSampleClassId) {
+    return sampleClasses.filter(function(sampleClass) {
+      return Constants.sampleValidRelationships.find(function(relationship) {
+        return relationship.parentId === parentSampleClassId && relationship.childId === sampleClass.id;
       });
     });
   }

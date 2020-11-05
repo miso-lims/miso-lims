@@ -108,15 +108,15 @@ public class BulkSamplePage extends BulkPage {
     table = new HandsOnTable(getDriver());
   }
 
-  public static BulkSamplePage getForCreate(WebDriver driver, String baseUrl, Integer quantity, Long projectId, Long sampleClassId) {
+  public static BulkSamplePage getForCreate(WebDriver driver, String baseUrl, Integer quantity, Long projectId, String sampleCategory) {
     String url = baseUrl + "miso/sample/bulk/new";
     MapBuilder<String, String> params = new MapBuilder<String, String>()
         .put("quantity", quantity.toString());
     if (projectId != null) {
       params.put("projectId", projectId.toString());
     }
-    if (sampleClassId != null) {
-      params.put("sampleClassId", sampleClassId.toString());
+    if (sampleCategory != null) {
+      params.put("targetCategory", sampleCategory);
     }
     postData(driver, url, params.build());
     return new BulkSamplePage(driver);
@@ -130,16 +130,14 @@ public class BulkSamplePage extends BulkPage {
   }
 
   public static BulkSamplePage getForPropagate(WebDriver driver, String baseUrl, List<Long> parentIds, List<Integer> replicates,
-      Long sampleClassId) {
+      String sampleCategory) {
     String ids = Joiner.on(',').join(parentIds);
     String replicatesString = Joiner.on(',').join(replicates);
     String url = baseUrl + "miso/sample/bulk/propagate";
     MapBuilder<String, String> params = new MapBuilder<String, String>()
         .put("parentIds", ids)
-        .put("replicates", replicatesString);
-    if (sampleClassId != null) {
-      params.put("sampleClassId", sampleClassId.toString());
-    }
+        .put("replicates", replicatesString)
+        .put("targetCategory", sampleCategory);
     postData(driver, url, params.build());
     return new BulkSamplePage(driver);
   }

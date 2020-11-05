@@ -1,6 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -26,7 +25,6 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleType;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 
@@ -73,8 +71,6 @@ public class SampleClassImpl implements SampleClass {
   @Column(nullable = false)
   @Temporal(TemporalType.TIMESTAMP)
   private Date lastUpdated;
-
-  private boolean dnaseTreatable = false;
 
   @ManyToOne
   @JoinColumn(name = "defaultSampleTypeId")
@@ -197,16 +193,6 @@ public class SampleClassImpl implements SampleClass {
   }
 
   @Override
-  public boolean getDNAseTreatable() {
-    return dnaseTreatable;
-  }
-
-  @Override
-  public void setDNAseTreatable(boolean treatable) {
-    dnaseTreatable = treatable;
-  }
-
-  @Override
   public String getSampleSubcategory() {
     return sampleSubcategory;
   }
@@ -217,31 +203,9 @@ public class SampleClassImpl implements SampleClass {
   }
 
   @Override
-  public boolean hasPathToDnaseTreatable(Collection<SampleValidRelationship> relationships) {
-    return hasPathToDnaseTreatable(this, new HashSet<>(), relationships);
-  }
-
-  private static boolean hasPathToDnaseTreatable(SampleClass from, Set<Long> checked, Collection<SampleValidRelationship> relationships) {
-    if (from.getDNAseTreatable()) {
-      return true;
-    }
-    // stop at tissue level, or if circling into a class hierarchy that has already been checked
-    if (from.getSampleCategory().equals(SampleTissue.CATEGORY_NAME) || !checked.add(from.getId())) {
-      return false;
-    }
-    return relationships.stream()
-        .filter(relationship -> !relationship.isArchived()
-            && !relationship.getParent().isArchived()
-            && relationship.getChild().getId() == from.getId()
-            && !checked.contains(relationship.getParent().getId()))
-        .anyMatch(relationship -> hasPathToDnaseTreatable(relationship.getParent(), checked, relationships));
-  }
-
-  @Override
   public int hashCode() {
     return new HashCodeBuilder(19, 49)
         .append(alias)
-        .append(dnaseTreatable)
         .append(sampleCategory)
         .append(sampleSubcategory)
         .append(suffix)
@@ -257,7 +221,6 @@ public class SampleClassImpl implements SampleClass {
     SampleClassImpl other = (SampleClassImpl) obj;
     return new EqualsBuilder()
         .append(alias, other.alias)
-        .append(dnaseTreatable, other.dnaseTreatable)
         .append(sampleCategory, other.sampleCategory)
         .append(sampleSubcategory, other.sampleSubcategory)
         .append(suffix, other.suffix)

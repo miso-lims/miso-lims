@@ -66,6 +66,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotRna;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
@@ -91,7 +92,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.QcNodeService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
-import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.core.service.SopService;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorkstationService;
@@ -109,6 +109,7 @@ import uk.ac.bbsrc.tgac.miso.dto.LibraryBatchDto;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryTemplateDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
+import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotRnaDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotSingleCellDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
@@ -143,6 +144,7 @@ public class EditLibraryController {
 
   private static class Config {
     private static final String IS_LIBRARY_RECEIPT = "isLibraryReceipt";
+    private static final String TARGET_SAMPLE_CLASS = "targetSampleClass";
     private static final String DEFAULT_SCI_NAME = "defaultSciName";
     private static final String SHOW_LIBRARY_ALIAS = "showLibraryAlias";
     private static final String SHOW_DESCRIPTION = "showDescription";
@@ -166,8 +168,6 @@ public class EditLibraryController {
   private ExperimentService experimentService;
   @Autowired
   private SampleClassService sampleClassService;
-  @Autowired
-  private SampleValidRelationshipService sampleValidRelationshipService;
   @Autowired
   private ProjectService projectService;
   @Autowired
@@ -459,8 +459,14 @@ public class EditLibraryController {
       if (aliquotClass == null) throw new ClientErrorException("No sample class found for ID " + aliquotClassId);
       DetailedLibraryDto detailedDto = new DetailedLibraryDto();
       libDto = detailedDto;
-      SampleAliquotDto samDto = SampleAliquotSingleCell.SUBCATEGORY_NAME.equals(aliquotClass.getAlias()) ? new SampleAliquotSingleCellDto()
-          : new SampleAliquotDto();
+      SampleAliquotDto samDto = null;
+      if (SampleAliquotSingleCell.SUBCATEGORY_NAME.equals(aliquotClass.getSampleSubcategory())) {
+        samDto = new SampleAliquotSingleCellDto();
+      } else if (SampleAliquotRna.SUBCATEGORY_NAME.equals(aliquotClass.getSampleSubcategory())) {
+        samDto = new SampleAliquotRnaDto();
+      } else {
+        samDto = new SampleAliquotDto();
+      }
       detailedDto.setSample(samDto);
       samDto.setSampleClassId(aliquotClassId);
       detailedDto.setParentSampleClassId(aliquotClassId);
@@ -502,8 +508,7 @@ public class EditLibraryController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
       if (aliquotClass != null) {
-        config.putPOJO("targetSampleClass", Dtos.asDto(aliquotClass));
-        config.put("dnaseTreatable", aliquotClass.hasPathToDnaseTreatable(sampleValidRelationshipService.getAll()));
+        config.putPOJO(Config.TARGET_SAMPLE_CLASS, Dtos.asDto(aliquotClass));
       }
       Map<Long, List<LibraryTemplateDto>> templatesByProjectId = new HashMap<>();
       addJsonArray(mapper, config, "projects", projectService.list(), Dtos::asDto);

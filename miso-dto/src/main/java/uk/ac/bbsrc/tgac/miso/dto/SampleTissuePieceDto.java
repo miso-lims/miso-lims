@@ -1,7 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
@@ -13,7 +11,6 @@ public class SampleTissuePieceDto extends SampleTissueProcessingDto {
   private Long parentSlideClassId;
   private Long tissuePieceTypeId;
   private Long referenceSlideId;
-  private List<SampleDto> relatedSlides;
 
   public Integer getSlidesConsumed() {
     return slidesConsumed;
@@ -45,14 +42,6 @@ public class SampleTissuePieceDto extends SampleTissueProcessingDto {
 
   public void setReferenceSlideId(Long referenceSlideId) {
     this.referenceSlideId = referenceSlideId;
-  }
-
-  public List<SampleDto> getRelatedSlides() {
-    return relatedSlides;
-  }
-
-  public void setRelatedSlides(List<SampleDto> relatedSlides) {
-    this.relatedSlides = relatedSlides;
   }
 
 }

@@ -15,11 +15,13 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotRna;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStockRna;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
@@ -30,9 +32,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({ @JsonSubTypes.Type(value = SampleAliquotDto.class, name = SampleAliquot.CATEGORY_NAME),
+    @JsonSubTypes.Type(value = SampleAliquotRnaDto.class, name = SampleAliquotRna.SUBCATEGORY_NAME),
     @JsonSubTypes.Type(value = SampleAliquotSingleCellDto.class, name = SampleAliquotSingleCell.SUBCATEGORY_NAME),
     @JsonSubTypes.Type(value = SampleIdentityDto.class, name = SampleIdentity.CATEGORY_NAME),
     @JsonSubTypes.Type(value = SampleStockDto.class, name = SampleStock.CATEGORY_NAME),
+    @JsonSubTypes.Type(value = SampleStockRnaDto.class, name = SampleStockRna.SUBCATEGORY_NAME),
     @JsonSubTypes.Type(value = SampleStockSingleCellDto.class, name = SampleStockSingleCell.SUBCATEGORY_NAME),
     @JsonSubTypes.Type(value = SampleTissueDto.class, name = SampleTissue.CATEGORY_NAME),
     @JsonSubTypes.Type(value = SampleTissueProcessingDto.class, name = SampleTissueProcessing.CATEGORY_NAME),

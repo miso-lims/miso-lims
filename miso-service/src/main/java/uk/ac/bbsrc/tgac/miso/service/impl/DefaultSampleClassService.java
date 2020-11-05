@@ -189,10 +189,6 @@ public class DefaultSampleClassService extends AbstractSaveService<SampleClass> 
         errors.add(new ValidationError("sampleCategory",
             String.format("Cannot change because this sample class is already used by %d samples", usage)));
       }
-      if (ValidationUtils.isSetAndChanged(SampleClass::getDNAseTreatable, object, beforeChange)) {
-        errors.add(new ValidationError("dnaseTreatable",
-            String.format("Cannot change because this sample class is already used by %d samples", usage)));
-      }
     }
     if (!SampleClass.CATEGORIES.contains(object.getSampleCategory())) {
       errors.add(new ValidationError("sampleCategory", "Invalid category"));
@@ -306,7 +302,6 @@ public class DefaultSampleClassService extends AbstractSaveService<SampleClass> 
   @Override
   protected void applyChanges(SampleClass to, SampleClass from) throws IOException {
     to.setAlias(from.getAlias());
-    to.setDNAseTreatable(from.getDNAseTreatable());
     to.setDirectCreationAllowed(from.isDirectCreationAllowed());
     to.setArchived(from.isArchived());
     to.setSampleCategory(from.getSampleCategory());

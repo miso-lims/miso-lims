@@ -97,6 +97,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStockRna;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
@@ -148,6 +149,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotRnaImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotSingleCellImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleGroupImpl;
@@ -158,6 +160,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleSingleCellImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleSlideImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockRnaImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockSingleCellImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissuePieceImpl;
@@ -357,7 +360,6 @@ public class Dtos {
     dto.setLastUpdated(formatDateTime(from.getLastModified()));
     setLong(dto::setCreatedById, maybeGetProperty(from.getCreator(), User::getId), true);
     setLong(dto::setUpdatedById, maybeGetProperty(from.getLastModifier(), User::getId), true);
-    dto.setDNAseTreatable(from.getDNAseTreatable());
     setString(dto::setDefaultSampleType, maybeGetProperty(from.getDefaultSampleType(), SampleType::getName));
     dto.setParentRelationships(from.getParentRelationships().stream().map(Dtos::asDto).collect(Collectors.toList()));
     dto.setChildRelationships(from.getChildRelationships().stream().map(Dtos::asDto).collect(Collectors.toList()));
@@ -378,7 +380,6 @@ public class Dtos {
     setString(to::setV2NamingCode, from.getV2NamingCode());
     to.setArchived(from.isArchived());
     to.setDirectCreationAllowed(from.isDirectCreationAllowed());
-    to.setDNAseTreatable(from.getDNAseTreatable());
     setObject(to::setDefaultSampleType, from.getDefaultSampleType(), name -> {
       SampleType st = new SampleType();
       st.setName(name);
@@ -538,7 +539,7 @@ public class Dtos {
       DetailedSample parent = from.getParent();
       dto.setParentId(parent.getId());
       dto.setParentAlias(parent.getAlias());
-      dto.setParentTissueSampleClassId(parent.getSampleClass().getId());
+      dto.setParentSampleClassId(parent.getSampleClass().getId());
       if (parent.getBox() != null) {
         dto.setParentBoxPositionLabel(BoxUtils.makeBoxPositionLabel(parent.getBox().getAlias(), parent.getBoxPosition()));
       }
@@ -628,10 +629,10 @@ public class Dtos {
    *
    * <ol>
    * <li>parent ID is provided. This implies that the parent exists, so no other parent information will be required</li>
-   * <li>identity information and parentTissueSampleClassId are provided. This implies that a tissue parent should be created, and that the
+   * <li>identity information and parentSampleClassId are provided. This implies that a tissue parent should be created, and that the
    * identity may or may not yet exist. If the sampleClassId is an aliquot, a stockClassId must be provided. ParentAliquotClassId may be
    * provided to indicate a second aliquot level in the hierarchy</li>
-   * <li>identity information is provided, but no parentTissueSampleClassId. You must be creating a tissue in this case.</li>
+   * <li>identity information is provided, but no parentSampleClassId. You must be creating a tissue in this case.</li>
    * </ol>
    *
    * @param childDto
@@ -649,12 +650,12 @@ public class Dtos {
       }
 
       if (childDto instanceof SampleTissueDto && childDto.getClass() != SampleTissueDto.class) {
-        if (childDto.getParentTissueSampleClassId() == null) {
+        if (childDto.getParentSampleClassId() == null) {
           throw new IllegalArgumentException("No tissue class specified.");
         }
         DetailedSample tissue = toTissueSample((SampleTissueDto) childDto);
         tissue.setSampleClass(new SampleClassImpl());
-        tissue.getSampleClass().setId(childDto.getParentTissueSampleClassId());
+        tissue.getSampleClass().setId(childDto.getParentSampleClassId());
         tissue.setParent(parent);
         parent = tissue;
 
@@ -679,7 +680,7 @@ public class Dtos {
         parent = tissueProcessing;
       }
       if (childDto instanceof SampleStockDto && childDto.getClass() != SampleStockDto.class
-          && childDto.getClass() != SampleStockSingleCellDto.class) {
+          && childDto.getClass() != SampleStockSingleCellDto.class && childDto.getClass() != SampleStockRnaDto.class) {
         SampleAliquotDto aliquotDto = (SampleAliquotDto) childDto;
         DetailedSample stock = toStockSample((SampleStockDto) childDto);
         stock.setSampleClass(new SampleClassImpl());
@@ -792,11 +793,15 @@ public class Dtos {
       setString(sc::setCellViability, scFrom.getCellViability());
       setString(sc::setLoadingCellConcentration, scFrom.getLoadingCellConcentration());
       dto = sc;
+    } else if (isStockRnaSample(from)) {
+      SampleStockRna rnaFrom = (SampleStockRna) from;
+      SampleStockRnaDto rna = new SampleStockRnaDto();
+      setBoolean(rna::setDnaseTreated, rnaFrom.getDnaseTreated(), true);
+      dto = rna;
     } else {
       dto = new SampleStockDto();
     }
     dto.setStrStatus(from.getStrStatus().getLabel());
-    dto.setDnaseTreated(from.getDNAseTreated());
     setId(dto::setReferenceSlideId, from.getReferenceSlide());
     return dto;
   }
@@ -810,13 +815,17 @@ public class Dtos {
       setBigDecimal(sc::setCellViability, scFrom.getCellViability());
       setBigDecimal(sc::setLoadingCellConcentration, scFrom.getLoadingCellConcentration());
       to = sc;
+    } else if (from instanceof SampleStockRnaRelative) {
+      SampleStockRnaRelative rnaFrom = (SampleStockRnaRelative) from;
+      SampleStockRna rna = new SampleStockRnaImpl();
+      setBoolean(rna::setDnaseTreated, rnaFrom.getDnaseTreated(), true);
+      to = rna;
     } else {
       to = new SampleStockImpl();
     }
     if (from.getStrStatus() != null) {
       to.setStrStatus(from.getStrStatus());
     }
-    to.setDNAseTreated(from.getDnaseTreated());
     setObject(to::setReferenceSlide, SampleSlideImpl::new, from.getReferenceSlideId());
     return to;
   }
@@ -828,6 +837,8 @@ public class Dtos {
       SampleAliquotSingleCell sc = new SampleAliquotSingleCellImpl();
       setBigDecimal(sc::setInputIntoLibrary, scFrom.getInputIntoLibrary());
       to = sc;
+    } else if (from.getClass() == SampleAliquotRnaDto.class) {
+      to = new SampleAliquotRnaImpl();
     } else {
       to = new SampleAliquotImpl();
     }

@@ -952,7 +952,6 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       ((SampleStockSingleCell) target).setLoadingCellConcentration(((SampleStockSingleCell) source).getLoadingCellConcentration());
     }
     target.setStrStatus(source.getStrStatus());
-    target.setDNAseTreated(source.getDNAseTreated());
     target.setReferenceSlide(source.getReferenceSlide());
   }
 

@@ -252,10 +252,10 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     adminSlugs = Collections.unmodifiableSet(moreSlugs);
 
     factoryPages = Collections.unmodifiableMap(new MapBuilder<String, BiConsumer<WebDriver, String>>()
-        .put("sample/bulk/new", (driver, baseUrl) -> BulkSamplePage.getForCreate(driver, baseUrl, 5, null, 15L))
+        .put("sample/bulk/new", (driver, baseUrl) -> BulkSamplePage.getForCreate(driver, baseUrl, 5, null, "Aliquot"))
         .put("sample/bulk/edit", (driver, baseUrl) -> BulkSamplePage.getForEdit(driver, baseUrl, Lists.newArrayList(302L, 202L)))
         .put("sample/bulk/propagate",
-            (driver, baseUrl) -> BulkSamplePage.getForPropagate(driver, baseUrl, Arrays.asList(302L, 202L), Arrays.asList(1), 11L))
+            (driver, baseUrl) -> BulkSamplePage.getForPropagate(driver, baseUrl, Arrays.asList(302L, 202L), Arrays.asList(1), "Aliquot"))
         .put("library/bulk/propagate",
             (driver, baseUrl) -> BulkLibraryPage.getForPropagate(driver, baseUrl, Arrays.asList(304L, 305L), Arrays.asList(1)))
         .put("library/bulk/edit", (driver, baseUrl) -> BulkLibraryPage.getForEdit(driver, baseUrl, Arrays.asList(601L, 602L, 603L, 604L)))

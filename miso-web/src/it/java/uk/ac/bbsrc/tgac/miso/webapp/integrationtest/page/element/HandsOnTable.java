@@ -133,7 +133,11 @@ public class HandsOnTable extends AbstractElement {
   public Set<String> getDropdownOptions(String columnHeading, int rowNum) {
     WebElement cell = getCell(columnHeading, rowNum);
     cancelEditing();
-    WebElement dropdownArrow = cell.findElement(dropdownArrowSelector);
+    List<WebElement> elements = cell.findElements(dropdownArrowSelector);
+    if (elements.isEmpty()) {
+      throw new IllegalArgumentException("Column '%s' is not a dropdown");
+    }
+    WebElement dropdownArrow = elements.get(0);
     dropdownArrow.click();
     WebElement dropdown = hotContainer.findElement(activeDropdownSelector);
 

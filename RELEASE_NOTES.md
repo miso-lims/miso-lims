@@ -2,12 +2,49 @@
 
 Changes:
 
+  * Detailed sample: changed the bulk sample pages to allow creating/editing samples of multiple sample
+    classes at once. The tables are now limited to a single sample category (e.g. tissue or stock), and
+    fields not applicable to the selected sample class for a particular row will be disabled.
   * Fixed an issue that allowed login to time out during bulk save
   * Fixed remember-me token not being checked during REST requests (during saves, searches, etc.),
     causing the requests to fail authentication if the session had timed out
   * Fixed Initial Extraction Yields List sample download format to use initial volume instead of
     current volume for calculating total yield
   * Added an editor for printer labels
+
+Upgrade Notes:
+
+  * Detailed sample mode only: The DNAse treated field now belongs to the "RNA (stock)" stock sample
+    category. Previously, there was a flag on sample classes to indicate whether they should include this
+    field. In order to ensure that this field is handled properly when receiving RNA aliquots, an additional
+    "RNA (aliquot)" subcategory has been added.
+
+    Running the database migration for this version will add the "RNA (stock)" subcategory to any stock
+    class that was marked DNAse treatable. The "RNA (aliquot)" subcategory will be added to any aliquot
+    class with an alias containing "RNA". After the upgrade, you should ensure that the correct changes
+    have been made to your sample classes. You can use the following queries to check and fix any issues:
+
+    ```
+    -- Check subcategories
+    SELECT sampleClassId, alias, sampleCategory, sampleSubcategory FROM SampleClass;
+
+    -- Add missing subcategory
+    -- substitute the correct sampleClassId and subcategory (may be 'RNA (stock)' or 'RNA (aliquot)')
+    UPDATE SampleClass SET sampleSubcategory = 'RNA (stock)' WHERE sampleClassId = 123;
+    
+    -- Remove incorrect subcategory; substitute correct sampleClassId
+    UPDATE SampleClass SET sampleSubcategory = NULL WHERE sampleClassId = 123;
+
+    -- IMPORTANT: Run the following after making any changes to these subcategories:
+    UPDATE Sample SET discriminator = 'StockRna' WHERE sampleClassId IN
+      (SELECT sampleClassId FROM SampleClass WHERE sampleSubcategory = 'RNA (stock)');
+    UPDATE Sample SET discriminator = 'AliquotRna' WHERE sampleClassId IN
+      (SELECT sampleClassId FROM SampleClass WHERE sampleSubcategory = 'RNA (aliquot)');
+    UPDATE Sample SET discriminator = 'Stock' WHERE sampleClassId IN
+      (SELECT sampleClassId FROM SampleClass WHERE sampleCategory = 'Stock' AND sampleSubcategory IS NULL);
+    UPDATE Sample SET discriminator = 'Aliquot' WHERE sampleClassId IN
+      (SELECT sampleClassId FROM SampleClass WHERE sampleCategory = 'Aliquot' AND sampleSubcategory IS NULL);
+    ```
 
 # 1.16.0
 

@@ -19,7 +19,6 @@ public class SampleClassDto {
   private String creationDate;
   private Long updatedById;
   private String lastUpdated;
-  private boolean dnaseTreatable;
   private String defaultSampleType;
   private List<SampleValidRelationshipDto> parentRelationships;
   private List<SampleValidRelationshipDto> childRelationships;
@@ -112,14 +111,6 @@ public class SampleClassDto {
     this.directCreationAllowed = directCreationAllowed;
   }
 
-  public boolean getDNAseTreatable() {
-    return dnaseTreatable;
-  }
-
-  public void setDNAseTreatable(boolean dnaseTreatable) {
-    this.dnaseTreatable = dnaseTreatable;
-  }
-
   public String getDefaultSampleType() {
     return defaultSampleType;
   }
@@ -157,7 +148,7 @@ public class SampleClassDto {
     return "SampleClassDto [id=" + id + ", alias=" + alias + ", sampleCategory=" + sampleCategory + ", sampleSubcategory="
         + sampleSubcategory + ", suffix=" + suffix
         + ", createdById=" + createdById + ", creationDate=" + creationDate + ", updatedById=" + updatedById + ", lastUpdated="
-        + lastUpdated + ", dnaseTreatable=" + dnaseTreatable + "]";
+        + lastUpdated + "]";
   }
 
 }
