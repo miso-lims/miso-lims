@@ -5,6 +5,8 @@ Changes:
   * Fixed an issue that allowed login to time out during bulk save
   * Fixed remember-me token not being checked during REST requests (during saves, searches, etc.),
     causing the requests to fail authentication if the session had timed out
+  * Fixed Initial Extraction Yields List sample download format to use initial volume instead of
+    current volume for calculating total yield
   * Added an editor for printer labels
 
 # 1.16.0
