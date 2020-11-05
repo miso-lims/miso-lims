@@ -1233,5 +1233,4 @@ INSERT INTO Printer(printerId, name, driver, backend, configuration, enabled, wi
 (1, 'Printer', 'BRADY', 'BRADY_FTP', '{"host:"127.0.0.1","pin":"0000"}', TRUE, 25, 25, '[{"element":"text", "contents":{"use":"ALIAS"}}]');
 
 -- Keep this at bottom - checked to verify that script has completed and constants all loaded
-INSERT INTO AttachmentCategory(categoryId, alias) VALUES
-(4, 'last entry');
+INSERT INTO AttachmentCategory(categoryId, alias) VALUES (4, 'last entry');

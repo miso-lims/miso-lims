@@ -198,3 +198,6 @@ INSERT INTO Pool (poolId, concentration, volume, name, alias, identificationBarc
 
 INSERT INTO Pool_LibraryAliquot (poolId, aliquotId) VALUES
 (1, 1);
+
+-- Keep this at bottom - checked to verify that script has completed and constants all loaded
+INSERT INTO AttachmentCategory(categoryId, alias) VALUES (1, 'last entry');
