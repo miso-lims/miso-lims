@@ -456,6 +456,7 @@ public class EditSampleController {
         dto.setParentId(sample.getId());
         dto.setParentAlias(sample.getAlias());
         if (sample.getBox() != null) {
+          dto.setParentBoxPosition(sample.getBoxPosition());
           dto.setParentBoxPositionLabel(BoxUtils.makeBoxPositionLabel(sample.getBox().getAlias(), sample.getBoxPosition()));
         }
         dto.setParentSampleClassId(sample.getSampleClass().getId());

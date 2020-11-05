@@ -339,6 +339,7 @@ public class EditLibraryController {
         detailedDto.setParentSampleClassId(sample.getSampleClass().getId());
         detailedDto.setNonStandardAlias(sample.hasNonStandardAlias());
         if (sample.getBox() != null) {
+          detailedDto.setSampleBoxPosition(sample.getBoxPosition());
           detailedDto.setSampleBoxPositionLabel(BoxUtils.makeBoxPositionLabel(sample.getBox().getAlias(), sample.getBoxPosition()));
         }
         GroupIdentifiable effective = sample.getEffectiveGroupIdEntity();

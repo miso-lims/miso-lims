@@ -541,6 +541,7 @@ public class Dtos {
       dto.setParentAlias(parent.getAlias());
       dto.setParentSampleClassId(parent.getSampleClass().getId());
       if (parent.getBox() != null) {
+        dto.setParentBoxPosition(parent.getBoxPosition());
         dto.setParentBoxPositionLabel(BoxUtils.makeBoxPositionLabel(parent.getBox().getAlias(), parent.getBoxPosition()));
       }
     }
@@ -1423,6 +1424,7 @@ public class Dtos {
     }
     dto.setDiscarded(from.isDiscarded());
     if (from.getSample().getBox() != null) {
+      dto.setSampleBoxPosition(from.getSample().getBoxPosition());
       dto.setSampleBoxPositionLabel(BoxUtils.makeBoxPositionLabel(from.getSample().getBox().getAlias(), from.getSample().getBoxPosition()));
     }
     setId(dto::setSpikeInId, from.getSpikeIn());

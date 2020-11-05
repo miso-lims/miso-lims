@@ -21,6 +21,8 @@ BulkTarget.sample = (function($) {
 
   var originalProjectIdsBySampleId = {};
   var originalEffectiveGroupIdsByRow = {};
+  var parentLocationsByRow = null;
+
   var showLabColumn = false;
   var editSubcategories = [];
 
@@ -34,8 +36,10 @@ BulkTarget.sample = (function($) {
     getUserManualUrl: function() {
       return Urls.external.userManual('samples');
     },
-    getCustomActions: function() {
-      return BulkUtils.actions.boxable();
+    getCustomActions: function(config) {
+      var allowMatchParentPos = Constants.isDetailedSample
+          && (config.pageMode === 'propagate' || (config.pageMode === 'edit' && config.targetCategory !== 'Identity'));
+      return BulkUtils.actions.boxable(allowMatchParentPos, parentLocationsByRow);
     },
     getBulkActions: function(config) {
       var actions = [
@@ -221,8 +225,12 @@ BulkTarget.sample = (function($) {
       return actions;
     },
     prepareData: function(data, config) {
+      parentLocationsByRow = {};
       data.forEach(function(sample, index) {
         originalEffectiveGroupIdsByRow[index] = sample.effectiveGroupId;
+        if (Constants.isDetailedSample && sample.parentBoxPosition) {
+          parentLocationsByRow[index] = sample.parentBoxPosition;
+        }
         if (config.pageMode === 'edit') {
           originalProjectIdsBySampleId[sample.id] = sample.projectId;
         } else {
