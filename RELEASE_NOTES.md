@@ -18,7 +18,7 @@ Changes:
 
 Upgrade Notes:
 
-  * Updated to Pinery v2.14.0
+  * Updated to Pinery v2.14.1
   * Detailed sample mode only: The DNAse treated field now belongs to the "RNA (stock)" stock sample
     category. Previously, there was a flag on sample classes to indicate whether they should include this
     field. In order to ensure that this field is handled properly when receiving RNA aliquots, an additional
