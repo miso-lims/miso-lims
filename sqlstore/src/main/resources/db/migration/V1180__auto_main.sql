@@ -1,3 +1,4 @@
+-- rna_subcategory
 UPDATE SampleClass SET sampleSubcategory = 'RNA (stock)'
 WHERE sampleCategory = 'Stock'
 AND sampleSubCategory IS NULL
@@ -15,3 +16,4 @@ UPDATE Sample SET discriminator = 'StockRna' WHERE sampleClassId IN
 
 UPDATE Sample SET discriminator = 'AliquotRna' WHERE sampleClassId IN
   (SELECT sampleClassId FROM SampleClass WHERE sampleSubcategory = 'RNA (aliquot)');
+
