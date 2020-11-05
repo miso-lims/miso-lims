@@ -6,6 +6,7 @@ SELECT DISTINCT Run.runId
   ,tr.alias targeted_sequencing 
   ,COALESCE(Run.dataManglingPolicy, im.dataManglingPolicy) dataManglingPolicy
   ,rp.alias run_purpose
+  ,rpa.qcPassed qc_passed
 FROM SequencingContainerModel scm
 JOIN SequencerPartitionContainer spc ON scm.sequencingContainerModelId = spc.sequencingContainerModelId
 JOIN _Partition part ON part.containerId = spc.containerId

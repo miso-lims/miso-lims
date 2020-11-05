@@ -664,6 +664,7 @@ public class MisoClient implements Lims {
       p.setPoolCreated(rs.getTimestamp("pool_created"));
       p.setPoolModifiedById(rs.getInt("pool_modifiedById"));
       p.setPoolModified(rs.getTimestamp("pool_modified"));
+      p.setPoolStatus(makeStatus(rs, "pool_qc_passed", null));
       p.setAnalysisSkipped(rs.getBoolean("analysis_skipped"));
       p.setQcStatus(rs.getString("qc_status"));
       p.setRunPurpose(rs.getString("run_purpose"));
@@ -674,9 +675,6 @@ public class MisoClient implements Lims {
   }
 
   public static class SampleRowMapper implements RowMapper<Sample> {
-
-    private static final String SAMPLE_STATUS_READY = "Ready";
-    private static final String SAMPLE_STATUS_NOT_READY = "Not Ready";
 
     @Override
     public Sample mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -727,12 +725,7 @@ public class MisoClient implements Lims {
       if (!atts.isEmpty()) {
         s.setAttributes(atts);
       }
-      Boolean qcPassed = rs.getBoolean("qcPassed");
-      String detailedQcStatus = rs.getString("detailedQcStatus");
-      Status status = new DefaultStatus();
-      status.setState((qcPassed == null || !qcPassed) ? SAMPLE_STATUS_NOT_READY : SAMPLE_STATUS_READY);
-      status.setName(detailedQcStatus == null ? status.getState() : detailedQcStatus);
-      s.setStatus(status);
+      s.setStatus(makeStatus(rs, "qcPassed", "detailedQcStatus"));
       s.setPreMigrationId(rs.getLong("premigration_id"));
       if (rs.wasNull()) s.setPreMigrationId(null);
 
@@ -1115,6 +1108,7 @@ public class MisoClient implements Lims {
       boolean reverseComplement2 = rs.getString("dataManglingPolicy").equals("I5_RC");
       s.setBarcodeTwo(reverseComplement2 ? reverseComplement(barcode2) : barcode2);
       s.setRunPurpose(rs.getString("run_purpose"));
+      s.setStatus(makeStatus(rs, "qc_passed", null));
 
       Attribute att = AttributeKey.TARGETED_RESEQUENCING.extractAttributeFrom(rs);
       if (att != null) {
@@ -1246,6 +1240,21 @@ public class MisoClient implements Lims {
     }
 
   };
+
+  private static Status makeStatus(ResultSet rs, String stateColumn, String nameColumn) throws SQLException {
+    Status status = new DefaultStatus();
+    boolean qcPassed = rs.getBoolean(stateColumn);
+    if (rs.wasNull()) {
+      status.setState("Not Ready");
+    } else if (qcPassed) {
+      status.setState("Ready");
+    } else {
+      status.setState("Failed");
+    }
+    String name = nameColumn == null ? null : rs.getString(nameColumn);
+    status.setName(name == null ? status.getState() : name);
+    return status;
+  }
 
   private static String getResourceAsString(String resourceName) {
     try {
