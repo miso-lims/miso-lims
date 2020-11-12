@@ -133,7 +133,7 @@ Name to display for sender of outgoing mail. Defaults to "MISO" if unspecified.
 ### `miso.smtp.holdMinutes`
 
 Minimum number of minutes to wait before sending notifications. This allows time for the user to catch mistakes and
-revise the data or cancel the notification before it is sent.
+revise the data or cancel the notification before it is sent. Defaults to 60 if unspecified.
 
 ### `miso.smtp.throttleMinutes`
 
