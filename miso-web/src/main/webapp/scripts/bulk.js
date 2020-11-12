@@ -2040,6 +2040,9 @@ BulkUtils = (function($) {
     } else if (responseData.dataFormat === 'bulk validation') {
       showValidationErrors(responseData.detail, responseData.data, hot, columns);
     } else {
+      if (!additionalMessage && responseData.data) {
+        additionalMessage = responseData.data.uiHelp;
+      }
       showError(responseData.detail, additionalMessage);
     }
   }
