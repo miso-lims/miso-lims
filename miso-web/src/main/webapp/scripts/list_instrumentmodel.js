@@ -7,6 +7,7 @@ ListTarget.instrumentmodel = {
     return Urls.rest.instrumentModels.datatable;
   },
   getQueryUrl: null,
+  showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
     return !config.isAdmin ? [] : [ListUtils.createBulkDeleteAction('Instrument Models', 'instrumentmodels', function(item) {
       return item.platformType + ' - ' + item.alias;

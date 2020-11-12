@@ -11,6 +11,7 @@ ListTarget.libraryselection = {
     text: 'WARNING: Adding or modifying library selection types may cause your data to be invalid for ENA submission',
     level: 'important'
   },
+  showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
     var actions = HotTarget.libraryselection.getBulkActions(config);
     if (config.isAdmin) {

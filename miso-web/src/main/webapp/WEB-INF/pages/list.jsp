@@ -27,6 +27,7 @@
 <div id="maincontent">
   <div id="contentcolumn">
     <h1 id="tableTitle"></h1>
+    <div id="headerMessages"></div>
     <table class="display no-border ui-widget-content" id="listingTable">
     </table>
     <script type="text/javascript">

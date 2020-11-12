@@ -7,6 +7,7 @@ ListTarget.containermodel = {
     throw new Error("Must be provided statically");
   },
   getQueryUrl: null,
+  showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
     if (config.isInstrumentModelPage) {
       return !config.isAdmin ? [] : [{

@@ -30,6 +30,7 @@ ListTarget.targetedsequencing = {
     return Urls.rest.targetedSequencings[config.add ? 'kitAvailableDatatable' : 'kitIncludedDatatable'](config.kitDescriptorId);
   },
   getQueryUrl: null,
+  showNewOptionSop: true,
   createBulkActions: function(config) {
     if (config.kitDescriptorId) {
       return !config.isAdmin ? [] : [{

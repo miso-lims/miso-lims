@@ -7,6 +7,7 @@ ListTarget.tissuetype = {
     throw new Error("Must be provided statically");
   },
   queryUrl: null,
+  showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
     var actions = HotTarget.tissuetype.getBulkActions(config);
     if (config.isAdmin) {

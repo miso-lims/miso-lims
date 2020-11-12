@@ -30,6 +30,7 @@ ListTarget.qctype = {
     throw new Error("Must be provided statically");
   },
   getQueryUrl: null,
+  showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
     return config.isAdmin ? [ListUtils.createBulkDeleteAction("QC Types", "qctypes", function(qcType) {
       return qcType.name + ' (' + qcType.qcTarget + ' QC)';

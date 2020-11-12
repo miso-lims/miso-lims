@@ -11,6 +11,7 @@ ListTarget.studytype = {
     text: 'WARNING: Adding or modifying study types may cause your data to be invalid for ENA submission',
     level: 'important'
   },
+  showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
     var actions = HotTarget.studytype.getBulkActions(config);
     if (config.isAdmin) {

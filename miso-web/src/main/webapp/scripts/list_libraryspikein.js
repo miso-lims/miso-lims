@@ -7,6 +7,7 @@ ListTarget.libraryspikein = {
     throw new Error("Must be provided statically");
   },
   getQueryUrl: null,
+  showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
     var actions = HotTarget.libraryspikein.getBulkActions(config);
     if (config.isAdmin) {

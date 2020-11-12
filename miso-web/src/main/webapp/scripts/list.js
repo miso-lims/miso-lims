@@ -267,11 +267,21 @@ ListUtils = (function($) {
     registerPopupClose(popupCloseId, popupId);
   };
 
-  var makeHeaderMessage = function(text, level) {
-    $('#headerMessage').remove();
-    $('#tableTitle').after(
-        $('<p>').attr('id', 'headerMessage').addClass('big big-' + (level || 'info')).css('margin-top', '.25em').text(text));
-  };
+  var addHeaderMessages = function(target) {
+    $('#headerMessages').empty();
+    var messages = [];
+    if (target.headerMessage) {
+      messages.push($('<p>').addClass('big big-' + (target.headerMessage.level || 'info')).text(target.headerMessage.text));
+    }
+    if (target.showNewOptionSop && Constants.newOptionSopUrl) {
+      messages.push($('<p>').addClass('big big-important').append(
+          $('<a>').attr('href', Constants.newOptionSopUrl).attr('target', '_blank').text('Click to see the SOP for adding new options')))
+    }
+    if (messages.length) {
+      messages[0].css('margin-top', '.25em');
+      $('#headerMessages').append(messages);
+    }
+  }
 
   var setSortFromPriority = function(table) {
     var info = table.aoColumns.reduce(function(acc, curr, index) {
@@ -470,9 +480,7 @@ ListUtils = (function($) {
     });
     optionModifier(options, jqTable, errorMessage, columns);
     var dataTable = jqTable.dataTable(options);
-    if (target.headerMessage) {
-      makeHeaderMessage(target.headerMessage.text, target.headerMessage.level);
-    }
+    addHeaderMessages(target);
     if (options.sAjaxSource && target.hasOwnProperty("searchTermSelector")) {
       var searchDivId = elementId + '_filter';
 

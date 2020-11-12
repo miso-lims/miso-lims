@@ -203,6 +203,8 @@ public class ConstantsController {
   private String genomeFolder;
   @Value("${miso.test.lockConstants:false}")
   private boolean locked;
+  @Value("${miso.newOptionSopUrl:#{null}}")
+  private String newOptionSopUrl;
 
   @Resource
   private Boolean boxScannerEnabled;
@@ -242,6 +244,7 @@ public class ConstantsController {
       node.put("isDetailedSample", detailedSample);
       node.put("automaticBarcodes", autoGenerateIdBarcodes);
       node.put("boxScannerEnabled", boxScannerEnabled);
+      node.put("newOptionSopUrl", newOptionSopUrl);
 
       final Collection<SampleValidRelationship> relationships = sampleValidRelationshipService.getAll();
 

@@ -34,6 +34,7 @@ ListTarget.instrument = {
     }
   },
   getQueryUrl: null,
+  showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
     return !config.isAdmin ? [] : [ListUtils.createBulkDeleteAction("Instruments", "instruments", function(instrument) {
       return instrument.name + ' (' + instrument.instrumentModelAlias + ')';

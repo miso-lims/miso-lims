@@ -7,6 +7,7 @@ ListTarget.librarytype = {
     throw new Error("Must be provided statically");
   },
   getQueryUrl: null,
+  showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
     var actions = HotTarget.librarytype.getBulkActions(config);
     if (config.isAdmin) {

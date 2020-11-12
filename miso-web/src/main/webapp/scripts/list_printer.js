@@ -7,6 +7,7 @@ ListTarget.printer = {
     return Urls.rest.printers.datatable;
   },
   getQueryUrl: null,
+  showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
     return !config.isAdmin ? [] : [{
       "name": "Enable",

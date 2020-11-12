@@ -7,6 +7,7 @@ ListTarget.indexfamily = {
     throw new Error("Must be provided statically");
   },
   getQueryUrl: null,
+  showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
     return !config.isAdmin ? [] : [ListUtils.createBulkDeleteAction('Index Families', 'indexfamilies', Utils.array.getName)];
   },

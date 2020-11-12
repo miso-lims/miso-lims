@@ -34,6 +34,7 @@ ListTarget.kit = {
     }
   },
   getQueryUrl: null,
+  showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
     if (config.isUserAdmin) {
       if (config.isQcTypePage) {
