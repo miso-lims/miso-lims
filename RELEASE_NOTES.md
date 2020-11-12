@@ -2,7 +2,9 @@
 
 Changes:
 
-
+  * Set default values in bulk sample tables (detailed sample)
+    * STR Status (stocks): Not Submitted
+    * DNAse (RNA stocks): True
 
 # 1.17.0
 
@@ -43,7 +45,7 @@ Upgrade Notes:
     -- Add missing subcategory
     -- substitute the correct sampleClassId and subcategory (may be 'RNA (stock)' or 'RNA (aliquot)')
     UPDATE SampleClass SET sampleSubcategory = 'RNA (stock)' WHERE sampleClassId = 123;
-    
+
     -- Remove incorrect subcategory; substitute correct sampleClassId
     UPDATE SampleClass SET sampleSubcategory = NULL WHERE sampleClassId = 123;
 
@@ -334,7 +336,7 @@ Known Issues:
     (unknown)
   * Fill Boxes actions on the bulk Create/Edit Sample and Library Aliquot pages don't work
   * When bulk receiving libraries with the same receipt information, the libraries may be broken into
-    multiple transfers, and the transfers' receipt time may be modified incorrectly 
+    multiple transfers, and the transfers' receipt time may be modified incorrectly
   * Buttons to add/edit box uses link to the wrong URL
   * Tissue processing classes with no subcategory cause errors
 
@@ -402,7 +404,7 @@ Known Issues:
   * Buttons to add/edit box uses link to the wrong URL
   * Tissue processing classes with no subcategory cause errors
 
-# 1.2.0 
+# 1.2.0
 
 Changes:
 
