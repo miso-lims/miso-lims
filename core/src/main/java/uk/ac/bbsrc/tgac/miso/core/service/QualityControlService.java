@@ -10,7 +10,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QualityControlEntity;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 
-public interface QualityControlService {
+public interface QualityControlService extends DeleterService<QC> {
 
   public QC create(QC qc) throws IOException;
 

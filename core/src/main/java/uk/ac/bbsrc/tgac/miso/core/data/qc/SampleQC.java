@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.qc;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -53,7 +54,7 @@ public class SampleQC extends QC {
   @JoinColumn(name = "sample_sampleId")
   private Sample sample;
 
-  @OneToMany(mappedBy = "qc")
+  @OneToMany(mappedBy = "qc", cascade = CascadeType.REMOVE)
   private List<SampleQcControlRun> controls;
 
   public Sample getSample() {

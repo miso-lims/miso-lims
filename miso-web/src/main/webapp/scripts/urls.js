@@ -629,7 +629,8 @@ Urls = (function() {
   var qcRestBase = restBase + '/qcs';
   rest.qcs = {
     bulkSave: qcRestBase + '/bulk',
-    bulkSaveProgress: idUrlFunction(qcRestBase + '/bulk')
+    bulkSaveProgress: idUrlFunction(qcRestBase + '/bulk'),
+    bulkDelete: qcRestBase + '/bulk-delete'
   };
 
   // QC Types
