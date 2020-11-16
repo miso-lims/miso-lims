@@ -47,12 +47,16 @@ public interface DeleterService<T extends Deletable> extends ProviderService<T> 
 
   @Transactional(rollbackFor = Exception.class)
   public default void delete(T object) throws IOException {
-    T managed = get(object.getId());
+    T managed = getManaged(object);
     authorizeDeletion(managed);
     validateDeletion(managed).throwIfInvalid();
     beforeDelete(managed);
     getDeletionStore().delete(managed, getAuthorizationManager().getCurrentUser());
     afterDelete(managed);
+  }
+
+  public default T getManaged(T object) throws IOException {
+    return get(object.getId());
   }
 
   /**
@@ -79,7 +83,7 @@ public interface DeleterService<T extends Deletable> extends ProviderService<T> 
   public default void bulkDelete(Collection<T> objects) throws IOException {
     List<T> managedObjects = new ArrayList<>();
     for (T object : objects) {
-      managedObjects.add(get(object.getId()));
+      managedObjects.add(getManaged(object));
     }
 
     for (T object : managedObjects) {
