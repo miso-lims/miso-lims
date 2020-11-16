@@ -5,6 +5,9 @@ Changes:
   * Added transfer notifications. From the Edit Transfer page, you can now send email notifications to
     transfer recipients or other interested parties.
   * Added delete option to QC lists
+  * Set default values in bulk sample tables (detailed sample)
+    * STR Status (stocks): Not Submitted
+    * DNAse (RNA stocks): True
 
 Upgrade Notes:
 
