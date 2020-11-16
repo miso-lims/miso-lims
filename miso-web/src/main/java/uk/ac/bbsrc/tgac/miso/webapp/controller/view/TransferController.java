@@ -148,7 +148,6 @@ public class TransferController {
     formConfig.put(PageMode.PROPERTY, pageMode.getLabel());
     formConfig.put("editSend", editSend);
     formConfig.put("editReceipt", editReceipt);
-    formConfig.put("notificationsEnabled", notificationsEnabled());
 
     Collection<Group> senderGroups = null;
     User user = authorizationManager.getCurrentUser();
@@ -182,6 +181,7 @@ public class TransferController {
     model.put("transferDto", mapper.writeValueAsString(Dtos.asDto(transfer)));
     model.put("formConfig", mapper.writeValueAsString(formConfig));
     model.put("itemsListConfig", mapper.writeValueAsString(itemsListConfig));
+    model.put("notificationsEnabled", notificationsEnabled());
     return new ModelAndView("/WEB-INF/pages/editTransfer.jsp", model);
   }
 
