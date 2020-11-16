@@ -7,6 +7,7 @@ ListTarget.staincategory = {
     throw new Error("Must be provided statically");
   },
   getQueryUrl: null,
+  showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
     var actions = HotTarget.staincategory.getBulkActions(config);
     if (config.isAdmin) {

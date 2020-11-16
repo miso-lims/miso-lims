@@ -30,6 +30,7 @@ ListTarget.lab = {
     throw new Error('Must be provided statically');
   },
   getQueryUrl: null,
+  showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
     return HotTarget.lab.getBulkActions(config);
   },

@@ -27,6 +27,7 @@
 <div id="maincontent">
   <div id="contentcolumn">
     <h1 id="tableTitle"></h1>
+    <div id="headerMessages"></div>
     ${note}
     <div id="tabs">
       <ul>

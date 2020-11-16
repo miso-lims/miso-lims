@@ -7,6 +7,7 @@ ListTarget.sop = {
     return Urls.rest.sops.categoryDatatable(config.category);
   },
   getQueryUrl: null,
+  showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
     var actions = BulkTarget.sop.getBulkActions(config);
     if (config.isAdmin) {

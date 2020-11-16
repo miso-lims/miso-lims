@@ -11,6 +11,7 @@ ListTarget.sampletype = {
     text: 'WARNING: Adding or modifying sample types may cause your data to be invalid for ENA submission',
     level: 'important'
   },
+  showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
     var actions = HotTarget.sampletype.getBulkActions(config);
     if (config.isAdmin) {

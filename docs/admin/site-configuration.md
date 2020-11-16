@@ -49,6 +49,11 @@ image). The link will also appear on error pages. This could be used to link to
 
 Note that there is also a "Chat" link in the header that goes to the MISO users Gitter, where users can ask questions.
 
+### `miso.newOptionSopUrl`
+
+URL of your SOP for adding new options such as scientific names, kits, and indices to MISO. If specified, a message and
+link will be shown at the top of several list pages under the Misc and Institute Defaults menus.
+
 ### `miso.detailed.sample.enabled`\*
 
 Set `true` to use detailed sample mode, or `false` for plain sample mode. Changing this setting after you have created

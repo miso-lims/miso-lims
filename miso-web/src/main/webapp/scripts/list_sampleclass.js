@@ -7,6 +7,7 @@ ListTarget.sampleclass = {
     throw new Error("Must be provided statically");
   },
   getQueryUrl: null,
+  showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
     return !config.isAdmin ? [] : [ListUtils.createBulkDeleteAction('Sample Classes', 'sampleclasses', Utils.array.getAlias)];
   },

@@ -7,6 +7,7 @@ ListTarget.runpurpose = {
     throw new Error("Must be provided statically");
   },
   getQueryUrl: null,
+  showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
     var actions = HotTarget.runpurpose.getBulkActions(config);
     if (config.isAdmin) {

@@ -30,6 +30,7 @@ ListTarget.institute = {
     throw new Error('Must be provided statically');
   },
   getQueryUrl: null,
+  showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
     return HotTarget.institute.getBulkActions(config);
   },
