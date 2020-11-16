@@ -107,7 +107,9 @@ public class RestSignatureFilter extends OncePerRequestFilter {
           filterUnauthenticated(request, response, filterChain);
           return;
         }
-        throw new RestException("Cannot enact RESTful request without a user specified!", Status.UNAUTHORIZED);
+        RestException ex = new RestException("Unauthorized - your login may have expired.", Status.UNAUTHORIZED);
+        ex.addData("uiHelp", "You can log in again using a separate browser tab, then resubmit your request.");
+        throw ex;
       }
       
       // Attempt authentication via username and signature headers

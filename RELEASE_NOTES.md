@@ -8,6 +8,7 @@ Changes:
   * Set default values in bulk sample tables (detailed sample)
     * STR Status (stocks): Not Submitted
     * DNAse (RNA stocks): True
+  * Improved error message displayed when login has timed out
 
 Upgrade Notes:
 
