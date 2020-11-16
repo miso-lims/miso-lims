@@ -124,6 +124,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Workstation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Contact;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Deletion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
@@ -190,6 +191,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferItem;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferNotification;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BarcodableView;
@@ -4230,6 +4232,42 @@ public class Dtos {
       }
       to.setChildren(childDtos);
     }
+  }
+
+  public static TransferNotificationDto asDto(@Nonnull TransferNotification from) {
+    TransferNotificationDto to = new TransferNotificationDto();
+    setLong(to::setId, from.getId(), true);
+    setString(to::setRecipientName, from.getRecipientName());
+    setString(to::setRecipientEmail, from.getRecipientEmail());
+    setString(to::setSenderName, maybeGetProperty(from.getCreator(), User::getFullName));
+    setDateTimeString(to::setSentTime, from.getSentTime());
+    setBoolean(to::setSendSuccess, from.getSendSuccess(), true);
+    return to;
+  }
+
+  public static TransferNotification to(@Nonnull TransferNotificationDto from) {
+    // This is only used for creation, so most fields are generated
+    TransferNotification to = new TransferNotification();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setRecipientName, from.getRecipientName());
+    setString(to::setRecipientEmail, from.getRecipientEmail());
+    return to;
+  }
+
+  public static ContactDto asDto(@Nonnull Contact from) {
+    ContactDto to = new ContactDto();
+    setLong(to::setId, from.getId(), true);
+    setString(to::setName, from.getName());
+    setString(to::setEmail, from.getEmail());
+    return to;
+  }
+
+  public static Contact to(@Nonnull ContactDto from) {
+    Contact to = new Contact();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setName, from.getName());
+    setString(to::setEmail, from.getEmail());
+    return to;
   }
 
   private static void setBigDecimal(@Nonnull Consumer<BigDecimal> setter, String value) {

@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.qc;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -50,7 +51,7 @@ public class PoolQC extends QC {
   @JoinColumn(name = "pool_poolId")
   private Pool pool;
 
-  @OneToMany(mappedBy = "qc")
+  @OneToMany(mappedBy = "qc", cascade = CascadeType.REMOVE)
   private List<PoolQcControlRun> controls;
 
   @Override

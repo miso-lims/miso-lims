@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.SessionFactory;
@@ -196,4 +197,11 @@ public class HibernateSecurityDaoIT extends AbstractDAOTest {
     assertEquals(group.getDescription(), saved.getDescription());
   }
   
+  @Test
+  public void testListUsersBySearch() throws IOException {
+    List<User> results = dao.listUsersBySearch("USER");
+    assertEquals(1, results.size());
+    assertEquals("user", results.get(0).getFullName());
+  }
+
 }

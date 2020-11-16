@@ -41,6 +41,7 @@ import javax.persistence.TemporalType;
 
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
@@ -50,7 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @MappedSuperclass
-public abstract class QC implements Serializable, Comparable<QC>, Identifiable {
+public abstract class QC implements Deletable, Serializable, Comparable<QC>, Identifiable {
   private static final long serialVersionUID = 1L;
 
   public static final Long UNSAVED_ID = 0L;
@@ -221,6 +222,16 @@ public abstract class QC implements Serializable, Comparable<QC>, Identifiable {
   @Override
   public boolean isSaved() {
     return getId() != UNSAVED_ID;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return getEntity().getQcTarget().getLabel() + " QC";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getType().getAlias() + " for " + getEntity().getAlias();
   }
 
 }
