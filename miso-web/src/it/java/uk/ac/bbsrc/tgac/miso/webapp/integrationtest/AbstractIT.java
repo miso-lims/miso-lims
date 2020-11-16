@@ -71,7 +71,7 @@ public abstract class AbstractIT {
     ChromeOptions opts = new ChromeOptions();
     opts.setHeadless(true);
     // large width is important so that all columns of handsontables get rendered
-    opts.addArguments("--disable-gpu", "--window-size=6000x1440");
+    opts.addArguments("--disable-gpu", "--window-size=6000x4000");
     LoggingPreferences loggingPrefs = new LoggingPreferences();
     loggingPrefs.enable(LogType.BROWSER, Level.ALL);
     opts.setCapability(CapabilityType.LOGGING_PREFS, loggingPrefs);
