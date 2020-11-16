@@ -8,8 +8,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
+import org.apache.commons.mail.EmailException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -29,6 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferItem;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferNotification;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -38,6 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.core.service.TransferNotificationService;
 import uk.ac.bbsrc.tgac.miso.core.service.TransferService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -55,6 +60,8 @@ public class TransferController {
   @Autowired
   private TransferService transferService;
   @Autowired
+  private TransferNotificationService transferNotificationService;
+  @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
   private GroupService groupService;
@@ -66,6 +73,13 @@ public class TransferController {
   private LibraryAliquotService libraryAliquotService;
   @Autowired
   private PoolService poolService;
+
+  @Value("${miso.smtp.host:#{null}}")
+  private String smtpHost;
+
+  private boolean notificationsEnabled() {
+    return smtpHost != null;
+  }
 
   @GetMapping("/list")
   public ModelAndView list(ModelMap model) throws IOException {
@@ -85,7 +99,7 @@ public class TransferController {
     addItems("library aliquot", libraryAliquotIdString, libraryAliquotService, TransferLibraryAliquot::new,
         transfer::getLibraryAliquotTransfers);
     addItems("pool", poolIdString, poolService, TransferPool::new, transfer::getPoolTransfers);
-    return setupForm(transfer, PageMode.CREATE.getLabel(), true, false, model);
+    return setupForm(transfer, PageMode.CREATE, true, false, model);
   }
 
   private <T extends Boxable, U extends TransferItem<T>> void addItems(String typeName, String idString, ProviderService<T> service,
@@ -105,7 +119,7 @@ public class TransferController {
   }
 
   @GetMapping("/{id}")
-  public ModelAndView edit(@PathVariable long id, ModelMap model) throws IOException {
+  public ModelAndView edit(@PathVariable long id, ModelMap model) throws IOException, EmailException {
     Transfer transfer = transferService.get(id);
     if (transfer == null) {
       throw new NotFoundException("No transfer found for ID: " + id);
@@ -120,14 +134,18 @@ public class TransferController {
     boolean editSend = user.isAdmin()
         || (transfer.getSenderGroup() != null && userHasGroup(user, transfer.getSenderGroup()))
         || (editReceipt && transfer.getSenderGroup() == null);
-    return setupForm(transfer, PageMode.EDIT.getLabel(), editSend, editReceipt, model);
+
+    List<TransferNotification> notifications = transferNotificationService.listByTransferId(id);
+    ObjectMapper mapper = new ObjectMapper();
+    model.put("notifications", mapper.writeValueAsString(notifications.stream().map(Dtos::asDto).collect(Collectors.toList())));
+    return setupForm(transfer, PageMode.EDIT, editSend, editReceipt, model);
   }
 
-  public ModelAndView setupForm(Transfer transfer, String pageMode, boolean editSend, boolean editReceipt, ModelMap model)
+  public ModelAndView setupForm(Transfer transfer, PageMode pageMode, boolean editSend, boolean editReceipt, ModelMap model)
       throws IOException {
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode formConfig = mapper.createObjectNode();
-    formConfig.put(PageMode.PROPERTY, pageMode);
+    formConfig.put(PageMode.PROPERTY, pageMode.getLabel());
     formConfig.put("editSend", editSend);
     formConfig.put("editReceipt", editReceipt);
 
@@ -158,10 +176,12 @@ public class TransferController {
     itemsListConfig.put("editSend", editSend);
     itemsListConfig.put("editReceipt", editReceipt);
 
+    model.put(PageMode.PROPERTY, pageMode.getLabel());
     model.put("transfer", transfer);
     model.put("transferDto", mapper.writeValueAsString(Dtos.asDto(transfer)));
     model.put("formConfig", mapper.writeValueAsString(formConfig));
     model.put("itemsListConfig", mapper.writeValueAsString(itemsListConfig));
+    model.put("notificationsEnabled", notificationsEnabled());
     return new ModelAndView("/WEB-INF/pages/editTransfer.jsp", model);
   }
 

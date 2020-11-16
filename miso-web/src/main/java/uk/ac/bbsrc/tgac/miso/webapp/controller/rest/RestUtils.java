@@ -74,7 +74,7 @@ public class RestUtils {
       if (id == null) {
         throw new RestException(type + " id cannot be null", Status.BAD_REQUEST);
       }
-      T item = retrieve(type, id, service);
+      T item = retrieve(type, id, service, Status.BAD_REQUEST);
       items.add(item);
     }
     service.bulkDelete(items);

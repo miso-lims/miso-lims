@@ -626,3 +626,10 @@ of file it is.
 
 Any user can add attachment categories using the standard interface. MISO administrators can also edit and delete them.
 An attachment category can only be deleted if there are no attachments of that category posted.
+
+
+
+## Contacts
+
+Contacts may be saved for convenience when sending [transfer notifications](../transfers#transfer-notifications). Any
+user can add, edit, and delete contacts using the standard interface.

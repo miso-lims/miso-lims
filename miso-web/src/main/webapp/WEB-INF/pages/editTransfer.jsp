@@ -20,26 +20,45 @@
 
 <form:form id="transferForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
 
-<br/>
+<br>
 <h1>Items</h1>
 <div id="transferForm_itemsError"></div>
 <div id="listItems"></div>
+<br>
+
+<c:choose>
+  <c:when test="${pageMode eq 'edit'}">
+    <c:if test="${notificationsEnabled}">
+      <h1>Notifications</h1>
+      <div id="listNotifications"></div>
+      <br>
+    </c:if>
+    <miso:changelog item="${transfer}"/>
+  </c:when>
+  <c:otherwise>
+    <c:if test="${notificationsEnabled}">
+      <p>(Notifications may be added after the transfer is saved.)</p>
+    </c:if>
+  </c:otherwise>
+</c:choose>
 
 <script type="text/javascript">
   jQuery(document).ready(function () {
     var transfer = ${transferDto};
-    var form = FormUtils.createForm('transferForm', 'save', transfer, 'transfer', ${formConfig});
+    var formConfig = ${formConfig};
+    var form = FormUtils.createForm('transferForm', 'save', transfer, 'transfer', formConfig);
     Transfer.setForm(form);
     Transfer.setItemsListConfig(${itemsListConfig});
     Transfer.setItems(transfer.items);
+    if (formConfig.pageMode === 'edit' && ${notificationsEnabled}) {
+      Transfer.setNotificationsListConfig({
+        transferId: ${transfer.id}
+      });
+      Transfer.setNotifications(${notifications});
+    }
     Utils.ui.updateHelpLink(FormTarget.transfer.getUserManualUrl());
   });
 </script>
-
-<c:if test="${pageMode eq 'edit'}">
-  <br>
-  <miso:changelog item="${transfer}"/>
-</c:if>
 
 </div>
 </div>

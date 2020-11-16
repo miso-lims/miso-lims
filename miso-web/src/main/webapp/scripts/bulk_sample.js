@@ -473,10 +473,16 @@ BulkTarget.sample = (function($) {
                       || (typeof column.sampleSubcategory === 'string' && column.sampleSubcategory === selected.sampleSubcategory);
                   // for library receipt, need to correct since 'sample.' gets added again on updateField calls
                   var dataField = config.isLibraryReceipt ? column.data.replace('sample.', '') : column.data;
+                  var newValue = undefined;
+                  if (!subcategoryMatch) {
+                    newValue = null;
+                  } else if (config.pageMode !== 'edit' && column.initial) {
+                    newValue = column.initial;
+                  }
                   api.updateField(rowIndex, dataField, {
                     disabled: !subcategoryMatch,
                     required: subcategoryMatch ? column.required : false,
-                    value: subcategoryMatch ? undefined : null
+                    value: newValue
                   });
                 });
             if (selected.defaultSampleType && config.pageMode !== 'edit') {
@@ -882,6 +888,7 @@ BulkTarget.sample = (function($) {
         includeSaved: targetCategory === 'Stock',
         required: true,
         source: Constants.strStatuses,
+        initial: 'Not Submitted',
         description: 'Status of short tandem repeat analysis'
       }, {
         title: 'DNAse',
@@ -899,7 +906,8 @@ BulkTarget.sample = (function($) {
           value: false
         }],
         getItemLabel: Utils.array.get('label'),
-        getItemValue: Utils.array.get('value')
+        getItemValue: Utils.array.get('value'),
+        initial: 'True'
       });
 
       if ((!Constants.isDetailedSample || show['Stock'] || show['Aliquot']) && !config.isLibraryReceipt) {

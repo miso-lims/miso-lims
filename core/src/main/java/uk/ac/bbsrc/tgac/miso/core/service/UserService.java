@@ -10,5 +10,7 @@ public interface UserService extends DeleterService<User>, SaveService<User> {
   public User getByLoginName(String loginName) throws IOException;
 
   public List<User> list() throws IOException;
+  
+  public List<User> listBySearch(String search) throws IOException;
 
 }
