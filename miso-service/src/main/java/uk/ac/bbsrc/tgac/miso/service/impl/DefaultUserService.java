@@ -120,4 +120,9 @@ public class DefaultUserService implements UserService {
     return result;
   }
 
+  @Override
+  public List<User> listBySearch(String search) throws IOException {
+    return securityStore.listUsersBySearch(search);
+  }
+
 }

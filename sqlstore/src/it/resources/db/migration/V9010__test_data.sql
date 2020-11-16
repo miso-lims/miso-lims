@@ -787,3 +787,13 @@ INSERT INTO Transfer_Library(transferId, libraryId) VALUES
 (2, 3),
 (3, 1),
 (3, 2);
+
+INSERT INTO TransferNotification(notificationId, transferId, recipientName, recipientEmail, creator, created, sentTime, sendSuccess, failureSentTime) VALUES
+(1, 1, 'Me', 'me@example.com', 1, '2020-11-11 10:36:00', '2020-11-11 10:36:00', TRUE, NULL),
+(2, 1, 'Them', 'them@example.com', 1, '2020-11-11 10:36:00', '2020-11-11 10:36:00', FALSE, '2020-11-11 10:36:00'),
+(3, 2, 'Others', 'others@example.com', 1, '2020-11-11 10:36:00', NULL, NULL, NULL),
+(4, 2, 'Anyone', 'anyone@example.com', 1, '2020-11-11 10:36:00', '2020-11-11 10:36:00', FALSE, NULL);
+
+INSERT INTO Contact(contactId, name, email) VALUES
+(1, 'Someone', 'someone@example.com'),
+(2, 'Everyone', 'everyone@example.com');
