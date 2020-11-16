@@ -40,3 +40,9 @@ click the "Save" button at the top right to confirm the changes.
 It is also possible to edit the QCs for a single item from its edit page. For example, you can edit sample QCs from the
 Edit Sample page by scrolling to the QCs table, selecting the QCs you wish to edit, and clicking the "Edit" button in
 its toolbar.
+
+## Deleting QCs
+
+QCs can be deleted from the QC table on an item's edit page. Select the QCs that you wish to delete and click the delete
+button at the top of the table. A dialog will appear, asking you to confirm the deletion. QCs can only be deleted by the
+person who created them or a MISO administrator.

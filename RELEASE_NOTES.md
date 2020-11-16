@@ -4,6 +4,7 @@ Changes:
 
   * Added transfer notifications. From the Edit Transfer page, you can now send email notifications to
     transfer recipients or other interested parties.
+  * Added delete option to QC lists
 
 Upgrade Notes:
 

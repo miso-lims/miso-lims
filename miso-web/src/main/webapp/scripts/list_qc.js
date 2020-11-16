@@ -29,9 +29,30 @@ ListTarget.qc = function(qcTarget) {
     },
     getQueryUrl: null,
     createBulkActions: function(config, projectId) {
-      return BulkTarget.qc.getBulkActions({
+      var actions = BulkTarget.qc.getBulkActions({
         qcTarget: qcTarget
       });
+      actions.push({
+        name: 'Delete',
+        action: function(items) {
+          var lines = ['Are you sure you wish to delete the following items? This cannot be undone.'];
+          var ids = [];
+          jQuery.each(items, function(index, item) {
+            var qcType = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(item.qcTypeId), Constants.qcTypes);
+            lines.push('* ' + qcType.name + ' (' + item.date + ')');
+            ids.push(item.id);
+          });
+          Utils.showConfirmDialog('Delete QCs', 'Delete', lines, function() {
+            var url = Urls.rest.qcs.bulkDelete + '?' + jQuery.param({
+              qcTarget: qcTarget
+            });
+            Utils.ajaxWithDialog('Deleting QCs', 'POST', url, ids, function() {
+              Utils.page.pageReload();
+            });
+          });
+        }
+      });
+      return actions;
     },
     createStaticActions: function(config, projectId) {
       return config.entityId ? [{
@@ -53,11 +74,11 @@ ListTarget.qc = function(qcTarget) {
             } else if (!Number.isInteger(result.controls) || result.controls < 0) {
               Utils.showOkDialog('Error', ['Invalid number of controls entered']);
             } else {
-              Utils.page.post(Urls.ui.qcs.bulkAddFrom(qcTarget),
-                {entityIds: config.entityId,
+              Utils.page.post(Urls.ui.qcs.bulkAddFrom(qcTarget), {
+                entityIds: config.entityId,
                 copies: result.copies,
-                controls: result.controls}
-              );
+                controls: result.controls
+              });
             }
           });
         }

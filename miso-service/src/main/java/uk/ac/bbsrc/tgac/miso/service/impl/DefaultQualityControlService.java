@@ -40,6 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.QualityControlService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.BulkValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
+import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.ThrowingFunction;
 import uk.ac.bbsrc.tgac.miso.persistence.ChangeLoggableStore;
 import uk.ac.bbsrc.tgac.miso.persistence.ContainerQcStore;
@@ -72,6 +73,8 @@ public class DefaultQualityControlService implements QualityControlService {
   private ChangeLoggableStore changeLoggableStore;
   @Autowired
   private InstrumentService instrumentService;
+  @Autowired
+  private DeletionStore deletionStore;
   @Autowired
   private TransactionTemplate transactionTemplate;
 
@@ -346,6 +349,31 @@ public class DefaultQualityControlService implements QualityControlService {
 
     thread.start();
     return operation;
+  }
+
+  @Override
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
+  }
+
+  @Override
+  public AuthorizationManager getAuthorizationManager() {
+    return authorizationManager;
+  }
+
+  @Override
+  public QC get(long id) throws IOException {
+    throw new UnsupportedOperationException("Cannot retrieve QC without QC target");
+  }
+
+  @Override
+  public void authorizeDeletion(QC object) throws IOException {
+    authorizationManager.throwIfNonAdminOrMatchingOwner(object.getCreator());
+  }
+
+  @Override
+  public QC getManaged(QC object) throws IOException {
+    return get(object.getEntity().getQcTarget(), object.getId());
   }
 
 }
