@@ -38,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferItem;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferNotification;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -49,6 +50,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.core.service.TransferNotificationService;
 import uk.ac.bbsrc.tgac.miso.core.service.TransferService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
@@ -72,6 +74,8 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
 
   @Autowired
   private TransferStore transferStore;
+  @Autowired
+  private TransferNotificationService transferNotificationService;
   @Autowired
   private GroupService groupService;
   @Autowired
@@ -517,6 +521,12 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
   @Override
   public void authorizeDeletion(Transfer object) throws IOException {
     authorizationManager.throwIfNonAdminOrMatchingOwner(object.getCreator());
+  }
+
+  @Override
+  public void beforeDelete(Transfer object) throws IOException {
+    List<TransferNotification> notifications = transferNotificationService.listByTransferId(object.getId());
+    transferNotificationService.bulkDelete(notifications, true);
   }
 
 }

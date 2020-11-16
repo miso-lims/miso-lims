@@ -29,6 +29,7 @@ import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -101,6 +102,15 @@ public class HibernateSecurityDao implements SecurityStore {
     Criteria criteria = currentSession().createCriteria(UserImpl.class);
     @SuppressWarnings("unchecked")
     List<User> results = criteria.list();
+    return results;
+  }
+
+  @Override
+  public List<User> listUsersBySearch(String search) throws IOException {
+    @SuppressWarnings("unchecked")
+    List<User> results = currentSession().createCriteria(UserImpl.class)
+        .add(Restrictions.or(Restrictions.ilike("fullName", search, MatchMode.ANYWHERE), Restrictions.ilike("loginName", search)))
+        .list();
     return results;
   }
 

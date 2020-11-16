@@ -119,3 +119,30 @@ if you are done making changes.
 To delete transfers, go to the Transfers list, check the checkbox(es) next to the transfer(s) that you wish to delete,
 and click the "Delete" button in the toolbar at the top of the table. A transfer can only be deleted by its creator or
 a MISO administrator.
+
+
+
+## Transfer Notifications
+
+If your site is configured to send emails from MISO, you can have MISO send notifications to transfer recipients or
+other interested parties via email. The email includes the transfer date and time, the sender and recipient names, and
+a list detailing all of the items included in the transfer. If notifications are enabled, you will see a Notifications
+list on the Edit Transfer page.
+
+To send a transfer notification, click the "Add" button at the top of the Notifications list. A dialog will appear,
+allowing you to search for existing users or contacts, or to create a new contact. New contacts can be saved, so that
+you can find them via search next time.
+
+A notification will initially be in a "Pending" state. There may be a holding period before notifications are sent,
+depending on your site configuration. Even if no holding period is configured, it may take a few minutes before the
+notification is sent. There may also be a limit on how many emails MISO is allowed to send per hour, which may further
+delay the notification if many notifications are being sent. Once MISO attempts to send the email, the status will
+change to "Success" or "Failed" as appropriate. If MISO fails to send the email, it will try to email the sender to
+alert them that the notification failed.
+
+A notification that is still in the "Pending" state can be cancelled by selecting it in the list and clicking the
+"Cancel" button. If MISO has already attempted to send the notification, it can no longer be cancelled.
+
+A notification that has already been sent - successfully or not - may be resent by selecting it in the list and clicking
+the "Resend" button. This will create a new notification to the same recipient and queue it for sending. The record of
+the original notification will be maintained.

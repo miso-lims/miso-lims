@@ -148,6 +148,20 @@ Urls = (function() {
     bulkSaveProgress: idUrlFunction(boxUseRestBase + '/bulk')
   };
 
+  // Contacts
+  var contactUiBase = baseUrl + '/contact';
+  ui.contacts = {
+    bulkCreate: contactUiBase + '/bulk/new',
+    bulkEdit: contactUiBase + '/bulk/edit'
+  };
+
+  var contactRestBase = restBase + '/contacts';
+  rest.contacts = {
+    search: contactRestBase,
+    bulkSave: contactRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(contactRestBase + '/bulk')
+  };
+
   // Containers
   var containerUiBase = baseUrl + '/container';
   ui.containers = {
@@ -1048,7 +1062,12 @@ Urls = (function() {
   rest.transfers = {
     datatable: idUrlFunction(transferRestBase + '/dt'),
     create: transferRestBase,
-    update: idUrlFunction(transferRestBase)
+    update: idUrlFunction(transferRestBase),
+    addNotification: middleIdUrlFunction(transferRestBase, '/notifications'),
+    resendNotification: function(transferId, notificationId) {
+      return transferRestBase + '/' + transferId + '/notifications/' + notificationId + '/resend';
+    },
+    bulkDeleteNotifications: middleIdUrlFunction(transferRestBase, '/notifications/bulk-delete')
   };
 
   // Users
@@ -1063,7 +1082,8 @@ Urls = (function() {
   rest.users = {
     create: userRestBase,
     update: idUrlFunction(userRestBase),
-    resetPassword: middleIdUrlFunction(userRestBase, '/password')
+    resetPassword: middleIdUrlFunction(userRestBase, '/password'),
+    search: userRestBase
   };
 
   // Worksets

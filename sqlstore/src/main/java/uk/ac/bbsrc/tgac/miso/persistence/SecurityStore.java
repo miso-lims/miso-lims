@@ -14,6 +14,8 @@ public interface SecurityStore {
 
   public User getUserByLoginName(String loginName) throws IOException;
 
+  public List<User> listUsersBySearch(String search) throws IOException;
+
   public long saveGroup(Group group) throws IOException;
 
   public Group getGroupById(Long groupId) throws IOException;

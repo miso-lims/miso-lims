@@ -153,3 +153,8 @@ cannot be added to a pool when their addition would cause duplicate or near-dupl
 pool.
 
 The advantage of enabling this setting is the prevention of sequencing library aliquots which cannot be de-multiplexed.
+
+# Email Notifications
+
+If configured, notifications of item transfers can be sent via email to both internal users and external contacts. See
+[Transfer Notifications](../transfers#transfer-notifications) for more information.
