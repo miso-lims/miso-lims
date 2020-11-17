@@ -334,11 +334,11 @@ public class RunPageIT extends AbstractIT {
 
     RunPage page2 = page.setPartitionQC(Arrays.asList(0), LaneQC.FAIL_INSTRUMENT, null);
     assertEquals(LaneQC.FAIL_INSTRUMENT, page2.getLaneInfo(Columns.QC_STATUS, 0));
-    assertTrue(isStringEmptyOrNull(page.getLaneInfo(Columns.QC_NOTE, 0)));
+    assertTrue(isStringEmptyOrNull(page2.getLaneInfo(Columns.QC_NOTE, 0)));
 
     RunPage page3 = page2.setPartitionQC(Arrays.asList(0), LaneQC.OK_COLLAB, null);
     assertEquals(LaneQC.OK_COLLAB, page3.getLaneInfo(Columns.QC_STATUS, 0));
-    assertTrue(isStringEmptyOrNull(page.getLaneInfo(Columns.QC_NOTE, 0)));
+    assertTrue(isStringEmptyOrNull(page3.getLaneInfo(Columns.QC_NOTE, 0)));
   }
 
   @Test
@@ -474,7 +474,7 @@ public class RunPageIT extends AbstractIT {
     testPoolTileWarning("IPO804", "Low Quality Libraries");
   }
 
-  public void testPoolTileWarning(String search, String warning) throws Exception {
+  private void testPoolTileWarning(String search, String warning) throws Exception {
     RunPage page = RunPage.getForEdit(getDriver(), getBaseUrl(), 5100L);
 
     page.searchForPools(false, Arrays.asList(0), PoolSearch.SEARCH, search);
