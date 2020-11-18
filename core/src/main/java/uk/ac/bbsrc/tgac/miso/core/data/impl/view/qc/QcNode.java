@@ -11,7 +11,7 @@ public interface QcNode extends Serializable {
     return null;
   }
 
-  public String getEntityType();
+  public QcNodeType getEntityType();
 
   public String getTypeLabel();
 

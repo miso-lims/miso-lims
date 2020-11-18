@@ -93,8 +93,8 @@ public class LibraryAliquotQcNode extends DetailedQcNode {
   }
 
   @Override
-  public String getEntityType() {
-    return EntityType.LIBRARY_ALIQUOT.getLabel();
+  public QcNodeType getEntityType() {
+    return QcNodeType.LIBRARY_ALIQUOT;
   }
 
   @Override

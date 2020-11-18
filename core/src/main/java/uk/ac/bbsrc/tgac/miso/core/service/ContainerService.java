@@ -31,4 +31,7 @@ public interface ContainerService extends BarcodableService<SequencerPartitionCo
   void update(Partition partition) throws IOException;
 
   List<PoreVersion> listPoreVersions() throws IOException;
+
+  public Long getPartitionIdByRunIdAndPartitionNumber(long runId, int partitionNumber) throws IOException;
+
 }

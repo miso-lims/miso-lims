@@ -608,13 +608,4 @@ public class PoolRestController extends RestController {
         .getBytes(StandardCharsets.UTF_8));
   }
 
-  @PutMapping("/{poolId}/qc-status")
-  public @ResponseBody PoolDto updateQcStatus(@PathVariable long poolId, @RequestParam Boolean qcPassed) throws IOException {
-    Pool pool = RestUtils.retrieve("Pool", poolId, poolService);
-    pool.setQcPassed(qcPassed);
-    long savedId = poolService.update(pool);
-    Pool saved = poolService.get(savedId);
-    return Dtos.asDto(saved, false, false, indexChecker);
-  }
-
 }

@@ -12,4 +12,6 @@ public interface QcNodeService {
 
   public SampleQcNode getForLibraryAliquot(long id) throws IOException;
 
+  public SampleQcNode getForRunLibrary(long runId, long partitionId, long aliquotId) throws IOException;
+
 }

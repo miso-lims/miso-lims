@@ -83,10 +83,6 @@ public class HibernateQcNodeDao implements QcNodeDao {
   @Override
   public SampleQcNode getForRunLibrary(long runId, long partitionId, long aliquotId) throws IOException {
     RunQcNode run = (RunQcNode) currentSession().get(RunQcNode.class, runId);
-    if (run == null) {
-      System.out.println("##### NULL RUN");
-      return null;
-    }
 
     DetachedCriteria subquery = DetachedCriteria.forClass(RunPartition.class)
         .createAlias("partition", "partition")
@@ -100,10 +96,6 @@ public class HibernateQcNodeDao implements QcNodeDao {
     pool.setRuns(Lists.newArrayList(run));
 
     LibraryAliquotQcNode aliquot = (LibraryAliquotQcNode) currentSession().get(LibraryAliquotQcNode.class, aliquotId);
-    if (aliquot == null) {
-      System.out.println("##### NULL ALIQUOT");
-      return null;
-    }
     aliquot.setPools(Lists.newArrayList(pool));
 
     SampleQcNode top = populateParents(aliquot);
@@ -113,14 +105,9 @@ public class HibernateQcNodeDao implements QcNodeDao {
         .add(Restrictions.eq("partition.id", partitionId))
         .uniqueResult();
     run.setRunPartitions(Lists.newArrayList(partition));
-    if (partition == null) {
-      System.out.println("##### NULL PARTITION");
-      return null;
-    }
 
     populateChildren(partition, run, aliquot);
 
-    System.out.println("##### SUCCESS");
     return top;
   }
 

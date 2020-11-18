@@ -6,6 +6,7 @@ import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -106,4 +107,17 @@ public class HibernateSequencerPartitionContainerDao implements SequencerPartiti
     List<PoreVersion> results = criteria.list();
     return results;
   }
+
+  @Override
+  public Long getPartitionIdByRunIdAndPartitionNumber(long runId, int partitionNumber) throws IOException {
+    return (Long) currentSession().createCriteria(PartitionImpl.class)
+        .createAlias("sequencerPartitionContainer", "container")
+        .createAlias("container.runPositions", "runPosition")
+        .createAlias("runPosition.run", "run")
+        .add(Restrictions.eq("run.id", runId))
+        .add(Restrictions.eq("partitionNumber", partitionNumber))
+        .setProjection(Projections.id())
+        .uniqueResult();
+  }
+
 }

@@ -11,8 +11,6 @@ import javax.persistence.Transient;
 
 import org.hibernate.annotations.Immutable;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
-
 @Entity
 @Table(name = "Pool")
 @Immutable
@@ -43,13 +41,13 @@ public class PoolQcNode implements QcNode {
   }
 
   @Override
-  public String getEntityType() {
-    return EntityType.POOL.getLabel();
+  public QcNodeType getEntityType() {
+    return QcNodeType.POOL;
   }
 
   @Override
   public String getTypeLabel() {
-    return EntityType.POOL.getLabel();
+    return QcNodeType.POOL.getLabel();
   }
 
   @Override

@@ -444,7 +444,11 @@ var Utils = Utils
             }
             var invalidFields = fields.filter(function(field) {
               var value = output[field.property];
-              return field.regex && value && !new RegExp(field.regex).test(value);
+              var regex = field.regex;
+              if (!regex && field.type === 'text') {
+                regex = Utils.validation.sanitizeRegex;
+              }
+              return regex && value && !new RegExp(regex).test(value);
             }).map(function(field) {
               return field.label;
             })

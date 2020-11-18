@@ -11,8 +11,6 @@ import javax.persistence.Transient;
 
 import org.hibernate.annotations.Immutable;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
-
 @Entity
 @Table(name = "Library")
 @Immutable
@@ -65,13 +63,13 @@ public class LibraryQcNode extends DetailedQcNode {
   }
 
   @Override
-  public String getEntityType() {
-    return EntityType.LIBRARY.getLabel();
+  public QcNodeType getEntityType() {
+    return QcNodeType.LIBRARY;
   }
 
   @Override
   public String getTypeLabel() {
-    return EntityType.LIBRARY.getLabel();
+    return QcNodeType.LIBRARY.getLabel();
   }
 
 }

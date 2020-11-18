@@ -23,23 +23,13 @@ import org.springframework.web.servlet.ModelAndView;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.HierarchyEntity;
-import uk.ac.bbsrc.tgac.miso.core.data.Partition;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
-import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.QcNode;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.QcNodeType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.SampleQcNode;
-import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
-import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionAliquotService;
-import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionService;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.service.QcNodeService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.QcNodeDto;
 import uk.ac.bbsrc.tgac.miso.dto.dashi.RunLibraryQCTableRowDto;
@@ -47,7 +37,6 @@ import uk.ac.bbsrc.tgac.miso.dto.dashi.RunLibraryQcTableRequestDto;
 import uk.ac.bbsrc.tgac.miso.dto.dashi.RunLibraryQcTableRequestLibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.dashi.RunLibraryQcTableRequestMetricDto;
 import uk.ac.bbsrc.tgac.miso.dto.dashi.RunLibraryQcTableRowMetricDto;
-import uk.ac.bbsrc.tgac.miso.persistence.QcNodeDao;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
 
 @Controller
@@ -59,45 +48,71 @@ public class RunLibraryController {
   @Autowired
   private LibraryAliquotService libraryAliquotService;
   @Autowired
-  private RunPartitionService runPartitionService;
+  private ContainerService containerService;
   @Autowired
-  private RunPartitionAliquotService runPartitionAliquotService;
-  @Autowired
-  private QcNodeDao qcNodeDao;
+  private QcNodeService qcNodeService;
 
   @PostMapping("/metrics")
   public ModelAndView getRunLibraryQcTable(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
     RunLibraryQcTableRequestDto data = validateRunLibraryQcTableRequest(form, mapper);
+
     List<RunLibraryQCTableRowDto> rows = new ArrayList<>();
     for (RunLibraryQcTableRequestLibraryDto item : data.getLibraryAliquots()) {
       long aliquotId = getAliquotIdFromName(item.getName());
-      LibraryAliquot libraryAliquot = libraryAliquotService.get(aliquotId);
-      if (libraryAliquot == null) {
-        throw new ClientErrorException(String.format("Library aliquot %s not found", item.getName()));
+      long partitionId = containerService.getPartitionIdByRunIdAndPartitionNumber(item.getRunId(), item.getPartition());
+      SampleQcNode hierarchy = qcNodeService.getForRunLibrary(item.getRunId(), partitionId, aliquotId);
+      if (hierarchy == null) {
+        throw new NotFoundException("Run-library not found");
       }
-      List<RunPartitionAliquot> runLibs = runPartitionAliquotService.listByAliquotId(aliquotId);
-      // RunPartitionAliquots may not already exist for all relationships, so we need to construct some of them
-      List<RunPartition> runParts = runPartitionService.listByAliquot(libraryAliquot);
-      for (RunPartition runPart : runParts) {
-        if (runLibs.stream().noneMatch(runLib -> runLib.getRun().getId() == runPart.getRun().getId()
-            && runLib.getPartition().getId() == runPart.getPartition().getId())) {
-          runLibs.add(new RunPartitionAliquot(runPart.getRun(), runPart.getPartition(), libraryAliquot));
-        }
-      }
-
-      runLibs = runLibs.stream()
-          .filter(runLib -> item.getRunId() == null ? true : runLib.getRun().getId() == item.getRunId().longValue())
-          .filter(runLib -> item.getPartition() == null ? true : runLib.getPartition().getPartitionNumber().equals(item.getPartition()))
-          .collect(Collectors.toList());
-      if (runLibs.isEmpty()) {
-        throw new ClientErrorException("No matching run-libraries");
-      }
-      rows.add(makeQcTableRow(runLibs, item.getMetrics()));
+      RunLibraryQCTableRowDto row = new RunLibraryQCTableRowDto();
+      LibraryAliquot aliquot = libraryAliquotService.get(aliquotId);
+      row.setLibraryAliquot(Dtos.asDto(aliquot, false));
+      row.setMetrics(item.getMetrics().stream().map(RunLibraryQcTableRowMetricDto::fromRequestDto).collect(Collectors.toList()));
+      row.setQcNodes(getNodes(hierarchy, item.getRunId(), partitionId, aliquotId));
+      rows.add(row);
     }
+
     model.put("title", "Run-Library Metrics");
     model.put("tableData", mapper.writeValueAsString(rows));
     return new ModelAndView("/WEB-INF/pages/runLibraryMetrics.jsp", model);
+  }
+
+  /**
+   * Traverse the hierarchy and return a list of all the nodes on the direct path from the top sample to the specified
+   * run-library. Nodes not on the direct path are excluded
+   * 
+   * @param node
+   * @param runId
+   * @param partitionId
+   * @param aliquotId
+   * @return
+   */
+  private List<QcNodeDto> getNodes(QcNode node, long runId, long partitionId, long aliquotId) {
+    if (node.getChildren() != null && !node.getChildren().isEmpty()) {
+      for (QcNode child : node.getChildren()) {
+        List<QcNodeDto> list = getNodes(child, runId, partitionId, aliquotId);
+        if (list != null) {
+          list.add(0, Dtos.asDto(node));
+          return list;
+        }
+      }
+      return null;
+    } else if (node.getEntityType() == QcNodeType.RUN_LIBRARY && idsMatch(node, runId, partitionId, aliquotId)) {
+      List<QcNodeDto> list = new LinkedList<>();
+      list.add(Dtos.asDto(node));
+      return list;
+    } else {
+      return null;
+    }
+  }
+
+  private static boolean idsMatch(QcNode node, long runId, long partitionId, long aliquotId) {
+    return node.getIds() != null
+        && node.getIds().length == 3
+        && node.getIds()[0] == runId
+        && node.getIds()[1] == partitionId
+        && node.getIds()[2] == aliquotId;
   }
 
   private static long getAliquotIdFromName(String name) {
@@ -146,144 +161,17 @@ public class RunLibraryController {
     return data;
   }
 
-  private RunLibraryQCTableRowDto makeQcTableRow(List<RunPartitionAliquot> runLibs, List<RunLibraryQcTableRequestMetricDto> metrics)
-      throws IOException {
-    RunLibraryQCTableRowDto row = new RunLibraryQCTableRowDto();
-    LibraryAliquot libraryAliquot = runLibs.get(0).getAliquot();
-    row.setLibraryAliquot(Dtos.asDto(libraryAliquot, false));
-    row.setMetrics(metrics.stream().map(RunLibraryQcTableRowMetricDto::fromRequestDto).collect(Collectors.toList()));
-    List<QcNodeDto> qcNodes = new LinkedList<>();
-    for (HierarchyEntity current = libraryAliquot; current != null; current = current.getParent()) {
-      qcNodes.add(0, makeQcNode(current));
-    }
-    for (RunPartitionAliquot runLib : runLibs) {
-      RunPartition runPartition = runPartitionService.get(runLib.getRun(), runLib.getPartition());
-      if (qcNodes.stream()
-          .noneMatch(qcNode -> "Pool".equals(qcNode.getEntityType()) && qcNode.getId() == runPartition.getPartition().getPool().getId())) {
-        qcNodes.add(makeQcNode(runPartition.getPartition().getPool()));
-      }
-      if (qcNodes.stream().noneMatch(qcNode -> "Run".equals(qcNode.getEntityType()) && qcNode.getId() == runLib.getRun().getId())) {
-        qcNodes.add(makeQcNode(runLib.getRun()));
-      }
-      qcNodes.add(makeQcNode(runPartition));
-      qcNodes.add(makeQcNode(runLib));
-    }
-    row.setQcNodes(qcNodes);
-    return row;
-  }
-
-  private static QcNodeDto makeQcNode(HierarchyEntity hierarchyEntity) {
-    QcNodeDto node = new QcNodeDto();
-    node.setEntityType(hierarchyEntity.getEntityType().getLabel());
-    node.setTypeLabel(getTypeLabel(hierarchyEntity));
-    node.setId(hierarchyEntity.getId());
-    node.setName(hierarchyEntity.getName());
-    node.setLabel(hierarchyEntity.getAlias());
-    if (hierarchyEntity.getDetailedQcStatus() != null) {
-      node.setQcStatusId(hierarchyEntity.getDetailedQcStatus().getId());
-      node.setQcPassed(hierarchyEntity.getDetailedQcStatus().getStatus());
-    }
-    node.setQcNote(hierarchyEntity.getDetailedQcStatusNote());
-    return node;
-  }
-
-  private static String getTypeLabel(HierarchyEntity hierarchyEntity) {
-    switch (hierarchyEntity.getEntityType()) {
-    case SAMPLE:
-      if (LimsUtils.isDetailedSample((Sample) hierarchyEntity)) {
-        return ((DetailedSample) hierarchyEntity).getSampleClass().getAlias();
-      } else {
-        return "Sample";
-      }
-    case LIBRARY:
-      return "Library";
-    case LIBRARY_ALIQUOT:
-      return "Library Aliquot";
-    default:
-      throw new IllegalStateException("Unexpected entity type in hierarchy");
-    }
-  }
-
-  private static QcNodeDto makeQcNode(Pool pool) {
-    QcNodeDto node = new QcNodeDto();
-    node.setEntityType("Pool");
-    node.setTypeLabel("Pool");
-    node.setId(pool.getId());
-    node.setName(pool.getName());
-    node.setLabel(pool.getAlias());
-    node.setQcPassed(pool.getQcPassed());
-    return node;
-  }
-
-  private static QcNodeDto makeQcNode(Run run) {
-    QcNodeDto node = new QcNodeDto();
-    node.setEntityType("Run");
-    node.setTypeLabel("Run");
-    node.setId(run.getId());
-    node.setName(run.getName());
-    node.setLabel(run.getAlias());
-    node.setRunStatus(run.getHealth().getKey());
-    if (run.getHealth() == HealthType.Completed) {
-      node.setQcPassed(true);
-    } else if (run.getHealth() == HealthType.Failed) {
-      node.setQcPassed(false);
-    }
-    return node;
-  }
-
-  private static QcNodeDto makeQcNode(RunPartition runPartition) {
-    Run run = runPartition.getRun();
-    Partition partition = runPartition.getPartition();
-    PlatformType platform = run.getPlatformType();
-
-    QcNodeDto node = new QcNodeDto();
-    node.setEntityType("RunPartition");
-    node.setTypeLabel(runPartition.getRun().getPlatformType().getPartitionName());
-    node.setIds(new Long[] { run.getId(), partition.getId() });
-    RunPosition runPosition = runPartition.getRun().getRunPositions().stream()
-        .filter(runPos -> runPos.getContainer().getId() == runPartition.getPartition().getSequencerPartitionContainer().getId())
-        .findFirst().orElseThrow(() -> new IllegalStateException("No run position found matching partition container"));
-    node.setLabel(run.getAlias() + " " + platform.getPartitionName() + " "
-        + (runPosition.getPosition() == null ? "" : runPosition.getPosition().getAlias() + "-") + partition.getPartitionNumber());
-    if (runPartition.getQcType() != null) {
-      node.setQcStatusId(runPartition.getQcType().getId());
-    }
-    node.setQcNote(runPartition.getNotes());
-    return node;
-  }
-
-  private static QcNodeDto makeQcNode(RunPartitionAliquot runLib) {
-    Run run = runLib.getRun();
-    Partition partition = runLib.getPartition();
-    LibraryAliquot libraryAliquot = runLib.getAliquot();
-    PlatformType platform = run.getPlatformType();
-
-    QcNodeDto node = new QcNodeDto();
-    node.setEntityType("RunPartitionLibrary");
-    node.setTypeLabel("Run-Library");
-    node.setIds(new Long[] { run.getId(), partition.getId(), libraryAliquot.getId() });
-    RunPosition runPosition = runLib.getRun().getRunPositions().stream()
-        .filter(runPos -> runPos.getContainer().getId() == runLib.getPartition().getSequencerPartitionContainer().getId())
-        .findFirst().orElseThrow(() -> new IllegalStateException("No run position found matching partition container"));
-    node.setLabel(run.getAlias() + " " + platform.getPartitionName() + " "
-        + (runPosition.getPosition() == null ? "" : runPosition.getPosition().getAlias() + "-") + partition.getPartitionNumber()
-        + " " + runLib.getAliquot().getAlias());
-    node.setQcPassed(runLib.getQcPassed());
-    node.setQcNote(runLib.getQcNote());
-    return node;
-  }
-
   @GetMapping("/{runId}-{partitionId}-{aliquotId}/qc-hierarchy")
   public ModelAndView getQcHierarchy(@PathVariable long runId, @PathVariable long partitionId, @PathVariable long aliquotId, ModelMap model)
       throws IOException {
-    SampleQcNode hierarchy = qcNodeDao.getForRunLibrary(runId, partitionId, aliquotId);
+    SampleQcNode hierarchy = qcNodeService.getForRunLibrary(runId, partitionId, aliquotId);
     if (hierarchy == null) {
       throw new NotFoundException("Run-library not found");
     }
 
     ObjectMapper mapper = new ObjectMapper();
     model.put("title", "Run-Library Hierarchy");
-    model.put("selectedType", "RunPartitionLibrary");
+    model.put("selectedType", "Run-Library");
     model.put("selectedId", "[" + runId + ", " + partitionId + ", " + aliquotId + "]");
     model.put("hierarchy", mapper.writeValueAsString(Dtos.asHierarchyDto(hierarchy)));
 

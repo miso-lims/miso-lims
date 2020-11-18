@@ -107,7 +107,7 @@ var QcHierarchy = (function($) {
         if (node.item.entityType !== selectedType) {
           return false;
         }
-        if (selectedType === 'RunPartitionLibrary') {
+        if (selectedType === 'Run-Library') {
           if (!Array.isArray(node.item.ids) || node.item.ids.length !== 3 || !Array.isArray(selectedId) || selectedId.length !== 3) {
             throw new Error("Invalid ID");
           }
@@ -220,11 +220,11 @@ var QcHierarchy = (function($) {
       return makeNodeHtml(item, status.label);
     case 'Run':
       return makeNodeHtml(item, item.runStatus);
-    case 'RunPartition':
+    case 'Run-Partition':
       var status = item.qcStatusId ? Utils.array.findUniqueOrThrow(Utils.array.idPredicate(item.qcStatusId), Constants.partitionQcTypes)
           : null;
       return makeNodeHtml(item, status ? status.description : 'Not Set');
-    case 'RunPartitionLibrary':
+    case 'Run-Library':
       var status = QcHierarchy.runLibraryQcOptions.find(function(x) {
         return x.value === item.qcPassed;
       });
@@ -290,13 +290,9 @@ var QcHierarchy = (function($) {
 
     switch (selectedItem.entityType) {
     case 'Sample':
-      updateDetailedQcControls(selectedItem, Urls.rest.samples.updateQcStatus(selectedItem.id));
-      break;
     case 'Library':
-      updateDetailedQcControls(selectedItem, Urls.rest.libraries.updateQcStatus(selectedItem.id));
-      break;
     case 'Library Aliquot':
-      updateDetailedQcControls(selectedItem, Urls.rest.libraryAliquots.updateQcStatus(selectedItem.id));
+      updateDetailedQcControls(selectedItem);
       break;
     case 'Pool':
       updatePoolQcControls(selectedItem);
@@ -304,10 +300,10 @@ var QcHierarchy = (function($) {
     case 'Run':
       updateRunQcControls(selectedItem);
       break;
-    case 'RunPartition':
+    case 'Run-Partition':
       updatePartitionQcControls(selectedItem);
       break;
-    case 'RunPartitionLibrary':
+    case 'Run-Library':
       updateRunLibraryQcControls(selectedItem);
       break;
     default:
@@ -315,7 +311,7 @@ var QcHierarchy = (function($) {
     }
   }
 
-  function updateDetailedQcControls(selectedItem, updateUrl) {
+  function updateDetailedQcControls(selectedItem) {
     $(statusInput).append(makeSelectOption(0, 'Not Ready', !selectedItem.qcStatusId)).append(Constants.detailedQcStatuses.map(function(x) {
       return makeSelectOption(x.id, x.description, selectedItem.qcStatusId === x.id);
     })).change(function() {
@@ -328,12 +324,11 @@ var QcHierarchy = (function($) {
       }
     }).change();
     $(applyButton).click(function() {
-      validateAndSubmit(function() {
-        var update = {
+      validateAndSubmit(selectedItem, function() {
+        return {
           qcStatusId: Number.parseInt($(statusInput).val()) || null,
-          note: $(noteInput).val() || null
+          qcNote: $(noteInput).val() || null
         };
-        Utils.ajaxWithDialog('Setting Status', 'PUT', updateUrl, update, Utils.page.pageReload);
       });
     });
   }
@@ -343,11 +338,10 @@ var QcHierarchy = (function($) {
       return makeSelectOption(i, x.label, selectedItem.qcPassed === x.value);
     }));
     $(applyButton).click(function() {
-      validateAndSubmit(function() {
-        var selectedStatus = QcHierarchy.poolQcOptions[$(statusInput).val()].value;
-        Utils.ajaxWithDialog('Setting Status', 'PUT', Urls.rest.pools.updateQcStatus(selectedItem.id) + '?' + $.param({
-          qcPassed: selectedStatus
-        }), null, Utils.page.pageReload);
+      validateAndSubmit(selectedItem, function() {
+        return {
+          qcPassed: QcHierarchy.poolQcOptions[$(statusInput).val()].value
+        };
       });
     });
   }
@@ -357,11 +351,10 @@ var QcHierarchy = (function($) {
       return makeSelectOption(x.label, x.label, selectedItem.runStatus === x.label);
     }));
     $(applyButton).click(function() {
-      validateAndSubmit(function() {
-        var selectedStatus = $(statusInput).val();
-        Utils.ajaxWithDialog('Setting Status', 'PUT', Urls.rest.runs.updateStatus(selectedItem.id) + '?' + $.param({
-          status: selectedStatus
-        }), null, Utils.page.pageReload);
+      validateAndSubmit(selectedItem, function() {
+        return {
+          runStatus: $(statusInput).val()
+        };
       });
     });
   }
@@ -381,13 +374,11 @@ var QcHierarchy = (function($) {
     }).change();
     $(applyButton).click(
         function() {
-          validateAndSubmit(function() {
-            var update = {
+          validateAndSubmit(selectedItem, function() {
+            return {
               qcStatusId: Number.parseInt($(statusInput).val()) || null,
-              note: $(noteInput).val() || null
+              qcNote: $(noteInput).val() || null
             };
-            Utils.ajaxWithDialog('Setting Status', 'PUT', Urls.rest.runs.updatePartitionQcStatus(selectedItem.ids[0], selectedItem.ids[1]),
-                update, Utils.page.pageReload);
           });
         });
   }
@@ -400,18 +391,16 @@ var QcHierarchy = (function($) {
     Utils.ui.setDisabled(noteInput, false);
     $(applyButton).click(
         function() {
-          validateAndSubmit(function() {
-            var update = {
+          validateAndSubmit(selectedItem, function() {
+            return {
               qcPassed: QcHierarchy.runLibraryQcOptions[$(statusInput).val()].value,
-              note: $(noteInput).val() || null
+              qcNote: $(noteInput).val() || null
             };
-            Utils.ajaxWithDialog('Setting Status', 'PUT', Urls.rest.runs.updateLibraryQcStatus(selectedItem.ids[0], selectedItem.ids[1],
-                selectedItem.ids[2]), update, Utils.page.pageReload);
           });
         });
   }
 
-  function validateAndSubmit(submitFunction) {
+  function validateAndSubmit(item, getUpdates) {
     Validate.cleanFields(editForm);
     Validate.clearErrors(editForm);
 
@@ -419,7 +408,8 @@ var QcHierarchy = (function($) {
 
     var valid = $(editForm).parsley().validate();
     if (valid) {
-      submitFunction();
+      var updated = Object.assign(item, getUpdates());
+      Utils.ajaxWithDialog('Setting Status', 'PUT', Urls.rest.qcStatuses.update, updated, Utils.page.pageReload);
     }
   }
 

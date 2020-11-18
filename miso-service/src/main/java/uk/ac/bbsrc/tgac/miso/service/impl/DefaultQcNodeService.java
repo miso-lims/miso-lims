@@ -32,4 +32,9 @@ public class DefaultQcNodeService implements QcNodeService {
     return qcNodeDao.getForLibraryAliquot(id);
   }
 
+  @Override
+  public SampleQcNode getForRunLibrary(long runId, long partitionId, long aliquotId) throws IOException {
+    return qcNodeDao.getForRunLibrary(runId, partitionId, aliquotId);
+  }
+
 }

@@ -325,4 +325,9 @@ public class DefaultContainerService implements ContainerService {
     return result;
   }
 
+  @Override
+  public Long getPartitionIdByRunIdAndPartitionNumber(long runId, int partitionNumber) throws IOException {
+    return containerDao.getPartitionIdByRunIdAndPartitionNumber(runId, partitionNumber);
+  }
+
 }

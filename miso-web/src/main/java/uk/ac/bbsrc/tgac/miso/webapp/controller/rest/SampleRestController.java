@@ -74,7 +74,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
-import uk.ac.bbsrc.tgac.miso.core.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
@@ -98,7 +97,6 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleStockDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissuePieceDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueProcessingDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
-import uk.ac.bbsrc.tgac.miso.dto.request.DetailedQcStatusUpdateDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
@@ -121,8 +119,6 @@ public class SampleRestController extends RestController {
   private PoolService poolService;
   @Autowired
   private WorksetService worksetService;
-  @Autowired
-  private DetailedQcStatusService detailedQcStatusService;
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
@@ -500,11 +496,6 @@ public class SampleRestController extends RestController {
   public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
     return asyncOperationManager.getAsyncProgress(uuid, Sample.class, sampleService,
         ali -> Dtos.asDto(ali, false));
-  }
-
-  @PutMapping("/{sampleId}/qc-status")
-  public @ResponseBody SampleDto updateQcStatus(@PathVariable long sampleId, @RequestBody DetailedQcStatusUpdateDto dto) throws IOException {
-    return RestUtils.updateQcStatus("Sample", sampleId, dto, sampleService, detailedQcStatusService, sam -> Dtos.asDto(sam, false));
   }
 
 }

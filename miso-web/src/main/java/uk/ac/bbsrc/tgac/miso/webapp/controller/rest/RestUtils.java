@@ -13,14 +13,11 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
-import uk.ac.bbsrc.tgac.miso.core.data.HierarchyEntity;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.service.DeleterService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SaveService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.BulkValidationException;
-import uk.ac.bbsrc.tgac.miso.dto.request.DetailedQcStatusUpdateDto;
 
 public class RestUtils {
 
@@ -119,20 +116,6 @@ public class RestUtils {
         }
       }
     }
-  }
-
-  public static <T extends HierarchyEntity, R> R updateQcStatus(String entityType, long id, DetailedQcStatusUpdateDto dto,
-      SaveService<T> service, ProviderService<DetailedQcStatus> detailedQcStatusService, Function<T, R> toDto) throws IOException {
-    T item = RestUtils.retrieve(entityType, id, service);
-    DetailedQcStatus status = null;
-    if (dto.getQcStatusId() != null) {
-      status = RestUtils.retrieve("QC Status", dto.getQcStatusId(), detailedQcStatusService, Status.BAD_REQUEST);
-    }
-    item.setDetailedQcStatus(status);
-    item.setDetailedQcStatusNote(dto.getNote());
-    long savedId = service.update(item);
-    T saved = service.get(savedId);
-    return toDto.apply(saved);
   }
 
 }

@@ -60,12 +60,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
-import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
@@ -94,10 +92,8 @@ import uk.ac.bbsrc.tgac.miso.dto.InstrumentModelDto;
 import uk.ac.bbsrc.tgac.miso.dto.PartitionDto;
 import uk.ac.bbsrc.tgac.miso.dto.RunPartitionAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.StudyDto;
-import uk.ac.bbsrc.tgac.miso.dto.request.DetailedQcStatusUpdateDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ServerErrorException;
 
 /**
  * A controller to handle all REST requests for Runs
@@ -555,76 +551,6 @@ public class RunRestController extends RestController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
     RestUtils.bulkDelete("Run", ids, runService);
-  }
-
-  @PutMapping("/{runId}/status")
-  public @ResponseBody RunDto updateStatus(@PathVariable long runId, @RequestParam String status) throws IOException {
-    Run run = RestUtils.retrieve("Run", runId, runService);
-    HealthType health = HealthType.get(status);
-    if (health == null) {
-      throw new RestException("Invalid run status: " + status, Status.BAD_REQUEST);
-    }
-    run.setHealth(health);
-    long savedId = runService.update(run);
-    Run saved = runService.get(savedId);
-    return Dtos.asDto(saved);
-  }
-
-  @PutMapping("/{runId}/partitions/{partitionId}/qc-status")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  public @ResponseBody void updateRunPartitionQcStatus(@PathVariable long runId, @PathVariable long partitionId,
-      @RequestBody DetailedQcStatusUpdateDto dto) throws IOException {
-    Run run = RestUtils.retrieve("Run", runId, runService);
-    Partition partition = findPartitionInRun(run, partitionId);
-    PartitionQCType status = dto.getQcStatusId() == null ? null
-        : RestUtils.retrieve("Partition QC status", dto.getQcStatusId(), partitionQcTypeService, Status.BAD_REQUEST);
-
-    RunPartition runPartition = runPartitionService.get(run, partition);
-    if (runPartition == null) {
-      throw new ServerErrorException(String.format("No RunPartition found for run %d, partition %d", run.getId(), partition.getId()));
-    }
-    runPartition.setQcType(status);
-    runPartition.setNotes(dto.getNote());
-    runPartitionService.save(runPartition);
-  }
-
-  private Partition findPartitionInRun(Run run, long partitionId) {
-    Partition partition = run.getRunPositions().stream()
-        .map(RunPosition::getContainer)
-        .flatMap(x -> x.getPartitions().stream())
-        .filter(x -> x.getId() == partitionId)
-        .findFirst().orElse(null);
-    if (partition == null) {
-      throw new RestException(String.format("Partition %d not found in run", partitionId), Status.NOT_FOUND);
-    }
-    return partition;
-  }
-
-  @PutMapping("/{runId}/partitions/{partitionId}/libraryaliquots/{aliquotId}/qc-status")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  public @ResponseBody void updateRunLibraryQcStatus(@PathVariable long runId, @PathVariable long partitionId,
-      @PathVariable long aliquotId, @RequestBody RunLibraryQcStatusUpdateRequest dto) throws IOException {
-    Run run = RestUtils.retrieve("Run", runId, runService);
-    Partition partition = findPartitionInRun(run, partitionId);
-    PoolableElementView poolableElementView = partition.getPool().getPoolContents().stream()
-        .map(PoolElement::getPoolableElementView)
-        .filter(x -> x.getId() == aliquotId)
-        .findFirst().orElse(null);
-    if (poolableElementView == null) {
-      throw new RestException(String.format("Library aliquot %d not found in partition", aliquotId), Status.NOT_FOUND);
-    }
-    LibraryAliquot aliquot = RestUtils.retrieve("Library aliquot", aliquotId, libraryAliquotService);
-
-    RunPartitionAliquot runLib = runPartitionAliquotService.get(run, partition, aliquot);
-    if (runLib == null) {
-      runLib = new RunPartitionAliquot();
-      runLib.setRun(run);
-      runLib.setPartition(partition);
-      runLib.setAliquot(aliquot);
-    }
-    runLib.setQcPassed(dto.getQcPassed());
-    runLib.setQcNote(dto.getNote());
-    runPartitionAliquotService.save(runLib);
   }
 
 }
