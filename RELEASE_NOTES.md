@@ -1,5 +1,8 @@
 # Unreleased
 
+  * Fixed RNA Library Preparation spreadsheet download and Pinery-MISO excluding some QCs if QC type
+    name doesn't exactly match the original spec.
+
 Changes:
 
   * Added transfer notifications. From the Edit Transfer page, you can now send email notifications to
