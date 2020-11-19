@@ -1,3 +1,4 @@
+-- transfer_notifications
 CREATE TABLE TransferNotification (
   notificationId bigint(20) NOT NULL AUTO_INCREMENT,
   transferId bigint(20) NOT NULL,
@@ -20,3 +21,4 @@ CREATE TABLE Contact (
   PRIMARY KEY (contactId),
   CONSTRAINT uk_contact_email UNIQUE (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
