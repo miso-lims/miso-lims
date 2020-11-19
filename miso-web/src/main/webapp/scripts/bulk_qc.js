@@ -67,9 +67,15 @@ BulkTarget.qc = (function() {
             title: 'Type',
             type: 'dropdown',
             data: 'qcTypeId',
-            source: Constants.qcTypes.filter(function(qcType) {
-              return qcType.qcTarget == config.qcTarget && !qcType.archived;
-            }),
+            source: function(data, api) {
+              if (config.pageMode === 'edit') {
+                return [Utils.array.findUniqueOrThrow(Utils.array.idPredicate(data.qcTypeId), Constants.qcTypes)];
+              } else {
+                return Constants.qcTypes.filter(function(qcType) {
+                  return qcType.qcTarget == config.qcTarget && !qcType.archived;
+                });
+              }
+            },
             getItemLabel: Utils.array.getName,
             getItemValue: Utils.array.getId,
             sortSource: Utils.sorting.standardSort('name'),
