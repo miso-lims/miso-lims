@@ -120,8 +120,8 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forString("Concentration Units", sam -> sam.getConcentrationUnits() == null ? "" : sam.getConcentrationUnits().getRawLabel()), //
       Column.forBigDecimal("Volume", Sample::getVolume), //
       Column.forString("Volume Units", sam -> sam.getVolumeUnits() == null ? "" : sam.getVolumeUnits().getRawLabel()), //
-      Column.forBigDecimal("DV200", sam -> qcValue(sam, "DV200")), //
-      Column.forBigDecimal("RIN", sam -> qcValue(sam, "RIN")), //
+      Column.forBigDecimal("DV200", sam -> qcValue(sam, "DV200", false)), //
+      Column.forBigDecimal("RIN", sam -> qcValue(sam, "RIN", true)), //
       Column.forString("QC Status", qcStatusFunction()), //
       Column.forString("QC Status Note", true, detailedSample(DetailedSample.class, DetailedSample::getDetailedQcStatusNote, "")), //
       Column.forString("Notes",
@@ -186,9 +186,9 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
     return s -> s.getDetailedQcStatus() == null ? "Not Ready" : s.getDetailedQcStatus().getDescription();
   }
 
-  private static BigDecimal qcValue(Sample sample, String qcTypeName) {
+  private static BigDecimal qcValue(Sample sample, String qcTypeName, boolean matchStartOnly) {
     return sample.getQCs().stream()
-        .filter(qc -> qcTypeName.equals(qc.getType().getName()))
+        .filter(qc -> matchStartOnly ? qc.getType().getName().startsWith(qcTypeName) : qc.getType().getName().contains(qcTypeName))
         .max(Comparator.comparing(QC::getDate))
         .map(QC::getResults).orElse(null);
   }

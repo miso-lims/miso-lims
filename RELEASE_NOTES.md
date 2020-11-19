@@ -1,5 +1,8 @@
 # Unreleased
 
+  * Fixed RNA Library Preparation spreadsheet download and Pinery-MISO excluding some QCs if QC type
+    name doesn't exactly match the original spec.
+
 Changes:
 
 

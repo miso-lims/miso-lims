@@ -99,7 +99,7 @@ LEFT JOIN (
         SELECT sample_sampleId, type, MAX(date) AS maxDate
         FROM SampleQC
         JOIN QCType ON QCType.qcTypeId = SampleQC.type
-        WHERE QCType.name = 'Qubit'
+        WHERE QCType.name = '%Qubit%'
         GROUP By sample_sampleId, type
         ) maxQubitDates
     JOIN SampleQC sqc ON sqc.sample_sampleId = maxQubitDates.sample_sampleId
@@ -144,7 +144,7 @@ LEFT JOIN (
         SELECT sample_sampleId, type, MAX(date) AS maxDate
         FROM SampleQC
         JOIN QCType ON QCType.qcTypeId = SampleQC.type
-        WHERE QCType.name = 'RIN'
+        WHERE QCType.name LIKE 'RIN%'
         GROUP By sample_sampleId, type
         ) maxRinDates
     JOIN SampleQC sqc ON sqc.sample_sampleId = maxRinDates.sample_sampleId
@@ -159,7 +159,7 @@ LEFT JOIN (
         SELECT sample_sampleId, type, MAX(date) AS maxDate
         FROM SampleQC
         JOIN QCType ON QCType.qcTypeId = SampleQC.type
-        WHERE QCType.name = 'DV200'
+        WHERE QCType.name LIKE '%DV200%'
         GROUP By sample_sampleId, type
         ) maxDv200Dates
     JOIN SampleQC sqc ON sqc.sample_sampleId = maxDv200Dates.sample_sampleId
@@ -309,7 +309,7 @@ LEFT JOIN (
             SELECT library_libraryId, type, MAX(date) AS maxDate
             FROM LibraryQC
             JOIN QCType ON QCType.qcTypeId = LibraryQC.type
-            WHERE QCType.name = 'Qubit'
+            WHERE QCType.name LIKE '%Qubit%'
             GROUP By library_libraryId, type
             ) maxQubitDates
         JOIN LibraryQC lqc ON lqc.library_libraryId = maxQubitDates.library_libraryId
