@@ -25,12 +25,9 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,19 +42,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
-import uk.ac.bbsrc.tgac.miso.core.service.SampleGroupService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.dto.AttachmentDto;
@@ -89,8 +83,6 @@ public class ProjectRestController extends RestController {
   private PoolService poolService;
   @Autowired
   private RunService runService;
-  @Autowired
-  private SampleGroupService sampleGroupService;
   @Autowired
   private IndexChecker indexChecker;
 
@@ -162,17 +154,6 @@ public class ProjectRestController extends RestController {
   public @ResponseBody List<ProjectDto> listAllProjects() throws IOException {
     Collection<Project> lp = projectService.list();
     return Dtos.asProjectDtos(lp);
-  }
-
-  @GetMapping(value = "/{id}/groups", produces = { "application/json" })
-  @ResponseBody
-  public Collection<Integer> getProjectSampleGroups(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
-      HttpServletResponse response) throws IOException {
-    Set<Integer> groups = new HashSet<>();
-    for (SampleGroupId sgi : sampleGroupService.getAllForProject(id)) {
-      groups.add(sgi.getGroupId());
-    }
-    return groups;
   }
 
   @GetMapping(value = "/search")

@@ -81,7 +81,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.QualityControlService;
 import uk.ac.bbsrc.tgac.miso.core.service.ReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
-import uk.ac.bbsrc.tgac.miso.core.service.SampleGroupService;
 import uk.ac.bbsrc.tgac.miso.core.service.SamplePurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
@@ -156,8 +155,6 @@ public class ConstantsController {
   private SampleValidRelationshipService sampleValidRelationshipService;
   @Autowired
   private SubprojectService subprojectService;
-  @Autowired
-  private SampleGroupService sampleGroupService;
   @Autowired
   private SamplePurposeService samplePurposeService;
   @Autowired
@@ -265,7 +262,6 @@ public class ConstantsController {
       addJsonArray(mapper, node, "sampleClasses", sampleClassService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "sampleValidRelationships", relationships, Dtos::asDto);
       addJsonArray(mapper, node, "detailedQcStatuses", detailedQcStatusService.getAll(), Dtos::asDto);
-      addJsonArray(mapper, node, "sampleGroups", sampleGroupService.getAll(), Dtos::asDto);
       addJsonArray(mapper, node, "subprojects", subprojectService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "labs", labService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "tissueOrigins", tissueOriginService.list(), Dtos::asDto);
