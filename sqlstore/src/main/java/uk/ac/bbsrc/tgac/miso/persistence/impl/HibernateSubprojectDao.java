@@ -8,8 +8,6 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,8 +21,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
 @Transactional(rollbackFor = Exception.class)
 public class HibernateSubprojectDao implements SubprojectDao {
 
-  protected static final Logger log = LoggerFactory.getLogger(HibernateSubprojectDao.class);
-
   @Autowired
   private SessionFactory sessionFactory;
 
@@ -37,7 +33,7 @@ public class HibernateSubprojectDao implements SubprojectDao {
   }
 
   @Override
-  public List<Subproject> getSubproject() {
+  public List<Subproject> list() {
     Query query = currentSession().createQuery("from SubprojectImpl");
     @SuppressWarnings("unchecked")
     List<Subproject> records = query.list();
@@ -45,29 +41,30 @@ public class HibernateSubprojectDao implements SubprojectDao {
   }
 
   @Override
-  public Subproject getSubproject(Long id) {
+  public Subproject get(long id) {
     return (Subproject) currentSession().get(SubprojectImpl.class, id);
   }
 
   @Override
-  public Long addSubproject(Subproject subproject) {
+  public long create(Subproject subproject) {
     Date now = new Date();
-    subproject.setCreationDate(now);
-    subproject.setLastUpdated(now);
+    subproject.setCreationTime(now);
+    subproject.setLastModified(now);
     return (Long) currentSession().save(subproject);
   }
 
   @Override
-  public void deleteSubproject(Subproject subproject) {
+  public void delete(Subproject subproject) {
     currentSession().delete(subproject);
 
   }
 
   @Override
-  public void update(Subproject subproject) {
+  public long update(Subproject subproject) {
     Date now = new Date();
-    subproject.setLastUpdated(now);
+    subproject.setLastModified(now);
     currentSession().update(subproject);
+    return subproject.getId();
   }
 
   @Override
@@ -79,12 +76,19 @@ public class HibernateSubprojectDao implements SubprojectDao {
   }
 
   @Override
-  public List<Subproject> getByProjectId(Long projectId) {
+  public List<Subproject> listByProjectId(Long projectId) {
     @SuppressWarnings("unchecked")
     List<Subproject> subprojects = currentSession().createCriteria(SubprojectImpl.class)
         .add(Restrictions.eq("parentProject.id", projectId))
         .list();
     return subprojects;
+  }
+
+  @Override
+  public Subproject getByAlias(String alias) {
+    return (Subproject) currentSession().createCriteria(SubprojectImpl.class)
+        .add(Restrictions.eq("alias", alias))
+        .uniqueResult();
   }
 
 }

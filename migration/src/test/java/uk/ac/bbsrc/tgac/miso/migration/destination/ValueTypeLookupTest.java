@@ -193,7 +193,7 @@ public class ValueTypeLookupTest {
     HibernateSubprojectDao subProjDao = Mockito.mock(HibernateSubprojectDao.class);
     List<Subproject> subprojs = new ArrayList<>();
     subprojs.add(makeSubproject(VALID_LONG, VALID_STRING));
-    Mockito.when(subProjDao.getSubproject()).thenReturn(subprojs);
+    Mockito.when(subProjDao.list()).thenReturn(subprojs);
     Mockito.when(mgr.getSubprojectDao()).thenReturn(subProjDao);
 
     DefaultReferenceGenomeService referenceGenomeService = Mockito.mock(DefaultReferenceGenomeService.class);

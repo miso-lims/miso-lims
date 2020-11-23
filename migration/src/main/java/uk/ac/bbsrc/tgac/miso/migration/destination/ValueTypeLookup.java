@@ -122,7 +122,7 @@ public class ValueTypeLookup {
     setSampleQcTypes(misoServiceManager.getQualityControlService().listQcTypes(QcTarget.Sample));
     setLibraryQcTypes(misoServiceManager.getQualityControlService().listQcTypes(QcTarget.Library));
     setSequencers(misoServiceManager.getInstrumentDao().listAll());
-    setSubprojects(misoServiceManager.getSubprojectDao().getSubproject());
+    setSubprojects(misoServiceManager.getSubprojectDao().list());
     setDetailedQcStatuses(misoServiceManager.getDetailedQcStatusDao().list());
     setReferenceGenomes(misoServiceManager.getReferenceGenomeService().list());
     setTargetedSequencings(misoServiceManager.getTargetedSequencingDao().list());
