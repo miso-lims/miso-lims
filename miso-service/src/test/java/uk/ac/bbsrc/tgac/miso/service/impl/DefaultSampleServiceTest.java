@@ -60,7 +60,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.ProjectStore;
-import uk.ac.bbsrc.tgac.miso.persistence.SampleGroupDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SecurityStore;
@@ -98,8 +97,6 @@ public class DefaultSampleServiceTest {
   private SecurityStore securityStore;
   @Mock
   private SamplePurposeDao samplePurposeDao;
-  @Mock
-  private SampleGroupDao sampleGroupDao;
   @Mock
   private TissueMaterialDao tissueMaterialDao;
   @Mock
