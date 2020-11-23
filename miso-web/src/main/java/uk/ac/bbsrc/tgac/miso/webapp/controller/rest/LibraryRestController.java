@@ -69,7 +69,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibrarySpreadSheets;
-import uk.ac.bbsrc.tgac.miso.core.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
@@ -85,7 +84,6 @@ import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
-import uk.ac.bbsrc.tgac.miso.dto.request.DetailedQcStatusUpdateDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
@@ -124,8 +122,6 @@ public class LibraryRestController extends RestController {
   private PoolService poolService;
   @Autowired
   private WorksetService worksetService;
-  @Autowired
-  private DetailedQcStatusService detailedQcStatusService;
   @Autowired
   private SampleRestController sampleController;
   @Autowired
@@ -351,12 +347,6 @@ public class LibraryRestController extends RestController {
       }
     }
     return response;
-  }
-
-  @PutMapping("/{libraryId}/qc-status")
-  public @ResponseBody LibraryDto updateQcStatus(@PathVariable long libraryId, @RequestBody DetailedQcStatusUpdateDto dto)
-      throws IOException {
-    return RestUtils.updateQcStatus("Library", libraryId, dto, libraryService, detailedQcStatusService, lib -> Dtos.asDto(lib, false));
   }
 
 }

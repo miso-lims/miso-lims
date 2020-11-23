@@ -24,8 +24,6 @@ public class RunQcNode implements QcNode {
 
   private static final long serialVersionUID = 1L;
 
-  private static final String TYPE_LABEL = "Run";
-
   @Id
   @Column(name = "runId")
   private long id;
@@ -49,13 +47,13 @@ public class RunQcNode implements QcNode {
   }
 
   @Override
-  public String getEntityType() {
-    return TYPE_LABEL;
+  public QcNodeType getEntityType() {
+    return QcNodeType.RUN;
   }
 
   @Override
   public String getTypeLabel() {
-    return TYPE_LABEL;
+    return QcNodeType.RUN.getLabel();
   }
 
   @Override

@@ -17,6 +17,9 @@ Changes:
   * Improved error message displayed when login has timed out
   * Added message and link to SOP for adding new options at the top of several list pages in the Misc
     and Institute Defaults menus
+  * Dashi integration: improved performance of Run-Library Metrics page and added bulk controls
+    * Set status of all run-libraries at once
+    * Save all changes
 
 Upgrade Notes:
 

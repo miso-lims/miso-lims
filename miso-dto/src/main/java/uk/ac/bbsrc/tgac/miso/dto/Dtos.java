@@ -208,6 +208,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SequencingOrderSummaryView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.QcNode;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.QcNodeType;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.QcStatusUpdate;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.SampleQcNode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
@@ -4201,17 +4203,23 @@ public class Dtos {
     return to;
   }
 
-  public static QcHierarchyNodeDto asHierarchyDto(SampleQcNode from) {
+  public static QcNodeDto asDto(@Nonnull QcNode from) {
+    QcNodeDto to = new QcNodeDto();
+    convertIntoDto(from, to);
+    return to;
+  }
+
+  public static QcHierarchyNodeDto asHierarchyDto(@Nonnull SampleQcNode from) {
     QcHierarchyNodeDto dto = new QcHierarchyNodeDto();
     convertIntoDto(from, dto);
     addChildren(from, dto);
     return dto;
   }
 
-  private static <T extends QcNodeDto> void convertIntoDto(QcNode from, T to) {
+  private static <T extends QcNodeDto> void convertIntoDto(@Nonnull QcNode from, @Nonnull T to) {
     setLong(to::setId, from.getId(), true);
     to.setIds(from.getIds());
-    setString(to::setEntityType, from.getEntityType());
+    setString(to::setEntityType, maybeGetProperty(from.getEntityType(), QcNodeType::getLabel));
     setString(to::setTypeLabel, from.getTypeLabel());
     setString(to::setName, from.getName());
     setString(to::setLabel, from.getLabel());
@@ -4219,6 +4227,18 @@ public class Dtos {
     setLong(to::setQcStatusId, from.getQcStatusId(), true);
     setString(to::setRunStatus, from.getRunStatus());
     setString(to::setQcNote, from.getQcNote());
+  }
+
+  public static QcStatusUpdate to(@Nonnull QcNodeDto from) {
+    QcStatusUpdate to = new QcStatusUpdate();
+    setLong(to::setId, from.getId(), true);
+    to.setIds(from.getIds());
+    setObject(to::setEntityType, from.getEntityType(), QcNodeType::lookup);
+    setBoolean(to::setQcPassed, from.getQcPassed(), true);
+    setLong(to::setQcStatusId, from.getQcStatusId(), true);
+    setObject(to::setRunStatus, from.getRunStatus(), HealthType::get);
+    setString(to::setQcNote, from.getQcNote());
+    return to;
   }
 
   private static void addChildren(QcNode from, QcHierarchyNodeDto to) {

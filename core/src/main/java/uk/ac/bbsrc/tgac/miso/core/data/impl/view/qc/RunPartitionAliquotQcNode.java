@@ -73,9 +73,6 @@ public class RunPartitionAliquotQcNode implements QcNode {
 
   private static final long serialVersionUID = 1L;
 
-  private static final String ENTITY_TYPE = "RunPartitionLibrary";
-  private static final String TYPE_LABEL = "Run-Library";
-
   @Id
   @ManyToOne
   @JoinColumn(name = "runId")
@@ -130,13 +127,13 @@ public class RunPartitionAliquotQcNode implements QcNode {
   }
 
   @Override
-  public String getEntityType() {
-    return ENTITY_TYPE;
+  public QcNodeType getEntityType() {
+    return QcNodeType.RUN_LIBRARY;
   }
 
   @Override
   public String getTypeLabel() {
-    return TYPE_LABEL;
+    return QcNodeType.RUN_LIBRARY.getLabel();
   }
 
   @Override

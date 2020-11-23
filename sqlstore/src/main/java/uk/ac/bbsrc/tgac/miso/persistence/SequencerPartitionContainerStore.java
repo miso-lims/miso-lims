@@ -80,4 +80,7 @@ public interface SequencerPartitionContainerStore {
   public PoreVersion getPoreVersion(long id);
 
   public List<PoreVersion> listPoreVersions();
+
+  public Long getPartitionIdByRunIdAndPartitionNumber(long runId, int partitionNumber) throws IOException;
+
 }

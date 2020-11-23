@@ -170,4 +170,10 @@ public class HibernateSequencerPartitionContainerDaoIT extends AbstractDAOTest {
   public void testGetModel() throws Exception {
     assertNotNull(dao.get(1L));
   }
+
+  @Test
+  public void testGetPartitionIdByRunIdAndPartitionNumber() throws Exception {
+    assertEquals(Long.valueOf(11L), dao.getPartitionIdByRunIdAndPartitionNumber(2L, 3));
+  }
+
 }

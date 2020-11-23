@@ -13,7 +13,6 @@ import javax.persistence.Transient;
 
 import org.hibernate.annotations.Immutable;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 
@@ -112,13 +111,13 @@ public class SampleQcNode extends DetailedQcNode {
   }
 
   @Override
-  public String getEntityType() {
-    return EntityType.SAMPLE.getLabel();
+  public QcNodeType getEntityType() {
+    return QcNodeType.SAMPLE;
   }
 
   @Override
   public String getTypeLabel() {
-    return getSampleClass() == null ? EntityType.SAMPLE.getLabel() : getSampleClass().getAlias();
+    return getSampleClass() == null ? QcNodeType.SAMPLE.getLabel() : getSampleClass().getAlias();
   }
 
 }
