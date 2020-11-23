@@ -91,6 +91,7 @@ public class DefaultTargetedSequencingService extends AbstractSaveService<Target
   protected void applyChanges(TargetedSequencing to, TargetedSequencing from) throws IOException {
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
+    to.setArchived(from.isArchived());
   }
 
   @Override
