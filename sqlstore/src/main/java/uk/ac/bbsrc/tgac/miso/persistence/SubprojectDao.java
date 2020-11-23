@@ -4,19 +4,13 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 
-public interface SubprojectDao {
+public interface SubprojectDao extends SaveDao<Subproject> {
 
-  List<Subproject> getSubproject();
+  public Subproject getByAlias(String alias);
 
-  List<Subproject> getByProjectId(Long projectId);
+  public List<Subproject> listByProjectId(Long projectId);
 
-  Subproject getSubproject(Long id);
-
-  Long addSubproject(Subproject subproject);
-
-  void deleteSubproject(Subproject subproject);
-
-  void update(Subproject subproject);
+  public void delete(Subproject subproject);
 
   public long getUsage(Subproject subproject);
 

@@ -104,7 +104,7 @@ public class EditProjectController {
 
   private ModelAndView setupForm(Project project, ModelMap model) throws IOException {
     if (project.isSaved()) {
-      Collection<Subproject> subprojects = subprojectService.getByProjectId(project.getId());
+      Collection<Subproject> subprojects = subprojectService.listByProjectId(project.getId());
       model.put("subprojects", Dtos.asSubprojectDtos(subprojects));
       model.put("title", "Project " + project.getId());
       List<Issue> issues = null;

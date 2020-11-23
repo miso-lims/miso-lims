@@ -1,44 +1,25 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
-import java.util.Date;
 
-import com.eaglegenomics.simlims.core.User;
+public interface Subproject extends Serializable, Aliasable, Deletable, Timestamped {
 
-public interface Subproject extends Serializable, Aliasable, Deletable {
+  public void setAlias(String alias);
 
-  void setAlias(String alias);
+  public String getDescription();
 
-  String getDescription();
+  public void setDescription(String description);
 
-  void setDescription(String description);
+  public Project getParentProject();
 
-  User getCreatedBy();
+  public void setParentProject(Project parentProject);
 
-  void setCreatedBy(User createdBy);
+  public Boolean getPriority();
 
-  Date getCreationDate();
+  public void setPriority(Boolean priority);
 
-  void setCreationDate(Date creationDate);
+  public void setReferenceGenome(ReferenceGenome referenceGenome);
 
-  User getUpdatedBy();
-
-  void setUpdatedBy(User updatedBy);
-
-  Date getLastUpdated();
-
-  void setLastUpdated(Date lastUpdated);
-
-  Project getParentProject();
-
-  void setParentProject(Project parentProject);
-
-  Boolean getPriority();
-
-  void setPriority(Boolean priority);
-
-  void setReferenceGenomeId(Long referenceGenomeId);
-
-  Long getReferenceGenomeId();
+  public ReferenceGenome getReferenceGenome();
 
 }

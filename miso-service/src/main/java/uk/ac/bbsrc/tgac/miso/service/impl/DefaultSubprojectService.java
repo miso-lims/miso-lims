@@ -10,30 +10,33 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
+import uk.ac.bbsrc.tgac.miso.core.service.ReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.core.service.SubprojectService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
-import uk.ac.bbsrc.tgac.miso.persistence.ProjectStore;
+import uk.ac.bbsrc.tgac.miso.persistence.SaveDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
+import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultSubprojectService implements SubprojectService {
+public class DefaultSubprojectService extends AbstractSaveService<Subproject> implements SubprojectService {
 
   protected static final Logger log = LoggerFactory.getLogger(DefaultSubprojectService.class);
 
   @Autowired
-  private ProjectStore projectStore;
-  @Autowired
   private SubprojectDao subprojectDao;
+  @Autowired
+  private ProjectService projectService;
+  @Autowired
+  private ReferenceGenomeService referenceGenomeService;
   @Autowired
   private DeletionStore deletionStore;
 
@@ -41,44 +44,45 @@ public class DefaultSubprojectService implements SubprojectService {
   private AuthorizationManager authorizationManager;
 
   @Override
-  public Subproject get(long subprojectId) throws IOException {
-    authorizationManager.throwIfUnauthenticated();
-    return subprojectDao.getSubproject(subprojectId);
-  }
-
-  @Override
-  public Long create(Subproject subproject, Long parentProjectId) throws IOException {
-    authorizationManager.throwIfNotInternal();
-    User user = authorizationManager.getCurrentUser();
-    Project parentProject = projectStore.get(parentProjectId);
-    subproject.setCreatedBy(user);
-    subproject.setUpdatedBy(user);
-    subproject.setParentProject(parentProject);
-    return subprojectDao.addSubproject(subproject);
-  }
-
-  @Override
-  public void update(Subproject subproject) throws IOException {
+  public long update(Subproject subproject) throws IOException {
     authorizationManager.throwIfNonAdmin();
-    Subproject updatedSubproject = get(subproject.getId());
-    updatedSubproject.setAlias(subproject.getAlias());
-    updatedSubproject.setDescription(subproject.getDescription());
-    updatedSubproject.setPriority(subproject.getPriority());
-    updatedSubproject.setReferenceGenomeId(subproject.getReferenceGenomeId());
-    User user = authorizationManager.getCurrentUser();
-    updatedSubproject.setUpdatedBy(user);
-    subprojectDao.update(updatedSubproject);
+    return super.update(subproject);
+  }
+
+  @Override
+  protected void loadChildEntities(Subproject object) throws IOException {
+    ValidationUtils.loadChildEntity(object::setParentProject, object.getParentProject(), projectService, "parentProjectId");
+    ValidationUtils.loadChildEntity(object::setReferenceGenome, object.getReferenceGenome(), referenceGenomeService, "referenceGenomeId");
+  }
+
+  @Override
+  protected void collectValidationErrors(Subproject object, Subproject beforeChange, List<ValidationError> errors) throws IOException {
+    if (ValidationUtils.isChanged(Subproject::getAlias, object, beforeChange) && subprojectDao.getByAlias(object.getAlias()) != null) {
+      errors.add(ValidationError.forDuplicate("subproject", "alias"));
+    }
+  }
+
+  @Override
+  protected void applyChanges(Subproject to, Subproject from) throws IOException {
+    to.setAlias(from.getAlias());
+    to.setDescription(from.getDescription());
+    to.setPriority(from.getPriority());
+    to.setReferenceGenome(from.getReferenceGenome());
+  }
+
+  @Override
+  protected void beforeSave(Subproject object) throws IOException {
+    object.setChangeDetails(authorizationManager.getCurrentUser());
   }
 
   @Override
   public List<Subproject> list() throws IOException {
-    return subprojectDao.getSubproject();
+    return subprojectDao.list();
   }
 
   @Override
-  public Set<Subproject> getByProjectId(Long projectId) throws IOException {
-    Project project = projectStore.get(projectId);
-    return Sets.newHashSet(subprojectDao.getByProjectId(projectId));
+  public Set<Subproject> listByProjectId(Long projectId) throws IOException {
+    return Sets.newHashSet(subprojectDao.listByProjectId(projectId));
   }
 
   @Override
@@ -101,6 +105,11 @@ public class DefaultSubprojectService implements SubprojectService {
     }
 
     return result;
+  }
+
+  @Override
+  public SaveDao<Subproject> getDao() {
+    return subprojectDao;
   }
 
 }

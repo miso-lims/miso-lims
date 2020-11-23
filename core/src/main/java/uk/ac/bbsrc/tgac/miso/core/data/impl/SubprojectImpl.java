@@ -17,6 +17,7 @@ import javax.persistence.TemporalType;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 
 @Entity
@@ -59,8 +60,9 @@ public class SubprojectImpl implements Subproject {
   @Temporal(TemporalType.TIMESTAMP)
   private Date lastUpdated;
 
-  @Column(nullable = true)
-  private Long referenceGenomeId;
+  @ManyToOne(targetEntity = ReferenceGenomeImpl.class)
+  @JoinColumn(name = "referenceGenomeId")
+  private ReferenceGenome referenceGenome;
 
   @Override
   public long getId() {
@@ -93,42 +95,42 @@ public class SubprojectImpl implements Subproject {
   }
 
   @Override
-  public User getCreatedBy() {
+  public User getCreator() {
     return createdBy;
   }
 
   @Override
-  public void setCreatedBy(User createdBy) {
+  public void setCreator(User createdBy) {
     this.createdBy = createdBy;
   }
 
   @Override
-  public Date getCreationDate() {
+  public Date getCreationTime() {
     return creationDate;
   }
 
   @Override
-  public void setCreationDate(Date creationDate) {
+  public void setCreationTime(Date creationDate) {
     this.creationDate = creationDate;
   }
 
   @Override
-  public User getUpdatedBy() {
+  public User getLastModifier() {
     return updatedBy;
   }
 
   @Override
-  public void setUpdatedBy(User updatedBy) {
+  public void setLastModifier(User updatedBy) {
     this.updatedBy = updatedBy;
   }
 
   @Override
-  public Date getLastUpdated() {
+  public Date getLastModified() {
     return lastUpdated;
   }
 
   @Override
-  public void setLastUpdated(Date lastUpdated) {
+  public void setLastModified(Date lastUpdated) {
     this.lastUpdated = lastUpdated;
   }
 
@@ -153,13 +155,13 @@ public class SubprojectImpl implements Subproject {
   }
 
   @Override
-  public Long getReferenceGenomeId() {
-    return referenceGenomeId;
+  public ReferenceGenome getReferenceGenome() {
+    return referenceGenome;
   }
 
   @Override
-  public void setReferenceGenomeId(Long referenceGenomeId) {
-    this.referenceGenomeId = referenceGenomeId;
+  public void setReferenceGenome(ReferenceGenome referenceGenome) {
+    this.referenceGenome = referenceGenome;
   }
 
   @Override

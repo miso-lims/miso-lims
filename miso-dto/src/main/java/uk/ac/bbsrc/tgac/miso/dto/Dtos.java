@@ -329,11 +329,11 @@ public class Dtos {
     dto.setDescription(from.getDescription());
     dto.setPriority(from.getPriority());
     dto.setParentProjectId(from.getParentProject().getId());
-    dto.setCreationDate(formatDateTime(from.getCreationDate()));
-    dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
-    setLong(dto::setCreatedById, maybeGetProperty(from.getCreatedBy(), User::getId), true);
-    setLong(dto::setUpdatedById, maybeGetProperty(from.getUpdatedBy(), User::getId), true);
-    dto.setReferenceGenomeId(from.getReferenceGenomeId());
+    dto.setCreationDate(formatDateTime(from.getCreationTime()));
+    dto.setLastUpdated(formatDateTime(from.getLastModified()));
+    setLong(dto::setCreatedById, maybeGetProperty(from.getCreator(), User::getId), true);
+    setLong(dto::setUpdatedById, maybeGetProperty(from.getLastModifier(), User::getId), true);
+    setId(dto::setReferenceGenomeId, from.getReferenceGenome());
     return dto;
   }
 
@@ -343,10 +343,12 @@ public class Dtos {
 
   public static Subproject to(@Nonnull SubprojectDto from) {
     Subproject to = new SubprojectImpl();
-    to.setAlias(from.getAlias());
-    to.setDescription(from.getDescription());
-    to.setPriority(from.getPriority());
-    to.setReferenceGenomeId(from.getReferenceGenomeId());
+    setLong(to::setId, from.getId(), false);
+    setString(to::setAlias, from.getAlias());
+    setString(to::setDescription, from.getDescription());
+    setBoolean(to::setPriority, from.getPriority(), true);
+    setObject(to::setReferenceGenome, ReferenceGenomeImpl::new, from.getReferenceGenomeId());
+    setObject(to::setParentProject, ProjectImpl::new, from.getParentProjectId());
     return to;
   }
 
