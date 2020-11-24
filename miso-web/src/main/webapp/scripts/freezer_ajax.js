@@ -302,8 +302,6 @@ var Freezer = (function($) {
     case 'LOOSE_STORAGE':
       displayLooseStorage(storage);
       displayEditStorageComponentControls(storage);
-      $('#saveStorageComponent').hide();
-      $('#storageComponentBarcodeRow').hide();
       break;
     case 'TRAY_RACK':
       displayTrayRack(storage);
@@ -365,7 +363,7 @@ var Freezer = (function($) {
       };
       break;
     case 'LOOSE_STORAGE':
-      return getUnorganizedStorageSelectFunction(node, false, true, assignBox);
+      return getUnorganizedStorageSelectFunction(node, true, true, assignBox);
       break;
     case 'TRAY':
       return getUnorganizedStorageSelectFunction(node, true, false, assignBox);
