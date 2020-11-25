@@ -21,6 +21,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BarcodableReference;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.DetailedQcItem;
+import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BarcodableReferenceService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
@@ -164,6 +166,19 @@ public class ValidationUtils {
         to.add(fromItem);
       }
     });
+  }
+
+  public static void updateQcUser(DetailedQcItem object, DetailedQcItem beforeChange, AuthorizationManager authorizationManager)
+      throws IOException {
+    if (isChanged(DetailedQcItem::getDetailedQcStatus, object, beforeChange)) {
+      if (object.getDetailedQcStatus() == null) {
+        object.setQcUser(null);
+      } else {
+        object.setQcUser(authorizationManager.getCurrentUser());
+      }
+    } else if (beforeChange != null) {
+      object.setQcUser(beforeChange.getQcUser());
+    }
   }
 
   public static ValidationException rewriteParentErrors(ValidationException original) {

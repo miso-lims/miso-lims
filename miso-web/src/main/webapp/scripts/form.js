@@ -220,6 +220,13 @@ FormUtils = (function($) {
         data: 'detailedQcStatusNote',
         type: 'text',
         maxLength: 500
+      }, {
+        title: 'QC User',
+        data: 'qcUserName',
+        type: 'read-only',
+        getDisplayValue: function(data) {
+          return data.qcUserName || 'n/a';
+        }
       }];
     },
 

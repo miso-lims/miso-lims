@@ -70,6 +70,8 @@ public class DefaultRunPartitionAliquotService implements RunPartitionAliquotSer
     }
     User user = authorizationManager.getCurrentUser();
 
+    updateQcUser(runPartitionAliquot, managed);
+
     if (managed == null) {
       runPartitionAliquot.setRun(runService.get(runPartitionAliquot.getRun().getId()));
       runPartitionAliquot.setPartition(containerService.getPartition(runPartitionAliquot.getPartition().getId()));
@@ -80,8 +82,21 @@ public class DefaultRunPartitionAliquotService implements RunPartitionAliquotSer
       managed.setPurpose(runPartitionAliquot.getPurpose());
       managed.setQcPassed(runPartitionAliquot.getQcPassed());
       managed.setQcNote(runPartitionAliquot.getQcNote());
+      managed.setQcUser(runPartitionAliquot.getQcUser());
       managed.setLastModifier(user);
       runPartitionAliquotDao.update(managed);
+    }
+  }
+
+  private void updateQcUser(RunPartitionAliquot runPartitionAliquot, RunPartitionAliquot beforeChange) throws IOException {
+    if (ValidationUtils.isChanged(RunPartitionAliquot::getQcPassed, runPartitionAliquot, beforeChange)) {
+      if (runPartitionAliquot.getQcPassed() == null) {
+        runPartitionAliquot.setQcUser(null);
+      } else {
+        runPartitionAliquot.setQcUser(authorizationManager.getCurrentUser());
+      }
+    } else if (beforeChange != null) {
+      runPartitionAliquot.setQcUser(beforeChange.getQcUser());
     }
   }
 

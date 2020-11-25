@@ -100,6 +100,10 @@ public class RunPartitionAliquot implements Serializable {
   private String qcNote;
 
   @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "qcUser")
+  private User qcUser;
+
+  @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier")
   private User lastModifier;
 
@@ -168,6 +172,14 @@ public class RunPartitionAliquot implements Serializable {
 
   public void setQcNote(String qcNote) {
     this.qcNote = qcNote;
+  }
+
+  public User getQcUser() {
+    return qcUser;
+  }
+
+  public void setQcUser(User qcUser) {
+    this.qcUser = qcUser;
   }
 
   public User getLastModifier() {
