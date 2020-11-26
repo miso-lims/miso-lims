@@ -5,6 +5,7 @@ Changes:
   * Fixed RNA Library Preparation spreadsheet download and Pinery-MISO excluding some QCs if QC type
     name doesn't exactly match the original spec.
   * Fixed error displaying/validating QC type when editing QC with an archived QC type
+  * Fixed targeted sequencing archived field not saving
 
 Upgrade Notes:
 
