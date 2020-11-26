@@ -87,7 +87,7 @@ public class PlainSampleITs extends AbstractIT {
     attrs.put(SamColumns.DESCRIPTION, "description");
     attrs.put(SamColumns.RECEIVE_DATE, "2017-10-10");
     attrs.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
-    attrs.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    attrs.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     attrs.put(SamColumns.RECEIPT_CONFIRMED, "True");
     attrs.put(SamColumns.RECEIPT_QC_PASSED, "True");
     attrs.put(SamColumns.RECEIPT_QC_NOTE, "");
@@ -177,7 +177,7 @@ public class PlainSampleITs extends AbstractIT {
     attrs.put(SamColumns.PROJECT, "PRO1");
     attrs.put(LibColumns.RECEIVE_DATE, "2017-11-28");
     attrs.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
-    attrs.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    attrs.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     attrs.put(SamColumns.RECEIPT_CONFIRMED, "True");
     attrs.put(SamColumns.RECEIPT_QC_PASSED, "True");
     attrs.put(SamColumns.RECEIPT_QC_NOTE, "");

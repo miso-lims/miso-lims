@@ -343,8 +343,8 @@ INSERT INTO BoxSize (boxSizeId, boxSizeRows, boxSizeColumns, scannable) VALUES
 (3, 3, 3, 0);
 
 INSERT INTO _Group (groupId, description, name) VALUES
-(1, 'TestGroup1', 'TestGroup1'),
-(2, 'TestGroup2', 'TestGroup2'),
+(1, 'TestGroup1', 'TestGroupOne'),
+(2, 'TestGroup2', 'TestGroupTwo'),
 (3, 'DeleteGroup', 'DeleteGroup');
 
 INSERT INTO User_Group (users_userId, groups_groupId)
@@ -452,8 +452,8 @@ INSERT INTO ServiceRecord(recordId, instrumentId, title, details, servicedBy, re
   (152, 101, 'Test 152', 'details to remove', 'technitchin', 'Riffraff', '2017-09-12', '2017-09-11 11:00:00', '2017-09-12 12:00:00', 1);
 
 INSERT INTO Project(projectId, name, alias, shortName, created, description, status, referenceGenomeId, lastModified, creator, lastModifier) VALUES
-  (1, 'PRO1', 'Project One', 'PRO1', '2017-06-27', 'integration test project one', 'ACTIVE', 1, '2017-06-27 14:11:00', 1, 1),
-  (2, 'PRO2', 'Project Two', 'PRO2', '2017-07-20', 'integration test project for custom identities', 'ACTIVE', 1, '2017-07-20 16:55:00', 1, 1),
+  (1, 'PRO1', 'Project One', 'PONE', '2017-06-27', 'integration test project one', 'ACTIVE', 1, '2017-06-27 14:11:00', 1, 1),
+  (2, 'PRO2', 'Project Two', 'PTWO', '2017-07-20', 'integration test project for custom identities', 'ACTIVE', 1, '2017-07-20 16:55:00', 1, 1),
   (3, 'PRO3', 'Test Data', 'TEST', '2017-06-27', 'integration test project three', 'ACTIVE', 1, '2017-06-27 14:12:00', 1, 1),
   (4, 'PRO4', 'Project To Change', 'DELTA', '2017-08-04', 'integration test project for changing fields', 'PROPOSED', 2, '2017-08-04 15:12:00', 1, 1),
   (5, 'PRO5', 'Search Tables Project', 'SRCH', '2017-10-10', 'integration test project five', 'ACTIVE', 1, '2017-10-10 10:10:10', 1, 1),
