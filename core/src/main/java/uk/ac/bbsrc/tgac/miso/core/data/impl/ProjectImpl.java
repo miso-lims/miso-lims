@@ -56,7 +56,6 @@ import com.google.common.collect.Lists;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.ProjectChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
@@ -120,9 +119,6 @@ public class ProjectImpl implements Project {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long id = UNSAVED_ID;
 
-  @OneToMany(targetEntity = SampleImpl.class, fetch = FetchType.LAZY, mappedBy = "project")
-  private Collection<Sample> samples = new HashSet<>();
-
   @OneToMany(targetEntity = StudyImpl.class, fetch = FetchType.LAZY, mappedBy = "project", cascade = CascadeType.REMOVE)
   private Collection<Study> studies = new HashSet<>();
 
@@ -176,11 +172,6 @@ public class ProjectImpl implements Project {
   }
 
   @Override
-  public Collection<Sample> getSamples() {
-    return samples;
-  }
-
-  @Override
   public Collection<Study> getStudies() {
     return studies;
   }
@@ -198,18 +189,6 @@ public class ProjectImpl implements Project {
   @Override
   public void setAlias(String alias) {
     this.alias = alias;
-  }
-
-  @Override
-  public void setSamples(Collection<Sample> samples) {
-    this.samples = samples;
-    Collections.sort(Lists.newArrayList(this.samples), new AliasComparator<Sample>());
-  }
-
-  @Override
-  public void addSample(Sample sample) {
-    this.samples.add(sample);
-    Collections.sort(Lists.newArrayList(this.samples), new AliasComparator<Sample>());
   }
 
   @Override
