@@ -5,12 +5,8 @@ import java.util.Set;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 
-public interface SubprojectService extends DeleterService<Subproject>, ListService<Subproject> {
+public interface SubprojectService extends DeleterService<Subproject>, ListService<Subproject>, SaveService<Subproject> {
 
-  Long create(Subproject subproject, Long parentProjectId) throws IOException;
-
-  void update(Subproject subproject) throws IOException;
-
-  Set<Subproject> getByProjectId(Long projectId) throws IOException;
+  public Set<Subproject> listByProjectId(Long projectId) throws IOException;
 
 }

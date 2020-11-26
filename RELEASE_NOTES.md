@@ -7,6 +7,10 @@ Changes:
   * Fixed error displaying/validating QC type when editing QC with an archived QC type
   * Fixed targeted sequencing archived field not saving
 
+Upgrade Notes:
+
+  * Updated to Pinery v2.14.2
+
 # 1.18.0
 
 Changes:

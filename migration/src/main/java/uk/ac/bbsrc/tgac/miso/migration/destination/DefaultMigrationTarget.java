@@ -374,12 +374,12 @@ public class DefaultMigrationTarget implements MigrationTarget {
     subproject.setParentProject(project);
     subproject.setDescription(subproject.getAlias());
     subproject.setPriority(Boolean.FALSE);
-    subproject.setReferenceGenomeId(project.getReferenceGenome().getId());
-    subproject.setCreatedBy(migrationUser);
-    subproject.setCreationDate(timeStamp);
-    subproject.setUpdatedBy(migrationUser);
-    subproject.setLastUpdated(timeStamp);
-    subproject.setId(serviceManager.getSubprojectDao().addSubproject(subproject));
+    subproject.setReferenceGenome(project.getReferenceGenome());
+    subproject.setCreator(migrationUser);
+    subproject.setCreationTime(timeStamp);
+    subproject.setLastModifier(migrationUser);
+    subproject.setLastModified(timeStamp);
+    subproject.setId(serviceManager.getSubprojectDao().create(subproject));
     valueTypeLookup.addSubproject(subproject);
   }
 

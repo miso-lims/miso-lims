@@ -818,7 +818,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     DetailedSample beforeDetailed = beforeChange == null ? null : (DetailedSample) beforeChange;
     if (isChanged(DetailedSample::getSubproject, detailed, beforeDetailed)
         || isChanged(Sample::getProject, detailed, beforeDetailed)) {
-      Set<Subproject> subprojects = subprojectService.getByProjectId(detailed.getProject().getId());
+      Set<Subproject> subprojects = subprojectService.listByProjectId(detailed.getProject().getId());
       if (!subprojects.isEmpty() && detailed.getSubproject() == null) {
         errors.add(new ValidationError("subprojectId", "Subproject must be specified"));
       }

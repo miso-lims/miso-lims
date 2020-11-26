@@ -90,7 +90,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
@@ -153,7 +152,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotRnaImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotSingleCellImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleGroupImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl;
@@ -329,11 +327,11 @@ public class Dtos {
     dto.setDescription(from.getDescription());
     dto.setPriority(from.getPriority());
     dto.setParentProjectId(from.getParentProject().getId());
-    dto.setCreationDate(formatDateTime(from.getCreationDate()));
-    dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
-    setLong(dto::setCreatedById, maybeGetProperty(from.getCreatedBy(), User::getId), true);
-    setLong(dto::setUpdatedById, maybeGetProperty(from.getUpdatedBy(), User::getId), true);
-    dto.setReferenceGenomeId(from.getReferenceGenomeId());
+    dto.setCreationDate(formatDateTime(from.getCreationTime()));
+    dto.setLastUpdated(formatDateTime(from.getLastModified()));
+    setLong(dto::setCreatedById, maybeGetProperty(from.getCreator(), User::getId), true);
+    setLong(dto::setUpdatedById, maybeGetProperty(from.getLastModifier(), User::getId), true);
+    setId(dto::setReferenceGenomeId, from.getReferenceGenome());
     return dto;
   }
 
@@ -343,10 +341,12 @@ public class Dtos {
 
   public static Subproject to(@Nonnull SubprojectDto from) {
     Subproject to = new SubprojectImpl();
-    to.setAlias(from.getAlias());
-    to.setDescription(from.getDescription());
-    to.setPriority(from.getPriority());
-    to.setReferenceGenomeId(from.getReferenceGenomeId());
+    setLong(to::setId, from.getId(), false);
+    setString(to::setAlias, from.getAlias());
+    setString(to::setDescription, from.getDescription());
+    setBoolean(to::setPriority, from.getPriority(), true);
+    setObject(to::setReferenceGenome, ReferenceGenomeImpl::new, from.getReferenceGenomeId());
+    setObject(to::setParentProject, ProjectImpl::new, from.getParentProjectId());
     return to;
   }
 
@@ -745,31 +745,6 @@ public class Dtos {
   public static SamplePurpose to(@Nonnull SamplePurposeDto from) {
     SamplePurpose to = new SamplePurposeImpl();
     to.setAlias(from.getAlias());
-    return to;
-  }
-
-  public static SampleGroupDto asDto(@Nonnull SampleGroupId from) {
-    SampleGroupDto dto = new SampleGroupDto();
-    dto.setId(from.getId());
-    dto.setGroupId(from.getGroupId());
-    dto.setProjectId(from.getProject().getId());
-    dto.setSubprojectId(from.getSubproject() == null ? null : from.getSubproject().getId());
-    dto.setDescription(from.getDescription());
-    dto.setCreationDate(formatDateTime(from.getCreationDate()));
-    dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
-    setLong(dto::setCreatedById, maybeGetProperty(from.getCreatedBy(), User::getId), true);
-    setLong(dto::setUpdatedById, maybeGetProperty(from.getUpdatedBy(), User::getId), true);
-    return dto;
-  }
-
-  public static Set<SampleGroupDto> asSampleGroupDtos(@Nonnull Set<SampleGroupId> from) {
-    return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
-  }
-
-  public static SampleGroupId to(@Nonnull SampleGroupDto from) {
-    SampleGroupId to = new SampleGroupImpl();
-    to.setGroupId(from.getGroupId());
-    to.setDescription(from.getDescription());
     return to;
   }
 

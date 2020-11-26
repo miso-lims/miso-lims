@@ -55,7 +55,7 @@ public class SubprojectDefaultsController extends AbstractInstituteDefaultsContr
 
   @Override
   protected String getName() {
-    return "Subproject";
+    return "Subprojects";
   }
 
   @Override
