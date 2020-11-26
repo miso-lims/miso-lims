@@ -63,6 +63,8 @@ public class DefaultQcStatusService implements QcStatusService {
 
   @Override
   public void update(QcStatusUpdate update) throws IOException {
+    // Since we're editing managed objects in session here, we can't depend on the saving service
+    // to detect changes and set QC users
     switch (update.getEntityType()) {
     case SAMPLE: {
       Sample sample = sampleService.get(update.getId());
@@ -92,7 +94,12 @@ public class DefaultQcStatusService implements QcStatusService {
     case RUN: {
       Run run = runService.get(update.getId());
       throwIfNull("Run", run);
-      run.setHealth(update.getRunStatus());
+      if (update.getQcPassed() == null) {
+        run.setQcUser(null);
+      } else if (!update.getQcPassed().equals(run.getQcPassed())) {
+        run.setQcUser(authorizationManager.getCurrentUser());
+      }
+      run.setQcPassed(update.getQcPassed());
       runService.update(run);
       break;
     }

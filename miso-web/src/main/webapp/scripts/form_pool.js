@@ -83,26 +83,7 @@ FormTarget.pool = (function($) {
           type: 'date',
           required: true,
           initial: Utils.getCurrentDate()
-        }, {
-          title: 'QC Status',
-          data: 'qcPassed',
-          type: 'dropdown',
-          source: [{
-            label: 'Ready',
-            value: true
-          }, {
-            label: 'Failed',
-            value: false
-          }],
-          convertToBoolean: true,
-          getItemLabel: function(item) {
-            return item.label;
-          },
-          getItemValue: function(item) {
-            return item.value;
-          },
-          nullLabel: 'Not Ready'
-        }, {
+        }, FormUtils.makeQcPassedField(), {
           title: 'Volume',
           data: 'volume',
           type: 'decimal'

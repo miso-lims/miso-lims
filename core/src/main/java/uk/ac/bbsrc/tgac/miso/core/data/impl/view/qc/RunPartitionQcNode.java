@@ -170,11 +170,6 @@ public class RunPartitionQcNode implements QcNode {
   }
 
   @Override
-  public String getRunStatus() {
-    return null;
-  }
-
-  @Override
   public List<? extends QcNode> getChildren() {
     return getRunLibraries();
   }

@@ -39,9 +39,10 @@ public class RunDto {
   private String sequencingKitLot;
   private String runPath;
   private List<ContainerDto> containers;
-  private Boolean dataApproved;
-  private Long dataApproverId;
-  private String dataApproverName;
+  private Boolean qcPassed;
+  private String qcUserName;
+  private Boolean dataReview;
+  private String dataReviewerName;
   private String projectsLabel;
   private Long sopId;
   private String dataManglingPolicy;
@@ -214,28 +215,36 @@ public class RunDto {
     this.containers = containers;
   }
 
-  public Boolean isDataApproved() {
-    return dataApproved;
+  public Boolean getQcPassed() {
+    return qcPassed;
   }
 
-  public void setDataApproved(Boolean dataApproved) {
-    this.dataApproved = dataApproved;
+  public void setQcPassed(Boolean qcPassed) {
+    this.qcPassed = qcPassed;
   }
 
-  public Long getDataApproverId() {
-    return dataApproverId;
+  public String getQcUserName() {
+    return qcUserName;
   }
 
-  public void setDataApproverId(Long dataApproverId) {
-    this.dataApproverId = dataApproverId;
+  public void setQcUserName(String qcUserName) {
+    this.qcUserName = qcUserName;
   }
 
-  public String getDataApproverName() {
-    return dataApproverName;
+  public Boolean getDataReview() {
+    return dataReview;
   }
 
-  public void setDataApproverName(String dataApproverName) {
-    this.dataApproverName = dataApproverName;
+  public void setDataReview(Boolean dataReview) {
+    this.dataReview = dataReview;
+  }
+
+  public String getDataReviewerName() {
+    return dataReviewerName;
+  }
+
+  public void setDataReviewerName(String dataReviewerName) {
+    this.dataReviewerName = dataReviewerName;
   }
 
   public String getProjectsLabel() {

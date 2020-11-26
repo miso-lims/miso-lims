@@ -10,7 +10,6 @@ public class QcNodeDto {
   private String label;
   private Boolean qcPassed;
   private Long qcStatusId; // may be detailedQcStatusId or partitionQcTypeId
-  private String runStatus;
   private String qcNote;
 
   public String getEntityType() {
@@ -75,14 +74,6 @@ public class QcNodeDto {
 
   public void setQcStatusId(Long qcStatusId) {
     this.qcStatusId = qcStatusId;
-  }
-
-  public String getRunStatus() {
-    return runStatus;
-  }
-
-  public void setRunStatus(String runStatus) {
-    this.runStatus = runStatus;
   }
 
   public String getQcNote() {

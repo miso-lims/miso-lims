@@ -164,11 +164,17 @@ public abstract class Run
   @Transient
   private List<FileAttachment> pendingAttachmentDeletions;
 
-  private Boolean dataApproved;
+  private Boolean qcPassed;
 
   @ManyToOne(targetEntity = UserImpl.class)
-  @JoinColumn(name = "dataApproverId")
-  private User dataApprover;
+  @JoinColumn(name = "qcUser")
+  private User qcUser;
+
+  private Boolean dataReview;
+
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "dataReviewerId")
+  private User dataReviewer;
 
   @OneToOne
   @JoinColumn(name = "runId", updatable = false, insertable = false)
@@ -480,20 +486,36 @@ public abstract class Run
     return getAlias();
   }
 
-  public Boolean isDataApproved() {
-    return dataApproved;
+  public Boolean getQcPassed() {
+    return qcPassed;
   }
 
-  public void setDataApproved(Boolean dataApproved) {
-    this.dataApproved = dataApproved;
+  public void setQcPassed(Boolean qcPassed) {
+    this.qcPassed = qcPassed;
   }
 
-  public User getDataApprover() {
-    return dataApprover;
+  public User getQcUser() {
+    return qcUser;
   }
 
-  public void setDataApprover(User dataApprover) {
-    this.dataApprover = dataApprover;
+  public void setQcUser(User qcUser) {
+    this.qcUser = qcUser;
+  }
+
+  public Boolean getDataReview() {
+    return dataReview;
+  }
+
+  public void setDataReview(Boolean dataReview) {
+    this.dataReview = dataReview;
+  }
+
+  public User getDataReviewer() {
+    return dataReviewer;
+  }
+
+  public void setDataReviewer(User dataReviewer) {
+    this.dataReviewer = dataReviewer;
   }
 
   public RunProjectView getRunProjectView() {

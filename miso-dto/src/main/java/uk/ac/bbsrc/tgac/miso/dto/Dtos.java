@@ -1966,9 +1966,10 @@ public class Dtos {
       dto.setContainers(asContainerDtos(from.getSequencerPartitionContainers(), includeContainerPartitions, includePoolContents));
     }
 
-    setBoolean(dto::setDataApproved, from.isDataApproved(), true);
-    setId(dto::setDataApproverId, from.getDataApprover());
-    setString(dto::setDataApproverName, maybeGetProperty(from.getDataApprover(), User::getFullName));
+    setBoolean(dto::setQcPassed, from.getQcPassed(), true);
+    setString(dto::setQcUserName, maybeGetProperty(from.getQcUser(), User::getFullName));
+    setBoolean(dto::setDataReview, from.getDataReview(), true);
+    setString(dto::setDataReviewerName, maybeGetProperty(from.getDataReviewer(), User::getFullName));
     setId(dto::setSopId, from.getSop());
     setString(dto::setDataManglingPolicy, maybeGetProperty(from.getDataManglingPolicy(), InstrumentDataManglingPolicy::name));
 
@@ -2034,8 +2035,8 @@ public class Dtos {
     setObject(to::setSequencingKit, KitDescriptor::new, dto.getSequencingKitId());
     setString(to::setSequencingKitLot, dto.getSequencingKitLot());
     setString(to::setFilePath, dto.getRunPath());
-    setBoolean(to::setDataApproved, dto.isDataApproved(), true);
-    setObject(to::setDataApprover, UserImpl::new, dto.getDataApproverId());
+    setBoolean(to::setQcPassed, dto.getQcPassed(), true);
+    setBoolean(to::setDataReview, dto.getDataReview(), true);
     setObject(to::setSop, Sop::new, dto.getSopId());
     setObject(to::setDataManglingPolicy, dto.getDataManglingPolicy(), InstrumentDataManglingPolicy::valueOf);
     return to;
@@ -4205,7 +4206,6 @@ public class Dtos {
     setString(to::setLabel, from.getLabel());
     setBoolean(to::setQcPassed, from.getQcPassed(), true);
     setLong(to::setQcStatusId, from.getQcStatusId(), true);
-    setString(to::setRunStatus, from.getRunStatus());
     setString(to::setQcNote, from.getQcNote());
   }
 
@@ -4216,7 +4216,6 @@ public class Dtos {
     setObject(to::setEntityType, from.getEntityType(), QcNodeType::lookup);
     setBoolean(to::setQcPassed, from.getQcPassed(), true);
     setLong(to::setQcStatusId, from.getQcStatusId(), true);
-    setObject(to::setRunStatus, from.getRunStatus(), HealthType::get);
     setString(to::setQcNote, from.getQcNote());
     return to;
   }

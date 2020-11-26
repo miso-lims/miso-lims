@@ -13,7 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -324,8 +326,8 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     if (run.getSequencingKit() != null) {
       run.setSequencingKit(kitDescriptorService.get(run.getSequencingKit().getId()));
     }
-    if (run.getDataApprover() != null) {
-      run.setDataApprover(userService.get(run.getDataApprover().getId()));
+    if (run.getDataReviewer() != null) {
+      run.setDataReviewer(userService.get(run.getDataReviewer().getId()));
     }
     if (run.getRunPositions() != null) {
       for (RunPosition position : run.getRunPositions()) {
@@ -336,6 +338,9 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   }
 
   private void validateChanges(Run before, Run changed) throws IOException {
+    updateQcUser(changed, before, Run::getQcPassed, Run::getQcUser, Run::setQcUser);
+    updateQcUser(changed, before, Run::getDataReview, Run::getDataReviewer, Run::setDataReviewer);
+
     List<ValidationError> errors = new ArrayList<>();
 
     if (!changed.getHealth().isDone()) {
@@ -372,13 +377,17 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       errors.add(new ValidationError("sequencingKitLot", "Sequencing kit not specified"));
     }
 
-    User user = authorizationManager.getCurrentUser();
-    if (((before == null && changed.isDataApproved() != null) || (before != null && isChanged(Run::isDataApproved, changed, before)))
-        && !user.isRunApprover() && !user.isAdmin()) {
-      errors.add(new ValidationError("dataApproved", "You are not authorized to make this change"));
+    if (changed.getQcPassed() != null && changed.getQcUser() == null) {
+      errors.add(new ValidationError("QC user must be set when review is specified"));
     }
-    if (changed.isDataApproved() != null && changed.getDataApprover() == null) {
-      errors.add(new ValidationError("dataApproverId", "Must be set when approval is specified"));
+
+    User user = authorizationManager.getCurrentUser();
+    if (((before == null && changed.getDataReview() != null) || (before != null && isChanged(Run::getDataReview, changed, before)))
+        && !user.isRunReviewer() && !user.isAdmin()) {
+      errors.add(new ValidationError("dataReview", "You are not authorized to make this change"));
+    }
+    if (changed.getDataReview() != null && changed.getDataReviewer() == null) {
+      errors.add(new ValidationError("Data reviewer must be set when review is specified"));
     }
 
     if (changed.getSequencerPartitionContainers() != null) {
@@ -396,9 +405,21 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       }
     }
 
-
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
+    }
+  }
+
+  private void updateQcUser(Run run, Run beforeChange, Function<Run, Object> getStatus, Function<Run, User> getUser,
+      BiConsumer<Run, User> setUser) throws IOException {
+    if (isChanged(getStatus, run, beforeChange)) {
+      if (getStatus.apply(run) == null) {
+        setUser.accept(run, null);
+      } else {
+        setUser.accept(run, authorizationManager.getCurrentUser());
+      }
+    } else if (beforeChange != null) {
+      setUser.accept(run, getUser.apply(beforeChange));
     }
   }
 
@@ -418,8 +439,10 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     target.setSequencer(source.getSequencer());
     target.setSequencingKit(source.getSequencingKit());
     target.setSequencingKitLot(source.getSequencingKitLot());
-    target.setDataApproved(source.isDataApproved());
-    target.setDataApprover(target.isDataApproved() == null ? null : source.getDataApprover());
+    target.setQcPassed(source.getQcPassed());
+    target.setQcUser(source.getQcUser());
+    target.setDataReview(source.getDataReview());
+    target.setDataReviewer(source.getDataReviewer());
     target.setSop(source.getSop());
     target.setDataManglingPolicy(source.getDataManglingPolicy());
     if (isIlluminaRun(target)) {

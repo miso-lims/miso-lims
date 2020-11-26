@@ -178,4 +178,45 @@ public class RunLibraryController {
     return new ModelAndView("/WEB-INF/pages/qcHierarchy.jsp", model);
   }
 
+  // Uncomment and adjust constants for convenient endpoint for testing Run-Library Metrics page
+  // @GetMapping("/metricstest")
+  // public ModelAndView test(ModelMap model) throws IOException {
+  // final long runId = 4862L;
+  // final int partitionNumber = 1;
+  // final String aliquot1Name = "LDI48170";
+  //
+  // RunLibraryQcTableRequestDto dto = new RunLibraryQcTableRequestDto();
+  //
+  // dto.setReport("Some Report");
+  // List<RunLibraryQcTableRequestLibraryDto> aliquots = new ArrayList<>();
+  // dto.setLibraryAliquots(aliquots);
+  //
+  // RunLibraryQcTableRequestLibraryDto aliquot = new RunLibraryQcTableRequestLibraryDto();
+  // aliquots.add(aliquot);
+  //
+  // aliquot.setName(aliquot1Name);
+  // aliquot.setRunId(runId);
+  // aliquot.setPartition(partitionNumber);
+  // List<RunLibraryQcTableRequestMetricDto> metrics = new ArrayList<>();
+  // aliquot.setMetrics(metrics);
+  //
+  // RunLibraryQcTableRequestMetricDto metric1 = new RunLibraryQcTableRequestMetricDto();
+  // metrics.add(metric1);
+  // metric1.setTitle("Something");
+  // metric1.setThreshold(100D);
+  // metric1.setThresholdType("gt");
+  // metric1.setValue(120D);
+  //
+  // RunLibraryQcTableRequestMetricDto metric2 = new RunLibraryQcTableRequestMetricDto();
+  // metrics.add(metric2);
+  // metric2.setTitle("Another Thing");
+  // metric2.setThreshold(100D);
+  // metric2.setThresholdType("le");
+  // metric2.setValue(120D);
+  //
+  // Map<String, String> form = new HashMap<>();
+  // form.put("data", new ObjectMapper().writeValueAsString(dto));
+  // return getRunLibraryQcTable(form, model);
+  // }
+
 }

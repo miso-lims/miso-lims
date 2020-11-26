@@ -221,13 +221,7 @@ public class EditRunController {
     ObjectNode formConfig = mapper.createObjectNode();
     User user = authorizationManager.getCurrentUser();
     formConfig.put("isAdmin", user.isAdmin());
-    if (user.isRunApprover() || user.isAdmin()) {
-      formConfig.put("isRunApprover", true);
-      formConfig.put("userId", user.getId());
-      formConfig.put("userFullName", user.getFullName());
-    } else {
-      formConfig.put("isRunApprover", false);
-    }
+    formConfig.put("isRunReviewer", user.isRunReviewer() || user.isAdmin());
     MisoWebUtils.addJsonArray(mapper, formConfig, "sops", sopService.listByCategory(SopCategory.RUN), Dtos::asDto);
     model.put("formConfig", mapper.writeValueAsString(formConfig));
 

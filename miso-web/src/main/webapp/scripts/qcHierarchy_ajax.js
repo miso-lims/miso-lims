@@ -24,7 +24,7 @@ var QcHierarchy = (function($) {
   var selectedPoint = null;
 
   return {
-    poolQcOptions: [{
+    qcPassedOptions: [{
       value: null,
       label: 'Not Ready'
     }, {
@@ -214,12 +214,11 @@ var QcHierarchy = (function($) {
           : null;
       return makeNodeHtml(item, status ? status.description : 'Not Ready', item.qcNote);
     case 'Pool':
-      var status = QcHierarchy.poolQcOptions.find(function(x) {
+    case 'Run':
+      var status = QcHierarchy.qcPassedOptions.find(function(x) {
         return x.value === item.qcPassed;
       });
       return makeNodeHtml(item, status.label);
-    case 'Run':
-      return makeNodeHtml(item, item.runStatus);
     case 'Run-Partition':
       var status = item.qcStatusId ? Utils.array.findUniqueOrThrow(Utils.array.idPredicate(item.qcStatusId), Constants.partitionQcTypes)
           : null;
@@ -295,10 +294,8 @@ var QcHierarchy = (function($) {
       updateDetailedQcControls(selectedItem);
       break;
     case 'Pool':
-      updatePoolQcControls(selectedItem);
-      break;
     case 'Run':
-      updateRunQcControls(selectedItem);
+      updateQcPassedControls(selectedItem);
       break;
     case 'Run-Partition':
       updatePartitionQcControls(selectedItem);
@@ -333,27 +330,14 @@ var QcHierarchy = (function($) {
     });
   }
 
-  function updatePoolQcControls(selectedItem) {
-    $(statusInput).append(QcHierarchy.poolQcOptions.map(function(x, i) {
+  function updateQcPassedControls(selectedItem) {
+    $(statusInput).append(QcHierarchy.qcPassedOptions.map(function(x, i) {
       return makeSelectOption(i, x.label, selectedItem.qcPassed === x.value);
     }));
     $(applyButton).click(function() {
       validateAndSubmit(selectedItem, function() {
         return {
-          qcPassed: QcHierarchy.poolQcOptions[$(statusInput).val()].value
-        };
-      });
-    });
-  }
-
-  function updateRunQcControls(selectedItem) {
-    $(statusInput).append(Constants.healthTypes.map(function(x) {
-      return makeSelectOption(x.label, x.label, selectedItem.runStatus === x.label);
-    }));
-    $(applyButton).click(function() {
-      validateAndSubmit(selectedItem, function() {
-        return {
-          runStatus: $(statusInput).val()
+          qcPassed: QcHierarchy.qcPassedOptions[$(statusInput).val()].value
         };
       });
     });
