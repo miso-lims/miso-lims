@@ -235,7 +235,7 @@ public class MisoWebUtils {
     }
 
     ObjectMapper mapper = new ObjectMapper();
-    model.put("title", String.format("%s %d Hierarchy", hierarchy.getEntityType(), hierarchy.getId()));
+    model.put("title", String.format("%s %d Hierarchy", entityType, hierarchy.getId()));
     model.put("selectedType", entityType);
     model.put("selectedId", id);
     model.put("hierarchy", mapper.writeValueAsString(Dtos.asHierarchyDto(hierarchy)));
