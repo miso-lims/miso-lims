@@ -163,9 +163,9 @@ INSERT INTO Study (studyId, name, project_projectId, alias, studyTypeId, creator
 (1, 'STU1',  1, 'PLAIN Study One', 1, 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00');
 
 INSERT INTO Sample (sampleId, name, alias, description, identificationBarcode, sampleType, project_projectId,
-scientificNameId, volume, detailedQcStatusId, lastModifier, creator, created, lastModified, discriminator) VALUES
+scientificNameId, volume, detailedQcStatusId, qcUser, lastModifier, creator, created, lastModified, discriminator) VALUES
 (1, 'SAM1', 'PLAIN_S0001_1', 'Plain', 'SAM1::PLAIN_S0001_first', 'GENOMIC', 1,
-  2, NULL, 1, 1, 1, '2017-07-20 09:00:00', '2017-07-20 09:00:00', 'Sample');
+  2, NULL, 1, 1, 1, 1, '2017-07-20 09:00:00', '2017-07-20 09:00:00', 'Sample');
 
 INSERT INTO Institute(instituteId, alias, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 'University Health Network',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00');

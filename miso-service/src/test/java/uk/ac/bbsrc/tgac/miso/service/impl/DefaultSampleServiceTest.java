@@ -402,6 +402,7 @@ public class DefaultSampleServiceTest {
     updated.setDescription("newDesc");
     updated.setSampleType("newType");
     updated.setDetailedQcStatus(mockDetailedQcStatus(5L, "Ready", false));
+    updated.setQcUser(mockUser());
     updated.setScientificName(mockScientificName(2L, "newSciName"));
     updated.setTaxonIdentifier("newTaxonId");
     updated.setVolume(new BigDecimal("5.5"));
