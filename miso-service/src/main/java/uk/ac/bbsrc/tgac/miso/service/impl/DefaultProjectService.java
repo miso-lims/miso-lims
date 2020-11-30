@@ -245,7 +245,8 @@ public class DefaultProjectService implements ProjectService {
 
   @Override
   public boolean hasSamples(Project project) throws IOException {
-    return projectStore.getUsage(project) > 0L;
+    Project managed = projectStore.get(project.getId());
+    return projectStore.getUsage(managed) > 0L;
   }
 
 }
