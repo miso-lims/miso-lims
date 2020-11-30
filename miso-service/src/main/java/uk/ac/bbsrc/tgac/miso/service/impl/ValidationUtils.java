@@ -9,9 +9,12 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
@@ -86,6 +89,15 @@ public class ValidationUtils {
       }
     } else if (item.getDetailedQcStatusNote() != null) {
       errors.add(new ValidationError("detailedQcStatusNote", "Note cannot be specified for the selected status"));
+    }
+    validateQcUser(item.getDetailedQcStatus(), item.getQcUser(), errors);
+  }
+
+  public static void validateQcUser(Object qcStatus, User qcUser, Collection<ValidationError> errors) {
+    if (qcStatus == null && qcUser != null) {
+      errors.add(new ValidationError("QC user cannot be set when QC status is not specified"));
+    } else if (qcStatus != null && qcUser == null) {
+      errors.add(new ValidationError("QC user must be set when QC statis is specified"));
     }
   }
 
@@ -168,16 +180,22 @@ public class ValidationUtils {
     });
   }
 
-  public static void updateQcUser(DetailedQcItem object, DetailedQcItem beforeChange, AuthorizationManager authorizationManager)
-      throws IOException {
-    if (isChanged(DetailedQcItem::getDetailedQcStatus, object, beforeChange)) {
-      if (object.getDetailedQcStatus() == null) {
-        object.setQcUser(null);
+  public static void updateDetailedQcStatusUser(DetailedQcItem object, DetailedQcItem beforeChange,
+      AuthorizationManager authorizationManager) throws IOException {
+    updateQcUser(object, beforeChange, DetailedQcItem::getDetailedQcStatus, DetailedQcItem::getQcUser, DetailedQcItem::setQcUser,
+        authorizationManager);
+  }
+
+  public static <T> void updateQcUser(T object, T beforeChange, Function<T, Object> getStatus, Function<T, User> getUser,
+      BiConsumer<T, User> setUser, AuthorizationManager authorizationManager) throws IOException {
+    if (isChanged(getStatus, object, beforeChange)) {
+      if (getStatus.apply(object) == null) {
+        setUser.accept(object, null);
       } else {
-        object.setQcUser(authorizationManager.getCurrentUser());
+        setUser.accept(object, authorizationManager.getCurrentUser());
       }
     } else if (beforeChange != null) {
-      object.setQcUser(beforeChange.getQcUser());
+      setUser.accept(object, getUser.apply(beforeChange));
     }
   }
 

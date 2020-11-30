@@ -187,6 +187,17 @@ FormUtils = (function($) {
       return initializedForms.indexOf(formId) !== -1;
     },
 
+    makeQcUserField: function() {
+      return {
+        title: 'QC User',
+        data: 'qcUserName',
+        type: 'read-only',
+        getDisplayValue: function(data) {
+          return data.qcUserName || 'n/a';
+        }
+      };
+    },
+
     makeDetailedQcStatusFields: function() {
       return [{
         title: 'QC Status',
@@ -220,14 +231,7 @@ FormUtils = (function($) {
         data: 'detailedQcStatusNote',
         type: 'text',
         maxLength: 500
-      }, {
-        title: 'QC User',
-        data: 'qcUserName',
-        type: 'read-only',
-        getDisplayValue: function(data) {
-          return data.qcUserName || 'n/a';
-        }
-      }];
+      }, FormUtils.makeQcUserField()];
     },
 
     makeUnitsField: function(object, unitType) {

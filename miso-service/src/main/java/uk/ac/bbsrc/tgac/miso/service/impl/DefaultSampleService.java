@@ -792,7 +792,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   }
 
   private void validateChange(Sample sample, Sample beforeChange) throws IOException {
-    updateQcUser(sample, beforeChange, authorizationManager);
+    updateDetailedQcStatusUser(sample, beforeChange, authorizationManager);
 
     List<ValidationError> errors = new ArrayList<>();
     validateConcentrationUnits(sample.getConcentration(), sample.getConcentrationUnits(), errors);

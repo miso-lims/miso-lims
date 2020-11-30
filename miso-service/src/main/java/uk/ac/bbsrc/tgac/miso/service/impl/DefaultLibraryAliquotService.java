@@ -309,7 +309,7 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
   }
 
   private void validateChange(LibraryAliquot aliquot, LibraryAliquot beforeChange) throws IOException {
-    updateQcUser(aliquot, beforeChange, authorizationManager);
+    updateDetailedQcStatusUser(aliquot, beforeChange, authorizationManager);
 
     List<ValidationError> errors = new ArrayList<>();
 

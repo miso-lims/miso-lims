@@ -553,7 +553,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   }
 
   private void validateChange(Library library, Library beforeChange, boolean libraryReceipt) throws IOException {
-    updateQcUser(library, beforeChange, authorizationManager);
+    updateDetailedQcStatusUser(library, beforeChange, authorizationManager);
 
     List<ValidationError> errors = new ArrayList<>();
 
