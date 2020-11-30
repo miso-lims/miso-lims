@@ -42,7 +42,7 @@ public class HomePageIT extends AbstractIT {
     String projectIdString = projectPage.getId();
     long projectId = Long.parseLong(projectIdString);
     assertEquals(1L, projectId);
-    assertEquals("PONE", projectPage.getName());
+    assertEquals("PRO1", projectPage.getName());
   }
 
 }
