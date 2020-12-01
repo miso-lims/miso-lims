@@ -7,6 +7,7 @@ Changes:
     name doesn't exactly match the original spec.
   * Fixed error displaying/validating QC type when editing QC with an archived QC type
   * Fixed targeted sequencing archived field not saving
+  * Fixed login timeout message not being displayed in some places
 
 Upgrade Notes:
 
