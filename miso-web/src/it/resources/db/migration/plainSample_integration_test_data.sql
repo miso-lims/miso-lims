@@ -3,8 +3,8 @@ INSERT INTO User (userId, active, admin, fullName, internal, loginName, roles, p
 (3,1,0,'user',1,'user','ROLE_INTERNAL','{bcrypt}$2a$10$vqYii//w2shSZnt/4uNyIeeU4FGQIB4QJeisv9l16xVRQ1lTOghIO','user@user.user'); -- password 'user'
 
 INSERT INTO _Group (groupId, description, name) VALUES
-(1, 'TestGroup1', 'TestGroup1'),
-(2, 'TestGroup2', 'TestGroup2');
+(1, 'TestGroup1', 'TestGroupOne'),
+(2, 'TestGroup2', 'TestGroupTwo');
 
 INSERT INTO User_Group (users_userId, groups_groupId)
 VALUES (3,1),(3,2),(1,1);

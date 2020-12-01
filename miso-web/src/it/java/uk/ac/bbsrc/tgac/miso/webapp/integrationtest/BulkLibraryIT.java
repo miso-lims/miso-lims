@@ -510,7 +510,7 @@ public class BulkLibraryIT extends AbstractIT {
     attrs.put(LibColumns.RECEIVE_DATE, "2017-10-12");
     attrs.put(LibColumns.RECEIVE_TIME, "3:00 pm");
     attrs.put(LibColumns.RECEIVED_FROM, "BioBank (University Health Network)");
-    attrs.put(LibColumns.RECEIVED_BY, "TestGroup1");
+    attrs.put(LibColumns.RECEIVED_BY, "TestGroupOne");
     attrs.put(LibColumns.RECEIPT_CONFIRMED, "True");
     attrs.put(LibColumns.RECEIPT_QC_PASSED, "True");
     attrs.put(LibColumns.RECEIPT_QC_NOTE, "");

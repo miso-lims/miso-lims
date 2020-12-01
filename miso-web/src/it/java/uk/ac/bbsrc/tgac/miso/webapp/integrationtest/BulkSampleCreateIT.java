@@ -113,10 +113,10 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
     Set<String> projects = table.getDropdownOptions(SamColumns.PROJECT, 0);
     assertTrue(projects.size() > 0);
-    assertTrue(projects.contains("PRO1"));
+    assertTrue(projects.contains("PONE"));
 
-    table.enterText(SamColumns.PROJECT, 0, "PRO1");
-    assertEquals("PRO1", table.getText(SamColumns.PROJECT, 0));
+    table.enterText(SamColumns.PROJECT, 0, "PONE");
+    assertEquals("PONE", table.getText(SamColumns.PROJECT, 0));
 
     Set<String> donorSexes = table.getDropdownOptions(SamColumns.DONOR_SEX, 0);
     assertTrue(donorSexes.size() >= 5);
@@ -180,14 +180,14 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     tissue.put(SamColumns.DESCRIPTION, "Description");
     tissue.put(SamColumns.RECEIVE_DATE, "2017-07-17");
     tissue.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
-    tissue.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    tissue.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     tissue.put(SamColumns.RECEIPT_CONFIRMED, "True");
     tissue.put(SamColumns.RECEIPT_QC_PASSED, "True");
     tissue.put(SamColumns.RECEIPT_QC_NOTE, "");
     tissue.put(SamColumns.ID_BARCODE, "101"); // increment
     tissue.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     tissue.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
-    tissue.put(SamColumns.PROJECT, "PRO1");
+    tissue.put(SamColumns.PROJECT, "PONE");
     tissue.put(SamColumns.GROUP_ID, "1");
     tissue.put(SamColumns.GROUP_DESCRIPTION, "Test one");
     tissue.put(SamColumns.TISSUE_ORIGIN, "Bn (Brain)");
@@ -229,7 +229,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     tissue.put(SamColumns.DESCRIPTION, "Description");
     tissue.put(SamColumns.RECEIVE_DATE, "2017-07-17");
     tissue.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
-    tissue.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    tissue.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     tissue.put(SamColumns.RECEIPT_CONFIRMED, "True");
     tissue.put(SamColumns.RECEIPT_QC_PASSED, "True");
     tissue.put(SamColumns.RECEIPT_QC_NOTE, "");
@@ -278,7 +278,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     tissue.put(SamColumns.DESCRIPTION, "Description");
     tissue.put(SamColumns.RECEIVE_DATE, "2017-07-17");
     tissue.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
-    tissue.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    tissue.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     tissue.put(SamColumns.RECEIPT_CONFIRMED, "True");
     tissue.put(SamColumns.RECEIPT_QC_PASSED, "True");
     tissue.put(SamColumns.RECEIPT_QC_NOTE, "");
@@ -376,7 +376,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     slide.put(SamColumns.DESCRIPTION, "Description");
     slide.put(SamColumns.RECEIVE_DATE, "2017-07-17");
     slide.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
-    slide.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    slide.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     slide.put(SamColumns.RECEIPT_CONFIRMED, "True");
     slide.put(SamColumns.RECEIPT_QC_PASSED, "True");
     slide.put(SamColumns.RECEIPT_QC_NOTE, "");
@@ -384,7 +384,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     slide.put(SamColumns.SAMPLE_CLASS, "Slide");
     slide.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     slide.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
-    slide.put(SamColumns.PROJECT, "PRO1");
+    slide.put(SamColumns.PROJECT, "PONE");
     slide.put(SamColumns.GROUP_ID, "1");
     slide.put(SamColumns.GROUP_DESCRIPTION, "Test one");
     slide.put(SamColumns.TISSUE_ORIGIN, "Bn (Brain)");
@@ -425,7 +425,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     slide.put(SamColumns.DESCRIPTION, "Description");
     slide.put(SamColumns.RECEIVE_DATE, "2017-07-17");
     slide.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
-    slide.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    slide.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     slide.put(SamColumns.RECEIPT_CONFIRMED, "True");
     slide.put(SamColumns.RECEIPT_QC_PASSED, "True");
     slide.put(SamColumns.RECEIPT_QC_NOTE, "");
@@ -479,7 +479,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     curls.put(SamColumns.DESCRIPTION, "Description");
     curls.put(SamColumns.RECEIVE_DATE, "2017-07-17");
     curls.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
-    curls.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    curls.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     curls.put(SamColumns.RECEIPT_CONFIRMED, "True");
     curls.put(SamColumns.RECEIPT_QC_PASSED, "True");
     curls.put(SamColumns.RECEIPT_QC_NOTE, "");
@@ -487,7 +487,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     curls.put(SamColumns.SAMPLE_CLASS, "Tissue Piece");
     curls.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     curls.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
-    curls.put(SamColumns.PROJECT, "PRO1");
+    curls.put(SamColumns.PROJECT, "PONE");
     curls.put(SamColumns.EXTERNAL_NAME, "ext5"); // increment
     curls.put(SamColumns.GROUP_ID, "1");
     curls.put(SamColumns.GROUP_DESCRIPTION, "Test one");
@@ -527,7 +527,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     curls.put(SamColumns.DESCRIPTION, "Description");
     curls.put(SamColumns.RECEIVE_DATE, "2017-07-17");
     curls.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
-    curls.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    curls.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     curls.put(SamColumns.RECEIPT_CONFIRMED, "True");
     curls.put(SamColumns.RECEIPT_QC_PASSED, "True");
     curls.put(SamColumns.RECEIPT_QC_NOTE, "");
@@ -579,7 +579,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     singleCell.put(SamColumns.DESCRIPTION, "Description");
     singleCell.put(SamColumns.RECEIVE_DATE, "2017-07-17");
     singleCell.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
-    singleCell.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    singleCell.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     singleCell.put(SamColumns.RECEIPT_CONFIRMED, "True");
     singleCell.put(SamColumns.RECEIPT_QC_PASSED, "True");
     singleCell.put(SamColumns.RECEIPT_QC_NOTE, "");
@@ -587,7 +587,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     singleCell.put(SamColumns.SAMPLE_CLASS, "Single Cell");
     singleCell.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     singleCell.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
-    singleCell.put(SamColumns.PROJECT, "PRO1");
+    singleCell.put(SamColumns.PROJECT, "PONE");
     singleCell.put(SamColumns.EXTERNAL_NAME, "ext5");
     singleCell.put(SamColumns.GROUP_ID, "1");
     singleCell.put(SamColumns.GROUP_DESCRIPTION, "Test one");
@@ -663,7 +663,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     gDnaStock.put(SamColumns.DESCRIPTION, "Description");
     gDnaStock.put(SamColumns.RECEIVE_DATE, "2017-07-17");
     gDnaStock.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
-    gDnaStock.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    gDnaStock.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     gDnaStock.put(SamColumns.RECEIPT_CONFIRMED, "True");
     gDnaStock.put(SamColumns.RECEIPT_QC_PASSED, "True");
     gDnaStock.put(SamColumns.RECEIPT_QC_NOTE, "");
@@ -671,7 +671,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     gDnaStock.put(SamColumns.SAMPLE_CLASS, "gDNA (stock)");
     gDnaStock.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     gDnaStock.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
-    gDnaStock.put(SamColumns.PROJECT, "PRO1");
+    gDnaStock.put(SamColumns.PROJECT, "PONE");
     gDnaStock.put(SamColumns.GROUP_ID, "1");
     gDnaStock.put(SamColumns.GROUP_DESCRIPTION, "Test one");
     gDnaStock.put(SamColumns.TISSUE_ORIGIN, "Bn (Brain)");
@@ -711,7 +711,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     gDnaStock.put(SamColumns.DESCRIPTION, "Description");
     gDnaStock.put(SamColumns.RECEIVE_DATE, "2017-07-17");
     gDnaStock.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
-    gDnaStock.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    gDnaStock.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     gDnaStock.put(SamColumns.RECEIPT_CONFIRMED, "True");
     gDnaStock.put(SamColumns.RECEIPT_QC_PASSED, "True");
     gDnaStock.put(SamColumns.RECEIPT_QC_NOTE, "");
@@ -762,7 +762,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     stock.put(SamColumns.DESCRIPTION, "Description");
     stock.put(SamColumns.RECEIVE_DATE, "2017-07-17");
     stock.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
-    stock.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    stock.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     stock.put(SamColumns.RECEIPT_CONFIRMED, "True");
     stock.put(SamColumns.RECEIPT_QC_PASSED, "True");
     stock.put(SamColumns.RECEIPT_QC_NOTE, "");
@@ -770,7 +770,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     stock.put(SamColumns.SAMPLE_CLASS, "Single Cell DNA (stock)");
     stock.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     stock.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
-    stock.put(SamColumns.PROJECT, "PRO1");
+    stock.put(SamColumns.PROJECT, "PONE");
     stock.put(SamColumns.GROUP_ID, "1");
     stock.put(SamColumns.GROUP_DESCRIPTION, "Test one");
     stock.put(SamColumns.TISSUE_ORIGIN, "Bn (Brain)");
@@ -815,7 +815,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     rnaStock.put(SamColumns.DESCRIPTION, "Description");
     rnaStock.put(SamColumns.RECEIVE_DATE, "2017-07-17");
     rnaStock.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
-    rnaStock.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    rnaStock.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     rnaStock.put(SamColumns.RECEIPT_CONFIRMED, "True");
     rnaStock.put(SamColumns.RECEIPT_QC_PASSED, "True");
     rnaStock.put(SamColumns.RECEIPT_QC_NOTE, "");
@@ -823,7 +823,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     rnaStock.put(SamColumns.SAMPLE_CLASS, "whole RNA (stock)");
     rnaStock.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     rnaStock.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
-    rnaStock.put(SamColumns.PROJECT, "PRO1");
+    rnaStock.put(SamColumns.PROJECT, "PONE");
     rnaStock.put(SamColumns.GROUP_ID, "1");
     rnaStock.put(SamColumns.GROUP_DESCRIPTION, "Test one");
     rnaStock.put(SamColumns.TISSUE_ORIGIN, "Bn (Brain)");
@@ -864,7 +864,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     rnaStock.put(SamColumns.DESCRIPTION, "Description");
     rnaStock.put(SamColumns.RECEIVE_DATE, "2017-07-17");
     rnaStock.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
-    rnaStock.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    rnaStock.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     rnaStock.put(SamColumns.RECEIPT_CONFIRMED, "True");
     rnaStock.put(SamColumns.RECEIPT_QC_PASSED, "True");
     rnaStock.put(SamColumns.RECEIPT_QC_NOTE, "");
@@ -949,7 +949,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     gDnaAliquot.put(SamColumns.DESCRIPTION, "Description");
     gDnaAliquot.put(SamColumns.RECEIVE_DATE, "2017-07-17");
     gDnaAliquot.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
-    gDnaAliquot.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    gDnaAliquot.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     gDnaAliquot.put(SamColumns.RECEIPT_CONFIRMED, "True");
     gDnaAliquot.put(SamColumns.RECEIPT_QC_PASSED, "True");
     gDnaAliquot.put(SamColumns.RECEIPT_QC_NOTE, "");
@@ -957,7 +957,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     gDnaAliquot.put(SamColumns.SAMPLE_CLASS, "gDNA (aliquot)");
     gDnaAliquot.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     gDnaAliquot.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
-    gDnaAliquot.put(SamColumns.PROJECT, "PRO1");
+    gDnaAliquot.put(SamColumns.PROJECT, "PONE");
     gDnaAliquot.put(SamColumns.GROUP_ID, "1");
     gDnaAliquot.put(SamColumns.GROUP_DESCRIPTION, "Test one");
     gDnaAliquot.put(SamColumns.TISSUE_ORIGIN, "Bn (Brain)");
@@ -998,7 +998,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     gDnaAliquot.put(SamColumns.DESCRIPTION, "Description");
     gDnaAliquot.put(SamColumns.RECEIVE_DATE, "2017-07-17");
     gDnaAliquot.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
-    gDnaAliquot.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    gDnaAliquot.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     gDnaAliquot.put(SamColumns.RECEIPT_CONFIRMED, "True");
     gDnaAliquot.put(SamColumns.RECEIPT_QC_PASSED, "True");
     gDnaAliquot.put(SamColumns.RECEIPT_QC_NOTE, "");
@@ -1051,7 +1051,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     aliquot.put(SamColumns.DESCRIPTION, "Description");
     aliquot.put(SamColumns.RECEIVE_DATE, "2017-07-17");
     aliquot.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
-    aliquot.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    aliquot.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     aliquot.put(SamColumns.RECEIPT_CONFIRMED, "True");
     aliquot.put(SamColumns.RECEIPT_QC_PASSED, "True");
     aliquot.put(SamColumns.RECEIPT_QC_NOTE, "");
@@ -1059,7 +1059,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     aliquot.put(SamColumns.SAMPLE_CLASS, "Single Cell DNA (aliquot)");
     aliquot.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     aliquot.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
-    aliquot.put(SamColumns.PROJECT, "PRO1");
+    aliquot.put(SamColumns.PROJECT, "PONE");
     aliquot.put(SamColumns.GROUP_ID, "1");
     aliquot.put(SamColumns.GROUP_DESCRIPTION, "Test one");
     aliquot.put(SamColumns.TISSUE_ORIGIN, "Bn (Brain)");
@@ -1105,7 +1105,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     rnaAliquot.put(SamColumns.DESCRIPTION, "Description");
     rnaAliquot.put(SamColumns.RECEIVE_DATE, "2017-07-17");
     rnaAliquot.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
-    rnaAliquot.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    rnaAliquot.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     rnaAliquot.put(SamColumns.RECEIPT_CONFIRMED, "True");
     rnaAliquot.put(SamColumns.RECEIPT_QC_PASSED, "True");
     rnaAliquot.put(SamColumns.RECEIPT_QC_NOTE, "");
@@ -1113,7 +1113,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     rnaAliquot.put(SamColumns.SAMPLE_CLASS, "whole RNA (aliquot)");
     rnaAliquot.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     rnaAliquot.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
-    rnaAliquot.put(SamColumns.PROJECT, "PRO1");
+    rnaAliquot.put(SamColumns.PROJECT, "PONE");
     rnaAliquot.put(SamColumns.GROUP_ID, "1");
     rnaAliquot.put(SamColumns.GROUP_DESCRIPTION, "Test one");
     rnaAliquot.put(SamColumns.TISSUE_ORIGIN, "Bn (Brain)");
@@ -1155,7 +1155,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     rnaAliquot.put(SamColumns.DESCRIPTION, "Description");
     rnaAliquot.put(SamColumns.RECEIVE_DATE, "2017-07-17");
     rnaAliquot.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
-    rnaAliquot.put(SamColumns.RECEIVED_BY, "TestGroup1");
+    rnaAliquot.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     rnaAliquot.put(SamColumns.RECEIPT_CONFIRMED, "True");
     rnaAliquot.put(SamColumns.RECEIPT_QC_PASSED, "True");
     rnaAliquot.put(SamColumns.RECEIPT_QC_NOTE, "");
@@ -1217,10 +1217,10 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
     Set<String> projects = table.getDropdownOptions(SamColumns.PROJECT, 0);
     assertTrue(projects.size() > 0);
-    assertTrue(projects.contains("PRO1"));
+    assertTrue(projects.contains("PONE"));
 
-    table.enterText(SamColumns.PROJECT, 0, "PRO1");
-    assertEquals("PRO1", table.getText(SamColumns.PROJECT, 0));
+    table.enterText(SamColumns.PROJECT, 0, "PONE");
+    assertEquals("PONE", table.getText(SamColumns.PROJECT, 0));
 
     Set<String> donorSexes = table.getDropdownOptions(SamColumns.DONOR_SEX, 0);
     assertEquals(5, donorSexes.size());
@@ -1260,11 +1260,11 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     HandsOnTable table = page.getTable();
 
     Map<String, String> identity = new LinkedHashMap<>();
-    identity.put(SamColumns.ALIAS, "PRO2_1001");
+    identity.put(SamColumns.ALIAS, "PTWO_1001");
     identity.put(SamColumns.DESCRIPTION, "");
     identity.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     identity.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
-    identity.put(SamColumns.PROJECT, "PRO2"); // different project so as not to mess with the SampleNumberPerProject generator
+    identity.put(SamColumns.PROJECT, "PTWO"); // different project so as not to mess with the SampleNumberPerProject generator
     identity.put(SamColumns.EXTERNAL_NAME, "ext2001"); // increment
     identity.put(SamColumns.DONOR_SEX, "Female");
     identity.put(SamColumns.CONSENT, ConsentLevel.ALL_PROJECTS.getLabel());
@@ -1290,7 +1290,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     HandsOnTable table = page.getTable();
 
     Map<String, String> identity = new LinkedHashMap<>();
-    identity.put(SamColumns.ALIAS, "PRO2_1002");
+    identity.put(SamColumns.ALIAS, "PTWO_1002");
     identity.put(SamColumns.DESCRIPTION, "");
     identity.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     identity.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
@@ -1316,7 +1316,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
   private void assertIdentityLookupWasSuccessful(HandsOnTable table, int rowNum) {
     table.waitForSearch(SamColumns.IDENTITY_ALIAS, rowNum);
-    assertEquals("identity lookup was successful", "First Receipt (PRO1)", table.getText(SamColumns.IDENTITY_ALIAS, 0));
+    assertEquals("identity lookup was successful", "First Receipt (PONE)", table.getText(SamColumns.IDENTITY_ALIAS, 0));
   }
 
 }

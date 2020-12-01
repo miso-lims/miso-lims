@@ -46,7 +46,7 @@ public class TimestampConversionIT extends AbstractIT {
     TransferPage page = TransferPage.getForCreateWithSamples(getDriver(), getBaseUrl(), Collections.singleton(2L));
     Map<Field, String> fields = new LinkedHashMap<>();
     fields.put(Field.TRANSFER_TIME, "2020-02-20 12:48:00");
-    fields.put(Field.SENDER_GROUP, "TestGroup1");
+    fields.put(Field.SENDER_GROUP, "TestGroupOne");
     fields.put(Field.RECIPIENT, "Random Passerby");
     page.setFields(fields);
 
