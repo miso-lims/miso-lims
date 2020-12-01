@@ -3,6 +3,7 @@
 Changes:
 
   * Allowed assigning a barcode to loose storage
+  * Added changelog message to QC target (e.g. sample) when QCs are deleted
   * Fixed RNA Library Preparation spreadsheet download and Pinery-MISO excluding some QCs if QC type
     name doesn't exactly match the original spec.
   * Fixed error displaying/validating QC type when editing QC with an archived QC type
