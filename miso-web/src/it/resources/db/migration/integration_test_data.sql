@@ -549,7 +549,7 @@ INSERT INTO Sample (sampleId, project_projectId, name, alias, description, ident
 
 -- Slides
 INSERT INTO Sample (sampleId, project_projectId, name, alias, description, identificationBarcode, sampleType, scientificNameId, volume, volumeUnits, concentration, concentrationUnits, creator, created, lastModifier, lastModified,
-  nonStandardAlias, isSynthetic, sampleClassId, parentId, siblingNumber, groupId, groupDescription, detailedQcStatusId, detailedQcStatusNote. qcUser, archived, discriminator,
+  nonStandardAlias, isSynthetic, sampleClassId, parentId, siblingNumber, groupId, groupDescription, detailedQcStatusId, detailedQcStatusNote, qcUser, archived, discriminator,
   initialSlides, slides) VALUES
 (3, 3, 'SAM3', 'TEST_0001_Bn_R_nn_1-1_SL01', 'Slide', '33333', 'GENOMIC', 1, NULL, NULL, NULL, NULL, 1, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00',
   FALSE, FALSE, 24, 2, 1, '7357', 'TEST', 1, NULL, 1, 0, 'Slide',
