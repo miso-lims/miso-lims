@@ -181,10 +181,10 @@ INSERT INTO Transfer_Sample(transferId, sampleId, received, qcPassed, qcNote) VA
 (1, 1, TRUE, TRUE, NULL);
 
 INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, sample_sampleId, platformType,
-  libraryType, librarySelectionType, libraryStrategyType, creationDate, creator, created, lastModifier, lastModified, detailedQcStatusId, dnaSize,
+  libraryType, librarySelectionType, libraryStrategyType, creationDate, creator, created, lastModifier, lastModified, detailedQcStatusId, qcUser, dnaSize,
   volume, volumeUnits, concentration, concentrationUnits, locationBarcode, kitDescriptorId, discriminator) VALUES
   (1, 'LIB1', 'PLAIN_L0001-1_1', 'LIB1::PLAIN_L0001-1_1', 'plain lib', 1, 'ILLUMINA',
-    1, 3, 1,  '2016-11-07', 1, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00', 1, 300,
+    1, 3, 1,  '2016-11-07', 1, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00', 1, 1, 300,
     5.0, 'MICROLITRES', 2.75, 'NANOGRAMS_PER_MICROLITRE', NULL, 1, 'Library');
 
 INSERT INTO Library_Index(library_libraryId, index_indexId) VALUES
