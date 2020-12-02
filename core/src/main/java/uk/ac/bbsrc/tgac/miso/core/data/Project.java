@@ -88,34 +88,11 @@ public interface Project extends Comparable<Project>, Deletable, Nameable, Seria
   void setStatus(StatusType status);
 
   /**
-   * Returns the registered samples of this Project object.
-   * 
-   * @return Collection<Sample> samples.
-   */
-  Collection<Sample> getSamples();
-
-  /**
    * Returns the registered studies of this Project object.
    * 
    * @return Collection<Study> studies.
    */
   Collection<Study> getStudies();
-
-  /**
-   * Registers a collection of samples to this Project object.
-   * 
-   * @param samples
-   *          samples.
-   */
-  void setSamples(Collection<Sample> samples);
-
-  /**
-   * Register that a Sample has been recieved in relation to this Project
-   * 
-   * @param sample
-   *          of type Sample
-   */
-  void addSample(Sample sample);
 
   /**
    * Registers a collection of studies to this Project object.

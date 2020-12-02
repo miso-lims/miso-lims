@@ -106,15 +106,6 @@ public class ProjectRestController extends RestController {
     this.runService = runService;
   }
 
-  @GetMapping(value = "/alias/{projectAlias}", produces = "application/json")
-  public @ResponseBody ProjectDto getProjectByAlias(@PathVariable String projectAlias) throws IOException {
-    Project project = projectService.getProjectByAlias(projectAlias);
-    if (project == null) {
-      throw new RestException("No project found with alias: " + projectAlias, Status.NOT_FOUND);
-    }
-    return Dtos.asDto(project);
-  }
-
   @GetMapping(value = "/{projectId}", produces = "application/json")
   public @ResponseBody ProjectDto getProjectById(@PathVariable long projectId) throws IOException {
     return RestUtils.getObject("Project", projectId, projectService, Dtos::asDto);
