@@ -19,3 +19,5 @@ AND clinical = TRUE;
 
 ALTER TABLE Project MODIFY COLUMN pipelineId bigint(20) NOT NULL;
 ALTER TABLE Project ADD CONSTRAINT fk_project_pipeline FOREIGN KEY (pipelineId) REFERENCES Pipeline (pipelineId);
+
+ALTER TABLE Project DROP COLUMN clinical;
