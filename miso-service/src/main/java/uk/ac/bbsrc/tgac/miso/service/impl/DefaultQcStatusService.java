@@ -23,6 +23,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.QcStatusUpdate;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.DetailedQcItem;
+import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
@@ -57,6 +58,8 @@ public class DefaultQcStatusService implements QcStatusService {
   private DetailedQcStatusService detailedQcStatusService;
   @Autowired
   private PartitionQcTypeService partitionQcTypeService;
+  @Autowired
+  private AuthorizationManager authorizationManager;
 
   @Override
   public void update(QcStatusUpdate update) throws IOException {
@@ -133,7 +136,13 @@ public class DefaultQcStatusService implements QcStatusService {
         runLib.setPartition(partition);
         runLib.setAliquot(aliquot);
       }
-      runLib.setQcPassed(update.getQcPassed());
+      if (update.getQcPassed() == null) {
+        runLib.setQcPassed(null);
+        runLib.setQcUser(null);
+      } else if (!update.getQcPassed().equals(runLib.getQcPassed())) {
+        runLib.setQcPassed(update.getQcPassed());
+        runLib.setQcUser(authorizationManager.getCurrentUser());
+      }
       runLib.setQcNote(update.getQcNote());
       runPartitionAliquotService.save(runLib);
       break;
@@ -147,12 +156,14 @@ public class DefaultQcStatusService implements QcStatusService {
     throwIfNull(typeLabel, item);
     if (update.getQcStatusId() == null) {
       item.setDetailedQcStatus(null);
-    } else {
+      item.setQcUser(null);
+    } else if (item.getDetailedQcStatus() == null || item.getDetailedQcStatus().getId() != update.getQcStatusId().longValue()) {
       DetailedQcStatus status = detailedQcStatusService.get(update.getQcStatusId());
       if (status == null) {
         throw new ValidationException("Invalid detailed QC status ID: " + update.getQcStatusId());
       }
       item.setDetailedQcStatus(status);
+      item.setQcUser(authorizationManager.getCurrentUser());
     }
     item.setDetailedQcStatusNote(update.getQcNote());
   }

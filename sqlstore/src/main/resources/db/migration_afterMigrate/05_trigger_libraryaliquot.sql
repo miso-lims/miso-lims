@@ -23,6 +23,7 @@ FOR EACH ROW
       makeChangeMessage('size', OLD.dnaSize, NEW.dnaSize),
       makeChangeMessage('QC Status', (SELECT description FROM DetailedQcStatus WHERE detailedQcStatusId = OLD.detailedQcStatusId), (SELECT description FROM DetailedQcStatus WHERE detailedQcStatusId = NEW.detailedQcStatusId)),
       makeChangeMessage('QC Status Note', OLD.detailedQcStatusNote, NEW.detailedQcStatusNote),
+      makeChangeMessage('QC User', (SELECT fullName FROM User WHERE userId = OLD.qcUser), (SELECT fullName FROM User WHERE userId = NEW.qcUser)),
       makeChangeMessage('group id', OLD.groupId, NEW.groupId),
       makeChangeMessage('group description', OLD.groupDescription, NEW.groupDescription)
     );
@@ -46,6 +47,7 @@ FOR EACH ROW
           makeChangeColumn('dnaSize', OLD.dnaSize, NEW.dnaSize),
           makeChangeColumn('detailedQcStatusId', OLD.detailedQcStatusId, NEW.detailedQcStatusId),
           makeChangeColumn('detailedQcStatusNote', OLD.detailedQcStatusNote, NEW.detailedQcStatusNote),
+          makeChangeColumn('qcUser', OLD.qcUser, NEW.qcUser),
           makeChangeColumn('groupId', OLD.groupId, NEW.groupId),
           makeChangeColumn('groupDescription', OLD.groupDescription, NEW.groupDescription)
         ), ''),

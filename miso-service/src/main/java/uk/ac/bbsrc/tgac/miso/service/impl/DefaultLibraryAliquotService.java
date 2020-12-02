@@ -297,6 +297,7 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
     target.setCreationDate(source.getCreationDate());
     target.setDetailedQcStatus(source.getDetailedQcStatus());
     target.setDetailedQcStatusNote(source.getDetailedQcStatusNote());
+    target.setQcUser(source.getQcUser());
 
     if (isDetailedLibraryAliquot(target)) {
       DetailedLibraryAliquot dTarget = (DetailedLibraryAliquot) target;
@@ -308,6 +309,8 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
   }
 
   private void validateChange(LibraryAliquot aliquot, LibraryAliquot beforeChange) throws IOException {
+    updateDetailedQcStatusUser(aliquot, beforeChange, authorizationManager);
+
     List<ValidationError> errors = new ArrayList<>();
 
     validateConcentrationUnits(aliquot.getConcentration(), aliquot.getConcentrationUnits(), errors);
