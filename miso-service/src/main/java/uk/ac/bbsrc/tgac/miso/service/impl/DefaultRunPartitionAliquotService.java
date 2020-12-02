@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,8 @@ import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.persistence.RunPartitionAliquotDao;
 
 @Service
@@ -69,6 +72,13 @@ public class DefaultRunPartitionAliquotService implements RunPartitionAliquotSer
       runPartitionAliquot.setPurpose(runPurposeService.get(runPartitionAliquot.getPurpose().getId()));
     }
     User user = authorizationManager.getCurrentUser();
+    updateQcUser(runPartitionAliquot, managed);
+
+    List<ValidationError> errors = new ArrayList<>();
+    ValidationUtils.validateQcUser(runPartitionAliquot.getQcPassed(), runPartitionAliquot.getQcUser(), errors);
+    if (!errors.isEmpty()) {
+      throw new ValidationException(errors);
+    }
 
     if (managed == null) {
       runPartitionAliquot.setRun(runService.get(runPartitionAliquot.getRun().getId()));
@@ -80,8 +90,21 @@ public class DefaultRunPartitionAliquotService implements RunPartitionAliquotSer
       managed.setPurpose(runPartitionAliquot.getPurpose());
       managed.setQcPassed(runPartitionAliquot.getQcPassed());
       managed.setQcNote(runPartitionAliquot.getQcNote());
+      managed.setQcUser(runPartitionAliquot.getQcUser());
       managed.setLastModifier(user);
       runPartitionAliquotDao.update(managed);
+    }
+  }
+
+  private void updateQcUser(RunPartitionAliquot runPartitionAliquot, RunPartitionAliquot beforeChange) throws IOException {
+    if (ValidationUtils.isChanged(RunPartitionAliquot::getQcPassed, runPartitionAliquot, beforeChange)) {
+      if (runPartitionAliquot.getQcPassed() == null) {
+        runPartitionAliquot.setQcUser(null);
+      } else {
+        runPartitionAliquot.setQcUser(authorizationManager.getCurrentUser());
+      }
+    } else if (beforeChange != null) {
+      runPartitionAliquot.setQcUser(beforeChange.getQcUser());
     }
   }
 

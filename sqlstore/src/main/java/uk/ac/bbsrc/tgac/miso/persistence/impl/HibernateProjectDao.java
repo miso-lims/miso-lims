@@ -29,17 +29,15 @@ import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
@@ -47,8 +45,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 @Transactional(rollbackFor = Exception.class)
 @Repository
 public class HibernateProjectDao implements ProjectStore {
-
-  protected static final Logger log = LoggerFactory.getLogger(HibernateProjectDao.class);
 
   private static final String[] SEARCH_PROPERTIES = new String[] { "name", "alias",
       "description", "shortName" };
@@ -89,14 +85,6 @@ public class HibernateProjectDao implements ProjectStore {
     return (Project) criteria.uniqueResult();
   }
 
-  @Override
-  public Project getByStudyId(long studyId) throws IOException {
-    Criteria criteria = currentSession().createCriteria(ProjectImpl.class);
-    criteria.createAlias("studies", "study");
-    criteria.add(Restrictions.eq("study.id", studyId));
-    return (Project) criteria.uniqueResult();
-  }
-
   public SecurityStore getSecurityStore() {
     return securityStore;
   }
@@ -108,16 +96,6 @@ public class HibernateProjectDao implements ProjectStore {
   @Override
   public List<Project> listAll() throws IOException {
     Criteria criteria = currentSession().createCriteria(ProjectImpl.class);
-    @SuppressWarnings("unchecked")
-    List<Project> results = criteria.list();
-    return results;
-  }
-
-  @Override
-  public List<Project> listAllWithLimit(long limit) throws IOException {
-    Criteria criteria = currentSession().createCriteria(ProjectImpl.class);
-    criteria.setMaxResults((int) limit);
-    criteria.addOrder(Order.desc("id"));
     @SuppressWarnings("unchecked")
     List<Project> results = criteria.list();
     return results;
@@ -148,4 +126,12 @@ public class HibernateProjectDao implements ProjectStore {
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
   }
+
+  @Override
+  public long getUsage(Project project) throws IOException {
+    return (long) currentSession().createCriteria(SampleImpl.class)
+        .add(Restrictions.eq("project", project))
+        .setProjection(Projections.rowCount()).uniqueResult();
+  }
+
 }

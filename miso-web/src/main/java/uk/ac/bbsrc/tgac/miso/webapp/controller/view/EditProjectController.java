@@ -134,11 +134,11 @@ public class EditProjectController {
     return new ModelAndView("/WEB-INF/pages/editProject.jsp", model);
   }
 
-  private static void addNamingSchemeConfig(ObjectNode namingConfig, String property, NamingScheme scheme, Project project) {
+  private void addNamingSchemeConfig(ObjectNode namingConfig, String property, NamingScheme scheme, Project project) throws IOException {
     if (scheme != null) {
       ObjectNode config = namingConfig.putObject(property);
       config.put("shortNameRequired", !scheme.nullProjectShortNameAllowed());
-      config.put("shortNameModifiable", scheme.nullProjectShortNameAllowed() || project.getSamples().isEmpty());
+      config.put("shortNameModifiable", scheme.nullProjectShortNameAllowed() || !projectService.hasSamples(project));
     }
   }
 
