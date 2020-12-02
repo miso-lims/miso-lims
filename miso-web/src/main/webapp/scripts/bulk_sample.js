@@ -408,7 +408,7 @@ BulkTarget.sample = (function($) {
             }) : [];
             var changes = {
               source: subprojects,
-              required: !!subprojects.length,
+              //required: !!subprojects.length,
               disabled: !subprojects.length
             };
             if (!subprojects.length) {
