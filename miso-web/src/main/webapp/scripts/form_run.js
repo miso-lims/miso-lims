@@ -228,14 +228,7 @@ FormTarget.run = (function($) {
           title: 'Completion Date',
           data: 'endDate',
           type: 'date'
-        }, FormUtils.makeQcPassedField(), {
-          title: 'QC User',
-          data: 'qcUserName',
-          type: 'read-only',
-          getDisplayValue: function(data) {
-            return data.qcUserName || 'n/a';
-          }
-        }, {
+        }, FormUtils.makeQcPassedField(), FormUtils.makeQcUserField(), {
           title: 'Data Review',
           data: 'dataReview',
           type: 'dropdown',

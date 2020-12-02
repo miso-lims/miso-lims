@@ -13,9 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -338,8 +336,8 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   }
 
   private void validateChanges(Run before, Run changed) throws IOException {
-    updateQcUser(changed, before, Run::getQcPassed, Run::getQcUser, Run::setQcUser);
-    updateQcUser(changed, before, Run::getDataReview, Run::getDataReviewer, Run::setDataReviewer);
+    ValidationUtils.updateQcUser(changed, before, Run::getQcPassed, Run::getQcUser, Run::setQcUser, authorizationManager);
+    ValidationUtils.updateQcUser(changed, before, Run::getDataReview, Run::getDataReviewer, Run::setDataReviewer, authorizationManager);
 
     List<ValidationError> errors = new ArrayList<>();
 
@@ -377,17 +375,13 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       errors.add(new ValidationError("sequencingKitLot", "Sequencing kit not specified"));
     }
 
-    if (changed.getQcPassed() != null && changed.getQcUser() == null) {
-      errors.add(new ValidationError("QC user must be set when review is specified"));
-    }
+    ValidationUtils.validateQcUser(changed.getQcPassed(), changed.getQcUser(), errors);
+    ValidationUtils.validateQcUser(changed.getDataReview(), changed.getDataReviewer(), errors, "data review", "Data reviewer");
 
     User user = authorizationManager.getCurrentUser();
     if (((before == null && changed.getDataReview() != null) || (before != null && isChanged(Run::getDataReview, changed, before)))
         && !user.isRunReviewer() && !user.isAdmin()) {
       errors.add(new ValidationError("dataReview", "You are not authorized to make this change"));
-    }
-    if (changed.getDataReview() != null && changed.getDataReviewer() == null) {
-      errors.add(new ValidationError("Data reviewer must be set when review is specified"));
     }
 
     if (changed.getSequencerPartitionContainers() != null) {
@@ -407,19 +401,6 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
-    }
-  }
-
-  private void updateQcUser(Run run, Run beforeChange, Function<Run, Object> getStatus, Function<Run, User> getUser,
-      BiConsumer<Run, User> setUser) throws IOException {
-    if (isChanged(getStatus, run, beforeChange)) {
-      if (getStatus.apply(run) == null) {
-        setUser.accept(run, null);
-      } else {
-        setUser.accept(run, authorizationManager.getCurrentUser());
-      }
-    } else if (beforeChange != null) {
-      setUser.accept(run, getUser.apply(beforeChange));
     }
   }
 
