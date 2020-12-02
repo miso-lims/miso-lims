@@ -18,6 +18,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQcControlRun;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQC;
@@ -33,6 +34,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQcControlRun;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BulkQcSaveOperation;
+import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.KitDescriptorService;
 import uk.ac.bbsrc.tgac.miso.core.service.QcTypeService;
@@ -65,6 +67,8 @@ public class DefaultQualityControlService implements QualityControlService {
   private QcTypeService qcTypeService;
   @Autowired
   private KitDescriptorService kitDescriptorService;
+  @Autowired
+  private ChangeLogService changeLogService;
   @Autowired
   private QualityControlTypeStore qcTypeStore;
   @Autowired
@@ -374,6 +378,14 @@ public class DefaultQualityControlService implements QualityControlService {
   @Override
   public QC getManaged(QC object) throws IOException {
     return get(object.getEntity().getQcTarget(), object.getId());
+  }
+
+  @Override
+  public void beforeDelete(QC object) throws IOException {
+    QcTargetStore handler = getHandler(object.getType().getQcTarget());
+    QualityControlEntity entity = handler.getEntity(object.getEntity().getId());
+    ChangeLog change = entity.createChangeLog("QC deleted: " + object.getType().getName(), "", authorizationManager.getCurrentUser());
+    changeLogService.create(change);
   }
 
 }
