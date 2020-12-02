@@ -66,13 +66,7 @@ public class HibernateSopDaoIT extends AbstractHibernateSaveDaoTest<Sop, Hiberna
 
   @Test
   public void testListByIdList() throws Exception {
-    List<Long> ids = Lists.newArrayList(3L, 4L);
-    List<Sop> sops = getTestSubject().listByIdList(ids);
-    assertNotNull(sops);
-    assertEquals(2, sops.size());
-    for (Long id : ids) {
-      assertTrue(sops.stream().anyMatch(sop -> sop.getId() == id.longValue()));
-    }
+    testListByIdList(HibernateSopDao::listByIdList, Lists.newArrayList(3L, 4L));
   }
 
   @Test

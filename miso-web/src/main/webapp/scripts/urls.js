@@ -556,6 +556,19 @@ Urls = (function() {
     update: idUrlFunction(partitionQcTypeRestBase)
   };
 
+  // Pipelines
+  var pipelineUiBase = baseUrl + '/pipeline';
+  ui.pipelines = {
+    bulkCreate: pipelineUiBase + '/bulk/new',
+    bulkEdit: pipelineUiBase + '/bulk/edit'
+  };
+
+  var pipelineRestBase = restBase + '/pipelines';
+  rest.pipelines = {
+    bulkSave: pipelineRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(pipelineRestBase + '/bulk')
+  };
+
   // Pools
   var poolUiBase = baseUrl + '/pool';
   ui.pools = {

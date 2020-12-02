@@ -896,6 +896,16 @@ public class ListTablesIT extends AbstractIT {
     testTabbedColumnsSort(ListTarget.SOPS);
   }
 
+  @Test
+  public void testListPipelinesSetup() throws Exception {
+    testPageSetup(ListTarget.PIPELINES, Sets.newHashSet(Columns.ALIAS));
+  }
+
+  @Test
+  public void testListPipelinesColumnSort() throws Exception {
+    testColumnsSort(ListTarget.PIPELINES);
+  }
+
   private void testPageSetup(String listTarget, Set<String> targetColumns) {
     testPageSetup(listTarget, targetColumns, false);
   }

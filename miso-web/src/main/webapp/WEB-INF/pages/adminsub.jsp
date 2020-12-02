@@ -95,6 +95,7 @@
       <a href="<c:url value="/miso/partitionqctype/list"/>">Partition QC Types</a>
       <a href="<c:url value="/miso/scientificname/list"/>">Scientific Names</a>
       <a href="<c:url value="/miso/referencegenome/list"/>">Reference Genomes</a>
+      <a href="<c:url value="/miso/pipeline/list"/>">Pipelines</a>
       <a href="<c:url value="/miso/studytype/list"/>">Study Types</a>
       <a href="<c:url value="/miso/workstation/list"/>">Workstations</a>
       <a href="<c:url value="/miso/sop/list"/>">SOPs</a>

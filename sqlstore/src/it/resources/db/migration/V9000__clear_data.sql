@@ -49,6 +49,7 @@ DELETE FROM LibraryType;
 DELETE FROM Note;
 DELETE FROM _Partition;
 DELETE FROM PartitionQCType;
+DELETE FROM Pipeline;
 DELETE FROM Pool;
 DELETE FROM PoolChangeLog;
 DELETE FROM Pool_LibraryAliquot;

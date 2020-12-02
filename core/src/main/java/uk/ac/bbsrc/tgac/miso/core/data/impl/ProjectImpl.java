@@ -133,7 +133,10 @@ public class ProjectImpl implements Project {
   @JoinColumn(name = "targetedSequencingId", referencedColumnName = "targetedSequencingId", nullable = true)
   private TargetedSequencing defaultTargetedSequencing;
 
-  private boolean clinical;
+  @ManyToOne
+  @JoinColumn(name = "pipelineId")
+  private Pipeline pipeline;
+
   private boolean secondaryNaming;
 
   @Override
@@ -389,13 +392,13 @@ public class ProjectImpl implements Project {
   }
 
   @Override
-  public boolean isClinical() {
-    return clinical;
+  public Pipeline getPipeline() {
+    return pipeline;
   }
 
   @Override
-  public void setClinical(boolean clinical) {
-    this.clinical = clinical;
+  public void setPipeline(Pipeline pipeline) {
+    this.pipeline = pipeline;
   }
 
   @Override

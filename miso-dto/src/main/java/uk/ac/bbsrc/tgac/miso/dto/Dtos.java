@@ -141,6 +141,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Pipeline;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
@@ -2489,7 +2490,7 @@ public class Dtos {
           ScientificName::getAlias));
     }
     setId(dto::setDefaultTargetedSequencingId, from.getDefaultTargetedSequencing());
-    setBoolean(dto::setClinical, from.isClinical(), false);
+    setId(dto::setPipelineId, from.getPipeline());
     setBoolean(dto::setSecondaryNaming, from.isSecondaryNaming(), false);
     setString(dto::setRebNumber, from.getRebNumber());
     setDateString(dto::setRebExpiry, from.getRebExpiry());
@@ -2511,7 +2512,7 @@ public class Dtos {
     setObject(to::setStatus, dto.getStatus(), (key) -> StatusType.get(key));
     setObject(to::setReferenceGenome, ReferenceGenomeImpl::new, dto.getReferenceGenomeId());
     setObject(to::setDefaultTargetedSequencing, TargetedSequencing::new, dto.getDefaultTargetedSequencingId());
-    setBoolean(to::setClinical, dto.isClinical(), false);
+    setObject(to::setPipeline, Pipeline::new, dto.getPipelineId());
     setBoolean(to::setSecondaryNaming, dto.isSecondaryNaming(), false);
     setString(to::setRebNumber, dto.getRebNumber());
     setDate(to::setRebExpiry, dto.getRebExpiry());
@@ -4267,6 +4268,20 @@ public class Dtos {
     setLong(to::setId, from.getId(), false);
     setString(to::setName, from.getName());
     setString(to::setEmail, from.getEmail());
+    return to;
+  }
+
+  public static PipelineDto asDto(@Nonnull Pipeline from) {
+    PipelineDto to = new PipelineDto();
+    setLong(to::setId, from.getId(), true);
+    setString(to::setAlias, from.getAlias());
+    return to;
+  }
+
+  public static Pipeline to(@Nonnull PipelineDto from) {
+    Pipeline to = new Pipeline();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setAlias, from.getAlias());
     return to;
   }
 

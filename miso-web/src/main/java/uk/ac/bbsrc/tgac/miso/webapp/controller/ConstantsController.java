@@ -77,6 +77,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.LibrarySpikeInService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryStrategyService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.PartitionQcTypeService;
+import uk.ac.bbsrc.tgac.miso.core.service.PipelineService;
 import uk.ac.bbsrc.tgac.miso.core.service.QualityControlService;
 import uk.ac.bbsrc.tgac.miso.core.service.ReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
@@ -190,6 +191,8 @@ public class ConstantsController {
   @Autowired
   private ScientificNameService scientificNameService;
   @Autowired
+  private PipelineService pipelineService;
+  @Autowired
   private IndexChecker indexChecker;
 
   @Value("${miso.autoGenerateIdentificationBarcodes}")
@@ -287,6 +290,7 @@ public class ConstantsController {
       addJsonArray(mapper, node, "runPurposes", runPurposeService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "sequencingControlTypes", sequencingControlTypeService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "scientificNames", scientificNameService.list(), Dtos::asDto);
+      addJsonArray(mapper, node, "pipelines", pipelineService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "sampleSheetFormats", Arrays.asList(SampleSheet.values()), SampleSheet::name);
 
       Collection<IndexFamily> indexFamilies = indexFamilyService.list();

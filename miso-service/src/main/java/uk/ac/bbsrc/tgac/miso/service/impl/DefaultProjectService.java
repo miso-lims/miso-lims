@@ -24,7 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.generateTemporaryName;
-import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.validateNameOrThrow;
+import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,9 +44,12 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryTemplateService;
+import uk.ac.bbsrc.tgac.miso.core.service.PipelineService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
+import uk.ac.bbsrc.tgac.miso.core.service.ReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.core.service.TargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
@@ -55,8 +58,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.persistence.ProjectStore;
-import uk.ac.bbsrc.tgac.miso.persistence.ReferenceGenomeDao;
-import uk.ac.bbsrc.tgac.miso.persistence.TargetedSequencingStore;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
@@ -66,9 +67,9 @@ public class DefaultProjectService implements ProjectService {
   @Autowired
   private ProjectStore projectStore;
   @Autowired
-  private ReferenceGenomeDao referenceGenomeDao;
+  private ReferenceGenomeService referenceGenomeService;
   @Autowired
-  private TargetedSequencingStore targetedSequencingStore;
+  private TargetedSequencingService targetedSequencingService;
   @Autowired
   private NamingSchemeHolder namingSchemeHolder;
   @Autowired
@@ -83,6 +84,8 @@ public class DefaultProjectService implements ProjectService {
   private LibraryTemplateService libraryTemplateService;
   @Autowired
   private SampleNumberPerProjectService sampleNumberPerProjectService;
+  @Autowired
+  private PipelineService pipelineService;
 
   @Override
   public Project get(long projectId) throws IOException {
@@ -161,10 +164,10 @@ public class DefaultProjectService implements ProjectService {
   }
 
   private void loadChildEntities(Project project) throws IOException {
-    project.setReferenceGenome(referenceGenomeDao.get(project.getReferenceGenome().getId()));
-    if (project.getDefaultTargetedSequencing() != null) {
-      project.setDefaultTargetedSequencing(targetedSequencingStore.get(project.getDefaultTargetedSequencing().getId()));
-    }
+    loadChildEntity(project::setReferenceGenome, project.getReferenceGenome(), referenceGenomeService, "referenceGenomeId");
+    loadChildEntity(project::setDefaultTargetedSequencing, project.getDefaultTargetedSequencing(), targetedSequencingService,
+        "defaultTargetedSequencingId");
+    loadChildEntity(project::setPipeline, project.getPipeline(), pipelineService, "pipelineId");
   }
 
   private void applyChanges(Project original, Project project) {
@@ -174,7 +177,7 @@ public class DefaultProjectService implements ProjectService {
     original.setReferenceGenome(project.getReferenceGenome());
     original.setDefaultTargetedSequencing(project.getDefaultTargetedSequencing());
     original.setShortName(project.getShortName());
-    original.setClinical(project.isClinical());
+    original.setPipeline(project.getPipeline());
     original.setRebNumber(project.getRebNumber());
     original.setRebExpiry(project.getRebExpiry());
   }
@@ -187,8 +190,8 @@ public class DefaultProjectService implements ProjectService {
     this.projectStore = projectStore;
   }
 
-  public void setReferenceGenomeDao(ReferenceGenomeDao referenceGenomeDao) {
-    this.referenceGenomeDao = referenceGenomeDao;
+  public void setReferenceGenomeService(ReferenceGenomeService referenceGenomeService) {
+    this.referenceGenomeService = referenceGenomeService;
   }
 
   public void setAuthorizationManager(AuthorizationManager authorizationManager) {

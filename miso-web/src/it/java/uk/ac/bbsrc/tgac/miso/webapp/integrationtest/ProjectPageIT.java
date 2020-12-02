@@ -48,6 +48,7 @@ public class ProjectPageIT extends AbstractIT {
     unsaved.put(Fields.DESCRIPTION, "New Project via UI");
     unsaved.put(Fields.STATUS, "Proposed");
     unsaved.put(Fields.REFERENCE_GENOME, "Human hg18 random");
+    unsaved.put(Fields.PIPELINE, "Special");
     
     assertEquals("Project ID is unsaved", unsaved.get(Fields.ID), page.getId());
     assertEquals("Project name is unsaved", unsaved.get(Fields.NAME), page.getName());
@@ -56,6 +57,7 @@ public class ProjectPageIT extends AbstractIT {
     page.setDescription(unsaved.get(Fields.DESCRIPTION));
     page.setStatus(unsaved.get(Fields.STATUS));
     page.setReferenceGenome(unsaved.get(Fields.REFERENCE_GENOME));
+    page.setPipeline(unsaved.get(Fields.PIPELINE));
 
     ProjectPage savedPage = page.clickSave();
 
@@ -67,6 +69,7 @@ public class ProjectPageIT extends AbstractIT {
     assertEquals(unsaved.get(Fields.DESCRIPTION), savedPage.getDescription());
     assertEquals(unsaved.get(Fields.STATUS), savedPage.getStatus());
     assertEquals(unsaved.get(Fields.REFERENCE_GENOME), savedPage.getReferenceGenome());
+    assertEquals(unsaved.get(Fields.PIPELINE), savedPage.getPipeline());
   }
 
   @Test

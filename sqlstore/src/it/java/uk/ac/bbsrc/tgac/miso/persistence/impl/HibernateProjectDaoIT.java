@@ -22,6 +22,7 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Pipeline;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -74,8 +75,10 @@ public class HibernateProjectDaoIT extends AbstractDAOTest {
    */
   @Test
   public void testSave() throws Exception {
+    Pipeline pipeline = (Pipeline) currentSession().get(Pipeline.class, 1L);
     final String testAlias = "test alias";
     project.setAlias(testAlias);
+    project.setPipeline(pipeline);
 
     long savedProjectId = projectDAO.save(project);
 

@@ -119,4 +119,5 @@ DELETE FROM Workstation;
 DELETE FROM SequencingControlType;
 DELETE FROM ScientificName;
 DELETE FROM Sop;
+DELETE FROM Pipeline;
 SET FOREIGN_KEY_CHECKS=1;

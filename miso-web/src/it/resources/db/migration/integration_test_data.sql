@@ -3,6 +3,11 @@ INSERT INTO User (userId, active, admin, fullName, internal, loginName, roles, p
 (3,1,0,'user',1,'user','ROLE_INTERNAL','{bcrypt}$2a$10$vqYii//w2shSZnt/4uNyIeeU4FGQIB4QJeisv9l16xVRQ1lTOghIO','user@user.user'), -- password 'user'
 (4,1,0,'Harry Henderson', 1, 'hhenderson', 'ROLE_INTERNAL', '{bcrypt}$2a$10$vqYii//w2shSZnt/4uNyIeeU4FGQIB4QJeisv9l16xVRQ1lTOghIO', 'hhenderson@somewhere.maybe');
 
+INSERT INTO Pipeline(pipelineId, alias) VALUES
+(1, 'Default'),
+(2, 'Special'),
+(3, 'Delete me');
+
 INSERT INTO Sop(sopId, alias, version, category, url, archived) VALUES
 (1, 'Sample SOP 1', '1.0', 'SAMPLE', 'http://sops.test.com/sample/1/1', FALSE),
 (2, 'Sample SOP 2', '1.0', 'SAMPLE', 'http://sops.test.com/sample/2/1', FALSE),
@@ -451,24 +456,24 @@ INSERT INTO ServiceRecord(recordId, instrumentId, title, details, servicedBy, re
   (151, 101, 'Test 151', NULL, NULL, NULL, '2017-09-12', NULL, NULL, 0),
   (152, 101, 'Test 152', 'details to remove', 'technitchin', 'Riffraff', '2017-09-12', '2017-09-11 11:00:00', '2017-09-12 12:00:00', 1);
 
-INSERT INTO Project(projectId, name, alias, shortName, created, description, status, referenceGenomeId, lastModified, creator, lastModifier) VALUES
-  (1, 'PRO1', 'Project One', 'PONE', '2017-06-27', 'integration test project one', 'ACTIVE', 1, '2017-06-27 14:11:00', 1, 1),
-  (2, 'PRO2', 'Project Two', 'PTWO', '2017-07-20', 'integration test project for custom identities', 'ACTIVE', 1, '2017-07-20 16:55:00', 1, 1),
-  (3, 'PRO3', 'Test Data', 'TEST', '2017-06-27', 'integration test project three', 'ACTIVE', 1, '2017-06-27 14:12:00', 1, 1),
-  (4, 'PRO4', 'Project To Change', 'DELTA', '2017-08-04', 'integration test project for changing fields', 'PROPOSED', 2, '2017-08-04 15:12:00', 1, 1),
-  (5, 'PRO5', 'Search Tables Project', 'SRCH', '2017-10-10', 'integration test project five', 'ACTIVE', 1, '2017-10-10 10:10:10', 1, 1),
-  (6, 'PRO6', 'Subprojects', 'SUBP', '2020-02-20', 'integration test project six', 'ACTIVE', 1, '2020-02-20 11:32:00', 1, 1),
-  (7, 'PRO7', 'Please Delete Me', 'GSLE', '2020-02-25', 'project to delete', 'ACTIVE', 1, '2020-02-25 19:18:00', 3, 3),
-  (100001, 'PRO100001', 'BulkLibraryIT', 'LIBT', '2017-07-24', 'bulk library test project', 'ACTIVE', 1, '2017-07-24 16:11:00', 1, 1),
-  (110001, 'PRO110001', 'SingleLibraryIT', '1LIB', '2017-08-16', 'single library test project', 'ACTIVE', 1, '2017-08-16 16:11:00', 1, 1),
-  (120001, 'PRO120001', 'SinglePoolIT', '1IPO', '2017-08-22', 'single pool test project', 'ACTIVE', 1, '2017-08-22 16:35:00', 1, 1),
-  (200001, 'PRO200001', 'BulkPoolIT', 'IPOT', '2017-08-15', 'bulk Pool test project', 'ACTIVE', 1, '2017-08-15 12:22:00', 1, 1),
-  (200, 'PRO200', 'HotSorting', 'SORT', '2017-08-09', 'test sorting by BoxPosition in Handsontable', 'ACTIVE', 1, '2017-08-09 11:51:00', 1, 1),
-  (300, 'PRO300', 'BulkLibraryAliquotIT', 'DILT', '2017-08-14', 'bulk library aliquot test project', 'ACTIVE', 1, '2017-08-14 11:54:00', 1, 1),
-  (400, 'PRO400', 'StudiesIT', 'STUT', '2017-08-16', 'studies test project', 'ACTIVE', 1, '2017-08-16 14:50:00', 1, 1),
-  (500, 'PRO500', 'Tubes In Boxes', 'TIB', '2017-08-15', 'test tubes in and out of boxes', 'ACTIVE', 1, '2017-08-15 13:45:00', 1, 1),
-  (4440, 'PRO4440', 'Propagate Samples', 'PROP', '2017-10-26', 'propagate samples', 'ACTIVE', 1, '2017-10-26 14:20:00', 1, 1),
-  (2200, 'PRO2200', 'Update Via QC', 'UQC', '2018-07-10', 'update via qc', 'ACTIVE', 1, '2018-07-10 12:52:00', 1, 1);
+INSERT INTO Project(projectId, name, alias, shortName, created, description, status, referenceGenomeId, lastModified, creator, lastModifier, pipelineId) VALUES
+  (1, 'PRO1', 'Project One', 'PONE', '2017-06-27', 'integration test project one', 'ACTIVE', 1, '2017-06-27 14:11:00', 1, 1, 1),
+  (2, 'PRO2', 'Project Two', 'PTWO', '2017-07-20', 'integration test project for custom identities', 'ACTIVE', 1, '2017-07-20 16:55:00', 1, 1, 1),
+  (3, 'PRO3', 'Test Data', 'TEST', '2017-06-27', 'integration test project three', 'ACTIVE', 1, '2017-06-27 14:12:00', 1, 1, 1),
+  (4, 'PRO4', 'Project To Change', 'DELTA', '2017-08-04', 'integration test project for changing fields', 'PROPOSED', 2, '2017-08-04 15:12:00', 1, 1, 1),
+  (5, 'PRO5', 'Search Tables Project', 'SRCH', '2017-10-10', 'integration test project five', 'ACTIVE', 1, '2017-10-10 10:10:10', 1, 1, 1),
+  (6, 'PRO6', 'Subprojects', 'SUBP', '2020-02-20', 'integration test project six', 'ACTIVE', 1, '2020-02-20 11:32:00', 1, 1, 1),
+  (7, 'PRO7', 'Please Delete Me', 'GSLE', '2020-02-25', 'project to delete', 'ACTIVE', 1, '2020-02-25 19:18:00', 3, 3, 1),
+  (100001, 'PRO100001', 'BulkLibraryIT', 'LIBT', '2017-07-24', 'bulk library test project', 'ACTIVE', 1, '2017-07-24 16:11:00', 1, 1, 1),
+  (110001, 'PRO110001', 'SingleLibraryIT', '1LIB', '2017-08-16', 'single library test project', 'ACTIVE', 1, '2017-08-16 16:11:00', 1, 1, 1),
+  (120001, 'PRO120001', 'SinglePoolIT', '1IPO', '2017-08-22', 'single pool test project', 'ACTIVE', 1, '2017-08-22 16:35:00', 1, 1, 1),
+  (200001, 'PRO200001', 'BulkPoolIT', 'IPOT', '2017-08-15', 'bulk Pool test project', 'ACTIVE', 1, '2017-08-15 12:22:00', 1, 1, 1),
+  (200, 'PRO200', 'HotSorting', 'SORT', '2017-08-09', 'test sorting by BoxPosition in Handsontable', 'ACTIVE', 1, '2017-08-09 11:51:00', 1, 1, 1),
+  (300, 'PRO300', 'BulkLibraryAliquotIT', 'DILT', '2017-08-14', 'bulk library aliquot test project', 'ACTIVE', 1, '2017-08-14 11:54:00', 1, 1, 1),
+  (400, 'PRO400', 'StudiesIT', 'STUT', '2017-08-16', 'studies test project', 'ACTIVE', 1, '2017-08-16 14:50:00', 1, 1, 1),
+  (500, 'PRO500', 'Tubes In Boxes', 'TIB', '2017-08-15', 'test tubes in and out of boxes', 'ACTIVE', 1, '2017-08-15 13:45:00', 1, 1, 1),
+  (4440, 'PRO4440', 'Propagate Samples', 'PROP', '2017-10-26', 'propagate samples', 'ACTIVE', 1, '2017-10-26 14:20:00', 1, 1, 1),
+  (2200, 'PRO2200', 'Update Via QC', 'UQC', '2018-07-10', 'update via qc', 'ACTIVE', 1, '2018-07-10 12:52:00', 1, 1, 1);
 
 INSERT INTO Subproject(subprojectId, projectId, alias, referenceGenomeId, description, priority, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 6, 'Subproject 1', 1, 'test subproject one', TRUE, 1, '2020-02-20 11:35:00', 1, '2020-02-20 11:35:00'),

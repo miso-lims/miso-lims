@@ -9,6 +9,10 @@ INSERT INTO _Group (groupId, description, name) VALUES
 INSERT INTO User_Group (users_userId, groups_groupId)
 VALUES (3,1),(3,2),(1,1);
 
+INSERT INTO Pipeline(pipelineId, alias) VALUES
+(1, 'Default'),
+(2, 'Special');
+
 INSERT INTO DetailedQcStatus (DetailedQcStatusId, status, description, noteRequired, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1,TRUE,  'Ready',                  0,1,'2016-09-26 15:55:44',1,'2016-09-26 15:55:44'),
 (2,FALSE, 'Failed: QC',             0,1,'2016-09-26 15:55:44',1,'2016-09-26 15:55:44');
@@ -156,8 +160,8 @@ INSERT INTO SequencingParameters (parametersId, name, instrumentModelId, readLen
 INSERT INTO Instrument (instrumentId, name, instrumentModelId) VALUES
   (1, 'T2500', 1);
 
-INSERT INTO Project(projectId, name, alias, shortName, created, description, status, referenceGenomeId, lastModified, creator, lastModifier) VALUES
-  (1, 'PRO1', 'PLAIN', NULL, '2017-06-27', 'integration test project one', 'ACTIVE', 1, '2017-06-27 14:11:00', 1, 1);
+INSERT INTO Project(projectId, name, alias, shortName, created, description, status, referenceGenomeId, lastModified, creator, lastModifier, pipelineId) VALUES
+  (1, 'PRO1', 'PLAIN', NULL, '2017-06-27', 'integration test project one', 'ACTIVE', 1, '2017-06-27 14:11:00', 1, 1, 1);
   
 INSERT INTO Study (studyId, name, project_projectId, alias, studyTypeId, creator, created, lastModifier, lastModified) VALUES
 (1, 'STU1',  1, 'PLAIN Study One', 1, 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00');

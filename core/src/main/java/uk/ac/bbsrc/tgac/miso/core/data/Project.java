@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Pipeline;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
 
@@ -113,9 +114,9 @@ public interface Project extends Comparable<Project>, Deletable, Nameable, Seria
   @Override
   public boolean isSaved();
 
-  public boolean isClinical();
+  public Pipeline getPipeline();
 
-  public void setClinical(boolean clinical);
+  public void setPipeline(Pipeline pipeline);
 
   public boolean isSecondaryNaming();
 
