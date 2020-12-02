@@ -157,6 +157,10 @@ public class LibraryAliquot extends AbstractBoxable
   private DetailedQcStatus detailedQcStatus;
   private String detailedQcStatusNote;
 
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "qcUser")
+  private User qcUser;
+
   @OneToMany(targetEntity = LibraryAliquotChangeLog.class, mappedBy = "libraryAliquot", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
@@ -443,6 +447,16 @@ public class LibraryAliquot extends AbstractBoxable
   @Override
   public void setDetailedQcStatusNote(String detailedQcStatusNote) {
     this.detailedQcStatusNote = detailedQcStatusNote;
+  }
+
+  @Override
+  public User getQcUser() {
+    return qcUser;
+  }
+
+  @Override
+  public void setQcUser(User qcUser) {
+    this.qcUser = qcUser;
   }
 
   @Override

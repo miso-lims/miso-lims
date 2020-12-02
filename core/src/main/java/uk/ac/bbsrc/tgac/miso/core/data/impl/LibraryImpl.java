@@ -128,6 +128,10 @@ public class LibraryImpl extends AbstractBoxable implements Library {
   private DetailedQcStatus detailedQcStatus;
   private String detailedQcStatusNote;
 
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "qcUser")
+  private User qcUser;
+
   @Column(nullable = false)
   private boolean lowQuality = false;
 
@@ -479,6 +483,16 @@ public class LibraryImpl extends AbstractBoxable implements Library {
   @Override
   public void setDetailedQcStatusNote(String detailedQcStatusNote) {
     this.detailedQcStatusNote = detailedQcStatusNote;
+  }
+
+  @Override
+  public User getQcUser() {
+    return qcUser;
+  }
+
+  @Override
+  public void setQcUser(User qcUser) {
+    this.qcUser = qcUser;
   }
 
   @Override

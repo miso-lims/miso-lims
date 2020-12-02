@@ -492,6 +492,7 @@ public class Dtos {
     dto.setSampleType(from.getSampleType());
     setId(dto::setDetailedQcStatusId, from.getDetailedQcStatus());
     setString(dto::setDetailedQcStatusNote, from.getDetailedQcStatusNote());
+    setString(dto::setQcUserName, maybeGetProperty(from.getQcUser(), User::getFullName));
     dto.setAlias(from.getAlias());
     dto.setProjectId(from.getProject().getId());
     dto.setProjectName(from.getProject().getName());
@@ -1356,6 +1357,7 @@ public class Dtos {
     }
     setId(dto::setDetailedQcStatusId, from.getDetailedQcStatus());
     setString(dto::setDetailedQcStatusNote, from.getDetailedQcStatusNote());
+    setString(dto::setQcUserName, maybeGetProperty(from.getQcUser(), User::getFullName));
     dto.setLowQuality(from.isLowQuality());
     dto.setPaired(from.getPaired());
     if (from.getPlatformType() != null) {
@@ -1676,6 +1678,7 @@ public class Dtos {
     setDateTimeString(dto::setLastModified, from.getLastModified());
     setId(dto::setDetailedQcStatusId, from.getDetailedQcStatus());
     setString(dto::setDetailedQcStatusNote, from.getDetailedQcStatusNote());
+    setString(dto::setQcUserName, maybeGetProperty(from.getQcUser(), User::getFullName));
     setEffectiveQcFailure(from, dto);
     return dto;
   }
@@ -1750,6 +1753,7 @@ public class Dtos {
     setString(dto::setSequencingControlTypeAlias, maybeGetProperty(from.getSampleSequencingControlType(), SequencingControlType::getAlias));
     setId(dto::setDetailedQcStatusId, from.getDetailedQcStatus());
     setString(dto::setDetailedQcStatusNote, from.getDetailedQcStatusNote());
+    setString(dto::setQcUserName, maybeGetProperty(from.getQcUser(), User::getFullName));
 
     if (from.getAliquot() != null) {
       List<Long> parentAliquotIds = new ArrayList<>();
@@ -4038,6 +4042,7 @@ public class Dtos {
     setId(to::setRunPurposeId, from.getPurpose());
     setBoolean(to::setQcPassed, from.getQcPassed(), true);
     setString(to::setQcNote, from.getQcNote());
+    setString(to::setQcUserName, maybeGetProperty(from.getQcUser(), User::getFullName));
     return to;
   }
 

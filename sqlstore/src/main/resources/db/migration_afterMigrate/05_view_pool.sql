@@ -20,6 +20,7 @@ AS SELECT
     d.discarded AS discarded,
     d.detailedQcStatusId AS detailedQcStatusId,
     d.detailedQcStatusNote AS detailedQcStatusNote,
+    d.qcUser AS qcUser,
     dist.distributed AS distributed,
     l.libraryId AS libraryId,
     l.name AS libraryName,

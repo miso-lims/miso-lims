@@ -82,6 +82,10 @@ public class PoolableElementView implements DetailedQcItem, Identifiable, Serial
   private DetailedQcStatus detailedQcStatus;
   private String detailedQcStatusNote;
 
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "qcUser")
+  private User qcUser;
+
   @ManyToOne
   @JoinColumn(name = "libraryDesignCodeId")
   private LibraryDesignCode aliquotDesignCode;
@@ -313,6 +317,16 @@ public class PoolableElementView implements DetailedQcItem, Identifiable, Serial
   @Override
   public void setDetailedQcStatusNote(String detailedQcStatusNote) {
     this.detailedQcStatusNote = detailedQcStatusNote;
+  }
+
+  @Override
+  public User getQcUser() {
+    return qcUser;
+  }
+
+  @Override
+  public void setQcUser(User qcUser) {
+    this.qcUser = qcUser;
   }
 
   public LibraryDesignCode getAliquotDesignCode() {

@@ -16,6 +16,7 @@ public class RunPartitionAliquotDto {
   public Long runPurposeId;
   public Boolean qcPassed;
   public String qcNote;
+  public String qcUserName;
 
   public Long getId() {
     return id;
@@ -119,6 +120,14 @@ public class RunPartitionAliquotDto {
 
   public void setQcNote(String qcNote) {
     this.qcNote = qcNote;
+  }
+
+  public String getQcUserName() {
+    return qcUserName;
+  }
+
+  public void setQcUserName(String qcUserName) {
+    this.qcUserName = qcUserName;
   }
 
 }
