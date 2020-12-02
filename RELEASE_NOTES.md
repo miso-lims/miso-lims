@@ -7,6 +7,7 @@ Changes:
     name doesn't exactly match the original spec.
   * Fixed error displaying/validating QC type when editing QC with an archived QC type
   * Fixed targeted sequencing archived field not saving
+  * (Detailed Sample) Subproject is no longer required for samples in projects that have subprojects
 
 Upgrade Notes:
 
