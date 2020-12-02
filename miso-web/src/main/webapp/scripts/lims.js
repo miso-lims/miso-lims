@@ -543,6 +543,9 @@ var Utils = Utils
                 });
               });
             }
+            if (responseObj.data && responseObj.data.uiHelp) {
+              lines.push(responseObj.data.uiHelp);
+            }
           }
         } catch (e) {
           // If we got detail, great; if we didn't meh.
