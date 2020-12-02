@@ -31,23 +31,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 public interface ProjectService extends DeleterService<Project>, ListService<Project>, SaveService<Project> {
 
 
-  // GETS
-  public Project getProjectByAlias(String projectAlias) throws IOException;
-
   public Project getProjectByShortName(String projectShortName) throws IOException;
-
-  // LISTS
-  public Collection<Project> listAllProjectsWithLimit(long limit) throws IOException;
 
   public Collection<Project> listAllProjectsBySearch(String query) throws IOException;
 
-  /**
-   * Obtain a list of all the projects the user has access to, sorted alphabetically by shortname.
-   * Used for displaying lists in Detailed Sample mode.
-   * 
-   * @return Collection of Projects sorted alphabetically by shortname.
-   * @throws IOException upon failure to access Projects
-   */
-  public Collection<Project> listAllProjectsByShortname() throws IOException;
+  public boolean hasSamples(Project project) throws IOException;
 
 }

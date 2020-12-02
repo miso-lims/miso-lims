@@ -3,11 +3,15 @@
 Changes:
 
   * Allowed assigning a barcode to loose storage
+  * Record the user who sets QC status on samples, libraries, library aliquots, and run-libraries
+  * Added changelog message to QC target (e.g. sample) when QCs are deleted
+  * Improved performance of Edit Project page
   * Fixed RNA Library Preparation spreadsheet download and Pinery-MISO excluding some QCs if QC type
     name doesn't exactly match the original spec.
   * Fixed error displaying/validating QC type when editing QC with an archived QC type
   * Fixed targeted sequencing archived field not saving
   * (Detailed Sample) Subproject is no longer required for samples in projects that have subprojects
+  * Fixed login timeout message not being displayed in some places
 
 Upgrade Notes:
 

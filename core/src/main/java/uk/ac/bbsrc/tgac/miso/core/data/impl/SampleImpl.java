@@ -142,6 +142,10 @@ public class SampleImpl extends AbstractBoxable implements Sample {
   private String detailedQcStatusNote;
 
   @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "qcUser")
+  private User qcUser;
+
+  @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "creator", nullable = false, updatable = false)
   private User creator;
 
@@ -614,6 +618,16 @@ public class SampleImpl extends AbstractBoxable implements Sample {
   @Override
   public void setDetailedQcStatusNote(String detailedQcStatusNote) {
     this.detailedQcStatusNote = detailedQcStatusNote;
+  }
+
+  @Override
+  public User getQcUser() {
+    return qcUser;
+  }
+
+  @Override
+  public void setQcUser(User qcUser) {
+    this.qcUser = qcUser;
   }
 
   @Override

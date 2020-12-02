@@ -71,12 +71,17 @@ var Validate = Validate || {
     Validate.clearErrors(formSelector);
     jQuery(formSelector + ' .bs-callout-warning').removeClass('hidden');
 
-    if (!restError || !restError.data || restError.dataFormat !== 'validation') {
+    if (!restError || !restError.data) {
       Validate.displayError(formId, 'GENERAL', 'Something has gone terribly wrong. Please report this to your MISO administrator.');
-    } else {
+    } else if (restError.dataFormat === 'validation') {
       jQuery.each(restError.data, function(key, value) {
         Validate.displayError(formId, key, value);
       });
+    } else {
+      Validate.displayError(formId, 'GENERAL', restError.detail);
+      if (restError.data && restError.data.uiHelp) {
+        Validate.displayError(formId, 'GENERAL', restError.data.uiHelp);
+      }
     }
   },
 

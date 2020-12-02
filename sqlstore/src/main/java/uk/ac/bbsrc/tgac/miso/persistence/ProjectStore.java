@@ -49,17 +49,6 @@ public interface ProjectStore extends Store<Project> {
   Project getByShortName(String shortName) throws IOException;
 
   /**
-   * Get a parent Project related to a Study given a Study ID
-   * 
-   * @param studyId
-   *          of type long
-   * @return Project
-   * @throws IOException
-   *           when
-   */
-  Project getByStudyId(long studyId) throws IOException;
-
-  /**
    * List all Projects that match a search criteria
    * 
    * @param query
@@ -69,14 +58,7 @@ public interface ProjectStore extends Store<Project> {
    *           when
    */
   Collection<Project> listBySearch(String query) throws IOException;
-
-  /**
-   * List all persisted objects
-   * 
-   * @return Collection<Project>
-   * @throws IOException
-   *           when the objects cannot be retrieved
-   */
-  Collection<Project> listAllWithLimit(long limit) throws IOException;
+  
+  long getUsage(Project project) throws IOException;
 
 }

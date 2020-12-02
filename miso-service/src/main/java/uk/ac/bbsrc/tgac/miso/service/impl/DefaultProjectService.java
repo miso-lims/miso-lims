@@ -90,11 +90,6 @@ public class DefaultProjectService implements ProjectService {
   }
 
   @Override
-  public Project getProjectByAlias(String projectAlias) throws IOException {
-    return projectStore.getByAlias(projectAlias);
-  }
-
-  @Override
   public Project getProjectByShortName(String projectShortName) throws IOException {
     return projectStore.getByShortName(projectShortName);
   }
@@ -107,23 +102,6 @@ public class DefaultProjectService implements ProjectService {
   @Override
   public Collection<Project> listAllProjectsBySearch(String query) throws IOException {
     return projectStore.listBySearch(query);
-  }
-
-  @Override
-  public Collection<Project> listAllProjectsWithLimit(long limit) throws IOException {
-    return projectStore.listAllWithLimit(limit);
-  }
-
-  @Override
-  public Collection<Project> listAllProjectsByShortname() throws IOException {
-    List<Project> sortedProjects = projectStore.listAll();
-
-    /**
-     * Uses String.compareTo to alphabetically sort Projects by shortname
-     */
-    sortedProjects.sort((Project p1, Project p2) -> p1.getShortName().compareTo(p2.getShortName()));
-
-    return sortedProjects;
   }
 
   @Override
@@ -160,7 +138,7 @@ public class DefaultProjectService implements ProjectService {
     NamingScheme namingScheme = namingSchemeHolder.get(project.isSecondaryNaming());
     if (ValidationUtils.isSetAndChanged(Project::getShortName, project, beforeChange)) {
       // assume that if project shortname is required, it is used for generating sample aliases
-      if (beforeChange != null && !namingScheme.nullProjectShortNameAllowed() && !beforeChange.getSamples().isEmpty()) {
+      if (beforeChange != null && !namingScheme.nullProjectShortNameAllowed() && hasSamples(beforeChange)) {
         errors.add(new ValidationError("shortName", "Cannot change because there are already samples in the project"));
       }
     }
@@ -172,7 +150,8 @@ public class DefaultProjectService implements ProjectService {
         && (project.getShortName() != null && getProjectByShortName(project.getShortName()) != null)) {
       errors.add(new ValidationError("shortName", "There is already a project with this short name"));
     }
-    if ((beforeChange == null || !project.getAlias().equals(beforeChange.getAlias())) && getProjectByAlias(project.getAlias()) != null) {
+    if ((beforeChange == null || !project.getAlias().equals(beforeChange.getAlias()))
+        && projectStore.getByAlias(project.getAlias()) != null) {
       errors.add(new ValidationError("alias", "There is already a project with this alias"));
     }
 
@@ -262,6 +241,12 @@ public class DefaultProjectService implements ProjectService {
   @Override
   public void afterDelete(Project object) throws IOException {
     fileAttachmentService.afterDelete(object);
+  }
+
+  @Override
+  public boolean hasSamples(Project project) throws IOException {
+    Project managed = projectStore.get(project.getId());
+    return projectStore.getUsage(managed) > 0L;
   }
 
 }

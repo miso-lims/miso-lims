@@ -792,6 +792,8 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   }
 
   private void validateChange(Sample sample, Sample beforeChange) throws IOException {
+    updateDetailedQcStatusUser(sample, beforeChange, authorizationManager);
+
     List<ValidationError> errors = new ArrayList<>();
     validateConcentrationUnits(sample.getConcentration(), sample.getConcentrationUnits(), errors);
     validateVolumeUnits(sample.getVolume(), sample.getVolumeUnits(), errors);
@@ -889,6 +891,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     target.setSop(source.getSop());
     target.setDetailedQcStatus(source.getDetailedQcStatus());
     target.setDetailedQcStatusNote(nullifyStringIfBlank(source.getDetailedQcStatusNote()));
+    target.setQcUser(source.getQcUser());
 
     if (isDetailedSample(target)) {
       DetailedSample dTarget = (DetailedSample) target;

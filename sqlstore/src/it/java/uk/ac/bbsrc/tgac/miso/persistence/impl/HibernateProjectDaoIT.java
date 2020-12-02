@@ -93,17 +93,6 @@ public class HibernateProjectDaoIT extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#listAllWithLimit(long)} .
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testListAllWithLimit() throws IOException {
-    List<Project> projects = projectDAO.listAllWithLimit(2L);
-    assertEquals(2, projects.size());
-  }
-
-  /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#count()}.
    * 
    * @throws IOException
@@ -147,15 +136,10 @@ public class HibernateProjectDaoIT extends AbstractDAOTest {
     assertEquals(expected, p.getShortName());
   }
 
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#getByStudyId(long)}.
-   * 
-   * @throws IOException
-   */
   @Test
-  public void testGetByStudyId() throws IOException {
-    Project p = projectDAO.getByStudyId(1L);
-    assertNotNull(p);
+  public void testGetUsage() throws Exception {
+    Project proj = (Project) currentSession().get(ProjectImpl.class, 1L);
+    assertEquals(21L, projectDAO.getUsage(proj));
   }
 
 }
