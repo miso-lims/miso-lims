@@ -817,14 +817,6 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
 
   private void validateSubproject(Sample sample, Sample beforeChange, List<ValidationError> errors) throws IOException {
     DetailedSample detailed = (DetailedSample) sample;
-    DetailedSample beforeDetailed = beforeChange == null ? null : (DetailedSample) beforeChange;
-    if (isChanged(DetailedSample::getSubproject, detailed, beforeDetailed)
-        || isChanged(Sample::getProject, detailed, beforeDetailed)) {
-      Set<Subproject> subprojects = subprojectService.listByProjectId(detailed.getProject().getId());
-      if (!subprojects.isEmpty() && detailed.getSubproject() == null) {
-        errors.add(new ValidationError("subprojectId", "Subproject must be specified"));
-      }
-    }
     if (detailed.getSubproject() != null && detailed.getSubproject().getParentProject().getId() != detailed.getProject().getId()) {
       errors.add(new ValidationError("subprojectId", "Subproject does not belong to the selected project"));
     }
