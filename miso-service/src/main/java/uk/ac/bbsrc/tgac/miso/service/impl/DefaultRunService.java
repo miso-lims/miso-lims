@@ -324,8 +324,8 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     if (run.getSequencingKit() != null) {
       run.setSequencingKit(kitDescriptorService.get(run.getSequencingKit().getId()));
     }
-    if (run.getDataApprover() != null) {
-      run.setDataApprover(userService.get(run.getDataApprover().getId()));
+    if (run.getDataReviewer() != null) {
+      run.setDataReviewer(userService.get(run.getDataReviewer().getId()));
     }
     if (run.getRunPositions() != null) {
       for (RunPosition position : run.getRunPositions()) {
@@ -336,6 +336,9 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   }
 
   private void validateChanges(Run before, Run changed) throws IOException {
+    ValidationUtils.updateQcUser(changed, before, Run::getQcPassed, Run::getQcUser, Run::setQcUser, authorizationManager);
+    ValidationUtils.updateQcUser(changed, before, Run::getDataReview, Run::getDataReviewer, Run::setDataReviewer, authorizationManager);
+
     List<ValidationError> errors = new ArrayList<>();
 
     if (!changed.getHealth().isDone()) {
@@ -372,13 +375,13 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       errors.add(new ValidationError("sequencingKitLot", "Sequencing kit not specified"));
     }
 
+    ValidationUtils.validateQcUser(changed.getQcPassed(), changed.getQcUser(), errors);
+    ValidationUtils.validateQcUser(changed.getDataReview(), changed.getDataReviewer(), errors, "data review", "Data reviewer");
+
     User user = authorizationManager.getCurrentUser();
-    if (((before == null && changed.isDataApproved() != null) || (before != null && isChanged(Run::isDataApproved, changed, before)))
-        && !user.isRunApprover() && !user.isAdmin()) {
-      errors.add(new ValidationError("dataApproved", "You are not authorized to make this change"));
-    }
-    if (changed.isDataApproved() != null && changed.getDataApprover() == null) {
-      errors.add(new ValidationError("dataApproverId", "Must be set when approval is specified"));
+    if (((before == null && changed.getDataReview() != null) || (before != null && isChanged(Run::getDataReview, changed, before)))
+        && !user.isRunReviewer() && !user.isAdmin()) {
+      errors.add(new ValidationError("dataReview", "You are not authorized to make this change"));
     }
 
     if (changed.getSequencerPartitionContainers() != null) {
@@ -395,7 +398,6 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
         }
       }
     }
-
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
@@ -418,8 +420,10 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     target.setSequencer(source.getSequencer());
     target.setSequencingKit(source.getSequencingKit());
     target.setSequencingKitLot(source.getSequencingKitLot());
-    target.setDataApproved(source.isDataApproved());
-    target.setDataApprover(target.isDataApproved() == null ? null : source.getDataApprover());
+    target.setQcPassed(source.getQcPassed());
+    target.setQcUser(source.getQcUser());
+    target.setDataReview(source.getDataReview());
+    target.setDataReviewer(source.getDataReviewer());
     target.setSop(source.getSop());
     target.setDataManglingPolicy(source.getDataManglingPolicy());
     if (isIlluminaRun(target)) {

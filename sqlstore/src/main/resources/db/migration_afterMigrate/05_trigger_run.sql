@@ -16,8 +16,10 @@ FOR EACH ROW
     makeChangeMessage('startDate', OLD.startDate, NEW.startDate),
     makeChangeMessage('parameters', (SELECT name FROM SequencingParameters WHERE parametersId = OLD.sequencingParameters_parametersId), (SELECT name FROM SequencingParameters WHERE parametersId = NEW.sequencingParameters_parametersId)),
     makeChangeMessage('sequencer', (SELECT name FROM Instrument WHERE instrumentId = OLD.instrumentId), (SELECT name FROM Instrument WHERE instrumentId = NEW.instrumentId)),
-    makeChangeMessage('data approved', booleanToString(OLD.dataApproved), booleanToString(NEW.dataApproved)),
-    makeChangeMessage('data approver', (SELECT fullName FROM User WHERE userId = OLD.dataApproverId), (SELECT fullName FROM User WHERE userId = NEW.dataApproverId)),
+    makeChangeMessage('QC passed', OLD.qcPassed, NEW.qcPassed),
+    makeChangeMessage('QC user', (SELECT fullName FROM User WHERE userId = OLD.qcUser), (SELECT fullName FROM User WHERE userId = NEW.qcUser)),
+    makeChangeMessage('data review', CASE OLD.dataReview WHEN TRUE THEN 'Pass' WHEN FALSE THEN 'Fail' ELSE 'n/a' END, CASE NEW.dataReview WHEN TRUE THEN 'Pass' WHEN FALSE THEN 'Fail' ELSE 'n/a' END),
+    makeChangeMessage('data reviewer', (SELECT fullName FROM User WHERE userId = OLD.dataReviewerId), (SELECT fullName FROM User WHERE userId = NEW.dataReviewerId)),
     makeChangeMessage('SOP', (SELECT CONCAT(alias, ' (', version, ')') FROM Sop WHERE sopId = OLD.sopId), (SELECT CONCAT(alias, ' (', version, ')') FROM Sop WHERE sopId = NEW.sopId)),
     makeChangeMessage('index sequencing', OLD.dataManglingPolicy, NEW.dataManglingPolicy)
   );
@@ -35,8 +37,10 @@ FOR EACH ROW
         makeChangeColumn('startDate', OLD.startDate, NEW.startDate),
         makeChangeColumn('sequencingParameters_parametersId', OLD.sequencingParameters_parametersId, NEW.sequencingParameters_parametersId),
         makeChangeColumn('instrumentId', OLD.instrumentId, NEW.instrumentId),
-        makeChangeColumn('dataApproved', OLD.dataApproved, NEW.dataApproved),
-        makeChangeColumn('dataApproverId', OLD.dataApproverId, NEW.dataApproverId),
+        makeChangeColumn('qcPassed', OLD.qcPassed, NEW.qcPassed),
+        makeChangeColumn('qcUser', OLD.qcUser, NEW.qcUser),
+        makeChangeColumn('dataReview', OLD.dataReview, NEW.dataReview),
+        makeChangeColumn('dataReviewerId', OLD.dataReviewerId, NEW.dataReviewerId),
         makeChangeColumn('sopId', OLD.sopId, NEW.sopId),
         makeChangeColumn('dataManglingPolicy', OLD.dataManglingPolicy, NEW.dataManglingPolicy)
       ), ''),

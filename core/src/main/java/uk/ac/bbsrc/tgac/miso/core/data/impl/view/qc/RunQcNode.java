@@ -6,15 +6,12 @@ import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.hibernate.annotations.Immutable;
 
-import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
@@ -30,9 +27,7 @@ public class RunQcNode implements QcNode {
 
   private String name;
   private String alias;
-
-  @Enumerated(EnumType.STRING)
-  private HealthType health;
+  private Boolean qcPassed;
 
   @Transient
   private List<RunPartitionQcNode> runPartitions;
@@ -80,13 +75,11 @@ public class RunQcNode implements QcNode {
 
   @Override
   public Boolean getQcPassed() {
-    if (getHealth() == HealthType.Completed) {
-      return true;
-    } else if (getHealth() == HealthType.Failed) {
-      return false;
-    } else {
-      return null;
-    }
+    return qcPassed;
+  }
+
+  public void setQcPassed(Boolean qcPassed) {
+    this.qcPassed = qcPassed;
   }
 
   @Override
@@ -97,14 +90,6 @@ public class RunQcNode implements QcNode {
   @Override
   public String getQcNote() {
     return null;
-  }
-
-  public HealthType getHealth() {
-    return health;
-  }
-
-  public void setHealth(HealthType health) {
-    this.health = health;
   }
 
   public List<RunPartitionQcNode> getRunPartitions() {
@@ -119,25 +104,20 @@ public class RunQcNode implements QcNode {
   }
 
   @Override
-  public String getRunStatus() {
-    return health == null ? null : health.getKey();
-  }
-
-  @Override
   public List<? extends QcNode> getChildren() {
     return getRunPartitions();
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(alias, health, id, name);
+    return Objects.hash(alias, qcPassed, id, name);
   }
 
   @Override
   public boolean equals(Object obj) {
     return LimsUtils.equals(this, obj,
         RunQcNode::getAlias,
-        RunQcNode::getHealth,
+        RunQcNode::getQcPassed,
         RunQcNode::getId,
         RunQcNode::getName);
   }

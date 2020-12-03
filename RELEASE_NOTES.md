@@ -4,6 +4,10 @@ Changes:
 
   * Allowed assigning a barcode to loose storage
   * Record the user who sets QC status on samples, libraries, library aliquots, and run-libraries
+  * Added run QC Status field
+  * Changed QC Hierarchy and Run-Library Metrics pages to allow setting run QC Status instead of Run
+    Status
+  * Renamed run Data Approved field to Data Review, and Run Approvers group to Run Reviewers
   * Added changelog message to QC target (e.g. sample) when QCs are deleted
   * Improved performance of Edit Project page
   * Fixed RNA Library Preparation spreadsheet download and Pinery-MISO excluding some QCs if QC type

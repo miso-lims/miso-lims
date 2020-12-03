@@ -94,10 +94,15 @@ public class ValidationUtils {
   }
 
   public static void validateQcUser(Object qcStatus, User qcUser, Collection<ValidationError> errors) {
+    validateQcUser(qcStatus, qcUser, errors, "QC status", "QC user");
+  }
+
+  public static void validateQcUser(Object qcStatus, User qcUser, Collection<ValidationError> errors, String qcFieldLabel,
+      String qcUserLabel) {
     if (qcStatus == null && qcUser != null) {
-      errors.add(new ValidationError("QC user cannot be set when QC status is not specified"));
+      errors.add(new ValidationError(String.format("%s cannot be set when %s is not specified", qcUserLabel, qcFieldLabel)));
     } else if (qcStatus != null && qcUser == null) {
-      errors.add(new ValidationError("QC user must be set when QC statis is specified"));
+      errors.add(new ValidationError("%s must be set when %s is specified"));
     }
   }
 

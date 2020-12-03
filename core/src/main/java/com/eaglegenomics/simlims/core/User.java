@@ -45,7 +45,7 @@ public interface User extends Serializable, Comparable<User>, Deletable, Identif
 
   boolean isInternal();
 
-  boolean isRunApprover();
+  boolean isRunReviewer();
 
   Set<WorkflowName> getFavouriteWorkflows();
 

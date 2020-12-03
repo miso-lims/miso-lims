@@ -193,38 +193,16 @@ var RunLibraryMetrics = (function($) {
       updateQcCellDetailedQcStatus(controls, qcNode, rowData);
       break;
     case 'Pool':
-      controls.status.append(QcHierarchy.poolQcOptions.map(function(item, i) {
+    case 'Run':
+      controls.status.append(QcHierarchy.qcPassedOptions.map(function(item, i) {
         var qcPassed = qcNode.qcPassed === undefined ? null : qcNode.qcPassed;
         return makeSelectOption(i, item.label, qcPassed === item.value);
       }));
 
       rowData.getUpdate = function() {
         return {
-          qcPassed: QcHierarchy.poolQcOptions[controls.status.val()].value
+          qcPassed: QcHierarchy.qcPassedOptions[controls.status.val()].value
         };
-      };
-      break;
-    case 'Run':
-      controls.status.append(Constants.healthTypes.map(function(item) {
-        return makeSelectOption(item.label, item.label, qcNode.runStatus === item.label);
-      }));
-
-      rowData.getUpdate = function() {
-        var update = {
-          runStatus: controls.status.val()
-        };
-        switch (update.runStatus) {
-        case 'Completed':
-          update.qcPassed = true;
-          break;
-        case 'Failed':
-          update.qcPassed = false;
-          break;
-        default:
-          update.qcPassed = null;
-          break;
-        }
-        return update;
       };
       break;
     case 'Run-Partition':

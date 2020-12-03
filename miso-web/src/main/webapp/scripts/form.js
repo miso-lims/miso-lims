@@ -187,6 +187,29 @@ FormUtils = (function($) {
       return initializedForms.indexOf(formId) !== -1;
     },
 
+    makeQcPassedField: function() {
+      return {
+        title: 'QC Status',
+        data: 'qcPassed',
+        type: 'dropdown',
+        source: [{
+          label: 'Ready',
+          value: true
+        }, {
+          label: 'Failed',
+          value: false
+        }],
+        convertToBoolean: true,
+        getItemLabel: function(item) {
+          return item.label;
+        },
+        getItemValue: function(item) {
+          return item.value;
+        },
+        nullLabel: 'Not Ready'
+      };
+    },
+
     makeQcUserField: function() {
       return {
         title: 'QC User',

@@ -35,7 +35,7 @@ public class Group implements Serializable, Comparable<Group>, Deletable, Identi
   private static final long serialVersionUID = 1L;
   private static final long UNSAVED_ID = 0L;
 
-  public static final String RUN_APPROVERS = "Run Approvers";
+  public static final String RUN_REVIEWERS = "Run Reviewers";
 
   private String description = "";
   private String name = "";

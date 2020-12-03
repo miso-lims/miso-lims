@@ -304,8 +304,8 @@ public class UserImpl implements User, Serializable {
   }
 
   @Override
-  public boolean isRunApprover() {
-    return getGroups().stream().anyMatch(group -> Group.RUN_APPROVERS.equals(group.getName()));
+  public boolean isRunReviewer() {
+    return getGroups().stream().anyMatch(group -> Group.RUN_REVIEWERS.equals(group.getName()));
   }
 
 }

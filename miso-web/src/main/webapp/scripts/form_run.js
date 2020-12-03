@@ -6,9 +6,7 @@ FormTarget.run = (function($) {
   /*
    * Expected config {
    *   isAdmin: boolean,
-   *   isRunApprover: boolean,
-   *   userId: integer (if isRunApprover),
-   *   userFullName: string (if isRunApprover),
+   *   isRunReviewer: boolean,
    *   sops: array
    * }
    */
@@ -230,16 +228,16 @@ FormTarget.run = (function($) {
           title: 'Completion Date',
           data: 'endDate',
           type: 'date'
-        }, {
-          title: 'Data Approved',
-          data: 'dataApproved',
+        }, FormUtils.makeQcPassedField(), FormUtils.makeQcUserField(), {
+          title: 'Data Review',
+          data: 'dataReview',
           type: 'dropdown',
-          include: config.isRunApprover,
+          include: config.isRunReviewer,
           source: [{
-            label: 'Yes',
+            label: 'Pass',
             value: true
           }, {
-            label: 'No',
+            label: 'Fail',
             value: false
           }],
           convertToBoolean: true,
@@ -249,40 +247,27 @@ FormTarget.run = (function($) {
           getItemValue: function(item) {
             return item.value;
           },
-          nullLabel: 'Unknown',
-          onChange: function(newValue, form) {
-            if (newValue != null) {
-              form.updateField('dataApproverId', {
-                value: config.userId,
-                label: config.userFullName
-              });
-            } else {
-              form.updateField('dataApproverId', {
-                value: null,
-                label: 'n/a'
-              });
-            }
-          }
+          nullLabel: 'Pending'
         }, {
-          title: 'Data Approved',
-          data: 'dataApproved',
+          title: 'Data Review',
+          data: 'dataReview',
           type: 'read-only',
           getDisplayValue: function(item) {
-            if (item.dataApproved === true) {
-              return 'Yes';
-            } else if (item.dataApproved === false) {
-              return 'No';
+            if (item.dataReview === true) {
+              return 'Pass';
+            } else if (item.dataReview === false) {
+              return 'Fail';
             } else {
-              return 'Unknown';
+              return 'Pending';
             }
           },
-          include: !config.isRunApprover
+          include: !config.isRunReviewer
         }, {
-          title: 'Data Approver',
-          data: 'dataApproverId',
+          title: 'Data Reviewer',
+          data: 'dataReviewerName',
           type: 'read-only',
           getDisplayValue: function(run) {
-            return run.dataApproverName || 'n/a';
+            return run.dataReviewerName || 'n/a';
           }
         }])
       }];

@@ -1,7 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc;
 
-import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
-
 public class QcStatusUpdate {
 
   private QcNodeType entityType;
@@ -9,7 +7,6 @@ public class QcStatusUpdate {
   private Long[] ids; // used for runPartitions and runPartitionAliquots. IDs are in same order as entity type name
   private Boolean qcPassed;
   private Long qcStatusId; // may be detailedQcStatusId or partitionQcTypeId
-  private HealthType runStatus;
   private String qcNote;
 
   public QcNodeType getEntityType() {
@@ -50,14 +47,6 @@ public class QcStatusUpdate {
 
   public void setQcStatusId(Long qcStatusId) {
     this.qcStatusId = qcStatusId;
-  }
-
-  public HealthType getRunStatus() {
-    return runStatus;
-  }
-
-  public void setRunStatus(HealthType runStatus) {
-    this.runStatus = runStatus;
   }
 
   public String getQcNote() {

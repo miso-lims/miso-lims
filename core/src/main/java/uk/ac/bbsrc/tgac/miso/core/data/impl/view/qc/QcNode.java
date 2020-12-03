@@ -25,8 +25,6 @@ public interface QcNode extends Serializable {
 
   public String getQcNote();
 
-  public String getRunStatus();
-
   public List<? extends QcNode> getChildren();
 
 }

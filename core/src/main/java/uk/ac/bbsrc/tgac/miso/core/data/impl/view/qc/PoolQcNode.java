@@ -103,11 +103,6 @@ public class PoolQcNode implements QcNode {
   }
 
   @Override
-  public String getRunStatus() {
-    return null;
-  }
-
-  @Override
   public List<RunQcNode> getChildren() {
     return getRuns();
   }

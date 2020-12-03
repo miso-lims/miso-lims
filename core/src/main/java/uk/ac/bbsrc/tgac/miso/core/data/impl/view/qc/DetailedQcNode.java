@@ -77,9 +77,4 @@ public abstract class DetailedQcNode implements QcNode {
     return getDetailedQcStatusNote();
   }
 
-  @Override
-  public String getRunStatus() {
-    return null;
-  }
-
 }
