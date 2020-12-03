@@ -1,3 +1,12 @@
+-- drop_samplegroup
+-- Disable "does not exist" warnings
+SET sql_notes = 0;
+
+DROP TABLE IF EXISTS SampleGroup;
+
+SET sql_notes = 1;
+
+-- qc_user
 -- These will get re-created in afterMigrate. Need to be removed to avoid interfering with updates
 DROP TRIGGER IF EXISTS SampleChange;
 DROP TRIGGER IF EXISTS LibraryChange;
@@ -48,3 +57,38 @@ SET rla.qcUser = COALESCE((
   AND message LIKE CONCAT(spc.identificationBarcode, '-', part.partitionNumber, '-', ali.alias, '%')
   ORDER BY changeTime DESC LIMIT 1
 ), @admin) WHERE qcPassed IS NOT NULL;
+
+-- run_signoffs
+ALTER TABLE Run ADD COLUMN qcPassed BOOLEAN;
+ALTER TABLE Run ADD COLUMN qcUser bigint(20);
+ALTER TABLE Run ADD CONSTRAINT fk_run_qcUser FOREIGN KEY (qcUser) REFERENCES User (userId);
+ALTER TABLE Run CHANGE COLUMN dataApproved dataReview BOOLEAN;
+ALTER TABLE Run CHANGE COLUMN dataApproverId dataReviewerId bigint(20);
+
+UPDATE _Group SET name = 'Run Reviewers' WHERE name = 'Run Approvers';
+
+-- project_pipeline
+CREATE TABLE Pipeline (
+  pipelineId bigint(20) NOT NULL AUTO_INCREMENT,
+  alias varchar(50) NOT NULL,
+  PRIMARY KEY (pipelineId),
+  CONSTRAINT uk_pipeline_alias UNIQUE (alias)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO Pipeline (alias) VALUES ('Default');
+INSERT INTO Pipeline (alias)
+SELECT 'Clinical' FROM DUAL
+WHERE (SELECT COUNT(*) FROM (SELECT DISTINCT clinical FROM Project) sub) > 1;
+
+ALTER TABLE Project ADD COLUMN pipelineId bigint(20);
+
+UPDATE Project SET pipelineId = (SELECT pipelineId FROM Pipeline WHERE alias = 'Default');
+UPDATE Project SET pipelineId = (SELECT pipelineId FROM Pipeline WHERE alias = 'Clinical')
+WHERE (SELECT COUNT(*) FROM (SELECT DISTINCT clinical FROM Project) sub) > 1
+AND clinical = TRUE;
+
+ALTER TABLE Project MODIFY COLUMN pipelineId bigint(20) NOT NULL;
+ALTER TABLE Project ADD CONSTRAINT fk_project_pipeline FOREIGN KEY (pipelineId) REFERENCES Pipeline (pipelineId);
+
+ALTER TABLE Project DROP COLUMN clinical;
+

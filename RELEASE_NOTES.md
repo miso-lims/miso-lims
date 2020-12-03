@@ -2,6 +2,12 @@
 
 Changes:
 
+
+
+# 1.19.0
+
+Changes:
+
   * Allowed assigning a barcode to loose storage
   * Record the user who sets QC status on samples, libraries, library aliquots, and run-libraries
   * Added run QC Status field
