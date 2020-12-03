@@ -16,7 +16,7 @@ Changes:
 
 Upgrade Notes:
 
-  * Updated to Pinery v2.14.2
+  * Updated to Pinery v2.15.0
   * For the change from project "clinical" flag to "pipeline" field, a pipeline named "Default" is
     created and assigned to all projects. If you had specified some projects as clinical, and some
     not clinical, then a second "Clinical" pipeline will also be created and assigned to projects
