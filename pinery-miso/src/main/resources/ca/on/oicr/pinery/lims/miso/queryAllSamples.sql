@@ -99,7 +99,7 @@ LEFT JOIN (
         SELECT sample_sampleId, type, MAX(date) AS maxDate
         FROM SampleQC
         JOIN QCType ON QCType.qcTypeId = SampleQC.type
-        WHERE QCType.name = '%Qubit%'
+        WHERE QCType.name LIKE '%Qubit%'
         GROUP By sample_sampleId, type
         ) maxQubitDates
     JOIN SampleQC sqc ON sqc.sample_sampleId = maxQubitDates.sample_sampleId
