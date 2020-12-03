@@ -11,7 +11,7 @@ public class ProjectDto {
   private Long referenceGenomeId;
   private String defaultSciName;
   private Long defaultTargetedSequencingId;
-  private boolean clinical;
+  private Long pipelineId;
   private boolean secondaryNaming;
   private String rebNumber;
   private String rebExpiry;
@@ -96,12 +96,12 @@ public class ProjectDto {
     this.defaultTargetedSequencingId = defaultTargetedSequencingId;
   }
 
-  public boolean isClinical() {
-    return clinical;
+  public Long getPipelineId() {
+    return pipelineId;
   }
 
-  public void setClinical(boolean clinical) {
-    this.clinical = clinical;
+  public void setPipelineId(Long pipelineId) {
+    this.pipelineId = pipelineId;
   }
 
   public boolean isSecondaryNaming() {

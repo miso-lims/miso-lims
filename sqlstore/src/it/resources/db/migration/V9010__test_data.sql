@@ -10,6 +10,10 @@ INSERT INTO `_Group`(`groupId`, `name`, `description`) VALUES
 INSERT INTO `User_Group` (`users_userId`, `groups_groupId`)
 VALUES (3,1),(1,1);
 
+INSERT INTO Pipeline (pipelineId, alias) VALUES
+(1, 'Default'),
+(2, 'Special');
+
 INSERT INTO Sop(sopId, alias, version, category, url, archived) VALUES
 (1, 'Sample SOP 1', '1.0', 'SAMPLE', 'http://sops.test.com/sample/1/1', FALSE),
 (2, 'Sample SOP 2', '1.0', 'SAMPLE', 'http://sops.test.com/sample/2/1', FALSE),
@@ -205,10 +209,10 @@ INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`, defaultScientificNa
 (2, 'Human hg19', 1),
 (3, 'Human hg18 random', NULL);
 
-INSERT INTO `Project`(`projectId`, `created`, `description`, `name`, `status`, `alias`, `shortName`, `lastModified`, `referenceGenomeId`, creator, lastModifier) VALUES
-(1,'2015-08-27 15:40:15','Test project','PRO1','ACTIVE','TEST1','TEST1','2015-08-27 19:40:40', 1, 1, 1),
-(2,'2013-11-27 12:20:15','Test project2','PRO2','ACTIVE','TEST2','TEST2','2015-11-30 15:23:18', 1, 1, 1),
-(3,'2016-01-27 11:11:15','Test project3','PRO3','ACTIVE','TEST3','TEST3','2016-02-22 10:43:18', 2, 1, 1);
+INSERT INTO `Project`(`projectId`, `created`, `description`, `name`, `status`, `alias`, `shortName`, `lastModified`, `referenceGenomeId`, creator, lastModifier, pipelineId) VALUES
+(1,'2015-08-27 15:40:15','Test project','PRO1','ACTIVE','TEST1','TEST1','2015-08-27 19:40:40', 1, 1, 1, 1),
+(2,'2013-11-27 12:20:15','Test project2','PRO2','ACTIVE','TEST2','TEST2','2015-11-30 15:23:18', 1, 1, 1, 1),
+(3,'2016-01-27 11:11:15','Test project3','PRO3','ACTIVE','TEST3','TEST3','2016-02-22 10:43:18', 2, 1, 1, 2);
 
 INSERT INTO Study(studyId, name, description, accession, project_projectId, studyTypeId, alias, creator, created, lastModifier, lastModified)
 VALUES (1,'STU1','Test study1',NULL,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study1',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),

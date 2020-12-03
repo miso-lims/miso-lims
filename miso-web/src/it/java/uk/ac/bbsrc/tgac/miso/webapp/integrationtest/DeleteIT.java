@@ -40,6 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Pipeline;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
@@ -282,6 +283,11 @@ public class DeleteIT extends AbstractIT {
   @Test
   public void testDeleteReferenceGenome() {
     testAdminDelete(ListTarget.REFERENCE_GENOMES, null, "Sasquatch sg12 random", Columns.ALIAS, ReferenceGenomeImpl.class, 4L);
+  }
+
+  @Test
+  public void testDeletePipeline() {
+    testAdminDelete(ListTarget.PIPELINES, null, "Delete me", Columns.ALIAS, Pipeline.class, 3L);
   }
 
   @Test

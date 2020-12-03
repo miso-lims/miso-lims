@@ -24,6 +24,7 @@ public class ProjectPage extends HeaderFooterPage {
     public static final String DESCRIPTION = "description";
     public static final String STATUS = "status";
     public static final String REFERENCE_GENOME = "referenceGenome";
+    public static final String PIPELINE = "pipeline";
 
     private Fields() {
       throw new IllegalStateException("Util class not intended for instantiation");
@@ -46,15 +47,17 @@ public class ProjectPage extends HeaderFooterPage {
   @FindBy(id = "projectForm_creationDate")
   private WebElement creationDateLabel;
   @FindBy(id = "projectForm_alias")
-  private WebElement aliasLabel;
+  private WebElement aliasInput;
   @FindBy(id = "projectForm_shortName")
-  private WebElement shortNameLabel;
+  private WebElement shortNameInput;
   @FindBy(id = "projectForm_description")
-  private WebElement descriptionLabel;
+  private WebElement descriptionInput;
   @FindBy(id = "projectForm_status")
-  private WebElement statusLabel;
+  private WebElement statusInput;
   @FindBy(id = "projectForm_referenceGenomeId")
-  private WebElement referenceGenomeLabel;
+  private WebElement referenceGenomeInput;
+  @FindBy(id = "projectForm_pipelineId")
+  private WebElement pipelineInput;
   @FindBy(id = "save")
   private WebElement saveButton;
 
@@ -84,48 +87,52 @@ public class ProjectPage extends HeaderFooterPage {
     return creationDateLabel.getText();
   }
 
-  public void setCreationDate(String date) {
-    setText(date, creationDateLabel);
-  }
-
   public String getAlias() {
-    return aliasLabel.getAttribute("value");
+    return aliasInput.getAttribute("value");
   }
 
   public void setAlias(String alias) {
-    setText(alias, aliasLabel);
+    setText(alias, aliasInput);
   }
 
   public String getShortName() {
-    return shortNameLabel.getAttribute("value");
+    return shortNameInput.getAttribute("value");
   }
 
   public void setShortName(String shortName) {
-    setText(shortName, shortNameLabel);
+    setText(shortName, shortNameInput);
   }
 
   public String getDescription() {
-    return descriptionLabel.getAttribute("value");
+    return descriptionInput.getAttribute("value");
   }
 
   public void setDescription(String description) {
-    setText(description, descriptionLabel);
+    setText(description, descriptionInput);
   }
 
   public String getStatus() {
-    return getSelectedDropdownText(statusLabel);
+    return getSelectedDropdownText(statusInput);
   }
 
   public void setStatus(String status) {
-    setDropdown(status, statusLabel);
+    setDropdown(status, statusInput);
   }
 
   public String getReferenceGenome() {
-    return getSelectedDropdownText(referenceGenomeLabel);
+    return getSelectedDropdownText(referenceGenomeInput);
   }
 
   public void setReferenceGenome(String referenceGenome) {
-    setDropdown(referenceGenome, referenceGenomeLabel);
+    setDropdown(referenceGenome, referenceGenomeInput);
+  }
+
+  public String getPipeline() {
+    return getSelectedDropdownText(pipelineInput);
+  }
+
+  public void setPipeline(String pipeline) {
+    setDropdown(pipeline, pipelineInput);
   }
 
   public ProjectPage clickSave() {

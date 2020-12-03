@@ -83,6 +83,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("partitionqctype/list");
     slugs.add("scientificname/list");
     slugs.add("referencegenome/list");
+    slugs.add("pipeline/list");
     slugs.add("studytype/list");
     slugs.add("workstation/list");
     slugs.add("sop/list");
@@ -278,6 +279,8 @@ public class BulkErrorCrawlerIT extends AbstractIT {
         .put("boxsize/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
         .put("sop/bulk/new", Collections.unmodifiableMap(new MapBuilder<String, String>().put("quantity", "2").build()))
         .put("sop/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
+        .put("pipeline/bulk/new", Collections.unmodifiableMap(new MapBuilder<String, String>().put("quantity", "2").build()))
+        .put("pipeline/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
         .build());
   }
 

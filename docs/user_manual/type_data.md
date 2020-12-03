@@ -23,6 +23,16 @@ To delete items, go to the list page, check the checkboxes beside the items you 
 
 
 
+## Pipelines
+
+Each project specifies a pipeline so that you can use this information in downstream analysis to decide how to handle
+sequencing run data.
+
+MISO administrators can add, edit, and delete pipelines using the standard interface. A pipeline can only be deleted if
+it is not used by any existing projects.
+
+
+
 ## Scientific Names
 
 Scientific name is the species that a sample came from. These are intended to match the taxon names in the NCBI Taxonomy

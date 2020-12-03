@@ -132,9 +132,15 @@ FormTarget.project = (function($) {
             return item.id;
           }
         }, {
-          title: 'Clinical',
-          data: 'clinical',
-          type: 'checkbox'
+          title: 'Pipeline',
+          data: 'pipelineId',
+          type: 'dropdown',
+          source: Constants.pipelines,
+          getItemLabel: Utils.array.getAlias,
+          getItemValue: Utils.array.getId,
+          sortSource: Utils.sorting.standardSort('alias'),
+          required: true,
+          nullLabel: '(Choose)'
         }]
       }];
     }

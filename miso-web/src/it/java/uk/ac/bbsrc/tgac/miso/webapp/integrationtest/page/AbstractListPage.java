@@ -189,6 +189,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String ORDERS_IN_PROGRESS = "sequencingorders/in-progress";
     public static final String ORDERS_OUTSTANDING = "sequencingorders/outstanding";
     public static final String PARTITION_QC_TYPE = "partitionqctype/list";
+    public static final String PIPELINES = "pipeline/list";
     public static final String POOLS = "pools";
     public static final String POOL_ORDERS = "poolorders";
     public static final String PRINTERS = "printers";

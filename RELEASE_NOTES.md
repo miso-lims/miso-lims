@@ -9,6 +9,7 @@ Changes:
     Status
   * Renamed run Data Approved field to Data Review, and Run Approvers group to Run Reviewers
   * Added changelog message to QC target (e.g. sample) when QCs are deleted
+  * Replaced project "clincial" flag with more flexible "pipeline" field
   * Improved performance of Edit Project page
   * Fixed RNA Library Preparation spreadsheet download and Pinery-MISO excluding some QCs if QC type
     name doesn't exactly match the original spec.
@@ -19,7 +20,12 @@ Changes:
 
 Upgrade Notes:
 
-  * Updated to Pinery v2.14.2
+  * Updated to Pinery v2.15.0
+  * For the change from project "clinical" flag to "pipeline" field, a pipeline named "Default" is
+    created and assigned to all projects. If you had specified some projects as clinical, and some
+    not clinical, then a second "Clinical" pipeline will also be created and assigned to projects
+    that were previously marked clinical. You should review your projects after the upgrade, and
+    customize the available pipeline options if you wish.
 
 # 1.18.0
 
