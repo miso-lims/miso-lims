@@ -2,6 +2,12 @@
 
 Changes:
 
+
+
+# 1.19.1
+
+Changes:
+
   * Fixed qubit values missing from Pinery samples
 
 # 1.19.0
