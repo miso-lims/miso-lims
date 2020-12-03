@@ -1188,6 +1188,7 @@ public class MisoClient implements Lims {
       p.setLatest(rs.getTimestamp("latest"));
       p.setActive(rs.getBoolean("active"));
       p.setClinical(rs.getBoolean("clinical"));
+      p.setPipeline(rs.getString("pipeline"));
       p.setSecondaryNamingScheme(rs.getBoolean("secondaryNamingScheme"));
 
       return p;
