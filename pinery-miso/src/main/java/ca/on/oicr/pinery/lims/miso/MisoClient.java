@@ -14,6 +14,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
@@ -59,6 +61,7 @@ import ca.on.oicr.pinery.lims.DefaultStatus;
 import ca.on.oicr.pinery.lims.DefaultType;
 import ca.on.oicr.pinery.lims.DefaultUser;
 import ca.on.oicr.pinery.lims.miso.MisoClient.SampleRowMapper.AttributeKey;
+import ca.on.oicr.pinery.lims.miso.converters.QcConverter;
 import ca.on.oicr.pinery.lims.miso.converters.SampleTypeConverter;
 
 public class MisoClient implements Lims {
@@ -100,8 +103,11 @@ public class MisoClient implements Lims {
 
   // Sample queries
   private static final String QUERY_ALL_SAMPLES = getResourceAsString("queryAllSamples.sql");
-  private static final String QUERY_SAMPLE_BY_ID = "SELECT * FROM (" + QUERY_ALL_SAMPLES + ") combined " + "WHERE id = ?";
+  private static final String QUERY_SAMPLE_BY_ID = "SELECT * FROM (" + QUERY_ALL_SAMPLES + ") combined WHERE id = ?";
 
+  private static final String QUERY_ALL_SAMPLE_QCS = getResourceAsString("queryAllSampleQcs.sql");
+  private static final String QUERY_SAMPLE_QCS_BY_ID = "SELECT * FROM (" + QUERY_ALL_SAMPLE_QCS + ") combined WHERE sampleId = ?";
+  
   private static final String QUERY_SAMPLE_CHILD_IDS_BY_SAMPLE_ID = getResourceAsString("querySampleChildIdsBySampleId.sql");
 
   // SampleType (MISO SampleClass and Library) queries
@@ -155,7 +161,14 @@ public class MisoClient implements Lims {
   public Sample getSample(String id) {
     validateSampleId(id);
     List<Sample> samples = template.query(QUERY_SAMPLE_BY_ID, new Object[] { id }, sampleMapper);
-    return samples.size() == 1 ? addChildren(samples.get(0)) : null;
+    if (samples.size() != 1) {
+      return null;
+    }
+    Sample sample = addChildren(samples.get(0));
+    template.query(QUERY_SAMPLE_QCS_BY_ID, new Object[] { sample.getId() }, rs -> {
+      QcConverter.addToSample(rs, sample);
+    });
+    return sample;
   }
 
   private void validateSampleId(String id) {
@@ -180,13 +193,40 @@ public class MisoClient implements Lims {
   @Override
   public List<Sample> getSamples(Boolean archived, Set<String> projects, Set<String> types, ZonedDateTime before, ZonedDateTime after) {
     List<Sample> samples = template.query(QUERY_ALL_SAMPLES, sampleMapper);
-    mapChildren(samples);
+
+    Map<String, Sample> samplesById = samples.stream().collect(Collectors.toMap(Sample::getId, Function.identity()));
+    mapChildren(samplesById);
+    addQcAttributes(samplesById);
+
     if (archived == null && (projects == null || projects.isEmpty()) && (types == null || types.isEmpty()) && before == null
         && after == null) {
       return samples;
     } else {
       return filterSamples(samples, archived, projects, types, before, after);
     }
+  }
+
+  private static void mapChildren(Map<String, Sample> samplesById) {
+    for (Sample child : samplesById.values()) {
+      if (child.getParents() != null) {
+        for (String parentId : child.getParents()) {
+          Sample parent = samplesById.get(parentId);
+          if (parent.getChildren() == null) {
+            parent.setChildren(new HashSet<String>());
+          }
+          parent.getChildren().add(child.getId());
+        }
+      }
+    }
+  }
+
+  private void addQcAttributes(Map<String, Sample> samplesById) {
+    template.query(QUERY_ALL_SAMPLE_QCS, rs -> {
+      Sample sample = samplesById.get(rs.getString("sampleId"));
+      if (sample != null) {
+        QcConverter.addToSample(rs, sample);
+      }
+    });
   }
 
   private List<Sample> filterSamples(List<Sample> unfiltered, Boolean archived, Set<String> projects, Set<String> types,
@@ -256,25 +296,6 @@ public class MisoClient implements Lims {
       parent.setChildren(new HashSet<>(children));
     }
     return parent;
-  }
-
-  private List<Sample> mapChildren(List<Sample> samples) {
-    Map<String, Sample> map = new HashMap<>();
-    for (Sample sample : samples) {
-      map.put(sample.getId(), sample);
-    }
-    for (Sample child : samples) {
-      if (child.getParents() != null) {
-        for (String parentId : child.getParents()) {
-          Sample parent = map.get(parentId);
-          if (parent.getChildren() == null) {
-            parent.setChildren(new HashSet<String>());
-          }
-          parent.getChildren().add(child.getId());
-        }
-      }
-    }
-    return samples;
   }
 
   @Override
@@ -641,6 +662,13 @@ public class MisoClient implements Lims {
       }
       r.setContainerModel(rs.getString("containerModel"));
       r.setSequencingKit(rs.getString("sequencingKit"));
+      r.setStatus(makeStatus(rs, "qcPassed", null));
+
+      Boolean dataReview = rs.getBoolean("dataReview");
+      if (rs.wasNull()) {
+        dataReview = null;
+      }
+      r.setDataReview(dataReview);
 
       return r;
     }
@@ -801,19 +829,6 @@ public class MisoClient implements Lims {
           return str == null ? null : StrStatus.valueOf(str).getValue();
         }
       },
-      QPCR_PERCENTAGE_HUMAN("qpcr_percentage_human", "qPCR %"),
-      QUBIT_CONCENTRATION("qubit_concentration", "Qubit (ng/uL)") {
-        @Override
-        public String extractStringValueFrom(ResultSet rs) throws SQLException {
-          return extractBigDecimalString(rs, getSqlKey());
-        }
-      },
-      NANODROP_CONCENTRATION("nanodrop_concentration", "Nanodrop (ng/uL)") {
-        @Override
-        public String extractStringValueFrom(ResultSet rs) throws SQLException {
-          return extractBigDecimalString(rs, getSqlKey());
-        }
-      },
       BARCODE("barcode", "Barcode"),
       BARCODE_TWO("barcode_two", "Barcode Two"),
       BARCODE_KIT("barcode_kit", "Barcode Kit"),
@@ -837,17 +852,6 @@ public class MisoClient implements Lims {
       SUBPROJECT("subproject", "Sub-project"),
       INSTITUTE("institute", "Institute"),
       CREATION_DATE("inLabCreationDate", "In-lab Creation Date"),
-      PDAC_CONFIRMED("pdac", "PDAC Confirmed") {
-        @Override
-        public String extractStringValueFrom(ResultSet rs) throws SQLException {
-          int pdacConfirmed = rs.getInt(getSqlKey());
-          if (!rs.wasNull()) {
-            if (pdacConfirmed == 1) return "True";
-            if (pdacConfirmed == 0) return "False";
-          }
-          return null;
-        }
-      },
       SYNTHETIC("isSynthetic", "Synthetic") {
         @Override
         public String extractStringValueFrom(ResultSet rs) throws SQLException {
@@ -875,18 +879,6 @@ public class MisoClient implements Lims {
           boolean umis = rs.getBoolean(getSqlKey());
           if (rs.wasNull()) return null;
           return umis ? "True" : "False";
-        }
-      }, //
-      RIN("rin", "RIN") {
-        @Override
-        public String extractStringValueFrom(ResultSet rs) throws SQLException {
-          return extractBigDecimalString(rs, getSqlKey());
-        }
-      }, //
-      DV200("dv200", "DV200") {
-        @Override
-        public String extractStringValueFrom(ResultSet rs) throws SQLException {
-          return extractBigDecimalString(rs, getSqlKey());
         }
       }, //
       INITIAL_VOLUME("initial_volume", "Initial Volume") {
@@ -1190,6 +1182,16 @@ public class MisoClient implements Lims {
       p.setClinical(rs.getBoolean("clinical"));
       p.setPipeline(rs.getString("pipeline"));
       p.setSecondaryNamingScheme(rs.getBoolean("secondaryNamingScheme"));
+      p.setCreated(rs.getTimestamp("created"));
+      p.setRebNumber(rs.getString("rebNumber"));
+      p.setRebExpiry(rs.getDate("rebExpiry"));
+      p.setDescription(rs.getString("description"));
+      p.setSamplesExpected(rs.getInt("samplesExpected"));
+      if (rs.wasNull()) {
+        p.setSamplesExpected(null);
+      }
+      p.setContactName(rs.getString("contactName"));
+      p.setContactEmail(rs.getString("contactEmail"));
 
       return p;
     }

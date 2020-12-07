@@ -5,7 +5,7 @@ Changes:
   * Added new project fields:                                                    
     * samples expected                                                           
     * contact
-    * Added parent name to bulk propagate pages where applicable
+  * Added parent name to bulk propagate pages where applicable
   * Added library aliquot description field
   * Adjusted OICR naming scheme to allow more than 2 digits in times received and tube number
   * Improved controls for setting freezer location on Edit Box page
@@ -19,6 +19,15 @@ Changes:
     changes
   * Fixed forms going into bad state after cancelling save confirmation
   * Fixed a bug that caused box contents to be cleared when saving on the bulk Edit Boxes page
+  * Export the following via Pinery:
+    * Run QC status and data review
+    * Sample "Draft Clinical Report" and "Informatics Review" QCs
+    * Project created, REB number, REB expiry, description, samples expected, contact name, and
+      contact email
+
+Upgrade Notes:
+
+  * Updated to Pinery v2.16.0
 
 # 1.19.1
 
