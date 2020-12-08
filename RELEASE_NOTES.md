@@ -2,7 +2,7 @@
 
 Changes:
 
-
+  * Fixed failed QCs showing as checkmark on QCs lists
 
 # 1.19.1
 
