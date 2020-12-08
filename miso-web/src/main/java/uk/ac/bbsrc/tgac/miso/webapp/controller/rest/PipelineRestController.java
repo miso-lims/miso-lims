@@ -21,6 +21,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.Pipeline;
 import uk.ac.bbsrc.tgac.miso.core.service.PipelineService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PipelineDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
@@ -31,17 +32,19 @@ public class PipelineRestController {
   private PipelineService pipelineService;
   @Autowired
   private AsyncOperationManager asyncOperationManager;
+  @Autowired
+  private ConstantsController constantsController;
 
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<PipelineDto> dtos) throws IOException {
-    return asyncOperationManager.startAsyncBulkCreate("Pipeline", dtos, Dtos::to, pipelineService);
+    return asyncOperationManager.startAsyncBulkCreate("Pipeline", dtos, Dtos::to, pipelineService, true);
   }
 
   @PutMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<PipelineDto> dtos) throws IOException {
-    return asyncOperationManager.startAsyncBulkUpdate("Pipeline", dtos, Dtos::to, pipelineService);
+    return asyncOperationManager.startAsyncBulkUpdate("Pipeline", dtos, Dtos::to, pipelineService, true);
   }
 
   @GetMapping("/bulk/{uuid}")
@@ -53,6 +56,7 @@ public class PipelineRestController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public @ResponseBody void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
     RestUtils.bulkDelete("Pipeline", ids, pipelineService);
+    constantsController.refreshConstants();
   }
 
 }
