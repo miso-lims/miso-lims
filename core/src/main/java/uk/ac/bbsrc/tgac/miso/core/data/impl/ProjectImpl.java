@@ -87,6 +87,12 @@ public class ProjectImpl implements Project {
   @Temporal(TemporalType.DATE)
   private Date rebExpiry;
 
+  private Integer samplesExpected;
+
+  @ManyToOne
+  @JoinColumn(name = "contactId")
+  private Contact contact;
+
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "creator", nullable = false, updatable = false)
   private User creator;
@@ -429,6 +435,26 @@ public class ProjectImpl implements Project {
   @Override
   public void setRebExpiry(Date rebExpiry) {
     this.rebExpiry = rebExpiry;
+  }
+
+  @Override
+  public Integer getSamplesExpected() {
+    return samplesExpected;
+  }
+
+  @Override
+  public void setSamplesExpected(Integer samplesExpected) {
+    this.samplesExpected = samplesExpected;
+  }
+
+  @Override
+  public Contact getContact() {
+    return contact;
+  }
+
+  @Override
+  public void setContact(Contact contact) {
+    this.contact = contact;
   }
 
 }
