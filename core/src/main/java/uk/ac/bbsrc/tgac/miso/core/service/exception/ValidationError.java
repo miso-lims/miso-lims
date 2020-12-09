@@ -8,7 +8,7 @@ public class ValidationError implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private static final String GENERAL_PROPERTY = "GENERAL";
+  public static final String GENERAL_PROPERTY = "GENERAL";
   private static final String DEFAULT_PROPERTY_MESSAGE = "This value is invalid";
   private static final String DEFAULT_GENERAL_MESSAGE = "This data is invalid";
 

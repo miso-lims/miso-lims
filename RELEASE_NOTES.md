@@ -2,7 +2,10 @@
 
 Changes:
 
-  * Added parent name to bulk propagate pages where applicable
+  * Added new project fields:                                                    
+    * samples expected                                                           
+    * contact
+    * Added parent name to bulk propagate pages where applicable
   * Added library aliquot description field
   * Adjusted OICR naming scheme to allow more than 2 digits in times received and tube number
   * Improved controls for setting freezer location on Edit Box page

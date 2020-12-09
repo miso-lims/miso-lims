@@ -15,6 +15,10 @@ public class ProjectDto {
   private boolean secondaryNaming;
   private String rebNumber;
   private String rebExpiry;
+  private Integer samplesExpected;
+  private Long contactId;
+  private String contactName;
+  private String contactEmail;
 
   public long getId() {
     return id;
@@ -126,5 +130,37 @@ public class ProjectDto {
 
   public void setRebExpiry(String rebExpiry) {
     this.rebExpiry = rebExpiry;
+  }
+
+  public Integer getSamplesExpected() {
+    return samplesExpected;
+  }
+
+  public void setSamplesExpected(Integer samplesExpected) {
+    this.samplesExpected = samplesExpected;
+  }
+
+  public Long getContactId() {
+    return contactId;
+  }
+
+  public void setContactId(Long contactId) {
+    this.contactId = contactId;
+  }
+
+  public String getContactName() {
+    return contactName;
+  }
+
+  public void setContactName(String contactName) {
+    this.contactName = contactName;
+  }
+
+  public String getContactEmail() {
+    return contactEmail;
+  }
+
+  public void setContactEmail(String contactEmail) {
+    this.contactEmail = contactEmail;
   }
 }
