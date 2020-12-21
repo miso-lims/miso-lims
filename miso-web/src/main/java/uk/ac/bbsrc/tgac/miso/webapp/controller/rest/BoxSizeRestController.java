@@ -21,6 +21,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxSizeService;
 import uk.ac.bbsrc.tgac.miso.dto.BoxSizeDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
@@ -31,6 +32,8 @@ public class BoxSizeRestController extends RestController {
   private BoxSizeService boxSizeService;
   @Autowired
   private AsyncOperationManager asyncOperationManager;
+  @Autowired
+  private ConstantsController constantsController;
 
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
@@ -54,6 +57,7 @@ public class BoxSizeRestController extends RestController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
     RestUtils.bulkDelete("Box Size", ids, boxSizeService);
+    constantsController.refreshConstants();
   }
 
 }

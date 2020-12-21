@@ -2,7 +2,8 @@
 
 Changes:
 
-
+  * Fixed cases where pipeline, box use, and box size constants were not being refreshed after
+    changes
 
 # 1.19.1
 
