@@ -78,6 +78,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.BoxDto;
 import uk.ac.bbsrc.tgac.miso.dto.BoxableDto;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
@@ -807,13 +808,16 @@ public class BoxRestController extends RestController {
   @PutMapping(value = "/{boxId}", produces = "application/json")
   @ResponseBody
   public BoxDto updateBox(@PathVariable long boxId, @RequestBody BoxDto dto) throws IOException {
-    Box original = getBox(boxId);
-    return RestUtils.updateObject("Box", boxId, dto, d -> {
-      Box box = Dtos.to(d);
-      // reset contents in-case they were changed while the box was being edited
-      box.setBoxPositions(original.getBoxPositions());
-      return box;
-    }, boxService, box -> Dtos.asDto(box, false));
+    return RestUtils.updateObject("Box", boxId, dto, WhineyFunction.rethrow(this::toBoxWithOriginalContents), boxService,
+        box -> Dtos.asDto(box, false));
+  }
+  
+  private Box toBoxWithOriginalContents(BoxDto dto) throws IOException {
+    Box original = getBox(dto.getId());
+    Box box = Dtos.to(dto);
+    // reset contents in-case they were changed while the box was being edited
+    box.setBoxPositions(original.getBoxPositions());
+    return box;
   }
 
   @PostMapping("/bulk")
@@ -825,7 +829,7 @@ public class BoxRestController extends RestController {
   @PutMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<BoxDto> dtos) throws IOException {
-    return asyncOperationManager.startAsyncBulkUpdate("Box", dtos, Dtos::to, boxService);
+    return asyncOperationManager.startAsyncBulkUpdate("Box", dtos, WhineyFunction.rethrow(this::toBoxWithOriginalContents), boxService);
   }
 
   @GetMapping("/bulk/{uuid}")
