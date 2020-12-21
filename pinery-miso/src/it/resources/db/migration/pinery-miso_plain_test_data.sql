@@ -1,7 +1,7 @@
 INSERT INTO Project(projectId, name, alias, shortName, created, description,
-  status, referenceGenomeId, lastModified, creator, lastModifier, clinical) VALUES
-  (1, 'PRO1', 'Project One', 'PRO1', '2017-06-27', 'integration test project one', 'ACTIVE', 1, '2017-06-27 14:11:00', 1, 1, FALSE),
-  (2, 'PRO2', 'Project Two', 'PRO2', '2017-06-27', 'integration test project two', 'ACTIVE', 1, '2017-06-27 14:11:00', 1, 1, TRUE);
+  status, referenceGenomeId, lastModified, creator, lastModifier, pipelineId) VALUES
+  (1, 'PRO1', 'Project One', 'PRO1', '2017-06-27', 'integration test project one', 'ACTIVE', 1, '2017-06-27 14:11:00', 1, 1, 1),
+  (2, 'PRO2', 'Project Two', 'PRO2', '2017-06-27', 'integration test project two', 'ACTIVE', 1, '2017-06-27 14:11:00', 1, 1, 2);
 
 INSERT INTO Sample (sampleId, name, alias, description, identificationBarcode, sampleType, project_projectId,
 scientificNameId, volume, detailedQcStatusId, lastModifier, creator, created, lastModified, discriminator) VALUES
