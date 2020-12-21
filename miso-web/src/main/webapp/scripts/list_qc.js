@@ -105,7 +105,7 @@ ListTarget.qc = function(qcTarget) {
           if (type === 'display') {
             var qcType = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(full.qcTypeId), Constants.qcTypes);
             if (qcType.precisionAfterDecimal < 0) {
-              return ListUtils.render.booleanChecks(!!data, type, full);
+              return ListUtils.render.booleanChecks(data > 0, type, full);
             } else {
               return data + " " + qcType.units;
             }
