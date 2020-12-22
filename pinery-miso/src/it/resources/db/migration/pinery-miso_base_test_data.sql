@@ -78,6 +78,7 @@ DELETE FROM User;
 DELETE FROM _Group;
 DELETE FROM RunPurpose;
 DELETE FROM TissuePieceType;
+DELETE FROM Pipeline;
 SET FOREIGN_KEY_CHECKS=1;
 
 INSERT INTO User (userId, active, admin, fullName, internal, loginName, password, email) VALUES
@@ -88,6 +89,10 @@ INSERT INTO `_Group` (groupId, description, name) VALUES
 
 INSERT INTO `User_Group` (`users_userId`, `groups_groupId`)
 VALUES (1,1);
+
+INSERT INTO Pipeline(pipelineId, alias) VALUES
+(1, 'Default'),
+(2, 'Clinical');
 
 INSERT INTO `DetailedQcStatus` (DetailedQcStatusId, status, description, noteRequired, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1,TRUE,  'Ready',                  0,1,'2016-09-26 15:55:44',1,'2016-09-26 15:55:44'),
