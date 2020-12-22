@@ -544,6 +544,7 @@ public class Dtos {
     if (from.getParent() != null) {
       DetailedSample parent = from.getParent();
       dto.setParentId(parent.getId());
+      setString(dto::setParentName, parent.getName());
       dto.setParentAlias(parent.getAlias());
       dto.setParentSampleClassId(parent.getSampleClass().getId());
       if (parent.getBox() != null) {
@@ -1336,6 +1337,7 @@ public class Dtos {
     dto.setAlias(from.getAlias());
     dto.setName(from.getName());
     dto.setParentSampleId(from.getSample().getId());
+    setString(dto::setParentSampleName, maybeGetProperty(from.getSample(), Sample::getName));
     dto.setParentSampleAlias(from.getSample().getAlias());
     dto.setProjectId(from.getSample().getProject().getId());
     if (from.getSample() instanceof DetailedSample) {

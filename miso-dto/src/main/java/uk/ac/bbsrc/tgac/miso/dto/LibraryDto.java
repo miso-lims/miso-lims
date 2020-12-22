@@ -46,6 +46,7 @@ public class LibraryDto extends AbstractBoxableDto implements ReceivableDto<Libr
   private Boolean paired;
   private String parentSampleAlias;
   private Long parentSampleId;
+  private String parentSampleName;
   private Long parentSampleClassId;
   private Long projectId;
   private String platformType;
@@ -603,6 +604,14 @@ public class LibraryDto extends AbstractBoxableDto implements ReceivableDto<Libr
   @Override
   public void setEffectiveQcFailureLevel(String effectiveQcFailureLevel) {
     this.effectiveQcFailureLevel = effectiveQcFailureLevel;
+  }
+
+  public String getParentSampleName() {
+    return parentSampleName;
+  }
+
+  public void setParentSampleName(String parentSampleName) {
+    this.parentSampleName = parentSampleName;
   }
 
 }

@@ -265,7 +265,7 @@ BulkTarget.sample = (function($) {
       case 'edit':
         return 2;
       case 'propagate':
-        return 1;
+        return 2;
       default:
         return 0;
       }
@@ -315,6 +315,11 @@ BulkTarget.sample = (function($) {
         if (Constants.isDetailedSample) {
           // parent columns go at start if propagating, or after the sample name and alias if editing
           var parentColumns = [{
+            title: 'Parent Name',
+            type: 'text',
+            data: 'parentName',
+            disabled: true
+          }, {
             title: 'Parent Alias',
             type: 'text',
             data: 'parentAlias',

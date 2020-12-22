@@ -33,7 +33,8 @@ public class BulkLibraryAliquotIT extends AbstractIT {
       LibraryAliquotColumns.NG_USED, LibraryAliquotColumns.VOLUME_USED, LibraryAliquotColumns.CREATION_DATE,
       LibraryAliquotColumns.TARGETED_SEQUENCING);
 
-  private static final Set<String> propagateColumns = Sets.newHashSet(LibraryAliquotColumns.PARENT_ALIAS);
+  private static final Set<String> propagateColumns = Sets.newHashSet(LibraryAliquotColumns.PARENT_NAME,
+      LibraryAliquotColumns.PARENT_ALIAS);
 
   private static final String NO_TAR_SEQ = "(None)";
 

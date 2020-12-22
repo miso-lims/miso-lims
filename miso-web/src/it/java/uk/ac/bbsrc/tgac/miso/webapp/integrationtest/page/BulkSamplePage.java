@@ -81,6 +81,7 @@ public class BulkSamplePage extends BulkPage {
     public static final String PURPOSE = "Purpose";
     public static final String PARENT_ALIAS = "Parent Alias";
     public static final String PARENT_LOCATION = "Parent Location";
+    public static final String PARENT_NAME = "Parent Name";
     public static final String PARENT_SAMPLE_CLASS = "Parent Sample Class";
     public static final String INITIAL_CELL_CONC = "Initial Cell Conc.";
     public static final String DIGESTION = "Digestion";

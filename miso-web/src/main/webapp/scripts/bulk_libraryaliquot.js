@@ -129,10 +129,16 @@ BulkTarget.libraryaliquot = (function($) {
           HotUtils.makeTransferAction('libraryAliquotIds')];
     },
     getFixedColumns: function(config) {
-      return config.pageMode === 'propagate' ? 1 : 2;
+      return 2;
     },
     getColumns: function(config, api) {
       var columns = [{
+        title: 'Parent Name',
+        type: 'text',
+        data: 'parentName',
+        disabled: true,
+        include: config.pageMode === 'propagate'
+      }, {
         title: 'Parent Alias',
         type: 'text',
         data: 'parentAlias',
