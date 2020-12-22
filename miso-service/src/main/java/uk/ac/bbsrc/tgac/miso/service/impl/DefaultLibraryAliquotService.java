@@ -284,6 +284,7 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
    */
   private void applyChanges(LibraryAliquot target, LibraryAliquot source) {
     target.setAlias(source.getAlias());
+    target.setDescription(source.getDescription());
     target.setTargetedSequencing(source.getTargetedSequencing());
     target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
     target.setDiscarded(source.isDiscarded());

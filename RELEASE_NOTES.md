@@ -3,6 +3,7 @@
 Changes:
 
   * Added parent name to bulk propagate pages where applicable
+  * Added library aliquot description field
   * Fixed failed QCs showing as checkmark on QCs lists
   * Fixed cases where pipeline, box use, and box size options were not being refreshed after
     changes
