@@ -3,6 +3,7 @@
 Changes:
 
   * Added parent name to bulk propagate pages where applicable
+  * Adjusted OICR naming scheme to allow more than 2 digits in times received and tube number
   * Fixed failed QCs showing as checkmark on QCs lists
   * Fixed cases where pipeline, box use, and box size options were not being refreshed after
     changes
