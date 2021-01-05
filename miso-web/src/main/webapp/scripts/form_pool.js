@@ -99,15 +99,15 @@ FormTarget.pool = (function($) {
         }, FormUtils.makeBoxLocationField(true)]
       }];
     },
-    confirmSave: function(pool, saveCallback, isDialog) {
+    confirmSave: function(pool, isDialog) {
       if (!isDialog) {
         pool.pooledElements = Pool.getAliquots();
       }
       if (!pool.id && !pool.identificationBarcode && !Constants.automaticBarcodes) {
+    	var deferred = $.Deferred();
         Utils.showConfirmDialog("Missing Barcode", "Save",
-            ["Pools should usually have barcodes. Are you sure you wish to save without one?"], saveCallback);
-      } else {
-        saveCallback();
+            ["Pools should usually have barcodes. Are you sure you wish to save without one?"], deferred.resolve, deferred.reject);
+        return deferred.promise();
       }
     }
   }

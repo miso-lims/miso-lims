@@ -5,6 +5,7 @@ Changes:
   * Fixed failed QCs showing as checkmark on QCs lists
   * Fixed cases where pipeline, box use, and box size options were not being refreshed after
     changes
+  * Fixed forms going into bad state after cancelling save confirmation
 
 # 1.19.1
 

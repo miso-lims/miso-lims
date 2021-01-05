@@ -207,9 +207,8 @@ FormTarget.poolorder = (function($) {
         }]
       }];
     },
-    confirmSave: function(object, saveCallback) {
+    confirmSave: function(object) {
       object.orderAliquots = PoolOrder.getAliquots();
-      saveCallback();
     }
   }
 

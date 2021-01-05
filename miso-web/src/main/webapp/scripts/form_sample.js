@@ -555,7 +555,7 @@ FormTarget.sample = (function($) {
             }]
           }];
     },
-    confirmSave: function(object, saveCallback, isDialog, form) {
+    confirmSave: function(object, isDialog, form) {
       if (form.isChanged('projectId')) {
         var messages = [];
         if (object.identityConsentLevel && object.identityConsentLevel !== 'All Projects') {
@@ -565,12 +565,12 @@ FormTarget.sample = (function($) {
           messages.push('• ' + object.libraryCount + ' existing librar' + (object.libraryCount > 1 ? 'ies' : 'y') + ' will be affected');
         }
         if (messages.length) {
+          var deferred = $.Deferred();
           messages.unshift('Are you sure you wish to transfer the sample to a different project?');
-          Utils.showConfirmDialog('Confirm', 'Save', messages, saveCallback);
-          return;
+          Utils.showConfirmDialog('Confirm', 'Save', messages, deferred.resolve, deferred.reject);
+          return deferred.promise();
         }
       }
-      saveCallback();
     }
   }
 

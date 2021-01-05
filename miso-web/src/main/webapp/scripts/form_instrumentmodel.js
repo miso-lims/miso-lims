@@ -29,10 +29,9 @@ FormTarget.instrumentmodel = (function($) {
         fields: config.isAdmin ? getEditableFields(config, object) : getReadOnlyFields(config, object)
       }];
     },
-    confirmSave: function(object, saveCallback) {
+    confirmSave: function(object) {
       object.positions = InstrumentModel.getInstrumentPositions();
       object.containerModels = InstrumentModel.getContainerModels();
-      saveCallback();
     }
   }
 

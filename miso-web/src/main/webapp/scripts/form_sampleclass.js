@@ -36,10 +36,9 @@ FormTarget.sampleclass = (function($) {
         fields: config.isAdmin ? getEditableFields(config, object) : getReadOnlyFields(config, object)
       }];
     },
-    confirmSave: function(object, saveCallback) {
+    confirmSave: function(object) {
       object.parentRelationships = SampleClass.getParents();
       object.childRelationships = SampleClass.getChildren();
-      saveCallback();
     }
   }
 
