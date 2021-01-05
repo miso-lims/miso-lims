@@ -146,7 +146,7 @@ BulkTarget.library = (function($) {
     getFixedColumns: function(config) {
       switch (config.pageMode) {
       case 'propagate':
-        return 1;
+        return 2;
       case 'edit':
         return config.showLibraryAlias ? 2 : 1;
       case 'create':
@@ -157,6 +157,12 @@ BulkTarget.library = (function($) {
     },
     getColumns: function(config, api) {
       var columns = [{
+        title: 'Sample Name',
+        type: 'text',
+        data: 'parentSampleName',
+        include: config.pageMode === 'propagate',
+        disabled: true
+      }, {
         title: 'Sample Alias',
         type: 'text',
         data: 'parentSampleAlias',

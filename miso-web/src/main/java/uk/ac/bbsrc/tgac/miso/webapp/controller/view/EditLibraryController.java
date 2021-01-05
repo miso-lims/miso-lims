@@ -352,6 +352,7 @@ public class EditLibraryController {
         dto = new LibraryDto();
       }
       dto.setParentSampleId(item.getId());
+      dto.setParentSampleName(item.getName());
       dto.setParentSampleAlias(item.getAlias());
       dto.setProjectId(item.getProject().getId());
       dto.setBox(newBox);

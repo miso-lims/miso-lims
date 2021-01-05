@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.dto;
 public class DetailedSampleDto extends SampleDto implements UpstreamQcFailableDto {
 
   private Long parentId;
+  private String parentName;
   private String parentAlias;
   private String parentBoxPosition;
   private String parentBoxPositionLabel;
@@ -37,6 +38,14 @@ public class DetailedSampleDto extends SampleDto implements UpstreamQcFailableDt
 
   public void setParentId(Long parentId) {
     this.parentId = parentId;
+  }
+
+  public String getParentName() {
+    return parentName;
+  }
+
+  public void setParentName(String parentName) {
+    this.parentName = parentName;
   }
 
   public String getParentAlias() {
