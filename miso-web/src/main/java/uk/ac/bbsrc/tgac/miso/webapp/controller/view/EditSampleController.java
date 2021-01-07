@@ -454,6 +454,7 @@ public class EditSampleController {
           dto.setScientificNameId(sample.getScientificName().getId());
         }
         dto.setParentId(sample.getId());
+        dto.setParentName(sample.getName());
         dto.setParentAlias(sample.getAlias());
         if (sample.getBox() != null) {
           dto.setParentBoxPosition(sample.getBoxPosition());

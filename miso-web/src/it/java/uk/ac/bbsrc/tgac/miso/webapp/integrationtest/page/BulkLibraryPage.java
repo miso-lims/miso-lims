@@ -20,6 +20,7 @@ public class BulkLibraryPage extends BulkPage {
     public static final String NAME = "Name";
     public static final String ALIAS = "Alias";
     public static final String SAMPLE_ALIAS = "Sample Alias";
+    public static final String SAMPLE_NAME = "Sample Name";
     public static final String ID_BARCODE = "Matrix Barcode";
     public static final String BOX_SEARCH = "Box Search";
     public static final String BOX_ALIAS = "Box Alias";

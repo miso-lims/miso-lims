@@ -28,8 +28,8 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
 
   private static final Set<String> identityColumns = Sets.newHashSet(SamColumns.EXTERNAL_NAME, SamColumns.DONOR_SEX, SamColumns.CONSENT);
 
-  private static final Set<String> nonIdentityColumns = Sets.newHashSet(SamColumns.PARENT_ALIAS, SamColumns.PARENT_LOCATION,
-      SamColumns.REQUISITION_ID);
+  private static final Set<String> nonIdentityColumns = Sets.newHashSet(SamColumns.PARENT_NAME, SamColumns.PARENT_ALIAS,
+      SamColumns.PARENT_LOCATION, SamColumns.REQUISITION_ID);
 
   private static final Set<String> tissueColumns = Sets.newHashSet(SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE,
       SamColumns.PASSAGE_NUMBER, SamColumns.TIMES_RECEIVED, SamColumns.TUBE_NUMBER, SamColumns.LAB, SamColumns.SECONDARY_ID,
