@@ -25,7 +25,8 @@ FOR EACH ROW
       makeChangeMessage('QC Status Note', OLD.detailedQcStatusNote, NEW.detailedQcStatusNote),
       makeChangeMessage('QC User', (SELECT fullName FROM User WHERE userId = OLD.qcUser), (SELECT fullName FROM User WHERE userId = NEW.qcUser)),
       makeChangeMessage('group id', OLD.groupId, NEW.groupId),
-      makeChangeMessage('group description', OLD.groupDescription, NEW.groupDescription)
+      makeChangeMessage('group description', OLD.groupDescription, NEW.groupDescription),
+      makeChangeMessage('description', OLD.description, NEW.description)
     );
     IF log_message IS NOT NULL AND log_message <> '' THEN
       INSERT INTO LibraryAliquotChangeLog(aliquotId, columnsChanged, userId, message, changeTime) VALUES (
@@ -49,7 +50,8 @@ FOR EACH ROW
           makeChangeColumn('detailedQcStatusNote', OLD.detailedQcStatusNote, NEW.detailedQcStatusNote),
           makeChangeColumn('qcUser', OLD.qcUser, NEW.qcUser),
           makeChangeColumn('groupId', OLD.groupId, NEW.groupId),
-          makeChangeColumn('groupDescription', OLD.groupDescription, NEW.groupDescription)
+          makeChangeColumn('groupDescription', OLD.groupDescription, NEW.groupDescription),
+          makeChangeColumn('description', OLD.description, NEW.description)
         ), ''),
         NEW.lastModifier,
         log_message,

@@ -1657,6 +1657,7 @@ public class Dtos {
     dto.setId(from.getId());
     dto.setName(from.getName());
     setString(dto::setAlias, from.getAlias());
+    setString(dto::setDescription, from.getDescription());
     dto.setCreatorName(from.getCreator().getFullName());
     setString(dto::setConcentration, from.getConcentration());
     dto.setConcentrationUnits(from.getConcentrationUnits());
@@ -1779,11 +1780,10 @@ public class Dtos {
       setObject(to::setLibrary, LibraryImpl::new, from.getLibraryId());
       setObject(to::setParentAliquot, LibraryAliquot::new, from.getParentAliquotId());
     }
-    if (from.getId() != null) to.setId(from.getId());
-    if (!isStringEmptyOrNull(from.getName())) {
-      to.setName(from.getName());
-    }
+    setLong(to::setId, from.getId(), false);
+    setString(to::setName, from.getName());
     setString(to::setAlias, from.getAlias());
+    setString(to::setDescription, from.getDescription());
     setInteger(to::setDnaSize, from.getDnaSize(), true);
     to.setIdentificationBarcode(from.getIdentificationBarcode());
     setBigDecimal(to::setConcentration, from.getConcentration());

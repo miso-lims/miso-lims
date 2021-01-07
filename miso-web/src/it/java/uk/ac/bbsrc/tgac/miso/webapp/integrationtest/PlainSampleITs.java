@@ -46,11 +46,12 @@ public class PlainSampleITs extends AbstractIT {
       LibColumns.CONCENTRATION_UNITS, LibColumns.SPIKE_IN, LibColumns.SPIKE_IN_DILUTION, LibColumns.SPIKE_IN_VOL);
 
   private static final Set<String> libraryAliquotColumns = Sets.newHashSet(LibraryAliquotColumns.NAME, LibraryAliquotColumns.ALIAS,
-      LibraryAliquotColumns.PARENT_NAME, LibraryAliquotColumns.PARENT_ALIAS, LibraryAliquotColumns.BOX_SEARCH,
-      LibraryAliquotColumns.BOX_ALIAS, LibraryAliquotColumns.BOX_POSITION, LibraryAliquotColumns.DISCARDED, LibraryAliquotColumns.QC_STATUS,
-      LibraryAliquotColumns.QC_NOTE, LibraryAliquotColumns.SIZE, LibraryAliquotColumns.CONCENTRATION,
-      LibraryAliquotColumns.CONCENTRATION_UNITS, LibraryAliquotColumns.VOLUME, LibraryAliquotColumns.VOLUME_UNITS,
-      LibraryAliquotColumns.NG_USED, LibraryAliquotColumns.VOLUME_USED, LibraryAliquotColumns.CREATION_DATE);
+      LibraryAliquotColumns.PARENT_NAME, LibraryAliquotColumns.PARENT_ALIAS, LibraryAliquotColumns.DESCRIPTION,
+      LibraryAliquotColumns.BOX_SEARCH, LibraryAliquotColumns.BOX_ALIAS, LibraryAliquotColumns.BOX_POSITION,
+      LibraryAliquotColumns.DISCARDED, LibraryAliquotColumns.QC_STATUS, LibraryAliquotColumns.QC_NOTE, LibraryAliquotColumns.SIZE,
+      LibraryAliquotColumns.CONCENTRATION, LibraryAliquotColumns.CONCENTRATION_UNITS, LibraryAliquotColumns.VOLUME,
+      LibraryAliquotColumns.VOLUME_UNITS, LibraryAliquotColumns.NG_USED, LibraryAliquotColumns.VOLUME_USED,
+      LibraryAliquotColumns.CREATION_DATE);
 
   @Override
   protected boolean isDetailedSampleMode() {

@@ -96,6 +96,7 @@ public class LibraryAliquot extends AbstractBoxable
   private String name;
 
   private String alias;
+  private String description;
 
   @Column(nullable = false)
   @Temporal(TemporalType.DATE)
@@ -358,6 +359,14 @@ public class LibraryAliquot extends AbstractBoxable
   @Override
   public void setAlias(String alias) {
     this.alias = alias;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   @Override

@@ -148,7 +148,7 @@ BulkTarget.libraryaliquot = (function($) {
         },
         include: config.pageMode === 'propagate',
         omit: true
-      }, BulkUtils.columns.name, BulkUtils.columns.generatedAlias(config)];
+      }, BulkUtils.columns.name, BulkUtils.columns.generatedAlias(config), BulkUtils.columns.description];
 
       columns = columns.concat(BulkUtils.columns.boxable(config, api));
       columns = columns.concat(BulkUtils.columns.groupId(true, function(rowIndex) {
