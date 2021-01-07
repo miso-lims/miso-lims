@@ -132,9 +132,8 @@ FormTarget.transfer = (function($) {
         }]
       }];
     },
-    confirmSave: function(object, saveCallback) {
+    confirmSave: function(object) {
       object.items = Transfer.getItems();
-      saveCallback();
     }
   }
 

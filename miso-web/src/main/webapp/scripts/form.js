@@ -8,8 +8,9 @@ FormUtils = (function($) {
    *   getEditUrl: required function(object, config) returning string; URL for the object's edit page
    *   getSections: required function(config, object) returning array of FormSections; see below
    *   onLoad: optional function(form); called after the form is initialized
-   *   confirmSave: optional function(object, saveCallback, isDialog); called before saving. saveCallback must be invoked to confirm and
-   *       save
+   *   confirmSave: optional function(object, isDialog, form); called before saving. May return a promise while
+   *       performing asynchronous work or to control whether saving is allowed to proceed. Resolve promise
+   *       to allow save, or reject to cancel. If anything else (or nothing) is returned, saving will proceed
    * }
    * 
    * FormSection Structure: {
@@ -664,12 +665,8 @@ FormUtils = (function($) {
       var saveCallback = function() {
         save(containerId, object, target, config, postSaveCallback, invalidCallback);
       };
-
-      if (target.confirmSave) {
-        target.confirmSave(object, saveCallback, containerId === dialogFormId, form);
-      } else {
-        saveCallback();
-      }
+      $.when(target.confirmSave ? target.confirmSave(object, containerId === dialogFormId, form) : null).then(saveCallback).fail(
+          invalidCallback);
     }, invalidCallback);
   }
 
