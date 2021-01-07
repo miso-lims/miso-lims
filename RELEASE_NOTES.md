@@ -14,6 +14,7 @@ Changes:
   * Allow changing box size as long as the box is empty
   * Prevent setting group description on an item without group ID (detailed sample)
   * Changed free-text location field labels to "Location Note"
+  * Set index sequencing for NovaSeq runs automatically based on Run Scanner data
   * Fixed failed QCs showing as checkmark on QCs lists
   * Fixed cases where pipeline, box use, and box size options were not being refreshed after
     changes
@@ -28,6 +29,7 @@ Changes:
 Upgrade Notes:
 
   * Updated to Pinery v2.16.0
+  * Updated to Run Scanner v1.12.3
 
 # 1.19.1
 
