@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum InstrumentDataManglingPolicy {
-  I5_RC("Reverse compliment i5"), // An Illumina sequencer which sequences the reverse complement of the reverse primer, rather than the
+  I5_RC("Reverse complement i5"), // An Illumina sequencer which sequences the reverse complement of the reverse primer, rather than the
                                   // primer
   NONE("Normal");
 
