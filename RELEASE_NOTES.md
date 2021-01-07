@@ -6,6 +6,7 @@ Changes:
   * Fixed failed QCs showing as checkmark on QCs lists
   * Fixed cases where pipeline, box use, and box size options were not being refreshed after
     changes
+  * Fixed a bug that caused box contents to be cleared when saving on the bulk Edit Boxes page
 
 # 1.19.1
 
