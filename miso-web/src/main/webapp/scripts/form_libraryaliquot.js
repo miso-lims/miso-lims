@@ -66,6 +66,11 @@ FormTarget.libraryaliquot = (function($) {
           required: true,
           maxLength: 100
         }, {
+          title: 'Description',
+          data: 'description',
+          type: 'text',
+          maxLength: 255
+        }, {
           title: 'Matrix Barcode',
           data: 'identificationBarcode',
           type: 'text',

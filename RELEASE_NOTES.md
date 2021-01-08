@@ -3,10 +3,12 @@
 Changes:
 
   * Added parent name to bulk propagate pages where applicable
+  * Added library aliquot description field
   * Adjusted OICR naming scheme to allow more than 2 digits in times received and tube number
   * Fixed failed QCs showing as checkmark on QCs lists
   * Fixed cases where pipeline, box use, and box size options were not being refreshed after
     changes
+  * Fixed forms going into bad state after cancelling save confirmation
   * Fixed a bug that caused box contents to be cleared when saving on the bulk Edit Boxes page
 
 # 1.19.1

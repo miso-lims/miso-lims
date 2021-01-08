@@ -28,10 +28,9 @@ FormTarget.qctype = (function($) {
         fields: config.isAdmin ? getAdminFields(config, object) : getReadOnlyFields(config, object)
       }];
     },
-    confirmSave: function(object, saveCallback) {
+    confirmSave: function(object) {
       object.controls = QcType.getControls();
       object.kitDescriptors = QcType.getKits();
-      saveCallback();
     }
   };
 

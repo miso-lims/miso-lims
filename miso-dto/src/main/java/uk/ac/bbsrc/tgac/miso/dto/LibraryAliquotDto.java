@@ -23,6 +23,7 @@ public class LibraryAliquotDto extends AbstractBoxableDto implements UpstreamQcF
   private Long id;
   private String name;
   private String alias;
+  private String description;
   private String identificationBarcode;
   private String locationLabel;
   private String concentration;
@@ -87,6 +88,14 @@ public class LibraryAliquotDto extends AbstractBoxableDto implements UpstreamQcF
 
   public void setAlias(String alias) {
     this.alias = alias;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   @JsonInclude(JsonInclude.Include.ALWAYS)

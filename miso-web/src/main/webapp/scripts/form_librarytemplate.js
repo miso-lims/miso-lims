@@ -150,10 +150,9 @@ FormTarget.librarytemplate = (function($) {
             }]
       }];
     },
-    confirmSave: function(object, saveCallback) {
+    confirmSave: function(object) {
       LibraryTemplate.applyIndices(object);
       LibraryTemplate.applyProjects(object);
-      saveCallback();
     }
   }
 
