@@ -553,8 +553,8 @@ Some things to keep in mind when adding instrument models:
 * Platform is only important for sequencers. For array scanners and other instruments, it doesn't matter which platform
   is selected
 * Containers per run only applies to sequencers and should be set to 0 for other instrument types
-* Index sequencing should be set to normal except for instruments that sequence the reverse compliment of the i5 index,
-  such as the Illumina NextSeq. For these, "Reverse compliment i5" should be chosen
+* Index sequencing should be set to normal except for instruments that sequence the reverse complement of the i5 index,
+  such as the Illumina NextSeq. For these, "Reverse complement i5" should be chosen
 * If you are creating a sequencer-type instrument, don't forget to add container models to it
 
 
