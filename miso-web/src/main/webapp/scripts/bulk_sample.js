@@ -735,14 +735,16 @@ BulkTarget.sample = (function($) {
         data: 'timesReceived',
         include: show['Tissue'],
         includeSaved: targetCategory === 'Tissue',
-        min: 1
+        min: 1,
+        max: 1000000000
       }, {
         title: 'Tube Number',
         type: 'int',
         data: 'tubeNumber',
         include: show['Tissue'],
         includeSaved: targetCategory === 'Tissue',
-        min: 1
+        min: 1,
+        max: 1000000000
       }, {
         title: 'Lab',
         type: 'dropdown',

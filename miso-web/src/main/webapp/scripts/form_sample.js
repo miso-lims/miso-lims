@@ -312,13 +312,15 @@ FormTarget.sample = (function($) {
                   title: 'Times Received',
                   data: 'timesReceived',
                   type: 'int',
-                  min: 1
+                  min: 1,
+                  max: 1000000000
                 },
                 {
                   title: 'Tube Number',
                   data: 'tubeNumber',
                   type: 'int',
-                  min: 1
+                  min: 1,
+                  max: 1000000000
                 },
                 {
                   title: 'Tissue Material',
