@@ -68,14 +68,7 @@ FormTarget.box = (function($) {
           source: Constants.boxSizes,
           getItemLabel: Utils.array.get('label'),
           getItemValue: Utils.array.getId,
-          required: true,
-          include: config.isNew
-        }, {
-          title: 'Box Size',
-          data: 'sizeId',
-          getDisplayValue: Utils.array.get('sizeLabel'),
-          type: 'read-only',
-          include: !config.isNew
+          required: true
         }, {
           title: 'Location',
           data: 'locationBarcode',

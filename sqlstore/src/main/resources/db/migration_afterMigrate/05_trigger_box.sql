@@ -11,7 +11,8 @@ FOR EACH ROW
     makeChangeMessage('barcode', OLD.identificationBarcode, NEW.identificationBarcode),
     makeChangeMessage('location', OLD.locationBarcode, NEW.locationBarcode),
     makeChangeMessage('description', OLD.description, NEW.description),
-    makeChangeMessage('use', (SELECT alias FROM BoxUse WHERE boxUseId = OLD.boxUseId), (SELECT alias FROM BoxUse WHERE boxUseId = NEW.boxUseId))
+    makeChangeMessage('use', (SELECT alias FROM BoxUse WHERE boxUseId = OLD.boxUseId), (SELECT alias FROM BoxUse WHERE boxUseId = NEW.boxUseId)),
+    makeChangeMessage('size', boxSizeToString(OLD.boxSizeId), boxSizeToString(NEW.boxSizeId))
   );
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO BoxChangeLog(boxId, columnsChanged, userId, message, changeTime) VALUES (
@@ -21,7 +22,8 @@ FOR EACH ROW
         makeChangeColumn('identificationBarcode', NEW.identificationBarcode, OLD.identificationBarcode),
         makeChangeColumn('locationBarcode', NEW.locationBarcode, OLD.locationBarcode),
         makeChangeColumn('description', NEW.description, OLD.description),
-        makeChangeColumn('boxUseId', NEW.boxUseId, OLD.boxUseId)
+        makeChangeColumn('boxUseId', NEW.boxUseId, OLD.boxUseId),
+        makeChangeColumn('boxSizeId', NEW.boxSizeId, OLD.boxSizeId)
       ), ''),
       NEW.lastModifier,
       log_message,
