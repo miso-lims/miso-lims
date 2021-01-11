@@ -32,6 +32,16 @@ BEGIN
   END;
 END//
 
+DROP FUNCTION IF EXISTS qcPassedToString//
+CREATE FUNCTION qcPassedToString(original BOOLEAN) RETURNS CHAR(21)
+BEGIN
+  RETURN CASE original
+    WHEN TRUE THEN 'Ready'
+    WHEN FALSE THEN 'Failed'
+    ELSE 'Not Ready'
+  END;
+END//
+
 DROP FUNCTION IF EXISTS boxSizeToString//
 CREATE FUNCTION boxSizeToString(id bigint(20)) RETURNS varchar(50)
 BEGIN
@@ -40,7 +50,6 @@ BEGIN
   FROM BoxSize WHERE boxSizeId = id;
   RETURN label;
 END//
-
 
 DROP FUNCTION IF EXISTS isChanged//
 CREATE FUNCTION isChanged(val1 varchar(255), val2 varchar(255)) RETURNS BOOLEAN
