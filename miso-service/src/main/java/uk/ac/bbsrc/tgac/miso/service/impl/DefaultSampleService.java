@@ -45,7 +45,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
-import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl.IdentityBuilder;
@@ -804,6 +803,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     if (isDetailedSample(sample)) {
       validateSubproject(sample, beforeChange, errors);
       validateReferenceSlide((DetailedSample) sample, errors);
+      validateGroupDescription((DetailedSample) sample, errors);
     }
 
     if (sample.getCreationReceiptInfo() != null) {

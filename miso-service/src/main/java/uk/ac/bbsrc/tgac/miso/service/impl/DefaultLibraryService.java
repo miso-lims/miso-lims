@@ -564,6 +564,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     validateDetailedQcStatus(library, errors);
     if (isDetailedLibrary(library) && beforeChange != null) {
       validateTargetedSequencing(((DetailedLibrary) library).getLibraryDesignCode(), beforeChange.getLibraryAliquots(), errors);
+      validateGroupDescription((DetailedLibrary) library, errors);
     }
 
     // Fields required on either of these conditions
