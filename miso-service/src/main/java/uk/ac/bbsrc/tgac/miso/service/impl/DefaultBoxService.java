@@ -100,7 +100,8 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
     to.setDescription(from.getDescription());
     to.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(from.getIdentificationBarcode()));
     to.setLocationBarcode(from.getLocationBarcode());
-    to.setUse(boxUseService.get(from.getUse().getId()));
+    to.setUse(from.getUse());
+    to.setSize(from.getSize());
     to.setStorageLocation(from.getStorageLocation());
   }
 
@@ -378,6 +379,11 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
         }
       }
     }
+
+    if (beforeChange != null && isChanged(Box::getSize, box, beforeChange) && !box.getBoxPositions().isEmpty()) {
+      errors.add(new ValidationError("sizeId", "Size can only be changed when the box is empty"));
+    }
+
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }
