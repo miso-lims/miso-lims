@@ -5,6 +5,8 @@ Changes:
   * Added parent name to bulk propagate pages where applicable
   * Added library aliquot description field
   * Adjusted OICR naming scheme to allow more than 2 digits in times received and tube number
+  * Allow adding entire boxes to transfers on the Create/Edit Transfer page
+  * Allow creating transfers from the Boxes list
   * Allow changing box size as long as the box is empty
   * Fixed failed QCs showing as checkmark on QCs lists
   * Fixed cases where pipeline, box use, and box size options were not being refreshed after

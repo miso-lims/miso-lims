@@ -39,6 +39,8 @@ Internal and distribution transfers can be created in several different ways.
 * On the Transfers list page, click the "Add" button in the toolbar
 * On the Samples, Libraries, Library Aliquots, or Pool list page, select the items to transfer and click the "Transfer"
   button in the toolbar
+* On the Boxes list page, select the boxes to transfer and click the "Transfer" button in the toolbar. This will create
+  a transfer containing all items from the selected boxes
 * On the Edit Sample, Edit Library, Edit Library Aliquot, or Edit Pool page, in the Transfers list, click the "Add"
   button in the toolbar
 
