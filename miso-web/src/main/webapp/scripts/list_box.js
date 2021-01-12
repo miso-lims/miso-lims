@@ -112,13 +112,13 @@ ListTarget.box = {
           "bSortable": false,
           "iSortPriority": 0
         }, {
-          "sTitle": "Storage Location",
+          "sTitle": "Freezer Location",
           "mData": "storageDisplayLocation",
           "include": config.showStorageLocation,
           "bSortable": false,
           "iSortPriority": 0
         }, {
-          "sTitle": "Location",
+          "sTitle": "Location Note",
           "mData": "locationBarcode",
           "include": true,
           "iSortPriority": 0

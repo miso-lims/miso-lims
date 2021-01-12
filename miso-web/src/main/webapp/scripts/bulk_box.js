@@ -40,11 +40,6 @@ BulkTarget.box = (function($) {
         getItemValue: Utils.array.getId,
         sortSource: true
       }, {
-        title: 'Location',
-        type: 'text',
-        data: 'locationBarcode',
-        maxLength: 255
-      }, {
         title: 'Freezer Location Barcode',
         type: 'text',
         data: 'storageLocationBarcode',
@@ -89,6 +84,11 @@ BulkTarget.box = (function($) {
         },
         getItemLabel: Utils.array.get('fullDisplayLocation'),
         getItemValue: Utils.array.getId
+      }, {
+        title: 'Location Note',
+        type: 'text',
+        data: 'locationBarcode',
+        maxLength: 255
       }];
     }
   };

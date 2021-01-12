@@ -296,7 +296,7 @@ FormUtils = (function($) {
           return location;
         },
         getLink: function(object) {
-          return object.box ? ('/miso/box/' + object.box.id) : null;
+          return object.box ? (Urls.ui.boxes.edit(object.box.id)) : null;
         }
       }
     },

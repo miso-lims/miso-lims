@@ -47,6 +47,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String FALLBACK = "Fallback";
     public static final String FAMILY = "Family";
     public static final String FILENAME = "Filename";
+    public static final String FREEZER_LOCATION = "Freezer Location";
     public static final String FULL_NAME = "Full Name";
     public static final String ID = "ID";
     public static final String IDENTIFICATION_BARCODE = "Identification Barcode";
@@ -77,6 +78,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String LIBRARY_STRATEGY = "Strategy";
     public static final String LIBRARY_TYPE = "Library Type";
     public static final String LOCATION = "Location";
+    public static final String LOCATION_NOTE = "Location Note";
     public static final String LOGGED_IN = "Logged In";
     public static final String LOGIN_NAME = "Login Name";
     public static final String LONGEST_INDEX = "Longest Index";
@@ -132,7 +134,6 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String STATUS = "Status";
     public static final String STOCK_LEVEL = "Stock Level";
     public static final String STOPPED = "Stopped";
-    public static final String STORAGE_LOCATION = "Storage Location";
     public static final String STUDY_ALIAS = "Study Alias";
     public static final String STUDY_NAME = "Study Name";
     public static final String SUBCATEGORY = "Subcategory";
