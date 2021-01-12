@@ -70,10 +70,14 @@ and click "Edit" in the toolbar at the top of the table.
 
 To edit a single box, go to the [Boxes list page](#boxes-list) and click on the target box's name or alias.
 
-Freezer location can be changed on the Edit Box page by scanning the desired freezer location's barcode or
-selecting the desired freezer location from the dropdown menu, and clicking "Set". Freezer location can be
-changed on the bulk edit boxes page by scanning the freezer location barcode into the Freezer Location Barcode
-cell; the Freezer Location cell will update automatically with the appropriate freezer location details.
+Freezer location can be changed in several ways:
+
+* On the Edit Box page, click the "Scan" button. Scan a location barcode and follow the prompts.
+* On the Edit Box page, click the "Select" button. Select a freezer from the dialog, then follow the prompts to choose
+  a location within the selected freezer.
+* On the Edit Box page, click "Remove" to clear the freezer location.
+* On the bulk Edit Boxes page, scan the freezer location barcode into the Freezer Location Barcode cell. The Freezer
+  Location cell will update automatically with the appropriate freezer location details.
 
 ![Contents diagram and table](../images/contents-diagram-and-table.png)
 *Contents diagram and table*
@@ -216,7 +220,7 @@ sources of error are:
     * Ensure that the tube barcode is correctly associated with an item in MISO.
  * The network is down or MISO cannot connect to the scanner
     * Fix these problems first, then rescan.
-    
+
 ## Exporting Box Information
 
 Go to the Edit Box page by clicking on the box name in the Boxes list page. The Contents section heading has an
@@ -289,5 +293,3 @@ click the "Delete" button in the toolbar at the top of the table. A box can be d
 items in it; in this case, the items will be removed from the box and their location will be unknown to MISO.
 It is recommended that you add them to a new box if you wish their location to be tracked in MISO. A box can
 only be deleted by its creator or a MISO admin user.
-
-
