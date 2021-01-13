@@ -7,6 +7,7 @@ Changes:
   * Adjusted OICR naming scheme to allow more than 2 digits in times received and tube number
   * Prevent setting group description on an item without group ID (detailed sample)
   * Allow changing box size as long as the box is empty
+  * Changed free-text location field labels to "Location Note"
   * Fixed failed QCs showing as checkmark on QCs lists
   * Fixed cases where pipeline, box use, and box size options were not being refreshed after
     changes

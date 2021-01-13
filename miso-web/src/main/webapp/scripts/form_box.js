@@ -70,11 +70,6 @@ FormTarget.box = (function($) {
           getItemValue: Utils.array.getId,
           required: true
         }, {
-          title: 'Location',
-          data: 'locationBarcode',
-          type: 'text',
-          maxLength: 255
-        }, {
           title: 'Freezer Location',
           data: 'storageLocationId',
           getDisplayValue: function(box) {
@@ -88,6 +83,11 @@ FormTarget.box = (function($) {
           title: 'Change Location (scan or select)',
           type: 'special',
           makeControls: makeLocationSelect
+        }, {
+          title: 'Location Note',
+          data: 'locationBarcode',
+          type: 'text',
+          maxLength: 255
         }]
       }];
     },
