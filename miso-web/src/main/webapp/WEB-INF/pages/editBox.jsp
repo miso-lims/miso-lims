@@ -62,6 +62,7 @@
 <form:form id="boxForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
 
 </div>
+<br>
 
 <script type="text/javascript">
   jQuery(document).ready(function () {
