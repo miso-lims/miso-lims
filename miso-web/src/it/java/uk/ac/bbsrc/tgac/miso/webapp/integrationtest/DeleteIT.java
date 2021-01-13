@@ -256,7 +256,7 @@ public class DeleteIT extends AbstractIT {
 
   @Test
   public void testDeleteLab() {
-    testAdminDelete(ListTarget.LABS, null, "Unused Lab", Columns.ALIAS, LabImpl.class, 3L);
+    testAdminDelete(ListTarget.LABS, null, "Almost Unused Institute - Unused Lab", Columns.ALIAS, LabImpl.class, 3L);
   }
 
   @Test

@@ -142,9 +142,8 @@ public class AdvancedSearchParser {
         case "ext":
         case "extern":
           return PaginationFilter.external(parts[1]);
-        case "institute":
-        case "inst":
-          return PaginationFilter.institute(parts[1]);
+        case "lab":
+          return PaginationFilter.lab(parts[1]);
         case "box":
           return PaginationFilter.box(parts[1]);
         case "boxType":

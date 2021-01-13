@@ -741,7 +741,7 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListLabsSetup() throws Exception {
-    testPageSetup(ListTarget.LABS, Sets.newHashSet(Columns.ALIAS, Columns.INSTITUTE, Columns.ARCHIVED));
+    testPageSetup(ListTarget.LABS, Sets.newHashSet(Columns.ALIAS, Columns.ARCHIVED));
   }
 
   @Test

@@ -95,9 +95,9 @@ ListUtils = (function($) {
       term: "class:NAME",
       help: "Check if the item belong to the sample class provided. This is taken as a partial match."
     },
-    "institute": {
-      term: "institute:NAME",
-      help: "Check if the item came from the institute mentioned. This is a partial match."
+    "lab": {
+      term: "lab:NAME",
+      help: "Check if an item came from the specified lab. This is a partial match."
     },
     "external": {
       term: "external:NAME",

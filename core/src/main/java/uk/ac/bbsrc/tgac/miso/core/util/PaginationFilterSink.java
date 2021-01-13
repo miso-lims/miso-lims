@@ -57,7 +57,7 @@ public interface PaginationFilterSink<T> {
 
   public void restrictPaginationByIndex(T item, String index, Consumer<String> errorHandler);
 
-  public void restrictPaginationByInstitute(T item, String name, Consumer<String> errorHandler);
+  public void restrictPaginationByLab(T item, String name, Consumer<String> errorHandler);
 
   public void restrictPaginationByInstrumentType(T item, InstrumentType type, Consumer<String> errorHandler);
 

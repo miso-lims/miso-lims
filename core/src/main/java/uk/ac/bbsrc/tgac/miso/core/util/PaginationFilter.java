@@ -246,12 +246,12 @@ public abstract interface PaginationFilter {
     };
   }
 
-  public static PaginationFilter institute(String name) {
+  public static PaginationFilter lab(String name) {
     return new PaginationFilter() {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
-        sink.restrictPaginationByInstitute(item, name, errorHandler);
+        sink.restrictPaginationByLab(item, name, errorHandler);
       }
     };
   }

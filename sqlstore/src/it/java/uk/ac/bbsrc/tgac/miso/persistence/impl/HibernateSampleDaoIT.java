@@ -358,7 +358,7 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
 
   @Test
   public void testSearchByInstitute() throws IOException {
-    testSearch(PaginationFilter.institute("OICR"));
+    testSearch(PaginationFilter.lab("OICR"));
   }
 
   @Test
