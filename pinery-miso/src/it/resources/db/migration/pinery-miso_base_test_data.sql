@@ -45,7 +45,6 @@ DELETE FROM TissueMaterial;
 DELETE FROM TissueOrigin;
 DELETE FROM TissueType;
 DELETE FROM Lab;
-DELETE FROM Institute;
 DELETE FROM Stain;
 DELETE FROM SamplePurpose;
 DELETE FROM DetailedQcStatus;
@@ -228,9 +227,6 @@ INSERT INTO Indices (indexId, indexFamilyId, name, sequence, position) VALUES
   (11, 2, 'B03',      'GGGCCC', 2),
   (12, 2, 'B04',      'TTTAAA', 2);
 
-INSERT INTO Institute(instituteId, alias, createdBy, creationDate, updatedBy, lastUpdated) VALUES
-(1, 'University Health Network',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00');
-
-INSERT INTO Lab(labId, alias, instituteId, createdBy, creationDate, updatedBy, lastUpdated) VALUES
-(1, 'BioBank', 1, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(2, 'Pathology', 1, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00');
+INSERT INTO Lab(labId, alias, createdBy, creationDate, updatedBy, lastUpdated) VALUES
+(1, 'University Health Network - BioBank', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(2, 'University Health Network - Pathology', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00');

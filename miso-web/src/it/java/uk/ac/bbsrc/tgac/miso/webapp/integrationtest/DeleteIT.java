@@ -34,7 +34,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Workstation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
@@ -253,11 +252,6 @@ public class DeleteIT extends AbstractIT {
   @Test
   public void testDeleteBoxUse() {
     testAdminDelete(ListTarget.BOX_USES, null, "Tissue", Columns.ALIAS, BoxUse.class, 6L);
-  }
-
-  @Test
-  public void testDeleteInstitute() {
-    testAdminDelete(ListTarget.INSTITUTES, null, "Unused Institute", Columns.ALIAS, InstituteImpl.class, 3L);
   }
 
   @Test

@@ -176,15 +176,10 @@ INSERT INTO TissueType(tissueTypeId, alias, description, createdBy, creationDate
 (13, 'U','Unspecified',1,'2017-03-23 22:01:22',1,'2017-03-23 22:01:22'),
 (14, 'n','Unknown',1,'2017-05-29 20:02:03',1,'2017-05-29 20:02:03');
 
-INSERT INTO Institute(instituteId, alias, createdBy, creationDate, updatedBy, lastUpdated) VALUES
-(1, 'University Health Network',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00'),
-(2, 'Almost Unused Institute', 3, '2020-02-28 16:01:00', 3, '2020-02-28 16:01:00'),
-(3, 'Unused Institute', 3, '2020-02-28 16:01:00', 3, '2020-02-28 16:01:00');
-
-INSERT INTO Lab(labId, alias, instituteId, createdBy, creationDate, updatedBy, lastUpdated) VALUES
-(1, 'BioBank', 1, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(2, 'Pathology', 1, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(3, 'Unused Lab', 2, 3, '2020-02-28 16:01:00', 3, '2020-02-28 16:01:00');
+INSERT INTO Lab(labId, alias, createdBy, creationDate, updatedBy, lastUpdated) VALUES
+(1, 'University Health Network - BioBank', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(2, 'University Health Network - Pathology', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(3, 'Almost Unused Institute - Unused Lab', 3, '2020-02-28 16:01:00', 3, '2020-02-28 16:01:00');
 
 INSERT INTO StainCategory(stainCategoryId, name) VALUES
 (1, 'One'),

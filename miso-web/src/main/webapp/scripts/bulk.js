@@ -256,11 +256,9 @@ BulkUtils = (function($) {
           data: 'senderLabId',
           includeSaved: false,
           source: Constants.labs.filter(function(lab) {
-            return !lab.archived && !lab.instituteArchived;
+            return !lab.archived;
           }),
-          getItemLabel: function(item) {
-            return item.label;
-          },
+          getItemLabel: Utils.array.getAlias,
           getItemValue: Utils.array.getId
         }, {
           title: 'Received By',

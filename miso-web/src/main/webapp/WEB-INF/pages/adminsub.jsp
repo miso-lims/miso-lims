@@ -89,7 +89,6 @@
       <a href="<c:url value="/miso/instrumentmodel/list"/>">Instrument Models</a>
       <a href="<c:url value="/miso/boxsize/list"/>">Box Sizes</a>
       <a href="<c:url value="/miso/boxuse/list"/>">Box Uses</a>
-      <a href="<c:url value="/miso/institute/list"/>">Institutes</a>
       <a href="<c:url value="/miso/lab/list"/>">Labs</a>
       <a href="<c:url value="/miso/arraymodel/list"/>">Array Models</a>
       <a href="<c:url value="/miso/partitionqctype/list"/>">Partition QC Types</a>

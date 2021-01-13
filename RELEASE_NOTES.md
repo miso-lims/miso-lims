@@ -8,11 +8,18 @@ Changes:
   * Prevent setting group description on an item without group ID (detailed sample)
   * Allow changing box size as long as the box is empty
   * Changed free-text location field labels to "Location Note"
+  * Changed institutes and labs into a single "lab" item
   * Fixed failed QCs showing as checkmark on QCs lists
   * Fixed cases where pipeline, box use, and box size options were not being refreshed after
     changes
   * Fixed forms going into bad state after cancelling save confirmation
   * Fixed a bug that caused box contents to be cleared when saving on the bulk Edit Boxes page
+
+Upgrade Notes:
+
+  * Institutes have been removed from MISO, and any existing institutes and labs are combined into
+    single "lab" items during the update. After the update, you may wish to review your labs as
+    their aliases may have changed.
 
 # 1.19.1
 

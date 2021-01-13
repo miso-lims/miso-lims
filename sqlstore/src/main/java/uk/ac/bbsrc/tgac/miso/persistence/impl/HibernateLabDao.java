@@ -1,6 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -48,16 +47,11 @@ public class HibernateLabDao implements LabDao {
 
   @Override
   public Long addLab(Lab lab) {
-    Date now = new Date();
-    lab.setCreationDate(now);
-    lab.setLastUpdated(now);
     return (Long) currentSession().save(lab);
   }
 
   @Override
   public void update(Lab lab) {
-    Date now = new Date();
-    lab.setLastUpdated(now);
     currentSession().update(lab);
   }
 

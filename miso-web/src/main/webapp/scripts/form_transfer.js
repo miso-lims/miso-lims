@@ -59,11 +59,9 @@ FormTarget.transfer = (function($) {
           data: 'senderLabId',
           type: 'dropdown',
           source: Constants.labs.filter(function(lab) {
-            return lab.id === object.senderLabId || (!lab.archived && !lab.instituteArchived)
+            return lab.id === object.senderLabId || !lab.archived;
           }),
-          getItemLabel: function(item) {
-            return item.label;
-          },
+          getItemLabel: Utils.array.getAlias,
           getItemValue: Utils.array.getId,
           sortSource: Utils.sorting.standardSort('label'),
           include: config.editSend && object.senderLabId,

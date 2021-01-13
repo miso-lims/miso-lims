@@ -740,16 +740,6 @@ public class ListTablesIT extends AbstractIT {
   }
 
   @Test
-  public void testListInstitutesSetup() throws Exception {
-    testPageSetup(ListTarget.INSTITUTES, Sets.newHashSet(Columns.ALIAS, Columns.ARCHIVED));
-  }
-
-  @Test
-  public void testListInstitutesColumnSort() throws Exception {
-    testColumnsSort(ListTarget.INSTITUTES);
-  }
-
-  @Test
   public void testListLabsSetup() throws Exception {
     testPageSetup(ListTarget.LABS, Sets.newHashSet(Columns.ALIAS, Columns.INSTITUTE, Columns.ARCHIVED));
   }

@@ -70,7 +70,6 @@ DELETE FROM TissueMaterial;
 DELETE FROM TissueOrigin;
 DELETE FROM TissueType;
 DELETE FROM Lab;
-DELETE FROM Institute;
 DELETE FROM Stain;
 DELETE FROM SamplePurpose;
 DELETE FROM DetailedQcStatus;

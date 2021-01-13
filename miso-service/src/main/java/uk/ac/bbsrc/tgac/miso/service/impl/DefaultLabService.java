@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.LabService;
@@ -16,7 +14,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
-import uk.ac.bbsrc.tgac.miso.persistence.InstituteDao;
 import uk.ac.bbsrc.tgac.miso.persistence.LabDao;
 
 @Transactional(rollbackFor = Exception.class)
@@ -30,17 +27,10 @@ public class DefaultLabService implements LabService {
   private DeletionStore deletionStore;
 
   @Autowired
-  private InstituteDao instituteDao;
-
-  @Autowired
   private AuthorizationManager authorizationManager;
 
   public void setLabDao(LabDao labDao) {
     this.labDao = labDao;
-  }
-
-  public void setInstituteDao(InstituteDao instituteDao) {
-    this.instituteDao = instituteDao;
   }
 
   public void setAuthorizationManager(AuthorizationManager authorizationManager) {
@@ -54,25 +44,21 @@ public class DefaultLabService implements LabService {
   }
 
   @Override
-  public Long create(Lab lab, Long instituteId) throws IOException {
+  public long create(Lab lab) throws IOException {
     authorizationManager.throwIfNotInternal();
-    User user = authorizationManager.getCurrentUser();
-    lab.setCreatedBy(user);
-    lab.setUpdatedBy(user);
-    lab.setInstitute(instituteDao.getInstitute(instituteId));
+    lab.setChangeDetails(authorizationManager.getCurrentUser());
     return labDao.addLab(lab);
   }
 
   @Override
-  public void update(Lab lab, Long instituteId) throws IOException {
+  public long update(Lab lab) throws IOException {
     authorizationManager.throwIfNonAdmin();
     Lab updatedLab = get(lab.getId());
     updatedLab.setAlias(lab.getAlias());
-    updatedLab.setInstitute(instituteDao.getInstitute(instituteId));
     updatedLab.setArchived(lab.isArchived());
-    User user = authorizationManager.getCurrentUser();
-    updatedLab.setUpdatedBy(user);
+    lab.setChangeDetails(authorizationManager.getCurrentUser());
     labDao.update(updatedLab);
+    return updatedLab.getId();
   }
 
   @Override

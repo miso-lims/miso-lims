@@ -171,12 +171,9 @@ scientificNameId, volume, detailedQcStatusId, qcUser, lastModifier, creator, cre
 (1, 'SAM1', 'PLAIN_S0001_1', 'Plain', 'SAM1::PLAIN_S0001_first', 'GENOMIC', 1,
   2, NULL, 1, 1, 1, 1, '2017-07-20 09:00:00', '2017-07-20 09:00:00', 'Sample');
 
-INSERT INTO Institute(instituteId, alias, createdBy, creationDate, updatedBy, lastUpdated) VALUES
-(1, 'University Health Network',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00');
-
-INSERT INTO Lab(labId, alias, instituteId, createdBy, creationDate, updatedBy, lastUpdated) VALUES
-(1, 'BioBank', 1, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(2, 'Pathology', 1, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00');
+INSERT INTO Lab(labId, alias, createdBy, creationDate, updatedBy, lastUpdated) VALUES
+(1, 'University Health Network - BioBank', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(2, 'University Health Network - Pathology', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00');
 
 INSERT INTO Transfer(transferId, transferTime, senderLabId, recipientGroupId, creator, created, lastModifier, lastModified) VALUES
 (1, '2017-07-20 12:00:00', 1, 1, 1, '2017-07-20 12:53:00', 1, '2017-07-20 12:53:00');
