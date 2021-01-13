@@ -119,7 +119,8 @@ Urls = (function() {
   // Boxables
   var boxablesRestBase = restBase + '/boxables';
   rest.boxables = {
-    search: boxablesRestBase + '/search'
+    search: boxablesRestBase + '/search',
+    queryByBox: boxablesRestBase + '/query-by-box'
   };
 
   // Box Sizes

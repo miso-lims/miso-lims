@@ -96,7 +96,8 @@ ListTarget.transferitem = (function() {
           Utils.showWizardDialog('Add Items', [makeAddHandler('Samples', 'Add Samples', Urls.rest.samples.query, 'Sample'),
               makeAddHandler('Libraries', 'Add Libraries', Urls.rest.libraries.query, 'Library'),
               makeAddHandler('Library Aliquots', 'Add Library Aliquots', Urls.rest.libraryAliquots.query, 'Library Aliquot'),
-              makeAddHandler('Pools', 'Add Pools', Urls.rest.pools.query, 'Pool')]);
+              makeAddHandler('Pools', 'Add Pools', Urls.rest.pools.query, 'Pool'),
+              makeAddHandler('Boxes', 'Add Items from Boxes', Urls.rest.boxables.queryByBox)]);
         }
       }];
     },
@@ -208,6 +209,7 @@ ListTarget.transferitem = (function() {
               })));
             } else {
               Transfer.addItems(items.map(function(item) {
+                itemType = itemType || getEntityTypeLabel(item.entityType);
                 return {
                   type: itemType,
                   id: item.id,
@@ -225,6 +227,21 @@ ListTarget.transferitem = (function() {
           });
         });
       }
+    }
+  }
+
+  function getEntityTypeLabel(entityType) {
+    switch (entityType) {
+    case 'SAMPLE':
+      return 'Sample';
+    case 'LIBRARY':
+      return 'Library';
+    case 'LIBRARY_ALIQUOT':
+      return 'Library Aliquot';
+    case 'POOL':
+      return 'Pool';
+    default:
+      throw new Error('Invalid entity type');
     }
   }
 
