@@ -27,6 +27,8 @@ import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferItem;
@@ -36,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferNotification;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.GroupService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
@@ -73,6 +76,8 @@ public class TransferController {
   private LibraryAliquotService libraryAliquotService;
   @Autowired
   private PoolService poolService;
+  @Autowired
+  private BoxService boxService;
 
   @Value("${miso.smtp.host:#{null}}")
   private String smtpHost;
@@ -91,7 +96,8 @@ public class TransferController {
   public ModelAndView create(@RequestParam(name = "sampleIds", required = false) String sampleIdString,
       @RequestParam(name = "libraryIds", required = false) String libraryIdString,
       @RequestParam(name = "libraryAliquotIds", required = false) String libraryAliquotIdString,
-      @RequestParam(name = "poolIds", required = false) String poolIdString, ModelMap model) throws IOException {
+      @RequestParam(name = "poolIds", required = false) String poolIdString, ModelMap model,
+      @RequestParam(name = "boxIds", required = false) String boxIdString) throws IOException {
     model.put("title", "New Transfer");
     Transfer transfer = new Transfer();
     addItems("sample", sampleIdString, sampleService, TransferSample::new, transfer::getSampleTransfers);
@@ -99,6 +105,7 @@ public class TransferController {
     addItems("library aliquot", libraryAliquotIdString, libraryAliquotService, TransferLibraryAliquot::new,
         transfer::getLibraryAliquotTransfers);
     addItems("pool", poolIdString, poolService, TransferPool::new, transfer::getPoolTransfers);
+    addBoxItems(boxIdString, transfer);
     return setupForm(transfer, PageMode.CREATE, true, false, model);
   }
 
@@ -115,6 +122,45 @@ public class TransferController {
       U transferItem = constructor.get();
       transferItem.setItem(item);
       setGetter.get().add(transferItem);
+    }
+  }
+
+  private <T extends Boxable, U extends TransferItem<T>> void addBoxItems(String idString, Transfer transfer) throws IOException {
+    if (idString == null) {
+      return;
+    }
+    for (Long id : LimsUtils.parseIds(idString)) {
+      Box box = boxService.get(id);
+      if (box == null) {
+        throw new ClientErrorException(String.format("No box found for ID: %d", id));
+      }
+      for (BoxPosition item : box.getBoxPositions().values()) {
+        long itemId = item.getBoxableId().getTargetId();
+        switch (item.getBoxableId().getTargetType()) {
+        case SAMPLE:
+          TransferSample transferSample = new TransferSample();
+          transferSample.setItem(sampleService.get(itemId));
+          transfer.getSampleTransfers().add(transferSample);
+          break;
+        case LIBRARY:
+          TransferLibrary transferLibrary = new TransferLibrary();
+          transferLibrary.setItem(libraryService.get(itemId));
+          transfer.getLibraryTransfers().add(transferLibrary);
+          break;
+        case LIBRARY_ALIQUOT:
+          TransferLibraryAliquot transferLibraryAliquot = new TransferLibraryAliquot();
+          transferLibraryAliquot.setItem(libraryAliquotService.get(itemId));
+          transfer.getLibraryAliquotTransfers().add(transferLibraryAliquot);
+          break;
+        case POOL:
+          TransferPool transferPool = new TransferPool();
+          transferPool.setItem(poolService.get(itemId));
+          transfer.getPoolTransfers().add(transferPool);
+          break;
+        default:
+          throw new IllegalArgumentException("Unexpected boxable type: " + item.getBoxableId().getTargetType());
+        }
+      }
     }
   }
 

@@ -70,16 +70,16 @@ FormTarget.box = (function($) {
           getItemValue: Utils.array.getId,
           required: true
         }, {
-          title: 'Location',
-          data: 'locationBarcode',
-          type: 'text',
-          maxLength: 255
-        }, {
           title: 'Freezer Location',
           type: 'special',
           makeControls: function(form) {
             return makeFreezerControls(form, object);
           }
+        }, {
+          title: 'Location Note',
+          data: 'locationBarcode',
+          type: 'text',
+          maxLength: 255
         }]
       }];
     }

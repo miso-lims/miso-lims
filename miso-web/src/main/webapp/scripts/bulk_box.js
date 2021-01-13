@@ -18,7 +18,7 @@ BulkTarget.box = (function($) {
       return Urls.external.userManual('boxes');
     },
     getBulkActions: function(config) {
-      return [BulkUtils.actions.edit(Urls.ui.boxes.bulkEdit)];
+      return [BulkUtils.actions.edit(Urls.ui.boxes.bulkEdit), HotUtils.makeTransferAction('boxIds')];
     },
     getColumns: function(config, api) {
       return [BulkUtils.columns.name, BulkUtils.columns.simpleAlias(255), BulkUtils.columns.description, BulkUtils.columns.matrixBarcode, {
@@ -39,11 +39,6 @@ BulkTarget.box = (function($) {
         getItemLabel: Utils.array.get('label'),
         getItemValue: Utils.array.getId,
         sortSource: true
-      }, {
-        title: 'Location',
-        type: 'text',
-        data: 'locationBarcode',
-        maxLength: 255
       }, {
         title: 'Freezer Location Barcode',
         type: 'text',
@@ -89,6 +84,11 @@ BulkTarget.box = (function($) {
         },
         getItemLabel: Utils.array.get('fullDisplayLocation'),
         getItemValue: Utils.array.getId
+      }, {
+        title: 'Location Note',
+        type: 'text',
+        data: 'locationBarcode',
+        maxLength: 255
       }];
     }
   };

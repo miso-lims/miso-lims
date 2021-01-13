@@ -160,12 +160,12 @@ FormTarget.sample = (function($) {
               type: 'decimal',
               precision: 14,
               scale: 10
-            }, FormUtils.makeUnitsField(object, 'concentration'), {
-              title: 'Location',
+            }, FormUtils.makeUnitsField(object, 'concentration'), FormUtils.makeBoxLocationField(), {
+              title: 'Location Note',
               data: 'locationBarcode',
               type: 'text',
               maxLength: 255
-            }, FormUtils.makeBoxLocationField(), {
+            }, {
               title: 'Sequencing Control Type',
               data: 'sequencingControlTypeId',
               type: 'dropdown',
