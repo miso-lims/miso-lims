@@ -19,6 +19,7 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.HierarchyEntity;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
@@ -103,6 +104,12 @@ public class ValidationUtils {
       errors.add(new ValidationError(String.format("%s cannot be set when %s is not specified", qcUserLabel, qcFieldLabel)));
     } else if (qcStatus != null && qcUser == null) {
       errors.add(new ValidationError("%s must be set when %s is specified"));
+    }
+  }
+
+  public static void validateGroupDescription(GroupIdentifiable object, Collection<ValidationError> errors) {
+    if (object.getGroupDescription() != null && object.getGroupId() == null) {
+      errors.add(new ValidationError("groupDescription", "Cannot set group description without group ID"));
     }
   }
 

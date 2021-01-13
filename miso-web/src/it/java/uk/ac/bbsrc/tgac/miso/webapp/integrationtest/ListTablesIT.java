@@ -324,7 +324,7 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListBoxesSetup() throws Exception {
     testTabbedPageSetup(ListTarget.BOXES, Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.DESCRIPTION,
-        Columns.STORAGE_LOCATION, Columns.LOCATION, Columns.ITEMS_CAPACITY, Columns.SIZE, Columns.USE));
+        Columns.FREEZER_LOCATION, Columns.LOCATION_NOTE, Columns.ITEMS_CAPACITY, Columns.SIZE, Columns.USE));
   }
 
   @Test

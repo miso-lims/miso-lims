@@ -8,6 +8,8 @@ Changes:
   * Allow adding entire boxes to transfers on the Create/Edit Transfer page
   * Allow creating transfers from the Boxes list
   * Allow changing box size as long as the box is empty
+  * Prevent setting group description on an item without group ID (detailed sample)
+  * Changed free-text location field labels to "Location Note"
   * Fixed failed QCs showing as checkmark on QCs lists
   * Fixed cases where pipeline, box use, and box size options were not being refreshed after
     changes

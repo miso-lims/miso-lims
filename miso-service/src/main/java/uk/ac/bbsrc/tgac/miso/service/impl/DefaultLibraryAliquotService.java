@@ -321,6 +321,10 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
     validateUnboxableFields(aliquot, errors);
     validateDetailedQcStatus(aliquot, errors);
 
+    if (isDetailedLibraryAliquot(aliquot)) {
+      validateGroupDescription((DetailedLibraryAliquot) aliquot, errors);
+    }
+
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }
