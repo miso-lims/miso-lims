@@ -264,6 +264,7 @@ import uk.ac.bbsrc.tgac.miso.dto.run.SolidRunDto;
 import ca.on.oicr.gsi.runscanner.dto.IlluminaNotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.NotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.OxfordNanoporeNotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.type.IndexSequencing;
 
 @SuppressWarnings("squid:S3776") // make Sonar ignore cognitive complexity warnings for this file
 public class Dtos {
@@ -2465,6 +2466,10 @@ public class Dtos {
     setBoolean(dto::setSecondaryNaming, from.isSecondaryNaming(), false);
     setString(dto::setRebNumber, from.getRebNumber());
     setDateString(dto::setRebExpiry, from.getRebExpiry());
+    setInteger(dto::setSamplesExpected, from.getSamplesExpected(), true);
+    setId(dto::setContactId, from.getContact());
+    setString(dto::setContactName, maybeGetProperty(from.getContact(), Contact::getName));
+    setString(dto::setContactEmail, maybeGetProperty(from.getContact(), Contact::getEmail));
     return dto;
   }
 
@@ -2487,6 +2492,14 @@ public class Dtos {
     setBoolean(to::setSecondaryNaming, dto.isSecondaryNaming(), false);
     setString(to::setRebNumber, dto.getRebNumber());
     setDate(to::setRebExpiry, dto.getRebExpiry());
+    setInteger(to::setSamplesExpected, dto.getSamplesExpected(), true);
+    if (dto.getContactId() != null || !isStringEmptyOrNull(dto.getContactName()) || !isStringEmptyOrNull(dto.getContactEmail())) {
+      Contact contact = new Contact();
+      setLong(contact::setId, dto.getContactId(), false);
+      setString(contact::setName, dto.getContactName());
+      setString(contact::setEmail, dto.getContactEmail());
+      to.setContact(contact);
+    }
     return to;
   }
 
@@ -2684,6 +2697,21 @@ public class Dtos {
     to.setRunBasesMask(from.getRunBasesMask());
     if (!isStringEmptyOrNull(from.getWorkflowType())) {
       to.setWorkflowType(IlluminaWorkflowType.get(from.getWorkflowType()));
+    }
+    to.setDataManglingPolicy(getDataManglingPolicy(from.getIndexSequencing()));
+  }
+
+  private static InstrumentDataManglingPolicy getDataManglingPolicy(IndexSequencing indexSequencing) {
+    if (indexSequencing == null) {
+      return null;
+    }
+    switch (indexSequencing) {
+    case NORMAL:
+      return InstrumentDataManglingPolicy.NONE;
+    case I5_REVERSE_COMPLEMENT:
+      return InstrumentDataManglingPolicy.I5_RC;
+    default:
+      return null;
     }
   }
 

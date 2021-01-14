@@ -5,6 +5,8 @@ SELECT DISTINCT r.alias
   ,r.health
   ,r.startDate
   ,r.completionDate
+  ,r.qcPassed
+  ,r.dataReview
   ,spc.identificationBarcode
   ,createLog.userId
   ,createLog.changeTime

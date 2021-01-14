@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,9 +40,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Contact;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.ContactService;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryTemplateService;
 import uk.ac.bbsrc.tgac.miso.core.service.PipelineService;
@@ -86,6 +89,8 @@ public class DefaultProjectService implements ProjectService {
   private SampleNumberPerProjectService sampleNumberPerProjectService;
   @Autowired
   private PipelineService pipelineService;
+  @Autowired
+  private ContactService contactService;
 
   @Override
   public Project get(long projectId) throws IOException {
@@ -109,6 +114,7 @@ public class DefaultProjectService implements ProjectService {
 
   @Override
   public long create(Project project) throws IOException {
+    saveNewContact(project.getContact());
     loadChildEntities(project);
     validateChange(project, null);
     project.setChangeDetails(authorizationManager.getCurrentUser());
@@ -127,12 +133,31 @@ public class DefaultProjectService implements ProjectService {
   @Override
   public long update(Project project) throws IOException {
     Project original = projectStore.get(project.getId());
+    saveNewContact(project.getContact());
     loadChildEntities(project);
     validateChange(project, original);
     applyChanges(original, project);
     project = original;
     project.setChangeDetails(authorizationManager.getCurrentUser());
     return projectStore.save(project);
+  }
+
+  private void saveNewContact(Contact contact) throws IOException {
+    if (contact != null && !contact.isSaved()) {
+      try {
+        long savedId = contactService.create(contact);
+        contact.setId(savedId);
+      } catch (ValidationException e) {
+        List<ValidationError> errors = e.getErrors().stream().map(error -> {
+          String message = error.getMessage();
+          if (!ValidationError.GENERAL_PROPERTY.equals(error.getProperty())) {
+            message = error.getProperty() + ": " + error.getMessage();
+          }
+          return new ValidationError("contact", message);
+        }).collect(Collectors.toList());
+        throw new ValidationException(errors);
+      }
+    }
   }
 
   private void validateChange(Project project, Project beforeChange) throws IOException {
@@ -168,6 +193,8 @@ public class DefaultProjectService implements ProjectService {
     loadChildEntity(project::setDefaultTargetedSequencing, project.getDefaultTargetedSequencing(), targetedSequencingService,
         "defaultTargetedSequencingId");
     loadChildEntity(project::setPipeline, project.getPipeline(), pipelineService, "pipelineId");
+    loadChildEntity(project::setContact, project.getContact(), contactService, "contactId");
+
   }
 
   private void applyChanges(Project original, Project project) {
@@ -180,6 +207,8 @@ public class DefaultProjectService implements ProjectService {
     original.setPipeline(project.getPipeline());
     original.setRebNumber(project.getRebNumber());
     original.setRebExpiry(project.getRebExpiry());
+    original.setSamplesExpected(project.getSamplesExpected());
+    original.setContact(project.getContact());
   }
 
   public void setNamingSchemeHolder(NamingSchemeHolder namingSchemeHolder) {

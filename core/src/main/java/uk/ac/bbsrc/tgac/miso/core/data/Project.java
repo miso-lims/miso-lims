@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Contact;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Pipeline;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
@@ -129,5 +130,13 @@ public interface Project extends Comparable<Project>, Deletable, Nameable, Seria
   public Date getRebExpiry();
 
   public void setRebExpiry(Date rebExpiry);
+
+  public Integer getSamplesExpected();
+
+  public void setSamplesExpected(Integer samplesExpected);
+
+  public Contact getContact();
+
+  public void setContact(Contact contact);
 
 }

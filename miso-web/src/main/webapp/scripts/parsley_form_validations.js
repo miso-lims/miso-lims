@@ -91,10 +91,18 @@ var Validate = Validate || {
   displayError: function(formId, property, message) {
     var messages = message.split('\n');
     var container = null;
-    if (property === 'GENERAL') {
+    if (property !== 'GENERAL') {
+      var fieldErrors = jQuery('#' + formId + '_' + property + 'Error');
+      if (fieldErrors.length) {
+        container = fieldErrors;
+      } else {
+        messages = messages.map(function(x) {
+          return property + ': ' + x;
+        });
+      }
+    }
+    if (!container) {
       container = jQuery('#' + formId + ' .generalErrors');
-    } else {
-      container = jQuery('#' + formId + '_' + property + 'Error');
     }
     var list = container.find('.errorList');
     if (!list.length) {

@@ -488,10 +488,16 @@ var Utils = Utils
           buttons: buttons
         });
       },
-      showWizardDialog: function(title, actions) {
+      showWizardDialog: function(title, actions, promptText) {
         var dialogArea = document.getElementById('dialog');
         while (dialogArea.hasChildNodes()) {
           dialogArea.removeChild(dialogArea.lastChild);
+        }
+
+        if (promptText) {
+          var prompt = document.createElement('P');
+          prompt.appendChild(document.createTextNode(promptText));
+          dialogArea.appendChild(prompt);
         }
 
         actions.forEach(function(action) {

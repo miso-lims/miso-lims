@@ -1,13 +1,20 @@
 SELECT
   COALESCE(proj.shortName, proj.alias) NAME,
-  COALESCE(count, 0) count,
-  COALESCE(archivedCount, 0) archivedCount,
-  earliest,
-  latest,
-  status IN ('ACTIVE', 'PENDING') active,
+  COALESCE(stats.count, 0) count,
+  COALESCE(stats.archivedCount, 0) archivedCount,
+  stats.earliest,
+  stats.latest,
+  proj.status IN ('ACTIVE', 'PENDING') active,
   pipe.alias = 'Clinical' OR pipe.alias LIKE 'Accredited%' clinical,
   pipe.alias pipeline,
-  secondaryNaming secondaryNamingScheme
+  proj.secondaryNaming secondaryNamingScheme,
+  proj.created,
+  proj.rebNumber,
+  proj.rebExpiry,
+  proj.description,
+  proj.samplesExpected,
+  c.name contactName,
+  c.email contactEmail
 FROM Project proj
 JOIN Pipeline pipe ON pipe.pipelineId = proj.pipelineId
 LEFT JOIN (
@@ -26,6 +33,14 @@ LEFT JOIN (
     SELECT project_projectId, l.archived, l.created, l.lastModified
     FROM Library l
     JOIN Sample s ON s.sampleId = l.sample_sampleId
+    
+    UNION ALL
+    
+    SELECT project_projectId, FALSE, la.created, la.lastUpdated
+    FROM LibraryAliquot la
+    JOIN Library l ON l.libraryId = la.libraryId
+    JOIN Sample s ON s.sampleId = l.sample_sampleId
   ) items
   GROUP BY project_projectId
 ) stats ON stats.project_projectId = proj.projectId
+LEFT JOIN Contact c ON c.contactId = proj.contactId

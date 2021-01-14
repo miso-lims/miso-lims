@@ -33,15 +33,10 @@ SELECT s.alias NAME
         ,s.groupId group_id
         ,s.groupDescription group_id_description
         ,sp.alias purpose
-        ,qubit.results qubit_concentration
-        ,nanodrop.results nanodrop_concentration
-        ,rin.results rin
-        ,dv200.results dv200
         ,NULL barcode
         ,NULL barcode_two
         ,NULL barcode_kit
         ,NULL umis
-        ,qpcr.results qpcr_percentage_human
         ,qpd.status qcPassed
         ,qpd.description detailedQcStatus
         ,box.locationBarcode boxLocation
@@ -59,7 +54,6 @@ SELECT s.alias NAME
         ,s.discards discards
         ,stain.name stain
         ,s.slidesConsumed slides_consumed
-        ,NULL pdac
         ,s.isSynthetic isSynthetic
         ,NOT ISNULL(dist.recipient) distributed
         ,DATE(dist.transferTime) distribution_date
@@ -92,81 +86,6 @@ LEFT JOIN Lab la ON s.labId = la.labId
 LEFT JOIN Sample refSlide ON refSlide.sampleId = s.referenceSlideId
 LEFT JOIN Stain stain ON stain.stainId = s.stain
 LEFT JOIN ScientificName sn ON sn.scientificNameId = s.scientificNameId
-LEFT JOIN (
-    SELECT sqc.sample_sampleId, MAX(sqc.qcId) AS qcId
-    FROM (
-        SELECT sample_sampleId, type, MAX(date) AS maxDate
-        FROM SampleQC
-        JOIN QCType ON QCType.qcTypeId = SampleQC.type
-        WHERE QCType.name LIKE '%Qubit%'
-        GROUP By sample_sampleId, type
-        ) maxQubitDates
-    JOIN SampleQC sqc ON sqc.sample_sampleId = maxQubitDates.sample_sampleId
-        AND sqc.date = maxQubitDates.maxDate
-        AND sqc.type = maxQubitDates.type
-    GROUP BY sqc.sample_sampleId
-) newestQubit ON newestQubit.sample_sampleId = s.sampleId
-LEFT JOIN SampleQC qubit ON qubit.qcId = newestQubit.qcId
-LEFT JOIN (
-        SELECT sqc.sample_sampleId, MAX(sqc.qcId) AS qcId
-        FROM (
-            SELECT sample_sampleId, type, MAX(date) AS maxDate
-            FROM SampleQC
-            JOIN QCType ON QCType.qcTypeId = SampleQC.type
-            WHERE QCType.name = 'Nanodrop'
-            GROUP By sample_sampleId, type
-            ) maxNanodropDates
-        JOIN SampleQC sqc ON sqc.sample_sampleId = maxNanodropDates.sample_sampleId
-            AND sqc.date = maxNanodropDates.maxDate
-            AND sqc.type = maxNanodropDates.type
-        GROUP BY sqc.sample_sampleId
-        ) newestNanodrop ON newestNanodrop.sample_sampleId = s.sampleId
-LEFT JOIN SampleQC nanodrop ON nanodrop.qcId = newestNanodrop.qcId
-LEFT JOIN (
-        SELECT sqc.sample_sampleId, MAX(sqc.qcId) AS qcId
-        FROM (
-            SELECT sample_sampleId, type, MAX(date) AS maxDate
-            FROM SampleQC
-            JOIN QCType ON QCType.qcTypeId = SampleQC.type
-            WHERE QCType.name = 'Human qPCR'
-            GROUP By sample_sampleId, type
-            ) maxQpcrDates
-        JOIN SampleQC sqc ON sqc.sample_sampleId = maxQpcrDates.sample_sampleId
-            AND sqc.date = maxQpcrDates.maxDate
-            AND sqc.type = maxQpcrDates.type
-        GROUP BY sqc.sample_sampleId
-        ) newestQpcr ON newestQpcr.sample_sampleId = s.sampleId
-LEFT JOIN SampleQC qpcr ON qpcr.qcId = newestQpcr.qcId
-LEFT JOIN (
-    SELECT sqc.sample_sampleId, MAX(sqc.qcId) AS qcId
-    FROM (
-        SELECT sample_sampleId, type, MAX(date) AS maxDate
-        FROM SampleQC
-        JOIN QCType ON QCType.qcTypeId = SampleQC.type
-        WHERE QCType.name LIKE 'RIN%'
-        GROUP By sample_sampleId, type
-        ) maxRinDates
-    JOIN SampleQC sqc ON sqc.sample_sampleId = maxRinDates.sample_sampleId
-        AND sqc.date = maxRinDates.maxDate
-        AND sqc.type = maxRinDates.type
-    GROUP BY sqc.sample_sampleId
-) newestRin ON newestRin.sample_sampleId = s.sampleId
-LEFT JOIN SampleQC rin ON rin.qcId = newestRin.qcId
-LEFT JOIN (
-    SELECT sqc.sample_sampleId, MAX(sqc.qcId) AS qcId
-    FROM (
-        SELECT sample_sampleId, type, MAX(date) AS maxDate
-        FROM SampleQC
-        JOIN QCType ON QCType.qcTypeId = SampleQC.type
-        WHERE QCType.name LIKE '%DV200%'
-        GROUP By sample_sampleId, type
-        ) maxDv200Dates
-    JOIN SampleQC sqc ON sqc.sample_sampleId = maxDv200Dates.sample_sampleId
-        AND sqc.date = maxDv200Dates.maxDate
-        AND sqc.type = maxDv200Dates.type
-    GROUP BY sqc.sample_sampleId
-) newestDv200 ON newestDv200.sample_sampleId = s.sampleId
-LEFT JOIN SampleQC dv200 ON dv200.qcId = newestDv200.qcId
 LEFT JOIN BoxPosition pos ON pos.targetId = s.sampleId 
         AND pos.targetType = 'SAMPLE' 
 LEFT JOIN Box box ON box.boxId = pos.boxId 
@@ -244,15 +163,10 @@ SELECT l.alias NAME
         ,l.groupId group_id 
         ,l.groupDescription group_id_description 
         ,NULL purpose 
-        ,qubit.results qubit_concentration 
-        ,NULL nanodrop_concentration 
-        ,NULL rin
-        ,NULL dv200
         ,bc1.sequence barcode 
         ,bc2.sequence barcode_two
         ,bc1.indexFamily barcode_kit
         ,l.umis
-        ,NULL qpcr_percentage_human 
         ,qpd.status qcPassed
         ,qpd.description detailedQcStatus
         ,box.locationBarcode boxLocation 
@@ -270,7 +184,6 @@ SELECT l.alias NAME
         ,NULL discards
         ,NULL stain
         ,NULL slides_consumed
-        ,pdac.results pdac
         ,NULL isSynthetic
         ,NOT ISNULL(dist.recipient) distributed
         ,DATE(dist.transferTime) distribution_date
@@ -301,36 +214,6 @@ LEFT JOIN LibrarySpikeIn lsi ON lsi.spikeInId = l.spikeInId
 LEFT JOIN KitDescriptor kd ON kd.kitDescriptorId = l.kitDescriptorId
 LEFT JOIN LibraryDesignCode ldc ON l.libraryDesignCodeId = ldc.libraryDesignCodeId
 LEFT JOIN LibraryType lt ON lt.libraryTypeId = l.libraryType
-LEFT JOIN (
-        SELECT lqc.library_libraryId, MAX(lqc.qcId) AS qcId
-        FROM (
-            SELECT library_libraryId, type, MAX(date) AS maxDate
-            FROM LibraryQC
-            JOIN QCType ON QCType.qcTypeId = LibraryQC.type
-            WHERE QCType.name LIKE '%Qubit%'
-            GROUP By library_libraryId, type
-            ) maxQubitDates
-        JOIN LibraryQC lqc ON lqc.library_libraryId = maxQubitDates.library_libraryId
-            AND lqc.date = maxQubitDates.maxDate
-            AND lqc.type = maxQubitDates.type
-        GROUP BY lqc.library_libraryId
-        ) newestQubit ON newestQubit.library_libraryId = l.libraryId
-LEFT JOIN LibraryQC qubit ON qubit.qcId = newestQubit.qcId
-LEFT JOIN (
-        SELECT lqc.library_libraryId, MAX(lqc.qcId) AS qcId
-        FROM (
-            SELECT library_libraryId, type, MAX(date) AS maxDate
-            FROM LibraryQC
-            JOIN QCType ON QCType.qcTypeId = LibraryQC.type
-            WHERE QCType.name = 'PDAC Confirmed'
-            GROUP By library_libraryId, type
-            ) maxPdacDates
-        JOIN LibraryQC lqc ON lqc.library_libraryId = maxPdacDates.library_libraryId
-            AND lqc.date = maxPdacDates.maxDate
-            AND lqc.type = maxPdacDates.type
-        GROUP BY lqc.library_libraryId
-        ) newestPdac ON newestPdac.library_libraryId = l.libraryId
-LEFT JOIN LibraryQC pdac ON pdac.qcId = newestPdac.qcId
 LEFT JOIN ( 
         SELECT library_libraryId 
                 ,sequence
@@ -423,15 +306,10 @@ SELECT d.alias name
         ,d.groupId group_id 
         ,d.groupDescription group_id_description 
         ,NULL purpose 
-        ,NULL qubit_concentration 
-        ,NULL nanodrop_concentration 
-        ,NULL rin 
-        ,NULL dv200 
         ,NULL barcode 
         ,NULL barcode_two 
         ,NULL barcode_kit
         ,NULL umis
-        ,NULL qpcr_percentage_human 
         ,qpd.status qcPassed
         ,qpd.description detailedQcStatus
         ,box.locationBarcode boxLocation 
@@ -449,7 +327,6 @@ SELECT d.alias name
         ,NULL discards
         ,NULL stain
         ,NULL slides_consumed
-        ,NULL pdac
         ,NULL isSynthetic
         ,NOT ISNULL(dist.recipient) distributed
         ,DATE(dist.transferTime) distribution_date

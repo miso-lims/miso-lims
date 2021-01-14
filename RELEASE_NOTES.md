@@ -2,24 +2,38 @@
 
 Changes:
 
+  * Added new project fields:                                                    
+    * samples expected                                                           
+    * contact
   * Added parent name to bulk propagate pages where applicable
   * Added library aliquot description field
   * Adjusted OICR naming scheme to allow more than 2 digits in times received and tube number
-  * Prevent setting group description on an item without group ID (detailed sample)
+  * Improved controls for setting freezer location on Edit Box page
+  * Allow adding entire boxes to transfers on the Create/Edit Transfer page
+  * Allow creating transfers from the Boxes list
   * Allow changing box size as long as the box is empty
+  * Prevent setting group description on an item without group ID (detailed sample)
   * Changed free-text location field labels to "Location Note"
   * Changed institutes and labs into a single "lab" item
+  * Set index sequencing for NovaSeq runs automatically based on Run Scanner data
   * Fixed failed QCs showing as checkmark on QCs lists
   * Fixed cases where pipeline, box use, and box size options were not being refreshed after
     changes
   * Fixed forms going into bad state after cancelling save confirmation
   * Fixed a bug that caused box contents to be cleared when saving on the bulk Edit Boxes page
+  * Export the following via Pinery:
+    * Run QC status and data review
+    * Sample "Draft Clinical Report" and "Informatics Review" QCs
+    * Project created, REB number, REB expiry, description, samples expected, contact name, and
+      contact email
 
 Upgrade Notes:
 
   * Institutes have been removed from MISO, and any existing institutes and labs are combined into
     single "lab" items during the update. After the update, you may wish to review your labs as
     their aliases may have changed.
+  * Updated to Pinery v2.16.0
+  * Updated to Run Scanner v1.12.3
 
 # 1.19.1
 
