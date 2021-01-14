@@ -12,7 +12,6 @@ COPY ./miso-service/pom.xml /miso-lims/miso-service/pom.xml
 COPY ./sqlstore/pom.xml /miso-lims/sqlstore/pom.xml
 COPY ./miso-dto/pom.xml /miso-lims/miso-dto/pom.xml
 COPY ./pinery-miso/pom.xml /miso-lims/pinery-miso/pom.xml
-COPY ./migration/pom.xml /miso-lims/migration/pom.xml
 WORKDIR /miso-lims
 # cache the .m2 repository so it doesn't have to download the internet
 # every single time it runs. It runs with --fail-never because this command
@@ -28,7 +27,6 @@ COPY ./miso-service/ /miso-lims/miso-service/
 COPY ./sqlstore/ /miso-lims/sqlstore/
 COPY ./miso-dto/ /miso-lims/miso-dto/
 COPY ./pinery-miso/ /miso-lims/pinery-miso/
-COPY ./migration/ /miso-lims/migration/
 
 RUN mvn clean && mvn package -DskipTests
 
