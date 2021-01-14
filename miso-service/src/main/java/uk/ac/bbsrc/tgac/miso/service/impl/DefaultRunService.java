@@ -618,6 +618,7 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     isMutated |= updateMetricsFromNotification(source, target);
     isMutated |= updateField(source.getFilePath(), target.getFilePath(), target::setFilePath);
     isMutated |= updateField(source.getStartDate(), target.getStartDate(), target::setStartDate);
+    isMutated |= updateField(source.getDataManglingPolicy(), target.getDataManglingPolicy(), target::setDataManglingPolicy);
 
     final Instrument sequencer = instrumentService.getByName(sequencerName);
     if (sequencer == null) {

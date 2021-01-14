@@ -266,6 +266,7 @@ import uk.ac.bbsrc.tgac.miso.dto.run.SolidRunDto;
 import ca.on.oicr.gsi.runscanner.dto.IlluminaNotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.NotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.OxfordNanoporeNotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.type.IndexSequencing;
 
 @SuppressWarnings("squid:S3776") // make Sonar ignore cognitive complexity warnings for this file
 public class Dtos {
@@ -2728,6 +2729,21 @@ public class Dtos {
     to.setRunBasesMask(from.getRunBasesMask());
     if (!isStringEmptyOrNull(from.getWorkflowType())) {
       to.setWorkflowType(IlluminaWorkflowType.get(from.getWorkflowType()));
+    }
+    to.setDataManglingPolicy(getDataManglingPolicy(from.getIndexSequencing()));
+  }
+
+  private static InstrumentDataManglingPolicy getDataManglingPolicy(IndexSequencing indexSequencing) {
+    if (indexSequencing == null) {
+      return null;
+    }
+    switch (indexSequencing) {
+    case NORMAL:
+      return InstrumentDataManglingPolicy.NONE;
+    case I5_REVERSE_COMPLEMENT:
+      return InstrumentDataManglingPolicy.I5_RC;
+    default:
+      return null;
     }
   }
 
