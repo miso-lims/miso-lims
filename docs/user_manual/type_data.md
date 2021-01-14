@@ -202,20 +202,15 @@ be deleted if the option has not been used by any existing samples.
 
 
 
-## Labs and Institutes
+## Labs
 
-Labs can be recorded as the sender that samples, libraries, library aliquots, or pools were received from. Each lab
-belongs to an institute.
+Labs can be recorded as the sender that samples, libraries, library aliquots, or pools were received from. Labs can be
+archived, which means they will no longer show up in dropdowns when creating new transfers.
 
-Both labs and institutes can be archived, which means they will no longer show up in dropdowns when creating new
-transfers. Note that archiving an institute effectively archives all of its labs as well.
-
-Any user may create new labs and institutes in MISO using the standard interface. Administrators may also
-edit and delete existing labs and institutes. You will only be allowed to delete a lab if it has not been used by any
-existing receipt transfers. If a lab has been used for existing receipt transfers and you no longer wish to see the
-option in dropdowns when creating new transfers, you can archive either the lab or its institute instead. You will
-only be allowed to delete an institute if it has no labs associated with it. This means that if you want to delete an
-institute, you will first have to delete all of its labs.
+Any user may create new labs in MISO using the standard interface. Administrators may also edit and delete existing
+labs. You will only be allowed to delete a lab if it has not been used by any existing receipt transfers. If a lab has
+been used for existing receipt transfers and you no longer wish to see the option in dropdowns when creating new
+transfers, you can archive the lab instead.
 
 
 

@@ -77,7 +77,6 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("instrumentmodel/list");
     slugs.add("boxsize/list");
     slugs.add("boxuse/list");
-    slugs.add("institute/list");
     slugs.add("lab/list");
     slugs.add("arraymodel/list");
     slugs.add("partitionqctype/list");
@@ -196,8 +195,6 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("containermodel/bulk/edit?ids=1%2C2");
     slugs.add("boxsize/bulk/new?quantity=3");
     slugs.add("boxuse/bulk/new?quantity=3");
-    slugs.add("institute/bulk/new?quantity=3");
-    slugs.add("institute/bulk/edit?ids=1");
     slugs.add("lab/bulk/new?quantity=3");
     slugs.add("lab/bulk/edit?ids=1%2C2");
     slugs.add("arraymodel/bulk/new?quantity=3");

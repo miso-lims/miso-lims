@@ -20,7 +20,6 @@ DELETE FROM Experiment;
 DELETE FROM _Group;
 DELETE FROM IndexFamily;
 DELETE FROM Indices;
-DELETE FROM Institute;
 DELETE FROM Instrument;
 DELETE FROM InstrumentModel;
 DELETE FROM InstrumentPosition;

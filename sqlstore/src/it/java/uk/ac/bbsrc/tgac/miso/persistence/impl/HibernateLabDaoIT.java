@@ -13,9 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
-import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
@@ -44,8 +42,7 @@ public class HibernateLabDaoIT extends AbstractDAOTest {
     Lab l = dao.getLab(1L);
     assertNotNull(l);
     assertEquals(1L, l.getId());
-    assertEquals("Lab A1", l.getAlias());
-    assertEquals(1L, l.getInstitute().getId());
+    assertEquals("Institute A - Lab A1", l.getAlias());
   }
 
   @Test
@@ -57,35 +54,30 @@ public class HibernateLabDaoIT extends AbstractDAOTest {
   @Test
   public void testAddLab() {
     Lab l = new LabImpl();
-    Institute i = new InstituteImpl();
-    i.setId(1L);
-    l.setInstitute(i);
     l.setAlias("NewLab");
     User user = new UserImpl();
     user.setId(1L);
-    l.setCreatedBy(user);
-    l.setUpdatedBy(user);
+    l.setCreator(user);
+    l.setLastModifier(user);
     Date now = new Date();
-    l.setCreationDate(now);
+    l.setCreationTime(now);
+    l.setLastModified(now);
 
     final Long newId = dao.addLab(l);
     Lab saved = dao.getLab(newId);
     assertNotNull(saved);
     assertEquals(l.getAlias(), saved.getAlias());
-    assertEquals(l.getInstitute().getId(), saved.getInstitute().getId());
   }
 
   @Test
   public void testUpdateLab() {
     Lab l = dao.getLab(1L);
-    final Date oldDate = l.getLastUpdated();
     final String newAlias = "Changed Alias";
     l.setAlias(newAlias);
 
     dao.update(l);
     Lab updated = dao.getLab(1L);
     assertEquals(newAlias, updated.getAlias());
-    assertFalse(oldDate.equals(updated.getLastUpdated()));
   }
 
   @Test

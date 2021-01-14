@@ -291,7 +291,7 @@ public class NotificationManager {
     if (transfer.getSenderGroup() != null) {
       return transfer.getSenderGroup().getName();
     } else {
-      return transfer.getSenderLab().getAlias() + " (" + transfer.getSenderLab().getInstitute().getAlias() + ")";
+      return transfer.getSenderLab().getAlias();
     }
   }
 

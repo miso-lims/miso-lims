@@ -509,7 +509,7 @@ public class BulkLibraryIT extends AbstractIT {
     attrs.put(LibColumns.DESCRIPTION, "LIBT receive test");
     attrs.put(LibColumns.RECEIVE_DATE, "2017-10-12");
     attrs.put(LibColumns.RECEIVE_TIME, "3:00 pm");
-    attrs.put(LibColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    attrs.put(LibColumns.RECEIVED_FROM, "University Health Network - BioBank");
     attrs.put(LibColumns.RECEIVED_BY, "TestGroupOne");
     attrs.put(LibColumns.RECEIPT_CONFIRMED, "True");
     attrs.put(LibColumns.RECEIPT_QC_PASSED, "True");
@@ -805,7 +805,7 @@ public class BulkLibraryIT extends AbstractIT {
         s -> s == null ? "" : LimsUtils.formatDate(s.getTransfer().getTransferTime()));
     assertEntityAttribute(LibColumns.RECEIVE_TIME, attributes, receipt, BulkLibraryIT::getReceiptTime);
     assertEntityAttribute(LibColumns.RECEIVED_FROM, attributes, receipt,
-        s -> s == null ? "" : s.getTransfer().getSenderLab().getItemLabel());
+        s -> s == null ? "" : s.getTransfer().getSenderLab().getAlias());
     assertEntityAttribute(LibColumns.RECEIVED_BY, attributes, receipt,
         s -> s == null ? "" : s.getTransfer().getRecipientGroup().getName());
     assertEntityAttribute(LibColumns.RECEIPT_CONFIRMED, attributes, receipt,

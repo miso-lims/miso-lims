@@ -298,19 +298,6 @@ Urls = (function() {
     platformDatatable: idUrlFunction(indexRestBase + '/dt/platform')
   };
 
-  // Institutes
-  var instituteUiBase = baseUrl + '/institute'
-  ui.institutes = {
-    bulkCreate: instituteUiBase + '/bulk/new',
-    bulkEdit: instituteUiBase + '/bulk/edit'
-  };
-
-  var instituteRestBase = restBase + '/institutes';
-  rest.institutes = {
-    create: instituteRestBase,
-    update: idUrlFunction(instituteRestBase)
-  };
-
   // Instruments
   var instrumentUiBase = baseUrl + '/instrument';
   ui.instruments = {

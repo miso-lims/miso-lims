@@ -222,12 +222,11 @@ VALUES (1,'STU1','Test study1',NULL,1,(SELECT typeId FROM StudyType WHERE name =
 (5,'STU5','OICR',NULL,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study5',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
 (6,'STU6','delete me',NULL,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study6',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00');
 
-INSERT INTO `Institute`(`instituteId`, `alias`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
-VALUES (1,'Institute A',1,'2016-01-28 14:32:00',1,'2016-01-28 14:32:00'),(2,'Institute B',1,'2016-01-29 09:32:00',1,'2016-01-29 09:32:00');
-
-INSERT INTO `Lab`(`labId`, `instituteId`, `alias`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
-VALUES (1,1,'Lab A1',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00'),(2,1,'Lab A2',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00'),
-(3,1,'Lab B1',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00'),(4,1,'Lab B2',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00');
+INSERT INTO `Lab`(`labId`, `alias`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`) VALUES
+(1,'Institute A - Lab A1',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00'),
+(2,'Institute A - Lab A2',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00'),
+(3,'Institute B - Lab B1',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00'),
+(4,'Institute B - Lab B2',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00');
 
 INSERT INTO `TissueOrigin`(`tissueOriginId`, `alias`, `description`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
 VALUES (1,'Test Origin','for testing',1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:00');

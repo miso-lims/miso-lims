@@ -96,7 +96,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
         s -> s == null ? "" : LimsUtils.formatDate(s.getTransfer().getTransferTime()));
     assertEntityAttribute(SamColumns.RECEIVE_TIME, attributes, receipt, AbstractBulkSampleIT::getReceiptTime);
     assertEntityAttribute(SamColumns.RECEIVED_FROM, attributes, receipt,
-        s -> s == null ? "" : s.getTransfer().getSenderLab().getItemLabel());
+        s -> s == null ? "" : s.getTransfer().getSenderLab().getAlias());
     assertEntityAttribute(SamColumns.RECEIVED_BY, attributes, receipt,
         s -> s == null ? "" : s.getTransfer().getRecipientGroup().getName());
     assertEntityAttribute(SamColumns.RECEIPT_CONFIRMED, attributes, receipt,
@@ -142,7 +142,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
     assertEntityAttribute(SamColumns.REGION, attributes, sample, s -> s.getRegion() == null ? "" : s.getRegion());
     assertEntityAttribute(SamColumns.SECONDARY_ID, attributes, sample,
         s -> s.getSecondaryIdentifier() == null ? "" : s.getSecondaryIdentifier());
-    assertEntityAttribute(SamColumns.LAB, attributes, sample, s -> s.getLab() == null ? "" : s.getLab().getItemLabel());
+    assertEntityAttribute(SamColumns.LAB, attributes, sample, s -> s.getLab() == null ? "" : s.getLab().getAlias());
     assertEntityAttribute(SamColumns.TISSUE_ORIGIN, attributes, sample, s -> s.getTissueOrigin().getItemLabel());
     assertEntityAttribute(SamColumns.TISSUE_TYPE, attributes, sample, s -> s.getTissueType().getItemLabel());
     assertEntityAttribute(SamColumns.PASSAGE_NUMBER, attributes, sample,

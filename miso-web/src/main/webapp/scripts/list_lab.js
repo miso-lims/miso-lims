@@ -24,7 +24,7 @@
 ListTarget.lab = {
   name: 'Labs',
   getUserManualUrl: function() {
-    return Urls.external.userManual('type_data', 'labs-and-institutes');
+    return Urls.external.userManual('type_data', 'labs');
   },
   createUrl: function(config, projectId) {
     throw new Error('Must be provided statically');
@@ -62,10 +62,6 @@ ListTarget.lab = {
       mData: 'alias',
       iSortPriority: 1,
       bSortDirection: true
-    }, {
-      sTitle: 'Institute',
-      mData: 'instituteId',
-      mRender: ListUtils.render.textFromId(config.institutes, 'alias')
     }, {
       sTitle: 'Archived',
       mData: 'archived',

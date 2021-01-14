@@ -49,7 +49,7 @@ SELECT s.alias NAME
         ,s.preMigrationId premigration_id
         ,sn.alias organism
         ,subp.alias subproject
-        ,COALESCE(IF(rcpt.excludeFromPinery, NULL, rcpt.institute), IF(la.excludeFromPinery, NULL, it.alias)) institute
+        ,COALESCE(IF(rcpt.excludeFromPinery, NULL, rcpt.institute), IF(la.excludeFromPinery, NULL, la.alias)) institute
         ,s.initialSlides slides
         ,s.discards discards
         ,stain.name stain
@@ -83,7 +83,6 @@ LEFT JOIN TissueType tt ON tt.tissueTypeId = s.tissueTypeId
 LEFT JOIN TissueOrigin tor ON tor.tissueOriginId = s.tissueOriginId 
 LEFT JOIN TissueMaterial tm ON tm.tissueMaterialId = s.tissueMaterialId
 LEFT JOIN Lab la ON s.labId = la.labId
-LEFT JOIN Institute it ON la.instituteId = it.instituteId
 LEFT JOIN Sample refSlide ON refSlide.sampleId = s.referenceSlideId
 LEFT JOIN Stain stain ON stain.stainId = s.stain
 LEFT JOIN ScientificName sn ON sn.scientificNameId = s.scientificNameId
@@ -91,11 +90,10 @@ LEFT JOIN BoxPosition pos ON pos.targetId = s.sampleId
         AND pos.targetType = 'SAMPLE' 
 LEFT JOIN Box box ON box.boxId = pos.boxId 
 LEFT JOIN (
-  SELECT xfers.sampleId, xferinst.alias institute, xfer.transferTime, xferlab.excludeFromPinery
+  SELECT xfers.sampleId, xferlab.alias institute, xfer.transferTime, xferlab.excludeFromPinery
   FROM Transfer_Sample xfers
   JOIN Transfer xfer ON xfer.transferId = xfers.transferId
   JOIN Lab xferlab ON xferlab.labId = xfer.senderLabId
-  JOIN Institute xferinst ON xferinst.instituteId = xferlab.instituteId
   WHERE xfer.senderLabId IS NOT NULL
 ) rcpt ON rcpt.sampleId = s.sampleId
 LEFT JOIN (
@@ -236,11 +234,10 @@ LEFT JOIN BoxPosition pos ON pos.targetId = l.libraryId
         AND pos.targetType = 'LIBRARY' 
 LEFT JOIN Box box ON box.boxId = pos.boxId
 LEFT JOIN (
-  SELECT xferl.libraryId, xferinst.alias institute, xfer.transferTime, xferlab.excludeFromPinery
+  SELECT xferl.libraryId, xferlab.alias institute, xfer.transferTime, xferlab.excludeFromPinery
   FROM Transfer_Library xferl
   JOIN Transfer xfer ON xfer.transferId = xferl.transferId
   JOIN Lab xferlab ON xferlab.labId = xfer.senderLabId
-  JOIN Institute xferinst ON xferinst.instituteId = xferlab.instituteId
   WHERE xfer.senderLabId IS NOT NULL
 ) rcpt ON rcpt.libraryId = l.libraryId
 LEFT JOIN (
@@ -361,11 +358,10 @@ LEFT JOIN BoxPosition pos ON pos.targetId = d.aliquotId
         AND pos.targetType = 'LIBRARY_ALIQUOT' 
 LEFT JOIN Box box ON box.boxId = pos.boxId
 LEFT JOIN (
-  SELECT xferla.aliquotId, xferinst.alias institute, xfer.transferTime, xferlab.excludeFromPinery
+  SELECT xferla.aliquotId, xferlab.alias institute, xfer.transferTime, xferlab.excludeFromPinery
   FROM Transfer_LibraryAliquot xferla
   JOIN Transfer xfer ON xfer.transferId = xferla.transferId
   JOIN Lab xferlab ON xferlab.labId = xfer.senderLabId
-  JOIN Institute xferinst ON xferinst.instituteId = xferlab.instituteId
   WHERE xfer.senderLabId IS NOT NULL
 ) rcpt ON rcpt.aliquotId = d.aliquotId
 LEFT JOIN (

@@ -7,12 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
-import uk.ac.bbsrc.tgac.miso.core.service.InstituteService;
 import uk.ac.bbsrc.tgac.miso.core.service.LabService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LabDto;
@@ -23,9 +18,6 @@ public class LabDefaultsController extends AbstractInstituteDefaultsController<L
 
   @Autowired
   private LabService service;
-
-  @Autowired
-  private InstituteService instituteService;
 
   @Override
   protected LabDto asDto(Lab model) {
@@ -60,12 +52,6 @@ public class LabDefaultsController extends AbstractInstituteDefaultsController<L
   @Override
   protected String getType() {
     return "lab";
-  }
-
-  @Override
-  protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-    ArrayNode node = config.putArray("institutes");
-    instituteService.list().stream().map(Dtos::asDto).forEach(node::addPOJO);
   }
 
 }

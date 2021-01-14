@@ -292,8 +292,8 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
-  default void restrictPaginationByInstitute(Criteria criteria, String name, Consumer<String> errorHandler) {
-    errorHandler.accept(String.format("%s has no institute associated with it.", getFriendlyName()));
+  default void restrictPaginationByLab(Criteria criteria, String name, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s has no lab associated with it.", getFriendlyName()));
   }
 
   @Override

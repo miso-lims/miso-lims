@@ -60,7 +60,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.IlluminaChemistry;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
-import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentDataManglingPolicy;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
@@ -131,7 +130,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
@@ -962,42 +960,11 @@ public class Dtos {
     return to;
   }
 
-  public static InstituteDto asDto(@Nonnull Institute from) {
-    InstituteDto dto = new InstituteDto();
-    dto.setId(from.getId());
-    dto.setAlias(from.getAlias());
-    setBoolean(dto::setArchived, from.isArchived(), true);
-    dto.setCreationDate(formatDateTime(from.getCreationDate()));
-    dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
-    setLong(dto::setCreatedById, maybeGetProperty(from.getCreatedBy(), User::getId), true);
-    setLong(dto::setUpdatedById, maybeGetProperty(from.getUpdatedBy(), User::getId), true);
-    return dto;
-  }
-
-  public static Set<InstituteDto> asInstituteDtos(@Nonnull Collection<Institute> from) {
-    return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
-  }
-
-  public static Institute to(@Nonnull InstituteDto from) {
-    Institute to = new InstituteImpl();
-    to.setAlias(from.getAlias());
-    setBoolean(to::setArchived, from.getArchived(), false);
-    return to;
-  }
-
   public static LabDto asDto(@Nonnull Lab from) {
     LabDto dto = new LabDto();
-    dto.setId(from.getId());
-    dto.setInstituteId(from.getInstitute().getId());
-    dto.setInstituteAlias(from.getInstitute().getAlias());
-    setBoolean(dto::setInstituteArchived, maybeGetProperty(from.getInstitute(), Institute::isArchived), true);
-    dto.setAlias(from.getAlias());
-    dto.setLabel(from.getItemLabel());
-    setBoolean(dto::setArchived, from.isArchived(), true);
-    dto.setCreationDate(formatDateTime(from.getCreationDate()));
-    dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
-    setLong(dto::setCreatedById, maybeGetProperty(from.getCreatedBy(), User::getId), true);
-    setLong(dto::setUpdatedById, maybeGetProperty(from.getUpdatedBy(), User::getId), true);
+    setLong(dto::setId, from.getId(), true);
+    setString(dto::setAlias, from.getAlias());
+    setBoolean(dto::setArchived, from.isArchived(), false);
     return dto;
   }
 
@@ -1007,7 +974,8 @@ public class Dtos {
 
   public static Lab to(@Nonnull LabDto from) {
     Lab to = new LabImpl();
-    to.setAlias(from.getAlias());
+    setLong(to::setId, from.getId(), false);
+    setString(to::setAlias, from.getAlias());
     setBoolean(to::setArchived, from.getArchived(), false);
     return to;
   }
@@ -3935,7 +3903,7 @@ public class Dtos {
     setString(to::setTransferRequestName, from.getTransferRequestName());
     setDateTimeString(to::setTransferTime, from.getTransferTime());
     setId(to::setSenderLabId, from.getSenderLab());
-    setString(to::setSenderLabLabel, maybeGetProperty(from.getSenderLab(), Lab::getItemLabel));
+    setString(to::setSenderLabLabel, maybeGetProperty(from.getSenderLab(), Lab::getAlias));
     setId(to::setSenderGroupId, from.getSenderGroup());
     setString(to::setSenderGroupName, maybeGetProperty(from.getSenderGroup(), Group::getName));
     setString(to::setRecipient, from.getRecipient());
@@ -4040,7 +4008,7 @@ public class Dtos {
     setLong(to::setId, from.getId(), false);
     setDateString(to::setTransferTime, from.getTransferTime());
     setId(to::setSenderLabId, from.getSenderLab());
-    setString(to::setSenderLabLabel, maybeGetProperty(from.getSenderLab(), Lab::getItemLabel));
+    setString(to::setSenderLabLabel, maybeGetProperty(from.getSenderLab(), Lab::getAlias));
     setId(to::setSenderGroupId, from.getSenderGroup());
     setString(to::setSenderGroupName, maybeGetProperty(from.getSenderGroup(), Group::getName));
     setString(to::setRecipient, from.getRecipient());

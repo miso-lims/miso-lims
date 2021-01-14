@@ -1,6 +1,6 @@
 HotTarget.lab = {
   getUserManualUrl: function() {
-    return Urls.external.userManual('type_data', 'labs-and-institutes');
+    return Urls.external.userManual('type_data', 'labs');
   },
   getCreateUrl: function() {
     return Urls.rest.labs.create;
@@ -14,13 +14,10 @@ HotTarget.lab = {
   fixUp: function(lab, errorHandler) {
   },
   createColumns: function(config, create, data) {
-    return [
-        HotUtils.makeColumnForText('Name', true, 'alias', {
-          unpackAfterSave: true,
-          validator: HotUtils.validator.requiredText
-        }),
-        HotUtils.makeColumnForConstantsList('Institute', true, 'instituteAlias', 'instituteId', 'id', 'alias', config.institutes, true, {},
-            null), HotUtils.makeColumnForBoolean('Archived', true, 'archived', true)];
+    return [HotUtils.makeColumnForText('Name', true, 'alias', {
+      unpackAfterSave: true,
+      validator: HotUtils.validator.requiredText
+    }), HotUtils.makeColumnForBoolean('Archived', true, 'archived', true)];
   },
 
   getBulkActions: function(config) {

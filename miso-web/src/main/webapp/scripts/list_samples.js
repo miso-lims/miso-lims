@@ -184,7 +184,7 @@ ListTarget.sample = (function() {
           searchTerms['received'], searchTerms['creator'], searchTerms['changedby'], searchTerms['box'], searchTerms['freezer'],
           searchTerms['distributed'], searchTerms['distributedto']];
       const detailedSampleTerms = [searchTerms['created'], searchTerms['class'], searchTerms['tissueOrigin'], searchTerms['tissueType'],
-          searchTerms['institute'], searchTerms['external'], searchTerms['subproject'], searchTerms['groupid'], searchTerms['ghost']];
+          searchTerms['lab'], searchTerms['external'], searchTerms['subproject'], searchTerms['groupid'], searchTerms['ghost']];
       if (Constants.isDetailedSample) {
         return plainSampleTerms.concat(detailedSampleTerms);
       } else {

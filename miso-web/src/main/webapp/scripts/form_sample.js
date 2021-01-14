@@ -354,12 +354,8 @@ FormTarget.sample = (function($) {
                   type: 'dropdown',
                   nullLabel: 'n/a',
                   source: Constants.labs.sort(Utils.sorting.standardSort('alias')),
-                  getItemLabel: function(item) {
-                    return item.label;
-                  },
-                  getItemValue: function(item) {
-                    return item.id;
-                  },
+                  getItemLabel: Utils.array.getAlias,
+                  getItemValue: Utils.array.getId,
                   include: !!object.lab,
                   description: 'The external lab that a tissue came from. This field is intended for historical data only as the lab should '
                       + 'normally be recorded in a receipt transfer instead'

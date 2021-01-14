@@ -751,8 +751,8 @@ BulkTarget.sample = (function($) {
         data: 'labId',
         include: showLabColumn,
         source: Constants.labs,
-        sortSource: Utils.sorting.standardSort('label'),
-        getItemLabel: Utils.array.get('label'),
+        sortSource: Utils.sorting.standardSort('alias'),
+        getItemLabel: Utils.array.getAlias,
         getItemValue: Utils.array.getId,
         description: 'The external lab that a tissue came from. This field is intended for historical data only as the lab should '
             + 'normally be recorded in a receipt transfer instead'

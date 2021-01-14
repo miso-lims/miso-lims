@@ -14,6 +14,7 @@ Changes:
   * Allow changing box size as long as the box is empty
   * Prevent setting group description on an item without group ID (detailed sample)
   * Changed free-text location field labels to "Location Note"
+  * Changed institutes and labs into a single "lab" item
   * Set index sequencing for NovaSeq runs automatically based on Run Scanner data
   * Fixed failed QCs showing as checkmark on QCs lists
   * Fixed cases where pipeline, box use, and box size options were not being refreshed after
@@ -28,6 +29,9 @@ Changes:
 
 Upgrade Notes:
 
+  * Institutes have been removed from MISO, and any existing institutes and labs are combined into
+    single "lab" items during the update. After the update, you may wish to review your labs as
+    their aliases may have changed.
   * Updated to Pinery v2.16.0
   * Updated to Run Scanner v1.12.3
 

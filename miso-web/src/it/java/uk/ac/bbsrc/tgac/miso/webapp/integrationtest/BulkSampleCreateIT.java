@@ -179,7 +179,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Map<String, String> tissue = new LinkedHashMap<>();
     tissue.put(SamColumns.DESCRIPTION, "Description");
     tissue.put(SamColumns.RECEIVE_DATE, "2017-07-17");
-    tissue.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    tissue.put(SamColumns.RECEIVED_FROM, "University Health Network - BioBank");
     tissue.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     tissue.put(SamColumns.RECEIPT_CONFIRMED, "True");
     tissue.put(SamColumns.RECEIPT_QC_PASSED, "True");
@@ -228,7 +228,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Map<String, String> tissue = new LinkedHashMap<>();
     tissue.put(SamColumns.DESCRIPTION, "Description");
     tissue.put(SamColumns.RECEIVE_DATE, "2017-07-17");
-    tissue.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    tissue.put(SamColumns.RECEIVED_FROM, "University Health Network - BioBank");
     tissue.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     tissue.put(SamColumns.RECEIPT_CONFIRMED, "True");
     tissue.put(SamColumns.RECEIPT_QC_PASSED, "True");
@@ -277,7 +277,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Map<String, String> tissue = new LinkedHashMap<>();
     tissue.put(SamColumns.DESCRIPTION, "Description");
     tissue.put(SamColumns.RECEIVE_DATE, "2017-07-17");
-    tissue.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    tissue.put(SamColumns.RECEIVED_FROM, "University Health Network - BioBank");
     tissue.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     tissue.put(SamColumns.RECEIPT_CONFIRMED, "True");
     tissue.put(SamColumns.RECEIPT_QC_PASSED, "True");
@@ -375,7 +375,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Map<String, String> slide = new LinkedHashMap<>();
     slide.put(SamColumns.DESCRIPTION, "Description");
     slide.put(SamColumns.RECEIVE_DATE, "2017-07-17");
-    slide.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    slide.put(SamColumns.RECEIVED_FROM, "University Health Network - BioBank");
     slide.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     slide.put(SamColumns.RECEIPT_CONFIRMED, "True");
     slide.put(SamColumns.RECEIPT_QC_PASSED, "True");
@@ -424,7 +424,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Map<String, String> slide = new LinkedHashMap<>();
     slide.put(SamColumns.DESCRIPTION, "Description");
     slide.put(SamColumns.RECEIVE_DATE, "2017-07-17");
-    slide.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    slide.put(SamColumns.RECEIVED_FROM, "University Health Network - BioBank");
     slide.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     slide.put(SamColumns.RECEIPT_CONFIRMED, "True");
     slide.put(SamColumns.RECEIPT_QC_PASSED, "True");
@@ -478,7 +478,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Map<String, String> curls = new LinkedHashMap<>();
     curls.put(SamColumns.DESCRIPTION, "Description");
     curls.put(SamColumns.RECEIVE_DATE, "2017-07-17");
-    curls.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    curls.put(SamColumns.RECEIVED_FROM, "University Health Network - BioBank");
     curls.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     curls.put(SamColumns.RECEIPT_CONFIRMED, "True");
     curls.put(SamColumns.RECEIPT_QC_PASSED, "True");
@@ -526,7 +526,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Map<String, String> curls = new LinkedHashMap<>();
     curls.put(SamColumns.DESCRIPTION, "Description");
     curls.put(SamColumns.RECEIVE_DATE, "2017-07-17");
-    curls.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    curls.put(SamColumns.RECEIVED_FROM, "University Health Network - BioBank");
     curls.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     curls.put(SamColumns.RECEIPT_CONFIRMED, "True");
     curls.put(SamColumns.RECEIPT_QC_PASSED, "True");
@@ -578,7 +578,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Map<String, String> singleCell = new LinkedHashMap<>();
     singleCell.put(SamColumns.DESCRIPTION, "Description");
     singleCell.put(SamColumns.RECEIVE_DATE, "2017-07-17");
-    singleCell.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    singleCell.put(SamColumns.RECEIVED_FROM, "University Health Network - BioBank");
     singleCell.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     singleCell.put(SamColumns.RECEIPT_CONFIRMED, "True");
     singleCell.put(SamColumns.RECEIPT_QC_PASSED, "True");
@@ -662,7 +662,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Map<String, String> gDnaStock = new LinkedHashMap<>();
     gDnaStock.put(SamColumns.DESCRIPTION, "Description");
     gDnaStock.put(SamColumns.RECEIVE_DATE, "2017-07-17");
-    gDnaStock.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    gDnaStock.put(SamColumns.RECEIVED_FROM, "University Health Network - BioBank");
     gDnaStock.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     gDnaStock.put(SamColumns.RECEIPT_CONFIRMED, "True");
     gDnaStock.put(SamColumns.RECEIPT_QC_PASSED, "True");
@@ -710,7 +710,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Map<String, String> gDnaStock = new LinkedHashMap<>();
     gDnaStock.put(SamColumns.DESCRIPTION, "Description");
     gDnaStock.put(SamColumns.RECEIVE_DATE, "2017-07-17");
-    gDnaStock.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    gDnaStock.put(SamColumns.RECEIVED_FROM, "University Health Network - BioBank");
     gDnaStock.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     gDnaStock.put(SamColumns.RECEIPT_CONFIRMED, "True");
     gDnaStock.put(SamColumns.RECEIPT_QC_PASSED, "True");
@@ -761,7 +761,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Map<String, String> stock = new LinkedHashMap<>();
     stock.put(SamColumns.DESCRIPTION, "Description");
     stock.put(SamColumns.RECEIVE_DATE, "2017-07-17");
-    stock.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    stock.put(SamColumns.RECEIVED_FROM, "University Health Network - BioBank");
     stock.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     stock.put(SamColumns.RECEIPT_CONFIRMED, "True");
     stock.put(SamColumns.RECEIPT_QC_PASSED, "True");
@@ -814,7 +814,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Map<String, String> rnaStock = new LinkedHashMap<>();
     rnaStock.put(SamColumns.DESCRIPTION, "Description");
     rnaStock.put(SamColumns.RECEIVE_DATE, "2017-07-17");
-    rnaStock.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    rnaStock.put(SamColumns.RECEIVED_FROM, "University Health Network - BioBank");
     rnaStock.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     rnaStock.put(SamColumns.RECEIPT_CONFIRMED, "True");
     rnaStock.put(SamColumns.RECEIPT_QC_PASSED, "True");
@@ -863,7 +863,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Map<String, String> rnaStock = new LinkedHashMap<>();
     rnaStock.put(SamColumns.DESCRIPTION, "Description");
     rnaStock.put(SamColumns.RECEIVE_DATE, "2017-07-17");
-    rnaStock.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    rnaStock.put(SamColumns.RECEIVED_FROM, "University Health Network - BioBank");
     rnaStock.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     rnaStock.put(SamColumns.RECEIPT_CONFIRMED, "True");
     rnaStock.put(SamColumns.RECEIPT_QC_PASSED, "True");
@@ -948,7 +948,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Map<String, String> gDnaAliquot = new LinkedHashMap<>();
     gDnaAliquot.put(SamColumns.DESCRIPTION, "Description");
     gDnaAliquot.put(SamColumns.RECEIVE_DATE, "2017-07-17");
-    gDnaAliquot.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    gDnaAliquot.put(SamColumns.RECEIVED_FROM, "University Health Network - BioBank");
     gDnaAliquot.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     gDnaAliquot.put(SamColumns.RECEIPT_CONFIRMED, "True");
     gDnaAliquot.put(SamColumns.RECEIPT_QC_PASSED, "True");
@@ -997,7 +997,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Map<String, String> gDnaAliquot = new LinkedHashMap<>();
     gDnaAliquot.put(SamColumns.DESCRIPTION, "Description");
     gDnaAliquot.put(SamColumns.RECEIVE_DATE, "2017-07-17");
-    gDnaAliquot.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    gDnaAliquot.put(SamColumns.RECEIVED_FROM, "University Health Network - BioBank");
     gDnaAliquot.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     gDnaAliquot.put(SamColumns.RECEIPT_CONFIRMED, "True");
     gDnaAliquot.put(SamColumns.RECEIPT_QC_PASSED, "True");
@@ -1050,7 +1050,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Map<String, String> aliquot = new LinkedHashMap<>();
     aliquot.put(SamColumns.DESCRIPTION, "Description");
     aliquot.put(SamColumns.RECEIVE_DATE, "2017-07-17");
-    aliquot.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    aliquot.put(SamColumns.RECEIVED_FROM, "University Health Network - BioBank");
     aliquot.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     aliquot.put(SamColumns.RECEIPT_CONFIRMED, "True");
     aliquot.put(SamColumns.RECEIPT_QC_PASSED, "True");
@@ -1104,7 +1104,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Map<String, String> rnaAliquot = new LinkedHashMap<>();
     rnaAliquot.put(SamColumns.DESCRIPTION, "Description");
     rnaAliquot.put(SamColumns.RECEIVE_DATE, "2017-07-17");
-    rnaAliquot.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    rnaAliquot.put(SamColumns.RECEIVED_FROM, "University Health Network - BioBank");
     rnaAliquot.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     rnaAliquot.put(SamColumns.RECEIPT_CONFIRMED, "True");
     rnaAliquot.put(SamColumns.RECEIPT_QC_PASSED, "True");
@@ -1154,7 +1154,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Map<String, String> rnaAliquot = new LinkedHashMap<>();
     rnaAliquot.put(SamColumns.DESCRIPTION, "Description");
     rnaAliquot.put(SamColumns.RECEIVE_DATE, "2017-07-17");
-    rnaAliquot.put(SamColumns.RECEIVED_FROM, "BioBank (University Health Network)");
+    rnaAliquot.put(SamColumns.RECEIVED_FROM, "University Health Network - BioBank");
     rnaAliquot.put(SamColumns.RECEIVED_BY, "TestGroupOne");
     rnaAliquot.put(SamColumns.RECEIPT_CONFIRMED, "True");
     rnaAliquot.put(SamColumns.RECEIPT_QC_PASSED, "True");

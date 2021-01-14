@@ -16,7 +16,6 @@ import javax.persistence.TemporalType;
 
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 
 @Entity
@@ -31,10 +30,6 @@ public class LabImpl implements Lab {
   @Column(name = "labId")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id = UNSAVED_ID;
-
-  @ManyToOne(targetEntity = InstituteImpl.class)
-  @JoinColumn(name = "instituteId", nullable = false)
-  private Institute institute;
 
   @Column(nullable = false)
   private String alias;
@@ -88,58 +83,43 @@ public class LabImpl implements Lab {
   }
 
   @Override
-  public Institute getInstitute() {
-    return institute;
-  }
-
-  @Override
-  public void setInstitute(Institute institute) {
-    this.institute = institute;
-  }
-
-  @Override
-  public User getCreatedBy() {
+  public User getCreator() {
     return this.createdBy;
   }
 
   @Override
-  public void setCreatedBy(User createdBy) {
+  public void setCreator(User createdBy) {
     this.createdBy = createdBy;
   }
 
   @Override
-  public Date getCreationDate() {
+  public Date getCreationTime() {
     return creationDate;
   }
 
   @Override
-  public void setCreationDate(Date creationDate) {
+  public void setCreationTime(Date creationDate) {
     this.creationDate = creationDate;
   }
 
   @Override
-  public User getUpdatedBy() {
+  public User getLastModifier() {
     return updatedBy;
   }
 
   @Override
-  public void setUpdatedBy(User updatedBy) {
+  public void setLastModifier(User updatedBy) {
     this.updatedBy = updatedBy;
   }
 
   @Override
-  public Date getLastUpdated() {
+  public Date getLastModified() {
     return lastUpdated;
   }
 
   @Override
-  public void setLastUpdated(Date lastUpdated) {
+  public void setLastModified(Date lastUpdated) {
     this.lastUpdated = lastUpdated;
-  }
-
-  @Override
-  public String getItemLabel() {
-    return getAlias() + " (" + getInstitute().getAlias() + ")";
   }
 
   @Override
@@ -149,7 +129,7 @@ public class LabImpl implements Lab {
 
   @Override
   public String getDeleteDescription() {
-    return getAlias() + " (" + getInstitute().getAlias() + ")";
+    return getAlias();
   }
 
   @Override
