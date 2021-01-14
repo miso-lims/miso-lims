@@ -85,10 +85,9 @@ public class HibernateSubprojectDao implements SubprojectDao {
   }
 
   @Override
-  public Subproject getByAlias(String alias) {
-    return (Subproject) currentSession().createCriteria(SubprojectImpl.class)
-        .add(Restrictions.eq("alias", alias))
-        .uniqueResult();
+  public List<Subproject> getByAlias(String alias) {
+    return currentSession().createCriteria(SubprojectImpl.class)
+        .add(Restrictions.eq("alias", alias)).list();
   }
 
 }
