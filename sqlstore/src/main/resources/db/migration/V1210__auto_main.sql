@@ -16,7 +16,7 @@ SET Lab.alias = CONCAT(
 );
 
 ALTER TABLE Lab DROP FOREIGN KEY lab_institute_fkey;
-ALTER TABLE Lab DROP CONSTRAINT `lab_institute-alias_uk`;
+ALTER TABLE Lab DROP INDEX `lab_institute-alias_uk`;
 ALTER TABLE Lab DROP COLUMN instituteId;
 DROP TABLE Institute;
 
