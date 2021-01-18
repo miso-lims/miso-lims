@@ -1,15 +1,21 @@
 # Unreleased
 
 Changes:
+  * Fixed Flyway migration
 
+# 1.21.0
 
+Changes:
+  * Attempt to fix Flyway migration
+
+Known Issues:
+  * Flyway migrations fails on some databases
 
 # 1.20.0
 
 Changes:
-
-  * Added new project fields:                                                    
-    * samples expected                                                           
+  * Added new project fields:
+    * samples expected
     * contact
   * Added parent name to bulk propagate pages where applicable
   * Added library aliquot description field
@@ -40,6 +46,9 @@ Upgrade Notes:
     their aliases may have changed.
   * Updated to Pinery v2.16.0
   * Updated to Run Scanner v1.12.3
+
+Known Issues:
+  * Flyway migration fails on some databases
 
 # 1.19.1
 

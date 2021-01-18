@@ -15,6 +15,8 @@ BEGIN
     UPDATE flyway_schema_history SET checksum = 330422399 WHERE version = '1000';
     -- V1060 was altered to fix an error migrating tissue processing classes with no subcategory
     UPDATE flyway_schema_history SET checksum = -1464362715 WHERE version = '1060';
+    -- V1210 was altered for compatibility between mysql and mariadb
+    UPDATE flyway_schema_history SET checksum = 1607781079 WHERE version = '1210';
   END IF;
 END//
 
