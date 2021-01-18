@@ -14,7 +14,8 @@ Known Issues:
 # 1.20.0
 
 Changes:
-  * Added new project fields:                                                       * samples expected
+  * Added new project fields:
+    * samples expected
     * contact
   * Added parent name to bulk propagate pages where applicable
   * Added library aliquot description field
