@@ -66,7 +66,7 @@ public class DefaultLibrarySpikeInService extends AbstractSaveService<LibrarySpi
   }
 
   @Override
-  protected void authorizeSave(LibrarySpikeIn object) throws IOException {
+  protected void authorizeUpdate(LibrarySpikeIn object) throws IOException {
     authorizationManager.throwIfNonAdmin();
   }
 

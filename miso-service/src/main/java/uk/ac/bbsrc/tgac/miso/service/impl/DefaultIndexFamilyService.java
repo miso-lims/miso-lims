@@ -75,7 +75,7 @@ public class DefaultIndexFamilyService extends AbstractSaveService<IndexFamily> 
   }
 
   @Override
-  protected void authorizeSave(IndexFamily object) throws IOException {
+  protected void authorizeUpdate(IndexFamily object) throws IOException {
     authorizationManager.throwIfNonAdmin();
   }
 

@@ -58,7 +58,7 @@ public class DefaultLibraryTypeService extends AbstractSaveService<LibraryType> 
   }
 
   @Override
-  protected void authorizeSave(LibraryType object) throws IOException {
+  protected void authorizeUpdate(LibraryType object) throws IOException {
     authorizationManager.throwIfNonAdmin();
   }
 

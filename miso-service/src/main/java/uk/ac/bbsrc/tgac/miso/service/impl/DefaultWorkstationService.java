@@ -50,7 +50,7 @@ public class DefaultWorkstationService extends AbstractSaveService<Workstation> 
   }
 
   @Override
-  protected void authorizeSave(Workstation object) throws IOException {
+  protected void authorizeUpdate(Workstation object) throws IOException {
     authorizationManager.throwIfNonAdmin();
   }
 

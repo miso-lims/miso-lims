@@ -63,7 +63,7 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
   }
 
   @Override
-  protected void authorizeSave(Sop object) throws IOException {
+  protected void authorizeUpdate(Sop object) throws IOException {
     authorizationManager.throwIfNonAdmin();
   }
 

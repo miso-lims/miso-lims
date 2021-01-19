@@ -33,7 +33,7 @@ public class HibernateLabDao implements LabDao {
   }
 
   @Override
-  public List<Lab> getLabs() {
+  public List<Lab> list() {
     Query query = currentSession().createQuery("from LabImpl");
     @SuppressWarnings("unchecked")
     List<Lab> labs = query.list();
@@ -41,18 +41,26 @@ public class HibernateLabDao implements LabDao {
   }
 
   @Override
-  public Lab getLab(Long id) {
+  public Lab get(long id) {
     return (Lab) currentSession().get(LabImpl.class, id);
   }
 
   @Override
-  public Long addLab(Lab lab) {
+  public Lab getByAlias(String alias) {
+    return (Lab) currentSession().createCriteria(LabImpl.class)
+        .add(Restrictions.eq("alias", alias))
+        .uniqueResult();
+  }
+
+  @Override
+  public long create(Lab lab) {
     return (Long) currentSession().save(lab);
   }
 
   @Override
-  public void update(Lab lab) {
+  public long update(Lab lab) {
     currentSession().update(lab);
+    return lab.getId();
   }
 
   public SessionFactory getSessionFactory() {

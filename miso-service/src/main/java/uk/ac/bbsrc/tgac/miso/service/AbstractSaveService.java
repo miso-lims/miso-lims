@@ -24,7 +24,7 @@ public abstract class AbstractSaveService<T extends Identifiable> implements Sav
 
   @Override
   public long create(T object) throws IOException {
-    authorizeSave(object);
+    authorizeCreate(object);
     loadChildEntities(object);
     beforeValidate(object);
     validateChange(object, null);
@@ -37,7 +37,7 @@ public abstract class AbstractSaveService<T extends Identifiable> implements Sav
   @Override
   public long update(T object) throws IOException {
     T managed = get(object.getId());
-    authorizeSave(managed);
+    authorizeUpdate(managed);
     loadChildEntities(object);
     beforeValidate(object);
     validateChange(object, managed);
@@ -49,13 +49,24 @@ public abstract class AbstractSaveService<T extends Identifiable> implements Sav
   }
 
   /**
+   * Check authorization to create new object. Should throw {@link AuthorizationException} if the user is not authorized to create the
+   * object. Default implementation calls {@link AbstractSaveService#authorizeSave}
+   * 
+   * @param object
+   * @throws IOException
+   */
+  protected void authorizeCreate(T object) throws IOException {
+    authorizeUpdate(object);
+  }
+
+  /**
    * Check authorization to save object. Should throw {@link AuthorizationException} if the user is not authorized to save the object.
    * Default implementation does nothing, which means the save is always authorized
    * 
    * @param object object being saved
    * @throws IOException
    */
-  protected void authorizeSave(T object) throws IOException {
+  protected void authorizeUpdate(T object) throws IOException {
     // do nothing
   }
 

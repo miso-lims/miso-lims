@@ -15,10 +15,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.LabDao;
+import uk.ac.bbsrc.tgac.miso.persistence.SaveDao;
+import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultLabService implements LabService {
+public class DefaultLabService extends AbstractSaveService<Lab> implements LabService {
 
   @Autowired
   private LabDao labDao;
@@ -38,32 +40,41 @@ public class DefaultLabService implements LabService {
   }
 
   @Override
-  public Lab get(long id) throws IOException {
-    authorizationManager.throwIfUnauthenticated();
-    return labDao.getLab(id);
+  protected void authorizeCreate(Lab object) throws IOException {
+    // Do nothing - anyone can create
   }
 
   @Override
-  public long create(Lab lab) throws IOException {
-    authorizationManager.throwIfNotInternal();
-    lab.setChangeDetails(authorizationManager.getCurrentUser());
-    return labDao.addLab(lab);
-  }
-
-  @Override
-  public long update(Lab lab) throws IOException {
+  protected void authorizeUpdate(Lab object) throws IOException {
     authorizationManager.throwIfNonAdmin();
-    Lab updatedLab = get(lab.getId());
-    updatedLab.setAlias(lab.getAlias());
-    updatedLab.setArchived(lab.isArchived());
-    lab.setChangeDetails(authorizationManager.getCurrentUser());
-    labDao.update(updatedLab);
-    return updatedLab.getId();
+  }
+
+  @Override
+  protected void collectValidationErrors(Lab object, Lab beforeChange, List<ValidationError> errors) throws IOException {
+    if (ValidationUtils.isChanged(Lab::getAlias, object, beforeChange) && labDao.getByAlias(object.getAlias()) != null) {
+      errors.add(ValidationError.forDuplicate("lab", "alias"));
+    }
+  }
+
+  @Override
+  protected void applyChanges(Lab to, Lab from) throws IOException {
+    to.setAlias(from.getAlias());
+    to.setArchived(from.isArchived());
+  }
+
+  @Override
+  protected void beforeSave(Lab object) throws IOException {
+    object.setChangeDetails(authorizationManager.getCurrentUser());
   }
 
   @Override
   public List<Lab> list() throws IOException {
-    return labDao.getLabs();
+    return labDao.list();
+  }
+
+  @Override
+  public SaveDao<Lab> getDao() {
+    return labDao;
   }
 
   @Override
