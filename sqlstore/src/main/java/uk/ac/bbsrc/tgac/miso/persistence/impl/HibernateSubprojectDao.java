@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
@@ -85,9 +86,11 @@ public class HibernateSubprojectDao implements SubprojectDao {
   }
 
   @Override
-  public List<Subproject> getByAlias(String alias) {
-    return currentSession().createCriteria(SubprojectImpl.class)
-        .add(Restrictions.eq("alias", alias)).list();
+  public Subproject getByProjectAndAlias(Project project, String alias) {
+    return (Subproject) currentSession().createCriteria(SubprojectImpl.class)
+        .add(Restrictions.eq("parentProject", project))
+        .add(Restrictions.eq("alias", alias))
+        .uniqueResult();
   }
 
 }

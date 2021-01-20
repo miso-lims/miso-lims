@@ -1,12 +1,17 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
-import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.util.List;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
+
+import com.google.common.collect.Sets;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
@@ -19,10 +24,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.SaveDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
 import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Set;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
@@ -56,19 +57,10 @@ public class DefaultSubprojectService extends AbstractSaveService<Subproject> im
 
   @Override
   protected void collectValidationErrors(Subproject object, Subproject beforeChange, List<ValidationError> errors) throws IOException {
-    if (ValidationUtils.isChanged(Subproject::getAlias, object, beforeChange) && multipleForProject(subprojectDao.getByAlias(object.getAlias()), object.getParentProject())) {
+    if (ValidationUtils.isChanged(Subproject::getAlias, object, beforeChange)
+        && subprojectDao.getByProjectAndAlias(object.getParentProject(), object.getAlias()) != null) {
       errors.add(ValidationError.forDuplicate("subproject", "alias"));
     }
-  }
-
-  // Does not work
-  private boolean multipleForProject(List<Subproject> subprojects, Project targetProject){
-    for(Subproject subproject: subprojects){
-      if (subproject.getParentProject() == targetProject){
-        return true;
-      }
-    }
-    return false;
   }
 
   @Override
