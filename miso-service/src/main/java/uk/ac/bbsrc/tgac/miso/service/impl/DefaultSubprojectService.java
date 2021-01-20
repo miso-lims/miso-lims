@@ -56,11 +56,12 @@ public class DefaultSubprojectService extends AbstractSaveService<Subproject> im
 
   @Override
   protected void collectValidationErrors(Subproject object, Subproject beforeChange, List<ValidationError> errors) throws IOException {
-    if (ValidationUtils.isChanged(Subproject::getAlias, object, beforeChange) && !multipleForProject(subprojectDao.getByAlias(object.getAlias()), object.getParentProject())) {
+    if (ValidationUtils.isChanged(Subproject::getAlias, object, beforeChange) && multipleForProject(subprojectDao.getByAlias(object.getAlias()), object.getParentProject())) {
       errors.add(ValidationError.forDuplicate("subproject", "alias"));
     }
   }
 
+  // Does not work
   private boolean multipleForProject(List<Subproject> subprojects, Project targetProject){
     for(Subproject subproject: subprojects){
       if (subproject.getParentProject() == targetProject){
