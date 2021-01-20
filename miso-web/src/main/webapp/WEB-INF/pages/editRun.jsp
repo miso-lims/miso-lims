@@ -117,9 +117,20 @@
   <br/>
   
   <miso:attachments item="${run}"/>
-  <div id="issues">
-    <miso:list-section id="list_issue" name="Related Issues" target="issue" alwaysShow="true" items="${runIssues}" config="{}"/>
-  </div>
+  
+  <c:if test="${issueTrackerEnabled}">
+    <div id="issues">
+      <c:choose>
+        <c:when test="${empty issueLookupError}">
+          <p class="big big-error">Error retrieving issues</p>
+        </c:when>
+        <c:otherwise>
+          <miso:list-section id="list_issue" name="Related Issues" target="issue" alwaysShow="true" items="${issues}" config="{}"/>
+        </c:otherwise>
+      </c:choose>
+    </div>
+  </c:if>
+  
   <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#metrix_arrowclick'), 'metrix');">Metrics
     <div id="metrix_arrowclick" class="toggleLeft"></div>
   </div>

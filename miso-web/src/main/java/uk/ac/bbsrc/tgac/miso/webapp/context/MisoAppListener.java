@@ -29,7 +29,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 import java.util.Map;
-import java.util.Properties;
 import java.util.TimeZone;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -43,19 +42,16 @@ import org.apache.log4j.PropertyConfigurator;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 
-import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.NameGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.resolvers.NamingSchemeResolverService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.NameValidator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.webapp.service.integration.jira.JiraIssueManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
@@ -131,8 +127,6 @@ public class MisoAppListener implements ServletContextListener {
     } catch (MalformedObjectNameException | IOException e) {
       log.error("Failed to load Prometheus configuration.", e);
     }
-
-    loadIssueTrackerManager(misoProperties, context);
   }
 
   private void linkMapsDir(ServletContext application, String fileStoragePath) {
@@ -148,22 +142,6 @@ public class MisoAppListener implements ServletContextListener {
       Files.createSymbolicLink(link, target);
     } catch (IOException e) {
       throw new IllegalStateException("Failed to link freezer maps directory", e);
-    }
-  }
-
-  private void loadIssueTrackerManager(Map<String, String> misoProperties, XmlWebApplicationContext context) {
-    if (misoProperties.containsKey("miso.issuetracker.tracker")) {
-      String trackerType = misoProperties.get("miso.issuetracker.tracker");
-      if ("jira".equals(trackerType)) {
-        IssueTrackerManager issueTracker = new JiraIssueManager();
-        Properties properties = new Properties();
-        properties.putAll(misoProperties);
-        issueTracker.setConfiguration(properties);
-        ((DefaultListableBeanFactory) context.getBeanFactory()).removeBeanDefinition("issueTrackerManager");
-        context.getBeanFactory().registerSingleton("issueTrackerManager", issueTracker);
-      } else {
-        throw new IllegalArgumentException("Invalid tracker type specified at miso.issuetracker.tracker");
-      }
     }
   }
 
