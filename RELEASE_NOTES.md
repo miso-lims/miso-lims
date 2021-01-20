@@ -1,5 +1,8 @@
 # Unreleased
 
+  * Fixed subproject alias unique constraint - they must now be unique only
+    within a project
+
 Changes:
 
 
