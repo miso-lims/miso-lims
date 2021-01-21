@@ -106,7 +106,7 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
   }
 
   @Override
-  protected void authorizeSave(Transfer transfer) throws IOException {
+  protected void authorizeUpdate(Transfer transfer) throws IOException {
     Set<Group> allowedGroups = new HashSet<>();
     if (transfer.getSenderGroup() != null) {
       allowedGroups.add(transfer.getSenderGroup());

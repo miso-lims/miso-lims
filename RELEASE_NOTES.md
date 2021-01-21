@@ -1,11 +1,10 @@
 # Unreleased
 
-  * Fixed subproject alias unique constraint - they must now be unique only
-    within a project
-
 Changes:
 
-
+  * Prevent duplicate lab aliases
+  * Fixed subproject alias unique constraint - they must now be unique only
+    within a project
 
 # 1.21.1
 

@@ -74,7 +74,7 @@ public class DefaultTargetedSequencingService extends AbstractSaveService<Target
   }
 
   @Override
-  protected void authorizeSave(TargetedSequencing object) throws IOException {
+  protected void authorizeUpdate(TargetedSequencing object) throws IOException {
     authorizationManager.throwIfNonAdmin();
   }
 

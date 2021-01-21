@@ -76,7 +76,7 @@ public class DefaultSequencingParametersService extends AbstractSaveService<Sequ
   }
 
   @Override
-  protected void authorizeSave(SequencingParameters object) throws IOException {
+  protected void authorizeUpdate(SequencingParameters object) throws IOException {
     authorizationManager.throwIfNonAdmin();
   }
 

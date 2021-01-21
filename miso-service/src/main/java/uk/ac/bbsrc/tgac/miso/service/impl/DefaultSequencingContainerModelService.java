@@ -53,7 +53,7 @@ public class DefaultSequencingContainerModelService extends AbstractSaveService<
   }
 
   @Override
-  protected void authorizeSave(SequencingContainerModel model) throws IOException {
+  protected void authorizeUpdate(SequencingContainerModel model) throws IOException {
     authorizationManager.throwIfNonAdmin();
   }
 

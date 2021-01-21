@@ -143,7 +143,7 @@ public class DefaultSampleClassService extends AbstractSaveService<SampleClass> 
   }
 
   @Override
-  protected void authorizeSave(SampleClass object) throws IOException {
+  protected void authorizeUpdate(SampleClass object) throws IOException {
     authorizationManager.throwIfNonAdmin();
   }
 
