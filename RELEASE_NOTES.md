@@ -5,6 +5,7 @@ Changes:
   * Prevent duplicate lab aliases
   * Fixed subproject alias unique constraint - they must now be unique only
     within a project
+  * Fixed project list name column to sort numerically
 
 # 1.21.1
 

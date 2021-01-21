@@ -94,7 +94,7 @@ ListTarget.project = {
       sTitle: 'Name',
       mData: 'name',
       iSortPriority: 0,
-      iDatSort: 0, // Use ID for sorting,
+      iDataSort: 0, // Use ID for sorting,
       mRender: Warning.tableWarningRenderer(WarningTarget.project, function(project) {
         return Urls.ui.projects.edit(project.id);
       }),
