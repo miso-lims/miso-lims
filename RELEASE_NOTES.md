@@ -6,6 +6,7 @@ Changes:
   * Fixed subproject alias unique constraint - they must now be unique only
     within a project
   * Fixed project list name column to sort numerically
+  * Fixed wizard dialogs' max height to stay within window
 
 # 1.21.1
 

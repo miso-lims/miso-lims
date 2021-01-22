@@ -1083,3 +1083,7 @@ ul.unformatted-list {
 #metricsTable input {
   width: 242px;
 }
+
+#dialog {
+  max-height: 75vh;
+}
