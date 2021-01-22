@@ -220,51 +220,34 @@ ListUtils = (function($) {
       + '</table>';
 
   var makePopupHelp = function(target) {
-    return '<h1>Search Syntax</h1>' + '<p>' + '  This search box supports case-sensitive search syntax.'
-        + '  Multiple searches can be separated by spaces (not AND).' + '  If a filter does not apply, it is ignored.'
+    return '<p>' + '  This search box supports case-sensitive search syntax.' + '  Multiple searches can be separated by spaces (not AND).'
+        + '  If a filter does not apply, it is ignored.'
         + '  Any other search term is taken as a regular query and matched against the current fields for each item.'
         + '  To search for a term with spaces, surround the entire term in quotation marks.' + '</p>' + '<br/>' + makePopupTable(target)
         + "<br/>" + dateGrammar + "<br/>" + userGrammar;
   };
 
-  var makePopupElement = function(parentId, popupId, popupCloseId, target) {
-    $("#" + parentId).append(
-        '<div id="' + popupId + '" class="popup">' + '  <div class="popup-inner">' + makePopupHelp(target) + '    <a id="' + popupCloseId
-            + '" class="popup-close" href="#">x</a>' + '  </div>' + '</div>');
-  };
-
-  var registerPopupOpen = function(triggerId, popupId) {
+  var registerPopupOpen = function(triggerId, target) {
     $("#" + triggerId).click(function() {
-      $("#" + popupId).fadeIn(350);
+      var dialogArea = $('#dialog');
+      dialogArea.empty();
+      dialogArea.append(makePopupHelp(target));
+      var dialog = jQuery('#dialog').dialog({
+        autoOpen: true,
+        width: 800,
+        title: 'Search Syntax',
+        modal: true,
+        buttons: {
+          'OK': {
+            id: 'ok',
+            text: 'Close',
+            click: function() {
+              dialog.dialog("close");
+            }
+          }
+        }
+      });
     });
-  };
-
-  var registerPopupClose = function(popupCloseId, popupId) {
-    var closePopup = function(e) {
-      $("#" + popupId).fadeOut(350);
-      e.preventDefault();
-    };
-
-    // Close popup when popupCloseId is clicked
-    $("#" + popupCloseId).click(function(e) {
-      closePopup(e);
-    });
-
-    // Close popup when esc is pressed
-    $(document).keyup(function(e) {
-      if (e.keyCode == 27) {
-        closePopup(e);
-      }
-    });
-  };
-
-  var makeSearchPopup = function(tableId, parentId, triggerId, target) {
-    var popupId = tableId + "_searchHelpPopup";
-    var popupCloseId = tableId + "_searchHelpPopupClose";
-
-    makePopupElement(parentId, popupId, popupCloseId, target);
-    registerPopupOpen(triggerId, popupId);
-    registerPopupClose(popupCloseId, popupId);
   };
 
   var addHeaderMessages = function(target) {
@@ -490,7 +473,7 @@ ListUtils = (function($) {
       var searchDivId = elementId + '_filter';
 
       var tooltipId = makeSearchTooltip(elementId, searchDivId, target);
-      makeSearchPopup(elementId, searchDivId, tooltipId, target);
+      registerPopupOpen(tooltipId, target);
     }
     var filterbox = $('#' + elementId + '_filter :input');
     filterbox.unbind();

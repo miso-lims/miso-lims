@@ -6,6 +6,7 @@ Changes:
   * Fixed subproject alias unique constraint - they must now be unique only
     within a project
   * Fixed project list name column to sort numerically
+  * Fixed sizing and scrolling of advanced search help dialog
 
 # 1.21.1
 
