@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -91,6 +92,9 @@ public class DefaultProjectService implements ProjectService {
   private PipelineService pipelineService;
   @Autowired
   private ContactService contactService;
+
+  @Value("${miso.detailed.sample.enabled}")
+  private Boolean detailedSample;
 
   @Override
   public Project get(long projectId) throws IOException {
@@ -165,10 +169,13 @@ public class DefaultProjectService implements ProjectService {
 
     NamingScheme namingScheme = namingSchemeHolder.get(project.isSecondaryNaming());
     if (ValidationUtils.isSetAndChanged(Project::getShortName, project, beforeChange)) {
-      // assume that if project shortname is required, it is used for generating sample aliases
+      // assume that if project shortname is required by the naming scheme, it is used for generating sample aliases
       if (beforeChange != null && !namingScheme.nullProjectShortNameAllowed() && hasSamples(beforeChange)) {
         errors.add(new ValidationError("shortName", "Cannot change because there are already samples in the project"));
       }
+    }
+    if (project.getShortName() == null && detailedSample) {
+      errors.add(ValidationError.forRequired("shortName"));
     }
     ValidationResult shortNameValidation = namingScheme.validateProjectShortName(project.getShortName());
     if (!shortNameValidation.isValid()) {

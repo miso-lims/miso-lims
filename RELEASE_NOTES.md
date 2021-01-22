@@ -2,6 +2,7 @@
 
 Changes:
 
+  * Changed project short name to be required in detailed sample mode
   * Prevent duplicate lab aliases
   * Fixed subproject alias unique constraint - they must now be unique only
     within a project
