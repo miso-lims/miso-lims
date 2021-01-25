@@ -55,7 +55,7 @@ public class DefaultScientificNameService extends AbstractSaveService<Scientific
   }
 
   @Override
-  protected void authorizeSave(ScientificName object) throws IOException {
+  protected void authorizeUpdate(ScientificName object) throws IOException {
     authorizationManager.throwIfNonAdmin();
   }
 

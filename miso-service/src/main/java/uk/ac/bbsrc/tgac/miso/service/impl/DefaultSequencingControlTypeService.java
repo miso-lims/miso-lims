@@ -51,7 +51,7 @@ public class DefaultSequencingControlTypeService extends AbstractSaveService<Seq
   }
 
   @Override
-  protected void authorizeSave(SequencingControlType object) throws IOException {
+  protected void authorizeUpdate(SequencingControlType object) throws IOException {
     authorizationManager.throwIfNonAdmin();
   }
 

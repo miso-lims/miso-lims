@@ -52,7 +52,7 @@ public class DefaultTissuePieceTypeService extends AbstractSaveService<TissuePie
   }
 
   @Override
-  protected void authorizeSave(TissuePieceType object) throws IOException {
+  protected void authorizeUpdate(TissuePieceType object) throws IOException {
     authorizationManager.throwIfNonAdmin();
   }
 

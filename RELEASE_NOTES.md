@@ -1,15 +1,16 @@
 # Unreleased
 
-  * Fixed subproject alias unique constraint - they must now be unique only
-    within a project
-
 Changes:
 
+* Prevent duplicate lab aliases
 * Improved error handling for issue tracker integration
   * Only display related issues secton on Edit Project and Edit Run pages if an
     issue tracker is configured
   * Show an error message in the section if issue lookup fails
   * Added monitoring for JIRA errors
+* Fixed subproject alias unique constraint - they must now be unique only
+  within a project
+* Fixed project list name column to sort numerically
 
 # 1.21.1
 

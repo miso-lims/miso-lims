@@ -329,6 +329,11 @@ ListUtils = (function($) {
               + checked + ">";
         }
       });
+      columns.forEach(function(column) {
+        if (column.hasOwnProperty('iDataSort')) {
+          column.iDataSort += 1;
+        }
+      });
       if (staticActions.length > 0) {
         staticActions.push(null);
       }

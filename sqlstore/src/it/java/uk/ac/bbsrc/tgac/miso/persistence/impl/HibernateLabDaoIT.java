@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -31,15 +32,15 @@ public class HibernateLabDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testGetLabList() {
-    List<Lab> list = dao.getLabs();
+  public void testGetLabList() throws IOException {
+    List<Lab> list = dao.list();
     assertNotNull(list);
     assertEquals(4, list.size());
   }
 
   @Test
   public void testGetSingleLab() {
-    Lab l = dao.getLab(1L);
+    Lab l = dao.get(1L);
     assertNotNull(l);
     assertEquals(1L, l.getId());
     assertEquals("Institute A - Lab A1", l.getAlias());
@@ -47,8 +48,16 @@ public class HibernateLabDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetSingleLabNull() {
-    Lab l = dao.getLab(100L);
+    Lab l = dao.get(100L);
     assertNull(l);
+  }
+
+  @Test
+  public void testGetByAlias() throws Exception {
+    String alias = "Institute B - Lab B1";
+    Lab lab = dao.getByAlias(alias);
+    assertNotNull(lab);
+    assertEquals(alias, lab.getAlias());
   }
 
   @Test
@@ -63,32 +72,32 @@ public class HibernateLabDaoIT extends AbstractDAOTest {
     l.setCreationTime(now);
     l.setLastModified(now);
 
-    final Long newId = dao.addLab(l);
-    Lab saved = dao.getLab(newId);
+    final long newId = dao.create(l);
+    Lab saved = dao.get(newId);
     assertNotNull(saved);
     assertEquals(l.getAlias(), saved.getAlias());
   }
 
   @Test
   public void testUpdateLab() {
-    Lab l = dao.getLab(1L);
+    Lab l = dao.get(1L);
     final String newAlias = "Changed Alias";
     l.setAlias(newAlias);
 
     dao.update(l);
-    Lab updated = dao.getLab(1L);
+    Lab updated = dao.get(1L);
     assertEquals(newAlias, updated.getAlias());
   }
 
   @Test
   public void testGetUsageByTissues() {
-    Lab lab = dao.getLab(2L);
+    Lab lab = dao.get(2L);
     assertEquals(1L, dao.getUsageByTissues(lab));
   }
 
   @Test
   public void testGetUsageByTransfers() {
-    Lab lab = dao.getLab(1L);
+    Lab lab = dao.get(1L);
     assertEquals(2L, dao.getUsageByTransfers(lab));
   }
 

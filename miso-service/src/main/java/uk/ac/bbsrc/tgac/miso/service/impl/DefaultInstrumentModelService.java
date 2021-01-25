@@ -76,7 +76,7 @@ public class DefaultInstrumentModelService extends AbstractSaveService<Instrumen
   }
 
   @Override
-  protected void authorizeSave(InstrumentModel object) throws IOException {
+  protected void authorizeUpdate(InstrumentModel object) throws IOException {
     authorizationManager.throwIfNonAdmin();
   }
 
