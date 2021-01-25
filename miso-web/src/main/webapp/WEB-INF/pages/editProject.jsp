@@ -98,14 +98,23 @@
   <br/>
   <br/>
 
-  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#issues_arrowclick'), 'issuesdiv');">
-    Tracked Issues
-    <div id="issues_arrowclick" class="toggleLeft"></div>
-  </div>
-  <div id="issuesdiv" class="expandable_section" style="display:none;">
-    <div class="note">Tag an issue with the project's short name (${project.shortName}) to have it show up here.</div>
-    <miso:list-section id="list_issue" name="Related Issues" target="issue" items="${projectIssues}" config="{}"/>
-  </div>
+  <c:if test="${issueTrackerEnabled}">
+    <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#issues_arrowclick'), 'issuesdiv');">
+      Tracked Issues
+      <div id="issues_arrowclick" class="toggleLeft"></div>
+    </div>
+    <div id="issuesdiv" class="expandable_section" style="display:none;">
+      <div class="note">Tag an issue with the project's short name (${project.shortName}) to have it show up here.</div>
+      <c:choose>
+        <c:when test="${issueLookupError}">
+      	  <p class="big big-error">Error retrieving issues</p>
+        </c:when>
+        <c:otherwise>
+          <miso:list-section id="list_issue" name="Related Issues" target="issue" items="${issues}" config="{}"/>
+        </c:otherwise>
+      </c:choose>
+    </div>
+  </c:if>
   
   <div id="simplebox">
     <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#upload_arrowclick'), 'uploaddiv');">

@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletResponse;
@@ -49,12 +50,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Issue;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.SampleQcNode;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.HandsontableSpreadsheet;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.Spreadsheet;
+import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.ThrowingFunction;
+import uk.ac.bbsrc.tgac.miso.core.util.ThrowingSupplier;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
@@ -241,6 +245,21 @@ public class MisoWebUtils {
     model.put("hierarchy", mapper.writeValueAsString(Dtos.asHierarchyDto(hierarchy)));
 
     return new ModelAndView("/WEB-INF/pages/qcHierarchy.jsp", model);
+  }
+
+  public static void addIssues(IssueTrackerManager issueTrackerManager, ThrowingSupplier<List<Issue>, IOException> getIssues,
+      ModelMap model) {
+    model.put("issueTrackerEnabled", issueTrackerManager != null);
+    if (issueTrackerManager != null) {
+      try {
+        List<Issue> issues = getIssues.get();
+        model.put("issueLookupError", false);
+        model.put("issues", issues.stream().map(Dtos::asDto).collect(Collectors.toList()));
+      } catch (IOException e) {
+        log.error("Error retrieving issues", e);
+        model.put("issueLookupError", true);
+      }
+    }
   }
 
 }

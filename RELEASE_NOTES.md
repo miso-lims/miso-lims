@@ -2,29 +2,38 @@
 
 Changes:
 
-  * Prevent duplicate lab aliases
-  * Fixed subproject alias unique constraint - they must now be unique only
-    within a project
-  * Fixed project list name column to sort numerically
-  * Fixed OICR sample alias validator to be more flexible to match sample class
-    and tissue piece type definitions
+* Prevent duplicate lab aliases
+* Improved error handling for issue tracker integration
+  * Only display related issues secton on Edit Project and Edit Run pages if an
+    issue tracker is configured
+  * Show an error message in the section if issue lookup fails
+  * Added monitoring for JIRA errors
+* Fixed subproject alias unique constraint - they must now be unique only
+  within a project
+* Fixed project list name column to sort numerically
+* Fixed OICR sample alias validator to be more flexible to match sample class
+  and tissue piece type definitions
 
 # 1.21.1
 
 Changes:
-  * Fixed Flyway migration
+
+* Fixed Flyway migration
 
 # 1.21.0
 
 Changes:
-  * Attempt to fix Flyway migration
+
+* Attempt to fix Flyway migration
 
 Known Issues:
-  * Flyway migrations fails on some databases
+
+* Flyway migrations fails on some databases
 
 # 1.20.0
 
 Changes:
+
   * Added new project fields:
     * samples expected
     * contact
@@ -59,7 +68,8 @@ Upgrade Notes:
   * Updated to Run Scanner v1.12.3
 
 Known Issues:
-  * Flyway migration fails on some databases
+
+* Flyway migration fails on some databases
 
 # 1.19.1
 

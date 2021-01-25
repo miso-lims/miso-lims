@@ -37,7 +37,6 @@ import java.util.Properties;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.springframework.stereotype.Component;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
@@ -56,6 +55,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Issue;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
+import io.prometheus.client.Gauge;
+
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.service.integration.jira
  * <p/>
@@ -66,11 +67,13 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  * @date 20-Jan-2011
  * @since 0.0.3
  */
-@Component
 public class JiraIssueManager implements IssueTrackerManager {
 
   private static final String REST_API_URL = "/rest/api/";
   private static final String JIRA_REST_API_VERSION = "2";
+
+  private static final Gauge errorGauge = Gauge.build().name("miso_jira_issue_manager_errors")
+      .help("The number of consecutive failures to retrieve JIRA issues").register();
 
   private final DateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
@@ -161,8 +164,10 @@ public class JiraIssueManager implements IssueTrackerManager {
       for (int i = 0; i < jsonIssues.size(); i++) {
         issues.add(makeIssue(jsonIssues.getJSONObject(i)));
       }
+      errorGauge.set(0);
       return issues;
     } catch (Exception e) {
+      errorGauge.inc();
       throw new IOException("Unable to get resource", e);
     }
   }
