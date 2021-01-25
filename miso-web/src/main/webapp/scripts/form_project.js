@@ -65,7 +65,7 @@ FormTarget.project = (function($) {
           onChange: function(newValue, form) {
             var scheme = config.naming[newValue ? 'secondary' : 'primary'];
             form.updateField('shortName', {
-              required: scheme.shortNameRequired,
+              required: Constants.isDetailedSample || scheme.shortNameRequired,
               disabled: !scheme.shortNameModifiable
             });
           }
@@ -82,7 +82,7 @@ FormTarget.project = (function($) {
           data: 'shortName',
           type: 'text',
           maxLength: 255,
-          required: config.naming.primary.shortNameRequired,
+          required: Constants.isDetailedSample || config.naming.primary.shortNameRequired,
           disabled: !config.naming.primary.shortNameModifiable
         }, {
           title: 'REB Number',

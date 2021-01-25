@@ -2,6 +2,7 @@
 
 Changes:
 
+* Changed project short name to be required in detailed sample mode
 * Prevent duplicate lab aliases
 * Improved error handling for issue tracker integration
   * Only display related issues secton on Edit Project and Edit Run pages if an

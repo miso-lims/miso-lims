@@ -43,6 +43,10 @@ public class ValidationError implements Serializable {
     return new ValidationError(property, String.format("There is already another %s with this %s", typeLabel, propertyLabel));
   }
 
+  public static ValidationError forRequired(String property) {
+    return new ValidationError(property, "This field is required");
+  }
+
   /**
    * Constructs a ValidationError to describe one of possibly several reasons that an object is invalid. If the error applies to a specific
    * field, a different constructor should be used
