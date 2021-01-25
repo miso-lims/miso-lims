@@ -11,6 +11,8 @@ Changes:
 * Fixed subproject alias unique constraint - they must now be unique only
   within a project
 * Fixed project list name column to sort numerically
+* Fixed OICR sample alias validator to be more flexible to match sample class
+  and tissue piece type definitions
 
 # 1.21.1
 
