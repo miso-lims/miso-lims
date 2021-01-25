@@ -26,12 +26,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
@@ -44,7 +39,6 @@ import org.springframework.web.servlet.ModelAndView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Issue;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
@@ -61,11 +55,10 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 @Controller
 @RequestMapping("/project")
 public class EditProjectController {
-  private static final Logger log = LoggerFactory.getLogger(EditProjectController.class);
 
   @Autowired
   private ProjectService projectService;
-  @Autowired
+  @Autowired(required = false)
   private IssueTrackerManager issueTrackerManager;
   @Autowired
   private ExternalUriBuilder externalUriBuilder;
@@ -107,15 +100,7 @@ public class EditProjectController {
       Collection<Subproject> subprojects = subprojectService.listByProjectId(project.getId());
       model.put("subprojects", Dtos.asSubprojectDtos(subprojects));
       model.put("title", "Project " + project.getId());
-      List<Issue> issues = null;
-      try {
-        issues = issueTrackerManager.getIssuesByTag(project.getShortName());
-      } catch (IOException e) {
-        log.error("Error retrieving issues", e);
-        issues = Collections.emptyList();
-      }
-
-      model.put("projectIssues", issues.stream().map(Dtos::asDto).collect(Collectors.toList()));
+      MisoWebUtils.addIssues(issueTrackerManager, () -> issueTrackerManager.getIssuesByTag(project.getShortName()), model);
       model.put("projectReportLinks", externalUriBuilder.getUris(project));
     }
 

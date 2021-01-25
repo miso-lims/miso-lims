@@ -27,7 +27,6 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringBlankOrNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -108,7 +107,7 @@ public class EditRunController {
   private ExperimentService experimentService;
   @Autowired
   private SopService sopService;
-  @Autowired
+  @Autowired(required = false)
   private IssueTrackerManager issueTrackerManager;
   @Autowired
   private ExternalUriBuilder externalUriBuilder;
@@ -191,12 +190,7 @@ public class EditRunController {
           return dto;
         })).collect(Collectors.toList()));
     model.put("runAliquots", getRunAliquots(run));
-    try {
-      model.put("runIssues", issueTrackerManager.searchIssues(run.getAlias()).stream().map(Dtos::asDto).collect(Collectors.toList()));
-    } catch (IOException e) {
-      model.put("runIssues", Collections.emptyList());
-      log.error("Error retrieving issues", e);
-    }
+    MisoWebUtils.addIssues(issueTrackerManager, () -> issueTrackerManager.searchIssues(run.getAlias()), model);
     model.put("run", run);
 
     ObjectMapper mapper = new ObjectMapper();
