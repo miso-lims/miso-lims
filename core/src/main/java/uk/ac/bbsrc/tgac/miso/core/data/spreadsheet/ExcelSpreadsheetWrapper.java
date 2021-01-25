@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.core.data.spreadsheet;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -40,12 +39,12 @@ public class ExcelSpreadsheetWrapper implements SpreadsheetWrapper {
   @Override
   public String getCellValue(int rowNum, int colNum) {
     XSSFRow row = sheet.getRow(rowNum);
-    XSSFCell cell = row.getCell(colNum, Row.CREATE_NULL_AS_BLANK);
-    switch (cell.getCellType()) {
-    case Cell.CELL_TYPE_BLANK:
-    case Cell.CELL_TYPE_STRING:
+    XSSFCell cell = row.getCell(colNum, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+    switch (cell.getCellTypeEnum()) {
+    case BLANK:
+    case STRING:
       return cell.getStringCellValue();
-    case Cell.CELL_TYPE_NUMERIC:
+    case NUMERIC:
       if (DateUtil.isCellDateFormatted(cell)) {
         return LimsUtils.formatDate(cell.getDateCellValue());
       } else {

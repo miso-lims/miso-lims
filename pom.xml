@@ -145,6 +145,7 @@
     <mockito.verison>1.10.19</mockito.verison>
     <slf4j.version>1.6.1</slf4j.version>
     <jersey.version>1.19</jersey.version>
+    <poi.version>3.17</poi.version>
     <prometheus.version>0.0.21</prometheus.version>
     <prometheus.jmx.version>0.9</prometheus.jmx.version>
     <jackson.version>2.8.6</jackson.version>
@@ -396,14 +397,14 @@
       <dependency>
         <groupId>org.apache.poi</groupId>
         <artifactId>poi</artifactId>
-        <version>3.8</version>
+        <version>${poi.version}</version>
         <type>jar</type>
         <scope>compile</scope>
       </dependency>
       <dependency>
         <groupId>org.apache.poi</groupId>
         <artifactId>poi-ooxml</artifactId>
-        <version>3.8</version>
+        <version>${poi.version}</version>
         <exclusions>
           <exclusion>
             <artifactId>dom4j</artifactId>
