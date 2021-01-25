@@ -1087,3 +1087,7 @@ ul.unformatted-list {
 #dialog {
   max-height: 75vh;
 }
+
+.ui-dialog {
+  max-width: 90vw;
+}

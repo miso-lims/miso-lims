@@ -14,6 +14,7 @@ Changes:
 * Fixed OICR sample alias validator to be more flexible to match sample class
   and tissue piece type definitions
 * Fixed wizard dialogs' max height to stay within window
+* Fixed sizing and scrolling of advanced search help dialog
 
 # 1.21.1
 
