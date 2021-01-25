@@ -13,6 +13,7 @@ Changes:
 * Fixed project list name column to sort numerically
 * Fixed OICR sample alias validator to be more flexible to match sample class
   and tissue piece type definitions
+* Fixed wizard dialogs' max height to stay within window
 
 # 1.21.1
 
