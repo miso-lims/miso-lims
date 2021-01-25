@@ -521,6 +521,10 @@ var Utils = Utils
           autoOpen: true,
           height: actions.length * 40 + 200,
           width: 450,
+          position: {
+            my: 'center',
+            at: 'center'
+          },
           title: title,
           modal: true,
           buttons: {
