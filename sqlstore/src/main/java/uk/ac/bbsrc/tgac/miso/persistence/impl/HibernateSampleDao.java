@@ -451,4 +451,9 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
     criteria.add(Property.forName("id").in(subquery));
   }
 
+  @Override
+  public void restrictPaginationByTimepoint(Criteria criteria, String timepoint, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.ilike("timepoint", timepoint, MatchMode.ANYWHERE));
+  }
+
 }

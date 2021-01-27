@@ -50,4 +50,8 @@ public interface SampleTissue extends DetailedSample {
 
   void setTubeNumber(Integer tubeNumber);
 
+  String getTimepoint();
+
+  void setTimepoint(String timespoint);
+
 }

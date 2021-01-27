@@ -999,6 +999,7 @@ public class Dtos {
     if (from.getTissueMaterial() != null) {
       dto.setTissueMaterialId(from.getTissueMaterial().getId());
     }
+    setString(dto::setTimepoint, from.getTimepoint());
     return dto;
   }
 
@@ -1029,6 +1030,7 @@ public class Dtos {
       lab.setId(from.getLabId());
       to.setLab(lab);
     }
+    setString(to::setTimepoint, from.getTimepoint());
     return to;
   }
 

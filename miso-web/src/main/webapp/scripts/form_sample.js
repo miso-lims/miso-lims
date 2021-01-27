@@ -359,6 +359,12 @@ FormTarget.sample = (function($) {
                   include: !!object.lab,
                   description: 'The external lab that a tissue came from. This field is intended for historical data only as the lab should '
                       + 'normally be recorded in a receipt transfer instead'
+                }, {
+                  title: 'Timepoint',
+                  data: 'timepoint',
+                  type: 'text',
+                  maxLength: 50,
+                  description: 'When the sample was taken'
                 }]
           },
           {

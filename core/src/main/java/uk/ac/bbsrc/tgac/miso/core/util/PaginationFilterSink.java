@@ -95,6 +95,8 @@ public interface PaginationFilterSink<T> {
 
   public void restrictPaginationByTransferType(T item, TransferType transferType, Consumer<String> errorHandler);
 
+  public void restrictPaginationByTimepoint(T item, String timepoint, Consumer<String> errorHandler);
+
   public void restrictPaginationByTissueOrigin(T item, String origin, Consumer<String> errorHandler);
 
   public void restrictPaginationByTissueType(T item, String type, Consumer<String> errorHandler);

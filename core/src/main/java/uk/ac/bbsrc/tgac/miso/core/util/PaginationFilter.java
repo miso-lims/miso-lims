@@ -463,6 +463,16 @@ public abstract interface PaginationFilter {
     };
   }
 
+  public static PaginationFilter timepoint(String timepoint) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByTimepoint(item, timepoint, errorHandler);
+      }
+    };
+  }
+
   public static PaginationFilter tissueOrigin(String origin) {
     return new PaginationFilter() {
 

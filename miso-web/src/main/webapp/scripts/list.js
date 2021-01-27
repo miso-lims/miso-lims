@@ -155,6 +155,10 @@ ListUtils = (function($) {
     "tissueType": {
       term: "tissueType:CODE",
       help: "Checks whether an item has the specified tissue type"
+    },
+    "timepoint": {
+      term: "timepoint:NAME",
+      help: "Checks whether the item's timepoint matches. This is a partial match."
     }
   };
 

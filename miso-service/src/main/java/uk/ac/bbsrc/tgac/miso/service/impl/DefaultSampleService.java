@@ -960,6 +960,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     target.setTissueOrigin(source.getTissueOrigin());
     target.setTissueType(source.getTissueType());
     target.setLab(source.getLab());
+    target.setTimepoint(source.getTimepoint());
   }
 
   private void applyTissueProcessingChanges(SampleTissueProcessing target, SampleTissueProcessing source) {
