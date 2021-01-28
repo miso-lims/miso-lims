@@ -193,7 +193,8 @@ BulkTarget.libraryaliquot = (function($) {
             return [];
           }
           return Constants.targetedSequencings.filter(function(tarseq) {
-            return tarseq.kitDescriptorIds.indexOf(data.libraryKitDescriptorId) !== -1;
+            return tarseq.kitDescriptorIds.indexOf(data.libraryKitDescriptorId) !== -1
+                && (!tarseq.archived || data.targetedSequencingId === tarseq.id);
           });
         },
         sortSource: Utils.sorting.standardSort('alias'),
