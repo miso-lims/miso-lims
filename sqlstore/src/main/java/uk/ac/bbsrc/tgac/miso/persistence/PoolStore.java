@@ -29,7 +29,6 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 /**
@@ -60,19 +59,6 @@ public interface PoolStore extends Store<Pool>, PaginatedDataSource<Pool> {
    *           when
    */
   List<Pool> listByProjectId(long projectId) throws IOException;
-
-  /**
-   * List all Pools that are for a given {@link PlatformType}
-   *
-   * @param platformType
-   *          of type PlatformType (null for wildcard)
-   * @param query the search term to use (null for wildcard)
-   * @param limit the number of results to return (null for all)
-   * @return List<Pool<? extends Poolable<?,?>>
-   * @throws IOException
-   *           when
-   */
-  List<Pool> listAllByCriteria(PlatformType platformType, String query, Integer limit) throws IOException;
 
   /**
    * List all Samples associated with identificationBarcodes from the given identificationBarcode list

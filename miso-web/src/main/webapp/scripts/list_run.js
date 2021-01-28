@@ -129,7 +129,6 @@ ListTarget.run = {
   },
   searchTermSelector: function(searchTerms) {
     return [searchTerms['id'], searchTerms['runstatus'], searchTerms['created'], searchTerms['entered'], searchTerms['changed'],
-        searchTerms['creator'], searchTerms['changedby'], searchTerms['platform'], searchTerms['index_name'], searchTerms['index_seq'],
-        searchTerms['parameters']]
+        searchTerms['creator'], searchTerms['changedby'], searchTerms['platform'], searchTerms['index'], searchTerms['parameters']]
   }
 };

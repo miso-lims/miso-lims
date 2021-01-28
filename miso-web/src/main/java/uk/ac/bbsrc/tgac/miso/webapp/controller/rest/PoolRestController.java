@@ -417,7 +417,7 @@ public class PoolRestController extends RestController {
     if (PlatformType.getKeys().contains(platform)) {
       Collection<Pool> pools = new ArrayList<>();
       PlatformType platformType = PlatformType.get(platform);
-      pools = poolService.listByPlatform(platformType);
+      pools = poolService.list(0, 0, false, null, PaginationFilter.platformType(platformType));
       return serializePools(pools, uriBuilder);
     } else {
       throw new RestException("Request must specify a platform");
@@ -487,7 +487,10 @@ public class PoolRestController extends RestController {
 
   @GetMapping(value = "/search")
   public @ResponseBody List<PoolDto> search(@RequestParam("q") String search) throws IOException {
-    return poolService.listBySearch(search).stream().map(pool -> Dtos.asDto(pool, true, false, indexChecker)).collect(Collectors.toList());
+    return poolService.list(0, 0, false, search, PaginationFilter.query(search))
+        .stream()
+        .map(pool -> Dtos.asDto(pool, true, false, indexChecker))
+        .collect(Collectors.toList());
   }
 
   @PostMapping(value = "/spreadsheet")

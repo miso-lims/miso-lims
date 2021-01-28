@@ -40,7 +40,6 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.persistence.ExperimentStore;
-import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
@@ -79,15 +78,6 @@ public class HibernateExperimentDao implements ExperimentStore {
   public List<Experiment> listAllWithLimit(long limit) throws IOException {
     Criteria criteria = currentSession().createCriteria(Experiment.class);
     criteria.setMaxResults((int) limit);
-    @SuppressWarnings("unchecked")
-    List<Experiment> results = criteria.list();
-    return results;
-  }
-
-  @Override
-  public List<Experiment> listBySearch(String query) {
-    Criteria criteria = currentSession().createCriteria(Experiment.class);
-    criteria.add(DbUtils.searchRestrictions(query, false, "name", "alias", "description"));
     @SuppressWarnings("unchecked")
     List<Experiment> results = criteria.list();
     return results;

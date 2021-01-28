@@ -36,16 +36,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
  * @since 0.0.2
  */
 public interface ExperimentStore extends Store<Experiment> {
-  /**
-   * List all Experiments that match a search criteria
-   * 
-   * @param query
-   *          of type String
-   * @return Collection<Experiment>
-   * @throws IOException
-   *           when
-   */
-  public Collection<Experiment> listBySearch(String query) throws IOException;
 
   /**
    * List all Experiments that are part of a Study given a Study ID

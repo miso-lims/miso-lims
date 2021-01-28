@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -54,16 +53,6 @@ public interface RunStore extends Store<Run>, PaginatedDataSource<Run> {
    * @throws IOException
    */
   Run getLatestRunIdRunBySequencerPartitionContainerId(long containerId) throws IOException;
-
-  /**
-   * List all Runs with name, alias, or description containing the query string
-   *
-   * @param query String to search for
-   * @return Collection<Run>
-   * @throws IOException
-   * @throws NullPointerException if query is null
-   */
-  Collection<Run> listBySearch(String query) throws IOException;
 
   /**
    * Retrieve a Run from an underlying data store given a Run alias
@@ -117,9 +106,5 @@ public interface RunStore extends Store<Run>, PaginatedDataSource<Run> {
    * @return all runs with matching sequencer instrument id
    */
   List<Run> listBySequencerId(long instrumentId) throws IOException;
-
-  public long countRuns() throws IOException;
-
-  public long countBySearch(String querystr) throws IOException;
 
 }

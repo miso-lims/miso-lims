@@ -18,7 +18,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SequencingOrderSummaryView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
+import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
 import uk.ac.bbsrc.tgac.miso.persistence.SequencingOrderSummaryViewDao;
+import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
@@ -152,10 +154,11 @@ public class HibernateSequencingOrderSummaryViewDao
   }
 
   @Override
-  public void restrictPaginationByIndex(Criteria criteria, String index, Consumer<String> errorHandler) {
-    criteria.createAlias("pool.elements", "poolElement");
-    criteria.createAlias("poolElement.indices", "indices");
-    HibernateLibraryDao.restrictPaginationByIndices(criteria, index);
+  public void restrictPaginationByIndex(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    criteria.createAlias("pool.elements", "poolElement")
+        .createAlias("poolElement.indices", "indices")
+        .add(DbUtils.textRestriction(query, "indices.name", "indices.sequence"));
+
   }
 
   @Override

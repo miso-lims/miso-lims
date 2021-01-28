@@ -83,52 +83,48 @@ ListUtils = (function($) {
       term: "platform:PLATFORM",
       help: "Check if this item is meant for a particular platform type: ILLUMINA, LS454, SOLID, IONTORRENT, PACBIO, OXFORDNANOPORE."
     },
-    "index_name": {
-      term: "index:NAME",
-      help: "Checks if this item has the index provided. The name can be a partial match."
-    },
-    "index_seq": {
-      term: "index:SEQ",
-      help: "Checks if this item has the index provided. The sequence must be an exact match."
+    "index": {
+      term: "index:TEXT",
+      help: "Checks if this item has the index provided. Both the index name and sequence are checked."
     },
     "class": {
       term: "class:NAME",
-      help: "Check if the item belong to the sample class provided. This is taken as a partial match."
+      help: "Check if the item belong to the sample class provided. This is always taken as a partial match."
     },
     "lab": {
-      term: "lab:NAME",
-      help: "Check if an item came from the specified lab. This is a partial match."
+      term: "lab:TEXT",
+      help: "Check if an item came from the specified lab."
     },
     "external": {
-      term: "external:NAME",
+      term: "external:TEXT",
       help: "Checks if an item came from the external identifier or external name."
     },
     "box": {
-      term: "box:NAME",
-      help: "Checks if an item is located in a particular box.  The name can either be the partial name or partial alias of the box."
+      term: "box:TEXT",
+      help: "Checks if an item is located in a particular box by alias or name."
     },
     "boxType": {
       term: "boxType:NAME",
       help: "Checks whether the box is of the specified type - 'storage' or 'plate'."
     },
     "freezer": {
-      term: "freezer:NAME",
+      term: "freezer:TEXT",
       help: "Checks if an item is located in a particular freezer. This is a partial match."
     },
     "kitname": {
-      term: "kitname:NAME",
-      help: "Checks if an item uses a library, clustering, or multiplexing kit of the specified name. This is a partial match."
+      term: "kitname:TEXT",
+      help: "Checks if an item uses a library, clustering, or multiplexing kit of the specified name."
     },
     "subproject": {
-      term: "subproject:NAME",
+      term: "subproject:TEXT",
       help: "Checks if an item is tagged with the given subproject"
     },
     "parameters": {
-      term: "parameters:NAME",
+      term: "parameters:TEXT",
       help: "Checks if an item has the specified sequencing parameters."
     },
     "groupid": {
-      term: "groupid:NAME",
+      term: "groupid:TEXT",
       help: "Checks if an item has the specified group ID."
     },
     "distributed": {
@@ -136,7 +132,7 @@ ListUtils = (function($) {
       help: "Checks whether this item has a distribution date that matches the provided date. For rules about dates, see below. If empty, checks whether an item has been distributed at any time."
     },
     "distributedto": {
-      term: "distributedto:NAME",
+      term: "distributedto:TEXT",
       help: "Checks if the item has been distributed to the specified recipient."
     },
     "ghost": {
@@ -145,20 +141,20 @@ ListUtils = (function($) {
           + "'ghost' or 'real'. 'is:ghost' matches ghost/synthetic samples, and 'is:real' matches NON-ghost/synthetic samples."
     },
     "requisition": {
-      term: "req:#",
+      term: "req:TEXT",
       help: "Checks whether an item has the specified requisition ID"
     },
     "tissueOrigin": {
-      term: "origin:CODE",
+      term: "origin:TEXT",
       help: "Checks whether an item has the specified tissue origin"
     },
     "tissueType": {
-      term: "tissueType:CODE",
+      term: "tissuetype:TEXT",
       help: "Checks whether an item has the specified tissue type"
     },
     "timepoint": {
-      term: "timepoint:NAME",
-      help: "Checks whether the item's timepoint matches. This is a partial match."
+      term: "timepoint:TEXT",
+      help: "Checks whether the item's timepoint matches."
     }
   };
 
@@ -195,6 +191,15 @@ ListUtils = (function($) {
         + '    <tr><th>Syntax</th><th>Meaning</th></tr>' + '  </thead>' + makePopupTableBody(target) + '</table>';
   };
 
+  var textGrammar = '<table class="searchHelpTable">' + '  <caption><h2>TEXT Format</h2></caption>' + '  <thead>'
+      + '    <tr><th>Format</th><th>Behaviour</th></tr>' + '  </thead>'
+      + '  <tr><td>mytext</td><td>Find items matching "mytext" exactly.</td></tr>'
+      + '  <tr><td>mytext*</td><td>Find items beginning with "mytext."</td></tr>'
+      + '  <tr><td>*mytext</td><td>Find items ending with "mytext."</td></tr>'
+      + '  <tr><td>*mytext*</td><td>Find items containing "mytext" anywhere.</td></tr>'
+      + '  <tr><td>*</td><td>Find items with any value specified.</td></tr>'
+      + '  <tr><td></td><td>(Enter nothing to find items with no value specified.)</td></tr>' + '</table>';
+
   var dateGrammar = '<table class="searchHelpTable">'
       + '  <caption><h2>DATE Format</h2></caption>'
       + '  <thead>'
@@ -228,7 +233,7 @@ ListUtils = (function($) {
         + '  If a filter does not apply, it is ignored.'
         + '  Any other search term is taken as a regular query and matched against the current fields for each item.'
         + '  To search for a term with spaces, surround the entire term in quotation marks.' + '</p>' + '<br/>' + makePopupTable(target)
-        + "<br/>" + dateGrammar + "<br/>" + userGrammar;
+        + "<br/>" + textGrammar + "<br/>" + dateGrammar + "<br/>" + userGrammar;
   };
 
   var registerPopupOpen = function(triggerId, target) {

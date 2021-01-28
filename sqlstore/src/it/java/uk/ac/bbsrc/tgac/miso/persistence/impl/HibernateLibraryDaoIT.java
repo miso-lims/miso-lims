@@ -175,20 +175,6 @@ public class HibernateLibraryDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testListBySearch() throws Exception {
-    String searchStr = "LIB";
-    List<Library> libraries = dao.listBySearch(searchStr);
-    assertEquals("did not find all libraries", 15, libraries.size());
-  }
-
-  @Test
-  public void testListBySearch_NoResults() throws Exception {
-    String searchStr = "IJOHEWF";
-    List<Library> libraries = dao.listBySearch(searchStr);
-    assertEquals("search returned results", 0, libraries.size());
-  }
-
-  @Test
   public void testListWithLimitAndOffset() throws IOException {
     assertEquals(3, dao.list(5, 3, true, "id").size());
   }

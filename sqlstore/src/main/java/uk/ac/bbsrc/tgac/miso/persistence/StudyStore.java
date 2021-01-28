@@ -39,17 +39,6 @@ public interface StudyStore extends Store<Study>, PaginatedDataSource<Study> {
 
   public Study getByAlias(String alias) throws IOException;
 
-  /**
-   * List all Studies that match a search criteria
-   * 
-   * @param query
-   *          of type String
-   * @return Collection<Study>
-   * @throws IOException
-   *           when
-   */
-  public Collection<Study> listBySearch(String query) throws IOException;
-
 
   /**
    * List all Studies that are carried out as part of a parent Project given a Project ID

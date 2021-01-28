@@ -44,7 +44,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.StudyStore;
-import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -107,15 +106,6 @@ public class HibernateStudyDao implements StudyStore, HibernatePaginatedDataSour
   public int count() throws IOException {
     long c = (Long) currentSession().createCriteria(StudyImpl.class).setProjection(Projections.rowCount()).uniqueResult();
     return (int) c;
-  }
-
-  @Override
-  public List<Study> listBySearch(String query) {
-    Criteria criteria = currentSession().createCriteria(StudyImpl.class);
-    criteria.add(DbUtils.searchRestrictions(query, false, "alias", "name", "description"));
-    @SuppressWarnings("unchecked")
-    List<Study> results = criteria.list();
-    return results;
   }
 
   @Override

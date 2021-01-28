@@ -7,7 +7,6 @@ import java.util.function.Consumer;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListContainerView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
+import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
 import uk.ac.bbsrc.tgac.miso.persistence.ListContainerViewDao;
+import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
@@ -91,22 +92,20 @@ public class HibernateListContainerViewDao implements ListContainerViewDao, Hibe
   }
 
   @Override
-  public void restrictPaginationByKitName(Criteria criteria, String name, Consumer<String> errorHandler) {
+  public void restrictPaginationByKitName(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
     criteria.createAlias("clusteringKit", "clusteringKit", JoinType.LEFT_OUTER_JOIN);
     criteria.createAlias("multiplexingKit", "multiplexingKit", JoinType.LEFT_OUTER_JOIN);
-    criteria.add(Restrictions.disjunction()
-        .add(Restrictions.ilike("clusteringKit.name", name, MatchMode.START))
-        .add(Restrictions.ilike("multiplexingKit.name", name, MatchMode.START)));
+    criteria.add(DbUtils.textRestriction(query, "clusteringKit.name", "multiplexingKit.name"));
   }
 
   @Override
-  public void restrictPaginationByIndex(Criteria criteria, String index, Consumer<String> errorHandler) {
-    criteria.createAlias("partitions", "partitions");
-    criteria.createAlias("partitions.pool", "pool");
-    criteria.createAlias("pool.poolElements", "poolElement");
-    criteria.createAlias("poolElement.poolableElementView", "aliquotForIndex");
-    criteria.createAlias("aliquotForIndex.indices", "indices");
-    HibernateLibraryDao.restrictPaginationByIndices(criteria, index);
+  public void restrictPaginationByIndex(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    criteria.createAlias("partitions", "partitions")
+        .createAlias("partitions.pool", "pool")
+        .createAlias("pool.poolElements", "poolElement")
+        .createAlias("poolElement.poolableElementView", "aliquotForIndex")
+        .createAlias("aliquotForIndex.indices", "indices")
+        .add(DbUtils.textRestriction(query, "indices.name", "indices.sequence"));
   }
 
 }

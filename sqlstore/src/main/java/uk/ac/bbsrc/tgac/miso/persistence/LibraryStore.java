@@ -54,15 +54,6 @@ public interface LibraryStore extends Store<Library>, PaginatedDataSource<Librar
   Library getByBarcode(String barcode) throws IOException;
 
   /**
-   * List all Libraries that match a search criteria
-   *
-   * @param query of type String
-   * @return Collection<Library>
-   * @throws IOException when
-   */
-  List<Library> listBySearch(String query) throws IOException;
-
-  /**
    * Get all Library with a given Library alias
    *
    * @param alias of type String
@@ -149,14 +140,6 @@ public interface LibraryStore extends Store<Library>, PaginatedDataSource<Librar
    * @throws IOException when the objects cannot be retrieved
    */
   List<Library> getByBarcodeList(Collection<String> barcodeList) throws IOException;
-
-  /**
-   *
-   * @param querystr of type String
-   * @return a count of how many libraries match the querystr
-   * @throws IOException
-   */
-  long countLibrariesBySearch(String querystr) throws IOException;
 
   EntityReference getAdjacentLibrary(Library library, boolean before) throws IOException;
 

@@ -54,7 +54,7 @@ public class AdvancedSearchParser {
       if (x.isEmpty()) return null;
       if (x.contains(":")) {
         String[] parts = x.split(":", 2);
-        switch (parts[0]) {
+        switch (parts[0].toLowerCase()) {
         case "is":
         case "has":
           switch (parts[1].toLowerCase()) {
@@ -92,9 +92,9 @@ public class AdvancedSearchParser {
         case "createdon":
           return parseDate(parts[1], DateType.CREATE, errorHandler);
         case "entered":
-        case "enteredOn":
+        case "enteredon":
         case "recorded":
-        case "recordedOn":
+        case "recordedon":
           return parseDate(parts[1], DateType.ENTERED, errorHandler);
         case "changed":
         case "modified":
@@ -175,12 +175,12 @@ public class AdvancedSearchParser {
           return PaginationFilter.freezer(parts[1]);
         case "req":
         case "requisition":
-        case "requisitionId":
+        case "requisitionid":
           return PaginationFilter.requisitionId(parts[1]);
-        case "tissueOrigin":
+        case "tissueorigin":
         case "origin":
           return PaginationFilter.tissueOrigin(parts[1]);
-        case "tissueType":
+        case "tissuetype":
           return PaginationFilter.tissueType(parts[1]);
         case "timepoint":
           return PaginationFilter.timepoint(parts[1]);

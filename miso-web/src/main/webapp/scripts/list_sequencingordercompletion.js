@@ -187,7 +187,6 @@ ListTarget.sequencingordercompletion = {
     searchTerms['runstatus'], //
     searchTerms['changed'], //
     searchTerms['platform'], //
-    searchTerms['index_name'],//
-    searchTerms['index_seq']]
+    searchTerms['index']]
   }
 };

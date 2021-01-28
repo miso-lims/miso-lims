@@ -7,18 +7,17 @@ import java.util.function.Consumer;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
+import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
 import uk.ac.bbsrc.tgac.miso.persistence.ListPoolViewDao;
+import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
@@ -106,40 +105,22 @@ public class HibernateListPoolViewDao implements ListPoolViewDao, HibernatePagin
   }
 
   @Override
-  public void restrictPaginationByBox(Criteria criteria, String name, Consumer<String> errorHandler) {
-    criteria.add(Restrictions.or(Restrictions.ilike("boxName", name, MatchMode.ANYWHERE),
-        Restrictions.ilike("boxAlias", name, MatchMode.ANYWHERE)));
+  public void restrictPaginationByBox(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    criteria.add(DbUtils.textRestriction(query, "boxName", "boxAlias"));
+
   }
 
   @Override
-  public void restrictPaginationByIndex(Criteria criteria, String index, Consumer<String> errorHandler) {
-    criteria.createAlias("elements", "element");
-    criteria.createAlias("element.indices", "indices");
-    HibernateLibraryDao.restrictPaginationByIndices(criteria, index);
+  public void restrictPaginationByIndex(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    criteria.createAlias("elements", "element")
+        .createAlias("element.indices", "indices")
+        .add(DbUtils.textRestriction(query, "indices.name", "indices.sequence"));
   }
 
   @Override
-  public void restrictPaginationByFreezer(Criteria criteria, String freezer, Consumer<String> errorHandler) {
-    criteria.createAlias("box", "box")
-        .createAlias("box.storageLocation", "location1")
-        .createAlias("location1.parentLocation", "location2", JoinType.LEFT_OUTER_JOIN)
-        .createAlias("location2.parentLocation", "location3", JoinType.LEFT_OUTER_JOIN)
-        .createAlias("location3.parentLocation", "location4", JoinType.LEFT_OUTER_JOIN)
-        .createAlias("location4.parentLocation", "location5", JoinType.LEFT_OUTER_JOIN)
-        .createAlias("location5.parentLocation", "location6", JoinType.LEFT_OUTER_JOIN)
-        .add(Restrictions.or(
-            Restrictions.and(Restrictions.eq("location1.locationUnit", LocationUnit.FREEZER),
-                Restrictions.ilike("location1.alias", freezer, MatchMode.START)),
-            Restrictions.and(Restrictions.eq("location2.locationUnit", LocationUnit.FREEZER),
-                Restrictions.ilike("location2.alias", freezer, MatchMode.START)),
-            Restrictions.and(Restrictions.eq("location3.locationUnit", LocationUnit.FREEZER),
-                Restrictions.ilike("location3.alias", freezer, MatchMode.START)),
-            Restrictions.and(Restrictions.eq("location4.locationUnit", LocationUnit.FREEZER),
-                Restrictions.ilike("location4.alias", freezer, MatchMode.START)),
-            Restrictions.and(Restrictions.eq("location5.locationUnit", LocationUnit.FREEZER),
-                Restrictions.ilike("location5.alias", freezer, MatchMode.START)),
-            Restrictions.and(Restrictions.eq("location6.locationUnit", LocationUnit.FREEZER),
-                Restrictions.ilike("location6.alias", freezer, MatchMode.START))));
+  public void restrictPaginationByFreezer(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    criteria.createAlias("box", "box");
+    DbUtils.restrictPaginationByFreezer(criteria, query, "box.storageLocation");
   }
 
   @Override
@@ -167,10 +148,8 @@ public class HibernateListPoolViewDao implements ListPoolViewDao, HibernatePagin
   }
 
   @Override
-  public void restrictPaginationByDistributionRecipient(Criteria criteria, String recipient, Consumer<String> errorHandler) {
-    criteria.createAlias("transfers", "transferItem")
-        .createAlias("transferItem.transfer", "transfer")
-        .add(Restrictions.ilike("transfer.recipient", recipient, MatchMode.ANYWHERE));
+  public void restrictPaginationByDistributionRecipient(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    DbUtils.restrictPaginationByDistributionRecipient(criteria, query, "pools", "poolId");
   }
 
 }

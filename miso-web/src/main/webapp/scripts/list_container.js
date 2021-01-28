@@ -150,6 +150,6 @@ ListTarget.container = {
   },
   searchTermSelector: function(searchTerms) {
     return [searchTerms['id'], searchTerms['entered'], searchTerms['changed'], searchTerms['creator'], searchTerms['changedby'],
-        searchTerms['platform'], searchTerms['index_name'], searchTerms['index_seq'], searchTerms['kitname']]
+        searchTerms['platform'], searchTerms['index'], searchTerms['kitname']]
   }
 };

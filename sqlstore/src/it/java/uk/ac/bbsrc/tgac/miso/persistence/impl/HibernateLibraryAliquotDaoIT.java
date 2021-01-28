@@ -321,6 +321,11 @@ public class HibernateLibraryAliquotDaoIT extends AbstractDAOTest {
     testSearch(PaginationFilter.pool(1L));
   }
 
+  @Test
+  public void testSearchByGroupId() throws Exception {
+    testSearch(PaginationFilter.groupId("test"));
+  }
+
   /**
    * Verifies Hibernate mappings by ensuring that no exception is thrown by a search
    * 

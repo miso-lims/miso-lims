@@ -320,21 +320,6 @@ public class HibernateRunDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testCountBySearch() throws IOException {
-    assertEquals(2, dao.countBySearch("1204"));
-  }
-
-  @Test
-  public void testCountByEmptySearch() throws IOException {
-    assertEquals(4L, dao.countBySearch(""));
-  }
-
-  @Test
-  public void testCountByBadSearch() throws IOException {
-    assertEquals(0L, dao.countBySearch("; DROP TABLE Run;"));
-  }
-
-  @Test
   public void testListBySearchWithLimit() throws IOException {
     List<Run> runs = dao.list(2, 2, true, "id", PaginationFilter.query("C0"));
     assertEquals(1, runs.size());

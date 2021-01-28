@@ -68,7 +68,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.service.ExperimentService;
-import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PartitionQcTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionAliquotService;
@@ -193,8 +192,6 @@ public class RunRestController extends RestController {
   private RunPartitionAliquotService runPartitionAliquotService;
   @Autowired
   private LibraryService libraryService;
-  @Autowired
-  private LibraryAliquotService libraryAliquotService;
   @Autowired
   private ExperimentService experimentService;
   @Autowired
@@ -511,7 +508,10 @@ public class RunRestController extends RestController {
 
   @GetMapping("/search")
   public @ResponseBody List<RunDto> searchRuns(@RequestParam("q") String query) throws IOException {
-    return runService.listBySearch(query).stream().map(Dtos::asDto).collect(Collectors.toList());
+    return runService.list(0, 0, false, "id", PaginationFilter.query(query))
+        .stream()
+        .map(Dtos::asDto)
+        .collect(Collectors.toList());
   }
 
   @GetMapping("/recent")
