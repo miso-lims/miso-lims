@@ -442,6 +442,11 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
   }
 
   @Test
+  public void testSearchByTimepoint() throws Exception {
+    testSearch(PaginationFilter.timepoint("test"));
+  }
+
+  @Test
   public void testSearchByTissueOrigin() throws Exception {
     testSearch(PaginationFilter.tissueOrigin("Ly"));
   }

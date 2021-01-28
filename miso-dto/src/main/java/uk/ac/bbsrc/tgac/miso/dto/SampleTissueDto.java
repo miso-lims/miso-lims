@@ -15,6 +15,7 @@ public class SampleTissueDto extends SampleIdentityDto {
   private Long tissueOriginId;
   private Long tissueTypeId;
   private Integer tubeNumber;
+  private String timepoint;
 
   public String getSecondaryIdentifier() {
     return secondaryIdentifier;
@@ -86,6 +87,14 @@ public class SampleTissueDto extends SampleIdentityDto {
 
   public void setTubeNumber(Integer tubeNumber) {
     this.tubeNumber = tubeNumber;
+  }
+
+  public String getTimepoint() {
+    return timepoint;
+  }
+
+  public void setTimepoint(String timepoint) {
+    this.timepoint = timepoint;
   }
 
 }

@@ -782,6 +782,14 @@ BulkTarget.sample = (function($) {
         includeSaved: targetCategory === 'Tissue',
         maxLength: 255
       }, {
+        title: 'Timepoint',
+        type: 'text',
+        data: 'timepoint',
+        include: show['Tissue'],
+        includeSaved: targetCategory === 'Tissue',
+        maxLength: 50,
+        description: 'When the sample was taken'
+      }, {
         title: 'Initial Slides',
         type: 'int',
         data: 'initialSlides',

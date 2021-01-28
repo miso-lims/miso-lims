@@ -409,6 +409,11 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
+  public default void restrictPaginationByTimepoint(Criteria item, String timepoint, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s has no timepoint", getFriendlyName()));
+  }
+
+  @Override
   public default void restrictPaginationByTissueOrigin(Criteria item, String origin, Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s has no tissue origin", getFriendlyName()));
   }

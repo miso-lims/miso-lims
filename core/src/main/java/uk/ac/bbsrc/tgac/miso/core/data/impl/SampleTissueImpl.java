@@ -45,6 +45,7 @@ public class SampleTissueImpl extends DetailedSampleImpl implements SampleTissue
   private TissueType tissueType;
 
   private Integer tubeNumber;
+  private String timepoint;
 
   @Override
   public String getSecondaryIdentifier() {
@@ -134,6 +135,16 @@ public class SampleTissueImpl extends DetailedSampleImpl implements SampleTissue
   @Override
   public void setTubeNumber(Integer tubeNumber) {
     this.tubeNumber = tubeNumber;
+  }
+
+  @Override
+  public String getTimepoint() {
+    return timepoint;
+  }
+
+  @Override
+  public void setTimepoint(String timepoint) {
+    this.timepoint = timepoint;
   }
 
   @Override
