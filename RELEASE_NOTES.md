@@ -17,6 +17,7 @@ Changes:
   and tissue piece type definitions
 * Fixed wizard dialogs' max height to stay within window
 * Fixed sizing and scrolling of advanced search help dialog
+* Fixed archived targeted sequencing options remaining available
 
 # 1.21.1
 
