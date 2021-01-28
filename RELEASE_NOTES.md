@@ -2,6 +2,12 @@
 
 Changes:
 
+
+
+# 1.22.0
+
+Changes:
+
 * Added timepoint field to tissue samples (detailed sample)
 * Changed project short name to be required in detailed sample mode
 * Prevent duplicate lab aliases
