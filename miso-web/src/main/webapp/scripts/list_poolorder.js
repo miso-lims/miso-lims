@@ -85,5 +85,8 @@ ListTarget.poolorder = {
             }
           }
         }];
+  },
+  searchTermSelector: function(searchTerms) {
+    return [searchTerms['id'], searchTerms['fulfilled'], searchTerms['active']];
   }
 };

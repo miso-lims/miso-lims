@@ -349,7 +349,7 @@ public class RunPageIT extends AbstractIT {
     String nameSearch = "IPO510";
 
     // search by partial name
-    page.searchForPools(false, Arrays.asList(0), PoolSearch.SEARCH, nameSearch);
+    page.searchForPools(false, Arrays.asList(0), PoolSearch.SEARCH, nameSearch + "*");
     List<Long> poolIds = page.getPoolIdsFromTiles();
     assertFalse(poolIds.isEmpty());
     poolIds.forEach(poolId -> {
@@ -387,7 +387,7 @@ public class RunPageIT extends AbstractIT {
     String barcodeSearch = "ipobar";
 
     // search by partial identificationBarcode
-    page.searchForPools(false, Arrays.asList(0), PoolSearch.SEARCH, barcodeSearch);
+    page.searchForPools(false, Arrays.asList(0), PoolSearch.SEARCH, barcodeSearch + "*");
     List<Long> poolIds = page.getPoolIdsFromTiles();
     assertTrue(poolIds.size() > 1);
     poolIds.forEach(poolId -> {

@@ -43,5 +43,8 @@ ListTarget.sop = {
       mData: 'archived',
       mRender: ListUtils.render.archived
     }];
+  },
+  searchTermSelector: function(searchTerms) {
+    return [searchTerms['id']];
   }
 };

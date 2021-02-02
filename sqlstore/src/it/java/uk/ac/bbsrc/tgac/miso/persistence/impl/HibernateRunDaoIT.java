@@ -114,30 +114,6 @@ public class HibernateRunDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testListBySearch1204() throws IOException {
-    List<Run> runs = dao.listBySearch("1204");
-    assertEquals(2, runs.size());
-  }
-
-  @Test
-  public void testListBySearchH1179() throws IOException {
-    List<Run> runs = dao.listBySearch("h1179");
-    assertEquals(4, runs.size());
-  }
-
-  @Test
-  public void testListBySearchNone() throws IOException {
-    List<Run> runs = dao.listBySearch("pizza");
-    assertEquals(0, runs.size());
-  }
-
-  @Test
-  public void testListBySearchEmpty() throws IOException {
-    List<Run> runs = dao.listBySearch("");
-    assertEquals(4, runs.size());
-  }
-
-  @Test
   public void testListByProjectId() throws IOException {
     List<Run> runs = dao.listByProjectId(1L);
     assertEquals(1, runs.size());
@@ -321,14 +297,14 @@ public class HibernateRunDaoIT extends AbstractDAOTest {
 
   @Test
   public void testListBySearchWithLimit() throws IOException {
-    List<Run> runs = dao.list(2, 2, true, "id", PaginationFilter.query("C0"));
+    List<Run> runs = dao.list(2, 2, true, "id", PaginationFilter.query("*C0*"));
     assertEquals(1, runs.size());
     assertEquals(4L, runs.get(0).getId());
   }
 
   @Test
   public void testListByEmptySearchWithLimit() throws IOException {
-    List<Run> runs = dao.list(0, 3, true, "id", PaginationFilter.query(""));
+    List<Run> runs = dao.list(0, 3, true, "id");
     assertEquals(3L, runs.size());
   }
 

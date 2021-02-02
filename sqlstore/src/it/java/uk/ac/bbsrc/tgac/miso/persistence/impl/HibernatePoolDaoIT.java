@@ -264,12 +264,12 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
 
   @Test
   public void testCountIlluminaPoolsBySearch() throws IOException {
-    assertEquals(2L, dao.count(PaginationFilter.platformType(PlatformType.ILLUMINA), PaginationFilter.query("IPO1")));
+    assertEquals(2L, dao.count(PaginationFilter.platformType(PlatformType.ILLUMINA), PaginationFilter.query("IPO1*")));
   }
 
   @Test
   public void testCountIlluminaPoolsEmptySearch() throws IOException {
-    assertTrue(dao.count(PaginationFilter.platformType(PlatformType.ILLUMINA), PaginationFilter.query("")) > 0);
+    assertTrue(dao.count(PaginationFilter.platformType(PlatformType.ILLUMINA)) > 0);
   }
 
   @Test
@@ -308,13 +308,13 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
 
   @Test
   public void testListByIlluminaEmptySearchWithLimit() throws IOException {
-    List<Pool> pools = dao.list(5, 3, true, "id", PaginationFilter.platformType(PlatformType.ILLUMINA), PaginationFilter.query(""));
+    List<Pool> pools = dao.list(5, 3, true, "id", PaginationFilter.platformType(PlatformType.ILLUMINA));
     assertEquals(3L, pools.size());
   }
 
   @Test
   public void testListByIlluminaSearchWithLimit() throws IOException {
-    List<Pool> pools = dao.list(5, 3, true, "id", PaginationFilter.platformType(PlatformType.ILLUMINA), PaginationFilter.query("IPO"));
+    List<Pool> pools = dao.list(5, 3, true, "id", PaginationFilter.platformType(PlatformType.ILLUMINA), PaginationFilter.query("IPO*"));
     assertEquals(3, pools.size());
     assertEquals(6L, pools.get(0).getId());
   }

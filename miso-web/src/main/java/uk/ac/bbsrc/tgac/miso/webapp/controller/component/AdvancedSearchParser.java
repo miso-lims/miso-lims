@@ -164,11 +164,7 @@ public class AdvancedSearchParser {
         case "groupid":
           return PaginationFilter.groupId(parts[1]);
         case "distributed":
-          if (LimsUtils.isStringEmptyOrNull(parts[1])) {
-            return PaginationFilter.distributed();
-          } else {
-            return parseDate(parts[1], DateType.DISTRIBUTED, errorHandler);
-          }
+          return parseDate(parts[1], DateType.DISTRIBUTED, errorHandler);
         case "distributedto":
           return PaginationFilter.distributedTo(parts[1]);
         case "freezer":

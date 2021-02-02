@@ -35,8 +35,6 @@ public interface PaginationFilterSink<T> {
 
   public void restrictPaginationByDate(T item, Date start, Date end, DateType type, Consumer<String> errorHandler);
 
-  public void restrictPaginationByDistributed(T item, Consumer<String> errorHandler);
-
   public void restrictPaginationByDistributionRecipient(T item, TextQuery query, Consumer<String> errorHandler);
 
   public void restrictPaginationByExternalName(T item, TextQuery query, Consumer<String> errorHandler);

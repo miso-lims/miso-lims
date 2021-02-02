@@ -180,23 +180,8 @@ public class HibernateLibraryDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testCountBySearch() throws IOException {
-    assertEquals(7L, dao.countLibrariesBySearch("LIB1"));
-  }
-
-  @Test
-  public void testCountByEmptySearch() throws IOException {
-    assertEquals(15L, dao.countLibrariesBySearch(""));
-  }
-
-  @Test
-  public void testCountByBadSearch() throws IOException {
-    assertEquals(0L, dao.countLibrariesBySearch("; DROP TABLE Library;"));
-  }
-
-  @Test
   public void testListBySearchWithLimit() throws IOException {
-    List<Library> libraries = dao.list(2, 3, false, "lastModified", PaginationFilter.query("Bn_R"));
+    List<Library> libraries = dao.list(2, 3, false, "lastModified", PaginationFilter.query("*Bn_R*"));
     assertEquals(3, libraries.size());
     assertEquals(10L, libraries.get(0).getId());
   }
@@ -307,11 +292,6 @@ public class HibernateLibraryDaoIT extends AbstractDAOTest {
   @Test
   public void testSearchByGroupId() throws IOException {
     testSearch(PaginationFilter.groupId("ID of group"));
-  }
-
-  @Test
-  public void testSearchByDistributed() throws Exception {
-    testSearch(PaginationFilter.distributed());
   }
 
   @Test

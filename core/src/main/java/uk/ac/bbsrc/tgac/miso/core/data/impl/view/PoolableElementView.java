@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -13,6 +15,7 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -40,7 +43,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferView;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.DetailedQcItem;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
@@ -157,8 +160,11 @@ public class PoolableElementView implements DetailedQcItem, Identifiable, Serial
           @JoinColumn(name = "index_indexId", nullable = false) })
   private List<Index> indices = new ArrayList<>();
 
-  @OneToMany(mappedBy = "item")
-  private List<TransferLibraryAliquot> transfers;
+  @Immutable
+  @ManyToMany
+  @JoinTable(name = "Transfer_LibraryAliquot", joinColumns = { @JoinColumn(name = "aliquotId") }, inverseJoinColumns = {
+      @JoinColumn(name = "transferId") })
+  private Set<ListTransferView> listTransferViews;
 
   public static PoolableElementView fromLibraryAliquot(LibraryAliquot aliquot) {
     PoolableElementView v = new PoolableElementView();
@@ -678,11 +684,11 @@ public class PoolableElementView implements DetailedQcItem, Identifiable, Serial
     this.sample = sample;
   }
 
-  public List<TransferLibraryAliquot> getTransfers() {
-    if (transfers == null) {
-      transfers = new ArrayList<>();
+  public Set<ListTransferView> getTransferViews() {
+    if (listTransferViews == null) {
+      listTransferViews = new HashSet<>();
     }
-    return transfers;
+    return listTransferViews;
   }
 
   @Override

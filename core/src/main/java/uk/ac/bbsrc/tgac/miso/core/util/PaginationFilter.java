@@ -122,16 +122,6 @@ public abstract interface PaginationFilter {
     };
   }
 
-  public static PaginationFilter distributed() {
-    return new PaginationFilter() {
-
-      @Override
-      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
-        sink.restrictPaginationByDistributed(item, errorHandler);
-      }
-    };
-  }
-
   public static PaginationFilter distributedTo(String recipient) {
     return new PaginationFilter() {
 

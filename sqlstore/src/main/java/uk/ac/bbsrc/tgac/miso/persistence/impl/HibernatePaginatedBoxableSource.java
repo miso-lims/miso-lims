@@ -39,22 +39,12 @@ public interface HibernatePaginatedBoxableSource<T extends Boxable> extends Hibe
   @Override
   public default void restrictPaginationByDate(Criteria criteria, Date start, Date end, DateType type, Consumer<String> errorHandler) {
     if (type == DateType.RECEIVE) {
-      criteria.createAlias("listTransferViews", "transfer")
-          .add(Restrictions.isNotNull("transfer.senderLab"))
-          .add(Restrictions.between("transfer.transferTime", start, end));
+      DbUtils.restrictPaginationByReceiptTransferDate(criteria, start, end);
     } else if (type == DateType.DISTRIBUTED) {
-      criteria.createAlias("listTransferViews", "transfer")
-          .add(Restrictions.isNotNull("transfer.recipient"))
-          .add(Restrictions.between("transfer.transferTime", start, end));
+      DbUtils.restrictPaginationByDistributionTransferDate(criteria, start, end);
     } else {
       HibernatePaginatedDataSource.super.restrictPaginationByDate(criteria, start, end, type, errorHandler);
     }
-  }
-
-  @Override
-  public default void restrictPaginationByDistributed(Criteria criteria, Consumer<String> errorHandler) {
-    criteria.createAlias("listTransferViews", "transfer")
-        .add(Restrictions.isNotNull("transfer.recipient"));
   }
 
 }

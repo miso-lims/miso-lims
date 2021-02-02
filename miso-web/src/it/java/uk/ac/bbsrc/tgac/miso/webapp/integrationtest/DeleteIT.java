@@ -414,7 +414,11 @@ public class DeleteIT extends AbstractIT {
     }
     DataTable table = page.getTable();
     if (search != null) {
-      table.searchFor(search);
+      if (table.hasAdvancedSearch()) {
+        table.searchFor("\"" + search + "\"");
+      } else {
+        table.searchFor(search);
+      }
     }
     List<String> values = table.getColumnValues(selectByColumn);
     assertFalse("No values found in column", values.isEmpty());

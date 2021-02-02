@@ -48,11 +48,6 @@ public class HibernatePoolableElementViewDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testSearchByDistributed() throws Exception {
-    testSearch(PaginationFilter.distributed());
-  }
-
-  @Test
   public void testSearchByDistributionDate() throws Exception {
     testSearch(PaginationFilter.date(LimsUtils.parseDate("2019-01-01"), LimsUtils.parseDate("2020-01-01"), DateType.DISTRIBUTED));
   }

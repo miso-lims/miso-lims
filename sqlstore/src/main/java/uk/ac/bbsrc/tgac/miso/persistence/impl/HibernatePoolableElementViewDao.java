@@ -215,32 +215,17 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
   @Override
   public void restrictPaginationByDate(Criteria criteria, Date start, Date end, DateType type, Consumer<String> errorHandler) {
     if (type == DateType.RECEIVE) {
-      criteria.createAlias("transfers", "transferItem")
-          .createAlias("transferItem.transfer", "transfer")
-          .add(Restrictions.isNotNull("transfer.senderLab"))
-          .add(Restrictions.between("transfer.transferTime", start, end));
+      DbUtils.restrictPaginationByReceiptTransferDate(criteria, start, end);
     } else if (type == DateType.DISTRIBUTED) {
-      criteria.createAlias("transfers", "transferItem")
-          .createAlias("transferItem.transfer", "transfer")
-          .add(Restrictions.isNotNull("transfer.recipient"))
-          .add(Restrictions.between("transfer.transferTime", start, end));
+      DbUtils.restrictPaginationByDistributionTransferDate(criteria, start, end);
     } else {
       HibernatePaginatedDataSource.super.restrictPaginationByDate(criteria, start, end, type, errorHandler);
     }
   }
 
   @Override
-  public void restrictPaginationByDistributed(Criteria criteria, Consumer<String> errorHandler) {
-    criteria.createAlias("transfers", "transferItem")
-        .createAlias("transferItem.transfer", "transfer")
-        .add(Restrictions.isNotNull("transfer.recipient"));
-  }
-
-  @Override
   public void restrictPaginationByDistributionRecipient(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
-    criteria.createAlias("transfers", "transferItem")
-        .createAlias("transferItem.transfer", "transfer")
-        .add(DbUtils.textRestriction(query, "transfer.recipient"));
+    DbUtils.restrictPaginationByDistributionRecipient(criteria, query, "libraryAliquots", "aliquotId");
   }
 
   @Override

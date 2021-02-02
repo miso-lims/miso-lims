@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.persistence.util;
 
+import java.util.Date;
 import java.util.UUID;
 import java.util.regex.Matcher;
 
@@ -92,6 +93,18 @@ public class DbUtils {
     }
   }
 
+  public static void restrictPaginationByReceiptTransferDate(Criteria criteria, Date start, Date end) {
+    criteria.createAlias("listTransferViews", "transfer")
+        .add(Restrictions.isNotNull("transfer.senderLab"))
+        .add(Restrictions.between("transfer.transferTime", start, end));
+  }
+
+  public static void restrictPaginationByDistributionTransferDate(Criteria criteria, Date start, Date end) {
+    criteria.createAlias("listTransferViews", "transfer")
+        .add(Restrictions.isNotNull("transfer.recipient"))
+        .add(Restrictions.between("transfer.transferTime", start, end));
+  }
+
   public static Criterion textRestriction(TextQuery query, String... searchProperties) {
     String sanitized = sanitizeQueryString(query.getText());
     MatchMode matchMode = getMatchMode(query);
@@ -103,8 +116,10 @@ public class DbUtils {
         criteria[i] = textRestriction(searchProperties[i], sanitized, matchMode);
       }
       if (sanitized == null) {
+        // if null, all search properties must be null
         return Restrictions.and(criteria);
       } else {
+        // if not null, match on any search property
         return Restrictions.or(criteria);
       }
     }

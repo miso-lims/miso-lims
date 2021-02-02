@@ -10,7 +10,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import com.google.common.base.Predicates;
@@ -38,7 +37,6 @@ public class DataTable extends AbstractElement {
 
   public DataTable(WebDriver driver, String tableWrapperId) {
     super(driver);
-    PageFactory.initElements(driver, this);
     WebElement tableWrapper = getDriver().findElement(By.id(tableWrapperId));
     this.table = tableWrapper.findElement(tableSelector);
     this.toolbar = findElementIfExists(By.xpath(".//div[@id='" + tableWrapperId + "']/preceding::div[contains(@class, 'fg-toolbar')][1]"));
@@ -194,16 +192,17 @@ public class DataTable extends AbstractElement {
     return tooltips.stream().map(tip -> tip.getAttribute("textContent")).collect(Collectors.joining(", "));
   }
 
+  public boolean hasAdvancedSearch() {
+    List<WebElement> bubble = searchBarDiv.findElements(By.id("searchHelpQuestionMark"));
+    return !bubble.isEmpty();
+  }
+
   public void searchFor(String searchTerm) {
     waitUntil(elementToBeClickable(searchBar));
     searchBar.clear();
     searchBar.sendKeys(searchTerm);
     searchBar.sendKeys(Keys.ENTER);
     waitUntil(elementToBeClickable(searchBar));
-  }
-
-  public String getSearchDivId() {
-    return searchBarDiv.getAttribute("id");
   }
 
   public void clickButton(String text) {
