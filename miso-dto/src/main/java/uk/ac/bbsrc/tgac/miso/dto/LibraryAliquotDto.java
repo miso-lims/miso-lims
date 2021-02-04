@@ -62,6 +62,7 @@ public class LibraryAliquotDto extends AbstractBoxableDto implements UpstreamQcF
   private Long detailedQcStatusId;
   private String detailedQcStatusNote;
   private String qcUserName;
+  private String qcDate;
   private String worksetAddedTime;
   private Long effectiveQcFailureId;
   private String effectiveQcFailureLevel;
@@ -388,6 +389,14 @@ public class LibraryAliquotDto extends AbstractBoxableDto implements UpstreamQcF
 
   public void setQcUserName(String qcUserName) {
     this.qcUserName = qcUserName;
+  }
+
+  public String getQcDate() {
+    return qcDate;
+  }
+
+  public void setQcDate(String qcDate) {
+    this.qcDate = qcDate;
   }
 
   public String getWorksetAddedTime() {

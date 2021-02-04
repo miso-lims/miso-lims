@@ -74,7 +74,8 @@ FOR EACH ROW
       makeChangeMessage('purpose', (SELECT alias FROM RunPurpose WHERE purposeId = OLD.purposeId), (SELECT alias FROM RunPurpose WHERE purposeId = NEW.purposeId)),
       makeChangeMessage('QC status', CASE OLD.qcPassed WHEN TRUE THEN "Passed" WHEN FALSE THEN "Failed" ELSE NULL END, CASE NEW.qcPassed WHEN TRUE THEN "Passed" WHEN FALSE THEN "Failed" ELSE NULL END),
       makeChangeMessage('QC note', OLD.qcNote, NEW.qcNote),
-      makeChangeMessage('QC user', (SELECT fullName FROM User WHERE userId = OLD.qcUser), (SELECT fullName FROM User WHERE userId = NEW.qcUser))
+      makeChangeMessage('QC user', (SELECT fullName FROM User WHERE userId = OLD.qcUser), (SELECT fullName FROM User WHERE userId = NEW.qcUser)),
+      makeChangeMessage('QC date', OLD.qcDate, NEW.qcDate)
     );
     
     IF log_message IS NOT NULL AND log_message <> '' THEN
@@ -92,7 +93,8 @@ FOR EACH ROW
         makeChangeColumn('aliquot purpose', OLD.purposeId, NEW.purposeId),
         makeChangeColumn('aliquot qcPassed', OLD.qcPassed, NEW.qcPassed),
         makeChangeColumn('aliquot qcNote', OLD.qcNote, NEW.qcNote),
-        makeChangeColumn('aliquot qcUser', OLD.qcUser, NEW.qcUser)
+        makeChangeColumn('aliquot qcUser', OLD.qcUser, NEW.qcUser),
+        makeChangeColumn('aliquot qcDate', OLD.qcDate, NEW.qcDate)
       ), ''),
       NEW.lastModifier,
       CONCAT(@container, '-', @partitionNumber, '-', @aliquot, ' ', log_message)

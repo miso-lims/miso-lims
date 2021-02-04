@@ -18,8 +18,10 @@ FOR EACH ROW
     makeChangeMessage('sequencer', (SELECT name FROM Instrument WHERE instrumentId = OLD.instrumentId), (SELECT name FROM Instrument WHERE instrumentId = NEW.instrumentId)),
     makeChangeMessage('QC status', qcPassedToString(OLD.qcPassed), qcPassedToString(NEW.qcPassed)),
     makeChangeMessage('QC user', (SELECT fullName FROM User WHERE userId = OLD.qcUser), (SELECT fullName FROM User WHERE userId = NEW.qcUser)),
+    makeChangeMessage('QC date', OLD.qcDate, NEW.qcDate),
     makeChangeMessage('data review', CASE OLD.dataReview WHEN TRUE THEN 'Pass' WHEN FALSE THEN 'Fail' ELSE 'n/a' END, CASE NEW.dataReview WHEN TRUE THEN 'Pass' WHEN FALSE THEN 'Fail' ELSE 'n/a' END),
     makeChangeMessage('data reviewer', (SELECT fullName FROM User WHERE userId = OLD.dataReviewerId), (SELECT fullName FROM User WHERE userId = NEW.dataReviewerId)),
+    makeChangeMessage('data review date', Old.dataReviewDate, NEW.dataReviewDate),
     makeChangeMessage('SOP', (SELECT CONCAT(alias, ' (', version, ')') FROM Sop WHERE sopId = OLD.sopId), (SELECT CONCAT(alias, ' (', version, ')') FROM Sop WHERE sopId = NEW.sopId)),
     makeChangeMessage('index sequencing', OLD.dataManglingPolicy, NEW.dataManglingPolicy)
   );
@@ -39,8 +41,10 @@ FOR EACH ROW
         makeChangeColumn('instrumentId', OLD.instrumentId, NEW.instrumentId),
         makeChangeColumn('qcPassed', OLD.qcPassed, NEW.qcPassed),
         makeChangeColumn('qcUser', OLD.qcUser, NEW.qcUser),
+        makeChangeColumn('qcDate', OLD.qcDate, NEW.qcDate),
         makeChangeColumn('dataReview', OLD.dataReview, NEW.dataReview),
         makeChangeColumn('dataReviewerId', OLD.dataReviewerId, NEW.dataReviewerId),
+        makeChangeColumn('dataReviewDate', OLD.dataReviewDate, NEW.dataReviewDate),
         makeChangeColumn('sopId', OLD.sopId, NEW.sopId),
         makeChangeColumn('dataManglingPolicy', OLD.dataManglingPolicy, NEW.dataManglingPolicy)
       ), ''),

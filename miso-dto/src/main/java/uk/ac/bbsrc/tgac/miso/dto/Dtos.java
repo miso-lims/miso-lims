@@ -493,6 +493,7 @@ public class Dtos {
     setId(dto::setDetailedQcStatusId, from.getDetailedQcStatus());
     setString(dto::setDetailedQcStatusNote, from.getDetailedQcStatusNote());
     setString(dto::setQcUserName, maybeGetProperty(from.getQcUser(), User::getFullName));
+    setDateString(dto::setQcDate, from.getQcDate());
     dto.setAlias(from.getAlias());
     dto.setProjectId(from.getProject().getId());
     dto.setProjectName(from.getProject().getName());
@@ -1332,6 +1333,7 @@ public class Dtos {
     setId(dto::setDetailedQcStatusId, from.getDetailedQcStatus());
     setString(dto::setDetailedQcStatusNote, from.getDetailedQcStatusNote());
     setString(dto::setQcUserName, maybeGetProperty(from.getQcUser(), User::getFullName));
+    setDateString(dto::setQcDate, from.getQcDate());
     dto.setLowQuality(from.isLowQuality());
     dto.setPaired(from.getPaired());
     if (from.getPlatformType() != null) {
@@ -1654,6 +1656,7 @@ public class Dtos {
     setId(dto::setDetailedQcStatusId, from.getDetailedQcStatus());
     setString(dto::setDetailedQcStatusNote, from.getDetailedQcStatusNote());
     setString(dto::setQcUserName, maybeGetProperty(from.getQcUser(), User::getFullName));
+    setDateString(dto::setQcDate, from.getQcDate());
     setEffectiveQcFailure(from, dto);
     return dto;
   }
@@ -1729,6 +1732,7 @@ public class Dtos {
     setId(dto::setDetailedQcStatusId, from.getDetailedQcStatus());
     setString(dto::setDetailedQcStatusNote, from.getDetailedQcStatusNote());
     setString(dto::setQcUserName, maybeGetProperty(from.getQcUser(), User::getFullName));
+    setDateString(dto::setQcDate, from.getQcDate());
 
     if (from.getAliquot() != null) {
       List<Long> parentAliquotIds = new ArrayList<>();
@@ -1942,8 +1946,10 @@ public class Dtos {
 
     setBoolean(dto::setQcPassed, from.getQcPassed(), true);
     setString(dto::setQcUserName, maybeGetProperty(from.getQcUser(), User::getFullName));
+    setDateString(dto::setQcDate, from.getQcDate());
     setBoolean(dto::setDataReview, from.getDataReview(), true);
     setString(dto::setDataReviewerName, maybeGetProperty(from.getDataReviewer(), User::getFullName));
+    setDateString(dto::setDataReviewDate, from.getDataReviewDate());
     setId(dto::setSopId, from.getSop());
     setString(dto::setDataManglingPolicy, maybeGetProperty(from.getDataManglingPolicy(), InstrumentDataManglingPolicy::name));
 
@@ -4045,6 +4051,7 @@ public class Dtos {
     setBoolean(to::setQcPassed, from.getQcPassed(), true);
     setString(to::setQcNote, from.getQcNote());
     setString(to::setQcUserName, maybeGetProperty(from.getQcUser(), User::getFullName));
+    setDateString(to::setQcDate, from.getQcDate());
     return to;
   }
 

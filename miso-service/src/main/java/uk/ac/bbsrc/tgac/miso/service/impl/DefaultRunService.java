@@ -331,8 +331,10 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   }
 
   private void validateChanges(Run before, Run changed) throws IOException {
-    ValidationUtils.updateQcUser(changed, before, Run::getQcPassed, Run::getQcUser, Run::setQcUser, authorizationManager);
-    ValidationUtils.updateQcUser(changed, before, Run::getDataReview, Run::getDataReviewer, Run::setDataReviewer, authorizationManager);
+    ValidationUtils.updateQcDetails(changed, before, Run::getQcPassed, Run::getQcUser, Run::setQcUser, authorizationManager, Run::getQcDate,
+        Run::setQcDate);
+    ValidationUtils.updateQcDetails(changed, before, Run::getDataReview, Run::getDataReviewer, Run::setDataReviewer, authorizationManager,
+        Run::getDataReviewDate, Run::setDataReviewDate);
 
     List<ValidationError> errors = new ArrayList<>();
 
@@ -417,8 +419,10 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     target.setSequencingKitLot(source.getSequencingKitLot());
     target.setQcPassed(source.getQcPassed());
     target.setQcUser(source.getQcUser());
+    target.setQcDate(source.getQcDate());
     target.setDataReview(source.getDataReview());
     target.setDataReviewer(source.getDataReviewer());
+    target.setDataReviewDate(source.getDataReviewDate());
     target.setSop(source.getSop());
     target.setDataManglingPolicy(source.getDataManglingPolicy());
     if (isIlluminaRun(target)) {

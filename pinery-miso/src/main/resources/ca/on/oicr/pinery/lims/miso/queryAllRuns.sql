@@ -6,6 +6,7 @@ SELECT DISTINCT r.alias
   ,r.startDate
   ,r.completionDate
   ,r.qcPassed
+  ,r.qcDate
   ,r.dataReview
   ,spc.identificationBarcode
   ,createLog.userId

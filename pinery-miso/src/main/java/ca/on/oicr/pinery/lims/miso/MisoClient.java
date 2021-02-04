@@ -662,7 +662,7 @@ public class MisoClient implements Lims {
       }
       r.setContainerModel(rs.getString("containerModel"));
       r.setSequencingKit(rs.getString("sequencingKit"));
-      r.setStatus(makeStatus(rs, "qcPassed", null));
+      r.setStatus(makeStatus(rs, "qcPassed", null, "qcDate"));
 
       Boolean dataReview = rs.getBoolean("dataReview");
       if (rs.wasNull()) {
@@ -692,7 +692,7 @@ public class MisoClient implements Lims {
       p.setPoolCreated(rs.getTimestamp("pool_created"));
       p.setPoolModifiedById(rs.getInt("pool_modifiedById"));
       p.setPoolModified(rs.getTimestamp("pool_modified"));
-      p.setPoolStatus(makeStatus(rs, "pool_qc_passed", null));
+      p.setPoolStatus(makeStatus(rs, "pool_qc_passed", null, null));
       p.setAnalysisSkipped(rs.getBoolean("analysis_skipped"));
       p.setQcStatus(rs.getString("qc_status"));
       p.setRunPurpose(rs.getString("run_purpose"));
@@ -753,7 +753,7 @@ public class MisoClient implements Lims {
       if (!atts.isEmpty()) {
         s.setAttributes(atts);
       }
-      s.setStatus(makeStatus(rs, "qcPassed", "detailedQcStatus"));
+      s.setStatus(makeStatus(rs, "qcPassed", "detailedQcStatus", "qcDate"));
       s.setPreMigrationId(rs.getLong("premigration_id"));
       if (rs.wasNull()) s.setPreMigrationId(null);
 
@@ -1100,7 +1100,7 @@ public class MisoClient implements Lims {
       boolean reverseComplement2 = rs.getString("dataManglingPolicy").equals("I5_RC");
       s.setBarcodeTwo(reverseComplement2 ? reverseComplement(barcode2) : barcode2);
       s.setRunPurpose(rs.getString("run_purpose"));
-      s.setStatus(makeStatus(rs, "qc_passed", null));
+      s.setStatus(makeStatus(rs, "qc_passed", null, "qc_date"));
 
       Attribute att = AttributeKey.TARGETED_RESEQUENCING.extractAttributeFrom(rs);
       if (att != null) {
@@ -1244,7 +1244,7 @@ public class MisoClient implements Lims {
 
   };
 
-  private static Status makeStatus(ResultSet rs, String stateColumn, String nameColumn) throws SQLException {
+  private static Status makeStatus(ResultSet rs, String stateColumn, String nameColumn, String dateColumn) throws SQLException {
     Status status = new DefaultStatus();
     boolean qcPassed = rs.getBoolean(stateColumn);
     if (rs.wasNull()) {
@@ -1256,6 +1256,9 @@ public class MisoClient implements Lims {
     }
     String name = nameColumn == null ? null : rs.getString(nameColumn);
     status.setName(name == null ? status.getState() : name);
+
+    java.sql.Date date = dateColumn == null ? null : rs.getDate(dateColumn);
+    status.setDate(date == null ? null : date.toLocalDate());
     return status;
   }
 

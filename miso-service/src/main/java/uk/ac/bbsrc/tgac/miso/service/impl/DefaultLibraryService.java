@@ -501,6 +501,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     target.setDetailedQcStatus(source.getDetailedQcStatus());
     target.setDetailedQcStatusNote(source.getDetailedQcStatusNote());
     target.setQcUser(source.getQcUser());
+    target.setQcDate(source.getQcDate());
 
     applySetChanges(target.getIndices(), source.getIndices());
     target.setKitDescriptor(source.getKitDescriptor());
@@ -543,7 +544,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   }
 
   private void validateChange(Library library, Library beforeChange, boolean libraryReceipt) throws IOException {
-    updateDetailedQcStatusUser(library, beforeChange, authorizationManager);
+    updateDetailedQcStatusDetails(library, beforeChange, authorizationManager);
 
     List<ValidationError> errors = new ArrayList<>();
 

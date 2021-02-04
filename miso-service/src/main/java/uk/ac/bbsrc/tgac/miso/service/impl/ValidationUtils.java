@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -192,22 +193,26 @@ public class ValidationUtils {
     });
   }
 
-  public static void updateDetailedQcStatusUser(DetailedQcItem object, DetailedQcItem beforeChange,
+  public static void updateDetailedQcStatusDetails(DetailedQcItem object, DetailedQcItem beforeChange,
       AuthorizationManager authorizationManager) throws IOException {
-    updateQcUser(object, beforeChange, DetailedQcItem::getDetailedQcStatus, DetailedQcItem::getQcUser, DetailedQcItem::setQcUser,
-        authorizationManager);
+    updateQcDetails(object, beforeChange, DetailedQcItem::getDetailedQcStatus, DetailedQcItem::getQcUser, DetailedQcItem::setQcUser,
+        authorizationManager, DetailedQcItem::getQcDate, DetailedQcItem::setQcDate);
   }
 
-  public static <T> void updateQcUser(T object, T beforeChange, Function<T, Object> getStatus, Function<T, User> getUser,
-      BiConsumer<T, User> setUser, AuthorizationManager authorizationManager) throws IOException {
+  public static <T> void updateQcDetails(T object, T beforeChange, Function<T, Object> getStatus, Function<T, User> getUser,
+      BiConsumer<T, User> setUser, AuthorizationManager authorizationManager, Function<T, Date> getDate, BiConsumer<T, Date> setDate)
+      throws IOException {
     if (isChanged(getStatus, object, beforeChange)) {
       if (getStatus.apply(object) == null) {
         setUser.accept(object, null);
+        setDate.accept(object, null);
       } else {
         setUser.accept(object, authorizationManager.getCurrentUser());
+        setDate.accept(object, new Date());
       }
     } else if (beforeChange != null) {
       setUser.accept(object, getUser.apply(beforeChange));
+      setDate.accept(object, getDate.apply(beforeChange));
     }
   }
 

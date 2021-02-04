@@ -82,6 +82,10 @@ ListTarget.runaliquot = {
       mData: 'qcUserName',
       sDefaultContent: 'n/a'
     }, {
+      sTitle: 'QC Date',
+      mData: 'qcDate',
+      sDefaultContent: 'n/a'
+    }, {
       sTitle: 'Hierarchy',
       mData: function(full) {
         return full.runId + '-' + full.partitionId + '-' + full.aliquotId;
