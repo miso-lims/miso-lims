@@ -16,8 +16,6 @@ public interface StudyService extends PaginatedDataSource<Study>, DeleterService
    */
   public Collection<Study> listByProjectId(long projectId) throws IOException;
 
-  public Collection<Study> listBySearch(String query) throws IOException;
-
   public Collection<Study> listWithLimit(long limit) throws IOException;
 
 }

@@ -16,7 +16,6 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -31,7 +30,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
@@ -42,6 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
+import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
 import uk.ac.bbsrc.tgac.miso.persistence.BoxStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleStore;
 import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
@@ -181,30 +180,21 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
-  public void restrictPaginationByExternalName(Criteria criteria, String name, Consumer<String> errorHandler) {
+  public void restrictPaginationByExternalName(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
     // TODO: this should extend to the children of the entity with this external name (including libraries and library aliquots)
-    String query = DbUtils.convertStringToSearchQuery(name, false);
-    Disjunction or = Restrictions.disjunction();
-    or.add(externalNameCheck(SampleIdentityImpl.class, "externalName", query));
-    or.add(externalNameCheck(SampleTissueImpl.class, "secondaryIdentifier", query));
-    criteria.add(or);
-  }
-
-  private Criterion externalNameCheck(Class<? extends DetailedSample> clazz, String property, String query) {
-    return Restrictions.and(Restrictions.eq("class", clazz),
-        Restrictions.ilike(property, query, MatchMode.ANYWHERE));
+    criteria.add(DbUtils.textRestriction(query, "externalName", "secondaryIdentifier"));
   }
 
   @Override
-  public void restrictPaginationByLab(Criteria criteria, String name, Consumer<String> errorHandler) {
+  public void restrictPaginationByLab(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
     // TODO: this should extend to the children of the entity with this lab (including libraries and library aliquots)
-    criteria.createAlias("lab", "lab");
-    criteria.add(DbUtils.searchRestrictions(name, false, "lab.alias"));
+    criteria.createAlias("lab", "lab", JoinType.LEFT_OUTER_JOIN);
+    criteria.add(DbUtils.textRestriction(query, "lab.alias"));
   }
 
   @Override
-  public void restrictPaginationByGroupId(Criteria criteria, String groupId, Consumer<String> errorHandler) {
-    criteria.add(Restrictions.ilike("groupId", groupId, MatchMode.EXACT));
+  public void restrictPaginationByGroupId(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    criteria.add(DbUtils.textRestriction(query, "groupId"));
   }
 
   @Override
@@ -245,12 +235,11 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
     @SuppressWarnings("unchecked")
     Set<SampleIdentity> records = (Set<SampleIdentity>) SampleIdentityImpl.getSetFromString(query)
         .stream().map(extNameOrAlias -> {
-          String str = DbUtils.convertStringToSearchQuery(extNameOrAlias, false);
           Criteria criteria = currentSession().createCriteria(SampleIdentityImpl.class);
           if (projectId != null) {
             criteria.add(Restrictions.eq("project.id", projectId));
           }
-          criteria.add(Restrictions.or(Restrictions.ilike("externalName", str), Restrictions.ilike("alias", str)));
+          criteria.add(DbUtils.textRestriction(TextQuery.matchAnywhere(extNameOrAlias), "externalName", "alias"));
           return criteria.list();
         }).flatMap(list -> list.stream())
         .distinct()
@@ -379,24 +368,28 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
-  public void restrictPaginationByRequisitionId(Criteria criteria, String requisitionId, Consumer<String> errorHandler) {
-    criteria.add(Restrictions.eq("requisitionId", requisitionId));
+  public void restrictPaginationByRequisitionId(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    criteria.add(DbUtils.textRestriction(query, "requisitionId"));
   }
 
   @Override
-  public void restrictPaginationBySubproject(Criteria criteria, String subproject, Consumer<String> errorHandler) {
-    criteria.createAlias("subproject", "subproject");
-    criteria.add(Restrictions.ilike("subproject.alias", subproject, MatchMode.START));
+  public void restrictPaginationBySubproject(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    if (query.getText() == null) {
+      criteria.add(Restrictions.isNull("subproject"));
+    } else {
+      criteria.createAlias("subproject", "subproject");
+      criteria.add(DbUtils.textRestriction(query, "subproject.alias"));
+    }
   }
 
   @Override
-  public void restrictPaginationByTissueOrigin(Criteria criteria, String origin, Consumer<String> errorHandler) {
-    criteria.add(Restrictions.eq("tissueOrigin.alias", origin));
+  public void restrictPaginationByTissueOrigin(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    criteria.add(DbUtils.textRestriction(query, "tissueOrigin.alias"));
   }
 
   @Override
-  public void restrictPaginationByTissueType(Criteria criteria, String type, Consumer<String> errorHandler) {
-    criteria.add(Restrictions.eq("tissueType.alias", type));
+  public void restrictPaginationByTissueType(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    criteria.add(DbUtils.textRestriction(query, "tissueType.alias"));
   }
 
   @Override
@@ -452,8 +445,13 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
-  public void restrictPaginationByTimepoint(Criteria criteria, String timepoint, Consumer<String> errorHandler) {
-    criteria.add(Restrictions.ilike("timepoint", timepoint, MatchMode.ANYWHERE));
+  public void restrictPaginationByTimepoint(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    criteria.add(DbUtils.textRestriction(query, "timepoint"));
+  }
+
+  @Override
+  public void restrictPaginationByDistributionRecipient(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    DbUtils.restrictPaginationByDistributionRecipient(criteria, query, "samples", "sampleId");
   }
 
 }

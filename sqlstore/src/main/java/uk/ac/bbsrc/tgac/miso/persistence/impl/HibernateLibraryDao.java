@@ -1,7 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,7 +13,6 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
@@ -38,6 +35,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
+import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
 import uk.ac.bbsrc.tgac.miso.persistence.BoxStore;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
@@ -143,15 +141,6 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   }
 
   @Override
-  public List<Library> listBySearch(String query) throws IOException {
-    Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
-    criteria.add(DbUtils.searchRestrictions(query, false, SEARCH_FIELDS));
-    @SuppressWarnings("unchecked")
-    List<Library> records = criteria.list();
-    return records;
-  }
-
-  @Override
   public List<Library> listByAlias(String alias) throws IOException {
     Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
     criteria.add(Restrictions.eq("alias", alias));
@@ -239,17 +228,6 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
     @SuppressWarnings("unchecked")
     List<LibraryType> records = criteria.list();
     return records;
-  }
-
-  @Override
-  public long countLibrariesBySearch(String querystr) throws IOException {
-    if (isStringEmptyOrNull(querystr)) {
-      return count();
-    } else {
-      Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
-      criteria.add(DbUtils.searchRestrictions(querystr, false, SEARCH_FIELDS));
-      return (Long) criteria.setProjection(Projections.rowCount()).uniqueResult();
-    }
   }
 
   @Override
@@ -396,35 +374,38 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   }
 
   @Override
-  public void restrictPaginationByIndex(Criteria criteria, String index, Consumer<String> errorHandler) {
-    criteria.createAlias("indices", "indices");
-    restrictPaginationByIndices(criteria, index);
+  public void restrictPaginationByIndex(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    if (query.getText() == null) {
+      criteria.add(Restrictions.isEmpty("indices"));
+    } else {
+      criteria.createAlias("indices", "indices")
+          .add(DbUtils.textRestriction(query, "indices.name", "indices.sequence"));
+    }
   }
 
   @Override
-  public void restrictPaginationByKitName(Criteria criteria, String name, Consumer<String> errorHandler) {
-    criteria.createAlias("kitDescriptor", "kitDescriptor");
-    criteria.add(Restrictions.ilike("kitDescriptor.name", name, MatchMode.START));
-  }
-
-  public static void restrictPaginationByIndices(Criteria criteria, String index) {
-    criteria.add(Restrictions.or(Restrictions.ilike("indices.name", index, MatchMode.ANYWHERE),
-        Restrictions.ilike("indices.sequence", index, MatchMode.EXACT)));
-  }
-
-  @Override
-  public void restrictPaginationByGroupId(Criteria criteria, String groupId, Consumer<String> errorHandler) {
-    criteria.add(Restrictions.ilike("groupId", groupId, MatchMode.EXACT));
+  public void restrictPaginationByKitName(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    if (query.getText() == null) {
+      criteria.add(Restrictions.isNull("kitDescriptor"));
+    } else {
+      criteria.createAlias("kitDescriptor", "kitDescriptor");
+      criteria.add(DbUtils.textRestriction(query, "kitDescriptor.name"));
+    }
   }
 
   @Override
-  public void restrictPaginationByTissueOrigin(Criteria criteria, String origin, Consumer<String> errorHandler) {
-    criteria.add(Restrictions.eq("tissueOrigin.alias", origin));
+  public void restrictPaginationByGroupId(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    criteria.add(DbUtils.textRestriction(query, "groupId"));
   }
 
   @Override
-  public void restrictPaginationByTissueType(Criteria criteria, String type, Consumer<String> errorHandler) {
-    criteria.add(Restrictions.eq("tissueType.alias", type));
+  public void restrictPaginationByTissueOrigin(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    criteria.add(DbUtils.textRestriction(query, "tissueOrigin.alias"));
+  }
+
+  @Override
+  public void restrictPaginationByTissueType(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    criteria.add(DbUtils.textRestriction(query, "tissueType.alias"));
   }
 
   @Override
@@ -459,6 +440,11 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
         .add(Restrictions.eq("sop.id", batch.getSopId()))
         .add(Restrictions.eq("kitDescriptor.id", batch.getKitId()))
         .add(Restrictions.eq("kitLot", batch.getKitLot()));
+  }
+
+  @Override
+  public void restrictPaginationByDistributionRecipient(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    DbUtils.restrictPaginationByDistributionRecipient(criteria, query, "libraries", "libraryId");
   }
 
 }

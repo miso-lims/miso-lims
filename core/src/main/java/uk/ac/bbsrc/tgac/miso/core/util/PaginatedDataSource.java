@@ -23,15 +23,15 @@ public interface PaginatedDataSource<T> {
    * 
    * @param offset the index of the first element to retrieve
    * @param limit the maximum number of items to retrieve. The implementation may return less even if more are available on the next page.
-   * @param sortDir the sorting direction (true for ascending, false for descending)
+   * @param ascending the sorting direction (true for ascending, false for descending)
    */
   public List<T> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol, PaginationFilter... filter)
       throws IOException;
 
-  public default List<T> list(int offset, int limit, boolean sortDir, String sortCol, PaginationFilter... filter)
+  public default List<T> list(int offset, int limit, boolean ascending, String sortCol, PaginationFilter... filter)
       throws IOException {
     return list(x -> {
-    }, offset, limit, sortDir, sortCol, filter);
+    }, offset, limit, ascending, sortCol, filter);
   }
 
 }

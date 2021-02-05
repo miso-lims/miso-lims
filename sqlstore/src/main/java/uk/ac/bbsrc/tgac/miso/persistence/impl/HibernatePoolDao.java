@@ -23,6 +23,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
+import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
 import uk.ac.bbsrc.tgac.miso.persistence.BoxStore;
 import uk.ac.bbsrc.tgac.miso.persistence.PoolStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SecurityStore;
@@ -109,26 +110,6 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   public List<Pool> listAll() throws IOException {
     @SuppressWarnings("unchecked")
     List<Pool> results = createCriteria().list();
-    return results;
-  }
-
-  @Override
-  public List<Pool> listAllByCriteria(PlatformType platformType, String query, Integer limit) throws IOException {
-    if (limit != null && limit == 0) {
-      return Collections.emptyList();
-    }
-    Criteria criteria = createCriteria();
-    if (platformType != null) {
-      criteria.add(Restrictions.eq("platformType", platformType));
-    }
-    if (query != null) {
-      criteria.add(DbUtils.searchRestrictions(query, false, SEARCH_PROPERTIES));
-    }
-    if (limit != null) {
-      criteria.setMaxResults(limit);
-    }
-    @SuppressWarnings("unchecked")
-    List<Pool> results = criteria.list();
     return results;
   }
 
@@ -270,11 +251,16 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   }
 
   @Override
-  public void restrictPaginationByIndex(Criteria criteria, String index, Consumer<String> errorHandler) {
-    criteria.createAlias("poolElements", "poolElement");
-    criteria.createAlias("poolElement.poolableElementView", "aliquotForIndex");
-    criteria.createAlias("aliquotForIndex.indices", "indices");
-    HibernateLibraryDao.restrictPaginationByIndices(criteria, index);
+  public void restrictPaginationByIndex(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    criteria.createAlias("poolElements", "poolElement")
+        .createAlias("poolElement.poolableElementView", "aliquotForIndex")
+        .createAlias("aliquotForIndex.indices", "indices")
+        .add(DbUtils.textRestriction(query, "indices.name", "indices.sequence"));
+  }
+
+  @Override
+  public void restrictPaginationByDistributionRecipient(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    DbUtils.restrictPaginationByDistributionRecipient(criteria, query, "pools", "poolId");
   }
 
   @Override

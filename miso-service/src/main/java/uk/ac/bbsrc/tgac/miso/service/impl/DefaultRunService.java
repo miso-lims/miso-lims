@@ -148,11 +148,6 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   }
 
   @Override
-  public Collection<Run> listBySearch(String query) throws IOException {
-    return runDao.listBySearch(query);
-  }
-
-  @Override
   public Collection<Run> listByProjectId(long projectId) throws IOException {
     return runDao.listByProjectId(projectId);
   }

@@ -107,5 +107,8 @@ ListTarget.kit = {
       "iSortPriority": 0,
       "mData": "platformType"
     }];
+  },
+  searchTermSelector: function(searchTerms) {
+    return [searchTerms['id']];
   }
 };

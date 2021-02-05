@@ -77,7 +77,7 @@ public class BulkPoolIT extends AbstractIT {
     // directs the page to the correct link with the correct aliquots
     ListPage listLibraryAliquots = ListPage.getListPage(getDriver(), getBaseUrl(), ListTarget.LIBRARY_ALIQUOTS);
     DataTable aliquots = listLibraryAliquots.getTable();
-    aliquots.searchFor("LDI70"); // should get LDI701 and LDI702
+    aliquots.searchFor("LDI70*"); // should get LDI701 and LDI702
     assertEquals(2, aliquots.countRows());
 
     aliquots.checkBoxForRow(0);
@@ -97,7 +97,7 @@ public class BulkPoolIT extends AbstractIT {
     // directs the page to the correct link with the correct aliquotss
     ListPage listLibraryAliquots = ListPage.getListPage(getDriver(), getBaseUrl(), ListTarget.LIBRARY_ALIQUOTS);
     DataTable aliquots = listLibraryAliquots.getTable();
-    aliquots.searchFor("LDI70"); // should get LDI701 and LDI702
+    aliquots.searchFor("LDI70*"); // should get LDI701 and LDI702
     assertEquals(2, aliquots.countRows());
 
     aliquots.checkBoxForRow(0);
@@ -664,7 +664,7 @@ public class BulkPoolIT extends AbstractIT {
   public void testSelectForMerge() {
     ListPoolsPage listPools = ListPoolsPage.getListPage(getDriver(), getBaseUrl());
     DataTable pools = listPools.getTable();
-    pools.searchFor("IPO20000"); // should get IPO200001 and IPO200002
+    pools.searchFor("IPO20000*"); // should get IPO200001 and IPO200002
     pools.checkBoxForRow(0);
     pools.checkBoxForRow(1);
     

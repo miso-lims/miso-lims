@@ -88,30 +88,6 @@ public class HibernateStudyDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testListBySearchOICR() {
-    List<Study> runs = dao.listBySearch("OICR");
-    assertEquals(3, runs.size());
-  }
-
-  @Test
-  public void testListBySearchStu() {
-    List<Study> runs = dao.listBySearch("STU");
-    assertEquals(6, runs.size());
-  }
-
-  @Test
-  public void testListBySearchNone() {
-    List<Study> runs = dao.listBySearch("pizza");
-    assertEquals(0, runs.size());
-  }
-
-  @Test
-  public void testListBySearchEmpty() {
-    List<Study> studies = dao.listBySearch("");
-    assertTrue(studies.size() > 0);
-  }
-
-  @Test
   public void testListByProjectId() throws IOException {
     List<Study> studies = dao.listByProjectId(1L);
     assertTrue(studies.size() > 0);

@@ -214,34 +214,34 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
 
   @Test
   public void getSamplesBySearchOffsetZeroWithTwoSamplesPerPageTest() throws Exception {
-    List<Sample> samples = dao.list(0, 2, true, "id", PaginationFilter.query("TEST_0006"));
+    List<Sample> samples = dao.list(0, 2, true, "id", PaginationFilter.query("TEST_0006*"));
     assertEquals(2, samples.size());
     assertEquals(11L, samples.get(0).getId());
   }
 
   @Test
   public void getSamplesBySearchOffsetZeroWithTenSamplesPerPageTest() throws Exception {
-    List<Sample> samples = dao.list(0, 10, false, "id", PaginationFilter.query("SaM1"));
+    List<Sample> samples = dao.list(0, 10, false, "id", PaginationFilter.query("SaM1*"));
     assertEquals(10, samples.size());
     assertEquals(19L, samples.get(0).getId());
   }
 
   @Test
   public void countSamplesBySearch() throws IOException {
-    Long numSamples = dao.count(PaginationFilter.query("SAM1"));
-    assertEquals(Long.valueOf(11L), numSamples);
+    long numSamples = dao.count(PaginationFilter.query("SAM1*"));
+    assertEquals(11L, numSamples);
   }
 
   @Test
   public void countSamplesByBadSearch() throws IOException {
-    Long numSamples = dao.count(PaginationFilter.query(";DROP TABLE Sample;"));
-    assertEquals(Long.valueOf(0), numSamples);
+    long numSamples = dao.count(PaginationFilter.query(";DROP TABLE Sample;"));
+    assertEquals(0L, numSamples);
   }
 
   @Test
   public void countSamplesByEmptySearch() throws IOException {
-    Long numSamples = dao.count(PaginationFilter.query(""));
-    assertEquals(Long.valueOf(21L), numSamples);
+    long numSamples = dao.count();
+    assertEquals(21L, numSamples);
   }
 
   @Test
@@ -424,11 +424,6 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
   @Test
   public void testSearchByRequisition() throws IOException {
     testSearch(PaginationFilter.requisitionId("FORM1234"));
-  }
-
-  @Test
-  public void testSearchByDistributed() throws Exception {
-    testSearch(PaginationFilter.distributed());
   }
 
   @Test

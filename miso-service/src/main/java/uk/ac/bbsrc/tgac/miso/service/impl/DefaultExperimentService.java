@@ -69,11 +69,6 @@ public class DefaultExperimentService implements ExperimentService {
   }
 
   @Override
-  public Collection<Experiment> listAllBySearch(String query) throws IOException {
-    return experimentStore.listBySearch(query);
-  }
-
-  @Override
   public Collection<Experiment> listAllByStudyId(long studyId) throws IOException {
     return studyService.get(studyId).getExperiments();
   }

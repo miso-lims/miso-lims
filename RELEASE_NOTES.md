@@ -2,7 +2,8 @@
 
 Changes:
 
-
+* Improved advanced search - use wildcards or blanks to find exact or partial
+  matches, match any specified value, and match unspecified
 
 # 1.22.0
 

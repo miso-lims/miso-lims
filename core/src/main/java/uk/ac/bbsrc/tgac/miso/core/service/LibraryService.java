@@ -19,8 +19,6 @@ public interface LibraryService extends PaginatedDataSource<Library>, Barcodable
 
   public int count() throws IOException;
 
-  public long countBySearch(String querystr) throws IOException;
-
   public List<Library> list() throws IOException;
 
   public EntityReference getAdjacentLibrary(Library library, boolean before) throws IOException;
@@ -29,11 +27,10 @@ public interface LibraryService extends PaginatedDataSource<Library>, Barcodable
 
   public List<Library> listByBarcodeList(List<String> barcodeList) throws IOException;
 
+  @Override
   public List<Library> listByIdList(List<Long> idList) throws IOException;
 
   public Library getByPositionId(long positionId) throws IOException;
-
-  public List<Library> listBySearch(String querystr) throws IOException;
 
   public List<Library> listByAlias(String alias) throws IOException;
 

@@ -96,11 +96,6 @@ public class DefaultStudyService implements StudyService, PaginatedDataSource<St
   }
 
   @Override
-  public Collection<Study> listBySearch(String query) throws IOException {
-    return studyStore.listBySearch(query);
-  }
-
-  @Override
   public Collection<Study> listWithLimit(long limit) throws IOException {
     return studyStore.listAllWithLimit(limit);
   }

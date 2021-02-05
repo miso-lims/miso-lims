@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl.view;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -14,6 +15,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -31,7 +34,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Timestamped;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferPool;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -93,8 +96,11 @@ public class ListPoolView implements Aliasable, Nameable, Serializable, Timestam
   @OneToMany(mappedBy = "pool")
   private List<ListPoolViewElement> elements;
 
-  @OneToMany(mappedBy = "item")
-  private List<TransferPool> transfers;
+  @Immutable
+  @ManyToMany
+  @JoinTable(name = "Transfer_Pool", joinColumns = { @JoinColumn(name = "poolId") }, inverseJoinColumns = {
+      @JoinColumn(name = "transferId") })
+  private Set<ListTransferView> listTransferViews;
 
   @Override
   public long getId() {
@@ -383,11 +389,11 @@ public class ListPoolView implements Aliasable, Nameable, Serializable, Timestam
     this.elements = elements;
   }
 
-  public List<TransferPool> getTransfers() {
-    if (transfers == null) {
-      transfers = new ArrayList<>();
+  public Set<ListTransferView> getTransferViews() {
+    if (listTransferViews == null) {
+      listTransferViews = new HashSet<>();
     }
-    return transfers;
+    return listTransferViews;
   }
 
   public String getLongestIndex() {

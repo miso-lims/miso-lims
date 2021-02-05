@@ -14,8 +14,6 @@ public interface RunService extends DeleterService<Run>, ListService<Run>, SaveS
 
   int count() throws IOException;
 
-  Collection<Run> listBySearch(String query) throws IOException;
-
   Collection<Run> listByProjectId(long projectId) throws IOException;
 
   Collection<Run> listByPoolId(long poolId) throws IOException;

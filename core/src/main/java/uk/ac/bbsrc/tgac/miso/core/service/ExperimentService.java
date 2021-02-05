@@ -13,8 +13,6 @@ public interface ExperimentService extends DeleterService<Experiment>, ListServi
 
   public List<Experiment> listAllByRunId(long runId) throws IOException;
 
-  public Collection<Experiment> listAllBySearch(String query) throws IOException;
-
   /**
    * Obtain a list of all the Experiments the user has access to. Access is defined as either read or write access.
    */

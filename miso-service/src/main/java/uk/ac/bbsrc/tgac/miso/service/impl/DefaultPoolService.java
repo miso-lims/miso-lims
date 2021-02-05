@@ -35,7 +35,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BarcodableReferenceService;
@@ -134,28 +133,8 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   }
 
   @Override
-  public List<Pool> listBySearch(String query) throws IOException {
-    return poolStore.listAllByCriteria(null, query, null);
-  }
-
-  @Override
-  public List<Pool> listWithLimit(int limit) throws IOException {
-    return poolStore.listAllByCriteria(null, null, limit);
-  }
-
-  @Override
   public List<Pool> list() throws IOException {
     return poolStore.listAll();
-  }
-
-  @Override
-  public List<Pool> listByPlatform(PlatformType platformType) throws IOException {
-    return poolStore.listAllByCriteria(platformType, null, null);
-  }
-
-  @Override
-  public List<Pool> listByPlatformAndSearch(PlatformType platformType, String query) throws IOException {
-    return poolStore.listAllByCriteria(platformType, query, null);
   }
 
   @Override

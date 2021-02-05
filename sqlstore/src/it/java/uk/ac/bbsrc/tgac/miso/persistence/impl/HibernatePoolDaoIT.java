@@ -184,67 +184,6 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testListAllByPlatform() throws IOException {
-    assertTrue(dao.listAllByCriteria(PlatformType.ILLUMINA, null, null).size() > 0);
-  }
-
-  @Test
-  public void testListAllByPlatformAndSearch_alias() throws Exception {
-    // search on name, alias, identificationBarcode and description
-    PoolImpl test1 = getATestPool(81, new Date(), false, 3);
-    PoolImpl test2 = getATestPool(82, new Date(), true, 2);
-    PoolImpl test3 = getATestPool(83, new Date(), false, 1);
-
-    dao.save(test1);
-    dao.save(test2);
-    dao.save(test3);
-    assertEquals(3, dao.listAllByCriteria(PlatformType.ILLUMINA, "alias 8", null).size());
-    assertEquals(1, dao.listAllByCriteria(PlatformType.ILLUMINA, "alias 81", null).size());
-  }
-
-  @Test
-  public void testListAllByPlatformAndSearch_description() throws Exception {
-    // search on name, alias, identificationBarcode and description
-    PoolImpl test1 = getATestPool(61, new Date(), false, 3);
-    PoolImpl test2 = getATestPool(62, new Date(), true, 2);
-    PoolImpl test3 = getATestPool(63, new Date(), false, 1);
-
-    dao.save(test1);
-    dao.save(test2);
-    dao.save(test3);
-    assertEquals(3, dao.listAllByCriteria(PlatformType.ILLUMINA, "description 6", null).size());
-    assertEquals(1, dao.listAllByCriteria(PlatformType.ILLUMINA, "description 61", null).size());
-  }
-
-  @Test
-  public void testListAllByPlatformAndSearch_identificationBarcode() throws Exception {
-    // search on name, alias, identificationBarcode and description
-    PoolImpl test1 = getATestPool(71, new Date(), false, 3);
-    PoolImpl test2 = getATestPool(72, new Date(), true, 2);
-    PoolImpl test3 = getATestPool(73, new Date(), false, 1);
-
-    dao.save(test1);
-    dao.save(test2);
-    dao.save(test3);
-    assertEquals(3, dao.listAllByCriteria(PlatformType.ILLUMINA, "boop7", null).size());
-    assertEquals(1, dao.listAllByCriteria(PlatformType.ILLUMINA, "boop71", null).size());
-  }
-
-  @Test
-  public void testListAllByPlatformAndSearch_Name() throws Exception {
-    // search on name, alias, identificationBarcode and description
-    PoolImpl test1 = getATestPool(91, new Date(), false, 3);
-    PoolImpl test2 = getATestPool(92, new Date(), true, 2);
-    PoolImpl test3 = getATestPool(93, new Date(), false, 1);
-
-    dao.save(test1);
-    dao.save(test2);
-    dao.save(test3);
-    assertEquals(3, dao.listAllByCriteria(PlatformType.ILLUMINA, "test pool 9", null).size());
-    assertEquals(1, dao.listAllByCriteria(PlatformType.ILLUMINA, "test pool 91", null).size());
-  }
-
-  @Test
   public void testListByLibraryId() throws IOException {
     assertEquals(2, dao.listByLibraryId(1L).size());
   }
@@ -325,12 +264,12 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
 
   @Test
   public void testCountIlluminaPoolsBySearch() throws IOException {
-    assertEquals(2L, dao.count(PaginationFilter.platformType(PlatformType.ILLUMINA), PaginationFilter.query("IPO1")));
+    assertEquals(2L, dao.count(PaginationFilter.platformType(PlatformType.ILLUMINA), PaginationFilter.query("IPO1*")));
   }
 
   @Test
   public void testCountIlluminaPoolsEmptySearch() throws IOException {
-    assertTrue(dao.count(PaginationFilter.platformType(PlatformType.ILLUMINA), PaginationFilter.query("")) > 0);
+    assertTrue(dao.count(PaginationFilter.platformType(PlatformType.ILLUMINA)) > 0);
   }
 
   @Test
@@ -361,31 +300,6 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testListAllByPlatformAndSearchNoneForPlatformType() throws IOException {
-    assertEquals(0, dao.listAllByCriteria(PlatformType.SOLID, "", null).size());
-  }
-
-  @Test
-  public void testListAllByPlatformAndSearchNoneForQuery() throws IOException {
-    assertEquals(0, dao.listAllByCriteria(PlatformType.ILLUMINA, "asdf", null).size());
-  }
-
-  @Test
-  public void testListAllByPlatformAndSearchNullQuery() throws IOException {
-    assertTrue(dao.listAllByCriteria(PlatformType.ILLUMINA, null, null).size() > 0);
-  }
-
-  @Test
-  public void testListAllByPlatformAndSearchWithEmptyString() throws IOException {
-    assertTrue(dao.listAllByCriteria(PlatformType.ILLUMINA, "", null).size() > 0);
-  }
-
-  @Test
-  public void testListAllByPlatformNone() throws IOException {
-    assertEquals(0, dao.listAllByCriteria(PlatformType.SOLID, null, null).size());
-  }
-
-  @Test
   public void testListByIlluminaBadSearchWithLimit() throws IOException {
     List<Pool> pools = dao.list(5, 3, true, "id", PaginationFilter.platformType(PlatformType.ILLUMINA),
         PaginationFilter.query("; DROP TABLE Pool;"));
@@ -394,31 +308,15 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
 
   @Test
   public void testListByIlluminaEmptySearchWithLimit() throws IOException {
-    List<Pool> pools = dao.list(5, 3, true, "id", PaginationFilter.platformType(PlatformType.ILLUMINA), PaginationFilter.query(""));
+    List<Pool> pools = dao.list(5, 3, true, "id", PaginationFilter.platformType(PlatformType.ILLUMINA));
     assertEquals(3L, pools.size());
   }
 
   @Test
   public void testListByIlluminaSearchWithLimit() throws IOException {
-    List<Pool> pools = dao.list(5, 3, true, "id", PaginationFilter.platformType(PlatformType.ILLUMINA), PaginationFilter.query("IPO"));
+    List<Pool> pools = dao.list(5, 3, true, "id", PaginationFilter.platformType(PlatformType.ILLUMINA), PaginationFilter.query("IPO*"));
     assertEquals(3, pools.size());
     assertEquals(6L, pools.get(0).getId());
-  }
-
-  @Test
-  public void testListBySearchWithBadQuery() throws IOException {
-    assertEquals(0, dao.listAllByCriteria(null, ";DROP TABLE Users;", null).size());
-  }
-
-  @Test
-  public void testListBySearchWithGoodAliasQuery() throws IOException {
-    dao.listAll();
-    assertTrue(dao.listAllByCriteria(null, "IPO1", null).size() > 0);
-  }
-
-  @Test
-  public void testListBySearchWithGoodNameQuery() throws IOException {
-    assertTrue(dao.listAllByCriteria(null, "Pool 1", null).size() > 0);
   }
 
   @Test
@@ -437,16 +335,6 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
   @Test
   public void testListIlluminaPoolsWithLimitAndOffset() throws IOException {
     assertEquals(3, dao.list(5, 3, true, "id", PaginationFilter.platformType(PlatformType.ILLUMINA)).size());
-  }
-
-  @Test
-  public void testListPoolsWithLimit() throws IOException {
-    assertEquals(10, dao.listAllByCriteria(null, null, 10).size());
-  }
-
-  @Test
-  public void testListPoolsWithLimitZero() throws IOException {
-    assertEquals(0, dao.listAllByCriteria(null, null, 0).size());
   }
 
   @Test

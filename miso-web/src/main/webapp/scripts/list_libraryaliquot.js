@@ -182,9 +182,9 @@ ListTarget.libraryaliquot = {
   },
   searchTermSelector: function(searchTerms) {
     const plainSampleTerms = [searchTerms['id'], searchTerms['created'], searchTerms['entered'], searchTerms['changed'],
-        searchTerms['creator'], searchTerms['changedby'], searchTerms['platform'], searchTerms['index_name'], searchTerms['index_seq'],
-        searchTerms['box'], searchTerms['freezer'], searchTerms['distributed'], searchTerms['distributedto']];
-    const detailedSampleTerms = [searchTerms['tissueOrigin'], searchTerms['tissueType']];
+        searchTerms['creator'], searchTerms['changedby'], searchTerms['platform'], searchTerms['index'], searchTerms['box'],
+        searchTerms['freezer'], searchTerms['distributed'], searchTerms['distributedto']];
+    const detailedSampleTerms = [searchTerms['tissueOrigin'], searchTerms['tissueType'], searchTerms['groupid']];
     if (Constants.isDetailedSample) {
       return plainSampleTerms.concat(detailedSampleTerms);
     } else {

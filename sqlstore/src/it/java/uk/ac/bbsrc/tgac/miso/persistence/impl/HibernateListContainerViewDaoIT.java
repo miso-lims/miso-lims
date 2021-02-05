@@ -39,12 +39,12 @@ public class HibernateListContainerViewDaoIT extends AbstractDAOTest {
 
   @Test
   public void testCountBySearch() throws IOException {
-    assertEquals(3, sut.count(PaginationFilter.query("C0")));
+    assertEquals(3, sut.count(PaginationFilter.query("C0*")));
   }
 
   @Test
   public void testCountByEmptySearch() throws IOException {
-    assertEquals(4L, sut.count(PaginationFilter.query("")));
+    assertEquals(4L, sut.count());
   }
 
   @Test
@@ -54,14 +54,14 @@ public class HibernateListContainerViewDaoIT extends AbstractDAOTest {
 
   @Test
   public void testListBySearchWithLimit() throws IOException {
-    List<ListContainerView> spcs = sut.list(2, 2, true, "id", PaginationFilter.query("C0"));
+    List<ListContainerView> spcs = sut.list(2, 2, true, "id", PaginationFilter.query("C0*"));
     assertEquals(1, spcs.size());
     assertEquals(4L, spcs.get(0).getId());
   }
 
   @Test
   public void testListByEmptySearchWithLimit() throws IOException {
-    List<ListContainerView> spcs = sut.list(0, 3, true, "id", PaginationFilter.query(""));
+    List<ListContainerView> spcs = sut.list(0, 3, true, "id");
     assertEquals(3L, spcs.size());
   }
 

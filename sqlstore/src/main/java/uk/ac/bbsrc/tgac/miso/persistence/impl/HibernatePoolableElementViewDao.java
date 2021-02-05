@@ -11,7 +11,6 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
@@ -21,11 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
+import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
 import uk.ac.bbsrc.tgac.miso.persistence.PoolableElementViewDao;
 import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
@@ -186,14 +185,18 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
   }
 
   @Override
-  public void restrictPaginationByIndex(Criteria criteria, String index, Consumer<String> errorHandler) {
-    criteria.createAlias("indices", "indices");
-    HibernateLibraryDao.restrictPaginationByIndices(criteria, index);
+  public void restrictPaginationByIndex(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    if (query.getText() == null) {
+      criteria.add(Restrictions.isEmpty("indices"));
+    } else {
+      criteria.createAlias("indices", "indices", JoinType.LEFT_OUTER_JOIN)
+          .add(DbUtils.textRestriction(query, "indices.name", "indices.sequence"));
+    }
   }
 
   @Override
-  public void restrictPaginationByBox(Criteria criteria, String name, Consumer<String> errorHandler) {
-    criteria.add(DbUtils.searchRestrictions(name, false, "boxAlias", "boxName", "boxIdentificationBarcode", "boxLocationBarcode"));
+  public void restrictPaginationByBox(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    criteria.add(DbUtils.textRestriction(query, "boxAlias", "boxName", "boxIdentificationBarcode", "boxLocationBarcode"));
   }
 
   @Override
@@ -202,70 +205,37 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
   }
 
   @Override
-  public void restrictPaginationByFreezer(Criteria criteria, String freezer, Consumer<String> errorHandler) {
+  public void restrictPaginationByFreezer(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
     criteria.createAlias("aliquot", "aliquot")
         .createAlias("aliquot.boxPosition", "boxPosition")
-        .createAlias("boxPosition.box", "box")
-        .createAlias("box.storageLocation", "location1")
-        .createAlias("location1.parentLocation", "location2", JoinType.LEFT_OUTER_JOIN)
-        .createAlias("location2.parentLocation", "location3", JoinType.LEFT_OUTER_JOIN)
-        .createAlias("location3.parentLocation", "location4", JoinType.LEFT_OUTER_JOIN)
-        .createAlias("location4.parentLocation", "location5", JoinType.LEFT_OUTER_JOIN)
-        .createAlias("location5.parentLocation", "location6", JoinType.LEFT_OUTER_JOIN)
-        .add(Restrictions.or(
-            Restrictions.and(Restrictions.eq("location1.locationUnit", LocationUnit.FREEZER),
-                Restrictions.ilike("location1.alias", freezer, MatchMode.START)),
-            Restrictions.and(Restrictions.eq("location2.locationUnit", LocationUnit.FREEZER),
-                Restrictions.ilike("location2.alias", freezer, MatchMode.START)),
-            Restrictions.and(Restrictions.eq("location3.locationUnit", LocationUnit.FREEZER),
-                Restrictions.ilike("location3.alias", freezer, MatchMode.START)),
-            Restrictions.and(Restrictions.eq("location4.locationUnit", LocationUnit.FREEZER),
-                Restrictions.ilike("location4.alias", freezer, MatchMode.START)),
-            Restrictions.and(Restrictions.eq("location5.locationUnit", LocationUnit.FREEZER),
-                Restrictions.ilike("location5.alias", freezer, MatchMode.START)),
-            Restrictions.and(Restrictions.eq("location6.locationUnit", LocationUnit.FREEZER),
-                Restrictions.ilike("location6.alias", freezer, MatchMode.START))));
+        .createAlias("boxPosition.box", "box");
+    DbUtils.restrictPaginationByFreezer(criteria, query, "box.storageLocation");
   }
 
   @Override
   public void restrictPaginationByDate(Criteria criteria, Date start, Date end, DateType type, Consumer<String> errorHandler) {
     if (type == DateType.RECEIVE) {
-      criteria.createAlias("transfers", "transferItem")
-          .createAlias("transferItem.transfer", "transfer")
-          .add(Restrictions.isNotNull("transfer.senderLab"))
-          .add(Restrictions.between("transfer.transferTime", start, end));
+      DbUtils.restrictPaginationByReceiptTransferDate(criteria, start, end);
     } else if (type == DateType.DISTRIBUTED) {
-      criteria.createAlias("transfers", "transferItem")
-          .createAlias("transferItem.transfer", "transfer")
-          .add(Restrictions.isNotNull("transfer.recipient"))
-          .add(Restrictions.between("transfer.transferTime", start, end));
+      DbUtils.restrictPaginationByDistributionTransferDate(criteria, start, end);
     } else {
       HibernatePaginatedDataSource.super.restrictPaginationByDate(criteria, start, end, type, errorHandler);
     }
   }
 
   @Override
-  public void restrictPaginationByDistributed(Criteria criteria, Consumer<String> errorHandler) {
-    criteria.createAlias("transfers", "transferItem")
-        .createAlias("transferItem.transfer", "transfer")
-        .add(Restrictions.isNotNull("transfer.recipient"));
+  public void restrictPaginationByDistributionRecipient(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    DbUtils.restrictPaginationByDistributionRecipient(criteria, query, "libraryAliquots", "aliquotId");
   }
 
   @Override
-  public void restrictPaginationByDistributionRecipient(Criteria criteria, String recipient, Consumer<String> errorHandler) {
-    criteria.createAlias("transfers", "transferItem")
-        .createAlias("transferItem.transfer", "transfer")
-        .add(Restrictions.ilike("transfer.recipient", recipient, MatchMode.ANYWHERE));
+  public void restrictPaginationByTissueOrigin(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    criteria.add(DbUtils.textRestriction(query, "tissueOrigin.alias"));
   }
 
   @Override
-  public void restrictPaginationByTissueOrigin(Criteria criteria, String origin, Consumer<String> errorHandler) {
-    criteria.add(Restrictions.eq("tissueOrigin.alias", origin));
-  }
-
-  @Override
-  public void restrictPaginationByTissueType(Criteria criteria, String type, Consumer<String> errorHandler) {
-    criteria.add(Restrictions.eq("tissueType.alias", type));
+  public void restrictPaginationByTissueType(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    criteria.add(DbUtils.textRestriction(query, "tissueType.alias"));
   }
 
   @Override

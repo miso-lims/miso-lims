@@ -115,21 +115,13 @@ public class HibernateLibraryAliquotDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testListAllLibraryAliquotsBySearchWithEmptyQueryString() throws IOException {
-    assertEquals(15, dao.list(0, 0, false, "id", PaginationFilter.query(""),
-        PaginationFilter.platformType(PlatformType.ILLUMINA)).size());
-  }
-
-  @Test
-  public void testListAllLibraryAliquotsBySearchWithNullQueryString() throws IOException {
-    assertEquals(15, dao.list(0, 0, false, "id",
-        PaginationFilter.platformType(PlatformType.ILLUMINA)).size());
+  public void testListAllLibraryAliquotsBySearchWithNoQueryString() throws IOException {
+    assertEquals(15, dao.list(0, 0, false, "id", PaginationFilter.platformType(PlatformType.ILLUMINA)).size());
   }
 
   @Test
   public void testListAllLibraryAliquotsBySearchNoneForPlatform() throws IOException {
-    assertEquals(0, dao.list(0, 0, false, "id", PaginationFilter.query(""),
-        PaginationFilter.platformType(PlatformType.SOLID)).size());
+    assertEquals(0, dao.list(0, 0, false, "id", PaginationFilter.platformType(PlatformType.SOLID)).size());
   }
 
   @Test
@@ -143,13 +135,13 @@ public class HibernateLibraryAliquotDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testListAllLibraryAliquotsBySearchOnlyWithEmptyQueryString() throws IOException {
-    assertEquals(15, dao.list(0, 0, false, "id", PaginationFilter.query("")).size());
+  public void testListAllLibraryAliquotsBySearchOnlyWithNoQueryString() throws IOException {
+    assertEquals(15, dao.list(0, 0, false, "id").size());
   }
 
   @Test
   public void testListAllLibraryAliquotsBySearchOnlyWithNullQueryString() throws IOException {
-    assertEquals(15, dao.list(0, 0, false, "id", PaginationFilter.query(null)).size());
+    assertEquals(0, dao.list(0, 0, false, "id", PaginationFilter.query(null)).size());
   }
 
   @Test
@@ -256,7 +248,7 @@ public class HibernateLibraryAliquotDaoIT extends AbstractDAOTest {
 
   @Test
   public void testListBySearchOffsetAndNumResultsAndPlatformSearchGeneral() throws IOException {
-    final List<LibraryAliquot> results = dao.list(0, 100, true, "name", PaginationFilter.query("LDI"),
+    final List<LibraryAliquot> results = dao.list(0, 100, true, "name", PaginationFilter.query("LDI*"),
         PaginationFilter.platformType(PlatformType.ILLUMINA));
     assertNotNull(results);
     assertEquals(15, results.size());
@@ -319,6 +311,11 @@ public class HibernateLibraryAliquotDaoIT extends AbstractDAOTest {
   @Test
   public void testSearchByPool() throws Exception {
     testSearch(PaginationFilter.pool(1L));
+  }
+
+  @Test
+  public void testSearchByGroupId() throws Exception {
+    testSearch(PaginationFilter.groupId("test"));
   }
 
   /**

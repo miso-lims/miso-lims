@@ -10,7 +10,6 @@ import java.util.function.Consumer;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -24,6 +23,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
+import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
 import uk.ac.bbsrc.tgac.miso.persistence.RunStore;
 import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
@@ -111,15 +111,6 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   }
 
   @Override
-  public List<Run> listBySearch(String query) throws IOException {
-    Criteria criteria = currentSession().createCriteria(Run.class);
-    criteria.add(DbUtils.searchRestrictions(query, false, SEARCH_PROPERTIES));
-    @SuppressWarnings("unchecked")
-    List<Run> records = criteria.list();
-    return records;
-  }
-
-  @Override
   public Run getByAlias(String alias) throws IOException {
     Criteria criteria = currentSession().createCriteria(Run.class);
     criteria.add(Restrictions.eq("alias", alias));
@@ -201,20 +192,6 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
     return records;
   }
 
-  @Override
-  public long countRuns() throws IOException {
-    long c = (Long) currentSession().createCriteria(Run.class).setProjection(Projections.rowCount()).uniqueResult();
-    return (int) c;
-  }
-
-  @Override
-  public long countBySearch(String querystr) throws IOException {
-    Criteria criteria = currentSession().createCriteria(Run.class);
-    criteria.add(DbUtils.searchRestrictions(querystr, false, "name", "alias", "description"));
-    long c = (long) criteria.setProjection(Projections.rowCount()).uniqueResult();
-    return (int) c;
-  }
-
   public SessionFactory getSessionFactory() {
     return sessionFactory;
   }
@@ -235,9 +212,13 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   }
 
   @Override
-  public void restrictPaginationBySequencingParametersName(Criteria criteria, String name, Consumer<String> errorHandler) {
-    criteria.createAlias("sequencingParameters", "params");
-    criteria.add(Restrictions.ilike("params.name", name, MatchMode.START));
+  public void restrictPaginationBySequencingParametersName(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    if (query.getText() == null) {
+      criteria.add(Restrictions.isNull("sequencingParameters"));
+    } else {
+      criteria.createAlias("sequencingParameters", "params");
+      criteria.add(DbUtils.textRestriction(query, "params.name"));
+    }
   }
 
   @Override
@@ -299,15 +280,15 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   }
 
   @Override
-  public void restrictPaginationByIndex(Criteria criteria, String index, Consumer<String> errorHandler) {
-    criteria.createAlias("runPositions", "runPos");
-    criteria.createAlias("runPos.container", "spc");
-    criteria.createAlias("spc.partitions", "partition");
-    criteria.createAlias("partition.pool", "pool");
-    criteria.createAlias("pool.poolElements", "poolElement");
-    criteria.createAlias("poolElement.poolableElementView", "aliquotForIndex");
-    criteria.createAlias("aliquotForIndex.indices", "indices");
-    HibernateLibraryDao.restrictPaginationByIndices(criteria, index);
+  public void restrictPaginationByIndex(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    criteria.createAlias("runPositions", "runPos")
+        .createAlias("runPos.container", "spc")
+        .createAlias("spc.partitions", "partition")
+        .createAlias("partition.pool", "pool")
+        .createAlias("pool.poolElements", "poolElement")
+        .createAlias("poolElement.poolableElementView", "aliquotForIndex")
+        .createAlias("aliquotForIndex.indices", "indices")
+        .add(DbUtils.textRestriction(query, "indices.name", "indices.sequence"));
   }
 
   @Override

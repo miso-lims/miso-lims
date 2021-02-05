@@ -279,11 +279,6 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   }
 
   @Override
-  public long countBySearch(String querystr) throws IOException {
-    return libraryDao.countLibrariesBySearch(querystr);
-  }
-
-  @Override
   public List<Library> list() throws IOException {
     return libraryDao.listAll();
   }
@@ -311,11 +306,6 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   @Override
   public Library getByPositionId(long positionId) throws IOException {
     return (Library) libraryDao.getByPositionId(positionId);
-  }
-
-  @Override
-  public List<Library> listBySearch(String querystr) throws IOException {
-    return libraryDao.listBySearch(querystr);
   }
 
   @Override
