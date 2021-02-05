@@ -61,7 +61,9 @@ BulkUtils = (function($) {
    *       omitted, the item is used as the value
    *   validationCache: optional string for dropdown columns; if set, any key found in the named
    *       cache will be marked valid
-   *   required: optional boolean (default: false); whether the field is required
+   *   required: optional boolean (default: false); whether the field is required. This should only
+   *       be set when the field is *always* required. Otherwise, may be controlled with
+   *       updateField (see API object below)
    *   maxLength: optional integer; maximum number of characters for text input
    *   regex: optional regex string; validation regex for text input
    *   initial: optional string; value to initialize field value to when missing. For dropdowns,
@@ -878,7 +880,7 @@ BulkUtils = (function($) {
       manualColumnResize: true,
       rowHeaders: true,
       colHeaders: columns.map(function(column) {
-        return column.title;
+        return column.title + (column.required ? '*' : '');
       }),
       viewportColumnRenderingOffset: 700,
       preventOverflow: 'horizontal',

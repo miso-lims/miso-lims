@@ -52,7 +52,7 @@ public class HandsOnTable extends AbstractElement {
     super(driver);
     PageFactory.initElements(driver, this);
     this.columnHeadings = hotContainer.findElements(columnHeadingsSelector).stream()
-        .map(element -> element.getAttribute("textContent").trim())
+        .map(element -> element.getAttribute("textContent").trim().replace("*", ""))
         .collect(Collectors.toList());
     this.inputRows = hotContainer.findElements(inputRowsSelector);
     this.lockedRows = hotContainer.findElements(lockedRowsSelector);
