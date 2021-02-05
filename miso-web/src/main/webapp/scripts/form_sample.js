@@ -132,13 +132,14 @@ FormTarget.sample = (function($) {
               title: 'Initial Volume',
               data: 'initialVolume',
               type: 'decimal',
-              precision: 14,
-              scale: 10
+              precision: 16,
+              scale: 10,
+              min: 0
             }, {
               title: 'Volume',
               data: 'volume',
               type: 'decimal',
-              precision: 14,
+              precision: 16,
               scale: 10
             }, FormUtils.makeUnitsField(object, 'volume'), {
               title: 'Parent ng Used',
@@ -151,8 +152,9 @@ FormTarget.sample = (function($) {
               title: 'Parent Volume Used',
               data: 'volumeUsed',
               type: 'decimal',
-              precision: 14,
+              precision: 16,
               scale: 10,
+              min: 0,
               include: config.detailedSample && (object.sampleCategory === 'Stock' || object.sampleCategory === 'Aliquot')
             }, {
               title: 'Concentration',

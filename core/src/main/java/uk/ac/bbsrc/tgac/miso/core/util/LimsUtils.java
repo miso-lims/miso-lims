@@ -96,6 +96,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer;
  */
 public class LimsUtils {
 
+  private static final BigDecimal MAX_VOLUME = new BigDecimal("999999.9999999999");
+  private static final BigDecimal MIN_VOLUME = new BigDecimal("-999999.9999999999");
+
   private static final Logger log = LoggerFactory.getLogger(LimsUtils.class);
 
   public static boolean isStringEmptyOrNull(String s) {
@@ -567,7 +570,7 @@ public class LimsUtils {
 
   private static void updateParentVolume(HierarchyEntity parent, BigDecimal value, User changeUser) {
     parent.setChangeDetails(changeUser);
-    parent.setVolume(value);
+    parent.setVolume(value.min(MAX_VOLUME).max(MIN_VOLUME));
   }
 
   @SafeVarargs

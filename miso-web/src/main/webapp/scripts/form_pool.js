@@ -86,7 +86,10 @@ FormTarget.pool = (function($) {
         }, FormUtils.makeQcPassedField(), {
           title: 'Volume',
           data: 'volume',
-          type: 'decimal'
+          type: 'decimal',
+          precision: 16,
+          scale: 10,
+          min: 0
         }, FormUtils.makeUnitsField(object, 'volume'), {
           title: 'Discarded',
           data: 'discarded',
@@ -104,7 +107,7 @@ FormTarget.pool = (function($) {
         pool.pooledElements = Pool.getAliquots();
       }
       if (!pool.id && !pool.identificationBarcode && !Constants.automaticBarcodes) {
-    	var deferred = $.Deferred();
+        var deferred = $.Deferred();
         Utils.showConfirmDialog("Missing Barcode", "Save",
             ["Pools should usually have barcodes. Are you sure you wish to save without one?"], deferred.resolve, deferred.reject);
         return deferred.promise();

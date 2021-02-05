@@ -119,7 +119,7 @@ FormTarget.libraryaliquot = (function($) {
                       title: 'Volume',
                       data: 'volume',
                       type: 'decimal',
-                      precision: 14,
+                      precision: 16,
                       scale: 10
                     },
                     FormUtils.makeUnitsField(object, 'volume'),
@@ -164,7 +164,7 @@ FormTarget.libraryaliquot = (function($) {
                       title: 'Parent Volume Used',
                       data: 'volumeUsed',
                       type: 'decimal',
-                      precision: 14,
+                      precision: 16,
                       scale: 10,
                       min: 0
                     }])
