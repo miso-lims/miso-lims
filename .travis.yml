@@ -8,7 +8,7 @@ env:
     - MAVEN_SETTINGS="${TRAVIS_BUILD_DIR}/gsi-config"
     - MAVEN_OPTS="-Xms1g -Xmx2g" 
   matrix: 
-    - JOB=SONAR_AND_UNIT_TESTS
+    - JOB=UNIT_TESTS
     - JOB=SQLSTORE_IT
     - JOB=PLAIN_WEB_IT
     - JOB=BULK_WEB_IT
@@ -18,19 +18,8 @@ env:
 git:
   depth: 3
 
-addons:
-    sonarcloud:
-        organization: "miso-lims"
-        token:
-            secure: "CuaZUL0SJiRQR3Z+zvSTKAJc+/SOC+2g5a9gG08NYYSkwN8Ujwoyd9e14DLuyFaY2xZppQb5OIcQWQH+lmZqZbycRuAlBsTy1iIooUFB9v80g5eW8RDaJu3609Y7emSV7sZ3wuTJx3sTDeITAbkhRz0FQ2FyyoFMgD1jI+lxPXA="
-
 services:
   - xvfb
-
-before_install:
-    - git clone https://github.com/oicr-gsi/gsi-config.git "${MAVEN_SETTINGS}"
-    - cp "${MAVEN_SETTINGS}/settings.xml" "${HOME}/.m2/settings.xml"
-    - 'echo pr slug ${TRAVIS_PULL_REQUEST_SLUG} && echo repo slug ${TRAVIS_REPO_SLUG}'
 
 before_script:
   - export MAVEN_OPTS='-Xms1g -Xmx2g' CXX=g++-5
@@ -43,14 +32,8 @@ script: ./travis_jobs.sh
 
 cache:
   directories:
-    - "$HOME/.sonar/cache"
     - "$HOME/.m2"
 
 notifications:
   email: false
-  slack:
-    rooms:
-      secure: Op3cFjj8lw8y5I+Bh4Hq0yt4G9Rx2GNOuwo6onjHGRrlODIPvFE0GCD+aEWmB76qcH/Lq/9NRf86Ik2tWnQbBRrwkH7bcJjmK05DvRFP3gvqIMiReHKugdYcthMnI+ep2PX+tiUMt3OwLAT9F2tpmOjEm2oG6DRsJ45oN/iUpVo=
-    on_success: change
-    on_failure: always
 
