@@ -37,15 +37,10 @@
     </div>
 
    <div id="successesAndErrors">
-     <div id="warnings" class="bs-callout bs-callout-warning hidden">
-        <h2>Warning</h2>
-        <div id="warningMessages"></div>
-     </div>
      <div id="successes" class="parsley-success hidden">
        <p id="successMessage"></p>
      </div>
      <div id="errorsContainer" class="bs-callout bs-callout-warning hidden">
-       <h2>Oh snap!</h2>
        <div id="errors"></div>
      </div>
    </div>

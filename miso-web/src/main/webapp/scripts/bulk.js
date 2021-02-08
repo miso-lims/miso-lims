@@ -134,6 +134,8 @@ BulkUtils = (function($) {
 
   var INTEGER_REGEXP = new RegExp('^-?\\d+$');
 
+  var REQUIRED_ERROR = 'This field is required';
+
   var caches = {};
   var tableSaved = false;
 
@@ -1867,8 +1869,10 @@ BulkUtils = (function($) {
           clearMessages();
           hot.validateCells(function(valid) {
             if (!valid) {
-              showError('Please fix highlighted cells. See the Quick Help section '
-                  + '(above) for additional information regarding specific fields.');
+              var message = 'Please fix highlighted cells. See the Quick Help section '
+                  + '(above) for additional information regarding specific fields.';
+              var errors = collectValidationErrors(hot, columns);
+              showValidationErrors(message, errors, hot, columns);
               showLoading(false, true);
               return;
             }
@@ -1883,6 +1887,57 @@ BulkUtils = (function($) {
             });
           });
         });
+  }
+
+  function collectValidationErrors(hot, columns) {
+    errors = [];
+    hot.getCellsMeta().filter(function(cellMeta) {
+      return cellMeta.hasOwnProperty('valid') && !cellMeta.valid;
+    }).forEach(function(cellMeta) {
+      var row = errors.find(function(error) {
+        return error.row === cellMeta.row;
+      });
+      if (!row) {
+        row = {
+          row: cellMeta.row,
+          fields: []
+        };
+        errors.push(row);
+      }
+      var column = columns.find(function(col) {
+        return col.data === cellMeta.prop;
+      });
+      row.fields.push({
+        field: cellMeta.prop,
+        errors: [getValidationError(hot.getDataAtCell(cellMeta.row, cellMeta.col), cellMeta, column)]
+      })
+
+    });
+    return errors;
+  }
+
+  function getValidationError(value, cellMeta, column) {
+    if (!column) {
+      return 'Unknown error - failed to determine requirements';
+    }
+    // validators return error message for text, int, and decimal fields
+    if (Utils.validation.isEmpty(value)) {
+      if (cellMeta.allowEmpty === false) {
+        return REQUIRED_ERROR;
+      } else {
+        return 'Unknown error - field empty and not required';
+      }
+    }
+    if (cellMeta.validator) {
+      message = cellMeta.validator(value, function() {
+        // ignore
+      });
+      if (message) {
+        return message;
+      }
+    }
+    // date, time, and dropdown fields will always get this default message if invalid and not empty
+    return 'This field is invalid';
   }
 
   function saveWithProgressDialog(hot, target, columns, config, data) {
@@ -2069,13 +2124,22 @@ BulkUtils = (function($) {
     $(ERRORS_CONTAINER).removeClass('hidden');
   }
 
+  /*
+   * errors: [{
+   *   row: int,
+   *   fields: [{
+   *     field: string,
+   *     errors: [string]
+   *   }]
+   * }]
+   */
   function showValidationErrors(message, errors, hot, columns) {
     clearMessages();
     $(ERRORS_BOX).append($('<p>').text(message));
     var list = $('<ul>');
     errors.forEach(function(error) {
+      list.append($('<li>').text('Row ' + (error.row + 1)));
       error.fields.forEach(function(field) {
-        list.append($('<li>').text('Row ' + (error.row + 1)));
         var sublist = $('<ul>');
         var colIndex = -1;
         if (field.field !== 'GENERAL') {
@@ -2113,17 +2177,31 @@ BulkUtils = (function($) {
     var regex = column.regex ? new RegExp(column.regex) : null;
     return function(value, callback) {
       if (Utils.validation.isEmpty(value)) {
-        callback(this.instance.getCellMeta(this.row, this.col).allowEmpty);
+        return validateEmpty(this, callback);
       } else if (column.maxLength && value.length > column.maxLength) {
         callback(false);
+        return 'Max length is ' + column.maxLength + ' characters';
       } else if (!sanitize.test(value)) {
         callback(false);
+        return 'Cannot contain tabs, line breaks, or the following characters: <>&';
       } else if (regex && !regex.test(value)) {
         callback(false);
+        return 'Does not match expected pattern';
       } else {
         callback(true);
+        return null;
       }
     };
+  }
+
+  function validateEmpty(context, callback) {
+    if (context.instance.getCellMeta(context.row, context.col).allowEmpty) {
+      callback(true);
+      return null;
+    } else {
+      callback(false);
+      return REQUIRED_ERROR;
+    }
   }
 
   function decimalValidator(column) {
@@ -2140,9 +2218,16 @@ BulkUtils = (function($) {
     var regex = new RegExp(pattern);
     return function(value, callback) {
       if (Utils.validation.isEmpty(value)) {
-        callback(this.instance.getCellMeta(this.row, this.col).allowEmpty);
+        return validateEmpty(this, callback);
+      } else if (!Handsontable.helper.isNumeric(value)) {
+        callback(false);
+        return 'Must be a decimal number';
+      } else if (!regex.test(value) || value < min || value > max) {
+        callback(false);
+        return 'Must be between ' + min + ' and ' + max;
       } else {
-        callback(Handsontable.helper.isNumeric(value) && regex.test(value) && value >= min && value <= max);
+        callback(true);
+        return null;
       }
     };
   }
@@ -2150,15 +2235,19 @@ BulkUtils = (function($) {
   function intValidator(column) {
     return function(value, callback) {
       if (Utils.validation.isEmpty(value)) {
-        callback(this.instance.getCellMeta(this.row, this.col).allowEmpty);
+        return validateEmpty(this, callback);
       } else if (!INTEGER_REGEXP.test(value)) {
         callback(false);
+        return 'Must be an integer';
       } else if (column.hasOwnProperty('min') && value < column.min) {
         callback(false);
+        return 'Must be at least ' + column.min;
       } else if (column.hasOwnProperty('max') && value > column.max) {
         callback(false);
+        return 'Must be no greater than ' + column.max;
       } else {
         callback(true);
+        return null;
       }
     };
   }

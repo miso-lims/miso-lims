@@ -3,6 +3,7 @@
 Changes:
 
 * Added asterisks to indicate always-required fields in bulk tables
+* Added error messages for all field errors on bulk pages
 * Improved advanced search - use wildcards or blanks to find exact or partial
   matches, match any specified value, and match unspecified
 * Increased max value for all volume fields to just under 1,000,000
