@@ -1,14 +1,7 @@
 #!/bin/bash
 set -ev
 
-if [ "$JOB" = "SONAR_AND_UNIT_TESTS" ]; then
-    if [[ ${TRAVIS_PULL_REQUEST} == "false" ]] || [[ ${TRAVIS_PULL_REQUEST_SLUG} == ${TRAVIS_REPO_SLUG} ]] ; then 
-        # Sonar
-        mvn org.jacoco:jacoco-maven-plugin:prepare-agent sonar:sonar
-    else 
-        echo "[WARN] SonarCloud cannot run on pull requests from forks."
-    fi
-    # Unit Tests
+if [ "$JOB" = "UNIT_TESTS" ]; then
     mvn clean test
 elif [ "$JOB" = "SQLSTORE_IT" ]; then
     cd sqlstore
