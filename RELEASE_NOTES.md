@@ -4,6 +4,7 @@ Changes:
 
 * Improved advanced search - use wildcards or blanks to find exact or partial
   matches, match any specified value, and match unspecified
+* Increased max value for all volume fields to just under 1,000,000
 
 # 1.22.0
 

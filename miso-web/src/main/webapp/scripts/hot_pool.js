@@ -208,7 +208,7 @@ HotTarget.pool = (function() {
           });
           obj['concentrationUnits'] = !!units ? units.name : null;
         }
-      }, HotUtils.makeColumnForDecimal('Volume', true, 'volume', 14, 10, false, true), {
+      }, HotUtils.makeColumnForDecimal('Volume', true, 'volume', 16, 10, false, false), {
         header: 'Vol. Units',
         data: 'volumeUnits',
         type: 'dropdown',

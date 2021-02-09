@@ -569,7 +569,7 @@ BulkUtils = (function($) {
           title: 'Volume',
           type: 'decimal',
           data: 'volume',
-          precision: 14,
+          precision: 16,
           scale: 10
         }, {
           title: 'Vol. Units',
@@ -591,7 +591,7 @@ BulkUtils = (function($) {
             type: 'decimal',
             data: 'initialVolume',
             include: config.pageMode === 'edit',
-            precision: 14,
+            precision: 16,
             scale: 10
           });
         }
@@ -610,7 +610,7 @@ BulkUtils = (function($) {
         title: 'Parent Vol. Used',
         type: 'decimal',
         data: 'volumeUsed',
-        precision: 14,
+        precision: 16,
         scale: 10,
         min: 0
       }],
