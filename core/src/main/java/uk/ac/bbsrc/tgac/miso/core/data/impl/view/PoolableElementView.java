@@ -89,6 +89,9 @@ public class PoolableElementView implements DetailedQcItem, Identifiable, Serial
   @JoinColumn(name = "qcUser")
   private User qcUser;
 
+  @Temporal(TemporalType.DATE)
+  private Date qcDate;
+
   @ManyToOne
   @JoinColumn(name = "libraryDesignCodeId")
   private LibraryDesignCode aliquotDesignCode;
@@ -333,6 +336,16 @@ public class PoolableElementView implements DetailedQcItem, Identifiable, Serial
   @Override
   public void setQcUser(User qcUser) {
     this.qcUser = qcUser;
+  }
+
+  @Override
+  public Date getQcDate() {
+    return qcDate;
+  }
+
+  @Override
+  public void setQcDate(Date qcDate) {
+    this.qcDate = qcDate;
   }
 
   public LibraryDesignCode getAliquotDesignCode() {

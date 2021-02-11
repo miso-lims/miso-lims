@@ -145,6 +145,9 @@ public class SampleImpl extends AbstractBoxable implements Sample {
   @JoinColumn(name = "qcUser")
   private User qcUser;
 
+  @Temporal(TemporalType.DATE)
+  private Date qcDate;
+
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "creator", nullable = false, updatable = false)
   private User creator;
@@ -628,6 +631,16 @@ public class SampleImpl extends AbstractBoxable implements Sample {
   @Override
   public void setQcUser(User qcUser) {
     this.qcUser = qcUser;
+  }
+
+  @Override
+  public Date getQcDate() {
+    return qcDate;
+  }
+
+  @Override
+  public void setQcDate(Date qcDate) {
+    this.qcDate = qcDate;
   }
 
   @Override

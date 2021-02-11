@@ -65,6 +65,7 @@ public class SampleDto extends AbstractBoxableDto implements ReceivableDto<Sampl
   private Long detailedQcStatusId;
   private String detailedQcStatusNote;
   private String qcUserName;
+  private String qcDate;
   private String alias;
   private Long projectId;
   private String projectName;
@@ -239,6 +240,14 @@ public class SampleDto extends AbstractBoxableDto implements ReceivableDto<Sampl
 
   public void setQcUserName(String qcUserName) {
     this.qcUserName = qcUserName;
+  }
+
+  public String getQcDate() {
+    return qcDate;
+  }
+
+  public void setQcDate(String qcDate) {
+    this.qcDate = qcDate;
   }
 
   public String getAlias() {

@@ -132,6 +132,9 @@ public class LibraryImpl extends AbstractBoxable implements Library {
   @JoinColumn(name = "qcUser")
   private User qcUser;
 
+  @Temporal(TemporalType.DATE)
+  private Date qcDate;
+
   @Column(nullable = false)
   private boolean lowQuality = false;
 
@@ -493,6 +496,16 @@ public class LibraryImpl extends AbstractBoxable implements Library {
   @Override
   public void setQcUser(User qcUser) {
     this.qcUser = qcUser;
+  }
+
+  @Override
+  public Date getQcDate() {
+    return qcDate;
+  }
+
+  @Override
+  public void setQcDate(Date qcDate) {
+    this.qcDate = qcDate;
   }
 
   @Override

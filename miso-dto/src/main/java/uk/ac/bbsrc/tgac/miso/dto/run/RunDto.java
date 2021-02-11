@@ -41,8 +41,10 @@ public class RunDto {
   private List<ContainerDto> containers;
   private Boolean qcPassed;
   private String qcUserName;
+  private String qcDate;
   private Boolean dataReview;
   private String dataReviewerName;
+  private String dataReviewDate;
   private String projectsLabel;
   private Long sopId;
   private String dataManglingPolicy;
@@ -231,6 +233,14 @@ public class RunDto {
     this.qcUserName = qcUserName;
   }
 
+  public String getQcDate() {
+    return qcDate;
+  }
+
+  public void setQcDate(String qcDate) {
+    this.qcDate = qcDate;
+  }
+
   public Boolean getDataReview() {
     return dataReview;
   }
@@ -245,6 +255,14 @@ public class RunDto {
 
   public void setDataReviewerName(String dataReviewerName) {
     this.dataReviewerName = dataReviewerName;
+  }
+
+  public String getDataReviewDate() {
+    return dataReviewDate;
+  }
+
+  public void setDataReviewDate(String dataReviewDate) {
+    this.dataReviewDate = dataReviewDate;
   }
 
   public String getProjectsLabel() {

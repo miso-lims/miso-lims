@@ -228,7 +228,7 @@ FormTarget.run = (function($) {
           title: 'Completion Date',
           data: 'endDate',
           type: 'date'
-        }, FormUtils.makeQcPassedField(), FormUtils.makeQcUserField(), {
+        }, FormUtils.makeQcPassedField(), FormUtils.makeQcUserField(), FormUtils.makeQcDateField(), {
           title: 'Data Review',
           data: 'dataReview',
           type: 'dropdown',
@@ -268,6 +268,13 @@ FormTarget.run = (function($) {
           type: 'read-only',
           getDisplayValue: function(run) {
             return run.dataReviewerName || 'n/a';
+          }
+        }, {
+          title: 'Data Review Date',
+          data: 'dataReviewDate',
+          type: 'read-only',
+          getDisplayValue: function(run) {
+            return run.dataReviewDate || 'n/a';
           }
         }])
       }];

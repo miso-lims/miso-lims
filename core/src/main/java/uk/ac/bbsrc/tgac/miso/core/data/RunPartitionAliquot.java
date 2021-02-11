@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Objects;
 
 import javax.persistence.Entity;
@@ -9,6 +10,8 @@ import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -103,6 +106,9 @@ public class RunPartitionAliquot implements Serializable {
   @JoinColumn(name = "qcUser")
   private User qcUser;
 
+  @Temporal(TemporalType.DATE)
+  private Date qcDate;
+
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier")
   private User lastModifier;
@@ -180,6 +186,14 @@ public class RunPartitionAliquot implements Serializable {
 
   public void setQcUser(User qcUser) {
     this.qcUser = qcUser;
+  }
+
+  public Date getQcDate() {
+    return qcDate;
+  }
+
+  public void setQcDate(Date qcDate) {
+    this.qcDate = qcDate;
   }
 
   public User getLastModifier() {

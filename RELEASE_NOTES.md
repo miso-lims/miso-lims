@@ -7,6 +7,12 @@ Changes:
 * Improved advanced search - use wildcards or blanks to find exact or partial
   matches, match any specified value, and match unspecified
 * Increased max value for all volume fields to just under 1,000,000
+* Track dates for sample, library, library aliquot, and run QC status, and run
+  data approved sign-offs
+
+Upgrade Notes:
+
+* Updated to Pinery v2.18.0
 
 # 1.22.0
 

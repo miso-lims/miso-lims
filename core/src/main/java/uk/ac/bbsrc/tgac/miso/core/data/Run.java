@@ -170,11 +170,17 @@ public abstract class Run
   @JoinColumn(name = "qcUser")
   private User qcUser;
 
+  @Temporal(TemporalType.DATE)
+  private Date qcDate;
+
   private Boolean dataReview;
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "dataReviewerId")
   private User dataReviewer;
+
+  @Temporal(TemporalType.DATE)
+  private Date dataReviewDate;
 
   @OneToOne
   @JoinColumn(name = "runId", updatable = false, insertable = false)
@@ -502,6 +508,14 @@ public abstract class Run
     this.qcUser = qcUser;
   }
 
+  public Date getQcDate() {
+    return qcDate;
+  }
+
+  public void setQcDate(Date qcDate) {
+    this.qcDate = qcDate;
+  }
+
   public Boolean getDataReview() {
     return dataReview;
   }
@@ -516,6 +530,14 @@ public abstract class Run
 
   public void setDataReviewer(User dataReviewer) {
     this.dataReviewer = dataReviewer;
+  }
+
+  public Date getDataReviewDate() {
+    return dataReviewDate;
+  }
+
+  public void setDataReviewDate(Date dataReviewDate) {
+    this.dataReviewDate = dataReviewDate;
   }
 
   public RunProjectView getRunProjectView() {

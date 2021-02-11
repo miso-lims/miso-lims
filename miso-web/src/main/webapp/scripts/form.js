@@ -222,6 +222,17 @@ FormUtils = (function($) {
       };
     },
 
+    makeQcDateField: function() {
+      return {
+        title: 'QC Date',
+        data: 'qcDate',
+        type: 'read-only',
+        getDisplayValue: function(data) {
+          return data.qcDate || 'n/a';
+        }
+      }
+    },
+
     makeDetailedQcStatusFields: function() {
       return [{
         title: 'QC Status',
@@ -255,7 +266,7 @@ FormUtils = (function($) {
         data: 'detailedQcStatusNote',
         type: 'text',
         maxLength: 500
-      }, FormUtils.makeQcUserField()];
+      }, FormUtils.makeQcUserField(), FormUtils.makeQcDateField()];
     },
 
     makeUnitsField: function(object, unitType) {

@@ -53,6 +53,7 @@ public class LibraryDto extends AbstractBoxableDto implements ReceivableDto<Libr
   private Long detailedQcStatusId;
   private String detailedQcStatusNote;
   private String qcUserName;
+  private String qcDate;
   private Long index1Id;
   private Long index2Id;
   private String index1Label;
@@ -584,6 +585,14 @@ public class LibraryDto extends AbstractBoxableDto implements ReceivableDto<Libr
 
   public void setQcUserName(String qcUserName) {
     this.qcUserName = qcUserName;
+  }
+
+  public String getQcDate() {
+    return qcDate;
+  }
+
+  public void setQcDate(String qcDate) {
+    this.qcDate = qcDate;
   }
 
   @Override

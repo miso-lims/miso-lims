@@ -162,6 +162,9 @@ public class LibraryAliquot extends AbstractBoxable
   @JoinColumn(name = "qcUser")
   private User qcUser;
 
+  @Temporal(TemporalType.DATE)
+  private Date qcDate;
+
   @OneToMany(targetEntity = LibraryAliquotChangeLog.class, mappedBy = "libraryAliquot", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
@@ -466,6 +469,16 @@ public class LibraryAliquot extends AbstractBoxable
   @Override
   public void setQcUser(User qcUser) {
     this.qcUser = qcUser;
+  }
+
+  @Override
+  public Date getQcDate() {
+    return qcDate;
+  }
+
+  @Override
+  public void setQcDate(Date qcDate) {
+    this.qcDate = qcDate;
   }
 
   @Override

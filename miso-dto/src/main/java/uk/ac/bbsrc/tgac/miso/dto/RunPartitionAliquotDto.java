@@ -3,20 +3,21 @@ package uk.ac.bbsrc.tgac.miso.dto;
 public class RunPartitionAliquotDto {
 
   // This ID is only for the sake of DataTables selection and doesn't relate to anything in the DB
-  public Long id;
-  public Long runId;
-  public String platformType;
-  public Long containerId;
-  public String containerIdentificationBarcode;
-  public Long partitionId;
-  public Integer partitionNumber;
-  public Long aliquotId;
-  public String aliquotName;
-  public String aliquotAlias;
-  public Long runPurposeId;
-  public Boolean qcPassed;
-  public String qcNote;
-  public String qcUserName;
+  private Long id;
+  private Long runId;
+  private String platformType;
+  private Long containerId;
+  private String containerIdentificationBarcode;
+  private Long partitionId;
+  private Integer partitionNumber;
+  private Long aliquotId;
+  private String aliquotName;
+  private String aliquotAlias;
+  private Long runPurposeId;
+  private Boolean qcPassed;
+  private String qcNote;
+  private String qcUserName;
+  private String qcDate;
 
   public Long getId() {
     return id;
@@ -128,6 +129,14 @@ public class RunPartitionAliquotDto {
 
   public void setQcUserName(String qcUserName) {
     this.qcUserName = qcUserName;
+  }
+
+  public String getQcDate() {
+    return qcDate;
+  }
+
+  public void setQcDate(String qcDate) {
+    this.qcDate = qcDate;
   }
 
 }

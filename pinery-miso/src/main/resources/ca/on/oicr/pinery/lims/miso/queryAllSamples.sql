@@ -39,6 +39,7 @@ SELECT s.alias NAME
         ,NULL umis
         ,qpd.status qcPassed
         ,qpd.description detailedQcStatus
+        ,s.qcDate qcDate
         ,box.locationBarcode boxLocation
         ,box.alias boxAlias
         ,pos.position boxPosition
@@ -169,6 +170,7 @@ SELECT l.alias NAME
         ,l.umis
         ,qpd.status qcPassed
         ,qpd.description detailedQcStatus
+        ,l.qcDate qcDate
         ,box.locationBarcode boxLocation 
         ,box.alias boxAlias 
         ,pos.position boxPosition 
@@ -312,6 +314,7 @@ SELECT d.alias name
         ,NULL umis
         ,qpd.status qcPassed
         ,qpd.description detailedQcStatus
+        ,d.qcDate qcDate
         ,box.locationBarcode boxLocation 
         ,box.alias boxAlias 
         ,pos.position boxPosition 
