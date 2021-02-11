@@ -20,7 +20,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
 
 public enum SampleSheet {
   BCL2FASTQ("BCL2FASTQ") {
@@ -54,7 +54,7 @@ public enum SampleSheet {
 
     @Override
     protected Stream<String> makeColumns(boolean needsSuffix, InstrumentModel model, int partitionNumber, String partitionBarcode,
-        PoolableElementView aliquot,
+        ListLibaryAliquotView aliquot,
         List<String> index,
         String userName) {
       final Optional<Index> firstIndex = aliquot.getIndices().stream().filter(i -> i.getPosition() == 1).findFirst();
@@ -92,13 +92,13 @@ public enum SampleSheet {
 
     @Override
     protected Stream<String> makeColumns(boolean suffixNeeded, InstrumentModel model, int partitionNumber, String partitionBarcode,
-        PoolableElementView aliquot,
+        ListLibaryAliquotView aliquot,
         List<String> index,
         String userName) {
       return Stream.of(partitionBarcode, //
           Integer.toString(partitionNumber), //
           String.format("%s_%s%s", aliquot.getLibraryName(), //
-              aliquot.getAliquotName(), suffixNeeded ? ("_" + String.join("_", index)) : ""), //
+              aliquot.getName(), suffixNeeded ? ("_" + String.join("_", index)) : ""), //
 
           aliquot.getSampleAlias().replaceAll("\\s", ""), //
           String.join("-", index), //
@@ -132,7 +132,7 @@ public enum SampleSheet {
 
     @Override
     protected Stream<String> makeColumns(boolean suffixNeeded, InstrumentModel model, int partitionNumber, String partitionBarcode,
-        PoolableElementView aliquot,
+        ListLibaryAliquotView aliquot,
         List<String> index,
         String userName) {
       return Stream.concat(
@@ -163,10 +163,10 @@ public enum SampleSheet {
 
     @Override
     protected Stream<String> makeColumns(boolean suffixNeeded, InstrumentModel model, int partitionNumber, String partitionBarcode,
-        PoolableElementView aliquot, List<String> index,
+        ListLibaryAliquotView aliquot, List<String> index,
         String userName) {
       return Stream.of(Integer.toString(partitionNumber), //
-          aliquot.getAliquotName(), //
+          aliquot.getName(), //
           aliquot.getLibraryAlias(), //
           String.join(",", index), //
           aliquot.getProjectShortName());
@@ -174,7 +174,7 @@ public enum SampleSheet {
 
     @Override
     protected Stream<String> flattenRows(InstrumentModel model, int partitionNumber, String partitionBarcode,
-        PoolableElementView aliquot,
+        ListLibaryAliquotView aliquot,
         String userName) {
       return Stream.of(makeColumns(false, model, partitionNumber, partitionBarcode, aliquot,
           aliquot.getIndices().stream().map(Index::getSequence).collect(Collectors.toList()), userName).collect(Collectors.joining(",")));
@@ -245,7 +245,7 @@ public enum SampleSheet {
 
   private Stream<String> createRowsForPartition(Run run, User user, List<String> columns, Partition partition) {
     return partition.getPool().getPoolContents().stream()//
-        .map(PoolElement::getPoolableElementView)
+        .map(PoolElement::getAliquot)
         .flatMap(aliquot -> flattenRows(run.getSequencer().getInstrumentModel(), partition.getPartitionNumber(),
             partition.getSequencerPartitionContainer().getIdentificationBarcode(), aliquot, user.getLoginName()));
   }
@@ -262,7 +262,7 @@ public enum SampleSheet {
   }
 
   protected Stream<String> flattenRows(InstrumentModel model, int partitionNumber, String partitionBarcode,
-      PoolableElementView aliquot,
+      ListLibaryAliquotView aliquot,
       String userName) {
     Set<Integer> positions = aliquot.getIndices().stream().map(Index::getPosition).collect(Collectors.toCollection(TreeSet::new));
     if (positions.isEmpty()) {
@@ -302,6 +302,6 @@ public enum SampleSheet {
   protected abstract String header(InstrumentModel model);
 
   protected abstract Stream<String> makeColumns(boolean suffixNeeded, InstrumentModel model, int partitionNumber, String partitionBarcode,
-      PoolableElementView aliquot, List<String> index,
+      ListLibaryAliquotView aliquot, List<String> index,
       String userName);
 }

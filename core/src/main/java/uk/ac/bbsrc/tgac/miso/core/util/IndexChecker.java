@@ -22,7 +22,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolViewElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
 
 @Component
 public class IndexChecker {
@@ -156,8 +156,8 @@ public class IndexChecker {
   }
 
   private static List<List<Index>> getIndexSequences(Pool pool) {
-    return pool.getPoolContents().stream().map(PoolElement::getPoolableElementView)
-        .map(PoolableElementView::getIndices)
+    return pool.getPoolContents().stream().map(PoolElement::getAliquot)
+        .map(ListLibaryAliquotView::getIndices)
         .collect(Collectors.toList());
   }
 

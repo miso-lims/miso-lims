@@ -193,16 +193,20 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BarcodableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.GrandparentSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListContainerRunSequencerView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListContainerRunView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListContainerView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolViewElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListWorksetView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentIdentityAttributes;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentTissueAttributes;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SequencingOrderSummaryView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.QcNode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.QcNodeType;
@@ -589,6 +593,41 @@ public class Dtos {
         to.setEffectiveQcFailureLevel(((DetailedSample) failure).getSampleClass().getSampleCategory());
       } else {
         to.setEffectiveQcFailureLevel(failure.getEntityType().getLabel());
+      }
+    }
+  }
+
+  private static void setEffectiveQcFailure(ListLibaryAliquotView from, UpstreamQcFailableDto to) {
+    for (ParentAliquot parent = from.getParentAliquot(); parent != null; parent = parent.getParentAliquot()) {
+      if (parent.getDetailedQcStatus() != null && Boolean.FALSE.equals(parent.getDetailedQcStatus().getStatus())) {
+        to.setEffectiveQcFailureId(parent.getDetailedQcStatus().getId());
+        to.setEffectiveQcFailureLevel(EntityType.LIBRARY_ALIQUOT.getLabel());
+        return;
+      }
+    }
+    ParentLibrary lib = from.getParentLibrary();
+    if (lib != null) {
+      if (lib.getDetailedQcStatus() != null && Boolean.FALSE.equals(lib.getDetailedQcStatus().getStatus())) {
+        to.setEffectiveQcFailureId(lib.getDetailedQcStatus().getId());
+        to.setEffectiveQcFailureLevel(EntityType.LIBRARY.getLabel());
+        return;
+      }
+      ParentSample sam = lib.getParentSample();
+      if (sam != null) {
+        if (sam.getDetailedQcStatus() != null && Boolean.FALSE.equals(sam.getDetailedQcStatus().getStatus())) {
+          to.setEffectiveQcFailureId(sam.getDetailedQcStatus().getId());
+          to.setEffectiveQcFailureLevel(
+              sam.getParentSampleClass() == null ? EntityType.SAMPLE.getLabel() : sam.getParentSampleClass().getSampleCategory());
+          return;
+        }
+        for (GrandparentSample parent = sam.getParentSample(); parent != null; parent = parent.getParentSample()) {
+          if (sam.getDetailedQcStatus() != null && Boolean.FALSE.equals(sam.getDetailedQcStatus().getStatus())) {
+            to.setEffectiveQcFailureId(parent.getDetailedQcStatus().getId());
+            to.setEffectiveQcFailureLevel(
+                parent.getParentSampleClass() == null ? EntityType.SAMPLE.getLabel() : parent.getParentSampleClass().getSampleCategory());
+            return;
+          }
+        }
       }
     }
   }
@@ -1675,23 +1714,22 @@ public class Dtos {
     return dto;
   }
 
-  public static LibraryAliquotDto asDto(@Nonnull PoolableElementView from) {
+  public static LibraryAliquotDto asDto(@Nonnull ListLibaryAliquotView from) {
     LibraryAliquotDto dto = null;
-    if (isDetailedSample(from.getSample())) {
+    if (from.getParentAttributes() != null) { // indicates detailed sample
       DetailedLibraryAliquotDto detailedDto = new DetailedLibraryAliquotDto();
-      setId(detailedDto::setLibraryDesignCodeId, from.getAliquotDesignCode());
-      DetailedSample detailed = (DetailedSample) from.getSample();
-      if (detailed.getSubproject() != null) {
-        detailedDto.setSubprojectAlias(detailed.getSubproject().getAlias());
-        detailedDto.setSubprojectPriority(detailed.getSubproject().getPriority());
+      setId(detailedDto::setLibraryDesignCodeId, from.getDesignCode());
+      if (from.getSubprojectId() != null) {
+        detailedDto.setSubprojectAlias(from.getSubprojectAlias());
+        detailedDto.setSubprojectPriority(from.getSubprojectPriority());
       }
-      if (detailed.getIdentityAttributes() != null) {
-        ParentIdentityAttributes identity = detailed.getIdentityAttributes();
+      if (from.getIdentityAttributes() != null) {
+        ParentIdentityAttributes identity = from.getIdentityAttributes();
         setString(detailedDto::setIdentityConsentLevel, maybeGetProperty(identity.getConsentLevel(), ConsentLevel::getLabel));
         setString(detailedDto::setEffectiveExternalNames, identity.getExternalName());
       }
-      if (detailed.getTissueAttributes() != null) {
-        ParentTissueAttributes tissue = detailed.getTissueAttributes();
+      if (from.getTissueAttributes() != null) {
+        ParentTissueAttributes tissue = from.getTissueAttributes();
         setString(detailedDto::setEffectiveTissueOriginLabel, maybeGetProperty(tissue.getTissueOrigin(), TissueOrigin::getAlias));
         setString(detailedDto::setEffectiveTissueTypeLabel, maybeGetProperty(tissue.getTissueType(), TissueType::getAlias));
       }
@@ -1699,12 +1737,12 @@ public class Dtos {
     } else {
       dto = new LibraryAliquotDto();
     }
-    dto.setId(from.getAliquotId());
-    dto.setName(from.getAliquotName());
-    setString(dto::setAlias, from.getAliquotAlias());
+    dto.setId(from.getId());
+    dto.setName(from.getName());
+    setString(dto::setAlias, from.getAlias());
     setString(dto::setCreatorName, maybeGetProperty(from.getCreator(), User::getFullName));
-    setString(dto::setConcentration, from.getAliquotConcentration());
-    dto.setConcentrationUnits(from.getAliquotConcentrationUnits());
+    setString(dto::setConcentration, from.getConcentration());
+    dto.setConcentrationUnits(from.getConcentrationUnits());
     dto.setLastModified(formatDateTime(from.getLastModified()));
     dto.setCreationDate(formatDate(from.getCreated()));
     dto.setIdentificationBarcode(from.getAliquotBarcode());
@@ -1714,11 +1752,11 @@ public class Dtos {
     dto.setIndexLabels(from.getIndices().stream().sorted(Comparator.comparingInt(Index::getPosition)).map(Index::getLabel)
         .collect(Collectors.toList()));
     dto.setTargetedSequencingId(from.getTargetedSequencingId());
-    setInteger(dto::setDnaSize, from.getAliquotDnaSize(), true);
+    setInteger(dto::setDnaSize, from.getDnaSize(), true);
     setString(dto::setVolume, from.getAliquotVolume());
     dto.setVolumeUnits(from.getAliquotVolumeUnits());
-    setString(dto::setNgUsed, from.getAliquotNgUsed());
-    setString(dto::setVolumeUsed, from.getAliquotVolumeUsed());
+    setString(dto::setNgUsed, from.getNgUsed());
+    setString(dto::setVolumeUsed, from.getVolumeUsed());
 
     dto.setLibraryId(from.getLibraryId());
     dto.setLibraryName(from.getLibraryName());
@@ -1734,14 +1772,12 @@ public class Dtos {
     setString(dto::setQcUserName, maybeGetProperty(from.getQcUser(), User::getFullName));
     setDateString(dto::setQcDate, from.getQcDate());
 
-    if (from.getAliquot() != null) {
-      List<Long> parentAliquotIds = new ArrayList<>();
-      for (LibraryAliquot parent = from.getAliquot(); parent != null; parent = parent.getParentAliquot()) {
-        parentAliquotIds.add(parent.getId());
-      }
-      dto.setParentAliquotIds(parentAliquotIds);
+    List<Long> parentAliquotIds = new ArrayList<>();
+    for (ParentAliquot parent = from.getParentAliquot(); parent != null; parent = parent.getParentAliquot()) {
+      parentAliquotIds.add(parent.getId());
     }
-    setEffectiveQcFailure(from.getAliquot(), dto);
+    dto.setParentAliquotIds(parentAliquotIds);
+    setEffectiveQcFailure(from, dto);
 
     return dto;
   }
@@ -1809,8 +1845,8 @@ public class Dtos {
     dto.setLastModified(formatDateTime(from.getLastModified()));
     dto.setLibraryAliquotCount(from.getPoolContents().size());
     from.getPoolContents().stream()//
-        .map(PoolElement::getPoolableElementView)//
-        .map(PoolableElementView::getAliquotDnaSize)//
+        .map(PoolElement::getAliquot)//
+        .map(ListLibaryAliquotView::getDnaSize)//
         .filter(Objects::nonNull)//
         .mapToDouble(Integer::doubleValue)//
         .average()//
@@ -1819,7 +1855,7 @@ public class Dtos {
     if (includeContents) {
       Set<LibraryAliquotDto> pooledElements = new HashSet<>();
       for (PoolElement element : from.getPoolContents()) {
-        LibraryAliquotDto ldi = asDto(element.getPoolableElementView());
+        LibraryAliquotDto ldi = asDto(element.getAliquot());
         ldi.setProportion(element.getProportion());
         pooledElements.add(ldi);
       }
@@ -2782,10 +2818,10 @@ public class Dtos {
     setObject(to::setPlatformType, dto.getPlatformType(), pt -> PlatformType.valueOf(pt));
     if (dto.getPooledElements() != null) {
       to.setPoolElements(dto.getPooledElements().stream().map(aliquot -> {
-        PoolableElementView view = new PoolableElementView();
-        view.setAliquotId(aliquot.getId());
-        view.setAliquotName(aliquot.getName());
-        setBigDecimal(view::setAliquotVolumeUsed, aliquot.getVolumeUsed());
+        ListLibaryAliquotView view = new ListLibaryAliquotView();
+        view.setId(aliquot.getId());
+        view.setName(aliquot.getName());
+        setBigDecimal(view::setVolumeUsed, aliquot.getVolumeUsed());
         PoolElement link = new PoolElement(to, view);
         if (aliquot.getProportion() != null) {
           link.setProportion(aliquot.getProportion());

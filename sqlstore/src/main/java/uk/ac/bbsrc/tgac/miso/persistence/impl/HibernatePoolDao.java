@@ -118,8 +118,9 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
     @SuppressWarnings("unchecked")
     List<Pool> results = currentSession().createCriteria(PoolImpl.class)
         .createAlias("poolElements", "element")
-        .createAlias("element.poolableElementView", "view")
-        .add(Restrictions.eq("view.libraryId", libraryId))
+        .createAlias("element.aliquot", "aliquot")
+        .createAlias("aliquot.parentLibrary", "library")
+        .add(Restrictions.eq("library.id", libraryId))
         .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
         .list();
     return results;
@@ -130,28 +131,33 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
     @SuppressWarnings("unchecked")
     List<Pool> results = currentSession().createCriteria(PoolImpl.class)
         .createAlias("poolElements", "element")
-        .createAlias("element.poolableElementView", "view")
-        .add(Restrictions.eq("view.aliquotId", aliquotId))
+        .createAlias("element.aliquot", "aliquot")
+        .add(Restrictions.eq("aliquot.id", aliquotId))
         .list();
     return results;
   }
 
   @Override
   public List<Pool> listByProjectId(long projectId) throws IOException {
-    Criteria idCriteria = currentSession().createCriteria(PoolImpl.class, "p");
-    idCriteria.createAlias("p.poolElements", "poolElement");
-    idCriteria.createAlias("poolElement.poolableElementView", "aliquot");
-    idCriteria.add(Restrictions.eq("aliquot.projectId", projectId));
-    idCriteria.setProjection(Projections.distinct(Projections.property("p.id")));
     @SuppressWarnings("unchecked")
-    List<Long> ids = idCriteria.list();
+    List<Long> ids = currentSession().createCriteria(PoolImpl.class, "p")
+        .createAlias("p.poolElements", "poolElement")
+        .createAlias("poolElement.aliquot", "aliquot")
+        .createAlias("aliquot.parentLibrary", "library")
+        .createAlias("library.parentSample", "sample")
+        .createAlias("sample.parentProject", "project")
+        .add(Restrictions.eq("project.id", projectId))
+        .setProjection(Projections.distinct(Projections.property("p.id")))
+        .list();
     if (ids.isEmpty()) {
       return Collections.emptyList();
     }
-    Criteria criteria = currentSession().createCriteria(PoolImpl.class);
-    criteria.add(Restrictions.in("id", ids));
+
     @SuppressWarnings("unchecked")
-    List<Pool> pools = criteria.list();
+    List<Pool> pools = currentSession().createCriteria(PoolImpl.class)
+        .add(Restrictions.in("id", ids))
+        .list();
+
     return pools;
   }
 
@@ -199,7 +205,7 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
 
   @Override
   public String getProjectColumn() {
-    return "aliquot.projectId";
+    return "project.id";
   }
 
   @Override
@@ -216,8 +222,12 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
 
   @Override
   public void restrictPaginationByProjectId(Criteria criteria, long projectId, Consumer<String> errorHandler) {
-    criteria.createAlias("poolElements", "poolElement");
-    criteria.createAlias("poolElement.poolableElementView", "aliquot");
+    criteria.createAlias("poolElements", "poolElement")
+        .createAlias("poolElement.aliquot", "aliquot")
+        .createAlias("aliquot.parentLibrary", "library")
+        .createAlias("library.parentSample", "sample")
+        .createAlias("sample.parentProject", "project");
+
     HibernatePaginatedBoxableSource.super.restrictPaginationByProjectId(criteria, projectId, errorHandler);
   }
 
@@ -253,8 +263,9 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   @Override
   public void restrictPaginationByIndex(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
     criteria.createAlias("poolElements", "poolElement")
-        .createAlias("poolElement.poolableElementView", "aliquotForIndex")
-        .createAlias("aliquotForIndex.indices", "indices")
+        .createAlias("poolElement.aliquot", "aliquot")
+        .createAlias("aliquot.parentLibrary", "library")
+        .createAlias("library.indices", "indices")
         .add(DbUtils.textRestriction(query, "indices.name", "indices.sequence"));
   }
 

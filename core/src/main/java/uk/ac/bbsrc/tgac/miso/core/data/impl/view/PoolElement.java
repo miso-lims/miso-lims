@@ -23,7 +23,7 @@ public class PoolElement implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Pool pool;
-    private PoolableElementView poolableElementView;
+    private ListLibaryAliquotView aliquot;
 
     public Pool getPool() {
       return pool;
@@ -33,12 +33,12 @@ public class PoolElement implements Serializable {
       this.pool = pool;
     }
 
-    public PoolableElementView getPoolableElementView() {
-      return poolableElementView;
+    public ListLibaryAliquotView getAliquot() {
+      return aliquot;
     }
 
-    public void setPoolableElementView(PoolableElementView poolableElementView) {
-      this.poolableElementView = poolableElementView;
+    public void setAliquot(ListLibaryAliquotView aliquot) {
+      this.aliquot = aliquot;
     }
 
     @Override
@@ -46,7 +46,7 @@ public class PoolElement implements Serializable {
       final int prime = 31;
       int result = 1;
       result = prime * result + ((pool == null) ? 0 : pool.hashCode());
-      result = prime * result + ((poolableElementView == null) ? 0 : poolableElementView.hashCode());
+      result = prime * result + ((aliquot == null) ? 0 : aliquot.hashCode());
       return result;
     }
 
@@ -59,9 +59,9 @@ public class PoolElement implements Serializable {
       if (pool == null) {
         if (other.pool != null) return false;
       } else if (!pool.equals(other.pool)) return false;
-      if (poolableElementView == null) {
-        if (other.poolableElementView != null) return false;
-      } else if (!poolableElementView.equals(other.poolableElementView)) return false;
+      if (aliquot == null) {
+        if (other.aliquot != null) return false;
+      } else if (!aliquot.equals(other.aliquot)) return false;
       return true;
     }
 
@@ -77,7 +77,7 @@ public class PoolElement implements Serializable {
   @Id
   @ManyToOne
   @JoinColumn(name = "aliquotId")
-  private PoolableElementView poolableElementView;
+  private ListLibaryAliquotView aliquot;
 
   private int proportion = 1;
 
@@ -85,13 +85,13 @@ public class PoolElement implements Serializable {
     // Default constructor
   }
 
-  public PoolElement(Pool pool, PoolableElementView poolableElementView) {
+  public PoolElement(Pool pool, ListLibaryAliquotView aliquot) {
     this.pool = pool;
-    this.poolableElementView = poolableElementView;
+    this.aliquot = aliquot;
   }
 
-  public PoolElement(Pool pool, PoolableElementView poolableElementView, int proportion) {
-    this(pool, poolableElementView);
+  public PoolElement(Pool pool, ListLibaryAliquotView aliquot, int proportion) {
+    this(pool, aliquot);
     this.proportion = proportion;
   }
 
@@ -103,12 +103,12 @@ public class PoolElement implements Serializable {
     this.pool = pool;
   }
 
-  public PoolableElementView getPoolableElementView() {
-    return poolableElementView;
+  public ListLibaryAliquotView getAliquot() {
+    return aliquot;
   }
 
-  public void setPoolableElementView(PoolableElementView poolableElementView) {
-    this.poolableElementView = poolableElementView;
+  public void setAliquot(ListLibaryAliquotView aliquot) {
+    this.aliquot = aliquot;
   }
 
   public int getProportion() {

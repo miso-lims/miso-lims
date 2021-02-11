@@ -8,11 +8,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
@@ -29,20 +27,20 @@ import com.eaglegenomics.simlims.core.Note;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BarcodableReferenceService;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
+import uk.ac.bbsrc.tgac.miso.core.service.ListLibraryAliquotViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
-import uk.ac.bbsrc.tgac.miso.core.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
@@ -81,7 +79,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   @Autowired
   private BoxService boxService;
   @Autowired
-  private PoolableElementViewService poolableElementViewService;
+  private ListLibraryAliquotViewService listLibraryAliquotViewService;
   @Autowired
   private SequencingOrderService sequencingOrderService;
   @Autowired
@@ -119,8 +117,8 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     this.boxService = boxService;
   }
 
-  public void setPoolableElementViewService(PoolableElementViewService poolableElementViewService) {
-    this.poolableElementViewService = poolableElementViewService;
+  public void setListLibraryAliquotViewService(ListLibraryAliquotViewService listLibraryAliquotViewService) {
+    this.listLibraryAliquotViewService = listLibraryAliquotViewService;
   }
 
   public void setFileAttachmentService(FileAttachmentService fileAttachmentService) {
@@ -270,7 +268,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   private void refreshPoolElements(Pool pool) throws IOException {
     for (PoolElement element : pool.getPoolContents()) {
       element.setPool(pool);
-      element.setPoolableElementView(poolableElementViewService.get(element.getPoolableElementView().getAliquotId()));
+      element.setAliquot(listLibraryAliquotViewService.get(element.getAliquot().getId()));
     }
   }
 
@@ -298,25 +296,23 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
 
   @Override
   public List<ValidationError> getMismatchesWithOrders(Pool pool, List<PoolOrder> poolOrders) throws IOException {
-    Set<LibraryAliquot> poolAliquots = new HashSet<>();
-    Map<LibraryAliquot, String> poolOrderAliquots = new HashMap<>();
+    Set<Long> poolAliquotIds = new HashSet<>();
     List<ValidationError> errors = new LinkedList<>();
 
     for(PoolElement pe: pool.getPoolContents()){
-      poolAliquots.add(pe.getPoolableElementView().getAliquot());
+      poolAliquotIds.add(pe.getAliquot().getId());
+      for (ParentAliquot parent = pe.getAliquot().getParentAliquot(); parent != null; parent = parent.getParentAliquot()) {
+        poolAliquotIds.add(parent.getId());
+      }
     }
 
-    for(OrderLibraryAliquot ola: poolOrders.stream().flatMap(poolOrder -> poolOrder.getOrderLibraryAliquots().stream()).collect(Collectors.toSet())){
-      poolOrderAliquots.put(ola.getAliquot(), ola.getPoolOrder().getAlias());
-    }
-
-    for(Map.Entry<LibraryAliquot, String> e: poolOrderAliquots.entrySet()){
-      if(!poolAliquots.contains(e.getKey())) {
-        String errorMessage = "Pool needs to contain library aliquot ";
-        errorMessage += e.getKey().getAlias();
-        errorMessage += " as specified by pool order ";
-        errorMessage += e.getValue();
-        errors.add(new ValidationError("poolElements", errorMessage));
+    for (PoolOrder order : poolOrders) {
+      for (OrderLibraryAliquot orderAliquot : order.getOrderLibraryAliquots()) {
+        if (!poolAliquotIds.contains(orderAliquot.getAliquot().getId())) {
+          String errorMessage = String.format("Pool must contain library aliquot '%s', as specified by pool order '%s'",
+              orderAliquot.getAliquot().getAlias(), order.getAlias());
+          errors.add(new ValidationError("poolElements", errorMessage));
+        }
       }
     }
     return errors;
@@ -355,7 +351,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
         .filter(notInOther(targetAliquots))
         .collect(Collectors.toSet());
     for (PoolElement sourcePd : additions) {
-      PoolableElementView v = poolableElementViewService.get(sourcePd.getPoolableElementView().getAliquotId());
+      ListLibaryAliquotView v = listLibraryAliquotViewService.get(sourcePd.getAliquot().getId());
       if (v == null) {
         throw new IllegalStateException("Pool contains an unsaved library aliquot");
       }
@@ -363,7 +359,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     }
     for (PoolElement targetPd : targetAliquots) {
       PoolElement sourcePd = source.stream()
-          .filter(spd -> spd.getPoolableElementView().getAliquotId() == targetPd.getPoolableElementView().getAliquotId())
+          .filter(spd -> spd.getAliquot().getId() == targetPd.getAliquot().getId())
           .findFirst().orElse(null);
       if (sourcePd != null) {
         targetPd.setProportion(sourcePd.getProportion());
@@ -373,16 +369,16 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
 
   private Predicate<PoolElement> notInOther(Collection<PoolElement> otherCollection) {
     return t -> otherCollection.stream()
-        .noneMatch(other -> other.getPoolableElementView().getAliquotId() == t.getPoolableElementView().getAliquotId());
+        .noneMatch(other -> other.getAliquot().getId() == t.getAliquot().getId());
   }
 
   private void loadPoolElements(Pool source, Pool target) throws IOException {
-    Set<PoolableElementView> removals = target.getPoolContents().stream()
+    Set<ListLibaryAliquotView> removals = target.getPoolContents().stream()
         .filter(notInOther(source.getPoolContents()))
-        .map(PoolElement::getPoolableElementView)
+        .map(PoolElement::getAliquot)
         .collect(Collectors.toSet());
-    for (PoolableElementView aliquot : removals) {
-      runPartitionAliquotService.deleteForPoolAliquot(target, aliquot.getAliquotId());
+    for (ListLibaryAliquotView aliquot : removals) {
+      runPartitionAliquotService.deleteForPoolAliquot(target, aliquot.getId());
     }
     loadPoolElements(source.getPoolContents(), target);
   }
@@ -390,7 +386,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   private Set<String> extractAliquotNames(Set<PoolElement> elements) {
     Set<String> original = new HashSet<>();
     for (PoolElement element : elements) {
-      original.add(element.getPoolableElementView().getAliquotName());
+      original.add(element.getAliquot().getName());
     }
     return original;
   }

@@ -10,22 +10,23 @@ public class AliasDescriptor {
 
   private final JoinType joinType;
 
-  public AliasDescriptor(String alias) {
-    this.associationPath = alias;
-    this.alias = alias;
-    this.joinType = JoinType.INNER_JOIN;
+  private static String getLastPart(String associationPath) {
+    String[] parts = associationPath.split("\\.");
+    return parts[parts.length - 1];
   }
 
-  public AliasDescriptor(String alias, JoinType joinType) {
-    this.associationPath = alias;
-    this.alias = alias;
+  public AliasDescriptor(String associationPath) {
+    this(associationPath, JoinType.INNER_JOIN);
+  }
+
+  public AliasDescriptor(String associationPath, JoinType joinType) {
+    this.associationPath = associationPath;
+    this.alias = getLastPart(associationPath);
     this.joinType = joinType;
   }
 
   public AliasDescriptor(String associationPath, String alias) {
-    this.associationPath = associationPath;
-    this.alias = alias;
-    this.joinType = JoinType.INNER_JOIN;
+    this(associationPath, alias, JoinType.INNER_JOIN);
   }
 
   public AliasDescriptor(String associationPath, String alias, JoinType joinType) {

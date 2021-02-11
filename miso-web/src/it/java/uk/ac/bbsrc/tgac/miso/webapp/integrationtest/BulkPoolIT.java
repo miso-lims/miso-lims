@@ -417,7 +417,7 @@ public class BulkPoolIT extends AbstractIT {
     assertPoolAttributes(row0, saved0);
     assertEquals(2, saved0.getPoolContents().size());
     List<Long> pool0AliquotIds = saved0.getPoolContents().stream()
-        .map(pd -> pd.getPoolableElementView().getAliquotId())
+        .map(pd -> pd.getAliquot().getId())
         .collect(Collectors.toList());
     assertTrue(pool0AliquotIds.contains(Long.valueOf(504L)));
     assertTrue(pool0AliquotIds.contains(Long.valueOf(505L)));
@@ -426,7 +426,7 @@ public class BulkPoolIT extends AbstractIT {
     assertPoolAttributes(row1, saved1);
     assertEquals(2, saved1.getPoolContents().size());
     List<Long> pool1AliquotIds = saved1.getPoolContents().stream()
-        .map(pd -> pd.getPoolableElementView().getAliquotId())
+        .map(pd -> pd.getAliquot().getId())
         .collect(Collectors.toList());
     assertTrue(pool1AliquotIds.contains(Long.valueOf(701L)));
     assertTrue(pool1AliquotIds.contains(Long.valueOf(702L)));
@@ -711,7 +711,7 @@ public class BulkPoolIT extends AbstractIT {
     Pool saved = (Pool) getSession().get(PoolImpl.class, savedId);
     assertPoolAttributes(changes, saved);
 
-    assertPoolableElementViews(saved, Lists.newArrayList(120001L, 200001L, 200002L), Lists.newArrayList(3, 2, 1));
+    assertLibraryAliquotViews(saved, Lists.newArrayList(120001L, 200001L, 200002L), Lists.newArrayList(3, 2, 1));
   }
 
   private static void assertPoolAttributes(Map<String, String> attributes, Pool pool) {
@@ -723,12 +723,12 @@ public class BulkPoolIT extends AbstractIT {
     assertEntityAttribute(Columns.QC_STATUS, attributes, pool, p -> TestUtils.qcPassedToString(p.getQcPassed()));
   }
 
-  private static void assertPoolableElementViews(Pool pool, List<Long> ids, List<Integer> proportions) {
+  private static void assertLibraryAliquotViews(Pool pool, List<Long> ids, List<Integer> proportions) {
     assertTrue("Incorrect number of pooled elements in pool", pool.getPoolContents().size() == ids.size());
     for (int i = 0; i < ids.size(); i++) {
       final Long id = ids.get(i);
       PoolElement poolElement = pool.getPoolContents().stream()
-          .filter(pd -> Long.valueOf(pd.getPoolableElementView().getAliquotId()).equals(id))
+          .filter(pd -> Long.valueOf(pd.getAliquot().getId()).equals(id))
           .findFirst().orElse(null);
       assertNotNull("Pool does not contain element with id " + id, poolElement);
       assertEquals("Saved PoolElement has incorrect proportion", proportions.get(i), Integer.valueOf(poolElement.getProportion()));

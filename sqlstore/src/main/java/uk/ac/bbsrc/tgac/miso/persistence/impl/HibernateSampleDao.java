@@ -34,6 +34,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
@@ -130,6 +131,19 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
     @SuppressWarnings("unchecked")
     List<Sample> records = criteria.list();
     return records;
+  }
+
+  @Override
+  public Sample getByLibraryAliquotId(long aliquotId) {
+    DetachedCriteria subquery = DetachedCriteria.forClass(LibraryAliquot.class)
+        .createAlias("library", "library")
+        .createAlias("library.sample", "sample")
+        .add(Restrictions.eq("id", aliquotId))
+        .setProjection(Projections.property("sample.sampleId"));
+
+    return (Sample) currentSession().createCriteria(SampleImpl.class)
+        .add(Property.forName("id").eq(subquery))
+        .uniqueResult();
   }
 
   @Override

@@ -71,7 +71,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferView;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
@@ -281,7 +281,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   @Override
   public boolean getHasLowQualityMembers() {
-    return poolElements.stream().map(PoolElement::getPoolableElementView).anyMatch(PoolableElementView::isLibraryLowQuality);
+    return poolElements.stream().map(PoolElement::getAliquot).anyMatch(ListLibaryAliquotView::isLibraryLowQuality);
   }
 
   @Override
@@ -361,7 +361,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   @Override
   public boolean hasLibrariesWithoutIndex() {
-    return getPoolContents().stream().map(PoolElement::getPoolableElementView).anyMatch(v -> v.getIndices().isEmpty());
+    return getPoolContents().stream().map(PoolElement::getAliquot).anyMatch(v -> v.getIndices().isEmpty());
   }
 
   @Override
@@ -515,7 +515,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Override
   public String getLongestIndex() {
     return LimsUtils.getLongestIndex(poolElements.stream()
-        .flatMap(element -> element.getPoolableElementView().getIndices().stream()));
+        .flatMap(element -> element.getAliquot().getIndices().stream()));
   }
 
   @Override
@@ -547,7 +547,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Override
   public Set<String> getPrioritySubprojectAliases() {
     return poolElements.stream()
-        .map(PoolElement::getPoolableElementView).filter(view -> view.getSubprojectPriority() != null && view.getSubprojectPriority())
+        .map(PoolElement::getAliquot).filter(view -> view.getSubprojectPriority() != null && view.getSubprojectPriority())
         .map(view -> view.getSubprojectAlias()).collect(Collectors.toSet());
   }
 

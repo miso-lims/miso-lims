@@ -2,13 +2,13 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -27,7 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
+import uk.ac.bbsrc.tgac.miso.core.util.ThrowingFunction;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 
@@ -38,7 +38,7 @@ public abstract class RelationFinder<M extends Identifiable> {
 
     public abstract D asDto(P model);
 
-    public abstract Stream<P> find(M model, Consumer<String> emitError);
+    public abstract Stream<P> find(M model, Consumer<String> emitError) throws IOException;
 
     private final String category;
 
@@ -50,9 +50,14 @@ public abstract class RelationFinder<M extends Identifiable> {
       this.category = category;
     }
 
-    public final HttpEntity<byte[]> handle(ObjectMapper mapper, Stream<M> items) throws JsonProcessingException {
+    public final HttpEntity<byte[]> handle(ObjectMapper mapper, Collection<M> items) throws IOException, JsonProcessingException {
       List<String> errors = new ArrayList<>();
-      List<D> relations = items.flatMap(item -> find(item, errors::add))//
+      
+      Stream<P> relationStream = Stream.empty();
+      for (M item : items) {
+        relationStream = Stream.concat(relationStream, find(item, errors::add));
+      }
+      List<D> relations = relationStream
           .filter(Objects::nonNull)//
           .collect(Collectors.groupingBy(Identifiable::getId)).values().stream()//
           .map(l -> l.get(0))//
@@ -69,16 +74,17 @@ public abstract class RelationFinder<M extends Identifiable> {
     return new ParentSampleAdapter<>(category, true, targetClass, Stream::of);
   }
   public static final class ParentSampleAdapter<M extends Identifiable> extends RelationAdapter<M, Sample, SampleDto> {
-    private final Function<M, Stream<Sample>> getSample;
+    private final ThrowingFunction<M, Stream<Sample>, IOException> getSample;
     private final Class<? extends DetailedSample> targetClass;
     private final boolean strict;
 
-    public ParentSampleAdapter(String category, Class<? extends DetailedSample> targetClass, Function<M, Stream<Sample>> getSample) {
+    public ParentSampleAdapter(String category, Class<? extends DetailedSample> targetClass,
+        ThrowingFunction<M, Stream<Sample>, IOException> getSample) {
       this(category, false, targetClass, getSample);
     }
 
     public ParentSampleAdapter(String category, boolean strict, Class<? extends DetailedSample> targetClass,
-        Function<M, Stream<Sample>> getSample) {
+        ThrowingFunction<M, Stream<Sample>, IOException> getSample) {
       super(category);
       this.strict = strict;
       this.targetClass = targetClass;
@@ -91,9 +97,11 @@ public abstract class RelationFinder<M extends Identifiable> {
     }
 
     @Override
-    public Stream<Sample> find(M model, Consumer<String> emitError) {
+    public Stream<Sample> find(M model, Consumer<String> emitError) throws IOException {
       return getSample.apply(model).flatMap(sample -> {
-        if (sample == null) return Stream.empty();
+        if (sample == null) {
+          return Stream.empty();
+        }
         if (sample instanceof DetailedSample) {
           if (!strict && targetClass.isInstance(sample)) {
             return Stream.of(sample);
@@ -123,12 +131,16 @@ public abstract class RelationFinder<M extends Identifiable> {
 
   protected abstract M fetch(long id) throws IOException;
 
-  public HttpEntity<byte[]> list(List<Long> ids, String category) throws JsonProcessingException {
+  public HttpEntity<byte[]> list(List<Long> ids, String category) throws IOException {
     RelationAdapter<M, ?, ?> adapter = adapters.get(category);
     if (adapter == null) {
       throw new RestException(String.format("No such category %s.", category), Status.NOT_FOUND);
     }
-    return adapter.handle(mapper, ids.stream().map(WhineyFunction.rethrow(this::fetch)));
+    List<M> items = new ArrayList<>();
+    for (Long id : ids) {
+      items.add(fetch(id));
+    }
+    return adapter.handle(mapper, items);
   }
 
   public static ChildrenSampleAdapter child(String category, Class<? extends DetailedSample> targetClass) {

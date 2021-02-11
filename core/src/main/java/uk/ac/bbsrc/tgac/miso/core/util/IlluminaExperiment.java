@@ -97,7 +97,7 @@ public enum IlluminaExperiment {
   private int getMaxLength(List<Pool> pools, int position) {
     return pools.stream()//
         .flatMap(pool -> pool.getPoolContents().stream())//
-        .flatMap(element -> element.getPoolableElementView().getIndices().stream())//
+        .flatMap(element -> element.getAliquot().getIndices().stream())//
         .filter(i -> i.getPosition() == position)//
         .flatMap(i -> i.getFamily().hasFakeSequence() ? i.getRealSequences().stream() : Stream.of(i.getSequence()))//
         .mapToInt(String::length)//
@@ -114,14 +114,14 @@ public enum IlluminaExperiment {
     header.put("Instrument Type", parameters.getInstrumentModel().getAlias().replace("Illumina ", ""));
     header.put("Index Adapters", pools.stream()//
         .flatMap(pool -> pool.getPoolContents().stream())//
-        .flatMap(element -> element.getPoolableElementView().getIndices().stream())//
+        .flatMap(element -> element.getAliquot().getIndices().stream())//
         .map(i -> i.getFamily().getName())//
         .distinct()//
         .sorted()//
         .collect(Collectors.joining("/")));
     if (pools.stream()//
         .flatMap(pool -> pool.getPoolContents().stream())
-        .flatMap(element -> element.getPoolableElementView().getIndices().stream())//
+        .flatMap(element -> element.getAliquot().getIndices().stream())//
         .anyMatch(index -> index.getPosition() == 2)) {
       header.put("Chemistry", "Amplicon");
     } else {
@@ -165,7 +165,7 @@ public enum IlluminaExperiment {
     output.append("GenomeFolder,Sample_Project,Description\n");
     for (int lane = 0; lane < pools.size(); lane++) {
       for (final PoolElement element : pools.get(lane).getPoolContents()) {
-        final List<Index> indices = element.getPoolableElementView().getIndices();
+        final List<Index> indices = element.getAliquot().getIndices();
         final List<Pair<Pair<String, String>, Pair<String, String>>> outputIndicies;
         if (indices.isEmpty()) {
           outputIndicies = Collections.singletonList(
@@ -186,7 +186,7 @@ public enum IlluminaExperiment {
         }
         int suffix = 0;
         for (final Pair<Pair<String, String>, Pair<String, String>> paddedIndices : outputIndicies) {
-          output.append(element.getPoolableElementView().getAliquotAlias());
+          output.append(element.getAliquot().getAlias());
           if (outputIndicies.size() > 1) {
             output.append("_").append(++suffix);
           }
@@ -210,10 +210,10 @@ public enum IlluminaExperiment {
           output.append(",")//
               .append(genomeFolder)//
               .append(",")//
-              .append(element.getPoolableElementView().getProjectShortName())//
+              .append(element.getAliquot().getProjectShortName())//
               .append(",");
-          if (element.getPoolableElementView().getAliquotBarcode() != null) {
-            escape(output, element.getPoolableElementView().getAliquotBarcode());
+          if (element.getAliquot().getAliquotBarcode() != null) {
+            escape(output, element.getAliquot().getAliquotBarcode());
           }
           output.append("\n");
         }

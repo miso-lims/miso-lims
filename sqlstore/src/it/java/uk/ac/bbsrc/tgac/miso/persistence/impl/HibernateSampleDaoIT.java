@@ -182,7 +182,13 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
     for (Sample sample : samples) {
       assertTrue("did not find id " + sample.getId(), Arrays.asList(7L, 11L).contains(sample.getId()));
     }
+  }
 
+  @Test
+  public void testGetByLibraryAliquotId() throws Exception {
+    Sample sample = dao.getByLibraryAliquotId(5L);
+    assertNotNull(sample);
+    assertEquals(5L, sample.getId());
   }
 
   @Test

@@ -33,14 +33,7 @@ public interface SampleService
 
   public Collection<Sample> listByProjectId(long projectId) throws IOException;
 
-  /**
-   * Throws AuthorizationException if user cannot read one of the requested samples
-   * 
-   * @param idList
-   * @return
-   * @throws IOException
-   */
-  public List<Sample> listByIdList(List<Long> idList) throws IOException;
+  public Sample getByLibraryAliquotId(long aliquotId) throws IOException;
 
   public Sample save(Sample sample) throws IOException;
 

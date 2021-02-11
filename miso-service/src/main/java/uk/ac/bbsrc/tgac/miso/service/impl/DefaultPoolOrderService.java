@@ -16,9 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -112,8 +112,11 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
         errors.add(new ValidationError("poolId", "Pool must be provided if a sequencing order is linked"));
       } else {
         for (OrderLibraryAliquot orderAli : object.getOrderLibraryAliquots()) {
-          if (object.getPool().getPoolContents().stream().map(PoolElement::getPoolableElementView).noneMatch(poolElement -> {
-            for (LibraryAliquot parent = poolElement.getAliquot(); parent != null; parent = parent.getParentAliquot()) {
+          if (object.getPool().getPoolContents().stream().map(PoolElement::getAliquot).noneMatch(poolElement -> {
+            if (poolElement.getId() == orderAli.getAliquot().getId()) {
+              return true;
+            }
+            for (ParentAliquot parent = poolElement.getParentAliquot(); parent != null; parent = parent.getParentAliquot()) {
               if (parent.getId() == orderAli.getAliquot().getId()) {
                 return true;
               }

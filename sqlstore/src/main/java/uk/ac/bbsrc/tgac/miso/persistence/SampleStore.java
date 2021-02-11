@@ -94,6 +94,8 @@ public interface SampleStore extends Store<Sample>, PaginatedDataSource<Sample> 
    */
   List<Sample> getByIdList(List<Long> idList) throws IOException;
 
+  Sample getByLibraryAliquotId(long aliquotId) throws IOException;
+
   List<Sample> list() throws IOException;
 
   Sample getSample(long id) throws IOException;

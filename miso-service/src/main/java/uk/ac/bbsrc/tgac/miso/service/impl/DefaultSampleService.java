@@ -1035,6 +1035,11 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   }
 
   @Override
+  public Sample getByLibraryAliquotId(long aliquotId) throws IOException {
+    return sampleStore.getByLibraryAliquotId(aliquotId);
+  }
+
+  @Override
   public void addNote(Sample sample, Note note) throws IOException {
     Sample managed = sampleStore.get(sample.getId());
     note.setCreationDate(new Date());

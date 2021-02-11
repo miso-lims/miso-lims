@@ -63,7 +63,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
@@ -492,8 +492,8 @@ public class RunRestController extends RestController {
         .flatMap(container -> container.getPartitions().stream())//
         .filter(partition -> partition.getPool() != null)//
         .flatMap(partition -> partition.getPool().getPoolContents().stream()//
-            .map(PoolElement::getPoolableElementView)//
-            .map(PoolableElementView::getLibraryId)//
+            .map(PoolElement::getAliquot)//
+            .map(ListLibaryAliquotView::getLibraryId)//
             .distinct()
             .map(libraryId -> new Pair<>(libraryId, partition)))//
         .collect(Collectors.groupingBy(Pair::getKey))//

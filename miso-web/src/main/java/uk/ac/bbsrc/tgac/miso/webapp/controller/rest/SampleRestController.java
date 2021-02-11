@@ -58,7 +58,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -372,7 +371,7 @@ public class SampleRestController extends RestController {
   @PostMapping(value = "/parents/{category}")
   @ResponseBody
   public HttpEntity<byte[]> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids)
-      throws JsonProcessingException {
+      throws IOException {
     return parentFinder.list(ids, category);
   }
 
@@ -458,7 +457,7 @@ public class SampleRestController extends RestController {
   @PostMapping(value = "/children/{category}")
   @ResponseBody
   public HttpEntity<byte[]> getChildren(@PathVariable("category") String category, @RequestBody List<Long> ids)
-      throws JsonProcessingException {
+      throws IOException {
     return childFinder.list(ids, category);
   }
 

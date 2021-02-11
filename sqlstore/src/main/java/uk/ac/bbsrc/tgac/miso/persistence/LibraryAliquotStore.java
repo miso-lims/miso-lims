@@ -47,6 +47,8 @@ public interface LibraryAliquotStore extends Store<LibraryAliquot>, PaginatedDat
 
   List<LibraryAliquot> listByIdList(List<Long> idList) throws IOException;
 
+  List<LibraryAliquot> listByPoolIds(Collection<Long> poolIds) throws IOException;
+
   /**
    * Get a LibraryAliquot by ID barcode
    *

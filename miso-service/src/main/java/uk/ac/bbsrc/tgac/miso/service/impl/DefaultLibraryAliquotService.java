@@ -6,6 +6,7 @@ import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
@@ -393,7 +394,11 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
   @Override
   public List<LibraryAliquot> listByIdList(List<Long> idList) throws IOException {
     return libraryAliquotDao.listByIdList(idList);
+  }
 
+  @Override
+  public List<LibraryAliquot> listByPoolIds(Collection<Long> poolIds) throws IOException {
+    return libraryAliquotDao.listByPoolIds(poolIds);
   }
 
   @Override

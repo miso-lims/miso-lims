@@ -246,11 +246,11 @@ public class EditPoolController {
         for (int i = 0; i < parentIds.size(); i++) {
           if (parentIds.get(i).equals(Long.valueOf(parent.getId()))) {
             for (PoolElement element : parent.getPoolContents()) {
-              masterIndexList.add(element.getPoolableElementView().getIndices());
-              LibraryAliquotDto existing = aliquotDtos.stream().filter(d -> d.getId().equals(element.getPoolableElementView().getAliquotId()))
+              masterIndexList.add(element.getAliquot().getIndices());
+              LibraryAliquotDto existing = aliquotDtos.stream().filter(d -> d.getId().equals(element.getAliquot().getId()))
                   .findFirst().orElse(null);
               if (existing == null) {
-                LibraryAliquotDto ldiDto = Dtos.asDto(element.getPoolableElementView());
+                LibraryAliquotDto ldiDto = Dtos.asDto(element.getAliquot());
                 ldiDto.setProportion(element.getProportion() * proportions.get(i));
                 aliquotDtos.add(ldiDto);
               } else {

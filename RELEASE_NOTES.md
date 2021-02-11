@@ -2,7 +2,7 @@
 
 Changes:
 
-
+* Performance improvements
 
 # 1.23.0
 

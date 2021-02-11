@@ -183,7 +183,7 @@ public class HibernateQcNodeDao implements QcNodeDao {
 
     DetachedCriteria subquery = DetachedCriteria.forClass(PoolImpl.class)
         .createAlias("poolElements", "element")
-        .createAlias("element.poolableElementView", "aliquot")
+        .createAlias("element.aliquot", "aliquot")
         .add(Restrictions.eq("aliquot.id", item.getId()))
         .setProjection(Projections.id());
 

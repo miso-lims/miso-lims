@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.service;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
@@ -19,7 +20,10 @@ public interface LibraryAliquotService extends PaginatedDataSource<LibraryAliquo
 
   public List<LibraryAliquot> listByLibraryId(Long libraryId) throws IOException;
 
+  @Override
   public List<LibraryAliquot> listByIdList(List<Long> idList) throws IOException;
+
+  public List<LibraryAliquot> listByPoolIds(Collection<Long> poolIds) throws IOException;
 
   public List<LibraryAliquot> list() throws IOException;
 

@@ -20,22 +20,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
-import uk.ac.bbsrc.tgac.miso.persistence.PoolableElementViewDao;
+import uk.ac.bbsrc.tgac.miso.persistence.ListLibraryAliquotViewDao;
 import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
-public class HibernatePoolableElementViewDao implements PoolableElementViewDao, HibernatePaginatedDataSource<PoolableElementView> {
+public class HibernateListLibraryAliquotViewDao implements ListLibraryAliquotViewDao, HibernatePaginatedDataSource<ListLibaryAliquotView> {
 
   // Make sure these match the HiberateLibraryAliquotDao
-  private static final String[] SEARCH_PROPERTIES = new String[] { "aliquotName", "aliquotAlias", "aliquotBarcode" };
-  private final static List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("sample"),
-      new AliasDescriptor("sample.parentAttributes", JoinType.LEFT_OUTER_JOIN),
+  private static final String[] SEARCH_PROPERTIES = new String[] { "name", "alias", "identificationBarcode" };
+  private final static List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(
+      new AliasDescriptor("parentLibrary", "library"),
+      new AliasDescriptor("library.parentSample", "sample"),
+      new AliasDescriptor("sample.parentAttributes", "parentAttributes", JoinType.LEFT_OUTER_JOIN),
       new AliasDescriptor("parentAttributes.tissueAttributes", JoinType.LEFT_OUTER_JOIN),
       new AliasDescriptor("tissueAttributes.tissueOrigin", JoinType.LEFT_OUTER_JOIN),
       new AliasDescriptor("tissueAttributes.tissueType", JoinType.LEFT_OUTER_JOIN));
@@ -53,45 +55,53 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
   }
 
   @Override
-  public PoolableElementView get(Long aliquotId) throws IOException {
-    return (PoolableElementView) currentSession().get(PoolableElementView.class, aliquotId);
+  public ListLibaryAliquotView get(Long aliquotId) throws IOException {
+    return (ListLibaryAliquotView) currentSession().get(ListLibaryAliquotView.class, aliquotId);
   }
 
   @Override
-  public PoolableElementView getByBarcode(String barcode) throws IOException {
+  public ListLibaryAliquotView getByBarcode(String barcode) throws IOException {
     if (barcode == null) throw new IOException("Barcode cannot be null!");
-    Criteria criteria = currentSession().createCriteria(PoolableElementView.class);
-    criteria.add(Restrictions.eq("aliquotBarcode", barcode));
-    return (PoolableElementView) criteria.uniqueResult();
+    Criteria criteria = currentSession().createCriteria(ListLibaryAliquotView.class);
+    criteria.add(Restrictions.eq("identificationBarcode", barcode));
+    return (ListLibaryAliquotView) criteria.uniqueResult();
   }
 
   @Override
-  public PoolableElementView getByPreMigrationId(Long preMigrationId) throws IOException {
+  public ListLibaryAliquotView getByPreMigrationId(Long preMigrationId) throws IOException {
     if (preMigrationId == null) throw new NullPointerException("preMigrationId cannot be null");
-    Criteria criteria = currentSession().createCriteria(PoolableElementView.class);
+    Criteria criteria = currentSession().createCriteria(ListLibaryAliquotView.class);
     criteria.add(Restrictions.eq("preMigrationId", preMigrationId));
-    return (PoolableElementView) criteria.uniqueResult();
+    return (ListLibaryAliquotView) criteria.uniqueResult();
   }
 
   @Override
   public String getProjectColumn() {
-    return "projectId";
+    return "project.id";
   }
 
   @Override
-  public Class<? extends PoolableElementView> getRealClass() {
-    return PoolableElementView.class;
+  public void restrictPaginationByProjectId(Criteria criteria, long projectId, Consumer<String> errorHandler) {
+    criteria.createAlias("parentLibrary", "library")
+        .createAlias("library.parentSample", "sample")
+        .createAlias("sample.parentProject", "project");
+    HibernatePaginatedDataSource.super.restrictPaginationByProjectId(criteria, projectId, errorHandler);
   }
 
   @Override
-  public List<PoolableElementView> list(List<Long> aliquotIds) throws IOException {
+  public Class<? extends ListLibaryAliquotView> getRealClass() {
+    return ListLibaryAliquotView.class;
+  }
+
+  @Override
+  public List<ListLibaryAliquotView> list(List<Long> aliquotIds) throws IOException {
     if (aliquotIds.size() == 0) {
       return Collections.emptyList();
     }
-    Criteria criteria = currentSession().createCriteria(PoolableElementView.class);
+    Criteria criteria = currentSession().createCriteria(ListLibaryAliquotView.class);
     criteria.add(Restrictions.in("id", aliquotIds));
     @SuppressWarnings("unchecked")
-    List<PoolableElementView> results = criteria.list();
+    List<ListLibaryAliquotView> results = criteria.list();
     return results;
   }
 
@@ -103,44 +113,19 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
   @Override
   public String propertyForSortColumn(String original) {
     switch (original) {
-    case "id":
-      return "aliquotId";
-    case "name":
-      return "aliquotName";
-    case "alias":
-      return "aliquotAlias";
-    case "volume":
-      return "aliquotVolume";
-    case "identificationBarcode":
-      return "aliquotBarcode";
-    case "qcPassed":
-      return "aliquotQcPassed";
-    case "library.id":
-      return "libraryId";
-    case "library.alias":
-      return "libraryAlias";
+    case "lastModified":
+      return "lastUpdated";
     case "library.parentSampleId":
-      return "sampleId";
+      return "sample.id";
     case "library.parentSampleAlias":
-      return "sampleAlias";
+      return "sample.alias";
     case "libraryPlatformType":
-      return "platformType";
+    case "library.platformType":
+      return "library.platformType";
     case "creatorName":
       return "creator.fullName";
     case "creationDate":
       return "created";
-    case "library.platformType":
-      return "platformType";
-    case "concentration":
-      return "aliquotConcentration";
-    case "concentrationUnits":
-      return "aliquotConcentrationUnits";
-    case "ngUsed":
-      return "aliquotNgUsed";
-    case "volumeUsed":
-      return "aliquotVolumeUsed";
-    case "dnaSize":
-      return "aliquotDnaSize";
     case "effectiveTissueOriginLabel":
       return "tissueOrigin.alias";
     case "effectiveTissueTypeLabel":
@@ -152,7 +137,7 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
 
   @Override
   public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
-    criteria.add(Restrictions.eq("platformType", platformType));
+    criteria.add(Restrictions.eq("library.platformType", platformType));
   }
 
   @Override
@@ -173,7 +158,7 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
     case CREATE:
       return "created";
     case UPDATE:
-      return "lastModified";
+      return "lastUpdated";
     default:
       return null;
     }
@@ -187,16 +172,23 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
   @Override
   public void restrictPaginationByIndex(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
     if (query.getText() == null) {
-      criteria.add(Restrictions.isEmpty("indices"));
+      criteria.add(Restrictions.isEmpty("pibrary.indices"));
     } else {
-      criteria.createAlias("indices", "indices", JoinType.LEFT_OUTER_JOIN)
+      criteria.createAlias("library.indices", "indices", JoinType.LEFT_OUTER_JOIN)
           .add(DbUtils.textRestriction(query, "indices.name", "indices.sequence"));
     }
   }
 
   @Override
   public void restrictPaginationByBox(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
-    criteria.add(DbUtils.textRestriction(query, "boxAlias", "boxName", "boxIdentificationBarcode", "boxLocationBarcode"));
+    if (query.getText() == null) {
+      criteria.createAlias("boxPosition", "boxPosition", JoinType.LEFT_OUTER_JOIN)
+          .add(Restrictions.isNull("boxPosition.box"));
+    } else {
+      criteria.createAlias("boxPosition", "boxPosition")
+          .createAlias("boxPosition.box", "box")
+          .add(DbUtils.textRestriction(query, HibernatePaginatedBoxableSource.BOX_SEARCH_PROPERTIES));
+    }
   }
 
   @Override
@@ -206,8 +198,7 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
 
   @Override
   public void restrictPaginationByFreezer(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
-    criteria.createAlias("aliquot", "aliquot")
-        .createAlias("aliquot.boxPosition", "boxPosition")
+    criteria.createAlias("boxPosition", "boxPosition")
         .createAlias("boxPosition.box", "box");
     DbUtils.restrictPaginationByFreezer(criteria, query, "box.storageLocation");
   }

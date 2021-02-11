@@ -18,6 +18,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
+import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -329,6 +330,18 @@ public class HibernateLibraryAliquotDaoIT extends AbstractDAOTest {
     assertNotNull(dao.list(err -> {
       throw new RuntimeException(err);
     }, 0, 10, true, "name", filter));
+  }
+
+  @Test
+  public void testListByPoolIds() throws Exception {
+    List<Long> poolIds = Lists.newArrayList(1L, 2L, 3L);
+    List<Long> expectedAliquotIds = Lists.newArrayList(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L, 12L, 13L, 14L);
+
+    List<LibraryAliquot> aliquots = dao.listByPoolIds(poolIds);
+    assertEquals(expectedAliquotIds.size(), aliquots.size());
+    for (Long expectedId : expectedAliquotIds) {
+      assertTrue(aliquots.stream().anyMatch(aliquot -> aliquot.getId() == expectedId.longValue()));
+    }
   }
 
 }

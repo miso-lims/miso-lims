@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isDetailedSample;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 
@@ -11,35 +10,21 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
-public class HibernatePoolableElementViewDaoIT extends AbstractDAOTest {
+public class HibernateListLibraryAliquotViewDaoIT extends AbstractDAOTest {
 
   @Autowired
   private SessionFactory sessionFactory;
 
-  private HibernatePoolableElementViewDao sut;
+  private HibernateListLibraryAliquotViewDao sut;
 
   @Before
   public void setup() {
-    sut = new HibernatePoolableElementViewDao();
+    sut = new HibernateListLibraryAliquotViewDao();
     sut.setSessionFactory(sessionFactory);
-  }
-
-  @Test
-  public void testLoadSampleRelative() throws Exception {
-    // There was a problem with Hibernate lazy-loading Sample's inheritance structure (DetailedSample, etc.).
-    // This is to prevent regression
-    PoolableElementView ldi = sut.get(15L);
-    assertNotNull(ldi);
-    Sample sam = ldi.getSample();
-    assertNotNull(sam);
-    assertEquals(19L, sam.getId());
-    assertTrue(isDetailedSample(sam));
   }
 
   @Test
@@ -65,6 +50,11 @@ public class HibernatePoolableElementViewDaoIT extends AbstractDAOTest {
   @Test
   public void testSearchByTissueType() throws Exception {
     testSearch(PaginationFilter.tissueType("P"));
+  }
+
+  @Test
+  public void testSearchByProject() throws Exception {
+    testSearch(PaginationFilter.project(1L));
   }
 
   /**
