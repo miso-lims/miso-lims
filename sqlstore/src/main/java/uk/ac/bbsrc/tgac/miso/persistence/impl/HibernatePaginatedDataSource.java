@@ -67,8 +67,7 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
     final Criteria backingCriteria = currentSession().createCriteria(getRealClass());
     Criteria criteria = new AliasTrackingCriteria(backingCriteria);
     for (AliasDescriptor descriptor : listAliases()) {
-      String[] parts = descriptor.getAssociationPath().split("\\.");
-      criteria.createAlias(descriptor.getAlias(), parts[parts.length - 1], descriptor.getJoinType());
+      criteria.createAlias(descriptor.getAssociationPath(), descriptor.getAlias(), descriptor.getJoinType());
     }
     criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
     return criteria;
@@ -91,7 +90,6 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   public default List<T> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
       PaginationFilter... filters)
       throws IOException {
-
     if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must not be less than zero");
     String sortProperty = propertyForSortColumn(sortCol);
     Order primaryOrder = null;

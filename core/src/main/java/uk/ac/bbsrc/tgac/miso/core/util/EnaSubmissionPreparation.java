@@ -41,7 +41,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
 
@@ -60,13 +60,13 @@ public class EnaSubmissionPreparation {
     public abstract String name();
   }
 
-  private final class LibraryAliquotXmlSubfile extends XmlSubmissionFromSet<Pair<PoolableElementView, Partition>> {
+  private final class LibraryAliquotXmlSubfile extends XmlSubmissionFromSet<Pair<ListLibaryAliquotView, Partition>> {
 
     @Override
-    protected Stream<Pair<PoolableElementView, Partition>> items() {
+    protected Stream<Pair<ListLibaryAliquotView, Partition>> items() {
       return submission.getExperiments().stream().flatMap(experiment -> experiment.getRunPartitions().stream()).flatMap(
           rp -> rp.getPartition().getPool().getPoolContents().stream()
-              .map(pd -> new Pair<>(pd.getPoolableElementView(), rp.getPartition())));
+              .map(pd -> new Pair<>(pd.getAliquot(), rp.getPartition())));
     }
 
     @Override
@@ -75,11 +75,11 @@ public class EnaSubmissionPreparation {
     }
 
     @Override
-    protected void populate(Element xml, Pair<PoolableElementView, Partition> entry) {
+    protected void populate(Element xml, Pair<ListLibaryAliquotView, Partition> entry) {
       Run r = entry.getValue().getSequencerPartitionContainer().getLastRun();
 
       xml.setAttribute("alias",
-          "L00" + entry.getValue().getPartitionNumber() + ":" + entry.getKey().getAliquotName() + ":" + r.getAlias());
+          "L00" + entry.getValue().getPartitionNumber() + ":" + entry.getKey().getName() + ":" + r.getAlias());
       xml.setAttribute("run_center", centreName);
       if (r.getHealth() == HealthType.Completed) {
         xml.setAttribute("run_date", DF_TIMESTAMP.format(r.getCompletionDate()));
@@ -97,7 +97,7 @@ public class EnaSubmissionPreparation {
       dataBlock.setAttribute("sector", Integer.toString(entry.getValue().getPartitionNumber()));
       if (entry.getValue().getPool().getPoolContents().size() > 1) {
         // multiplexed
-        dataBlock.setAttribute("member_name", entry.getKey().getAliquotName());
+        dataBlock.setAttribute("member_name", entry.getKey().getName());
       }
 
     }
@@ -163,9 +163,9 @@ public class EnaSubmissionPreparation {
             Element xmlPool = xml.getOwnerDocument().createElementNS(null, "POOL");
             sampleDescriptor.appendChild(xmlPool);
 
-            pool.getPoolContents().stream().map(PoolElement::getPoolableElementView).forEach(aliquot -> {
+            pool.getPoolContents().stream().map(PoolElement::getAliquot).forEach(aliquot -> {
               Element xmlMember = xml.getOwnerDocument().createElementNS(null, "MEMBER");
-              xmlMember.setAttribute("member_name", aliquot.getAliquotName());
+              xmlMember.setAttribute("member_name", aliquot.getName());
               xmlMember.setAttribute("refcenter", centreName);
               xmlMember.setAttribute("refname", aliquot.getSampleAlias());
               if (!isStringEmptyOrNull(aliquot.getSampleAccession())) {

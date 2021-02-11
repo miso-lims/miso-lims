@@ -12,8 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -29,7 +27,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -41,11 +38,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibraryAliquotSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
-import uk.ac.bbsrc.tgac.miso.core.service.PoolableElementViewService;
+import uk.ac.bbsrc.tgac.miso.core.service.ListLibraryAliquotViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -66,27 +63,25 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 @RequestMapping("/rest/libraryaliquots")
 public class LibraryAliquotRestController extends RestController {
 
-  private static final Logger log = LoggerFactory.getLogger(LibraryAliquotRestController.class);
-
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
 
-  private final JQueryDataTableBackend<PoolableElementView, LibraryAliquotDto> jQueryBackend = new JQueryDataTableBackend<PoolableElementView, LibraryAliquotDto>() {
+  private final JQueryDataTableBackend<ListLibaryAliquotView, LibraryAliquotDto> jQueryBackend = new JQueryDataTableBackend<ListLibaryAliquotView, LibraryAliquotDto>() {
     @Override
-    protected LibraryAliquotDto asDto(PoolableElementView model) {
+    protected LibraryAliquotDto asDto(ListLibaryAliquotView model) {
       return Dtos.asDto(model);
     }
 
     @Override
-    protected PaginatedDataSource<PoolableElementView> getSource() throws IOException {
-      return poolableElementViewService;
+    protected PaginatedDataSource<ListLibaryAliquotView> getSource() throws IOException {
+      return listLibraryAliquotViewService;
     }
   };
 
   @Autowired
   private LibraryAliquotService libraryAliquotService;
   @Autowired
-  private PoolableElementViewService poolableElementViewService;
+  private ListLibraryAliquotViewService listLibraryAliquotViewService;
   @Autowired
   private PoolService poolService;
   @Autowired
@@ -164,7 +159,7 @@ public class LibraryAliquotRestController extends RestController {
   @PostMapping(value = "/query", produces = { "application/json" })
   @ResponseBody
   public List<LibraryAliquotDto> getLibraryAliquotsInBulk(@RequestBody List<String> names) {
-    return PaginationFilter.bulkSearch(names, poolableElementViewService, Dtos::asDto,
+    return PaginationFilter.bulkSearch(names, listLibraryAliquotViewService, Dtos::asDto,
         message -> new RestException(message, Status.BAD_REQUEST));
   }
 
@@ -220,7 +215,7 @@ public class LibraryAliquotRestController extends RestController {
   @PostMapping(value = "/parents/{category}")
   @ResponseBody
   public HttpEntity<byte[]> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
-      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws JsonProcessingException {
+      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
     return parentFinder.list(ids, category);
   }
 
@@ -239,15 +234,8 @@ public class LibraryAliquotRestController extends RestController {
         }
 
         @Override
-        public Stream<Pool> find(LibraryAliquot model, Consumer<String> emitError) {
-          List<Pool> children;
-          try {
-            children = poolService.listByLibraryAliquotId(model.getId());
-          } catch (IOException e) {
-            log.error("Failed looking up pools for library aliquot", e);
-            emitError.accept("Database error");
-            return Stream.empty();
-          }
+        public Stream<Pool> find(LibraryAliquot model, Consumer<String> emitError) throws IOException {
+          List<Pool> children = poolService.listByLibraryAliquotId(model.getId());
           if (children.isEmpty()) {
             emitError.accept(String.format("%s (%s) has no %s.", model.getName(), model.getAlias(), category()));
             return Stream.empty();
@@ -259,7 +247,7 @@ public class LibraryAliquotRestController extends RestController {
   @PostMapping(value = "/children/{category}")
   @ResponseBody
   public HttpEntity<byte[]> getChildren(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
-      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws JsonProcessingException {
+      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
     return childFinder.list(ids, category);
   }
 

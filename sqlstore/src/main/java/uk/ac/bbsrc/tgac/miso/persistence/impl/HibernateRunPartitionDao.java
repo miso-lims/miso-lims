@@ -53,8 +53,8 @@ public class HibernateRunPartitionDao implements RunPartitionStore {
         .createAlias("partition", "partition")
         .createAlias("partition.pool", "pool")
         .createAlias("pool.poolElements", "poolElement")
-        .createAlias("poolElement.poolableElementView", "poolableElementView")
-        .add(Restrictions.eq("poolableElementView.id", aliquot.getId()))
+        .createAlias("poolElement.aliquot", "aliquot")
+        .add(Restrictions.eq("aliquot.id", aliquot.getId()))
         .list();
     return results;
   }

@@ -231,10 +231,10 @@ public class EditRunController {
             RunPartitionAliquot runPartitionAliquot = runPartitionAliquots.stream()
                 .filter(rpa -> rpa.getRun().getId() == run.getId()
                     && rpa.getPartition().getId() == partition.getId()
-                    && rpa.getAliquot().getId() == poolElement.getPoolableElementView().getAliquotId())
+                    && rpa.getAliquot().getId() == poolElement.getAliquot().getId())
                 .findAny().orElse(null);
             if (runPartitionAliquot == null) {
-              runPartitionAliquot = new RunPartitionAliquot(run, partition, poolElement.getPoolableElementView());
+              runPartitionAliquot = new RunPartitionAliquot(run, partition, poolElement.getAliquot());
               runPartitionAliquots.add(runPartitionAliquot);
             }
           }

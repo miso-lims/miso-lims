@@ -33,7 +33,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 public class HibernateLibraryAliquotDao
     implements LibraryAliquotStore, HibernatePaginatedBoxableSource<LibraryAliquot> {
 
-  // Make sure these match the HiberatePoolableElementViewDao
+  // Make sure these match the HiberateListLibraryAliquotViewDao
   private final static String[] SEARCH_PROPERTIES = new String[] { "name", "alias", "identificationBarcode" };
   private final static List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("library"));
 
@@ -159,9 +159,9 @@ public class HibernateLibraryAliquotDao
   public void restrictPaginationByPoolId(Criteria criteria, long poolId, Consumer<String> errorHandler) {
     DetachedCriteria subquery = DetachedCriteria.forClass(PoolImpl.class)
         .createAlias("poolElements", "element")
-        .createAlias("element.poolableElementView", "view")
+        .createAlias("element.aliquot", "aliquot")
         .add(Restrictions.eq("id", poolId))
-        .setProjection(Projections.property("view.aliquotId"));
+        .setProjection(Projections.property("aliquot.id"));
     criteria.add(Property.forName("id").in(subquery));
   }
 
@@ -225,4 +225,23 @@ public class HibernateLibraryAliquotDao
     List<LibraryAliquot> records = criteria.list();
     return records;
   }
+
+  @Override
+  public List<LibraryAliquot> listByPoolIds(Collection<Long> poolIds) throws IOException {
+    if (poolIds.isEmpty()) {
+      return Collections.emptyList();
+    }
+    DetachedCriteria subquery = DetachedCriteria.forClass(PoolImpl.class)
+        .createAlias("poolElements", "element")
+        .createAlias("element.aliquot", "aliquot")
+        .add(Restrictions.in("id", poolIds))
+        .setProjection(Projections.property("aliquot.id"));
+
+    @SuppressWarnings("unchecked")
+    List<LibraryAliquot> results = currentSession().createCriteria(LibraryAliquot.class)
+        .add(Property.forName("id").in(subquery))
+        .list();
+    return results;
+  }
+
 }

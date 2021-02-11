@@ -20,7 +20,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.QcStatusUpdate;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.DetailedQcItem;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -130,11 +130,11 @@ public class DefaultQcStatusService implements QcStatusService {
       Run run = runService.get(update.getIds()[0]);
       throwIfNull("Run", run);
       Partition partition = findPartitionInRun(run, update.getIds()[1]);
-      PoolableElementView poolableElementView = partition.getPool().getPoolContents().stream()
-          .map(PoolElement::getPoolableElementView)
+      ListLibaryAliquotView aliquotView = partition.getPool().getPoolContents().stream()
+          .map(PoolElement::getAliquot)
           .filter(x -> x.getId() == update.getIds()[2])
           .findFirst().orElse(null);
-      throwIfNull("Run-library", poolableElementView);
+      throwIfNull("Run-library", aliquotView);
       LibraryAliquot aliquot = libraryAliquotService.get(update.getIds()[2]);
       RunPartitionAliquot runLib = runPartitionAliquotService.get(run, partition, aliquot);
       if (runLib == null) {

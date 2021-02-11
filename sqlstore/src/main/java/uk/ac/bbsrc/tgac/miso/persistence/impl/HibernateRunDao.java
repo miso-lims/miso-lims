@@ -153,24 +153,28 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   @Override
   public List<Run> listByProjectId(long projectId) throws IOException {
-    Criteria idCriteria = currentSession().createCriteria(Run.class, "r");
-    idCriteria.createAlias("runPositions", "runPos")
+    @SuppressWarnings("unchecked")
+    List<Long> ids = currentSession().createCriteria(Run.class, "r")
+        .createAlias("runPositions", "runPos")
         .createAlias("runPos.container", "spc")
         .createAlias("spc.partitions", "partition")
         .createAlias("partition.pool", "pool")
         .createAlias("pool.poolElements", "poolElement")
-        .createAlias("poolElement.poolableElementView", "aliquot");
-    idCriteria.add(Restrictions.eq("aliquot.projectId", projectId));
-    idCriteria.setProjection(Projections.distinct(Projections.property("r.id")));
-    @SuppressWarnings("unchecked")
-    List<Long> ids = idCriteria.list();
+        .createAlias("poolElement.aliquot", "aliquot")
+        .createAlias("aliquot.parentLibrary", "library")
+        .createAlias("library.parentSample", "sample")
+        .createAlias("sample.parentProject", "project")
+        .add(Restrictions.eq("project.id", projectId))
+        .setProjection(Projections.distinct(Projections.property("r.id")))
+        .list();
     if (ids.isEmpty()) {
       return Collections.emptyList();
     }
-    Criteria criteria = currentSession().createCriteria(Run.class);
-    criteria.add(Restrictions.in("id", ids));
+
     @SuppressWarnings("unchecked")
-    List<Run> records = criteria.list();
+    List<Run> records = currentSession().createCriteria(Run.class)
+        .add(Restrictions.in("id", ids))
+        .list();
     return records;
   }
 
@@ -202,12 +206,15 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   @Override
   public void restrictPaginationByProjectId(Criteria criteria, long projectId, Consumer<String> errorHandler) {
-    criteria.createAlias("runPositions", "runPos");
-    criteria.createAlias("runPos.container", "spc");
-    criteria.createAlias("spc.partitions", "partition");
-    criteria.createAlias("partition.pool", "pool");
-    criteria.createAlias("pool.poolElements", "poolElement");
-    criteria.createAlias("poolElement.poolableElementView", "aliquot");
+    criteria.createAlias("runPositions", "runPos")
+        .createAlias("runPos.container", "spc")
+        .createAlias("spc.partitions", "partition")
+        .createAlias("partition.pool", "pool")
+        .createAlias("pool.poolElements", "poolElement")
+        .createAlias("poolElement.aliquot", "aliquot")
+        .createAlias("aliquot.parentLibrary", "library")
+        .createAlias("library.parentSample", "sample")
+        .createAlias("sample.parentProject", "project");
     HibernatePaginatedDataSource.super.restrictPaginationByProjectId(criteria, projectId, errorHandler);
   }
 
@@ -223,7 +230,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   @Override
   public String getProjectColumn() {
-    return "aliquot.projectId";
+    return "project.id";
   }
 
   @Override
@@ -286,8 +293,9 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
         .createAlias("spc.partitions", "partition")
         .createAlias("partition.pool", "pool")
         .createAlias("pool.poolElements", "poolElement")
-        .createAlias("poolElement.poolableElementView", "aliquotForIndex")
-        .createAlias("aliquotForIndex.indices", "indices")
+        .createAlias("poolElement.aliquot", "aliquot")
+        .createAlias("aliquot.parentLibrary", "library")
+        .createAlias("library.indices", "indices")
         .add(DbUtils.textRestriction(query, "indices.name", "indices.sequence"));
   }
 

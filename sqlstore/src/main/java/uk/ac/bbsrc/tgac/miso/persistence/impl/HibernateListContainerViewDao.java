@@ -103,8 +103,9 @@ public class HibernateListContainerViewDao implements ListContainerViewDao, Hibe
     criteria.createAlias("partitions", "partitions")
         .createAlias("partitions.pool", "pool")
         .createAlias("pool.poolElements", "poolElement")
-        .createAlias("poolElement.poolableElementView", "aliquotForIndex")
-        .createAlias("aliquotForIndex.indices", "indices")
+        .createAlias("poolElement.aliquot", "aliquot")
+        .createAlias("aliquot.parentLibrary", "library")
+        .createAlias("library.indices", "indices")
         .add(DbUtils.textRestriction(query, "indices.name", "indices.sequence"));
   }
 

@@ -56,8 +56,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment.RunPartition;
@@ -73,9 +71,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibraryAliquotSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.PoolSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -83,10 +81,11 @@ import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.core.service.ListLibraryAliquotViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.ListPoolViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
-import uk.ac.bbsrc.tgac.miso.core.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
+import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderSummaryViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.core.util.IlluminaExperiment;
@@ -236,11 +235,13 @@ public class PoolRestController extends RestController {
   @Autowired
   private ContainerService containerService;
   @Autowired
-  private PoolableElementViewService poolableElementViewService;
+  private ListLibraryAliquotViewService listLibraryAliquotViewService;
   @Autowired
   private SequencingOrderSummaryViewService sequencingOrderCompletionService;
   @Autowired
   private SequencingParametersService sequencingParametersService;
+  @Autowired
+  private SampleService sampleService;
   @Autowired
   private LibraryService libraryService;
   @Autowired
@@ -275,11 +276,11 @@ public class PoolRestController extends RestController {
     return RestUtils.createObject("Pool", dto, d -> {
       Pool pool = Dtos.to(d);
       if (pool.getVolume() == null && !pool.getPoolContents().isEmpty() && pool.getPoolContents().stream()
-          .map(PoolElement::getPoolableElementView)
-          .allMatch(view -> view.getAliquotVolumeUsed() != null)) {
+          .map(PoolElement::getAliquot)
+          .allMatch(view -> view.getVolumeUsed() != null)) {
         pool.setVolume(pool.getPoolContents().stream()
-            .map(PoolElement::getPoolableElementView)
-            .map(PoolableElementView::getAliquotVolumeUsed)
+            .map(PoolElement::getAliquot)
+            .map(ListLibaryAliquotView::getVolumeUsed)
             .reduce(BigDecimal.ZERO, (result, item) -> result.add(item)));
       }
       return pool;
@@ -296,8 +297,8 @@ public class PoolRestController extends RestController {
   public @ResponseBody PoolDto changePoolContents(@PathVariable Long poolId, @RequestBody PoolChangeRequest request) throws IOException {
     Pool pool = poolService.get(poolId);
     Stream<PoolElement> originalMinusRemoved = pool.getPoolContents().stream()
-        .filter(element -> !request.remove.contains(element.getPoolableElementView().getAliquotId()));
-    Stream<PoolElement> added = poolableElementViewService.list(request.add).stream()
+        .filter(element -> !request.remove.contains(element.getAliquot().getId()));
+    Stream<PoolElement> added = listLibraryAliquotViewService.list(request.add).stream()
         .map(view -> new PoolElement(pool, view));
     pool.setPoolElements(Stream.concat(originalMinusRemoved, added).collect(Collectors.toSet()));
     poolService.update(pool);
@@ -319,7 +320,7 @@ public class PoolRestController extends RestController {
         throw new RestException("Invalid proportion: " + entry.getValue(), Status.BAD_REQUEST);
       }
       PoolElement poolElement = pool.getPoolContents().stream()
-          .filter(pd -> pd.getPoolableElementView().getAliquotName().equals(entry.getKey()))
+          .filter(pd -> pd.getAliquot().getName().equals(entry.getKey()))
           .findFirst()
           .orElseThrow(() -> new RestException("Invalid library aliquot name: " + entry.getKey(), Status.BAD_REQUEST));
       poolElement.setProportion(entry.getValue());
@@ -366,7 +367,7 @@ public class PoolRestController extends RestController {
     // Determine if this pool transition is allowed for this experiment. If removing a pool, it strictly isn't. If the new pool contains the
     // same library as the experiment, it's fine.
     Predicate<Experiment> isTransitionValid = pool == null ? experiment -> false
-        : experiment -> pool.getPoolContents().stream().map(pd -> pd.getPoolableElementView().getLibraryId())
+        : experiment -> pool.getPoolContents().stream().map(pd -> pd.getAliquot().getLibraryId())
             .anyMatch(id -> id == experiment.getLibrary().getId());
 
     request.getPartitionIds().stream()//
@@ -503,13 +504,10 @@ public class PoolRestController extends RestController {
   @PostMapping(value = "/contents/spreadsheet")
   @ResponseBody
   public HttpEntity<byte[]> getContentsSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response,
-      UriComponentsBuilder uriBuilder) {
-    return MisoWebUtils.generateSpreadsheet(request, request.getIds().stream()//
-        .flatMap(
-            WhineyFunction.rethrow(id -> poolService.get(id).getPoolContents().stream()))//
-        .map(pe -> pe.getPoolableElementView().getAliquot()),
-        detailedSample,
-        LibraryAliquotSpreadSheets::valueOf, response);
+      UriComponentsBuilder uriBuilder) throws IOException {
+    List<LibraryAliquot> aliquots = libraryAliquotService.listByPoolIds(request.getIds());
+
+    return MisoWebUtils.generateSpreadsheet(request, aliquots.stream(), detailedSample, LibraryAliquotSpreadSheets::valueOf, response);
   }
 
   @PostMapping(value = "/bulk-delete")
@@ -530,8 +528,12 @@ public class PoolRestController extends RestController {
     poolService.bulkDelete(pools);
   }
 
-  private static Stream<Sample> getSamples(Pool pool) {
-    return pool.getPoolContents().stream().map(pd -> pd.getPoolableElementView().getSample());
+  private Stream<Sample> getSamples(Pool pool) throws IOException {
+    List<Sample> samples = new ArrayList<>();
+    for (PoolElement poolElement : pool.getPoolContents()) {
+      samples.add(sampleService.getByLibraryAliquotId(poolElement.getAliquot().getId()));
+    }
+    return samples.stream();
   }
 
   private final RelationFinder<Pool> parentFinder = (new RelationFinder<Pool>() {
@@ -541,12 +543,12 @@ public class PoolRestController extends RestController {
       return poolService.get(id);
     }
   })
-      .add(new RelationFinder.ParentSampleAdapter<>(SampleIdentity.CATEGORY_NAME, SampleIdentity.class, PoolRestController::getSamples))//
-      .add(new RelationFinder.ParentSampleAdapter<>(SampleTissue.CATEGORY_NAME, SampleTissue.class, PoolRestController::getSamples))//
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleIdentity.CATEGORY_NAME, SampleIdentity.class, this::getSamples))//
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleTissue.CATEGORY_NAME, SampleTissue.class, this::getSamples))//
       .add(new RelationFinder.ParentSampleAdapter<>(SampleTissueProcessing.CATEGORY_NAME, SampleTissueProcessing.class,
-          PoolRestController::getSamples))//
-      .add(new RelationFinder.ParentSampleAdapter<>(SampleStock.CATEGORY_NAME, SampleStock.class, PoolRestController::getSamples))//
-      .add(new RelationFinder.ParentSampleAdapter<>(SampleAliquot.CATEGORY_NAME, SampleAliquot.class, PoolRestController::getSamples))//
+          this::getSamples))//
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleStock.CATEGORY_NAME, SampleStock.class, this::getSamples))//
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleAliquot.CATEGORY_NAME, SampleAliquot.class, this::getSamples))//
       .add(new RelationFinder.RelationAdapter<Pool, Sample, SampleDto>("Sample") {
 
         @Override
@@ -555,7 +557,7 @@ public class PoolRestController extends RestController {
         }
 
         @Override
-        public Stream<Sample> find(Pool model, Consumer<String> emitError) {
+        public Stream<Sample> find(Pool model, Consumer<String> emitError) throws IOException {
           return getSamples(model);
         }
 
@@ -570,7 +572,7 @@ public class PoolRestController extends RestController {
         @Override
         public Stream<Library> find(Pool model, Consumer<String> emitError) {
           return model.getPoolContents().stream()
-              .map(WhineyFunction.rethrow(pd -> libraryService.get(pd.getPoolableElementView().getLibraryId())));
+              .map(WhineyFunction.rethrow(pd -> libraryService.get(pd.getAliquot().getLibraryId())));
         }
       })
       .add(new RelationFinder.RelationAdapter<Pool, LibraryAliquot, LibraryAliquotDto>("Library Aliquot") {
@@ -583,14 +585,14 @@ public class PoolRestController extends RestController {
         @Override
         public Stream<LibraryAliquot> find(Pool model, Consumer<String> emitError) {
           return model.getPoolContents().stream()
-              .map(WhineyFunction.rethrow(pd -> libraryAliquotService.get(pd.getPoolableElementView().getAliquotId())));
+              .map(WhineyFunction.rethrow(pd -> libraryAliquotService.get(pd.getAliquot().getId())));
         }
       });
 
   @PostMapping(value = "/parents/{category}")
   @ResponseBody
   public HttpEntity<byte[]> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
-      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws JsonProcessingException {
+      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
     return parentFinder.list(ids, category);
   }
 

@@ -27,8 +27,8 @@ import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -349,7 +349,7 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
   public void testRemoveAliquot() throws IOException {
     Pool pool = dao.get(3L);
     int originalSize = pool.getPoolContents().size();
-    pool.getPoolContents().removeIf(pd -> pd.getPoolableElementView().getAliquotId() == 10L);
+    pool.getPoolContents().removeIf(pd -> pd.getAliquot().getId() == 10L);
     assertEquals("LDI8 should be removed from collection", originalSize - 1, pool.getPoolContents().size());
     dao.save(pool);
 
@@ -365,7 +365,7 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
   public void testAddAliquot() throws IOException {
     Pool pool = dao.get(1L);
     int originalSize = pool.getPoolContents().size();
-    PoolableElementView ldi = (PoolableElementView) sessionFactory.getCurrentSession().get(PoolableElementView.class, 14L);
+    ListLibaryAliquotView ldi = (ListLibaryAliquotView) sessionFactory.getCurrentSession().get(ListLibaryAliquotView.class, 14L);
     PoolElement element = new PoolElement(pool, ldi);
     pool.getPoolContents().add(element);
     dao.save(pool);
@@ -383,7 +383,7 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
     Pool pool = dao.get(1L);
     assertFalse("Test pool should contain aliquots", pool.getPoolContents().isEmpty());
     pool.getPoolContents().forEach(pd -> {
-      assertEquals(String.format("Original proportion of %s should be 1", pd.getPoolableElementView().getAliquotName()), 1,
+      assertEquals(String.format("Original proportion of %s should be 1", pd.getAliquot().getName()), 1,
           pd.getProportion());
       pd.setProportion(3);
     });
@@ -394,7 +394,7 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
 
     Pool saved = dao.get(1L);
     saved.getPoolContents().forEach(pd -> {
-      assertEquals(String.format("Saved proportion of %s should be 3", pd.getPoolableElementView().getAliquotName()), 3,
+      assertEquals(String.format("Saved proportion of %s should be 3", pd.getAliquot().getName()), 3,
           pd.getProportion());
     });
   }

@@ -471,11 +471,13 @@ VALUES (1,2,'IPO1::Illumina','IPO1','TEST','2015-08-27','ILLUMINA','Pool 1',NULL
 (9,2,'IPO9::Illumina','IPO9','TEST','2015-08-27','ILLUMINA','Pool 9',NULL,1,'2016-07-07 13:31:05',1,'2016-07-07 13:31:05'),
 (10,2,'IPO10::Illumina','IPO10','TEST','2015-08-27','ILLUMINA','Pool 10',NULL,1,'2016-07-07 13:31:07',1,'2016-07-07 13:31:07');
 
-INSERT INTO `Pool_LibraryAliquot`(`poolId`, `aliquotId`) 
-VALUES (1,2),
-(2,6),
-(2,5),
+INSERT INTO `Pool_LibraryAliquot`(`poolId`, `aliquotId`) VALUES
+(1,1),
+(1,2),
+(2,3),
 (2,4),
+(2,5),
+(2,6),
 (3,7),
 (3,8),
 (3,9),
@@ -483,6 +485,7 @@ VALUES (1,2),
 (3,11),
 (3,12),
 (3,13),
+(3,14),
 (4,1),
 (5,2),
 (6,3),
@@ -496,10 +499,7 @@ VALUES (1,2),
 (9,11),
 (9,12),
 (10,13),
-(10,14),
-(3,14),
-(1,1),
-(2,3);
+(10,14);
 
 INSERT INTO `PoolQC`(`qcId`, `pool_poolId`, `creator`, `date`, `type`, `results`)
 VALUES (1,1,1,'2016-03-18',1,12.3),
