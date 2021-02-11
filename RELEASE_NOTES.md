@@ -2,6 +2,12 @@
 
 Changes:
 
+
+
+# 1.23.0
+
+Changes:
+
 * Added asterisks to indicate always-required fields in bulk tables
 * Added error messages for all field errors on bulk pages
 * Improved advanced search - use wildcards or blanks to find exact or partial

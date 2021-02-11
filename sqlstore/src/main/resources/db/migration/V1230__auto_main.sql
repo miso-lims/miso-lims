@@ -1,3 +1,4 @@
+-- qc_dates
 -- These will get re-created in afterMigrate. Need to be removed to avoid interfering with updates
 DROP TRIGGER IF EXISTS SampleChange;
 DROP TRIGGER IF EXISTS LibraryChange;
@@ -57,3 +58,18 @@ SET rla.qcDate = COALESCE((
   AND message LIKE CONCAT(spc.identificationBarcode, '-', part.partitionNumber, '-', ali.alias, '%')
 ), NOW())
 WHERE qcPassed IS NOT NULL;
+
+-- max_volumes
+ALTER TABLE Sample MODIFY COLUMN initialVolume DECIMAL(16,10);
+ALTER TABLE Sample MODIFY COLUMN volume DECIMAL(16,10);
+ALTER TABLE Sample MODIFY COLUMN volumeUsed DECIMAL(16,10);
+
+ALTER TABLE Library MODIFY COLUMN initialVolume DECIMAL(16,10);
+ALTER TABLE Library MODIFY COLUMN volume DECIMAL(16,10);
+ALTER TABLE Library MODIFY COLUMN volumeUsed DECIMAL(16,10);
+
+ALTER TABLE LibraryAliquot MODIFY COLUMN volume DECIMAL(16,10);
+ALTER TABLE LibraryAliquot MODIFY COLUMN volumeUsed DECIMAL(16,10);
+
+ALTER TABLE Pool MODIFY COLUMN volume DECIMAL(16,10);
+
