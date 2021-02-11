@@ -10,6 +10,10 @@ Changes:
 * Track dates for sample, library, library aliquot, and run QC status, and run
   data approved sign-offs
 
+Upgrade Notes:
+
+* Updated to Pinery v2.18.0
+
 # 1.22.0
 
 Changes:
