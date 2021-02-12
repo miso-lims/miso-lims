@@ -1,10 +1,5 @@
 -- drop_samplegroup
--- Disable "does not exist" warnings
-SET sql_notes = 0;
-
 DROP TABLE IF EXISTS SampleGroup;
-
-SET sql_notes = 1;
 
 -- qc_user
 -- These will get re-created in afterMigrate. Need to be removed to avoid interfering with updates

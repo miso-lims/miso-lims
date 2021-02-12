@@ -1,9 +1,6 @@
 -- Any triggers, procedures, and functions that are created in after migrate scripts
 -- and depend on the schema should be dropped here
 
--- Disable "Trigger does not exist" warnings
-SET sql_notes = 0;
-
 DROP TRIGGER IF EXISTS ArrayInsert;
 DROP TRIGGER IF EXISTS ArrayChange;
 DROP TRIGGER IF EXISTS ArrayPositionInsert;
@@ -66,6 +63,3 @@ DROP FUNCTION IF EXISTS getParentTissueId;
 DROP FUNCTION IF EXISTS getParentIdentityId;
 
 DROP PROCEDURE IF EXISTS updateSampleHierarchy;
-
-SET sql_notes = 1;
-
