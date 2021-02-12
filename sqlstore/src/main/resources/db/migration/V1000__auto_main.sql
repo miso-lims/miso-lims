@@ -93,7 +93,6 @@ SELECT userId, @internalGroup
 FROM User
 WHERE INTERNAL = TRUE;
 
-SET sql_notes = 0;
 DELIMITER //
 
 DROP FUNCTION IF EXISTS findParentWithLab//
@@ -112,7 +111,6 @@ BEGIN
 END//
 
 DELIMITER ;
-SET sql_notes = 1;
 
 CREATE TABLE TissueParentView (
   sampleId bigint(20),
@@ -332,9 +330,6 @@ ALTER TABLE Run ADD COLUMN dataApproverId bigint(20);
 ALTER TABLE Run ADD CONSTRAINT fk_run_approver FOREIGN KEY (dataApproverId) REFERENCES User (userId);
 
 -- remove_old_triggers
--- StartNoTest
--- Disable "x does not exist" warnings
-SET sql_notes = 0;
 
 DROP TRIGGER IF EXISTS LibraryAdditionalInfoChange;
 DROP TRIGGER IF EXISTS BeforeInsertLibrary;
@@ -382,9 +377,6 @@ DROP PROCEDURE IF EXISTS deletePool;
 DROP PROCEDURE IF EXISTS deleteRun;
 DROP PROCEDURE IF EXISTS deleteSample;
 
-SET sql_notes = 1;
--- EndNoTest
-
 -- sample_hierarchy
 CREATE TABLE SampleHierarchy (
   sampleId bigint(20) PRIMARY KEY,
@@ -395,7 +387,6 @@ CREATE TABLE SampleHierarchy (
   CONSTRAINT fk_sampleHierarchy_tissue FOREIGN KEY (tissueId) REFERENCES SampleTissue (sampleId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-SET sql_notes = 0;
 DELIMITER //
 
 DROP FUNCTION IF EXISTS getParentTissueId//
@@ -421,7 +412,6 @@ BEGIN
 END//
 
 DELIMITER ;
-SET sql_notes = 1;
 
 INSERT INTO SampleHierarchy(sampleId, identityId, tissueId)
 SELECT sampleId, getParentIdentityId(sampleId), getParentTissueId(sampleId)
@@ -442,11 +432,8 @@ ALTER TABLE SampleStock ADD COLUMN referenceSlideId bigint(20);
 ALTER TABLE SampleStock ADD CONSTRAINT fk_sampleStock_referenceSlide FOREIGN KEY (referenceSlideId) REFERENCES SampleSlide(sampleId);
 
 -- run_purposes
--- Disable "trigger doesn't exist" warnings
-SET sql_notes = 0;
 DROP TRIGGER IF EXISTS PartitionQCInsert;
 DROP TRIGGER IF EXISTS PartitionQCUpdate;
-SET sql_notes = 1;
 
 RENAME TABLE OrderPurpose TO RunPurpose;
 

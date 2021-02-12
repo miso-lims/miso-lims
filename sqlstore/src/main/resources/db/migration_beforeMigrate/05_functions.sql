@@ -1,6 +1,3 @@
--- StartNoTest
--- Disable "Function does not exist" warnings
-SET sql_notes = 0;
 DELIMITER //
 
 DROP FUNCTION IF EXISTS getAdminUserId//
@@ -84,5 +81,3 @@ BEGIN
 END//
 
 DELIMITER ;
-SET sql_notes = 1;
--- EndNoTest

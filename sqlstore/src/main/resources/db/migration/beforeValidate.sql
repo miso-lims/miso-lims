@@ -17,6 +17,12 @@ BEGIN
     UPDATE flyway_schema_history SET checksum = -1464362715 WHERE version = '1060';
     -- V1210 was altered for compatibility between mysql and mariadb
     UPDATE flyway_schema_history SET checksum = 1607781079 WHERE version = '1210';
+    /* V1000, 1060, 1100, and 1200 were updated to remove sql_note toggling
+       as it is now disabled for the entire migration */
+    UPDATE flyway_schema_history SET checksum = -159086106 WHERE version = '1000';
+    UPDATE flyway_schema_history SET checksum = 1248674807 WHERE version = '1060';
+    UPDATE flyway_schema_history SET checksum = 1770487871 WHERE version = '1100';
+    UPDATE flyway_schema_history SET checksum = 876069334 WHERE version = '1200';
   END IF;
 END//
 
