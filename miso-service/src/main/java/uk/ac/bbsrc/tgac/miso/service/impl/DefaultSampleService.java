@@ -703,7 +703,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       if (isAliquotSample(detailed)) {
         SampleAliquot sa = (SampleAliquot) detailed;
         if (sa.getSamplePurpose() != null && sa.getSamplePurpose().isSaved()) {
-          sa.setSamplePurpose(samplePurposeDao.getSamplePurpose(sa.getSamplePurpose().getId()));
+          sa.setSamplePurpose(samplePurposeDao.get(sa.getSamplePurpose().getId()));
         }
       }
       if (isStockSample(detailed)) {

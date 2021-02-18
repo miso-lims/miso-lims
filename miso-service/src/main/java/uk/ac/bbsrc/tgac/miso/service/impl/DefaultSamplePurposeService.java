@@ -9,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.SamplePurposeService;
@@ -37,17 +35,13 @@ public class DefaultSamplePurposeService implements SamplePurposeService {
 
   @Override
   public SamplePurpose get(long samplePurposeId) throws IOException {
-    authorizationManager.throwIfUnauthenticated();
-    return samplePurposeDao.getSamplePurpose(samplePurposeId);
+    return samplePurposeDao.get(samplePurposeId);
   }
 
   @Override
   public Long create(SamplePurpose samplePurpose) throws IOException {
-    authorizationManager.throwIfNotInternal();
-    User user = authorizationManager.getCurrentUser();
-    samplePurpose.setCreatedBy(user);
-    samplePurpose.setUpdatedBy(user);
-    return samplePurposeDao.addSamplePurpose(samplePurpose);
+    samplePurpose.setChangeDetails(authorizationManager.getCurrentUser());
+    return samplePurposeDao.create(samplePurpose);
   }
 
   @Override
@@ -55,14 +49,13 @@ public class DefaultSamplePurposeService implements SamplePurposeService {
     authorizationManager.throwIfNonAdmin();
     SamplePurpose updatedSamplePurpose = get(samplePurpose.getId());
     updatedSamplePurpose.setAlias(samplePurpose.getAlias());
-    User user = authorizationManager.getCurrentUser();
-    updatedSamplePurpose.setUpdatedBy(user);
+    updatedSamplePurpose.setChangeDetails(authorizationManager.getCurrentUser());
     samplePurposeDao.update(updatedSamplePurpose);
   }
 
   @Override
   public List<SamplePurpose> list() throws IOException {
-    return samplePurposeDao.getSamplePurpose();
+    return samplePurposeDao.list();
   }
 
   @Override

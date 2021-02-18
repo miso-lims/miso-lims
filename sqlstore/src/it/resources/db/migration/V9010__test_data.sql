@@ -240,6 +240,10 @@ VALUES (1,'Identity','Identity',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00')
 (3,'Stock','Stock',1,'2017-05-31 14:57:00',1,'2017-05-31 14:57:00'),
 (4,'Aliquot','Aliquot',1,'2017-05-31 14:57:00',1,'2017-05-31 14:57:00');
 
+INSERT INTO SamplePurpose(samplePurposeId, alias, createdBy, creationDate, updatedBy, lastUpdated) VALUES
+(1, 'Sequencing', 1, '2021-02-18 16:21:00', 1, '2021-02-18 16:21:00'),
+(2, 'Validation', 1, '2021-02-18 16:21:00', 1, '2021-02-18 16:21:00');
+
 -- Plain Samples
 INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identificationBarcode`, `locationBarcode`, `sampleType`, `detailedQcStatusId`, qcUser, qcDate, `alias`, `project_projectId`, `scientificNameId`, `taxonIdentifier`, sequencingControlTypeId, `lastModifier`, `lastModified`, `creator`, `created`, discriminator) VALUES
 (1,NULL,'SAM1','Inherited from TEST_0001','SAM1::TEST_0001_Bn_P_nn_1-1_D_1','Freezer1_1','GENOMIC',1,1,'2016-07-07','TEST_0001_Bn_P_nn_1-1_D_1',1,1,NULL,NULL,1,'2016-07-07 13:30:47',1,'2016-07-07 13:30:47', 'Sample'),
@@ -302,9 +306,9 @@ INSERT INTO SampleHierarchy(sampleId, identityId, tissueId) VALUES
 
 -- Aliquots
 INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identificationBarcode`, `locationBarcode`, `sampleType`, `detailedQcStatusId`, qcUser, qcDate, `alias`, `project_projectId`, `scientificNameId`, `taxonIdentifier`, sequencingControlTypeId, `lastModifier`, `lastModified`, `creator`, `created`,
-  `sampleClassId`, `archived`, `parentId`, `siblingNumber`, `preMigrationId`, isSynthetic, nonStandardAlias, discriminator) VALUES
+  `sampleClassId`, `archived`, `parentId`, `siblingNumber`, `preMigrationId`, isSynthetic, nonStandardAlias, samplePurposeId, discriminator) VALUES
 (19,NULL,'SAM19','aliquot1','SAM19::TEST_0001_ALIQUOT_1','Freezer1_1','GENOMIC',1,1,'2016-07-07','TEST_0001_ALIQUOT_1',1,1,NULL,1,1,'2016-07-07 13:31:21',1,'2016-07-07 13:31:21',
-  4,0,18,1,NULL,0, FALSE, 'Aliquot');
+  4,0,18,1,NULL,0, FALSE, 1, 'Aliquot');
 
 INSERT INTO SampleHierarchy(sampleId, identityId, tissueId) VALUES
 (19, 15, 17);
