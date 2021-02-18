@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
+import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.ChangeLogStore;
 
 @Transactional(rollbackFor = Exception.class)
@@ -23,7 +25,15 @@ public class DefaultChangeLogService implements ChangeLogService {
 
   @Override
   public Long create(ChangeLog changeLog) throws IOException {
-    authorizationManager.throwIfUnauthenticated();
+    if (LimsUtils.isStringEmptyOrNull(changeLog.getSummary())) {
+      throw new IllegalArgumentException("Changelog summary cannot be empty");
+    }
+    if (changeLog.getTime() == null) {
+      changeLog.setTime(new Date());
+    }
+    if (changeLog.getUser() == null) {
+      changeLog.setUser(authorizationManager.getCurrentUser());
+    }
     return changeLogDao.create(changeLog);
   }
 
