@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -35,8 +36,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import uk.ac.bbsrc.tgac.miso.core.data.InstrumentStatus;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.instrumentstatus.InstrumentStatus;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.instrumentstatus.InstrumentStatusPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.instrumentstatus.InstrumentStatusPositionRun;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentStatusService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -77,10 +79,10 @@ public class InstrumentStatusRestController extends RestController {
   }
 
   private static RunningPositions checkRunning(InstrumentStatus status) {
-    Predicate<Run> running = run -> run != null && run.getHealth() == HealthType.Running;
-    if (status.getPositions().values().stream().allMatch(running)) {
+    Predicate<InstrumentStatusPositionRun> running = run -> run != null && run.getHealth() == HealthType.Running;
+    if (status.getPositions().stream().map(InstrumentStatusPosition::getRun).allMatch(running)) {
       return RunningPositions.ALL;
-    } else if (status.getPositions().values().stream().anyMatch(running)) {
+    } else if (status.getPositions().stream().map(InstrumentStatusPosition::getRun).anyMatch(running)) {
       return RunningPositions.SOME;
     } else {
       return RunningPositions.NONE;
@@ -88,20 +90,15 @@ public class InstrumentStatusRestController extends RestController {
   }
 
   private static Date getCompareDate(InstrumentStatus status) {
-    Date latest = null;
-    for (Run run : status.getPositions().values()) {
-      if (run == null) {
-        continue;
-      }
-      Date runDate = getCompareDate(run);
-      if (latest == null || runDate.after(latest)) {
-        latest = runDate;
-      }
-    }
-    return latest;
+    return status.getPositions().stream()
+        .map(InstrumentStatusPosition::getRun)
+        .filter(Objects::nonNull)
+        .map(run -> getCompareDate(run))
+        .max(Date::compareTo)
+        .orElse(null);
   }
 
-  private static Date getCompareDate(Run run) {
+  private static Date getCompareDate(InstrumentStatusPositionRun run) {
     return run.getCompletionDate() == null ? run.getStartDate() : run.getCompletionDate();
   }
 

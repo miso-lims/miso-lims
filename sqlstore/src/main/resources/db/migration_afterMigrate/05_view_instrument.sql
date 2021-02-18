@@ -1,27 +1,30 @@
-CREATE OR REPLACE VIEW InstrumentPositionStatus AS
-SELECT
-  inst.instrumentId,
-  ipos.positionId,
-  COALESCE(ipos.positionId, -1) AS positionKey,
-  sub1.runId,
-  COALESCE(sub1.runId, -1) AS runKey
+CREATE OR REPLACE VIEW InstrumentStatusView AS
+SELECT inst.instrumentId, inst.name
 FROM Instrument inst
 JOIN InstrumentModel im ON im.instrumentModelId = inst.instrumentModelId
-LEFT JOIN InstrumentPosition ipos ON ipos.instrumentModelId = im.instrumentModelId
+WHERE inst.dateDecommissioned IS NULL
+AND im.instrumentType = 'SEQUENCER';
+
+CREATE OR REPLACE VIEW InstrumentStatusPositionView AS
+SELECT inst.instrumentId, COALESCE(ipos.positionId, -1) AS positionId, ipos.alias, sr.outOfServiceTime
+FROM Instrument inst
+LEFT JOIN InstrumentPosition ipos ON ipos.instrumentModelId = inst.instrumentModelId
 LEFT JOIN (
-  SELECT sub2.instrumentId, sub2.positionId, r.runId FROM Run r
-  JOIN Run_SequencerPartitionContainer rspc ON rspc.Run_runId = r.runId
-  JOIN (
-    SELECT inst.instrumentId, ipos.positionId, MAX(r.startDate) AS startDate
-    FROM Run r
-    JOIN Run_SequencerPartitionContainer rspc ON rspc.Run_runId = r.runId
-    JOIN Instrument inst ON inst.instrumentId = r.instrumentId
-    LEFT JOIN InstrumentPosition ipos ON ipos.positionId = rspc.positionId
-    GROUP BY inst.instrumentId, ipos.positionId
-  ) sub2 ON sub2.instrumentId = r.instrumentId
-    AND ((sub2.positionId IS NULL AND rspc.positionId IS NULL) OR sub2.positionId = rspc.positionId)
-    AND sub2.startDate = r.startDate
-) sub1 ON sub1.instrumentId = inst.instrumentId
-  AND ((sub1.positionId IS NULL AND ipos.positionId IS NULL) OR sub1.positionId = ipos.positionId)
-WHERE im.instrumentType = 'SEQUENCER'
-AND inst.dateDecommissioned IS NULL;
+  SELECT instrumentId, positionId, MIN(startTime) AS outOfServiceTime
+  FROM ServiceRecord
+  WHERE outOfService = TRUE AND startTime IS NOT NULL AND endTime IS NULL
+  GROUP BY instrumentId, positionId
+) sr ON sr.instrumentId = inst.instrumentId AND (sr.positionId IS NULL OR sr.positionId = ipos.positionId);
+
+CREATE OR REPLACE VIEW InstrumentStatusPositionRunView AS
+SELECT r.runId, r.name, r.alias, r.instrumentId, r.health, r.startDate, r.completionDate, r.lastModified,
+  COALESCE(rspc.positionId, -1) AS positionId
+FROM Run r
+LEFT JOIN Run_SequencerPartitionContainer rspc ON rspc.Run_runId = r.runId
+ORDER BY COALESCE(r.completionDate, r.startDate) DESC;
+
+CREATE OR REPLACE VIEW InstrumentStatusPositionRunPoolView AS
+SELECT rspc.Run_runId AS runId, COALESCE(rspc.positionId, -1) AS positionId, part.partitionId, pool.poolId, pool.name, pool.alias
+FROM Run_SequencerPartitionContainer rspc
+JOIN _Partition part ON part.containerId = rspc.containers_containerId
+JOIN Pool pool ON pool.poolId = part.pool_poolId;
