@@ -50,11 +50,11 @@ public abstract class AbstractHibernateSaveDaoTest<T extends Identifiable, D ext
 
   private D sut;
 
-  private final Class<T> implClass;
+  private final Class<? extends T> implClass;
   private final long knownId;
   private final int listSize;
 
-  public AbstractHibernateSaveDaoTest(Class<T> implClass, long knownId, int listSize) {
+  public AbstractHibernateSaveDaoTest(Class<? extends T> implClass, long knownId, int listSize) {
     this.implClass = implClass;
     this.knownId = knownId;
     this.listSize = listSize;

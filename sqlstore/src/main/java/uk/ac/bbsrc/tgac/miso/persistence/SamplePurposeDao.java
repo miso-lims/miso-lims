@@ -1,19 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.persistence;
 
-import java.util.List;
-
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 
-public interface SamplePurposeDao {
+public interface SamplePurposeDao extends SaveDao<SamplePurpose> {
 
-  List<SamplePurpose> getSamplePurpose();
-
-  SamplePurpose getSamplePurpose(Long id);
-
-  Long addSamplePurpose(SamplePurpose samplePurpose);
-
-  void update(SamplePurpose samplePurpose);
-
-  public long getUsage(SamplePurpose samplePurpose);
+  long getUsage(SamplePurpose samplePurpose);
 
 }
