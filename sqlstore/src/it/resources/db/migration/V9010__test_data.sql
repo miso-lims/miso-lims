@@ -795,7 +795,8 @@ INSERT INTO TransferNotification(notificationId, transferId, recipientName, reci
 (1, 1, 'Me', 'me@example.com', 1, '2020-11-11 10:36:00', '2020-11-11 10:36:00', TRUE, NULL),
 (2, 1, 'Them', 'them@example.com', 1, '2020-11-11 10:36:00', '2020-11-11 10:36:00', FALSE, '2020-11-11 10:36:00'),
 (3, 2, 'Others', 'others@example.com', 1, '2020-11-11 10:36:00', NULL, NULL, NULL),
-(4, 2, 'Anyone', 'anyone@example.com', 1, '2020-11-11 10:36:00', '2020-11-11 10:36:00', FALSE, NULL);
+(4, 2, 'Anyone', 'anyone@example.com', 1, '2020-11-11 10:36:00', '2020-11-11 10:36:00', FALSE, NULL),
+(5, 2, 'Nobody', 'nobody@example.com', 1, '2021-02-18 12:38:00', NULL, NULL, NULL);
 
 INSERT INTO Contact(contactId, name, email) VALUES
 (1, 'Someone', 'someone@example.com'),

@@ -46,7 +46,7 @@ public class HibernateTransferNotificationDao extends HibernateSaveDao<TransferN
         .add(Restrictions.isNull("sentTime"))
         .add(Restrictions.le("created", time))
         .addOrder(Order.asc("created"))
-        .setFetchSize(limit)
+        .setMaxResults(limit)
         .list();
     return results;
   }
@@ -63,7 +63,7 @@ public class HibernateTransferNotificationDao extends HibernateSaveDao<TransferN
         .createAlias("creator", "creator")
         .add(Restrictions.isNotNull("creator.email"))
         .addOrder(Order.asc("sentTime"))
-        .setFetchSize(limit)
+        .setMaxResults(limit)
         .list();
     return results;
   }

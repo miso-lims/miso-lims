@@ -18,7 +18,7 @@ public class HibernateTransferNotificationDaoIT
     extends AbstractHibernateSaveDaoTest<TransferNotification, HibernateTransferNotificationDao> {
 
   public HibernateTransferNotificationDaoIT() {
-    super(TransferNotification.class, 1L, 4);
+    super(TransferNotification.class, 1L, 5);
   }
 
   @Override
@@ -58,9 +58,23 @@ public class HibernateTransferNotificationDaoIT
   @Test
   public void testListPending() throws Exception {
     List<TransferNotification> results = getTestSubject().listPending(0, 10);
-    assertEquals(1, results.size());
+    assertEquals(2, results.size());
     assertNull(results.get(0).getSentTime());
     assertNull(results.get(0).getSendSuccess());
+    assertNull(results.get(1).getSentTime());
+    assertNull(results.get(1).getSendSuccess());
+  }
+
+  @Test
+  public void testListPendingWithLimit() throws Exception {
+    List<TransferNotification> results = getTestSubject().listPending(0, 1);
+    assertEquals(1, results.size());
+  }
+
+  @Test
+  public void testListPendingZeroLimit() throws Exception {
+    List<TransferNotification> results = getTestSubject().listPending(0, 0);
+    assertEquals(0, results.size());
   }
 
   @Test
@@ -71,6 +85,12 @@ public class HibernateTransferNotificationDaoIT
     assertNotNull(notification.getSentTime());
     assertFalse(notification.getSendSuccess());
     assertNull(notification.getFailureSentTime());
+  }
+
+  @Test
+  public void testListFailurePendingZeroLimit() throws Exception {
+    List<TransferNotification> results = getTestSubject().listFailurePending(0);
+    assertEquals(0, results.size());
   }
 
   @Test
