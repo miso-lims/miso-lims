@@ -50,16 +50,6 @@ public class HibernateChangeLogDaoIT extends AbstractDAOTest {
     libraryDao.setSessionFactory(sessionFactory);
   }
 
-  @Test
-  public void testDeleteAllById() throws Exception {
-    Collection<ChangeLog> list = listSampleChangelogs(1L);
-    assertEquals(3, list.size());
-    sut.deleteAllById("sample", 1L);
-    Collection<ChangeLog> newList = listSampleChangelogs(1L);
-    assertNotNull(newList);
-    assertEquals(0, newList.size());
-  }
-
   private Collection<ChangeLog> listSampleChangelogs(long libraryId) {
     @SuppressWarnings("unchecked")
     Collection<ChangeLog> list = currentSession().createCriteria(SampleChangeLog.class)
@@ -78,6 +68,7 @@ public class HibernateChangeLogDaoIT extends AbstractDAOTest {
 
     Library library = libraryDao.get(libraryId);
     ChangeLog changeLog = library.createChangeLog("Things have changed.", "Columns that have changed.", user);
+    changeLog.setTime(new Date());
 
     sut.create(changeLog);
     Collection<ChangeLog> newList = listLibraryChangelogs(libraryId);

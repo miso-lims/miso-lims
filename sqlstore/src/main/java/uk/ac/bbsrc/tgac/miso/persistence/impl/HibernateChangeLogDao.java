@@ -1,10 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static com.google.common.base.Preconditions.*;
-
-import java.util.Date;
-
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,16 +7,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.ExperimentChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.KitDescriptorChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SequencerPartitionContainerChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.StudyChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.ChangeLogStore;
 
 @Transactional(rollbackFor = Exception.class)
@@ -40,68 +25,8 @@ public class HibernateChangeLogDao implements ChangeLogStore {
   }
 
   @Override
-  public void deleteAllById(String type, long id) {
-    ChangeLogType changeLogType = ChangeLogType.get(type);
-    Query query = currentSession().createQuery(
-        String.format("delete %s where %s.id = :ID", changeLogType.getTableName(), changeLogType.getChangeLogEntityReferenceName()));
-    query.setParameter("ID", id);
-    query.executeUpdate();
-  }
-
-  @Override
   public Long create(ChangeLog changeLog) {
-    checkNotNull(changeLog.getId(), "The entity this change log applies to must have an id.");
-    checkNotNull(changeLog.getUser(), "The change log must be associated with a user.");
-    checkArgument(!LimsUtils.isStringEmptyOrNull(changeLog.getSummary()), "The change log summary must not be empty.");
-    if (changeLog.getTime() == null) {
-      // Set the change log time stamp to the current time if it hasn't already been set. In the case of migration the time stamp
-      // will be set to a historical time to accurately represent the time when the even occurred.
-      changeLog.setTime(new Date());
-    }
     return (Long) currentSession().save(changeLog);
-  }
-
-  public static enum ChangeLogType {
-    BOX("BoxChangeLog", "box", BoxChangeLog.class), //
-    EXPERIMENT("ExperimentChangeLog", "experiment", ExperimentChangeLog.class), //
-    KITDESCRIPTOR("KitDescriptorChangeLog", "kitDescriptor", KitDescriptorChangeLog.class), //
-    LIBRARY("LibraryChangeLog", "library", LibraryChangeLog.class), //
-    POOL("PoolChangeLog", "pool", PoolChangeLog.class), //
-    RUN("RunChangeLog", "run", RunChangeLog.class), //
-    SAMPLE("SampleChangeLog", "sample", SampleChangeLog.class), //
-    SEQUENCERPARTITIONCONTAINER("SequencerPartitionContainerChangeLog", "sequencerPartitionContainer", SequencerPartitionContainerChangeLog.class), //
-    STUDY("StudyChangeLog", "study", StudyChangeLog.class);//
-
-    private final String tableName;
-    private final String changeLogEntityReferenceName;
-    private final Class<? extends ChangeLog> clazz;
-
-    private ChangeLogType(String tableName, String changeLogReferenceName, Class<? extends ChangeLog> clazz) {
-      this.tableName = tableName;
-      this.changeLogEntityReferenceName = changeLogReferenceName;
-      this.clazz = clazz;
-    }
-
-    public String getTableName() {
-      return tableName;
-    }
-
-    public Class<? extends ChangeLog> getClazz() {
-      return clazz;
-    }
-
-    public static ChangeLogType get(String type) {
-      return ChangeLogType.valueOf(type.toUpperCase());
-    }
-
-    /**
-     * Name of change log member that provides a reference to entity the change log was written about.
-     * 
-     * @return Change log member name.
-     */
-    public String getChangeLogEntityReferenceName() {
-      return changeLogEntityReferenceName;
-    }
   }
 
 }
