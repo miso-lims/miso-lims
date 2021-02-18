@@ -4,31 +4,20 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.List;
 
-import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Matchers;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 
 /**
  * @author Chris Salt
@@ -36,25 +25,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
  */
 public class HibernateExperimentDaoIT extends AbstractDAOTest {
 
-
-  @Autowired
-  private SessionFactory sessionFactory;
-
-  @Mock
-  private NamingSchemeHolder namingSchemeHolder;
-  @Mock
-  private NamingScheme namingScheme;
-
-  @InjectMocks
   private HibernateExperimentDao dao;
 
   @Before
   public void setup() throws Exception {
-    MockitoAnnotations.initMocks(this);
-    dao.setSessionFactory(sessionFactory);
-    when(namingSchemeHolder.getPrimary()).thenReturn(namingScheme);
-    when(namingScheme.generateNameFor(Matchers.any(Experiment.class))).thenReturn("EDI123");
-    when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
+    dao = new HibernateExperimentDao();
+    dao.setSessionFactory(getSessionFactory());
   }
 
   /**
@@ -65,19 +41,39 @@ public class HibernateExperimentDaoIT extends AbstractDAOTest {
    * @throws MisoNamingException
    */
   @Test
-  public void testSave() throws IOException, MisoNamingException {
+  public void testCreate() throws IOException, MisoNamingException {
+    String name = "TEMPORARY_XXX";
     Experiment experiment = new Experiment();
-    experiment.setName("TEMPORARY_XXX");
-    InstrumentModel model = (InstrumentModel) sessionFactory.getCurrentSession().get(InstrumentModel.class, 16L);
+    experiment.setName(name);
+    InstrumentModel model = (InstrumentModel) currentSession().get(InstrumentModel.class, 16L);
     experiment.setInstrumentModel(model);
-    experiment.setStudy(new StudyImpl());
-    User user = new UserImpl();
+    User user = (User) currentSession().get(UserImpl.class, 1L);
     user.setId(1L);
 
     experiment.setChangeDetails(user);
-    experiment.setName(namingScheme.generateNameFor(experiment));
     experiment.setTitle("Title");
-    dao.save(experiment);
+    long savedId = dao.save(experiment);
+
+    clearSession();
+
+    Experiment saved = (Experiment) currentSession().get(Experiment.class, savedId);
+    assertNotNull(saved);
+    assertEquals(name, saved.getName());
+  }
+
+  @Test
+  public void testUpdate() throws Exception {
+    long id = 4L;
+    String newAlias = "New Alias";
+    Experiment original = (Experiment) currentSession().get(Experiment.class, id);
+    assertNotEquals(newAlias, original.getAlias());
+    original.setAlias(newAlias);
+    dao.save(original);
+
+    clearSession();
+
+    Experiment saved = (Experiment) currentSession().get(Experiment.class, id);
+    assertEquals(newAlias, saved.getAlias());
   }
 
   /**
