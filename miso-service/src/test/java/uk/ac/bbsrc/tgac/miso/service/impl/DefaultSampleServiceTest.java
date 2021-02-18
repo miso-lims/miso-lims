@@ -2,7 +2,6 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.hasTemporaryName;
-import static uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils.generateTemporaryName;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -130,7 +129,7 @@ public class DefaultSampleServiceTest {
   @Test
   public void temporarySampleNameTest() throws Exception {
     Sample sample = new SampleImpl();
-    sample.setName(generateTemporaryName());
+    sample.setName(LimsUtils.generateTemporaryName());
     assertTrue("Temporary sample names must return true.", hasTemporaryName(sample));
   }
 

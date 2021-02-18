@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.util;
 
 import java.util.Date;
-import java.util.UUID;
 import java.util.regex.Matcher;
 
 import org.hibernate.Criteria;
@@ -152,20 +151,6 @@ public class DbUtils {
     } else {
       return Restrictions.ilike(propertyName, sanitizedQuery, matchMode);
     }
-  }
-
-  /**
-   * Prefix for a temporary name for any entity
-   */
-  public static final String TEMPORARY_NAME_PREFIX = "TEMPORARY_";
-
-  /**
-   * Generate a temporary name using a UUID.
-   * 
-   * @return Temporary name
-   */
-  public static String generateTemporaryName() {
-    return TEMPORARY_NAME_PREFIX + UUID.randomUUID();
   }
 
 }

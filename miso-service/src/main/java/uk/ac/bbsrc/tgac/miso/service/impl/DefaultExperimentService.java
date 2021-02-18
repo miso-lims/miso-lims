@@ -29,10 +29,10 @@ import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.persistence.ExperimentStore;
-import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
@@ -81,7 +81,7 @@ public class DefaultExperimentService implements ExperimentService {
   @Override
   public long create(Experiment experiment) throws IOException {
     loadRunPartitions(experiment);
-    experiment.setName(DbUtils.generateTemporaryName());
+    experiment.setName(LimsUtils.generateTemporaryName());
     experiment.setInstrumentModel(instrumentModelService.get(experiment.getInstrumentModel().getId()));
     experiment.setLibrary(libraryService.get(experiment.getLibrary().getId()));
     experiment.setStudy(studyService.get(experiment.getStudy().getId()));
