@@ -535,7 +535,8 @@ INSERT INTO SequencingParameters (parametersId, name, instrumentModelId, readLen
 (3, 'MiSeq Params 1', 1, 100, 100, 1, 1, '2019-09-23 10:05:00', '2019-09-23 10:05:00', NULL);
 
 INSERT INTO RunPurpose(purposeId, alias) VALUES
-(1, 'Production');
+(1, 'Production'),
+(2, 'Research');
 
 INSERT INTO `Instrument`(`instrumentId`, `name`, `instrumentModelId`, defaultPurposeId) VALUES
 (1, 'SN7001179', 16, 1),
