@@ -49,6 +49,18 @@ public class HibernateSiblingNumberGeneratorIT extends AbstractDAOTest {
   }
 
   @Test
+  public void testIgnoreNonSiblingPartialMatch() throws Exception {
+    String partialAlias = "TEST_0001_TIS";
+    DetailedSample s1 = (DetailedSample) sessionFactory.getCurrentSession().get(SampleImpl.class, 16L);
+    DetailedSample s2 = (DetailedSample) sessionFactory.getCurrentSession().get(SampleImpl.class, 17L);
+    assertTrue(s1.getAlias().startsWith(partialAlias));
+    assertEquals(new Integer(1), s1.getSiblingNumber());
+    assertTrue(s2.getAlias().startsWith(partialAlias));
+    assertEquals(new Integer(2), s2.getSiblingNumber());
+    assertEquals(1, sut.getFirstAvailableSiblingNumber(SampleImpl.class, partialAlias));
+  }
+
+  @Test
   public void getNextForFirstChildTest() throws Exception {
     String partialAlias = "only_child_";
     assertEquals(1, sut.getNextSiblingNumber(SampleImpl.class, partialAlias));

@@ -52,7 +52,7 @@ public class HibernateSiblingNumberGenerator implements SiblingNumberGenerator {
     return next;
   }
 
-  public <T extends Aliasable> Set<Integer> getExistingSiblingNumbers(Class<T> clazz, String partialAlias) throws IOException {
+  private <T extends Aliasable> Set<Integer> getExistingSiblingNumbers(Class<T> clazz, String partialAlias) throws IOException {
     @SuppressWarnings("unchecked")
     List<String> results = currentSession().createCriteria(clazz)
         .add(Restrictions.like("alias", partialAlias, MatchMode.START))
