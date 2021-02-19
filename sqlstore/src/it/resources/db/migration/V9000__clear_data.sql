@@ -100,6 +100,7 @@ DELETE FROM StorageLocation;
 DELETE FROM StorageLocationMap;
 DELETE FROM Study;
 DELETE FROM StudyChangeLog;
+DELETE FROM StudyType;
 DELETE FROM Submission;
 DELETE FROM Submission_Experiment;
 DELETE FROM TargetedSequencing;
