@@ -235,6 +235,11 @@ INSERT INTO `TissueOrigin`(`tissueOriginId`, `alias`, `description`, `createdBy`
 INSERT INTO `TissueType`(`tissueTypeId`, `alias`, `description`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
 VALUES (1,'Test Type','for testing',1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:00');
 
+INSERT INTO TissueMaterial(tissueMaterialId, alias, createdBy, creationDate, updatedBy, lastUpdated) VALUES
+(1, 'Fresh Frozen', 1, '2021-02-19 09:12:00', 1, '2021-02-19 09:12:00'),
+(2, 'FFPE', 1, '2021-02-19 09:12:00', 1, '2021-02-19 09:12:00'),
+(3, 'Blood', 1, '2021-02-19 09:12:00', 1, '2021-02-19 09:12:00');
+
 INSERT INTO `SampleClass`(`sampleClassId`, `alias`, `sampleCategory`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
 VALUES (1,'Identity','Identity',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00'),
 (2,'Primary Tumor Tissue','Tissue',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00'),
@@ -280,16 +285,16 @@ INSERT INTO SampleHierarchy(sampleId, identityId, tissueId) VALUES
 -- Tissues
 INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identificationBarcode`, `locationBarcode`, `sampleType`, `detailedQcStatusId`, qcUser, qcDate, `alias`, `project_projectId`, `scientificNameId`, `taxonIdentifier`, sequencingControlTypeId, `lastModifier`, `lastModified`, `creator`, `created`,
   `sampleClassId`, `archived`, `parentId`, `siblingNumber`, `preMigrationId`, isSynthetic, nonStandardAlias, discriminator,
-  tissueOriginId, tissueTypeId, timesReceived, tubeNumber, labId) VALUES
+  tissueOriginId, tissueTypeId, tissueMaterialId, timesReceived, tubeNumber, labId) VALUES
 (16,NULL,'SAM16','tissue1','SAM16::TEST_0001_TISSUE_1','Freezer1_1','GENOMIC',1,1,'2016-07-07','TEST_0001_TISSUE_1',1,1,NULL,NULL,1,'2016-07-07 13:31:15',1,'2016-07-07 13:31:15',
   2,0,15,1,NULL,1, FALSE, 'Tissue',
-  1, 1, 1, 1, 2),
+  1, 1, 2, 1, 1, 2),
 (17,NULL,'SAM17','tissue2','SAM17::TEST_0001_TISSUE_2','Freezer1_1','GENOMIC',1,1,'2016-07-07','TEST_0001_TISSUE_2',1,1,NULL,NULL,1,'2016-07-07 13:31:17',1,'2016-07-07 13:31:17',
   2,0,15,2,1,0, FALSE, 'Tissue',
-  1, 1, 1, 2, NULL),
+  1, 1, 2, 1, 2, NULL),
 (21,NULL,'SAM21','tissue4','SAM21::TEST_0001_TISSUE_4','Freezer1_1','GENOMIC',1,1,'2016-07-07','TEST_0001_TISSUE_4',1,1,NULL,NULL,1,'2016-07-07 13:31:17',1,'2016-07-07 13:31:17',
   2,0,15,4,NULL,0, FALSE, 'Tissue',
-  1, 1, 1, 3, NULL);
+  1, 1, NULL, 1, 3, NULL);
 
 INSERT INTO SampleHierarchy(sampleId, identityId, tissueId) VALUES
 (16, 15, 16),
