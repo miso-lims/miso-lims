@@ -108,8 +108,6 @@ public interface SampleStore extends Store<Sample>, PaginatedDataSource<Sample> 
 
   void update(Sample sample) throws IOException;
 
-  Long countAll() throws IOException;
-
   /**
    * List all the identities associated with a given project which have at least one external name which exactly or partially matches the
    * input String or a comma-separated portion of the input String.

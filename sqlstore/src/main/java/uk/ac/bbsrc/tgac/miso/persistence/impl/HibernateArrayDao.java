@@ -7,7 +7,6 @@ import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -132,12 +131,6 @@ public class HibernateArrayDao implements ArrayStore, HibernatePaginatedDataSour
     @SuppressWarnings("unchecked")
     List<Array> results = criteria.list();
     return results;
-  }
-
-  @Override
-  public int count() throws IOException {
-    long c = (Long) currentSession().createCriteria(Array.class).setProjection(Projections.rowCount()).uniqueResult();
-    return (int) c;
   }
 
   @Override

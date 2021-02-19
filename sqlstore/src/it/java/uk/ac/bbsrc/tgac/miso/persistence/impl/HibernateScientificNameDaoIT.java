@@ -38,7 +38,7 @@ public class HibernateScientificNameDaoIT extends AbstractHibernateSaveDaoTest<S
 
   @Test
   public void testGetUsageBySamples() throws Exception {
-    testGetUsage(HibernateScientificNameDao::getUsageBySamples, 1L, 21L);
+    testGetUsage(HibernateScientificNameDao::getUsageBySamples, 1L, 24L);
   }
 
   @Test

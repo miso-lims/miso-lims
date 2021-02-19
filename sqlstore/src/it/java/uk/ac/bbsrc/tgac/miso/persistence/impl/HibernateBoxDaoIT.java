@@ -75,12 +75,6 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testCount() throws IOException {
-    int runs = dao.count();
-    assertEquals(2, runs);
-  }
-
-  @Test
   public void testGetBoxById() throws IOException, InterruptedException {
     Box box = dao.get(1);
     assertEquals("box1alias", box.getAlias());
@@ -107,9 +101,7 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
   @Test
   public void testListAll() throws Exception {
     Collection<Box> boxes = dao.listAll();
-    assertTrue(boxes.size() > 0);
-
-    assertEquals(boxes.size(), dao.count());
+    assertEquals(2, boxes.size());
   }
 
   @Test

@@ -56,12 +56,6 @@ public class HibernateProjectDao implements ProjectStore {
   @Autowired
   private SessionFactory sessionFactory;
 
-  @Override
-  public int count() throws IOException {
-    long c = (Long) currentSession().createCriteria(ProjectImpl.class).setProjection(Projections.rowCount()).uniqueResult();
-    return (int) c;
-  }
-
   private Session currentSession() {
     return sessionFactory.getCurrentSession();
   }

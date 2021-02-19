@@ -105,12 +105,7 @@ public class HibernateRunDaoIT extends AbstractDAOTest {
   @Test
   public void testListAll() throws IOException {
     List<Run> runs = dao.listAll();
-    assertTrue(runs.size() > 0);
-  }
-
-  @Test
-  public void testRunCount() throws IOException {
-    assertEquals(dao.listAll().size(), dao.count());
+    assertEquals(4, runs.size());
   }
 
   @Test

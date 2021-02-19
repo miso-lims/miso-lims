@@ -64,11 +64,6 @@ public class HibernateLibraryAliquotDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testCount() throws IOException {
-    assertEquals(15, dao.count());
-  }
-
-  @Test
   public void testGetLibraryAliquotByBarcode() throws IOException {
     final LibraryAliquot ld = dao.getByBarcode("LDI2::TEST_0001_Bn_R_PE_300_WG");
     assertNotNull(ld);

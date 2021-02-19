@@ -214,6 +214,11 @@ INSERT INTO `Project`(`projectId`, `created`, `description`, `name`, `status`, `
 (2,'2013-11-27 12:20:15','Test project2','PRO2','ACTIVE','TEST2','TEST2','2015-11-30 15:23:18', 1, 1, 1, 1),
 (3,'2016-01-27 11:11:15','Test project3','PRO3','ACTIVE','TEST3','TEST3','2016-02-22 10:43:18', 2, 1, 1, 2);
 
+INSERT INTO Subproject(subprojectId, projectId, alias, referenceGenomeId, priority, createdBy, creationDate, updatedBy, lastUpdated) VALUES
+(1, 2, 'Important', 1, TRUE, 1, '2021-02-19 10:01:00', 1, '2021-02-19 10:01:00'),
+(2, 2, 'Meh', 1, FALSE, 1, '2021-02-19 10:01:00', 1, '2021-02-19 10:01:00'),
+(3, 2, 'Unused', 1, FALSE, 1, '2021-02-19 10:01:00', 1, '2021-02-19 10:01:00');
+
 INSERT INTO Study(studyId, name, description, accession, project_projectId, studyTypeId, alias, creator, created, lastModifier, lastModified)
 VALUES (1,'STU1','Test study1',NULL,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study1',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
 (2,'STU2','Test study2',NULL,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study2',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
@@ -268,33 +273,63 @@ INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identifica
 (14,NULL,'SAM14','Inherited from TEST_0007','SAM14::TEST_0007_Bn_R_nn_1-1_D_1','Freezer1_14','GENOMIC',1,1,'2016-07-07','TEST_0007_Bn_R_nn_1-1_D_1',1,1,NULL,NULL,1,'2016-07-07 13:31:11',1,'2016-07-07 13:31:11', 'Sample');
 
   -- Identities
-INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identificationBarcode`, `locationBarcode`, `sampleType`, `detailedQcStatusId`, qcUser, qcDate, `alias`, `project_projectId`, `scientificNameId`, `taxonIdentifier`, sequencingControlTypeId, `lastModifier`, `lastModified`, `creator`, `created`,
+INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identificationBarcode`, `locationBarcode`,
+  `sampleType`, `detailedQcStatusId`, qcUser, qcDate, `alias`, `project_projectId`, `scientificNameId`,
+  `taxonIdentifier`, sequencingControlTypeId, `lastModifier`, `lastModified`, `creator`, `created`,
   `sampleClassId`, `archived`, `parentId`, `siblingNumber`, `preMigrationId`, isSynthetic, nonStandardAlias, discriminator,
   externalName, donorSex, consentLevel) VALUES
-(15,NULL,'SAM15','identity1','SAM15::TEST_0001_IDENTITY_1','Freezer1_1','GENOMIC',1,1,'2016-07-07','TEST_0001_IDENTITY_1',1,1,NULL,NULL,1,'2016-07-07 13:31:13',1,'2016-07-07 13:31:13',
+(15,NULL,'SAM15','identity1','SAM15::TEST_0001_IDENTITY_1','Freezer1_1',
+  'GENOMIC',1,1,'2016-07-07','TEST_0001_IDENTITY_1',1,1,
+  NULL,NULL,1,'2016-07-07 13:31:13',1,'2016-07-07 13:31:13',
   1,0,NULL,NULL,NULL,0, FALSE, 'Identity',
   '15_EXT15,EXT15','UNKNOWN', 'THIS_PROJECT'),
-(20,NULL,'SAM20','identity2','SAM20::TEST_0002_IDENTITY_2','Freezer1_1','GENOMIC',1,1,'2016-07-07','TEST_0002_IDENTITY_2',1,1,NULL,NULL,1,'2018-02-22 14:34:00',1,'2018-02-22 14:34:00',
+(20,NULL,'SAM20','identity2','SAM20::TEST_0002_IDENTITY_2','Freezer1_1',
+  'GENOMIC',1,1,'2016-07-07','TEST_0002_IDENTITY_2',1,1,
+  NULL,NULL,1,'2018-02-22 14:34:00',1,'2018-02-22 14:34:00',
   1,0,NULL,NULL,NULL,0, FALSE, 'Identity',
-  '20_EXT20,EXT20','UNKNOWN', 'THIS_PROJECT');
+  '20_EXT20,EXT20','UNKNOWN', 'THIS_PROJECT'),
+(22,NULL,'SAM22','identity3','SAM22::TEST2_0001',NULL,
+  'GENOMIC',1,1,'2021-02-19','TEST2_0001',2,1,
+  NULL,NULL,1,'2021-02-19 10:12:00',1,'2021-02-19 10:12:00',
+  1,0,NULL,NULL,NULL,0, FALSE, 'Identity',
+  'test2donor1','UNKNOWN', 'THIS_PROJECT');
 
 INSERT INTO SampleHierarchy(sampleId, identityId, tissueId) VALUES
 (15, 15, NULL),
-(20, 20, NULL);
+(20, 20, NULL),
+(22, 22, NULL);
 
 -- Tissues
-INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identificationBarcode`, `locationBarcode`, `sampleType`, `detailedQcStatusId`, qcUser, qcDate, `alias`, `project_projectId`, `scientificNameId`, `taxonIdentifier`, sequencingControlTypeId, `lastModifier`, `lastModified`, `creator`, `created`,
+INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identificationBarcode`, `locationBarcode`,
+  `sampleType`, `detailedQcStatusId`, qcUser, qcDate, `alias`, `project_projectId`, subprojectId, `scientificNameId`,
+  `taxonIdentifier`, sequencingControlTypeId, `lastModifier`, `lastModified`, `creator`, `created`,
   `sampleClassId`, `archived`, `parentId`, `siblingNumber`, `preMigrationId`, isSynthetic, nonStandardAlias, discriminator,
   tissueOriginId, tissueTypeId, tissueMaterialId, timesReceived, tubeNumber, labId) VALUES
-(16,NULL,'SAM16','tissue1','SAM16::TEST_0001_TISSUE_1','Freezer1_1','GENOMIC',1,1,'2016-07-07','TEST_0001_TISSUE_1',1,1,NULL,NULL,1,'2016-07-07 13:31:15',1,'2016-07-07 13:31:15',
+(16,NULL,'SAM16','tissue1','SAM16::TEST_0001_TISSUE_1','Freezer1_1',
+  'GENOMIC',1,1,'2016-07-07','TEST_0001_TISSUE_1',1,NULL,1,
+  NULL,NULL,1,'2016-07-07 13:31:15',1,'2016-07-07 13:31:15',
   2,0,15,1,NULL,1, FALSE, 'Tissue',
   1, 1, 2, 1, 1, 2),
-(17,NULL,'SAM17','tissue2','SAM17::TEST_0001_TISSUE_2','Freezer1_1','GENOMIC',1,1,'2016-07-07','TEST_0001_TISSUE_2',1,1,NULL,NULL,1,'2016-07-07 13:31:17',1,'2016-07-07 13:31:17',
+(17,NULL,'SAM17','tissue2','SAM17::TEST_0001_TISSUE_2','Freezer1_1',
+  'GENOMIC',1,1,'2016-07-07','TEST_0001_TISSUE_2',1,NULL,1,
+  NULL,NULL,1,'2016-07-07 13:31:17',1,'2016-07-07 13:31:17',
   2,0,15,2,1,0, FALSE, 'Tissue',
   1, 1, 2, 1, 2, NULL),
-(21,NULL,'SAM21','tissue4','SAM21::TEST_0001_TISSUE_4','Freezer1_1','GENOMIC',1,1,'2016-07-07','TEST_0001_TISSUE_4',1,1,NULL,NULL,1,'2016-07-07 13:31:17',1,'2016-07-07 13:31:17',
+(21,NULL,'SAM21','tissue4','SAM21::TEST_0001_TISSUE_4','Freezer1_1',
+  'GENOMIC',1,1,'2016-07-07','TEST_0001_TISSUE_4',1,NULL,1,
+  NULL,NULL,1,'2016-07-07 13:31:17',1,'2016-07-07 13:31:17',
   2,0,15,4,NULL,0, FALSE, 'Tissue',
-  1, 1, NULL, 1, 3, NULL);
+  1, 1, NULL, 1, 3, NULL),
+(23,NULL,'SAM23','tissue5','SAM23::TEST2_0001_TISSUE_1',NULL,
+  'GENOMIC',1,1,'2016-07-07','TEST_0001_TISSUE_1',2,1,1,
+  NULL,NULL,1,'2021-02-19 10:12:00',1,'2021-02-19 10:12:00',
+  2,0,22,1,NULL,0, FALSE, 'Tissue',
+  1, 1, NULL, 1, 1, NULL),
+(24,NULL,'SAM24','tissue6','SAM24::TEST2_0001_TISSUE_2',NULL,
+  'GENOMIC',1,1,'2016-07-07','TEST_0001_TISSUE_2',2,2,1,
+  NULL,NULL,1,'2021-02-19 10:12:00',1,'2021-02-19 10:12:00',
+  2,0,22,1,NULL,0, FALSE, 'Tissue',
+  1, 1, NULL, 1, 1, NULL);
 
 INSERT INTO SampleHierarchy(sampleId, identityId, tissueId) VALUES
 (16, 15, 16),

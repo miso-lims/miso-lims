@@ -81,12 +81,6 @@ public class HibernateLibraryAliquotDao
   }
 
   @Override
-  public int count() throws IOException {
-    Criteria criteria = currentSession().createCriteria(LibraryAliquot.class);
-    return ((Long) criteria.setProjection(Projections.rowCount()).uniqueResult()).intValue();
-  }
-
-  @Override
   public List<LibraryAliquot> listByLibraryId(long libraryId) throws IOException {
     Criteria criteria = currentSession().createCriteria(LibraryAliquot.class);
     criteria.add(Restrictions.eq("library.id", libraryId));

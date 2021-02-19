@@ -6,10 +6,7 @@ import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,8 +17,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.ServiceRecordStore;
 @Repository
 @Transactional(rollbackFor = Exception.class)
 public class HibernateServiceRecordDao implements ServiceRecordStore {
-
-  protected static final Logger log = LoggerFactory.getLogger(HibernateServiceRecordDao.class);
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -56,12 +51,6 @@ public class HibernateServiceRecordDao implements ServiceRecordStore {
     @SuppressWarnings("unchecked")
     List<ServiceRecord> records = criteria.list();
     return records;
-  }
-
-  @Override
-  public int count() throws IOException {
-    Criteria criteria = currentSession().createCriteria(ServiceRecord.class);
-    return ((Long) criteria.setProjection(Projections.rowCount()).uniqueResult()).intValue();
   }
 
   @Override

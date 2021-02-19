@@ -11,8 +11,6 @@ public interface SubprojectDao extends SaveDao<Subproject> {
 
   public List<Subproject> listByProjectId(Long projectId);
 
-  public void delete(Subproject subproject);
-
   public long getUsage(Subproject subproject);
 
 }

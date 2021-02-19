@@ -17,8 +17,6 @@ public interface LibraryService extends PaginatedDataSource<Library>, Barcodable
     return EntityType.LIBRARY;
   }
 
-  public int count() throws IOException;
-
   public List<Library> list() throws IOException;
 
   public EntityReference getAdjacentLibrary(Library library, boolean before) throws IOException;

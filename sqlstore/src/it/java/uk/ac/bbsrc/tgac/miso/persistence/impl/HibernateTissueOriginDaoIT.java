@@ -51,7 +51,7 @@ public class HibernateTissueOriginDaoIT extends AbstractHibernateSaveDaoTest<Tis
   @Test
   public void testGetUsage() throws Exception {
     TissueOrigin origin1 = (TissueOrigin) currentSession().get(TissueOriginImpl.class, 1L);
-    assertEquals(3, getTestSubject().getUsage(origin1));
+    assertEquals(5, getTestSubject().getUsage(origin1));
     TissueOrigin origin2 = (TissueOrigin) currentSession().get(TissueOriginImpl.class, 2L);
     assertEquals(0, getTestSubject().getUsage(origin2));
   }

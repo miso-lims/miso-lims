@@ -274,11 +274,6 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   }
 
   @Override
-  public int count() throws IOException {
-    return libraryDao.count();
-  }
-
-  @Override
   public List<Library> list() throws IOException {
     return libraryDao.listAll();
   }

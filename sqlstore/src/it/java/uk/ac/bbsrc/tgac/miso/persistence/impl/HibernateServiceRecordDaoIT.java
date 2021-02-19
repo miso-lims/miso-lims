@@ -136,12 +136,6 @@ public class HibernateServiceRecordDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testCount() throws IOException {
-    int rows = dao.count();
-    assertEquals(3, rows);
-  }
-
-  @Test
   public void testListByInstrumentId() {
     List<ServiceRecord> list = dao.listByInstrumentId(1L);
     assertEquals(2, list.size());

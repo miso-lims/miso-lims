@@ -47,11 +47,6 @@ public class HibernateExperimentDao implements ExperimentStore {
 
   @Autowired
   private SessionFactory sessionFactory;
-  @Override
-  public int count() throws IOException {
-    long c = (Long) currentSession().createCriteria(Experiment.class).setProjection(Projections.rowCount()).uniqueResult();
-    return (int) c;
-  }
 
   private Session currentSession() {
     return getSessionFactory().getCurrentSession();

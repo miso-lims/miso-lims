@@ -83,7 +83,7 @@ public class HibernateTissueTypeDaoIT extends AbstractDAOTest {
   public void testGetUsage() throws IOException {
     TissueType tt = (TissueType) getSessionFactory().getCurrentSession().get(TissueTypeImpl.class, 1L);
     assertEquals("Test Type", tt.getAlias());
-    assertEquals(3L, sut.getUsage(tt));
+    assertEquals(5L, sut.getUsage(tt));
   }
 
 }

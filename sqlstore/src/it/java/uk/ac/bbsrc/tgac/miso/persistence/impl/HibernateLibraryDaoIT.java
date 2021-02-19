@@ -170,11 +170,6 @@ public class HibernateLibraryDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testCount() throws Exception {
-    assertEquals("count incorrect", 15, dao.count());
-  }
-
-  @Test
   public void testListWithLimitAndOffset() throws IOException {
     assertEquals(3, dao.list(5, 3, true, "id").size());
   }
