@@ -97,17 +97,6 @@ public class HibernateExperimentDaoIT extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao#count()}.
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testCount() throws IOException {
-    int count = dao.count();
-    assertEquals(32, count);
-  }
-
-  /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao#listByStudyId(long)} .
    */
   @Test

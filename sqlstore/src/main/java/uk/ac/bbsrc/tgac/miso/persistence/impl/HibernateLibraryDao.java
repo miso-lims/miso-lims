@@ -128,12 +128,6 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   }
 
   @Override
-  public int count() throws IOException {
-    Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
-    return ((Long) criteria.setProjection(Projections.rowCount()).uniqueResult()).intValue();
-  }
-
-  @Override
   public Library getByBarcode(String barcode) throws IOException {
     Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
     criteria.add(Restrictions.eq("identificationBarcode", barcode));

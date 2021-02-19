@@ -1003,11 +1003,6 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   }
 
   @Override
-  public Long countAll() throws IOException {
-    return sampleStore.countAll();
-  }
-
-  @Override
   public Collection<Sample> listByProjectId(long projectId) throws IOException {
     return sampleStore.listByProjectId(projectId);
   }

@@ -101,13 +101,6 @@ public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginat
   }
 
   @Override
-  public int count() throws IOException {
-    long c = (Long) currentSession().createCriteria(InstrumentImpl.class)
-        .setProjection(Projections.rowCount()).uniqueResult();
-    return (int) c;
-  }
-
-  @Override
   public Instrument getByName(String name) throws IOException {
     Criteria criteria = currentSession().createCriteria(InstrumentImpl.class);
     criteria.add(Restrictions.eq("name", name));

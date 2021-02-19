@@ -83,11 +83,6 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
-  public int count() throws IOException {
-    return list().size();
-  }
-
-  @Override
   public Session currentSession() {
     return getSessionFactory().getCurrentSession();
   }
@@ -157,12 +152,6 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   @Override
   public Sample getSample(long id) throws IOException {
     return (Sample) currentSession().get(SampleImpl.class, id);
-  }
-
-  @Override
-  public Long countAll() throws IOException {
-    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
-    return (Long) criteria.setProjection(Projections.rowCount()).uniqueResult();
   }
 
   @Override

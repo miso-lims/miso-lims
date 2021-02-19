@@ -56,7 +56,7 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
   @Test
   public void testListAll() throws IOException {
     Collection<Sample> samples = dao.listAll();
-    assertEquals(21, samples.size());
+    assertEquals(24, samples.size());
   }
 
   @Test
@@ -110,12 +110,6 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
     Sample retrieved = dao.get(id);
     assertEquals("sample name does not match", sampleName, retrieved.getName());
     assertEquals("did not update sample", sizeBefore, dao.listAll().size());
-  }
-
-  @Test
-  public void testCount() throws Exception {
-    int total = dao.count();
-    assertEquals(21, total);
   }
 
   @Test
@@ -201,21 +195,21 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
   public void getSamplesOffsetZeroWithTwoSamplesPerPageTest() throws Exception {
     List<Sample> samples = dao.list(0, 2, false, "id");
     assertEquals(2, samples.size());
-    assertEquals(21L, samples.get(0).getId());
+    assertEquals(24L, samples.get(0).getId());
   }
 
   @Test
   public void getSamplesOffsetThreeWithThreeSamplesPerPageTest() throws Exception {
     List<Sample> samples = dao.list(3, 3, false, "id");
     assertEquals(3, samples.size());
-    assertEquals(18L, samples.get(0).getId());
+    assertEquals(21L, samples.get(0).getId());
   }
 
   @Test
   public void getSamplesOffsetTwoWithTwoSamplesPerPageOrderLastModTest() throws Exception {
     List<Sample> samples = dao.list(2, 2, false, "lastModified");
     assertEquals(2, samples.size());
-    assertEquals(18L, samples.get(0).getId());
+    assertEquals(24L, samples.get(0).getId());
   }
 
   @Test
@@ -242,12 +236,6 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
   public void countSamplesByBadSearch() throws IOException {
     long numSamples = dao.count(PaginationFilter.query(";DROP TABLE Sample;"));
     assertEquals(0L, numSamples);
-  }
-
-  @Test
-  public void countSamplesByEmptySearch() throws IOException {
-    long numSamples = dao.count();
-    assertEquals(21L, numSamples);
   }
 
   @Test

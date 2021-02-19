@@ -164,11 +164,6 @@ public class HibernateArrayDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testCount() throws Exception {
-    assertEquals(1, sut.count());
-  }
-
-  @Test
   public void testSearch() throws IOException {
     testSearch(PaginationFilter.query("Array"));
   }

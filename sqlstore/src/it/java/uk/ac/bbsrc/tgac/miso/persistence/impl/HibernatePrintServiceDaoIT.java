@@ -37,10 +37,9 @@ public class HibernatePrintServiceDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testListAllAndCount() throws IOException {
+  public void testListAll() throws IOException {
     Collection<Printer> all = dao.listAll();
-    assertTrue(all.size() > 0);
-    assertEquals(all.size(), dao.count());
+    assertEquals(1, all.size());
   }
 
 

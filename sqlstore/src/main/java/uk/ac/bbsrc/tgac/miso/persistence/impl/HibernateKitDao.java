@@ -98,12 +98,6 @@ public class HibernateKitDao implements KitStore, HibernatePaginatedDataSource<K
     return currentSession().createCriteria(KitImpl.class).list();
   }
 
-  @Override
-  public int count() throws IOException {
-    long c = (Long) currentSession().createCriteria(KitImpl.class).setProjection(Projections.rowCount()).uniqueResult();
-    return (int) c;
-  }
-
   @SuppressWarnings("unchecked")
   @Override
   public List<Kit> listKitsByType(KitType kitType) throws IOException {

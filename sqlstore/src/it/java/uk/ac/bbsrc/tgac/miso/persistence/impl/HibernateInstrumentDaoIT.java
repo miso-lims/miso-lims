@@ -67,12 +67,6 @@ public class HibernateInstrumentDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testCount() throws Exception {
-    int total = dao.count();
-    assertEquals(3, total);
-  }
-
-  @Test
   public void testGet() throws Exception {
     Instrument instrument = dao.get(1);
     assertNotNull(instrument);

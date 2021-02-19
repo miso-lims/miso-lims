@@ -30,7 +30,6 @@ import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Projections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,12 +44,6 @@ public class HibernatePrinterDao implements PrinterStore, HibernatePaginatedData
 
   @Autowired
   private SessionFactory sessionFactory;
-
-  @Override
-  public int count() throws IOException {
-    long c = (Long) currentSession().createCriteria(Printer.class).setProjection(Projections.rowCount()).uniqueResult();
-    return (int) c;
-  }
 
   @Override
   public Session currentSession() {

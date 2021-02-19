@@ -219,11 +219,6 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
   }
 
   @Override
-  public int count() throws IOException {
-    return libraryAliquotDao.count();
-  }
-
-  @Override
   public List<LibraryAliquot> list() throws IOException {
     return libraryAliquotDao.listAll();
   }

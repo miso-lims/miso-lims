@@ -103,12 +103,6 @@ public class HibernateStudyDao implements StudyStore, HibernatePaginatedDataSour
   }
 
   @Override
-  public int count() throws IOException {
-    long c = (Long) currentSession().createCriteria(StudyImpl.class).setProjection(Projections.rowCount()).uniqueResult();
-    return (int) c;
-  }
-
-  @Override
   public Study get(long studyId) throws IOException {
     return (Study) currentSession().get(StudyImpl.class, studyId);
   }

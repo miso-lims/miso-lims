@@ -84,11 +84,6 @@ public class HibernateKitDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testCount() throws IOException {
-    assertThat("Count of Kits", dao.count(), is(2));
-  }
-
-  @Test
   public void testListKitsByType() throws IOException {
     List<Kit> kit = dao.listKitsByType(KitType.LIBRARY);
     assertThat(kit.size(), is(2));

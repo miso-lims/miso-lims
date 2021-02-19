@@ -75,12 +75,6 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   }
 
   @Override
-  public int count() throws IOException {
-    Criteria criteria = currentSession().createCriteria(Run.class);
-    return ((Long) criteria.setProjection(Projections.rowCount()).uniqueResult()).intValue();
-  }
-
-  @Override
   public Run getLatestStartDateRunBySequencerPartitionContainerId(long containerId) throws IOException {
     // flush here because if Hibernate has not persisted recent changes to container-run relationships, unexpected associations may
     // show up

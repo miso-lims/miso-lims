@@ -183,11 +183,6 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   }
 
   @Override
-  public int count() throws IOException {
-    return runDao.count();
-  }
-
-  @Override
   public void addNote(Run run, Note note) throws IOException {
     Run managed = runDao.get(run.getId());
     note.setCreationDate(new Date());

@@ -83,11 +83,6 @@ public class HibernateStudyDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testStudyCount() throws IOException {
-    assertEquals(6, dao.count());
-  }
-
-  @Test
   public void testListByProjectId() throws IOException {
     List<Study> studies = dao.listByProjectId(1L);
     assertTrue(studies.size() > 0);

@@ -12,8 +12,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 public interface RunService extends DeleterService<Run>, ListService<Run>, SaveService<Run>, PaginatedDataSource<Run>, NoteService<Run> {
 
-  int count() throws IOException;
-
   Collection<Run> listByProjectId(long projectId) throws IOException;
 
   Collection<Run> listByPoolId(long poolId) throws IOException;

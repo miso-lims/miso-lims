@@ -248,11 +248,6 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testCount() throws IOException {
-    assertTrue(dao.count() > 0);
-  }
-
-  @Test
   public void testCountIlluminaPools() throws IOException {
     assertTrue(dao.count(PaginationFilter.platformType(PlatformType.ILLUMINA)) > 0);
   }

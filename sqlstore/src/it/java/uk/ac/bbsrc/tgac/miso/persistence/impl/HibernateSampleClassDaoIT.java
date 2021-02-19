@@ -89,7 +89,7 @@ public class HibernateSampleClassDaoIT extends AbstractDAOTest {
   public void testGetUsage() throws IOException {
     SampleClass sampleClass = (SampleClass) getSessionFactory().getCurrentSession().get(SampleClassImpl.class, 2L);
     assertEquals("Primary Tumor Tissue", sampleClass.getAlias());
-    assertEquals(3L, sut.getUsage(sampleClass));
+    assertEquals(5L, sut.getUsage(sampleClass));
   }
 
 }

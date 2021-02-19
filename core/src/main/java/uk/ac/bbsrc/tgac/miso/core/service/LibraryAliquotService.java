@@ -16,12 +16,7 @@ public interface LibraryAliquotService extends PaginatedDataSource<LibraryAliquo
     return EntityType.LIBRARY_ALIQUOT;
   }
 
-  public int count() throws IOException;
-
   public List<LibraryAliquot> listByLibraryId(Long libraryId) throws IOException;
-
-  @Override
-  public List<LibraryAliquot> listByIdList(List<Long> idList) throws IOException;
 
   public List<LibraryAliquot> listByPoolIds(Collection<Long> poolIds) throws IOException;
 

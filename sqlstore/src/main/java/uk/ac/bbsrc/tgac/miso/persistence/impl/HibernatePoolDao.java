@@ -51,12 +51,6 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   @Autowired
   private SessionFactory sessionFactory;
 
-  @Override
-  public int count() {
-    long c = (Long) createCriteria().setProjection(Projections.rowCount()).uniqueResult();
-    return (int) c;
-  }
-
   public Criteria createCriteria() {
     return currentSession().createCriteria(PoolImpl.class);
   }
