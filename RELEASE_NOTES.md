@@ -2,6 +2,7 @@
 
 Changes:
 
+* Fixed bug where fields in Label Editor would always save as ALIAS
 * Performance improvements
 
 # 1.23.0

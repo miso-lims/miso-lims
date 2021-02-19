@@ -487,6 +487,10 @@ function printerLabelEditor(layout, width, height, saveCallback) {
           });
         } else if (p.hasOwnProperty("use")) {
           var select = document.createElement("select");
+          select.addEventListener("change", function() {
+            printables[i] = { use: select.value };
+            callback(printables);
+          });
           Constants.printableFields.forEach(function(value) {
             var option = document.createElement("option");
             option.text = value;
@@ -495,10 +499,6 @@ function printerLabelEditor(layout, width, height, saveCallback) {
             if (p.use == option.text) {
               select.value = value;
             }
-            option.addEventListener("change", function() {
-              printables[i] = { use: input.value };
-              callback(printables);
-            });
           });
           container.appendChild(select);
         } else {
