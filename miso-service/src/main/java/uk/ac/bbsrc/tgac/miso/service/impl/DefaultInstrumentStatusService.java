@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.InstrumentStatus;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.instrumentstatus.InstrumentStatus;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentStatusService;
 import uk.ac.bbsrc.tgac.miso.persistence.InstrumentStatusStore;
 

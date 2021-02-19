@@ -64,7 +64,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentDataManglingPolicy;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
-import uk.ac.bbsrc.tgac.miso.core.data.InstrumentStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.IonTorrentRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Issue;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
@@ -208,6 +207,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentTissueAttributes;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SequencingOrderSummaryView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.instrumentstatus.InstrumentStatus;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.instrumentstatus.InstrumentStatusPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.instrumentstatus.InstrumentStatusPositionRun;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.instrumentstatus.InstrumentStatusPositionRunPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.QcNode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.QcNodeType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.QcStatusUpdate;
@@ -3297,34 +3300,44 @@ public class Dtos {
 
   public static InstrumentStatusDto asDto(@Nonnull InstrumentStatus from) {
     InstrumentStatusDto to = new InstrumentStatusDto();
-    to.setInstrument(asDto(from.getInstrument()));
+
+    InstrumentDto instrumentDto = new InstrumentDto();
+    instrumentDto.setId(from.getId());
+    instrumentDto.setName(from.getName());
+    to.setInstrument(instrumentDto);
 
     List<InstrumentPositionStatusDto> posDtos = new ArrayList<>();
-    from.getPositions().forEach((pos, run) -> {
+    for (InstrumentStatusPosition pos : from.getPositions()) {
       InstrumentPositionStatusDto posDto = new InstrumentPositionStatusDto();
       posDto.setPosition(pos.getAlias());
-      posDto.setRun(run == null ? null : asDto(run));
-      posDto.setPools(run == null ? Collections.emptyList()
-          : run.getSequencerPartitionContainers().stream()//
-              .flatMap(c -> c.getPartitions().stream())//
-              .map(Partition::getPool)//
-              .filter(Objects::nonNull)//
-              .collect(Collectors.groupingBy(Pool::getId)).values().stream()//
-              .map(l -> l.get(0))//
-              .sorted((a, b) -> a.getAlias().compareTo(b.getAlias()))//
-              .map(p -> asDto(p, false, false, null))
-              .collect(Collectors.toList()));
-      ServiceRecord instrumentOutOfServiceRecord = from.getInstrument().getServiceRecords().stream()
-          .filter(sr -> sr.isOutOfService() && sr.getStartTime() != null && sr.getEndTime() == null
-              && (sr.getPosition() == null || sr.getPosition().getAlias().equals(pos.getAlias())))
-          .min(Comparator.comparing(ServiceRecord::getStartTime))
-          .orElse(null);
-      if (instrumentOutOfServiceRecord != null) {
+      if (pos.getOutOfServiceTime() != null) {
         posDto.setOutOfService(true);
-        posDto.setOutOfServiceTime(formatDateTime(instrumentOutOfServiceRecord.getStartTime()));
+        setDateTimeString(posDto::setOutOfServiceTime, pos.getOutOfServiceTime());
+      }
+      if (pos.getRun() != null) {
+        RunDto runDto = new RunDto();
+        InstrumentStatusPositionRun run = pos.getRun();
+        runDto.setId(run.getRunId());
+        runDto.setName(run.getName());
+        runDto.setAlias(run.getAlias());
+        runDto.setStatus(run.getHealth().getKey());
+        setDateString(runDto::setStartDate, run.getStartDate());
+        setDateString(runDto::setEndDate, run.getCompletionDate());
+        setDateTimeString(runDto::setLastModified, run.getLastModified());
+        posDto.setRun(runDto);
+
+        List<PoolDto> poolDtos = new ArrayList<>();
+        for (InstrumentStatusPositionRunPool pool : run.getPools()) {
+          PoolDto poolDto = new PoolDto();
+          poolDto.setId(pool.getPoolId());
+          poolDto.setName(pool.getName());
+          poolDto.setAlias(pool.getAlias());
+          poolDtos.add(poolDto);
+        }
+        posDto.setPools(poolDtos);
       }
       posDtos.add(posDto);
-    });
+    }
     to.setPositions(posDtos);
     return to;
   }
