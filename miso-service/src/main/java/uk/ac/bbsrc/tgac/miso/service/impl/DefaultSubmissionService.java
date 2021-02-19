@@ -37,7 +37,7 @@ public class DefaultSubmissionService implements SubmissionService {
 
   @Override
   public List<Submission> list() throws IOException {
-    return submissionStore.listAll();
+    return submissionStore.list();
   }
 
   @Override
@@ -45,7 +45,7 @@ public class DefaultSubmissionService implements SubmissionService {
     submission.setExperiments(submission.getExperiments().stream().map(Experiment::getId)
         .map(WhineyFunction.rethrow(experimentService::get))
         .collect(Collectors.toSet()));
-    return submissionStore.save(submission);
+    return submissionStore.create(submission);
   }
 
   @Override
@@ -58,7 +58,7 @@ public class DefaultSubmissionService implements SubmissionService {
     managed.setSubmissionDate(submission.getSubmissionDate());
     managed.setTitle(submission.getTitle());
     managed.setVerified(submission.isVerified());
-    return submissionStore.save(managed);
+    return submissionStore.update(managed);
   }
 
   @Override
