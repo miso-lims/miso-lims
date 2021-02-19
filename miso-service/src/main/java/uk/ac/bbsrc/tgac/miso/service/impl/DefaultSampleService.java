@@ -719,7 +719,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
           st.setTissueMaterial(tissueMaterialDao.getTissueMaterial(st.getTissueMaterial().getId()));
         }
         if (st.getTissueOrigin() != null && st.getTissueOrigin().isSaved()) {
-          st.setTissueOrigin(tissueOriginDao.getTissueOrigin(st.getTissueOrigin().getId()));
+          st.setTissueOrigin(tissueOriginDao.get(st.getTissueOrigin().getId()));
         }
         if (st.getTissueType() != null && st.getTissueType().isSaved()) {
           st.setTissueType(tissueTypeDao.get(st.getTissueType().getId()));

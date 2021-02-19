@@ -2,16 +2,11 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -28,8 +23,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
 @Service
 public class DefaultTissueOriginService implements TissueOriginService {
 
-  protected static final Logger log = LoggerFactory.getLogger(DefaultTissueOriginService.class);
-
   @Autowired
   private TissueOriginDao tissueOriginDao;
 
@@ -41,16 +34,15 @@ public class DefaultTissueOriginService implements TissueOriginService {
 
   @Override
   public TissueOrigin get(long tissueOriginId) throws IOException {
-    authorizationManager.throwIfUnauthenticated();
-    return tissueOriginDao.getTissueOrigin(tissueOriginId);
+    return tissueOriginDao.get(tissueOriginId);
   }
 
   @Override
   public Long create(TissueOrigin tissueOrigin) throws IOException {
     authorizationManager.throwIfNonAdmin();
-    setChangeDetails(tissueOrigin);
+    tissueOrigin.setChangeDetails(authorizationManager.getCurrentUser());
     validateChange(tissueOrigin, null);
-    return tissueOriginDao.addTissueOrigin(tissueOrigin);
+    return tissueOriginDao.create(tissueOrigin);
   }
 
   @Override
@@ -60,7 +52,7 @@ public class DefaultTissueOriginService implements TissueOriginService {
     validateChange(tissueOrigin, managed);
     managed.setAlias(tissueOrigin.getAlias());
     managed.setDescription(tissueOrigin.getDescription());
-    setChangeDetails(managed);
+    managed.setChangeDetails(authorizationManager.getCurrentUser());
     tissueOriginDao.update(managed);
   }
 
@@ -86,34 +78,9 @@ public class DefaultTissueOriginService implements TissueOriginService {
     }
   }
 
-  /**
-   * Updates all user data and timestamps associated with the change. Existing timestamps will be preserved
-   * if the TissueOrigin is unsaved, and they are already set
-   * 
-   * @param tissueOrigin the TissueOrigin to update
-   * @throws IOException
-   */
-  private void setChangeDetails(TissueOrigin tissueOrigin) throws IOException {
-    User user = authorizationManager.getCurrentUser();
-    Date now = new Date();
-    tissueOrigin.setUpdatedBy(user);
-
-    if (!tissueOrigin.isSaved()) {
-      tissueOrigin.setCreatedBy(user);
-      if (tissueOrigin.getCreationDate() == null) {
-        tissueOrigin.setCreationDate(now);
-      }
-      if (tissueOrigin.getLastUpdated() == null) {
-        tissueOrigin.setLastUpdated(now);
-      }
-    } else {
-      tissueOrigin.setLastUpdated(now);
-    }
-  }
-
   @Override
   public List<TissueOrigin> list() throws IOException {
-    return tissueOriginDao.getTissueOrigin();
+    return tissueOriginDao.list();
   }
 
   @Override

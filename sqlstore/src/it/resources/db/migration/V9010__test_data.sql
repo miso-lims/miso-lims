@@ -228,8 +228,9 @@ INSERT INTO `Lab`(`labId`, `alias`, `createdBy`, `creationDate`, `updatedBy`, `l
 (3,'Institute B - Lab B1',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00'),
 (4,'Institute B - Lab B2',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00');
 
-INSERT INTO `TissueOrigin`(`tissueOriginId`, `alias`, `description`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
-VALUES (1,'Test Origin','for testing',1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:00');
+INSERT INTO `TissueOrigin`(`tissueOriginId`, `alias`, `description`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`) VALUES
+(1, 'Test Origin', 'for testing', 1, '2016-02-19 11:28:00', 1, '2016-02-19 11:28:00'),
+(2, 'Origin Two', 'Second Origin', 1, '2021-02-18 16:54:00', 1, '2021-02-18 16:54:00');
 
 INSERT INTO `TissueType`(`tissueTypeId`, `alias`, `description`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
 VALUES (1,'Test Type','for testing',1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:00');
