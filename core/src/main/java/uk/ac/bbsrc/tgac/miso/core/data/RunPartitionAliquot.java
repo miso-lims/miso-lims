@@ -44,6 +44,16 @@ public class RunPartitionAliquot implements Serializable {
     @JoinColumn(name = "aliquotId")
     private LibraryAliquot aliquot;
 
+    public RunPartitionAliquotId() {
+      // default constructor
+    }
+
+    public RunPartitionAliquotId(Run run, Partition partition, LibraryAliquot aliquot) {
+      this.run = run;
+      this.partition = partition;
+      this.aliquot = aliquot;
+    }
+
     public Run getRun() {
       return run;
     }

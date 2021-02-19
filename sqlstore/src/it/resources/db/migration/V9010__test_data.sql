@@ -658,7 +658,7 @@ VALUES (1,'C0JHTACXX',1,1,'2016-07-07 13:30:47',1,'2016-07-07 13:30:47'),
 (4,'C0KY7ACXX',1,1,'2016-07-07 13:30:53',1,'2016-07-07 13:30:53');
 
 INSERT INTO _Partition (containerId, partitionId, partitionNumber, pool_poolId) VALUES
-(1,1,1,1), (1,2,2,NULL), (1,3,3,NULL), (1,4,4,NULL), (1,5,5,NULL), (1,6,6,NULL), (1,7,7,NULL), (1,8,8,NULL),
+(1,1,1,1), (1,2,2,2), (1,3,3,NULL), (1,4,4,NULL), (1,5,5,NULL), (1,6,6,NULL), (1,7,7,NULL), (1,8,8,NULL),
 (2,9,1,NULL), (2,10,2,NULL), (2,11,3,NULL), (2,12,4,NULL), (2,13,5,NULL), (2,14,6,NULL), (2,15,7,NULL), (2,16,8,NULL),
 (3,17,1,NULL), (3,18,2,NULL), (3,19,3,NULL), (3,20,4,NULL), (3,21,5,NULL), (3,22,6,NULL), (3,23,7,NULL), (3,24,8,NULL),
 (4,25,1,NULL), (4,26,2,NULL), (4,27,3,NULL), (4,28,4,NULL), (4,29,5,NULL), (4,30,6,NULL), (4,31,7,NULL), (4,32,8,NULL);
@@ -705,6 +705,10 @@ INSERT INTO Run_Partition(runId, partitionId, partitionQcTypeId, notes, purposeI
 (4, 30, NULL, NULL, 1, 1),
 (4, 31, NULL, NULL, 1, 1),
 (4, 32, NULL, NULL, 1, 1);
+
+INSERT INTO Run_Partition_LibraryAliquot(runId, partitionId, aliquotId, lastModifier, qcPassed, qcUser, qcDate) VALUES
+(1, 1, 1, 1, TRUE, 1, '2021-02-19 14:41:00'),
+(1, 1, 2, 1, FALSE, 1, '2021-02-19 14:41:00');
 
 INSERT INTO Experiment_Run_Partition(experiment_experimentId, run_runId, partition_partitionId)
 VALUES
