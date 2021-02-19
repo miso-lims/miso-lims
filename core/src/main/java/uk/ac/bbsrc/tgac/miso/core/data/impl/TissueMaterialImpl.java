@@ -69,42 +69,42 @@ public class TissueMaterialImpl implements TissueMaterial {
   }
 
   @Override
-  public User getCreatedBy() {
+  public User getCreator() {
     return createdBy;
   }
 
   @Override
-  public void setCreatedBy(User createdBy) {
+  public void setCreator(User createdBy) {
     this.createdBy = createdBy;
   }
 
   @Override
-  public Date getCreationDate() {
+  public Date getCreationTime() {
     return creationDate;
   }
 
   @Override
-  public void setCreationDate(Date creationDate) {
+  public void setCreationTime(Date creationDate) {
     this.creationDate = creationDate;
   }
 
   @Override
-  public User getUpdatedBy() {
+  public User getLastModifier() {
     return updatedBy;
   }
 
   @Override
-  public void setUpdatedBy(User updatedBy) {
+  public void setLastModifier(User updatedBy) {
     this.updatedBy = updatedBy;
   }
 
   @Override
-  public Date getLastUpdated() {
+  public Date getLastModified() {
     return lastUpdated;
   }
 
   @Override
-  public void setLastUpdated(Date lastUpdated) {
+  public void setLastModified(Date lastUpdated) {
     this.lastUpdated = lastUpdated;
   }
 

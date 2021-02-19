@@ -9,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.TissueMaterialService;
@@ -38,16 +36,14 @@ public class DefaultTissueMaterialService implements TissueMaterialService {
   @Override
   public TissueMaterial get(long tissueMaterialId) throws IOException {
     authorizationManager.throwIfUnauthenticated();
-    return tissueMaterialDao.getTissueMaterial(tissueMaterialId);
+    return tissueMaterialDao.get(tissueMaterialId);
   }
 
   @Override
   public Long create(TissueMaterial tissueMaterial) throws IOException {
     authorizationManager.throwIfNonAdmin();
-    User user = authorizationManager.getCurrentUser();
-    tissueMaterial.setCreatedBy(user);
-    tissueMaterial.setUpdatedBy(user);
-    return tissueMaterialDao.addTissueMaterial(tissueMaterial);
+    tissueMaterial.setChangeDetails(authorizationManager.getCurrentUser());
+    return tissueMaterialDao.create(tissueMaterial);
   }
 
   @Override
@@ -55,14 +51,13 @@ public class DefaultTissueMaterialService implements TissueMaterialService {
     authorizationManager.throwIfNonAdmin();
     TissueMaterial updatedTissueMaterial = get(tissueMaterial.getId());
     updatedTissueMaterial.setAlias(tissueMaterial.getAlias());
-    User user = authorizationManager.getCurrentUser();
-    updatedTissueMaterial.setUpdatedBy(user);
+    tissueMaterial.setChangeDetails(authorizationManager.getCurrentUser());
     tissueMaterialDao.update(updatedTissueMaterial);
   }
 
   @Override
   public List<TissueMaterial> list() throws IOException {
-    return tissueMaterialDao.getTissueMaterial();
+    return tissueMaterialDao.list();
   }
 
   @Override
