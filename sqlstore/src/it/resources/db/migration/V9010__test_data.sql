@@ -219,13 +219,19 @@ INSERT INTO Subproject(subprojectId, projectId, alias, referenceGenomeId, priori
 (2, 2, 'Meh', 1, FALSE, 1, '2021-02-19 10:01:00', 1, '2021-02-19 10:01:00'),
 (3, 2, 'Unused', 1, FALSE, 1, '2021-02-19 10:01:00', 1, '2021-02-19 10:01:00');
 
+INSERT INTO StudyType (typeId, name) VALUES
+(1,'Other'),
+(2,'Whole Genome Sequencing'),
+(3,'Metagenomics'),
+(4,'Transcriptome Analysis');
+
 INSERT INTO Study(studyId, name, description, accession, project_projectId, studyTypeId, alias, creator, created, lastModifier, lastModified)
-VALUES (1,'STU1','Test study1',NULL,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study1',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
-(2,'STU2','Test study2',NULL,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study2',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
-(3,'STU3','OICR',NULL,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study3',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
-(4,'STU4','OICR',NULL,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study4',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
-(5,'STU5','OICR',NULL,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study5',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
-(6,'STU6','delete me',NULL,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study6',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00');
+VALUES (1,'STU1','Test study1',NULL,1,1,'Test Study1',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
+(2,'STU2','Test study2',NULL,1,1,'Test Study2',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
+(3,'STU3','OICR',NULL,1,1,'Test Study3',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
+(4,'STU4','OICR',NULL,1,1,'Test Study4',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
+(5,'STU5','OICR',NULL,1,1,'Test Study5',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
+(6,'STU6','delete me',NULL,1,1,'Test Study6',1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00');
 
 INSERT INTO `Lab`(`labId`, `alias`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`) VALUES
 (1,'Institute A - Lab A1',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00'),
