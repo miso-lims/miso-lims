@@ -52,7 +52,7 @@ public class HibernateRunPurposeDaoIT extends AbstractHibernateSaveDaoTest<RunPu
   @Test
   public void testGetUsageBySequencingOrders() throws Exception {
     RunPurpose purpose1 = (RunPurpose) currentSession().get(RunPurpose.class, 1L);
-    assertEquals(1, getTestSubject().getUsageBySequencingOrders(purpose1));
+    assertEquals(2, getTestSubject().getUsageBySequencingOrders(purpose1));
     RunPurpose purpose2 = (RunPurpose) currentSession().get(RunPurpose.class, 2L);
     assertEquals(0, getTestSubject().getUsageBySequencingOrders(purpose2));
   }

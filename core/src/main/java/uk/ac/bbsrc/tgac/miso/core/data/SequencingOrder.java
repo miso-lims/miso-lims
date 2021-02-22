@@ -1,13 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import java.util.Date;
-
-import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 
-public interface SequencingOrder extends Deletable {
+public interface SequencingOrder extends Deletable, Timestamped {
 
   public Pool getPool();
 
@@ -20,22 +16,6 @@ public interface SequencingOrder extends Deletable {
   public SequencingParameters getSequencingParameter();
 
   public void setSequencingParameters(SequencingParameters parameter);
-
-  public User getCreatedBy();
-
-  public void setCreatedBy(User createdBy);
-
-  public Date getCreationDate();
-
-  public void setCreationDate(Date creationDate);
-
-  public User getUpdatedBy();
-
-  public void setUpdatedBy(User updatedBy);
-
-  public Date getLastUpdated();
-
-  public void setLastUpdated(Date lastUpdated);
 
   public String getDescription();
 
