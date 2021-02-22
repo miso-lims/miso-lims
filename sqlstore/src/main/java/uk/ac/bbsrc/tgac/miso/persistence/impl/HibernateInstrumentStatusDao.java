@@ -6,8 +6,6 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,8 +19,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.InstrumentStatusStore;
 @Repository
 @Transactional(rollbackFor = Exception.class)
 public class HibernateInstrumentStatusDao implements InstrumentStatusStore {
-
-  protected static final Logger log = LoggerFactory.getLogger(HibernateQcTypeDao.class);
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -42,9 +38,6 @@ public class HibernateInstrumentStatusDao implements InstrumentStatusStore {
         .list();
 
     for (InstrumentStatus instrument : instruments) {
-      if (instrument.getPositions().isEmpty()) {
-        instrument.getPositions().add(new InstrumentStatusPosition());
-      }
       for (InstrumentStatusPosition position : instrument.getPositions()) {
         InstrumentStatusPositionRun run = (InstrumentStatusPositionRun) currentSession()
             .createCriteria(InstrumentStatusPositionRun.class)

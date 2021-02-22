@@ -19,7 +19,6 @@ import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 public class HibernateInstrumentDaoIT extends AbstractDAOTest {
@@ -45,12 +44,12 @@ public class HibernateInstrumentDaoIT extends AbstractDAOTest {
   @Test
   public void testListAll() throws IOException {
     Collection<Instrument> instruments = dao.listAll();
-    assertEquals(PlatformType.ILLUMINA, instruments.iterator().next().getInstrumentModel().getPlatformType());
+    assertEquals(4, instruments.size());
   }
 
   @Test
   public void testListByType() throws Exception {
-    assertEquals(2L, dao.listByType(InstrumentType.SEQUENCER).size());
+    assertEquals(3, dao.listByType(InstrumentType.SEQUENCER).size());
   }
 
   @Test
@@ -94,7 +93,7 @@ public class HibernateInstrumentDaoIT extends AbstractDAOTest {
   @Test
   public void testGetUsageByRuns() throws Exception {
     Instrument instrument = (Instrument) currentSession().get(InstrumentImpl.class, 1L);
-    assertEquals(4L, dao.getUsageByRuns(instrument));
+    assertEquals(3L, dao.getUsageByRuns(instrument));
   }
 
   @Test
