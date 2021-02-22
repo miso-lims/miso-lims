@@ -108,7 +108,7 @@ public class HibernateSequencingParametersDaoIT extends AbstractDAOTest {
   @Test
   public void testGetUsageBySequencingOrders() throws Exception {
     SequencingParameters params = (SequencingParameters) currentSession().get(SequencingParameters.class, 1L);
-    assertEquals(1L, sut.getUsageBySequencingOrders(params));
+    assertEquals(2L, sut.getUsageBySequencingOrders(params));
   }
 
 }

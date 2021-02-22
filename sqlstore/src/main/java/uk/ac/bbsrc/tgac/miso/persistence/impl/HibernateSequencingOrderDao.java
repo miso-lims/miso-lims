@@ -1,13 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,41 +16,10 @@ import uk.ac.bbsrc.tgac.miso.persistence.SequencingOrderDao;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateSequencingOrderDao implements SequencingOrderDao {
+public class HibernateSequencingOrderDao extends HibernateSaveDao<SequencingOrder> implements SequencingOrderDao {
 
-  @Autowired
-  private SessionFactory sessionFactory;
-
-  private Session currentSession() {
-    return sessionFactory.getCurrentSession();
-  }
-
-  @Override
-  public List<SequencingOrder> list() {
-    @SuppressWarnings("unchecked")
-    List<SequencingOrder> records = currentSession().createCriteria(SequencingOrderImpl.class).list();
-    return records;
-  }
-
-  @Override
-  public SequencingOrder get(long id) {
-    return (SequencingOrder) currentSession().get(SequencingOrderImpl.class, id);
-  }
-
-  @Override
-  public long create(SequencingOrder seqOrder) {
-    Date now = new Date();
-    seqOrder.setCreationDate(now);
-    seqOrder.setLastUpdated(now);
-    return (long) currentSession().save(seqOrder);
-  }
-
-  @Override
-  public long update(SequencingOrder seqOrder) {
-    Date now = new Date();
-    seqOrder.setLastUpdated(now);
-    currentSession().update(seqOrder);
-    return seqOrder.getId();
+  public HibernateSequencingOrderDao() {
+    super(SequencingOrderImpl.class);
   }
 
   @Override
@@ -64,10 +29,6 @@ public class HibernateSequencingOrderDao implements SequencingOrderDao {
         .add(Restrictions.eq("pool", pool))
         .list();
     return records;
-  }
-
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
   }
 
   @Override

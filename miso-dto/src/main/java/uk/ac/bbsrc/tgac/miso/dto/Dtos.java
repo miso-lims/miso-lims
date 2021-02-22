@@ -1278,10 +1278,10 @@ public class Dtos {
     setId(dto::setContainerModelId, from.getContainerModel());
     dto.setParameters(asDto(from.getSequencingParameter()));
     dto.setPartitions(from.getPartitions());
-    dto.setCreationDate(formatDateTime(from.getCreationDate()));
-    dto.setLastUpdated(formatDateTime(from.getLastUpdated()));
-    setLong(dto::setCreatedById, maybeGetProperty(from.getCreatedBy(), User::getId), true);
-    setLong(dto::setUpdatedById, maybeGetProperty(from.getUpdatedBy(), User::getId), true);
+    dto.setCreationDate(formatDateTime(from.getCreationTime()));
+    dto.setLastUpdated(formatDateTime(from.getLastModified()));
+    setLong(dto::setCreatedById, maybeGetProperty(from.getCreator(), User::getId), true);
+    setLong(dto::setUpdatedById, maybeGetProperty(from.getLastModifier(), User::getId), true);
     dto.setDescription(from.getDescription());
     setLong(dto::setPurposeId, maybeGetProperty(from.getPurpose(), RunPurpose::getId), false);
     setString(dto::setPurposeAlias, maybeGetProperty(from.getPurpose(), RunPurpose::getAlias));

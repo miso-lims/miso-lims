@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -76,12 +75,10 @@ public class DefaultSequencingOrderService implements SequencingOrderService {
               "near-duplicate indices. Please resolve index problems in pool " + pool.getAlias());
     }
 
-    User user = authorizationManager.getCurrentUser();
     seqOrder.setPool(pool);
     seqOrder.setSequencingParameters(sequencingParametersService.get(seqOrder.getSequencingParameter().getId()));
     seqOrder.setPurpose(runPurposeService.get(seqOrder.getPurpose().getId()));
-    seqOrder.setCreatedBy(user);
-    seqOrder.setUpdatedBy(user);
+    seqOrder.setChangeDetails(authorizationManager.getCurrentUser());
     validateChange(seqOrder, null);
     return sequencingOrderDao.create(seqOrder);
   }
@@ -90,7 +87,7 @@ public class DefaultSequencingOrderService implements SequencingOrderService {
   public long update(SequencingOrder seqOrder) throws IOException {
     SequencingOrder managed = sequencingOrderDao.get(seqOrder.getId());
     managed.setPartitions(seqOrder.getPartitions());
-    managed.setUpdatedBy(authorizationManager.getCurrentUser());
+    managed.setChangeDetails(authorizationManager.getCurrentUser());
     validateChange(managed, seqOrder);
     return sequencingOrderDao.update(managed);
   }
