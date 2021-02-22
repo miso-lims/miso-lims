@@ -75,9 +75,6 @@ INSERT INTO AttachmentCategory(categoryId, alias) VALUES
 (1, 'Category One'),
 (2, 'Category Two');
 
-INSERT INTO Attachment (attachmentId, filename, path, creator, created, categoryId) VALUES
-(1, 'file1.txt', '/path/1234567890', 1, '2018-10-02 12:29:00', 1);
-
 INSERT INTO IndexFamily(indexFamilyId, platformType, name) VALUES
   (1, 'ILLUMINA', 'TruSeq Single Index'),
   (2, 'LS454', '454 Rapid Library'),
@@ -863,3 +860,12 @@ INSERT INTO TransferNotification(notificationId, transferId, recipientName, reci
 INSERT INTO Contact(contactId, name, email) VALUES
 (1, 'Someone', 'someone@example.com'),
 (2, 'Everyone', 'everyone@example.com');
+
+INSERT INTO Attachment(attachmentId, filename, path, creator, created, categoryId) VALUES
+(1, 'File1', '/sample/1/12345', 1, '2021-02-22 14:40:00', 1),
+(2, 'File2', '/sample/2/12346', 1, '2021-02-22 14:40:00', 1),
+(3, 'Orphaned', '/sample/2/12347', 1, '2021-02-22 14:40:00', 1);
+
+INSERT INTO Sample_Attachment(sampleId, attachmentId) VALUES
+(1, 1),
+(2, 2);

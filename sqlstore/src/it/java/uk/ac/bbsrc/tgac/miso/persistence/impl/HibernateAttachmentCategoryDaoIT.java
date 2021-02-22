@@ -88,7 +88,7 @@ public class HibernateAttachmentCategoryDaoIT extends AbstractDAOTest {
     AttachmentCategory cat = (AttachmentCategory) sessionFactory.getCurrentSession().get(AttachmentCategory.class, 1L);
     assertNotNull(cat);
     long usage = sut.getUsage(cat);
-    assertEquals(1L, usage);
+    assertEquals(3L, usage);
   }
 
 }
