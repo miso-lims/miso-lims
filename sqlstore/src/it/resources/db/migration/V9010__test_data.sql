@@ -580,6 +580,10 @@ INSERT INTO InstrumentModel(instrumentModelId, platform, alias, description, num
 (16, 'ILLUMINA', 'Illumina HiSeq 2000', '4-channel flowgram', 1, 'SEQUENCER'),
 (30, 'ILLUMINA', 'Illumina iScan', NULL, 1, 'ARRAY_SCANNER');
 
+INSERT INTO InstrumentPosition(positionId, instrumentModelId, alias) VALUES
+(1, 16, 'A'),
+(2, 16, 'B');
+
 INSERT INTO SequencingParameters (parametersId, name, instrumentModelId, readLength, readLength2, createdBy, updatedBy, creationDate, lastUpdated, chemistry) VALUES
 (1, 'HiSeq Params 1', 16, 100, 100, 1, 1, '2019-09-23 10:05:00', '2019-09-23 10:05:00', NULL),
 (2, 'Rapid Run 2x151', 16, 151, 151, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'RAPID_RUN'),
@@ -592,7 +596,8 @@ INSERT INTO RunPurpose(purposeId, alias) VALUES
 INSERT INTO `Instrument`(`instrumentId`, `name`, `instrumentModelId`, defaultPurposeId) VALUES
 (1, 'SN7001179', 16, 1),
 (2, 'h1180', 16, 1),
-(3, 'iScan_1', 30, 1);
+(3, 'iScan_1', 30, 1),
+(4, 'miseq1', 1, 1);
 
 INSERT INTO `Experiment`(`experimentId`, `name`, `description`, `accession`, `title`, `study_studyId`, `alias`, `instrumentModelId`,`lastModifier`, lastModified, creator, created, `library_libraryId`) 
 VALUES
@@ -629,16 +634,16 @@ VALUES
 (31,'EXP31','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',4,'EXP_AUTOGEN_STU1_Other_31',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 9),
 (32,'EXP32','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',5,'EXP_AUTOGEN_STU1_Other_32',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 9);
 
-INSERT INTO `ServiceRecord`(`recordId`, `instrumentId`, `title`, `details`, `servicedBy`, `referenceNumber`, `serviceDate`, `startTime`, `endTime`)
-VALUES (1,1,'Seq1_Rec1','Test service','Service Person','12345','2016-01-01', '2016-01-01 07:30:00', '2016-01-01 09:00:00'),
-(2,1,'Seq1_Rec2',NULL,'Service Person',NULL,'2016-01-21',NULL,NULL),
-(3,2,'Seq2_Rec1',NULL,'Service Person',NULL,'2016-01-21',NULL,NULL);
+INSERT INTO `ServiceRecord`(`recordId`, `instrumentId`, `title`, `details`, `servicedBy`, `referenceNumber`, `serviceDate`, `startTime`, `endTime`, outOfService, positionId) VALUES
+(1,1,'Seq1_Rec1','Test service','Service Person','12345','2016-01-01', '2016-01-01 07:30:00', '2016-01-01 09:00:00', FALSE, NULL),
+(2,1,'Seq1_Rec2',NULL,'Service Person',NULL,'2016-01-21',NULL,NULL, FALSE, NULL),
+(3,2,'Seq2_Rec1',NULL,'Service Person',NULL,'2016-01-21','2016-01-21 9:32:00',NULL, TRUE, 2);
 
 INSERT INTO `Run`(`runId`, `name`, `description`, `accession`, `filePath`, `alias`, `instrumentId`, `lastModifier`, `health`, `completionDate`, `lastModified`, `creator`, `created`, sequencingParameters_parametersId, sopId) 
 VALUES (1,'RUN1','BC0JHTACXX',NULL,'/.mounts/labs/prod/archive/h1179/120323_h1179_0070_BC0JHTACXX','120323_h1179_0070_BC0JHTACXX',1,1,'Completed','2012-03-31','2016-07-07 13:30:49',1,'2016-07-07 13:30:49', 1, 5),
 (2,'RUN2','AD0VJ9ACXX',NULL,'/.mounts/labs/prod/archive/h1179/120404_h1179_0072_AD0VJ9ACXX','120404_h1179_0072_AD0VJ9ACXX',1,1,'Failed','2012-04-04','2016-07-07 13:30:51',1,'2016-07-07 13:30:51', NULL, NULL),
 (3,'RUN3','BC075RACXX',NULL,'/.mounts/labs/prod/archive/h1179/120412_h1179_0073_BC075RACXX','120412_h1179_0073_BC075RACXX',1,1,'Completed','2012-04-20','2016-07-07 13:30:53',1,'2016-07-07 13:30:53', NULL, NULL),
-(4,'RUN4','AC0KY7ACXX',NULL,'/.mounts/labs/prod/archive/h1179/120314_h1179_0068_AC0KY7ACXX','120314_h1179_0068_AC0KY7ACXX',1,1,'Completed','2012-03-23','2016-07-07 13:30:55',1,'2016-07-07 13:30:55', NULL, NULL);
+(4,'RUN4','AC0KY7ACXX',NULL,'/.mounts/labs/prod/archive/h1180/120314_h1180_0068_AC0KY7ACXX','120314_h1180_0068_AC0KY7ACXX',2,1,'Completed','2012-03-23','2016-07-07 13:30:55',1,'2016-07-07 13:30:55', NULL, NULL);
 INSERT INTO RunIllumina(runId) VALUES (1), (2), (3), (4);
 
 INSERT INTO `RunChangeLog`(`runId`, `columnsChanged`, `userId`, `message`, `changeTime`)
@@ -675,8 +680,8 @@ VALUES (1, 'identificationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:47'),
 (3, 'identificationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:51'),
 (4, 'identificationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:53');
 
-INSERT INTO `Run_SequencerPartitionContainer`(`Run_runId`, `containers_containerId`) 
-VALUES (1,1),(2,2),(3,3),(4,4);
+INSERT INTO Run_SequencerPartitionContainer(Run_runId, containers_containerId, positionId)
+VALUES (1,1,2),(2,2,1),(3,3,2),(4,4,1);
 
 INSERT INTO Run_Partition(runId, partitionId, partitionQcTypeId, notes, purposeId, lastModifier) VALUES
 (1, 1, 1, 'it is written', 1, 1),
