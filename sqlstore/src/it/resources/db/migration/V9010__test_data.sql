@@ -263,6 +263,12 @@ VALUES (1,'Identity','Identity',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00')
 (3,'Stock','Stock',1,'2017-05-31 14:57:00',1,'2017-05-31 14:57:00'),
 (4,'Aliquot','Aliquot',1,'2017-05-31 14:57:00',1,'2017-05-31 14:57:00');
 
+INSERT INTO SampleValidRelationship(sampleValidRelationshipId, parentId, childId, createdBy, creationDate, updatedBy, lastUpdated) VALUES
+(1, 1, 2, 1, '2021-02-23 10:41:00', 1, '2021-02-23 10:41:00'),
+(2, 2, 3, 1, '2021-02-23 10:41:00', 1, '2021-02-23 10:41:00'),
+(3, 3, 4, 1, '2021-02-23 10:41:00', 1, '2021-02-23 10:41:00'),
+(4, 4, 4, 1, '2021-02-23 10:41:00', 1, '2021-02-23 10:41:00');
+
 INSERT INTO SamplePurpose(samplePurposeId, alias, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 'Sequencing', 1, '2021-02-18 16:21:00', 1, '2021-02-18 16:21:00'),
 (2, 'Validation', 1, '2021-02-18 16:21:00', 1, '2021-02-18 16:21:00');

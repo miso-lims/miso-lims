@@ -14,10 +14,6 @@ public interface SampleValidRelationshipDao {
 
   public SampleValidRelationship getByClasses(SampleClass parent, SampleClass child) throws IOException;
 
-  public Long create(SampleValidRelationship sampleValidRelationship);
-
-  public void update(SampleValidRelationship sampleValidRelationship);
-
   public void delete(SampleValidRelationship sampleValidRelationship) throws IOException;
 
 }
