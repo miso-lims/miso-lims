@@ -72,7 +72,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryBatch;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
@@ -221,7 +220,7 @@ public class EditLibraryController {
   }
 
   public void addAdjacentLibraries(Library library, ModelMap model) throws IOException {
-    if (library.getId() == LibraryImpl.UNSAVED_ID) {
+    if (!library.isSaved()) {
       return;
     }
     model.put("previousLibrary", libraryService.getAdjacentLibrary(library, true));

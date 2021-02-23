@@ -101,10 +101,11 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 public class LibraryImpl extends AbstractBoxable implements Library {
 
   private static final long serialVersionUID = 1L;
+  private static final long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private long libraryId = LibraryImpl.UNSAVED_ID;
+  private long libraryId = UNSAVED_ID;
 
   @Column(nullable = false)
   private String name;
