@@ -76,7 +76,7 @@ public class HibernateStorageLocationMapDaoIT extends AbstractDAOTest {
   public void testGetUsage() throws IOException {
     StorageLocationMap map = (StorageLocationMap) getSessionFactory().getCurrentSession().get(StorageLocationMap.class, 1L);
     assertEquals("floor_one.html", map.getFilename());
-    assertEquals(0L, sut.getUsage(map));
+    assertEquals(2L, sut.getUsage(map));
   }
 
 }
