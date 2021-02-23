@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.service;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
@@ -21,18 +20,7 @@ public interface LibraryService extends PaginatedDataSource<Library>, Barcodable
 
   public EntityReference getAdjacentLibrary(Library library, boolean before) throws IOException;
 
-  public Library getByBarcode(String barcode) throws IOException;
-
-  public List<Library> listByBarcodeList(List<String> barcodeList) throws IOException;
-
-  @Override
-  public List<Library> listByIdList(List<Long> idList) throws IOException;
-
-  public Library getByPositionId(long positionId) throws IOException;
-
   public List<Library> listByAlias(String alias) throws IOException;
-
-  public List<Library> searchByCreationDate(Date from, Date to) throws IOException;
 
   public List<Library> listBySampleId(long sampleId) throws IOException;
 

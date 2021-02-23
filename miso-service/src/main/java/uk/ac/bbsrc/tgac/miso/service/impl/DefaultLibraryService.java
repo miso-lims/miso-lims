@@ -38,7 +38,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
@@ -284,33 +283,13 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   }
 
   @Override
-  public Library getByBarcode(String barcode) throws IOException {
-    return libraryDao.getByBarcode(barcode);
-  }
-
-  @Override
-  public List<Library> listByBarcodeList(List<String> barcodeList) throws IOException {
-    return libraryDao.getByBarcodeList(barcodeList);
-  }
-
-  @Override
   public List<Library> listByIdList(List<Long> idList) throws IOException {
-    return libraryDao.getByIdList(idList);
-  }
-
-  @Override
-  public Library getByPositionId(long positionId) throws IOException {
-    return (Library) libraryDao.getByPositionId(positionId);
+    return libraryDao.listByIdList(idList);
   }
 
   @Override
   public List<Library> listByAlias(String alias) throws IOException {
     return libraryDao.listByAlias(alias);
-  }
-
-  @Override
-  public List<Library> searchByCreationDate(Date from, Date to) throws IOException {
-    return libraryDao.searchByCreationDate(from, to);
   }
 
   @Override
@@ -670,7 +649,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     }
     List<Library> potentialDupes = listByAlias(library.getAlias());
     for (Library potentialDupe : potentialDupes) {
-      if (library.getId() == LibraryImpl.UNSAVED_ID || library.getId() != potentialDupe.getId()) {
+      if (!library.isSaved() || library.getId() != potentialDupe.getId()) {
         // an existing DIFFERENT library already has this alias
         throw new ValidationException(new ValidationError("alias", "A library with this alias already exists in the database"));
       }

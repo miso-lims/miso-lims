@@ -2,9 +2,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -18,25 +16,18 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryBatch;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
-import uk.ac.bbsrc.tgac.miso.persistence.BoxStore;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
@@ -78,14 +69,8 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
 
   };
 
-  protected static final Logger log = LoggerFactory.getLogger(HibernateLibraryDao.class);
-
   @Autowired
   private SessionFactory sessionFactory;
-  @Autowired
-  private BoxStore boxDao;
-  @Value("${miso.detailed.sample.enabled:false}")
-  private boolean detailedSampleEnabled;
 
   @Override
   public Session currentSession() {
@@ -101,17 +86,12 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
 
   @Override
   public long save(Library library) throws IOException {
-    long id;
-    if (library.getId() == LibraryImpl.UNSAVED_ID) {
-      id = (long) currentSession().save(library);
+    if (!library.isSaved()) {
+      return (long) currentSession().save(library);
     } else {
-      if (library.isDiscarded()) {
-        getBoxDao().removeBoxableFromBox(library);
-      }
       currentSession().update(library);
-      id = library.getId();
+      return library.getId();
     }
-    return id;
   }
 
   @Override
@@ -125,13 +105,6 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
     @SuppressWarnings("unchecked")
     List<Library> records = criteria.list();
     return records;
-  }
-
-  @Override
-  public Library getByBarcode(String barcode) throws IOException {
-    Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
-    criteria.add(Restrictions.eq("identificationBarcode", barcode));
-    return (Library) criteria.uniqueResult();
   }
 
   @Override
@@ -163,64 +136,14 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   }
 
   @Override
-  public List<Library> getByIdList(List<Long> idList) throws IOException {
-    if (idList.isEmpty()) {
+  public List<Library> listByIdList(List<Long> idList) throws IOException {
+    if (idList == null || idList.isEmpty()) {
       return Collections.emptyList();
     }
     Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
     criteria.add(Restrictions.in("id", idList));
     @SuppressWarnings("unchecked")
     List<Library> records = criteria.list();
-    return records;
-  }
-
-  @Override
-  public Boxable getByPositionId(long positionId) {
-    Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
-    criteria.add(Restrictions.eq("boxPositionId", positionId));
-    return (Library) criteria.uniqueResult();
-  }
-
-  @Override
-  public List<Library> getByBarcodeList(Collection<String> barcodeList) throws IOException {
-    if (barcodeList.isEmpty()) {
-      return Collections.emptyList();
-    }
-    Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
-    criteria.add(Restrictions.in("identificationBarcode", barcodeList));
-    @SuppressWarnings("unchecked")
-    List<Library> records = criteria.list();
-    return records;
-  }
-
-  @Override
-  public LibraryType getLibraryTypeById(long libraryTypeId) throws IOException {
-    Criteria criteria = currentSession().createCriteria(LibraryType.class);
-    criteria.add(Restrictions.eq("id", libraryTypeId));
-    return (LibraryType) criteria.uniqueResult();
-  }
-
-  @Override
-  public LibraryType getLibraryTypeByDescriptionAndPlatform(String description, PlatformType platformType) throws IOException {
-    Criteria criteria = currentSession().createCriteria(LibraryType.class);
-    criteria.add(Restrictions.and(Restrictions.eq("description", description), Restrictions.eq("platformType", platformType)));
-    return (LibraryType) criteria.uniqueResult();
-  }
-
-  @Override
-  public List<LibraryType> listAllLibraryTypes() throws IOException {
-    Criteria criteria = currentSession().createCriteria(LibraryType.class);
-    @SuppressWarnings("unchecked")
-    List<LibraryType> records = criteria.list();
-    return records;
-  }
-
-  @Override
-  public List<LibraryType> listLibraryTypesByPlatform(PlatformType platformType) throws IOException {
-    Criteria criteria = currentSession().createCriteria(LibraryType.class);
-    criteria.add(Restrictions.eq("platformType", platformType));
-    @SuppressWarnings("unchecked")
-    List<LibraryType> records = criteria.list();
     return records;
   }
 
@@ -255,54 +178,12 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
     return library;
   }
 
-  @Override
-  public List<Library> searchByCreationDate(Date from, Date to) throws IOException {
-    Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
-    criteria.add(Restrictions.ge("creationDate", from));
-    criteria.add(Restrictions.le("creationDate", to));
-    @SuppressWarnings("unchecked")
-    List<Library> records = criteria.list();
-    return records;
-  }
-
-  @Override
-  public Library getByPreMigrationId(Long preMigrationId) throws IOException {
-    if (!detailedSampleEnabled) return null;
-    Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
-    criteria.add(Restrictions.eq("preMigrationId", preMigrationId));
-    return (Library) criteria.uniqueResult();
-  }
-
-  @Override
-  public List<LibrarySpikeIn> listSpikeIns() throws IOException {
-    @SuppressWarnings("unchecked")
-    List<LibrarySpikeIn> results = currentSession().createCriteria(LibrarySpikeIn.class).list();
-    return results;
-  }
-
-  @Override
-  public LibrarySpikeIn getSpikeIn(long spikeInId) throws IOException {
-    return (LibrarySpikeIn) currentSession().get(LibrarySpikeIn.class, spikeInId);
-  }
-
   public SessionFactory getSessionFactory() {
     return sessionFactory;
   }
 
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
-  }
-
-  public BoxStore getBoxDao() {
-    return boxDao;
-  }
-
-  public void setBoxDao(BoxStore boxDao) {
-    this.boxDao = boxDao;
-  }
-
-  public void setDetailedSampleEnabled(boolean detailedSampleEnabled) {
-    this.detailedSampleEnabled = detailedSampleEnabled;
   }
 
   @Override
@@ -345,8 +226,6 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
       return "creationTime";
     case UPDATE:
       return "lastModified";
-    case RECEIVE:
-      return "receivedDate";
     default:
       return null;
     }
