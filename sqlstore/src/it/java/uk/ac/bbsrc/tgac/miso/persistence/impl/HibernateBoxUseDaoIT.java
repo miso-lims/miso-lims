@@ -76,7 +76,7 @@ public class HibernateBoxUseDaoIT extends AbstractDAOTest {
   public void testGetUsage() throws IOException {
     BoxUse boxUse = (BoxUse) getSessionFactory().getCurrentSession().get(BoxUse.class, 1L);
     assertEquals("boxuse1", boxUse.getAlias());
-    assertEquals(1L, sut.getUsage(boxUse));
+    assertEquals(2L, sut.getUsage(boxUse));
   }
 
 }

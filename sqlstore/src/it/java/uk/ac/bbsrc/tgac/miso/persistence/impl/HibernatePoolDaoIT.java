@@ -14,8 +14,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,8 +31,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
-import uk.ac.bbsrc.tgac.miso.persistence.BoxStore;
-import uk.ac.bbsrc.tgac.miso.persistence.SecurityStore;
 
 @Transactional
 public class HibernatePoolDaoIT extends AbstractDAOTest {
@@ -92,11 +88,6 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
   @Rule
   public final ExpectedException exception = ExpectedException.none();
 
-  @Mock
-  BoxStore boxStore;
-  @Mock
-  private SecurityStore securityStore;
-
   @Autowired
   private SessionFactory sessionFactory;
 
@@ -107,7 +98,6 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
   public void setup() {
     MockitoAnnotations.initMocks(this);
     dao.setSessionFactory(sessionFactory);
-    dao.setBoxStore(boxStore);
   }
 
   @Test
@@ -214,7 +204,6 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
     final Date creationDate = new Date();
     final PoolImpl saveMe = getATestPool(1, creationDate, true, 0);
     final long rtn = dao.save(saveMe);
-    Mockito.verifyZeroInteractions(boxStore);
 
     // check they're actually the same
     Pool freshPool = dao.get(rtn);
@@ -227,7 +216,6 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
     final Date creationDate = new Date();
     final PoolImpl saveMe = getATestPool(1, creationDate, true, 10);
     final long rtn = dao.save(saveMe);
-    Mockito.verifyZeroInteractions(boxStore);
 
     // check they're actually the same
     Pool freshPool = dao.get(rtn);
@@ -240,7 +228,6 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
     final Date creationDate = new Date();
     final Pool saveMe = getATestPool(1, creationDate, false, 0);
     final long rtn = dao.save(saveMe);
-    Mockito.verifyZeroInteractions(boxStore);
 
     // check they're actually the same
     Pool freshPool = dao.get(rtn);

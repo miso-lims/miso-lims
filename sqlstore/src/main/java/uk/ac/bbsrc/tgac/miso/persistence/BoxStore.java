@@ -26,8 +26,6 @@ public interface BoxStore extends Store<Box>, PaginatedDataSource<Box> {
    */
   Box getBoxByAlias(String alias) throws IOException;
 
-  Box getBoxByBarcode(String barcode) throws IOException;
-
   /**
    * List all Boxes associated with ids from the given id list
    * 
@@ -35,19 +33,15 @@ public interface BoxStore extends Store<Box>, PaginatedDataSource<Box> {
    * @throws IOException
    *           when the objects cannot be retrieved
    */
-  List<Box> getByIdList(List<Long> idList) throws IOException;
+  List<Box> listByIdList(List<Long> idList) throws IOException;
 
   public List<Box> getBySearch(String search);
 
   public List<Box> getByPartialSearch(String search, boolean onlyMatchBeginning);
-  
-  void removeBoxableFromBox(Boxable boxable) throws IOException;
 
   void removeBoxableFromBox(BoxableView boxable) throws IOException;
 
   public BoxableView getBoxableView(BoxableId id) throws IOException;
-
-  public BoxableView getBoxableViewByPreMigrationId(Long preMigrationId) throws IOException;
 
   public List<BoxableView> getBoxableViewsByBarcodeList(Collection<String> barcodes) throws IOException;
 

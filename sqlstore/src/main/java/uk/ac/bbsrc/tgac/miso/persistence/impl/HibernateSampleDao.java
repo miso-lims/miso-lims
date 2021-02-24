@@ -42,7 +42,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
-import uk.ac.bbsrc.tgac.miso.persistence.BoxStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleStore;
 import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
@@ -66,15 +65,8 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   @Autowired
   private SessionFactory sessionFactory;
 
-  @Autowired
-  private BoxStore boxStore;
-
   public void setDetailedSample(boolean detailedSample) {
     this.detailedSample = detailedSample;
-  }
-
-  public void setBoxStore(BoxStore boxStore) {
-    this.boxStore = boxStore;
   }
 
   @Override
@@ -217,9 +209,6 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
 
   @Override
   public void update(Sample sample) throws IOException {
-    if (sample.isDiscarded()) {
-      boxStore.removeBoxableFromBox(sample);
-    }
     currentSession().update(sample);
   }
 

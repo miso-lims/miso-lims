@@ -57,9 +57,7 @@ import com.google.common.collect.Lists;
 import net.sf.json.JSONArray;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
-import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
@@ -126,13 +124,13 @@ public class EditPoolController {
 
   @GetMapping(value = "/new")
   public ModelAndView newUnassignedPool(ModelMap model) throws IOException {
-    return setupForm(PoolImpl.UNSAVED_ID, model);
+    return setupForm(null, model);
   }
 
   @GetMapping(value = "/{poolId}")
   public ModelAndView setupForm(@PathVariable Long poolId, ModelMap model) throws IOException {
     Pool pool = null;
-    if (poolId == PoolImpl.UNSAVED_ID) {
+    if (poolId == null) {
       pool = new PoolImpl();
       model.put("title", "New Pool");
     } else {
@@ -145,17 +143,17 @@ public class EditPoolController {
     
     ObjectMapper mapper = new ObjectMapper();
     model.put("pool", pool);
-    model.put("poolDto", poolId == PoolImpl.UNSAVED_ID ? "{}"
-        : mapper.writeValueAsString(poolDto));
-    Collection<Partition> partitions = containerService.listPartitionsByPoolId(poolId);
-    model.put("partitions", partitions.stream()
-        .map(partition -> Dtos.asDto(partition, indexChecker)).collect(Collectors.toList()));
-    model.put("runs", poolId == PoolImpl.UNSAVED_ID ? Collections.emptyList() : Dtos.asRunDtos(runService.listByPoolId(poolId)));
-    if (poolId == PoolImpl.UNSAVED_ID) {
+    if (poolId == null) {
+      model.put("partitions", Collections.emptyList());
+      model.put("poolDto", "{}");
+      model.put("runs", Collections.emptyList());
       model.put("orders", Collections.emptyList());
     } else {
-      Collection<SequencingOrder> sequencingOrders = sequencingOrderService.getByPool(pool);
-      model.put("orders", Dtos.asSequencingOrderDtos(sequencingOrders, indexChecker));
+      model.put("partitions", containerService.listPartitionsByPoolId(poolId).stream()
+          .map(partition -> Dtos.asDto(partition, indexChecker)).collect(Collectors.toList()));
+      model.put("poolDto", mapper.writeValueAsString(poolDto));
+      model.put("runs", Dtos.asRunDtos(runService.listByPoolId(poolId)));
+      model.put("orders", Dtos.asSequencingOrderDtos(sequencingOrderService.getByPool(pool), indexChecker));
     }
 
     model.put("poolorders", poolOrderService.getAllByPoolId(pool.getId()).stream().map(order -> Dtos.asDto(order)).collect(Collectors.toList()));

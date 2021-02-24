@@ -738,19 +738,20 @@ VALUES
 (1, 1, 1),
 (2, 1, 1);
 
-INSERT INTO `BoxSize` (`boxSizeId`, `boxSizeRows`, `boxSizeColumns`, `scannable`)
-VALUES
-('1', '4', '4', '0');
+INSERT INTO `BoxSize` (`boxSizeId`, `boxSizeRows`, `boxSizeColumns`, `scannable`) VALUES
+(1, 4, 4, FALSE),
+(2, 8, 12, TRUE);
 
 INSERT INTO `BoxUse` (`boxUseId`, `alias`)
 VALUES
-('1', 'boxuse1'),
-('2', 'boxuse2');
+(1, 'boxuse1'),
+(2, 'boxuse2');
 
-INSERT INTO `Box` (`boxId`, `boxSizeId`, `boxUseId`, `name`, `alias`, `description`, `identificationBarcode`, `locationBarcode`, `lastModifier`, `lastModified`, `creator`, `created`)
-VALUES
-('1','1', '1', 'box1', 'box1alias', 'box1','identificationbarcode1', 'location1', '1', '2017-06-20 16:02:00', '1', '2017-06-20 16:02:00'),
-('2','1', '2', 'box2', 'box2alias', 'box2','identificationbarcode2', 'location2', '1', '2017-06-20 16:02:00', '1', '2017-06-20 16:02:00');
+INSERT INTO `Box` (`boxId`, `boxSizeId`, `boxUseId`, `name`, `alias`, `description`, `identificationBarcode`, `locationBarcode`, `lastModifier`, `lastModified`, `creator`, `created`) VALUES
+(1, 1, 1, 'BOX1', 'box1alias', 'description1', 'identificationbarcode1', 'location1', 1, '2017-06-20 16:02:00', 1, '2017-06-20 16:02:00'),
+(2, 1, 2, 'BOX2', 'box2alias', 'description2', 'identificationbarcode2', 'location2', 1, '2017-06-20 16:02:00', 1, '2017-06-20 16:02:00'),
+(3, 2, 1, 'BOX3', 'alias', NULL, 'testbarcode', NULL, 1, '2021-02-24 08:41:00', 1, '2021-02-24 08:41:00'),
+(4, 2, 2, 'BOX4', 'alias4', NULL, 'barcodetest', NULL, 1, '2021-02-24 08:41:00', 1, '2021-02-24 08:41:00');
 
 INSERT INTO BoxChangeLog(boxChangeLogId, boxId, columnsChanged, userId, message, changeTime)
 VALUES

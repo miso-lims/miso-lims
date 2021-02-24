@@ -34,7 +34,7 @@ public class HibernateBoxSizeDaoIT extends AbstractDAOTest {
   public void testList() throws IOException {
     List<BoxSize> list = sut.list();
     assertNotNull(list);
-    assertEquals(1, list.size());
+    assertEquals(2, list.size());
   }
 
   @Test

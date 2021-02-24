@@ -2808,7 +2808,7 @@ public class Dtos {
 
   public static Pool to(@Nonnull PoolDto dto) {
     PoolImpl to = new PoolImpl();
-    to.setId(dto.getId() == null ? PoolImpl.UNSAVED_ID : dto.getId());
+    setLong(to::setId, dto.getId(), false);
     to.setAlias(dto.getAlias());
     setBigDecimal(to::setConcentration, dto.getConcentration());
     to.setConcentrationUnits(dto.getConcentrationUnits());
