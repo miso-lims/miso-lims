@@ -156,7 +156,7 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
 
   @Override
   public List<Box> listByIdList(List<Long> idList) throws IOException {
-    List<Box> boxes = boxStore.getByIdList(idList);
+    List<Box> boxes = boxStore.listByIdList(idList);
     return boxes;
   }
 

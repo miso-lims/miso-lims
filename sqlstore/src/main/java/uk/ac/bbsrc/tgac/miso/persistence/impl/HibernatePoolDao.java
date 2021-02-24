@@ -1,12 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
@@ -24,29 +21,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
-import uk.ac.bbsrc.tgac.miso.persistence.BoxStore;
 import uk.ac.bbsrc.tgac.miso.persistence.PoolStore;
-import uk.ac.bbsrc.tgac.miso.persistence.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
 public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSource<Pool> {
 
-  private static class ChangeLogEntry {
-    public Pool pool;
-    public String summary;
-  }
-
   private final static String[] SEARCH_PROPERTIES = new String[] { "name", "alias", "identificationBarcode", "description" };
-
-  @Autowired
-  private BoxStore boxStore;
-
-  private final Queue<ChangeLogEntry> changeLogQueue = new ConcurrentLinkedQueue<>();
-
-  @Autowired
-  private SecurityStore securityStore;
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -63,10 +45,6 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   @Override
   public Pool get(long poolId) throws IOException {
     return (PoolImpl) currentSession().get(PoolImpl.class, poolId);
-  }
-
-  public BoxStore getBoxStore() {
-    return boxStore;
   }
 
   @Override
@@ -90,10 +68,6 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
     @SuppressWarnings("unchecked")
     List<Pool> results = criteria.list();
     return results;
-  }
-
-  public SecurityStore getSecurityStore() {
-    return securityStore;
   }
 
   public SessionFactory getSessionFactory() {
@@ -157,35 +131,12 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
 
   @Override
   public long save(final Pool pool) throws IOException {
-    currentSession().flush();
-    Long id;
-    if (pool.getId() == PoolImpl.UNSAVED_ID) {
-      id = (Long) currentSession().save(pool);
-      currentSession().flush();
+    if (!pool.isSaved()) {
+      return (Long) currentSession().save(pool);
     } else {
-      if (pool.isDiscarded()) {
-        getBoxStore().removeBoxableFromBox(pool);
-        pool.setVolume(BigDecimal.ZERO);
-      }
-
-      id = pool.getId();
       currentSession().update(pool);
-      currentSession().flush();
-      ChangeLogEntry log;
-      while ((log = changeLogQueue.poll()) != null) {
-        pool.createChangeLog(log.summary, "contents", log.pool.getLastModifier());
-      }
+      return pool.getId();
     }
-
-    return id;
-  }
-
-  public void setBoxStore(BoxStore boxDAO) {
-    this.boxStore = boxDAO;
-  }
-
-  public void setSecurityStore(SecurityStore securityStore) {
-    this.securityStore = securityStore;
   }
 
   public void setSessionFactory(SessionFactory sessionFactory) {

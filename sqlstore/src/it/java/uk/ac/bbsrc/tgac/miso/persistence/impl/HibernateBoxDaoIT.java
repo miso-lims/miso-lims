@@ -41,10 +41,13 @@ import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.google.common.collect.Lists;
+
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxSize.BoxType;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
@@ -55,6 +58,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.util.DateType;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 public class HibernateBoxDaoIT extends AbstractDAOTest {
@@ -78,7 +83,7 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
   public void testGetBoxById() throws IOException, InterruptedException {
     Box box = dao.get(1);
     assertEquals("box1alias", box.getAlias());
-    assertEquals("box1", box.getName());
+    assertEquals("BOX1", box.getName());
     assertEquals(1L, box.getId());
     assertEquals("identificationbarcode1", box.getIdentificationBarcode());
     assertEquals(4, box.getSize().getRows().intValue());
@@ -99,32 +104,34 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testListAll() throws Exception {
-    Collection<Box> boxes = dao.listAll();
+  public void testListByIdList() throws Exception {
+    List<Long> ids = Lists.newArrayList(2L, 3L);
+    List<Box> boxes = dao.listByIdList(ids);
+    assertNotNull(boxes);
     assertEquals(2, boxes.size());
+    for (Long id : ids) {
+      assertTrue(boxes.stream().anyMatch(x -> x.getId() == id.longValue()));
+    }
   }
 
   @Test
-  public void testRemoveBoxableFromBox() throws Exception {
-    Sample s = (Sample) sessionFactory.getCurrentSession().get(SampleImpl.class, 15L);
-    assertNotNull(s.getBox());
-    assertEquals(1L, s.getBox().getId());
-    assertEquals("A01", s.getBoxPosition());
-    Box box = dao.get(1L);
-    BoxPosition bp = box.getBoxPositions().get("A01");
-    assertNotNull(bp);
-    assertEquals(new BoxableId(s.getEntityType(), s.getId()), bp.getBoxableId());
+  public void testListByIdListNull() throws Exception {
+    List<Box> boxes = dao.listByIdList(null);
+    assertNotNull(boxes);
+    assertTrue(boxes.isEmpty());
+  }
 
-    dao.removeBoxableFromBox(s);
+  @Test
+  public void testListByIdListNone() throws Exception {
+    List<Box> boxes = dao.listByIdList(Collections.emptyList());
+    assertNotNull(boxes);
+    assertTrue(boxes.isEmpty());
+  }
 
-    sessionFactory.getCurrentSession().flush();
-    sessionFactory.getCurrentSession().clear();
-
-    Box savedBox = dao.get(1);
-    assertFalse(savedBox.getBoxPositions().containsKey("A01"));
-    Sample savedSample = (Sample) sessionFactory.getCurrentSession().get(SampleImpl.class, 15L);
-    assertNull(savedSample.getBox());
-    assertNull(savedSample.getBoxPosition());
+  @Test
+  public void testListAll() throws Exception {
+    Collection<Box> boxes = dao.listAll();
+    assertEquals(4, boxes.size());
   }
 
   @Test
@@ -142,6 +149,20 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
 
     Box again = dao.get(1);
     assertFalse(again.getBoxPositions().containsKey("A01"));
+  }
+
+  @Test
+  public void testRemoveBoxableViewUnneccessary() throws Exception {
+    Sample before = (Sample) sessionFactory.getCurrentSession().get(SampleImpl.class, 1L);
+    assertNull(before.getBox());
+    BoxableView item = BoxableView.fromBoxable(before);
+    dao.removeBoxableFromBox(item);
+
+    sessionFactory.getCurrentSession().flush();
+    sessionFactory.getCurrentSession().clear();
+
+    Sample after = (Sample) sessionFactory.getCurrentSession().get(SampleImpl.class, 1L);
+    assertNull(after.getBox());
   }
 
   @Test
@@ -270,24 +291,34 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testGetBoxableViewByPreMigrationId() throws Exception {
-    assertNull(dao.getBoxableViewByPreMigrationId(32123L));
-
-    BoxableView sample = dao.getBoxableViewByPreMigrationId(1L);
-    assertNotNull(sample);
-    assertEquals(new BoxableId(EntityType.SAMPLE, 17L), sample.getId());
-  }
-
-  @Test
   public void testGetBoxableViewsByBarcodeList() throws Exception {
-    List<BoxableView> empty = dao.getBoxableViewsByBarcodeList(Collections.emptyList());
-    assertNotNull(empty);
-    assertTrue(empty.isEmpty());
-
     List<String> barcodes = Arrays.asList("SAM1::TEST_0001_Bn_P_nn_1-1_D_1", "LIB1::TEST_0001_Bn_P_PE_300_WG");
     List<BoxableView> list = dao.getBoxableViewsByBarcodeList(barcodes);
     assertNotNull(list);
     assertEquals(2, list.size());
+  }
+
+  @Test
+  public void testGetBoxableViewsByBarcodeListNull() throws Exception {
+    List<BoxableView> empty = dao.getBoxableViewsByBarcodeList(null);
+    assertNotNull(empty);
+    assertTrue(empty.isEmpty());
+  }
+
+  @Test
+  public void testGetBoxableViewsByBarcodeListNone() throws Exception {
+    List<BoxableView> empty = dao.getBoxableViewsByBarcodeList(Collections.emptyList());
+    assertNotNull(empty);
+    assertTrue(empty.isEmpty());
+  }
+
+  @Test
+  public void testGetBoxContents() throws Exception {
+    List<BoxableView> contents = dao.getBoxContents(1L);
+    assertNotNull(contents);
+    assertEquals(2, contents.size());
+    assertTrue(contents.stream().anyMatch(x -> x.getId().equals(new BoxableId(EntityType.SAMPLE, 15L))));
+    assertTrue(contents.stream().anyMatch(x -> x.getId().equals(new BoxableId(EntityType.SAMPLE, 16L))));
   }
 
   @Test
@@ -300,6 +331,43 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
     List<BoxableView> list = dao.getBoxableViewsByIdList(ids);
     assertNotNull(list);
     assertEquals(2, list.size());
+  }
+
+  @Test
+  public void testGetBySearch() {
+    List<Box> boxes = dao.getBySearch("alias");
+    assertNotNull(boxes);
+    assertEquals(3L, boxes.get(0).getId());
+  }
+
+  @Test
+  public void testGetBySearchNull() {
+    exception.expect(NullPointerException.class);
+    dao.getBySearch(null);
+  }
+
+  @Test
+  public void testGetByPartialSearchNull() {
+    exception.expect(NullPointerException.class);
+    dao.getByPartialSearch(null, true);
+  }
+
+  @Test
+  public void testGetByPartialSearchStart() {
+    List<Box> boxes = dao.getByPartialSearch("identificationbarcode", true);
+    assertNotNull(boxes);
+    assertEquals(2, boxes.size());
+    assertTrue(boxes.stream().anyMatch(x -> x.getId() == 1L));
+    assertTrue(boxes.stream().anyMatch(x -> x.getId() == 2L));
+  }
+
+  @Test
+  public void testGetByPartialSearchAnywhere() {
+    List<Box> boxes = dao.getByPartialSearch("test", false);
+    assertNotNull(boxes);
+    assertEquals(2, boxes.size());
+    assertTrue(boxes.stream().anyMatch(x -> x.getId() == 3L));
+    assertTrue(boxes.stream().anyMatch(x -> x.getId() == 4L));
   }
 
   @Test
@@ -324,8 +392,61 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
   }
 
   @Test
+  public void testGetBoxableViewsBySearchNull() throws Exception {
+    exception.expect(NullPointerException.class);
+    dao.getBoxableViewsBySearch(null);
+  }
+
+  @Test
   public void testSearch() throws IOException {
     testSearch(PaginationFilter.query("BOX1"));
+  }
+
+  @Test
+  public void testSearchByFreezer() throws IOException {
+    testSearch(PaginationFilter.freezer("freezer"));
+  }
+
+  @Test
+  public void testSearchByBoxUse() throws IOException {
+    testSearch(PaginationFilter.boxUse(1L));
+  }
+
+  @Test
+  public void testSearchByBoxType() throws IOException {
+    testSearch(PaginationFilter.boxType(BoxType.PLATE));
+  }
+
+  @Test
+  public void testSearchByCreator() throws IOException {
+    testSearch(PaginationFilter.user("name", true));
+  }
+
+  @Test
+  public void testSearchByLastModifier() throws IOException {
+    testSearch(PaginationFilter.user("name", false));
+  }
+
+  @Test
+  public void testSearchByEntered() throws IOException {
+    testSearch(PaginationFilter.date(LimsUtils.parseDate("2021-02-24"), LimsUtils.parseDate("2021-02-24"), DateType.ENTERED));
+  }
+
+  @Test
+  public void testSearchByLastModified() throws IOException {
+    testSearch(PaginationFilter.date(LimsUtils.parseDate("2021-02-24"), LimsUtils.parseDate("2021-02-24"), DateType.UPDATE));
+  }
+
+  @Test
+  public void testSearchByDistributedInvalid() throws IOException {
+    exception.expect(RuntimeException.class);
+    testSearch(PaginationFilter.date(LimsUtils.parseDate("2021-02-24"), LimsUtils.parseDate("2021-02-24"), DateType.DISTRIBUTED));
+  }
+
+  @Test
+  public void testSearchByProjectInvalid() throws IOException {
+    exception.expect(RuntimeException.class);
+    testSearch(PaginationFilter.project(1L));
   }
 
   /**
@@ -404,6 +525,14 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
 
     Boxable saved = dao.getBoxable(new BoxableId(EntityType.SAMPLE, 15L));
     assertTrue(saved.isDiscarded());
+  }
+
+  @Test
+  public void testSorts() throws Exception {
+    String[] sorts = { "sizeId", "useId" };
+    for (String sort : sorts) {
+      assertNotNull(dao.list(0, 0, true, sort));
+    }
   }
 
 }

@@ -18,6 +18,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryAliquotBoxPositio
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.LibraryAliquotBoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.LibraryBoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolBoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SampleBoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferView;
 
 /**
@@ -27,10 +32,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferView;
 public interface Boxable extends Nameable, Barcodable, Serializable {
 
   public enum EntityType {
-    SAMPLE("Sample", SampleImpl.class, SampleBoxPosition::new), //
-    LIBRARY("Library", LibraryImpl.class, LibraryBoxPosition::new), //
-    LIBRARY_ALIQUOT("Library Aliquot", LibraryAliquot.class, LibraryAliquotBoxPosition::new), //
-    POOL("Pool", PoolImpl.class, PoolBoxPosition::new); //
+    SAMPLE("Sample", SampleImpl.class, SampleBoxableView.class, SampleBoxPosition::new), //
+    LIBRARY("Library", LibraryImpl.class, LibraryBoxableView.class, LibraryBoxPosition::new), //
+    LIBRARY_ALIQUOT("Library Aliquot", LibraryAliquot.class, LibraryAliquotBoxableView.class, LibraryAliquotBoxPosition::new), //
+    POOL("Pool", PoolImpl.class, PoolBoxableView.class, PoolBoxPosition::new); //
 
     private static final Map<String, EntityType> lookup;
 
@@ -44,11 +49,14 @@ public interface Boxable extends Nameable, Barcodable, Serializable {
 
     private final String label;
     private final Class<? extends Boxable> persistClass;
+    private final Class<? extends BoxableView> viewClass;
     private final Supplier<? extends AbstractBoxPosition> positionConstructor;
 
-    private EntityType(String label, Class<? extends Boxable> persistClass, Supplier<? extends AbstractBoxPosition> positionConstructor) {
+    private EntityType(String label, Class<? extends Boxable> persistClass, Class<? extends BoxableView> viewClass,
+        Supplier<? extends AbstractBoxPosition> positionConstructor) {
       this.label = label;
       this.persistClass = persistClass;
+      this.viewClass = viewClass;
       this.positionConstructor = positionConstructor;
     }
 
@@ -62,6 +70,10 @@ public interface Boxable extends Nameable, Barcodable, Serializable {
 
     public Class<? extends Boxable> getPersistClass() {
       return persistClass;
+    }
+
+    public Class<? extends BoxableView> getViewClass() {
+      return viewClass;
     }
 
     public AbstractBoxPosition makeBoxPosition() {

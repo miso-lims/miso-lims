@@ -24,7 +24,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
-import uk.ac.bbsrc.tgac.miso.persistence.BoxStore;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAliquotStore;
 import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
@@ -40,31 +39,19 @@ public class HibernateLibraryAliquotDao
   @Autowired
   private SessionFactory sessionFactory;
 
-  @Autowired
-  private BoxStore boxStore;
-
   @Override
   public Session currentSession() {
     return getSessionFactory().getCurrentSession();
   }
 
-  public void setBoxStore(BoxStore boxStore) {
-    this.boxStore = boxStore;
-  }
-
   @Override
   public long save(LibraryAliquot aliquot) throws IOException {
-    long id;
     if (aliquot.getId() == LibraryAliquot.UNSAVED_ID) {
-      id = (long) currentSession().save(aliquot);
+      return (long) currentSession().save(aliquot);
     } else {
-      if (aliquot.isDiscarded()) {
-        boxStore.removeBoxableFromBox(aliquot);
-      }
       currentSession().update(aliquot);
-      id = aliquot.getId();
+      return aliquot.getId();
     }
-    return id;
   }
 
   @Override

@@ -70,8 +70,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferView;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
@@ -92,7 +92,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   private static final int NAME_LENGTH = 255;
   public static final String PREFIX = "IPO";
   private static final long serialVersionUID = 1L;
-  public static final Long UNSAVED_ID = 0L;
+  private static final Long UNSAVED_ID = 0L;
 
   @OneToMany(targetEntity = PoolChangeLog.class, mappedBy = "pool", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();

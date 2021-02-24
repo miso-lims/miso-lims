@@ -82,15 +82,8 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
   }
 
   @Override
-  public Box getBoxByBarcode(String barcode) throws IOException {
-    Criteria criteria = currentSession().createCriteria(BoxImpl.class);
-    criteria.add(Restrictions.eq(FIELD_BARCODE, barcode));
-    return (Box) criteria.uniqueResult();
-  }
-
-  @Override
-  public List<Box> getByIdList(List<Long> idList) throws IOException {
-    if (idList.isEmpty()) {
+  public List<Box> listByIdList(List<Long> idList) throws IOException {
+    if (idList == null || idList.isEmpty()) {
       return Collections.emptyList();
     }
     Criteria criteria = currentSession().createCriteria(BoxImpl.class);
@@ -163,14 +156,6 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
   }
 
   @Override
-  public void removeBoxableFromBox(Boxable boxable) throws IOException {
-    if (boxable.getBox() != null) {
-      boxable.getBox().getBoxPositions().remove(boxable.getBoxPosition());
-      currentSession().save(boxable.getBox());
-    }
-  }
-
-  @Override
   public void removeBoxableFromBox(BoxableView boxable) throws IOException {
     if (boxable.getBoxId() == null) {
       return;
@@ -200,15 +185,7 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
 
   @Override
   public BoxableView getBoxableView(BoxableId id) throws IOException {
-    List<BoxableView> results = queryBoxables(Restrictions.eq("id", id));
-    switch (results.size()) {
-    case 0:
-      return null;
-    case 1:
-      return results.get(0);
-    default:
-      throw new IllegalStateException(String.format("More than one Boxable found with ID %s %d", id.getTargetType(), id.getTargetId()));
-    }
+    return (BoxableView) currentSession().get(id.getTargetType().getViewClass(), id);
   }
 
   @Override
@@ -242,22 +219,6 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
       results.addAll(partialResults);
     }
     return results;
-  }
-
-  @Override
-  public BoxableView getBoxableViewByPreMigrationId(Long preMigrationId) throws IOException {
-    if (preMigrationId == null) {
-      throw new NullPointerException("Cannot search for null preMigrationId");
-    }
-    List<BoxableView> results = queryBoxables(Restrictions.eq("preMigrationId", preMigrationId));
-    switch (results.size()) {
-    case 0:
-      return null;
-    case 1:
-      return results.get(0);
-    default:
-      throw new IllegalStateException(String.format("More than one Boxable found with preMigrationId %d", preMigrationId));
-    }
   }
 
   @Override
