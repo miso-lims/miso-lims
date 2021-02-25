@@ -499,6 +499,22 @@ only be deleted if the type has not been used by any existing partitions.
 
 
 
+## Run-Library QC Statuses
+
+The QC status of the library and library aliquot indicate library preparation QC, whereas run-library QC status
+indicates sequencing QC of a specific library in a specific lane of a specific run. This means that a library prep may
+pass QC, a run may pass QC, the partition may even pass QC, but the data for a particular library in that partition may
+still be bad.
+
+By default, there are "Passed" and "Failed" statuses, and if the status has not been set, it shows as "Pending."
+Additional statuses may be added to indicate other results. For example, a "top-up required" status could indicate that
+while the data is good, more sequencing is still required.
+
+MISO administrators can add, edit, and delete run-library QC statuses using the standard interface. A run-library QC
+status can only be deleted if the status has not been used by any existing run-libraries.
+
+
+
 ## Box Sizes
 
 A box in MISO describes a physical container that holds multiple samples, libraries, library aliquots, and/or pools.

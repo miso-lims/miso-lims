@@ -12,7 +12,7 @@ var QcHierarchy = (function($) {
   var applyButton = '#applySelected'
   var chartMargin = 11; // (includes 1px border)
   var nodeWidth = 300;
-  var nodeHeight = 80;
+  var nodeHeight = 92;
   var nodeSpacing = 10;
   var linkHeight = 30;
 
@@ -30,17 +30,6 @@ var QcHierarchy = (function($) {
     }, {
       value: true,
       label: 'Ready'
-    }, {
-      value: false,
-      label: 'Failed'
-    }],
-
-    runLibraryQcOptions: [{
-      value: null,
-      label: 'Pending'
-    }, {
-      value: true,
-      label: 'Passed'
     }, {
       value: false,
       label: 'Failed'
@@ -220,14 +209,11 @@ var QcHierarchy = (function($) {
       });
       return makeNodeHtml(item, status.label);
     case 'Run-Partition':
-      var status = item.qcStatusId ? Utils.array.findUniqueOrThrow(Utils.array.idPredicate(item.qcStatusId), Constants.partitionQcTypes)
-          : null;
+      var status = item.qcStatusId ? Utils.array.findUniqueOrThrow(Utils.array.idPredicate(item.qcStatusId), Constants.partitionQcTypes) : null;
       return makeNodeHtml(item, status ? status.description : 'Not Set');
     case 'Run-Library':
-      var status = QcHierarchy.runLibraryQcOptions.find(function(x) {
-        return x.value === item.qcPassed;
-      });
-      return makeNodeHtml(item, status.label, item.qcNote);
+      var status = item.qcStatusId ? Utils.array.findUniqueOrThrow(Utils.array.idPredicate(item.qcStatusId), Constants.runLibraryQcStatuses) : null;
+      return makeNodeHtml(item, status ? status.description : 'Pending', item.qcNote);
     default:
       throw new Error('Unknown entity type: ' + selectedItem.entityType);
     }
@@ -368,16 +354,17 @@ var QcHierarchy = (function($) {
   }
 
   function updateRunLibraryQcControls(selectedItem) {
-    $(statusInput).append(QcHierarchy.runLibraryQcOptions.map(function(x, i) {
+    $(statusInput).append(makeSelectOption(0, 'Pending', !selectedItem.qcStatusId));
+    $(statusInput).append(Constants.runLibraryQcStatuses.map(function(x) {
       var qcPassed = selectedItem.qcPassed === undefined ? null : selectedItem.qcPassed;
-      return makeSelectOption(i, x.label, qcPassed === x.value);
+      return makeSelectOption(x.id, x.description, selectedItem.qcStatusId === x.id);
     }));
     Utils.ui.setDisabled(noteInput, false);
     $(applyButton).click(
         function() {
           validateAndSubmit(selectedItem, function() {
             return {
-              qcPassed: QcHierarchy.runLibraryQcOptions[$(statusInput).val()].value,
+              qcStatusId: Number.parseInt($(statusInput).val()) || null,
               qcNote: $(noteInput).val() || null
             };
           });

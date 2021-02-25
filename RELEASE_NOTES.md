@@ -2,7 +2,7 @@
 
 Changes:
 
-
+* Added detailed QC statuses for run-libraries
 
 # 1.24.0
 

@@ -83,6 +83,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Printer;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.RunLibraryQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
@@ -4097,7 +4098,7 @@ public class Dtos {
     setString(to::setAliquotName, maybeGetProperty(from.getAliquot(), LibraryAliquot::getName));
     setString(to::setAliquotAlias, maybeGetProperty(from.getAliquot(), LibraryAliquot::getAlias));
     setId(to::setRunPurposeId, from.getPurpose());
-    setBoolean(to::setQcPassed, from.getQcPassed(), true);
+    setId(to::setQcStatusId, from.getQcStatus());
     setString(to::setQcNote, from.getQcNote());
     setString(to::setQcUserName, maybeGetProperty(from.getQcUser(), User::getFullName));
     setDateString(to::setQcDate, from.getQcDate());
@@ -4111,7 +4112,7 @@ public class Dtos {
     setObject(to::setPartition, PartitionImpl::new, from.getPartitionId());
     setObject(to::setAliquot, LibraryAliquot::new, from.getAliquotId());
     setObject(to::setPurpose, RunPurpose::new, from.getRunPurposeId());
-    setBoolean(to::setQcPassed, from.getQcPassed(), true);
+    setObject(to::setQcStatus, RunLibraryQcStatus::new, from.getQcStatusId());
     setString(to::setQcNote, from.getQcNote());
     return to;
   }
@@ -4337,6 +4338,22 @@ public class Dtos {
     Pipeline to = new Pipeline();
     setLong(to::setId, from.getId(), false);
     setString(to::setAlias, from.getAlias());
+    return to;
+  }
+
+  public static RunLibraryQcStatusDto asDto(RunLibraryQcStatus from) {
+    RunLibraryQcStatusDto to = new RunLibraryQcStatusDto();
+    setLong(to::setId, from.getId(), true);
+    setString(to::setDescription, from.getDescription());
+    setBoolean(to::setQcPassed, from.getQcPassed(), true);
+    return to;
+  }
+
+  public static RunLibraryQcStatus to(RunLibraryQcStatusDto from) {
+    RunLibraryQcStatus to = new RunLibraryQcStatus();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setDescription, from.getDescription());
+    setBoolean(to::setQcPassed, from.getQcPassed(), true);
     return to;
   }
 

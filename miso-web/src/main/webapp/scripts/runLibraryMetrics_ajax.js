@@ -48,22 +48,15 @@ var RunLibraryMetrics = (function($) {
         label: 'Status',
         property: 'option',
         type: 'select',
-        values: QcHierarchy.runLibraryQcOptions.map(function(option, i) {
-          return {
-            label: option.label,
-            value: i
-          };
-        }),
-        getLabel: function(option) {
-          return option.label;
-        }
+        values: Constants.runLibraryQcStatuses,
+        getLabel: Utils.array.get('description')
       }, {
         label: 'Note',
         property: 'note',
         type: 'text'
       }];
       Utils.showDialog('Set All Run-Library QCs', 'Set', fields, function(results) {
-        setAllRunLibraryQcs(results.option.value, results.note);
+        setAllRunLibraryQcs(results.option.id, results.note);
       });
     },
     saveAll: function() {
@@ -235,15 +228,15 @@ var RunLibraryMetrics = (function($) {
       };
       break;
     case 'Run-Library':
-      controls.status.append(QcHierarchy.runLibraryQcOptions.map(function(item, i) {
-        var qcPassed = qcNode.qcPassed === undefined ? null : qcNode.qcPassed;
-        return makeSelectOption(i, item.label, qcPassed === item.value);
+      controls.status.append(makeSelectOption(0, 'Pending', !qcNode.qcStatusId));
+      controls.status.append(Constants.runLibraryQcStatuses.map(function(item) {
+        return makeSelectOption(item.id, item.description, qcNode.qcStatusId === item.id);
       }));
       Utils.ui.setDisabled(controls.note, false);
 
       rowData.getUpdate = function() {
         return {
-          qcPassed: QcHierarchy.runLibraryQcOptions[controls.status.val()].value,
+          qcStatusId: Number.parseInt(controls.status.val()) || null,
           qcNote: controls.note.val() || null
         };
       };
