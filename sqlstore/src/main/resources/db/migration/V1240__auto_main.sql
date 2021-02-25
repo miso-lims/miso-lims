@@ -1,3 +1,8 @@
+-- drop_view
+DROP VIEW IF EXISTS PoolableElementView;
+DROP VIEW IF EXISTS InstrumentPositionStatus;
+
+-- cascade_delete_changelogs
 ALTER TABLE ArrayChangeLog DROP FOREIGN KEY fk_arrayChangeLog_array;
 ALTER TABLE ArrayChangeLog ADD CONSTRAINT fk_arrayChangeLog_array
   FOREIGN KEY (arrayId) REFERENCES Array (arrayId) ON DELETE CASCADE;
@@ -65,3 +70,4 @@ ALTER TABLE TransferChangeLog ADD CONSTRAINT fk_transferChangeLog_transfer
 ALTER TABLE WorksetChangeLog DROP FOREIGN KEY fk_worksetChangeLog_workset;
 ALTER TABLE WorksetChangeLog ADD CONSTRAINT fk_worksetChangeLog_workset
   FOREIGN KEY (worksetId) REFERENCES Workset (worksetId) ON DELETE CASCADE;
+
