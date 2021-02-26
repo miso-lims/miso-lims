@@ -8,7 +8,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BarcodableView;
 
 public interface BarcodableViewService {
-  public List<BarcodableView> searchByBarcode(String barcode);
 
   public List<BarcodableView> searchByBarcode(String barcode, Collection<Barcodable.EntityType> typeFilter);
 
@@ -24,8 +23,6 @@ public interface BarcodableViewService {
    * Incorrect usage (e.g. view.id.targetType != SAMPLE && Sample s = getEntity(view)) will result in a ClassCastException
    */
   public <T extends Barcodable> T getEntity(BarcodableView view) throws IOException;
-
-  public List<BarcodableView> searchByAlias(String alias);
 
   public List<BarcodableView> searchByAlias(String alias, Collection<Barcodable.EntityType> typeFilter);
 
