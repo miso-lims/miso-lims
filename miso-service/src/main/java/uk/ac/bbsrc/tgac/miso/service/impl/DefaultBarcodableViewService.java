@@ -28,18 +28,8 @@ public class DefaultBarcodableViewService implements BarcodableViewService {
   private Map<EntityType, BarcodableService<?>> barcodableServicesMap;
 
   @Override
-  public List<BarcodableView> searchByBarcode(String barcode) {
-    return barcodableViewDao.searchByBarcode(barcode);
-  }
-
-  @Override
   public List<BarcodableView> searchByBarcode(String barcode, Collection<EntityType> typeFilter) {
     return barcodableViewDao.searchByBarcode(barcode, typeFilter);
-  }
-
-  @Override
-  public List<BarcodableView> searchByAlias(String alias) {
-    return barcodableViewDao.searchByAlias(alias);
   }
 
   @Override

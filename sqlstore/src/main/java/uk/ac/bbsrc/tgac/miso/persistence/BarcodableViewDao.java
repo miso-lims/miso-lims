@@ -9,7 +9,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BarcodableReference;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BarcodableView;
 
 public interface BarcodableViewDao {
-  public List<BarcodableView> searchByBarcode(String barcode);
 
   public List<BarcodableView> searchByBarcode(String barcode, Collection<Barcodable.EntityType> typeFilter);
 
@@ -18,8 +17,6 @@ public interface BarcodableViewDao {
    * @param query name, alias, or barcode of a Barcodable entity
    */
   public List<BarcodableView> search(String query);
-
-  public List<BarcodableView> searchByAlias(String alias);
 
   public List<BarcodableView> searchByAlias(String alias, Collection<Barcodable.EntityType> typeFilter);
 

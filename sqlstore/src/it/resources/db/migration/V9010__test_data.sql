@@ -349,7 +349,7 @@ INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identifica
   2,0,22,1,NULL,0, FALSE, 'Tissue',
   1, 1, NULL, 1, 1, NULL),
 (24,NULL,'SAM24','tissue6','SAM24::TEST2_0001_TISSUE_2',NULL,
-  'GENOMIC',1,1,'2016-07-07','TEST_0001_TISSUE_2',2,2,1,
+  'GENOMIC',1,1,'2016-07-07','TEST2_0001_TISSUE_2',2,2,1,
   NULL,NULL,1,'2021-02-19 10:12:00',1,'2021-02-19 10:12:00',
   2,0,22,1,NULL,0, FALSE, 'Tissue',
   1, 1, NULL, 1, 1, NULL);

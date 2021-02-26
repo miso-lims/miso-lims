@@ -50,53 +50,44 @@ public class HibernateBarcodableViewDao implements BarcodableViewDao {
   }
 
   @Override
-  public List<BarcodableView> searchByBarcode(String barcode) {
-    if (barcode == null)
+  public List<BarcodableView> searchByBarcode(String barcode, Collection<EntityType> typeFilter) {
+    if (barcode == null) {
       throw new IllegalArgumentException("Barcode cannot be null!");
+    } else if (typeFilter == null || typeFilter.isEmpty()) {
+      throw new IllegalArgumentException("Types must be specified");
+    }
 
     @SuppressWarnings("unchecked")
     List<BarcodableView> results = currentSession().createCriteria(BarcodableView.class)
         .add(Restrictions.eq("identificationBarcode", barcode)).list();
 
-    return results;
-  }
-
-  @Override
-  public List<BarcodableView> searchByBarcode(String barcode, Collection<EntityType> typeFilter) {
-    if (barcode == null)
-      throw new IllegalArgumentException("Barcode cannot be null!");
-
     Predicate<BarcodableView> matchesTypeFilter = barcodableView -> typeFilter.contains(barcodableView.getId().getTargetType());
 
-    return searchByBarcode(barcode).stream().filter(matchesTypeFilter).collect(toList());
+    return results.stream().filter(matchesTypeFilter).collect(toList());
   }
 
   @Override
-  public List<BarcodableView> searchByAlias(String alias) {
-    if (alias == null)
+  public List<BarcodableView> searchByAlias(String alias, Collection<EntityType> typeFilter) {
+    if (alias == null) {
       throw new IllegalArgumentException("Alias cannot be null!");
+    } else if (typeFilter == null || typeFilter.isEmpty()) {
+      throw new IllegalArgumentException("Types must be specified");
+    }
 
     @SuppressWarnings("unchecked")
     List<BarcodableView> results = currentSession().createCriteria(BarcodableView.class)
         .add(Restrictions.eq("alias", alias)).list();
 
-    return results;
-  }
-
-  @Override
-  public List<BarcodableView> searchByAlias(String alias, Collection<EntityType> typeFilter) {
-    if (alias == null)
-      throw new IllegalArgumentException("Alias cannot be null!");
-
     Predicate<BarcodableView> matchesTypeFilter = barcodableView -> typeFilter.contains(barcodableView.getId().getTargetType());
 
-    return searchByAlias(alias).stream().filter(matchesTypeFilter).collect(toList());
+    return results.stream().filter(matchesTypeFilter).collect(toList());
   }
 
   @Override
   public List<BarcodableView> search(String query) {
-    if (isStringEmptyOrNull(query))
+    if (isStringEmptyOrNull(query)) {
       throw new IllegalArgumentException("Search is empty");
+    }
 
     @SuppressWarnings("unchecked")
     List<BarcodableView> results = currentSession().createCriteria(BarcodableView.class)
