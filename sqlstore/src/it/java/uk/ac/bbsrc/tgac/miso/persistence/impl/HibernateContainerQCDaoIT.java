@@ -1,58 +1,64 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
-
 import java.math.BigDecimal;
-import java.util.Date;
 
-import org.hibernate.SessionFactory;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 
-import com.eaglegenomics.simlims.core.User;
-
-import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
+import uk.ac.bbsrc.tgac.miso.AbstractHibernateQcDaoTest;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQC;
-import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQcControlRun;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcControlRun;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcCorrespondingField;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
 
-public class HibernateContainerQCDaoIT extends AbstractDAOTest {
+public class HibernateContainerQCDaoIT
+    extends AbstractHibernateQcDaoTest<ContainerQC, HibernateContainerQcDao, SequencerPartitionContainer, ContainerQcControlRun> {
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  @Rule
+  public ExpectedException exception = ExpectedException.none();
 
-  private HibernateContainerQcDao sut;
-
-  @Before
-  public void setUp() throws Exception {
-    sut = new HibernateContainerQcDao();
-    sut.setSessionFactory(sessionFactory);
+  public HibernateContainerQCDaoIT() {
+    super(ContainerQC.class, SequencerPartitionContainerImpl.class, ContainerQcControlRun.class, QcTarget.Container, 16L, 1, 1, 7L, 1, 1);
   }
 
-  @Test
-  public void testSave() throws Exception {
+  @Override
+  public HibernateContainerQcDao constructTestSubject() {
+    return new HibernateContainerQcDao();
+  }
+
+  @Override
+  protected ContainerQC makeQc(SequencerPartitionContainer entity) {
     ContainerQC qc = new ContainerQC();
-    SequencerPartitionContainer container = (SequencerPartitionContainer) currentSession().get(SequencerPartitionContainerImpl.class, 3L);
-    QcType qcType = (QcType) currentSession().get(QcType.class, 1L);
-    User user = (User) currentSession().get(UserImpl.class, 1L);
-    qc.setContainer(container);
-    qc.setType(qcType);
-    qc.setResults(new BigDecimal("12"));
-    qc.setCreator(user);
-    qc.setCreationTime(new Date());
-    qc.setLastModified(new Date());
-    long id = sut.save(qc);
-
-    clearSession();
-
-    ContainerQC saved = (ContainerQC) currentSession().get(ContainerQC.class, id);
-    assertNotNull(saved);
-    assertEquals(qc.getContainer().getId(), saved.getContainer().getId());
-    assertEquals(qc.getType().getId(), saved.getType().getId());
-    assertEquals(qc.getResults().compareTo(saved.getResults()), 0);
+    qc.setContainer(entity);
+    return qc;
   }
+
+  @Override
+  protected QcControlRun makeControlRun(ContainerQC qc) {
+    ContainerQcControlRun controlRun = new ContainerQcControlRun();
+    controlRun.setQc(qc);
+    return controlRun;
+  }
+
+  @Override
+  public void testUpdateEntity() throws Exception {
+    // No valid correspondingfields for containers
+    exception.expect(UnsupportedOperationException.class);
+    getTestSubject().updateEntity(1L, QcCorrespondingField.CONCENTRATION, new BigDecimal(1), "nM");
+  }
+
+  @Override
+  protected BigDecimal getConcentration(SequencerPartitionContainer entity) {
+    return null;
+  }
+
+  @Override
+  protected void setConcentration(SequencerPartitionContainer entity, BigDecimal concentration) {
+    // Do nothing
+  }
+
 
 }

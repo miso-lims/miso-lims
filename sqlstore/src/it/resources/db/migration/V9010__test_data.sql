@@ -203,12 +203,20 @@ INSERT INTO `QCType` (`qcTypeId`, `name`, `description`, `qcTarget`, `units`) VA
 (9,'poolQcType2', 'qc 2 for pools', 'Pool', 'nM'),
 (10,'poolQcType3', 'qc 3 for pools', 'Pool', 'nM'),
 (11,'poolQcType4', 'qc 4 for pools', 'Pool', 'nM'),
-(12,'InsertSizeQC', 'Insert Size QC', 'Library', 'bp');
+(12,'InsertSizeQC', 'Insert Size QC', 'Library', 'bp'),
+(13, 'Sample QC With Control', NULL, 'Sample', 'x'),
+(14, 'Library QC With Control', NULL, 'Library', 'x'),
+(15, 'Pool QC With Control', NULL, 'Pool', 'x'),
+(16, 'Container QC With Control', NULL, 'Container', 'x');
 
 INSERT INTO QcControl (controlId, qcTypeId, alias) VALUES
 (1, 11, 'Control 1'),
 (2, 11, 'Control 2'),
-(3, 11, 'Control 3');
+(3, 11, 'Control 3'),
+(4, 13, 'Control'),
+(5, 14, 'Control'),
+(6, 15, 'Control'),
+(7, 16, 'Control');
 
 INSERT INTO QCType_KitDescriptor (qcTypeId, kitDescriptorId) VALUES
 (7, 3);
@@ -377,23 +385,27 @@ INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identifica
 INSERT INTO SampleHierarchy(sampleId, identityId, tissueId) VALUES
 (19, 15, 17);
 
-INSERT INTO `SampleQC`(`sample_sampleId`, `creator`, `date`, `type`, `results`, kitDescriptorId, kitLot) 
-VALUES (1,1,'2015-08-27',3,5, NULL, NULL),
-(2,1,'2015-08-27',3,5, NULL, NULL),
-(3,1,'2015-08-27',3,5, NULL, NULL),
-(4,1,'2015-08-27',3,5, NULL, NULL),
-(5,1,'2015-08-27',3,5, NULL, NULL),
-(6,1,'2015-08-27',3,5, NULL, NULL),
-(7,1,'2015-08-27',3,5, NULL, NULL),
-(8,1,'2015-08-27',3,5, NULL, NULL),
-(9,1,'2015-08-27',3,5, NULL, NULL),
-(10,1,'2015-08-27',3,5, NULL, NULL),
-(11,1,'2015-08-27',3,5, NULL, NULL),
-(12,1,'2015-08-27',3,5, NULL, NULL),
-(13,1,'2015-08-27',3,5, NULL, NULL),
-(14,1,'2015-08-27',3,5, NULL, NULL),
-(14,1,'2015-08-28',3,55, NULL, NULL),
-(1,1,'2020-03-11',7,12, 3, 'asdf');
+INSERT INTO `SampleQC`(qcId, `sample_sampleId`, `creator`, `date`, `type`, `results`, kitDescriptorId, kitLot) VALUES
+(1,1,1,'2015-08-27',3,5, NULL, NULL),
+(2,2,1,'2015-08-27',3,5, NULL, NULL),
+(3,3,1,'2015-08-27',3,5, NULL, NULL),
+(4,4,1,'2015-08-27',3,5, NULL, NULL),
+(5,5,1,'2015-08-27',3,5, NULL, NULL),
+(6,6,1,'2015-08-27',3,5, NULL, NULL),
+(7,7,1,'2015-08-27',3,5, NULL, NULL),
+(8,8,1,'2015-08-27',3,5, NULL, NULL),
+(9,9,1,'2015-08-27',3,5, NULL, NULL),
+(10,10,1,'2015-08-27',3,5, NULL, NULL),
+(11,11,1,'2015-08-27',3,5, NULL, NULL),
+(12,12,1,'2015-08-27',3,5, NULL, NULL),
+(13,13,1,'2015-08-27',3,5, NULL, NULL),
+(14,14,1,'2015-08-27',3,5, NULL, NULL),
+(15,14,1,'2015-08-28',3,55, NULL, NULL),
+(16,1,1,'2020-03-11',7,12, 3, 'asdf'),
+(17,16,1,'2021-03-01',13,12,NULL,NULL);
+
+INSERT INTO SampleQcControl(qcControlId, qcId, controlId, lot, qcPassed) VALUES
+(1, 17, 4, 'testlotx', TRUE);
 
 INSERT INTO `SampleChangeLog`(`sampleChangeLogId`, `sampleId`, `columnsChanged`, `userId`, `message`, `changeTime`)
 VALUES (1, 1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:47'),
@@ -522,7 +534,11 @@ INSERT INTO `LibraryQC`(`qcId`, `library_libraryId`, `creator`, `date`, `type`, 
  (12,12,1,'2015-08-27',4,3),
  (13,13,1,'2015-08-27',4,3),
  (14,14,1,'2015-08-27',4,3),
- (15,2,1,'2015-08-27',12,300);
+ (15,2,1,'2015-08-27',12,300),
+ (16,1,1,'2021-03-01',14,10);
+ 
+INSERT INTO LibraryQcControl(qcControlId, qcId, controlId, lot, qcPassed) VALUES
+(1, 16, 5, '20210301', TRUE);
 
 INSERT INTO `Library_Index` 
 VALUES (1,12),(2,11),(3,10),(4,9),(5,8),(6,7),(7,6),(8,5),(9,4),(10,3),(11,2),(12,1),(13,24),(14,23);
@@ -572,12 +588,14 @@ INSERT INTO `Pool_LibraryAliquot`(`poolId`, `aliquotId`) VALUES
 INSERT INTO `PoolQC`(`qcId`, `pool_poolId`, `creator`, `date`, `type`, `results`)
 VALUES (1,1,1,'2016-03-18',1,12.3),
 (2,1,1,'2016-03-18',11,45.6),
-(3,2,1,'2016-03-18',11,7.89);
+(3,2,1,'2016-03-18',11,7.89),
+(4,4,1,'2021-03-01',15,99);
 
 INSERT INTO PoolQcControl (qcControlId, qcId, controlId, lot, qcPassed) VALUES
 (1, 2, 1, 'controllot1', TRUE),
 (2, 3, 1, 'controllot1', FALSE),
-(3, 3, 2, 'controllot1', TRUE);
+(3, 3, 2, 'controllot1', TRUE),
+(4, 4, 5, 'testlot742', TRUE);
 
 INSERT INTO `PoolChangeLog`(`poolId`, `columnsChanged`, `userId`, `message`, `changeTime`)
 VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
@@ -696,6 +714,12 @@ VALUES (1, 'identificationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:47'),
 (2, 'identificationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:49'),
 (3, 'identificationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:51'),
 (4, 'identificationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:53');
+
+INSERT INTO `ContainerQC`(`qcId`, `containerId`, `creator`, `date`, `type`, `results`) VALUES
+(1, 1, 1, '2021-03-01', 16, 11.22);
+ 
+INSERT INTO ContainerQcControl(qcControlId, qcId, controlId, lot, qcPassed) VALUES
+(1, 1, 7, '20210301', TRUE);
 
 INSERT INTO Run_SequencerPartitionContainer(Run_runId, containers_containerId, positionId)
 VALUES (1,1,2),(2,2,1),(3,3,2),(4,4,1);
