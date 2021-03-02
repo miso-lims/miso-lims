@@ -22,8 +22,6 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
@@ -49,8 +47,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 @Transactional(rollbackFor = Exception.class)
 public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxableSource<Sample> {
 
-  protected static final Logger log = LoggerFactory.getLogger(HibernateSampleDao.class);
-
   private final static String[] SEARCH_PROPERTIES = new String[] { "alias", "identificationBarcode", "name" };
   private final static List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(
       new AliasDescriptor("parentAttributes", JoinType.LEFT_OUTER_JOIN),
@@ -70,18 +66,13 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
-  public Long addSample(final Sample sample) throws IOException {
+  public Long create(final Sample sample) throws IOException {
     return (Long) currentSession().save(sample);
   }
 
   @Override
   public Session currentSession() {
     return getSessionFactory().getCurrentSession();
-  }
-
-  @Override
-  public void deleteSample(Sample sample) {
-    currentSession().delete(sample);
   }
 
   @Override
@@ -97,7 +88,7 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
-  public Collection<Sample> getByBarcodeList(Collection<String> barcodeList) throws IOException {
+  public Collection<Sample> listByBarcodeList(Collection<String> barcodeList) throws IOException {
     if (barcodeList.isEmpty()) {
       return Collections.emptyList();
     }
@@ -109,7 +100,7 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
-  public List<Sample> getByIdList(List<Long> idList) throws IOException {
+  public List<Sample> listByIdList(List<Long> idList) throws IOException {
     if (idList.isEmpty()) {
       return Collections.emptyList();
     }
@@ -147,11 +138,6 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
-  public List<Sample> listAll() throws IOException {
-    return list();
-  }
-
-  @Override
   public Collection<Sample> listByAlias(String alias) throws IOException {
     Criteria criteria = currentSession().createCriteria(SampleImpl.class);
     criteria.add(Restrictions.eq("alias", alias));
@@ -160,56 +146,10 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
     return records;
   }
 
-  /**
-   * Lazy-gets samples associated with a given Project
-   *
-   * @param Long
-   *          projectId
-   * @return Collection<Sample> samples
-   */
   @Override
-  public Collection<Sample> listByProjectId(long projectId) throws IOException {
-    @SuppressWarnings("unchecked")
-    List<Sample> records = currentSession().createCriteria(SampleImpl.class).add(Restrictions.eq("project.id", projectId)).list();
-    return records;
-  }
-
-  @Override
-  public void restrictPaginationByExternalName(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
-    // TODO: this should extend to the children of the entity with this external name (including libraries and library aliquots)
-    criteria.add(DbUtils.textRestriction(query, "externalName", "secondaryIdentifier"));
-  }
-
-  @Override
-  public void restrictPaginationByLab(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
-    // TODO: this should extend to the children of the entity with this lab (including libraries and library aliquots)
-    criteria.createAlias("lab", "lab", JoinType.LEFT_OUTER_JOIN);
-    criteria.add(DbUtils.textRestriction(query, "lab.alias"));
-  }
-
-  @Override
-  public void restrictPaginationByGroupId(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
-    criteria.add(DbUtils.textRestriction(query, "groupId"));
-  }
-
-  @Override
-  public void restrictPaginationByGhost(Criteria criteria, boolean isGhost, Consumer<String> errorHandler) {
-    criteria.add(Restrictions.eq("isSynthetic", isGhost));
-  }
-
-  @Override
-  public long save(Sample t) throws IOException {
-    if (!t.isSaved()) {
-      return addSample(t);
-    } else {
-      update(t);
-      return t.getId();
-    }
-  }
-
-  @Override
-  public void update(Sample sample) throws IOException {
+  public long update(Sample sample) throws IOException {
     currentSession().update(sample);
+    return sample.getId();
   }
 
   public SessionFactory getSessionFactory() {
@@ -287,13 +227,6 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
-  public Sample getByPreMigrationId(Long id) throws IOException {
-    Criteria criteria = currentSession().createCriteria(DetailedSampleImpl.class);
-    criteria.add(Restrictions.eq("preMigrationId", id));
-    return (Sample) criteria.uniqueResult();
-  }
-
-  @Override
   public String getProjectColumn() {
     return "project.id";
   }
@@ -342,6 +275,71 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
+  public String getFriendlyName() {
+    return "Sample";
+  }
+
+  @Override
+  public String[] getSearchProperties() {
+    return SEARCH_PROPERTIES;
+  }
+
+  @Override
+  public long getChildSampleCount(Sample sample) {
+    return (long) currentSession().createCriteria(DetailedSampleImpl.class)
+        .add(Restrictions.eqOrIsNull("parent", sample))
+        .setProjection(Projections.rowCount())
+        .uniqueResult();
+  }
+
+  @Override
+  public EntityReference getNextInProject(Sample sample) {
+    return (EntityReference) currentSession().createCriteria(SampleImpl.class)
+        .add(Restrictions.eq("project", sample.getProject()))
+        .add(Restrictions.gt("sampleId", sample.getId()))
+        .addOrder(Order.asc("sampleId"))
+        .setMaxResults(1)
+        .setProjection(EntityReference.makeProjectionList("id", "name"))
+        .setResultTransformer(EntityReference.RESULT_TRANSFORMER)
+        .uniqueResult();
+  }
+
+  @Override
+  public EntityReference getPreviousInProject(Sample sample) {
+    return (EntityReference) currentSession().createCriteria(SampleImpl.class)
+        .add(Restrictions.eq("project", sample.getProject()))
+        .add(Restrictions.lt("sampleId", sample.getId()))
+        .addOrder(Order.desc("sampleId"))
+        .setMaxResults(1)
+        .setProjection(EntityReference.makeProjectionList("id", "name"))
+        .setResultTransformer(EntityReference.RESULT_TRANSFORMER)
+        .uniqueResult();
+  }
+
+  @Override
+  public void restrictPaginationByExternalName(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    // TODO: this should extend to the children of the entity with this external name (including libraries and library aliquots)
+    criteria.add(DbUtils.textRestriction(query, "externalName", "secondaryIdentifier"));
+  }
+
+  @Override
+  public void restrictPaginationByLab(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    // TODO: this should extend to the children of the entity with this lab (including libraries and library aliquots)
+    criteria.createAlias("lab", "lab", JoinType.LEFT_OUTER_JOIN);
+    criteria.add(DbUtils.textRestriction(query, "lab.alias"));
+  }
+
+  @Override
+  public void restrictPaginationByGroupId(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    criteria.add(DbUtils.textRestriction(query, "groupId"));
+  }
+
+  @Override
+  public void restrictPaginationByGhost(Criteria criteria, boolean isGhost, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.eq("isSynthetic", isGhost));
+  }
+
+  @Override
   public void restrictPaginationByClass(Criteria criteria, String name, Consumer<String> errorHandler) {
     criteria.createAlias("sampleClass", "sampleClass");
     criteria.add(Restrictions.ilike("sampleClass.alias", name, MatchMode.ANYWHERE));
@@ -382,48 +380,6 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   @Override
   public void restrictPaginationByTissueType(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
     criteria.add(DbUtils.textRestriction(query, "tissueType.alias"));
-  }
-
-  @Override
-  public String getFriendlyName() {
-    return "Sample";
-  }
-
-  @Override
-  public String[] getSearchProperties() {
-    return SEARCH_PROPERTIES;
-  }
-
-  @Override
-  public long getChildSampleCount(Sample sample) {
-    return (long) currentSession().createCriteria(DetailedSampleImpl.class)
-        .add(Restrictions.eqOrIsNull("parent", sample))
-        .setProjection(Projections.rowCount())
-        .uniqueResult();
-  }
-
-  @Override
-  public EntityReference getNextInProject(Sample sample) {
-    return (EntityReference) currentSession().createCriteria(SampleImpl.class)
-        .add(Restrictions.eq("project", sample.getProject()))
-        .add(Restrictions.gt("sampleId", sample.getId()))
-        .addOrder(Order.asc("sampleId"))
-        .setMaxResults(1)
-        .setProjection(EntityReference.makeProjectionList("id", "name"))
-        .setResultTransformer(EntityReference.RESULT_TRANSFORMER)
-        .uniqueResult();
-  }
-
-  @Override
-  public EntityReference getPreviousInProject(Sample sample) {
-    return (EntityReference) currentSession().createCriteria(SampleImpl.class)
-        .add(Restrictions.eq("project", sample.getProject()))
-        .add(Restrictions.lt("sampleId", sample.getId()))
-        .addOrder(Order.desc("sampleId"))
-        .setMaxResults(1)
-        .setProjection(EntityReference.makeProjectionList("id", "name"))
-        .setResultTransformer(EntityReference.RESULT_TRANSFORMER)
-        .uniqueResult();
   }
 
   @Override

@@ -5,14 +5,17 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
@@ -31,6 +34,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -55,12 +59,12 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
 
   @Test
   public void testListAll() throws IOException {
-    Collection<Sample> samples = dao.listAll();
+    Collection<Sample> samples = dao.list();
     assertEquals(24, samples.size());
   }
 
   @Test
-  public void testSaveNew() throws Exception {
+  public void testCreate() throws Exception {
     Sample sample = new SampleImpl();
     String sampleName = "latestSample32";
     sample.setName(sampleName);
@@ -77,18 +81,18 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
     sample.setLastModifier(user);
     sample.setLastModified(now);
 
-    int sizeBefore = dao.listAll().size();
-    long id = dao.save(sample);
+    int sizeBefore = dao.list().size();
+    long id = dao.create(sample);
 
     clearSession();
 
     Sample retrieved = dao.get(id);
-    assertEquals("did not insert sample", sizeBefore + 1, dao.listAll().size());
+    assertEquals("did not insert sample", sizeBefore + 1, dao.list().size());
     assertEquals("sample name does not match", sampleName, retrieved.getName());
   }
 
   @Test
-  public void testSaveExisting() throws Exception {
+  public void testUpdate() throws Exception {
     Sample sample = dao.get(8);
 
     Project project = new ProjectImpl();
@@ -102,14 +106,14 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
     user.setId(1L);
     sample.setLastModifier(user);
 
-    int sizeBefore = dao.listAll().size();
-    long id = dao.save(sample);
+    int sizeBefore = dao.list().size();
+    long id = dao.update(sample);
 
     clearSession();
 
     Sample retrieved = dao.get(id);
     assertEquals("sample name does not match", sampleName, retrieved.getName());
-    assertEquals("did not update sample", sizeBefore, dao.listAll().size());
+    assertEquals("did not update sample", sizeBefore, dao.list().size());
   }
 
   @Test
@@ -169,13 +173,20 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testGetByBarcodeList() throws Exception {
-    Collection<Sample> samples = dao.getByBarcodeList(Arrays.asList("SAM7::TEST_0004_Bn_P_nn_1-1_D_1", "SAM11::TEST_0006_Bn_P_nn_1-1_D_1"));
+  public void testListByBarcodeList() throws Exception {
+    Collection<Sample> samples = dao.listByBarcodeList(Arrays.asList("SAM7::TEST_0004_Bn_P_nn_1-1_D_1", "SAM11::TEST_0006_Bn_P_nn_1-1_D_1"));
     assertEquals("Sample size does not match", 2, samples.size());
 
     for (Sample sample : samples) {
       assertTrue("did not find id " + sample.getId(), Arrays.asList(7L, 11L).contains(sample.getId()));
     }
+  }
+
+  @Test
+  public void testListByBarcodeListNone() throws Exception {
+    Collection<Sample> samples = dao.listByBarcodeList(Collections.emptyList());
+    assertNotNull(samples);
+    assertTrue(samples.isEmpty());
   }
 
   @Test
@@ -341,6 +352,74 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
   }
 
   @Test
+  public void testGetChildSampleCount() throws Exception {
+    Sample parent = (Sample) currentSession().get(SampleImpl.class, 15L);
+    assertEquals(3L, dao.getChildSampleCount(parent));
+  }
+
+  @Test
+  public void testListByIdList() throws Exception {
+    List<Long> ids = Arrays.asList(16L, 17L, 21L);
+    List<Sample> results = dao.listByIdList(ids);
+    assertNotNull(results);
+    assertEquals(ids.size(), results.size());
+    for (Long id : ids) {
+      assertTrue(results.stream().anyMatch(x -> x.getId() == id.longValue()));
+    }
+  }
+
+  @Test
+  public void testListByIdListNone() throws Exception {
+    List<Sample> results = dao.listByIdList(Collections.emptyList());
+    assertNotNull(results);
+    assertTrue(results.isEmpty());
+  }
+
+  @Test
+  public void testGetPreviousInProject() throws Exception {
+    Sample sample = (Sample) currentSession().get(SampleImpl.class, 23L);
+    EntityReference reference = dao.getPreviousInProject(sample);
+    assertNotNull(reference);
+    assertEquals(22L, reference.getId());
+  }
+
+  @Test
+  public void testGetPreviousInProjectNone() throws Exception {
+    Sample sample = (Sample) currentSession().get(SampleImpl.class, 22L);
+    assertNull(dao.getPreviousInProject(sample));
+  }
+
+  @Test
+  public void testGetNextInProject() throws Exception {
+    Sample sample = (Sample) currentSession().get(SampleImpl.class, 23L);
+    EntityReference reference = dao.getNextInProject(sample);
+    assertNotNull(reference);
+    assertEquals(24L, reference.getId());
+  }
+
+  @Test
+  public void testGetNextInProjectNone() throws Exception {
+    Sample sample = (Sample) currentSession().get(SampleImpl.class, 24L);
+    assertNull(dao.getNextInProject(sample));
+  }
+
+  @Test
+  public void testPropertyForDateNull() throws Exception {
+    // receive and distributed dates are handled by HibernatePaginatedBoxableSource
+    Criteria criteria = Mockito.mock(Criteria.class);
+    assertNull(dao.propertyForDate(criteria, DateType.RECEIVE));
+    assertNull(dao.propertyForDate(criteria, DateType.DISTRIBUTED));
+  }
+
+  @Test
+  public void testSorts() throws Exception {
+    String[] sorts = { "name", "effectiveTissueOriginLabel", "effectiveTissueTypeLabel", "sampleClassId" };
+    for (String sort : sorts) {
+      assertNotNull(dao.list(0, 0, true, sort));
+    }
+  }
+
+  @Test
   public void testSearch() throws IOException {
     testSearch(PaginationFilter.query("SAM1"));
   }
@@ -361,8 +440,18 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
   }
 
   @Test
+  public void testSearchByProject() throws IOException {
+    testSearch(PaginationFilter.project(1L));
+  }
+
+  @Test
   public void testSearchBySubproject() throws IOException {
     testSearch(PaginationFilter.subproject("Mini"));
+  }
+
+  @Test
+  public void testSearchBySubprojectNone() throws IOException {
+    testSearch(PaginationFilter.subproject(""));
   }
 
   @Test
@@ -378,6 +467,11 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
   @Test
   public void testSearchByReceived() throws IOException {
     testSearch(PaginationFilter.date(LimsUtils.parseDate("2017-01-01"), LimsUtils.parseDate("2018-01-01"), DateType.RECEIVE));
+  }
+
+  @Test
+  public void testSearchByUpdated() throws IOException {
+    testSearch(PaginationFilter.date(LimsUtils.parseDate("2017-01-01"), LimsUtils.parseDate("2018-01-01"), DateType.UPDATE));
   }
 
   @Test
@@ -443,6 +537,27 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
   @Test
   public void testSearchByTissueType() throws Exception {
     testSearch(PaginationFilter.tissueType("P"));
+  }
+
+  @Test
+  public void testSearchByWorksetId() throws Exception {
+    testSearch(PaginationFilter.workset(1L));
+  }
+
+  @Test
+  public void testSearchByArrayed() throws Exception {
+    testSearch(PaginationFilter.arrayed(true));
+  }
+
+  @Test
+  public void testSearchByNotArrayed() throws Exception {
+    testSearch(PaginationFilter.arrayed(false));
+  }
+
+  @Test
+  public void testSearchByBatchInvalid() throws IOException {
+    exception.expect(RuntimeException.class);
+    testSearch(PaginationFilter.batchId("bad"));
   }
 
   /**

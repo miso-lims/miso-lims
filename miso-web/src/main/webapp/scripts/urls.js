@@ -627,7 +627,8 @@ Urls = (function() {
     get: idUrlFunction(projectRestBase),
     create: projectRestBase,
     update: idUrlFunction(projectRestBase),
-    search: projectRestBase + '/search'
+    search: projectRestBase + '/search',
+    attachments: middleIdUrlFunction(projectRestBase, '/files')
   };
 
   // QCs

@@ -29,8 +29,6 @@ public interface SampleService
 
   public Sample getByBarcode(String barcode) throws IOException;
 
-  public Collection<Sample> listByProjectId(long projectId) throws IOException;
-
   public Sample getByLibraryAliquotId(long aliquotId) throws IOException;
 
   public Sample save(Sample sample) throws IOException;

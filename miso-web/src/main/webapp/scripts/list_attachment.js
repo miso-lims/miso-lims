@@ -191,7 +191,7 @@ ListTarget.attachment = (function() {
       });
     },
     showLinkDialog: function(entityType, entityId, projectId, sharedIds) {
-      var url = '/miso/rest/projects/' + projectId + '/files';
+      var url = Urls.rest.projects.attachments(projectId);
       Utils.ajaxWithDialog('Retrieving Project Files', 'GET', url, null, function(attachments) {
         if (!attachments.length) {
           Utils.showOkDialog('Link Project File', ['Project has no attachments to link.']);
