@@ -169,7 +169,7 @@ public class DefaultSampleServiceTest {
     sut.create(sample);
 
     ArgumentCaptor<Sample> createdCapture = ArgumentCaptor.forClass(Sample.class);
-    Mockito.verify(sampleStore).addSample(createdCapture.capture());
+    Mockito.verify(sampleStore).create(createdCapture.capture());
     Sample created = createdCapture.getValue();
     assertEquals("shell project should be replaced by real project", expectedProject.getAlias(), created.getProject().getAlias());
     assertNotNull("modification details should be added", created.getLastModifier());
@@ -230,14 +230,14 @@ public class DefaultSampleServiceTest {
     postSave.setId(newId);
     postSave.setParent(parent);
 
-    Mockito.when(sampleStore.addSample(Mockito.any(Sample.class))).thenReturn(newId);
+    Mockito.when(sampleStore.create(Mockito.any(Sample.class))).thenReturn(newId);
     Mockito.when(sampleStore.getSample(newId)).thenReturn(postSave);
     mockValidRelationship(parent.getSampleClass(), child.getSampleClass());
 
     sut.create(child);
 
     ArgumentCaptor<Sample> createdCapture = ArgumentCaptor.forClass(Sample.class);
-    Mockito.verify(sampleStore).addSample(createdCapture.capture());
+    Mockito.verify(sampleStore).create(createdCapture.capture());
     Sample created = createdCapture.getValue();
     assertTrue("Expected a TissueSample", LimsUtils.isTissueSample(created));
     assertNotNull("Child sample should have parent", ((SampleTissue) created).getParent());
@@ -260,7 +260,7 @@ public class DefaultSampleServiceTest {
     postSave.setId(newId);
     postSave.setParent(parent);
 
-    Mockito.when(sampleStore.addSample(Mockito.any(Sample.class))).thenReturn(newId);
+    Mockito.when(sampleStore.create(Mockito.any(Sample.class))).thenReturn(newId);
     Mockito.when(sampleStore.getSample(newId)).thenReturn(postSave);
     Mockito.when(sampleStore.getSample(shellParentId)).thenReturn(parent);
     mockValidRelationship(parent.getSampleClass(), child.getSampleClass());
@@ -268,7 +268,7 @@ public class DefaultSampleServiceTest {
     sut.create(child);
 
     ArgumentCaptor<Sample> createdCapture = ArgumentCaptor.forClass(Sample.class);
-    Mockito.verify(sampleStore).addSample(createdCapture.capture());
+    Mockito.verify(sampleStore).create(createdCapture.capture());
     Sample created = createdCapture.getValue();
     assertTrue("Expected a TissueSample", LimsUtils.isTissueSample(created));
     assertNotNull("Child sample should have parent", ((SampleTissue) created).getParent());
@@ -298,17 +298,17 @@ public class DefaultSampleServiceTest {
     // because of mocked dao, we can't actually continue with the same parent sample that should be created, but the partial
     // parent sample that gets created is caught and examined below
     SampleIdentity parent = makeParentIdentityWithLookup();
-    Mockito.when(sampleStore.addSample(Mockito.any(Sample.class))).thenReturn(parent.getId());
+    Mockito.when(sampleStore.create(Mockito.any(Sample.class))).thenReturn(parent.getId());
     mockValidRelationship(parent.getSampleClass(), sample.getSampleClass());
 
     Long newId = 31L;
-    Mockito.when(sampleStore.addSample(sample)).thenReturn(newId);
+    Mockito.when(sampleStore.create(sample)).thenReturn(newId);
     Mockito.when(sampleStore.getSample(newId)).thenReturn(sample);
 
     sut.create(sample);
 
     ArgumentCaptor<Sample> createdCapture = ArgumentCaptor.forClass(Sample.class);
-    Mockito.verify(sampleStore, Mockito.times(2)).addSample(createdCapture.capture());
+    Mockito.verify(sampleStore, Mockito.times(2)).create(createdCapture.capture());
     Sample partialParent = createdCapture.getAllValues().get(0);
     assertTrue(LimsUtils.isIdentitySample(partialParent));
 
@@ -338,9 +338,9 @@ public class DefaultSampleServiceTest {
     SampleStock analyte = makeUnsavedChildStock();
     analyte.setParent(tissue);
 
-    Mockito.when(sampleStore.addSample(tissue)).thenReturn(94L);
+    Mockito.when(sampleStore.create(tissue)).thenReturn(94L);
     Mockito.when(sampleStore.getSample(94L)).thenReturn(tissue);
-    Mockito.when(sampleStore.addSample(analyte)).thenReturn(12L);
+    Mockito.when(sampleStore.create(analyte)).thenReturn(12L);
     Mockito.when(sampleStore.getSample(12L)).thenReturn(analyte);
 
     mockValidRelationship(identity.getSampleClass(), tissue.getSampleClass());
@@ -370,11 +370,11 @@ public class DefaultSampleServiceTest {
 
     SampleIdentity identityPostCreate = makeUnsavedParentIdentity();
     identityPostCreate.setId(39L);
-    Mockito.when(sampleStore.addSample(Mockito.any(Sample.class))).thenReturn(identityPostCreate.getId());
+    Mockito.when(sampleStore.create(Mockito.any(Sample.class))).thenReturn(identityPostCreate.getId());
     Mockito.when(sampleStore.getSample(39L)).thenReturn(identityPostCreate);
-    Mockito.when(sampleStore.addSample(tissue)).thenReturn(94L);
+    Mockito.when(sampleStore.create(tissue)).thenReturn(94L);
     Mockito.when(sampleStore.getSample(94L)).thenReturn(tissue);
-    Mockito.when(sampleStore.addSample(analyte)).thenReturn(12L);
+    Mockito.when(sampleStore.create(analyte)).thenReturn(12L);
     Mockito.when(sampleStore.getSample(12L)).thenReturn(analyte);
 
     mockValidRelationship(identity.getSampleClass(), tissue.getSampleClass());
@@ -521,7 +521,7 @@ public class DefaultSampleServiceTest {
     sut.addNote(paramSample, note);
     
     ArgumentCaptor<Sample> capture = ArgumentCaptor.forClass(Sample.class);
-    Mockito.verify(sampleStore).save(capture.capture());
+    Mockito.verify(sampleStore).update(capture.capture());
     Sample savedSample = capture.getValue();
     assertEquals(1, savedSample.getNotes().size());
   }
@@ -547,7 +547,7 @@ public class DefaultSampleServiceTest {
 
     Mockito.verify(authorizationManager).throwIfNonAdminOrMatchingOwner(owner);
     ArgumentCaptor<Sample> capture = ArgumentCaptor.forClass(Sample.class);
-    Mockito.verify(sampleStore).save(capture.capture());
+    Mockito.verify(sampleStore).update(capture.capture());
     Sample savedSample = capture.getValue();
     assertTrue(savedSample.getNotes().isEmpty());
   }

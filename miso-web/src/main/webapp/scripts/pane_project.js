@@ -23,14 +23,13 @@
 
 PaneTarget.project = (function() {
   var title = "Project";
-  var url = "/miso/rest/projects/search";
 
   var transform = function(project) {
     return Tile.make([Tile.title(project.shortName || project.alias),
         Tile.lines(["Name: " + project.name, project.shortName ? ("Alias: " + project.alias) : null].filter(function(x) {
           return !!x;
         }))], function() {
-      window.location = window.location.origin + '/miso/project/' + project.id;
+      window.location = Urls.ui.projects.edit(project.id);
     });
   };
 
@@ -47,7 +46,7 @@ PaneTarget.project = (function() {
       var divs = Pane.createSearchPane(paneId, title);
 
       Pane.updateDiv(divs.content, createHelpMessage());
-      Pane.registerSearchHandlers(divs.input, transform, url, divs.content, true);
+      Pane.registerSearchHandlers(divs.input, transform, Urls.rest.projects.search, divs.content, true);
     }
   }
 })();

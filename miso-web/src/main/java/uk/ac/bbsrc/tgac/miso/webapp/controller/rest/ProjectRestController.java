@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,24 +42,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
-import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
-import uk.ac.bbsrc.tgac.miso.core.service.RunService;
-import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
-import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.dto.AttachmentDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
-import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.ProjectDto;
-import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
-import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
 
 /**
  * A controller to handle all REST requests for Projects
@@ -75,76 +61,14 @@ public class ProjectRestController extends RestController {
 
   @Autowired
   private ProjectService projectService;
-  @Autowired
-  private SampleService sampleService;
-  @Autowired
-  private LibraryService libraryService;
-  @Autowired
-  private PoolService poolService;
-  @Autowired
-  private RunService runService;
-  @Autowired
-  private IndexChecker indexChecker;
 
   public void setProjectService(ProjectService projectService) {
     this.projectService = projectService;
   }
 
-  public void setSampleService(SampleService sampleService) {
-    this.sampleService = sampleService;
-  }
-
-  public void setLibraryService(LibraryService libraryService) {
-    this.libraryService = libraryService;
-  }
-
-  public void setPoolService(PoolService poolService) {
-    this.poolService = poolService;
-  }
-
-  public void setRunService(RunService runService) {
-    this.runService = runService;
-  }
-
   @GetMapping(value = "/{projectId}", produces = "application/json")
   public @ResponseBody ProjectDto getProjectById(@PathVariable long projectId) throws IOException {
     return RestUtils.getObject("Project", projectId, projectService, Dtos::asDto);
-  }
-
-  @GetMapping(value = "/{projectId}/samples", produces = "application/json")
-  public @ResponseBody List<SampleDto> getProjectSamples(@PathVariable Long projectId) throws IOException {
-    Collection<Sample> sp = sampleService.listByProjectId(projectId);
-    return Dtos.asSampleDtos(sp, false);
-  }
-
-  @GetMapping(value = "/{projectId}/samples/full", produces = "application/json")
-  public @ResponseBody List<SampleDto> getProjectSamplesFull(@PathVariable Long projectId) throws IOException {
-    Collection<Sample> sp = sampleService.listByProjectId(projectId);
-    return Dtos.asSampleDtos(sp, true);
-  }
-
-  @GetMapping(value = "/{projectId}/libraries", produces = "application/json")
-  public @ResponseBody List<LibraryDto> getProjectLibraries(@PathVariable Long projectId) throws IOException {
-    Collection<Library> lp = libraryService.listByProjectId(projectId);
-    return lp.stream().map(lib -> Dtos.asDto(lib, false)).collect(Collectors.toList());
-  }
-
-  @GetMapping(value = "/{projectId}/pools", produces = "application/json")
-  public @ResponseBody List<PoolDto> getProjectPools(@PathVariable Long projectId) throws IOException {
-    Collection<Pool> pp = poolService.listByProjectId(projectId);
-    return pp.stream().map(pool -> Dtos.asDto(pool, true, false, indexChecker)).collect(Collectors.toList());
-  }
-
-  @GetMapping(value = "/{projectId}/runs", produces = "application/json")
-  public @ResponseBody List<RunDto> getProjectRuns(@PathVariable Long projectId) throws IOException {
-    Collection<Run> rp = runService.listByProjectId(projectId);
-    return Dtos.asRunDtos(rp);
-  }
-
-  @GetMapping(produces = "application/json")
-  public @ResponseBody List<ProjectDto> listAllProjects() throws IOException {
-    Collection<Project> lp = projectService.list();
-    return Dtos.asProjectDtos(lp);
   }
 
   @GetMapping(value = "/search")

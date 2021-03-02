@@ -368,9 +368,11 @@ INSERT INTO SampleHierarchy(sampleId, identityId, tissueId) VALUES
 (21, 15, 21);
 
 -- Stocks
-INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identificationBarcode`, `locationBarcode`, `sampleType`, `detailedQcStatusId`, qcUser, qcDate, `alias`, `project_projectId`, `scientificNameId`, `taxonIdentifier`, sequencingControlTypeId, `lastModifier`, `lastModified`, `creator`, `created`, sopId,
+INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identificationBarcode`, `locationBarcode`, `sampleType`, `detailedQcStatusId`,
+  qcUser, qcDate, `alias`, `project_projectId`, `scientificNameId`, `taxonIdentifier`, sequencingControlTypeId, `lastModifier`, `lastModified`, `creator`, `created`, sopId,
   `sampleClassId`, `archived`, `parentId`, `siblingNumber`, `preMigrationId`, isSynthetic, nonStandardAlias, discriminator) VALUES
-(18,NULL,'SAM18','stock1','SAM18::TEST_0001_STOCK_1','Freezer1_1','GENOMIC',1,1,'2016-07-07','TEST_0001_STOCK_1',1,1,NULL,NULL,1,'2016-07-07 13:31:19',1,'2016-07-07 13:31:19', 1,
+(18,NULL,'SAM18','stock1','SAM18::TEST_0001_STOCK_1','Freezer1_1','GENOMIC',1,
+  1,'2016-07-07','TEST_0001_STOCK_1',1,1,NULL,NULL,1,'2016-07-07 13:31:19',1,'2016-07-07 13:31:19', 1,
   3,0,17,1,NULL,0, FALSE, 'Stock');
 
 INSERT INTO SampleHierarchy(sampleId, identityId, tissueId) VALUES

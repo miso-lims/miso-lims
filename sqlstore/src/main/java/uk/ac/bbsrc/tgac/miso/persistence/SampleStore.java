@@ -33,13 +33,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-/**
- * Defines a DAO interface for storing Samples
- * 
- * @author Rob Davey
- * @since 0.0.2
- */
-public interface SampleStore extends Store<Sample>, PaginatedDataSource<Sample> {
+public interface SampleStore extends PaginatedDataSource<Sample> {
+
+  Sample get(long id) throws IOException;
 
   /**
    * Retrieve a Sample from an underlying data store given a Sample ID barcode
@@ -53,17 +49,6 @@ public interface SampleStore extends Store<Sample>, PaginatedDataSource<Sample> 
    *           when
    */
   Sample getByBarcode(String barcode) throws IOException;
-
-  /**
-   * List all Samples related to a parent Project given a Project ID
-   * 
-   * @param projectId
-   *          of type long
-   * @return Collection<Sample>
-   * @throws IOException
-   *           when
-   */
-  Collection<Sample> listByProjectId(long projectId) throws IOException;
 
   /**
    * List all Samples by a given alias
@@ -83,7 +68,7 @@ public interface SampleStore extends Store<Sample>, PaginatedDataSource<Sample> 
    * @throws IOException
    *           when the objects cannot be retrieved
    */
-  Collection<Sample> getByBarcodeList(Collection<String> barcodeList) throws IOException;
+  Collection<Sample> listByBarcodeList(Collection<String> barcodeList) throws IOException;
   
   /**
    * List all Samples associated with ids from the given id list
@@ -92,7 +77,7 @@ public interface SampleStore extends Store<Sample>, PaginatedDataSource<Sample> 
    * @throws IOException
    *           when the objects cannot be retrieved
    */
-  List<Sample> getByIdList(List<Long> idList) throws IOException;
+  List<Sample> listByIdList(List<Long> idList) throws IOException;
 
   Sample getByLibraryAliquotId(long aliquotId) throws IOException;
 
@@ -100,13 +85,9 @@ public interface SampleStore extends Store<Sample>, PaginatedDataSource<Sample> 
 
   Sample getSample(long id) throws IOException;
 
-  Sample getByPreMigrationId(Long id) throws IOException;
+  Long create(Sample sample) throws IOException;
 
-  Long addSample(Sample sample) throws IOException;
-
-  void deleteSample(Sample sample);
-
-  void update(Sample sample) throws IOException;
+  long update(Sample sample) throws IOException;
 
   /**
    * List all the identities associated with a given project which have at least one external name which exactly or partially matches the

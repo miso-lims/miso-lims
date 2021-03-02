@@ -368,7 +368,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
         validateAlias(sample, namingScheme);
       }
       if (!sample.isSaved()) {
-        newId = sampleStore.addSample(sample);
+        newId = sampleStore.create(sample);
       } else {
         sampleStore.update(sample);
       }
@@ -1003,13 +1003,8 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   }
 
   @Override
-  public Collection<Sample> listByProjectId(long projectId) throws IOException {
-    return sampleStore.listByProjectId(projectId);
-  }
-
-  @Override
   public List<Sample> listByIdList(List<Long> idList) throws IOException {
-    return sampleStore.getByIdList(idList);
+    return sampleStore.listByIdList(idList);
   }
 
   @Override
@@ -1040,7 +1035,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     note.setCreationDate(new Date());
     note.setOwner(authorizationManager.getCurrentUser());
     managed.addNote(note);
-    sampleStore.save(managed);
+    sampleStore.update(managed);
   }
 
   @Override
@@ -1061,7 +1056,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     }
     authorizationManager.throwIfNonAdminOrMatchingOwner(deleteNote.getOwner());
     managed.getNotes().remove(deleteNote);
-    sampleStore.save(managed);
+    sampleStore.update(managed);
   }
 
   @Override
