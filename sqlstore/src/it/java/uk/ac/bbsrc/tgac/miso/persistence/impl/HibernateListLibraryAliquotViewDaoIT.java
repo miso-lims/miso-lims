@@ -1,8 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
-import java.io.IOException;
+import java.util.Arrays;
 
 import org.hibernate.SessionFactory;
 import org.junit.Before;
@@ -10,9 +10,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
-import uk.ac.bbsrc.tgac.miso.core.util.DateType;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
 
 public class HibernateListLibraryAliquotViewDaoIT extends AbstractDAOTest {
 
@@ -28,46 +26,21 @@ public class HibernateListLibraryAliquotViewDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testSearchByFreezer() throws Exception {
-    testSearch(PaginationFilter.freezer("freezer1"));
+  public void testGet() throws Exception {
+    long id = 12L;
+    ListLibaryAliquotView aliquot = sut.get(id);
+    assertNotNull(aliquot);
+    assertEquals(id, aliquot.getId());
   }
 
   @Test
-  public void testSearchByDistributionDate() throws Exception {
-    testSearch(PaginationFilter.date(LimsUtils.parseDate("2019-01-01"), LimsUtils.parseDate("2020-01-01"), DateType.DISTRIBUTED));
+  public void testListByIdList() throws Exception {
+    testListByIdList(sut::listByIdList, Arrays.asList(3L, 4L, 5L));
   }
 
   @Test
-  public void testSearchByDistributionRecipient() throws Exception {
-    testSearch(PaginationFilter.distributedTo("far away"));
-  }
-
-  @Test
-  public void testSearchByTissueOrigin() throws Exception {
-    testSearch(PaginationFilter.tissueOrigin("Ly"));
-  }
-
-  @Test
-  public void testSearchByTissueType() throws Exception {
-    testSearch(PaginationFilter.tissueType("P"));
-  }
-
-  @Test
-  public void testSearchByProject() throws Exception {
-    testSearch(PaginationFilter.project(1L));
-  }
-
-  /**
-   * Verifies Hibernate mappings by ensuring that no exception is thrown by a search
-   * 
-   * @param filter the search filter
-   * @throws IOException
-   */
-  private void testSearch(PaginationFilter filter) throws IOException {
-    // verify Hibernate mappings by ensuring that no exception is thrown
-    assertNotNull(sut.list(err -> {
-      throw new RuntimeException(err);
-    }, 0, 10, true, "name", filter));
+  public void testListByIdListNone() throws Exception {
+    testListByIdListNone(sut::listByIdList);
   }
 
 }

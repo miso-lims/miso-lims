@@ -10,9 +10,5 @@ public interface ListLibraryAliquotViewService extends PaginatedDataSource<ListL
 
   public ListLibaryAliquotView get(Long aliquotId) throws IOException;
 
-  public ListLibaryAliquotView getByBarcode(String barcode) throws IOException;
-
-  public ListLibaryAliquotView getByPreMigrationId(Long preMigrationId) throws IOException;
-
-  public List<ListLibaryAliquotView> list(List<Long> aliquotIds) throws IOException;
+  public List<ListLibaryAliquotView> listByIdList(List<Long> aliquotIds) throws IOException;
 }

@@ -13,7 +13,6 @@ import com.eaglegenomics.simlims.core.Group;
 
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize.BoxType;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
@@ -312,13 +311,6 @@ public abstract interface PaginationFilter {
         sink.restrictPaginationByWorksetId(item, worksetId, errorHandler);
       }
     };
-  }
-
-  public static PaginationFilter pool(final Pool pool) {
-    if (!pool.isSaved()) {
-      throw new IllegalArgumentException("Cannot filter by unsaved pool.");
-    }
-    return pool(pool.getId());
   }
 
   public static PaginationFilter project(final long projectId) {
