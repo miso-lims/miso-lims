@@ -298,7 +298,7 @@ public class PoolRestController extends RestController {
     Pool pool = poolService.get(poolId);
     Stream<PoolElement> originalMinusRemoved = pool.getPoolContents().stream()
         .filter(element -> !request.remove.contains(element.getAliquot().getId()));
-    Stream<PoolElement> added = listLibraryAliquotViewService.list(request.add).stream()
+    Stream<PoolElement> added = listLibraryAliquotViewService.listByIdList(request.add).stream()
         .map(view -> new PoolElement(pool, view));
     pool.setPoolElements(Stream.concat(originalMinusRemoved, added).collect(Collectors.toSet()));
     poolService.update(pool);

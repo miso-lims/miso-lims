@@ -40,7 +40,8 @@ public class HibernateListLibraryAliquotViewDao implements ListLibraryAliquotVie
       new AliasDescriptor("sample.parentAttributes", "parentAttributes", JoinType.LEFT_OUTER_JOIN),
       new AliasDescriptor("parentAttributes.tissueAttributes", JoinType.LEFT_OUTER_JOIN),
       new AliasDescriptor("tissueAttributes.tissueOrigin", JoinType.LEFT_OUTER_JOIN),
-      new AliasDescriptor("tissueAttributes.tissueType", JoinType.LEFT_OUTER_JOIN));
+      new AliasDescriptor("tissueAttributes.tissueType", JoinType.LEFT_OUTER_JOIN),
+      new AliasDescriptor("creator"));
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -60,32 +61,8 @@ public class HibernateListLibraryAliquotViewDao implements ListLibraryAliquotVie
   }
 
   @Override
-  public ListLibaryAliquotView getByBarcode(String barcode) throws IOException {
-    if (barcode == null) throw new IOException("Barcode cannot be null!");
-    Criteria criteria = currentSession().createCriteria(ListLibaryAliquotView.class);
-    criteria.add(Restrictions.eq("identificationBarcode", barcode));
-    return (ListLibaryAliquotView) criteria.uniqueResult();
-  }
-
-  @Override
-  public ListLibaryAliquotView getByPreMigrationId(Long preMigrationId) throws IOException {
-    if (preMigrationId == null) throw new NullPointerException("preMigrationId cannot be null");
-    Criteria criteria = currentSession().createCriteria(ListLibaryAliquotView.class);
-    criteria.add(Restrictions.eq("preMigrationId", preMigrationId));
-    return (ListLibaryAliquotView) criteria.uniqueResult();
-  }
-
-  @Override
   public String getProjectColumn() {
     return "project.id";
-  }
-
-  @Override
-  public void restrictPaginationByProjectId(Criteria criteria, long projectId, Consumer<String> errorHandler) {
-    criteria.createAlias("parentLibrary", "library")
-        .createAlias("library.parentSample", "sample")
-        .createAlias("sample.parentProject", "project");
-    HibernatePaginatedDataSource.super.restrictPaginationByProjectId(criteria, projectId, errorHandler);
   }
 
   @Override
@@ -94,7 +71,7 @@ public class HibernateListLibraryAliquotViewDao implements ListLibraryAliquotVie
   }
 
   @Override
-  public List<ListLibaryAliquotView> list(List<Long> aliquotIds) throws IOException {
+  public List<ListLibaryAliquotView> listByIdList(List<Long> aliquotIds) throws IOException {
     if (aliquotIds.size() == 0) {
       return Collections.emptyList();
     }
@@ -136,18 +113,6 @@ public class HibernateListLibraryAliquotViewDao implements ListLibraryAliquotVie
   }
 
   @Override
-  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
-    criteria.add(Restrictions.eq("library.platformType", platformType));
-  }
-
-  @Override
-  public void restrictPaginationByPoolId(Criteria criteria, long poolId, Consumer<String> errorHandler) {
-    criteria
-        .add(Restrictions.sqlRestriction("EXISTS(SELECT * FROM Pool_LibraryAliquot WHERE poolId = ? AND aliquotId = aliquotId)",
-            poolId, LongType.INSTANCE));
-  }
-
-  @Override
   public String[] getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
@@ -170,9 +135,34 @@ public class HibernateListLibraryAliquotViewDao implements ListLibraryAliquotVie
   }
 
   @Override
+  public String getFriendlyName() {
+    return "Library Aliquot";
+  }
+
+  @Override
+  public void restrictPaginationByProjectId(Criteria criteria, long projectId, Consumer<String> errorHandler) {
+    criteria.createAlias("parentLibrary", "library")
+        .createAlias("library.parentSample", "sample")
+        .createAlias("sample.parentProject", "project");
+    HibernatePaginatedDataSource.super.restrictPaginationByProjectId(criteria, projectId, errorHandler);
+  }
+
+  @Override
+  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.eq("library.platformType", platformType));
+  }
+
+  @Override
+  public void restrictPaginationByPoolId(Criteria criteria, long poolId, Consumer<String> errorHandler) {
+    criteria
+        .add(Restrictions.sqlRestriction("EXISTS(SELECT * FROM Pool_LibraryAliquot WHERE poolId = ? AND aliquotId = aliquotId)",
+            poolId, LongType.INSTANCE));
+  }
+
+  @Override
   public void restrictPaginationByIndex(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
     if (query.getText() == null) {
-      criteria.add(Restrictions.isEmpty("pibrary.indices"));
+      criteria.add(Restrictions.isEmpty("library.indices"));
     } else {
       criteria.createAlias("library.indices", "indices", JoinType.LEFT_OUTER_JOIN)
           .add(DbUtils.textRestriction(query, "indices.name", "indices.sequence"));
@@ -189,11 +179,6 @@ public class HibernateListLibraryAliquotViewDao implements ListLibraryAliquotVie
           .createAlias("boxPosition.box", "box")
           .add(DbUtils.textRestriction(query, HibernatePaginatedBoxableSource.BOX_SEARCH_PROPERTIES));
     }
-  }
-
-  @Override
-  public String getFriendlyName() {
-    return "Library Aliquot";
   }
 
   @Override

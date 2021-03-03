@@ -30,16 +30,6 @@ public class DefaultListLibraryAliquotViewService implements ListLibraryAliquotV
   }
 
   @Override
-  public ListLibaryAliquotView getByBarcode(String barcode) throws IOException {
-    return listLibraryAliquotViewDao.getByBarcode(barcode);
-  }
-
-  @Override
-  public ListLibaryAliquotView getByPreMigrationId(Long preMigrationId) throws IOException {
-    return listLibraryAliquotViewDao.getByPreMigrationId(preMigrationId);
-  }
-
-  @Override
   public long count(Consumer<String> errorHandler, PaginationFilter... filter) throws IOException {
     return listLibraryAliquotViewDao.count(errorHandler, filter);
   }
@@ -52,8 +42,8 @@ public class DefaultListLibraryAliquotViewService implements ListLibraryAliquotV
   }
 
   @Override
-  public List<ListLibaryAliquotView> list(List<Long> aliquotIds) throws IOException {
-    return listLibraryAliquotViewDao.list(aliquotIds);
+  public List<ListLibaryAliquotView> listByIdList(List<Long> aliquotIds) throws IOException {
+    return listLibraryAliquotViewDao.listByIdList(aliquotIds);
   }
 
 }
