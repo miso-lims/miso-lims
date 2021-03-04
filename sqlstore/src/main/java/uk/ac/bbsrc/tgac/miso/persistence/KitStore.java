@@ -40,11 +40,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
  * @since 0.0.2
  */
 public interface KitStore extends Store<Kit>, PaginatedDataSource<KitDescriptor> {
-  public Kit getKitByIdentificationBarcode(String barcode) throws IOException;
 
   public Kit getKitByLotNumber(String lotNumber) throws IOException;
-
-  public List<Kit> listKitsByType(KitType kitType) throws IOException;
 
   public KitDescriptor getKitDescriptorById(long kitDescriptorId) throws IOException;
 
@@ -53,8 +50,6 @@ public interface KitStore extends Store<Kit>, PaginatedDataSource<KitDescriptor>
   public KitDescriptor getKitDescriptorByPartNumber(String partNumber) throws IOException;
 
   public List<KitDescriptor> listAllKitDescriptors() throws IOException;
-
-  public List<KitDescriptor> listKitDescriptorsByType(KitType kitType) throws IOException;
 
   public long saveKitDescriptor(KitDescriptor kitDescriptor) throws IOException;
 

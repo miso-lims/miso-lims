@@ -189,7 +189,9 @@ VALUES
 INSERT INTO KitDescriptor (kitDescriptorId, name, version, manufacturer, partNumber, stockLevel, kitType, platformType, creator, created, lastModifier, lastModified) VALUES
 (1, 'Test Kit 1', 1, 'KitMaker', 'k001', 0, 'LIBRARY', 'ILLUMINA', 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
 (2, 'Test Kit 2', 1, 'KitMaker', 'k002', 0, 'LIBRARY', 'ILLUMINA', 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
-(3, 'Test QC Kit', 1, 'KitMaker', 'k003', 0, 'QC', 'ILLUMINA', 1, '2020-03-11 13:24:00', 1, '2020-03-11 13:24:00');
+(3, 'Test QC Kit', 1, 'KitMaker', 'k003', 0, 'QC', 'ILLUMINA', 1, '2020-03-11 13:24:00', 1, '2020-03-11 13:24:00'),
+(4, 'Test Container Kit', 1, 'KitMaker', 'k004', 0, 'CLUSTERING', 'ILLUMINA', 1, '2021-03-04 09:45:00', 1, '2021-03-04 09:45:00'),
+(5, 'Test Sequencing Kit', 1, 'KitMaker', 'k005', 0, 'SEQUENCING', 'ILLUMINA', 1, '2021-03-04 09:45:00', 1, '2021-03-04 09:45:00');
 
 INSERT INTO `QCType` (`qcTypeId`, `name`, `description`, `qcTarget`, `units`) VALUES
 (2,'Bioanalyzer','Chip-based capillary electrophoresis machine to analyse RNA, DNA, and protein, manufactured by Agilent','Library','nM'),
@@ -460,9 +462,9 @@ VALUES (1, 'DESIGN1', 1, 1, 1, 1),
 
 INSERT INTO `Library`(`libraryId`, `name`, `description`, `accession`, `sample_sampleId`, `identificationBarcode`, `locationBarcode`, `libraryType`, `concentration`, `creationDate`, `platformType`, `alias`, `paired`, `librarySelectionType`, `libraryStrategyType`, `detailedQcStatusId`, qcUser, qcDate, `lastModifier`, `lastModified`, `creator`, `created`, `kitDescriptorId`, workstationId, discriminator, libraryDesignCodeId, archived, nonStandardAlias, sopId) VALUES
 (1,'LIB1','Inherited from TEST_0001',NULL,1,'LIB1::TEST_0001_Bn_P_PE_300_WG','LIBRARY_INBOX_A01',3,0,'2015-08-27','ILLUMINA','TEST_0001_Bn_P_PE_300_WG',1,1,1,1,1,'2016-07-07',1,'2016-07-07 13:30:49',1,'2016-07-07 13:30:49', 1, 1, 'DetailedLibrary', 1, FALSE, FALSE, 3),
-(2,'LIB2','Inherited from TEST_0001',NULL,1,'LIB2::TEST_0001_Bn_R_PE_300_WG','LIBRARY_INBOX_A02',3,0,'2015-08-27','ILLUMINA','TEST_0001_Bn_R_PE_300_WG',1,1,1,1,1,'2016-07-07',1,'2016-07-07 13:30:51',1,'2016-07-07 13:30:51', NULL, 1, 'Library', NULL, NULL, NULL, NULL),
-(3,'LIB3','Inherited from TEST_0002',NULL,3,'LIB3::TEST_0002_Bn_P_PE_300_WG','LIBRARY_INBOX_A03',3,0,'2015-08-27','ILLUMINA','TEST_0002_Bn_P_PE_300_WG',1,1,1,1,1,'2016-07-07',1,'2016-07-07 13:30:53',1,'2016-07-07 13:30:53', NULL, 1, 'Library', NULL, NULL, NULL, NULL),
-(4,'LIB4','Inherited from TEST_0002',NULL,4,'LIB4::TEST_0002_Bn_R_PE_300_WG','LIBRARY_INBOX_A04',3,0,'2015-08-27','ILLUMINA','TEST_0002_Bn_R_PE_300_WG',1,1,1,1,1,'2016-07-07',1,'2016-07-07 13:30:55',1,'2016-07-07 13:30:55', NULL, 1, 'Library', NULL, NULL, NULL, NULL),
+(2,'LIB2','Inherited from TEST_0001',NULL,1,'LIB2::TEST_0001_Bn_R_PE_300_WG','LIBRARY_INBOX_A02',3,0,'2015-08-27','ILLUMINA','TEST_0001_Bn_R_PE_300_WG',1,1,1,1,1,'2016-07-07',1,'2016-07-07 13:30:51',1,'2016-07-07 13:30:51', 2, 1, 'Library', NULL, NULL, NULL, NULL),
+(3,'LIB3','Inherited from TEST_0002',NULL,3,'LIB3::TEST_0002_Bn_P_PE_300_WG','LIBRARY_INBOX_A03',3,0,'2015-08-27','ILLUMINA','TEST_0002_Bn_P_PE_300_WG',1,1,1,1,1,'2016-07-07',1,'2016-07-07 13:30:53',1,'2016-07-07 13:30:53', 2, 1, 'Library', NULL, NULL, NULL, NULL),
+(4,'LIB4','Inherited from TEST_0002',NULL,4,'LIB4::TEST_0002_Bn_R_PE_300_WG','LIBRARY_INBOX_A04',3,0,'2015-08-27','ILLUMINA','TEST_0002_Bn_R_PE_300_WG',1,1,1,1,1,'2016-07-07',1,'2016-07-07 13:30:55',1,'2016-07-07 13:30:55', 2, 1, 'Library', NULL, NULL, NULL, NULL),
 (5,'LIB5','Inherited from TEST_0003',NULL,5,'LIB5::TEST_0003_Bn_P_PE_300_WG','LIBRARY_INBOX_A05',3,0,'2015-08-27','ILLUMINA','TEST_0003_Bn_P_PE_300_WG',1,1,1,1,1,'2016-07-07',1,'2016-07-07 13:30:57',1,'2016-07-07 13:30:57', NULL, NULL, 'Library', NULL, NULL, NULL, NULL),
 (6,'LIB6','Inherited from TEST_0003',NULL,6,'LIB6::TEST_0003_Bn_R_PE_300_WG','LIBRARY_INBOX_A06',3,0,'2015-08-27','ILLUMINA','TEST_0003_Bn_R_PE_300_WG',1,1,1,1,1,'2016-07-07',1,'2016-07-07 13:30:59',1,'2016-07-07 13:30:59', NULL, NULL, 'Library', NULL, NULL, NULL, NULL),
 (7,'LIB7','Inherited from TEST_0004',NULL,7,'LIB7::TEST_0004_Bn_P_PE_300_WG','LIBRARY_INBOX_A07',3,0,'2015-08-27','ILLUMINA','TEST_0004_Bn_P_PE_300_WG',1,1,1,1,1,'2016-07-07',1,'2016-07-07 13:31:01',1,'2016-07-07 13:31:01', NULL, NULL, 'Library', NULL, NULL, NULL, NULL),
@@ -676,11 +678,11 @@ INSERT INTO `ServiceRecord`(`recordId`, `instrumentId`, `title`, `details`, `ser
 (2,1,'Seq1_Rec2',NULL,'Service Person',NULL,'2016-01-21',NULL,NULL, FALSE, NULL),
 (3,2,'Seq2_Rec1',NULL,'Service Person',NULL,'2016-01-21','2016-01-21 9:32:00',NULL, TRUE, 2);
 
-INSERT INTO `Run`(`runId`, `name`, `description`, `accession`, `filePath`, `alias`, `instrumentId`, `lastModifier`, `health`, `completionDate`, `lastModified`, `creator`, `created`, sequencingParameters_parametersId, sopId) 
-VALUES (1,'RUN1','BC0JHTACXX',NULL,'/.mounts/labs/prod/archive/h1179/120323_h1179_0070_BC0JHTACXX','120323_h1179_0070_BC0JHTACXX',1,1,'Completed','2012-03-31','2016-07-07 13:30:49',1,'2016-07-07 13:30:49', 1, 5),
-(2,'RUN2','AD0VJ9ACXX',NULL,'/.mounts/labs/prod/archive/h1179/120404_h1179_0072_AD0VJ9ACXX','120404_h1179_0072_AD0VJ9ACXX',1,1,'Failed','2012-04-04','2016-07-07 13:30:51',1,'2016-07-07 13:30:51', NULL, NULL),
-(3,'RUN3','BC075RACXX',NULL,'/.mounts/labs/prod/archive/h1179/120412_h1179_0073_BC075RACXX','120412_h1179_0073_BC075RACXX',1,1,'Completed','2012-04-20','2016-07-07 13:30:53',1,'2016-07-07 13:30:53', NULL, NULL),
-(4,'RUN4','AC0KY7ACXX',NULL,'/.mounts/labs/prod/archive/h1180/120314_h1180_0068_AC0KY7ACXX','120314_h1180_0068_AC0KY7ACXX',2,1,'Completed','2012-03-23','2016-07-07 13:30:55',1,'2016-07-07 13:30:55', NULL, NULL);
+INSERT INTO `Run`(`runId`, `name`, `description`, `accession`, `filePath`, `alias`, `instrumentId`, `lastModifier`, `health`, `completionDate`, `lastModified`, `creator`, `created`, sequencingParameters_parametersId, sopId, sequencingKitId, sequencingKitLot) 
+VALUES (1,'RUN1','BC0JHTACXX',NULL,'/.mounts/labs/prod/archive/h1179/120323_h1179_0070_BC0JHTACXX','120323_h1179_0070_BC0JHTACXX',1,1,'Completed','2012-03-31','2016-07-07 13:30:49',1,'2016-07-07 13:30:49', 1, 5, NULL, NULL),
+(2,'RUN2','AD0VJ9ACXX',NULL,'/.mounts/labs/prod/archive/h1179/120404_h1179_0072_AD0VJ9ACXX','120404_h1179_0072_AD0VJ9ACXX',1,1,'Failed','2012-04-04','2016-07-07 13:30:51',1,'2016-07-07 13:30:51', NULL, NULL, NULL, NULL),
+(3,'RUN3','BC075RACXX',NULL,'/.mounts/labs/prod/archive/h1179/120412_h1179_0073_BC075RACXX','120412_h1179_0073_BC075RACXX',1,1,'Completed','2012-04-20','2016-07-07 13:30:53',1,'2016-07-07 13:30:53', NULL, NULL, 5, '20210304'),
+(4,'RUN4','AC0KY7ACXX',NULL,'/.mounts/labs/prod/archive/h1180/120314_h1180_0068_AC0KY7ACXX','120314_h1180_0068_AC0KY7ACXX',2,1,'Completed','2012-03-23','2016-07-07 13:30:55',1,'2016-07-07 13:30:55', NULL, NULL, 5, '20210304');
 INSERT INTO RunIllumina(runId) VALUES (1), (2), (3), (4);
 
 INSERT INTO `RunChangeLog`(`runId`, `columnsChanged`, `userId`, `message`, `changeTime`)
@@ -699,11 +701,11 @@ INSERT INTO SequencingContainerModel_InstrumentModel (sequencingContainerModelId
 (2, 16),
 (3, 16);
 
-INSERT INTO `SequencerPartitionContainer`(`containerId`, `identificationBarcode`, sequencingContainerModelId, `lastModifier`, `lastModified`, `creator`, `created`) 
-VALUES (1,'C0JHTACXX',1,1,'2016-07-07 13:30:47',1,'2016-07-07 13:30:47'),
-(2,'D0VJ9ACXX',1,1,'2016-07-07 13:30:49',1,'2016-07-07 13:30:49'),
-(3,'C075RACXX',1,1,'2016-07-07 13:30:51',1,'2016-07-07 13:30:51'),
-(4,'C0KY7ACXX',1,1,'2016-07-07 13:30:53',1,'2016-07-07 13:30:53');
+INSERT INTO `SequencerPartitionContainer`(`containerId`, `identificationBarcode`, sequencingContainerModelId, `lastModifier`, `lastModified`, `creator`, `created`, clusteringKit, clusteringKitLot) 
+VALUES (1,'C0JHTACXX',1,1,'2016-07-07 13:30:47',1,'2016-07-07 13:30:47', 4, '20210304'),
+(2,'D0VJ9ACXX',1,1,'2016-07-07 13:30:49',1,'2016-07-07 13:30:49', NULL, NULL),
+(3,'C075RACXX',1,1,'2016-07-07 13:30:51',1,'2016-07-07 13:30:51', NULL, NULL),
+(4,'C0KY7ACXX',1,1,'2016-07-07 13:30:53',1,'2016-07-07 13:30:53', 4, '20210304');
 
 INSERT INTO _Partition (containerId, partitionId, partitionNumber, pool_poolId) VALUES
 (1,1,1,1), (1,2,2,2), (1,3,3,NULL), (1,4,4,NULL), (1,5,5,NULL), (1,6,6,NULL), (1,7,7,NULL), (1,8,8,NULL),

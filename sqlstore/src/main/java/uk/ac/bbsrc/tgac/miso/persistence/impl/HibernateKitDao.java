@@ -79,13 +79,6 @@ public class HibernateKitDao implements KitStore, HibernatePaginatedDataSource<K
   }
 
   @Override
-  public Kit getKitByIdentificationBarcode(String barcode) throws IOException {
-    Criteria criteria = currentSession().createCriteria(KitImpl.class);
-    criteria.add(Restrictions.eq("identificationBarcode", barcode));
-    return (Kit) criteria.uniqueResult();
-  }
-
-  @Override
   public Kit getKitByLotNumber(String lotNumber) throws IOException {
     Criteria criteria = currentSession().createCriteria(KitImpl.class);
     criteria.add(Restrictions.eq("lotNumber", lotNumber));
@@ -96,15 +89,6 @@ public class HibernateKitDao implements KitStore, HibernatePaginatedDataSource<K
   @Override
   public List<Kit> listAll() throws IOException {
     return currentSession().createCriteria(KitImpl.class).list();
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public List<Kit> listKitsByType(KitType kitType) throws IOException {
-    Criteria criteria = currentSession().createCriteria(KitImpl.class);
-    criteria.createAlias("kitDescriptor", "kd");
-    criteria.add(Restrictions.eq("kd.kitType", kitType));
-    return criteria.list();
   }
 
   @Override
@@ -146,16 +130,6 @@ public class HibernateKitDao implements KitStore, HibernatePaginatedDataSource<K
     @SuppressWarnings("unchecked")
     List<KitDescriptor> result = criteria.list();
     return result;
-  }
-
-  @Override
-  public List<KitDescriptor> listKitDescriptorsByType(KitType kitType) throws IOException {
-    Criteria criteria = currentSession().createCriteria(KitDescriptor.class);
-    criteria.add(Restrictions.eq("kitType", kitType));
-    @SuppressWarnings("unchecked")
-    List<KitDescriptor> result = criteria.list();
-    return result;
-
   }
 
   @Override
