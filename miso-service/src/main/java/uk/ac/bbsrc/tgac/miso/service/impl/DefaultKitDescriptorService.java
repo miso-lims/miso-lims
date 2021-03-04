@@ -58,11 +58,6 @@ public class DefaultKitDescriptorService implements KitDescriptorService {
   }
 
   @Override
-  public Collection<KitDescriptor> listByType(KitType kitType) throws IOException {
-    return kitStore.listKitDescriptorsByType(kitType);
-  }
-
-  @Override
   public long create(KitDescriptor kitDescriptor) throws IOException {
     authorizationManager.throwIfNonAdmin();
     validateChange(kitDescriptor, null);
