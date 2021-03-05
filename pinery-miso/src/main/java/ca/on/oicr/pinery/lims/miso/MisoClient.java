@@ -1100,7 +1100,7 @@ public class MisoClient implements Lims {
       boolean reverseComplement2 = rs.getString("dataManglingPolicy").equals("I5_RC");
       s.setBarcodeTwo(reverseComplement2 ? reverseComplement(barcode2) : barcode2);
       s.setRunPurpose(rs.getString("run_purpose"));
-      s.setStatus(makeStatus(rs, "qc_passed", null, "qc_date"));
+      s.setStatus(makeStatus(rs, "qc_passed", "qc_description", "qc_date"));
 
       Attribute att = AttributeKey.TARGETED_RESEQUENCING.extractAttributeFrom(rs);
       if (att != null) {

@@ -14,13 +14,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.RunLibraryQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.QcStatusUpdate;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.DetailedQcItem;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -30,6 +31,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PartitionQcTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.QcStatusService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunLibraryQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
@@ -58,6 +60,8 @@ public class DefaultQcStatusService implements QcStatusService {
   private DetailedQcStatusService detailedQcStatusService;
   @Autowired
   private PartitionQcTypeService partitionQcTypeService;
+  @Autowired
+  private RunLibraryQcStatusService runLibraryQcStatusService;
   @Autowired
   private AuthorizationManager authorizationManager;
 
@@ -143,11 +147,13 @@ public class DefaultQcStatusService implements QcStatusService {
         runLib.setPartition(partition);
         runLib.setAliquot(aliquot);
       }
-      if (update.getQcPassed() == null) {
-        runLib.setQcPassed(null);
+      if (update.getQcStatusId() == null) {
+        runLib.setQcStatus(null);
         runLib.setQcUser(null);
-      } else if (!update.getQcPassed().equals(runLib.getQcPassed())) {
-        runLib.setQcPassed(update.getQcPassed());
+      } else {
+        RunLibraryQcStatus status = runLibraryQcStatusService.get(update.getQcStatusId());
+        throwIfNull("Run-library QC status", status);
+        runLib.setQcStatus(status);
         runLib.setQcUser(authorizationManager.getCurrentUser());
       }
       runLib.setQcNote(update.getQcNote());

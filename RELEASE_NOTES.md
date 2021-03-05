@@ -2,6 +2,7 @@
 
 Changes:
 
+* Added detailed QC statuses for run-libraries
 * Prevent Run Scanner data from overriding user-specified index sequencing or
   sequencing parameters
 

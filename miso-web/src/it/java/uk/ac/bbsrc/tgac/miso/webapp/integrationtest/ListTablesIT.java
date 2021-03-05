@@ -896,6 +896,16 @@ public class ListTablesIT extends AbstractIT {
     testColumnsSort(ListTarget.PIPELINES);
   }
 
+  @Test
+  public void testListRunLibraryQcStatusesSetup() throws Exception {
+    testPageSetup(ListTarget.RUN_LIBRARY_QC_STATUSES, Sets.newHashSet(Columns.DESCRIPTION, Columns.QC_PASSED));
+  }
+
+  @Test
+  public void testListRunLibraryQcStatusesColumnSort() throws Exception {
+    testColumnsSort(ListTarget.RUN_LIBRARY_QC_STATUSES);
+  }
+
   private void testPageSetup(String listTarget, Set<String> targetColumns) {
     testPageSetup(listTarget, targetColumns, false);
   }

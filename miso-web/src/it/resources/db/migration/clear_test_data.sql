@@ -119,4 +119,5 @@ DELETE FROM SequencingControlType;
 DELETE FROM ScientificName;
 DELETE FROM Sop;
 DELETE FROM Pipeline;
+DELETE FROM RunLibraryQcStatus;
 SET FOREIGN_KEY_CHECKS=1;

@@ -37,9 +37,10 @@ FOR EACH ROW
     DECLARE log_message longtext CHARACTER SET utf8;
     SET log_message = CONCAT_WS(', ',
       makeChangeMessage('purpose', NULL, (SELECT alias FROM RunPurpose WHERE purposeId = NEW.purposeId)),
-      makeChangeMessage('QC status', NULL, CASE NEW.qcPassed WHEN TRUE THEN "Passed" WHEN FALSE THEN "Failed" ELSE NULL END),
+      makeChangeMessage('QC status', NULL, (SELECT description FROM RunLibraryQcStatus WHERE statusId = NEW.statusId)),
       makeChangeMessage('QC note', NULL, NEW.qcNote),
-      makeChangeMessage('QC user', NULL, (SELECT fullName FROM User WHERE userId = NEW.qcUser))
+      makeChangeMessage('QC user', NULL, (SELECT fullName FROM User WHERE userId = NEW.qcUser)),
+      makeChangeMessage('QC date', NULL, NEW.qcDate)
     );
     
     IF log_message IS NOT NULL AND log_message <> '' THEN
@@ -54,10 +55,11 @@ FOR EACH ROW
       INSERT INTO RunChangeLog(runId, columnsChanged, userId, message) VALUES (
       NEW.runId,
       COALESCE(CONCAT_WS(',',
-        makeChangeColumn('aliquot purpose', NULL, NEW.purposeId),
-        makeChangeColumn('aliquot qcPassed', NULL, NEW.qcPassed),
+        makeChangeColumn('aliquot purposeId', NULL, NEW.purposeId),
+        makeChangeColumn('aliquot statusId', NULL, NEW.statusId),
         makeChangeColumn('aliquot qcNote', NULL, NEW.qcNote),
-        makeChangeColumn('aliquot qcUser', NULL, NEW.qcUser)
+        makeChangeColumn('aliquot qcUser', NULL, NEW.qcUser),
+        makeChangeColumn('aliquot qcDate', NULL, NEW.qcDate)
       ), ''),
       NEW.lastModifier,
       CONCAT(@container, '-', @partitionNumber, '-', @aliquot, ' ', log_message)
@@ -72,7 +74,7 @@ FOR EACH ROW
     DECLARE log_message longtext CHARACTER SET utf8;
     SET log_message = CONCAT_WS(', ',
       makeChangeMessage('purpose', (SELECT alias FROM RunPurpose WHERE purposeId = OLD.purposeId), (SELECT alias FROM RunPurpose WHERE purposeId = NEW.purposeId)),
-      makeChangeMessage('QC status', CASE OLD.qcPassed WHEN TRUE THEN "Passed" WHEN FALSE THEN "Failed" ELSE NULL END, CASE NEW.qcPassed WHEN TRUE THEN "Passed" WHEN FALSE THEN "Failed" ELSE NULL END),
+      makeChangeMessage('QC status', (SELECT description FROM RunLibraryQcStatus WHERE statusId = OLD.statusId), (SELECT description FROM RunLibraryQcStatus WHERE statusId = NEW.statusId)),
       makeChangeMessage('QC note', OLD.qcNote, NEW.qcNote),
       makeChangeMessage('QC user', (SELECT fullName FROM User WHERE userId = OLD.qcUser), (SELECT fullName FROM User WHERE userId = NEW.qcUser)),
       makeChangeMessage('QC date', OLD.qcDate, NEW.qcDate)
@@ -90,8 +92,8 @@ FOR EACH ROW
       INSERT INTO RunChangeLog(runId, columnsChanged, userId, message) VALUES (
       NEW.runId,
       COALESCE(CONCAT_WS(',',
-        makeChangeColumn('aliquot purpose', OLD.purposeId, NEW.purposeId),
-        makeChangeColumn('aliquot qcPassed', OLD.qcPassed, NEW.qcPassed),
+        makeChangeColumn('aliquot purposeId', OLD.purposeId, NEW.purposeId),
+        makeChangeColumn('aliquot statusId', OLD.statusId, NEW.statusId),
         makeChangeColumn('aliquot qcNote', OLD.qcNote, NEW.qcNote),
         makeChangeColumn('aliquot qcUser', OLD.qcUser, NEW.qcUser),
         makeChangeColumn('aliquot qcDate', OLD.qcDate, NEW.qcDate)

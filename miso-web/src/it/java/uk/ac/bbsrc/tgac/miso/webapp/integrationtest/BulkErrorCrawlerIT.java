@@ -80,6 +80,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("lab/list");
     slugs.add("arraymodel/list");
     slugs.add("partitionqctype/list");
+    slugs.add("runlibraryqcstatus/list");
     slugs.add("scientificname/list");
     slugs.add("referencegenome/list");
     slugs.add("pipeline/list");
@@ -201,6 +202,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("arraymodel/bulk/edit?ids=1");
     slugs.add("partitionqctype/bulk/new?quantity=3");
     slugs.add("partitionqctype/bulk/edit?ids=2%2C3");
+    slugs.add("runlibraryqcstatus/bulk/new?quantity=2");
     slugs.add("scientificname/bulk/new?quantity=3");
     slugs.add("scientificname/bulk/edit?ids=1%2C2%2C3");
     slugs.add("referencegenome/bulk/new?quantity=3");
@@ -278,6 +280,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
         .put("sop/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
         .put("pipeline/bulk/new", Collections.unmodifiableMap(new MapBuilder<String, String>().put("quantity", "2").build()))
         .put("pipeline/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
+        .put("runlibraryqcstatus/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
         .build());
   }
 

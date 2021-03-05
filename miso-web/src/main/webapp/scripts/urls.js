@@ -707,6 +707,19 @@ Urls = (function() {
     qcHierarchy: middleIdUrlFunction(runLibraryUiBase, '/qc-hierarchy')
   };
 
+  // Run-Library QC Statuses
+  var runLibraryQcStatusUiBase = baseUrl + '/runlibraryqcstatus';
+  ui.runLibraryQcStatuses = {
+    bulkCreate: runLibraryQcStatusUiBase + '/bulk/new',
+    bulkEdit: runLibraryQcStatusUiBase + '/bulk/edit'
+  };
+
+  var runLibraryQcStatusRestBase = restBase + '/runlibraryqcstatuses';
+  rest.runLibraryQcStatuses = {
+    bulkSave: runLibraryQcStatusRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(runLibraryQcStatusRestBase + '/bulk')
+  };
+
   // Run Purposes
   var runPurposeUiBase = baseUrl + '/runpurpose';
   ui.runPurposes = {

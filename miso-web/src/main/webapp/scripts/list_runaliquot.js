@@ -11,17 +11,12 @@ ListTarget.runaliquot = {
         var fields = [{
           label: 'Status',
           type: 'select',
-          property: 'qcPassed',
-          values: [true, false, null],
-          getLabel: function(value) {
-            if (value === true) {
-              return 'Passed';
-            } else if (value === false) {
-              return 'Failed';
-            } else {
-              return 'Pending';
-            }
-          }
+          property: 'status',
+          values: [{
+            id: null,
+            description: 'Pending'
+          }].concat(Constants.runLibraryQcStatuses),
+          getLabel: Utils.array.get('description')
         }, {
           label: 'Note',
           type: 'text',
@@ -29,7 +24,7 @@ ListTarget.runaliquot = {
         }];
         Utils.showDialog('Set QC', 'OK', fields, function(output) {
           aliquots.forEach(function(aliquot) {
-            aliquot.qcPassed = output.qcPassed;
+            aliquot.qcStatusId = output.status.id;
             aliquot.qcNote = output.qcNote ? output.qcNote : null;
           });
           Utils.ajaxWithDialog('Setting QC', 'PUT', Urls.rest.runs.updateAliquots(config.runId), aliquots, Utils.page.pageReload);
@@ -70,9 +65,8 @@ ListTarget.runaliquot = {
       return item.aliquotId;
     }, "aliquotAlias", 0, true), {
       sTitle: "QC Status",
-      mData: "qcPassed",
-      sDefaultContent: '',
-      mRender: ListUtils.render.booleanChecks
+      mData: "qcStatusId",
+      mRender: ListUtils.render.textFromId(Constants.runLibraryQcStatuses, 'description', 'Pending')
     }, {
       sTitle: "QC Note",
       mData: 'qcNote',

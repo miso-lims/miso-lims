@@ -13,6 +13,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Immutable;
 
+import uk.ac.bbsrc.tgac.miso.core.data.RunLibraryQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.RunPartitionAliquotQcNode.RunPartitionAliquotQcNodeId;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -88,7 +89,9 @@ public class RunPartitionAliquotQcNode implements QcNode {
   @JoinColumn(name = "aliquotId")
   private LibraryAliquotQcNode aliquot;
 
-  private Boolean qcPassed;
+  @ManyToOne
+  @JoinColumn(name = "statusId")
+  private RunLibraryQcStatus qcStatus;
 
   private String qcNote;
 
@@ -146,18 +149,22 @@ public class RunPartitionAliquotQcNode implements QcNode {
     return String.format("%s partition %d - %s", getRun().getAlias(), getPartition().getPartitionNumber(), getAliquot().getAlias());
   }
 
-  @Override
-  public Boolean getQcPassed() {
-    return qcPassed;
+  public RunLibraryQcStatus getQcStatus() {
+    return qcStatus;
   }
 
-  public void setQcPassed(Boolean qcPassed) {
-    this.qcPassed = qcPassed;
+  public void setQcStatus(RunLibraryQcStatus qcStatus) {
+    this.qcStatus = qcStatus;
+  }
+
+  @Override
+  public Boolean getQcPassed() {
+    return getQcStatus() == null ? null : getQcStatus().getQcPassed();
   }
 
   @Override
   public Long getQcStatusId() {
-    return null;
+    return getQcStatus() == null ? null : getQcStatus().getId();
   }
 
   @Override
