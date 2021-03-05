@@ -43,6 +43,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.exception.BulkValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.PrometheusAsyncMonitor;
 import uk.ac.bbsrc.tgac.miso.core.util.ThrowingFunction;
 import uk.ac.bbsrc.tgac.miso.persistence.ChangeLoggableStore;
 import uk.ac.bbsrc.tgac.miso.persistence.ContainerQcStore;
@@ -302,12 +303,12 @@ public class DefaultQualityControlService implements QualityControlService {
 
   @Override
   public BulkQcSaveOperation startBulkCreate(List<QC> items) throws IOException {
-    return startBulkOperation(items, this::create);
+    return startBulkOperation(items, x -> PrometheusAsyncMonitor.monitor(getClass().getSimpleName(), "create", this::create, x));
   }
 
   @Override
   public BulkQcSaveOperation startBulkUpdate(List<QC> items) throws IOException {
-    return startBulkOperation(items, this::update);
+    return startBulkOperation(items, x -> PrometheusAsyncMonitor.monitor(getClass().getSimpleName(), "update", this::update, x));
   }
 
   private BulkQcSaveOperation startBulkOperation(List<QC> items, ThrowingFunction<QC, QC, IOException> action) throws IOException {

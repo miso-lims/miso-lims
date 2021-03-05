@@ -55,8 +55,11 @@
      <property name="advice">
         <ref bean="prometheusInterceptor"/>
      </property>
-     <property name="pattern">
-        <value>uk\.ac\.bbsrc\.tgac\.miso\.persistence\.impl\.Hibernate.*</value>
+     <property name="patterns">
+     <array>
+       <value>uk\.ac\.bbsrc\.tgac\.miso\.service\.impl\..*</value>
+       <value>uk\.ac\.bbsrc\.tgac\.miso\.webapp\.controller\..*</value>
+     </array>
      </property>
   </bean>
 

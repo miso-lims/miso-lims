@@ -93,15 +93,6 @@
   </servlet-mapping>
 
   <filter>
-    <filter-name>metricsFilter</filter-name>
-    <filter-class>uk.ac.bbsrc.tgac.miso.webapp.context.PrometheusCollectionFilter</filter-class>
-  </filter>
-  <filter-mapping>
-    <filter-name>metricsFilter</filter-name>
-    <url-pattern>/miso/*</url-pattern>
-  </filter-mapping>
-
-  <filter>
     <filter-name>ExpiresFilter</filter-name>
     <filter-class>org.apache.catalina.filters.ExpiresFilter</filter-class>
     <init-param>

@@ -230,7 +230,7 @@ public class AsyncOperationManager {
   }
 
   @Scheduled(fixedDelay = 300000)
-  private void cleanOperations() {
+  public void cleanOperations() {
     LocalDateTime cutoffTime = LocalDateTime.now().minus(5L, ChronoUnit.MINUTES);
     asyncOperations.values().removeIf(operation -> {
       LocalDateTime completionTime = operation.getCompletionTime();

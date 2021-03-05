@@ -6,6 +6,11 @@ Changes:
 * Prevent Run Scanner data from overriding user-specified index sequencing or
   sequencing parameters
 
+Upgrade Notes:
+
+* If you are using Prometheus, be advised that performance metrics have been
+  revised
+
 # 1.24.0
 
 Changes:
