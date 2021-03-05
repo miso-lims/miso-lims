@@ -38,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.GetLaneContents;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentDataManglingPolicy;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
@@ -612,7 +613,6 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     isMutated |= updateMetricsFromNotification(source, target);
     isMutated |= updateField(source.getFilePath(), target.getFilePath(), target::setFilePath);
     isMutated |= updateField(source.getStartDate(), target.getStartDate(), target::setStartDate);
-    isMutated |= updateField(source.getDataManglingPolicy(), target.getDataManglingPolicy(), target::setDataManglingPolicy);
 
     final Instrument sequencer = instrumentService.getByName(sequencerName);
     if (sequencer == null) {
@@ -633,6 +633,7 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     isMutated |= updateContainerFromNotification(target, user, model, containerSerialNumber, getLaneContents, positionName);
     isMutated |= updateHealthFromNotification(source, target, user);
     isMutated |= updateSequencingKitFromNotification(target, source.getSequencingKit());
+    isMutated |= updateDataManglingPolicyFromNotification(target, source.getDataManglingPolicy(), user);
 
     switch (source.getPlatformType()) {
     case ILLUMINA:
@@ -745,7 +746,7 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   private boolean updateSequencingParameters(final Run target, User user, Predicate<SequencingParameters> filterParameters,
       final Instrument sequencer) throws IOException {
     // If the sequencing parameters haven't been updated by a human, see if we can find exactly one that matches.
-    if (!target.didSomeoneElseChangeColumn("parameters", user)) {
+    if (!target.didSomeoneElseChangeColumn("sequencingParameters_parametersId", user)) {
       List<SequencingParameters> possibleParameters = sequencingParametersService.listByInstrumentModelId(sequencer.getInstrumentModel().getId()).stream()
           .filter(parameters -> !parameters.getName().startsWith("Custom")).filter(filterParameters).collect(Collectors.toList());
       if (possibleParameters.size() == 1) {
@@ -867,6 +868,13 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     boolean changed = target.getSequencingKit() == null || target.getSequencingKit().getId() != managedKit.getId();
     target.setSequencingKit(managedKit);
     return changed;
+  }
+
+  private boolean updateDataManglingPolicyFromNotification(Run target, InstrumentDataManglingPolicy policy, User user) {
+    if (target.didSomeoneElseChangeColumn("dataManglingPolicy", user)) {
+      return false;
+    }
+    return updateField(policy, target.getDataManglingPolicy(), target::setDataManglingPolicy);
   }
 
   private <T> boolean updateField(T newValue, T oldValue, Consumer<T> writer) {
