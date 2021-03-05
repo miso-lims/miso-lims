@@ -14,7 +14,7 @@ public class RunPartitionAliquotDto {
   private String aliquotName;
   private String aliquotAlias;
   private Long runPurposeId;
-  private Boolean qcPassed;
+  private Long qcStatusId;
   private String qcNote;
   private String qcUserName;
   private String qcDate;
@@ -107,12 +107,12 @@ public class RunPartitionAliquotDto {
     this.runPurposeId = runPurposeId;
   }
 
-  public Boolean getQcPassed() {
-    return qcPassed;
+  public Long getQcStatusId() {
+    return qcStatusId;
   }
 
-  public void setQcPassed(Boolean qcPassed) {
-    this.qcPassed = qcPassed;
+  public void setQcStatusId(Long qcStatusId) {
+    this.qcStatusId = qcStatusId;
   }
 
   public String getQcNote() {

@@ -68,6 +68,7 @@ DELETE FROM Run;
 DELETE FROM RunChangeLog;
 DELETE FROM RunIllumina;
 DELETE FROM RunIonTorrent;
+DELETE FROM RunLibraryQcStatus;
 DELETE FROM RunLS454;
 DELETE FROM RunOxfordNanopore;
 DELETE FROM RunPacBio;

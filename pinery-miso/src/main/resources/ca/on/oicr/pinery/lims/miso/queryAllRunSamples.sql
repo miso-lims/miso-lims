@@ -6,7 +6,8 @@ SELECT DISTINCT Run.runId
   ,tr.alias targeted_sequencing 
   ,COALESCE(Run.dataManglingPolicy, im.dataManglingPolicy) dataManglingPolicy
   ,rp.alias run_purpose
-  ,rpa.qcPassed qc_passed
+  ,rlqc.qcPassed qc_passed
+  ,rlqc.description qc_description
   ,rpa.qcDate qc_date
 FROM SequencingContainerModel scm
 JOIN SequencerPartitionContainer spc ON scm.sequencingContainerModelId = spc.sequencingContainerModelId
@@ -35,3 +36,4 @@ LEFT JOIN Run_Partition_LibraryAliquot rpa
   AND rpa.partitionId = part.partitionId
   AND rpa.aliquotId = ld.aliquotId
 LEFT JOIN RunPurpose rp ON rp.purposeId = rpa.purposeId
+LEFT JOIN RunLibraryQcStatus rlqc ON rlqc.statusId = rpa.statusId

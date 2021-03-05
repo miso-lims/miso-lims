@@ -56,6 +56,19 @@ table to remove the container.
 
 
 
+## Setting Run Purpose
+
+Run purpose describes the reason for the sequencing. Example purposes may include "Production," "Research," and "Quality
+Control." These may be useful for things such as automating analysis decisions. Sequencers may specify a default
+purpose. Runs will use the sequencer's default purpose by default, but this can be changed on the Edit Run page.
+
+The purpose may also be set on individual partitions, or individual library aliquots within a run. The partition's
+purpose, if set, overrides the run's purpose. The library aliquot's purpose, if set, overrides the partition's purpose.
+To set the purpose for a partition or library aliquot, select the item in the Partitions or Library Aliquots table on
+the Edit Run page, click the "Set Purpose" button in the table's toolbar, and select the purpose you wish to set.
+
+
+
 ## Setting Partition QCs
 
 Partition QCs answer two questions about a sequenced partition:
@@ -68,6 +81,16 @@ partitions for which you wish to set QCs, then click the "Set QC" button in the 
 that the Partitions list will be labelled differently depending on the platform of the run. In the dialog that appears,
 select a QC value. The effects of the selection are displayed in parenthesis. The Partitions list will be updated to
 reflect your selection.
+
+
+
+## Setting Run-Library QC Status
+
+Run-library QC status indicates the results of sequencing a specific library aliquot in a specific partition of a
+specific run. See [Run-Library QC Statuses](../type_data#run-library-qc-statuses) for more information. This status can
+be set in the Library Aliquots table on the Edit Run page. First, select the library aliquots to set the status for,
+then click the "Set QC" button in the table's toolbar. In the dialog that appears, select the status, enter a note if
+you wish, and click "OK" to save.
 
 
 
@@ -124,4 +147,3 @@ about Run Scanner, see the [Related Software - Run Scanner](../related_software#
 
 To delete runs, go to the Runs list page, select the runs that you wish to delete, and click the "Delete" button in the
 toolbar at the top of the table. A run can only be deleted by its creator or a MISO administrator.
-

@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
+import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunLibraryQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
@@ -40,6 +43,8 @@ public class DefaultRunPartitionAliquotService implements RunPartitionAliquotSer
   private LibraryAliquotService libraryAliquotService;
   @Autowired
   private RunPurposeService runPurposeService;
+  @Autowired
+  private RunLibraryQcStatusService runLibraryQcStatusService;
   @Autowired
   private AuthorizationManager authorizationManager;
 
@@ -71,12 +76,14 @@ public class DefaultRunPartitionAliquotService implements RunPartitionAliquotSer
     if (runPartitionAliquot.getPurpose() != null) {
       runPartitionAliquot.setPurpose(runPurposeService.get(runPartitionAliquot.getPurpose().getId()));
     }
+    loadChildEntity(runPartitionAliquot::setPurpose, runPartitionAliquot.getPurpose(), runPurposeService, "runPurposeId");
+    loadChildEntity(runPartitionAliquot::setQcStatus, runPartitionAliquot.getQcStatus(), runLibraryQcStatusService, "qcStatusId");
     User user = authorizationManager.getCurrentUser();
-    ValidationUtils.updateQcDetails(runPartitionAliquot, managed, RunPartitionAliquot::getQcPassed, RunPartitionAliquot::getQcUser,
+    updateQcDetails(runPartitionAliquot, managed, RunPartitionAliquot::getQcStatus, RunPartitionAliquot::getQcUser,
         RunPartitionAliquot::setQcUser, authorizationManager, RunPartitionAliquot::getQcDate, RunPartitionAliquot::setQcDate);
 
     List<ValidationError> errors = new ArrayList<>();
-    ValidationUtils.validateQcUser(runPartitionAliquot.getQcPassed(), runPartitionAliquot.getQcUser(), errors);
+    validateQcUser(runPartitionAliquot.getQcStatus(), runPartitionAliquot.getQcUser(), errors);
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }
@@ -89,7 +96,7 @@ public class DefaultRunPartitionAliquotService implements RunPartitionAliquotSer
       runPartitionAliquotDao.create(runPartitionAliquot);
     } else {
       managed.setPurpose(runPartitionAliquot.getPurpose());
-      managed.setQcPassed(runPartitionAliquot.getQcPassed());
+      managed.setQcStatus(runPartitionAliquot.getQcStatus());
       managed.setQcNote(runPartitionAliquot.getQcNote());
       managed.setQcUser(runPartitionAliquot.getQcUser());
       managed.setQcDate(runPartitionAliquot.getQcDate());
