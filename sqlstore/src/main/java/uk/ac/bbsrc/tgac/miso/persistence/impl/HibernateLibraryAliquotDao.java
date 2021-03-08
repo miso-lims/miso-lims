@@ -84,18 +84,6 @@ public class HibernateLibraryAliquotDao
     return (LibraryAliquot) criteria.uniqueResult();
   }
 
-  @Override
-  public Collection<LibraryAliquot> getByBarcodeList(Collection<String> barcodeList) throws IOException {
-    if (barcodeList.isEmpty()) {
-      return Collections.emptyList();
-    }
-    Criteria criteria = currentSession().createCriteria(LibraryAliquot.class);
-    criteria.add(Restrictions.in("identificationBarcode", barcodeList));
-    @SuppressWarnings("unchecked")
-    List<LibraryAliquot> records = criteria.list();
-    return records;
-  }
-
   public SessionFactory getSessionFactory() {
     return sessionFactory;
   }

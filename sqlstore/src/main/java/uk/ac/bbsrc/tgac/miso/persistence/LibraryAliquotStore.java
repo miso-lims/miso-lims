@@ -58,5 +58,4 @@ public interface LibraryAliquotStore extends Store<LibraryAliquot>, PaginatedDat
    */
   LibraryAliquot getByBarcode(String barcode) throws IOException;
 
-  Collection<LibraryAliquot> getByBarcodeList(Collection<String> barcodeList) throws IOException;
 }
