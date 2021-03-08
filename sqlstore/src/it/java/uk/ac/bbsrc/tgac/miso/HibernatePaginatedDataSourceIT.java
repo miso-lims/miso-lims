@@ -51,10 +51,17 @@ public abstract class HibernatePaginatedDataSourceIT extends AbstractDAOTest {
 
   private final Collection<SearchType> validSearchTypes;
   private final Collection<String> sortFields;
+  private final String defaultSortProperty;
 
   public HibernatePaginatedDataSourceIT(Collection<SearchType> validSearchTypes, Collection<String> sortFields) {
+    this(validSearchTypes, sortFields, "name");
+  }
+
+  public HibernatePaginatedDataSourceIT(Collection<SearchType> validSearchTypes, Collection<String> sortFields,
+      String defaultSortProperty) {
     this.validSearchTypes = validSearchTypes;
     this.sortFields = sortFields;
+    this.defaultSortProperty = defaultSortProperty;
   }
 
   protected abstract HibernatePaginatedDataSource<?> constructTestSubject();
@@ -356,7 +363,7 @@ public abstract class HibernatePaginatedDataSourceIT extends AbstractDAOTest {
     }
     assertNotNull(sut.list(err -> {
       throw new RuntimeException(err);
-    }, 0, 10, true, "name", filter));
+    }, 0, 10, true, defaultSortProperty, filter));
   }
 
   @Test

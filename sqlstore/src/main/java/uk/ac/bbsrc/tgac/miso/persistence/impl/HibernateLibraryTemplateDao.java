@@ -9,8 +9,6 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,8 +20,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.LibraryTemplateStore;
 @Repository
 @Transactional(rollbackFor = Exception.class)
 public class HibernateLibraryTemplateDao implements LibraryTemplateStore, HibernatePaginatedDataSource<LibraryTemplate> {
-
-  protected static final Logger log = LoggerFactory.getLogger(HibernateLibraryTemplateDao.class);
 
   private static final String[] SEARCH_PROPERTIES = new String[] { "alias" };
 
@@ -117,7 +113,7 @@ public class HibernateLibraryTemplateDao implements LibraryTemplateStore, Hibern
   }
 
   @Override
-  public List<LibraryTemplate> getByIdList(List<Long> idList) throws IOException {
+  public List<LibraryTemplate> listByIdList(List<Long> idList) throws IOException {
     if (idList.isEmpty()) {
       return Collections.emptyList();
     }

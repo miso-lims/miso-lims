@@ -204,7 +204,7 @@ public class DefaultLibraryTemplateService implements LibraryTemplateService {
   @Override
   public List<LibraryTemplate> listByIdList(List<Long> idList) throws IOException {
     authorizationManager.throwIfUnauthenticated();
-    return new ArrayList<>(libraryTemplateStore.getByIdList(idList));
+    return new ArrayList<>(libraryTemplateStore.listByIdList(idList));
   }
 
   @Override
