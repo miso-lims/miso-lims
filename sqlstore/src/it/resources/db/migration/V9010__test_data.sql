@@ -860,17 +860,17 @@ INSERT INTO Workset(worksetId, alias, description, creator, created, lastModifie
 (1, 'test', 'test workset', 1, '2018-08-08 14:47:00', 1, '2018-08-08 14:47:00'),
 (2, 'two', 'second workset', 1, '2020-03-27 18:50:00', 1, '2020-03-27 18:50:00');
 
-INSERT INTO Workset_Sample(worksetId, sampleId) VALUES
-(1, 1),
-(1, 2),
-(1, 3),
-(2, 1);
+INSERT INTO Workset_Sample(worksetId, sampleId, addedTime) VALUES
+(1, 1, NULL),
+(1, 2, '2021-03-08 13:57:00'),
+(1, 3, '2021-03-08 13:57:00'),
+(2, 1, '2021-03-08 13:57:00');
 
-INSERT INTO Workset_Library(worksetId, libraryId) VALUES
-(2, 1);
+INSERT INTO Workset_Library(worksetId, libraryId, addedTime) VALUES
+(2, 1, '2021-03-08 13:58:00');
 
-INSERT INTO Workset_LibraryAliquot(worksetId, aliquotId) VALUES
-(2, 1);
+INSERT INTO Workset_LibraryAliquot(worksetId, aliquotId, addedTime) VALUES
+(2, 1, '2021-03-08 13:59:00');
 
 INSERT INTO SequencingOrder(sequencingOrderId, poolId, partitions, parametersId, purposeId, description, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 1, 1, 1, 1, 'seq order 1', 1, '2019-09-23 10:30:00', 1, '2019-09-23 10:30:00'),

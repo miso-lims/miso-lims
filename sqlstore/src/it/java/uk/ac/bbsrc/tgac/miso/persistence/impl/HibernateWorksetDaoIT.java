@@ -4,17 +4,22 @@ import static org.junit.Assert.*;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetSample;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class HibernateWorksetDaoIT extends AbstractDAOTest {
 
@@ -38,6 +43,28 @@ public class HibernateWorksetDaoIT extends AbstractDAOTest {
     assertEquals("test workset", workset.getDescription());
     assertNotNull(workset.getWorksetSamples());
     assertEquals(3, workset.getWorksetSamples().size());
+  }
+
+  @Test
+  public void testCreate() {
+    String alias = "New workset";
+    long sampleId = 3L;
+    Workset workset = new Workset();
+    workset.setAlias(alias);
+    WorksetSample sample = new WorksetSample();
+    sample.setWorkset(workset);
+    sample.setItem((Sample) currentSession().get(SampleImpl.class, sampleId));
+    workset.getWorksetSamples().add(sample);
+    workset.setChangeDetails((User) currentSession().get(UserImpl.class, 1L));
+    long savedId = sut.save(workset);
+
+    clearSession();
+
+    Workset saved = (Workset) currentSession().get(Workset.class, savedId);
+    assertNotNull(saved);
+    assertEquals(alias, saved.getAlias());
+    assertEquals(1, saved.getWorksetSamples().size());
+    assertEquals(sampleId, saved.getWorksetSamples().iterator().next().getItem().getId());
   }
 
   @Test
@@ -107,6 +134,39 @@ public class HibernateWorksetDaoIT extends AbstractDAOTest {
   public void testListByLibraryAliquot() throws Exception {
     List<Workset> results = sut.listByLibraryAliquot(1L);
     assertEquals(1, results.size());
+  }
+
+  @Test
+  public void testGetByAlias() throws Exception {
+    String alias = "test";
+    Workset workset = sut.getByAlias(alias);
+    assertNotNull(workset);
+    assertEquals(alias, workset.getAlias());
+  }
+
+  @Test
+  public void testGetSampleAddedTimes() throws Exception {
+    Map<Long, Date> times = sut.getSampleAddedTimes(1L);
+    assertEquals(2, times.size());
+    Date expected = LimsUtils.parseDateTime("2021-03-08 13:57:00");
+    assertEquals(expected, times.get(2L));
+    assertEquals(expected, times.get(3L));
+  }
+
+  @Test
+  public void testGetLibraryAddedTimes() throws Exception {
+    Map<Long, Date> times = sut.getLibraryAddedTimes(2L);
+    assertEquals(1, times.size());
+    Date expected = LimsUtils.parseDateTime("2021-03-08 13:58:00");
+    assertEquals(expected, times.get(1L));
+  }
+
+  @Test
+  public void testGetLibraryAliquotAddedTimes() throws Exception {
+    Map<Long, Date> times = sut.getLibraryAliquotAddedTimes(2L);
+    assertEquals(1, times.size());
+    Date expected = LimsUtils.parseDateTime("2021-03-08 13:59:00");
+    assertEquals(expected, times.get(1L));
   }
 
 }
