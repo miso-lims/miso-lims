@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
@@ -11,7 +10,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 
 public interface QualityControlTypeStore {
 
-  public Collection<QcType> list() throws IOException;
+  public List<QcType> list() throws IOException;
 
   public QcType get(long id) throws IOException;
 
