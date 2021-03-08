@@ -4,7 +4,6 @@ import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -198,7 +197,7 @@ public class DefaultQcTypeService implements QcTypeService {
   }
 
   @Override
-  public Collection<QcType> getAll() throws IOException {
+  public List<QcType> list() throws IOException {
     return qcTypeStore.list();
   }
 

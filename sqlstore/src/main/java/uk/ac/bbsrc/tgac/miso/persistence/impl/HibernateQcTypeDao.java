@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -48,7 +47,7 @@ public class HibernateQcTypeDao implements QualityControlTypeStore {
   }
 
   @Override
-  public Collection<QcType> list() throws IOException {
+  public List<QcType> list() throws IOException {
     Criteria criteria = currentSession().createCriteria(QcType.class);
     @SuppressWarnings("unchecked")
     List<QcType> records = criteria.list();

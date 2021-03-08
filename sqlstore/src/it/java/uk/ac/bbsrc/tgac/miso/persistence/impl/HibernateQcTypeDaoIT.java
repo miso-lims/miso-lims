@@ -31,11 +31,7 @@ import java.util.List;
 
 import org.hibernate.SessionFactory;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
@@ -47,18 +43,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 
 public class HibernateQcTypeDaoIT extends AbstractDAOTest {
 
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
-
   @Autowired
   private SessionFactory sessionFactory;
 
-  @InjectMocks
   private HibernateQcTypeDao dao;
 
   @Before
   public void setup() throws IOException {
-    MockitoAnnotations.initMocks(this);
+    dao = new HibernateQcTypeDao();
     dao.setSessionFactory(sessionFactory);
   }
 

@@ -39,7 +39,7 @@ public class QcTypeController extends AbstractInstituteDefaultsController<QcType
 
   @Override
   protected Collection<QcType> getAll() throws IOException {
-    return qcTypeService.getAll();
+    return qcTypeService.list();
   }
 
   @Override
