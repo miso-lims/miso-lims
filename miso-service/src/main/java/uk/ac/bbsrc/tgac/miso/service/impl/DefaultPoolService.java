@@ -131,16 +131,6 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   }
 
   @Override
-  public List<Pool> list() throws IOException {
-    return poolStore.listAll();
-  }
-
-  @Override
-  public List<Pool> listByProjectId(long projectId) throws IOException {
-    return poolStore.listByProjectId(projectId);
-  }
-
-  @Override
   public List<Pool> listByLibraryId(long libraryId) throws IOException {
     return poolStore.listByLibraryId(libraryId);
   }
@@ -294,8 +284,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     }
   }
 
-  @Override
-  public List<ValidationError> getMismatchesWithOrders(Pool pool, List<PoolOrder> poolOrders) throws IOException {
+  private List<ValidationError> getMismatchesWithOrders(Pool pool, List<PoolOrder> poolOrders) throws IOException {
     Set<Long> poolAliquotIds = new HashSet<>();
     List<ValidationError> errors = new LinkedList<>();
 
@@ -412,7 +401,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
 
   @Override
   public List<Pool> listByIdList(List<Long> poolIds) throws IOException {
-    return poolStore.listPoolsById(poolIds);
+    return poolStore.listByIdList(poolIds);
   }
 
   @Override

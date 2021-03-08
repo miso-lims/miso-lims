@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
@@ -58,18 +57,6 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
     return (Pool) createCriteria().add(Restrictions.eq("alias", alias)).uniqueResult();
   }
 
-  @Override
-  public List<Pool> getByBarcodeList(Collection<String> barcodeList) throws IOException {
-    if (barcodeList.isEmpty()) {
-      return Collections.emptyList();
-    }
-    Criteria criteria = createCriteria();
-    criteria.add(Restrictions.in("identificationBarcode", barcodeList));
-    @SuppressWarnings("unchecked")
-    List<Pool> results = criteria.list();
-    return results;
-  }
-
   public SessionFactory getSessionFactory() {
     return sessionFactory;
   }
@@ -103,30 +90,6 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
         .add(Restrictions.eq("aliquot.id", aliquotId))
         .list();
     return results;
-  }
-
-  @Override
-  public List<Pool> listByProjectId(long projectId) throws IOException {
-    @SuppressWarnings("unchecked")
-    List<Long> ids = currentSession().createCriteria(PoolImpl.class, "p")
-        .createAlias("p.poolElements", "poolElement")
-        .createAlias("poolElement.aliquot", "aliquot")
-        .createAlias("aliquot.parentLibrary", "library")
-        .createAlias("library.parentSample", "sample")
-        .createAlias("sample.parentProject", "project")
-        .add(Restrictions.eq("project.id", projectId))
-        .setProjection(Projections.distinct(Projections.property("p.id")))
-        .list();
-    if (ids.isEmpty()) {
-      return Collections.emptyList();
-    }
-
-    @SuppressWarnings("unchecked")
-    List<Pool> pools = currentSession().createCriteria(PoolImpl.class)
-        .add(Restrictions.in("id", ids))
-        .list();
-
-    return pools;
   }
 
   @Override
@@ -225,7 +188,7 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   }
 
   @Override
-  public List<Pool> listPoolsById(List<Long> poolIds) {
+  public List<Pool> listByIdList(List<Long> poolIds) {
     if (poolIds.isEmpty()) return Collections.emptyList();
     Criteria criteria = currentSession().createCriteria(PoolImpl.class);
     criteria.add(Restrictions.in("id", poolIds));

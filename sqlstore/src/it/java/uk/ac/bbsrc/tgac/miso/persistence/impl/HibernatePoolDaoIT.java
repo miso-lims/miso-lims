@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -28,8 +28,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.util.DateType;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 @Transactional
@@ -136,33 +134,6 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testGetByBarcodeList() throws IOException {
-    List<String> barcodes = new ArrayList<>();
-    barcodes.add("IPO2::Illumina");
-    barcodes.add("IPO3::Illumina");
-    assertEquals(2, dao.getByBarcodeList(barcodes).size());
-  }
-
-  @Test
-  public void testGetByBarcodeListEmpty() throws IOException {
-    assertEquals(0, dao.getByBarcodeList(new ArrayList<String>()).size());
-  }
-
-  @Test
-  public void testGetByBarcodeListNone() throws IOException {
-    List<String> barcodes = new ArrayList<>();
-    barcodes.add("asdf");
-    barcodes.add("jkl;");
-    assertEquals(0, dao.getByBarcodeList(barcodes).size());
-  }
-
-  @Test
-  public void testGetByBarcodeListNull() throws IOException {
-    exception.expect(NullPointerException.class);
-    dao.getByBarcodeList(null);
-  }
-
-  @Test
   public void testGetByBarcodeNull() throws Exception {
     exception.expect(NullPointerException.class);
     dao.getByBarcode(null);
@@ -186,16 +157,6 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
   @Test
   public void testListByLibraryAliquotId() throws Exception {
     assertEquals(2, dao.listByLibraryAliquotId(1L).size());
-  }
-
-  @Test
-  public void testListByProjectId() throws IOException {
-    assertEquals(10, dao.listByProjectId(1L).size());
-  }
-
-  @Test
-  public void testListByProjectNone() throws IOException {
-    assertEquals(0, dao.listByProjectId(100L).size());
   }
 
   @Test
@@ -380,58 +341,35 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
           pd.getProportion());
     });
   }
-
-  @Test
-  public void testSearch() throws IOException {
-    testSearch(PaginationFilter.query("IPO1"));
-  }
-
-  @Test
-  public void testSearchByCreated() throws IOException {
-    testSearch(PaginationFilter.date(LimsUtils.parseDate("2017-01-01"), LimsUtils.parseDate("2018-01-01"), DateType.CREATE));
-  }
-
-  @Test
-  public void testSearchByEntered() throws IOException {
-    testSearch(PaginationFilter.date(LimsUtils.parseDate("2017-01-01"), LimsUtils.parseDate("2018-01-01"), DateType.ENTERED));
-  }
-
-  @Test
-  public void testSearchByCreator() throws IOException {
-    testSearch(PaginationFilter.user("admin", true));
-  }
-
-  @Test
-  public void testSearchByModifier() throws IOException {
-    testSearch(PaginationFilter.user("admin", false));
-  }
-
-  @Test
-  public void testSearchByPlatform() throws IOException {
-    testSearch(PaginationFilter.platformType(PlatformType.ILLUMINA));
-  }
-
-  @Test
-  public void testSearchByBox() throws IOException {
-    testSearch(PaginationFilter.box("BOX1"));
-  }
-
-  @Test
-  public void testSearchByFreezer() throws Exception {
-    testSearch(PaginationFilter.freezer("freezer1"));
-  }
   
-  /**
-   * Verifies Hibernate mappings by ensuring that no exception is thrown by a search
-   * 
-   * @param filter the search filter
-   * @throws IOException
-   */
-  private void testSearch(PaginationFilter filter) throws IOException {
-    // verify Hibernate mappings by ensuring that no exception is thrown
-    assertNotNull(dao.list(err -> {
-      throw new RuntimeException(err);
-    }, 0, 10, true, "name", filter));
+  @Test
+  public void testListByIdList() throws Exception {
+    testListByIdList(dao::listByIdList, Arrays.asList(1L, 3L, 5L));
   }
-  
+
+  @Test
+  public void testListByIdListNone() throws Exception {
+    testListByIdListNone(dao::listByIdList);
+  }
+
+  @Test
+  public void testGetPartitionCount() throws Exception {
+    Pool pool = (Pool) currentSession().get(PoolImpl.class, 1L);
+    assertEquals(1L, dao.getPartitionCount(pool));
+  }
+
+  @Test
+  public void testGetPartitionCountNone() throws Exception {
+    Pool pool = (Pool) currentSession().get(PoolImpl.class, 3L);
+    assertEquals(0L, dao.getPartitionCount(pool));
+  }
+
+  @Test
+  public void testGetByAlias() throws Exception {
+    String alias = "Pool 3";
+    Pool pool = dao.getByAlias(alias);
+    assertNotNull(pool);
+    assertEquals(alias, pool.getAlias());
+  }
+
 }
