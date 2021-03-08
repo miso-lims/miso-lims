@@ -851,10 +851,14 @@ INSERT INTO StepPool(workflowProgressId, stepNumber, poolId) VALUES
 (2, 1, 1);
 
 INSERT INTO LibraryTemplate(libraryTemplateId, alias) VALUES
-(1, 'pro1_temp1');
+(1, 'pro1_temp1'),
+(2, 'pro1_temp2'),
+(3, 'pro2_temp1');
 
 INSERT INTO LibraryTemplate_Project(libraryTemplateId, projectId) VALUES
-(1, 1);
+(1, 1),
+(2, 1),
+(3, 2);
 
 INSERT INTO Workset(worksetId, alias, description, creator, created, lastModifier, lastModified) VALUES
 (1, 'test', 'test workset', 1, '2018-08-08 14:47:00', 1, '2018-08-08 14:47:00'),
