@@ -33,7 +33,7 @@ public class HibernateInstrumentStatusDaoIT extends AbstractDAOTest {
     assertNotNull(status1);
     assertEquals("SN7001179", status1.getName());
     assertNotNull(status1.getPositions());
-    assertEquals(2, status1.getPositions().size());
+    assertEquals(3, status1.getPositions().size());
     InstrumentStatusPosition pos1a = find(status1.getPositions(), InstrumentStatusPosition::getAlias, "A");
     assertNotNull(pos1a.getRun());
     assertEquals(2L, pos1a.getRun().getRunId());
@@ -47,7 +47,7 @@ public class HibernateInstrumentStatusDaoIT extends AbstractDAOTest {
     assertNotNull(status2);
     assertEquals("h1180", status2.getName());
     assertNotNull(status2.getPositions());
-    assertEquals(2, status2.getPositions().size());
+    assertEquals(3, status2.getPositions().size());
     InstrumentStatusPosition pos2a = find(status2.getPositions(), InstrumentStatusPosition::getAlias, "A");
     assertNotNull(pos2a);
     assertNotNull(pos2a.getRun());

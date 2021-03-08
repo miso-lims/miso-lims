@@ -41,6 +41,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
@@ -164,6 +165,51 @@ public class HibernateInstrumentModelDaoIT extends AbstractDAOTest {
   public void testGetMaxContainersUsedArrayScanner() throws Exception {
     InstrumentModel scanner = (InstrumentModel) currentSession().get(InstrumentModel.class, 30L);
     assertEquals(0, dao.getMaxContainersUsed(scanner));
+  }
+
+  @Test
+  public void testGetPosition() throws Exception {
+    long id = 2L;
+    InstrumentPosition position = dao.getPosition(id);
+    assertNotNull(position);
+    assertEquals(id, position.getId());
+  }
+
+  @Test
+  public void testGetPositionUsage() throws Exception {
+    InstrumentPosition position = (InstrumentPosition) currentSession().get(InstrumentPosition.class, 1L);
+    assertEquals(2, dao.getPositionUsage(position));
+  }
+
+  @Test
+  public void testCreatePosition() throws Exception {
+    String alias = "D";
+    long modelId = 16L;
+    InstrumentPosition position = new InstrumentPosition();
+    position.setAlias(alias);
+    InstrumentModel model = (InstrumentModel) currentSession().get(InstrumentModel.class, modelId);
+    position.setInstrumentModel(model);
+    long savedId = dao.createPosition(position);
+
+    clearSession();
+
+    InstrumentPosition saved = (InstrumentPosition) currentSession().get(InstrumentPosition.class, savedId);
+    assertNotNull(saved);
+    assertEquals(alias, saved.getAlias());
+    assertEquals(modelId, saved.getInstrumentModel().getId());
+  }
+
+  @Test
+  public void testDeletePosition() throws Exception {
+    long id = 3L;
+    InstrumentPosition before = (InstrumentPosition) currentSession().get(InstrumentPosition.class, id);
+    assertNotNull(before);
+    dao.deletePosition(before);
+
+    clearSession();
+
+    InstrumentPosition after = (InstrumentPosition) currentSession().get(InstrumentPosition.class, id);
+    assertNull(after);
   }
 
 }

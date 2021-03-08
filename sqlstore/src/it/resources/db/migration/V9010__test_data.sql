@@ -205,7 +205,8 @@ INSERT INTO InstrumentModel(instrumentModelId, platform, alias, description, num
 
 INSERT INTO InstrumentPosition(positionId, instrumentModelId, alias) VALUES
 (1, 16, 'A'),
-(2, 16, 'B');
+(2, 16, 'B'),
+(3, 16, 'C');
 
 INSERT INTO `Instrument`(`instrumentId`, `name`, `instrumentModelId`, defaultPurposeId, upgradedInstrumentId, dateDecommissioned) VALUES
 (1, 'SN7001179', 16, 1, NULL, NULL),
