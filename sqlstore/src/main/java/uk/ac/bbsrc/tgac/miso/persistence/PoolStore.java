@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -50,26 +49,6 @@ public interface PoolStore extends Store<Pool>, PaginatedDataSource<Pool> {
   List<Pool> listByLibraryAliquotId(long aliquotId) throws IOException;
 
   /**
-   * List all Pools that are related to a given {@link uk.ac.bbsrc.tgac.miso.core.data.Project}
-   *
-   * @param projectId
-   *          of type long
-   * @return List<Pool<? extends Poolable<?,?>>
-   * @throws IOException
-   *           when
-   */
-  List<Pool> listByProjectId(long projectId) throws IOException;
-
-  /**
-   * List all Samples associated with identificationBarcodes from the given identificationBarcode list
-   *
-   * @return Collection<Sample
-   * @throws IOException
-   *           when the objects cannot be retrieved
-   */
-  List<Pool> getByBarcodeList(Collection<String> barcodeList) throws IOException;
-
-  /**
    * List the Pool associated with a given identificationBarcode
    * 
    * @param barcode
@@ -82,7 +61,7 @@ public interface PoolStore extends Store<Pool>, PaginatedDataSource<Pool> {
 
   Pool getByAlias(String alias) throws IOException;
 
-  List<Pool> listPoolsById(List<Long> poolIds);
+  List<Pool> listByIdList(List<Long> poolIds);
 
   public long getPartitionCount(Pool pool);
 
