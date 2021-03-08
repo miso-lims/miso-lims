@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -44,12 +45,12 @@ public class HibernateInstrumentDaoIT extends AbstractDAOTest {
   @Test
   public void testListAll() throws IOException {
     Collection<Instrument> instruments = dao.listAll();
-    assertEquals(4, instruments.size());
+    assertEquals(6, instruments.size());
   }
 
   @Test
   public void testListByType() throws Exception {
-    assertEquals(3, dao.listByType(InstrumentType.SEQUENCER).size());
+    assertEquals(4, dao.listByType(InstrumentType.SEQUENCER).size());
   }
 
   @Test
@@ -100,6 +101,47 @@ public class HibernateInstrumentDaoIT extends AbstractDAOTest {
   public void testGetUsageByArrayRuns() throws Exception {
     Instrument instrument = (Instrument) currentSession().get(InstrumentImpl.class, 3L);
     assertEquals(1L, dao.getUsageByArrayRuns(instrument));
+  }
+
+  @Test
+  public void testGetUsageByQcs() throws Exception {
+    Instrument instrument = (Instrument) currentSession().get(InstrumentImpl.class, 5L);
+    assertEquals(1L, dao.getUsageByQcs(instrument));
+  }
+
+  @Test
+  public void testGetUsageByQcsNone() throws Exception {
+    Instrument instrument = (Instrument) currentSession().get(InstrumentImpl.class, 1L);
+    assertEquals(0L, dao.getUsageByQcs(instrument));
+  }
+
+  @Test
+  public void testGetByUpgradedInstrument() throws Exception {
+    Instrument upgraded = dao.getByUpgradedInstrument(2L);
+    assertNotNull(upgraded);
+    assertEquals(6L, upgraded.getId());
+  }
+
+  @Test
+  public void testGetByName() throws Exception {
+    String name = "old hiseq";
+    Instrument instrument = dao.getByName(name);
+    assertNotNull(instrument);
+    assertEquals(name, instrument.getName());
+  }
+
+  @Test
+  public void testCreate() throws Exception {
+    Instrument instrument = new InstrumentImpl();
+    instrument.setName("Test Instrument");
+    InstrumentModel model = (InstrumentModel) currentSession().get(InstrumentModel.class, 2L);
+    instrument.setInstrumentModel(model);
+    long savedId = dao.save(instrument);
+
+    clearSession();
+
+    Instrument saved = (Instrument) currentSession().get(InstrumentImpl.class, savedId);
+    assertNotNull(saved);
   }
 
 }

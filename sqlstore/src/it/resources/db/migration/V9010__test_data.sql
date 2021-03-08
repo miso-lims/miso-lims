@@ -193,23 +193,45 @@ INSERT INTO KitDescriptor (kitDescriptorId, name, version, manufacturer, partNum
 (4, 'Test Container Kit', 1, 'KitMaker', 'k004', 0, 'CLUSTERING', 'ILLUMINA', 1, '2021-03-04 09:45:00', 1, '2021-03-04 09:45:00'),
 (5, 'Test Sequencing Kit', 1, 'KitMaker', 'k005', 0, 'SEQUENCING', 'ILLUMINA', 1, '2021-03-04 09:45:00', 1, '2021-03-04 09:45:00');
 
-INSERT INTO `QCType` (`qcTypeId`, `name`, `description`, `qcTarget`, `units`) VALUES
-(2,'Bioanalyzer','Chip-based capillary electrophoresis machine to analyse RNA, DNA, and protein, manufactured by Agilent','Library','nM'),
-(7,'QuBit','Quantitation of DNA, RNA and protein, manufacturered by Invitrogen','Sample','ng/µl'),
-(3,'Bioanalyser','Chip-based capillary electrophoresis machine to analyse RNA, DNA, and protein, manufactured by Agilent','Sample','ng/µl'),
-(4,'QuBit','Quantitation of DNA, RNA and protein, manufacturered by Invitrogen','Library','ng/µl'),
-(6,'SeqInfo QC','Post-run completion run QC step, undertaken by the SeqInfo team, as part of the primary analysis stage.','Run',''),
-(5,'SeqOps QC','Post-run completion run QC step, undertaken by the SeqOps team, to move a run through to the primary analysis stage.','Run',''),
-(1,'qPCR','Quantitative PCR','Library','mol/µl'),
-(8,'poolQcType1', 'qc 1 for pools', 'Pool', 'nM'),
-(9,'poolQcType2', 'qc 2 for pools', 'Pool', 'nM'),
-(10,'poolQcType3', 'qc 3 for pools', 'Pool', 'nM'),
-(11,'poolQcType4', 'qc 4 for pools', 'Pool', 'nM'),
-(12,'InsertSizeQC', 'Insert Size QC', 'Library', 'bp'),
-(13, 'Sample QC With Control', NULL, 'Sample', 'x'),
-(14, 'Library QC With Control', NULL, 'Library', 'x'),
-(15, 'Pool QC With Control', NULL, 'Pool', 'x'),
-(16, 'Container QC With Control', NULL, 'Container', 'x');
+INSERT INTO RunPurpose(purposeId, alias) VALUES
+(1, 'Production'),
+(2, 'Research');
+
+INSERT INTO InstrumentModel(instrumentModelId, platform, alias, description, numContainers, instrumentType) VALUES
+(1, 'ILLUMINA', 'Illumina MiSeq', '4-channel flowgram', 1, 'SEQUENCER'),
+(16, 'ILLUMINA', 'Illumina HiSeq 2000', '4-channel flowgram', 1, 'SEQUENCER'),
+(30, 'ILLUMINA', 'Illumina iScan', NULL, 1, 'ARRAY_SCANNER'),
+(2, 'ILLUMINA', 'QC Machine', NULL, 0, 'OTHER');
+
+INSERT INTO InstrumentPosition(positionId, instrumentModelId, alias) VALUES
+(1, 16, 'A'),
+(2, 16, 'B');
+
+INSERT INTO `Instrument`(`instrumentId`, `name`, `instrumentModelId`, defaultPurposeId, upgradedInstrumentId, dateDecommissioned) VALUES
+(1, 'SN7001179', 16, 1, NULL, NULL),
+(2, 'h1180', 16, 1, NULL, NULL),
+(3, 'iScan_1', 30, 1, NULL, NULL),
+(4, 'miseq1', 1, 1, NULL, NULL),
+(5, 'qcer', 2, NULL, NULL, NULL),
+(6, 'old hiseq', 16, 1, 2, '2021-03-08 10:36:00');
+
+INSERT INTO `QCType` (`qcTypeId`, `name`, `description`, `qcTarget`, `units`, instrumentModelId) VALUES
+(2,'Bioanalyzer','Chip-based capillary electrophoresis machine to analyse RNA, DNA, and protein, manufactured by Agilent','Library','nM', NULL),
+(7,'QuBit','Quantitation of DNA, RNA and protein, manufacturered by Invitrogen','Sample','ng/µl', NULL),
+(3,'Bioanalyser','Chip-based capillary electrophoresis machine to analyse RNA, DNA, and protein, manufactured by Agilent','Sample','ng/µl', NULL),
+(4,'QuBit','Quantitation of DNA, RNA and protein, manufacturered by Invitrogen','Library','ng/µl', NULL),
+(6,'SeqInfo QC','Post-run completion run QC step, undertaken by the SeqInfo team, as part of the primary analysis stage.','Run','', NULL),
+(5,'SeqOps QC','Post-run completion run QC step, undertaken by the SeqOps team, to move a run through to the primary analysis stage.','Run','', NULL),
+(1,'qPCR','Quantitative PCR','Library','mol/µl', 2),
+(8,'poolQcType1', 'qc 1 for pools', 'Pool', 'nM', NULL),
+(9,'poolQcType2', 'qc 2 for pools', 'Pool', 'nM', NULL),
+(10,'poolQcType3', 'qc 3 for pools', 'Pool', 'nM', NULL),
+(11,'poolQcType4', 'qc 4 for pools', 'Pool', 'nM', NULL),
+(12,'InsertSizeQC', 'Insert Size QC', 'Library', 'bp', 2),
+(13, 'Sample QC With Control', NULL, 'Sample', 'x', NULL),
+(14, 'Library QC With Control', NULL, 'Library', 'x', NULL),
+(15, 'Pool QC With Control', NULL, 'Pool', 'x', NULL),
+(16, 'Container QC With Control', NULL, 'Container', 'x', NULL);
 
 INSERT INTO QcControl (controlId, qcTypeId, alias) VALUES
 (1, 11, 'Control 1'),
@@ -523,23 +545,23 @@ VALUES (1,2,1,'TEST_0001_Bn_P_PE_300_WG','LDI1::TEST_0001_Bn_P_PE_300_WG','2015-
 (14,2,14,'TEST_0007_Bn_R_PE_300_WG','LDI14::TEST_0007_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI14',NULL, 'LibraryAliquot', NULL),
 (15,2,15,'TEST_0001_ALIQUOT_1_PE_300_WG','LDI15::TEST_0001_ALIQUOT_1_PE_300_WG','2018-02-15',1,1,'LDI15',NULL, 'LibraryAliquot', NULL);
 
-INSERT INTO `LibraryQC`(`qcId`, `library_libraryId`, `creator`, `date`, `type`, `results`) VALUES
- (1,1,1,'2015-08-27',4,3),
- (2,2,1,'2015-08-27',4,3),
- (3,3,1,'2015-08-27',4,3),
- (4,4,1,'2015-08-27',4,3),
- (5,5,1,'2015-08-27',4,3),
- (6,6,1,'2015-08-27',4,3),
- (7,7,1,'2015-08-27',4,3),
- (8,8,1,'2015-08-27',4,3),
- (9,9,1,'2015-08-27',4,3),
- (10,10,1,'2015-08-27',4,3),
- (11,11,1,'2015-08-27',4,3),
- (12,12,1,'2015-08-27',4,3),
- (13,13,1,'2015-08-27',4,3),
- (14,14,1,'2015-08-27',4,3),
- (15,2,1,'2015-08-27',12,300),
- (16,1,1,'2021-03-01',14,10);
+INSERT INTO `LibraryQC`(`qcId`, `library_libraryId`, `creator`, `date`, `type`, `results`, instrumentId) VALUES
+ (1,1,1,'2015-08-27',4,3,NULL),
+ (2,2,1,'2015-08-27',4,3,NULL),
+ (3,3,1,'2015-08-27',4,3,NULL),
+ (4,4,1,'2015-08-27',4,3,NULL),
+ (5,5,1,'2015-08-27',4,3,NULL),
+ (6,6,1,'2015-08-27',4,3,NULL),
+ (7,7,1,'2015-08-27',4,3,NULL),
+ (8,8,1,'2015-08-27',4,3,NULL),
+ (9,9,1,'2015-08-27',4,3,NULL),
+ (10,10,1,'2015-08-27',4,3,NULL),
+ (11,11,1,'2015-08-27',4,3,NULL),
+ (12,12,1,'2015-08-27',4,3,NULL),
+ (13,13,1,'2015-08-27',4,3,NULL),
+ (14,14,1,'2015-08-27',4,3,NULL),
+ (15,2,1,'2015-08-27',12,300,5),
+ (16,1,1,'2021-03-01',14,10,NULL);
  
 INSERT INTO LibraryQcControl(qcControlId, qcId, controlId, lot, qcPassed) VALUES
 (1, 16, 5, '20210301', TRUE);
@@ -614,29 +636,10 @@ VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
 (9, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:05'),
 (10, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:07');
 
-INSERT INTO InstrumentModel(instrumentModelId, platform, alias, description, numContainers, instrumentType) VALUES
-(1, 'ILLUMINA', 'Illumina MiSeq', '4-channel flowgram', 1, 'SEQUENCER'),
-(16, 'ILLUMINA', 'Illumina HiSeq 2000', '4-channel flowgram', 1, 'SEQUENCER'),
-(30, 'ILLUMINA', 'Illumina iScan', NULL, 1, 'ARRAY_SCANNER');
-
-INSERT INTO InstrumentPosition(positionId, instrumentModelId, alias) VALUES
-(1, 16, 'A'),
-(2, 16, 'B');
-
 INSERT INTO SequencingParameters (parametersId, name, instrumentModelId, readLength, readLength2, createdBy, updatedBy, creationDate, lastUpdated, chemistry) VALUES
 (1, 'HiSeq Params 1', 16, 100, 100, 1, 1, '2019-09-23 10:05:00', '2019-09-23 10:05:00', NULL),
 (2, 'Rapid Run 2x151', 16, 151, 151, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'RAPID_RUN'),
 (3, 'MiSeq Params 1', 1, 100, 100, 1, 1, '2019-09-23 10:05:00', '2019-09-23 10:05:00', NULL);
-
-INSERT INTO RunPurpose(purposeId, alias) VALUES
-(1, 'Production'),
-(2, 'Research');
-
-INSERT INTO `Instrument`(`instrumentId`, `name`, `instrumentModelId`, defaultPurposeId) VALUES
-(1, 'SN7001179', 16, 1),
-(2, 'h1180', 16, 1),
-(3, 'iScan_1', 30, 1),
-(4, 'miseq1', 1, 1);
 
 INSERT INTO `Experiment`(`experimentId`, `name`, `description`, `accession`, `title`, `study_studyId`, `alias`, `instrumentModelId`,`lastModifier`, lastModified, creator, created, `library_libraryId`) 
 VALUES

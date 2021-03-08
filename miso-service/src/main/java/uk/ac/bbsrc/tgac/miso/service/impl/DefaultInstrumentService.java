@@ -4,7 +4,6 @@ import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -14,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
@@ -45,11 +43,6 @@ public class DefaultInstrumentService implements InstrumentService {
   @Override
   public List<Instrument> list() throws IOException {
     return instrumentDao.listAll();
-  }
-
-  @Override
-  public Collection<Instrument> listByPlatformType(PlatformType platformType) throws IOException {
-    return instrumentDao.list(0, 0, true, "id", PaginationFilter.platformType(platformType), PaginationFilter.archived(false));
   }
 
   @Override

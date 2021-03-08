@@ -50,6 +50,9 @@ import uk.ac.bbsrc.tgac.miso.persistence.InstrumentStore;
 @Transactional(rollbackFor = Exception.class)
 public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginatedDataSource<Instrument> {
 
+  private static final String[] SEARCH_PROPERTIES = new String[] { "name", "instrumentModel.alias" };
+  private static final List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("instrumentModel"));
+
   @Autowired
   private SessionFactory sessionFactory;
 
@@ -130,14 +133,10 @@ public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginat
     return InstrumentImpl.class;
   }
 
-  private static final String[] SEARCH_PROPERTIES = new String[] { "name", "instrumentModel.alias" };
-
   @Override
   public String[] getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
-
-  private static final List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("instrumentModel"));
 
   @Override
   public Iterable<AliasDescriptor> listAliases() {
@@ -146,7 +145,7 @@ public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginat
 
   @Override
   public String propertyForDate(Criteria criteria, DateType type) {
-    return type == DateType.CREATE ? "dateComissioned" : null;
+    return type == DateType.CREATE ? "dateCommissioned" : null;
   }
 
   @Override
