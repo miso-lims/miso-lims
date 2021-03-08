@@ -16,6 +16,7 @@ import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.RunLibraryQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot.RunPartitionAliquotId;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -77,7 +78,8 @@ public class HibernateRunPartitionAliquotDaoIT extends AbstractDAOTest {
     RunPartitionAliquot rpa = new RunPartitionAliquot(run, partition, aliquot);
     User user = (User) currentSession().get(UserImpl.class, 1L);
     rpa.setLastModifier(user);
-    rpa.setQcPassed(true);
+    RunLibraryQcStatus qc = (RunLibraryQcStatus) currentSession().get(RunLibraryQcStatus.class, 1L);
+    rpa.setQcStatus(qc);
     rpa.setQcUser(user);
     rpa.setQcDate(new Date());
     sut.create(rpa);

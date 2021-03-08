@@ -762,9 +762,9 @@ INSERT INTO Run_Partition(runId, partitionId, partitionQcTypeId, notes, purposeI
 (4, 31, NULL, NULL, 1, 1),
 (4, 32, NULL, NULL, 1, 1);
 
-INSERT INTO Run_Partition_LibraryAliquot(runId, partitionId, aliquotId, lastModifier, qcPassed, qcUser, qcDate) VALUES
-(1, 1, 1, 1, TRUE, 1, '2021-02-19 14:41:00'),
-(1, 1, 2, 1, FALSE, 1, '2021-02-19 14:41:00');
+INSERT INTO Run_Partition_LibraryAliquot(runId, partitionId, aliquotId, lastModifier, statusId, qcUser, qcDate) VALUES
+(1, 1, 1, 1, 1, 1, '2021-02-19 14:41:00'),
+(1, 1, 2, 1, 2, 1, '2021-02-19 14:41:00');
 
 INSERT INTO Experiment_Run_Partition(experiment_experimentId, run_runId, partition_partitionId)
 VALUES
