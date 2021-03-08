@@ -65,6 +65,11 @@ public abstract class HibernatePaginatedDataSourceIT extends AbstractDAOTest {
   }
 
   @Test
+  public void testSearchByNotArchived() throws Exception {
+    testSearch(PaginationFilter.archived(false), SearchType.ARCHIVED);
+  }
+
+  @Test
   public void testSearchByArrayed() throws Exception {
     testSearch(PaginationFilter.arrayed(true), SearchType.ARRAYED);
   }

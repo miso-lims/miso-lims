@@ -69,7 +69,7 @@ public class HibernateInstrumentModelDaoIT extends AbstractDAOTest {
   @Test
   public void testList() throws IOException {
     List<InstrumentModel> models = dao.list();
-    assertEquals(3, models.size());
+    assertEquals(4, models.size());
   }
 
   @Test
@@ -151,7 +151,7 @@ public class HibernateInstrumentModelDaoIT extends AbstractDAOTest {
   @Test
   public void testGetUsage() throws Exception {
     InstrumentModel model = (InstrumentModel) currentSession().get(InstrumentModel.class, 16L);
-    assertEquals(2L, dao.getUsage(model));
+    assertEquals(3L, dao.getUsage(model));
   }
 
   @Test
