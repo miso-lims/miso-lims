@@ -4,7 +4,9 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -27,8 +29,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.util.DateType;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 public class HibernateLibraryAliquotDaoIT extends AbstractDAOTest {
@@ -257,75 +257,6 @@ public class HibernateLibraryAliquotDaoIT extends AbstractDAOTest {
     assertNotNull(results);
     assertEquals(1, results.size());
   }
-  
-  @Test
-  public void testSearch() throws IOException {
-    testSearch(PaginationFilter.query("LDI1"));
-  }
-
-  @Test
-  public void testSearchByCreated() throws IOException {
-    testSearch(PaginationFilter.date(LimsUtils.parseDate("2017-01-01"), LimsUtils.parseDate("2018-01-01"), DateType.CREATE));
-  }
-
-  @Test
-  public void testSearchByEntered() throws IOException {
-    testSearch(PaginationFilter.date(LimsUtils.parseDate("2017-01-01"), LimsUtils.parseDate("2018-01-01"), DateType.ENTERED));
-  }
-
-  @Test
-  public void testSearchByCreator() throws IOException {
-    testSearch(PaginationFilter.user("admin", true));
-  }
-
-  @Test
-  public void testSearchByModifier() throws IOException {
-    testSearch(PaginationFilter.user("admin", false));
-  }
-
-  @Test
-  public void testSearchByPlatform() throws IOException {
-    testSearch(PaginationFilter.platformType(PlatformType.ILLUMINA));
-  }
-
-  @Test
-  public void testSearchByIndices() throws IOException {
-    testSearch(PaginationFilter.index("A501"));
-    testSearch(PaginationFilter.index("ACGTACGT"));
-  }
-
-  @Test
-  public void testSearchByBox() throws IOException {
-    testSearch(PaginationFilter.box("BOX1"));
-  }
-
-  @Test
-  public void testSearchByFreezer() throws Exception {
-    testSearch(PaginationFilter.freezer("freezer1"));
-  }
-
-  @Test
-  public void testSearchByPool() throws Exception {
-    testSearch(PaginationFilter.pool(1L));
-  }
-
-  @Test
-  public void testSearchByGroupId() throws Exception {
-    testSearch(PaginationFilter.groupId("test"));
-  }
-
-  /**
-   * Verifies Hibernate mappings by ensuring that no exception is thrown by a search
-   * 
-   * @param filter the search filter
-   * @throws IOException
-   */
-  private void testSearch(PaginationFilter filter) throws IOException {
-    // verify Hibernate mappings by ensuring that no exception is thrown
-    assertNotNull(dao.list(err -> {
-      throw new RuntimeException(err);
-    }, 0, 10, true, "name", filter));
-  }
 
   @Test
   public void testListByPoolIds() throws Exception {
@@ -337,6 +268,23 @@ public class HibernateLibraryAliquotDaoIT extends AbstractDAOTest {
     for (Long expectedId : expectedAliquotIds) {
       assertTrue(aliquots.stream().anyMatch(aliquot -> aliquot.getId() == expectedId.longValue()));
     }
+  }
+
+  @Test
+  public void testListByPoolIdsNone() throws Exception {
+    List<LibraryAliquot> aliquots = dao.listByPoolIds(Collections.emptyList());
+    assertNotNull(aliquots);
+    assertTrue(aliquots.isEmpty());
+  }
+
+  @Test
+  public void testListByIdList() throws Exception {
+    testListByIdList(dao::listByIdList, Arrays.asList(3L, 6L, 9L));
+  }
+
+  @Test
+  public void testListByIdListNone() throws Exception {
+    testListByIdListNone(dao::listByIdList);
   }
 
 }
