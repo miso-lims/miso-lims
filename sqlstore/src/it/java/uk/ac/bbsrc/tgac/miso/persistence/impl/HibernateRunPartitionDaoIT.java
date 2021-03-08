@@ -3,14 +3,14 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
@@ -18,15 +18,16 @@ import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 
-public class HibernatePartitionQcDaoIT extends AbstractDAOTest {
+public class HibernateRunPartitionDaoIT extends AbstractDAOTest {
 
   @Rule
   public final ExpectedException exception = ExpectedException.none();
 
-  @InjectMocks
   private HibernateRunPartitionDao dao;
 
   @Autowired
@@ -34,7 +35,7 @@ public class HibernatePartitionQcDaoIT extends AbstractDAOTest {
 
   @Before
   public void setup() throws IOException, MisoNamingException {
-    MockitoAnnotations.initMocks(this);
+    dao = new HibernateRunPartitionDao();
     dao.setSessionFactory(sessionFactory);
   }
 
@@ -80,7 +81,51 @@ public class HibernatePartitionQcDaoIT extends AbstractDAOTest {
     assertNotNull(fetchedQc);
     assertEquals(qc.getQcType().getId(), fetchedQc.getQcType().getId());
     assertEquals(qc.getNotes(), fetchedQc.getNotes());
+  }
 
+  @Test
+  public void testDeleteForRun() throws Exception {
+    Run run = (Run) currentSession().get(Run.class, 1L);
+    List<RunPartition> before = getByRun(run);
+    assertEquals(8, before.size());
+    dao.deleteForRun(run);
+
+    clearSession();
+
+    List<RunPartition> after = getByRun(run);
+    assertEquals(0, after.size());
+  }
+
+  private List<RunPartition> getByRun(Run run) {
+    @SuppressWarnings("unchecked")
+    List<RunPartition> results = currentSession().createCriteria(RunPartition.class)
+        .add(Restrictions.eq("run", run))
+        .list();
+    return results;
+  }
+
+  @Test
+  public void testDeleteForRunContainer() throws Exception {
+    Run run = (Run) currentSession().get(Run.class, 2L);
+    SequencerPartitionContainer container = (SequencerPartitionContainer) currentSession().get(SequencerPartitionContainerImpl.class, 2L);
+    List<RunPartition> before = getByRunAndContainer(run, container);
+    assertEquals(8, before.size());
+    dao.deleteForRunContainer(run, container);
+
+    clearSession();
+
+    List<RunPartition> after = getByRunAndContainer(run, container);
+    assertEquals(0, after.size());
+  }
+
+  private List<RunPartition> getByRunAndContainer(Run run, SequencerPartitionContainer container) {
+    @SuppressWarnings("unchecked")
+    List<RunPartition> results = currentSession().createCriteria(RunPartition.class)
+        .createAlias("partition", "partition")
+        .add(Restrictions.eq("run", run))
+        .add(Restrictions.eq("partition.sequencerPartitionContainer", container))
+        .list();
+    return results;
   }
 
 }
