@@ -164,11 +164,6 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   }
 
   @Override
-  public Collection<Run> listByInstrumentId(long instrumentId) throws IOException {
-    return runDao.listBySequencerId(instrumentId);
-  }
-
-  @Override
   public Run get(long runId) throws IOException, AuthorizationException {
     return runDao.get(runId);
   }

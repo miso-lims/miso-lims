@@ -34,8 +34,9 @@ public abstract class HibernatePaginatedDataSourceIT extends AbstractDAOTest {
     EXTERNAL_NAME, FULFILLED, FREEZER, GHOST, GROUP_ID, HEALTH, ID, IDS, //
     INDEX, INSTRUMENT_TYPE, KIT_NAME, KIT_TYPE, LAB, MODIFIER, PENDING, //
     PLATFORM_TYPE, POOL, PROJECT, QUERY, RECEIVED, RECIPIENT_GROUPS, //
-    REQUISITION, SEQUENCER, SEQUENCING_PARAMETERS, SUBPROJECT, TIMEPOINT, //
-    TISSUE_ORIGIN, TISSUE_TYPE, TRANSFER_TYPE, UPDATED, WORKSET;
+    REQUISITION, SEQUENCER, SEQUENCING_PARAMETERS_ID, //
+    SEQUENCING_PARAMETERS_NAME, SUBPROJECT, TIMEPOINT, TISSUE_ORIGIN, //
+    TISSUE_TYPE, TRANSFER_TYPE, UPDATED, WORKSET;
   }
 
   @Rule
@@ -250,12 +251,17 @@ public abstract class HibernatePaginatedDataSourceIT extends AbstractDAOTest {
 
   @Test
   public void testSearchBySequencingParametersId() throws Exception {
-    testSearch(PaginationFilter.sequencingParameters(1L), SearchType.SEQUENCING_PARAMETERS);
+    testSearch(PaginationFilter.sequencingParameters(1L), SearchType.SEQUENCING_PARAMETERS_ID);
   }
 
   @Test
   public void testSearchBySequencingParmetersName() throws Exception {
-    testSearch(PaginationFilter.sequencingParameters("params"), SearchType.SEQUENCING_PARAMETERS);
+    testSearch(PaginationFilter.sequencingParameters("params"), SearchType.SEQUENCING_PARAMETERS_NAME);
+  }
+
+  @Test
+  public void testSearchBySequencingParmetersNameNone() throws Exception {
+    testSearch(PaginationFilter.sequencingParameters(""), SearchType.SEQUENCING_PARAMETERS_NAME);
   }
 
   @Test

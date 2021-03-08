@@ -18,8 +18,6 @@ public interface RunService extends DeleterService<Run>, ListService<Run>, SaveS
 
   Collection<Run> listByContainerId(long containerId) throws IOException;
 
-  Collection<Run> listByInstrumentId(long instrumentId) throws IOException;
-
   /**
    * Throws AuthorizationException if user is not authorized to read the retrieved run.
    * 

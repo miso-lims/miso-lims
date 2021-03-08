@@ -181,45 +181,12 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
     return records;
   }
 
-  @Override
-  public List<Run> listBySequencerId(long sequencerId) throws IOException {
-    Criteria criteria = currentSession().createCriteria(Run.class);
-    criteria.add(Restrictions.eq("sequencer.id", sequencerId));
-    @SuppressWarnings("unchecked")
-    List<Run> records = criteria.list();
-    return records;
-  }
-
   public SessionFactory getSessionFactory() {
     return sessionFactory;
   }
 
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
-  }
-
-  @Override
-  public void restrictPaginationByProjectId(Criteria criteria, long projectId, Consumer<String> errorHandler) {
-    criteria.createAlias("runPositions", "runPos")
-        .createAlias("runPos.container", "spc")
-        .createAlias("spc.partitions", "partition")
-        .createAlias("partition.pool", "pool")
-        .createAlias("pool.poolElements", "poolElement")
-        .createAlias("poolElement.aliquot", "aliquot")
-        .createAlias("aliquot.parentLibrary", "library")
-        .createAlias("library.parentSample", "sample")
-        .createAlias("sample.parentProject", "project");
-    HibernatePaginatedDataSource.super.restrictPaginationByProjectId(criteria, projectId, errorHandler);
-  }
-
-  @Override
-  public void restrictPaginationBySequencingParametersName(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
-    if (query.getText() == null) {
-      criteria.add(Restrictions.isNull("sequencingParameters"));
-    } else {
-      criteria.createAlias("sequencingParameters", "params");
-      criteria.add(DbUtils.textRestriction(query, "params.name"));
-    }
   }
 
   @Override
@@ -268,6 +235,30 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   @Override
   public Class<? extends Run> getRealClass() {
     return Run.class;
+  }
+
+  @Override
+  public void restrictPaginationByProjectId(Criteria criteria, long projectId, Consumer<String> errorHandler) {
+    criteria.createAlias("runPositions", "runPos")
+        .createAlias("runPos.container", "spc")
+        .createAlias("spc.partitions", "partition")
+        .createAlias("partition.pool", "pool")
+        .createAlias("pool.poolElements", "poolElement")
+        .createAlias("poolElement.aliquot", "aliquot")
+        .createAlias("aliquot.parentLibrary", "library")
+        .createAlias("library.parentSample", "sample")
+        .createAlias("sample.parentProject", "project");
+    HibernatePaginatedDataSource.super.restrictPaginationByProjectId(criteria, projectId, errorHandler);
+  }
+
+  @Override
+  public void restrictPaginationBySequencingParametersName(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    if (query.getText() == null) {
+      criteria.add(Restrictions.isNull("sequencingParameters"));
+    } else {
+      criteria.createAlias("sequencingParameters", "params");
+      criteria.add(DbUtils.textRestriction(query, "params.name"));
+    }
   }
 
   @Override

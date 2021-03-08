@@ -99,12 +99,4 @@ public interface RunStore extends Store<Run>, PaginatedDataSource<Run> {
    */
   List<Run> listByStatus(String health) throws IOException;
 
-  /**
-   * List all runs for a given instrument id
-   * 
-   * @param instrumentId id of the sequencer to get runs for
-   * @return all runs with matching sequencer instrument id
-   */
-  List<Run> listBySequencerId(long instrumentId) throws IOException;
-
 }
