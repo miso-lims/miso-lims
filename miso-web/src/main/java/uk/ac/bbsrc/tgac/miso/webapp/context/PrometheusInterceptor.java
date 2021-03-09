@@ -1,49 +1,58 @@
 package uk.ac.bbsrc.tgac.miso.webapp.context;
 
-import java.util.Collection;
+import java.lang.reflect.Method;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
 
 public class PrometheusInterceptor implements MethodInterceptor {
 
-  private final static Counter hits = Counter.build().name("miso_method_requests").labelNames("javaclass", "method")
-      .help("The number of requests for this method.").register();
-  private final static Histogram times = Histogram.build().name("miso_method_time").labelNames("javaclass", "method")
-      .help("The time, in nano seconds, this method takes to run.").exponentialBuckets(1000, 10, 9).register();
-  private final static Counter throwCounts = Counter.build().name("miso_method_throws").labelNames("javaclass", "method")
-      .help("The number of times this method has thrown an exception.").register();
-  private final static Histogram resultCounts = Histogram.build().name("miso_method_results").labelNames("javaclass", "method")
-      .help("The number of items this method returns (if a collection).").buckets(0, 1, 10, 50, 100, 500, 1000).register();
+  private static final Histogram controller_times = Histogram.build().name("miso_controller_method_time")
+      .labelNames("javaclass", "method", "success")
+      .help("The time, in milliseconds, this method takes to run.").buckets(100, 500, 1000, 2000, 3000, 5000, 8000, 15000, 30000)
+      .register();
+  private static final Histogram service_times = Histogram.build().name("miso_service_method_time")
+      .labelNames("javaclass", "method", "success")
+      .help("The time, in milliseconds, this method takes to run.").buckets(100, 500, 1000, 2000, 3000, 5000, 8000, 15000, 30000)
+      .register();
 
   @Override
-  public Object invoke(MethodInvocation method) throws Throwable {
-    // Don't bother with the interfaces since tracking will happen on the concrete class.
-    if (method.getMethod().getDeclaringClass().isInterface()) {
-      return method.proceed();
+  public Object invoke(MethodInvocation invocation) throws Throwable {
+    Method method = invocation.getMethod();
+    Class<?> clazz = invocation.getThis().getClass();
+    if (isServiceClass(clazz)) {
+      return monitor(invocation, service_times, clazz.getSimpleName(), method.getName());
+    } else if (isMappingMethod(method)) {
+      return monitor(invocation, controller_times, clazz.getSimpleName(), method.getName());
     }
+    return invocation.proceed();
+  }
 
-    String className = method.getMethod().getDeclaringClass().getSimpleName();
-    String methodName = method.getMethod().getName();
+  private static boolean isServiceClass(Class<?> clazz) {
+    return clazz.isAnnotationPresent(Service.class);
+  }
 
-    long startTime = System.nanoTime();
+  private static boolean isMappingMethod(Method method) {
+    return AnnotationUtils.findAnnotation(method, RequestMapping.class) != null;
+  }
+
+  private static Object monitor(MethodInvocation invocation, Histogram histogram, String className, String methodName) throws Throwable {
+    long startTime = System.currentTimeMillis();
+    boolean success = true;
     try {
-      Object retVal = method.proceed();
-      if (retVal != null && retVal instanceof Collection) {
-        resultCounts.labels(className, methodName).observe(((Collection<?>) retVal).size());
-      }
-      return retVal;
+      return invocation.proceed();
     } catch (Throwable e) {
-      throwCounts.labels(className, methodName).inc();
+      success = false;
       throw e;
     } finally {
-      long duration = System.nanoTime() - startTime;
-
-      times.labels(className, methodName).observe(duration);
-      hits.labels(className, methodName).inc();
+      long duration = System.currentTimeMillis() - startTime;
+      histogram.labels(className, methodName, Boolean.toString(success)).observe(duration);
     }
   }
+
 }

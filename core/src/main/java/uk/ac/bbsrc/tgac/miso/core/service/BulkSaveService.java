@@ -15,6 +15,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.BulkValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
+import uk.ac.bbsrc.tgac.miso.core.util.PrometheusAsyncMonitor;
 import uk.ac.bbsrc.tgac.miso.core.util.ThrowingFunction;
 
 public interface BulkSaveService<T extends Identifiable> extends SaveService<T> {
@@ -26,11 +27,11 @@ public interface BulkSaveService<T extends Identifiable> extends SaveService<T> 
   public List<T> listByIdList(List<Long> ids) throws IOException;
 
   public default BulkSaveOperation<T> startBulkCreate(List<T> items, Consumer<BulkSaveOperation<T>> callback) throws IOException {
-    return startBulkOperation(items, this::create, callback);
+    return startBulkOperation(items, x -> PrometheusAsyncMonitor.monitor(getClass().getSimpleName(), "create", this::create, x), callback);
   }
 
   public default BulkSaveOperation<T> startBulkUpdate(List<T> items, Consumer<BulkSaveOperation<T>> callback) throws IOException {
-    return startBulkOperation(items, this::update, callback);
+    return startBulkOperation(items, x -> PrometheusAsyncMonitor.monitor(getClass().getSimpleName(), "update", this::update, x), callback);
   }
 
   public default BulkSaveOperation<T> startBulkOperation(List<T> items, ThrowingFunction<T, Long, IOException> action,
