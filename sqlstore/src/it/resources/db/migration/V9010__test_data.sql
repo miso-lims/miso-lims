@@ -861,9 +861,18 @@ INSERT INTO LibraryTemplate_Project(libraryTemplateId, projectId) VALUES
 (2, 1),
 (3, 2);
 
-INSERT INTO Workset(worksetId, alias, description, creator, created, lastModifier, lastModified) VALUES
-(1, 'test', 'test workset', 1, '2018-08-08 14:47:00', 1, '2018-08-08 14:47:00'),
-(2, 'two', 'second workset', 1, '2020-03-27 18:50:00', 1, '2020-03-27 18:50:00');
+INSERT INTO WorksetCategory(categoryId, alias) VALUES
+(1, 'Category A'),
+(2, 'Category B');
+
+INSERT INTO WorksetStage(stageId, alias) VALUES
+(1, 'Extraction'),
+(2, 'Library Preparation'),
+(3, 'Sequencing');
+
+INSERT INTO Workset(worksetId, alias, description, categoryId, stageId, creator, created, lastModifier, lastModified) VALUES
+(1, 'test', 'test workset', 1, 2, 1, '2018-08-08 14:47:00', 1, '2018-08-08 14:47:00'),
+(2, 'two', 'second workset', 1, 2, 1, '2020-03-27 18:50:00', 1, '2020-03-27 18:50:00');
 
 INSERT INTO Workset_Sample(worksetId, sampleId, addedTime) VALUES
 (1, 1, NULL),

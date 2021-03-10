@@ -180,6 +180,8 @@ public class AdvancedSearchParser {
           return PaginationFilter.tissueType(parts[1]);
         case "timepoint":
           return PaginationFilter.timepoint(parts[1]);
+        case "stage":
+          return PaginationFilter.stage(parts[1]);
         }
       }
       return PaginationFilter.query(x);

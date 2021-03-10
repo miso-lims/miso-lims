@@ -87,6 +87,8 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("studytype/list");
     slugs.add("workstation/list");
     slugs.add("sop/list");
+    slugs.add("worksetcategory/list");
+    slugs.add("worksetstage/list");
     slugs.add("printers");
     slugs.add("deletions");
 
@@ -211,6 +213,8 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("studytype/bulk/edit?ids=2%2C4");
     slugs.add("workstation/bulk/new?quantity=2");
     slugs.add("workstation/bulk/edit?ids=1%2C2");
+    slugs.add("worksetcategory/bulk/new?quantity=2");
+    slugs.add("worksetstage/bulk/new?quantity=2");
 
     slugs.add("tissuematerial/bulk/new?quantity=3");
     slugs.add("tissuematerial/bulk/edit?ids=1%2C2%2C3");
@@ -281,6 +285,8 @@ public class BulkErrorCrawlerIT extends AbstractIT {
         .put("pipeline/bulk/new", Collections.unmodifiableMap(new MapBuilder<String, String>().put("quantity", "2").build()))
         .put("pipeline/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
         .put("runlibraryqcstatus/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
+        .put("worksetcategory/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
+        .put("worksetstage/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
         .build());
   }
 

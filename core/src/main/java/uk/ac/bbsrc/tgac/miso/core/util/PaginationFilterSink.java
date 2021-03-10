@@ -31,6 +31,8 @@ public interface PaginationFilterSink<T> {
 
   public void restrictPaginationByCategory(T item, SopCategory category, Consumer<String> errorHandler);
 
+  public void restrictPaginationByCategory(T item, TextQuery query, Consumer<String> errorHandler);
+
   public void restrictPaginationByClass(T item, String name, Consumer<String> errorHandler);
 
   public void restrictPaginationByDate(T item, Date start, Date end, DateType type, Consumer<String> errorHandler);
@@ -78,6 +80,8 @@ public interface PaginationFilterSink<T> {
   public void restrictPaginationBySequencingParametersName(T item, TextQuery query, Consumer<String> errorHandler);
 
   public void restrictPaginationBySequencingParametersId(T item, long id, Consumer<String> errorHandler);
+
+  public void restrictPaginationByStage(T item, TextQuery query, Consumer<String> errorHandler);
 
   public void restrictPaginationBySubproject(T item, TextQuery query, Consumer<String> errorHandler);
 

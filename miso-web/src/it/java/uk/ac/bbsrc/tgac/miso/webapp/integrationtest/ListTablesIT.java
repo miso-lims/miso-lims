@@ -432,7 +432,7 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListWorksetsSetup() throws Exception {
     testTabbedPageSetup(ListTarget.WORKSETS,
-        Sets.newHashSet(Columns.SORT, Columns.ID, Columns.ALIAS, Columns.ITEMS, Columns.DESCRIPTION, Columns.LAST_MODIFIED));
+        Sets.newHashSet(Columns.SORT, Columns.ID, Columns.ALIAS, Columns.ITEMS, Columns.STAGE, Columns.DESCRIPTION, Columns.LAST_MODIFIED));
   }
 
   @Test
@@ -904,6 +904,26 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListRunLibraryQcStatusesColumnSort() throws Exception {
     testColumnsSort(ListTarget.RUN_LIBRARY_QC_STATUSES);
+  }
+
+  @Test
+  public void testListWorksetCategoriesSetup() throws Exception {
+    testPageSetup(ListTarget.WORKSET_CATEGORIES, Sets.newHashSet(Columns.ALIAS));
+  }
+
+  @Test
+  public void testListWorksetCategoriesColumnSort() throws Exception {
+    testColumnsSort(ListTarget.WORKSET_CATEGORIES);
+  }
+
+  @Test
+  public void testListWorksetStagesSetup() throws Exception {
+    testPageSetup(ListTarget.WORKSET_STAGES, Sets.newHashSet(Columns.ALIAS));
+  }
+
+  @Test
+  public void testListWorksetStagesColumnSort() throws Exception {
+    testColumnsSort(ListTarget.WORKSET_STAGES);
   }
 
   private void testPageSetup(String listTarget, Set<String> targetColumns) {

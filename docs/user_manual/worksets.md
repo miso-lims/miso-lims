@@ -1,13 +1,19 @@
 # Worksets
 
 Worksets provide a way of grouping samples, libraries, and library aliquots so that they are easy to find and select
-when you want to work with them again.
+when you want to work with them again. Worksets may specify a [category](../type_data/#workset-categories) and/or
+[stage](../type_data/#workset-stages) to be used for grouping and finding worksets according to responsibility or
+purpose. Both are described further in the linked articles.
+
+
 
 # Worksets List
 
 To get to the Worksets list page, click "Worksets" in the Tracking list in the menu on the left side of the screen. The
-Worksets list page is divided into two tabs. The "Mine" tab includes only the worksets that you created. The "All" tab
-includes all worksets created by anyone. The toolbar at the top of the table contains controls for working with
+Worksets list page is divided into two or more tabs. The "Mine" tab includes only the worksets that you created. The
+"All" tab includes all worksets created by anyone. If [workset categories](../type_data/#workset-categories) have been
+created, there will be another tab for each category, and an additional "Uncategorized" tab. Each workset will appear in
+the tab for whichever category it specifies. The toolbar at the top of the table contains controls for working with
 worksets.
 
 
@@ -36,7 +42,7 @@ On the Edit Workset page, you can also see and work with all of the items contai
 
 ## Working with Items in a Workset
 
-The Edit Workset page contains Samples, Libraries, and/or Library ALiquots lists, depending on what you've added to the
+The Edit Workset page contains Samples, Libraries, and Library Aliquots lists, depending on what you've added to the
 workset. These lists function the same as other Samples, Libraries, and Library Aliquots lists, so the same options for
 working with these items are available in the toolbars at the top of each table.
 
@@ -66,7 +72,7 @@ You may wish to remove items from one workset while adding the same items to ano
 transfering items to another person or team, for example. On the Edit Workset page, select the items you would like to
 move and then click the "Move to Workset" button in the toolbar at the top of the table. In the dialog that appears,
 type in the alias of the Workset that you want to move the items to and click "Search." Click on the alias of the
-workset to confirm and the items will be moved. 
+workset to confirm and the items will be moved.
 
 
 
@@ -86,4 +92,3 @@ This feature can also be used to copy an existing workset. If you only select a 
 
 To delete worksets, go to the Worksets list, check the checkboxes next to the worksets that you wish to delete, and
 click the "Delete" button in the toolbar at the top of the table.
-

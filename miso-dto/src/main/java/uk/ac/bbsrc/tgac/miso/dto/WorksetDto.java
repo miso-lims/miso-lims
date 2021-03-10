@@ -7,6 +7,8 @@ public class WorksetDto {
   private Long id;
   private String alias;
   private String description;
+  private Long categoryId;
+  private Long stageId;
   private List<Long> sampleIds;
   private List<Long> libraryIds;
   private List<Long> libraryAliquotIds;
@@ -35,6 +37,22 @@ public class WorksetDto {
 
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  public Long getCategoryId() {
+    return categoryId;
+  }
+
+  public void setCategoryId(Long categoryId) {
+    this.categoryId = categoryId;
+  }
+
+  public Long getStageId() {
+    return stageId;
+  }
+
+  public void setStageId(Long stageId) {
+    this.stageId = stageId;
   }
 
   public List<Long> getSampleIds() {

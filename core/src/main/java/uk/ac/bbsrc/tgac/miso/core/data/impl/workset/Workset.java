@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -31,6 +32,26 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.WorksetChangeLog;
 @Entity
 public class Workset implements Serializable, Aliasable, ChangeLoggable, Deletable {
 
+  public enum ReservedWord {
+    MINE("Mine"), ALL("All"), UNCATEGORIZED("Uncategorized");
+
+    private final String text;
+
+    private ReservedWord(String text) {
+      this.text = text;
+    }
+
+    public String getText() {
+      return text;
+    }
+
+    public static ReservedWord find(String word) {
+      return Stream.of(ReservedWord.values())
+          .filter(x -> x.getText().equalsIgnoreCase(word))
+          .findAny().orElse(null);
+    }
+  }
+  
   private static final long serialVersionUID = 1L;
 
   private static final long UNSAVED_ID = 0L;
@@ -43,6 +64,14 @@ public class Workset implements Serializable, Aliasable, ChangeLoggable, Deletab
   private String alias;
 
   private String description;
+
+  @ManyToOne
+  @JoinColumn(name = "categoryId")
+  private WorksetCategory category;
+
+  @ManyToOne
+  @JoinColumn(name = "stageId")
+  private WorksetStage stage;
 
   @OneToMany(mappedBy = "workset", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<WorksetSample> worksetSamples;
@@ -97,6 +126,22 @@ public class Workset implements Serializable, Aliasable, ChangeLoggable, Deletab
 
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  public WorksetCategory getCategory() {
+    return category;
+  }
+
+  public void setCategory(WorksetCategory category) {
+    this.category = category;
+  }
+
+  public WorksetStage getStage() {
+    return stage;
+  }
+
+  public void setStage(WorksetStage stage) {
+    this.stage = stage;
   }
 
   public Set<WorksetSample> getWorksetSamples() {

@@ -1119,8 +1119,34 @@ Urls = (function() {
     moveLibraries: middleIdUrlFunction(worksetRestBase, '/libraries/move'),
     moveLibraryAliquots: middleIdUrlFunction(worksetRestBase, '/libraryaliquots/move'),
     merge: worksetRestBase + '/merge',
-    creatorDatatable: idUrlFunction(worksetRestBase + '/dt'),
+    categoryDatatable: idUrlFunction(worksetRestBase + '/dt'),
     bulkDelete: worksetRestBase + '/bulk-delete'
+  };
+
+  // Workset Categories
+  var worksetCategoryUiBase = baseUrl + '/worksetcategory';
+  ui.worksetCategories = {
+    bulkCreate: worksetCategoryUiBase + '/bulk/new',
+    bulkEdit: worksetCategoryUiBase + '/bulk/edit'
+  };
+
+  var worksetCategoryRestBase = restBase + '/worksetcategories';
+  rest.worksetCategories = {
+    bulkSave: worksetCategoryRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(worksetCategoryRestBase + '/bulk')
+  };
+
+  // Workset Stages
+  var worksetStageUiBase = baseUrl + '/worksetstage';
+  ui.worksetStages = {
+    bulkCreate: worksetStageUiBase + '/bulk/new',
+    bulkEdit: worksetStageUiBase + '/bulk/edit'
+  };
+
+  var worksetStageRestBase = restBase + '/worksetstages';
+  rest.worksetStages = {
+    bulkSave: worksetStageRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(worksetStageRestBase + '/bulk')
   };
 
   // Workstations

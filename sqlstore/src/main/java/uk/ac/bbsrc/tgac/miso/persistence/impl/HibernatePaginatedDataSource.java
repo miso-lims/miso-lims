@@ -348,6 +348,11 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
+  default void restrictPaginationByStage(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s cannot be filtered by subproject.", getFriendlyName()));
+  }
+
+  @Override
   default void restrictPaginationBySubproject(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s cannot be filtered by subproject.", getFriendlyName()));
   }
@@ -409,6 +414,11 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   @Override
   public default void restrictPaginationByTissueType(Criteria item, TextQuery query, Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s has no tissue type", getFriendlyName()));
+  }
+
+  @Override
+  public default void restrictPaginationByCategory(Criteria item, TextQuery query, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s has no category", getFriendlyName()));
   }
 
   @Override

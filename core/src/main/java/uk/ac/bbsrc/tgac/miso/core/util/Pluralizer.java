@@ -122,6 +122,10 @@ public class Pluralizer {
     return pluralize(count, "type", "types");
   }
 
+  public static String worksets(long count) {
+    return pluralize(count, "workset", "worksets");
+  }
+
   private static String pluralize(long count, String singular, String plural) {
     return count == 1 ? singular : plural;
   }

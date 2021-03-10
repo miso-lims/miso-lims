@@ -537,6 +537,39 @@ it has not been used by any existing boxes.
 
 
 
+## Workset Categories
+
+By default, the Worksets list page has the following tabs.
+
+* Mine: includes all worksets created by the current user
+* All: includes all worksets
+
+If workset categories have been created, a tab will be added for each of them. An additional "Uncategorized" tab will be
+added and include any worksets without a category set. One example of useful groupings is to create a category for each
+team in your lab.
+
+MISO administrators can add, edit, and delete workset categories using the standard interface. A workset category can
+only be deleted if if has not been used by any existing worksets.
+
+
+
+## Workset Stages
+
+A workset may be used to follow a set of items through multiple stages of processing. For example, you might add samples
+to a workset upon receipt. You may need to perform QC on the samples, then create libraries, perform sequencing, and
+finally move the remaining items into long-term storage, or return them to a collaborator. You can use workset stages
+to represent where the items are in such a process. Following this example, you might have the following stages.
+
+* Sample QC
+* Library Prep
+* Sequencing
+* Distribution
+
+MISO administrators can add, edit, and delete workset stages using the standard interface. A workset stage can only be
+deleted if if has not been used by any existing worksets.
+
+
+
 ## Instrument Models
 
 Instrument models describe the instrument types that can be registered in MISO. These can be broken into three

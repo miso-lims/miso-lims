@@ -120,4 +120,6 @@ DELETE FROM ScientificName;
 DELETE FROM Sop;
 DELETE FROM Pipeline;
 DELETE FROM RunLibraryQcStatus;
+DELETE FROM WorksetCategory;
+DELETE FROM WorksetStage;
 SET FOREIGN_KEY_CHECKS=1;

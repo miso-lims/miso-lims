@@ -99,6 +99,8 @@
       <a href="<c:url value="/miso/studytype/list"/>">Study Types</a>
       <a href="<c:url value="/miso/workstation/list"/>">Workstations</a>
       <a href="<c:url value="/miso/sop/list"/>">SOPs</a>
+      <a href="<c:url value="/miso/worksetcategory/list"/>">Workset Categories</a>
+      <a href="<c:url value="/miso/worksetstage/list"/>">Workset Stages</a>
       <a href="<c:url value="/miso/printers"/>">Printers</a>
       <a href="<c:url value="/miso/deletions"/>">Deletion Log</a>
     </div>

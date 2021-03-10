@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
+import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.loadChildEntity;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,7 +35,9 @@ import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.core.service.WorksetCategoryService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
+import uk.ac.bbsrc.tgac.miso.core.service.WorksetStageService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
@@ -50,6 +54,10 @@ public class DefaultWorksetService implements WorksetService {
   private WorksetStore worksetStore;
   @Autowired
   private ListWorksetViewStore listWorksetViewStore;
+  @Autowired
+  private WorksetCategoryService worksetCategoryService;
+  @Autowired
+  private WorksetStageService worksetStageService;
   @Autowired
   private SampleService sampleService;
   @Autowired
@@ -145,6 +153,8 @@ public class DefaultWorksetService implements WorksetService {
   }
 
   private void loadMembers(Workset newWorkset, Date timestamp) throws IOException {
+    loadChildEntity(newWorkset::setCategory, newWorkset.getCategory(), worksetCategoryService, "categoryId");
+    loadChildEntity(newWorkset::setStage, newWorkset.getStage(), worksetStageService, "stageId");
     loadMembers(newWorkset, newWorkset.getWorksetSamples(), sampleService, timestamp);
     loadMembers(newWorkset, newWorkset.getWorksetLibraries(), libraryService, timestamp);
     loadMembers(newWorkset, newWorkset.getWorksetLibraryAliquots(), libraryAliquotService, timestamp);
@@ -169,6 +179,8 @@ public class DefaultWorksetService implements WorksetService {
   private void applyChanges(Workset from, Workset to) throws IOException {
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
+    to.setCategory(from.getCategory());
+    to.setStage(from.getStage());
   }
 
   private void validateChange(Workset workset, Workset beforeChange) throws IOException {

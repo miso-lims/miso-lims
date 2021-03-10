@@ -38,6 +38,20 @@ FormTarget.workset = (function($) {
           type: 'text',
           maxLength: 255
         }, {
+          title: 'Category',
+          data: 'categoryId',
+          type: 'dropdown',
+          source: Constants.worksetCategories,
+          getItemLabel: Utils.array.getAlias,
+          getItemValue: Utils.array.getId
+        }, {
+          title: 'Stage',
+          data: 'stageId',
+          type: 'dropdown',
+          source: Constants.worksetStages,
+          getItemLabel: Utils.array.getAlias,
+          getItemValue: Utils.array.getId
+        }, {
           title: 'Created By',
           data: 'creator',
           type: 'read-only',

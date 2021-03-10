@@ -6,6 +6,7 @@ public class ListWorksetViewDto {
   private String alias;
   private int itemCount;
   private String description;
+  private String stage;
   private String creator;
   private String lastModified;
 
@@ -39,6 +40,14 @@ public class ListWorksetViewDto {
 
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  public String getStage() {
+    return stage;
+  }
+
+  public void setStage(String stage) {
+    this.stage = stage;
   }
 
   public String getCreator() {
