@@ -30,6 +30,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.LabelCanvas.FontStyle;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -38,7 +39,39 @@ public enum PrintableField implements PrintableText {
 
     @Override
     public String text(Barcodable barcodable) {
-      return barcodable.getAlias();
+      return barcodable.visit(new BarcodableVisitor<String>() {
+
+        @Override
+        public String visitBox(Box box) {
+          return box.getAlias();
+        }
+
+        @Override
+        public String visitContainerModel(SequencingContainerModel model) {
+          return model.getAlias();
+        }
+
+        @Override
+        public String visitLibrary(Library library) {
+          return library.getAlias();
+        }
+
+        @Override
+        public String visitLibraryAliquot(LibraryAliquot libraryAliquot) {
+          return libraryAliquot.getAlias();
+        }
+
+        @Override
+        public String visitPool(Pool pool) {
+          return pool.getAlias();
+        }
+
+        @Override
+        public String visitSample(Sample sample) {
+          return sample.getAlias();
+        }
+
+      });
     }
 
   },

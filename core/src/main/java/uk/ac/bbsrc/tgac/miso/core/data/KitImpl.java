@@ -193,11 +193,6 @@ public class KitImpl implements Kit {
     return getKitDate();
   }
 
-  @Override
-  public String getAlias() {
-    return getLotNumber();
-  }
-
 
   @Override
   public boolean isSaved() {

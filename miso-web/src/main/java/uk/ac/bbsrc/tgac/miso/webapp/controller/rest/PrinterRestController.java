@@ -407,6 +407,6 @@ public class PrinterRestController extends RestController {
 
     return printer.printBarcode(user, request.getCopies(), request.getIds().stream()//
         .map(WhineyFunction.rethrow(fetcher))//
-        .sorted(Comparator.comparing(Barcodable::getAlias)));
+        .sorted(Comparator.comparing(Barcodable::getLabelText)));
   }
 }
