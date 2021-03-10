@@ -29,6 +29,15 @@ jQuery.ajaxSetup({
 var Utils = Utils
     || {
 
+      copyText: function(text) {
+        var input = document.createElement("textarea");
+        input.value = text;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand("Copy");
+        input.remove();
+      },
+
       decodeHtmlString: function(text) {
         var textarea = document.createElement('textarea');
         textarea.innerHTML = text;
@@ -488,7 +497,7 @@ var Utils = Utils
           buttons: buttons
         });
       },
-      showWizardDialog: function(title, actions, promptText) {
+      showWizardDialog: function(title, actions, promptText, cancelText) {
         var dialogArea = document.getElementById('dialog');
         while (dialogArea.hasChildNodes()) {
           dialogArea.removeChild(dialogArea.lastChild);
@@ -530,7 +539,7 @@ var Utils = Utils
           buttons: {
             "Cancel": {
               id: 'cancel',
-              text: 'Cancel',
+              text: cancelText || 'Cancel',
               click: function() {
                 dialog.dialog("close");
               }
@@ -1154,6 +1163,10 @@ Utils.page = {
     });
     form.appendTo(document.body);
     form.submit();
+  },
+
+  getBaseUrl: function() {
+    return window.location.protocol + '//' + window.location.host;
   }
 };
 

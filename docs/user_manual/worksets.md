@@ -26,8 +26,9 @@ table. This will take you to the Create Workset page. Enter an alias and descrip
 
 You can also create a new workset from a selection of items on the Samples, Libraries, or Library Aliquots lists. On
 any of these lists, select the items that you would like to include in a new workset and click the "Add to Workset"
-button in the toolbar at the top of the table. In the dialog that appears, choose "New Workset." Enter an alias and
-description for the new workset and click the "Create" button.
+button in the toolbar at the top of the table. In the dialog that appears, choose "New Workset." Complete the form for
+the new workset and click the "Create" button. After the workset has been created, another dialog will allow you to
+navigate to the Edit Workset page if you choose.
 
 
 
@@ -54,7 +55,8 @@ Samples, libraries, and library aliquots can be added to worksets. To add any of
 page, select the items that you wish to add to the workset, and click the "Add to Workset" button in the toolbar at the
 top of the table. In the dialog that appears, select "Existing Workset." Enter the alias of the workset you'd like to
 add the items to and click the "Search" button. In the search results, click the alias of the workset that you'd like
-to add the items to.
+to add the items to. After the items have been added, another dialog will allow you to navigate to the Edit Workset page
+if you choose.
 
 
 

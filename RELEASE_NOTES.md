@@ -3,6 +3,8 @@
 Changes:
 
 * Added workset categories and stages
+* Added a dialog after adding items to a workset, allowing you to navigate to
+  the Edit Workset page
 * Added detailed QC statuses for run-libraries
 * Prevent Run Scanner data from overriding user-specified index sequencing or
   sequencing parameters
