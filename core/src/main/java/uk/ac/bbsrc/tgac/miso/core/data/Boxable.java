@@ -29,7 +29,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferView;
  * This interface simply describes an object that can be placed into a box. i.e. Sample, Library
  * 
  */
-public interface Boxable extends Nameable, Barcodable, Serializable {
+public interface Boxable extends Aliasable, Barcodable, Serializable {
 
   public enum EntityType {
     SAMPLE("Sample", SampleImpl.class, SampleBoxableView.class, SampleBoxPosition::new), //
