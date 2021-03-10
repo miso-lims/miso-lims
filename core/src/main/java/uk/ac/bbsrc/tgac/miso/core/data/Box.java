@@ -12,7 +12,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
  * 
  * A Box usually has dimensions 8 by 12. (A-H, 1-12, A01 through H12)
  */
-public interface Box extends Aliasable, Barcodable, Locatable, ChangeLoggable, Serializable, Deletable {
+public interface Box extends Aliasable, Nameable, Barcodable, Locatable, ChangeLoggable, Serializable, Deletable {
 
   public static final String PREFIX = "BOX";
 

@@ -222,14 +222,6 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
     return getIdentificationBarcode() + " (" + getModel().getAlias() + ")";
   }
 
-  /**
-   * Containers don't have names, but they implement an interface which requires this method.
-   */
-  @Override
-  public String getName() {
-    throw new UnsupportedOperationException();
-  }
-
   @Override
   public Set<RunPosition> getRunPositions() {
     return runPositions;
