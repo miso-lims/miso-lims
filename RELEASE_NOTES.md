@@ -5,6 +5,8 @@ Changes:
 * Added detailed QC statuses for run-libraries
 * Prevent Run Scanner data from overriding user-specified index sequencing or
   sequencing parameters
+* Ignore items already included when adding a set of items to a workset
+  (previously, trying to add an item already in the workset caused an error)
 
 Upgrade Notes:
 

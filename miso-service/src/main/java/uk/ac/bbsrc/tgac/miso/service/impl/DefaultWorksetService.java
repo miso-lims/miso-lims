@@ -251,21 +251,25 @@ public class DefaultWorksetService implements WorksetService {
       throws IOException {
     Date now = new Date();
     Set<J> worksetItems = getter.apply(toWorkset);
+    List<T> itemsAdded = new ArrayList<>();
     for (T item : items) {
       T managedItem = service.get(item.getId());
       if (managedItem == null) {
         throw new ValidationException(String.format("%s %d not found", item.getEntityType().getLabel(), item.getId()));
       }
       if (worksetItems.stream().anyMatch(worksetItem -> worksetItem.getItem().getId() == managedItem.getId())) {
-        throw new ValidationException(String.format("Workset already contains %s (%s)", managedItem.getAlias(), managedItem.getName()));
+        continue;
       }
+      itemsAdded.add(managedItem);
       worksetItems.add(makeWorksetItem(constructor, managedItem, toWorkset, now));
     }
-    toWorkset.setChangeDetails(authorizationManager.getCurrentUser());
-    worksetStore.save(toWorkset);
-    String actionMessage = fromWorkset == null ? String.format("Added %s", typeLabel)
-        : String.format("Added %s from workset '%s'", typeLabel, fromWorkset.getAlias());
-    addChangeLogForItems(toWorkset, items, actionMessage, typeLabel);
+    if (!itemsAdded.isEmpty()) {
+      toWorkset.setChangeDetails(authorizationManager.getCurrentUser());
+      worksetStore.save(toWorkset);
+      String actionMessage = fromWorkset == null ? String.format("Added %s", typeLabel)
+          : String.format("Added %s from workset '%s'", typeLabel, fromWorkset.getAlias());
+      addChangeLogForItems(toWorkset, itemsAdded, actionMessage, typeLabel);
+    }
   }
 
   private <T extends Boxable, J extends WorksetItem<T>> void removeItems(Workset fromWorkset, Workset toWorkset, Collection<T> items,
