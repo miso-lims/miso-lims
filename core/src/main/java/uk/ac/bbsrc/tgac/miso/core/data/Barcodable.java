@@ -35,7 +35,7 @@ import java.util.TreeSet;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface Barcodable extends Nameable {
+public interface Barcodable extends Identifiable {
   public enum EntityType {
     LIBRARY_ALIQUOT, POOL, SAMPLE, LIBRARY, BOX, CONTAINER, CONTAINER_MODEL, KIT;
   }

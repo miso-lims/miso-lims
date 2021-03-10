@@ -81,7 +81,7 @@ public enum PrintableField implements PrintableText {
     public String text(Barcodable barcodable) {
       String str = barcodable.getIdentificationBarcode();
       if (LimsUtils.isStringBlankOrNull(str)) {
-        str = barcodable.getName();
+        str = NAME.text(barcodable);
       }
       return str;
     }
@@ -225,7 +225,34 @@ public enum PrintableField implements PrintableText {
 
     @Override
     public String text(Barcodable barcodable) {
-      return barcodable.getName();
+      return barcodable.visit(new BarcodableVisitor<String>() {
+
+        @Override
+        public String visitBox(Box box) {
+          return box.getName();
+        }
+
+        @Override
+        public String visitLibrary(Library library) {
+          return library.getName();
+        }
+
+        @Override
+        public String visitLibraryAliquot(LibraryAliquot libraryAliquot) {
+          return libraryAliquot.getName();
+        }
+
+        @Override
+        public String visitPool(Pool pool) {
+          return pool.getName();
+        }
+
+        @Override
+        public String visitSample(Sample sample) {
+          return sample.getName();
+        }
+
+      });
     }
 
   },

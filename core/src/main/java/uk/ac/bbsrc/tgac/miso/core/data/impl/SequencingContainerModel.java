@@ -134,14 +134,6 @@ public class SequencingContainerModel implements Aliasable, Deletable, Serializa
     this.fallback = fallback;
   }
 
-  /**
-   * ContainerModels don't have names, but they implement an interface which requires this method.
-   */
-  @Override
-  public String getName() {
-    throw new UnsupportedOperationException();
-  }
-
   @Override
   public boolean isSaved() {
     return getId() != UNSAVED_ID;

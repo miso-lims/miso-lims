@@ -38,7 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface Kit extends Comparable<Kit>, Barcodable, Locatable, Serializable {
+public interface Kit extends Comparable<Kit>, Barcodable, Locatable, Nameable, Serializable {
 
   /**
    * Returns the lotNumber of this Kit object.
