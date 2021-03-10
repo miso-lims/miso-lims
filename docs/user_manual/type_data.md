@@ -549,7 +549,7 @@ added and include any worksets without a category set. One example of useful gro
 team in your lab.
 
 MISO administrators can add, edit, and delete workset categories using the standard interface. A workset category can
-only be deleted if if has not been used by any existing worksets.
+only be deleted if it has not been used by any existing worksets.
 
 
 
@@ -566,7 +566,7 @@ to represent where the items are in such a process. Following this example, you 
 * Distribution
 
 MISO administrators can add, edit, and delete workset stages using the standard interface. A workset stage can only be
-deleted if if has not been used by any existing worksets.
+deleted if it has not been used by any existing worksets.
 
 
 
