@@ -2,6 +2,12 @@
 
 Changes:
 
+
+
+# 1.25.0
+
+Changes:
+
 * Added workset categories and stages
 * Added a dialog after adding items to a workset, allowing you to navigate to
   the Edit Workset page
