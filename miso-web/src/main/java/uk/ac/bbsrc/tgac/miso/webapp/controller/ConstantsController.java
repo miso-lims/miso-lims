@@ -98,6 +98,8 @@ import uk.ac.bbsrc.tgac.miso.core.service.TissueMaterialService;
 import uk.ac.bbsrc.tgac.miso.core.service.TissueOriginService;
 import uk.ac.bbsrc.tgac.miso.core.service.TissuePieceTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.TissueTypeService;
+import uk.ac.bbsrc.tgac.miso.core.service.WorksetCategoryService;
+import uk.ac.bbsrc.tgac.miso.core.service.WorksetStageService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.PrintableField;
@@ -195,6 +197,10 @@ public class ConstantsController {
   private PipelineService pipelineService;
   @Autowired
   private RunLibraryQcStatusService runLibraryQcStatusService;
+  @Autowired
+  private WorksetCategoryService worksetCategoryService;
+  @Autowired
+  private WorksetStageService worksetStageService;
   @Autowired
   private IndexChecker indexChecker;
 
@@ -295,6 +301,8 @@ public class ConstantsController {
       addJsonArray(mapper, node, "scientificNames", scientificNameService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "pipelines", pipelineService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "runLibraryQcStatuses", runLibraryQcStatusService.list(), Dtos::asDto);
+      addJsonArray(mapper, node, "worksetCategories", worksetCategoryService.list(), Dtos::asDto);
+      addJsonArray(mapper, node, "worksetStages", worksetStageService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "sampleSheetFormats", Arrays.asList(SampleSheet.values()), SampleSheet::name);
 
       Collection<IndexFamily> indexFamilies = indexFamilyService.list();

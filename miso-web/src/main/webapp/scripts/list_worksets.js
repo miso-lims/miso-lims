@@ -27,7 +27,7 @@ ListTarget.workset = {
     return Urls.external.userManual('worksets');
   },
   createUrl: function(config, projectId) {
-    return Urls.rest.worksets.creatorDatatable(config.creator);
+    return Urls.rest.worksets.categoryDatatable(config.category);
   },
   createBulkActions: function(config, projectId) {
     return [
@@ -92,6 +92,10 @@ ListTarget.workset = {
           include: true,
           iSortPriority: 0
         }, {
+          sTitle: 'Stage',
+          mData: 'stage',
+          sDefaultContent: ''
+        }, {
           sTitle: 'Description',
           mData: 'description',
           include: true,
@@ -109,6 +113,7 @@ ListTarget.workset = {
         }];
   },
   searchTermSelector: function(searchTerms) {
-    return [searchTerms['id'], searchTerms['entered'], searchTerms['changed'], searchTerms['creator'], searchTerms['changedby']];
+    return [searchTerms['id'], searchTerms['stage'], searchTerms['entered'], searchTerms['changed'], searchTerms['creator'],
+        searchTerms['changedby']];
   }
 };

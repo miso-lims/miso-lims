@@ -144,6 +144,10 @@ ListUtils = (function($) {
       term: "req:TEXT",
       help: "Checks whether an item has the specified requisition ID"
     },
+    "stage": {
+      term: "stage:TEXT",
+      help: "Checks whether an item is in the specified stage"
+    },
     "tissueOrigin": {
       term: "origin:TEXT",
       help: "Checks whether an item has the specified tissue origin"

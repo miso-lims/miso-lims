@@ -35,8 +35,8 @@ public abstract class HibernatePaginatedDataSourceIT extends AbstractDAOTest {
     INDEX, INSTRUMENT_TYPE, KIT_NAME, KIT_TYPE, LAB, MODIFIER, PENDING, //
     PLATFORM_TYPE, POOL, PROJECT, QUERY, RECEIVED, RECIPIENT_GROUPS, //
     REQUISITION, SEQUENCER, SEQUENCING_PARAMETERS_ID, //
-    SEQUENCING_PARAMETERS_NAME, SUBPROJECT, TIMEPOINT, TISSUE_ORIGIN, //
-    TISSUE_TYPE, TRANSFER_TYPE, UPDATED, WORKSET;
+    SEQUENCING_PARAMETERS_NAME, SOP_CATEGORY, STAGE, SUBPROJECT, TIMEPOINT, //
+    TISSUE_ORIGIN, TISSUE_TYPE, TRANSFER_TYPE, UPDATED, WORKSET;
   }
 
   @Rule
@@ -342,7 +342,17 @@ public abstract class HibernatePaginatedDataSourceIT extends AbstractDAOTest {
 
   @Test
   public void testSearchByCategory() throws Exception {
-    testSearch(PaginationFilter.category(SopCategory.LIBRARY), SearchType.CATEGORY);
+    testSearch(PaginationFilter.category("Category"), SearchType.CATEGORY);
+  }
+
+  @Test
+  public void testSearchByStage() throws Exception {
+    testSearch(PaginationFilter.stage("Stage"), SearchType.STAGE);
+  }
+
+  @Test
+  public void testSearchBySopCategory() throws Exception {
+    testSearch(PaginationFilter.category(SopCategory.LIBRARY), SearchType.SOP_CATEGORY);
   }
 
   @Test

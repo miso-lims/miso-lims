@@ -64,6 +64,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetCategory;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetStage;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
@@ -393,6 +395,16 @@ public class DeleteIT extends AbstractIT {
   @Test
   public void testDeleteRunLibraryQcStatus() {
     testAdminDelete(ListTarget.RUN_LIBRARY_QC_STATUSES, null, "DeleteMe", Columns.DESCRIPTION, RunLibraryQcStatus.class, 4L);
+  }
+
+  @Test
+  public void testDeleteWorksetCategory() {
+    testAdminDelete(ListTarget.WORKSET_CATEGORIES, null, "DeleteCategory", Columns.ALIAS, WorksetCategory.class, 3L);
+  }
+
+  @Test
+  public void testDeleteWorksetStage() {
+    testAdminDelete(ListTarget.WORKSET_STAGES, null, "DeleteStage", Columns.ALIAS, WorksetStage.class, 4L);
   }
 
   private void testDelete(String listTarget, String tab, String search, String selectByColumn, Class<?> clazz,

@@ -1398,27 +1398,10 @@ var HotUtils = {
             }, {
               name: 'New Workset',
               handler: function() {
-                var fields = [{
-                  label: 'Alias',
-                  property: 'alias',
-                  type: 'text',
-                  required: true
-                }, {
-                  label: 'Description',
-                  property: 'description',
-                  type: 'textarea',
-                  rows: 3,
-                  required: false
-                }];
-                Utils.showDialog('New Workset', 'Create', fields, function(input) {
-                  var workset = {
-                    alias: input.alias,
-                    description: input.description
-                  };
-                  workset[idsField] = ids;
-                  Utils.ajaxWithDialog('Creating Workset', 'POST', Urls.rest.worksets.create, workset, function() {
-                    Utils.showOkDialog('Add to Workset', ['New workset \'' + workset.alias + '\' created.']);
-                  });
+                var workset = {};
+                workset[idsField] = ids;
+                FormUtils.createFormDialog('New Workset', workset, 'workset', {}, function(saved) {
+                  Utils.showOkDialog('Add to Workset', ['New workset \'' + saved.alias + '\' created.']);
                 });
               }
             }]);

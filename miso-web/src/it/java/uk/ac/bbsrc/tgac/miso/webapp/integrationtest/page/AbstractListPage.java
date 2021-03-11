@@ -129,6 +129,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String SIZE_BP = "Size (bp)";
     public static final String SOP = "SOP";
     public static final String SORT = "";
+    public static final String STAGE = "Stage";
     public static final String START_DATE = "Start Date";
     public static final String STARTED = "Started";
     public static final String STATUS = "Status";
@@ -222,6 +223,8 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String TRANSFERS = "transfer/list";
     public static final String USERS = "admin/users";
     public static final String WORKSETS = "worksets";
+    public static final String WORKSET_CATEGORIES = "worksetcategory/list";
+    public static final String WORKSET_STAGES = "worksetstage/list";
     public static final String WORKSTATIONS = "workstation/list";
   }
 

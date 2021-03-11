@@ -36,6 +36,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
+import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayModel;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
@@ -218,10 +219,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.QcStatusUpdate;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.SampleQcNode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetItem;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetSample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetStage;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQcControlRun;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQC;
@@ -3636,6 +3639,8 @@ public class Dtos {
     setLong(dto::setId, from.getId(), true);
     setString(dto::setAlias, from.getAlias());
     setString(dto::setDescription, from.getDescription());
+    setId(dto::setCategoryId, from.getCategory());
+    setId(dto::setStageId, from.getStage());
     setWorksetItemIds(from.getWorksetSamples(), dto::setSampleIds);
     setWorksetItemIds(from.getWorksetLibraries(), dto::setLibraryIds);
     setWorksetItemIds(from.getWorksetLibraryAliquots(), dto::setLibraryAliquotIds);
@@ -3657,6 +3662,8 @@ public class Dtos {
     setLong(workset::setId, from.getId(), false);
     setString(workset::setAlias, from.getAlias());
     setString(workset::setDescription, from.getDescription());
+    setObject(workset::setCategory, WorksetCategory::new, from.getCategoryId());
+    setObject(workset::setStage, WorksetStage::new, from.getStageId());
     setWorksetItems(workset::setWorksetSamples, from.getSampleIds(), WorksetSample::new, SampleImpl::new);
     setWorksetItems(workset::setWorksetLibraries, from.getLibraryIds(), WorksetLibrary::new, LibraryImpl::new);
     setWorksetItems(workset::setWorksetLibraryAliquots, from.getLibraryAliquotIds(), WorksetLibraryAliquot::new, LibraryAliquot::new);
@@ -4139,6 +4146,7 @@ public class Dtos {
     setString(to::setAlias, from.getAlias());
     setInteger(to::setItemCount, from.getItemCount(), false);
     setString(to::setDescription, from.getDescription());
+    setString(to::setStage, from.getStage());
     setString(to::setCreator, maybeGetProperty(from.getCreator(), User::getFullName));
     setDateTimeString(to::setLastModified, from.getLastModified());
     return to;
@@ -4354,6 +4362,27 @@ public class Dtos {
     setLong(to::setId, from.getId(), false);
     setString(to::setDescription, from.getDescription());
     setBoolean(to::setQcPassed, from.getQcPassed(), true);
+    return to;
+  }
+
+  public static SimpleAliasableDto asDto(Aliasable from) {
+    SimpleAliasableDto to = new SimpleAliasableDto();
+    setLong(to::setId, from.getId(), true);
+    setString(to::setAlias, from.getAlias());
+    return to;
+  }
+
+  public static WorksetCategory toWorksetCategory(SimpleAliasableDto from) {
+    WorksetCategory to = new WorksetCategory();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setAlias, from.getAlias());
+    return to;
+  }
+
+  public static WorksetStage toWorksetStage(SimpleAliasableDto from) {
+    WorksetStage to = new WorksetStage();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setAlias, from.getAlias());
     return to;
   }
 

@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -15,7 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListWorksetView;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
+import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
 import uk.ac.bbsrc.tgac.miso.persistence.ListWorksetViewStore;
+import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
@@ -92,6 +95,16 @@ public class HibernateListWorksetViewDao implements ListWorksetViewStore, Hibern
         .add(Restrictions.ilike("alias", query, MatchMode.START))
         .list();
     return results;
+  }
+
+  @Override
+  public void restrictPaginationByCategory(Criteria item, TextQuery query, Consumer<String> errorHandler) {
+    item.add(DbUtils.textRestriction(query, "category"));
+  }
+
+  @Override
+  public void restrictPaginationByStage(Criteria item, TextQuery query, Consumer<String> errorHandler) {
+    item.add(DbUtils.textRestriction(query, "stage"));
   }
 
 }

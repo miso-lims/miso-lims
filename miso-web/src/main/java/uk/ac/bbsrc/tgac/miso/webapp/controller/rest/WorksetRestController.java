@@ -95,6 +95,17 @@ public class WorksetRestController extends RestController {
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.user(username, true));
   }
 
+  @GetMapping(value = "/dt/uncategorized", produces = "application/json")
+  public @ResponseBody DataTablesResponseDto<ListWorksetViewDto> dataTableForUncategorized(HttpServletRequest request) throws IOException {
+    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.category(""));
+  }
+
+  @GetMapping("/dt/{category}")
+  public @ResponseBody DataTablesResponseDto<ListWorksetViewDto> dataTableForCategory(HttpServletRequest request,
+      @PathVariable String category) throws IOException {
+    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.category(category));
+  }
+
   @GetMapping
   public @ResponseBody List<ListWorksetViewDto> queryWorksets(@RequestParam String q) throws IOException {
     return worksetService.listBySearch(q).stream().map(Dtos::asDto).collect(Collectors.toList());

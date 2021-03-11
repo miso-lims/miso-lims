@@ -1177,6 +1177,17 @@ INSERT INTO QcControl(controlId, qcTypeId, alias) VALUES
 INSERT INTO SampleQC(sample_sampleId, creator, date, type, results, created, lastModified) VALUES
 (2201, 1, '2018-07-10', 101, 4.3, '2018-07-10 14:29:00', '2018-07-10 14:29:00');
 
+INSERT INTO WorksetCategory(categoryId, alias) VALUES
+(1, 'Category A'),
+(2, 'Category B'),
+(3, 'DeleteCategory');
+
+INSERT INTO WorksetStage(stageId, alias) VALUES
+(1, 'Extraction'),
+(2, 'Library Preparation'),
+(3, 'Sequencing'),
+(4, 'DeleteStage');
+
 INSERT INTO Workset(worksetId, alias, description, creator, created, lastModifier, lastModified) VALUES
 (1, 'Workset One', 'Workset One description', 1, '2018-08-03 13:12:00', 1, '2018-08-03 13:12:00'),
 (2, 'Workset Two', 'Workset Two description', 3, '2018-08-03 13:12:00', 3, '2018-08-03 13:12:00');
