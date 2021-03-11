@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -69,6 +70,16 @@ public class HibernateWorkstationDaoIT extends AbstractDAOTest {
   public void testGetUsage() throws IOException {
     Workstation workstation = (Workstation) getSessionFactory().getCurrentSession().get(Workstation.class, 1L);
     assertEquals(4L, sut.getUsage(workstation));
+  }
+
+  @Test
+  public void testListByIdList() throws Exception {
+    testListByIdList(sut::listByIdList, Arrays.asList(2L, 3L));
+  }
+
+  @Test
+  public void testListByIdListNone() throws Exception {
+    testListByIdListNone(sut::listByIdList);
   }
 
 }

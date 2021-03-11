@@ -57,13 +57,15 @@ public interface PaginationFilterSink<T> {
 
   public void restrictPaginationByIndex(T item, TextQuery query, Consumer<String> errorHandler);
 
-  public void restrictPaginationByLab(T item, TextQuery query, Consumer<String> errorHandler);
-
   public void restrictPaginationByInstrumentType(T item, InstrumentType type, Consumer<String> errorHandler);
+
+  public void restrictPaginationByKitName(T item, TextQuery query, Consumer<String> errorHandler);
 
   public void restrictPaginationByKitType(T item, KitType type, Consumer<String> errorHandler);
 
-  public void restrictPaginationByKitName(T item, TextQuery query, Consumer<String> errorHandler);
+  public void restrictPaginationByLab(T item, TextQuery query, Consumer<String> errorHandler);
+
+  public void restrictPaginationByModel(T item, TextQuery query, Consumer<String> errorHandler);
 
   public void restrictPaginationByPending(T item, Consumer<String> errorHandler);
 
@@ -104,5 +106,7 @@ public interface PaginationFilterSink<T> {
   public void restrictPaginationByTissueType(T item, TextQuery query, Consumer<String> errorHandler);
 
   public void restrictPaginationByWorksetId(T item, long worksetId, Consumer<String> errorHandler);
+
+  public void restrictPaginationByWorkstation(T item, TextQuery query, Consumer<String> errorHandler);
 
 }

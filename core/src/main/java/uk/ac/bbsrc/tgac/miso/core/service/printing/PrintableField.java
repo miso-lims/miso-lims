@@ -20,6 +20,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
+import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pair;
@@ -28,6 +29,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.Workstation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
@@ -69,6 +71,16 @@ public enum PrintableField implements PrintableText {
         @Override
         public String visitSample(Sample sample) {
           return sample.getAlias();
+        }
+
+        @Override
+        public String visitWorkstation(Workstation workstation) {
+          return workstation.getAlias();
+        }
+
+        @Override
+        public String visitInstrument(Instrument instrument) {
+          return instrument.getName();
         }
 
       });
@@ -151,6 +163,11 @@ public enum PrintableField implements PrintableText {
         @Override
         public String visitSample(Sample sample) {
           return sample.getDescription();
+        }
+
+        @Override
+        public String visitWorkstation(Workstation workstation) {
+          return workstation.getDescription();
         }
 
       });

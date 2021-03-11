@@ -288,6 +288,11 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
+  default void restrictPaginationByModel(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s has no model associated with it.", getFriendlyName()));
+  }
+
+  @Override
   default void restrictPaginationByInstrumentType(Criteria criteria, InstrumentType type, Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s cannot be filtered by instrument type.", getFriendlyName()));
   }
@@ -429,5 +434,10 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   @Override
   default void restrictPaginationByWorksetId(Criteria criteria, long worksetId, Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s cannot be filtered by workset.", getFriendlyName()));
+  }
+
+  @Override
+  default void restrictPaginationByWorkstation(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s cannot be filtered by workstation.", getFriendlyName()));
   }
 }

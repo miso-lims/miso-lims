@@ -48,8 +48,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.ServiceRecordService;
+import uk.ac.bbsrc.tgac.miso.core.service.WorkstationService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentDto;
+import uk.ac.bbsrc.tgac.miso.dto.WorkstationDto;
 
 @Controller
 @RequestMapping("/instrument")
@@ -57,12 +59,12 @@ public class EditInstrumentController {
 
   @Autowired
   private AuthorizationManager authorizationManager;
-
   @Autowired
   private InstrumentService instrumentService;
-
   @Autowired
   private ServiceRecordService serviceRecordService;
+  @Autowired
+  private WorkstationService workstationService;
 
   public void setInstrumentService(InstrumentService instrumentService) {
     this.instrumentService = instrumentService;
@@ -116,6 +118,11 @@ public class EditInstrumentController {
       dto.put("value", type.name());
     }
     model.put("instrumentTypes", mapper.writeValueAsString(instrumentTypes));
+
+    List<WorkstationDto> workstationDtos = workstationService.list().stream()
+        .map(Dtos::asDto)
+        .collect(Collectors.toList());
+    model.put("workstations", mapper.writeValueAsString(workstationDtos));
 
     return new ModelAndView("/WEB-INF/pages/editInstrument.jsp", model);
   }

@@ -6,7 +6,7 @@ ListTarget.workstation = {
   getQueryUrl: null,
   showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
-    var actions = HotTarget.workstation.getBulkActions(config);
+    var actions = BulkTarget.workstation.getBulkActions(config);
     if (config.isAdmin) {
       actions.push(ListUtils.createBulkDeleteAction('Workstations', 'workstations', Utils.array.getAlias));
     }

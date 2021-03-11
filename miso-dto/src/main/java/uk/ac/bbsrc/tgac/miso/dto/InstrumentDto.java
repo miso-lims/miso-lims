@@ -9,6 +9,9 @@ public class InstrumentDto {
   private String instrumentModelAlias;
   private String platformType;
   private String serialNumber;
+  private String identificationBarcode;
+  private Long workstationId;
+  private String workstationAlias;
   private String status;
   private boolean outOfService;
   private String dateCommissioned;
@@ -136,6 +139,30 @@ public class InstrumentDto {
 
   public void setDefaultRunPurposeId(Long defaultRunPurposeId) {
     this.defaultRunPurposeId = defaultRunPurposeId;
+  }
+
+  public String getIdentificationBarcode() {
+    return identificationBarcode;
+  }
+
+  public void setIdentificationBarcode(String identificationBarcode) {
+    this.identificationBarcode = identificationBarcode;
+  }
+
+  public Long getWorkstationId() {
+    return workstationId;
+  }
+
+  public void setWorkstationId(Long workstationId) {
+    this.workstationId = workstationId;
+  }
+
+  public String getWorkstationAlias() {
+    return workstationAlias;
+  }
+
+  public void setWorkstationAlias(String workstationAlias) {
+    this.workstationAlias = workstationAlias;
   }
 
 }

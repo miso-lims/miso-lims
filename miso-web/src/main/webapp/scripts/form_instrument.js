@@ -7,7 +7,8 @@ FormTarget.instrument = (function($) {
    * Expected config {
    *   isAdmin: boolean,
    *   instrumentTypes: array,
-   *   instruments: array
+   *   instruments: array,
+   *   workstations: array
    * }
    */
 
@@ -54,13 +55,24 @@ FormTarget.instrument = (function($) {
         return instrument.platformType + ' - ' + instrument.instrumentModelAlias;
       }
     }, {
+      title: 'Name',
+      data: 'name',
+      type: 'read-only'
+    }, {
       title: 'Serial Number',
       data: 'serialNumber',
       type: 'read-only'
     }, {
-      title: 'Name',
-      data: 'name',
+      title: 'Barcode',
+      data: 'identificationBarcode',
       type: 'read-only'
+    }, {
+      title: 'Workstation',
+      data: 'workstationId',
+      type: 'read-only',
+      getDisplayValue: function(instrument) {
+        return instrument.workstationAlias || 'Not specified';
+      }
     }, {
       title: 'Upgraded From',
       data: 'preUpgradeInstrumentId',
@@ -161,16 +173,29 @@ FormTarget.instrument = (function($) {
         return item.platformType + item.alias;
       })
     }, {
-      title: 'Serial Number',
-      data: 'serialNumber',
-      type: 'text',
-      maxLength: 30
-    }, {
       title: 'Name',
       data: 'name',
       type: 'text',
       required: true,
       maxLength: 30
+    }, {
+      title: 'Serial Number',
+      data: 'serialNumber',
+      type: 'text',
+      maxLength: 30
+    }, {
+      title: 'Barcode',
+      data: 'identificationBarcode',
+      type: 'text',
+      maxLength: 255
+    }, {
+      title: 'Workstation',
+      data: 'workstationId',
+      type: 'dropdown',
+      source: config.workstations,
+      getItemLabel: Utils.array.getAlias,
+      getItemValue: Utils.array.getId,
+      sortSource: Utils.sorting.standardSort('alias')
     }, {
       title: 'Upgraded From',
       data: 'preUpgradeInstrumentId',

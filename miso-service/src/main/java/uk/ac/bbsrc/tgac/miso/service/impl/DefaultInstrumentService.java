@@ -17,6 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
+import uk.ac.bbsrc.tgac.miso.core.service.WorkstationService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
@@ -39,6 +40,8 @@ public class DefaultInstrumentService implements InstrumentService {
   private InstrumentModelService instrumentModelService;
   @Autowired
   private RunPurposeService runPurposeService;
+  @Autowired
+  private WorkstationService workstationService;
 
   @Override
   public List<Instrument> list() throws IOException {
@@ -115,12 +118,15 @@ public class DefaultInstrumentService implements InstrumentService {
     target.setDateDecommissioned(source.getDateDecommissioned());
     target.setUpgradedInstrument(source.getUpgradedInstrument());
     target.setDefaultRunPurpose(source.getDefaultRunPurpose());
+    target.setIdentificationBarcode(source.getIdentificationBarcode());
+    target.setWorkstation(source.getWorkstation());
   }
 
   private void loadChildEntities(Instrument instrument) throws IOException {
     loadChildEntity(instrument::setUpgradedInstrument, instrument.getUpgradedInstrument(), this, "upgradedInstrumentId");
     loadChildEntity(instrument::setInstrumentModel, instrument.getInstrumentModel(), instrumentModelService, "instrumentModelId");
     loadChildEntity(instrument::setDefaultRunPurpose, instrument.getDefaultRunPurpose(), runPurposeService, "defaultRunPurposeId");
+    loadChildEntity(instrument::setWorkstation, instrument.getWorkstation(), workstationService, "workstationId");
   }
 
   public void setInstrumentDao(InstrumentStore instrumentDao) {

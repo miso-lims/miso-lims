@@ -6,6 +6,10 @@ Changes:
 * Added a dialog after adding items to a workset, allowing you to navigate to
   the Edit Workset page
 * Added detailed QC statuses for run-libraries
+* Added workstation barcode field
+* Added instrument barcode and workstation fields
+* Added several advanced search terms for instruments
+* Added workstation search term for libraries
 * Prevent Run Scanner data from overriding user-specified index sequencing or
   sequencing parameters
 * Ignore items already included when adding a set of items to a workset

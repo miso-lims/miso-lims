@@ -28,11 +28,15 @@ PaneTarget.barcode = (function() {
   var transform = function(searchResult) {
     return Tile.make([
         Tile.title(searchResult.entityType),
-        Tile.lines(["Name: " + searchResult.name, searchResult.alias ? ("Alias: " + searchResult.alias) : null,
+        Tile.lines(["Name: " + (searchResult.name || 'n/a'), searchResult.alias ? ("Alias: " + searchResult.alias) : null,
             searchResult.identificationBarcode ? ("Barcode: " + searchResult.identificationBarcode) : null].filter(function(x) {
           return !!x;
         }))], function() {
-      window.location = window.location.origin + searchResult.url;
+      if (searchResult.url) {
+        window.location = window.location.origin + searchResult.url;
+      } else {
+        Utils.showOkDialog('Error', ['This item does not have its own page']);
+      }
     });
   };
 

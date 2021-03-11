@@ -68,4 +68,12 @@ public interface BarcodableVisitor<T> {
   default T visitSampleTissueProcessing(SampleTissueProcessing sample) {
     return this.visitSampleDetailed(sample);
   }
+
+  default T visitWorkstation(Workstation workstation) {
+    return null;
+  }
+
+  default T visitInstrument(Instrument instrument) {
+    return null;
+  }
 }

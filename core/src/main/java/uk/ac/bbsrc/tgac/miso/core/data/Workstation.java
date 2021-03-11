@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Objects;
 
 import javax.persistence.Entity;
@@ -11,7 +12,7 @@ import javax.persistence.Id;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
-public class Workstation implements Aliasable, Deletable, Serializable {
+public class Workstation implements Aliasable, Barcodable, Deletable, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -23,6 +24,7 @@ public class Workstation implements Aliasable, Deletable, Serializable {
 
   private String alias;
   private String description;
+  private String identificationBarcode;
 
   @Override
   public long getId() {
@@ -67,8 +69,18 @@ public class Workstation implements Aliasable, Deletable, Serializable {
   }
 
   @Override
+  public String getIdentificationBarcode() {
+    return identificationBarcode;
+  }
+
+  @Override
+  public void setIdentificationBarcode(String identificationBarcode) {
+    this.identificationBarcode = identificationBarcode;
+  }
+
+  @Override
   public int hashCode() {
-    return Objects.hash(workstationId, alias, description);
+    return Objects.hash(workstationId, alias, description, identificationBarcode);
   }
 
   @Override
@@ -76,7 +88,23 @@ public class Workstation implements Aliasable, Deletable, Serializable {
     return LimsUtils.equals(this, obj,
         Workstation::getId,
         Workstation::getAlias,
-        Workstation::getDescription);
+        Workstation::getDescription,
+        Workstation::getIdentificationBarcode);
+  }
+
+  @Override
+  public String getLabelText() {
+    return getAlias();
+  }
+
+  @Override
+  public Date getBarcodeDate() {
+    return null;
+  }
+
+  @Override
+  public <T> T visit(BarcodableVisitor<T> visitor) {
+    return visitor.visitWorkstation(this);
   }
 
 }

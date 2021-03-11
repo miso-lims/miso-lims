@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Workstation;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -28,6 +29,8 @@ public class DefaultWorkstationService extends AbstractSaveService<Workstation> 
   private AuthorizationManager authorizationManager;
   @Autowired
   private DeletionStore deletionStore;
+  @Autowired
+  private TransactionTemplate transactionTemplate;
 
   @Override
   public DeletionStore getDeletionStore() {
@@ -45,8 +48,18 @@ public class DefaultWorkstationService extends AbstractSaveService<Workstation> 
   }
 
   @Override
+  public TransactionTemplate getTransactionTemplate() {
+    return transactionTemplate;
+  }
+
+  @Override
   public List<Workstation> list() throws IOException {
     return workstationDao.list();
+  }
+
+  @Override
+  public List<Workstation> listByIdList(List<Long> ids) throws IOException {
+    return workstationDao.listByIdList(ids);
   }
 
   @Override
@@ -66,6 +79,7 @@ public class DefaultWorkstationService extends AbstractSaveService<Workstation> 
   protected void applyChanges(Workstation to, Workstation from) throws IOException {
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
+    to.setIdentificationBarcode(from.getIdentificationBarcode());
   }
 
   @Override
