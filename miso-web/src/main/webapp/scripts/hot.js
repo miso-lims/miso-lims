@@ -1357,54 +1357,72 @@ var HotUtils = {
     return {
       name: 'Add to Workset',
       action: function(items) {
+        var showAdded = function(pluralLabel, workset) {
+          Utils.showWizardDialog('Add to Workset', [{
+            name: 'Edit Workset',
+            handler: function() {
+              window.location = Urls.ui.worksets.edit(workset.id);
+            }
+          }, {
+            name: 'Edit in New Tab',
+            handler: function() {
+              window.open(Urls.ui.worksets.edit(workset.id));
+            }
+          }, {
+            name: 'Copy Link',
+            handler: function() {
+              Utils.copyText(Utils.page.getBaseUrl() + Urls.ui.worksets.edit(workset.id));
+              Utils.showOkDialog('Add to Workset', ['Workset URL copied to clipboard']);
+            }
+          }], 'The selected ' + pluralLabel + ' have been added to workset \'' + workset.alias + '\'.', 'Close');
+        };
+
         var ids = items.map(Utils.array.getId);
-        Utils.showWizardDialog('Add to Workset', [
-            {
-              name: 'Existing Workset',
-              handler: function() {
-                var doSearch = function() {
-                  var fields = [{
-                    label: 'Workset search',
-                    property: 'query',
-                    type: 'text',
-                    required: true
-                  }]
-                  Utils.showDialog('Add to Existing Workset', 'Search', fields, function(input) {
-                    Utils.ajaxWithDialog('Finding Worksets', 'GET', Urls.rest.worksets.query + '?' + jQuery.param({
-                      q: input.query
-                    }), null, function(worksets) {
-                      var selectFields = [];
-                      if (!worksets || !worksets.length) {
-                        Utils.showOkDialog('Workset Search', ['No matching worksets found.'], doSearch);
-                      } else {
-                        worksets.forEach(function(workset) {
-                          selectFields.push({
-                            name: workset.alias,
-                            handler: function() {
-                              Utils.ajaxWithDialog('Adding to Workset', 'POST', getAddUrlForWorksetId(workset.id), ids, function() {
-                                Utils.showOkDialog('Add to Workset', ['The selected ' + pluralLabel + ' have been added to workset \''
-                                    + workset.alias + '\'.']);
-                              });
-                            }
+        Utils.showWizardDialog('Add to Workset', [{
+          name: 'Existing Workset',
+          handler: function() {
+            var doSearch = function() {
+              var fields = [{
+                label: 'Workset search',
+                property: 'query',
+                type: 'text',
+                required: true
+              }]
+              Utils.showDialog('Add to Existing Workset', 'Search', fields, function(input) {
+                Utils.ajaxWithDialog('Finding Worksets', 'GET', Urls.rest.worksets.query + '?' + jQuery.param({
+                  q: input.query
+                }), null, function(worksets) {
+                  var selectFields = [];
+                  if (!worksets || !worksets.length) {
+                    Utils.showOkDialog('Workset Search', ['No matching worksets found.'], doSearch);
+                  } else {
+                    worksets.forEach(function(workset) {
+                      selectFields.push({
+                        name: workset.alias,
+                        handler: function() {
+                          Utils.ajaxWithDialog('Adding to Workset', 'POST', getAddUrlForWorksetId(workset.id), ids, function() {
+                            showAdded(pluralLabel, workset);
                           });
-                          Utils.showWizardDialog('Add to Existing Workset', selectFields);
-                        });
-                      }
+                        }
+                      });
+                      Utils.showWizardDialog('Add to Existing Workset', selectFields);
                     });
-                  });
-                }
-                doSearch();
-              }
-            }, {
-              name: 'New Workset',
-              handler: function() {
-                var workset = {};
-                workset[idsField] = ids;
-                FormUtils.createFormDialog('New Workset', workset, 'workset', {}, function(saved) {
-                  Utils.showOkDialog('Add to Workset', ['New workset \'' + saved.alias + '\' created.']);
+                  }
                 });
-              }
-            }]);
+              });
+            }
+            doSearch();
+          }
+        }, {
+          name: 'New Workset',
+          handler: function() {
+            var workset = {};
+            workset[idsField] = ids;
+            FormUtils.createFormDialog('New Workset', workset, 'workset', {}, function(saved) {
+              showAdded(pluralLabel, saved);
+            });
+          }
+        }]);
       }
     }
   },
