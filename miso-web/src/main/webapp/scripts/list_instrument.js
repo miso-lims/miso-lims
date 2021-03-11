@@ -72,10 +72,17 @@ ListTarget.instrument = {
         return full.outOfService ? "Out of Service" : data;
       }
     }, {
+      "sTitle": "Workstation",
+      "mData": "workstationAlias",
+      "sDefaultContent": ""
+    }, {
       "sTitle": "Serial Number",
       "mData": "serialNumber",
       "include": true,
       "iSortPriority": 0
     }];
+  },
+  searchTermSelector: function(searchTerms) {
+    return [searchTerms['id'], searchTerms['platform'], searchTerms['model'], searchTerms['workstation'], searchTerms['archived']];
   }
 };

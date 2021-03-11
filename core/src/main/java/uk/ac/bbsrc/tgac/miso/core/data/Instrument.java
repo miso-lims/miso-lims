@@ -29,7 +29,7 @@ import java.util.Set;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 
-public interface Instrument extends Deletable, Nameable, Serializable {
+public interface Instrument extends Barcodable, Deletable, Nameable, Serializable {
 
   public void setName(String name);
 
@@ -40,6 +40,10 @@ public interface Instrument extends Deletable, Nameable, Serializable {
   public void setSerialNumber(String serialNumber);
   
   public String getSerialNumber();
+
+  public Workstation getWorkstation();
+
+  public void setWorkstation(Workstation workstation);
 
   /**
    * Sets the date when use of this instrument began

@@ -40,12 +40,9 @@ public class BarcodableSearchRestController extends RestController {
   private BarcodableDto toDto(BarcodableView view) {
     BarcodableDto dto = Dtos.asDto(view);
 
-    if (Barcodable.EntityType.CONTAINER_MODEL.equals(view.getId().getTargetType())) {
-      // don't display the name as "null"
-      dto.setName("n/a");
-    } else {
-      // all barcodable views except container models are linkable
-      dto.setUrl(makeUrl(makeUrlComponent(view.getId().getTargetType()), view.getId().getTargetId()));
+    String urlComponent = makeUrlComponent(view.getId().getTargetType());
+    if (urlComponent != null) {
+      dto.setUrl(makeUrl(urlComponent, view.getId().getTargetId()));
     }
 
     return dto;
@@ -66,7 +63,7 @@ public class BarcodableSearchRestController extends RestController {
     case CONTAINER:
       return "container";
     default:
-      throw new IllegalArgumentException("Cannot make URL for entity type " + entityType.toString());
+      return null;
     }
   }
 

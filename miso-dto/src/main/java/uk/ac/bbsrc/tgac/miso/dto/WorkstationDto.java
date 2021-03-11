@@ -5,6 +5,7 @@ public class WorkstationDto {
   private Long id;
   private String alias;
   private String description;
+  private String identificationBarcode;
 
   public Long getId() {
     return id;
@@ -28,6 +29,14 @@ public class WorkstationDto {
 
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  public String getIdentificationBarcode() {
+    return identificationBarcode;
+  }
+
+  public void setIdentificationBarcode(String identificationBarcode) {
+    this.identificationBarcode = identificationBarcode;
   }
 
 }

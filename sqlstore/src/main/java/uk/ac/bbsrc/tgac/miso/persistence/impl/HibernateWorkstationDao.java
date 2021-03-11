@@ -1,6 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,11 @@ public class HibernateWorkstationDao extends HibernateSaveDao<Workstation> imple
   @Override
   public long getUsage(Workstation workstation) throws IOException {
     return getUsageBy(LibraryImpl.class, "workstation", workstation);
+  }
+
+  @Override
+  public List<Workstation> listByIdList(Collection<Long> ids) throws IOException {
+    return listByIdList("workstationId", ids);
   }
 
 }

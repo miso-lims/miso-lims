@@ -9,7 +9,8 @@ import uk.ac.bbsrc.tgac.miso.HibernatePaginatedDataSourceIT;
 public class HibernateInstrumentDaoSearchIT extends HibernatePaginatedDataSourceIT {
 
   private static final EnumSet<SearchType> VALID_SEARCH_TYPES = EnumSet.of(SearchType.QUERY, SearchType.ID, SearchType.IDS,
-      SearchType.PLATFORM_TYPE, SearchType.ARCHIVED, SearchType.INSTRUMENT_TYPE, SearchType.CREATED);
+      SearchType.PLATFORM_TYPE, SearchType.ARCHIVED, SearchType.INSTRUMENT_TYPE, SearchType.CREATED, SearchType.MODEL,
+      SearchType.WORKSTATION);
   private static final List<String> SORT_FIELDS = Arrays.asList("name", "platformType", "instrumentModelAlias");
 
   public HibernateInstrumentDaoSearchIT() {

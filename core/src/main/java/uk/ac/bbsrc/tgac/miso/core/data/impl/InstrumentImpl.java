@@ -46,11 +46,13 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import uk.ac.bbsrc.tgac.miso.core.data.BarcodableVisitor;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
+import uk.ac.bbsrc.tgac.miso.core.data.Workstation;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
@@ -74,6 +76,12 @@ public class InstrumentImpl implements Instrument {
   private InstrumentModel instrumentModel;
 
   private String serialNumber;
+  private String identificationBarcode;
+
+  @ManyToOne
+  @JoinColumn(name = "workstationId")
+  private Workstation workstation;
+
   @Temporal(TemporalType.DATE)
   private Date dateCommissioned;
   @Temporal(TemporalType.DATE)
@@ -143,6 +151,26 @@ public class InstrumentImpl implements Instrument {
   @Override
   public String getSerialNumber() {
     return serialNumber;
+  }
+
+  @Override
+  public String getIdentificationBarcode() {
+    return identificationBarcode;
+  }
+
+  @Override
+  public void setIdentificationBarcode(String identificationBarcode) {
+    this.identificationBarcode = identificationBarcode;
+  }
+
+  @Override
+  public Workstation getWorkstation() {
+    return workstation;
+  }
+
+  @Override
+  public void setWorkstation(Workstation workstation) {
+    this.workstation = workstation;
   }
 
   @Override
@@ -286,7 +314,8 @@ public class InstrumentImpl implements Instrument {
         getSerialNumber(),
         getServiceRecords(),
         getUpgradedInstrument(),
-        getDefaultRunPurpose());
+        getDefaultRunPurpose(),
+        getIdentificationBarcode());
   }
 
   @Override
@@ -301,7 +330,8 @@ public class InstrumentImpl implements Instrument {
         InstrumentImpl::getSerialNumber,
         InstrumentImpl::getServiceRecords,
         InstrumentImpl::getUpgradedInstrument,
-        InstrumentImpl::getDefaultRunPurpose);
+        InstrumentImpl::getDefaultRunPurpose,
+        InstrumentImpl::getIdentificationBarcode);
   }
 
   @Override
@@ -317,6 +347,21 @@ public class InstrumentImpl implements Instrument {
   @Override
   public String getDeleteDescription() {
     return getName() + " (" + getInstrumentModel().getAlias() + ")";
+  }
+
+  @Override
+  public String getLabelText() {
+    return getName();
+  }
+
+  @Override
+  public Date getBarcodeDate() {
+    return getDateCommissioned();
+  }
+
+  @Override
+  public <T> T visit(BarcodableVisitor<T> visitor) {
+    return visitor.visitInstrument(this);
   }
 
 }

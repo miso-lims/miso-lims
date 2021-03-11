@@ -2999,6 +2999,9 @@ public class Dtos {
     setBoolean(dto::setOutOfService, from.isOutOfService(), false);
     setId(dto::setUpgradedInstrumentId, from.getUpgradedInstrument());
     setId(dto::setDefaultRunPurposeId, from.getDefaultRunPurpose());
+    setString(dto::setIdentificationBarcode, from.getIdentificationBarcode());
+    setId(dto::setWorkstationId, from.getWorkstation());
+    setString(dto::setWorkstationAlias, maybeGetProperty(from.getWorkstation(), Workstation::getAlias));
     return dto;
   }
 
@@ -3012,6 +3015,8 @@ public class Dtos {
     setString(to::setSerialNumber, dto.getSerialNumber());
     setObject(to::setUpgradedInstrument, InstrumentImpl::new, dto.getUpgradedInstrumentId());
     setObject(to::setDefaultRunPurpose, RunPurpose::new, dto.getDefaultRunPurposeId());
+    setString(to::setIdentificationBarcode, dto.getIdentificationBarcode());
+    setObject(to::setWorkstation, Workstation::new, dto.getWorkstationId());
     return to;
   }
 
@@ -4129,6 +4134,7 @@ public class Dtos {
     setLong(to::setId, from.getId(), true);
     setString(to::setAlias, from.getAlias());
     setString(to::setDescription, from.getDescription());
+    setString(to::setIdentificationBarcode, from.getIdentificationBarcode());
     return to;
   }
 
@@ -4137,6 +4143,7 @@ public class Dtos {
     setLong(to::setId, from.getId(), false);
     setString(to::setAlias, from.getAlias());
     setString(to::setDescription, from.getDescription());
+    setString(to::setIdentificationBarcode, from.getIdentificationBarcode());
     return to;
   }
 

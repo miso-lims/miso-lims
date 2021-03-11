@@ -159,6 +159,18 @@ ListUtils = (function($) {
     "timepoint": {
       term: "timepoint:TEXT",
       help: "Checks whether the item's timepoint matches."
+    },
+    "model": {
+      term: "model:TEXT",
+      help: "Checks whether the item's model matches"
+    },
+    "archived": {
+      term: "is:archived OR not:archived",
+      help: "Checks whether the item is archived/retired"
+    },
+    "workstation": {
+      term: "workstation:TEXT",
+      help: "Checks whether the item belongs to or was prepared at the specified workstation. May specify the workstation alias or barcode"
     }
   };
 

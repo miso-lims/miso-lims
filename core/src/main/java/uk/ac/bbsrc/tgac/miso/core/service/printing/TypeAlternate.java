@@ -15,12 +15,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.BarcodableVisitor;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pair;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.Workstation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.LabelCanvas.FontStyle;
@@ -73,6 +75,16 @@ public final class TypeAlternate implements PrintableText {
       @Override
       public EntityType visitSample(Sample sample) {
         return EntityType.SAMPLE;
+      }
+
+      @Override
+      public EntityType visitWorkstation(Workstation workstation) {
+        return EntityType.WORKSTATION;
+      }
+
+      @Override
+      public EntityType visitInstrument(Instrument instrument) {
+        return EntityType.INSTRUMENT;
       }
     }), PrintableText.NULL);
   }

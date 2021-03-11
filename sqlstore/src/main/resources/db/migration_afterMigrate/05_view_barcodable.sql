@@ -47,4 +47,18 @@ CREATE OR REPLACE VIEW BarcodableView AS
               NULL              AS name,
               alias             AS alias,
               'CONTAINER_MODEL' AS targetType
-            FROM SequencingContainerModel;
+            FROM SequencingContainerModel
+  UNION ALL SELECT
+              workstationId,
+              identificationBarcode,
+              NULL          AS name,
+              alias         AS alias,
+              'WORKSTATION' AS targetType
+            FROM Workstation
+  UNION ALL SELECT
+              instrumentId,
+              identificationBarcode,
+              name         AS name,
+              NULL         AS alias,
+              'INSTRUMENT' AS targetType
+            FROM Instrument;

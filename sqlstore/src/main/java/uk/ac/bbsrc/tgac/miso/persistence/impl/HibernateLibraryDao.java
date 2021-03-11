@@ -320,4 +320,10 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
     DbUtils.restrictPaginationByDistributionRecipient(criteria, query, "libraries", "libraryId");
   }
 
+  @Override
+  public void restrictPaginationByWorkstation(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    criteria.createAlias("workstation", "workstation")
+        .add(DbUtils.textRestriction(query, "workstation.alias", "workstation.identificationBarcode"));
+  }
+
 }

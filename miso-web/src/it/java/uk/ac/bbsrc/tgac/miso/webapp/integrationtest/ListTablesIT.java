@@ -335,7 +335,8 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListInstrumentsSetup() throws Exception {
     testTabbedPageSetup(ListTarget.INSTRUMENTS,
-        Sets.newHashSet(Columns.INSTRUMENT_NAME, Columns.PLATFORM, Columns.INSTRUMENT_MODEL, Columns.STATUS, Columns.SERIAL_NUMBER));
+        Sets.newHashSet(Columns.INSTRUMENT_NAME, Columns.PLATFORM, Columns.INSTRUMENT_MODEL, Columns.STATUS, Columns.WORKSTATION,
+            Columns.SERIAL_NUMBER));
   }
 
   @Test

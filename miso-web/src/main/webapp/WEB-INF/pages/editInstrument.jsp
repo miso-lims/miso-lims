@@ -75,7 +75,8 @@
         FormUtils.createForm('instrumentForm', 'save', ${instrumentDto}, 'instrument', {
           isAdmin: ${miso:isAdmin()},
           instrumentTypes: ${instrumentTypes},
-          instruments: ${otherInstruments}
+          instruments: ${otherInstruments},
+          workstations: ${workstations}
         });
         Utils.ui.updateHelpLink(FormTarget.instrument.getUserManualUrl());
       });

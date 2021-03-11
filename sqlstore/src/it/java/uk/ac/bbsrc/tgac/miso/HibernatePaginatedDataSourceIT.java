@@ -32,11 +32,11 @@ public abstract class HibernatePaginatedDataSourceIT extends AbstractDAOTest {
     ARCHIVED, ARRAYED, BATCH, BOX, BOX_TYPE, BOX_USE, CATEGORY, CLASS, //
     CREATED, CREATOR, DISTRIBUTED, DISTRIBUTION_RECIPIENT, DRAFT, ENTERED, //
     EXTERNAL_NAME, FULFILLED, FREEZER, GHOST, GROUP_ID, HEALTH, ID, IDS, //
-    INDEX, INSTRUMENT_TYPE, KIT_NAME, KIT_TYPE, LAB, MODIFIER, PENDING, //
-    PLATFORM_TYPE, POOL, PROJECT, QUERY, RECEIVED, RECIPIENT_GROUPS, //
+    INDEX, INSTRUMENT_TYPE, KIT_NAME, KIT_TYPE, LAB, MODEL, MODIFIER, //
+    PENDING, PLATFORM_TYPE, POOL, PROJECT, QUERY, RECEIVED, RECIPIENT_GROUPS, //
     REQUISITION, SEQUENCER, SEQUENCING_PARAMETERS_ID, //
     SEQUENCING_PARAMETERS_NAME, SOP_CATEGORY, STAGE, SUBPROJECT, TIMEPOINT, //
-    TISSUE_ORIGIN, TISSUE_TYPE, TRANSFER_TYPE, UPDATED, WORKSET;
+    TISSUE_ORIGIN, TISSUE_TYPE, TRANSFER_TYPE, UPDATED, WORKSET, WORKSTATION;
   }
 
   @Rule
@@ -358,6 +358,16 @@ public abstract class HibernatePaginatedDataSourceIT extends AbstractDAOTest {
   @Test
   public void testSearchByWorksetId() throws Exception {
     testSearch(PaginationFilter.workset(1L), SearchType.WORKSET);
+  }
+
+  @Test
+  public void testSearchByModel() throws Exception {
+    testSearch(PaginationFilter.model("model"), SearchType.MODEL);
+  }
+
+  @Test
+  public void testSearchByWorkstation() throws Exception {
+    testSearch(PaginationFilter.workstation("station"), SearchType.WORKSTATION);
   }
 
   /**

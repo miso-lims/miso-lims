@@ -494,6 +494,26 @@ public abstract interface PaginationFilter {
     };
   }
 
+  public static PaginationFilter model(String model) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByModel(item, new TextQuery(model), errorHandler);
+      }
+    };
+  }
+
+  public static PaginationFilter workstation(String workstation) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByWorkstation(item, new TextQuery(workstation), errorHandler);
+      }
+    };
+  }
+
   public abstract <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler);
 
 }

@@ -37,7 +37,7 @@ import java.util.TreeSet;
  */
 public interface Barcodable extends Identifiable {
   public enum EntityType {
-    LIBRARY_ALIQUOT, POOL, SAMPLE, LIBRARY, BOX, CONTAINER, CONTAINER_MODEL, KIT;
+    LIBRARY_ALIQUOT, POOL, SAMPLE, LIBRARY, BOX, CONTAINER, CONTAINER_MODEL, KIT, WORKSTATION, INSTRUMENT;
   }
 
   /**

@@ -84,6 +84,18 @@ public class AdvancedSearchParser {
             return PaginationFilter.ghost(true);
           case "real":
             return PaginationFilter.ghost(false);
+          case "archived":
+          case "retired":
+            return PaginationFilter.archived(true);
+          default:
+            errorHandler.accept("No filter for " + x);
+            return null;
+          }
+        case "not":
+          switch (parts[1].toLowerCase()) {
+          case "archived":
+          case "retired":
+            return PaginationFilter.archived(false);
           default:
             errorHandler.accept("No filter for " + x);
             return null;
@@ -182,6 +194,10 @@ public class AdvancedSearchParser {
           return PaginationFilter.timepoint(parts[1]);
         case "stage":
           return PaginationFilter.stage(parts[1]);
+        case "model":
+          return PaginationFilter.model(parts[1]);
+        case "workstation":
+          return PaginationFilter.workstation(parts[1]);
         }
       }
       return PaginationFilter.query(x);

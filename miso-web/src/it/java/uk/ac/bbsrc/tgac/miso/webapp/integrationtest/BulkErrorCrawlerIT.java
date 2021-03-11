@@ -212,7 +212,6 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("studytype/bulk/new?quantity=3");
     slugs.add("studytype/bulk/edit?ids=2%2C4");
     slugs.add("workstation/bulk/new?quantity=2");
-    slugs.add("workstation/bulk/edit?ids=1%2C2");
     slugs.add("worksetcategory/bulk/new?quantity=2");
     slugs.add("worksetstage/bulk/new?quantity=2");
 
@@ -287,6 +286,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
         .put("runlibraryqcstatus/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
         .put("worksetcategory/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
         .put("worksetstage/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
+        .put("workstation/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
         .build());
   }
 

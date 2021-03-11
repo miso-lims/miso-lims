@@ -1158,8 +1158,8 @@ Urls = (function() {
 
   var workstationRestBase = restBase + '/workstations';
   rest.workstations = {
-    create: workstationRestBase,
-    update: idUrlFunction(workstationRestBase)
+    bulkSave: workstationRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(workstationRestBase + '/bulk')
   };
 
   // Downloads

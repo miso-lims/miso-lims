@@ -32,6 +32,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,14 +45,18 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.QC;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
+import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
 import uk.ac.bbsrc.tgac.miso.persistence.InstrumentStore;
+import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
 public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginatedDataSource<Instrument> {
 
-  private static final String[] SEARCH_PROPERTIES = new String[] { "name", "instrumentModel.alias" };
-  private static final List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("instrumentModel"));
+  private static final String[] SEARCH_PROPERTIES = new String[] { "name", "serialNumber", "identificationBarcode" };
+  private static final List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(
+      new AliasDescriptor("instrumentModel"),
+      new AliasDescriptor("workstation", JoinType.LEFT_OUTER_JOIN));
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -155,6 +160,8 @@ public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginat
       return "instrumentModel.platformType";
     case "instrumentModelAlias":
       return "instrumentModel.alias";
+    case "workstationAlias":
+      return "workstation.alias";
     default:
       return original;
     }
@@ -178,6 +185,16 @@ public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginat
   @Override
   public void restrictPaginationByInstrumentType(Criteria criteria, InstrumentType type, Consumer<String> errorHandler) {
     criteria.add(Restrictions.eq("instrumentModel.instrumentType", type));
+  }
+
+  @Override
+  public void restrictPaginationByModel(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    criteria.add(DbUtils.textRestriction(query, "instrumentModel.alias"));
+  }
+
+  @Override
+  public void restrictPaginationByWorkstation(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+    criteria.add(DbUtils.textRestriction(query, "workstation.alias", "workstation.identificationBarcode"));
   }
 
   @Override

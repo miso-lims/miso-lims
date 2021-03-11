@@ -156,6 +156,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String VOLUME = "Volume";
     public static final String VOLUME_UNITS = "Vol. Units";
     public static final String VOLUME_USED = "Vol. Lib. Used";
+    public static final String WORKSTATION = "Workstation";
   }
 
   public static class ListTarget {
