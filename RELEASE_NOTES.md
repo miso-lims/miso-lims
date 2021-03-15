@@ -2,7 +2,8 @@
 
 Changes:
 
-
+* Improved error message when attempting to delete a library aliquot that
+  is included in a pool order
 
 # 1.25.0
 

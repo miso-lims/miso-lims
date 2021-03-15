@@ -413,8 +413,12 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
 
     int poolCount = poolService.listByLibraryAliquotId(object.getId()).size();
     if (poolCount > 0) {
-      result.addError(
-          new ValidationError(String.format("%s is included in %d %s", object.getName(), poolCount, Pluralizer.pools(poolCount))));
+      result.addError(ValidationError.forDeletionUsage(object, poolCount, Pluralizer.pools(poolCount)));
+    }
+
+    long orderCount = libraryAliquotDao.getUsageByPoolOrders(object);
+    if (orderCount > 0L) {
+      result.addError(ValidationError.forDeletionUsage(object, orderCount, "pool " + Pluralizer.orders(orderCount)));
     }
 
     return result;
