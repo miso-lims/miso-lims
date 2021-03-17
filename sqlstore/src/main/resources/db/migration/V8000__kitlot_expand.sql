@@ -1,0 +1,1 @@
+ALTER TABLE Library MODIFY kitLot varchar(1000);
