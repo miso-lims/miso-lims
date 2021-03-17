@@ -2,7 +2,8 @@
 
 Changes:
 
-
+* Extend 'Kit Lot' field on Libraries to 1000 characters
+* Add front-end error checking for Kit Lot length
 
 # 1.25.0
 
