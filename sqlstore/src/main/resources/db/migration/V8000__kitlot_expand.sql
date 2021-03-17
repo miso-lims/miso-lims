@@ -1,1 +1,1 @@
-ALTER TABLE Library MODIFY kitLot varchar(1000);
+ALTER TABLE Library MODIFY COLUMN kitLot varchar(1000);

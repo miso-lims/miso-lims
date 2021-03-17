@@ -625,6 +625,7 @@ BulkTarget.library = (function($) {
                 title: 'Kit Lot',
                 type: 'text',
                 data: 'kitLot',
+                maxLength: 1000,
                 include: !config.isLibraryReceipt,
                 required: config.pageMode === 'propagate',
                 regex: Utils.validation.uriComponentRegex
