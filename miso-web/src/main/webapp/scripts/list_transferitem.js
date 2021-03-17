@@ -142,7 +142,13 @@ ListTarget.transferitem = (function() {
         mData: 'boxId',
         mRender: function(data, type, full) {
           if (type === 'display') {
-            return data ? "<a href='" + Urls.ui.boxes.edit(data) + "'>" + full.boxAlias + ' ' + full.boxPosition + "</a>" : 'Unknown';
+            if (data) {
+              return "<a href='" + Urls.ui.boxes.edit(data) + "'>" + full.boxAlias + ' ' + full.boxPosition + "</a>"
+            } else if (full.boxAlias) {
+              return full.boxAlias + ' ' + full.boxPosition;
+            } else {
+              return 'Unknown';
+            }
           }
           return data;
         },

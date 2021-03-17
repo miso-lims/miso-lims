@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.context;
 import static j2html.TagCreator.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -34,6 +35,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferItem;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferNotification;
@@ -319,7 +321,7 @@ public class NotificationManager {
     if (detailed) {
       headerRow = headerRow.with(makeTh("Subproject"), makeTh("Group ID"), makeTh("Group Description"));
     }
-    headerRow = headerRow.with(makeTh("Barcode"));
+    headerRow = headerRow.with(makeTh("Barcode"), makeTh("Location"));
 
     List<ContainerTag> rows = new ArrayList<>();
     for (TransferSample transferSample : transferSamples) {
@@ -331,9 +333,10 @@ public class NotificationManager {
         cells.add(makeTd(dnaOrRna(detailedSample)));
         cells.add(makeTd(detailedSample.getIdentityAttributes().getExternalName()));
       }
-      cells.add(makeTd(LimsUtils.toNiceString(sample.getVolume())));
+      BigDecimal volume = transferSample.getDistributedVolume() != null ? transferSample.getDistributedVolume() : sample.getVolume();
+      cells.add(makeTd(LimsUtils.toNiceString(volume)));
       cells.add(makeTd(LimsUtils.toNiceString(sample.getConcentration())));
-      cells.add(makeTd(getYieldString(sample)));
+      cells.add(makeTd(getYieldString(volume, sample.getConcentration())));
       if (detailed) {
         cells.add(makeTd(detailedSample.getSubproject() == null ? null : detailedSample.getSubproject().getAlias()));
         GroupIdentifiable groupIdEntity = detailedSample.getEffectiveGroupIdEntity();
@@ -341,15 +344,26 @@ public class NotificationManager {
         cells.add(makeTd(groupIdEntity == null ? null : groupIdEntity.getGroupDescription()));
       }
       cells.add(makeTd(sample.getIdentificationBarcode()));
+      cells.add(makeTd(makeLocationLabel(transferSample)));
       rows.add(tr().with(cells));
     }
 
     return makeTable(headerRow, rows);
   }
 
+  private static String makeLocationLabel(TransferItem<?> item) {
+    if (item.getDistributedBoxAlias() != null) {
+      return item.getDistributedBoxAlias() + " " + item.getDistributedBoxPosition();
+    } else if (item.getItem().getBox() != null) {
+      return item.getItem().getBox().getAlias() + " " + item.getItem().getBoxPosition();
+    } else {
+      return "Unknown";
+    }
+  }
+
   private static ContainerTag makeLibraryTable(Collection<TransferLibrary> transferLibraries) {
-    ContainerTag headerRow = tr(makeTh("Alias"), makeTh("Barcode"), makeTh("Platform"), makeTh("Type"), makeTh("i7 Index Name"),
-        makeTh("i7 Index"), makeTh("i5 Index Name"), makeTh("i5 Index"));
+    ContainerTag headerRow = tr(makeTh("Alias"), makeTh("Barcode"), makeTh("Location"), makeTh("Platform"), makeTh("Type"),
+        makeTh("i7 Index Name"), makeTh("i7 Index"), makeTh("i5 Index Name"), makeTh("i5 Index"));
 
     List<ContainerTag> rows = new ArrayList<>();
     for (TransferLibrary transferLibrary : transferLibraries) {
@@ -357,6 +371,7 @@ public class NotificationManager {
       List<DomContent> cells = new ArrayList<>();
       cells.add(makeTd(library.getAlias()));
       cells.add(makeTd(library.getIdentificationBarcode()));
+      cells.add(makeTd(makeLocationLabel(transferLibrary)));
       cells.add(makeTd(library.getPlatformType().getKey()));
       cells.add(makeTd(library.getLibraryType().getDescription()));
       cells.add(makeTd(getIndexName(library, 1)));
@@ -370,8 +385,8 @@ public class NotificationManager {
   }
 
   private static ContainerTag makeLibraryAliquotTable(Collection<TransferLibraryAliquot> transferLibraryAliquots) {
-    ContainerTag headerRow = tr(makeTh("Alias"), makeTh("Barcode"), makeTh("Platform"), makeTh("Type"), makeTh("i7 Index Name"),
-        makeTh("i7 Index"), makeTh("i5 Index Name"), makeTh("i5 Index"), makeTh("Targeted Sequencing"));
+    ContainerTag headerRow = tr(makeTh("Alias"), makeTh("Barcode"), makeTh("Location"), makeTh("Platform"), makeTh("Type"),
+        makeTh("i7 Index Name"), makeTh("i7 Index"), makeTh("i5 Index Name"), makeTh("i5 Index"), makeTh("Targeted Sequencing"));
 
     List<ContainerTag> rows = new ArrayList<>();
     for (TransferLibraryAliquot transferLibraryAliquot : transferLibraryAliquots) {
@@ -380,6 +395,7 @@ public class NotificationManager {
       List<DomContent> cells = new ArrayList<>();
       cells.add(makeTd(libraryAliquot.getAlias()));
       cells.add(makeTd(libraryAliquot.getIdentificationBarcode()));
+      cells.add(makeTd(makeLocationLabel(transferLibraryAliquot)));
       cells.add(makeTd(library.getPlatformType().getKey()));
       cells.add(makeTd(library.getLibraryType().getDescription()));
       cells.add(makeTd(getIndexName(library, 1)));
@@ -393,7 +409,7 @@ public class NotificationManager {
   }
 
   private static ContainerTag makePoolTable(Collection<TransferPool> transferPools) {
-    ContainerTag headerRow = tr(makeTh("Alias"), makeTh("Barcode"));
+    ContainerTag headerRow = tr(makeTh("Alias"), makeTh("Barcode"), makeTh("Location"));
 
     List<ContainerTag> rows = new ArrayList<>();
     for (TransferPool transferPool : transferPools) {
@@ -401,6 +417,7 @@ public class NotificationManager {
       List<DomContent> cells = new ArrayList<>();
       cells.add(makeTd(pool.getAlias()));
       cells.add(makeTd(pool.getIdentificationBarcode()));
+      cells.add(makeTd(makeLocationLabel(transferPool)));
       rows.add(tr().with(cells));
     }
 
@@ -432,9 +449,9 @@ public class NotificationManager {
     }
   }
 
-  private static String getYieldString(Sample sample) {
-    if (sample.getVolume() != null && sample.getConcentration() != null) {
-      return LimsUtils.toNiceString(sample.getVolume().multiply(sample.getConcentration()));
+  private static String getYieldString(BigDecimal volume, BigDecimal concentration) {
+    if (volume != null && concentration != null) {
+      return LimsUtils.toNiceString(volume.multiply(concentration));
     } else {
       return null;
     }

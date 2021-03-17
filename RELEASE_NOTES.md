@@ -2,7 +2,7 @@
 
 Changes:
 
-
+* Record item volume and location at time of distribution
 
 # 1.25.0
 
