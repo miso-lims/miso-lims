@@ -4047,8 +4047,13 @@ public class Dtos {
     setBoolean(to::setQcPassed, from.isQcPassed(), true);
     setString(to::setQcNote, from.getQcNote());
     setLong(to::setBoxId, maybeGetProperty(maybeGetProperty(from.getItem(), Boxable::getBox), Box::getId), true);
-    setString(to::setBoxAlias, maybeGetProperty(maybeGetProperty(from.getItem(), Boxable::getBox), Box::getAlias));
-    setString(to::setBoxPosition, maybeGetProperty(from.getItem(), Boxable::getBoxPosition));
+    if (from.getItem().getBox() != null) {
+      setString(to::setBoxAlias, maybeGetProperty(maybeGetProperty(from.getItem(), Boxable::getBox), Box::getAlias));
+      setString(to::setBoxPosition, maybeGetProperty(from.getItem(), Boxable::getBoxPosition));
+    } else if (from.getDistributedBoxAlias() != null) {
+      setString(to::setBoxAlias, "DISTRIBUTED - " + from.getDistributedBoxAlias());
+      setString(to::setBoxPosition, from.getDistributedBoxPosition());
+    }
     return to;
   }
 
@@ -4069,6 +4074,9 @@ public class Dtos {
       boxPos.setBox(box);
       boxPos.setPosition(from.getBoxPosition());
       boxPositionSetter.accept(toItem, boxPos);
+    } else {
+      setString(to::setDistributedBoxAlias, from.getBoxAlias());
+      setString(to::setDistributedBoxPosition, from.getBoxPosition());
     }
     return to;
   }

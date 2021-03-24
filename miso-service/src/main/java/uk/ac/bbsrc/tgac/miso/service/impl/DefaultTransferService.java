@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -42,6 +43,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferNotification;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.core.service.GroupService;
 import uk.ac.bbsrc.tgac.miso.core.service.LabService;
@@ -90,6 +92,8 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
   private PoolService poolService;
   @Autowired
   private ChangeLogService changeLogService;
+  @Autowired
+  private BoxService boxService;
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -143,6 +147,9 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
   private <T extends Boxable, U extends TransferItem<T>, V extends AbstractBoxPosition> void loadItem(U item, Consumer<T> setter,
       ProviderService<T> service, Supplier<V> positionConstructor, BiConsumer<T, V> positionSetter) throws IOException {
     Box box = item.getItem().getBox();
+    if (box != null) {
+      box = boxService.get(box.getId());
+    }
     String position = item.getItem().getBoxPosition();
     loadChildEntity(item.getItem(), setter, service);
     transferStore.detachEntity(item.getItem());
@@ -451,10 +458,17 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
   protected void beforeValidate(Transfer transfer) throws IOException {
     Consumer<TransferItem<?>> action = null;
     if (transfer.isDistribution()) {
-      // Mark all items received for distribution transfers
+      // Mark all items received for distribution transfers; record distributed volume and location
       action = item -> {
         item.setTransfer(transfer);
         item.setReceived(true);
+        if (item.getItem().getVolume() != null && item.getItem().getVolume().compareTo(BigDecimal.ZERO) > 0) {
+          item.setDistributedVolume(item.getItem().getVolume());
+        }
+        if (item.getItem().getBox() != null) {
+          item.setDistributedBoxAlias(item.getItem().getBox().getAlias());
+          item.setDistributedBoxPosition(item.getItem().getBoxPosition());
+        }
       };
     } else {
       action = item -> item.setTransfer(transfer);

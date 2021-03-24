@@ -2,6 +2,7 @@
 
 Changes:
 
+* Record item volume and location at time of distribution
 * Extend 'Kit Lot' field on Libraries to 255 characters
 * Add front-end error checking for Kit Lot length
 * Improved error message when attempting to delete a library aliquot that
