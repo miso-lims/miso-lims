@@ -58,4 +58,6 @@ public interface LibraryAliquotStore extends Store<LibraryAliquot>, PaginatedDat
    */
   LibraryAliquot getByBarcode(String barcode) throws IOException;
 
+  long getUsageByPoolOrders(LibraryAliquot aliquot) throws IOException;
+
 }
