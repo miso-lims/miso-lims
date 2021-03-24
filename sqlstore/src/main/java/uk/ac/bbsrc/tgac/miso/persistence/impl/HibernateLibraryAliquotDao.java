@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
@@ -211,6 +212,14 @@ public class HibernateLibraryAliquotDao
         .add(Property.forName("id").in(subquery))
         .list();
     return results;
+  }
+
+  @Override
+  public long getUsageByPoolOrders(LibraryAliquot aliquot) throws IOException {
+    return (long) currentSession().createCriteria(PoolOrder.class)
+        .createAlias("orderLibraryAliquots", "item")
+        .add(Restrictions.eq("item.aliquot", aliquot))
+        .setProjection(Projections.rowCount()).uniqueResult();
   }
 
 }
