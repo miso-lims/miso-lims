@@ -20,8 +20,6 @@ public interface SampleService
 
   public List<Sample> list() throws IOException;
 
-  public List<Sample> getByAlias(String alias) throws IOException;
-
   public Collection<SampleIdentity> getIdentitiesByExternalNameOrAliasAndProject(String externalName, Long projectId, boolean exactMatch)
       throws IOException;
 

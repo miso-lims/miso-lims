@@ -198,8 +198,11 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
 
   @Test
   public void testListByAlias() throws Exception {
-    Collection<Sample> samples = dao.listByAlias("TEST_0007_Bn_P_nn_1-1_D_1");
-    assertEquals("wrong sample found", 13, ((Sample) samples.toArray()[0]).getId());
+    String alias = "TEST_0007_Bn_P_nn_1-1_D_1";
+    List<EntityReference> samples = dao.listByAlias(alias);
+    assertEquals(1, samples.size());
+    assertEquals("wrong sample found", 13, samples.get(0).getId());
+    assertEquals(alias, samples.get(0).getLabel());
   }
 
   @Test

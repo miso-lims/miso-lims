@@ -20,8 +20,6 @@ public interface LibraryService extends PaginatedDataSource<Library>, Barcodable
 
   public EntityReference getAdjacentLibrary(Library library, boolean before) throws IOException;
 
-  public List<Library> listByAlias(String alias) throws IOException;
-
   public List<Library> listBySampleId(long sampleId) throws IOException;
 
   public List<Library> listByProjectId(long projectId) throws IOException;

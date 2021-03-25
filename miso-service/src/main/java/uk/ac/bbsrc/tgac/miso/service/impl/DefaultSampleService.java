@@ -1015,11 +1015,6 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   }
 
   @Override
-  public List<Sample> getByAlias(String alias) throws IOException {
-    return new ArrayList<>(sampleStore.listByAlias(alias));
-  }
-
-  @Override
   public Sample getByBarcode(String barcode) throws IOException {
     return sampleStore.getByBarcode(barcode);
   }
