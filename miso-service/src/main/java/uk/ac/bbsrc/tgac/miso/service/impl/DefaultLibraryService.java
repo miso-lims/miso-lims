@@ -243,7 +243,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
       if (existingTransfer != null) {
         existingTransfer.getLibraryTransfers().add(transferLibrary);
         transferLibrary.setTransfer(existingTransfer);
-        transferService.update(existingTransfer);
+        transferService.addTransferLibrary(transferLibrary);
       } else {
         transferService.create(transfer);
       }
