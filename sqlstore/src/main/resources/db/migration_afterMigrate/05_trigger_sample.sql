@@ -1,4 +1,3 @@
--- StartNoTest
 DELIMITER //
 
 DROP TRIGGER IF EXISTS SampleChange//
@@ -59,6 +58,7 @@ FOR EACH ROW
     makeChangeMessage('material', (SELECT alias FROM TissueMaterial WHERE tissueMaterialId = OLD.tissueMaterialId), (SELECT alias FROM TissueMaterial WHERE tissueMaterialId = NEW.tissueMaterialId)),
     makeChangeMessage('origin', (SELECT alias FROM TissueOrigin WHERE tissueOriginId = OLD.tissueOriginId), (SELECT alias FROM TissueOrigin WHERE tissueOriginId = NEW.tissueOriginId)),
     makeChangeMessage('type', (SELECT alias FROM TissueType WHERE tissueTypeId = OLD.tissueTypeId), (SELECT alias FROM TissueType WHERE tissueTypeId = NEW.tissueTypeId)),
+    makeChangeMessage('timepoint', OLD.timepoint, NEW.timepoint),
     makeChangeMessage('donor sex', OLD.donorSex, NEW.donorSex),
     makeChangeMessage('consent level', OLD.consentLevel, NEW.consentLevel),
     makeChangeMessage('external name', OLD.externalName, NEW.externalName),
@@ -126,6 +126,7 @@ FOR EACH ROW
         makeChangeColumn('tissueMaterialId', OLD.tissueMaterialId, NEW.tissueMaterialId),
         makeChangeColumn('tissueOriginId', OLD.tissueOriginId, NEW.tissueOriginId),
         makeChangeColumn('tissueTypeId', OLD.tissueTypeId, NEW.tissueTypeId),
+        makeChangeColumn('timepoint', OLD.timepoint, NEW.timepoint),
         makeChangeColumn('donorSex', OLD.donorSex, NEW.donorSex),
         makeChangeColumn('consentLevel', OLD.consentLevel, NEW.consentLevel),
         makeChangeColumn('externalName', OLD.externalName, NEW.externalName),
@@ -163,4 +164,3 @@ BEGIN
 END//
 
 DELIMITER ;
--- EndNoTest

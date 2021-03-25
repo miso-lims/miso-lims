@@ -8,6 +8,7 @@ Changes:
 * Improved error message when attempting to delete a library aliquot that
   is included in a pool order
 * Improved performance of library receipt
+* Fixed tissue timepoint field not being changelogged (detailed sample)
 
 # 1.25.0
 
