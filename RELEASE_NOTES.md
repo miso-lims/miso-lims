@@ -2,6 +2,12 @@
 
 Changes:
 
+
+
+# 1.26.0
+
+Changes:
+
 * Record item volume and location at time of distribution
 * Extend 'Kit Lot' field on Libraries to 255 characters
 * Add front-end error checking for Kit Lot length
