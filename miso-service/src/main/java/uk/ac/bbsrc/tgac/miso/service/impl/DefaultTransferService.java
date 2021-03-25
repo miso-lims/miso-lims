@@ -523,6 +523,17 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
   }
 
   @Override
+  public void addTransferLibrary(TransferLibrary transferLibrary) throws IOException {
+    Transfer managedTransfer = get(transferLibrary.getTransfer().getId());
+    Library managedLibrary = libraryService.get(transferLibrary.getItem().getId());
+    transferLibrary.setTransfer(managedTransfer);
+    transferLibrary.setItem(managedLibrary);
+    validateAddition(managedTransfer, transferLibrary);
+    transferStore.update(managedTransfer);
+    libraryService.update(managedLibrary);
+  }
+
+  @Override
   public DeletionStore getDeletionStore() {
     return deletionStore;
   }

@@ -50,16 +50,7 @@ public interface SampleStore extends PaginatedDataSource<Sample> {
    */
   Sample getByBarcode(String barcode) throws IOException;
 
-  /**
-   * List all Samples by a given alias
-   * 
-   * @param alias
-   *          of type String
-   * @return Collection<Sample>
-   * @throws IOException
-   *           when
-   */
-  Collection<Sample> listByAlias(String alias) throws IOException;
+  List<EntityReference> listByAlias(String alias) throws IOException;
 
   /**
    * List all Samples associated with identificationBarcodes from the given identificationBarcode list

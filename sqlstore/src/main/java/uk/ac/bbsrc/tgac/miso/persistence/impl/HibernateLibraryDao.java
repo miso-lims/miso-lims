@@ -108,12 +108,14 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   }
 
   @Override
-  public List<Library> listByAlias(String alias) throws IOException {
-    Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
-    criteria.add(Restrictions.eq("alias", alias));
+  public List<EntityReference> listByAlias(String alias) throws IOException {
     @SuppressWarnings("unchecked")
-    List<Library> records = criteria.list();
-    return records;
+    List<EntityReference> results = currentSession().createCriteria(LibraryImpl.class)
+        .add(Restrictions.eq("alias", alias))
+        .setProjection(EntityReference.makeProjectionList("id", "alias"))
+        .setResultTransformer(EntityReference.RESULT_TRANSFORMER)
+        .list();
+    return results;
   }
 
   @Override

@@ -38,14 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
  */
 public interface LibraryStore extends Store<Library>, PaginatedDataSource<Library> {
 
-  /**
-   * Get all Library with a given Library alias
-   *
-   * @param alias of type String
-   * @return all libraries with the given alias
-   * @throws IOException
-   */
-  List<Library> listByAlias(String alias) throws IOException;
+  List<EntityReference> listByAlias(String alias) throws IOException;
 
   /**
    * List all Libraries generated from a Sample given a parent Sample ID

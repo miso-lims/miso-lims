@@ -128,12 +128,12 @@ public class HibernateLibraryDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testGetByAlias() throws Exception {
+  public void testListByAlias() throws Exception {
     String alias = "TEST_0006_Bn_R_PE_300_WG";
-    Collection<Library> byAlias = dao.listByAlias(alias);
+    Collection<EntityReference> byAlias = dao.listByAlias(alias);
     assertNotNull(byAlias);
     assertEquals(1, byAlias.size());
-    assertEquals("alias name does not match", alias, byAlias.iterator().next().getAlias());
+    assertEquals("alias does not match", alias, byAlias.iterator().next().getLabel());
   }
 
   @Test
