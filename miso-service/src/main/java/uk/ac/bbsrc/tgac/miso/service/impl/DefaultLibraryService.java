@@ -288,11 +288,6 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   }
 
   @Override
-  public List<Library> listByAlias(String alias) throws IOException {
-    return libraryDao.listByAlias(alias);
-  }
-
-  @Override
   public List<Library> listBySampleId(long sampleId) throws IOException {
     return libraryDao.listBySampleId(sampleId);
   }
@@ -647,8 +642,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
         || (LimsUtils.isDetailedLibrary(library) && ((DetailedLibrary) library).hasNonStandardAlias())) {
       return;
     }
-    List<Library> potentialDupes = listByAlias(library.getAlias());
-    for (Library potentialDupe : potentialDupes) {
+    List<EntityReference> potentialDupes = libraryDao.listByAlias(library.getAlias());
+    for (EntityReference potentialDupe : potentialDupes) {
       if (!library.isSaved() || library.getId() != potentialDupe.getId()) {
         // an existing DIFFERENT library already has this alias
         throw new ValidationException(new ValidationError("alias", "A library with this alias already exists in the database"));
