@@ -7,6 +7,7 @@ Changes:
 * Add front-end error checking for Kit Lot length
 * Improved error message when attempting to delete a library aliquot that
   is included in a pool order
+* Fixed tissue timepoint field not being changelogged (detailed sample)
 
 # 1.25.0
 
