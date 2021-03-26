@@ -267,8 +267,8 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
         RunPartition runPartition = runPartitionService.get(run, partition);
         if (runPartition == null) {
           runPartition = new RunPartition();
-          runPartition.setRun(run);
-          runPartition.setPartition(partition);
+          runPartition.setRunId(run.getId());
+          runPartition.setPartitionId(partition.getId());
           runPartition.setPurpose(run.getSequencer().getDefaultRunPurpose());
           runPartitionService.save(runPartition);
         }

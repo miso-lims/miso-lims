@@ -50,7 +50,7 @@ public class HibernateRunPartitionDaoIT extends AbstractDAOTest {
     qc.setQcType(type);
     dao.create(qc);
 
-    RunPartition fetchedQc = dao.get(run, partition);
+    RunPartition fetchedQc = dao.get(run.getId(), partition.getId());
     assertNotNull(fetchedQc);
     assertEquals(qc.getQcType().getId(), fetchedQc.getQcType().getId());
     assertEquals(qc.getNotes(), fetchedQc.getNotes());
@@ -62,7 +62,7 @@ public class HibernateRunPartitionDaoIT extends AbstractDAOTest {
     assertNotNull(run);
     Partition partition = (Partition) sessionFactory.getCurrentSession().get(PartitionImpl.class, 1L);
     assertNotNull(partition);
-    RunPartition qc = dao.get(run, partition);
+    RunPartition qc = dao.get(run.getId(), partition.getId());
     assertNotNull(qc);
     assertEquals(1L, qc.getQcType().getId());
     assertEquals("it is written", qc.getNotes());
@@ -72,12 +72,12 @@ public class HibernateRunPartitionDaoIT extends AbstractDAOTest {
   public void testUpdate() throws Exception {
     Run run = (Run) sessionFactory.getCurrentSession().get(Run.class, 1L);
     Partition partition = (Partition) sessionFactory.getCurrentSession().get(PartitionImpl.class, 1L);
-    RunPartition qc = dao.get(run, partition);
+    RunPartition qc = dao.get(run.getId(), partition.getId());
     assertNotNull(qc);
     qc.setNotes("change is inevitable");
     dao.update(qc);
 
-    RunPartition fetchedQc = dao.get(run, partition);
+    RunPartition fetchedQc = dao.get(run.getId(), partition.getId());
     assertNotNull(fetchedQc);
     assertEquals(qc.getQcType().getId(), fetchedQc.getQcType().getId());
     assertEquals(qc.getNotes(), fetchedQc.getNotes());
