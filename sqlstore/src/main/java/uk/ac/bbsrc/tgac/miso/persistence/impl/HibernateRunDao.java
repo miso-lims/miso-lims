@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -13,8 +14,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +22,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
 import uk.ac.bbsrc.tgac.miso.persistence.RunStore;
 import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
@@ -33,8 +33,6 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   private static final List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("sequencer"),
       new AliasDescriptor("sequencer.instrumentModel"));
-
-  protected static final Logger log = LoggerFactory.getLogger(HibernateRunDao.class);
 
   private static final String[] SEARCH_PROPERTIES = new String[] { "name", "alias", "description" };
   @Autowired
@@ -63,15 +61,6 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   public Run get(long id) throws IOException {
     Run run = (Run) currentSession().get(Run.class, id);
     return run;
-  }
-
-  @Override
-  public List<Run> listAll() throws IOException {
-    Criteria criteria = currentSession().createCriteria(Run.class);
-    @SuppressWarnings("unchecked")
-    List<Run> records = criteria.list();
-
-    return records;
   }
 
   @Override
@@ -293,6 +282,38 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   @Override
   public String getFriendlyName() {
     return "Run";
+  }
+
+  @Override
+  public List<Run> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol, PaginationFilter... filter)
+      throws IOException {
+    List<Run> runs = HibernatePaginatedDataSource.super.list(errorHandler, offset, limit, sortDir, sortCol, filter);
+    @SuppressWarnings("unchecked")
+    List<Object[]> results = currentSession().createCriteria(Run.class)
+        .createAlias("runPositions", "position")
+        .createAlias("position.container", "container")
+        .createAlias("container.partitions", "partition")
+        .createAlias("partition.pool", "pool")
+        .createAlias("pool.poolElements", "element")
+        .createAlias("element.aliquot", "aliquot")
+        .createAlias("aliquot.parentLibrary", "library")
+        .createAlias("library.parentSample", "sample")
+        .createAlias("sample.parentProject", "project")
+        .setProjection(Projections.distinct(
+            Projections.projectionList()
+                .add(Projections.property("project.id"))
+                .add(Projections.property("project.shortName"))
+                .add(Projections.property("project.name"))))
+        .add(Restrictions.in("id", runs.stream().map(Run::getId).toArray()))
+        .list();
+
+    for (Run run : runs) {
+      run.setProjectsLabel(results.stream()
+          .filter(arr -> ((Long) arr[0]).longValue() == run.getId())
+          .map(arr -> arr[1] == null ? (String) arr[2] : (String) arr[1])
+          .collect(Collectors.joining(", ")));
+    }
+    return runs;
   }
 
 }

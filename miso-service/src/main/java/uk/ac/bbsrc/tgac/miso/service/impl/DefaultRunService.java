@@ -144,11 +144,6 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   private SopService sopService;
 
   @Override
-  public List<Run> list() throws IOException {
-    return runDao.listAll();
-  }
-
-  @Override
   public Collection<Run> listByProjectId(long projectId) throws IOException {
     return runDao.listByProjectId(projectId);
   }
