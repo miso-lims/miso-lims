@@ -288,6 +288,10 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   public List<Run> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol, PaginationFilter... filter)
       throws IOException {
     List<Run> runs = HibernatePaginatedDataSource.super.list(errorHandler, offset, limit, sortDir, sortCol, filter);
+    if (runs.isEmpty()) {
+      return runs;
+    }
+
     @SuppressWarnings("unchecked")
     List<Object[]> results = currentSession().createCriteria(Run.class)
         .createAlias("runPositions", "position")

@@ -74,7 +74,6 @@ public class HibernateRunPartitionDao implements RunPartitionStore {
 
     @SuppressWarnings("unchecked")
     List<RunPartition> items = currentSession().createCriteria(RunPartition.class)
-        .createAlias("partition", "partition")
         .add(Restrictions.eq("runId", run.getId()))
         .add(Restrictions.in("partitionId", partitionIds))
         .list();
