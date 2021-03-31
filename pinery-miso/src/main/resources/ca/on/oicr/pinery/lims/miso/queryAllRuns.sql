@@ -16,6 +16,7 @@ SELECT DISTINCT r.alias
   ,sp.readLength = sp.readLength2 AS paired
   ,sp.readLength AS read_length
   ,sp.name AS sequencingParameters
+  ,sp.chemistry
   ,ri.runBasesMask AS runBasesMask
   ,ri.workflowType AS workflowType
   ,scm.alias AS containerModel
