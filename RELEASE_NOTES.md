@@ -2,7 +2,7 @@
 
 Changes:
 
-
+* Export tissue timepoint field to Pinery (detailed sample)
 
 # 1.26.0
 
