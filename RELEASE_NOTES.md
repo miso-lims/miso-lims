@@ -2,7 +2,11 @@
 
 Changes:
 
+* Removed deprecated project clinical field from Pinery
 
+Upgrade Notes:
+
+* Updated to Pinery v2.19.0
 
 # 1.26.0
 

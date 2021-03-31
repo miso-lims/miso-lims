@@ -5,7 +5,6 @@ SELECT
   stats.earliest,
   stats.latest,
   proj.status IN ('ACTIVE', 'PENDING') active,
-  pipe.alias = 'Clinical' OR pipe.alias LIKE 'Accredited%' clinical,
   pipe.alias pipeline,
   proj.secondaryNaming secondaryNamingScheme,
   proj.created,
