@@ -13,7 +13,6 @@ import javax.persistence.Table;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition.RunPartitionId;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
@@ -26,13 +25,34 @@ public class RunPartition implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ManyToOne(targetEntity = PartitionImpl.class)
-    @JoinColumn(name = "partitionId")
-    private Partition partition;
+    private long runId;
 
-    @ManyToOne
-    @JoinColumn(name = "runId")
-    private Run run;
+    private long partitionId;
+
+    public long getRunId() {
+      return runId;
+    }
+
+    public void setRunId(long runId) {
+      this.runId = runId;
+    }
+
+    public long getPartitionId() {
+      return partitionId;
+    }
+
+    public void setPartitionId(long partitionId) {
+      this.partitionId = partitionId;
+    }
+
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + (int) (partitionId ^ (partitionId >>> 32));
+      result = prime * result + (int) (runId ^ (runId >>> 32));
+      return result;
+    }
 
     @Override
     public boolean equals(Object obj) {
@@ -40,56 +60,27 @@ public class RunPartition implements Serializable {
       if (obj == null) return false;
       if (getClass() != obj.getClass()) return false;
       RunPartitionId other = (RunPartitionId) obj;
-      if (partition == null) {
-        if (other.partition != null) return false;
-      } else if (!partition.equals(other.partition)) return false;
-      if (run == null) {
-        if (other.run != null) return false;
-      } else if (!run.equals(other.run)) return false;
+      if (partitionId != other.partitionId) return false;
+      if (runId != other.runId) return false;
       return true;
-    }
-
-    public Partition getPartition() {
-      return partition;
-    }
-
-    public Run getRun() {
-      return run;
-    }
-
-    @Override
-    public int hashCode() {
-      final int prime = 31;
-      int result = 1;
-      result = prime * result + ((partition == null) ? 0 : partition.hashCode());
-      result = prime * result + ((run == null) ? 0 : run.hashCode());
-      return result;
-    }
-
-    public void setPartition(Partition partition) {
-      this.partition = partition;
-    }
-
-    public void setRun(Run run) {
-      this.run = run;
     }
 
   }
 
   private static final long serialVersionUID = 1L;
 
-  @Column(length = 1024)
-  private String notes;
+  @Id
+  private long runId;
 
   @Id
-  private Partition partition;
-
-  @Id
-  private Run run;
+  private long partitionId;
 
   @ManyToOne
   @JoinColumn(name = "partitionQcTypeId")
   private PartitionQCType qcType;
+
+  @Column(length = 1024)
+  private String notes;
 
   @ManyToOne
   @JoinColumn(name = "purposeId")
@@ -99,36 +90,36 @@ public class RunPartition implements Serializable {
   @JoinColumn(name = "lastModifier")
   private User lastModifier;
 
-  public String getNotes() {
-    return notes;
+  public long getRunId() {
+    return runId;
   }
 
-  public Partition getPartition() {
-    return partition;
+  public void setRunId(long runId) {
+    this.runId = runId;
   }
 
-  public Run getRun() {
-    return run;
+  public long getPartitionId() {
+    return partitionId;
+  }
+
+  public void setPartitionId(long partitionId) {
+    this.partitionId = partitionId;
   }
 
   public PartitionQCType getQcType() {
     return qcType;
   }
 
-  public void setNotes(String notes) {
-    this.notes = notes;
-  }
-
-  public void setPartition(Partition partition) {
-    this.partition = partition;
-  }
-
-  public void setRun(Run run) {
-    this.run = run;
-  }
-
   public void setQcType(PartitionQCType qcType) {
     this.qcType = qcType;
+  }
+
+  public String getNotes() {
+    return notes;
+  }
+
+  public void setNotes(String notes) {
+    this.notes = notes;
   }
 
   public RunPurpose getPurpose() {

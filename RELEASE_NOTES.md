@@ -2,6 +2,8 @@
 
 Changes:
 
+* Improved performance of loading sequencer runs
+
 Upgrade Notes:
 
 * MISO has been updated to use Java 11. If you use Docker to run MISO, you
