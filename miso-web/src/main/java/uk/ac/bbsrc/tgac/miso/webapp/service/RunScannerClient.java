@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Semaphore;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.SuperuserAuthentication;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.util.LatencyHistogram;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 
@@ -195,6 +197,11 @@ public class RunScannerClient {
           } else {
             unknownSequencingKitRuns.remove(saved.getAlias());
           }
+        } catch (ValidationException e) {
+          String errors = e.getErrors().stream()
+              .map(error -> error.getProperty() + ": " + error.getMessage())
+              .collect(Collectors.joining("; "));
+          log.error("Failed to save run due to validation errors: " + errors, e);
         } catch (Exception e) {
           log.error("Failed to save run: " + dto.getRunAlias(), e);
           saveFailures.inc();
