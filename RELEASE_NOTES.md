@@ -3,6 +3,7 @@
 Changes:
 
 * Improved performance of loading sequencer runs
+* Export tissue timepoint field to Pinery (detailed sample)
 
 Upgrade Notes:
 
