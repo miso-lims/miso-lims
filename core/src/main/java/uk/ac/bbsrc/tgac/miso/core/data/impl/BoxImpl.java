@@ -10,8 +10,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -27,8 +25,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 public class BoxImpl extends AbstractBox {
 
   private static final long serialVersionUID = 1L;
-
-  protected static final Logger log = LoggerFactory.getLogger(BoxImpl.class);
 
   @OneToMany(mappedBy = "box", cascade = CascadeType.ALL, orphanRemoval = true)
   @MapKeyColumn(name = "position")

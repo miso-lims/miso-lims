@@ -2,7 +2,7 @@
 
 Changes:
 
-
+* Improved performance of boxes
 
 # 1.26.0
 
