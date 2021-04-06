@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.LibraryAliquotQcNode;
@@ -84,10 +83,12 @@ public class HibernateQcNodeDao implements QcNodeDao {
   public SampleQcNode getForRunLibrary(long runId, long partitionId, long aliquotId) throws IOException {
     RunQcNode run = (RunQcNode) currentSession().get(RunQcNode.class, runId);
 
-    DetachedCriteria subquery = DetachedCriteria.forClass(RunPartition.class)
-        .createAlias("partition", "partition")
+    DetachedCriteria subquery = DetachedCriteria.forClass(Run.class)
+        .createAlias("runPositions", "position")
+        .createAlias("position.container", "container")
+        .createAlias("container.partitions", "partition")
         .createAlias("partition.pool", "pool")
-        .add(Restrictions.eq("run.id", runId))
+        .add(Restrictions.eq("id", runId))
         .add(Restrictions.eq("partition.id", partitionId))
         .setProjection(Projections.property("pool.id"));
     PoolQcNode pool = (PoolQcNode) currentSession().createCriteria(PoolQcNode.class)

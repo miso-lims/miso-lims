@@ -62,8 +62,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
@@ -219,11 +219,6 @@ public class RunRestController extends RestController {
     return RestUtils.getObject("Run", runId, runService, Dtos::asDto);
   }
 
-  @GetMapping(value = "/{runId}/full", produces = "application/json")
-  public @ResponseBody RunDto getRunByIdFull(@PathVariable Long runId) throws IOException {
-    return RestUtils.getObject("Run", runId, runService, run -> Dtos.asDto(run, true, true, true));
-  }
-
   @GetMapping(value = "/{runId}/containers", produces = "application/json")
   public @ResponseBody List<ContainerDto> getContainersByRunId(@PathVariable Long runId) throws IOException {
     Collection<SequencerPartitionContainer> cc = containerService.listByRunId(runId);
@@ -268,12 +263,6 @@ public class RunRestController extends RestController {
         "attachment; filename=" + String.format("RUN%d-%s-SampleSheet.csv", run.getId(), casavaVersion.name()));
 
     return new HttpEntity<>(casavaVersion.createSampleSheet(run, user), headers);
-  }
-
-  @GetMapping(produces = "application/json")
-  public @ResponseBody List<RunDto> listAllRuns() throws IOException {
-    Collection<Run> lr = runService.list();
-    return Dtos.asRunDtos(lr);
   }
 
   @GetMapping(value = "/dt", produces = "application/json")
@@ -362,8 +351,8 @@ public class RunRestController extends RestController {
           RunPartition runPartition = runPartitionService.get(run, partition);
           if (runPartition == null) {
             runPartition = new RunPartition();
-            runPartition.setRun(run);
-            runPartition.setPartition(partition);
+            runPartition.setRunId(run.getId());
+            runPartition.setPartitionId(partition.getId());
           }
           runPartition.setQcType(qcType);
           runPartition.setNotes(request.notes);
@@ -384,8 +373,8 @@ public class RunRestController extends RestController {
       RunPartition runPartition = runPartitionService.get(run, partition);
       if (runPartition == null) {
         runPartition = new RunPartition();
-        runPartition.setRun(run);
-        runPartition.setPartition(partition);
+        runPartition.setRunId(run.getId());
+        runPartition.setPartitionId(partition.getId());
       }
       runPartition.setPurpose(purpose);
       runPartitionService.save(runPartition);

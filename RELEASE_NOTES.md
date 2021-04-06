@@ -2,7 +2,7 @@
 
 Changes:
 
-
+* Improved performance of loading sequencer runs
 
 # 1.26.0
 

@@ -2,6 +2,8 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -13,9 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
-import uk.ac.bbsrc.tgac.miso.core.data.RunPartition.RunPartitionId;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.persistence.RunPartitionStore;
 
 @Repository
@@ -38,11 +38,11 @@ public class HibernateRunPartitionDao implements RunPartitionStore {
   }
 
   @Override
-  public RunPartition get(Run run, Partition partition) throws IOException {
-    RunPartitionId id = new RunPartitionId();
-    id.setRun(run);
-    id.setPartition(partition);
-    return (RunPartition) currentSession().get(RunPartition.class, id);
+  public RunPartition get(long runId, long partitionId) throws IOException {
+    return (RunPartition) currentSession().createCriteria(RunPartition.class)
+        .add(Restrictions.eq("runId", runId))
+        .add(Restrictions.eq("partitionId", partitionId))
+        .uniqueResult();
   }
 
   @Override
@@ -57,21 +57,25 @@ public class HibernateRunPartitionDao implements RunPartitionStore {
 
   @Override
   public void deleteForRun(Run run) throws IOException {
-    for (RunPosition position : run.getRunPositions()) {
-      for (Partition partition : position.getContainer().getPartitions()) {
-        RunPartition runPartition = get(run, partition);
-        currentSession().delete(runPartition);
-      }
+    @SuppressWarnings("unchecked")
+    List<RunPartition> runPartitions = currentSession().createCriteria(RunPartition.class)
+        .add(Restrictions.eq("runId", run.getId()))
+        .list();
+    for (RunPartition runPartition : runPartitions) {
+      currentSession().delete(runPartition);
     }
   }
 
   @Override
   public void deleteForRunContainer(Run run, SequencerPartitionContainer container) throws IOException {
+    Set<Long> partitionIds = container.getPartitions().stream()
+        .map(Partition::getId)
+        .collect(Collectors.toSet());
+
     @SuppressWarnings("unchecked")
     List<RunPartition> items = currentSession().createCriteria(RunPartition.class)
-        .createAlias("partition", "partition")
-        .add(Restrictions.eq("run", run))
-        .add(Restrictions.eq("partition.sequencerPartitionContainer", container))
+        .add(Restrictions.eq("runId", run.getId()))
+        .add(Restrictions.in("partitionId", partitionIds))
         .list();
 
     for (RunPartition item : items) {

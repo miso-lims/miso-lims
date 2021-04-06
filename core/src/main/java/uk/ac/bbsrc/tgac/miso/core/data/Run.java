@@ -47,7 +47,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -63,7 +62,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.RunProjectView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
@@ -182,9 +180,8 @@ public abstract class Run
   @Temporal(TemporalType.DATE)
   private Date dataReviewDate;
 
-  @OneToOne
-  @JoinColumn(name = "runId", updatable = false, insertable = false)
-  private RunProjectView runProjectView;
+  @Transient
+  private String projectsLabel;
 
   @ManyToOne
   @JoinColumn(name = "sopId")
@@ -540,16 +537,12 @@ public abstract class Run
     this.dataReviewDate = dataReviewDate;
   }
 
-  public RunProjectView getRunProjectView() {
-    return runProjectView;
-  }
-
-  public void setRunProjectView(RunProjectView runProjectView) {
-    this.runProjectView = runProjectView;
-  }
-
   public String getProjectsLabel() {
-    return runProjectView == null ? null : runProjectView.getProjects();
+    return projectsLabel;
+  }
+
+  public void setProjectsLabel(String projectsLabel) {
+    this.projectsLabel = projectsLabel;
   }
 
   public Sop getSop() {
