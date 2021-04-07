@@ -1950,7 +1950,7 @@ public class Dtos {
     return asDto(from, false, false, false);
   }
 
-  public static RunDto asDto(@Nonnull Run from, boolean includeContainers, boolean includeContainerPartitions,
+  private static RunDto asDto(@Nonnull Run from, boolean includeContainers, boolean includeContainerPartitions,
       boolean includePoolContents) {
     RunDto dto = getPlatformRunDto(from);
     setLong(dto::setId, from.getId(), true);

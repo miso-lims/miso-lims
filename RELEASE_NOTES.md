@@ -3,6 +3,17 @@
 Changes:
 
 * Improved performance of boxes
+* Improved performance of loading sequencer runs
+* Export tissue timepoint field to Pinery (detailed sample)
+
+Upgrade Notes:
+
+* MISO has been updated to use Java 11. If you use Docker to run MISO, you
+  don't need to worry about this as the images have been updated as required.
+  If you build MISO from source, run the Flyway command-line tool, or run
+  MISO on your own Tomcat installation, you will need to have JDK 11 or higher
+  installed. You will also need to ensure that Tomcat is configured to use the
+  newly installed JDK.
 
 # 1.26.0
 

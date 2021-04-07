@@ -2,8 +2,8 @@
 ## Build miso-lims from current directory
 #######################################################
 
-FROM maven:3.6.0-jdk-8 as builder
-# only re-initialize Maven when there's a POM change 
+FROM maven:3.6-openjdk-11 as builder
+# only re-initialize Maven when there's a POM change
 COPY pom.xml /miso-lims/
 COPY ./integration-tools/pom.xml /miso-lims/integration-tools/pom.xml
 COPY ./core/pom.xml /miso-lims/core/pom.xml
@@ -33,8 +33,24 @@ RUN mvn clean && mvn package -DskipTests
 
 #######################################################
 ## Flyway database migration
+## Adapted from https://github.com/flyway/flyway-docker/blob/v7.7.1/Dockerfile
 #######################################################
-FROM boxfuse/flyway:5.2.4-alpine as flyway-migration
+FROM adoptopenjdk:11-jre-hotspot as flyway-migration
+
+# Add the flyway user and step in the directory
+RUN adduser --system --home /flyway --disabled-password --group flyway
+WORKDIR /flyway
+
+# Change to the flyway user
+USER flyway
+
+ENV FLYWAY_VERSION 5.2.4
+
+RUN curl -L https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/${FLYWAY_VERSION}/flyway-commandline-${FLYWAY_VERSION}.tar.gz -o flyway-commandline-${FLYWAY_VERSION}.tar.gz \
+  && tar -xzf flyway-commandline-${FLYWAY_VERSION}.tar.gz --strip-components=1 \
+  && rm flyway-commandline-${FLYWAY_VERSION}.tar.gz
+
+ENV PATH="/flyway:${PATH}"
 
 COPY --from=builder /miso-lims/sqlstore/target/classes/db/migration/*.sql /flyway/sql/
 COPY --from=builder /miso-lims/sqlstore/target/sqlstore*.jar /flyway/jars/
@@ -52,7 +68,7 @@ ENTRYPOINT ["/run-flyway"]
 ## Tomcat webapp
 #######################################################
 
-FROM tomcat:8.5.56-jdk8-openjdk-slim as webapp
+FROM tomcat:9-jdk11-openjdk-slim as webapp
 
 COPY ./.docker/tomcat/setenv.sh /usr/local/tomcat/bin/
 COPY ./.docker/tomcat/logging.properties ${CATALINA_HOME}/conf/
