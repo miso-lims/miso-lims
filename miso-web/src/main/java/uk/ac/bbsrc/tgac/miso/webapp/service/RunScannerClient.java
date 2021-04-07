@@ -202,6 +202,8 @@ public class RunScannerClient {
               .map(error -> error.getProperty() + ": " + error.getMessage())
               .collect(Collectors.joining("; "));
           log.error("Failed to save run due to validation errors: " + errors, e);
+          saveFailures.inc();
+          badRuns.add(dto.getRunAlias());
         } catch (Exception e) {
           log.error("Failed to save run: " + dto.getRunAlias(), e);
           saveFailures.inc();
