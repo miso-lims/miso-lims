@@ -752,6 +752,9 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
 
   private boolean updateContainerFromNotification(final Run target, User user, SequencingContainerModel containerModel,
       String containerSerialNumber, final GetLaneContents getLaneContents, String positionName) throws IOException {
+    if (LimsUtils.isStringBlankOrNull(containerSerialNumber)) {
+      return false;
+    }
     final Collection<SequencerPartitionContainer> containers = containerService.listByBarcode(containerSerialNumber);
     int laneCount = containerModel.getPartitionCount();
     InstrumentPosition position = null;

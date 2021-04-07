@@ -5,6 +5,9 @@ Changes:
 * Improved performance of boxes
 * Improved performance of loading sequencer runs
 * Export tissue timepoint field to Pinery (detailed sample)
+* Fixed saving runs from Run Scanner that are missing container serial numbers.
+  The run will now be created or updated successfully, but no container will be
+  created or updated
 
 Upgrade Notes:
 
