@@ -18,11 +18,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryAliquotBoxPositio
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.LibraryAliquotBoxableView;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.LibraryBoxableView;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolBoxableView;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SampleBoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.BoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.LibraryAliquotBoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.LibraryBoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.PoolBoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.SampleBoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferView;
 
 /**

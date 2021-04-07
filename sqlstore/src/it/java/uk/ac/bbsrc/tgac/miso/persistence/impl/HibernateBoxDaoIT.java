@@ -56,7 +56,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.BoxView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.BoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.SampleBoxablePositionView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.SampleBoxableView;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -141,7 +144,7 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
     BoxPosition bp = box.getBoxPositions().get("A01");
     assertNotNull(bp);
     assertEquals(new BoxableId(s.getEntityType(), s.getId()), bp.getBoxableId());
-    BoxableView item = BoxableView.fromBoxable(s);
+    BoxableView item = makeBoxableView(s);
     dao.removeBoxableFromBox(item);
 
     sessionFactory.getCurrentSession().flush();
@@ -155,7 +158,7 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
   public void testRemoveBoxableViewUnneccessary() throws Exception {
     Sample before = (Sample) sessionFactory.getCurrentSession().get(SampleImpl.class, 1L);
     assertNull(before.getBox());
-    BoxableView item = BoxableView.fromBoxable(before);
+    BoxableView item = makeBoxableView(before);
     dao.removeBoxableFromBox(item);
 
     sessionFactory.getCurrentSession().flush();
@@ -163,6 +166,33 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
 
     Sample after = (Sample) sessionFactory.getCurrentSession().get(SampleImpl.class, 1L);
     assertNull(after.getBox());
+  }
+
+  private static SampleBoxableView makeBoxableView(Sample boxable) {
+    SampleBoxableView v = new SampleBoxableView();
+    v.setId(boxable.getId());
+    v.setName(boxable.getName());
+    v.setAlias(boxable.getAlias());
+    v.setIdentificationBarcode(boxable.getIdentificationBarcode());
+    v.setLocationBarcode(boxable.getLocationBarcode());
+    v.setVolume(boxable.getVolume());
+    v.setDiscarded(boxable.isDiscarded());
+
+    Box box = boxable.getBox();
+    if (box != null) {
+      BoxView toBox = new BoxView();
+      toBox.setId(box.getId());
+      toBox.setName(box.getName());
+      toBox.setAlias(box.getAlias());
+      toBox.setLocationBarcode(box.getLocationBarcode());
+
+      SampleBoxablePositionView boxPosition = new SampleBoxablePositionView();
+      boxPosition.setBox(toBox);
+      boxPosition.setId(boxable.getId());
+      boxPosition.setPosition(boxable.getBoxPosition());
+      v.setBoxablePosition(boxPosition);
+    }
+    return v;
   }
 
   @Test
@@ -317,8 +347,8 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
     List<BoxableView> contents = dao.getBoxContents(1L);
     assertNotNull(contents);
     assertEquals(2, contents.size());
-    assertTrue(contents.stream().anyMatch(x -> x.getId().equals(new BoxableId(EntityType.SAMPLE, 15L))));
-    assertTrue(contents.stream().anyMatch(x -> x.getId().equals(new BoxableId(EntityType.SAMPLE, 16L))));
+    assertTrue(contents.stream().anyMatch(x -> x.getEntityType() == EntityType.SAMPLE && x.getId() == 15L));
+    assertTrue(contents.stream().anyMatch(x -> x.getEntityType() == EntityType.SAMPLE && x.getId() == 16L));
   }
 
   @Test
@@ -374,21 +404,27 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
   public void testGetBoxableViewsBySearchBarcode() throws Exception {
     List<BoxableView> byBarcode = dao.getBoxableViewsBySearch("SAM1::TEST_0001_Bn_P_nn_1-1_D_1");
     assertEquals(1, byBarcode.size());
-    assertEquals(new BoxableId(EntityType.SAMPLE, 1L), byBarcode.get(0).getId());
+    BoxableView result = byBarcode.get(0);
+    assertEquals(EntityType.SAMPLE, result.getEntityType());
+    assertEquals(1L, result.getId());
   }
 
   @Test
   public void testGetBoxableViewsBySearchName() throws Exception {
     List<BoxableView> byName = dao.getBoxableViewsBySearch("LIB3");
     assertEquals(1, byName.size());
-    assertEquals(new BoxableId(EntityType.LIBRARY, 3L), byName.get(0).getId());
+    BoxableView result = byName.get(0);
+    assertEquals(EntityType.LIBRARY, result.getEntityType());
+    assertEquals(3L, result.getId());
   }
 
   @Test
   public void testGetBoxableViewsBySearchAlias() throws Exception {
     List<BoxableView> byAlias = dao.getBoxableViewsBySearch("Pool 5");
     assertEquals(1, byAlias.size());
-    assertEquals(new BoxableId(EntityType.POOL, 5L), byAlias.get(0).getId());
+    BoxableView result = byAlias.get(0);
+    assertEquals(EntityType.POOL, result.getEntityType());
+    assertEquals(5L, result.getId());
   }
 
   @Test
