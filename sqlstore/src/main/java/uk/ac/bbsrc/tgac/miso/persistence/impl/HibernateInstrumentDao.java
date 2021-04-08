@@ -45,7 +45,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.QC;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
-import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
 import uk.ac.bbsrc.tgac.miso.persistence.InstrumentStore;
 import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
@@ -188,12 +187,12 @@ public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginat
   }
 
   @Override
-  public void restrictPaginationByModel(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+  public void restrictPaginationByModel(Criteria criteria, String query, Consumer<String> errorHandler) {
     criteria.add(DbUtils.textRestriction(query, "instrumentModel.alias"));
   }
 
   @Override
-  public void restrictPaginationByWorkstation(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+  public void restrictPaginationByWorkstation(Criteria criteria, String query, Consumer<String> errorHandler) {
     criteria.add(DbUtils.textRestriction(query, "workstation.alias", "workstation.identificationBarcode"));
   }
 

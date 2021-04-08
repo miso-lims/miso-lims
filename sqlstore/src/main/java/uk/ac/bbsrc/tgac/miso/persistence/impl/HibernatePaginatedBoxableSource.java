@@ -10,7 +10,6 @@ import org.hibernate.sql.JoinType;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
 import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
 public interface HibernatePaginatedBoxableSource<T extends Boxable> extends HibernatePaginatedDataSource<T> {
@@ -18,8 +17,8 @@ public interface HibernatePaginatedBoxableSource<T extends Boxable> extends Hibe
   public final static String[] BOX_SEARCH_PROPERTIES = LimsUtils.prefix("box.", HibernateBoxDao.SEARCH_PROPERTIES);
 
   @Override
-  default void restrictPaginationByBox(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
-    if (query.getText() == null) {
+  default void restrictPaginationByBox(Criteria criteria, String query, Consumer<String> errorHandler) {
+    if (LimsUtils.isStringBlankOrNull(query)) {
       criteria.createAlias("boxPosition", "boxPosition", JoinType.LEFT_OUTER_JOIN)
           .add(Restrictions.isNull("boxPosition.box"));
     } else {
@@ -30,7 +29,7 @@ public interface HibernatePaginatedBoxableSource<T extends Boxable> extends Hibe
   }
 
   @Override
-  public default void restrictPaginationByFreezer(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+  public default void restrictPaginationByFreezer(Criteria criteria, String query, Consumer<String> errorHandler) {
     criteria.createAlias("boxPosition", "boxPosition", JoinType.LEFT_OUTER_JOIN)
         .createAlias("boxPosition.box", "box", JoinType.LEFT_OUTER_JOIN);
     DbUtils.restrictPaginationByFreezer(criteria, query, "box.storageLocation");

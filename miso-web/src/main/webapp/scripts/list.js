@@ -88,8 +88,8 @@ ListUtils = (function($) {
       help: "Checks if this item has the index provided. Both the index name and sequence are checked."
     },
     "class": {
-      term: "class:NAME",
-      help: "Check if the item belong to the sample class provided. This is always taken as a partial match."
+      term: "class:TEXT",
+      help: "Check if the item belong to the sample class provided."
     },
     "lab": {
       term: "lab:TEXT",
@@ -175,9 +175,11 @@ ListUtils = (function($) {
   };
 
   var makeTooltipHelp = function(target) {
-    return "Search syntax: <br/><br/>" + target.searchTermSelector(searchTerms).map(function(term) {
+    var terms = target.searchTermSelector(searchTerms).map(function(term) {
       return term["term"];
-    }).join('<br/>');
+    });
+    terms.unshift("TEXT");
+    return "Search syntax: <br/><br/>" + terms.join('<br/>');
   };
 
   var makeSearchTooltip = function(tableId, searchDivId, target) {
@@ -194,6 +196,12 @@ ListUtils = (function($) {
   var makePopupTableBody = function(target) {
     var result = "";
     var targetTerms = target.searchTermSelector(searchTerms);
+    targetTerms.unshift({
+      term: "TEXT",
+      help: "If no term is specified, the text is taken as a general query and matched against"
+          + " identifying fields such as name, alias, or barcode, depending on the item type. "
+          + "This termless criterion can only be entered as the first criterion in a search."
+    });
 
     for (var i = 0; i < targetTerms.length; ++i) {
       result += "<tr><td>" + targetTerms[i]["term"] + "</td><td>" + targetTerms[i]["help"] + "</td></tr>";
@@ -207,14 +215,18 @@ ListUtils = (function($) {
         + '    <tr><th>Syntax</th><th>Meaning</th></tr>' + '  </thead>' + makePopupTableBody(target) + '</table>';
   };
 
-  var textGrammar = '<table class="searchHelpTable">' + '  <caption><h2>TEXT Format</h2></caption>' + '  <thead>'
-      + '    <tr><th>Format</th><th>Behaviour</th></tr>' + '  </thead>'
-      + '  <tr><td>mytext</td><td>Find items matching "mytext" exactly.</td></tr>'
-      + '  <tr><td>mytext*</td><td>Find items beginning with "mytext."</td></tr>'
-      + '  <tr><td>*mytext</td><td>Find items ending with "mytext."</td></tr>'
-      + '  <tr><td>*mytext*</td><td>Find items containing "mytext" anywhere.</td></tr>'
+  var textGrammar = '<table class="searchHelpTable">'
+      + '  <caption><h2>TEXT Format</h2></caption>'
+      + '  <thead>'
+      + '    <tr><th>Format</th><th>Behaviour</th></tr>'
+      + '  </thead>'
+      + '  <tr><td>mytext</td><td>Find items containing "mytext" anywhere (partial matching).</td></tr>'
+      + '  <tr><td>"mytext"</td><td>Find items matching "mytext" exactly.</td></tr>'
+      + '  <tr><td>mytext*</td><td>Find items beginning with "mytext". Asterisks may be used as wildcards anywhere in the text</td></tr>'
       + '  <tr><td>*</td><td>Find items with any value specified.</td></tr>'
-      + '  <tr><td></td><td>(Enter nothing to find items with no value specified.)</td></tr>' + '</table>';
+      + '  <tr><td></td><td>(Enter nothing to find items with no value specified.)</td></tr>'
+      + '  <tr><td>\\*\\"\\:</td><td>Asterisk, colon, and quotation marks are normally treated as special characters. If you wish to search for text containing these characters, they must be escaped by preceding them with a backslash.</td></tr>'
+      + '</table>';
 
   var dateGrammar = '<table class="searchHelpTable">'
       + '  <caption><h2>DATE Format</h2></caption>'
@@ -245,11 +257,10 @@ ListUtils = (function($) {
       + '</table>';
 
   var makePopupHelp = function(target) {
-    return '<p>' + '  This search box supports case-sensitive search syntax.' + '  Multiple searches can be separated by spaces (not AND).'
-        + '  If a filter does not apply, it is ignored.'
-        + '  Any other search term is taken as a regular query and matched against the current fields for each item.'
-        + '  To search for a term with spaces, surround the entire term in quotation marks.' + '</p>' + '<br/>' + makePopupTable(target)
-        + "<br/>" + textGrammar + "<br/>" + dateGrammar + "<br/>" + userGrammar;
+    return '<p>'
+        + '  This search box supports case-insensitive search syntax. Multiple criteria may be entered as one search, and an item must match all criteria to be included in the results.'
+        + '  Most criteria are entered in the format "term:phrase" where the term specifies the type of criterion, and the phrase specifies what to match.'
+        + '</p>' + '<br/>' + makePopupTable(target) + "<br/>" + textGrammar + "<br/>" + dateGrammar + "<br/>" + userGrammar;
   };
 
   var registerPopupOpen = function(triggerId, target) {

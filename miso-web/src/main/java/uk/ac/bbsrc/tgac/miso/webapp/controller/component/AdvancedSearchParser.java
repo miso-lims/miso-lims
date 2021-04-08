@@ -1,7 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.component;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -10,6 +12,8 @@ import java.util.regex.Pattern;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import com.google.common.annotations.VisibleForTesting;
 
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize.BoxType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
@@ -21,9 +25,9 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 @Component
 public class AdvancedSearchParser {
 
-  private Integer fiscalYearStartMonth;
+  private static final String TERMED_CRITERION_PATTERN = "(\\w+):(.*)";
 
-  private static final Pattern WHITESPACE = Pattern.compile("\\s+(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+  private Integer fiscalYearStartMonth;
 
   private static final Pattern fiscalQuarter = Pattern.compile("^(?:fy(\\d{4})\\s?)?q([1234])$");
   private static final Pattern fiscalYear = Pattern.compile("^fy(\\d{4})$");
@@ -49,15 +53,18 @@ public class AdvancedSearchParser {
    * Search terms are documented in miso-web/src/main/webapp/scripts/list.js
    */
   public PaginationFilter[] parseQuery(String request, String currentUser, Consumer<String> errorHandler) {
-    return WHITESPACE.splitAsStream(request).map(x -> {
-      x = x.replace("\"", "");
-      if (x.isEmpty()) return null;
-      if (x.contains(":")) {
-        String[] parts = x.split(":", 2);
-        switch (parts[0].toLowerCase()) {
+    return splitCriteria(request).stream().map(x -> {
+      if (LimsUtils.isStringBlankOrNull(x)) {
+        return null;
+      }
+      Matcher m = Pattern.compile(TERMED_CRITERION_PATTERN).matcher(x);
+      if (m.matches()) {
+        String term = m.group(1).toLowerCase();
+        String phrase = m.group(2);
+        switch (term) {
         case "is":
         case "has":
-          switch (parts[1].toLowerCase()) {
+          switch (phrase.toLowerCase()) {
           case "fulfilled":
             return PaginationFilter.fulfilled(true);
           case "active":
@@ -92,7 +99,7 @@ public class AdvancedSearchParser {
             return null;
           }
         case "not":
-          switch (parts[1].toLowerCase()) {
+          switch (phrase.toLowerCase()) {
           case "archived":
           case "retired":
             return PaginationFilter.archived(false);
@@ -102,106 +109,129 @@ public class AdvancedSearchParser {
           }
         case "created":
         case "createdon":
-          return parseDate(parts[1], DateType.CREATE, errorHandler);
+          return parseDate(phrase, DateType.CREATE, errorHandler);
         case "entered":
         case "enteredon":
         case "recorded":
         case "recordedon":
-          return parseDate(parts[1], DateType.ENTERED, errorHandler);
+          return parseDate(phrase, DateType.ENTERED, errorHandler);
         case "changed":
         case "modified":
         case "updated":
         case "changedon":
         case "modifiedon":
         case "updatedon":
-          return parseDate(parts[1], DateType.UPDATE, errorHandler);
+          return parseDate(phrase, DateType.UPDATE, errorHandler);
         case "received":
         case "recieved":
         case "receivedon":
         case "recievedon":
-          return parseDate(parts[1], DateType.RECEIVE, errorHandler);
+          return parseDate(phrase, DateType.RECEIVE, errorHandler);
         case "createdby":
         case "creator":
         case "creater":
-          return parseUser(parts[1], currentUser, true);
+          return parseUser(phrase, currentUser, true);
         case "changedby":
         case "modifier":
         case "updater":
-          return parseUser(parts[1], currentUser, false);
+          return parseUser(phrase, currentUser, false);
         case "platform":
           try {
-            return PaginationFilter.platformType(PlatformType.valueOf(parts[1].toUpperCase()));
+            return PaginationFilter.platformType(PlatformType.valueOf(phrase.toUpperCase()));
           } catch (IllegalArgumentException e) {
-            errorHandler.accept("Invalid platform: " + parts[1]);
+            errorHandler.accept("Invalid platform: " + phrase);
             return null;
           }
         case "id":
           try {
-            if (parts[1].contains(",")) {
-              return PaginationFilter.ids(LimsUtils.parseIds(parts[1]));
+            if (phrase.contains(",")) {
+              return PaginationFilter.ids(LimsUtils.parseIds(phrase));
             } else {
-              return PaginationFilter.id(Long.parseLong(parts[1]));
+              return PaginationFilter.id(Long.parseLong(phrase));
             }
           } catch (NumberFormatException ex) {
-            errorHandler.accept("Invalid ID: " + parts[1]);
+            errorHandler.accept("Invalid ID: " + phrase);
             return null;
           }
         case "index":
-          return PaginationFilter.index(parts[1]);
+          return PaginationFilter.index(phrase);
         case "class":
-          return PaginationFilter.sampleClass(parts[1]);
+          return PaginationFilter.sampleClass(phrase);
         case "external":
         case "ext":
         case "extern":
-          return PaginationFilter.external(parts[1]);
+          return PaginationFilter.external(phrase);
         case "lab":
-          return PaginationFilter.lab(parts[1]);
+          return PaginationFilter.lab(phrase);
         case "box":
-          return PaginationFilter.box(parts[1]);
+          return PaginationFilter.box(phrase);
         case "boxType":
           try {
-            return PaginationFilter.boxType(BoxType.valueOf(parts[1].toUpperCase()));
+            return PaginationFilter.boxType(BoxType.valueOf(phrase.toUpperCase()));
           } catch (IllegalArgumentException e) {
-            errorHandler.accept("Invalid box type: " + parts[1]);
+            errorHandler.accept("Invalid box type: " + phrase);
             return null;
           }
         case "kitname":
-          return PaginationFilter.kitName(parts[1]);
+          return PaginationFilter.kitName(phrase);
         case "subproject":
-          return PaginationFilter.subproject(parts[1]);
+          return PaginationFilter.subproject(phrase);
         case "sequencingparameters":
         case "parameters":
         case "params":
-          return PaginationFilter.sequencingParameters(parts[1]);
+          return PaginationFilter.sequencingParameters(phrase);
         case "groupid":
-          return PaginationFilter.groupId(parts[1]);
+          return PaginationFilter.groupId(phrase);
         case "distributed":
-          return parseDate(parts[1], DateType.DISTRIBUTED, errorHandler);
+          return parseDate(phrase, DateType.DISTRIBUTED, errorHandler);
         case "distributedto":
-          return PaginationFilter.distributedTo(parts[1]);
+          return PaginationFilter.distributedTo(phrase);
         case "freezer":
-          return PaginationFilter.freezer(parts[1]);
+          return PaginationFilter.freezer(phrase);
         case "req":
         case "requisition":
         case "requisitionid":
-          return PaginationFilter.requisitionId(parts[1]);
+          return PaginationFilter.requisitionId(phrase);
         case "tissueorigin":
         case "origin":
-          return PaginationFilter.tissueOrigin(parts[1]);
+          return PaginationFilter.tissueOrigin(phrase);
         case "tissuetype":
-          return PaginationFilter.tissueType(parts[1]);
+          return PaginationFilter.tissueType(phrase);
         case "timepoint":
-          return PaginationFilter.timepoint(parts[1]);
+          return PaginationFilter.timepoint(phrase);
         case "stage":
-          return PaginationFilter.stage(parts[1]);
+          return PaginationFilter.stage(phrase);
         case "model":
-          return PaginationFilter.model(parts[1]);
+          return PaginationFilter.model(phrase);
         case "workstation":
-          return PaginationFilter.workstation(parts[1]);
+          return PaginationFilter.workstation(phrase);
         }
       }
       return PaginationFilter.query(x);
     }).filter(Objects::nonNull).toArray(PaginationFilter[]::new);
+  }
+
+  /**
+   * The first criterion may not have a term. All others must have a term. Any word containing an unescaped colon is treated as a term
+   * 
+   * @param request
+   * @return all the separate criteria with any colons unescaped
+   */
+  @VisibleForTesting
+  protected List<String> splitCriteria(String request) {
+    String[] words = request.split(" ");
+    List<String> criteria = new ArrayList<>();
+    String currentTerm = words[0];
+    for (int i = 1; i < words.length; i++) {
+      if (words[i].matches(TERMED_CRITERION_PATTERN)) {
+        criteria.add(currentTerm.replace("\\:", ":"));
+        currentTerm = words[i];
+      } else {
+        currentTerm += " " + words[i];
+      }
+    }
+    criteria.add(currentTerm.replace("\\:", ":"));
+    return criteria;
   }
 
   private PaginationFilter parseDate(String text, DateType type, Consumer<String> errorHandler) {

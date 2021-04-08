@@ -2,6 +2,12 @@
 
 Changes:
 
+* Revised advanced search syntax
+  * All text searches use partial matching by default
+  * Surround text with quotation marks to do exact matching
+  * Quotes are no longer required for phrases containing spaces
+  * Use asterisks as wildcards (e.g. "text*" to match items beginning with "text")
+  * See the help dialog for more information
 * Improved performance of boxes
 * Improved performance of loading sequencer runs
 * Export tissue timepoint field to Pinery (detailed sample)
