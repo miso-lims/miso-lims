@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -15,22 +16,18 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.collect.Lists;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize.BoxType;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.LibraryAliquotBoxableView;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.LibraryBoxableView;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolBoxableView;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SampleBoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
 import uk.ac.bbsrc.tgac.miso.persistence.BoxStore;
@@ -40,15 +37,13 @@ import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 @Repository
 public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<Box> {
 
+  private static final String FIELD_NAME = "name";
   private static final String FIELD_ALIAS = "alias";
   private static final String FIELD_BARCODE = "identificationBarcode";
 
   protected static final String[] SEARCH_PROPERTIES = new String[] { "name", FIELD_ALIAS, FIELD_BARCODE, "locationBarcode" };
 
   private static final List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("size"), new AliasDescriptor("use"));
-
-  private static final List<Class<? extends BoxableView>> VIEW_CLASSES = Lists.newArrayList(SampleBoxableView.class,
-      LibraryBoxableView.class, LibraryAliquotBoxableView.class, PoolBoxableView.class);
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -185,7 +180,7 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
 
   @Override
   public BoxableView getBoxableView(BoxableId id) throws IOException {
-    return (BoxableView) currentSession().get(id.getTargetType().getViewClass(), id);
+    return (BoxableView) currentSession().get(id.getTargetType().getViewClass(), id.getTargetId());
   }
 
   @Override
@@ -193,7 +188,7 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
     if (barcodes == null || barcodes.isEmpty()) {
       return Collections.emptyList();
     }
-    return queryBoxables(Restrictions.in("identificationBarcode", barcodes));
+    return queryBoxables(Restrictions.in(FIELD_BARCODE, barcodes));
   }
 
   @Override
@@ -201,19 +196,36 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
     if (ids.isEmpty()) {
       return Collections.emptyList();
     }
-    return queryBoxables(Restrictions.in("id", ids));
+
+    List<BoxableView> results = new ArrayList<>();
+    for (EntityType entityType : EntityType.values()) {
+      List<Long> filteredIds = ids.stream()
+          .filter(x -> x.getTargetType() == entityType)
+          .map(BoxableId::getTargetId)
+          .collect(Collectors.toList());
+      if (!filteredIds.isEmpty()) {
+        @SuppressWarnings("unchecked")
+        List<BoxableView> partialResults = currentSession().createCriteria(entityType.getViewClass())
+            .add(Restrictions.in("id", filteredIds))
+            .list();
+        results.addAll(partialResults);
+      }
+    }
+    return results;
   }
 
   @Override
   public List<BoxableView> getBoxContents(long boxId) throws IOException {
-    return queryBoxables(Restrictions.eq("boxId", boxId));
+    return queryBoxables(Restrictions.eq("box.id", boxId));
   }
 
   private List<BoxableView> queryBoxables(Criterion criterion) {
     List<BoxableView> results = new ArrayList<>();
-    for (Class<? extends BoxableView> clazz : VIEW_CLASSES) {
+    for (EntityType entityType : EntityType.values()) {
       @SuppressWarnings("unchecked")
-      List<BoxableView> partialResults = currentSession().createCriteria(clazz)
+      List<BoxableView> partialResults = currentSession().createCriteria(entityType.getViewClass())
+          .createAlias("boxPosition", "boxPosition", JoinType.LEFT_OUTER_JOIN)
+          .createAlias("boxPosition.box", "box", JoinType.LEFT_OUTER_JOIN)
           .add(criterion)
           .list();
       results.addAll(partialResults);
@@ -227,8 +239,8 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
       throw new NullPointerException("No search String provided");
     }
     return queryBoxables(Restrictions.and(Restrictions.or(
-        Restrictions.eq("identificationBarcode", search),
-        Restrictions.eq("name", search),
+        Restrictions.eq(FIELD_BARCODE, search),
+        Restrictions.eq(FIELD_NAME, search),
         Restrictions.eq(FIELD_ALIAS, search)), Restrictions.eq("discarded", false)));
   }
 

@@ -31,7 +31,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.BoxStorageAmount;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BarcodableReferenceService;
@@ -242,7 +242,7 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
         .collect(Collectors.toList());
     Map<BoxableId, BoxableView> oldOccupants = boxStore.getBoxableViewsByIdList(ids)
         .stream()
-        .collect(Collectors.toMap(BoxableView::getId, Functions.identity()));
+        .collect(Collectors.toMap(view -> new BoxableId(view.getEntityType(), view.getId()), Functions.identity()));
 
     // Process additions/moves
     Set<BoxPosition> movedWithinBox = Sets.newHashSet();
@@ -293,7 +293,7 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
     }
     List<BoxableView> removed = boxStore.getBoxableViewsByIdList(removedIds);
     for (BoxableView v : removed) {
-      if (!movedWithinBoxIds.contains(v.getId())) {
+      if (!movedWithinBoxIds.contains(new BoxableId(v.getEntityType(), v.getId()))) {
         if (message.length() > 0) {
           message.append("\n");
         }

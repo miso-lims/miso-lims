@@ -11,8 +11,8 @@ required:
 
 Application Server:
 
-* JDK 8
-* Tomcat 8
+* JDK 11 or later
+* Tomcat 8 or later
 
 Database Server:
 
@@ -38,7 +38,7 @@ work; a typical Mac system may work. MISO is not guaranteed to work on Windows.
 
 You will need:
 
-* JDK 8.0
+* JDK 11 or later
 * [Maven 3.0.5](http://maven.apache.org/download.html) or later
 * Git
 

@@ -956,7 +956,8 @@ public class MisoClient implements Lims {
       SEQUENCING_CONTROL_TYPE("sequencing_control_type", "Sequencing Control Type"), //
       CUSTODY("custody", "Custody"), //
       LATEST_TRANSFER_REQUEST("latest_transfer_request", "Latest Transfer Request"), //
-      BATCH_ID("batch_id", "Batch ID");
+      BATCH_ID("batch_id", "Batch ID"), //
+      TIMEPOINT("timepoint", "Timepoint");
 
       private final String sqlKey;
       private final String attributeKey;

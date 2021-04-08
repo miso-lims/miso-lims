@@ -5,10 +5,10 @@ import java.util.Collection;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxableId;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 public interface BoxService extends PaginatedDataSource<Box>, BarcodableService<Box>, DeleterService<Box>, BulkSaveService<Box> {

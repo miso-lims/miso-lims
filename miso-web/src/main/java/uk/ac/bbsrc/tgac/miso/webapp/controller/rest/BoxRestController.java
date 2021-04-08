@@ -66,7 +66,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.BoxStorageAmount;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
@@ -178,7 +178,7 @@ public class BoxRestController extends RestController {
       box.getBoxPositions().remove(boxable.getBoxPosition());
     }
     // if an item already exists at this position, its location will be set to unknown.
-    box.getBoxPositions().put(position, new BoxPosition(box, position, boxable.getId()));
+    box.getBoxPositions().put(position, new BoxPosition(box, position, new BoxableId(boxable.getEntityType(), boxable.getId())));
     boxService.save(box);
     Box saved = boxService.get(boxId);
     Collection<BoxableView> savedContents = boxService.getBoxContents(boxId);
@@ -263,7 +263,7 @@ public class BoxRestController extends RestController {
   private String findExternalName(BoxableView boxableView) throws IOException {
     DetailedSample detailedSample;
 
-    switch (boxableView.getId().getTargetType()) {
+    switch (boxableView.getEntityType()) {
     case SAMPLE:
       detailedSample = (DetailedSample) extractSample(boxableView);
       break;
@@ -294,15 +294,15 @@ public class BoxRestController extends RestController {
   }
 
   private Sample extractSample(BoxableView boxableView) throws IOException {
-    return sampleService.get(boxableView.getId().getTargetId());
+    return sampleService.get(boxableView.getId());
   }
 
   private Library extractLibrary(BoxableView boxableView) throws IOException {
-    return libraryService.get(boxableView.getId().getTargetId());
+    return libraryService.get(boxableView.getId());
   }
 
   private LibraryAliquot extractLibraryAliquot(BoxableView boxableView) throws IOException {
-    return libraryAliquotService.get(boxableView.getId().getTargetId());
+    return libraryAliquotService.get(boxableView.getId());
   }
 
   private String findNumSlides(BoxableView boxableView) throws IOException {
@@ -318,7 +318,7 @@ public class BoxRestController extends RestController {
   }
 
   private boolean isSample(BoxableView boxableView) {
-    return boxableView.getId().getTargetType() == EntityType.SAMPLE;
+    return boxableView.getEntityType() == EntityType.SAMPLE;
   }
 
   private static BoxableId parseEntityIdentifier(String identifier) {
@@ -754,7 +754,8 @@ public class BoxRestController extends RestController {
     }
     for (Entry<String, BoxableView> entry : updates.entrySet()) {
       // if an item already exists at this position, its location will be set to unknown.
-      BoxPosition bp = new BoxPosition(box, entry.getKey(), entry.getValue().getId());
+      BoxableId id = new BoxableId(entry.getValue().getEntityType(), entry.getValue().getId());
+      BoxPosition bp = new BoxPosition(box, entry.getKey(), id);
       box.getBoxPositions().put(entry.getKey(), bp);
     }
 
@@ -874,7 +875,11 @@ public class BoxRestController extends RestController {
         .collect(Collectors.toMap(BoxableView::getIdentificationBarcode, Function.identity()));
     box.setBoxPositions(positionToBarcode.entrySet().stream().filter(entry -> barcodesToBoxables.containsKey(entry.getValue()))
         .collect(Collectors.toMap(Map.Entry::getKey,
-            entry -> new BoxPosition(box, entry.getKey(), barcodesToBoxables.get(entry.getValue()).getId()))));
+            entry -> {
+              BoxableView boxable = barcodesToBoxables.get(entry.getValue());
+              BoxableId id = new BoxableId(boxable.getEntityType(), boxable.getId());
+              return new BoxPosition(box, entry.getKey(), id);
+            })));
     boxService.save(box);
   }
 
