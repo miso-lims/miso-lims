@@ -19,7 +19,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
-import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
 import uk.ac.bbsrc.tgac.miso.persistence.PoolStore;
 import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
@@ -169,7 +168,7 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   }
 
   @Override
-  public void restrictPaginationByIndex(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+  public void restrictPaginationByIndex(Criteria criteria, String query, Consumer<String> errorHandler) {
     criteria.createAlias("poolElements", "poolElement")
         .createAlias("poolElement.aliquot", "aliquot")
         .createAlias("aliquot.parentLibrary", "library")
@@ -178,7 +177,7 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   }
 
   @Override
-  public void restrictPaginationByDistributionRecipient(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+  public void restrictPaginationByDistributionRecipient(Criteria criteria, String query, Consumer<String> errorHandler) {
     DbUtils.restrictPaginationByDistributionRecipient(criteria, query, "pools", "poolId");
   }
 

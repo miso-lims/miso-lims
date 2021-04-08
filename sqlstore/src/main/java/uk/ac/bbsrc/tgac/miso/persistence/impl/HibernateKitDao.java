@@ -49,7 +49,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
-import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
 import uk.ac.bbsrc.tgac.miso.persistence.KitStore;
 import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
@@ -150,7 +149,7 @@ public class HibernateKitDao implements KitStore, HibernatePaginatedDataSource<K
   }
 
   @Override
-  public void restrictPaginationByKitName(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+  public void restrictPaginationByKitName(Criteria criteria, String query, Consumer<String> errorHandler) {
     criteria.add(DbUtils.textRestriction(query, "name"));
   }
 

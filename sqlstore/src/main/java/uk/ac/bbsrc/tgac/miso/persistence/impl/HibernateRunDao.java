@@ -22,8 +22,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
-import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
 import uk.ac.bbsrc.tgac.miso.persistence.RunStore;
 import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
@@ -241,8 +241,8 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   }
 
   @Override
-  public void restrictPaginationBySequencingParametersName(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
-    if (query.getText() == null) {
+  public void restrictPaginationBySequencingParametersName(Criteria criteria, String query, Consumer<String> errorHandler) {
+    if (LimsUtils.isStringBlankOrNull(query)) {
       criteria.add(Restrictions.isNull("sequencingParameters"));
     } else {
       criteria.createAlias("sequencingParameters", "params");
@@ -261,7 +261,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   }
 
   @Override
-  public void restrictPaginationByIndex(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+  public void restrictPaginationByIndex(Criteria criteria, String query, Consumer<String> errorHandler) {
     criteria.createAlias("runPositions", "runPos")
         .createAlias("runPos.container", "spc")
         .createAlias("spc.partitions", "partition")

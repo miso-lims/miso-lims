@@ -24,7 +24,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
-import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAliquotStore;
 import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
@@ -160,8 +160,8 @@ public class HibernateLibraryAliquotDao
   }
 
   @Override
-  public void restrictPaginationByIndex(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
-    if (query.getText() == null) {
+  public void restrictPaginationByIndex(Criteria criteria, String query, Consumer<String> errorHandler) {
+    if (LimsUtils.isStringBlankOrNull(query)) {
       criteria.add(Restrictions.isEmpty("library.indices"));
     } else {
       criteria.createAlias("library.indices", "indices", JoinType.LEFT_OUTER_JOIN)
@@ -170,12 +170,12 @@ public class HibernateLibraryAliquotDao
   }
 
   @Override
-  public void restrictPaginationByGroupId(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+  public void restrictPaginationByGroupId(Criteria criteria, String query, Consumer<String> errorHandler) {
     criteria.add(DbUtils.textRestriction(query, "groupId"));
   }
 
   @Override
-  public void restrictPaginationByDistributionRecipient(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+  public void restrictPaginationByDistributionRecipient(Criteria criteria, String query, Consumer<String> errorHandler) {
     DbUtils.restrictPaginationByDistributionRecipient(criteria, query, "libraryAliquots", "aliquotId");
   }
 

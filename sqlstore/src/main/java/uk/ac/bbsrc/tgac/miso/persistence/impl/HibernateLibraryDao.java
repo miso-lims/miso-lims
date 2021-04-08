@@ -27,7 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
-import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
@@ -249,8 +249,8 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   }
 
   @Override
-  public void restrictPaginationByIndex(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
-    if (query.getText() == null) {
+  public void restrictPaginationByIndex(Criteria criteria, String query, Consumer<String> errorHandler) {
+    if (LimsUtils.isStringBlankOrNull(query)) {
       criteria.add(Restrictions.isEmpty("indices"));
     } else {
       criteria.createAlias("indices", "indices")
@@ -259,8 +259,8 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   }
 
   @Override
-  public void restrictPaginationByKitName(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
-    if (query.getText() == null) {
+  public void restrictPaginationByKitName(Criteria criteria, String query, Consumer<String> errorHandler) {
+    if (LimsUtils.isStringBlankOrNull(query)) {
       criteria.add(Restrictions.isNull("kitDescriptor"));
     } else {
       criteria.createAlias("kitDescriptor", "kitDescriptor");
@@ -269,17 +269,17 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   }
 
   @Override
-  public void restrictPaginationByGroupId(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+  public void restrictPaginationByGroupId(Criteria criteria, String query, Consumer<String> errorHandler) {
     criteria.add(DbUtils.textRestriction(query, "groupId"));
   }
 
   @Override
-  public void restrictPaginationByTissueOrigin(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+  public void restrictPaginationByTissueOrigin(Criteria criteria, String query, Consumer<String> errorHandler) {
     criteria.add(DbUtils.textRestriction(query, "tissueOrigin.alias"));
   }
 
   @Override
-  public void restrictPaginationByTissueType(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+  public void restrictPaginationByTissueType(Criteria criteria, String query, Consumer<String> errorHandler) {
     criteria.add(DbUtils.textRestriction(query, "tissueType.alias"));
   }
 
@@ -318,12 +318,12 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   }
 
   @Override
-  public void restrictPaginationByDistributionRecipient(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+  public void restrictPaginationByDistributionRecipient(Criteria criteria, String query, Consumer<String> errorHandler) {
     DbUtils.restrictPaginationByDistributionRecipient(criteria, query, "libraries", "libraryId");
   }
 
   @Override
-  public void restrictPaginationByWorkstation(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+  public void restrictPaginationByWorkstation(Criteria criteria, String query, Consumer<String> errorHandler) {
     criteria.createAlias("workstation", "workstation")
         .add(DbUtils.textRestriction(query, "workstation.alias", "workstation.identificationBarcode"));
   }

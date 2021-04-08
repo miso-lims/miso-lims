@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListWorksetView;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
-import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
 import uk.ac.bbsrc.tgac.miso.persistence.ListWorksetViewStore;
 import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
@@ -98,12 +97,12 @@ public class HibernateListWorksetViewDao implements ListWorksetViewStore, Hibern
   }
 
   @Override
-  public void restrictPaginationByCategory(Criteria item, TextQuery query, Consumer<String> errorHandler) {
+  public void restrictPaginationByCategory(Criteria item, String query, Consumer<String> errorHandler) {
     item.add(DbUtils.textRestriction(query, "category"));
   }
 
   @Override
-  public void restrictPaginationByStage(Criteria item, TextQuery query, Consumer<String> errorHandler) {
+  public void restrictPaginationByStage(Criteria item, String query, Consumer<String> errorHandler) {
     item.add(DbUtils.textRestriction(query, "stage"));
   }
 

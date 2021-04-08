@@ -57,7 +57,7 @@ public abstract interface PaginationFilter {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
-        sink.restrictPaginationByBox(item, new TextQuery(name), errorHandler);
+        sink.restrictPaginationByBox(item, name, errorHandler);
       }
     };
   }
@@ -125,7 +125,7 @@ public abstract interface PaginationFilter {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
-        sink.restrictPaginationByDistributionRecipient(item, new TextQuery(recipient), errorHandler);
+        sink.restrictPaginationByDistributionRecipient(item, recipient, errorHandler);
       }
     };
   }
@@ -135,7 +135,7 @@ public abstract interface PaginationFilter {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
-        sink.restrictPaginationByExternalName(item, new TextQuery(name), errorHandler);
+        sink.restrictPaginationByExternalName(item, name, errorHandler);
       }
     };
   }
@@ -175,7 +175,7 @@ public abstract interface PaginationFilter {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
-        sink.restrictPaginationByGroupId(item, new TextQuery(groupId), errorHandler);
+        sink.restrictPaginationByGroupId(item, groupId, errorHandler);
       }
     };
   }
@@ -219,7 +219,7 @@ public abstract interface PaginationFilter {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
-        sink.restrictPaginationByIndex(item, new TextQuery(index), errorHandler);
+        sink.restrictPaginationByIndex(item, index, errorHandler);
       }
     };
   }
@@ -229,7 +229,7 @@ public abstract interface PaginationFilter {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
-        sink.restrictPaginationByLab(item, new TextQuery(name), errorHandler);
+        sink.restrictPaginationByLab(item, name, errorHandler);
       }
     };
   }
@@ -259,7 +259,7 @@ public abstract interface PaginationFilter {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
-        sink.restrictPaginationByKitName(item, new TextQuery(name), errorHandler);
+        sink.restrictPaginationByKitName(item, name, errorHandler);
       }
     };
   }
@@ -269,7 +269,7 @@ public abstract interface PaginationFilter {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
-        sink.restrictPaginationBySequencingParametersName(item, new TextQuery(name), errorHandler);
+        sink.restrictPaginationBySequencingParametersName(item, name, errorHandler);
       }
     };
   }
@@ -328,7 +328,7 @@ public abstract interface PaginationFilter {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
-        sink.restrictPaginationByQuery(item, new TextQuery(query), errorHandler);
+        sink.restrictPaginationByQuery(item, query, errorHandler);
       }
     };
   }
@@ -368,7 +368,7 @@ public abstract interface PaginationFilter {
       
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
-        sink.restrictPaginationBySubproject(item, new TextQuery(subproject), errorHandler);
+        sink.restrictPaginationBySubproject(item, subproject, errorHandler);
       }
     };
   }
@@ -378,7 +378,7 @@ public abstract interface PaginationFilter {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
-        sink.restrictPaginationByUser(item, new TextQuery(loginName), creator, errorHandler);
+        sink.restrictPaginationByUser(item, loginName, creator, errorHandler);
       }
     };
   }
@@ -388,7 +388,7 @@ public abstract interface PaginationFilter {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
-        sink.restrictPaginationByUserOrGroup(item, new TextQuery(name), creator, errorHandler);
+        sink.restrictPaginationByUserOrGroup(item, name, creator, errorHandler);
       }
     };
   }
@@ -398,7 +398,7 @@ public abstract interface PaginationFilter {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
-        sink.restrictPaginationByFreezer(item, new TextQuery(freezer), errorHandler);
+        sink.restrictPaginationByFreezer(item, freezer, errorHandler);
       }
     };
   }
@@ -409,7 +409,7 @@ public abstract interface PaginationFilter {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
-        sink.restrictPaginationByRequisitionId(item, new TextQuery(requisitionId), errorHandler);
+        sink.restrictPaginationByRequisitionId(item, requisitionId, errorHandler);
       }
     };
   }
@@ -439,7 +439,7 @@ public abstract interface PaginationFilter {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
-        sink.restrictPaginationByTimepoint(item, new TextQuery(timepoint), errorHandler);
+        sink.restrictPaginationByTimepoint(item, timepoint, errorHandler);
       }
     };
   }
@@ -449,7 +449,7 @@ public abstract interface PaginationFilter {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
-        sink.restrictPaginationByTissueOrigin(item, new TextQuery(origin), errorHandler);
+        sink.restrictPaginationByTissueOrigin(item, origin, errorHandler);
       }
     };
   }
@@ -459,7 +459,7 @@ public abstract interface PaginationFilter {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
-        sink.restrictPaginationByTissueType(item, new TextQuery(type), errorHandler);
+        sink.restrictPaginationByTissueType(item, type, errorHandler);
       }
     };
   }
@@ -479,7 +479,7 @@ public abstract interface PaginationFilter {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
-        sink.restrictPaginationByCategory(item, new TextQuery(category), errorHandler);
+        sink.restrictPaginationByCategory(item, category, errorHandler);
       }
     };
   }
@@ -489,7 +489,7 @@ public abstract interface PaginationFilter {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
-        sink.restrictPaginationByStage(item, new TextQuery(stage), errorHandler);
+        sink.restrictPaginationByStage(item, stage, errorHandler);
       }
     };
   }
@@ -499,7 +499,7 @@ public abstract interface PaginationFilter {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
-        sink.restrictPaginationByModel(item, new TextQuery(model), errorHandler);
+        sink.restrictPaginationByModel(item, model, errorHandler);
       }
     };
   }
@@ -509,7 +509,7 @@ public abstract interface PaginationFilter {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
-        sink.restrictPaginationByWorkstation(item, new TextQuery(workstation), errorHandler);
+        sink.restrictPaginationByWorkstation(item, workstation, errorHandler);
       }
     };
   }

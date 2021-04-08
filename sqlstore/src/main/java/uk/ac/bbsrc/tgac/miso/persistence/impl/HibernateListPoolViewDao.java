@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
-import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
 import uk.ac.bbsrc.tgac.miso.persistence.ListPoolViewDao;
 import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
@@ -105,20 +104,20 @@ public class HibernateListPoolViewDao implements ListPoolViewDao, HibernatePagin
   }
 
   @Override
-  public void restrictPaginationByBox(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+  public void restrictPaginationByBox(Criteria criteria, String query, Consumer<String> errorHandler) {
     criteria.add(DbUtils.textRestriction(query, "boxName", "boxAlias"));
 
   }
 
   @Override
-  public void restrictPaginationByIndex(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+  public void restrictPaginationByIndex(Criteria criteria, String query, Consumer<String> errorHandler) {
     criteria.createAlias("elements", "element")
         .createAlias("element.indices", "indices")
         .add(DbUtils.textRestriction(query, "indices.name", "indices.sequence"));
   }
 
   @Override
-  public void restrictPaginationByFreezer(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+  public void restrictPaginationByFreezer(Criteria criteria, String query, Consumer<String> errorHandler) {
     criteria.createAlias("box", "box");
     DbUtils.restrictPaginationByFreezer(criteria, query, "box.storageLocation");
   }
@@ -135,7 +134,7 @@ public class HibernateListPoolViewDao implements ListPoolViewDao, HibernatePagin
   }
 
   @Override
-  public void restrictPaginationByDistributionRecipient(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+  public void restrictPaginationByDistributionRecipient(Criteria criteria, String query, Consumer<String> errorHandler) {
     DbUtils.restrictPaginationByDistributionRecipient(criteria, query, "pools", "poolId");
   }
 

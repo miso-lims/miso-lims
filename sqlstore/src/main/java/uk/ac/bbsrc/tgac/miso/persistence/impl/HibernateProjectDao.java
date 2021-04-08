@@ -38,7 +38,6 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
-import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
 import uk.ac.bbsrc.tgac.miso.persistence.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
@@ -99,7 +98,7 @@ public class HibernateProjectDao implements ProjectStore {
   @Override
   public List<Project> listBySearch(String query) throws IOException {
     Criteria criteria = currentSession().createCriteria(ProjectImpl.class)
-        .add(DbUtils.textRestriction(new TextQuery(query), SEARCH_PROPERTIES));
+        .add(DbUtils.textRestriction(query, SEARCH_PROPERTIES));
 
     @SuppressWarnings("unchecked")
     List<Project> results = criteria.list();

@@ -35,27 +35,19 @@ import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferView;
-import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
-/**
- * uk.ac.bbsrc.tgac.miso.util
- * <p/>
- * Info
- *
- * @author Rob Davey
- * @since 0.0.2
- */
 public class DbUtils {
 
-  public static void restrictPaginationByFreezer(Criteria criteria, TextQuery query, String boxStorageLocationProperty) {
-    if (query.getText() == null) {
+  public static void restrictPaginationByFreezer(Criteria criteria, String query, String boxStorageLocationProperty) {
+    if (LimsUtils.isStringBlankOrNull(query)) {
       criteria.add(Restrictions.isNull(boxStorageLocationProperty));
       return;
     }
-    String sanitized = sanitizeQueryString(query.getText());
-    MatchMode matchMode = getMatchMode(query);
 
     criteria.createAlias(boxStorageLocationProperty, "location1", JoinType.LEFT_OUTER_JOIN)
         .createAlias("location1.parentLocation", "location2", JoinType.LEFT_OUTER_JOIN)
@@ -65,22 +57,22 @@ public class DbUtils {
         .createAlias("location5.parentLocation", "location6", JoinType.LEFT_OUTER_JOIN)
         .add(Restrictions.or(
             Restrictions.and(Restrictions.eq("location1.locationUnit", LocationUnit.FREEZER),
-                textRestriction("location1.alias", sanitized, matchMode)),
+                textRestriction("location1.alias", query)),
             Restrictions.and(Restrictions.eq("location2.locationUnit", LocationUnit.FREEZER),
-                textRestriction("location2.alias", sanitized, matchMode)),
+                textRestriction("location2.alias", query)),
             Restrictions.and(Restrictions.eq("location3.locationUnit", LocationUnit.FREEZER),
-                textRestriction("location3.alias", sanitized, matchMode)),
+                textRestriction("location3.alias", query)),
             Restrictions.and(Restrictions.eq("location4.locationUnit", LocationUnit.FREEZER),
-                textRestriction("location4.alias", sanitized, matchMode)),
+                textRestriction("location4.alias", query)),
             Restrictions.and(Restrictions.eq("location5.locationUnit", LocationUnit.FREEZER),
-                textRestriction("location5.alias", sanitized, matchMode)),
+                textRestriction("location5.alias", query)),
             Restrictions.and(Restrictions.eq("location6.locationUnit", LocationUnit.FREEZER),
-                textRestriction("location6.alias", sanitized, matchMode))));
+                textRestriction("location6.alias", query))));
   }
 
-  public static void restrictPaginationByDistributionRecipient(Criteria criteria, TextQuery query, String collectionProperty,
+  public static void restrictPaginationByDistributionRecipient(Criteria criteria, String query, String collectionProperty,
       String itemIdProperty) {
-    if (query.getText() == null) {
+    if (LimsUtils.isStringBlankOrNull(query)) {
       DetachedCriteria subquery = DetachedCriteria.forClass(ListTransferView.class)
           .createAlias(collectionProperty, "transferItem")
           .add(Restrictions.isNotNull("recipient"))
@@ -88,7 +80,7 @@ public class DbUtils {
       criteria.add(Property.forName("id").notIn(subquery));
     } else {
       criteria.createAlias("listTransferViews", "transfer")
-          .add(DbUtils.textRestriction(query, "transfer.recipient"));
+          .add(DbUtils.textRestriction("transfer.recipient", query));
     }
   }
 
@@ -104,17 +96,15 @@ public class DbUtils {
         .add(Restrictions.between("transfer.transferTime", start, end));
   }
 
-  public static Criterion textRestriction(TextQuery query, String... searchProperties) {
-    String sanitized = sanitizeQueryString(query.getText());
-    MatchMode matchMode = getMatchMode(query);
+  public static Criterion textRestriction(String query, String... searchProperties) {
     if (searchProperties.length == 1) {
-      return textRestriction(searchProperties[0], sanitized, matchMode);
+      return textRestriction(searchProperties[0], query);
     } else {
       Criterion[] criteria = new Criterion[searchProperties.length];
       for (int i = 0; i < searchProperties.length; i++) {
-        criteria[i] = textRestriction(searchProperties[i], sanitized, matchMode);
+        criteria[i] = textRestriction(searchProperties[i], query);
       }
-      if (sanitized == null) {
+      if (LimsUtils.isStringBlankOrNull(query)) {
         // if null, all search properties must be null
         return Restrictions.and(criteria);
       } else {
@@ -124,33 +114,55 @@ public class DbUtils {
     }
   }
 
-  private static String sanitizeQueryString(String original) {
-    return original == null ? null
-        : original.trim()
-            .replaceAll("_", Matcher.quoteReplacement("\\_"))
-            .replaceAll("%", Matcher.quoteReplacement("\\%"));
-  }
-
-  private static MatchMode getMatchMode(TextQuery query) {
-    if (query.isExactStart()) {
-      if (query.isExactEnd()) {
-        return MatchMode.EXACT;
-      } else {
-        return MatchMode.START;
-      }
-    } else if (query.isExactEnd()) {
-      return MatchMode.END;
-    } else {
-      return MatchMode.ANYWHERE;
-    }
-  }
-
-  private static Criterion textRestriction(String propertyName, String sanitizedQuery, MatchMode matchMode) {
-    if (sanitizedQuery == null) {
+  private static Criterion textRestriction(String propertyName, String query) {
+    if (query == null) {
       return Restrictions.isNull(propertyName);
+    } else if (isQuoted(query)) {
+      String finalQuery = removeQuotes(query);
+      return Restrictions.eq(propertyName, finalQuery);
+    } else if (containsWildcards(query)) {
+      String sanitized = sanitizeQueryString(query);
+      String finalQuery = replaceWildcards(sanitized);
+      return Restrictions.ilike(propertyName, finalQuery);
     } else {
-      return Restrictions.ilike(propertyName, sanitizedQuery, matchMode);
+      String sanitized = sanitizeQueryString(query);
+      String finalQuery = removeEscapes(sanitized);
+      return Restrictions.ilike(propertyName, finalQuery, MatchMode.ANYWHERE);
     }
+  }
+
+  private static String sanitizeQueryString(String original) {
+    // escape MySQL LIKE wildcard characters
+    return original.trim()
+        .replaceAll("_", Matcher.quoteReplacement("\\_"))
+        .replaceAll("%", Matcher.quoteReplacement("\\%"));
+  }
+
+  @VisibleForTesting
+  protected static boolean isQuoted(String query) {
+    return query.matches("\"(.*[^\\\\])?\"");
+  }
+
+  @VisibleForTesting
+  protected static boolean containsWildcards(String query) {
+    return query.matches(".*(^|[^\\\\])\\*.*");
+  }
+
+  @VisibleForTesting
+  protected static String removeQuotes(String original) {
+    return removeEscapes(original.replaceFirst("^\"(.*)\"$", "$1"));
+  }
+
+  @VisibleForTesting
+  protected static String replaceWildcards(String original) {
+    return removeEscapes(original.replaceAll("(^|[^\\\\])\\*", "$1%"));
+  }
+
+  @VisibleForTesting
+  protected static String removeEscapes(String original) {
+    return original
+        .replaceAll("\\\\\"", "\"")
+        .replaceAll("\\\\\\*", "*");
   }
 
 }

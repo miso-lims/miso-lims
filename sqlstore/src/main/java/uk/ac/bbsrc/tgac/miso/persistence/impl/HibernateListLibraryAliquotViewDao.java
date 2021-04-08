@@ -24,7 +24,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
-import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.ListLibraryAliquotViewDao;
 import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
@@ -160,8 +160,8 @@ public class HibernateListLibraryAliquotViewDao implements ListLibraryAliquotVie
   }
 
   @Override
-  public void restrictPaginationByIndex(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
-    if (query.getText() == null) {
+  public void restrictPaginationByIndex(Criteria criteria, String query, Consumer<String> errorHandler) {
+    if (LimsUtils.isStringBlankOrNull(query)) {
       criteria.add(Restrictions.isEmpty("library.indices"));
     } else {
       criteria.createAlias("library.indices", "indices", JoinType.LEFT_OUTER_JOIN)
@@ -170,8 +170,8 @@ public class HibernateListLibraryAliquotViewDao implements ListLibraryAliquotVie
   }
 
   @Override
-  public void restrictPaginationByBox(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
-    if (query.getText() == null) {
+  public void restrictPaginationByBox(Criteria criteria, String query, Consumer<String> errorHandler) {
+    if (LimsUtils.isStringBlankOrNull(query)) {
       criteria.createAlias("boxPosition", "boxPosition", JoinType.LEFT_OUTER_JOIN)
           .add(Restrictions.isNull("boxPosition.box"));
     } else {
@@ -182,7 +182,7 @@ public class HibernateListLibraryAliquotViewDao implements ListLibraryAliquotVie
   }
 
   @Override
-  public void restrictPaginationByFreezer(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+  public void restrictPaginationByFreezer(Criteria criteria, String query, Consumer<String> errorHandler) {
     criteria.createAlias("boxPosition", "boxPosition")
         .createAlias("boxPosition.box", "box");
     DbUtils.restrictPaginationByFreezer(criteria, query, "box.storageLocation");
@@ -200,17 +200,17 @@ public class HibernateListLibraryAliquotViewDao implements ListLibraryAliquotVie
   }
 
   @Override
-  public void restrictPaginationByDistributionRecipient(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+  public void restrictPaginationByDistributionRecipient(Criteria criteria, String query, Consumer<String> errorHandler) {
     DbUtils.restrictPaginationByDistributionRecipient(criteria, query, "libraryAliquots", "aliquotId");
   }
 
   @Override
-  public void restrictPaginationByTissueOrigin(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+  public void restrictPaginationByTissueOrigin(Criteria criteria, String query, Consumer<String> errorHandler) {
     criteria.add(DbUtils.textRestriction(query, "tissueOrigin.alias"));
   }
 
   @Override
-  public void restrictPaginationByTissueType(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+  public void restrictPaginationByTissueType(Criteria criteria, String query, Consumer<String> errorHandler) {
     criteria.add(DbUtils.textRestriction(query, "tissueType.alias"));
   }
 

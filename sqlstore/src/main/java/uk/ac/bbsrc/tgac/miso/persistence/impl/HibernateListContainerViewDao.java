@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListContainerView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
-import uk.ac.bbsrc.tgac.miso.core.util.TextQuery;
 import uk.ac.bbsrc.tgac.miso.persistence.ListContainerViewDao;
 import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
@@ -92,14 +91,14 @@ public class HibernateListContainerViewDao implements ListContainerViewDao, Hibe
   }
 
   @Override
-  public void restrictPaginationByKitName(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+  public void restrictPaginationByKitName(Criteria criteria, String query, Consumer<String> errorHandler) {
     criteria.createAlias("clusteringKit", "clusteringKit", JoinType.LEFT_OUTER_JOIN);
     criteria.createAlias("multiplexingKit", "multiplexingKit", JoinType.LEFT_OUTER_JOIN);
     criteria.add(DbUtils.textRestriction(query, "clusteringKit.name", "multiplexingKit.name"));
   }
 
   @Override
-  public void restrictPaginationByIndex(Criteria criteria, TextQuery query, Consumer<String> errorHandler) {
+  public void restrictPaginationByIndex(Criteria criteria, String query, Consumer<String> errorHandler) {
     criteria.createAlias("partitions", "partitions")
         .createAlias("partitions.pool", "pool")
         .createAlias("pool.poolElements", "poolElement")
