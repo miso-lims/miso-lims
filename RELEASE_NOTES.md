@@ -5,6 +5,7 @@ Changes:
 * Improved performance of boxes
 * Improved performance of loading sequencer runs
 * Export tissue timepoint field to Pinery (detailed sample)
+* Removed deprecated project clinical field from Pinery
 * Fixed saving runs from Run Scanner that are missing container serial numbers.
   The run will now be created or updated successfully, but no container will be
   created or updated
@@ -17,6 +18,7 @@ Upgrade Notes:
   MISO on your own Tomcat installation, you will need to have JDK 11 or higher
   installed. You will also need to ensure that Tomcat is configured to use the
   newly installed JDK.
+* Updated to Pinery v2.19.0
 
 # 1.26.0
 
