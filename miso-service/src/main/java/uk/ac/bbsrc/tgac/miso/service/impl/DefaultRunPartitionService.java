@@ -13,7 +13,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.service.PartitionQcTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
@@ -25,8 +24,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.RunPartitionStore;
 @Transactional(rollbackFor = Exception.class)
 public class DefaultRunPartitionService implements RunPartitionService {
 
-  @Autowired
-  private ContainerService containerService;
   @Autowired
   private RunPartitionStore runPartitionDao;
   @Autowired
@@ -40,13 +37,16 @@ public class DefaultRunPartitionService implements RunPartitionService {
 
   @Override
   public RunPartition get(Run run, Partition partition) throws IOException {
-    Run managedRun = runService.get(run.getId());
-    return runPartitionDao.get(managedRun, partition);
+    return get(run.getId(), partition.getId());
+  }
+
+  private RunPartition get(long runId, long partitionId) throws IOException {
+    return runPartitionDao.get(runId, partitionId);
   }
 
   @Override
   public void save(RunPartition runPartition) throws IOException {
-    RunPartition managed = get(runPartition.getRun(), runPartition.getPartition());
+    RunPartition managed = get(runPartition.getRunId(), runPartition.getPartitionId());
     User user = authorizationManager.getCurrentUser();
 
     ValidationUtils.loadChildEntity(runPartition::setPurpose, runPartition.getPurpose(), runPurposeService, "runPurposeId");
@@ -57,8 +57,6 @@ public class DefaultRunPartitionService implements RunPartitionService {
     }
 
     if (managed == null) {
-      runPartition.setRun(runService.get(runPartition.getRun().getId()));
-      runPartition.setPartition(containerService.getPartition(runPartition.getPartition().getId()));
       runPartition.setLastModifier(user);
       runPartitionDao.create(runPartition);
     } else {

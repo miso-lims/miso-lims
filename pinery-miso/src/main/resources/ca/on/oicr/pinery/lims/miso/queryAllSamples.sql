@@ -28,6 +28,7 @@ SELECT s.alias NAME
         ,tor.alias tissue_origin
         ,tm.alias tissue_preparation
         ,s.region tissue_region
+        ,s.timepoint timepoint
         ,s.secondaryIdentifier tube_id
         ,s.strStatus str_result
         ,s.groupId group_id
@@ -159,6 +160,7 @@ SELECT l.alias NAME
         ,NULL tissue_origin 
         ,NULL tissue_preparation 
         ,NULL tissue_region 
+        ,NULL timepoint
         ,NULL tube_id 
         ,NULL str_result 
         ,l.groupId group_id 
@@ -303,6 +305,7 @@ SELECT d.alias name
         ,NULL tissue_origin 
         ,NULL tissue_preparation 
         ,NULL tissue_region 
+        ,NULL timepoint
         ,NULL tube_id 
         ,NULL str_result 
         ,d.groupId group_id 

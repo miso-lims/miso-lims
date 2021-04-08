@@ -193,7 +193,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferNotification;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BarcodableView;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.GrandparentSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListContainerRunSequencerView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListContainerRunView;
@@ -209,6 +208,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentTissueAttributes;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SequencingOrderSummaryView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.BoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.SampleBoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.instrumentstatus.InstrumentStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.instrumentstatus.InstrumentStatusPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.instrumentstatus.InstrumentStatusPositionRun;
@@ -1579,7 +1580,7 @@ public class Dtos {
 
   public static BoxableDto asDto(@Nonnull BoxableView from) {
     BoxableDto dto = new BoxableDto();
-    dto.setId(from.getId().getTargetId());
+    dto.setId(from.getId());
     dto.setAlias(from.getAlias());
     dto.setBoxAlias(from.getBoxAlias());
     dto.setBoxPosition(BoxUtils.makeLocationLabel(from));
@@ -1588,8 +1589,10 @@ public class Dtos {
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setName(from.getName());
     setString(dto::setVolume, from.getVolume());
-    dto.setEntityType(from.getId().getTargetType());
-    dto.setSampleClassId(from.getSampleClassId());
+    dto.setEntityType(from.getEntityType());
+    if (from instanceof SampleBoxableView) {
+      dto.setSampleClassId(((SampleBoxableView) from).getSampleClassId());
+    }
     return dto;
   }
 
@@ -1947,7 +1950,7 @@ public class Dtos {
     return asDto(from, false, false, false);
   }
 
-  public static RunDto asDto(@Nonnull Run from, boolean includeContainers, boolean includeContainerPartitions,
+  private static RunDto asDto(@Nonnull Run from, boolean includeContainers, boolean includeContainerPartitions,
       boolean includePoolContents) {
     RunDto dto = getPlatformRunDto(from);
     setLong(dto::setId, from.getId(), true);

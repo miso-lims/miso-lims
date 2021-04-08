@@ -144,11 +144,6 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   private SopService sopService;
 
   @Override
-  public List<Run> list() throws IOException {
-    return runDao.listAll();
-  }
-
-  @Override
   public Collection<Run> listByProjectId(long projectId) throws IOException {
     return runDao.listByProjectId(projectId);
   }
@@ -267,8 +262,8 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
         RunPartition runPartition = runPartitionService.get(run, partition);
         if (runPartition == null) {
           runPartition = new RunPartition();
-          runPartition.setRun(run);
-          runPartition.setPartition(partition);
+          runPartition.setRunId(run.getId());
+          runPartition.setPartitionId(partition.getId());
           runPartition.setPurpose(run.getSequencer().getDefaultRunPurpose());
           runPartitionService.save(runPartition);
         }
@@ -757,6 +752,9 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
 
   private boolean updateContainerFromNotification(final Run target, User user, SequencingContainerModel containerModel,
       String containerSerialNumber, final GetLaneContents getLaneContents, String positionName) throws IOException {
+    if (LimsUtils.isStringBlankOrNull(containerSerialNumber)) {
+      return false;
+    }
     final Collection<SequencerPartitionContainer> containers = containerService.listByBarcode(containerSerialNumber);
     int laneCount = containerModel.getPartitionCount();
     InstrumentPosition position = null;

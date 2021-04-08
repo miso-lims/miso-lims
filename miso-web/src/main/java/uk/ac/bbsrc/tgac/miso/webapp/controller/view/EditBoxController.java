@@ -31,7 +31,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.dto.BoxDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;

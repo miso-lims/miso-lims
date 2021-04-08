@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
@@ -13,6 +15,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
@@ -20,7 +24,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 
 public class HibernateRunPartitionDaoIT extends AbstractDAOTest {
@@ -41,16 +47,20 @@ public class HibernateRunPartitionDaoIT extends AbstractDAOTest {
 
   @Test
   public void testCreate() throws Exception {
-    PartitionQCType type = (PartitionQCType) sessionFactory.getCurrentSession().get(PartitionQCType.class, 1L);
-    Run run = (Run) sessionFactory.getCurrentSession().get(Run.class, 2L);
-    Partition partition = (Partition) sessionFactory.getCurrentSession().get(PartitionImpl.class, 2L);
+    long runId = 2L;
+    long partitionId = 2L;
+    PartitionQCType type = (PartitionQCType) currentSession().get(PartitionQCType.class, 1L);
+    RunPurpose purpose = (RunPurpose) currentSession().get(RunPurpose.class, 1L);
     RunPartition qc = new RunPartition();
-    qc.setRun(run);
-    qc.setPartition(partition);
+    User user = (User) currentSession().get(UserImpl.class, 1L);
+    qc.setRunId(runId);
+    qc.setPartitionId(partitionId);
     qc.setQcType(type);
+    qc.setPurpose(purpose);
+    qc.setLastModifier(user);
     dao.create(qc);
 
-    RunPartition fetchedQc = dao.get(run, partition);
+    RunPartition fetchedQc = dao.get(runId, partitionId);
     assertNotNull(fetchedQc);
     assertEquals(qc.getQcType().getId(), fetchedQc.getQcType().getId());
     assertEquals(qc.getNotes(), fetchedQc.getNotes());
@@ -60,9 +70,9 @@ public class HibernateRunPartitionDaoIT extends AbstractDAOTest {
   public void testGet() throws Exception {
     Run run = (Run) sessionFactory.getCurrentSession().get(Run.class, 1L);
     assertNotNull(run);
-    Partition partition = (Partition) sessionFactory.getCurrentSession().get(PartitionImpl.class, 1L);
+    Partition partition = (Partition) currentSession().get(PartitionImpl.class, 1L);
     assertNotNull(partition);
-    RunPartition qc = dao.get(run, partition);
+    RunPartition qc = dao.get(run.getId(), partition.getId());
     assertNotNull(qc);
     assertEquals(1L, qc.getQcType().getId());
     assertEquals("it is written", qc.getNotes());
@@ -71,13 +81,13 @@ public class HibernateRunPartitionDaoIT extends AbstractDAOTest {
   @Test
   public void testUpdate() throws Exception {
     Run run = (Run) sessionFactory.getCurrentSession().get(Run.class, 1L);
-    Partition partition = (Partition) sessionFactory.getCurrentSession().get(PartitionImpl.class, 1L);
-    RunPartition qc = dao.get(run, partition);
+    Partition partition = (Partition) currentSession().get(PartitionImpl.class, 1L);
+    RunPartition qc = dao.get(run.getId(), partition.getId());
     assertNotNull(qc);
     qc.setNotes("change is inevitable");
     dao.update(qc);
 
-    RunPartition fetchedQc = dao.get(run, partition);
+    RunPartition fetchedQc = dao.get(run.getId(), partition.getId());
     assertNotNull(fetchedQc);
     assertEquals(qc.getQcType().getId(), fetchedQc.getQcType().getId());
     assertEquals(qc.getNotes(), fetchedQc.getNotes());
@@ -86,20 +96,20 @@ public class HibernateRunPartitionDaoIT extends AbstractDAOTest {
   @Test
   public void testDeleteForRun() throws Exception {
     Run run = (Run) currentSession().get(Run.class, 1L);
-    List<RunPartition> before = getByRun(run);
+    List<RunPartition> before = getByRunId(run.getId());
     assertEquals(8, before.size());
     dao.deleteForRun(run);
 
     clearSession();
 
-    List<RunPartition> after = getByRun(run);
+    List<RunPartition> after = getByRunId(run.getId());
     assertEquals(0, after.size());
   }
 
-  private List<RunPartition> getByRun(Run run) {
+  private List<RunPartition> getByRunId(long runId) {
     @SuppressWarnings("unchecked")
     List<RunPartition> results = currentSession().createCriteria(RunPartition.class)
-        .add(Restrictions.eq("run", run))
+        .add(Restrictions.eq("runId", runId))
         .list();
     return results;
   }
@@ -119,11 +129,11 @@ public class HibernateRunPartitionDaoIT extends AbstractDAOTest {
   }
 
   private List<RunPartition> getByRunAndContainer(Run run, SequencerPartitionContainer container) {
+    Set<Long> partitionIds = container.getPartitions().stream().map(Partition::getId).collect(Collectors.toSet());
     @SuppressWarnings("unchecked")
     List<RunPartition> results = currentSession().createCriteria(RunPartition.class)
-        .createAlias("partition", "partition")
-        .add(Restrictions.eq("run", run))
-        .add(Restrictions.eq("partition.sequencerPartitionContainer", container))
+        .add(Restrictions.eq("runId", run.getId()))
+        .add(Restrictions.in("partitionId", partitionIds))
         .list();
     return results;
   }
