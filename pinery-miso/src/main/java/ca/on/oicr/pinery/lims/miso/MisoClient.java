@@ -655,6 +655,7 @@ public class MisoClient implements Lims {
       r.setRunDirectory(rs.getString("filePath"));
       r.setRunBasesMask(rs.getString("runBasesMask"));
       r.setSequencingParameters(rs.getString("sequencingParameters"));
+      r.setChemistry(rs.getString("chemistry"));
       String rawWorkflowType = rs.getString("workflowType");
       if (!rs.wasNull()) {
         String workflowType = workflowTypeMapper.get(rawWorkflowType);

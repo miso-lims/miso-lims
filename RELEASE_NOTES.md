@@ -10,6 +10,7 @@ Changes:
   * See the help dialog for more information
 * Improved performance of boxes
 * Improved performance of loading sequencer runs
+* Export run chemistry to Pinery
 * Export tissue timepoint field to Pinery (detailed sample)
 * Removed deprecated project clinical field from Pinery
 * Fixed saving runs from Run Scanner that are missing container serial numbers.
