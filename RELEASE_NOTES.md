@@ -2,6 +2,12 @@
 
 Changes:
 
+
+
+# 1.27.0
+
+Changes:
+
 * Revised advanced search syntax
   * All text searches use partial matching by default
   * Surround text with quotation marks to do exact matching
