@@ -113,6 +113,11 @@ public class HibernateListLibraryAliquotViewDao implements ListLibraryAliquotVie
   }
 
   @Override
+  public String[] getIdentifierProperties() {
+    return SEARCH_PROPERTIES;
+  }
+
+  @Override
   public String[] getSearchProperties() {
     return SEARCH_PROPERTIES;
   }

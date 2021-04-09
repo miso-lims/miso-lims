@@ -40,7 +40,8 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
   private static final String FIELD_ALIAS = "alias";
   private static final String FIELD_BARCODE = "identificationBarcode";
 
-  protected static final String[] SEARCH_PROPERTIES = new String[] { "name", FIELD_ALIAS, FIELD_BARCODE, "locationBarcode" };
+  protected static final String[] IDENTIFIER_PROPERTIES = { FIELD_NAME, FIELD_ALIAS, FIELD_BARCODE };
+  protected static final String[] SEARCH_PROPERTIES = { FIELD_NAME, FIELD_ALIAS, FIELD_BARCODE, "locationBarcode" };
 
   private static final List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("size"), new AliasDescriptor("use"));
 
@@ -260,6 +261,11 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
   @Override
   public Class<? extends Box> getRealClass() {
     return BoxImpl.class;
+  }
+
+  @Override
+  public String[] getIdentifierProperties() {
+    return IDENTIFIER_PROPERTIES;
   }
 
   @Override

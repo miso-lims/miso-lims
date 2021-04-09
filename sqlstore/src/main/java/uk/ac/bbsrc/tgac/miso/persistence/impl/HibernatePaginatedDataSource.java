@@ -15,6 +15,7 @@ import javax.persistence.Table;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
@@ -82,6 +83,14 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   String getProjectColumn();
 
   Class<? extends T> getRealClass();
+
+  /**
+   * @return an array containing the field names for all String identifier columns - usually name, alias, and/or identificationBarcode.
+   *         Required for bulk lookup by identifiers (search by names feature)
+   */
+  default String[] getIdentifierProperties() {
+    return null;
+  }
 
   String[] getSearchProperties();
 
@@ -438,5 +447,19 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   @Override
   default void restrictPaginationByWorkstation(Criteria criteria, String query, Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s cannot be filtered by workstation.", getFriendlyName()));
+  }
+
+  @Override
+  public default void restrictPaginationByIdentifiers(Criteria criteria, Collection<String> identifiers, Consumer<String> errorHandler) {
+    String[] fields = getIdentifierProperties();
+    if (fields == null) {
+      errorHandler.accept(String.format("%s cannot be filtered by identifiers", getFriendlyName()));
+      return;
+    }
+    Disjunction disjunction = Restrictions.disjunction();
+    for (String field : fields) {
+      disjunction.add(Restrictions.in(field, identifiers));
+    }
+    criteria.add(disjunction);
   }
 }

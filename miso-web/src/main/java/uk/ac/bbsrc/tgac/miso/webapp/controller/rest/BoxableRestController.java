@@ -6,7 +6,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -42,9 +41,8 @@ public class BoxableRestController extends RestController {
 
   @PostMapping(value = "/query-by-box", produces = { "application/json" })
   @ResponseBody
-  public List<BoxableDto> getSamplesInBulk(@RequestBody List<String> names) throws IOException {
-    List<Box> boxes = PaginationFilter.bulkSearch(names, boxService, box -> box,
-        message -> new RestException(message, Status.BAD_REQUEST));
+  public List<BoxableDto> getBoxablesInBulk(@RequestBody List<String> names) throws IOException {
+    List<Box> boxes = boxService.list(0, 0, true, "id", PaginationFilter.bulkLookup(names));
 
     List<BoxableDto> dtos = new ArrayList<>();
     for (Box box : boxes) {

@@ -3,16 +3,12 @@ package uk.ac.bbsrc.tgac.miso.core.util;
 import java.util.Collection;
 import java.util.Date;
 import java.util.EnumSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import com.eaglegenomics.simlims.core.Group;
 
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize.BoxType;
-import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
@@ -82,32 +78,15 @@ public abstract interface PaginationFilter {
     };
   }
 
-  public static <M extends Identifiable, D, X extends RuntimeException> List<D> bulkSearch(Collection<String> names,
-      PaginatedDataSource<M> service,
-      Function<M, D> dto, Function<String, X> makeException) {
-    List<String> namesNotFound = new LinkedList<>();
-    List<D> dtos = names.stream()//
-        .filter(name -> !LimsUtils.isStringBlankOrNull(name))//
-        .flatMap(WhineyFunction.flatRethrow(name -> {
-          Collection<M> matches = service.list(0, 0, true, "id", query(name));
-          if (matches.isEmpty()) {
-            namesNotFound.add(name);
-          }
-          return matches;
-        }))//
-        .collect(Collectors.groupingBy(Identifiable::getId))//
-        .values()//
-        .stream()//
-        .map(list -> list.get(0))//
-        .map(dto).collect(Collectors.toList());
-    if(!namesNotFound.isEmpty()){
-      StringBuilder exceptionMessage = new StringBuilder().append("Cannot find: \n");
-      for(String name : namesNotFound){
-        exceptionMessage.append(name).append("\n");
+  public static PaginationFilter bulkLookup(Collection<String> identifiers) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByIdentifiers(item, identifiers, errorHandler);
       }
-      throw makeException.apply(exceptionMessage.toString());
-    }
-    return dtos;
+
+    };
   }
 
   public static PaginationFilter date(Date start, Date end, DateType type) {

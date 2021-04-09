@@ -435,7 +435,7 @@ ListUtils = (function($) {
                   return;
                 }
                 Utils.ajaxWithDialog('Searching', 'POST', target.getQueryUrl(), names, function(items) {
-                  var title = items.length + ' ' + target.name;
+                  var title = items.length + ' ' + target.name + ' found for ' + names.length + ' names';
                   var selectedActions = bulkActions.filter(function(bulkAction) {
                     return !!bulkAction;
                   }).map(function(bulkAction) {

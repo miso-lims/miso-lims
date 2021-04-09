@@ -53,6 +53,8 @@ public interface PaginationFilterSink<T> {
 
   public void restrictPaginationById(T item, long id, Consumer<String> errorHandler);
 
+  public void restrictPaginationByIdentifiers(T item, Collection<String> identifiers, Consumer<String> errorHandler);
+
   public void restrictPaginationByIds(T item, List<Long> ids, Consumer<String> errorHandler);
 
   public void restrictPaginationByIndex(T item, String query, Consumer<String> errorHandler);

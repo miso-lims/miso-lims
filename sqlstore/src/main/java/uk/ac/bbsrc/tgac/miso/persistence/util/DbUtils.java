@@ -123,11 +123,11 @@ public class DbUtils {
     } else if (containsWildcards(query)) {
       String sanitized = sanitizeQueryString(query);
       String finalQuery = replaceWildcards(sanitized);
-      return Restrictions.ilike(propertyName, finalQuery);
+      return Restrictions.like(propertyName, finalQuery);
     } else {
       String sanitized = sanitizeQueryString(query);
       String finalQuery = removeEscapes(sanitized);
-      return Restrictions.ilike(propertyName, finalQuery, MatchMode.ANYWHERE);
+      return Restrictions.like(propertyName, finalQuery, MatchMode.ANYWHERE);
     }
   }
 
