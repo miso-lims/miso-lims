@@ -29,10 +29,10 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePaginatedDataSource;
 public abstract class HibernatePaginatedDataSourceIT extends AbstractDAOTest {
 
   public enum SearchType {
-    ARCHIVED, ARRAYED, BATCH, BOX, BOX_TYPE, BOX_USE, CATEGORY, CLASS, //
-    CREATED, CREATOR, DISTRIBUTED, DISTRIBUTION_RECIPIENT, DRAFT, ENTERED, //
-    EXTERNAL_NAME, FULFILLED, FREEZER, GHOST, GROUP_ID, HEALTH, ID, IDS, //
-    INDEX, INSTRUMENT_TYPE, KIT_NAME, KIT_TYPE, LAB, MODEL, MODIFIER, //
+    ARCHIVED, ARRAYED, BATCH, BOX, BOX_TYPE, BOX_USE, BULK_LOOKUP, CATEGORY, //
+    CLASS, CREATED, CREATOR, DISTRIBUTED, DISTRIBUTION_RECIPIENT, DRAFT, //
+    ENTERED, EXTERNAL_NAME, FULFILLED, FREEZER, GHOST, GROUP_ID, HEALTH, ID, //
+    IDS, INDEX, INSTRUMENT_TYPE, KIT_NAME, KIT_TYPE, LAB, MODEL, MODIFIER, //
     PENDING, PLATFORM_TYPE, POOL, PROJECT, QUERY, RECEIVED, RECIPIENT_GROUPS, //
     REQUISITION, SEQUENCER, SEQUENCING_PARAMETERS_ID, //
     SEQUENCING_PARAMETERS_NAME, SOP_CATEGORY, STAGE, SUBPROJECT, TIMEPOINT, //
@@ -109,6 +109,11 @@ public abstract class HibernatePaginatedDataSourceIT extends AbstractDAOTest {
   @Test
   public void testSearchByBoxUse() throws Exception {
     testSearch(PaginationFilter.boxUse(1L), SearchType.BOX_USE);
+  }
+
+  @Test
+  public void testSearchByBulkLookup() throws Exception {
+    testSearch(PaginationFilter.bulkLookup(Arrays.asList("identifier1", "identifier2")), SearchType.BULK_LOOKUP);
   }
 
   @Test

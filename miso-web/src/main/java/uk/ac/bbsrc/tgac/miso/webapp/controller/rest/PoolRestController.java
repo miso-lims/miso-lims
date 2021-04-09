@@ -481,9 +481,11 @@ public class PoolRestController extends RestController {
   @PostMapping(value = "/query", produces = { "application/json" })
   @ResponseBody
   public List<PoolDto> getPoolsInBulk(@RequestBody List<String> names, HttpServletRequest request, HttpServletResponse response,
-      UriComponentsBuilder uriBuilder) {
-    return PaginationFilter.bulkSearch(names, poolService, this::makeEmptyPoolDto,
-        message -> new RestException(message, Status.BAD_REQUEST));
+      UriComponentsBuilder uriBuilder) throws IOException {
+    return poolService.list(0, 0, true, "id", PaginationFilter.bulkLookup(names))
+        .stream()
+        .map(this::makeEmptyPoolDto)
+        .collect(Collectors.toList());
   }
 
   @GetMapping(value = "/search")

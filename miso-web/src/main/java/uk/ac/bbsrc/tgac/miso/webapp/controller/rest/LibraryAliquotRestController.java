@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,8 +42,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibraryAliquotSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
-import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.ListLibraryAliquotViewService;
+import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -158,9 +159,11 @@ public class LibraryAliquotRestController extends RestController {
 
   @PostMapping(value = "/query", produces = { "application/json" })
   @ResponseBody
-  public List<LibraryAliquotDto> getLibraryAliquotsInBulk(@RequestBody List<String> names) {
-    return PaginationFilter.bulkSearch(names, listLibraryAliquotViewService, Dtos::asDto,
-        message -> new RestException(message, Status.BAD_REQUEST));
+  public List<LibraryAliquotDto> getLibraryAliquotsInBulk(@RequestBody List<String> names) throws IOException {
+    return listLibraryAliquotViewService.list(0, 0, true, "id", PaginationFilter.bulkLookup(names))
+        .stream()
+        .map(Dtos::asDto)
+        .collect(Collectors.toList());
   }
 
   @PostMapping(value = "/spreadsheet")

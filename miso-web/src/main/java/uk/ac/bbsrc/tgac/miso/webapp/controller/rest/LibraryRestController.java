@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
@@ -193,9 +194,11 @@ public class LibraryRestController extends RestController {
 
   @PostMapping(value = "/query", produces = { "application/json" })
   @ResponseBody
-  public List<LibraryDto> getLibariesInBulk(@RequestBody List<String> names, HttpServletRequest request) {
-    return PaginationFilter.bulkSearch(names, libraryService, lib -> Dtos.asDto(lib, false),
-        message -> new RestException(message, Status.BAD_REQUEST));
+  public List<LibraryDto> getLibrariesInBulk(@RequestBody List<String> names, HttpServletRequest request) throws IOException {
+    return libraryService.list(0, 0, true, "id", PaginationFilter.bulkLookup(names))
+        .stream()
+        .map(lib -> Dtos.asDto(lib, false))
+        .collect(Collectors.toList());
   }
 
   @PostMapping(value = "/spreadsheet")

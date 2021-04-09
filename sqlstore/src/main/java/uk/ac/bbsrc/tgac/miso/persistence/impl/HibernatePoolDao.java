@@ -26,7 +26,8 @@ import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 @Repository
 public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSource<Pool> {
 
-  private final static String[] SEARCH_PROPERTIES = new String[] { "name", "alias", "identificationBarcode", "description" };
+  private final static String[] IDENTIFIER_PROPERTIES = { "name", "alias", "identificationBarcode" };
+  private final static String[] SEARCH_PROPERTIES = { "name", "alias", "identificationBarcode", "description" };
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -103,6 +104,11 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
 
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
+  }
+
+  @Override
+  public String[] getIdentifierProperties() {
+    return IDENTIFIER_PROPERTIES;
   }
 
   @Override

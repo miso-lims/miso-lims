@@ -77,7 +77,8 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
     return getSessionFactory().getCurrentSession();
   }
 
-  private final static String[] SEARCH_FIELDS = new String[] { "name", "alias", "description", "identificationBarcode" };
+  private final static String[] IDENTIFIER_FIELDS = { "name", "alias", "identificationBarcode" };
+  private final static String[] SEARCH_FIELDS = { "name", "alias", "description", "identificationBarcode" };
   private final static List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("sample"),
       new AliasDescriptor("sample.parentAttributes", JoinType.LEFT_OUTER_JOIN),
       new AliasDescriptor("parentAttributes.tissueAttributes", JoinType.LEFT_OUTER_JOIN),
@@ -191,6 +192,11 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   @Override
   public String getProjectColumn() {
     return "sample.project.id";
+  }
+
+  @Override
+  public String[] getIdentifierProperties() {
+    return IDENTIFIER_FIELDS;
   }
 
   @Override

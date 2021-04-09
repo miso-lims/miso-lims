@@ -35,6 +35,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.IdentityView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -254,28 +255,28 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetIdentityByPartialMatchExternalName() throws IOException {
-    Collection<SampleIdentity> identity = dao.getIdentitiesByExternalNameOrAliasAndProject("EXT1", null, false);
+    Collection<IdentityView> identity = dao.getIdentitiesByExternalNameOrAliasAndProject("EXT1", null, false);
     assertEquals(1, identity.size());
   }
 
   @Test
   public void testGetIdentityByExactMatchExternalNameWithNonExactMatch() throws IOException {
     String query = "EXT1";
-    Collection<SampleIdentity> exactMatches = dao.getIdentitiesByExternalNameOrAliasAndProject(query, null, true);
+    Collection<IdentityView> exactMatches = dao.getIdentitiesByExternalNameOrAliasAndProject(query, null, true);
     assertTrue(exactMatches.isEmpty());
   }
 
   @Test
   public void testGetIdentityByExactMatchExternalNameWithExactMatch() throws IOException {
     String query = "EXT15";
-    Collection<SampleIdentity> exactMatches = dao.getIdentitiesByExternalNameOrAliasAndProject(query, null, true);
+    Collection<IdentityView> exactMatches = dao.getIdentitiesByExternalNameOrAliasAndProject(query, null, true);
     assertFalse(exactMatches.isEmpty());
   }
 
   @Test
   public void testGetIdentityByExactMatchExternalNameWithEmptyString() throws IOException {
     String query = "";
-    Collection<SampleIdentity> exactMatches = dao.getIdentitiesByExternalNameOrAliasAndProject(query, null, true);
+    Collection<IdentityView> exactMatches = dao.getIdentitiesByExternalNameOrAliasAndProject(query, null, true);
     assertTrue(exactMatches.isEmpty());
   }
 
@@ -283,7 +284,7 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
   public void testGetIdentityByExternalNameAndProjectExactMatch() throws IOException {
     String externalName = "EXT15";
     long projectId = 1;
-    Collection<SampleIdentity> exactMatches = dao.getIdentitiesByExternalNameOrAliasAndProject(externalName, projectId, true);
+    Collection<IdentityView> exactMatches = dao.getIdentitiesByExternalNameOrAliasAndProject(externalName, projectId, true);
     assertFalse(exactMatches.isEmpty());
     assertEquals(1, exactMatches.size());
   }
@@ -292,26 +293,26 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
   public void testGetIdentityByExternalNameAndProjectNonExactMatch() throws IOException {
     String externalName = "EXT1";
     long projectId = 1;
-    Collection<SampleIdentity> exactMatches = dao.getIdentitiesByExternalNameOrAliasAndProject(externalName, projectId, true);
+    Collection<IdentityView> exactMatches = dao.getIdentitiesByExternalNameOrAliasAndProject(externalName, projectId, true);
     assertTrue(exactMatches.isEmpty());
   }
 
   @Test
   public void getIdentityByAlias() throws IOException {
-    Collection<SampleIdentity> identities = dao.getIdentitiesByExternalNameOrAliasAndProject("TEST_0001_IDENTITY_1", null, true);
+    Collection<IdentityView> identities = dao.getIdentitiesByExternalNameOrAliasAndProject("TEST_0001_IDENTITY_1", null, true);
     assertEquals(1, identities.size());
     assertEquals("TEST_0001_IDENTITY_1", identities.iterator().next().getAlias());
   }
 
   @Test
   public void getIdentityByNullAlias() throws IOException {
-    Collection<SampleIdentity> identities = dao.getIdentitiesByExternalNameOrAliasAndProject(null, null, true);
+    Collection<IdentityView> identities = dao.getIdentitiesByExternalNameOrAliasAndProject(null, null, true);
     assertTrue(identities.isEmpty());
   }
 
   @Test
   public void getIdentityByNonIdentityAlias() throws IOException {
-    Collection<SampleIdentity> identities = dao.getIdentitiesByExternalNameOrAliasAndProject("TEST_0001_Bn_P_nn_1-1_D_1", null, false);
+    Collection<IdentityView> identities = dao.getIdentitiesByExternalNameOrAliasAndProject("TEST_0001_Bn_P_nn_1-1_D_1", null, false);
     assertTrue(identities.isEmpty());
   }
 
@@ -412,168 +413,6 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
     Criteria criteria = Mockito.mock(Criteria.class);
     assertNull(dao.propertyForDate(criteria, DateType.RECEIVE));
     assertNull(dao.propertyForDate(criteria, DateType.DISTRIBUTED));
-  }
-
-  @Test
-  public void testSorts() throws Exception {
-    String[] sorts = { "name", "effectiveTissueOriginLabel", "effectiveTissueTypeLabel", "sampleClassId" };
-    for (String sort : sorts) {
-      assertNotNull(dao.list(0, 0, true, sort));
-    }
-  }
-
-  @Test
-  public void testSearch() throws IOException {
-    testSearch(PaginationFilter.query("SAM1"));
-  }
-
-  @Test
-  public void testSearchByClass() throws IOException {
-    testSearch(PaginationFilter.sampleClass("gDNA"));
-  }
-
-  @Test
-  public void testSearchByInstitute() throws IOException {
-    testSearch(PaginationFilter.lab("OICR"));
-  }
-
-  @Test
-  public void testSearchByExternal() throws IOException {
-    testSearch(PaginationFilter.external("EXT"));
-  }
-
-  @Test
-  public void testSearchByProject() throws IOException {
-    testSearch(PaginationFilter.project(1L));
-  }
-
-  @Test
-  public void testSearchBySubproject() throws IOException {
-    testSearch(PaginationFilter.subproject("Mini"));
-  }
-
-  @Test
-  public void testSearchBySubprojectNone() throws IOException {
-    testSearch(PaginationFilter.subproject(""));
-  }
-
-  @Test
-  public void testSearchByCreated() throws IOException {
-    testSearch(PaginationFilter.date(LimsUtils.parseDate("2017-01-01"), LimsUtils.parseDate("2018-01-01"), DateType.CREATE));
-  }
-
-  @Test
-  public void testSearchByEntered() throws IOException {
-    testSearch(PaginationFilter.date(LimsUtils.parseDate("2017-01-01"), LimsUtils.parseDate("2018-01-01"), DateType.ENTERED));
-  }
-
-  @Test
-  public void testSearchByReceived() throws IOException {
-    testSearch(PaginationFilter.date(LimsUtils.parseDate("2017-01-01"), LimsUtils.parseDate("2018-01-01"), DateType.RECEIVE));
-  }
-
-  @Test
-  public void testSearchByUpdated() throws IOException {
-    testSearch(PaginationFilter.date(LimsUtils.parseDate("2017-01-01"), LimsUtils.parseDate("2018-01-01"), DateType.UPDATE));
-  }
-
-  @Test
-  public void testSearchByCreator() throws IOException {
-    testSearch(PaginationFilter.user("admin", true));
-  }
-
-  @Test
-  public void testSearchByModifier() throws IOException {
-    testSearch(PaginationFilter.user("admin", false));
-  }
-
-  @Test
-  public void testSearchByBox() throws IOException {
-    testSearch(PaginationFilter.box("BOX1"));
-  }
-
-  @Test
-  public void testSearchByFreezer() throws Exception {
-    testSearch(PaginationFilter.freezer("freezer1"));
-  }
-
-  @Test
-  public void testSearchByGhost() throws IOException {
-    testSearch(PaginationFilter.ghost(true));
-  }
-
-  @Test
-  public void testSearchByGroupId() throws IOException {
-    testSearch(PaginationFilter.groupId("ID of group"));
-  }
-
-  @Test
-  public void testSearchByReal() throws IOException {
-    testSearch(PaginationFilter.ghost(false));
-  }
-
-  @Test
-  public void testSearchByRequisition() throws IOException {
-    testSearch(PaginationFilter.requisitionId("FORM1234"));
-  }
-
-  @Test
-  public void testSearchByDistributionDate() throws Exception {
-    testSearch(PaginationFilter.date(LimsUtils.parseDate("2019-01-01"), LimsUtils.parseDate("2020-01-01"), DateType.DISTRIBUTED));
-  }
-
-  @Test
-  public void testSearchByDistributionRecipient() throws Exception {
-    testSearch(PaginationFilter.distributedTo("far away"));
-  }
-
-  @Test
-  public void testSearchByTimepoint() throws Exception {
-    testSearch(PaginationFilter.timepoint("test"));
-  }
-
-  @Test
-  public void testSearchByTissueOrigin() throws Exception {
-    testSearch(PaginationFilter.tissueOrigin("Ly"));
-  }
-
-  @Test
-  public void testSearchByTissueType() throws Exception {
-    testSearch(PaginationFilter.tissueType("P"));
-  }
-
-  @Test
-  public void testSearchByWorksetId() throws Exception {
-    testSearch(PaginationFilter.workset(1L));
-  }
-
-  @Test
-  public void testSearchByArrayed() throws Exception {
-    testSearch(PaginationFilter.arrayed(true));
-  }
-
-  @Test
-  public void testSearchByNotArrayed() throws Exception {
-    testSearch(PaginationFilter.arrayed(false));
-  }
-
-  @Test
-  public void testSearchByBatchInvalid() throws IOException {
-    exception.expect(RuntimeException.class);
-    testSearch(PaginationFilter.batchId("bad"));
-  }
-
-  /**
-   * Verifies Hibernate mappings by ensuring that no exception is thrown by a search
-   * 
-   * @param filter the search filter
-   * @throws IOException
-   */
-  private void testSearch(PaginationFilter filter) throws IOException {
-    // verify Hibernate mappings by ensuring that no exception is thrown
-    assertNotNull(dao.list(err -> {
-      throw new RuntimeException(err);
-    }, 0, 10, true, "name", filter));
   }
 
 }

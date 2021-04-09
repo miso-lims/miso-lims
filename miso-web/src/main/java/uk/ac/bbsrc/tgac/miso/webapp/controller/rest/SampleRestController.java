@@ -344,9 +344,11 @@ public class SampleRestController extends RestController {
 
   @PostMapping(value = "/query", produces = { "application/json" })
   @ResponseBody
-  public List<SampleDto> getSamplesInBulk(@RequestBody List<String> names) {
-    return PaginationFilter.bulkSearch(names, sampleService, sam -> Dtos.asDto(sam, false),
-        message -> new RestException(message, Status.BAD_REQUEST));
+  public List<SampleDto> getSamplesInBulk(@RequestBody List<String> names) throws IOException {
+    return sampleService.list(0, 0, true, "id", PaginationFilter.bulkLookup(names))
+        .stream()
+        .map(sam -> Dtos.asDto(sam, false))
+        .collect(Collectors.toList());
   }
 
   @PostMapping(value = "/spreadsheet")

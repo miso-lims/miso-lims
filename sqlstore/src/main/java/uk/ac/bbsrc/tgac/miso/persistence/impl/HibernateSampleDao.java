@@ -281,6 +281,11 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
+  public String[] getIdentifierProperties() {
+    return SEARCH_PROPERTIES;
+  }
+
+  @Override
   public String[] getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
