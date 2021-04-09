@@ -180,8 +180,8 @@ public class LibraryAliquotRestController extends RestController {
   private final RelationFinder<LibraryAliquot> parentFinder = (new RelationFinder<LibraryAliquot>() {
 
     @Override
-    protected LibraryAliquot fetch(long id) throws IOException {
-      return libraryAliquotService.get(id);
+    protected List<LibraryAliquot> fetchByIds(List<Long> ids) throws IOException {
+      return libraryAliquotService.listByIdList(ids);
     }
   })//
       .add(new RelationFinder.ParentSampleAdapter<>(SampleIdentity.CATEGORY_NAME, SampleIdentity.class, LibraryAliquotRestController::getSample))//
@@ -225,8 +225,8 @@ public class LibraryAliquotRestController extends RestController {
   private final RelationFinder<LibraryAliquot> childFinder = (new RelationFinder<LibraryAliquot>() {
 
     @Override
-    protected LibraryAliquot fetch(long id) throws IOException {
-      return libraryAliquotService.get(id);
+    protected List<LibraryAliquot> fetchByIds(List<Long> ids) throws IOException {
+      return libraryAliquotService.listByIdList(ids);
     }
   })//
       .add(new RelationFinder.RelationAdapter<LibraryAliquot, Pool, PoolDto>("Pool") {

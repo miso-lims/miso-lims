@@ -541,8 +541,8 @@ public class PoolRestController extends RestController {
   private final RelationFinder<Pool> parentFinder = (new RelationFinder<Pool>() {
 
     @Override
-    protected Pool fetch(long id) throws IOException {
-      return poolService.get(id);
+    protected List<Pool> fetchByIds(List<Long> ids) throws IOException {
+      return poolService.listByIdList(ids);
     }
   })
       .add(new RelationFinder.ParentSampleAdapter<>(SampleIdentity.CATEGORY_NAME, SampleIdentity.class, this::getSamples))//

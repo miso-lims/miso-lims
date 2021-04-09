@@ -214,8 +214,8 @@ public class LibraryRestController extends RestController {
   private final RelationFinder<Library> parentFinder = (new RelationFinder<Library>() {
 
     @Override
-    protected Library fetch(long id) throws IOException {
-      return libraryService.get(id);
+    protected List<Library> fetchByIds(List<Long> ids) throws IOException {
+      return libraryService.listByIdList(ids);
     }
   })//
       .add(new RelationFinder.ParentSampleAdapter<>(SampleIdentity.CATEGORY_NAME, SampleIdentity.class, LibraryRestController::getSample))//
@@ -247,8 +247,8 @@ public class LibraryRestController extends RestController {
   private final RelationFinder<Library> childFinder = (new RelationFinder<Library>() {
 
     @Override
-    protected Library fetch(long id) throws IOException {
-      return libraryService.get(id);
+    protected List<Library> fetchByIds(List<Long> ids) throws IOException {
+      return libraryService.listByIdList(ids);
     }
   })//
       .add(new RelationFinder.RelationAdapter<Library, LibraryAliquot, LibraryAliquotDto>("Library Aliquot") {
