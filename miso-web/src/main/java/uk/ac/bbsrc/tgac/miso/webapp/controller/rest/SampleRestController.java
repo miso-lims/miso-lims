@@ -360,8 +360,8 @@ public class SampleRestController extends RestController {
   private final RelationFinder<Sample> parentFinder = (new RelationFinder<Sample>() {
 
     @Override
-    protected Sample fetch(long id) throws IOException {
-      return sampleService.get(id);
+    protected List<Sample> fetchByIds(List<Long> ids) throws IOException {
+      return sampleService.listByIdList(ids);
     }
   })//
       .add(RelationFinder.parent(SampleIdentity.CATEGORY_NAME, SampleIdentity.class))//
@@ -380,8 +380,8 @@ public class SampleRestController extends RestController {
   private final RelationFinder<Sample> childFinder = (new RelationFinder<Sample>() {
 
     @Override
-    protected Sample fetch(long id) throws IOException {
-      return sampleService.get(id);
+    protected List<Sample> fetchByIds(List<Long> ids) throws IOException {
+      return sampleService.listByIdList(ids);
     }
   })
       .add(RelationFinder.child(SampleIdentity.CATEGORY_NAME, SampleIdentity.class))//

@@ -129,17 +129,14 @@ public abstract class RelationFinder<M extends Identifiable> {
     return this;
   }
 
-  protected abstract M fetch(long id) throws IOException;
+  protected abstract List<M> fetchByIds(List<Long> ids) throws IOException;
 
   public HttpEntity<byte[]> list(List<Long> ids, String category) throws IOException {
     RelationAdapter<M, ?, ?> adapter = adapters.get(category);
     if (adapter == null) {
       throw new RestException(String.format("No such category %s.", category), Status.NOT_FOUND);
     }
-    List<M> items = new ArrayList<>();
-    for (Long id : ids) {
-      items.add(fetch(id));
-    }
+    List<M> items = fetchByIds(ids);
     return adapter.handle(mapper, items);
   }
 
