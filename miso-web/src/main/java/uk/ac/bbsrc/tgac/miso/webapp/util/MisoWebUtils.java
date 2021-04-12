@@ -59,7 +59,6 @@ import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.ThrowingFunction;
 import uk.ac.bbsrc.tgac.miso.core.util.ThrowingSupplier;
-import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
@@ -135,10 +134,11 @@ public class MisoWebUtils {
     return checks;
   }
 
-  public static <T> HttpEntity<byte[]> generateSpreadsheet(SpreadsheetRequest request, WhineyFunction<Long, T> fetcher,
-      boolean detailedSample, Function<String, Spreadsheet<T>> formatLibrary, HttpServletResponse response) {
-    Stream<T> input = request.getIds().stream().map(WhineyFunction.rethrow(fetcher));
-    return generateSpreadsheet(request, input, detailedSample, formatLibrary, response);
+  public static <T> HttpEntity<byte[]> generateSpreadsheet(SpreadsheetRequest request,
+      ThrowingFunction<List<Long>, List<T>, IOException> fetcher,
+      boolean detailedSample, Function<String, Spreadsheet<T>> formatLibrary, HttpServletResponse response) throws IOException {
+    List<T> input = fetcher.apply(request.getIds());
+    return generateSpreadsheet(request, input.stream(), detailedSample, formatLibrary, response);
   }
 
   public static <T> HttpEntity<byte[]> generateSpreadsheet(SpreadsheetRequest request, Stream<T> input,
