@@ -51,7 +51,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SequencerPartitionContainerChangeLog;
@@ -766,7 +765,7 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     }
     switch (containers.size()) {
     case 0:
-      SequencerPartitionContainer newContainer = new SequencerPartitionContainerImpl();
+      SequencerPartitionContainer newContainer = containerModel.getPlatformType().createContainer();
       newContainer.setModel(containerModel);
       newContainer.setCreator(user);
       newContainer.setIdentificationBarcode(containerSerialNumber);

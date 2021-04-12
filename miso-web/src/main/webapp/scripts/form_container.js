@@ -112,7 +112,6 @@ FormTarget.container = (function($) {
           title: 'Received Date',
           data: 'receivedDate',
           type: 'date',
-          required: true,
           include: config.platformType === 'OXFORDNANOPORE'
         }, {
           title: "Returned Date",
