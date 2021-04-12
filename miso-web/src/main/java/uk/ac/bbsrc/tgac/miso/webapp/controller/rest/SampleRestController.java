@@ -25,7 +25,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -72,6 +71,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.IdentityView;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
@@ -311,8 +311,7 @@ public class SampleRestController extends RestController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public List<Map<String, Set<SampleDto>>> getIdentitiesBySearch(@RequestParam boolean exactMatch,
-      @RequestBody com.fasterxml.jackson.databind.JsonNode json,
-      HttpServletResponse response) throws IOException {
+      @RequestBody JsonNode json, HttpServletResponse response) throws IOException {
     final JsonNode searchTerms = json.get("identitiesSearches");
     final String project = (json.get("project") == null ? "" : json.get("project").asText());
     if (!searchTerms.isArray() || searchTerms.size() == 0) {
@@ -331,7 +330,7 @@ public class SampleRestController extends RestController {
 
   private Set<SampleDto> getSamplesForIdentityString(String identityIdentifier, String project, boolean exactMatch)
       throws IOException {
-    Collection<SampleIdentity> matches = new HashSet<>();
+    List<IdentityView> matches = null;
     Project selected = null;
     selected = projectService.getProjectByShortName(project);
     if (selected != null) {
@@ -339,7 +338,7 @@ public class SampleRestController extends RestController {
     } else {
       matches = sampleService.getIdentitiesByExternalNameOrAliasAndProject(identityIdentifier, null, exactMatch);
     }
-    return matches.stream().map(identity -> Dtos.asDto(identity, false)).collect(Collectors.toSet());
+    return matches.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
   @PostMapping(value = "/query", produces = { "application/json" })
