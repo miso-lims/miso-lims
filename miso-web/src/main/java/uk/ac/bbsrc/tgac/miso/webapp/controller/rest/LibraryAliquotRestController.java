@@ -169,9 +169,9 @@ public class LibraryAliquotRestController extends RestController {
   @PostMapping(value = "/spreadsheet")
   @ResponseBody
   public HttpEntity<byte[]> getSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response,
-      UriComponentsBuilder uriBuilder) {
-    return MisoWebUtils.generateSpreadsheet(request, libraryAliquotService::get, detailedSample, LibraryAliquotSpreadSheets::valueOf,
-        response);
+      UriComponentsBuilder uriBuilder) throws IOException {
+    return MisoWebUtils.generateSpreadsheet(request, libraryAliquotService::listByIdList, detailedSample,
+        LibraryAliquotSpreadSheets::valueOf, response);
   }
 
   private static Stream<Sample> getSample(LibraryAliquot aliquot) {

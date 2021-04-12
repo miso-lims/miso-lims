@@ -6,6 +6,7 @@ Changes:
 * Search by names now does exact matching only                                   
 * Improved performance of bulk parent/child lookup                               
 * Improved performance of identity lookup (detailed sample)                      
+* Improved performance of spreadsheet downloads                                  
 * Fixed no projects shown for runs in the Runs list
 * Fixed Oxford Nanopore containers from Run Scanner saving incorrectly
 * Fixed errors updating some attributes of Oxford Nanopore containers

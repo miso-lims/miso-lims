@@ -203,8 +203,8 @@ public class LibraryRestController extends RestController {
 
   @PostMapping(value = "/spreadsheet")
   @ResponseBody
-  public HttpEntity<byte[]> getSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response) {
-    return MisoWebUtils.generateSpreadsheet(request, libraryService::get, detailedSample, LibrarySpreadSheets::valueOf, response);
+  public HttpEntity<byte[]> getSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response) throws IOException {
+    return MisoWebUtils.generateSpreadsheet(request, libraryService::listByIdList, detailedSample, LibrarySpreadSheets::valueOf, response);
   }
 
   private static Stream<Sample> getSample(Library library) {

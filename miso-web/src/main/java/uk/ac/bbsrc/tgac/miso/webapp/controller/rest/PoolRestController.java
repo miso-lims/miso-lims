@@ -499,8 +499,8 @@ public class PoolRestController extends RestController {
   @PostMapping(value = "/spreadsheet")
   @ResponseBody
   public HttpEntity<byte[]> getSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response,
-      UriComponentsBuilder uriBuilder) {
-    return MisoWebUtils.generateSpreadsheet(request, poolService::get, detailedSample, PoolSpreadSheets::valueOf, response);
+      UriComponentsBuilder uriBuilder) throws IOException {
+    return MisoWebUtils.generateSpreadsheet(request, poolService::listByIdList, detailedSample, PoolSpreadSheets::valueOf, response);
   }
 
   @PostMapping(value = "/contents/spreadsheet")
