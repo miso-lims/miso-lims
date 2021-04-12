@@ -28,9 +28,9 @@ import java.util.Collection;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.IdentityView;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 public interface SampleStore extends PaginatedDataSource<Sample> {
@@ -90,7 +90,7 @@ public interface SampleStore extends PaginatedDataSource<Sample> {
    * @return List<Sample> set of Identities belonging to a given project which have an external name that matches the input string
    * @throws IOException
    */
-  Collection<SampleIdentity> getIdentitiesByExternalNameOrAliasAndProject(String externalName, Long projectId, boolean exactMatch)
+  List<IdentityView> getIdentitiesByExternalNameOrAliasAndProject(String externalName, Long projectId, boolean exactMatch)
       throws IOException;
 
   /**

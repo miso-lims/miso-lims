@@ -51,6 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl.IdentityBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.IdentityView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -503,10 +504,10 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   public void confirmExternalNameUniqueForProjectIfRequired(String newExternalName, Sample sample)
       throws IOException, ConstraintViolationException {
     if (!isUniqueExternalNameWithinProjectRequired()) return;
-    Collection<SampleIdentity> matches = getIdentitiesByExternalNameOrAliasAndProject(newExternalName,
+    Collection<IdentityView> matches = getIdentitiesByExternalNameOrAliasAndProject(newExternalName,
         sample.getProject().getId(), true);
     if (!matches.isEmpty()) {
-      for (SampleIdentity match : matches) {
+      for (IdentityView match : matches) {
         if (match.getId() != sample.getId()) {
           throw makeDuplicateExternalNameError(newExternalName);
         }
@@ -611,7 +612,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     } else {
       // If samples are being bulk received for the same new donor, they will all have a null parentId.
       // After the new donor's Identity is created, the following samples need to be parented to that now-existing Identity.
-      Collection<SampleIdentity> newlyCreated = getIdentitiesByExternalNameOrAliasAndProject(identity.getExternalName(),
+      Collection<IdentityView> newlyCreated = getIdentitiesByExternalNameOrAliasAndProject(identity.getExternalName(),
           descendant.getProject().getId(), true);
       if (newlyCreated.size() > 1) {
         throw new IllegalArgumentException(
@@ -619,9 +620,12 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
                 + identity.getExternalName()
                 + " in project " + descendant.getProject().getId());
       } else if (newlyCreated.size() == 1) {
-        Sample parent = newlyCreated.iterator().next();
-        if (parent == null) throw new IllegalArgumentException("Parent sample does not exist");
-        else return (SampleIdentity) parent;
+        IdentityView parent = newlyCreated.iterator().next();
+        if (parent == null) {
+          throw new IllegalArgumentException("Parent sample does not exist");
+        } else {
+          return (SampleIdentity) get(parent.getId());
+        }
       } else {
         try {
           return createParentIdentity(descendant, identity);
@@ -1009,7 +1013,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
 
   @Override
   @Transactional(propagation = Propagation.REQUIRED)
-  public Collection<SampleIdentity> getIdentitiesByExternalNameOrAliasAndProject(String externalName, Long projectId, boolean exactMatch)
+  public List<IdentityView> getIdentitiesByExternalNameOrAliasAndProject(String externalName, Long projectId, boolean exactMatch)
       throws IOException {
     return sampleStore.getIdentitiesByExternalNameOrAliasAndProject(externalName, projectId, exactMatch);
   }

@@ -36,6 +36,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.IdentityView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -162,21 +163,24 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
-  public Collection<SampleIdentity> getIdentitiesByExternalNameOrAliasAndProject(String query, Long projectId, boolean exactMatch)
+  public List<IdentityView> getIdentitiesByExternalNameOrAliasAndProject(String query, Long projectId, boolean exactMatch)
       throws IOException {
-    if (isStringEmptyOrNull(query)) return Collections.emptySet();
+    if (isStringEmptyOrNull(query)) {
+      return Collections.emptyList();
+    }
     @SuppressWarnings("unchecked")
-    Set<SampleIdentity> records = (Set<SampleIdentity>) SampleIdentityImpl.getSetFromString(query)
+    List<IdentityView> records = (List<IdentityView>) SampleIdentityImpl.getSetFromString(query)
         .stream().map(extNameOrAlias -> {
-          Criteria criteria = currentSession().createCriteria(SampleIdentityImpl.class);
+          Criteria criteria = currentSession().createCriteria(IdentityView.class)
+              .add(Restrictions.eq("discriminator", SampleIdentity.CATEGORY_NAME));
           if (projectId != null) {
-            criteria.add(Restrictions.eq("project.id", projectId));
+            criteria.add(Restrictions.eq("projectId", projectId));
           }
           criteria.add(DbUtils.textRestriction(extNameOrAlias, "externalName", "alias"));
           return criteria.list();
         }).flatMap(list -> list.stream())
         .distinct()
-        .collect(Collectors.toSet());
+        .collect(Collectors.toList());
 
     // filter out those with a non-exact external name match
     if (exactMatch) {
@@ -186,7 +190,7 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
     }
   }
 
-  private Collection<SampleIdentity> filterOnlyExactExternalNameMatches(Collection<SampleIdentity> candidates,
+  private List<IdentityView> filterOnlyExactExternalNameMatches(Collection<IdentityView> candidates,
       String externalNamesOrAlias) {
     return candidates.stream().filter(sam -> {
       Set<String> targets = SampleIdentityImpl.getSetFromString(externalNamesOrAlias).stream().map(String::toLowerCase)
@@ -195,7 +199,7 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
           .map(String::toLowerCase).collect(Collectors.toSet());
       targets.retainAll(externalNamesOfCandidate);
       return !targets.isEmpty() || externalNamesOrAlias.equals(sam.getAlias());
-    }).collect(Collectors.toSet());
+    }).collect(Collectors.toList());
   }
 
   @Override

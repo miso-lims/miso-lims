@@ -194,6 +194,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BarcodableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.GrandparentSample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.IdentityView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListContainerRunSequencerView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListContainerRunView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListContainerView;
@@ -638,6 +639,15 @@ public class Dtos {
         }
       }
     }
+  }
+
+  public static SampleIdentityDto asDto(IdentityView from) {
+    SampleIdentityDto to = new SampleIdentityDto();
+    setLong(to::setId, from.getId(), true);
+    setLong(to::setProjectId, from.getProjectId(), true);
+    setString(to::setAlias, from.getAlias());
+    setString(to::setExternalName, from.getExternalName());
+    return to;
   }
 
   private static DetailedSample toDetailedSample(@Nonnull DetailedSampleDto from) {

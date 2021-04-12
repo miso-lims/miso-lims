@@ -5,6 +5,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.hasTemporaryName;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -45,6 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.IdentityView;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.DetailedQcStatusService;
@@ -440,13 +442,11 @@ public class DefaultSampleServiceTest {
     Project project = new ProjectImpl();
     project.setId(1L);
     project.setReferenceGenome(humanReferenceGenome());
-    Set<SampleIdentity> idList = new HashSet<>();
-    SampleIdentity id1 = new SampleIdentityImpl();
+    IdentityView id1 = new IdentityView();
     id1.setExternalName("String1,String2");
-    id1.setProject(project);
-    idList.add(id1);
+    id1.setProjectId(project.getId());
     Mockito.when(sut.getIdentitiesByExternalNameOrAliasAndProject(Matchers.anyString(), Matchers.anyLong(), Matchers.anyBoolean()))
-        .thenReturn(idList);
+        .thenReturn(Collections.singletonList(id1));
     Sample newSample = new SampleImpl();
     newSample.setProject(project);
     sut.confirmExternalNameUniqueForProjectIfRequired("String3", newSample);
@@ -457,15 +457,16 @@ public class DefaultSampleServiceTest {
     Project project = new ProjectImpl();
     project.setId(1L);
     project.setReferenceGenome(humanReferenceGenome());
-    Set<SampleIdentity> idSet = new HashSet<>();
-    SampleIdentity id1 = new SampleIdentityImpl();
+    IdentityView id1 = new IdentityView();
     id1.setId(1L);
     id1.setExternalName("String1,String2");
-    id1.setProject(project);
-    idSet.add(id1);
+    id1.setProjectId(project.getId());
+    Sample newSample = new SampleImpl();
+    newSample.setProject(project);
     Mockito.when(sut.getIdentitiesByExternalNameOrAliasAndProject(Matchers.anyString(), Matchers.anyLong(), Matchers.anyBoolean()))
-        .thenReturn(idSet);
-    sut.confirmExternalNameUniqueForProjectIfRequired("String1,String3", id1);
+        .thenReturn(Collections.singletonList(id1));
+    exception.expect(ValidationException.class);
+    sut.confirmExternalNameUniqueForProjectIfRequired("String1,String3", newSample);
   }
 
   @Test
@@ -473,14 +474,12 @@ public class DefaultSampleServiceTest {
     Project project = new ProjectImpl();
     project.setId(1L);
     project.setReferenceGenome(humanReferenceGenome());
-    Set<SampleIdentity> idSet = new HashSet<>();
-    SampleIdentity id1 = new SampleIdentityImpl();
+    IdentityView id1 = new IdentityView();
     id1.setId(1L);
     id1.setExternalName("String1,String2");
-    id1.setProject(project);
-    idSet.add(id1);
+    id1.setProjectId(project.getId());
     Mockito.when(sut.getIdentitiesByExternalNameOrAliasAndProject(Matchers.anyString(), Matchers.anyLong(), Matchers.anyBoolean()))
-        .thenReturn(idSet);
+        .thenReturn(Collections.singletonList(id1));
     Sample newSample = new SampleImpl();
     newSample.setProject(project);
     exception.expect(ValidationException.class);
@@ -492,14 +491,12 @@ public class DefaultSampleServiceTest {
     Project project = new ProjectImpl();
     project.setId(1L);
     project.setReferenceGenome(humanReferenceGenome());
-    Set<SampleIdentity> idList = new HashSet<>();
-    SampleIdentity id1 = new SampleIdentityImpl();
+    IdentityView id1 = new IdentityView();
     id1.setExternalName("String1,String2");
-    id1.setProject(project);
-    idList.add(id1);
+    id1.setProjectId(project.getId());
     sut.setUniqueExternalNameWithinProjectRequired(false);
     Mockito.when(sut.getIdentitiesByExternalNameOrAliasAndProject(Matchers.anyString(), Matchers.anyLong(), Matchers.anyBoolean()))
-        .thenReturn(idList);
+        .thenReturn(Collections.singletonList(id1));
     Sample newSample = new SampleImpl();
     newSample.setProject(project);
     sut.confirmExternalNameUniqueForProjectIfRequired("String1", newSample);
