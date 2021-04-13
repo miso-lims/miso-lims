@@ -3,6 +3,8 @@
 Changes:
 
 * Fixed no projects shown for runs in the Runs list
+* Fixed Oxford Nanopore containers from Run Scanner saving incorrectly
+* Fixed errors updating some attributes of Oxford Nanopore containers
 
 # 1.27.0
 

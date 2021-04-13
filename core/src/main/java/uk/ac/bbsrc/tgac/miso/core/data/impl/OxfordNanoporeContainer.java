@@ -21,10 +21,10 @@ public class OxfordNanoporeContainer extends SequencerPartitionContainerImpl {
   private PoreVersion poreVersion;
 
   @Column(nullable = false)
-  @Temporal(TemporalType.TIMESTAMP)
+  @Temporal(TemporalType.DATE)
   private Date receivedDate;
 
-  @Temporal(TemporalType.TIMESTAMP)
+  @Temporal(TemporalType.DATE)
   private Date returnedDate;
 
   public PoreVersion getPoreVersion() {
