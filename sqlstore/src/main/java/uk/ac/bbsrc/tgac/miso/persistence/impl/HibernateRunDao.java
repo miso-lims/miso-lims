@@ -305,7 +305,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
         .createAlias("sample.parentProject", "project")
         .setProjection(Projections.distinct(
             Projections.projectionList()
-                .add(Projections.property("project.id"))
+                .add(Projections.property("id"))
                 .add(Projections.property("project.shortName"))
                 .add(Projections.property("project.name"))))
         .add(Restrictions.in("id", runs.stream().map(Run::getId).toArray()))
@@ -314,7 +314,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
     for (Run run : runs) {
       run.setProjectsLabel(results.stream()
           .filter(arr -> ((Long) arr[0]).longValue() == run.getId())
-          .map(arr -> arr[1] == null ? (String) arr[2] : (String) arr[1])
+          .map(arr -> (String) (arr[1] == null ? arr[2] : arr[1]))
           .collect(Collectors.joining(", ")));
     }
     return runs;

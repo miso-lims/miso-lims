@@ -2,6 +2,7 @@
 
 Changes:
 
+* Fixed no projects shown for runs in the Runs list
 * Fixed Oxford Nanopore containers from Run Scanner saving incorrectly
 * Fixed errors updating some attributes of Oxford Nanopore containers
 
@@ -33,6 +34,10 @@ Upgrade Notes:
   installed. You will also need to ensure that Tomcat is configured to use the
   newly installed JDK.
 * Updated to Pinery v2.19.0
+
+Known Issues:
+
+* No projects are shown for any runs in the Runs list
 
 # 1.26.0
 
