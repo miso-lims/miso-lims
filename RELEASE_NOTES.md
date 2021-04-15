@@ -2,6 +2,7 @@
 
 Changes:
 
+* Sort items by alias in transfer notifications
 * Improved performance of search by names feature                                
 * Search by names now does exact matching only                                   
 * Improved performance of bulk parent/child lookup                               
