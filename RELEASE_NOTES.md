@@ -10,6 +10,8 @@ Changes:
 * Fixed no projects shown for runs in the Runs list
 * Fixed Oxford Nanopore containers from Run Scanner saving incorrectly
 * Fixed errors updating some attributes of Oxford Nanopore containers
+* Fixed error on Edit Library page when using unique dual indices and there is
+  no index 2 matching the selected index 1
 
 # 1.27.0
 

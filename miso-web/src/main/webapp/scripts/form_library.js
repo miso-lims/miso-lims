@@ -459,12 +459,14 @@ FormTarget.library = (function($) {
         var indexFamily = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(indexFamilyId), Constants.indexFamilies);
         if (indexFamily.uniqueDualIndex) {
           var index1 = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(newValue), indexFamily.indices);
-          var index2 = Utils.array.findUniqueOrThrow(function(index) {
+          var index2 = indexFamily.indices.find(function(index) {
             return index.position === 2 && index.name === index1.name;
-          }, indexFamily.indices);
-          form.updateField('index2Id', {
-            value: index2.id
           });
+          if (index2) {
+            form.updateField('index2Id', {
+              value: index2.id
+            });
+          }
         }
       }
     }
