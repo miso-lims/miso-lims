@@ -7,12 +7,14 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.stream.Collectors;
 
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
@@ -324,7 +326,8 @@ public class NotificationManager {
     headerRow = headerRow.with(makeTh("Barcode"), makeTh("Location"));
 
     List<ContainerTag> rows = new ArrayList<>();
-    for (TransferSample transferSample : transferSamples) {
+    List<TransferSample> sorted = sortByAlias(transferSamples);
+    for (TransferSample transferSample : sorted) {
       Sample sample = transferSample.getItem();
       DetailedSample detailedSample = detailed ? (DetailedSample) sample : null;
       List<DomContent> cells = new ArrayList<>();
@@ -351,6 +354,12 @@ public class NotificationManager {
     return makeTable(headerRow, rows);
   }
 
+  private static <T extends TransferItem<?>> List<T> sortByAlias(Collection<T> original) {
+    return original.stream()
+        .sorted(Comparator.comparing(item -> item.getItem().getAlias()))
+        .collect(Collectors.toList());
+  }
+
   private static String makeLocationLabel(TransferItem<?> item) {
     if (item.getDistributedBoxAlias() != null) {
       return item.getDistributedBoxAlias() + " " + item.getDistributedBoxPosition();
@@ -366,7 +375,8 @@ public class NotificationManager {
         makeTh("i7 Index Name"), makeTh("i7 Index"), makeTh("i5 Index Name"), makeTh("i5 Index"));
 
     List<ContainerTag> rows = new ArrayList<>();
-    for (TransferLibrary transferLibrary : transferLibraries) {
+    List<TransferLibrary> sorted = sortByAlias(transferLibraries);
+    for (TransferLibrary transferLibrary : sorted) {
       Library library = transferLibrary.getItem();
       List<DomContent> cells = new ArrayList<>();
       cells.add(makeTd(library.getAlias()));
@@ -389,7 +399,8 @@ public class NotificationManager {
         makeTh("i7 Index Name"), makeTh("i7 Index"), makeTh("i5 Index Name"), makeTh("i5 Index"), makeTh("Targeted Sequencing"));
 
     List<ContainerTag> rows = new ArrayList<>();
-    for (TransferLibraryAliquot transferLibraryAliquot : transferLibraryAliquots) {
+    List<TransferLibraryAliquot> sorted = sortByAlias(transferLibraryAliquots);
+    for (TransferLibraryAliquot transferLibraryAliquot : sorted) {
       LibraryAliquot libraryAliquot = transferLibraryAliquot.getItem();
       Library library = libraryAliquot.getLibrary();
       List<DomContent> cells = new ArrayList<>();
@@ -412,7 +423,8 @@ public class NotificationManager {
     ContainerTag headerRow = tr(makeTh("Alias"), makeTh("Barcode"), makeTh("Location"));
 
     List<ContainerTag> rows = new ArrayList<>();
-    for (TransferPool transferPool : transferPools) {
+    List<TransferPool> sorted = sortByAlias(transferPools);
+    for (TransferPool transferPool : sorted) {
       Pool pool = transferPool.getItem();
       List<DomContent> cells = new ArrayList<>();
       cells.add(makeTd(pool.getAlias()));
