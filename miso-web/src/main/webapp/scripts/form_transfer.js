@@ -13,6 +13,13 @@ FormTarget.transfer = (function($) {
    * }
    */
 
+  var descriptions = {
+    senderLab: 'External lab from which the items were received. Applicable to receipt transfers.',
+    senderGroup: 'Internal group from whom the items are being sent. Applicable to internal and distribution transfers.',
+    recipient: 'External entity who is receiving the items. Applicable to distribution transfers.',
+    recipientGroup: 'Internal group that is receiving the items. Applicable to receipt and internal transfers.'
+  }
+
   return {
     getUserManualUrl: function() {
       return Urls.external.userManual('transfers');
@@ -64,13 +71,20 @@ FormTarget.transfer = (function($) {
           getItemLabel: Utils.array.getAlias,
           getItemValue: Utils.array.getId,
           sortSource: Utils.sorting.standardSort('label'),
-          include: config.editSend && object.senderLabId,
-          required: true
+          include: config.editSend && (config.pageMode === 'create' || object.senderLabId),
+          required: !!object.senderLabId,
+          onChange: function(newValue, form) {
+            if (config.pageMode == 'create') {
+              updateFieldRestrictions(form);
+            }
+          },
+          description: descriptions.senderLab
         }, {
           title: 'Sender Lab (External)',
           data: 'senderLabLabel',
           type: 'read-only',
-          include: !config.editSend && object.senderLabLabel
+          include: !config.editSend && object.senderLabLabel,
+          description: descriptions.senderLab
         }, {
           title: 'Sender Group (Internal)',
           data: 'senderGroupId',
@@ -80,12 +94,19 @@ FormTarget.transfer = (function($) {
           getItemValue: Utils.array.getId,
           sortSource: Utils.sorting.standardSort('name'),
           include: config.editSend && (config.pageMode === 'create' || object.senderGroupId),
-          required: true
+          required: !!object.senderGroupId,
+          onChange: function(newValue, form) {
+            if (config.pageMode == 'create') {
+              updateFieldRestrictions(form);
+            }
+          },
+          description: descriptions.senderGroup
         }, {
           title: 'Sender Group (Internal)',
           data: 'senderGroupName',
           type: 'read-only',
-          include: !config.editSend && object.senderGroupName
+          include: !config.editSend && object.senderGroupName,
+          description: descriptions.senderGroup
         }, {
           title: 'Recipient (External)',
           data: 'recipient',
@@ -95,16 +116,16 @@ FormTarget.transfer = (function($) {
           required: !!object.recipient,
           onChange: function(newValue, form) {
             if (config.pageMode == 'create') {
-              form.updateField('recipientGroupId', {
-                disabled: !!newValue
-              });
+              updateFieldRestrictions(form);
             }
-          }
+          },
+          description: descriptions.recipient
         }, {
           title: 'Recipient (External)',
           data: 'recipient',
           type: 'read-only',
-          include: !config.editSend && object.recipient
+          include: !config.editSend && object.recipient,
+          description: descriptions.recipient
         }, {
           title: 'Recipient Group (Internal)',
           data: 'recipientGroupId',
@@ -117,22 +138,64 @@ FormTarget.transfer = (function($) {
           required: object.recipientGroupId,
           onChange: function(newValue, form) {
             if (config.pageMode == 'create') {
-              form.updateField('recipient', {
-                disabled: !!newValue
-              });
+              updateFieldRestrictions(form);
             }
-          }
+          },
+          description: descriptions.recipientGroup
         }, {
           title: 'Recipient Group (Internal)',
           data: 'recipientGroupName',
           type: 'read-only',
-          include: !config.editSend && object.recipientGroupName
+          include: !config.editSend && object.recipientGroupName,
+          description: descriptions.recipientGroup
         }]
       }];
     },
     confirmSave: function(object) {
       object.items = Transfer.getItems();
     }
+  }
+
+  function updateFieldRestrictions(form) {
+    var senderLab = form.get('senderLabId');
+    var senderGroup = form.get('senderGroupId');
+    var recipient = form.get('recipient');
+    var recipientGroup = form.get('recipientGroupId');
+
+    if (senderLab) {
+      // receipt transfer
+      disableField(form, 'senderGroupId', true);
+      disableField(form, 'recipient', true);
+      disableField(form, 'recipientGroupId', false);
+    } else if (recipient) {
+      // distribution transfer
+      disableField(form, 'senderLabId', true);
+      disableField(form, 'senderGroupId', false);
+      disableField(form, 'recipientGroupId', true);
+    } else if (senderGroup && recipientGroup) {
+      // internal transfer
+      disableField(form, 'senderLabId', true);
+      disableField(form, 'recipient', true);
+    } else if (senderGroup) {
+      disableField(form, 'senderLabId', true);
+      disableField(form, 'recipient', false);
+      disableField(form, 'recipientGroupId', false);
+    } else if (recipientGroup) {
+      disableField(form, 'senderLabId', false);
+      disableField(form, 'senderGroupId', false);
+      disableField(form, 'recipient', true);
+    } else {
+      disableField(form, 'senderLabId', false);
+      disableField(form, 'senderGroupId', false);
+      disableField(form, 'recipient', false);
+      disableField(form, 'recipientGroupId', false);
+    }
+  }
+
+  function disableField(form, field, disable) {
+    form.updateField(field, {
+      disabled: disable
+    });
   }
 
 })(jQuery);

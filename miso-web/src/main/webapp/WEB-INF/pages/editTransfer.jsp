@@ -18,6 +18,34 @@
   <button id="save" type="button" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
 
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
+  <div id="note_arrowclick" class="toggleLeft"></div>
+</div>
+<div id="notediv" class="note" style="display:none;">
+  <p>
+    A transfer shows the change of custody for a set of items. There are three types of transfers,
+    and the type that a transfer is classified as depends on the sender and recipient:
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th><th>Sender</th><th>Recipient</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Receipt</td><td>External Lab</td><td>Internal Group</td>
+      </tr>
+      <tr>
+        <td>Internal</td><td>Internal Group</td><td>Internal Group</td>
+      </tr>
+      <tr>
+        <td>Distribution</td><td>Internal Group</td><td>External Entity</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
 <form:form id="transferForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
 
 <br>

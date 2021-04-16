@@ -315,6 +315,19 @@ table.in select[multiple="multiple"] {
     margin-bottom: 0px;
 }
 
+.note table {
+    margin: 12px 24px;
+}
+
+.note table, .note th, .note td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+.note th, .note td {
+    padding: 4px 8px;
+}
+
 div.sectionDivider {
     text-align: right;
     border-bottom: 1px solid #999;
