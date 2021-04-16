@@ -131,6 +131,8 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forString("Name", Sample::getName), //
       Column.forString("Project", sample -> sample.getProject().getShortName()), //
       Column.forString("Alias", Sample::getAlias), //
+      Column.forString("Box Alias", sample -> sample.getBox() == null ? null : sample.getBox().getAlias()), //
+      Column.forString("Position", sample -> sample.getBoxPosition()), //
       Column.forString("Group ID", effectiveGroupIdProperty(GroupIdentifiable::getGroupId)), //
       Column.forString("Description", Sample::getDescription), //
       Column.forBigDecimal("Concentration", Sample::getConcentration), //

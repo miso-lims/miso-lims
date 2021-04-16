@@ -3,6 +3,7 @@
 Changes:
 
 * Sort items by alias in transfer notifications
+* Added box alias and position to 'DNA Library Preparation' sample download sheet
 * Improved performance of search by names feature                                
 * Search by names now does exact matching only                                   
 * Improved performance of bulk parent/child lookup                               
