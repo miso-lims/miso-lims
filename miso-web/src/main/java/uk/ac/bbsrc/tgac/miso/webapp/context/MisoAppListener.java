@@ -95,6 +95,7 @@ public class MisoAppListener implements ServletContextListener {
     Map<String, String> misoProperties = exporter.getResolvedProperties();
 
     // load logging system manually so that we can inject the baseDirectory property
+    // from the miso properties file into the log4j2 properties file
     System.setProperty("misoBaseDirectory", misoProperties.get("miso.baseDirectory"));
     String configFilePath = application.getRealPath("/") + "/WEB-INF/log4j2.miso.properties";
     try {
