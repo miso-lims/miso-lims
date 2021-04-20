@@ -263,7 +263,8 @@ BulkUtils = (function($) {
             return !lab.archived;
           }),
           getItemLabel: Utils.array.getAlias,
-          getItemValue: Utils.array.getId
+          getItemValue: Utils.array.getId,
+          sortSource: true
         }, {
           title: 'Received By',
           type: 'dropdown',
