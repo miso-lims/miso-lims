@@ -19,6 +19,7 @@ BulkTarget.library = (function($) {
 
   var originalDataByRow = {};
   var parentLocationsByRow = null;
+  var allowUniqueDualIndexSelectionByRow = {};
 
   return {
     getSaveUrl: function() {
@@ -131,6 +132,7 @@ BulkTarget.library = (function($) {
     },
     prepareData: function(data, config) {
       parentLocationsByRow = {};
+      allowUniqueDualIndexSelectionByRow = {};
       data.forEach(function(library, index) {
         originalDataByRow[index] = {
           effectiveGroupId: library.effectiveGroupId,
@@ -141,6 +143,7 @@ BulkTarget.library = (function($) {
         if (library.sampleBoxPosition) {
           parentLocationsByRow[index] = library.sampleBoxPosition;
         }
+        allowUniqueDualIndexSelectionByRow[index] = false;
       });
     },
     getFixedColumns: function(config) {
@@ -698,6 +701,10 @@ BulkTarget.library = (function($) {
     };
     if (position === 1) {
       column.onChange = function(rowIndex, newValue, api) {
+        if (!allowUniqueDualIndexSelectionByRow[rowIndex]) {
+          updateUdiSelection(rowIndex, api);
+          return;
+        }
         if (!newValue) {
           return;
         }
@@ -719,8 +726,30 @@ BulkTarget.library = (function($) {
           }
         }
       };
+    } else {
+      column.onChange = function(rowIndex, newValue, api) {
+        updateUdiSelection(rowIndex, api);
+      }
     }
     return column;
+  }
+
+  function updateUdiSelection(rowIndex, api) {
+    var indexFamilyName = api.getValue(rowIndex, 'indexFamilyId');
+    var indexFamily = Constants.indexFamilies.find(Utils.array.namePredicate(indexFamilyName));
+    if (!indexFamily) {
+      allowUniqueDualIndexSelectionByRow[rowIndex] = true;
+      return;
+    }
+    var index1 = api.getValueObject(rowIndex, 'index1Id');
+    var index2 = api.getValueObject(rowIndex, 'index2Id');
+    if (!index2) {
+      allowUniqueDualIndexSelectionByRow[rowIndex] = true;
+    } else if (!index1) {
+      allowUniqueDualIndexSelectionByRow[rowIndex] = false;
+    } else {
+      allowUniqueDualIndexSelectionByRow[rowIndex] = index1.name === index2.name;
+    }
   }
 
   function getPropertyForItemId(items, id, property) {
