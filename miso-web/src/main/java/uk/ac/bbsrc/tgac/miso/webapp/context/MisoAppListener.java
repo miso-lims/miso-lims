@@ -24,6 +24,8 @@
 package uk.ac.bbsrc.tgac.miso.webapp.context;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -38,7 +40,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.ThreadContext;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,15 +89,21 @@ public class MisoAppListener implements ServletContextListener {
     DefaultExports.initialize();
 
     ServletContext application = event.getServletContext();
-
-    // load logging system manually so that we get the placeholders ${} swapped out for real values
-    PropertyConfigurator.configure(application.getRealPath("/") + "/WEB-INF/log4j.miso.properties");
-
     XmlWebApplicationContext context = (XmlWebApplicationContext) WebApplicationContextUtils.getRequiredWebApplicationContext(application);
 
     // resolve property file configuration placeholders
     MisoPropertyExporter exporter = (MisoPropertyExporter) context.getBean("propertyConfigurer");
     Map<String, String> misoProperties = exporter.getResolvedProperties();
+
+    // load logging system manually so that we can inject the baseDirectory property
+    ThreadContext.put("baseDirectory", misoProperties.get("miso.baseDirectory"));
+    String configFilePath = application.getRealPath("/") + "/WEB-INF/log4j2.miso.properties";
+    try {
+      URI uri = new URI(configFilePath);
+      Configurator.reconfigure(uri);
+    } catch (URISyntaxException e) {
+      throw new IllegalStateException("Failed to configure logging", e);
+    }
 
     // Set JVM time zone to configured UI time
     String uiZone = getStringPropertyOrNull("miso.timeCorrection.uiZone", misoProperties);
