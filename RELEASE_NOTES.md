@@ -2,6 +2,7 @@
 
 Changes:
 
+* Allow creating receipt transfers for existing items
 * Sort items by alias in transfer notifications
 * Improved performance of search by names feature                                
 * Search by names now does exact matching only                                   
