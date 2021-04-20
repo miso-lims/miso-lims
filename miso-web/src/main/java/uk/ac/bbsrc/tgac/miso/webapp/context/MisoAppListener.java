@@ -40,7 +40,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.apache.logging.log4j.ThreadContext;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
@@ -96,7 +95,7 @@ public class MisoAppListener implements ServletContextListener {
     Map<String, String> misoProperties = exporter.getResolvedProperties();
 
     // load logging system manually so that we can inject the baseDirectory property
-    ThreadContext.put("baseDirectory", misoProperties.get("miso.baseDirectory"));
+    System.setProperty("misoBaseDirectory", misoProperties.get("miso.baseDirectory"));
     String configFilePath = application.getRealPath("/") + "/WEB-INF/log4j2.miso.properties";
     try {
       URI uri = new URI(configFilePath);
