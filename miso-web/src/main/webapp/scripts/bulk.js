@@ -655,14 +655,9 @@ BulkUtils = (function($) {
             var status = Constants.detailedQcStatuses.find(function(item) {
               return item.description === newValue;
             });
-            var changes = {
-              required: status && status.noteRequired,
-              disabled: !status || !status.noteRequired
-            };
-            if (!status || !status.noteRequired) {
-              changes.value = null;
-            }
-            api.updateField(rowIndex, 'detailedQcStatusNote', changes);
+            api.updateField(rowIndex, 'detailedQcStatusNote', {
+              required: status && status.noteRequired
+            });
           }
         }, {
           title: 'QC Note',

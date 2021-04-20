@@ -1378,7 +1378,7 @@ Utils.sorting = {
       }
       return 3;
     }
-    return statusToInt(a) - statusToInt(b);
+    return statusToInt(a) - statusToInt(b) || a.description.localeCompare(b.description);
   }
 };
 

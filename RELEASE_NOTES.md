@@ -3,6 +3,7 @@
 Changes:
 
 * Allow creating receipt transfers for existing items
+* Allow adding QC notes with any QC status
 * Sort items by alias in transfer notifications
 * Added box alias and position to 'DNA Library Preparation' sample download sheet
 * Improved performance of search by names feature                                
