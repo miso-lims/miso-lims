@@ -18,6 +18,8 @@ Changes:
   no index 2 matching the selected index 1
 * Fixed wrong index being selected for index 2 when editing libraries using a
   unique dual index family if non-matching indices were selected
+* Fixed updating subproject options when project is changed on the Edit Sample
+  page (detailed sample)
 
 # 1.27.0
 
