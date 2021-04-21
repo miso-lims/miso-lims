@@ -81,16 +81,9 @@ public class ValidationUtils {
   }
 
   public static void validateDetailedQcStatus(HierarchyEntity item, Collection<ValidationError> errors) {
-    if (item.getDetailedQcStatus() == null) {
-      if (item.getDetailedQcStatusNote() != null) {
-        errors.add(new ValidationError("detailedQcStatusNote", "Note cannot be specified without status"));
-      }
-    } else if (item.getDetailedQcStatus().getNoteRequired()) {
-      if (LimsUtils.isStringEmptyOrNull(item.getDetailedQcStatusNote())) {
-        errors.add(new ValidationError("detailedQcStatusNote", "Note must be specified for the selected status"));
-      }
-    } else if (item.getDetailedQcStatusNote() != null) {
-      errors.add(new ValidationError("detailedQcStatusNote", "Note cannot be specified for the selected status"));
+    if (item.getDetailedQcStatus() != null && item.getDetailedQcStatus().getNoteRequired()
+        && LimsUtils.isStringEmptyOrNull(item.getDetailedQcStatusNote())) {
+      errors.add(new ValidationError("detailedQcStatusNote", "QC Note must be specified for the selected status"));
     }
     validateQcUser(item.getDetailedQcStatus(), item.getQcUser(), errors);
   }
@@ -104,7 +97,7 @@ public class ValidationUtils {
     if (qcStatus == null && qcUser != null) {
       errors.add(new ValidationError(String.format("%s cannot be set when %s is not specified", qcUserLabel, qcFieldLabel)));
     } else if (qcStatus != null && qcUser == null) {
-      errors.add(new ValidationError("%s must be set when %s is specified"));
+      errors.add(new ValidationError(String.format("%s must be set when %s is specified", qcUserLabel, qcFieldLabel)));
     }
   }
 

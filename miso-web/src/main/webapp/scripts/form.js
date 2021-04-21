@@ -252,17 +252,12 @@ FormUtils = (function($) {
           var noteRequired = newValue ? Utils.array.findUniqueOrThrow(function(item) {
             return item.id === Number(newValue);
           }, Constants.detailedQcStatuses).noteRequired : false;
-          var updates = {
-            disabled: !noteRequired,
+          form.updateField('detailedQcStatusNote', {
             required: noteRequired
-          }
-          if (!noteRequired) {
-            updates.value = null;
-          }
-          form.updateField('detailedQcStatusNote', updates);
+          });
         }
       }, {
-        title: 'QC Status Note',
+        title: 'QC Note',
         data: 'detailedQcStatusNote',
         type: 'text',
         maxLength: 500

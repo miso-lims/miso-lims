@@ -72,7 +72,8 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     editable.put(SamColumns.DONOR_SEX, "Unspecified");
     editable.put(SamColumns.GROUP_ID, "changed");
     editable.put(SamColumns.GROUP_DESCRIPTION, "changed");
-    editable.put(SamColumns.QC_STATUS, "Refused Consent");
+    editable.put(SamColumns.QC_STATUS, "OKd by Collaborator");
+    editable.put(SamColumns.QC_NOTE, "Approved");
     editable.put(SamColumns.CREATION_DATE, "2018-07-17");
 
     editable.forEach((k, v) -> table.enterText(k, 0, v));
@@ -80,15 +81,6 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
 
     assertFalse(table.isWritable(SamColumns.NAME, 0));
     assertFalse(table.isWritable(SamColumns.SAMPLE_CLASS, 0));
-    assertFalse(table.isWritable(SamColumns.QC_NOTE, 0));
-
-    // ensure dependent columns update properly
-    editable.put(SamColumns.QC_STATUS, "OKd by Collaborator");
-    table.enterText(SamColumns.QC_STATUS, 0, editable.get(SamColumns.QC_STATUS));
-    assertEquals(editable.get(SamColumns.QC_STATUS), table.getText(SamColumns.QC_STATUS, 0));
-    editable.put(SamColumns.QC_NOTE, "Approved");
-    table.enterText(SamColumns.QC_NOTE, 0, editable.get(SamColumns.QC_NOTE));
-    assertEquals(editable.get(SamColumns.QC_NOTE), table.getText(SamColumns.QC_NOTE, 0));
   }
 
   @Test
