@@ -1241,20 +1241,6 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
   }
 
   @Test
-  public void testCreateIdentityDependencyCells() throws Exception {
-    // Goal: ensure that cells which depend on other columns are updated once the other columns are updated
-    BulkSamplePage page = getCreatePage(1, null, SampleIdentity.CATEGORY_NAME);
-    HandsOnTable table = page.getTable();
-
-    assertFalse(table.isWritable(SamColumns.QC_NOTE, 0));
-
-    table.enterText(SamColumns.QC_STATUS, 0, "Okd by Collaborator");
-    assertTrue(table.isWritable(SamColumns.QC_NOTE, 0));
-    table.enterText(SamColumns.QC_NOTE, 0, "writable note");
-    assertEquals("note is writable", "writable note", table.getText(SamColumns.QC_NOTE, 0));
-  }
-
-  @Test
   public void testCreateOneIdentityNoProject() throws Exception {
     // Goal: ensure one identity can be saved
     BulkSamplePage page = getCreatePage(1, null, SampleIdentity.CATEGORY_NAME);
