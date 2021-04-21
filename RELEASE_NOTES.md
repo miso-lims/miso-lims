@@ -6,6 +6,8 @@ Changes:
 * Sort items by alias in transfer notifications
 * Sort 'Received From' options in bulk Create Samples and Libraries pages
 * Added box alias and position to 'DNA Library Preparation' sample download sheet
+* Changed colour of ambiguous external name warning in bulk Create Samples table
+  (detailed sample)
 * Improved performance of search by names feature
 * Search by names now does exact matching only
 * Improved performance of bulk parent/child lookup
