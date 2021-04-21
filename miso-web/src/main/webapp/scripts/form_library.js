@@ -12,6 +12,8 @@ FormTarget.library = (function($) {
    * }
    */
 
+  var allowUniqueDualIndexSelection = false;
+
   return {
     getUserManualUrl: function() {
       return Urls.external.userManual('libraries');
@@ -453,6 +455,10 @@ FormTarget.library = (function($) {
     }
     if (position === 1) {
       field.onChange = function(newValue, form) {
+        if (!allowUniqueDualIndexSelection) {
+          updateUdiSelection(form);
+          return;
+        }
         var indexFamilyId = form.get('indexFamilyId');
         if (!indexFamilyId)
           return;
@@ -469,8 +475,32 @@ FormTarget.library = (function($) {
           }
         }
       }
+    } else {
+      field.onChange = function(newValue, form) {
+        updateUdiSelection(form);
+      }
     }
     return field;
+  }
+
+  function updateUdiSelection(form) {
+    var indexFamilyId = form.get('indexFamilyId');
+    if (!indexFamilyId) {
+      allowUniqueDualIndexSelection = true;
+      return;
+    }
+    var index1Id = form.get('index1Id');
+    var index2Id = form.get('index2Id');
+    if (!index2Id) {
+      allowUniqueDualIndexSelection = true;
+    } else if (!index1Id) {
+      allowUniqueDualIndexSelection = false;
+    } else {
+      var indexFamily = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(indexFamilyId), Constants.indexFamilies);
+      var index1 = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(index1Id), indexFamily.indices);
+      var index2 = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(index2Id), indexFamily.indices);
+      allowUniqueDualIndexSelection = index1.name === index2.name;
+    }
   }
 
   function getIndices(indexFamilyId, position) {

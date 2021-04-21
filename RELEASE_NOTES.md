@@ -15,6 +15,8 @@ Changes:
 * Fixed errors updating some attributes of Oxford Nanopore containers
 * Fixed error on Edit Library page when using unique dual indices and there is
   no index 2 matching the selected index 1
+* Fixed wrong index being selected for index 2 when editing libraries using a
+  unique dual index family if non-matching indices were selected
 
 # 1.27.0
 
