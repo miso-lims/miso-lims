@@ -4,12 +4,13 @@ Changes:
 
 * Allow creating receipt transfers for existing items
 * Sort items by alias in transfer notifications
+* Sort 'Received From' options in bulk Create Samples and Libraries pages
 * Added box alias and position to 'DNA Library Preparation' sample download sheet
-* Improved performance of search by names feature                                
-* Search by names now does exact matching only                                   
-* Improved performance of bulk parent/child lookup                               
-* Improved performance of identity lookup (detailed sample)                      
-* Improved performance of spreadsheet downloads                                  
+* Improved performance of search by names feature
+* Search by names now does exact matching only
+* Improved performance of bulk parent/child lookup
+* Improved performance of identity lookup (detailed sample)
+* Improved performance of spreadsheet downloads
 * Fixed no projects shown for runs in the Runs list
 * Fixed Oxford Nanopore containers from Run Scanner saving incorrectly
 * Fixed errors updating some attributes of Oxford Nanopore containers
