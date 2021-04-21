@@ -53,7 +53,16 @@ FormTarget.sample = (function($) {
                     return Constants.isDetailedSample ? item.shortName : item.name;
                   },
                   getItemValue: Utils.array.getId,
-                  sortSource: Utils.sorting.standardSort(Constants.isDetailedSample ? 'shortName' : 'id')
+                  sortSource: Utils.sorting.standardSort(Constants.isDetailedSample ? 'shortName' : 'id'),
+                  onChange: function(newValue, form) {
+                    if (Constants.isDetailedSample) {
+                      form.updateField('subprojectId', {
+                        source: Constants.subprojects.filter(function(subproject) {
+                          return subproject.parentProjectId === parseInt(newValue);
+                        })
+                      });
+                    }
+                  }
                 },
                 {
                   title: 'Name',
@@ -233,7 +242,8 @@ FormTarget.sample = (function($) {
               type: 'dropdown',
               source: Constants.subprojects.filter(function(subproject) {
                 return subproject.parentProjectId === object.projectId;
-              }).sort(Utils.sorting.standardSort('alias')),
+              }),
+              sortSource: Utils.sorting.standardSort('alias'),
               getItemLabel: function(item) {
                 return item.alias;
               },
