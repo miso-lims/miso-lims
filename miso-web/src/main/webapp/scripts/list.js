@@ -629,7 +629,18 @@ ListUtils = (function($) {
         options.aaData = data;
         errorMessage.style.visibility = "hidden";
       }, function(errorMessage, searchString, callback) {
-        callback(data);
+        var table = $('#' + elementId).dataTable();
+        var filteredRows = table.$('tr', {
+          filter: 'applied'
+        });
+        var filteredIds = [];
+        filteredRows.each(function(index, row) {
+          var checkboxId = row.children[0].children[0].id;
+          filteredIds.push(parseInt(checkboxId.match(/^list_.*_toggle(\d+)$/)[1]));
+        });
+        callback(data.filter(function(item) {
+          return filteredIds.indexOf(item.id) !== -1;
+        }));
       });
     },
     _checkEventHandler: function(isChecked, ev, data, elementId) {
