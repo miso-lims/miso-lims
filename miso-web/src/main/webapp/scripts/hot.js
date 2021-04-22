@@ -1245,7 +1245,7 @@ var HotUtils = {
             return x.description;
           }
         }], function(result) {
-          var errors = generateErrors(items, result)
+          var errors = generateErrors ? generateErrors(items, result) : [];
           if (errors.length >= 1) {
             Utils.showOkDialog("Error", errors);
           } else {

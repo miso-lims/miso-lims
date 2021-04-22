@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -138,6 +139,21 @@ public class HibernateRunDaoIT extends AbstractDAOTest {
   public void testListByPoolIdNone() throws IOException {
     List<Run> runs = dao.listByPoolId(9999);
     assertEquals(0, runs.size());
+  }
+
+  @Test
+  public void testListByIdsNull() throws Exception {
+    assertEquals(0, dao.listByIdList(null).size());
+  }
+
+  @Test
+  public void testListByIdList() throws Exception {
+    List<Long> ids = Arrays.asList(2L, 3L);
+    List<Run> runs = dao.listByIdList(ids);
+    assertEquals(2, runs.size());
+    for (Long id : ids) {
+      assertTrue(runs.stream().anyMatch(run -> run.getId() == id.longValue()));
+    }
   }
 
   @Test

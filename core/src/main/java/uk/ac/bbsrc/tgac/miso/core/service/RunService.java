@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.service;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.function.Predicate;
 
 import uk.ac.bbsrc.tgac.miso.core.data.GetLaneContents;
@@ -17,6 +18,8 @@ public interface RunService extends DeleterService<Run>, SaveService<Run>, Pagin
   Collection<Run> listByPoolId(long poolId) throws IOException;
 
   Collection<Run> listByContainerId(long containerId) throws IOException;
+
+  List<Run> listByIdList(Collection<Long> ids) throws IOException;
 
   /**
    * Throws AuthorizationException if user is not authorized to read the retrieved run.

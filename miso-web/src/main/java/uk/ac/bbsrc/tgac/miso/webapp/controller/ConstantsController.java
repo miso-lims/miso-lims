@@ -49,6 +49,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibraryAliquotSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibrarySpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.PartitionSpreadsheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.PoolSpreadSheets;
+import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.RunLibrarySpreadsheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
@@ -319,6 +320,7 @@ public class ConstantsController {
       addJsonArray(mapper, node, "libraryAliquotSpreadsheets", Arrays.asList(LibraryAliquotSpreadSheets.values()), Dtos::asDto);
       addJsonArray(mapper, node, "poolSpreadsheets", Arrays.asList(PoolSpreadSheets.values()), Dtos::asDto);
       addJsonArray(mapper, node, "partitionSpreadsheets", Arrays.asList(PartitionSpreadsheets.values()), Dtos::asDto);
+      addJsonArray(mapper, node, "runLibrarySpreadsheets", Arrays.asList(RunLibrarySpreadsheets.values()), Dtos::asDto);
       addJsonArray(mapper, node, "workflows", Arrays.asList(WorkflowName.values()), Dtos::asDto);
       addJsonArray(mapper, node, "printableFields", Arrays.asList(PrintableField.values()), PrintableField::name);
 
