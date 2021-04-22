@@ -2,6 +2,12 @@
 
 Changes:
 
+
+
+# 1.28.0
+
+Changes:
+
 * Allow creating receipt transfers for existing items
 * Allow adding QC notes with any QC status
 * Sort items by alias in transfer notifications
