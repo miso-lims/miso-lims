@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -168,6 +169,18 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
     return records;
+  }
+
+  @Override
+  public List<Run> listByIdList(Collection<Long> ids) throws IOException {
+    if (ids == null) {
+      return Collections.emptyList();
+    }
+    @SuppressWarnings("unchecked")
+    List<Run> results = currentSession().createCriteria(Run.class)
+        .add(Restrictions.in("id", ids))
+        .list();
+    return results;
   }
 
   public SessionFactory getSessionFactory() {

@@ -699,7 +699,8 @@ Urls = (function() {
     updateAliquots: middleIdUrlFunction(runRestBase, '/aliquots'),
     addContainer: middleIdUrlFunction(runRestBase, '/add'),
     removeContainers: middleIdUrlFunction(runRestBase, '/remove'),
-    potentialExperiments: middleIdUrlFunction(runRestBase, '/potentialExperiments')
+    potentialExperiments: middleIdUrlFunction(runRestBase, '/potentialExperiments'),
+    spreadsheet: runRestBase + '/spreadsheet'
   };
 
   // Run-Libraries

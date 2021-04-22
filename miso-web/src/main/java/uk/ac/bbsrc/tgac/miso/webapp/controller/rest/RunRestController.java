@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -48,6 +50,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -60,14 +63,17 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
+import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.RunLibrarySpreadsheets;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PartitionQcTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionAliquotService;
@@ -90,9 +96,11 @@ import uk.ac.bbsrc.tgac.miso.dto.ExperimentDto.RunPartitionDto;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentModelDto;
 import uk.ac.bbsrc.tgac.miso.dto.PartitionDto;
 import uk.ac.bbsrc.tgac.miso.dto.RunPartitionAliquotDto;
+import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 import uk.ac.bbsrc.tgac.miso.dto.StudyDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
+import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 /**
  * A controller to handle all REST requests for Runs
@@ -178,6 +186,9 @@ public class RunRestController extends RestController {
 
   }
 
+  @Value("${miso.detailed.sample.enabled}")
+  private Boolean detailedSample;
+
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -192,6 +203,8 @@ public class RunRestController extends RestController {
   private RunPartitionAliquotService runPartitionAliquotService;
   @Autowired
   private LibraryService libraryService;
+  @Autowired
+  private LibraryAliquotService libraryAliquotService;
   @Autowired
   private ExperimentService experimentService;
   @Autowired
@@ -540,6 +553,28 @@ public class RunRestController extends RestController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
     RestUtils.bulkDelete("Run", ids, runService);
+  }
+
+  @PostMapping(value = "/spreadsheet")
+  @ResponseBody
+  public HttpEntity<byte[]> getSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response,
+      UriComponentsBuilder uriBuilder) throws IOException {
+    // Note: not retrieving persisted run-libraries, so QC data will be missing
+    List<Run> runs = runService.listByIdList(request.getIds());
+    List<RunPartitionAliquot> runLibraries = new ArrayList<>();
+    for (Run run : runs) {
+      for (RunPosition runPosition : run.getRunPositions()) {
+        for (Partition partition : runPosition.getContainer().getPartitions()) {
+          if (partition.getPool() != null) {
+            for (PoolElement element : partition.getPool().getPoolContents()) {
+              LibraryAliquot aliquot = libraryAliquotService.get(element.getAliquot().getId());
+              runLibraries.add(new RunPartitionAliquot(run, partition, aliquot));
+            }
+          }
+        }
+      }
+    }
+    return MisoWebUtils.generateSpreadsheet(request, runLibraries.stream(), detailedSample, RunLibrarySpreadsheets::valueOf, response);
   }
 
 }

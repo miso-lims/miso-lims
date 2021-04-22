@@ -39,9 +39,10 @@ ListTarget.run = {
   },
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {
-    return [ListUtils.createBulkDeleteAction("Runs", "runs", function(run) {
-      return run.alias;
-    })];
+    return [HotUtils.spreadsheetAction(Urls.rest.runs.spreadsheet, Constants.runLibrarySpreadsheets),
+        ListUtils.createBulkDeleteAction("Runs", "runs", function(run) {
+          return run.alias;
+        })];
   },
   createStaticActions: function(config, projectId) {
     if (!projectId && config.platformType) {

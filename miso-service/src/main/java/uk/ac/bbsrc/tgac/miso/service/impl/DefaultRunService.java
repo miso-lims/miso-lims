@@ -158,6 +158,11 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   }
 
   @Override
+  public List<Run> listByIdList(Collection<Long> ids) throws IOException {
+    return runDao.listByIdList(ids);
+  }
+
+  @Override
   public Run get(long runId) throws IOException, AuthorizationException {
     return runDao.get(runId);
   }

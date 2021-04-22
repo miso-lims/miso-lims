@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -103,5 +104,7 @@ public interface RunStore extends PaginatedDataSource<Run> {
    * @throws IOException
    */
   List<Run> listByStatus(String health) throws IOException;
+
+  List<Run> listByIdList(Collection<Long> ids) throws IOException;
 
 }
