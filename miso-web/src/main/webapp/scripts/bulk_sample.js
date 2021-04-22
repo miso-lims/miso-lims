@@ -613,7 +613,7 @@ BulkTarget.sample = (function($) {
           return item.label || (item.alias + ' -- ' + item.externalName);
         },
         getItemValue: Utils.array.getId,
-        description: 'A coloured background indicates that multiple identities correspond to the external name.',
+        description: 'A yellow background indicates that multiple identities correspond to the external name.',
         onChange: function(rowIndex, newValue, api) {
           var formatter = null;
           var source = api.getSourceData(rowIndex, 'identityId');

@@ -3,6 +3,7 @@
     --grey-light: #CDCDCD;
     --purple-dark: #404087;
     --purple-light: #F0F0FF;
+    --yellow-light: #FEFEE3;
     --error-background: #FFE3E3;
 }
 
@@ -302,7 +303,7 @@ table.in select[multiple="multiple"] {
 
 /* Quick Help and similar blocks */
 .note {
-    background-color: #FEFEE3;
+    background-color: var(--yellow-light);
     border: 1px solid #333333;
     margin-top: 5px;
     margin-bottom: 5px;
@@ -744,7 +745,7 @@ button.disabled {
 }
 
 .table-note {
-  background-color: #FEFEE3;
+  background-color: var(--yellow-light);
 }
 
 .no-border {
@@ -772,7 +773,7 @@ button.disabled {
 }
 
 .handsontable td.nonStandardAlias {
-  background-color: #FEFEE3 !important;
+  background-color: var(--yellow-light) !important;
 }
 
 .handsontable td.nonStandardAlias.htInvalid {
@@ -780,7 +781,7 @@ button.disabled {
 }
 
 .handsontable td.multipleOptions {
-  background-color: var(--purple-light) !important;
+  background-color: var(--yellow-light) !important;
 }
 
 .handsontable td.notification {
