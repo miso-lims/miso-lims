@@ -12,6 +12,8 @@ Changes:
 * Improved performance of bulk parent/child lookup
 * Improved performance of identity lookup (detailed sample)
 * Improved performance of spreadsheet downloads
+* Fixed 'select all on all pages' selecting items that are filtered out by search
+  on some lists
 * Fixed no projects shown for runs in the Runs list
 * Fixed Oxford Nanopore containers from Run Scanner saving incorrectly
 * Fixed errors updating some attributes of Oxford Nanopore containers
