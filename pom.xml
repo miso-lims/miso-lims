@@ -143,8 +143,8 @@
     <hamcrest.version>1.3</hamcrest.version>
     <junit.version>4.12</junit.version>
     <mockito.verison>1.10.19</mockito.verison>
-    <slf4j.version>1.6.1</slf4j.version>
     <jersey.version>1.19</jersey.version>
+    <log4j.version>2.14.1</log4j.version>
     <poi.version>3.17</poi.version>
     <prometheus.version>0.0.21</prometheus.version>
     <prometheus.jmx.version>0.9</prometheus.jmx.version>
@@ -183,7 +183,7 @@
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>22.0</version>
+        <version>30.1.1-jre</version>
       </dependency>
       <dependency>
         <groupId>com.googlecode.json-simple</groupId>
@@ -359,11 +359,6 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>log4j</groupId>
-        <artifactId>log4j</artifactId>
-        <version>1.2.16</version>
-      </dependency>
-      <dependency>
         <groupId>mysql</groupId>
         <artifactId>mysql-connector-java</artifactId>
         <version>5.1.49</version>
@@ -388,6 +383,21 @@
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpmime</artifactId>
         <version>4.0.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-api</artifactId>
+        <version>${log4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-core</artifactId>
+        <version>${log4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-slf4j18-impl</artifactId>
+        <version>${log4j.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.poi</groupId>
@@ -464,6 +474,12 @@
         </exclusions>
       </dependency>
       <dependency>
+        <!-- Required to make Hibernate 4 logging compatible with log4j2 -->
+        <groupId>org.jboss.logging</groupId>
+        <artifactId>jboss-logging</artifactId>
+        <version>3.4.1.Final</version>
+      </dependency>
+      <dependency>
         <groupId>org.hibernate.javax.persistence</groupId>
         <artifactId>hibernate-jpa-2.0-api</artifactId>
         <version>1.0.1.Final</version>
@@ -504,16 +520,6 @@
         <groupId>org.seleniumhq.selenium</groupId>
         <artifactId>selenium-java</artifactId>
         <version>3.14.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <version>${slf4j.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-log4j12</artifactId>
-        <version>${slf4j.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
