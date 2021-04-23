@@ -32,6 +32,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
@@ -44,6 +45,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibraryAliquotSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.ListLibraryAliquotViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -56,6 +58,7 @@ import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
+import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
@@ -67,7 +70,7 @@ public class LibraryAliquotRestController extends RestController {
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
 
-  private final JQueryDataTableBackend<ListLibaryAliquotView, LibraryAliquotDto> jQueryBackend = new JQueryDataTableBackend<ListLibaryAliquotView, LibraryAliquotDto>() {
+  private final JQueryDataTableBackend<ListLibaryAliquotView, LibraryAliquotDto> jQueryBackend = new JQueryDataTableBackend<>() {
     @Override
     protected LibraryAliquotDto asDto(ListLibaryAliquotView model) {
       return Dtos.asDto(model);
@@ -85,6 +88,8 @@ public class LibraryAliquotRestController extends RestController {
   private ListLibraryAliquotViewService listLibraryAliquotViewService;
   @Autowired
   private PoolService poolService;
+  @Autowired
+  private RunService runService;
   @Autowired
   private WorksetService worksetService;
   @Autowired
@@ -245,6 +250,19 @@ public class LibraryAliquotRestController extends RestController {
           }
           return children.stream();
         }
+      })
+      .add(new RelationFinder.RelationAdapter<LibraryAliquot, Run, RunDto>("Run") {
+
+        @Override
+        public RunDto asDto(Run model) {
+          return Dtos.asDto(model);
+        }
+
+        @Override
+        public Stream<Run> find(LibraryAliquot model, Consumer<String> emitError) throws IOException {
+          return runService.listByLibraryAliquotId(model.getId()).stream();
+        }
+
       });
 
   @PostMapping(value = "/children/{category}")

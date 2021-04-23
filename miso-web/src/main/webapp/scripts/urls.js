@@ -571,6 +571,7 @@ Urls = (function() {
     create: poolRestBase,
     update: idUrlFunction(poolRestBase),
     parents: idUrlFunction(poolRestBase + '/parents'),
+    children: idUrlFunction(poolRestBase + '/children'),
     query: poolRestBase + '/query',
     search: poolRestBase + '/search',
     picker: {
@@ -700,7 +701,8 @@ Urls = (function() {
     addContainer: middleIdUrlFunction(runRestBase, '/add'),
     removeContainers: middleIdUrlFunction(runRestBase, '/remove'),
     potentialExperiments: middleIdUrlFunction(runRestBase, '/potentialExperiments'),
-    spreadsheet: runRestBase + '/spreadsheet'
+    spreadsheet: runRestBase + '/spreadsheet',
+    parents: idUrlFunction(runRestBase + '/parents')
   };
 
   // Run-Libraries

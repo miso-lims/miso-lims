@@ -61,6 +61,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
@@ -71,6 +72,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibrarySpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -84,6 +86,7 @@ import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
+import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
@@ -104,7 +107,7 @@ public class LibraryRestController extends RestController {
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
 
-  private final JQueryDataTableBackend<Library, LibraryDto> jQueryBackend = new JQueryDataTableBackend<Library, LibraryDto>() {
+  private final JQueryDataTableBackend<Library, LibraryDto> jQueryBackend = new JQueryDataTableBackend<>() {
     @Override
     protected LibraryDto asDto(Library model) {
       return Dtos.asDto(model, false);
@@ -120,6 +123,8 @@ public class LibraryRestController extends RestController {
   private LibraryService libraryService;
   @Autowired
   private PoolService poolService;
+  @Autowired
+  private RunService runService;
   @Autowired
   private WorksetService worksetService;
   @Autowired
@@ -293,6 +298,23 @@ public class LibraryRestController extends RestController {
           }
           return children.stream();
         }
+      })
+      .add(new RelationFinder.RelationAdapter<Library, Run, RunDto>("Run") {
+
+        @Override
+        public RunDto asDto(Run model) {
+          return Dtos.asDto(model);
+        }
+
+        @Override
+        public Stream<Run> find(Library model, Consumer<String> emitError) throws IOException {
+          Set<Run> children = new HashSet<>();
+          for (LibraryAliquot aliquot : model.getLibraryAliquots()) {
+            children.addAll(runService.listByLibraryAliquotId(aliquot.getId()));
+          }
+          return children.stream();
+        }
+
       });
 
   @PostMapping(value = "/children/{category}")

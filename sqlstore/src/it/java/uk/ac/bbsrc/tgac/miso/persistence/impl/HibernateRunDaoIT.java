@@ -131,13 +131,25 @@ public class HibernateRunDaoIT extends AbstractDAOTest {
 
   @Test
   public void testListByPoolId() throws IOException {
-    List<Run> runs = dao.listByPoolId(1);
+    List<Run> runs = dao.listByPoolId(1L);
     assertEquals(1, runs.size());
   }
 
   @Test
   public void testListByPoolIdNone() throws IOException {
-    List<Run> runs = dao.listByPoolId(9999);
+    List<Run> runs = dao.listByPoolId(9999L);
+    assertEquals(0, runs.size());
+  }
+
+  @Test
+  public void testListByLibraryAliquotId() throws IOException {
+    List<Run> runs = dao.listByLibraryAliquotId(3L);
+    assertEquals(1, runs.size());
+  }
+
+  @Test
+  public void testListByLibraryAliquotIdNone() throws IOException {
+    List<Run> runs = dao.listByLibraryAliquotId(9999L);
     assertEquals(0, runs.size());
   }
 

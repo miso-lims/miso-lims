@@ -403,7 +403,8 @@ HotTarget.pool = (function() {
             }
           },
           HotUtils.makeParents(Urls.rest.pools.parents, HotUtils.relationCategoriesForDetailed().concat(
-              [HotUtils.relations.library(), HotUtils.relations.libraryAliquot()]))].concat(BulkUtils.actions.qc('Pool')).concat(
+              [HotUtils.relations.library(), HotUtils.relations.libraryAliquot()])),
+          HotUtils.makeChildren(Urls.rest.pools.children, [HotUtils.relations.run()])].concat(BulkUtils.actions.qc('Pool')).concat(
           [HotUtils.makeTransferAction('poolIds')]);
     },
 

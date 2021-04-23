@@ -210,7 +210,7 @@ public class PoolRestController extends RestController {
 
   }
 
-  private final JQueryDataTableBackend<ListPoolView, PoolDto> jQueryBackend = new JQueryDataTableBackend<ListPoolView, PoolDto>() {
+  private final JQueryDataTableBackend<ListPoolView, PoolDto> jQueryBackend = new JQueryDataTableBackend<>() {
 
     @Override
     protected PoolDto asDto(ListPoolView model) {
@@ -596,6 +596,35 @@ public class PoolRestController extends RestController {
   public HttpEntity<byte[]> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
     return parentFinder.list(ids, category);
+  }
+
+  private final RelationFinder<Pool> childFinder = (new RelationFinder<Pool>() {
+
+    @Override
+    protected List<Pool> fetchByIds(List<Long> ids) throws IOException {
+      return poolService.listByIdList(ids);
+    }
+
+  })
+      .add(new RelationFinder.RelationAdapter<Pool, Run, RunDto>("Run") {
+
+        @Override
+        public RunDto asDto(Run model) {
+          return Dtos.asDto(model);
+        }
+
+        @Override
+        public Stream<Run> find(Pool model, Consumer<String> emitError) throws IOException {
+          return runService.listByPoolId(model.getId()).stream();
+        }
+
+      });
+
+  @PostMapping(value = "/children/{category}")
+  @ResponseBody
+  public HttpEntity<byte[]> getChildren(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
+      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
+    return childFinder.list(ids, category);
   }
 
   @PostMapping(value = "/samplesheet")

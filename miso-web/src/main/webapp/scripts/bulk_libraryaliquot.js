@@ -123,7 +123,7 @@ BulkTarget.libraryaliquot = (function($) {
 
           HotUtils.makeParents(Urls.rest.libraryAliquots.parents, HotUtils.relationCategoriesForDetailed().concat(
               [HotUtils.relations.library()])),
-          HotUtils.makeChildren(Urls.rest.libraryAliquots.children, [HotUtils.relations.pool()]),
+          HotUtils.makeChildren(Urls.rest.libraryAliquots.children, [HotUtils.relations.pool(), HotUtils.relations.run()]),
           config.worksetId ? HotUtils.makeRemoveFromWorkset('library aliquots', Urls.rest.worksets.removeLibraryAliquots(config.worksetId))
               : HotUtils.makeAddToWorkset('library aliquots', 'libraryAliquotIds', Urls.rest.worksets.addLibraryAliquots),
           HotUtils.makeTransferAction('libraryAliquotIds')];

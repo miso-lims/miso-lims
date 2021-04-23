@@ -114,15 +114,16 @@ BulkTarget.library = (function($) {
                 });
               });
             }
-          }, HotUtils.printAction('library'),
+          },
+          HotUtils.printAction('library'),
           HotUtils.spreadsheetAction(Urls.rest.libraries.spreadsheet, Constants.librarySpreadsheets, function(libraries, spreadsheet) {
             var errors = [];
             return errors;
           }),
 
           HotUtils.makeParents(Urls.rest.libraries.parents, HotUtils.relationCategoriesForDetailed()),
-          HotUtils.makeChildren(Urls.rest.libraries.children, [HotUtils.relations.libraryAliquot(), HotUtils.relations.pool()])].concat(
-          BulkUtils.actions.qc('Library')).concat(
+          HotUtils.makeChildren(Urls.rest.libraries.children, [HotUtils.relations.libraryAliquot(), HotUtils.relations.pool(),
+              HotUtils.relations.run()])].concat(BulkUtils.actions.qc('Library')).concat(
           [
               config.worksetId ? HotUtils.makeRemoveFromWorkset('libraries', Urls.rest.worksets.removeLibraries(config.worksetId))
                   : HotUtils.makeAddToWorkset('libraries', 'libraryIds', Urls.rest.worksets.addLibraries),

@@ -17,6 +17,8 @@ public interface RunService extends DeleterService<Run>, SaveService<Run>, Pagin
 
   Collection<Run> listByPoolId(long poolId) throws IOException;
 
+  List<Run> listByLibraryAliquotId(long libraryAliquotId) throws IOException;
+
   Collection<Run> listByContainerId(long containerId) throws IOException;
 
   List<Run> listByIdList(Collection<Long> ids) throws IOException;

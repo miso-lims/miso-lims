@@ -1559,6 +1559,14 @@ var HotUtils = {
         "config": {},
         "index": Constants.sampleCategories.length + 3
       };
+    },
+    run: function() {
+      return {
+        "name": "Run",
+        "getBulkActions": ListTarget.run.createBulkActions,
+        "config": {},
+        "index": Constants.sampleCategories.length + 4
+      };
     }
   },
 

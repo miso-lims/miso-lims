@@ -103,21 +103,32 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   @Override
   public List<Run> listByPoolId(long poolId) throws IOException {
-    Criteria idCriteria = currentSession().createCriteria(Run.class);
-    idCriteria.createAlias("runPositions", "runPos")
+    @SuppressWarnings("unchecked")
+    List<Long> ids = currentSession().createCriteria(Run.class)
+        .createAlias("runPositions", "runPos")
         .createAlias("runPos.container", "spc")
         .createAlias("spc.partitions", "partition")
         .createAlias("partition.pool", "pool")
         .add(Restrictions.eq("pool.id", poolId))
-        .setProjection(Projections.distinct(Projections.property("id")));
+        .setProjection(Projections.distinct(Projections.property("id")))
+        .list();
+    return listByIdList(ids);
+  }
+
+  @Override
+  public List<Run> listByLibraryAliquotId(long libraryAliquotId) throws IOException {
     @SuppressWarnings("unchecked")
-    List<Long> ids = idCriteria.list();
-    if (ids.isEmpty()) return Collections.emptyList();
-    Criteria criteria = currentSession().createCriteria(Run.class);
-    criteria.add(Restrictions.in("id", ids));
-    @SuppressWarnings("unchecked")
-    List<Run> records = criteria.list();
-    return records;
+    List<Long> ids = currentSession().createCriteria(Run.class)
+        .createAlias("runPositions", "runPos")
+        .createAlias("runPos.container", "spc")
+        .createAlias("spc.partitions", "partition")
+        .createAlias("partition.pool", "pool")
+        .createAlias("pool.poolElements", "element")
+        .createAlias("element.aliquot", "aliquot")
+        .add(Restrictions.eq("aliquot.id", libraryAliquotId))
+        .setProjection(Projections.distinct(Projections.property("id")))
+        .list();
+    return listByIdList(ids);
   }
 
   @Override
@@ -173,7 +184,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   @Override
   public List<Run> listByIdList(Collection<Long> ids) throws IOException {
-    if (ids == null) {
+    if (ids == null || ids.isEmpty()) {
       return Collections.emptyList();
     }
     @SuppressWarnings("unchecked")
