@@ -23,7 +23,7 @@ public class PoolElement implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Pool pool;
-    private ListLibaryAliquotView aliquot;
+    private ListLibraryAliquotView aliquot;
 
     public Pool getPool() {
       return pool;
@@ -33,11 +33,11 @@ public class PoolElement implements Serializable {
       this.pool = pool;
     }
 
-    public ListLibaryAliquotView getAliquot() {
+    public ListLibraryAliquotView getAliquot() {
       return aliquot;
     }
 
-    public void setAliquot(ListLibaryAliquotView aliquot) {
+    public void setAliquot(ListLibraryAliquotView aliquot) {
       this.aliquot = aliquot;
     }
 
@@ -77,7 +77,7 @@ public class PoolElement implements Serializable {
   @Id
   @ManyToOne
   @JoinColumn(name = "aliquotId")
-  private ListLibaryAliquotView aliquot;
+  private ListLibraryAliquotView aliquot;
 
   private int proportion = 1;
 
@@ -85,12 +85,12 @@ public class PoolElement implements Serializable {
     // Default constructor
   }
 
-  public PoolElement(Pool pool, ListLibaryAliquotView aliquot) {
+  public PoolElement(Pool pool, ListLibraryAliquotView aliquot) {
     this.pool = pool;
     this.aliquot = aliquot;
   }
 
-  public PoolElement(Pool pool, ListLibaryAliquotView aliquot, int proportion) {
+  public PoolElement(Pool pool, ListLibraryAliquotView aliquot, int proportion) {
     this(pool, aliquot);
     this.proportion = proportion;
   }
@@ -103,11 +103,11 @@ public class PoolElement implements Serializable {
     this.pool = pool;
   }
 
-  public ListLibaryAliquotView getAliquot() {
+  public ListLibraryAliquotView getAliquot() {
     return aliquot;
   }
 
-  public void setAliquot(ListLibaryAliquotView aliquot) {
+  public void setAliquot(ListLibraryAliquotView aliquot) {
     this.aliquot = aliquot;
   }
 

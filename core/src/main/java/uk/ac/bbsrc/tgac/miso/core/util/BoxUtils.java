@@ -3,7 +3,7 @@ package uk.ac.bbsrc.tgac.miso.core.util;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.BoxableView;
 
 /**
@@ -170,7 +170,7 @@ public class BoxUtils {
         boxable.getBoxLocationBarcode());
   }
 
-  public static String makeLocationLabel(ListLibaryAliquotView boxable) {
+  public static String makeLocationLabel(ListLibraryAliquotView boxable) {
     return makeLocationLabel(boxable.isDiscarded(),
         boxable.isDistributed(),
         null,

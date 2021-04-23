@@ -41,7 +41,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
 
@@ -60,10 +60,10 @@ public class EnaSubmissionPreparation {
     public abstract String name();
   }
 
-  private final class LibraryAliquotXmlSubfile extends XmlSubmissionFromSet<Pair<ListLibaryAliquotView, Partition>> {
+  private final class LibraryAliquotXmlSubfile extends XmlSubmissionFromSet<Pair<ListLibraryAliquotView, Partition>> {
 
     @Override
-    protected Stream<Pair<ListLibaryAliquotView, Partition>> items() {
+    protected Stream<Pair<ListLibraryAliquotView, Partition>> items() {
       return submission.getExperiments().stream().flatMap(experiment -> experiment.getRunPartitions().stream()).flatMap(
           rp -> rp.getPartition().getPool().getPoolContents().stream()
               .map(pd -> new Pair<>(pd.getAliquot(), rp.getPartition())));
@@ -75,7 +75,7 @@ public class EnaSubmissionPreparation {
     }
 
     @Override
-    protected void populate(Element xml, Pair<ListLibaryAliquotView, Partition> entry) {
+    protected void populate(Element xml, Pair<ListLibraryAliquotView, Partition> entry) {
       Run r = entry.getValue().getSequencerPartitionContainer().getLastRun();
 
       xml.setAttribute("alias",

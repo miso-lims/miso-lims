@@ -71,7 +71,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibraryAliquotSpreadSheets;
@@ -280,7 +280,7 @@ public class PoolRestController extends RestController {
           .allMatch(view -> view.getVolumeUsed() != null)) {
         pool.setVolume(pool.getPoolContents().stream()
             .map(PoolElement::getAliquot)
-            .map(ListLibaryAliquotView::getVolumeUsed)
+            .map(ListLibraryAliquotView::getVolumeUsed)
             .reduce(BigDecimal.ZERO, (result, item) -> result.add(item)));
       }
       return pool;

@@ -45,7 +45,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 @Entity
 @Immutable
 @Table(name = "LibraryAliquot")
-public class ListLibaryAliquotView implements DetailedQcItem, Identifiable, Serializable, Comparable<ListLibaryAliquotView> {
+public class ListLibraryAliquotView implements DetailedQcItem, Identifiable, Serializable, Comparable<ListLibraryAliquotView> {
 
   private static final long serialVersionUID = 1L;
 
@@ -378,8 +378,8 @@ public class ListLibaryAliquotView implements DetailedQcItem, Identifiable, Seri
   }
 
   @Override
-  public int compareTo(ListLibaryAliquotView o) {
-    ListLibaryAliquotView t = o;
+  public int compareTo(ListLibraryAliquotView o) {
+    ListLibraryAliquotView t = o;
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;
@@ -470,7 +470,7 @@ public class ListLibaryAliquotView implements DetailedQcItem, Identifiable, Seri
     if (this == obj) return true;
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
-    ListLibaryAliquotView other = (ListLibaryAliquotView) obj;
+    ListLibraryAliquotView other = (ListLibraryAliquotView) obj;
     if (created == null) {
       if (other.created != null) return false;
     } else if (!created.equals(other.created)) return false;

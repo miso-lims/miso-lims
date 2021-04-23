@@ -20,7 +20,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
@@ -135,7 +135,7 @@ public class RunPartitionAliquot implements Serializable {
     this.aliquot = aliquot;
   }
 
-  public RunPartitionAliquot(Run run, Partition partition, ListLibaryAliquotView aliquot) {
+  public RunPartitionAliquot(Run run, Partition partition, ListLibraryAliquotView aliquot) {
     this.run = run;
     this.partition = partition;
     this.aliquot = new LibraryAliquot();

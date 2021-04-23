@@ -30,7 +30,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
@@ -340,7 +340,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
         .filter(notInOther(targetAliquots))
         .collect(Collectors.toSet());
     for (PoolElement sourcePd : additions) {
-      ListLibaryAliquotView v = listLibraryAliquotViewService.get(sourcePd.getAliquot().getId());
+      ListLibraryAliquotView v = listLibraryAliquotViewService.get(sourcePd.getAliquot().getId());
       if (v == null) {
         throw new IllegalStateException("Pool contains an unsaved library aliquot");
       }
@@ -362,11 +362,11 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   }
 
   private void loadPoolElements(Pool source, Pool target) throws IOException {
-    Set<ListLibaryAliquotView> removals = target.getPoolContents().stream()
+    Set<ListLibraryAliquotView> removals = target.getPoolContents().stream()
         .filter(notInOther(source.getPoolContents()))
         .map(PoolElement::getAliquot)
         .collect(Collectors.toSet());
-    for (ListLibaryAliquotView aliquot : removals) {
+    for (ListLibraryAliquotView aliquot : removals) {
       runPartitionAliquotService.deleteForPoolAliquot(target, aliquot.getId());
     }
     loadPoolElements(source.getPoolContents(), target);

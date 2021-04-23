@@ -70,7 +70,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferView;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.PoolQC;
@@ -281,7 +281,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   @Override
   public boolean getHasLowQualityMembers() {
-    return poolElements.stream().map(PoolElement::getAliquot).anyMatch(ListLibaryAliquotView::isLibraryLowQuality);
+    return poolElements.stream().map(PoolElement::getAliquot).anyMatch(ListLibraryAliquotView::isLibraryLowQuality);
   }
 
   @Override
