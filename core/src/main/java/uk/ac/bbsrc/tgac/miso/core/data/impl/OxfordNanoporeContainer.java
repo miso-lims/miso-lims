@@ -20,7 +20,6 @@ public class OxfordNanoporeContainer extends SequencerPartitionContainerImpl {
   @JoinColumn(name = "poreVersionId")
   private PoreVersion poreVersion;
 
-  @Column(nullable = false)
   @Temporal(TemporalType.DATE)
   private Date receivedDate;
 
