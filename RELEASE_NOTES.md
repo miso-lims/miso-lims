@@ -2,6 +2,7 @@
 
 Changes:
 
+* Fix issue saving Oxford Nanopore containers
 
 
 # 1.28.0
@@ -31,6 +32,9 @@ Changes:
   unique dual index family if non-matching indices were selected
 * Fixed updating subproject options when project is changed on the Edit Sample
   page (detailed sample)
+
+Known issues:
+* Oxford Nanopore containers fail to save
 
 # 1.27.0
 
