@@ -39,10 +39,13 @@ ListTarget.run = {
   },
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {
-    return [HotUtils.spreadsheetAction(Urls.rest.runs.spreadsheet, Constants.runLibrarySpreadsheets),
+    return [
+        HotUtils.spreadsheetAction(Urls.rest.runs.spreadsheet, Constants.runLibrarySpreadsheets),
         ListUtils.createBulkDeleteAction("Runs", "runs", function(run) {
           return run.alias;
-        })];
+        }),
+        HotUtils.makeParents(Urls.rest.runs.parents, HotUtils.relationCategoriesForDetailed().concat(
+            [HotUtils.relations.pool(), HotUtils.relations.library(), HotUtils.relations.libraryAliquot()]))];
   },
   createStaticActions: function(config, projectId) {
     if (!projectId && config.platformType) {

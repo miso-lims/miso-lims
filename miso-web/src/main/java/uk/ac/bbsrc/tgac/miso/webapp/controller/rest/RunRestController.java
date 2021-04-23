@@ -28,7 +28,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -59,9 +62,16 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pair;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
@@ -80,6 +90,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
+import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -94,8 +105,12 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ExperimentDto;
 import uk.ac.bbsrc.tgac.miso.dto.ExperimentDto.RunPartitionDto;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentModelDto;
+import uk.ac.bbsrc.tgac.miso.dto.LibraryAliquotDto;
+import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.PartitionDto;
+import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.RunPartitionAliquotDto;
+import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 import uk.ac.bbsrc.tgac.miso.dto.StudyDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
@@ -202,6 +217,8 @@ public class RunRestController extends RestController {
   @Autowired
   private RunPartitionAliquotService runPartitionAliquotService;
   @Autowired
+  private SampleService sampleService;
+  @Autowired
   private LibraryService libraryService;
   @Autowired
   private LibraryAliquotService libraryAliquotService;
@@ -214,7 +231,7 @@ public class RunRestController extends RestController {
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
 
-  private final JQueryDataTableBackend<Run, RunDto> jQueryBackend = new JQueryDataTableBackend<Run, RunDto>() {
+  private final JQueryDataTableBackend<Run, RunDto> jQueryBackend = new JQueryDataTableBackend<>() {
 
     @Override
     protected RunDto asDto(Run model) {
@@ -226,6 +243,107 @@ public class RunRestController extends RestController {
       return runService;
     }
   };
+
+  private final RelationFinder<Run> parentFinder = (new RelationFinder<Run>() {
+
+    @Override
+    protected List<Run> fetchByIds(List<Long> ids) throws IOException {
+      return runService.listByIdList(ids);
+    }
+
+  })
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleIdentity.CATEGORY_NAME, SampleIdentity.class, this::getSamples))//
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleTissue.CATEGORY_NAME, SampleTissue.class, this::getSamples))//
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleTissueProcessing.CATEGORY_NAME, SampleTissueProcessing.class,
+          this::getSamples))//
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleStock.CATEGORY_NAME, SampleStock.class, this::getSamples))//
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleAliquot.CATEGORY_NAME, SampleAliquot.class, this::getSamples))//
+      .add(new RelationFinder.RelationAdapter<Run, Sample, SampleDto>("Sample") {
+
+        @Override
+        public SampleDto asDto(Sample model) {
+          return Dtos.asDto(model, false);
+        }
+
+        @Override
+        public Stream<Sample> find(Run model, Consumer<String> emitError) throws IOException {
+          return getSamples(model);
+        }
+        
+      })
+      .add(new RelationFinder.RelationAdapter<Run, Library, LibraryDto>("Library") {
+
+        @Override
+        public LibraryDto asDto(Library model) {
+          return Dtos.asDto(model, false);
+        }
+
+        @Override
+        public Stream<Library> find(Run model, Consumer<String> emitError) throws IOException {
+          return getLibraries(model);
+        }
+
+      })
+      .add(new RelationFinder.RelationAdapter<Run, ListLibaryAliquotView, LibraryAliquotDto>("Library Aliquot") {
+
+        @Override
+        public LibraryAliquotDto asDto(ListLibaryAliquotView model) {
+          return Dtos.asDto(model);
+        }
+
+        @Override
+        public Stream<ListLibaryAliquotView> find(Run model, Consumer<String> emitError) throws IOException {
+          return getLibraryAliquots(model);
+        }
+
+      })
+      .add(new RelationFinder.RelationAdapter<Run, Pool, PoolDto>("Pool") {
+
+        @Override
+        public PoolDto asDto(Pool model) {
+          return Dtos.asDto(model, false, false, indexChecker);
+        }
+
+        @Override
+        public Stream<Pool> find(Run model, Consumer<String> emitError) throws IOException {
+          return getPools(model);
+        }
+
+      });
+
+  @PostMapping(value = "/parents/{category}")
+  @ResponseBody
+  public HttpEntity<byte[]> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids) throws IOException {
+    return parentFinder.list(ids, category);
+  }
+
+  private Stream<Pool> getPools(Run run) {
+    return run.getRunPositions().stream()
+        .map(RunPosition::getContainer)
+        .flatMap(container -> container.getPartitions().stream())
+        .map(Partition::getPool)
+        .filter(Objects::nonNull);
+  }
+
+  private Stream<ListLibaryAliquotView> getLibraryAliquots(Run run) {
+    return getPools(run)
+        .flatMap(pool -> pool.getPoolContents().stream())
+        .map(PoolElement::getAliquot);
+  }
+
+  private Stream<Library> getLibraries(Run run) throws IOException {
+    List<Long> libraryIds = getLibraryAliquots(run)
+        .map(ListLibaryAliquotView::getLibraryId)
+        .collect(Collectors.toList());
+    return libraryService.listByIdList(libraryIds).stream();
+  }
+
+  private Stream<Sample> getSamples(Run run) throws IOException {
+    List<Long> sampleIds = getLibraryAliquots(run)
+        .map(ListLibaryAliquotView::getSampleId)
+        .collect(Collectors.toList());
+    return sampleService.listByIdList(sampleIds).stream();
+  }
 
   @GetMapping(value = "/{runId}", produces = "application/json")
   public @ResponseBody RunDto getRunById(@PathVariable long runId) throws IOException {

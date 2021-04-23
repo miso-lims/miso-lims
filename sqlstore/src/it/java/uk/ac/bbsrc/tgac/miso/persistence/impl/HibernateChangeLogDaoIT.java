@@ -25,6 +25,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class HibernateChangeLogDaoIT extends AbstractDAOTest {
 
@@ -96,7 +97,7 @@ public class HibernateChangeLogDaoIT extends AbstractDAOTest {
     assertEquals(1L, cl.getUser().getId());
     assertEquals("false -> true", cl.getSummary());
     Date date = new Date(ISODateTimeFormat.dateTimeParser().parseDateTime("2016-07-07T13:31:01").getMillis());
-    assertEquals(date, cl.getTime());
+    assertEquals(LimsUtils.formatDate(date), LimsUtils.formatDate(cl.getTime()));
   }
 
 }

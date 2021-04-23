@@ -63,6 +63,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
@@ -76,6 +77,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
@@ -96,6 +98,7 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleStockDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissuePieceDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueProcessingDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
+import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
@@ -117,6 +120,8 @@ public class SampleRestController extends RestController {
   @Autowired
   private PoolService poolService;
   @Autowired
+  private RunService runService;
+  @Autowired
   private WorksetService worksetService;
 
   @Value("${miso.detailed.sample.enabled}")
@@ -133,7 +138,7 @@ public class SampleRestController extends RestController {
     return detailedSample;
   }
 
-  private final JQueryDataTableBackend<Sample, SampleDto> jQueryBackend = new JQueryDataTableBackend<Sample, SampleDto>() {
+  private final JQueryDataTableBackend<Sample, SampleDto> jQueryBackend = new JQueryDataTableBackend<>() {
 
     @Override
     protected SampleDto asDto(Sample model) {
@@ -435,17 +440,11 @@ public class SampleRestController extends RestController {
         }
 
         @Override
-        public Stream<Pool> find(Sample model, Consumer<String> emitError) {
+        public Stream<Pool> find(Sample model, Consumer<String> emitError) throws IOException {
           Set<Pool> children = new HashSet<>();
           for (LibraryAliquot aliquot : RelationFinder.ChildrenSampleAdapter.searchChildrenLibraries(model, libraryService)
               .flatMap(library -> library.getLibraryAliquots().stream()).collect(Collectors.toList())) {
-            try {
-              children.addAll(poolService.listByLibraryAliquotId(aliquot.getId()));
-            } catch (IOException e) {
-              log.error("Failed looking up pools for sample", e);
-              emitError.accept("Database error");
-              return Stream.empty();
-            }
+            children.addAll(poolService.listByLibraryAliquotId(aliquot.getId()));
           }
           if (children.isEmpty()) {
             emitError.accept(String.format("%s (%s) has no %s.", model.getName(), model.getAlias(), category()));
@@ -453,6 +452,28 @@ public class SampleRestController extends RestController {
           }
           return children.stream();
         }
+      })
+      .add(new RelationFinder.RelationAdapter<Sample, Run, RunDto>("Run") {
+
+        @Override
+        public RunDto asDto(Run model) {
+          return Dtos.asDto(model);
+        }
+
+        @Override
+        public Stream<Run> find(Sample model, Consumer<String> emitError) throws IOException {
+          Set<Run> children = new HashSet<>();
+          for (LibraryAliquot aliquot : RelationFinder.ChildrenSampleAdapter.searchChildrenLibraries(model, libraryService)
+              .flatMap(library -> library.getLibraryAliquots().stream()).collect(Collectors.toList())) {
+            children.addAll(runService.listByLibraryAliquotId(aliquot.getId()));
+          }
+          if (children.isEmpty()) {
+            emitError.accept(String.format("%s (%s) has no %s.", model.getName(), model.getAlias(), category()));
+            return Stream.empty();
+          }
+          return children.stream();
+        }
+
       });
 
   @PostMapping(value = "/children/{category}")
