@@ -20,7 +20,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.QcStatusUpdate;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.DetailedQcItem;
@@ -134,7 +134,7 @@ public class DefaultQcStatusService implements QcStatusService {
       Run run = runService.get(update.getIds()[0]);
       throwIfNull("Run", run);
       Partition partition = findPartitionInRun(run, update.getIds()[1]);
-      ListLibaryAliquotView aliquotView = partition.getPool().getPoolContents().stream()
+      ListLibraryAliquotView aliquotView = partition.getPool().getPoolContents().stream()
           .map(PoolElement::getAliquot)
           .filter(x -> x.getId() == update.getIds()[2])
           .findFirst().orElse(null);

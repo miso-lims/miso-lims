@@ -198,7 +198,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.IdentityView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListContainerRunSequencerView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListContainerRunView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListContainerView;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolViewElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListWorksetView;
@@ -606,7 +606,7 @@ public class Dtos {
     }
   }
 
-  private static void setEffectiveQcFailure(ListLibaryAliquotView from, UpstreamQcFailableDto to) {
+  private static void setEffectiveQcFailure(ListLibraryAliquotView from, UpstreamQcFailableDto to) {
     for (ParentAliquot parent = from.getParentAliquot(); parent != null; parent = parent.getParentAliquot()) {
       if (parent.getDetailedQcStatus() != null && Boolean.FALSE.equals(parent.getDetailedQcStatus().getStatus())) {
         to.setEffectiveQcFailureId(parent.getDetailedQcStatus().getId());
@@ -1734,7 +1734,7 @@ public class Dtos {
     return dto;
   }
 
-  public static LibraryAliquotDto asDto(@Nonnull ListLibaryAliquotView from) {
+  public static LibraryAliquotDto asDto(@Nonnull ListLibraryAliquotView from) {
     LibraryAliquotDto dto = null;
     if (from.getParentAttributes() != null) { // indicates detailed sample
       DetailedLibraryAliquotDto detailedDto = new DetailedLibraryAliquotDto();
@@ -1866,7 +1866,7 @@ public class Dtos {
     dto.setLibraryAliquotCount(from.getPoolContents().size());
     from.getPoolContents().stream()//
         .map(PoolElement::getAliquot)//
-        .map(ListLibaryAliquotView::getDnaSize)//
+        .map(ListLibraryAliquotView::getDnaSize)//
         .filter(Objects::nonNull)//
         .mapToDouble(Integer::doubleValue)//
         .average()//
@@ -2838,7 +2838,7 @@ public class Dtos {
     setObject(to::setPlatformType, dto.getPlatformType(), pt -> PlatformType.valueOf(pt));
     if (dto.getPooledElements() != null) {
       to.setPoolElements(dto.getPooledElements().stream().map(aliquot -> {
-        ListLibaryAliquotView view = new ListLibaryAliquotView();
+        ListLibraryAliquotView view = new ListLibraryAliquotView();
         view.setId(aliquot.getId());
         view.setName(aliquot.getName());
         setBigDecimal(view::setVolumeUsed, aliquot.getVolumeUsed());

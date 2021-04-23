@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
@@ -30,7 +30,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
-public class HibernateListLibraryAliquotViewDao implements ListLibraryAliquotViewDao, HibernatePaginatedDataSource<ListLibaryAliquotView> {
+public class HibernateListLibraryAliquotViewDao implements ListLibraryAliquotViewDao, HibernatePaginatedDataSource<ListLibraryAliquotView> {
 
   // Make sure these match the HiberateLibraryAliquotDao
   private static final String[] SEARCH_PROPERTIES = new String[] { "name", "alias", "identificationBarcode" };
@@ -56,8 +56,8 @@ public class HibernateListLibraryAliquotViewDao implements ListLibraryAliquotVie
   }
 
   @Override
-  public ListLibaryAliquotView get(Long aliquotId) throws IOException {
-    return (ListLibaryAliquotView) currentSession().get(ListLibaryAliquotView.class, aliquotId);
+  public ListLibraryAliquotView get(Long aliquotId) throws IOException {
+    return (ListLibraryAliquotView) currentSession().get(ListLibraryAliquotView.class, aliquotId);
   }
 
   @Override
@@ -66,19 +66,19 @@ public class HibernateListLibraryAliquotViewDao implements ListLibraryAliquotVie
   }
 
   @Override
-  public Class<? extends ListLibaryAliquotView> getRealClass() {
-    return ListLibaryAliquotView.class;
+  public Class<? extends ListLibraryAliquotView> getRealClass() {
+    return ListLibraryAliquotView.class;
   }
 
   @Override
-  public List<ListLibaryAliquotView> listByIdList(List<Long> aliquotIds) throws IOException {
+  public List<ListLibraryAliquotView> listByIdList(List<Long> aliquotIds) throws IOException {
     if (aliquotIds.size() == 0) {
       return Collections.emptyList();
     }
-    Criteria criteria = currentSession().createCriteria(ListLibaryAliquotView.class);
+    Criteria criteria = currentSession().createCriteria(ListLibraryAliquotView.class);
     criteria.add(Restrictions.in("id", aliquotIds));
     @SuppressWarnings("unchecked")
-    List<ListLibaryAliquotView> results = criteria.list();
+    List<ListLibraryAliquotView> results = criteria.list();
     return results;
   }
 

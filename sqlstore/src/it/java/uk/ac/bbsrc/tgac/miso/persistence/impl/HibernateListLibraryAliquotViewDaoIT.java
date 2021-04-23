@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 
 public class HibernateListLibraryAliquotViewDaoIT extends AbstractDAOTest {
 
@@ -28,7 +28,7 @@ public class HibernateListLibraryAliquotViewDaoIT extends AbstractDAOTest {
   @Test
   public void testGet() throws Exception {
     long id = 12L;
-    ListLibaryAliquotView aliquot = sut.get(id);
+    ListLibraryAliquotView aliquot = sut.get(id);
     assertNotNull(aliquot);
     assertEquals(id, aliquot.getId());
   }

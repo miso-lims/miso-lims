@@ -76,7 +76,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.RunLibrarySpreadsheets;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -284,15 +284,15 @@ public class RunRestController extends RestController {
         }
 
       })
-      .add(new RelationFinder.RelationAdapter<Run, ListLibaryAliquotView, LibraryAliquotDto>("Library Aliquot") {
+      .add(new RelationFinder.RelationAdapter<Run, ListLibraryAliquotView, LibraryAliquotDto>("Library Aliquot") {
 
         @Override
-        public LibraryAliquotDto asDto(ListLibaryAliquotView model) {
+        public LibraryAliquotDto asDto(ListLibraryAliquotView model) {
           return Dtos.asDto(model);
         }
 
         @Override
-        public Stream<ListLibaryAliquotView> find(Run model, Consumer<String> emitError) throws IOException {
+        public Stream<ListLibraryAliquotView> find(Run model, Consumer<String> emitError) throws IOException {
           return getLibraryAliquots(model);
         }
 
@@ -325,7 +325,7 @@ public class RunRestController extends RestController {
         .filter(Objects::nonNull);
   }
 
-  private Stream<ListLibaryAliquotView> getLibraryAliquots(Run run) {
+  private Stream<ListLibraryAliquotView> getLibraryAliquots(Run run) {
     return getPools(run)
         .flatMap(pool -> pool.getPoolContents().stream())
         .map(PoolElement::getAliquot);
@@ -333,14 +333,14 @@ public class RunRestController extends RestController {
 
   private Stream<Library> getLibraries(Run run) throws IOException {
     List<Long> libraryIds = getLibraryAliquots(run)
-        .map(ListLibaryAliquotView::getLibraryId)
+        .map(ListLibraryAliquotView::getLibraryId)
         .collect(Collectors.toList());
     return libraryService.listByIdList(libraryIds).stream();
   }
 
   private Stream<Sample> getSamples(Run run) throws IOException {
     List<Long> sampleIds = getLibraryAliquots(run)
-        .map(ListLibaryAliquotView::getSampleId)
+        .map(ListLibraryAliquotView::getSampleId)
         .collect(Collectors.toList());
     return sampleService.listByIdList(sampleIds).stream();
   }
@@ -613,7 +613,7 @@ public class RunRestController extends RestController {
         .filter(partition -> partition.getPool() != null)//
         .flatMap(partition -> partition.getPool().getPoolContents().stream()//
             .map(PoolElement::getAliquot)//
-            .map(ListLibaryAliquotView::getLibraryId)//
+            .map(ListLibraryAliquotView::getLibraryId)//
             .distinct()
             .map(libraryId -> new Pair<>(libraryId, partition)))//
         .collect(Collectors.groupingBy(Pair::getKey))//

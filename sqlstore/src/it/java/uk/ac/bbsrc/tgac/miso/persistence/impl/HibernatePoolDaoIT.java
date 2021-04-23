@@ -25,7 +25,7 @@ import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -308,7 +308,7 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
   public void testAddAliquot() throws IOException {
     Pool pool = dao.get(1L);
     int originalSize = pool.getPoolContents().size();
-    ListLibaryAliquotView ldi = (ListLibaryAliquotView) sessionFactory.getCurrentSession().get(ListLibaryAliquotView.class, 14L);
+    ListLibraryAliquotView ldi = (ListLibraryAliquotView) sessionFactory.getCurrentSession().get(ListLibraryAliquotView.class, 14L);
     PoolElement element = new PoolElement(pool, ldi);
     pool.getPoolContents().add(element);
     dao.save(pool);

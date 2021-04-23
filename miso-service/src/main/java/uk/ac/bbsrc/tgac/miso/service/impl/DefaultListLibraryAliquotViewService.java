@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.service.ListLibraryAliquotViewService;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.persistence.ListLibraryAliquotViewDao;
@@ -25,7 +25,7 @@ public class DefaultListLibraryAliquotViewService implements ListLibraryAliquotV
   }
 
   @Override
-  public ListLibaryAliquotView get(Long aliquotId) throws IOException {
+  public ListLibraryAliquotView get(Long aliquotId) throws IOException {
     return listLibraryAliquotViewDao.get(aliquotId);
   }
 
@@ -35,14 +35,14 @@ public class DefaultListLibraryAliquotViewService implements ListLibraryAliquotV
   }
 
   @Override
-  public List<ListLibaryAliquotView> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
+  public List<ListLibraryAliquotView> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
       PaginationFilter... filter)
       throws IOException {
     return listLibraryAliquotViewDao.list(errorHandler, offset, limit, sortDir, sortCol, filter);
   }
 
   @Override
-  public List<ListLibaryAliquotView> listByIdList(List<Long> aliquotIds) throws IOException {
+  public List<ListLibraryAliquotView> listByIdList(List<Long> aliquotIds) throws IOException {
     return listLibraryAliquotViewDao.listByIdList(aliquotIds);
   }
 

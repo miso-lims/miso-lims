@@ -40,7 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibaryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibraryAliquotSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.ListLibraryAliquotViewService;
@@ -70,14 +70,14 @@ public class LibraryAliquotRestController extends RestController {
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
 
-  private final JQueryDataTableBackend<ListLibaryAliquotView, LibraryAliquotDto> jQueryBackend = new JQueryDataTableBackend<>() {
+  private final JQueryDataTableBackend<ListLibraryAliquotView, LibraryAliquotDto> jQueryBackend = new JQueryDataTableBackend<>() {
     @Override
-    protected LibraryAliquotDto asDto(ListLibaryAliquotView model) {
+    protected LibraryAliquotDto asDto(ListLibraryAliquotView model) {
       return Dtos.asDto(model);
     }
 
     @Override
-    protected PaginatedDataSource<ListLibaryAliquotView> getSource() throws IOException {
+    protected PaginatedDataSource<ListLibraryAliquotView> getSource() throws IOException {
       return listLibraryAliquotViewService;
     }
   };
