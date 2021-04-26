@@ -13,7 +13,7 @@ CHANGELOG=RELEASE_NOTES.md
 RELEASE_VERSION=$1
 DATE=$(date +%Y-%m-%d)
 
-BAD_FILES=$(find changes -mindepth 1 -maxdepth 1 -not -name "README.md" -and -not -name "add_*" \
+BAD_FILES=$(find "${CHANGE_DIR}" -mindepth 1 -maxdepth 1 -not -name "README.md" -and -not -name "add_*" \
   -and -not -name "change_*" -and -not -name "remove_*" -and -not -name "fix_*" \
   -and -not -name "note*")
 
@@ -39,7 +39,7 @@ add_section() {
   # $1: title
   # $2: change type prefix
 
-  FILES=$(find "${CHANGE_DIR}" -depth 1 -name "$2_*")
+  FILES=$(find "${CHANGE_DIR}" -mindepth 1 -maxdepth 1 -name "$2_*")
   if [[ ! -z "${FILES}" ]]; then
     CHANGES="${CHANGES}\n\n### ${1}\n"
 
@@ -60,3 +60,5 @@ add_section "Fixed" "fix"
 add_section "Upgrade Notes" "note"
 
 sed -i "s/^\(-\{10,\}\)/\1${CHANGES}/" "${CHANGELOG}"
+rm -f -- "${CHANGE_DIR}"/add_* "${CHANGE_DIR}"/change_* "${CHANGE_DIR}"/remove_* \
+"${CHANGE_DIR}"/fix_* "${CHANGE_DIR}"/note_*
