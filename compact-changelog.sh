@@ -13,7 +13,7 @@ CHANGELOG=RELEASE_NOTES.md
 RELEASE_VERSION=$1
 DATE=$(date +%Y-%m-%d)
 
-BAD_FILES=$(find changes -depth 1 -not -name "README.md" -and -not -name "add_*" \
+BAD_FILES=$(find changes -mindepth 1 -maxdepth 1 -not -name "README.md" -and -not -name "add_*" \
   -and -not -name "change_*" -and -not -name "remove_*" -and -not -name "fix_*" \
   -and -not -name "note*")
 
@@ -22,8 +22,8 @@ if [[ ! -z "$BAD_FILES" ]]; then
   exit 2
 fi
 
-if [[ -z $(find "${CHANGE_DIR}" -depth 1 -name "add_*" -or -name "change_*" -or -name "remove_*" \
-  -or -name "fix_*") ]]; then
+if [[ -z $(find "${CHANGE_DIR}" -mindepth 1 -maxdepth 1 -name "add_*" -or -name "change_*" \
+  -or -name "remove_*" -or -name "fix_*") ]]; then
   echo "ERROR: No add/change/remove/fix changes found"
   exit 3
 fi

@@ -20,16 +20,16 @@ require a patch release, then a patch release should be performed instead.
 ## File Names
 
 The file name must begin with a prefix depending on the change type (see above), followed by an
-underscore. e.g. `fix_saving_samples.txt` or `add_GLT-1234.txt`. The portion after the underscore
+underscore. e.g. `fix_saving_samples.md` or `add_GLT-1234.md`. The portion after the underscore
 is not important, but something descriptive makes them easier to find if they need to be modified.
 
 ## Message Format
 
-Each change must be in a separate file, but a single change may contain multiple lines of text. A
-bullet point will be added before the first line when writing to the changelog, so the first line
-in a change file should not have a bullet point. Subsequent lines may use bullet points, which will
-be indented as a second-level list. For example, the following is a well-formatted change, which
-could be named `add_field_x.txt`:
+Each change must be in a separate file, but a single change may contain multiple lines of text.
+Changes can be written using markdown. A bullet point will be added before the first line when
+writing to the changelog, so the first line in a change file should not have a bullet point.
+Subsequent lines will be indented, so you could include a second-level list by using bullet points.
+For example, the following is a well-formatted change, which could be named `add_field_x.md`:
 
 ```
 Field x on several entities
