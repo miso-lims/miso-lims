@@ -11,8 +11,8 @@ required:
 
 Application Server:
 
-* JDK 11 or later
-* Tomcat 8 or later
+* JDK 11
+* Tomcat 8 or 9
 
 Database Server:
 
@@ -38,7 +38,7 @@ work; a typical Mac system may work. MISO is not guaranteed to work on Windows.
 
 You will need:
 
-* JDK 11 or later
+* JDK 11
 * [Maven 3.0.5](http://maven.apache.org/download.html) or later
 * Git
 
@@ -91,7 +91,7 @@ need to add a grant privilege to the MISO database from your remote machine:
 Download the [Flyway command line tool](https://flywaydb.org/download/community) version 5.2.4 and install it.
 Newer versions of Flyway may cause issues, and are not recommended.
 
-The application server needs [Tomcat 8](https://tomcat.apache.org/download-80.cgi).
+The application server needs Tomcat [8](https://tomcat.apache.org/download-80.cgi) or [9](https://tomcat.apache.org/download-90.cgi).
 
 Create a file called `ROOT.xml` in the following directory
 `$CATALINA_HOME/conf/Catalina/localhost`, creating the directory if necessary,
