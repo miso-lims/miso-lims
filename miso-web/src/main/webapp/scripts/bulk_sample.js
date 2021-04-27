@@ -12,8 +12,6 @@ BulkTarget.sample = (function($) {
    *   recipientGroups: groups to include in Received By column
    *   project: project to create sample in,
    *   projects: all projects
-   *   defaultLcmTubeGroupId: string
-   *   defaultLcmTubeGroupDescription: string
    *   sortLibraryPropagate: string; column for default sort when propagating libraries
    *   sops: array
    * }
@@ -667,25 +665,7 @@ BulkTarget.sample = (function($) {
         source: Constants.tissuePieceTypes,
         sortSource: Utils.sorting.standardSort('name'),
         getItemLabel: Utils.array.getName,
-        getItemValue: Utils.array.getId,
-        onChange: function(rowIndex, newValue, api) {
-          if (newValue === 'LCM Tube' && (config.defaultLcmTubeGroupId || config.defaultLcmTubeGroupDescription)) {
-            var currentGroupId = api.getValue(rowIndex, 'groupId');
-            var currentGroupDesc = api.getValue(rowIndex, 'groupDescription');
-            if (!currentGroupId && !currentGroupDesc) {
-              if (config.defaultLcmTubeGroupId) {
-                api.updateField(rowIndex, 'groupId', {
-                  value: config.defaultLcmTubeGroupId
-                });
-              }
-              if (config.defaultLcmTubeGroupDescription) {
-                api.updateField(rowIndex, 'groupDescription', {
-                  value: config.defaultLcmTubeGroupDescription
-                });
-              }
-            }
-          }
-        }
+        getItemValue: Utils.array.getId
       });
 
       if (!Constants.isDetailedSample || (targetCategory !== 'Identity' && targetCategory !== 'Tissue')) {
