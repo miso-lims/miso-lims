@@ -136,10 +136,6 @@ public class EditSampleController {
   private Boolean detailedSample;
   @Value("${miso.defaults.sample.bulk.scientificname:}")
   private String defaultSciName;
-  @Value("${miso.defaults.sample.lcmtube.groupid:#{null}}")
-  private String defaultLcmTubeGroupId;
-  @Value("${miso.defaults.sample.lcmtube.groupdescription:#{null}}")
-  private String defaultLcmTubeGroupDesc;
 
   public void setProjectService(ProjectService projectService) {
     this.projectService = projectService;
@@ -173,8 +169,6 @@ public class EditSampleController {
     private static final String PROJECTS = "projects";
     private static final String SOPS = "sops";
     private static final String DEFAULT_SCI_NAME = "defaultSciName";
-    private static final String DEFAULT_LCM_TUBE_GROUP_ID = "defaultLcmTubeGroupId";
-    private static final String DEFAULT_LCM_TUBE_GROUP_DESC = "defaultLcmTubeGroupDescription";
     private static final String SOURCE_CATEGORY = "sourceCategory";
     private static final String TARGET_CATEGORY = "targetCategory";
     private static final String BOX = "box";
@@ -505,8 +499,6 @@ public class EditSampleController {
       config.put(Config.SOURCE_CATEGORY, sourceCategory);
       config.put(Config.TARGET_CATEGORY, targetCategory);
       config.putPOJO(Config.BOX, newBox);
-      config.put(Config.DEFAULT_LCM_TUBE_GROUP_ID, defaultLcmTubeGroupId);
-      config.put(Config.DEFAULT_LCM_TUBE_GROUP_DESC, defaultLcmTubeGroupDesc);
       addJsonArray(mapper, config, Config.RECIPIENT_GROUPS, recipientGroups, Dtos::asDto);
       addJsonArray(mapper, config, Config.PROJECTS, projectService.list(), Dtos::asDto);
       addJsonArray(mapper, config, Config.SOPS, sopService.listByCategory(SopCategory.SAMPLE), Dtos::asDto);
@@ -536,8 +528,6 @@ public class EditSampleController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
       config.put(Config.TARGET_CATEGORY, targetCategory);
-      config.put(Config.DEFAULT_LCM_TUBE_GROUP_ID, defaultLcmTubeGroupId);
-      config.put(Config.DEFAULT_LCM_TUBE_GROUP_DESC, defaultLcmTubeGroupDesc);
       addJsonArray(mapper, config, Config.PROJECTS, projectService.list(), Dtos::asDto);
       config.put(Config.DEFAULT_SCI_NAME, defaultSciName);
       if (project != null) {
