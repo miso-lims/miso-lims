@@ -5,8 +5,6 @@
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.checkbox.js'/>" type="text/javascript"></script><!-- high charts -->
 <script src="/scripts/highcharts/modules/sankey.js"></script>
 <script src="/scripts/highcharts/modules/organization.js"></script>
-<link href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" rel="stylesheet" type="text/css">
-<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
 
 <div id="maincontent">
 <div id="contentcolumn">

@@ -804,6 +804,11 @@ button.disabled {
     overflow-y: visible;
 }
 
+/* Override Datatables' explicit toolbar height */
+.paging_full_numbers {
+    height: auto;
+}
+
 .unselectable {
 	-webkit-user-select: none;
 	-khtml-user-select: none;

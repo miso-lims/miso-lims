@@ -10,6 +10,9 @@ Changes:
 
 * Fix issue saving Oxford Nanopore containers
 
+Known Issues:
+
+* Toolbars are not displayed correctly in the Items list on the Edit Transfer page
 
 # 1.28.0
 
@@ -41,6 +44,7 @@ Changes:
 
 Known issues:
 * Oxford Nanopore containers fail to save
+* Toolbars are not displayed correctly in the Items list on the Edit Transfer page
 
 # 1.27.0
 
