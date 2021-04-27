@@ -1,10 +1,13 @@
-# Unreleased
+# Changelog
 
-Changes:
+This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+Starting with version 1.29.0, the format of this file is based on
+[Keep a Changelog](https://keepachangelog.com/en/1.0.0/). For unreleased changes, see
+[changes](changes).
 
+---------------------------------------------------------------------------------------------------
 
-
-# 1.28.1
+## [1.28.1]
 
 Changes:
 
@@ -14,7 +17,7 @@ Known Issues:
 
 * Toolbars are not displayed correctly in the Items list on the Edit Transfer page
 
-# 1.28.0
+## [1.28.0]
 
 Changes:
 
@@ -43,10 +46,11 @@ Changes:
   page (detailed sample)
 
 Known issues:
+
 * Oxford Nanopore containers fail to save
 * Toolbars are not displayed correctly in the Items list on the Edit Transfer page
 
-# 1.27.0
+## 1.27.0
 
 Changes:
 
@@ -79,7 +83,7 @@ Known Issues:
 
 * No projects are shown for any runs in the Runs list
 
-# 1.26.0
+## 1.26.0
 
 Changes:
 
@@ -91,7 +95,7 @@ Changes:
 * Improved performance of library receipt
 * Fixed tissue timepoint field not being changelogged (detailed sample)
 
-# 1.25.0
+## 1.25.0
 
 Changes:
 
@@ -113,7 +117,7 @@ Upgrade Notes:
 * If you are using Prometheus, be advised that performance metrics have been
   revised
 
-# 1.24.0
+## 1.24.0
 
 Changes:
 
@@ -121,7 +125,7 @@ Changes:
 * Fixed errors deleting items
 * Performance improvements
 
-# 1.23.0
+## 1.23.0
 
 Changes:
 
@@ -137,7 +141,7 @@ Upgrade Notes:
 
 * Updated to Pinery v2.18.0
 
-# 1.22.0
+## 1.22.0
 
 Changes:
 
@@ -158,13 +162,13 @@ Changes:
 * Fixed sizing and scrolling of advanced search help dialog
 * Fixed archived targeted sequencing options remaining available
 
-# 1.21.1
+## 1.21.1
 
 Changes:
 
 * Fixed Flyway migration
 
-# 1.21.0
+## 1.21.0
 
 Changes:
 
@@ -174,7 +178,7 @@ Known Issues:
 
 * Flyway migrations fails on some databases
 
-# 1.20.0
+## 1.20.0
 
 Changes:
 
@@ -215,13 +219,13 @@ Known Issues:
 
 * Flyway migration fails on some databases
 
-# 1.19.1
+## 1.19.1
 
 Changes:
 
   * Fixed qubit values missing from Pinery samples
 
-# 1.19.0
+## 1.19.0
 
 Changes:
 
@@ -250,7 +254,7 @@ Upgrade Notes:
     that were previously marked clinical. You should review your projects after the upgrade, and
     customize the available pipeline options if you wish.
 
-# 1.18.0
+## 1.18.0
 
 Changes:
 
@@ -275,7 +279,7 @@ Upgrade Notes:
   * The `miso.newOptionSopUrl` option has been added to `miso.properties` for linking to an SOP
     describing how users should go about adding new options to MISO.
 
-# 1.17.0
+## 1.17.0
 
 Changes:
 
@@ -329,7 +333,7 @@ Upgrade Notes:
       (SELECT sampleClassId FROM SampleClass WHERE sampleCategory = 'Aliquot' AND sampleSubcategory IS NULL);
     ```
 
-# 1.16.0
+## 1.16.0
 
 Changes:
 
@@ -341,14 +345,14 @@ Changes:
   * Prevent duplicate barcodes between different item types (e.g. samples and libraries)
   * Fixed setting partition QC on Run-Library metrics page
 
-# 1.15.1
+## 1.15.1
 
 Changes:
 
   * Fixed errors updating QC status of some items on Run-Library Metrics page
   * Fixed Effective QC Status column not updating after setting QC on Run-Library Metrics page
 
-# 1.15.0
+## 1.15.0
 
 Changes:
 
@@ -366,7 +370,7 @@ Changes:
   * Fixed project validation when receiving samples or libraries from the Edit Project page for a
     project that is not marked as active
 
-# 1.14.0
+## 1.14.0
 
 Changes:
 
@@ -384,7 +388,7 @@ Upgrade Notes:
     These have been applied to items that previously had QC Passed set to true and false,
     respectively. You can modify these default options and/or add other options if you wish.
 
-# 1.13.0
+## 1.13.0
 
 Changes:
 
@@ -397,7 +401,7 @@ Changes:
     the Edit Workset page
   * Fixed user and timestamp on transfer changelogs
 
-# 1.12.0
+## 1.12.0
 
 Changes:
 
@@ -409,7 +413,7 @@ Changes:
   * Fixed error where importing into bulk tables would fail with no error message
   * Fixed Project dropdown not working when receiving libraries from the Edit Project page
 
-# 1.11.0
+## 1.11.0
 
 Changes:
 
@@ -423,7 +427,7 @@ Changes:
   * Fixed error on Adding QC from Edit Sample, Library, Container, Pool pages
   * Fixed setting volume units from library template
 
-# 1.10.1
+## 1.10.1
 
 Changes:
 
@@ -433,7 +437,7 @@ Known Issues:
 
   * Server Error adding QCs from Edit Sample, Library, Container, Pool pages
 
-# 1.10.0
+## 1.10.0
 
 Changes:
 
@@ -455,7 +459,7 @@ Known Issues:
   * Tissue processing classes with no subcategory cause errors
   * Server error on adding QCs to Sample, Library, Container, Pool from Edit pages
 
-# 1.9.1
+## 1.9.1
 
 Changes:
 
@@ -467,7 +471,7 @@ Known Issues:
   * "Check QCs" button is missing from bulk library pages
   * Buttons to add/edit box uses link to the wrong URL
 
-# 1.9.0
+## 1.9.0
 
 Changes:
 
@@ -484,7 +488,7 @@ Known Issues:
   * Buttons to add/edit box uses link to the wrong URL
   * Tissue processing classes with no subcategory cause errors
 
-# 1.8.1
+## 1.8.1
 
 Changes:
 
@@ -498,7 +502,7 @@ Known Issues:
   * Buttons to add/edit box uses link to the wrong URL
   * Tissue processing classes with no subcategory cause errors
 
-# 1.8.0
+## 1.8.0
 
 Changes:
 
@@ -519,7 +523,7 @@ Known Issues:
   * Buttons to add/edit box uses link to the wrong URL
   * Tissue processing classes with no subcategory cause errors
 
-# 1.7.1
+## 1.7.1
 
 Changes:
 
@@ -534,7 +538,7 @@ Known Issues:
   * Buttons to add/edit box uses link to the wrong URL
   * Tissue processing classes with no subcategory cause errors
 
-# 1.7.0
+## 1.7.0
 
 Changes:
 
@@ -582,7 +586,7 @@ Known Issues:
   * Buttons to add/edit box uses link to the wrong URL
   * Tissue processing classes with no subcategory cause errors
 
-# 1.6.0
+## 1.6.0
 
 Changes:
 
@@ -609,7 +613,7 @@ Known Issues:
   * Buttons to add/edit box uses link to the wrong URL
   * Tissue processing classes with no subcategory cause errors
 
-# 1.5.0
+## 1.5.0
 
 Changes:
 
@@ -627,7 +631,7 @@ Known Issues:
   * Buttons to add/edit box uses link to the wrong URL
   * Tissue processing classes with no subcategory cause errors
 
-# 1.4.0
+## 1.4.0
 
 Changes:
 
@@ -657,7 +661,7 @@ Known Issues:
   * Buttons to add/edit box uses link to the wrong URL
   * Tissue processing classes with no subcategory cause errors
 
-# 1.3.0
+## 1.3.0
 
 Changes:
 
@@ -673,7 +677,7 @@ Known Issues:
   * Buttons to add/edit box uses link to the wrong URL
   * Tissue processing classes with no subcategory cause errors
 
-# 1.2.0
+## 1.2.0
 
 Changes:
 
@@ -694,7 +698,7 @@ Known Issues:
   * Buttons to add/edit box uses link to the wrong URL
   * Tissue processing classes with no subcategory cause errors
 
-# 1.1.0
+## 1.1.0
 
 Changes:
 
@@ -726,7 +730,7 @@ Known Issues:
   * V1000 migration hangs on plain sample databases
   * Buttons to add/edit box uses link to the wrong URL
 
-# 1.0.2
+## 1.0.2
 
 Changes:
 
@@ -763,7 +767,7 @@ Known Issues:
   * V1000 migration hangs on plain sample databases
   * Buttons to add/edit box uses link to the wrong URL
 
-# 1.0.1
+## 1.0.1
 
 Changes:
 
@@ -773,7 +777,7 @@ Known Issues:
 
   * V1000 migration hangs on plain sample databases
 
-# 1.0.0
+## 1.0.0
 
 Users and/or administrators can now add, edit, and delete everything through the MISO website
 without having to resort to direct database manipulation. MISO is now able to track tasks
@@ -794,7 +798,7 @@ Known Issues:
   * Some samples may error on load.
   * V1000 migration hangs on plain sample databases
 
-# 0.2.202
+## 0.2.202
 
 Changes:
 
@@ -835,7 +839,7 @@ Known Issues:
 
   * V1000 migration hangs on plain sample databases
 
-# 0.2.201
+## 0.2.201
 
 Changes:
 
@@ -850,7 +854,7 @@ Known Issues:
   * Edit Sample page returned a server error in plain sample mode
   * V1000 migration hangs on plain sample databases
 
-# 0.2.200
+## 0.2.200
 
 Changes:
 
@@ -867,7 +871,7 @@ Known Issues:
   * Edit Sample page returned a server error in plain sample mode
   * V1000 migration hangs on plain sample databases
 
-# 0.2.199
+## 0.2.199
 
 Changes:
 
@@ -921,7 +925,7 @@ Known Issues
   * Edit Sample page returned a server error in plain sample mode
   * V1000 migration hangs on plain sample databases
 
-# 0.2.198
+## 0.2.198
 
 Changes:
 
@@ -995,7 +999,7 @@ Known Issues:
   * Edit Sample page returned a server error in plain sample mode
   * V1000 migration hangs on plain sample databases
 
-# 0.2.197
+## 0.2.197
 
 Changes:
 
@@ -1015,7 +1019,7 @@ Known Issues:
   * Error deleting sequencing orders
   * Service record start and end times may save in incorrect time zone depending on configuration
 
-# 0.2.196
+## 0.2.196
 
 Changes:
 
@@ -1046,7 +1050,7 @@ Known Issues:
   * Error deleting sequencing orders
   * Service record start and end times may save in incorrect time zone depending on configuration
 
-# 0.2.195
+## 0.2.195
 
 Changes:
 
@@ -1093,13 +1097,13 @@ Known Issues:
   * Error deleting sequencing orders
   * Service record start and end times may save in incorrect time zone depending on configuration
 
-# 0.2.194
+## 0.2.194
 
 Changes:
 
   * Changed Pinery Qubit concentration formatter to eliminate trailing zeros.
 
-# 0.2.193
+## 0.2.193
 
 Changes:
 
@@ -1142,7 +1146,7 @@ Known Issues:
   * Error deleting sequencing orders
   * Service record start and end times may save in incorrect time zone depending on configuration
 
-# 0.2.192
+## 0.2.192
 
 Changes:
 
@@ -1174,7 +1178,7 @@ Known Issues:
   * Error deleting sequencing orders
   * Service record start and end times may save in incorrect time zone depending on configuration
 
-# 0.2.191
+## 0.2.191
 
 Changes:
 
@@ -1207,7 +1211,7 @@ Known issues:
   * Error deleting sequencing orders
   * Service record start and end times may save in incorrect time zone depending on configuration
 
-# 0.2.190
+## 0.2.190
 
 Changes:
 
@@ -1234,7 +1238,7 @@ Known issues:
   * Error deleting sequencing orders
   * Service record start and end times may save in incorrect time zone depending on configuration
 
-# 0.2.189
+## 0.2.189
 
 Changes:
 
@@ -1251,7 +1255,7 @@ Known issues:
   * Error deleting sequencing orders
   * Service record start and end times may save in incorrect time zone depending on configuration
 
-# 0.2.188
+## 0.2.188
 
 Changes:
 
@@ -1268,7 +1272,7 @@ Known issues:
   * Error deleting sequencing orders
   * Service record start and end times may save in incorrect time zone depending on configuration
 
-# 0.2.187
+## 0.2.187
 
 Changes:
 
@@ -1281,7 +1285,7 @@ Known issues:
   * Error deleting sequencing orders
   * Service record start and end times may save in incorrect time zone depending on configuration
 
-# 0.2.186
+## 0.2.186
 
 Changes:
 
@@ -1321,7 +1325,7 @@ Known issues:
   * Error deleting sequencing orders
   * Service record start and end times may save in incorrect time zone depending on configuration
 
-# 0.2.185:
+## 0.2.185:
 
 Changes:
 
@@ -1332,7 +1336,7 @@ Known Issues:
   * List Freezers page still broken
   * Service record start and end times may save in incorrect time zone depending on configuration
 
-# 0.2.184
+## 0.2.184
 
 Changes:
 
@@ -1362,7 +1366,7 @@ Known Issues:
   * List Freezers page still broken
   * Service record start and end times may save in incorrect time zone depending on configuration
 
-# 0.2.183
+## 0.2.183
 
 Changes:
 
@@ -1386,7 +1390,7 @@ Known Issues:
   * Broke List Freezers page
   * Service record start and end times may save in incorrect time zone depending on configuration
 
-# 0.2.182
+## 0.2.182
 
 Changes:
 
@@ -1396,7 +1400,7 @@ Known Issues:
 
   * Service record start and end times may save in incorrect time zone depending on configuration
 
-# 0.2.181
+## 0.2.181
 
 Changes:
 
@@ -1434,7 +1438,7 @@ Known Issues:
   * Run metrics disappear when saving a run on the Edit Run page
   * Service record start and end times may save in incorrect time zone depending on configuration
 
-# 0.2.180
+## 0.2.180
 
 Changes:
 
@@ -1469,7 +1473,7 @@ Known Issues:
   * Run metrics disappear when saving a run on the Edit Run page
   * Service record start and end times may save in incorrect time zone depending on configuration
 
-# 0.2.179
+## 0.2.179
 
 Changes:
 
@@ -1496,7 +1500,7 @@ Known Issues:
   * Run metrics disappear when saving a run on the Edit Run page
   * Service record start and end times may save in incorrect time zone depending on configuration
 
-# 0.2.178
+## 0.2.178
 
 Changes:
 
@@ -1517,7 +1521,7 @@ Known Issues:
   * Run metrics disappear when saving a run on the Edit Run page
   * Service record start and end times may save in incorrect time zone depending on configuration
 
-# 0.2.177
+## 0.2.177
 
 Changes:
 
@@ -1534,7 +1538,7 @@ Known Issues:
   * Run metrics disappear when saving a run on the Edit Run page
   * Service record start and end times may save in incorrect time zone depending on configuration
 
-# 0.2.176
+## 0.2.176
 
 Changes:
 
@@ -1557,7 +1561,7 @@ Known Issues:
   * Run metrics disappear when saving a run on the Edit Run page
   * Service record start and end times may save in incorrect time zone depending on configuration
 
-# 0.2.175
+## 0.2.175
 
 Changes:
 
@@ -1575,7 +1579,7 @@ Changes:
   * Fixed a bug in the bulk library table where selecting a box position and index family for a
     library without a library template would cause the table to become unresponsive
 
-# 0.2.174
+## 0.2.174
 
 Changes:
 
@@ -1608,7 +1612,7 @@ Upgrade notes:
    HAVING COUNT(containerId) > 1;
    ```
 
-# 0.2.173
+## 0.2.173
 
 Changes:
 
@@ -1616,13 +1620,13 @@ Changes:
  * Fix error page
  * Allow any internal user to delete a pool order
 
-# 0.2.172
+## 0.2.172
 
 Changes:
 
  * Bug fixes and performance enhancements
 
-# 0.2.171
+## 0.2.171
 
 Changes:
 
@@ -1649,7 +1653,7 @@ BAD:
 
  * Bad database migration
 
-# 0.2.170
+## 0.2.170
 
 Changes:
 
@@ -1662,7 +1666,7 @@ Changes:
 BAD:
  * Manually created containers sometimes had wrong number of partitions
 
-# 0.2.169
+## 0.2.169
 
 Changes:
 
@@ -1672,7 +1676,7 @@ BAD:
 
  * Didn't actually fix the issue with saving Oxford Nanopore runs
 
-# 0.2.168
+## 0.2.168
 
 Changes:
 
@@ -1691,7 +1695,7 @@ BAD:
 
  * Failure to save Oxford Nanopore runs from Run Scanner
 
-# 0.2.167
+## 0.2.167
 
 Changes:
 
@@ -1701,7 +1705,7 @@ Changes:
  * Allow anyone to change project progress
  * Sort items for printing by alias
 
-# 0.2.166
+## 0.2.166
 
 Changes:
 
@@ -1710,13 +1714,13 @@ Changes:
  * Finalize new user maual
  * Remove SecurityProfile
 
-# 0.2.165
+## 0.2.165
 
 Changes:
 
  * Logging bug fix
 
-# 0.2.164
+## 0.2.164
 
 Changes:
 
@@ -1729,20 +1733,20 @@ Changes:
 
  BAD: Dropped dependency in Run Scanner disabled logging.
 
-# 0.2.163
+## 0.2.163
 
 Changes:
 
  * Make JTT_7S the same as JTT_7 with size info instead of extra info
 
-# 0.2.162
+## 0.2.162
 
 Changes:
 
  * Search for freezers by storage location barcode (#1816)
  * Include creation date as a possibility when printing samples
 
-# 0.2.161
+## 0.2.161
 
 Changes:
 
@@ -1752,7 +1756,7 @@ Changes:
  * Added Sequencer Runs section of user manual
  * Fix bugs in distributing from edit single Sample/Library pages
 
-# 0.2.160
+## 0.2.160
 
 Changes:
 
@@ -1770,13 +1774,13 @@ Bad:
 
  * Labels do not print correctly
 
-# 0.2.159
+## 0.2.159
 
 Changes:
 
  * Fix bad migration
 
-# 0.2.158
+## 0.2.158
 
 Changes:
 
@@ -1790,7 +1794,7 @@ Bad:
 
   * Incorrectly named migration
 
-# 0.2.157
+## 0.2.157
 
 Changes:
 
@@ -1800,7 +1804,7 @@ Bad:
 
   * Error creating some runs from Run Scanner
 
-# 0.2.156
+## 0.2.156
 
 Changes:
 
@@ -1819,7 +1823,7 @@ Changes:
 Bad:
  * Error when trying to create new runs from the Runs list page
 
-# 0.2.155
+## 0.2.155
 
 Changes:
 
@@ -1829,7 +1833,7 @@ Changes:
 Bad:
  * Could not save new runs from runscanner
 
-# 0.2.154
+## 0.2.154
 
 Changes:
 
@@ -1837,13 +1841,13 @@ Changes:
  * Restrict class search on sample to only use SampleClass alias, not category name
  * Fixed bug where box contents were deleted when updating multiple positions
 
-# 0.2.153
+## 0.2.153
 
 Changes:
 
  * Fix pinery-miso Spring version
 
-# 0.2.152
+## 0.2.152
 
 Changes:
 
@@ -1855,7 +1859,7 @@ Bad:
 
  * Incorrect Spring library in Pinery MISO
 
-# 0.2.151
+## 0.2.151
 
 Changes:
 
@@ -1863,7 +1867,7 @@ Changes:
  * Fixed applying library template indices
  * Add db index on run alias (#1744)
 
-# 0.2.150
+## 0.2.150
 
 Changes:
 
@@ -1885,7 +1889,7 @@ https://github.com/oicr-gsi/runscanner
 
 BAD: Depended on incompatible version of Run Scanner
 
-# 0.2.149
+## 0.2.149
 
 Changes:
 
@@ -1894,7 +1898,7 @@ Changes:
  * Added Deletions section of user manual
  * Fixed Identity Search tool (DetailedSample mode)
 
-# 0.2.148
+## 0.2.148
 
 Changes:
 
@@ -1909,7 +1913,7 @@ Changes:
  * added Orders section of user manual
  * removed broken and unused pages
 
-# 0.2.147
+## 0.2.147
 
 Changes:
 
@@ -1925,13 +1929,13 @@ Changes:
  * Show position on List Indices table
  * Rearraged dilution columns, combined measure+unit columns
 
-# 0.2.146
+## 0.2.146
 
 Changes:
 
  * Update stored procedures to be compatible with desired MySQL version
 
-# 0.2.145
+## 0.2.145
 
 Changes:
 
@@ -1947,7 +1951,7 @@ Changes:
     * Sample sheets now display correct index 2 sequences
     * Ghost slides no longer save incorrectly (DetailedSample mode)
 
-# 0.2.144
+## 0.2.144
 
 Changes:
 
@@ -1961,7 +1965,7 @@ Changes:
  * fixed bug where second index of unique dual index families was not automatically selected
  * added feature list and first few chapters of new user manual
 
-# 0.2.143
+## 0.2.143
 
 Changes:
 
@@ -1971,7 +1975,7 @@ Changes:
  * Added Cell Ranger sample sheet
  * Allow multiple sample sheet types
 
-# 0.2.142
+## 0.2.142
 
 Changes:
 
@@ -1980,7 +1984,7 @@ Changes:
  * Fixed creating stacks in freezers
  * Fixed start of x-axis in some run metrics graphs
 
-# 0.2.141
+## 0.2.141
 
 Changes:
 
@@ -1994,7 +1998,7 @@ Changes:
  * Added floor map link for storage locations
  * Added 'description' field to orders
 
-# 0.2.140
+## 0.2.140
 
 Changes:
 
@@ -2007,11 +2011,11 @@ Changes:
  * Set default volume and concentration units (#1632)
  * Fix List Worksets - Mine tab (#1637)
 
-# 0.2.139
+## 0.2.139
 
 (This is an empty release; please ignore it)
 
-# 0.2.138
+## 0.2.138
 
 Changes:
 
@@ -2045,7 +2049,7 @@ This can be configured in `miso.properties` file (usually located at
 miso.run.report.links:External Project Link|http://example.com/{id}\\Another Project Link|http://another-site.com/project/{name}
 ```
 
-# 0.2.137
+## 0.2.137
 
 Changes:
 
@@ -2063,7 +2067,7 @@ Changes:
  * Improved error handling on Edit Box page
  * Made Samples inherit Scientific Name from Project
 
-# 0.2.136
+## 0.2.136
 
 Changes:
 
@@ -2105,7 +2109,7 @@ by adding the property `miso.run.report.links`, like so:
 miso.run.report.links:Illumina,PacBio|External Run Link|http://example.com/{id}\\Illumina|Link For Illumina data|http://another-site.com/run/{name}
 ```
 
-# 0.2.135
+## 0.2.135
 
 Changes:
 
@@ -2123,7 +2127,7 @@ Changes:
 BAD: The Create Sample (single) page errors and is unusable. Should affect plain sample mode only.
 BAD: The Create Run page errors and is unusable.
 
-# 0.2.134
+## 0.2.134
 
 Changes:
 
@@ -2132,7 +2136,7 @@ Changes:
 BAD: The Create Sample (single) page errors and is unusable. Should affect plain sample mode only.
 BAD: The Create Run page errors and is unusable.
 
-# 0.2.133
+## 0.2.133
 
 Changes:
 
@@ -2142,7 +2146,7 @@ BAD: Flyway migration via Flyway command-line tool still fails. Fixed in 0.2.134
 BAD: The Create Sample (single) page errors and is unusable. Should affect plain sample mode only.
 BAD: The Create Run page errors and is unusable.
 
-# 0.2.132
+## 0.2.132
 
 Changes:
 
@@ -2190,7 +2194,7 @@ simpler fix.
 BAD: The Create Sample (single) page errors and is unusable. Should affect plain sample mode only.
 BAD: The Create Run page errors and is unusable.
 
-# 0.2.131
+## 0.2.131
 
 Changes:
 
@@ -2208,7 +2212,7 @@ Changes:
 
 BAD: The Create Sample (single) page errors and is unusable. Should affect plain sample mode only.
 
-# 0.2.130
+## 0.2.130
 
 Changes:
 
@@ -2223,7 +2227,7 @@ Changes:
  * Add ng Lib Used and Vol Lib Used to List Dilutions
  * Automatically calculate pool volumes
 
-# 0.2.129
+## 0.2.129
 
 Changes:
 
@@ -2232,7 +2236,7 @@ Changes:
  * Add columns for ng and volume of library used by library dilutions
  * Add concentration units field on Library Dilutions
 
-# 0.2.128
+## 0.2.128
 
 Changes:
 
@@ -2243,14 +2247,14 @@ Changes:
  * Add project short name to home page project tiles
  * Allow adding QC-types through the front-end
 
-# 0.2.127
+## 0.2.127
 
 Changes:
 
  * Fix table filtering and make results copyable in identity search
  * Clarify which server needs Flyway installed on iti (documentation)
 
-# 0.2.126
+## 0.2.126
 
 Changes:
 
@@ -2260,7 +2264,7 @@ Changes:
  * Fix unable to place boxes in freezers on freezers page
  * Hide archived QCTypes from the create QC tables
 
-# 0.2.125
+## 0.2.125
 
 Changes:
 
@@ -2276,7 +2280,7 @@ Changes:
 Changes:
 
 
-# 0.2.124
+## 0.2.124
 
 Changes:
 
@@ -2295,7 +2299,7 @@ Changes:
  * Allow skipping to the next box when pasting into box update
  * Add actions for pools onto list orders pages
 
-# 0.2.123
+## 0.2.123
 
 Changes:
 
@@ -2311,7 +2315,7 @@ Changes:
 Bad:
  * Introduced bug that broke creating pool Orders
 
-# 0.2.122
+## 0.2.122
 
 Changes:
 
@@ -2323,14 +2327,14 @@ Changes:
  * Default pool creation date to today (#1448)
  * Fix race condition in identity selection due to bad scoping
 
-# 0.2.121
+## 0.2.121
 
 Changes:
 
  * Make DetailedSample identity search page
  * Make DetailedSample group IDs longer & allow `-_`
 
-# 0.2.120
+## 0.2.120
 
 Changes:
 
@@ -2343,7 +2347,7 @@ Changes:
  * Add (near-) duplicate indices and low quality libraries warnings to orders pages
  * Note possible Flyway migration error
 
-# 0.2.119
+## 0.2.119
 
 Changes:
 
@@ -2356,7 +2360,7 @@ Changes:
  * Added bulk Library 'Check QCs' button to set QC passed based on specified criteria
  * Added project templates for library propagation
 
-# 0.2.118
+## 0.2.118
 
 Changes:
 
@@ -2367,7 +2371,7 @@ Changes:
  * update addKitDescriptor procedure (#1419)
  * Add QC changelogs for Library, Pool, Container (#1418)
 
-# 0.2.117
+## 0.2.117
 
 Changes:
 
@@ -2378,7 +2382,7 @@ Changes:
  * Allow printing multiple copies of a label
  * Default dilution creation date to today
 
-# 0.2.116
+## 0.2.116
 
 Changes:
 
@@ -2396,7 +2400,7 @@ so runs failed to save correctly. Fixed in #0.2.117.
 Note: If Flyway migration V0480__auto_main.sql fails, you may have bad data in your database that needs
 corrected before retrying the migration. See [Issue 1433](https://github.com/TGAC/miso-lims/issues/1433).
 
-# 0.2.115
+## 0.2.115
 
 Changes:
 
@@ -2405,7 +2409,7 @@ Changes:
  * Don't put '(None)' in the targeted sequencing list if not allowed
  * Fix addLibraryType stored procedure
 
-# 0.2.114
+## 0.2.114
 
 Changes:
 
@@ -2413,7 +2417,7 @@ Changes:
  * Warn when saving new pools without barcodes
  * Improve Illumina run completion detection
 
-# 0.2.113
+## 0.2.113
 
 Changes:
 
@@ -2422,7 +2426,7 @@ Changes:
  * Allow users to delete pools
  * Added `pinery-miso`
 
-# 0.2.112
+## 0.2.112
 
 Changes:
 
@@ -2430,7 +2434,7 @@ Changes:
  * Fix error where box scanner retry failed
  * Fix counts in some tables
 
-# 0.2.111
+## 0.2.111
 
 Changes:
 
@@ -2438,7 +2442,7 @@ Changes:
  * Improve UI consistency in bulk HoT pages
  * Change tick marks on per-cycle graphs
 
-# 0.2.110
+## 0.2.110
 
 Changes:
 
@@ -2456,7 +2460,7 @@ Changes:
  * Save run_bases_mask
  * Added Identity consentLevel field
 
-# 0.2.109
+## 0.2.109
 
 Changes:
 
@@ -2466,7 +2470,7 @@ Changes:
  * Allow users to add and admins to add, edit, and delete new Tissue Origins (Detailed Sample only)
  * Export run bases mask
 
-# 0.2.108
+## 0.2.108
 
 Changes:
 
@@ -2480,7 +2484,7 @@ Changes:
  * Added tool to check index edit distance
  * Add metrics endpoint to Run Scanner
 
-# 0.2.107
+## 0.2.107
 
 Changes:
 
@@ -2491,7 +2495,7 @@ Changes:
  * Allow bulk select using names, aliases, or barcodes
  * Document search syntax using tooltip and popup
 
-# 0.2.106
+## 0.2.106
 
 Changes:
 
@@ -2501,7 +2505,7 @@ Changes:
  * Separated sequencers from other instruments
  * Allowed more digits in Identity number
 
-# 0.2.105
+## 0.2.105
 
 Changes:
 
@@ -2509,7 +2513,7 @@ Changes:
  * Fix editing run start/end date (#1281)
  * Fix PacBio access with URLs with spaces
 
-# 0.2.104
+## 0.2.104
 
 Changes:
 
@@ -2520,7 +2524,7 @@ Changes:
  * Require unique pool alias
  * Show library concentration for plain sample
 
-# 0.2.103
+## 0.2.103
 
 Changes:
 
@@ -2532,7 +2536,7 @@ Changes:
  * Sorted Project dashboard widget with newest projects at the top
  * Improved performance of list pages
 
-# 0.2.102
+## 0.2.102
 
 Changes:
 
@@ -2541,14 +2545,14 @@ Changes:
  * Fixed user password changes
  * Fixed adding new users under JDBC security
 
-# 0.2.101
+## 0.2.101
 
 Changes:
 
  * Allow adding non-barcoded boxables to boxes
  * Fix Prometheus monitoring
 
-# 0.2.100
+## 0.2.100
 
 Changes:
 
@@ -2558,7 +2562,7 @@ Changes:
  * Update documentation
  * Do not base64 encode barcodes
 
-# 0.2.99
+## 0.2.99
 
 Changes:
 
@@ -2569,7 +2573,7 @@ Changes:
  * Remove DNAse Treated QC since there is a field for it
  * Handle boolean QC results correctly on editing
 
-# 0.2.98
+## 0.2.98
 
 Changes:
 
@@ -2577,7 +2581,7 @@ Changes:
  * Generate Identity aliases
  * Print the name if no barcode is provided
 
-# 0.2.97
+## 0.2.97
 
 Changes:
 
@@ -2586,13 +2590,13 @@ Changes:
  * require targeted sequencing depending on library design code
  * redirect to List Pools page after creating an order from bulk or list page
 
-# 0.2.96
+## 0.2.96
 
 Changes:
 
  * fixed RunScanner overwriting user-marked run completion
 
-# 0.2.95
+## 0.2.95
 
 Changes:
 
@@ -2605,7 +2609,7 @@ Changes:
 
 Bad: RunScanner could sometimes overwrite user-marked run completion
 
-# 0.2.94
+## 0.2.94
 
 Changes:
 
@@ -2615,13 +2619,13 @@ Changes:
 
 Bad: RunScanner could sometimes overwrite user-marked run completion
 
-# 0.2.93
+## 0.2.93
 
 Changes:
 
  * rename library receipt migration
 
-# 0.2.92
+## 0.2.92
 
 Changes:
 
@@ -2632,7 +2636,7 @@ Bad:
 
  * Misnamed migration will cause issues when migrating database. Use v0.2.93 instead.
 
-# 0.2.91
+## 0.2.91
 
 Changes:
 
@@ -2658,7 +2662,7 @@ DELETE FROM Experiment_Run;
 DELETE FROM Experiment;
 ```
 
-# 0.2.90
+## 0.2.90
 
 Changes:
 
@@ -2672,7 +2676,7 @@ Changes:
  * Reorder dilution table columns
  * Add targeted sequencing to edit pool page
 
-# 0.2.89
+## 0.2.89
 
 Changes:
 
@@ -2688,7 +2692,7 @@ Changes:
  * Indicate low quality libraries in pool picker
  * Fixed PacBio dashboard link
 
-# 0.2.88
+## 0.2.88
 
 Changes:
 
@@ -2698,13 +2702,13 @@ Changes:
  * Allow a default scientificName (configuration change in miso.properties) (#1107)
  * Add new printer drivers
 
-# 0.2.87
+## 0.2.87
 
 Changes:
 
  * Bug fixes
 
-# 0.2.86
+## 0.2.86
 
 Changes:
 
@@ -2721,7 +2725,7 @@ Bad:
  * Error saving Sequencer Service Records
  * Bad date format for dilution last modified on Edit Pool page
 
-# 0.2.85
+## 0.2.85
 
 Changes:
 
@@ -2730,7 +2734,7 @@ Changes:
  * Delete notification server (_configuration change in miso.properties_)
  * Only update completion date if run is marked as done
 
-# 0.2.84
+## 0.2.84
 
 Changes:
 
@@ -2741,7 +2745,7 @@ Bad:
 
  * Bugs in runscanner
 
-# 0.2.83
+## 0.2.83
 
 Changes:
 
@@ -2758,23 +2762,13 @@ Bad:
 
  * Run Scanner created incorrect partition numbers
 
-# 0.2.81
+## 0.2.81
 
 Changes:
 
  * Bug fixes
 
-# 0.2.80
-
-Changes:
-
- * Bug fixes
-
-Bad:
-
- * Bugs (fixes in 0.2.80)
-
-# 0.2.79
+## 0.2.80
 
 Changes:
 
@@ -2784,7 +2778,17 @@ Bad:
 
  * Bugs (fixes in 0.2.80)
 
-# 0.2.78
+## 0.2.79
+
+Changes:
+
+ * Bug fixes
+
+Bad:
+
+ * Bugs (fixes in 0.2.80)
+
+## 0.2.78
 
 Changes:
 
@@ -2794,7 +2798,7 @@ Bad:
 
  * Bug (fix in 0.2.79)
 
-# 0.2.77
+## 0.2.77
 
 Changes:
 
@@ -2805,7 +2809,7 @@ Bad:
 
  * Bugs (fixes in 0.2.78)
 
-# 0.2.76
+## 0.2.76
 
 Changes:
 
@@ -2816,7 +2820,7 @@ Bad:
  * Identity lookup doesn't work when bulk creating samples from project page
  * Indices dropdown not showing up when changing Index Family on edit singe library page
 
-# 0.2.75
+## 0.2.75
 
 Changes:
 
@@ -2845,7 +2849,7 @@ Bad:
  * Selecting a different tab on a list page displayed it at half width
  * Received Date was not showing for bulk create samples
 
-# 0.2.74
+## 0.2.74
 
 Changes:
 
@@ -2855,7 +2859,7 @@ Bad:
 
  * Saving Run fails, both through UI and via Notification Server
 
-# 0.2.73
+## 0.2.73
 
 Changes:
 
@@ -2872,7 +2876,7 @@ Bad:
 
 * Saving Run fails, both through UI and via Notification Server
 
-# 0.2.72
+## 0.2.72
 
 Changes:
 
@@ -2880,7 +2884,7 @@ Changes:
  * Generate library aliases (OICR)
  * Add list dilutions page
 
-# 0.2.71
+## 0.2.71
 
 Changes:
 
@@ -2890,7 +2894,7 @@ Bad:
 
  * Kits are not saved during bulk library save
 
-# 0.2.70
+## 0.2.70
 
 Changes:
 
@@ -2907,7 +2911,7 @@ Bad:
 
  * Kits are not saved during bulk library save
 
-# 0.2.69
+## 0.2.69
 
 Changes:
 
@@ -2921,19 +2925,19 @@ Changes:
  * Add PacBio library types and library selections
  * Other misc. bug fixes
 
-# 0.2.68
+## 0.2.68
 
 Changes:
 
  * Many bug fixes
 
-# 0.2.67
+## 0.2.67
 
 Changes:
 
  * Bug fix
 
-# 0.2.66
+## 0.2.66
 
 Changes:
 
@@ -2947,13 +2951,13 @@ Changes:
  * Allow searching items by box name, box alias, barcode, institute, and external name
  * Other misc. bug fixes
 
-# 0.2.65
+## 0.2.65
 
 Changes:
 
  * Fix bug causing instance to lock
 
-# 0.2.64
+## 0.2.64
 
 Changes:
 
@@ -2963,7 +2967,7 @@ Bad:
 
  * Instance can lock due to serialisation error
 
-# 0.2.63
+## 0.2.63
 
 Changes:
 
@@ -2976,14 +2980,14 @@ Bad:
 
  * Some pages do not load due to null pointer exception
 
-# 0.2.62
+## 0.2.62
 
 Changes:
 
  * Serialization fixes to prevent periodic inability to login
  * Allow searches to operate on “ago” ranges
 
-# 0.2.61
+## 0.2.61
 
 Changes:
 
@@ -2996,14 +3000,14 @@ Changes:
  * Change to structure query search
 
 
-# 0.2.60
+## 0.2.60
 
 Changes:
 
  * improved load time of Edit Pool page
  * improved load time of New/Edit Run page
 
-# 0.2.59
+## 0.2.59
 
 Changes:
 
@@ -3016,13 +3020,13 @@ Changes:
  * Added last modified column to pool elements table on Edit Pool page
  * Allow bulk addition/deletion of a pool's dilutions on Edit Pool page
 
-# 0.2.58
+## 0.2.58
 
 Changes:
 
  * Fix join column mismatch in order completions
 
-# 0.2.57
+## 0.2.57
 
 Changes:
 
@@ -3037,14 +3041,14 @@ Bad:
 
  * Pool order completions display incorrect results
 
-# 0.2.56
+## 0.2.56
 
 Changes:
 
  * Make dilutions boxable
  * Paginate samples and dilutions list on edit project page
 
-# 0.2.55
+## 0.2.55
 
 Changes:
 
@@ -3055,7 +3059,7 @@ Changes:
  * Improved performance of sample and library list pages
  * Removed dilution content from list pools page to improve performance
 
-# 0.2.54
+## 0.2.54
 
 Changes:
 
@@ -3065,7 +3069,7 @@ Changes:
  * Don't display an error if an XHR is aborted prematurely
  * Load previous kit value when editing libraries
 
-# 0.2.53
+## 0.2.53
 
 Changes:
 
@@ -3080,7 +3084,7 @@ Changes:
  * Add a link to file a ticket
  * Allow saving of duplicate alias if marked non-standard
 
-# 0.2.52
+## 0.2.52
 
 Changes:
 
@@ -3094,13 +3098,13 @@ Changes:
  * Updated user interface for creating runs and containers
  * Many bug fixes and stability improvements
 
-# 0.2.51
+## 0.2.51
 
 Changes:
 
  * Fix LDAP concurrency filter configuration
 
-# 0.2.50
+## 0.2.50
 
 Changes:
 
@@ -3117,7 +3121,7 @@ Changes:
 Bad:
  * Some samples display stacktrace org.hibernate.exception.SQLGrammarException
 
-# 0.2.49
+## 0.2.49
 
 Changes:
 
@@ -3137,39 +3141,39 @@ Changes:
  * hide Experiments section when creating a new pool
  * updated naming scheme docs
 
-# 0.2.48
+## 0.2.48
 
 Changes:
 
  * Allow library editor to edit dilutions (#647)
  * Update Dilution changelog entries to include dilution name (#622)
 
-# 0.2.47
+## 0.2.47
 
 Changes:
 
  * Add changes to Library changelog when a Library Dilution is created/updated
 
-# 0.2.46
+## 0.2.46
 
 Changes:
 
  * GLT-1380 allow users to delete barcodes (#610)
  * GLT-1363 hide Experiments section when creating a new pool (#594)
 
-# 0.2.45
+## 0.2.45
 
 Changes:
 
  * Changed to next development version
 
-# 0.2.44
+## 0.2.44
 
 Changes:
 
  * Changed to next development version
 
-# 0.2.43
+## 0.2.43
 
 Changes:
 
@@ -3206,7 +3210,7 @@ Changes:
  * Fix Sample Navigation Arrows
  * Changed to next development version
 
-# 0.2.42
+## 0.2.42
 
 Changes:
 
@@ -3216,7 +3220,7 @@ Changes:
  * re-add surprisingly necessary ehcache lines
  * Changed to next development version
 
-# 0.2.41
+## 0.2.41
 
 Changes:
 
@@ -3233,7 +3237,7 @@ Bad:
  * updating a LibraryDilution from the Edit Library page will cause the next LibraryDilution save to fail
  * OICR only: additional Tissue Origins not entered in the OicrSampleNamingScheme
 
-# 0.2.40
+## 0.2.40
 
 Changes:
 
@@ -3254,7 +3258,7 @@ Changes:
  * Raise an error if a migration has a space in it
  * Add test of SQLPrintServiceDAO (#540)
 
-# 0.2.39
+## 0.2.39
 
 Changes:
 
@@ -3272,13 +3276,13 @@ Changes:
  * Avoid NPE when design code is missing
  * in migration, Library SecurityProfile is set using its parent Sample's Project, not the Sample itself.
 
-# 0.2.38
+## 0.2.38
 Changes:
 
  * Library design now provides Selection Type and Strategy Type defaults
  * Sample sibling number generation improvements
 
-# 0.2.37
+## 0.2.37
 Changes:
 
  * Re-add bulk library creation screen
@@ -3300,7 +3304,7 @@ Bad:
  * error in bulkEditSamples.jsp means it's impossible to propagate samples; hotfixed
  * detailedSample set to false in develop overrode true in oicr. Hotfixed by adding miso.properties to Catalina/localhost and adding relevant line in ROOT.xml
 
-# 0.2.36
+## 0.2.36
 Changes:
 
  * Fix missing low quality character
