@@ -28,14 +28,14 @@ We have several types of automated testing:
 * Unit tests
   * Run with `mvn clean install`
 * Integration tests in `sqlstore`
-  * Run with `cd sqlstore; mvn clean verify -DskipITs=false`
+  * Run with `mvn clean verify -pl sqlstore -DskipITs=false`
 * Integration tests in `miso-web` for plain sample mode
-  * Run with `cd miso-web; mvn clean verify -DrunPlainITs`
+  * Run with `mvn clean verify -pl miso-web -DrunPlainITs`
 * Integration tests in `miso-web` for detailed sample mode (also contains tests which are relevant to both modes)
-  * Run with `cd miso-web; mvn clean verify -DskipITs=false`
+  * Run with `mvn clean verify -pl miso-web -DskipITs=false`
   * Run individual test classes or methods by adding `-Dit.test=ClassName` or `Dit.test=ClassName#methodName`
 * Integration tests for `pinery-miso`
-  * Run with `cd pinery-miso; mvn clean verify -DskipITs=false`
+  * Run with `mvn clean verify -pl pinery-miso -DskipITs=false`
 
 Please make sure to add or update the relevant tests for your changes.
 
@@ -43,9 +43,7 @@ Please make sure to add or update the relevant tests for your changes.
 
 * Make sure your commit messages begin with the issue number. e.g. "#1234: fixed display of
   library aliquot concentration units"
-* Edit the **Unreleased** section in `RELEASE_NOTES.md` to detail any user-visible **Changes** or
-  **Update Notes** (Additional steps that must be taken when upgrading to the MISO version
-  containing your change)
+* Include change messages as described [here](changes/README.md)
 
 ## Pull Requests
 
@@ -71,4 +69,3 @@ for someone else to do the merge.
 Please delete your feature branch after it is merged.
 
 ### Thank you for your contributions!
-
