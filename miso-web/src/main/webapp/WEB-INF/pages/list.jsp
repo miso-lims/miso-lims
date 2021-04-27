@@ -21,8 +21,6 @@
   ~ **********************************************************************
   --%>
 <%@ include file="../header.jsp" %>
-<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
-<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
 
 <div id="maincontent">
   <div id="contentcolumn">
