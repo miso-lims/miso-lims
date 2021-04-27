@@ -1,7 +1,11 @@
 package ca.on.oicr.pinery.lims.miso;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.ZoneId;
@@ -19,7 +23,6 @@ import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -1264,8 +1267,10 @@ public class MisoClient implements Lims {
   }
 
   private static String getResourceAsString(String resourceName) {
-    try {
-      return IOUtils.toString(MisoClient.class.getResourceAsStream(resourceName), "UTF-8");
+    try (InputStream in = MisoClient.class.getResourceAsStream(resourceName);
+        InputStreamReader inReader = new InputStreamReader(in, StandardCharsets.UTF_8);
+        BufferedReader reader = new BufferedReader(inReader)) {
+      return reader.lines().collect(Collectors.joining("\n"));
     } catch (IOException ioe) {
       throw new IllegalStateException("Failed to load resource: " + resourceName, ioe);
     }
