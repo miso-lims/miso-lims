@@ -24,13 +24,13 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import javax.persistence.CollectionTable;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -38,9 +38,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -96,11 +93,7 @@ public class Index implements Deletable, Nameable, Serializable {
   @Column(nullable = false)
   private String sequence;
 
-  @Fetch(FetchMode.JOIN)
-  @ElementCollection
-  @CollectionTable(name = "Index_RealSequences", joinColumns = @JoinColumn(name = "indexId"))
-  @Column(name = "sequence")
-  private Set<String> realSequences;
+  private String realSequences;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -174,11 +167,27 @@ public class Index implements Deletable, Nameable, Serializable {
   }
 
   public Set<String> getRealSequences() {
-    return realSequences;
+    if (realSequences == null) {
+      return Collections.emptySet();
+    } else {
+      return Arrays.stream(realSequences.split(",")).collect(Collectors.toUnmodifiableSet());
+    }
+  }
+
+  public void setRealSequences(String realSequences) {
+    if (LimsUtils.isStringEmptyOrNull(realSequences)) {
+      this.realSequences = null;
+    } else {
+      this.realSequences = Arrays.stream(realSequences.split(",")).sorted().collect(Collectors.joining(","));
+    }
   }
 
   public void setRealSequences(Set<String> realSequences) {
-    this.realSequences = realSequences;
+    if (realSequences == null || realSequences.isEmpty()) {
+      this.realSequences = null;
+    } else {
+      this.realSequences = realSequences.stream().sorted().collect(Collectors.joining(","));
+    }
   }
 
   @Override

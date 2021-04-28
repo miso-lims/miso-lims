@@ -98,12 +98,7 @@ public class DefaultIndexService extends AbstractSaveService<Index> implements I
     to.setName(from.getName());
     to.setSequence(from.getSequence());
     to.setPosition(from.getPosition());
-    to.getRealSequences().removeIf(sequence -> !from.getRealSequences().contains(sequence));
-    for (String sequence : from.getRealSequences()) {
-      if (!to.getRealSequences().contains(sequence)) {
-        to.getRealSequences().add(sequence);
-      }
-    }
+    to.setRealSequences(from.getRealSequences());
   }
 
   @Override
