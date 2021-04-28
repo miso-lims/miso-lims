@@ -18,7 +18,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -93,7 +92,8 @@ public class ListPoolView implements Aliasable, Nameable, Serializable, Timestam
   private String boxLocationBarcode;
   private String boxPosition;
 
-  @OneToMany(mappedBy = "pool")
+  @ManyToMany
+  @JoinTable(name = "Pool_LibraryAliquot", joinColumns = @JoinColumn(name = "poolId"), inverseJoinColumns = @JoinColumn(name = "aliquotId"))
   private List<ListPoolViewElement> elements;
 
   @Immutable
