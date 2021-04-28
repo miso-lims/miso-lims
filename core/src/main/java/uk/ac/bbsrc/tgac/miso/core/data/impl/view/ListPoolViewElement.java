@@ -8,78 +8,22 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Immutable;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolViewElement.ListPoolViewElementId;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 
 @Entity
 @Immutable
 @Table(name = "ListPoolView_Element")
-@IdClass(ListPoolViewElementId.class)
 public class ListPoolViewElement implements Serializable {
 
-  public static class ListPoolViewElementId implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
-    private ListPoolView pool;
-    private long aliquotId;
-
-    public ListPoolView getPool() {
-      return pool;
-    }
-
-    public void setPool(ListPoolView pool) {
-      this.pool = pool;
-    }
-
-    public long getAliquotId() {
-      return aliquotId;
-    }
-
-    public void setAliquotId(long aliquotId) {
-      this.aliquotId = aliquotId;
-    }
-
-    @Override
-    public int hashCode() {
-      final int prime = 31;
-      int result = 1;
-      result = prime * result + (int) (aliquotId ^ (aliquotId >>> 32));
-      result = prime * result + ((pool == null) ? 0 : pool.hashCode());
-      return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (this == obj) return true;
-      if (obj == null) return false;
-      if (getClass() != obj.getClass()) return false;
-      ListPoolViewElementId other = (ListPoolViewElementId) obj;
-      if (aliquotId != other.aliquotId) return false;
-      if (pool == null) {
-        if (other.pool != null) return false;
-      } else if (!pool.equals(other.pool)) return false;
-      return true;
-    }
-
-  }
-
   private static final long serialVersionUID = 1L;
-
-  @Id
-  @ManyToOne(targetEntity = ListPoolView.class)
-  @JoinColumn(name = "poolId")
-  private ListPoolView pool;
 
   @Id
   private long aliquotId;
@@ -102,14 +46,6 @@ public class ListPoolViewElement implements Serializable {
 
   @Enumerated(EnumType.STRING)
   private ConsentLevel consentLevel;
-
-  public ListPoolView getPool() {
-    return pool;
-  }
-
-  public void setPool(ListPoolView pool) {
-    this.pool = pool;
-  }
 
   public long getAliquotId() {
     return aliquotId;

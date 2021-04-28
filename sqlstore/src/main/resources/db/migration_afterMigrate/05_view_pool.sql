@@ -27,19 +27,17 @@ JOIN PoolDistributionView dist ON dist.poolId = p.poolId;
 
 CREATE OR REPLACE VIEW ListPoolView_Element AS
 SELECT
-  link.poolId,
-  lib.libraryId,
   la.aliquotId,
   la.name,
   la.alias,
   la.dnaSize,
+  lib.libraryId,
   lib.lowQuality,
   sam.project_projectId AS projectId,
   sp.alias AS subprojectAlias,
   sp.priority AS subprojectPriority,
   ident.consentLevel
-FROM Pool_LibraryAliquot link
-JOIN LibraryAliquot la ON la.aliquotId = link.aliquotId
+FROM LibraryAliquot la
 JOIN Library lib ON lib.libraryId = la.libraryId
 JOIN Sample sam ON sam.sampleId = lib.sample_sampleId
 LEFT JOIN Subproject sp ON sp.subprojectId = sam.subprojectId
