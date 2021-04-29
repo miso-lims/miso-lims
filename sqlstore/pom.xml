@@ -88,6 +88,12 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
+      <!-- Required to get Spring logging into Log4j2 -->
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-jcl</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-slf4j18-impl</artifactId>
     </dependency>
