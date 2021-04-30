@@ -397,8 +397,7 @@ public class ListPoolView implements Aliasable, Nameable, Serializable, Timestam
   }
 
   public String getLongestIndex() {
-    return LimsUtils.getLongestIndex(getElements().stream()
-        .flatMap(element -> element.getIndices().stream()));
+    return LimsUtils.getLongestIndex(getElements());
   }
 
 }

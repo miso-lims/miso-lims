@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -56,10 +55,10 @@ import com.google.common.collect.Lists;
 
 import net.sf.json.JSONArray;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
@@ -176,7 +175,7 @@ public class EditPoolController {
     model.put("sequencingParametersJson", array.toString());
   }
 
-  private final BulkEditTableBackend<Pool, PoolDto> bulkEditBackend = new BulkEditTableBackend<Pool, PoolDto>(
+  private final BulkEditTableBackend<Pool, PoolDto> bulkEditBackend = new BulkEditTableBackend<>(
       "pool", PoolDto.class, "Pools") {
 
     @Override
@@ -239,12 +238,10 @@ public class EditPoolController {
       }
 
       Set<LibraryAliquotDto> aliquotDtos = new HashSet<>();
-      List<List<Index>> masterIndexList = new LinkedList<>();
       for (Pool parent : parents) {
         for (int i = 0; i < parentIds.size(); i++) {
           if (parentIds.get(i).equals(Long.valueOf(parent.getId()))) {
             for (PoolElement element : parent.getPoolContents()) {
-              masterIndexList.add(element.getAliquot().getIndices());
               LibraryAliquotDto existing = aliquotDtos.stream().filter(d -> d.getId().equals(element.getAliquot().getId()))
                   .findFirst().orElse(null);
               if (existing == null) {
@@ -261,9 +258,13 @@ public class EditPoolController {
       }
       dto.setPooledElements(aliquotDtos);
 
-      dto.setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequencesFromList(masterIndexList));
+      List<ParentLibrary> libraries = parents.stream()
+          .flatMap(pool -> pool.getPoolContents().stream())
+          .map(element -> element.getAliquot().getParentLibrary())
+          .collect(Collectors.toList());
+      dto.setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(libraries));
       dto.setNearDuplicateIndices(!dto.getNearDuplicateIndicesSequences().isEmpty());
-      dto.setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequencesFromList(masterIndexList));
+      dto.setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(libraries));
       dto.setDuplicateIndices(!dto.getDuplicateIndicesSequences().isEmpty());
 
       List<VolumeUnit> volumeUnits = parents.stream().map(Pool::getVolumeUnits).filter(Objects::nonNull).distinct()

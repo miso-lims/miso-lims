@@ -39,14 +39,12 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.proxy.HibernateProxy;
@@ -64,6 +62,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.HierarchyEntity;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.IndexedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
@@ -454,7 +453,7 @@ public class LimsUtils {
   }
 
   public static <T> Predicate<T> rejectUntil(Predicate<T> check) {
-    return new Predicate<T>() {
+    return new Predicate<>() {
       private boolean state = false;
 
       @Override
@@ -618,17 +617,23 @@ public class LimsUtils {
     }
   }
 
-  public static String getLongestIndex(Stream<Index> indices) {
-    Map<Integer, Integer> lengths = indices
-        .collect(Collectors.toMap(Index::getPosition, index -> index.getSequence().length(), Integer::max));
-    if (lengths.isEmpty()) {
-      return "0";
+  public static String getLongestIndex(Collection<? extends IndexedLibrary> libraries) {
+    int index1Max = getLongestIndex(libraries, IndexedLibrary::getIndex1);
+    int index2Max = getLongestIndex(libraries, IndexedLibrary::getIndex2);
+    if (index2Max > 0) {
+      return index1Max + "," + index2Max;
+    } else {
+      return String.valueOf(index1Max);
     }
-    return lengths.entrySet().stream()
-        .sorted((a, b) -> a.getKey().compareTo(b.getKey()))
-        .map(Map.Entry<Integer, Integer>::getValue)
-        .map(length -> length.toString())
-        .collect(Collectors.joining(","));
+  }
+
+  public static int getLongestIndex(Collection<? extends IndexedLibrary> libraries, Function<IndexedLibrary, Index> getIndex) {
+    return libraries.stream()
+        .map(getIndex)
+        .filter(Objects::nonNull)
+        .mapToInt(index -> index.getSequence().length())
+        .max()
+        .orElse(0);
   }
 
 }

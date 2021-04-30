@@ -772,14 +772,10 @@ public class BulkLibraryIT extends AbstractIT {
     testLibraryAttribute(LibColumns.PLATFORM, attributes, library, lib -> lib.getPlatformType().getKey());
     testLibraryAttribute(LibColumns.ID_BARCODE, attributes, library, Library::getIdentificationBarcode);
     testLibraryAttribute(LibColumns.LIBRARY_TYPE, attributes, library, lib -> lib.getLibraryType().getDescription());
-    testLibraryAttribute(LibColumns.INDEX_FAMILY, attributes, library, lib -> {
-      if (lib.getIndices() == null || lib.getIndices().isEmpty()) {
-        return null;
-      }
-      return lib.getIndices().iterator().next().getFamily().getName();
-    });
-    testLibraryAttribute(LibColumns.INDEX_1, attributes, library, indexGetter(1));
-    testLibraryAttribute(LibColumns.INDEX_2, attributes, library, indexGetter(2));
+    testLibraryAttribute(LibColumns.INDEX_FAMILY, attributes, library,
+        lib -> lib.getIndex1() == null ? null : lib.getIndex1().getFamily().getName());
+    testLibraryAttribute(LibColumns.INDEX_1, attributes, library, lib -> lib.getIndex1() == null ? null : lib.getIndex1().getLabel());
+    testLibraryAttribute(LibColumns.INDEX_2, attributes, library, lib -> lib.getIndex2() == null ? null : lib.getIndex2().getLabel());
     testLibraryAttribute(LibColumns.QC_STATUS, attributes, library,
         lib -> lib.getDetailedQcStatus() == null ? "Not Ready" : lib.getDetailedQcStatus().getDescription());
     testLibraryAttribute(LibColumns.QC_NOTE, attributes, library, Library::getDetailedQcStatusNote);
@@ -873,15 +869,6 @@ public class BulkLibraryIT extends AbstractIT {
     } while (!isTissueSample(sam));
     return (SampleTissue) deproxify(sam);
   };
-
-  private Function<Library, String> indexGetter(int position) {
-    return lib -> {
-      if (lib.getIndices() == null || lib.getIndices().size() < position) {
-        return null;
-      }
-      return lib.getIndices().stream().filter(index -> index.getPosition() == position).findFirst().get().getLabel();
-    };
-  }
 
   private <T> void testLibraryAttribute(String column, Map<String, String> attributes, T object, Function<T, String> getter) {
     if (attributes.containsKey(column)) {

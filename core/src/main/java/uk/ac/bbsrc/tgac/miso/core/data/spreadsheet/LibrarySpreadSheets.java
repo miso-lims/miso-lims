@@ -21,10 +21,10 @@ public enum LibrarySpreadSheets implements Spreadsheet<Library> {
       Column.forString("Barcode", Library::getIdentificationBarcode), //
       Column.forString("Library Type", library -> library.getLibraryType().getDescription()),
       Column.forString("Library Design", true, library -> ((DetailedLibrary)library).getLibraryDesignCode().getCode()), //
-      Column.forString("i7 Index Name", listIndexName(1)), //
-      Column.forString("i7 Index", listIndex(1)), //
-      Column.forString("i5 Index Name", listIndexName(2)), //
-      Column.forString("i5 Index", listIndex(2)), //
+      Column.forString("i7 Index Name", library -> getName(library.getIndex1())), //
+      Column.forString("i7 Index", library -> getSequence(library.getIndex1())), //
+      Column.forString("i5 Index Name", library -> getName(library.getIndex2())), //
+      Column.forString("i5 Index", library -> getSequence(library.getIndex2())), //
       Column.forString("Sample Name", library -> library.getSample().getName()), //
       Column.forString("Sample Alias", library -> library.getSample().getAlias()), //
       Column.forString("Sample Barcode", library -> library.getSample().getIdentificationBarcode()), //
@@ -41,10 +41,10 @@ public enum LibrarySpreadSheets implements Spreadsheet<Library> {
       Column.forBigDecimal("Concentration", Library::getConcentration), //
       Column.forString("Concentration Units", lib -> lib.getConcentrationUnits() == null ? "" : lib.getConcentrationUnits().getRawLabel()), //
       Column.forInteger("Size (bp)", Library::getDnaSize), //
-      Column.forString("Index 1", listIndex(1)), //
-      Column.forString("Index 2", listIndex(2)), //
+      Column.forString("Index 1", library -> getSequence(library.getIndex1())), //
+      Column.forString("Index 2", library -> getSequence(library.getIndex2())), //
       Column.forString("Index Family",
-          lib -> lib.getIndices() == null || lib.getIndices().isEmpty() ? "" : lib.getIndices().iterator().next().getFamily().getName())), //
+          lib -> lib.getIndex1() == null ? null : lib.getIndex1().getFamily().getName())), //
   DILUTION_PREPARATION("Dilution Preparation", //
       Column.forString("Name", Library::getName), //
       Column.forString("Alias", Library::getAlias), //
@@ -55,10 +55,9 @@ public enum LibrarySpreadSheets implements Spreadsheet<Library> {
       Column.forBigDecimal("Volume", Library::getVolume), //
       Column.forString("Volume Units", lib -> lib.getVolumeUnits() == null ? "" : lib.getVolumeUnits().getRawLabel()), //
       Column.forInteger("Size (bp)", Library::getDnaSize), //
-      Column.forString("Index 1", listIndex(1)), //
-      Column.forString("Index 2", listIndex(2)), //
-      Column.forString("Index Family",
-          lib -> lib.getIndices() == null || lib.getIndices().isEmpty() ? "" : lib.getIndices().iterator().next().getFamily().getName()));
+      Column.forString("Index 1", library -> getSequence(library.getIndex1())), //
+      Column.forString("Index 2", library -> getSequence(library.getIndex2())), //
+      Column.forString("Index Family", lib -> lib.getIndex1() == null ? null : lib.getIndex1().getFamily().getName()));
 
   private static <S extends DetailedSample, T> Function<Library, T> detailedSample(Class<S> clazz, Function<S, T> function,
       T defaultValue) {
@@ -76,16 +75,12 @@ public enum LibrarySpreadSheets implements Spreadsheet<Library> {
     };
   }
 
-  private static Function<Library, String> listIndex(int position) {
-    return library -> library.getIndices().stream().filter(i -> i.getPosition() == position)
-        .map(Index::getSequence)
-        .findFirst().orElse("");
+  private static String getSequence(Index index) {
+    return index == null ? null : index.getSequence();
   }
 
-  private static Function<Library, String> listIndexName(int position) {
-    return library -> library.getIndices().stream().filter(i -> i.getPosition() == position)
-        .map(Index::getName)
-        .findFirst().orElse("");
+  private static String getName(Index index) {
+    return index == null ? null : index.getName();
   }
 
   private static Function<Library, String> groupIdFunction() {

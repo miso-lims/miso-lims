@@ -30,7 +30,6 @@ DELETE FROM PoolChangeLog;
 DELETE FROM Pool;
 DELETE FROM LibraryAliquotChangeLog;
 DELETE FROM LibraryAliquot;
-DELETE FROM Library_Index;
 DELETE FROM Library_Note;
 DELETE FROM LibraryChangeLog;
 DELETE FROM Library;

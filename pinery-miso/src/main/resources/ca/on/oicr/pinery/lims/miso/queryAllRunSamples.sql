@@ -17,16 +17,8 @@ JOIN Pool_LibraryAliquot ele ON ele.poolId = pool.poolId
 JOIN LibraryAliquot ld ON ld.aliquotId = ele.aliquotId 
 JOIN Library l ON l.libraryId = ld.libraryId 
 LEFT JOIN TargetedSequencing tr ON tr.targetedSequencingId = ld.targetedSequencingId
-LEFT JOIN ( 
-  SELECT library_libraryId, sequence FROM Library_Index 
-  JOIN Indices ON Indices.indexId = Library_Index.index_indexId 
-  WHERE position = 1
-) bc1 ON bc1.library_libraryId = l.libraryId
-LEFT JOIN ( 
-  SELECT library_libraryId, sequence FROM Library_Index 
-  JOIN Indices ON Indices.indexId = Library_Index.index_indexId
-  WHERE position = 2 
-) bc2 ON bc2.library_libraryId = l.libraryId
+LEFT JOIN Indices bc1 ON bc1.indexId = l.index1Id
+LEFT JOIN Indices bc2 ON bc2.indexId = l.index2Id
 JOIN Run_SequencerPartitionContainer rspc ON rspc.containers_containerId = spc.containerId
 JOIN Run ON Run.runId = rspc.run_runId
 JOIN Instrument inst ON inst.instrumentId = Run.instrumentId

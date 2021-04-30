@@ -16,8 +16,6 @@ import org.junit.Test;
 import com.google.common.collect.Maps;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
@@ -399,12 +397,12 @@ public class LibraryPageIT extends AbstractIT {
     assertAttribute(Field.STRATEGY, expectedValues,
         nullValueOrGet(lib.getLibraryStrategyType(), LibraryStrategyType::getName, "None"));
     assertAttribute(Field.INDEX_FAMILY, expectedValues,
-        lib.getIndices() == null || lib.getIndices().isEmpty() ? "No indices" : lib.getIndices().iterator().next().getFamily().getName());
+        lib.getIndex1() == null ? "No indices" : lib.getIndex1().getFamily().getName());
     if (expectedValues.containsKey(Field.INDEX_1)) {
-      assertAttribute(Field.INDEX_1, expectedValues, getIndexString(lib, 1));
+      assertAttribute(Field.INDEX_1, expectedValues, lib.getIndex1() == null ? "None" : lib.getIndex1().getLabel());
     }
     if (expectedValues.containsKey(Field.INDEX_2)) {
-      assertAttribute(Field.INDEX_2, expectedValues, getIndexString(lib, 2));
+      assertAttribute(Field.INDEX_2, expectedValues, lib.getIndex2() == null ? "None" : lib.getIndex2().getLabel());
     }
     assertAttribute(Field.DETAILED_QC_STATUS, expectedValues,
         replaceIfNull(lib.getDetailedQcStatus() == null ? null : lib.getDetailedQcStatus().getDescription(), "Not Ready"));
@@ -417,11 +415,6 @@ public class LibraryPageIT extends AbstractIT {
     assertAttribute(Field.KIT, expectedValues, nullOrGet(lib.getKitDescriptor(), KitDescriptor::getName));
     assertAttribute(Field.CONCENTRATION, expectedValues, LimsUtils.toNiceString(lib.getConcentration()));
     assertAttribute(Field.ARCHIVED, expectedValues, lib.getArchived().toString());
-  }
-
-  private static String getIndexString(Library lib, int position) {
-    Index index = lib.getIndices().stream().filter(i -> i.getPosition() == position).findFirst().orElse(null);
-    return nullValueOrGet(index, Index::getLabel, "None");
   }
 
 }

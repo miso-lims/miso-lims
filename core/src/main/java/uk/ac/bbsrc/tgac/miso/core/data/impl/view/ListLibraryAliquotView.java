@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -30,7 +29,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingControlType;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
@@ -319,10 +317,6 @@ public class ListLibraryAliquotView implements DetailedQcItem, Identifiable, Ser
 
   public PlatformType getPlatformType() {
     return getLibraryAttribute(ParentLibrary::getPlatformType);
-  }
-
-  public List<Index> getIndices() {
-    return getLibraryAttribute(ParentLibrary::getIndices);
   }
 
   public Long getSampleId() {

@@ -8,6 +8,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -112,8 +113,9 @@ public class HibernateListPoolViewDao implements ListPoolViewDao, HibernatePagin
   @Override
   public void restrictPaginationByIndex(Criteria criteria, String query, Consumer<String> errorHandler) {
     criteria.createAlias("elements", "element")
-        .createAlias("element.indices", "indices")
-        .add(DbUtils.textRestriction(query, "indices.name", "indices.sequence"));
+        .createAlias("element.index1", "index1")
+        .createAlias("element.index2", "index2", JoinType.LEFT_OUTER_JOIN)
+        .add(DbUtils.textRestriction(query, "index1.name", "index1.sequence", "index2.name", "index2.sequence"));
   }
 
   @Override

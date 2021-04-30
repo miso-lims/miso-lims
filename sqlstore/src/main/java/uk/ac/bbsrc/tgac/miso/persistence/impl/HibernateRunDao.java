@@ -15,6 +15,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -293,8 +294,9 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
         .createAlias("pool.poolElements", "poolElement")
         .createAlias("poolElement.aliquot", "aliquot")
         .createAlias("aliquot.parentLibrary", "library")
-        .createAlias("library.indices", "indices")
-        .add(DbUtils.textRestriction(query, "indices.name", "indices.sequence"));
+        .createAlias("library.index1", "index1")
+        .createAlias("library.index2", "index2", JoinType.LEFT_OUTER_JOIN)
+        .add(DbUtils.textRestriction(query, "index1.name", "index1.sequence", "index2.name", "index2.sequence"));
   }
 
   @Override
