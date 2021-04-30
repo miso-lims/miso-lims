@@ -73,6 +73,12 @@
     <dependency>
      <groupId>commons-fileupload</groupId>
      <artifactId>commons-fileupload</artifactId>
+     <exclusions>
+       <exclusion>
+         <groupId>commons-io</groupId>
+         <artifactId>commons-io</artifactId>
+       </exclusion>
+     </exclusions>
     </dependency>
     <dependency>
       <groupId>commons-httpclient</groupId>

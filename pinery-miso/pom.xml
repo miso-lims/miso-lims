@@ -75,10 +75,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-    </dependency>
-    <dependency>
       <groupId>uk.ac.bbsrc.tgac.miso</groupId>
       <artifactId>sqlstore</artifactId>
     </dependency>
@@ -230,7 +226,7 @@
               </execution>
             </executions>
             <configuration>
-              <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?autoReconnect=true</url>
+              <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?autoReconnect=true&amp;useSSL=false</url>
               <user>${mysql.user}</user>
               <password>${mysql.pw}</password>
               <locations>
@@ -257,7 +253,7 @@
             <configuration>
               <systemPropertyVariables>
                 <!-- Make URLs available for tests -->
-                <miso.it.mysql.url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?autoReconnect=true</miso.it.mysql.url>
+                <miso.it.mysql.url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?autoReconnect=true&amp;useSSL=false</miso.it.mysql.url>
                 <miso.it.mysql.user>${mysql.user}</miso.it.mysql.user>
                 <miso.it.mysql.pw>${mysql.pw}</miso.it.mysql.pw>
               </systemPropertyVariables>
