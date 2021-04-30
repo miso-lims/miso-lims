@@ -361,7 +361,9 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   @Override
   public boolean hasLibrariesWithoutIndex() {
-    return getPoolContents().stream().map(PoolElement::getAliquot).anyMatch(v -> v.getIndices().isEmpty());
+    return getPoolContents().stream()
+        .map(element -> element.getAliquot().getParentLibrary())
+        .anyMatch(lib -> lib.getIndex1() == null);
   }
 
   @Override
@@ -514,8 +516,9 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   @Override
   public String getLongestIndex() {
-    return LimsUtils.getLongestIndex(poolElements.stream()
-        .flatMap(element -> element.getAliquot().getIndices().stream()));
+    return LimsUtils.getLongestIndex(getPoolContents().stream()
+        .map(element -> element.getAliquot().getParentLibrary())
+        .collect(Collectors.toList()));
   }
 
   @Override

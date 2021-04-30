@@ -34,7 +34,6 @@ DELETE FROM LibraryAliquotChangeLog;
 DELETE FROM LibraryChangeLog;
 DELETE FROM LibraryDesign;
 DELETE FROM LibraryDesignCode;
-DELETE FROM Library_Index;
 DELETE FROM Library_Note;
 DELETE FROM LibraryQC;
 DELETE FROM LibrarySelectionType;

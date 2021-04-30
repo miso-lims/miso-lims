@@ -21,6 +21,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
 
@@ -1401,23 +1402,15 @@ public class Dtos {
       dto.setKitDescriptorId(from.getKitDescriptor().getId());
     }
     setString(dto::setKitLot, from.getKitLot());
-    if (!from.getIndices().isEmpty()) {
-      IndexFamily family = from.getIndices().iterator().next().getFamily();
+    if (from.getIndex1() != null) {
+      IndexFamily family = from.getIndex1().getFamily();
       dto.setIndexFamilyId(family.getId());
       dto.setIndexFamilyName(family.getName());
-      for (Index index : from.getIndices()) {
-        switch (index.getPosition()) {
-        case 1:
-          dto.setIndex1Id(index.getId());
-          dto.setIndex1Label(index.getLabel());
-          break;
-        case 2:
-          dto.setIndex2Id(index.getId());
-          dto.setIndex2Label(index.getLabel());
-          break;
-        default:
-          throw new IllegalArgumentException("Index at position " + index.getPosition());
-        }
+      dto.setIndex1Id(from.getIndex1().getId());
+      dto.setIndex1Label(from.getIndex1().getLabel());
+      if (from.getIndex2() != null) {
+        dto.setIndex2Id(from.getIndex2().getId());
+        dto.setIndex2Label(from.getIndex2().getLabel());
       }
     }
     setString(dto::setInitialVolume, from.getInitialVolume());
@@ -1495,11 +1488,11 @@ public class Dtos {
     if (from.getIndex1Id() != null) {
       Index tb1 = new Index();
       tb1.setId(from.getIndex1Id());
-      to.getIndices().add(tb1);
+      to.setIndex1(tb1);
       if (from.getIndex2Id() != null) {
         Index tb2 = new Index();
         tb2.setId(from.getIndex2Id());
-        to.getIndices().add(tb2);
+        to.setIndex2(tb2);
       }
     }
     setBigDecimal(to::setInitialVolume, from.getInitialVolume());
@@ -1668,10 +1661,11 @@ public class Dtos {
       setId(dto::setLibraryKitDescriptorId, library.getKitDescriptor());
       setBoolean(dto::setLibraryLowQuality, library.isLowQuality(), false);
       setString(dto::setLibraryPlatformType, library.getPlatformType().getKey());
-      if (library.getIndices() != null && !library.getIndices().isEmpty()) {
-        dto.setIndexIds(library.getIndices().stream().sorted(Comparator.comparingInt(Index::getPosition)).map(Index::getId)
+      if (library.getIndex1() != null) {
+        List<Index> indices = Stream.of(library.getIndex1(), library.getIndex2()).filter(Objects::nonNull).collect(Collectors.toList());
+        dto.setIndexIds(indices.stream().sorted(Comparator.comparingInt(Index::getPosition)).map(Index::getId)
             .collect(Collectors.toList()));
-        dto.setIndexLabels(library.getIndices().stream().sorted(Comparator.comparingInt(Index::getPosition)).map(Index::getLabel)
+        dto.setIndexLabels(indices.stream().sorted(Comparator.comparingInt(Index::getPosition)).map(Index::getLabel)
             .collect(Collectors.toList()));
       }
       if (sample != null) {
@@ -1767,9 +1761,13 @@ public class Dtos {
     dto.setCreationDate(formatDate(from.getCreated()));
     dto.setIdentificationBarcode(from.getAliquotBarcode());
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
-    dto.setIndexIds(
-        from.getIndices().stream().sorted(Comparator.comparingInt(Index::getPosition)).map(Index::getId).collect(Collectors.toList()));
-    dto.setIndexLabels(from.getIndices().stream().sorted(Comparator.comparingInt(Index::getPosition)).map(Index::getLabel)
+    dto.setIndexIds(Stream.of(from.getParentLibrary().getIndex1(), from.getParentLibrary().getIndex2())
+        .filter(Objects::nonNull)
+        .map(Index::getId)
+        .collect(Collectors.toList()));
+    dto.setIndexLabels(Stream.of(from.getParentLibrary().getIndex1(), from.getParentLibrary().getIndex2())
+        .filter(Objects::nonNull)
+        .map(Index::getLabel)
         .collect(Collectors.toList()));
     dto.setTargetedSequencingId(from.getTargetedSequencingId());
     setInteger(dto::setDnaSize, from.getDnaSize(), true);
@@ -1938,7 +1936,7 @@ public class Dtos {
         indexChecker.getDuplicateIndicesSequences(from) != null && !indexChecker.getDuplicateIndicesSequences(from).isEmpty());
     to.setNearDuplicateIndices(
         indexChecker.getNearDuplicateIndicesSequences(from) != null && !indexChecker.getNearDuplicateIndicesSequences(from).isEmpty());
-    to.setHasEmptySequence(from.getElements().stream().anyMatch(element -> element.getIndices() == null || element.getIndices().isEmpty()));
+    to.setHasEmptySequence(from.getElements().stream().anyMatch(element -> element.getIndex1() == null));
     to.setPrioritySubprojectAliases(from.getPrioritySubprojectAliases());
     to.setPooledElements(from.getElements().stream()
         .map(element -> {

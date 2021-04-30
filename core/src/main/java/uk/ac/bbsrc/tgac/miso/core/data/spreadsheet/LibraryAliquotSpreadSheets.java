@@ -1,12 +1,15 @@
 package uk.ac.bbsrc.tgac.miso.core.data.spreadsheet;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
-import uk.ac.bbsrc.tgac.miso.core.data.*;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
@@ -23,8 +26,8 @@ public enum LibraryAliquotSpreadSheets implements Spreadsheet<LibraryAliquot> {
       Column.forString("Library Type", libraryAliquot -> libraryAliquot.getLibrary().getLibraryType().getDescription()), //
       Column.forString("Library Design", true, libraryAliquot -> ((DetailedLibraryAliquot)libraryAliquot).getLibraryDesignCode().getCode()), //
       Column.forString("Index(es)", LibraryAliquotSpreadSheets::listIndices), //
-      Column.forString("i7 Index", listIndex(1)), //
-      Column.forString("i5 Index", listIndex(2)), //
+      Column.forString("i7 Index", libraryAliquot -> getSequence(libraryAliquot.getLibrary().getIndex1())), //
+      Column.forString("i5 Index", libraryAliquot -> getSequence(libraryAliquot.getLibrary().getIndex2())), //
       Column.forString("Targeted Sequencing",
           libraryAliquot -> libraryAliquot.getTargetedSequencing() != null ? libraryAliquot.getTargetedSequencing().getAlias() : ""), //
       Column.forString("Sample Name", libraryAliquot -> libraryAliquot.getLibrary().getSample().getName()), //
@@ -44,11 +47,10 @@ public enum LibraryAliquotSpreadSheets implements Spreadsheet<LibraryAliquot> {
       Column.forString("Concentration Units",
           aliquot -> aliquot.getConcentrationUnits() == null ? "" : aliquot.getConcentrationUnits().getRawLabel()), //
       Column.forInteger("Size (bp)", LibraryAliquot::getDnaSize), //
-      Column.forString("Index 1", listIndex(1)), //
-      Column.forString("Index 2", listIndex(2)), //
+      Column.forString("Index 1", libraryAliquot -> getSequence(libraryAliquot.getLibrary().getIndex1())), //
+      Column.forString("Index 2", libraryAliquot -> getSequence(libraryAliquot.getLibrary().getIndex2())), //
       Column.forString("Index Family",
-          aliquot -> aliquot.getLibrary().getIndices() == null || aliquot.getLibrary().getIndices().isEmpty() ? ""
-              : aliquot.getLibrary().getIndices().iterator().next().getFamily().getName())), //
+          aliquot -> aliquot.getLibrary().getIndex1() == null ? null : aliquot.getLibrary().getIndex1().getFamily().getName())), //
   DILUTION_PREPARATION("Dilution Preparation", //
       Column.forString("Name", LibraryAliquot::getName), //
       Column.forString("Alias", LibraryAliquot::getAlias), //
@@ -60,11 +62,10 @@ public enum LibraryAliquotSpreadSheets implements Spreadsheet<LibraryAliquot> {
       Column.forBigDecimal("Volume", LibraryAliquot::getVolume), //
       Column.forString("Volume Units", aliquot -> aliquot.getVolumeUnits() == null ? "" : aliquot.getVolumeUnits().getRawLabel()), //
       Column.forInteger("Size (bp)", LibraryAliquot::getDnaSize), //
-      Column.forString("Index 1", listIndex(1)), //
-      Column.forString("Index 2", listIndex(2)), //
+      Column.forString("Index 1", libraryAliquot -> getSequence(libraryAliquot.getLibrary().getIndex1())), //
+      Column.forString("Index 2", libraryAliquot -> getSequence(libraryAliquot.getLibrary().getIndex2())), //
       Column.forString("Index Family",
-          aliquot -> aliquot.getLibrary().getIndices() == null || aliquot.getLibrary().getIndices().isEmpty() ? ""
-              : aliquot.getLibrary().getIndices().iterator().next().getFamily().getName()));
+          aliquot -> aliquot.getLibrary().getIndex1() == null ? null : aliquot.getLibrary().getIndex1().getFamily().getName()));
 
   private static <S extends DetailedSample, T> Function<LibraryAliquot, T> detailedSample(Class<S> clazz, Function<S, T> function,
       T defaultValue) {
@@ -84,14 +85,19 @@ public enum LibraryAliquotSpreadSheets implements Spreadsheet<LibraryAliquot> {
   }
 
   private static String listIndices(LibraryAliquot libraryAliquot) {
-    return libraryAliquot.getLibrary().getIndices().stream().sorted(Comparator.comparingInt(Index::getPosition)).map(Index::getSequence)
-        .collect(Collectors.joining(", "));
+    Index index1 = libraryAliquot.getLibrary().getIndex1();
+    Index index2 = libraryAliquot.getLibrary().getIndex2();
+    if (index1 == null) {
+      return null;
+    } else if (index2 == null) {
+      return index1.getSequence();
+    } else {
+      return index1.getSequence() + ", " + index2.getSequence();
+    }
   }
 
-  private static Function<LibraryAliquot, String> listIndex(int position) {
-    return libraryAliquot -> libraryAliquot.getLibrary().getIndices().stream().filter(i -> i.getPosition() == position)
-        .map(Index::getSequence)
-        .findFirst().orElse("");
+  private static String getSequence(Index index) {
+    return index == null ? null : index.getSequence();
   }
 
   private static Function<LibraryAliquot, String> groupIdFunction() {

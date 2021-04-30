@@ -77,7 +77,7 @@ public abstract class JQueryDataTableBackend<Model, Dto> {
       dtResponse.setITotalRecords(numItems);
       dtResponse.setITotalDisplayRecords(numMatches);
       dtResponse.setAaData(dtos);
-      dtResponse.setSEcho(new Long(request.getParameter("sEcho")));
+      dtResponse.setSEcho(Long.valueOf(request.getParameter("sEcho")));
       String errorMessage = errorBuffer.toString();
       if (errorMessage.length() > 0) {
         dtResponse.setSError(errorMessage);

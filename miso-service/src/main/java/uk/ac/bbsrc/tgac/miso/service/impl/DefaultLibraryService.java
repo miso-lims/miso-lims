@@ -10,10 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -39,7 +36,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
@@ -49,7 +45,6 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BarcodableReferenceService;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
-import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.core.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
@@ -112,8 +107,6 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   private SampleService sampleService;
   @Autowired
   private KitDescriptorService kitService;
-  @Autowired
-  private ChangeLogService changeLogService;
   @Autowired
   private BoxService boxService;
   @Autowired
@@ -256,7 +249,6 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     Library managed = get(library.getId());
     User changeUser = authorizationManager.getCurrentUser();
     managed.setChangeDetails(changeUser);
-    Set<Index> originalIndices = new HashSet<>(managed.getIndices());
     maybeRemoveFromBox(library, managed);
     boxService.throwIfBoxPositionIsFilled(library);
     library.setSample(sampleService.get(library.getSample().getId()));
@@ -265,7 +257,6 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     loadChildEntities(library);
     validateChange(library, managed, false);
     applyChanges(managed, library);
-    makeChangeLogForIndices(originalIndices, managed.getIndices(), managed);
     Library saved = save(managed, validateAliasUniqueness);
     sampleStore.update(library.getParent());
     boxService.updateBoxableLocation(library);
@@ -328,55 +319,6 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   }
 
   /**
-   * Turns indices into strings for easier comparison and changelog message concatentation.
-   * 
-   * @param indices
-   * @return
-   */
-  private Set<String> stringifyIndices(Collection<Index> indices) {
-    Set<String> original = new HashSet<>();
-    for (Index index : indices) {
-      if (index != null && index.isSaved()) {
-        original.add(index.getFamily().getName() + " - " + index.getLabel());
-      }
-    }
-    return original;
-  }
-
-  /**
-   * Create a changelog if the indices have changed.
-   * 
-   * @param originalIndices
-   * @param updatedIndices
-   * @param target
-   * @throws IOException
-   */
-  private void makeChangeLogForIndices(Set<Index> originalIndices, Set<Index> updatedIndices, Library target) throws IOException {
-
-    Set<String> original = stringifyIndices(originalIndices);
-    Set<String> updated = stringifyIndices(updatedIndices);
-    Set<String> added = new TreeSet<>(updated);
-    added.removeAll(original);
-    Set<String> removed = new TreeSet<>(original);
-    removed.removeAll(updated);
-
-    if (!added.isEmpty() || !removed.isEmpty()) {
-      StringBuilder message = new StringBuilder();
-      message.append("Indices");
-      LimsUtils.appendSet(message, removed, "removed");
-      LimsUtils.appendSet(message, added, (removed.isEmpty() ? "" : "; ") + "added");
-
-      LibraryChangeLog changeLog = new LibraryChangeLog();
-      changeLog.setLibrary(target);
-      changeLog.setColumnsChanged("indices");
-      changeLog.setSummary(message.toString());
-      changeLog.setTime(new Date());
-      changeLog.setUser(authorizationManager.getCurrentUser());
-      changeLogService.create(changeLog);
-    }
-  }
-
-  /**
    * Loads persisted objects into library fields. Should be called before saving libraries. Loads all member objects <b>except</b>
    * <ul>
    * <li>creator/lastModifier User objects</li>
@@ -399,13 +341,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     if (library.getLibraryStrategyType() != null) {
       library.setLibraryStrategyType(libraryStrategyService.get(library.getLibraryStrategyType().getId()));
     }
-    List<Index> managedIndices = new ArrayList<>();
-    for (Index index : library.getIndices()) {
-      Index managedIndex = indexService.get(index.getId());
-      if (managedIndex != null) managedIndices.add(managedIndex);
-    }
-    library.getIndices().clear();
-    library.getIndices().addAll(managedIndices);
+    loadChildEntity(library::setIndex1, library.getIndex1(), indexService, "index1Id");
+    loadChildEntity(library::setIndex2, library.getIndex2(), indexService, "index2Id");
     if (library.getKitDescriptor() != null) {
       library.setKitDescriptor(kitService.get(library.getKitDescriptor().getId()));
     }
@@ -472,7 +409,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     target.setQcUser(source.getQcUser());
     target.setQcDate(source.getQcDate());
 
-    applySetChanges(target.getIndices(), source.getIndices());
+    target.setIndex1(source.getIndex1());
+    target.setIndex2(source.getIndex2());
     target.setKitDescriptor(source.getKitDescriptor());
     target.setKitLot(source.getKitLot());
     target.setSpikeIn(source.getSpikeIn());
@@ -573,28 +511,25 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   }
 
   private static void validateIndices(Library library, List<ValidationError> errors) {
-    Set<Index> indices = library.getIndices();
-    switch (indices.size()) {
-    case 0:
-      break;
-    case 1:
-      if (indices.iterator().next().getPosition() != 1) {
-        errors.add(new ValidationError("Invalid index position"));
+    Index index1 = library.getIndex1();
+    Index index2 = library.getIndex2();
+    if (index1 != null) {
+      if (index1.getPosition() != 1) {
+        errors.add(new ValidationError("index1Id", "Invalid index position"));
       }
-      break;
-    case 2:
-      if (indices.stream().noneMatch(index -> index.getPosition() == 1) || indices.stream().noneMatch(index -> index.getPosition() == 2)) {
-        errors.add(new ValidationError("Invalid index positions"));
+      if (index1.getFamily().getPlatformType() != library.getPlatformType()) {
+        errors.add(new ValidationError("Library platform and index family are incompatible"));
       }
-      if (indices.stream().map(index -> index.getFamily().getId()).distinct().count() > 1) {
-        errors.add(new ValidationError("Indices must belong to the same family"));
+      if (index2 != null) {
+        if (index2.getPosition() != 2) {
+          errors.add(new ValidationError("index2Id", "Invalid index position"));
+        }
+        if (index2.getFamily().getId() != index1.getFamily().getId()) {
+          errors.add(new ValidationError("index2Id", "Indices must belong to the same family"));
+        }
       }
-      break;
-    default:
-      errors.add(new ValidationError("A library can only have a maximum of 2 indices"));
-    }
-    if (indices.stream().anyMatch(index -> index.getFamily().getPlatformType() != library.getPlatformType())) {
-      errors.add(new ValidationError("Library platform and index family are incompatible"));
+    } else if (index2 != null) {
+      errors.add(new ValidationError("index2Id", "Cannot specify index2 without index1"));
     }
   }
 
@@ -696,10 +631,6 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
 
   public void setKitDescriptorService(KitDescriptorService kitService) {
     this.kitService = kitService;
-  }
-
-  public void setChangeLogService(ChangeLogService changeLogService) {
-    this.changeLogService = changeLogService;
   }
 
   public void setBoxService(BoxService boxService) {

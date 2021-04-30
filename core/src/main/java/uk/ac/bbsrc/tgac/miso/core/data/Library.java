@@ -27,7 +27,6 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Set;
 
 import com.eaglegenomics.simlims.core.Note;
 
@@ -53,7 +52,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface Library extends Attachable, Comparable<Library>, Deletable, HierarchyEntity, Locatable,
+public interface Library extends Attachable, Comparable<Library>, Deletable, HierarchyEntity, IndexedLibrary, Locatable,
     QualityControllable<LibraryQC>, Serializable {
 
   public static final String PREFIX = "LIB";
@@ -205,11 +204,6 @@ public interface Library extends Attachable, Comparable<Library>, Deletable, Hie
    *          LibraryStrategyType.
    */
   public void setLibraryStrategyType(LibraryStrategyType libraryStrategyType);
-
-  /**
-   * Returns the indices for this Library object.
-   */
-  public Set<Index> getIndices();
 
   /**
    * Returns the platformType of this Library object.

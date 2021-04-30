@@ -232,15 +232,12 @@ INSERT INTO SampleChangeLog(sampleId, columnsChanged, message, userId, changeTim
 
 INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, sample_sampleId, platformType,
   libraryType, librarySelectionType, libraryStrategyType, creationDate, creator, created, lastModifier, lastModified, detailedQcStatusId, qcDate, dnaSize,
-  volume, concentration, locationBarcode, kitDescriptorId, discriminator,
+  volume, concentration, locationBarcode, kitDescriptorId, index1Id, discriminator,
   archived, libraryDesign, libraryDesignCodeId, nonStandardAlias) VALUES
   (1, 'LIB1', 'TEST_0001_Bn_R_PE_300_WG', '11211', 'description lib 1', 8, 'ILLUMINA',
     1, 3, 1,  '2016-11-07', 1, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00', 1, '2017-07-20', 300,
-    5.0, 2.75, NULL, 1, 'DetailedLibrary',
+    5.0, 2.75, NULL, 1, 5, 'DetailedLibrary',
     0, 1, 7, FALSE);
-
-INSERT INTO Library_Index(library_libraryId, index_indexId) VALUES
-  (1, 5);
 
 INSERT INTO LibraryAliquot (aliquotId, name, alias, concentration, libraryId, identificationBarcode, creationDate, creator, lastModifier, lastUpdated, discriminator, libraryDesignCodeId, nonStandardAlias) VALUES
 (1, 'LDI1', 'TEST_0001_Bn_R_PE_300_WG', 5.9, 1, '12321', '2017-07-20', 1, 1, '2017-07-20 09:01:00', 'DetailedLibraryAliquot', 7, FALSE);

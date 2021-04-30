@@ -168,7 +168,7 @@ SELECT l.alias NAME
         ,NULL purpose 
         ,bc1.sequence barcode 
         ,bc2.sequence barcode_two
-        ,bc1.indexFamily barcode_kit
+        ,fam.name barcode_kit
         ,l.umis
         ,qpd.status qcPassed
         ,qpd.description detailedQcStatus
@@ -218,22 +218,9 @@ LEFT JOIN LibrarySpikeIn lsi ON lsi.spikeInId = l.spikeInId
 LEFT JOIN KitDescriptor kd ON kd.kitDescriptorId = l.kitDescriptorId
 LEFT JOIN LibraryDesignCode ldc ON l.libraryDesignCodeId = ldc.libraryDesignCodeId
 LEFT JOIN LibraryType lt ON lt.libraryTypeId = l.libraryType
-LEFT JOIN ( 
-        SELECT library_libraryId 
-                ,sequence
-                ,IndexFamily.name indexFamily
-        FROM Library_Index 
-        INNER JOIN Indices ON Indices.indexId = Library_Index.index_indexId
-        JOIN IndexFamily ON IndexFamily.indexFamilyId = Indices.indexFamilyId
-        WHERE position = 1 
-        ) bc1 ON bc1.library_libraryId = l.libraryId 
-LEFT JOIN ( 
-        SELECT library_libraryId 
-                ,sequence 
-        FROM Library_Index 
-        INNER JOIN Indices ON Indices.indexId = Library_Index.index_indexId 
-                WHERE position = 2 
-        ) bc2 ON bc2.library_libraryId = l.libraryId 
+LEFT JOIN Indices bc1 ON bc1.indexId = l.index1Id
+LEFT JOIN IndexFamily fam ON fam.indexFamilyId = bc1.indexFamilyId
+LEFT JOIN Indices bc2 ON bc2.indexId = l.index2Id
 LEFT JOIN BoxPosition pos ON pos.targetId = l.libraryId 
         AND pos.targetType = 'LIBRARY' 
 LEFT JOIN Box box ON box.boxId = pos.boxId

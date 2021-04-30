@@ -257,10 +257,11 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   @Override
   public void restrictPaginationByIndex(Criteria criteria, String query, Consumer<String> errorHandler) {
     if (LimsUtils.isStringBlankOrNull(query)) {
-      criteria.add(Restrictions.isEmpty("indices"));
+      criteria.add(Restrictions.isNull("index1"));
     } else {
-      criteria.createAlias("indices", "indices")
-          .add(DbUtils.textRestriction(query, "indices.name", "indices.sequence"));
+      criteria.createAlias("index1", "index1")
+          .createAlias("index2", "index2", JoinType.LEFT_OUTER_JOIN)
+          .add(DbUtils.textRestriction(query, "index1.name", "index1.sequence", "index2.name", "index2.sequence"));
     }
   }
 

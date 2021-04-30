@@ -53,7 +53,6 @@ DELETE FROM ArrayModel;
 DELETE FROM LibraryQC;
 DELETE FROM LibraryAliquotChangeLog;
 DELETE FROM LibraryAliquot;
-DELETE FROM Library_Index;
 DELETE FROM Library_Note;
 DELETE FROM LibraryChangeLog;
 DELETE FROM Library;

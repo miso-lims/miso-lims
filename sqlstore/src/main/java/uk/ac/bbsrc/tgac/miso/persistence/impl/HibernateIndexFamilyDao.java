@@ -27,8 +27,8 @@ public class HibernateIndexFamilyDao extends HibernateSaveDao<IndexFamily> imple
   @Override
   public long getUsage(IndexFamily indexFamily) throws IOException {
     return (long) currentSession().createCriteria(LibraryImpl.class)
-        .createAlias("indices", "index")
-        .createAlias("index.family", "indexFamily")
+        .createAlias("index1", "index1")
+        .createAlias("index1.family", "indexFamily")
         .add(Restrictions.eq("indexFamily.id", indexFamily.getId()))
         .setProjection(Projections.rowCount())
         .uniqueResult();

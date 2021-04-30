@@ -10,6 +10,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -110,8 +111,11 @@ public class HibernateIndexDao extends HibernateSaveDao<Index> implements IndexS
   @Override
   public long getUsage(Index index) throws IOException {
     return (long) currentSession().createCriteria(LibraryImpl.class)
-        .createAlias("indices", "index")
-        .add(Restrictions.eq("index.id", index.getId()))
+        .createAlias("index1", "index1")
+        .createAlias("index2", "index2", JoinType.LEFT_OUTER_JOIN)
+        .add(Restrictions.or(
+            Restrictions.eq("index1.id", index.getId()),
+            Restrictions.eq("index2.id", index.getId())))
         .setProjection(Projections.rowCount())
         .uniqueResult();
   }

@@ -8,16 +8,19 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.IndexedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentDataManglingPolicy;
 import uk.ac.bbsrc.tgac.miso.core.data.Pair;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 
 public enum IlluminaExperiment {
@@ -95,13 +98,17 @@ public enum IlluminaExperiment {
   }
 
   private int getMaxLength(List<Pool> pools, int position) {
-    return pools.stream()//
-        .flatMap(pool -> pool.getPoolContents().stream())//
-        .flatMap(element -> element.getAliquot().getIndices().stream())//
-        .filter(i -> i.getPosition() == position)//
-        .flatMap(i -> i.getFamily().hasFakeSequence() ? i.getRealSequences().stream() : Stream.of(i.getSequence()))//
-        .mapToInt(String::length)//
-        .max().orElse(0);
+    List<ParentLibrary> libraries = pools.stream()
+        .flatMap(pool -> pool.getPoolContents().stream())
+        .map(element -> element.getAliquot().getParentLibrary())
+        .collect(Collectors.toList());
+    if (position == 1) {
+      return LimsUtils.getLongestIndex(libraries, IndexedLibrary::getIndex1);
+    } else if (position == 2) {
+      return LimsUtils.getLongestIndex(libraries, IndexedLibrary::getIndex2);
+    } else {
+      throw new IllegalArgumentException("Invalid index position: " + position);
+    }
   }
 
   public final String makeSampleSheet(String genomeFolder, SequencingParameters parameters, String read1Primer, String indexPrimer,
@@ -114,15 +121,15 @@ public enum IlluminaExperiment {
     header.put("Instrument Type", parameters.getInstrumentModel().getAlias().replace("Illumina ", ""));
     header.put("Index Adapters", pools.stream()//
         .flatMap(pool -> pool.getPoolContents().stream())//
-        .flatMap(element -> element.getAliquot().getIndices().stream())//
+        .map(element -> element.getAliquot().getParentLibrary().getIndex1())//
+        .filter(Objects::nonNull)
         .map(i -> i.getFamily().getName())//
         .distinct()//
         .sorted()//
         .collect(Collectors.joining("/")));
     if (pools.stream()//
         .flatMap(pool -> pool.getPoolContents().stream())
-        .flatMap(element -> element.getAliquot().getIndices().stream())//
-        .anyMatch(index -> index.getPosition() == 2)) {
+        .anyMatch(element -> element.getAliquot().getParentLibrary().getIndex2() != null)) {
       header.put("Chemistry", "Amplicon");
     } else {
       header.put("Chemistry", "Default");
@@ -165,7 +172,10 @@ public enum IlluminaExperiment {
     output.append("GenomeFolder,Sample_Project,Description\n");
     for (int lane = 0; lane < pools.size(); lane++) {
       for (final PoolElement element : pools.get(lane).getPoolContents()) {
-        final List<Index> indices = element.getAliquot().getIndices();
+        ParentLibrary library = element.getAliquot().getParentLibrary();
+        final List<Index> indices = Stream.of(library.getIndex1(), library.getIndex2())
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
         final List<Pair<Pair<String, String>, Pair<String, String>>> outputIndicies;
         if (indices.isEmpty()) {
           outputIndicies = Collections.singletonList(

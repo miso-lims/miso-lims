@@ -4,12 +4,10 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.google.common.collect.Lists;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 
 public class PoolImplTest {
 
@@ -40,17 +38,18 @@ public class PoolImplTest {
   }
 
   private void addElement(PoolImpl pool, String index1) {
-    addElement(pool, makeIndex(index1, 1));
+    addElement(pool, makeIndex(index1, 1), null);
   }
   
   private void addElement(PoolImpl pool, String index1, String index2) {
     addElement(pool, makeIndex(index1, 1), makeIndex(index2, 2));
   }
 
-  private void addElement(PoolImpl pool, Index... indices) {
+  private void addElement(PoolImpl pool, Index index1, Index index2) {
     ListLibraryAliquotView ldi = new ListLibraryAliquotView();
     ldi.setParentLibrary(new ParentLibrary());
-    ldi.getParentLibrary().setIndices(Lists.newArrayList(indices));
+    ldi.getParentLibrary().setIndex1(index1);
+    ldi.getParentLibrary().setIndex2(index2);
     PoolElement element = new PoolElement(pool, ldi);
     pool.getPoolContents().add(element);
   }

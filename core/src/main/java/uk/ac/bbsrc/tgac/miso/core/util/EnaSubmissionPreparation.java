@@ -31,7 +31,6 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment.RunPartition;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pair;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
@@ -40,8 +39,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
 
@@ -174,12 +174,13 @@ public class EnaSubmissionPreparation {
               xmlPool.appendChild(xmlMember);
 
               Element xmlReadLabel = xml.getOwnerDocument().createElementNS(null, "READ_LABEL");
-              if (!aliquot.getIndices().isEmpty()) {
-                StringBuilder tsb = new StringBuilder();
-                StringBuilder vsb = new StringBuilder();
-                for (Index index : aliquot.getIndices()) {
-                  tsb.append(index.getSequence());
-                  vsb.append(index.getName());
+              ParentLibrary library = aliquot.getParentLibrary();
+              if (library.getIndex1() != null) {
+                StringBuilder tsb = new StringBuilder(library.getIndex1().getSequence());
+                StringBuilder vsb = new StringBuilder(library.getIndex1().getName());
+                if (library.getIndex2() != null) {
+                  tsb.append(library.getIndex2().getSequence());
+                  vsb.append(library.getIndex2().getName());
                 }
                 xmlReadLabel.setAttribute("read_group_tag", tsb.toString());
                 xmlReadLabel.setTextContent(vsb.toString());

@@ -154,11 +154,13 @@ public class LibraryImpl extends AbstractBoxable implements Library {
   @Enumerated(EnumType.STRING)
   private VolumeUnit volumeUnits;
 
-  @ManyToMany(targetEntity = Index.class)
-  @JoinTable(name = "Library_Index", joinColumns = {
-      @JoinColumn(name = "library_libraryId", nullable = false) }, inverseJoinColumns = {
-          @JoinColumn(name = "index_indexId", nullable = false) })
-  private Set<Index> indices;
+  @ManyToOne
+  @JoinColumn(name = "index1Id")
+  private Index index1;
+
+  @ManyToOne
+  @JoinColumn(name = "index2Id")
+  private Index index2;
 
   @OneToMany(targetEntity = LibraryQC.class, mappedBy = "library", cascade = CascadeType.ALL)
   private final Collection<LibraryQC> libraryQCs = new TreeSet<>();
@@ -371,11 +373,23 @@ public class LibraryImpl extends AbstractBoxable implements Library {
   }
 
   @Override
-  public Set<Index> getIndices() {
-    if (indices == null) {
-      indices = new HashSet<>();
-    }
-    return indices;
+  public Index getIndex1() {
+    return index1;
+  }
+
+  @Override
+  public void setIndex1(Index index1) {
+    this.index1 = index1;
+  }
+
+  @Override
+  public Index getIndex2() {
+    return index2;
+  }
+
+  @Override
+  public void setIndex2(Index index2) {
+    this.index2 = index2;
   }
 
   @Override
@@ -653,7 +667,8 @@ public class LibraryImpl extends AbstractBoxable implements Library {
         .append(getAlias())
         .append(description)
         .append(identificationBarcode)
-        .append(indices)
+        .append(index1)
+        .append(index2)
         .append(concentration)
         .append(librarySelectionType)
         .append(libraryStrategyType)
@@ -683,7 +698,8 @@ public class LibraryImpl extends AbstractBoxable implements Library {
         .append(getAlias(), other.getAlias())
         .append(description, other.description)
         .append(identificationBarcode, other.identificationBarcode)
-        .append(indices, other.indices)
+        .append(index1, other.index1)
+        .append(index2, other.index2)
         .append(concentration, other.concentration)
         .append(librarySelectionType, other.librarySelectionType)
         .append(libraryStrategyType, other.libraryStrategyType)

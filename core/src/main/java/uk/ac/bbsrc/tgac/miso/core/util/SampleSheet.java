@@ -2,11 +2,11 @@ package uk.ac.bbsrc.tgac.miso.core.util;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -19,8 +19,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.InstrumentDataManglingPolicy;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 
 public enum SampleSheet {
   BCL2FASTQ("BCL2FASTQ") {
@@ -57,8 +57,8 @@ public enum SampleSheet {
         ListLibraryAliquotView aliquot,
         List<String> index,
         String userName) {
-      final Optional<Index> firstIndex = aliquot.getIndices().stream().filter(i -> i.getPosition() == 1).findFirst();
-      final Optional<Index> secondIndex = aliquot.getIndices().stream().filter(i -> i.getPosition() == 2).findFirst();
+      final Optional<Index> firstIndex = Optional.ofNullable(aliquot.getParentLibrary().getIndex1());
+      final Optional<Index> secondIndex = Optional.ofNullable(aliquot.getParentLibrary().getIndex2());
       return Stream.of(
           aliquot.getLibraryAlias() + (needsSuffix ? ("_" + String.join("_", index)) : ""), //
           aliquot.getLibraryName(), //
@@ -176,8 +176,15 @@ public enum SampleSheet {
     protected Stream<String> flattenRows(InstrumentModel model, int partitionNumber, String partitionBarcode,
         ListLibraryAliquotView aliquot,
         String userName) {
+      List<String> indexSequences = new ArrayList<>();
+      if (aliquot.getParentLibrary().getIndex1() != null) {
+        indexSequences.add(aliquot.getParentLibrary().getIndex1().getSequence());
+        if (aliquot.getParentLibrary().getIndex2() != null) {
+          indexSequences.add(aliquot.getParentLibrary().getIndex2().getSequence());
+        }
+      }
       return Stream.of(makeColumns(false, model, partitionNumber, partitionBarcode, aliquot,
-          aliquot.getIndices().stream().map(Index::getSequence).collect(Collectors.toList()), userName).collect(Collectors.joining(",")));
+          indexSequences, userName).collect(Collectors.joining(",")));
     }
   };
   private static char complement(char nt) {
@@ -262,30 +269,32 @@ public enum SampleSheet {
   }
 
   protected Stream<String> flattenRows(InstrumentModel model, int partitionNumber, String partitionBarcode,
-      ListLibraryAliquotView aliquot,
-      String userName) {
-    Set<Integer> positions = aliquot.getIndices().stream().map(Index::getPosition).collect(Collectors.toCollection(TreeSet::new));
-    if (positions.isEmpty()) {
+      ListLibraryAliquotView aliquot, String userName) {
+    if (aliquot.getParentLibrary().getIndex1() == null) {
       return Stream.of(makeColumns(false, model, partitionNumber, partitionBarcode, aliquot, Collections.emptyList(), userName)
           .collect(Collectors.joining(",")));
     }
     List<List<String>> indices = null;
-    for (int position : positions) {
-      List<String> suffixes = aliquot.getIndices().stream().filter(i -> i.getPosition() == position)
-          .flatMap(i -> i.getFamily().hasFakeSequence() ? i.getRealSequences().stream() : Stream.of(i.getSequence()))
-          .map(
-              model.getDataManglingPolicy() == InstrumentDataManglingPolicy.I5_RC
-                  && position == 2 ? SampleSheet::reverseComplement : Function.identity())
+    Index index1 = aliquot.getParentLibrary().getIndex1();
+    Index index2 = aliquot.getParentLibrary().getIndex2();
+    if (index1.getFamily().hasFakeSequence()) {
+      indices = index1.getRealSequences().stream()
+          .map(Collections::singletonList)
           .collect(Collectors.toList());
-      if (indices == null) {
-        indices = suffixes.stream().map(Collections::singletonList).collect(Collectors.toList());
+    } else {
+      indices = Arrays.asList(Collections.singletonList(index1.getSequence()));
+    }
+    if (index2 != null) {
+      if (index2.getFamily().hasFakeSequence()) {
+        indices.addAll(index2.getRealSequences().stream()
+            .map(model.getDataManglingPolicy() == InstrumentDataManglingPolicy.I5_RC ? SampleSheet::reverseComplement : Function.identity())
+            .map(Collections::singletonList)
+            .collect(Collectors.toList()));
       } else {
-        indices = indices.stream()//
-            .flatMap(prefix -> suffixes.stream()//
-                .map(suffix -> Stream.concat(prefix.stream(), //
-                    Stream.of(suffix))//
-                    .collect(Collectors.toList())))//
-            .collect(Collectors.toList());
+        String sequence = model.getDataManglingPolicy() == InstrumentDataManglingPolicy.I5_RC
+            ? SampleSheet.reverseComplement(index2.getSequence())
+            : index2.getSequence();
+        indices.add(Collections.singletonList(sequence));
       }
     }
     final boolean needsSuffix = indices.size() > 1;

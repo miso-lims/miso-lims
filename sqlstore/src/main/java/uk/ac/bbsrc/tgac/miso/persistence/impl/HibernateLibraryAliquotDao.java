@@ -162,10 +162,11 @@ public class HibernateLibraryAliquotDao
   @Override
   public void restrictPaginationByIndex(Criteria criteria, String query, Consumer<String> errorHandler) {
     if (LimsUtils.isStringBlankOrNull(query)) {
-      criteria.add(Restrictions.isEmpty("library.indices"));
+      criteria.add(Restrictions.isNull("library.index1"));
     } else {
-      criteria.createAlias("library.indices", "indices", JoinType.LEFT_OUTER_JOIN)
-          .add(DbUtils.textRestriction(query, "indices.name", "indices.sequence"));
+      criteria.createAlias("library.index1", "index1")
+          .createAlias("library.index2", "index2", JoinType.LEFT_OUTER_JOIN)
+          .add(DbUtils.textRestriction(query, "index1.name", "index1.sequence", "index2.name", "index2.sequence"));
     }
   }
 

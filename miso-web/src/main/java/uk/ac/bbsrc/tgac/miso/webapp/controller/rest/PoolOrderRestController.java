@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
@@ -61,7 +62,7 @@ public class PoolOrderRestController extends RestController {
     }
   }
 
-  private final JQueryDataTableBackend<PoolOrder, PoolOrderDto> jQueryBackend = new JQueryDataTableBackend<PoolOrder, PoolOrderDto>() {
+  private final JQueryDataTableBackend<PoolOrder, PoolOrderDto> jQueryBackend = new JQueryDataTableBackend<>() {
 
     @Override
     protected PaginatedDataSource<PoolOrder> getSource() throws IOException {
@@ -104,8 +105,9 @@ public class PoolOrderRestController extends RestController {
   public IndexResponseDto indexChecker(@RequestBody(required = true) List<Long> ids) throws IOException {
     List<LibraryAliquot> aliquots = ids.stream().map(WhineyFunction.rethrow(libraryAliquotService::get)).collect(Collectors.toList());
     IndexResponseDto response = new IndexResponseDto();
-    response.setDuplicateIndices(indexChecker.getDuplicateIndicesSequences(aliquots));
-    response.setNearDuplicateIndices(indexChecker.getNearDuplicateIndicesSequences(aliquots));
+    List<Library> libraries = aliquots.stream().map(LibraryAliquot::getLibrary).collect(Collectors.toList());
+    response.setDuplicateIndices(indexChecker.getDuplicateIndicesSequences(libraries));
+    response.setNearDuplicateIndices(indexChecker.getNearDuplicateIndicesSequences(libraries));
     return response;
   }
 

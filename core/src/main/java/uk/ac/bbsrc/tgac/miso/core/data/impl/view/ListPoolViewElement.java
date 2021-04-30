@@ -1,27 +1,25 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl.view;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Immutable;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.IndexedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 
 @Entity
 @Immutable
 @Table(name = "ListPoolView_Element")
-public class ListPoolViewElement implements Serializable {
+public class ListPoolViewElement implements IndexedLibrary, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -35,11 +33,13 @@ public class ListPoolViewElement implements Serializable {
   private boolean lowQuality;
   private Long dnaSize;
 
-  @ManyToMany(targetEntity = Index.class)
-  @JoinTable(name = "Library_Index", joinColumns = {
-      @JoinColumn(name = "library_libraryId", nullable = false, referencedColumnName = "libraryId") }, inverseJoinColumns = {
-          @JoinColumn(name = "index_indexId", nullable = false) })
-  private final List<Index> indices = new ArrayList<>();
+  @ManyToOne
+  @JoinColumn(name = "index1Id")
+  private Index index1;
+
+  @ManyToOne
+  @JoinColumn(name = "index2Id")
+  private Index index2;
 
   private String subprojectAlias;
   private Boolean subprojectPriority = false;
@@ -103,8 +103,24 @@ public class ListPoolViewElement implements Serializable {
     this.dnaSize = dnaSize;
   }
 
-  public List<Index> getIndices() {
-    return indices;
+  @Override
+  public Index getIndex1() {
+    return index1;
+  }
+
+  @Override
+  public void setIndex1(Index index1) {
+    this.index1 = index1;
+  }
+
+  @Override
+  public Index getIndex2() {
+    return index2;
+  }
+
+  @Override
+  public void setIndex2(Index index2) {
+    this.index2 = index2;
   }
 
   public String getSubprojectAlias() {

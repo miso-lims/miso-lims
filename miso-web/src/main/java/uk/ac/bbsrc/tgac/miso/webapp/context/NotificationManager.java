@@ -30,7 +30,6 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -384,10 +383,10 @@ public class NotificationManager {
       cells.add(makeTd(makeLocationLabel(transferLibrary)));
       cells.add(makeTd(library.getPlatformType().getKey()));
       cells.add(makeTd(library.getLibraryType().getDescription()));
-      cells.add(makeTd(getIndexName(library, 1)));
-      cells.add(makeTd(getIndexSequence(library, 1)));
-      cells.add(makeTd(getIndexName(library, 2)));
-      cells.add(makeTd(getIndexSequence(library, 2)));
+      cells.add(makeTd(library.getIndex1() == null ? null : library.getIndex1().getName()));
+      cells.add(makeTd(library.getIndex1() == null ? null : library.getIndex1().getSequence()));
+      cells.add(makeTd(library.getIndex2() == null ? null : library.getIndex2().getName()));
+      cells.add(makeTd(library.getIndex2() == null ? null : library.getIndex2().getSequence()));
       rows.add(tr().with(cells));
     }
 
@@ -409,10 +408,10 @@ public class NotificationManager {
       cells.add(makeTd(makeLocationLabel(transferLibraryAliquot)));
       cells.add(makeTd(library.getPlatformType().getKey()));
       cells.add(makeTd(library.getLibraryType().getDescription()));
-      cells.add(makeTd(getIndexName(library, 1)));
-      cells.add(makeTd(getIndexSequence(library, 1)));
-      cells.add(makeTd(getIndexName(library, 2)));
-      cells.add(makeTd(getIndexSequence(library, 2)));
+      cells.add(makeTd(library.getIndex1() == null ? null : library.getIndex1().getName()));
+      cells.add(makeTd(library.getIndex1() == null ? null : library.getIndex1().getSequence()));
+      cells.add(makeTd(library.getIndex2() == null ? null : library.getIndex2().getName()));
+      cells.add(makeTd(library.getIndex2() == null ? null : library.getIndex2().getSequence()));
       rows.add(tr().with(cells));
     }
 
@@ -467,20 +466,6 @@ public class NotificationManager {
     } else {
       return null;
     }
-  }
-
-  private static String getIndexName(Library library, int position) {
-    return library.getIndices().stream().filter(index -> index.getPosition() == position)
-        .map(Index::getName)
-        .findFirst()
-        .orElse(null);
-  }
-
-  private static String getIndexSequence(Library library, int position) {
-    return library.getIndices().stream().filter(index -> index.getPosition() == position)
-        .map(Index::getSequence)
-        .findFirst()
-        .orElse(null);
   }
 
 }

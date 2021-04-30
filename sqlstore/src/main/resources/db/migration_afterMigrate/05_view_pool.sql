@@ -33,6 +33,8 @@ SELECT
   la.dnaSize,
   lib.libraryId,
   lib.lowQuality,
+  lib.index1Id,
+  lib.index2Id,
   sam.project_projectId AS projectId,
   sp.alias AS subprojectAlias,
   sp.priority AS subprojectPriority,

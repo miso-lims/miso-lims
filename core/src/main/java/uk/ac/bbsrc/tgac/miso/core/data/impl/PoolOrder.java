@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -318,7 +319,8 @@ public class PoolOrder implements Deletable, Identifiable, Serializable, Timesta
   }
 
   public String getLongestIndex() {
-    return LimsUtils.getLongestIndex(orderLibraryAliquots.stream()
-        .flatMap(element -> element.getAliquot().getLibrary().getIndices().stream()));
+    return LimsUtils.getLongestIndex(getOrderLibraryAliquots().stream()
+        .map(orderAliquot -> orderAliquot.getAliquot().getLibrary())
+        .collect(Collectors.toList()));
   }
 }
