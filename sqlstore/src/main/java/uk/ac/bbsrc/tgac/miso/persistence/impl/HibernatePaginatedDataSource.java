@@ -464,6 +464,11 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
+  public default void restrictPaginationByIdentityIds(Criteria criteria, List<Long> identityIds, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s cannot be filtered by identity ID.", getFriendlyName()));
+  }
+
+  @Override
   public default void restrictPaginationByBarcode(Criteria criteria, String barcode, Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s cannot be filtered by barcode.", getFriendlyName()));
   }

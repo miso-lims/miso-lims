@@ -22,42 +22,7 @@
           "project": $('#projectAlias').val()
         })
       }).success(function(results) {
-        var tbody = document.getElementById('externalNameResults');
-        results.map(function(result, i) {
-          var tr = document.createElement('TR');
-          tr.className = (i % 2 == 0 ? 'even' : 'odd');
-
-          var extNameTd = document.createElement('TD');
-          var searchTerm = Object.keys(result)[0];
-          extNameTd.appendChild(document.createTextNode(searchTerm));
-          tr.appendChild(extNameTd);
-
-          var identityAliasTd = document.createElement('TD');
-          // create custom buttons for each found identity
-          if (!result[searchTerm].length) {
-            // Explicitly tell the user that no results were found
-            var span = document.createElement('SPAN');
-            var txt = document.createTextNode('(None found)');
-            span.appendChild(txt);
-            identityAliasTd.appendChild(span);
-          } else {
-            result[searchTerm].map(function(sam) {
-              var span = document.createElement('SPAN');
-              span.className = 'small-gap-right clickable-non-link';
-              var label = sam.alias + ' (' + sam.externalName + ')';
-              var txt = document.createTextNode(IdentitySearch.unbreakString(label));
-              span.appendChild(txt);
-              span.dataset.alias = sam.alias
-              span.onclick = IdentitySearch.sampleSearchFor;
-              return span;
-            }).map(function(span) {
-              identityAliasTd.appendChild(span);
-              identityAliasTd.appendChild(document.createTextNode(' '));
-            });
-          }
-          tr.appendChild(identityAliasTd);
-          tbody.appendChild(tr);
-        });
+        updateResults(results);
         jQuery('#searchButton').prop('disabled', false);
         jQuery('#ajaxLoaderDiv').empty();
       }).error(function(data) {
@@ -68,23 +33,19 @@
     }
   }
 
-  IdentitySearch.unbreakString = function(str) {
-    // \u00A0 = non-breaking space; \u2011 = non-breaking hyphen
-    return str.split(' ').join('\u00A0').split('-').join('\u2011');
-  }
-
-  IdentitySearch.sampleSearchFor = function() {
-    $('#list_samples_filter input').val(this.dataset.alias);
-    $('#list_samples').dataTable().fnFilter($('#list_samples_filter :input').val()); // regrettably ugly
-  }
-
   IdentitySearch.clearForm = function() {
     $('#externalNames').val('');
     IdentitySearch.clearResults();
   }
 
   IdentitySearch.clearResults = function() {
-    $('#externalNameResults tr').remove();
+    updateResults([]);
+  }
+
+  function updateResults(results) {
+    FormUtils.setTableData(ListTarget.identitysearch, {
+      identitySearch: true
+    }, 'listResults', results);
   }
 
   function getExternalNamesInput() {

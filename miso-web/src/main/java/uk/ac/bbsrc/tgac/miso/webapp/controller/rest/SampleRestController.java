@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -94,6 +93,7 @@ import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
+import uk.ac.bbsrc.tgac.miso.dto.SampleIdentityDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleStockDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissuePieceDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueProcessingDto;
@@ -315,35 +315,19 @@ public class SampleRestController extends RestController {
   @PostMapping(value = "/identitiesLookup", headers = { "Content-type=application/json" })
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public List<Map<String, Set<SampleDto>>> getIdentitiesBySearch(@RequestParam boolean exactMatch,
+  public List<SampleIdentityDto> getIdentitiesBySearch(@RequestParam boolean exactMatch,
       @RequestBody JsonNode json, HttpServletResponse response) throws IOException {
     final JsonNode searchTerms = json.get("identitiesSearches");
-    final String project = (json.get("project") == null ? "" : json.get("project").asText());
+    Project project = (json.get("project") == null ? null : projectService.getProjectByShortName(json.get("project").asText()));
     if (!searchTerms.isArray() || searchTerms.size() == 0) {
       throw new RestException("Please provide external name or alias for identity lookup", Status.BAD_REQUEST);
     }
-    List<Map<String, Set<SampleDto>>> identitiesBySearchTerm = new ArrayList<>();
+    List<String> externalNames = new ArrayList<>();
     for (int i = 0; i < searchTerms.size(); i++) {
-      JsonNode term = searchTerms.get(i);
-      Set<SampleDto> uniqueIdentities = getSamplesForIdentityString(term.asText(), project, exactMatch);
-      Map<String, Set<SampleDto>> found = new HashMap<>();
-      found.put(term.asText(), uniqueIdentities);
-      identitiesBySearchTerm.add(i, found);
+      externalNames.add(searchTerms.get(i).asText());
     }
-    return identitiesBySearchTerm;
-  }
-
-  private Set<SampleDto> getSamplesForIdentityString(String identityIdentifier, String project, boolean exactMatch)
-      throws IOException {
-    List<IdentityView> matches = null;
-    Project selected = null;
-    selected = projectService.getProjectByShortName(project);
-    if (selected != null) {
-      matches = sampleService.getIdentitiesByExternalNameOrAliasAndProject(identityIdentifier, selected.getId(), exactMatch);
-    } else {
-      matches = sampleService.getIdentitiesByExternalNameOrAliasAndProject(identityIdentifier, null, exactMatch);
-    }
-    return matches.stream().map(Dtos::asDto).collect(Collectors.toSet());
+    List<IdentityView> results = sampleService.getIdentities(externalNames, exactMatch, project);
+    return results.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
   @PostMapping(value = "/query", produces = { "application/json" })

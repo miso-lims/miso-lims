@@ -34,15 +34,17 @@
 
 <h1>Identity Search Tool</h1>
 
-<p>Find which external names are already associated with an identity in MISO, and which samples are derived from them.</p>
+<p>
+  Find which external names are already associated with an identity in MISO, and which samples are
+  derived from them. Use the 'Show Children' action to display all children of the selected identities. 
+</p>
 <br/>
 
 <div style="display:table; width:100%;">
   <div style="display:table-row;">
     <div style="display:table-cell; width:1px;">
-      <label>External Names<br/>
-        <textarea id="externalNames" rows="25" cols="40"></textarea>
-      </label>
+      <h1>External Names</h1>
+      <textarea id="externalNames" rows="25" cols="40"></textarea>
     </div>
     <div style="display: table-cell; width: 100px; vertical-align: bottom; padding-left: 12px; padding-right: 12px;">
       <div id="ajaxLoaderDiv"></div><br/>
@@ -55,14 +57,9 @@
         style="width:100%; margin-top:6px; margin-bottom:6px;">Search for Partial Match</button><br/>
       <button class="ui-button ui-state-default" onclick="IdentitySearch.clearForm();" style="width:100%;">Clear</button>
     </div>
-    <div style="display:table-cell;">
-      <label>Results</label>
-        <table class="dataTable">
-          <thead>
-            <tr><th>External Name</th><th>Identity Alias</th></tr>
-          </thead>
-          <tbody id="externalNameResults"></tbody>
-        </table>
+    <div>
+      <h1>Identity Results</h1>
+      <div id="listResults"></div>
     </div>
   </div>
 </div>
@@ -70,6 +67,7 @@
 <script type="text/javascript">
 jQuery(document).ready(function () {
   Utils.ui.updateHelpLink(Urls.external.userManual('other_miso_tools', 'identity-search'));
+  IdentitySearch.clearResults();
 });
 </script>
 

@@ -3,7 +3,7 @@
 The following tools can help you with planning or finding things within MISO. They can be found by clicking the
 appropriate link in the Tools list in the menu on the left side of the screen.
 
-# Index Distance
+## Index Distance
 
 When you run multiple libraries in a sequencing lane or partition, known as multiplexing, indices are used to
 identify the individual libraries and demultiplex (separate) the data afterwards. If two or more libraries in the pool
@@ -59,10 +59,11 @@ received samples from this donor or organism before, or if you want to see all o
 *Identity Search tool*
 
 To use the Identity Search, enter the external names you're looking for in the External Names box. Optionally, you can
-enter the short name of the project you wish to search in. If no results are found within that project, identities from
-other projects will still be included in the results.
+enter the short name of the project you wish to search in.
 
-After clicking one of the Search buttons -- either for exact or partial matches -- results will be listed in the
-Results box for each external name you entered. Clicking on one of the identity aliases will cause all of its related
-samples to be listed in the Samples list below.
+After clicking one of the Search buttons -- either for exact or partial matches -- matching identity samples will be
+listed in the Identity Results box. To view all children of one or more of these identities, select the identities
+and click the 'Show Children' button. The children will be displayed in the Samples list below.
 
+The Identity Results list also has a 'Children' button, which is useful if you want to perform bulk actions on a
+particular type of descendant, such as tissues, or libraries.

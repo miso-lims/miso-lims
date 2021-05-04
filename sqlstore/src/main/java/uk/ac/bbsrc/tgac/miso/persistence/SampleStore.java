@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
@@ -92,6 +93,18 @@ public interface SampleStore extends PaginatedDataSource<Sample> {
    */
   List<IdentityView> getIdentitiesByExternalNameOrAliasAndProject(String externalName, Long projectId, boolean exactMatch)
       throws IOException;
+
+  /**
+   * List all the identities matching any of the provided external names
+   * 
+   * @param externalNames the external names to search for
+   * @param exactMatch if true, only identities exactly matching one of the provided external names will be included; otherwise, all
+   *          identities with external names containing one of the provided external names will be included
+   * @param project if not null, only identities belonging to this project will be included
+   * @return all matching identities
+   * @throws IOException
+   */
+  List<IdentityView> getIdentities(Collection<String> externalNames, boolean exactMatch, Project project) throws IOException;
 
   /**
    * Find a ghost Tissue with Identity, Tissue Origin, Tissue Type, times received, tube number, and passage number matching the provided

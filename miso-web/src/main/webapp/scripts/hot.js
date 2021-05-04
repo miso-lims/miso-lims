@@ -1286,18 +1286,21 @@ var HotUtils = {
           var childBound = Constants.sampleCategories.length - 1;
           var parentBound = 0;
           for (sample in items) {
-            if (items[sample].sampleClassId === undefined) {
-              parentBound = Constants.sampleCategories.length - 1;
-              continue;
-            }
-            var index = Constants.sampleCategories.indexOf(Constants.sampleClasses.find(function(sampleClass) {
+            var sampleClass = Constants.sampleClasses.find(function(sampleClass) {
               return sampleClass.id == items[sample].sampleClassId;
-            }).sampleCategory);
-            if (index > parentBound) {
-              parentBound = index;
-            }
-            if (index < childBound) {
-              childBound = index;
+            });
+            if (sampleClass) {
+              var index = Constants.sampleCategories.indexOf(sampleClass.sampleCategory);
+              if (index > parentBound) {
+                parentBound = index;
+              }
+              if (index < childBound) {
+                childBound = index;
+              }
+            } else if (items[sample].type === 'Identity') {
+              childBound = 1;
+            } else {
+              parentBound = Constants.sampleCategories.length - 1;
             }
           }
           if (useParentBound) {
