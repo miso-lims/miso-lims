@@ -29,7 +29,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePaginatedDataSource;
 public abstract class HibernatePaginatedDataSourceIT extends AbstractDAOTest {
 
   public enum SearchType {
-    ARCHIVED, ARRAYED, BATCH, BOX, BOX_TYPE, BOX_USE, BULK_LOOKUP, CATEGORY, //
+    ARCHIVED, ARRAYED, BARCODE, BATCH, BOX, BOX_TYPE, BOX_USE, BULK_LOOKUP, CATEGORY, //
     CLASS, CREATED, CREATOR, DISTRIBUTED, DISTRIBUTION_RECIPIENT, DRAFT, //
     ENTERED, EXTERNAL_NAME, FULFILLED, FREEZER, GHOST, GROUP_ID, HEALTH, ID, //
     IDS, INDEX, INSTRUMENT_TYPE, KIT_NAME, KIT_TYPE, LAB, MODEL, MODIFIER, //
@@ -84,6 +84,11 @@ public abstract class HibernatePaginatedDataSourceIT extends AbstractDAOTest {
   @Test
   public void testSearchByNotArrayed() throws Exception {
     testSearch(PaginationFilter.arrayed(false), SearchType.ARRAYED);
+  }
+
+  @Test
+  public void testSearchByBarcode() throws Exception {
+    testSearch(PaginationFilter.barcode("11111111"), SearchType.BARCODE);
   }
 
   @Test

@@ -13,7 +13,7 @@ public class HibernateSampleDaoSearchIT extends HibernatePaginatedDataSourceIT {
       SearchType.PROJECT, SearchType.BOX, SearchType.CREATED, SearchType.UPDATED, SearchType.RECEIVED, SearchType.WORKSET,
       SearchType.CREATOR, SearchType.MODIFIER, SearchType.BULK_LOOKUP, SearchType.CLASS, SearchType.LAB, SearchType.EXTERNAL_NAME,
       SearchType.SUBPROJECT, SearchType.ENTERED, SearchType.GHOST, SearchType.REQUISITION, SearchType.TIMEPOINT, SearchType.ARRAYED,
-      SearchType.GROUP_ID);
+      SearchType.GROUP_ID, SearchType.BARCODE);
 
   private static final List<String> SORT_FIELDS = Arrays.asList("effectiveTissueOriginLabel", "effectiveTissueTypeLabel", "sampleClassId");
 
