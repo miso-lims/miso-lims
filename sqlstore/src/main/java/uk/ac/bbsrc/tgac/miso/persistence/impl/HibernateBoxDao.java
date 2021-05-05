@@ -322,4 +322,9 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
     criteria.add(Restrictions.eq("size.boxType", boxType));
   }
 
+  @Override
+  public void restrictPaginationByBarcode(Criteria criteria, String barcode, Consumer<String> errorHandler) {
+    criteria.add(DbUtils.textRestriction(barcode, FIELD_BARCODE));
+  }
+
 }

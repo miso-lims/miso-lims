@@ -229,4 +229,9 @@ public class HibernateListLibraryAliquotViewDao implements ListLibraryAliquotVie
         .setProjection(Projections.property("libraryaliquot.id"));
     criteria.add(Property.forName("id").in(subquery));
   }
+
+  @Override
+  public void restrictPaginationByBarcode(Criteria criteria, String barcode, Consumer<String> errorHandler) {
+    criteria.add(DbUtils.textRestriction(barcode, "identificationBarcode"));
+  }
 }

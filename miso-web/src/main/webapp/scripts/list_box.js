@@ -146,7 +146,7 @@ ListTarget.box = {
         }];
   },
   searchTermSelector: function(searchTerms) {
-    return [searchTerms['id'], searchTerms['entered'], searchTerms['changed'], searchTerms['creator'], searchTerms['changedby'],
-        searchTerms['boxType'], searchTerms['freezer']];
+    return [searchTerms['id'], searchTerms['barcode'], searchTerms['entered'], searchTerms['changed'], searchTerms['creator'],
+        searchTerms['changedby'], searchTerms['boxType'], searchTerms['freezer']];
   }
 };

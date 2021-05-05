@@ -171,6 +171,10 @@ ListUtils = (function($) {
     "workstation": {
       term: "workstation:TEXT",
       help: "Checks whether the item belongs to or was prepared at the specified workstation. May specify the workstation alias or barcode"
+    },
+    "barcode": {
+      term: "barcode:TEXT",
+      help: "Checks whether the item's barcode matches"
     }
   };
 

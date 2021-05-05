@@ -462,4 +462,9 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
     }
     criteria.add(disjunction);
   }
+
+  @Override
+  public default void restrictPaginationByBarcode(Criteria criteria, String barcode, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s cannot be filtered by barcode.", getFriendlyName()));
+  }
 }

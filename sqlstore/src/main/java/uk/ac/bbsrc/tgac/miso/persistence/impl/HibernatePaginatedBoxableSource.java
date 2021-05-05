@@ -46,4 +46,9 @@ public interface HibernatePaginatedBoxableSource<T extends Boxable> extends Hibe
     }
   }
 
+  @Override
+  public default void restrictPaginationByBarcode(Criteria criteria, String barcode, Consumer<String> errorHandler) {
+    criteria.add(DbUtils.textRestriction(barcode, "identificationBarcode"));
+  }
+
 }
