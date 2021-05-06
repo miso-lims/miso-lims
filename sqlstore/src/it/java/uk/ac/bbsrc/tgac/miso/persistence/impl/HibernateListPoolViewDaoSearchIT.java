@@ -11,7 +11,7 @@ public class HibernateListPoolViewDaoSearchIT extends HibernatePaginatedDataSour
   private static final EnumSet<SearchType> VALID_SEARCH_TYPES = EnumSet.of(SearchType.QUERY, SearchType.ID, SearchType.IDS,
       SearchType.INDEX, SearchType.BOX, SearchType.PROJECT, SearchType.PLATFORM_TYPE, SearchType.FREEZER, SearchType.DISTRIBUTION_RECIPIENT,
       SearchType.CREATED, SearchType.ENTERED, SearchType.UPDATED, SearchType.CREATOR, SearchType.MODIFIER, SearchType.DISTRIBUTED,
-      SearchType.RECEIVED);
+      SearchType.RECEIVED, SearchType.BARCODE);
   private static final List<String> SORT_FIELDS = Arrays.asList("alias", "creationDate");
 
   public HibernateListPoolViewDaoSearchIT() {

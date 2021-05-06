@@ -107,6 +107,8 @@ public class AdvancedSearchParser {
             errorHandler.accept("No filter for " + x);
             return null;
           }
+        case "barcode":
+          return PaginationFilter.barcode(phrase);
         case "created":
         case "createdon":
           return parseDate(phrase, DateType.CREATE, errorHandler);

@@ -166,8 +166,8 @@ ListTarget.pool = {
     }];
   },
   searchTermSelector: function(searchTerms) {
-    return [searchTerms['id'], searchTerms['created'], searchTerms['entered'], searchTerms['changed'], searchTerms['creator'],
-        searchTerms['changedby'], searchTerms['platform'], searchTerms['index'], searchTerms['box'], searchTerms['freezer'],
-        searchTerms['distributed'], searchTerms['distributedto']];
+    return [searchTerms['id'], searchTerms['barcode'], searchTerms['created'], searchTerms['entered'], searchTerms['changed'],
+        searchTerms['creator'], searchTerms['changedby'], searchTerms['platform'], searchTerms['index'], searchTerms['box'],
+        searchTerms['freezer'], searchTerms['distributed'], searchTerms['distributedto']];
   }
 };

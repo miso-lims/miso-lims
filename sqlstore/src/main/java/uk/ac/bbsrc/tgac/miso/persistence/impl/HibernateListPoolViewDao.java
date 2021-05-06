@@ -140,4 +140,9 @@ public class HibernateListPoolViewDao implements ListPoolViewDao, HibernatePagin
     DbUtils.restrictPaginationByDistributionRecipient(criteria, query, "pools", "poolId");
   }
 
+  @Override
+  public void restrictPaginationByBarcode(Criteria criteria, String barcode, Consumer<String> errorHandler) {
+    criteria.add(DbUtils.textRestriction(barcode, "identificationBarcode"));
+  }
+
 }

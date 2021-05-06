@@ -21,6 +21,8 @@ public interface PaginationFilterSink<T> {
 
   public void restrictPaginationByArrayed(T item, boolean isArrayed, Consumer<String> errorHandler);
 
+  public void restrictPaginationByBarcode(T item, String barcode, Consumer<String> errorHandler);
+
   public void restrictPaginationByBatchId(T item, String batchId, Consumer<String> errorHandler);
 
   public void restrictPaginationByBox(T item, String query, Consumer<String> errorHandler);

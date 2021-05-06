@@ -193,10 +193,10 @@ ListTarget.library = {
     }];
   },
   searchTermSelector: function(searchTerms) {
-    const plainSampleTerms = [searchTerms['id'], searchTerms['created'], searchTerms['entered'], searchTerms['changed'],
-        searchTerms['creator'], searchTerms['changedby'], searchTerms['platform'], searchTerms['index'], searchTerms['box'],
-        searchTerms['freezer'], searchTerms['kitname'], searchTerms['distributed'], searchTerms['distributedto'],
-        searchTerms['workstation']];
+    const plainSampleTerms = [searchTerms['id'], searchTerms['barcode'], searchTerms['created'], searchTerms['entered'],
+        searchTerms['changed'], searchTerms['creator'], searchTerms['changedby'], searchTerms['platform'],
+        searchTerms['index'], searchTerms['box'], searchTerms['freezer'], searchTerms['kitname'], searchTerms['distributed'],
+        searchTerms['distributedto'], searchTerms['workstation']];
     const detailedSampleTerms = [searchTerms['tissueOrigin'], searchTerms['tissueType'], searchTerms['groupid']];
     if (Constants.isDetailedSample) {
       return plainSampleTerms.concat(detailedSampleTerms);

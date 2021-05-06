@@ -38,6 +38,16 @@ public abstract interface PaginationFilter {
     };
   }
 
+  public static PaginationFilter barcode(String barcode) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByBarcode(item, barcode, errorHandler);
+      }
+    };
+  }
+
   public static PaginationFilter batchId(String batchId) {
     return new PaginationFilter() {
 
