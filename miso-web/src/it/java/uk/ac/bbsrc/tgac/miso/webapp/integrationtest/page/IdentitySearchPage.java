@@ -14,7 +14,7 @@ public class IdentitySearchPage extends HeaderFooterPage {
   }
 
   public static IdentitySearchPage get(WebDriver driver, String baseUrl) {
-    driver.get(baseUrl + "%smiso/identitysearch");
+    driver.get(baseUrl + "miso/tools/identitysearch");
     return new IdentitySearchPage(driver);
   }
   
