@@ -36,31 +36,31 @@
 
 <p>
   Find which external names are already associated with an identity in MISO, and which samples are
-  derived from them. Use the 'Show Children' action to display all children of the selected identities. 
+  derived from them. Use the 'Filter Below' action to display all children of the selected identities,
+  or the 'Children' action to navigate the hierarchy and perform actions on the children. 
 </p>
 <br/>
 
-<div style="display:table; width:100%;">
-  <div style="display:table-row;">
-    <div style="display:table-cell; width:1px;">
-      <h1>External Names</h1>
-      <textarea id="externalNames" rows="25" cols="40"></textarea>
-    </div>
-    <div style="display: table-cell; width: 100px; vertical-align: bottom; padding-left: 12px; padding-right: 12px;">
-      <div id="ajaxLoaderDiv"></div><br/>
-      <label>Project<br/>
-        <input id="projectAlias" style="width:inherit;"/>
-      </label>
-      <button class="ui-button ui-state-default" onclick="IdentitySearch.lookup(true);"
-        style="width:100%; margin-top:6px; margin-bottom:6px;">Search for Exact Match</button><br/>
-      <button class="ui-button ui-state-default" onclick="IdentitySearch.lookup(false);"
-        style="width:100%; margin-top:6px; margin-bottom:6px;">Search for Partial Match</button><br/>
-      <button class="ui-button ui-state-default" onclick="IdentitySearch.clearForm();" style="width:100%;">Clear</button>
-    </div>
-    <div>
-      <h1>Identity Results</h1>
-      <div id="listResults"></div>
-    </div>
+<div style="display:flex; width:100%;">
+  <div style="flex: 25%; margin-right: 8px;">
+    <h1>Criteria</h1>
+    <label>External Names<br/>
+      <textarea id="externalNames" rows="15" cols="40" style="width:98%;"></textarea>
+    </label>
+    <label>Project<br/>
+      <input id="projectAlias" style="width:98%;"/>
+    </label>
+    <button class="ui-button ui-state-default" onclick="IdentitySearch.lookup(true);"
+      style="width:100%; margin-top:8px;">Search for Exact Match</button><br/>
+    <button class="ui-button ui-state-default" onclick="IdentitySearch.lookup(false);"
+      style="width:100%; margin-top:8px;">Search for Partial Match</button><br/>
+    <button class="ui-button ui-state-default" onclick="IdentitySearch.clearForm();"
+      style="width:100%; margin-top:8px">Clear</button>
+    <div id="ajaxLoaderDiv"></div>
+  </div>
+  <div style="flex: 75%;">
+    <h1>Identity Results</h1>
+    <div id="listResults"></div>
   </div>
 </div>
 

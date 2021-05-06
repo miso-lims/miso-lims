@@ -5,7 +5,7 @@ ListTarget.identitysearch = (function($) {
     createBulkActions: function(config, projectId) {
       return [
           {
-            name: 'Show Children',
+            name: 'Filter Below',
             action: function(items) {
               var idString = items.map(function(identity) {
                 return identity.id;
