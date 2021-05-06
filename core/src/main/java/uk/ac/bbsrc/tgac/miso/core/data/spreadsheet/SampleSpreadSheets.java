@@ -28,9 +28,17 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
           SampleTissueProcessing.CATEGORY_NAME, SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME), //
       Column.forString("Name", Sample::getName), //
       Column.forString("Alias", Sample::getAlias), //
+      Column.forString("Tissue Origin", true, detailedSample(SampleTissue.class, st -> st.getTissueOrigin().getAlias(), "")), //
+      Column.forString("Type", true, dnaOrRna()), //
       Column.forString("Barcode", Sample::getIdentificationBarcode), //
+      Column.forString("Class", true, sam -> LimsUtils.isDetailedSample(sam) ? ((DetailedSample) sam).getSampleClass().getAlias() : null), //
       Column.forString("External Identifier", true, detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
-      Column.forString("Secondary Identifier", true, detailedSample(SampleTissue.class, SampleTissue::getSecondaryIdentifier, "")), //
+      Column.forString("Group ID", true, sam -> LimsUtils.isDetailedSample(sam) ? ((DetailedSample) sam).getGroupId() : null), //
+      Column.forString("Timepoint", true, detailedSample(SampleTissue.class, SampleTissue::getTimepoint, null)), //
+      Column.forString("Subproject", true,
+          (sam -> (LimsUtils.isDetailedSample(sam) && ((DetailedSample) sam).getSubproject() != null
+              ? ((DetailedSample) sam).getSubproject().getAlias()
+              : ""))), //
       Column.forString("Location", BoxUtils::makeLocationLabel)),
   
   BIOBANK_TRANSFER_LIST("BioBank Transfer List", //
@@ -42,36 +50,35 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
   TRANSFER_LIST("Transfer List", //
       Arrays.asList(Sample.PLAIN_CATEGORY_NAME, SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME), //
       Column.forString("Alias", Sample::getAlias), //
-      Column.forString("Type", dnaOrRna()), //
-      Column.forString("External Identifier", detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
+      Column.forString("Type", true, dnaOrRna()), //
+      Column.forString("Barcode", Sample::getIdentificationBarcode), //
+      Column.forString("Class", true, sam -> LimsUtils.isDetailedSample(sam) ? ((DetailedSample) sam).getSampleClass().getAlias() : null), //
+      Column.forString("External Identifier", true, detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
+      Column.forString("Group ID", true, effectiveGroupIdProperty(GroupIdentifiable::getGroupId)), //
       Column.forBigDecimal("VOL (uL)", Sample::getVolume), //
       Column.forBigDecimal("[] (ng/uL)", Sample::getConcentration), //
       Column.forBigDecimal("Total (ng)",
-          (sam -> (sam.getVolume() != null && sam.getConcentration() != null) ? sam.getVolume().multiply(sam.getConcentration()) : null)), //
-      Column.forString("Subproject", true,
-          (sam-> (LimsUtils.isDetailedSample(sam) && ((DetailedSample) sam).getSubproject() != null ? 
-              ((DetailedSample) sam).getSubproject().getAlias() : ""))), //
-      Column.forString("Group ID", true, effectiveGroupIdProperty(GroupIdentifiable::getGroupId)), //
-      Column.forString("Group Description", true, effectiveGroupIdProperty(GroupIdentifiable::getGroupDescription)), //
-      Column.forString("Barcode", Sample::getIdentificationBarcode)
+          (sam -> (sam.getVolume() != null && sam.getConcentration() != null) ? sam.getVolume().multiply(sam.getConcentration()) : null)) //
   ), //
 
   TRANSFER_LIST_V2("Transfer List V2", //
       Arrays.asList(SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME), //
       Column.forString("Alias", Sample::getAlias), //
-      Column.forString("Class", dnaOrRna()), //
       Column.forString("Origin", detailedSample(SampleTissue.class, st -> st.getTissueOrigin().getAlias(), "")), //
       Column.forString("Type", detailedSample(SampleTissue.class, st -> st.getTissueType().getAlias(), "")), //
-      Column.forString("Material",
-          detailedSample(SampleTissue.class, st -> st.getTissueMaterial() != null ? st.getTissueMaterial().getAlias() : "", "")), //
+      Column.forString("Barcode", Sample::getIdentificationBarcode), //
+      Column.forString("Class", true, sam -> LimsUtils.isDetailedSample(sam) ? ((DetailedSample) sam).getSampleClass().getAlias() : null), //
       Column.forString("External Identifier", detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
+      Column.forString("Group ID", effectiveGroupIdProperty(GroupIdentifiable::getGroupId)), //
+      Column.forString("Timepoint", true, detailedSample(SampleTissue.class, SampleTissue::getTimepoint, null)), //
+      Column.forString("Subproject", true,
+          (sam -> (LimsUtils.isDetailedSample(sam) && ((DetailedSample) sam).getSubproject() != null
+              ? ((DetailedSample) sam).getSubproject().getAlias()
+              : ""))), //
       Column.forBigDecimal("VOL (uL)", Sample::getInitialVolume), //
       Column.forBigDecimal("[] (ng/uL)", Sample::getConcentration), //
       Column.forBigDecimal("Total (ng)",
-          (sam -> (sam.getVolume() != null && sam.getConcentration() != null) ? sam.getVolume().multiply(sam.getConcentration()) : null)), //
-      Column.forString("Group ID", effectiveGroupIdProperty(GroupIdentifiable::getGroupId)), //
-      Column.forString("Group Description", effectiveGroupIdProperty(GroupIdentifiable::getGroupDescription)), //
-      Column.forString("Barcode", Sample::getIdentificationBarcode)
+          (sam -> (sam.getVolume() != null && sam.getConcentration() != null) ? sam.getVolume().multiply(sam.getConcentration()) : null)) //
   ), //
   INITIAL_EXTRACTION_YIELDS("Initial Extraction Yields List", //
       Arrays.asList(SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME), //
