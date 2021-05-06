@@ -1,2 +1,0 @@
-Runs are now included in the hierarchy that can be navigated using the Parents/Children buttons
-on the Samples, Libraries, Library Aliquots, Pools, and now Runs lists.

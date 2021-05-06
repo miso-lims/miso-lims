@@ -7,6 +7,37 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.29.0] - 2021-05-06
+
+### Added
+
+* 'Barcode' advanced search term for samples, libraries, library aliquots, pools, and boxes
+* Library Sequencing Report downloadable from the Runs list
+
+### Changed
+
+* Columns included on sample download sheets
+  * Tracking List
+  * Transfer List
+  * Transfer List V2
+* Runs are now included in the hierarchy that can be navigated using the Parents/Children buttons
+  on the Samples, Libraries, Library Aliquots, Pools, and now Runs lists.
+* Display of identities found in the Identity Search Tool (detailed sample)
+  * It is now possible to view the children of multiple identities at once
+  * A 'Children' button has been added so that you can easily perform bulk actions on related
+  samples
+
+### Removed
+
+* Default LCM Tube group ID settings (detailed sample)
+
+### Fixed
+
+* Select All on All Pages action on Transfer Items list
+* Toolbars were not being displayed correctly in the Items list on the Edit Transfer page
+* Improved performance of libraries and pools
+
+
 ## [1.28.1]
 
 Changes:

@@ -1,3 +1,4 @@
+-- indices_performance
 ALTER TABLE Indices ADD COLUMN realSequences varchar(255);
 
 UPDATE Indices
@@ -33,3 +34,4 @@ index2Id = (
 );
 
 DROP TABLE Library_Index;
+
