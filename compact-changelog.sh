@@ -12,6 +12,7 @@ CHANGE_DIR=changes
 CHANGELOG=RELEASE_NOTES.md
 RELEASE_VERSION=$1
 DATE=$(date +%Y-%m-%d)
+TEMP_FILE="temp_changes.md"
 
 BAD_FILES=$(find "${CHANGE_DIR}" -mindepth 1 -maxdepth 1 -not -name "README.md" -and -not -name "add_*" \
   -and -not -name "change_*" -and -not -name "remove_*" -and -not -name "fix_*" \
@@ -33,7 +34,7 @@ if [[ $(grep -c "^----------" "${CHANGELOG}") -ne 1 ]]; then
   exit 4
 fi
 
-CHANGES="\n\n## [${RELEASE_VERSION}] - ${DATE}"
+printf "\n## [${RELEASE_VERSION}] - ${DATE}" > "${TEMP_FILE}"
 
 add_section() {
   # $1: title
@@ -41,12 +42,12 @@ add_section() {
 
   FILES=$(find "${CHANGE_DIR}" -mindepth 1 -maxdepth 1 -name "$2_*")
   if [[ ! -z "${FILES}" ]]; then
-    CHANGES="${CHANGES}\n\n### ${1}\n"
+    printf "\n\n### ${1}\n" >> "${TEMP_FILE}"
 
     for FILE in ${FILES}; do
       PREFIX="* "
       while read LINE; do
-        CHANGES="${CHANGES}\n${PREFIX}${LINE}"
+        printf "\n${PREFIX}${LINE}" >> "${TEMP_FILE}"
         PREFIX="  "
       done <"${FILE}"
     done
@@ -59,6 +60,8 @@ add_section "Removed" "remove"
 add_section "Fixed" "fix"
 add_section "Upgrade Notes" "note"
 
-sed -i "s/^\(-\{10,\}\)/\1${CHANGES}/" "${CHANGELOG}"
+printf "\n\n" >> "${TEMP_FILE}"
+
+sed -i.bak -e "/^\(-\{10,\}\)/ r ${TEMP_FILE}" "${CHANGELOG}"
 rm -f -- "${CHANGE_DIR}"/add_* "${CHANGE_DIR}"/change_* "${CHANGE_DIR}"/remove_* \
-"${CHANGE_DIR}"/fix_* "${CHANGE_DIR}"/note_*
+"${CHANGE_DIR}"/fix_* "${CHANGE_DIR}"/note_* "${TEMP_FILE}" "${CHANGELOG}.bak"
