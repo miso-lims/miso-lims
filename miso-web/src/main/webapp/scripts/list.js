@@ -640,7 +640,7 @@ ListUtils = (function($) {
         var filteredIds = [];
         filteredRows.each(function(index, row) {
           var checkboxId = row.children[0].children[0].id;
-          filteredIds.push(parseInt(checkboxId.match(/^list_.*_toggle(\d+)$/)[1]));
+          filteredIds.push(parseInt(checkboxId.match('^' + elementId + '_toggle(\\d+)$')[1]));
         });
         callback(data.filter(function(item) {
           return filteredIds.indexOf(item.id) !== -1;
