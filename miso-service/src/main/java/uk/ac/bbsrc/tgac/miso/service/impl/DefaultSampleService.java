@@ -32,6 +32,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
@@ -1016,6 +1017,11 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   public List<IdentityView> getIdentitiesByExternalNameOrAliasAndProject(String externalName, Long projectId, boolean exactMatch)
       throws IOException {
     return sampleStore.getIdentitiesByExternalNameOrAliasAndProject(externalName, projectId, exactMatch);
+  }
+
+  @Override
+  public List<IdentityView> getIdentities(Collection<String> externalNames, boolean exactMatch, Project project) throws IOException {
+    return sampleStore.getIdentities(externalNames, exactMatch, project);
   }
 
   @Override

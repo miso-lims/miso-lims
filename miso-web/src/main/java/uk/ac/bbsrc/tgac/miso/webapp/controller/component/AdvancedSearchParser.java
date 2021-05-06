@@ -155,6 +155,13 @@ public class AdvancedSearchParser {
             errorHandler.accept("Invalid ID: " + phrase);
             return null;
           }
+        case "identityid":
+          try {
+            return PaginationFilter.identityIds(LimsUtils.parseIds(phrase));
+          } catch (NumberFormatException ex) {
+            errorHandler.accept("Invalid identity ID: " + phrase);
+            return null;
+          }
         case "index":
           return PaginationFilter.index(phrase);
         case "class":
@@ -207,6 +214,8 @@ public class AdvancedSearchParser {
           return PaginationFilter.model(phrase);
         case "workstation":
           return PaginationFilter.workstation(phrase);
+        default:
+          errorHandler.accept("Unknown search term: " + term);
         }
       }
       return PaginationFilter.query(x);

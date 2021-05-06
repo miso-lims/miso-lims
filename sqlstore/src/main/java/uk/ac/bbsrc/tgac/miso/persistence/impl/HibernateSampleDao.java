@@ -16,6 +16,8 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Disjunction;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
@@ -27,6 +29,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
@@ -203,6 +206,27 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
+  public List<IdentityView> getIdentities(Collection<String> externalNames, boolean exactMatch, Project project)
+      throws IOException {
+    if (externalNames == null || externalNames.isEmpty()) {
+      return Collections.emptyList();
+    }
+    Criteria criteria = currentSession().createCriteria(IdentityView.class);
+    if (project != null) {
+      criteria.add(Restrictions.eq("projectId", project.getId()));
+    }
+    Disjunction disjunction = Restrictions.disjunction();
+    MatchMode matchMode = exactMatch ? MatchMode.EXACT : MatchMode.ANYWHERE;
+    for (String externalName : externalNames) {
+      disjunction.add(Restrictions.ilike("externalName", externalName, matchMode));
+    }
+    criteria.add(disjunction);
+    @SuppressWarnings("unchecked")
+    List<IdentityView> results = criteria.list();
+    return results;
+  }
+
+  @Override
   public SampleTissue getMatchingGhostTissue(SampleTissue tissue) {
     validateGhostTissueLookup(tissue);
     Criteria criteria = currentSession().createCriteria(SampleTissueImpl.class);
@@ -328,13 +352,11 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
 
   @Override
   public void restrictPaginationByExternalName(Criteria criteria, String query, Consumer<String> errorHandler) {
-    // TODO: this should extend to the children of the entity with this external name (including libraries and library aliquots)
     criteria.add(DbUtils.textRestriction(query, "externalName", "secondaryIdentifier"));
   }
 
   @Override
   public void restrictPaginationByLab(Criteria criteria, String query, Consumer<String> errorHandler) {
-    // TODO: this should extend to the children of the entity with this lab (including libraries and library aliquots)
     criteria.createAlias("lab", "lab", JoinType.LEFT_OUTER_JOIN);
     criteria.add(DbUtils.textRestriction(query, "lab.alias"));
   }
@@ -410,6 +432,12 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   @Override
   public void restrictPaginationByDistributionRecipient(Criteria criteria, String query, Consumer<String> errorHandler) {
     DbUtils.restrictPaginationByDistributionRecipient(criteria, query, "samples", "sampleId");
+  }
+
+  @Override
+  public void restrictPaginationByIdentityIds(Criteria criteria, List<Long> identityIds, Consumer<String> errorHandler) {
+    criteria.createAlias("parentAttributes.identityAttributes", "identity")
+        .add(Restrictions.in("identity.id", identityIds));
   }
 
 }

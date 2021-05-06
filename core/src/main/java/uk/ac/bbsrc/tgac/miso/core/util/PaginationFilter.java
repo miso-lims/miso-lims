@@ -203,6 +203,16 @@ public abstract interface PaginationFilter {
     };
   }
 
+  public static PaginationFilter identityIds(List<Long> ids) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByIdentityIds(item, ids, errorHandler);
+      }
+    };
+  }
+
   public static PaginationFilter index(String index) {
     return new PaginationFilter() {
 

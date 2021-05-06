@@ -23,6 +23,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.Columns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.ListTarget;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.IdentitySearchPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListTabbedPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListTabbedPage.Tabs;
@@ -176,8 +177,8 @@ public class ListTablesIT extends AbstractIT {
   public void testIdentitySearchToolSetup() throws Exception {
     // Goal: ensure all expected columns are present and no extra
     login();
-    ListPage page = ListPage.getListPage(getDriver(), getBaseUrl(), "tools/identitysearch");
-    DataTable table = page.getTable();
+    IdentitySearchPage page = IdentitySearchPage.get(getDriver(), getBaseUrl());
+    DataTable table = page.getSamplesTable();
     List<String> headings = table.getColumnHeadings();
     assertEquals("number of columns", samplesColumns.size(), headings.size());
     for (String col : samplesColumns) {
