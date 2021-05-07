@@ -12,7 +12,7 @@
   testOnBorrow="true"
   testOnReturn="true"
   validationQuery="select 1"
-  url="jdbc:mysql://${misohostport}/${misodb}?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useLegacyDatetimeCode=false"
+  url="jdbc:mysql://${misohostport}/${misodb}?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useLegacyDatetimeCode=false&amp;useSSL=false"
   username="${misouser}"
   password="${misopass}"/>
   <Parameter name="miso.propertiesFile" value="file:${catalina.home}/conf/Catalina/localhost/miso.properties" override="false"/>
