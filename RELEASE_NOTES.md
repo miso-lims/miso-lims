@@ -7,6 +7,15 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.30.0] - 2021-05-13
+
+### Fixed
+
+* Error when attempting to upload files
+* Existing identities not found by lookup on Create Samples page (detailed sample)
+* Error when trying to select a library template if the volume column is hidden
+
+
 ## [1.29.0] - 2021-05-06
 
 ### Added
