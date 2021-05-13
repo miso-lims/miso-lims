@@ -1306,4 +1306,14 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     assertEquals("identity lookup was successful", "First Receipt (PONE)", table.getText(SamColumns.IDENTITY_ALIAS, 0));
   }
 
+  @Test
+  public void testLookupExistingIdentity() throws Exception {
+    BulkSamplePage page = getCreatePage(1, null, SampleTissue.CATEGORY_NAME);
+    HandsOnTable table = page.getTable();
+    table.enterText(SamColumns.PROJECT, 0, "TEST");
+    table.enterText(SamColumns.EXTERNAL_NAME, 0, "TEST_external_1");
+    table.waitForSearch(SamColumns.IDENTITY_ALIAS, 0);
+    assertEquals("TEST_0001 -- TEST_external_1", table.getText(SamColumns.IDENTITY_ALIAS, 0));
+  }
+
 }

@@ -568,8 +568,8 @@ BulkTarget.sample = (function($) {
           }).success(function(data) {
             // sort with identities from selected project on top
             var potentialIdentities = [];
-            if (data && data.length && data[0][newValue] && data[0][newValue].length) {
-              potentialIdentities = data[0][newValue].sort(function(a, b) {
+            if (data && data.length) {
+              potentialIdentities = data.sort(function(a, b) {
                 var aSortId = a.projectId == selectedProject.id ? 0 : a.projectId;
                 var bSortId = b.projectId == selectedProject.id ? 0 : b.projectId;
                 return aSortId - bSortId;
