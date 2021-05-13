@@ -372,7 +372,7 @@ BulkTarget.library = (function($) {
             getItemValue: Utils.array.getId,
             onChange: function(rowIndex, newValue, api) {
               var template = api.getValueObject(rowIndex, 'template');
-              if (template) {
+              if (template && config.showVolume) {
                 // volume can still be changed
                 if (template.defaultVolume) {
                   api.updateField(rowIndex, 'volume', {
