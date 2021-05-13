@@ -40,6 +40,7 @@ Starting with version 1.29.0, the format of this file is based on
 ### Known Issues
 
 * Error when attempting to upload files
+* Existing identities not found by lookup on Create Samples page (detailed sample)
 
 
 ## [1.28.1]
