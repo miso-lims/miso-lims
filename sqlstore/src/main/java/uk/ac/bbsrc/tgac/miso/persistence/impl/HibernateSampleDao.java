@@ -216,14 +216,26 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
       criteria.add(Restrictions.eq("projectId", project.getId()));
     }
     Disjunction disjunction = Restrictions.disjunction();
-    MatchMode matchMode = exactMatch ? MatchMode.EXACT : MatchMode.ANYWHERE;
     for (String externalName : externalNames) {
-      disjunction.add(Restrictions.ilike("externalName", externalName, matchMode));
+      disjunction.add(Restrictions.ilike("externalName", externalName, MatchMode.ANYWHERE));
     }
     criteria.add(disjunction);
     @SuppressWarnings("unchecked")
     List<IdentityView> results = criteria.list();
-    return results;
+    if (exactMatch) {
+      return filterOnlyExactExternalNameMatches(results, externalNames);
+    } else {
+      return results;
+    }
+  }
+
+  private List<IdentityView> filterOnlyExactExternalNameMatches(Collection<IdentityView> candidates, Collection<String> externalNames) {
+    return candidates.stream()
+        .filter(identity -> {
+          Set<String> names = SampleIdentityImpl.getSetFromString(identity.getExternalName());
+          return names.stream().anyMatch(name -> externalNames.contains(name));
+        })
+        .collect(Collectors.toList());
   }
 
   @Override

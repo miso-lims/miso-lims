@@ -37,6 +37,10 @@ Starting with version 1.29.0, the format of this file is based on
 * Toolbars were not being displayed correctly in the Items list on the Edit Transfer page
 * Improved performance of libraries and pools
 
+### Known Issues
+
+* Existing identities not found by lookup on Create Samples page (detailed sample)
+
 
 ## [1.28.1]
 
