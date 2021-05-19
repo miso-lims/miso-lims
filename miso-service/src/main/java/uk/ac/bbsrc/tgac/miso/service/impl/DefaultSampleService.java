@@ -468,7 +468,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
 
   private void addExternalNames(DetailedSample sample, SampleIdentity identityCopy) throws IOException {
     if (identityCopy == null || identityCopy.getExternalName() == null) return;
-    SampleIdentity identity = (SampleIdentity) get(getIdentity(sample).getId());
+    SampleIdentity identity = (SampleIdentity) LimsUtils.deproxify(get(getIdentity(sample).getId()));
     Set<String> identityExternalNames = SampleIdentityImpl.getSetFromString(identity.getExternalName());
     Set<String> tempExternalNames = SampleIdentityImpl.getSetFromString(identityCopy.getExternalName());
     Set<String> lowerCaseIdentityExternalNames = identityExternalNames.stream().map(String::toLowerCase).collect(Collectors.toSet());
@@ -609,7 +609,8 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
 
   private SampleIdentity findOrCreateIdentity(DetailedSample descendant, SampleIdentity identity) throws IOException, MisoNamingException {
     if (identity.isSaved()) {
-      return (SampleIdentity) sampleStore.getSample(identity.getId());
+      Sample managedIdentity = sampleStore.getSample(identity.getId());
+      return (SampleIdentity) LimsUtils.deproxify(managedIdentity);
     } else {
       // If samples are being bulk received for the same new donor, they will all have a null parentId.
       // After the new donor's Identity is created, the following samples need to be parented to that now-existing Identity.
