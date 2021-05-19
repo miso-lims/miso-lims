@@ -66,7 +66,7 @@ public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
       }
       if (isIdentitySample(parent)) {
         if (!isTissueSample(detailed)) throw new IllegalArgumentException("Missing parent tissue");
-        return generateTissueAlias((SampleTissue) detailed, (SampleIdentity) parent);
+        return generateTissueAlias((SampleTissue) detailed, (SampleIdentity) LimsUtils.deproxify(parent));
       }
     }
     throw new IllegalStateException("Unexpected conditions for alias generation");
