@@ -27,7 +27,7 @@ Use the GitHub interface to download the following files for the
 
 * ROOT.war
 * sqlstore.jar
-* setup_file.tar.gz (for new installations only)
+* setup_files.tar.gz (for new installations only)
 
 ## Setting Up the Database Server
 
