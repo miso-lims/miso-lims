@@ -7,6 +7,20 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.30.1] - 2021-05-20
+
+### Fixed
+
+* Error creating samples parented to an existing identity (detailed sample)
+
+### Upgrade Notes
+
+* The bare metal install/upgrade procedure has been simplified, as required files are now available
+  for download on the GitHub release page. See the
+  [Install Guide](https://miso-lims.readthedocs.io/projects/docs/en/latest/admin/baremetal-installation-guide/).
+  The old procedure can still be used if you prefer to build from source.
+
+
 ## [1.30.0] - 2021-05-13
 
 ### Fixed
