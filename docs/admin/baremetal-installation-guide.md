@@ -6,6 +6,7 @@ if possible by following the
 [Docker compose installation guide](../compose-installation-guide).
 
 ## Prerequisites
+
 For each service, which may be put on the same machine, the following tools are
 required:
 
@@ -19,32 +20,14 @@ Database Server:
 * MySQL 5.7.7 or MariaDB 10.2.3
 * [Flyway 5.2.4](https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/5.2.4/) (newer versions may cause issues)
 
-Development Machine(s):
-
-* Maven
-* git
-* Eclipse
-* A merge tool such as Meld
-
 ## Downloading the latest release
-Use the GitHub interface to download the [latest release](https://github.com/miso-lims/miso-lims/releases/latest).
-Extract the `.zip` or `.tar.gz` file.
 
-Proceed to set up a build environment.
+Use the GitHub interface to download the following files for the
+[latest release](https://github.com/miso-lims/miso-lims/releases/latest):
 
-# Setting Up the Build Environment
-One or more machines should be set up to build MISO. A typical Linux system will
-work; a typical Mac system may work. MISO is not guaranteed to work on Windows.
-
-You will need:
-
-* JDK 11
-* [Maven 3.0.5](http://maven.apache.org/download.html) or later
-* Git
-
-For development purposes, Eclipse is recommended and it might be useful to set
-up the server environments for testing. There is an automatic code formatting
-configuration available for Eclipse.
+* ROOT.war
+* sqlstore.jar
+* setup_files.tar.gz (for new installations only)
 
 ## Setting Up the Database Server
 
@@ -124,7 +107,7 @@ Make sure the database path in `ROOT.xml` is correct for your install:
 
 If you use MariaDB instead of MySQL, replace 'mysql' with 'mariadb' in the URL.
 
-Copy `$MISO_SRC/miso-web/src/main/resources/miso.properties` to
+Extract the `setup_files.tar.gz` file and copy `miso.properties` to
 `$CATALINA_HOME/conf/Catalina/localhost/miso.properties`. This file contains site-specific configuration that you should
 review and modify as appropriate. See [Site Configuration](../site-configuration) for more information.
 
@@ -145,7 +128,7 @@ Ensure that the user that Tomcat runs as has write permission to the storage dir
 
     chgrp -R tomcat /storage/miso/
 
-Move the following configuration files from `miso-lims/miso-web/src/main/resources` into
+Copy the following configuration files from `setup_files.tar.gz` into
 the `/storage/miso/` directory:
 
 | File                      | Purpose                                                    |
@@ -204,27 +187,22 @@ different sequencers and add all the URLs to `miso.properties`. If you are addin
 previously-established MISO environment, restart MISO.
 
 
-# Building the Application
+# Installing and Upgrading
 
-`cd` into `$MISO_SRC`.
-Build the application using:
-
-    mvn clean package
-
-There will be an important build artefact: `miso-web/target/ROOT.war`
-
-# Releasing and Upgrading
-
-Prior to release, ensure that you have followed the instructions in the above and have WAR files for both MISO
+Prior to the installation, ensure that you have followed the instructions in the above and have WAR files for both MISO
 (`ROOT.war`) and, if desired, [Run Scanner](https://github.com/miso-lims/runscanner)(`runscanner-*.war`).
 
 To install or upgrade, perform the following steps:
 
+1. If performing an upgrade, make sure to read all release notes since the previous version you were running. Some
+   releases indicate additional upgrade instructions, which may include
+   * Configuration changes (in `miso.properties` or elsewhere)
+   * Database preparation or cleanup steps
+   * Other necessary steps or warnings
 1. Backup your existing database.
 1. Stop MISO's Tomcat.
-1. Remove `$CATALINA_HOME/webapps/ROOT` directory and `$CATALINA_HOME/webapps/ROOT.war` file.
-1. Copy the `ROOT.war` from the build to `$CATALINA_HOME/webapps`.
-1. Make any necessary configuration changes to `$CATALINA_HOME/conf/Catalina/localhost/miso.properties`.
+1. Remove `$CATALINA_HOME/webapps/ROOT` directory and `$CATALINA_HOME/webapps/ROOT.war` file if they exist.
+1. Copy the new `ROOT.war` to `$CATALINA_HOME/webapps`.
 1. Migrate the database to the newest version. (Described below.)
 1. If also releasing Run Scanner, deploy it:
     1. Stop Run Scanner's Tomcat.
@@ -234,13 +212,13 @@ To install or upgrade, perform the following steps:
 
 ## Migrating the database
 
-Updating the database (or setting it up initially) will apply patches to the database using Flyway using the `ROOT.war`.
-The same path should be used for `MISO_FILES_DIR` as is set for `miso.fileStorageDirectory` in `miso.properties`
-(`/storage/miso/files/` by default)
+Flyway is used to apply patches to your database to make it compatible with the new MISO version. The same
+path should be used for `MISO_FILES_DIR` as is set for `miso.fileStorageDirectory` in `miso.properties`
+(`/storage/miso/files/` by default). `SQLSTORE.JAR` should be the `sqlstore.jar` file you downloaded.
 
     cd ${FLYWAY}
     rm -f jars/sqlstore-*.jar
-    unzip -xjo $CATALINA_HOME/webapps/ROOT.war 'WEB-INF/lib/sqlstore-*.jar' -d jars
+    cp ${SQLSTORE.JAR} jars
     ./flyway -user=$MISO_DB_USER -password=$MISO_DB_PASS -url=$MISO_DB_URL -outOfOrder=true -locations=classpath:db/migration,classpath:uk.ac.bbsrc.tgac.miso.db.migration migrate -placeholders.filesDir=${MISO_FILES_DIR}
 
 `$DB_URL` should be in the same format as in the `ROOT.xml`, except replacing `&amp;` with just `&`
