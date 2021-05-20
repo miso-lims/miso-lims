@@ -7,7 +7,7 @@ MAIN_BRANCH="develop"
 # validate prerequisites
 if [[ ! $(command -v gh) ]]; then
   echo "Error: GitHub CLI not found"
-  exit 2
+  exit 1
 fi
 
 # validate git state

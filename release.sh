@@ -35,12 +35,12 @@ fi
 # validate git state
 if [[ ! $(git branch | grep \* | cut -d ' ' -f2) = "${MAIN_BRANCH}" ]]; then
   echo "Error: Not on ${MAIN_BRANCH} branch" >&2
-  exit 2
+  exit 3
 fi
 git fetch
 if (( $(git log HEAD..origin/${MAIN_BRANCH} --oneline | wc -l) > 0 )); then
   echo "Error: Branch is not up-to-date with remote origin" >&2
-  exit 3
+  exit 4
 fi
 
 determine_version() {
@@ -64,7 +64,7 @@ determine_version() {
     # use patch version from snapshot version
   else
     echo "No changes found in 'changes' directory. Aborting release." >&2
-    exit 4
+    exit 5
   fi
 
   RELEASE_VERSION="${MAJOR}.${MINOR}.${PATCH}"
@@ -90,7 +90,7 @@ rollback_local() {
     git tag -d v${RELEASE_VERSION}
   fi
   echo "Release failed. Changes reset." >&2
-  exit 7
+  exit 6
 }
 
 push() {
@@ -108,7 +108,7 @@ push() {
 push_error() {
   set +x
   echo "An error occurred while pushing the release. The process should probably be completed manually."
-  exit 8
+  exit 7
 }
 
 determine_version
