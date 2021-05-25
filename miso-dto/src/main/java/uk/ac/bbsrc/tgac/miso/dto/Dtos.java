@@ -1658,7 +1658,6 @@ public class Dtos {
       setLong(dto::setLibraryId, library.getId(), true);
       setString(dto::setLibraryName, library.getName());
       setString(dto::setLibraryAlias, library.getAlias());
-      setId(dto::setLibraryKitDescriptorId, library.getKitDescriptor());
       setBoolean(dto::setLibraryLowQuality, library.isLowQuality(), false);
       setString(dto::setLibraryPlatformType, library.getPlatformType().getKey());
       if (library.getIndex1() != null) {
@@ -1711,6 +1710,8 @@ public class Dtos {
     setString(dto::setQcUserName, maybeGetProperty(from.getQcUser(), User::getFullName));
     setDateString(dto::setQcDate, from.getQcDate());
     setEffectiveQcFailure(from, dto);
+    setId(dto::setKitDescriptorId, from.getKitDescriptor());
+    setString(dto::setKitLot, from.getKitLot());
     return dto;
   }
 
@@ -1830,6 +1831,8 @@ public class Dtos {
     to.setDiscarded(from.isDiscarded());
     setObject(to::setDetailedQcStatus, DetailedQcStatusImpl::new, from.getDetailedQcStatusId());
     setString(to::setDetailedQcStatusNote, from.getDetailedQcStatusNote());
+    setObject(to::setKitDescriptor, KitDescriptor::new, from.getKitDescriptorId());
+    setString(to::setKitLot, from.getKitLot());
     return to;
   }
 

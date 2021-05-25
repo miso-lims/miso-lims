@@ -41,7 +41,8 @@ public class LibraryAliquotDto extends AbstractBoxableDto implements UpstreamQcF
   private Long libraryId;
   private String libraryName;
   private String libraryAlias;
-  private Long libraryKitDescriptorId;
+  private Long kitDescriptorId;
+  private String kitLot;
   private boolean libraryLowQuality;
   private String libraryPlatformType;
   private Long parentAliquotId;
@@ -56,6 +57,7 @@ public class LibraryAliquotDto extends AbstractBoxableDto implements UpstreamQcF
   private String volumeUsed;
   private Integer dnaSize;
   private Integer proportion;
+  private Long projectId;
   private String subprojectAlias;
   private Boolean subprojectPriority;
   private String sequencingControlTypeAlias;
@@ -206,12 +208,20 @@ public class LibraryAliquotDto extends AbstractBoxableDto implements UpstreamQcF
     this.libraryAlias = libraryAlias;
   }
 
-  public Long getLibraryKitDescriptorId() {
-    return libraryKitDescriptorId;
+  public Long getKitDescriptorId() {
+    return kitDescriptorId;
   }
 
-  public void setLibraryKitDescriptorId(Long libraryKitDescriptorId) {
-    this.libraryKitDescriptorId = libraryKitDescriptorId;
+  public void setKitDescriptorId(Long kitDescriptorId) {
+    this.kitDescriptorId = kitDescriptorId;
+  }
+
+  public String getKitLot() {
+    return kitLot;
+  }
+
+  public void setKitLot(String kitLot) {
+    this.kitLot = kitLot;
   }
 
   public boolean isLibraryLowQuality() {
@@ -333,6 +343,14 @@ public class LibraryAliquotDto extends AbstractBoxableDto implements UpstreamQcF
 
   public void setProportion(Integer proportion) {
     this.proportion = proportion;
+  }
+
+  public Long getProjectId() {
+    return projectId;
+  }
+
+  public void setProjectId(Long projectId) {
+    this.projectId = projectId;
   }
 
   public String getSubprojectAlias() {

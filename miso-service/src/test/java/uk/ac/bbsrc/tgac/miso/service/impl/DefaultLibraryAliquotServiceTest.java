@@ -5,15 +5,14 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 
 public class DefaultLibraryAliquotServiceTest {
   private DefaultLibraryAliquotService service;
-  private DetailedLibrary library;
+  private DetailedLibraryAliquot aliquot;
   private final Long id = 42L;
   private final String alias = "test alias";
   private final String description = "test description";
@@ -22,35 +21,35 @@ public class DefaultLibraryAliquotServiceTest {
   @Before
   public void setUp() {
     service = new DefaultLibraryAliquotService();
-    library = new DetailedLibraryImpl();
+    aliquot = new DetailedLibraryAliquot();
     KitDescriptor libraryKd = new KitDescriptor();
-    library.setKitDescriptor(libraryKd);
+    aliquot.setKitDescriptor(libraryKd);
   }
 
   @Test
   public void testEmptyTargetedSequencingCompatibility() {
     TargetedSequencing ts = new TargetedSequencing();
-    addTargetedSequencing(ts, library);
+    addTargetedSequencing(ts, aliquot);
 
-    assertTrue(service.isTargetedSequencingCompatible(ts, library));
+    assertTrue(service.isTargetedSequencingCompatible(ts, aliquot));
   }
 
   @Test
   public void testDistinctEmptyTargetedSequencingCompatibility() {
     TargetedSequencing ts1 = new TargetedSequencing();
     TargetedSequencing ts2 = new TargetedSequencing();
-    addTargetedSequencing(ts2, library);
+    addTargetedSequencing(ts2, aliquot);
 
-    assertTrue(service.isTargetedSequencingCompatible(ts1, library));
+    assertTrue(service.isTargetedSequencingCompatible(ts1, aliquot));
   }
 
   @Test
   public void testDistinctEqualTargetedSequencingCompatibility() {
     TargetedSequencing ts1 = defaultTargetedSequencing();
     TargetedSequencing ts2 = defaultTargetedSequencing();
-    addTargetedSequencing(ts2, library);
+    addTargetedSequencing(ts2, aliquot);
 
-    assertTrue(service.isTargetedSequencingCompatible(ts1, library));
+    assertTrue(service.isTargetedSequencingCompatible(ts1, aliquot));
   }
 
   @Test
@@ -60,9 +59,9 @@ public class DefaultLibraryAliquotServiceTest {
     TargetedSequencing ts2 = defaultTargetedSequencing();
     // Now distinct from ts1
     ts2.setId(ts1.getId() + 1);
-    addTargetedSequencing(ts2, library);
+    addTargetedSequencing(ts2, aliquot);
 
-    assertFalse(service.isTargetedSequencingCompatible(ts1, library));
+    assertFalse(service.isTargetedSequencingCompatible(ts1, aliquot));
   }
 
 
@@ -77,7 +76,7 @@ public class DefaultLibraryAliquotServiceTest {
     return ts;
   }
 
-  private void addTargetedSequencing(TargetedSequencing ts, Library library) {
-    library.getKitDescriptor().addTargetedSequencing(ts);
+  private void addTargetedSequencing(TargetedSequencing ts, LibraryAliquot aliquot) {
+    aliquot.getKitDescriptor().addTargetedSequencing(ts);
   }
 }

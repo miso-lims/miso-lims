@@ -23,7 +23,6 @@ import com.eaglegenomics.simlims.core.User;
 import com.google.common.annotations.VisibleForTesting;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.HierarchyEntity;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
@@ -35,6 +34,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BarcodableReferenceService;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.DetailedQcStatusService;
+import uk.ac.bbsrc.tgac.miso.core.service.KitDescriptorService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
@@ -82,6 +82,8 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
   private WorksetService worksetService;
   @Autowired
   private BarcodableReferenceService barcodableReferenceService;
+  @Autowired
+  private KitDescriptorService kitDescriptorService;
   @Autowired
   private LibraryStore libraryStore;
   @Value("${miso.autoGenerateIdentificationBarcodes}")
@@ -255,7 +257,7 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
       aliquot.setTargetedSequencing(targetedSequencingService.get(aliquot.getTargetedSequencing().getId()));
     }
     loadChildEntity(aliquot::setDetailedQcStatus, aliquot.getDetailedQcStatus(), detailedQcStatusService, "detailedQcStatusId");
-
+    loadChildEntity(aliquot::setKitDescriptor, aliquot.getKitDescriptor(), kitDescriptorService, "kitDescriptorId");
     if (isDetailedLibraryAliquot(aliquot)) {
       DetailedLibraryAliquot detailed = (DetailedLibraryAliquot) aliquot;
       if (detailed.getLibraryDesignCode() != null) {
@@ -296,6 +298,8 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
     target.setDetailedQcStatusNote(source.getDetailedQcStatusNote());
     target.setQcUser(source.getQcUser());
     target.setQcDate(source.getQcDate());
+    target.setKitDescriptor(source.getKitDescriptor());
+    target.setKitLot(source.getKitLot());
 
     if (isDetailedLibraryAliquot(target)) {
       DetailedLibraryAliquot dTarget = (DetailedLibraryAliquot) target;
@@ -321,6 +325,10 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
     if (isDetailedLibraryAliquot(aliquot)) {
       validateGroupDescription((DetailedLibraryAliquot) aliquot, errors);
     }
+    if (aliquot.getKitDescriptor() != null && aliquot.getKitLot() == null
+        && (beforeChange == null || beforeChange.getKitLot() != null)) {
+      ValidationError.forRequired("kitLot");
+    }
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
@@ -329,24 +337,27 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
 
   private void validateTargetedSequencing(LibraryAliquot aliquot, List<ValidationError> errors) {
     TargetedSequencing ts = aliquot.getTargetedSequencing();
-    Library library = aliquot.getLibrary();
 
     if (ts == null) {
-      if (isTargetedSequencingRequired(library)) {
-        errors.add(new ValidationError("targetedSequencingId", "Value is required (based on library design code)"));
+      if (isTargetedSequencingRequired(aliquot)) {
+        errors.add(new ValidationError("targetedSequencingId", "Value is required (based on design code)"));
       }
-    } else if (!isTargetedSequencingCompatible(ts, library)) {
-      errors.add(new ValidationError("targetedSequencingId", "Selected value not compatible with the library kit"));
+    } else if (!isTargetedSequencingCompatible(ts, aliquot)) {
+      errors.add(new ValidationError("targetedSequencingId", "Selected value not compatible with the kit"));
     }
   }
 
-  private boolean isTargetedSequencingRequired(Library library) {
-    return LimsUtils.isDetailedLibrary(library) && ((DetailedLibrary) library).getLibraryDesignCode().isTargetedSequencingRequired();
+  private boolean isTargetedSequencingRequired(LibraryAliquot aliquot) {
+    if (!LimsUtils.isDetailedLibraryAliquot(aliquot)) {
+      return false;
+    }
+    DetailedLibraryAliquot detailed = (DetailedLibraryAliquot) aliquot;
+    return detailed.getLibraryDesignCode() != null && detailed.getLibraryDesignCode().isTargetedSequencingRequired();
   }
 
   @VisibleForTesting
-  protected boolean isTargetedSequencingCompatible(TargetedSequencing ts, Library library) {
-    return library.getKitDescriptor().getTargetedSequencing().contains(ts);
+  protected boolean isTargetedSequencingCompatible(TargetedSequencing ts, LibraryAliquot aliquot) {
+    return aliquot.getKitDescriptor() != null && aliquot.getKitDescriptor().getTargetedSequencing().contains(ts);
   }
 
   public void setLibraryAliquotDao(LibraryAliquotStore libraryAliquotDao) {

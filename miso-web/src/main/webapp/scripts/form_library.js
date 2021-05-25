@@ -145,6 +145,11 @@ FormTarget.library = (function($) {
                 return item.platformType === name;
               })
             });
+            form.updateField('kitDescriptorId', {
+              source: Constants.kitDescriptors.filter(function(item) {
+                return item.kitType === 'Library' && item.platformType === name;
+              })
+            })
           }
         }, {
           title: 'Library Type',
@@ -342,13 +347,11 @@ FormTarget.library = (function($) {
           type: 'text',
           maxLength: 255
         }, {
-          title: 'Library Kit',
+          title: 'Kit',
           data: 'kitDescriptorId',
           type: 'dropdown',
           required: true,
-          source: Constants.kitDescriptors.filter(function(kit) {
-            return kit.kitType === 'Library';
-          }),
+          source: [], // initialized by platformType onChange
           sortSource: Utils.sorting.standardSort('name'),
           getItemLabel: function(item) {
             return item.name;
