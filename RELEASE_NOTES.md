@@ -20,6 +20,10 @@ Starting with version 1.29.0, the format of this file is based on
   [Install Guide](https://miso-lims.readthedocs.io/projects/docs/en/latest/admin/baremetal-installation-guide/).
   The old procedure can still be used if you prefer to build from source.
 
+### Known Issues
+
+* Error generating sample sheets from the Edit Run page
+
 
 ## [1.30.0] - 2021-05-13
 
@@ -28,6 +32,10 @@ Starting with version 1.29.0, the format of this file is based on
 * Error when attempting to upload files
 * Existing identities not found by lookup on Create Samples page (detailed sample)
 * Error when trying to select a library template if the volume column is hidden
+
+### Known Issues
+
+* Error generating sample sheets from the Edit Run page
 
 
 ## [1.29.0] - 2021-05-06
@@ -64,6 +72,7 @@ Starting with version 1.29.0, the format of this file is based on
 
 * Error when attempting to upload files
 * Existing identities not found by lookup on Create Samples page (detailed sample)
+* Error generating sample sheets from the Edit Run page
 
 
 ## [1.28.1]
