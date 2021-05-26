@@ -243,7 +243,6 @@ BulkTarget.libraryaliquot = (function($) {
           var tarSeq = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(aliquot.targetedSequencingId), Constants.targetedSequencings);
           return tarSeq.alias;
         },
-        include: Constants.isDetailedSample,
         source: [], // initialized in kitDescriptorId onChange
         sortSource: Utils.sorting.standardSort('alias'),
         getItemLabel: Utils.array.getAlias,

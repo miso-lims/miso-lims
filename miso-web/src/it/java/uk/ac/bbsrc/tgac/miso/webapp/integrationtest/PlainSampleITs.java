@@ -51,7 +51,8 @@ public class PlainSampleITs extends AbstractIT {
       LibraryAliquotColumns.DISCARDED, LibraryAliquotColumns.QC_STATUS, LibraryAliquotColumns.QC_NOTE, LibraryAliquotColumns.SIZE,
       LibraryAliquotColumns.CONCENTRATION, LibraryAliquotColumns.CONCENTRATION_UNITS, LibraryAliquotColumns.VOLUME,
       LibraryAliquotColumns.VOLUME_UNITS, LibraryAliquotColumns.NG_USED, LibraryAliquotColumns.VOLUME_USED,
-      LibraryAliquotColumns.CREATION_DATE);
+      LibraryAliquotColumns.CREATION_DATE, LibraryAliquotColumns.KIT, LibraryAliquotColumns.KIT_LOT,
+      LibraryAliquotColumns.TARGETED_SEQUENCING);
 
   @Override
   protected boolean isDetailedSampleMode() {

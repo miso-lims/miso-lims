@@ -132,24 +132,24 @@ FormTarget.library = (function($) {
             return item.key;
           },
           onChange: function(newValue, form) {
-            var name = Utils.array.findUniqueOrThrow(function(item) {
+            var platformType = Utils.array.findUniqueOrThrow(function(item) {
               return item.key === newValue;
-            }, Constants.platformTypes).name;
+            }, Constants.platformTypes);
             form.updateField('libraryTypeId', {
               source: Constants.libraryTypes.filter(function(item) {
-                return item.platform === name;
+                return item.platform === platformType.name;
               })
             });
             form.updateField('indexFamilyId', {
               source: Constants.indexFamilies.filter(function(item) {
-                return item.platformType === name;
+                return item.platformType === platformType.name;
               })
             });
             form.updateField('kitDescriptorId', {
               source: Constants.kitDescriptors.filter(function(item) {
-                return item.kitType === 'Library' && item.platformType === name;
+                return item.kitType === 'Library' && item.platformType === platformType.key;
               })
-            })
+            });
           }
         }, {
           title: 'Library Type',
