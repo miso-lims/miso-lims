@@ -182,6 +182,10 @@ public class DefaultKitDescriptorService implements KitDescriptorService {
     if (libUsage > 0) {
       result.addError(ValidationError.forDeletionUsage(object, libUsage, Pluralizer.libraries(libUsage)));
     }
+    long aliquotUsage = kitStore.getUsageByLibraries(object);
+    if (aliquotUsage > 0) {
+      result.addError(ValidationError.forDeletionUsage(object, aliquotUsage, Pluralizer.libraryAliquots(libUsage)));
+    }
     long containerUsage = kitStore.getUsageByContainers(object);
     if (containerUsage > 0) {
       result.addError(ValidationError.forDeletionUsage(object, containerUsage, "sequencing " + Pluralizer.containers(containerUsage)));

@@ -57,6 +57,8 @@ public interface KitStore extends Store<Kit>, PaginatedDataSource<KitDescriptor>
 
   public long getUsageByLibraries(KitDescriptor kitDescriptor) throws IOException;
 
+  public long getUsageByLibraryAliquots(KitDescriptor kitDescriptor) throws IOException;
+
   public long getUsageByContainers(KitDescriptor kitDescriptor) throws IOException;
 
   public long getUsageByRuns(KitDescriptor kitDescriptor) throws IOException;
