@@ -192,7 +192,8 @@ BulkTarget.libraryaliquot = (function($) {
         data: 'kitDescriptorId',
         source: function(data) {
           return Constants.kitDescriptors.filter(function(kit) {
-          	return kit.kitType === 'Library' && kit.platformType === data.libraryPlatformType;
+          	return kit.kitType === 'Library' && kit.platformType === data.libraryPlatformType
+                && (!kit.archived || kit.id === data.kitDescriptorId);
           });
         },
         sortSource: Utils.sorting.standardSort('name'),

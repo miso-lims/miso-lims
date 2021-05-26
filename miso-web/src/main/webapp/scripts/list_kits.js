@@ -106,6 +106,10 @@ ListTarget.kit = {
       "include": !config.platformType,
       "iSortPriority": 0,
       "mData": "platformType"
+    }, {
+      "sTitle": "Archived",
+      "mData": "archived",
+      "mRender": ListUtils.render.archived
     }];
   },
   searchTermSelector: function(searchTerms) {

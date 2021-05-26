@@ -77,6 +77,7 @@ public class DefaultKitDescriptorService implements KitDescriptorService {
     original.setPartNumber(kitDescriptor.getPartNumber());
     original.setStockLevel(kitDescriptor.getStockLevel());
     original.setDescription(kitDescriptor.getDescription());
+    original.setArchived(kitDescriptor.isArchived());
     kitDescriptor = original;
     kitDescriptor.setChangeDetails(authorizationManager.getCurrentUser());
     return kitStore.saveKitDescriptor(kitDescriptor);

@@ -1192,6 +1192,7 @@ public class Dtos {
     dto.setStockLevel(from.getStockLevel());
     setObject(dto::setKitType, from.getKitType(), KitType::getKey);
     setObject(dto::setPlatformType, from.getPlatformType(), PlatformType::getKey);
+    setBoolean(dto::setArchived, from.isArchived(), false);
     return dto;
   }
 
@@ -1210,6 +1211,7 @@ public class Dtos {
     to.setStockLevel(from.getStockLevel());
     to.setKitType(KitType.get(from.getKitType()));
     to.setPlatformType(PlatformType.get(from.getPlatformType()));
+    setBoolean(to::setArchived, from.isArchived(), false);
     return to;
   }
 

@@ -139,7 +139,8 @@ BulkTarget.library = (function($) {
           effectiveGroupId: library.effectiveGroupId,
           projectId: library.projectId,
           libraryTypeId: library.libraryTypeId,
-          indexFamilyId: library.indexFamilyId
+          indexFamilyId: library.indexFamilyId,
+          kitDescriptorId: library.kitDescriptorId
         };
         if (library.sampleBoxPosition) {
           parentLocationsByRow[index] = library.sampleBoxPosition;
@@ -507,7 +508,8 @@ BulkTarget.library = (function($) {
               });
               api.updateField(rowIndex, 'kitDescriptorId', {
                 source: newValue ? Constants.kitDescriptors.filter(function(kit) {
-                  return kit.kitType === 'Library' && kit.platformType === selectedPlatform.key;
+                  return kit.kitType === 'Library' && kit.platformType === selectedPlatform.key
+                      && (!kit.archived || kit.id === originalDataByRow[rowIndex].kitDescriptorId);
                 }) : []
               });
             }

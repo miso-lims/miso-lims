@@ -104,6 +104,10 @@ FormTarget.kitdescriptor = (function($) {
       include: !isNew,
       data: 'platformType',
       type: 'read-only'
+    }, {
+      title: 'Archived',
+      data: 'archived',
+      type: 'checkbox'
     }];
   }
 
@@ -144,6 +148,11 @@ FormTarget.kitdescriptor = (function($) {
       title: 'Platform Type',
       data: 'platformType',
       type: 'read-only'
+    }, {
+      title: 'Archived',
+      data: 'archived',
+      type: 'checkbox',
+      disabled: true
     }];
   }
 

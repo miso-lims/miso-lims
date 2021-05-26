@@ -147,7 +147,8 @@ FormTarget.library = (function($) {
             });
             form.updateField('kitDescriptorId', {
               source: Constants.kitDescriptors.filter(function(item) {
-                return item.kitType === 'Library' && item.platformType === platformType.key;
+                return item.kitType === 'Library' && item.platformType === platformType.key
+                    && (!item.archived || item.id === object.kitDescriptorId);
               })
             });
           }
