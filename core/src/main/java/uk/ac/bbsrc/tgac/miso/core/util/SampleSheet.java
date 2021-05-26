@@ -297,7 +297,7 @@ public enum SampleSheet {
 
   private Set<String> getSequences(Index index, InstrumentModel model) {
     Set<String> sequences = index.getFamily().hasFakeSequence() ? index.getRealSequences() : Collections.singleton(index.getSequence());
-    if (model.getDataManglingPolicy() == InstrumentDataManglingPolicy.I5_RC) {
+    if (index.getPosition() == 2 && model.getDataManglingPolicy() == InstrumentDataManglingPolicy.I5_RC) {
       sequences = sequences.stream().map(SampleSheet::reverseComplement).collect(Collectors.toSet());
     }
     return sequences;
