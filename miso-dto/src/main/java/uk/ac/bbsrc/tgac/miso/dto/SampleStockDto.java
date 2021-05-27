@@ -10,8 +10,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 public class SampleStockDto extends SampleTissueDto {
 
   private Long tissueProcessingClassId;
-  private String concentration;
   private String strStatus;
+  private Integer slidesConsumed;
   private Long referenceSlideId;
   private List<SampleDto> relatedSlides;
 
@@ -23,22 +23,20 @@ public class SampleStockDto extends SampleTissueDto {
     this.tissueProcessingClassId = tissueProcessingClassId;
   }
 
-  @Override
-  public String getConcentration() {
-    return concentration;
-  }
-
   public String getStrStatus() {
     return strStatus;
   }
 
-  @Override
-  public void setConcentration(String concentration) {
-    this.concentration = concentration;
-  }
-
   public void setStrStatus(String strStatus) {
     this.strStatus = strStatus;
+  }
+
+  public Integer getSlidesConsumed() {
+    return slidesConsumed;
+  }
+
+  public void setSlidesConsumed(Integer slidesConsumed) {
+    this.slidesConsumed = slidesConsumed;
   }
 
   public Long getReferenceSlideId() {

@@ -843,6 +843,7 @@ public class Dtos {
       dto = new SampleStockDto();
     }
     dto.setStrStatus(from.getStrStatus().getLabel());
+    setInteger(dto::setSlidesConsumed, from.getSlidesConsumed(), true);
     setId(dto::setReferenceSlideId, from.getReferenceSlide());
     return dto;
   }
@@ -867,6 +868,7 @@ public class Dtos {
     if (from.getStrStatus() != null) {
       to.setStrStatus(from.getStrStatus());
     }
+    setInteger(to::setSlidesConsumed, from.getSlidesConsumed(), true);
     setObject(to::setReferenceSlide, SampleSlideImpl::new, from.getReferenceSlideId());
     return to;
   }
