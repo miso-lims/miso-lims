@@ -35,6 +35,10 @@ public interface SampleStock extends DetailedSample {
    */
   public void setStrStatus(String strStatus);
 
+  public Integer getSlidesConsumed();
+
+  public void setSlidesConsumed(Integer slidesConsumed);
+
   public SampleSlide getReferenceSlide();
 
   public void setReferenceSlide(SampleSlide referenceSlide);

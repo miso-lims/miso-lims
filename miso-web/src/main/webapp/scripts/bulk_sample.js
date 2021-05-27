@@ -850,6 +850,12 @@ BulkTarget.sample = (function($) {
         required: true,
         min: 0
       }, {
+        title: 'Slides Consumed',
+        type: 'int',
+        data: 'slidesConsumed',
+        include: config.pageMode !== 'create' && targetCategory === 'Stock',
+        min: 0
+      }, {
         title: 'Initial Cell Conc.',
         type: 'decimal',
         data: 'initialCellConcentration',

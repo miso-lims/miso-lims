@@ -331,20 +331,30 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   }
 
   private void updateParentSlides(Sample child, Sample beforeChange, User changeUser) {
-    if (child.getParent() == null || !isSampleSlide(child.getParent()) || !isTissuePieceSample(child)) {
+    if (child.getParent() == null || !isSampleSlide(child.getParent())) {
       return;
     }
     SampleSlide parent = (SampleSlide) deproxify(child.getParent());
-    SampleTissuePiece childPiece = (SampleTissuePiece) child;
-    if (childPiece.getSlidesConsumed() == null) {
+    Integer slidesConsumed = null;
+    if (isTissuePieceSample(child)) {
+      slidesConsumed = ((SampleTissuePiece) child).getSlidesConsumed();
+    } else if (isStockSample(child)) {
+      slidesConsumed = ((SampleStock) child).getSlidesConsumed();
+    }
+    if (slidesConsumed == null) {
       return;
     }
     if (beforeChange == null) {
-      updateParentSlides(parent, parent.getSlides() - childPiece.getSlidesConsumed(), changeUser);
+      updateParentSlides(parent, parent.getSlides() - slidesConsumed, changeUser);
     } else {
-      SampleTissuePiece beforePiece = (SampleTissuePiece) beforeChange;
-      if (!childPiece.getSlidesConsumed().equals(beforePiece.getSlidesConsumed())) {
-        updateParentSlides(parent, parent.getSlides() + beforePiece.getSlidesConsumed() - childPiece.getSlidesConsumed(), changeUser);
+      Integer beforeSlidesConsumed = null;
+      if (isTissuePieceSample(beforeChange)) {
+        beforeSlidesConsumed = ((SampleTissuePiece) beforeChange).getSlidesConsumed();
+      } else if (isStockSample(beforeChange)) {
+        beforeSlidesConsumed = ((SampleStock) beforeChange).getSlidesConsumed();
+      }
+      if (!slidesConsumed.equals(beforeSlidesConsumed)) {
+        updateParentSlides(parent, parent.getSlides() + beforeSlidesConsumed - slidesConsumed, changeUser);
       }
     }
   }
@@ -953,6 +963,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       ((SampleStockSingleCell) target).setLoadingCellConcentration(((SampleStockSingleCell) source).getLoadingCellConcentration());
     }
     target.setStrStatus(source.getStrStatus());
+    target.setSlidesConsumed(source.getSlidesConsumed());
     target.setReferenceSlide(source.getReferenceSlide());
   }
 

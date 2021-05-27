@@ -510,6 +510,11 @@ FormTarget.sample = (function($) {
               include: object.sampleSubcategory === 'RNA (stock)',
               required: true
             }, {
+              title: 'Slides Consumed',
+              data: 'slidesConsumed',
+              type: 'int',
+              min: 0
+            }, {
               title: 'Reference Slide',
               data: 'referenceSlideId',
               type: 'dropdown',
@@ -582,12 +587,6 @@ FormTarget.sample = (function($) {
         }
       }
     }
-  }
-
-  function decodeHtmlString(text) {
-    var textarea = document.createElement('textarea');
-    textarea.innerHTML = text;
-    return textarea.value;
   }
 
 })(jQuery);

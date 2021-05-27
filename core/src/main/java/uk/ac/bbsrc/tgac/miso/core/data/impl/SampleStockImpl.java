@@ -24,6 +24,8 @@ public class SampleStockImpl extends DetailedSampleImpl implements SampleStock {
   @Enumerated(EnumType.STRING)
   private StrStatus strStatus = StrStatus.NOT_SUBMITTED;
 
+  private Integer slidesConsumed;
+
   @ManyToOne(targetEntity = SampleSlideImpl.class)
   @JoinColumn(name = "referenceSlideId")
   private SampleSlide referenceSlide;
@@ -41,6 +43,16 @@ public class SampleStockImpl extends DetailedSampleImpl implements SampleStock {
   @Override
   public void setStrStatus(String strStatus) {
     this.strStatus = StrStatus.get(strStatus);
+  }
+
+  @Override
+  public Integer getSlidesConsumed() {
+    return slidesConsumed;
+  }
+
+  @Override
+  public void setSlidesConsumed(Integer slidesConsumed) {
+    this.slidesConsumed = slidesConsumed;
   }
 
   @Override
