@@ -563,7 +563,6 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       Integer slides = parentSlides.getSlides() == null ? 0 : parentSlides.getSlides();
       slides += ((SampleTissuePiece) child).getSlidesConsumed();
       parentSlides.setSlides(slides);
-      parentSlides.setDiscards(0);
       if (parentSlides.isSaved()) {
         update(parentSlides);
       }
@@ -974,7 +973,6 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     if (source instanceof SampleSlide) {
       ((SampleSlide) target).setInitialSlides(((SampleSlide) source).getInitialSlides());
       ((SampleSlide) target).setSlides(((SampleSlide) source).getSlides());
-      ((SampleSlide) target).setDiscards(((SampleSlide) source).getDiscards());
       ((SampleSlide) target).setThickness(((SampleSlide) source).getThickness());
       ((SampleSlide) target).setStain(((SampleSlide) source).getStain());
       ((SampleSlide) target).setPercentTumour(((SampleSlide) source).getPercentTumour());

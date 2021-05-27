@@ -36,8 +36,8 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
       SamColumns.TISSUE_MATERIAL, SamColumns.REGION, SamColumns.TIMEPOINT);
 
   private static final Set<String> slideColumns = Sets.newHashSet(SamColumns.SOP, SamColumns.INITIAL_SLIDES, SamColumns.SLIDES,
-      SamColumns.DISCARDS, SamColumns.THICKNESS, SamColumns.STAIN, SamColumns.PERCENT_TUMOUR, SamColumns.PERCENT_NECROSIS,
-      SamColumns.MARKED_AREA, SamColumns.MARKED_AREA_PERCENT_TUMOUR);
+      SamColumns.THICKNESS, SamColumns.STAIN, SamColumns.PERCENT_TUMOUR, SamColumns.PERCENT_NECROSIS, SamColumns.MARKED_AREA,
+      SamColumns.MARKED_AREA_PERCENT_TUMOUR);
 
   private static final Set<String> tissuePieceColumns = Sets.newHashSet(SamColumns.SOP, SamColumns.PIECE_TYPE, SamColumns.SLIDES_CONSUMED,
       SamColumns.REFERENCE_SLIDE);
@@ -292,7 +292,6 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     editable.put(SamColumns.GROUP_ID, "changed");
     editable.put(SamColumns.GROUP_DESCRIPTION, "changed");
     editable.put(SamColumns.SLIDES, "1700");
-    editable.put(SamColumns.DISCARDS, "300");
     editable.put(SamColumns.THICKNESS, "700");
     editable.put(SamColumns.STAIN, "Hematoxylin+Eosin");
     editable.put(SamColumns.QC_STATUS, "Waiting: Path Report");
@@ -323,7 +322,6 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     editable.put(SamColumns.GROUP_ID, "12");
     editable.put(SamColumns.GROUP_DESCRIPTION, "different");
     editable.put(SamColumns.SLIDES, "17");
-    editable.put(SamColumns.DISCARDS, "3");
     editable.put(SamColumns.THICKNESS, "7");
     editable.put(SamColumns.STAIN, "Hematoxylin+Eosin");
     editable.put(SamColumns.QC_STATUS, "Waiting: Path Report");
@@ -350,7 +348,6 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     empty.put(SamColumns.GROUP_ID, "");
     empty.put(SamColumns.GROUP_DESCRIPTION, "");
     empty.put(SamColumns.SLIDES, "17");
-    empty.put(SamColumns.DISCARDS, "3");
     empty.put(SamColumns.THICKNESS, "");
     empty.put(SamColumns.STAIN, "");
     empty.put(SamColumns.QC_STATUS, "Not Ready");

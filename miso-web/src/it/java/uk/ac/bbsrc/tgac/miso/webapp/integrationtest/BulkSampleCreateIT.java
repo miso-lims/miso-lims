@@ -48,9 +48,8 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
       SamColumns.TIMEPOINT);
 
   // columns specific to creating Slides
-  private static final Set<String> slideColumns = Sets.newHashSet(SamColumns.SOP, SamColumns.SLIDES, SamColumns.DISCARDS,
-      SamColumns.THICKNESS, SamColumns.STAIN, SamColumns.PERCENT_TUMOUR, SamColumns.PERCENT_NECROSIS, SamColumns.MARKED_AREA,
-      SamColumns.MARKED_AREA_PERCENT_TUMOUR);
+  private static final Set<String> slideColumns = Sets.newHashSet(SamColumns.SOP, SamColumns.SLIDES, SamColumns.THICKNESS, SamColumns.STAIN,
+      SamColumns.PERCENT_TUMOUR, SamColumns.PERCENT_NECROSIS, SamColumns.MARKED_AREA, SamColumns.MARKED_AREA_PERCENT_TUMOUR);
 
   // columns specific to creating curls
   private static final Set<String> tissuePieceColumns = Sets.newHashSet(SamColumns.SOP, SamColumns.PIECE_TYPE, SamColumns.SLIDES_CONSUMED);
@@ -397,7 +396,6 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     slide.put(SamColumns.TISSUE_MATERIAL, "FFPE");
     slide.put(SamColumns.REGION, "Medulla oblongata");
     slide.put(SamColumns.SLIDES, "7");
-    slide.put(SamColumns.DISCARDS, "0");
     slide.put(SamColumns.THICKNESS, "5");
     slide.put(SamColumns.STAIN, "Hematoxylin+Eosin");
     slide.put(SamColumns.QC_STATUS, "Ready");
@@ -445,7 +443,6 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     slide.put(SamColumns.TISSUE_MATERIAL, "FFPE");
     slide.put(SamColumns.REGION, "Medulla oblongata");
     slide.put(SamColumns.SLIDES, "7");
-    slide.put(SamColumns.DISCARDS, "0");
     slide.put(SamColumns.THICKNESS, "5");
     slide.put(SamColumns.STAIN, "Hematoxylin+Eosin");
     slide.put(SamColumns.QC_STATUS, "Ready");

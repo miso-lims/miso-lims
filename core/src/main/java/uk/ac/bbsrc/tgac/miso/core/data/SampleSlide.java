@@ -14,10 +14,6 @@ public interface SampleSlide extends SampleTissueProcessing {
 
   public void setSlides(Integer slides);
 
-  public Integer getDiscards();
-
-  public void setDiscards(Integer discards);
-
   public Integer getThickness();
 
   public void setThickness(Integer thickness);

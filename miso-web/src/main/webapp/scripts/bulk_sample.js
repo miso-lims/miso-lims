@@ -786,14 +786,6 @@ BulkTarget.sample = (function($) {
         required: true,
         min: 0
       }, {
-        title: 'Discards',
-        type: 'int',
-        data: 'discards',
-        include: targetCategory === 'Tissue Processing',
-        sampleSubcategory: 'Slide',
-        required: true,
-        min: 0
-      }, {
         title: 'Thickness',
         type: 'int',
         data: 'thickness',

@@ -1125,7 +1125,6 @@ public class Dtos {
     SampleSlideDto dto = new SampleSlideDto();
     setInteger(dto::setInitialSlides, from.getInitialSlides(), true);
     setInteger(dto::setSlides, from.getSlides(), true);
-    setInteger(dto::setDiscards, from.getDiscards(), true);
     setInteger(dto::setThickness, from.getThickness(), true);
     setId(dto::setStainId, from.getStain());
     setString(dto::setPercentTumour, from.getPercentTumour());
@@ -1139,7 +1138,6 @@ public class Dtos {
     SampleSlide to = new SampleSlideImpl();
     setInteger(to::setInitialSlides, from.getInitialSlides(), true);
     setInteger(to::setSlides, from.getSlides(), true);
-    setInteger(to::setDiscards, from.getDiscards(), true);
     setInteger(to::setThickness, from.getThickness(), true);
     setObject(to::setStain, Stain::new, from.getStainId());
     setBigDecimal(to::setPercentTumour, from.getPercentTumour());
