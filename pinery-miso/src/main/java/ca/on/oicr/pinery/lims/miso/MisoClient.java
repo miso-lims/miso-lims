@@ -866,7 +866,6 @@ public class MisoClient implements Lims {
       },
       STAIN("stain", "Stain"),
       SLIDES("slides", "Slides"),
-      DISCARDS("discards", "Discards"),
       DISTRIBUTED("distributed", "Distributed") {
         @Override
         public String extractStringValueFrom(ResultSet rs) throws SQLException {
@@ -1227,7 +1226,7 @@ public class MisoClient implements Lims {
 
   }
 
-  private static final RowMapper<MisoBoxPosition> boxPositionRowMapper = new RowMapper<MisoBoxPosition>() {
+  private static final RowMapper<MisoBoxPosition> boxPositionRowMapper = new RowMapper<>() {
 
     @Override
     public MisoBoxPosition mapRow(ResultSet rs, int rowNum) throws SQLException {

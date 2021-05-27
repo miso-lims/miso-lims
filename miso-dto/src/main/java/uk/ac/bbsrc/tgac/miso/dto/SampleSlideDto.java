@@ -9,7 +9,6 @@ public class SampleSlideDto extends SampleTissueProcessingDto {
 
   private Integer initialSlides;
   private Integer slides;
-  private Integer discards;
   private Integer thickness;
   private Long stainId;
   private String percentTumour;
@@ -31,14 +30,6 @@ public class SampleSlideDto extends SampleTissueProcessingDto {
 
   public void setSlides(Integer slides) {
     this.slides = slides;
-  }
-
-  public Integer getDiscards() {
-    return discards;
-  }
-
-  public void setDiscards(Integer discards) {
-    this.discards = discards;
   }
 
   public Integer getThickness() {

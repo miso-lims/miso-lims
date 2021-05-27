@@ -18,7 +18,6 @@ public class SampleSlideImpl extends SampleTissueProcessingImpl implements Sampl
 
   private Integer initialSlides;
   private Integer slides;
-  private Integer discards;
   private Integer thickness;
   private BigDecimal percentTumour;
   private BigDecimal percentNecrosis;
@@ -47,16 +46,6 @@ public class SampleSlideImpl extends SampleTissueProcessingImpl implements Sampl
   @Override
   public void setSlides(Integer slides) {
     this.slides = slides;
-  }
-
-  @Override
-  public Integer getDiscards() {
-    return discards;
-  }
-
-  @Override
-  public void setDiscards(Integer discards) {
-    this.discards = discards;
   }
 
   @Override

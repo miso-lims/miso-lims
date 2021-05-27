@@ -118,7 +118,6 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.GROUP_ID, "1");
     attrs.put(SamColumns.GROUP_DESCRIPTION, "Test one");
     attrs.put(SamColumns.SLIDES, "7");
-    attrs.put(SamColumns.DISCARDS, "0");
     attrs.put(SamColumns.THICKNESS, "5");
     attrs.put(SamColumns.STAIN, "Hematoxylin+Eosin");
     attrs.put(SamColumns.QC_STATUS, "Ready");

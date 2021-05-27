@@ -153,7 +153,6 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
 
   protected void assertSlideAttributes(Map<String, String> attributes, SampleSlide sample) {
     assertEntityAttribute(SamColumns.SLIDES, attributes, sample, s -> s.getSlides().toString());
-    assertEntityAttribute(SamColumns.DISCARDS, attributes, sample, s -> s.getDiscards() == null ? "" : s.getDiscards().toString());
     assertEntityAttribute(SamColumns.THICKNESS, attributes, sample,
         s -> s.getThickness() == null ? "" : sample.getThickness().toString());
     assertEntityAttribute(SamColumns.STAIN, attributes, sample, s -> s.getStain() == null ? "" : s.getStain().getName());

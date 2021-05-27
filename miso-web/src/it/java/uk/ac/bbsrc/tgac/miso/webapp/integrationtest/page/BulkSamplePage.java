@@ -58,7 +58,6 @@ public class BulkSamplePage extends BulkPage {
     public static final String TIMEPOINT = "Timepoint";
     public static final String INITIAL_SLIDES = "Initial Slides";
     public static final String SLIDES = "Slides";
-    public static final String DISCARDS = "Discards";
     public static final String THICKNESS = "Thickness";
     public static final String STAIN = "Stain";
     public static final String PERCENT_TUMOUR = "% Tumour";

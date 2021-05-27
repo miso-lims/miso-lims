@@ -53,7 +53,6 @@ SELECT s.alias NAME
         ,subp.alias subproject
         ,COALESCE(IF(rcpt.excludeFromPinery, NULL, rcpt.institute), IF(la.excludeFromPinery, NULL, la.alias)) institute
         ,s.initialSlides slides
-        ,s.discards discards
         ,stain.name stain
         ,s.slidesConsumed slides_consumed
         ,s.isSynthetic isSynthetic
@@ -185,7 +184,6 @@ SELECT l.alias NAME
         ,NULL subproject
         ,IF(rcpt.excludeFromPinery, NULL, rcpt.institute) institute
         ,NULL slides
-        ,NULL discards
         ,NULL stain
         ,NULL slides_consumed
         ,NULL isSynthetic
@@ -317,7 +315,6 @@ SELECT d.alias name
         ,NULL subproject
         ,IF(rcpt.excludeFromPinery, NULL, rcpt.institute) institute
         ,NULL slides
-        ,NULL discards
         ,NULL stain
         ,NULL slides_consumed
         ,NULL isSynthetic

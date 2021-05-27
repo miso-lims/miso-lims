@@ -395,12 +395,6 @@ FormTarget.sample = (function($) {
               min: 0,
               required: true
             }, {
-              title: 'Discards',
-              data: 'discards',
-              type: 'int',
-              min: 0,
-              required: true
-            }, {
               title: 'Thickness (µm)',
               data: 'thickness',
               type: 'int',

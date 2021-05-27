@@ -108,7 +108,6 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forString("Group ID", effectiveGroupIdProperty(GroupIdentifiable::getGroupId)), //
       Column.forString("Description", Sample::getDescription), //
       Column.forInteger("Slides", detailedSample(SampleSlide.class, SampleSlide::getSlides, null)), //
-      Column.forInteger("Discards", detailedSample(SampleSlide.class, SampleSlide::getDiscards, null)), //
       Column.forString("QC Status", qcStatusFunction()), //
       Column.forString("QC Status Note", detailedSample(DetailedSample.class, DetailedSample::getDetailedQcStatusNote, "")), //
       Column.forString("Notes",
