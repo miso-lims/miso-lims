@@ -351,7 +351,9 @@ FormTarget.library = (function($) {
           data: 'kitDescriptorId',
           type: 'dropdown',
           required: true,
-          source: [], // initialized by platformType onChange
+          source: Constants.kitDescriptors.filter(function(item) {
+            return item.kitType === 'Library' && item.platformType === object.platformType;
+          }),
           sortSource: Utils.sorting.standardSort('name'),
           getItemLabel: function(item) {
             return item.name;

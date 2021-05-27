@@ -173,7 +173,10 @@ FormTarget.libraryaliquot = (function($) {
                       title: 'Targeted Sequencing',
                       data: 'targetedSequencingId',
                       type: 'dropdown',
-                      source: [], // initialized by kitDescriptorId onChange
+                      source: !object.kitDescriptorId ? [] : Constants.targetedSequencings.filter(function(tarseq) {
+                        return tarseq.kitDescriptorIds.indexOf(object.kitDescriptorId) !== -1
+                            && (!tarseq.archived || object.targetedSequencingId === tarseq.id);
+                      }),
                       sortSource: Utils.sorting.standardSort('alias'),
                       getItemLabel: function(item) {
                         return item.alias;
