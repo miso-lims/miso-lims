@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -274,34 +274,33 @@ public enum SampleSheet {
       return Stream.of(makeColumns(false, model, partitionNumber, partitionBarcode, aliquot, Collections.emptyList(), userName)
           .collect(Collectors.joining(",")));
     }
-    List<List<String>> indices = null;
     Index index1 = aliquot.getParentLibrary().getIndex1();
     Index index2 = aliquot.getParentLibrary().getIndex2();
-    if (index1.getFamily().hasFakeSequence()) {
-      indices = index1.getRealSequences().stream()
+    Set<String> sequence1s = getSequences(index1, model);
+    List<List<String>> indices = null;
+    if (index2 == null) {
+      indices = sequence1s.stream()
           .map(Collections::singletonList)
           .collect(Collectors.toList());
     } else {
-      indices = Arrays.asList(Collections.singletonList(index1.getSequence()));
-    }
-    if (index2 != null) {
-      if (index2.getFamily().hasFakeSequence()) {
-        indices.addAll(index2.getRealSequences().stream()
-            .map(model.getDataManglingPolicy() == InstrumentDataManglingPolicy.I5_RC ? SampleSheet::reverseComplement : Function.identity())
-            .map(Collections::singletonList)
-            .collect(Collectors.toList()));
-      } else {
-        String sequence = model.getDataManglingPolicy() == InstrumentDataManglingPolicy.I5_RC
-            ? SampleSheet.reverseComplement(index2.getSequence())
-            : index2.getSequence();
-        indices.add(Collections.singletonList(sequence));
-      }
+      Set<String> sequence2s = getSequences(index2, model);
+      indices = sequence1s.stream()
+          .flatMap(sequence1 -> sequence2s.stream()
+              .map(sequence2 -> Arrays.asList(sequence1, sequence2)))
+          .collect(Collectors.toList());
     }
     final boolean needsSuffix = indices.size() > 1;
     return indices.stream()
         .map(index -> makeColumns(needsSuffix, model, partitionNumber, partitionBarcode, aliquot, index, userName)
             .collect(Collectors.joining(",")));
+  }
 
+  private Set<String> getSequences(Index index, InstrumentModel model) {
+    Set<String> sequences = index.getFamily().hasFakeSequence() ? index.getRealSequences() : Collections.singleton(index.getSequence());
+    if (index.getPosition() == 2 && model.getDataManglingPolicy() == InstrumentDataManglingPolicy.I5_RC) {
+      sequences = sequences.stream().map(SampleSheet::reverseComplement).collect(Collectors.toSet());
+    }
+    return sequences;
   }
 
   protected abstract Stream<String> getColumns();
