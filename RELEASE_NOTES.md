@@ -23,6 +23,7 @@ Starting with version 1.29.0, the format of this file is based on
 ### Known Issues
 
 * Error generating sample sheets from the Edit Run page
+* Blank text search returning items with ANY value instead of items with NO value
 
 
 ## [1.30.0] - 2021-05-13
@@ -36,6 +37,7 @@ Starting with version 1.29.0, the format of this file is based on
 ### Known Issues
 
 * Error generating sample sheets from the Edit Run page
+* Blank text search returning items with ANY value instead of items with NO value
 
 
 ## [1.29.0] - 2021-05-06
@@ -73,6 +75,7 @@ Starting with version 1.29.0, the format of this file is based on
 * Error when attempting to upload files
 * Existing identities not found by lookup on Create Samples page (detailed sample)
 * Error generating sample sheets from the Edit Run page
+* Blank text search returning items with ANY value instead of items with NO value
 
 
 ## [1.28.1]
@@ -84,6 +87,8 @@ Changes:
 Known Issues:
 
 * Toolbars are not displayed correctly in the Items list on the Edit Transfer page
+* Blank text search returning items with ANY value instead of items with NO value
+
 
 ## [1.28.0]
 
@@ -117,6 +122,7 @@ Known issues:
 
 * Oxford Nanopore containers fail to save
 * Toolbars are not displayed correctly in the Items list on the Edit Transfer page
+* Blank text search returning items with ANY value instead of items with NO value
 
 ## 1.27.0
 
@@ -150,6 +156,7 @@ Upgrade Notes:
 Known Issues:
 
 * No projects are shown for any runs in the Runs list
+* Blank text search returning items with ANY value instead of items with NO value
 
 ## 1.26.0
 
