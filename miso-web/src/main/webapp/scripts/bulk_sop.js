@@ -27,7 +27,11 @@ BulkTarget.sop = (function() {
         type: 'text',
         data: 'version',
         required: true,
-        maxLength: 50
+        maxLength: 50,
+        disabled: config.pageMode === 'edit',
+        description: 'Version of the SOP. this is not modifiable as changing the version would '
+            + 'affect items already using the SOP. A new SOP should be created to represent a new '
+            + 'version. The old version can then be archived if it will no longer be used.'
       }, {
         title: 'Category',
         type: 'dropdown',
