@@ -115,7 +115,7 @@ public class DbUtils {
   }
 
   private static Criterion textRestriction(String propertyName, String query) {
-    if (query == null) {
+    if (LimsUtils.isStringEmptyOrNull(query)) {
       return Restrictions.isNull(propertyName);
     } else if (isQuoted(query)) {
       String finalQuery = removeQuotes(query);
