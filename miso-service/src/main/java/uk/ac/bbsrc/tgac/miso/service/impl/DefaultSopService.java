@@ -78,7 +78,6 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
   @Override
   protected void applyChanges(Sop to, Sop from) throws IOException {
     to.setAlias(from.getAlias());
-    to.setVersion(from.getVersion());
     to.setUrl(from.getUrl());
     to.setArchived(from.isArchived());
   }
