@@ -31,7 +31,8 @@ public class BulkLibraryAliquotIT extends AbstractIT {
       LibraryAliquotColumns.DESIGN_CODE, LibraryAliquotColumns.QC_STATUS, LibraryAliquotColumns.QC_NOTE, LibraryAliquotColumns.SIZE,
       LibraryAliquotColumns.CONCENTRATION, LibraryAliquotColumns.CONCENTRATION_UNITS, LibraryAliquotColumns.VOLUME,
       LibraryAliquotColumns.VOLUME_UNITS, LibraryAliquotColumns.NG_USED, LibraryAliquotColumns.VOLUME_USED,
-      LibraryAliquotColumns.CREATION_DATE, LibraryAliquotColumns.TARGETED_SEQUENCING);
+      LibraryAliquotColumns.CREATION_DATE, LibraryAliquotColumns.KIT, LibraryAliquotColumns.KIT_LOT,
+      LibraryAliquotColumns.TARGETED_SEQUENCING);
 
   private static final Set<String> propagateColumns = Sets.newHashSet(LibraryAliquotColumns.PARENT_NAME,
       LibraryAliquotColumns.PARENT_ALIAS);
@@ -84,6 +85,7 @@ public class BulkLibraryAliquotIT extends AbstractIT {
         Sets.newHashSet(304L));
     HandsOnTable table = page.getTable();
     
+    table.enterText(LibraryAliquotColumns.KIT, 0, "Test Kit");
     Set<String> targetedSequencings = table.getDropdownOptions(LibraryAliquotColumns.TARGETED_SEQUENCING, 0);
     assertTrue(targetedSequencings.contains("Test TarSeq One"));
     assertTrue(targetedSequencings.contains("Test TarSeq Two"));
@@ -108,6 +110,8 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     attrs.put(LibraryAliquotColumns.ID_BARCODE, "102938");
     attrs.put(LibraryAliquotColumns.CONCENTRATION, "3.45");
     attrs.put(LibraryAliquotColumns.CREATION_DATE, "2017-08-14");
+    attrs.put(LibraryAliquotColumns.KIT, "Test Kit");
+    attrs.put(LibraryAliquotColumns.KIT_LOT, "20210526");
     attrs.put(LibraryAliquotColumns.TARGETED_SEQUENCING, "Test TarSeq Two");
     attrs.put(LibraryAliquotColumns.QC_STATUS, "Ready");
 
@@ -161,6 +165,8 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     attrs.put(LibraryAliquotColumns.CONCENTRATION, "4.56");
     attrs.put(LibraryAliquotColumns.VOLUME, "9.77");
     attrs.put(LibraryAliquotColumns.CREATION_DATE, "2017-08-14");
+    attrs.put(LibraryAliquotColumns.KIT, "Test Kit");
+    attrs.put(LibraryAliquotColumns.KIT_LOT, "20210526");
     attrs.put(LibraryAliquotColumns.TARGETED_SEQUENCING, "Test TarSeq One");
     attrs.put(LibraryAliquotColumns.QC_STATUS, "Not Ready");
 
@@ -436,6 +442,9 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     testLibraryAliquotAttribute(LibraryAliquotColumns.NG_USED, attributes, aliquot, dil -> LimsUtils.toNiceString(dil.getNgUsed()));
     testLibraryAliquotAttribute(LibraryAliquotColumns.VOLUME_USED, attributes, aliquot,
         dil -> dil.getVolumeUsed() == null ? "" : LimsUtils.toNiceString(dil.getVolumeUsed()));
+    testLibraryAliquotAttribute(LibraryAliquotColumns.KIT, attributes, aliquot,
+        x -> x.getKitDescriptor() == null ? null : x.getKitDescriptor().getName());
+    testLibraryAliquotAttribute(LibraryAliquotColumns.KIT_LOT, attributes, aliquot, LibraryAliquot::getKitLot);
     testLibraryAliquotAttribute(LibraryAliquotColumns.TARGETED_SEQUENCING, attributes, aliquot, dil -> {
       if (dil.getTargetedSequencing() == null) {
         return null;
@@ -457,11 +466,7 @@ public class BulkLibraryAliquotIT extends AbstractIT {
   }
 
   private String cleanNullValues(String key, String value) {
-    if (LibraryAliquotColumns.TARGETED_SEQUENCING.equals(key)) {
-      return NO_TAR_SEQ.equals(value) ? null : value;
-    } else {
-      return value == null || value.isEmpty() ? null : value;
-    }
+    return value == null || value.isEmpty() ? null : value;
   }
 
   private boolean compareDoubles(BigDecimal d1, String d2) {

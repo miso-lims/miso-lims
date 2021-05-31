@@ -73,6 +73,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryAliquotBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryAliquotChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferView;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -113,6 +114,12 @@ public class LibraryAliquot extends AbstractBoxable
   private ConcentrationUnit concentrationUnits;
 
   private Integer dnaSize;
+
+  @ManyToOne
+  @JoinColumn(name = "kitDescriptorId")
+  private KitDescriptor kitDescriptor;
+
+  private String kitLot;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = true)
@@ -274,6 +281,22 @@ public class LibraryAliquot extends AbstractBoxable
     this.dnaSize = dnaSize;
   }
 
+  public KitDescriptor getKitDescriptor() {
+    return kitDescriptor;
+  }
+
+  public void setKitDescriptor(KitDescriptor kitDescriptor) {
+    this.kitDescriptor = kitDescriptor;
+  }
+
+  public String getKitLot() {
+    return kitLot;
+  }
+
+  public void setKitLot(String kitLot) {
+    this.kitLot = kitLot;
+  }
+
   public VolumeUnit getVolumeUnits() {
     return this.volumeUnits;
   }
@@ -330,7 +353,9 @@ public class LibraryAliquot extends AbstractBoxable
         LibraryAliquot::getLibrary,
         LibraryAliquot::getTargetedSequencing,
         LibraryAliquot::getDetailedQcStatus,
-        LibraryAliquot::getDetailedQcStatusNote);
+        LibraryAliquot::getDetailedQcStatusNote,
+        LibraryAliquot::getKitDescriptor,
+        LibraryAliquot::getKitLot);
   }
 
   @CoverageIgnore
@@ -344,7 +369,9 @@ public class LibraryAliquot extends AbstractBoxable
         library,
         targetedSequencing,
         detailedQcStatus,
-        detailedQcStatusNote);
+        detailedQcStatusNote,
+        kitDescriptor,
+        kitLot);
   }
 
   @Override

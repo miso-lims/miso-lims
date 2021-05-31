@@ -43,6 +43,8 @@ public class BulkLibraryAliquotPage extends BulkPage {
     public static final String NG_USED = "Parent ng Used";
     public static final String VOLUME_USED = "Parent Vol. Used";
     public static final String CREATION_DATE = "Creation Date";
+    public static final String KIT = "Kit";
+    public static final String KIT_LOT = "Kit Lot";
     public static final String TARGETED_SEQUENCING = "Targeted Sequencing";
 
     private LibraryAliquotColumns() {

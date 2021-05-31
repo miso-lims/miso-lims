@@ -6,6 +6,7 @@ import static uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils.*;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,6 +29,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -105,6 +107,7 @@ public class EditLibraryAliquotController {
   private final class BulkPropagateLibraryBackend extends BulkPropagateTableBackend<Library, LibraryAliquotDto> {
 
     private final BoxDto newBox;
+    private final Map<Long, Long> defaultTargetedSequencingByProject = new HashMap<>();
 
     private BulkPropagateLibraryBackend(BoxDto newBox) {
       super("libraryaliquot", LibraryAliquotDto.class, "Library Aliquots", "Libraries");
@@ -127,16 +130,18 @@ public class EditLibraryAliquotController {
       dto.setLibraryId(item.getId());
       dto.setLibraryName(item.getName());
       dto.setLibraryAlias(item.getAlias());
-      dto.setLibraryKitDescriptorId(item.getKitDescriptor() == null ? null : item.getKitDescriptor().getId());
       dto.setParentName(item.getName());
       dto.setParentVolume(item.getVolume() == null ? null : item.getVolume().toString());
-      if (item.getSample().getProject().getDefaultTargetedSequencing() != null) {
-        dto.setTargetedSequencingId(item.getSample().getProject().getDefaultTargetedSequencing().getId());
-      }
       dto.setBox(newBox);
       if (item.getConcentration() != null) {
         dto.setConcentration(LimsUtils.toNiceString(item.getConcentration()));
         dto.setConcentrationUnits(item.getConcentrationUnits());
+      }
+      dto.setLibraryPlatformType(item.getPlatformType().getKey());
+      Project project = item.getSample().getProject();
+      dto.setProjectId(project.getId());
+      if (project.getDefaultTargetedSequencing() != null) {
+        defaultTargetedSequencingByProject.put(project.getId(), project.getDefaultTargetedSequencing().getId());
       }
       return dto;
     }
@@ -149,6 +154,7 @@ public class EditLibraryAliquotController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.putPOJO("box", newBox);
+      config.set("defaultTargetedSequencingByProject", mapper.valueToTree(defaultTargetedSequencingByProject));
     }
 
     @Override
@@ -160,6 +166,7 @@ public class EditLibraryAliquotController {
   private final class BulkPropagateAliquotBackend extends BulkPropagateTableBackend<LibraryAliquot, LibraryAliquotDto> {
 
     private final BoxDto newBox;
+    private final Map<Long, Long> defaultTargetedSequencingByProject = new HashMap<>();
 
     private BulkPropagateAliquotBackend(BoxDto newBox) {
       super("libraryaliquot", LibraryAliquotDto.class, "Library Aliquots", "Library Aliquots");
@@ -184,18 +191,18 @@ public class EditLibraryAliquotController {
       dto.setLibraryId(item.getLibrary().getId());
       dto.setLibraryName(item.getLibrary().getName());
       dto.setLibraryAlias(item.getLibrary().getAlias());
-      dto.setLibraryKitDescriptorId(item.getLibrary().getKitDescriptor() == null ? null : item.getLibrary().getKitDescriptor().getId());
       dto.setParentName(item.getName());
       dto.setParentVolume(item.getVolume() == null ? null : item.getVolume().toString());
-      if (item.getTargetedSequencing() != null) {
-        dto.setTargetedSequencingId(item.getTargetedSequencing().getId());
-      } else if (item.getLibrary().getSample().getProject().getDefaultTargetedSequencing() != null) {
-        dto.setTargetedSequencingId(item.getLibrary().getSample().getProject().getDefaultTargetedSequencing().getId());
-      }
       dto.setBox(newBox);
       if (item.getConcentration() != null) {
         dto.setConcentration(LimsUtils.toNiceString(item.getConcentration()));
         dto.setConcentrationUnits(item.getConcentrationUnits());
+      }
+      dto.setLibraryPlatformType(item.getLibrary().getPlatformType().getKey());
+      Project project = item.getLibrary().getSample().getProject();
+      dto.setProjectId(project.getId());
+      if (project.getDefaultTargetedSequencing() != null) {
+        defaultTargetedSequencingByProject.put(project.getId(), project.getDefaultTargetedSequencing().getId());
       }
       return dto;
     }
@@ -208,6 +215,7 @@ public class EditLibraryAliquotController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.putPOJO("box", newBox);
+      config.set("defaultTargetedSequencingByProject", mapper.valueToTree(defaultTargetedSequencingByProject));
     }
 
     @Override
@@ -236,7 +244,7 @@ public class EditLibraryAliquotController {
     return bulkPropagateBackend.propagate(aliquotIds, model);
   }
 
-  private final BulkEditTableBackend<LibraryAliquot, LibraryAliquotDto> bulkEditBackend = new BulkEditTableBackend<LibraryAliquot, LibraryAliquotDto>(
+  private final BulkEditTableBackend<LibraryAliquot, LibraryAliquotDto> bulkEditBackend = new BulkEditTableBackend<>(
       "libraryaliquot", LibraryAliquotDto.class, "Library Aliquots") {
 
     @Override

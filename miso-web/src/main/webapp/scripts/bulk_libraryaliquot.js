@@ -5,10 +5,11 @@ BulkTarget.libraryaliquot = (function($) {
    * Expected config: {
    *   pageMode: string {propagate, edit}
    *   box: optional new box created to put items in
+   *   defaultTargetedSequencingByProject
    * }
    */
 
-  var originalEffectiveGroupIdsByRow = {};
+  var originalDataByRow = {};
   var parentVolumesByRow = {};
 
   return {
@@ -152,7 +153,7 @@ BulkTarget.libraryaliquot = (function($) {
 
       columns = columns.concat(BulkUtils.columns.boxable(config, api));
       columns = columns.concat(BulkUtils.columns.groupId(true, function(rowIndex) {
-        return originalEffectiveGroupIdsByRow[rowIndex];
+        return originalDataByRow[rowIndex].effectiveGroupIds;
       }));
 
       columns.push({
@@ -171,9 +172,11 @@ BulkTarget.libraryaliquot = (function($) {
           var designCode = Utils.array.findFirstOrNull(function(designCode) {
             return designCode.code === newValue;
           }, Constants.libraryDesignCodes);
-          api.updateField(rowIndex, 'targetedSequencingId', {
+          var changes = {
             required: designCode ? designCode.targetedSequencingRequired : false
-          });
+          };
+          api.updateField(rowIndex, 'kitDescriptorId', changes);
+          api.updateField(rowIndex, 'targetedSequencingId', changes);
         }
       });
 
@@ -184,19 +187,63 @@ BulkTarget.libraryaliquot = (function($) {
       columns = columns.concat(BulkUtils.columns.parentUsed);
 
       columns.push(BulkUtils.columns.creationDate(true, true, 'library aliquot'), {
+        title: 'Kit',
+        type: 'dropdown',
+        data: 'kitDescriptorId',
+        source: function(data) {
+          return Constants.kitDescriptors.filter(function(kit) {
+          	return kit.kitType === 'Library' && kit.platformType === data.libraryPlatformType;
+          });
+        },
+        sortSource: Utils.sorting.standardSort('name'),
+        getItemLabel: Utils.array.getName,
+        getItemValue: Utils.array.getId,
+        onChange: function(rowIndex, newValue, api) {
+        	api.updateField(rowIndex, 'kitLot', {
+          	disabled: !newValue,
+            required: !!newValue
+          });
+          var kitDescriptor = !newValue ? null : Constants.kitDescriptors.find(function(x) {
+          	return x.kitType === 'Library' && x.name === newValue;
+          });
+          var tarSeqs = (!newValue || !kitDescriptor) ? [] : Constants.targetedSequencings.filter(function(tarseq) {
+            return tarseq.kitDescriptorIds.indexOf(kitDescriptor.id) !== -1
+                && (!tarseq.archived || originalDataByRow[rowIndex].targetedSequencingId === tarseq.id);
+          });
+          // select default targeted sequencing for project if valid
+          var selectedTarseqAlias = undefined;
+          if (config.pageMode === 'propagate' && !api.getValue(rowIndex, 'targetedSequencingId')) {
+	          var defaultTarseqId = config.defaultTargetedSequencingByProject[originalDataByRow[rowIndex].projectId];
+            var selectedTarseq = tarSeqs.find(Utils.array.idPredicate(defaultTarseqId));
+            if (selectedTarseq) {
+            	selectedTarseqAlias = selectedTarseq.alias;
+            }
+          }
+        	api.updateField(rowIndex, 'targetedSequencingId', {
+          	source: tarSeqs,
+            disabled: !tarSeqs.length,
+            value: newValue ? selectedTarseqAlias : null
+          });
+        }
+      }, {
+        title: 'Kit Lot',
+        type: 'text',
+        data: 'kitLot',
+        maxLength: 255,
+        required: config.pageMode === 'propagate',
+        regex: Utils.validation.uriComponentRegex
+      }, {
         title: 'Targeted Sequencing',
         type: 'dropdown',
         data: 'targetedSequencingId',
-        include: Constants.isDetailedSample,
-        source: function(data, api) {
-          if (!data.libraryKitDescriptorId) {
-            return [];
-          }
-          return Constants.targetedSequencings.filter(function(tarseq) {
-            return tarseq.kitDescriptorIds.indexOf(data.libraryKitDescriptorId) !== -1
-                && (!tarseq.archived || data.targetedSequencingId === tarseq.id);
-          });
+        getData: function(aliquot) {
+  	      if (!aliquot.targetedSequencingId) {
+        		return null;
+        	}
+          var tarSeq = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(aliquot.targetedSequencingId), Constants.targetedSequencings);
+          return tarSeq.alias;
         },
+        source: [], // initialized in kitDescriptorId onChange
         sortSource: Utils.sorting.standardSort('alias'),
         getItemLabel: Utils.array.getAlias,
         getItemValue: Utils.array.getId
@@ -205,7 +252,11 @@ BulkTarget.libraryaliquot = (function($) {
     },
     prepareData: function(data) {
       data.forEach(function(aliquot, index) {
-        originalEffectiveGroupIdsByRow[index] = aliquot.effectiveGroupId;
+        originalDataByRow[index] = {
+        	effectiveGroupIds: aliquot.effectiveGroupId,
+          targetedSequencingId: aliquot.targetedSequencingId,
+          projectId: aliquot.projectId
+        }
         // prepare parent volumes for validation in confirmSave
         if (aliquot.parentVolume !== undefined && aliquot.parentVolume !== null) {
           if (aliquot.volumeUsed) {

@@ -214,6 +214,13 @@ public class HibernateKitDao implements KitStore, HibernatePaginatedDataSource<K
   }
 
   @Override
+  public long getUsageByLibraryAliquots(KitDescriptor kitDescriptor) throws IOException {
+    return (long) currentSession().createCriteria(LibraryAliquot.class)
+        .add(Restrictions.eq("kitDescriptor", kitDescriptor))
+        .setProjection(Projections.rowCount()).uniqueResult();
+  }
+
+  @Override
   public long getUsageByContainers(KitDescriptor kitDescriptor) throws IOException {
     return (long) currentSession().createCriteria(SequencerPartitionContainerImpl.class)
         .add(Restrictions.or(Restrictions.eq("clusteringKit", kitDescriptor), Restrictions.eq("multiplexingKit", kitDescriptor)))

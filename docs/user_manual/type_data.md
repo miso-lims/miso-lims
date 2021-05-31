@@ -339,7 +339,7 @@ type can only be deleted if it has not been used by any existing libraries.
 A kit descriptor describes a kit product that is used for library or run preparation. The types of kits available in
 MISO are:
 
-* Library kit - used for libraries
+* Library kit - used for libraries and library aliquots
 * Sequencing kit -used for runs
 * Clustering kit - used for sequencing containers
 * Multiplexing kit - used for sequencing containers
@@ -355,15 +355,15 @@ descriptor. To edit an existing kit descriptor, click the kit name in the list. 
 Descriptor page, which works similarly to the Create Kit Descriptor page.
 
 Once a library kit has been created, it is possible to link existing [Targeted Sequencing](#targeted-sequencing) values
-to the kit descriptor. Then, if a library is prepared using this kit descriptor, aliquots created from the library can
+to the kit descriptor. Then, if a library aliquot is prepared using this kit descriptor, it may also
 be assigned a targeted sequencing from the targeted sequencings linked to the kit descriptor. This means that if a
 desired targeted sequencing is not available for a library aliquot, this can be solved by linking the targeted
-sequencing to the kit descriptor of the library aliquot's parent library.
+sequencing to the appropriate kit descriptor and selecting that kit descriptor for the library aliquot first.
 
 MISO administrators can delete kit descriptors using the standard interface. Library kits can only be deleted if they
-are not used by any existing libraries. Clustering and multiplexing kits can only be deleted if they are not used by
-any existing sequencing containers. Sequencing kits can only be deleted if they are not used by any existing runs. QC
-kits can only be deleted if they are not used by any existing QCs.
+are not used by any existing libraries or library aliquots. Clustering and multiplexing kits can only be deleted if
+they are not used by any existing sequencing containers. Sequencing kits can only be deleted if they are not used by
+any existing runs. QC kits can only be deleted if they are not used by any existing QCs.
 
 
 
@@ -428,9 +428,8 @@ options when creating new library aliquots.
 MISO administrators can add, edit, and delete targeted sequencings using the standard interface. A targeted sequencing
 can only be deleted if it has not been used by any existing library aliquots.
 
-Targeted sequencings are associated with kits, and a targeted sequencing may only be set on a library aliquot if its
-parent library uses an associated kit. Targeted sequencings can be associated with a kit from the Edit Kit Descriptor
-page.
+Targeted sequencings are associated with kits, and a targeted sequencing may only be set on a library aliquot that uses
+an associated kit. Targeted sequencings can be associated with a kit from the Edit Kit Descriptor page.
 
 
 

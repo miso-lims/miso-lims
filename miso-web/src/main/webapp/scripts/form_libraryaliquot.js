@@ -92,9 +92,11 @@ FormTarget.libraryaliquot = (function($) {
               },
               onChange: function(newValue, form) {
                 var designCode = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(newValue), Constants.libraryDesignCodes);
-                form.updateField('targetedSequencingId', {
+                var changes = {
                   required: designCode.targetedSequencingRequired
-                });
+                };
+                form.updateField('kitDescriptorId', changes);
+                form.updateField('targetedSequencingId', changes);
               }
             }].concat(FormUtils.makeDetailedQcStatusFields()).concat(
                 [
@@ -137,14 +139,43 @@ FormTarget.libraryaliquot = (function($) {
                       data: 'creationDate',
                       required: 'true',
                       type: 'date'
-                    },
-                    {
+                    }, {
+                      title: 'Kit',
+                      data: 'kitDescriptorId',
+                      type: 'dropdown',
+                      source: Constants.kitDescriptors.filter(function(kit) {
+                        return kit.kitType === 'Library' && kit.platformType === object.libraryPlatformType;
+                      }),
+                      sortSource: Utils.sorting.standardSort('name'),
+                      getItemLabel: function(item) {
+                        return item.name;
+                      },
+                      getItemValue: function(item) {
+                        return item.id;
+                      },
+                      onChange: function(newValue, form) {
+                        var kitDescriptor = !newValue ? null : Utils.array.findUniqueOrThrow(Utils.array.idPredicate(newValue), Constants.kitDescriptors);
+                        var tarseqs = !kitDescriptor ? [] : Constants.targetedSequencings.filter(function(tarseq) {
+                          return tarseq.kitDescriptorIds.indexOf(kitDescriptor.id) !== -1
+                              && (!tarseq.archived || object.targetedSequencingId === tarseq.id);
+                        });
+                        form.updateField('targetedSequencingId', {
+                          source: tarseqs
+                        });
+                      }
+                    }, {
+                      title: 'Kit Lot',
+                      data: 'kitLot',
+                      type: 'text',
+                      maxLength: 100,
+                      regex: Utils.validation.uriComponentRegex
+                    }, {
                       title: 'Targeted Sequencing',
                       data: 'targetedSequencingId',
                       type: 'dropdown',
-                      source: Constants.targetedSequencings.filter(function(targetedSequencing) {
-                        return targetedSequencing.kitDescriptorIds.indexOf(object.libraryKitDescriptorId) > -1
-                            && (!targetedSequencing.archived || object.targetedSequencingId === targetedSequencing.id);
+                      source: !object.kitDescriptorId ? [] : Constants.targetedSequencings.filter(function(tarseq) {
+                        return tarseq.kitDescriptorIds.indexOf(object.kitDescriptorId) !== -1
+                            && (!tarseq.archived || object.targetedSequencingId === tarseq.id);
                       }),
                       sortSource: Utils.sorting.standardSort('alias'),
                       getItemLabel: function(item) {
