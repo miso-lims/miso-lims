@@ -4136,6 +4136,9 @@ public class Dtos {
     setString(to::setQcNote, from.getQcNote());
     setString(to::setQcUserName, maybeGetProperty(from.getQcUser(), User::getFullName));
     setDateString(to::setQcDate, from.getQcDate());
+    setBoolean(to::setDataReview, from.getDataReview(), true);
+    setString(to::setDataReviewer, maybeGetProperty(from.getDataReviewer(), User::getFullName));
+    setDateString(to::setDataReviewDate, from.getDataReviewDate());
     return to;
   }
 
@@ -4148,6 +4151,7 @@ public class Dtos {
     setObject(to::setPurpose, RunPurpose::new, from.getRunPurposeId());
     setObject(to::setQcStatus, RunLibraryQcStatus::new, from.getQcStatusId());
     setString(to::setQcNote, from.getQcNote());
+    setBoolean(to::setDataReview, from.getDataReview(), true);
     return to;
   }
 
@@ -4302,6 +4306,7 @@ public class Dtos {
     setBoolean(to::setQcPassed, from.getQcPassed(), true);
     setLong(to::setQcStatusId, from.getQcStatusId(), true);
     setString(to::setQcNote, from.getQcNote());
+    setBoolean(to::setDataReview, from.getDataReview(), true);
   }
 
   public static QcStatusUpdate to(@Nonnull QcNodeDto from) {

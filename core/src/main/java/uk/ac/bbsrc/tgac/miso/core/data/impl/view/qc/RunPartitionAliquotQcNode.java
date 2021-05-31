@@ -95,6 +95,8 @@ public class RunPartitionAliquotQcNode implements QcNode {
 
   private String qcNote;
 
+  private Boolean dataReview;
+
   public RunQcNode getRun() {
     return run;
   }
@@ -174,6 +176,15 @@ public class RunPartitionAliquotQcNode implements QcNode {
 
   public void setQcNote(String qcNote) {
     this.qcNote = qcNote;
+  }
+
+  @Override
+  public Boolean getDataReview() {
+    return dataReview;
+  }
+
+  public void setDataReview(Boolean dataReview) {
+    this.dataReview = dataReview;
   }
 
   @Override

@@ -838,6 +838,9 @@ button.disabled {
 .tooltip {
     position: relative;
     display: inline-block;
+}
+
+.tooltipIcon {
     padding: 5px;
 }
 
@@ -853,7 +856,7 @@ button.disabled {
     padding-right: 5px;
     position: absolute;
     z-index: 1;
-    left: -300%;
+    right: 0px;
     top: 25px;
 
     /* Fade in tooltip - takes 1 second to go from 0% to 100% opac: */

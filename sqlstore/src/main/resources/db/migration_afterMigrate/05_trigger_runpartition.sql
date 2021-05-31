@@ -40,7 +40,10 @@ FOR EACH ROW
       makeChangeMessage('QC status', NULL, (SELECT description FROM RunLibraryQcStatus WHERE statusId = NEW.statusId)),
       makeChangeMessage('QC note', NULL, NEW.qcNote),
       makeChangeMessage('QC user', NULL, (SELECT fullName FROM User WHERE userId = NEW.qcUser)),
-      makeChangeMessage('QC date', NULL, NEW.qcDate)
+      makeChangeMessage('QC date', NULL, NEW.qcDate),
+      makeChangeMessage('data review', NULL, dataReviewToString(NEW.dataReview)),
+      makeChangeMessage('data reviewer', NULL, (SELECT fullName from User WHERE userId = NEW.dataReviewerId)),
+      makeChangeMessage('data review date', NULL, NEW.dataReviewDate)
     );
     
     IF log_message IS NOT NULL AND log_message <> '' THEN
@@ -59,7 +62,10 @@ FOR EACH ROW
         makeChangeColumn('aliquot statusId', NULL, NEW.statusId),
         makeChangeColumn('aliquot qcNote', NULL, NEW.qcNote),
         makeChangeColumn('aliquot qcUser', NULL, NEW.qcUser),
-        makeChangeColumn('aliquot qcDate', NULL, NEW.qcDate)
+        makeChangeColumn('aliquot qcDate', NULL, NEW.qcDate),
+        makeChangeColumn('aliquot dataReview', NULL, NEW.dataReview),
+        makeChangeColumn('aliquot dataReviewerId', NULL, NEW.dataReviewerId),
+        makeChangeColumn('aliquot dataReviewDate', NULL, NEW.dataReviewDate)
       ), ''),
       NEW.lastModifier,
       CONCAT(@container, '-', @partitionNumber, '-', @aliquot, ' ', log_message)
@@ -77,7 +83,10 @@ FOR EACH ROW
       makeChangeMessage('QC status', (SELECT description FROM RunLibraryQcStatus WHERE statusId = OLD.statusId), (SELECT description FROM RunLibraryQcStatus WHERE statusId = NEW.statusId)),
       makeChangeMessage('QC note', OLD.qcNote, NEW.qcNote),
       makeChangeMessage('QC user', (SELECT fullName FROM User WHERE userId = OLD.qcUser), (SELECT fullName FROM User WHERE userId = NEW.qcUser)),
-      makeChangeMessage('QC date', OLD.qcDate, NEW.qcDate)
+      makeChangeMessage('QC date', OLD.qcDate, NEW.qcDate),
+      makeChangeMessage('data review', dataReviewToString(OLD.dataReview), dataReviewToString(NEW.dataReview)),
+      makeChangeMessage('data reviewer', (SELECT fullName from User WHERE userId = OLD.dataReviewerId), (SELECT fullName from User WHERE userId = NEW.dataReviewerId)),
+      makeChangeMessage('data review date', OLD.dataReviewDate, NEW.dataReviewDate)
     );
     
     IF log_message IS NOT NULL AND log_message <> '' THEN
@@ -96,7 +105,10 @@ FOR EACH ROW
         makeChangeColumn('aliquot statusId', OLD.statusId, NEW.statusId),
         makeChangeColumn('aliquot qcNote', OLD.qcNote, NEW.qcNote),
         makeChangeColumn('aliquot qcUser', OLD.qcUser, NEW.qcUser),
-        makeChangeColumn('aliquot qcDate', OLD.qcDate, NEW.qcDate)
+        makeChangeColumn('aliquot qcDate', OLD.qcDate, NEW.qcDate),
+        makeChangeColumn('aliquot dataReview', OLD.dataReview, NEW.dataReview),
+        makeChangeColumn('aliquot dataReviewerId', OLD.dataReviewerId, NEW.dataReviewerId),
+        makeChangeColumn('aliquot dataReviewDate', OLD.dataReviewDate, NEW.dataReviewDate)
       ), ''),
       NEW.lastModifier,
       CONCAT(@container, '-', @partitionNumber, '-', @aliquot, ' ', log_message)

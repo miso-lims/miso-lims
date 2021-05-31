@@ -228,7 +228,31 @@ FormTarget.run = (function($) {
           title: 'Completion Date',
           data: 'endDate',
           type: 'date'
-        }, FormUtils.makeQcPassedField(), FormUtils.makeQcUserField(), FormUtils.makeQcDateField(), {
+        }, (function() {
+          var qcPassed = FormUtils.makeQcPassedField();
+          qcPassed.onChange = function(newValue, form) {
+            if (newValue === null) {
+              form.updateField('dataReview', {
+                disabled: true,
+                value: null
+              });
+            } else {
+              form.updateField('dataReview', {
+                disabled: false,
+                value: newValue === object.qcPassed ? undefined : null
+              });
+            }
+            if (newValue === null || newValue !== object.qcPassed) {
+              form.updateField('dataReviewerName', {
+                label: null
+              });
+              form.updateField('dataReviewDate', {
+                label: null
+              });
+            }
+          };
+          return qcPassed;
+        })(), FormUtils.makeQcUserField(), FormUtils.makeQcDateField(), {
           title: 'Data Review',
           data: 'dataReview',
           type: 'dropdown',

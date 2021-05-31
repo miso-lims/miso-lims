@@ -65,11 +65,21 @@ var RunLibraryMetrics = (function($) {
         Utils.showOkDialog('Error', ['No changes to save']);
         return;
       }
-      Utils.ajaxWithDialog('Saving...', 'PUT', Urls.rest.qcStatuses.bulkUpdate, changes.map(Utils.array.get('update')), function() {
-        changes.forEach(function(change) {
-          change.rowData.update(change.update);
+      function save() {
+        Utils.ajaxWithDialog('Saving...', 'PUT', Urls.rest.qcStatuses.bulkUpdate, changes.map(Utils.array.get('update')), function() {
+          changes.forEach(function(change) {
+            change.rowData.dataReview = null; // TODO: test
+            change.rowData.update(change.update);
+          });
         });
-      });
+      }
+      if (changes.some(function(change) {
+        return change.rowData.dataReview !== null;
+      })) {
+        warnDataReviewReset(save);
+      } else {
+        save();
+      }
     },
     hasUnsavedChanges: function() {
       return getAllChanges().length > 0;
@@ -248,10 +258,23 @@ var RunLibraryMetrics = (function($) {
 
     controls.apply.click(function() {
       var updated = Object.assign({}, rowData.selectedNode, rowData.getUpdate());
-      Utils.ajaxWithDialog('Setting Status', 'PUT', Urls.rest.qcStatuses.update, updated, function(response) {
-        rowData.update(updated);
-      });
+      
+      function update() {
+        Utils.ajaxWithDialog('Setting Status', 'PUT', Urls.rest.qcStatuses.update, updated, function(response) {
+          rowData.update(updated);
+        });
+      }
+      
+      if (rowData.selectedNode.dataReview !== null) {
+        warnDataReviewReset(update);
+      } else {
+        update();
+      }
     });
+  }
+  
+  function warnDataReviewReset(acceptCallback) {
+    Utils.showConfirmDialog('Warning', 'OK', ['Changing QC status will reset the data review. Do you wish to proceed?'], acceptCallback);
   }
 
   function updateQcCellDetailedQcStatus(controls, qcNode, rowData) {

@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -98,10 +99,17 @@ public class DefaultQcStatusService implements QcStatusService {
     case RUN: {
       Run run = runService.get(update.getId());
       throwIfNull("Run", run);
+      if (update.getQcPassed() == null || run.getQcPassed() == null || !update.getQcPassed().equals(run.getQcPassed())) {
+        run.setDataReview(null);
+        run.setDataReviewer(null);
+        run.setDataReviewDate(null);
+      }
       if (update.getQcPassed() == null) {
         run.setQcUser(null);
+        run.setQcDate(null);
       } else if (!update.getQcPassed().equals(run.getQcPassed())) {
         run.setQcUser(authorizationManager.getCurrentUser());
+        run.setQcDate(new Date());
       }
       run.setQcPassed(update.getQcPassed());
       runService.update(run);
@@ -146,15 +154,22 @@ public class DefaultQcStatusService implements QcStatusService {
         runLib.setRun(run);
         runLib.setPartition(partition);
         runLib.setAliquot(aliquot);
+      } else if (update.getQcStatusId() == null || runLib.getQcStatus() == null
+          || !update.getQcStatusId().equals(runLib.getQcStatus().getId())) {
+            runLib.setDataReview(null);
+            runLib.setDataReviewer(null);
+            runLib.setDataReviewDate(null);
       }
       if (update.getQcStatusId() == null) {
         runLib.setQcStatus(null);
         runLib.setQcUser(null);
+        runLib.setQcDate(null);
       } else {
         RunLibraryQcStatus status = runLibraryQcStatusService.get(update.getQcStatusId());
         throwIfNull("Run-library QC status", status);
         runLib.setQcStatus(status);
         runLib.setQcUser(authorizationManager.getCurrentUser());
+        runLib.setQcDate(new Date());
       }
       runLib.setQcNote(update.getQcNote());
       runPartitionAliquotService.save(runLib);

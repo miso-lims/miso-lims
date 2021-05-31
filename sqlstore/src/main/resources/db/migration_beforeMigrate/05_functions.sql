@@ -39,6 +39,16 @@ BEGIN
   END;
 END//
 
+DROP FUNCTION IF EXISTS dataReviewToString//
+CREATE FUNCTION dataReviewToString(original BOOLEAN) RETURNS CHAR(21)
+BEGIN
+  RETURN CASE original
+    WHEN TRUE THEN 'Pass'
+    WHEN FALSE THEN 'Fail'
+    ELSE 'n/a'
+  END;
+END//
+
 DROP FUNCTION IF EXISTS boxSizeToString//
 CREATE FUNCTION boxSizeToString(id bigint(20)) RETURNS varchar(50)
 BEGIN

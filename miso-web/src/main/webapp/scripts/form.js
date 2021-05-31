@@ -487,8 +487,10 @@ FormUtils = (function($) {
                 Utils.ui.setDisabled(inputSelector, options.disabled);
                 break;
               case 'value':
-                setFormValue(containerId, field, options.value, object);
-                cascade = true;
+                if (options.value !== undefined) {
+                  setFormValue(containerId, field, options.value, object);
+                  cascade = true;
+                }
                 break;
               case 'required':
                 field.required = options.required;
@@ -517,8 +519,10 @@ FormUtils = (function($) {
                 if (field.type !== 'read-only' || !field.getDisplayValue) {
                   throw new Error('Cannot set label for field \'' + field.title + '\'');
                 }
-                $('#' + makeInputId(containerId, field.data) + 'Label').text(options.label || '');
-                cascade = true;
+                if (options.label !== undefined) {
+                  $('#' + makeInputId(containerId, field.data) + 'Label').text(options.label || '');
+                  cascade = true;
+                }
                 break;
               }
               case 'link': {

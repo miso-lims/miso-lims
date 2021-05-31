@@ -18,6 +18,9 @@ public class RunPartitionAliquotDto {
   private String qcNote;
   private String qcUserName;
   private String qcDate;
+  private Boolean dataReview;
+  private String dataReviewer;
+  private String dataReviewDate;
 
   public Long getId() {
     return id;
@@ -137,6 +140,30 @@ public class RunPartitionAliquotDto {
 
   public void setQcDate(String qcDate) {
     this.qcDate = qcDate;
+  }
+
+  public Boolean getDataReview() {
+    return dataReview;
+  }
+
+  public void setDataReview(Boolean dataReview) {
+    this.dataReview = dataReview;
+  }
+
+  public String getDataReviewer() {
+    return dataReviewer;
+  }
+
+  public void setDataReviewer(String dataReviewer) {
+    this.dataReviewer = dataReviewer;
+  }
+
+  public String getDataReviewDate() {
+    return dataReviewDate;
+  }
+
+  public void setDataReviewDate(String dataReviewDate) {
+    this.dataReviewDate = dataReviewDate;
   }
 
 }

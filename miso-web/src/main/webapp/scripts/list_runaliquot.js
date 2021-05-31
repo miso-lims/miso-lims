@@ -8,26 +8,68 @@ ListTarget.runaliquot = {
     return [{
       name: 'Set QC',
       action: function(aliquots) {
-        var fields = [{
-          label: 'Status',
-          type: 'select',
-          property: 'status',
-          values: [{
-            id: null,
-            description: 'Pending'
-          }].concat(Constants.runLibraryQcStatuses),
-          getLabel: Utils.array.get('description')
-        }, {
-          label: 'Note',
-          type: 'text',
-          property: 'qcNote'
-        }];
-        Utils.showDialog('Set QC', 'OK', fields, function(output) {
-          aliquots.forEach(function(aliquot) {
-            aliquot.qcStatusId = output.status.id;
-            aliquot.qcNote = output.qcNote ? output.qcNote : null;
+        function showUpdateDialog() {
+          var fields = [{
+            label: 'Status',
+            type: 'select',
+            property: 'status',
+            values: [{
+              id: null,
+              description: 'Pending'
+            }].concat(Constants.runLibraryQcStatuses),
+            getLabel: Utils.array.get('description')
+          }, {
+            label: 'Note',
+            type: 'text',
+            property: 'qcNote'
+          }];
+          Utils.showDialog('Set QC', 'OK', fields, function(output) {
+            aliquots.forEach(function(aliquot) {
+              aliquot.qcStatusId = output.status.id;
+              aliquot.qcNote = output.qcNote ? output.qcNote : null;
+            });
+            Utils.ajaxWithDialog('Setting QC', 'PUT', Urls.rest.runs.updateAliquots(config.runId), aliquots, Utils.page.pageReload);
           });
-          Utils.ajaxWithDialog('Setting QC', 'PUT', Urls.rest.runs.updateAliquots(config.runId), aliquots, Utils.page.pageReload);
+        }
+        
+        if (aliquots.some(function(aliquot) {
+          return aliquot.dataReview !== null;
+        })) {
+          showConfirmDialog('Warning', 'OK', ['Changing QC status will reset the data review. Do you wish to proceed?'], showUpdateDialog);
+        } else {
+          showUpdateDialog();
+        }
+      }
+    }, {
+      name: 'Data Review',
+      action: function(aliquots) {
+        if (aliquots.some(function(aliquot) {
+          return !aliquot.qcStatusId;
+        })) {
+          Utils.showOkDialog('Error', ['Cannot set data review before QC status']);
+          return;
+        }
+        var fields = [{
+          label: 'Data Review',
+          type: 'select',
+          property: 'dataReview',
+          values: [{
+            value: null,
+            label: 'Pending'
+          }, {
+            value: true,
+            label: 'Pass'
+          }, {
+            value: false,
+            label: 'Fail'
+          }],
+          getLabel: Utils.array.get('label')
+        }];
+        Utils.showDialog('Set Data Review', 'OK', fields, function(output) {
+          aliquots.forEach(function(aliquot) {
+            aliquot.dataReview = output.dataReview.value;
+          });
+          Utils.ajaxWithDialog('Setting Data Review', 'PUT', Urls.rest.runs.updateAliquots(config.runId), aliquots, Utils.page.pageReload);
         });
       }
     }, {
@@ -66,19 +108,37 @@ ListTarget.runaliquot = {
     }, "aliquotAlias", 0, true), {
       sTitle: "QC Status",
       mData: "qcStatusId",
-      mRender: ListUtils.render.textFromId(Constants.runLibraryQcStatuses, 'description', 'Pending')
+      mRender: function(data, type, full) {
+        if (data === undefined || data === null) {
+          return 'Pending';
+        }
+        var status = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(data), Constants.runLibraryQcStatuses);
+        if (type !== 'display') {
+          return status.description;
+        }
+        return '<div class="tooltip"><span>' + status.description + '</span>'
+            + '<span class=tooltiptext>Set by ' + full.qcUserName + ', ' + full.qcDate
+            + '</span></div>';
+      }
     }, {
       sTitle: "QC Note",
       mData: 'qcNote',
       sDefaultContent: ''
     }, {
-      sTitle: 'QC User',
-      mData: 'qcUserName',
-      sDefaultContent: 'n/a'
-    }, {
-      sTitle: 'QC Date',
-      mData: 'qcDate',
-      sDefaultContent: 'n/a'
+      sTitle: 'Data Review',
+      mData: 'dataReview',
+      mRender: function(data, type, full) {
+        if (data === undefined || data === null) {
+          return 'Pending';
+        }
+        var status = data ? 'Pass' : 'Fail';
+        if (type !== 'display') {
+          return status;
+        }
+        return '<div class="tooltip"><span>' + status + '</span>'
+            + '<span class=tooltiptext>Set by ' + full.dataReviewer + ', ' + full.dataReviewDate
+            + '</span></div>';
+      }
     }, {
       sTitle: 'Hierarchy',
       mData: function(full) {
