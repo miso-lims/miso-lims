@@ -897,16 +897,6 @@ Utils.timer = {
     };
   },
 
-  typewatchFunc: function(obj, func, wait, capturelength) {
-    var options = {
-      callback: func,
-      wait: wait,
-      highlight: true,
-      captureLength: capturelength
-    };
-    jQuery(obj).typeWatch(options);
-  },
-
   queueFunctions: function(funcs) {
     if (Object.prototype.toString.apply(funcs) === '[object Array]') {
       for (var i = 0; i < funcs.length; i++) {
@@ -1097,26 +1087,10 @@ Utils.validation = {
   uriComponentRegex: '^[^<>&%;\/\\\\]*$', // problem characters even when encoded in URI components: %;\/
   alphanumRegex: '^[-_\\w]*$',
   unicodeWordRegex: '^[\\p{L}0-9_\\^\\-\\.\\s]+$',
-  _unicodeWord: XRegExp('^[\\p{L}0-9_\\^\\-\\.\\s]+$'),
   emailRegex: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
 
   isNullCheck: function(value) {
     return (value === "" || value === " " || value === "undefined" || value === "&nbsp;" || value === undefined);
-  },
-
-  validate_input_field: function(field, name, okstatus) {
-    var self = this;
-    var errormsg = '';
-    if (!self._unicodeWord.test(jQuery(field).val())) {
-      okstatus = false;
-      errormsg = "In the " + name + " " + jQuery(field).attr("id")
-          + " field you CAN use alpha numeric values with the following symbols:\n" + "^ - _ .\n"
-          + "but you CANNOT use slashes, comma, brackets, single or double quotes, and it CANNOT end with a space or be empty\n\n";
-    }
-    return {
-      "okstatus": okstatus,
-      "errormsg": errormsg
-    };
   },
 
   // Clean input fields by removing leading and trailing whitespace
