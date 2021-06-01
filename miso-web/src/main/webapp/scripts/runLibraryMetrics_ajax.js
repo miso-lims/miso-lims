@@ -68,7 +68,7 @@ var RunLibraryMetrics = (function($) {
       function save() {
         Utils.ajaxWithDialog('Saving...', 'PUT', Urls.rest.qcStatuses.bulkUpdate, changes.map(Utils.array.get('update')), function() {
           changes.forEach(function(change) {
-            change.rowData.dataReview = null; // TODO: test
+            change.rowData.dataReview = null;
             change.rowData.update(change.update);
           });
         });

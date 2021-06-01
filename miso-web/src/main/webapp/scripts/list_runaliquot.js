@@ -35,7 +35,7 @@ ListTarget.runaliquot = {
         if (aliquots.some(function(aliquot) {
           return aliquot.dataReview !== null;
         })) {
-          showConfirmDialog('Warning', 'OK', ['Changing QC status will reset the data review. Do you wish to proceed?'], showUpdateDialog);
+          Utils.showConfirmDialog('Warning', 'OK', ['Changing QC status will reset the data review. Do you wish to proceed?'], showUpdateDialog);
         } else {
           showUpdateDialog();
         }
@@ -117,7 +117,7 @@ ListTarget.runaliquot = {
           return status.description;
         }
         return '<div class="tooltip"><span>' + status.description + '</span>'
-            + '<span class=tooltiptext>Set by ' + full.qcUserName + ', ' + full.qcDate
+            + '<span class="tooltiptext">Set by ' + full.qcUserName + ', ' + full.qcDate
             + '</span></div>';
       }
     }, {
@@ -136,7 +136,7 @@ ListTarget.runaliquot = {
           return status;
         }
         return '<div class="tooltip"><span>' + status + '</span>'
-            + '<span class=tooltiptext>Set by ' + full.dataReviewer + ', ' + full.dataReviewDate
+            + '<span class="tooltiptext">Set by ' + full.dataReviewer + ', ' + full.dataReviewDate
             + '</span></div>';
       }
     }, {
