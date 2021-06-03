@@ -450,7 +450,9 @@ BulkTarget.sample = (function($) {
         include: Constants.isDetailedSample,
         required: true,
         source: function(data, limitedApi) {
-          if (data.parentSampleClassId) {
+          if (config.pageMode === 'edit') {
+            return Constants.sampleClasses.filter(Utils.array.idPredicate(data.sampleClassId));
+          } else if (data.parentSampleClassId) {
             return filterSampleClassesByParentId(sampleClassOptions, data.parentSampleClassId);
           } else {
             return sampleClassOptions;
