@@ -866,6 +866,7 @@ public class MisoClient implements Lims {
       },
       STAIN("stain", "Stain"),
       SLIDES("slides", "Slides"),
+      INITIAL_SLIDES("initialSlides", "Initial Slides"),
       DISTRIBUTED("distributed", "Distributed") {
         @Override
         public String extractStringValueFrom(ResultSet rs) throws SQLException {
