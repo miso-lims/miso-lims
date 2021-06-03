@@ -1,6 +1,5 @@
 <%@ include file="../header.jsp" %>
 
-
 <%--
   ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
   ~ MISO project contacts: Robert Davey @ TGAC

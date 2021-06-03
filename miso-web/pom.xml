@@ -352,16 +352,9 @@
               </cssSourceIncludes>
               <cssFinalFile>style.css</cssFinalFile>
               <jsSourceDir>scripts</jsSourceDir>
-              <jsSourceFiles>
-                <jsSourceFile>jquery/datatables/js/jquery.dataTables.min.js</jsSourceFile>
-              </jsSourceFiles>
               <jsSourceIncludes>
                 <jsSourceInclude>*.js</jsSourceInclude>
               </jsSourceIncludes>
-              <jsSourceExcludes>
-                <jsSourceExclude>xregexp-all-min.js</jsSourceExclude>
-                <jsSourceExclude>runCalendar.js</jsSourceExclude>
-              </jsSourceExcludes>
               <jsFinalFile>header_script.js</jsFinalFile>
             </configuration>
           </execution>

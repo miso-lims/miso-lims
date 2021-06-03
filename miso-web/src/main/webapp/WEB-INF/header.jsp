@@ -46,26 +46,12 @@
   <!-- jQuery -->
   <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery-1.8.3.min.js'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery-ui-1.9.2.custom.min.js'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.validate.min.js'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/jquery/colorbox/jquery.colorbox-min-1.4.16.js'/>"></script>
   <link rel="stylesheet" href="<c:url value='/scripts/jquery/css/smoothness/jquery-ui-1.9.2.custom.min.css'/>"
     type="text/css">
-  <link rel="stylesheet" href="<c:url value='/scripts/jquery/colorbox/colorbox-1.4.16.css'/>"
-    type="text/css">
-  <!-- give $ back to prototype -->
-  <script type="text/javascript">jQuery.noConflict();</script>
-
-  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.simplyCountable.js'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.tinysort.min.js'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.typewatch.js'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.uitablefilter.js'/>"></script>
-
-  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.tablesorter.min.js'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.metadata.js'/>"></script>
-
-  <!-- unicode regexs for il8n validation -->
-  <script type="text/javascript" src="<c:url value='/scripts/xregexp-all-min.js'/>"></script>
-
+  <script src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>" type="text/javascript"></script>
+	<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
+	<script type="text/javascript" src="<c:url value='/scripts/jquery/timepicker/js/jquery-ui-timepicker-addon.min.js'/>"></script>
+  
   <!-- high charts -->
   <script type="text/javascript" src="<c:url value='/scripts/highcharts/highcharts.js'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/highcharts/highcharts-more.js'/>"></script>
@@ -81,10 +67,16 @@
   <link rel="stylesheet" media="screen" href="<c:url value='/scripts/handsontable/dist/handsontable.full.css'/>">
   <link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
   <link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
+  <link rel="stylesheet" href="<c:url value='/scripts/jquery/timepicker/css/jquery-ui-timepicker-addon.min.css'/>"
+        type="text/css">
 
   <!-- concatenated MISO stylesheets and scripts -->
   <link rel="stylesheet" href="<c:url value='/styles/style.css'/>" type="text/css">
-  <script type="text/javascript" src="<c:url value='/miso/constants.js'/>?ts=<fmt:formatNumber value="${timestamp.time / 60000}" maxFractionDigits="0" groupingUsed="false" />"></script>
+  
+  <script type="text/javascript">Constants = {};</script>
+  <sec:authorize access="isAuthenticated()">
+    <script type="text/javascript" src="<c:url value='/miso/constants.js'/>?ts=<fmt:formatNumber value="${timestamp.time / 60000}" maxFractionDigits="0" groupingUsed="false" />"></script>
+  </sec:authorize>
   <script type="text/javascript" src="<c:url value='/scripts/header_script.js'/>?version=${miso:version()}"></script>
 
 

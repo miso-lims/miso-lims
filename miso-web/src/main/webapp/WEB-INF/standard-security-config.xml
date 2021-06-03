@@ -78,7 +78,6 @@
     <security:intercept-url pattern="/miso/login" access="permitAll" />
     <security:intercept-url pattern="/miso/accessDenied" access="permitAll" />
     <security:intercept-url pattern="/miso/error" access="permitAll" />
-    <security:intercept-url pattern="/miso/constants.js" access="permitAll" />
     <security:intercept-url pattern="/metrics" access="permitAll" />
     <security:intercept-url pattern="/miso/admin/**" access="hasRole('ROLE_ADMIN')" />
     <security:intercept-url pattern="/miso/mainMenu" access="hasRole('ROLE_INTERNAL')" />
