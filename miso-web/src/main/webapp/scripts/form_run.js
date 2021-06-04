@@ -231,23 +231,22 @@ FormTarget.run = (function($) {
         }, (function() {
           var qcPassed = FormUtils.makeQcPassedField();
           qcPassed.onChange = function(newValue, form) {
-            if (newValue === null) {
+            if (config.isRunReviewer) {
               form.updateField('dataReview', {
-                disabled: true,
-                value: null
+                disabled: newValue === null,
+                value: (newValue !== null && newValue === object.qcPassed) ? undefined : null
               });
-            } else {
+            } else if (newValue === null || newValue !== object.qcPassed) {
               form.updateField('dataReview', {
-                disabled: false,
-                value: newValue === object.qcPassed ? undefined : null
+                label: 'Pending'
               });
             }
             if (newValue === null || newValue !== object.qcPassed) {
               form.updateField('dataReviewerName', {
-                label: null
+                label: 'n/a'
               });
               form.updateField('dataReviewDate', {
-                label: null
+                label: 'n/a'
               });
             }
           };
