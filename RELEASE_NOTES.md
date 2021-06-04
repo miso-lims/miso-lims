@@ -7,6 +7,45 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.31.0] - 2021-06-04
+
+### Added
+
+* Sample stock slides consumed field (detailed sample)
+* Library aliquot kit and kit lot fields
+* Subproject column to Library Sequencing Report run download sheet (detailed sample)
+
+### Changed
+
+* The targeted sequencing options available on a library aliquot now depend on the library aliquot's
+  kit, rather than the library's
+* SOP versions can no longer be modified. A new SOP should be created to represent a new version
+* In Pinery, sample attribute 'Initial Slides' has been added, and 'Slides' now represents the
+  current slide count. 'Discards' has been removed (detailed sample)
+
+### Removed
+
+* Discards field from slides - this information should be recorded by decreasing the slides field
+  instead (detailed sample)
+
+### Fixed
+
+* Error generating sample sheets from the Edit Run page
+* Targeted sequencing column missing on the bulk Library Aliquot pages (plain sample)
+* Blank text search returning items with ANY value instead of items with NO value
+
+### Upgrade Notes
+
+* Considering the addition of kits on library aliquots, you may want to redesign some of your
+  existing kits in MISO. For example, if you were previously using a single kit to represent two
+  separate kits that are used during library preparation, you may want to instead use two separate
+  MISO kits - one on the library, and one on the library aliquot. To ensure the validity of
+  existing data, the upgrade will copy the library kit to the library aliquot for any existing
+  aliquot that has a targeted sequencing option selected.
+* You may wish to review your slide data before this upgrade to ensure that your slide counts are
+  accurately recorded without the discards field (detailed sample)
+
+
 ## [1.30.1] - 2021-05-20
 
 ### Fixed

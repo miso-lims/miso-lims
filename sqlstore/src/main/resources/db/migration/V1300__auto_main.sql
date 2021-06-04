@@ -1,3 +1,4 @@
+-- library_aliquot_kits
 ALTER TABLE LibraryAliquot
   ADD COLUMN kitDescriptorId bigint(20),
   ADD COLUMN kitLot varchar(255),
@@ -7,3 +8,7 @@ UPDATE LibraryAliquot la
 JOIN Library l ON l.libraryId = la.libraryId
 SET la.kitDescriptorId = l.kitDescriptorId, la.kitLot = l.kitLot
 WHERE la.targetedSequencingId IS NOT NULL;
+
+-- remove_slide_discards
+ALTER TABLE Sample DROP COLUMN discards;
+
