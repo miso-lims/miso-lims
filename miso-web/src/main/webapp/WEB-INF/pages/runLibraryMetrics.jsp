@@ -29,7 +29,10 @@
 
 <h1>Run-Library Metrics</h1>
 <div class="right fg-toolbar ui-helper-clearfix paging_full_numbers">
-  <span class="ui-button ui-state-default" onclick="RunLibraryMetrics.showSetAllDialog()">Set All Run-Libraries</span>
+  <span class="ui-button ui-state-default" onclick="RunLibraryMetrics.showQcAllDialog()">QC All Run-Libraries</span>
+  <c:if test="${isRunReviewer}">
+  <span class="ui-button ui-state-default" onclick="RunLibraryMetrics.showReviewAllDialog()">Review All Run-Libraries</span>
+  </c:if>
   <span class="ui-button ui-state-default" onclick="RunLibraryMetrics.saveAll()">Save All</span>
 </div>
 
@@ -37,7 +40,7 @@
 
 <script type="text/javascript">
 jQuery(document).ready(function () {
-  RunLibraryMetrics.buildTable(${tableData});
+  RunLibraryMetrics.buildTable(${tableData}, ${isRunReviewer});
   
   window.onbeforeunload = function() {
     if (RunLibraryMetrics.hasUnsavedChanges()) {

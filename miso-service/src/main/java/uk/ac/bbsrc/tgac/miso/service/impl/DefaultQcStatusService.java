@@ -99,19 +99,27 @@ public class DefaultQcStatusService implements QcStatusService {
     case RUN: {
       Run run = runService.get(update.getId());
       throwIfNull("Run", run);
-      if (update.getQcPassed() == null || run.getQcPassed() == null || !update.getQcPassed().equals(run.getQcPassed())) {
-        run.setDataReview(null);
-        run.setDataReviewer(null);
-        run.setDataReviewDate(null);
-      }
       if (update.getQcPassed() == null) {
+        // QC Passed not set
+        run.setQcPassed(null);
         run.setQcUser(null);
         run.setQcDate(null);
+        clearDataReview(run);
       } else if (!update.getQcPassed().equals(run.getQcPassed())) {
+        // QC Passed set and changed
+        run.setQcPassed(update.getQcPassed());
         run.setQcUser(authorizationManager.getCurrentUser());
         run.setQcDate(new Date());
+        clearDataReview(run);
+      } else if (update.getDataReview() == null) {
+        // QC Passed set and not changed, data review not set
+        clearDataReview(run);
+      } else {
+        // QC Passed set and not changed, data review set and changed
+        run.setDataReview(update.getDataReview());
+        run.setDataReviewer(authorizationManager.getCurrentUser());
+        run.setDataReviewDate(new Date());
       }
-      run.setQcPassed(update.getQcPassed());
       runService.update(run);
       break;
     }
@@ -154,22 +162,29 @@ public class DefaultQcStatusService implements QcStatusService {
         runLib.setRun(run);
         runLib.setPartition(partition);
         runLib.setAliquot(aliquot);
-      } else if (update.getQcStatusId() == null || runLib.getQcStatus() == null
-          || !update.getQcStatusId().equals(runLib.getQcStatus().getId())) {
-            runLib.setDataReview(null);
-            runLib.setDataReviewer(null);
-            runLib.setDataReviewDate(null);
       }
       if (update.getQcStatusId() == null) {
+        // QC status not set
         runLib.setQcStatus(null);
         runLib.setQcUser(null);
         runLib.setQcDate(null);
-      } else {
+        clearDataReview(runLib);
+      } else if (runLib.getQcStatus() == null || runLib.getQcStatus().getId() != update.getQcStatusId().longValue()) {
+        // QC status set and changed
         RunLibraryQcStatus status = runLibraryQcStatusService.get(update.getQcStatusId());
         throwIfNull("Run-library QC status", status);
         runLib.setQcStatus(status);
         runLib.setQcUser(authorizationManager.getCurrentUser());
         runLib.setQcDate(new Date());
+        clearDataReview(runLib);
+      } else if (update.getDataReview() == null) {
+        // QC status set and not changed, data review not set
+        clearDataReview(runLib);
+      } else if (update.getDataReview() != runLib.getDataReview()) {
+        // QC status set and not changed, data review set and changed
+        runLib.setDataReview(update.getDataReview());
+        runLib.setDataReviewer(authorizationManager.getCurrentUser());
+        runLib.setDataReviewDate(new Date());
       }
       runLib.setQcNote(update.getQcNote());
       runPartitionAliquotService.save(runLib);
@@ -180,18 +195,30 @@ public class DefaultQcStatusService implements QcStatusService {
     }
   }
 
+  private static void clearDataReview(Run run) {
+    run.setDataReview(null);
+    run.setDataReviewer(null);
+    run.setDataReviewDate(null);
+  }
+
+  private static void clearDataReview(RunPartitionAliquot runLibrary) {
+    runLibrary.setDataReview(null);
+    runLibrary.setDataReviewer(null);
+    runLibrary.setDataReviewDate(null);
+  }
+
   private void updateDetailedStatus(String typeLabel, DetailedQcItem item, QcStatusUpdate update) throws IOException {
     throwIfNull(typeLabel, item);
     if (update.getQcStatusId() == null) {
       item.setDetailedQcStatus(null);
       item.setQcUser(null);
+      item.setQcDate(null);
     } else if (item.getDetailedQcStatus() == null || item.getDetailedQcStatus().getId() != update.getQcStatusId().longValue()) {
       DetailedQcStatus status = detailedQcStatusService.get(update.getQcStatusId());
-      if (status == null) {
-        throw new ValidationException("Invalid detailed QC status ID: " + update.getQcStatusId());
-      }
+      throwIfNull("QC status", status);
       item.setDetailedQcStatus(status);
       item.setQcUser(authorizationManager.getCurrentUser());
+      item.setQcDate(new Date());
     }
     item.setDetailedQcStatusNote(update.getQcNote());
   }

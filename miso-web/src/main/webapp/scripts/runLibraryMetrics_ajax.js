@@ -3,10 +3,23 @@ var RunLibraryMetrics = (function($) {
   var tableSelector = '#metricsTable';
 
   var tableData = null;
+  var runReviewer = null;
+  
+  var dataReviewOptions = [{
+    label: 'Pending',
+    value: ''
+  }, {
+    label: 'Pass',
+    value: 'true'
+  }, {
+    label: 'Fail',
+    value: 'false'
+  }];
 
   return {
-    buildTable: function(data) {
+    buildTable: function(data, isRunReviewer) {
       tableData = data;
+      runReviewer = isRunReviewer;
 
       var table = $(tableSelector);
       table.empty();
@@ -43,20 +56,35 @@ var RunLibraryMetrics = (function($) {
       });
       table.append(tbody);
     },
-    showSetAllDialog: function() {
+    showQcAllDialog: function() {
       var fields = [{
         label: 'Status',
         property: 'option',
         type: 'select',
-        values: Constants.runLibraryQcStatuses,
+        values: [{
+          id: 0,
+          description: 'Pending'
+        }].concat(Constants.runLibraryQcStatuses),
         getLabel: Utils.array.get('description')
       }, {
         label: 'Note',
         property: 'note',
         type: 'text'
       }];
-      Utils.showDialog('Set All Run-Library QCs', 'Set', fields, function(results) {
+      Utils.showDialog('QC All Run-Libraryies', 'Apply', fields, function(results) {
         setAllRunLibraryQcs(results.option.id, results.note);
+      });
+    },
+    showReviewAllDialog: function() {
+      var fields = [{
+        label: 'Data Review',
+        property: 'option',
+        type: 'select',
+        values: dataReviewOptions,
+        getLabel: Utils.array.get('label')
+      }];
+      Utils.showDialog('Review All Run-Libraries', 'Apply', fields, function(results) {
+        setAllRunLibraryReviews(results.option.value);
       });
     },
     saveAll: function() {
@@ -73,7 +101,7 @@ var RunLibraryMetrics = (function($) {
           });
         });
       }
-      if (changes.some(function(change) {
+      if (anyQcChanges() && changes.some(function(change) {
         return change.rowData.dataReview !== null;
       })) {
         warnDataReviewReset(save);
@@ -149,6 +177,7 @@ var RunLibraryMetrics = (function($) {
       name: $('<span>'),
       status: $('<select>').addClass('statusSelect'),
       note: $('<input>').addClass('noteInput'),
+      dataReview: $('<select>').addClass('dataReviewSelect'),
       apply: $('<button>').text('Apply')
     };
     controls.node.change(function() {
@@ -162,6 +191,7 @@ var RunLibraryMetrics = (function($) {
     appendQcNodeTableRow(table, 'Name:', controls.name);
     appendQcNodeTableRow(table, 'Status:', controls.status);
     appendQcNodeTableRow(table, 'Note:', controls.note);
+    appendQcNodeTableRow(table, 'Data Review:', controls.dataReview);
     appendQcNodeTableRow(table, '', controls.apply);
 
     cell.append(table);
@@ -187,6 +217,8 @@ var RunLibraryMetrics = (function($) {
     controls.status.empty();
     controls.status.off('change');
     Utils.ui.setDisabled(controls.note, true);
+    Utils.ui.setDisabled(controls.dataReview, true);
+    controls.dataReview.empty();
     controls.apply.off('click');
 
     switch (qcNode.entityType) {
@@ -196,15 +228,36 @@ var RunLibraryMetrics = (function($) {
       updateQcCellDetailedQcStatus(controls, qcNode, rowData);
       break;
     case 'Pool':
-    case 'Run':
       controls.status.append(QcHierarchy.qcPassedOptions.map(function(item, i) {
         var qcPassed = qcNode.qcPassed === undefined ? null : qcNode.qcPassed;
         return makeSelectOption(i, item.label, qcPassed === item.value);
       }));
-
       rowData.getUpdate = function() {
         return {
           qcPassed: QcHierarchy.qcPassedOptions[controls.status.val()].value
+        };
+      };
+      break;
+    case 'Run':
+      var qcPassed = qcNode.qcPassed === undefined ? null : qcNode.qcPassed;
+      controls.status.append(QcHierarchy.qcPassedOptions.map(function(item, i) {
+        return makeSelectOption(i, item.label, qcPassed === item.value);
+      }));
+      controls.status.change(function() {
+        var selected = QcHierarchy.qcPassedOptions[controls.status.val()].value;
+        if (selected !== qcPassed) {
+          controls.dataReview.val('');
+        }
+        Utils.ui.setDisabled(controls.dataReview, !runReviewer || selected === null || selected !== qcPassed);
+      }).change();
+      controls.dataReview.append(dataReviewOptions.map(function(item) {
+        return makeSelectOption(item.value, item.label, stringToBoolean(item.value) === qcNode.dataReview);
+      }));
+
+      rowData.getUpdate = function() {
+        return {
+          qcPassed: QcHierarchy.qcPassedOptions[controls.status.val()].value,
+          dataReview: stringToBoolean(controls.dataReview.val())
         };
       };
       break;
@@ -242,12 +295,30 @@ var RunLibraryMetrics = (function($) {
       controls.status.append(Constants.runLibraryQcStatuses.map(function(item) {
         return makeSelectOption(item.id, item.description, qcNode.qcStatusId === item.id);
       }));
+      controls.status.change(function() {
+        var selectedId = Number.parseInt(controls.status.val()) || null;
+        if (selectedId !== qcNode.qcStatusId) {
+          controls.dataReview.val('');
+        }
+        Utils.ui.setDisabled(controls.dataReview, !runReviewer || selectedId === null || selectedId !== qcNode.qcStatusId);
+      }).change();
       Utils.ui.setDisabled(controls.note, false);
+      controls.dataReview.append(dataReviewOptions.map(function(item) {
+        return makeSelectOption(item.value, item.label, stringToBoolean(item.value) === qcNode.dataReview);
+      }))
 
       rowData.getUpdate = function() {
+        var statusId = Number.parseInt(controls.status.val()) || null;
+        var qcPassed = null;
+        if (statusId) {
+          qcPassed = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(statusId), Constants.runLibraryQcStatuses).qcPassed;
+        }
+        
         return {
-          qcStatusId: Number.parseInt(controls.status.val()) || null,
-          qcNote: controls.note.val() || null
+          qcStatusId: statusId,
+          qcPassed: qcPassed,
+          qcNote: controls.note.val() || null,
+          dataReview: stringToBoolean(controls.dataReview.val())
         };
       };
       break;
@@ -257,20 +328,42 @@ var RunLibraryMetrics = (function($) {
     controls.note.val(qcNode.qcNote);
 
     controls.apply.click(function() {
-      var updated = Object.assign({}, rowData.selectedNode, rowData.getUpdate());
+      var updates = rowData.getUpdate();
+      var updated = Object.assign({}, rowData.selectedNode, updates);
       
       function update() {
         Utils.ajaxWithDialog('Setting Status', 'PUT', Urls.rest.qcStatuses.update, updated, function(response) {
           rowData.update(updated);
+          updateQcCell(controls, qcNode, rowData);
         });
       }
       
-      if (rowData.selectedNode.dataReview !== null) {
+      if (qcChanged(rowData.selectedNode, updates) && rowData.selectedNode.dataReview !== null) {
         warnDataReviewReset(update);
       } else {
         update();
       }
     });
+  }
+  
+  function qcChanged(before, after) {
+    if (before.qcPassed === null || before.qcPassed === undefined) {
+      if (after.qcPassed !== null && after.qcPassed !== undefined) {
+        return true;
+      }
+    } else if (after.qcPassed !== before.qcPassed) {
+      return true;
+    }
+    
+    if (before.qcStatusId === null || before.qcStatusId === undefined) {
+      if (after.qcStatusId !== null && after.qcStatusId !== undefined) {
+        return true;
+      }
+    } else if (after.qcStatusId !== before.qcStatusId) {
+      return true;
+    }
+    
+    return false;
   }
   
   function warnDataReviewReset(acceptCallback) {
@@ -332,8 +425,25 @@ var RunLibraryMetrics = (function($) {
       $(this).val($(this).find('option').length - 1);
       $(this).change();
     });
-    $('.statusSelect').val(optionValue);
+    $('.statusSelect').val(optionValue).change();
     $('.noteInput').val(note);
+  }
+
+  function setAllRunLibraryReviews(optionValue) {
+    $('.nodeSelect').each(function() {
+      $(this).val($(this).find('option').length - 1);
+      $(this).change();
+    });
+    $('.dataReviewSelect').val(optionValue);
+  }
+  
+  function anyQcChanges() {
+    for (var i = 0; i < tableData.length; i++) {
+      if (qcChanged(tableData[i].selectedNode, tableData[i].getUpdate())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   function getAllChanges() {
@@ -352,6 +462,17 @@ var RunLibraryMetrics = (function($) {
     }).filter(function(updated) {
       return updated !== null;
     });
+  }
+  
+  function stringToBoolean(string) {
+    switch (string) {
+    case 'true':
+      return true;
+    case 'false':
+      return false;
+    default:
+      return null;
+    }
   }
 
 })(jQuery);

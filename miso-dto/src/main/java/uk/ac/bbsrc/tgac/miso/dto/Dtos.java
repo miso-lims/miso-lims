@@ -4317,6 +4317,7 @@ public class Dtos {
     setBoolean(to::setQcPassed, from.getQcPassed(), true);
     setLong(to::setQcStatusId, from.getQcStatusId(), true);
     setString(to::setQcNote, from.getQcNote());
+    setBoolean(to::setDataReview, from.getDataReview(), true);
     return to;
   }
 

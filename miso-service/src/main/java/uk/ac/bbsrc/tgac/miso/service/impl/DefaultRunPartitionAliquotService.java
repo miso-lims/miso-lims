@@ -73,9 +73,6 @@ public class DefaultRunPartitionAliquotService implements RunPartitionAliquotSer
   @Override
   public void save(RunPartitionAliquot runPartitionAliquot) throws IOException {
     RunPartitionAliquot managed = get(runPartitionAliquot.getRun(), runPartitionAliquot.getPartition(), runPartitionAliquot.getAliquot());
-    if (runPartitionAliquot.getPurpose() != null) {
-      runPartitionAliquot.setPurpose(runPurposeService.get(runPartitionAliquot.getPurpose().getId()));
-    }
     loadChildEntity(runPartitionAliquot::setPurpose, runPartitionAliquot.getPurpose(), runPurposeService, "runPurposeId");
     loadChildEntity(runPartitionAliquot::setQcStatus, runPartitionAliquot.getQcStatus(), runLibraryQcStatusService, "qcStatusId");
     User user = authorizationManager.getCurrentUser();
