@@ -69,7 +69,10 @@ FormTarget.container = (function($) {
           title: 'Clustering Kit',
           data: 'clusteringKitId',
           type: 'dropdown',
-          source: [], // initialized by model.id onChange
+          source: (function() {
+            var platform = Utils.array.findUniqueOrThrow(Utils.array.namePredicate(object.model.platformType), Constants.platformTypes);
+            return getKits('Clustering', platform.key, object.clusteringKitId);
+          })(),
           getItemLabel: function(item) {
             return item.name;
           },
@@ -94,7 +97,10 @@ FormTarget.container = (function($) {
           title: 'Multiplexing Kit',
           data: 'multiplexingKitId',
           type: 'dropdown',
-          source: [], // initialized by model.id onChange
+          source: (function() {
+            var platform = Utils.array.findUniqueOrThrow(Utils.array.namePredicate(object.model.platformType), Constants.platformTypes);
+            return getKits('Multiplexing', platform.key, object.multiplexingKitId);
+          })(),
           getItemLabel: function(item) {
             return item.name;
           },

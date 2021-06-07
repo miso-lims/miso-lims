@@ -353,7 +353,8 @@ FormTarget.library = (function($) {
           type: 'dropdown',
           required: true,
           source: Constants.kitDescriptors.filter(function(item) {
-            return item.kitType === 'Library' && item.platformType === object.platformType;
+            return item.kitType === 'Library' && item.platformType === object.platformType
+                && (!item.archived || item.id === object.kitDescriptorId);
           }),
           sortSource: Utils.sorting.standardSort('name'),
           getItemLabel: function(item) {
