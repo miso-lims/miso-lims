@@ -71,7 +71,7 @@ var RunLibraryMetrics = (function($) {
         property: 'note',
         type: 'text'
       }];
-      Utils.showDialog('QC All Run-Libraryies', 'Apply', fields, function(results) {
+      Utils.showDialog('QC All Run-Libraries', 'Apply', fields, function(results) {
         setAllRunLibraryQcs(results.option.id, results.note);
       });
     },
