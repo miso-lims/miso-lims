@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -27,6 +28,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.QcNode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.QcNodeType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.SampleQcNode;
+import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.QcNodeService;
@@ -51,6 +53,8 @@ public class RunLibraryController {
   private ContainerService containerService;
   @Autowired
   private QcNodeService qcNodeService;
+  @Autowired
+  private AuthorizationManager authorizationManager;
 
   @PostMapping("/metrics")
   public ModelAndView getRunLibraryQcTable(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
@@ -75,6 +79,8 @@ public class RunLibraryController {
 
     model.put("title", "Run-Library Metrics");
     model.put("tableData", mapper.writeValueAsString(rows));
+    User user = authorizationManager.getCurrentUser();
+    model.put("isRunReviewer", user.isRunReviewer() || user.isAdmin());
     return new ModelAndView("/WEB-INF/pages/runLibraryMetrics.jsp", model);
   }
 

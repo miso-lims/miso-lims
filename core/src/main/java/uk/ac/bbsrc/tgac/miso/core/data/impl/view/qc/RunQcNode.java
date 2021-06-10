@@ -28,6 +28,7 @@ public class RunQcNode implements QcNode {
   private String name;
   private String alias;
   private Boolean qcPassed;
+  private Boolean dataReview;
 
   @Transient
   private List<RunPartitionQcNode> runPartitions;
@@ -92,6 +93,15 @@ public class RunQcNode implements QcNode {
     return null;
   }
 
+  @Override
+  public Boolean getDataReview() {
+    return dataReview;
+  }
+
+  public void setDataReview(Boolean dataReview) {
+    this.dataReview = dataReview;
+  }
+
   public List<RunPartitionQcNode> getRunPartitions() {
     if (runPartitions == null) {
       runPartitions = new ArrayList<>();
@@ -110,7 +120,7 @@ public class RunQcNode implements QcNode {
 
   @Override
   public int hashCode() {
-    return Objects.hash(alias, qcPassed, id, name);
+    return Objects.hash(alias, qcPassed, id, name, dataReview);
   }
 
   @Override
@@ -119,7 +129,8 @@ public class RunQcNode implements QcNode {
         RunQcNode::getAlias,
         RunQcNode::getQcPassed,
         RunQcNode::getId,
-        RunQcNode::getName);
+        RunQcNode::getName,
+        RunQcNode::getDataReview);
   }
 
 }

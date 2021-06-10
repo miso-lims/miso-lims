@@ -8,6 +8,7 @@ public class QcStatusUpdate {
   private Boolean qcPassed;
   private Long qcStatusId; // may be detailedQcStatusId or partitionQcTypeId
   private String qcNote;
+  private Boolean dataReview;
 
   public QcNodeType getEntityType() {
     return entityType;
@@ -55,6 +56,14 @@ public class QcStatusUpdate {
 
   public void setQcNote(String qcNote) {
     this.qcNote = qcNote;
+  }
+
+  public Boolean getDataReview() {
+    return dataReview;
+  }
+
+  public void setDataReview(Boolean dataReview) {
+    this.dataReview = dataReview;
   }
 
 }

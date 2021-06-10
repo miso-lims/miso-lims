@@ -19,7 +19,7 @@ FOR EACH ROW
     makeChangeMessage('QC status', qcPassedToString(OLD.qcPassed), qcPassedToString(NEW.qcPassed)),
     makeChangeMessage('QC user', (SELECT fullName FROM User WHERE userId = OLD.qcUser), (SELECT fullName FROM User WHERE userId = NEW.qcUser)),
     makeChangeMessage('QC date', OLD.qcDate, NEW.qcDate),
-    makeChangeMessage('data review', CASE OLD.dataReview WHEN TRUE THEN 'Pass' WHEN FALSE THEN 'Fail' ELSE 'n/a' END, CASE NEW.dataReview WHEN TRUE THEN 'Pass' WHEN FALSE THEN 'Fail' ELSE 'n/a' END),
+    makeChangeMessage('data review', dataReviewToString(OLD.dataReview), dataReviewToString(NEW.dataReview)),
     makeChangeMessage('data reviewer', (SELECT fullName FROM User WHERE userId = OLD.dataReviewerId), (SELECT fullName FROM User WHERE userId = NEW.dataReviewerId)),
     makeChangeMessage('data review date', Old.dataReviewDate, NEW.dataReviewDate),
     makeChangeMessage('SOP', (SELECT CONCAT(alias, ' (', version, ')') FROM Sop WHERE sopId = OLD.sopId), (SELECT CONCAT(alias, ' (', version, ')') FROM Sop WHERE sopId = NEW.sopId)),

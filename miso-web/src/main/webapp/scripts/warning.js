@@ -78,7 +78,7 @@ var Warning = (function($) {
           })) {
             level = 'important';
           }
-          html += ' <div class="tooltip"><span class="message-' + level + ' warning-icon">⚠</span><span class="tooltiptext">'
+          html += ' <div class="tooltip tooltipIcon"><span class="message-' + level + ' warning-icon">⚠</span><span class="tooltiptext">'
               + warnings.map(function(warning) {
                 return warning.tableMessage;
               }).join(';<br>') + '</span></div>';

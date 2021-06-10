@@ -228,7 +228,30 @@ FormTarget.run = (function($) {
           title: 'Completion Date',
           data: 'endDate',
           type: 'date'
-        }, FormUtils.makeQcPassedField(), FormUtils.makeQcUserField(), FormUtils.makeQcDateField(), {
+        }, (function() {
+          var qcPassed = FormUtils.makeQcPassedField();
+          qcPassed.onChange = function(newValue, form) {
+            if (config.isRunReviewer) {
+              form.updateField('dataReview', {
+                disabled: newValue === null,
+                value: (newValue !== null && newValue === object.qcPassed) ? undefined : null
+              });
+            } else if (newValue === null || newValue !== object.qcPassed) {
+              form.updateField('dataReview', {
+                label: 'Pending'
+              });
+            }
+            if (newValue === null || newValue !== object.qcPassed) {
+              form.updateField('dataReviewerName', {
+                label: 'n/a'
+              });
+              form.updateField('dataReviewDate', {
+                label: 'n/a'
+              });
+            }
+          };
+          return qcPassed;
+        })(), FormUtils.makeQcUserField(), FormUtils.makeQcDateField(), {
           title: 'Data Review',
           data: 'dataReview',
           type: 'dropdown',

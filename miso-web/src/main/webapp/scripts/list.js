@@ -190,7 +190,7 @@ ListUtils = (function($) {
     var searchTooltipId = tableId + "_searchHelpTooltip";
 
     $("#" + searchDivId).append(
-        '<div id="' + searchTooltipId + '" class="tooltip">'
+        '<div id="' + searchTooltipId + '" class="tooltip tooltipIcon">'
             + '<img id="searchHelpQuestionMark" src="/styles/images/question_mark.png"><span class="tooltiptext">'
             + makeTooltipHelp(target) + '</span>' + '</div>');
 

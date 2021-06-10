@@ -73,17 +73,28 @@ public class DefaultRunPartitionAliquotService implements RunPartitionAliquotSer
   @Override
   public void save(RunPartitionAliquot runPartitionAliquot) throws IOException {
     RunPartitionAliquot managed = get(runPartitionAliquot.getRun(), runPartitionAliquot.getPartition(), runPartitionAliquot.getAliquot());
-    if (runPartitionAliquot.getPurpose() != null) {
-      runPartitionAliquot.setPurpose(runPurposeService.get(runPartitionAliquot.getPurpose().getId()));
-    }
     loadChildEntity(runPartitionAliquot::setPurpose, runPartitionAliquot.getPurpose(), runPurposeService, "runPurposeId");
     loadChildEntity(runPartitionAliquot::setQcStatus, runPartitionAliquot.getQcStatus(), runLibraryQcStatusService, "qcStatusId");
     User user = authorizationManager.getCurrentUser();
     updateQcDetails(runPartitionAliquot, managed, RunPartitionAliquot::getQcStatus, RunPartitionAliquot::getQcUser,
         RunPartitionAliquot::setQcUser, authorizationManager, RunPartitionAliquot::getQcDate, RunPartitionAliquot::setQcDate);
+    if (isChanged(RunPartitionAliquot::getQcStatus, runPartitionAliquot, managed)) {
+      runPartitionAliquot.setDataReview(null);
+    }
+    ValidationUtils.updateQcDetails(runPartitionAliquot, managed, RunPartitionAliquot::getDataReview, RunPartitionAliquot::getDataReviewer,
+        RunPartitionAliquot::setDataReviewer, authorizationManager, RunPartitionAliquot::getDataReviewDate,
+        RunPartitionAliquot::setDataReviewDate);
 
     List<ValidationError> errors = new ArrayList<>();
+    if (runPartitionAliquot.getDataReview() != null && runPartitionAliquot.getQcStatus() == null) {
+      errors.add(new ValidationError("dataReview", "Cannot set data review before QC status"));
+    }
     validateQcUser(runPartitionAliquot.getQcStatus(), runPartitionAliquot.getQcUser(), errors);
+    if (((managed == null && runPartitionAliquot.getDataReview() != null)
+        || (managed != null && isChanged(RunPartitionAliquot::getDataReview, runPartitionAliquot, managed)))
+        && !user.isRunReviewer() && !user.isAdmin()) {
+      errors.add(new ValidationError("dataReview", "You are not authorized to make this change"));
+    }
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }
@@ -100,6 +111,9 @@ public class DefaultRunPartitionAliquotService implements RunPartitionAliquotSer
       managed.setQcNote(runPartitionAliquot.getQcNote());
       managed.setQcUser(runPartitionAliquot.getQcUser());
       managed.setQcDate(runPartitionAliquot.getQcDate());
+      managed.setDataReview(runPartitionAliquot.getDataReview());
+      managed.setDataReviewer(runPartitionAliquot.getDataReviewer());
+      managed.setDataReviewDate(runPartitionAliquot.getDataReviewDate());
       managed.setLastModifier(user);
       runPartitionAliquotDao.update(managed);
     }

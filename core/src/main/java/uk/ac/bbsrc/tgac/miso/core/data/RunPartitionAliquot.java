@@ -121,6 +121,15 @@ public class RunPartitionAliquot implements Serializable {
   @Temporal(TemporalType.DATE)
   private Date qcDate;
 
+  private Boolean dataReview;
+
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "dataReviewerId")
+  private User dataReviewer;
+
+  @Temporal(TemporalType.DATE)
+  private Date dataReviewDate;
+
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier")
   private User lastModifier;
@@ -206,6 +215,30 @@ public class RunPartitionAliquot implements Serializable {
 
   public void setQcDate(Date qcDate) {
     this.qcDate = qcDate;
+  }
+
+  public Boolean getDataReview() {
+    return dataReview;
+  }
+
+  public void setDataReview(Boolean dataReview) {
+    this.dataReview = dataReview;
+  }
+
+  public User getDataReviewer() {
+    return dataReviewer;
+  }
+
+  public void setDataReviewer(User dataReviewer) {
+    this.dataReviewer = dataReviewer;
+  }
+
+  public Date getDataReviewDate() {
+    return dataReviewDate;
+  }
+
+  public void setDataReviewDate(Date dataReviewDate) {
+    this.dataReviewDate = dataReviewDate;
   }
 
   public User getLastModifier() {

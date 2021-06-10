@@ -328,6 +328,9 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   private void validateChanges(Run before, Run changed) throws IOException {
     ValidationUtils.updateQcDetails(changed, before, Run::getQcPassed, Run::getQcUser, Run::setQcUser, authorizationManager, Run::getQcDate,
         Run::setQcDate);
+    if (isChanged(Run::getQcPassed, changed, before)) {
+      changed.setDataReview(null);
+    }
     ValidationUtils.updateQcDetails(changed, before, Run::getDataReview, Run::getDataReviewer, Run::setDataReviewer, authorizationManager,
         Run::getDataReviewDate, Run::setDataReviewDate);
 
@@ -367,6 +370,9 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       errors.add(new ValidationError("sequencingKitLot", "Sequencing kit not specified"));
     }
 
+    if (changed.getDataReview() != null && changed.getQcPassed() == null) {
+      errors.add(new ValidationError("dataReview", "Cannot set data review before QC status"));
+    }
     ValidationUtils.validateQcUser(changed.getQcPassed(), changed.getQcUser(), errors);
     ValidationUtils.validateQcUser(changed.getDataReview(), changed.getDataReviewer(), errors, "data review", "Data reviewer");
 

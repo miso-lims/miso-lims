@@ -25,6 +25,10 @@ public interface QcNode extends Serializable {
 
   public String getQcNote();
 
+  public default Boolean getDataReview() {
+    return null;
+  };
+
   public List<? extends QcNode> getChildren();
 
 }
