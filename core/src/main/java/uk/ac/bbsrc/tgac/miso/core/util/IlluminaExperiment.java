@@ -64,6 +64,29 @@ public enum IlluminaExperiment {
       settings.put("AdapterRead2", "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT");
 
     }
+  },
+  FASTQ_ONLY_NEXTERA_XT("FASTQ Only (Nextera XT)") {
+
+    @Override
+    protected void applyAttribute(Map<String, String> header, Map<String, String> settings) {
+      header.put("Workflow", "GenerateFASTQ");
+      header.put("Application", "FASTQ Only");
+      header.put("Assay", "Nextera XT");
+      settings.put("ReverseComplement", "0");
+      settings.put("Adapter", "CTGTCTCTTATACACATCT");
+    }
+  },
+  FASTQ_ONLY_TRUSEQ_NANO_DNA("FASTQ Only (TruSeq Nano DNA)") {
+
+    @Override
+    protected void applyAttribute(Map<String, String> header, Map<String, String> settings) {
+      header.put("Workflow", "GenerateFASTQ");
+      header.put("Application", "FASTQ Only");
+      header.put("Assay", "TruSeq Nano DNA");
+      settings.put("ReverseComplement", "0");
+      settings.put("Adapter", "AGATCGGAAGAGCACACGTCTGAACTCCAGTCA");
+      settings.put("AdapterRead2", "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT");
+    }
   };
   private static final DateTimeFormatter MDY = DateTimeFormatter.ofPattern("M/d/yyyy");
 
