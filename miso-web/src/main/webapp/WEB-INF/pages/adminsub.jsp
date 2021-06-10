@@ -62,65 +62,21 @@
         <a href="<c:url value="/miso/tools/indexsearch"/>">Index Search</a>
         <c:if test="${detailedSample}">
         <a href="<c:url value="/miso/tools/identitysearch"/>">Identity Search</a>
+        <a href="<c:url value="/miso/deletions"/>">Deletion Log</a>
         </c:if>
     </div>
-
+    
     <h2>Misc</h2>
     <div class="menu">
       <a href="<c:url value="/miso/contact/list"/>">Contacts</a>
       <a href="<c:url value="/miso/storagelocations"/>">Freezers &amp; Rooms</a>
-      <a href="<c:url value="/miso/locationmap/list"/>">Location Maps</a>
       <a href="<c:url value="/miso/librarytemplates"/>">Library Templates</a>
-      <a href="<c:url value="/miso/kitdescriptors"/>">Kits</a>
-      <a href="<c:url value="/miso/indexfamily/list"/>">Index Families</a>
-      <a href="<c:url value="/miso/qctype/list"/>">QC Types</a>
-      <a href="<c:url value="/miso/attachmentcategories/list"/>">Attachment Categories</a>
-      <a href="<c:url value="/miso/detailedqcstatus/list"/>">Detailed QC Statuses</a>
-      <a href="<c:url value="/miso/sampletype/list"/>">Sample Types</a>
-      <a href="<c:url value="/miso/sequencingcontroltype/list"/>">Sequencing Control Types</a>
-      <a href="<c:url value="/miso/librarytype/list"/>">Library Types</a>
-      <a href="<c:url value="/miso/libraryselection/list"/>">Library Selection Types</a>
-      <a href="<c:url value="/miso/librarystrategy/list"/>">Library Strategy Types</a>
-      <a href="<c:url value="/miso/libraryspikein/list"/>">Library Spike-Ins</a>
-      <a href="<c:url value="/miso/targetedsequencing/list"/>">Targeted Sequencings</a>
-      <a href="<c:url value="/miso/runpurpose/list"/>">Run Purposes</a>
-      <a href="<c:url value="/miso/sequencingparameters/list"/>">Sequencing Parameters</a>
-      <a href="<c:url value="/miso/containermodel/list"/>">Sequencing Container Models</a>
-      <a href="<c:url value="/miso/instrumentmodel/list"/>">Instrument Models</a>
-      <a href="<c:url value="/miso/boxsize/list"/>">Box Sizes</a>
-      <a href="<c:url value="/miso/boxuse/list"/>">Box Uses</a>
-      <a href="<c:url value="/miso/lab/list"/>">Labs</a>
-      <a href="<c:url value="/miso/arraymodel/list"/>">Array Models</a>
-      <a href="<c:url value="/miso/partitionqctype/list"/>">Partition QC Types</a>
-      <a href="<c:url value="/miso/runlibraryqcstatus/list"/>">Run-Library QC Statuses</a>
-      <a href="<c:url value="/miso/scientificname/list"/>">Scientific Names</a>
-      <a href="<c:url value="/miso/referencegenome/list"/>">Reference Genomes</a>
-      <a href="<c:url value="/miso/pipeline/list"/>">Pipelines</a>
-      <a href="<c:url value="/miso/studytype/list"/>">Study Types</a>
-      <a href="<c:url value="/miso/workstation/list"/>">Workstations</a>
-      <a href="<c:url value="/miso/sop/list"/>">SOPs</a>
-      <a href="<c:url value="/miso/worksetcategory/list"/>">Workset Categories</a>
-      <a href="<c:url value="/miso/worksetstage/list"/>">Workset Stages</a>
       <a href="<c:url value="/miso/printers"/>">Printers</a>
-      <a href="<c:url value="/miso/deletions"/>">Deletion Log</a>
-    </div>
-
-    <c:if test="${detailedSample}">
-      <h2>Institute Defaults</h2>
-      <div class="menu">
-        <a href="<c:url value="/miso/sampleclass/list"/>">Sample Classes</a>
-        <a href="<c:url value="/miso/tissuematerial/list"/>">Tissue Materials</a>
-        <a href="<c:url value="/miso/tissueorigin/list"/>">Tissue Origins</a>
-        <a href="<c:url value="/miso/tissuetype/list"/>">Tissue Types</a>
-        <a href="<c:url value="/miso/tissuepiecetype/list"/>">Tissue Piece Types</a>
-        <a href="<c:url value="/miso/samplepurpose/list"/>">Sample Purposes</a>
+      <c:if test="${detailedSample}">
         <a href="<c:url value="/miso/subproject/list"/>">Subprojects</a>
-        <a href="<c:url value="/miso/stain/list"/>">Stains</a>
-        <a href="<c:url value="/miso/staincategory/list"/>">Stain Categories</a>
-        <a href="<c:url value="/miso/librarydesigncode/list"/>">Library Design Codes</a>
-        <a href="<c:url value="/miso/librarydesign/list"/>">Library Designs</a>
-      </div>
-    </c:if>
+      </c:if>
+      <a href="<c:url value="/miso/workstation/list"/>">Workstations</a>
+    </div>
 	
     <h2>ENA</h2>
     <div class="menu">
@@ -129,8 +85,62 @@
         <a href="<c:url value="/miso/submissions"/>">Submissions</a>
     </div>
 
-	<c:if test="${miso:isAdmin()}">
-	  <h2>User Administration</h2>
+    <h2 class="menuDropdownTitle" onclick="Utils.ui.toggleElement('configurationMenu');">
+      Configuration<span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
+    </h2>
+    <div id="configurationMenu" class="menu" style="display: none;">
+      <a href="<c:url value="/miso/arraymodel/list"/>">Array Models</a>
+      <a href="<c:url value="/miso/attachmentcategories/list"/>">Attachment Categories</a>
+      <a href="<c:url value="/miso/boxsize/list"/>">Box Sizes</a>
+      <a href="<c:url value="/miso/boxuse/list"/>">Box Uses</a>
+      <a href="<c:url value="/miso/detailedqcstatus/list"/>">Detailed QC Statuses</a>
+      <a href="<c:url value="/miso/indexfamily/list"/>">Index Families</a>
+      <a href="<c:url value="/miso/instrumentmodel/list"/>">Instrument Models</a>
+      <a href="<c:url value="/miso/kitdescriptors"/>">Kits</a>
+      <a href="<c:url value="/miso/lab/list"/>">Labs</a>
+      <c:if test="${detailedSample}">
+        <a href="<c:url value="/miso/librarydesign/list"/>">Library Designs</a>
+        <a href="<c:url value="/miso/librarydesigncode/list"/>">Library Design Codes</a>
+      </c:if>
+      <a href="<c:url value="/miso/libraryselection/list"/>">Library Selection Types</a>
+      <a href="<c:url value="/miso/libraryspikein/list"/>">Library Spike-Ins</a>
+      <a href="<c:url value="/miso/librarystrategy/list"/>">Library Strategy Types</a>
+      <a href="<c:url value="/miso/librarytype/list"/>">Library Types</a>
+      <a href="<c:url value="/miso/locationmap/list"/>">Location Maps</a>
+      <a href="<c:url value="/miso/partitionqctype/list"/>">Partition QC Types</a>
+      <a href="<c:url value="/miso/pipeline/list"/>">Pipelines</a>
+      <a href="<c:url value="/miso/qctype/list"/>">QC Types</a>
+      <a href="<c:url value="/miso/referencegenome/list"/>">Reference Genomes</a>
+      <a href="<c:url value="/miso/runlibraryqcstatus/list"/>">Run-Library QC Statuses</a>
+      <a href="<c:url value="/miso/runpurpose/list"/>">Run Purposes</a>
+      <c:if test="${detailedSample}">
+        <a href="<c:url value="/miso/sampleclass/list"/>">Sample Classes</a>
+        <a href="<c:url value="/miso/samplepurpose/list"/>">Sample Purposes</a>
+      </c:if>
+      <a href="<c:url value="/miso/sampletype/list"/>">Sample Types</a>
+      <a href="<c:url value="/miso/scientificname/list"/>">Scientific Names</a>
+      <a href="<c:url value="/miso/containermodel/list"/>">Sequencing Container Models</a>
+      <a href="<c:url value="/miso/sequencingcontroltype/list"/>">Sequencing Control Types</a>
+      <a href="<c:url value="/miso/sequencingparameters/list"/>">Sequencing Parameters</a>
+      <a href="<c:url value="/miso/sop/list"/>">SOPs</a>
+      <c:if test="${detailedSample}">
+        <a href="<c:url value="/miso/stain/list"/>">Stains</a>
+        <a href="<c:url value="/miso/staincategory/list"/>">Stain Categories</a>
+      </c:if>
+      <a href="<c:url value="/miso/studytype/list"/>">Study Types</a>
+      <a href="<c:url value="/miso/targetedsequencing/list"/>">Targeted Sequencings</a>
+      <c:if test="${detailedSample}">
+        <a href="<c:url value="/miso/tissuematerial/list"/>">Tissue Materials</a>
+        <a href="<c:url value="/miso/tissueorigin/list"/>">Tissue Origins</a>
+        <a href="<c:url value="/miso/tissuepiecetype/list"/>">Tissue Piece Types</a>
+        <a href="<c:url value="/miso/tissuetype/list"/>">Tissue Types</a>
+      </c:if>
+      <a href="<c:url value="/miso/worksetcategory/list"/>">Workset Categories</a>
+      <a href="<c:url value="/miso/worksetstage/list"/>">Workset Stages</a>
+    </div>
+
+	  <c:if test="${miso:isAdmin()}">
+	    <h2>User Administration</h2>
       <div class="menu">
         <a href="<c:url value="/miso/admin/users"/>">Users</a>
         <a href="<c:url value="/miso/admin/groups"/>">Groups</a>

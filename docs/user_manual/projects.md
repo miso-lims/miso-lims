@@ -102,9 +102,9 @@ page. Clicking on a subproject name will take you to the project's samples list 
 subproject. You can reset the table to show all of the project's samples by clearing the search box at the top right of
 the table and pressing the Enter key.
 
-To view a list of all subprojects in all projects, click the "Subprojects" link in the Institute Defaults list in the
-menu on the left side of the screen. This will take you to the Subprojects list page. Controls at the top of the table
-allow you to create, edit, and delete subprojects.
+To view a list of all subprojects in all projects, click to expand the Configuration menu within the main navigation
+menu, then click the "Subprojects" link. This will take you to the Subprojects list page. Controls at the top of the
+table allow you to create, edit, and delete subprojects.
 
 
 
