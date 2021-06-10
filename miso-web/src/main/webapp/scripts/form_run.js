@@ -90,7 +90,8 @@ FormTarget.run = (function($) {
           type: 'dropdown',
           nullLabel: 'N/A',
           source: Constants.kitDescriptors.filter(function(kit) {
-            return kit.kitType === 'Sequencing' && kit.platformType === object.platformType;
+            return kit.kitType === 'Sequencing' && kit.platformType === object.platformType
+                && (!kit.archived || kit.id === object.sequencingKitId);
           }),
           getItemLabel: Utils.array.getName,
           getItemValue: Utils.array.getId,

@@ -360,6 +360,9 @@ be assigned a targeted sequencing from the targeted sequencings linked to the ki
 desired targeted sequencing is not available for a library aliquot, this can be solved by linking the targeted
 sequencing to the appropriate kit descriptor and selecting that kit descriptor for the library aliquot first.
 
+Kit descriptors may be archived if they are no longer needed. This will prevent them from showing up in the
+options when creating new items.
+
 MISO administrators can delete kit descriptors using the standard interface. Library kits can only be deleted if they
 are not used by any existing libraries or library aliquots. Clustering and multiplexing kits can only be deleted if
 they are not used by any existing sequencing containers. Sequencing kits can only be deleted if they are not used by

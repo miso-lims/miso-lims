@@ -144,7 +144,8 @@ FormTarget.libraryaliquot = (function($) {
                       data: 'kitDescriptorId',
                       type: 'dropdown',
                       source: Constants.kitDescriptors.filter(function(kit) {
-                        return kit.kitType === 'Library' && kit.platformType === object.libraryPlatformType;
+                        return kit.kitType === 'Library' && kit.platformType === object.libraryPlatformType
+                            && (!kit.archived || kit.id === object.kitDescriptorId);
                       }),
                       sortSource: Utils.sorting.standardSort('name'),
                       getItemLabel: function(item) {

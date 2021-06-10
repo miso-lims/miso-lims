@@ -82,7 +82,7 @@ FormTarget.librarytemplate = (function($) {
                   source: getLibraryTypeOptions(platformType, object)
                 });
                 form.updateField('kitDescriptorId', {
-                  source: getKitDescriptorOptions(platformType)
+                  source: getKitDescriptorOptions(platformType, object.kitDescriptorId)
                 });
                 form.updateField('indexFamilyId', {
                   source: getIndexFamilyOptions(platformType, object)
@@ -118,7 +118,7 @@ FormTarget.librarytemplate = (function($) {
               title: 'Kit',
               data: 'kitDescriptorId',
               type: 'dropdown',
-              source: getKitDescriptorOptions(getPlatformType(object.platformType)),
+              source: getKitDescriptorOptions(getPlatformType(object.platformType), object.kitDescriptorId),
               getItemLabel: Utils.array.getName,
               getItemValue: Utils.array.getId,
               nullLabel: unspecified
@@ -179,9 +179,10 @@ FormTarget.librarytemplate = (function($) {
     });
   }
 
-  function getKitDescriptorOptions(platformType) {
+  function getKitDescriptorOptions(platformType, originalKitDescriptorId) {
     return !platformType ? [] : Constants.kitDescriptors.filter(function(kit) {
-      return kit.platformType == platformType.key && kit.kitType == 'Library';
+      return kit.platformType == platformType.key && kit.kitType == 'Library'
+          && (!kit.archived || kit.id === originalKitDescriptorId);
     })
   }
 

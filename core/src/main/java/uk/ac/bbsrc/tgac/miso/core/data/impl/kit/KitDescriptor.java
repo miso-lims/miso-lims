@@ -91,6 +91,7 @@ public class KitDescriptor implements Serializable, ChangeLoggable, Deletable, I
   private String partNumber;
   private Integer stockLevel;
   private String description;
+  private boolean archived = false;
 
   @OneToMany(targetEntity = KitDescriptorChangeLog.class, mappedBy = "kitDescriptor", cascade = CascadeType.REMOVE)
   private Collection<ChangeLog> changelog = new ArrayList<>();
@@ -256,6 +257,14 @@ public class KitDescriptor implements Serializable, ChangeLoggable, Deletable, I
    */
   public String getDescription() {
     return description;
+  }
+
+  public boolean isArchived() {
+    return archived;
+  }
+
+  public void setArchived(boolean archived) {
+    this.archived = archived;
   }
 
   /**

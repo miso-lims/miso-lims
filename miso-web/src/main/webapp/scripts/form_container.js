@@ -40,7 +40,26 @@ FormTarget.container = (function($) {
           source: getValidContainerModels(object),
           getItemLabel: Utils.array.getAlias,
           getItemValue: Utils.array.getId,
-          sortSource: Utils.sorting.standardSort('alias')
+          sortSource: Utils.sorting.standardSort('alias'),
+          onChange: function(newValue, form) {
+            if (!newValue) {
+              form.updateField('clusteringKitId', {
+                source: []
+              });
+              form.updateField('multiplexingKitId', {
+                source: []
+              });
+              return;
+            }
+            var selectedModel = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(newValue), Constants.containerModels);
+            var platform = Utils.array.findUniqueOrThrow(Utils.array.namePredicate(selectedModel.platformType), Constants.platformTypes);
+            form.updateField('clusteringKitId', {
+              source: getKits('Clustering', platform.key, object.clusteringKitId)
+            });
+            form.updateField('multiplexingKitId', {
+              source: getKits('Multiplexing', platform.key, object.multiplexingKitId)
+            });
+          }
         }, {
           title: 'Description',
           data: 'description',
@@ -50,7 +69,10 @@ FormTarget.container = (function($) {
           title: 'Clustering Kit',
           data: 'clusteringKitId',
           type: 'dropdown',
-          source: getKitsByType('Clustering'),
+          source: (function() {
+            var platform = Utils.array.findUniqueOrThrow(Utils.array.namePredicate(object.model.platformType), Constants.platformTypes);
+            return getKits('Clustering', platform.key, object.clusteringKitId);
+          })(),
           getItemLabel: function(item) {
             return item.name;
           },
@@ -75,7 +97,10 @@ FormTarget.container = (function($) {
           title: 'Multiplexing Kit',
           data: 'multiplexingKitId',
           type: 'dropdown',
-          source: getKitsByType('Multiplexing'),
+          source: (function() {
+            var platform = Utils.array.findUniqueOrThrow(Utils.array.namePredicate(object.model.platformType), Constants.platformTypes);
+            return getKits('Multiplexing', platform.key, object.multiplexingKitId);
+          })(),
           getItemLabel: function(item) {
             return item.name;
           },
@@ -146,10 +171,11 @@ FormTarget.container = (function($) {
       return accumulator;
     }, []);
   }
-
-  function getKitsByType(type) {
+  
+  function getKits(type, platform, savedValueId) {
     return Constants.kitDescriptors.filter(function(kit) {
-      return kit.kitType === type;
+      return kit.kitType === type && kit.platformType === platform
+          && (!kit.archived || kit.id === savedValueId);
     });
   }
 

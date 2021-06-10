@@ -348,7 +348,7 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListKitsSetup() throws Exception {
     testTabbedPageSetup(ListTarget.KITS, Sets.newHashSet(Columns.KIT_NAME, Columns.VERSION, Columns.MANUFACTURER, Columns.PART_NUMBER,
-        Columns.STOCK_LEVEL, Columns.PLATFORM));
+        Columns.STOCK_LEVEL, Columns.PLATFORM, Columns.ARCHIVED));
   }
 
   @Test

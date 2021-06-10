@@ -147,7 +147,8 @@ FormTarget.library = (function($) {
             });
             form.updateField('kitDescriptorId', {
               source: Constants.kitDescriptors.filter(function(item) {
-                return item.kitType === 'Library' && item.platformType === platformType.key;
+                return item.kitType === 'Library' && item.platformType === platformType.key
+                    && (!item.archived || item.id === object.kitDescriptorId);
               })
             });
           }
@@ -352,7 +353,8 @@ FormTarget.library = (function($) {
           type: 'dropdown',
           required: true,
           source: Constants.kitDescriptors.filter(function(item) {
-            return item.kitType === 'Library' && item.platformType === object.platformType;
+            return item.kitType === 'Library' && item.platformType === object.platformType
+                && (!item.archived || item.id === object.kitDescriptorId);
           }),
           sortSource: Utils.sorting.standardSort('name'),
           getItemLabel: function(item) {

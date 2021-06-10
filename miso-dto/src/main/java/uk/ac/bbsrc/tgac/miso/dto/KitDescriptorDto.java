@@ -14,6 +14,7 @@ public class KitDescriptorDto {
   private Integer stockLevel;
   private String kitType;
   private String platformType;
+  private boolean archived = false;
 
   public Long getId() {
     return id;
@@ -85,6 +86,14 @@ public class KitDescriptorDto {
 
   public void setPlatformType(String platformType) {
     this.platformType = platformType;
+  }
+
+  public boolean isArchived() {
+    return archived;
+  }
+
+  public void setArchived(boolean archived) {
+    this.archived = archived;
   }
 
   @Override
