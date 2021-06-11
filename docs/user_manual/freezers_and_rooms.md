@@ -10,7 +10,7 @@ may also specify an anchor link to further help with locating the freezer on the
 
 ## Location Maps
 
-To get to the Location Maps list, to expand the Configuration menu within the main navigation menu, then click
+To get to the Location Maps list, expand the Configuration menu within the main navigation menu, then click
 "Location Maps" within. You can open a map by clicking its filename in the list. MISO administrators can upload new
 maps and delete existing maps from here too.
 
