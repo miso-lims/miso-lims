@@ -957,9 +957,12 @@ Utils.ui = {
   },
 
   toggleElement: function(id) {
-    jQuery("#" + id).slideToggle({
-      'duration': 500
-    });
+    var element = $('#' + id);
+    if (!element.is(':animated')) {
+      element.slideToggle({
+        'duration': 500
+      });
+    }
   },
 
   toggleRightInfo: function(div, id) {

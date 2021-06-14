@@ -113,14 +113,24 @@ div.menu a {
     margin: 0;
 }
 
-div.menu a:hover {
-   color: var(--purple-light);
-   background-color: #444;
+h2.menuDropdownTitle {
+    padding: 0.4em 0.5em;
+    padding-left: 0;
+}
+
+div.menu a:hover, h2.menuDropdownTitle:hover {
+    color: var(--purple-light);
+    background-color: #444;
+}
+
+div.menu a:active, h2.menuDropdownTitle:active {
+    color: #444;
+    background-color: transparent;
 }
 
 div.menu a.submenu {
-   padding: 0.1em 0.5em;
-   padding-left: 2.5em;
+    padding: 0.1em 0.5em;
+    padding-left: 2.5em;
 }
 
 table.in {

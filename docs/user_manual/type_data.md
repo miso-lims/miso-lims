@@ -3,9 +3,9 @@
 Type data describes sets of items listed as dropdown options in various forms throughout MISO. Most of these options
 can be modified to suit your institute. In most cases, only MISO administrators can make these changes.
 
-Each type that can be modified within MISO has a list page. You can find most of these by clicking the appropriate link
-in the Misc list in the navigation menu. Types that are only used in detailed sample mode appear in the Institute
-Defaults list instead.
+Each type that can be modified within MISO has a list page. You can find most of these by clicking to expand the
+Configuration menu within the main navigation menu, and then clicking the appropriate link within. Any that is
+located elsewhere will be noted in its description below.
 
 To add new items, click the “Add” button in the toolbar at the top of the list. In the dialog, enter the quantity that
 you would like to create, and click the “Create” button. This will take you to the bulk Create page. Enter the
@@ -100,10 +100,8 @@ an option for the aliquot class to use when receiving libraries, but it won't be
 or propagating samples. This is useful if you want to have an "Unknown" type of sample class for cases where libraries
 are received and not much is known about the samples they were made from.
 
-MISO administrators can create, edit, and delete sample classes from the Sample Classes list page, which can be found
-by clicking "Sample Classes" in the Institute Defaults menu. Click the "Add" button in the toolbar at the top of the
-page to get to the Create Sample Class page, or click on a Sample Class alias in the list to get to the Edit Sample
-Class page.
+MISO administrators can create, edit, and delete sample classes using the standard interface. A sample class can only
+be deleted if there are no existing samples of that class.
 
 In the top section of the Create/Edit Sample Class page, you can enter or change the sample class attributes. In the
 Parent Relationships table below, you can add, edit, and remove relationships that define which classes this one can be
@@ -393,17 +391,12 @@ referred to as **multi-sequence indices** in MISO. For these, a demultiplexing n
 sequences. The demultiplexing name is a value that may be used by demultiplexing software in order to identify the
 indices.
 
-Index families can be viewed on the Index Families list page. To get there, click "Index Families" in the Misc list in
-the menu on the left side of the screen. From here, MISO administrators can create, edit, and delete index families. To
-create a new index family, click the "Add" button in the toolbar at the top of the list. To edit an existing index
-family, click on its name in the list. To delete index families, select the ones you wish to delete, then click the
-"Delete" button in the toolbar at the top of the list. An index family can only be deleted if it has not been used by
-any existing libraries.
+MISO administrators can create, edit, and delete index families using the standard interface. An index family can only
+be deleted if it has not been used by any existing libraries. MISO administrators can add, edit, and delete indices using
+the standard interface within the Edit Index Family page.
 
 Index families may be archived if they are no longer needed. This will prevent them from showing up in the options when
 creating new libraries.
-
-MISO administrators can add, edit, and delete indices using the standard interface within the Edit Index Family page.
 
 When creating indices, keep in mind that they are sorted alphabetically in dropdowns. If your indices are named "Index 1,
 Index 2... Index 10, Index 11..." then it may be ideal to add zeros before the numbers so that they sort in the expected
@@ -687,5 +680,6 @@ An attachment category can only be deleted if there are no attachments of that c
 
 ## Contacts
 
-Contacts may be saved for convenience when sending [transfer notifications](../transfers#transfer-notifications). Any
-user can add, edit, and delete contacts using the standard interface.
+Contacts may be saved for convenience when sending [transfer notifications](../transfers#transfer-notifications). The
+link to the Contacts list can be found in the Misc menu within the main navigation menu. Any user can add, edit, and
+delete contacts using the standard interface.
