@@ -69,8 +69,8 @@ To add a shelf, click the "Add Storage" button beside the "Freezer" label in the
 Freezer Storage dialog that appears, select "Shelf." Enter a barcode for the shelf if you would like, and then click
 the "OK" button. The shelf will appear in the Layout diagram.
 
-You can click an existing shelf in the diagram to select it, which allows you to change the barcode. Another "Add
-Storage" button appears on the shelf in the diagram to add further storage units within the shelf.
+You can click an existing shelf in the diagram to select it, which allows you to change the barcode and label. Another
+"Add Storage" button appears on the shelf in the diagram to add further storage units within the shelf.
 
 
 ### Stacks
@@ -90,9 +90,9 @@ The final dialog allows you to enter a barcode for each of the individual slots 
 click the "OK" button again to finish creating the stack. The stack will appear in the Layout diagram within the
 freezer or shelf to which you added it.
 
-You can click an existing stack in the diagram to select it, which allows you to change its barcode. Once you've
-selected a stack, a second diagram appears showing the slots within the stack. You can click on a slot in this diagram
-to select the slot, allowing you to change its barcode, or add a box to it.
+You can click an existing stack in the diagram to select it, which allows you to change its barcode and label. Once
+you've selected a stack, a second diagram appears showing the slots within the stack. You can click on a slot in this
+diagram to select the slot, allowing you to change its barcode, or add a box to it.
 
 
 ### Racks
@@ -109,9 +109,9 @@ Add Shelf Storage dialog, choose "Rack." In the next dialog, choose the number o
 barcode for the rack, then click the "OK" button. A final dialog allows you to enter a barcode for each individual slot
 if you wish. Click the "OK" button to finish adding the rack. It will appear in the Layout diagram within the shelf.
 
-You can click an existing rack in the diagram to select it, which allows you to change its barcode. Once you've
-selected a rack, a second diagram appears showing the slots within the rack. You can click a slot in this diagram to
-select the slot, allowing you to change its barcode or add a box to it.
+You can click an existing rack in the diagram to select it, which allows you to change its barcode and label. Once
+you've selected a rack, a second diagram appears showing the slots within the rack. You can click a slot in this
+diagram to select the slot, allowing you to change its barcode or add a box to it.
 
 
 ### Tray Racks
@@ -126,9 +126,9 @@ optionally a barcode for the tray rack, then click the "OK" button. A final dial
 each tray within the tray rack if you wish. Click the "OK" button when you are done to finish adding the tray rack. It
 will appear in the Layout diagram within the shelf.
 
-You can click an existing tray rack in the diagram to select it, which allows you to change its barcode. Once you've
-selected a tray rack, a second diagram appears showing the trays within the tray rack. You can click a tray in this
-diagram to select the tray, allowing you to change its barcode or add boxes to it.
+You can click an existing tray rack in the diagram to select it, which allows you to change its barcode and label. Once
+you've selected a tray rack, a second diagram appears showing the trays within the tray rack. You can click a tray in
+this diagram to select the tray, allowing you to change its barcode or add boxes to it.
 
 
 ### Loose Storage

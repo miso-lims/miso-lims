@@ -1,4 +1,3 @@
--- StartNoTest
 DELIMITER //
 
 DROP TRIGGER IF EXISTS StorageLocationInsert//
@@ -16,18 +15,22 @@ FOR EACH ROW
   DECLARE log_message longtext CHARACTER SET utf8;
   IF NEW.locationUnit = 'FREEZER' THEN
     SET log_message = CONCAT_WS(', ',
-          CASE WHEN NEW.alias <> OLD.alias THEN CONCAT('alias: ', OLD.alias, ' → ', NEW.alias) END,
-          CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN CONCAT('identification barcode: ', COALESCE(OLD.identificationBarcode, 'n/a'), ' → ', COALESCE(NEW.identificationBarcode, 'n/a')) END,
-          CASE WHEN NEW.parentLocationId <> OLD.parentLocationId THEN CONCAT('room: ', (SELECT alias FROM StorageLocation WHERE locationId = OLD.parentLocationId), ' → ', (SELECT alias FROM StorageLocation WHERE locationId = NEW.parentLocationId)) END,
-          CASE WHEN (NEW.probeId IS NULL) <> (OLD.probeId IS NULL) OR NEW.probeId <> OLD.probeId THEN CONCAT('probe ID: ', COALESCE(OLD.probeId, 'n/a'),  ' → ', COALESCE(NEW.probeId, 'n/a')) END);
+      makeChangeMessage('alias', OLD.alias, NEW.alias),
+      makeChangeMessage('barcode', OLD.identificationBarcode, NEW.identificationBarcode),
+      makeChangeMessage('room', (SELECT alias FROM StorageLocation WHERE locationId = OLD.parentLocationId), (SELECT alias FROM StorageLocation WHERE locationId = NEW.parentLocationId)),
+      makeChangeMessage('probe ID', OLD.probeId, NEW.probeId),
+      makeChangeMessage('label', (SELECT label FROM StorageLabel WHERE labelId = OLD.labelId), (SELECT label FROM StorageLabel WHERE labelId = NEW.labelId))
+    );
     IF log_message IS NOT NULL AND log_message <> '' THEN
       INSERT INTO StorageLocationChangeLog(locationId, columnsChanged, userId, message, changeTime) VALUES (
         NEW.locationId,
         COALESCE(CONCAT_WS(',',
-          CASE WHEN NEW.alias <> OLD.alias THEN 'alias' END,
-          CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN 'identificationBarcode' END,
-          CASE WHEN NEW.parentLocationId <> OLD.parentLocationId THEN 'parentLocationId' END,
-          CASE WHEN (NEW.probeId IS NULL) <> (OLD.probeId IS NULL) OR NEW.probeId <> OLD.probeId THEN 'probeId' END), ''),
+          makeChangeColumn('alias', OLD.alias, NEW.alias),
+          makeChangeColumn('identificationBarcode', OLD.identificationBarcode, NEW.identificationBarcode),
+          makeChangeColumn('parentLocationId', OLD.parentLocationId, NEW.parentLocationId),
+          makeChangeColumn('probeId', OLD.probeId, NEW.probeId),
+          makeChangeColumn('labelId', OLD.labelId, NEW.labelId)
+        ), ''),
         NEW.lastModifier,
         log_message,
         NEW.lastModified);
@@ -36,4 +39,3 @@ FOR EACH ROW
 END//
   
 DELIMITER ;
--- EndNoTest

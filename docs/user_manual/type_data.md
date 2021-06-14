@@ -532,6 +532,16 @@ it has not been used by any existing boxes.
 
 
 
+## Storage Labels
+
+Storage labels can be added to freezers and freezer components such as shelves and racks. They may describe the type
+of items that should be stored within, or may be used for other purposes.
+
+MISO administrators can add, edit, and delete storage labels using the standard interface. A storage label can only be
+deleted if it has not been attached to any existing freezers or freezer components.
+
+
+
 ## Workset Categories
 
 By default, the Worksets list page has the following tabs.

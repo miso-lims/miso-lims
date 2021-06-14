@@ -127,6 +127,7 @@
         <a href="<c:url value="/miso/stain/list"/>">Stains</a>
         <a href="<c:url value="/miso/staincategory/list"/>">Stain Categories</a>
       </c:if>
+      <a href="<c:url value="/miso/storagelabel/list"/>">Storage Labels</a>
       <a href="<c:url value="/miso/studytype/list"/>">Study Types</a>
       <a href="<c:url value="/miso/targetedsequencing/list"/>">Targeted Sequencings</a>
       <c:if test="${detailedSample}">

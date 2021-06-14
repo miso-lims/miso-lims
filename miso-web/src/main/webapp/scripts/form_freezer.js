@@ -6,7 +6,8 @@ FormTarget.freezer = (function($) {
   /*
    * Expected config {
    *   rooms: array,
-   *   locationMaps: array
+   *   locationMaps: array,
+   *   storageLabels: array
    * }
    */
 
@@ -48,6 +49,14 @@ FormTarget.freezer = (function($) {
           type: 'text',
           required: true,
           maxLength: 255
+        }, {
+          title: 'Label',
+          data: 'labelId',
+          type: 'dropdown',
+          source: config.storageLabels,
+          getItemLabel: Utils.array.get('label'),
+          getItemValue: Utils.array.getId,
+          sortSource: Utils.sorting.standardSort('label')
         }, {
           title: 'Barcode',
           data: 'identificationBarcode',

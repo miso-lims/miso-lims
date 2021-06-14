@@ -66,6 +66,10 @@ public class Pluralizer {
     return pluralize(count, "library template", "library templates");
   }
 
+  public static String locations(long count) {
+    return pluralize(count, "location", "locations");
+  }
+
   public static String orders(long count) {
     return pluralize(count, "order", "orders");
   }

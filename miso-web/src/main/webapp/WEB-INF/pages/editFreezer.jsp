@@ -47,9 +47,13 @@
     Freezer.setFreezerJson(dto);
     FormUtils.createForm('freezerForm', 'save', dto, 'freezer', {
       rooms: ${rooms},
-      locationMaps: ${locationMaps}
+      locationMaps: ${locationMaps},
+      storageLabels: ${storageLabels}
     });
     Utils.ui.updateHelpLink(FormTarget.freezer.getUserManualUrl());
+    $(storageComponentLabel).append(${storageLabels}.map(function(x) {
+      return $('<option>').val(x.id).text(x.label);
+    }));
   });
 </script>
 
@@ -91,6 +95,15 @@
               <td>
                 <input id="storageComponentBarcode" type="text">
                 <div id="freezerComponent-form_identificationBarcodeError" class="errorContainer"></div>
+              </td>
+            </tr>
+            <tr id="storageComponentLabelRow">
+              <td class="h">Label:</td>
+              <td>
+                <select id="storageComponentLabel">
+                  <option value=''>None</option>
+                </select>
+                <div id="freezerComponent-form_labelError" class="errorContainer"></div>
               </td>
             </tr>
           </tbody>

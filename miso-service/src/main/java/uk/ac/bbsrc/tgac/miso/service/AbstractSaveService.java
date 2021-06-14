@@ -50,7 +50,7 @@ public abstract class AbstractSaveService<T extends Identifiable> implements Sav
 
   /**
    * Check authorization to create new object. Should throw {@link AuthorizationException} if the user is not authorized to create the
-   * object. Default implementation calls {@link AbstractSaveService#authorizeSave}
+   * object. Default implementation calls {@link AbstractSaveService#authorizeUpdate}
    * 
    * @param object
    * @throws IOException

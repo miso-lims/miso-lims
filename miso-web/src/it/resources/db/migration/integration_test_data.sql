@@ -1190,7 +1190,11 @@ INSERT INTO Workset_LibraryAliquot(worksetId, aliquotId) VALUES
 (1, 120001),
 (1, 120002);
 
-DELETE FROM StorageLocationMap;
+INSERT INTO StorageLabel(labelId, label) VALUES
+(1, 'Label One'),
+(2, 'Label Two'),
+(3, 'Label to delete');
+
 INSERT INTO StorageLocationMap(mapId, filename, description) VALUES
 (1, 'floor_one.html', 'floor one map'),
 (2, 'floor_two.html', 'floor two map'),

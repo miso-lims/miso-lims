@@ -15,6 +15,7 @@ import com.google.common.collect.Sets;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.StorageLabelService;
 import uk.ac.bbsrc.tgac.miso.core.service.StorageLocationMapService;
 import uk.ac.bbsrc.tgac.miso.core.service.StorageLocationService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
@@ -30,10 +31,10 @@ public class DefaultStorageLocationService implements StorageLocationService {
 
   @Autowired
   private StorageLocationStore storageLocationStore;
-
   @Autowired
   private StorageLocationMapService mapService;
-
+  @Autowired
+  private StorageLabelService storageLabelService;
   @Autowired
   private AuthorizationManager authorizationManager;
 
@@ -117,9 +118,8 @@ public class DefaultStorageLocationService implements StorageLocationService {
     if (storage.getParentLocation() != null && storage.getParentLocation().isSaved()) {
       storage.setParentLocation(get(storage.getParentLocation().getId()));
     }
-    if (storage.getMap() != null) {
-      storage.setMap(mapService.get(storage.getMap().getId()));
-    }
+    ValidationUtils.loadChildEntity(storage::setMap, storage.getMap(), mapService, "map");
+    ValidationUtils.loadChildEntity(storage::setLabel, storage.getLabel(), storageLabelService, "label");
   }
 
   private long create(StorageLocation location) throws IOException {
@@ -189,6 +189,7 @@ public class DefaultStorageLocationService implements StorageLocationService {
     to.setProbeId(from.getProbeId());
     to.setMap(from.getMap());
     to.setMapAnchor(from.getMapAnchor());
+    to.setLabel(from.getLabel());
   }
 
   @Override

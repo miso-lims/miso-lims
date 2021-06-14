@@ -25,7 +25,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
 import uk.ac.bbsrc.tgac.miso.core.service.SaveService;
 import uk.ac.bbsrc.tgac.miso.core.service.StorageLocationService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.StorageLocationDto;
 
 @Controller
@@ -35,7 +34,7 @@ public class StorageLocationRestController extends RestController {
   @Autowired
   private StorageLocationService storageLocationService;
 
-  private final SaveService<StorageLocation> freezerSaveService = new SaveService<StorageLocation>() {
+  private final SaveService<StorageLocation> freezerSaveService = new SaveService<>() {
 
     @Override
     public StorageLocation get(long id) throws IOException {
@@ -57,7 +56,7 @@ public class StorageLocationRestController extends RestController {
   @GetMapping(value = "/freezers")
   public @ResponseBody List<StorageLocationDto> getFreezers() {
     return storageLocationService.listFreezers().stream()
-        .map(freezer -> Dtos.asDto(freezer, false, false))
+        .map(freezer -> StorageLocationDto.from(freezer, false, false))
         .collect(Collectors.toList());
   }
 
@@ -67,7 +66,7 @@ public class StorageLocationRestController extends RestController {
     if (location == null) {
       throw new RestException("storage location not found", Status.NOT_FOUND);
     }
-    return Dtos.asDto(location, true, false);
+    return StorageLocationDto.from(location, true, false);
   }
 
   @GetMapping(value = "/{id}/children")
@@ -77,7 +76,7 @@ public class StorageLocationRestController extends RestController {
       throw new RestException("storage location not found", Status.NOT_FOUND);
     }
     return location.getChildLocations().stream()
-        .map(child -> Dtos.asDto(child, false, false))
+        .map(child -> StorageLocationDto.from(child, false, false))
         .collect(Collectors.toList());
   }
 
@@ -85,13 +84,15 @@ public class StorageLocationRestController extends RestController {
   @ResponseStatus(HttpStatus.CREATED)
   public @ResponseBody StorageLocationDto createFreezer(@RequestBody StorageLocationDto dto) throws IOException {
     dto.setLocationUnit(LocationUnit.FREEZER.name());
-    return RestUtils.createObject("Freezer", dto, Dtos::to, freezerSaveService, freezer -> Dtos.asDto(freezer, true, true));
+    return RestUtils.createObject("Freezer", dto, StorageLocationDto::to, freezerSaveService,
+        freezer -> StorageLocationDto.from(freezer, true, true));
   }
 
   @PutMapping(value = "/freezers/{id}")
   public @ResponseBody StorageLocationDto update(@PathVariable(name = "id", required = true) long id, @RequestBody StorageLocationDto dto)
       throws IOException {
-    return RestUtils.updateObject("Freezer", id, dto, Dtos::to, freezerSaveService, freezer -> Dtos.asDto(freezer, true, true));
+    return RestUtils.updateObject("Freezer", id, dto, StorageLocationDto::to, freezerSaveService,
+        freezer -> StorageLocationDto.from(freezer, true, true));
   }
 
   @PostMapping(value = "/freezers/{id}/shelves")
@@ -114,7 +115,7 @@ public class StorageLocationRestController extends RestController {
 
     long savedId = storageLocationService.addFreezerStorage(shelf);
     StorageLocation saved = storageLocationService.get(savedId);
-    return Dtos.asDto(saved, false, false);
+    return StorageLocationDto.from(saved, false, false);
   }
 
   private StorageLocation getFreezer(long id) throws IOException {
@@ -147,7 +148,7 @@ public class StorageLocationRestController extends RestController {
     room.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(identificationBarcode));
     long savedId = storageLocationService.createRoom(room);
     StorageLocation saved = storageLocationService.get(savedId);
-    return Dtos.asDto(saved, false, false);
+    return StorageLocationDto.from(saved, false, false);
   }
 
   private StorageLocation makeStorage(String alias, LocationUnit locationUnit, StorageLocation parent, String barcode) {
@@ -178,7 +179,7 @@ public class StorageLocationRestController extends RestController {
   private StorageLocationDto doSave(StorageLocation storage) throws IOException {
     long savedId = storageLocationService.addFreezerStorage(storage);
     StorageLocation saved = storageLocationService.get(savedId);
-    return Dtos.asDto(saved, false, false);
+    return StorageLocationDto.from(saved, false, false);
   }
 
   @PostMapping(value = "/freezers/{freezerId}/shelves/{shelfId}/stacks")
@@ -260,7 +261,7 @@ public class StorageLocationRestController extends RestController {
   @ResponseStatus(value = HttpStatus.NO_CONTENT)
   public void updateStorageComponent(@PathVariable(name = "locationId", required = true) long locationId,
       @RequestBody StorageLocationDto dto) throws IOException {
-    StorageLocation component = Dtos.to(dto);
+    StorageLocation component = dto.to();
     storageLocationService.updateStorageComponent(component);
   }
 

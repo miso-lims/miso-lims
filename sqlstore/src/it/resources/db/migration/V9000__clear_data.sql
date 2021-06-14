@@ -96,6 +96,7 @@ DELETE FROM ServiceRecord;
 DELETE FROM Sop;
 DELETE FROM Stain;
 DELETE FROM StainCategory;
+DELETE FROM StorageLabel;
 DELETE FROM StorageLocation;
 DELETE FROM StorageLocationMap;
 DELETE FROM Study;
