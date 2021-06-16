@@ -51,7 +51,7 @@
       storageLabels: ${storageLabels}
     });
     Utils.ui.updateHelpLink(FormTarget.freezer.getUserManualUrl());
-    $(storageComponentLabel).append(${storageLabels}.map(function(x) {
+    $('#storageComponentLabel').append(${storageLabels}.map(function(x) {
       return $('<option>').val(x.id).text(x.label);
     }));
   });
