@@ -16,6 +16,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
@@ -153,9 +154,9 @@ public class DefaultSequencingOrderService implements SequencingOrderService {
   }
 
   @Override
-  public List<SequencingOrder> listByAttributes(Pool pool, RunPurpose purpose, SequencingParameters parameters, Integer partitions)
-      throws IOException {
-    return sequencingOrderDao.listByAttributes(pool, purpose, parameters, partitions);
+  public List<SequencingOrder> listByAttributes(Pool pool, RunPurpose purpose, SequencingContainerModel containerModel,
+      SequencingParameters parameters, Integer partitions) throws IOException {
+    return sequencingOrderDao.listByAttributes(pool, purpose, containerModel, parameters, partitions);
   }
 
 }

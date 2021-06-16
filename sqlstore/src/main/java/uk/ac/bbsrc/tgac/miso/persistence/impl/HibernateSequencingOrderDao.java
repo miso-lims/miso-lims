@@ -11,6 +11,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingOrderImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.SequencingOrderDao;
 
@@ -32,12 +33,13 @@ public class HibernateSequencingOrderDao extends HibernateSaveDao<SequencingOrde
   }
 
   @Override
-  public List<SequencingOrder> listByAttributes(Pool pool, RunPurpose purpose, SequencingParameters parameters, Integer partitions)
-      throws IOException {
+  public List<SequencingOrder> listByAttributes(Pool pool, RunPurpose purpose, SequencingContainerModel containerModel,
+      SequencingParameters parameters, Integer partitions) throws IOException {
     @SuppressWarnings("unchecked")
     List<SequencingOrder> records = currentSession().createCriteria(SequencingOrderImpl.class)
         .add(Restrictions.eq("pool", pool))
         .add(Restrictions.eq("purpose", purpose))
+        .add(containerModel == null ? Restrictions.isNull("containerModel") : Restrictions.eq("containerModel", containerModel))
         .add(Restrictions.eq("parameters", parameters))
         .add(Restrictions.eq("partitions", partitions))
         .list();
