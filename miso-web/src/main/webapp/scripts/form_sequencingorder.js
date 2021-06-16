@@ -42,7 +42,11 @@ FormTarget.sequencingorder = (function($) {
           omit: true,
           type: 'read-only',
           getDisplayValue: function(order) {
-            return Utils.array.findUniqueOrThrow(Utils.array.idPredicate(order.containerModelId), Constants.containerModels).alias;
+            if (order.containerModelId) {
+              return Utils.array.findUniqueOrThrow(Utils.array.idPredicate(order.containerModelId), Constants.containerModels).alias;
+            } else {
+              return 'Unspecified';
+            }
           }
         }, {
           title: 'Partitions Required',
