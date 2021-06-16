@@ -490,7 +490,7 @@ public class PoolRestController extends RestController {
 
   @GetMapping(value = "/search")
   public @ResponseBody List<PoolDto> search(@RequestParam("q") String search) throws IOException {
-    return poolService.list(0, 0, false, search, PaginationFilter.query(search))
+    return poolService.list(0, 0, false, "id", PaginationFilter.query(search))
         .stream()
         .map(pool -> Dtos.asDto(pool, true, false, indexChecker))
         .collect(Collectors.toList());
