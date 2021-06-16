@@ -378,6 +378,7 @@ FormTarget.poolorder = (function($) {
     Utils.ajaxWithDialog("Finding Sequencing Orders", "GET", Urls.rest.sequencingOrders.search + '?' + jQuery.param({
       poolId: form.get('poolId'),
       purposeId: form.get('purposeId'),
+      containerModelId: form.get('containerModelId'),
       parametersId: form.get('parametersId'),
       partitions: form.get('partitions')
     }), null, function(sequencingOrders) {

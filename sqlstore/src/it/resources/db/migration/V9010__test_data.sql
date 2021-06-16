@@ -936,9 +936,9 @@ INSERT INTO Workset_Library(worksetId, libraryId, addedTime) VALUES
 INSERT INTO Workset_LibraryAliquot(worksetId, aliquotId, addedTime) VALUES
 (2, 1, '2021-03-08 13:59:00');
 
-INSERT INTO SequencingOrder(sequencingOrderId, poolId, partitions, parametersId, purposeId, description, createdBy, creationDate, updatedBy, lastUpdated) VALUES
-(1, 1, 1, 1, 1, 'seq order 1', 1, '2019-09-23 10:30:00', 1, '2019-09-23 10:30:00'),
-(2, 1, 2, 1, 1, 'seq order 2', 1, '2021-02-22 10:46:00', 1, '2021-02-22 10:46:00');
+INSERT INTO SequencingOrder(sequencingOrderId, poolId, partitions, parametersId, purposeId, sequencingContainerModelId, description, createdBy, creationDate, updatedBy, lastUpdated) VALUES
+(1, 1, 1, 1, 1, NULL, 'seq order 1', 1, '2019-09-23 10:30:00', 1, '2019-09-23 10:30:00'),
+(2, 1, 2, 1, 1, 1, 'seq order 2', 1, '2021-02-22 10:46:00', 1, '2021-02-22 10:46:00');
 
 INSERT INTO PoolOrder(poolOrderId, alias, description, purposeId, parametersId, partitions, draft, poolId, sequencingOrderId, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 'pool order 1', 'pool order 1 desc', 1, 2, 1, FALSE, NULL, NULL, 1, '2019-09-23 10:30:00', 1, '2019-09-23 10:30:00'),

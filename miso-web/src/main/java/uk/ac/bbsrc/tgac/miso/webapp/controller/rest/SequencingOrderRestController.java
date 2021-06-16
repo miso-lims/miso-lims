@@ -29,11 +29,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SequencingOrderSummaryView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
+import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderSummaryViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
@@ -64,11 +66,13 @@ public class SequencingOrderRestController extends RestController {
   @Autowired
   private RunPurposeService runPurposeService;
   @Autowired
+  private SequencingContainerModelService containerModelService;
+  @Autowired
   private IndexChecker indexChecker;
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
 
-  private final JQueryDataTableBackend<SequencingOrderSummaryView, SequencingOrderCompletionDto> jQueryBackend = new JQueryDataTableBackend<SequencingOrderSummaryView, SequencingOrderCompletionDto>() {
+  private final JQueryDataTableBackend<SequencingOrderSummaryView, SequencingOrderCompletionDto> jQueryBackend = new JQueryDataTableBackend<>() {
 
     @Override
     protected PaginatedDataSource<SequencingOrderSummaryView> getSource() throws IOException {
@@ -203,12 +207,15 @@ public class SequencingOrderRestController extends RestController {
 
   @GetMapping(value = "/sequencingorders/search")
   @ResponseBody
-  public List<SequencingOrderDto> search(@RequestParam long poolId, @RequestParam long purposeId, @RequestParam long parametersId,
-      @RequestParam int partitions) throws IOException {
+  public List<SequencingOrderDto> search(@RequestParam long poolId, @RequestParam long purposeId,
+      @RequestParam(required = false) Long containerModelId, @RequestParam long parametersId, @RequestParam int partitions)
+      throws IOException {
     Pool pool = getOrThrow(poolService, poolId, "Pool");
     RunPurpose purpose = getOrThrow(runPurposeService, purposeId, "Run purpose");
+    SequencingContainerModel containerModel = containerModelId == null ? null
+        : getOrThrow(containerModelService, containerModelId, "Container model");
     SequencingParameters parameters = getOrThrow(sequencingParametersService, parametersId, "Sequencing parameters");
-    List<SequencingOrder> results = sequencingOrderService.listByAttributes(pool, purpose, parameters, partitions);
+    List<SequencingOrder> results = sequencingOrderService.listByAttributes(pool, purpose, containerModel, parameters, partitions);
     return results.stream().map(so -> Dtos.asDto(so, indexChecker)).collect(Collectors.toList());
   }
 
