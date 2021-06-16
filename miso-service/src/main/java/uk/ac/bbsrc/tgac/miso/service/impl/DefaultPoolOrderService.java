@@ -217,7 +217,7 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
 
   private static <R> void preventFulfilledChange(String property, Function<PoolOrder, R> getter, PoolOrder newItem, PoolOrder beforeChange,
       List<ValidationError> errors) {
-    if (ValidationUtils.isSetAndChanged(getter, newItem, beforeChange)) {
+    if (newItem.getSequencingOrder() != null && ValidationUtils.isSetAndChanged(getter, newItem, beforeChange)) {
       errors.add(new ValidationError(property, "Cannot be changed after order is fulfilled"));
     }
   }
