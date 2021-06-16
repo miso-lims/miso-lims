@@ -65,7 +65,7 @@ HotTarget.sequencingorder = (function() {
             depends: '*start',
             update: function(order, flat, flatProperty, value, setReadOnly, setOptions, setData) {
               var instrumentModels = Constants.instrumentModels.filter(function(model) {
-                return model.platformType == order.pool.platformType && model.active;
+                return model.instrumentType === 'SEQUENCER' && model.platformType == order.pool.platformType && model.active;
               }).map(function(model) {
                 return model.alias;
               }).sort();
