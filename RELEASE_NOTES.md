@@ -7,6 +7,37 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.32.0] - 2021-06-18
+
+### Added
+
+* Label field for freezers and freezer components
+* 2 new IlluminaExperiment types for Application "FASTQ Only" for Assays "Nextera XT" and "TruSeq Nano DNA" for Illumina sample sheet CSV creation.
+* Ability to archive kits
+* Separate data review field for run-libraries, including data reviewer and data review date, which
+  are set automatically
+
+### Changed
+
+* Data review on runs and run-libraries will be reset to pending if the item's QC status changes
+* Data review can now only be set on runs and run-libraries that already have QC status set
+* The Misc and Institute Defaults menus have been reorganized
+  * Some more frequently useful items remain in the Misc menu
+  * The Deletion Log has been moved to the Tools menu
+  * Everything else has been moved to a Configuration menu, which is collapsed by default
+
+### Fixed
+
+* Sequencing orders with non-matching container models detected as match when trying to link to a pool
+  order from the Edit Pool Order page
+* Sample Class column not loading correctly when bulk editing samples of archived sample classes
+* Error creating a sequencing order from the Edit Pool Order page if a container model is not
+  specified
+* Error editing sequencing parameters of unfulfilled pool order
+* Error searching for pools to link from the Edit Pool Order page
+* Instrument Model column on bulk Create Sequencing Orders page included non-sequencer models
+
+
 ## [1.31.0] - 2021-06-04
 
 ### Added
