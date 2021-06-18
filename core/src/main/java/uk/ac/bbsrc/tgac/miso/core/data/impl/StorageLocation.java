@@ -98,6 +98,10 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable,
 
   private String identificationBarcode;
 
+  @ManyToOne
+  @JoinColumn(name = "labelId")
+  private StorageLabel label;
+
   @OneToMany(targetEntity = BoxImpl.class, mappedBy = "storageLocation")
   private Set<Box> boxes;
 
@@ -188,6 +192,14 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable,
 
   public void setIdentificationBarcode(String identificationBarcode) {
     this.identificationBarcode = identificationBarcode;
+  }
+
+  public StorageLabel getLabel() {
+    return label;
+  }
+
+  public void setLabel(StorageLabel label) {
+    this.label = label;
   }
 
   public Set<Box> getBoxes() {

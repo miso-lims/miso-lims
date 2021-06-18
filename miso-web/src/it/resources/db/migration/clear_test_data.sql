@@ -104,6 +104,7 @@ DELETE FROM Deletion;
 DELETE FROM User_Group;
 DELETE FROM User;
 DELETE FROM _Group;
+DELETE FROM StorageLabel;
 DELETE FROM StorageLocation;
 DELETE FROM StorageLocationMap;
 DELETE FROM RunPurpose;

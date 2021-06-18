@@ -48,14 +48,19 @@ INSERT INTO StorageLocationMap(mapId, filename, description) VALUES
 (1, 'floor_one.html', 'floor one map'),
 (2, 'floor_two.html', 'floor two map');
 
-INSERT INTO StorageLocation(locationId, parentLocationId, locationUnit, alias, identificationBarcode, creator, created, lastModifier, lastModified, mapId) VALUES
-(1, NULL, 'ROOM', 'Room 1', 'room1barcode', 1, '2021-02-23 09:57:00', 1, '2021-02-23 09:57:00', NULL),
-(2, NULL, 'ROOM', 'Room 2', 'room2barcode', 1, '2021-02-23 09:57:00', 1, '2021-02-23 09:57:00', NULL),
-(3, 1, 'FREEZER', 'Freezer 1', 'freezer1barcode', 1, '2021-02-23 09:57:00', 1, '2021-02-23 09:57:00', 1),
-(4, 3, 'SHELF', '1', NULL, 1, '2021-02-23 09:57:00', 1, '2021-02-23 09:57:00', NULL),
-(5, 3, 'SHELF', '2', NULL, 1, '2021-02-23 09:57:00', 1, '2021-02-23 09:57:00', NULL),
-(6, 3, 'SHELF', '3', NULL, 1, '2021-02-23 09:57:00', 1, '2021-02-23 09:57:00', NULL),
-(7, 1, 'FREEZER', 'Freezer 2', 'freezer2barcode', 1, '2021-02-23 09:57:00', 1, '2021-02-23 09:57:00', 1);
+INSERT INTO StorageLabel(labelId, label) VALUES
+(1, 'Label One'),
+(2, 'Label Two'),
+(3, 'Label Three');
+
+INSERT INTO StorageLocation(locationId, parentLocationId, locationUnit, alias, identificationBarcode, creator, created, lastModifier, lastModified, mapId, labelId) VALUES
+(1, NULL, 'ROOM', 'Room 1', 'room1barcode', 1, '2021-02-23 09:57:00', 1, '2021-02-23 09:57:00', NULL, NULL),
+(2, NULL, 'ROOM', 'Room 2', 'room2barcode', 1, '2021-02-23 09:57:00', 1, '2021-02-23 09:57:00', NULL, NULL),
+(3, 1, 'FREEZER', 'Freezer 1', 'freezer1barcode', 1, '2021-02-23 09:57:00', 1, '2021-02-23 09:57:00', 1, NULL),
+(4, 3, 'SHELF', '1', NULL, 1, '2021-02-23 09:57:00', 1, '2021-02-23 09:57:00', NULL, 2),
+(5, 3, 'SHELF', '2', NULL, 1, '2021-02-23 09:57:00', 1, '2021-02-23 09:57:00', NULL, 2),
+(6, 3, 'SHELF', '3', NULL, 1, '2021-02-23 09:57:00', 1, '2021-02-23 09:57:00', NULL, 3),
+(7, 1, 'FREEZER', 'Freezer 2', 'freezer2barcode', 1, '2021-02-23 09:57:00', 1, '2021-02-23 09:57:00', 1, NULL);
 
 INSERT INTO DetailedQcStatus (detailedQcStatusId, description, status, noteRequired, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 'Passed', TRUE, FALSE, 1, '2019-05-28 13:17:00', 1, '2019-05-28 13:17:00'),

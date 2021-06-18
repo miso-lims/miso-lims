@@ -172,7 +172,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocationMap;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
@@ -3503,62 +3502,6 @@ public class Dtos {
     return dto;
   }
 
-  public static StorageLocationDto asDto(@Nonnull StorageLocation from, boolean includeChildLocations, boolean recursive) {
-    StorageLocationDto dto = new StorageLocationDto();
-    dto.setId(from.getId());
-    if (from.getParentLocation() != null) {
-      dto.setParentLocationId(from.getParentLocation().getId());
-    }
-    setId(dto::setFreezerId, from.getFreezerLocation());
-    dto.setLocationUnit(from.getLocationUnit().name());
-    switch (from.getLocationUnit().getBoxStorageAmount()) {
-    case NONE:
-      dto.setAvailableStorage(false);
-      break;
-    case SINGLE:
-      dto.setAvailableStorage(from.getBoxes().isEmpty());
-      break;
-    case MULTIPLE:
-      dto.setAvailableStorage(true);
-      break;
-    default:
-      throw new IllegalStateException("Unexpected BoxStorageAmount");
-    }
-    dto.setAlias(from.getAlias());
-    dto.setIdentificationBarcode(from.getIdentificationBarcode());
-    dto.setDisplayLocation(from.getDisplayLocation());
-    dto.setFullDisplayLocation(from.getFullDisplayLocation());
-    dto.setProbeId(from.getProbeId());
-    setId(dto::setMapId, from.getMap());
-    setString(dto::setMapFilename, maybeGetProperty(from.getMap(), StorageLocationMap::getFilename));
-    setString(dto::setMapAnchor, from.getMapAnchor());
-    if (includeChildLocations) {
-      dto.setChildLocations(from.getChildLocations().stream()
-          .map(child -> Dtos.asDto(child, recursive, recursive))
-          .collect(Collectors.toList()));
-    }
-    dto.setBoxes(from.getBoxes().stream().map(box -> asDto(box, true)).collect(Collectors.toSet()));
-    return dto;
-  }
-
-  public static StorageLocation to(@Nonnull StorageLocationDto from) {
-    StorageLocation location = new StorageLocation();
-    location.setId(from.getId());
-    location.setAlias(from.getAlias());
-    if (!LimsUtils.isStringEmptyOrNull(from.getIdentificationBarcode())) {
-      location.setIdentificationBarcode(from.getIdentificationBarcode());
-    }
-    if (from.getParentLocationId() != null) {
-      location.setParentLocation(new StorageLocation());
-      location.getParentLocation().setId(from.getParentLocationId());
-    }
-    location.setLocationUnit(LocationUnit.valueOf(from.getLocationUnit()));
-    location.setProbeId(from.getProbeId());
-    setObject(location::setMap, StorageLocationMap::new, from.getMapId());
-    setString(location::setMapAnchor, from.getMapAnchor());
-    return location;
-  }
-
   public static StorageLocationMapDto asDto(@Nonnull StorageLocationMap from) {
     StorageLocationMapDto to = new StorageLocationMapDto();
     setLong(to::setId, from.getId(), true);
@@ -4423,11 +4366,11 @@ public class Dtos {
     return to;
   }
 
-  private static void setBigDecimal(@Nonnull Consumer<BigDecimal> setter, String value) {
+  public static void setBigDecimal(@Nonnull Consumer<BigDecimal> setter, String value) {
     setter.accept(isStringEmptyOrNull(value) ? null : new BigDecimal(value));
   }
 
-  private static void setBoolean(@Nonnull Consumer<Boolean> setter, Boolean value, boolean nullOk) {
+  public static void setBoolean(@Nonnull Consumer<Boolean> setter, Boolean value, boolean nullOk) {
     if (value != null || nullOk) {
       setter.accept(value);
     } else {
@@ -4435,7 +4378,7 @@ public class Dtos {
     }
   }
 
-  private static void setInteger(@Nonnull Consumer<Integer> setter, Integer value, boolean nullOk) {
+  public static void setInteger(@Nonnull Consumer<Integer> setter, Integer value, boolean nullOk) {
     if (value != null || nullOk) {
       setter.accept(value);
     } else {
@@ -4443,35 +4386,35 @@ public class Dtos {
     }
   }
 
-  private static void setString(@Nonnull Consumer<String> setter, BigDecimal value) {
+  public static void setString(@Nonnull Consumer<String> setter, BigDecimal value) {
     setter.accept(toNiceString(value));
   }
 
-  private static void setString(@Nonnull Consumer<String> setter, Double value) {
+  public static void setString(@Nonnull Consumer<String> setter, Double value) {
     setter.accept(value == null ? null : value.toString());
   }
 
-  private static void setString(@Nonnull Consumer<String> setter, String value) {
+  public static void setString(@Nonnull Consumer<String> setter, String value) {
     setter.accept(isStringBlankOrNull(value) ? null : value.trim());
   }
 
-  private static void setDateString(@Nonnull Consumer<String> setter, Date value) {
+  public static void setDateString(@Nonnull Consumer<String> setter, Date value) {
     setter.accept(value == null ? null : formatDate(value));
   }
 
-  private static void setDate(@Nonnull Consumer<Date> setter, String value) {
+  public static void setDate(@Nonnull Consumer<Date> setter, String value) {
     setter.accept(value == null ? null : parseDate(value));
   }
 
-  private static void setDateTimeString(@Nonnull Consumer<String> setter, Date value) {
+  public static void setDateTimeString(@Nonnull Consumer<String> setter, Date value) {
     setter.accept(value == null ? null : formatDateTime(value));
   }
 
-  private static void setDateTime(@Nonnull Consumer<Date> setter, String value) {
+  public static void setDateTime(@Nonnull Consumer<Date> setter, String value) {
     setter.accept(value == null ? null : parseDateTime(value));
   }
 
-  private static void setLong(@Nonnull Consumer<Long> setter, Long value, boolean nullOk) {
+  public static void setLong(@Nonnull Consumer<Long> setter, Long value, boolean nullOk) {
     Long effectiveValue = value;
     if (effectiveValue == null) {
       effectiveValue = nullOk ? null : 0L;
@@ -4479,11 +4422,11 @@ public class Dtos {
     setter.accept(effectiveValue);
   }
 
-  private static void setId(@Nonnull Consumer<Long> setter, Identifiable value) {
+  public static void setId(@Nonnull Consumer<Long> setter, Identifiable value) {
     setter.accept(value == null ? null : value.getId());
   }
 
-  private static <T extends Identifiable> void setObject(@Nonnull Consumer<T> setter, @Nonnull Supplier<T> constructor, Long id) {
+  public static <T extends Identifiable> void setObject(@Nonnull Consumer<T> setter, @Nonnull Supplier<T> constructor, Long id) {
     if (id == null) {
       setter.accept(null);
     } else {
@@ -4493,15 +4436,15 @@ public class Dtos {
     }
   }
 
-  private static <T> void setObject(@Nonnull Consumer<T> setter, String value, @Nonnull Function<String, T> lookup) {
+  public static <T> void setObject(@Nonnull Consumer<T> setter, String value, @Nonnull Function<String, T> lookup) {
     setter.accept(value == null ? null : lookup.apply(value));
   }
 
-  private static <S, R> void setObject(@Nonnull Consumer<R> setter, S value, @Nonnull Function<S, R> transform) {
+  public static <S, R> void setObject(@Nonnull Consumer<R> setter, S value, @Nonnull Function<S, R> transform) {
     setter.accept(value == null ? null : transform.apply(value));
   }
 
-  private static <S, R> R maybeGetProperty(S object, @Nonnull Function<S, R> getter) {
+  public static <S, R> R maybeGetProperty(S object, @Nonnull Function<S, R> getter) {
     return object == null ? null : getter.apply(object);
   }
 

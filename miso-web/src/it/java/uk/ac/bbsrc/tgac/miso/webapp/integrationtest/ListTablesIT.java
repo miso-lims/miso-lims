@@ -928,6 +928,16 @@ public class ListTablesIT extends AbstractIT {
     testColumnsSort(ListTarget.WORKSET_STAGES);
   }
 
+  @Test
+  public void testListStorageLabelsSetup() throws Exception {
+    testPageSetup(ListTarget.STORAGE_LABELS, Sets.newHashSet(Columns.LABEL));
+  }
+
+  @Test
+  public void testListStorageLabelsColumnSort() throws Exception {
+    testColumnsSort(ListTarget.STORAGE_LABELS);
+  }
+
   private void testPageSetup(String listTarget, Set<String> targetColumns) {
     testPageSetup(listTarget, targetColumns, false);
   }

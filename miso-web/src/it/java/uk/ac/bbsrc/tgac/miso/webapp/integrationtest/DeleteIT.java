@@ -52,6 +52,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLabel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocationMap;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
@@ -405,6 +406,11 @@ public class DeleteIT extends AbstractIT {
   @Test
   public void testDeleteWorksetStage() {
     testAdminDelete(ListTarget.WORKSET_STAGES, null, "DeleteStage", Columns.ALIAS, WorksetStage.class, 4L);
+  }
+
+  @Test
+  public void testDeleteStorageLabel() {
+    testAdminDelete(ListTarget.STORAGE_LABELS, null, "Label to delete", Columns.LABEL, StorageLabel.class, 3L);
   }
 
   private void testDelete(String listTarget, String tab, String search, String selectByColumn, Class<?> clazz,

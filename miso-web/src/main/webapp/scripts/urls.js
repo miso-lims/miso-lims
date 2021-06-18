@@ -914,6 +914,19 @@ Urls = (function() {
     create: stainCategoryRestBase,
     update: idUrlFunction(stainCategoryRestBase)
   };
+  
+  // Storage Labels
+  var storageLabelUiBase = baseUrl + '/storagelabel';
+  ui.storageLabels = {
+    bulkCreate: storageLabelUiBase + '/bulk/new',
+    bulkEdit: storageLabelUiBase + '/bulk/edit'
+  };
+  
+  var storageLabelRestBase = restBase + '/storagelabels';
+  rest.storageLabels = {
+    bulkSave: storageLabelRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(storageLabelRestBase + '/bulk')
+  };
 
   // Storage Locations
   var storageLocationRestBase = restBase + '/storagelocations';

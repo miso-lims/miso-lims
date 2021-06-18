@@ -39,7 +39,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.StorageLocationService;
-import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.StorageLocationDto;
 import uk.ac.bbsrc.tgac.miso.webapp.util.TabbedListItemsPage;
 
 @Controller
@@ -78,9 +78,9 @@ public class ListStorageLocationsController {
     return new ListLocationsPage(authorizationManager).list(key -> {
       switch (key) {
       case "Rooms":
-        return storageLocationService.listRooms().stream().map(r -> Dtos.asDto(r, false, false));
+        return storageLocationService.listRooms().stream().map(r -> StorageLocationDto.from(r, false, false));
       case "Freezers":
-        return storageLocationService.listFreezers().stream().map(r -> Dtos.asDto(r, false, false));
+        return storageLocationService.listFreezers().stream().map(r -> StorageLocationDto.from(r, false, false));
       default:
         throw new IllegalArgumentException();
       }

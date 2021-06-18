@@ -1,11 +1,61 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import static uk.ac.bbsrc.tgac.miso.dto.Dtos.*;
+
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.annotation.Nonnull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLabel;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocationMap;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+
 public class StorageLocationDto {
+
+  public static StorageLocationDto from(@Nonnull StorageLocation from, boolean includeChildLocations, boolean recursive) {
+    StorageLocationDto dto = new StorageLocationDto();
+    dto.setId(from.getId());
+    if (from.getParentLocation() != null) {
+      dto.setParentLocationId(from.getParentLocation().getId());
+    }
+    Dtos.setId(dto::setFreezerId, from.getFreezerLocation());
+    dto.setLocationUnit(from.getLocationUnit().name());
+    switch (from.getLocationUnit().getBoxStorageAmount()) {
+    case NONE:
+      dto.setAvailableStorage(false);
+      break;
+    case SINGLE:
+      dto.setAvailableStorage(from.getBoxes().isEmpty());
+      break;
+    case MULTIPLE:
+      dto.setAvailableStorage(true);
+      break;
+    default:
+      throw new IllegalStateException("Unexpected BoxStorageAmount");
+    }
+    dto.setAlias(from.getAlias());
+    dto.setIdentificationBarcode(from.getIdentificationBarcode());
+    dto.setDisplayLocation(from.getDisplayLocation());
+    dto.setFullDisplayLocation(from.getFullDisplayLocation());
+    dto.setProbeId(from.getProbeId());
+    Dtos.setId(dto::setMapId, from.getMap());
+    setString(dto::setMapFilename, maybeGetProperty(from.getMap(), StorageLocationMap::getFilename));
+    setString(dto::setMapAnchor, from.getMapAnchor());
+    Dtos.setId(dto::setLabelId, from.getLabel());
+    if (includeChildLocations) {
+      dto.setChildLocations(from.getChildLocations().stream()
+          .map(child -> StorageLocationDto.from(child, recursive, recursive))
+          .collect(Collectors.toList()));
+    }
+    dto.setBoxes(from.getBoxes().stream().map(box -> asDto(box, true)).collect(Collectors.toSet()));
+    return dto;
+  }
 
   private long id;
   private Long parentLocationId;
@@ -22,6 +72,7 @@ public class StorageLocationDto {
   private Long mapId;
   private String mapFilename;
   private String mapAnchor;
+  private Long labelId;
 
   public long getId() {
     return id;
@@ -142,6 +193,33 @@ public class StorageLocationDto {
 
   public void setMapAnchor(String mapAnchor) {
     this.mapAnchor = mapAnchor;
+  }
+
+  public Long getLabelId() {
+    return labelId;
+  }
+
+  public void setLabelId(Long labelId) {
+    this.labelId = labelId;
+  }
+
+  public StorageLocation to() {
+    StorageLocation location = new StorageLocation();
+    location.setId(getId());
+    location.setAlias(getAlias());
+    if (!LimsUtils.isStringEmptyOrNull(getIdentificationBarcode())) {
+      location.setIdentificationBarcode(getIdentificationBarcode());
+    }
+    if (getParentLocationId() != null) {
+      location.setParentLocation(new StorageLocation());
+      location.getParentLocation().setId(getParentLocationId());
+    }
+    location.setLocationUnit(LocationUnit.valueOf(getLocationUnit()));
+    location.setProbeId(getProbeId());
+    setObject(location::setMap, StorageLocationMap::new, getMapId());
+    setString(location::setMapAnchor, getMapAnchor());
+    setObject(location::setLabel, StorageLabel::new, getLabelId());
+    return location;
   }
 
 }

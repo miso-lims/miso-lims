@@ -318,6 +318,7 @@ var Freezer = (function($) {
     $('#storageComponentAlias').text(storage.displayLocation);
     $('#storageComponentId').text(storage.id);
     $('#storageComponentBarcode').val(storage.identificationBarcode);
+    $('#storageComponentLabel').val(storage.labelId);
     $('#editStorageComponentContainer').show();
     $('#saveStorageComponent').show();
     $('#deleteStorageComponent').show();
@@ -361,10 +362,8 @@ var Freezer = (function($) {
         displayEditStorageComponentControls(node.item);
         $('#deleteStorageComponent').hide();
       };
-      break;
     case 'LOOSE_STORAGE':
       return getUnorganizedStorageSelectFunction(node, true, true, assignBox);
-      break;
     case 'TRAY':
       return getUnorganizedStorageSelectFunction(node, true, false, assignBox);
     default:
@@ -497,6 +496,7 @@ var Freezer = (function($) {
       component[prop] = selectedComponent[prop];
     }
     component.identificationBarcode = $('#storageComponentBarcode').val();
+    component.labelId = parseInt($('#storageComponentLabel').val()) || null;
 
     $.ajax({
       url: Urls.rest.storageLocations.updateComponent(component.id),

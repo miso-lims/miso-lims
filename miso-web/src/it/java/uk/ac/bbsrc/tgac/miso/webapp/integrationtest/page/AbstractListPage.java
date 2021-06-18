@@ -63,6 +63,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String ITEMS = "Items";
     public static final String ITEMS_CAPACITY = "Items/Capacity";
     public static final String KIT_NAME = "Kit Name";
+    public static final String LABEL = "Label";
     public static final String LAST_MODIFIED = "Last Modified";
     public static final String LAST_RUN_ALIAS = "Last Run Alias";
     public static final String LAST_RUN_NAME = "Last Run Name";
@@ -211,6 +212,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String SOPS = "sop/list";
     public static final String STAINS = "stain/list";
     public static final String STAIN_CATEGORIES = "staincategory/list";
+    public static final String STORAGE_LABELS = "storagelabel/list";
     public static final String STORAGE_LOCATIONS = "storagelocations";
     public static final String STUDIES = "studies";
     public static final String STUDY_TYPES = "studytype/list";
