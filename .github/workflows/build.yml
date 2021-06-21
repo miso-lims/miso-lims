@@ -1,0 +1,65 @@
+name: CI
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+jobs:
+  Build:
+    strategy:
+      fail-fast: false
+      matrix:
+        testsuite: [UNIT_TEST, SQLSTORE_IT, PLAIN_WEB_IT, BULK_WEB_IT, OTHER_WEB_IT, PINERY_IT]
+    env:
+      DOCKER_USERNAME: dcooke
+      DOCKER_PASSWORD: ${{ secrets.docker_password }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+      - name: Cache Maven packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      - run: mvn --batch-mode clean install -DskipTests
+      - name: Unit Tests
+        if: ${{ matrix.testsuite == 'UNIT_TEST' }}
+        run: mvn --batch-mode test
+      - name: SQLStore Integration Tests
+        if: ${{ matrix.testsuite == 'SQLSTORE_IT' }}
+        run: |
+          mvn --batch-mode verify -pl sqlstore -DskipUTs=true -DskipITs=false \
+          -Ddocker.username="${DOCKER_USERNAME}" \
+          -Ddocker.password="${DOCKER_PASSWORD}"
+      - name: MISO-Web Plain Sample Integration Tests
+        if: ${{ matrix.testsuite == 'PLAIN_WEB_IT' }}
+        run: |
+          mvn --batch-mode verify -pl miso-web -DskipUTs=true -DrunPlainITs \
+          -Ddocker.username="${DOCKER_USERNAME}" \
+          -Ddocker.password="${DOCKER_PASSWORD}"
+      - name: MISO-Web Bulk Page Integration tests
+        if: ${{ matrix.testsuite == 'BULK_WEB_IT' }}
+        run: |
+          mvn --batch-mode verify -pl miso-web -DskipUTs=true -DskipITs=false \
+          -Dit.test='Bulk*' -Ddocker.username="${DOCKER_USERNAME}" \
+          -Ddocker.password="${DOCKER_PASSWORD}"
+      - name: MISO-Web Other Integration tests
+        if: ${{ matrix.testsuite == 'OTHER_WEB_IT' }}
+        run: |
+          mvn --batch-mode verify -pl miso-web -DskipUTs=true -DskipITs=false \
+          -Dit.test='!PlainSampleITs, !Bulk*' \
+          -Ddocker.username="${DOCKER_USERNAME}" \
+          -Ddocker.password="${DOCKER_PASSWORD}"
+      - name: Pinery-MISO Integration Tests
+        if: ${{ matrix.testsuite == 'PINERY_IT' }}
+        run: |
+          mvn --batch-mode verify -pl pinery-miso -DskipUTs=true \
+          -DskipITs=false -Ddocker.username="${DOCKER_USERNAME}" \
+          -Ddocker.password="${DOCKER_PASSWORD}"
