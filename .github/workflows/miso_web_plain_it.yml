@@ -1,4 +1,4 @@
-name: CI
+name: MISO-Web Plain IT
 on:
   push:
     branches:
@@ -7,7 +7,7 @@ on:
     branches:
       - develop
 jobs:
-  Build:
+  CI:
     runs-on: ubuntu-latest
     env:
       DOCKER_USERNAME: dcooke

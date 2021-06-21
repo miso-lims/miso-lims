@@ -1,4 +1,4 @@
-name: CI
+name: Unit Tests
 on:
   push:
     branches:
@@ -7,7 +7,7 @@ on:
     branches:
       - develop
 jobs:
-  Build:
+  CI:
     runs-on: ubuntu-latest
     env:
       DOCKER_USERNAME: dcooke
