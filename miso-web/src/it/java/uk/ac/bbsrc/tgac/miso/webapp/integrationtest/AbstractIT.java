@@ -119,11 +119,12 @@ public abstract class AbstractIT {
     return sessionFactory.openSession();
   }
 
-  protected final void login() {
+  protected final HomePage login() {
     LoginPage loginPage = LoginPage.get(getDriver(), getBaseUrl());
     HomePage homePage = loginPage.loginValidUser("user", "user");
     assertNotNull(homePage);
     verifyConstants();
+    return homePage;
   }
 
   protected final void loginAdmin() {
