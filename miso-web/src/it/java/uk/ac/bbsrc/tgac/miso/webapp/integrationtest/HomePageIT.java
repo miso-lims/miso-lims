@@ -16,7 +16,6 @@ public class HomePageIT extends AbstractIT {
 
   @Before
   public void setup() {
-    login();
     page = login();
     assertNotNull(page);
   }
