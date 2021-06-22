@@ -1,0 +1,27 @@
+name: Unit Tests
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+jobs:
+  CI:
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_USERNAME: dcooke
+      DOCKER_PASSWORD: ${{ secrets.docker_password }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+      - name: Cache Maven packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      - run: mvn --batch-mode test

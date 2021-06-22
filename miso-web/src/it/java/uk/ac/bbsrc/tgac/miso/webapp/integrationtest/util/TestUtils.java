@@ -8,11 +8,14 @@ import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.logging.LogType;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,8 +84,10 @@ public class TestUtils {
     }
 
     // confirm that page contains logo
-    if (driver.findElements(By.id("misologo")).isEmpty()) {
-      log.error("{}: Page is completely empty. Is resource correct?", url);
+    try {
+      new WebDriverWait(driver, 10).until(ExpectedConditions.presenceOfElementLocated(By.id("misologo")));
+    } catch (TimeoutException e) {
+      log.error("{}: MISO logo image not found. Is resource correct?", url);
       return true;
     }
 

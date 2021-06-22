@@ -37,8 +37,6 @@ public class BulkLibraryAliquotIT extends AbstractIT {
   private static final Set<String> propagateColumns = Sets.newHashSet(LibraryAliquotColumns.PARENT_NAME,
       LibraryAliquotColumns.PARENT_ALIAS);
 
-  private static final String NO_TAR_SEQ = "(None)";
-
   @Before
   public void setup() {
     login();
