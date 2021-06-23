@@ -18,7 +18,7 @@ BulkTarget.box = (function($) {
       return Urls.external.userManual('boxes');
     },
     getBulkActions: function(config) {
-      return [BulkUtils.actions.edit(Urls.ui.boxes.bulkEdit), HotUtils.makeTransferAction('boxIds')];
+      return [BulkUtils.actions.edit(Urls.ui.boxes.bulkEdit), BulkUtils.actions.transfer('boxIds')];
     },
     getColumns: function(config, api) {
       return [BulkUtils.columns.name, BulkUtils.columns.simpleAlias(255), BulkUtils.columns.description, BulkUtils.columns.matrixBarcode, {

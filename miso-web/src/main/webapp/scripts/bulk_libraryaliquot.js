@@ -127,7 +127,7 @@ BulkTarget.libraryaliquot = (function($) {
           HotUtils.makeChildren(Urls.rest.libraryAliquots.children, [HotUtils.relations.pool(), HotUtils.relations.run()]),
           config.worksetId ? HotUtils.makeRemoveFromWorkset('library aliquots', Urls.rest.worksets.removeLibraryAliquots(config.worksetId))
               : HotUtils.makeAddToWorkset('library aliquots', 'libraryAliquotIds', Urls.rest.worksets.addLibraryAliquots),
-          HotUtils.makeTransferAction('libraryAliquotIds')];
+          BulkUtils.actions.transfer('libraryAliquotIds')];
     },
     getFixedColumns: function(config) {
       return 2;

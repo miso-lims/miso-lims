@@ -845,6 +845,16 @@ BulkUtils = (function($) {
             loadPage();
           }
         });
+      },
+      transfer: function(idsParameter) {
+        return {
+          name: 'Transfer',
+          action: function(items) {
+            var params = {};
+            params[idsParameter] = items.map(Utils.array.getId).join(",");
+            Utils.page.post(Urls.ui.transfers.create, params);
+          }
+        };
       }
     }
 

@@ -1,10 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
+import static uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils.getStringInput;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -18,6 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -92,13 +96,14 @@ public class TransferController {
         .list(model);
   }
 
-  @GetMapping("/new")
-  public ModelAndView create(@RequestParam(name = "sampleIds", required = false) String sampleIdString,
-      @RequestParam(name = "libraryIds", required = false) String libraryIdString,
-      @RequestParam(name = "libraryAliquotIds", required = false) String libraryAliquotIdString,
-      @RequestParam(name = "poolIds", required = false) String poolIdString, ModelMap model,
-      @RequestParam(name = "boxIds", required = false) String boxIdString) throws IOException {
-    model.put("title", "New Transfer");
+  @PostMapping("/new")
+  public ModelAndView create(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
+    String sampleIdString = getStringInput("sampleIds", form, false);
+    String libraryIdString = getStringInput("libraryIds", form, false);
+    String libraryAliquotIdString = getStringInput("libraryAliquotIds", form, false);
+    String poolIdString = getStringInput("poolIds", form, false);
+    String boxIdString = getStringInput("boxIds", form, false);
+
     Transfer transfer = new Transfer();
     addItems("sample", sampleIdString, sampleService, TransferSample::new, transfer::getSampleTransfers);
     addItems("library", libraryIdString, libraryService, TransferLibrary::new, transfer::getLibraryTransfers);
@@ -106,6 +111,15 @@ public class TransferController {
         transfer::getLibraryAliquotTransfers);
     addItems("pool", poolIdString, poolService, TransferPool::new, transfer::getPoolTransfers);
     addBoxItems(boxIdString, transfer);
+
+    model.put("title", "New Transfer");
+    return setupForm(transfer, PageMode.CREATE, true, false, model);
+  }
+
+  @GetMapping("/new")
+  public ModelAndView create(ModelMap model) throws IOException {
+    model.put("title", "New Transfer");
+    Transfer transfer = new Transfer();
     return setupForm(transfer, PageMode.CREATE, true, false, model);
   }
 
