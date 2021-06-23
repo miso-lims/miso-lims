@@ -65,8 +65,10 @@ public class BulkSequencingOrderIT extends AbstractIT {
     changes.putAll(attrs);
     assertColumnValues(table, 0, changes, "changes pre-save");
 
-    saveAndAssertSuccess(table);
-    assertColumnValues(table, 0, changes, "post-save");
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
+    changes.remove(Columns.INSTRUMENT_MODEL); // not shown after save as it's not actually saved
+    assertColumnValues(savedTable, 0, changes, "post-save");
 
     Pool pool = (Pool) getSession().get(PoolImpl.class, 120001L);
     @SuppressWarnings("unchecked")
