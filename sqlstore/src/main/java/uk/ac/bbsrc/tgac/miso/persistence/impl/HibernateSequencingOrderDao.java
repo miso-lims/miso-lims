@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.criterion.Restrictions;
@@ -44,6 +45,11 @@ public class HibernateSequencingOrderDao extends HibernateSaveDao<SequencingOrde
         .add(Restrictions.eq("partitions", partitions))
         .list();
     return records;
+  }
+
+  @Override
+  public List<SequencingOrder> listByIdList(Collection<Long> ids) throws IOException {
+    return listByIdList("id", ids);
   }
 
 }

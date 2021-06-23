@@ -2,6 +2,8 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
+
 import org.junit.Test;
 
 import com.eaglegenomics.simlims.core.User;
@@ -63,6 +65,11 @@ public class HibernateSequencingOrderDaoIT extends AbstractHibernateSaveDaoTest<
     assertEquals(1, getTestSubject().listByAttributes(pool, purpose, null, parameters, 1).size());
     assertEquals(1, getTestSubject().listByAttributes(pool, purpose, containerModel, parameters, 2).size());
     assertEquals(0, getTestSubject().listByAttributes(pool, purpose, null, parameters, 10).size());
+  }
+
+  @Test
+  public void testListByIdList() throws Exception {
+    testListByIdList(HibernateSequencingOrderDao::listByIdList, Arrays.asList(1L, 2L));
   }
 
 }

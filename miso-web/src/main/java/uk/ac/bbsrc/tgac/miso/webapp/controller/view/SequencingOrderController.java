@@ -1,12 +1,16 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
+import static uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils.getStringInput;
+
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -23,14 +27,14 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
 
 @Controller
 @RequestMapping("/sequencingorder")
-public class EditSequencingOrderController {
+public class SequencingOrderController {
 
   @Autowired
   private PoolService poolService;
   @Autowired
   private IndexChecker indexChecker;
 
-  private final BulkPropagateTableBackend<Pool, SequencingOrderDto> orderBulkPropagateBackend = new BulkPropagateTableBackend<Pool, SequencingOrderDto>(
+  private final BulkPropagateTableBackend<Pool, SequencingOrderDto> orderBulkPropagateBackend = new BulkPropagateTableBackend<>(
       "sequencingorder", SequencingOrderDto.class, "Sequencing Orders", "Pools") {
 
     @Override
@@ -49,10 +53,16 @@ public class EditSequencingOrderController {
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
       // no config necessary
     }
+
+    @Override
+    protected boolean isNewInterface() {
+      return true;
+    }
   };
 
-  @RequestMapping("/bulk/create")
-  public ModelAndView bulkCreateOrders(@RequestParam("ids") String poolIds, ModelMap model) throws IOException {
+  @PostMapping("/bulk/new")
+  public ModelAndView bulkCreateOrders(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
+    String poolIds = getStringInput("poolIds", form, true);
     return orderBulkPropagateBackend.propagate(poolIds, model);
   }
 

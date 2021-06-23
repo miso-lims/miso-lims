@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
@@ -48,12 +50,15 @@ import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingOrderCompletionDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingOrderDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse.PoolPickerEntry;
 
 @Controller
 @RequestMapping("/rest")
 public class SequencingOrderRestController extends RestController {
+
+  private static final String TYPE_LABEL = "Sequencing Order";
 
   @Autowired
   private SequencingOrderService sequencingOrderService;
@@ -71,6 +76,8 @@ public class SequencingOrderRestController extends RestController {
   private IndexChecker indexChecker;
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
+  @Autowired
+  private AsyncOperationManager asyncOperationManager;
 
   private final JQueryDataTableBackend<SequencingOrderSummaryView, SequencingOrderCompletionDto> jQueryBackend = new JQueryDataTableBackend<>() {
 
@@ -225,6 +232,18 @@ public class SequencingOrderRestController extends RestController {
       throw new RestException(String.format("%s with id %d not found", type, id), Status.BAD_REQUEST);
     }
     return object;
+  }
+
+  @PostMapping("/sequencingorders/bulk")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<SequencingOrderDto> dtos) throws IOException {
+    return asyncOperationManager.startAsyncBulkCreate(TYPE_LABEL, dtos, Dtos::to, sequencingOrderService);
+  }
+
+  @GetMapping("/sequencingorders/bulk/{uuid}")
+  public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
+    return asyncOperationManager.getAsyncProgress(uuid, SequencingOrder.class, sequencingOrderService,
+        order -> Dtos.asDto(order, indexChecker));
   }
 
 }
