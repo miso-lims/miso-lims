@@ -1,4 +1,4 @@
-name: SQLStore IT
+name: Database Integration Tests
 on:
   push:
     branches:

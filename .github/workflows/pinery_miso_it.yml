@@ -1,4 +1,4 @@
-name: Pinery-MISO IT
+name: Pinery-MISO Integration Tests
 on:
   push:
     branches:
