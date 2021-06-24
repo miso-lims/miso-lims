@@ -129,7 +129,7 @@ BulkTarget.library = (function($) {
                   : HotUtils.makeAddToWorkset('libraries', 'libraryIds', Urls.rest.worksets.addLibraries),
               HotUtils.makeAttachFile('library', function(library) {
                 return library.projectId;
-              }), HotUtils.makeTransferAction('libraryIds')]);
+              }), BulkUtils.actions.transfer('libraryIds')]);
     },
     prepareData: function(data, config) {
       parentLocationsByRow = {};

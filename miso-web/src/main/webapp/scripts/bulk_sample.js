@@ -218,7 +218,7 @@ BulkTarget.sample = (function($) {
 
       actions.push(HotUtils.makeAttachFile('sample', function(sample) {
         return sample.projectId;
-      }), HotUtils.makeTransferAction('sampleIds'));
+      }), BulkUtils.actions.transfer('sampleIds'));
 
       return actions;
     },

@@ -12,6 +12,8 @@ import org.openqa.selenium.support.PageFactory;
 
 import com.google.common.base.Joiner;
 
+import uk.ac.bbsrc.tgac.miso.core.util.MapBuilder;
+
 public class TransferPage extends FormPage<TransferPage.Field> {
 
   public static enum Field implements FormPage.FieldElement {
@@ -55,8 +57,9 @@ public class TransferPage extends FormPage<TransferPage.Field> {
   }
 
   public static TransferPage getForCreateWithSamples(WebDriver driver, String baseUrl, Collection<Long> sampleIds) {
-    String ids = Joiner.on(',').join(sampleIds);
-    driver.get(baseUrl + "miso/transfer/new?sampleIds=" + ids);
+    MapBuilder<String, String> params = new MapBuilder<String, String>()
+        .put("sampleIds", Joiner.on(',').join(sampleIds));
+    postData(driver, baseUrl + "miso/transfer/new", params.build());
     return new TransferPage(driver);
   }
 

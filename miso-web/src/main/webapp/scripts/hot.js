@@ -1511,17 +1511,6 @@ var HotUtils = {
     }
   },
 
-  makeTransferAction: function(idsParameter) {
-    return {
-      name: 'Transfer',
-      action: function(items) {
-        var params = {};
-        params[idsParameter] = items.map(Utils.array.getId).join(",");
-        window.location = Urls.ui.transfers.create + '?' + jQuery.param(params);
-      }
-    };
-  },
-
   relationCategoriesForDetailed: function() { // Change name to relationCategoriesForDetailed
     return Constants.isDetailedSample ? Constants.sampleCategories.map(function(category) {
       return {
