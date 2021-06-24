@@ -1,4 +1,4 @@
-name: MISO-Web Plain IT
+name: Plain Sample UI Tests
 on:
   push:
     branches:

@@ -1,5 +1,12 @@
-[![Build Status](https://travis-ci.org/miso-lims/miso-lims.svg?branch=develop)](https://travis-ci.org/miso-lims/miso-lims) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=uk.ac.bbsrc.tgac.miso:miso&metric=alert_status)](https://sonarcloud.io/dashboard?id=uk.ac.bbsrc.tgac.miso:miso) [![DOI](https://zenodo.org/badge/4726428.svg)](https://zenodo.org/badge/latestdoi/4726428) [![Gitter](https://badges.gitter.im/miso-lims/community.svg)](https://gitter.im/miso-lims/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) [![Documentation Status](https://readthedocs.org/projects/miso-lims-docs/badge/?version=latest)](https://miso-lims.readthedocs.io/projects/docs/en/latest/?badge=latest)
-
+![Unit Tests](https://github.com/miso-lims/miso-lims/actions/workflows/unit_tests.yml/badge.svg)
+![Database Integration Tests](https://github.com/miso-lims/miso-lims/actions/workflows/sqlstore_it.yml/badge.svg)
+![Plain Sample UI Tests](https://github.com/miso-lims/miso-lims/actions/workflows/miso_web_plain_it.yml/badge.svg)
+![Bulk Page UI Tests](https://github.com/miso-lims/miso-lims/actions/workflows/miso_web_bulk_it.yml/badge.svg)
+![Other UI Tests](https://github.com/miso-lims/miso-lims/actions/workflows/miso_web_other_it.yml/badge.svg)
+![Pinery-MISO Integration Tests](https://github.com/miso-lims/miso-lims/actions/workflows/pinery_miso_it.yml/badge.svg)
+[![DOI](https://zenodo.org/badge/4726428.svg)](https://zenodo.org/badge/latestdoi/4726428)
+[![Gitter](https://badges.gitter.im/miso-lims/community.svg)](https://gitter.im/miso-lims/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Documentation Status](https://readthedocs.org/projects/miso-lims-docs/badge/?version=latest)](https://miso-lims.readthedocs.io/projects/docs/en/latest/?badge=latest)
 
 
 # MISO: An open source LIMS for small-to-large scale sequencing centres
