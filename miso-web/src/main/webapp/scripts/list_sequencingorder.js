@@ -73,8 +73,8 @@ ListTarget.sequencingorder = {
       return [{
         name: "Create",
         handler: function() {
-          window.location = Urls.ui.sequencingOrders.bulkCreate + '?' + jQuery.param({
-            ids: config.pool.id
+          Utils.page.post(Urls.ui.sequencingOrders.bulkCreate, {
+            poolIds: config.pool.id
           });
         }
       }];

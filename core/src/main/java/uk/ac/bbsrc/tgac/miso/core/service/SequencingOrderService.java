@@ -11,7 +11,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationException;
 
-public interface SequencingOrderService extends DeleterService<SequencingOrder>, ListService<SequencingOrder>, SaveService<SequencingOrder> {
+public interface SequencingOrderService
+    extends DeleterService<SequencingOrder>, ListService<SequencingOrder>, BulkSaveService<SequencingOrder> {
 
   Set<SequencingOrder> getByPool(Pool pool) throws AuthorizationException, IOException;
 

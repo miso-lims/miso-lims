@@ -6,16 +6,15 @@ import java.util.Collection;
 import java.util.List;
 
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
+import uk.ac.bbsrc.tgac.miso.core.util.MapBuilder;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 
-public class BulkSequencingOrderPage extends HeaderFooterPage {
+public class BulkSequencingOrderPage extends BulkPage {
 
   public static class Columns {
     public static final String NAME = "Pool Name";
@@ -36,29 +35,31 @@ public class BulkSequencingOrderPage extends HeaderFooterPage {
     }
   };
 
-  public static final String CREATE_URL_FRAGMENT = "miso/sequencingorder/bulk/create";
+  public static final String CREATE_URL_FRAGMENT = "miso/sequencingorder/bulk/new";
 
-  @FindBy(id = "bulkactions")
-  private WebElement toolbar;
-
-  private final HandsOnTable table;
+  private HandsOnTable table;
 
   public BulkSequencingOrderPage(WebDriver driver) {
     super(driver);
     PageFactory.initElements(driver, this);
     waitWithTimeout().until(titleContains("Create Sequencing Orders from Pools "));
-    table = new HandsOnTable(driver);
+    refreshElements();
   }
 
   public static BulkSequencingOrderPage getForCreate(WebDriver driver, String baseUrl, Collection<Long> poolIds) {
-    String ids = Joiner.on("%2C").join(poolIds);
-    String url = baseUrl + CREATE_URL_FRAGMENT + "?ids=" + ids;
-    driver.get(url);
+    String poolIdString = Joiner.on(",").join(poolIds);
+    postData(driver, baseUrl + CREATE_URL_FRAGMENT, new MapBuilder<String, String>().put("poolIds", poolIdString).build());
     return new BulkSequencingOrderPage(driver);
   }
 
+  @Override
   public HandsOnTable getTable() {
     return table;
+  }
+
+  @Override
+  protected void refreshElements() {
+    table = new HandsOnTable(getDriver());
   }
 
 }

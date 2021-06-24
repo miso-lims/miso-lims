@@ -833,13 +833,15 @@ Urls = (function() {
   // Sequencing Orders
   var sequencingOrderUiBase = baseUrl + '/sequencingorder';
   ui.sequencingOrders = {
-    bulkCreate: sequencingOrderUiBase + '/bulk/create'
+    bulkCreate: sequencingOrderUiBase + '/bulk/new'
   };
 
   var sequencingOrderRestBase = restBase + '/sequencingorders';
   rest.sequencingOrders = {
     create: sequencingOrderRestBase,
     update: idUrlFunction(sequencingOrderRestBase),
+    bulkSave: sequencingOrderRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(sequencingOrderRestBase + '/bulk'),
     search: sequencingOrderRestBase + '/search',
     picker: {
       chemistry: sequencingOrderRestBase + '/picker/chemistry',

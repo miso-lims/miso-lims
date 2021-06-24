@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -15,5 +16,7 @@ public interface SequencingOrderDao extends SaveDao<SequencingOrder> {
 
   List<SequencingOrder> listByAttributes(Pool pool, RunPurpose purpose, SequencingContainerModel containerModel,
       SequencingParameters parameters, Integer partitions) throws IOException;
+
+  List<SequencingOrder> listByIdList(Collection<Long> ids) throws IOException;
 
 }

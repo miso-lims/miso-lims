@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.google.common.collect.Sets;
 
@@ -38,22 +39,18 @@ public class DefaultSequencingOrderService implements SequencingOrderService {
 
   @Autowired
   private SequencingOrderDao sequencingOrderDao;
-
   @Autowired
   private DeletionStore deletionStore;
-
+  @Autowired
+  private TransactionTemplate transactionTemplate;
   @Autowired
   private SequencingParametersService sequencingParametersService;
-
   @Autowired
   private RunPurposeService runPurposeService;
-
   @Autowired
   private PoolService poolService;
-
   @Autowired
   private AuthorizationManager authorizationManager;
-
   @Autowired
   private IndexChecker indexChecker;
 
@@ -157,6 +154,16 @@ public class DefaultSequencingOrderService implements SequencingOrderService {
   public List<SequencingOrder> listByAttributes(Pool pool, RunPurpose purpose, SequencingContainerModel containerModel,
       SequencingParameters parameters, Integer partitions) throws IOException {
     return sequencingOrderDao.listByAttributes(pool, purpose, containerModel, parameters, partitions);
+  }
+
+  @Override
+  public TransactionTemplate getTransactionTemplate() {
+    return transactionTemplate;
+  }
+
+  @Override
+  public List<SequencingOrder> listByIdList(List<Long> ids) throws IOException {
+    return sequencingOrderDao.listByIdList(ids);
   }
 
 }

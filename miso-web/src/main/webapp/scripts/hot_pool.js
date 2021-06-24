@@ -294,8 +294,8 @@ HotTarget.pool = (function() {
             name: "Create Orders",
             excludeOnOrders: true,
             action: function(pools) {
-              window.location = Urls.ui.sequencingOrders.bulkCreate + '?' + jQuery.param({
-                ids: pools.map(Utils.array.getId).join(',')
+              Utils.page.post(Urls.ui.sequencingOrders.bulkCreate, {
+                poolIds: pools.map(Utils.array.getId).join(',')
               });
             }
           },
