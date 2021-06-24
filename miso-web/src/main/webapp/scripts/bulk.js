@@ -919,7 +919,7 @@ BulkUtils = (function($) {
         updateField(hot, columns, rowIndex, dataProperty, changes);
       };
       changes.forEach(function(change) {
-        if (listeners[change[1]] && change[3] !== change[2]) {
+        if (listeners[change[1]]) {
           listeners[change[1]](change[0], change[3], onChangeApi);
         }
       });
@@ -1805,7 +1805,22 @@ BulkUtils = (function($) {
                               changes.push([rowIndex, columnIndex, column.data[rowIndex]]);
                             }
                           });
-                          hot.setDataAtCell(changes, 'CopyPaste.paste');
+                          
+                          // set data multiple times to allow for onchange effects to cascade
+                          // changes happen quickly, but still asynchronously, so a delay is required in-between
+                          var setData = function(i) {
+                            hot.setDataAtCell(changes, 'CopyPaste.paste');
+                            
+                            if (--i > 0) {
+                              setTimeout(function() {
+                                setData(i);
+                              }, 500);
+                            } else {
+                              dialog.dialog('close');
+                            }
+                          };
+                          setData(3);
+                          return true; // prevents dialog from closing
                         });
                       }).fail(function(xhr, textStatus, errorThrown) {
                     dialog.dialog("close");
