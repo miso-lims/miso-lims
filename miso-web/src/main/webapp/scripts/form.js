@@ -187,6 +187,17 @@ FormUtils = (function($) {
     isInitialized: function(formId) {
       return initializedForms.indexOf(formId) !== -1;
     },
+    
+    makeIdField: function(typeLabel) {
+      return {
+        title: typeLabel + ' ID',
+        data: 'id',
+        type: 'read-only',
+        getDisplayValue: function(object) {
+          return object.id || 'Unsaved';
+        }
+      };
+    },
 
     makeQcPassedField: function() {
       return {

@@ -134,7 +134,10 @@ public class SampleImpl extends AbstractBoxable implements Sample {
   private BigDecimal concentration;
   @Enumerated(EnumType.STRING)
   private ConcentrationUnit concentrationUnits;
-  private String requisitionId;
+
+  @ManyToOne
+  @JoinColumn(name = "requisitionId")
+  private Requisition requisition;
 
   @ManyToOne(targetEntity = DetailedQcStatusImpl.class)
   @JoinColumn(name = "detailedQcStatusId")
@@ -594,13 +597,13 @@ public class SampleImpl extends AbstractBoxable implements Sample {
   }
 
   @Override
-  public String getRequisitionId() {
-    return requisitionId;
+  public Requisition getRequisition() {
+    return requisition;
   }
 
   @Override
-  public void setRequisitionId(String requisitionId) {
-    this.requisitionId = requisitionId;
+  public void setRequisition(Requisition requisition) {
+    this.requisition = requisition;
   }
 
   @Override

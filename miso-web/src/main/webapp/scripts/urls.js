@@ -62,6 +62,19 @@ Urls = (function() {
     projectDatatable: idUrlFunction(arrayRunRestBase + '/dt/project'),
     arraySearch: arrayRunRestBase + '/array-search'
   };
+  
+  // Assays
+  var assayUiBase = baseUrl + '/assay';
+  ui.assays = {
+    create: assayUiBase + '/new',
+    edit: idUrlFunction(assayUiBase)
+  };
+  
+  var assayRestBase = restBase + '/assays';
+  rest.assays = {
+    create: assayRestBase,
+    update: idUrlFunction(assayRestBase)
+  };
 
   // Attachment Categories
   var attachmentCategoryUiBase = baseUrl + '/attachmentcategories';
@@ -530,6 +543,30 @@ Urls = (function() {
   rest.locationMaps = {
     create: locationMapRestBase
   };
+  
+  // Metrics
+  var metricUiBase = baseUrl + '/metric';
+  ui.metrics = {
+    bulkCreate: metricUiBase + '/bulk/new',
+    bulkEdit: metricUiBase + '/bulk/edit'
+  };
+  
+  var metricRestBase = restBase + '/metrics';
+  rest.metrics = {
+    bulkSave: metricRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(metricRestBase + '/bulk')
+  };
+  
+  // Notes
+  var noteRestBase = restBase + '/notes';
+  rest.notes = {
+    create: function(entityType, entityId) {
+      return noteRestBase + '/' + entityType + '/' + entityId;
+    },
+    remove: function(entityType, entityId, noteId) {
+      return noteRestBase + '/' + entityType + '/' + entityId + '/' + noteId;
+    }
+  };
 
   // Partition QC Types
   var partitionQcTypeUiBase = baseUrl + '/partitionqctype';
@@ -679,6 +716,24 @@ Urls = (function() {
     create: referenceGenomeRestBase,
     update: idUrlFunction(referenceGenomeRestBase)
   };
+  
+  // Requisitions
+  var requisitionUiBase = baseUrl + '/requisition';
+  ui.requisitions = {
+    create: requisitionUiBase + '/new',
+    edit: idUrlFunction(requisitionUiBase)
+  };
+  
+  var requisitionRestBase = restBase + '/requisitions';
+  rest.requisitions = {
+    datatable: requisitionRestBase + '/dt',
+    create: requisitionRestBase,
+    update: idUrlFunction(requisitionRestBase),
+    addSamples: middleIdUrlFunction(requisitionRestBase, '/samples'),
+    removeSamples: middleIdUrlFunction(requisitionRestBase, '/samples/remove'),
+    samplesUpdateProgress: idUrlFunction(requisitionRestBase + '/samplesupdate'),
+    search: requisitionRestBase + '/search'
+  };
 
   // Runs
   var runUiBase = baseUrl + '/run'
@@ -762,7 +817,8 @@ Urls = (function() {
     spreadsheet: sampleRestBase + '/spreadsheet',
     bulkSave: sampleRestBase + '/bulk',
     bulkSaveProgress: idUrlFunction(sampleRestBase + '/bulk'),
-    worksetDatatable: idUrlFunction(sampleRestBase + '/dt/workset')
+    worksetDatatable: idUrlFunction(sampleRestBase + '/dt/workset'),
+    requisitionDatatable: idUrlFunction(sampleRestBase + '/dt/requisition')
   };
 
   // Sample Classes

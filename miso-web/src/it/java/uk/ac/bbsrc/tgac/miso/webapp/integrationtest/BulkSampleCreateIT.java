@@ -43,9 +43,9 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
   private static final Set<String> tissueColumns = Sets.newHashSet(SamColumns.ID_BARCODE, SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS,
       SamColumns.BOX_POSITION, SamColumns.DISCARDED, SamColumns.RECEIVE_DATE, SamColumns.RECEIVE_TIME, SamColumns.RECEIVED_FROM,
       SamColumns.RECEIVED_BY, SamColumns.RECEIPT_CONFIRMED, SamColumns.RECEIPT_QC_PASSED, SamColumns.RECEIPT_QC_NOTE,
-      SamColumns.REQUISITION_ID, SamColumns.IDENTITY_ALIAS, SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER,
-      SamColumns.TIMES_RECEIVED, SamColumns.TUBE_NUMBER, SamColumns.SECONDARY_ID, SamColumns.TISSUE_MATERIAL, SamColumns.REGION,
-      SamColumns.TIMEPOINT);
+      SamColumns.REQUISITION_ALIAS, SamColumns.REQUISITION, SamColumns.REQUISITION_ASSAY, SamColumns.IDENTITY_ALIAS,
+      SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER, SamColumns.TIMES_RECEIVED, SamColumns.TUBE_NUMBER,
+      SamColumns.SECONDARY_ID, SamColumns.TISSUE_MATERIAL, SamColumns.REGION, SamColumns.TIMEPOINT);
 
   // columns specific to creating Slides
   private static final Set<String> slideColumns = Sets.newHashSet(SamColumns.SOP, SamColumns.SLIDES, SamColumns.THICKNESS, SamColumns.STAIN,

@@ -27,7 +27,9 @@ public class BulkSamplePage extends BulkPage {
     public static final String RECEIPT_CONFIRMED = "Receipt Confirmed";
     public static final String RECEIPT_QC_PASSED = "Receipt QC Passed";
     public static final String RECEIPT_QC_NOTE = "Receipt QC Note";
-    public static final String REQUISITION_ID = "Requisition ID";
+    public static final String REQUISITION_ALIAS = "Requisition Alias";
+    public static final String REQUISITION = "Requisition";
+    public static final String REQUISITION_ASSAY = "Assay";
     public static final String ID_BARCODE = "Matrix Barcode";
     public static final String BOX_SEARCH = "Box Search";
     public static final String BOX_ALIAS = "Box Alias";

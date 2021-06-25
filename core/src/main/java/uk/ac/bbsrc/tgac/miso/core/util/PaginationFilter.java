@@ -402,13 +402,22 @@ public abstract interface PaginationFilter {
     };
   }
 
-
-  public static PaginationFilter requisitionId(String requisitionId) {
+  public static PaginationFilter requisitionId(final long requisitionId) {
     return new PaginationFilter() {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
         sink.restrictPaginationByRequisitionId(item, requisitionId, errorHandler);
+      }
+    };
+  }
+
+  public static PaginationFilter requisition(String requisition) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByRequisition(item, requisition, errorHandler);
       }
     };
   }

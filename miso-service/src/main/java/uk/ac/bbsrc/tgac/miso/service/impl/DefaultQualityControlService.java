@@ -51,6 +51,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.LibraryQcStore;
 import uk.ac.bbsrc.tgac.miso.persistence.PoolQcStore;
 import uk.ac.bbsrc.tgac.miso.persistence.QcTargetStore;
 import uk.ac.bbsrc.tgac.miso.persistence.QualityControlTypeStore;
+import uk.ac.bbsrc.tgac.miso.persistence.RequisitionQcStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleQcStore;
 
 @Service
@@ -64,6 +65,8 @@ public class DefaultQualityControlService implements QualityControlService {
   private PoolQcStore poolQcStore;
   @Autowired
   private ContainerQcStore containerQcStore;
+  @Autowired
+  private RequisitionQcStore requisitionQcStore;
   @Autowired
   private QcTypeService qcTypeService;
   @Autowired
@@ -255,6 +258,8 @@ public class DefaultQualityControlService implements QualityControlService {
       return sampleQcStore;
     case Container:
       return containerQcStore;
+    case Requisition:
+      return requisitionQcStore;
     default:
       throw new IllegalArgumentException("Unknown QC target: " + target);
     }
@@ -285,6 +290,10 @@ public class DefaultQualityControlService implements QualityControlService {
 
   public void setContainerQcStore(ContainerQcStore containerQcStore) {
     this.containerQcStore = containerQcStore;
+  }
+
+  public void setRequisitionQcStore(RequisitionQcStore requisitionQcStore) {
+    this.requisitionQcStore = requisitionQcStore;
   }
 
   public void setQcTypeStore(QualityControlTypeStore qcTypeStore) {

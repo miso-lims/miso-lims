@@ -721,6 +721,80 @@ var Utils = Utils
           });
         });
       },
+      
+      showSearchByNamesDialog: function(title, queryUrl, callback, identifiersLabel) {
+        Utils.showDialog(title, 'Search', [{
+          label: identifiersLabel || 'Names, Aliases, or Barcodes',
+          type: 'textarea',
+          property: 'names',
+          rows: 15,
+          cols: 40
+        }], function(result) {
+          var names = result.names.split(/[ \t\r\n]+/).filter(function(name) {
+            return name.length > 0;
+          });
+          if (names.length == 0) {
+            return;
+          }
+          Utils.ajaxWithDialog('Searching', 'POST', queryUrl, names, callback);
+        });
+      },
+      
+      saveWithProgressDialog: function(requestMethod, saveUrl, data, makeProgressUrl, callback, errorCallback) {
+        var dialogArea = $('#dialog');
+        dialogArea.empty();
+        dialogArea.append($('<p>').text('Processed ').append($('<span>').attr('id', 'dialogProgressText').text('0/' + data.length)));
+        dialogArea.append(Utils.ui.makeProgressBar('dialogProgressBar'));
+    
+        $('#dialog').dialog({
+          autoOpen: true,
+          height: 400,
+          width: 350,
+          title: 'Adding',
+          modal: true,
+          buttons: {},
+          closeOnEscape: false,
+          open: function(event, ui) {
+            jQuery(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+          }
+        });
+        $.ajax({
+          dataType: 'json',
+          type: requestMethod,
+          url: saveUrl,
+          data: JSON.stringify(data),
+          contentType: 'application/json; charset=utf8'
+        }).success(function(data) {
+          var updateProgress = function(update) {
+            $('#dialogProgressText').text(update.completedUnits + '/' + update.totalUnits);
+            var percentComplete = update.completedUnits * 100 / update.totalUnits;
+            Utils.ui.setProgressBarProgress('dialogProgressBar', percentComplete);
+    
+            if (update.status === 'running') {
+              window.setTimeout(function() {
+                $.ajax({
+                  dataType: 'json',
+                  type: 'GET',
+                  url: makeProgressUrl(update.operationId),
+                  contentType: 'application/json; charset=utf8'
+                }).success(function(progressData) {
+                  updateProgress(progressData);
+                }).fail(function(response, textStatus, errorThrown) {
+                  // progress request failed (operation status unknown)
+                  errorCallback(response, textStatus, errorThrown, false);
+                });
+              }, 2000);
+            } else {
+              // update.status should be 'completed' or 'failed'
+              callback(update);
+            }
+          };
+          updateProgress(data);
+        }).fail(function(response, textStatus, errorThrown) {
+          // initial start request failed (operation status unknown)
+          errorCallback(response, textStatus, errorThrown, true);
+        });
+      },
 
       /**
        * Helper method for extracting the components of a BoxPosition into integers e.g. "BOX3 A01" gets converted to [65, 1]
@@ -1127,6 +1201,10 @@ Utils.page = {
   pageRedirect: function(url) {
     window.location = url;
   },
+  
+  reloadWithParams: function(params) {
+    window.location = window.location.protocol + '//' + window.location.host + window.location.pathname + '?' + $.param(params);
+  },
 
   post: function(url, params) {
     var form = jQuery('<form>').attr('action', url).attr('method', 'POST').css('display', 'none');
@@ -1378,15 +1456,15 @@ Utils.notes = {
   },
 
   addNote: function(entityType, entityId, internalOnly, text) {
-    Utils.ajaxWithDialog('Adding Note', 'POST', window.location.origin + '/miso/rest/notes/' + entityType + '/' + entityId, {
+    Utils.ajaxWithDialog('Adding Note', 'POST', Urls.rest.notes.create(entityType, entityId), {
       internalOnly: internalOnly == 'on',
       text: text
     }, Utils.page.pageReload);
   },
   deleteNote: function(entityType, entityId, noteId) {
     Utils.showConfirmDialog('Delete Note', 'Delete', ['Are you sure you wish to delete this note?'], function() {
-      Utils.ajaxWithDialog('Deleting Note', 'DELETE', window.location.origin + '/miso/rest/notes/' + entityType + '/' + entityId + '/'
-          + noteId, null, Utils.page.pageReload);
+      Utils.ajaxWithDialog('Deleting Note', 'DELETE', Urls.rest.notes.remove(entityType, entityId, noteId), null,
+          Utils.page.pageReload);
     });
   },
 

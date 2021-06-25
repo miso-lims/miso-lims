@@ -122,6 +122,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Workstation;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Contact;
@@ -147,6 +148,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
@@ -237,6 +239,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.QC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcControl;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcControlRun;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.RequisitionQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQcControlRun;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
@@ -521,7 +524,9 @@ public class Dtos {
     dto.setConcentrationUnits(from.getConcentrationUnits());
     dto.setDiscarded(from.isDiscarded());
     dto.setLastModified(formatDateTime(from.getLastModified()));
-    setString(dto::setRequisitionId, from.getRequisitionId());
+    setId(dto::setRequisitionId, from.getRequisition());
+    setString(dto::setRequisitionAlias, maybeGetProperty(from.getRequisition(), Requisition::getAlias));
+    setId(dto::setRequisitionAssayId, maybeGetProperty(from.getRequisition(), Requisition::getAssay));
     dto.setLibraryCount(libraryCount);
     setId(dto::setSequencingControlTypeId, from.getSequencingControlType());
     setId(dto::setSopId, from.getSop());
@@ -924,7 +929,14 @@ public class Dtos {
     }
     to.setBoxPosition((SampleBoxPosition) makeBoxablePosition(from, (SampleImpl) to));
 
-    setString(to::setRequisitionId, from.getRequisitionId());
+    setObject(to::setRequisition, Requisition::new, from.getRequisitionId());
+    if (to.getRequisition() != null) {
+      Requisition toRequisition = to.getRequisition();
+      setString(toRequisition::setAlias, from.getRequisitionAlias());
+      if (from.getRequisitionAssayId() != null) {
+        setObject(toRequisition::setAssay, Assay::new, from.getRequisitionAssayId());
+      }
+    }
     setObject(to::setSequencingControlType, SequencingControlType::new, from.getSequencingControlTypeId());
     setObject(to::setSop, Sop::new, from.getSopId());
     to.setCreationReceiptInfo(toReceiptTransfer(from, to));
@@ -2361,6 +2373,13 @@ public class Dtos {
       ownerContainer.setId(dto.getEntityId());
       newContainerQc.setContainer(ownerContainer);
       to = newContainerQc;
+      break;
+    case "Requisition":
+      RequisitionQC newRequisitionQc = new RequisitionQC();
+      Requisition ownerRequisition = new Requisition();
+      ownerRequisition.setId(dto.getEntityId());
+      newRequisitionQc.setRequisition(ownerRequisition);
+      to = newRequisitionQc;
       break;
     default:
       throw new IllegalArgumentException("No such QC target: " + dto.getQcTarget());

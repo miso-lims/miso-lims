@@ -58,7 +58,7 @@ public class HibernateQcTypeDaoIT extends AbstractDAOTest {
   public void testList() throws IOException {
     Collection<QcType> qcTypes = dao.list();
     assertNotNull(qcTypes);
-    assertEquals(16, qcTypes.size());
+    assertEquals(17, qcTypes.size());
   }
 
   @Test

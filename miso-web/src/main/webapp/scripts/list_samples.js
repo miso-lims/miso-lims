@@ -37,6 +37,8 @@ ListTarget.sample = (function() {
         }
       } else if (config.worksetId) {
         return Urls.rest.samples.worksetDatatable(config.worksetId);
+      } else if (config.requisitionId) {
+        return Urls.rest.samples.requisitionDatatable(config.requisitionId);
       }
       return Urls.rest.samples.datatable;
     },
@@ -45,6 +47,13 @@ ListTarget.sample = (function() {
     },
     createBulkActions: function(config, projectId) {
       var actions = BulkTarget.sample.getBulkActions(config);
+      
+      if (config.requisitionId) {
+        actions.unshift({
+          name: 'Remove',
+          action: samplesUpdateFunction(Urls.rest.requisitions.removeSamples(config.requisitionId))
+        });
+      }
 
       if (config.worksetId) {
         actions.push(HotUtils.makeMoveFromWorkset('samples', Urls.rest.worksets.moveSamples(config.worksetId)));
@@ -72,7 +81,19 @@ ListTarget.sample = (function() {
 
     },
     createStaticActions: function(config, projectId) {
-      return [{
+      var actions = [];
+      
+      if (config.requisitionId) {
+        actions.push({
+          name: "Add",
+          handler: function() {
+            Utils.showSearchByNamesDialog('Add Samples', Urls.rest.samples.query,
+                samplesUpdateFunction(Urls.rest.requisitions.addSamples(config.requisitionId)));
+          }
+        });
+      }
+      
+      actions.push({
         name: "Create",
         handler: function() {
           var fields = [{
@@ -110,7 +131,9 @@ ListTarget.sample = (function() {
             return result.quantity;
           });
         }
-      }];
+      });
+      
+      return actions;
     },
     createColumns: function(config, projectId) {
       return [{
@@ -182,7 +205,7 @@ ListTarget.sample = (function() {
     searchTermSelector: function(searchTerms) {
       const plainSampleTerms = [searchTerms['id'], searchTerms['barcode'], searchTerms['requisition'], searchTerms['entered'],
           searchTerms['changed'], searchTerms['received'], searchTerms['creator'], searchTerms['changedby'], searchTerms['box'],
-          searchTerms['freezer'], searchTerms['distributed'], searchTerms['distributedto']];
+          searchTerms['freezer'], searchTerms['requisition'], searchTerms['distributed'], searchTerms['distributedto']];
       const detailedSampleTerms = [searchTerms['created'], searchTerms['class'], searchTerms['tissueOrigin'], searchTerms['tissueType'],
           searchTerms['timepoint'], searchTerms['lab'], searchTerms['external'], searchTerms['subproject'], searchTerms['groupid'],
           searchTerms['ghost']];
@@ -200,6 +223,31 @@ ListTarget.sample = (function() {
         return !sampleClass.archived && sampleClass.directCreationAllowed && sampleClass.sampleCategory === category;
       });
     });
+  }
+  
+  function samplesUpdateFunction(saveUrl) {
+    return function(items) {
+      var callback = function(update) {
+        switch (update.status) {
+          case 'completed':
+            Utils.page.pageReload();
+            break;
+          case 'failed':
+            Utils.showOkDialog('Error', ['Failed to save samples']);
+            break;
+          default:
+            Utils.showOkDialog('Error', ['Unexpected operation status. The save may still be in progress or completed.']);
+          }
+      };
+      var errorCallback = function(response, textStatus, errorThrown, startedOk) {
+        var message = startedOk
+            ? 'Failed to check operation status. The save may still be in progress or completed.'
+            : 'Save Failed.';
+        Utils.showAjaxErrorDialog(response, textStatus, message);
+      };
+      Utils.saveWithProgressDialog('POST', saveUrl, items.map(Utils.array.getId),
+          Urls.rest.requisitions.samplesUpdateProgress, callback, errorCallback);
+    };
   }
 
 })();

@@ -402,8 +402,15 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
-  public void restrictPaginationByRequisitionId(Criteria criteria, String query, Consumer<String> errorHandler) {
-    criteria.add(DbUtils.textRestriction(query, "requisitionId"));
+  public void restrictPaginationByRequisitionId(Criteria criteria, long requisitionId, Consumer<String> errorHandler) {
+    criteria.createAlias("requisition", "requisition")
+        .add(Restrictions.eq("requisition.requisitionId", requisitionId));
+  }
+
+  @Override
+  public void restrictPaginationByRequisition(Criteria criteria, String query, Consumer<String> errorHandler) {
+    criteria.createAlias("requisition", "requisition")
+        .add(DbUtils.textRestriction(query, "requisition.alias"));
   }
 
   @Override

@@ -199,8 +199,7 @@ public class AdvancedSearchParser {
           return PaginationFilter.freezer(phrase);
         case "req":
         case "requisition":
-        case "requisitionid":
-          return PaginationFilter.requisitionId(phrase);
+          return PaginationFilter.requisition(phrase);
         case "tissueorigin":
         case "origin":
           return PaginationFilter.tissueOrigin(phrase);

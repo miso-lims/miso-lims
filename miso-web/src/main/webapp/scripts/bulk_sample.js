@@ -364,16 +364,112 @@ BulkTarget.sample = (function($) {
           columns = columns.concat(BulkUtils.columns.receipt(config));
         }
       }
-
-      columns.push({
-        title: 'Requisition ID',
-        type: 'text',
-        data: 'requisitionId',
-        include: (!Constants.isDetailedSample || targetCategory !== 'Identity') && !config.isLibraryReceipt,
-        regex: Utils.validation.alphanumRegex,
-        maxLength: 50,
-        description: 'ID of a requisition form stored in a separate system'
-      });
+      
+      if (config.pageMode === 'create' && !config.isLibraryReceipt && targetCategory !== 'Identity') {
+        columns.push({
+          title: 'Requisition Alias',
+          data: 'requisitionAlias',
+          type: 'text',
+          maxLength: 50,
+          description: 'Should usually match the ID of a requisition form stored in a separate system. Enter an alias to'
+              + 'search for existing requisitions.',
+          onChange: function(rowIndex, newValue, api) {
+            if (!newValue) {
+              api.updateField(rowIndex, 'requisitionId', {
+                source: [],
+                value: null,
+                formatter: null,
+                disabled: true
+              });
+              return;
+            }
+            api.updateField(rowIndex, 'requisitionId', {
+              source: [],
+              value: '(searching...)',
+              formatter: null,
+              disabled: true
+            });
+            $.ajax({
+              url: Urls.rest.requisitions.search + '?' + $.param({
+                q: newValue
+              }),
+              contentType: 'application/json; charset=utf8',
+              type: 'GET'
+            }).success(function(data) {
+              var setValue = null;
+              if (data.some(function(x) {
+                return x.alias === newValue;
+              })) {
+                setValue = newValue;
+              } else {
+                data.unshift({
+                  id: 0,
+                  alias: 'Create New'
+                });
+                setValue = 'Create New';
+              }
+              api.updateField(rowIndex, 'requisitionId', {
+                source: data,
+                value: setValue,
+                formatter: data.length > 1 ? 'multipleOptions' : null,
+                disabled: false
+              });
+            }).fail(function(response, textStatus, serverStatus) {
+              var error = JSON.parse(response.responseText);
+              api.showError(error.detail);
+            });
+          }
+        }, {
+          title: 'Requisition',
+          type: 'dropdown',
+          data: 'requisitionId',
+          includeSaved: false,
+          source: [],
+          getItemLabel: Utils.array.getAlias,
+          getItemValue: Utils.array.getId,
+          disabled: true,
+          onChange: function(rowIndex, newValue, api) {
+            var requisition = api.getValueObject(rowIndex, 'requisitionId');
+            if (!requisition) {
+              api.updateField(rowIndex, 'requisitionAssayId', {
+                source: [],
+                value: null,
+                disabled: true
+              });
+            } else if (requisition.id) {
+              api.updateField(rowIndex, 'requisitionAssayId', {
+                source: Constants.assays.filter(function(x) {
+                  return !x.archived || x.id === requisition.assayId;
+                }),
+                value: !requisition.assayId ? null : (function() {
+                  var assay = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(requisition.assayId), Constants.assays);
+                  return makeAssayLabel(assay);
+                })(),
+                disabled: true
+              });
+            } else {
+              api.updateField(rowIndex, 'requisitionAssayId', {
+                source: Constants.assays.filter(function(x) {
+                  return !x.archived;
+                }),
+                value: null,
+                disabled: false
+              });
+            }
+          }
+        }, {
+          title: 'Assay',
+          data: 'requisitionAssayId',
+          type: 'dropdown',
+          includeSaved: false,
+          source: Constants.assays.filter(function(x) {
+            return !x.archived;
+          }),
+          getItemLabel: makeAssayLabel,
+          getItemValue: Utils.array.getId,
+          disabled: true
+        });
+      }
 
       if (targetCategory !== 'Identity' && !config.isLibraryReceipt) {
         columns = columns.concat(BulkUtils.columns.boxable(config, api));
@@ -1137,6 +1233,10 @@ BulkTarget.sample = (function($) {
         return relationship.parentId === parentSampleClassId && relationship.childId === sampleClass.id;
       });
     });
+  }
+  
+  function makeAssayLabel(assay) {
+    return assay.alias + ' v' + assay.version;
   }
 
 })(jQuery);
