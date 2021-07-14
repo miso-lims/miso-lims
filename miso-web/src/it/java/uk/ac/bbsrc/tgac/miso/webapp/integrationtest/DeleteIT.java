@@ -416,7 +416,7 @@ public class DeleteIT extends AbstractIT {
 
   @Test
   public void testDeleteMetric() {
-    testAdminDelete(ListTarget.METRICS, null, "To delete", Columns.ALIAS, Metric.class, 4L);
+    testAdminDelete(ListTarget.METRICS, null, "To Delete", Columns.ALIAS, Metric.class, 4L);
   }
 
   private void testDelete(String listTarget, String tab, String search, String selectByColumn, Class<?> clazz,

@@ -41,7 +41,8 @@ ListTarget.metric = (function() {
             return x.value === data;
           }, Constants.thresholdTypes);
           return category.sign;
-        }
+        },
+        bSortable: false
       }, {
         sTitle: 'Units',
         mData: 'units',
