@@ -7,7 +7,7 @@ INSERT INTO Metric(metricId, alias, category, thresholdType, units) VALUES
 (1, 'Container Intact', 'RECEIPT', 'BOOLEAN', NULL),
 (2, 'WG Library Yield', 'LIBRARY_PREP', 'GE', 'ng/μL'),
 (3, 'Min Clusters (PF)', 'LOW_PASS_SEQUENCING', 'GT', 'K/lane'),
-(4, 'To Delete', 'FULL_DEPTH_SEQUENCING', 'PASS_FAIL', NULL);
+(4, 'To Delete', 'FULL_DEPTH_SEQUENCING', 'BOOLEAN', NULL);
 
 INSERT INTO RunLibraryQcStatus(statusId, description, qcPassed) VALUES
 (1, 'Passed', TRUE),
