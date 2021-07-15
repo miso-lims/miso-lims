@@ -7,6 +7,23 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.33.0] - 2021-07-15
+
+### Added
+
+* Requisitions, including assays and metrics. See the
+  [User Manual](https://miso-lims.readthedocs.io/projects/docs/en/latest/user_manual/requisitions/)
+  for details
+  * Existing requisition IDs will be converted into full requisitions during the upgrade to this
+  version
+
+### Fixed
+
+* Error when trying to create a transfer from a large number of selected items
+* Box alias and position columns not updating correctly when importing a spreadsheet on bulk pages
+* Bulk sequencing order page performance and accessibility improvements
+
+
 ## [1.32.0] - 2021-06-18
 
 ### Added

@@ -1,3 +1,4 @@
+-- requisitions
 CREATE TABLE Metric(
   metricId bigint(20) NOT NULL AUTO_INCREMENT,
   alias varchar(100) NOT NULL,
@@ -145,3 +146,4 @@ CREATE TABLE Requisition_Note (
   CONSTRAINT fk_note_requisition FOREIGN KEY (requisitionId) REFERENCES Requisition (requisitionId),
   CONSTRAINT fk_requisition_note FOREIGN KEY (noteId) REFERENCES Note (noteId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
