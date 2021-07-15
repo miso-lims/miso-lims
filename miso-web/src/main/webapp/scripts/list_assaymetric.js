@@ -15,6 +15,11 @@ ListTarget.assaymetric = (function() {
       return !config.isAdmin || config.pageMode == 'view' ? [] : [{
         name: 'Add',
         handler: function() {
+          if (!Constants.metrics.length) {
+            Utils.showOkDialog('Error', ['No metrics found. Metrics must be created from the Metrics list page before'
+                + ' they can be added to assays.']);
+            return;
+          }
           Utils.showWizardDialog('Add Metric', Constants.metrics.map(function(metric) {
             return {
               name: metric.alias,

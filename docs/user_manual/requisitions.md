@@ -32,9 +32,9 @@ If you want to add a requisition to existing samples, you should use the Create 
 the Requisitions list page and click the "Add" button in the toolbar.
 
 On the Create Requisition page, you can give the requisition an alias and choose an assay. The alias may refer to a
-requisition form stored in a separate system, or may simply be a friendly identifier for the requisition. You must save
-the requisition using the "Save" button at the top right before you can add samples. See below for information about
-adding samples and other tasks you can complete from the Edit Requisition page.
+requisition form stored in a separate system, or may simply be an identifier of your choice for the requisition. You
+must save the requisition using the "Save" button at the top right before you can add samples. See below for
+information about adding samples and other tasks you can complete from the Edit Requisition page.
 
 ### Editing Requisitions
 

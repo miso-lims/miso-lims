@@ -719,5 +719,5 @@ Examples:
 * A "Yield" metric for library preparation requiring library yield to be greater than or equal to a threshold value in
   ng/µL
 
-MISO administrators can add, edit, and delete metfics using the standard interface. A metric can only be deleted if it
-is not used by any existing studies.
+MISO administrators can add, edit, and delete metrics using the standard interface. A metric can only be deleted if it
+is not used by any existing assays.
