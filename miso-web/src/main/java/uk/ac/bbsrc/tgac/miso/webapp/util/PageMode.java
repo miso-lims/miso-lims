@@ -2,7 +2,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.util;
 
 public enum PageMode {
 
-  CREATE("create"), EDIT("edit"), PROPAGATE("propagate");
+  VIEW("view"), CREATE("create"), EDIT("edit"), PROPAGATE("propagate");
 
   public static final String PROPERTY = "pageMode";
 

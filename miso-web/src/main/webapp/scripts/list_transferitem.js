@@ -188,52 +188,37 @@ ListTarget.transferitem = (function() {
     return {
       name: handlerName,
       handler: function() {
-        Utils.showDialog(title, "Search", [{
-          label: "Names, Aliases, or Barcodes",
-          type: "textarea",
-          property: "names",
-          rows: 15,
-          cols: 40,
-          required: true
-        }], function(result) {
-          var names = result.names.split(/[ \t\r\n]+/).filter(function(name) {
-            return name.length > 0;
-          });
-          if (names.length == 0) {
-            return;
-          }
-          Utils.ajaxWithDialog('Searching', 'POST', queryUrl, names, function(items) {
-            var dupes = [];
-            Transfer.getItems().forEach(function(transferItem) {
-              if (items.map(Utils.array.getId).indexOf(transferItem.id) !== -1) {
-                dupes.push(transferItem);
-              }
-            });
-            if (dupes.length) {
-              Utils.showOkDialog('Error', ['The following items are already included in this transfer:'].concat(dupes.map(function(item) {
-                return '* ' + item.name + ' (' + item.alias + ')';
-              })));
-            } else {
-              Transfer.addItems(items.map(function(item) {
-                itemType = itemType || getEntityTypeLabel(item.entityType);
-                return {
-                  type: itemType,
-                  id: item.id,
-                  name: item.name,
-                  alias: item.alias,
-                  boxId: item.box ? item.box.id : null,
-                  boxAlias: item.box ? item.box.alias : null,
-                  boxPosition: item.boxPosition,
-                  received: null,
-                  qcPassed: null,
-                  qcNote: null
-                }
-              }));
+        Utils.showSearchByNamesDialog(title, queryUrl, function(items) {
+          var dupes = [];
+          Transfer.getItems().forEach(function(transferItem) {
+            if (items.map(Utils.array.getId).indexOf(transferItem.id) !== -1) {
+              dupes.push(transferItem);
             }
           });
+          if (dupes.length) {
+            Utils.showOkDialog('Error', ['The following items are already included in this transfer:'].concat(dupes.map(function(item) {
+              return '* ' + item.name + ' (' + item.alias + ')';
+            })));
+          } else {
+            Transfer.addItems(items.map(function(item) {
+              itemType = itemType || getEntityTypeLabel(item.entityType);
+              return {
+                type: itemType,
+                id: item.id,
+                name: item.name,
+                alias: item.alias,
+                boxId: item.box ? item.box.id : null,
+                boxAlias: item.box ? item.box.alias : null,
+                boxPosition: item.boxPosition,
+                received: null,
+                qcPassed: null,
+                qcNote: null
+              }
+            }));
+          }
         });
       }
-    }
+    };
   }
 
   function getEntityTypeLabel(entityType) {

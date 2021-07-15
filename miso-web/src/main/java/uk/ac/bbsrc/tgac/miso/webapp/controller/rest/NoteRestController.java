@@ -46,6 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.NoteService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.core.service.RequisitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 
@@ -78,15 +79,14 @@ public class NoteRestController extends RestController {
 
   @Autowired
   private LibraryService libraryService;
-
   @Autowired
   private PoolService poolService;
-
   @Autowired
   private RunService runService;
-
   @Autowired
   private SampleService sampleService;
+  @Autowired
+  private RequisitionService requisitionService;
 
   private <T extends Identifiable> void addNote(NoteService<T> service, long entityId, NoteRequest request) throws IOException {
     T entity = service.get(entityId);
@@ -128,6 +128,8 @@ public class NoteRestController extends RestController {
       return poolService;
     case "run":
       return runService;
+    case "requisition":
+      return requisitionService;
     default:
       throw new RestException("Unknown entity type: " + entityType, Status.NOT_FOUND);
     }
@@ -147,5 +149,9 @@ public class NoteRestController extends RestController {
 
   public void setSampleService(SampleService sampleService) {
     this.sampleService = sampleService;
+  }
+
+  public void setRequisitionService(RequisitionService requisitionService) {
+    this.requisitionService = requisitionService;
   }
 }

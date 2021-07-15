@@ -35,6 +35,7 @@
         <a href="<c:url value="/miso/pools"/>">Pools</a>
         <a href="<c:url value="/miso/worksets"/>">Worksets</a>
         <a href="<c:url value="/miso/boxes"/>">Boxes</a>
+        <a href="<c:url value="/miso/requisition/list"/>">Requisitions</a>
         <a href="<c:url value="/miso/transfer/list"/>"><c:choose><c:when test="${pendingTransfers > 0}"><strong>Transfers (${pendingTransfers})</strong></c:when><c:otherwise>Transfers</c:otherwise></c:choose></a>
     </div>
 
@@ -90,6 +91,7 @@
     </h2>
     <div id="configurationMenu" class="menu" style="display: none;">
       <a href="<c:url value="/miso/arraymodel/list"/>">Array Models</a>
+      <a href="<c:url value="/miso/assay/list"/>">Assays</a>
       <a href="<c:url value="/miso/attachmentcategories/list"/>">Attachment Categories</a>
       <a href="<c:url value="/miso/boxsize/list"/>">Box Sizes</a>
       <a href="<c:url value="/miso/boxuse/list"/>">Box Uses</a>
@@ -107,6 +109,7 @@
       <a href="<c:url value="/miso/librarystrategy/list"/>">Library Strategy Types</a>
       <a href="<c:url value="/miso/librarytype/list"/>">Library Types</a>
       <a href="<c:url value="/miso/locationmap/list"/>">Location Maps</a>
+      <a href="<c:url value="/miso/metric/list"/>">Metrics</a>
       <a href="<c:url value="/miso/partitionqctype/list"/>">Partition QC Types</a>
       <a href="<c:url value="/miso/pipeline/list"/>">Pipelines</a>
       <a href="<c:url value="/miso/qctype/list"/>">QC Types</a>

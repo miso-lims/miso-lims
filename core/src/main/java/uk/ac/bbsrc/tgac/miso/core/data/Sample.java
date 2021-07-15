@@ -30,6 +30,7 @@ import java.util.Collection;
 import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
@@ -241,17 +242,9 @@ public interface Sample extends Attachable, Comparable<Sample>, Deletable, Hiera
   @Override
   public Sample getParent();
 
-  /**
-   * @return the ID for a requisition form for this sample stored in another system
-   */
-  public String getRequisitionId();
+  public Requisition getRequisition();
 
-  /**
-   * Sets the ID for a requisition form for this sample stored in another system
-   * 
-   * @param requisitionId
-   */
-  public void setRequisitionId(String requisitionId);
+  public void setRequisition(Requisition requisition);
 
   public SequencingControlType getSequencingControlType();
 

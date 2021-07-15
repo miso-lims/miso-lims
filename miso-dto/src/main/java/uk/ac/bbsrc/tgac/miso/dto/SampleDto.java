@@ -86,7 +86,9 @@ public class SampleDto extends AbstractBoxableDto implements ReceivableDto<Sampl
   private String qcDv200;
   private String qcRin;
   private List<QcDto> qcs;
-  private String requisitionId;
+  private Long requisitionId;
+  private String requisitionAlias;
+  private Long requisitionAssayId;
   private Long sequencingControlTypeId;
   private int libraryCount = 0;
   private Long sopId;
@@ -396,12 +398,28 @@ public class SampleDto extends AbstractBoxableDto implements ReceivableDto<Sampl
     this.concentrationUnits = concentrationUnits;
   }
 
-  public String getRequisitionId() {
+  public Long getRequisitionId() {
     return requisitionId;
   }
 
-  public void setRequisitionId(String requisitionId) {
+  public void setRequisitionId(Long requisitionId) {
     this.requisitionId = requisitionId;
+  }
+
+  public String getRequisitionAlias() {
+    return requisitionAlias;
+  }
+
+  public void setRequisitionAlias(String requisitionAlias) {
+    this.requisitionAlias = requisitionAlias;
+  }
+
+  public Long getRequisitionAssayId() {
+    return requisitionAssayId;
+  }
+
+  public void setRequisitionAssayId(Long requisitionAssayId) {
+    this.requisitionAssayId = requisitionAssayId;
   }
 
   public int getLibraryCount() {

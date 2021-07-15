@@ -59,6 +59,7 @@ DELETE FROM Library;
 DELETE FROM LibraryDesign;
 DELETE FROM LibraryDesignCode;
 DELETE FROM LibrarySpikeIn;
+DELETE FROM Metric;
 DELETE FROM SampleQC;
 DELETE FROM Sample_Note;
 DELETE FROM SampleChangeLog;

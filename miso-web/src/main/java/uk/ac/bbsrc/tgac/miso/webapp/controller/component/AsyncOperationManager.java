@@ -91,6 +91,13 @@ public class AsyncOperationManager {
     return items;
   }
 
+  public <T extends Identifiable> ObjectNode startAsyncBulkUpdate(String type, List<T> items, BulkSaveService<T> service)
+      throws IOException {
+    BulkSaveOperation<T> operation = service.startBulkUpdate(items, null);
+    String uuid = addAsyncOperation(operation);
+    return makeRunningProgress(uuid, operation);
+  }
+
   public <T, R extends Identifiable> ObjectNode startAsyncBulkUpdate(String type, List<T> dtos, Function<T, R> toObject,
       BulkSaveService<R> service) throws IOException {
     return startAsyncBulkUpdate(type, dtos, toObject, service, false);
@@ -146,6 +153,10 @@ public class AsyncOperationManager {
     return items;
   }
 
+  public <T, R extends Identifiable> ObjectNode getAsyncProgress(String uuid, Class<R> itemClass) throws Exception {
+    return getAsyncProgress(uuid, itemClass, null);
+  }
+
   public <T, R extends Identifiable> ObjectNode getAsyncProgress(String uuid, Class<R> itemClass, BulkSaveService<R> service,
       Function<R, T> toDto) throws Exception {
     return getAsyncProgress(uuid, itemClass, operation -> {
@@ -178,7 +189,7 @@ public class AsyncOperationManager {
       return makeRunningProgress(uuid, operation);
     } else {
       if (operation.isSuccess()) {
-        List<T> dtos = getDtos.apply(operation);
+        List<T> dtos = getDtos == null ? null : getDtos.apply(operation);
         return makeCompletedProgress(uuid, operation, dtos);
       } else {
         return makeFailedProgress(uuid, operation);
@@ -192,7 +203,9 @@ public class AsyncOperationManager {
 
   private static <T> ObjectNode makeCompletedProgress(String uuid, BulkSaveOperation<?> operation, List<T> dtos) {
     ObjectNode json = makeBaseProgress(uuid, operation, "completed");
-    json.putPOJO("data", dtos);
+    if (dtos != null) {
+      json.putPOJO("data", dtos);
+    }
     return json;
   }
 

@@ -57,10 +57,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.DilutionFactor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.IlluminaWorkflowType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.MetricCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.ThresholdType;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName;
+import uk.ac.bbsrc.tgac.miso.core.service.AssayService;
 import uk.ac.bbsrc.tgac.miso.core.service.AttachmentCategoryService;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxSizeService;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxUseService;
@@ -77,6 +80,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.LibrarySelectionService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibrarySpikeInService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryStrategyService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryTypeService;
+import uk.ac.bbsrc.tgac.miso.core.service.MetricService;
 import uk.ac.bbsrc.tgac.miso.core.service.PartitionQcTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.PipelineService;
 import uk.ac.bbsrc.tgac.miso.core.service.QualityControlService;
@@ -107,8 +111,10 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.PrintableField;
 import uk.ac.bbsrc.tgac.miso.core.util.IlluminaExperiment;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.SampleSheet;
+import uk.ac.bbsrc.tgac.miso.dto.AssayDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentModelDto;
+import uk.ac.bbsrc.tgac.miso.dto.MetricDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
 
 import io.prometheus.client.Gauge;
@@ -122,6 +128,8 @@ public class ConstantsController {
   private String constantsJs;
 
   ServletContext servletContext;
+  @Autowired
+  private AssayService assayService;
   @Autowired
   private KitDescriptorService kitService;
   @Autowired
@@ -202,6 +210,8 @@ public class ConstantsController {
   private WorksetCategoryService worksetCategoryService;
   @Autowired
   private WorksetStageService worksetStageService;
+  @Autowired
+  private MetricService metricService;
   @Autowired
   private IndexChecker indexChecker;
 
@@ -304,6 +314,8 @@ public class ConstantsController {
       addJsonArray(mapper, node, "runLibraryQcStatuses", runLibraryQcStatusService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "worksetCategories", worksetCategoryService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "worksetStages", worksetStageService.list(), Dtos::asDto);
+      addJsonArray(mapper, node, "metrics", metricService.list(), MetricDto::from);
+      addJsonArray(mapper, node, "assays", assayService.list(), AssayDto::from);
       addJsonArray(mapper, node, "sampleSheetFormats", Arrays.asList(SampleSheet.values()), SampleSheet::name);
 
       Collection<IndexFamily> indexFamilies = indexFamilyService.list();
@@ -335,12 +347,6 @@ public class ConstantsController {
         dto.put("partitionName", platformType.getPartitionName());
         dto.put("pluralPartitionName", platformType.getPluralPartitionName());
       }
-      ArrayNode illuminaExperimentTypes = node.putArray("illuminaExperimentTypes");
-      for (IlluminaExperiment experiment : IlluminaExperiment.values()) {
-        ObjectNode dto = illuminaExperimentTypes.addObject();
-        dto.put("name", experiment.name());
-        dto.put("description", experiment.getDescription());
-      }
       ArrayNode sampleTypes = node.putArray("sampleTypes");
       for (SampleType sampleType : sampleTypeService.list()) {
         if (!sampleType.isArchived()) {
@@ -363,35 +369,17 @@ public class ConstantsController {
       for (String label : DilutionFactor.getLabels()) {
         dilutionFactors.add(label);
       }
-      ArrayNode healthTypes = node.putArray("healthTypes");
-      for (HealthType status : HealthType.values()) {
-        ObjectNode dto = healthTypes.addObject();
-        dto.put("label", status.getKey());
-        dto.put("allowedFromSequencer", status.isAllowedFromSequencer());
-        dto.put("isDone", status.isDone());
-      }
-      ArrayNode illuminaWorkflowTypes = node.putArray("illuminaWorkflowTypes");
-      for (IlluminaWorkflowType wf : IlluminaWorkflowType.values()) {
-        ObjectNode dto = illuminaWorkflowTypes.addObject();
-        dto.put("label", wf.getLabel());
-        dto.put("value", wf.getRawValue());
-      }
       ArrayNode illuminaChemistry = node.putArray("illuminaChemistry");
       for (IlluminaChemistry chemistry : IlluminaChemistry.values()) {
         illuminaChemistry.add(chemistry.name());
       }
-      ArrayNode instrumentTypes = node.putArray("instrumentTypes");
-      for (InstrumentType type : InstrumentType.values()) {
-        ObjectNode dto = instrumentTypes.addObject();
-        dto.put("label", type.getLabel());
-        dto.put("value", type.name());
-      }
-      ArrayNode dataManglingPolicies = node.putArray("dataManglingPolicies");
-      for (InstrumentDataManglingPolicy policy : InstrumentDataManglingPolicy.values()) {
-        ObjectNode dto = dataManglingPolicies.addObject();
-        dto.put("label", policy.getLabel());
-        dto.put("value", policy.name());
-      }
+      addIlluminaExperimentTypes(node);
+      addHealthTypes(node);
+      addIlluminaWorkflowTypes(node);
+      addInstrumentTypes(node);
+      addDataManglingPolicies(node);
+      addMetricCategories(node);
+      addThresholdTypes(node);
 
       ObjectNode warningsNode = mapper.createObjectNode();
       warningsNode.put("consentRevoked", "CONSENT REVOKED");
@@ -410,6 +398,72 @@ public class ConstantsController {
       constantsTimestamp.set(System.currentTimeMillis() / 1000.0);
     } catch (IOException e) {
       throw new RestException(e);
+    }
+  }
+
+  private static void addIlluminaExperimentTypes(ObjectNode node) {
+    ArrayNode illuminaExperimentTypes = node.putArray("illuminaExperimentTypes");
+    for (IlluminaExperiment experiment : IlluminaExperiment.values()) {
+      ObjectNode dto = illuminaExperimentTypes.addObject();
+      dto.put("name", experiment.name());
+      dto.put("description", experiment.getDescription());
+    }
+  }
+
+  private static void addHealthTypes(ObjectNode node) {
+    ArrayNode healthTypes = node.putArray("healthTypes");
+    for (HealthType status : HealthType.values()) {
+      ObjectNode dto = healthTypes.addObject();
+      dto.put("label", status.getKey());
+      dto.put("allowedFromSequencer", status.isAllowedFromSequencer());
+      dto.put("isDone", status.isDone());
+    }
+  }
+
+  private static void addIlluminaWorkflowTypes(ObjectNode node) {
+    ArrayNode illuminaWorkflowTypes = node.putArray("illuminaWorkflowTypes");
+    for (IlluminaWorkflowType wf : IlluminaWorkflowType.values()) {
+      ObjectNode dto = illuminaWorkflowTypes.addObject();
+      dto.put("label", wf.getLabel());
+      dto.put("value", wf.getRawValue());
+    }
+  }
+
+  private static void addInstrumentTypes(ObjectNode node) {
+    ArrayNode instrumentTypes = node.putArray("instrumentTypes");
+    for (InstrumentType type : InstrumentType.values()) {
+      ObjectNode dto = instrumentTypes.addObject();
+      dto.put("label", type.getLabel());
+      dto.put("value", type.name());
+    }
+  }
+
+  private static void addDataManglingPolicies(ObjectNode node) {
+    ArrayNode dataManglingPolicies = node.putArray("dataManglingPolicies");
+    for (InstrumentDataManglingPolicy policy : InstrumentDataManglingPolicy.values()) {
+      ObjectNode dto = dataManglingPolicies.addObject();
+      dto.put("label", policy.getLabel());
+      dto.put("value", policy.name());
+    }
+  }
+
+  private static void addMetricCategories(ObjectNode node) {
+    ArrayNode metricCategories = node.putArray("metricCategories");
+    for (MetricCategory category : MetricCategory.values()) {
+      ObjectNode dto = metricCategories.addObject();
+      dto.put("label", category.getLabel());
+      dto.put("value", category.name());
+    }
+  }
+
+  private static void addThresholdTypes(ObjectNode node) {
+    ArrayNode thresholdTypes = node.putArray("thresholdTypes");
+    for (ThresholdType thresholdType : ThresholdType.values()) {
+      ObjectNode dto = thresholdTypes.addObject();
+      dto.put("value", thresholdType.name());
+      dto.put("sign", thresholdType.getSign());
+      dto.put("lowerBound", thresholdType.hasLowerBound());
+      dto.put("upperBound", thresholdType.hasUpperBound());
     }
   }
 

@@ -40,6 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Metric;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Pipeline;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
@@ -411,6 +412,11 @@ public class DeleteIT extends AbstractIT {
   @Test
   public void testDeleteStorageLabel() {
     testAdminDelete(ListTarget.STORAGE_LABELS, null, "Label to delete", Columns.LABEL, StorageLabel.class, 3L);
+  }
+
+  @Test
+  public void testDeleteMetric() {
+    testAdminDelete(ListTarget.METRICS, null, "To Delete", Columns.ALIAS, Metric.class, 4L);
   }
 
   private void testDelete(String listTarget, String tab, String search, String selectByColumn, Class<?> clazz,

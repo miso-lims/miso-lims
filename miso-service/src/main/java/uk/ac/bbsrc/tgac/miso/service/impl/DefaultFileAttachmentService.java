@@ -27,6 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
+import uk.ac.bbsrc.tgac.miso.core.service.RequisitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.ServiceRecordService;
@@ -86,6 +87,11 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
   @Autowired
   public void setServiceRecordService(ServiceRecordService serviceRecordService) {
     entityProviders.put("servicerecord", serviceRecordService);
+  }
+
+  @Autowired
+  public void setRequisitionService(RequisitionService requisitionService) {
+    entityProviders.put("requisition", requisitionService);
   }
 
   public void setFileStorageDirectory(String fileStorageDirectory) {

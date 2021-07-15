@@ -143,6 +143,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String TARGET = "Target";
     public static final String TARGETED_SEQUENCING = "Targeted Sequencing";
     public static final String TARGETED_SEQUENCING_REQD = "Targeted Sequencing Required";
+    public static final String THRESHOLD_TYPE = "Threshold Type";
     public static final String TISSUE_ORIGIN = "Tissue Origin";
     public static final String TISSUE_TYPE = "Tissue Type";
     public static final String TRANSFER_TIME = "Transfer Time";
@@ -188,6 +189,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String LIBRARY_TEMPLATES = "librarytemplates";
     public static final String LIBRARY_TYPES = "librarytype/list";
     public static final String LOCATION_MAPS = "locationmap/list";
+    public static final String METRICS = "metric/list";
     public static final String ORDERS_ALL = "sequencingorders/all";
     public static final String ORDERS_IN_PROGRESS = "sequencingorders/in-progress";
     public static final String ORDERS_OUTSTANDING = "sequencingorders/outstanding";

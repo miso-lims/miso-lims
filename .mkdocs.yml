@@ -30,31 +30,32 @@ nav:
     - 5. Type Data: user_manual/type_data.md
     - 6. Projects: user_manual/projects.md
     - 7. Samples: user_manual/samples.md
-    - 8. Libraries: user_manual/libraries.md
-    - 9. Library Aliquots: user_manual/library_aliquots.md
-    - 10. Worksets: user_manual/worksets.md
-    - 11. Pool Orders: user_manual/pool_orders.md
-    - 12. Pools: user_manual/pools.md
-    - 13. Sequencing Orders: user_manual/sequencing_orders.md
-    - 14. Freezers and Rooms: user_manual/freezers_and_rooms.md
-    - 15. Boxes: user_manual/boxes.md
-    - 16. Transfers: user_manual/transfers.md
-    - 17. Sequencing Containers: user_manual/sequencing_containers.md
-    - 18. Instruments: user_manual/instruments.md
-    - 19. Workstations: user_manual/workstations.md
-    - 20. Sequencer Runs: user_manual/sequencer_runs.md
-    - 21. Arrays : user_manual/arrays.md
-    - 22. Array Runs: user_manual/array_runs.md
-    - 23. QCs: user_manual/qcs.md
-    - 24. Notes: user_manual/notes.md
-    - 25. Attachments: user_manual/attachments.md
-    - 26. Deletions: user_manual/deletions.md
-    - 27. Workflows: user_manual/workflows.md
-    - 28. European Nucleotide Archive Support: user_manual/european_nucleotide_archive_support.md
-    - 29. Home Screen Widgets: user_manual/home_screen_widgets.md
-    - 30. Other MISO Tools: user_manual/other_miso_tools.md
-    - 31. Dashi Integration: user_manual/dashi_integration.md
-    - 32. Related Software: user_manual/related_software.md
+    - 8. Requisitions: user_manual/requisitions.md
+    - 9. Libraries: user_manual/libraries.md
+    - 10. Library Aliquots: user_manual/library_aliquots.md
+    - 11. Worksets: user_manual/worksets.md
+    - 12. Pool Orders: user_manual/pool_orders.md
+    - 13. Pools: user_manual/pools.md
+    - 14. Sequencing Orders: user_manual/sequencing_orders.md
+    - 15. Freezers and Rooms: user_manual/freezers_and_rooms.md
+    - 16. Boxes: user_manual/boxes.md
+    - 17. Transfers: user_manual/transfers.md
+    - 18. Sequencing Containers: user_manual/sequencing_containers.md
+    - 19. Instruments: user_manual/instruments.md
+    - 20. Workstations: user_manual/workstations.md
+    - 21. Sequencer Runs: user_manual/sequencer_runs.md
+    - 22. Arrays : user_manual/arrays.md
+    - 23. Array Runs: user_manual/array_runs.md
+    - 24. QCs: user_manual/qcs.md
+    - 25. Notes: user_manual/notes.md
+    - 26. Attachments: user_manual/attachments.md
+    - 27. Deletions: user_manual/deletions.md
+    - 28. Workflows: user_manual/workflows.md
+    - 29. European Nucleotide Archive Support: user_manual/european_nucleotide_archive_support.md
+    - 30. Home Screen Widgets: user_manual/home_screen_widgets.md
+    - 31. Other MISO Tools: user_manual/other_miso_tools.md
+    - 32. Dashi Integration: user_manual/dashi_integration.md
+    - 33. Related Software: user_manual/related_software.md
   - Developer Guide: developers-manual.md
   - Index Checker: index-checker.md
 

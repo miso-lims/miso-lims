@@ -9,6 +9,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 
 public enum QcCorrespondingField {
   CONCENTRATION {
@@ -90,6 +91,10 @@ public enum QcCorrespondingField {
   }
 
   public void updateField(SequencerPartitionContainer container, BigDecimal value, String units) {
+    throw new UnsupportedOperationException("Method not implemented for unspecified field");
+  }
+
+  public void updateField(Requisition requisition, BigDecimal value, String units) {
     throw new UnsupportedOperationException("Method not implemented for unspecified field");
   }
 

@@ -21,7 +21,6 @@ FOR EACH ROW
     makeChangeMessage('volume', decimalToString(OLD.volume), decimalToString(NEW.volume)),
     makeChangeMessage('concentration units', OLD.concentrationUnits, NEW.concentrationUnits),
     makeChangeMessage('volume units', OLD.volumeUnits, NEW.volumeUnits),
-    makeChangeMessage('requisition ID', OLD.requisitionId, NEW.requisitionId),
     makeChangeMessage('sequencing control type', (SELECT alias FROM SequencingControlType WHERE sequencingControlTypeId = OLD.sequencingControlTypeId), (SELECT alias FROM SequencingControlType WHERE sequencingControlTypeId = NEW.sequencingControlTypeId)),
     makeChangeMessage('archived', booleanToString(OLD.archived), booleanToString(NEW.archived)),
     makeChangeMessage('group description', OLD.groupDescription, NEW.groupDescription),
@@ -68,7 +67,8 @@ FOR EACH ROW
     makeChangeMessage('cell viability', decimalToString(OLD.cellViability), decimalToString(NEW.cellViability)),
     makeChangeMessage('loading cell concentration', decimalToString(OLD.loadingCellConcentration), decimalToString(NEW.loadingCellConcentration)),
     makeChangeMessage('input into library', decimalToString(OLD.inputIntoLibrary), decimalToString(NEW.inputIntoLibrary)),
-    makeChangeMessage('SOP', (SELECT CONCAT(alias, ' (', version, ')') FROM Sop WHERE sopId = OLD.sopId), (SELECT CONCAT(alias, ' (', version, ')') FROM Sop WHERE sopId = NEW.sopId))
+    makeChangeMessage('SOP', (SELECT CONCAT(alias, ' (', version, ')') FROM Sop WHERE sopId = OLD.sopId), (SELECT CONCAT(alias, ' (', version, ')') FROM Sop WHERE sopId = NEW.sopId)),
+    makeChangeMessage('Requisition', (SELECT alias FROM Requisition WHERE requisitionId = OLD.requisitionId), (SELECT alias FROM Requisition WHERE requisitionId = NEW.requisitionId))
   );
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime) VALUES (
@@ -89,7 +89,6 @@ FOR EACH ROW
         makeChangeColumn('volume', OLD.volume, NEW.volume),
         makeChangeColumn('concentrationUnits', OLD.concentrationUnits, NEW.concentrationUnits),
         makeChangeColumn('volumeUnits', OLD.volumeUnits, NEW.volumeUnits),
-        makeChangeColumn('requisitionId', OLD.requisitionId, NEW.requisitionId),
         makeChangeColumn('sequencingControlTypeId', OLD.sequencingControlTypeId, NEW.sequencingControlTypeId),
         makeChangeColumn('archived', OLD.archived, NEW.archived),
         makeChangeColumn('groupDescription', OLD.groupDescription, NEW.groupDescription),
@@ -136,7 +135,8 @@ FOR EACH ROW
         makeChangeColumn('cellViability', OLD.cellViability, NEW.cellViability),
         makeChangeColumn('loadingCellConcentration', OLD.loadingCellConcentration, NEW.loadingCellConcentration),
         makeChangeColumn('inputIntoLibrary', OLD.inputIntoLibrary, NEW.inputIntoLibrary),
-        makeChangeColumn('sopId', OLD.sopId, NEW.sopId)
+        makeChangeColumn('sopId', OLD.sopId, NEW.sopId),
+        makeChangeColumn('requisitionId', OLD.requisitionId, NEW.requisitionId)
   ), ''),
       NEW.lastModifier,
       log_message,

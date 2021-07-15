@@ -10,6 +10,10 @@ public class Pluralizer {
     return pluralize(count, "array", "arrays");
   }
 
+  public static String assays(long count) {
+    return pluralize(count, "assay", "assays");
+  }
+
   public static String attachments(long count) {
     return pluralize(count, "attachment", "attachments");
   }
@@ -88,6 +92,10 @@ public class Pluralizer {
 
   public static String qcs(long count) {
     return pluralize(count, "QC", "QCs");
+  }
+
+  public static String requisitions(long count) {
+    return pluralize(count, "requisition", "requisitions");
   }
 
   public static String runs(long count) {

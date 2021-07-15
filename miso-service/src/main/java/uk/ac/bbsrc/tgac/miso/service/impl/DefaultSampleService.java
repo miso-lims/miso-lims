@@ -47,6 +47,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl.IdentityBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
@@ -62,6 +63,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
 import uk.ac.bbsrc.tgac.miso.core.service.LabService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.core.service.RequisitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
@@ -145,6 +147,8 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   private SubprojectService subprojectService;
   @Autowired
   private SopService sopService;
+  @Autowired
+  private RequisitionService requisitionService;
   @Autowired
   private BarcodableReferenceService barcodableReferenceService;
   @Autowired
@@ -248,6 +252,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
 
   @Override
   public long create(Sample sample) throws IOException {
+    findOrCreateRequisition(sample);
     loadChildEntities(sample);
     boxService.throwIfBoxPositionIsFilled(sample);
     User changeUser = authorizationManager.getCurrentUser();
@@ -319,6 +324,18 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       }
     }
     return savedId;
+  }
+
+  private void findOrCreateRequisition(Sample sample) throws IOException {
+    if (sample.getRequisition() != null && !sample.getRequisition().isSaved()) {
+      Requisition existing = requisitionService.getByAlias(sample.getRequisition().getAlias());
+      if (existing == null) {
+        long requisitionId = requisitionService.create(sample.getRequisition());
+        sample.getRequisition().setId(requisitionId);
+      } else {
+        sample.setRequisition(existing);
+      }
+    }
   }
 
   private ValidationException makeDuplicateExternalNameError(String externalName) {
@@ -688,6 +705,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
         "sequencingControlTypeId");
     loadChildEntity(sample::setSop, sample.getSop(), sopService, "sopId");
     loadChildEntity(sample::setDetailedQcStatus, sample.getDetailedQcStatus(), detailedQcStatusService, "detailedQcStatusId");
+    loadChildEntity(sample::setRequisition, sample.getRequisition(), requisitionService, "requisitionId");
     if (isDetailedSample(sample)) {
       DetailedSample detailed = (DetailedSample) sample;
       if (detailed.getSampleClass() != null && detailed.getSampleClass().isSaved()) {
@@ -901,7 +919,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     target.setLocationBarcode(source.getLocationBarcode());
     target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
     target.setLocationBarcode(source.getLocationBarcode());
-    target.setRequisitionId(source.getRequisitionId());
+    target.setRequisition(source.getRequisition());
     target.setSequencingControlType(source.getSequencingControlType());
     target.setSop(source.getSop());
     target.setDetailedQcStatus(source.getDetailedQcStatus());

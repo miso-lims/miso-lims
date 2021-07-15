@@ -693,3 +693,31 @@ An attachment category can only be deleted if there are no attachments of that c
 Contacts may be saved for convenience when sending [transfer notifications](../transfers#transfer-notifications). The
 link to the Contacts list can be found in the Misc menu within the main navigation menu. Any user can add, edit, and
 delete contacts using the standard interface.
+
+
+
+## Metrics
+
+[Assays](../requisitions#assays) may specify requirements that must be met in order for a case to be considered
+successful. These requirements are specified using metrics. A metric belongs to one of the following categories.
+
+* Receipt
+* Extraction
+* Library Preparation
+* Low Pass Sequencing
+* Full Depth Sequencing
+* Informatics
+
+Each metric has a threshold type, which describes the type of requirement. Some metrics may be pass/fail, but most are
+numerical, and will require a value to be greater and/or less than specified thresholds. The actual thresholds values
+are specified in the assay, as different assays may have different thresholds. A metric may also specify the units for
+the associated value.
+
+Examples:
+
+* A "Container Intact" metric for receipt requiring a pass/fail inspection of the received container
+* A "Yield" metric for library preparation requiring library yield to be greater than or equal to a threshold value in
+  ng/µL
+
+MISO administrators can add, edit, and delete metrics using the standard interface. A metric can only be deleted if it
+is not used by any existing assays.

@@ -92,13 +92,15 @@ FormTarget.sample = (function($) {
                   type: 'text',
                   maxLength: 255
                 }, {
-                  title: 'Requisition ID',
+                  title: 'Requisition',
                   data: 'requisitionId',
-                  type: 'text',
-                  maxLength: 50,
-                  regex: Utils.validation.alphanumRegex,
-                  include: !config.detailedSample || object.sampleCategory !== 'Identity',
-                  description: 'ID of a requisition form stored in a separate system'
+                  type: 'read-only',
+                  getDisplayValue: function(sample) {
+                    return sample.requisitionAlias || 'n/a';
+                  },
+                  getLink: function(sample) {
+                    return sample.requisitionId ? Urls.ui.requisitions.edit(sample.requisitionId) : null;
+                  }
                 }, {
                   title: 'Scientific Name',
                   data: 'scientificNameId',

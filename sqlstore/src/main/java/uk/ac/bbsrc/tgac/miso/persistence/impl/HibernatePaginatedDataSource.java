@@ -400,8 +400,13 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
-  public default void restrictPaginationByRequisitionId(Criteria criteria, String query, Consumer<String> errorHandler) {
+  public default void restrictPaginationByRequisitionId(Criteria criteria, long requisitionId, Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s cannot be filtered by requisition ID.", getFriendlyName()));
+  }
+
+  @Override
+  public default void restrictPaginationByRequisition(Criteria criteria, String query, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s cannot be filtered by requisition.", getFriendlyName()));
   }
 
   @Override

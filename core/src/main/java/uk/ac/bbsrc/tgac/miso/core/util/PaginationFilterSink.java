@@ -99,7 +99,9 @@ public interface PaginationFilterSink<T> {
 
   public void restrictPaginationByFreezer(T item, String query, Consumer<String> errorHandler);
 
-  public void restrictPaginationByRequisitionId(T item, String query, Consumer<String> errorHandler);
+  public void restrictPaginationByRequisitionId(T item, long requisitionId, Consumer<String> errorHandler);
+
+  public void restrictPaginationByRequisition(T item, String query, Consumer<String> errorHandler);
 
   public void restrictPaginationByRecipientGroups(T item, Collection<Group> groups, Consumer<String> errorHandler);
 

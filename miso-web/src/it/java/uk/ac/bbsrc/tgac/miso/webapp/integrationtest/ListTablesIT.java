@@ -938,6 +938,16 @@ public class ListTablesIT extends AbstractIT {
     testColumnsSort(ListTarget.STORAGE_LABELS);
   }
 
+  @Test
+  public void testListMetricsSetup() throws Exception {
+    testPageSetup(ListTarget.METRICS, Sets.newHashSet(Columns.ALIAS, Columns.CATEGORY, Columns.THRESHOLD_TYPE, Columns.UNITS));
+  }
+
+  @Test
+  public void testListMetricsColumnSort() throws Exception {
+    testColumnsSort(ListTarget.METRICS);
+  }
+
   private void testPageSetup(String listTarget, Set<String> targetColumns) {
     testPageSetup(listTarget, targetColumns, false);
   }

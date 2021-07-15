@@ -313,7 +313,12 @@ public abstract class HibernatePaginatedDataSourceIT extends AbstractDAOTest {
 
   @Test
   public void testSearchByRequisitionId() throws Exception {
-    testSearch(PaginationFilter.requisitionId("requisition"), SearchType.REQUISITION);
+    testSearch(PaginationFilter.requisitionId(1L), SearchType.REQUISITION);
+  }
+
+  @Test
+  public void testSearchByRequisition() throws Exception {
+    testSearch(PaginationFilter.requisition("requisition"), SearchType.REQUISITION);
   }
 
   @Test

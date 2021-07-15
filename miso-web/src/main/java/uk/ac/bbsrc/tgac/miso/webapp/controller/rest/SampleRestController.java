@@ -174,14 +174,21 @@ public class SampleRestController extends RestController {
 
   @GetMapping(value = "/dt/project/{id}", produces = { "application/json" })
   @ResponseBody
-  public DataTablesResponseDto<SampleDto> getDTSamplesByProject(@PathVariable("id") Long id, HttpServletRequest request)
+  public DataTablesResponseDto<SampleDto> getDTSamplesByProject(@PathVariable("id") long id, HttpServletRequest request)
       throws IOException {
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.project(id));
   }
 
+  @GetMapping(value = "/dt/requisition/{id}", produces = { "application/json" })
+  @ResponseBody
+  public DataTablesResponseDto<SampleDto> getDTSamplesByRequisition(@PathVariable("id") long id, HttpServletRequest request)
+      throws IOException {
+    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.requisitionId(id));
+  }
+
   @GetMapping(value = "/dt/workset/{id}", produces = { "application/json" })
   @ResponseBody
-  public DataTablesResponseDto<SampleDto> getDTSamplesByWorkset(@PathVariable("id") Long id, HttpServletRequest request)
+  public DataTablesResponseDto<SampleDto> getDTSamplesByWorkset(@PathVariable("id") long id, HttpServletRequest request)
     throws IOException {
     DataTablesResponseDto<SampleDto> response = jQueryBackend.get(request, advancedSearchParser, PaginationFilter.workset(id));
     if (!response.getAaData().isEmpty()) {
@@ -195,7 +202,7 @@ public class SampleRestController extends RestController {
 
   @GetMapping(value = "/dt/project/{id}/arrayed", produces = { "application/json" })
   @ResponseBody
-  public DataTablesResponseDto<SampleDto> getDTArrayedSamplesByProject(@PathVariable("id") Long id, HttpServletRequest request)
+  public DataTablesResponseDto<SampleDto> getDTArrayedSamplesByProject(@PathVariable("id") long id, HttpServletRequest request)
       throws IOException {
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.project(id),
         PaginationFilter.arrayed(true));

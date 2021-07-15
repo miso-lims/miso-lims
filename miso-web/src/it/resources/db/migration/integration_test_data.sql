@@ -3,6 +3,12 @@ INSERT INTO User (userId, active, admin, fullName, internal, loginName, roles, p
 (3,1,0,'user',1,'user','ROLE_INTERNAL','{bcrypt}$2a$10$vqYii//w2shSZnt/4uNyIeeU4FGQIB4QJeisv9l16xVRQ1lTOghIO','user@user.user'), -- password 'user'
 (4,1,0,'Harry Henderson', 1, 'hhenderson', 'ROLE_INTERNAL', '{bcrypt}$2a$10$vqYii//w2shSZnt/4uNyIeeU4FGQIB4QJeisv9l16xVRQ1lTOghIO', 'hhenderson@somewhere.maybe');
 
+INSERT INTO Metric(metricId, alias, category, thresholdType, units) VALUES
+(1, 'Container Intact', 'RECEIPT', 'BOOLEAN', NULL),
+(2, 'WG Library Yield', 'LIBRARY_PREP', 'GE', 'ng/μL'),
+(3, 'Min Clusters (PF)', 'LOW_PASS_SEQUENCING', 'GT', 'K/lane'),
+(4, 'To Delete', 'FULL_DEPTH_SEQUENCING', 'BOOLEAN', NULL);
+
 INSERT INTO RunLibraryQcStatus(statusId, description, qcPassed) VALUES
 (1, 'Passed', TRUE),
 (2, 'Failed', FALSE),

@@ -10,6 +10,22 @@ INSERT INTO `_Group`(`groupId`, `name`, `description`) VALUES
 INSERT INTO `User_Group` (`users_userId`, `groups_groupId`)
 VALUES (3,1),(1,1);
 
+INSERT INTO Metric(metricId, alias, category, thresholdType, units) VALUES
+(1, 'Container Intact', 'RECEIPT', 'BOOLEAN', NULL),
+(2, 'WG Library Yield', 'LIBRARY_PREP', 'GE', 'ng/μL'),
+(3, 'Min Clusters (PF)', 'LOW_PASS_SEQUENCING', 'GT', 'K/lane');
+
+INSERT INTO Assay(assayId, alias, version, description) VALUES
+(1, 'Low Depth WGTS', '1.0', NULL),
+(2, 'Full Depth WGTS', '1.0', NULL);
+
+INSERT INTO Assay_Metric(assayId, metricId, minimumThreshold, maximumThreshold) VALUES
+(1, 1, NULL, NULL),
+(1, 2, 11, NULL),
+(1, 3, 500, NULL),
+(2, 1, NULL, NULL),
+(2, 2, 12, NULL);
+
 INSERT INTO RunLibraryQcStatus(statusId, description, qcPassed) VALUES
 (1, 'Passed', TRUE),
 (2, 'Failed', FALSE),
@@ -237,7 +253,8 @@ INSERT INTO `QCType` (`qcTypeId`, `name`, `description`, `qcTarget`, `units`, in
 (13, 'Sample QC With Control', NULL, 'Sample', 'x', NULL),
 (14, 'Library QC With Control', NULL, 'Library', 'x', NULL),
 (15, 'Pool QC With Control', NULL, 'Pool', 'x', NULL),
-(16, 'Container QC With Control', NULL, 'Container', 'x', NULL);
+(16, 'Container QC With Control', NULL, 'Container', 'x', NULL),
+(17, 'Requisition QC With Control', NULL, 'Requisition', 'x', NULL);
 
 INSERT INTO QcControl (controlId, qcTypeId, alias) VALUES
 (1, 11, 'Control 1'),
@@ -246,7 +263,8 @@ INSERT INTO QcControl (controlId, qcTypeId, alias) VALUES
 (4, 13, 'Control'),
 (5, 14, 'Control'),
 (6, 15, 'Control'),
-(7, 16, 'Control');
+(7, 16, 'Control'),
+(8, 17, 'Control');
 
 INSERT INTO QCType_KitDescriptor (qcTypeId, kitDescriptorId) VALUES
 (7, 3);
@@ -315,6 +333,16 @@ INSERT INTO SampleValidRelationship(sampleValidRelationshipId, parentId, childId
 INSERT INTO SamplePurpose(samplePurposeId, alias, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 'Sequencing', 1, '2021-02-18 16:21:00', 1, '2021-02-18 16:21:00'),
 (2, 'Validation', 1, '2021-02-18 16:21:00', 1, '2021-02-18 16:21:00');
+
+INSERT INTO Requisition(requisitionId, alias, assayId, creator, created, lastModifier, lastModified) VALUES
+(1, 'Req One', 1, 1, '2021-07-13 12:30:00', 1, '2021-07-13 12:30:00'),
+(2, 'Req Two', 2, 1, '2021-07-13 12:30:00', 1, '2021-07-13 12:30:00');
+
+INSERT INTO RequisitionQc(qcId, requisitionId, creator, `date`, type, results, created, lastModified) VALUES
+(1, 1, 1, '2021-07-13', 17, 123, '2021-07-13', '2021-07-13');
+
+ INSERT INTO RequisitionQcControl(qcControlId, qcId, controlId, lot, qcPassed) VALUES
+(1, 1, 8, '20210713', TRUE);
 
 -- Plain Samples
 INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identificationBarcode`, `locationBarcode`, `sampleType`, `detailedQcStatusId`, qcUser, qcDate, `alias`, `project_projectId`, `scientificNameId`, `taxonIdentifier`, sequencingControlTypeId, `lastModifier`, `lastModified`, `creator`, `created`, discriminator) VALUES
