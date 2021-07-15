@@ -31,7 +31,7 @@ pushd miso-web/src/main/resources
 SETUP_FILES="setup_files.tar.gz"
 tar -czf "../../../../${SETUP_FILES}" *.properties
 popd
-ANCHOR=grep "^## \[${MISO_VERSION_OLD}\]" RELEASE_NOTES.md | sed -e 's/ - /---/; s/[# \.\[]//g; s/\]//g'
+ANCHOR=$(grep "^## \[${MISO_VERSION_OLD}\]" RELEASE_NOTES.md | sed -e 's/ - /---/; s/[# \.\[]//g; s/\]//g')
 gh release create v${MISO_VERSION_OLD} \
     --notes "[Release Notes](https://github.com/miso-lims/miso-lims/blob/develop/RELEASE_NOTES.md#${ANCHOR})" \
     miso-web/target/ROOT.war \
