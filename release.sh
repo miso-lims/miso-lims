@@ -116,4 +116,4 @@ prepare || rollback_local
 push || push_error
 ADDITIONAL_EXPORTS=" PINERY_VERSION=$(xmlstarlet sel -t -v /_:project/_:properties/_:pinery.version pinery-miso/pom.xml)" # MISO-specific
 echo "Release completed. Copy this export into your shell before running the deploy scripts:"
-echo "$(echo ${PROJECT} | tr '[:lower:]' '[:upper:]')_VERSION=${RELEASE_VERSION}${ADDITIONAL_EXPORTS}"
+echo "export $(echo ${PROJECT} | tr '[:lower:]' '[:upper:]')_VERSION=${RELEASE_VERSION}${ADDITIONAL_EXPORTS}"
