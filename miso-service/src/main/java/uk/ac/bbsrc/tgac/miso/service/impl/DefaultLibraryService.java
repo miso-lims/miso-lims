@@ -711,4 +711,9 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     return transactionTemplate;
   }
 
+  @Override
+  public List<Library> getSampleDescendants(long parentSampleId) throws IOException {
+    return libraryDao.getSampleDescendants(parentSampleId);
+  }
+
 }

@@ -6,6 +6,8 @@ import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,6 +33,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -59,6 +62,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BarcodableReferenceService;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
+import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.core.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
 import uk.ac.bbsrc.tgac.miso.core.service.LabService;
@@ -151,6 +155,8 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   private RequisitionService requisitionService;
   @Autowired
   private BarcodableReferenceService barcodableReferenceService;
+  @Autowired
+  private ChangeLogService changeLogService;
   @Autowired
   private TransactionTemplate transactionTemplate;
   @Autowired
@@ -322,6 +328,11 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       } else {
         transferService.create(transfer);
       }
+    }
+    // Don't log initial additions to requisition, as that's part of the requisition creation
+    if (sample.getRequisition() != null
+        && sample.getRequisition().getCreationTime().toInstant().isBefore(Instant.now().minus(1, ChronoUnit.HOURS))) {
+      addRequisitionSampleChange(sample.getRequisition(), sample, true);
     }
     return savedId;
   }
@@ -798,6 +809,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     LimsUtils.updateParentVolume(sample, managed, changeUser);
     updateParentSlides(sample, managed, changeUser);
     loadChildEntities(sample);
+    writeRequisitionChangelogs(sample, managed);
     validateChange(sample, managed);
     applyChanges(managed, sample);
     if (isDetailedSample(managed)) {
@@ -814,6 +826,24 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     }
     boxService.updateBoxableLocation(sample);
     return sample.getId();
+  }
+
+  private void writeRequisitionChangelogs(Sample sample, Sample beforeChange) throws IOException {
+    if (!isChanged(Sample::getRequisition, sample, beforeChange)) {
+      return;
+    }
+    if (beforeChange.getRequisition() != null) {
+      addRequisitionSampleChange(beforeChange.getRequisition(), beforeChange, false);
+    }
+    if (sample.getRequisition() != null) {
+      addRequisitionSampleChange(sample.getRequisition(), sample, true);
+    }
+  }
+
+  private void addRequisitionSampleChange(Requisition requisition, Sample sample, boolean addition) throws IOException {
+    String message = String.format("%s sample %s (%s)", addition ? "Added" : "Removed", sample.getName(), sample.getAlias());
+    ChangeLog change = requisition.createChangeLog(message, "samples", authorizationManager.getCurrentUser());
+    changeLogService.create(change);
   }
 
   private void maybeRemoveFromBox(Sample sample, Sample managed) {
@@ -1181,6 +1211,11 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   @Override
   public TransactionTemplate getTransactionTemplate() {
     return transactionTemplate;
+  }
+
+  @Override
+  public List<Sample> getChildren(long parentId, String targetSampleCategory) throws IOException {
+    return sampleStore.getChildren(parentId, targetSampleCategory);
   }
 
 }

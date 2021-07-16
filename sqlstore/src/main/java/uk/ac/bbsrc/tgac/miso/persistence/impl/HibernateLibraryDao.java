@@ -1,9 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
@@ -17,10 +20,12 @@ import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryBatch;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
@@ -29,6 +34,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryStore;
+import uk.ac.bbsrc.tgac.miso.persistence.SampleStore;
 import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
 @Repository
@@ -71,6 +77,16 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
 
   @Autowired
   private SessionFactory sessionFactory;
+
+  @Autowired
+  private SampleStore sampleStore;
+
+  @Value("${miso.detailed.sample.enabled}")
+  private Boolean detailedSample;
+
+  public void setDetailedSample(boolean detailedSample) {
+    this.detailedSample = detailedSample;
+  }
 
   @Override
   public Session currentSession() {
@@ -179,6 +195,21 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
     criteria.setResultTransformer(EntityReference.RESULT_TRANSFORMER);
     library = (EntityReference) criteria.uniqueResult();
     return library;
+  }
+
+  @Override
+  public List<Library> getSampleDescendants(long parentSampleId) throws IOException {
+    if (detailedSample) {
+      Set<Library> libraries = new HashSet<>();
+      libraries.addAll(listBySampleId(parentSampleId));
+      Set<Long> childAliquotIds = sampleStore.getChildIds(parentSampleId, SampleAliquot.CATEGORY_NAME);
+      for (Long aliquotId : childAliquotIds) {
+        libraries.addAll(listBySampleId(aliquotId));
+      }
+      return new ArrayList<>(libraries);
+    } else {
+      return listBySampleId(parentSampleId);
+    }
   }
 
   public SessionFactory getSessionFactory() {

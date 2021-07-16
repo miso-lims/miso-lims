@@ -20,6 +20,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String ALIAS = "Alias";
     public static final String ANALYSIS_SKIPPED = "Analysis Skipped";
     public static final String ARCHIVED = "Archived";
+    public static final String ASSAY = "Assay";
     public static final String AUTO_UPDATE_FIELD = "Auto Update Field";
     public static final String AVAILABLE = "Available";
     public static final String AVG_INSERT_SIZE = "Average Insert Size";
@@ -129,7 +130,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String SIZE = "Size";
     public static final String SIZE_BP = "Size (bp)";
     public static final String SOP = "SOP";
-    public static final String SORT = "";
+    public static final String SELECTOR = "";
     public static final String STAGE = "Stage";
     public static final String START_DATE = "Start Date";
     public static final String STARTED = "Started";
@@ -165,6 +166,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String ARRAYS = "arrays";
     public static final String ARRAY_RUNS = "arrayruns";
     public static final String ARRAY_MODELS = "arraymodel/list";
+    public static final String ASSAYS = "assay/list";
     public static final String ATTACHMENT_CATEGORIES = "attachmentcategories/list";
     public static final String BOX_SIZES = "boxsize/list";
     public static final String BOX_USES = "boxuse/list";
@@ -201,6 +203,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String PROJECTS = "projects";
     public static final String QC_TYPE = "qctype/list";
     public static final String REFERENCE_GENOMES = "referencegenome/list";
+    public static final String REQUISITIONS = "requisition/list";
     public static final String RUNS = "runs";
     public static final String RUN_LIBRARY_QC_STATUSES = "runlibraryqcstatus/list";
     public static final String RUN_PURPOSES = "runpurpose/list";

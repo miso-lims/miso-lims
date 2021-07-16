@@ -106,6 +106,8 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("librarydesign/list");
     slugs.add("storagelabel/list");
     slugs.add("metric/list");
+    slugs.add("assay/list");
+    slugs.add("requisition/list");
 
     slugs.add("studies");
     slugs.add("experiments");
@@ -137,6 +139,11 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("transfer/new");
     slugs.add("transfer/1");
     slugs.add("library/batch/2017-07-24_u1_s3_k1-KITLOTONE");
+    slugs.add("assay/new");
+    slugs.add("assay/1");
+    slugs.add("assay/1?locked=false");
+    slugs.add("requisition/new");
+    slugs.add("requisition/1");
 
     slugs.add("container/new/2");
     slugs.add("container/1"); // Illumina

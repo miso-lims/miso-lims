@@ -64,6 +64,11 @@ public class DefaultRunPartitionAliquotService implements RunPartitionAliquotSer
   }
 
   @Override
+  public List<RunPartitionAliquot> listByLibraryId(long libraryId) throws IOException {
+    return runPartitionAliquotDao.listByLibraryId(libraryId);
+  }
+
+  @Override
   public void save(List<RunPartitionAliquot> runPartitionAliquots) throws IOException {
     for (RunPartitionAliquot runPartitionAliquot : runPartitionAliquots) {
       save(runPartitionAliquot);

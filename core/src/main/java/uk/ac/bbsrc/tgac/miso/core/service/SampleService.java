@@ -15,27 +15,29 @@ public interface SampleService
     extends PaginatedDataSource<Sample>, BarcodableService<Sample>, DeleterService<Sample>, NoteService<Sample>, BulkSaveService<Sample> {
 
   @Override
-  public default EntityType getEntityType() {
+  default EntityType getEntityType() {
     return EntityType.SAMPLE;
   }
 
-  public List<Sample> list() throws IOException;
+  List<Sample> list() throws IOException;
 
-  public List<IdentityView> getIdentitiesByExternalNameOrAliasAndProject(String externalName, Long projectId, boolean exactMatch)
+  List<IdentityView> getIdentitiesByExternalNameOrAliasAndProject(String externalName, Long projectId, boolean exactMatch)
       throws IOException;
 
-  public List<IdentityView> getIdentities(Collection<String> externalNames, boolean exactMatch, Project project) throws IOException;
+  List<IdentityView> getIdentities(Collection<String> externalNames, boolean exactMatch, Project project) throws IOException;
 
-  public void confirmExternalNameUniqueForProjectIfRequired(String externalNames, Sample sample) throws IOException;
+  void confirmExternalNameUniqueForProjectIfRequired(String externalNames, Sample sample) throws IOException;
 
-  public Sample getByBarcode(String barcode) throws IOException;
+  Sample getByBarcode(String barcode) throws IOException;
 
-  public Sample getByLibraryAliquotId(long aliquotId) throws IOException;
+  Sample getByLibraryAliquotId(long aliquotId) throws IOException;
 
-  public Sample save(Sample sample) throws IOException;
+  Sample save(Sample sample) throws IOException;
 
-  public EntityReference getNextInProject(Sample sample);
+  EntityReference getNextInProject(Sample sample);
 
-  public EntityReference getPreviousInProject(Sample sample);
+  EntityReference getPreviousInProject(Sample sample);
+
+  List<Sample> getChildren(long parentId, String targetSampleCategory) throws IOException;
 
 }

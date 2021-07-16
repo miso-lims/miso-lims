@@ -32,6 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.StainCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.Workstation;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
@@ -46,6 +47,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
@@ -417,6 +419,16 @@ public class DeleteIT extends AbstractIT {
   @Test
   public void testDeleteMetric() {
     testAdminDelete(ListTarget.METRICS, null, "To Delete", Columns.ALIAS, Metric.class, 4L);
+  }
+
+  @Test
+  public void testDeleteAssay() {
+    testAdminDelete(ListTarget.ASSAYS, null, "Bad Assay", Columns.ALIAS, Assay.class, 4L);
+  }
+
+  @Test
+  public void testDeleteRequisition() {
+    testDelete(ListTarget.REQUISITIONS, null, "Req Two", Columns.ALIAS, Requisition.class, 2L);
   }
 
   private void testDelete(String listTarget, String tab, String search, String selectByColumn, Class<?> clazz,

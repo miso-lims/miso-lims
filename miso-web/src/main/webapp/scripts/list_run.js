@@ -83,7 +83,7 @@ ListTarget.run = {
         ListUtils.labelHyperlinkColumn("Alias", Urls.ui.runs.edit, Utils.array.getId, "alias", 0, true), {
           sTitle: "Projects",
           mData: "projectsLabel",
-          include: true,
+          include: !config.requisitionId,
           bSortable: false
         }, {
           "sTitle": "Seq. Params.",
@@ -107,7 +107,7 @@ ListTarget.run = {
           "mRender": function(data, type, full) {
             return data || "";
           },
-          "include": true,
+          "include": !config.requisitionId,
           "iSortPriority": 2
         }, {
           "sTitle": "End Date",
@@ -115,7 +115,7 @@ ListTarget.run = {
           "mRender": function(data, type, full) {
             return data || "";
           },
-          "include": true,
+          "include": !config.requisitionId,
           "iSortPriority": 0
         }, {
           "sTitle": "Type",
@@ -123,6 +123,16 @@ ListTarget.run = {
           "include": !config.platformType,
           "iSortPriority": 0,
           "sClass": config.poolId ? "noPrint" : undefined
+        }, {
+          "sTitle": "QC",
+          "mData": "qcPassed",
+          "mRender": ListUtils.render.booleanChecks,
+          "include": config.requisitionId
+        }, {
+          "sTitle": "Data Review",
+          "mData": "dataReview",
+          "mRender": ListUtils.render.booleanChecks,
+          "include": config.requisitionId
         }, {
           "sTitle": "Last Modified",
           "mData": "lastModified",

@@ -31,7 +31,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 
 public class ListTablesIT extends AbstractIT {
 
-  private static final Set<String> samplesColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.TISSUE_ORIGIN,
+  private static final Set<String> samplesColumns = Sets.newHashSet(Columns.SELECTOR, Columns.NAME, Columns.ALIAS, Columns.TISSUE_ORIGIN,
       Columns.TISSUE_TYPE, Columns.SAMPLE_CLASS, Columns.QC, Columns.LOCATION, Columns.CREATION_DATE, Columns.LAST_MODIFIED);
 
   private static final Map<String, Set<String>> tabsForTarget;
@@ -164,7 +164,7 @@ public class ListTablesIT extends AbstractIT {
     ListPage page = ListPage.getListPage(getDriver(), getBaseUrl(), "tools/indexdistance");
     DataTable table = page.getTable();
     Set<String> expected = indicesColumns;
-    expected.add(Columns.SORT); // Checkbox column
+    expected.add(Columns.SELECTOR); // Checkbox column
     expected.add(Columns.PLATFORM); // Platform column
     List<String> headings = table.getColumnHeadings();
     assertEquals("number of columns", expected.size(), headings.size());
@@ -202,7 +202,7 @@ public class ListTablesIT extends AbstractIT {
   public void testListLibrariesPageSetup() throws Exception {
     // Goal: ensure all expected columns are present and no extra
     testPageSetup(ListTarget.LIBRARIES,
-        Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.TISSUE_ORIGIN, Columns.TISSUE_TYPE, Columns.QC, Columns.DESIGN,
+        Sets.newHashSet(Columns.SELECTOR, Columns.NAME, Columns.ALIAS, Columns.TISSUE_ORIGIN, Columns.TISSUE_TYPE, Columns.QC, Columns.DESIGN,
             Columns.SIZE_BP, Columns.INDICES, Columns.LOCATION, Columns.VOLUME, Columns.CONCENTRATION, Columns.LAST_MODIFIED));
   }
 
@@ -222,7 +222,7 @@ public class ListTablesIT extends AbstractIT {
   public void testListLibraryAliquotsPageSetup() throws Exception {
     // Goal: ensure all expected columns are present and no extra
     testPageSetup(ListTarget.LIBRARY_ALIQUOTS,
-        Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.TISSUE_ORIGIN, Columns.TISSUE_TYPE, Columns.QC, Columns.DESIGN,
+        Sets.newHashSet(Columns.SELECTOR, Columns.NAME, Columns.ALIAS, Columns.TISSUE_ORIGIN, Columns.TISSUE_TYPE, Columns.QC, Columns.DESIGN,
             Columns.SIZE_BP, Columns.INDICES, Columns.LOCATION, Columns.VOLUME, Columns.CONCENTRATION, Columns.LAST_MODIFIED));
   }
 
@@ -236,7 +236,7 @@ public class ListTablesIT extends AbstractIT {
   public void testListPoolsPageSetup() throws Exception {
     // Goal: ensure all expected columns are present and no extra
     testTabbedPageSetup(ListTarget.POOLS,
-        Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.DESCRIPTION, Columns.DATE_CREATED, Columns.LIBRARY_ALIQUOTS,
+        Sets.newHashSet(Columns.SELECTOR, Columns.NAME, Columns.ALIAS, Columns.DESCRIPTION, Columns.DATE_CREATED, Columns.LIBRARY_ALIQUOTS,
             Columns.CONCENTRATION, Columns.LOCATION, Columns.AVG_INSERT_SIZE, Columns.LAST_MODIFIED));
   }
 
@@ -258,7 +258,7 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListOrdersSetup() throws Exception {
     login();
-    Set<String> ordersColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.PURPOSE, Columns.ORDER_DESCRIPTION,
+    Set<String> ordersColumns = Sets.newHashSet(Columns.SELECTOR, Columns.NAME, Columns.ALIAS, Columns.PURPOSE, Columns.ORDER_DESCRIPTION,
         Columns.POOL_DESCRIPTION, Columns.INSTRUMENT_MODEL, Columns.LONGEST_INDEX, Columns.CONTAINER_MODEL, Columns.SEQUENCING_PARAMETERS,
         Columns.REMAINING, Columns.LAST_MODIFIED);
     for (String pageName : new String[] { ListTarget.ORDERS_ALL,  ListTarget.ORDERS_OUTSTANDING,  ListTarget.ORDERS_IN_PROGRESS }) {
@@ -302,7 +302,7 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListContainersSetup() throws Exception {
-    testTabbedPageSetup(ListTarget.CONTAINERS, Sets.newHashSet(Columns.SORT, Columns.ID, Columns.SERIAL_NUMBER, Columns.LAST_RUN_NAME,
+    testTabbedPageSetup(ListTarget.CONTAINERS, Sets.newHashSet(Columns.SELECTOR, Columns.ID, Columns.SERIAL_NUMBER, Columns.LAST_RUN_NAME,
         Columns.LAST_RUN_ALIAS, Columns.LAST_SEQUENCER, Columns.LAST_MODIFIED));
   }
 
@@ -313,7 +313,7 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListRunsSetup() throws Exception {
-    testTabbedPageSetup(ListTarget.RUNS, Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.PROJECTS, Columns.SEQ_PARAMS,
+    testTabbedPageSetup(ListTarget.RUNS, Sets.newHashSet(Columns.SELECTOR, Columns.NAME, Columns.ALIAS, Columns.PROJECTS, Columns.SEQ_PARAMS,
         Columns.STATUS, Columns.START_DATE, Columns.END_DATE, Columns.LAST_MODIFIED));
   }
 
@@ -324,7 +324,7 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListBoxesSetup() throws Exception {
-    testTabbedPageSetup(ListTarget.BOXES, Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.DESCRIPTION,
+    testTabbedPageSetup(ListTarget.BOXES, Sets.newHashSet(Columns.SELECTOR, Columns.NAME, Columns.ALIAS, Columns.DESCRIPTION,
         Columns.FREEZER_LOCATION, Columns.LOCATION_NOTE, Columns.ITEMS_CAPACITY, Columns.SIZE, Columns.USE));
   }
 
@@ -391,7 +391,7 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListProjectsSetup() throws Exception {
     testPageSetup(ListTarget.PROJECTS,
-        Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.SHORT_NAME, Columns.DESCRIPTION, Columns.STATUS));
+        Sets.newHashSet(Columns.SELECTOR, Columns.NAME, Columns.ALIAS, Columns.SHORT_NAME, Columns.DESCRIPTION, Columns.STATUS));
   }
 
   @Test
@@ -402,7 +402,7 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListArraysSetup() throws Exception {
     testPageSetup(ListTarget.ARRAYS,
-        Sets.newHashSet(Columns.SORT, Columns.ID, Columns.ALIAS, Columns.SERIAL_NUMBER, Columns.LAST_MODIFIED));
+        Sets.newHashSet(Columns.SELECTOR, Columns.ID, Columns.ALIAS, Columns.SERIAL_NUMBER, Columns.LAST_MODIFIED));
   }
 
   @Test
@@ -422,7 +422,7 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListArrayRunsSetup() throws Exception {
-    testPageSetup(ListTarget.ARRAY_RUNS, Sets.newHashSet(Columns.SORT, Columns.ID, Columns.ALIAS, Columns.STATUS, Columns.START_DATE,
+    testPageSetup(ListTarget.ARRAY_RUNS, Sets.newHashSet(Columns.SELECTOR, Columns.ID, Columns.ALIAS, Columns.STATUS, Columns.START_DATE,
         Columns.END_DATE, Columns.LAST_MODIFIED));
   }
 
@@ -434,7 +434,7 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListWorksetsSetup() throws Exception {
     testTabbedPageSetup(ListTarget.WORKSETS,
-        Sets.newHashSet(Columns.SORT, Columns.ID, Columns.ALIAS, Columns.ITEMS, Columns.STAGE, Columns.DESCRIPTION, Columns.LAST_MODIFIED));
+        Sets.newHashSet(Columns.SELECTOR, Columns.ID, Columns.ALIAS, Columns.ITEMS, Columns.STAGE, Columns.DESCRIPTION, Columns.LAST_MODIFIED));
   }
 
   @Test
@@ -636,7 +636,7 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListPoolOrdersSetup() throws Exception {
-    testTabbedPageSetup(ListTarget.POOL_ORDERS, Sets.newHashSet(Columns.SORT, Columns.ID, Columns.ALIAS, Columns.PURPOSE,
+    testTabbedPageSetup(ListTarget.POOL_ORDERS, Sets.newHashSet(Columns.SELECTOR, Columns.ID, Columns.ALIAS, Columns.PURPOSE,
         Columns.DESCRIPTION, Columns.LIBRARY_ALIQUOTS, Columns.LONGEST_INDEX, Columns.INSTRUMENT_MODEL,
             Columns.SEQUENCING_PARAMETERS, Columns.PARTITIONS));
   }
@@ -698,7 +698,7 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListTransfersSetup() throws Exception {
-    testTabbedPageSetup(ListTarget.TRANSFERS, Sets.newHashSet(Columns.SORT, Columns.ID, Columns.ITEMS, Columns.PROJECTS, Columns.SENDER,
+    testTabbedPageSetup(ListTarget.TRANSFERS, Sets.newHashSet(Columns.SELECTOR, Columns.ID, Columns.ITEMS, Columns.PROJECTS, Columns.SENDER,
         Columns.RECIPIENT, Columns.TRANSFER_TIME, Columns.RECEIVED, Columns.QC_PASSED, Columns.LAST_MODIFIED));
   }
 
@@ -710,7 +710,7 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListLibraryTemplatesSetup() throws Exception {
     testPageSetup(ListTarget.LIBRARY_TEMPLATES,
-        Sets.newHashSet(Columns.SORT, Columns.ALIAS, Columns.LIBRARY_DESIGN, Columns.LIBRARY_DESIGN_CODE, Columns.LIBRARY_TYPE,
+        Sets.newHashSet(Columns.SELECTOR, Columns.ALIAS, Columns.LIBRARY_DESIGN, Columns.LIBRARY_DESIGN_CODE, Columns.LIBRARY_TYPE,
             Columns.LIBRARY_SELECTION, Columns.LIBRARY_STRATEGY, Columns.KIT_NAME, Columns.INDEX_FAMILY, Columns.PLATFORM,
             Columns.DEFAULT_VOLUME));
   }
@@ -803,7 +803,7 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListExperimentsSetup() throws Exception {
-    testPageSetup(ListTarget.EXPERIMENTS, Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.PLATFORM, Columns.LIBRARY_NAME,
+    testPageSetup(ListTarget.EXPERIMENTS, Sets.newHashSet(Columns.SELECTOR, Columns.NAME, Columns.ALIAS, Columns.PLATFORM, Columns.LIBRARY_NAME,
         Columns.LIBRARY_ALIAS, Columns.STUDY_NAME, Columns.STUDY_ALIAS));
   }
 
@@ -826,7 +826,7 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListUsersSetup() throws Exception {
     loginAdmin();
-    testPageSetup(ListTarget.USERS, Sets.newHashSet(Columns.SORT, Columns.LOGIN_NAME, Columns.FULL_NAME, Columns.ACTIVE, Columns.ADMIN,
+    testPageSetup(ListTarget.USERS, Sets.newHashSet(Columns.SELECTOR, Columns.LOGIN_NAME, Columns.FULL_NAME, Columns.ACTIVE, Columns.ADMIN,
         Columns.INTERNAL, Columns.LOGGED_IN), true);
   }
 
@@ -839,7 +839,7 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListGroupsSetup() throws Exception {
     loginAdmin();
-    testPageSetup(ListTarget.GROUPS, Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.DESCRIPTION), true);
+    testPageSetup(ListTarget.GROUPS, Sets.newHashSet(Columns.SELECTOR, Columns.NAME, Columns.DESCRIPTION), true);
   }
 
   @Test
@@ -946,6 +946,27 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListMetricsColumnSort() throws Exception {
     testColumnsSort(ListTarget.METRICS);
+  }
+
+  @Test
+  public void testListAssaysSetup() throws Exception {
+    testPageSetup(ListTarget.ASSAYS, Sets.newHashSet(Columns.ALIAS, Columns.VERSION, Columns.ARCHIVED));
+  }
+
+  @Test
+  public void testListAssaysColumnSort() throws Exception {
+    testColumnsSort(ListTarget.ASSAYS);
+  }
+
+  @Test
+  public void testListRequisitionsSetup() throws Exception {
+    testPageSetup(ListTarget.REQUISITIONS,
+        Sets.newHashSet(Columns.SELECTOR, Columns.ALIAS, Columns.ASSAY, Columns.STOPPED, Columns.LAST_MODIFIED));
+  }
+
+  @Test
+  public void testListRequisitionsColumnSort() throws Exception {
+    testColumnsSort(ListTarget.REQUISITIONS);
   }
 
   private void testPageSetup(String listTarget, Set<String> targetColumns) {

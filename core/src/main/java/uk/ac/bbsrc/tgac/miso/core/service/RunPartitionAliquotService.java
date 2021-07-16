@@ -12,18 +12,20 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 
 public interface RunPartitionAliquotService {
 
-  public RunPartitionAliquot get(Run run, Partition partition, LibraryAliquot aliquot) throws IOException;
+  RunPartitionAliquot get(Run run, Partition partition, LibraryAliquot aliquot) throws IOException;
 
-  public List<RunPartitionAliquot> listByRunId(long runId) throws IOException;
+  List<RunPartitionAliquot> listByRunId(long runId) throws IOException;
 
-  public List<RunPartitionAliquot> listByAliquotId(long aliquotId) throws IOException;
+  List<RunPartitionAliquot> listByAliquotId(long aliquotId) throws IOException;
 
-  public void save(RunPartitionAliquot runPartitionAliquot) throws IOException;
+  List<RunPartitionAliquot> listByLibraryId(long libraryId) throws IOException;
 
-  public void save(List<RunPartitionAliquot> runPartitionAliquots) throws IOException;
+  void save(RunPartitionAliquot runPartitionAliquot) throws IOException;
 
-  public void deleteForRunContainer(Run run, SequencerPartitionContainer container) throws IOException;
+  void save(List<RunPartitionAliquot> runPartitionAliquots) throws IOException;
 
-  public void deleteForPoolAliquot(Pool pool, long aliquotId) throws IOException;
+  void deleteForRunContainer(Run run, SequencerPartitionContainer container) throws IOException;
+
+  void deleteForPoolAliquot(Pool pool, long aliquotId) throws IOException;
 
 }

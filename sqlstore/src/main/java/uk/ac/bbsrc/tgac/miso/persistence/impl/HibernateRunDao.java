@@ -133,6 +133,23 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   }
 
   @Override
+  public List<Run> listByLibraryId(long libraryId) throws IOException {
+    @SuppressWarnings("unchecked")
+    List<Long> ids = currentSession().createCriteria(Run.class)
+        .createAlias("runPositions", "runPos")
+        .createAlias("runPos.container", "spc")
+        .createAlias("spc.partitions", "partition")
+        .createAlias("partition.pool", "pool")
+        .createAlias("pool.poolElements", "element")
+        .createAlias("element.aliquot", "aliquot")
+        .createAlias("aliquot.parentLibrary", "library")
+        .add(Restrictions.eq("library.id", libraryId))
+        .setProjection(Projections.distinct(Projections.property("id")))
+        .list();
+    return listByIdList(ids);
+  }
+
+  @Override
   public List<Run> listBySequencerPartitionContainerId(long containerId) throws IOException {
     // flush here because if Hibernate has not persisted recent changes to container-run relationships, unexpected associations may
     // show up

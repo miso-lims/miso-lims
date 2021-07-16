@@ -1,4 +1,6 @@
 SET FOREIGN_KEY_CHECKS=0;
+DELETE FROM Assay;
+DELETE FROM Assay_Metric;
 DELETE FROM Printer;
 DELETE FROM Submission_Experiment;
 DELETE FROM Submission;
@@ -60,6 +62,8 @@ DELETE FROM LibraryDesign;
 DELETE FROM LibraryDesignCode;
 DELETE FROM LibrarySpikeIn;
 DELETE FROM Metric;
+DELETE FROM Requisition;
+DELETE FROM RequisitionChangeLog;
 DELETE FROM SampleQC;
 DELETE FROM Sample_Note;
 DELETE FROM SampleChangeLog;

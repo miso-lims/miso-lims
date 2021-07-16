@@ -76,7 +76,8 @@ ListTarget.transfer = (function() {
       }];
     },
     searchTermSelector: function(searchTerms) {
-      return [searchTerms['id']];
+      return [searchTerms['id'], searchTerms['entered'], searchTerms['creator'], searchTerms['changed'],
+          searchTerms['changedby']];
     }
   }
 

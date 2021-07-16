@@ -17,15 +17,18 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -60,6 +63,7 @@ public class HibernateLibraryDaoIT extends AbstractDAOTest {
   public void setup() throws IOException {
     MockitoAnnotations.initMocks(this);
     dao.setSessionFactory(sessionFactory);
+    dao.setDetailedSample(true);
   }
 
   @Test
@@ -275,6 +279,37 @@ public class HibernateLibraryDaoIT extends AbstractDAOTest {
     List<Library> libraries = dao.list(3, 3, false, "lastModified");
     assertEquals(3, libraries.size());
     assertEquals(12, libraries.get(0).getId());
+  }
+
+  @Test
+  public void testGetSampleDescendantsPlain() throws Exception {
+    // sam1 > lib1, lib2
+    dao.setDetailedSample(false);
+    List<Library> libraries = dao.getSampleDescendants(1L);
+    assertNotNull(libraries);
+    assertEquals(2, libraries.size());
+    assertTrue(libraries.stream().anyMatch(x -> x.getId() == 1L));
+    assertTrue(libraries.stream().anyMatch(x -> x.getId() == 2L));
+  }
+
+  @Test
+  public void testGetSampleDescendantsDetailedDirect() throws Exception {
+    // sam1 > lib1, lib2
+    List<Library> libraries = dao.getSampleDescendants(1L);
+    assertNotNull(libraries);
+    assertEquals(2, libraries.size());
+    assertTrue(libraries.stream().anyMatch(x -> x.getId() == 1L));
+    assertTrue(libraries.stream().anyMatch(x -> x.getId() == 2L));
+  }
+
+  @Test
+  public void testGetSampleDescendantsDetailedIndirect() throws Exception {
+    // sam17 > ... > lib15
+    Mockito.when(sampleStore.getChildIds(15L, SampleAliquot.CATEGORY_NAME)).thenReturn(Sets.newHashSet(19L));
+    List<Library> libraries = dao.getSampleDescendants(15L);
+    assertNotNull(libraries);
+    assertEquals(1, libraries.size());
+    assertEquals(15L, libraries.get(0).getId());
   }
 
 }

@@ -5,6 +5,7 @@ public class RunPartitionAliquotDto {
   // This ID is only for the sake of DataTables selection and doesn't relate to anything in the DB
   private Long id;
   private Long runId;
+  private String runAlias;
   private String platformType;
   private Long containerId;
   private String containerIdentificationBarcode;
@@ -36,6 +37,14 @@ public class RunPartitionAliquotDto {
 
   public void setRunId(Long runId) {
     this.runId = runId;
+  }
+
+  public String getRunAlias() {
+    return runAlias;
+  }
+
+  public void setRunAlias(String runAlias) {
+    this.runAlias = runAlias;
   }
 
   public String getPlatformType() {

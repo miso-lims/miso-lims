@@ -80,6 +80,8 @@ public interface RunStore extends PaginatedDataSource<Run> {
 
   List<Run> listByLibraryAliquotId(long libraryAliquotId) throws IOException;
 
+  List<Run> listByLibraryId(long libraryId) throws IOException;
+
   /**
    * List all Runs using a Container given a Container ID
    *

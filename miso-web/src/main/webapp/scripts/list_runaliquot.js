@@ -93,69 +93,75 @@ ListTarget.runaliquot = {
     return [];
   },
   createColumns: function(config, projectId) {
-    return [ListUtils.labelHyperlinkColumn("Container", Urls.ui.containers.edit, function(item) {
-      return item.containerId;
-    }, "containerIdentificationBarcode", 2, true), {
-      sTitle: "Partition",
-      mData: "partitionNumber",
-      include: true,
-      iSortPriority: 1,
-      bSortDirection: true
-    }, ListUtils.labelHyperlinkColumn("Name", Urls.ui.libraryAliquots.edit, function(item) {
-      return item.aliquotId;
-    }, "aliquotName", 0, true), ListUtils.labelHyperlinkColumn("Alias", Urls.ui.libraryAliquots.edit, function(item) {
-      return item.aliquotId;
-    }, "aliquotAlias", 0, true), {
-      sTitle: "QC Status",
-      mData: "qcStatusId",
-      mRender: function(data, type, full) {
-        if (data === undefined || data === null) {
-          return 'Pending';
+    return [
+      ListUtils.labelHyperlinkColumn("Run", Urls.ui.runs.edit, function(item) {
+        return item.runId;
+      }, "runAlias", 3, config.requisitionId),
+      ListUtils.labelHyperlinkColumn("Container", Urls.ui.containers.edit, function(item) {
+        return item.containerId;
+      }, "containerIdentificationBarcode", 2, true), {
+        sTitle: "Partition",
+        mData: "partitionNumber",
+        include: true,
+        iSortPriority: 1,
+        bSortDirection: true
+      }, ListUtils.labelHyperlinkColumn("Name", Urls.ui.libraryAliquots.edit, function(item) {
+        return item.aliquotId;
+      }, "aliquotName", 0, true), ListUtils.labelHyperlinkColumn("Alias", Urls.ui.libraryAliquots.edit, function(item) {
+        return item.aliquotId;
+      }, "aliquotAlias", 0, true), {
+        sTitle: "QC Status",
+        mData: "qcStatusId",
+        mRender: function(data, type, full) {
+          if (data === undefined || data === null) {
+            return 'Pending';
+          }
+          var status = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(data), Constants.runLibraryQcStatuses);
+          if (type !== 'display') {
+            return status.description;
+          }
+          return '<div class="tooltip"><span>' + status.description + '</span>'
+              + '<span class="tooltiptext">Set by ' + full.qcUserName + ', ' + full.qcDate
+              + '</span></div>';
         }
-        var status = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(data), Constants.runLibraryQcStatuses);
-        if (type !== 'display') {
-          return status.description;
+      }, {
+        sTitle: "QC Note",
+        mData: 'qcNote',
+        sDefaultContent: ''
+      }, {
+        sTitle: 'Data Review',
+        mData: 'dataReview',
+        mRender: function(data, type, full) {
+          if (data === undefined || data === null) {
+            return 'Pending';
+          }
+          var status = data ? 'Pass' : 'Fail';
+          if (type !== 'display') {
+            return status;
+          }
+          return '<div class="tooltip"><span>' + status + '</span>'
+              + '<span class="tooltiptext">Set by ' + full.dataReviewer + ', ' + full.dataReviewDate
+              + '</span></div>';
         }
-        return '<div class="tooltip"><span>' + status.description + '</span>'
-            + '<span class="tooltiptext">Set by ' + full.qcUserName + ', ' + full.qcDate
-            + '</span></div>';
+      }, {
+        sTitle: 'Hierarchy',
+        mData: function(full) {
+          return full.runId + '-' + full.partitionId + '-' + full.aliquotId;
+        },
+        mRender: function(data, type, full) {
+          if (type === 'display') {
+            return '<a href="' + Urls.ui.runLibraries.qcHierarchy(data) + '">View</a>'
+          }
+          return data;
+        },
+        include: !config.requisitionId
+      }, {
+        sTitle: "Purpose",
+        mData: "runPurposeId",
+        include: !config.requisitionId,
+        iSortPriority: 0,
+        mRender: ListUtils.render.textFromId(Constants.runPurposes, 'alias', '(Unset)')
       }
-    }, {
-      sTitle: "QC Note",
-      mData: 'qcNote',
-      sDefaultContent: ''
-    }, {
-      sTitle: 'Data Review',
-      mData: 'dataReview',
-      mRender: function(data, type, full) {
-        if (data === undefined || data === null) {
-          return 'Pending';
-        }
-        var status = data ? 'Pass' : 'Fail';
-        if (type !== 'display') {
-          return status;
-        }
-        return '<div class="tooltip"><span>' + status + '</span>'
-            + '<span class="tooltiptext">Set by ' + full.dataReviewer + ', ' + full.dataReviewDate
-            + '</span></div>';
-      }
-    }, {
-      sTitle: 'Hierarchy',
-      mData: function(full) {
-        return full.runId + '-' + full.partitionId + '-' + full.aliquotId;
-      },
-      mRender: function(data, type, full) {
-        if (type === 'display') {
-          return '<a href="' + Urls.ui.runLibraries.qcHierarchy(data) + '">View</a>'
-        }
-        return data;
-      }
-    }, {
-      sTitle: "Purpose",
-      mData: "runPurposeId",
-      include: true,
-      iSortPriority: 0,
-      mRender: ListUtils.render.textFromId(Constants.runPurposes, 'alias', '(Unset)')
-    }];
+    ];
   }
 };
