@@ -46,9 +46,9 @@ from these. Clients can then use the flatfile webapp instead, to reduce strain o
   * Copy the built war file (`pinery-miso/target/pinery-miso-<version>.war`) into
     `${CATALINA_HOME}/webapps/`. Rename it to match your desired webapp name (e.g. `pinery-miso.war`)
 
-5. Restart tomcat. You can check out the API documentation to test that deployment was successful.
-   These are available at `http://<server>/<webapp-name>/api-docs/index.html` (e.g.
-   `http://localhost:8080/pinery-miso/api-docs/index.html`)
+5. Restart Tomcat. You can verify that the deployment was successful by accessing Pinery via your
+   web browser at `http://<server>/<webapp-name>/` (e.g. `http://localhost:8080/pinery-miso/`). If
+   the deployment was not successful, you should check the Tomcat logs for errors.
 
 ## Upgrading Pinery-MISO
 
