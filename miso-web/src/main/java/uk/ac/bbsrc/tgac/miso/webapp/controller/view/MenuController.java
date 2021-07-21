@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
@@ -49,7 +48,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
 
 @Controller
 public class MenuController {
@@ -80,27 +78,18 @@ public class MenuController {
   }
 
   @RequestMapping("/myAccount")
-  public ModelAndView myAccountMenu(ModelMap model) {
-    try {
-      User user = authorizationManager.getCurrentUser();
-      String realName = user.getFullName();
-      StringBuilder groups = new StringBuilder();
-      for (String role : user.getRoles()) {
-        groups.append(role.replaceAll("ROLE_", "") + "&nbsp;");
-      }
-      model.put("title", "My Account");
-      model.put("userRealName", realName);
-      model.put("userId", user.getId());
-      model.put("apiKey", SignatureHelper.generatePrivateUserKey((user.getLoginName() + "::" + user.getPassword()).getBytes("UTF-8")));
-      model.put("userGroups", groups.toString());
-      return new ModelAndView("/WEB-INF/pages/myAccount.jsp", model);
-    } catch (IOException e) {
-      log.error("my account menu", e);
-      return new ModelAndView("/WEB-INF/login.jsp", model);
-    } catch (NoSuchAlgorithmException e) {
-      log.error("my account menu", e);
-      return new ModelAndView("/WEB-INF/login.jsp", model);
+  public ModelAndView myAccountMenu(ModelMap model) throws IOException {
+    User user = authorizationManager.getCurrentUser();
+    String realName = user.getFullName();
+    StringBuilder groups = new StringBuilder();
+    for (String role : user.getRoles()) {
+      groups.append(role.replaceAll("ROLE_", "") + "&nbsp;");
     }
+    model.put("title", "My Account");
+    model.put("userRealName", realName);
+    model.put("userId", user.getId());
+    model.put("userGroups", groups.toString());
+    return new ModelAndView("/WEB-INF/pages/myAccount.jsp", model);
   }
 
   @GetMapping("/")
