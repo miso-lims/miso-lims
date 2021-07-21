@@ -322,6 +322,16 @@ public abstract interface PaginationFilter {
     };
   }
 
+  public static PaginationFilter project(String project) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByProject(item, project, errorHandler);
+      }
+    };
+  }
+
   public static PaginationFilter query(final String query) {
     return new PaginationFilter() {
 
