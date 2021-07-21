@@ -183,6 +183,8 @@ public class AdvancedSearchParser {
           }
         case "kitname":
           return PaginationFilter.kitName(phrase);
+        case "project":
+          return PaginationFilter.project(phrase);
         case "subproject":
           return PaginationFilter.subproject(phrase);
         case "sequencingparameters":

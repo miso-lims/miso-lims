@@ -19,6 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferView;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.TransferType;
 import uk.ac.bbsrc.tgac.miso.persistence.ListTransferViewDao;
+import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
@@ -120,6 +121,24 @@ public class HibernateListTransferViewDao implements ListTransferViewDao, Hibern
     default:
       throw new IllegalArgumentException("Unhandled transfer type: " + transferType);
     }
+  }
+
+  @Override
+  public void restrictPaginationByProject(Criteria criteria, String project, Consumer<String> errorHandler) {
+    criteria.createAlias("samples", "sample", JoinType.LEFT_OUTER_JOIN)
+        .createAlias("sample.sample", "parentSample", JoinType.LEFT_OUTER_JOIN)
+        .createAlias("parentSample.project", "sampleProject", JoinType.LEFT_OUTER_JOIN)
+        .createAlias("libraries", "library", JoinType.LEFT_OUTER_JOIN)
+        .createAlias("library.library", "parentLibrary", JoinType.LEFT_OUTER_JOIN)
+        .createAlias("parentLibrary.sample", "librarySample", JoinType.LEFT_OUTER_JOIN)
+        .createAlias("librarySample.project", "libraryProject", JoinType.LEFT_OUTER_JOIN)
+        .createAlias("libraryAliquots", "libraryAliquot", JoinType.LEFT_OUTER_JOIN)
+        .createAlias("libraryAliquot.aliquot", "parentAliquot", JoinType.LEFT_OUTER_JOIN)
+        .createAlias("parentAliquot.library", "aliquotLibrary", JoinType.LEFT_OUTER_JOIN)
+        .createAlias("aliquotLibrary.sample", "aliquotSample", JoinType.LEFT_OUTER_JOIN)
+        .createAlias("aliquotSample.project", "aliquotProject", JoinType.LEFT_OUTER_JOIN)
+        .add(DbUtils.textRestriction(project, "sampleProject.name", "sampleProject.shortName", "libraryProject.name",
+            "libraryProject.shortName", "aliquotProject.name", "aliquotProject.shortName"));
   }
 
 }

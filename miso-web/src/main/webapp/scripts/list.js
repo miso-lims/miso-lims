@@ -175,6 +175,10 @@ ListUtils = (function($) {
     "barcode": {
       term: "barcode:TEXT",
       help: "Checks whether the item's barcode matches"
+    },
+    "project": {
+      term: "project:TEXT",
+      help: "Checks whether the item involves the specified project (name or short name)"
     }
   };
 

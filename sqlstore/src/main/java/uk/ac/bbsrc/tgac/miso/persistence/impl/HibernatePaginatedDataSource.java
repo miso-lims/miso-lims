@@ -341,6 +341,11 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
+  default void restrictPaginationByProject(Criteria criteria, String project, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s cannot be filtered by project.", getFriendlyName()));
+  }
+
+  @Override
   default void restrictPaginationByQuery(Criteria criteria, String query, Consumer<String> errorHandler) {
     String[] properties = getSearchProperties();
     if (properties == null || properties.length == 0) {
