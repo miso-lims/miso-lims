@@ -108,7 +108,7 @@ public class DefaultQcTypeService implements QcTypeService {
     to.setName(from.getName());
     to.setDescription(LimsUtils.isStringBlankOrNull(from.getDescription()) ? "" : from.getDescription());
     to.setQcTarget(from.getQcTarget());
-    to.setUnits(LimsUtils.isStringBlankOrNull(from.getUnits()) ? "" : from.getUnits());
+    to.setUnits(from.getUnits());
     to.setPrecisionAfterDecimal(from.getPrecisionAfterDecimal());
     to.setCorrespondingField(from.getCorrespondingField());
     to.setAutoUpdateField(from.isAutoUpdateField());
