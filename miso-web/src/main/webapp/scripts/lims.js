@@ -1139,6 +1139,11 @@ Utils.ui = {
       text: action.name
     });
     button.click(function() {
+      var items = getItems();
+      if (!items || !items.length) {
+        Utils.showOkDialog(action.title, ['Nothing selected.']);
+        return;
+      }
       action.action(getItems());
     });
     return button;
