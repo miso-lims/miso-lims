@@ -127,7 +127,7 @@ public class DeleteIT extends AbstractIT {
 
   @Test
   public void testDeleteTransfer() {
-    testDelete(ListTarget.TRANSFERS, Tabs.RECEIPT, "2", Columns.ID, Transfer.class, 2L);
+    testDelete(ListTarget.TRANSFERS, Tabs.RECEIPT, "id:2", Columns.ID, "2", Transfer.class, 2L);
   }
 
   @Test
@@ -433,17 +433,22 @@ public class DeleteIT extends AbstractIT {
 
   private void testDelete(String listTarget, String tab, String search, String selectByColumn, Class<?> clazz,
       Long id) {
+    testDelete(listTarget, tab, search, selectByColumn, search, clazz, id);
+  }
+
+  private void testDelete(String listTarget, String tab, String search, String selectByColumn, String columnValue, Class<?> clazz,
+      Long id) {
     login();
-    doTestDelete(listTarget, tab, search, selectByColumn, clazz, id);
+    doTestDelete(listTarget, tab, search, selectByColumn, columnValue, clazz, id);
   }
 
   private void testAdminDelete(String listTarget, String tab, String search, String selectByColumn, Class<?> clazz,
       Long id) {
     loginAdmin();
-    doTestDelete(listTarget, tab, search, selectByColumn, clazz, id);
+    doTestDelete(listTarget, tab, search, selectByColumn, search, clazz, id);
   }
 
-  private void doTestDelete(String listTarget, String tab, String search, String selectByColumn, Class<?> clazz,
+  private void doTestDelete(String listTarget, String tab, String search, String selectByColumn, String columnValue, Class<?> clazz,
       Long id) {
     assertNotNull("Couldn't find item in the database", getSession().get(clazz, id));
     AbstractListPage page = null;
@@ -456,7 +461,7 @@ public class DeleteIT extends AbstractIT {
     }
     DataTable table = page.getTable();
     if (search != null) {
-      if (table.hasAdvancedSearch()) {
+      if (table.hasAdvancedSearch() && search.equals(columnValue)) {
         table.searchFor("\"" + search + "\"");
       } else {
         table.searchFor(search);
@@ -466,7 +471,7 @@ public class DeleteIT extends AbstractIT {
     assertFalse("No values found in column", values.isEmpty());
     boolean found = false;
     for (int i = 0; i < values.size(); i++) {
-      if (values.get(i).equals(search)) {
+      if (values.get(i).equals(columnValue)) {
         table.checkBoxForRow(i);
         found = true;
         break;
