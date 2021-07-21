@@ -97,7 +97,10 @@ public class DbUtils {
   }
 
   public static Criterion textRestriction(String query, String... searchProperties) {
-    if (searchProperties.length == 1) {
+    if (searchProperties == null || searchProperties.length == 0) {
+      // Sabotage the query to return nothing if there are no properties
+      return Restrictions.sqlRestriction("FALSE");
+    } else if (searchProperties.length == 1) {
       return textRestriction(searchProperties[0], query);
     } else {
       Criterion[] criteria = new Criterion[searchProperties.length];
