@@ -16,6 +16,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.DefaultNameValidator
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.NameValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrProjectShortNameValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.V2LibraryAliasValidator;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.V2LibraryAliquotAliasValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.V2SampleAliasValidator;
 
 /**
@@ -29,6 +30,7 @@ public class V2NamingScheme extends AbstractNamingScheme {
   private final V2SampleAliasGenerator sampleAliasGenerator = new V2SampleAliasGenerator();
   private final V2LibraryAliasValidator libraryAliasValidator = new V2LibraryAliasValidator();
   private final V2LibraryAliasGenerator libraryAliasGenerator = new V2LibraryAliasGenerator();
+  private final V2LibraryAliquotAliasValidator libraryAliquotAliasValidator = new V2LibraryAliquotAliasValidator();
   private final V2LibraryAliquotAliasGenerator libraryAliquotAliasGenerator = new V2LibraryAliquotAliasGenerator();
   private final OicrProjectShortNameValidator projectShortNameValidator = new OicrProjectShortNameValidator();
 
@@ -146,7 +148,7 @@ public class V2NamingScheme extends AbstractNamingScheme {
 
   @Override
   protected NameValidator getLibraryAliquotAliasValidator() {
-    return libraryAliasValidator;
+    return libraryAliquotAliasValidator;
   }
 
   @Override
