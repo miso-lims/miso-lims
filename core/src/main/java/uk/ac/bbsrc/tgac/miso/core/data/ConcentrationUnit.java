@@ -4,21 +4,24 @@ import java.util.stream.Stream;
 
 public enum ConcentrationUnit {
 
-  NANOGRAMS_PER_MICROLITRE("ng/&#181;L", "µL"), //
+  NANOGRAMS_PER_MICROLITRE("ng/&#181;L", "ng/µL", "ng/uL"), //
   NANOMOLAR("nM"), //
   PICOMOLAR("pM");
 
   private final String units;
   private final String rawLabel;
+  private final String alternateLabel;
 
   private ConcentrationUnit(String units) {
     this.units = units;
     this.rawLabel = units;
+    this.alternateLabel = null;
   }
 
-  private ConcentrationUnit(String units, String rawLabel) {
+  private ConcentrationUnit(String units, String rawLabel, String alternateLabel) {
     this.units = units;
     this.rawLabel = rawLabel;
+    this.alternateLabel = alternateLabel;
   }
 
   public String getUnits() {
@@ -29,6 +32,10 @@ public enum ConcentrationUnit {
     return rawLabel;
   }
 
+  public String getAlternateLabel() {
+    return alternateLabel;
+  }
+
   /**
    * Finds the ConcentrationUnit corresponding to a unit String, or null if no ConcentrationUnit is found.
    * 
@@ -36,8 +43,13 @@ public enum ConcentrationUnit {
    * @return ConcentrationUnit The ConcentrationUnit with the specified units, or null if no ConcentrationUnits have the specified units
    */
   public static ConcentrationUnit getFromString(String units) {
-    return Stream.of(ConcentrationUnit.values()).filter(concentrationUnit -> concentrationUnit.getUnits().equals(units)).findFirst()
-        .orElse(null);
+    if (units == null) {
+      return null;
+    }
+    return Stream.of(ConcentrationUnit.values())
+        .filter(concentrationUnit -> units.equalsIgnoreCase(concentrationUnit.getRawLabel())
+            || units.equalsIgnoreCase(concentrationUnit.getAlternateLabel()))
+        .findFirst().orElse(null);
   }
 
 }

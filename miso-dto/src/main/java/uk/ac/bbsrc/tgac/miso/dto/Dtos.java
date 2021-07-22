@@ -2276,7 +2276,7 @@ public class Dtos {
     dto.setName(from.getName());
     dto.setDescription(from.getDescription());
     dto.setQcTarget(from.getQcTarget());
-    dto.setUnits(from.getUnits());
+    setString(dto::setUnits, from.getUnits());
     dto.setPrecisionAfterDecimal(from.getPrecisionAfterDecimal());
     dto.setCorrespondingField(from.getCorrespondingField());
     dto.setAutoUpdateField(from.isAutoUpdateField());

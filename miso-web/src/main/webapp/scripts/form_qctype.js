@@ -140,7 +140,6 @@ FormTarget.qctype = (function($) {
       title: 'Units',
       data: 'units',
       type: 'text',
-      required: true,
       maxLength: 20
     }, {
       title: 'Results Format',
