@@ -61,13 +61,8 @@
   </bean>
 
   <bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
-  <bean id="httpSessionSecurityContextRepository" class="org.springframework.security.web.context.HttpSessionSecurityContextRepository" />
-  <bean id="restSignatureFilter" class="uk.ac.bbsrc.tgac.miso.webapp.context.RestSignatureFilter">
-    <constructor-arg ref="httpSessionSecurityContextRepository" />
-  </bean>
   
   <security:http entry-point-ref="loginUrlEntryPoint">
-  	<security:custom-filter ref="restSignatureFilter" after="SESSION_MANAGEMENT_FILTER"/>
     <security:access-denied-handler error-page="/miso/accessDenied"/>
     <security:csrf disabled="true" />
     

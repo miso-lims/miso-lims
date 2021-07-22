@@ -265,40 +265,6 @@ A great deal of MISO can be configured at the Spring XML level, making it easy f
 The REST API is used primarily to support AJAX on the front-end. Because the model classes may be very complex and sometimes contain a
 deep graph of nested objects, they are converted to simpler Data Transfer Objects (DTO) before serializion to JSON.
 
-#### Request Signing
-
-Signing requests requires 3 elements:
-
-* REST API URL of the service you wish to request
-* Your MISO username
-* Your MISO API key - this can be found by logging in to MISO as normal and clicking your username at the top right. The key is in the top box
-
-Producing HMAC keys from these elements for your request is easy:
-
-```
-echo -n "<REST-url>?x-url=<REST-url>@x-user=<miso_user_name>" | openssl sha1 -binary -hmac "<your_key_from_miso>" | openssl base64 | tr -d = | tr +/ -_
-```
-
-You can then use curl to initiate the request, using the REST API URL, your username, and the signed fragment produced above:
-
-```
-curl --request GET 'http://<miso_url>/<REST-url>'--header 'x-user:<miso_user_name>'--header 'x-signature:<hmac_string_from_above>'--header 'x-url:<REST-url>'
-```
-
-Putting the two together, here's an example shell script that can grab a list of libraries associated with a project:
-
-```
-#!/bin/bash
-
-PROJECTID=$1
-USER=$2
-KEY=$3
-
-SIGNATURE=`echo -n "/miso/rest/projects/$PROJECTID/libraries?x-url=/miso/rest/projects/$PROJECTID/libraries@x-user=$USER" | openssl sha1 -binary -hmac "$KEY" | openssl base64 | tr -d = | tr +/ -_`
-
-curl --request GET "http://your.miso.url/miso/rest/projects/$PROJECTID/libraries" --header "x-user:$USER" --header "x-signature:$SIGNATURE" --header "x-url:/miso/rest/projects/$PROJECTID/libraries"
-```
-
 ## Run Scanner
 (TODO)
 
