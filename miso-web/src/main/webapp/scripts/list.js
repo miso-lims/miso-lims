@@ -97,7 +97,7 @@ ListUtils = (function($) {
     },
     "external": {
       term: "external:TEXT",
-      help: "Checks if an item came from the external identifier or external name."
+      help: "Checks whether an item has the specified external name or secondary identifier."
     },
     "box": {
       term: "box:TEXT",
