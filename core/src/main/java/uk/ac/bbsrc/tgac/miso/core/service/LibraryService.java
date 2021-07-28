@@ -12,16 +12,18 @@ public interface LibraryService extends PaginatedDataSource<Library>, Barcodable
     NoteService<Library>, BulkSaveService<Library> {
 
   @Override
-  public default EntityType getEntityType() {
+  default EntityType getEntityType() {
     return EntityType.LIBRARY;
   }
 
-  public List<Library> list() throws IOException;
+  List<Library> list() throws IOException;
 
-  public EntityReference getAdjacentLibrary(Library library, boolean before) throws IOException;
+  EntityReference getAdjacentLibrary(Library library, boolean before) throws IOException;
 
-  public List<Library> listBySampleId(long sampleId) throws IOException;
+  List<Library> listBySampleId(long sampleId) throws IOException;
 
-  public List<Library> listByProjectId(long projectId) throws IOException;
+  List<Library> listByProjectId(long projectId) throws IOException;
+
+  List<Library> getSampleDescendants(long parentSampleId) throws IOException;
 
 }

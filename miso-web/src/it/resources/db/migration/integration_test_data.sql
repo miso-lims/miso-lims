@@ -9,6 +9,23 @@ INSERT INTO Metric(metricId, alias, category, thresholdType, units) VALUES
 (3, 'Min Clusters (PF)', 'LOW_PASS_SEQUENCING', 'GT', 'K/lane'),
 (4, 'To Delete', 'FULL_DEPTH_SEQUENCING', 'BOOLEAN', NULL);
 
+INSERT INTO Assay(assayId, alias, version, archived) VALUES
+(1, 'Main Assay', '1.0', FALSE),
+(2, 'Alternate Assay', '1.0', TRUE),
+(3, 'Alternate Assay', '2.0', FALSE),
+(4, 'Bad Assay', '1.0', FALSE);
+
+INSERT INTO Assay_Metric(assayId, metricId, minimumThreshold, maximumThreshold) VALUES
+(1, 1, NULL, NULL),
+(1, 2, 10, NULL),
+(1, 3, 500, NULL),
+(2, 1, NULL, NULL),
+(2, 2, 5, NULL),
+(2, 3, 500, NULL),
+(3, 1, NULL, NULL),
+(3, 2, 8, NULL),
+(3, 3, 500, NULL);
+
 INSERT INTO RunLibraryQcStatus(statusId, description, qcPassed) VALUES
 (1, 'Passed', TRUE),
 (2, 'Failed', FALSE),
@@ -495,6 +512,10 @@ INSERT INTO Study (studyId, name, project_projectId, alias, studyTypeId, creator
 (3, 'STU3', 3, 'Study Three', 1, 1, '2020-02-20 11:53:00', 1, '2020-02-20 11:53:00'),
 (400, 'STU400', 400, 'UI Test Study', 1, 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00');
 
+INSERT INTO Requisition(requisitionId, alias, assayId, creator, created, lastModifier, lastModified) VALUES
+(1, 'Req One', 1, 1, '2021-07-21 11:31:00', 1, '2021-07-21 11:31:00'),
+(2, 'Req Two', 3, 3, '2021-07-21 11:31:00', 3, '2021-07-21 11:31:00');
+
 -- Identities
 INSERT INTO Sample (sampleId, project_projectId, name, alias, description, identificationBarcode, sampleType, scientificNameId, volume, volumeUnits, concentration, concentrationUnits, creator, created, lastModifier, lastModified,
   nonStandardAlias, isSynthetic, sampleClassId, parentId, siblingNumber, groupId, groupDescription, detailedQcStatusId, detailedQcStatusNote, qcUser, qcDate, archived, discriminator,
@@ -530,34 +551,34 @@ INSERT INTO Sample (sampleId, project_projectId, name, alias, description, ident
 -- Tissues
 INSERT INTO Sample (sampleId, project_projectId, name, alias, description, identificationBarcode, sampleType, scientificNameId, volume, volumeUnits, concentration, concentrationUnits, creator, created, lastModifier, lastModified,
   nonStandardAlias, isSynthetic, sampleClassId, parentId, siblingNumber, groupId, groupDescription, detailedQcStatusId, detailedQcStatusNote, qcUser, qcDate, archived, discriminator,
-  tissueOriginId, tissueTypeId, secondaryIdentifier, labId, region, passageNumber, tubeNumber, timesReceived, tissueMaterialId) VALUES
+  tissueOriginId, tissueTypeId, secondaryIdentifier, labId, region, passageNumber, tubeNumber, timesReceived, tissueMaterialId, requisitionId) VALUES
 (2, 3, 'SAM2', 'TEST_0001_Bn_R_nn_1-1', 'Tissue', '22222', 'GENOMIC', 1, 30, 'MICROLITRES', NULL, NULL, 1, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00',
   FALSE, FALSE, 23, 1, NULL, NULL, NULL, 1, NULL, 1, '2017-07-20', 0, 'Tissue',
-  1, 1, 'tube 1', 2, 'cortex', NULL, 1, 1, 2),
+  1, 1, 'tube 1', 2, 'cortex', NULL, 1, 1, 2, 1),
 (202, 200, 'SAM202', 'SORT_0001_nn_n_1-1', NULL, NULL, 'GENOMIC', 1, NULL, NULL, NULL, NULL, 1, '2017-08-09 11:51:00', 1, '2017-08-09 11:51:00',
   FALSE, FALSE, 23, 201, NULL, NULL, NULL, 1, NULL, 1, '2017-08-09', 0, 'Tissue',
-  1, 1, NULL, NULL, NULL, NULL, 1, 1, NULL),
+  1, 1, NULL, NULL, NULL, NULL, 1, 1, NULL, NULL),
 (302, 300, 'SAM302', 'DILT_0001_nn_n_1-1', NULL, NULL, 'GENOMIC', 1, NULL, NULL, NULL, NULL, 1, '2017-08-14 11:55:00', 1, '2017-08-14 11:55:00',
   FALSE, FALSE, 23, 301, NULL, NULL, NULL, 1, NULL, 1, '2017-08-14', 0, 'Tissue',
-  1, 1, NULL, NULL, NULL, NULL, 1, 1, NULL),
+  1, 1, NULL, NULL, NULL, NULL, 1, 1, NULL, NULL),
 (502, 500, 'SAM502', 'TIB_0001_nn_n_1-1', NULL, 'TIB_SamTissue', 'GENOMIC', 1, NULL, NULL, NULL, NULL, 1, '2017-08-15 13:45:00', 1, '2017-08-15 13:45:00',
   FALSE, FALSE, 23, 501, NULL, NULL, NULL, 1, NULL, 1, '2017-08-15', 0, 'Tissue',
-  1, 1, NULL, NULL, NULL, NULL, 1, 1, NULL),
+  1, 1, NULL, NULL, NULL, NULL, 1, 1, NULL, NULL),
 (4442, 4440, 'SAM4442', 'PROP_0001_nn_n_1-1', NULL, NULL, 'GENOMIC', 1, NULL, NULL, NULL, NULL, 1, '2017-10-26 14:40:00', 1, '2017-10-26 14:40:00',
   FALSE, FALSE, 23, 4441, 1, NULL, NULL, NULL, NULL, NULL, NULL, 0, 'Tissue',
-  4, 14, NULL, NULL, NULL, NULL, 1, 1, NULL),
-(100002, 100001, 'SAM100002', 'LIBT_0001_Ly_P_1-1', NULL, NULL, 'GENOMIC', 1, NULL, NULL, NULL, NULL, 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00',
+  4, 14, NULL, NULL, NULL, NULL, 1, 1, NULL, NULL),
+(100002, 100001, 'SAM100002', 'LIBT_0001_Ly_P_nn_1-1', NULL, NULL, 'GENOMIC', 1, NULL, NULL, NULL, NULL, 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00',
   FALSE, FALSE, 23, 100001, NULL, NULL, NULL, 1, NULL, 1, '2017-07-24', 0, 'Tissue',
-  2, 2, NULL, NULL, NULL, NULL, 1, 1, NULL),
+  2, 2, NULL, NULL, NULL, NULL, 1, 1, NULL, 2),
 (110002, 110001, 'SAM110002', '1LIB_0001_Ly_P_1-1', NULL, NULL, 'GENOMIC', 1, NULL, NULL, NULL, NULL, 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00',
   FALSE, FALSE, 23, 110001, NULL, NULL, NULL, 1, NULL, 1, '2017-07-24', 0, 'Tissue',
-  2, 2, NULL, NULL, NULL, NULL, 1, 1, NULL),
+  2, 2, NULL, NULL, NULL, NULL, 1, 1, NULL, NULL),
 (120002, 120001, 'SAM120002', '1IPO_0001_Ly_P_1-1', NULL, NULL, 'GENOMIC', 1, NULL, NULL, NULL, NULL, 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00',
   FALSE, FALSE, 23, 120001, NULL, NULL, NULL, 1, NULL, 1, '2017-07-24', 0, 'Tissue',
-  2, 2, NULL, NULL, NULL, NULL, 1, 1, NULL),
+  2, 2, NULL, NULL, NULL, NULL, 1, 1, NULL, NULL),
 (200002, 200001, 'SAM200002', 'IPOT_0001_Pa_P_1-1', NULL, NULL, 'GENOMIC', 1, NULL, NULL, NULL, NULL, 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00',
   FALSE, FALSE, 23, 200001, NULL, NULL, NULL, 1, NULL, 1, '2017-07-24', 0, 'Tissue',
-  3, 2, NULL, NULL, NULL, NULL, 1, 1, NULL);
+  3, 2, NULL, NULL, NULL, NULL, 1, 1, NULL, NULL);
 
 -- Slides
 INSERT INTO Sample (sampleId, project_projectId, name, alias, description, identificationBarcode, sampleType, scientificNameId, volume, volumeUnits, concentration, concentrationUnits, creator, created, lastModifier, lastModified,

@@ -1,11 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.sql.JoinType;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,7 @@ public class HibernateRequisitionDao extends HibernateSaveDao<Requisition>
     implements HibernatePaginatedDataSource<Requisition>, RequisitionDao {
 
   private final static String[] SEARCH_PROPERTIES = new String[] { "alias" };
+  private static final List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("assay", JoinType.LEFT_OUTER_JOIN));
 
   public HibernateRequisitionDao() {
     super(Requisition.class);
@@ -56,22 +58,34 @@ public class HibernateRequisitionDao extends HibernateSaveDao<Requisition>
 
   @Override
   public Iterable<AliasDescriptor> listAliases() {
-    return Collections.emptySet();
+    return STANDARD_ALIASES;
   }
 
   @Override
   public String propertyForDate(Criteria criteria, DateType type) {
-    return null;
+    switch (type) {
+    case ENTERED:
+      return "created";
+    case UPDATE:
+      return "lastModified";
+    default:
+      return null;
+    }
   }
 
   @Override
   public String propertyForSortColumn(String original) {
-    return original;
+    switch (original) {
+    case "assayId":
+      return "assay.alias";
+    default:
+      return original;
+    }
   }
 
   @Override
   public String propertyForUser(boolean creator) {
-    return null;
+    return creator ? "creator" : "lastModifier";
   }
 
 }

@@ -3,9 +3,11 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -31,8 +33,11 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
@@ -50,13 +55,16 @@ import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 @Transactional(rollbackFor = Exception.class)
 public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxableSource<Sample> {
 
-  private final static String[] SEARCH_PROPERTIES = new String[] { "alias", "identificationBarcode", "name" };
-  private final static List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(
+  private static final String[] SEARCH_PROPERTIES = new String[] { "alias", "identificationBarcode", "name" };
+  private static final List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(
       new AliasDescriptor("parentAttributes", JoinType.LEFT_OUTER_JOIN),
       new AliasDescriptor("parentAttributes.tissueAttributes", JoinType.LEFT_OUTER_JOIN),
       new AliasDescriptor("tissueAttributes.tissueOrigin", JoinType.LEFT_OUTER_JOIN),
       new AliasDescriptor("tissueAttributes.tissueType", JoinType.LEFT_OUTER_JOIN),
       new AliasDescriptor("sampleClass", JoinType.LEFT_OUTER_JOIN));
+
+  private static final List<String> SAMPLE_CATEGORIES = Arrays.asList(SampleIdentity.CATEGORY_NAME, SampleTissue.CATEGORY_NAME,
+      SampleTissueProcessing.CATEGORY_NAME, SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME);
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
@@ -103,7 +111,7 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
-  public List<Sample> listByIdList(List<Long> idList) throws IOException {
+  public List<Sample> listByIdList(Collection<Long> idList) throws IOException {
     if (idList.isEmpty()) {
       return Collections.emptyList();
     }
@@ -360,6 +368,43 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
         .setProjection(EntityReference.makeProjectionList("id", "name"))
         .setResultTransformer(EntityReference.RESULT_TRANSFORMER)
         .uniqueResult();
+  }
+
+  @Override
+  public List<Sample> getChildren(long parentId, String targetSampleCategory) throws IOException {
+    Set<Long> childIds = getChildIds(parentId, targetSampleCategory);
+    return listByIdList(new ArrayList<>(childIds));
+  }
+
+  @Override
+  public Set<Long> getChildIds(long parentId, String targetSampleCategory) throws IOException {
+    Set<Long> ids = new HashSet<>();
+    collectChildSampleIds(parentId, targetSampleCategory, ids);
+    return ids;
+  }
+
+  private void collectChildSampleIds(long parentId, String targetSampleCategory, Collection<Long> output) throws IOException {
+    @SuppressWarnings("unchecked")
+    List<Object[]> results = currentSession().createCriteria(SampleImpl.class)
+        .createAlias("parent", "parent")
+        .createAlias("sampleClass", "sampleClass")
+        .add(Restrictions.eq("parent.sampleId", parentId))
+        .setProjection(
+            Projections.projectionList()
+                .add(Projections.property("sampleId"))
+                .add(Projections.property("sampleClass.sampleCategory")))
+        .list();
+    int targetIndex = SAMPLE_CATEGORIES.indexOf(targetSampleCategory);
+    for (Object[] result : results) {
+      Long childId = (Long) result[0];
+      String childCategory = (String) result[1];
+      if (childCategory.equals(targetSampleCategory)) {
+        output.add(childId);
+      }
+      if (SAMPLE_CATEGORIES.indexOf(childCategory) <= targetIndex) {
+        collectChildSampleIds(childId, targetSampleCategory, output);
+      }
+    }
   }
 
   @Override

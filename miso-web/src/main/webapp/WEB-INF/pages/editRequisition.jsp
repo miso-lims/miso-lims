@@ -58,8 +58,14 @@
       
       <miso:attachments item="${requisition}"/>
       <miso:qcs id="list_qc" item="${requisition}"/>
-      <miso:list-section-ajax id="list_samples" name="Samples" target="sample" config="{requisitionId: ${requisition.id}}"/>
+      <miso:list-section-ajax id="list_samples" name="Requisitioned Samples" target="sample" config="{requisitionId: ${requisition.id}}"/>
       <br>
+      <c:if test="${detailedSample}">
+        <miso:list-section id="list_extractions" name="Extractions" target="sample" items="${extractions}"/>
+      </c:if>
+      <miso:list-section id="list_libraries" name="Libraries" target="library" items="${libraries}"/>
+      <miso:list-section id="list_runs" name="Runs" target="run" items="${runs}" config="{requisitionId: ${requisition.id}}"/>
+      <miso:list-section id="list_runLibraries" name="Run-Libraries" target="runaliquot" items="${runLibraries}" config="{requisitionId: ${requisition.id}}"/>
       <miso:changelog item="${requisition}"/>
     </c:otherwise>
   </c:choose>

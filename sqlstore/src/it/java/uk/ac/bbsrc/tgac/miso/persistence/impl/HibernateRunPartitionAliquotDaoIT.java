@@ -68,6 +68,14 @@ public class HibernateRunPartitionAliquotDaoIT extends AbstractDAOTest {
   }
 
   @Test
+  public void testListByLibraryId() throws Exception {
+    List<RunPartitionAliquot> results = sut.listByLibraryId(2L);
+    assertNotNull(results);
+    assertEquals(1, results.size());
+    assertEquals(2L, results.get(0).getAliquot().getLibrary().getId());
+  }
+
+  @Test
   public void testCreate() throws Exception {
     Run run = (Run) currentSession().get(Run.class, 1L);
     Partition partition = (Partition) currentSession().get(PartitionImpl.class, 2L);

@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.AssayMetric;
 
 public class HibernateAssayDaoIT extends AbstractHibernateSaveDaoTest<Assay, HibernateAssayDao> {
 
@@ -48,7 +49,8 @@ public class HibernateAssayDaoIT extends AbstractHibernateSaveDaoTest<Assay, Hib
 
   @Test
   public void testGetUsage() throws Exception {
-    // TODO
+    Assay assay = (Assay) currentSession().get(Assay.class, 1L);
+    assertEquals(1L, getTestSubject().getUsage(assay));
   }
 
   @Test
@@ -58,7 +60,21 @@ public class HibernateAssayDaoIT extends AbstractHibernateSaveDaoTest<Assay, Hib
 
   @Test
   public void testDeleteAssayMetric() throws Exception {
-    // TODO
+    final long assayId = 2L;
+    final long metricId = 2L;
+
+    Assay before = (Assay) currentSession().get(Assay.class, assayId);
+    assertEquals(2, before.getAssayMetrics().size());
+    AssayMetric beforeMetric = before.getAssayMetrics().stream().filter(x -> x.getMetric().getId() == metricId).findAny().orElse(null);
+    before.getAssayMetrics().remove(beforeMetric);
+    assertNotNull(beforeMetric);
+    getTestSubject().deleteAssayMetric(beforeMetric);
+
+    clearSession();
+
+    Assay after = (Assay) currentSession().get(Assay.class, assayId);
+    assertEquals(1, after.getAssayMetrics().size());
+    assertTrue(after.getAssayMetrics().stream().noneMatch(x -> x.getMetric().getId() == metricId));
   }
 
 }

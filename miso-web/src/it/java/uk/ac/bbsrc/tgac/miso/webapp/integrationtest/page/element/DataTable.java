@@ -117,7 +117,7 @@ public class DataTable extends AbstractElement {
   }
 
   public void checkBoxForRow(int rowNum) {
-    List<WebElement> checkbox = getCell(Columns.SORT, rowNum).findElements(By.tagName("input"));
+    List<WebElement> checkbox = getCell(Columns.SELECTOR, rowNum).findElements(By.tagName("input"));
     if (checkbox.isEmpty()) {
       throw new IllegalArgumentException("Row " + rowNum + " does not have a checkbox to click.");
     }

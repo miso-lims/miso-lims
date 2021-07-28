@@ -25,6 +25,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.ScientificName;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
@@ -413,6 +414,16 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
     Criteria criteria = Mockito.mock(Criteria.class);
     assertNull(dao.propertyForDate(criteria, DateType.RECEIVE));
     assertNull(dao.propertyForDate(criteria, DateType.DISTRIBUTED));
+  }
+
+  @Test
+  public void testGetChildren() throws Exception {
+    final long identityId = 15L;
+    final long stockId = 18L;
+    List<Sample> children = dao.getChildren(identityId, SampleStock.CATEGORY_NAME);
+    assertNotNull(children);
+    assertEquals(1, children.size());
+    assertEquals(stockId, children.get(0).getId());
   }
 
 }

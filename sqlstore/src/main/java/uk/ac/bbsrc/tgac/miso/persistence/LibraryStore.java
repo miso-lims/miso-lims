@@ -68,4 +68,6 @@ public interface LibraryStore extends Store<Library>, PaginatedDataSource<Librar
 
   EntityReference getAdjacentLibrary(Library library, boolean before) throws IOException;
 
+  List<Library> getSampleDescendants(long parentSampleId) throws IOException;
+
 }

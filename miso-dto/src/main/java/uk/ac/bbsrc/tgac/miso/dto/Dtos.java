@@ -4085,6 +4085,7 @@ public class Dtos {
     setId(to::setRunId, from.getRun());
     setId(to::setPartitionId, from.getPartition());
     setId(to::setAliquotId, from.getAliquot());
+    setString(to::setRunAlias, maybeGetProperty(from.getRun(), Run::getAlias));
     if (from.getRun() != null && from.getRun().getPlatformType() != null) {
       to.setPlatformType(from.getRun().getPlatformType().name());
     }

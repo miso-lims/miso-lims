@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
@@ -35,6 +36,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.QcCorrespondingField;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QualityControllable;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.RequisitionQC;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
 public class Requisition implements Aliasable, Attachable, ChangeLoggable, Deletable, QualityControllable<RequisitionQC>, Serializable {
@@ -247,6 +249,20 @@ public class Requisition implements Aliasable, Attachable, ChangeLoggable, Delet
   @Override
   public void setPendingAttachmentDeletions(List<FileAttachment> pendingAttachmentDeletions) {
     this.pendingAttachmentDeletions = pendingAttachmentDeletions;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(requisitionId, alias, assay, stopped);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return LimsUtils.equals(this, obj,
+        Requisition::getId,
+        Requisition::getAlias,
+        Requisition::getAssay,
+        Requisition::isStopped);
   }
 
 }

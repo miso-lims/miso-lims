@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.persistence;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -69,7 +70,7 @@ public interface SampleStore extends PaginatedDataSource<Sample> {
    * @throws IOException
    *           when the objects cannot be retrieved
    */
-  List<Sample> listByIdList(List<Long> idList) throws IOException;
+  List<Sample> listByIdList(Collection<Long> idList) throws IOException;
 
   Sample getByLibraryAliquotId(long aliquotId) throws IOException;
 
@@ -115,20 +116,40 @@ public interface SampleStore extends PaginatedDataSource<Sample> {
    * @return the matching ghost tissue, if one exists; null otherwise
    * @throws IOException
    */
-  public SampleTissue getMatchingGhostTissue(SampleTissue tissue) throws IOException;
+  SampleTissue getMatchingGhostTissue(SampleTissue tissue) throws IOException;
 
-  public long getChildSampleCount(Sample sample);
+  long getChildSampleCount(Sample sample);
 
   /**
    * @param sample the "current" sample
    * @return a reference to the sample in the same project as the "current" sample with the next ID in numerical order
    */
-  public EntityReference getNextInProject(Sample sample);
+  EntityReference getNextInProject(Sample sample);
 
   /**
    * @param sample the "current" sample
    * @return a reference to the sample in the same project as the "current" sample with the previous ID in numerical order
    */
-  public EntityReference getPreviousInProject(Sample sample);
+  EntityReference getPreviousInProject(Sample sample);
+
+  /**
+   * Get all descendants of the specified sample that have a particular sample category
+   * 
+   * @param parentId id of the sample from which to find descendants
+   * @param targetSampleCategory sample category of descendants to return
+   * @return all of the matching descendants
+   * @throws IOException
+   */
+  List<Sample> getChildren(long parentId, String targetSampleCategory) throws IOException;
+
+  /**
+   * Get the sample IDs of all descendants of the specified sample that have a particular sample category
+   * 
+   * @param parentId id of the sample from which to find descendants
+   * @param targetSampleCategory sample category of descendants to return
+   * @return all of the matching descendants' sample IDs
+   * @throws IOException
+   */
+  Set<Long> getChildIds(long parentId, String targetSampleCategory) throws IOException;
 
 }

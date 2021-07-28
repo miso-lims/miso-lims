@@ -13,9 +13,7 @@ ListTarget.requisition = (function() {
     showNewOptionSop: true,
     createBulkActions: function(config, projectId) {
       var actions = BulkUtils.actions.qc('Requisition');
-      if (config.isAdmin) {
-        actions.push(ListUtils.createBulkDeleteAction(TYPE_LABEL, 'requisitions', Utils.array.getAlias));
-      }
+      actions.push(ListUtils.createBulkDeleteAction(TYPE_LABEL, 'requisitions', Utils.array.getAlias));
       return actions;
     },
     createStaticActions: function(config, projectId) {
@@ -46,6 +44,10 @@ ListTarget.requisition = (function() {
         iSortPriority: 1,
         bSortDirection: false
       }];
+    },
+    searchTermSelector: function(searchTerms) {
+      return [searchTerms['id'], searchTerms['entered'], searchTerms['creator'], searchTerms['changed'],
+          searchTerms['changedby']];
     }
   };
 
