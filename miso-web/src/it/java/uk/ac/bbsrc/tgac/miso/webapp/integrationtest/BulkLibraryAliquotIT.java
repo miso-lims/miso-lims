@@ -35,7 +35,7 @@ public class BulkLibraryAliquotIT extends AbstractIT {
       LibraryAliquotColumns.TARGETED_SEQUENCING);
 
   private static final Set<String> propagateColumns = Sets.newHashSet(LibraryAliquotColumns.PARENT_NAME,
-      LibraryAliquotColumns.PARENT_ALIAS);
+      LibraryAliquotColumns.PARENT_ALIAS, LibraryAliquotColumns.PARENT_LOCATION);
 
   @Before
   public void setup() {

@@ -11,6 +11,7 @@ BulkTarget.libraryaliquot = (function($) {
 
   var originalDataByRow = {};
   var parentVolumesByRow = {};
+  var parentLocationsByRow = null;
 
   return {
     getSaveUrl: function() {
@@ -22,8 +23,8 @@ BulkTarget.libraryaliquot = (function($) {
     getUserManualUrl: function() {
       return Urls.external.userManual('library_aliquots');
     },
-    getCustomActions: function() {
-      return BulkUtils.actions.boxable();
+    getCustomActions: function(config) {
+      return BulkUtils.actions.boxable(config.pageMode === 'propagate', parentLocationsByRow);
     },
     getBulkActions: function(config) {
       var editAction = BulkUtils.actions.edit(Urls.ui.libraryAliquots.bulkEdit);
@@ -149,6 +150,23 @@ BulkTarget.libraryaliquot = (function($) {
         },
         include: config.pageMode === 'propagate',
         omit: true
+      }, {
+        title: 'Parent Location',
+        type: 'text',
+        data: 'parentBoxPositionLabel',
+        disabled: true,
+        include: config.pageMode === 'propagate',
+        customSorting: [{
+          name: 'Parent Location (by rows)',
+          sort: function(a, b) {
+            return Utils.sorting.sortBoxPositions(a, b, true);
+          }
+        }, {
+          name: 'Parent Location (by columns)',
+          sort: function(a, b) {
+            return Utils.sorting.sortBoxPositions(a, b, false);
+          }
+        }]
       }, BulkUtils.columns.name, BulkUtils.columns.generatedAlias(config), BulkUtils.columns.description];
 
       columns = columns.concat(BulkUtils.columns.boxable(config, api));
@@ -252,6 +270,7 @@ BulkTarget.libraryaliquot = (function($) {
       return columns;
     },
     prepareData: function(data) {
+      parentLocationsByRow = {};
       data.forEach(function(aliquot, index) {
         originalDataByRow[index] = {
         	effectiveGroupIds: aliquot.effectiveGroupId,
@@ -265,6 +284,9 @@ BulkTarget.libraryaliquot = (function($) {
           } else {
             parentVolumesByRow[index] = aliquot.parentVolume;
           }
+        }
+        if (aliquot.parentBoxPosition) {
+          parentLocationsByRow[index] = aliquot.parentBoxPosition;
         }
       });
     },
