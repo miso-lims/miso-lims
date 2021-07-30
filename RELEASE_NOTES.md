@@ -7,6 +7,44 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.34.0] - 2021-07-30
+
+### Added
+
+* Criterion to search transfers by project
+* Requisition changelog message when samples are added or removed
+* Parent Location column on bulk Create Library Aliquots page, including Match
+  Parent Positions action
+* Extractions (detailed sample), Libraries, Runs, and Run-Libraries lists on
+  the Edit Requisition page
+
+### Changed
+
+* Max length for Illumina run bases mask field increased to 100
+* QC type units are no longer required
+
+### Removed
+
+* REST authentication via signatures. The MISO REST API is only intended for
+  internal use by MISO itself. Pinery is recommended as an external read-only
+  REST webservice for accessing MISO data
+
+### Fixed
+
+* No error was displayed when using a termless criterion for searching tables
+  where this is not valid
+* Units not correctly selected when setting volume or concentration based on a
+  sample/library/aliquot QC (note: the QC type must specify valid volume/
+  concentration units)
+* No error was displayed when attempting bulk actions with no items selected on
+  the Edit Transfer page Items list
+* All library aliquot aliases being marked as non-standard when using the V2
+  naming scheme
+* Delete button on Requisitions list missing for non-admins
+* Concentration unit 'ng/μL' sometimes displayed as 'μL' (mainly in spreadsheet
+  downloads)
+
+
 ## [1.33.0] - 2021-07-15
 
 ### Added
