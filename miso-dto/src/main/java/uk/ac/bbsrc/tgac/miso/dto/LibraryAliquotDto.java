@@ -50,6 +50,8 @@ public class LibraryAliquotDto extends AbstractBoxableDto implements UpstreamQcF
   private String parentAliquotAlias;
   private String parentName;
   private String parentVolume;
+  private String parentBoxPosition;
+  private String parentBoxPositionLabel;
   private String lastModified;
   private List<Long> indexIds;
   private List<String> indexLabels;
@@ -278,6 +280,22 @@ public class LibraryAliquotDto extends AbstractBoxableDto implements UpstreamQcF
 
   public void setParentVolume(String parentVolume) {
     this.parentVolume = parentVolume;
+  }
+
+  public String getParentBoxPosition() {
+    return parentBoxPosition;
+  }
+
+  public void setParentBoxPosition(String parentBoxPosition) {
+    this.parentBoxPosition = parentBoxPosition;
+  }
+
+  public String getParentBoxPositionLabel() {
+    return parentBoxPositionLabel;
+  }
+
+  public void setParentBoxPositionLabel(String parentBoxPositionLabel) {
+    this.parentBoxPositionLabel = parentBoxPositionLabel;
   }
 
   public String getLastModified() {

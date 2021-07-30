@@ -20,6 +20,7 @@ public class BulkLibraryAliquotPage extends BulkPage {
     public static final String ALIAS = "Alias";
     public static final String PARENT_NAME = "Parent Name";
     public static final String PARENT_ALIAS = "Parent Alias";
+    public static final String PARENT_LOCATION = "Parent Location";
     public static final String DESCRIPTION = "Description";
     public static final String ID_BARCODE = "Matrix Barcode";
     public static final String BOX_SEARCH = "Box Search";

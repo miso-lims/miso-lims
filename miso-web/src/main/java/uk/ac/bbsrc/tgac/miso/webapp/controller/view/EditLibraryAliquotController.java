@@ -41,6 +41,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.QcNodeService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.AlphanumericComparator;
+import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
@@ -132,6 +133,10 @@ public class EditLibraryAliquotController {
       dto.setLibraryAlias(item.getAlias());
       dto.setParentName(item.getName());
       dto.setParentVolume(item.getVolume() == null ? null : item.getVolume().toString());
+      if (item.getBox() != null) {
+        dto.setParentBoxPosition(item.getBoxPosition());
+        dto.setParentBoxPositionLabel(BoxUtils.makeBoxPositionLabel(item.getBox().getAlias(), item.getBoxPosition()));
+      }
       dto.setBox(newBox);
       if (item.getConcentration() != null) {
         dto.setConcentration(LimsUtils.toNiceString(item.getConcentration()));
@@ -193,6 +198,10 @@ public class EditLibraryAliquotController {
       dto.setLibraryAlias(item.getLibrary().getAlias());
       dto.setParentName(item.getName());
       dto.setParentVolume(item.getVolume() == null ? null : item.getVolume().toString());
+      if (item.getBox() != null) {
+        dto.setParentBoxPosition(item.getBoxPosition());
+        dto.setParentBoxPositionLabel(BoxUtils.makeBoxPositionLabel(item.getBox().getAlias(), item.getBoxPosition()));
+      }
       dto.setBox(newBox);
       if (item.getConcentration() != null) {
         dto.setConcentration(LimsUtils.toNiceString(item.getConcentration()));
