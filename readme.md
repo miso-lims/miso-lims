@@ -103,7 +103,7 @@ Please see the [Docker Compose Guide](https://miso-lims.readthedocs.io/projects/
 ## User Tutorial
 
 There are tutorials available to introduce and train new users to MISO's functionality.  
-* [Plain sample tutorials](https://miso-lims.github.io/walkthroughs/plain-index)
+* [Plain sample tutorials](https://miso-lims.github.io/walkthroughs/index-plain)
 * [Detailed sample tutorials](https://miso-lims.github.io/walkthroughs)
 
 Some of the resources (MISO URL,
