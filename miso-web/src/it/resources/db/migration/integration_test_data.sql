@@ -6,7 +6,7 @@ INSERT INTO User (userId, active, admin, fullName, internal, loginName, roles, p
 INSERT INTO Metric(metricId, alias, category, thresholdType, units) VALUES
 (1, 'Container Intact', 'RECEIPT', 'BOOLEAN', NULL),
 (2, 'WG Library Yield', 'LIBRARY_PREP', 'GE', 'ng/μL'),
-(3, 'Min Clusters (PF)', 'LOW_PASS_SEQUENCING', 'GT', 'K/lane'),
+(3, 'Min Clusters (PF)', 'LIBRARY_QUALIFICATION', 'GT', 'K/lane'),
 (4, 'To Delete', 'FULL_DEPTH_SEQUENCING', 'BOOLEAN', NULL);
 
 INSERT INTO Assay(assayId, alias, version, archived) VALUES

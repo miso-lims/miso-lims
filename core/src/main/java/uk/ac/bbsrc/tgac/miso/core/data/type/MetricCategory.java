@@ -6,7 +6,7 @@ public enum MetricCategory {
   RECEIPT("Receipt"), //
   EXTRACTION("Extraction"), //
   LIBRARY_PREP("Library Preparation"), //
-  LOW_PASS_SEQUENCING("Low Pass Sequencing"), //
+  LIBRARY_QUALIFICATION("Library Qualification"), //
   FULL_DEPTH_SEQUENCING("Full Depth Sequencing"), //
   INFORMATICS("Informatics Pipelines + Variant Interpretation");
   

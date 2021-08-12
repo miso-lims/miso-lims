@@ -332,7 +332,7 @@ INSERT INTO MetricSubcategory(subcategoryId, alias, category, libraryDesignCodeI
 INSERT INTO Metric(metricId, alias, category, subcategoryId, thresholdType, units) VALUES
 (1, 'Container Intact', 'RECEIPT', NULL, 'BOOLEAN', NULL),
 (2, 'WG Library Yield', 'LIBRARY_PREP', 3, 'GE', 'ng/μL'),
-(3, 'Min Clusters (PF)', 'LOW_PASS_SEQUENCING', NULL, 'GT', 'K/lane');
+(3, 'Min Clusters (PF)', 'LIBRARY_QUALIFICATION', NULL, 'GT', 'K/lane');
 
 INSERT INTO Assay(assayId, alias, version, description) VALUES
 (1, 'Low Depth WGTS', '1.0', NULL),
