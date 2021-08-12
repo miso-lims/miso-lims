@@ -704,7 +704,7 @@ successful. These requirements are specified using metrics. A metric belongs to 
 * Receipt
 * Extraction
 * Library Preparation
-* Low Pass Sequencing
+* Library Qualification
 * Full Depth Sequencing
 * Informatics
 
@@ -721,6 +721,16 @@ Examples:
 * A "Yield" metric for library preparation requiring library yield to be greater than or equal to a threshold value in
   ng/µL
 
+Some metrics only apply or have different requirements under certain conditions. A metric may specify which items it
+applies to depending on
+
+* Nucleic acid type
+* Tissue material (detailed sample only)
+* Tissue Type (detailed sample only)
+* Tissue Origin (detailed sample only)
+* Sequencing container model
+* Read lengths
+
 MISO administrators can add, edit, and delete metrics using the standard interface. A metric can only be deleted if it
 is not used by any existing assays.
 
@@ -731,5 +741,5 @@ Metric subcategories can be used to subdivide metrics within the major the metri
 [detailed sample mode](../site_configuration/#detailed-sample-mode), a library design code may be specified to indicate
 that the subcategory is only applicable to matching libraries.
 
-MISO administrators can add, edit, and delete metric subcategoriess using the standard interface. A metric subcategory
+MISO administrators can add, edit, and delete metric subcategories using the standard interface. A metric subcategory
 can only be deleted if it is not used by any existing metrics.

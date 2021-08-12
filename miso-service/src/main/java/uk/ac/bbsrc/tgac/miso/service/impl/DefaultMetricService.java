@@ -12,6 +12,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.Metric;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.MetricService;
 import uk.ac.bbsrc.tgac.miso.core.service.MetricSubcategoryService;
+import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
+import uk.ac.bbsrc.tgac.miso.core.service.TissueMaterialService;
+import uk.ac.bbsrc.tgac.miso.core.service.TissueOriginService;
+import uk.ac.bbsrc.tgac.miso.core.service.TissueTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
@@ -34,6 +38,14 @@ public class DefaultMetricService extends AbstractSaveService<Metric> implements
   private DeletionStore deletionStore;
   @Autowired
   private MetricSubcategoryService metricSubcategoryService;
+  @Autowired
+  private TissueMaterialService tissueMaterialService;
+  @Autowired
+  private TissueTypeService tissueTypeService;
+  @Autowired
+  private TissueOriginService tissueOriginService;
+  @Autowired
+  private SequencingContainerModelService containerModelService;
 
   @Override
   public AuthorizationManager getAuthorizationManager() {
@@ -73,15 +85,15 @@ public class DefaultMetricService extends AbstractSaveService<Metric> implements
   @Override
   protected void loadChildEntities(Metric object) throws IOException {
     loadChildEntity(object.getSubcategory(), object::setSubcategory, metricSubcategoryService);
+    loadChildEntity(object.getTissueMaterial(), object::setTissueMaterial, tissueMaterialService);
+    loadChildEntity(object.getTissueType(), object::setTissueType, tissueTypeService);
+    loadChildEntity(object.getTissueOrigin(), object::setTissueOrigin, tissueOriginService);
+    loadChildEntity(object.getContainerModel(), object::setContainerModel, containerModelService);
   }
 
   @Override
   protected void collectValidationErrors(Metric object, Metric beforeChange, List<ValidationError> errors) throws IOException {
-    if ((ValidationUtils.isChanged(Metric::getAlias, object, beforeChange)
-        || ValidationUtils.isChanged(Metric::getCategory, object, beforeChange))
-        && metricDao.getByAliasAndCategory(object.getAlias(), object.getCategory(), object.getSubcategory()) != null) {
-      errors.add(ValidationError.forDuplicate("metric", "alias"));
-    }
+    // no checks
   }
 
   @Override
@@ -91,6 +103,14 @@ public class DefaultMetricService extends AbstractSaveService<Metric> implements
     to.setThresholdType(from.getThresholdType());
     to.setUnits(from.getUnits());
     to.setSortPriority(from.getSortPriority());
+    to.setNucleicAcidType(from.getNucleicAcidType());
+    to.setTissueMaterial(from.getTissueMaterial());
+    to.setTissueType(from.getTissueType());
+    to.setNegateTissueType(from.isNegateTissueType());
+    to.setTissueOrigin(from.getTissueOrigin());
+    to.setContainerModel(from.getContainerModel());
+    to.setReadLength(from.getReadLength());
+    to.setReadLength2(from.getReadLength2());
   }
 
   @Override

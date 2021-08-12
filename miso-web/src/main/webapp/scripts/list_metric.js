@@ -21,7 +21,7 @@ ListTarget.metric = (function() {
     createColumns: function(config, projectId) {
       return [{
         sTitle: 'Alias',
-        mData: 'alias',
+        mData: 'label',
         iSortPriority: 1,
         bSortDirection: true
       }, {

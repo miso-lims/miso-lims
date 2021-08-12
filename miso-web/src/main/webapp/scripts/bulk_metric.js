@@ -82,6 +82,81 @@ BulkTarget.metric = (function() {
         max: 255,
         description: 'Defines sorting order for metrics within a category and subcategory. Lower numbers should be'
             + ' sorted higher, and unspecified should be at the bottom. Must be between 1 and 255 inclusive'
+      }, {
+        title: 'Nucleic Acid Type',
+        type: 'dropdown',
+        data: 'nucleicAcidType',
+        source: ['DNA', 'RNA'],
+        description: 'Metric only applies to samples of this nucleic acid type if selected'
+      }, {
+        title: 'Tissue Material',
+        type: 'dropdown',
+        data: 'tissueMaterialId',
+        source: Constants.tissueMaterials,
+        getItemLabel: Utils.array.getAlias,
+        getItemValue: Utils.array.getId,
+        sortSource: true,
+        include: Constants.isDetailedSample,
+        description: 'Metric only applies to samples of this tissue material if selected'
+      }, {
+        title: 'Tissue Type',
+        type: 'dropdown',
+        data: 'tissueTypeId',
+        source: Constants.tissueTypes,
+        getItemLabel: Utils.array.getAlias,
+        getItemValue: Utils.array.getId,
+        sortSource: true,
+        include: Constants.isDetailedSample,
+        description: 'Metric only applies to samples of this tissue type if selected. If negate tissue type is'
+            + ' selected, applies instead to all EXCEPT the selected tissue type'
+      }, {
+        title: 'Negate Tissue Type',
+        type: 'dropdown',
+        data: 'negateTissueType',
+        source: [{
+          label: 'No',
+          value: false
+        }, {
+          label: 'Yes',
+          value: true
+        }],
+        required: true,
+        getItemLabel: Utils.array.get('label'),
+        getItemValue: Utils.array.get('value'),
+        include: Constants.isDetailedSample,
+        description: 'If yes, the metric applies to all EXCEPT the selected tissue type'
+      }, {
+        title: 'Tissue Origin',
+        type: 'dropdown',
+        data: 'tissueOriginId',
+        source: Constants.tissueOrigins,
+        getItemLabel: Utils.array.getAlias,
+        getItemValue: Utils.array.getId,
+        sortSource: true,
+        include: Constants.isDetailedSample,
+        description: 'Metric only applies to samples of this tissue origin if selected'
+      }, {
+        title: 'Container Model',
+        type: 'dropdown',
+        data: 'containerModelId',
+        source: Constants.containerModels,
+        getItemLabel: Utils.array.getAlias,
+        getItemValue: Utils.array.getId,
+        sortSource: true,
+        description: 'Metric only applies to runs of this container model if selected'
+      }, {
+        title: 'Read 1 Length',
+        type: 'int',
+        data: 'readLength',
+        min: 0,
+        description: 'Metric only applies to runs with this read 1 length if specified'
+      }, {
+        title: 'Read 2 Length',
+        type: 'int',
+        data: 'readLength2',
+        min: 0,
+        description: 'Metric only applies to runs with this read 2 length if specified. Use zero (0) to indicate'
+            + ' single end'
       }];
     }
   };
