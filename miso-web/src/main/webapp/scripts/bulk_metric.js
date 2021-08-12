@@ -28,7 +28,38 @@ BulkTarget.metric = (function() {
         source: Constants.metricCategories,
         getItemLabel: Utils.array.get('label'),
         getItemValue: Utils.array.get('value'),
-        required: true
+        required: true,
+        disabled: config.pageMode === 'edit',
+        onChange: function(rowIndex, newValue, api) {
+          var category = Constants.metricCategories.find(function(x) {
+            return x.label === newValue;
+          });
+          var subcategories = !category ? [] : Constants.metricSubcategories.filter(function(x) {
+            return x.category === category.value;
+          });
+          api.updateField(rowIndex, 'subcategoryId', {
+            source: subcategories,
+            disabled: !subcategories.length,
+            value: subcategories.length ? undefined : null
+          });
+        }
+      }, {
+        title: 'Subcategory',
+        type: 'dropdown',
+        data: 'subcategoryId',
+        getData: function(metric) {
+          if (metric.subcategoryId) {
+            var subcategory = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(metric.subcategoryId),
+                Constants.metricSubcategories);
+            return subcategory.alias;
+          } else {
+            return '';
+          }
+        },
+        source: [], // initialized in category onChange
+        getItemLabel: Utils.array.getAlias,
+        getItemValue: Utils.array.getId,
+        disabled: true
       }, {
         title: 'Threshold Type',
         type: 'dropdown',
@@ -43,6 +74,14 @@ BulkTarget.metric = (function() {
         title: 'Units',
         type: 'text',
         data: 'units'
+      }, {
+        title: 'Sort Priority',
+        type: 'int',
+        data: 'sortPriority',
+        min: 1,
+        max: 255,
+        description: 'Defines sorting order for metrics within a category and subcategory. Lower numbers should be'
+            + ' sorted higher, and unspecified should be at the bottom. Must be between 1 and 255 inclusive'
       }];
     }
   };

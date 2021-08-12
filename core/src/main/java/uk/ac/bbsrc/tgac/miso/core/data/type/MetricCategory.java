@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.type;
 
 public enum MetricCategory {
 
+  // Note: ordinals are used for sorting
   RECEIPT("Receipt"), //
   EXTRACTION("Extraction"), //
   LIBRARY_PREP("Library Preparation"), //
@@ -19,4 +20,8 @@ public enum MetricCategory {
     return label;
   }
   
+  public int getSortPriority() {
+    return this.ordinal() + 1;
+  }
+
 }

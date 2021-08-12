@@ -761,8 +761,10 @@ ListUtils = (function($) {
       },
       textFromId: function(list, property, unknown) {
         return function(data, type, full) {
-          return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.idPredicate(data), list), property) || unknown
-              || "Unknown";
+          if (unknown == null || unknown == undefined) {
+            unknown = "Unknown";
+          }
+          return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.idPredicate(data), list), property) || unknown;
         };
       },
       naIfNull: function(data, type, full) {

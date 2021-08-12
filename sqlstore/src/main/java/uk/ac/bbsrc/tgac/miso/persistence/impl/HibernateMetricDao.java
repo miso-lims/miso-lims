@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Metric;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.MetricSubcategory;
 import uk.ac.bbsrc.tgac.miso.core.data.type.MetricCategory;
 import uk.ac.bbsrc.tgac.miso.persistence.MetricDao;
 
@@ -23,10 +24,11 @@ public class HibernateMetricDao extends HibernateSaveDao<Metric> implements Metr
   }
 
   @Override
-  public Metric getByAliasAndCategory(String alias, MetricCategory category) throws IOException {
+  public Metric getByAliasAndCategory(String alias, MetricCategory category, MetricSubcategory subcategory) throws IOException {
     return (Metric) currentSession().createCriteria(getEntityClass())
         .add(Restrictions.eq("alias", alias))
         .add(Restrictions.eq("category", category))
+        .add(Restrictions.eqOrIsNull("subcategory", subcategory))
         .uniqueResult();
   }
 

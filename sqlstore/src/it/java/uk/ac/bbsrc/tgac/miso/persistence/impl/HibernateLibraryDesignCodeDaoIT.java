@@ -41,7 +41,7 @@ public class HibernateLibraryDesignCodeDaoIT extends AbstractDAOTest {
   public void testList() throws IOException {
     List<LibraryDesignCode> list = sut.list();
     assertNotNull(list);
-    assertEquals(1, list.size());
+    assertEquals(3, list.size());
   }
 
   @Test

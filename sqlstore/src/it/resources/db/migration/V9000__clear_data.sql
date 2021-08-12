@@ -47,6 +47,7 @@ DELETE FROM LibraryTemplate_Index2;
 DELETE FROM LibraryTemplate_Project;
 DELETE FROM LibraryType;
 DELETE FROM Metric;
+DELETE FROM MetricSubcategory;
 DELETE FROM Note;
 DELETE FROM _Partition;
 DELETE FROM PartitionQCType;

@@ -708,6 +708,8 @@ successful. These requirements are specified using metrics. A metric belongs to 
 * Full Depth Sequencing
 * Informatics
 
+Metrics may also have [subcategories](#metric-subcategories).
+
 Each metric has a threshold type, which describes the type of requirement. Some metrics may be pass/fail, but most are
 numerical, and will require a value to be greater and/or less than specified thresholds. The actual thresholds values
 are specified in the assay, as different assays may have different thresholds. A metric may also specify the units for
@@ -721,3 +723,13 @@ Examples:
 
 MISO administrators can add, edit, and delete metrics using the standard interface. A metric can only be deleted if it
 is not used by any existing assays.
+
+
+## Metric Subcategories
+
+Metric subcategories can be used to subdivide metrics within the major the metric categories. If your site uses
+[detailed sample mode](../site_configuration/#detailed-sample-mode), a library design code may be specified to indicate
+that the subcategory is only applicable to matching libraries.
+
+MISO administrators can add, edit, and delete metric subcategoriess using the standard interface. A metric subcategory
+can only be deleted if it is not used by any existing metrics.

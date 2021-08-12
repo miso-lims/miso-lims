@@ -557,6 +557,19 @@ Urls = (function() {
     bulkSaveProgress: idUrlFunction(metricRestBase + '/bulk')
   };
   
+  // Metric Subcategories
+  var metricSubcategoryUiBase = baseUrl + '/metricsubcategory';
+  ui.metricSubcategories = {
+    bulkCreate: metricSubcategoryUiBase + '/bulk/new',
+    bulkEdit: metricSubcategoryUiBase + '/bulk/edit'
+  };
+  
+  var metricSubcategoryRestBase = restBase + '/metricsubcategories';
+  rest.metricSubcategories = {
+    bulkSave: metricSubcategoryRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(metricSubcategoryRestBase + '/bulk')
+  };
+  
   // Notes
   var noteRestBase = restBase + '/notes';
   rest.notes = {

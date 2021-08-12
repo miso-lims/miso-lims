@@ -10,22 +10,6 @@ INSERT INTO `_Group`(`groupId`, `name`, `description`) VALUES
 INSERT INTO `User_Group` (`users_userId`, `groups_groupId`)
 VALUES (3,1),(1,1);
 
-INSERT INTO Metric(metricId, alias, category, thresholdType, units) VALUES
-(1, 'Container Intact', 'RECEIPT', 'BOOLEAN', NULL),
-(2, 'WG Library Yield', 'LIBRARY_PREP', 'GE', 'ng/μL'),
-(3, 'Min Clusters (PF)', 'LOW_PASS_SEQUENCING', 'GT', 'K/lane');
-
-INSERT INTO Assay(assayId, alias, version, description) VALUES
-(1, 'Low Depth WGTS', '1.0', NULL),
-(2, 'Full Depth WGTS', '1.0', NULL);
-
-INSERT INTO Assay_Metric(assayId, metricId, minimumThreshold, maximumThreshold) VALUES
-(1, 1, NULL, NULL),
-(1, 2, 11, NULL),
-(1, 3, 500, NULL),
-(2, 1, NULL, NULL),
-(2, 2, 12, NULL);
-
 INSERT INTO RunLibraryQcStatus(statusId, description, qcPassed) VALUES
 (1, 'Passed', TRUE),
 (2, 'Failed', FALSE),
@@ -334,6 +318,33 @@ INSERT INTO SamplePurpose(samplePurposeId, alias, createdBy, creationDate, updat
 (1, 'Sequencing', 1, '2021-02-18 16:21:00', 1, '2021-02-18 16:21:00'),
 (2, 'Validation', 1, '2021-02-18 16:21:00', 1, '2021-02-18 16:21:00');
 
+INSERT INTO LibraryDesignCode(libraryDesignCodeId, code, description) VALUES
+(1, 'TT', 'TEST'),
+(2, 'WG', 'Whole Genome'),
+(3, 'WT', 'Whole Transcriptome');
+
+INSERT INTO MetricSubcategory(subcategoryId, alias, category, libraryDesignCodeId, sortPriority) VALUES
+(1, 'Nucleic Acid Isolation', 'EXTRACTION', NULL, 1),
+(2, 'Fluorometric Quantification (Qubit or Plate Reader)', 'EXTRACTION', NULL, 2),
+(3, 'WG Library QC (Qubit, TS, FA)', 'LIBRARY_PREP', 2, 1),
+(4, 'WT Library QC (Qubit, TS, FA)', 'LIBRARY_PREP', 3, 2);
+
+INSERT INTO Metric(metricId, alias, category, subcategoryId, thresholdType, units) VALUES
+(1, 'Container Intact', 'RECEIPT', NULL, 'BOOLEAN', NULL),
+(2, 'WG Library Yield', 'LIBRARY_PREP', 3, 'GE', 'ng/μL'),
+(3, 'Min Clusters (PF)', 'LOW_PASS_SEQUENCING', NULL, 'GT', 'K/lane');
+
+INSERT INTO Assay(assayId, alias, version, description) VALUES
+(1, 'Low Depth WGTS', '1.0', NULL),
+(2, 'Full Depth WGTS', '1.0', NULL);
+
+INSERT INTO Assay_Metric(assayId, metricId, minimumThreshold, maximumThreshold) VALUES
+(1, 1, NULL, NULL),
+(1, 2, 11, NULL),
+(1, 3, 500, NULL),
+(2, 1, NULL, NULL),
+(2, 2, 12, NULL);
+
 INSERT INTO Requisition(requisitionId, alias, assayId, creator, created, lastModifier, lastModified) VALUES
 (1, 'Req One', 1, 1, '2021-07-13 12:30:00', 1, '2021-07-13 12:30:00'),
 (2, 'Req Two', 2, 1, '2021-07-13 12:30:00', 1, '2021-07-13 12:30:00');
@@ -508,9 +519,6 @@ INSERT INTO `LibraryStrategyType` (`libraryStrategyTypeId`,`name`,`description`)
 VALUES (1,'WGS','Whole genome shotgun'),
 (12,'EST','Single pass sequencing of cDNA templates'),
 (14,'CTS','Concatenated Tag Sequencing');
-
-INSERT INTO LibraryDesignCode(libraryDesignCodeId, code, description) 
-VALUES (1, 'TT', 'TEST');
 
 INSERT INTO `LibraryDesign`(`libraryDesignId`, `name`, `sampleClassId`, `librarySelectionType`, `libraryStrategyType`, `libraryDesignCodeId`)
 VALUES (1, 'DESIGN1', 1, 1, 1, 1), 

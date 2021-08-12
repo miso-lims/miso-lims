@@ -11,6 +11,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Metric;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.MetricService;
+import uk.ac.bbsrc.tgac.miso.core.service.MetricSubcategoryService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
@@ -31,6 +32,8 @@ public class DefaultMetricService extends AbstractSaveService<Metric> implements
   private AuthorizationManager authorizationManager;
   @Autowired
   private DeletionStore deletionStore;
+  @Autowired
+  private MetricSubcategoryService metricSubcategoryService;
 
   @Override
   public AuthorizationManager getAuthorizationManager() {
@@ -68,10 +71,15 @@ public class DefaultMetricService extends AbstractSaveService<Metric> implements
   }
 
   @Override
+  protected void loadChildEntities(Metric object) throws IOException {
+    loadChildEntity(object.getSubcategory(), object::setSubcategory, metricSubcategoryService);
+  }
+
+  @Override
   protected void collectValidationErrors(Metric object, Metric beforeChange, List<ValidationError> errors) throws IOException {
     if ((ValidationUtils.isChanged(Metric::getAlias, object, beforeChange)
         || ValidationUtils.isChanged(Metric::getCategory, object, beforeChange))
-        && metricDao.getByAliasAndCategory(object.getAlias(), object.getCategory()) != null) {
+        && metricDao.getByAliasAndCategory(object.getAlias(), object.getCategory(), object.getSubcategory()) != null) {
       errors.add(ValidationError.forDuplicate("metric", "alias"));
     }
   }
@@ -79,9 +87,10 @@ public class DefaultMetricService extends AbstractSaveService<Metric> implements
   @Override
   protected void applyChanges(Metric to, Metric from) throws IOException {
     to.setAlias(from.getAlias());
-    to.setCategory(from.getCategory());
+    to.setSubcategory(from.getSubcategory());
     to.setThresholdType(from.getThresholdType());
     to.setUnits(from.getUnits());
+    to.setSortPriority(from.getSortPriority());
   }
 
   @Override
