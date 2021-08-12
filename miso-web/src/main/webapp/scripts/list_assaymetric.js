@@ -17,8 +17,8 @@ ListTarget.assaymetric = (function() {
     },
     createColumns: function(config, projectId) {
       return [{
-        sTitle: 'Alias',
-        mData: metricPropertyDataFunction('alias')
+        sTitle: 'Metric',
+        mData: metricPropertyDataFunction('label')
       }, {
         sTitle: 'Category Sort',
         mData: function(full) {
@@ -95,7 +95,7 @@ ListTarget.assaymetric = (function() {
           }
           Utils.showWizardDialog('Add ' + category.label + ' Metric', metrics.map(function(metric) {
             return {
-              name: metric.alias,
+              name: metric.label,
               handler: function() {
                 addSelectedMetric(metric);
               }

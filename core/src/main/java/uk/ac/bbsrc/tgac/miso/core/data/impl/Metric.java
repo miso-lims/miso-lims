@@ -14,7 +14,11 @@ import javax.persistence.ManyToOne;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
+import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
+import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
+import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.MetricCategory;
+import uk.ac.bbsrc.tgac.miso.core.data.type.NucleicAcidType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ThresholdType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -43,6 +47,31 @@ public class Metric implements Aliasable, Deletable, Serializable {
   private String units;
 
   private Integer sortPriority;
+
+  @Enumerated(EnumType.STRING)
+  private NucleicAcidType nucleicAcidType;
+
+  @ManyToOne(targetEntity = TissueMaterialImpl.class)
+  @JoinColumn(name = "tissueMaterialId")
+  private TissueMaterial tissueMaterial;
+
+  @ManyToOne(targetEntity = TissueTypeImpl.class)
+  @JoinColumn(name = "tissueTypeId")
+  private TissueType tissueType;
+
+  private boolean negateTissueType = false;
+
+  @ManyToOne(targetEntity = TissueOriginImpl.class)
+  @JoinColumn(name = "tissueOriginId")
+  private TissueOrigin tissueOrigin;
+
+  @ManyToOne
+  @JoinColumn(name = "containerModelId")
+  private SequencingContainerModel containerModel;
+
+  private Integer readLength;
+
+  private Integer readLength2;
 
   @Override
   public long getId() {
@@ -118,9 +147,74 @@ public class Metric implements Aliasable, Deletable, Serializable {
     this.sortPriority = sortPriority;
   }
 
+  public NucleicAcidType getNucleicAcidType() {
+    return nucleicAcidType;
+  }
+
+  public void setNucleicAcidType(NucleicAcidType nucleicAcidType) {
+    this.nucleicAcidType = nucleicAcidType;
+  }
+
+  public TissueMaterial getTissueMaterial() {
+    return tissueMaterial;
+  }
+
+  public void setTissueMaterial(TissueMaterial tissueMaterial) {
+    this.tissueMaterial = tissueMaterial;
+  }
+
+  public TissueType getTissueType() {
+    return tissueType;
+  }
+
+  public void setTissueType(TissueType tissueType) {
+    this.tissueType = tissueType;
+  }
+
+  public boolean isNegateTissueType() {
+    return negateTissueType;
+  }
+
+  public void setNegateTissueType(boolean negateTissueType) {
+    this.negateTissueType = negateTissueType;
+  }
+
+  public TissueOrigin getTissueOrigin() {
+    return tissueOrigin;
+  }
+
+  public void setTissueOrigin(TissueOrigin tissueOrigin) {
+    this.tissueOrigin = tissueOrigin;
+  }
+
+  public SequencingContainerModel getContainerModel() {
+    return containerModel;
+  }
+
+  public void setContainerModel(SequencingContainerModel containerModel) {
+    this.containerModel = containerModel;
+  }
+
+  public Integer getReadLength() {
+    return readLength;
+  }
+
+  public void setReadLength(Integer readLength) {
+    this.readLength = readLength;
+  }
+
+  public Integer getReadLength2() {
+    return readLength2;
+  }
+
+  public void setReadLength2(Integer readLength2) {
+    this.readLength2 = readLength2;
+  }
+
   @Override
   public int hashCode() {
-    return Objects.hash(metricId, alias, category, thresholdType, units, sortPriority);
+    return Objects.hash(metricId, alias, category, thresholdType, units, sortPriority, nucleicAcidType, tissueMaterial, tissueType,
+        negateTissueType, tissueOrigin, containerModel, readLength, readLength2);
   }
 
   @Override
@@ -131,7 +225,15 @@ public class Metric implements Aliasable, Deletable, Serializable {
         Metric::getCategory,
         Metric::getThresholdType,
         Metric::getUnits,
-        Metric::getSortPriority);
+        Metric::getSortPriority,
+        Metric::getNucleicAcidType,
+        Metric::getTissueMaterial,
+        Metric::getTissueType,
+        Metric::isNegateTissueType,
+        Metric::getTissueOrigin,
+        Metric::getContainerModel,
+        Metric::getReadLength,
+        Metric::getReadLength2);
   }
 
 }

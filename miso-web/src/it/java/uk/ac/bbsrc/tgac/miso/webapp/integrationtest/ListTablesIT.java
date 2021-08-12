@@ -940,7 +940,8 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListMetricsSetup() throws Exception {
-    testPageSetup(ListTarget.METRICS, Sets.newHashSet(Columns.ALIAS, Columns.CATEGORY, Columns.THRESHOLD_TYPE, Columns.UNITS));
+    testPageSetup(ListTarget.METRICS,
+        Sets.newHashSet(Columns.ALIAS, Columns.CATEGORY, Columns.SUBCATEGORY, Columns.THRESHOLD_TYPE, Columns.UNITS));
   }
 
   @Test
