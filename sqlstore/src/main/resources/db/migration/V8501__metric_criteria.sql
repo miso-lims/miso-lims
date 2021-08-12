@@ -15,3 +15,7 @@ ALTER TABLE Metric
   DROP INDEX uk_metric_alias_category,
   ADD CONSTRAINT uk_metric_alias_category_subcategory UNIQUE (alias, category, subcategoryId),
   ADD COLUMN sortPriority TINYINT UNSIGNED;
+
+UPDATE Metric
+SET category = 'LIBRARY_QUALIFICATION'
+WHERE category = 'LOW_PASS_SEQUENCING';
