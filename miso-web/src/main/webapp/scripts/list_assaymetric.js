@@ -18,9 +18,13 @@ ListTarget.assaymetric = (function() {
     createColumns: function(config, projectId) {
       return [{
         sTitle: 'Alias',
-        mData: metricPropertyDataFunction('alias'),
-        iSortPriority: 1,
-        bSortDirection: true
+        mData: metricPropertyDataFunction('alias')
+      }, {
+        sTitle: 'Category Sort',
+        mData: function(full) {
+          return getSortPriority(full.id);
+        },
+        bVisible: false
       }, {
         sTitle: 'Category',
         mData: metricPropertyDataFunction('category'),
@@ -29,7 +33,14 @@ ListTarget.assaymetric = (function() {
             return x.value === data;
           }, Constants.metricCategories);
           return category.label;
-        }
+        },
+        iDataSort: 1,
+        iSortPriority: 1,
+        bSortDirection: true
+      }, {
+        sTitle: 'Subcategory',
+        mData: metricPropertyDataFunction('subcategoryId'),
+        mRender: ListUtils.render.textFromId(Constants.metricSubcategories, 'alias', '')
       }, {
         sTitle: 'Threshold Type',
         mData: metricPropertyDataFunction('thresholdType'),
@@ -131,6 +142,22 @@ ListTarget.assaymetric = (function() {
         maximumThreshold: null
       });
     }
+  }
+  
+  function getSortPriority(metricId) {
+    var metric = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(metricId), Constants.metrics);
+    var category = Utils.array.findUniqueOrThrow(function(x) {
+      return x.value === metric.category;
+    }, Constants.metricCategories);
+    var subcategory = !metric.subcategoryId ? null
+        : Utils.array.findUniqueOrThrow(Utils.array.idPredicate(metric.subcategoryId), Constants.metricSubcategories);
+    
+    // no subcategory: top, subcategory with no priority: bottom
+    var subcategoryPriority = subcategory ? (subcategory.sortPriority || 500) : 0;
+    // metric with no priority: bottom
+    var metricPriority = metric.sortPriority || 500;
+    
+    return category.sortPriority * 1000000 + subcategoryPriority * 1000 + metricPriority;
   }
 
 })();

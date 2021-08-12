@@ -34,6 +34,10 @@ ListTarget.metric = (function() {
           return category.label;
         }
       }, {
+        sTitle: 'Subcategory',
+        mData: 'subcategoryId',
+        mRender: ListUtils.render.textFromId(Constants.metricSubcategories, 'alias', '')
+      }, {
         sTitle: 'Threshold Type',
         mData: 'thresholdType',
         mRender: function(data, type, full) {

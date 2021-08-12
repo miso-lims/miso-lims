@@ -81,6 +81,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.LibrarySpikeInService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryStrategyService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.MetricService;
+import uk.ac.bbsrc.tgac.miso.core.service.MetricSubcategoryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PartitionQcTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.PipelineService;
 import uk.ac.bbsrc.tgac.miso.core.service.QualityControlService;
@@ -115,6 +116,7 @@ import uk.ac.bbsrc.tgac.miso.dto.AssayDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentModelDto;
 import uk.ac.bbsrc.tgac.miso.dto.MetricDto;
+import uk.ac.bbsrc.tgac.miso.dto.MetricSubcategoryDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
 
 import io.prometheus.client.Gauge;
@@ -212,6 +214,8 @@ public class ConstantsController {
   private WorksetStageService worksetStageService;
   @Autowired
   private MetricService metricService;
+  @Autowired
+  private MetricSubcategoryService metricSubcategoryService;
   @Autowired
   private IndexChecker indexChecker;
 
@@ -315,6 +319,7 @@ public class ConstantsController {
       addJsonArray(mapper, node, "worksetCategories", worksetCategoryService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "worksetStages", worksetStageService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "metrics", metricService.list(), MetricDto::from);
+      addJsonArray(mapper, node, "metricSubcategories", metricSubcategoryService.list(), MetricSubcategoryDto::from);
       addJsonArray(mapper, node, "assays", assayService.list(), AssayDto::from);
       addJsonArray(mapper, node, "sampleSheetFormats", Arrays.asList(SampleSheet.values()), SampleSheet::name);
 
@@ -453,6 +458,7 @@ public class ConstantsController {
       ObjectNode dto = metricCategories.addObject();
       dto.put("label", category.getLabel());
       dto.put("value", category.name());
+      dto.put("sortPriority", category.getSortPriority());
     }
   }
 

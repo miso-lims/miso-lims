@@ -9,6 +9,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
@@ -31,10 +33,16 @@ public class Metric implements Aliasable, Deletable, Serializable {
   @Enumerated(EnumType.STRING)
   private MetricCategory category;
 
+  @ManyToOne
+  @JoinColumn(name = "subcategoryId")
+  private MetricSubcategory subcategory;
+
   @Enumerated(EnumType.STRING)
   private ThresholdType thresholdType;
 
   private String units;
+
+  private Integer sortPriority;
 
   @Override
   public long getId() {
@@ -78,6 +86,14 @@ public class Metric implements Aliasable, Deletable, Serializable {
     this.category = category;
   }
 
+  public MetricSubcategory getSubcategory() {
+    return subcategory;
+  }
+
+  public void setSubcategory(MetricSubcategory subcategory) {
+    this.subcategory = subcategory;
+  }
+
   public ThresholdType getThresholdType() {
     return thresholdType;
   }
@@ -94,9 +110,17 @@ public class Metric implements Aliasable, Deletable, Serializable {
     this.units = units;
   }
 
+  public Integer getSortPriority() {
+    return sortPriority;
+  }
+
+  public void setSortPriority(Integer sortPriority) {
+    this.sortPriority = sortPriority;
+  }
+
   @Override
   public int hashCode() {
-    return Objects.hash(metricId, alias, category, thresholdType, units);
+    return Objects.hash(metricId, alias, category, thresholdType, units, sortPriority);
   }
 
   @Override
@@ -106,7 +130,8 @@ public class Metric implements Aliasable, Deletable, Serializable {
         Metric::getAlias,
         Metric::getCategory,
         Metric::getThresholdType,
-        Metric::getUnits);
+        Metric::getUnits,
+        Metric::getSortPriority);
   }
 
 }

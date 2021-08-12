@@ -74,6 +74,10 @@ public class Pluralizer {
     return pluralize(count, "location", "locations");
   }
 
+  public static String metrics(long count) {
+    return pluralize(count, "metric", "metrics");
+  }
+
   public static String orders(long count) {
     return pluralize(count, "order", "orders");
   }

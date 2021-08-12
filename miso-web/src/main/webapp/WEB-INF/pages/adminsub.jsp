@@ -110,6 +110,7 @@
       <a href="<c:url value="/miso/librarytype/list"/>">Library Types</a>
       <a href="<c:url value="/miso/locationmap/list"/>">Location Maps</a>
       <a href="<c:url value="/miso/metric/list"/>">Metrics</a>
+      <a href="<c:url value="/miso/metricsubcategory/list"/>">Metric Subcategories</a>
       <a href="<c:url value="/miso/partitionqctype/list"/>">Partition QC Types</a>
       <a href="<c:url value="/miso/pipeline/list"/>">Pipelines</a>
       <a href="<c:url value="/miso/qctype/list"/>">QC Types</a>
