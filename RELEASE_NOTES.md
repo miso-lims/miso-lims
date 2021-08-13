@@ -7,6 +7,19 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.35.0] - 2021-08-13
+
+### Added
+
+* Metric subcategories
+* Metric sort priority field to indicate sorting order
+* Fields to specify which items a metric applies to
+
+### Changed
+
+* Renamed 'Low Pass Sequencing' metric category to 'Library Qualification'
+
+
 ## [1.34.0] - 2021-07-30
 
 ### Added

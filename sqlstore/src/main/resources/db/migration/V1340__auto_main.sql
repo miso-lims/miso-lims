@@ -1,3 +1,4 @@
+-- metric_criteria
 CREATE TABLE MetricSubcategory(
   subcategoryId bigint(20) NOT NULL AUTO_INCREMENT,
   alias varchar(100) NOT NULL,
@@ -30,3 +31,4 @@ ALTER TABLE Metric
 UPDATE Metric
 SET category = 'LIBRARY_QUALIFICATION'
 WHERE category = 'LOW_PASS_SEQUENCING';
+
