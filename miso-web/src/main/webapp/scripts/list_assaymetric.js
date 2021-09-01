@@ -93,14 +93,47 @@ ListTarget.assaymetric = (function() {
                 + ' they can be added to assays.']);
             return;
           }
-          Utils.showWizardDialog('Add ' + category.label + ' Metric', metrics.map(function(metric) {
-            return {
-              name: metric.label,
-              handler: function() {
-                addSelectedMetric(metric);
+          var subcategoryIds = []
+          metrics.forEach(function(metric) {
+            if (subcategoryIds.indexOf(metric.subcategoryId) === -1) {
+              subcategoryIds.push(metric.subcategoryId);
+            }
+          });
+          if (subcategoryIds.length > 1) {
+            Utils.showWizardDialog('Add ' + category.label + ' Metric', subcategoryIds.map(function (subcategoryId) {
+              var subcategory = null;
+              if (!subcategoryId) {
+                subcategory = {
+                  id: null,
+                  alias: 'No subcategory'
+                }
+              } else {
+                subcategory = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(subcategoryId), Constants.metricSubcategories);
               }
-            };
-          }));
+              return {
+                name: subcategory.alias,
+                handler: function() {
+                  metrics = metrics.filter(function(metric) {
+                    return metric.subcategoryId === subcategory.id;
+                  });
+                  showFinalMetricSelectionDialog(metrics, subcategory.id ? subcategory.alias : category.label);
+                }
+              }
+            }));
+          } else {
+            showFinalMetricSelectionDialog(metrics, category.label)
+          }
+        }
+      };
+    }));
+  }
+  
+  function showFinalMetricSelectionDialog(metrics, categoryLabel) {
+    Utils.showWizardDialog('Add ' + categoryLabel + ' Metric', metrics.map(function(metric) {
+      return {
+        name: metric.label,
+        handler: function() {
+          addSelectedMetric(metric);
         }
       };
     }));

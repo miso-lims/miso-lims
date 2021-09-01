@@ -75,6 +75,18 @@ public class MetricDto {
     if (from.getContainerModel() != null) {
       sb.append(from.getContainerModel().getAlias()).append(SEPARATOR);
     }
+    if (from.getReadLength() != null) {
+      if (from.getReadLength2() != null) {
+        if (from.getReadLength2().equals(from.getReadLength())) {
+          sb.append("2×").append(from.getReadLength());
+        } else {
+          sb.append("Read lengths (").append(from.getReadLength()).append(", ").append(from.getReadLength2()).append(")");
+        }
+      } else {
+        sb.append("1×").append(from.getReadLength());
+      }
+      sb.append(SEPARATOR);
+    }
 
     if (sb.length() > 0) {
       sb.insert(0, " - ").delete(sb.length() - 2, sb.length());
