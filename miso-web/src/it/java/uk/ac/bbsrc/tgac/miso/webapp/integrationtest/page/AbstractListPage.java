@@ -18,7 +18,6 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String ACTIVE = "Active";
     public static final String ADMIN = "Admin";
     public static final String ALIAS = "Alias";
-    public static final String ANALYSIS_SKIPPED = "Analysis Skipped";
     public static final String ARCHIVED = "Archived";
     public static final String ASSAY = "Assay";
     public static final String AUTO_UPDATE_FIELD = "Auto Update Field";
@@ -41,6 +40,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String DEFAULT_VOLUME = "Default Volume";
     public static final String DESCRIPTION = "Description";
     public static final String DESIGN = "Design";
+    public static final String DISABLE_PIPELINE = "Disable Pipeline";
     public static final String DRIVER = "Driver";
     public static final String END_DATE = "End Date";
     public static final String EXTERNAL = "External";

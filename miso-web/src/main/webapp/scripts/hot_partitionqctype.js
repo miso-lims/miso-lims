@@ -18,7 +18,7 @@ HotTarget.partitionqctype = {
       validator: HotUtils.validator.requiredText
     }), HotUtils.makeColumnForBoolean('Note Required', true, 'noteRequired', true),
         HotUtils.makeColumnForBoolean('Order Fulfilled', true, 'orderFulfilled', true),
-        HotUtils.makeColumnForBoolean('Analysis Skipped', true, 'analysisSkipped', true)];
+        HotUtils.makeColumnForBoolean('Disable Pipeline', true, 'analysisSkipped', true)];
   },
 
   getBulkActions: function(config) {
