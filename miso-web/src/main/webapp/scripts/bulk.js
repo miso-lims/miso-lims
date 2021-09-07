@@ -2050,6 +2050,9 @@ BulkUtils = (function($) {
     var tableData = hot.getData();
     for (var rowIndex = 0; rowIndex < tableData.length; rowIndex++) {
       for (var colIndex = 0; colIndex < columns.length; colIndex++) {
+        if (typeof tableData[rowIndex][colIndex] === 'string') {
+          tableData[rowIndex][colIndex] = tableData[rowIndex][colIndex].trim();
+        } 
         var column = columns[colIndex];
         if (column.omit) {
           continue;
