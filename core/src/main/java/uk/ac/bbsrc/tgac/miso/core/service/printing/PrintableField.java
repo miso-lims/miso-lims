@@ -2,6 +2,8 @@ package uk.ac.bbsrc.tgac.miso.core.service.printing;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+import java.util.OptionalDouble;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -33,6 +35,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Workstation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.LabelCanvas.FontStyle;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -307,6 +311,24 @@ public enum PrintableField implements PrintableText {
           return libraryAliquot.getDnaSize() == null ? visitLibrary(libraryAliquot.getLibrary()) : libraryAliquot.getDnaSize().toString();
         }
 
+        @Override
+        public String visitPool(Pool pool) {
+          if (pool.getPoolContents() == null) {
+            return null;
+          }
+          OptionalDouble avg = pool.getPoolContents().stream()//
+              .map(PoolElement::getAliquot)//
+              .map(ListLibraryAliquotView::getDnaSize)//
+              .filter(Objects::nonNull)//
+              .mapToDouble(Integer::doubleValue)//
+              .average();
+          if (avg.isPresent()) {
+            return Double.toString(avg.getAsDouble());
+          } else {
+            return null;
+          }
+        }
+
       });
     }
 
@@ -342,7 +364,7 @@ public enum PrintableField implements PrintableText {
   };
 
   private static <T extends DetailedSample> BarcodableVisitor<String> getParentSampleField(Class<T> clazz, Function<T, String> getter) {
-    return new BarcodableVisitor<String>() {
+    return new BarcodableVisitor<>() {
 
       @Override
       public String visitLibraryAliquotDetailed(DetailedLibraryAliquot libraryAliquot) {
