@@ -60,12 +60,12 @@ public class RunPage extends FormPage<RunPage.Field> {
   } // end PoolSearch class
 
   public static class LaneQC {
-    public static final String OK = "OK (order fulfilled, analysis to proceed)";
-    public static final String OK_COLLAB = "OK'd by collaborator (order fulfilled, analysis to proceed)";
-    public static final String FAIL_INSTRUMENT = "Failed: Instrument problem (order not fulfilled, analysis skipped)";
-    public static final String FAIL_LIB_PREP = "Failed: Library preparation problem (order fulfilled, analysis skipped)";
-    public static final String FAIL_ANALYSIS = "Failed: Analysis problem (order fulfilled, analysis skipped)";
-    public static final String FAIL_OTHER = "Failed: Other problem (order not fulfilled, analysis skipped)";
+    public static final String OK = "OK (order fulfilled, pipeline to proceed)";
+    public static final String OK_COLLAB = "OK'd by collaborator (order fulfilled, pipeline to proceed)";
+    public static final String FAIL_INSTRUMENT = "Failed: Instrument problem (order not fulfilled, no pipeline)";
+    public static final String FAIL_LIB_PREP = "Failed: Library preparation problem (order fulfilled, no pipeline)";
+    public static final String FAIL_ANALYSIS = "Failed: Analysis problem (order fulfilled, no pipeline)";
+    public static final String FAIL_OTHER = "Failed: Other problem (order not fulfilled, no pipeline)";
   } // end LaneQC class
 
   public static class RunTableWrapperId {

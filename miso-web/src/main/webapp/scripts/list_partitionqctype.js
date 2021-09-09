@@ -39,7 +39,7 @@ ListTarget.partitionqctype = {
       iSortPriority: 0,
       mRender: ListUtils.render.booleanChecks
     }, {
-      sTitle: 'Analysis Skipped',
+      sTitle: 'Disable Pipeline',
       mData: 'analysisSkipped',
       include: true,
       iSortPriority: 0,

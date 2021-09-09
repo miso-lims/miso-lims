@@ -56,11 +56,11 @@ public class PartitionQCTypeDto {
     sb.append(getDescription());
     sb.append(" (order ");
     if (!isOrderFulfilled()) sb.append("not ");
-    sb.append("fulfilled, analysis ");
+    sb.append("fulfilled, ");
     if (isAnalysisSkipped()) {
-      sb.append("skipped");
+      sb.append("no pipeline");
     } else {
-      sb.append("to proceed");
+      sb.append("pipeline to proceed");
     }
     sb.append(")");
     return sb.toString();

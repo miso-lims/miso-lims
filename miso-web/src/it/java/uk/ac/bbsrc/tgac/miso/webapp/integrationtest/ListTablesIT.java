@@ -525,7 +525,7 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListPartitionQcTypeSetup() throws Exception {
     testPageSetup(ListTarget.PARTITION_QC_TYPE,
-        Sets.newHashSet(Columns.DESCRIPTION, Columns.NOTE_REQUIRED, Columns.ORDER_FULFILLED, Columns.ANALYSIS_SKIPPED));
+        Sets.newHashSet(Columns.DESCRIPTION, Columns.NOTE_REQUIRED, Columns.ORDER_FULFILLED, Columns.DISABLE_PIPELINE));
   }
 
   @Test
@@ -1110,7 +1110,7 @@ public class ListTablesIT extends AbstractIT {
     case Columns.QC_PASSED:
     case Columns.NOTE_REQUIRED:
     case Columns.ORDER_FULFILLED:
-    case Columns.ANALYSIS_SKIPPED:
+    case Columns.DISABLE_PIPELINE:
       return booleanColumnComparator;
     case Columns.ROWS:
     case Columns.COLUMNS:
