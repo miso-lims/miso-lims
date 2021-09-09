@@ -7,6 +7,23 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.36.0] - 2021-09-09
+
+### Changed
+
+* Average library size can now be printed on pool labels
+* When adding metrics to an assay, a new dialog to select the subcategory has
+  been added in-between selecting the category and metric
+* Labels for partition QC status options
+  * analysis to proceed -> pipeline to proceed
+  * analysis skipped -> no pipeline
+
+### Fixed
+
+* cases where trailing spaces were not being trimmed from text entered in bulk tables
+* Read length conditions were not included in metric labels
+
+
 ## [1.35.0] - 2021-08-13
 
 ### Added
