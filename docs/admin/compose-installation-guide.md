@@ -59,7 +59,7 @@ echo "changeme" > ./.miso_db_password
 docker-compose -f demo.detailed.yml up
 ```
 
-For both environments, navigate to [http://localhost/miso](http://localhost/miso)
+For both environments, navigate to [http://localhost](http://localhost)
 and use the credentials **admin**/**admin**.
 
 Once you are finished with the container, make sure to run
@@ -313,7 +313,7 @@ services:
       - webapp
 ```
 
-As before, navigate to [http://localhost/miso](http://localhost/miso). You will
+As before, navigate to [http://localhost](http://localhost). You will
 be automatically redirected to the login page at https://localhost/miso and can
 use **admin**/**admin** to log in.
 
@@ -361,7 +361,7 @@ services:
     command: ["sh", "-c", "./self-sign-cert.sh; nginx -g 'daemon off;'"]
 ```
 
-As before, navigate to [http://localhost/miso](http://localhost/miso). You will
+As before, navigate to [http://localhost](http://localhost). You will
 be automatically redirected to the login page at https://localhost/miso and can
 use **admin**/**admin** to log in.
 
@@ -372,7 +372,7 @@ potential trust issues. If you would like to download the certificate for re-use
 ##### Browser security warnings
 
 With self-signed certificates, you will likely get security warnings on Chrome
-or Firefox when you go to [https://localhost/miso](https://localhost/miso).
+or Firefox when you go to [https://localhost](https://localhost).
 Since you set up the certificate and you (hopefully) trust yourself, these
 warnings can be ignored. Your data is still protected despite the browser's
 warning.
@@ -424,7 +424,7 @@ docker-compose -f compose.yml build
 docker-compose -f compose.yml up
 ```
 
-The URL [http://localhost/miso](http://localhost/miso) is still where to go and
+The URL [http://localhost](http://localhost) is still where to go and
 log in with the credentials **admin**/**admin**.
 
 #### Improving build times while developing
@@ -748,7 +748,7 @@ starting.
         Statement  : DELETE FROM BoxUse WHERE alias='Libraries'
         DELETE FROM SampleClass WHERE alias='Slide'
 
-1. **MISO started with no errors but the page at http://localhost/miso says
+1. **MISO started with no errors but the page at http://localhost says
   "Server not found" or "Proxy error".**
 
     First, to check if the problem with with MISO or nginx, temporarily expose
