@@ -78,6 +78,7 @@ public class SampleClassRestController extends RestController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
     RestUtils.bulkDelete("Sample Class", ids, sampleClassService);
+    constantsController.refreshConstants();
   }
 
 }
