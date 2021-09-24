@@ -294,7 +294,8 @@ public class MisoClient implements Lims {
   }
 
   private Sample addChildren(Sample parent) {
-    List<String> children = template.query(QUERY_SAMPLE_CHILD_IDS_BY_SAMPLE_ID, new Object[] { parent.getId(), parent.getId() }, idListMapper);
+    List<String> children = template.query(QUERY_SAMPLE_CHILD_IDS_BY_SAMPLE_ID,
+        new Object[] { parent.getId(), parent.getId(), parent.getId(), parent.getId() }, idListMapper);
     if (!children.isEmpty()) {
       parent.setChildren(new HashSet<>(children));
     }
