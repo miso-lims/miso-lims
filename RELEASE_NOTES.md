@@ -7,6 +7,14 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.36.1] - 2021-10-07
+
+### Fixed
+
+* library aliquot children missing in Pinery
+* Sample classes continued to appear in option lists after being deleted
+
+
 ## [1.36.0] - 2021-09-09
 
 ### Changed
