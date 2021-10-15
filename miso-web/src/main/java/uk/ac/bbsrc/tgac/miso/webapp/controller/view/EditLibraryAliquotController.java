@@ -333,11 +333,17 @@ public class EditLibraryAliquotController {
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.putPOJO("box", newBox);
     }
+
+    @Override
+    protected boolean isNewInterface() {
+      return true;
+    }
   }
 
-  @GetMapping(value = "/bulk/merge")
-  public ModelAndView propagatePoolsMerged(@RequestParam("ids") String aliquotIds,
-      @RequestParam(value = "boxId", required = false) Long boxId, ModelMap model) throws IOException {
+  @PostMapping(value = "/bulk/merge")
+  public ModelAndView propagatePoolsMerged(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
+    String aliquotIds = getStringInput("ids", form, true);
+    Long boxId = getLongInput("boxId", form, false);
     BulkMergeBackend bulkMergeBackend = new BulkMergeBackend(
         (boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null));
     return bulkMergeBackend.propagate(aliquotIds, model);
@@ -381,12 +387,19 @@ public class EditLibraryAliquotController {
       return prepare(model, PageMode.CREATE, "Create Pools from Library Aliquots", Collections.nCopies(poolQuantity, dto));
     }
 
+    @Override
+    protected boolean isNewInterface() {
+      return true;
+    }
+
   }
 
-  @GetMapping(value = "/bulk/pool")
-  public ModelAndView propagatePoolsCustom(@RequestParam("ids") String aliquotIds, @RequestParam("quantity") int poolQuantity,
-      @RequestParam(value = "boxId", required = false) Long boxId, ModelMap model)
+  @PostMapping(value = "/bulk/pool")
+  public ModelAndView propagatePoolsCustom(@RequestParam Map<String, String> form, ModelMap model)
       throws IOException {
+    String aliquotIds = getStringInput("ids", form, true);
+    int poolQuantity = getIntegerInput("quantity", form, true);
+    Long boxId = getLongInput("boxId", form, false);
     BulkCustomPoolTableBackend bulkCustomPoolTableBackend = new BulkCustomPoolTableBackend(poolQuantity, aliquotIds, libraryAliquotService,
         (boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null));
     return bulkCustomPoolTableBackend.create(model);
@@ -427,11 +440,17 @@ public class EditLibraryAliquotController {
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.putPOJO("box", newBox);
     }
+
+    @Override
+    protected boolean isNewInterface() {
+      return true;
+    }
   }
 
-  @GetMapping(value = "/bulk/pool-separate")
-  public ModelAndView propagatePoolsIndividual(@RequestParam("ids") String aliquotIds,
-      @RequestParam(value = "boxId", required = false) Long boxId, ModelMap model) throws IOException {
+  @PostMapping(value = "/bulk/pool-separate")
+  public ModelAndView propagatePoolsIndividual(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
+    String aliquotIds = getStringInput("ids", form, true);
+    Long boxId = getLongInput("boxId", form, false);
     BulkPropagateBackend bulkPropagateBackend = new BulkPropagateBackend(
         (boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null));
     return bulkPropagateBackend.propagate(aliquotIds, model);

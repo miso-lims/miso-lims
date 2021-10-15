@@ -8,13 +8,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 public interface PoolService
-    extends PaginatedDataSource<Pool>, BarcodableService<Pool>, DeleterService<Pool>, NoteService<Pool>, SaveService<Pool> {
+    extends PaginatedDataSource<Pool>, BarcodableService<Pool>, DeleterService<Pool>, NoteService<Pool>, BulkSaveService<Pool> {
 
   @Override
   default EntityType getEntityType() {
     return EntityType.POOL;
   }
 
+  @Override
   public List<Pool> listByIdList(List<Long> poolIds) throws IOException;
 
   public List<Pool> listByLibraryId(long libraryId) throws IOException;

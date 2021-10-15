@@ -1547,7 +1547,7 @@ var HotUtils = {
     pool: function() {
       return {
         "name": "Pool",
-        "getBulkActions": HotTarget.pool.getBulkActions,
+        "getBulkActions": BulkTarget.pool.getBulkActions,
         "config": {},
         "index": Constants.sampleCategories.length + 3
       };

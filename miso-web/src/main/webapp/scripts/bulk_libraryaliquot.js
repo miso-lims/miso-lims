@@ -63,7 +63,7 @@ BulkTarget.libraryaliquot = (function($) {
             action: function(items) {
               HotUtils.warnIfConsentRevoked(items, function() {
                 var fields = [];
-                HotUtils.showDialogForBoxCreation('Create Pools', 'Create', fields, Urls.ui.libraryAliquots.bulkPoolTogether, function(
+                BulkUtils.actions.showDialogForBoxCreation('Create Pools', 'Create', fields, Urls.ui.libraryAliquots.bulkPoolTogether, function(
                     result) {
                   return {
                     ids: items.map(Utils.array.getId).join(',')
@@ -81,7 +81,7 @@ BulkTarget.libraryaliquot = (function($) {
             action: function(items) {
               HotUtils.warnIfConsentRevoked(items, function() {
                 var fields = [];
-                HotUtils.showDialogForBoxCreation('Create Pools', 'Create', fields, Urls.ui.libraryAliquots.bulkPoolSeparate, function(
+                BulkUtils.actions.showDialogForBoxCreation('Create Pools', 'Create', fields, Urls.ui.libraryAliquots.bulkPoolSeparate, function(
                     result) {
                   return {
                     ids: items.map(Utils.array.getId).join(',')
@@ -103,7 +103,7 @@ BulkTarget.libraryaliquot = (function($) {
                   property: 'quantity',
                   type: 'int',
                 }];
-                HotUtils.showDialogForBoxCreation('Create Pools', 'Create', fields, Urls.ui.libraryAliquots.bulkPoolCustom,
+                BulkUtils.actions.showDialogForBoxCreation('Create Pools', 'Create', fields, Urls.ui.libraryAliquots.bulkPoolCustom,
                     function(result) {
                       return {
                         ids: items.map(Utils.array.getId).join(','),

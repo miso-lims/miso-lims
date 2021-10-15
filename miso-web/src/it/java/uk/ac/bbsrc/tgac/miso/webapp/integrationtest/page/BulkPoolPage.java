@@ -18,8 +18,8 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 public class BulkPoolPage extends HeaderFooterPage {
 
   public static class Columns {
-    public static final String NAME = "Pool Name";
-    public static final String ALIAS = "Pool Alias";
+    public static final String NAME = "Name";
+    public static final String ALIAS = "Alias";
     public static final String DESCRIPTION = "Description";
     public static final String BARCODE = "Matrix Barcode";
     public static final String BOX_SEARCH = "Box Search";

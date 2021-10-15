@@ -635,7 +635,9 @@ Urls = (function() {
     bulkDelete: poolRestBase + '/bulk-delete',
     spreadsheet: poolRestBase + '/spreadsheet',
     contentsSpreadsheet: poolRestBase + '/contents/spreadsheet',
-    samplesheet: poolRestBase + '/samplesheet'
+    samplesheet: poolRestBase + '/samplesheet',
+    bulkSave: poolRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(poolRestBase + '/bulk')
   };
 
   // Pool Orders

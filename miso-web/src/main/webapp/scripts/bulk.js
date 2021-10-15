@@ -6,6 +6,7 @@ BulkUtils = (function($) {
    *       for edits
    *   getUserManualUrl: optional (recommended) function() returning url of specific user manual
    *       page to set on 'Help' link
+   *   description: optional string; help text to include in the page Quick Help
    *   getCustomActions: optional function(config) returning array of Custom Actions (see below) to
    *       make available on the bulk edit page while editing
    *   getBulkActions: optional function(config) returning array of Bulk Actions (see below) to
@@ -16,10 +17,11 @@ BulkUtils = (function($) {
    *   prepareData: optional function(data, config); allows manipulating source data prior to table
    *       creation. Note that this may be called multiple times, including when the table is first
    *       built, and whenever it is rebuilt (for sorting, showing data after save, etc.).
-   *   confirmSave: optional function(data, config) May return a promise while performing
+   *   confirmSave: optional function(data, config, api) May return a promise while performing
    *       asynchronous work or to control whether saving is allowed to proceed. Resolve promise
-   *       to allow save, or fail to cancel. If anything else (or nothing) is returned, saving will
-   *       proceed
+   *       to allow save, or reject to cancel. Pass true in the reject call to prevent showing the
+   *       save cancelled message and reactivating the table. If anything else (or nothing) is
+   *       returned, saving will proceed
    * }
    * 
    * Custom Action structure: {
@@ -111,7 +113,11 @@ BulkUtils = (function($) {
    *   updateData: function(changes); update fields in bulk. Use this rather than multiple
    *       updateField calls to improve performance. changes is an array of arrays where the inner
    *       arrays have three elements - rowIndex, dataProperty, and newValue
-   *   isSaved: function(); returns true if the data has been saved; else false
+   *   isSaved: function(); returns true if the data has been saved; else false,
+   *   getData: function(); returns original data updated with changes made in the table. For use
+   *       in custom actions only - will not work in onChange
+   *   rebuildTable: function(target, data); destroys the table and rebuilds using the provided
+   *       BulkTarget and data. For use in custom actions only - will not work in onChange
    * }
    * 
    */
@@ -129,6 +135,7 @@ BulkUtils = (function($) {
   ERRORS_CONTAINER = '#errorsContainer';
   ERRORS_BOX = '#errors';
   ACTION_BAR = '#bulkactions';
+  TARGET_HELP = '#hotTargetHelp';
   COLUMN_HELP = '#hotColumnHelp';
   NON_STANDARD_ALIAS_NOTE = '#nonStandardAliasNote';
 
@@ -620,24 +627,6 @@ BulkUtils = (function($) {
         min: 0
       }],
 
-      qcPassed: function(include) {
-        return {
-          title: 'QC Passed?',
-          type: 'dropdown',
-          data: 'qcPassed',
-          include: include,
-          source: [{
-            label: 'True',
-            value: true
-          }, {
-            label: 'False',
-            value: false
-          }],
-          getItemLabel: Utils.array.get('label'),
-          getItemValue: Utils.array.get('value')
-        };
-      },
-
       detailedQcStatus: function() {
         return [{
           title: 'QC Status',
@@ -833,6 +822,11 @@ BulkUtils = (function($) {
           if (params == null) {
             return;
           }
+          var itemCount = getItemCount(result);
+          if (!itemCount || itemCount < 1) {
+            Utils.showOkDialog('Error', ['Quantity must be 1 or greater']);
+            return;
+          }
           var loadPage = function() {
             Utils.page.post(pageURL, params);
           }
@@ -874,7 +868,8 @@ BulkUtils = (function($) {
           return (!column.hasOwnProperty('include') || column.include)
               && (!tableSaved || (!column.hasOwnProperty('includeSaved') || column.includeSaved));
         });
-    addColumnHelp(columns);
+    var targetDescription = target.getDescription? target.getDescription(config) : null;
+    addQuickHelp(targetDescription, columns);
 
     var tableData = makeTableData(data, columns, config, api);
     var cellMetas = processDropdownSources(columns, data, tableData, api);
@@ -917,7 +912,7 @@ BulkUtils = (function($) {
       // changes = [[row, prop, oldVal, newVal], ...]
       // construct a new api for each afterChange call, so we can collect data changes to apply in bulk
       var onChangeApi = makeApi();
-      extendApi(onChangeApi, hot, columns);
+      extendApi(onChangeApi, hot, columns, config, data);
       var dataChanges = [];
       var storingChanges = true;
       onChangeApi.updateField = function(rowIndex, dataProperty, changes) {
@@ -978,7 +973,7 @@ BulkUtils = (function($) {
 
     hot.validateCells();
 
-    extendApi(api, hot, columns);
+    extendApi(api, hot, columns, config, data);
 
     if (tableSaved) {
       showBulkActions(target, config, data);
@@ -988,12 +983,17 @@ BulkUtils = (function($) {
     }
   }
 
-  function addColumnHelp(columns) {
+  function addQuickHelp(targetDescription, columns) {
+    $(TARGET_HELP).empty();
+    if (targetDescription) {
+      $(TARGET_HELP).append('<br>', $('<p>').text(targetDescription));
+    }
+    $(COLUMN_HELP).empty();
     columns.filter(function(column) {
       return column.description;
     }).forEach(function(column, index) {
       if (index === 0) {
-        $(COLUMN_HELP).empty().append('<br>', $('<p>').text('Column Descriptions:'));
+        $(COLUMN_HELP).append('<br>', $('<p>').text('Column Descriptions:'));
       }
       $(COLUMN_HELP).append($('<p>').text(column.title + ' - ' + column.description));
     });
@@ -1350,7 +1350,7 @@ BulkUtils = (function($) {
     return colIndex;
   }
 
-  function extendApi(api, hot, columns) {
+  function extendApi(api, hot, columns, config, data) {
     // Note: make sure to mirror capabilities here in processOnChangeListeners' tempApi
     api.showError = function(message) {
       showError(message);
@@ -1388,6 +1388,16 @@ BulkUtils = (function($) {
     api.updateData = function(changes) {
       // changes = [[row, prop, value]...]
       hot.setDataAtRowProp(changes);
+    };
+    
+    // Note: below functions not available in processOnChangeListeners' tempApi
+    api.getData = function() {
+      updateSourceData(data, hot, columns, api);
+      return data;
+    }
+    
+    api.rebuildTable = function(target, data) {
+      rebuildTable(hot, target, config, data)
     };
   }
 
@@ -1619,7 +1629,7 @@ BulkUtils = (function($) {
   }
 
   function setupActions(hot, target, columns, api, config, data) {
-    var actions = target.getCustomActions ? target.getCustomActions(config) : [];
+    var actions = target.getCustomActions ? target.getCustomActions(config, api) : [];
     actions.push(makeSortAction(hot, target, columns, api, config, data), makeImportAction(hot), makeExportAction(hot));
     $(ACTION_BAR).empty().append(
         actions.map(function(customAction) {
@@ -1900,11 +1910,13 @@ BulkUtils = (function($) {
 
             updateSourceData(data, hot, columns, api);
 
-            $.when(target.confirmSave ? target.confirmSave(data, config) : null).then(function() {
+            $.when(target.confirmSave ? target.confirmSave(data, config, api) : null).then(function() {
               saveWithProgressDialog(hot, target, columns, config, data);
-            }).fail(function() {
-              showError('Save cancelled');
-              showLoading(false, true);
+            }).fail(function(stop) {
+              if (!stop) {
+                showError('Save cancelled');
+                showLoading(false, true);
+              }
             });
           });
         });

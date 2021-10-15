@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.eaglegenomics.simlims.core.Note;
 
@@ -66,6 +67,8 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
 
+  @Autowired
+  private TransactionTemplate transactionTemplate;
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -453,5 +456,10 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   public List<Pool> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol, PaginationFilter... filter)
       throws IOException {
     return poolStore.list(errorHandler, offset, limit, sortDir, sortCol, filter);
+  }
+
+  @Override
+  public TransactionTemplate getTransactionTemplate() {
+    return transactionTemplate;
   }
 }

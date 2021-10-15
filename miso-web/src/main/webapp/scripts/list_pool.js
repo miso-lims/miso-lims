@@ -37,7 +37,7 @@ ListTarget.pool = {
     return Urls.rest.pools.query;
   },
   createBulkActions: function(config, projectId) {
-    var actions = HotTarget.pool.getBulkActions(config);
+    var actions = BulkTarget.pool.getBulkActions(config);
     actions.push({
       name: "Delete",
       action: function(items) {
@@ -68,7 +68,7 @@ ListTarget.pool = {
           };
         });
 
-        HotUtils.showDialogForBoxCreation("Merge Proportions", "Merge", fields, Urls.ui.pools.bulkMerge, function(output) {
+        BulkUtils.actions.showDialogForBoxCreation("Merge Proportions", "Merge", fields, Urls.ui.pools.bulkMerge, function(output) {
           var ids = pools.map(Utils.array.getId);
           var proportions = ids.map(function(id) {
             return output['pool' + id];
