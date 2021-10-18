@@ -58,7 +58,7 @@ BulkTarget.libraryaliquot = (function($) {
             }
           },
           {
-            name: 'Pool together',
+            name: 'Pool Together',
             title: 'Create one pool from many library aliquots',
             action: function(items) {
               HotUtils.warnIfConsentRevoked(items, function() {
@@ -76,7 +76,7 @@ BulkTarget.libraryaliquot = (function($) {
             allowOnLibraryPage: false
           },
           {
-            name: 'Pool separately',
+            name: 'Pool Separately',
             title: 'Create a pool for each library aliquot',
             action: function(items) {
               HotUtils.warnIfConsentRevoked(items, function() {
@@ -94,7 +94,7 @@ BulkTarget.libraryaliquot = (function($) {
             allowOnLibraryPage: true
           },
           {
-            name: 'Pool custom',
+            name: 'Pool Custom',
             title: 'Divide library aliquots into several pools',
             action: function(items) {
               HotUtils.warnIfConsentRevoked(items, function() {

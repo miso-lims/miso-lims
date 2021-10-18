@@ -11,6 +11,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import com.google.common.base.Joiner;
 
+import uk.ac.bbsrc.tgac.miso.core.util.MapBuilder;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 
 public class BulkPoolCustomPage extends BulkPoolPage {
@@ -24,8 +25,11 @@ public class BulkPoolCustomPage extends BulkPoolPage {
 
   public static BulkPoolCustomPage get(WebDriver driver, String baseUrl, Collection<Long> aliquotIds, int poolQuantity) {
     String ids = Joiner.on(',').join(aliquotIds);
-    String url = baseUrl + "miso/libraryaliquot/bulk/pool?ids=" + ids + "&quantity=" + poolQuantity;
-    driver.get(url);
+    String url = baseUrl + "miso/libraryaliquot/bulk/pool";
+    MapBuilder<String, String> params = new MapBuilder<String, String>()
+        .put("ids", ids)
+        .put("quantity", Integer.toString(poolQuantity));
+    postData(driver, url, params.build());
     return new BulkPoolCustomPage(driver);
   }
 

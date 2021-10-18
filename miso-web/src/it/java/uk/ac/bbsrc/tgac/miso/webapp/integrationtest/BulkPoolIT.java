@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtils.*;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,12 +21,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.ButtonText;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.ListTarget;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkPoolCustomPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkPoolPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkPoolPage.Columns;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListPage;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListLibraryAliquotsPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListPoolsPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
@@ -39,7 +36,7 @@ public class BulkPoolIT extends AbstractIT {
       Columns.BOX_ALIAS, Columns.BOX_POSITION, Columns.DISCARDED, Columns.CREATE_DATE, Columns.CONCENTRATION, Columns.CONCENTRATION_UNITS,
       Columns.VOLUME, Columns.VOLUME_UNITS, Columns.QC_STATUS, Columns.DESCRIPTION);
 
-  private static final Set<String> libraryAliquotsToPoolColumns = Sets.newHashSet(Columns.LIBRARY_ALIQUOT_NAME, Columns.LIBRARY_ALIAS,
+  private static final Set<String> libraryAliquotsToPoolColumns = Sets.newHashSet(Columns.LIBRARY_ALIQUOT_NAME, Columns.ALIAS,
       Columns.LIBRARY_SIZE, Columns.POOL);
 
   @Before
@@ -75,41 +72,30 @@ public class BulkPoolIT extends AbstractIT {
   public void testSelectForPoolTogether() {
     // goal: confirm that using the List Aliquots page to select aliquots for pooling together
     // directs the page to the correct link with the correct aliquots
-    ListPage listLibraryAliquots = ListPage.getListPage(getDriver(), getBaseUrl(), ListTarget.LIBRARY_ALIQUOTS);
-    DataTable aliquots = listLibraryAliquots.getTable();
+    ListLibraryAliquotsPage listPage = ListLibraryAliquotsPage.getListPage(getDriver(), getBaseUrl());
+    DataTable aliquots = listPage.getTable();
     aliquots.searchFor("LDI70*"); // should get LDI701 and LDI702
     assertEquals(2, aliquots.countRows());
 
     aliquots.checkBoxForRow(0);
     aliquots.checkBoxForRow(1);
-    String newUrl = listLibraryAliquots.clickButtonAndGetUrlWithConfirm(ButtonText.POOL_TOGETHER);
-
-    assertTrue(newUrl.contains(BulkPoolPage.POOL_TOGETHER_URL_FRAGMENT));
-    List<String> ids = Arrays.asList(newUrl.split("=")[1].split("%2C"));
-    assertEquals(2, ids.size());
-    assertTrue(ids.contains("701"));
-    assertTrue(ids.contains("702"));
+    BulkPoolPage bulkPoolPage = listPage.poolSelectedSeparately();
+    assertNotNull(bulkPoolPage);
   }
 
   @Test
   public void testSelectForPoolSeparately() {
     // goal: confirm that using the List Library Aliquots page to select aliquots for pooling separately
-    // directs the page to the correct link with the correct aliquotss
-    ListPage listLibraryAliquots = ListPage.getListPage(getDriver(), getBaseUrl(), ListTarget.LIBRARY_ALIQUOTS);
-    DataTable aliquots = listLibraryAliquots.getTable();
+    // directs the page to the correct link with the correct aliquots
+    ListLibraryAliquotsPage listPage = ListLibraryAliquotsPage.getListPage(getDriver(), getBaseUrl());
+    DataTable aliquots = listPage.getTable();
     aliquots.searchFor("LDI70*"); // should get LDI701 and LDI702
     assertEquals(2, aliquots.countRows());
 
     aliquots.checkBoxForRow(0);
     aliquots.checkBoxForRow(1);
-    String newUrl = listLibraryAliquots.clickButtonAndGetUrlWithConfirm(ButtonText.POOL_SEPARATELY);
-
-
-    assertTrue(newUrl.contains(BulkPoolPage.POOL_SEPARATELY_URL_FRAGMENT));
-    List<String> ids = Arrays.asList(newUrl.split("=")[1].split("%2C"));
-    assertEquals(2, ids.size());
-    assertTrue(ids.contains("701"));
-    assertTrue(ids.contains("702"));
+    BulkPoolPage bulkPoolPage = listPage.poolSelectedSeparately();
+    assertNotNull(bulkPoolPage);
   }
 
   @Test
@@ -184,8 +170,9 @@ public class BulkPoolIT extends AbstractIT {
     changes.put(Columns.NAME, attrs.get(Columns.NAME));
     assertColumnValues(table, 0, changes, "changes pre-save");
 
-    saveAndAssertSuccess(table);
-    assertColumnValues(table, 0, changes, "post-save");
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
+    assertColumnValues(savedTable, 0, changes, "post-save");
 
     Pool saved = (Pool) getSession().get(PoolImpl.class, 200001L);
     assertPoolAttributes(changes, saved);
@@ -221,8 +208,9 @@ public class BulkPoolIT extends AbstractIT {
     changes.put(Columns.CONCENTRATION, attrs.get(Columns.CONCENTRATION));
     assertColumnValues(table, 0, changes, "changes pre-save");
 
-    saveAndAssertSuccess(table);
-    assertColumnValues(table, 0, changes, "post-save");
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
+    assertColumnValues(savedTable, 0, changes, "post-save");
 
     Pool saved = (Pool) getSession().get(PoolImpl.class, 200002L);
     assertPoolAttributes(changes, saved);
@@ -258,8 +246,9 @@ public class BulkPoolIT extends AbstractIT {
     changes.put(Columns.CONCENTRATION, attrs.get(Columns.CONCENTRATION));
     assertColumnValues(table, 0, changes, "changes pre-save");
 
-    saveAndAssertSuccess(table);
-    assertColumnValues(table, 0, changes, "post-save");
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
+    assertColumnValues(savedTable, 0, changes, "post-save");
 
     Pool saved = (Pool) getSession().get(PoolImpl.class, 200003L);
     assertPoolAttributes(changes, saved);
@@ -291,10 +280,11 @@ public class BulkPoolIT extends AbstractIT {
     fillRow(table, 0, attrs);
     assertColumnValues(table, 0, attrs, "changes pre-save");
 
-    saveAndAssertSuccess(table, true);
-    assertColumnValues(table, 0, attrs, "post-save");
+    assertTrue(page.save(true));
+    HandsOnTable savedTable = page.getTable();
+    assertColumnValues(savedTable, 0, attrs, "post-save");
 
-    String savedName = assertAndGetSavedName(table, 0);
+    String savedName = assertAndGetSavedName(savedTable, 0);
     attrs.put(Columns.NAME, savedName);
     Long savedId = Long.valueOf(savedName.substring(3, savedName.length()));
 
@@ -330,7 +320,7 @@ public class BulkPoolIT extends AbstractIT {
     row0.put(Columns.BARCODE, "ipotpoolseparate1bar");
     row0.put(Columns.CREATE_DATE, "2017-08-01");
     row0.put(Columns.CONCENTRATION, "1.23");
-    row0.put(Columns.CONCENTRATION_UNITS, "ng/&#181;L");
+    row0.remove(Columns.CONCENTRATION_UNITS);
     row0.put(Columns.VOLUME, "4.56");
     row0.put(Columns.QC_STATUS, "Ready");
     fillRow(table, 0, row0);
@@ -342,19 +332,20 @@ public class BulkPoolIT extends AbstractIT {
     row1.put(Columns.BARCODE, "ipotpoolseparate2bar");
     row1.put(Columns.CREATE_DATE, "2017-08-01");
     row1.put(Columns.CONCENTRATION, "1.25");
-    row1.put(Columns.CONCENTRATION_UNITS, "ng/&#181;L");
+    row1.remove(Columns.CONCENTRATION_UNITS);
     row1.put(Columns.VOLUME, "4.53");
     row1.put(Columns.QC_STATUS, "Ready");
     fillRow(table, 1, row1);
     row1.put(Columns.CONCENTRATION_UNITS, "ng/L");
     assertColumnValues(table, 1, row1, "row 1 changes pre-save");
 
-    saveAndAssertSuccess(table);
-    assertColumnValues(table, 0, row0, "row 0 post-save");
-    assertColumnValues(table, 1, row1, "row 1 post-save");
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
+    assertColumnValues(savedTable, 0, row0, "row 0 post-save");
+    assertColumnValues(savedTable, 1, row1, "row 1 post-save");
 
-    String savedName0 = assertAndGetSavedName(table, 0);
-    String savedName1 = assertAndGetSavedName(table, 1);
+    String savedName0 = assertAndGetSavedName(savedTable, 0);
+    String savedName1 = assertAndGetSavedName(savedTable, 1);
     row0.put(Columns.NAME, savedName0);
     row1.put(Columns.NAME, savedName1);
     Long savedId0 = Long.valueOf(savedName0.substring(3, savedName0.length()));
@@ -402,12 +393,13 @@ public class BulkPoolIT extends AbstractIT {
     page.switchToPoolView();
     table = page.getTable();
 
-    saveAndAssertSuccess(table);
-    assertColumnValues(table, 0, row0, "row 0 post-save");
-    assertColumnValues(table, 1, row1, "row 1 post-save");
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
+    assertColumnValues(savedTable, 0, row0, "row 0 post-save");
+    assertColumnValues(savedTable, 1, row1, "row 1 post-save");
 
-    String savedName0 = assertAndGetSavedName(table, 0);
-    String savedName1 = assertAndGetSavedName(table, 1);
+    String savedName0 = assertAndGetSavedName(savedTable, 0);
+    String savedName1 = assertAndGetSavedName(savedTable, 1);
     row0.put(Columns.NAME, savedName0);
     row1.put(Columns.NAME, savedName1);
     Long savedId0 = Long.valueOf(savedName0.substring(3, savedName0.length()));
@@ -449,9 +441,10 @@ public class BulkPoolIT extends AbstractIT {
 
     fillRow(table, 0, attrs);
 
-    saveAndAssertSuccess(table);
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
-    String savedName = assertAndGetSavedName(table, 0);
+    String savedName = assertAndGetSavedName(savedTable, 0);
     attrs.put(Columns.NAME, savedName);
     Long savedId = Long.valueOf(savedName.substring(3, savedName.length()));
 
@@ -472,8 +465,9 @@ public class BulkPoolIT extends AbstractIT {
     attrs.put(Columns.VOLUME, "10.0");
     fillRow(table, 0, attrs);
 
-    saveAndAssertSuccess(table);
-    String savedName = assertAndGetSavedName(table, 0);
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
+    String savedName = assertAndGetSavedName(savedTable, 0);
     attrs.put(Columns.NAME, savedName);
     Long savedId = Long.valueOf(savedName.substring(3, savedName.length()));
 
@@ -507,10 +501,11 @@ public class BulkPoolIT extends AbstractIT {
     row1.put(Columns.VOLUME, null);
 
     fillRow(table, 1, row1);
-    saveAndAssertSuccess(table);
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
-    String savedName0 = assertAndGetSavedName(table, 0);
-    String savedName1 = assertAndGetSavedName(table, 1);
+    String savedName0 = assertAndGetSavedName(savedTable, 0);
+    String savedName1 = assertAndGetSavedName(savedTable, 1);
 
     row0.put(Columns.NAME, savedName0);
     row1.put(Columns.NAME, savedName1);
@@ -545,10 +540,11 @@ public class BulkPoolIT extends AbstractIT {
     row1.put(Columns.VOLUME, "10.0");
     fillRow(table, 1, row1);
 
-    saveAndAssertSuccess(table);
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
 
-    String savedName0 = assertAndGetSavedName(table, 0);
-    String savedName1 = assertAndGetSavedName(table, 1);
+    String savedName0 = assertAndGetSavedName(savedTable, 0);
+    String savedName1 = assertAndGetSavedName(savedTable, 1);
 
     row0.put(Columns.NAME, savedName0);
     row1.put(Columns.NAME, savedName1);
@@ -584,8 +580,9 @@ public class BulkPoolIT extends AbstractIT {
     table.enterText(Columns.VOLUME, 0, attrs.get(Columns.VOLUME));
     assertColumnValues(table, 0, attrs, "first changes pre-save");
 
-    saveAndAssertSuccess(table);
-    assertColumnValues(table, 0, attrs, "first edit post-save");
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
+    assertColumnValues(savedTable, 0, attrs, "first edit post-save");
 
     Pool saved = (Pool) getSession().get(PoolImpl.class, 200004L);
     assertPoolAttributes(attrs, saved);
@@ -600,8 +597,9 @@ public class BulkPoolIT extends AbstractIT {
     table2.enterText(Columns.VOLUME, 0, attrs.get(Columns.VOLUME));
     assertColumnValues(table2, 0, attrs, "second changes pre-save");
 
-    saveAndAssertSuccess(table2);
-    assertColumnValues(table2, 0, attrs, "second edit post-save");
+    assertTrue(page2.save(false));
+    HandsOnTable savedTable2 = page2.getTable();
+    assertColumnValues(savedTable2, 0, attrs, "second edit post-save");
 
     Pool saved2 = (Pool) getSession().get(PoolImpl.class, 200004L);
     assertPoolAttributes(attrs, saved2);
@@ -633,10 +631,11 @@ public class BulkPoolIT extends AbstractIT {
     fillRow(table, 0, attrs);
     assertColumnValues(table, 0, attrs, "creation pre-save");
 
-    saveAndAssertSuccess(table);
-    assertColumnValues(table, 0, attrs, "creation post-save");
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
+    assertColumnValues(savedTable, 0, attrs, "creation post-save");
 
-    String savedName = assertAndGetSavedName(table, 0);
+    String savedName = assertAndGetSavedName(savedTable, 0);
     attrs.put(Columns.NAME, savedName);
     Long savedId = Long.valueOf(savedName.substring(3, savedName.length()));
 
@@ -653,8 +652,9 @@ public class BulkPoolIT extends AbstractIT {
     table2.enterText(Columns.VOLUME, 0, attrs.get(Columns.VOLUME));
     assertColumnValues(table2, 0, attrs, "edits pre-save");
 
-    saveAndAssertSuccess(table2);
-    assertColumnValues(table2, 0, attrs, "edits post-save");
+    assertTrue(page2.save(false));
+    HandsOnTable savedTable2 = page2.getTable();
+    assertColumnValues(savedTable2, 0, attrs, "edits post-save");
 
     Pool saved2 = (Pool) getSession().get(PoolImpl.class, savedId);
     assertPoolAttributes(attrs, saved2);
@@ -673,17 +673,6 @@ public class BulkPoolIT extends AbstractIT {
     proportions.put("IPO200002", 3);
     BulkPoolPage newPage = listPools.mergeSelected(proportions);
     assertNotNull(newPage);
-
-    String newUrl = getDriver().getCurrentUrl();
-    assertTrue(newUrl.contains(BulkPoolPage.MERGE_URL_FRAGMENT));
-    String[] ids = newUrl.split("=")[1].split("(%2C|&proportions)");
-    assertEquals(2, ids.length);
-    assertEquals("200001", ids[0]);
-    assertEquals("200002", ids[1]);
-    String[] props = newUrl.split("=")[2].split("(%2C)");
-    assertEquals(2, props.length);
-    assertEquals("1", props[0]);
-    assertEquals("3", props[1]);
   }
 
   @Test
@@ -701,10 +690,11 @@ public class BulkPoolIT extends AbstractIT {
     fillRow(table, 0, changes);
 
     assertColumnValues(table, 0, changes, "changes pre-save");
-    saveAndAssertSuccess(table);
-    assertColumnValues(table, 0, changes, "post-save");
+    assertTrue(page.save(false));
+    HandsOnTable savedTable = page.getTable();
+    assertColumnValues(savedTable, 0, changes, "post-save");
 
-    String savedName = assertAndGetSavedName(table, 0);
+    String savedName = assertAndGetSavedName(savedTable, 0);
     changes.put(Columns.NAME, savedName);
     Long savedId = Long.valueOf(savedName.substring(3, savedName.length()));
 
