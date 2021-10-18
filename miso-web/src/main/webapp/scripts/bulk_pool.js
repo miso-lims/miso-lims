@@ -7,7 +7,6 @@ BulkTarget.pool = (function($) {
    * }
    */
 
-  // TODO: display
   var customPoolNotes = "Switch between Pool and Library Aliquot views using the 'Choose Library Aliquots'/'Edit Pools' buttons";
 
   // used for custom pooling - table is rebuilt when switching between aliquot/pool views
