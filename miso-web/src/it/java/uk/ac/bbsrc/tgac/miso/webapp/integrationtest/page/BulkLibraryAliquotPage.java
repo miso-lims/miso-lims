@@ -54,8 +54,8 @@ public class BulkLibraryAliquotPage extends BulkPage {
   };
 
   private static final By EDIT_BUTTON_TEXT = By.linkText("Edit");
-  private static final By POOL_TOGETHER_BUTTON_TEXT = By.linkText("Pool together");
-  private static final By POOL_SEPARATELY_BUTTON_TEXT = By.linkText("Pool separately");
+  private static final By POOL_TOGETHER_BUTTON_TEXT = By.linkText("Pool Together");
+  private static final By POOL_SEPARATELY_BUTTON_TEXT = By.linkText("Pool Separately");
 
   private WebElement toolbar;
 
