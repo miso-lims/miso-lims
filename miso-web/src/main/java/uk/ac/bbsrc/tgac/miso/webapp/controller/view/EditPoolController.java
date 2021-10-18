@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
+import static uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils.*;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -30,6 +32,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -45,6 +48,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -192,10 +196,16 @@ public class EditPoolController {
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       // no config required
     }
+
+    @Override
+    protected boolean isNewInterface() {
+      return true;
+    }
   };
 
-  @GetMapping(value = "/bulk/edit")
-  public ModelAndView editPools(@RequestParam("ids") String poolIds, ModelMap model) throws IOException {
+  @PostMapping(value = "/bulk/edit")
+  public ModelAndView editPools(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
+    String poolIds = getStringInput("ids", form, true);
     return bulkEditBackend.edit(poolIds, model);
   }
 
@@ -314,11 +324,18 @@ public class EditPoolController {
       return proportions;
     }
 
+    @Override
+    protected boolean isNewInterface() {
+      return true;
+    }
+
   }
 
-  @GetMapping(value = "/bulk/merge")
-  public ModelAndView propagatePoolsMerged(@RequestParam("ids") String poolIds, @RequestParam(value = "boxId", required = false) Long boxId, @RequestParam String proportions, ModelMap model)
-      throws IOException {
+  @PostMapping(value = "/bulk/merge")
+  public ModelAndView propagatePoolsMerged(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
+    String poolIds = getStringInput("ids", form, true);
+    Long boxId = getLongInput("boxId", form, false);
+    String proportions = getStringInput("proportions", form, true);
     return new BulkMergePoolsBackend((boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null),
             poolService, indexChecker, strictPools).merge(poolIds, proportions, model);
   }

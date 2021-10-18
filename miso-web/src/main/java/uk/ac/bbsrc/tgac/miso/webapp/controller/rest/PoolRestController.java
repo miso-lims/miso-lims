@@ -56,6 +56,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment.RunPartition;
@@ -104,6 +106,7 @@ import uk.ac.bbsrc.tgac.miso.dto.SequencingOrderCompletionDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse.PoolPickerEntry;
@@ -116,11 +119,13 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse.PoolPickerEntry;
 @Controller
 @RequestMapping("/rest/pools")
 public class PoolRestController extends RestController {
-  @Autowired
-  private IndexChecker indexChecker;
 
   @Autowired
+  private IndexChecker indexChecker;
+  @Autowired
   private AdvancedSearchParser advancedSearchParser;
+  @Autowired
+  private AsyncOperationManager asyncOperationManager;
 
   public static class PoolChangeRequest {
     private List<Long> add;
@@ -273,18 +278,7 @@ public class PoolRestController extends RestController {
   @ResponseBody
   public PoolDto createPool(@RequestBody PoolDto dto)
       throws IOException {
-    return RestUtils.createObject("Pool", dto, d -> {
-      Pool pool = Dtos.to(d);
-      if (pool.getVolume() == null && !pool.getPoolContents().isEmpty() && pool.getPoolContents().stream()
-          .map(PoolElement::getAliquot)
-          .allMatch(view -> view.getVolumeUsed() != null)) {
-        pool.setVolume(pool.getPoolContents().stream()
-            .map(PoolElement::getAliquot)
-            .map(ListLibraryAliquotView::getVolumeUsed)
-            .reduce(BigDecimal.ZERO, (result, item) -> result.add(item)));
-      }
-      return pool;
-    }, poolService, this::makePoolDto);
+    return RestUtils.createObject("Pool", dto, PoolRestController::toPoolWithVolume, poolService, this::makePoolDto);
   }
 
   @PutMapping(value = "{poolId}", produces = "application/json")
@@ -642,6 +636,36 @@ public class PoolRestController extends RestController {
             request.getCustomRead2Primer(),
             pools)
         .getBytes(StandardCharsets.UTF_8));
+  }
+
+  @PostMapping("/bulk")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<PoolDto> dtos) throws IOException {
+    return asyncOperationManager.startAsyncBulkCreate("Pool", dtos, PoolRestController::toPoolWithVolume, poolService);
+  }
+
+  private static Pool toPoolWithVolume(PoolDto dto) {
+    Pool pool = Dtos.to(dto);
+    if (pool.getVolume() == null && !pool.getPoolContents().isEmpty() && pool.getPoolContents().stream()
+        .map(PoolElement::getAliquot)
+        .allMatch(view -> view.getVolumeUsed() != null)) {
+      pool.setVolume(pool.getPoolContents().stream()
+          .map(PoolElement::getAliquot)
+          .map(ListLibraryAliquotView::getVolumeUsed)
+          .reduce(BigDecimal.ZERO, (result, item) -> result.add(item)));
+    }
+    return pool;
+  }
+
+  @PutMapping("/bulk")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<PoolDto> dtos) throws IOException {
+    return asyncOperationManager.startAsyncBulkUpdate("Pool", dtos, Dtos::to, poolService);
+  }
+
+  @GetMapping("/bulk/{uuid}")
+  public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
+    return asyncOperationManager.getAsyncProgress(uuid, Pool.class, poolService, this::makePoolDto);
   }
 
 }

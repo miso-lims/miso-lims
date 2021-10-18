@@ -58,12 +58,12 @@ BulkTarget.libraryaliquot = (function($) {
             }
           },
           {
-            name: 'Pool together',
+            name: 'Pool Together',
             title: 'Create one pool from many library aliquots',
             action: function(items) {
               HotUtils.warnIfConsentRevoked(items, function() {
                 var fields = [];
-                HotUtils.showDialogForBoxCreation('Create Pools', 'Create', fields, Urls.ui.libraryAliquots.bulkPoolTogether, function(
+                BulkUtils.actions.showDialogForBoxCreation('Create Pools', 'Create', fields, Urls.ui.libraryAliquots.bulkPoolTogether, function(
                     result) {
                   return {
                     ids: items.map(Utils.array.getId).join(',')
@@ -76,12 +76,12 @@ BulkTarget.libraryaliquot = (function($) {
             allowOnLibraryPage: false
           },
           {
-            name: 'Pool separately',
+            name: 'Pool Separately',
             title: 'Create a pool for each library aliquot',
             action: function(items) {
               HotUtils.warnIfConsentRevoked(items, function() {
                 var fields = [];
-                HotUtils.showDialogForBoxCreation('Create Pools', 'Create', fields, Urls.ui.libraryAliquots.bulkPoolSeparate, function(
+                BulkUtils.actions.showDialogForBoxCreation('Create Pools', 'Create', fields, Urls.ui.libraryAliquots.bulkPoolSeparate, function(
                     result) {
                   return {
                     ids: items.map(Utils.array.getId).join(',')
@@ -94,7 +94,7 @@ BulkTarget.libraryaliquot = (function($) {
             allowOnLibraryPage: true
           },
           {
-            name: 'Pool custom',
+            name: 'Pool Custom',
             title: 'Divide library aliquots into several pools',
             action: function(items) {
               HotUtils.warnIfConsentRevoked(items, function() {
@@ -103,7 +103,7 @@ BulkTarget.libraryaliquot = (function($) {
                   property: 'quantity',
                   type: 'int',
                 }];
-                HotUtils.showDialogForBoxCreation('Create Pools', 'Create', fields, Urls.ui.libraryAliquots.bulkPoolCustom,
+                BulkUtils.actions.showDialogForBoxCreation('Create Pools', 'Create', fields, Urls.ui.libraryAliquots.bulkPoolCustom,
                     function(result) {
                       return {
                         ids: items.map(Utils.array.getId).join(','),

@@ -95,7 +95,7 @@ var Transfer = (function($) {
       setBulkActions(BulkTarget.libraryaliquot.getBulkActions({}));
       break;
     case 'Pool':
-      setBulkActions(HotTarget.pool.getBulkActions({}));
+      setBulkActions(BulkTarget.pool.getBulkActions({}));
       break;
     default:
       throw new Error('Unexpected item type: ' + itemTypes[0]);

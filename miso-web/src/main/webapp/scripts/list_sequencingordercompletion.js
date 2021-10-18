@@ -38,7 +38,7 @@ ListTarget.sequencingordercompletion = {
     if (config.poolId) {
       return [];
     }
-    return HotTarget.pool.getBulkActions().filter(function(action) {
+    return BulkTarget.pool.getBulkActions().filter(function(action) {
       return !action || !action.excludeOnOrders;
     }).map(function(action) {
       return action ? {

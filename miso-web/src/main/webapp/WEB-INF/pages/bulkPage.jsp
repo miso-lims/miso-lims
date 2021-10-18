@@ -23,6 +23,7 @@
       filled-in selected cell and <b>drag</b> up or down. All selected columns will be filled in.</p>
     <p>To fill down a column with values following an incremental (+1) pattern, select two adjacent cells in a column and then either drag down, or
       double-click the square in the bottom right of the selected cells.</p>
+    <div id="hotTargetHelp"></div>
     <div id="hotColumnHelp"></div>
   </div>
   <div class="clear"></div>

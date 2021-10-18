@@ -176,9 +176,6 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("user/3");
 
     // Bulk pages
-    slugs.add("libraryaliquot/bulk/merge?ids=901%2C902");
-    slugs.add("libraryaliquot/bulk/pool-separate?ids=901%2C902");
-    slugs.add("libraryaliquot/bulk/pool?ids=901%2C902&quantity=2");
     slugs.add("box/bulk/new?quantity=5");
 
     slugs.add("librarytemplate/bulk/edit?ids=1");
@@ -302,6 +299,14 @@ public class BulkErrorCrawlerIT extends AbstractIT {
         .put("sequencingorder/bulk/new",
             Collections.unmodifiableMap(new MapBuilder<String, String>().put("poolIds", "120001,120002").build()))
         .put("metric/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
+        .put("libraryaliquot/bulk/merge", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "901,902").build()))
+        .put("libraryaliquot/bulk/pool-separate",
+            Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "901,902").build()))
+        .put("libraryaliquot/bulk/pool",
+            Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "901,902").put("quantity", "2").build()))
+        .put("pool/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "801,802").build()))
+        .put("pool/bulk/merge",
+            Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "801,802").put("proportions", "1,1").build()))
         .build());
   }
 
