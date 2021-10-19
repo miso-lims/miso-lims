@@ -43,6 +43,7 @@ public class AssayController {
 
   @GetMapping("/list")
   public ModelAndView list(ModelMap model) throws IOException {
+    model.put("title", "Assays");
     Stream<AssayDto> dtos = assayService.list().stream().map(AssayDto::from);
     return listPage.list(model, dtos);
   }
@@ -61,6 +62,7 @@ public class AssayController {
       throw new NotFoundException("No assay found for ID: " + id);
     }
     PageMode pageMode = locked ? PageMode.VIEW : PageMode.EDIT;
+    model.put("title", "Assay " + assay.getId());
     return setupForm(assay, pageMode, model);
   }
 
