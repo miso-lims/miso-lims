@@ -18,6 +18,7 @@ SELECT s.alias NAME
         ,s.volume volume
         ,s.discarded discarded
         ,s.concentration concentration
+        ,s.concentrationUnits
         ,s.locationBarcode storageLocation
         ,NULL kitName
         ,NULL kitDescription
@@ -41,6 +42,7 @@ SELECT s.alias NAME
         ,qpd.status qcPassed
         ,qpd.description detailedQcStatus
         ,s.qcDate qcDate
+        ,s.qcUser qcUserId
         ,box.locationBarcode boxLocation
         ,box.alias boxAlias
         ,pos.position boxPosition
@@ -74,6 +76,7 @@ SELECT s.alias NAME
         ,custody.recipient AS custody
         ,custody.transferRequestName AS latest_transfer_request
         ,NULL batch_id
+        ,s.requisitionId
 FROM Sample s
 LEFT JOIN DetailedQcStatus qpd ON qpd.detailedQcStatusId = s.detailedQcStatusId 
 LEFT JOIN Sample parent ON parent.sampleId = s.parentId 
@@ -149,7 +152,8 @@ SELECT l.alias NAME
         ,l.identificationBarcode tubeBarcode 
         ,l.volume volume 
         ,l.discarded discarded
-        ,l.concentration concentration 
+        ,l.concentration concentration
+        ,l.concentrationUnits
         ,l.locationBarcode storageLocation 
         ,kd.NAME kitName 
         ,kd.description kitDescription 
@@ -173,6 +177,7 @@ SELECT l.alias NAME
         ,qpd.status qcPassed
         ,qpd.description detailedQcStatus
         ,l.qcDate qcDate
+        ,l.qcUser qcUserId
         ,box.locationBarcode boxLocation 
         ,box.alias boxAlias 
         ,pos.position boxPosition 
@@ -210,6 +215,7 @@ SELECT l.alias NAME
             NULL,
             CONCAT(DATE_FORMAT(l.creationDate, '%Y-%m-%d'), '_u', l.creator, '_s', l.sopId, '_k', l.kitDescriptorId, '-', l.kitLot)
         ) batch_id
+        ,NULL requisitionId
 FROM Library l 
 LEFT JOIN Sample parent ON parent.sampleId = l.sample_sampleId
 LEFT JOIN Project sp ON sp.projectId = parent.project_projectId
@@ -281,7 +287,8 @@ SELECT d.alias name
         ,d.identificationBarcode tubeBarcode 
         ,d.volume volume 
         ,d.discarded discarded
-        ,d.concentration concentration 
+        ,d.concentration concentration
+        ,d.concentrationUnits
         ,NULL storageLocation 
         ,NULL kitName 
         ,NULL kitDescription 
@@ -305,6 +312,7 @@ SELECT d.alias name
         ,qpd.status qcPassed
         ,qpd.description detailedQcStatus
         ,d.qcDate qcDate
+        ,d.qcUser qcUserId
         ,box.locationBarcode boxLocation 
         ,box.alias boxAlias 
         ,pos.position boxPosition 
@@ -338,6 +346,7 @@ SELECT d.alias name
         ,custody.recipient AS custody
         ,custody.transferRequestName AS latest_transfer_request
         ,NULL batch_id
+        ,NULL requisitionId
 FROM LibraryAliquot d 
 LEFT JOIN LibraryAliquot laParent ON laParent.aliquotId = d.parentAliquotId
 JOIN Library lib ON lib.libraryId = d.libraryId 

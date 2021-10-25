@@ -9,6 +9,10 @@ SELECT DISTINCT Run.runId
   ,rlqc.qcPassed qc_passed
   ,rlqc.description qc_description
   ,rpa.qcDate qc_date
+  ,rpa.qcUser qcUserId
+  ,rpa.dataReview
+  ,rpa.dataReviewDate
+  ,rpa.dataReviewerId
 FROM SequencingContainerModel scm
 JOIN SequencerPartitionContainer spc ON scm.sequencingContainerModelId = spc.sequencingContainerModelId
 JOIN _Partition part ON part.containerId = spc.containerId

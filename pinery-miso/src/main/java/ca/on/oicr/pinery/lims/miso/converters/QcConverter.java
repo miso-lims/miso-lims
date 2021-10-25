@@ -21,7 +21,9 @@ public enum QcConverter {
   DV200(".*DV200.*", "DV200"), //
   PDAC("^PDAC Confirmed$", "PDAC Confirmed", "True", "False"), //
   DRAFT_CLINICAL_REPORT("^Draft Clinical Report$", "Draft Clinical Report", "Pass", "Fail"), //
-  INFORMATICS_REVIEW("^Informatics Review$", "Informatics Review", "Pass", "Fail");
+  INFORMATICS_REVIEW("^Informatics Review$", "Informatics Review", "Pass", "Fail"), //
+  PURITY("^Purity$", "Purity"), //
+  UMI_COLLAPSED_COVERAGE("^UMI-Collapsed Coverage$", "UMI-Collapsed Coverage");
 
   private final String pattern;
   private final String attributeName;
