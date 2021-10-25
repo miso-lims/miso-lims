@@ -75,7 +75,7 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
           (sam -> (LimsUtils.isDetailedSample(sam) && ((DetailedSample) sam).getSubproject() != null
               ? ((DetailedSample) sam).getSubproject().getAlias()
               : ""))), //
-      Column.forBigDecimal("VOL (uL)", Sample::getInitialVolume), //
+      Column.forBigDecimal("VOL (uL)", Sample::getVolume), //
       Column.forBigDecimal("[] (ng/uL)", Sample::getConcentration), //
       Column.forBigDecimal("Total (ng)",
           (sam -> (sam.getVolume() != null && sam.getConcentration() != null) ? sam.getVolume().multiply(sam.getConcentration()) : null)) //
