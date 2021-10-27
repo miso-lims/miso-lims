@@ -194,7 +194,7 @@ public abstract class AbstractMisoClientIT {
 
   @Test
   public void testGetAllRuns() throws Exception {
-    List<Run> runs = sut.getRuns();
+    List<Run> runs = sut.getRuns(null);
     assertFalse(runs.isEmpty());
   }
 

@@ -12,10 +12,10 @@ SELECT DISTINCT r.alias
   ,r.dataReviewDate
   ,r.dataReviewerId
   ,spc.identificationBarcode
-  ,creator
-  ,created
-  ,lastModifier
-  ,lastModified
+  ,r.creator
+  ,r.created
+  ,r.lastModifier
+  ,r.lastModified
   ,sp.readLength = sp.readLength2 AS paired
   ,sp.readLength AS read_length
   ,sp.name AS sequencingParameters
