@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,6 +32,9 @@ import org.springframework.jdbc.core.RowMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import ca.on.oicr.pinery.api.Assay;
+import ca.on.oicr.pinery.api.AssayMetric;
+import ca.on.oicr.pinery.api.AssayMetricSubcategory;
 import ca.on.oicr.pinery.api.Attribute;
 import ca.on.oicr.pinery.api.AttributeName;
 import ca.on.oicr.pinery.api.Box;
@@ -42,14 +46,19 @@ import ca.on.oicr.pinery.api.Lims;
 import ca.on.oicr.pinery.api.Order;
 import ca.on.oicr.pinery.api.OrderSample;
 import ca.on.oicr.pinery.api.PreparationKit;
+import ca.on.oicr.pinery.api.Requisition;
 import ca.on.oicr.pinery.api.Run;
 import ca.on.oicr.pinery.api.RunPosition;
 import ca.on.oicr.pinery.api.RunSample;
 import ca.on.oicr.pinery.api.Sample;
 import ca.on.oicr.pinery.api.SampleProject;
+import ca.on.oicr.pinery.api.SignOff;
 import ca.on.oicr.pinery.api.Status;
 import ca.on.oicr.pinery.api.Type;
 import ca.on.oicr.pinery.api.User;
+import ca.on.oicr.pinery.lims.DefaultAssay;
+import ca.on.oicr.pinery.lims.DefaultAssayMetric;
+import ca.on.oicr.pinery.lims.DefaultAssayMetricSubcategory;
 import ca.on.oicr.pinery.lims.DefaultAttribute;
 import ca.on.oicr.pinery.lims.DefaultAttributeName;
 import ca.on.oicr.pinery.lims.DefaultChangeLog;
@@ -57,9 +66,11 @@ import ca.on.oicr.pinery.lims.DefaultInstrument;
 import ca.on.oicr.pinery.lims.DefaultInstrumentModel;
 import ca.on.oicr.pinery.lims.DefaultOrder;
 import ca.on.oicr.pinery.lims.DefaultPreparationKit;
+import ca.on.oicr.pinery.lims.DefaultRequisition;
 import ca.on.oicr.pinery.lims.DefaultRun;
 import ca.on.oicr.pinery.lims.DefaultSample;
 import ca.on.oicr.pinery.lims.DefaultSampleProject;
+import ca.on.oicr.pinery.lims.DefaultSignOff;
 import ca.on.oicr.pinery.lims.DefaultStatus;
 import ca.on.oicr.pinery.lims.DefaultType;
 import ca.on.oicr.pinery.lims.DefaultUser;
@@ -93,8 +104,9 @@ public class MisoClient implements Lims {
 
   // Run queries
   private static final String QUERY_ALL_RUNS = getResourceAsString("queryAllRuns.sql");
-  private static final String QUERY_RUN_BY_ID = QUERY_ALL_RUNS + " AND r.runId = ?";
-  private static final String QUERY_RUN_BY_NAME = QUERY_ALL_RUNS + " AND r.alias = ?";
+  private static final String QUERY_RUN_BY_ID = QUERY_ALL_RUNS + " WHERE r.runId = ?";
+  private static final String QUERY_RUN_BY_NAME = QUERY_ALL_RUNS + " WHERE r.alias = ?";
+  private static final String QUERY_RUN_IDS_BY_SAMPLE_IDS = getResourceAsString("queryRunIdsBySampleIds.sql");
 
   // RunPosition queries
   private static final String QUERY_ALL_RUN_POSITIONS = getResourceAsString("queryAllRunPositions.sql");
@@ -126,7 +138,22 @@ public class MisoClient implements Lims {
   
   // Box queries
   private static final String QUERY_ALL_BOXES = getResourceAsString("queryAllBoxes.sql");
-  // @formatter:on
+  
+  // Assay queries
+  private static final String QUERY_ALL_ASSAYS = getResourceAsString("queryAllAssays.sql");
+  private static final String QUERY_ASSAY_BY_ID = QUERY_ALL_ASSAYS + " WHERE assayId = ?";
+  private static final String QUERY_ALL_ASSAY_METRICS = getResourceAsString("queryAllAssayMetrics.sql");
+  private static final String QUERY_ASSAY_METRICS_BY_ID = QUERY_ALL_ASSAY_METRICS + " WHERE am.assayId = ?";
+  
+  // Requisition queries
+  private static final String QUERY_ALL_REQUISITIONS = getResourceAsString("queryAllRequisitions.sql");
+  private static final String QUERY_REQUISITION_BY_ID = QUERY_ALL_REQUISITIONS + " WHERE requisitionId = ?";
+  private static final String QUERY_REQUISITION_BY_NAME = QUERY_ALL_REQUISITIONS + " WHERE alias = ?";
+  private static final String QUERY_ALL_REQUISITION_SAMPLE_IDS = getResourceAsString("queryAllRequisitionSampleIds.sql");
+  private static final String QUERY_REQUISITION_SAMPLE_IDS_BY_ID = QUERY_ALL_REQUISITION_SAMPLE_IDS + " AND requisitionId = ?";
+  private static final String QUERY_ALL_REQUISITION_QCS = getResourceAsString("queryAllRequisitionQcs.sql");
+  private static final String QUERY_REQUISITION_QCS_BY_ID = QUERY_ALL_REQUISITION_QCS + " WHERE requisitionId = ?";
+    // @formatter:on
 
   private final RowMapper<Instrument> instrumentMapper = new InstrumentMapper();
   private final RowMapper<InstrumentModel> modelMapper = new InstrumentModelRowMapper();
@@ -360,13 +387,31 @@ public class MisoClient implements Lims {
   }
 
   @Override
-  public List<Run> getRuns() {
-    List<Run> runs = template.query(QUERY_ALL_RUNS, runMapper);
-    List<MisoRunPosition> positions = getRunPositions();
-    Map<Integer, Run> map = new HashMap<>();
-    for (Run r : runs) {
-      map.put(r.getId(), r);
+  public List<Run> getRuns(Set<String> sampleIds) {
+    List<Run> runs = null;
+    List<MisoRunPosition> positions = null;
+    if (sampleIds == null || sampleIds.isEmpty()) {
+      // get all
+      runs = template.query(QUERY_ALL_RUNS, runMapper);
+      positions = getRunPositions();
+    } else {
+      // filter by sample IDs
+      String idsQuery = QUERY_RUN_IDS_BY_SAMPLE_IDS
+          + " WHERE pla.aliquotId IN ("
+          + nParams(sampleIds.size())
+          + ")";
+      Object[] runIds = template.query(idsQuery, sampleIds.toArray(), (rs, rowNum) -> rs.getInt("runId")).toArray();
+      if (runIds.length == 0) {
+        return Collections.emptyList();
+      }
+
+      String runsQuery = QUERY_ALL_RUNS
+          + " WHERE r.runId IN (" + nParams(runIds.length) + ")";
+      runs = template.query(runsQuery, runIds, runMapper);
+      positions = getRunPositions(runIds);
     }
+
+    Map<Integer, Run> map = runs.stream().collect(Collectors.toMap(Run::getId, Function.identity()));
     for (MisoRunPosition p : positions) {
       Run r = map.get(p.getRunId());
       if (r != null) {
@@ -379,6 +424,10 @@ public class MisoClient implements Lims {
       }
     }
     return runs;
+  }
+
+  private static String nParams(int n) {
+    return String.join(",", Collections.nCopies(n, "?"));
   }
 
   @Override
@@ -410,6 +459,16 @@ public class MisoClient implements Lims {
   private List<MisoRunPosition> getRunPositions(Integer runId) {
     List<MisoRunPosition> positions = template.query(QUERY_RUN_POSITIONS_BY_RUN_ID, new Object[] { runId }, runPositionMapper);
     List<MisoRunSample> samples = getRunSamples(runId);
+    return mapSamplesToPositions(positions, samples);
+  }
+
+  private List<MisoRunPosition> getRunPositions(Object[] runIds) {
+    String query = QUERY_ALL_RUN_POSITIONS
+        + " WHERE r_spc.Run_runId IN ("
+        + nParams(runIds.length)
+        + ")";
+    List<MisoRunPosition> positions = template.query(query, runIds, runPositionMapper);
+    List<MisoRunSample> samples = getRunSamples(runIds);
     return mapSamplesToPositions(positions, samples);
   }
 
@@ -446,6 +505,14 @@ public class MisoClient implements Lims {
 
   private List<MisoRunSample> getRunSamples(Integer runId) {
     return template.query(QUERY_RUN_SAMPLES_BY_RUN_ID, new Object[] { runId }, runSampleMapper);
+  }
+
+  private List<MisoRunSample> getRunSamples(Object[] runIds) {
+    String query = QUERY_ALL_RUN_SAMPLES
+        + " WHERE Run.runId IN ("
+        + nParams(runIds.length)
+        + ")";
+    return template.query(query, runIds, runSampleMapper);
   }
 
   @Override
@@ -558,6 +625,107 @@ public class MisoClient implements Lims {
     return Lists.newArrayList(boxes.values());
   }
 
+  @Override
+  public List<Assay> getAssays() {
+    List<Assay> assays = template.query(QUERY_ALL_ASSAYS, assayRowMapper);
+    Map<Integer, Assay> assaysById = assays.stream().collect(Collectors.toMap(Assay::getId, Function.identity()));
+    template.query(QUERY_ALL_ASSAY_METRICS, rs -> {
+      AssayMetric metric = assayMetricRowMapper.mapRow(rs, 0);
+      Assay assay = assaysById.get(rs.getInt("assayId"));
+      assay.addMetric(metric);
+    });
+    return assays;
+  }
+
+  @Override
+  public Assay getAssay(Integer id) {
+    Object[] params = { id };
+    List<Assay> assays = template.query(QUERY_ASSAY_BY_ID, params, assayRowMapper);
+    if (assays.isEmpty()) {
+      return null;
+    } else if (assays.size() > 1) {
+      throw new IllegalStateException(String.format("Found multiple assays with ID: %d", id));
+    }
+    Assay assay = assays.get(0);
+    template.query(QUERY_ASSAY_METRICS_BY_ID, params, rs -> {
+      AssayMetric metric = assayMetricRowMapper.mapRow(rs, 0);
+      assay.addMetric(metric);
+    });
+    return assay;
+  }
+
+  @Override
+  public List<Requisition> getRequisitions() {
+    List<Requisition> reqs = template.query(QUERY_ALL_REQUISITIONS, requisitionRowMapper);
+    Map<Integer, Requisition> reqsById = reqs.stream().collect(Collectors.toMap(Requisition::getId, Function.identity()));
+    template.query(QUERY_ALL_REQUISITION_SAMPLE_IDS, rs -> {
+      Requisition req = reqsById.get(rs.getInt("requisitionId"));
+      req.addSampleId(rs.getString("sampleId"));
+    });
+    template.query(QUERY_ALL_REQUISITION_QCS, rs -> {
+      Requisition req = reqsById.get(rs.getInt("requisitionId"));
+      addSignOff(req, rs);
+    });
+    return reqs;
+  }
+
+  private static final List<String> signOffQcs = Arrays.asList("Informatics Review", "Draft Clinical Report", "Final Clinical Report");
+
+  private static void addSignOff(Requisition requisition, ResultSet rs) throws SQLException {
+    String qcName = rs.getString("name");
+    if (signOffQcs.contains(qcName)) {
+      SignOff so = new DefaultSignOff();
+      so.setName(qcName);
+      so.setPassed(booleanFromInt(rs.getInt("results")));
+      so.setDate(rs.getDate("date").toLocalDate());
+      so.setUserId(rs.getInt("creator"));
+      requisition.addSignOff(so);
+    }
+  }
+
+  private static Boolean booleanFromInt(Integer value) {
+    if (value == null) {
+      return null;
+    }
+    return value > 0 ? Boolean.TRUE : Boolean.FALSE;
+  }
+
+  @Override
+  public Requisition getRequisition(Integer id) {
+    List<Requisition> reqs = template.query(QUERY_REQUISITION_BY_ID, new Object[] { id }, requisitionRowMapper);
+    if (reqs.isEmpty()) {
+      return null;
+    } else if (reqs.size() > 1) {
+      throw new IllegalStateException(String.format("Found multiple requisitions with ID: %d", id));
+    }
+    Requisition req = reqs.get(0);
+    addSampleIdsAndSignOffs(req);
+    return req;
+  }
+
+  @Override
+  public Requisition getRequisition(String name) {
+    List<Requisition> reqs = template.query(QUERY_REQUISITION_BY_NAME, new Object[] { name }, requisitionRowMapper);
+    if (reqs.isEmpty()) {
+      return null;
+    } else if (reqs.size() > 1) {
+      throw new IllegalStateException(String.format("Found multiple requisitions with name: %s", name));
+    }
+    Requisition req = reqs.get(0);
+    addSampleIdsAndSignOffs(req);
+    return req;
+  }
+
+  private void addSampleIdsAndSignOffs(Requisition requisition) {
+    Object[] params = { requisition.getId() };
+    template.query(QUERY_REQUISITION_SAMPLE_IDS_BY_ID, params, rs -> {
+      requisition.addSampleId(rs.getString("sampleId"));
+    });
+    template.query(QUERY_REQUISITION_QCS_BY_ID, params, rs -> {
+      addSignOff(requisition, rs);
+    });
+  }
+
   private static class InstrumentMapper implements RowMapper<Instrument> {
 
     @Override
@@ -648,10 +816,10 @@ public class MisoClient implements Lims {
       r.setName(rs.getString("alias"));
       r.setBarcode(rs.getString("identificationBarcode"));
       r.setInstrumentId(rs.getInt("instrumentId"));
-      r.setCreatedById(rs.getInt("createLog.userId"));
-      r.setCreatedDate(rs.getTimestamp("createLog.changeTime"));
-      r.setModifiedById(rs.getInt("updateLog.userId"));
-      r.setModified(rs.getTimestamp("updateLog.changeTime"));
+      r.setCreatedById(rs.getInt("creator"));
+      r.setCreatedDate(rs.getTimestamp("created"));
+      r.setModifiedById(rs.getInt("lastModifier"));
+      r.setModified(rs.getTimestamp("lastModified"));
       r.setId(rs.getInt("runId"));
       r.setStartDate(rs.getDate("startDate"));
       r.setCompletionDate(rs.getDate("completionDate"));
@@ -667,13 +835,16 @@ public class MisoClient implements Lims {
       }
       r.setContainerModel(rs.getString("containerModel"));
       r.setSequencingKit(rs.getString("sequencingKit"));
-      r.setStatus(makeStatus(rs, "qcPassed", null, "qcDate"));
+      r.setStatus(makeStatus(rs, "qcPassed", null, "qcDate", "qcUserId"));
 
       Boolean dataReview = rs.getBoolean("dataReview");
       if (rs.wasNull()) {
         dataReview = null;
       }
       r.setDataReview(dataReview);
+      java.sql.Date date = rs.getDate("dataReviewDate");
+      r.setDataReviewDate(date == null ? null : date.toLocalDate());
+      r.setDataReviewerId(rs.getInt("dataReviewerId"));
 
       return r;
     }
@@ -697,7 +868,7 @@ public class MisoClient implements Lims {
       p.setPoolCreated(rs.getTimestamp("pool_created"));
       p.setPoolModifiedById(rs.getInt("pool_modifiedById"));
       p.setPoolModified(rs.getTimestamp("pool_modified"));
-      p.setPoolStatus(makeStatus(rs, "pool_qc_passed", null, null));
+      p.setPoolStatus(makeStatus(rs, "pool_qc_passed", null, null, null));
       p.setAnalysisSkipped(rs.getBoolean("analysis_skipped"));
       p.setQcStatus(rs.getString("qc_status"));
       p.setRunPurpose(rs.getString("run_purpose"));
@@ -740,7 +911,11 @@ public class MisoClient implements Lims {
       s.setVolume(rs.getFloat("volume"));
       if (rs.wasNull()) s.setVolume(null);
       s.setConcentration(rs.getFloat("concentration"));
-      if (rs.wasNull()) s.setConcentration(null);
+      if (rs.wasNull()) {
+        s.setConcentration(null);
+      } else {
+        s.setConcentrationUnits(rs.getString("concentrationUnits"));
+      }
       s.setStorageLocation(extractStorageLocation(rs));
       PreparationKit kit = new DefaultPreparationKit();
       kit.setName(rs.getString("kitName"));
@@ -758,7 +933,7 @@ public class MisoClient implements Lims {
       if (!atts.isEmpty()) {
         s.setAttributes(atts);
       }
-      s.setStatus(makeStatus(rs, "qcPassed", "detailedQcStatus", "qcDate"));
+      s.setStatus(makeStatus(rs, "qcPassed", "detailedQcStatus", "qcDate", "qcUserId"));
       s.setPreMigrationId(rs.getLong("premigration_id"));
       if (rs.wasNull()) s.setPreMigrationId(null);
 
@@ -961,7 +1136,8 @@ public class MisoClient implements Lims {
       CUSTODY("custody", "Custody"), //
       LATEST_TRANSFER_REQUEST("latest_transfer_request", "Latest Transfer Request"), //
       BATCH_ID("batch_id", "Batch ID"), //
-      TIMEPOINT("timepoint", "Timepoint");
+      TIMEPOINT("timepoint", "Timepoint"), //
+      REQUISITION_ID("requisitionId", "Requisition ID");
 
       private final String sqlKey;
       private final String attributeKey;
@@ -1106,7 +1282,16 @@ public class MisoClient implements Lims {
       boolean reverseComplement2 = rs.getString("dataManglingPolicy").equals("I5_RC");
       s.setBarcodeTwo(reverseComplement2 ? reverseComplement(barcode2) : barcode2);
       s.setRunPurpose(rs.getString("run_purpose"));
-      s.setStatus(makeStatus(rs, "qc_passed", "qc_description", "qc_date"));
+      s.setStatus(makeStatus(rs, "qc_passed", "qc_description", "qc_date", "qcUserId"));
+
+      Boolean dataReview = rs.getBoolean("dataReview");
+      if (rs.wasNull()) {
+        dataReview = null;
+      }
+      s.setDataReview(dataReview);
+      java.sql.Date date = rs.getDate("dataReviewDate");
+      s.setDataReviewDate(date == null ? null : date.toLocalDate());
+      s.setDataReviewerId(rs.getInt("dataReviewerId"));
 
       Attribute att = AttributeKey.TARGETED_RESEQUENCING.extractAttributeFrom(rs);
       if (att != null) {
@@ -1249,7 +1434,71 @@ public class MisoClient implements Lims {
 
   };
 
-  private static Status makeStatus(ResultSet rs, String stateColumn, String nameColumn, String dateColumn) throws SQLException {
+  private static final RowMapper<Assay> assayRowMapper = (rs, rowNum) -> {
+    Assay assay = new DefaultAssay();
+    assay.setId(rs.getInt("assayId"));
+    assay.setName(rs.getString("name"));
+    assay.setDescription(rs.getString("description"));
+    assay.setVersion(rs.getString("version"));
+    return assay;
+  };
+
+  private static final RowMapper<AssayMetric> assayMetricRowMapper = (rs, rowNum) -> {
+    AssayMetric metric = new DefaultAssayMetric();
+    metric.setName(rs.getString("name"));
+    metric.setCategory(rs.getString("category"));
+    String subcategoryName = rs.getString("subcategoryName");
+    if (!rs.wasNull()) {
+      AssayMetricSubcategory subcat = new DefaultAssayMetricSubcategory();
+      subcat.setName(subcategoryName);
+      int subcategorySortPriority = rs.getInt("subcategorySortPriority");
+      if (!rs.wasNull()) {
+        subcat.setSortPriority(subcategorySortPriority);
+      }
+      subcat.setDesignCode(rs.getString("subcategoryLibraryDesignCode"));
+      metric.setSubcategory(subcat);
+    }
+    metric.setUnits(rs.getString("units"));
+    metric.setThresholdType(rs.getString("thresholdType"));
+    metric.setMinimum(rs.getBigDecimal("minimumThreshold"));
+    metric.setMaximum(rs.getBigDecimal("maximumThreshold"));
+    int sortPriority = rs.getInt("sortPriority");
+    if (!rs.wasNull()) {
+      metric.setSortPriority(sortPriority);
+    }
+    metric.setNucleicAcidType(rs.getString("nucleicAcidType"));
+    metric.setTissueMaterial(rs.getString("tissueMaterial"));
+    metric.setTissueType(rs.getString("tissueType"));
+    boolean negateTissueType = rs.getBoolean("negateTissueType");
+    if (!rs.wasNull()) {
+      metric.setNegateTissueType(negateTissueType);
+    }
+    metric.setTissueOrigin(rs.getString("tissueOrigin"));
+    metric.setContainerModel(rs.getString("containerModel"));
+    int readLength = rs.getInt("readLength");
+    if (!rs.wasNull()) {
+      metric.setReadLength(readLength);
+    }
+    int readLength2 = rs.getInt("readLength2");
+    if (!rs.wasNull()) {
+      metric.setReadLength2(readLength2);
+    }
+    return metric;
+  };
+
+  private static final RowMapper<Requisition> requisitionRowMapper = (rs, rowNum) -> {
+    Requisition req = new DefaultRequisition();
+    req.setId(rs.getInt("requisitionId"));
+    req.setName(rs.getString("name"));
+    int assayId = rs.getInt("assayId");
+    if (!rs.wasNull()) {
+      req.setAssayId(assayId);
+    }
+    return req;
+  };
+
+  private static Status makeStatus(ResultSet rs, String stateColumn, String nameColumn, String dateColumn, String userIdColumn)
+      throws SQLException {
     Status status = new DefaultStatus();
     boolean qcPassed = rs.getBoolean(stateColumn);
     if (rs.wasNull()) {
@@ -1264,6 +1513,8 @@ public class MisoClient implements Lims {
 
     java.sql.Date date = dateColumn == null ? null : rs.getDate(dateColumn);
     status.setDate(date == null ? null : date.toLocalDate());
+
+    status.setUserId(userIdColumn == null ? null : rs.getInt(userIdColumn));
     return status;
   }
 
