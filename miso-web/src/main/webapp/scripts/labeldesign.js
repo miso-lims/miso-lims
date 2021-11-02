@@ -22,6 +22,10 @@
  */
 
 function printerLabelEditor(layout, width, height, saveCallback) {
+  var scale = Math.min(Math.max(width, 200) / width, Math.max(height, 200) / height);
+  var margins = Math.max(width, height) * 0.25 * scale;
+  var bgWidth = width * scale + margins * 2;
+  var bgHeight = height * scale + margins * 2;
   var current = JSON.parse(JSON.stringify(layout));
   var dialogNode = document.createElement("div");
   document.body.appendChild(dialogNode);
@@ -29,32 +33,33 @@ function printerLabelEditor(layout, width, height, saveCallback) {
   var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   dialogNode.appendChild(svg);
   dialogNode.appendChild(document.createElement("br"));
-  svg.setAttributeNS(null, "width", width + "mm");
-  svg.setAttributeNS(null, "height", height + "mm");
-  // Create a yellow rectangle as background
+  svg.setAttributeNS(null, "width", bgWidth);
+  svg.setAttributeNS(null, "height", bgHeight);
+  // Create a yellow rectangle as background for the label
   var bg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-  bg.setAttributeNS(null, "x", "0mm");
-  bg.setAttributeNS(null, "y", "0mm");
-  bg.setAttributeNS(null, "width", width + "mm");
-  bg.setAttributeNS(null, "height", height + "mm");
-  bg.setAttribute("fill", "#FEFEE3");
+  bg.setAttributeNS(null, "x", margins);
+  bg.setAttributeNS(null, "y", margins);
+  bg.setAttributeNS(null, "width", width * scale);
+  bg.setAttributeNS(null, "height", height * scale);
+  bg.setAttribute("fill", "#FFF27A");
   svg.appendChild(bg);
-  for (grid = 5; grid < width; grid += 5) {
+  var lineGap = 15;
+  for (grid = lineGap; grid < bgWidth; grid += lineGap) {
     var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    line.setAttributeNS(null, "x1", grid + "mm");
-    line.setAttributeNS(null, "x2", grid + "mm");
-    line.setAttributeNS(null, "y1", "0mm");
-    line.setAttributeNS(null, "y2", height + "mm");
+    line.setAttributeNS(null, "x1", grid);
+    line.setAttributeNS(null, "x2", grid);
+    line.setAttributeNS(null, "y1", "0");
+    line.setAttributeNS(null, "y2", bgHeight);
     line.setAttributeNS(null, "stroke", "#00000040");
     line.setAttributeNS(null, "stroke-dasharray", "1 1");
     svg.appendChild(line);
   }
-  for (grid = 5; grid < height; grid += 5) {
+  for (grid = lineGap; grid < bgHeight; grid += lineGap) {
     var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    line.setAttributeNS(null, "x1", "0mm");
-    line.setAttributeNS(null, "x2", width + "mm");
-    line.setAttributeNS(null, "y1", grid + "mm");
-    line.setAttributeNS(null, "y2", grid + "mm");
+    line.setAttributeNS(null, "x1", "0");
+    line.setAttributeNS(null, "x2", bgWidth);
+    line.setAttributeNS(null, "y1", grid);
+    line.setAttributeNS(null, "y2", grid);
     line.setAttributeNS(null, "stroke", "#00000040");
     line.setAttributeNS(null, "stroke-dasharray", "1 1");
     svg.appendChild(line);
@@ -64,6 +69,7 @@ function printerLabelEditor(layout, width, height, saveCallback) {
     "http://www.w3.org/2000/svg",
     "g"
   );
+  labelContents.setAttributeNS(null, "transform", "translate(" + margins + "," + margins + ")");
   svg.appendChild(labelContents);
   jQuery(dialogNode)
     .append(
@@ -215,18 +221,18 @@ function printerLabelEditor(layout, width, height, saveCallback) {
     // Set up a rectangle for a thing being drawn, these can overlap, but we're overlapping in the same way as the printer, so fine.
     current.forEach(function(labelElement, index) {
       var rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-      rect.setAttributeNS(null, "x", labelElement.x + "mm");
-      rect.setAttributeNS(null, "y", labelElement.y + "mm");
+      rect.setAttributeNS(null, "x", labelElement.x * scale);
+      rect.setAttributeNS(null, "y", labelElement.y * scale);
       rect.setAttribute("stroke", "#000");
       rect.setAttribute("stroke-width", "1px");
       // Set a colour and dimensions for each element. We can't know the real layout exactly since the printers have all the font metrics, so make some reasonable guesses.
       switch (labelElement.element) {
         case "1dbarcode":
-          rect.setAttributeNS(null, "height", labelElement.height + "mm");
+          rect.setAttributeNS(null, "height", labelElement.height * scale);
           rect.setAttributeNS(
             null,
             "width",
-            labelElement.moduleWidth * 100 + "mm"
+            labelElement.moduleWidth * 100 * scale
           );
           rect.setAttribute("fill", "#ff000080");
           break;
@@ -234,12 +240,12 @@ function printerLabelEditor(layout, width, height, saveCallback) {
           rect.setAttributeNS(
             null,
             "height",
-            labelElement.moduleSize * 144 + "mm"
+            labelElement.moduleSize * 144 * scale
           );
           rect.setAttributeNS(
             null,
             "width",
-            labelElement.moduleSize * 144 + "mm"
+            labelElement.moduleSize * 144 * scale
           );
           rect.setAttribute("fill", "#0000ff80");
           break;
@@ -248,12 +254,12 @@ function printerLabelEditor(layout, width, height, saveCallback) {
           rect.setAttributeNS(
             null,
             blockRotate ? "width" : "height",
-            labelElement.height * labelElement.rowLimit + "mm"
+            labelElement.height * labelElement.rowLimit * scale
           );
           rect.setAttributeNS(
             null,
             blockRotate ? "height" : "width",
-            (labelElement.lineLimit * labelElement.height) / 2 + "mm"
+            (labelElement.lineLimit * labelElement.height) / 2 * scale
           );
           rect.setAttribute("fill", "#d0d0d080");
           break;
@@ -262,12 +268,12 @@ function printerLabelEditor(layout, width, height, saveCallback) {
           rect.setAttributeNS(
             null,
             textRotate ? "width" : "height",
-            labelElement.height + "mm"
+            labelElement.height * scale
           );
           rect.setAttributeNS(
             null,
             textRotate ? "height" : "width",
-            (labelElement.lineLimit * labelElement.height) / 2 + "mm"
+            (labelElement.lineLimit * labelElement.height) / 2 * scale
           );
           rect.setAttribute("fill", "#a0a0a080");
           break;
