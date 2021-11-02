@@ -399,19 +399,19 @@ public enum PrintableField implements PrintableText {
 
       @Override
       public String visitLibraryAliquotDetailed(DetailedLibraryAliquot libraryAliquot) {
-        T sampleTissue = LimsUtils.getParent(clazz, (DetailedSample) libraryAliquot.getLibrary().getSample());
+        T sampleTissue = LimsUtils.getParentOrSelf(clazz, (DetailedSample) libraryAliquot.getLibrary().getSample());
         return sampleTissue == null ? null : getter.apply(sampleTissue);
       }
 
       @Override
       public String visitLibraryDetailed(DetailedLibrary library) {
-        T sampleTissue = LimsUtils.getParent(clazz, (DetailedSample) library.getSample());
+        T sampleTissue = LimsUtils.getParentOrSelf(clazz, (DetailedSample) library.getSample());
         return sampleTissue == null ? null : getter.apply(sampleTissue);
       }
 
       @Override
       public String visitSampleDetailed(DetailedSample sample) {
-        T sampleTissue = LimsUtils.getParent(clazz, sample);
+        T sampleTissue = LimsUtils.getParentOrSelf(clazz, sample);
         return sampleTissue == null ? null : getter.apply(sampleTissue);
       }
 
