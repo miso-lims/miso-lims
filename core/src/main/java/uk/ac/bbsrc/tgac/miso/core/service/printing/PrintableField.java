@@ -215,20 +215,51 @@ public enum PrintableField implements PrintableText {
 
         @Override
         public String visitLibraryAliquotDetailed(DetailedLibraryAliquot libraryAliquot) {
-          GroupIdentifiable groupParent = libraryAliquot.getEffectiveGroupIdEntity();
-          return groupParent == null ? null : groupParent.getGroupDescription();
+          return getGroupDescription(libraryAliquot);
         }
 
         @Override
         public String visitLibraryDetailed(DetailedLibrary library) {
-          GroupIdentifiable groupParent = library.getEffectiveGroupIdEntity();
-          return groupParent == null ? null : groupParent.getGroupDescription();
+          return getGroupDescription(library);
         }
 
         @Override
         public String visitSampleDetailed(DetailedSample sample) {
-          GroupIdentifiable groupParent = sample.getEffectiveGroupIdEntity();
+          return getGroupDescription(sample);
+        }
+
+        public String getGroupDescription(GroupIdentifiable item) {
+          GroupIdentifiable groupParent = item.getEffectiveGroupIdEntity();
           return groupParent == null ? null : groupParent.getGroupDescription();
+        }
+
+      });
+    }
+  },
+  GROUP_ID {
+
+    @Override
+    public String text(Barcodable barcodable) {
+      return barcodable.visit(new BarcodableVisitor<String>() {
+
+        @Override
+        public String visitLibraryAliquotDetailed(DetailedLibraryAliquot libraryAliquot) {
+          return getGroupId(libraryAliquot);
+        }
+
+        @Override
+        public String visitLibraryDetailed(DetailedLibrary library) {
+          return getGroupId(library);
+        }
+
+        @Override
+        public String visitSampleDetailed(DetailedSample sample) {
+          return getGroupId(sample);
+        }
+
+        public String getGroupId(GroupIdentifiable item) {
+          GroupIdentifiable groupParent = item.getEffectiveGroupIdEntity();
+          return groupParent == null ? null : groupParent.getGroupId();
         }
 
       });
