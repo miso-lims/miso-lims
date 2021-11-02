@@ -334,6 +334,15 @@ public class LimsUtils {
     return null;
   }
 
+  public static <T extends DetailedSample> T getParentOrSelf(Class<T> targetParentClass, DetailedSample start) {
+    for (DetailedSample current = deproxify(start); current != null; current = deproxify(current.getParent())) {
+      if (targetParentClass.isInstance(current)) {
+        return targetParentClass.cast(current);
+      }
+    }
+    return null;
+  }
+
   /**
    * universal temporary name prefix. TODO: these same methods are in sqlstore DbUtils;
    * use those when refactoring away the ProjectService.
