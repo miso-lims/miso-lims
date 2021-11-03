@@ -175,7 +175,7 @@ ListTarget.sequencingordercompletion = {
         return data;
       }
     }, {
-      "sTitle": "Last Modified",
+      "sTitle": "Modified",
       "mData": "lastUpdated",
       "iSortPriority": 2,
       "include": true

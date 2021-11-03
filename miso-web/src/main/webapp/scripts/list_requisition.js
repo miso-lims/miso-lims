@@ -39,7 +39,7 @@ ListTarget.requisition = (function() {
           return data;
         }
       }, {
-        sTitle: 'Last Modified',
+        sTitle: 'Modified',
         mData: 'lastModified',
         iSortPriority: 1,
         bSortDirection: false

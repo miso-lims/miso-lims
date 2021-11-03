@@ -33,7 +33,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String CONTAINER = "Container";
     public static final String CONTAINER_MODEL = "Container Model";
     public static final String CORRESPONDING_FIELD = "Corresponding Field";
-    public static final String CREATION_DATE = "Creation Date";
+    public static final String CREATION_DATE = "Created";
     public static final String CREATOR = "Creator";
     public static final String DATE_CREATED = "Date Created";
     public static final String DEFAULT_SCI_NAME = "Default Scientific Name";
@@ -44,6 +44,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String DRIVER = "Driver";
     public static final String END_DATE = "End Date";
     public static final String EXTERNAL = "External";
+    public static final String EXTERNAL_NAME = "External Name";
     public static final String FAILED = "Failed";
     public static final String FALLBACK = "Fallback";
     public static final String FAMILY = "Family";
@@ -65,7 +66,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String ITEMS_CAPACITY = "Items/Capacity";
     public static final String KIT_NAME = "Kit Name";
     public static final String LABEL = "Label";
-    public static final String LAST_MODIFIED = "Last Modified";
+    public static final String LAST_MODIFIED = "Modified";
     public static final String LAST_RUN_ALIAS = "Last Run Alias";
     public static final String LAST_RUN_NAME = "Last Run Name";
     public static final String LAST_SEQUENCER = "Last Sequencer Used";
@@ -145,6 +146,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String TARGETED_SEQUENCING = "Targeted Sequencing";
     public static final String TARGETED_SEQUENCING_REQD = "Targeted Sequencing Required";
     public static final String THRESHOLD_TYPE = "Threshold Type";
+    public static final String TISSUE_ATTRIBUTES = "Tissue Attributes";
     public static final String TISSUE_ORIGIN = "Tissue Origin";
     public static final String TISSUE_TYPE = "Tissue Type";
     public static final String TRANSFER_TIME = "Transfer Time";

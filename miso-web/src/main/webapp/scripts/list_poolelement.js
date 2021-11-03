@@ -156,7 +156,7 @@ ListTarget.poolelement = {
             }).join(', ');
           }
         }, {
-          sTitle: 'Last Modified',
+          sTitle: 'Modified',
           mData: 'lastModified',
           include: true,
           iSortPriority: 0,

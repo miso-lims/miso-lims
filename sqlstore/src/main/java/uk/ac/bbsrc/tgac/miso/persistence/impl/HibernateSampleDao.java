@@ -58,6 +58,7 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   private static final String[] SEARCH_PROPERTIES = new String[] { "alias", "identificationBarcode", "name" };
   private static final List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(
       new AliasDescriptor("parentAttributes", JoinType.LEFT_OUTER_JOIN),
+      new AliasDescriptor("parentAttributes.identityAttributes", JoinType.LEFT_OUTER_JOIN),
       new AliasDescriptor("parentAttributes.tissueAttributes", JoinType.LEFT_OUTER_JOIN),
       new AliasDescriptor("tissueAttributes.tissueOrigin", JoinType.LEFT_OUTER_JOIN),
       new AliasDescriptor("tissueAttributes.tissueType", JoinType.LEFT_OUTER_JOIN),
@@ -288,6 +289,8 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   @Override
   public String propertyForSortColumn(String original) {
     switch (original) {
+    case "effectiveExternalNames":
+      return "identityAttributes.externalName";
     case "effectiveTissueOriginLabel":
       return "tissueOrigin.alias";
     case "effectiveTissueTypeLabel":

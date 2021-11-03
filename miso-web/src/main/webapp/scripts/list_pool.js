@@ -159,7 +159,7 @@ ListTarget.pool = {
       "include": true,
       "iSortPriority": 0
     }, {
-      "sTitle": "Last Modified",
+      "sTitle": "Modified",
       "mData": "lastModified",
       "include": Constants.isDetailedSample,
       "iSortPriority": 2

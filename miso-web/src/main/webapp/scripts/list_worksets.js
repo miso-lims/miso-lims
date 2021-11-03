@@ -106,7 +106,7 @@ ListTarget.workset = {
           include: config.creator === 'all',
           iSortPriority: 0
         }, {
-          sTitle: "Last Modified",
+          sTitle: "Modified",
           mData: "lastModified",
           include: true,
           iSortPriority: 1
