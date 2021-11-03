@@ -48,7 +48,7 @@ ListTarget.array = {
         ListUtils.idHyperlinkColumn('Serial Number', Urls.ui.arrays.edit, 'id', function(item) {
           return item.serialNumber;
         }, 0, true), {
-          sTitle: 'Last Modified',
+          sTitle: 'Modified',
           mData: 'lastModified',
           include: true,
           iSortPriority: 2,

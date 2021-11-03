@@ -142,7 +142,7 @@ ListTarget.container = {
         }, "lastRunAlias", -1, true), ListUtils.labelHyperlinkColumn("Last Sequencer Used", Urls.ui.instruments.edit, function(container) {
           return container.lastSequencerId;
         }, "lastSequencerName", -1, true), {
-          "sTitle": "Last Modified",
+          "sTitle": "Modified",
           "mData": "lastModified",
           "include": true,
           "iSortPriority": 2

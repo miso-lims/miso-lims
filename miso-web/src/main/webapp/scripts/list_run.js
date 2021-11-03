@@ -134,7 +134,7 @@ ListTarget.run = {
           "mRender": ListUtils.render.booleanChecks,
           "include": config.requisitionId
         }, {
-          "sTitle": "Last Modified",
+          "sTitle": "Modified",
           "mData": "lastModified",
           "include": Constants.isDetailedSample,
           "iSortPriority": 0,

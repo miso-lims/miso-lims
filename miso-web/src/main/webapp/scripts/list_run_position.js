@@ -96,7 +96,7 @@ ListTarget.run_position = {
           mData: "containerModel.alias",
           include: true
         }, {
-          sTitle: "Last Modified",
+          sTitle: "Modified",
           mData: "lastModified",
           include: true,
           iSortPriority: 2

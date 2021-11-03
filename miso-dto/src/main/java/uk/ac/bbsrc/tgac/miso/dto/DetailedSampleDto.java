@@ -26,6 +26,7 @@ public class DetailedSampleDto extends SampleDto implements UpstreamQcFailableDt
   private String effectiveGroupIdSample;
   private String effectiveTissueOriginLabel;
   private String effectiveTissueTypeLabel;
+  private String effectiveTimepoint;
   private Long effectiveQcFailureId;
   private String effectiveQcFailureLevel;
   private String creationDate;
@@ -246,6 +247,14 @@ public class DetailedSampleDto extends SampleDto implements UpstreamQcFailableDt
 
   public void setEffectiveTissueTypeLabel(String effectiveTissueTypeLabel) {
     this.effectiveTissueTypeLabel = effectiveTissueTypeLabel;
+  }
+
+  public String getEffectiveTimepoint() {
+    return effectiveTimepoint;
+  }
+
+  public void setEffectiveTimepoint(String effectiveTimepoint) {
+    this.effectiveTimepoint = effectiveTimepoint;
   }
 
   @Override

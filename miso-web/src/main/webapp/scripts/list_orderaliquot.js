@@ -101,7 +101,7 @@ ListTarget.orderaliquot = {
             }).join(', ');
           }
         }, {
-          'sTitle': 'Last Modified',
+          'sTitle': 'Modified',
           'mData': 'aliquot.lastModified',
           'include': true,
           'iSortPriority': 0

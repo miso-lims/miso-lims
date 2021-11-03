@@ -151,17 +151,36 @@ ListTarget.sample = (function() {
         }),
         "sClass": "nowrap"
       }, ListUtils.labelHyperlinkColumn("Alias", Urls.ui.samples.edit, Utils.array.getId, "alias", 0, true), {
-        "sTitle": "Tissue Origin",
-        "mData": "effectiveTissueOriginLabel",
-        "include": Constants.isDetailedSample,
-        "mRender": ListUtils.render.naIfNull,
-        "iSortPriority": 0
+        "sTitle": "External Name",
+        "mData": "effectiveExternalNames",
+        "include": Constants.isDetailedSample
       }, {
-        "sTitle": "Tissue Type",
+        "sTitle": "Tissue Attributes",
         "mData": "effectiveTissueTypeLabel",
         "include": Constants.isDetailedSample,
-        "mRender": ListUtils.render.naIfNull,
-        "iSortPriority": 0
+        "mRender": function(data, type, full) {
+          if (type !== "display") {
+            return data;
+          } else if (!data) {
+            return 'n/a';
+          }
+          var label = full.effectiveTissueOriginLabel + " " + full.effectiveTissueTypeLabel;
+          if (full.effectiveTimepoint) {
+            if (full.effectiveTimepoint.length > 12) {
+              label += " " + full.effectiveTimepoint.substring(0,12) + "&#8230;"; // #8230=ellipsis
+            } else {
+              label += " " + full.effectiveTimepoint;
+            }
+          }
+          return '<div class="tooltip" style="width: 100%;">'
+              + '<span>' + label + '</span>'
+              + '<span class="tooltiptext">'
+              + 'Tissue origin: ' + full.effectiveTissueOriginLabel + '<br/>'
+              + 'Tissue type: ' + full.effectiveTissueTypeLabel + '<br/>'
+              + (full.effectiveTimepoint ? 'Timepoint: ' + full.effectiveTimepoint + '<br/>' : '')
+              + '</span>'
+              + '</div>';
+        }
       }, {
         "sTitle": "Sample Class",
         "mData": "sampleClassId",
@@ -183,14 +202,23 @@ ListTarget.sample = (function() {
         "include": true,
         "iSortPriority": 0
       }, {
-        "sTitle": "Creation Date",
+        "sTitle": "Created",
         "mData": "creationDate",
         "sDefaultContent": "",
         "include": Constants.isDetailedSample,
         "iSortPriority": 0
       }, {
-        "sTitle": "Last Modified",
+        "sTitle": "Modified",
         "mData": "lastModified",
+        "mRender": function(data, type, full) {
+          if (type !== 'display') {
+            return data;
+          }
+          return '<div class="tooltip">'
+              + '<span>' + data.split(" ")[0] + '</span>'
+              + '<span class="tooltiptext">' + data + '</span>'
+              + '</div>'
+        },
         "include": Constants.isDetailedSample,
         "iSortPriority": 2
       }, {

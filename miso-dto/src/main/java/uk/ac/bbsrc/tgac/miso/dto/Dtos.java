@@ -455,11 +455,13 @@ public class Dtos {
       if (detailed.getIdentityAttributes() != null) {
         ParentIdentityAttributes identity = detailed.getIdentityAttributes();
         setString(dto::setIdentityConsentLevel, maybeGetProperty(identity.getConsentLevel(), ConsentLevel::getLabel));
+        setString(dto::setEffectiveExternalNames, identity.getExternalName());
       }
       if (detailed.getTissueAttributes() != null) {
         ParentTissueAttributes tissue = detailed.getTissueAttributes();
         setString(dto::setEffectiveTissueOriginLabel, maybeGetProperty(tissue.getTissueOrigin(), TissueOrigin::getAlias));
         setString(dto::setEffectiveTissueTypeLabel, maybeGetProperty(tissue.getTissueType(), TissueType::getAlias));
+        setString(dto::setEffectiveTimepoint, tissue.getTimepoint());
       }
       setEffectiveQcFailure(from, dto);
     }

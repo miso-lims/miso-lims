@@ -167,7 +167,7 @@ ListTarget.libraryaliquot = {
       "iSortPriority": 0,
       "mRender": ListUtils.render.measureWithUnits(Constants.concentrationUnits, 'concentrationUnits')
     }, {
-      "sTitle": "Last Modified",
+      "sTitle": "Modified",
       "mData": "lastModified",
       "include": true,
       "iSortPriority": 2

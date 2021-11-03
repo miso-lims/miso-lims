@@ -70,7 +70,7 @@ ListTarget.transfer = (function() {
         },
         bSortable: false
       }, {
-        sTitle: 'Last Modified',
+        sTitle: 'Modified',
         mData: 'lastModified',
         iSortPriority: 1
       }];

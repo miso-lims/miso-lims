@@ -33,6 +33,8 @@ public class ParentTissueAttributes implements Serializable {
   @JoinColumn(name = "tissueTypeId")
   private TissueType tissueType;
 
+  private String timepoint;
+
   public long getId() {
     return sampleId;
   }
@@ -55,6 +57,14 @@ public class ParentTissueAttributes implements Serializable {
 
   public void setTissueType(TissueType tissueType) {
     this.tissueType = tissueType;
+  }
+
+  public String getTimepoint() {
+    return timepoint;
+  }
+
+  public void setTimepoint(String timepoint) {
+    this.timepoint = timepoint;
   }
 
 }
