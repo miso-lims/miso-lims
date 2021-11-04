@@ -1514,7 +1514,12 @@ public class MisoClient implements Lims {
     java.sql.Date date = dateColumn == null ? null : rs.getDate(dateColumn);
     status.setDate(date == null ? null : date.toLocalDate());
 
-    status.setUserId(userIdColumn == null ? null : rs.getInt(userIdColumn));
+    if (userIdColumn != null) {
+      int userId = rs.getInt(userIdColumn);
+      if (!rs.wasNull()) {
+        status.setUserId(userId);
+      }
+    }
     return status;
   }
 
