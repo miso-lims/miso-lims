@@ -7,6 +7,30 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.37.0] - 2021-11-05
+
+### Added
+
+* Requisitions and assays in Pinery
+* Option to print group ID on labels (detailed sample)
+
+### Changed
+
+* Updated pools to use the newer bulk interface for improved performance
+
+### Fixed
+
+* Tissue attributes not printing correctly on labels (detailed sample)
+* Pinery showing QC user ID 0 instead of null
+* Transfer List V2 sample download sheet showing initial volume instead of
+  current volume
+* Missing titles on assay pages
+
+### Upgrade Notes
+
+* Updated to use Pinery v2.20.0
+
+
 ## [1.36.1] - 2021-10-07
 
 ### Fixed
