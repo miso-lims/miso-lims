@@ -503,8 +503,7 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
 
   @Override
   public void restrictPaginationByIdentityIds(Criteria criteria, List<Long> identityIds, Consumer<String> errorHandler) {
-    criteria.createAlias("parentAttributes.identityAttributes", "identity")
-        .add(Restrictions.in("identity.id", identityIds));
+    criteria.add(Restrictions.in("identityAttributes.id", identityIds));
   }
 
 }
