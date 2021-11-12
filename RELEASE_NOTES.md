@@ -16,7 +16,14 @@ Starting with version 1.29.0, the format of this file is based on
 
 ### Changed
 
+* Improved label editor display to make elements easier to see and target
 * Updated pools to use the newer bulk interface for improved performance
+* Columns on Samples list
+  * added external name (detailed sample)
+  * added timepoint (detailed sample)
+  * combined tissue origin, tissue type, and timepoint into a single column
+    (detailed sample)
+  * condensed last modified date
 
 ### Fixed
 
