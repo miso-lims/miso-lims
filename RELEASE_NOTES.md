@@ -37,6 +37,11 @@ Starting with version 1.29.0, the format of this file is based on
 
 * Updated to use Pinery v2.20.0
 
+### Known Issues
+
+* 'Filter Below' function on Identity Search page is not working (detailed
+  sample)
+
 
 ## [1.36.1] - 2021-10-07
 
