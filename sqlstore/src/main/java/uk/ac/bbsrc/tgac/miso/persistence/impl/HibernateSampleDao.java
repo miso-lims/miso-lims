@@ -258,10 +258,11 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
     criteria.add(eqNullable("timesReceived", tissue.getTimesReceived()));
     criteria.add(eqNullable("tubeNumber", tissue.getTubeNumber()));
     criteria.add(eqNullable("passageNumber", tissue.getPassageNumber()));
+    criteria.add(eqNullable("timepoint", tissue.getTimepoint()));
     return (SampleTissue) criteria.uniqueResult();
   }
 
-  private Criterion eqNullable(String propertyName, Integer value) {
+  private Criterion eqNullable(String propertyName, Object value) {
     return value == null ? Restrictions.isNull(propertyName) : Restrictions.eq(propertyName, value);
   }
 
