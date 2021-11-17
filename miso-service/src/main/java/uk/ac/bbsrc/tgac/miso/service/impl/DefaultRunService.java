@@ -833,8 +833,8 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   }
 
   private boolean updateHealthFromNotification(Run notification, final Run managed, User user) {
-    if (notification.getHealth() == null) {
-      // If the server has sent us nothing, ignore it.
+    if (notification.getHealth() == null || notification.getHealth() == managed.getHealth()) {
+      // server sent us nothing, or no change
       return false;
     } else if (notification.getHealth() == HealthType.Unknown) {
       // If it is sending us (effectively) an error, don't update the health if we have something already.
