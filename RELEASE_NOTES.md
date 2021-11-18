@@ -7,6 +7,21 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.38.0] - 2021-11-18
+
+### Changed
+
+* * When receiving samples, an existing ghost tissue must now match the
+  timepoint in addition to tissue origin, tissue type, times received, tube
+  number, and passage in order for the new sample to be parented to it
+
+### Fixed
+
+* Error deleting instrument models with defined run positions
+* 'Filter Below' function on Identity Search page was not working
+* Runs from Run Scanner were being updated even when there were no changes
+
+
 ## [1.37.0] - 2021-11-05
 
 ### Added
