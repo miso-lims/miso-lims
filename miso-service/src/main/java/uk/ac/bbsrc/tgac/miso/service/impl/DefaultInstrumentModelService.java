@@ -222,6 +222,9 @@ public class DefaultInstrumentModelService extends AbstractSaveService<Instrumen
     if (!params.isEmpty()) {
       sequencingParametersService.bulkDelete(params);
     }
+    for (InstrumentPosition pos : object.getPositions()) {
+      instrumentModelStore.deletePosition(pos);
+    }
   }
 
   @Override
