@@ -140,6 +140,7 @@ public class DefaultQcStatusService implements QcStatusService {
         runPartition.setQcType(status);
       }
       runPartition.setNotes(update.getQcNote());
+      runPartition.setLastModifier(authorizationManager.getCurrentUser());
       runPartitionService.save(runPartition);
       break;
     }
