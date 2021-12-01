@@ -131,7 +131,7 @@ ListTarget.run = {
         }, {
           "sTitle": "Data Review",
           "mData": "dataReview",
-          "mRender": ListUtils.render.booleanChecks,
+          "mRender": ListUtils.render.dataReview,
           "include": config.requisitionId
         }, {
           "sTitle": "Modified",

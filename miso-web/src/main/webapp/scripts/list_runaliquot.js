@@ -131,18 +131,7 @@ ListTarget.runaliquot = {
       }, {
         sTitle: 'Data Review',
         mData: 'dataReview',
-        mRender: function(data, type, full) {
-          if (data === undefined || data === null) {
-            return 'Pending';
-          }
-          var status = data ? 'Pass' : 'Fail';
-          if (type !== 'display') {
-            return status;
-          }
-          return '<div class="tooltip"><span>' + status + '</span>'
-              + '<span class="tooltiptext">Set by ' + full.dataReviewer + ', ' + full.dataReviewDate
-              + '</span></div>';
-        }
+        mRender: ListUtils.render.dataReview
       }, {
         sTitle: 'Hierarchy',
         mData: function(full) {

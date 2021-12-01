@@ -755,6 +755,18 @@ ListUtils = (function($) {
           return "?";
         }
       },
+      dataReview: function(data, type, full) {
+        if (data === undefined || data === null) {
+          return '?';
+        }
+        var status = data ? '✔' : '✘';
+        if (type !== 'display') {
+          return status;
+        }
+        return '<div class="tooltip"><span>' + status + '</span>'
+            + '<span class="tooltiptext">Set by ' + full.dataReviewer + ', ' + full.dataReviewDate
+            + '</span></div>';
+      },
       platformType: function(data, type, full) {
         return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.namePredicate(data), Constants.platformTypes), 'key')
             || 'Unknown';

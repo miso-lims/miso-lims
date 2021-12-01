@@ -43,7 +43,7 @@ public class RunDto {
   private String qcUserName;
   private String qcDate;
   private Boolean dataReview;
-  private String dataReviewerName;
+  private String dataReviewer;
   private String dataReviewDate;
   private String projectsLabel;
   private Long sopId;
@@ -249,12 +249,12 @@ public class RunDto {
     this.dataReview = dataReview;
   }
 
-  public String getDataReviewerName() {
-    return dataReviewerName;
+  public String getDataReviewer() {
+    return dataReviewer;
   }
 
-  public void setDataReviewerName(String dataReviewerName) {
-    this.dataReviewerName = dataReviewerName;
+  public void setDataReviewer(String dataReviewerName) {
+    this.dataReviewer = dataReviewerName;
   }
 
   public String getDataReviewDate() {
