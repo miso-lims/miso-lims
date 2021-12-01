@@ -20,11 +20,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.RequisitionService;
@@ -107,18 +110,33 @@ public class RequisitionController {
     model.put("libraries", libraryDtos);
 
     Set<Run> runs = new HashSet<>();
+    Set<RunPartitionAliquot> runLibraries = new HashSet<>();
     for (Library library : libraries) {
-      runs.addAll(runService.listByLibraryId(library.getId()));
+      List<Run> libraryRuns = runService.listByLibraryId(library.getId());
+      List<RunPartitionAliquot> libraryRunLibraries = runPartitionAliquotService.listByLibraryId(library.getId());
+      for (Run run : libraryRuns) {
+        for (SequencerPartitionContainer container : run.getSequencerPartitionContainers()) {
+          for (Partition partition : container.getPartitions()) {
+            if (partition.getPool() != null) {
+              for (PoolElement poolElement : partition.getPool().getPoolContents()) {
+                if (poolElement.getAliquot().getLibraryId().longValue() == library.getId()
+                    && libraryRunLibraries.stream().noneMatch(runlib -> runlib.getRun().getId() == run.getId()
+                        && runlib.getPartition().getId() == partition.getId())) {
+                  libraryRunLibraries.add(new RunPartitionAliquot(run, partition, poolElement.getAliquot()));
+                }
+              }
+            }
+          }
+        }
+      }
+      runs.addAll(libraryRuns);
+      runLibraries.addAll(libraryRunLibraries);
     }
+
     List<RunDto> runDtos = runs.stream()
         .map(Dtos::asDto)
         .collect(Collectors.toList());
     model.put("runs", runDtos);
-
-    Set<RunPartitionAliquot> runLibraries = new HashSet<>();
-    for (Library library : libraries) {
-      runLibraries.addAll(runPartitionAliquotService.listByLibraryId(library.getId()));
-    }
     List<RunPartitionAliquotDto> runLibraryDtos = runLibraries.stream()
         .map(Dtos::asDto)
         .collect(Collectors.toList());
