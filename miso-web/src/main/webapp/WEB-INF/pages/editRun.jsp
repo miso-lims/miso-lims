@@ -147,7 +147,7 @@
     <miso:list-section id="list_partition" name="${run.platformType.pluralPartitionName}" target="partition" items="${runPartitions}" config="${partitionConfig}"/>
   </div>
   <div id="aliquots">
-    <miso:list-section id="list_aliquot" name="Library Aliquots" target="runaliquot" items="${runAliquots}" config="{runId: ${run.id}}"/>
+    <miso:list-section id="list_aliquot" name="Run-Libraries" target="runaliquot" items="${runAliquots}" config="{runId: ${run.id}}"/>
   </div>
   <div id="experiments">
     <miso:list-section id="list_experiment" name="Experiments" target="experiment" alwaysShow="true" items="${experiments}" config="${experimentConfiguration}"/>
