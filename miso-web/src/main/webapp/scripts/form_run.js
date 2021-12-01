@@ -243,7 +243,7 @@ FormTarget.run = (function($) {
               });
             }
             if (newValue === null || newValue !== object.qcPassed) {
-              form.updateField('dataReviewerName', {
+              form.updateField('dataReviewer', {
                 label: 'n/a'
               });
               form.updateField('dataReviewDate', {
@@ -288,10 +288,10 @@ FormTarget.run = (function($) {
           include: !config.isRunReviewer
         }, {
           title: 'Data Reviewer',
-          data: 'dataReviewerName',
+          data: 'dataReviewer',
           type: 'read-only',
           getDisplayValue: function(run) {
-            return run.dataReviewerName || 'n/a';
+            return run.dataReviewer || 'n/a';
           }
         }, {
           title: 'Data Review Date',

@@ -2020,7 +2020,7 @@ public class Dtos {
     setString(dto::setQcUserName, maybeGetProperty(from.getQcUser(), User::getFullName));
     setDateString(dto::setQcDate, from.getQcDate());
     setBoolean(dto::setDataReview, from.getDataReview(), true);
-    setString(dto::setDataReviewerName, maybeGetProperty(from.getDataReviewer(), User::getFullName));
+    setString(dto::setDataReviewer, maybeGetProperty(from.getDataReviewer(), User::getFullName));
     setDateString(dto::setDataReviewDate, from.getDataReviewDate());
     setId(dto::setSopId, from.getSop());
     setString(dto::setDataManglingPolicy, maybeGetProperty(from.getDataManglingPolicy(), InstrumentDataManglingPolicy::name));
