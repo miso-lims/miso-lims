@@ -7,6 +7,20 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.39.0] - 2021-12-02
+
+### Changed
+
+* Renamed Library Aliquots table on the Edit Run page to Run-Libraries
+* Updated display of data review column to be consistent between runs and run-libraries
+
+### Fixed
+
+* The wrong user was recorded in run change logs when setting partition QC from the Run-Library
+  Metrics page
+* Missing run-libraries on the Edit Requisition page
+
+
 ## [1.38.0] - 2021-11-18
 
 ### Changed
