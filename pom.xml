@@ -144,7 +144,7 @@
     <junit.version>4.12</junit.version>
     <mockito.verison>1.10.19</mockito.verison>
     <jersey.version>1.19</jersey.version>
-    <log4j.version>2.14.1</log4j.version>
+    <log4j.version>2.15.0</log4j.version>
     <poi.version>3.17</poi.version>
     <prometheus.version>0.0.21</prometheus.version>
     <prometheus.jmx.version>0.9</prometheus.jmx.version>
