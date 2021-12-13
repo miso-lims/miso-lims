@@ -7,6 +7,13 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.39.1] - 2021-12-13
+
+### Fixed
+
+* Updated log4j library to patch log4shell vulnerability
+
+
 ## [1.39.0] - 2021-12-02
 
 ### Changed
