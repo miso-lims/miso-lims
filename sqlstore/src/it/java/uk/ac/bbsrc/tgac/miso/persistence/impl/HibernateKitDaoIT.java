@@ -125,13 +125,15 @@ public class HibernateKitDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetKitDescriptorByPartNumber() throws IOException {
-    KitDescriptor kitDescriptor = dao.getKitDescriptorByPartNumber("k002");
+    KitDescriptor kitDescriptor = dao.getKitDescriptorByPartNumber("k002", KitType.LIBRARY,
+        PlatformType.ILLUMINA);
     assertThat(kitDescriptor.getName(), is("Test Kit 2"));
   }
 
   @Test
   public void testGetKitDescriptorByPartNumberNotFound() throws IOException {
-    KitDescriptor kitDescriptor = dao.getKitDescriptorByPartNumber("doesnotexist");
+    KitDescriptor kitDescriptor = dao.getKitDescriptorByPartNumber("doesnotexist", KitType.LIBRARY,
+        PlatformType.ILLUMINA);
     assertNull(kitDescriptor);
   }
 

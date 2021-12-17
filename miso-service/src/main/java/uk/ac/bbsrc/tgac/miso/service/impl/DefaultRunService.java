@@ -670,9 +670,6 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       create(target);
     } else if (isMutated) {
       update(target);
-    } else {
-      Run original = get(target.getId());
-      validateChanges(original, target);
     }
     return isNew;
   }
