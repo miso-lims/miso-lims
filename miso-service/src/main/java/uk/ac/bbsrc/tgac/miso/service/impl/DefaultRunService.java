@@ -223,7 +223,6 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     loadChildEntities(run);
     validateChanges(null, run);
     saveContainers(run);
-    run.setChangeDetails(authorizationManager.getCurrentUser());
 
     run.setName(generateTemporaryName());
 
@@ -238,12 +237,12 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     loadChildEntities(run);
     saveContainers(run);
     applyChanges(managed, run);
-    managed.setChangeDetails(authorizationManager.getCurrentUser());
     return save(managed).getId();
   }
 
   private Run save(Run run) throws IOException {
     try {
+      run.setChangeDetails(authorizationManager.getCurrentUser());
       Long id = runDao.save(run);
       Run saved = runDao.get(id);
 
@@ -375,7 +374,7 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       errors.add(new ValidationError("sequencingKitLot", "Sequencing kit not specified"));
     }
 
-    if (changed.getDataReview() != null && changed.getQcPassed() == null) {
+    if (isSetAndChanged(Run::getDataReview, changed, before) && changed.getQcPassed() == null) {
       errors.add(new ValidationError("dataReview", "Cannot set data review before QC status"));
     }
     ValidationUtils.validateQcUser(changed.getQcPassed(), changed.getQcUser(), errors);
@@ -594,7 +593,6 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   public boolean processNotification(Run source, int laneCount, String containerModel, String containerSerialNumber, String sequencerName,
       Predicate<SequencingParameters> filterParameters, GetLaneContents getLaneContents, String positionName)
       throws IOException, MisoNamingException {
-    final Date now = new Date();
     User user = userService.getByLoginName("notification");
     final Run target;
 
@@ -603,9 +601,6 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
 
     if (runFromDb == null) {
       target = source.getPlatformType().createRun();
-      target.setCreationTime(now);
-      target.setCreator(user);
-      target.setName(generateTemporaryName());
       target.setAlias(source.getAlias());
       isNew = true;
     } else {
@@ -649,12 +644,9 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     case ILLUMINA:
       isMutated |= updateIlluminaRunFromNotification((IlluminaRun) source, (IlluminaRun) target);
       break;
-    case IONTORRENT:
-      // Nothing to do
-      break;
     case LS454:
       isMutated |= updateField(((LS454Run) source).getCycles(), ((LS454Run) target).getCycles(),
-          v -> ((LS454Run) target).setCycles(v));
+              ((LS454Run) target)::setCycles);
       isMutated |= updateField(source.getPairedEnd(), target.getPairedEnd(), target::setPairedEnd);
       break;
     case OXFORDNANOPORE:
@@ -663,9 +655,8 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       isMutated |= updateField(((OxfordNanoporeRun)source).getProtocolVersion(), ((OxfordNanoporeRun)target).getProtocolVersion(),
               ((OxfordNanoporeRun) target)::setProtocolVersion);
       break;
+    case IONTORRENT:
     case PACBIO:
-      // Nothing to do
-      break;
     case SOLID:
       // Nothing to do
       break;
@@ -673,19 +664,15 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       throw new NotImplementedException();
     }
 
-    target.setChangeDetails(user);
-
     isMutated |= updateSequencingParameters(target, user, filterParameters, sequencer);
 
-    for (RunPosition pos : target.getRunPositions()) {
-      containerService.save(pos.getContainer());
-    }
     if (isNew) {
-      target.setName(generateTemporaryName());
-
-      save(target);
+      create(target);
     } else if (isMutated) {
-      save(target);
+      update(target);
+    } else {
+      Run original = get(target.getId());
+      validateChanges(original, target);
     }
     return isNew;
   }
@@ -845,13 +832,13 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       }
     } else {
       if (!managed.didSomeoneElseChangeColumn("health", user) || (!managed.getHealth().isDone() && notification.getHealth().isDone())) {
-        // A human user has never change the health of this run, so we will.
+        // A human user has never changed the health of this run, so we will.
         // Alternatively, a human set the status to not-done but runscanner has indicated that the run is now done, so we will update with
         // this.
         managed.setHealth(notification.getHealth());
         Date completionDate = null;
         if (notification.getHealth().isDone()) {
-          // RunScanner might not have been able to figure out a date this run was completed. If so, use the existing completino date,
+          // RunScanner might not have been able to figure out a date this run was completed. If so, use the existing completion date,
           // otherwise, guess.
           if (notification.getCompletionDate() != null) {
             completionDate = notification.getCompletionDate();
@@ -874,7 +861,7 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       target.setSequencingKit(null);
       return changed;
     }
-    KitDescriptor managedKit = kitDescriptorService.getByPartNumber(kit.getPartNumber());
+    KitDescriptor managedKit = kitDescriptorService.getByPartNumber(kit.getPartNumber(), KitType.SEQUENCING, target.getPlatformType());
     if (managedKit == null) {
       managedKit = kitDescriptorService.getByName(kit.getName());
     }

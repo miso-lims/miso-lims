@@ -20,6 +20,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.KitDescriptorService;
 import uk.ac.bbsrc.tgac.miso.core.service.TargetedSequencingService;
@@ -151,8 +152,8 @@ public class DefaultKitDescriptorService implements KitDescriptorService {
   }
 
   @Override
-  public KitDescriptor getByPartNumber(String partNumber) throws IOException {
-    return kitStore.getKitDescriptorByPartNumber(partNumber);
+  public KitDescriptor getByPartNumber(String partNumber, KitType kitType, PlatformType platformType) throws IOException {
+    return kitStore.getKitDescriptorByPartNumber(partNumber, kitType, platformType);
   }
 
   @Override
