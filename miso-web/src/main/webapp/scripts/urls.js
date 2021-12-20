@@ -223,8 +223,8 @@ Urls = (function() {
 
   var detailedQcStatusRestBase = restBase + '/detailedqcstatuses';
   rest.detailedQcStatuses = {
-    create: detailedQcStatusRestBase,
-    update: idUrlFunction(detailedQcStatusRestBase)
+    bulkSave: detailedQcStatusRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(detailedQcStatusRestBase + '/bulk')
   };
 
   // Experiments

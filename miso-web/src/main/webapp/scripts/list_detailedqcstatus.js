@@ -9,11 +9,10 @@ ListTarget.detailedqcstatus = {
   getQueryUrl: null,
   showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
-    var actions = HotTarget.detailedqcstatus.getBulkActions(config);
+    var actions = BulkTarget.detailedqcstatus.getBulkActions(config);
     if (config.isAdmin) {
-      actions.push(ListUtils.createBulkDeleteAction('Detailed QC Statuses', 'detailedqcstatuses', function(status) {
-        return status.description;
-      }));
+      actions.push(ListUtils.createBulkDeleteAction('Detailed QC Statuses', 'detailedqcstatuses',
+          Utils.array.get('description')));
     }
     return actions;
   },

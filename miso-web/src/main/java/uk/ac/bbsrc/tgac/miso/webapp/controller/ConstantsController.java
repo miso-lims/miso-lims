@@ -288,7 +288,7 @@ public class ConstantsController {
       addJsonArray(mapper, node, "kitDescriptors", kitService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "sampleClasses", sampleClassService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "sampleValidRelationships", relationships, Dtos::asDto);
-      addJsonArray(mapper, node, "detailedQcStatuses", detailedQcStatusService.getAll(), Dtos::asDto);
+      addJsonArray(mapper, node, "detailedQcStatuses", detailedQcStatusService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "subprojects", subprojectService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "labs", labService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "tissueOrigins", tissueOriginService.list(), Dtos::asDto);

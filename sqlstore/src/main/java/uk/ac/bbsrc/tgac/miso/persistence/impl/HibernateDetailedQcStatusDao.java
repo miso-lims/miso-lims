@@ -1,13 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
+import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,48 +18,15 @@ import uk.ac.bbsrc.tgac.miso.persistence.DetailedQcStatusDao;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateDetailedQcStatusDao implements DetailedQcStatusDao {
+public class HibernateDetailedQcStatusDao extends HibernateSaveDao<DetailedQcStatus> implements DetailedQcStatusDao {
 
-  @Autowired
-  private SessionFactory sessionFactory;
-
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
-  }
-
-  private Session currentSession() {
-    return sessionFactory.getCurrentSession();
-  }
-
-  @Override
-  public List<DetailedQcStatus> list() {
-    Query query = currentSession().createQuery("from DetailedQcStatusImpl");
-    @SuppressWarnings("unchecked")
-    List<DetailedQcStatus> records = query.list();
-    return records;
-  }
-
-  @Override
-  public DetailedQcStatus get(Long id) {
-    return (DetailedQcStatus) currentSession().get(DetailedQcStatusImpl.class, id);
+  public HibernateDetailedQcStatusDao() {
+    super(DetailedQcStatusImpl.class);
   }
 
   @Override
   public DetailedQcStatus getByDescription(String description) {
-    return (DetailedQcStatus) currentSession().createCriteria(DetailedQcStatusImpl.class)
-        .add(Restrictions.eq("description", description))
-        .uniqueResult();
-  }
-
-  @Override
-  public long create(DetailedQcStatus detailedQcStatus) {
-    return (long) currentSession().save(detailedQcStatus);
-  }
-
-  @Override
-  public long update(DetailedQcStatus detailedQcStatus) {
-    currentSession().update(detailedQcStatus);
-    return detailedQcStatus.getId();
+    return getBy("description", description);
   }
 
   @Override
@@ -77,6 +42,11 @@ public class HibernateDetailedQcStatusDao implements DetailedQcStatusDao {
   @Override
   public long getUsageByLibraryAliquots(DetailedQcStatus detailedQcStatus) {
     return getUsageBy(detailedQcStatus, LibraryAliquot.class);
+  }
+
+  @Override
+  public List<DetailedQcStatus> listByIdList(Collection<Long> ids) throws IOException {
+    return listByIdList("detailedQcStatusId", ids);
   }
 
   private long getUsageBy(DetailedQcStatus detailedQcStatus, Class<?> user) {
