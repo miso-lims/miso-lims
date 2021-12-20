@@ -28,7 +28,17 @@ BulkTarget.pool = (function($) {
           title: 'Alias',
           type: 'text',
           disabled: true,
-          data: 'name',
+          data: 'alias',
+        }, {
+          title: 'Box Alias',
+          type: 'text',
+          disabled: true,
+          data: 'box.alias'
+        }, {
+          title: 'Position',
+          type: 'text',
+          disabled: true,
+          data: 'boxPosition'
         }, {
           title: 'Size (bp)',
           type: 'int',
