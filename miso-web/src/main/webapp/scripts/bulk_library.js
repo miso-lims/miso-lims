@@ -21,6 +21,7 @@ BulkTarget.library = (function($) {
   var parentLocationsByRow = null;
   var allowUniqueDualIndexSelectionByRow = {};
 
+
   return {
     getSaveUrl: function() {
       return Urls.rest.libraries.bulkSave;
@@ -471,7 +472,7 @@ BulkTarget.library = (function($) {
             required: true,
             source: Constants.libraryDesignCodes,
             sortSource: Utils.sorting.standardSort('code'),
-            getItemLabel: Utils.array.get('code'),
+            getItemLabel: getLibraryDesignCodeLabel,
             getItemValue: Utils.array.getId
           }, {
             title: 'Platform',
@@ -764,32 +765,31 @@ BulkTarget.library = (function($) {
   }
 
   function updateDesignFields(rowIndex, api, template, design) {
-    updateFromDesignOrTemplate(rowIndex, api, 'libraryDesignCodeId', design, 'designCodeLabel', template, 'designCodeId',
-        Constants.libraryDesignCodes, 'code');
-    updateFromDesignOrTemplate(rowIndex, api, 'librarySelectionTypeId', design, 'selectionName', template, 'selectionId',
-        Constants.librarySelections, 'name');
-    updateFromDesignOrTemplate(rowIndex, api, 'libraryStrategyTypeId', design, 'strategyName', template, 'strategyId',
-        Constants.libraryStrategies, 'name');
+    updateFromDesignOrTemplate(rowIndex, api, 'libraryDesignCodeId', design, 'designCodeId', template, 'designCodeId',
+        Constants.libraryDesignCodes, getLibraryDesignCodeLabel);
+    updateFromDesignOrTemplate(rowIndex, api, 'librarySelectionTypeId', design, 'selectionId', template, 'selectionId',
+        Constants.librarySelections, Utils.array.getName);
+    updateFromDesignOrTemplate(rowIndex, api, 'libraryStrategyTypeId', design, 'strategyId', template, 'strategyId',
+        Constants.libraryStrategies, Utils.array.getName);
   }
 
-  function updateFromDesignOrTemplate(rowIndex, api, dataProperty, design, designItemLabelField, template, templateItemIdField, items,
-      itemLabelField) {
+  function updateFromDesignOrTemplate(rowIndex, api, dataProperty, design, designItemIdField, template, templateItemIdField, items,
+      getItemLabel) {
+    var item = null;
     if (design) {
-      api.updateField(rowIndex, dataProperty, {
-        value: design[designItemLabelField],
-        disabled: true
-      });
-    } else if (template && template.designCodeId) {
-      var item = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(template[templateItemIdField]), items);
-      api.updateField(rowIndex, dataProperty, {
-        value: item[itemLabelField],
-        disabled: true
-      });
+      item = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(design[designItemIdField]), items);
+    } else if (template && template[templateItemIdField]) {
+      item = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(template[templateItemIdField]), items);
     } else {
       api.updateField(rowIndex, dataProperty, {
         disabled: false
       });
+      return;
     }
+    api.updateField(rowIndex, dataProperty, {
+      value: getItemLabel(item),
+      disabled: true
+    });
   }
 
   function updateFromTemplate(rowIndex, dataProperty, api, template, templateProperty, items, idField, labelField) {
@@ -831,6 +831,10 @@ BulkTarget.library = (function($) {
         })
       });
     }
+  }
+
+  function getLibraryDesignCodeLabel(item) {
+    return item.code + ' (' + item.description + ')';
   }
 
 })(jQuery);
