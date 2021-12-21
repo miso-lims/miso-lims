@@ -783,7 +783,7 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListSamplePurposesSetup() throws Exception {
-    testPageSetup(ListTarget.SAMPLE_PURPOSES, Sets.newHashSet(Columns.ALIAS));
+    testPageSetup(ListTarget.SAMPLE_PURPOSES, Sets.newHashSet(Columns.ALIAS, Columns.ARCHIVED));
   }
 
   @Test

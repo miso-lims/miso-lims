@@ -797,21 +797,15 @@ public class Dtos {
     SamplePurposeDto dto = new SamplePurposeDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
-    dto.setCreationDate(formatDateTime(from.getCreationTime()));
-    dto.setLastUpdated(formatDateTime(from.getLastModified()));
-    setLong(dto::setCreatedById, maybeGetProperty(from.getCreator(), User::getId), true);
-    setLong(dto::setUpdatedById, maybeGetProperty(from.getLastModifier(), User::getId), true);
     dto.setArchived(from.isArchived());
     return dto;
   }
 
-  public static Set<SamplePurposeDto> asSamplePurposeDtos(@Nonnull Collection<SamplePurpose> from) {
-    return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
-  }
-
   public static SamplePurpose to(@Nonnull SamplePurposeDto from) {
     SamplePurpose to = new SamplePurposeImpl();
-    to.setAlias(from.getAlias());
+    setLong(to::setId, from.getId(), false);
+    setString(to::setAlias, from.getAlias());
+    setBoolean(to::setArchived, from.isArchived(), false);
     return to;
   }
 

@@ -230,7 +230,6 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("tissuepiecetype/bulk/new?quantity=3");
     slugs.add("tissuepiecetype/bulk/edit?ids=1");
     slugs.add("samplepurpose/bulk/new?quantity=3");
-    slugs.add("samplepurpose/bulk/edit?ids=10%2C9");
     slugs.add("subproject/bulk/new?quantity=3");
     slugs.add("subproject/bulk/edit?ids=1%2C2%2C3");
     slugs.add("stain/bulk/new?quantity=3");
@@ -295,6 +294,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
         .put("worksetcategory/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
         .put("worksetstage/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
         .put("workstation/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
+        .put("samplepurpose/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "10,9").build()))
         .put("storagelabel/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
         .put("sequencingorder/bulk/new",
             Collections.unmodifiableMap(new MapBuilder<String, String>().put("poolIds", "120001,120002").build()))

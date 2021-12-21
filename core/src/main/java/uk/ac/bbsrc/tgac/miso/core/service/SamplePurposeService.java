@@ -4,10 +4,7 @@ import java.io.IOException;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 
-public interface SamplePurposeService extends DeleterService<SamplePurpose>, ListService<SamplePurpose> {
-
-  Long create(SamplePurpose samplePurpose) throws IOException;
-
-  void update(SamplePurpose samplePurpose) throws IOException;
+public interface SamplePurposeService extends BulkSaveService<SamplePurpose>, DeleterService<SamplePurpose>,
+    ListService<SamplePurpose> {
 
 }
