@@ -183,7 +183,6 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("attachmentcategories/bulk/new?quantity=3");
     slugs.add("attachmentcategories/bulk/edit?ids=1%2C2%2C3");
     slugs.add("sampletype/bulk/new?quantity=3");
-    slugs.add("sampletype/bulk/edit?ids=1%2C2");
     slugs.add("sequencingcontroltype/bulk/new?quantity=3");
     slugs.add("sequencingcontroltype/bulk/edit?ids=1%2C2");
     slugs.add("librarytype/bulk/new?quantity=3");
@@ -287,6 +286,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
         .put("box/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "500,501").build()))
         .put("boxuse/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "6,5").build()))
         .put("boxsize/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
+        .put("sampletype/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
         .put("sop/bulk/new", Collections.unmodifiableMap(new MapBuilder<String, String>().put("quantity", "2").build()))
         .put("sop/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
         .put("pipeline/bulk/new", Collections.unmodifiableMap(new MapBuilder<String, String>().put("quantity", "2").build()))

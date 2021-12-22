@@ -871,8 +871,8 @@ Urls = (function() {
 
   var sampleTypeRestBase = restBase + '/sampletypes';
   rest.sampleTypes = {
-    create: sampleTypeRestBase,
-    update: idUrlFunction(sampleTypeRestBase)
+    bulkSave: sampleTypeRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(sampleTypeRestBase + '/bulk')
   };
 
   // Scientific Names

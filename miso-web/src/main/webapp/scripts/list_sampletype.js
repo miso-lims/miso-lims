@@ -13,7 +13,7 @@ ListTarget.sampletype = {
   },
   showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
-    var actions = HotTarget.sampletype.getBulkActions(config);
+    var actions = BulkTarget.sampletype.getBulkActions(config);
     if (config.isAdmin) {
       actions.push(ListUtils.createBulkDeleteAction('Sample Types', 'sampletypes', Utils.array.getName));
     }
