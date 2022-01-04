@@ -37,7 +37,7 @@ public class BulkPoolIT extends AbstractIT {
       Columns.VOLUME, Columns.VOLUME_UNITS, Columns.QC_STATUS, Columns.DESCRIPTION);
 
   private static final Set<String> libraryAliquotsToPoolColumns = Sets.newHashSet(Columns.LIBRARY_ALIQUOT_NAME, Columns.ALIAS,
-      Columns.LIBRARY_SIZE, Columns.POOL);
+      Columns.BOX_ALIAS, Columns.BOX_POSITION, Columns.LIBRARY_SIZE, Columns.POOL);
 
   @Before
   public void setup() {
