@@ -38,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.KitDescriptorService;
@@ -46,11 +47,14 @@ import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.persistence.RunStore;
 
 public class DefaultRunServiceTest {
 
   private static final Date ORIGINAL_TIME = Date.from(LocalDateTime.of(2021, 11, 15, 0, 0).toInstant(ZoneOffset.UTC));
+  private static final long RUN_ID = 1l;
   private static final String RUN_ALIAS = "RUN1_ALIAS";
   private static final String SEQUENCER_NAME = "SEQ1";
   private static final String CONTAINER_MODEL_BARCODE = "CONTAINER_MODEL";
@@ -74,6 +78,8 @@ public class DefaultRunServiceTest {
   private SequencingParametersService sequencingParametersService;
   @Mock
   private RunPartitionService runPartitionService;
+  @Mock
+  private AuthorizationManager authorizationManager;
 
   @InjectMocks
   private DefaultRunService sut;
@@ -81,7 +87,9 @@ public class DefaultRunServiceTest {
   @Before
   public void setup() throws IOException {
     MockitoAnnotations.initMocks(this);
-    Mockito.when(userService.getByLoginName("notification")).thenReturn(makeUser(2L, "notification"));
+    User notificationUser = makeUser(2L, "notification");
+    Mockito.when(authorizationManager.getCurrentUser()).thenReturn(notificationUser);
+    Mockito.when(userService.getByLoginName("notification")).thenReturn(notificationUser);
     Mockito.when(instrumentService.getByName(SEQUENCER_NAME)).thenReturn(makeSequencer());
     Mockito.when(containerModelService.find(Mockito.any(), Mockito.eq(CONTAINER_MODEL_BARCODE), Mockito.eq(1)))
         .thenReturn(makeContainerModel());
@@ -107,7 +115,7 @@ public class DefaultRunServiceTest {
     Predicate<SequencingParameters> filterParameters = (params) -> false;
     GetLaneContents getLaneContents = (lane) -> Optional.empty();
     assertFalse(sut.processNotification(notificationRun, 1, CONTAINER_MODEL_BARCODE, CONTAINER_SERIAL_NO, SEQUENCER_NAME, filterParameters,
-        getLaneContents, null));
+            getLaneContents, null));
     Mockito.verify(runStore, Mockito.times(0)).save(Mockito.any());
   }
 
@@ -126,7 +134,7 @@ public class DefaultRunServiceTest {
 
   private static Run makeSavedRun() {
     Run run = makeRun();
-    run.setId(1L);
+    run.setId(RUN_ID);
     run.setName("RUN1");
     User user = makeUser(1L, "user");
     run.setCreator(user);

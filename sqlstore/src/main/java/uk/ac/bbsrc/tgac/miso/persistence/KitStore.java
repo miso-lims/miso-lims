@@ -31,6 +31,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 /**
@@ -47,7 +48,7 @@ public interface KitStore extends Store<Kit>, PaginatedDataSource<KitDescriptor>
 
   public KitDescriptor getKitDescriptorByName(String name) throws IOException;
 
-  public KitDescriptor getKitDescriptorByPartNumber(String partNumber) throws IOException;
+  public KitDescriptor getKitDescriptorByPartNumber(String partNumber, KitType kitType, PlatformType platformType) throws IOException;
 
   public List<KitDescriptor> listAllKitDescriptors() throws IOException;
 

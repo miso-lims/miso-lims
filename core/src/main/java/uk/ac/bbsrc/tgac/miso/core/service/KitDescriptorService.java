@@ -5,6 +5,7 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 public interface KitDescriptorService extends DeleterService<KitDescriptor>, ListService<KitDescriptor>, PaginatedDataSource<KitDescriptor>,
@@ -14,7 +15,7 @@ public interface KitDescriptorService extends DeleterService<KitDescriptor>, Lis
 
   public KitDescriptor getByName(String name) throws IOException;
 
-  public KitDescriptor getByPartNumber(String partNumber) throws IOException;
+  public KitDescriptor getByPartNumber(String partNumber, KitType kitType, PlatformType platformType) throws IOException;
 
   public List<KitDescriptor> search(KitType type, String search) throws IOException;
 

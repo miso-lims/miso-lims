@@ -32,7 +32,7 @@ Starting with version 1.29.0, the format of this file is based on
 
 ### Changed
 
-* * When receiving samples, an existing ghost tissue must now match the
+* When receiving samples, an existing ghost tissue must now match the
   timepoint in addition to tissue origin, tissue type, times received, tube
   number, and passage in order for the new sample to be parented to it
 

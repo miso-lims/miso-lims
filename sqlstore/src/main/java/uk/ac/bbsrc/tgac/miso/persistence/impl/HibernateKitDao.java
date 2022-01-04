@@ -47,6 +47,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.KitStore;
@@ -115,12 +116,12 @@ public class HibernateKitDao implements KitStore, HibernatePaginatedDataSource<K
   }
 
   @Override
-  public KitDescriptor getKitDescriptorByPartNumber(String partNumber) throws IOException {
-    Criteria criteria = currentSession().createCriteria(KitDescriptor.class);
-    criteria.add(Restrictions.eq("partNumber", partNumber));
-    @SuppressWarnings("unchecked")
-    List<KitDescriptor> kitDescriptors = criteria.list();
-    return kitDescriptors.size() == 0 ? null : kitDescriptors.get(0);
+  public KitDescriptor getKitDescriptorByPartNumber(String partNumber, KitType kitType, PlatformType platformType) throws IOException {
+    return (KitDescriptor) currentSession().createCriteria(KitDescriptor.class)
+        .add(Restrictions.eq("partNumber", partNumber))
+        .add(Restrictions.eq("kitType", kitType))
+        .add(Restrictions.eq("platformType", platformType))
+        .uniqueResult();
   }
 
   @Override
