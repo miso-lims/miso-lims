@@ -3,21 +3,18 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 
+import uk.ac.bbsrc.tgac.miso.core.data.SampleType;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleTypeService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTypeDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/sampletypes")
@@ -25,24 +22,27 @@ public class SampleTypeRestController extends RestController {
 
   @Autowired
   private SampleTypeService sampleTypeService;
-
   @Autowired
   private ConstantsController constantsController;
+  @Autowired
+  private AsyncOperationManager asyncOperationManager;
 
-  @PostMapping
-  public @ResponseBody SampleTypeDto create(@RequestBody SampleTypeDto dto) throws IOException {
-    return RestUtils.createObject("Sample Type", dto, Dtos::to, sampleTypeService, d -> {
-      constantsController.refreshConstants();
-      return Dtos.asDto(d);
-    });
+  @PostMapping("/bulk")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public @ResponseBody
+  ObjectNode bulkCreateAsync(@RequestBody List<SampleTypeDto> dtos) throws IOException {
+    return asyncOperationManager.startAsyncBulkCreate("Sample Type", dtos, Dtos::to, sampleTypeService, true);
   }
 
-  @PutMapping("/{typeId}")
-  public @ResponseBody SampleTypeDto update(@PathVariable long typeId, @RequestBody SampleTypeDto dto) throws IOException {
-    return RestUtils.updateObject("Sample Type", typeId, dto, Dtos::to, sampleTypeService, d -> {
-      constantsController.refreshConstants();
-      return Dtos.asDto(d);
-    });
+  @PutMapping("/bulk")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<SampleTypeDto> dtos) throws IOException {
+    return asyncOperationManager.startAsyncBulkUpdate("Sample Type", dtos, Dtos::to, sampleTypeService, true);
+  }
+
+  @GetMapping("/bulk/{uuid}")
+  public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
+    return asyncOperationManager.getAsyncProgress(uuid, SampleType.class, sampleTypeService, Dtos::asDto);
   }
 
   @PostMapping(value = "/bulk-delete")

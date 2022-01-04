@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -80,6 +81,16 @@ public class HibernateSampleTypeDaoIT extends AbstractDAOTest {
     SampleType synthetic = (SampleType) getSessionFactory().getCurrentSession().get(SampleType.class, 3L);
     assertEquals("SYNTHETIC", synthetic.getName());
     assertEquals(0L, sut.getUsage(synthetic));
+  }
+
+  @Test
+  public void testListByIdList() throws Exception {
+    testListByIdList(sut::listByIdList, Arrays.asList(2L, 1L, 5L));
+  }
+
+  @Test
+  public void testListByIdListNone() throws Exception {
+    testListByIdListNone(sut::listByIdList);
   }
 
 }

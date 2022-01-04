@@ -1,35 +1,36 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.transaction.support.TransactionTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
-import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleTypeDao;
+import uk.ac.bbsrc.tgac.miso.persistence.SaveDao;
+import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultSampleTypeService implements SampleTypeService {
+public class DefaultSampleTypeService extends AbstractSaveService<SampleType> implements SampleTypeService {
 
   @Autowired
   private SampleTypeDao sampleTypeDao;
-
   @Autowired
   private DeletionStore deletionStore;
-
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private TransactionTemplate transactionTemplate;
 
   @Override
   public DeletionStore getDeletionStore() {
@@ -39,6 +40,21 @@ public class DefaultSampleTypeService implements SampleTypeService {
   @Override
   public AuthorizationManager getAuthorizationManager() {
     return authorizationManager;
+  }
+
+  @Override
+  public TransactionTemplate getTransactionTemplate() {
+    return transactionTemplate;
+  }
+
+  @Override
+  public List<SampleType> listByIdList(List<Long> ids) throws IOException {
+    return sampleTypeDao.listByIdList(ids);
+  }
+
+  @Override
+  public SaveDao<SampleType> getDao() {
+    return sampleTypeDao;
   }
 
   @Override
@@ -52,41 +68,26 @@ public class DefaultSampleTypeService implements SampleTypeService {
   }
 
   @Override
-  public long create(SampleType sampleType) throws IOException {
+  protected void authorizeUpdate(SampleType object) throws IOException {
     authorizationManager.throwIfNonAdmin();
-    validateChange(sampleType, null);
-    return sampleTypeDao.create(sampleType);
   }
 
   @Override
-  public long update(SampleType sampleType) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    SampleType managed = get(sampleType.getId());
-    validateChange(sampleType, managed);
-    applyChanges(managed, sampleType);
-    return sampleTypeDao.update(managed);
-  }
-
-  private void validateChange(SampleType sampleType, SampleType beforeChange) throws IOException {
-    List<ValidationError> errors = new ArrayList<>();
-
-    if (ValidationUtils.isSetAndChanged(SampleType::getName, sampleType, beforeChange)) {
-      if (sampleTypeDao.getByName(sampleType.getName()) != null) {
+  protected void collectValidationErrors(SampleType object, SampleType beforeChange, List<ValidationError> errors) throws IOException {
+    if (ValidationUtils.isSetAndChanged(SampleType::getName, object, beforeChange)) {
+      if (sampleTypeDao.getByName(object.getName()) != null) {
         errors.add(new ValidationError("name", "There is already a sample type with this name"));
       }
       long usage = sampleTypeDao.getUsage(beforeChange);
       if (usage > 0L) {
         errors.add(new ValidationError("name",
-            "Cannot change name of sample type because it is already in use by " + usage + " " + Pluralizer.samples(usage)));
+                "Cannot change name of sample type because it is already in use by " + usage + " " + Pluralizer.samples(usage)));
       }
-    }
-
-    if (!errors.isEmpty()) {
-      throw new ValidationException(errors);
     }
   }
 
-  private void applyChanges(SampleType to, SampleType from) {
+  @Override
+  protected void applyChanges(SampleType to, SampleType from) {
     to.setName(from.getName());
     to.setArchived(from.isArchived());
   }
