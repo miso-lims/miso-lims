@@ -125,8 +125,8 @@ public class BulkLibraryIT extends AbstractIT {
 
     Set<String> codes = table.getDropdownOptions(LibColumns.CODE, 0);
     assertTrue(codes.size() > 10);
-    assertTrue(codes.contains("EX"));
-    assertTrue(codes.contains("MR"));
+    assertTrue(codes.contains("EX (Exome)"));
+    assertTrue(codes.contains("MR (mRNA)"));
 
     Set<String> platforms = table.getDropdownOptions(LibColumns.PLATFORM, 0);
     assertEquals(6, platforms.size()); // All members of PlatformType
@@ -251,7 +251,7 @@ public class BulkLibraryIT extends AbstractIT {
     fillRow(table, 0, attrs);
 
     // should be set by selecting Design
-    attrs.put(LibColumns.CODE, "WG");
+    attrs.put(LibColumns.CODE, "WG (Whole Genome)");
     attrs.put(LibColumns.SELECTION, "PCR");
     attrs.put(LibColumns.STRATEGY, "WGS");
 
@@ -272,7 +272,7 @@ public class BulkLibraryIT extends AbstractIT {
 
     Map<String, String> attrs = Maps.newLinkedHashMap();
     attrs.put(LibColumns.SOP, "Library SOP 1 v.2.0");
-    attrs.put(LibColumns.CODE, "WG");
+    attrs.put(LibColumns.CODE, "WG (Whole Genome)");
     attrs.put(LibColumns.PLATFORM, "Illumina");
     attrs.put(LibColumns.LIBRARY_TYPE, "Paired End");
     attrs.put(LibColumns.SELECTION, "CAGE");
@@ -316,7 +316,7 @@ public class BulkLibraryIT extends AbstractIT {
     attrs.put(LibColumns.ID_BARCODE, "libbar100001");
     attrs.put(LibColumns.DESCRIPTION, "libdesc100001");
     attrs.put(LibColumns.DESIGN, "");
-    attrs.put(LibColumns.CODE, "WG");
+    attrs.put(LibColumns.CODE, "WG (Whole Genome)");
     attrs.put(LibColumns.PLATFORM, "Illumina");
     attrs.put(LibColumns.LIBRARY_TYPE, "Paired End");
     attrs.put(LibColumns.SELECTION, "PCR");
@@ -354,7 +354,7 @@ public class BulkLibraryIT extends AbstractIT {
     changes.put(LibColumns.PLATFORM, "Illumina");
 
     // set based on other changes
-    changes.put(LibColumns.CODE, "EX");
+    changes.put(LibColumns.CODE, "EX (Exome)");
     changes.put(LibColumns.SELECTION, "Hybrid Selection");
     changes.put(LibColumns.STRATEGY, "WXS");
     changes.put(LibColumns.INDEX_2, "");
@@ -377,7 +377,7 @@ public class BulkLibraryIT extends AbstractIT {
     attrs.put(LibColumns.ID_BARCODE, "libbar100002");
     attrs.put(LibColumns.DESCRIPTION, "libdesc100002");
     attrs.put(LibColumns.DESIGN, "WG");
-    attrs.put(LibColumns.CODE, "WG");
+    attrs.put(LibColumns.CODE, "WG (Whole Genome)");
     attrs.put(LibColumns.PLATFORM, "Illumina");
     attrs.put(LibColumns.LIBRARY_TYPE, "Paired End");
     attrs.put(LibColumns.SELECTION, "PCR");
@@ -400,7 +400,7 @@ public class BulkLibraryIT extends AbstractIT {
     changes.put(LibColumns.ID_BARCODE, "");
     changes.put(LibColumns.DESCRIPTION, "");
     changes.put(LibColumns.DESIGN, "");
-    changes.put(LibColumns.CODE, "CH");
+    changes.put(LibColumns.CODE, "CH (ChIP-Seq)");
     changes.put(LibColumns.SELECTION, "cDNA");
     changes.put(LibColumns.STRATEGY, "CLONE");
     changes.put(LibColumns.INDEX_FAMILY, NO_INDEX_FAMILY);
@@ -441,7 +441,7 @@ public class BulkLibraryIT extends AbstractIT {
     attrs.put(LibColumns.ID_BARCODE, null);
     attrs.put(LibColumns.DESCRIPTION, null);
     attrs.put(LibColumns.DESIGN, "");
-    attrs.put(LibColumns.CODE, "WG");
+    attrs.put(LibColumns.CODE, "WG (Whole Genome)");
     attrs.put(LibColumns.PLATFORM, "Illumina");
     attrs.put(LibColumns.LIBRARY_TYPE, "Paired End");
     attrs.put(LibColumns.SELECTION, "PCR");
@@ -473,7 +473,7 @@ public class BulkLibraryIT extends AbstractIT {
     fillRow(table, 0, changes);
 
     // changed because of design
-    changes.put(LibColumns.CODE, "TS");
+    changes.put(LibColumns.CODE, "TS (Targeted Sequencing)");
     changes.put(LibColumns.SELECTION, "PCR");
     changes.put(LibColumns.STRATEGY, "AMPLICON");
 
@@ -529,7 +529,7 @@ public class BulkLibraryIT extends AbstractIT {
     fillRow(table, 0, attrs);
 
     // should be set by selecting Design
-    attrs.put(LibColumns.CODE, "WG");
+    attrs.put(LibColumns.CODE, "WG (Whole Genome)");
     attrs.put(LibColumns.SELECTION, "PCR");
     attrs.put(LibColumns.STRATEGY, "WGS");
 
@@ -552,7 +552,7 @@ public class BulkLibraryIT extends AbstractIT {
 
     Map<String, String> attrs = Maps.newLinkedHashMap();
     attrs.put(LibColumns.SOP, "Library SOP 1 v.2.0");
-    attrs.put(LibColumns.CODE, "WG");
+    attrs.put(LibColumns.CODE, "WG (Whole Genome)");
     attrs.put(LibColumns.PLATFORM, "Illumina");
     attrs.put(LibColumns.LIBRARY_TYPE, "Paired End");
     attrs.put(LibColumns.SELECTION, "CAGE");
@@ -827,7 +827,10 @@ public class BulkLibraryIT extends AbstractIT {
       return lib.getLibraryDesign() == null ? null : lib.getLibraryDesign().getName();
     });
     testLibraryAttribute(LibColumns.KIT_DESCRIPTOR, attributes, library, lib -> lib.getKitDescriptor().getName());
-    testLibraryAttribute(LibColumns.CODE, attributes, library, lib -> lib.getLibraryDesignCode().getCode());
+    testLibraryAttribute(LibColumns.CODE, attributes, library, lib -> {
+      return String.format("%s (%s)", lib.getLibraryDesignCode().getCode(),
+          lib.getLibraryDesignCode().getDescription());
+    });
     testLibraryAttribute(LibColumns.SELECTION, attributes, library, lib -> lib.getLibrarySelectionType().getName());
     testLibraryAttribute(LibColumns.STRATEGY, attributes, library, lib -> lib.getLibraryStrategyType().getName());
   }
