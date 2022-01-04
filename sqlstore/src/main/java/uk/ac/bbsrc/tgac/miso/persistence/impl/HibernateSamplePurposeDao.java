@@ -10,6 +10,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
 
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+
 @Repository
 @Transactional(rollbackFor = Exception.class)
 public class HibernateSamplePurposeDao extends HibernateSaveDao<SamplePurpose> implements SamplePurposeDao {
@@ -24,6 +28,16 @@ public class HibernateSamplePurposeDao extends HibernateSaveDao<SamplePurpose> i
         .add(Restrictions.eq("samplePurpose", samplePurpose))
         .setProjection(Projections.rowCount())
         .uniqueResult();
+  }
+
+  @Override
+  public SamplePurpose getByAlias(String alias) throws IOException {
+    return getBy("alias", alias);
+  }
+
+  @Override
+  public List<SamplePurpose> listByIdList(Collection<Long> ids) throws IOException {
+    return listByIdList("samplePurposeId", ids);
   }
 
 }

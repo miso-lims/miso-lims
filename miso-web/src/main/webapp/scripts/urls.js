@@ -858,8 +858,8 @@ Urls = (function() {
 
   var samplePurposeRestBase = restBase + '/samplepurposes';
   rest.samplePurposes = {
-    create: samplePurposeRestBase,
-    update: idUrlFunction(samplePurposeRestBase)
+    bulkSave: samplePurposeRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(samplePurposeRestBase + '/bulk')
   };
 
   // Sample Types

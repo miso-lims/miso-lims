@@ -11,6 +11,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
+import java.util.Arrays;
+
 public class HibernateSamplePurposeDaoIT extends AbstractHibernateSaveDaoTest<SamplePurpose, HibernateSamplePurposeDao> {
 
   public HibernateSamplePurposeDaoIT() {
@@ -45,6 +47,21 @@ public class HibernateSamplePurposeDaoIT extends AbstractHibernateSaveDaoTest<Sa
     assertEquals(1, getTestSubject().getUsage(purpose1));
     SamplePurpose purpose2 = (SamplePurpose) currentSession().get(SamplePurposeImpl.class, 2L);
     assertEquals(0, getTestSubject().getUsage(purpose2));
+  }
+
+  @Test
+  public void testGetByAlias() throws Exception {
+    testGetBy(HibernateSamplePurposeDao::getByAlias, "Sequencing", SamplePurpose::getAlias);
+  }
+
+  @Test
+  public void testListByIdList() throws Exception {
+    testListByIdList(HibernateSamplePurposeDao::listByIdList, Arrays.asList(1L, 2L));
+  }
+
+  @Test
+  public void testListByIdListNone() throws Exception {
+    testListByIdListNone(getTestSubject()::listByIdList);
   }
 
 }
