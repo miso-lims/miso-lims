@@ -50,7 +50,7 @@ public class HibernateScientificNameDaoIT extends AbstractHibernateSaveDaoTest<S
 
   @Test
   public void testListByIdList() throws Exception {
-    testListByIdList(HibernateScientificNameDao::listByIdList, Arrays.asList(2L, 1L, 5L));
+    testListByIdList(HibernateScientificNameDao::listByIdList, Arrays.asList(2L, 1L, 3L));
   }
 
   @Test
