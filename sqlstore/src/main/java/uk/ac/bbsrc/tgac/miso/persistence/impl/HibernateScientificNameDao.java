@@ -1,6 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +33,11 @@ public class HibernateScientificNameDao extends HibernateSaveDao<ScientificName>
   @Override
   public long getUsageByReferenceGenomes(ScientificName scientificName) throws IOException {
     return getUsageBy(ReferenceGenomeImpl.class, "defaultScientificName", scientificName);
+  }
+
+  @Override
+  public List<ScientificName> listByIdList(Collection<Long> ids) throws IOException {
+    return listByIdList("scientificNameId", ids);
   }
 
 }
