@@ -296,7 +296,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
         .put("storagelabel/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
         .put("sequencingorder/bulk/new",
             Collections.unmodifiableMap(new MapBuilder<String, String>().put("poolIds", "120001,120002").build()))
-        .put("sequencingconroltype/bulk/edit",
+        .put("sequencingcontroltype/bulk/edit",
             Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
         .put("metric/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
         .put("libraryaliquot/bulk/merge", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "901,902").build()))
