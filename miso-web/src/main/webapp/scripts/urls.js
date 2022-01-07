@@ -897,8 +897,8 @@ Urls = (function() {
 
   var sequencingControlTypeRestBase = restBase + '/sequencingcontroltypes';
   rest.sequencingControlTypes = {
-    create: sequencingControlTypeRestBase,
-    update: idUrlFunction(sequencingControlTypeRestBase)
+    bulkSave: sequencingControlTypeRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(sequencingControlTypeRestBase + '/bulk')
   };
 
   // Sequencing Orders

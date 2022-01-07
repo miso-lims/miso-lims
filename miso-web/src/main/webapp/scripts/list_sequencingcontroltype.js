@@ -9,7 +9,7 @@ ListTarget.sequencingcontroltype = {
   getQueryUrl: null,
   showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
-    var actions = HotTarget.sequencingcontroltype.getBulkActions(config);
+    var actions = BulkTarget.sequencingcontroltype.getBulkActions(config);
     if (config.isAdmin) {
       actions.push(ListUtils.createBulkDeleteAction('Sequencing Control Types', 'sequencingcontroltypes', Utils.array.getAlias));
     }

@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -75,6 +76,16 @@ public class HibernateSequencingControlTypeDaoIT extends AbstractDAOTest {
   public void testGetUsage() throws Exception {
     SequencingControlType type = (SequencingControlType) currentSession().get(SequencingControlType.class, 1L);
     assertEquals(1L, sut.getUsage(type));
+  }
+
+  @Test
+  public void testListByIdList() throws Exception {
+    testListByIdList(sut::listByIdList, Arrays.asList(1L, 2L));
+  }
+
+  @Test
+  public void testListByIdListNone() throws Exception {
+    testListByIdListNone(sut::listByIdList);
   }
 
 }
