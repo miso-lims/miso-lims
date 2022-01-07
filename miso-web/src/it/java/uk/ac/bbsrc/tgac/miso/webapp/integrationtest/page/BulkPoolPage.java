@@ -28,6 +28,7 @@ public class BulkPoolPage extends BulkPage {
     public static final String BOX_POSITION = "Position";
     public static final String DISCARDED = "Discarded";
     public static final String CREATE_DATE = "Creation Date";
+    public static final String SIZE = "Size (bp)";
     public static final String CONCENTRATION = "Conc.";
     public static final String CONCENTRATION_UNITS = "Conc. Units";
     public static final String VOLUME = "Volume";
