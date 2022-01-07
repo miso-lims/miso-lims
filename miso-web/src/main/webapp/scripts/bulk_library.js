@@ -576,6 +576,9 @@ BulkTarget.library = (function($) {
                       var indices = indexFamily.indices.filter(function(index) {
                         return index.position === pos;
                       });
+                      if (pos === 1 && !indices.length) {
+                        Utils.showOkDialog('Error', ['Selected index family has no indices for position 1']);
+                      }
                       var changes = {
                         source: indices,
                         required: !!indices.length,
