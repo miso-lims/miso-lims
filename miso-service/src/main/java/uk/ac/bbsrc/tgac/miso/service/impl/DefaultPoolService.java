@@ -221,6 +221,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     managed.setCreationDate(pool.getCreationDate());
     managed.setVolume(pool.getVolume());
     managed.setVolumeUnits(pool.getVolume() == null ? null : pool.getVolumeUnits());
+    managed.setDnaSize(pool.getDnaSize());
 
     Set<String> originalItems = extractAliquotNames(managed.getPoolContents());
     loadPoolElements(pool, managed);

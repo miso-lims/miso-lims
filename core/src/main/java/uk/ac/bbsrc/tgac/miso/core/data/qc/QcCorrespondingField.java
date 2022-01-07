@@ -72,6 +72,19 @@ public enum QcCorrespondingField {
     }
 
   },
+  SIZE {
+
+    @Override
+    public void updateField(Pool pool, BigDecimal value, String units) {
+      pool.setDnaSize(value.intValue());
+    }
+
+    @Override
+    public void updateField(Library library, BigDecimal value, String units) {
+      library.setDnaSize(value.intValue());
+    }
+
+  },
   NONE;
 
   public void updateField(Pool pool, BigDecimal value, String units) {
