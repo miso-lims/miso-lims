@@ -17,6 +17,7 @@ public class PoolDto extends AbstractBoxableDto {
   private String name;
   private String alias;
   private String concentration;
+  private Integer dnaSize;
   @Enumerated(EnumType.STRING)
   private ConcentrationUnit concentrationUnits;
   private String identificationBarcode;
@@ -37,7 +38,6 @@ public class PoolDto extends AbstractBoxableDto {
   private String longestIndex;
   private boolean hasLowQualityLibraries;
   private int libraryAliquotCount;
-  private Double insertSize;
   private boolean hasEmptySequence;
   private Set<String> prioritySubprojectAliases;
   private boolean mergeChild;
@@ -220,12 +220,12 @@ public class PoolDto extends AbstractBoxableDto {
     this.libraryAliquotCount = libraryAliquotCount;
   }
 
-  public Double getInsertSize() {
-    return insertSize;
+  public Integer getDnaSize() {
+    return dnaSize;
   }
 
-  public void setInsertSize(Double insertSize) {
-    this.insertSize = insertSize;
+  public void setDnaSize(Integer dnaSize) {
+    this.dnaSize = dnaSize;
   }
 
   public boolean getHasEmptySequence() {

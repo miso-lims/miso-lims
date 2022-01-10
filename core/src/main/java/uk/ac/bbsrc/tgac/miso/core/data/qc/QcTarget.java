@@ -5,9 +5,11 @@ import java.util.Arrays;
 import java.util.List;
 
 public enum QcTarget {
-  Library("Library", QcCorrespondingField.NONE, QcCorrespondingField.CONCENTRATION, QcCorrespondingField.VOLUME), //
+  Library("Library", QcCorrespondingField.NONE, QcCorrespondingField.CONCENTRATION, QcCorrespondingField.VOLUME,
+      QcCorrespondingField.SIZE), //
   Sample("Sample", QcCorrespondingField.NONE, QcCorrespondingField.CONCENTRATION, QcCorrespondingField.VOLUME), //
-  Pool("Pool", QcCorrespondingField.NONE, QcCorrespondingField.CONCENTRATION, QcCorrespondingField.VOLUME), //
+  Pool("Pool", QcCorrespondingField.NONE, QcCorrespondingField.CONCENTRATION, QcCorrespondingField.VOLUME,
+      QcCorrespondingField.SIZE), //
   Run("Run", QcCorrespondingField.NONE), //
   Container("Container", QcCorrespondingField.NONE), //
   Requisition("Requisition", QcCorrespondingField.NONE);

@@ -100,13 +100,7 @@ FormTarget.libraryaliquot = (function($) {
               }
             }].concat(FormUtils.makeDetailedQcStatusFields()).concat(
                 [
-                    {
-                      title: 'Size (bp)',
-                      data: 'dnaSize',
-                      type: 'int',
-                      min: 1,
-                      max: 10000000
-                    },
+                    FormUtils.makeDnaSizeField(),
                     {
                       title: 'Discarded',
                       data: 'discarded',

@@ -32,9 +32,10 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.TestUtils;
 
 public class BulkPoolIT extends AbstractIT {
 
-  private static final Set<String> commonColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.BARCODE, Columns.BOX_SEARCH,
-      Columns.BOX_ALIAS, Columns.BOX_POSITION, Columns.DISCARDED, Columns.CREATE_DATE, Columns.CONCENTRATION, Columns.CONCENTRATION_UNITS,
-      Columns.VOLUME, Columns.VOLUME_UNITS, Columns.QC_STATUS, Columns.DESCRIPTION);
+  private static final Set<String> commonColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.BARCODE,
+      Columns.BOX_SEARCH, Columns.BOX_ALIAS, Columns.BOX_POSITION, Columns.DISCARDED, Columns.CREATE_DATE,
+      Columns.SIZE, Columns.CONCENTRATION, Columns.CONCENTRATION_UNITS, Columns.VOLUME, Columns.VOLUME_UNITS,
+      Columns.QC_STATUS, Columns.DESCRIPTION);
 
   private static final Set<String> libraryAliquotsToPoolColumns = Sets.newHashSet(Columns.LIBRARY_ALIQUOT_NAME, Columns.ALIAS,
       Columns.BOX_ALIAS, Columns.BOX_POSITION, Columns.LIBRARY_SIZE, Columns.POOL);

@@ -884,8 +884,8 @@ Urls = (function() {
 
   var scientificNameRestBase = restBase + '/scientificnames';
   rest.scientificNames = {
-    create: scientificNameRestBase,
-    update: idUrlFunction(scientificNameRestBase)
+    bulkSave: scientificNameRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(scientificNameRestBase + '/bulk')
   };
 
   // Sequencing Control Types

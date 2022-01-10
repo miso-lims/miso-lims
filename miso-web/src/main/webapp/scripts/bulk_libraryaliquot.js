@@ -199,7 +199,7 @@ BulkTarget.libraryaliquot = (function($) {
       });
 
       columns = columns.concat(BulkUtils.columns.detailedQcStatus());
-      columns.push(BulkUtils.columns.librarySize);
+      columns.push(BulkUtils.columns.dnaSize);
       columns = columns.concat(BulkUtils.columns.concentration());
       columns = columns.concat(BulkUtils.columns.volume(false, config));
       columns = columns.concat(BulkUtils.columns.parentUsed);

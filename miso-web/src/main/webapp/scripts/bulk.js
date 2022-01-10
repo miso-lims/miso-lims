@@ -656,7 +656,7 @@ BulkUtils = (function($) {
         }];
       },
 
-      librarySize: {
+      dnaSize: {
         title: 'Size (bp)',
         type: 'int',
         data: 'dnaSize',

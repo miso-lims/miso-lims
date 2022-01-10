@@ -280,8 +280,12 @@ FormTarget.library = (function($) {
                 source: indices2,
                 disabled: !indices2 || !indices2.length
               });
+              var indices1 = getIndices(newValue, 1);
+              if (!indices1.length) {
+                Utils.showOkDialog('Error', ['Selected index family has no indices for position 1']);
+              }
               form.updateField('index1Id', {
-                source: getIndices(newValue, 1),
+                source: indices1,
                 disabled: false,
                 required: true
               });
@@ -295,13 +299,7 @@ FormTarget.library = (function($) {
           title: 'Low Quality Sequencing',
           data: 'lowQuality',
           type: 'checkbox',
-        }, {
-          title: 'Size (bp)',
-          data: 'dnaSize',
-          type: 'int',
-          maxLength: 10,
-          min: 1
-        }, {
+        }, FormUtils.makeDnaSizeField(), {
           title: 'Discarded',
           data: 'discarded',
           type: 'checkbox',
@@ -471,6 +469,9 @@ FormTarget.library = (function($) {
           return;
         var indexFamily = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(indexFamilyId), Constants.indexFamilies);
         if (indexFamily.uniqueDualIndex) {
+          if (!newValue) {
+            return;
+          }
           var index1 = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(newValue), indexFamily.indices);
           var index2 = indexFamily.indices.find(function(index) {
             return index.position === 2 && index.name === index1.name;

@@ -5,6 +5,8 @@ import org.junit.Test;
 import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
 import uk.ac.bbsrc.tgac.miso.core.data.ScientificName;
 
+import java.util.Arrays;
+
 public class HibernateScientificNameDaoIT extends AbstractHibernateSaveDaoTest<ScientificName, HibernateScientificNameDao> {
 
   public HibernateScientificNameDaoIT() {
@@ -44,6 +46,16 @@ public class HibernateScientificNameDaoIT extends AbstractHibernateSaveDaoTest<S
   @Test
   public void testGetUsageByReferenceGenomes() throws Exception {
     testGetUsage(HibernateScientificNameDao::getUsageByReferenceGenomes, 1L, 2L);
+  }
+
+  @Test
+  public void testListByIdList() throws Exception {
+    testListByIdList(HibernateScientificNameDao::listByIdList, Arrays.asList(2L, 1L, 3L));
+  }
+
+  @Test
+  public void testListByIdListNone() throws Exception {
+    testListByIdListNone(getTestSubject()::listByIdList);
   }
 
 }

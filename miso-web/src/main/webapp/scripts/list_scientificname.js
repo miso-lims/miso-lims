@@ -9,7 +9,7 @@ ListTarget.scientificname = {
   getQueryUrl: null,
   showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
-    var actions = HotTarget.scientificname.getBulkActions(config);
+    var actions = BulkTarget.scientificname.getBulkActions(config);
     if (config.isAdmin) {
       actions.push(ListUtils.createBulkDeleteAction('Scientific Names', 'scientificnames', Utils.array.getAlias));
     }

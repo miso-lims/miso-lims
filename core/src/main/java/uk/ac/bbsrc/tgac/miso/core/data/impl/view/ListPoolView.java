@@ -79,6 +79,7 @@ public class ListPoolView implements Aliasable, Nameable, Serializable, Timestam
   @Enumerated(EnumType.STRING)
   private ConcentrationUnit concentrationUnits;
 
+  private Integer dnaSize;
   private boolean discarded;
   private boolean distributed;
 
@@ -224,6 +225,14 @@ public class ListPoolView implements Aliasable, Nameable, Serializable, Timestam
 
   public void setConcentrationUnits(ConcentrationUnit concentrationUnits) {
     this.concentrationUnits = concentrationUnits;
+  }
+
+  public Integer getDnaSize() {
+    return dnaSize;
+  }
+
+  public void setDnaSize(Integer dnaSize) {
+    this.dnaSize = dnaSize;
   }
 
   public boolean isDiscarded() {

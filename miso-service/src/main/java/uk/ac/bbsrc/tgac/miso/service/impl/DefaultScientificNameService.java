@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.transaction.support.TransactionTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.ScientificName;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ScientificNameService;
@@ -30,6 +31,8 @@ public class DefaultScientificNameService extends AbstractSaveService<Scientific
   private AuthorizationManager authorizationManager;
   @Autowired
   private DeletionStore deletionStore;
+  @Autowired
+  private TransactionTemplate transactionTemplate;
 
   @Value("${miso.taxonLookup.enabled:false}")
   private boolean taxonLookupEnabled;
@@ -45,13 +48,23 @@ public class DefaultScientificNameService extends AbstractSaveService<Scientific
   }
 
   @Override
-  public List<ScientificName> list() throws IOException {
-    return scientificNameDao.list();
+  public TransactionTemplate getTransactionTemplate() {
+    return transactionTemplate;
   }
 
   @Override
   public SaveDao<ScientificName> getDao() {
     return scientificNameDao;
+  }
+
+  @Override
+  public List<ScientificName> list() throws IOException {
+    return scientificNameDao.list();
+  }
+
+  @Override
+  public List<ScientificName> listByIdList(List<Long> ids) throws IOException {
+    return scientificNameDao.listByIdList(ids);
   }
 
   @Override
