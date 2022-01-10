@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.transaction.support.TransactionTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingControlType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingControlTypeService;
@@ -29,6 +30,13 @@ public class DefaultSequencingControlTypeService extends AbstractSaveService<Seq
   private AuthorizationManager authorizationManager;
   @Autowired
   private DeletionStore deletionStore;
+  @Autowired
+  private TransactionTemplate transactionTemplate;
+
+  @Override
+  public SaveDao<SequencingControlType> getDao() {
+    return sequencingControlTypeDao;
+  }
 
   @Override
   public DeletionStore getDeletionStore() {
@@ -41,13 +49,18 @@ public class DefaultSequencingControlTypeService extends AbstractSaveService<Seq
   }
 
   @Override
+  public TransactionTemplate getTransactionTemplate() {
+    return transactionTemplate;
+  }
+
+  @Override
   public List<SequencingControlType> list() throws IOException {
     return sequencingControlTypeDao.list();
   }
 
   @Override
-  public SaveDao<SequencingControlType> getDao() {
-    return sequencingControlTypeDao;
+  public List<SequencingControlType> listByIdList(List<Long> ids) throws IOException {
+    return sequencingControlTypeDao.listByIdList(ids);
   }
 
   @Override
