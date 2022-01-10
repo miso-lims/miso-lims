@@ -143,7 +143,7 @@ BulkTarget.pool = (function($) {
           data: 'creationDate',
           required: true,
           initial: Utils.getCurrentDate()
-        }
+        }, BulkUtils.columns.dnaSize
       ])
       .concat(BulkUtils.columns.concentration())
       .concat(BulkUtils.columns.volume())

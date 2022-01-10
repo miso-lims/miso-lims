@@ -102,6 +102,10 @@ public interface Pool extends Comparable<Pool>, Barcodable, Boxable, Nameable, C
    */
   public void setConcentration(BigDecimal concentration);
 
+  public Integer getDnaSize();
+
+  public void setDnaSize(Integer dnaSize);
+
   /**
    * Returns the platformType of this Platform object.
    * 

@@ -13,6 +13,7 @@ SELECT
   p.lastModified,
   p.concentration,
   p.concentrationUnits,
+  p.dnaSize,
   p.discarded,
   dist.distributed,
   b.boxId,

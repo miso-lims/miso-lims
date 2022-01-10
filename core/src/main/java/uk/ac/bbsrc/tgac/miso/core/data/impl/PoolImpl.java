@@ -100,6 +100,8 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Column
   private BigDecimal concentration;
 
+  private Integer dnaSize;
+
   @Temporal(TemporalType.DATE)
   private Date creationDate = new Date();
 
@@ -215,6 +217,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
         PoolImpl::getDescription,
         PoolImpl::getPoolContents,
         PoolImpl::getConcentration,
+        PoolImpl::getDnaSize,
         PoolImpl::getIdentificationBarcode,
         PoolImpl::getQcPassed);
   }
@@ -225,6 +228,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
         description,
         poolElements,
         concentration,
+        dnaSize,
         identificationBarcode,
         qcPassed);
   }
@@ -512,6 +516,15 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Override
   public void setCreationTime(Date created) {
     this.creationTime = created;
+  }
+
+  @Override
+  public Integer getDnaSize() {
+    return dnaSize;
+  }
+
+  public void setDnaSize(Integer dnaSize) {
+    this.dnaSize = dnaSize;
   }
 
   @Override

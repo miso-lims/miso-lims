@@ -1863,6 +1863,7 @@ public class Dtos {
     dto.setAlias(from.getAlias());
     dto.setDescription(from.getDescription());
     setString(dto::setConcentration, from.getConcentration());
+    setInteger(dto::setDnaSize, from.getDnaSize(), true);
     dto.setConcentrationUnits(from.getConcentrationUnits());
     dto.setQcPassed(from.getQcPassed());
     dto.setCreationDate(formatDate(from.getCreationDate()));
@@ -1874,13 +1875,6 @@ public class Dtos {
     dto.setLongestIndex(from.getLongestIndex());
     dto.setLastModified(formatDateTime(from.getLastModified()));
     dto.setLibraryAliquotCount(from.getPoolContents().size());
-    from.getPoolContents().stream()//
-        .map(PoolElement::getAliquot)//
-        .map(ListLibraryAliquotView::getDnaSize)//
-        .filter(Objects::nonNull)//
-        .mapToDouble(Integer::doubleValue)//
-        .average()//
-        .ifPresent(dto::setInsertSize);
 
     if (includeContents) {
       Set<LibraryAliquotDto> pooledElements = new HashSet<>();
@@ -1929,6 +1923,7 @@ public class Dtos {
     setDateString(to::setCreationDate, from.getCreationTime());
     setString(to::setConcentration, from.getConcentration());
     to.setConcentrationUnits(from.getConcentrationUnits());
+    setInteger(to::setDnaSize, from.getDnaSize(), true);
     to.setPlatformType(from.getPlatformType().name());
     if (from.getBoxId() != null) {
       to.setBox(new BoxDto());
@@ -1936,12 +1931,6 @@ public class Dtos {
     }
     to.setLocationLabel(BoxUtils.makeLocationLabel(from.isDiscarded(), from.isDistributed(), null, from.getBoxAlias(),
         from.getBoxPosition(), from.getBoxLocationBarcode()));
-    from.getElements().stream()
-        .map(ListPoolViewElement::getDnaSize)
-        .filter(Objects::nonNull)
-        .mapToDouble(Long::doubleValue)
-        .average()
-        .ifPresent(to::setInsertSize);
     to.setLibraryAliquotCount(from.getElements().size());
     setDateTimeString(to::setLastModified, from.getLastModified());
     to.setDuplicateIndices(
@@ -2846,6 +2835,7 @@ public class Dtos {
     to.setAlias(dto.getAlias());
     setBigDecimal(to::setConcentration, dto.getConcentration());
     to.setConcentrationUnits(dto.getConcentrationUnits());
+    setInteger(to::setDnaSize, dto.getDnaSize(), true);
     to.setCreationDate(parseDate(dto.getCreationDate()));
     to.setDescription(dto.getDescription());
     to.setIdentificationBarcode(dto.getIdentificationBarcode());

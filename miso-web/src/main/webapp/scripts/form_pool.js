@@ -83,7 +83,7 @@ FormTarget.pool = (function($) {
           type: 'date',
           required: true,
           initial: Utils.getCurrentDate()
-        }, FormUtils.makeQcPassedField(), {
+        }, FormUtils.makeQcPassedField(), FormUtils.makeDnaSizeField(), {
           title: 'Volume',
           data: 'volume',
           type: 'decimal',

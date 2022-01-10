@@ -151,10 +151,10 @@ ListTarget.pool = {
       "iSortPriority": 0
     }, {
       "sTitle": "Average Insert Size",
-      "mData": "insertSize",
+      "mData": "dnaSize",
       "bSortable": false,
       "mRender": function(data, type, full) {
-        return data ? Math.round(data) : "N/A";
+        return data || "N/A";
       },
       "include": true,
       "iSortPriority": 0

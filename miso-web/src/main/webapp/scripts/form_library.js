@@ -299,13 +299,7 @@ FormTarget.library = (function($) {
           title: 'Low Quality Sequencing',
           data: 'lowQuality',
           type: 'checkbox',
-        }, {
-          title: 'Size (bp)',
-          data: 'dnaSize',
-          type: 'int',
-          maxLength: 10,
-          min: 1
-        }, {
+        }, FormUtils.makeDnaSizeField(), {
           title: 'Discarded',
           data: 'discarded',
           type: 'checkbox',

@@ -382,6 +382,16 @@ FormUtils = (function($) {
       }];
     },
 
+    makeDnaSizeField: function() {
+      return {
+         title: 'Size (bp)',
+         data: 'dnaSize',
+         type: 'int',
+         min: 1,
+         max: 10000000
+       }
+    },
+
     setTableData: function(listTarget, config, containerId, data, form) {
       var listId = containerId + 'Table';
       if (initializedTables.indexOf(containerId) !== -1) {
