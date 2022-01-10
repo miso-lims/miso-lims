@@ -971,8 +971,8 @@ Urls = (function() {
 
   var stainRestBase = restBase + '/stains';
   rest.stains = {
-    create: stainRestBase,
-    update: idUrlFunction(stainRestBase)
+    bulkSave: stainRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(stainRestBase + '/bulk')
   };
 
   // Stain Categories

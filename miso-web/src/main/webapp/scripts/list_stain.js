@@ -9,7 +9,7 @@ ListTarget.stain = {
   getQueryUrl: null,
   showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
-    var actions = HotTarget.stain.getBulkActions(config);
+    var actions = BulkTarget.stain.getBulkActions(config);
     if (config.isAdmin) {
       actions.push(ListUtils.createBulkDeleteAction('Stains', 'stains', Utils.array.getName));
     }

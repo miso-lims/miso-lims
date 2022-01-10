@@ -5,8 +5,6 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 
-public interface StainService extends DeleterService<Stain>, SaveService<Stain> {
-
-  public List<Stain> list() throws IOException;
+public interface StainService extends BulkSaveService<Stain>, DeleterService<Stain>, ListService<Stain> {
 
 }

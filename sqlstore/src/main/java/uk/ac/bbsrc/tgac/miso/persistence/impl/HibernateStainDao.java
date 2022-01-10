@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -17,33 +18,10 @@ import uk.ac.bbsrc.tgac.miso.persistence.StainDao;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
-public class HibernateStainDao implements StainDao {
+public class HibernateStainDao extends HibernateSaveDao<Stain> implements StainDao {
 
-  @Autowired
-  private SessionFactory sessionFactory;
-
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
-  }
-
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
-  }
-
-  private Session currentSession() {
-    return getSessionFactory().getCurrentSession();
-  }
-
-  @Override
-  public Stain get(long id) {
-    return (Stain) currentSession().get(Stain.class, id);
-  }
-
-  @Override
-  public List<Stain> list() {
-    @SuppressWarnings("unchecked")
-    List<Stain> results = currentSession().createCriteria(Stain.class).list();
-    return results;
+  public HibernateStainDao() {
+    super(Stain.class);
   }
 
   @Override
@@ -54,21 +32,15 @@ public class HibernateStainDao implements StainDao {
   }
 
   @Override
-  public long create(Stain stain) throws IOException {
-    return (long) currentSession().save(stain);
-  }
-
-  @Override
-  public long update(Stain stain) throws IOException {
-    currentSession().update(stain);
-    return stain.getId();
-  }
-
-  @Override
   public long getUsage(Stain stain) throws IOException {
     return (long) currentSession().createCriteria(SampleSlideImpl.class)
         .add(Restrictions.eq("stain", stain))
         .setProjection(Projections.rowCount()).uniqueResult();
+  }
+
+  @Override
+  public List<Stain> listByIdList(Collection<Long> ids) throws IOException {
+    return listByIdList("stainId", ids);
   }
 
 }
