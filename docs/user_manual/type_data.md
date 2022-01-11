@@ -264,7 +264,7 @@ control type can only be deleted if the option has not been used by any existing
 Standard operating procedures (SOPs) describe the process that was followed to prepare samples or libraries, or to
 perform a sequencing run. An SOP in MISO has a name and version, and links to the actual SOP in another system.
 
-MISO administrators can add, edit, and delete library types using the standard interface. An SOP can only be deleted if
+MISO administrators can add, edit, and delete SOPs using the standard interface. An SOP can only be deleted if
 it has not been used for any existing samples, libraries, or runs.
 
 When editing SOPs in MISO, keep in mind that your changes will affect existing items that are already using the SOP.
