@@ -231,7 +231,6 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("subproject/bulk/edit?ids=1%2C2%2C3");
     slugs.add("stain/bulk/new?quantity=3");
     slugs.add("staincategory/bulk/new?quantity=3");
-    slugs.add("staincategory/bulk/edit?ids=1%2C2%2C3");
     slugs.add("detailedqcstatus/bulk/new?quantity=3");
     slugs.add("librarydesigncode/bulk/new?quantity=3");
     slugs.add("librarydesigncode/bulk/edit?ids=8%2C7");
@@ -285,6 +284,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
         .put("sop/bulk/new", Collections.unmodifiableMap(new MapBuilder<String, String>().put("quantity", "2").build()))
         .put("sop/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
         .put("stain/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
+        .put("staincategory/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2,3").build()))
         .put("pipeline/bulk/new", Collections.unmodifiableMap(new MapBuilder<String, String>().put("quantity", "2").build()))
         .put("pipeline/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
         .put("runlibraryqcstatus/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))

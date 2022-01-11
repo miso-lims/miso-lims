@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -77,6 +78,16 @@ public class HibernateStainCategoryDaoIT extends AbstractDAOTest {
     StainCategory cat = (StainCategory) getSessionFactory().getCurrentSession().get(StainCategory.class, 1L);
     assertEquals("Category One", cat.getName());
     assertEquals(2L, sut.getUsage(cat));
+  }
+
+  @Test
+  public void testListByIdList() throws Exception {
+    testListByIdList(sut::listByIdList, Arrays.asList(1L, 2L));
+  }
+
+  @Test
+  public void testListByIdListNone() throws Exception {
+    testListByIdListNone(sut::listByIdList);
   }
 
 }
