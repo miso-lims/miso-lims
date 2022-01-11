@@ -984,8 +984,8 @@ Urls = (function() {
 
   var stainCategoryRestBase = restBase + '/staincategories';
   rest.stainCategories = {
-    create: stainCategoryRestBase,
-    update: idUrlFunction(stainCategoryRestBase)
+    bulkSave: stainCategoryRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(stainCategoryRestBase + '/bulk')
   };
   
   // Storage Labels

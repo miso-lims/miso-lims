@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.transaction.support.TransactionTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.StainCategory;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.StainCategoryService;
@@ -16,20 +17,27 @@ import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
+import uk.ac.bbsrc.tgac.miso.persistence.SaveDao;
 import uk.ac.bbsrc.tgac.miso.persistence.StainCategoryDao;
+import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultStainCategoryService implements StainCategoryService {
+public class DefaultStainCategoryService extends AbstractSaveService<StainCategory> implements StainCategoryService {
 
   @Autowired
   private StainCategoryDao stainCategoryDao;
-
   @Autowired
   private DeletionStore deletionStore;
-
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private TransactionTemplate transactionTemplate;
+
+  @Override
+  public SaveDao<StainCategory> getDao() {
+    return stainCategoryDao;
+  }
 
   @Override
   public DeletionStore getDeletionStore() {
@@ -42,40 +50,30 @@ public class DefaultStainCategoryService implements StainCategoryService {
   }
 
   @Override
-  public StainCategory get(long id) throws IOException {
-    return stainCategoryDao.get(id);
+  public TransactionTemplate getTransactionTemplate() {
+    return transactionTemplate;
   }
 
   @Override
-  public long create(StainCategory stainCategory) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    validateChange(stainCategory, null);
-    return stainCategoryDao.create(stainCategory);
+  public List<StainCategory> listByIdList(List<Long> ids) throws IOException {
+    return stainCategoryDao.listByIdList(ids);
   }
 
   @Override
-  public long update(StainCategory stainCategory) throws IOException {
+  protected void authorizeUpdate(StainCategory object) throws IOException {
     authorizationManager.throwIfNonAdmin();
-    StainCategory managed = get(stainCategory.getId());
-    validateChange(stainCategory, managed);
-    applyChanges(managed, stainCategory);
-    return stainCategoryDao.update(managed);
   }
 
-  private void validateChange(StainCategory stainCategory, StainCategory beforeChange) throws IOException {
-    List<ValidationError> errors = new ArrayList<>();
-
+  @Override
+  protected void collectValidationErrors(StainCategory stainCategory, StainCategory beforeChange, List<ValidationError> errors) throws IOException {
     if (ValidationUtils.isSetAndChanged(StainCategory::getName, stainCategory, beforeChange)
-        && stainCategoryDao.getByName(stainCategory.getName()) != null) {
+            && stainCategoryDao.getByName(stainCategory.getName()) != null) {
       errors.add(new ValidationError("name", "There is already a stain category with this name"));
     }
-
-    if (!errors.isEmpty()) {
-      throw new ValidationException(errors);
-    }
   }
 
-  private void applyChanges(StainCategory to, StainCategory from) {
+  @Override
+  protected void applyChanges(StainCategory to, StainCategory from) {
     to.setName(from.getName());
   }
 
