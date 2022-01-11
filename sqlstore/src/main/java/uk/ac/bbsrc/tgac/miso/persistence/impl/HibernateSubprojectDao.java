@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
+import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.criterion.Projections;
@@ -36,6 +38,11 @@ public class HibernateSubprojectDao extends HibernateSaveDao<Subproject> impleme
         .add(Restrictions.eq("parentProject.id", projectId))
         .list();
     return subprojects;
+  }
+
+  @Override
+  public List<Subproject> listByIdList(Collection<Long> ids) throws IOException {
+    return listByIdList("subprojectId", ids);
   }
 
   @Override

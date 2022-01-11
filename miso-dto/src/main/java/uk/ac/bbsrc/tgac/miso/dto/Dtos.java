@@ -343,10 +343,6 @@ public class Dtos {
     dto.setDescription(from.getDescription());
     dto.setPriority(from.getPriority());
     dto.setParentProjectId(from.getParentProject().getId());
-    dto.setCreationDate(formatDateTime(from.getCreationTime()));
-    dto.setLastUpdated(formatDateTime(from.getLastModified()));
-    setLong(dto::setCreatedById, maybeGetProperty(from.getCreator(), User::getId), true);
-    setLong(dto::setUpdatedById, maybeGetProperty(from.getLastModifier(), User::getId), true);
     setId(dto::setReferenceGenomeId, from.getReferenceGenome());
     return dto;
   }

@@ -123,6 +123,7 @@ public abstract class AbstractTypeDataController<T extends Identifiable, R> {
     ObjectNode config = mapper.createObjectNode();
     User user = getAuthorizationManager().getCurrentUser();
     config.put("isAdmin", user.isAdmin());
+    addBaseConfig(config, mapper);
     return config;
   }
 
@@ -139,8 +140,18 @@ public abstract class AbstractTypeDataController<T extends Identifiable, R> {
   }
 
   /**
+   * Override to provide additional config for both bulk pages and listing. Default implementation does nothing
+   *
+   * @param config
+   * @param mapper
+   */
+  protected void addBaseConfig(ObjectNode config, ObjectMapper mapper) throws IOException {
+    // Does nothing
+  }
+
+  /**
    * Override to provide additional config for Handsontable. Default implementation does nothing
-   * 
+   *
    * @param config
    * @param mapper
    */

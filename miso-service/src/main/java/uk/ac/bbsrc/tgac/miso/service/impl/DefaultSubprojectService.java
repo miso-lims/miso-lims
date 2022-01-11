@@ -4,14 +4,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Sets;
 
+import org.springframework.transaction.support.TransactionTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
@@ -29,8 +28,6 @@ import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
 @Service
 public class DefaultSubprojectService extends AbstractSaveService<Subproject> implements SubprojectService {
 
-  protected static final Logger log = LoggerFactory.getLogger(DefaultSubprojectService.class);
-
   @Autowired
   private SubprojectDao subprojectDao;
   @Autowired
@@ -39,7 +36,8 @@ public class DefaultSubprojectService extends AbstractSaveService<Subproject> im
   private ReferenceGenomeService referenceGenomeService;
   @Autowired
   private DeletionStore deletionStore;
-
+  @Autowired
+  private TransactionTemplate transactionTemplate;
   @Autowired
   private AuthorizationManager authorizationManager;
 
@@ -94,6 +92,16 @@ public class DefaultSubprojectService extends AbstractSaveService<Subproject> im
   @Override
   public AuthorizationManager getAuthorizationManager() {
     return authorizationManager;
+  }
+
+  @Override
+  public TransactionTemplate getTransactionTemplate() {
+    return transactionTemplate;
+  }
+
+  @Override
+  public List<Subproject> listByIdList(List<Long> ids) throws IOException {
+    return subprojectDao.listByIdList(ids);
   }
 
   @Override
