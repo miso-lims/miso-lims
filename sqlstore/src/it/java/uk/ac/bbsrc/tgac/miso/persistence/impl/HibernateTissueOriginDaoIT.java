@@ -61,7 +61,7 @@ public class HibernateTissueOriginDaoIT extends AbstractHibernateSaveDaoTest<Tis
 
   @Test
   public void testListByIdList() throws Exception {
-    testListByIdList(TissueOriginDao::listByIdList, Arrays.asList(2L, 3L));
+    testListByIdList(TissueOriginDao::listByIdList, Arrays.asList(1L, 2L));
   }
 
   @Test
