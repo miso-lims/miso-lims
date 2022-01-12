@@ -50,6 +50,7 @@ public class ScientificNameRestController extends RestController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody List<Long> ids) throws IOException {
     RestUtils.bulkDelete("Scientific Name", ids, scientificNameService);
+    constantsController.refreshConstants();
   }
 
 }
