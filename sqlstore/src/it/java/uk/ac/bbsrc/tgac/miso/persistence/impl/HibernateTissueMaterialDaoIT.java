@@ -11,6 +11,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
+import java.util.Arrays;
+
 public class HibernateTissueMaterialDaoIT extends AbstractHibernateSaveDaoTest<TissueMaterial, HibernateTissueMaterialDao> {
 
   public HibernateTissueMaterialDaoIT() {
@@ -45,6 +47,16 @@ public class HibernateTissueMaterialDaoIT extends AbstractHibernateSaveDaoTest<T
     assertEquals(0, getTestSubject().getUsage(material1));
     TissueMaterial material2 = (TissueMaterial) currentSession().get(TissueMaterialImpl.class, 2L);
     assertEquals(2, getTestSubject().getUsage(material2));
+  }
+
+  @Test
+  public void testListByIdList() throws Exception {
+    testListByIdList(HibernateTissueMaterialDao::listByIdList, Arrays.asList(1L, 2L));
+  }
+
+  @Test
+  public void testListByIdListNone() throws Exception {
+    testListByIdListNone(getTestSubject()::listByIdList);
   }
 
 }

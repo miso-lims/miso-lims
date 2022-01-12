@@ -75,6 +75,7 @@ public class DetailedQcStatusRestController extends RestController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
     RestUtils.bulkDelete("Detailed QC Status", ids, detailedQcStatusService);
+    constantsController.refreshConstants();
   }
   
 }

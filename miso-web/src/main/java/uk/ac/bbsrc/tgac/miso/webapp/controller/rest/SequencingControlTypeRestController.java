@@ -54,6 +54,7 @@ public class SequencingControlTypeRestController extends RestController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody List<Long> ids) throws IOException {
     RestUtils.bulkDelete(typeLabel, ids, sequencingControlTypeService);
+    constantsController.refreshConstants();
   }
 
 }

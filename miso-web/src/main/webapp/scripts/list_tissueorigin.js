@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 ListTarget.tissueorigin = {
   name: "Tissue Origins",
   getUserManualUrl: function() {
@@ -32,7 +9,11 @@ ListTarget.tissueorigin = {
   getQueryUrl: null,
   showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
-    return HotTarget.tissueorigin.getBulkActions(config);
+    var actions = BulkTarget.tissueorigin.getBulkActions(config);
+    if (config.isAdmin) {
+      actions.push(ListUtils.createBulkDeleteAction('Tissue Origins', 'tissueorigins', Utils.array.getAlias));
+    }
+    return actions;
   },
   createStaticActions: function(config, projectId) {
     return config.isAdmin ? [{

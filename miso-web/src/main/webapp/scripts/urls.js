@@ -1109,8 +1109,8 @@ Urls = (function() {
 
   var tissueMaterialRestBase = restBase + '/tissuematerials';
   rest.tissueMaterials = {
-    create: tissueMaterialRestBase,
-    update: idUrlFunction(tissueMaterialRestBase)
+    bulkSave: tissueMaterialRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(tissueMaterialRestBase + '/bulk')
   };
 
   // Tissue Origins
@@ -1122,8 +1122,8 @@ Urls = (function() {
 
   var tissueOriginRestBase = restBase + '/tissueorigins';
   rest.tissueOrigins = {
-    create: tissueOriginRestBase,
-    update: idUrlFunction(tissueOriginRestBase)
+    bulkSave: tissueOriginRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(tissueOriginRestBase + '/bulk')
   };
 
   // Tissue Piece Types
