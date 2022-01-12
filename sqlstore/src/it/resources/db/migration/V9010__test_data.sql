@@ -302,6 +302,10 @@ INSERT INTO TissueMaterial(tissueMaterialId, alias, createdBy, creationDate, upd
 (2, 'FFPE', 1, '2021-02-19 09:12:00', 1, '2021-02-19 09:12:00'),
 (3, 'Blood', 1, '2021-02-19 09:12:00', 1, '2021-02-19 09:12:00');
 
+INSERT INTO TissuePieceType(tissuePieceTypeId, abbreviation, name, v2NamingCode) VALUES
+(1, 'LCM', 'LCM Tube', 'TL'),
+(2, 'C', 'Curls', 'TC');
+
 INSERT INTO `SampleClass`(`sampleClassId`, `alias`, `sampleCategory`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
 VALUES (1,'Identity','Identity',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00'),
 (2,'Primary Tumor Tissue','Tissue',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00'),
