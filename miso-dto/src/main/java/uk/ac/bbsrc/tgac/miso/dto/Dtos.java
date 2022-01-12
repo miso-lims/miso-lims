@@ -770,22 +770,15 @@ public class Dtos {
 
   public static TissueMaterialDto asDto(@Nonnull TissueMaterial from) {
     TissueMaterialDto dto = new TissueMaterialDto();
-    dto.setId(from.getId());
-    dto.setAlias(from.getAlias());
-    dto.setCreationDate(formatDateTime(from.getCreationTime()));
-    dto.setLastUpdated(formatDateTime(from.getLastModified()));
-    setLong(dto::setCreatedById, maybeGetProperty(from.getCreator(), User::getId), true);
-    setLong(dto::setUpdatedById, maybeGetProperty(from.getLastModifier(), User::getId), true);
+    setLong(dto::setId, from.getId(), true);
+    setString(dto::setAlias, from.getAlias());
     return dto;
-  }
-
-  public static Set<TissueMaterialDto> asTissueMaterialDtos(@Nonnull Collection<TissueMaterial> from) {
-    return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
   public static TissueMaterial to(@Nonnull TissueMaterialDto from) {
     TissueMaterial to = new TissueMaterialImpl();
-    to.setAlias(from.getAlias());
+    setLong(to::setId, from.getId(), false);
+    setString(to::setAlias, from.getAlias());
     return to;
   }
 

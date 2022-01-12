@@ -1109,8 +1109,8 @@ Urls = (function() {
 
   var tissueMaterialRestBase = restBase + '/tissuematerials';
   rest.tissueMaterials = {
-    create: tissueMaterialRestBase,
-    update: idUrlFunction(tissueMaterialRestBase)
+    bulkSave: tissueMaterialRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(tissueMaterialRestBase + '/bulk')
   };
 
   // Tissue Origins
