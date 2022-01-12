@@ -11,6 +11,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
 
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+
 @Repository
 @Transactional(rollbackFor = Exception.class)
 public class HibernateTissueOriginDao extends HibernateSaveDao<TissueOrigin> implements TissueOriginDao {
@@ -21,16 +25,17 @@ public class HibernateTissueOriginDao extends HibernateSaveDao<TissueOrigin> imp
 
   @Override
   public TissueOrigin getByAlias(String alias) {
-    Criteria criteria = currentSession().createCriteria(TissueOrigin.class);
-    criteria.add(Restrictions.eq("alias", alias));
-    return (TissueOrigin) criteria.uniqueResult();
+    return getBy("alias", alias);
   }
 
   @Override
   public long getUsage(TissueOrigin tissueOrigin) {
-    return (long) currentSession().createCriteria(SampleTissueImpl.class)
-        .add(Restrictions.eqOrIsNull("tissueOrigin", tissueOrigin))
-        .setProjection(Projections.rowCount()).uniqueResult();
+    return getUsageBy(SampleTissueImpl.class, "tissueOrigin", tissueOrigin);
+  }
+
+  @Override
+  public List<TissueOrigin> listByIdList(Collection<Long> ids) throws IOException {
+    return listByIdList("tissueOriginId", ids);
   }
 
 }

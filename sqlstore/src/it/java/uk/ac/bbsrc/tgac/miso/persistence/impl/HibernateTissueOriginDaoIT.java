@@ -10,6 +10,9 @@ import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
+
+import java.util.Arrays;
 
 public class HibernateTissueOriginDaoIT extends AbstractHibernateSaveDaoTest<TissueOrigin, HibernateTissueOriginDao> {
 
@@ -54,6 +57,16 @@ public class HibernateTissueOriginDaoIT extends AbstractHibernateSaveDaoTest<Tis
     assertEquals(5, getTestSubject().getUsage(origin1));
     TissueOrigin origin2 = (TissueOrigin) currentSession().get(TissueOriginImpl.class, 2L);
     assertEquals(0, getTestSubject().getUsage(origin2));
+  }
+
+  @Test
+  public void testListByIdList() throws Exception {
+    testListByIdList(TissueOriginDao::listByIdList, Arrays.asList(2L, 3L));
+  }
+
+  @Test
+  public void testListByIdListNone() throws Exception {
+    testListByIdListNone(getTestSubject()::listByIdList);
   }
 
 }
