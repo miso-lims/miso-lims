@@ -116,6 +116,7 @@ DELETE FROM TargetedSequencing;
 DELETE FROM TargetedSequencing_KitDescriptor;
 DELETE FROM TissueMaterial;
 DELETE FROM TissueOrigin;
+DELETE FROM TissuePieceType;
 DELETE FROM TissueType;
 DELETE FROM Transfer;
 DELETE FROM TransferChangeLog;

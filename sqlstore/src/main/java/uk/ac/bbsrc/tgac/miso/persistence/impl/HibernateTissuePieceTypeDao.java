@@ -1,6 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,11 @@ public class HibernateTissuePieceTypeDao extends HibernateSaveDao<TissuePieceTyp
   @Override
   public TissuePieceType getByName(String name) {
     return getBy("name", name);
+  }
+
+  @Override
+  public List<TissuePieceType> listByIdList(Collection<Long> ids) throws IOException {
+    return listByIdList("tissuePieceTypeId", ids);
   }
 
 }

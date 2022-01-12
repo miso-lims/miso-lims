@@ -9,7 +9,7 @@ ListTarget.tissuepiecetype = {
   getQueryUrl: null,
   showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
-    var actions = HotTarget.tissuepiecetype.getBulkActions(config);
+    var actions = BulkTarget.tissuepiecetype.getBulkActions(config);
     if (config.isAdmin) {
       actions.push(ListUtils.createBulkDeleteAction('Tissue Piece Types', 'tissuepiecetypes', function(item) {
         return item.name;

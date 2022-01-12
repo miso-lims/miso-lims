@@ -1127,15 +1127,16 @@ Urls = (function() {
   };
 
   // Tissue Piece Types
-  var tissuePieceTypesRestBase = restBase + '/tissuepiecetypes';
-  rest.tissuePieceTypes = {
-    create: tissuePieceTypesRestBase,
-    update: idUrlFunction(tissuePieceTypesRestBase)
-  };
   var tissuePieceTypesUiBase = baseUrl + '/tissuepiecetype';
   ui.tissuePieceTypes = {
     bulkCreate: tissuePieceTypesUiBase + '/bulk/new',
     bulkEdit: tissuePieceTypesUiBase + '/bulk/edit',
+  };
+
+  var tissuePieceTypesRestBase = restBase + '/tissuepiecetypes';
+  rest.tissuePieceTypes = {
+    bulkSave: tissuePieceTypesRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(tissuePieceTypesRestBase + '/bulk')
   };
 
   // Tissue Types

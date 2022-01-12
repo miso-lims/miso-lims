@@ -678,7 +678,8 @@ BulkUtils = (function($) {
           }],
           initial: 'False',
           getItemLabel: Utils.array.get('label'),
-          getItemValue: Utils.array.get('value')
+          getItemValue: Utils.array.get('value'),
+          required: true
         };
       },
 

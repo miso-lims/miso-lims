@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.transaction.support.TransactionTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.type.TissuePieceType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.TissuePieceTypeService;
@@ -24,12 +25,12 @@ public class DefaultTissuePieceTypeService extends AbstractSaveService<TissuePie
 
   @Autowired
   private TissuePieceTypeDao tissuePieceTypeDao;
-
   @Autowired
   private DeletionStore deletionStore;
-
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private TransactionTemplate transactionTemplate;
 
   @Override
   public SaveDao<TissuePieceType> getDao() {
@@ -44,6 +45,16 @@ public class DefaultTissuePieceTypeService extends AbstractSaveService<TissuePie
   @Override
   public AuthorizationManager getAuthorizationManager() {
     return authorizationManager;
+  }
+
+  @Override
+  public TransactionTemplate getTransactionTemplate() {
+    return transactionTemplate;
+  }
+
+  @Override
+  public List<TissuePieceType> listByIdList(List<Long> ids) throws IOException {
+    return tissuePieceTypeDao.listByIdList(ids);
   }
 
   @Override
