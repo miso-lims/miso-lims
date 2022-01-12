@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.util.form;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -9,7 +10,7 @@ import uk.ac.bbsrc.tgac.miso.Version;
 
 public class TagUtils {
 
-  private static final Logger log = Logger.getLogger(TagUtils.class);
+  private static final Logger log = LoggerFactory.getLogger(TagUtils.class);
 
   private TagUtils() {
     throw new IllegalStateException("Static util class not intended for instantiation");

@@ -30,7 +30,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
@@ -60,7 +61,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
  */
 public class SessionConversationAttributeStore implements SessionAttributeStore, InitializingBean {
 
-  private final Logger _logger = Logger.getLogger(SessionConversationAttributeStore.class.getName());
+  private final Logger _logger = LoggerFactory.getLogger(SessionConversationAttributeStore.class);
 
   private int _numConversationsToKeep = 10;
 
