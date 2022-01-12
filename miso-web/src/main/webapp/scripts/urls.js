@@ -1081,8 +1081,8 @@ Urls = (function() {
 
   var subprojectRestBase = restBase + '/subprojects';
   rest.subprojects = {
-    create: subprojectRestBase,
-    update: idUrlFunction(subprojectRestBase)
+    bulkSave: subprojectRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(subprojectRestBase + '/bulk')
   };
 
   // Targeted Sequencings

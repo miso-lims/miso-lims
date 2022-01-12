@@ -700,6 +700,31 @@ BulkUtils = (function($) {
           getItemValue: Utils.array.getId,
           required: !!required
         };
+      },
+
+      makeBoolean: function(title, data, required) {
+        source = [{
+          label: 'True',
+          value: true
+        }, {
+          label: 'False',
+          value: false
+        }];
+        if (!required) {
+          source.push({
+            label: 'Unknown',
+            value: null
+          });
+        }
+        return {
+          title: title,
+          type: 'dropdown',
+          data: data,
+          source: source,
+          getItemLabel: Utils.array.get('label'),
+          getItemValue: Utils.array.get('value'),
+          required: !!required
+        }
       }
     },
 
