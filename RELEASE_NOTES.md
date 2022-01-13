@@ -7,6 +7,44 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.40.0] - 2022-01-13
+
+### Added
+
+* Pool insert size field
+* Library aliquot box and position columns on Pool Custom page
+
+### Changed
+
+* Design Code column on bulk Create/Edit Libraries page now displays full
+  description
+* Library and pool QC types can now be set up to automatically update the size
+  field upon creation
+
+### Fixed
+
+* Performance and accessibility improvements to several bulk pages
+  * Detailed QC Statuses
+  * Sample Purposes
+  * Sample Types
+  * Scientific Names
+  * Sequencing Control Types
+  * Stains
+  * Stain Categories
+  * Subprojects
+  * Tissue Materials
+  * Tissue Origins
+  * Tissue Piece Types
+* It was possible for runs from Run Scanner to be assigned kits of the wrong
+  kit type as the sequencing kit
+* Error applying some library template options to libraries
+* Error messages displayed when selecting an index family that is missing indices
+* Library aliquot alias column on Pool Custom page was showing the name instead
+  of alias
+* Runs and containers from Run Scanner were being updated even when they were
+  not changed
+
+
 ## [1.39.1] - 2021-12-13
 
 ### Fixed
