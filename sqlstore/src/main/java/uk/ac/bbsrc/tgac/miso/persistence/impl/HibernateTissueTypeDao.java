@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
+import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -20,57 +22,25 @@ import uk.ac.bbsrc.tgac.miso.persistence.TissueTypeDao;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateTissueTypeDao implements TissueTypeDao {
+public class HibernateTissueTypeDao extends HibernateSaveDao<TissueType> implements TissueTypeDao {
 
-  protected static final Logger log = LoggerFactory.getLogger(HibernateTissueTypeDao.class);
-
-  @Autowired
-  private SessionFactory sessionFactory;
-
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
-  }
-
-  private Session currentSession() {
-    return sessionFactory.getCurrentSession();
-  }
-
-  @Override
-  public List<TissueType> list() {
-    Query query = currentSession().createQuery("from TissueTypeImpl");
-    @SuppressWarnings("unchecked")
-    List<TissueType> records = query.list();
-    return records;
-  }
-
-  @Override
-  public TissueType get(Long id) {
-    return (TissueType) currentSession().get(TissueTypeImpl.class, id);
+  public HibernateTissueTypeDao() {
+    super(TissueTypeImpl.class);
   }
 
   @Override
   public TissueType getByAlias(String alias) {
-    return (TissueType) currentSession().createCriteria(TissueTypeImpl.class)
-        .add(Restrictions.eq("alias", alias))
-        .uniqueResult();
-  }
-
-  @Override
-  public Long create(TissueType tissueType) {
-    return (Long) currentSession().save(tissueType);
-  }
-
-  @Override
-  public long update(TissueType tissueType) {
-    currentSession().update(tissueType);
-    return tissueType.getId();
+    return getBy("alias", alias);
   }
 
   @Override
   public long getUsage(TissueType tissueType) {
-    return (long) currentSession().createCriteria(SampleTissueImpl.class)
-        .add(Restrictions.eq("tissueType", tissueType))
-        .setProjection(Projections.rowCount()).uniqueResult();
+    return getUsageBy(SampleTissueImpl.class, "tissueType", tissueType);
+  }
+
+  @Override
+  public List<TissueType> listByIdList(Collection<Long> ids) throws IOException {
+    return listByIdList("tissueTypeId", ids);
   }
 
 }

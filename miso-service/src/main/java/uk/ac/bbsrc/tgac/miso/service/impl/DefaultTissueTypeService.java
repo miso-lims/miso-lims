@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.User;
 
+import org.springframework.transaction.support.TransactionTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.TissueTypeService;
@@ -18,68 +19,26 @@ import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
+import uk.ac.bbsrc.tgac.miso.persistence.SaveDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueTypeDao;
+import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultTissueTypeService implements TissueTypeService {
+public class DefaultTissueTypeService extends AbstractSaveService<TissueType> implements TissueTypeService {
 
   @Autowired
   private TissueTypeDao tissueTypeDao;
-
   @Autowired
   private AuthorizationManager authorizationManager;
-
   @Autowired
   private DeletionStore deletionStore;
+  @Autowired
+  private TransactionTemplate transactionTemplate;
 
   @Override
-  public TissueType get(long tissueTypeId) throws IOException {
-    authorizationManager.throwIfUnauthenticated();
-    return tissueTypeDao.get(tissueTypeId);
-  }
-
-  @Override
-  public long create(TissueType tissueType) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    validateChange(tissueType, null);
-    User user = authorizationManager.getCurrentUser();
-    tissueType.setChangeDetails(user);
-    return tissueTypeDao.create(tissueType);
-  }
-
-  @Override
-  public long update(TissueType tissueType) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    TissueType managed = get(tissueType.getId());
-    validateChange(tissueType, managed);
-    applyChanges(managed, tissueType);
-    User user = authorizationManager.getCurrentUser();
-    tissueType.setChangeDetails(user);
-    return tissueTypeDao.update(managed);
-  }
-
-  private void validateChange(TissueType tissueType, TissueType beforeChange) {
-    List<ValidationError> errors = new ArrayList<>();
-
-    if (ValidationUtils.isSetAndChanged(TissueType::getAlias, tissueType, beforeChange)
-        && tissueTypeDao.getByAlias(tissueType.getAlias()) != null) {
-      errors.add(new ValidationError("alias", "There is already a tissue type with this alias"));
-    }
-
-    if (!errors.isEmpty()) {
-      throw new ValidationException(errors);
-    }
-  }
-
-  private void applyChanges(TissueType to, TissueType from) {
-    to.setAlias(from.getAlias());
-    to.setDescription(from.getDescription());
-  }
-
-  @Override
-  public List<TissueType> list() throws IOException {
-    return tissueTypeDao.list();
+  public SaveDao<TissueType> getDao() {
+    return tissueTypeDao;
   }
 
   @Override
@@ -90,6 +49,45 @@ public class DefaultTissueTypeService implements TissueTypeService {
   @Override
   public AuthorizationManager getAuthorizationManager() {
     return authorizationManager;
+  }
+
+  @Override
+  public TransactionTemplate getTransactionTemplate() {
+    return transactionTemplate;
+  }
+
+  @Override
+  protected void authorizeUpdate(TissueType object) throws IOException {
+    authorizationManager.throwIfNonAdmin();
+  }
+
+  @Override
+  protected void beforeSave(TissueType object) throws IOException {
+    object.setChangeDetails(authorizationManager.getCurrentUser());
+  }
+
+  @Override
+  protected void collectValidationErrors(TissueType tissueType, TissueType beforeChange, List<ValidationError> errors) throws IOException {
+    if (ValidationUtils.isSetAndChanged(TissueType::getAlias, tissueType, beforeChange)
+        && tissueTypeDao.getByAlias(tissueType.getAlias()) != null) {
+      errors.add(ValidationError.forDuplicate("tissue type", "alias"));
+    }
+  }
+
+  @Override
+  protected void applyChanges(TissueType to, TissueType from) {
+    to.setAlias(from.getAlias());
+    to.setDescription(from.getDescription());
+  }
+
+  @Override
+  public List<TissueType> list() throws IOException {
+    return tissueTypeDao.list();
+  }
+
+  @Override
+  public List<TissueType> listByIdList(List<Long> ids) throws IOException {
+    return tissueTypeDao.listByIdList(ids);
   }
 
   @Override

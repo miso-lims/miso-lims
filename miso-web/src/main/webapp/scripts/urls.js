@@ -1148,8 +1148,8 @@ Urls = (function() {
 
   var tissueTypeRestBase = restBase + '/tissuetypes';
   rest.tissueTypes = {
-    create: tissueTypeRestBase,
-    update: idUrlFunction(tissueTypeRestBase)
+    bulkSave: tissueTypeRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(tissueTypeRestBase + '/bulk')
   };
 
   // Transfers

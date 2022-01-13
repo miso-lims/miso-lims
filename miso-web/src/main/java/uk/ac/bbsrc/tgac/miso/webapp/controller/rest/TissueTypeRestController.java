@@ -26,24 +26,18 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.util.List;
 
-import javax.servlet.http.HttpServletResponse;
-
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.bind.annotation.*;
 
+import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.service.TissueTypeService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.TissueTypeDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/tissuetypes")
@@ -51,36 +45,35 @@ public class TissueTypeRestController extends RestController {
 
   @Autowired
   private TissueTypeService tissueTypeService;
-
   @Autowired
   private ConstantsController constantsController;
+  @Autowired
+  private AsyncOperationManager asyncOperationManager;
 
-  @PostMapping(headers = { "Content-type=application/json" })
-  @ResponseStatus(HttpStatus.CREATED)
-  @ResponseBody
-  public TissueTypeDto createTissueType(@RequestBody TissueTypeDto tissueTypeDto, UriComponentsBuilder b, HttpServletResponse response)
-      throws IOException {
-    return RestUtils.createObject("Tissue Type", tissueTypeDto, Dtos::to, tissueTypeService, d -> {
-      constantsController.refreshConstants();
-      return Dtos.asDto(d);
-    });
+  @PostMapping("/bulk")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public @ResponseBody
+  ObjectNode bulkCreateAsync(@RequestBody List<TissueTypeDto> dtos) throws IOException {
+    return asyncOperationManager.startAsyncBulkCreate("Tissue Type", dtos, Dtos::to, tissueTypeService, true);
   }
 
-  @PutMapping(value = "/{id}", headers = { "Content-type=application/json" })
-  @ResponseBody
-  public TissueTypeDto updateTissueType(@PathVariable long id, @RequestBody TissueTypeDto tissueTypeDto,
-      HttpServletResponse response) throws IOException {
-    return RestUtils.updateObject("Tissue Type", id, tissueTypeDto, Dtos::to, tissueTypeService, d -> {
-      constantsController.refreshConstants();
-      return Dtos.asDto(d);
-    });
+  @PutMapping("/bulk")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<TissueTypeDto> dtos) throws IOException {
+    return asyncOperationManager.startAsyncBulkUpdate("Tissue Type", dtos, Dtos::to, tissueTypeService, true);
+  }
+
+  @GetMapping("/bulk/{uuid}")
+  public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
+    return asyncOperationManager.getAsyncProgress(uuid, TissueType.class, tissueTypeService, Dtos::asDto);
   }
 
   @PostMapping(value = "/bulk-delete")
   @ResponseBody
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
+  public void bulkDelete(@RequestBody List<Long> ids) throws IOException {
     RestUtils.bulkDelete("Tissue Type", ids, tissueTypeService);
+    constantsController.refreshConstants();
   }
 
 }

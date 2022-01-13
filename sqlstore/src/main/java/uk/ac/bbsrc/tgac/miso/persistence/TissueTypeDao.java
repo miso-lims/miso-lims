@@ -1,21 +1,17 @@
 package uk.ac.bbsrc.tgac.miso.persistence;
 
+import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 
-public interface TissueTypeDao {
+public interface TissueTypeDao extends SaveDao<TissueType> {
 
-  public List<TissueType> list();
+  TissueType getByAlias(String alias) throws IOException;
 
-  public TissueType get(Long id);
+  long getUsage(TissueType tissueType) throws IOException;
 
-  public TissueType getByAlias(String alias);
-
-  public Long create(TissueType tissueType);
-
-  public long update(TissueType tissueType);
-
-  public long getUsage(TissueType tissueType);
+  List<TissueType> listByIdList(Collection<Long> ids) throws IOException;
 
 }
