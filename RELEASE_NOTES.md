@@ -7,6 +7,13 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.40.1] - 2022-01-14
+
+### Fixed
+
+* Errors saving runs from Run Scanner
+
+
 ## [1.40.0] - 2022-01-13
 
 ### Added
