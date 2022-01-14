@@ -323,7 +323,9 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     }
     if (run.getRunPositions() != null) {
       for (RunPosition position : run.getRunPositions()) {
-        position.setContainer(containerService.get(position.getContainer().getId()));
+        if (position.getContainer().isSaved()) {
+          position.setContainer(containerService.get(position.getContainer().getId()));
+        }
       }
     }
     loadChildEntity(run::setSop, run.getSop(), sopService, "sopId");
@@ -861,6 +863,10 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     KitDescriptor managedKit = kitDescriptorService.getByPartNumber(kit.getPartNumber(), KitType.SEQUENCING, target.getPlatformType());
     if (managedKit == null) {
       managedKit = kitDescriptorService.getByName(kit.getName());
+      if (managedKit == null || managedKit.getKitType() != KitType.SEQUENCING
+          || managedKit.getPlatformType() != target.getPlatformType()) {
+        return false;
+      }
     }
     boolean changed = target.getSequencingKit() == null || target.getSequencingKit().getId() != managedKit.getId();
     target.setSequencingKit(managedKit);
