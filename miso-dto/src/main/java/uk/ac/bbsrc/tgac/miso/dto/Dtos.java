@@ -309,14 +309,10 @@ public class Dtos {
 
   public static TissueTypeDto asDto(@Nonnull TissueType from) {
     TissueTypeDto dto = new TissueTypeDto();
-    dto.setId(from.getId());
-    dto.setAlias(from.getAlias());
-    dto.setDescription(from.getDescription());
-    dto.setLabel(from.getItemLabel());
-    dto.setCreationDate(formatDateTime(from.getCreationTime()));
-    dto.setLastUpdated(formatDateTime(from.getLastModified()));
-    setLong(dto::setCreatedById, maybeGetProperty(from.getCreator(), User::getId), true);
-    setLong(dto::setUpdatedById, maybeGetProperty(from.getLastModifier(), User::getId), true);
+    setLong(dto::setId, from.getId(), true);
+    setString(dto::setAlias, from.getAlias());
+    setString(dto::setDescription, from.getDescription());
+    setString(dto::setLabel, from.getItemLabel());
     return dto;
   }
 
@@ -326,7 +322,7 @@ public class Dtos {
 
   public static TissueType to(@Nonnull TissueTypeDto from) {
     TissueType to = new TissueTypeImpl();
-    if (from.getId() != null) to.setId(from.getId());
+    setLong(to::setId, from.getId(), false);
     setString(to::setAlias, from.getAlias());
     setString(to::setDescription, from.getDescription());
     return to;

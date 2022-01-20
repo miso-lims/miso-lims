@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -84,6 +85,16 @@ public class HibernateTissueTypeDaoIT extends AbstractDAOTest {
     TissueType tt = (TissueType) getSessionFactory().getCurrentSession().get(TissueTypeImpl.class, 1L);
     assertEquals("Test Type", tt.getAlias());
     assertEquals(5L, sut.getUsage(tt));
+  }
+
+  @Test
+  public void testListByIdList() throws Exception {
+    testListByIdList(sut::listByIdList, Arrays.asList(1L));
+  }
+
+  @Test
+  public void testListByIdListNone() throws Exception {
+    testListByIdListNone(sut::listByIdList);
   }
 
 }
