@@ -344,20 +344,7 @@ public enum PrintableField implements PrintableText {
 
         @Override
         public String visitPool(Pool pool) {
-          if (pool.getPoolContents() == null) {
-            return null;
-          }
-          OptionalDouble avg = pool.getPoolContents().stream()//
-              .map(PoolElement::getAliquot)//
-              .map(ListLibraryAliquotView::getDnaSize)//
-              .filter(Objects::nonNull)//
-              .mapToDouble(Integer::doubleValue)//
-              .average();
-          if (avg.isPresent()) {
-            return Double.toString(avg.getAsDouble());
-          } else {
-            return null;
-          }
+          return pool.getDnaSize() == null ? null : pool.getDnaSize().toString();
         }
 
       });
