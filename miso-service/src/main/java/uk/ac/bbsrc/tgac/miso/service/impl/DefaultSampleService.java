@@ -927,9 +927,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     target.setSampleType(source.getSampleType());
     target.setScientificName(source.getScientificName());
     target.setTaxonIdentifier(source.getTaxonIdentifier());
-    target.setProject(source.getProject());
 
-    // validate alias uniqueness only if the alias has changed and the sample does not have a non-standard alias
     target.setAlias(source.getAlias());
     target.setDescription(source.getDescription());
     target.setDiscarded(source.isDiscarded());
@@ -960,6 +958,9 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     if (isDetailedSample(target)) {
       DetailedSample dTarget = (DetailedSample) target;
       DetailedSample dSource = (DetailedSample) source;
+      if (source.getProject().isSecondaryNaming() != target.getProject().isSecondaryNaming()) {
+        dTarget.setNonStandardAlias(true);
+      }
       dTarget.setArchived(dSource.getArchived());
       dTarget.setGroupDescription(dSource.getGroupDescription());
       dTarget.setGroupId(dSource.getGroupId());
@@ -982,6 +983,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
         applyStockChanges((SampleStock) target, (SampleStock) source);
       }
     }
+    target.setProject(source.getProject());
   }
 
   private void applyIdentityChanges(SampleIdentity target, SampleIdentity source) throws IOException {
