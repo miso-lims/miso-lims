@@ -23,7 +23,9 @@ FOR EACH ROW
     makeChangeMessage('data reviewer', (SELECT fullName FROM User WHERE userId = OLD.dataReviewerId), (SELECT fullName FROM User WHERE userId = NEW.dataReviewerId)),
     makeChangeMessage('data review date', Old.dataReviewDate, NEW.dataReviewDate),
     makeChangeMessage('SOP', (SELECT CONCAT(alias, ' (', version, ')') FROM Sop WHERE sopId = OLD.sopId), (SELECT CONCAT(alias, ' (', version, ')') FROM Sop WHERE sopId = NEW.sopId)),
-    makeChangeMessage('index sequencing', OLD.dataManglingPolicy, NEW.dataManglingPolicy)
+    makeChangeMessage('index sequencing', OLD.dataManglingPolicy, NEW.dataManglingPolicy),
+    makeChangeMessage('sequencing kit', (SELECT name FROM KitDescriptor WHERE kitDescriptorId = OLD.sequencingKitId), (SELECT name FROM KitDescriptor WHERE kitDescriptorId = NEW.sequencingKitId)),
+    makeChangeMessage('sequencing kit lot', OLD.sequencingKitLot, NEW.sequencingKitLot)
   );
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO RunChangeLog(runId, columnsChanged, userId, message, changeTime) VALUES (
@@ -46,7 +48,9 @@ FOR EACH ROW
         makeChangeColumn('dataReviewerId', OLD.dataReviewerId, NEW.dataReviewerId),
         makeChangeColumn('dataReviewDate', OLD.dataReviewDate, NEW.dataReviewDate),
         makeChangeColumn('sopId', OLD.sopId, NEW.sopId),
-        makeChangeColumn('dataManglingPolicy', OLD.dataManglingPolicy, NEW.dataManglingPolicy)
+        makeChangeColumn('dataManglingPolicy', OLD.dataManglingPolicy, NEW.dataManglingPolicy),
+        makeChangeColumn('sequencingKitId', OLD.sequencingKitId, NEW.sequencingKitId),
+        makeChangeColumn('sequencingKitLot', OLD.sequencingKitLot, NEW.sequencingKitLot)
       ), ''),
       NEW.lastModifier,
       log_message,
