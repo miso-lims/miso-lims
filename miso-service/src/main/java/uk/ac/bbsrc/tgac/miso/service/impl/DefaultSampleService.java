@@ -596,7 +596,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     parent.setVolumeUnits(VolumeUnit.MICROLITRES);
     parent.setSynthetic(true);
     if (child.getIdentityId() != null) parent.setIdentityId(child.getIdentityId());
-    if (isTissuePieceSample(child)) {
+    if (isTissuePieceSample(child) && isSampleSlide(parent)) {
       SampleSlide parentSlides = (SampleSlide) parent;
       Integer slides = parentSlides.getSlides() == null ? 0 : parentSlides.getSlides();
       slides += ((SampleTissuePiece) child).getSlidesConsumed();
