@@ -4,15 +4,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -677,11 +669,11 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   }
 
   private boolean updateMetricsFromNotification(Run source, Run target) {
-    if (source.getMetrics() != null && source.getMetrics().equals(target.getMetrics())) return false;
     if (source.getMetrics() == null) {
       return false;
     }
-    if (source.getMetrics() != null && target.getMetrics() == null) {
+    if (source.getMetrics().equals(target.getMetrics())) return false;
+    if (target.getMetrics() == null) {
       target.setMetrics(source.getMetrics());
       return true;
     }
@@ -703,18 +695,25 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     }
     Map<String, JsonNode> sourceMetricsMap = parseMetrics(sourceMetrics);
     Map<String, JsonNode> targetMetricsMap = parseMetrics(targetMetrics);
-    if (sourceMetricsMap.equals(targetMetricsMap))
-      return false;
-    targetMetricsMap.putAll(sourceMetricsMap);
-    ArrayNode combinedMetrics = mapper.createArrayNode();
-    combinedMetrics.addAll(targetMetricsMap.values());
-    try {
-      target.setMetrics(mapper.writeValueAsString(combinedMetrics));
-    } catch (JsonProcessingException e) {
-      log.error("Failed to save data just unserialised.", e);
-      return false;
+    boolean changed = false;
+    for (Map.Entry<String, JsonNode> x : sourceMetricsMap.entrySet()) {
+      if (!targetMetricsMap.containsKey(x.getKey()) || !targetMetricsMap.get(x.getKey()).equals(x.getValue())) {
+        targetMetricsMap.put(x.getKey(), x.getValue());
+        changed = true;
+      }
     }
-    return true;
+    if (changed) {
+      ArrayNode combinedMetrics = mapper.createArrayNode();
+      combinedMetrics.addAll(targetMetricsMap.values());
+      try {
+        target.setMetrics(mapper.writeValueAsString(combinedMetrics));
+        return true;
+      } catch (JsonProcessingException e) {
+        log.error("Failed to save data just unserialised.", e);
+        return false;
+      }
+    }
+    return false;
   }
 
   private Map<String, JsonNode> parseMetrics(ArrayNode metrics) {
