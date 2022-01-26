@@ -17,8 +17,10 @@ public class DetailedLibraryDto extends LibraryDto {
   private String identityConsentLevel;
   private String effectiveGroupId;
   private String effectiveGroupIdSample;
-  private String effectiveTissueOriginLabel;
-  private String effectiveTissueTypeLabel;
+  private String effectiveTissueOriginAlias;
+  private String effectiveTissueOriginDescription;
+  private String effectiveTissueTypeAlias;
+  private String effectiveTissueTypeDescription;
   private Boolean subprojectPriority;
   private String subprojectAlias;
 
@@ -102,20 +104,36 @@ public class DetailedLibraryDto extends LibraryDto {
     this.effectiveGroupIdSample = effectiveGroupIdSample;
   }
 
-  public String getEffectiveTissueOriginLabel() {
-    return effectiveTissueOriginLabel;
+  public String getEffectiveTissueOriginAlias() {
+    return effectiveTissueOriginAlias;
   }
 
-  public void setEffectiveTissueOriginLabel(String effectiveTissueOriginLabel) {
-    this.effectiveTissueOriginLabel = effectiveTissueOriginLabel;
+  public void setEffectiveTissueOriginAlias(String effectiveTissueOriginAlias) {
+    this.effectiveTissueOriginAlias = effectiveTissueOriginAlias;
   }
 
-  public String getEffectiveTissueTypeLabel() {
-    return effectiveTissueTypeLabel;
+  public String getEffectiveTissueOriginDescription() {
+    return effectiveTissueOriginDescription;
   }
 
-  public void setEffectiveTissueTypeLabel(String effectiveTissueTypeLabel) {
-    this.effectiveTissueTypeLabel = effectiveTissueTypeLabel;
+  public void setEffectiveTissueOriginDescription(String effectiveTissueOriginDescription) {
+    this.effectiveTissueOriginDescription = effectiveTissueOriginDescription;
+  }
+
+  public String getEffectiveTissueTypeAlias() {
+    return effectiveTissueTypeAlias;
+  }
+
+  public void setEffectiveTissueTypeAlias(String effectiveTissueTypeAlias) {
+    this.effectiveTissueTypeAlias = effectiveTissueTypeAlias;
+  }
+
+  public String getEffectiveTissueTypeDescription() {
+    return effectiveTissueTypeDescription;
+  }
+
+  public void setEffectiveTissueTypeDescription(String effectiveTissueTypeDescription) {
+    this.effectiveTissueTypeDescription = effectiveTissueTypeDescription;
   }
 
   public Boolean getSubprojectPriority() {

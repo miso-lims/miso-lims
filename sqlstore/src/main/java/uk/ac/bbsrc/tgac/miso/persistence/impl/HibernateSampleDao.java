@@ -292,9 +292,9 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
     switch (original) {
     case "effectiveExternalNames":
       return "identityAttributes.externalName";
-    case "effectiveTissueOriginLabel":
+    case "effectiveTissueOriginAlias":
       return "tissueOrigin.alias";
-    case "effectiveTissueTypeLabel":
+    case "effectiveTissueTypeAlias":
       return "tissueType.alias";
     case "sampleClassId":
       return "sampleClass.alias";

@@ -4,12 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
@@ -19,6 +14,8 @@ public enum LibraryAliquotSpreadSheets implements Spreadsheet<LibraryAliquot> {
   TRACKING_LIST("Tracking List", //
       Column.forString("Name", LibraryAliquot::getName), //
       Column.forString("Alias", LibraryAliquot::getAlias), //
+      Column.forString("Tissue Origin", true, tissueOrigin()), //
+      Column.forString("Tissue Type", true, tissueType()), //
       Column.forString("Barcode", LibraryAliquot::getIdentificationBarcode), //
       Column.forString("Library Name", libraryAliquot -> libraryAliquot.getLibrary().getName()), //
       Column.forString("Library Alias", libraryAliquot -> libraryAliquot.getLibrary().getAlias()), //
@@ -41,6 +38,8 @@ public enum LibraryAliquotSpreadSheets implements Spreadsheet<LibraryAliquot> {
   POOL_PREPARATION("Pool Preparation", //
       Column.forString("Name", LibraryAliquot::getName), //
       Column.forString("Alias", LibraryAliquot::getAlias), //
+      Column.forString("Tissue Origin", true, tissueOrigin()), //
+      Column.forString("Tissue Type", true, tissueType()), //
       Column.forString("Group ID", groupIdFunction()), //
       Column.forString("Library Description", aliquot -> aliquot.getLibrary().getDescription()), //
       Column.forBigDecimal("Concentration", LibraryAliquot::getConcentration), //
@@ -54,6 +53,8 @@ public enum LibraryAliquotSpreadSheets implements Spreadsheet<LibraryAliquot> {
   DILUTION_PREPARATION("Dilution Preparation", //
       Column.forString("Name", LibraryAliquot::getName), //
       Column.forString("Alias", LibraryAliquot::getAlias), //
+      Column.forString("Tissue Origin", true, tissueOrigin()), //
+      Column.forString("Tissue Type", true, tissueType()), //
       Column.forString("Group ID", groupIdFunction()), //
       Column.forString("Library Description", aliquot -> aliquot.getLibrary().getDescription()), //
       Column.forBigDecimal("Concentration", LibraryAliquot::getConcentration), //
@@ -81,6 +82,24 @@ public enum LibraryAliquotSpreadSheets implements Spreadsheet<LibraryAliquot> {
         }
       }
       return defaultValue;
+    };
+  }
+
+  private static Function<LibraryAliquot, String> tissueOrigin() {
+    return l -> {
+      if (!LimsUtils.isDetailedLibraryAliquot(l)) {
+        return null;
+      }
+      return ((DetailedSample) l.getLibrary().getSample()).getTissueAttributes().getTissueOrigin().getAlias();
+    };
+  }
+
+  private static Function<LibraryAliquot, String> tissueType() {
+    return l -> {
+      if (!LimsUtils.isDetailedLibraryAliquot(l)) {
+        return null;
+      }
+      return ((DetailedSample) l.getLibrary().getSample()).getTissueAttributes().getTissueType().getAlias();
     };
   }
 

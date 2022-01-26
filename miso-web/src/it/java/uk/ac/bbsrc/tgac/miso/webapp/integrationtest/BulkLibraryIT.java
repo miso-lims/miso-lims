@@ -43,13 +43,15 @@ public class BulkLibraryIT extends AbstractIT {
       LibColumns.KIT_DESCRIPTOR, LibColumns.QC_STATUS, LibColumns.QC_NOTE, LibColumns.SIZE, LibColumns.VOLUME, LibColumns.VOLUME_UNITS,
       LibColumns.CONCENTRATION, LibColumns.CONCENTRATION_UNITS, LibColumns.SPIKE_IN, LibColumns.SPIKE_IN_DILUTION, LibColumns.SPIKE_IN_VOL);
 
-  private static final Set<String> editColumns = Sets.newHashSet(LibColumns.EFFECTIVE_GROUP_ID, LibColumns.CREATION_DATE,
-      LibColumns.SOP, LibColumns.WORKSTATION, LibColumns.THERMAL_CYCLER, LibColumns.INITIAL_VOLUME, LibColumns.PARENT_NG_USED,
-      LibColumns.PARENT_VOLUME_USED, LibColumns.KIT_LOT);
+  private static final Set<String> editColumns = Sets.newHashSet(LibColumns.TISSUE_ORIGIN, LibColumns.TISSUE_TYPE,
+      LibColumns.EFFECTIVE_GROUP_ID, LibColumns.CREATION_DATE, LibColumns.SOP, LibColumns.WORKSTATION,
+      LibColumns.THERMAL_CYCLER, LibColumns.INITIAL_VOLUME, LibColumns.PARENT_NG_USED, LibColumns.PARENT_VOLUME_USED,
+      LibColumns.KIT_LOT);
 
   private static final Set<String> propagateColumns = Sets.newHashSet(LibColumns.SAMPLE_NAME, LibColumns.SAMPLE_ALIAS,
-      LibColumns.SAMPLE_LOCATION, LibColumns.EFFECTIVE_GROUP_ID, LibColumns.CREATION_DATE, LibColumns.SOP, LibColumns.WORKSTATION,
-      LibColumns.THERMAL_CYCLER, LibColumns.PARENT_NG_USED, LibColumns.PARENT_VOLUME_USED, LibColumns.KIT_LOT);
+      LibColumns.SAMPLE_LOCATION, LibColumns.TISSUE_ORIGIN, LibColumns.TISSUE_TYPE, LibColumns.EFFECTIVE_GROUP_ID,
+      LibColumns.CREATION_DATE, LibColumns.SOP, LibColumns.WORKSTATION, LibColumns.THERMAL_CYCLER,
+      LibColumns.PARENT_NG_USED, LibColumns.PARENT_VOLUME_USED, LibColumns.KIT_LOT);
 
   private static final Set<String> receiptColumns = Sets.newHashSet(SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT,
       SamColumns.SUBPROJECT, SamColumns.EXTERNAL_NAME, SamColumns.IDENTITY_ALIAS, SamColumns.DONOR_SEX, SamColumns.CONSENT,

@@ -198,6 +198,20 @@ FormTarget.libraryaliquot = (function($) {
             title: 'Details',
             include: config.detailedSample,
             fields: [{
+              title: 'Tissue Origin',
+              data: 'effectiveTissueOriginAlias',
+              getDisplayValue: function(item) {
+              return item.effectiveTissueOriginAlias + ' (' + item.effectiveTissueOriginDescription + ')';
+              },
+              type: 'read-only'
+            }, {
+              title: 'Tissue Type',
+              data: 'effectiveTissueTypeAlias',
+              getDisplayValue: function(item) {
+              return item.effectiveTissueTypeAlias + ' (' + item.effectiveTissueTypeDescription + ')';
+              },
+              type: 'read-only'
+            }, {
               title: 'Effective Group ID',
               data: 'effectiveGroupId',
               type: 'read-only',
@@ -220,7 +234,8 @@ FormTarget.libraryaliquot = (function($) {
               type: 'text',
               maxLength: 255
             }]
-          }];
+          }
+      ];
     }
   };
 

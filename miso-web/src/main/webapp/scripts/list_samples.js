@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 ListTarget.sample = (function() {
 
   return {
@@ -156,7 +133,7 @@ ListTarget.sample = (function() {
         "include": Constants.isDetailedSample
       }, {
         "sTitle": "Tissue Attributes",
-        "mData": "effectiveTissueTypeLabel",
+        "mData": "effectiveTissueTypeAlias",
         "include": Constants.isDetailedSample,
         "mRender": function(data, type, full) {
           if (type !== "display") {
@@ -164,7 +141,7 @@ ListTarget.sample = (function() {
           } else if (!data) {
             return 'n/a';
           }
-          var label = full.effectiveTissueOriginLabel + " " + full.effectiveTissueTypeLabel;
+          var label = full.effectiveTissueOriginAlias + " " + full.effectiveTissueTypeAlias;
           if (full.effectiveTimepoint) {
             if (full.effectiveTimepoint.length > 12) {
               label += " " + full.effectiveTimepoint.substring(0,12) + "&#8230;"; // #8230=ellipsis
@@ -175,8 +152,8 @@ ListTarget.sample = (function() {
           return '<div class="tooltip" style="width: 100%;">'
               + '<span>' + label + '</span>'
               + '<span class="tooltiptext">'
-              + 'Tissue origin: ' + full.effectiveTissueOriginLabel + '<br/>'
-              + 'Tissue type: ' + full.effectiveTissueTypeLabel + '<br/>'
+              + 'Tissue origin: ' + full.effectiveTissueOriginAlias + ' (' + full.effectiveTissueOriginDescription + ')<br/>'
+              + 'Tissue type: ' + full.effectiveTissueTypeAlias + ' (' + full.effectiveTissueTypeDescription + ')<br/>'
               + (full.effectiveTimepoint ? 'Timepoint: ' + full.effectiveTimepoint + '<br/>' : '')
               + '</span>'
               + '</div>';

@@ -18,6 +18,8 @@ public enum LibrarySpreadSheets implements Spreadsheet<Library> {
   TRACKING_LIST("Tracking List", //
       Column.forString("Name", Library::getName), //
       Column.forString("Alias", Library::getAlias), //
+      Column.forString("Tissue Origin", true, tissueOrigin()), //
+      Column.forString("Tissue Type", true, tissueType()), //
       Column.forString("Barcode", Library::getIdentificationBarcode), //
       Column.forString("Library Type", library -> library.getLibraryType().getDescription()),
       Column.forString("Library Design", true, library -> ((DetailedLibrary)library).getLibraryDesignCode().getCode()), //
@@ -36,6 +38,8 @@ public enum LibrarySpreadSheets implements Spreadsheet<Library> {
   POOL_PREPARATION("Pool Preparation", //
       Column.forString("Name", Library::getName), //
       Column.forString("Alias", Library::getAlias), //
+      Column.forString("Tissue Origin", true, tissueOrigin()), //
+      Column.forString("Tissue Type", true, tissueType()), //
       Column.forString("Group ID", groupIdFunction()), //
       Column.forString("Description", Library::getDescription), //
       Column.forBigDecimal("Concentration", Library::getConcentration), //
@@ -48,6 +52,8 @@ public enum LibrarySpreadSheets implements Spreadsheet<Library> {
   DILUTION_PREPARATION("Dilution Preparation", //
       Column.forString("Name", Library::getName), //
       Column.forString("Alias", Library::getAlias), //
+      Column.forString("Tissue Origin", true, tissueOrigin()), //
+      Column.forString("Tissue Type", true, tissueType()), //
       Column.forString("Group ID", groupIdFunction()), //
       Column.forString("Description", Library::getDescription), //
       Column.forBigDecimal("Concentration", Library::getConcentration), //
@@ -58,6 +64,24 @@ public enum LibrarySpreadSheets implements Spreadsheet<Library> {
       Column.forString("Index 1", library -> getSequence(library.getIndex1())), //
       Column.forString("Index 2", library -> getSequence(library.getIndex2())), //
       Column.forString("Index Family", lib -> lib.getIndex1() == null ? null : lib.getIndex1().getFamily().getName()));
+
+  private static Function<Library, String> tissueOrigin() {
+    return l -> {
+      if (!LimsUtils.isDetailedLibrary(l)) {
+        return null;
+      }
+      return ((DetailedSample) l.getSample()).getTissueAttributes().getTissueOrigin().getAlias();
+    };
+  }
+
+  private static Function<Library, String> tissueType() {
+    return l -> {
+      if (!LimsUtils.isDetailedLibrary(l)) {
+        return null;
+      }
+      return ((DetailedSample) l.getSample()).getTissueAttributes().getTissueType().getAlias();
+    };
+  }
 
   private static <S extends DetailedSample, T> Function<Library, T> detailedSample(Class<S> clazz, Function<S, T> function,
       T defaultValue) {
