@@ -90,6 +90,8 @@ public class LibraryDto extends AbstractBoxableDto implements ReceivableDto<Libr
   private String worksetAddedTime;
   private Long effectiveQcFailureId;
   private String effectiveQcFailureLevel;
+  private Long requisitionId;
+  private String requisitionAlias;
 
   public String getAlias() {
     return alias;
@@ -621,6 +623,22 @@ public class LibraryDto extends AbstractBoxableDto implements ReceivableDto<Libr
 
   public void setParentSampleName(String parentSampleName) {
     this.parentSampleName = parentSampleName;
+  }
+
+  public Long getRequisitionId() {
+    return requisitionId;
+  }
+
+  public void setRequisitionId(Long requisitionId) {
+    this.requisitionId = requisitionId;
+  }
+
+  public String getRequisitionAlias() {
+    return requisitionAlias;
+  }
+
+  public void setRequisitionAlias(String requisitionAlias) {
+    this.requisitionAlias = requisitionAlias;
   }
 
 }

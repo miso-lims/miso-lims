@@ -474,6 +474,12 @@ public class Dtos {
     if (from.getQCs() != null && !from.getQCs().isEmpty()) {
       dto.setQcs(asQcDtos(from.getQCs()));
     }
+
+    Requisition requisition = getRequisition(from);
+    setId(dto::setRequisitionId, requisition);
+    setString(dto::setRequisitionAlias, maybeGetProperty(requisition, Requisition::getAlias));
+    setId(dto::setRequisitionAssayId, maybeGetProperty(requisition, Requisition::getAssay));
+
     return dto;
   }
 
@@ -514,9 +520,6 @@ public class Dtos {
     dto.setConcentrationUnits(from.getConcentrationUnits());
     dto.setDiscarded(from.isDiscarded());
     dto.setLastModified(formatDateTime(from.getLastModified()));
-    setId(dto::setRequisitionId, from.getRequisition());
-    setString(dto::setRequisitionAlias, maybeGetProperty(from.getRequisition(), Requisition::getAlias));
-    setId(dto::setRequisitionAssayId, maybeGetProperty(from.getRequisition(), Requisition::getAssay));
     dto.setLibraryCount(libraryCount);
     setId(dto::setSequencingControlTypeId, from.getSequencingControlType());
     setId(dto::setSopId, from.getSop());
@@ -587,6 +590,17 @@ public class Dtos {
     setEffectiveQcFailure(from, dto);
 
     return dto;
+  }
+
+  private static Requisition getRequisition(Sample sample) {
+    if (!LimsUtils.isDetailedSample(sample)) {
+      return sample.getRequisition();
+    }
+    DetailedSample requisitionSample = (DetailedSample) sample;
+    while (requisitionSample != null && requisitionSample.getRequisition() == null) {
+      requisitionSample = requisitionSample.getParent();
+    }
+    return requisitionSample == null ? null : requisitionSample.getRequisition();
   }
 
   private static void setEffectiveQcFailure(HierarchyEntity from, UpstreamQcFailableDto to) {
@@ -1434,6 +1448,10 @@ public class Dtos {
     setString(dto::setBatchId, from.getBatchId());
     setEffectiveQcFailure(from, dto);
 
+    Requisition requisition = getRequisition(from.getSample());
+    setId(dto::setRequisitionId, requisition);
+    setString(dto::setRequisitionAlias, maybeGetProperty(requisition, Requisition::getAlias));
+
     return dto;
   }
 
@@ -1702,6 +1720,11 @@ public class Dtos {
     setEffectiveQcFailure(from, dto);
     setId(dto::setKitDescriptorId, from.getKitDescriptor());
     setString(dto::setKitLot, from.getKitLot());
+
+    Requisition requisition = getRequisition(from.getLibrary().getSample());
+    setId(dto::setRequisitionId, requisition);
+    setString(dto::setRequisitionAlias, maybeGetProperty(requisition, Requisition::getAlias));
+
     return dto;
   }
 
