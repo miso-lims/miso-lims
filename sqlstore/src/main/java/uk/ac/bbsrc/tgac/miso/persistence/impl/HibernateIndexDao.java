@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -11,8 +12,6 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,19 +26,12 @@ import uk.ac.bbsrc.tgac.miso.persistence.IndexStore;
 @Repository
 public class HibernateIndexDao extends HibernateSaveDao<Index> implements IndexStore, HibernatePaginatedDataSource<Index> {
 
-  protected static final Logger log = LoggerFactory.getLogger(HibernateSubprojectDao.class);
-
   private static final String[] SEARCH_PROPERTIES = new String[] { "name", "sequence", "family.name" };
 
   private static final List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("family"));
 
   public HibernateIndexDao() {
     super(Index.class);
-  }
-
-  @Override
-  public Session currentSession() {
-    return super.currentSession();
   }
 
   @Override
@@ -118,6 +110,11 @@ public class HibernateIndexDao extends HibernateSaveDao<Index> implements IndexS
             Restrictions.eq("index2.id", index.getId())))
         .setProjection(Projections.rowCount())
         .uniqueResult();
+  }
+
+  @Override
+  public List<Index> listByIdList(Collection<Long> ids) throws IOException {
+    return listByIdList("indexId", ids);
   }
 
 }

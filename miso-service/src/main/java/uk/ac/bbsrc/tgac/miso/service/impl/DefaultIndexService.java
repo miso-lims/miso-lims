@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.transaction.support.TransactionTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexFamilyService;
@@ -33,6 +34,32 @@ public class DefaultIndexService extends AbstractSaveService<Index> implements I
   private AuthorizationManager authorizationManager;
   @Autowired
   private DeletionStore deletionStore;
+  @Autowired
+  private TransactionTemplate transactionTemplate;
+
+  public void setIndexStore(IndexStore indexStore) {
+    this.indexStore = indexStore;
+  }
+
+  @Override
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
+  }
+
+  @Override
+  public AuthorizationManager getAuthorizationManager() {
+    return authorizationManager;
+  }
+
+  @Override
+  public TransactionTemplate getTransactionTemplate() {
+    return transactionTemplate;
+  }
+
+  @Override
+  public SaveDao<Index> getDao() {
+    return indexStore;
+  }
 
   @Override
   public long count(Consumer<String> errorHandler, PaginationFilter... filter) throws IOException {
@@ -50,23 +77,9 @@ public class DefaultIndexService extends AbstractSaveService<Index> implements I
     return indexStore.list(errorHandler, offset, limit, sortDir, sortCol, filter);
   }
 
-  public void setIndexStore(IndexStore indexStore) {
-    this.indexStore = indexStore;
-  }
-
   @Override
-  public DeletionStore getDeletionStore() {
-    return deletionStore;
-  }
-
-  @Override
-  public AuthorizationManager getAuthorizationManager() {
-    return authorizationManager;
-  }
-
-  @Override
-  public SaveDao<Index> getDao() {
-    return indexStore;
+  public List<Index> listByIdList(List<Long> ids) throws IOException {
+    return indexStore.listByIdList(ids);
   }
 
   @Override

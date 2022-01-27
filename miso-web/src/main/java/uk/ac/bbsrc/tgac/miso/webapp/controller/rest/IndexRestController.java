@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response.Status;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,6 +32,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.IndexDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping(value = "/rest/indices", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -38,15 +40,14 @@ public class IndexRestController extends RestController {
 
   @Autowired
   private IndexService indexService;
-
   @Autowired
   private IndexFamilyService indexFamilyService;
-
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
-
   @Autowired
   private ConstantsController constantsController;
+  @Autowired
+  private AsyncOperationManager asyncOperationManager;
 
   private final JQueryDataTableBackend<Index, IndexDto> jQueryBackend = new JQueryDataTableBackend<Index, IndexDto>() {
 
@@ -71,35 +72,40 @@ public class IndexRestController extends RestController {
   @ResponseBody
   public DataTablesResponseDto<IndexDto> dataTableByPlatform(@PathVariable("platform") String platform, HttpServletRequest request)
       throws IOException {
-    PlatformType platformType = PlatformType.valueOf(platform);
-    if (platformType == null) {
+    PlatformType platformType = null;
+    try {
+      platformType = PlatformType.valueOf(platform);
+    } catch (IllegalArgumentException e) {
       throw new RestException("Invalid platform type.", Status.BAD_REQUEST);
     }
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.platformType(platformType),
         PaginationFilter.archived(false));
   }
 
-  @PostMapping
-  public @ResponseBody IndexDto create(@RequestBody IndexDto dto) throws IOException {
-    return RestUtils.createObject("Index", dto, Dtos::to, indexService, d -> {
-      constantsController.refreshConstants();
-      return Dtos.asDto(d);
-    });
+  @PostMapping("/bulk")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public @ResponseBody
+  ObjectNode bulkCreateAsync(@RequestBody List<IndexDto> dtos) throws IOException {
+    return asyncOperationManager.startAsyncBulkCreate("Index", dtos, Dtos::to, indexService, true);
   }
 
-  @PutMapping("/{indexId}")
-  public @ResponseBody IndexDto update(@PathVariable long indexId, @RequestBody IndexDto dto) throws IOException {
-    return RestUtils.updateObject("Index", indexId, dto, Dtos::to, indexService, d -> {
-      constantsController.refreshConstants();
-      return Dtos.asDto(d);
-    });
+  @PutMapping("/bulk")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<IndexDto> dtos) throws IOException {
+    return asyncOperationManager.startAsyncBulkUpdate("Index", dtos, Dtos::to, indexService, true);
+  }
+
+  @GetMapping("/bulk/{uuid}")
+  public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
+    return asyncOperationManager.getAsyncProgress(uuid, Index.class, indexService, Dtos::asDto);
   }
 
   @PostMapping(value = "/bulk-delete")
   @ResponseBody
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
+  public void bulkDelete(@RequestBody List<Long> ids) throws IOException {
     RestUtils.bulkDelete("Index", ids, indexService);
+    constantsController.refreshConstants();
   }
 
   public static class IndexSearchRequest {

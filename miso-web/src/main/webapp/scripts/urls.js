@@ -305,8 +305,8 @@ Urls = (function() {
 
   var indexRestBase = restBase + '/indices';
   rest.indices = {
-    create: indexRestBase,
-    update: idUrlFunction(indexRestBase),
+    bulkSave: indexRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(indexRestBase + '/bulk'),
     datatable: indexRestBase + '/dt',
     platformDatatable: idUrlFunction(indexRestBase + '/dt/platform')
   };
