@@ -258,6 +258,22 @@ FormTarget.sample = (function($) {
               type: 'read-only',
               include: object.sampleCategory !== 'Identity'
             }, {
+              title: 'Tissue Origin',
+              data: 'effectiveTissueOriginAlias',
+              getDisplayValue: function(item) {
+                return item.effectiveTissueOriginAlias + ' (' + item.effectiveTissueOriginDescription + ')';
+              },
+              type: 'read-only',
+              include: !['Identity', 'Tissue'].includes(object.sampleCategory)
+            }, {
+              title: 'Tissue Type',
+              data: 'effectiveTissueTypeAlias',
+              getDisplayValue: function(item) {
+                return item.effectiveTissueTypeAlias + ' (' + item.effectiveTissueTypeDescription + ')';
+              },
+              type: 'read-only',
+              include: !['Identity', 'Tissue'].includes(object.sampleCategory)
+            }, {
               title: 'Effective Group ID',
               data: 'effectiveGroupId',
               type: 'read-only',

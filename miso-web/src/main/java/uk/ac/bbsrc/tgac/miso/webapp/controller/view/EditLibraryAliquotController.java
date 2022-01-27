@@ -26,12 +26,10 @@ import org.springframework.web.servlet.ModelAndView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentTissueAttributes;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
@@ -123,6 +121,11 @@ public class EditLibraryAliquotController {
         DetailedLibrary detailedLibrary = (DetailedLibrary) item;
         detailed.setNonStandardAlias(detailedLibrary.hasNonStandardAlias());
         detailed.setLibraryDesignCodeId(detailedLibrary.getLibraryDesignCode().getId());
+        ParentTissueAttributes tissue = ((DetailedSample) detailedLibrary.getSample()).getTissueAttributes();
+        detailed.setEffectiveTissueOriginAlias(tissue.getTissueOrigin().getAlias());
+        detailed.setEffectiveTissueOriginDescription(tissue.getTissueOrigin().getDescription());
+        detailed.setEffectiveTissueTypeAlias(tissue.getTissueType().getAlias());
+        detailed.setEffectiveTissueTypeDescription(tissue.getTissueType().getDescription());
         dto = detailed;
       } else {
         dto = new LibraryAliquotDto();
@@ -186,6 +189,11 @@ public class EditLibraryAliquotController {
         DetailedLibraryAliquot detailedParent = (DetailedLibraryAliquot) item;
         detailed.setNonStandardAlias(detailedParent.isNonStandardAlias());
         detailed.setLibraryDesignCodeId(detailedParent.getLibraryDesignCode().getId());
+        ParentTissueAttributes tissue = ((DetailedSample) detailedParent.getLibrary().getSample()).getTissueAttributes();
+        detailed.setEffectiveTissueOriginAlias(tissue.getTissueOrigin().getAlias());
+        detailed.setEffectiveTissueOriginDescription(tissue.getTissueOrigin().getDescription());
+        detailed.setEffectiveTissueTypeAlias(tissue.getTissueType().getAlias());
+        detailed.setEffectiveTissueTypeDescription(tissue.getTissueType().getDescription());
         dto = detailed;
       } else {
         dto = new LibraryAliquotDto();

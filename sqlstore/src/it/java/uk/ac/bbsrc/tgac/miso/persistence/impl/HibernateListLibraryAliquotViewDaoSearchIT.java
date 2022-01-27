@@ -15,7 +15,7 @@ public class HibernateListLibraryAliquotViewDaoSearchIT extends HibernatePaginat
       SearchType.BARCODE);
   private static final List<String> SORT_FIELDS = Arrays.asList("alias", "lastModified", "library.parentSampleId",
       "library.parentSampleAlias", "libraryPlatformType", "library.platformType", "creatorName", "creationDate",
-      "effectiveTissueOriginLabel", "effectiveTissueTypeLabel");
+      "effectiveTissueOriginAlias", "effectiveTissueTypeAlias");
 
   public HibernateListLibraryAliquotViewDaoSearchIT() {
     super(VALID_SEARCH_TYPES, SORT_FIELDS);

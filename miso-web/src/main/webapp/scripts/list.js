@@ -785,6 +785,22 @@ ListUtils = (function($) {
         }
         return data;
       },
+      textWithHoverTitle: function(textProperty, titleProperty, defaultText) {
+        return function(data, type, full) {
+          if (type !== 'display') {
+            return data;
+          }
+          var text = full[textProperty];
+          if (text === null) {
+            return defaultText || 'n/a';
+          }
+          var title = full[titleProperty];
+          if (title === null) {
+            return text;
+          }
+          return '<span title="' + title + '">' + text + '</span>';
+        }
+      },
       measureWithUnits: function(unitsList, unitsProperty) {
         return function(data, type, full) {
           if (type === 'display' && data) {

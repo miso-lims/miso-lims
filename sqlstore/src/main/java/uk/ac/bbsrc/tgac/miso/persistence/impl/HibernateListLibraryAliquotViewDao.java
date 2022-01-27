@@ -103,9 +103,9 @@ public class HibernateListLibraryAliquotViewDao implements ListLibraryAliquotVie
       return "creator.fullName";
     case "creationDate":
       return "created";
-    case "effectiveTissueOriginLabel":
+    case "effectiveTissueOriginAlias":
       return "tissueOrigin.alias";
-    case "effectiveTissueTypeLabel":
+    case "effectiveTissueTypeAlias":
       return "tissueType.alias";
     default:
       return original;

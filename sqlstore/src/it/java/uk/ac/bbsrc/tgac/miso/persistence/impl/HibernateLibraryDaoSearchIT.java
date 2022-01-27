@@ -14,8 +14,8 @@ public class HibernateLibraryDaoSearchIT extends HibernatePaginatedDataSourceIT 
       SearchType.CREATOR, SearchType.MODIFIER, SearchType.BULK_LOOKUP, SearchType.ENTERED, SearchType.GROUP_ID, SearchType.INDEX,
       SearchType.KIT_NAME, SearchType.PLATFORM_TYPE, SearchType.WORKSTATION, SearchType.BARCODE);
 
-  private static final List<String> SORT_FIELDS = Arrays.asList("effectiveTissueOriginLabel", "effectiveTissueTypeLabel", "parentSampleId",
-      "parentSampleAlias");
+  private static final List<String> SORT_FIELDS = Arrays.asList("effectiveTissueOriginAlias",
+      "effectiveTissueTypeAlias", "parentSampleId", "parentSampleAlias");
 
   public HibernateLibraryDaoSearchIT() {
     super(VALID_SEARCH_TYPES, SORT_FIELDS);

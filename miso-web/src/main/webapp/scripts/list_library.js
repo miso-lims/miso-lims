@@ -126,15 +126,15 @@ ListTarget.library = {
       "sClass": "nowrap"
     }, ListUtils.labelHyperlinkColumn("Alias", Urls.ui.libraries.edit, Utils.array.getId, "alias", 0, true), {
       "sTitle": "Tissue Origin",
-      "mData": "effectiveTissueOriginLabel",
+      "mData": "effectiveTissueOriginAlias",
       "include": Constants.isDetailedSample,
-      "mRender": ListUtils.render.naIfNull,
+      "mRender": ListUtils.render.textWithHoverTitle("effectiveTissueOriginAlias", "effectiveTissueOriginDescription"),
       "iSortPriority": 0
     }, {
       "sTitle": "Tissue Type",
-      "mData": "effectiveTissueTypeLabel",
+      "mData": "effectiveTissueTypeAlias",
       "include": Constants.isDetailedSample,
-      "mRender": ListUtils.render.naIfNull,
+      "mRender": ListUtils.render.textWithHoverTitle("effectiveTissueTypeAlias", "effectiveTissueTypeDescription"),
       "iSortPriority": 0
     }, ListUtils.columns.detailedQcStatus, {
       "sTitle": "Design",

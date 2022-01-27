@@ -167,7 +167,27 @@ BulkTarget.libraryaliquot = (function($) {
             return Utils.sorting.sortBoxPositions(a, b, false);
           }
         }]
-      }, BulkUtils.columns.name, BulkUtils.columns.generatedAlias(config), BulkUtils.columns.description];
+      }, BulkUtils.columns.name, BulkUtils.columns.generatedAlias(config), {
+        title: 'Tissue Origin',
+        type: 'text',
+        disabled: true,
+        data: 'effectiveTissueOriginAlias',
+        getData: function(item, api) {
+          return item.effectiveTissueOriginAlias + ' (' + item.effectiveTissueOriginDescription + ')';
+        },
+        omit: true,
+        include: Constants.isDetailedSample
+      }, {
+        title: 'Tissue Type',
+        type: 'text',
+        disabled: true,
+        data: 'effectiveTissueTypeAlias',
+        getData: function(item, api) {
+          return item.effectiveTissueTypeAlias + ' (' + item.effectiveTissueTypeDescription + ')';
+        },
+        omit: true,
+        include: Constants.isDetailedSample
+      }, BulkUtils.columns.description];
 
       columns = columns.concat(BulkUtils.columns.boxable(config, api));
       columns = columns.concat(BulkUtils.columns.groupId(true, function(rowIndex) {

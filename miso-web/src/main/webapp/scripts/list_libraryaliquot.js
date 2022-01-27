@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 ListTarget.libraryaliquot = {
   name: "Library Aliquots",
   getUserManualUrl: function() {
@@ -111,15 +88,15 @@ ListTarget.libraryaliquot = {
       "sClass": "nowrap"
     }, ListUtils.labelHyperlinkColumn("Alias", Urls.ui.libraryAliquots.edit, Utils.array.getId, "alias", 0, true), {
       "sTitle": "Tissue Origin",
-      "mData": "effectiveTissueOriginLabel",
+      "mData": "effectiveTissueOriginAlias",
       "include": Constants.isDetailedSample,
-      "mRender": ListUtils.render.naIfNull,
+      "mRender": ListUtils.render.textWithHoverTitle("effectiveTissueOriginAlias", "effectiveTissueOriginDescription"),
       "iSortPriority": 0
     }, {
       "sTitle": "Tissue Type",
-      "mData": "effectiveTissueTypeLabel",
+      "mData": "effectiveTissueTypeAlias",
       "include": Constants.isDetailedSample,
-      "mRender": ListUtils.render.naIfNull,
+      "mRender": ListUtils.render.textWithHoverTitle("effectiveTissueTypeAlias", "effectiveTissueTypeDescription"),
       "iSortPriority": 0
     }, ListUtils.columns.detailedQcStatus, {
       "sTitle": "Design",

@@ -294,6 +294,28 @@ BulkTarget.library = (function($) {
         }
 
         columns = columns.concat(samColumns);
+      } else {
+        columns.push({
+          title: 'Tissue Origin',
+          type: 'text',
+          disabled: true,
+          data: 'effectiveTissueOriginAlias',
+          getData: function(item, api) {
+            return item.effectiveTissueOriginAlias + ' (' + item.effectiveTissueOriginDescription + ')';
+          },
+          omit: true,
+          include: Constants.isDetailedSample
+        }, {
+          title: 'Tissue Type',
+          type: 'text',
+          disabled: true,
+          data: 'effectiveTissueTypeAlias',
+          getData: function(item, api) {
+            return item.effectiveTissueTypeAlias + ' (' + item.effectiveTissueTypeDescription + ')';
+          },
+          omit: true,
+          include: Constants.isDetailedSample
+        });
       }
 
       if (config.showDescription) {
