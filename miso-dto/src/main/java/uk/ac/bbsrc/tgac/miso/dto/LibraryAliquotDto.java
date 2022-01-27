@@ -70,6 +70,8 @@ public class LibraryAliquotDto extends AbstractBoxableDto implements UpstreamQcF
   private String worksetAddedTime;
   private Long effectiveQcFailureId;
   private String effectiveQcFailureLevel;
+  private Long requisitionId;
+  private String requisitionAlias;
 
   public Long getId() {
     return id;
@@ -461,6 +463,22 @@ public class LibraryAliquotDto extends AbstractBoxableDto implements UpstreamQcF
   @Override
   public void setEffectiveQcFailureLevel(String effectiveQcFailureLevel) {
     this.effectiveQcFailureLevel = effectiveQcFailureLevel;
+  }
+
+  public Long getRequisitionId() {
+    return requisitionId;
+  }
+
+  public void setRequisitionId(Long requisitionId) {
+    this.requisitionId = requisitionId;
+  }
+
+  public String getRequisitionAlias() {
+    return requisitionAlias;
+  }
+
+  public void setRequisitionAlias(String requisitionAlias) {
+    this.requisitionAlias = requisitionAlias;
   }
 
 }
