@@ -7,6 +7,30 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.41.0] - 2022-01-28
+
+### Changed
+
+* Tissue origin and tissue type are now displayed when editing libraries and
+  library aliquots, and are included on all library and library aliquot
+  download sheets (detailed sample)
+* Requisition is now linked on the Edit page of sample, library, and library
+  aliquot descendants of a requisitioned sample
+
+### Fixed
+
+* Run metrics from Run Scanner were being updated even when there were no
+  changes
+* Size field on pool labels showing average from libraries instead of the
+  pool's own size field
+* Run sequencing kit changes were not being logged
+* Error saving tissue piece samples when the sample class has no slide parent
+  class (detailed sample)
+* Bulk tissue types page performance and accessibility improvements
+* Aliases will no longer be validated for samples that move between projects
+  with different naming schemes
+
+
 ## [1.40.1] - 2022-01-14
 
 ### Fixed
