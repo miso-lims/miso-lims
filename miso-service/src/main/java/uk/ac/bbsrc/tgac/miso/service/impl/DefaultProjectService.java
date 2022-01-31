@@ -266,7 +266,7 @@ public class DefaultProjectService implements ProjectService {
   public void beforeDelete(Project object) throws IOException {
     fileAttachmentService.beforeDelete(object);
 
-    List<LibraryTemplate> templates = libraryTemplateService.listLibraryTemplatesForProject(object.getId());
+    List<LibraryTemplate> templates = libraryTemplateService.listByProject(object.getId());
     for (LibraryTemplate template : templates) {
       template.getProjects().removeIf(templateProject -> templateProject.getId() == object.getId());
       libraryTemplateService.update(template);

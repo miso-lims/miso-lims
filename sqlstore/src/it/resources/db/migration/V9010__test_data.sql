@@ -941,15 +941,19 @@ INSERT INTO StepSample(workflowProgressId, stepNumber, sampleId) VALUES
 INSERT INTO StepPool(workflowProgressId, stepNumber, poolId) VALUES
 (2, 1, 1);
 
-INSERT INTO LibraryTemplate(libraryTemplateId, alias) VALUES
-(1, 'pro1_temp1'),
-(2, 'pro1_temp2'),
-(3, 'pro2_temp1');
+INSERT INTO LibraryTemplate(libraryTemplateId, alias, indexFamilyId) VALUES
+(1, 'pro1_temp1', 1),
+(2, 'pro1_temp2', NULL),
+(3, 'pro2_temp1', NULL);
 
 INSERT INTO LibraryTemplate_Project(libraryTemplateId, projectId) VALUES
 (1, 1),
 (2, 1),
 (3, 2);
+
+INSERT INTO LibraryTemplate_Index1(libraryTemplateId, `position`, index1Id) VALUES
+(1, 'A01', 1),
+(2, 'A02', 2);
 
 INSERT INTO WorksetCategory(categoryId, alias) VALUES
 (1, 'Category A'),

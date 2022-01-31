@@ -19,40 +19,12 @@ import uk.ac.bbsrc.tgac.miso.persistence.LibraryTemplateStore;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateLibraryTemplateDao implements LibraryTemplateStore, HibernatePaginatedDataSource<LibraryTemplate> {
+public class HibernateLibraryTemplateDao extends HibernateSaveDao<LibraryTemplate> implements LibraryTemplateStore, HibernatePaginatedDataSource<LibraryTemplate> {
 
   private static final String[] SEARCH_PROPERTIES = new String[] { "alias" };
 
-
-  @Autowired
-  private SessionFactory sessionFactory;
-
-  @Override
-  public Session currentSession() {
-    return getSessionFactory().getCurrentSession();
-  }
-
-  @Override
-  public LibraryTemplate get(long id) throws IOException {
-    return (LibraryTemplate) currentSession().get(LibraryTemplate.class, id);
-  }
-
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
-  }
-
-  @Override
-  public long create(LibraryTemplate libraryTemplate) throws IOException {
-    return (Long) currentSession().save(libraryTemplate);
-  }
-
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
-  }
-
-  @Override
-  public void update(LibraryTemplate libraryTemplate) throws IOException {
-    currentSession().update(libraryTemplate);
+  public HibernateLibraryTemplateDao() {
+    super(LibraryTemplate.class);
   }
 
   @Override
@@ -96,14 +68,12 @@ public class HibernateLibraryTemplateDao implements LibraryTemplateStore, Hibern
   }
 
   @Override
-  public List<LibraryTemplate> list() throws IOException {
-    @SuppressWarnings("unchecked")
-    List<LibraryTemplate> list = currentSession().createCriteria(LibraryTemplate.class).list();
-    return list;
+  public LibraryTemplate getByAlias(String alias) throws IOException {
+    return getBy("alias", alias);
   }
 
   @Override
-  public List<LibraryTemplate> listLibraryTemplatesForProject(long projectId) {
+  public List<LibraryTemplate> listByProject(long projectId) {
     @SuppressWarnings("unchecked")
     List<LibraryTemplate> list = currentSession().createCriteria(LibraryTemplate.class)
         .createAlias("projects", "project")
@@ -114,14 +84,7 @@ public class HibernateLibraryTemplateDao implements LibraryTemplateStore, Hibern
 
   @Override
   public List<LibraryTemplate> listByIdList(List<Long> idList) throws IOException {
-    if (idList.isEmpty()) {
-      return Collections.emptyList();
-    }
-    Criteria criteria = currentSession().createCriteria(LibraryTemplate.class);
-    criteria.add(Restrictions.in("id", idList));
-    @SuppressWarnings("unchecked")
-    List<LibraryTemplate> records = criteria.list();
-    return records;
+    return listByIdList("id", idList);
   }
 
   @Override

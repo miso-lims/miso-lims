@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -35,17 +36,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
@@ -54,11 +51,9 @@ import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.dto.DetailedLibraryTemplateDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryTemplateDto;
+import uk.ac.bbsrc.tgac.miso.dto.LibraryTemplateIndexDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
-import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
-import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
-import uk.ac.bbsrc.tgac.miso.webapp.util.BulkTableBackend;
-import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
+import uk.ac.bbsrc.tgac.miso.webapp.util.*;
 
 @Controller
 @RequestMapping("/librarytemplate")
@@ -79,19 +74,24 @@ public class EditLibraryTemplateController {
   private final class BulkCreateLibraryTemplateBackend extends BulkCreateTableBackend<LibraryTemplateDto> {
 
     public BulkCreateLibraryTemplateBackend(LibraryTemplateDto dto, Integer quantity) {
-      super("libraryTemplate", LibraryTemplateDto.class, "Library Templates", dto, quantity);
+      super("librarytemplate", LibraryTemplateDto.class, "Library Templates", dto, quantity);
     }
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
       // No config required
     }
+
+    @Override
+    protected boolean isNewInterface() {
+      return true;
+    }
   }
 
   private final class BulkEditLibraryTemplateBackend extends BulkEditTableBackend<LibraryTemplate, LibraryTemplateDto> {
 
     public BulkEditLibraryTemplateBackend() {
-      super("libraryTemplate", LibraryTemplateDto.class, "Library Templates");
+      super("librarytemplate", LibraryTemplateDto.class, "Library Templates");
     }
 
     @Override
@@ -107,6 +107,11 @@ public class EditLibraryTemplateController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       // No config required
+    }
+
+    @Override
+    protected boolean isNewInterface() {
+      return true;
     }
   };
 
@@ -125,8 +130,9 @@ public class EditLibraryTemplateController {
     return new BulkCreateLibraryTemplateBackend(dto, quantity).create(model);
   }
 
-  @GetMapping(value = "/bulk/edit")
-  public ModelAndView editBulkLibraryTemplates(@RequestParam("ids") String libraryTemplateIds, ModelMap model) throws IOException {
+  @PostMapping("/bulk/edit")
+  public ModelAndView edit(@RequestParam Map<String, String> formData, ModelMap model) throws IOException {
+    String libraryTemplateIds = MisoWebUtils.getStringInput("ids", formData, true);
     return new BulkEditLibraryTemplateBackend().edit(libraryTemplateIds, model);
   }
 
@@ -163,58 +169,12 @@ public class EditLibraryTemplateController {
     return new ModelAndView("/WEB-INF/pages/editLibraryTemplate.jsp", model);
   }
 
-  public static class LibraryTemplateIndexDto {
-
-    private String boxPosition;
-    private Long index1Id;
-    private Long index2Id;
-
-    public LibraryTemplateIndexDto() {
-      // Default constructor
-    }
-
-    public LibraryTemplateIndexDto(String boxPosition, Index index1, Index index2) {
-      this.boxPosition = boxPosition;
-      if (index1 != null) {
-        this.index1Id = index1.getId();
-      }
-      if (index2 != null) {
-        this.index2Id = index2.getId();
-      }
-    }
-
-    public String getBoxPosition() {
-      return boxPosition;
-    }
-
-    public void setBoxPosition(String boxPosition) {
-      this.boxPosition = boxPosition;
-    }
-
-    public Long getIndex1Id() {
-      return index1Id;
-    }
-
-    public void setIndex1Id(Long index1Id) {
-      this.index1Id = index1Id;
-    }
-
-    public Long getIndex2Id() {
-      return index2Id;
-    }
-
-    public void setIndex2Id(Long index2Id) {
-      this.index2Id = index2Id;
-    }
-
-  }
-
   private static class BulkCreateTemplateIndicesBackend extends BulkCreateTableBackend<LibraryTemplateIndexDto> {
 
     private final LibraryTemplate libraryTemplate;
 
     public BulkCreateTemplateIndicesBackend(LibraryTemplate libraryTemplate, Integer quantity) {
-      super("libraryTemplate_index", LibraryTemplateIndexDto.class, "Library Template Indices", new LibraryTemplateIndexDto(), quantity);
+      super("librarytemplate_index", LibraryTemplateIndexDto.class, "Library Template Indices", new LibraryTemplateIndexDto(), quantity);
       this.libraryTemplate = libraryTemplate;
     }
 
@@ -224,6 +184,10 @@ public class EditLibraryTemplateController {
       config.set("indexFamily", mapper.valueToTree(Dtos.asDto(libraryTemplate.getIndexFamily())));
     }
 
+    @Override
+    protected boolean isNewInterface() {
+      return true;
+    }
   }
 
   @GetMapping("/{templateId}/indices/add")
@@ -238,7 +202,7 @@ public class EditLibraryTemplateController {
     private final LibraryTemplate libraryTemplate;
 
     public BulkEditTemplateIndicesBackend(LibraryTemplate libraryTemplate) {
-      super("libraryTemplate_index", LibraryTemplateIndexDto.class);
+      super("librarytemplate_index", LibraryTemplateIndexDto.class);
       this.libraryTemplate = libraryTemplate;
     }
 
@@ -255,6 +219,11 @@ public class EditLibraryTemplateController {
               libraryTemplate.getIndexTwos().get(position)))
           .collect(Collectors.toList());
       return prepare(model, PageMode.EDIT, "Edit Library Template Indices", dtos);
+    }
+
+    @Override
+    protected boolean isNewInterface() {
+      return true;
     }
 
   }

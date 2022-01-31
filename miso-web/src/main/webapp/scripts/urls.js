@@ -508,6 +508,7 @@ Urls = (function() {
   ui.libraryTemplates = {
     create: libraryTemplateUiBase + '/new',
     edit: idUrlFunction(libraryTemplateUiBase),
+    bulkCreate: libraryTemplateUiBase + '/bulk/new',
     bulkEdit: libraryTemplateUiBase + '/bulk/edit',
     addIndices: middleIdUrlFunction(libraryTemplateUiBase, '/indices/add'),
     editIndices: middleIdUrlFunction(libraryTemplateUiBase, '/indices/edit')
@@ -517,6 +518,9 @@ Urls = (function() {
   rest.libraryTemplates = {
     create: libraryTemplateRestBase,
     update: idUrlFunction(libraryTemplateRestBase),
+    bulkSave: libraryTemplateRestBase + '/bulk',
+    bulkSaveIndices: middleIdUrlFunction(libraryTemplateRestBase, '/indices'),
+    bulkSaveProgress: idUrlFunction(libraryTemplateRestBase + '/bulk'),
     query: libraryTemplateRestBase + '/query',
     datatable: libraryTemplateRestBase + '/dt',
     projectDatatable: idUrlFunction(libraryTemplateRestBase + '/dt/project'),

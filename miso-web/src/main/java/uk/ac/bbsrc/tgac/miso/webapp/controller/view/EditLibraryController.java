@@ -374,7 +374,7 @@ public class EditLibraryController {
           .distinct()
           .map(WhineyFunction.rethrow(projectId -> {
             Map<Long, List<LibraryTemplateDto>> map = new HashMap<>();
-            map.put(projectId, Dtos.asLibraryTemplateDtos(libraryTemplateService.listLibraryTemplatesForProject(projectId)));
+            map.put(projectId, Dtos.asLibraryTemplateDtos(libraryTemplateService.listByProject(projectId)));
             return map;
           }))
           .filter(map -> !map.values().stream().allMatch(value -> value.isEmpty()))
@@ -533,7 +533,7 @@ public class EditLibraryController {
       } else {
         config.putPOJO("project", Dtos.asDto(project));
         templatesByProjectId.put(project.getId(),
-            Dtos.asLibraryTemplateDtos(libraryTemplateService.listLibraryTemplatesForProject(project.getId())));
+            Dtos.asLibraryTemplateDtos(libraryTemplateService.listByProject(project.getId())));
       }
       config.put(Config.DEFAULT_SCI_NAME, defaultSciName);
       config.put(Config.SHOW_DESCRIPTION, showDescription);

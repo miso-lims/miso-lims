@@ -7,18 +7,12 @@ import java.util.List;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface LibraryTemplateStore extends PaginatedDataSource<LibraryTemplate> {
+public interface LibraryTemplateStore extends SaveDao<LibraryTemplate>, PaginatedDataSource<LibraryTemplate> {
 
-  LibraryTemplate get(long id) throws IOException;
+  LibraryTemplate getByAlias(String alias) throws IOException;
 
-  long create(LibraryTemplate libraryTemplate) throws IOException;
+  List<LibraryTemplate> listByProject(long projectId) throws IOException;
 
-  void update(LibraryTemplate libraryTemplate) throws IOException;
-
-  List<LibraryTemplate> list() throws IOException;
-
-  List<LibraryTemplate> listLibraryTemplatesForProject(long projectId);
-
-  Collection<LibraryTemplate> listByIdList(List<Long> idList) throws IOException;
+  List<LibraryTemplate> listByIdList(List<Long> idList) throws IOException;
 
 }

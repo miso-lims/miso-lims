@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.transaction.support.TransactionTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -28,12 +29,12 @@ import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryTemplateStore;
+import uk.ac.bbsrc.tgac.miso.persistence.SaveDao;
+import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultLibraryTemplateService implements LibraryTemplateService {
-
-  protected static final Logger log = LoggerFactory.getLogger(DefaultLibraryTemplateService.class);
+public class DefaultLibraryTemplateService extends AbstractSaveService<LibraryTemplate> implements LibraryTemplateService {
 
   @Autowired
   private LibraryTemplateStore libraryTemplateStore;
@@ -43,9 +44,26 @@ public class DefaultLibraryTemplateService implements LibraryTemplateService {
   private AuthorizationManager authorizationManager;
   @Autowired
   private DeletionStore deletionStore;
+  @Autowired
+  private TransactionTemplate transactionTemplate;
+
+  @Override
+  public SaveDao<LibraryTemplate> getDao() {
+    return libraryTemplateStore;
+  }
 
   public void setLibraryTemplateStore(LibraryTemplateStore libraryTemplateStore) {
     this.libraryTemplateStore = libraryTemplateStore;
+  }
+
+  @Override
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
+  }
+
+  @Override
+  public AuthorizationManager getAuthorizationManager() {
+    return authorizationManager;
   }
 
   public void setAuthorizationManager(AuthorizationManager authorizationManager) {
@@ -53,13 +71,12 @@ public class DefaultLibraryTemplateService implements LibraryTemplateService {
   }
 
   @Override
-  public LibraryTemplate get(long id) throws IOException {
-    authorizationManager.throwIfUnauthenticated();
-    LibraryTemplate libraryTemplate = libraryTemplateStore.get(id);
-    return libraryTemplate;
+  public TransactionTemplate getTransactionTemplate() {
+    return transactionTemplate;
   }
 
-  private void applyChanges(LibraryTemplate target, LibraryTemplate source) {
+  @Override
+  protected void applyChanges(LibraryTemplate target, LibraryTemplate source) {
     target.setAlias(source.getAlias());
     target.setPlatformType(source.getPlatformType());
     target.setLibraryType(source.getLibraryType());
@@ -104,24 +121,7 @@ public class DefaultLibraryTemplateService implements LibraryTemplateService {
   }
 
   @Override
-  public void update(LibraryTemplate template) throws IOException {
-    authorizationManager.throwIfUnauthenticated();
-    LibraryTemplate managed = get(template.getId());
-    loadChildEntities(template);
-    validateChange(template, managed);
-    applyChanges(managed, template);
-    libraryTemplateStore.update(managed);
-  }
-
-  @Override
-  public Long create(LibraryTemplate libraryTemplate) throws IOException {
-    authorizationManager.throwIfUnauthenticated();
-    loadChildEntities(libraryTemplate);
-    validateChange(libraryTemplate, null);
-    return libraryTemplateStore.create(libraryTemplate);
-  }
-
-  private void loadChildEntities(LibraryTemplate template) throws IOException {
+  protected void loadChildEntities(LibraryTemplate template) throws IOException {
     loadIndices(template.getIndexOnes());
     loadIndices(template.getIndexTwos());
   }
@@ -139,8 +139,12 @@ public class DefaultLibraryTemplateService implements LibraryTemplateService {
     indices.putAll(loaded);
   }
 
-  private void validateChange(LibraryTemplate template, LibraryTemplate beforeChange) {
-    List<ValidationError> errors = new ArrayList<>();
+  @Override
+  protected void collectValidationErrors(LibraryTemplate template, LibraryTemplate beforeChange, List<ValidationError> errors) throws IOException {
+    if (ValidationUtils.isChanged(LibraryTemplate::getAlias, template, beforeChange)
+            && libraryTemplateStore.getByAlias(template.getAlias()) != null) {
+      errors.add(ValidationError.forDuplicate("library template", "alias"));
+    }
 
     if (template.getDefaultVolume() != null && template.getVolumeUnits() == null) {
       errors.add(new ValidationError("volumeUnits", "Units must be specified when a default volume is set"));
@@ -153,10 +157,6 @@ public class DefaultLibraryTemplateService implements LibraryTemplateService {
     } else {
       validateIndices(template.getIndexFamily(), template.getIndexOnes(), "ones", errors);
       validateIndices(template.getIndexFamily(), template.getIndexTwos(), "twos", errors);
-    }
-
-    if (!errors.isEmpty()) {
-      throw new ValidationException(errors);
     }
   }
 
@@ -172,11 +172,6 @@ public class DefaultLibraryTemplateService implements LibraryTemplateService {
         break;
       }
     }
-  }
-
-  @Override
-  public AuthorizationManager getAuthorizationManager() {
-    return authorizationManager;
   }
 
   @Override
@@ -197,24 +192,13 @@ public class DefaultLibraryTemplateService implements LibraryTemplateService {
   }
 
   @Override
-  public List<LibraryTemplate> listLibraryTemplatesForProject(long projectId) throws IOException {
-    return libraryTemplateStore.listLibraryTemplatesForProject(projectId);
+  public List<LibraryTemplate> listByProject(long projectId) throws IOException {
+    return libraryTemplateStore.listByProject(projectId);
   }
 
   @Override
   public List<LibraryTemplate> listByIdList(List<Long> idList) throws IOException {
-    authorizationManager.throwIfUnauthenticated();
-    return new ArrayList<>(libraryTemplateStore.listByIdList(idList));
-  }
-
-  @Override
-  public DeletionStore getDeletionStore() {
-    return deletionStore;
-  }
-
-  @Override
-  public void authorizeDeletion(LibraryTemplate object) throws IOException {
-    authorizationManager.throwIfUnauthenticated();
+    return libraryTemplateStore.listByIdList(idList);
   }
 
 }

@@ -24,16 +24,15 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Response.Status;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -48,29 +47,31 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryTemplateService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
-import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
-import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.dto.LibraryTemplateDto;
+import uk.ac.bbsrc.tgac.miso.dto.*;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/librarytemplates")
 public class LibraryTemplateRestController extends RestController {
 
+  private static final String TYPE_LABEL = "Library Template";
+
   @Autowired
   private LibraryTemplateService libraryTemplateService;
-
   @Autowired
   private ProjectService projectService;
-
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
+  @Autowired
+  private AsyncOperationManager asyncOperationManager;
 
   private final JQueryDataTableBackend<LibraryTemplate, LibraryTemplateDto> jQueryBackend = new JQueryDataTableBackend<LibraryTemplate, LibraryTemplateDto>() {
 
@@ -86,32 +87,37 @@ public class LibraryTemplateRestController extends RestController {
 
   };
 
-  protected static final Logger log = LoggerFactory.getLogger(LibraryTemplateRestController.class);
+  @PostMapping("/bulk")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public @ResponseBody
+  ObjectNode bulkCreateAsync(@RequestBody List<LibraryTemplateDto> dtos) throws IOException {
+    return asyncOperationManager.startAsyncBulkCreate(TYPE_LABEL, dtos, Dtos::to, libraryTemplateService);
+  }
+
+  @PutMapping("/bulk")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<LibraryTemplateDto> dtos) throws IOException {
+    return asyncOperationManager.startAsyncBulkUpdate(TYPE_LABEL, dtos, Dtos::to, libraryTemplateService);
+  }
+
+  @GetMapping("/bulk/{uuid}")
+  public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
+    return asyncOperationManager.getAsyncProgress(uuid, LibraryTemplate.class, libraryTemplateService, Dtos::asDto);
+  }
 
   @PostMapping(produces = "application/json")
   @ResponseBody
-  public LibraryTemplateDto createLibraryTemplate(@RequestBody LibraryTemplateDto libraryTemplate, UriComponentsBuilder uriBuilder,
+  public LibraryTemplateDto create(@RequestBody LibraryTemplateDto libraryTemplate, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) throws IOException {
-    LibraryTemplate libraryTemplateObj = Dtos.to(libraryTemplate);
-    Long id = libraryTemplateService.create(libraryTemplateObj);
-    return Dtos.asDto(libraryTemplateService.get(id));
+    return RestUtils.createObject(TYPE_LABEL, libraryTemplate, Dtos::to, libraryTemplateService, Dtos::asDto);
   }
 
   @PutMapping(value = "/{id}")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public LibraryTemplateDto updateLibraryTemplate(@PathVariable("id") Long id, @RequestBody LibraryTemplateDto libraryTemplateDto)
+  public LibraryTemplateDto update(@PathVariable("id") Long id, @RequestBody LibraryTemplateDto libraryTemplateDto)
       throws IOException {
-    if (libraryTemplateDto == null) {
-      throw new RestException("Cannot convert null to LibraryTemplate", Status.BAD_REQUEST);
-    }
-    LibraryTemplate libraryTemplate = libraryTemplateService.get(id);
-    if (libraryTemplate == null) {
-      throw new RestException("No such LibraryTemplate.", Status.NOT_FOUND);
-    }
-    libraryTemplate = Dtos.to(libraryTemplateDto);
-    libraryTemplateService.update(libraryTemplate);
-    return Dtos.asDto(libraryTemplateService.get(id));
+    return RestUtils.updateObject(TYPE_LABEL, id, libraryTemplateDto, Dtos::to, libraryTemplateService, Dtos::asDto);
   }
   
   @GetMapping(value = "/dt", produces = "application/json")
@@ -131,18 +137,7 @@ public class LibraryTemplateRestController extends RestController {
   @ResponseBody
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody List<Long> ids) throws IOException {
-    List<LibraryTemplate> libraryTemplates = new ArrayList<>();
-    for (Long id : ids) {
-      if (id == null) {
-        throw new RestException("Cannot delete null LibraryTemplate", Status.BAD_REQUEST);
-      }
-      LibraryTemplate libraryTemplate = libraryTemplateService.get(id);
-      if (libraryTemplate == null) {
-        throw new RestException("LibraryTemplate " + id + " not found", Status.BAD_REQUEST);
-      }
-      libraryTemplates.add(libraryTemplate);
-    }
-    libraryTemplateService.bulkDelete(libraryTemplates);
+    RestUtils.bulkDelete(TYPE_LABEL, ids, libraryTemplateService);
   }
 
   @PostMapping(value = "/project/add")
@@ -184,4 +179,41 @@ public class LibraryTemplateRestController extends RestController {
     template.getProjects().removeIf(project -> projectId.equals(project.getId()));
     libraryTemplateService.update(template);
   }
+
+  @PostMapping("/{templateId}/indices")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public @ResponseBody ObjectNode addIndices(@PathVariable long templateId,
+      @RequestBody List<LibraryTemplateIndexDto> dtos) throws IOException {
+    List<LibraryTemplateDto> templateDtos = makeTemplateDtosForIndexUpdate(templateId, dtos);
+    return asyncOperationManager.startAsyncBulkUpdate(TYPE_LABEL, templateDtos, Dtos::to, libraryTemplateService);
+  }
+
+  @PutMapping("/{templateId}/indices")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public @ResponseBody ObjectNode updateIndices(@PathVariable long templateId,
+                                                @RequestBody List<LibraryTemplateIndexDto> dtos) throws IOException {
+    List<LibraryTemplateDto> templateDtos = makeTemplateDtosForIndexUpdate(templateId, dtos);
+    return asyncOperationManager.startAsyncBulkUpdate(TYPE_LABEL, templateDtos, Dtos::to, libraryTemplateService);
+  }
+
+  private List<LibraryTemplateDto> makeTemplateDtosForIndexUpdate(long templateId, List<LibraryTemplateIndexDto> dtos)
+      throws IOException {
+    LibraryTemplate template = RestUtils.retrieve(TYPE_LABEL, templateId, libraryTemplateService);
+    LibraryTemplateDto templateDto = Dtos.asDto(template);
+    for (LibraryTemplateIndexDto index : dtos) {
+      setIndex(index.getBoxPosition(), index.getIndex1Id(), templateDto.getIndexOneIds());
+      setIndex(index.getBoxPosition(), index.getIndex2Id(), templateDto.getIndexTwoIds());
+    }
+
+    return Collections.singletonList(templateDto);
+  }
+
+  private void setIndex(String boxPosition, Long indexId, Map<String, Long> indices) {
+    if (indexId == null) {
+      indices.remove(boxPosition);
+    } else {
+      indices.put(boxPosition, indexId);
+    }
+  }
+
 }
