@@ -951,7 +951,7 @@ INSERT INTO LibraryTemplate_Project(libraryTemplateId, projectId) VALUES
 (2, 1),
 (3, 2);
 
-INSERT INTO LibraryTemplate_Index1(libraryTemplateId, `position`, index1Id) VALUES
+INSERT INTO LibraryTemplate_Index1(libraryTemplateId, `position`, indexId) VALUES
 (1, 'A01', 1),
 (2, 'A02', 2);
 
