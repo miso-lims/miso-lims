@@ -24,6 +24,8 @@
 package uk.ac.bbsrc.tgac.miso.persistence;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
@@ -34,5 +36,7 @@ public interface IndexStore extends PaginatedDataSource<Index>, SaveDao<Index> {
   public Index getByFamilyPositionAndName(IndexFamily family, int position, String name) throws IOException;
 
   public long getUsage(Index index) throws IOException;
+
+  public List<Index> listByIdList(Collection<Long> ids) throws IOException;
 
 }

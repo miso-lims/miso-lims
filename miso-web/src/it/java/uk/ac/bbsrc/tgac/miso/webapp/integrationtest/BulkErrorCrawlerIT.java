@@ -179,7 +179,6 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("box/bulk/new?quantity=5");
 
     slugs.add("librarytemplate/bulk/edit?ids=1");
-    slugs.add("index/bulk/edit?ids=1%2C2%2C3%2C4");
     slugs.add("attachmentcategories/bulk/new?quantity=3");
     slugs.add("attachmentcategories/bulk/edit?ids=1%2C2%2C3");
     slugs.add("sampletype/bulk/new?quantity=3");
@@ -272,49 +271,45 @@ public class BulkErrorCrawlerIT extends AbstractIT {
         .build());
 
     postPages = Collections.unmodifiableMap(new MapBuilder<String, Map<String, String>>()
-        .put("box/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "500,501").build()))
-        .put("boxuse/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "6,5").build()))
-        .put("boxsize/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
-        .put("sampletype/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
-        .put("sop/bulk/new", Collections.unmodifiableMap(new MapBuilder<String, String>().put("quantity", "2").build()))
-        .put("sop/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
-        .put("stain/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
-        .put("staincategory/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2,3").build()))
-        .put("pipeline/bulk/new", Collections.unmodifiableMap(new MapBuilder<String, String>().put("quantity", "2").build()))
-        .put("pipeline/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
-        .put("runlibraryqcstatus/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
-        .put("worksetcategory/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
-        .put("worksetstage/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
-        .put("workstation/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
-        .put("samplepurpose/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "10,9").build()))
-        .put("scientificname/bulk/edit",
-            Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2,3").build()))
-        .put("storagelabel/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
-        .put("sequencingorder/bulk/new",
-            Collections.unmodifiableMap(new MapBuilder<String, String>().put("poolIds", "120001,120002").build()))
-        .put("sequencingcontroltype/bulk/edit",
-            Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
-        .put("subproject/bulk/edit",
-            Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2,3").build()))
-        .put("tissuematerial/bulk/edit",
-            Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2,3").build()))
-        .put("metric/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
-        .put("tissueorigin/bulk/edit",
-            Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "4,3").build()))
-        .put("tissuepiecetype/bulk/edit",
-            Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1").build()))
-        .put("tissuetype/bulk/edit",
-            Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "11,7").build()))
-        .put("libraryaliquot/bulk/merge", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "901,902").build()))
-        .put("libraryaliquot/bulk/pool-separate",
-            Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "901,902").build()))
+        .put("box/bulk/edit", unmodifiableMap("ids", "500,501"))
+        .put("boxuse/bulk/edit", unmodifiableMap("ids", "6,5"))
+        .put("boxsize/bulk/edit", unmodifiableMap("ids", "1,2"))
+        .put("index/bulk/edit", unmodifiableMap("ids", "1,2,3,4"))
+        .put("sampletype/bulk/edit", unmodifiableMap("ids", "1,2"))
+        .put("sop/bulk/new", unmodifiableMap("quantity", "2"))
+        .put("sop/bulk/edit", unmodifiableMap("ids", "1,2"))
+        .put("stain/bulk/edit", unmodifiableMap("ids", "1,2"))
+        .put("staincategory/bulk/edit", unmodifiableMap("ids", "1,2,3"))
+        .put("pipeline/bulk/new", unmodifiableMap("quantity", "2"))
+        .put("pipeline/bulk/edit", unmodifiableMap("ids", "1,2"))
+        .put("runlibraryqcstatus/bulk/edit", unmodifiableMap("ids", "1,2"))
+        .put("worksetcategory/bulk/edit", unmodifiableMap("ids", "1,2"))
+        .put("worksetstage/bulk/edit", unmodifiableMap("ids", "1,2"))
+        .put("workstation/bulk/edit", unmodifiableMap("ids", "1,2"))
+        .put("samplepurpose/bulk/edit", unmodifiableMap("ids", "10,9"))
+        .put("scientificname/bulk/edit", unmodifiableMap("ids", "1,2,3"))
+        .put("storagelabel/bulk/edit", unmodifiableMap("ids", "1,2"))
+        .put("sequencingorder/bulk/new", unmodifiableMap("poolIds", "120001,120002"))
+        .put("sequencingcontroltype/bulk/edit", unmodifiableMap("ids", "1,2"))
+        .put("subproject/bulk/edit", unmodifiableMap("ids", "1,2,3"))
+        .put("tissuematerial/bulk/edit", unmodifiableMap("ids", "1,2,3"))
+        .put("metric/bulk/edit", unmodifiableMap("ids", "1,2"))
+        .put("tissueorigin/bulk/edit", unmodifiableMap("ids", "4,3"))
+        .put("tissuepiecetype/bulk/edit", unmodifiableMap("ids", "1"))
+        .put("tissuetype/bulk/edit", unmodifiableMap("ids", "11,7"))
+        .put("libraryaliquot/bulk/merge", unmodifiableMap("ids", "901,902"))
+        .put("libraryaliquot/bulk/pool-separate", unmodifiableMap("ids", "901,902"))
         .put("libraryaliquot/bulk/pool",
             Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "901,902").put("quantity", "2").build()))
-        .put("pool/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "801,802").build()))
+        .put("pool/bulk/edit", unmodifiableMap("ids", "801,802"))
         .put("pool/bulk/merge",
             Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "801,802").put("proportions", "1,1").build()))
-        .put("detailedqcstatus/bulk/edit", Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "1,2").build()))
+        .put("detailedqcstatus/bulk/edit", unmodifiableMap("ids", "1,2"))
         .build());
+  }
+
+  private static Map<String, String> unmodifiableMap(String key, String value) {
+    return Collections.unmodifiableMap(new MapBuilder<String, String>().put(key, value).build());
   }
 
   @Test

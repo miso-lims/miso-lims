@@ -1,11 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -20,6 +22,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.IndexDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
+import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
 @RequestMapping("/index")
@@ -35,7 +38,7 @@ public class IndexController extends AbstractTypeDataController<Index, IndexDto>
   private AuthorizationManager authorizationManager;
 
   public IndexController() {
-    super("Indices", "index", "index");
+    super("Indices", "index", "index", true);
   }
 
   @GetMapping("/bulk/new")
@@ -50,8 +53,9 @@ public class IndexController extends AbstractTypeDataController<Index, IndexDto>
     });
   }
 
-  @GetMapping("/bulk/edit")
-  public ModelAndView edit(@RequestParam("ids") String idString, ModelMap model) throws IOException {
+  @PostMapping("/bulk/edit")
+  public ModelAndView edit(@RequestParam Map<String, String> formData, ModelMap model) throws IOException {
+    String idString = MisoWebUtils.getStringInput("ids", formData, true);
     IndexFamily family = null;
     for (Long id : LimsUtils.parseIds(idString)) {
       Index index = indexService.get(id);

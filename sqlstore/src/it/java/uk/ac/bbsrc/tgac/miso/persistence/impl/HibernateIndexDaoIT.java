@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -105,7 +106,27 @@ public class HibernateIndexDaoIT extends AbstractDAOTest {
 
   @Test
   public void testUpdate() throws Exception {
+    long indexId = 15L;
+    String newName = "changed";
+    Index index = (Index) currentSession().get(Index.class, indexId);
+    assertNotEquals(newName, index.getName());
+    index.setName(newName);
+    dao.update(index);
 
+    clearSession();
+
+    Index updated = (Index) currentSession().get(Index.class, indexId);
+    assertEquals(newName, updated.getName());
+  }
+
+  @Test
+  public void testListByIdList() throws Exception {
+    testListByIdList(dao::listByIdList, Arrays.asList(20L, 21L, 22L));
+  }
+
+  @Test
+  public void testListByIdListNone() throws Exception {
+    testListByIdListNone(dao::listByIdList);
   }
 
 }
