@@ -2129,7 +2129,7 @@ BulkUtils = (function($) {
     if (cache[label]) {
       return cache[label];
     } else {
-      throw new Error('Label "' + label + '" not found in cache');
+      throw new Error('Label "' + label + '" not found in cache "' + cacheName + '"');
     }
   }
 
