@@ -953,7 +953,7 @@ INSERT INTO LibraryTemplate_Project(libraryTemplateId, projectId) VALUES
 
 INSERT INTO LibraryTemplate_Index1(libraryTemplateId, `position`, indexId) VALUES
 (1, 'A01', 1),
-(2, 'A02', 2);
+(1, 'A02', 2);
 
 INSERT INTO WorksetCategory(categoryId, alias) VALUES
 (1, 'Category A'),

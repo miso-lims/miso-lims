@@ -201,4 +201,8 @@ public class DefaultLibraryTemplateService extends AbstractSaveService<LibraryTe
     return libraryTemplateStore.listByIdList(idList);
   }
 
+  @Override
+  public void authorizeDeletion(LibraryTemplate object) throws IOException {
+    // Do nothing - anyone can delete
+  }
 }
