@@ -2,8 +2,9 @@ BulkUtils = (function($) {
 
   /*
    * BulkTarget structure: {
-   *   getSaveUrl: required function() returning url for bulk save. POST is used for create and PUT
-   *       for edits
+   *   getSaveUrl: required function(config) returning url for bulk save. POST is used for create
+   *       and PUT for edits
+   *   getSaveProgressUrl: required function(operationId) returning url for checking save progress
    *   getUserManualUrl: optional (recommended) function() returning url of specific user manual
    *       page to set on 'Help' link
    *   description: optional string; help text to include in the page Quick Help
@@ -22,6 +23,8 @@ BulkUtils = (function($) {
    *       to allow save, or reject to cancel. Pass true in the reject call to prevent showing the
    *       save cancelled message and reactivating the table. If anything else (or nothing) is
    *       returned, saving will proceed
+   *   manipulateSavedData: optional function(data) returning manipulated data. Allows modifying
+   *       the data to be displayed after successful save
    * }
    * 
    * Custom Action structure: {
@@ -2020,7 +2023,7 @@ BulkUtils = (function($) {
     jQuery.ajax({
       dataType: 'json',
       type: config.pageMode === 'edit' ? 'PUT' : 'POST',
-      url: target.getSaveUrl(),
+      url: target.getSaveUrl(config),
       data: data == null ? undefined : JSON.stringify(data),
       contentType: 'application/json; charset=utf8'
     }).success(function(data) {
@@ -2049,7 +2052,8 @@ BulkUtils = (function($) {
           break;
         case 'completed':
           tableSaved = true;
-          rebuildTable(hot, target, config, update.data);
+          var savedData = target.manipulateSavedData ? target.manipulateSavedData(update.data) : update.data;
+          rebuildTable(hot, target, config, savedData);
           showSuccess('Saved ' + update.totalUnits + ' items');
           showLoading(false, false);
           dialog.dialog('close');

@@ -1237,7 +1237,11 @@ INSERT INTO StorageLocation(locationId, locationUnit, parentLocationId, alias, c
 (7, 'LOOSE_STORAGE', 6, '1', 3, '2020-02-27 15:46:00', 3, '2020-02-27 15:46:00');
 
 INSERT INTO LibraryTemplate(libraryTemplateId, alias, defaultVolume, platformType, libraryTypeId, librarySelectionTypeId, libraryStrategyTypeId, kitDescriptorId, indexFamilyId, volumeUnits) VALUES
-(1, 'TestLibTemp', 12.34, 'ILLUMINA', 1, 3, 5, 1, NULL, 'MICROLITRES');
+(1, 'TestLibTemp', 12.34, 'ILLUMINA', 1, 3, 5, 1, 1, 'MICROLITRES');
+
+INSERT INTO LibraryTemplate_Index1(libraryTemplateId, `position`, indexId) VALUES
+(1, 'A01', 1),
+(1, 'A02', 2);
 
 INSERT INTO DetailedLibraryTemplate(libraryTemplateId, libraryDesignId, libraryDesignCodeId) VALUES
 (1, 3, 6);

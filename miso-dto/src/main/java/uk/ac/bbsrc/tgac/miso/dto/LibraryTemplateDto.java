@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -121,6 +122,9 @@ public class LibraryTemplateDto {
   }
 
   public Map<String, Long> getIndexOneIds() {
+    if (indexOneIds == null) {
+      indexOneIds = new HashMap<>();
+    }
     return indexOneIds;
   }
 
@@ -129,6 +133,9 @@ public class LibraryTemplateDto {
   }
 
   public Map<String, Long> getIndexTwoIds() {
+    if (indexTwoIds == null) {
+      indexTwoIds = new HashMap<>();
+    }
     return indexTwoIds;
   }
 

@@ -118,7 +118,11 @@ public class MenuController {
     int statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
     Status status = Status.fromStatusCode(statusCode);
     model.addAttribute("genericMessage", statusCode);
-    model.addAttribute("specificMessage", status.getReasonPhrase());
+    if (status == null) {
+      model.addAttribute("specificMessage", "Unknown error");
+    } else {
+      model.addAttribute("specificMessage", status.getReasonPhrase());
+    }
     model.addAttribute("showBugUrl", true);
     return new ModelAndView("/WEB-INF/pages/handledError.jsp", model);
   }

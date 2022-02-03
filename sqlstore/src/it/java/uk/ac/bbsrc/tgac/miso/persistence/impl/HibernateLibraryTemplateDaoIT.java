@@ -36,8 +36,8 @@ public class HibernateLibraryTemplateDaoIT extends AbstractDAOTest {
 
   @Test
   public void testListLibraryTemplateForProject() {
-    assertEquals(2, sut.listLibraryTemplatesForProject(1L).size());
-    assertEquals(1, sut.listLibraryTemplatesForProject(2L).size());
+    assertEquals(2, sut.listByProject(1L).size());
+    assertEquals(1, sut.listByProject(2L).size());
   }
 
   @Test

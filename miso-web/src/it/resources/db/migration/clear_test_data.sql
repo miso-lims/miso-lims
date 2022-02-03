@@ -9,6 +9,8 @@ DELETE FROM Experiment_Run_Partition;
 DELETE FROM Experiment;
 DELETE FROM DetailedLibraryTemplate;
 DELETE FROM LibraryTemplate;
+DELETE FROM LibraryTemplate_Index1;
+DELETE FROM LibraryTemplate_Index2;
 DELETE FROM Transfer_Sample;
 DELETE FROM Transfer_Library;
 DELETE FROM Transfer_LibraryAliquot;

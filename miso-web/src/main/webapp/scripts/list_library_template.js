@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 ListTarget.library_template = {
   name: "Library Templates",
   getUserManualUrl: function() {
@@ -34,21 +11,8 @@ ListTarget.library_template = {
     return Urls.rest.libraryTemplates.query;
   },
   createBulkActions: function(config, projectId) {
-    var actions = HotTarget.libraryTemplate.getBulkActions(config);
-    actions.push({
-      name: "Delete",
-      action: function(items) {
-        var lines = ['Are you sure you wish to delete the following library templates? This cannot be undone.'];
-        var ids = [];
-        jQuery.each(items, function(index, librarytemplate) {
-          lines.push('* ' + librarytemplate.alias);
-          ids.push(librarytemplate.id);
-        });
-        Utils.showConfirmDialog('Delete Library Templates', 'Delete', lines, function() {
-          Utils.ajaxWithDialog('Deleting Library Templates', 'POST', Urls.rest.libraryTemplates.bulkDelete, ids, Utils.page.pageReload);
-        });
-      }
-    });
+    var actions = BulkTarget.librarytemplate.getBulkActions(config);
+    actions.push(ListUtils.createBulkDeleteAction('Library Templates', 'librarytemplates', Utils.array.getAlias));
 
     if (!projectId) {
       actions.push({
@@ -132,9 +96,32 @@ ListTarget.library_template = {
     return [{
       name: "Add",
       handler: function() {
-        window.location = Urls.ui.libraryTemplates.create + (projectId ? '?' + jQuery.param({
-          projectId: projectId
-        }) : '');
+        var fields = [{
+          property: 'quantity',
+          type: 'int',
+          label: 'Quantity',
+          value: 1
+        }];
+
+        Utils.showDialog('Create Library Templates', 'Create', fields, function(result) {
+          if (result.quantity < 1) {
+            Utils.showOkDialog('Error', ["Quantity must be 1 or more"]);
+            return;
+          }
+          if (result.quantity == 1) {
+            window.location = Urls.ui.libraryTemplates.create + (projectId ? '?' + jQuery.param({
+              projectId: projectId
+            }) : '');
+            return;
+          }
+          var params = {
+            quantity: result.quantity,
+          }
+          if (projectId) {
+            params.projectId = projectId;
+          }
+          window.location = Urls.ui.libraryTemplates.bulkCreate + '?' + jQuery.param(params);
+        });
       }
     }];
   },
