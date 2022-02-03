@@ -1620,30 +1620,20 @@ public class Dtos {
 
   public static Box to(@Nonnull BoxDto from) {
     Box to = new BoxImpl();
-    if (from.getId() != null) to.setId(from.getId());
-    to.setAlias(from.getAlias());
+    setLong(to::setId, from.getId(), false);
+    setString(to::setAlias, from.getAlias());
     setString(to::setDescription, from.getDescription());
-    to.setIdentificationBarcode(from.getIdentificationBarcode());
+    setString(to::setIdentificationBarcode, from.getIdentificationBarcode());
     setString(to::setLocationBarcode, from.getLocationBarcode());
-    if (from.getUseId() != null) {
-      BoxUse use = new BoxUse();
-      use.setId(from.getUseId());
-      to.setUse(use);
-    }
-    if (from.getSizeId() != null) {
-      BoxSize size = new BoxSize();
-      size.setId(from.getSizeId());
-      to.setSize(size);
-    }
-    if (from.getStorageLocationId() != null) {
-      to.setStorageLocation(new StorageLocation());
-      to.getStorageLocation().setId(from.getStorageLocationId());
-    }
+    setObject(to::setUse, BoxUse::new, from.getUseId());
+    setObject(to::setSize, BoxSize::new, from.getSizeId());
+    setObject(to::setStorageLocation, StorageLocation::new, from.getStorageLocationId());
     if (!isStringEmptyOrNull(from.getStorageLocationBarcode())) {
       if (to.getStorageLocation() == null) {
         to.setStorageLocation(new StorageLocation());
       }
-      to.getStorageLocation().setIdentificationBarcode(from.getStorageLocationBarcode());
+      StorageLocation storageLocation = to.getStorageLocation();
+      setString(storageLocation::setIdentificationBarcode, from.getStorageLocationBarcode());
     }
     return to;
   }

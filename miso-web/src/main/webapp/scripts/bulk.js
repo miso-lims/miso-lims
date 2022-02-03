@@ -2102,13 +2102,15 @@ BulkUtils = (function($) {
         var cellMeta = hot.getCellMeta(rowIndex, colIndex);
         if (cellMeta.type === 'dropdown') {
           if (column.validationCache) {
-            Utils.setObjectField(data[rowIndex], column.data, caches[column.validationCache][tableData[rowIndex][colIndex]]);
+            Utils.setObjectField(data[rowIndex], column.data,
+                getCachedValueForLabel(column.validationCache, tableData[rowIndex][colIndex]));
           } else {
             var source = hot.getCellMeta(rowIndex, colIndex).sourceData;
             if ((!source || !source.length) && Array.isArray(column.source)) {
               source = column.source;
             }
-            Utils.setObjectField(data[rowIndex], column.data, getSourceValueForLabel(source, tableData[rowIndex][colIndex], column));
+            Utils.setObjectField(data[rowIndex], column.data,
+                getSourceValueForLabel(source, tableData[rowIndex][colIndex], column));
           }
         } else if (column.setData) {
           column.setData(data[rowIndex], tableData[rowIndex][colIndex], rowIndex, api);
@@ -2116,6 +2118,18 @@ BulkUtils = (function($) {
           Utils.setObjectField(data[rowIndex], column.data, tableData[rowIndex][colIndex]);
         }
       }
+    }
+  }
+
+  function getCachedValueForLabel(cacheName, label) {
+    var cache = caches[cacheName];
+    if (!cache) {
+      throw new Error('Cache "' + cacheName + '" does not exist')
+    }
+    if (cache[label]) {
+      return cache[label];
+    } else {
+      throw new Error('Label "' + label + '" not found in cache');
     }
   }
 
