@@ -1089,6 +1089,17 @@ BulkTarget.sample = (function($) {
         }
       }
 
+      columns.forEach(function(column) {
+        if (column.sampleSubcategory) {
+          var message = 'Only applicable to ' + Utils.array.list(column.sampleSubcategory) + ' sample classes';
+          if (column.description) {
+            column.description = column.description + '; ' + message;
+          } else {
+            column.description = message;
+          }
+        }
+      });
+
       return columns;
     },
 
