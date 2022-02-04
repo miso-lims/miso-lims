@@ -23,6 +23,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.google.common.annotations.VisibleForTesting;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.HierarchyEntity;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
@@ -100,9 +101,6 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
   private LibraryAliquot save(LibraryAliquot aliquot) throws IOException {
     try {
       NamingScheme namingScheme = getNamingScheme(aliquot);
-      if (!hasTemporaryAlias(aliquot)) {
-        validateAlias(aliquot, namingScheme);
-      }
       Long newId = libraryAliquotDao.save(aliquot);
       LibraryAliquot managed = libraryAliquotDao.get(newId);
 
@@ -307,6 +305,7 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
       dTarget.setLibraryDesignCode(dSource.getLibraryDesignCode());
       dTarget.setGroupId(dSource.getGroupId());
       dTarget.setGroupDescription(dSource.getGroupDescription());
+      dTarget.setNonStandardAlias(dSource.isNonStandardAlias());
     }
   }
 
@@ -314,6 +313,20 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
     updateDetailedQcStatusDetails(aliquot, beforeChange, authorizationManager);
 
     List<ValidationError> errors = new ArrayList<>();
+
+    if (!hasTemporaryAlias(aliquot)) {
+      if (!isDetailedLibraryAliquot(aliquot) || !((DetailedLibraryAliquot) aliquot).isNonStandardAlias()) {
+        uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult aliasValidation
+            = getNamingScheme(aliquot).validateLibraryAlias(aliquot.getAlias());
+        if (!aliasValidation.isValid()) {
+          if (isDetailedLibraryAliquot(aliquot) && !isChanged(LibraryAliquot::getAlias, aliquot, beforeChange)) {
+            ((DetailedLibraryAliquot) aliquot).setNonStandardAlias(true);
+          } else {
+            throw new ValidationException(new ValidationError("alias", aliasValidation.getMessage()));
+          }
+        }
+      }
+    }
 
     validateConcentrationUnits(aliquot.getConcentration(), aliquot.getConcentrationUnits(), errors);
     validateVolumeUnits(aliquot.getVolume(), aliquot.getVolumeUnits(), errors);
