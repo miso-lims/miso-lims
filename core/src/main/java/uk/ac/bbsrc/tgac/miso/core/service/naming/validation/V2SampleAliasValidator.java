@@ -2,7 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.service.naming.validation;
 
 public class V2SampleAliasValidator extends RegexValidator {
 
-  private static final String regex = "^[A-Z0-9]{3,10}_\\d{3,}(_\\d{2,}(_[A-Z]{2}\\d{2,}(-\\d{2,})?)?)?$";
+  private static final String regex = "^[A-Z0-9]{3,10}_\\d{3,}(_\\d{2,}(_[A-Z]{1,2}\\d{2,}(-\\d{2,})?)?)?$";
 
   public V2SampleAliasValidator() {
     super(regex, false, false);
