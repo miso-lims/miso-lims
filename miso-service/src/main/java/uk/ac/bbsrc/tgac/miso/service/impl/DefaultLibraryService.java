@@ -138,9 +138,6 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   private Library save(Library library, boolean validateAliasUniqueness) throws IOException {
     NamingScheme namingScheme = getNamingScheme(library);
     try {
-      if (!hasTemporaryAlias(library)) {
-        validateAliasOrThrow(library, namingScheme);
-      }
       long newId = libraryDao.save(library);
 
       Library managed = libraryDao.get(newId);
@@ -450,10 +447,55 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     }
   }
 
+  private boolean isInvalidDuplicate(Library library, NamingScheme namingScheme) throws IOException {
+    // duplicate aliases may be allowed via naming scheme, or with nonStandardAlias=true in the case of a DetailedLibrary
+    if (namingScheme.duplicateLibraryAliasAllowed()
+        || (LimsUtils.isDetailedLibrary(library) && ((DetailedLibrary) library).hasNonStandardAlias())) {
+      return false;
+    }
+    List<EntityReference> potentialDupes = libraryDao.listByAlias(library.getAlias());
+    for (EntityReference potentialDupe : potentialDupes) {
+      if (!library.isSaved() || library.getId() != potentialDupe.getId()) {
+        // an existing DIFFERENT library already has this alias
+        return true;
+      }
+    }
+    return false;
+  }
+
   private void validateChange(Library library, Library beforeChange, boolean libraryReceipt) throws IOException {
     updateDetailedQcStatusDetails(library, beforeChange, authorizationManager);
 
     List<ValidationError> errors = new ArrayList<>();
+
+    if (!hasTemporaryAlias(library)) {
+      NamingScheme namingScheme = getNamingScheme(library);
+      boolean aliasChanged = isChanged(Library::getAlias, library, beforeChange);
+      if (aliasChanged) {
+        if (isInvalidDuplicate(library, namingScheme)) {
+          errors.add(ValidationError.forDuplicate("library", "alias"));
+        }
+      }
+      if (!isDetailedLibrary(library) || !((DetailedLibrary) library).hasNonStandardAlias()) {
+        uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult aliasValidation
+            = namingScheme.validateLibraryAlias(library.getAlias());
+        if (!aliasValidation.isValid()) {
+          if (!aliasChanged && isDetailedLibrary(library)) {
+            ((DetailedLibrary) library).setNonStandardAlias(true);
+          } else {
+            throw new ValidationException(new ValidationError("alias", aliasValidation.getMessage()));
+          }
+        }
+      }
+
+      if (!isDetailedLibrary(library) || !((DetailedLibrary) library).hasNonStandardAlias()) {
+        uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult aliasValidation = namingScheme.validateLibraryAlias(library
+            .getAlias());
+        if (!aliasValidation.isValid()) {
+          throw new ValidationException(new ValidationError("alias", aliasValidation.getMessage()));
+        }
+      }
+    }
 
     validateConcentrationUnits(library.getConcentration(), library.getConcentrationUnits(), errors);
     validateVolumeUnits(library.getVolume(), library.getVolumeUnits(), errors);
