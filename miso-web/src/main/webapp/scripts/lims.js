@@ -1321,6 +1321,21 @@ Utils.array = {
     return input.filter(function(a) {
       return !a.archived;
     });
+  },
+  list: function(items) {
+    if (!Array.isArray(items)) {
+      return items;
+    }
+    switch (items.length) {
+    case 1:
+      return items[0]
+    case 2:
+      return items[0] + ' and ' + items[1];
+    default:
+      return items.slice(0, -1).join(', ')
+          + ', and '
+          + items[items.length - 1];
+    }
   }
 };
 
