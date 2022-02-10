@@ -7,6 +7,27 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.42.0] - 2022-02-10
+
+### Changed
+
+* Library template aliases must now be unique
+
+### Fixed
+
+* 
+  An issue where spaces were not trimmed from box aliases, and samples silently
+  failed to save within such boxes
+* Bulk library template performance and accessibility improvements
+* An issue that caused Pinery-MISO to fail and return 500 status in some cases
+* Aliases will no longer be validated for libraries and library aliquots that
+  move between projects with different naming schemes
+* V2 naming scheme validation for sample classes that have a single-character
+  V2 naming code
+* Bulk indices page performance and accessibility improvements
+* Quick help for fields that only apply to specific sample class subcategories
+
+
 ## [1.41.0] - 2022-01-28
 
 ### Changed
