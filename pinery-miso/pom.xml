@@ -15,8 +15,8 @@
     <mysql.db>lims</mysql.db>
     <mysql.user>tgaclims</mysql.user>
     <mysql.pw>tgaclims</mysql.pw>
-    <pinery.version>2.21.0</pinery.version>
-    <spring-version>5.2.18.RELEASE</spring-version><!-- must match version used by Pinery -->
+    <pinery.version>2.21.1</pinery.version>
+    <spring-version>5.3.14</spring-version><!-- must match version used by Pinery -->
     <jackson.version>2.10.0</jackson.version>
   </properties>
 
@@ -49,7 +49,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-slf4j18-impl</artifactId>
+      <artifactId>log4j-slf4j-impl</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
