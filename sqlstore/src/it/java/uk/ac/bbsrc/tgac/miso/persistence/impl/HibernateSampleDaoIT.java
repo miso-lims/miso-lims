@@ -3,11 +3,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
@@ -420,10 +416,20 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
   public void testGetChildren() throws Exception {
     final long identityId = 15L;
     final long stockId = 18L;
-    List<Sample> children = dao.getChildren(identityId, SampleStock.CATEGORY_NAME);
+    List<Sample> children = dao.getChildren(Arrays.asList(identityId), SampleStock.CATEGORY_NAME);
     assertNotNull(children);
     assertEquals(1, children.size());
     assertEquals(stockId, children.get(0).getId());
+  }
+
+  @Test
+  public void testGetChildIds() throws Exception {
+    final long identityId = 15L;
+    final long stockId = 18L;
+    Set<Long> ids = dao.getChildIds(Arrays.asList(identityId), SampleStock.CATEGORY_NAME);
+    assertNotNull(ids);
+    assertEquals(1, ids.size());
+    assertTrue(ids.contains(stockId));
   }
 
 }

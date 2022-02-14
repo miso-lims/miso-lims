@@ -224,23 +224,6 @@ public class EditRunController {
 
   private List<RunPartitionAliquotDto> getRunAliquots(Run run) throws IOException {
     List<RunPartitionAliquot> runPartitionAliquots = runPartitionAliquotService.listByRunId(run.getId());
-    for (SequencerPartitionContainer container : run.getSequencerPartitionContainers()) {
-      for (Partition partition : container.getPartitions()) {
-        if (partition.getPool() != null) {
-          for (PoolElement poolElement : partition.getPool().getPoolContents()) {
-            RunPartitionAliquot runPartitionAliquot = runPartitionAliquots.stream()
-                .filter(rpa -> rpa.getRun().getId() == run.getId()
-                    && rpa.getPartition().getId() == partition.getId()
-                    && rpa.getAliquot().getId() == poolElement.getAliquot().getId())
-                .findAny().orElse(null);
-            if (runPartitionAliquot == null) {
-              runPartitionAliquot = new RunPartitionAliquot(run, partition, poolElement.getAliquot());
-              runPartitionAliquots.add(runPartitionAliquot);
-            }
-          }
-        }
-      }
-    }
     List<RunPartitionAliquotDto> dtos = new ArrayList<>();
     for (int i = 0; i < runPartitionAliquots.size(); i++) {
       RunPartitionAliquotDto dto = Dtos.asDto(runPartitionAliquots.get(i));

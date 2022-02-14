@@ -1,21 +1,17 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.hibernate.Criteria;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 import org.hibernate.sql.JoinType;
+import org.hibernate.type.LongType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -119,34 +115,48 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   @Override
   public List<Run> listByLibraryAliquotId(long libraryAliquotId) throws IOException {
     @SuppressWarnings("unchecked")
-    List<Long> ids = currentSession().createCriteria(Run.class)
-        .createAlias("runPositions", "runPos")
-        .createAlias("runPos.container", "spc")
-        .createAlias("spc.partitions", "partition")
-        .createAlias("partition.pool", "pool")
-        .createAlias("pool.poolElements", "element")
-        .createAlias("element.aliquot", "aliquot")
+    List<Run> results = listByLibraryAliquotBaseCriteria()
         .add(Restrictions.eq("aliquot.id", libraryAliquotId))
-        .setProjection(Projections.distinct(Projections.property("id")))
         .list();
-    return listByIdList(ids);
+    return results;
   }
 
   @Override
-  public List<Run> listByLibraryId(long libraryId) throws IOException {
+  public List<Run> listByLibraryIdList(Collection<Long> libraryIds) throws IOException {
+    if (libraryIds == null || libraryIds.isEmpty()) {
+      return Collections.emptyList();
+    }
     @SuppressWarnings("unchecked")
-    List<Long> ids = currentSession().createCriteria(Run.class)
+    List<Long> ids = currentSession().createSQLQuery("SELECT rspc.Run_runId AS runId"
+        + " FROM Run_SequencerPartitionContainer rspc"
+        + " JOIN _Partition part ON part.containerId = rspc.containers_containerId"
+        + " JOIN Pool_LibraryAliquot pla ON pla.poolId = part.pool_poolId"
+        + " JOIN LibraryAliquot la ON la.aliquotId = pla.aliquotId"
+        + " WHERE la.libraryId IN (:libraryIds)")
+        .addScalar("runId", new LongType())
+        .setParameterList("libraryIds", libraryIds)
+        .list();
+
+    if (ids == null || ids.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    @SuppressWarnings("unchecked")
+    List<Run> results = currentSession().createCriteria(Run.class)
+        .add(Property.forName("id").in(ids))
+        .list();
+
+    return results;
+  }
+
+  private Criteria listByLibraryAliquotBaseCriteria() {
+    return currentSession().createCriteria(Run.class)
         .createAlias("runPositions", "runPos")
         .createAlias("runPos.container", "spc")
         .createAlias("spc.partitions", "partition")
         .createAlias("partition.pool", "pool")
         .createAlias("pool.poolElements", "element")
-        .createAlias("element.aliquot", "aliquot")
-        .createAlias("aliquot.parentLibrary", "library")
-        .add(Restrictions.eq("library.id", libraryId))
-        .setProjection(Projections.distinct(Projections.property("id")))
-        .list();
-    return listByIdList(ids);
+        .createAlias("element.aliquot", "aliquot");
   }
 
   @Override

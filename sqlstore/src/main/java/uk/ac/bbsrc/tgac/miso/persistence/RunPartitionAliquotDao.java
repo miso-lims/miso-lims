@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
@@ -18,11 +19,9 @@ public interface RunPartitionAliquotDao {
 
   List<RunPartitionAliquot> listByAliquotId(long aliquotId) throws IOException;
 
-  List<RunPartitionAliquot> listByLibraryId(long libraryId) throws IOException;
+  List<RunPartitionAliquot> listByLibraryIdList(Collection<Long> libraryIds) throws IOException;
 
-  void create(RunPartitionAliquot runPartitionAliquot) throws IOException;
-
-  void update(RunPartitionAliquot runPartitionAliquot) throws IOException;
+  void save(RunPartitionAliquot runPartitionAliquot) throws IOException;
   
   void deleteForRunContainer(Run run, SequencerPartitionContainer container) throws IOException;
 

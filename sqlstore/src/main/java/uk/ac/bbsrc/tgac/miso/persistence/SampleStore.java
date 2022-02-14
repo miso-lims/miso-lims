@@ -88,7 +88,7 @@ public interface SampleStore extends PaginatedDataSource<Sample> {
    * 
    * @param externalName a single external name String
    * @param projectId Long
-   * @param boolean exactMatch
+   * @param exactMatch boolean
    * @return List<Sample> set of Identities belonging to a given project which have an external name that matches the input string
    * @throws IOException
    */
@@ -133,23 +133,23 @@ public interface SampleStore extends PaginatedDataSource<Sample> {
   EntityReference getPreviousInProject(Sample sample);
 
   /**
-   * Get all descendants of the specified sample that have a particular sample category
+   * Get all descendants of the specified samples that have a particular sample category
    * 
-   * @param parentId id of the sample from which to find descendants
+   * @param parentIds ids of the samples from which to find descendants
    * @param targetSampleCategory sample category of descendants to return
    * @return all of the matching descendants
    * @throws IOException
    */
-  List<Sample> getChildren(long parentId, String targetSampleCategory) throws IOException;
+  List<Sample> getChildren(Collection<Long> parentIds, String targetSampleCategory) throws IOException;
 
   /**
-   * Get the sample IDs of all descendants of the specified sample that have a particular sample category
-   * 
-   * @param parentId id of the sample from which to find descendants
+   * Get the sample IDs of all descendants of the specified samples that have a particular sample category
+   *
+   * @param parentIds ids of the samples from which to find descendants
    * @param targetSampleCategory sample category of descendants to return
    * @return all of the matching descendants' sample IDs
    * @throws IOException
    */
-  Set<Long> getChildIds(long parentId, String targetSampleCategory) throws IOException;
+  Set<Long> getChildIds(Collection<Long> parentIds, String targetSampleCategory) throws IOException;
 
 }

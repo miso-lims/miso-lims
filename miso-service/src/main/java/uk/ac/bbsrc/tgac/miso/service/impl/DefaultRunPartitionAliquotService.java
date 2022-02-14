@@ -4,6 +4,7 @@ import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,8 +65,8 @@ public class DefaultRunPartitionAliquotService implements RunPartitionAliquotSer
   }
 
   @Override
-  public List<RunPartitionAliquot> listByLibraryId(long libraryId) throws IOException {
-    return runPartitionAliquotDao.listByLibraryId(libraryId);
+  public List<RunPartitionAliquot> listByLibraryIdList(Collection<Long> libraryIds) throws IOException {
+    return runPartitionAliquotDao.listByLibraryIdList(libraryIds);
   }
 
   @Override
@@ -83,7 +84,8 @@ public class DefaultRunPartitionAliquotService implements RunPartitionAliquotSer
     User user = authorizationManager.getCurrentUser();
     updateQcDetails(runPartitionAliquot, managed, RunPartitionAliquot::getQcStatus, RunPartitionAliquot::getQcUser,
         RunPartitionAliquot::setQcUser, authorizationManager, RunPartitionAliquot::getQcDate, RunPartitionAliquot::setQcDate);
-    if (isChanged(RunPartitionAliquot::getQcStatus, runPartitionAliquot, managed)) {
+    boolean qcStatusChanged = isChanged(RunPartitionAliquot::getQcStatus, runPartitionAliquot, managed);
+    if (qcStatusChanged) {
       runPartitionAliquot.setDataReview(null);
     }
     ValidationUtils.updateQcDetails(runPartitionAliquot, managed, RunPartitionAliquot::getDataReview, RunPartitionAliquot::getDataReviewer,
@@ -95,33 +97,25 @@ public class DefaultRunPartitionAliquotService implements RunPartitionAliquotSer
       errors.add(new ValidationError("dataReview", "Cannot set data review before QC status"));
     }
     validateQcUser(runPartitionAliquot.getQcStatus(), runPartitionAliquot.getQcUser(), errors);
-    if (((managed == null && runPartitionAliquot.getDataReview() != null)
-        || (managed != null && isChanged(RunPartitionAliquot::getDataReview, runPartitionAliquot, managed)))
-        && !user.isRunReviewer() && !user.isAdmin()) {
+    // data review gets cleared if QC status changes; otherwise, it can only be changed by data reviewers/admin
+    if (isChanged(RunPartitionAliquot::getDataReview, runPartitionAliquot, managed)
+        && !user.isRunReviewer() && !user.isAdmin() && (!qcStatusChanged || runPartitionAliquot.getDataReview() != null)) {
       errors.add(new ValidationError("dataReview", "You are not authorized to make this change"));
     }
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }
 
-    if (managed == null) {
-      runPartitionAliquot.setRun(runService.get(runPartitionAliquot.getRun().getId()));
-      runPartitionAliquot.setPartition(containerService.getPartition(runPartitionAliquot.getPartition().getId()));
-      runPartitionAliquot.setAliquot(libraryAliquotService.get(runPartitionAliquot.getAliquot().getId()));
-      runPartitionAliquot.setLastModifier(user);
-      runPartitionAliquotDao.create(runPartitionAliquot);
-    } else {
-      managed.setPurpose(runPartitionAliquot.getPurpose());
-      managed.setQcStatus(runPartitionAliquot.getQcStatus());
-      managed.setQcNote(runPartitionAliquot.getQcNote());
-      managed.setQcUser(runPartitionAliquot.getQcUser());
-      managed.setQcDate(runPartitionAliquot.getQcDate());
-      managed.setDataReview(runPartitionAliquot.getDataReview());
-      managed.setDataReviewer(runPartitionAliquot.getDataReviewer());
-      managed.setDataReviewDate(runPartitionAliquot.getDataReviewDate());
-      managed.setLastModifier(user);
-      runPartitionAliquotDao.update(managed);
-    }
+    managed.setPurpose(runPartitionAliquot.getPurpose());
+    managed.setQcStatus(runPartitionAliquot.getQcStatus());
+    managed.setQcNote(runPartitionAliquot.getQcNote());
+    managed.setQcUser(runPartitionAliquot.getQcUser());
+    managed.setQcDate(runPartitionAliquot.getQcDate());
+    managed.setDataReview(runPartitionAliquot.getDataReview());
+    managed.setDataReviewer(runPartitionAliquot.getDataReviewer());
+    managed.setDataReviewDate(runPartitionAliquot.getDataReviewDate());
+    managed.setLastModifier(user);
+    runPartitionAliquotDao.save(managed);
   }
 
   @Override

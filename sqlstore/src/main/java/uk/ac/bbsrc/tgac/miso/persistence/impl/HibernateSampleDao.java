@@ -375,30 +375,27 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
-  public List<Sample> getChildren(long parentId, String targetSampleCategory) throws IOException {
-    Set<Long> childIds = getChildIds(parentId, targetSampleCategory);
+  public List<Sample> getChildren(Collection<Long> parentIds, String targetSampleCategory) throws IOException {
+    Set<Long> childIds = getChildIds(parentIds, targetSampleCategory);
     return listByIdList(new ArrayList<>(childIds));
   }
 
   @Override
-  public Set<Long> getChildIds(long parentId, String targetSampleCategory) throws IOException {
-    Set<Long> ids = new HashSet<>();
-    collectChildSampleIds(parentId, targetSampleCategory, ids);
-    return ids;
-  }
-
-  private void collectChildSampleIds(long parentId, String targetSampleCategory, Collection<Long> output) throws IOException {
+  public Set<Long> getChildIds(Collection<Long> parentIds, String targetSampleCategory) throws IOException {
+    Set<Long> output = new HashSet<>();
     @SuppressWarnings("unchecked")
     List<Object[]> results = currentSession().createCriteria(SampleImpl.class)
         .createAlias("parent", "parent")
         .createAlias("sampleClass", "sampleClass")
-        .add(Restrictions.eq("parent.sampleId", parentId))
+        .add(Restrictions.in("parent.sampleId", parentIds))
         .setProjection(
             Projections.projectionList()
                 .add(Projections.property("sampleId"))
                 .add(Projections.property("sampleClass.sampleCategory")))
         .list();
+
     int targetIndex = SAMPLE_CATEGORIES.indexOf(targetSampleCategory);
+    Set<Long> nextParents = new HashSet<>();
     for (Object[] result : results) {
       Long childId = (Long) result[0];
       String childCategory = (String) result[1];
@@ -406,9 +403,13 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
         output.add(childId);
       }
       if (SAMPLE_CATEGORIES.indexOf(childCategory) <= targetIndex) {
-        collectChildSampleIds(childId, targetSampleCategory, output);
+        nextParents.add(childId);
       }
     }
+    if (!nextParents.isEmpty()) {
+      output.addAll(getChildIds(nextParents, targetSampleCategory));
+    }
+    return output;
   }
 
   @Override

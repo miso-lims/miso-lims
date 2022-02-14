@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.service;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
@@ -24,6 +25,6 @@ public interface LibraryService extends PaginatedDataSource<Library>, Barcodable
 
   List<Library> listByProjectId(long projectId) throws IOException;
 
-  List<Library> getSampleDescendants(long parentSampleId) throws IOException;
+  List<Long> listIdsByRequisitionId(long requisitionId) throws IOException;
 
 }

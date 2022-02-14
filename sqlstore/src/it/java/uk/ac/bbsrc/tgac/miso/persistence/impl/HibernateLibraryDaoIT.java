@@ -4,11 +4,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import org.hibernate.SessionFactory;
 import org.junit.Before;
@@ -26,6 +22,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
@@ -37,6 +34,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.persistence.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.persistence.IndexStore;
@@ -146,7 +144,16 @@ public class HibernateLibraryDaoIT extends AbstractDAOTest {
     assertEquals(2, libraries.size());
     assertEquals(sampleId, libraries.get(0).getSample().getId());
     assertEquals(sampleId, libraries.get(1).getSample().getId());
+  }
 
+  @Test
+  public void testListBySampleIdList() throws Exception {
+    long sampleId = 1L;
+    List<Library> libraries = dao.listBySampleIdList(Arrays.asList(sampleId));
+
+    assertEquals(2, libraries.size());
+    assertEquals(sampleId, libraries.get(0).getSample().getId());
+    assertEquals(sampleId, libraries.get(1).getSample().getId());
   }
 
   @Test
@@ -282,34 +289,23 @@ public class HibernateLibraryDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testGetSampleDescendantsPlain() throws Exception {
-    // sam1 > lib1, lib2
-    dao.setDetailedSample(false);
-    List<Library> libraries = dao.getSampleDescendants(1L);
-    assertNotNull(libraries);
-    assertEquals(2, libraries.size());
-    assertTrue(libraries.stream().anyMatch(x -> x.getId() == 1L));
-    assertTrue(libraries.stream().anyMatch(x -> x.getId() == 2L));
+  public void testListIdsByRequisitionIdPlain() throws Exception {
+    List<Long> ids = dao.listIdsByRequisitionId(1L);
+    assertEquals(2, ids.size());
+    assertTrue(ids.contains(1L));
+    assertTrue(ids.contains(2L));
   }
 
   @Test
-  public void testGetSampleDescendantsDetailedDirect() throws Exception {
-    // sam1 > lib1, lib2
-    List<Library> libraries = dao.getSampleDescendants(1L);
-    assertNotNull(libraries);
-    assertEquals(2, libraries.size());
-    assertTrue(libraries.stream().anyMatch(x -> x.getId() == 1L));
-    assertTrue(libraries.stream().anyMatch(x -> x.getId() == 2L));
-  }
+  public void testListIdsByRequisitionIdDetailed() throws Exception {
+    List<Long> requisitionSampleIds = Arrays.asList(16L, 17L);
+    Set<Long> aliquotSampleIds = Collections.singleton(19L);
+    Mockito.when(sampleStore.getChildIds(requisitionSampleIds, SampleAliquot.CATEGORY_NAME))
+        .thenReturn(aliquotSampleIds);
 
-  @Test
-  public void testGetSampleDescendantsDetailedIndirect() throws Exception {
-    // sam17 > ... > lib15
-    Mockito.when(sampleStore.getChildIds(15L, SampleAliquot.CATEGORY_NAME)).thenReturn(Sets.newHashSet(19L));
-    List<Library> libraries = dao.getSampleDescendants(15L);
-    assertNotNull(libraries);
-    assertEquals(1, libraries.size());
-    assertEquals(15L, libraries.get(0).getId());
+    List<Long> ids = dao.listIdsByRequisitionId(2L);
+    assertEquals(1, ids.size());
+    assertTrue(ids.contains(15L));
   }
 
 }

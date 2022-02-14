@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.service;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
@@ -18,7 +19,7 @@ public interface RunPartitionAliquotService {
 
   List<RunPartitionAliquot> listByAliquotId(long aliquotId) throws IOException;
 
-  List<RunPartitionAliquot> listByLibraryId(long libraryId) throws IOException;
+  List<RunPartitionAliquot> listByLibraryIdList(Collection<Long> libraryIds) throws IOException;
 
   void save(RunPartitionAliquot runPartitionAliquot) throws IOException;
 

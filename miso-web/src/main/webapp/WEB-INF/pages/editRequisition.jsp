@@ -63,9 +63,16 @@
       <c:if test="${detailedSample}">
         <miso:list-section id="list_extractions" name="Extractions" target="sample" items="${extractions}"/>
       </c:if>
-      <miso:list-section id="list_libraries" name="Libraries" target="library" items="${libraries}"/>
+      <miso:list-section-ajax id="list_libraries" name="Libraries" target="library" config="{ requisitionId: ${requisition.id} }"/>
       <miso:list-section id="list_runs" name="Runs" target="run" items="${runs}" config="{requisitionId: ${requisition.id}}"/>
-      <miso:list-section id="list_runLibraries" name="Run-Libraries" target="runaliquot" items="${runLibraries}" config="{requisitionId: ${requisition.id}}"/>
+
+      <br>
+      <h1>Run-Libraries</h1>
+      <div id="list_runLibraries">
+        <img src="/styles/images/ajax-loader.gif" class="fg-button"/>
+      </div>
+      <br>
+
       <miso:changelog item="${requisition}"/>
     </c:otherwise>
   </c:choose>
@@ -81,6 +88,16 @@
     var form = FormUtils.createForm('requisitionForm', 'save', requisition, 'requisition', config);
     
     Utils.ui.updateHelpLink(FormTarget.requisition.getUserManualUrl());
+
+    $.ajax({
+      url: Urls.rest.requisitions.listRunLibraries(${requisition.id}),
+      dataType: 'json'
+    }).success(function(data) {
+      $('#list_runLibraries').empty();
+      FormUtils.setTableData(ListTarget.runaliquot, {requisitionId: ${requisition.id}}, 'list_runLibraries', data);
+    }).fail(function() {
+      Utils.showOkDialog('Error', ['Failed to load run-libraries']);
+    });
   });
 </script>
 

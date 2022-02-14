@@ -186,7 +186,7 @@ public class HibernateLibraryAliquotDao
   }
 
   @Override
-  public List<LibraryAliquot> listByIdList(List<Long> idList) throws IOException {
+  public List<LibraryAliquot> listByIdList(Collection<Long> idList) throws IOException {
     if (idList.isEmpty()) {
       return Collections.emptyList();
     }
