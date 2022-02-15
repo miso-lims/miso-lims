@@ -57,6 +57,12 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
     id.setAliquot(aliquot);
     RunPartitionAliquot result = (RunPartitionAliquot) currentSession().get(RunPartitionAliquot.class, id);
     if (result == null) {
+      // ensure the relationship exists before constructing the entity
+      List<Object[]> ids = queryIds("WHERE r.runId = ? AND part.partitionId = ? AND pla.aliquotId = ?",
+          new long[]{run.getId(), partition.getId(), aliquot.getId()});
+      if (ids.isEmpty()) {
+        return null;
+      }
       result = new RunPartitionAliquot(run, partition, aliquot);
     }
     return result;

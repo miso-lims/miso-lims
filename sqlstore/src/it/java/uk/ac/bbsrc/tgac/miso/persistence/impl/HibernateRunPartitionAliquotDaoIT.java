@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -52,15 +53,43 @@ public class HibernateRunPartitionAliquotDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testGet() throws Exception {
-    Run run = (Run) currentSession().get(Run.class, 1L);
-    Partition partition = (Partition) currentSession().get(PartitionImpl.class, 1L);
-    LibraryAliquot aliquot = (LibraryAliquot) currentSession().get(LibraryAliquot.class, 2L);
-    RunPartitionAliquot rpa = sut.get(run, partition, aliquot);
+  public void testGetExisting() throws Exception {
+    RunPartitionAliquot rpa = get(1L, 1L, 2L, true);
     assertNotNull(rpa);
     assertEquals(1L, rpa.getRun().getId());
     assertEquals(1L, rpa.getPartition().getId());
     assertEquals(2L, rpa.getAliquot().getId());
+  }
+
+  @Test
+  public void testGetConstructed() throws Exception {
+    RunPartitionAliquot rpa = get(1L, 2L, 3L, false);
+    assertNotNull(rpa);
+    assertEquals(1L, rpa.getRun().getId());
+    assertEquals(2L, rpa.getPartition().getId());
+    assertEquals(3L, rpa.getAliquot().getId());
+  }
+
+  @Test
+  public void testGetInvalid() throws Exception {
+    RunPartitionAliquot rpa = get(1L, 1L, 15L, false);
+    assertNull(rpa);
+  }
+
+  private RunPartitionAliquot get(long runId, long partitionId, long aliquotId, boolean expectExisting) throws IOException {
+    Run run = (Run) currentSession().get(Run.class, runId);
+    Partition partition = (Partition) currentSession().get(PartitionImpl.class, partitionId);
+    LibraryAliquot aliquot = (LibraryAliquot) currentSession().get(LibraryAliquot.class, aliquotId);
+
+    RunPartitionAliquotId id = new RunPartitionAliquotId(run, partition, aliquot);
+    RunPartitionAliquot existing = (RunPartitionAliquot) currentSession().get(RunPartitionAliquot.class, id);
+    if (expectExisting) {
+      assertNotNull(existing);
+    } else {
+      assertNull(existing);
+    }
+
+    return sut.get(run, partition, aliquot);
   }
 
   @Test

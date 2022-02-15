@@ -11,6 +11,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 
+/**
+ * Data access object for working with RunPartitionAliquots.
+ *
+ * Note that there is not always a RunPartitionAliquot entity persisted in the database for every existing
+ * Run+Partition+Aliquot relationship. Consumers do not need to know or care about this distinction, however - we
+ * should always let them assume that the entity already exists for all existing relationships. This requires
+ * constructing any missing entities during fetch operations.
+ */
 public interface RunPartitionAliquotDao {
 
   RunPartitionAliquot get(Run run, Partition partition, LibraryAliquot aliquot) throws IOException;
