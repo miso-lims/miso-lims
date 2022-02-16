@@ -1216,8 +1216,8 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   }
 
   @Override
-  public List<Sample> getChildren(long parentId, String targetSampleCategory) throws IOException {
-    return sampleStore.getChildren(parentId, targetSampleCategory);
+  public List<Sample> getChildren(Collection<Long> parentIds, String targetSampleCategory) throws IOException {
+    return sampleStore.getChildren(parentIds, targetSampleCategory);
   }
 
 }

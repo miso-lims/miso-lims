@@ -754,8 +754,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   }
 
   @Override
-  public List<Library> getSampleDescendants(long parentSampleId) throws IOException {
-    return libraryDao.getSampleDescendants(parentSampleId);
+  public List<Long> listIdsByRequisitionId(long requisitionId) throws IOException {
+    return libraryDao.listIdsByRequisitionId(requisitionId);
   }
 
 }

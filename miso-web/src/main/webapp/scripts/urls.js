@@ -395,6 +395,7 @@ Urls = (function() {
     datatable: libraryRestBase + '/dt',
     projectDatatable: idUrlFunction(libraryRestBase + '/dt/project'),
     batchDatatable: idUrlFunction(libraryRestBase + '/dt/batch'),
+    requisitionDatatable: idUrlFunction(libraryRestBase + '/dt/requisition'),
     bulkDelete: libraryRestBase + '/bulk-delete',
     spreadsheet: libraryRestBase + '/spreadsheet',
     bulkSave: libraryRestBase + '/bulk',
@@ -751,7 +752,8 @@ Urls = (function() {
     addSamples: middleIdUrlFunction(requisitionRestBase, '/samples'),
     removeSamples: middleIdUrlFunction(requisitionRestBase, '/samples/remove'),
     samplesUpdateProgress: idUrlFunction(requisitionRestBase + '/samplesupdate'),
-    search: requisitionRestBase + '/search'
+    search: requisitionRestBase + '/search',
+    listRunLibraries: middleIdUrlFunction(requisitionRestBase, '/runlibraries')
   };
 
   // Runs

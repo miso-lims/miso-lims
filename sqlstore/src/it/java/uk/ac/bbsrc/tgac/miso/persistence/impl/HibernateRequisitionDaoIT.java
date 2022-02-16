@@ -50,7 +50,7 @@ public class HibernateRequisitionDaoIT extends AbstractHibernateSaveDaoTest<Requ
 
   @Test
   public void testGetByAlias() throws Exception {
-    String alias = "Req Two";
+    String alias = "Detailed Req";
     Requisition req = getTestSubject().getByAlias(alias);
     assertNotNull(req);
     assertEquals(alias, req.getAlias());

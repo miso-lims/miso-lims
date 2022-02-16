@@ -1,13 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -25,6 +21,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryBatch;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
@@ -197,19 +194,33 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
     return library;
   }
 
+  public List<Library> listBySampleIdList(Collection<Long> sampleIds) throws IOException {
+    Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
+    criteria.add(Restrictions.in("sample.id", sampleIds));
+    @SuppressWarnings("unchecked")
+    List<Library> records = criteria.list();
+    return records;
+  }
+
   @Override
-  public List<Library> getSampleDescendants(long parentSampleId) throws IOException {
-    if (detailedSample) {
-      Set<Library> libraries = new HashSet<>();
-      libraries.addAll(listBySampleId(parentSampleId));
-      Set<Long> childAliquotIds = sampleStore.getChildIds(parentSampleId, SampleAliquot.CATEGORY_NAME);
-      for (Long aliquotId : childAliquotIds) {
-        libraries.addAll(listBySampleId(aliquotId));
-      }
-      return new ArrayList<>(libraries);
-    } else {
-      return listBySampleId(parentSampleId);
-    }
+  public List<Long> listIdsByRequisitionId(long requisitionId) throws IOException {
+    List<Long> requisitionSampleIds = currentSession().createCriteria(Sample.class)
+        .createAlias("requisition", "requisition")
+        .add(Restrictions.eq("requisition.id", requisitionId))
+        .setProjection(Projections.property("id"))
+        .list();
+
+    Set<Long> aliquotSampleIds = sampleStore.getChildIds(requisitionSampleIds, SampleAliquot.CATEGORY_NAME);
+
+    Set<Long> parentIds = new HashSet<>(aliquotSampleIds);
+    parentIds.addAll(requisitionSampleIds);
+
+    List<Long> results = currentSession().createCriteria(LibraryImpl.class)
+        .createAlias("sample", "sample")
+        .add(Restrictions.in("sample.id", parentIds))
+        .setProjection(Projections.property("id"))
+        .list();
+    return results;
   }
 
   public SessionFactory getSessionFactory() {

@@ -38,6 +38,6 @@ public interface SampleService
 
   EntityReference getPreviousInProject(Sample sample);
 
-  List<Sample> getChildren(long parentId, String targetSampleCategory) throws IOException;
+  List<Sample> getChildren(Collection<Long> parentIds, String targetSampleCategory) throws IOException;
 
 }

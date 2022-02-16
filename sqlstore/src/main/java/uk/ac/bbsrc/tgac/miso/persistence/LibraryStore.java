@@ -24,9 +24,11 @@
 package uk.ac.bbsrc.tgac.miso.persistence;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
@@ -68,6 +70,6 @@ public interface LibraryStore extends Store<Library>, PaginatedDataSource<Librar
 
   EntityReference getAdjacentLibrary(Library library, boolean before) throws IOException;
 
-  List<Library> getSampleDescendants(long parentSampleId) throws IOException;
+  List<Long> listIdsByRequisitionId(long requisitionId) throws IOException;
 
 }

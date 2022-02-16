@@ -23,14 +23,19 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.RequisitionService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.RequisitionDto;
+import uk.ac.bbsrc.tgac.miso.dto.RunPartitionAliquotDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
@@ -46,6 +51,10 @@ public class RequisitionRestController extends RestController {
   private AdvancedSearchParser advancedSearchParser;
   @Autowired
   private SampleService sampleService;
+  @Autowired
+  private LibraryService libraryService;
+  @Autowired
+  private RunPartitionAliquotService runPartitionAliquotService;
   @Autowired
   private AsyncOperationManager asyncOperationManager;
 
@@ -126,6 +135,14 @@ public class RequisitionRestController extends RestController {
     return requisitionService.list(0, 0, false, "id", PaginationFilter.query(q)).stream()
         .map(RequisitionDto::from)
         .collect(Collectors.toList());
+  }
+
+  @GetMapping("/{requisitionId}/runlibraries")
+  public @ResponseBody List<RunPartitionAliquotDto> listRunLibraries(@PathVariable long requisitionId)
+      throws IOException {
+    List<Long> libraryIds = libraryService.listIdsByRequisitionId(requisitionId);
+    List<RunPartitionAliquot> runLibraries = runPartitionAliquotService.listByLibraryIdList(libraryIds);
+    return runLibraries.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
 }
