@@ -1510,8 +1510,8 @@ BulkUtils = (function($) {
 
   function makeDecimalValidator(options, column) {
     return decimalValidator({
-      precision: options.precision || column.precision,
-      scale: options.scale || column.scale,
+      precision: options.precision === undefined ? column.precision : options.precision,
+      scale: options.scale === undefined ? column.scale : options.scale,
       min: column.min,
       max: column.max
     });
@@ -2290,7 +2290,7 @@ BulkUtils = (function($) {
     var max = Math.pow(10, precision - scale) - Math.pow(0.1, scale);
     var min = column.min === undefined ? max * -1 : column.min;
     max = column.max === undefined ? max : column.max;
-    var pattern = '^\\d{0,' + (precision - scale) + '}';
+    var pattern = '^-?\\d{0,' + (precision - scale) + '}';
     if (scale > 0) {
       pattern += '(?:\\.\\d{1,' + scale + '})?';
     }

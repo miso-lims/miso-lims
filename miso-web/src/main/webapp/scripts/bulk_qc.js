@@ -212,6 +212,8 @@ BulkTarget.qc = (function() {
               var qcType = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(qc.qcTypeId), Constants.qcTypes);
               if (qcType.precisionAfterDecimal < 0) {
                 return qc.results > 0 ? 'Pass' : 'Fail';
+              } else if (qcType.precisionAfterDecimal === 0) {
+                return qc.results.split('.')[0];
               } else {
                 return qc.results;
               }
