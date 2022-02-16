@@ -227,10 +227,16 @@ var Freezer = (function($) {
   }
 
   function compareLocations(a, b) {
-    if (a.alias < b.alias) {
+    var valueA = a.alias;
+    var valueB = b.alias;
+    if (Utils.isIntegerString(valueA) && Utils.isIntegerString(valueB)) {
+      valueA = parseInt(valueA);
+      valueB = parseInt(valueB);
+    }
+    if (valueA < valueB) {
       return -1;
     }
-    if (a.alias > b.alias) {
+    if (valueA > valueB) {
       return 1;
     }
     return 0;
