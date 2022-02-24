@@ -7,6 +7,17 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.42.1] - 2022-02-24
+
+### Fixed
+
+* Deletion Log was missing from the menu in plain sample mode
+* Sorting of freezer components with numbers greater than nine
+* Validation of QC results for QC types with no decimal places
+* improved performance of Edit Requisition page for requisitions containing
+  many samples
+
+
 ## [1.42.0] - 2022-02-10
 
 ### Changed
