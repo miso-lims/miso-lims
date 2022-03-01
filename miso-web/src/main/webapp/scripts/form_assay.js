@@ -53,6 +53,7 @@ FormTarget.assay = (function() {
       }];
     },
     confirmSave: function(object, isDialog, form) {
+      object.tests = Assay.getTests();
       object.metrics = Assay.getMetrics();
     }
     

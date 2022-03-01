@@ -5,13 +5,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
@@ -34,6 +28,11 @@ public class Assay implements Aliasable, Deletable, Serializable {
 
   private String description;
   private boolean archived = false;
+
+  @OneToMany
+  @JoinTable(name = "Assay_AssayTest", joinColumns = { @JoinColumn(name = "assayId") },
+      inverseJoinColumns = { @JoinColumn(name = "testId") })
+  private Set<AssayTest> assayTests;
 
   @OneToMany(mappedBy = "assay", cascade = CascadeType.ALL)
   private Set<AssayMetric> assayMetrics;
@@ -94,6 +93,13 @@ public class Assay implements Aliasable, Deletable, Serializable {
 
   public void setArchived(boolean archived) {
     this.archived = archived;
+  }
+
+  public Set<AssayTest> getAssayTests() {
+    if (assayTests == null) {
+      assayTests = new HashSet<>();
+    }
+    return assayTests;
   }
 
   public Set<AssayMetric> getAssayMetrics() {

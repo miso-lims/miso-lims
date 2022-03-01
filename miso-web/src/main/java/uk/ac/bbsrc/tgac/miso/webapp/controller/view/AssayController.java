@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 import java.io.IOException;
 import java.util.stream.Stream;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
@@ -21,6 +22,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.AssayService;
 import uk.ac.bbsrc.tgac.miso.dto.AssayDto;
 import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
+import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
 
 @Controller
@@ -71,6 +73,8 @@ public class AssayController {
     model.put("isAdmin", authorizationManager.isAdminUser());
     ObjectMapper mapper = new ObjectMapper();
     model.put("assayDto", mapper.writeValueAsString(AssayDto.from(assay)));
+    model.put("libraryQualificationMethods",
+        mapper.writeValueAsString(MisoWebUtils.getLibraryQualificationMethodDtos(mapper)));
     return new ModelAndView("/WEB-INF/pages/editAssay.jsp", model);
   }
 

@@ -46,7 +46,7 @@ public class HibernateTissueTypeDaoIT extends AbstractDAOTest {
   public void testList() throws IOException {
     List<TissueType> list = sut.list();
     assertNotNull(list);
-    assertEquals(1, list.size());
+    assertEquals(2, list.size());
   }
 
   @Test

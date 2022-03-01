@@ -294,8 +294,9 @@ INSERT INTO `TissueOrigin`(`tissueOriginId`, `alias`, `description`, `createdBy`
 (1, 'Test Origin', 'for testing', 1, '2016-02-19 11:28:00', 1, '2016-02-19 11:28:00'),
 (2, 'Origin Two', 'Second Origin', 1, '2021-02-18 16:54:00', 1, '2021-02-18 16:54:00');
 
-INSERT INTO `TissueType`(`tissueTypeId`, `alias`, `description`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
-VALUES (1,'Test Type','for testing',1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:00');
+INSERT INTO `TissueType`(`tissueTypeId`, `alias`, `description`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`) VALUES
+(1, 'Test Type', 'for testing', 1, '2016-02-19 11:28:00', 1, '2016-02-19 11:28:00'),
+(2, 'R', 'reference tissue', 1, '2022-02-28 10:00:00', 1, '2022-02-28 10:00:00');
 
 INSERT INTO TissueMaterial(tissueMaterialId, alias, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 'Fresh Frozen', 1, '2021-02-19 09:12:00', 1, '2021-02-19 09:12:00'),
@@ -340,7 +341,23 @@ INSERT INTO Metric(metricId, alias, category, subcategoryId, thresholdType, unit
 
 INSERT INTO Assay(assayId, alias, version, description) VALUES
 (1, 'Low Depth WGTS', '1.0', NULL),
-(2, 'Full Depth WGTS', '1.0', NULL);
+(2, 'Full Depth WGTS', '1.0', NULL),
+(3, 'WG Only', '1.0', NULL);
+
+INSERT INTO AssayTest(testId, alias, tissueTypeId, negateTissueType, extractionClassId, libraryDesignCodeId, libraryQualificationMethod, libraryQualificationDesignCodeId) VALUES
+(1, 'Tumour WG', 2, TRUE, 3, 2, 'LOW_DEPTH_SEQUENCING', NULL),
+(2, 'Tumour WT', 2, TRUE, 3, 3, 'LOW_DEPTH_SEQUENCING', NULL),
+(3, 'Normal WG', 2, FALSE, 3, 2, 'LOW_DEPTH_SEQUENCING', NULL);
+
+INSERT INTO Assay_AssayTest(assayId, testId) VALUES
+(1, 1),
+(1, 2),
+(1, 3),
+(2, 1),
+(2, 2),
+(2, 3),
+(3, 1),
+(3, 3);
 
 INSERT INTO Assay_Metric(assayId, metricId, minimumThreshold, maximumThreshold) VALUES
 (1, 1, NULL, NULL),

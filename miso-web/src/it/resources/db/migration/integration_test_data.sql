@@ -3,29 +3,6 @@ INSERT INTO User (userId, active, admin, fullName, internal, loginName, roles, p
 (3,1,0,'user',1,'user','ROLE_INTERNAL','{bcrypt}$2a$10$vqYii//w2shSZnt/4uNyIeeU4FGQIB4QJeisv9l16xVRQ1lTOghIO','user@user.user'), -- password 'user'
 (4,1,0,'Harry Henderson', 1, 'hhenderson', 'ROLE_INTERNAL', '{bcrypt}$2a$10$vqYii//w2shSZnt/4uNyIeeU4FGQIB4QJeisv9l16xVRQ1lTOghIO', 'hhenderson@somewhere.maybe');
 
-INSERT INTO Metric(metricId, alias, category, thresholdType, units) VALUES
-(1, 'Container Intact', 'RECEIPT', 'BOOLEAN', NULL),
-(2, 'WG Library Yield', 'LIBRARY_PREP', 'GE', 'ng/μL'),
-(3, 'Min Clusters (PF)', 'LIBRARY_QUALIFICATION', 'GT', 'K/lane'),
-(4, 'To Delete', 'FULL_DEPTH_SEQUENCING', 'BOOLEAN', NULL);
-
-INSERT INTO Assay(assayId, alias, version, archived) VALUES
-(1, 'Main Assay', '1.0', FALSE),
-(2, 'Alternate Assay', '1.0', TRUE),
-(3, 'Alternate Assay', '2.0', FALSE),
-(4, 'Bad Assay', '1.0', FALSE);
-
-INSERT INTO Assay_Metric(assayId, metricId, minimumThreshold, maximumThreshold) VALUES
-(1, 1, NULL, NULL),
-(1, 2, 10, NULL),
-(1, 3, 500, NULL),
-(2, 1, NULL, NULL),
-(2, 2, 5, NULL),
-(2, 3, 500, NULL),
-(3, 1, NULL, NULL),
-(3, 2, 8, NULL),
-(3, 3, 500, NULL);
-
 INSERT INTO RunLibraryQcStatus(statusId, description, qcPassed) VALUES
 (1, 'Passed', TRUE),
 (2, 'Failed', FALSE),
@@ -511,6 +488,40 @@ INSERT INTO Study (studyId, name, project_projectId, alias, studyTypeId, creator
 (1, 'STU1', 1, 'Study One', 1, 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
 (3, 'STU3', 3, 'Study Three', 1, 1, '2020-02-20 11:53:00', 1, '2020-02-20 11:53:00'),
 (400, 'STU400', 400, 'UI Test Study', 1, 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00');
+
+INSERT INTO Assay(assayId, alias, version, archived) VALUES
+(1, 'Main Assay', '1.0', FALSE),
+(2, 'Alternate Assay', '1.0', TRUE),
+(3, 'Alternate Assay', '2.0', FALSE),
+(4, 'Bad Assay', '1.0', FALSE);
+
+INSERT INTO Metric(metricId, alias, category, thresholdType, units) VALUES
+(1, 'Container Intact', 'RECEIPT', 'BOOLEAN', NULL),
+(2, 'WG Library Yield', 'LIBRARY_PREP', 'GE', 'ng/μL'),
+(3, 'Min Clusters (PF)', 'LIBRARY_QUALIFICATION', 'GT', 'K/lane'),
+(4, 'To Delete', 'FULL_DEPTH_SEQUENCING', 'BOOLEAN', NULL);
+
+INSERT INTO Assay_Metric(assayId, metricId, minimumThreshold, maximumThreshold) VALUES
+(1, 1, NULL, NULL),
+(1, 2, 10, NULL),
+(1, 3, 500, NULL),
+(2, 1, NULL, NULL),
+(2, 2, 5, NULL),
+(2, 3, 500, NULL),
+(3, 1, NULL, NULL),
+(3, 2, 8, NULL),
+(3, 3, 500, NULL);
+
+INSERT INTO AssayTest(testId, alias, tissueTypeId, negateTissueType, extractionClassId, libraryDesignCodeId, libraryQualificationMethod, libraryQualificationDesignCode) VALUES
+(1, 'Tumour WG', 1, TRUE, 11, 7, 'LOW_DEPTH_SEQUENCING', NULL),
+(2, 'Tumour WT', 1, TRUE, 13, 8, 'LOW_DEPTH_SEQUENCING', NULL),
+(3, 'Normal WG', 1, FALSE, 11, 7, 'LOW_DEPTH_SEQUENCING', NULL),
+(4, 'Delete Me', 1, FALSE, 11, 7, 'LOW_DEPTH_SEQUENCING', NULL);
+
+INSERT INTO Assay_AssayTest(assayId, testId) VALUES
+(1, 1),
+(1, 2),
+(1, 3);
 
 INSERT INTO Requisition(requisitionId, alias, assayId, creator, created, lastModifier, lastModified) VALUES
 (1, 'Req One', 1, 1, '2021-07-21 11:31:00', 1, '2021-07-21 11:31:00'),
