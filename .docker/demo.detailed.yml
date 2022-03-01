@@ -45,7 +45,7 @@ services:
       - lims_password
 
   flyway:
-    image: misolims/miso-lims-migration:${MISO_TAG}
+    image: ghcr.io/miso-lims/miso-lims-migration:${MISO_TAG}
     command: migrate
     secrets:
       - lims_password
@@ -66,7 +66,7 @@ services:
            nocopy: true
 
   webapp:
-    image: misolims/miso-lims-webapp:${MISO_TAG}
+    image: ghcr.io/miso-lims/miso-lims-webapp:${MISO_TAG}
     restart: always
     secrets:
       - lims_password

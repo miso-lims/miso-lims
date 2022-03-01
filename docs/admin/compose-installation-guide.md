@@ -76,13 +76,13 @@ The MISO Docker containers consist of four parts:
 [MySQL official Docker container](https://hub.docker.com/_/mysql).
 
 **Apache Tomcat server**. The actual server for the MISO webapp. The image is
-[miso-lims-webapp](https://hub.docker.com/r/misolims/miso-lims-webapp)
+[miso-lims-webapp](https://github.com/miso-lims/miso-lims/pkgs/container/miso-lims-webapp)
 container, based on the
 [official Tomcat alpine container](https://hub.docker.com/_/tomcat).
 
 **Flyway DB migration**. Initializes or updates the database.
 This is miso-lims's
-[miso-lims-migration](https://hub.docker.com/r/misolims/miso-lims-migration)
+[miso-lims-migration](https://github.com/miso-lims/miso-lims/pkgs/container/miso-lims-migration)
 container (_[Dockerfile](https://github.com/miso-lims/miso-lims/blob/master/Dockerfile),
 target `flyway-migration`_), based on [boxfuse/flyway](https://hub.docker.com/r/boxfuse/flyway). It will initialize or update the MySQL database for a particular MISO
 version.
@@ -464,7 +464,7 @@ This environment:
   * `MISO_DB_USER` : the MySQL database version
   * `MISO_DB` : the MySQL database user
   * `MISO_DB_PASSWORD_FILE` pointing to `.miso_db_password` for MISO_DB_USER
-  * `MISO_TAG` set to a [specific MISO Docker container version](https://cloud.docker.com/u/misolims/repository/docker/misolims/miso-lims-webapp/tags), and
+  * `MISO_TAG` set to a [specific MISO Docker container version](https://github.com/miso-lims/miso-lims/pkgs/container/miso-lims-webapp/versions), and
   * `SSL_PASSWORD_FILE` pointing to `.ssl_password`.
 
 
@@ -519,7 +519,7 @@ services:
         target: "/var/lib/mysql"
 
   flyway:
-    image: misolims/miso-lims-migration:${MISO_TAG}
+    image: ghcr.io/miso-lims/miso-lims-migration:${MISO_TAG}
     command: migrate
     secrets:
       - lims_password
@@ -541,7 +541,7 @@ services:
 
 
   webapp:
-    image: misolims/miso-lims-webapp:${MISO_TAG}
+    image: ghcr.io/miso-lims/miso-lims-webapp:${MISO_TAG}
     restart: always
     secrets:
       - lims_password
