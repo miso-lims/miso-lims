@@ -344,10 +344,10 @@ INSERT INTO Assay(assayId, alias, version, description) VALUES
 (2, 'Full Depth WGTS', '1.0', NULL),
 (3, 'WG Only', '1.0', NULL);
 
-INSERT INTO AssayTest(testId, alias, tissueTypeId, negateTissueType, extractionClassId, libraryDesignCodeId, libraryQualificationMethod, libraryQualificationDesignCodeId) VALUES
-(1, 'Tumour WG', 2, TRUE, 3, 2, 'LOW_DEPTH_SEQUENCING', NULL),
-(2, 'Tumour WT', 2, TRUE, 3, 3, 'LOW_DEPTH_SEQUENCING', NULL),
-(3, 'Normal WG', 2, FALSE, 3, 2, 'LOW_DEPTH_SEQUENCING', NULL);
+INSERT INTO AssayTest(testId, alias, tissueTypeId, negateTissueType, extractionClassId, libraryDesignCodeId, libraryQualificationMethod, libraryQualificationDesignCodeId, repeatPerTimepoint) VALUES
+(1, 'Tumour WG', 2, TRUE, 3, 2, 'LOW_DEPTH_SEQUENCING', NULL, TRUE),
+(2, 'Tumour WT', 2, TRUE, 3, 3, 'LOW_DEPTH_SEQUENCING', NULL, TRUE),
+(3, 'Normal WG', 2, FALSE, 3, 2, 'LOW_DEPTH_SEQUENCING', NULL, FALSE);
 
 INSERT INTO Assay_AssayTest(assayId, testId) VALUES
 (1, 1),

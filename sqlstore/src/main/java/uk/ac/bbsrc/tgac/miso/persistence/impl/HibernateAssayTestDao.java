@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
@@ -25,7 +27,10 @@ public class HibernateAssayTestDao extends HibernateSaveDao<AssayTest> implement
 
   @Override
   public long getUsage(AssayTest test) throws IOException {
-    return getUsageBy(Assay.class, "test", test); // TODO: verify this is correct
+    return (long) currentSession().createCriteria(Assay.class)
+        .createAlias("assayTests", "test")
+        .add(Restrictions.eq("test.id", test.getId()))
+        .setProjection(Projections.rowCount()).uniqueResult();
   }
 
   @Override

@@ -512,11 +512,11 @@ INSERT INTO Assay_Metric(assayId, metricId, minimumThreshold, maximumThreshold) 
 (3, 2, 8, NULL),
 (3, 3, 500, NULL);
 
-INSERT INTO AssayTest(testId, alias, tissueTypeId, negateTissueType, extractionClassId, libraryDesignCodeId, libraryQualificationMethod, libraryQualificationDesignCode) VALUES
-(1, 'Tumour WG', 1, TRUE, 11, 7, 'LOW_DEPTH_SEQUENCING', NULL),
-(2, 'Tumour WT', 1, TRUE, 13, 8, 'LOW_DEPTH_SEQUENCING', NULL),
-(3, 'Normal WG', 1, FALSE, 11, 7, 'LOW_DEPTH_SEQUENCING', NULL),
-(4, 'Delete Me', 1, FALSE, 11, 7, 'LOW_DEPTH_SEQUENCING', NULL);
+INSERT INTO AssayTest(testId, alias, tissueTypeId, negateTissueType, extractionClassId, libraryDesignCodeId, libraryQualificationMethod, libraryQualificationDesignCode, repeatPerTimepoint) VALUES
+(1, 'Tumour WG', 1, TRUE, 11, 7, 'LOW_DEPTH_SEQUENCING', NULL, TRUE),
+(2, 'Tumour WT', 1, TRUE, 13, 8, 'LOW_DEPTH_SEQUENCING', NULL, TRUE),
+(3, 'Normal WG', 1, FALSE, 11, 7, 'LOW_DEPTH_SEQUENCING', NULL, FALSE),
+(4, 'Delete Me', 1, FALSE, 11, 7, 'LOW_DEPTH_SEQUENCING', NULL, FALSE);
 
 INSERT INTO Assay_AssayTest(assayId, testId) VALUES
 (1, 1),

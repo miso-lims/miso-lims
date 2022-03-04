@@ -19,7 +19,9 @@ public class HibernateAssayTestDaoIT extends AbstractHibernateSaveDaoTest<AssayT
 
   @Override
   public HibernateAssayTestDao constructTestSubject() {
-    return new HibernateAssayTestDao();
+    HibernateAssayTestDao sut = new HibernateAssayTestDao();
+    sut.setSessionFactory(getSessionFactory());
+    return sut;
   }
 
   @Override
