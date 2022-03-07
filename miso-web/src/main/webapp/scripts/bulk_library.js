@@ -588,8 +588,8 @@ BulkTarget.library = (function($) {
                 onChange: function(rowIndex, newValue, api) {
                   var indexFamily = newValue ? Utils.array.findFirstOrNull(Utils.array.namePredicate(newValue), Constants.indexFamilies)
                       : null;
-                  var index1changes = null;
-                  var index2changes = null;
+                  var index1Changes = null;
+                  var index2Changes = null;
                   if (indexFamily) {
                     var template = (!api.isSaved() && config.templatesByProjectId) ? api.getValueObject(rowIndex, 'template') : null;
                     var boxPos = api.getValue(rowIndex, 'boxPosition');
@@ -621,7 +621,7 @@ BulkTarget.library = (function($) {
                       disabled: true,
                       value: null
                     };
-                    index2Changes = index1Changes;
+                    index2Changes = Object.assign({}, index1Changes);
                   }
                   api.updateField(rowIndex, 'index1Id', index1Changes);
                   api.updateField(rowIndex, 'index2Id', index2Changes);
