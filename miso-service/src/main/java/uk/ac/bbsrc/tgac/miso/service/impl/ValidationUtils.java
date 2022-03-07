@@ -67,6 +67,12 @@ public class ValidationUtils {
     }
   }
 
+  public static void validateVolume(BigDecimal initialVolume, BigDecimal volume, Collection<ValidationError> errors) {
+    if (initialVolume != null && volume == null) {
+      errors.add(new ValidationError("volume", "Volume is required when initial volume is set"));
+    }
+  }
+
   public static void validateVolumeUnits(BigDecimal volume, VolumeUnit units, Collection<ValidationError> errors) {
     if (volume != null && volume.compareTo(BigDecimal.ZERO) > 0 && units == null) {
       errors.add(new ValidationError("volumeUnits", "Volume units must be specified"));
