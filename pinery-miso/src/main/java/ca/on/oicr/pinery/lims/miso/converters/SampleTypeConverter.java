@@ -56,7 +56,7 @@ public class SampleTypeConverter {
   /**
    * Translates a MISO Sample Class to a Pinery Sample Type
    * 
-   * @param misoType SampleClass alias from MISO
+   * @param misoSampleClass SampleClass alias from MISO
    * @return the corresponding Pinery Sample Type String
    */
   public static String getSampleType(String misoSampleClass) {
