@@ -498,6 +498,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     }
 
     validateConcentrationUnits(library.getConcentration(), library.getConcentrationUnits(), errors);
+    validateVolume(library.getInitialVolume(), library.getVolume(), errors);
     validateVolumeUnits(library.getVolume(), library.getVolumeUnits(), errors);
     validateBarcodeUniqueness(library, beforeChange, barcodableReferenceService, errors);
     validateUnboxableFields(library, errors);

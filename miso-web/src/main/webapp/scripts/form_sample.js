@@ -145,7 +145,12 @@ FormTarget.sample = (function($) {
               type: 'decimal',
               precision: 16,
               scale: 10,
-              min: 0
+              min: 0,
+              onChange: function(newValue, form) {
+                form.updateField('volume', {
+                  required: newValue
+                });
+              }
             }, {
               title: 'Volume',
               data: 'volume',

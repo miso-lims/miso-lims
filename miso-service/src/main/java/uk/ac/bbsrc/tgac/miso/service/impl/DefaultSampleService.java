@@ -858,6 +858,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
 
     List<ValidationError> errors = new ArrayList<>();
     validateConcentrationUnits(sample.getConcentration(), sample.getConcentrationUnits(), errors);
+    validateVolume(sample.getInitialVolume(), sample.getVolume(), errors);
     validateVolumeUnits(sample.getVolume(), sample.getVolumeUnits(), errors);
     validateBarcodeUniqueness(sample, beforeChange, barcodableReferenceService, errors);
     validateUnboxableFields(sample, errors);

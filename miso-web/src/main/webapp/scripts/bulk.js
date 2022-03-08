@@ -607,7 +607,14 @@ BulkUtils = (function($) {
             data: 'initialVolume',
             include: config.pageMode === 'edit',
             precision: 16,
-            scale: 10
+            scale: 10,
+            onChange: function(rowIndex, newValue, api) {
+              if (config.pageMode === 'edit') {
+                api.updateField(rowIndex, 'volume', {
+                  required: newValue
+                });
+              }
+            }
           });
         }
 
