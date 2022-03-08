@@ -92,6 +92,7 @@
     <div id="configurationMenu" class="menu" style="display: none;">
       <a href="<c:url value="/miso/arraymodel/list"/>">Array Models</a>
       <a href="<c:url value="/miso/assay/list"/>">Assays</a>
+      <a href="<c:url value="/miso/assaytest/list"/>">Assay Tests</a>
       <a href="<c:url value="/miso/attachmentcategories/list"/>">Attachment Categories</a>
       <a href="<c:url value="/miso/boxsize/list"/>">Box Sizes</a>
       <a href="<c:url value="/miso/boxuse/list"/>">Box Uses</a>

@@ -588,8 +588,8 @@ BulkTarget.library = (function($) {
                 onChange: function(rowIndex, newValue, api) {
                   var indexFamily = newValue ? Utils.array.findFirstOrNull(Utils.array.namePredicate(newValue), Constants.indexFamilies)
                       : null;
-                  var index1changes = null;
-                  var index2changes = null;
+                  var index1Changes = null;
+                  var index2Changes = null;
                   if (indexFamily) {
                     var template = (!api.isSaved() && config.templatesByProjectId) ? api.getValueObject(rowIndex, 'template') : null;
                     var boxPos = api.getValue(rowIndex, 'boxPosition');

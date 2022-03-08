@@ -1,6 +1,8 @@
 SET FOREIGN_KEY_CHECKS=0;
 DELETE FROM Assay;
+DELETE FROM Assay_AssayTest;
 DELETE FROM Assay_Metric;
+DELETE FROM AssayTest;
 DELETE FROM Printer;
 DELETE FROM Submission_Experiment;
 DELETE FROM Submission;

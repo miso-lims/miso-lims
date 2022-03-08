@@ -76,6 +76,19 @@ Urls = (function() {
     update: idUrlFunction(assayRestBase)
   };
 
+  // Assay Tests
+  var assayTestUiBase = baseUrl + '/assaytest';
+  ui.assayTests = {
+    bulkCreate: assayTestUiBase + '/bulk/new',
+    bulkEdit: assayTestUiBase + '/bulk/edit'
+  };
+
+  var assayTestRestBase = restBase + '/assaytests';
+  rest.assayTests = {
+    bulkSave: assayTestRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(assayTestRestBase + '/bulk')
+  };
+
   // Attachment Categories
   var attachmentCategoryUiBase = baseUrl + '/attachmentcategories';
   ui.attachmentCategories = {

@@ -14,6 +14,7 @@ public class AssayDto {
   private String version;
   private String description;
   private boolean archived;
+  private List<AssayTestDto> tests;
   private List<AssayMetricDto> metrics;
 
   public static AssayDto from(Assay from) {
@@ -23,6 +24,7 @@ public class AssayDto {
     setString(to::setVersion, from.getVersion());
     setString(to::setDescription, from.getDescription());
     setBoolean(to::setArchived, from.isArchived(), false);
+    to.setTests(from.getAssayTests().stream().map(AssayTestDto::from).collect(Collectors.toList()));
     to.setMetrics(from.getAssayMetrics().stream().map(AssayMetricDto::from).collect(Collectors.toList()));
     return to;
   }
@@ -67,6 +69,14 @@ public class AssayDto {
     this.archived = archived;
   }
 
+  public List<AssayTestDto> getTests() {
+    return tests;
+  }
+
+  public void setTests(List<AssayTestDto> tests) {
+    this.tests = tests;
+  }
+
   public List<AssayMetricDto> getMetrics() {
     return metrics;
   }
@@ -82,6 +92,9 @@ public class AssayDto {
     setString(to::setVersion, getVersion());
     setString(to::setDescription, getDescription());
     setBoolean(to::setArchived, isArchived(), false);
+    if (getTests() != null) {
+      getTests().stream().map(AssayTestDto::to).forEach(x -> to.getAssayTests().add(x));
+    }
     if (getMetrics() != null) {
       getMetrics().stream().map(AssayMetricDto::to).forEach(x -> to.getAssayMetrics().add(x));
     }

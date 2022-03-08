@@ -96,6 +96,9 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
 
   @Override
   public List<RunPartitionAliquot> listByLibraryIdList(Collection<Long> libraryIds) throws IOException {
+    if (libraryIds == null || libraryIds.isEmpty()) {
+      return Collections.emptyList();
+    }
     List<Object[]> ids = queryIds("JOIN LibraryAliquot la ON la.aliquotId = pla.aliquotId"
         + " JOIN Library l ON l.libraryId = la.libraryId"
         + " WHERE l.libraryId IN (:ids)", query -> query.setParameterList("ids", libraryIds));

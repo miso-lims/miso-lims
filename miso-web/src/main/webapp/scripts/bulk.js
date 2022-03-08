@@ -952,9 +952,11 @@ BulkUtils = (function($) {
       var dataChanges = [];
       var storingChanges = true;
       onChangeApi.updateField = function(rowIndex, dataProperty, changes) {
-        if (storingChanges && changes.hasOwnProperty('value')) {
+        if (storingChanges && changes.hasOwnProperty('value') && changes.value !== undefined) {
           var colIndex = getColumnIndex(dataProperty, columns);
           dataChanges.push([rowIndex, colIndex, changes.value]);
+          // clone object before modification in-case same is being used for multiple fields
+          changes = Object.assign({}, changes);
           changes.value = undefined;
         }
         updateField(hot, columns, rowIndex, dataProperty, changes);

@@ -13,7 +13,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.AssayMetric;
 public class HibernateAssayDaoIT extends AbstractHibernateSaveDaoTest<Assay, HibernateAssayDao> {
 
   public HibernateAssayDaoIT() {
-    super(Assay.class, 1L, 2);
+    super(Assay.class, 1L, 3);
   }
 
   @Override

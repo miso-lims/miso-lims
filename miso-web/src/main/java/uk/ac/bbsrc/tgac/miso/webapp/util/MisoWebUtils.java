@@ -51,6 +51,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Issue;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.AssayTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.SampleQcNode;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.HandsontableSpreadsheet;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
@@ -260,6 +261,16 @@ public class MisoWebUtils {
         model.put("issueLookupError", true);
       }
     }
+  }
+
+  public static ArrayNode getLibraryQualificationMethodDtos(ObjectMapper mapper) {
+    ArrayNode libraryQualificationMethods = mapper.createArrayNode();
+    for (AssayTest.LibraryQualificationMethod method : AssayTest.LibraryQualificationMethod.values()) {
+      ObjectNode dto = libraryQualificationMethods.addObject();
+      dto.put("label", method.getLabel());
+      dto.put("value", method.name());
+    }
+    return libraryQualificationMethods;
   }
 
 }

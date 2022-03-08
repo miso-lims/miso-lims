@@ -32,39 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.StainCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.Workstation;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.Metric;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.Pipeline;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLabel;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocationMap;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
@@ -84,6 +52,11 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListTabbedPage.Tabs;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 
 public class DeleteIT extends AbstractIT {
+
+  @Test
+  public void testDeleteAssayTest() {
+    testAdminDelete(ListTarget.ASSAY_TESTS, null, "Delete Me", Columns.ALIAS, AssayTest.class, 4L);
+  }
 
   @Test
   public void testDeleteProject() {

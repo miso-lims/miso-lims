@@ -29,12 +29,9 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String COLUMNS = "Columns";
     public static final String COMPLETED = "Completed";
     public static final String CONCENTRATION = "Concentration";
-    public static final String CONCENTRATION_UNITS = "Conc. Units";
-    public static final String CONTAINER = "Container";
     public static final String CONTAINER_MODEL = "Container Model";
     public static final String CORRESPONDING_FIELD = "Corresponding Field";
     public static final String CREATION_DATE = "Created";
-    public static final String CREATOR = "Creator";
     public static final String DATE_CREATED = "Date Created";
     public static final String DEFAULT_SCI_NAME = "Default Scientific Name";
     public static final String DEFAULT_VOLUME = "Default Volume";
@@ -43,8 +40,8 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String DISABLE_PIPELINE = "Disable Pipeline";
     public static final String DRIVER = "Driver";
     public static final String END_DATE = "End Date";
-    public static final String EXTERNAL = "External";
     public static final String EXTERNAL_NAME = "External Name";
+    public static final String EXTRACTION_CLASS = "Extraction Class";
     public static final String FAILED = "Failed";
     public static final String FALLBACK = "Fallback";
     public static final String FAMILY = "Family";
@@ -53,11 +50,9 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String FULL_NAME = "Full Name";
     public static final String ID = "ID";
     public static final String IDENTIFICATION_BARCODE = "Identification Barcode";
-    public static final String INDEX = "Index(es)";
     public static final String INDEX_FAMILY = "Index Family";
     public static final String INDEX_NAME = "Index Name";
     public static final String INDICES = "Indices";
-    public static final String INSTITUTE = "Institute";
     public static final String INSTRUMENT_MODEL = "Instrument Model";
     public static final String INSTRUMENT_NAME = "Instrument Name";
     public static final String INSTRUMENT_TYPE = "Instrument Type";
@@ -70,13 +65,14 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String LAST_RUN_ALIAS = "Last Run Alias";
     public static final String LAST_RUN_NAME = "Last Run Name";
     public static final String LAST_SEQUENCER = "Last Sequencer Used";
-    public static final String LAYOUT = "Layout";
     public static final String LIBRARY_ALIAS = "Library Alias";
     public static final String LIBRARY_ALIQUOT_NAME = "Library Aliquot Name";
     public static final String LIBRARY_ALIQUOTS = "Library Aliquots";
     public static final String LIBRARY_DESIGN = "Library Design";
     public static final String LIBRARY_DESIGN_CODE = "Design Code";
+    public static final String LIBRARY_DESIGN_CODE_FULL = "Library Design Code";
     public static final String LIBRARY_NAME = "Library Name";
+    public static final String LIBRARY_QUALIFICATION_METHOD = "Library Qualification Method";
     public static final String LIBRARY_SELECTION = "Selection";
     public static final String LIBRARY_STRATEGY = "Strategy";
     public static final String LIBRARY_TYPE = "Library Type";
@@ -87,12 +83,9 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String LONGEST_INDEX = "Longest Index";
     public static final String MANUFACTURER = "Manufacturer";
     public static final String MAP = "Map";
-    public static final String MATRIX_BARCODE = "Matrix Barcode";
     public static final String MULTI_SEQUENCE_INDICES = "Multi-Sequence Indices";
     public static final String NAME = "Name";
-    public static final String NG_USED = "ng Lib. Used";
     public static final String NOTE_REQUIRED = "Note Required";
-    public static final String NUMBER = "Number";
     public static final String ORDER_DESCRIPTION = "Order Description";
     public static final String ORDER_FULFILLED = "Order Fulfilled";
     public static final String PART_NUMBER = "Part Number";
@@ -117,7 +110,6 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String REQUESTED = "Requested";
     public static final String ROWS = "Rows";
     public static final String RUNNING = "Running";
-    public static final String SAMPLE_ALIAS = "Sample Alias";
     public static final String SAMPLE_CLASS = "Sample Class";
     public static final String SAMPLE_NAME = "Sample Name";
     public static final String SAMPLE_TYPE = "Type";
@@ -143,7 +135,6 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String SUBCATEGORY = "Subcategory";
     public static final String SUBMISSION_DATE = "Submission Date";
     public static final String TARGET = "Target";
-    public static final String TARGETED_SEQUENCING = "Targeted Sequencing";
     public static final String TARGETED_SEQUENCING_REQD = "Targeted Sequencing Required";
     public static final String THRESHOLD_TYPE = "Threshold Type";
     public static final String TISSUE_ATTRIBUTES = "Tissue Attributes";
@@ -155,12 +146,9 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String UNITS = "Units";
     public static final String UNKNOWN = "Unknown";
     public static final String USE = "Use";
-    public static final String USER_NAME = "User Name";
     public static final String VERIFIED = "Verified";
     public static final String VERSION = "Version";
     public static final String VOLUME = "Volume";
-    public static final String VOLUME_UNITS = "Vol. Units";
-    public static final String VOLUME_USED = "Vol. Lib. Used";
     public static final String WORKSTATION = "Workstation";
   }
 
@@ -169,6 +157,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String ARRAY_RUNS = "arrayruns";
     public static final String ARRAY_MODELS = "arraymodel/list";
     public static final String ASSAYS = "assay/list";
+    public static final String ASSAY_TESTS = "assaytest/list";
     public static final String ATTACHMENT_CATEGORIES = "attachmentcategories/list";
     public static final String BOX_SIZES = "boxsize/list";
     public static final String BOX_USES = "boxuse/list";

@@ -13,6 +13,12 @@
 <form:form id="assayForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
 
 <br>
+<h1>Tests</h1>
+<div id="assayForm_testsError"></div>
+<div id="listTests"></div>
+<br>
+
+<br>
 <h1>Metrics</h1>
 <div id="assayForm_metricsError"></div>
 <div id="listMetrics"></div>
@@ -23,7 +29,9 @@
     var assay = ${assayDto};
     var config = {
       pageMode: '${pageMode}',
-      isAdmin: ${isAdmin}
+      isAdmin: ${isAdmin},
+      assayId: assay.id,
+      libraryQualificationMethods: ${libraryQualificationMethods}
     };
     var form = FormUtils.createForm('assayForm', config.pageMode === 'view' ? null : 'save', assay, 'assay', config);
     if (config.isAdmin && config.pageMode === 'view') {
@@ -40,8 +48,9 @@
       });
     }
     Assay.setForm(form);
-    Assay.setMetricsListConfig(config);
+    Assay.setListConfig(config);
     Assay.setMetrics(assay.metrics);
+    Assay.setTests(assay.tests);
     Utils.ui.updateHelpLink(FormTarget.assay.getUserManualUrl());
   });
 </script>

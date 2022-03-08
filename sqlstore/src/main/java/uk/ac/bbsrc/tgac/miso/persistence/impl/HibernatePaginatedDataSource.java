@@ -282,7 +282,12 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
 
   @Override
   public default void restrictPaginationByIds(Criteria criteria, List<Long> ids, Consumer<String> errorHandler) {
-    criteria.add(Restrictions.in("id", ids));
+    if (ids == null || ids.isEmpty()) {
+      // IDs should never be negative, so this just ensures nothing is returned
+      criteria.add(Restrictions.eq("id", -1L));
+    } else {
+      criteria.add(Restrictions.in("id", ids));
+    }
   }
 
   @Override

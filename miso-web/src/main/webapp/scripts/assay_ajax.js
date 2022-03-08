@@ -1,21 +1,22 @@
 var Assay = (function() {
   
   var metricsListId = 'listMetrics';
+  var testsListId = 'listTests';
   
   var form = null;
-  var metricsListConfig = {};
+  var listConfig = {};
   
   return {
     setForm: function(formApi) {
       form = formApi;
     },
 
-    setMetricsListConfig: function(config) {
-      metricsListConfig = config;
+    setListConfig: function(config) {
+      listConfg = config;
     },
 
     setMetrics: function(metrics) {
-      FormUtils.setTableData(ListTarget.assaymetric, metricsListConfig, metricsListId, metrics, form);
+      FormUtils.setTableData(ListTarget.assaymetric, listConfig, metricsListId, metrics, form);
     },
 
     getMetrics: function() {
@@ -35,7 +36,30 @@ var Assay = (function() {
         });
       })
       Assay.setMetrics(metrics);
-    }
+    },
+
+    setTests: function(tests) {
+      FormUtils.setTableData(ListTarget.assaytest, listConfg, testsListId, tests, form);
+    },
+
+    getTests: function() {
+      return FormUtils.getTableData(testsListId);
+    },
+
+    addTest: function(addTest) {
+      var tests = Assay.getTests();
+      tests.push(addTest);
+      Assay.setTests(tests);
+    },
+
+    removeTests: function(removeTests) {
+      var tests = Assay.getTests().filter(function(test) {
+        return !removeTests.some(function(removal) {
+          return removal.id === test.id;
+        });
+      })
+      Assay.setTests(tests);
+    },
   };
   
 })();

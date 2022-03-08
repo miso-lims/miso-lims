@@ -970,6 +970,17 @@ public class ListTablesIT extends AbstractIT {
     testColumnsSort(ListTarget.REQUISITIONS);
   }
 
+  @Test
+  public void testListAssayTestsSetup() throws Exception {
+    testPageSetup(ListTarget.ASSAY_TESTS, Sets.newHashSet(Columns.ALIAS, Columns.TISSUE_TYPE, Columns.EXTRACTION_CLASS,
+        Columns.LIBRARY_DESIGN_CODE_FULL, Columns.LIBRARY_QUALIFICATION_METHOD));
+  }
+
+  @Test
+  public void testListAssayTestsColumnSort() throws Exception {
+    testColumnsSort(ListTarget.ASSAY_TESTS);
+  }
+
   private void testPageSetup(String listTarget, Set<String> targetColumns) {
     testPageSetup(listTarget, targetColumns, false);
   }
