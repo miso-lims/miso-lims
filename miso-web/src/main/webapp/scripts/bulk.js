@@ -948,6 +948,8 @@ BulkUtils = (function($) {
         if (storingChanges && changes.hasOwnProperty('value') && changes.value !== undefined) {
           var colIndex = getColumnIndex(dataProperty, columns);
           dataChanges.push([rowIndex, colIndex, changes.value]);
+          // clone object before modification in-case same is being used for multiple fields
+          changes = Objects.assign({}, changes);
           changes.value = undefined;
         }
         updateField(hot, columns, rowIndex, dataProperty, changes);

@@ -621,7 +621,7 @@ BulkTarget.library = (function($) {
                       disabled: true,
                       value: null
                     };
-                    index2Changes = Object.assign({}, index1Changes);
+                    index2Changes = index1Changes;
                   }
                   api.updateField(rowIndex, 'index1Id', index1Changes);
                   api.updateField(rowIndex, 'index2Id', index2Changes);
