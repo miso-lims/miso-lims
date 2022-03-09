@@ -98,6 +98,8 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable,
 
   private String identificationBarcode;
 
+  private boolean retired;
+
   @ManyToOne
   @JoinColumn(name = "labelId")
   private StorageLabel label;
@@ -236,6 +238,14 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable,
     } else {
       this.probeId = probeId;
     }
+  }
+
+  public boolean getRetired() {
+    return retired;
+  }
+
+  public void setRetired(boolean retired) {
+    this.retired = retired;
   }
 
   @Override

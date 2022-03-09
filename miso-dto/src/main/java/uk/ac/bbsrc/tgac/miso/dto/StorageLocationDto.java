@@ -44,6 +44,7 @@ public class StorageLocationDto {
     dto.setDisplayLocation(from.getDisplayLocation());
     dto.setFullDisplayLocation(from.getFullDisplayLocation());
     dto.setProbeId(from.getProbeId());
+    dto.setRetired(from.getRetired());
     Dtos.setId(dto::setMapId, from.getMap());
     setString(dto::setMapFilename, maybeGetProperty(from.getMap(), StorageLocationMap::getFilename));
     setString(dto::setMapAnchor, from.getMapAnchor());
@@ -69,6 +70,7 @@ public class StorageLocationDto {
   private List<StorageLocationDto> childLocations;
   private Set<BoxDto> boxes;
   private String probeId;
+  private boolean retired;
   private Long mapId;
   private String mapFilename;
   private String mapAnchor;
@@ -171,6 +173,14 @@ public class StorageLocationDto {
     this.probeId = probeId;
   }
 
+  public boolean getRetired() {
+    return retired;
+  }
+
+  public void setRetired(boolean retired) {
+    this.retired = retired;
+  }
+
   public Long getMapId() {
     return mapId;
   }
@@ -216,6 +226,7 @@ public class StorageLocationDto {
     }
     location.setLocationUnit(LocationUnit.valueOf(getLocationUnit()));
     location.setProbeId(getProbeId());
+    location.setRetired(getRetired());
     setObject(location::setMap, StorageLocationMap::new, getMapId());
     setString(location::setMapAnchor, getMapAnchor());
     setObject(location::setLabel, StorageLabel::new, getLabelId());

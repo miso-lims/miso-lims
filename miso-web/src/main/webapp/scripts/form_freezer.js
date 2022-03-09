@@ -104,6 +104,10 @@ FormTarget.freezer = (function($) {
           data: 'probeId',
           type: 'text',
           maxLength: 50
+        }, {
+          title: 'Retired',
+          type: 'checkbox',
+          data: 'retired'
         }]
       }];
     }
