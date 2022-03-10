@@ -616,7 +616,7 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListTabbedStorageLocationsSetup() throws Exception {
-    testTabbedPageSetup(ListTarget.STORAGE_LOCATIONS, Sets.newHashSet(Columns.ALIAS, Columns.IDENTIFICATION_BARCODE, Columns.MAP));
+    testTabbedPageSetup(ListTarget.STORAGE_LOCATIONS, Sets.newHashSet(Columns.ALIAS, Columns.IDENTIFICATION_BARCODE, Columns.STATUS, Columns.MAP));
   }
 
   @Test

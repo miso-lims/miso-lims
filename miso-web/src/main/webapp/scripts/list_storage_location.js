@@ -71,6 +71,17 @@ ListTarget.storage_location = {
         }, ];
     if (config.slug == 'freezers') {
       columns.push({
+        "sTitle": "Status",
+        "mData": "retired",
+        "include": true,
+        mRender: function(data, type, full) {
+          if (type === 'display') {
+            return data ? "Retired" : "Production";
+          }
+          return data;
+        }
+      });
+      columns.push({
         "sTitle": "Map",
         "mData": "mapFilename",
         "include": true,

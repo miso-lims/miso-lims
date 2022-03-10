@@ -1,0 +1,1 @@
+Add 'retired' checkbox field for freezer status

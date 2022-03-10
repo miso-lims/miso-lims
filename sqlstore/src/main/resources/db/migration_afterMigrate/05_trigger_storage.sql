@@ -19,6 +19,7 @@ FOR EACH ROW
       makeChangeMessage('barcode', OLD.identificationBarcode, NEW.identificationBarcode),
       makeChangeMessage('room', (SELECT alias FROM StorageLocation WHERE locationId = OLD.parentLocationId), (SELECT alias FROM StorageLocation WHERE locationId = NEW.parentLocationId)),
       makeChangeMessage('probe ID', OLD.probeId, NEW.probeId),
+      makeChangeMessage('retired', booleanToString(OLD.retired), booleanToString(NEW.retired)),
       makeChangeMessage('label', (SELECT label FROM StorageLabel WHERE labelId = OLD.labelId), (SELECT label FROM StorageLabel WHERE labelId = NEW.labelId))
     );
     IF log_message IS NOT NULL AND log_message <> '' THEN
@@ -29,6 +30,7 @@ FOR EACH ROW
           makeChangeColumn('identificationBarcode', OLD.identificationBarcode, NEW.identificationBarcode),
           makeChangeColumn('parentLocationId', OLD.parentLocationId, NEW.parentLocationId),
           makeChangeColumn('probeId', OLD.probeId, NEW.probeId),
+          makeChangeColumn('retired', OLD.retired, NEW.retired),
           makeChangeColumn('labelId', OLD.labelId, NEW.labelId)
         ), ''),
         NEW.lastModifier,

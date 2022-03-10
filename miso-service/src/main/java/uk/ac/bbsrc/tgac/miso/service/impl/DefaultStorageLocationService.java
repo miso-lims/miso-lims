@@ -187,6 +187,7 @@ public class DefaultStorageLocationService implements StorageLocationService {
     to.setIdentificationBarcode(from.getIdentificationBarcode());
     to.setParentLocation(from.getParentLocation());
     to.setProbeId(from.getProbeId());
+    to.setRetired(from.getRetired());
     to.setMap(from.getMap());
     to.setMapAnchor(from.getMapAnchor());
     to.setLabel(from.getLabel());
