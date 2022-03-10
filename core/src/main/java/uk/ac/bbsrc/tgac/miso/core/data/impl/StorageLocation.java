@@ -322,6 +322,7 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable,
     result = prime * result + ((mapAnchor == null) ? 0 : mapAnchor.hashCode());
     result = prime * result + ((parentLocation == null) ? 0 : parentLocation.hashCode());
     result = prime * result + ((probeId == null) ? 0 : probeId.hashCode());
+    result = prime * result + (!retired ? 0 : 1);
     return result;
   }
 
@@ -357,6 +358,7 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable,
     if (probeId == null) {
       if (other.probeId != null) return false;
     } else if (!probeId.equals(other.probeId)) return false;
+    if (retired != other.retired) return false;
     return true;
   }
 
