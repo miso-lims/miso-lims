@@ -13,9 +13,11 @@ Starting with version 1.29.0, the format of this file is based on
 
 * Assay tests, allowing you to define all of the sequencing that needs to be
   performed for an assay
+* 'Retired' checkbox field for freezer status
 
 ### Changed
 
+* Volume is now required when initial volume is set for samples and libraries
 * Assays in Pinery now include tests
 * Docker images are now available on [GitHub](https://github.com/orgs/miso-lims/packages?ecosystem=container)
   instead of Docker Hub
