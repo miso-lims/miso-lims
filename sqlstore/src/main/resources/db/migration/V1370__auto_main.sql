@@ -1,3 +1,9 @@
+-- freezer_status
+-- freezer_status
+ALTER TABLE StorageLocation ADD COLUMN retired BOOLEAN NOT NULL DEFAULT 0;
+
+
+-- assay_tests
 CREATE TABLE AssayTest(
   testId bigint(20) NOT NULL AUTO_INCREMENT,
   alias varchar(50) NOT NULL,
@@ -25,3 +31,4 @@ CREATE TABLE Assay_AssayTest(
   CONSTRAINT fk_assayTest_assay FOREIGN KEY (assayId) REFERENCES Assay (assayId),
   CONSTRAINT fk_assay_assayTest FOREIGN KEY (testId) REFERENCES AssayTest (testId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+

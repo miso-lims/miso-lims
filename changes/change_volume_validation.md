@@ -1,1 +1,0 @@
-Make volume required when initial volume is set for samples and libraries

@@ -7,6 +7,31 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.43.0] - 2022-03-11
+
+### Added
+
+* Assay tests, allowing you to define all of the sequencing that needs to be
+  performed for an assay
+
+### Changed
+
+* Assays in Pinery now include tests
+* Docker images are now available on [GitHub](https://github.com/orgs/miso-lims/packages?ecosystem=container)
+  instead of Docker Hub
+
+### Fixed
+
+* Nginx container in Docker demos was not configured to restart automatically
+
+### Upgrade Notes
+
+* If using Docker Compose to run MISO, you will need to update the images in
+  your compose file:
+  * `misolims/miso-lims-webapp` -> `ghcr.io/miso-lims/miso-lims-webapp`
+  * `misolims/miso-lims-migration` -> `ghcr.io/miso-lims/miso-lims-migration`
+
+
 ## [1.42.1] - 2022-02-24
 
 ### Fixed
