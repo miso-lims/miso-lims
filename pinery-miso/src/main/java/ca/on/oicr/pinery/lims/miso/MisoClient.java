@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
+import ca.on.oicr.pinery.lims.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -35,6 +36,7 @@ import com.google.common.collect.Sets;
 import ca.on.oicr.pinery.api.Assay;
 import ca.on.oicr.pinery.api.AssayMetric;
 import ca.on.oicr.pinery.api.AssayMetricSubcategory;
+import ca.on.oicr.pinery.api.AssayTest;
 import ca.on.oicr.pinery.api.Attribute;
 import ca.on.oicr.pinery.api.AttributeName;
 import ca.on.oicr.pinery.api.Box;
@@ -56,24 +58,6 @@ import ca.on.oicr.pinery.api.SignOff;
 import ca.on.oicr.pinery.api.Status;
 import ca.on.oicr.pinery.api.Type;
 import ca.on.oicr.pinery.api.User;
-import ca.on.oicr.pinery.lims.DefaultAssay;
-import ca.on.oicr.pinery.lims.DefaultAssayMetric;
-import ca.on.oicr.pinery.lims.DefaultAssayMetricSubcategory;
-import ca.on.oicr.pinery.lims.DefaultAttribute;
-import ca.on.oicr.pinery.lims.DefaultAttributeName;
-import ca.on.oicr.pinery.lims.DefaultChangeLog;
-import ca.on.oicr.pinery.lims.DefaultInstrument;
-import ca.on.oicr.pinery.lims.DefaultInstrumentModel;
-import ca.on.oicr.pinery.lims.DefaultOrder;
-import ca.on.oicr.pinery.lims.DefaultPreparationKit;
-import ca.on.oicr.pinery.lims.DefaultRequisition;
-import ca.on.oicr.pinery.lims.DefaultRun;
-import ca.on.oicr.pinery.lims.DefaultSample;
-import ca.on.oicr.pinery.lims.DefaultSampleProject;
-import ca.on.oicr.pinery.lims.DefaultSignOff;
-import ca.on.oicr.pinery.lims.DefaultStatus;
-import ca.on.oicr.pinery.lims.DefaultType;
-import ca.on.oicr.pinery.lims.DefaultUser;
 import ca.on.oicr.pinery.lims.miso.MisoClient.SampleRowMapper.AttributeKey;
 import ca.on.oicr.pinery.lims.miso.converters.QcConverter;
 import ca.on.oicr.pinery.lims.miso.converters.SampleTypeConverter;
@@ -142,6 +126,8 @@ public class MisoClient implements Lims {
   // Assay queries
   private static final String QUERY_ALL_ASSAYS = getResourceAsString("queryAllAssays.sql");
   private static final String QUERY_ASSAY_BY_ID = QUERY_ALL_ASSAYS + " WHERE assayId = ?";
+  private static final String QUERY_ALL_ASSAY_TESTS = getResourceAsString("queryAllAssayTests.sql");
+  private static final String QUERY_ASSAY_TESTS_BY_ID = QUERY_ALL_ASSAY_TESTS + " where assayId = ?";
   private static final String QUERY_ALL_ASSAY_METRICS = getResourceAsString("queryAllAssayMetrics.sql");
   private static final String QUERY_ASSAY_METRICS_BY_ID = QUERY_ALL_ASSAY_METRICS + " WHERE am.assayId = ?";
   
@@ -629,6 +615,11 @@ public class MisoClient implements Lims {
   public List<Assay> getAssays() {
     List<Assay> assays = template.query(QUERY_ALL_ASSAYS, assayRowMapper);
     Map<Integer, Assay> assaysById = assays.stream().collect(Collectors.toMap(Assay::getId, Function.identity()));
+    template.query(QUERY_ALL_ASSAY_TESTS, rs -> {
+      AssayTest test = assayTestRowMapper.mapRow(rs, 0);
+      Assay assay = assaysById.get(rs.getInt("assayId"));
+      assay.addTest(test);
+    });
     template.query(QUERY_ALL_ASSAY_METRICS, rs -> {
       AssayMetric metric = assayMetricRowMapper.mapRow(rs, 0);
       Assay assay = assaysById.get(rs.getInt("assayId"));
@@ -647,6 +638,10 @@ public class MisoClient implements Lims {
       throw new IllegalStateException(String.format("Found multiple assays with ID: %d", id));
     }
     Assay assay = assays.get(0);
+    template.query(QUERY_ASSAY_TESTS_BY_ID, params, rs -> {
+      AssayTest test = assayTestRowMapper.mapRow(rs, 0);
+      assay.addTest(test);  
+    });
     template.query(QUERY_ASSAY_METRICS_BY_ID, params, rs -> {
       AssayMetric metric = assayMetricRowMapper.mapRow(rs, 0);
       assay.addMetric(metric);
@@ -1441,6 +1436,21 @@ public class MisoClient implements Lims {
     assay.setDescription(rs.getString("description"));
     assay.setVersion(rs.getString("version"));
     return assay;
+  };
+
+  private static final RowMapper<AssayTest> assayTestRowMapper = (rs, rowNum) -> {
+    AssayTest test = new DefaultAssayTest();
+    test.setName(rs.getString("name"));
+    test.setTissueType(rs.getString("tissueType"));
+    if (test.getTissueType() != null) {
+      test.setNegateTissueType(rs.getBoolean("negateTissueType"));
+      test.setRepeatPerTimepoint(rs.getBoolean("repeatPerTimepoint"));
+    }
+    test.setExtractionSampleType(SampleTypeConverter.getSampleType(rs.getString("extractionSampleType")));
+    test.setLibrarySourceTemplateType(rs.getString("librarySourceTemplateType"));
+    test.setLibraryQualificationMethod(rs.getString("libraryQualificationMethod"));
+    test.setLibraryQualificationSourceTemplateType(rs.getString("libraryQualificationSourceTemplateType"));
+    return test;
   };
 
   private static final RowMapper<AssayMetric> assayMetricRowMapper = (rs, rowNum) -> {
