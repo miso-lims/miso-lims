@@ -51,6 +51,10 @@ Changes should never be merged directly into `develop` or `master`. Pull request
 the `develop` branch for testing and review. The `master` branch is only ever updated to point to the
 latest official release.
 
+The pull request description will automatically be filled in with the 
+[pull request template](.github/pull_request_template.md). Please link to the GitHub issue for this 
+pull request and complete the checklist.
+
 ## Merging
 
 Once all of the tests are passing, and your pull request has received two approvals, you are ready to
