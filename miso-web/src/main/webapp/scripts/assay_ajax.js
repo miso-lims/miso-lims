@@ -12,7 +12,7 @@ var Assay = (function() {
     },
 
     setListConfig: function(config) {
-      listConfg = config;
+      listConfig = config;
     },
 
     setMetrics: function(metrics) {
@@ -39,7 +39,7 @@ var Assay = (function() {
     },
 
     setTests: function(tests) {
-      FormUtils.setTableData(ListTarget.assaytest, listConfg, testsListId, tests, form);
+      FormUtils.setTableData(ListTarget.assaytest, listConfig, testsListId, tests, form);
     },
 
     getTests: function() {
