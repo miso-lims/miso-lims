@@ -477,10 +477,9 @@ public class Dtos {
       dto.setQcs(asQcDtos(from.getQCs()));
     }
 
-    Requisition requisition = getRequisition(from);
-    setId(dto::setRequisitionId, requisition);
-    setString(dto::setRequisitionAlias, maybeGetProperty(requisition, Requisition::getAlias));
-    setId(dto::setRequisitionAssayId, maybeGetProperty(requisition, Requisition::getAssay));
+    setId(dto::setRequisitionId, from.getRequisition());
+    setString(dto::setRequisitionAlias, maybeGetProperty(from.getRequisition(), Requisition::getAlias));
+    setId(dto::setRequisitionAssayId, maybeGetProperty(from.getRequisition(), Requisition::getAssay));
 
     return dto;
   }
@@ -598,14 +597,20 @@ public class Dtos {
     }
     setEffectiveQcFailure(from, dto);
 
+    if (from.getRequisition() == null) {
+      Requisition requisition = getParentRequisition(from);
+      setId(dto::setEffectiveRequisitionId, requisition);
+      setString(dto::setEffectiveRequisitionAlias, maybeGetProperty(requisition, Requisition::getAlias));
+    }
+
     return dto;
   }
 
-  private static Requisition getRequisition(Sample sample) {
+  private static Requisition getParentRequisition(Sample sample) {
     if (!LimsUtils.isDetailedSample(sample)) {
-      return sample.getRequisition();
+      return null;
     }
-    DetailedSample requisitionSample = (DetailedSample) sample;
+    DetailedSample requisitionSample = ((DetailedSample) sample).getParent();
     while (requisitionSample != null && requisitionSample.getRequisition() == null) {
       requisitionSample = requisitionSample.getParent();
     }
@@ -1459,7 +1464,10 @@ public class Dtos {
     setString(dto::setBatchId, from.getBatchId());
     setEffectiveQcFailure(from, dto);
 
-    Requisition requisition = getRequisition(from.getSample());
+    Requisition requisition = from.getSample().getRequisition();
+    if (requisition == null) {
+      requisition = getParentRequisition(from.getSample());
+    }
     setId(dto::setRequisitionId, requisition);
     setString(dto::setRequisitionAlias, maybeGetProperty(requisition, Requisition::getAlias));
 
@@ -1724,7 +1732,10 @@ public class Dtos {
     setId(dto::setKitDescriptorId, from.getKitDescriptor());
     setString(dto::setKitLot, from.getKitLot());
 
-    Requisition requisition = getRequisition(from.getLibrary().getSample());
+    Requisition requisition = from.getLibrary().getSample().getRequisition();
+    if (requisition == null) {
+      requisition = getParentRequisition(from.getLibrary().getSample());
+    }
     setId(dto::setRequisitionId, requisition);
     setString(dto::setRequisitionAlias, maybeGetProperty(requisition, Requisition::getAlias));
 
