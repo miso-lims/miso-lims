@@ -31,6 +31,8 @@ public class DetailedSampleDto extends SampleDto implements UpstreamQcFailableDt
   private String effectiveTimepoint;
   private Long effectiveQcFailureId;
   private String effectiveQcFailureLevel;
+  private Long effectiveRequisitionId;
+  private String effectiveRequisitionAlias;
   private String creationDate;
   private String volumeUsed;
   private String ngUsed;
@@ -295,4 +297,19 @@ public class DetailedSampleDto extends SampleDto implements UpstreamQcFailableDt
     this.effectiveQcFailureLevel = effectiveQcFailureLevel;
   }
 
+  public Long getEffectiveRequisitionId() {
+    return effectiveRequisitionId;
+  }
+
+  public void setEffectiveRequisitionId(Long effectiveRequisitionId) {
+    this.effectiveRequisitionId = effectiveRequisitionId;
+  }
+
+  public String getEffectiveRequisitionAlias() {
+    return effectiveRequisitionAlias;
+  }
+
+  public void setEffectiveRequisitionAlias(String effectiveRequisitionAlias) {
+    this.effectiveRequisitionAlias = effectiveRequisitionAlias;
+  }
 }
