@@ -7,6 +7,16 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.43.1] - 2022-03-28
+
+### Fixed
+
+* Missing metric controls on the Edit Assay page
+  
+* When editing a sample that is a descendant of a requisitioned sample, the
+  descendant was being saved as a requisitioned sample as well
+
+
 ## [1.43.0] - 2022-03-11
 
 ### Added
