@@ -7,6 +7,18 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.43.2] - 2022-04-07
+
+### Fixed
+
+* updated Spring and Jackson dependencies with known vulnerabilities
+
+### Upgrade Notes
+
+* Updated to Pinery 2.22.1
+* Updated to Run Scanner 1.13.2
+
+
 ## [1.43.1] - 2022-03-28
 
 ### Fixed
