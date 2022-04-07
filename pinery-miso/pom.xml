@@ -8,7 +8,7 @@
   <artifactId>pinery-miso</artifactId>
   <name>pinery-miso</name>
   <packaging>war</packaging>
-  
+
   <properties>
     <failOnMissingWebXml>false</failOnMissingWebXml>
     <skipITs>true</skipITs>
@@ -16,8 +16,7 @@
     <mysql.user>tgaclims</mysql.user>
     <mysql.pw>tgaclims</mysql.pw>
     <pinery.version>2.22.1</pinery.version>
-    <spring-version>5.3.14</spring-version><!-- must match version used by Pinery -->
-    <jackson.version>2.10.0</jackson.version>
+    <spring-version>5.3.18</spring-version><!-- must match version used by Pinery -->
   </properties>
 
   <dependencies>
@@ -79,7 +78,7 @@
       <artifactId>sqlstore</artifactId>
     </dependency>
   </dependencies>
-  
+
   <profiles>
     <profile>
       <id>integration-test-setup</id>
