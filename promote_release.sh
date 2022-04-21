@@ -21,7 +21,7 @@ if (( $(git log HEAD..origin/${MAIN_BRANCH} --oneline | wc -l) > 0 )); then
   exit 3
 fi
 
-MISO_VERSION_OLD=$(git tag -l --sort -version:refname | head -n1); export MISO_VERSION_OLD=${MISO_VERSION_OLD:1}
+MISO_VERSION_OLD=$(git describe --tags --abbrev=0); export MISO_VERSION_OLD=${MISO_VERSION_OLD:1}
 
 # Post official release to GitHub
 git fetch --tags
