@@ -138,6 +138,10 @@
 
   <session-config>
     <session-timeout>60</session-timeout>
+    <cookie-config>
+      <secure>true</secure>
+      <http-only>true</http-only>
+    </cookie-config>
   </session-config>
   
   <context-param>
