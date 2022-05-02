@@ -129,11 +129,8 @@ FormTarget.qctype = (function($) {
         return item.qcTarget;
       },
       onChange: function(newValue, form) {
-        var target = Utils.array.findUniqueOrThrow(function(item) {
-          return item.qcTarget === newValue;
-        }, Constants.qcTargets);
         form.updateField('correspondingField', {
-          source: target.correspondingFields
+          source: getCorrespondingFields(newValue)
         });
       }
     }, {
@@ -184,7 +181,7 @@ FormTarget.qctype = (function($) {
       data: 'correspondingField',
       type: 'dropdown',
       required: true,
-      source: []
+      source: object.qcTarget ? getCorrespondingFields(object.qcTarget) : []
     }, {
       title: 'Auto Update Field',
       data: 'autoUpdateField',
@@ -204,6 +201,13 @@ FormTarget.qctype = (function($) {
       data: 'archived',
       type: 'checkbox'
     }];
+  }
+
+  function getCorrespondingFields(targetName) {
+    var target = Utils.array.findUniqueOrThrow(function(item) {
+      return item.qcTarget === targetName;
+    }, Constants.qcTargets);
+    return target.correspondingFields;
   }
 
 })(jQuery);
