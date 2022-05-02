@@ -555,7 +555,7 @@ FormUtils = (function($) {
                   var newLink = $('<a>').attr('id', makeInputId(containerId, field.data) + 'Label').attr('href', options.link).text(
                       label.text());
                   if (field.openNewTab) {
-                    newLink.attr('target', '_blank');
+                    newLink.attr('target', '_blank').attr('rel', 'noopener noreferrer');
                   }
                   label.replaceWith(newLink);
                 } else {
@@ -932,7 +932,7 @@ FormUtils = (function($) {
     if (isLink && Utils.getObjectField(item, field.data)) {
       input.attr('href', field.getLink(item));
       if (field.openNewTab) {
-        input.attr('target', '_blank');
+        input.attr('target', '_blank').attr('rel', 'noopener noreferrer');
       }
     }
     return input;
