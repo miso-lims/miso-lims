@@ -183,15 +183,15 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     validateChange(pool, null);
     poolStore.save(pool);
 
-    if (autoGenerateIdBarcodes) {
-      LimsUtils.generateAndSetIdBarcode(pool);
-    }
     try {
       NamingScheme namingScheme = namingSchemeHolder.getPrimary();
       pool.setName(namingScheme.generateNameFor(pool));
       validateNameOrThrow(pool, namingScheme);
     } catch (MisoNamingException e) {
       throw new IOException("Invalid name for pool", e);
+    }
+    if (autoGenerateIdBarcodes) {
+      LimsUtils.generateAndSetIdBarcode(pool);
     }
     long savedId = poolStore.save(pool);
     boxService.updateBoxableLocation(pool);
