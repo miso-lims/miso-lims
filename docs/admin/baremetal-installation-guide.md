@@ -20,6 +20,13 @@ Database Server:
 * MySQL 5.7.7 or MariaDB 10.2.3
 * [Flyway 5.2.4](https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/5.2.4/) (newer versions may cause issues)
 
+*Important Note*: MISO requires SSL (HTTPS) to function correctly over a
+network. It is usually ideal to configure SSL using a proxy server. This guide
+will not cover SSL configuration, but you can see an example configuration for
+NGINX [here](https://github.com/miso-lims/miso-lims/blob/develop/.docker/nginx/ssl.conf).
+SSL is not required to access MISO over a localhost connection (development
+purposes)
+
 ## Downloading the latest release
 
 Use the GitHub interface to download the following files for the
