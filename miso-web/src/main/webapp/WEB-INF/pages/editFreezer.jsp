@@ -36,7 +36,8 @@
 </div>
 <div id="notediv" class="note" style="display:none;">
   Freezers can be divided into several storage spaces which hold boxes. For full descriptions of the different storage
-  spaces, see the User Manual: <a id="addingStorageLink" target="_blank">Adding Storage to a Freezer</a>
+  spaces, see the User Manual:
+  <a id="addingStorageLink" target="_blank" rel="noopener noreferrer">Adding Storage to a Freezer</a>
 </div>
 
 <form:form id="freezerForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>

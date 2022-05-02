@@ -302,7 +302,8 @@ ListUtils = (function($) {
     }
     if (target.showNewOptionSop && Constants.newOptionSopUrl) {
       messages.push($('<p>').addClass('big big-important').append(
-          $('<a>').attr('href', Constants.newOptionSopUrl).attr('target', '_blank').text('Click to see the SOP for adding new options')))
+          $('<a>').attr('href', Constants.newOptionSopUrl).attr('target', '_blank').attr('rel', 'noopener noreferrer')
+              .text('Click to see the SOP for adding new options')))
     }
     if (messages.length) {
       messages[0].css('margin-top', '.25em');

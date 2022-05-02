@@ -103,10 +103,10 @@
   <div class="cell">
     <sec:authorize access="isAuthenticated()">
       <div id="loggedInBanner">
-        <a id="userManualLink" target="_blank">Help</a> |
-        <a href="https://gitter.im/miso-lims/users" target="_blank">Chat</a> |
+        <a id="userManualLink" target="_blank" rel="noopener noreferrer">Help</a> |
+        <a href="https://gitter.im/miso-lims/users" target="_blank" rel="noopener noreferrer">Chat</a> |
         <c:if test="${misoBugUrl != null}">
-          <a href="${misoBugUrl}" target="_blank">Report a problem</a> |
+          <a href="${misoBugUrl}" target="_blank" rel="noopener noreferrer">Report a problem</a> |
         </c:if>
         Logged in as:
         <a href="/miso/myAccount"><b id="currentUser"><sec:authentication property="principal.username"/></b></a>
