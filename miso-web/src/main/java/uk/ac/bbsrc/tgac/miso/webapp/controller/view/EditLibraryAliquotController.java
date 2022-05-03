@@ -122,10 +122,8 @@ public class EditLibraryAliquotController {
         detailed.setNonStandardAlias(detailedLibrary.hasNonStandardAlias());
         detailed.setLibraryDesignCodeId(detailedLibrary.getLibraryDesignCode().getId());
         ParentTissueAttributes tissue = ((DetailedSample) detailedLibrary.getSample()).getTissueAttributes();
-        detailed.setEffectiveTissueOriginAlias(tissue.getTissueOrigin().getAlias());
-        detailed.setEffectiveTissueOriginDescription(tissue.getTissueOrigin().getDescription());
-        detailed.setEffectiveTissueTypeAlias(tissue.getTissueType().getAlias());
-        detailed.setEffectiveTissueTypeDescription(tissue.getTissueType().getDescription());
+        setEffectiveAttributes(detailed, detailedLibrary, tissue);
+
         dto = detailed;
       } else {
         dto = new LibraryAliquotDto();
@@ -171,6 +169,20 @@ public class EditLibraryAliquotController {
     }
   }
 
+  protected static void setEffectiveAttributes(DetailedLibraryAliquotDto aliquot, GroupIdentifiable parent,
+      ParentTissueAttributes tissue) {
+    aliquot.setEffectiveTissueOriginAlias(tissue.getTissueOrigin().getAlias());
+    aliquot.setEffectiveTissueOriginDescription(tissue.getTissueOrigin().getDescription());
+    aliquot.setEffectiveTissueTypeAlias(tissue.getTissueType().getAlias());
+    aliquot.setEffectiveTissueTypeDescription(tissue.getTissueType().getDescription());
+
+    GroupIdentifiable effective = parent.getEffectiveGroupIdEntity();
+    if (effective != null) {
+      aliquot.setEffectiveGroupId(effective.getGroupId());
+      aliquot.setEffectiveGroupIdSample(effective.getAlias());
+    }
+  }
+
   private final class BulkPropagateAliquotBackend extends BulkPropagateTableBackend<LibraryAliquot, LibraryAliquotDto> {
 
     private final BoxDto newBox;
@@ -190,10 +202,8 @@ public class EditLibraryAliquotController {
         detailed.setNonStandardAlias(detailedParent.isNonStandardAlias());
         detailed.setLibraryDesignCodeId(detailedParent.getLibraryDesignCode().getId());
         ParentTissueAttributes tissue = ((DetailedSample) detailedParent.getLibrary().getSample()).getTissueAttributes();
-        detailed.setEffectiveTissueOriginAlias(tissue.getTissueOrigin().getAlias());
-        detailed.setEffectiveTissueOriginDescription(tissue.getTissueOrigin().getDescription());
-        detailed.setEffectiveTissueTypeAlias(tissue.getTissueType().getAlias());
-        detailed.setEffectiveTissueTypeDescription(tissue.getTissueType().getDescription());
+        setEffectiveAttributes(detailed, detailedParent, tissue);
+
         dto = detailed;
       } else {
         dto = new LibraryAliquotDto();
