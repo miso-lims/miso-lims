@@ -1,1 +1,0 @@
-Security vulnerabilities involving external links

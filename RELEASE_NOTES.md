@@ -7,6 +7,26 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.43.3] - 2022-05-05
+
+### Fixed
+
+* Security vulnerabilities involving external links
+* Pattern used when generating pool barcodes automatically
+* Security vulnerabilities related to the session cookie
+* Corresponding field not displaying correctly on Edit QC Type page, which
+  could also lead to accidentally saving "NONE" instead of the previously saved
+  value
+* Effective group ID was not displayed correctly on the Create Library Aliquots
+  page
+
+### Upgrade Notes
+
+* SSL (HTTPS) is now required for MISO logins to function correctly over a
+  network. HTTP can only be used for localhost connections
+  (development/testing)
+
+
 ## [1.43.2] - 2022-04-07
 
 ### Fixed
