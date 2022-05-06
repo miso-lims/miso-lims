@@ -382,6 +382,9 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
 
   @Override
   public Set<Long> getChildIds(Collection<Long> parentIds, String targetSampleCategory) throws IOException {
+    if (parentIds == null || parentIds.isEmpty()) {
+      return Collections.emptySet();
+    }
     Set<Long> output = new HashSet<>();
     @SuppressWarnings("unchecked")
     List<Object[]> results = currentSession().createCriteria(SampleImpl.class)

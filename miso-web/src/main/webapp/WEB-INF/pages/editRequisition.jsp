@@ -89,15 +89,17 @@
     
     Utils.ui.updateHelpLink(FormTarget.requisition.getUserManualUrl());
 
-    $.ajax({
-      url: Urls.rest.requisitions.listRunLibraries(${requisition.id}),
-      dataType: 'json'
-    }).success(function(data) {
-      $('#list_runLibraries').empty();
-      FormUtils.setTableData(ListTarget.runaliquot, {requisitionId: ${requisition.id}}, 'list_runLibraries', data);
-    }).fail(function() {
-      Utils.showOkDialog('Error', ['Failed to load run-libraries']);
-    });
+    if ('${pageMode}' === 'edit') {
+      $.ajax({
+        url: Urls.rest.requisitions.listRunLibraries(${requisition.id}),
+        dataType: 'json'
+      }).success(function(data) {
+        $('#list_runLibraries').empty();
+        FormUtils.setTableData(ListTarget.runaliquot, {requisitionId: ${requisition.id}}, 'list_runLibraries', data);
+      }).fail(function() {
+        Utils.showOkDialog('Error', ['Failed to load run-libraries']);
+      });
+    }
   });
 </script>
 
