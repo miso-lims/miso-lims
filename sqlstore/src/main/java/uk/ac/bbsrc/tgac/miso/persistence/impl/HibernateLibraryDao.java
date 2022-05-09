@@ -209,6 +209,9 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
         .add(Restrictions.eq("requisition.id", requisitionId))
         .setProjection(Projections.property("id"))
         .list();
+    if (requisitionSampleIds.isEmpty()) {
+      return Collections.emptyList();
+    }
 
     Set<Long> aliquotSampleIds = sampleStore.getChildIds(requisitionSampleIds, SampleAliquot.CATEGORY_NAME);
 
