@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
@@ -13,6 +14,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.persistence.SaveDao;
 
+@Transactional(rollbackFor = Exception.class)
 public abstract class AbstractSaveService<T extends Identifiable> implements SaveService<T> {
 
   public abstract SaveDao<T> getDao();
