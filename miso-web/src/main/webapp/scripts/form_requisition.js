@@ -31,7 +31,7 @@ FormTarget.requisition = (function() {
           type: 'text',
           data: 'alias',
           required: true,
-          maxLength: 50,
+          maxLength: 150,
           description: 'Should usually match the identifier of a requisition form stored in a separate system'
         }, {
           title: 'Assay',
