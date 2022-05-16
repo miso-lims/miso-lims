@@ -18,6 +18,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.AssayService;
 import uk.ac.bbsrc.tgac.miso.core.service.RequisitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.persistence.RequisitionDao;
@@ -133,6 +134,29 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
     authorizationManager.throwIfNonAdminOrMatchingOwner(deleteNote.getOwner());
     managed.getNotes().remove(deleteNote);
     requisitionDao.update(managed);
+  }
+
+  @Override
+  public Requisition moveToRequisition(Requisition template, List<Sample> samples)
+      throws IOException {
+    Requisition existing = null;
+    if (template.isSaved()) {
+      existing = get(template.getId());
+    } else {
+      existing = getByAlias(template.getAlias());
+      if (existing != null) {
+        throw new ValidationException(ValidationError.forDuplicate("requisition", "alias"));
+      }
+      long savedId = create(template);
+      existing = get(savedId);
+    }
+    final Requisition requisition = existing;
+    for (Sample sample : samples) {
+      Sample managedSample = sampleService.get(sample.getId());
+      managedSample.setRequisition(requisition);
+      sampleService.save(managedSample);
+    }
+    return requisition;
   }
 
 }

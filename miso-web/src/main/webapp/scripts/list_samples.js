@@ -29,6 +29,12 @@ ListTarget.sample = (function() {
         actions.unshift({
           name: 'Remove',
           action: samplesUpdateFunction(Urls.rest.requisitions.removeSamples(config.requisitionId))
+        }, {
+          name: 'Move to Req.',
+          action: function(items) {
+            showMoveToRequisitionDialog(items, config.requisitionId, config.requisition.alias,
+                config.requisition.assayId);
+          }
         });
       }
 
@@ -244,15 +250,124 @@ ListTarget.sample = (function() {
             Utils.showOkDialog('Error', ['Unexpected operation status. The save may still be in progress or completed.']);
           }
       };
-      var errorCallback = function(response, textStatus, errorThrown, startedOk) {
-        var message = startedOk
-            ? 'Failed to check operation status. The save may still be in progress or completed.'
-            : 'Save Failed.';
-        Utils.showAjaxErrorDialog(response, textStatus, message);
-      };
       Utils.saveWithProgressDialog('POST', saveUrl, items.map(Utils.array.getId),
-          Urls.rest.requisitions.samplesUpdateProgress, callback, errorCallback);
+          Urls.rest.requisitions.samplesUpdateProgress, callback);
     };
+  }
+
+  function showMoveToRequisitionDialog(samples, sourceRequisitionId, sourceRequisitionAlias, sourceRequisitionAssayId) {
+    var actions = [{
+      name: 'Stop',
+      handler: function() {
+        var suggestedAlias = sourceRequisitionAlias + ' - STOPPED';
+        checkExistingRequisitions(sourceRequisitionId, suggestedAlias, sourceRequisitionAssayId, true, samples);
+      }
+    }, {
+      name: 'Change Assay',
+      handler: function() {
+        var fields = [makeAssayField(sourceRequisitionAssayId)];
+        Utils.showDialog('Choose assay', 'Continue', fields, function(results) {
+          var suggestedAlias = sourceRequisitionAlias + ' - ' + results.assay.alias;
+          checkExistingRequisitions(sourceRequisitionId, suggestedAlias, results.assay.id, false, samples);
+        });
+      }
+    }, {
+      name: 'Other',
+      handler: function() {
+        var suggestedAlias = sourceRequisitionAlias + ' - ';
+        var fields = [{
+          label: 'Requisition Alias',
+          property: 'alias',
+          type: 'text',
+          required: true,
+          value: suggestedAlias
+        }];
+        Utils.showDialog('Move to Another Requisition', 'Continue', fields, function(results) {
+          checkExistingRequisitions(sourceRequisitionId, results.alias, sourceRequisitionAssayId, false, samples);
+        })
+      }
+    }];
+    Utils.showWizardDialog('Move to Another Requisition', actions, 'Purpose of move:');
+  }
+
+  function checkExistingRequisitions(sourceRequisitionId, suggestedAlias, assayId, stopped, samples) {
+    var url = Urls.rest.requisitions.search + '?' + $.param({
+      q: suggestedAlias
+    });
+    var callback = function(data) {
+      if (data.length) {
+        var options = data.map(function(existing) {
+          return {
+            name: existing.alias,
+            handler: function() {
+              moveToRequisition(sourceRequisitionId, existing.alias, existing.assayId, existing.stopped, samples,
+                  existing.id);
+            }
+          };
+        });
+        options.push({
+          name: 'New Requisition',
+          handler: function() {
+            showNewRequisitionDialog(sourceRequisitionId, suggestedAlias, assayId, stopped, samples);
+          }
+        });
+        Utils.showWizardDialog('Move to Another Requisition', options);
+      } else {
+        showNewRequisitionDialog(sourceRequisitionId, suggestedAlias, assayId, stopped, samples);
+      }
+    };
+    Utils.ajaxWithDialog('Checking for existing requisition', 'GET', url, null, callback);
+  }
+
+  function showNewRequisitionDialog(sourceRequisitionId, suggestedAlias, assayId, stopped, samples) {
+    var fields = [{
+      label: 'Alias',
+      property: 'alias',
+      type: 'text',
+      required: true,
+      value: suggestedAlias
+    }, makeAssayField(assayId), {
+      label: 'Stopped',
+      property: 'stopped',
+      type: 'checkbox',
+      value: stopped
+    }];
+    Utils.showDialog('Move to New Requisition', 'Create and Move', fields, function(results) {
+      moveToRequisition(sourceRequisitionId, results.alias, results.assay.id, results.stopped, samples);
+    });
+  }
+
+  function moveToRequisition(sourceRequisitionId, targetAlias, assayId, stopped, samples, existingRequisitionId) {
+    var data = {
+      requisitionId: existingRequisitionId,
+      requisitionAlias: targetAlias,
+      assayId: assayId,
+      stopped: stopped,
+      sampleIds: samples.map(Utils.array.getId)
+    }
+    var callback = function(data) {
+      Utils.page.pageRedirect(Urls.ui.requisitions.edit(data.id));
+    };
+    Utils.ajaxWithDialog('Moving Samples', 'POST', Urls.rest.requisitions.moveSamples(sourceRequisitionId), data, callback);
+  }
+
+  function makeAssayField(selectedAssayId) {
+    var selectedAssay = selectedAssayId
+        ? Utils.array.findUniqueOrThrow(Utils.array.idPredicate(selectedAssayId), Constants.assays)
+        : null;
+    return {
+      label: 'Assay',
+      property: 'assay',
+      type: 'select',
+      required: false,
+      values: Constants.assays.filter(function(item) {
+        return !item.archived || item.id === selectedAssayId;
+      }),
+      getLabel: function(item) {
+        return item.alias + ' v' + item.version;
+      },
+      value: selectedAssay ? (selectedAssay.alias + ' v' + selectedAssay.version) : undefined
+    }
   }
 
 })();

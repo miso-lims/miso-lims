@@ -58,7 +58,8 @@
       
       <miso:attachments item="${requisition}"/>
       <miso:qcs id="list_qc" item="${requisition}"/>
-      <miso:list-section-ajax id="list_samples" name="Requisitioned Samples" target="sample" config="{requisitionId: ${requisition.id}}"/>
+      <miso:list-section-ajax id="list_samples" name="Requisitioned Samples" target="sample"
+          config="{requisitionId: ${requisition.id}, requisition: ${requisitionDto}}"/>
       <br>
       <c:if test="${detailedSample}">
         <miso:list-section id="list_extractions" name="Extractions" target="sample" items="${extractions}"/>

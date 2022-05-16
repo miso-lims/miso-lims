@@ -53,6 +53,14 @@ also be used to perform other actions on the samples.
 Farther down the page, there are more lists showing all of the derived samples (if you are using detailed sample mode),
 libraries, library aliquots, and runs. At the very bottom of the page is the requisition's change log.
 
+### Moving Samples to Another Requisition
+
+There may be cases where you need to split samples from one requisition into separate ones. For example, you may want
+to change the assay for some of the samples, but not others. To do this, go to the Edit Requisition page, select the
+samples you wish to separate from the Requisitioned Samples list, and click the "Move to Req." button at the top of the
+table. Follow the prompts in the dialog to choose the purpose of the move, and either find an existing requisition or
+create a new one to move the samples to.
+
 ### Attaching Files
 
 You can attach any type and number of files to a requisition. This feature might be used to attach QC output, reports,

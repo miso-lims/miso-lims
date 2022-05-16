@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.RequisitionService;
@@ -99,6 +100,10 @@ public class RequisitionRestController extends RestController {
   @PostMapping("/{requisitionId}/samples")
   public @ResponseBody ObjectNode addSamples(@PathVariable long requisitionId, @RequestBody List<Long> ids) throws IOException {
     Requisition requisition = RestUtils.retrieve(TYPE_LABEL, requisitionId, requisitionService, Status.NOT_FOUND);
+    return addSamples(requisition, ids);
+  }
+
+  private ObjectNode addSamples(Requisition requisition, List<Long> ids) throws IOException {
     List<Sample> samples = new ArrayList<>();
     for (Long id : ids) {
       Sample sample = RestUtils.retrieve("Sample", id, sampleService, Status.BAD_REQUEST);
@@ -143,6 +148,37 @@ public class RequisitionRestController extends RestController {
     List<Long> libraryIds = libraryService.listIdsByRequisitionId(requisitionId);
     List<RunPartitionAliquot> runLibraries = runPartitionAliquotService.listByLibraryIdList(libraryIds);
     return runLibraries.stream().map(Dtos::asDto).collect(Collectors.toList());
+  }
+
+  public static class MoveSamplesRequest {
+    public Long requisitionId;
+    public String requisitionAlias;
+    public Long assayId;
+    public boolean stopped;
+    public List<Long> sampleIds;
+  }
+
+  @PostMapping("/{requisitionId}/samples/move")
+  public @ResponseBody RequisitionDto moveSamples(@PathVariable long requisitionId,
+      @RequestBody MoveSamplesRequest request) throws IOException {
+    List<Sample> samples = new ArrayList<>();
+    for (Long id : request.sampleIds) {
+      Sample sample = RestUtils.retrieve("Sample", id, sampleService, Status.BAD_REQUEST);
+      samples.add(sample);
+    }
+    Requisition requisition = null;
+    if (request.requisitionId != null) {
+      requisition = RestUtils.retrieve("Requisition", request.requisitionId, requisitionService, Status.BAD_REQUEST);
+    } else {
+      requisition = new Requisition();
+      requisition.setAlias(request.requisitionAlias);
+      Assay assay = new Assay();
+      assay.setId(request.assayId);
+      requisition.setAssay(assay);
+      requisition.setStopped(request.stopped);
+    }
+    Requisition saved = requisitionService.moveToRequisition(requisition, samples);
+    return RequisitionDto.from(saved);
   }
 
 }
