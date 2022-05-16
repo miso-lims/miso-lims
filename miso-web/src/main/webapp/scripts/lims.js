@@ -718,6 +718,13 @@ var Utils = Utils
       },
       
       saveWithProgressDialog: function(requestMethod, saveUrl, data, makeProgressUrl, callback, errorCallback) {
+        errorCallback = errorCallback || function(response, textStatus, errorThrown, startedOk) {
+          var message = startedOk
+              ? 'Failed to check operation status. The save may still be in progress or completed.'
+              : 'Save Failed.';
+          Utils.showAjaxErrorDialog(response, textStatus, message);
+        }
+
         var dialogArea = $('#dialog');
         dialogArea.empty();
         dialogArea.append($('<p>').text('Processed ').append($('<span>').attr('id', 'dialogProgressText').text('0/' + data.length)));

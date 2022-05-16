@@ -764,6 +764,7 @@ Urls = (function() {
     update: idUrlFunction(requisitionRestBase),
     addSamples: middleIdUrlFunction(requisitionRestBase, '/samples'),
     removeSamples: middleIdUrlFunction(requisitionRestBase, '/samples/remove'),
+    moveSamples: middleIdUrlFunction(requisitionRestBase, '/samples/move'),
     samplesUpdateProgress: idUrlFunction(requisitionRestBase + '/samplesupdate'),
     search: requisitionRestBase + '/search',
     listRunLibraries: middleIdUrlFunction(requisitionRestBase, '/runlibraries')
