@@ -39,6 +39,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
+import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPageWithAuthorization;
 
 @Controller
 public class ListExperimentsController {
@@ -47,24 +48,18 @@ public class ListExperimentsController {
   private ExperimentService experimentService;
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private ObjectMapper mapper;
 
   @ModelAttribute("title")
   public String title() {
     return "Experiments";
   }
 
-  private final ListItemsPage listExperimentsPage = new ListItemsPage("experiment") {
-
-    @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-      config.put("isAdmin", authorizationManager.isAdminUser());
-    }
-
-  };
-
   @RequestMapping("/experiments")
   public ModelAndView listExperiments(ModelMap model) throws IOException {
-    return listExperimentsPage.list(model, experimentService.list().stream().map(Dtos::asDto));
+    ListItemsPage listPage = new ListItemsPageWithAuthorization("experiment", authorizationManager, mapper);
+    return listPage.list(model, experimentService.list().stream().map(Dtos::asDto));
   }
 
 }

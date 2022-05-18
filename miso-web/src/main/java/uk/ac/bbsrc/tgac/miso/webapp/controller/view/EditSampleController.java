@@ -103,8 +103,6 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 @RequestMapping("/sample")
 public class EditSampleController {
 
-  private final ObjectMapper mapper = new ObjectMapper();
-
   @Autowired
   private ProjectService projectService;
   @Autowired
@@ -131,6 +129,8 @@ public class EditSampleController {
   private AuthorizationManager authorizationManager;
   @Autowired
   private IndexChecker indexChecker;
+  @Autowired
+  private ObjectMapper mapper;
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
@@ -284,7 +284,7 @@ public class EditSampleController {
   @PostMapping(value = "/bulk/edit")
   public ModelAndView editBulkSamples(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
     String sampleIds = getStringInput("ids", form, true);
-    return new BulkEditSampleBackend().edit(sampleIds, model);
+    return new BulkEditSampleBackend(mapper).edit(sampleIds, model);
   }
 
   /**
@@ -306,7 +306,7 @@ public class EditSampleController {
 
     Set<Group> recipientGroups = authorizationManager.getCurrentUser().getGroups();
     BulkPropagateSampleBackend bulkPropagateSampleBackend = new BulkPropagateSampleBackend(targetCategory,
-        (boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null), recipientGroups);
+        (boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null), recipientGroups, mapper);
     return bulkPropagateSampleBackend.propagate(parentIds, replicates, model);
   }
 
@@ -350,7 +350,8 @@ public class EditSampleController {
 
     Set<Group> recipientGroups = authorizationManager.getCurrentUser().getGroups();
 
-    return new BulkCreateSampleBackend(template.getClass(), template, quantity, project, targetCategory, recipientGroups).create(model);
+    return new BulkCreateSampleBackend(template.getClass(), template, quantity, project, targetCategory,
+        recipientGroups, mapper).create(model);
   }
 
   private void confirmClassesExist(String targetCategory) throws IOException {
@@ -381,8 +382,8 @@ public class EditSampleController {
   private final class BulkEditSampleBackend extends BulkEditTableBackend<Sample, SampleDto> {
     private String targetCategory = null;
 
-    private BulkEditSampleBackend() {
-      super("sample", SampleDto.class, "Samples");
+    private BulkEditSampleBackend(ObjectMapper mapper) {
+      super("sample", SampleDto.class, "Samples", mapper);
     }
 
     @Override
@@ -432,8 +433,9 @@ public class EditSampleController {
     private final BoxDto newBox;
     private final Set<Group> recipientGroups;
 
-    private BulkPropagateSampleBackend(String targetCategory, BoxDto newBox, Set<Group> recipientGroups) {
-      super("sample", SampleDto.class, "Samples", "Samples");
+    private BulkPropagateSampleBackend(String targetCategory, BoxDto newBox, Set<Group> recipientGroups,
+        ObjectMapper mapper) {
+      super("sample", SampleDto.class, "Samples", "Samples", mapper);
       this.targetCategory = targetCategory;
       this.newBox = newBox;
       this.recipientGroups = recipientGroups;
@@ -517,8 +519,8 @@ public class EditSampleController {
     private final Set<Group> recipientGroups;
 
     public BulkCreateSampleBackend(Class<? extends SampleDto> dtoClass, SampleDto dto, Integer quantity, Project project,
-        String targetCategory, Set<Group> recipientGroups) {
-      super("sample", dtoClass, "Samples", dto, quantity);
+        String targetCategory, Set<Group> recipientGroups, ObjectMapper mapper) {
+      super("sample", dtoClass, "Samples", dto, quantity, mapper);
       this.targetCategory = targetCategory;
       this.project = project;
       box = dto.getBox();
@@ -546,7 +548,7 @@ public class EditSampleController {
 
   @GetMapping("/{id}/qc-hierarchy")
   public ModelAndView getQcHierarchy(@PathVariable long id, ModelMap model) throws IOException {
-    return MisoWebUtils.getQcHierarchy("Sample", id, qcNodeService::getForSample, model);
+    return MisoWebUtils.getQcHierarchy("Sample", id, qcNodeService::getForSample, model, mapper);
   }
 
 }

@@ -65,6 +65,8 @@ public class EditInstrumentController {
   private ServiceRecordService serviceRecordService;
   @Autowired
   private WorkstationService workstationService;
+  @Autowired
+  private ObjectMapper mapper;
 
   public void setInstrumentService(InstrumentService instrumentService) {
     this.instrumentService = instrumentService;
@@ -101,7 +103,6 @@ public class EditInstrumentController {
       }
     }
 
-    ObjectMapper mapper = new ObjectMapper();
     model.put("instrument", instrument);
     model.put("instrumentDto", mapper.writeValueAsString(instrumentDto));
 

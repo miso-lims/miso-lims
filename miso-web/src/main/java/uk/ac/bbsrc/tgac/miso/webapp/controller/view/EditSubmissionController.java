@@ -60,6 +60,8 @@ public class EditSubmissionController {
   private SubmissionService submissionService;
   @Autowired
   private ExperimentService experimentService;
+  @Autowired
+  private ObjectMapper mapper;
 
   @GetMapping(value = "/new")
   public ModelAndView newSubmission(@QueryParam("experimentIds") String experimentIds, ModelMap model) throws IOException {
@@ -79,7 +81,6 @@ public class EditSubmissionController {
   private ModelAndView setupForm(Submission submission, String title, ModelMap model) throws JsonProcessingException {
     model.put("title", title);
     model.put("submission", submission);
-    ObjectMapper mapper = new ObjectMapper();
     model.put("submissionDto", mapper.writeValueAsString(Dtos.asDto(submission)));
     model.put("experiments", submission.getExperiments().stream().map(expt -> Dtos.asDto(expt))
         .collect(Collectors.toList()));

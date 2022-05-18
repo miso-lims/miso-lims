@@ -59,6 +59,8 @@ public class EditUserController {
   private UserService userService;
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private ObjectMapper mapper;
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
@@ -110,8 +112,6 @@ public class EditUserController {
   private ModelAndView setupForm(User user, ModelMap model) throws IOException {
     model.put("title", user.isSaved() ? ("User " + user.getId()) : "New User");
     model.put("user", user);
-
-    ObjectMapper mapper = new ObjectMapper();
     model.put("userDto", mapper.writeValueAsString(Dtos.asDto(user)));
 
     if (user.isSaved()) {

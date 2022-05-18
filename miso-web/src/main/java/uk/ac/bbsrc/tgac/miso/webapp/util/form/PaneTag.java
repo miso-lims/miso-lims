@@ -18,6 +18,8 @@ package uk.ac.bbsrc.tgac.miso.webapp.util.form;
 
 import java.util.Collection;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.servlet.tags.RequestContextAwareTag;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,7 +42,7 @@ public class PaneTag extends RequestContextAwareTag {
     if (items.size() == 0 && !alwaysShow) {
       return SKIP_BODY;
     }
-    ObjectMapper mapper = new ObjectMapper();
+    ObjectMapper mapper = TagUtils.getObjectMapper(pageContext);
 
     pageContext.getOut().append(String.format(
         "<div id='%1$s'></div><script type='text/javascript'>jQuery(document).ready(function () { Pane.createPane('%1$s', PaneTarget.%2$s, %3$s);});</script>",

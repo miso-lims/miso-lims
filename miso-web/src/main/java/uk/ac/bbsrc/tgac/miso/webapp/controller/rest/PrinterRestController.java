@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response.Status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -175,21 +176,20 @@ public class PrinterRestController extends RestController {
 
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
-
   @Autowired
   private AuthorizationManager authorizationManager;
-
   @Autowired
   private BoxService boxService;
-
   @Autowired
   private ContainerService containerService;
+  @Autowired
+  private ObjectMapper mapper;
 
   private final JQueryDataTableBackend<Printer, PrinterDto> jQueryBackend = new JQueryDataTableBackend<Printer, PrinterDto>() {
 
     @Override
     protected PrinterDto asDto(Printer model) {
-      return Dtos.asDto(model);
+      return Dtos.asDto(model, mapper);
     }
 
     @Override
@@ -253,7 +253,7 @@ public class PrinterRestController extends RestController {
   @ResponseBody
   @ResponseStatus(code = HttpStatus.CREATED)
   public PrinterDto create(@RequestBody PrinterDto dto) throws IOException {
-    Printer printer = Dtos.to(dto);
+    Printer printer = Dtos.to(dto, mapper);
     return get(printerService.create(printer));
   }
 
@@ -303,7 +303,7 @@ public class PrinterRestController extends RestController {
     if (printer == null) {
       throw new RestException("No printer found with ID: " + printerId, Status.NOT_FOUND);
     }
-    return Dtos.asDto(printer);
+    return Dtos.asDto(printer, mapper);
   }
 
   @GetMapping(value = "{printerId}/layout", headers = { "Content-type=application/json" })
@@ -320,7 +320,9 @@ public class PrinterRestController extends RestController {
   @GetMapping(headers = { "Content-type=application/json" })
   @ResponseBody
   public List<PrinterDto> list() throws IOException {
-    return printerService.list(0, 0, true, "id").stream().map(Dtos::asDto).collect(Collectors.toList());
+    return printerService.list(0, 0, true, "id").stream()
+        .map(printer -> Dtos.asDto(printer, mapper))
+        .collect(Collectors.toList());
   }
 
   private Barcodable loadBarcodable(Entry<String, BoxPosition> e) throws IOException {

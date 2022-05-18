@@ -30,10 +30,12 @@ public class InstrumentModelsController {
   private InstrumentModelService instrumentModelService;
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private ObjectMapper mapper;
 
   @GetMapping("/list")
   public ModelAndView list(ModelMap model) throws IOException {
-    return new ListItemsPageWithAuthorization("instrumentmodel", () -> this.authorizationManager).list(model);
+    return new ListItemsPageWithAuthorization("instrumentmodel", authorizationManager, mapper).list(model);
   }
 
   @GetMapping("/new")
@@ -58,7 +60,6 @@ public class InstrumentModelsController {
 
   private ModelAndView instrumentModelPage(InstrumentModel instrumentModel, ModelMap model) throws JsonProcessingException {
     InstrumentModelDto dto = Dtos.asDto(instrumentModel);
-    ObjectMapper mapper = new ObjectMapper();
     model.put("modelDto", mapper.writeValueAsString(dto));
     return new ModelAndView("/WEB-INF/pages/editInstrumentModel.jsp", model);
   }

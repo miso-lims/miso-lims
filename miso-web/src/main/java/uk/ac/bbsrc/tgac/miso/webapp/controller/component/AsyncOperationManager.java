@@ -45,6 +45,8 @@ public class AsyncOperationManager {
   private AuthorizationManager authorizationManager;
   @Autowired
   private ConstantsController constantsController;
+  @Autowired
+  private ObjectMapper mapper;
 
   private final ConcurrentHashMap<String, BulkSaveOperation<?>> asyncOperations = new ConcurrentHashMap<>();
 
@@ -197,11 +199,11 @@ public class AsyncOperationManager {
     }
   }
 
-  private static ObjectNode makeRunningProgress(String uuid, BulkSaveOperation<?> operation) {
+  private ObjectNode makeRunningProgress(String uuid, BulkSaveOperation<?> operation) {
     return makeBaseProgress(uuid, operation, "running");
   }
 
-  private static <T> ObjectNode makeCompletedProgress(String uuid, BulkSaveOperation<?> operation, List<T> dtos) {
+  private <T> ObjectNode makeCompletedProgress(String uuid, BulkSaveOperation<?> operation, List<T> dtos) {
     ObjectNode json = makeBaseProgress(uuid, operation, "completed");
     if (dtos != null) {
       json.putPOJO("data", dtos);
@@ -209,7 +211,7 @@ public class AsyncOperationManager {
     return json;
   }
 
-  private static ObjectNode makeFailedProgress(String uuid, BulkSaveOperation<?> operation) {
+  private ObjectNode makeFailedProgress(String uuid, BulkSaveOperation<?> operation) {
     ObjectNode json = makeBaseProgress(uuid, operation, "failed");
     if (operation.getException() instanceof BulkValidationException) {
       BulkValidationException bulkValidation = (BulkValidationException) operation.getException();
@@ -221,8 +223,7 @@ public class AsyncOperationManager {
     return json;
   }
 
-  private static ObjectNode makeBaseProgress(String uuid, BulkSaveOperation<?> operation, String status) {
-    ObjectMapper mapper = new ObjectMapper();
+  private ObjectNode makeBaseProgress(String uuid, BulkSaveOperation<?> operation, String status) {
     ObjectNode json = mapper.createObjectNode();
     json.put("operationId", uuid);
     json.put("status", status);

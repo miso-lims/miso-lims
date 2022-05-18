@@ -2897,7 +2897,7 @@ public class Dtos {
     return dto;
   }
 
-  public static PrinterDto asDto(@Nonnull Printer from) {
+  public static PrinterDto asDto(@Nonnull Printer from, @Nonnull ObjectMapper mapper) {
     PrinterDto dto = new PrinterDto();
     dto.setId(from.getId());
     dto.setAvailable(from.isEnabled());
@@ -2907,7 +2907,7 @@ public class Dtos {
     dto.setHeight(from.getHeight());
     dto.setWidth(from.getWidth());
     try {
-      dto.setLayout(new ObjectMapper().readValue(from.getLayout(), ArrayNode.class));
+      dto.setLayout(mapper.readValue(from.getLayout(), ArrayNode.class));
     } catch (IOException e) {
       log.error("Corrupt printer contents", e);
     }
@@ -2915,13 +2915,13 @@ public class Dtos {
     return dto;
   }
 
-  public static Printer to(@Nonnull PrinterDto dto) throws JsonProcessingException {
+  public static Printer to(@Nonnull PrinterDto dto, @Nonnull ObjectMapper mapper) throws JsonProcessingException {
     Printer to = new Printer();
     to.setId(dto.getId());
     to.setBackend(Backend.valueOf(dto.getBackend()));
-    to.setConfiguration(new ObjectMapper().writeValueAsString(dto.getConfiguration()));
+    to.setConfiguration(mapper.writeValueAsString(dto.getConfiguration()));
     to.setDriver(Driver.valueOf(dto.getDriver()));
-    to.setLayout(new ObjectMapper().writeValueAsString(dto.getLayout()));
+    to.setLayout(mapper.writeValueAsString(dto.getLayout()));
     to.setHeight(dto.getHeight());
     to.setWidth(dto.getWidth());
     to.setEnabled(dto.isAvailable());

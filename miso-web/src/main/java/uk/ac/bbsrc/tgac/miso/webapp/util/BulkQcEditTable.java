@@ -16,8 +16,9 @@ public class BulkQcEditTable extends BulkQcTable {
 
   private final int addControls;
 
-  public BulkQcEditTable(QcTarget qcTarget, QualityControlService qcService, InstrumentService instrumentService, int addControls) {
-    super(qcTarget, false, qcService, instrumentService, "Edit");
+  public BulkQcEditTable(QcTarget qcTarget, QualityControlService qcService, InstrumentService instrumentService,
+      int addControls, ObjectMapper mapper) {
+    super(qcTarget, false, qcService, instrumentService, "Edit", mapper);
     this.addControls = addControls;
   }
 

@@ -48,6 +48,8 @@ public class EditBoxController {
 
   @Autowired
   private BoxService boxService;
+  @Autowired
+  private ObjectMapper mapper;
 
   public void setBoxService(BoxService boxService) {
     this.boxService = boxService;
@@ -73,13 +75,13 @@ public class EditBoxController {
   public ModelAndView newBoxes(@RequestParam("quantity") Integer quantity, ModelMap model) throws IOException {
     if (quantity == null || quantity <= 0) throw new RestException("Must specify quantity of boxes to create", Status.BAD_REQUEST);
 
-    return new BulkCreateBoxBackend(quantity).create(model);
+    return new BulkCreateBoxBackend(quantity, mapper).create(model);
   }
 
   @PostMapping(value = "/bulk/edit")
   public ModelAndView editBoxes(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
     String boxIds = getStringInput("ids", form, true);
-    return new BulkEditBoxBackend().edit(boxIds, model);
+    return new BulkEditBoxBackend(mapper).edit(boxIds, model);
   }
 
   @GetMapping(value = "/new")
@@ -106,15 +108,14 @@ public class EditBoxController {
 
     // add JSON
     Collection<BoxableView> contents = boxService.getBoxContents(box.getId());
-    ObjectMapper mapper = new ObjectMapper();
     model.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDtoWithBoxables(box, contents)));
 
     return new ModelAndView("/WEB-INF/pages/editBox.jsp", model);
   }
 
   private final class BulkCreateBoxBackend extends BulkCreateTableBackend<BoxDto> {
-    public BulkCreateBoxBackend(Integer quantity) {
-      super("box", BoxDto.class, "Boxes", new BoxDto(), quantity);
+    public BulkCreateBoxBackend(Integer quantity, ObjectMapper mapper) {
+      super("box", BoxDto.class, "Boxes", new BoxDto(), quantity, mapper);
     }
 
     @Override
@@ -130,8 +131,8 @@ public class EditBoxController {
 
   private final class BulkEditBoxBackend extends BulkEditTableBackend<Box, BoxDto> {
 
-    private BulkEditBoxBackend() {
-      super("box", BoxDto.class, "Boxes");
+    private BulkEditBoxBackend(ObjectMapper mapper) {
+      super("box", BoxDto.class, "Boxes", mapper);
     }
 
     @Override

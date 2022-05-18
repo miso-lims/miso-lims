@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
 import java.io.IOException;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -37,8 +38,11 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.TabbedListItemsPage;
 
 @Controller
 public class ListContainerController {
+
   @Autowired
   private InstrumentModelService instrumentModelService;
+  @Autowired
+  private ObjectMapper mapper;
 
   @ModelAttribute("title")
   public String title() {
@@ -47,6 +51,6 @@ public class ListContainerController {
 
   @RequestMapping("/containers")
   public ModelAndView listContainers(ModelMap model) throws IOException {
-    return TabbedListItemsPage.createForPlatformType("container", instrumentModelService).list(model);
+    return TabbedListItemsPage.createForPlatformType("container", instrumentModelService, mapper).list(model);
   }
 }

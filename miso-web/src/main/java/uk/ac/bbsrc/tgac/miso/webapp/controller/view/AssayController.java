@@ -22,6 +22,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.AssayService;
 import uk.ac.bbsrc.tgac.miso.dto.AssayDto;
 import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
+import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPageWithAuthorization;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
 
@@ -33,20 +34,14 @@ public class AssayController {
   private AssayService assayService;
   @Autowired
   private AuthorizationManager authorizationManager;
-
-  private final ListItemsPage listPage = new ListItemsPage("assay") {
-
-    @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-      config.put("isAdmin", authorizationManager.isAdminUser());
-    }
-
-  };
+  @Autowired
+  private ObjectMapper mapper;
 
   @GetMapping("/list")
   public ModelAndView list(ModelMap model) throws IOException {
     model.put("title", "Assays");
     Stream<AssayDto> dtos = assayService.list().stream().map(AssayDto::from);
+    ListItemsPage listPage = new ListItemsPageWithAuthorization("assay", authorizationManager, mapper);
     return listPage.list(model, dtos);
   }
 
@@ -71,7 +66,6 @@ public class AssayController {
   private ModelAndView setupForm(Assay assay, PageMode pageMode, ModelMap model) throws IOException {
     model.put(PageMode.PROPERTY, pageMode.getLabel());
     model.put("isAdmin", authorizationManager.isAdminUser());
-    ObjectMapper mapper = new ObjectMapper();
     model.put("assayDto", mapper.writeValueAsString(AssayDto.from(assay)));
     model.put("libraryQualificationMethods",
         mapper.writeValueAsString(MisoWebUtils.getLibraryQualificationMethodDtos(mapper)));

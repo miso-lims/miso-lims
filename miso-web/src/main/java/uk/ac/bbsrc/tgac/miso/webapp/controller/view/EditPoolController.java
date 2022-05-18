@@ -116,6 +116,8 @@ public class EditPoolController {
   private IndexChecker indexChecker;
   @Autowired
   private PoolOrderService poolOrderService;
+  @Autowired
+  private ObjectMapper mapper;
 
   public void setRunService(RunService runService) {
     this.runService = runService;
@@ -144,7 +146,6 @@ public class EditPoolController {
     if (pool == null) throw new NotFoundException("No pool found for ID " + poolId.toString());
     PoolDto poolDto = Dtos.asDto(pool, true, false, indexChecker);
     
-    ObjectMapper mapper = new ObjectMapper();
     model.put("pool", pool);
     if (poolId == null) {
       model.put("partitions", Collections.emptyList());
@@ -180,7 +181,7 @@ public class EditPoolController {
   }
 
   private final BulkEditTableBackend<Pool, PoolDto> bulkEditBackend = new BulkEditTableBackend<>(
-      "pool", PoolDto.class, "Pools") {
+      "pool", PoolDto.class, "Pools", mapper) {
 
     @Override
     protected PoolDto asDto(Pool model) {
@@ -216,8 +217,9 @@ public class EditPoolController {
     private final IndexChecker indexChecker;
     private final Boolean strictPools;
 
-    public BulkMergePoolsBackend(BoxDto newBox, PoolService poolService, IndexChecker indexChecker, Boolean strictPools) {
-      super("pool", PoolDto.class);
+    public BulkMergePoolsBackend(BoxDto newBox, PoolService poolService, IndexChecker indexChecker, Boolean strictPools,
+        ObjectMapper mapper) {
+      super("pool", PoolDto.class, mapper);
       this.poolService = poolService;
       this.newBox = newBox;
       this.indexChecker = indexChecker;
@@ -337,7 +339,7 @@ public class EditPoolController {
     Long boxId = getLongInput("boxId", form, false);
     String proportions = getStringInput("proportions", form, true);
     return new BulkMergePoolsBackend((boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null),
-            poolService, indexChecker, strictPools).merge(poolIds, proportions, model);
+        poolService, indexChecker, strictPools, mapper).merge(poolIds, proportions, model);
   }
 
 }

@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -31,10 +32,11 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
 
 public abstract class AbstractTypeDataController<T extends Identifiable, R> {
 
+  @Autowired
+  private ObjectMapper mapper;
+
   private static final String OLD_JSP = "/WEB-INF/pages/handsontables.jsp";
   private static final String NEW_JSP = "/WEB-INF/pages/bulkPage.jsp";
-
-  private final ObjectMapper mapper = new ObjectMapper();
 
   private final String pluralType;
   private final String listTarget;

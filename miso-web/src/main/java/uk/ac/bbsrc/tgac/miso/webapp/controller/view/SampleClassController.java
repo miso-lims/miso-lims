@@ -28,9 +28,10 @@ public class SampleClassController extends AbstractTypeDataController<SampleClas
 
   @Autowired
   private SampleClassService sampleClassService;
-
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private ObjectMapper mapper;
 
   public SampleClassController() {
     super("Sample Classes", "sampleclass", "sampleclass");
@@ -80,7 +81,6 @@ public class SampleClassController extends AbstractTypeDataController<SampleClas
   }
 
   private ModelAndView sampleClassPage(SampleClass sampleClass, ModelMap model) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
     model.put("isAdmin", authorizationManager.isAdminUser());
     model.put("sampleClassDto", mapper.writeValueAsString(Dtos.asDto(sampleClass)));
     return new ModelAndView("/WEB-INF/pages/editSampleClass.jsp", model);

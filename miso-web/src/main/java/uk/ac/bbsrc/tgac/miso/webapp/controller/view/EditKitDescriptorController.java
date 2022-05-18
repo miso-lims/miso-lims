@@ -52,6 +52,8 @@ public class EditKitDescriptorController {
 
   @Autowired
   private KitDescriptorService kitService;
+  @Autowired
+  private ObjectMapper mapper;
 
   public void setKitService(KitDescriptorService kitService) {
     this.kitService = kitService;
@@ -77,7 +79,6 @@ public class EditKitDescriptorController {
     model.put("kitDescriptor", kitDescriptor);
     model.put("associatedTargetedSequencings", Dtos.asTargetedSequencingDtos(kitDescriptor.getTargetedSequencing()));
 
-    ObjectMapper mapper = new ObjectMapper();
     model.put("kitDescriptorDto", mapper.writeValueAsString(Dtos.asDto(kitDescriptor)));
     ArrayNode kitTypes = mapper.createArrayNode();
     for (String item : KitType.getKeys()) {

@@ -56,12 +56,13 @@ public class EditExperimentController {
   private ExperimentService experimentService;
   @Autowired
   private IndexChecker indexChecker;
+  @Autowired
+  private ObjectMapper mapper;
 
   @GetMapping(value = "/{experimentId}")
   public ModelAndView setupForm(@PathVariable Long experimentId, ModelMap model) throws IOException {
     Experiment experiment = experimentService.get(experimentId);
     if (experiment == null) throw new NotFoundException("No experiment found for ID " + experimentId.toString());
-    ObjectMapper mapper = new ObjectMapper();
     ObjectNode consumableConfig = mapper.createObjectNode();
     consumableConfig.put("experimentId", experiment.getId());
     Stream

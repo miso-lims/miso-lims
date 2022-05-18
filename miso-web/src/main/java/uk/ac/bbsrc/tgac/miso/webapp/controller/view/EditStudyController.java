@@ -52,6 +52,8 @@ public class EditStudyController {
   private ProjectService projectService;
   @Autowired
   private StudyService studyService;
+  @Autowired
+  private ObjectMapper mapper;
 
   public void setProjectService(ProjectService projectService) {
     this.projectService = projectService;
@@ -84,8 +86,6 @@ public class EditStudyController {
   private ModelAndView setupForm(Study study, ModelMap model) throws IOException {
     model.put("title", study.isSaved() ? ("Study " + study.getId()) : "New Study");
     model.put("study", study);
-
-    ObjectMapper mapper = new ObjectMapper();
     model.put("studyDto", mapper.writeValueAsString(Dtos.asDto(study)));
     model.put("projects", mapper.writeValueAsString(projectService.list().stream()
         .map(Dtos::asDto)

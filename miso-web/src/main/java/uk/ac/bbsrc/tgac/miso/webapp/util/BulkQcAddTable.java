@@ -17,9 +17,9 @@ public class BulkQcAddTable extends BulkQcTable {
   private final int replicates;
   private final int controls;
 
-  public BulkQcAddTable(QcTarget qcTarget, QualityControlService qcService, InstrumentService instrumentService, int replicates,
-      int controls) {
-    super(qcTarget, true, qcService, instrumentService, "Add");
+  public BulkQcAddTable(QcTarget qcTarget, QualityControlService qcService, InstrumentService instrumentService,
+      int replicates, int controls, ObjectMapper mapper) {
+    super(qcTarget, true, qcService, instrumentService, "Add", mapper);
     this.replicates = replicates;
     this.controls = controls;
   }

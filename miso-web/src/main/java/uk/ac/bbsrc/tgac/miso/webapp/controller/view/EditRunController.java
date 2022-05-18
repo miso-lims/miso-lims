@@ -35,6 +35,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import com.fasterxml.jackson.core.SerializableString;
+import com.fasterxml.jackson.core.io.CharacterEscapes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,9 +57,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -115,6 +115,8 @@ public class EditRunController {
   private IndexChecker indexChecker;
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private ObjectMapper mapper;
 
   public void setRunService(RunService runService) {
     this.runService = runService;
@@ -160,7 +162,6 @@ public class EditRunController {
               .filter(metrics -> !isStringBlankOrNull(metrics))
               .collect(new JsonArrayCollector()));
       if (run.getSequencerPartitionContainers().size() == 1) {
-        ObjectMapper mapper = new ObjectMapper();
         model.put("partitionNames", mapper.writeValueAsString(
             run.getSequencerPartitionContainers().get(0).getPartitions().stream()
                 .sorted(Comparator.comparing(Partition::getPartitionNumber))
@@ -193,7 +194,6 @@ public class EditRunController {
     MisoWebUtils.addIssues(issueTrackerManager, () -> issueTrackerManager.searchIssues(run.getAlias()), model);
     model.put("run", run);
 
-    ObjectMapper mapper = new ObjectMapper();
     ObjectNode partitionConfig = mapper.createObjectNode();
     partitionConfig.put("platformType", run.getPlatformType().name());
     partitionConfig.put("instrumentModelId", run.getSequencer().getInstrumentModel().getId());

@@ -27,6 +27,8 @@ public class ListBoxesController {
 
   @Autowired
   private BoxUseService boxUseService;
+  @Autowired
+  private ObjectMapper mapper;
 
   @ModelAttribute("title")
   public String title() {
@@ -51,23 +53,24 @@ public class ListBoxesController {
     BoxUse all = new BoxUse();
     all.setAlias(ALL_TAB);
     uses.add(0, all);
-    return new TabbedListBoxPage("box", "boxUse", uses.stream(), TAB_SORTER, BoxUse::getAlias, BoxUse::getId).list(model);
+    return new TabbedListBoxPage("box", "boxUse", uses.stream(), TAB_SORTER, BoxUse::getAlias, BoxUse::getId, mapper)
+        .list(model);
   }
 
   public class TabbedListBoxPage extends TabbedListItemsPage {
 
     public <T> TabbedListBoxPage(String targetType, String property, Stream<T> tabItems, Function<T, String> getName,
-        Function<T, Object> getValue) {
-      super(targetType, property, tabItems, getName, getValue);
+        Function<T, Object> getValue, ObjectMapper mapper) {
+      super(targetType, property, tabItems, getName, getValue, mapper);
     }
 
     public <T> TabbedListBoxPage(String targetType, String property, Stream<T> tabItems, Comparator<String> tabSorter,
-        Function<T, String> getName, Function<T, Object> getValue) {
-      super(targetType, property, tabItems, tabSorter, getName, getValue);
+        Function<T, String> getName, Function<T, Object> getValue, ObjectMapper mapper) {
+      super(targetType, property, tabItems, tabSorter, getName, getValue, mapper);
     }
 
-    public TabbedListBoxPage(String targetType, String property, SortedMap<String, String> tabs) {
-      super(targetType, property, tabs);
+    public TabbedListBoxPage(String targetType, String property, SortedMap<String, String> tabs, ObjectMapper mapper) {
+      super(targetType, property, tabs, mapper);
     }
 
     @Override

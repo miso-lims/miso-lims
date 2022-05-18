@@ -30,6 +30,8 @@ public class EditWorksetController {
 
   @Autowired
   private WorksetService worksetService;
+  @Autowired
+  private ObjectMapper mapper;
   
   @RequestMapping("/new")
   public ModelAndView newArray(ModelMap model) {
@@ -48,7 +50,6 @@ public class EditWorksetController {
     }
     model.addAttribute(MODEL_ATTR_ID, worksetId);
     model.addAttribute(MODEL_ATTR_WORKSET, workset);
-    ObjectMapper mapper = new ObjectMapper();
     model.addAttribute(MODEL_ATTR_JSON, mapper.writer().writeValueAsString(Dtos.asDto(workset)));
     return new ModelAndView(JSP, model);
   }

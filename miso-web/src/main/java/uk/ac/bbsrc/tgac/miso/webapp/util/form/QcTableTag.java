@@ -33,7 +33,7 @@ public class QcTableTag extends RequestContextAwareTag {
   protected int doStartTagInternal() throws Exception {
 
     QualityControllable<?> qcItem = (QualityControllable<?>) item;
-    ObjectMapper mapper = new ObjectMapper();
+    ObjectMapper mapper = TagUtils.getObjectMapper(pageContext);
 
     pageContext.getOut().append(String.format(
         "<br/><h1>QCs</h1><table id='%1$s' class='display no-border ui-widget-content'></table><script type='text/javascript'>jQuery(document).ready(function () { ListUtils.createStaticTable('%1$s', ListTarget.qc('%2$s'), { entityId : %3$d }, %4$s);});</script>",

@@ -56,13 +56,15 @@ public class ListStorageLocationsController {
   private StorageLocationService storageLocationService;
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private ObjectMapper mapper;
 
   private static class ListLocationsPage extends TabbedListItemsPage {
 
     private final AuthorizationManager authorizationManager;
 
-    public ListLocationsPage(AuthorizationManager authorizationManager) {
-      super("storage_location", "slug", LOCATIONS);
+    public ListLocationsPage(AuthorizationManager authorizationManager, ObjectMapper mapper) {
+      super("storage_location", "slug", LOCATIONS, mapper);
       this.authorizationManager = authorizationManager;
     }
 
@@ -75,7 +77,7 @@ public class ListStorageLocationsController {
 
   @RequestMapping("/storagelocations")
   public ModelAndView listProjects(ModelMap model) throws Exception {
-    return new ListLocationsPage(authorizationManager).list(key -> {
+    return new ListLocationsPage(authorizationManager, mapper).list(key -> {
       switch (key) {
       case "Rooms":
         return storageLocationService.listRooms().stream().map(r -> StorageLocationDto.from(r, false, false));

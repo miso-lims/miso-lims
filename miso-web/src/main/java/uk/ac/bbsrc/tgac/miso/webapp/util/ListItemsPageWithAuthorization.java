@@ -11,17 +11,16 @@ import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 
 public class ListItemsPageWithAuthorization extends ListItemsPage {
 
-  private final Supplier<AuthorizationManager> authorizationManager;
+  private AuthorizationManager authorizationManager;
 
-  public ListItemsPageWithAuthorization(String targetType, Supplier<AuthorizationManager> authorizationManager) {
-    super(targetType);
+  public ListItemsPageWithAuthorization(String targetType, AuthorizationManager authorizationManager, ObjectMapper mapper) {
+    super(targetType, mapper);
     this.authorizationManager = authorizationManager;
   }
 
   @Override
   protected final void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-    AuthorizationManager manager = authorizationManager.get();
-    User user = manager.getCurrentUser();
+    User user = authorizationManager.getCurrentUser();
     config.put("isAdmin", user.isAdmin());
     config.put("isInternal", user.isInternal());
     writeConfigurationExtra(mapper, config);

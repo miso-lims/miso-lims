@@ -82,6 +82,8 @@ public class TransferController {
   private PoolService poolService;
   @Autowired
   private BoxService boxService;
+  @Autowired
+  private ObjectMapper mapper;
 
   @Value("${miso.smtp.host:#{null}}")
   private String smtpHost;
@@ -92,8 +94,8 @@ public class TransferController {
 
   @GetMapping("/list")
   public ModelAndView list(ModelMap model) throws IOException {
-    return new TabbedListItemsPage("transfer", "tab", TABS.stream(), (t1, t2) -> 1, Function.identity(), String::toLowerCase)
-        .list(model);
+    return new TabbedListItemsPage("transfer", "tab", TABS.stream(), (t1, t2) -> 1, Function.identity(),
+        String::toLowerCase, mapper).list(model);
   }
 
   @PostMapping("/new")
@@ -196,14 +198,12 @@ public class TransferController {
         || (editReceipt && transfer.getSenderGroup() == null);
 
     List<TransferNotification> notifications = transferNotificationService.listByTransferId(id);
-    ObjectMapper mapper = new ObjectMapper();
     model.put("notifications", mapper.writeValueAsString(notifications.stream().map(Dtos::asDto).collect(Collectors.toList())));
     return setupForm(transfer, PageMode.EDIT, editSend, editReceipt, model);
   }
 
   public ModelAndView setupForm(Transfer transfer, PageMode pageMode, boolean editSend, boolean editReceipt, ModelMap model)
       throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
     ObjectNode formConfig = mapper.createObjectNode();
     formConfig.put(PageMode.PROPERTY, pageMode.getLabel());
     formConfig.put("editSend", editSend);

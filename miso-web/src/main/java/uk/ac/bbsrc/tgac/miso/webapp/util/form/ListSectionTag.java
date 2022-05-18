@@ -18,6 +18,8 @@ package uk.ac.bbsrc.tgac.miso.webapp.util.form;
 
 import java.util.Collection;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.servlet.tags.RequestContextAwareTag;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -46,7 +48,7 @@ public class ListSectionTag extends RequestContextAwareTag {
     if (items.size() == 0 && !alwaysShow) {
       return SKIP_BODY;
     }
-    ObjectMapper mapper = new ObjectMapper();
+    ObjectMapper mapper = TagUtils.getObjectMapper(pageContext);
 
     pageContext.getOut().append(String.format(
         "<br/><h1>%2$s</h1><table id='%1$s' class='display no-border ui-widget-content'></table><script type='text/javascript'>jQuery(document).ready(function () { ListUtils.createStaticTable('%1$s', ListTarget.%3$s, %5$s, %4$s);});</script>",
