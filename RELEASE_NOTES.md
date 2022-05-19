@@ -7,6 +7,24 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.44.0] - 2022-05-19
+
+### Added
+
+* Button to move requisitioned samples from one requisition to another
+
+### Changed
+
+* Requisition alias max length increased to 150 characters
+
+### Fixed
+
+* Errors when attempting to create or edit an empty requisition
+* An issue where a save could remain partially completed after part of its
+  effects failed. e.g. A transfer could be created despite some of the samples
+  failing to update their volume and box locations
+
+
 ## [1.43.3] - 2022-05-05
 
 ### Fixed
