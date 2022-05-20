@@ -30,7 +30,7 @@ ListTarget.tissuematerial = {
             Utils.showOkDialog('Create Tissue Materials', ["That's a peculiar number of tissuematerials to create."]);
             return;
           }
-          window.location = Urls.ui.tissueMaterials.bulkCreate + '?' + jQuery.param({
+          window.location = Urls.ui.tissueMaterials.bulkCreate + '?' + Utils.page.param({
             quantity: result.quantity,
           });
         });

@@ -23,7 +23,7 @@ HotTarget.studytype = {
     return !config.isAdmin ? [] : [{
       name: 'Edit',
       action: function(items) {
-        window.location = Urls.ui.studyTypes.bulkEdit + '?' + jQuery.param({
+        window.location = Urls.ui.studyTypes.bulkEdit + '?' + Utils.page.param({
           ids: items.map(Utils.array.getId).join(',')
         });
       }

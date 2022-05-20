@@ -390,12 +390,12 @@ BulkTarget.sample = (function($) {
               disabled: true
             });
             $.ajax({
-              url: Urls.rest.requisitions.search + '?' + $.param({
+              url: Urls.rest.requisitions.search + '?' + Utils.page.param({
                 q: newValue
               }),
               contentType: 'application/json; charset=utf8',
               type: 'GET'
-            }).success(function(data) {
+            }).done(function(data) {
               var setValue = null;
               if (data.some(function(x) {
                 return x.alias === newValue;
@@ -653,7 +653,7 @@ BulkTarget.sample = (function($) {
           });
           // we search by null project in case the user wants to choose an identity from another project
           $.ajax({
-            url: Urls.rest.samples.identitiesLookup + '?' + $.param({
+            url: Urls.rest.samples.identitiesLookup + '?' + Utils.page.param({
               exactMatch: true
             }),
             data: JSON.stringify({
@@ -663,7 +663,7 @@ BulkTarget.sample = (function($) {
             contentType: 'application/json; charset=utf8',
             dataType: 'json',
             type: 'POST'
-          }).success(function(data) {
+          }).done(function(data) {
             // sort with identities from selected project on top
             var potentialIdentities = [];
             if (data && data.length) {

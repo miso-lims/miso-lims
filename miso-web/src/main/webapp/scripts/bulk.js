@@ -406,12 +406,12 @@ BulkUtils = (function($) {
                   value: '(searching...)'
                 });
                 $.ajax({
-                  url: Urls.rest.boxes.searchPartial + '?' + $.param({
+                  url: Urls.rest.boxes.searchPartial + '?' + Utils.page.param({
                     q: newValue,
                     b: false
                   }),
                   dataType: "json"
-                }).success(function(data) {
+                }).done(function(data) {
                   searchCache[searchKey] = data;
                   var itemCache = api.getCache('boxes');
                   data.forEach(function(item) {
@@ -1826,7 +1826,7 @@ BulkUtils = (function($) {
                     cache: false,
                     contentType: false,
                     processData: false
-                  }).success(
+                  }).done(
                       function(columnData) {
                         dialog.dialog("close");
                         Utils.showWorkingDialog('Import', function() {
@@ -1923,7 +1923,7 @@ BulkUtils = (function($) {
             return x.description;
           }
         }], function(result) {
-          Utils.ajaxDownloadWithDialog(Urls.rest.hot.bulkExport + '?' + $.param({
+          Utils.ajaxDownloadWithDialog(Urls.rest.hot.bulkExport + '?' + Utils.page.param({
             format: result.format.name
           }), data);
         });
@@ -2035,7 +2035,7 @@ BulkUtils = (function($) {
       url: target.getSaveUrl(config),
       data: data == null ? undefined : JSON.stringify(data),
       contentType: 'application/json; charset=utf8'
-    }).success(function(data) {
+    }).done(function(data) {
       var updateProgress = function(update) {
         $('#dialogProgressText').text(update.completedUnits + '/' + update.totalUnits);
         var percentComplete = update.completedUnits * 100 / update.totalUnits;
@@ -2049,7 +2049,7 @@ BulkUtils = (function($) {
               type: 'GET',
               url: target.getSaveProgressUrl(update.operationId),
               contentType: 'application/json; charset=utf8'
-            }).success(function(progressData) {
+            }).done(function(progressData) {
               updateProgress(progressData);
             }).fail(function(response, textStatus, serverStatus) {
               // progress request failed (operation status unknown)

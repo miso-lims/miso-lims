@@ -49,7 +49,7 @@ ListTarget.lab = {
             Utils.showOkDialog('Create Labs', ['That\'s a peculiar number of labs to create.']);
             return;
           }
-          window.location = Urls.ui.labs.bulkCreate + '?' + jQuery.param({
+          window.location = Urls.ui.labs.bulkCreate + '?' + Utils.page.param({
             quantity: result.quantity,
           });
         });

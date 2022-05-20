@@ -616,7 +616,7 @@ ListUtils = (function($) {
           });
         };
       }, function(errorMessage, searchString, callback) {
-        Utils.ajaxWithDialog('Selecting', 'GET', target.createUrl(config, projectId) + "?" + jQuery.param({
+        Utils.ajaxWithDialog('Selecting', 'GET', target.createUrl(config, projectId) + "?" + Utils.page.param({
           iDisplayStart: 0,
           iDisplayLength: 10000,
           sSearch: searchString,
@@ -842,7 +842,7 @@ ListUtils = (function($) {
               quantity: result.quantity,
             };
             if (useGet) {
-              window.location = url + '?' + jQuery.param(params);
+              window.location = url + '?' + Utils.page.param(params);
             } else {
               Utils.page.post(url, params);
             }
@@ -862,7 +862,7 @@ ListUtils = (function($) {
             required: true
           }], function(output) {
             searchParams.q = output.query;
-            Utils.ajaxWithDialog('Searching...', 'GET', searchUrl + '?' + jQuery.param(searchParams), null,
+            Utils.ajaxWithDialog('Searching...', 'GET', searchUrl + '?' + Utils.page.param(searchParams), null,
                 function(items, textStatus, xhr) {
                   if (!items || !items.length) {
                     Utils.showOkDialog(dialogTitle, [typeLabel + ' not found.']);

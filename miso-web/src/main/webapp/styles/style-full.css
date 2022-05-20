@@ -1123,3 +1123,7 @@ ul.unformatted-list {
 .ui-dialog {
   max-width: 90vw;
 }
+
+.ui-button {
+  line-height: unset;
+}

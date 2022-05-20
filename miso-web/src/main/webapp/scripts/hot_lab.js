@@ -24,7 +24,7 @@ HotTarget.lab = {
     return !config.isAdmin ? [] : [{
       name: 'Edit',
       action: function(items) {
-        window.location = Urls.ui.labs.bulkEdit + '?' + jQuery.param({
+        window.location = Urls.ui.labs.bulkEdit + '?' + Utils.page.param({
           ids: items.map(Utils.array.getId).join(',')
         });
       }

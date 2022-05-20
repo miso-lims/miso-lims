@@ -43,7 +43,7 @@ ListTarget.qc = function(qcTarget) {
             ids.push(item.id);
           });
           Utils.showConfirmDialog('Delete QCs', 'Delete', lines, function() {
-            var url = Urls.rest.qcs.bulkDelete + '?' + jQuery.param({
+            var url = Urls.rest.qcs.bulkDelete + '?' + Utils.page.param({
               qcTarget: qcTarget
             });
             Utils.ajaxWithDialog('Deleting QCs', 'POST', url, ids, function() {

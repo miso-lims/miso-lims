@@ -26,7 +26,7 @@ HotTarget.referencegenome = {
     return !config.isAdmin ? [] : [{
       name: 'Edit',
       action: function(items) {
-        window.location = Urls.ui.referenceGenomes.bulkEdit + '?' + jQuery.param({
+        window.location = Urls.ui.referenceGenomes.bulkEdit + '?' + Utils.page.param({
           ids: items.map(Utils.array.getId).join(',')
         });
       }

@@ -64,7 +64,7 @@ ListTarget.locationmap = {
                   cache: false,
                   contentType: false,
                   processData: false
-                }).success(function(data) {
+                }).done(function(data) {
                   Utils.showOkDialog('Upload Location Map', ['File upload successful'], Utils.page.pageReload);
                 }).fail(function(xhr, textStatus, errorThrown) {
                   dialog.dialog("close");

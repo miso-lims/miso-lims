@@ -56,7 +56,7 @@ var Contacts = (function($) {
   }
 
   function doSearch(url, query, showSaveOption, callback) {
-    Utils.ajaxWithDialog('Searching', 'GET', url + '?' + $.param({
+    Utils.ajaxWithDialog('Searching', 'GET', url + '?' + Utils.page.param({
       q: query
     }), null, function(data) {
       var options = data.map(function(item) {

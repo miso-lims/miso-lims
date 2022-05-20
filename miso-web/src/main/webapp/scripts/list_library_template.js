@@ -24,7 +24,7 @@ ListTarget.library_template = {
             property: "query",
             value: ""
           }, ], function(results) {
-            Utils.ajaxWithDialog('Getting Projects', 'GET', Urls.rest.projects.search + '?' + jQuery.param({
+            Utils.ajaxWithDialog('Getting Projects', 'GET', Urls.rest.projects.search + '?' + Utils.page.param({
               q: results.query
             }), null, function(response) {
               var projectActions = [];
@@ -36,7 +36,7 @@ ListTarget.library_template = {
                       return template.id;
                     });
                     Utils.ajaxWithDialog("Adding Library Template" + (items.length > 1 ? "s" : "") + " to Project", "POST",
-                        Urls.rest.libraryTemplates.addProject + "?" + jQuery.param({
+                        Urls.rest.libraryTemplates.addProject + "?" + Utils.page.param({
                           projectId: project.id,
                         }), templateIds, function() {
                           Utils.showOkDialog("Add Project", ["Successfully added Library Template" + (items.length > 1 ? "s" : "")
@@ -64,7 +64,7 @@ ListTarget.library_template = {
                   url: Urls.rest.projects.get(id),
                   type: 'GET',
                   contentType: 'application/json; charset=utf8',
-                }).success(
+                }).done(
                     function(project) {
                       projectActions.push({
                         name: project.alias,
@@ -73,7 +73,7 @@ ListTarget.library_template = {
                             return item.id;
                           });
                           Utils.ajaxWithDialog("Removing Library Template " + (items.length > 1 ? "s" : "") + " from Project", "POST",
-                              Urls.rest.libraryTemplates.removeProject + "?" + jQuery.param({
+                              Urls.rest.libraryTemplates.removeProject + "?" + Utils.page.param({
                                 projectId: id
                               }), templateIds, function() {
                                 Utils.showOkDialog("Add Project", ["Successfully removed Library Template" + (items.length > 1 ? "s" : "")
@@ -109,7 +109,7 @@ ListTarget.library_template = {
             return;
           }
           if (result.quantity == 1) {
-            window.location = Urls.ui.libraryTemplates.create + (projectId ? '?' + jQuery.param({
+            window.location = Urls.ui.libraryTemplates.create + (projectId ? '?' + Utils.page.param({
               projectId: projectId
             }) : '');
             return;
@@ -120,7 +120,7 @@ ListTarget.library_template = {
           if (projectId) {
             params.projectId = projectId;
           }
-          window.location = Urls.ui.libraryTemplates.bulkCreate + '?' + jQuery.param(params);
+          window.location = Urls.ui.libraryTemplates.bulkCreate + '?' + Utils.page.param(params);
         });
       }
     }];

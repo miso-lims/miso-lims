@@ -303,7 +303,7 @@ FormTarget.poolorder = (function($) {
       type: 'text',
       property: 'query'
     }], function(results) {
-      Utils.ajaxWithDialog('Searching...', 'GET', Urls.rest.pools.search + '?' + jQuery.param({
+      Utils.ajaxWithDialog('Searching...', 'GET', Urls.rest.pools.search + '?' + Utils.page.param({
         q: results.query
       }), null, function(data) {
         if (!data || !data.length) {
@@ -375,7 +375,7 @@ FormTarget.poolorder = (function($) {
   }
 
   function linkSequencingOrder(form) {
-    Utils.ajaxWithDialog("Finding Sequencing Orders", "GET", Urls.rest.sequencingOrders.search + '?' + jQuery.param({
+    Utils.ajaxWithDialog("Finding Sequencing Orders", "GET", Urls.rest.sequencingOrders.search + '?' + Utils.page.param({
       poolId: form.get('poolId'),
       purposeId: form.get('purposeId'),
       containerModelId: form.get('containerModelId'),

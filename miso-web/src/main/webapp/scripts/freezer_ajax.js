@@ -82,7 +82,7 @@ var Freezer = (function($) {
         fields.forEach(function(field) {
           params[field.property] = output[field.property];
         });
-        var url = Urls.rest.storageLocations.createRoom + '?' + $.param(params);
+        var url = Urls.rest.storageLocations.createRoom + '?' + Utils.page.param(params);
         Utils.ajaxWithDialog("Adding Room", 'POST', url, {}, function(responseData) {
           callback();
         });
@@ -122,7 +122,7 @@ var Freezer = (function($) {
           fields.forEach(function(field) {
             params[field.property] = output[field.property];
           });
-          var url = createUrl + '?' + $.param(params);
+          var url = createUrl + '?' + Utils.page.param(params);
           var data = [];
           var submitFunction = function() {
             Utils.ajaxWithDialog("Adding Storage", 'POST', url, data, Utils.page.pageReload);
@@ -339,7 +339,7 @@ var Freezer = (function($) {
         property: "query",
         value: ""
       }, ], function(results) {
-        Utils.ajaxWithDialog('Searching for Boxes', 'GET', Urls.rest.boxes.searchPartial + '?' + jQuery.param({
+        Utils.ajaxWithDialog('Searching for Boxes', 'GET', Urls.rest.boxes.searchPartial + '?' + Utils.page.param({
           q: results.query,
           b: true
         }), null, function(response) {
@@ -347,7 +347,7 @@ var Freezer = (function($) {
             return {
               name: box.alias,
               handler: function() {
-                Utils.ajaxWithDialog('Moving Box', 'POST', Urls.rest.boxes.setLocation(box.id) + '?' + jQuery.param({
+                Utils.ajaxWithDialog('Moving Box', 'POST', Urls.rest.boxes.setLocation(box.id) + '?' + Utils.page.param({
                   storageId: node.item.id
                 }), {}, Utils.page.pageReload, function(json) {
                   Utils.showOkDialog('Error Moving Box', [json.error]);
@@ -510,7 +510,7 @@ var Freezer = (function($) {
       dataType: 'json',
       contentType: 'application/json; charset=utf8',
       data: JSON.stringify(component)
-    }).success(Utils.page.pageReload).fail(function(response, textStatus, serverStatus) {
+    }).done(Utils.page.pageReload).fail(function(response, textStatus, serverStatus) {
       Validate.displayErrors(JSON.parse(response.responseText), 'freezerComponent-form');
     });
   }

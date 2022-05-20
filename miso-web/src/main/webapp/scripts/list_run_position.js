@@ -71,7 +71,7 @@ ListTarget.run_position = {
           property: "barcode"
         }], function(results) {
           Utils.ajaxWithDialog('Adding ' + platformType.containerName, 'POST', Urls.rest.runs.addContainer(config.runId) + '?'
-              + jQuery.param({
+              + Utils.page.param({
                 position: results.position,
                 barcode: results.barcode
               }), null, Utils.page.pageReload);

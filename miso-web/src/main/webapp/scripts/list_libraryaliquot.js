@@ -54,7 +54,7 @@ ListTarget.libraryaliquot = {
               ids: config.library.id
             }
             var loadPage = function() {
-              window.location = Urls.ui.libraryAliquots.bulkPropagate + '?' + jQuery.param(params);
+              window.location = Urls.ui.libraryAliquots.bulkPropagate + '?' + Utils.page.param(params);
             }
             if (result.createBox) {
               Utils.createBoxDialog(result, function(result) {

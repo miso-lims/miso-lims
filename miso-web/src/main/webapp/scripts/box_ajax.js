@@ -43,7 +43,7 @@ var Box = Box
                 position: [jQuery(window).width() / 2 - 400 / 2, 50],
                 buttons: {}
               });
-              var url = Urls.rest.boxes.fillByPattern(Box.boxJSON.id) + '?' + jQuery.param({
+              var url = Urls.rest.boxes.fillByPattern(Box.boxJSON.id) + '?' + Utils.page.param({
                 prefix: prefix,
                 suffix: suffix
               });
@@ -103,7 +103,7 @@ var Box = Box
           type: 'POST',
           contentType: 'application/json; charset=utf8',
           data: JSON.stringify(data)
-        }).success(function(data) {
+        }).done(function(data) {
           Box.boxJSON.items = items;
           Box.ui.update();
         }).fail(function(xhr, textStatus, errorThrown) {
@@ -125,7 +125,7 @@ Box.scan = {
         rows: boxRows,
         columns: boxColumns
       })
-    }).success(function(data) {
+    }).done(function(data) {
       clearTimeout(prepareScannerTimeout);
       jQuery('#dialogDialog').dialog('close');
       Box.scanDialog.show({
@@ -149,7 +149,7 @@ Box.scan = {
       data: JSON.stringify({
         scannerName: scannerName
       })
-    }).success(function(data) {
+    }).done(function(data) {
       jQuery('#magnify').stop();
       Box.scanDiff.show(data);
     }).fail(function(response, textStatus, serverStatus) {
@@ -513,7 +513,7 @@ Box.ui = {
       type: "GET",
       contentType: "application/json; charset=utf8",
       dataType: "json",
-    }).success(function(json) {
+    }).done(function(json) {
       // REST endpoint will return a JSON object with the spreadsheet filename's hashCode inside
       // Send the hashCode to the DownloadController to download the spreadsheet
       Utils.page.pageRedirect(Urls.download.boxSpreadsheet(json.hashCode));
@@ -557,13 +557,13 @@ Box.ui = {
       Box.ui.showBoxableSearchLoading();
 
       jQuery.ajax({
-        url: Urls.rest.boxes.updatePosition(Box.boxId, selectedPosition) + '?' + jQuery.param({
+        url: Urls.rest.boxes.updatePosition(Box.boxId, selectedPosition) + '?' + Utils.page.param({
           entity: jQuery('#resultSelect').val()
         }),
         type: "PUT",
         dataType: "json",
         contentType: 'application/json; charset=utf8'
-      }).success(function(data) {
+      }).done(function(data) {
         Box.boxJSON = data;
         Box.ui.update();
         Box.ui.getBulkActions();
@@ -672,7 +672,7 @@ Box.ui = {
       contentType: "application/json; charset=utf8",
       dataType: "json",
       type: "GET"
-    }).success(function(data) {
+    }).done(function(data) {
       Box.ui.showBoxableSearchResults(data);
     }).fail(function(response, textStatus, serverStatus) {
       Box.ui.clearBoxableSearchResults();

@@ -34,7 +34,7 @@ ListTarget.index = {
             Utils.showOkDialog('Create Indices', ["Quantity must be 1 or more."]);
             return;
           }
-          window.location = Urls.ui.indices.bulkCreate + '?' + jQuery.param({
+          window.location = Urls.ui.indices.bulkCreate + '?' + Utils.page.param({
             indexFamilyId: config.indexFamilyId,
             quantity: result.quantity,
           });

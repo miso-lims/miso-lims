@@ -23,7 +23,7 @@ HotTarget.runpurpose = {
     return !config.isAdmin ? [] : [{
       name: 'Edit',
       action: function(items) {
-        window.location = Urls.ui.runPurposes.bulkEdit + '?' + jQuery.param({
+        window.location = Urls.ui.runPurposes.bulkEdit + '?' + Utils.page.param({
           ids: items.map(Utils.array.getId).join(',')
         });
       }

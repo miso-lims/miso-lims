@@ -21,7 +21,7 @@ ListTarget.itemtransfer = (function() {
           } else if (config.poolId) {
             params.poolIds = config.poolId;
           }
-          window.location = Urls.ui.transfers.create + '?' + jQuery.param(params);
+          window.location = Urls.ui.transfers.create + '?' + Utils.page.param(params);
         }
       }];
     },

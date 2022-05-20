@@ -37,7 +37,7 @@ ListTarget.experiment = {
     var actions = [{
       name: "Create Submission",
       action: function(experiments) {
-        window.location = Urls.ui.submissions.create + '?' + jQuery.param({
+        window.location = Urls.ui.submissions.create + '?' + Utils.page.param({
           experimentIds: experiments.map(Utils.array.getId).join(',')
         });
       }
@@ -116,7 +116,7 @@ ListTarget.experiment = {
                     + ") to " + request.experiment.name + " (" + request.experiment.alias + ")",
                 handler: function() {
                   Utils.ajaxWithDialog("Adding to Experiment", "POST", Urls.rest.experiments.addRunPartition(request.experiment.id) + "?"
-                      + jQuery.param({
+                      + Utils.page.param({
                         runId: config.runId,
                         partitionId: request.partition.id
                       }), null, Utils.page.pageReload);
@@ -139,7 +139,7 @@ ListTarget.experiment = {
                   + ") to " + request.experiment.name + " (" + request.experiment.alias + ")",
               handler: function() {
                 Utils.ajaxWithDialog("Adding to Experiment", "POST", Urls.rest.experiments.addRunPartition(request.experiment.id) + "?"
-                    + jQuery.param({
+                    + Utils.page.param({
                       runId: config.runId,
                       partitionId: request.partition.id
                     }), null, Utils.page.pageReload);

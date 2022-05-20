@@ -299,7 +299,7 @@ ListTarget.transferitem = (function() {
   }
 
   function queryBoxes(query, items, moveBoxToo, callback) {
-    Utils.ajaxWithDialog('Searching for Boxes', 'GET', Urls.rest.boxes.searchPartial + '?' + jQuery.param({
+    Utils.ajaxWithDialog('Searching for Boxes', 'GET', Urls.rest.boxes.searchPartial + '?' + Utils.page.param({
       q: query,
       b: true
     }), null, function(boxes) {
@@ -363,7 +363,7 @@ ListTarget.transferitem = (function() {
         }
       }], function(results) {
         if (results.barcode) {
-          continueLocationSelect(Urls.rest.storageLocations.queryByBarcode + '?' + $.params({
+          continueLocationSelect(Urls.rest.storageLocations.queryByBarcode + '?' + Utils.page.params({
             q: results.barcode
           }), items, callback);
         } else if (!results.freezer) {

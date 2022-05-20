@@ -187,7 +187,7 @@ ListTarget.partition = {
               property: "query",
               value: defaultQuery
             }, ], function(results) {
-              Utils.ajaxWithDialog('Getting Pools', 'GET', Urls.rest.pools.picker.search + '?' + jQuery.param({
+              Utils.ajaxWithDialog('Getting Pools', 'GET', Urls.rest.pools.picker.search + '?' + Utils.page.param({
                 platform: platformType.name,
                 query: results.query
               }), null, function(response) {
@@ -211,15 +211,15 @@ ListTarget.partition = {
         }, {
           name: "Search",
           handler: makeSearch("", assignDialog)
-        }, config.sequencingParametersId ? assignFromRest(Urls.rest.sequencingOrders.picker.chemistry + '?' + jQuery.param({
+        }, config.sequencingParametersId ? assignFromRest(Urls.rest.sequencingOrders.picker.chemistry + '?' + Utils.page.param({
           platform: platformType.name,
           seqParamsId: config.sequencingParametersId,
           fulfilled: false
         }), 'Outstanding Orders (Matched Chemistry)', setConcentration, assignDialog) : null,
-            assignFromRest(Urls.rest.sequencingOrders.picker.active + '?' + jQuery.param({
+            assignFromRest(Urls.rest.sequencingOrders.picker.active + '?' + Utils.page.param({
               platform: platformType.name
             }), 'Outstanding Orders (All)', setConcentration, assignDialog),
-            assignFromRest(Urls.rest.pools.picker.recent + '?' + jQuery.param({
+            assignFromRest(Urls.rest.pools.picker.recent + '?' + Utils.page.param({
               platform: platformType.name
             }), 'Recently Modified', setConcentration, assignDialog), ].filter(function(x) {
           return x;

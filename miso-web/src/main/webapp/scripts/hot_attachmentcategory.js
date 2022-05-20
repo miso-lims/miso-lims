@@ -24,7 +24,7 @@ HotTarget.attachmentcategory = {
     return !config.isAdmin ? [] : [{
       name: 'Edit',
       action: function(items) {
-        window.location = Urls.ui.attachmentCategories.bulkEdit + '?' + jQuery.param({
+        window.location = Urls.ui.attachmentCategories.bulkEdit + '?' + Utils.page.param({
           ids: items.map(Utils.array.getId).join(',')
         });
       }
