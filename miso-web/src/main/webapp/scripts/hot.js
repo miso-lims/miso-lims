@@ -822,7 +822,7 @@ var HotUtils = {
                         cache: false,
                         contentType: false,
                         processData: false
-                      }).success(
+                      }).done(
                           function(columnData) {
                             dialog.dialog("close");
                             var hotHeaders = table.getColHeader();
@@ -1392,7 +1392,7 @@ var HotUtils = {
                 required: true
               }]
               Utils.showDialog('Add to Existing Workset', 'Search', fields, function(input) {
-                Utils.ajaxWithDialog('Finding Worksets', 'GET', Urls.rest.worksets.query + '?' + jQuery.param({
+                Utils.ajaxWithDialog('Finding Worksets', 'GET', Urls.rest.worksets.query + '?' + Utils.page.param({
                   q: input.query
                 }), null, function(worksets) {
                   var selectFields = [];
@@ -1458,7 +1458,7 @@ var HotUtils = {
           required: true
         }];
         Utils.showDialog('Move to Workset', 'Search', fields, function(input) {
-          Utils.ajaxWithDialog('Finding Worksets', 'GET', Urls.rest.worksets.query + '?' + jQuery.param({
+          Utils.ajaxWithDialog('Finding Worksets', 'GET', Urls.rest.worksets.query + '?' + Utils.page.param({
             q: input.query
           }), null, function(worksets) {
             if (!worksets || !worksets.length) {
@@ -1617,7 +1617,7 @@ var HotUtils = {
         return;
       }
       var loadPage = function() {
-        window.location = window.location.origin + pageURL + '?' + jQuery.param(params);
+        window.location = window.location.origin + pageURL + '?' + Utils.page.param(params);
       }
       if (result.createBox) {
         Utils.createBoxDialog(result, getItemCount, function(newBox) {

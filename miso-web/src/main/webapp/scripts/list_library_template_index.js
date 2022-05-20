@@ -8,7 +8,7 @@ ListTarget.libraryTemplate_index = {
     return [{
       name: 'Edit',
       action: function(items) {
-        window.location = Urls.ui.libraryTemplates.editIndices(config.libraryTemplateId) + '?' + jQuery.param({
+        window.location = Urls.ui.libraryTemplates.editIndices(config.libraryTemplateId) + '?' + Utils.page.param({
           positions: items.map(function(item) {
             return item.boxPosition
           }).join(',')
@@ -36,7 +36,7 @@ ListTarget.libraryTemplate_index = {
             Utils.showOkDialog('Add Indices', ["Quantity must be 1 or more."]);
             return;
           }
-          window.location = Urls.ui.libraryTemplates.addIndices(config.libraryTemplateId) + '?' + jQuery.param({
+          window.location = Urls.ui.libraryTemplates.addIndices(config.libraryTemplateId) + '?' + Utils.page.param({
             quantity: result.quantity
           });
         });

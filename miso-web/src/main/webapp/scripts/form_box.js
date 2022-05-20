@@ -117,7 +117,7 @@ FormTarget.box = (function($) {
       required: true,
       type: 'text'
     }], function(results) {
-      var url = Urls.rest.storageLocations.queryByBarcode + '?' + $.param({
+      var url = Urls.rest.storageLocations.queryByBarcode + '?' + Utils.page.param({
         q: results.barcode
       });
       Utils.ajaxWithDialog('Finding Location...', 'GET', url, null, function(data) {

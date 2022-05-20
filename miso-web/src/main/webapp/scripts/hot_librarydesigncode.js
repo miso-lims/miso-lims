@@ -25,7 +25,7 @@ HotTarget.librarydesigncode = {
     return !config.isAdmin ? [] : [{
       name: 'Edit',
       action: function(items) {
-        window.location = Urls.ui.libraryDesignCodes.bulkEdit + '?' + jQuery.param({
+        window.location = Urls.ui.libraryDesignCodes.bulkEdit + '?' + Utils.page.param({
           ids: items.map(Utils.array.getId).join(',')
         });
       }

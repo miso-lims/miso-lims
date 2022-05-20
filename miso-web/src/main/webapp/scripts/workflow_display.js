@@ -45,7 +45,7 @@ var WorkflowDisplay = (function() {
   }
 
   function processInput(workflowId, stepNumber, input) {
-    ajax("POST", encodeURI("/miso/rest/workflows/" + workflowId + "/step/" + stepNumber + "/?" + jQuery.param({
+    ajax("POST", encodeURI("/miso/rest/workflows/" + workflowId + "/step/" + stepNumber + "/?" + Utils.page.param({
       input: input
     })), updateDisplay, showError);
   }

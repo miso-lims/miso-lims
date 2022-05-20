@@ -29,7 +29,7 @@ ListTarget.subproject = {
             Utils.showOkDialog('Create Subprojects', ["That's a peculiar number of subprojects to create."]);
             return;
           }
-          window.location = Urls.ui.subprojects.bulkCreate + '?' + jQuery.param({
+          window.location = Urls.ui.subprojects.bulkCreate + '?' + Utils.page.param({
             quantity: result.quantity,
           });
         });

@@ -57,12 +57,12 @@ BulkTarget.box = (function($) {
           }
           updateFreezerLocation(null, '(searching...)');
           $.ajax({
-            url: Urls.rest.storageLocations.queryByBarcode + '?' + jQuery.param({
+            url: Urls.rest.storageLocations.queryByBarcode + '?' + Utils.page.param({
               q: newValue,
             }),
             contentType: "application/json; charset=utf8",
             dataType: "json"
-          }).success(function(data) {
+          }).done(function(data) {
             updateFreezerLocation([data], data.fullDisplayLocation);
           }).fail(function(response, textStatus, serverStatus) {
             updateFreezerLocation(null, '(Not found)');

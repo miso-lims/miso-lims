@@ -94,7 +94,7 @@
       $.ajax({
         url: Urls.rest.requisitions.listRunLibraries(${requisition.id}),
         dataType: 'json'
-      }).success(function(data) {
+      }).done(function(data) {
         $('#list_runLibraries').empty();
         FormUtils.setTableData(ListTarget.runaliquot, {requisitionId: ${requisition.id}}, 'list_runLibraries', data);
       }).fail(function() {

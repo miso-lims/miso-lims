@@ -291,7 +291,7 @@ ListTarget.sample = (function() {
   }
 
   function checkExistingRequisitions(sourceRequisitionId, suggestedAlias, assayId, stopped, samples) {
-    var url = Urls.rest.requisitions.search + '?' + $.param({
+    var url = Urls.rest.requisitions.search + '?' + Utils.page.param({
       q: suggestedAlias
     });
     var callback = function(data) {

@@ -61,7 +61,7 @@ ListTarget.project = {
             property: "query",
             value: ""
           }], function(results) {
-            Utils.ajaxWithDialog('Getting Projects', 'GET', Urls.rest.projects.search + '?' + jQuery.param({
+            Utils.ajaxWithDialog('Getting Projects', 'GET', Urls.rest.projects.search + '?' + Utils.page.param({
               q: results.query
             }), null, function(response) {
               Utils.showWizardDialog("Add Project", response.map(function(project) {

@@ -50,7 +50,7 @@ ListTarget.attachmentcategory = {
             Utils.showOkDialog('Create Attachment Categories', ["That's a peculiar number of attachment categories to create."]);
             return;
           }
-          window.location = Urls.ui.attachmentCategories.bulkCreate + '?' + jQuery.param({
+          window.location = Urls.ui.attachmentCategories.bulkCreate + '?' + Utils.page.param({
             quantity: result.quantity,
           });
         });

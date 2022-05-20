@@ -89,7 +89,7 @@ FormTarget.arrayrun = (function($) {
                 type: 'text',
                 required: true
               }], function(formData) {
-                Utils.ajaxWithDialog('Searching', 'GET', Urls.rest.arrayRuns.arraySearch + '?' + jQuery.param({
+                Utils.ajaxWithDialog('Searching', 'GET', Urls.rest.arrayRuns.arraySearch + '?' + Utils.page.param({
                   q: formData.query
                 }), null, function(data) {
                   if (!data || !data.length) {

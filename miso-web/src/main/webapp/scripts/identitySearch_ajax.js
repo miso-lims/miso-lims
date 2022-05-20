@@ -11,7 +11,7 @@
       jQuery('#ajaxLoaderDiv').html('<img src="/styles/images/ajax-loader.gif"/>');
 
       $.ajax({
-        url: Urls.rest.samples.identitiesLookup + '?' + $.param({
+        url: Urls.rest.samples.identitiesLookup + '?' + Utils.page.param({
           exactMatch: exactMatch
         }),
         type: 'POST',
@@ -21,11 +21,11 @@
           "identitiesSearches": data,
           "project": $('#projectAlias').val()
         })
-      }).success(function(results) {
+      }).done(function(results) {
         updateResults(results);
         jQuery('#searchButton').prop('disabled', false);
         jQuery('#ajaxLoaderDiv').empty();
-      }).error(function(data) {
+      }).fail(function(data) {
         jQuery('#searchButton').prop('disabled', false);
         jQuery('#ajaxLoaderDiv').empty();
         jQuery('#ajaxLoaderDiv').html('Error getting samples: ' + data);

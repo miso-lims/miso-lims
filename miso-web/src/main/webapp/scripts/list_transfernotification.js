@@ -93,7 +93,7 @@ ListTarget.transfernotification = (function($) {
         recipientName: contact.name,
         recipientEmail: contact.email
       };
-      var url = Urls.rest.transfers.addNotification(config.transferId) + '?' + $.param({
+      var url = Urls.rest.transfers.addNotification(config.transferId) + '?' + Utils.page.param({
         saveContact: !!contact.save
       });
       Utils.ajaxWithDialog('Adding Notification', 'POST', url, notification, function(data) {

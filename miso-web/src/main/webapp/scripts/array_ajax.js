@@ -109,7 +109,7 @@
       url: '/miso/rest/arrays/' + arrayJson.id + '/positions/' + selectedPosition,
       type: 'DELETE',
       dataType: 'json'
-    }).success(function(data) {
+    }).done(function(data) {
       clearSampleSearchResults();
       SampleArray.setArrayJson(data);
     }).fail(function(response, textStatus, serverStatus) {
@@ -125,14 +125,14 @@
       return;
     }
     showSamplesLoading(true);
-    var url = "/miso/rest/arrays/sample-search?" + jQuery.param({
+    var url = "/miso/rest/arrays/sample-search?" + Utils.page.param({
       q: searchString
     });
     $.ajax({
       url: url,
       dataType: 'json',
       type: "GET"
-    }).success(function(data) {
+    }).done(function(data) {
       showSampleSearchResults(data);
     }).fail(function(response, textStatus, serverStatus) {
       clearSampleSearchResults();
@@ -158,12 +158,12 @@
       showSamplesLoading(true);
 
       $.ajax({
-        url: '/miso/rest/arrays/' + arrayJson.id + '/positions/' + selectedPosition + '?' + jQuery.param({
+        url: '/miso/rest/arrays/' + arrayJson.id + '/positions/' + selectedPosition + '?' + Utils.page.param({
           sampleId: jQuery('#resultSelect').val()
         }),
         type: "PUT",
         dataType: 'json'
-      }).success(function(data) {
+      }).done(function(data) {
         clearSampleSearchResults();
         SampleArray.setArrayJson(data);
       }).fail(function(response, textStatus, serverStatus) {
@@ -322,7 +322,7 @@
       url: '/miso/rest/arrays/' + arrayJson.id + '/changelog',
       type: 'GET',
       dataType: 'json'
-    }).success(function(data) {
+    }).done(function(data) {
       if (changelogInitialised) {
         $('#changelog').dataTable().fnDestroy();
         $('#changelog').empty();

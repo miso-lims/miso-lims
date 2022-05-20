@@ -137,7 +137,7 @@ var Pane = (function() {
 
   // Make a GET request to the given url with an optional query
   var ajaxCall = function(onLoad, onSuccess, onError, url, query) {
-    var queryUrl = encodeURI(query === undefined ? url : url + "/?" + jQuery.param({q: query}));
+    var queryUrl = encodeURI(query === undefined ? url : url + "/?" + Utils.page.param({q: query}));
 
     onLoad();
     jQuery.ajax({

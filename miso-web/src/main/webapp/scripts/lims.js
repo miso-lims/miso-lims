@@ -748,7 +748,7 @@ var Utils = Utils
           url: saveUrl,
           data: JSON.stringify(data),
           contentType: 'application/json; charset=utf8'
-        }).success(function(data) {
+        }).done(function(data) {
           var updateProgress = function(update) {
             $('#dialogProgressText').text(update.completedUnits + '/' + update.totalUnits);
             var percentComplete = update.completedUnits * 100 / update.totalUnits;
@@ -761,7 +761,7 @@ var Utils = Utils
                   type: 'GET',
                   url: makeProgressUrl(update.operationId),
                   contentType: 'application/json; charset=utf8'
-                }).success(function(progressData) {
+                }).done(function(progressData) {
                   updateProgress(progressData);
                 }).fail(function(response, textStatus, errorThrown) {
                   // progress request failed (operation status unknown)
@@ -946,73 +946,7 @@ var Utils = Utils
 
     };
 
-Utils.timer = {
-  timedFunc: function() {
-    var timer;
-    return function(func, time) {
-      clearTimeout(timer);
-      timer = setTimeout(func, time);
-    };
-  },
-
-  queueFunctions: function(funcs) {
-    if (Object.prototype.toString.apply(funcs) === '[object Array]') {
-      for (var i = 0; i < funcs.length; i++) {
-        var f = funcs[i];
-        jQuery('body').queue("queue", function() {
-          f();
-          if (i < (funcs.length - 1)) {
-            setTimeout(function() {
-              jQuery('body').dequeue("queue");
-            }, 1000);
-          }
-        });
-      }
-    }
-    return jQuery('body');
-  }
-};
-
 Utils.ui = {
-
-  checkAll: function(field) {
-    var self = this;
-    for (var i = 0; i < self._N(field).length; i++) {
-      self._N(field)[i].checked = true;
-    }
-  },
-
-  checkAllConfirm: function(field, message) {
-    if (confirm(message)) {
-      var self = this;
-      for (var i = 0; i < self._N(field).length; i++) {
-        self._N(field)[i].checked = true;
-      }
-    }
-  },
-
-  uncheckAll: function(field) {
-    var self = this;
-    for (var i = 0; i < self._N(field).length; i++) {
-      self._N(field)[i].checked = false;
-    }
-  },
-
-  uncheckOthers: function(field, item) {
-    var self = this;
-    for (var i = 0; i < self._N(field).length; i++) {
-      if (self._N(field)[i] != item) {
-        self._N(field)[i].checked = false;
-      }
-    }
-  },
-
-  _N: function(element) {
-    if (typeof element == 'string') {
-      element = document.getElementsByName(element);
-    }
-    return Element.extend(element);
-  },
 
   toggleElement: function(id) {
     var element = $('#' + id);
@@ -1056,47 +990,12 @@ Utils.ui = {
     });
   },
 
-  addMaxDatePicker: function(id, maxDateOffset) {
-    jQuery("#" + id).datepicker({
-      dateFormat: Utils.ui.goodDateFormat,
-      showButtonPanel: true,
-      maxDate: maxDateOffset
-    });
-  },
-
   addDateTimePicker: function(id) {
     jQuery("#" + id).datetimepicker({
       controlType: 'select',
       oneLine: true,
       dateFormat: Utils.ui.goodDateFormat,
       timeFormat: 'HH:mm:ss'
-    });
-  },
-
-  disableButton: function(buttonDiv) {
-    jQuery('#' + buttonDiv).attr('disabled', 'disabled');
-    jQuery('#' + buttonDiv).html("Processing...");
-  },
-
-  reenableButton: function(buttonDiv, text) {
-    jQuery('#' + buttonDiv).removeAttr('disabled');
-    jQuery('#' + buttonDiv).html(text);
-  },
-
-  confirmRemove: function(obj) {
-    if (confirm("Are you sure you wish to remove this item?")) {
-      obj.remove();
-    }
-  },
-
-  escape: function(obj, callback) {
-    return obj.each(function() {
-      jQuery(document).on("keydown", obj, function(e) {
-        var keycode = ((typeof e.keyCode != 'undefined' && e.keyCode) ? e.keyCode : e.which);
-        if (keycode === 27) {
-          callback.call(obj, e);
-        }
-      });
     });
   },
 
@@ -1192,7 +1091,7 @@ Utils.page = {
   },
   
   reloadWithParams: function(params) {
-    window.location = window.location.protocol + '//' + window.location.host + window.location.pathname + '?' + $.param(params);
+    window.location = window.location.protocol + '//' + window.location.host + window.location.pathname + '?' + Utils.page.param(params);
   },
 
   post: function(url, params) {
@@ -1211,6 +1110,11 @@ Utils.page = {
 
   getBaseUrl: function() {
     return window.location.protocol + '//' + window.location.host;
+  },
+
+  param: function(params) {
+    // jQuery.param no longer converts %20 to +, which broke some things...
+    return jQuery.param(params).replaceAll('%20', '+');
   }
 };
 

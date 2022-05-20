@@ -51,7 +51,7 @@ BulkTarget.libraryaliquot = (function($) {
             name: 'Create Order',
             action: function(items) {
               HotUtils.warnIfConsentRevoked(items, function() {
-                window.location = Urls.ui.poolOrders.create + '?' + jQuery.param({
+                window.location = Urls.ui.poolOrders.create + '?' + Utils.page.param({
                   aliquotIds: items.map(Utils.array.getId).join(',')
                 });
               }, getLabel);

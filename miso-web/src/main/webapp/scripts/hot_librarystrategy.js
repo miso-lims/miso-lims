@@ -25,7 +25,7 @@ HotTarget.librarystrategy = {
     return !config.isAdmin ? [] : [{
       name: 'Edit',
       action: function(items) {
-        window.location = Urls.ui.libraryStrategies.bulkEdit + '?' + jQuery.param({
+        window.location = Urls.ui.libraryStrategies.bulkEdit + '?' + Utils.page.param({
           ids: items.map(Utils.array.getId).join(',')
         });
       }

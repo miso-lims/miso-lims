@@ -146,7 +146,7 @@ ListTarget.attachment = (function() {
               if (sharedIds) {
                 params.entityIds = sharedIds;
               }
-              var url = '/miso/attachments/' + entityType + '/' + entityId + '?' + jQuery.param(params);
+              var url = '/miso/attachments/' + entityType + '/' + entityId + '?' + Utils.page.param(params);
               var formData = new FormData(jQuery('#uploadForm')[0]);
               dialog.dialog("close");
               dialogArea.empty();
@@ -172,7 +172,7 @@ ListTarget.attachment = (function() {
                 cache: false,
                 contentType: false,
                 processData: false
-              }).success(function(data) {
+              }).done(function(data) {
                 Utils.showOkDialog('Attach Files', ['File upload successful'], Utils.page.pageReload);
               }).fail(function(xhr, textStatus, errorThrown) {
                 dialog.dialog("close");
@@ -217,7 +217,7 @@ ListTarget.attachment = (function() {
           if (sharedIds) {
             params.entityIds = sharedIds;
           }
-          var url = '/miso/rest/attachments/' + entityType + '/' + entityId + '?' + jQuery.param(params);
+          var url = '/miso/rest/attachments/' + entityType + '/' + entityId + '?' + Utils.page.param(params);
           Utils.ajaxWithDialog('Linking File', 'POST', url, null, function() {
             Utils.showOkDialog('Link Project File', ['File link successful'], Utils.page.pageReload);
           });

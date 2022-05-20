@@ -27,7 +27,7 @@ ListTarget.transfer = (function() {
             window.location = Urls.ui.transfers.create;
             return;
           }
-          window.location = Urls.ui.transfers.create + '?' + jQuery.param(params);
+          window.location = Urls.ui.transfers.create + '?' + Utils.page.param(params);
         }
       }];
     },

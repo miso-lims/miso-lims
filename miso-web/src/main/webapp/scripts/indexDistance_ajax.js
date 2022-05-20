@@ -34,7 +34,7 @@
         dataType: 'json',
         contentType: 'application/json; charset=utf8',
         data: JSON.stringify(data)
-      }).success(function(data) {
+      }).done(function(data) {
         var results = '';
         if (Constants.warningEditDistance > Constants.errorEditDistance) {
           results += 'Indices with ' + Constants.warningEditDistance + ' or fewer mismatches are considered near-matches.\n';

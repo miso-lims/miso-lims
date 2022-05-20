@@ -768,7 +768,7 @@ FormUtils = (function($) {
       dataType: 'json',
       contentType: 'application/json; charset=utf8',
       data: JSON.stringify(object)
-    }).success(function(data) {
+    }).done(function(data) {
       postSaveCallback(data);
     }).fail(function(response, textStatus, serverStatus) {
       if (containerId === dialogFormId) {
@@ -971,7 +971,9 @@ FormUtils = (function($) {
     if (typeof value === 'boolean') {
       value = value.toString();
     }
-    select.val(value);
+    if (value !== null) {
+      select.val(value);
+    }
     if (field.onChange) {
       select.change(function() {
         var val = this.value;

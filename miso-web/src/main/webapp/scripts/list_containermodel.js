@@ -38,7 +38,7 @@ ListTarget.containermodel = {
             property: 'query',
             required: true
           }], function(output) {
-            Utils.ajaxWithDialog('Searching...', 'GET', Urls.rest.containerModels.search + '?' + jQuery.param({
+            Utils.ajaxWithDialog('Searching...', 'GET', Urls.rest.containerModels.search + '?' + Utils.page.param({
               platformType: jQuery('#instrumentModelForm_platformType').val(),
               q: output.query
             }), null, function(models, textStatus, xhr) {

@@ -1,26 +1,3 @@
-<%--
-  ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
-  ~ MISO project contacts: Robert Davey @ TGAC
-  ~ **********************************************************************
-  ~
-  ~ This file is part of MISO.
-  ~
-  ~ MISO is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
-  ~
-  ~ MISO is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU General Public License for more details.
-  ~
-  ~ You should have received a copy of the GNU General Public License
-  ~ along with MISO.  If not, see <http://www.gnu.org/licenses/>.
-  ~
-  ~ **********************************************************************
-  --%>
-
 <%@ page import="uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider" %>
 <!DOCTYPE html>
 
@@ -44,9 +21,9 @@
   <title><c:if test="${not empty title}">${title} &mdash; </c:if>MISO LIMS ${misoInstanceName}</title>
 
   <!-- jQuery -->
-  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery-1.8.3.min.js'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery-ui-1.9.2.custom.min.js'/>"></script>
-  <link rel="stylesheet" href="<c:url value='/scripts/jquery/css/smoothness/jquery-ui-1.9.2.custom.min.css'/>"
+  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery-3.6.0.min.js'/>"></script>
+  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery-ui.min.js'/>"></script>
+  <link rel="stylesheet" href="<c:url value='/scripts/jquery/css/jquery-ui.min.css'/>"
     type="text/css">
   <script src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>" type="text/javascript"></script>
 	<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
@@ -81,15 +58,6 @@
 
 
   <link rel="shortcut icon" href="<c:url value='/favicon.ico'/>" type="image/x-icon"/>
-
-    <!--IE check-->
-    <script type="text/javascript">
-        jQuery(document).ready(function () {
-            if (jQuery.browser.msie) {
-                alert("Internet Explorer is not supported by MISO. Please use Google Chrome, Safari or Mozilla Firefox");
-            }
-        });
-    </script>
 </head>
 
 <body>

@@ -163,14 +163,14 @@ HotTarget.boxable = (function() {
               var deferred = jQuery.Deferred();
               jQuery
                   .ajax({
-                    url: '/miso/rest/boxes/search/partial?' + jQuery.param({
+                    url: '/miso/rest/boxes/search/partial?' + Utils.page.param({
                       q: value,
                       b: false
                     }),
                     contentType: "application/json; charset=utf8",
                     dataType: "json"
                   })
-                  .success(
+                  .done(
                       function(data) {
                         boxSearchCache[value.toLowerCase()] = data;
                         jQuery.each(data, function(index, item) {

@@ -91,7 +91,7 @@ ListTarget.box = {
             window.location = Urls.ui.boxes.create;
             return;
           }
-          window.location = Urls.ui.boxes.bulkCreate + '?' + jQuery.param({
+          window.location = Urls.ui.boxes.bulkCreate + '?' + Utils.page.param({
             quantity: result.quantity,
           });
         });

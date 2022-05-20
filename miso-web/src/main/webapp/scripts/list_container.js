@@ -89,7 +89,7 @@ ListTarget.container = {
             property: "barcode"
           }, ], function(results) {
             Utils.ajaxWithDialog('Adding ' + platformType.containerName, 'POST', Urls.rest.runs.addContainer(config.runId) + '?'
-                + jQuery.param({
+                + Utils.page.param({
                   barcode: results.barcode
                 }), null, Utils.page.pageReload);
           });

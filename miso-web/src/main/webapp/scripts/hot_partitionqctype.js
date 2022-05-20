@@ -25,7 +25,7 @@ HotTarget.partitionqctype = {
     return !config.isAdmin ? [] : [{
       name: 'Edit',
       action: function(items) {
-        window.location = Urls.ui.partitionQcTypes.bulkEdit + '?' + jQuery.param({
+        window.location = Urls.ui.partitionQcTypes.bulkEdit + '?' + Utils.page.param({
           ids: items.map(Utils.array.getId).join(',')
         });
       }

@@ -35,7 +35,7 @@ var Submission = {
       label: 'Centre Name',
       property: 'centerName'
     }, ], function(results) {
-      window.location = window.location.origin + '/miso/rest/submissions/' + id + '/download?' + jQuery.param(results);
+      window.location = window.location.origin + '/miso/rest/submissions/' + id + '/download?' + Utils.page.param(results);
 
     });
   }
