@@ -108,7 +108,7 @@ public class EditLibraryAliquotController {
     private final BoxDto newBox;
     private final Map<Long, Long> defaultTargetedSequencingByProject = new HashMap<>();
 
-    private BulkPropagateLibraryBackend(BoxDto newBox, ObjectMapper mapper) {
+    private BulkPropagateLibraryBackend(BoxDto newBox) {
       super("libraryaliquot", LibraryAliquotDto.class, "Library Aliquots", "Libraries", mapper);
       this.newBox = newBox;
     }
@@ -188,7 +188,7 @@ public class EditLibraryAliquotController {
     private final BoxDto newBox;
     private final Map<Long, Long> defaultTargetedSequencingByProject = new HashMap<>();
 
-    private BulkPropagateAliquotBackend(BoxDto newBox, ObjectMapper mapper) {
+    private BulkPropagateAliquotBackend(BoxDto newBox) {
       super("libraryaliquot", LibraryAliquotDto.class, "Library Aliquots", "Library Aliquots", mapper);
       this.newBox = newBox;
     }
@@ -257,7 +257,7 @@ public class EditLibraryAliquotController {
     Long boxId = getLongInput("boxId", form, false);
 
     BulkPropagateLibraryBackend bulkPropagateBackend = new BulkPropagateLibraryBackend(
-        boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null, mapper);
+        boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null);
     return bulkPropagateBackend.propagate(libraryIds, model);
   }
 
@@ -267,12 +267,15 @@ public class EditLibraryAliquotController {
     Long boxId = getLongInput("boxId", form, false);
 
     BulkPropagateAliquotBackend bulkPropagateBackend = new BulkPropagateAliquotBackend(
-        boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null, mapper);
+        boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null);
     return bulkPropagateBackend.propagate(aliquotIds, model);
   }
 
-  private final BulkEditTableBackend<LibraryAliquot, LibraryAliquotDto> bulkEditBackend = new BulkEditTableBackend<>(
-      "libraryaliquot", LibraryAliquotDto.class, "Library Aliquots", mapper) {
+  private class BulkEditBackend extends BulkEditTableBackend<LibraryAliquot, LibraryAliquotDto> {
+
+    public BulkEditBackend() {
+      super("libraryaliquot", LibraryAliquotDto.class, "Library Aliquots", mapper);
+    }
 
     @Override
     protected LibraryAliquotDto asDto(LibraryAliquot model) {
@@ -298,14 +301,14 @@ public class EditLibraryAliquotController {
   @PostMapping(value = "/bulk/edit")
   public ModelAndView bulkEdit(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
     String ids = getStringInput("ids", form, true);
-    return bulkEditBackend.edit(ids, model);
+    return new BulkEditBackend().edit(ids, model);
   }
 
   private final class BulkMergeBackend extends BulkMergeTableBackend<PoolDto> {
 
     private final BoxDto newBox;
 
-    private BulkMergeBackend(BoxDto newBox, ObjectMapper mapper) {
+    private BulkMergeBackend(BoxDto newBox) {
       super("pool", PoolDto.class, "Pools", "Library Aliquots", mapper);
       this.newBox = newBox;
     }
@@ -363,7 +366,7 @@ public class EditLibraryAliquotController {
     String aliquotIds = getStringInput("ids", form, true);
     Long boxId = getLongInput("boxId", form, false);
     BulkMergeBackend bulkMergeBackend = new BulkMergeBackend(
-        (boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null), mapper);
+        (boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null));
     return bulkMergeBackend.propagate(aliquotIds, model);
   }
 

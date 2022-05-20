@@ -97,8 +97,6 @@ public class LibraryAliquotRestController extends RestController {
   private IndexChecker indexChecker;
   @Autowired
   private AsyncOperationManager asyncOperationManager;
-  @Autowired
-  private ObjectMapper mapper;
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
@@ -227,7 +225,7 @@ public class LibraryAliquotRestController extends RestController {
   @ResponseBody
   public HttpEntity<byte[]> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
-    return parentFinder.list(ids, category, mapper);
+    return parentFinder.list(ids, category, getObjectMapper());
   }
 
   private final RelationFinder<LibraryAliquot> childFinder = (new RelationFinder<LibraryAliquot>() {
@@ -272,7 +270,7 @@ public class LibraryAliquotRestController extends RestController {
   @ResponseBody
   public HttpEntity<byte[]> getChildren(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
-    return childFinder.list(ids, category, mapper);
+    return childFinder.list(ids, category, getObjectMapper());
   }
 
   @PostMapping(value = "/bulk-delete")

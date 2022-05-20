@@ -231,8 +231,6 @@ public class RunRestController extends RestController {
   private IndexChecker indexChecker;
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
-  @Autowired
-  private ObjectMapper mapper;
 
   private final JQueryDataTableBackend<Run, RunDto> jQueryBackend = new JQueryDataTableBackend<>() {
 
@@ -317,7 +315,7 @@ public class RunRestController extends RestController {
   @PostMapping(value = "/parents/{category}")
   @ResponseBody
   public HttpEntity<byte[]> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids) throws IOException {
-    return parentFinder.list(ids, category, mapper);
+    return parentFinder.list(ids, category, getObjectMapper());
   }
 
   private Stream<Pool> getPools(Run run) {

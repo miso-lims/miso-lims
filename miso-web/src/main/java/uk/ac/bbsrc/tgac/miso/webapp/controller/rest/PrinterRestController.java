@@ -182,14 +182,12 @@ public class PrinterRestController extends RestController {
   private BoxService boxService;
   @Autowired
   private ContainerService containerService;
-  @Autowired
-  private ObjectMapper mapper;
 
   private final JQueryDataTableBackend<Printer, PrinterDto> jQueryBackend = new JQueryDataTableBackend<Printer, PrinterDto>() {
 
     @Override
     protected PrinterDto asDto(Printer model) {
-      return Dtos.asDto(model, mapper);
+      return Dtos.asDto(model, getObjectMapper());
     }
 
     @Override
@@ -253,7 +251,7 @@ public class PrinterRestController extends RestController {
   @ResponseBody
   @ResponseStatus(code = HttpStatus.CREATED)
   public PrinterDto create(@RequestBody PrinterDto dto) throws IOException {
-    Printer printer = Dtos.to(dto, mapper);
+    Printer printer = Dtos.to(dto, getObjectMapper());
     return get(printerService.create(printer));
   }
 
@@ -303,7 +301,7 @@ public class PrinterRestController extends RestController {
     if (printer == null) {
       throw new RestException("No printer found with ID: " + printerId, Status.NOT_FOUND);
     }
-    return Dtos.asDto(printer, mapper);
+    return Dtos.asDto(printer, getObjectMapper());
   }
 
   @GetMapping(value = "{printerId}/layout", headers = { "Content-type=application/json" })
@@ -321,7 +319,7 @@ public class PrinterRestController extends RestController {
   @ResponseBody
   public List<PrinterDto> list() throws IOException {
     return printerService.list(0, 0, true, "id").stream()
-        .map(printer -> Dtos.asDto(printer, mapper))
+        .map(printer -> Dtos.asDto(printer, getObjectMapper()))
         .collect(Collectors.toList());
   }
 

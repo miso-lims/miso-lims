@@ -107,8 +107,6 @@ public class LibraryRestController extends RestController {
 
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
-  @Autowired
-  private ObjectMapper mapper;
 
   private final JQueryDataTableBackend<Library, LibraryDto> jQueryBackend = new JQueryDataTableBackend<>() {
     @Override
@@ -257,7 +255,7 @@ public class LibraryRestController extends RestController {
   @ResponseBody
   public HttpEntity<byte[]> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
-    return parentFinder.list(ids, category, mapper);
+    return parentFinder.list(ids, category, getObjectMapper());
   }
 
   private final RelationFinder<Library> childFinder = (new RelationFinder<Library>() {
@@ -332,7 +330,7 @@ public class LibraryRestController extends RestController {
   @ResponseBody
   public HttpEntity<byte[]> getChildren(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
-    return childFinder.list(ids, category, mapper);
+    return childFinder.list(ids, category, getObjectMapper());
   }
 
   @PostMapping(value = "/bulk-delete")

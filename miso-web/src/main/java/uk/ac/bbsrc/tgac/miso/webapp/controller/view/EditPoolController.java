@@ -180,8 +180,11 @@ public class EditPoolController {
     model.put("sequencingParametersJson", array.toString());
   }
 
-  private final BulkEditTableBackend<Pool, PoolDto> bulkEditBackend = new BulkEditTableBackend<>(
-      "pool", PoolDto.class, "Pools", mapper) {
+  private class BulkEditBackend extends BulkEditTableBackend<Pool, PoolDto> {
+
+    public BulkEditBackend() {
+      super("pool", PoolDto.class, "Pools", mapper);
+    }
 
     @Override
     protected PoolDto asDto(Pool model) {
@@ -207,7 +210,7 @@ public class EditPoolController {
   @PostMapping(value = "/bulk/edit")
   public ModelAndView editPools(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
     String poolIds = getStringInput("ids", form, true);
-    return bulkEditBackend.edit(poolIds, model);
+    return new BulkEditBackend().edit(poolIds, model);
   }
 
   private static class BulkMergePoolsBackend extends BulkTableBackend<PoolDto> {
