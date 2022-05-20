@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -73,6 +74,7 @@ public class WebConfig extends WebMvcConfigurationSupport {
     ObjectMapper mapper = new ObjectMapper();
     mapper.registerModule(new JsonStringValidator());
     mapper.getFactory().setCharacterEscapes(new JsonCharacterEscapes());
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     return mapper;
   }
 }
