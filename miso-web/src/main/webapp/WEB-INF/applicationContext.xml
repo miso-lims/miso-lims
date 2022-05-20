@@ -1,39 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
-  ~ MISO project contacts: Robert Davey @ TGAC
-  ~ **********************************************************************
-  ~
-  ~ This file is part of MISO.
-  ~
-  ~ MISO is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
-  ~
-  ~ MISO is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  ~ GNU General Public License for more details.
-  ~
-  ~ You should have received a copy of the GNU General Public License
-  ~ along with MISO. If not, see <http://www.gnu.org/licenses/>.
-  ~
-  ~ **********************************************************************
--->
-
 <beans
   xmlns="http://www.springframework.org/schema/beans"
   xmlns:aop="http://www.springframework.org/schema/aop"
   xmlns:context="http://www.springframework.org/schema/context"
   xmlns:task="http://www.springframework.org/schema/task"
   xmlns:tx="http://www.springframework.org/schema/tx"
+  xmlns:mvc="http://www.springframework.org/schema/mvc"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd 
                       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
                       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd 
                       http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
-                      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd"
+                      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+                      http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd"
   default-autowire="byName">
   <tx:annotation-driven proxy-target-class="true" />
 
@@ -80,5 +59,13 @@
   <task:annotation-driven executor="taskExecutor" scheduler="taskScheduler"/>
   <task:executor id="taskExecutor" pool-size="2"/>
   <task:scheduler id="taskScheduler" pool-size="10"/>
+
+  <mvc:annotation-driven>
+    <mvc:message-converters>
+      <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+        <property name="objectMapper" ref="objectMapper" />
+      </bean>
+    </mvc:message-converters>
+  </mvc:annotation-driven>
 
 </beans>

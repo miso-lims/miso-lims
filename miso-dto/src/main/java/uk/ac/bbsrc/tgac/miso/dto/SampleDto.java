@@ -7,10 +7,7 @@ import java.util.function.Function;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.*;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -435,6 +432,7 @@ public class SampleDto extends AbstractBoxableDto implements ReceivableDto<Sampl
     return new TransferSample();
   }
 
+  @JsonIgnore
   @Override
   public Function<Transfer, Set<TransferSample>> getTransferItemsFunction() {
     return Transfer::getSampleTransfers;

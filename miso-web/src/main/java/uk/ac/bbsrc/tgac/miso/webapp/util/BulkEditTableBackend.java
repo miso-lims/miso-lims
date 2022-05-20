@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -19,8 +20,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 public abstract class BulkEditTableBackend<Model, Dto> extends BulkTableBackend<Dto> {
   private final String name;
 
-  public BulkEditTableBackend(String targetType, Class<? extends Dto> dtoClass, String name) {
-    super(targetType, dtoClass);
+  public BulkEditTableBackend(String targetType, Class<? extends Dto> dtoClass, String name, ObjectMapper mapper) {
+    super(targetType, dtoClass, mapper);
     this.name = name;
   }
 

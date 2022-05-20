@@ -54,6 +54,8 @@ public class EditServiceRecordController {
   private InstrumentService instrumentService;
   @Autowired
   private ServiceRecordService serviceRecordService;
+  @Autowired
+  private ObjectMapper mapper;
 
   @GetMapping(value = "/{recordId}")
   public ModelAndView viewServiceRecord(@PathVariable(value = "recordId") Long recordId, ModelMap model) throws IOException {
@@ -81,7 +83,6 @@ public class EditServiceRecordController {
     } else {
       model.put("title", "Service Record " + record.getId());
     }
-    ObjectMapper mapper = new ObjectMapper();
     model.put("serviceRecord", record);
     model.put("serviceRecordDto", mapper.writeValueAsString(Dtos.asDto(record)));
     ArrayNode positions = mapper.createArrayNode();

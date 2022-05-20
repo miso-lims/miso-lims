@@ -13,6 +13,8 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.http.HttpMessage;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.NestedServletException;
 
@@ -53,8 +55,7 @@ public class RestExceptionHandler {
    * @param exception The exception that was thrown while handling a REST request
    * @return a representation of the error to return to the client
    */
-  public static ObjectNode handleException(HttpServletRequest request, HttpServletResponse response, Exception exception) {
-    ObjectMapper mapper = new ObjectMapper();
+  public static ObjectNode handleException(HttpServletRequest request, HttpServletResponse response, Exception exception, ObjectMapper mapper) {
     ObjectNode error = mapper.createObjectNode();
     error.put("requestUrl", request.getRequestURL().toString());
     String detailMessage = exception.getLocalizedMessage();
@@ -64,7 +65,12 @@ public class RestExceptionHandler {
     if (exception instanceof NestedServletException) {
       NestedServletException nested = (NestedServletException) exception;
       if (nested.getCause() instanceof Exception) {
-        return handleException(request, response, (Exception) nested.getCause());
+        return handleException(request, response, (Exception) nested.getCause(), mapper);
+      }
+    } else if (exception instanceof HttpMessageNotReadableException) {
+      Throwable rootCause = ((HttpMessageNotReadableException) exception).getRootCause();
+      if (rootCause instanceof ValidationException) {
+        return handleException(request, response, (Exception) rootCause, mapper);
       }
     }
     if (rs != null) {

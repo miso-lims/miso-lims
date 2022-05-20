@@ -2,6 +2,8 @@ package uk.ac.bbsrc.tgac.miso.webapp.util.form;
 
 import java.util.stream.Collectors;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.servlet.tags.RequestContextAwareTag;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,7 +23,7 @@ public class AttachmentsTag extends RequestContextAwareTag {
   @Override
   protected int doStartTagInternal() throws Exception {
     Attachable attachable = (Attachable) this.item;
-    ObjectMapper mapper = new ObjectMapper();
+    ObjectMapper mapper = TagUtils.getObjectMapper(pageContext);
 
     String projectConfig = projectId == null ? "" : (", projectId: " + projectId);
     pageContext.getOut().append(String.format(

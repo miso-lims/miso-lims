@@ -26,13 +26,14 @@ import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 
 public class TabbedListItemsPage {
 
-  public static TabbedListItemsPage createForPlatformType(String targetType, InstrumentModelService instrumentModelService)
-      throws IOException {
-    return new TabbedListItemsPage(targetType, "platformType", getPlatformTypes(instrumentModelService), PlatformType::getKey,
-        PlatformType::name);
+  public static TabbedListItemsPage createForPlatformType(String targetType,
+      InstrumentModelService instrumentModelService, ObjectMapper mapper) throws IOException {
+    return new TabbedListItemsPage(targetType, "platformType",
+        getPlatformTypes(instrumentModelService), PlatformType::getKey, PlatformType::name, mapper);
   }
 
-  public static Stream<PlatformType> getPlatformTypes(InstrumentModelService instrumentModelService) throws IOException {
+  public static Stream<PlatformType> getPlatformTypes(InstrumentModelService instrumentModelService)
+      throws IOException {
     Set<PlatformType> platforms = instrumentModelService.listActivePlatformTypes();
 
     if (platforms.size() > 0) {
@@ -45,21 +46,22 @@ public class TabbedListItemsPage {
   private final String property;
   private final Map<String, String> tabs;
   private final String targetType;
+  private final ObjectMapper mapper;
 
   public <T> TabbedListItemsPage(String targetType, String property, Stream<T> tabItems, Function<T, String> getName,
-      Function<T, Object> getValue) {
-    this(targetType, property, tabItems, Comparator.naturalOrder(), getName, getValue);
+      Function<T, Object> getValue, ObjectMapper mapper) {
+    this(targetType, property, tabItems, Comparator.naturalOrder(), getName, getValue, mapper);
   }
 
   public <T> TabbedListItemsPage(String targetType, String property, Stream<T> tabItems, Comparator<String> tabSorter,
-      Function<T, String> getName, Function<T, Object> getValue) {
+      Function<T, String> getName, Function<T, Object> getValue, ObjectMapper mapper) {
     this(targetType, property, tabItems.collect(Collectors.toMap(getName, v -> {
       try {
-        return new ObjectMapper().writeValueAsString(getValue.apply(v));
+        return mapper.writeValueAsString(getValue.apply(v));
       } catch (JsonProcessingException e) {
         throw new IllegalStateException("Failed to serialised tab value as JSON", e);
       }
-    }, (left, right) -> left, () -> tabSorter == null ? new LinkedHashMap<>() : new TreeMap<>(tabSorter))));
+    }, (left, right) -> left, () -> tabSorter == null ? new LinkedHashMap<>() : new TreeMap<>(tabSorter))), mapper);
   }
 
   /**
@@ -70,10 +72,11 @@ public class TabbedListItemsPage {
    * @param tabs The tabs to create. The key is a HTML-encoded string for the tab name and the value is a JavaScript-encoded value to set
    *          the configuration property to.
    */
-  public TabbedListItemsPage(String targetType, String property, Map<String, String> tabs) {
+  public TabbedListItemsPage(String targetType, String property, Map<String, String> tabs, ObjectMapper mapper) {
     this.targetType = targetType;
     this.property = property;
     this.tabs = tabs;
+    this.mapper = mapper;
   }
 
   public final ModelAndView list(ModelMap model) throws IOException {
@@ -81,7 +84,6 @@ public class TabbedListItemsPage {
   }
 
   private ModelAndView list(String projectId, ModelMap model) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
     ObjectNode config = mapper.createObjectNode();
     writeConfiguration(mapper, config);
     model.put("config", mapper.writeValueAsString(config));
@@ -93,7 +95,6 @@ public class TabbedListItemsPage {
   }
 
   public <V> ModelAndView list(Function<String, Stream<V>> getter, ModelMap model) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
     ObjectNode config = mapper.createObjectNode();
     writeConfiguration(mapper, config);
     model.put("config", mapper.writeValueAsString(config));

@@ -47,8 +47,11 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.TabbedListItemsPage;
 
 @Controller
 public class ListKitDescriptorsController {
+
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private ObjectMapper mapper;
 
   @ModelAttribute("title")
   public String title() {
@@ -57,23 +60,25 @@ public class ListKitDescriptorsController {
 
   @RequestMapping("/kitdescriptors")
   public ModelAndView listKitDescriptors(ModelMap model) throws IOException {
-    return new TabbedListKitDescriptorsPage("kit", "kitType", Arrays.stream(KitType.values()), KitType::getKey, KitType::name).list(model);
+    return new TabbedListKitDescriptorsPage("kit", "kitType", Arrays.stream(KitType.values()), KitType::getKey,
+        KitType::name, mapper).list(model);
   }
 
   public class TabbedListKitDescriptorsPage extends TabbedListItemsPage {
 
     public <T> TabbedListKitDescriptorsPage(String targetType, String property, Stream<T> tabItems, Function<T, String> getName,
-        Function<T, Object> getValue) {
-      super(targetType, property, tabItems, getName, getValue);
+        Function<T, Object> getValue, ObjectMapper mapper) {
+      super(targetType, property, tabItems, getName, getValue, mapper);
     }
 
     public <T> TabbedListKitDescriptorsPage(String targetType, String property, Stream<T> tabItems, Comparator<String> tabSorter,
-        Function<T, String> getName, Function<T, Object> getValue) {
-      super(targetType, property, tabItems, tabSorter, getName, getValue);
+        Function<T, String> getName, Function<T, Object> getValue, ObjectMapper mapper) {
+      super(targetType, property, tabItems, tabSorter, getName, getValue, mapper);
     }
 
-    public TabbedListKitDescriptorsPage(String targetType, String property, SortedMap<String, String> tabs) {
-      super(targetType, property, tabs);
+    public TabbedListKitDescriptorsPage(String targetType, String property, SortedMap<String, String> tabs,
+        ObjectMapper mapper) {
+      super(targetType, property, tabs, mapper);
     }
 
     @Override

@@ -22,14 +22,17 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 @RequestMapping("/workflow")
 @Controller
 public class WorkflowController {
+
   @Autowired
   WorkflowManager workflowManager;
+  @Autowired
+  private ObjectMapper mapper;
 
   @RequestMapping("/new/{workflowName}")
   public ModelAndView createWorkflow(@PathVariable String workflowName, ModelMap model) throws IOException {
     Workflow workflow = workflowManager.beginWorkflow(workflowName);
     model.put("title", workflow.getProgress().getWorkflowName().getDescription());
-    model.put("state", new ObjectMapper().writeValueAsString(Dtos.asDto(workflow)));
+    model.put("state", mapper.writeValueAsString(Dtos.asDto(workflow)));
     return new ModelAndView("/WEB-INF/pages/workflow.jsp", model);
   }
 
@@ -38,7 +41,7 @@ public class WorkflowController {
     Workflow workflow = workflowManager.loadWorkflow(id);
     if (workflow == null) throw new NotFoundException("No workflow found for ID " + id.toString());
     model.put("title", workflow.getProgress().getWorkflowName().getDescription());
-    model.put("state", new ObjectMapper().writeValueAsString(Dtos.asDto(workflow)));
+    model.put("state", mapper.writeValueAsString(Dtos.asDto(workflow)));
     return new ModelAndView("/WEB-INF/pages/workflow.jsp", model);
   }
 }

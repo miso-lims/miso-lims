@@ -66,6 +66,8 @@ public class EditProjectController {
   private SubprojectService subprojectService;
   @Autowired
   private NamingSchemeHolder namingSchemeHolder;
+  @Autowired
+  private ObjectMapper mapper;
 
   public void setProjectService(ProjectService projectService) {
     this.projectService = projectService;
@@ -105,8 +107,6 @@ public class EditProjectController {
     }
 
     model.put("project", project);
-
-    ObjectMapper mapper = new ObjectMapper();
     model.put("projectDto", mapper.writeValueAsString(Dtos.asDto(project)));
 
     ObjectNode formConfig = mapper.createObjectNode();

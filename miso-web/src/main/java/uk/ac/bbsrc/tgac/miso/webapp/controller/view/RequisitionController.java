@@ -51,19 +51,27 @@ public class RequisitionController {
   private RunPartitionAliquotService runPartitionAliquotService;
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private ObjectMapper mapper;
 
-  private final ListItemsPage listPage = new ListItemsPage("requisition") {
+  private static class ListRequisitionsPage extends ListItemsPage {
+
+    private final AuthorizationManager authorizationManager;
+
+    public ListRequisitionsPage(AuthorizationManager authorizationManager, ObjectMapper mapper) {
+      super("requisition", mapper);
+      this.authorizationManager = authorizationManager;
+    }
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
       config.put("isAdmin", authorizationManager.isAdminUser());
     }
-
-  };
+  }
 
   @GetMapping("/list")
   public ModelAndView list(ModelMap model) throws IOException {
-    return listPage.list(model);
+    return new ListRequisitionsPage(authorizationManager, mapper).list(model);
   }
 
   @GetMapping("/new")
@@ -100,7 +108,6 @@ public class RequisitionController {
   }
 
   private ModelAndView setupForm(Requisition requisition, PageMode pageMode, ModelMap model) throws JsonProcessingException {
-    ObjectMapper mapper = new ObjectMapper();
     model.put(PageMode.PROPERTY, pageMode.getLabel());
     model.put("requisition", requisition);
     model.put("requisitionDto", mapper.writeValueAsString(RequisitionDto.from(requisition)));

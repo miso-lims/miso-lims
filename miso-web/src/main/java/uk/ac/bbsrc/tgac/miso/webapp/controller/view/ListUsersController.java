@@ -62,18 +62,12 @@ public class ListUsersController {
   private AuthorizationManager authorizationManager;
   @Autowired
   private UserService userService;
+  @Autowired
+  private ObjectMapper mapper;
 
   @Autowired
   @Qualifier("sessionRegistry")
   private SessionRegistry sessionRegistry;
-
-  private final ListItemsPage usersPage = new ListItemsPageWithAuthorization("user", this::getAuthorizationManager) {
-    @Override
-    protected void writeConfigurationExtra(ObjectMapper mapper, ObjectNode config) throws IOException {
-      config.put("allowCreateUser", securityManager.canCreateNewUser());
-      config.put("listMode", "list");
-    }
-  };
 
   @RequestMapping("/admin/users")
   public ModelAndView adminListUsers(ModelMap model) throws IOException {
@@ -82,6 +76,13 @@ public class ListUsersController {
         .map(ListUsersController::getUsername)
         .collect(Collectors.toSet());
 
+    ListItemsPage usersPage = new ListItemsPageWithAuthorization("user", authorizationManager, mapper) {
+      @Override
+      protected void writeConfigurationExtra(ObjectMapper mapper, ObjectNode config) throws IOException {
+        config.put("allowCreateUser", securityManager.canCreateNewUser());
+        config.put("listMode", "list");
+      }
+    };
     return usersPage.list(model,
         userService.list().stream().map(Dtos::asDto).peek(user -> user.setLoggedIn(loggedIn.contains(user.getLoginName()))));
   }

@@ -16,7 +16,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,7 +82,6 @@ public class ConstantsController {
 
   private String constantsJs;
 
-  ServletContext servletContext;
   @Autowired
   private AssayService assayService;
   @Autowired
@@ -175,6 +173,9 @@ public class ConstantsController {
   @Autowired
   private IndexChecker indexChecker;
 
+  @Autowired
+  private ObjectMapper mapper;
+
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
   @Value("${miso.detailed.sample.enabled}")
@@ -218,7 +219,6 @@ public class ConstantsController {
 
   private void rebuildConstants() {
     try {
-      ObjectMapper mapper = new ObjectMapper();
       ObjectNode node = mapper.createObjectNode();
       node.put("docsVersion", getDocsVersion());
       node.put("isDetailedSample", detailedSample);

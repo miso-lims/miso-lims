@@ -47,19 +47,28 @@ public class ListSubmissionsController {
   private SubmissionService submissionService;
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private ObjectMapper mapper;
 
-  private final ListItemsPage listSubmissionsPage = new ListItemsPage("submission") {
+  private static class ListSubmissionsPage extends ListItemsPage {
+
+    private final AuthorizationManager authorizationManager;
+
+    public ListSubmissionsPage(AuthorizationManager authorizationManager, ObjectMapper mapper) {
+      super("submission", mapper);
+      this.authorizationManager = authorizationManager;
+    }
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
       config.put("isAdmin", authorizationManager.isAdminUser());
     }
-
-  };
+  }
 
   @RequestMapping("/submissions")
   public ModelAndView listSubmissions(ModelMap model) throws Exception {
-    return listSubmissionsPage.list(model, submissionService.list().stream().map(Dtos::asDto));
+    return new ListSubmissionsPage(authorizationManager, mapper)
+        .list(model, submissionService.list().stream().map(Dtos::asDto));
   }
 
   @ModelAttribute("title")

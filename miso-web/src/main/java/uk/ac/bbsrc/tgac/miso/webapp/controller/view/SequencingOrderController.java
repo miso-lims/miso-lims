@@ -33,36 +33,38 @@ public class SequencingOrderController {
   private PoolService poolService;
   @Autowired
   private IndexChecker indexChecker;
-
-  private final BulkPropagateTableBackend<Pool, SequencingOrderDto> orderBulkPropagateBackend = new BulkPropagateTableBackend<>(
-      "sequencingorder", SequencingOrderDto.class, "Sequencing Orders", "Pools") {
-
-    @Override
-    protected SequencingOrderDto createDtoFromParent(Pool item) {
-      SequencingOrderDto dto = new SequencingOrderDto();
-      dto.setPool(Dtos.asDto(item, false, false, indexChecker));
-      return dto;
-    }
-
-    @Override
-    protected Stream<Pool> loadParents(List<Long> parentIds) throws IOException {
-      return poolService.listByIdList(parentIds).stream();
-    }
-
-    @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-      // no config necessary
-    }
-
-    @Override
-    protected boolean isNewInterface() {
-      return true;
-    }
-  };
+  @Autowired
+  private ObjectMapper mapper;
 
   @PostMapping("/bulk/new")
   public ModelAndView bulkCreateOrders(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
     String poolIds = getStringInput("poolIds", form, true);
+
+    BulkPropagateTableBackend<Pool, SequencingOrderDto> orderBulkPropagateBackend = new BulkPropagateTableBackend<>(
+        "sequencingorder", SequencingOrderDto.class, "Sequencing Orders", "Pools", mapper) {
+
+      @Override
+      protected SequencingOrderDto createDtoFromParent(Pool item) {
+        SequencingOrderDto dto = new SequencingOrderDto();
+        dto.setPool(Dtos.asDto(item, false, false, indexChecker));
+        return dto;
+      }
+
+      @Override
+      protected Stream<Pool> loadParents(List<Long> parentIds) throws IOException {
+        return poolService.listByIdList(parentIds).stream();
+      }
+
+      @Override
+      protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+        // no config necessary
+      }
+
+      @Override
+      protected boolean isNewInterface() {
+        return true;
+      }
+    };
     return orderBulkPropagateBackend.propagate(poolIds, model);
   }
 

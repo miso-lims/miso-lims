@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,10 +42,12 @@ public class ListRunsController {
 
   @Autowired
   private InstrumentModelService instrumentModelService;
+  @Autowired
+  private ObjectMapper mapper;
 
   @RequestMapping("/runs")
   public ModelAndView listRuns(ModelMap model) throws Exception {
-    return TabbedListItemsPage.createForPlatformType("run", instrumentModelService).list(model);
+    return TabbedListItemsPage.createForPlatformType("run", instrumentModelService, mapper).list(model);
   }
 
   @ModelAttribute("title")

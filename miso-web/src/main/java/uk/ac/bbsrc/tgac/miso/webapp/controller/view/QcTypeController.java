@@ -24,8 +24,11 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
 @Controller
 @RequestMapping("/qctype")
 public class QcTypeController extends AbstractInstituteDefaultsController<QcType, QcTypeDto> {
+  
   @Autowired
   private QcTypeService qcTypeService;
+  @Autowired
+  private ObjectMapper mapper;
 
   @Override
   protected QcTypeDto asDto(QcType model) {
@@ -82,7 +85,6 @@ public class QcTypeController extends AbstractInstituteDefaultsController<QcType
 
   private ModelAndView setupForm(QcType qcType, ModelMap model) throws JsonProcessingException {
     QcTypeDto dto = Dtos.asDto(qcType);
-    ObjectMapper mapper = new ObjectMapper();
     model.put("qcTypeDto", mapper.writeValueAsString(dto));
     return new ModelAndView("/WEB-INF/pages/editQcType.jsp", model);
   }

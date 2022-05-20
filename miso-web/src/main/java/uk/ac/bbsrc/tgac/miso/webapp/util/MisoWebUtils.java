@@ -233,13 +233,12 @@ public class MisoWebUtils {
   }
   
   public static ModelAndView getQcHierarchy(String entityType, long id, ThrowingFunction<Long, SampleQcNode, IOException> getter,
-      ModelMap model) throws IOException {
+      ModelMap model, ObjectMapper mapper) throws IOException {
     SampleQcNode hierarchy = getter.apply(id);
     if (hierarchy == null) {
       throw new NotFoundException(String.format("No %s found with ID %d", entityType, id));
     }
 
-    ObjectMapper mapper = new ObjectMapper();
     model.put("title", String.format("%s %d Hierarchy", entityType, hierarchy.getId()));
     model.put("selectedType", entityType);
     model.put("selectedId", id);

@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -589,7 +590,7 @@ public class PoolRestController extends RestController {
   @ResponseBody
   public HttpEntity<byte[]> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
-    return parentFinder.list(ids, category);
+    return parentFinder.list(ids, category, getObjectMapper());
   }
 
   private final RelationFinder<Pool> childFinder = (new RelationFinder<Pool>() {
@@ -618,7 +619,7 @@ public class PoolRestController extends RestController {
   @ResponseBody
   public HttpEntity<byte[]> getChildren(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
-    return childFinder.list(ids, category);
+    return childFinder.list(ids, category, getObjectMapper());
   }
 
   @PostMapping(value = "/samplesheet")

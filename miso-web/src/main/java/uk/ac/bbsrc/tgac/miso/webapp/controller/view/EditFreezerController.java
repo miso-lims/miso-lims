@@ -44,13 +44,12 @@ public class EditFreezerController {
   private StorageLocationMapService mapService;
   @Autowired
   private StorageLabelService storageLabelService;
-
-  private static final ObjectMapper mapper = new ObjectMapper();
+  @Autowired
+  private ObjectMapper mapper;
 
   @ModelAttribute("rooms")
   public String getRoomDtos() throws JsonProcessingException {
     List<StorageLocation> rooms = storageLocationService.listRooms();
-    ObjectMapper mapper = new ObjectMapper();
     return mapper.writeValueAsString(rooms.stream().map(r -> StorageLocationDto.from(r, false, false)).collect(Collectors.toList()));
   }
 

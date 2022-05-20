@@ -38,9 +38,10 @@ public class EditArrayRunController {
 
   @Autowired
   private ArrayRunService arrayRunService;
-
   @Autowired
   private InstrumentService instrumentService;
+  @Autowired
+  private ObjectMapper mapper;
 
   @ModelAttribute("healthTypes")
   public Collection<String> populateHealthTypes() {
@@ -51,8 +52,6 @@ public class EditArrayRunController {
   public ModelAndView newArrayRun(ModelMap model) throws IOException {
     model.addAttribute(MODEL_ATTR_TITLE, "New Array Run");
     model.addAttribute(PageMode.PROPERTY, PageMode.CREATE.getLabel());
-
-    ObjectMapper mapper = new ObjectMapper();
     model.addAttribute(MODEL_ATTR_SCANNERS, mapper.writeValueAsString(getArrayScannerDtos()));
 
     return new ModelAndView(JSP, model);
@@ -66,8 +65,6 @@ public class EditArrayRunController {
     }
     model.addAttribute(MODEL_ATTR_TITLE, "Array Run " + arrayRunId);
     model.addAttribute(PageMode.PROPERTY, PageMode.EDIT.getLabel());
-
-    ObjectMapper mapper = new ObjectMapper();
     model.addAttribute(MODEL_ATTR_JSON, mapper.writer().writeValueAsString(Dtos.asDto(run)));
     model.addAttribute(MODEL_ATTR_RUN, run);
     return new ModelAndView(JSP, model);

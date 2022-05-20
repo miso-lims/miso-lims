@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -39,12 +41,16 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
  */
 @Controller
 public class ListLibrariesController {
+
+  @Autowired
+  private ObjectMapper mapper;
+
   @ModelAttribute("title")
   public String title() {
     return "Libraries";
   }
   @RequestMapping("/libraries")
   public ModelAndView listLibraries(ModelMap model) throws Exception {
-    return new ListItemsPage("library").list(model);
+    return new ListItemsPage("library", mapper).list(model);
   }
 }

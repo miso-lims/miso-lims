@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -22,6 +23,8 @@ public class ListWorksetsController {
 
   @Autowired
   private WorksetCategoryService worksetCategoryService;
+  @Autowired
+  private ObjectMapper mapper;
 
   @ModelAttribute("title")
   public String title() {
@@ -36,8 +39,8 @@ public class ListWorksetsController {
       tabs = Stream.concat(tabs, categories.stream().map(WorksetCategory::getAlias).sorted());
       tabs = Stream.concat(tabs, Stream.of(Workset.ReservedWord.UNCATEGORIZED.getText()));
     }
-    return new TabbedListItemsPage("workset", "category", tabs, (t1, t2) -> 1, Function.identity(), String::toLowerCase)
-        .list(model);
+    return new TabbedListItemsPage("workset", "category", tabs, (t1, t2) -> 1, Function.identity(),
+        String::toLowerCase, mapper).list(model);
   }
 
 }

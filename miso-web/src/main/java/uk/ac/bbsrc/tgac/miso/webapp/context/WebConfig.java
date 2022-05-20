@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -65,5 +67,14 @@ public class WebConfig extends WebMvcConfigurationSupport {
   @Bean
   public Map<ProgressStep.FactoryType, ProgressStepFactory> progressStepFactoryMap() {
     return progressStepFactories.stream().collect(Collectors.toMap(ProgressStepFactory::getFactoryType, Function.identity()));
+  }
+
+  @Bean(name = "objectMapper")
+  public ObjectMapper objectMapper() {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new JsonStringValidator());
+    mapper.getFactory().setCharacterEscapes(new JsonCharacterEscapes());
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    return mapper;
   }
 }

@@ -33,12 +33,12 @@ public class EditPoolOrderController {
 
   @Autowired
   private PoolOrderService poolOrderService;
-
   @Autowired
   private LibraryAliquotService libraryAliquotService;
-
   @Autowired
   private IndexChecker indexChecker;
+  @Autowired
+  private ObjectMapper mapper;
 
   @GetMapping("/new")
   public ModelAndView create(@RequestParam(name = "aliquotIds", required = false) String aliquotIds, ModelMap model) throws IOException {
@@ -71,7 +71,6 @@ public class EditPoolOrderController {
   }
 
   private ModelAndView orderPage(PoolOrder order, ModelMap model) throws JsonProcessingException {
-    ObjectMapper mapper = new ObjectMapper();
     PoolOrderDto dto = Dtos.asDto(order, indexChecker);
     model.put("poolOrder", order);
     model.put("orderDto", mapper.writeValueAsString(dto));

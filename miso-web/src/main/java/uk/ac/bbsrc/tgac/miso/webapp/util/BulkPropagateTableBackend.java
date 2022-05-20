@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -22,8 +23,9 @@ public abstract class BulkPropagateTableBackend<ParentModel extends Identifiable
   private final String name;
   private final String parentName;
 
-  public BulkPropagateTableBackend(String targetType, Class<? extends Dto> dtoClass, String name, String parentName) {
-    super(targetType, dtoClass);
+  public BulkPropagateTableBackend(String targetType, Class<? extends Dto> dtoClass, String name, String parentName,
+      ObjectMapper mapper) {
+    super(targetType, dtoClass, mapper);
     this.name = name;
     this.parentName = parentName;
   }

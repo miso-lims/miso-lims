@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
 import java.io.IOException;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -41,15 +42,16 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPageWithAuthorization;
 @Controller
 public class ListGroupsController {
 
-  private final ListItemsPage groupsPage = new ListItemsPageWithAuthorization("group", this::getAuthorizationManager);
-
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
   private GroupService groupService;
+  @Autowired
+  private ObjectMapper mapper;
 
   @RequestMapping("/admin/groups")
   public ModelAndView adminListGroups(ModelMap model) throws IOException {
+    ListItemsPage groupsPage = new ListItemsPageWithAuthorization("group", authorizationManager, mapper);
     return groupsPage.list(model, groupService.list().stream().map(Dtos::asDto));
   }
 

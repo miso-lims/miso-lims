@@ -1,12 +1,17 @@
 package uk.ac.bbsrc.tgac.miso.webapp.util.form;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import org.springframework.web.context.support.WebApplicationContextUtils;
 import uk.ac.bbsrc.tgac.miso.Version;
+
+import javax.servlet.jsp.PageContext;
 
 public class TagUtils {
 
@@ -55,6 +60,12 @@ public class TagUtils {
 
   public static String version() {
     return Version.VERSION;
+  }
+
+  public static ObjectMapper getObjectMapper(PageContext pageContext) {
+    ApplicationContext context = WebApplicationContextUtils
+        .getRequiredWebApplicationContext(pageContext.getServletContext());
+    return context.getBean(ObjectMapper.class);
   }
 
 }

@@ -25,6 +25,8 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
 import java.io.IOException;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -35,6 +37,10 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
 
 @Controller
 public class ListArrayRunsController {
+
+  @Autowired
+  private ObjectMapper mapper;
+
   @ModelAttribute("title")
   public String title() {
     return "Array Runs";
@@ -42,6 +48,6 @@ public class ListArrayRunsController {
 
   @RequestMapping("/arrayruns")
   public ModelAndView listArrays(ModelMap model) throws IOException {
-    return new ListItemsPage("arrayrun").list(model);
+    return new ListItemsPage("arrayrun", mapper).list(model);
   }
 }

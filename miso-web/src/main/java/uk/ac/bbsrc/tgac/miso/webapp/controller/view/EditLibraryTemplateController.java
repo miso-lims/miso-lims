@@ -63,6 +63,8 @@ public class EditLibraryTemplateController {
   private LibraryTemplateService libraryTemplateService;
   @Autowired
   private ProjectService projectService;
+  @Autowired
+  private ObjectMapper mapper;
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
@@ -73,8 +75,8 @@ public class EditLibraryTemplateController {
 
   private final class BulkCreateLibraryTemplateBackend extends BulkCreateTableBackend<LibraryTemplateDto> {
 
-    public BulkCreateLibraryTemplateBackend(LibraryTemplateDto dto, Integer quantity) {
-      super("librarytemplate", LibraryTemplateDto.class, "Library Templates", dto, quantity);
+    public BulkCreateLibraryTemplateBackend(LibraryTemplateDto dto, Integer quantity, ObjectMapper mapper) {
+      super("librarytemplate", LibraryTemplateDto.class, "Library Templates", dto, quantity, mapper);
     }
 
     @Override
@@ -90,8 +92,8 @@ public class EditLibraryTemplateController {
 
   private final class BulkEditLibraryTemplateBackend extends BulkEditTableBackend<LibraryTemplate, LibraryTemplateDto> {
 
-    public BulkEditLibraryTemplateBackend() {
-      super("librarytemplate", LibraryTemplateDto.class, "Library Templates");
+    public BulkEditLibraryTemplateBackend(ObjectMapper mapper) {
+      super("librarytemplate", LibraryTemplateDto.class, "Library Templates", mapper);
     }
 
     @Override
@@ -127,13 +129,13 @@ public class EditLibraryTemplateController {
       dto.setProjectIds(projectIds);
     }
 
-    return new BulkCreateLibraryTemplateBackend(dto, quantity).create(model);
+    return new BulkCreateLibraryTemplateBackend(dto, quantity, mapper).create(model);
   }
 
   @PostMapping("/bulk/edit")
   public ModelAndView edit(@RequestParam Map<String, String> formData, ModelMap model) throws IOException {
     String libraryTemplateIds = MisoWebUtils.getStringInput("ids", formData, true);
-    return new BulkEditLibraryTemplateBackend().edit(libraryTemplateIds, model);
+    return new BulkEditLibraryTemplateBackend(mapper).edit(libraryTemplateIds, model);
   }
 
   @GetMapping("/new")
@@ -162,7 +164,6 @@ public class EditLibraryTemplateController {
 
   private ModelAndView libraryTemplatePage(LibraryTemplate template, ModelMap model) throws JsonProcessingException {
     LibraryTemplateDto dto = Dtos.asDto(template);
-    ObjectMapper mapper = new ObjectMapper();
     model.put("template", template);
     model.put("templateDto", mapper.writeValueAsString(dto));
     model.put("templateProjects", mapper.writeValueAsString(template.getProjects().stream().map(Dtos::asDto).collect(Collectors.toList())));
@@ -173,8 +174,9 @@ public class EditLibraryTemplateController {
 
     private final LibraryTemplate libraryTemplate;
 
-    public BulkCreateTemplateIndicesBackend(LibraryTemplate libraryTemplate, Integer quantity) {
-      super("librarytemplate_index", LibraryTemplateIndexDto.class, "Library Template Indices", new LibraryTemplateIndexDto(), quantity);
+    public BulkCreateTemplateIndicesBackend(LibraryTemplate libraryTemplate, Integer quantity, ObjectMapper mapper) {
+      super("librarytemplate_index", LibraryTemplateIndexDto.class, "Library Template Indices",
+          new LibraryTemplateIndexDto(), quantity, mapper);
       this.libraryTemplate = libraryTemplate;
     }
 
@@ -194,15 +196,15 @@ public class EditLibraryTemplateController {
   public ModelAndView addIndices(@PathVariable("templateId") long templateId, @RequestParam("quantity") int quantity, ModelMap model)
       throws IOException {
     LibraryTemplate template = getTemplateWithIndexFamily(templateId);
-    return new BulkCreateTemplateIndicesBackend(template, quantity).create(model);
+    return new BulkCreateTemplateIndicesBackend(template, quantity, mapper).create(model);
   }
 
   private static class BulkEditTemplateIndicesBackend extends BulkTableBackend<LibraryTemplateIndexDto> {
 
     private final LibraryTemplate libraryTemplate;
 
-    public BulkEditTemplateIndicesBackend(LibraryTemplate libraryTemplate) {
-      super("librarytemplate_index", LibraryTemplateIndexDto.class);
+    public BulkEditTemplateIndicesBackend(LibraryTemplate libraryTemplate, ObjectMapper mapper) {
+      super("librarytemplate_index", LibraryTemplateIndexDto.class, mapper);
       this.libraryTemplate = libraryTemplate;
     }
 
@@ -232,7 +234,7 @@ public class EditLibraryTemplateController {
   public ModelAndView editIndices(@PathVariable("templateId") long templateId, @RequestParam("positions") String positions, ModelMap model)
       throws IOException {
     LibraryTemplate template = getTemplateWithIndexFamily(templateId);
-    return new BulkEditTemplateIndicesBackend(template).edit(positions, model);
+    return new BulkEditTemplateIndicesBackend(template, mapper).edit(positions, model);
   }
 
   private LibraryTemplate getTemplate(long templateId) throws IOException {

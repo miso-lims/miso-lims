@@ -40,6 +40,8 @@ public class QcController {
   private QualityControlService qcService;
   @Autowired
   private InstrumentService instrumentService;
+  @Autowired
+  private ObjectMapper mapper;
 
   @PostMapping("/bulk/addFrom/{qcTarget}")
   public ModelAndView addBulk(@PathVariable("qcTarget") String qcTargetLabel, @RequestParam Map<String, String> form, ModelMap model)
@@ -48,7 +50,8 @@ public class QcController {
     String entityIds = getStringInput("entityIds", form, true);
     int copies = getIntegerInput("copies", form, true);
     int controls = getIntegerInput("controls", form, true);
-    return new BulkQcAddTable(qcTarget, qcService, instrumentService, copies, controls).display(entityIds, model);
+    return new BulkQcAddTable(qcTarget, qcService, instrumentService, copies, controls, mapper)
+        .display(entityIds, model);
   }
 
   @PostMapping("/bulk/edit/{qcTarget}")
@@ -57,7 +60,7 @@ public class QcController {
     QcTarget qcTarget = getQcTarget(qcTargetLabel);
     String qcIds = getStringInput("ids", form, true);
     int addControls = getIntegerInput("addControls", form, true);
-    return new BulkEditTableBackend<QC, QcDto>("qc", QcDto.class, "QCs") {
+    return new BulkEditTableBackend<QC, QcDto>("qc", QcDto.class, "QCs", mapper) {
 
       @Override
       protected QcDto asDto(QC model) {
@@ -89,7 +92,7 @@ public class QcController {
     QcTarget qcTarget = getQcTarget(qcTargetLabel);
     String entityIds = getStringInput("entityIds", form, true);
     int addControls = getIntegerInput("addControls", form, true);
-    return new BulkQcEditTable(qcTarget, qcService, instrumentService, addControls).display(entityIds, model);
+    return new BulkQcEditTable(qcTarget, qcService, instrumentService, addControls, mapper).display(entityIds, model);
   }
 
   private QcTarget getQcTarget(String label) {

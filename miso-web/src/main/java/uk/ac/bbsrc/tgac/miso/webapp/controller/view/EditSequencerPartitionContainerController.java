@@ -74,6 +74,8 @@ public class EditSequencerPartitionContainerController {
   private SequencingContainerModelService containerModelService;
   @Autowired
   private IndexChecker indexChecker;
+  @Autowired
+  private ObjectMapper mapper;
 
   /**
    * Translates foreign keys to entity objects with only the ID set, to be used in service layer to reload persisted child objects
@@ -154,8 +156,6 @@ public class EditSequencerPartitionContainerController {
         container.getPartitions().stream().map(partition -> Dtos.asDto(partition, false, indexChecker))
             .collect(Collectors.toList()));
     model.put("containerRuns", runService.listByContainerId(container.getId()).stream().map(Dtos::asDto).collect(Collectors.toList()));
-
-    ObjectMapper mapper = new ObjectMapper();
     model.put("containerJSON", mapper.writer().writeValueAsString(Dtos.asDto(container, indexChecker)));
     model.put("poreVersions", containerService.listPoreVersions());
     return new ModelAndView("/WEB-INF/pages/editSequencerPartitionContainer.jsp", model);

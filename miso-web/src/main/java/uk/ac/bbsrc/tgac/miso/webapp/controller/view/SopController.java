@@ -31,27 +31,27 @@ public class SopController extends AbstractTypeDataController<Sop, SopDto> {
 
   @Autowired
   private SopService sopService;
-
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private ObjectMapper mapper;
 
   public SopController() {
     super("SOPs", "sop", "sop", true);
   }
 
-  private final TabbedListItemsPage listSops = new TabbedListItemsPage("sop", "category", Stream.of(SopCategory.values()),
-      SopCategory::getLabel, SopCategory::name) {
-
-    @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-      config.put("isAdmin", authorizationManager.getCurrentUser().isAdmin());
-    }
-
-  };
-
   @GetMapping("/list")
   public ModelAndView list(ModelMap model) throws IOException {
     model.put("title", "SOPs");
+    TabbedListItemsPage listSops = new TabbedListItemsPage("sop", "category",
+        Stream.of(SopCategory.values()), SopCategory::getLabel, SopCategory::name, mapper) {
+
+      @Override
+      protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+        config.put("isAdmin", authorizationManager.getCurrentUser().isAdmin());
+      }
+
+    };
     return listSops.list(model);
   }
 

@@ -122,7 +122,6 @@ public abstract class RelationFinder<M extends Identifiable> {
   }
 
   private final Map<String, RelationAdapter<M, ?, ?>> adapters = new HashMap<>();
-  private final ObjectMapper mapper = new ObjectMapper();
 
   public RelationFinder<M> add(RelationAdapter<M, ?, ?> adapter) {
     adapters.put(adapter.category(), adapter);
@@ -131,7 +130,7 @@ public abstract class RelationFinder<M extends Identifiable> {
 
   protected abstract List<M> fetchByIds(List<Long> ids) throws IOException;
 
-  public HttpEntity<byte[]> list(List<Long> ids, String category) throws IOException {
+  public HttpEntity<byte[]> list(List<Long> ids, String category, ObjectMapper mapper) throws IOException {
     RelationAdapter<M, ?, ?> adapter = adapters.get(category);
     if (adapter == null) {
       throw new RestException(String.format("No such category %s.", category), Status.NOT_FOUND);

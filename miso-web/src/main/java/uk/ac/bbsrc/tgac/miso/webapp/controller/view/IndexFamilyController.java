@@ -27,9 +27,10 @@ public class IndexFamilyController extends AbstractTypeDataController<IndexFamil
 
   @Autowired
   private IndexFamilyService indexFamilyService;
-
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private ObjectMapper mapper;
 
   public IndexFamilyController() {
     super("Index Families", "indexfamily", "indexfamily");
@@ -79,7 +80,6 @@ public class IndexFamilyController extends AbstractTypeDataController<IndexFamil
   }
 
   private ModelAndView indexFamilyPage(IndexFamily indexFamily, ModelMap model) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
     model.put("indexFamilyDto", mapper.writeValueAsString(Dtos.asDto(indexFamily)));
     return new ModelAndView("/WEB-INF/pages/editIndexFamily.jsp", model);
   }

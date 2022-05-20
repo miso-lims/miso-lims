@@ -39,6 +39,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
+import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPageWithAuthorization;
 
 @Controller
 @SessionAttributes("printer")
@@ -46,15 +47,8 @@ public class ListPrintersController {
 
   @Autowired
   private AuthorizationManager authorizationManager;
-
-  private final ListItemsPage listPage = new ListItemsPage("printer") {
-
-    @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-      config.put("isAdmin", authorizationManager.getCurrentUser().isAdmin());
-    }
-
-  };
+  @Autowired
+  private ObjectMapper mapper;
 
   @ModelAttribute("title")
   public String title() {
@@ -63,6 +57,7 @@ public class ListPrintersController {
 
   @RequestMapping(value = "/printers", method = RequestMethod.GET)
   public ModelAndView view(ModelMap model) throws IOException {
+    ListItemsPage listPage = new ListItemsPageWithAuthorization("printer", authorizationManager, mapper);
     return listPage.list(model);
   }
 }

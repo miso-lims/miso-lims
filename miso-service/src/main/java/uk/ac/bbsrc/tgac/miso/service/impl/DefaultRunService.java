@@ -678,17 +678,18 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       return true;
     }
 
-    ObjectMapper mapper = new ObjectMapper();
+    // Use separate ObjectMapper to allow <>& characters, which may be used in metrics
+    ObjectMapper metricsMapper = new ObjectMapper();
     ArrayNode sourceMetrics;
     try {
-      sourceMetrics = mapper.readValue(source.getMetrics(), ArrayNode.class);
+      sourceMetrics = metricsMapper.readValue(source.getMetrics(), ArrayNode.class);
     } catch (IOException e) {
       log.error("Impossible junk metrics were passed in for run " + target.getId(), e);
       return false;
     }
     ArrayNode targetMetrics;
     try {
-      targetMetrics = mapper.readValue(target.getMetrics(), ArrayNode.class);
+      targetMetrics = metricsMapper.readValue(target.getMetrics(), ArrayNode.class);
     } catch (IOException e) {
       log.error("The database is full of garbage metrics for run " + target.getId(), e);
       return false;
@@ -703,10 +704,10 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       }
     }
     if (changed) {
-      ArrayNode combinedMetrics = mapper.createArrayNode();
+      ArrayNode combinedMetrics = metricsMapper.createArrayNode();
       combinedMetrics.addAll(targetMetricsMap.values());
       try {
-        target.setMetrics(mapper.writeValueAsString(combinedMetrics));
+        target.setMetrics(metricsMapper.writeValueAsString(combinedMetrics));
         return true;
       } catch (JsonProcessingException e) {
         log.error("Failed to save data just unserialised.", e);

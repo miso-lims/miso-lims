@@ -51,16 +51,8 @@ public class ListInstrumentsController {
 
   @Autowired
   private AuthorizationManager authorizationManager;
-
-  private final TabbedListItemsPage listPage = new TabbedListItemsPage("instrument", "instrumentType",
-      Stream.of(InstrumentType.values()), sortByOrdinal, InstrumentType::getLabel, InstrumentType::name) {
-
-    @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-      config.put("isAdmin", authorizationManager.getCurrentUser().isAdmin());
-    }
-
-  };
+  @Autowired
+  private ObjectMapper mapper;
 
   @ModelAttribute("title")
   public String title() {
@@ -69,6 +61,15 @@ public class ListInstrumentsController {
 
   @RequestMapping(method = RequestMethod.GET)
   public ModelAndView listInstruments(ModelMap model) throws IOException {
+    TabbedListItemsPage listPage = new TabbedListItemsPage("instrument", "instrumentType",
+        Stream.of(InstrumentType.values()), sortByOrdinal, InstrumentType::getLabel, InstrumentType::name, mapper) {
+
+      @Override
+      protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+        config.put("isAdmin", authorizationManager.getCurrentUser().isAdmin());
+      }
+
+    };
     return listPage.list(model);
   }
 

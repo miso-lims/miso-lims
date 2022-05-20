@@ -55,10 +55,11 @@ public class RunLibraryController {
   private QcNodeService qcNodeService;
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private ObjectMapper mapper;
 
   @PostMapping("/metrics")
   public ModelAndView getRunLibraryQcTable(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
     RunLibraryQcTableRequestDto data = validateRunLibraryQcTableRequest(form, mapper);
 
     List<RunLibraryQCTableRowDto> rows = new ArrayList<>();
@@ -175,7 +176,6 @@ public class RunLibraryController {
       throw new NotFoundException("Run-library not found");
     }
 
-    ObjectMapper mapper = new ObjectMapper();
     model.put("title", "Run-Library Hierarchy");
     model.put("selectedType", "Run-Library");
     model.put("selectedId", "[" + runId + ", " + partitionId + ", " + aliquotId + "]");
@@ -221,7 +221,7 @@ public class RunLibraryController {
   // metric2.setValue(120D);
   //
   // Map<String, String> form = new HashMap<>();
-  // form.put("data", new ObjectMapper().writeValueAsString(dto));
+  // form.put("data", mapper.writeValueAsString(dto));
   // return getRunLibraryQcTable(form, model);
   // }
 

@@ -37,19 +37,15 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
+import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPageWithAuthorization;
 
 @Controller
 public class ListStudiesController {
-  private final ListItemsPage listStudies = new ListItemsPage("study") {
 
-    @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-      config.put("isAdmin", authorizationManager.isAdminUser());
-    }
-
-  };
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private ObjectMapper mapper;
 
   @ModelAttribute("title")
   public String title() {
@@ -57,6 +53,6 @@ public class ListStudiesController {
   }
   @RequestMapping("/studies")
   public ModelAndView listStudies(ModelMap model) throws Exception {
-    return listStudies.list(model);
+    return new ListItemsPageWithAuthorization("study", authorizationManager, mapper).list(model);
   }
 }

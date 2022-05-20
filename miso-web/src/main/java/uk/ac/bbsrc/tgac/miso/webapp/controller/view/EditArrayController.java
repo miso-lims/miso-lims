@@ -34,18 +34,17 @@ public class EditArrayController {
 
   @Autowired
   private ArrayService arrayService;
-
   @Autowired
   private ArrayModelService arrayModelService;
-
   @Autowired
   private ArrayRunService arrayRunService;
+  @Autowired
+  private ObjectMapper mapper;
 
   @RequestMapping("/new")
   public ModelAndView newArray(ModelMap model) throws IOException {
     model.addAttribute(PageMode.PROPERTY, PageMode.CREATE.getLabel());
     List<ArrayModel> models = arrayModelService.list();
-    ObjectMapper mapper = new ObjectMapper();
     model.addAttribute(MODEL_ATTR_MODELS, mapper.writeValueAsString(models.stream().map(Dtos::asDto).collect(Collectors.toList())));
     return new ModelAndView(JSP, model);
   }
@@ -61,7 +60,6 @@ public class EditArrayController {
         .map(Dtos::asDto)
         .collect(Collectors.toList()));
 
-    ObjectMapper mapper = new ObjectMapper();
     model.addAttribute(MODEL_ATTR_JSON, mapper.writer().writeValueAsString(Dtos.asDto(array)));
     return new ModelAndView(JSP, model);
   }

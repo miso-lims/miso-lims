@@ -14,9 +14,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 
 public class ListItemsPage {
   private final String targetType;
+  private final ObjectMapper mapper;
 
-  public ListItemsPage(String targetType) {
+  public ListItemsPage(String targetType, ObjectMapper mapper) {
     this.targetType = targetType;
+    this.mapper = mapper;
   }
 
   public final ModelAndView list(ModelMap model) throws IOException {
@@ -45,7 +47,6 @@ public class ListItemsPage {
   }
 
   private ObjectMapper prepare(ModelMap model) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
     ObjectNode config = mapper.createObjectNode();
     writeConfiguration(mapper, config);
     model.put("config", mapper.writeValueAsString(config));

@@ -25,9 +25,9 @@ public class ListSequencingOrdersController {
 
     private final String slug;
 
-    public OrderListPage(String slug) throws IOException {
+    public OrderListPage(String slug, ObjectMapper mapper) throws IOException {
       super("sequencingordercompletion", "platform", getPlatformTypes(instrumentModelService), PlatformType::getKey,
-          PlatformType::name);
+          PlatformType::name, mapper);
       this.slug = slug;
     }
 
@@ -42,23 +42,25 @@ public class ListSequencingOrdersController {
 
   @Autowired
   private InstrumentModelService instrumentModelService;
+  @Autowired
+  private ObjectMapper mapper;
 
   @GetMapping("/outstanding")
   public ModelAndView listActive(ModelMap model) throws IOException {
     model.addAttribute(MODEL_ATTR_TITLE, "Outstanding Sequencing Orders");
-    return new OrderListPage("outstanding").list(model);
+    return new OrderListPage("outstanding", mapper).list(model);
   }
 
   @GetMapping("/all")
   public ModelAndView listAll(ModelMap model) throws IOException {
     model.addAttribute(MODEL_ATTR_TITLE, "All Sequencing Orders");
-    return new OrderListPage("all").list(model);
+    return new OrderListPage("all", mapper).list(model);
   }
 
   @GetMapping("/in-progress")
   public ModelAndView listPools(ModelMap model) throws IOException {
     model.addAttribute(MODEL_ATTR_TITLE, "In-Progress Sequencing Orders");
-    return new OrderListPage("in-progress").list(model);
+    return new OrderListPage("in-progress", mapper).list(model);
   }
 
   @ModelAttribute("title")

@@ -21,11 +21,13 @@ public abstract class BulkTableBackend<Dto> {
 
   private final String targetType;
   private final Class<? extends Dto> dtoClass;
+  private final ObjectMapper mapper;
 
-  public BulkTableBackend(String targetType, Class<? extends Dto> dtoClass) {
+  public BulkTableBackend(String targetType, Class<? extends Dto> dtoClass, ObjectMapper mapper) {
     super();
     this.targetType = targetType;
     this.dtoClass = dtoClass;
+    this.mapper = mapper;
   }
 
   /**
@@ -38,7 +40,6 @@ public abstract class BulkTableBackend<Dto> {
    * @throws IOException
    */
   protected final ModelAndView prepare(ModelMap model, PageMode pageMode, String title, List<Dto> dtos) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
     ObjectNode config = mapper.createObjectNode();
     config.put(PageMode.PROPERTY, pageMode.getLabel());
     writeConfiguration(mapper, config);

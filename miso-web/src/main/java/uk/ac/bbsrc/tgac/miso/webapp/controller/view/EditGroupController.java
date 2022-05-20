@@ -51,6 +51,8 @@ public class EditGroupController {
   private GroupService groupService;
   @Autowired
   private UserService userService;
+  @Autowired
+  private ObjectMapper mapper;
 
   @RequestMapping(value = "/new", method = RequestMethod.GET)
   public ModelAndView setupForm(ModelMap model) throws IOException {
@@ -74,8 +76,6 @@ public class EditGroupController {
 
   private ModelAndView setupForm(Group group, ModelMap model) throws JsonProcessingException {
     model.put("group", group);
-
-    ObjectMapper mapper = new ObjectMapper();
     model.put("groupDto", mapper.writeValueAsString(Dtos.asDto(group)));
 
     return new ModelAndView("/WEB-INF/pages/editGroup.jsp", model);

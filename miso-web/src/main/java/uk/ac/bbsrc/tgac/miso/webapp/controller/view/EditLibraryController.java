@@ -192,6 +192,8 @@ public class EditLibraryController {
   private AuthorizationManager authorizationManager;
   @Autowired
   private NamingSchemeHolder namingSchemeHolder;
+  @Autowired
+  private ObjectMapper mapper;
 
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
@@ -245,7 +247,6 @@ public class EditLibraryController {
         .collect(Collectors.toList()));
     model.put("libraryAliquots", library.getLibraryAliquots().stream()
         .map(ldi -> Dtos.asDto(ldi, false)).collect(Collectors.toList()));
-    ObjectMapper mapper = new ObjectMapper();
     ObjectNode config = mapper.createObjectNode();
     config.putPOJO("library", Dtos.asDto(library, false));
     model.put("libraryAliquotsConfig", mapper.writeValueAsString(config));
@@ -274,39 +275,6 @@ public class EditLibraryController {
     return new ModelAndView("/WEB-INF/pages/editLibrary.jsp", model);
   }
 
-  private final BulkEditTableBackend<Library, LibraryDto> libraryBulkEditBackend = new BulkEditTableBackend<Library, LibraryDto>(
-      "library", LibraryDto.class, "Libraries") {
-
-    @Override
-    protected Stream<Library> load(List<Long> ids) throws IOException {
-      return libraryService.listByIdList(ids).stream().sorted(new AliasComparator<>());
-    }
-
-    @Override
-    protected LibraryDto asDto(Library model) {
-      return Dtos.asDto(model, true);
-    }
-
-    @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-      config.put(Config.SAMPLE_ALIAS_MAYBE_REQUIRED, !alwaysGenerateSampleAliases());
-      config.put(Config.LIBRARY_ALIAS_MAYBE_REQUIRED, !alwaysGenerateLibraryAliases());
-      addJsonArray(mapper, config, "workstations", workstationService.list(), Dtos::asDto);
-      addJsonArray(mapper, config, "thermalCyclers", instrumentService.listByType(InstrumentType.THERMAL_CYCLER),
-          Dtos::asDto);
-      addJsonArray(mapper, config, "sops", sopService.listByCategory(SopCategory.LIBRARY), Dtos::asDto);
-
-      config.put(Config.SHOW_DESCRIPTION, showDescription);
-      config.put(Config.SHOW_VOLUME, showVolume);
-      config.put(Config.SHOW_LIBRARY_ALIAS, showLibraryAlias);
-    }
-
-    @Override
-    protected boolean isNewInterface() {
-      return true;
-    }
-  };
-
   private boolean alwaysGenerateSampleAliases() {
     return namingSchemeHolder.getPrimary().hasSampleAliasGenerator()
         && (namingSchemeHolder.getSecondary() == null || namingSchemeHolder.getSecondary().hasSampleAliasGenerator());
@@ -322,8 +290,8 @@ public class EditLibraryController {
     private final BoxDto newBox;
     private final String sort;
 
-    public LibraryBulkPropagateBackend(BoxDto newBox, String sort) {
-      super("library", LibraryDto.class, "Libraries", "Samples");
+    public LibraryBulkPropagateBackend(BoxDto newBox, String sort, ObjectMapper mapper) {
+      super("library", LibraryDto.class, "Libraries", "Samples", mapper);
       this.newBox = newBox;
       this.sort = sort;
     }
@@ -436,14 +404,46 @@ public class EditLibraryController {
     Long boxId = getLongInput("boxId", form, false);
 
     BoxDto newBox = boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null;
-    return new LibraryBulkPropagateBackend(newBox, sort)
+    return new LibraryBulkPropagateBackend(newBox, sort, mapper)
         .propagate(sampleIds, replicates, model);
   }
 
   @PostMapping(value = "/bulk/edit")
   public ModelAndView editBulkLibraries(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
     String libraryIds = getStringInput("ids", form, true);
-    return libraryBulkEditBackend.edit(libraryIds, model);
+
+    BulkEditTableBackend backend = new BulkEditTableBackend<Library, LibraryDto>("library", LibraryDto.class,
+        "Libraries", mapper) {
+      @Override
+      protected Stream<Library> load(List<Long> ids) throws IOException {
+        return libraryService.listByIdList(ids).stream().sorted(new AliasComparator<>());
+      }
+
+      @Override
+      protected LibraryDto asDto(Library model) {
+        return Dtos.asDto(model, true);
+      }
+
+      @Override
+      protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+        config.put(Config.SAMPLE_ALIAS_MAYBE_REQUIRED, !alwaysGenerateSampleAliases());
+        config.put(Config.LIBRARY_ALIAS_MAYBE_REQUIRED, !alwaysGenerateLibraryAliases());
+        addJsonArray(mapper, config, "workstations", workstationService.list(), Dtos::asDto);
+        addJsonArray(mapper, config, "thermalCyclers", instrumentService.listByType(InstrumentType.THERMAL_CYCLER),
+            Dtos::asDto);
+        addJsonArray(mapper, config, "sops", sopService.listByCategory(SopCategory.LIBRARY), Dtos::asDto);
+
+        config.put(Config.SHOW_DESCRIPTION, showDescription);
+        config.put(Config.SHOW_VOLUME, showVolume);
+        config.put(Config.SHOW_LIBRARY_ALIAS, showLibraryAlias);
+      }
+
+      @Override
+      protected boolean isNewInterface() {
+        return true;
+      }
+    };
+    return backend.edit(libraryIds, model);
   }
 
   @PostMapping(value = "/bulk/receive")
@@ -453,17 +453,83 @@ public class EditLibraryController {
     Long projectId = getLongInput("projectId", form, false);
     Long boxId = getLongInput("boxId", form, false);
 
-    LibraryDto libDto = null;
-    Project project = null;
-    if (projectId != null) {
-      project = projectService.get(projectId);
-      if (project == null) throw new ClientErrorException("No project found for ID " + projectId);
-    }
+    final Project project = getProject(projectId);
+    final SampleClass aliquotClass = getAliquotClass(aliquotClassId);
+    final LibraryDto libDto = makeReceiptDto(aliquotClass, boxId);
+    Set<Group> recipientGroups = authorizationManager.getCurrentUser().getGroups();
 
-    SampleClass aliquotClass = null;
+    BulkCreateTableBackend<LibraryDto> backend = new BulkCreateTableBackend<>("library", LibraryDto.class,
+        "Libraries", libDto, quantity, mapper) {
+      @Override
+      protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+        if (aliquotClass != null) {
+          config.putPOJO(Config.TARGET_SAMPLE_CLASS, Dtos.asDto(aliquotClass));
+        }
+        Map<Long, List<LibraryTemplateDto>> templatesByProjectId = new HashMap<>();
+        addJsonArray(mapper, config, "projects", projectService.list(), Dtos::asDto);
+        if (project == null) {
+          List<LibraryTemplate> templates = libraryTemplateService.list();
+          for (LibraryTemplate template : templates) {
+            LibraryTemplateDto dto = Dtos.asDto(template);
+            for (Project tempProject : template.getProjects()) {
+              if (!templatesByProjectId.containsKey(tempProject.getId())) {
+                templatesByProjectId.put(tempProject.getId(), new ArrayList<>());
+              }
+              templatesByProjectId.get(tempProject.getId()).add(dto);
+            }
+          }
+        } else {
+          config.putPOJO("project", Dtos.asDto(project));
+          templatesByProjectId.put(project.getId(),
+              Dtos.asLibraryTemplateDtos(libraryTemplateService.listByProject(project.getId())));
+        }
+        config.put(Config.DEFAULT_SCI_NAME, defaultSciName);
+        config.put(Config.SHOW_DESCRIPTION, showDescription);
+        config.put(Config.SHOW_VOLUME, showVolume);
+        config.put(Config.SHOW_LIBRARY_ALIAS, showLibraryAlias);
+        config.put(Config.IS_LIBRARY_RECEIPT, true);
+        config.putPOJO(Config.BOX, libDto.getBox());
+        config.putPOJO(Config.TEMPLATES, templatesByProjectId);
+        config.put(Config.SAMPLE_ALIAS_MAYBE_REQUIRED, !alwaysGenerateSampleAliases());
+        config.put(Config.LIBRARY_ALIAS_MAYBE_REQUIRED, !alwaysGenerateLibraryAliases());
+        addJsonArray(mapper, config, "recipientGroups", recipientGroups, Dtos::asDto);
+      }
+
+      @Override
+      protected boolean isNewInterface() {
+        return true;
+      }
+    };
+    return backend.create(model);
+  }
+
+  private Project getProject(Long projectId) throws IOException {
+    if (projectId != null) {
+      Project project = projectService.get(projectId);
+      if (project == null) {
+        throw new ClientErrorException("No project found for ID " + projectId);
+      }
+      return project;
+    } else {
+      return null;
+    }
+  }
+
+  private SampleClass getAliquotClass(Long aliquotClassId) throws IOException {
     if (isDetailedSampleEnabled()) {
-      aliquotClass = sampleClassService.get(aliquotClassId);
-      if (aliquotClass == null) throw new ClientErrorException("No sample class found for ID " + aliquotClassId);
+      SampleClass aliquotClass = sampleClassService.get(aliquotClassId);
+      if (aliquotClass == null) {
+        throw new ClientErrorException("No sample class found for ID " + aliquotClassId);
+      }
+      return aliquotClass;
+    } else {
+      return null;
+    }
+  }
+
+  private LibraryDto makeReceiptDto(SampleClass aliquotClass, Long boxId) throws IOException {
+    LibraryDto libDto = null;
+    if (isDetailedSampleEnabled()) {
       DetailedLibraryDto detailedDto = new DetailedLibraryDto();
       libDto = detailedDto;
       SampleAliquotDto samDto = null;
@@ -475,8 +541,8 @@ public class EditLibraryController {
         samDto = new SampleAliquotDto();
       }
       detailedDto.setSample(samDto);
-      samDto.setSampleClassId(aliquotClassId);
-      detailedDto.setParentSampleClassId(aliquotClassId);
+      samDto.setSampleClassId(aliquotClass.getId());
+      detailedDto.setParentSampleClassId(aliquotClass.getId());
     } else {
       libDto = new LibraryDto();
       libDto.setSample(new SampleDto());
@@ -484,74 +550,7 @@ public class EditLibraryController {
     if (boxId != null) {
       libDto.setBox(Dtos.asDto(boxService.get(boxId), true));
     }
-
-    Set<Group> recipientGroups = authorizationManager.getCurrentUser().getGroups();
-
-    return new BulkReceiveLibraryBackend(libDto, quantity, project, aliquotClass, defaultSciName, libraryTemplateService, recipientGroups)
-        .create(model);
-  }
-
-  private final class BulkReceiveLibraryBackend extends BulkCreateTableBackend<LibraryDto> {
-
-    private final Project project;
-    private final SampleClass aliquotClass;
-    private final String defaultSciName;
-    private final BoxDto newBox;
-    private final LibraryTemplateService libraryTemplateService;
-    private final Set<Group> recipientGroups;
-
-    public BulkReceiveLibraryBackend(LibraryDto dto, Integer quantity, Project project, SampleClass aliquotClass, String defaultSciName,
-        LibraryTemplateService libraryTemplateService, Set<Group> recipientGroups) {
-      super("library", LibraryDto.class, "Libraries", dto, quantity);
-      if (isDetailedSampleEnabled() && aliquotClass == null) throw new InvalidParameterException("Aliquot class cannot be null");
-      this.project = project;
-      this.aliquotClass = aliquotClass;
-      this.defaultSciName = defaultSciName;
-      this.libraryTemplateService = libraryTemplateService;
-      this.recipientGroups = recipientGroups;
-      newBox = dto.getBox();
-    }
-
-    @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-      if (aliquotClass != null) {
-        config.putPOJO(Config.TARGET_SAMPLE_CLASS, Dtos.asDto(aliquotClass));
-      }
-      Map<Long, List<LibraryTemplateDto>> templatesByProjectId = new HashMap<>();
-      addJsonArray(mapper, config, "projects", projectService.list(), Dtos::asDto);
-      if (project == null) {
-        List<LibraryTemplate> templates = libraryTemplateService.list();
-        for (LibraryTemplate template : templates) {
-          LibraryTemplateDto dto = Dtos.asDto(template);
-          for (Project tempProject : template.getProjects()) {
-            if (!templatesByProjectId.containsKey(tempProject.getId())) {
-              templatesByProjectId.put(tempProject.getId(), new ArrayList<>());
-            }
-            templatesByProjectId.get(tempProject.getId()).add(dto);
-          }
-        }
-      } else {
-        config.putPOJO("project", Dtos.asDto(project));
-        templatesByProjectId.put(project.getId(),
-            Dtos.asLibraryTemplateDtos(libraryTemplateService.listByProject(project.getId())));
-      }
-      config.put(Config.DEFAULT_SCI_NAME, defaultSciName);
-      config.put(Config.SHOW_DESCRIPTION, showDescription);
-      config.put(Config.SHOW_VOLUME, showVolume);
-      config.put(Config.SHOW_LIBRARY_ALIAS, showLibraryAlias);
-      config.put(Config.IS_LIBRARY_RECEIPT, true);
-      config.putPOJO(Config.BOX, newBox);
-      config.putPOJO(Config.TEMPLATES, templatesByProjectId);
-      config.put(Config.SAMPLE_ALIAS_MAYBE_REQUIRED, !alwaysGenerateSampleAliases());
-      config.put(Config.LIBRARY_ALIAS_MAYBE_REQUIRED, !alwaysGenerateLibraryAliases());
-      addJsonArray(mapper, config, "recipientGroups", recipientGroups, Dtos::asDto);
-    }
-
-    @Override
-    protected boolean isNewInterface() {
-      return true;
-    }
-
+    return libDto;
   }
 
   @GetMapping("/batch/{batchId:.+}")
@@ -573,8 +572,7 @@ public class EditLibraryController {
     batchDto.setSopLabel(sop.getAlias() + "v." + sop.getVersion());
     batchDto.setSopUrl(sop.getUrl());
     batchDto.setKitName(kit.getName());
-    
-    ObjectMapper mapper = new ObjectMapper();
+
     model.put("batchId", StringEscapeUtils.escapeJavaScript(batchId));
     model.put("batchDto", mapper.writeValueAsString(batchDto));
 
@@ -583,7 +581,7 @@ public class EditLibraryController {
 
   @GetMapping("/{id}/qc-hierarchy")
   public ModelAndView getQcHierarchy(@PathVariable long id, ModelMap model) throws IOException {
-    return MisoWebUtils.getQcHierarchy("Library", id, qcNodeService::getForLibrary, model);
+    return MisoWebUtils.getQcHierarchy("Library", id, qcNodeService::getForLibrary, model, mapper);
   }
 
 }

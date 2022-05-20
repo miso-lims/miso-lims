@@ -26,8 +26,9 @@ public abstract class BulkQcTable extends BulkTableBackend<QcDto> {
   protected final QcTarget qcTarget;
   private final String verb;
 
-  public BulkQcTable(QcTarget qcTarget, boolean create, QualityControlService qcService, InstrumentService instrumentService, String verb) {
-    super("qc", QcDto.class);
+  public BulkQcTable(QcTarget qcTarget, boolean create, QualityControlService qcService,
+      InstrumentService instrumentService, String verb, ObjectMapper mapper) {
+    super("qc", QcDto.class, mapper);
     this.qcTarget = qcTarget;
     this.create = create;
     this.qcService = qcService;

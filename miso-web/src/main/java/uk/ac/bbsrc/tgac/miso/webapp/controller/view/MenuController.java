@@ -63,6 +63,8 @@ public class MenuController {
   private Boolean detailedSample;
   @Value("${miso.genomeFolder:}")
   private String genomeFolder;
+  @Autowired
+  private ObjectMapper mapper;
 
   @Resource
   private Boolean boxScannerEnabled;
@@ -102,7 +104,6 @@ public class MenuController {
   public ModelAndView mainMenu(ModelMap model) throws IOException {
     User user = authorizationManager.getCurrentUser();
     model.put("title", "Home");
-    ObjectMapper mapper = new ObjectMapper();
     model.put("favouriteWorkflows",
         user.getFavouriteWorkflows().stream().map(Dtos::asDto).map(dto -> mapper.valueToTree(dto)).collect(Collectors.toList()));
     return new ModelAndView("/WEB-INF/pages/mainMenu.jsp", model);
