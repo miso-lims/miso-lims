@@ -1,6 +1,7 @@
 :root {
     --grey-dark: #A9A9A9;
     --grey-light: #CDCDCD;
+    --grey-extralight: #FAFAFA;
     --purple-dark: #404087;
     --purple-light: #F0F0FF;
     --yellow-light: #FEFEE3;
@@ -811,12 +812,28 @@ button.disabled {
 
 .datatable-scroll {
     overflow-x: auto;
-    overflow-y: visible;
 }
 
 /* Override Datatables' explicit toolbar height */
 .paging_full_numbers {
     height: auto;
+}
+
+.dataTables_wrapper thead {
+  background-color: var(--grey-extralight);
+}
+
+.ui-toolbar {
+  background: #ccc url(images/ui-bg_highlight-soft_75_cccccc_1x100.png) 50% 50% repeat-x;
+  border: 1px solid var(--grey-dark);
+}
+
+.dataTables_wrapper .dataTables_length select, .dataTables_wrapper .dataTables_filter input {
+  background-color: white;
+}
+
+.dataTables_wrapper th {
+  border: 1px solid var(--grey-light);
 }
 
 .unselectable {
@@ -1125,5 +1142,5 @@ ul.unformatted-list {
 }
 
 .ui-button {
-  line-height: unset;
+  line-height: 22px;
 }
