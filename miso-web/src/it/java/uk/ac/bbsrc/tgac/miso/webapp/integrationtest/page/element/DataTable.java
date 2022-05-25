@@ -39,7 +39,7 @@ public class DataTable extends AbstractElement {
     super(driver);
     WebElement tableWrapper = getDriver().findElement(By.id(tableWrapperId));
     this.table = tableWrapper.findElement(tableSelector);
-    this.toolbar = findElementIfExists(By.xpath(".//div[@id='" + tableWrapperId + "']/preceding::div[contains(@class, 'fg-toolbar')][1]"));
+    this.toolbar = findElementIfExists(By.xpath(".//div[@id='" + tableWrapperId + "']/preceding::div[contains(@class, 'ui-toolbar')][1]"));
     this.searchBar = tableWrapper.findElement(searchBarSelector);
     this.searchBarDiv = tableWrapper.findElement(searchBarDivSelector);
     this.processing = tableWrapper.findElement(processingSelector);

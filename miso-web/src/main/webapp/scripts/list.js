@@ -495,7 +495,7 @@ ListUtils = (function($) {
       'bAutoWidth': false,
       'iDisplayLength': 25,
       'iDisplayStart': 0,
-      'sDom': '<"H"lf>r<"datatable-scroll"t><"F"ip>',
+      'sDom': '<"ui-toolbar clearfix"lfr><"datatable-scroll"t><"ui-toolbar ui-corner-bl ui-corner-br clearfix"ip>',
       'sPaginationType': 'full_numbers',
       'bStateSave': true,
       'bProcessing': true,
@@ -532,7 +532,7 @@ ListUtils = (function($) {
     tableNode.parentNode.insertBefore(errorMessage, tableNode);
     if (bulkActions.length > 0 || staticActions.length > 0) {
       var toolbar = document.createElement('DIV');
-      toolbar.setAttribute('class', 'fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix paging_full_numbers');
+      toolbar.setAttribute('class', 'ui-toolbar ui-corner-tl ui-corner-tr ui-helper-clearfix paging_full_numbers');
       tableNode.parentNode.insertBefore(toolbar, tableNode);
       if (staticActions.length > 0 && bulkActions.length > 0) {
         staticActions.push(null);
