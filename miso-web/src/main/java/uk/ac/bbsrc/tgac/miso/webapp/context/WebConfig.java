@@ -1,16 +1,17 @@
 package uk.ac.bbsrc.tgac.miso.webapp.context;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.web.bind.support.SessionAttributeStore;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
@@ -71,10 +72,10 @@ public class WebConfig extends WebMvcConfigurationSupport {
 
   @Bean(name = "objectMapper")
   public ObjectMapper objectMapper() {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new JsonStringValidator());
+    ObjectMapper mapper = Jackson2ObjectMapperBuilder.json()
+        .modulesToInstall(new JsonStringValidator())
+        .build();
     mapper.getFactory().setCharacterEscapes(new JsonCharacterEscapes());
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     return mapper;
   }
 }

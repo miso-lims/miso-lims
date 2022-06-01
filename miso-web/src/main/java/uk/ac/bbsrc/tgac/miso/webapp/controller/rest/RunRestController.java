@@ -674,7 +674,7 @@ public class RunRestController extends RestController {
     RestUtils.bulkDelete("Run", ids, runService);
   }
 
-  @PostMapping(value = "/spreadsheet")
+  @PostMapping(value = "/spreadsheet", produces = "application/octet-stream")
   @ResponseBody
   public HttpEntity<byte[]> getSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {

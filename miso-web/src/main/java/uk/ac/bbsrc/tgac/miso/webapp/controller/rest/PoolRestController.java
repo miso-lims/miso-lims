@@ -491,14 +491,14 @@ public class PoolRestController extends RestController {
         .collect(Collectors.toList());
   }
 
-  @PostMapping(value = "/spreadsheet")
+  @PostMapping(value = "/spreadsheet", produces = "application/octet-stream")
   @ResponseBody
   public HttpEntity<byte[]> getSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
     return MisoWebUtils.generateSpreadsheet(request, poolService::listByIdList, detailedSample, PoolSpreadSheets::valueOf, response);
   }
 
-  @PostMapping(value = "/contents/spreadsheet")
+  @PostMapping(value = "/contents/spreadsheet", produces = "application/octet-stream")
   @ResponseBody
   public HttpEntity<byte[]> getContentsSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {

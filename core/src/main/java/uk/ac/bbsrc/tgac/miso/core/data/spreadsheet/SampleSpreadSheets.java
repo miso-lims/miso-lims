@@ -31,6 +31,8 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forString("Tissue Origin", true, detailedSample(SampleTissue.class, st -> st.getTissueOrigin().getAlias(), "")), //
       Column.forString("Type", true, dnaOrRna()), //
       Column.forString("Barcode", Sample::getIdentificationBarcode), //
+      Column.forString("Box", sam -> sam.getBox() == null ? null : sam.getBox().getAlias()), //
+      Column.forString("Position", sam -> sam.getBoxPosition()), //
       Column.forString("Class", true, sam -> LimsUtils.isDetailedSample(sam) ? ((DetailedSample) sam).getSampleClass().getAlias() : null), //
       Column.forString("External Identifier", true, detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
       Column.forString("Group ID", true, sam -> LimsUtils.isDetailedSample(sam) ? ((DetailedSample) sam).getGroupId() : null), //
@@ -67,6 +69,8 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forString("Origin", detailedSample(SampleTissue.class, st -> st.getTissueOrigin().getAlias(), "")), //
       Column.forString("Type", detailedSample(SampleTissue.class, st -> st.getTissueType().getAlias(), "")), //
       Column.forString("Barcode", Sample::getIdentificationBarcode), //
+      Column.forString("Box", sam -> sam.getBox() == null ? null : sam.getBox().getAlias()), //
+      Column.forString("Position", sam -> sam.getBoxPosition()), //
       Column.forString("Class", true, sam -> LimsUtils.isDetailedSample(sam) ? ((DetailedSample) sam).getSampleClass().getAlias() : null), //
       Column.forString("External Identifier", detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
       Column.forString("Group ID", effectiveGroupIdProperty(GroupIdentifiable::getGroupId)), //

@@ -150,7 +150,7 @@ public class ContainerRestController extends RestController {
     containerService.bulkDelete(containers);
   }
 
-  @PostMapping(value = "/spreadsheet")
+  @PostMapping(value = "/spreadsheet", produces = "application/octet-stream")
   @ResponseBody
   public HttpEntity<byte[]> getSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) {
