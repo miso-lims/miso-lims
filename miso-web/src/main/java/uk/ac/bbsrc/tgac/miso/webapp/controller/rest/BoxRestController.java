@@ -204,7 +204,7 @@ public class BoxRestController extends RestController {
    * @param boxId ID of the Box
    * @return JSON object with "hashCode" field representing the hash code of the spreadsheet filename
    */
-  @GetMapping(value = "/{boxId}/spreadsheet")
+  @GetMapping(value = "/{boxId}/spreadsheet", produces = "application/octet-stream")
   public @ResponseBody JSONObject createSpreadsheet(@PathVariable("boxId") Long boxId) {
     try {
       return exportBoxContentsForm(boxId);

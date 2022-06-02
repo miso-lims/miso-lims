@@ -645,6 +645,7 @@ var Utils = Utils
         request.open(data ? 'POST' : 'GET', url);
         request.responseType = 'blob';
         request.setRequestHeader('Content-Type', 'application/json; charset=utf8');
+        request.setRequestHeader('Accept', 'application/octet-stream');
         request.onreadystatechange = function() {
           if (request.readyState === 4) {
             dialog.dialog("close");

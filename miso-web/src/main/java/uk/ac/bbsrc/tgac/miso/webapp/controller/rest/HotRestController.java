@@ -54,7 +54,7 @@ public class HotRestController extends RestController {
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
 
-  @PostMapping("/spreadsheet")
+  @PostMapping(value = "/spreadsheet", produces = "application/octet-stream")
   public HttpEntity<byte[]> downloadSpreadsheet(@RequestParam(name = "format", required = true) String format,
       @RequestBody SpreadsheetDataDto dto, HttpServletResponse response) {
     return MisoWebUtils.generateSpreadsheet(dto.getHeaders(), dto.getRows(), detailedSample, SpreadSheetFormat.valueOf(format), response);

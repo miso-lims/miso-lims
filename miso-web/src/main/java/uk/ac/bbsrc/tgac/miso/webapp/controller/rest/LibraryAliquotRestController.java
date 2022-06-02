@@ -172,7 +172,7 @@ public class LibraryAliquotRestController extends RestController {
         .collect(Collectors.toList());
   }
 
-  @PostMapping(value = "/spreadsheet")
+  @PostMapping(value = "/spreadsheet", produces = "application/octet-stream")
   @ResponseBody
   public HttpEntity<byte[]> getSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
