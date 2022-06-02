@@ -7,6 +7,21 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.45.0] - 2022-06-02
+
+### Changed
+
+* Minor cosmetic changes
+* Tracking List and Transfer List V2 sample download sheets now include Box and
+  Position columns
+
+### Fixed
+
+* Rare "request header too large" errors
+* Error when attempting to move transfer items to a different box
+* Security improvements
+
+
 ## [1.44.0] - 2022-05-19
 
 ### Added
