@@ -43,17 +43,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferNotification;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
-import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
-import uk.ac.bbsrc.tgac.miso.core.service.GroupService;
-import uk.ac.bbsrc.tgac.miso.core.service.LabService;
-import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
-import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
-import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
-import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
-import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
-import uk.ac.bbsrc.tgac.miso.core.service.TransferNotificationService;
-import uk.ac.bbsrc.tgac.miso.core.service.TransferService;
+import uk.ac.bbsrc.tgac.miso.core.service.*;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
@@ -152,7 +142,6 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
     }
     String position = item.getItem().getBoxPosition();
     loadChildEntity(item.getItem(), setter, service);
-    transferStore.detachEntity(item.getItem());
     setBoxPosition(item, box, position, positionConstructor, positionSetter);
   }
 
@@ -487,17 +476,18 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
   @Override
   protected void afterSave(Transfer object) throws IOException {
     // Individual services are responsible for updating box locations, or setting volume to 0 and removing items from boxes if distributed
-    for (TransferSample item : object.getSampleTransfers()) {
-      sampleService.update(item.getItem());
-    }
-    for (TransferLibrary item : object.getLibraryTransfers()) {
-      libraryService.update(item.getItem());
-    }
-    for (TransferLibraryAliquot item : object.getLibraryAliquotTransfers()) {
-      libraryAliquotService.update(item.getItem());
-    }
-    for (TransferPool item : object.getPoolTransfers()) {
-      poolService.update(item.getItem());
+    updateAllItems(object.getSampleTransfers(), sampleService);
+    updateAllItems(object.getLibraryTransfers(), libraryService);
+    updateAllItems(object.getLibraryAliquotTransfers(), libraryAliquotService);
+    updateAllItems(object.getPoolTransfers(), poolService);
+  }
+
+  private <T extends Boxable, U extends TransferItem<T>> void updateAllItems(Set<U> items, SaveService<T> service)
+      throws IOException {
+    for (U item : items) {
+      // detach to prevent Hibernate from prematurely detecting changes in this entity
+      transferStore.detachEntity(item.getItem());
+      service.update(item.getItem());
     }
   }
 
