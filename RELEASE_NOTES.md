@@ -21,6 +21,10 @@ Starting with version 1.29.0, the format of this file is based on
 * Error when attempting to move transfer items to a different box
 * Security improvements
 
+### Known Issues
+
+* Some bulk actions are missing from the Items list on the Edit Transfer page
+
 
 ## [1.44.0] - 2022-05-19
 
