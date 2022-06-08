@@ -122,7 +122,7 @@ var Transfer = (function($) {
     $('#type-toolbar').remove();
     var toolbar = $('<div>').prop('id', 'type-toolbar');
     toolbar.append(items);
-    $('#listItems > .fg-toolbar').append(toolbar);
+    $('#listItems > .ui-toolbar').append(toolbar);
   }
 
 })(jQuery);
