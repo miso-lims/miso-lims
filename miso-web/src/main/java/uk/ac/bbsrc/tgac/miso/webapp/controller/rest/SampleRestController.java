@@ -38,14 +38,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -106,7 +104,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
-@RequestMapping("/rest/samples")
+@RequestMapping(value = "/rest/samples")
 public class SampleRestController extends RestController {
 
   protected static final Logger log = LoggerFactory.getLogger(SampleRestController.class);
@@ -369,9 +367,9 @@ public class SampleRestController extends RestController {
 
   @PostMapping(value = "/parents/{category}")
   @ResponseBody
-  public HttpEntity<byte[]> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids)
+  public List<?> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids)
       throws IOException {
-    return parentFinder.list(ids, category, getObjectMapper());
+    return parentFinder.list(ids, category);
   }
 
   private final RelationFinder<Sample> childFinder = (new RelationFinder<Sample>() {
@@ -471,9 +469,9 @@ public class SampleRestController extends RestController {
 
   @PostMapping(value = "/children/{category}")
   @ResponseBody
-  public HttpEntity<byte[]> getChildren(@PathVariable("category") String category, @RequestBody List<Long> ids)
+  public List<?> getChildren(@PathVariable("category") String category, @RequestBody List<Long> ids)
       throws IOException {
-    return childFinder.list(ids, category, getObjectMapper());
+    return childFinder.list(ids, category);
   }
 
   @PostMapping(value = "/bulk-delete")

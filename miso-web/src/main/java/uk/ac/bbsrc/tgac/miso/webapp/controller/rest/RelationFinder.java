@@ -16,10 +16,8 @@ import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
@@ -50,7 +48,7 @@ public abstract class RelationFinder<M extends Identifiable> {
       this.category = category;
     }
 
-    public final HttpEntity<byte[]> handle(ObjectMapper mapper, Collection<M> items) throws IOException, JsonProcessingException {
+    public final List<D> handle(Collection<M> items) throws IOException, JsonProcessingException {
       List<String> errors = new ArrayList<>();
       
       Stream<P> relationStream = Stream.empty();
@@ -66,7 +64,7 @@ public abstract class RelationFinder<M extends Identifiable> {
       if (!errors.isEmpty() && relations.isEmpty()) {
         throw new RestException(errors.stream().collect(Collectors.joining("\n")), Status.BAD_REQUEST);
       }
-      return new HttpEntity<>(mapper.writeValueAsBytes(relations));
+      return relations;
     }
   }
 
@@ -130,13 +128,13 @@ public abstract class RelationFinder<M extends Identifiable> {
 
   protected abstract List<M> fetchByIds(List<Long> ids) throws IOException;
 
-  public HttpEntity<byte[]> list(List<Long> ids, String category, ObjectMapper mapper) throws IOException {
+  public List<?> list(List<Long> ids, String category) throws IOException {
     RelationAdapter<M, ?, ?> adapter = adapters.get(category);
     if (adapter == null) {
       throw new RestException(String.format("No such category %s.", category), Status.NOT_FOUND);
     }
     List<M> items = fetchByIds(ids);
-    return adapter.handle(mapper, items);
+    return adapter.handle(items);
   }
 
   public static ChildrenSampleAdapter child(String category, Class<? extends DetailedSample> targetClass) {

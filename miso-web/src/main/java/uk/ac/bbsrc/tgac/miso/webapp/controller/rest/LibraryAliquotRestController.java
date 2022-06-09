@@ -223,9 +223,9 @@ public class LibraryAliquotRestController extends RestController {
 
   @PostMapping(value = "/parents/{category}")
   @ResponseBody
-  public HttpEntity<byte[]> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
+  public List<?> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
-    return parentFinder.list(ids, category, getObjectMapper());
+    return parentFinder.list(ids, category);
   }
 
   private final RelationFinder<LibraryAliquot> childFinder = (new RelationFinder<LibraryAliquot>() {
@@ -268,9 +268,9 @@ public class LibraryAliquotRestController extends RestController {
 
   @PostMapping(value = "/children/{category}")
   @ResponseBody
-  public HttpEntity<byte[]> getChildren(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
+  public List<?> getChildren(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
-    return childFinder.list(ids, category, getObjectMapper());
+    return childFinder.list(ids, category);
   }
 
   @PostMapping(value = "/bulk-delete")

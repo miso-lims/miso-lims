@@ -24,6 +24,7 @@ Starting with version 1.29.0, the format of this file is based on
 ### Known Issues
 
 * Some bulk actions are missing from the Items list on the Edit Transfer page
+* Bulk actions available after Parent/Child navigation do not work
 
 
 ## [1.44.0] - 2022-05-19
