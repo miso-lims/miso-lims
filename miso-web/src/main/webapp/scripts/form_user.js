@@ -22,7 +22,7 @@ FormTarget.user = (function($) {
       return user.id ? 'PUT' : 'POST';
     },
     getEditUrl: function(user) {
-      return Urls.ui.users.edit(user.id);
+      return config.isAdmin ? Urls.ui.users.edit(user.id) : Urls.ui.users.editSelf(user.id);
     },
     getSections: function(config, object) {
       return [{
@@ -154,7 +154,7 @@ FormTarget.passwordreset = (function($) {
       return 'POST';
     },
     getEditUrl: function(user, config) {
-      return config.isAdmin ? Urls.ui.users.edit(user.id) : Urls.ui.users.view(user.id);
+      return config.isAdmin ? Urls.ui.users.edit(user.id) : Urls.ui.users.editSelf(user.id);
     },
     getSections: function(config, object) {
       return [{

@@ -1196,7 +1196,7 @@ Urls = (function() {
   ui.users = {
     create: userUiBase + '/new',
     edit: idUrlFunction(userUiBase),
-    view: idUrlFunction(baseUrl + '/users')
+    editSelf: idUrlFunction(baseUrl + '/user')
   };
 
   var userRestBase = restBase + '/users';
