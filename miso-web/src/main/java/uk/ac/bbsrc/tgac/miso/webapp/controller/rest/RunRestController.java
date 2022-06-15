@@ -37,7 +37,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -314,8 +313,8 @@ public class RunRestController extends RestController {
 
   @PostMapping(value = "/parents/{category}")
   @ResponseBody
-  public HttpEntity<byte[]> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids) throws IOException {
-    return parentFinder.list(ids, category, getObjectMapper());
+  public List<?> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids) throws IOException {
+    return parentFinder.list(ids, category);
   }
 
   private Stream<Pool> getPools(Run run) {
