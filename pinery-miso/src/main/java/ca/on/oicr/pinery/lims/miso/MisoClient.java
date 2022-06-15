@@ -1504,6 +1504,7 @@ public class MisoClient implements Lims {
     if (!rs.wasNull()) {
       req.setAssayId(assayId);
     }
+    req.setStopped(rs.getBoolean("stopped"));
     return req;
   };
 
