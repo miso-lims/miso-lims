@@ -7,6 +7,29 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.46.0] - 2022-06-16
+
+### Added
+
+* Running Sheet sample download sheet format
+
+### Changed
+
+* Pinery requisitions now include the 'stopped' field
+* Pinery samples now include attributes for barcode names (when applicable)
+
+### Fixed
+
+* JIRA issue lookup for projects with spaces in the shortname
+* 404 Not Found error after changing user password when using JDBC authentication
+* Bulk actions not working after Parent/Child navigation
+* Bulk actions missing from the Items list on the Edit Transfer page
+
+### Upgrade Notes
+
+* Updated to Pinery 2.23.0
+
+
 ## [1.45.0] - 2022-06-02
 
 ### Changed
