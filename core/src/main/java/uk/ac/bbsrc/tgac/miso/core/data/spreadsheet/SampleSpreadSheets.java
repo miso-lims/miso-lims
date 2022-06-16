@@ -145,7 +145,7 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Arrays.asList(SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME), //
       Column.forString("Alias", Sample::getAlias), //
       Column.forString("Group ID", effectiveGroupIdProperty(GroupIdentifiable::getGroupId)),
-      Column.forString("", sam -> ""), // intentional blank column
+      Column.forString("", blankColumn()), // intentional blank column
       Column.forString("Class", true, sampleClass()),
       Column.forString("Material", true, detailedSample(SampleTissue.class,
           tissue -> tissue.getTissueMaterial() == null ? null : tissue.getTissueMaterial().getAlias(), null)),
