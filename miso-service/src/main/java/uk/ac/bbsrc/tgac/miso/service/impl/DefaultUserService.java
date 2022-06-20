@@ -98,7 +98,7 @@ public class DefaultUserService implements UserService {
     }
     if (securityManager.isPasswordMutable()) {
       if (user.getPassword() != null) {
-        user.setPassword(validateAndEncodePassword(user.getPassword(), false));
+        original.setPassword(validateAndEncodePassword(user.getPassword(), false));
       }
     } else {
       original.setPassword(null);
