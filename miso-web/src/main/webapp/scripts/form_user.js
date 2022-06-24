@@ -21,7 +21,7 @@ FormTarget.user = (function($) {
     getSaveMethod: function(user) {
       return user.id ? 'PUT' : 'POST';
     },
-    getEditUrl: function(user) {
+    getEditUrl: function(user, config) {
       return config.isAdmin ? Urls.ui.users.edit(user.id) : Urls.ui.users.editSelf(user.id);
     },
     getSections: function(config, object) {
