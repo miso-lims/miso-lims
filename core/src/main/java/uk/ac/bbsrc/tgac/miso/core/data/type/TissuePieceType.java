@@ -55,7 +55,7 @@ public class TissuePieceType implements Deletable, Identifiable, Serializable {
   private String name;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long tissuePieceTypeId = TissuePieceType.UNSAVED_ID;
 
   @Override

@@ -35,7 +35,7 @@
   default-autowire="byName">
 
 
-  <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+  <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
     <property name="dataSource" ref="dataSource" />
     <property name="packagesToScan">
       <list>
@@ -55,7 +55,7 @@
   <bean id="jpaDialect" class="org.springframework.orm.jpa.vendor.HibernateJpaDialect" />
   <bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
 
-  <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+  <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
     <property name="sessionFactory" ref="sessionFactory" />
     <property name="dataSource" ref="dataSource" />
   </bean>
@@ -71,11 +71,8 @@
   <!-- Spring JDBC TEMPLATES STUFF -->
   <bean name="interfaceTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
     <property name="dataSource" ref="dataSource" />
-    <property name="nativeJdbcExtractor" ref="nativeJdbcExtractor" />
   </bean>
 
   <bean id="lobHandler" class="org.springframework.jdbc.support.lob.DefaultLobHandler" lazy-init="true" />
-
-  <bean name="nativeJdbcExtractor" class="org.springframework.jdbc.support.nativejdbc.CommonsDbcpNativeJdbcExtractor" />
 
 </beans>

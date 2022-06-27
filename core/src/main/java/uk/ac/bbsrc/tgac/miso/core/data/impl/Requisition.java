@@ -46,7 +46,7 @@ public class Requisition implements Aliasable, Attachable, ChangeLoggable, Delet
   private static final long UNSAVED_ID = 0L;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long requisitionId = UNSAVED_ID;
 
   private String alias;

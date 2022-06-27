@@ -104,7 +104,7 @@ public class LibraryImpl extends AbstractBoxable implements Library {
   private static final long UNSAVED_ID = 0L;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long libraryId = UNSAVED_ID;
 
   @Column(nullable = false)

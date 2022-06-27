@@ -58,7 +58,7 @@ public class KitImpl implements Kit {
   private static final long serialVersionUID = 1L;
   public static final Long UNSAVED_ID = 0L;
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long kitId = KitImpl.UNSAVED_ID;
   private String identificationBarcode;
   private String locationBarcode;

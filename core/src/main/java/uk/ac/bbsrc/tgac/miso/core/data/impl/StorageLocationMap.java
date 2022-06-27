@@ -18,7 +18,7 @@ public class StorageLocationMap implements Deletable, Identifiable, Serializable
   private static final long UNSAVED_ID = 0L;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long mapId = UNSAVED_ID;
   private String filename;
   private String description;

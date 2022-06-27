@@ -122,7 +122,7 @@ public class ProjectImpl implements Project {
 
   @Id
   @Column(name = "projectId")
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id = UNSAVED_ID;
 
   @OneToMany(targetEntity = StudyImpl.class, fetch = FetchType.LAZY, mappedBy = "project", cascade = CascadeType.REMOVE)

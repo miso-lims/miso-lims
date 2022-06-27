@@ -18,7 +18,7 @@ public class AttachmentCategory implements Aliasable, Deletable, Serializable {
   private static final long UNSAVED_ID = 0;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long categoryId = UNSAVED_ID;
 
   private String alias;

@@ -17,7 +17,7 @@ public class BoxUse implements Aliasable, Deletable, Serializable {
 
   private static final long UNSAVED_ID = 0L;
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "boxUseId")
   private long id = UNSAVED_ID;
 

@@ -74,7 +74,7 @@ public class StudyImpl implements Study {
   private Collection<Experiment> experiments = new HashSet<>();
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long studyId = StudyImpl.UNSAVED_ID;
 
   @Transient
