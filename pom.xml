@@ -447,17 +447,6 @@
         </exclusions>
       </dependency>
       <dependency>
-        <!-- Required to make Hibernate 4 logging compatible with log4j2 -->
-        <groupId>org.jboss.logging</groupId>
-        <artifactId>jboss-logging</artifactId>
-        <version>3.4.1.Final</version>
-      </dependency>
-      <!--<dependency>
-        <groupId>org.hibernate.javax.persistence</groupId>
-        <artifactId>hibernate-jpa-2.1-api</artifactId>
-        <version>1.0.2.Final</version>
-      </dependency>-->
-      <dependency>
         <groupId>javax.annotation</groupId>
         <artifactId>javax.annotation-api</artifactId>
         <version>1.2</version>
