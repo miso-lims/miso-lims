@@ -24,7 +24,7 @@ public class FileAttachment implements Identifiable, Serializable {
   private static final long UNSAVED_ID = 0;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long attachmentId = UNSAVED_ID;
   private String filename;
   private String path;

@@ -18,7 +18,7 @@ public class StorageLabel implements Deletable, Identifiable, Serializable {
   private static final long UNSAVED_ID = 0L;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long labelId = UNSAVED_ID;
 
   private String label;

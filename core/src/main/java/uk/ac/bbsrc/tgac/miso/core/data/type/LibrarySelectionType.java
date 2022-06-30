@@ -53,7 +53,7 @@ public class LibrarySelectionType implements Comparable<LibrarySelectionType>, D
   private static final long UNSAVED_ID = 0L;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long librarySelectionTypeId = LibrarySelectionType.UNSAVED_ID;
 
   @Column(nullable = false, unique = true)

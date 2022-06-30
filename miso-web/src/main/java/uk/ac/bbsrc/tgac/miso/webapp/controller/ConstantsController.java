@@ -197,7 +197,7 @@ public class ConstantsController {
     }
   }
 
-  @GetMapping(path = "/constants.js")
+  @GetMapping(path = "/constants.js", produces = "application/javascript")
   @ResponseBody
   public synchronized ResponseEntity<String> constantsScript(HttpServletResponse response, final UriComponentsBuilder uriBuilder)
       throws IOException {

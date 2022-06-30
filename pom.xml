@@ -111,10 +111,10 @@
   </distributionManagement>
   <properties>
     <skipUTs>${skipTests}</skipUTs>
-    <spring-version>4.3.24.RELEASE</spring-version>
+    <spring-version>5.3.21</spring-version>
     <spring-security-version>5.0.12.RELEASE</spring-security-version>
     <spring-integration-version>4.3.20.RELEASE</spring-integration-version>
-    <hibernate.version>4.2.21.Final</hibernate.version>
+    <hibernate.version>5.6.9.Final</hibernate.version>
     <joda-time.version>2.9</joda-time.version>
     <hamcrest.version>1.3</hamcrest.version>
     <junit.version>4.12</junit.version>
@@ -259,6 +259,11 @@
         <groupId>io.prometheus.jmx</groupId>
         <artifactId>collector</artifactId>
         <version>${prometheus.jmx.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.xml.bind</groupId>
+        <artifactId>jaxb-api</artifactId>
+        <version>2.3.1</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
@@ -440,17 +445,6 @@
             <artifactId>javassist</artifactId>
           </exclusion>
         </exclusions>
-      </dependency>
-      <dependency>
-        <!-- Required to make Hibernate 4 logging compatible with log4j2 -->
-        <groupId>org.jboss.logging</groupId>
-        <artifactId>jboss-logging</artifactId>
-        <version>3.4.1.Final</version>
-      </dependency>
-      <dependency>
-        <groupId>org.hibernate.javax.persistence</groupId>
-        <artifactId>hibernate-jpa-2.0-api</artifactId>
-        <version>1.0.1.Final</version>
       </dependency>
       <dependency>
         <groupId>javax.annotation</groupId>

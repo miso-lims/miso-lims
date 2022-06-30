@@ -73,7 +73,7 @@ public abstract class QC implements Deletable, Serializable, Comparable<QC>, Ide
   private Date lastModified;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long qcId = QC.UNSAVED_ID;
 
   private BigDecimal results;

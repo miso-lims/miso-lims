@@ -64,7 +64,7 @@ public class InstrumentImpl implements Instrument {
   private static final Long UNSAVED_ID = 0L;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "instrumentId")
   private long id = InstrumentImpl.UNSAVED_ID;
 

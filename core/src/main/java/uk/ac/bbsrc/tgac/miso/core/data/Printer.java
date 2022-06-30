@@ -64,7 +64,7 @@ public class Printer implements Deletable, Serializable {
   private String name;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long printerId = UNSAVED_ID;
 
   private double width;

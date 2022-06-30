@@ -53,7 +53,7 @@ public class LibraryStrategyType implements Comparable<LibraryStrategyType>, Del
   private static final Long UNSAVED_ID = 0L;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long libraryStrategyTypeId = LibraryStrategyType.UNSAVED_ID;
 
   @Column(nullable = false, unique = true)

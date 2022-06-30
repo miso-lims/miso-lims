@@ -134,7 +134,7 @@ public abstract class Run
   private Collection<Note> notes = new HashSet<>();
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long runId = UNSAVED_ID;
 
   @ManyToOne(targetEntity = InstrumentImpl.class)

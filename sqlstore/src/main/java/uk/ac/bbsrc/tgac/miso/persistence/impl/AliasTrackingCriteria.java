@@ -185,6 +185,12 @@ public class AliasTrackingCriteria implements Criteria {
   }
 
   @Override
+  public Criteria addQueryHint(String s) {
+    backingCriteria.addQueryHint(s);
+    return this;
+  }
+
+  @Override
   public Criteria setFetchMode(String associationPath, FetchMode mode) throws HibernateException {
     backingCriteria.setFetchMode(associationPath, mode);
     return this;

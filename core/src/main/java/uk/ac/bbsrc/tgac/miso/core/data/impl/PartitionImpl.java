@@ -58,7 +58,7 @@ public class PartitionImpl implements Partition {
   private static final long serialVersionUID = 1L;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "partitionId")
   private long id = UNSAVED_ID;
 

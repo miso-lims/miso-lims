@@ -96,7 +96,7 @@ public class SampleImpl extends AbstractBoxable implements Sample {
   private static final long UNSAVED_ID = 0L;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long sampleId = UNSAVED_ID;
 
   @ManyToOne(targetEntity = ProjectImpl.class)

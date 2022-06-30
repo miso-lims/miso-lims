@@ -38,7 +38,7 @@ public class Note implements Serializable, Comparable<Note>, Identifiable {
   public static final long UNSAVED_ID = 0L;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long noteId = Note.UNSAVED_ID;
 
   @Column(nullable = false)

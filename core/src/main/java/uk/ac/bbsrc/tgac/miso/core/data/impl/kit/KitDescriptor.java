@@ -83,7 +83,7 @@ public class KitDescriptor implements Serializable, ChangeLoggable, Deletable, I
   private static final Long UNSAVED_ID = 0L;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long kitDescriptorId = KitDescriptor.UNSAVED_ID;
   private String name;
   private Integer version;
