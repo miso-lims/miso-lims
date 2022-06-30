@@ -142,6 +142,8 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
     }
     String position = item.getItem().getBoxPosition();
     loadChildEntity(item.getItem(), setter, service);
+    // detach to prevent Hibernate from prematurely detecting changes in this entity
+    transferStore.detachEntity(item.getItem());
     setBoxPosition(item, box, position, positionConstructor, positionSetter);
   }
 
