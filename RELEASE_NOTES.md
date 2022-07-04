@@ -7,6 +7,22 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.47.0] - 2022-07-04
+
+### Changed
+
+* When using JDBC authentication, the following password requirements are now
+  enforced:
+  * minimum password length: 8
+  * minimum complexity: must contain at least 3 of the following: uppercase
+  letters, lowercase letters, numbers, special characters
+  
+
+### Fixed
+
+* Updated Spring and Hibernate libraries (security patches)
+
+
 ## [1.46.0] - 2022-06-16
 
 ### Added
