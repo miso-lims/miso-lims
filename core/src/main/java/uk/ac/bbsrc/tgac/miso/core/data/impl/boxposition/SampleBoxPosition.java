@@ -20,12 +20,13 @@ public class SampleBoxPosition extends AbstractBoxPosition {
   @Id
   private Long sampleId;
 
-  public Long getSampleId() {
+  @Override
+  public long getItemId() {
     return sampleId;
   }
 
-  public void setSampleId(Long sampleId) {
-    this.sampleId = sampleId;
+  @Override
+  public void setItemId(long id) {
+    this.sampleId = id;
   }
-
 }
