@@ -204,6 +204,31 @@
     }
   };
 
+  SampleArray.updateSamplesTable = function(array) {
+    $('#listingSamplesTable').empty();
+    var data = !array ? [] : array.samples.map(function(sample) {
+      return [sample.coordinates, Box.utils.hyperlinkifyBoxable(sample.name, sample.id, sample.name),
+          Box.utils.hyperlinkifyBoxable(sample.name, sample.id, sample.alias)];
+    });
+    $('#listingSamplesTable')
+        .dataTable(
+            {
+              "aaData": data,
+              "aoColumns": [{
+                "sTitle": "Position"
+              }, {
+                "sTitle": "Sample Name"
+              }, {
+                "sTitle": "Sample Alias"
+              }],
+              "bJQueryUI": true,
+              "bDestroy": true,
+              "sPaginationType": "full_numbers",
+              "sDom": '<"#toolbar.fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"lf>r<t><"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
+              "aaSorting": [[0, "asc"]]
+            }).css("width", "100%");
+  }
+
   function clearSampleSearchResults() {
     showSampleSearchResults();
   }
@@ -247,7 +272,7 @@
       $('#serialNumber').val(arrayJson.serialNumber);
       $('#description').val(arrayJson.description);
       createVisual();
-      updateSamplesTable();
+      SampleArray.updateSamplesTable(arrayJson);
       updateChangelogs();
     }
   }
@@ -288,33 +313,6 @@
     } else {
       controls.prop('disabled', false).removeClass('disabled');
     }
-  }
-
-  function updateSamplesTable() {
-    $('#listingSamplesTable').empty();
-    var data = arrayJson.samples.map(function(sample) {
-      return [sample.coordinates, Box.utils.hyperlinkifyBoxable(sample.name, sample.id, sample.name),
-          Box.utils.hyperlinkifyBoxable(sample.name, sample.id, sample.alias)];
-    });
-    $('#listingSamplesTable')
-        .dataTable(
-            {
-              "aaData": data,
-              "aoColumns": [{
-                "sTitle": "Position"
-              }, {
-                "sTitle": "Sample Name"
-              }, {
-                "sTitle": "Sample Alias"
-              }],
-              "bJQueryUI": true,
-              "bDestroy": true,
-              "aLengthMenu": [[arrayJson.columns * arrayJson.rows, 50, 25, 10], [arrayJson.columns * arrayJson.rows, 50, 25, 10]],
-              "iDisplayLength": arrayJson.columns * arrayJson.rows,
-              "sPaginationType": "full_numbers",
-              "sDom": '<"#toolbar.fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"lf>r<t><"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
-              "aaSorting": [[0, "asc"]]
-            }).css("width", "100%");
   }
 
   function updateChangelogs() {

@@ -105,7 +105,7 @@ FormTarget.arrayrun = (function($) {
                             label: array.alias,
                             link: Urls.ui.arrays.edit(array.id)
                           });
-                          updateSamplesTable(array);
+                          SampleArray.updateSamplesTable(array);
                         }
                       };
                     }));
@@ -120,7 +120,7 @@ FormTarget.arrayrun = (function($) {
                     label: '',
                     link: null
                   });
-                  updateSamplesTable(null);
+                  SampleArray.updateSamplesTable(null);
                 });
               } else {
                 Utils.showOkDialog('Remove Array', ['No array set']);
@@ -172,38 +172,6 @@ FormTarget.arrayrun = (function($) {
     return Utils.array.findUniqueOrThrow(function(item) {
       return item.label === label;
     }, Constants.healthTypes);
-  }
-
-  function updateSamplesTable(array) {
-    $('#listingSamplesTable').empty();
-    var data = [];
-    var lengthOptions = [50, 25, 10];
-    if (array) {
-      data = array.samples.map(function(sample) {
-        return [sample.coordinates, Box.utils.hyperlinkifyBoxable(sample.name, sample.id, sample.name),
-            Box.utils.hyperlinkifyBoxable(sample.name, sample.id, sample.alias)];
-      });
-      lengthOptions.unshift(array.columns * array.rows);
-    }
-    $('#listingSamplesTable')
-        .dataTable(
-            {
-              "aaData": data,
-              "aoColumns": [{
-                "sTitle": "Position"
-              }, {
-                "sTitle": "Sample Name"
-              }, {
-                "sTitle": "Sample Alias"
-              }],
-              "bJQueryUI": true,
-              "bDestroy": true,
-              "aLengthMenu": [lengthOptions, lengthOptions],
-              "iDisplayLength": lengthOptions[0],
-              "sPaginationType": "full_numbers",
-              "sDom": '<"#toolbar.fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"lf>r<t><"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
-              "aaSorting": [[0, "asc"]]
-            }).css("width", "100%");
   }
 
 })(jQuery);
