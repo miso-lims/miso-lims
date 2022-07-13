@@ -20,7 +20,11 @@ public class ArrayModel implements Serializable, Aliasable, Deletable {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id = UNSAVED_ID;
   private String alias;
+
+  @Column(name = "arrayModelRows")
   private int rows;
+
+  @Column(name = "arrayModelColumns")
   private int columns;
 
   @Override
