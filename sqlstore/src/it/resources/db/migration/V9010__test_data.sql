@@ -930,7 +930,7 @@ INSERT INTO `SampleNumberPerProject` (`sampleNumberPerProjectId`, `projectId`, `
 ('1', '1', '1', '4', '1', '1', '2016-01-28 14:32:00', '2016-01-28 14:32:00'),
 ('2', '3', '9999', '4', '1', '1', '2016-01-28 14:32:00', '2016-01-28 14:32:00');
 
-INSERT INTO ArrayModel(arrayModelId, alias, rows, columns) VALUES
+INSERT INTO ArrayModel(arrayModelId, alias, arrayModelRows, arrayModelColumns) VALUES
 (1, 'Test BeadChip', 8, 1);
 
 INSERT INTO Array(arrayId, alias, arrayModelId, serialNumber, description, creator, created, lastModifier, lastModified) VALUES
