@@ -19,9 +19,14 @@ public class RestException extends RuntimeException {
   public RestException() {
     super();
   }
-  
+
   public RestException(String message, Status status) {
     super(message);
+    this.status = status;
+  }
+
+  public RestException(String message, Status status, Throwable cause) {
+    super(message, cause);
     this.status = status;
   }
   

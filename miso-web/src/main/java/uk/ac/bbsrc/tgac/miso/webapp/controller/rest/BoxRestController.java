@@ -381,10 +381,8 @@ public class BoxRestController extends RestController {
     }
     try {
       boxScanner.prepareScan(requestData.getRows(), requestData.getColumns());
-    } catch (IntegrationException e) {
-      throw new RestException("Could not find the scanner", Status.INTERNAL_SERVER_ERROR);
     } catch (Exception e) {
-      throw new RestException("Could not find the scanner", Status.INTERNAL_SERVER_ERROR);
+      throw new RestException("Could not find the scanner", Status.INTERNAL_SERVER_ERROR, e);
     }
   }
 
