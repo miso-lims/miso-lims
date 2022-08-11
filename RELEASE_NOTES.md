@@ -7,6 +7,20 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.48.0] - 2022-08-11
+
+### Changed
+
+* Transfer notification emails now include tissue origin, tissue type, and
+  timepoint of each sample (detailed sample)
+
+### Fixed
+
+* searching for library aliquots by alias in the Search widget
+* error saving array models when using a MariaDB database
+* samples were sometimes not appearing on the Edit Array Run page
+
+
 ## [1.47.1] - 2022-07-06
 
 ### Fixed
