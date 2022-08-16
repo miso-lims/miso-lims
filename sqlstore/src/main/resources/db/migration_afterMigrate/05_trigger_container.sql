@@ -32,65 +32,6 @@ FOR EACH ROW
     'Container created.',
     NEW.lastModified)//
 
-DROP TRIGGER IF EXISTS PartitionChange//
-CREATE TRIGGER PartitionChange BEFORE UPDATE ON _Partition
-FOR EACH ROW
-  BEGIN
-    DECLARE log_message longtext CHARACTER SET utf8;
-    DECLARE last_modifier bigint(20);
-    DECLARE last_modified TIMESTAMP;
-    DECLARE old_pool_name, new_pool_name, new_container_serial varchar(255) CHARACTER SET utf8;
-    
-    SET old_pool_name = COALESCE((SELECT name FROM Pool WHERE poolId = OLD.pool_poolId), 'n/a');
-    SET new_pool_name = COALESCE((SELECT name FROM Pool WHERE poolId = NEW.pool_poolId), 'n/a');
-    SET log_message = CONCAT_WS(', ',
-      CASE WHEN (NEW.pool_poolId IS NULL) <> (OLD.pool_poolId IS NULL) OR NEW.pool_poolId <> OLD.pool_poolId
-        THEN CONCAT('pool changed in partition ', OLD.partitionNumber, ': ', old_pool_name, ' → ', new_pool_name)
-      END
-    );
-    SET new_container_serial = COALESCE(
-      (SELECT identificationBarcode FROM SequencerPartitionContainer WHERE containerId = NEW.containerId),
-      'unknown');
-    SELECT spc.lastModifier, spc.lastModified INTO last_modifier, last_modified
-      FROM SequencerPartitionContainer spc
-      WHERE spc.containerId = NEW.containerId; 
-    
-    IF log_message IS NOT NULL AND log_message <> '' THEN
-      INSERT INTO SequencerPartitionContainerChangeLog(containerId, columnsChanged, userId, message, changeTime)
-      VALUES (NEW.containerId, 'pool', last_modifier, log_message, last_modified);
-      
-      INSERT INTO RunChangeLog(runId, columnsChanged, userId, message, changeTime)
-        SELECT rspc.run_runId,
-          'pool',
-          last_modifier,
-          CONCAT('pool changed in partition ', OLD.partitionNumber, ' of container ', spc.identificationBarcode, ': ', old_pool_name, ' → ', new_pool_name),
-          last_modified
-        FROM Run_SequencerPartitionContainer rspc
-        JOIN SequencerPartitionContainer spc ON spc.containerId = rspc.containers_containerId
-        WHERE spc.containerId = NEW.containerId;
-    END IF;
-
-    IF (NEW.pool_poolId IS NOT NULL) AND ((OLD.pool_poolId IS NULL) OR ((OLD.pool_poolId IS NOT NULL) AND (OLD.pool_poolId <> NEW.pool_poolId))) THEN
-      INSERT INTO PoolChangeLog(poolId, columnsChanged, userId, message, changeTime) VALUES (
-        NEW.pool_poolId,
-        'container',
-        last_modifier,
-        CONCAT('Added to container ', new_container_serial, ' (partition ', NEW.partitionNumber, ')'),
-        last_modified
-      );
-    END IF;
-    
-    IF (OLD.pool_poolId IS NOT NULL) AND ((NEW.pool_poolId IS NULL) OR ((NEW.pool_poolId IS NOT NULL) AND (OLD.pool_poolId <> NEW.pool_poolId)))  THEN
-      INSERT INTO PoolChangeLog(poolId, columnsChanged, userId, message, changeTime) VALUES (
-        OLD.pool_poolId,
-        'container',
-        last_modifier,
-        CONCAT('Removed from container ', new_container_serial),
-        last_modified
-      );
-    END IF;
-  END //
-
 DROP TRIGGER IF EXISTS OxfordNanoporeContainerChange//
 CREATE TRIGGER OxfordNanoporeContainerChange BEFORE UPDATE ON OxfordNanoporeContainer
 FOR EACH ROW
