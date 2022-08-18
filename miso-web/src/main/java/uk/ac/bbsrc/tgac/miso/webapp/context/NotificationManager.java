@@ -337,7 +337,7 @@ public class NotificationManager {
         cells.add(makeTd(dnaOrRna(detailedSample)));
         cells.add(makeTd(detailedSample.getIdentityAttributes().getExternalName()));
         ParentTissueAttributes tissue = detailedSample.getTissueAttributes();
-        cells.add(makeTd(tissue == null ? null : tissue.getTissueOrigin() + "_" + tissue.getTissueType()));
+        cells.add(makeTd(tissue == null ? null : tissue.getTissueOrigin().getAlias() + "_" + tissue.getTissueType().getAlias()));
         cells.add(makeTd(tissue == null ? null : tissue.getTimepoint()));
       }
       BigDecimal volume = transferSample.getDistributedVolume() != null ? transferSample.getDistributedVolume() : sample.getVolume();
