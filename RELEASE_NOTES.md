@@ -7,6 +7,15 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.48.1] - 2022-08-19
+
+### Fixed
+
+* display of tissue attributes in transfer notification emails
+* changelogs for pools added/removed from sequencing containers showing the
+  wrong date and user
+
+
 ## [1.48.0] - 2022-08-11
 
 ### Changed
