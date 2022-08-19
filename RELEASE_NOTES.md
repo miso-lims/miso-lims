@@ -15,6 +15,10 @@ Starting with version 1.29.0, the format of this file is based on
 * changelogs for pools added/removed from sequencing containers showing the
   wrong date and user
 
+### Known Issues
+
+* error logging in new users when using LDAP/AD authentication
+
 
 ## [1.48.0] - 2022-08-11
 
@@ -29,12 +33,20 @@ Starting with version 1.29.0, the format of this file is based on
 * error saving array models when using a MariaDB database
 * samples were sometimes not appearing on the Edit Array Run page
 
+### Known Issues
+
+* error logging in new users when using LDAP/AD authentication
+
 
 ## [1.47.1] - 2022-07-06
 
 ### Fixed
 
 * Error saving transfers
+
+### Known Issues
+
+* error logging in new users when using LDAP/AD authentication
 
 
 ## [1.47.0] - 2022-07-04
@@ -46,7 +58,11 @@ Starting with version 1.29.0, the format of this file is based on
   * minimum password length: 8
   * minimum complexity: must contain at least 3 of the following: uppercase
   letters, lowercase letters, numbers, special characters
-  
+
+### Known Issues
+
+* error logging in new users when using LDAP/AD authentication
+
 
 ### Fixed
 
@@ -151,7 +167,7 @@ Starting with version 1.29.0, the format of this file is based on
 ### Fixed
 
 * Missing metric controls on the Edit Assay page
-  
+
 * When editing a sample that is a descendant of a requisitioned sample, the
   descendant was being saved as a requisitioned sample as well
 
@@ -202,7 +218,7 @@ Starting with version 1.29.0, the format of this file is based on
 
 ### Fixed
 
-* 
+*
   An issue where spaces were not trimmed from box aliases, and samples silently
   failed to save within such boxes
 * Bulk library template performance and accessibility improvements

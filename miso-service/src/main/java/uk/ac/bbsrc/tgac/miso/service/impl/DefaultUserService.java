@@ -51,12 +51,17 @@ public class DefaultUserService implements UserService {
     if (authorizationManager.getCurrentUser() != null) {
       authorizationManager.throwIfNonAdmin();
     }
+
     user.setPassword(validateAndEncodePassword(user.getPassword(), true));
     return securityStore.saveUser(user);
   }
 
   @VisibleForTesting
   protected String validateAndEncodePassword(String password, boolean newUser) {
+    if (newUser && !securityManager.isPasswordMutable() && password == null) {
+      // null expected if using LDAP/AD authentication
+      return null;
+    }
     String passwordProperty = newUser ? "password" : "newPassword";
     if (password.length() < 8) {
       throw new ValidationException(new ValidationError(passwordProperty, "Must be at least 8 characters long"));
