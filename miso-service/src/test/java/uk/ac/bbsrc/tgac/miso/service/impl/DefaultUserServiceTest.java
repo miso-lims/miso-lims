@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -26,6 +27,9 @@ public class DefaultUserServiceTest {
   @Mock
   private PasswordEncoder passwordEncoder;
 
+  @Mock
+  private SecurityManager securityManager;
+
   @InjectMocks
   private DefaultUserService sut;
 
@@ -33,6 +37,7 @@ public class DefaultUserServiceTest {
   public void setup() {
     MockitoAnnotations.initMocks(this);
     Mockito.when(passwordEncoder.encode(Mockito.anyString())).thenReturn(ENCODED);
+    Mockito.when(securityManager.isPasswordMutable()).thenReturn(true);
   }
 
   @Test
