@@ -7,6 +7,13 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.48.2] - 2022-08-22
+
+### Fixed
+
+* error logging in new users when using LDAP/AD authentication
+
+
 ## [1.48.1] - 2022-08-19
 
 ### Fixed
