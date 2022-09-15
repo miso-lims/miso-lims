@@ -13,6 +13,10 @@ Starting with version 1.29.0, the format of this file is based on
 
 * error logging in new users when using LDAP/AD authentication
 
+### Known Issues
+
+* Error accessing Jira tickets on project page in plain sample mode
+
 
 ## [1.48.1] - 2022-08-19
 
@@ -25,6 +29,7 @@ Starting with version 1.29.0, the format of this file is based on
 ### Known Issues
 
 * error logging in new users when using LDAP/AD authentication
+* Error loading project page in plain sample mode
 
 
 ## [1.48.0] - 2022-08-11
@@ -43,6 +48,7 @@ Starting with version 1.29.0, the format of this file is based on
 ### Known Issues
 
 * error logging in new users when using LDAP/AD authentication
+* Error loading project page in plain sample mode
 
 
 ## [1.47.1] - 2022-07-06
@@ -54,6 +60,7 @@ Starting with version 1.29.0, the format of this file is based on
 ### Known Issues
 
 * error logging in new users when using LDAP/AD authentication
+* Error loading project page in plain sample mode
 
 
 ## [1.47.0] - 2022-07-04
@@ -69,6 +76,7 @@ Starting with version 1.29.0, the format of this file is based on
 ### Known Issues
 
 * error logging in new users when using LDAP/AD authentication
+* Error loading project page in plain sample mode
 
 
 ### Fixed
@@ -93,6 +101,10 @@ Starting with version 1.29.0, the format of this file is based on
 * 404 Not Found error after changing user password when using JDBC authentication
 * Bulk actions not working after Parent/Child navigation
 * Bulk actions missing from the Items list on the Edit Transfer page
+
+### Known Issues
+
+* Error loading project page in plain sample mode
 
 ### Upgrade Notes
 
