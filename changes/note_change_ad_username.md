@@ -31,5 +31,5 @@ new user instead of the old. e.g.
 UPDATE Sample SET creator = @newUser WHERE creator = @oldUser;
 ```
 
-Substitute `Sample` and `creator` for with the table and field names specified
-in the error. Try deleting again, and repeat until deletion is successful.
+Substitute `Sample` and `creator` with the table and field names specified in
+the error. Try deleting again, and repeat until deletion is successful.
