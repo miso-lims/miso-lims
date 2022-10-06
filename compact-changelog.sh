@@ -47,7 +47,7 @@ add_section() {
     for FILE in ${FILES}; do
       PREFIX="* "
       while read LINE || [[ -n "${LINE}" ]]; do
-        printf '%s' "\n${PREFIX}${LINE}" >> "${TEMP_FILE}"
+        printf "\n${PREFIX}${LINE}" >> "${TEMP_FILE}"
         PREFIX="  "
       done <"${FILE}"
     done
