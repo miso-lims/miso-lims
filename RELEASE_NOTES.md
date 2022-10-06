@@ -7,6 +7,18 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.49.0] - 2022-10-06
+
+### Changed
+\n* The mail domain (if entered) will now be removed from usernames when logging\n  in using Active Directory authentication. For example, if your domain is\n  example.com and a user logs in as "person@example.com", their username will\n  be reduced to "person"
+
+### Fixed
+\n* Error loading project page in plain sample mode
+
+### Upgrade Notes
+\n* If you are using Active Directory authentication, you should check to see if\n  any of your usernames contain the email domain, as it will now be removed.\n  This may result in a new user being created, and it will no longer be\n  possible to access the old, domain-including user. It will be easiest to\n  query the database directly to find and fix these instances:\n  \n  1. Check for usernames containing the domain: `SELECT loginName FROM User WHERE\n  loginName LIKE '%@%';`\n  2. For each, rename to drop the domain: `UPDATE User SET loginName = 'person'\n  WHERE loginName = 'person@example.com';` (replacing appropriate values)\n  \n  If there is already another user with the same name, you'll have to decide\n  whether to ignore or delete it. If you ignore, anything associated with the\n  old domain-including user will NOT be associated with the new/domainless user.\n  \n  You can try deleting the domain-including user:\n  \n  ```\n  SELECT userId INTO @oldUser FROM User WHERE loginName = 'person@example.com';\n  SELECT userId INTO @newUser FROM User WHERE loginName = 'person';\n  \n  DELETE FROM User_Group WHERE users_userId = @oldUser;\n  DELETE FROM User WHERE loginName = '@oldUser';\n  ```\n  \n  If there is anything associated with that user, you will see a foreign key\n  violation error. You'll then have to update any records to associate with the\n  new user instead of the old. e.g.\n  \n  ```\n  UPDATE Sample SET creator = @newUser WHERE creator = @oldUser;\n  ```\n  \n  Substitute `Sample` and `creator` with the table and field names specified in\n  the error. Try deleting again, and repeat until deletion is successful.
+
+
 ## [1.48.2] - 2022-08-22
 
 ### Fixed
