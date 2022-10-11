@@ -7,7 +7,7 @@ public class RunLibraryQcTableRequestMetricDto {
   private String title;
   private String thresholdType;
   private double threshold;
-  private double value;
+  private Double value;
 
   public String getTitle() {
     return title;
@@ -34,11 +34,11 @@ public class RunLibraryQcTableRequestMetricDto {
     this.threshold = threshold;
   }
 
-  public double getValue() {
+  public Double getValue() {
     return value;
   }
 
-  public void setValue(double value) {
+  public void setValue(Double value) {
     this.value = value;
   }
 
