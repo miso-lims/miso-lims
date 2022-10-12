@@ -38,7 +38,7 @@ var RunLibraryMetrics = (function($) {
         var row = $('<tr>')
         row.append($('<td>').text(rowData.libraryAliquot.alias));
         rowData.metrics.forEach(function(metric) {
-          var metricCell = $('<td>').text(metric.value);
+          var metricCell = $('<td>').text(metric.value == null ? '?' : metric.value);
           if (!metricPassed(metric)) {
             metricCell.addClass('failed');
           }
