@@ -7,6 +7,15 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.49.1] - 2022-10-21
+
+### Fixed
+
+* exporting box to spreadsheet from the Edit Box page
+* Missing metric values were incorrectly displayed as "0" (zero) on the
+  Run-Library Metrics page
+
+
 ## [1.49.0] - 2022-10-06
 
 ### Changed
