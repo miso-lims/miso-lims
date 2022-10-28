@@ -38,12 +38,14 @@ public class PlainSampleITs extends AbstractIT {
       SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT, SamColumns.VOLUME, SamColumns.VOLUME_UNITS,
       SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS, SamColumns.QC_STATUS, SamColumns.QC_NOTE);
 
-  private static final Set<String> libraryColumns = Sets.newHashSet(LibColumns.NAME, LibColumns.SAMPLE_NAME, LibColumns.SAMPLE_ALIAS,
-      LibColumns.SAMPLE_LOCATION, LibColumns.BOX_SEARCH, LibColumns.BOX_ALIAS, LibColumns.BOX_POSITION, LibColumns.DISCARDED,
-      LibColumns.CREATION_DATE, LibColumns.WORKSTATION, LibColumns.THERMAL_CYCLER, LibColumns.PLATFORM, LibColumns.LIBRARY_TYPE,
-      LibColumns.SELECTION, LibColumns.STRATEGY, LibColumns.INDEX_FAMILY, LibColumns.INDEX_1, LibColumns.INDEX_2, LibColumns.UMIS,
-      LibColumns.KIT_DESCRIPTOR, LibColumns.KIT_LOT, LibColumns.QC_STATUS, LibColumns.QC_NOTE, LibColumns.SIZE, LibColumns.CONCENTRATION,
-      LibColumns.CONCENTRATION_UNITS, LibColumns.SPIKE_IN, LibColumns.SPIKE_IN_DILUTION, LibColumns.SPIKE_IN_VOL);
+  private static final Set<String> libraryColumns = Sets.newHashSet(LibColumns.NAME, SamColumns.PROJECT,
+      LibColumns.SAMPLE_NAME, LibColumns.SAMPLE_ALIAS, LibColumns.SAMPLE_LOCATION, LibColumns.BOX_SEARCH,
+      LibColumns.BOX_ALIAS, LibColumns.BOX_POSITION, LibColumns.DISCARDED, LibColumns.CREATION_DATE,
+      LibColumns.WORKSTATION, LibColumns.THERMAL_CYCLER, LibColumns.PLATFORM, LibColumns.LIBRARY_TYPE,
+      LibColumns.SELECTION, LibColumns.STRATEGY, LibColumns.INDEX_FAMILY, LibColumns.INDEX_1, LibColumns.INDEX_2,
+      LibColumns.UMIS, LibColumns.KIT_DESCRIPTOR, LibColumns.KIT_LOT, LibColumns.QC_STATUS, LibColumns.QC_NOTE,
+      LibColumns.SIZE, LibColumns.CONCENTRATION, LibColumns.CONCENTRATION_UNITS, LibColumns.SPIKE_IN,
+      LibColumns.SPIKE_IN_DILUTION, LibColumns.SPIKE_IN_VOL);
 
   private static final Set<String> libraryAliquotColumns = Sets.newHashSet(LibraryAliquotColumns.NAME, LibraryAliquotColumns.ALIAS,
       LibraryAliquotColumns.PARENT_NAME, LibraryAliquotColumns.PARENT_ALIAS, LibraryAliquotColumns.PARENT_LOCATION,

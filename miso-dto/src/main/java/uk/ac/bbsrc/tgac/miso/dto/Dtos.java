@@ -1390,6 +1390,8 @@ public class Dtos {
     setString(dto::setParentSampleName, maybeGetProperty(from.getSample(), Sample::getName));
     dto.setParentSampleAlias(from.getSample().getAlias());
     dto.setProjectId(from.getSample().getProject().getId());
+    setString(dto::setProjectName, from.getSample().getProject().getName());
+    setString(dto::setProjectShortName, from.getSample().getProject().getShortName());
     if (from.getSample() instanceof DetailedSample) {
       dto.setParentSampleClassId(((DetailedSample) from.getSample()).getSampleClass().getId());
     }

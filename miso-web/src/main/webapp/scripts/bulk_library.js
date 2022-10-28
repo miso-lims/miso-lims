@@ -201,6 +201,13 @@ BulkTarget.library = (function($) {
       if (config.showLibraryAlias) {
         columns.push(BulkUtils.columns.generatedAlias(config));
       }
+      columns.push({
+        title: 'Project',
+        type: 'text',
+        data: Constants.isDetailedSample ? 'projectShortName' : 'projectName',
+        include: !config.isLibraryReceipt,
+        disabled: true
+      });
 
       if (config.isLibraryReceipt) {
         var sampleProp = function(dataProperty) {
