@@ -46,6 +46,8 @@ public class LibraryDto extends AbstractBoxableDto implements ReceivableDto<Libr
   private String parentSampleName;
   private Long parentSampleClassId;
   private Long projectId;
+  private String projectName;
+  private String projectShortName;
   private String platformType;
   private Long detailedQcStatusId;
   private String detailedQcStatusNote;
@@ -639,4 +641,19 @@ public class LibraryDto extends AbstractBoxableDto implements ReceivableDto<Libr
     this.requisitionAlias = requisitionAlias;
   }
 
+  public String getProjectName() {
+    return projectName;
+  }
+
+  public void setProjectName(String projectName) {
+    this.projectName = projectName;
+  }
+
+  public String getProjectShortName() {
+    return projectShortName;
+  }
+
+  public void setProjectShortName(String projectShortName) {
+    this.projectShortName = projectShortName;
+  }
 }
