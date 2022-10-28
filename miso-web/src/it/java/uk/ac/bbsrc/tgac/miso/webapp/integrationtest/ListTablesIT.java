@@ -223,8 +223,9 @@ public class ListTablesIT extends AbstractIT {
   public void testListLibraryAliquotsPageSetup() throws Exception {
     // Goal: ensure all expected columns are present and no extra
     testPageSetup(ListTarget.LIBRARY_ALIQUOTS,
-        Sets.newHashSet(Columns.SELECTOR, Columns.NAME, Columns.ALIAS, Columns.TISSUE_ORIGIN, Columns.TISSUE_TYPE, Columns.QC, Columns.DESIGN,
-            Columns.SIZE_BP, Columns.INDICES, Columns.LOCATION, Columns.VOLUME, Columns.CONCENTRATION, Columns.LAST_MODIFIED));
+        Sets.newHashSet(Columns.SELECTOR, Columns.NAME, Columns.ALIAS, Columns.PROJECT, Columns.TISSUE_ORIGIN,
+            Columns.TISSUE_TYPE, Columns.QC, Columns.DESIGN, Columns.SIZE_BP, Columns.INDICES, Columns.LOCATION,
+            Columns.VOLUME, Columns.CONCENTRATION, Columns.LAST_MODIFIED));
   }
 
   @Test

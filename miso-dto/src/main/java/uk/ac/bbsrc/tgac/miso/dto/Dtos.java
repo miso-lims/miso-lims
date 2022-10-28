@@ -1822,6 +1822,9 @@ public class Dtos {
     dto.setSampleId(from.getSampleId());
     dto.setSampleName(from.getSampleName());
     dto.setSampleAlias(from.getSampleAlias());
+    setLong(dto::setProjectId, from.getProjectId(), true);
+    setString(dto::setProjectName, from.getProjectName());
+    setString(dto::setProjectShortName, from.getProjectShortName());
     setString(dto::setSequencingControlTypeAlias, maybeGetProperty(from.getSampleSequencingControlType(), SequencingControlType::getAlias));
     setId(dto::setDetailedQcStatusId, from.getDetailedQcStatus());
     setString(dto::setDetailedQcStatusNote, from.getDetailedQcStatusNote());

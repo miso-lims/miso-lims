@@ -86,7 +86,8 @@ ListTarget.libraryaliquot = {
         return Urls.ui.libraryAliquots.edit(aliquot.id);
       }),
       "sClass": "nowrap"
-    }, ListUtils.labelHyperlinkColumn("Alias", Urls.ui.libraryAliquots.edit, Utils.array.getId, "alias", 0, true), {
+    }, ListUtils.labelHyperlinkColumn("Alias", Urls.ui.libraryAliquots.edit, Utils.array.getId, "alias", 0, true),
+    ListUtils.labelHyperlinkColumn("Project", Urls.ui.projects.edit, Utils.array.get('projectId'), Constants.isDetailedSample ? "projectShortName" : "projectName", 0, true), {
       "sTitle": "Tissue Origin",
       "mData": "effectiveTissueOriginAlias",
       "include": Constants.isDetailedSample,
