@@ -1692,6 +1692,12 @@ public class Dtos {
         setLong(dto::setSampleId, sample.getId(), true);
         setString(dto::setSampleName, sample.getName());
         setString(dto::setSampleAlias, sample.getAlias());
+        Project project = sample.getProject();
+        if (sample.getProject() != null) {
+          setLong(dto::setProjectId, project.getId(), true);
+          setString(dto::setProjectName, project.getName());
+          setString(dto::setProjectShortName, project.getShortName());
+        }
       }
     }
     if (from.getParentAliquot() != null) {
