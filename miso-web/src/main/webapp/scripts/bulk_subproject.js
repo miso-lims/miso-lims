@@ -30,7 +30,8 @@ BulkTarget.subproject = (function($) {
         getItemLabel: Utils.array.getAlias,
         getItemValue: Utils.array.getId,
         sortSource: true,
-        required: true
+        required: true,
+        disabled: config.pageMode === 'edit'
       }, BulkUtils.columns.simpleAlias(255), BulkUtils.columns.description,
       BulkUtils.columns.makeBoolean('Priority', 'priority', true), {
         title: 'Reference Genome',
@@ -39,7 +40,8 @@ BulkTarget.subproject = (function($) {
         source: Constants.referenceGenomes,
         getItemLabel: Utils.array.getAlias,
         getItemValue: Utils.array.getId,
-        sortSource: true
+        sortSource: true,
+        required: true
       }];
     }
   };
