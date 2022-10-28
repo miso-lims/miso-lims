@@ -168,6 +168,11 @@ BulkTarget.libraryaliquot = (function($) {
           }
         }]
       }, BulkUtils.columns.name, BulkUtils.columns.generatedAlias(config), {
+        title: 'Project',
+        type: 'text',
+        disabled: true,
+        data: Constants.isDetailedSample ? 'projectShortName' : 'projectName'
+      }, {
         title: 'Tissue Origin',
         type: 'text',
         disabled: true,
