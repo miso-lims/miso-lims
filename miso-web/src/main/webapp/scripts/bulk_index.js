@@ -63,6 +63,9 @@ BulkTarget.index = (function($) {
       }, {
         title: 'Sequences',
         data: 'realSequences',
+        getData: function(object, api) {
+          return object.realSequences ? object.realSequences.join(', ') : "";
+        },
         setData: function(object, value, rowIndex, api) {
           object.realSequences = value.split(',').map(function(value) {
             return value.trim();
