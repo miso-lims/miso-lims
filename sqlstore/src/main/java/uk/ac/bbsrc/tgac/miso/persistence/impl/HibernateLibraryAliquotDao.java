@@ -223,4 +223,12 @@ public class HibernateLibraryAliquotDao
         .setProjection(Projections.rowCount()).uniqueResult();
   }
 
+  @Override
+  public long getUsageByChildAliquots(LibraryAliquot aliquot) throws IOException {
+    return (long) currentSession().createCriteria(LibraryAliquot.class)
+        .createAlias("parentAliquot", "parentAliquot")
+        .add(Restrictions.eq("parentAliquot", aliquot))
+        .setProjection(Projections.rowCount()).uniqueResult();
+  }
+
 }
