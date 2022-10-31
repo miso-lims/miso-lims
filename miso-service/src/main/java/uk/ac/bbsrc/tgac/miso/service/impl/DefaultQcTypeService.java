@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcControl;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcCorrespondingField;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -131,6 +132,11 @@ public class DefaultQcTypeService implements QcTypeService {
         }
         if (!qcType.getControls().isEmpty() && beforeChange.getControls().isEmpty()) {
           errors.add(new ValidationError("controls", "Cannot add controls because there are already QCs of this type"));
+        }
+        if (qcType.getCorrespondingField() == null) {
+          errors.add(ValidationError.forRequired("correspondingField"));
+        } else if (qcType.isAutoUpdateField() && qcType.getCorrespondingField() == QcCorrespondingField.NONE) {
+          errors.add(new ValidationError("autoUpdateField", "Cannot auto-update with no corresponding field selected"));
         }
       }
 
