@@ -106,11 +106,7 @@ public class DefaultSequencingParametersService extends AbstractSaveService<Sequ
     if (params.getReadLength2() < 0) {
       errors.add(new ValidationError("read2Length", "Read lengths cannot be negative."));
     }
-    if (params.getInstrumentModel().getPlatformType() == PlatformType.ILLUMINA) {
-      if (params.getReadLength() == 0) {
-        errors.add(new ValidationError("read1Length", "Read 1 length must be set for Illumina instruments."));
-      }
-    } else {
+    if (params.getInstrumentModel().getPlatformType() != PlatformType.ILLUMINA) {
       if (params.getReadLength() != 0) {
         errors.add(new ValidationError("read1Length",
             String.format("Read lengths must be 0 for %s instruments.", params.getInstrumentModel().getPlatformType().getKey())));
@@ -125,10 +121,6 @@ public class DefaultSequencingParametersService extends AbstractSaveService<Sequ
   private void validateChemistry(SequencingParameters params, List<ValidationError> errors) {
     if (params.getChemistry() == null) {
       errors.add(new ValidationError("chemistry", "Chemistry must be specified"));
-    } else if (params.getInstrumentModel().getPlatformType() == PlatformType.ILLUMINA) {
-      if (params.getChemistry() == IlluminaChemistry.UNKNOWN) {
-        errors.add(new ValidationError("chemistry", "Chemistry must be selected for Illumina instruments"));
-      }
     } else if (params.getChemistry() != IlluminaChemistry.UNKNOWN) {
       errors.add(new ValidationError("chemistry", "Chemistry must be 'UNKNOWN' for non-Illumina instruments"));
     }
