@@ -60,4 +60,6 @@ public interface LibraryAliquotStore extends Store<LibraryAliquot>, PaginatedDat
 
   long getUsageByPoolOrders(LibraryAliquot aliquot) throws IOException;
 
+  long getUsageByChildAliquots(LibraryAliquot parent) throws IOException;
+
 }
