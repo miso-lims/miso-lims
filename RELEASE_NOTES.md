@@ -7,6 +7,36 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.50.0] - 2022-11-03
+
+### Added
+
+* Project column on
+  * bulk Propagate and Edit Libraries pages
+  * bulk Propagate and Edit Library Aliquots pages
+  * Libraries lists
+  * Library Aliquots lists
+
+### Changed
+
+* Illumina sequencing parameters may now be saved with zero (0) read lengths and
+  'UNKNOWN' chemistry. This is mainly intended for "custom" parameters for
+  one-off experiments, or other times you may not want to create and use a more
+  specific option
+
+### Fixed
+
+* interface for creating/editing subprojects
+  * reference genome is required
+  * project cannot be changed
+* issues with multi-sequence indices on the Edit Indices page
+* error message when attempting to delete a library aliquot that has child
+  aliquots
+* It is no longer possible to save a QC type with auto-update field enabled and
+  no corresponding field selected. If such a QC type already exists, QCs of this
+  type will save successfully with the auto-update option having no effect
+
+
 ## [1.49.1] - 2022-10-21
 
 ### Fixed
