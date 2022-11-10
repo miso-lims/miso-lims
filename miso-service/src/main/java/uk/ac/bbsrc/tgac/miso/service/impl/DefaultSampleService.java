@@ -751,7 +751,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
         }
       }
       if (isStockSample(detailed)) {
-        SampleStock stock = (SampleStock) detailed;
+        SampleStock stock = (SampleStock) deproxify(detailed);
         if (stock.getReferenceSlide() != null) {
           Sample ref = deproxify(get(stock.getReferenceSlide().getId()));
           stock.setReferenceSlide((SampleSlide) ref);
@@ -903,7 +903,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
     if (isTissuePieceSample(sample)) {
       reference = ((SampleTissuePiece) sample).getReferenceSlide();
     } else if (isStockSample(sample)) {
-      reference = ((SampleStock) sample).getReferenceSlide();
+      reference = ((SampleStock) deproxify(sample)).getReferenceSlide();
     } else {
       return;
     }
