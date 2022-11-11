@@ -447,8 +447,10 @@ public class Dtos {
       }
       if (detailed.getTissueAttributes() != null) {
         ParentTissueAttributes tissue = detailed.getTissueAttributes();
+        setId(dto::setEffectiveTissueOriginId, tissue.getTissueOrigin());
         setString(dto::setEffectiveTissueOriginAlias, tissue.getTissueOrigin().getAlias());
         setString(dto::setEffectiveTissueOriginDescription, tissue.getTissueOrigin().getDescription());
+        setId(dto::setEffectiveTissueTypeId, tissue.getTissueType());
         setString(dto::setEffectiveTissueTypeAlias, tissue.getTissueType().getAlias());
         setString(dto::setEffectiveTissueTypeDescription, tissue.getTissueType().getDescription());
         setString(dto::setEffectiveTimepoint, tissue.getTimepoint());
@@ -477,9 +479,12 @@ public class Dtos {
       dto.setQcs(asQcDtos(from.getQCs()));
     }
 
-    setId(dto::setRequisitionId, from.getRequisition());
-    setString(dto::setRequisitionAlias, maybeGetProperty(from.getRequisition(), Requisition::getAlias));
-    setId(dto::setRequisitionAssayId, maybeGetProperty(from.getRequisition(), Requisition::getAssay));
+    if (from.getRequisition() != null) {
+      Requisition requisition = from.getRequisition();
+      setId(dto::setRequisitionId, requisition);
+      setString(dto::setRequisitionAlias, requisition.getAlias());
+      setId(dto::setRequisitionAssayId, requisition.getAssay());
+    }
 
     return dto;
   }
@@ -590,17 +595,20 @@ public class Dtos {
     }
     if (from.getTissueAttributes() != null) {
       ParentTissueAttributes tissue = from.getTissueAttributes();
+      setId(dto::setEffectiveTissueOriginId, tissue.getTissueOrigin());
       setString(dto::setEffectiveTissueOriginAlias, tissue.getTissueOrigin().getAlias());
       setString(dto::setEffectiveTissueOriginDescription, tissue.getTissueOrigin().getDescription());
+      setId(dto::setEffectiveTissueTypeId, tissue.getTissueType());
       setString(dto::setEffectiveTissueTypeAlias, tissue.getTissueType().getAlias());
       setString(dto::setEffectiveTissueTypeDescription, tissue.getTissueType().getDescription());
     }
     setEffectiveQcFailure(from, dto);
 
-    if (from.getRequisition() == null) {
-      Requisition requisition = getParentRequisition(from);
+    Requisition requisition = from.getRequisition() == null ? getParentRequisition(from) : from.getRequisition();
+    if (requisition != null) {
       setId(dto::setEffectiveRequisitionId, requisition);
-      setString(dto::setEffectiveRequisitionAlias, maybeGetProperty(requisition, Requisition::getAlias));
+      setString(dto::setEffectiveRequisitionAlias, requisition.getAlias());
+      setId(dto::setRequisitionAssayId, requisition.getAssay());
     }
 
     return dto;
