@@ -447,10 +447,8 @@ public class Dtos {
       }
       if (detailed.getTissueAttributes() != null) {
         ParentTissueAttributes tissue = detailed.getTissueAttributes();
-        setId(dto::setEffectiveTissueOriginId, tissue.getTissueOrigin());
         setString(dto::setEffectiveTissueOriginAlias, tissue.getTissueOrigin().getAlias());
         setString(dto::setEffectiveTissueOriginDescription, tissue.getTissueOrigin().getDescription());
-        setId(dto::setEffectiveTissueTypeId, tissue.getTissueType());
         setString(dto::setEffectiveTissueTypeAlias, tissue.getTissueType().getAlias());
         setString(dto::setEffectiveTissueTypeDescription, tissue.getTissueType().getDescription());
         setString(dto::setEffectiveTimepoint, tissue.getTimepoint());
@@ -595,10 +593,8 @@ public class Dtos {
     }
     if (from.getTissueAttributes() != null) {
       ParentTissueAttributes tissue = from.getTissueAttributes();
-      setId(dto::setEffectiveTissueOriginId, tissue.getTissueOrigin());
       setString(dto::setEffectiveTissueOriginAlias, tissue.getTissueOrigin().getAlias());
       setString(dto::setEffectiveTissueOriginDescription, tissue.getTissueOrigin().getDescription());
-      setId(dto::setEffectiveTissueTypeId, tissue.getTissueType());
       setString(dto::setEffectiveTissueTypeAlias, tissue.getTissueType().getAlias());
       setString(dto::setEffectiveTissueTypeDescription, tissue.getTissueType().getDescription());
     }

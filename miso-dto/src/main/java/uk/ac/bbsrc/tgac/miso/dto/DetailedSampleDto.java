@@ -24,10 +24,8 @@ public class DetailedSampleDto extends SampleDto implements UpstreamQcFailableDt
   private String effectiveExternalNames;
   private String effectiveGroupId;
   private String effectiveGroupIdSample;
-  private Long effectiveTissueOriginId;
   private String effectiveTissueOriginAlias;
   private String effectiveTissueOriginDescription;
-  private Long effectiveTissueTypeId;
   private String effectiveTissueTypeAlias;
   private String effectiveTissueTypeDescription;
   private String effectiveTimepoint;
@@ -239,14 +237,6 @@ public class DetailedSampleDto extends SampleDto implements UpstreamQcFailableDt
     this.ngUsed = ngUsed;
   }
 
-  public Long getEffectiveTissueOriginId() {
-    return effectiveTissueOriginId;
-  }
-
-  public void setEffectiveTissueOriginId(Long effectiveTissueOriginId) {
-    this.effectiveTissueOriginId = effectiveTissueOriginId;
-  }
-
   public String getEffectiveTissueOriginAlias() {
     return effectiveTissueOriginAlias;
   }
@@ -261,14 +251,6 @@ public class DetailedSampleDto extends SampleDto implements UpstreamQcFailableDt
 
   public void setEffectiveTissueOriginDescription(String effectiveTissueOriginDescription) {
     this.effectiveTissueOriginDescription = effectiveTissueOriginDescription;
-  }
-
-  public Long getEffectiveTissueTypeId() {
-    return effectiveTissueTypeId;
-  }
-
-  public void setEffectiveTissueTypeId(Long effectiveTissueTypeId) {
-    this.effectiveTissueTypeId = effectiveTissueTypeId;
   }
 
   public String getEffectiveTissueTypeAlias() {
