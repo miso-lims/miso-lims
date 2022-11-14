@@ -112,7 +112,14 @@ FormTarget.sample = (function($) {
                   getLink: function(sample) {
                     return Urls.ui.requisitions.edit(sample.effectiveRequisitionId);
                   },
-                  include: !!object.effectiveRequisitionId
+                  include: !object.requisitionId && !!object.effectiveRequisitionId
+                }, {
+                  title: 'Assay',
+                  data: 'requisitionAssayId',
+                  type: 'special',
+                  makeControls: function() {
+                    return makeAssayControls(object);
+                  }
                 }, {
                   title: 'Scientific Name',
                   data: 'scientificNameId',
@@ -621,6 +628,42 @@ FormTarget.sample = (function($) {
           return deferred.promise();
         }
       }
+    }
+  }
+
+  function makeAssayControls(sample) {
+    var assay = sample.requisitionAssayId
+        ? Utils.array.findUniqueOrThrow(Utils.array.idPredicate(sample.requisitionAssayId), Constants.assays) : null;
+    var container = $('<div>').css({
+      'width': '95%',
+      'display': 'flex',
+      'align-items': 'center'
+    });
+    container.append($('<span>').css({
+      flex: 1,
+      'margin-right': '2px'
+    }).text(assay ? (assay.alias + ' v' + assay.version) : 'n/a'));
+    if (assay) {
+      container.append($('<button>')
+          .addClass('ui-state-default')
+          .attr('type', 'button')
+          .text('View Metrics')
+          .click(function() {
+            showMetricsDialog(sample, assay);
+          }));
+    }
+    return container;
+  }
+
+  function showMetricsDialog(sample, assay) {
+    var metricCategory = null;
+    if (sample.requisitionId) {
+      // all plain samples should be caught here since the button only appears if there is a requisition
+      Assay.utils.showMetrics(assay, 'RECEIPT');
+    } else if (sample.sampleCategory === 'Stock') {
+      Assay.utils.showMetrics(assay, 'EXTRACTION');
+    } else {
+      Utils.showOkDialog('Error', ['No metrics applicable to ' + sample.sampleCategory]);
     }
   }
 

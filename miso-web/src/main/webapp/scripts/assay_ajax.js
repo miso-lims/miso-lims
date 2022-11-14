@@ -60,6 +60,93 @@ var Assay = (function() {
       })
       Assay.setTests(tests);
     },
+
+    utils: {
+      getSortPriority: function(metric, category, subcategory) {
+        // category and subcategory are optional and will be determined from the metric if not provided
+        if (!category) {
+          category = Utils.array.findUniqueOrThrow(function(x) {
+            return x.value === metric.category;
+          }, Constants.metricCategories);
+        }
+        if (metric.subcategoryId && !subcategory) {
+          subcategory = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(metric.subcategoryId),
+              Constants.metricSubcategories);
+        }
+        // no subcategory: top, subcategory with no priority: bottom
+        var subcategoryPriority = subcategory ? (subcategory.sortPriority || 500) : 0;
+        // metric with no priority: bottom
+        var metricPriority = metric.sortPriority || 500;
+
+        return category.sortPriority * 1000000 + subcategoryPriority * 1000 + metricPriority;
+      },
+      showMetrics: function(assay, categoryValue) {
+        var metricCategory = Utils.array.findUniqueOrThrow(function(x) {
+          return x.value === categoryValue;
+        }, Constants.metricCategories);
+        var data = assay.metrics.map(function(assayMetric) {
+          var metric = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(assayMetric.id), Constants.metrics);
+          return {
+            metric: metric,
+            metricSubcategory: getMetricSubcategory(metric),
+            assayMetric: assayMetric
+          };
+        }).filter(function(x) {
+          return x.metric.category === metricCategory.value;
+        }).sort(Utils.sorting.standardSortByCallback(function(x) {
+          return Assay.utils.getSortPriority(x.metric, metricCategory, x.metricSubcategory);
+        }));
+
+        lines = [];
+        var currentSubcategoryId = null;
+        for (var i = 0; i < data.length; i++) {
+          var x = data[i];
+          if (x.metric.subcategoryId !== currentSubcategoryId) {
+            lines.push(x.metricSubcategory.alias + ":");
+            currentSubcategoryId = x.metricSubcategory.id;
+          }
+          lines.push("• " + metricLabelWithThreshold(x.metric, x.assayMetric));
+        }
+        if (!lines.length) {
+          lines.push('(No metrics defined)');
+        }
+        var title = assay.alias + ' v' + assay.version + ' ' + metricCategory.label + ' Metrics';
+        Utils.showOkDialog(title, lines);
+      }
+    }
   };
+
+  function getMetricSubcategory(metric) {
+    if (metric.subcategoryId) {
+      return Utils.array.findUniqueOrThrow(Utils.array.idPredicate(metric.subcategoryId),
+          Constants.metricSubcategories);
+    }
+    return null;
+  }
+
+  function metricLabelWithThreshold(metric, assayMetric) {
+    var label = metric.label;
+    switch (metric.thresholdType) {
+    case 'LT':
+      label += ': < ' + assayMetric.maximumThreshold;
+      break;
+    case 'LE':
+      label += ': <= ' + assayMetric.maximumThreshold;
+      break;
+    case 'GT':
+      label += ': > ' + assayMetric.minimumThreshold;
+      break;
+    case 'GE':
+      label += ': >= ' + assayMetric.minimumThreshold;
+      break;
+    case 'BETWEEN':
+      label += ': ' + assayMetric.minimumThreshold + ' - ' + assayMetric.maximumThreshold;
+      break;
+    }
+    if (metric.units) {
+      label += ' ' + metric.units;
+    }
+    return label;
+  }
   
 })();
