@@ -90,6 +90,13 @@ FormTarget.library = (function($) {
             return item.requisitionId ? Urls.ui.requisitions.edit(item.requisitionId) : null;
           }
         }, {
+          title: 'Assay',
+          data: 'requisitionAssayId',
+          type: 'special',
+          makeControls: function() {
+            return makeAssayControls(object);
+          }
+        }, {
           title: 'Date of Receipt',
           data: 'receivedDate',
           type: 'date'
@@ -550,6 +557,19 @@ FormTarget.library = (function($) {
     return indexFamily.indices.filter(function(index) {
       return index.position === position;
     });
+  }
+
+  function makeAssayControls(library) {
+    var assay = library.requisitionAssayId
+        ? Utils.array.findUniqueOrThrow(Utils.array.idPredicate(library.requisitionAssayId), Constants.assays) : null;
+    if (assay) {
+      var assayLabel = assay.alias + ' v' + assay.version;
+      return FormUtils.makeFieldWithButton(assayLabel, 'View Metrics', function() {
+        Assay.utils.showMetrics(assay, 'LIBRARY_PREP');
+      });
+    } else {
+      return $('<span>').text('n/a');
+    }
   }
 
 })(jQuery);

@@ -1476,6 +1476,7 @@ public class Dtos {
     }
     setId(dto::setRequisitionId, requisition);
     setString(dto::setRequisitionAlias, maybeGetProperty(requisition, Requisition::getAlias));
+    setId(dto::setRequisitionAssayId, maybeGetProperty(requisition, Requisition::getAssay));
 
     return dto;
   }
@@ -1750,6 +1751,7 @@ public class Dtos {
     }
     setId(dto::setRequisitionId, requisition);
     setString(dto::setRequisitionAlias, maybeGetProperty(requisition, Requisition::getAlias));
+    setId(dto::setRequisitionAssayId, maybeGetProperty(requisition, Requisition::getAssay));
 
     return dto;
   }
