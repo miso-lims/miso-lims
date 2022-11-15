@@ -87,6 +87,13 @@ FormTarget.libraryaliquot = (function($) {
                 return item.requisitionId ? Urls.ui.requisitions.edit(item.requisitionId) : null;
               }
             }, {
+              title: 'Assay',
+              data: 'requisitionAssayId',
+              type: 'special',
+              makeControls: function() {
+                return makeAssayControls(object);
+              }
+            }, {
               title: 'Design Code',
               data: 'libraryDesignCodeId',
               type: 'dropdown',
@@ -248,5 +255,29 @@ FormTarget.libraryaliquot = (function($) {
       ];
     }
   };
+
+  function makeAssayControls(aliquot) {
+    var assay = aliquot.requisitionAssayId
+        ? Utils.array.findUniqueOrThrow(Utils.array.idPredicate(aliquot.requisitionAssayId), Constants.assays) : null;
+    if (assay) {
+      var assayLabel = assay.alias + ' v' + assay.version;
+      return FormUtils.makeFieldWithButton(assayLabel, 'View Metrics', function() {
+        Utils.showWizardDialog('View Metrics', [{
+          name: 'Library Preparation',
+          handler: function() {
+            Assay.utils.showMetrics(assay, 'LIBRARY_PREP');
+          }
+        }, {
+          name: 'Library Qualification',
+          handler: function() {
+            Assay.utils.showMetrics(assay, 'LIBRARY_QUALIFICATION');
+          }
+        }], 'Select QC gate to view metrics. Relevant gate depends on the assay test that this library aliquot will be'
+            + ' used for. Sequencing metrics may be included.');
+      });
+    } else {
+      return $('<span>').text('n/a');
+    }
+  }
 
 })(jQuery);

@@ -392,6 +392,24 @@ FormUtils = (function($) {
        }
     },
 
+    makeFieldWithButton: function(text, buttonText, onclick) {
+      var container = $('<div>').css({
+        'width': '95%',
+        'display': 'flex',
+        'align-items': 'center'
+      });
+      container.append($('<span>').css({
+        flex: 1,
+        'margin-right': '2px'
+      }).text(text));
+      container.append($('<button>')
+          .addClass('ui-state-default')
+          .attr('type', 'button')
+          .text(buttonText)
+          .click(onclick));
+      return container;
+    },
+
     setTableData: function(listTarget, config, containerId, data, form) {
       var listId = containerId + 'Table';
       if (initializedTables.indexOf(containerId) !== -1) {

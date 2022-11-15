@@ -74,6 +74,7 @@ public class LibraryAliquotDto extends AbstractBoxableDto implements UpstreamQcF
   private String effectiveQcFailureLevel;
   private Long requisitionId;
   private String requisitionAlias;
+  private Long requisitionAssayId;
 
   public Long getId() {
     return id;
@@ -497,6 +498,14 @@ public class LibraryAliquotDto extends AbstractBoxableDto implements UpstreamQcF
 
   public void setRequisitionAlias(String requisitionAlias) {
     this.requisitionAlias = requisitionAlias;
+  }
+
+  public Long getRequisitionAssayId() {
+    return requisitionAssayId;
+  }
+
+  public void setRequisitionAssayId(Long requisitionAssayId) {
+    this.requisitionAssayId = requisitionAssayId;
   }
 
 }
