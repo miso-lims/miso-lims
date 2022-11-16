@@ -610,17 +610,6 @@ public class Dtos {
     return dto;
   }
 
-  private static Requisition getParentRequisition(Sample sample) {
-    if (!LimsUtils.isDetailedSample(sample)) {
-      return null;
-    }
-    DetailedSample requisitionSample = ((DetailedSample) sample).getParent();
-    while (requisitionSample != null && requisitionSample.getRequisition() == null) {
-      requisitionSample = requisitionSample.getParent();
-    }
-    return requisitionSample == null ? null : requisitionSample.getRequisition();
-  }
-
   private static void setEffectiveQcFailure(HierarchyEntity from, UpstreamQcFailableDto to) {
     HierarchyEntity failure = from.getFailingParent();
     if (failure != null) {

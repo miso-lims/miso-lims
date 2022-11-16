@@ -20,6 +20,7 @@ BulkTarget.sample = (function($) {
   var originalProjectIdsBySampleId = {};
   var originalEffectiveGroupIdsByRow = {};
   var parentLocationsByRow = null;
+  var editingReceiptSamples = false;
 
   var showLabColumn = false;
   var editSubcategories = [];
@@ -37,7 +38,14 @@ BulkTarget.sample = (function($) {
     getCustomActions: function(config) {
       var allowMatchParentPos = Constants.isDetailedSample
           && (config.pageMode === 'propagate' || (config.pageMode === 'edit' && config.targetCategory !== 'Identity'));
-      return BulkUtils.actions.boxable(allowMatchParentPos, parentLocationsByRow);
+      var actions = BulkUtils.actions.boxable(allowMatchParentPos, parentLocationsByRow);
+      actions.push({
+        name: 'View Metrics',
+        action: function(api) {
+          prepareMetricsDialog(api, config);
+        }
+      });
+      return actions;
     },
     getBulkActions: function(config) {
       var actions = [
@@ -257,6 +265,9 @@ BulkTarget.sample = (function($) {
           return sampleClass.sampleSubcategory;
         });
       }
+      editingReceiptSamples = config.pageMode === 'create' || data.some(function(sample) {
+        return sample.requisitionId;
+      });
     },
     getFixedColumns: function(config) {
       switch (config.pageMode) {
@@ -457,21 +468,26 @@ BulkTarget.sample = (function($) {
               });
             }
           }
-        }, {
-          title: 'Assay',
-          data: 'requisitionAssayId',
-          type: 'dropdown',
-          includeSaved: false,
-          source: Constants.assays.filter(function(x) {
-            return !x.archived;
-          }),
-          getItemLabel: makeAssayLabel,
-          getItemValue: Utils.array.getId,
-          disabled: true
         });
       }
 
       if (targetCategory !== 'Identity' && !config.isLibraryReceipt) {
+        columns.push({
+          title: 'Assay',
+          data: 'requisitionAssayId',
+          type: 'dropdown',
+          source: Constants.assays.filter(function(x) {
+            return !x.archived;
+          }),
+          source: function(data) {
+            return Constants.assays.filter(function(x) {
+              return !x.archived || x.id === data.requisitionAssayId;
+            });
+          },
+          getItemLabel: makeAssayLabel,
+          getItemValue: Utils.array.getId,
+          disabled: true
+        });
         columns = columns.concat(BulkUtils.columns.boxable(config, api));
       }
 
@@ -1248,6 +1264,77 @@ BulkTarget.sample = (function($) {
   
   function makeAssayLabel(assay) {
     return assay.alias + ' v' + assay.version;
+  }
+
+  function prepareMetricsDialog(api, config) {
+    var qcGates = [];
+    if (editingReceiptSamples) {
+      qcGates.push('RECEIPT');
+    }
+    if (config.targetCategory === 'Stock') {
+      qcGates.push('EXTRACTION');
+    }
+    var rowCount = api.getRowCount();
+    var assayIds = [];
+    var assays = [];
+    var missingAssayCount = 0;
+    for (var row = 0; row < rowCount; row++) {
+      var assay = api.getValueObject(row, 'requisitionAssayId')
+      if (assay) {
+        if (assayIds.indexOf(assay.id) === -1) {
+          assayIds.push(assay.id);
+          assays.push(assay);
+        }
+      } else {
+        missingAssayCount++;
+      }
+    }
+
+    if (!assays.length) {
+      Utils.showOkDialog('Error', ['Samples have no assays assigned'])
+    } else if (missingAssayCount > 0) {
+      Utils.showConfirmDialog('Warning', 'Continue', [missingAssayCount + ' samples have no assay assigned'],
+          function() {
+            showMetricsDialog(assays, qcGates);
+          });
+    } else {
+      showMetricsDialog(assays, qcGates);
+    }
+  }
+
+  function showMetricsDialog(assays, qcGates) {
+    var show = function(assay) {
+      if (qcGates.length > 1) {
+        var gateSelectActions = qcGates.map(function(gate) {
+        var metricCategory = Utils.array.findUniqueOrThrow(function(x) {
+          return x.value === gate;
+        }, Constants.metricCategories);
+          return {
+            name: metricCategory.label,
+            handler: function() {
+              Assay.utils.showMetrics(assay, gate);
+            }
+          }
+        });
+        Utils.showWizardDialog('View Metrics', gateSelectActions, 'Samples found for multiple QC gates:');
+      } else {
+        Assay.utils.showMetrics(assay, qcGates[0]);
+      }
+    }
+
+    if (assays.length > 1) {
+      var assaySelectActions = assays.map(function(assay) {
+        return {
+          name: makeAssayLabel(assay),
+          handler: function() {
+            show(assay);
+          }
+        };
+      });
+      Utils.showWizardDialog('View Metrics', assaySelectActions, 'Multiple assays found:')
+    } else {
+      show(assays[0]);
+    }
   }
 
 })(jQuery);

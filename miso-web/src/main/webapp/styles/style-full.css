@@ -1139,6 +1139,7 @@ ul.unformatted-list {
 
 .ui-dialog {
   max-width: 90vw;
+  z-index: 105 !important; // needed to appear over Handsontables frozen columns
 }
 
 .ui-button {

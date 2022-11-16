@@ -31,12 +31,14 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.TestUtils;
 
 public class PlainSampleITs extends AbstractIT {
 
-  private static final Set<String> sampleColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
-      SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS, SamColumns.BOX_POSITION, SamColumns.DISCARDED, SamColumns.RECEIVE_DATE,
-      SamColumns.RECEIVE_TIME, SamColumns.RECEIVED_FROM, SamColumns.RECEIVED_BY, SamColumns.RECEIPT_CONFIRMED, SamColumns.RECEIPT_QC_PASSED,
+  private static final Set<String> sampleColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS,
+      SamColumns.DESCRIPTION, SamColumns.REQUISITION_ASSAY, SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS,
+      SamColumns.BOX_POSITION, SamColumns.DISCARDED, SamColumns.RECEIVE_DATE, SamColumns.RECEIVE_TIME,
+      SamColumns.RECEIVED_FROM, SamColumns.RECEIVED_BY, SamColumns.RECEIPT_CONFIRMED, SamColumns.RECEIPT_QC_PASSED,
       SamColumns.RECEIPT_QC_NOTE, SamColumns.REQUISITION_ALIAS, SamColumns.REQUISITION, SamColumns.REQUISITION_ASSAY,
-      SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT, SamColumns.VOLUME, SamColumns.VOLUME_UNITS,
-      SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS, SamColumns.QC_STATUS, SamColumns.QC_NOTE);
+      SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT, SamColumns.VOLUME,
+      SamColumns.VOLUME_UNITS, SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS, SamColumns.QC_STATUS,
+      SamColumns.QC_NOTE);
 
   private static final Set<String> libraryColumns = Sets.newHashSet(LibColumns.NAME, SamColumns.PROJECT,
       LibColumns.SAMPLE_NAME, LibColumns.SAMPLE_ALIAS, LibColumns.SAMPLE_LOCATION, LibColumns.BOX_SEARCH,
