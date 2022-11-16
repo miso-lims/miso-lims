@@ -24,7 +24,16 @@ BulkTarget.libraryaliquot = (function($) {
       return Urls.external.userManual('library_aliquots');
     },
     getCustomActions: function(config) {
-      return BulkUtils.actions.boxable(config.pageMode === 'propagate', parentLocationsByRow);
+      var actions = BulkUtils.actions.boxable(config.pageMode === 'propagate', parentLocationsByRow);
+      actions.push({
+        name: 'View Metrics',
+        action: function(api) {
+          BulkUtils.actions.viewMetrics(api, ['LIBRARY_PREP', 'LIBRARY_QUALIFICATION'], 'Select category to view metrics.'
+              + ' Relevant category depends on the assay test that this library aliquot will be used for. Sequencing'
+              + ' metrics may be included.');
+        }
+      });
+      return actions;
     },
     getBulkActions: function(config) {
       var editAction = BulkUtils.actions.edit(Urls.ui.libraryAliquots.bulkEdit);
@@ -172,7 +181,7 @@ BulkTarget.libraryaliquot = (function($) {
         type: 'text',
         disabled: true,
         data: Constants.isDetailedSample ? 'projectShortName' : 'projectName'
-      }, {
+      }, BulkUtils.columns.assay(), {
         title: 'Tissue Origin',
         type: 'text',
         disabled: true,

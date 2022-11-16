@@ -272,8 +272,8 @@ FormTarget.libraryaliquot = (function($) {
           handler: function() {
             Assay.utils.showMetrics(assay, 'LIBRARY_QUALIFICATION');
           }
-        }], 'Select QC gate to view metrics. Relevant gate depends on the assay test that this library aliquot will be'
-            + ' used for. Sequencing metrics may be included.');
+        }], 'Select category to view metrics. Relevant category depends on the assay test that this library aliquot'
+            + ' will be used for. Sequencing metrics may be included.');
       });
     } else {
       return $('<span>').text('n/a');
