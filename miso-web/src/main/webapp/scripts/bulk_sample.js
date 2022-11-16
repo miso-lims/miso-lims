@@ -641,9 +641,10 @@ BulkTarget.sample = (function($) {
         includeSaved: targetCategory === 'Identity',
         required: true,
         onChange: function(rowIndex, newValue, api) {
+          var enteredNames = separateExternalNames(newValue);
           if (targetCategory === 'Identity') {
             return;
-          } else if (!newValue) {
+          } else if (!enteredNames || !enteredNames.length) {
             api.updateField(rowIndex, 'identityId', {
               source: [],
               value: null,
@@ -673,7 +674,7 @@ BulkTarget.sample = (function($) {
               exactMatch: true
             }),
             data: JSON.stringify({
-              identitiesSearches: [newValue],
+              identitiesSearches: enteredNames,
               project: null
             }),
             contentType: 'application/json; charset=utf8',
@@ -690,11 +691,12 @@ BulkTarget.sample = (function($) {
               });
             }
             var setValue = null;
-            var exactMatch = potentialIdentities.find(function(identity) {
-              return identity.projectId === selectedProject.id && identity.externalName === newValue;
+            var exactMatches = potentialIdentities.filter(function(identity) {
+              return identity.projectId === selectedProject.id
+                  && anyMatch(enteredNames, separateExternalNames(identity.externalName));
             });
-            if (exactMatch) {
-              setValue = exactMatch.alias + ' -- ' + exactMatch.externalName;
+            if (exactMatches.length === 1) {
+              setValue = exactMatches[0].alias + ' -- ' + exactMatches[0].externalName;
             } else {
               var firstReceiptLabel = "First Receipt (" + selectedProject[label] + ")";
               potentialIdentities.unshift({
@@ -1335,6 +1337,27 @@ BulkTarget.sample = (function($) {
     } else {
       show(assays[0]);
     }
+  }
+
+  function separateExternalNames(names) {
+    if (!names) {
+      return [];
+    }
+    return names.split(',').map(function(name) {
+      return name.trim();
+    }).filter(function(name) {
+      return !!name;
+    });
+  }
+  function anyMatch(arr1, arr2) {
+    for (var i1 = 0; i1 < arr1.length; i1++) {
+      for (var i2 = 0; i2 < arr2.length; i2++) {
+        if (arr1[i1] === arr2[i2]) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
 })(jQuery);
