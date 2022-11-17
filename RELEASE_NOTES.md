@@ -7,6 +7,28 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.51.0] - 2022-11-17
+
+### Added
+
+* Assay field on all Create and Edit Sample, Library, and Library Aliquot pages
+* View Metrics button on all Create and Edit Sample, Library, and Library
+  Aliquot pages (button will appear on single Edit pages if the item has an
+  assay assigned via requisition)
+
+### Changed
+
+* When creating samples, an existing identity will now be selected by default
+  when any of the external names entered exactly matches any of the existing
+  external names. Previously, all external names entered had to match all of
+  the existing external names for automatic selection to occur (detailed
+  sample)
+
+### Fixed
+
+* Error when saving transfers including changes to stock samples
+
+
 ## [1.50.0] - 2022-11-03
 
 ### Added
