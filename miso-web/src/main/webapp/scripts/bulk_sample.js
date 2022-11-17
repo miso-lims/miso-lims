@@ -1349,15 +1349,11 @@ BulkTarget.sample = (function($) {
       return !!name;
     });
   }
+
   function anyMatch(arr1, arr2) {
-    for (var i1 = 0; i1 < arr1.length; i1++) {
-      for (var i2 = 0; i2 < arr2.length; i2++) {
-        if (arr1[i1] === arr2[i2]) {
-          return true;
-        }
-      }
-    }
-    return false;
+    return arr1.some(function(x) {
+      return arr2.includes(x);
+    });
   }
 
 })(jQuery);
