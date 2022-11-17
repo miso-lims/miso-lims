@@ -1,1 +1,1 @@
-Assay field on the bulk Edit Samples page
+Assay field on all Create and Edit Sample, Library, and Library Aliquot pages

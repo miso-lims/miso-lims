@@ -62,6 +62,9 @@ var Assay = (function() {
     },
 
     utils: {
+      makeLabel: function(assay) {
+        return assay.alias + ' v' + assay.version;
+      },
       getSortPriority: function(metric, category, subcategory) {
         // category and subcategory are optional and will be determined from the metric if not provided
         if (!category) {

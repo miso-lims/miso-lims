@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.getParentRequisition;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.parseIds;
 import static uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils.*;
 
@@ -29,6 +30,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentTissueAttributes;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
@@ -144,12 +146,19 @@ public class EditLibraryAliquotController {
         dto.setConcentrationUnits(item.getConcentrationUnits());
       }
       dto.setLibraryPlatformType(item.getPlatformType().getKey());
-      Project project = item.getSample().getProject();
+      Sample sample = item.getSample();
+      Project project = sample.getProject();
       dto.setProjectId(project.getId());
       dto.setProjectName(project.getName());
       dto.setProjectShortName(project.getShortName());
       if (project.getDefaultTargetedSequencing() != null) {
         defaultTargetedSequencingByProject.put(project.getId(), project.getDefaultTargetedSequencing().getId());
+      }
+
+      Requisition requisition = sample.getRequisition() == null ? getParentRequisition(sample)
+          : sample.getRequisition();
+      if (requisition != null && requisition.getAssay() != null) {
+        dto.setRequisitionAssayId(requisition.getAssay().getId());
       }
       return dto;
     }
@@ -228,12 +237,19 @@ public class EditLibraryAliquotController {
         dto.setConcentrationUnits(item.getConcentrationUnits());
       }
       dto.setLibraryPlatformType(item.getLibrary().getPlatformType().getKey());
-      Project project = item.getLibrary().getSample().getProject();
+      Sample sample = item.getLibrary().getSample();
+      Project project = sample.getProject();
       dto.setProjectId(project.getId());
       dto.setProjectName(project.getName());
       dto.setProjectShortName(project.getShortName());
       if (project.getDefaultTargetedSequencing() != null) {
         defaultTargetedSequencingByProject.put(project.getId(), project.getDefaultTargetedSequencing().getId());
+      }
+
+      Requisition requisition = sample.getRequisition() == null ? getParentRequisition(sample)
+          : sample.getRequisition();
+      if (requisition != null && requisition.getAssay() != null) {
+        dto.setRequisitionAssayId(requisition.getAssay().getId());
       }
       return dto;
     }

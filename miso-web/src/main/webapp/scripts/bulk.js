@@ -713,6 +713,25 @@ BulkUtils = (function($) {
         };
       },
 
+      assay: function() {
+        return {
+          title: 'Assay',
+          data: 'requisitionAssayId',
+          type: 'dropdown',
+          source: Constants.assays.filter(function(x) {
+            return !x.archived;
+          }),
+          source: function(data) {
+            return Constants.assays.filter(function(x) {
+              return !x.archived || x.id === data.requisitionAssayId;
+            });
+          },
+          getItemLabel: Assay.utils.makeLabel,
+          getItemValue: Utils.array.getId,
+          disabled: true
+        }
+      },
+
       makeBoolean: function(title, data, required) {
         source = [{
           label: 'True',
@@ -885,6 +904,69 @@ BulkUtils = (function($) {
             Utils.page.post(Urls.ui.transfers.create, params);
           }
         };
+      },
+      viewMetrics: function(api, metricCategories, multipleCategoryMessage) {
+        var showMetricsDialog = function(assays) {
+          var show = function(assay) {
+            if (metricCategories.length > 1) {
+              var gateSelectActions = metricCategories.map(function(gate) {
+              var metricCategory = Utils.array.findUniqueOrThrow(function(x) {
+                return x.value === gate;
+              }, Constants.metricCategories);
+                return {
+                  name: metricCategory.label,
+                  handler: function() {
+                    Assay.utils.showMetrics(assay, gate);
+                  }
+                }
+              });
+              Utils.showWizardDialog('View Metrics', gateSelectActions, multipleCategoryMessage);
+            } else {
+              Assay.utils.showMetrics(assay, metricCategories[0]);
+            }
+          }
+
+          if (assays.length > 1) {
+            var assaySelectActions = assays.map(function(assay) {
+              return {
+                name: Assay.utils.makeLabel(assay),
+                handler: function() {
+                  show(assay);
+                }
+              };
+            });
+            Utils.showWizardDialog('View Metrics', assaySelectActions, 'Multiple assays found:')
+          } else {
+            show(assays[0]);
+          }
+        };
+
+        var rowCount = api.getRowCount();
+        var assayIds = [];
+        var assays = [];
+        var missingAssayCount = 0;
+        for (var row = 0; row < rowCount; row++) {
+          var assay = api.getValueObject(row, 'requisitionAssayId')
+          if (assay) {
+            if (assayIds.indexOf(assay.id) === -1) {
+              assayIds.push(assay.id);
+              assays.push(assay);
+            }
+          } else {
+            missingAssayCount++;
+          }
+        }
+
+        if (!assays.length) {
+          Utils.showOkDialog('Error', ['No assays assigned'])
+        } else if (missingAssayCount > 0) {
+          Utils.showConfirmDialog('Warning', 'Continue', [missingAssayCount + ' items have no assay assigned'],
+              function() {
+                showMetricsDialog(assays);
+              });
+        } else {
+          showMetricsDialog(assays);
+        }
       }
     }
 

@@ -96,6 +96,11 @@ BulkTarget.library = (function($) {
                 api.updateData(changes);
               });
             }
+          }, {
+            name: 'View Metrics',
+            action: function(api) {
+              BulkUtils.actions.viewMetrics(api, ['LIBRARY_PREP']);
+            }
           });
     },
     getBulkActions: function(config) {
@@ -207,7 +212,7 @@ BulkTarget.library = (function($) {
         data: Constants.isDetailedSample ? 'projectShortName' : 'projectName',
         include: !config.isLibraryReceipt,
         disabled: true
-      });
+      }, BulkUtils.columns.assay());
 
       if (config.isLibraryReceipt) {
         var sampleProp = function(dataProperty) {
