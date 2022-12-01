@@ -462,8 +462,9 @@ Urls = (function() {
 
   var libraryDesignRestBase = restBase + '/librarydesigns';
   rest.libraryDesigns = {
-    create: libraryDesignRestBase,
-    update: idUrlFunction(libraryDesignRestBase)
+    bulkDelete: libraryDesignRestBase + '/bulk-delete',
+    bulkSave: libraryDesignRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(libraryDesignRestBase + '/bulk')
   };
 
   // Library Design Codes

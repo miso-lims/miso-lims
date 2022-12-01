@@ -42,6 +42,11 @@ public class HibernateLibraryDesignDao extends HibernateSaveDao<LibraryDesign> i
   }
 
   @Override
+  public List<LibraryDesign> listByIdList(List<Long> idList) throws IOException {
+    return listByIdList("libraryDesignId", idList);
+  }
+
+  @Override
   public long getUsage(LibraryDesign design) throws IOException {
     return getUsageBy(DetailedLibraryImpl.class, "libraryDesign", design);
   }
