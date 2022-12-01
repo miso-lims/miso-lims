@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.transaction.support.TransactionTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryDesignCodeService;
@@ -24,10 +25,10 @@ public class DefaultLibraryDesignCodeService extends AbstractSaveService<Library
 
   @Autowired
   private LibraryDesignCodeDao libraryDesignCodeDao;
-
+  @Autowired
+  private TransactionTemplate transactionTemplate;
   @Autowired
   private DeletionStore deletionStore;
-
   @Autowired
   private AuthorizationManager authorizationManager;
 
@@ -42,6 +43,11 @@ public class DefaultLibraryDesignCodeService extends AbstractSaveService<Library
   }
 
   @Override
+  public TransactionTemplate getTransactionTemplate() {
+    return transactionTemplate;
+  }
+
+  @Override
   public SaveDao<LibraryDesignCode> getDao() {
     return libraryDesignCodeDao;
   }
@@ -53,6 +59,11 @@ public class DefaultLibraryDesignCodeService extends AbstractSaveService<Library
   @Override
   public List<LibraryDesignCode> list() throws IOException {
     return libraryDesignCodeDao.list();
+  }
+
+  @Override
+  public List<LibraryDesignCode> listByIdList(List<Long> ids) throws IOException {
+    return libraryDesignCodeDao.listByIdList(ids);
   }
 
   @Override
