@@ -18,7 +18,7 @@ BulkTarget.librarydesigncode = (function($) {
       return Urls.rest.libraryDesignCodes.bulkSaveProgress(operationId);
     },
     getUserManualUrl: function() {
-      return Urls.external.userManual('libraries', 'library-templates');
+      return Urls.external.userManual('libraries', 'library-designs');
     },
     getBulkActions: function(config) {
       return !config.isAdmin ? [] : [BulkUtils.actions.edit(Urls.ui.libraryDesignCodes.bulkEdit)];
