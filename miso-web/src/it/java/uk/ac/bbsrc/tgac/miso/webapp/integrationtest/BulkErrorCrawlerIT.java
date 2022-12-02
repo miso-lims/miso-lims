@@ -231,7 +231,6 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("staincategory/bulk/new?quantity=3");
     slugs.add("detailedqcstatus/bulk/new?quantity=3");
     slugs.add("librarydesigncode/bulk/new?quantity=3");
-    slugs.add("librarydesigncode/bulk/edit?ids=8%2C7");
     slugs.add("librarydesign/bulk/new?quantity=3");
     slugs.add("storagelabel/bulk/new?quantity=3");
     slugs.add("metric/bulk/new?quantity=3");
