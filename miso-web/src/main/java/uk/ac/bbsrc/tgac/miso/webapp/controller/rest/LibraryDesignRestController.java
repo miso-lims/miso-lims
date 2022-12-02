@@ -33,13 +33,13 @@ public class LibraryDesignRestController extends RestController {
   @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody
   ObjectNode bulkCreateAsync(@RequestBody List<LibraryDesignDto> dtos) throws IOException {
-    return asyncOperationManager.startAsyncBulkCreate(TYPE_LABEL, dtos, Dtos::to, designService);
+    return asyncOperationManager.startAsyncBulkCreate(TYPE_LABEL, dtos, Dtos::to, designService, true);
   }
 
   @PutMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<LibraryDesignDto> dtos) throws IOException {
-    return asyncOperationManager.startAsyncBulkUpdate(TYPE_LABEL, dtos, Dtos::to, designService);
+    return asyncOperationManager.startAsyncBulkUpdate(TYPE_LABEL, dtos, Dtos::to, designService, true);
   }
 
   @GetMapping("/bulk/{uuid}")
@@ -52,6 +52,7 @@ public class LibraryDesignRestController extends RestController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody List<Long> ids) throws IOException {
     RestUtils.bulkDelete("Library Design", ids, designService);
+    constantsController.refreshConstants();
   }
 
 }
