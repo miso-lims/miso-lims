@@ -500,8 +500,8 @@ Urls = (function() {
 
   var librarySpikeInRestBase = restBase + '/libraryspikeins';
   rest.librarySpikeIns = {
-    create: librarySpikeInRestBase,
-    update: idUrlFunction(librarySpikeInRestBase)
+    bulkSave: librarySpikeInRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(librarySpikeInRestBase + '/bulk')
   };
 
   // Library Strategies

@@ -9,7 +9,7 @@ ListTarget.libraryspikein = {
   getQueryUrl: null,
   showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
-    var actions = HotTarget.libraryspikein.getBulkActions(config);
+    var actions = BulkTarget.libraryspikein.getBulkActions(config);
     if (config.isAdmin) {
       actions.push(ListUtils.createBulkDeleteAction('Library Spike-Ins', 'libraryspikeins', Utils.array.getAlias));
     }
