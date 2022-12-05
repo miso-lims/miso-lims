@@ -513,8 +513,8 @@ Urls = (function() {
 
   var libraryStrategyRestBase = restBase + '/librarystrategies';
   rest.libraryStrategies = {
-    create: libraryStrategyRestBase,
-    update: idUrlFunction(libraryStrategyRestBase)
+    bulkSave: libraryStrategyRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(libraryStrategyRestBase + '/bulk')
   };
 
   // Library Templates

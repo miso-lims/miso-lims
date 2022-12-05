@@ -5,18 +5,14 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 
-public interface LibraryStrategyDao {
+public interface LibraryStrategyDao extends SaveDao<LibraryStrategyType> {
 
-  public LibraryStrategyType get(long id) throws IOException;
+  LibraryStrategyType getByName(String name) throws IOException;
 
-  public LibraryStrategyType getByName(String name) throws IOException;
+  long getUsageByLibraries(LibraryStrategyType type) throws IOException;
 
-  public List<LibraryStrategyType> list() throws IOException;
+  long getUsageByLibraryDesigns(LibraryStrategyType type) throws IOException;
 
-  public long create(LibraryStrategyType type) throws IOException;
-
-  public long update(LibraryStrategyType type) throws IOException;
-
-  public long getUsage(LibraryStrategyType type) throws IOException;
+  List<LibraryStrategyType> listByIdList(List<Long> idList) throws IOException;
 
 }
