@@ -85,7 +85,7 @@ public class HibernateLibraryStrategyDaoIT extends AbstractDAOTest {
   public void testGetUsageByLibraryDesigns() throws IOException {
     LibraryStrategyType type = (LibraryStrategyType) getSessionFactory().getCurrentSession().get(LibraryStrategyType.class, 1L);
     assertEquals("WGS", type.getName());
-    assertEquals(2L, sut.getUsageByLibraries(type));
+    assertEquals(2L, sut.getUsageByLibraryDesigns(type));
   }
 
   @Test
