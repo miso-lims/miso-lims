@@ -9,7 +9,7 @@ ListTarget.librarytype = {
   getQueryUrl: null,
   showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
-    var actions = HotTarget.librarytype.getBulkActions(config);
+    var actions = BulkTarget.librarytype.getBulkActions(config);
     if (config.isAdmin) {
       actions.push(ListUtils.createBulkDeleteAction('Library Types', 'librarytypes', function(item) {
         return item.description;
