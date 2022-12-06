@@ -608,8 +608,8 @@ Urls = (function() {
 
   var partitionQcTypeRestBase = restBase + '/partitionqctypes';
   rest.partitionQcTypes = {
-    create: partitionQcTypeRestBase,
-    update: idUrlFunction(partitionQcTypeRestBase)
+    bulkSave: partitionQcTypeRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(partitionQcTypeRestBase + '/bulk')
   };
 
   // Pipelines
