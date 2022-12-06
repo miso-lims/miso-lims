@@ -7,6 +7,13 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.51.1] - 2022-12-01
+
+### Fixed
+
+* Some symbol characters were not displaying correctly
+
+
 ## [1.51.0] - 2022-11-17
 
 ### Added
