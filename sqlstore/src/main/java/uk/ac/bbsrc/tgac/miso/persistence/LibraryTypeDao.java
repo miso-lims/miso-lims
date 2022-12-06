@@ -8,12 +8,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 public interface LibraryTypeDao extends SaveDao<LibraryType> {
 
-  public LibraryType getByPlatformAndDescription(PlatformType platform, String description) throws IOException;
+  LibraryType getByPlatformAndDescription(PlatformType platform, String description) throws IOException;
   
-  public List<LibraryType> listByPlatform(PlatformType platform) throws IOException;
+  List<LibraryType> listByPlatform(PlatformType platform) throws IOException;
 
-  public long getUsageByLibraries(LibraryType type) throws IOException;
+  List<LibraryType> listByIdList(List<Long> idList) throws IOException;
 
-  public long getUsageByLibraryTemplates(LibraryType type) throws IOException;
+  long getUsageByLibraries(LibraryType type) throws IOException;
+
+  long getUsageByLibraryTemplates(LibraryType type) throws IOException;
 
 }
