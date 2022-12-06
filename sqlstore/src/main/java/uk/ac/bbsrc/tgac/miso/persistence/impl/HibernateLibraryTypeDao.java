@@ -39,6 +39,11 @@ public class HibernateLibraryTypeDao extends HibernateSaveDao<LibraryType> imple
   }
 
   @Override
+  public List<LibraryType> listByIdList(List<Long> idList) throws IOException {
+    return listByIdList("libraryTypeId", idList);
+  }
+
+  @Override
   public long getUsageByLibraries(LibraryType type) throws IOException {
     return getUsageBy(LibraryImpl.class, "libraryType", type);
   }

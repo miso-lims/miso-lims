@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.transaction.support.TransactionTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -25,7 +26,8 @@ public class DefaultLibraryTypeService extends AbstractSaveService<LibraryType> 
 
   @Autowired
   private LibraryTypeDao libraryTypeDao;
-
+  @Autowired
+  private TransactionTemplate transactionTemplate;
   @Autowired
   private DeletionStore deletionStore;
 
@@ -48,6 +50,11 @@ public class DefaultLibraryTypeService extends AbstractSaveService<LibraryType> 
   }
 
   @Override
+  public TransactionTemplate getTransactionTemplate() {
+    return transactionTemplate;
+  }
+
+  @Override
   public List<LibraryType> list() throws IOException {
     return libraryTypeDao.list();
   }
@@ -55,6 +62,11 @@ public class DefaultLibraryTypeService extends AbstractSaveService<LibraryType> 
   @Override
   public List<LibraryType> listByPlatform(PlatformType platform) throws IOException {
     return libraryTypeDao.listByPlatform(platform);
+  }
+
+  @Override
+  public List<LibraryType> listByIdList(List<Long> ids) throws IOException {
+    return libraryTypeDao.listByIdList(ids);
   }
 
   @Override

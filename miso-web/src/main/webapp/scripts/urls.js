@@ -552,8 +552,8 @@ Urls = (function() {
 
   var libraryTypeRestBase = restBase + '/librarytypes';
   rest.libraryTypes = {
-    create: libraryTypeRestBase,
-    update: idUrlFunction(libraryTypeRestBase)
+    bulkSave: libraryTypeRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(libraryTypeRestBase + '/bulk')
   };
 
   // Location Maps
