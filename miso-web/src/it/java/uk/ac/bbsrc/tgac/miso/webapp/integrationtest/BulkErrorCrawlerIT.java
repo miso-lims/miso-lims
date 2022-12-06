@@ -196,7 +196,6 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("targetedsequencing/bulk/new?quantity=3");
     slugs.add("targetedsequencing/bulk/edit?ids=1%2C2");
     slugs.add("runpurpose/bulk/new?quantity=3");
-    slugs.add("runpurpose/bulk/edit?ids=2%2C1");
     slugs.add("sequencingparameters/bulk/new?quantity=3");
     slugs.add("sequencingparameters/bulk/edit?ids=2%2C4");
     slugs.add("containermodel/bulk/new?quantity=3");
@@ -310,6 +309,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
         .put("pool/bulk/edit", unmodifiableMap("ids", "801,802"))
         .put("pool/bulk/merge",
             Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "801,802").put("proportions", "1,1").build()))
+        .put("runpurpose/bulk/edit", unmodifiableMap("ids", "2,1"))
         .put("detailedqcstatus/bulk/edit", unmodifiableMap("ids", "1,2"))
         .build());
   }

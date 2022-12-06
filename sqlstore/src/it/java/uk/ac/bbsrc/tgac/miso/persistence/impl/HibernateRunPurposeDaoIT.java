@@ -7,6 +7,8 @@ import org.junit.Test;
 import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 
+import java.util.Arrays;
+
 public class HibernateRunPurposeDaoIT extends AbstractHibernateSaveDaoTest<RunPurpose, HibernateRunPurposeDao> {
 
   public HibernateRunPurposeDaoIT() {
@@ -55,6 +57,11 @@ public class HibernateRunPurposeDaoIT extends AbstractHibernateSaveDaoTest<RunPu
     assertEquals(2, getTestSubject().getUsageBySequencingOrders(purpose1));
     RunPurpose purpose2 = (RunPurpose) currentSession().get(RunPurpose.class, 2L);
     assertEquals(0, getTestSubject().getUsageBySequencingOrders(purpose2));
+  }
+
+  @Test
+  public void testListByIdList() throws Exception {
+    testListByIdList(HibernateRunPurposeDao::listByIdList, Arrays.asList(1L, 2L));
   }
 
 }

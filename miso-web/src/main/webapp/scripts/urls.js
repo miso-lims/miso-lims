@@ -823,8 +823,8 @@ Urls = (function() {
 
   var runPurposeRestBase = restBase + '/runpurposes';
   rest.runPurposes = {
-    create: runPurposeRestBase,
-    update: idUrlFunction(runPurposeRestBase)
+    bulkSave: runPurposeRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(runPurposeRestBase + '/bulk')
   };
 
   // Samples

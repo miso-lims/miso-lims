@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.transaction.support.TransactionTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
@@ -24,10 +25,10 @@ public class DefaultRunPurposeService extends AbstractSaveService<RunPurpose> im
 
   @Autowired
   private RunPurposeDao runPurposeDao;
-
   @Autowired
   private AuthorizationManager authorizationManager;
-
+  @Autowired
+  private TransactionTemplate transactionTemplate;
   @Autowired
   private DeletionStore deletionStore;
 
@@ -42,6 +43,11 @@ public class DefaultRunPurposeService extends AbstractSaveService<RunPurpose> im
   }
 
   @Override
+  public TransactionTemplate getTransactionTemplate() {
+    return transactionTemplate;
+  }
+
+  @Override
   public SaveDao<RunPurpose> getDao() {
     return runPurposeDao;
   }
@@ -49,6 +55,11 @@ public class DefaultRunPurposeService extends AbstractSaveService<RunPurpose> im
   @Override
   public List<RunPurpose> list() throws IOException {
     return runPurposeDao.list();
+  }
+
+  @Override
+  public List<RunPurpose> listByIdList(List<Long> ids) throws IOException {
+    return runPurposeDao.listByIdList(ids);
   }
 
   @Override
