@@ -3,53 +3,56 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 
+import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
 import uk.ac.bbsrc.tgac.miso.core.service.PartitionQcTypeService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PartitionQCTypeDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/partitionqctypes")
 public class PartitionQcTypeRestController extends RestController {
 
+  private static final String TYPE_LABEL = "Partition QC Type";
+
   @Autowired
   private PartitionQcTypeService partitionQcTypeService;
-
+  @Autowired
+  private AsyncOperationManager asyncOperationManager;
   @Autowired
   private ConstantsController constantsController;
 
-  @PostMapping
-  public @ResponseBody PartitionQCTypeDto create(@RequestBody PartitionQCTypeDto dto) throws IOException {
-    return RestUtils.createObject("Partition QC Type", dto, Dtos::to, partitionQcTypeService, d -> {
-      constantsController.refreshConstants();
-      return Dtos.asDto(d);
-    });
+  @PostMapping("/bulk")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public @ResponseBody
+  ObjectNode bulkCreateAsync(@RequestBody List<PartitionQCTypeDto> dtos) throws IOException {
+    return asyncOperationManager.startAsyncBulkCreate(TYPE_LABEL, dtos, Dtos::to, partitionQcTypeService, true);
   }
 
-  @PutMapping("/{typeId}")
-  public @ResponseBody PartitionQCTypeDto update(@PathVariable long typeId, @RequestBody PartitionQCTypeDto dto) throws IOException {
-    return RestUtils.updateObject("Partition QC Type", typeId, dto, Dtos::to, partitionQcTypeService, d -> {
-      constantsController.refreshConstants();
-      return Dtos.asDto(d);
-    });
+  @PutMapping("/bulk")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<PartitionQCTypeDto> dtos) throws IOException {
+    return asyncOperationManager.startAsyncBulkUpdate(TYPE_LABEL, dtos, Dtos::to, partitionQcTypeService, true);
+  }
+
+  @GetMapping("/bulk/{uuid}")
+  public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
+    return asyncOperationManager.getAsyncProgress(uuid, PartitionQCType.class, partitionQcTypeService, Dtos::asDto);
   }
 
   @PostMapping(value = "/bulk-delete")
   @ResponseBody
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
-    RestUtils.bulkDelete("Partition QC Type", ids, partitionQcTypeService);
+  public void bulkDelete(@RequestBody List<Long> ids) throws IOException {
+    RestUtils.bulkDelete(TYPE_LABEL, ids, partitionQcTypeService);
+    constantsController.refreshConstants();
   }
 
 }
