@@ -8,6 +8,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.persistence.RunPurposeDao;
 
+import java.io.IOException;
+import java.util.List;
+
 @Transactional(rollbackFor = Exception.class)
 @Repository
 public class HibernateRunPurposeDao extends HibernateSaveDao<RunPurpose> implements RunPurposeDao {
@@ -19,6 +22,11 @@ public class HibernateRunPurposeDao extends HibernateSaveDao<RunPurpose> impleme
   @Override
   public RunPurpose getByAlias(String alias) {
     return getBy("alias", alias);
+  }
+
+  @Override
+  public List<RunPurpose> listByIdList(List<Long> idList) throws IOException {
+    return listByIdList("purposeId", idList);
   }
 
   @Override
