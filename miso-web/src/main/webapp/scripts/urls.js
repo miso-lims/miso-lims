@@ -952,8 +952,8 @@ Urls = (function() {
 
   var sequencingParametersRestBase = restBase + '/sequencingparameters';
   rest.sequencingParameters = {
-    create: sequencingParametersRestBase,
-    update: idUrlFunction(sequencingParametersRestBase)
+    bulkSave: sequencingParametersRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(sequencingParametersRestBase + '/bulk')
   };
 
   // Service Records

@@ -9,7 +9,7 @@ ListTarget.sequencingparameters = {
   getQueryUrl: null,
   showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
-    var actions = HotTarget.sequencingparameters.getBulkActions(config);
+    var actions = BulkTarget.sequencingparameters.getBulkActions(config);
     if (config.isAdmin) {
       actions.push(ListUtils.createBulkDeleteAction('Sequencing Parameters', 'sequencingparameters', function(item) {
         return item.name + ' (' + item.instrumentModelAlias + ')';
