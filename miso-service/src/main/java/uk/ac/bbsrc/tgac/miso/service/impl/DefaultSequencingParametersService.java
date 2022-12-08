@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.transaction.support.TransactionTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaChemistry;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
@@ -31,15 +32,20 @@ public class DefaultSequencingParametersService extends AbstractSaveService<Sequ
 
   @Autowired
   private SequencingParametersDao sequencingParametersDao;
-
   @Autowired
   private AuthorizationManager authorizationManager;
-
+  @Autowired
+  private TransactionTemplate transactionTemplate;
   @Autowired
   private DeletionStore deletionStore;
 
   @Autowired
   private InstrumentModelService instrumentModelService;
+
+  @Override
+  public TransactionTemplate getTransactionTemplate() {
+    return transactionTemplate;
+  }
 
   @Override
   public List<SequencingParameters> list() throws IOException {
@@ -50,6 +56,11 @@ public class DefaultSequencingParametersService extends AbstractSaveService<Sequ
   public List<SequencingParameters> listByInstrumentModelId(long instrumentModelId) throws IOException {
     InstrumentModel model = instrumentModelService.get(instrumentModelId);
     return sequencingParametersDao.listByInstrumentModel(model);
+  }
+
+  @Override
+  public List<SequencingParameters> listByIdList(List<Long> ids) throws IOException {
+    return sequencingParametersDao.listByIdList(ids);
   }
 
   public void setSequencingParametersDao(SequencingParametersDao sequencingParametersDao) {
@@ -121,7 +132,8 @@ public class DefaultSequencingParametersService extends AbstractSaveService<Sequ
   private void validateChemistry(SequencingParameters params, List<ValidationError> errors) {
     if (params.getChemistry() == null) {
       errors.add(new ValidationError("chemistry", "Chemistry must be specified"));
-    } else if (params.getChemistry() != IlluminaChemistry.UNKNOWN) {
+    } else if (params.getInstrumentModel().getPlatformType() != PlatformType.ILLUMINA
+        && params.getChemistry() != IlluminaChemistry.UNKNOWN) {
       errors.add(new ValidationError("chemistry", "Chemistry must be 'UNKNOWN' for non-Illumina instruments"));
     }
   }

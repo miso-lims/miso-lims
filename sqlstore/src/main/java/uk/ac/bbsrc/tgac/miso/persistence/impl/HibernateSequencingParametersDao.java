@@ -32,6 +32,11 @@ public class HibernateSequencingParametersDao extends HibernateSaveDao<Sequencin
   }
 
   @Override
+  public List<SequencingParameters> listByIdList(List<Long> idList) throws IOException {
+    return listByIdList("parametersId", idList);
+  }
+
+  @Override
   public SequencingParameters getByNameAndInstrumentModel(String name, InstrumentModel instrumentModel) throws IOException {
     return (SequencingParameters) currentSession().createCriteria(SequencingParameters.class)
         .add(Restrictions.eq("name", name))
