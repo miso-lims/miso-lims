@@ -17,7 +17,7 @@ ListTarget.containermodel = {
         }
       }];
     } else {
-      var actions = HotTarget.containermodel.getBulkActions(config);
+      var actions = BulkTarget.containermodel.getBulkActions(config);
       if (config.isAdmin) {
         actions.push(ListUtils.createBulkDeleteAction('Container Models', 'containermodels', function(model) {
           var platform = Utils.array.findUniqueOrThrow(Utils.array.namePredicate(model.platformType), Constants.platformTypes);
