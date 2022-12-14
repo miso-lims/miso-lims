@@ -190,16 +190,12 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("librarytype/bulk/new?quantity=3");
     slugs.add("libraryselection/bulk/new?quantity=3");
     slugs.add("librarystrategy/bulk/new?quantity=3");
-    slugs.add("librarystrategy/bulk/edit?ids=1%2C2%2C20");
     slugs.add("libraryspikein/bulk/new?quantity=3");
     slugs.add("targetedsequencing/bulk/new?quantity=3");
     slugs.add("targetedsequencing/bulk/edit?ids=1%2C2");
     slugs.add("runpurpose/bulk/new?quantity=3");
-    slugs.add("runpurpose/bulk/edit?ids=2%2C1");
     slugs.add("sequencingparameters/bulk/new?quantity=3");
-    slugs.add("sequencingparameters/bulk/edit?ids=2%2C4");
     slugs.add("containermodel/bulk/new?quantity=3");
-    slugs.add("containermodel/bulk/edit?ids=1%2C2");
     slugs.add("boxsize/bulk/new?quantity=3");
     slugs.add("boxuse/bulk/new?quantity=3");
     slugs.add("lab/bulk/new?quantity=3");
@@ -207,7 +203,6 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("arraymodel/bulk/new?quantity=3");
     slugs.add("arraymodel/bulk/edit?ids=1");
     slugs.add("partitionqctype/bulk/new?quantity=3");
-    slugs.add("partitionqctype/bulk/edit?ids=2%2C3");
     slugs.add("runlibraryqcstatus/bulk/new?quantity=2");
     slugs.add("scientificname/bulk/new?quantity=3");
     slugs.add("referencegenome/bulk/new?quantity=3");
@@ -276,6 +271,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
         .put("box/bulk/edit", unmodifiableMap("ids", "500,501"))
         .put("boxuse/bulk/edit", unmodifiableMap("ids", "6,5"))
         .put("boxsize/bulk/edit", unmodifiableMap("ids", "1,2"))
+        .put("containermodel/bulk/edit", unmodifiableMap("ids", "1,2"))
         .put("index/bulk/edit", unmodifiableMap("ids", "1,2,3,4"))
         .put("sampletype/bulk/edit", unmodifiableMap("ids", "1,2"))
         .put("sop/bulk/new", unmodifiableMap("quantity", "2"))
@@ -303,13 +299,18 @@ public class BulkErrorCrawlerIT extends AbstractIT {
         .put("libraryaliquot/bulk/pool-separate", unmodifiableMap("ids", "901,902"))
         .put("libraryaliquot/bulk/pool",
             Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "901,902").put("quantity", "2").build()))
+        .put("librarydesign/bulk/edit", unmodifiableMap("ids", "6,7,8"))
         .put("libraryselection/bulk/edit", unmodifiableMap("ids", "4,20,26"))
         .put("libraryspikein/bulk/edit", unmodifiableMap("ids", "2,3"))
+        .put("librarystrategy/bulk/edit", unmodifiableMap("ids", "1,2,20"))
         .put("librarytemplate/bulk/edit", unmodifiableMap("ids", "1"))
         .put("librarytype/bulk/edit", unmodifiableMap("ids", "28,27,17"))
+        .put("partitionqctype/bulk/edit", unmodifiableMap("ids", "2,3"))
         .put("pool/bulk/edit", unmodifiableMap("ids", "801,802"))
         .put("pool/bulk/merge",
             Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "801,802").put("proportions", "1,1").build()))
+        .put("runpurpose/bulk/edit", unmodifiableMap("ids", "2,1"))
+        .put("sequencingparameters/bulk/edit", unmodifiableMap("ids", "2,4"))
         .put("detailedqcstatus/bulk/edit", unmodifiableMap("ids", "1,2"))
         .build());
   }

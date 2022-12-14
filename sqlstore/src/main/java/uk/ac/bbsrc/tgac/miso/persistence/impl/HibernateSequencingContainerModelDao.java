@@ -95,4 +95,9 @@ public class HibernateSequencingContainerModelDao extends HibernateSaveDao<Seque
         .uniqueResult();
   }
 
+  @Override
+  public List<SequencingContainerModel> listByIdList(List<Long> idList) throws IOException {
+    return listByIdList("sequencingContainerModelId", idList);
+  }
+
 }

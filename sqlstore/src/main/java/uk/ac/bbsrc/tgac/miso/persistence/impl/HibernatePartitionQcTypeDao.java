@@ -17,22 +17,10 @@ import uk.ac.bbsrc.tgac.miso.persistence.PartitionQcTypeDao;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernatePartitionQcTypeDao implements PartitionQcTypeDao {
+public class HibernatePartitionQcTypeDao extends HibernateSaveDao<PartitionQCType> implements PartitionQcTypeDao {
 
-  @Autowired
-  private SessionFactory sessionFactory;
-
-  public Session currentSession() {
-    return sessionFactory.getCurrentSession();
-  }
-
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
-  }
-
-  @Override
-  public PartitionQCType get(long id) throws IOException {
-    return (PartitionQCType) currentSession().get(PartitionQCType.class, id);
+  public HibernatePartitionQcTypeDao() {
+    super(PartitionQCType.class);
   }
 
   @Override
@@ -43,21 +31,8 @@ public class HibernatePartitionQcTypeDao implements PartitionQcTypeDao {
   }
 
   @Override
-  public List<PartitionQCType> list() throws IOException {
-    @SuppressWarnings("unchecked")
-    List<PartitionQCType> results = currentSession().createCriteria(PartitionQCType.class).list();
-    return results;
-  }
-
-  @Override
-  public long create(PartitionQCType type) throws IOException {
-    return (long) currentSession().save(type);
-  }
-
-  @Override
-  public long update(PartitionQCType type) throws IOException {
-    currentSession().update(type);
-    return type.getId();
+  public List<PartitionQCType> listByIdList(List<Long> idList) throws IOException {
+    return listByIdList("partitionQcTypeId", idList);
   }
 
   @Override

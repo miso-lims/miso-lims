@@ -9,7 +9,7 @@ ListTarget.runpurpose = {
   getQueryUrl: null,
   showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
-    var actions = HotTarget.runpurpose.getBulkActions(config);
+    var actions = BulkTarget.runpurpose.getBulkActions(config);
     if (config.isAdmin) {
       actions.push(ListUtils.createBulkDeleteAction('Run Purposes', 'runpurposes', Utils.array.getAlias));
     }

@@ -9,7 +9,7 @@ ListTarget.partitionqctype = {
   getQueryUrl: null,
   showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
-    var actions = HotTarget.partitionqctype.getBulkActions(config);
+    var actions = BulkTarget.partitionqctype.getBulkActions(config);
     if (config.isAdmin) {
       actions.push(ListUtils.createBulkDeleteAction('Partition QC Types', 'partitionqctypes', function(type) {
         return type.description;

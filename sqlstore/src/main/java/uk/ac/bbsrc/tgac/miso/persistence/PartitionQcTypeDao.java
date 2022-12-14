@@ -5,18 +5,12 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
 
-public interface PartitionQcTypeDao {
+public interface PartitionQcTypeDao extends SaveDao<PartitionQCType> {
 
-  public PartitionQCType get(long id) throws IOException;
+  PartitionQCType getByDescription(String description) throws IOException;
 
-  public PartitionQCType getByDescription(String description) throws IOException;
+  List<PartitionQCType> listByIdList(List<Long> idList) throws IOException;
 
-  public List<PartitionQCType> list() throws IOException;
-
-  public long create(PartitionQCType type) throws IOException;
-
-  public long update(PartitionQCType type) throws IOException;
-
-  public long getUsage(PartitionQCType type) throws IOException;
+  long getUsage(PartitionQCType type) throws IOException;
 
 }

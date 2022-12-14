@@ -2,12 +2,17 @@ package uk.ac.bbsrc.tgac.miso.persistence;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 
+import java.io.IOException;
+import java.util.List;
+
 public interface RunPurposeDao extends SaveDao<RunPurpose> {
 
-  public RunPurpose getByAlias(String alias);
+  RunPurpose getByAlias(String alias);
 
-  public long getUsageByPoolOrders(RunPurpose purpose);
+  List<RunPurpose> listByIdList(List<Long> idList) throws IOException;
 
-  public long getUsageBySequencingOrders(RunPurpose purpose);
+  long getUsageByPoolOrders(RunPurpose purpose);
+
+  long getUsageBySequencingOrders(RunPurpose purpose);
 
 }
