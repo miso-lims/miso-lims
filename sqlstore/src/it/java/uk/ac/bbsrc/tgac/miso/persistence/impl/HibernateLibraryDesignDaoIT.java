@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -45,6 +46,16 @@ public class HibernateLibraryDesignDaoIT extends AbstractDAOTest {
     List<LibraryDesign> list = dao.listByClass(null);
     assertNotNull(list);
     assertEquals(0, list.size());
+  }
+
+  @Test
+  public void testListByIdList() throws Exception {
+    testListByIdList(dao::listByIdList, Arrays.asList(1L, 2L));
+  }
+
+  @Test
+  public void testListByIdListNone() throws Exception {
+    testListByIdListNone(dao::listByIdList);
   }
   
   @Test

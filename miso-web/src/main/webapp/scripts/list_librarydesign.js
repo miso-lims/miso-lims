@@ -9,7 +9,7 @@ ListTarget.librarydesign = {
   getQueryUrl: null,
   showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
-    var actions = HotTarget.librarydesign.getBulkActions(config);
+    var actions = BulkTarget.librarydesign.getBulkActions(config);
     if (config.isAdmin) {
       actions.push(ListUtils.createBulkDeleteAction('Library Designs', 'librarydesigns', Utils.array.getName));
     }

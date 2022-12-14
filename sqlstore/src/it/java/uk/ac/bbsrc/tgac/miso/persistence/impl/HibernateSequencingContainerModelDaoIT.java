@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
@@ -151,6 +152,16 @@ public class HibernateSequencingContainerModelDaoIT extends AbstractDAOTest {
     InstrumentModel instrumentModel = (InstrumentModel) currentSession().get(InstrumentModel.class, 16L);
     assertNotNull(instrumentModel);
     assertEquals(4, dao.getUsage(containerModel, instrumentModel));
+  }
+
+  @Test
+  public void testListByIdList() throws Exception {
+    testListByIdList(dao::listByIdList, Arrays.asList(2L, 1L));
+  }
+
+  @Test
+  public void testListByIdListNone() throws Exception {
+    testListByIdListNone(dao::listByIdList);
   }
 
 }

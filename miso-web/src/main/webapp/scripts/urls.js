@@ -216,8 +216,8 @@ Urls = (function() {
 
   var containerModelRestBase = restBase + '/containermodels';
   rest.containerModels = {
-    create: containerModelRestBase,
-    update: idUrlFunction(containerModelRestBase),
+    bulkSave: containerModelRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(containerModelRestBase + '/bulk'),
     search: containerModelRestBase + '/search'
   };
 
@@ -462,8 +462,9 @@ Urls = (function() {
 
   var libraryDesignRestBase = restBase + '/librarydesigns';
   rest.libraryDesigns = {
-    create: libraryDesignRestBase,
-    update: idUrlFunction(libraryDesignRestBase)
+    bulkDelete: libraryDesignRestBase + '/bulk-delete',
+    bulkSave: libraryDesignRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(libraryDesignRestBase + '/bulk')
   };
 
   // Library Design Codes
@@ -487,8 +488,8 @@ Urls = (function() {
 
   var librarySelectionRestBase = restBase + '/libraryselections';
   rest.librarySelections = {
-    create: librarySelectionRestBase,
-    update: idUrlFunction(librarySelectionRestBase)
+    bulkSave: librarySelectionRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(librarySelectionRestBase + '/bulk')
   };
 
   // Library Spike-Ins
@@ -513,8 +514,8 @@ Urls = (function() {
 
   var libraryStrategyRestBase = restBase + '/librarystrategies';
   rest.libraryStrategies = {
-    create: libraryStrategyRestBase,
-    update: idUrlFunction(libraryStrategyRestBase)
+    bulkSave: libraryStrategyRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(libraryStrategyRestBase + '/bulk')
   };
 
   // Library Templates
@@ -608,8 +609,8 @@ Urls = (function() {
 
   var partitionQcTypeRestBase = restBase + '/partitionqctypes';
   rest.partitionQcTypes = {
-    create: partitionQcTypeRestBase,
-    update: idUrlFunction(partitionQcTypeRestBase)
+    bulkSave: partitionQcTypeRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(partitionQcTypeRestBase + '/bulk')
   };
 
   // Pipelines
@@ -823,8 +824,8 @@ Urls = (function() {
 
   var runPurposeRestBase = restBase + '/runpurposes';
   rest.runPurposes = {
-    create: runPurposeRestBase,
-    update: idUrlFunction(runPurposeRestBase)
+    bulkSave: runPurposeRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(runPurposeRestBase + '/bulk')
   };
 
   // Samples
@@ -952,8 +953,8 @@ Urls = (function() {
 
   var sequencingParametersRestBase = restBase + '/sequencingparameters';
   rest.sequencingParameters = {
-    create: sequencingParametersRestBase,
-    update: idUrlFunction(sequencingParametersRestBase)
+    bulkSave: sequencingParametersRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(sequencingParametersRestBase + '/bulk')
   };
 
   // Service Records

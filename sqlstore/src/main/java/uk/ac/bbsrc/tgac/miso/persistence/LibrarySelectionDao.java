@@ -5,18 +5,14 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 
-public interface LibrarySelectionDao {
+public interface LibrarySelectionDao extends SaveDao<LibrarySelectionType> {
 
-  public LibrarySelectionType get(long id) throws IOException;
+  LibrarySelectionType getByName(String name) throws IOException;
 
-  public LibrarySelectionType getByName(String name) throws IOException;
+  long getUsageByLibraries(LibrarySelectionType type) throws IOException;
 
-  public List<LibrarySelectionType> list() throws IOException;
+  long getUsageByLibraryDesigns(LibrarySelectionType type) throws IOException;
 
-  public long create(LibrarySelectionType type) throws IOException;
-
-  public long update(LibrarySelectionType type) throws IOException;
-
-  public long getUsage(LibrarySelectionType type) throws IOException;
+  List<LibrarySelectionType> listByIdList(List<Long> idList) throws IOException;
 
 }
