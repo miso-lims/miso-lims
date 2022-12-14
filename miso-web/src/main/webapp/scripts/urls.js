@@ -475,8 +475,8 @@ Urls = (function() {
   };
   var libraryDesignCodeRestBase = restBase + '/librarydesigncodes';
   rest.libraryDesignCodes = {
-    create: libraryDesignCodeRestBase,
-    update: idUrlFunction(libraryDesignCodeRestBase)
+    bulkSave: libraryDesignCodeRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(libraryDesignCodeRestBase + '/bulk')
   };
 
   // Library Selections
