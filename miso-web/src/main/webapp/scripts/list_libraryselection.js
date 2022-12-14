@@ -13,7 +13,7 @@ ListTarget.libraryselection = {
   },
   showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
-    var actions = HotTarget.libraryselection.getBulkActions(config);
+    var actions = BulkTarget.libraryselection.getBulkActions(config);
     if (config.isAdmin) {
       actions.push(ListUtils.createBulkDeleteAction('Library Selection Types', 'libraryselections', Utils.array.getName));
     }

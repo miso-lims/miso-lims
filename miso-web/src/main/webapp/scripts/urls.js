@@ -488,8 +488,8 @@ Urls = (function() {
 
   var librarySelectionRestBase = restBase + '/libraryselections';
   rest.librarySelections = {
-    create: librarySelectionRestBase,
-    update: idUrlFunction(librarySelectionRestBase)
+    bulkSave: librarySelectionRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(librarySelectionRestBase + '/bulk')
   };
 
   // Library Spike-Ins
