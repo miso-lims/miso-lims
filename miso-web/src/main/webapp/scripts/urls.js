@@ -216,8 +216,8 @@ Urls = (function() {
 
   var containerModelRestBase = restBase + '/containermodels';
   rest.containerModels = {
-    create: containerModelRestBase,
-    update: idUrlFunction(containerModelRestBase),
+    bulkSave: containerModelRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(containerModelRestBase + '/bulk'),
     search: containerModelRestBase + '/search'
   };
 
