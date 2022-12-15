@@ -7,6 +7,23 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.51.2] - 2022-12-15
+
+### Fixed
+
+* Performance and accessibility improvements for the following bulk pages
+  * Library Designs
+  * Library Design Codes
+  * Library Selection Types
+  * Library Spike-Ins
+  * Library Strategy Types
+  * Library Types
+  * Partition QC Types
+  * Run Purposes
+  * Sequencing Container Models
+  * Sequencing Parameters
+
+
 ## [1.51.1] - 2022-12-01
 
 ### Fixed
