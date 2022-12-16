@@ -15,7 +15,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -123,9 +123,9 @@ public class DefaultSampleServiceTest {
     relationships = new HashSet<>();
     Mockito.when(namingSchemeHolder.getPrimary()).thenReturn(namingScheme);
     Mockito.when(namingSchemeHolder.get(Mockito.anyBoolean())).thenReturn(namingScheme);
-    Mockito.when(namingScheme.validateSampleAlias(Matchers.anyString())).thenReturn(ValidationResult.success());
-    Mockito.when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
-    Mockito.when(namingScheme.generateNameFor(Matchers.any(Sample.class))).thenReturn("SAM1");
+    Mockito.when(namingScheme.validateSampleAlias(ArgumentMatchers.any())).thenReturn(ValidationResult.success());
+    Mockito.when(namingScheme.validateName(ArgumentMatchers.anyString())).thenReturn(ValidationResult.success());
+    Mockito.when(namingScheme.generateNameFor(ArgumentMatchers.any(Sample.class))).thenReturn("SAM1");
   }
 
   @Test
@@ -445,7 +445,8 @@ public class DefaultSampleServiceTest {
     IdentityView id1 = new IdentityView();
     id1.setExternalName("String1,String2");
     id1.setProjectId(project.getId());
-    Mockito.when(sut.getIdentitiesByExternalNameOrAliasAndProject(Matchers.anyString(), Matchers.anyLong(), Matchers.anyBoolean()))
+    Mockito.when(sut.getIdentitiesByExternalNameOrAliasAndProject(ArgumentMatchers.anyString(),
+            ArgumentMatchers.anyLong(), ArgumentMatchers.anyBoolean()))
         .thenReturn(Collections.singletonList(id1));
     Sample newSample = new SampleImpl();
     newSample.setProject(project);
@@ -463,7 +464,8 @@ public class DefaultSampleServiceTest {
     id1.setProjectId(project.getId());
     Sample newSample = new SampleImpl();
     newSample.setProject(project);
-    Mockito.when(sut.getIdentitiesByExternalNameOrAliasAndProject(Matchers.anyString(), Matchers.anyLong(), Matchers.anyBoolean()))
+    Mockito.when(sut.getIdentitiesByExternalNameOrAliasAndProject(ArgumentMatchers.anyString(),
+            ArgumentMatchers.anyLong(), ArgumentMatchers.anyBoolean()))
         .thenReturn(Collections.singletonList(id1));
     exception.expect(ValidationException.class);
     sut.confirmExternalNameUniqueForProjectIfRequired("String1,String3", newSample);
@@ -478,7 +480,8 @@ public class DefaultSampleServiceTest {
     id1.setId(1L);
     id1.setExternalName("String1,String2");
     id1.setProjectId(project.getId());
-    Mockito.when(sut.getIdentitiesByExternalNameOrAliasAndProject(Matchers.anyString(), Matchers.anyLong(), Matchers.anyBoolean()))
+    Mockito.when(sut.getIdentitiesByExternalNameOrAliasAndProject(ArgumentMatchers.anyString(),
+            ArgumentMatchers.anyLong(), ArgumentMatchers.anyBoolean()))
         .thenReturn(Collections.singletonList(id1));
     Sample newSample = new SampleImpl();
     newSample.setProject(project);
@@ -495,7 +498,8 @@ public class DefaultSampleServiceTest {
     id1.setExternalName("String1,String2");
     id1.setProjectId(project.getId());
     sut.setUniqueExternalNameWithinProjectRequired(false);
-    Mockito.when(sut.getIdentitiesByExternalNameOrAliasAndProject(Matchers.anyString(), Matchers.anyLong(), Matchers.anyBoolean()))
+    Mockito.when(sut.getIdentitiesByExternalNameOrAliasAndProject(ArgumentMatchers.anyString(),
+            ArgumentMatchers.anyLong(), ArgumentMatchers.anyBoolean()))
         .thenReturn(Collections.singletonList(id1));
     Sample newSample = new SampleImpl();
     newSample.setProject(project);
