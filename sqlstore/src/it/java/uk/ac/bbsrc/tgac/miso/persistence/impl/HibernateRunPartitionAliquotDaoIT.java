@@ -15,10 +15,7 @@ import org.junit.Test;
 
 import com.eaglegenomics.simlims.core.User;
 
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -104,7 +101,7 @@ public class HibernateRunPartitionAliquotDaoIT extends AbstractDAOTest {
         (LibraryAliquot) currentSession().get(LibraryAliquot.class, 5L),
         (LibraryAliquot) currentSession().get(LibraryAliquot.class, 6L)
     );
-    Mockito.when(libraryAliquotStore.listByIdList(Mockito.anyList())).thenReturn(aliquots);
+    Mockito.when(libraryAliquotStore.listByIdList(ArgumentMatchers.any())).thenReturn(aliquots);
 
     List<RunPartitionAliquot> results = sut.listByRunId(runId);
     assertNotNull(results);

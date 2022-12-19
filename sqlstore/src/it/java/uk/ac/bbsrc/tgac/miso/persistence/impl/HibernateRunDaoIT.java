@@ -38,7 +38,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -94,9 +94,9 @@ public class HibernateRunDaoIT extends AbstractDAOTest {
     MockitoAnnotations.initMocks(this);
     dao.setSessionFactory(sessionFactory);
     emptyUser.setId(1L);
-    when(securityDAO.getUserById(Matchers.anyLong())).thenReturn(emptyUser);
+    when(securityDAO.getUserById(ArgumentMatchers.anyLong())).thenReturn(emptyUser);
     emptySR.setId(1L);
-    when(instrumentDAO.get(Matchers.anyLong())).thenReturn(emptySR);
+    when(instrumentDAO.get(ArgumentMatchers.anyLong())).thenReturn(emptySR);
   }
 
   @Test
@@ -304,11 +304,12 @@ public class HibernateRunDaoIT extends AbstractDAOTest {
 
   private void mockNonLazyThings() throws IOException {
     User mockUser = Mockito.mock(UserImpl.class);
-    Mockito.when(securityDAO.getUserById(Matchers.anyLong())).thenReturn(mockUser);
+    Mockito.when(securityDAO.getUserById(ArgumentMatchers.anyLong())).thenReturn(mockUser);
 
     List<SequencerPartitionContainer> mockContainers = new ArrayList<>();
     mockContainers.add(Mockito.mock(SequencerPartitionContainerImpl.class));
-    Mockito.when(sequencerPartitionContainerDAO.listAllSequencerPartitionContainersByRunId(Matchers.anyLong())).thenReturn(mockContainers);
+    Mockito.when(sequencerPartitionContainerDAO.listAllSequencerPartitionContainersByRunId(ArgumentMatchers.anyLong()))
+        .thenReturn(mockContainers);
   }
 
   private void assertNonLazyThings(Run run) {
