@@ -51,7 +51,7 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forString("Group ID", true, effectiveGroupIdProperty(GroupIdentifiable::getGroupId)), //
       Column.forBigDecimal("VOL (uL)", Sample::getVolume), //
       Column.forBigDecimal("[] (ng/uL)", Sample::getConcentration), //
-      Column.forBigDecimal("Total (ng)", yield()) //
+      Column.forBigDecimal("Total (ng)", getYield()) //
   ), //
 
   TRANSFER_LIST_V2("Transfer List V2", //
@@ -72,7 +72,7 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
               : ""))), //
       Column.forBigDecimal("VOL (uL)", Sample::getVolume), //
       Column.forBigDecimal("[] (ng/uL)", Sample::getConcentration), //
-      Column.forBigDecimal("Total (ng)", yield()) //
+      Column.forBigDecimal("Total (ng)", getYield()) //
   ), //
   INITIAL_EXTRACTION_YIELDS("Initial Extraction Yields List", //
       Arrays.asList(SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME), //
@@ -80,7 +80,7 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forString("External Identifier", detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
       Column.forBigDecimal("VOL (uL)", Sample::getInitialVolume), //
       Column.forBigDecimal("[] (ng/uL)", Sample::getConcentration), //
-      Column.forBigDecimal("Total (ng)", yield()), //
+      Column.forBigDecimal("Total (ng)", getYield()), //
       Column.forString("Subproject",
           (sam -> (LimsUtils.isDetailedSample(sam) && ((DetailedSample) sam).getSubproject() != null
               ? ((DetailedSample) sam).getSubproject().getAlias()
@@ -149,18 +149,18 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forString("Class", true, sampleClass()),
       Column.forString("Material", true, detailedSample(SampleTissue.class,
           tissue -> tissue.getTissueMaterial() == null ? null : tissue.getTissueMaterial().getAlias(), null)),
-      Column.forBigDecimal("Yield (ng)", yield()),
+      Column.forBigDecimal("Yield (ng)", getYield()),
       Column.forString("Type", detailedSample(SampleTissue.class, st -> st.getTissueType().getAlias(), null)), //
       Column.forBigDecimal("RNA Initial Vol.", ifRna(Sample::getInitialVolume)),
       Column.forBigDecimal("RNA Conc.", ifRna(Sample::getConcentration)),
       Column.forBigDecimal("RNA Used", ifRna(sam -> sam.getInitialVolume() != null && sam.getVolume() != null
           ? sam.getInitialVolume().subtract(sam.getVolume()) : null)),
-      Column.forBigDecimal("RNA Total Remaining", ifRna(yield())),
+      Column.forBigDecimal("RNA Total Remaining", ifRna(getYield())),
       Column.forBigDecimal("RIN", ifRna(sam -> qcValue(sam, "RIN", true))),
       Column.forBigDecimal("DV200", ifRna(sam -> qcValue(sam, "DV200", false))),
       Column.forBigDecimal("DNA Current Vol.", ifDna(Sample::getVolume)),
       Column.forBigDecimal("DNA Conc.", ifDna(Sample::getConcentration)),
-      Column.forBigDecimal("DNA Total Remaining", ifDna(yield())),
+      Column.forBigDecimal("DNA Total Remaining", ifDna(getYield())),
       Column.forString("% Genomic", blankColumn()), // intentionally blank - column no longer used
       Column.forString("RNA Identity", ifRna(detailedSample(SampleIdentity.class, Sample::getName, null))),
       Column.forString("RNA Tissue", ifRna(detailedSample(SampleTissue.class, Sample::getName, null))),
@@ -210,7 +210,7 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
         ? ((DetailedSample) sam).getSampleClass().getAlias() : null;
   }
 
-  private static Function<Sample, BigDecimal> yield() {
+  private static Function<Sample, BigDecimal> getYield() {
     return sam -> (sam.getVolume() != null && sam.getConcentration() != null)
         ? sam.getVolume().multiply(sam.getConcentration()) : null;
   }

@@ -136,7 +136,7 @@ public class LibrarySelectionType implements Comparable<LibrarySelectionType>, D
   @Override
   public int hashCode() {
     if (getId() != UNSAVED_ID) {
-      return new Long(getId()).intValue();
+      return Long.valueOf(getId()).intValue();
     } else {
       int hashcode = -1;
       if (getName() != null) hashcode = 37 * hashcode + getName().hashCode();

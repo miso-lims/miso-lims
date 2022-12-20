@@ -94,8 +94,8 @@ public final class AlphanumericComparator implements Comparator<String> {
       int result;
 
       if (Character.isDigit(space1[0]) && Character.isDigit(space2[0])) {
-        Integer firstNumberToCompare = new Integer(str1.trim());
-        Integer secondNumberToCompare = new Integer(str2.trim());
+        Integer firstNumberToCompare = Integer.valueOf(str1.trim());
+        Integer secondNumberToCompare = Integer.valueOf(str2.trim());
         result = firstNumberToCompare.compareTo(secondNumberToCompare);
       } else {
         result = str1.compareTo(str2);
