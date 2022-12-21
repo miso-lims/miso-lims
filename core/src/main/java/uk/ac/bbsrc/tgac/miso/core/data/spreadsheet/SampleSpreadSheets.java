@@ -33,7 +33,9 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
           (sam -> (LimsUtils.isDetailedSample(sam) && ((DetailedSample) sam).getSubproject() != null
               ? ((DetailedSample) sam).getSubproject().getAlias()
               : ""))), //
-      Column.forString("Location", BoxUtils::makeLocationLabel)),
+      Column.forString("Location", BoxUtils::makeLocationLabel), //
+      Column.forBigDecimal("Concentration", Sample::getConcentration), //
+      Column.forString("Concentration Units", sam -> sam.getConcentrationUnits() == null ? "" : sam.getConcentrationUnits().getRawLabel())),
   
   BIOBANK_TRANSFER_LIST("BioBank Transfer List", //
       Arrays.asList(SampleTissue.CATEGORY_NAME, SampleTissueProcessing.CATEGORY_NAME), //
