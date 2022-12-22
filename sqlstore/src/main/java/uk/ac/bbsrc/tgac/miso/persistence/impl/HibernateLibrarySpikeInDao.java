@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
@@ -24,7 +25,7 @@ public class HibernateLibrarySpikeInDao extends HibernateSaveDao<LibrarySpikeIn>
   }
 
   @Override
-  public List<LibrarySpikeIn> listByIdList(List<Long> idList) throws IOException {
+  public List<LibrarySpikeIn> listByIdList(Collection<Long> idList) throws IOException {
     return listByIdList("id", idList);
   }
 

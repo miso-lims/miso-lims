@@ -5,11 +5,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import java.io.IOException;
 import java.util.List;
 
-public interface RunPurposeDao extends SaveDao<RunPurpose> {
+public interface RunPurposeDao extends BulkSaveDao<RunPurpose> {
 
   RunPurpose getByAlias(String alias);
-
-  List<RunPurpose> listByIdList(List<Long> idList) throws IOException;
 
   long getUsageByPoolOrders(RunPurpose purpose);
 

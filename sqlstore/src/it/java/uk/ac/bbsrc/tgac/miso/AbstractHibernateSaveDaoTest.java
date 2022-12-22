@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -132,7 +133,7 @@ public abstract class AbstractHibernateSaveDaoTest<T extends Identifiable, D ext
     return (T) currentSession().get(implClass, id);
   }
 
-  protected void testListByIdList(WhineyBiFunction<D, List<Long>, List<T>> testMethod, List<Long> ids) throws Exception {
+  protected void testListByIdList(WhineyBiFunction<D, Collection<Long>, List<T>> testMethod, Collection<Long> ids) throws Exception {
     List<T> items = testMethod.apply(getTestSubject(), ids);
     assertNotNull(items);
     assertEquals(ids.size(), items.size());

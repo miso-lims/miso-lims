@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -31,7 +32,7 @@ public class HibernatePartitionQcTypeDao extends HibernateSaveDao<PartitionQCTyp
   }
 
   @Override
-  public List<PartitionQCType> listByIdList(List<Long> idList) throws IOException {
+  public List<PartitionQCType> listByIdList(Collection<Long> idList) throws IOException {
     return listByIdList("partitionQcTypeId", idList);
   }
 

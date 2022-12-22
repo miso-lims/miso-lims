@@ -32,11 +32,6 @@ public class HibernateRequisitionDao extends HibernateSaveDao<Requisition>
   }
 
   @Override
-  public List<Requisition> listByIdList(Collection<Long> ids) throws IOException {
-    return listByIdList("requisitionId", ids);
-  }
-
-  @Override
   public String getFriendlyName() {
     return "Requisition";
   }

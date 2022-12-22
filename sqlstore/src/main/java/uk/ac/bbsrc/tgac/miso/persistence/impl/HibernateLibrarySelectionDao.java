@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.criterion.Projections;
@@ -41,7 +42,7 @@ public class HibernateLibrarySelectionDao extends HibernateSaveDao<LibrarySelect
 
 
   @Override
-  public List<LibrarySelectionType> listByIdList(List<Long> idList) throws IOException {
+  public List<LibrarySelectionType> listByIdList(Collection<Long> idList) throws IOException {
     return listByIdList("librarySelectionTypeId", idList);
   }
 

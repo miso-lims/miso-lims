@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
@@ -29,7 +30,7 @@ public class HibernateBoxUseDao extends HibernateSaveDao<BoxUse> implements BoxU
   }
 
   @Override
-  public List<BoxUse> listByIdList(List<Long> idList) throws IOException {
+  public List<BoxUse> listByIdList(Collection<Long> idList) throws IOException {
     return listByIdList("id", idList);
   }
 

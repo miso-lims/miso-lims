@@ -6,7 +6,7 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 
-public interface DetailedQcStatusDao extends SaveDao<DetailedQcStatus> {
+public interface DetailedQcStatusDao extends BulkSaveDao<DetailedQcStatus> {
 
   public DetailedQcStatus getByDescription(String description);
 
@@ -15,7 +15,5 @@ public interface DetailedQcStatusDao extends SaveDao<DetailedQcStatus> {
   public long getUsageByLibraries(DetailedQcStatus detailedQcStatus);
 
   public long getUsageByLibraryAliquots(DetailedQcStatus detailedQcStatus);
-
-  public List<DetailedQcStatus> listByIdList(Collection<Long> ids) throws IOException;
 
 }

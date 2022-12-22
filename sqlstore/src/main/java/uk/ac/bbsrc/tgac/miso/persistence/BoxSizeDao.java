@@ -5,10 +5,8 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 
-public interface BoxSizeDao extends SaveDao<BoxSize> {
+public interface BoxSizeDao extends BulkSaveDao<BoxSize> {
 
   public long getUsage(BoxSize boxSize) throws IOException;
-
-  public List<BoxSize> listByIdList(List<Long> idList) throws IOException;
 
 }

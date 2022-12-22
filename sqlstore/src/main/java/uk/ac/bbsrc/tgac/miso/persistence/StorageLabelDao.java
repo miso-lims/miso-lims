@@ -6,12 +6,10 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLabel;
 
-public interface StorageLabelDao extends SaveDao<StorageLabel> {
+public interface StorageLabelDao extends BulkSaveDao<StorageLabel> {
 
   StorageLabel getByLabel(String label) throws IOException;
 
   long getUsage(StorageLabel label) throws IOException;
-
-  List<StorageLabel> listByIdList(Collection<Long> ids) throws IOException;
 
 }

@@ -6,12 +6,10 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-public interface TissueMaterialDao extends SaveDao<TissueMaterial> {
+public interface TissueMaterialDao extends BulkSaveDao<TissueMaterial> {
 
   TissueMaterial getByAlias(String alias) throws IOException;
 
   long getUsage(TissueMaterial tissueMaterial) throws IOException;
-
-  List<TissueMaterial> listByIdList(Collection<Long> ids) throws IOException;
 
 }

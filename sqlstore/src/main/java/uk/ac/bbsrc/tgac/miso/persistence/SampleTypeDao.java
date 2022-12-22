@@ -6,12 +6,10 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleType;
 
-public interface SampleTypeDao extends SaveDao<SampleType> {
+public interface SampleTypeDao extends BulkSaveDao<SampleType> {
 
   SampleType getByName(String name) throws IOException;
   
   long getUsage(SampleType sampleType) throws IOException;
-
-  List<SampleType> listByIdList(Collection<Long> ids) throws IOException;
 
 }
