@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -17,22 +18,11 @@ import uk.ac.bbsrc.tgac.miso.persistence.AttachmentCategoryStore;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateAttachmentCategoryDao implements AttachmentCategoryStore {
+public class HibernateAttachmentCategoryDao extends HibernateSaveDao<AttachmentCategory>
+    implements AttachmentCategoryStore {
 
-  @Autowired
-  private SessionFactory sessionFactory;
-
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
-  }
-
-  private Session currentSession() {
-    return sessionFactory.getCurrentSession();
-  }
-
-  @Override
-  public AttachmentCategory get(long id) throws IOException {
-    return (AttachmentCategory) currentSession().get(AttachmentCategory.class, id);
+  public HibernateAttachmentCategoryDao() {
+    super(AttachmentCategory.class);
   }
 
   @Override
@@ -43,27 +33,14 @@ public class HibernateAttachmentCategoryDao implements AttachmentCategoryStore {
   }
 
   @Override
-  public List<AttachmentCategory> list() throws IOException {
-    @SuppressWarnings("unchecked")
-    List<AttachmentCategory> list = currentSession().createCriteria(AttachmentCategory.class).list();
-    return list;
-  }
-
-  @Override
-  public long save(AttachmentCategory category) throws IOException {
-    if (category.isSaved()) {
-      currentSession().update(category);
-      return category.getId();
-    } else {
-      return (long) currentSession().save(category);
-    }
-  }
-
-  @Override
   public long getUsage(AttachmentCategory category) {
     return (long) currentSession().createCriteria(FileAttachment.class)
         .add(Restrictions.eq("category", category))
         .setProjection(Projections.rowCount()).uniqueResult();
   }
 
+  @Override
+  public List<AttachmentCategory> listByIdList(Collection<Long> idList) throws IOException {
+    return listByIdList("categoryId", idList);
+  }
 }
