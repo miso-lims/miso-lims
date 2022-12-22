@@ -931,7 +931,9 @@ INSERT INTO `SampleNumberPerProject` (`sampleNumberPerProjectId`, `projectId`, `
 ('2', '3', '9999', '4', '1', '1', '2016-01-28 14:32:00', '2016-01-28 14:32:00');
 
 INSERT INTO ArrayModel(arrayModelId, alias, arrayModelRows, arrayModelColumns) VALUES
-(1, 'Test BeadChip', 8, 1);
+(1, 'Test BeadChip', 8, 1),
+(2, 'Test Model 2', 8, 1),
+(3, 'Test Model 3', 8, 1);
 
 INSERT INTO Array(arrayId, alias, arrayModelId, serialNumber, description, creator, created, lastModifier, lastModified) VALUES
 (1, 'Array_1', 1, '1234', 'test array', 1, '2018-01-26 17:11:00', 1, '2018-01-26 17:11:00');

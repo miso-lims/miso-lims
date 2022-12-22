@@ -1,13 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,26 +15,10 @@ import uk.ac.bbsrc.tgac.miso.persistence.ArrayModelDao;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
-public class HibernateArrayModelDao implements ArrayModelDao {
+public class HibernateArrayModelDao extends HibernateSaveDao<ArrayModel> implements ArrayModelDao {
 
-  @Autowired
-  private SessionFactory sessionFactory;
-
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
-  }
-
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
-  }
-
-  private Session currentSession() {
-    return getSessionFactory().getCurrentSession();
-  }
-
-  @Override
-  public ArrayModel get(long id) throws IOException {
-    return (ArrayModel) currentSession().get(ArrayModel.class, id);
+  public HibernateArrayModelDao() {
+    super(ArrayModel.class);
   }
 
   @Override
@@ -47,21 +29,15 @@ public class HibernateArrayModelDao implements ArrayModelDao {
   }
 
   @Override
+  public List<ArrayModel> listByIdList(Collection<Long> idList) throws IOException {
+    return listByIdList("id", idList);
+  }
+
+  @Override
   public List<ArrayModel> list() throws IOException {
     @SuppressWarnings("unchecked")
     List<ArrayModel> results = currentSession().createCriteria(ArrayModel.class).list();
     return results;
-  }
-
-  @Override
-  public long create(ArrayModel model) throws IOException {
-    return (long) currentSession().save(model);
-  }
-
-  @Override
-  public long update(ArrayModel model) throws IOException {
-    currentSession().update(model);
-    return model.getId();
   }
 
   @Override

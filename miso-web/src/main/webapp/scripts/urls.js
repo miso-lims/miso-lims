@@ -43,8 +43,8 @@ Urls = (function() {
 
   var arrayModelRestBase = restBase + '/arraymodels'
   rest.arrayModels = {
-    create: arrayModelRestBase,
-    update: idUrlFunction(arrayModelRestBase)
+    bulkSave: arrayModelRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(arrayModelRestBase + '/bulk')
   };
 
   // Array Runs

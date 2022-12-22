@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -41,7 +42,7 @@ public class HibernateArrayModelDaoIT extends AbstractDAOTest {
   public void testList() throws IOException {
     List<ArrayModel> list = sut.list();
     assertNotNull(list);
-    assertEquals(1, list.size());
+    assertEquals(3, list.size());
   }
 
   @Test
@@ -79,6 +80,16 @@ public class HibernateArrayModelDaoIT extends AbstractDAOTest {
     ArrayModel arrayModel = (ArrayModel) getSessionFactory().getCurrentSession().get(ArrayModel.class, 1L);
     assertEquals("Test BeadChip", arrayModel.getAlias());
     assertEquals(1L, sut.getUsage(arrayModel));
+  }
+
+  @Test
+  public void testListByIdList() throws Exception {
+    testListByIdList(sut::listByIdList, Arrays.asList(2L, 3L));
+  }
+
+  @Test
+  public void testListByIdListNone() throws Exception {
+    testListByIdListNone(sut::listByIdList);
   }
 
 }
