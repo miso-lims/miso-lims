@@ -5,11 +5,9 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
 
-public interface PartitionQcTypeDao extends SaveDao<PartitionQCType> {
+public interface PartitionQcTypeDao extends BulkSaveDao<PartitionQCType> {
 
   PartitionQCType getByDescription(String description) throws IOException;
-
-  List<PartitionQCType> listByIdList(List<Long> idList) throws IOException;
 
   long getUsage(PartitionQCType type) throws IOException;
 

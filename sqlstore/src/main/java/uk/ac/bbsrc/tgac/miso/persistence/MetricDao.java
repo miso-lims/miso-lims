@@ -8,12 +8,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.Metric;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.MetricSubcategory;
 import uk.ac.bbsrc.tgac.miso.core.data.type.MetricCategory;
 
-public interface MetricDao extends SaveDao<Metric> {
+public interface MetricDao extends BulkSaveDao<Metric> {
 
   Metric getByAliasAndCategory(String alias, MetricCategory category, MetricSubcategory subcategory) throws IOException;
 
   long getUsage(Metric metric) throws IOException;
-
-  List<Metric> listByIdList(Collection<Long> ids) throws IOException;
 
 }

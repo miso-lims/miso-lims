@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
@@ -83,7 +84,7 @@ public class HibernateLibraryTemplateDao extends HibernateSaveDao<LibraryTemplat
   }
 
   @Override
-  public List<LibraryTemplate> listByIdList(List<Long> idList) throws IOException {
+  public List<LibraryTemplate> listByIdList(Collection<Long> idList) throws IOException {
     return listByIdList("id", idList);
   }
 

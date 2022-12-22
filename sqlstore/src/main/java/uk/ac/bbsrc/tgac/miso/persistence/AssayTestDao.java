@@ -6,12 +6,10 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-public interface AssayTestDao extends SaveDao<AssayTest> {
+public interface AssayTestDao extends BulkSaveDao<AssayTest> {
 
   AssayTest getByAlias(String alias) throws IOException;
 
   long getUsage(AssayTest test) throws IOException;
-
-  List<AssayTest> listByIdList(Collection<Long> ids) throws IOException;
 
 }

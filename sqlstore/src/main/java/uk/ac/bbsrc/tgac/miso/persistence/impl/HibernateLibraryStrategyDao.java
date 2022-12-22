@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -40,7 +41,7 @@ public class HibernateLibraryStrategyDao extends HibernateSaveDao<LibraryStrateg
   }
 
   @Override
-  public List<LibraryStrategyType> listByIdList(List<Long> idList) throws IOException {
+  public List<LibraryStrategyType> listByIdList(Collection<Long> idList) throws IOException {
     return listByIdList("libraryStrategyTypeId", idList);
   }
 

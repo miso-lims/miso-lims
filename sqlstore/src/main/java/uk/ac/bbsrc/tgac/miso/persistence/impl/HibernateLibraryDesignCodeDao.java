@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
@@ -35,7 +36,7 @@ public class HibernateLibraryDesignCodeDao extends HibernateSaveDao<LibraryDesig
   }
 
   @Override
-  public List<LibraryDesignCode> listByIdList(List<Long> idList) throws IOException {
+  public List<LibraryDesignCode> listByIdList(Collection<Long> idList) throws IOException {
     return listByIdList("libraryDesignCodeId", idList);
   }
 

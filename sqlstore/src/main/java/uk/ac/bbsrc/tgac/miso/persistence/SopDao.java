@@ -8,13 +8,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface SopDao extends PaginatedDataSource<Sop>, SaveDao<Sop> {
+public interface SopDao extends PaginatedDataSource<Sop>, BulkSaveDao<Sop> {
 
   public Sop get(SopCategory category, String alias, String version) throws IOException;
 
   public List<Sop> listByCategory(SopCategory category) throws IOException;
-
-  public List<Sop> listByIdList(Collection<Long> ids) throws IOException;
 
   public long getUsageBySamples(Sop sop) throws IOException;
 

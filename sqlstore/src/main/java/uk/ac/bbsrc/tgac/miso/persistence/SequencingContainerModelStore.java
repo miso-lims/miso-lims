@@ -30,7 +30,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
-public interface SequencingContainerModelStore extends SaveDao<SequencingContainerModel> {
+public interface SequencingContainerModelStore extends BulkSaveDao<SequencingContainerModel> {
 
   /**
    * Attempt to find a SequencingContainerModel matching the supplied parameters
@@ -63,7 +63,5 @@ public interface SequencingContainerModelStore extends SaveDao<SequencingContain
   long getUsage(SequencingContainerModel model) throws IOException;
 
   long getUsage(SequencingContainerModel containerModel, InstrumentModel instrumentModel) throws IOException;
-
-  List<SequencingContainerModel> listByIdList(List<Long> idList) throws IOException;
 
 }

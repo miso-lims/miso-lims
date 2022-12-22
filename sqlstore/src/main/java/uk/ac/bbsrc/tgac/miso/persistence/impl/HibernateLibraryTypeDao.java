@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.criterion.Restrictions;
@@ -39,7 +40,7 @@ public class HibernateLibraryTypeDao extends HibernateSaveDao<LibraryType> imple
   }
 
   @Override
-  public List<LibraryType> listByIdList(List<Long> idList) throws IOException {
+  public List<LibraryType> listByIdList(Collection<Long> idList) throws IOException {
     return listByIdList("libraryTypeId", idList);
   }
 

@@ -9,6 +9,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.persistence.RunPurposeDao;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 @Transactional(rollbackFor = Exception.class)
@@ -25,7 +26,7 @@ public class HibernateRunPurposeDao extends HibernateSaveDao<RunPurpose> impleme
   }
 
   @Override
-  public List<RunPurpose> listByIdList(List<Long> idList) throws IOException {
+  public List<RunPurpose> listByIdList(Collection<Long> idList) throws IOException {
     return listByIdList("purposeId", idList);
   }
 

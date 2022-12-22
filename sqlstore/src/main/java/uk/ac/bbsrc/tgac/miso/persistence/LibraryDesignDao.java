@@ -7,13 +7,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
 
-public interface LibraryDesignDao extends SaveDao<LibraryDesign> {
+public interface LibraryDesignDao extends BulkSaveDao<LibraryDesign> {
   
   LibraryDesign getByNameAndSampleClass(String name, SampleClass sampleClass) throws IOException;
 
   List<LibraryDesign> listByClass(SampleClass sampleClass) throws IOException;
-
-  List<LibraryDesign> listByIdList(List<Long> idList) throws IOException;
 
   long getUsage(LibraryDesign design) throws IOException;
 
