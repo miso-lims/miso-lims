@@ -98,8 +98,8 @@ Urls = (function() {
 
   var attachmentCategoryRestBase = restBase + '/attachmentcategories'
   rest.attachmentCategories = {
-    create: attachmentCategoryRestBase,
-    update: idUrlFunction(attachmentCategoryRestBase)
+    bulkSave: attachmentCategoryRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(attachmentCategoryRestBase + '/bulk')
   };
 
   // Boxes

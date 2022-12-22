@@ -184,7 +184,6 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("librarytemplate/1/indices/add?quantity=3");
     slugs.add("librarytemplate/1/indices/edit?positions=A01,A02");
     slugs.add("attachmentcategories/bulk/new?quantity=3");
-    slugs.add("attachmentcategories/bulk/edit?ids=1%2C2%2C3");
     slugs.add("sampletype/bulk/new?quantity=3");
     slugs.add("sequencingcontroltype/bulk/new?quantity=3");
     slugs.add("librarytype/bulk/new?quantity=3");
@@ -267,6 +266,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
 
     postPages = Collections.unmodifiableMap(new MapBuilder<String, Map<String, String>>()
         .put("assaytest/bulk/edit", unmodifiableMap("ids", "1,2,3"))
+        .put("attachmentcategories/bulk/edit", unmodifiableMap("ids", "1,2,3"))
         .put("box/bulk/edit", unmodifiableMap("ids", "500,501"))
         .put("boxuse/bulk/edit", unmodifiableMap("ids", "6,5"))
         .put("boxsize/bulk/edit", unmodifiableMap("ids", "1,2"))

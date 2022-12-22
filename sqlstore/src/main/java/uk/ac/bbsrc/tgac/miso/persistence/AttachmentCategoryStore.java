@@ -5,16 +5,10 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
 
-public interface AttachmentCategoryStore {
+public interface AttachmentCategoryStore extends BulkSaveDao<AttachmentCategory> {
 
-  public AttachmentCategory get(long id) throws IOException;
+  AttachmentCategory getByAlias(String alias) throws IOException;
 
-  public AttachmentCategory getByAlias(String alias) throws IOException;
-
-  public List<AttachmentCategory> list() throws IOException;
-
-  public long save(AttachmentCategory category) throws IOException;
-
-  public long getUsage(AttachmentCategory category);
+  long getUsage(AttachmentCategory category);
 
 }
