@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 import org.hibernate.SessionFactory;
@@ -90,6 +91,16 @@ public class HibernateTargetedSequencingDaoIT extends AbstractDAOTest {
 
     TargetedSequencing saved = (TargetedSequencing) currentSession().get(TargetedSequencing.class, 2L);
     assertEquals(description, saved.getDescription());
+  }
+
+  @Test
+  public void testListByIdList() throws Exception {
+    testListByIdList(dao::listByIdList, Arrays.asList(1L, 2L));
+  }
+
+  @Test
+  public void testListByIdListNone() throws Exception {
+    testListByIdListNone(dao::listByIdList);
   }
 
 }
