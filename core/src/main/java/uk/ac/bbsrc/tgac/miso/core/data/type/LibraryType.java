@@ -150,7 +150,7 @@ public class LibraryType implements Comparable<LibraryType>, Deletable, Identifi
   @Override
   public int hashCode() {
     if (getId() != UNSAVED_ID) {
-      return new Long(getId()).intValue();
+      return Long.valueOf(getId()).intValue();
     } else {
       int hashcode = -1;
       if (getDescription() != null) hashcode = 37 * hashcode + getDescription().hashCode();

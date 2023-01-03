@@ -34,7 +34,7 @@
   <bean id="passwordEncoder" class="org.springframework.security.crypto.factory.PasswordEncoderFactories" factory-method="createDelegatingPasswordEncoder" />
 
   <bean id="userAuthService" class="uk.ac.bbsrc.tgac.miso.webapp.context.MisoJdbcUserDetailsManager">
-    <property name="usersByUsernameQuery" value="SELECT loginName AS username, password AS password, active AS enabled, roles AS authority FROM User WHERE loginName=?" />
+    <property name="usersByUsernameQuery" value="SELECT loginName AS username, password AS password, active AS enabled FROM User WHERE loginName=?" />
     <property name="authoritiesByUsernameQuery" value="SELECT loginName AS username, roles AS authority, admin, internal FROM User WHERE loginName=?" />
     <property name="enableAuthorities" value="true" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />

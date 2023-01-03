@@ -12,8 +12,8 @@ required:
 
 Application Server:
 
-* JDK 11
-* Tomcat 8 or 9
+* JDK 17
+* Tomcat 9
 
 Database Server:
 
@@ -81,7 +81,7 @@ need to add a grant privilege to the MISO database from your remote machine:
 Download the [Flyway command line tool](https://flywaydb.org/download/community) version 5.2.4 and install it.
 Newer versions of Flyway may cause issues, and are not recommended.
 
-The application server needs Tomcat [8](https://tomcat.apache.org/download-80.cgi) or [9](https://tomcat.apache.org/download-90.cgi).
+The application server needs Tomcat [9](https://tomcat.apache.org/download-90.cgi).
 
 Create a file called `ROOT.xml` in the following directory
 `$CATALINA_HOME/conf/Catalina/localhost`, creating the directory if necessary,

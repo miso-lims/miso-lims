@@ -2,7 +2,7 @@
 ## Build miso-lims from current directory
 #######################################################
 
-FROM maven:3.6-openjdk-11 as builder
+FROM maven:3.8-eclipse-temurin-17 as builder
 # only re-initialize Maven when there's a POM change
 COPY pom.xml /miso-lims/
 COPY ./integration-tools/pom.xml /miso-lims/integration-tools/pom.xml
@@ -35,7 +35,7 @@ RUN mvn clean && mvn package -DskipTests
 ## Flyway database migration
 ## Adapted from https://github.com/flyway/flyway-docker/blob/v7.7.1/Dockerfile
 #######################################################
-FROM adoptopenjdk:11-jre-hotspot as flyway-migration
+FROM eclipse-temurin:17-jdk-jammy as flyway-migration
 
 # Add the flyway user and step in the directory
 RUN adduser --system --home /flyway --disabled-password --group flyway
@@ -68,7 +68,7 @@ ENTRYPOINT ["/run-flyway"]
 ## Tomcat webapp
 #######################################################
 
-FROM tomcat:9-jdk11-openjdk-slim as webapp
+FROM tomcat:9-jdk17-temurin as webapp
 
 COPY ./.docker/tomcat/setenv.sh /usr/local/tomcat/bin/
 COPY ./.docker/tomcat/logging.properties ${CATALINA_HOME}/conf/
