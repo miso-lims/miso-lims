@@ -1076,8 +1076,8 @@ Urls = (function() {
 
   var studyTypeRestBase = restBase + '/studytypes';
   rest.studyTypes = {
-    create: studyTypeRestBase,
-    update: idUrlFunction(studyTypeRestBase)
+    bulkSave: studyTypeRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(studyTypeRestBase + '/bulk')
   };
 
   // Submissions

@@ -7,6 +7,8 @@ import org.junit.Test;
 import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 
+import java.util.Arrays;
+
 public class HibernateStudyTypeDaoIT extends AbstractHibernateSaveDaoTest<StudyType, HibernateStudyTypeDao> {
 
   public HibernateStudyTypeDaoIT() {
@@ -47,6 +49,11 @@ public class HibernateStudyTypeDaoIT extends AbstractHibernateSaveDaoTest<StudyT
     assertEquals(6, getTestSubject().getUsage(type1));
     StudyType type2 = (StudyType) currentSession().get(StudyType.class, 2L);
     assertEquals(0, getTestSubject().getUsage(type2));
+  }
+
+  @Test
+  public void testListByIdList() throws Exception {
+    testListByIdList(HibernateStudyTypeDao::listByIdList, Arrays.asList(2L, 3L));
   }
 
 }

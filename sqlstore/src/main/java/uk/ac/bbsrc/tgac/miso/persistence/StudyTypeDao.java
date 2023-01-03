@@ -4,10 +4,10 @@ import java.io.IOException;
 
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 
-public interface StudyTypeDao extends SaveDao<StudyType> {
+public interface StudyTypeDao extends BulkSaveDao<StudyType> {
 
-  public StudyType getByName(String name) throws IOException;
+  StudyType getByName(String name) throws IOException;
 
-  public long getUsage(StudyType type) throws IOException;
+  long getUsage(StudyType type) throws IOException;
 
 }

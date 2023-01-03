@@ -1,9 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
 
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,16 +21,16 @@ public class HibernateStudyTypeDao extends HibernateSaveDao<StudyType> implement
 
   @Override
   public StudyType getByName(String name) throws IOException {
-    return (StudyType) currentSession().createCriteria(StudyType.class)
-        .add(Restrictions.eq("name", name))
-        .uniqueResult();
+    return getBy("name", name);
   }
 
   @Override
   public long getUsage(StudyType type) throws IOException {
-    return (long) currentSession().createCriteria(StudyImpl.class)
-        .add(Restrictions.eq("studyType", type))
-        .setProjection(Projections.rowCount()).uniqueResult();
+    return getUsageBy(StudyImpl.class, "studyType", type);
   }
 
+  @Override
+  public List<StudyType> listByIdList(Collection<Long> idList) throws IOException {
+    return listByIdList("typeId", idList);
+  }
 }
