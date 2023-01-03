@@ -747,8 +747,8 @@ Urls = (function() {
 
   var referenceGenomeRestBase = restBase + '/referencegenomes';
   rest.referenceGenomes = {
-    create: referenceGenomeRestBase,
-    update: idUrlFunction(referenceGenomeRestBase)
+    bulkSave: referenceGenomeRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(referenceGenomeRestBase + '/bulk')
   };
   
   // Requisitions
