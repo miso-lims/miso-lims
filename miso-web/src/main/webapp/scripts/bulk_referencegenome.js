@@ -30,8 +30,7 @@ BulkTarget.referencegenome = (function() {
           source: Constants.scientificNames,
           getItemLabel: Utils.array.getAlias,
           getItemValue: Utils.array.getId,
-          sortSource: true,
-          required: true
+          sortSource: true
         }
       ];
     }

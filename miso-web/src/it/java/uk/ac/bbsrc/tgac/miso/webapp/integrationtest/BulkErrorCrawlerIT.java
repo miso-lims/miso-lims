@@ -308,7 +308,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
         .put("pool/bulk/edit", unmodifiableMap("ids", "801,802"))
         .put("pool/bulk/merge",
             Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "801,802").put("proportions", "1,1").build()))
-        .put("referencegenomes/bulk/edit", unmodifiableMap("ids", "1,2,3"))
+        .put("referencegenome/bulk/edit", unmodifiableMap("ids", "1,2,3"))
         .put("runpurpose/bulk/edit", unmodifiableMap("ids", "2,1"))
         .put("sequencingparameters/bulk/edit", unmodifiableMap("ids", "2,4"))
         .put("detailedqcstatus/bulk/edit", unmodifiableMap("ids", "1,2"))
