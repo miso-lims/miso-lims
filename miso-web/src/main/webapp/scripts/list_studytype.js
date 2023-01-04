@@ -13,7 +13,7 @@ ListTarget.studytype = {
   },
   showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
-    var actions = HotTarget.studytype.getBulkActions(config);
+    var actions = BulkTarget.studytype.getBulkActions(config);
     if (config.isAdmin) {
       actions.push(ListUtils.createBulkDeleteAction('Study Types', 'studytypes', Utils.array.getName));
     }

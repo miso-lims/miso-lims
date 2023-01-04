@@ -203,7 +203,6 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("scientificname/bulk/new?quantity=3");
     slugs.add("referencegenome/bulk/new?quantity=3");
     slugs.add("studytype/bulk/new?quantity=3");
-    slugs.add("studytype/bulk/edit?ids=2%2C4");
     slugs.add("workstation/bulk/new?quantity=2");
     slugs.add("worksetcategory/bulk/new?quantity=2");
     slugs.add("worksetstage/bulk/new?quantity=2");
@@ -274,6 +273,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
         .put("sop/bulk/edit", unmodifiableMap("ids", "1,2"))
         .put("stain/bulk/edit", unmodifiableMap("ids", "1,2"))
         .put("staincategory/bulk/edit", unmodifiableMap("ids", "1,2,3"))
+        .put("studytype/bulk/edit", unmodifiableMap("ids", "2,4"))
         .put("pipeline/bulk/new", unmodifiableMap("quantity", "2"))
         .put("pipeline/bulk/edit", unmodifiableMap("ids", "1,2"))
         .put("runlibraryqcstatus/bulk/edit", unmodifiableMap("ids", "1,2"))
