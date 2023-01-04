@@ -2,12 +2,11 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Response.Status;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -29,19 +28,22 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.TargetedSequencingDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/targetedsequencings")
 public class TargetedSequencingRestController extends RestController {
 
+  private static final String TYPE_LABEL = "Targeted Sequencing";
+
   @Autowired
   private TargetedSequencingService targetedSequencingService;
-
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
-
   @Autowired
   private ConstantsController constantsController;
+  @Autowired
+  private AsyncOperationManager asyncOperationManager;
 
   private final JQueryDataTableBackend<TargetedSequencing, TargetedSequencingDto> jQueryBackend = new JQueryDataTableBackend<TargetedSequencing, TargetedSequencingDto>() {
     @Override
@@ -55,51 +57,36 @@ public class TargetedSequencingRestController extends RestController {
     }
   };
 
-  @GetMapping(value = "/{id}", produces = { "application/json" })
-  @ResponseBody
-  public TargetedSequencingDto getTargetedSequencing(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
-    TargetedSequencing targetedSequencing = targetedSequencingService.get(id);
-    if (targetedSequencing == null) {
-      throw new RestException("No targeted sequencing found with id: " + id, Status.NOT_FOUND);
-    } else {
-      return Dtos.asDto(targetedSequencing);
-    }
-  }
-
-  @GetMapping(value = "/", produces = { "application/json" })
-  @ResponseBody
-  public Set<TargetedSequencingDto> getTargetedSequencings(HttpServletResponse response) throws IOException {
-    return Dtos.asTargetedSequencingDtos(targetedSequencingService.list());
-  }
-
   @GetMapping(value = "/dt/kit/{id}/available", produces = "application/json")
   public @ResponseBody DataTablesResponseDto<TargetedSequencingDto> availableTargetedSequencings(@PathVariable("id") Long kitDescriptorId,
       HttpServletRequest request) throws IOException {
     return jQueryBackend.get(request, advancedSearchParser, new PaginationFilter[0]);
   }
 
-  @PostMapping
-  public @ResponseBody TargetedSequencingDto create(@RequestBody TargetedSequencingDto dto) throws IOException {
-    return RestUtils.createObject("Targeted Sequencing", dto, Dtos::to, targetedSequencingService, d -> {
-      constantsController.refreshConstants();
-      return Dtos.asDto(d);
-    });
+  @PostMapping("/bulk")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public @ResponseBody
+  ObjectNode bulkCreateAsync(@RequestBody List<TargetedSequencingDto> dtos) throws IOException {
+    return asyncOperationManager.startAsyncBulkCreate(TYPE_LABEL, dtos, Dtos::to, targetedSequencingService, true);
   }
 
-  @PutMapping("/{targetedSequencingId}")
-  public @ResponseBody TargetedSequencingDto update(@PathVariable long targetedSequencingId, @RequestBody TargetedSequencingDto dto)
-      throws IOException {
-    return RestUtils.updateObject("Targeted Sequencing", targetedSequencingId, dto, Dtos::to, targetedSequencingService, d -> {
-      constantsController.refreshConstants();
-      return Dtos.asDto(d);
-    });
+  @PutMapping("/bulk")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<TargetedSequencingDto> dtos) throws IOException {
+    return asyncOperationManager.startAsyncBulkUpdate(TYPE_LABEL, dtos, Dtos::to, targetedSequencingService, true);
+  }
+
+  @GetMapping("/bulk/{uuid}")
+  public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
+    return asyncOperationManager.getAsyncProgress(uuid, TargetedSequencing.class, targetedSequencingService, Dtos::asDto);
   }
 
   @PostMapping(value = "/bulk-delete")
   @ResponseBody
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
-    RestUtils.bulkDelete("Targeted Sequencing", ids, targetedSequencingService);
+  public void bulkDelete(@RequestBody List<Long> ids) throws IOException {
+    RestUtils.bulkDelete(TYPE_LABEL, ids, targetedSequencingService);
+    constantsController.refreshConstants();
   }
 
 }

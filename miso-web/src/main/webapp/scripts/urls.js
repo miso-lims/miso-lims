@@ -1115,10 +1115,9 @@ Urls = (function() {
 
   var targetedSequencingRestBase = restBase + '/targetedsequencings';
   rest.targetedSequencings = {
-    create: targetedSequencingRestBase,
-    update: idUrlFunction(targetedSequencingRestBase),
-    kitAvailableDatatable: middleIdUrlFunction(targetedSequencingRestBase + '/dt/kit', '/available'),
-    kitIncludedDatatable: middleIdUrlFunction(targetedSequencingRestBase + '/dt/kit', '/included')
+    bulkSave: targetedSequencingRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(targetedSequencingRestBase + '/bulk'),
+    kitAvailableDatatable: middleIdUrlFunction(targetedSequencingRestBase + '/dt/kit', '/available')
   };
 
   // Tissue Materials

@@ -1,7 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -32,6 +34,11 @@ public class HibernateTargetedSequencingDao extends HibernateSaveDao<TargetedSeq
   @Override
   public TargetedSequencing getByAlias(String alias) throws IOException {
     return getBy("alias", alias);
+  }
+
+  @Override
+  public List<TargetedSequencing> listByIdList(Collection<Long> idList) throws IOException {
+    return listByIdList("targetedSequencingId", idList);
   }
 
   @Override
@@ -78,5 +85,4 @@ public class HibernateTargetedSequencingDao extends HibernateSaveDao<TargetedSeq
   public String propertyForUser(boolean creator) {
     return null;
   }
-
 }
