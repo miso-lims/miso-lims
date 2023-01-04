@@ -1,15 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
+import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,70 +17,29 @@ import uk.ac.bbsrc.tgac.miso.persistence.LabDao;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateLabDao implements LabDao {
-  
-  protected static final Logger log = LoggerFactory.getLogger(HibernateLabDao.class);
-  
-  @Autowired
-  private SessionFactory sessionFactory;
+public class HibernateLabDao extends HibernateSaveDao<Lab> implements LabDao {
 
-  private Session currentSession() {
-    return getSessionFactory().getCurrentSession();
-  }
-
-  @Override
-  public List<Lab> list() {
-    Query query = currentSession().createQuery("from LabImpl");
-    @SuppressWarnings("unchecked")
-    List<Lab> labs = query.list();
-    return labs;
-  }
-
-  @Override
-  public Lab get(long id) {
-    return (Lab) currentSession().get(LabImpl.class, id);
+  public HibernateLabDao() {
+    super(LabImpl.class);
   }
 
   @Override
   public Lab getByAlias(String alias) {
-    return (Lab) currentSession().createCriteria(LabImpl.class)
-        .add(Restrictions.eq("alias", alias))
-        .uniqueResult();
-  }
-
-  @Override
-  public long create(Lab lab) {
-    return (Long) currentSession().save(lab);
-  }
-
-  @Override
-  public long update(Lab lab) {
-    currentSession().update(lab);
-    return lab.getId();
-  }
-
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
-  }
-
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
+    return getBy("alias", alias);
   }
 
   @Override
   public long getUsageByTissues(Lab lab) {
-    return (long) currentSession().createCriteria(SampleTissueImpl.class)
-        .add(Restrictions.eq("lab", lab))
-        .setProjection(Projections.rowCount())
-        .uniqueResult();
+    return getUsageBy(SampleTissueImpl.class, "lab", lab);
   }
 
   @Override
   public long getUsageByTransfers(Lab lab) {
-    return (long) currentSession().createCriteria(Transfer.class)
-        .add(Restrictions.eq("senderLab", lab))
-        .setProjection(Projections.rowCount())
-        .uniqueResult();
+    return getUsageBy(Transfer.class, "senderLab", lab);
   }
 
+  @Override
+  public List<Lab> listByIdList(Collection<Long> idList) throws IOException {
+    return listByIdList("id", idList);
+  }
 }

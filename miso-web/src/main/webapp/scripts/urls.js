@@ -381,8 +381,8 @@ Urls = (function() {
 
   var labRestBase = restBase + '/labs';
   rest.labs = {
-    create: labRestBase,
-    update: idUrlFunction(labRestBase)
+    bulkSave: labRestBase + '/bulk',
+    bulkSaveProgress: idUrlFunction(labRestBase + '/bulk')
   };
 
   // Libraries

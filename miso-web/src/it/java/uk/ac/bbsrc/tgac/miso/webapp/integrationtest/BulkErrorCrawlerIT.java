@@ -198,7 +198,6 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("boxsize/bulk/new?quantity=3");
     slugs.add("boxuse/bulk/new?quantity=3");
     slugs.add("lab/bulk/new?quantity=3");
-    slugs.add("lab/bulk/edit?ids=1%2C2");
     slugs.add("arraymodel/bulk/new?quantity=3");
     slugs.add("partitionqctype/bulk/new?quantity=3");
     slugs.add("runlibraryqcstatus/bulk/new?quantity=2");
@@ -294,6 +293,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
         .put("tissueorigin/bulk/edit", unmodifiableMap("ids", "4,3"))
         .put("tissuepiecetype/bulk/edit", unmodifiableMap("ids", "1"))
         .put("tissuetype/bulk/edit", unmodifiableMap("ids", "11,7"))
+        .put("lab/bulk/edit", unmodifiableMap("ids", "1,2"))
         .put("libraryaliquot/bulk/merge", unmodifiableMap("ids", "901,902"))
         .put("libraryaliquot/bulk/pool-separate", unmodifiableMap("ids", "901,902"))
         .put("libraryaliquot/bulk/pool",
