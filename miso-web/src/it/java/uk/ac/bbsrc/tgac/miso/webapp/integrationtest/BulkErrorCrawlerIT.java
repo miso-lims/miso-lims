@@ -276,7 +276,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
         .put("sop/bulk/edit", unmodifiableMap("ids", "1,2"))
         .put("stain/bulk/edit", unmodifiableMap("ids", "1,2"))
         .put("staincategory/bulk/edit", unmodifiableMap("ids", "1,2,3"))
-        .put("studytype/bulk/new", unmodifiableMap("quantity", "2,4"))
+        .put("studytype/bulk/edit", unmodifiableMap("quantity", "2,4"))
         .put("pipeline/bulk/new", unmodifiableMap("quantity", "2"))
         .put("pipeline/bulk/edit", unmodifiableMap("ids", "1,2"))
         .put("runlibraryqcstatus/bulk/edit", unmodifiableMap("ids", "1,2"))
