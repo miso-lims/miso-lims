@@ -5,8 +5,7 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayModel;
 
-public interface ArrayModelService extends DeleterService<ArrayModel>, SaveService<ArrayModel> {
-
-  public List<ArrayModel> list() throws IOException;
+public interface ArrayModelService extends BulkSaveService<ArrayModel>, DeleterService<ArrayModel>,
+    ListService<ArrayModel> {
 
 }

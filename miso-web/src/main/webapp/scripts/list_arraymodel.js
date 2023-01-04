@@ -9,7 +9,7 @@ ListTarget.arraymodel = {
   getQueryUrl: null,
   showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
-    var actions = HotTarget.arraymodel.getBulkActions(config);
+    var actions = BulkTarget.arraymodel.getBulkActions(config);
     if (config.isAdmin) {
       actions.push(ListUtils.createBulkDeleteAction('Array Models', 'arraymodels', Utils.array.getAlias));
     }
