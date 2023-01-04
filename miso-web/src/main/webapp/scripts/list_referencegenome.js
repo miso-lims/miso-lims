@@ -9,7 +9,7 @@ ListTarget.referencegenome = {
   getQueryUrl: null,
   showNewOptionSop: true,
   createBulkActions: function(config, projectId) {
-    var actions = HotTarget.referencegenome.getBulkActions(config);
+    var actions = BulkTarget.referencegenome.getBulkActions(config);
     if (config.isAdmin) {
       actions.push(ListUtils.createBulkDeleteAction('Reference Genomes', 'referencegenomes', Utils.array.getAlias));
     }
