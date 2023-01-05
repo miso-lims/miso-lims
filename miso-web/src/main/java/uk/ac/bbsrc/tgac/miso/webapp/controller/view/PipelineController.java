@@ -30,7 +30,7 @@ public class PipelineController extends AbstractTypeDataController<Pipeline, Pip
   private AuthorizationManager authorizationManager;
 
   public PipelineController() {
-    super("Pipelines", "pipeline", "pipeline", true);
+    super("Pipelines", "pipeline", "pipeline");
   }
 
   @GetMapping("/list")

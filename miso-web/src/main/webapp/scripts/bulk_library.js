@@ -109,7 +109,7 @@ BulkTarget.library = (function($) {
           {
             name: 'Make aliquots',
             action: function(items) {
-              HotUtils.warnIfConsentRevoked(items, function() {
+              Utils.warnIfConsentRevoked(items, function() {
                 BulkUtils.actions.showDialogForBoxCreation('Make Aliquots', 'Create', [], Urls.ui.libraryAliquots.bulkPropagate, function(
                     result) {
                   return {
@@ -121,19 +121,19 @@ BulkTarget.library = (function($) {
               });
             }
           },
-          HotUtils.printAction('library'),
-          HotUtils.spreadsheetAction(Urls.rest.libraries.spreadsheet, Constants.librarySpreadsheets, function(libraries, spreadsheet) {
+          BulkUtils.actions.print('library'),
+          BulkUtils.actions.download(Urls.rest.libraries.spreadsheet, Constants.librarySpreadsheets, function(libraries, spreadsheet) {
             var errors = [];
             return errors;
           }),
 
-          HotUtils.makeParents(Urls.rest.libraries.parents, HotUtils.relationCategoriesForDetailed()),
-          HotUtils.makeChildren(Urls.rest.libraries.children, [HotUtils.relations.libraryAliquot(), HotUtils.relations.pool(),
-              HotUtils.relations.run()])].concat(BulkUtils.actions.qc('Library')).concat(
+          BulkUtils.actions.parents(Urls.rest.libraries.parents, BulkUtils.relations.categoriesForDetailed()),
+          BulkUtils.actions.children(Urls.rest.libraries.children, [BulkUtils.relations.libraryAliquot(), BulkUtils.relations.pool(),
+              BulkUtils.relations.run()])].concat(BulkUtils.actions.qc('Library')).concat(
           [
-              config.worksetId ? HotUtils.makeRemoveFromWorkset('libraries', Urls.rest.worksets.removeLibraries(config.worksetId))
-                  : HotUtils.makeAddToWorkset('libraries', 'libraryIds', Urls.rest.worksets.addLibraries),
-              HotUtils.makeAttachFile('library', function(library) {
+              config.worksetId ? BulkUtils.actions.removeFromWorkset('libraries', Urls.rest.worksets.removeLibraries(config.worksetId))
+                  : BulkUtils.actions.addToWorkset('libraries', 'libraryIds', Urls.rest.worksets.addLibraries),
+              BulkUtils.actions.attachFile('library', function(library) {
                 return library.projectId;
               }), BulkUtils.actions.transfer('libraryIds')]);
     },

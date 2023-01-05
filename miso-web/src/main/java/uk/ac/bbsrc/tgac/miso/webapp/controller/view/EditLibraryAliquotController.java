@@ -173,11 +173,6 @@ public class EditLibraryAliquotController {
       config.putPOJO("box", newBox);
       config.set("defaultTargetedSequencingByProject", mapper.valueToTree(defaultTargetedSequencingByProject));
     }
-
-    @Override
-    protected boolean isNewInterface() {
-      return true;
-    }
   }
 
   protected static void setEffectiveAttributes(DetailedLibraryAliquotDto aliquot, GroupIdentifiable parent,
@@ -264,11 +259,6 @@ public class EditLibraryAliquotController {
       config.putPOJO("box", newBox);
       config.set("defaultTargetedSequencingByProject", mapper.valueToTree(defaultTargetedSequencingByProject));
     }
-
-    @Override
-    protected boolean isNewInterface() {
-      return true;
-    }
   }
 
   @PostMapping(value = "/bulk/propagate")
@@ -310,11 +300,6 @@ public class EditLibraryAliquotController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       // no config required
-    }
-
-    @Override
-    protected boolean isNewInterface() {
-      return true;
     }
   };
 
@@ -374,11 +359,6 @@ public class EditLibraryAliquotController {
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.putPOJO("box", newBox);
     }
-
-    @Override
-    protected boolean isNewInterface() {
-      return true;
-    }
   }
 
   @PostMapping(value = "/bulk/merge")
@@ -428,11 +408,6 @@ public class EditLibraryAliquotController {
       return prepare(model, PageMode.CREATE, "Create Pools from Library Aliquots", Collections.nCopies(poolQuantity, dto));
     }
 
-    @Override
-    protected boolean isNewInterface() {
-      return true;
-    }
-
   }
 
   @PostMapping(value = "/bulk/pool")
@@ -480,11 +455,6 @@ public class EditLibraryAliquotController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.putPOJO("box", newBox);
-    }
-
-    @Override
-    protected boolean isNewInterface() {
-      return true;
     }
   }
 

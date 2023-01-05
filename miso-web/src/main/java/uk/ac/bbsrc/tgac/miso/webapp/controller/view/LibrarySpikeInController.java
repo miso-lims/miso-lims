@@ -30,7 +30,7 @@ public class LibrarySpikeInController extends AbstractTypeDataController<Library
   private AuthorizationManager authorizationManager;
 
   public LibrarySpikeInController() {
-    super("Library Spike-Ins", "libraryspikein", "libraryspikein", true);
+    super("Library Spike-Ins", "libraryspikein", "libraryspikein");
   }
 
   @GetMapping("/list")

@@ -30,7 +30,7 @@ public class LibraryStrategyController extends AbstractTypeDataController<Librar
   private AuthorizationManager authorizationManager;
 
   public LibraryStrategyController() {
-    super("Library Strategy Types", "librarystrategy", "librarystrategy", true);
+    super("Library Strategy Types", "librarystrategy", "librarystrategy");
   }
 
   @GetMapping("/list")

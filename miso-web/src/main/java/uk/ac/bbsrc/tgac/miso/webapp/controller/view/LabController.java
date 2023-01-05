@@ -28,7 +28,7 @@ public class LabController extends AbstractTypeDataController<Lab, LabDto> {
   private AuthorizationManager authorizationManager;
 
   public LabController() {
-    super("Labs", "lab", "lab", true);
+    super("Labs", "lab", "lab");
   }
 
   @Override

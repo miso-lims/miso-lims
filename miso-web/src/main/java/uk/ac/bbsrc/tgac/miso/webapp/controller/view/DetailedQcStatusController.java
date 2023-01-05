@@ -30,7 +30,7 @@ public class DetailedQcStatusController extends AbstractTypeDataController<Detai
   private AuthorizationManager authorizationManager;
 
   public DetailedQcStatusController() {
-    super("Detailed QC Statuses", "detailedqcstatus", "detailedqcstatus", true);
+    super("Detailed QC Statuses", "detailedqcstatus", "detailedqcstatus");
   }
 
   @GetMapping("/list")

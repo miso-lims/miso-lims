@@ -30,7 +30,7 @@ public class LibrarySelectionController extends AbstractTypeDataController<Libra
   private AuthorizationManager authorizationManager;
 
   public LibrarySelectionController() {
-    super("Library Selection Types", "libraryselection", "libraryselection", true);
+    super("Library Selection Types", "libraryselection", "libraryselection");
   }
 
   @GetMapping("/list")

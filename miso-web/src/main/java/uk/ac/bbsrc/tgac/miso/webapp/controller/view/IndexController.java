@@ -38,7 +38,7 @@ public class IndexController extends AbstractTypeDataController<Index, IndexDto>
   private AuthorizationManager authorizationManager;
 
   public IndexController() {
-    super("Indices", "index", "index", true);
+    super("Indices", "index", "index");
   }
 
   @GetMapping("/bulk/new")

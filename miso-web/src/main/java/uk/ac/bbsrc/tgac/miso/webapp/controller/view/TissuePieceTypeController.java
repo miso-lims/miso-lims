@@ -29,7 +29,7 @@ public class TissuePieceTypeController extends AbstractTypeDataController<Tissue
   private AuthorizationManager authorizationManager;
 
   public TissuePieceTypeController() {
-    super("Tissue Piece Types", "tissuepiecetype", "tissuepiecetype", true);
+    super("Tissue Piece Types", "tissuepiecetype", "tissuepiecetype");
   }
 
   @GetMapping("/list")

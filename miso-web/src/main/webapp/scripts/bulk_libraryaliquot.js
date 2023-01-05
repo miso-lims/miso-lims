@@ -44,7 +44,7 @@ BulkTarget.libraryaliquot = (function($) {
           {
             name: 'Propagate',
             action: function(items) {
-              HotUtils.warnIfConsentRevoked(items, function() {
+              Utils.warnIfConsentRevoked(items, function() {
                 BulkUtils.actions.showDialogForBoxCreation('Create Library Aliquots', 'Create', [],
                     Urls.ui.libraryAliquots.bulkRepropagate, function(result) {
                       return {
@@ -59,7 +59,7 @@ BulkTarget.libraryaliquot = (function($) {
           {
             name: 'Create Order',
             action: function(items) {
-              HotUtils.warnIfConsentRevoked(items, function() {
+              Utils.warnIfConsentRevoked(items, function() {
                 window.location = Urls.ui.poolOrders.create + '?' + Utils.page.param({
                   aliquotIds: items.map(Utils.array.getId).join(',')
                 });
@@ -70,7 +70,7 @@ BulkTarget.libraryaliquot = (function($) {
             name: 'Pool Together',
             title: 'Create one pool from many library aliquots',
             action: function(items) {
-              HotUtils.warnIfConsentRevoked(items, function() {
+              Utils.warnIfConsentRevoked(items, function() {
                 var fields = [];
                 BulkUtils.actions.showDialogForBoxCreation('Create Pools', 'Create', fields, Urls.ui.libraryAliquots.bulkPoolTogether, function(
                     result) {
@@ -88,7 +88,7 @@ BulkTarget.libraryaliquot = (function($) {
             name: 'Pool Separately',
             title: 'Create a pool for each library aliquot',
             action: function(items) {
-              HotUtils.warnIfConsentRevoked(items, function() {
+              Utils.warnIfConsentRevoked(items, function() {
                 var fields = [];
                 BulkUtils.actions.showDialogForBoxCreation('Create Pools', 'Create', fields, Urls.ui.libraryAliquots.bulkPoolSeparate, function(
                     result) {
@@ -106,7 +106,7 @@ BulkTarget.libraryaliquot = (function($) {
             name: 'Pool Custom',
             title: 'Divide library aliquots into several pools',
             action: function(items) {
-              HotUtils.warnIfConsentRevoked(items, function() {
+              Utils.warnIfConsentRevoked(items, function() {
                 var fields = [{
                   label: 'Quantity',
                   property: 'quantity',
@@ -125,18 +125,18 @@ BulkTarget.libraryaliquot = (function($) {
             },
             allowOnLibraryPage: true
           },
-          HotUtils.printAction('libraryaliquot'),
-          HotUtils.spreadsheetAction(Urls.rest.libraryAliquots.spreadsheet, Constants.libraryAliquotSpreadsheets, function(aliquots,
+          BulkUtils.actions.print('libraryaliquot'),
+          BulkUtils.actions.download(Urls.rest.libraryAliquots.spreadsheet, Constants.libraryAliquotSpreadsheets, function(aliquots,
               spreadsheet) {
             var errors = [];
             return errors;
           }),
 
-          HotUtils.makeParents(Urls.rest.libraryAliquots.parents, HotUtils.relationCategoriesForDetailed().concat(
-              [HotUtils.relations.library()])),
-          HotUtils.makeChildren(Urls.rest.libraryAliquots.children, [HotUtils.relations.pool(), HotUtils.relations.run()]),
-          config.worksetId ? HotUtils.makeRemoveFromWorkset('library aliquots', Urls.rest.worksets.removeLibraryAliquots(config.worksetId))
-              : HotUtils.makeAddToWorkset('library aliquots', 'libraryAliquotIds', Urls.rest.worksets.addLibraryAliquots),
+          BulkUtils.actions.parents(Urls.rest.libraryAliquots.parents, BulkUtils.relations.categoriesForDetailed().concat(
+              [BulkUtils.relations.library()])),
+          BulkUtils.actions.children(Urls.rest.libraryAliquots.children, [BulkUtils.relations.pool(), BulkUtils.relations.run()]),
+          config.worksetId ? BulkUtils.actions.removeFromWorkset('library aliquots', Urls.rest.worksets.removeLibraryAliquots(config.worksetId))
+              : BulkUtils.actions.addToWorkset('library aliquots', 'libraryAliquotIds', Urls.rest.worksets.addLibraryAliquots),
           BulkUtils.actions.transfer('libraryAliquotIds')];
     },
     getFixedColumns: function(config) {

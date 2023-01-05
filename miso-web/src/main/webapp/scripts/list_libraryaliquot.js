@@ -20,7 +20,7 @@ ListTarget.libraryaliquot = {
     }) : BulkTarget.libraryaliquot.getBulkActions(config);
 
     if (config.worksetId) {
-      actions.push(HotUtils.makeMoveFromWorkset('library aliquots', Urls.rest.worksets.moveLibraryAliquots(config.worksetId)));
+      actions.push(BulkUtils.actions.moveFromWorkset('library aliquots', Urls.rest.worksets.moveLibraryAliquots(config.worksetId)));
     }
 
     actions.push({
@@ -47,7 +47,7 @@ ListTarget.libraryaliquot = {
     return config.library ? [{
       "name": "Create",
       "handler": function() {
-        HotUtils.warnIfConsentRevoked([config.library], function() {
+        Utils.warnIfConsentRevoked([config.library], function() {
           var fields = [ListUtils.createBoxField];
           Utils.showDialog('Make Library Aliquot', 'Create', fields, function(result) {
             var params = {

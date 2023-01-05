@@ -30,7 +30,7 @@ public class SequencingParametersController extends AbstractTypeDataController<S
   private AuthorizationManager authorizationManager;
 
   public SequencingParametersController() {
-    super("Sequencing Parameters", "sequencingparameters", "sequencingparameters", true);
+    super("Sequencing Parameters", "sequencingparameters", "sequencingparameters");
   }
 
   @GetMapping("/list")

@@ -29,7 +29,7 @@ public class TargetedSequencingController extends AbstractTypeDataController<Tar
   private AuthorizationManager authorizationManager;
 
   public TargetedSequencingController() {
-    super("Targeted Sequencings", "targetedsequencing", "targetedsequencing", true);
+    super("Targeted Sequencings", "targetedsequencing", "targetedsequencing");
   }
 
   @Override

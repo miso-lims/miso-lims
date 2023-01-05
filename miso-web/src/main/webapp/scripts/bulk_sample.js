@@ -76,7 +76,7 @@ BulkTarget.sample = (function($) {
           {
             name: "Propagate",
             action: function(samples) {
-              HotUtils.warnIfConsentRevoked(samples, function() {
+              Utils.warnIfConsentRevoked(samples, function() {
                 var idsString = samples.map(Utils.array.getId).join(",");
                 var classes = getSampleClasses(samples);
                 var sourceCategories = Utils.array.deduplicateString(classes.map(function(sampleClass) {
@@ -187,8 +187,8 @@ BulkTarget.sample = (function($) {
                 });
               });
             }
-          }, HotUtils.printAction('sample'),
-          HotUtils.spreadsheetAction(Urls.rest.samples.spreadsheet, Constants.sampleSpreadsheets.filter(function(sheet) {
+          }, BulkUtils.actions.print('sample'),
+          BulkUtils.actions.download(Urls.rest.samples.spreadsheet, Constants.sampleSpreadsheets.filter(function(sheet) {
             return Constants.isDetailedSample || sheet.allowedClasses.indexOf('Plain') !== -1;
           }), function(samples, spreadsheet) {
             var errors = [];
@@ -210,21 +210,21 @@ BulkTarget.sample = (function($) {
           })];
 
       if (Constants.isDetailedSample) {
-        actions.push(HotUtils.makeParents(Urls.rest.samples.parents, HotUtils.relationCategoriesForDetailed()));
+        actions.push(BulkUtils.actions.parents(Urls.rest.samples.parents, BulkUtils.relations.categoriesForDetailed()));
       }
 
-      actions.push(HotUtils.makeChildren(Urls.rest.samples.children, HotUtils.relationCategoriesForDetailed().concat(
-          [HotUtils.relations.library(), HotUtils.relations.libraryAliquot(), HotUtils.relations.pool(), HotUtils.relations.run()])));
+      actions.push(BulkUtils.actions.children(Urls.rest.samples.children, BulkUtils.relations.categoriesForDetailed().concat(
+          [BulkUtils.relations.library(), BulkUtils.relations.libraryAliquot(), BulkUtils.relations.pool(), BulkUtils.relations.run()])));
 
       actions = actions.concat(BulkUtils.actions.qc('Sample'));
 
       if (config && config.worksetId) {
-        actions.push(HotUtils.makeRemoveFromWorkset('samples', Urls.rest.worksets.removeSamples(config.worksetId)));
+        actions.push(BulkUtils.actions.removeFromWorkset('samples', Urls.rest.worksets.removeSamples(config.worksetId)));
       } else {
-        actions.push(HotUtils.makeAddToWorkset('samples', 'sampleIds', Urls.rest.worksets.addSamples));
+        actions.push(BulkUtils.actions.addToWorkset('samples', 'sampleIds', Urls.rest.worksets.addSamples));
       }
 
-      actions.push(HotUtils.makeAttachFile('sample', function(sample) {
+      actions.push(BulkUtils.actions.attachFile('sample', function(sample) {
         return sample.projectId;
       }), BulkUtils.actions.transfer('sampleIds'));
 

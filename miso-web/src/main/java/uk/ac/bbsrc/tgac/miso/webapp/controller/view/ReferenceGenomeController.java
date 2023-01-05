@@ -29,7 +29,7 @@ public class ReferenceGenomeController extends AbstractTypeDataController<Refere
   private AuthorizationManager authorizationManager;
 
   public ReferenceGenomeController() {
-    super("Reference Genomes", "referencegenome", "referencegenome", true);
+    super("Reference Genomes", "referencegenome", "referencegenome");
   }
 
   @GetMapping("/list")

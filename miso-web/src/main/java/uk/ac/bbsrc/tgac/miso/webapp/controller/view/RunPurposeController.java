@@ -29,7 +29,7 @@ public class RunPurposeController extends AbstractTypeDataController<RunPurpose,
   private AuthorizationManager authorizationManager;
 
   public RunPurposeController() {
-    super("Run Purposes", "runpurpose", "runpurpose", true);
+    super("Run Purposes", "runpurpose", "runpurpose");
   }
 
   @GetMapping("/list")

@@ -29,7 +29,7 @@ public class PartitionQcTypeController extends AbstractTypeDataController<Partit
   private AuthorizationManager authorizationManager;
 
   public PartitionQcTypeController() {
-    super("Partition QC Types", "partitionqctype", "partitionqctype", true);
+    super("Partition QC Types", "partitionqctype", "partitionqctype");
   }
 
   @GetMapping("/list")

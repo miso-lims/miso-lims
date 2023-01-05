@@ -83,11 +83,6 @@ public class EditLibraryTemplateController {
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
       // No config required
     }
-
-    @Override
-    protected boolean isNewInterface() {
-      return true;
-    }
   }
 
   private final class BulkEditLibraryTemplateBackend extends BulkEditTableBackend<LibraryTemplate, LibraryTemplateDto> {
@@ -109,11 +104,6 @@ public class EditLibraryTemplateController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       // No config required
-    }
-
-    @Override
-    protected boolean isNewInterface() {
-      return true;
     }
   };
 
@@ -185,11 +175,6 @@ public class EditLibraryTemplateController {
       config.set("libraryTemplate", mapper.valueToTree(Dtos.asDto(libraryTemplate)));
       config.set("indexFamily", mapper.valueToTree(Dtos.asDto(libraryTemplate.getIndexFamily())));
     }
-
-    @Override
-    protected boolean isNewInterface() {
-      return true;
-    }
   }
 
   @GetMapping("/{templateId}/indices/add")
@@ -222,12 +207,6 @@ public class EditLibraryTemplateController {
           .collect(Collectors.toList());
       return prepare(model, PageMode.EDIT, "Edit Library Template Indices", dtos);
     }
-
-    @Override
-    protected boolean isNewInterface() {
-      return true;
-    }
-
   }
 
   @GetMapping("/{templateId}/indices/edit")

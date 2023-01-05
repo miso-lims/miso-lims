@@ -30,7 +30,7 @@ public class LibraryDesignCodeController extends AbstractTypeDataController<Libr
   private AuthorizationManager authorizationManager;
 
   public LibraryDesignCodeController() {
-    super("Library Design Codes", "librarydesigncode", "librarydesigncode", true);
+    super("Library Design Codes", "librarydesigncode", "librarydesigncode");
   }
 
   @GetMapping("/list")

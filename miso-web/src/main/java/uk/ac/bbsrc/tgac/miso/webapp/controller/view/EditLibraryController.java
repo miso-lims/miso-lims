@@ -395,11 +395,6 @@ public class EditLibraryController {
       addJsonArray(mapper, config, "sops", sopService.listByCategory(SopCategory.LIBRARY), Dtos::asDto);
     }
 
-    @Override
-    protected boolean isNewInterface() {
-      return true;
-    }
-
   }
 
   @PostMapping(value = "/bulk/propagate")
@@ -442,11 +437,6 @@ public class EditLibraryController {
         config.put(Config.SHOW_DESCRIPTION, showDescription);
         config.put(Config.SHOW_VOLUME, showVolume);
         config.put(Config.SHOW_LIBRARY_ALIAS, showLibraryAlias);
-      }
-
-      @Override
-      protected boolean isNewInterface() {
-        return true;
       }
     };
     return backend.edit(libraryIds, model);
@@ -499,11 +489,6 @@ public class EditLibraryController {
         config.put(Config.SAMPLE_ALIAS_MAYBE_REQUIRED, !alwaysGenerateSampleAliases());
         config.put(Config.LIBRARY_ALIAS_MAYBE_REQUIRED, !alwaysGenerateLibraryAliases());
         addJsonArray(mapper, config, "recipientGroups", recipientGroups, Dtos::asDto);
-      }
-
-      @Override
-      protected boolean isNewInterface() {
-        return true;
       }
     };
     return backend.create(model);
