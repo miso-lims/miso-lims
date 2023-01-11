@@ -54,7 +54,7 @@ nav:
     - 29. European Nucleotide Archive Support: user_manual/european_nucleotide_archive_support.md
     - 30. Home Screen Widgets: user_manual/home_screen_widgets.md
     - 31. Other MISO Tools: user_manual/other_miso_tools.md
-    - 32. Dashi Integration: user_manual/dashi_integration.md
+    - 32. QC Software Integration: user_manual/qc_integration.md
     - 33. Related Software: user_manual/related_software.md
   - Developer Guide: developers-manual.md
   - Index Checker: index-checker.md
