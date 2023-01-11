@@ -34,7 +34,7 @@ public class SubprojectController extends AbstractTypeDataController<Subproject,
   private AuthorizationManager authorizationManager;
 
   public SubprojectController() {
-    super("Subprojects", "subproject", "subproject", true);
+    super("Subprojects", "subproject", "subproject");
   }
 
   @Override

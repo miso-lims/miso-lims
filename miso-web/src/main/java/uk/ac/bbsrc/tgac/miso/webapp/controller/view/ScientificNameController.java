@@ -30,7 +30,7 @@ public class ScientificNameController extends AbstractTypeDataController<Scienti
   private AuthorizationManager authorizationManager;
 
   public ScientificNameController() {
-    super("Scientific Names", "scientificname", "scientificname", true);
+    super("Scientific Names", "scientificname", "scientificname");
   }
 
   @GetMapping("/list")

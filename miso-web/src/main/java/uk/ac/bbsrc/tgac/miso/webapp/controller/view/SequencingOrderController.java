@@ -59,11 +59,6 @@ public class SequencingOrderController {
       protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
         // no config necessary
       }
-
-      @Override
-      protected boolean isNewInterface() {
-        return true;
-      }
     };
     return orderBulkPropagateBackend.propagate(poolIds, model);
   }

@@ -30,7 +30,7 @@ public class BoxUseController extends AbstractTypeDataController<BoxUse, BoxUseD
   private AuthorizationManager authorizationManager;
 
   public BoxUseController() {
-    super("Box Uses", "boxuse", "boxuse", true);
+    super("Box Uses", "boxuse", "boxuse");
   }
 
   @GetMapping("/list")

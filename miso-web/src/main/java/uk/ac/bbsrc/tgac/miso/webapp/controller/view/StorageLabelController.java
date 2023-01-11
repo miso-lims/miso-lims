@@ -28,7 +28,7 @@ public class StorageLabelController extends AbstractTypeDataController<StorageLa
   private AuthorizationManager authorizationManager;
 
   public StorageLabelController() {
-    super("Storage Labels", "storagelabel", "storagelabel", true);
+    super("Storage Labels", "storagelabel", "storagelabel");
   }
 
   @Override

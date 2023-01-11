@@ -13,8 +13,8 @@ ListTarget.identitysearch = (function($) {
               $('#list_samples').dataTable().fnFilter('identityId:' + idString);
             }
           },
-          HotUtils.makeChildren(Urls.rest.samples.children, HotUtils.relationCategoriesForDetailed().concat(
-              [HotUtils.relations.library(), HotUtils.relations.libraryAliquot(), HotUtils.relations.pool(), HotUtils.relations.run()]))];
+          BulkUtils.actions.children(Urls.rest.samples.children, BulkUtils.relations.categoriesForDetailed().concat(
+              [BulkUtils.relations.library(), BulkUtils.relations.libraryAliquot(), BulkUtils.relations.pool(), BulkUtils.relations.run()]))];
     },
     createStaticActions: function(config, projectId) {
       return [];

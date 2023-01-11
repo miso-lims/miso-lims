@@ -22,7 +22,7 @@ ListTarget.library = {
     var actions = BulkTarget.library.getBulkActions(config);
 
     if (config.worksetId) {
-      actions.push(HotUtils.makeMoveFromWorkset('libraries', Urls.rest.worksets.moveLibraries(config.worksetId)));
+      actions.push(BulkUtils.actions.moveFromWorkset('libraries', Urls.rest.worksets.moveLibraries(config.worksetId)));
     }
 
     actions.push({

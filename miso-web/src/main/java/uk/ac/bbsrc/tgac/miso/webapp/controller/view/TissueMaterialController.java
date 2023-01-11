@@ -28,7 +28,7 @@ public class TissueMaterialController extends AbstractTypeDataController<TissueM
   private AuthorizationManager authorizationManager;
 
   public TissueMaterialController() {
-    super("Tissue Materials", "tissuematerial", "tissuematerial", true);
+    super("Tissue Materials", "tissuematerial", "tissuematerial");
   }
 
   @GetMapping("/list")

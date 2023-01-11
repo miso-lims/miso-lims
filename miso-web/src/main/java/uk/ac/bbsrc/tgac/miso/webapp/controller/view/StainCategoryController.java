@@ -29,7 +29,7 @@ public class StainCategoryController extends AbstractTypeDataController<StainCat
   private AuthorizationManager authorizationManager;
 
   public StainCategoryController() {
-    super("Stain Categories", "staincategory", "staincategory", true);
+    super("Stain Categories", "staincategory", "staincategory");
   }
 
   @GetMapping("/list")

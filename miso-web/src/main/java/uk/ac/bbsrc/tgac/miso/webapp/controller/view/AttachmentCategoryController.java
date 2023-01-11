@@ -29,7 +29,7 @@ public class AttachmentCategoryController extends AbstractTypeDataController<Att
   private AuthorizationManager authorizationManager;
 
   public AttachmentCategoryController() {
-    super("Attachment Categories", "attachmentcategory", "attachmentcategory", true);
+    super("Attachment Categories", "attachmentcategory", "attachmentcategory");
   }
 
   @GetMapping("/list")

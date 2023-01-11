@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 ListTarget.run = {
   name: "Runs",
   getUserManualUrl: function() {
@@ -40,12 +17,12 @@ ListTarget.run = {
   getQueryUrl: null,
   createBulkActions: function(config, projectId) {
     return [
-        HotUtils.spreadsheetAction(Urls.rest.runs.spreadsheet, Constants.runLibrarySpreadsheets),
+        BulkUtils.actions.download(Urls.rest.runs.spreadsheet, Constants.runLibrarySpreadsheets),
         ListUtils.createBulkDeleteAction("Runs", "runs", function(run) {
           return run.alias;
         }),
-        HotUtils.makeParents(Urls.rest.runs.parents, HotUtils.relationCategoriesForDetailed().concat(
-            [HotUtils.relations.pool(), HotUtils.relations.library(), HotUtils.relations.libraryAliquot()]))];
+        BulkUtils.actions.parents(Urls.rest.runs.parents, BulkUtils.relations.categoriesForDetailed().concat(
+            [BulkUtils.relations.pool(), BulkUtils.relations.library(), BulkUtils.relations.libraryAliquot()]))];
   },
   createStaticActions: function(config, projectId) {
     if (!projectId && config.platformType) {

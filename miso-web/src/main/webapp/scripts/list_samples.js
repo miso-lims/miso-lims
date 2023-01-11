@@ -39,7 +39,7 @@ ListTarget.sample = (function() {
       }
 
       if (config.worksetId) {
-        actions.push(HotUtils.makeMoveFromWorkset('samples', Urls.rest.worksets.moveSamples(config.worksetId)));
+        actions.push(BulkUtils.actions.moveFromWorkset('samples', Urls.rest.worksets.moveSamples(config.worksetId)));
       }
 
       actions.push({

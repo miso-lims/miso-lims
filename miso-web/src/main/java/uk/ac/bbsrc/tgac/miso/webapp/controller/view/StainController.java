@@ -36,7 +36,7 @@ public class StainController extends AbstractTypeDataController<Stain, StainDto>
   private AuthorizationManager authorizationManager;
 
   public StainController() {
-    super("Stains", "stain", "stain", true);
+    super("Stains", "stain", "stain");
   }
 
   @GetMapping("/list")

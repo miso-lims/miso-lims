@@ -53,9 +53,4 @@ public abstract class BulkQcTable extends BulkTableBackend<QcDto> {
     config.put("qcTarget", qcTarget.getLabel());
   }
 
-  @Override
-  protected boolean isNewInterface() {
-    return true;
-  }
-
 }

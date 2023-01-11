@@ -24,7 +24,7 @@ import uk.ac.bbsrc.tgac.miso.dto.SequencingControlTypeDto;
 public class SequencingControlTypeController extends AbstractTypeDataController<SequencingControlType, SequencingControlTypeDto> {
 
   public SequencingControlTypeController() {
-    super("Sequencing Control Types", "sequencingcontroltype", "sequencingcontroltype", true);
+    super("Sequencing Control Types", "sequencingcontroltype", "sequencingcontroltype");
   }
 
   @Autowired

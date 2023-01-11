@@ -422,11 +422,6 @@ public class EditSampleController {
       addJsonArray(mapper, config, Config.PROJECTS, projectService.list(), Dtos::asDto);
       addJsonArray(mapper, config, Config.SOPS, sopService.listByCategory(SopCategory.SAMPLE), Dtos::asDto);
     }
-
-    @Override
-    protected boolean isNewInterface() {
-      return true;
-    }
   }
 
   private final class BulkPropagateSampleBackend extends BulkPropagateTableBackend<Sample, SampleDto> {
@@ -516,11 +511,6 @@ public class EditSampleController {
       addJsonArray(mapper, config, Config.PROJECTS, projectService.list(), Dtos::asDto);
       addJsonArray(mapper, config, Config.SOPS, sopService.listByCategory(SopCategory.SAMPLE), Dtos::asDto);
     }
-
-    @Override
-    protected boolean isNewInterface() {
-      return true;
-    }
   }
 
   private final class BulkCreateSampleBackend extends BulkCreateTableBackend<SampleDto> {
@@ -549,11 +539,6 @@ public class EditSampleController {
       config.putPOJO(Config.BOX, box);
       addJsonArray(mapper, config, "recipientGroups", recipientGroups, Dtos::asDto);
       addJsonArray(mapper, config, Config.SOPS, sopService.listByCategory(SopCategory.SAMPLE), Dtos::asDto);
-    }
-
-    @Override
-    protected boolean isNewInterface() {
-      return true;
     }
   }
 

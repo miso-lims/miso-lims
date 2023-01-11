@@ -30,7 +30,7 @@ public class StudyTypeController extends AbstractTypeDataController<StudyType, S
   private AuthorizationManager authorizationManager;
 
   public StudyTypeController() {
-    super("Study Types", "studytype", "studytype", true);
+    super("Study Types", "studytype", "studytype");
   }
 
   @GetMapping("/list")

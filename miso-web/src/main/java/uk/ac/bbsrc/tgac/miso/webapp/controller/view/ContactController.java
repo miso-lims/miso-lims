@@ -30,7 +30,7 @@ public class ContactController extends AbstractTypeDataController<Contact, Conta
   private AuthorizationManager authorizationManager;
 
   public ContactController() {
-    super("Contacts", "contact", "contact", true);
+    super("Contacts", "contact", "contact");
   }
 
   @GetMapping("/list")

@@ -30,7 +30,7 @@ public class ArrayModelController extends AbstractTypeDataController<ArrayModel,
   private AuthorizationManager authorizationManager;
 
   public ArrayModelController() {
-    super("Array Models", "arraymodel", "arraymodel", true);
+    super("Array Models", "arraymodel", "arraymodel");
   }
 
   @GetMapping("/list")

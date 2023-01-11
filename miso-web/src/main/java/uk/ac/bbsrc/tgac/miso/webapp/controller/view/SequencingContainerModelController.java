@@ -30,7 +30,7 @@ public class SequencingContainerModelController extends AbstractTypeDataControll
   private AuthorizationManager authorizationManager;
 
   public SequencingContainerModelController() {
-    super("Container Models", "containermodel", "containermodel", true);
+    super("Container Models", "containermodel", "containermodel");
   }
 
   @GetMapping("/list")

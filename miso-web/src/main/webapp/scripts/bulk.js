@@ -967,10 +967,356 @@ BulkUtils = (function($) {
         } else {
           showMetricsDialog(assays);
         }
+      },
+
+      print: function(type) {
+        return {
+          name: 'Print Barcode(s)',
+          action: function(items) {
+            Utils.printDialog(type, items.map(Utils.array.getId));
+          },
+          allowOnLibraryPage: true
+        };
+      },
+
+      download: function(url, sheets, generateErrors, name) {
+        return {
+          name: name || 'Download',
+          action: function(items) {
+            Utils.showDialog('Download Spreadsheet', 'Download', [{
+              property: 'sheet',
+              type: 'select',
+              label: 'Type',
+              values: sheets,
+              getLabel: function(x) {
+                return x.description;
+              }
+            }, {
+              property: 'format',
+              type: 'select',
+              label: 'Format',
+              values: Constants.spreadsheetFormats,
+              getLabel: function(x) {
+                return x.description;
+              }
+            }], function(result) {
+              var errors = generateErrors ? generateErrors(items, result) : [];
+              if (errors.length >= 1) {
+                Utils.showOkDialog("Error", errors);
+              } else {
+                Utils.ajaxDownloadWithDialog(url, {
+                  ids: items.map(Utils.array.getId),
+                  format: result.format.name,
+                  sheet: result.sheet.name
+                });
+              }
+            });
+          },
+          allowOnLibraryPage: true
+        };
+      },
+
+      parents: function(parentsByCategoryUrlFunction, parentCategories) {
+        return makeRelations(parentsByCategoryUrlFunction, 'Parents', parentCategories, true);
+      },
+
+      children: function(childrenByCategoryUrlFunction, childCategories) {
+        return makeRelations(childrenByCategoryUrlFunction, 'Children', childCategories, false);
+      },
+
+      addToWorkset: function(pluralLabel, idsField, getAddUrlForWorksetId) {
+        return {
+          name: 'Add to Workset',
+          action: function(items) {
+            var showAdded = function(pluralLabel, workset) {
+              Utils.showWizardDialog('Add to Workset', [{
+                name: 'Edit Workset',
+                handler: function() {
+                  window.location = Urls.ui.worksets.edit(workset.id);
+                }
+              }, {
+                name: 'Edit in New Tab',
+                handler: function() {
+                  window.open(Urls.ui.worksets.edit(workset.id));
+                }
+              }, {
+                name: 'Copy Link',
+                handler: function() {
+                  Utils.copyText(Utils.page.getBaseUrl() + Urls.ui.worksets.edit(workset.id));
+                  Utils.showOkDialog('Add to Workset', ['Workset URL copied to clipboard']);
+                }
+              }], 'The selected ' + pluralLabel + ' have been added to workset \'' + workset.alias + '\'.', 'Close');
+            };
+
+            var ids = items.map(Utils.array.getId);
+            Utils.showWizardDialog('Add to Workset', [{
+              name: 'Existing Workset',
+              handler: function() {
+                var doSearch = function() {
+                  var fields = [{
+                    label: 'Workset search',
+                    property: 'query',
+                    type: 'text',
+                    required: true
+                  }]
+                  Utils.showDialog('Add to Existing Workset', 'Search', fields, function(input) {
+                    Utils.ajaxWithDialog('Finding Worksets', 'GET', Urls.rest.worksets.query + '?' + Utils.page.param({
+                      q: input.query
+                    }), null, function(worksets) {
+                      var selectFields = [];
+                      if (!worksets || !worksets.length) {
+                        Utils.showOkDialog('Workset Search', ['No matching worksets found.'], doSearch);
+                      } else {
+                        worksets.forEach(function(workset) {
+                          selectFields.push({
+                            name: workset.alias,
+                            handler: function() {
+                              Utils.ajaxWithDialog('Adding to Workset', 'POST', getAddUrlForWorksetId(workset.id), ids, function() {
+                                showAdded(pluralLabel, workset);
+                              });
+                            }
+                          });
+                          Utils.showWizardDialog('Add to Existing Workset', selectFields);
+                        });
+                      }
+                    });
+                  });
+                }
+                doSearch();
+              }
+            }, {
+              name: 'New Workset',
+              handler: function() {
+                var workset = {};
+                workset[idsField] = ids;
+                FormUtils.createFormDialog('New Workset', workset, 'workset', {}, function(saved) {
+                  showAdded(pluralLabel, saved);
+                });
+              }
+            }]);
+          }
+        }
+      },
+
+      removeFromWorkset: function(pluralLabel, url) {
+        return {
+          name: 'Remove from Workset',
+          action: function(items) {
+            Utils.showConfirmDialog('Remove ' + pluralLabel, 'Remove', ['Remove these ' + items.length + ' ' + pluralLabel
+                + ' from the workset?'], function() {
+              var ids = items.map(Utils.array.getId);
+              Utils.ajaxWithDialog('Removing ' + pluralLabel, 'DELETE', url, ids, function() {
+                Utils.showOkDialog('Removed', [items.length + ' ' + pluralLabel + ' removed.'], function() {
+                  Utils.page.pageReload();
+                });
+              });
+            });
+          }
+        }
+      },
+
+      moveFromWorkset: function(pluralLabel, url) {
+        return {
+          name: "Move to Workset",
+          action: function(items) {
+            var fields = [{
+              label: 'Workset search',
+              property: 'query',
+              type: 'text',
+              required: true
+            }];
+            Utils.showDialog('Move to Workset', 'Search', fields, function(input) {
+              Utils.ajaxWithDialog('Finding Worksets', 'GET', Urls.rest.worksets.query + '?' + Utils.page.param({
+                q: input.query
+              }), null, function(worksets) {
+                if (!worksets || !worksets.length) {
+                  Utils.showOkDialog('Workset Search', ['No matching worksets found.'], doSearch);
+                } else {
+                  Utils.showWizardDialog('Move to Workset', worksets.map(function(workset) {
+                    return {
+                      name: workset.alias,
+                      handler: function() {
+                        var requestData = {
+                          targetWorksetId: workset.id,
+                          itemIds: items.map(Utils.array.getId)
+                        };
+                        Utils.ajaxWithDialog('Moving items', 'POST', url, requestData, function() {
+                          Utils.showOkDialog('Items moved', ['The selected ' + pluralLabel + ' have been moved to workset \'' + workset.alias
+                              + '\'.'], Utils.page.pageReload);
+                        });
+                      }
+                    };
+                  }));
+                }
+              });
+            });
+          }
+        }
+      },
+
+      attachFile: function(entityType, getProjectId) {
+        return {
+          name: 'Attach Files',
+          action: function(items) {
+            var ids = items.map(Utils.array.getId).join(",");
+            var projects = Utils.array.deduplicateNumeric(items.map(getProjectId));
+            if (projects.length > 1) {
+              ListTarget.attachment.showUploadDialog(entityType, 'shared', ids);
+            } else {
+              Utils.showWizardDialog('Attach Files', [{
+                name: 'Upload New Files',
+                handler: function() {
+                  ListTarget.attachment.showUploadDialog(entityType, 'shared', ids);
+                }
+              }, {
+                name: 'Link Project File',
+                handler: function() {
+                  ListTarget.attachment.showLinkDialog(entityType, 'shared', projects[0], ids);
+                }
+              }]);
+            }
+          }
+        }
+      }
+    },
+
+    relations: {
+      library: function() {
+        return {
+          "name": "Library",
+          "getBulkActions": BulkTarget.library.getBulkActions,
+          "config": {},
+          "index": Constants.sampleCategories.length + 1
+        };
+      },
+      libraryAliquot: function() {
+        return {
+          "name": "Library Aliquot",
+          "getBulkActions": BulkTarget.libraryaliquot.getBulkActions,
+          "config": {},
+          "index": Constants.sampleCategories.length + 2
+        };
+      },
+      pool: function() {
+        return {
+          "name": "Pool",
+          "getBulkActions": BulkTarget.pool.getBulkActions,
+          "config": {},
+          "index": Constants.sampleCategories.length + 3
+        };
+      },
+      run: function() {
+        return {
+          "name": "Run",
+          "getBulkActions": ListTarget.run.createBulkActions,
+          "config": {},
+          "index": Constants.sampleCategories.length + 4
+        };
+      },
+      categoriesForDetailed: function() {
+        return Constants.isDetailedSample ? Constants.sampleCategories.map(function(category) {
+          return {
+            "name": category,
+            "getBulkActions": BulkTarget.sample.getBulkActions,
+            "config": {},
+            "index": Constants.sampleCategories.indexOf(category)
+          };
+        }) : [{
+          "name": "Sample",
+          "getBulkActions": BulkTarget.sample.getBulkActions,
+          "config": {},
+          "index": Constants.sampleCategories.length
+        }];
       }
     }
 
   };
+
+  function makeRelations(categoryUrlFunction, relationship, relationCategories, useParentBound) {
+    return {
+      name: relationship,
+      action: function(items) {
+        function makeCategoriesFilter(items) {
+          if (!Constants.isDetailedSample) {
+            return function(category) {
+              if (useParentBound) {
+                return category.index >= Constants.sampleCategories.length;
+              }
+              return category.index > Constants.sampleCategories.length;
+            };
+          }
+          var childBound = Constants.sampleCategories.length - 1;
+          var parentBound = 0;
+          for (sample in items) {
+            var sampleClass = Constants.sampleClasses.find(function(sampleClass) {
+              return sampleClass.id == items[sample].sampleClassId;
+            });
+            if (sampleClass) {
+              var index = Constants.sampleCategories.indexOf(sampleClass.sampleCategory);
+              if (index > parentBound) {
+                parentBound = index;
+              }
+              if (index < childBound) {
+                childBound = index;
+              }
+            } else if (items[sample].type === 'Identity') {
+              childBound = 1;
+            } else {
+              parentBound = Constants.sampleCategories.length - 1;
+            }
+          }
+          if (useParentBound) {
+            return function(category) {
+              return category.index <= parentBound || category.index >= Constants.sampleCategories.length;
+            };
+          } else {
+            return function(category) {
+              return category.index >= childBound;
+            }
+          }
+        }
+
+        var actions = relationCategories.filter(makeCategoriesFilter(items)).map(function(category) {
+          return {
+            "name": category.name,
+            "handler": function() {
+              Utils.ajaxWithDialog('Searching', 'POST', categoryUrlFunction(category.name), items.map(function(s) {
+                return s.id;
+              }), function(relations) {
+                var selectedActions = category.getBulkActions(category.config).filter(function(bulkAction) {
+                  return !!bulkAction;
+                }).map(function(bulkAction) {
+                  return {
+                    "name": bulkAction.name,
+                    "handler": function() {
+                      bulkAction.action(relations);
+                    }
+                  };
+                });
+                selectedActions.unshift({
+                  "name": "View Selected",
+                  "handler": function() {
+                    Utils.showOkDialog(category.name + ' ' + relationship, relations.map(function(relation) {
+                      return relation.name + (relation.alias ? ' (' + relation.alias + ')' : '');
+                    }), showActionDialog);
+                  }
+                });
+                var showActionDialog = function() {
+                  Utils.showWizardDialog(category.name + ' Actions', selectedActions);
+                };
+                showActionDialog();
+              });
+            }
+          };
+        })
+        if (actions.length == 1) {
+          actions[0].handler();
+        } else {
+          Utils.showWizardDialog(relationship, actions);
+        }
+      }
+    };
+  }
 
   function makeTable(target, config, data) {
     var hotContainer = document.getElementById(CONTAINER_ID);

@@ -24,7 +24,7 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleTypeDto;
 public class SampleTypeController extends AbstractTypeDataController<SampleType, SampleTypeDto> {
 
   public SampleTypeController() {
-    super("Sample Types", "sampletype", "sampletype", true);
+    super("Sample Types", "sampletype", "sampletype");
   }
 
   @Autowired

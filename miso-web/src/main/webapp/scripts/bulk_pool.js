@@ -106,12 +106,12 @@ BulkTarget.pool = (function($) {
             });
           }
         },
-        HotUtils.printAction('pool'),
-        HotUtils.spreadsheetAction(Urls.rest.pools.spreadsheet, Constants.poolSpreadsheets, function(pools, spreadsheet) {
+        BulkUtils.actions.print('pool'),
+        BulkUtils.actions.download(Urls.rest.pools.spreadsheet, Constants.poolSpreadsheets, function(pools, spreadsheet) {
           var errors = [];
           return errors;
         }),
-        HotUtils.spreadsheetAction(Urls.rest.pools.contentsSpreadsheet, Constants.libraryAliquotSpreadsheets, function(aliquots,
+        BulkUtils.actions.download(Urls.rest.pools.contentsSpreadsheet, Constants.libraryAliquotSpreadsheets, function(aliquots,
           spreadsheet) {
           var errors = [];
           return errors;
@@ -120,9 +120,9 @@ BulkTarget.pool = (function($) {
           name: "Create Samplesheet",
           action: createSamplesheet
         },
-        HotUtils.makeParents(Urls.rest.pools.parents, HotUtils.relationCategoriesForDetailed().concat(
-          [HotUtils.relations.library(), HotUtils.relations.libraryAliquot()])),
-        HotUtils.makeChildren(Urls.rest.pools.children, [HotUtils.relations.run()])
+        BulkUtils.actions.parents(Urls.rest.pools.parents, BulkUtils.relations.categoriesForDetailed().concat(
+          [BulkUtils.relations.library(), BulkUtils.relations.libraryAliquot()])),
+        BulkUtils.actions.children(Urls.rest.pools.children, [BulkUtils.relations.run()])
       ]
       .concat(BulkUtils.actions.qc('Pool'))
       .concat([

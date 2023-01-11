@@ -28,7 +28,7 @@ public class TissueOriginController extends AbstractTypeDataController<TissueOri
   private AuthorizationManager authorizationManager;
 
   public TissueOriginController() {
-    super("Tissue Origins", "tissueorigin", "tissueorigin", true);
+    super("Tissue Origins", "tissueorigin", "tissueorigin");
   }
 
   @GetMapping("/list")

@@ -35,7 +35,7 @@ public class BoxSizeController extends AbstractTypeDataController<BoxSize, BoxSi
   private AuthorizationManager authorizationManager;
 
   public BoxSizeController() {
-    super("Box Sizes", "boxsize", "boxsize", true);
+    super("Box Sizes", "boxsize", "boxsize");
   }
 
   @GetMapping("/list")

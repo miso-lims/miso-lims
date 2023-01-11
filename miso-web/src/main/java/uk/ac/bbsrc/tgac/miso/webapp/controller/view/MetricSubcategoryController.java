@@ -28,7 +28,7 @@ public class MetricSubcategoryController extends AbstractTypeDataController<Metr
   private AuthorizationManager authorizationManager;
 
   public MetricSubcategoryController() {
-    super("Metric Subcategories", "metricsubcategory", "metricsubcategory", true);
+    super("Metric Subcategories", "metricsubcategory", "metricsubcategory");
   }
 
   @Override
