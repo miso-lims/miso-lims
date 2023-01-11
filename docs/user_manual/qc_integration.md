@@ -1,12 +1,13 @@
-# Dashi Integration
+# QC Software Integration
 
 ## Run-Library Metrics
 
-Dashi's "QC in MISO" button links to the Run-Library Metrics page in MISO, bringing some Dashi data with it. For each
-library in the run, metrics are displayed, along with the thresholds that you set in Dashi. Any failing metrics are
-displayed with a red background. The effective QC status column shows "Failed" if any item in the hierarchy is failed,
-"Passed" if everything is passed, or "Pending." Using the controls in the table, you can set the QC status of the
-run-libraries or related items.
+QC systems that have been integrated with MISO have "QC in MISO" buttons linking to the Run-Library Metrics page in
+MISO. For each run-library included, metrics are displayed, along with their corresponding thresholds. These metrics
+and thresholds are determined by the QC system, and may or may not be based on the assays defined in MISO. Any failing
+metrics are displayed with a red background. The effective QC status column shows "Failed" if any item in the hierarchy
+is failed, "Passed" if everything is passed, or "Pending." Using the controls in the table, you can set the QC status
+of the run-libraries or related items.
 
 ### Setting Run-Library QC Status
 
