@@ -7,6 +7,39 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.52.0] - 2023-01-12
+
+### Added
+
+* Concentration column on sample Tracking Sheet downloads
+
+### Changed
+
+* Updated MISO to run on Java 17
+
+### Fixed
+
+* Performance and accessibility improvements for the following bulk pages
+  * Array Models
+  * Attachment Categories
+  * Labs
+  * Reference Genomes
+  * Study Types
+  * Targeted Sequencing
+
+### Upgrade Notes
+
+* Updated to Runscanner 1.14.0. This release requires Java 17.
+* MISO has been updated to use Java 17. If you use Docker to run MISO, you
+  don't need to worry about this as the images have been updated as required.
+  If you build MISO from source, run the Flyway command-line tool, or run MISO
+  on your own Tomcat installation, you will need to have JDK 17 or higher
+  installed and ensure that Tomcat is configured to use the newly installed
+  JDK. We are also discontinuing support for Tomcat 8, and recommend running
+  MISO on Tomcat 9
+* Updated to Pinery 2.24.0. This release requires Java 17.
+
+
 ## [1.51.2] - 2022-12-15
 
 ### Fixed
