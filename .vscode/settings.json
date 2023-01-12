@@ -1,0 +1,17 @@
+{
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.format.settings.url": ".vscode/eclipse-java-google-style.xml",
+    "[java]": {
+        "editor.defaultFormatter": "redhat.java",
+        "editor.formatOnSaveMode": "file",
+        "editor.formatOnSave": true
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+        "editor.formatOnSaveMode": "file"
+    },
+    "editor.tabSize": 2,
+    "java.saveActions.organizeImports": true,
+    "java.sources.organizeImports.staticStarThreshold": 2
+}
