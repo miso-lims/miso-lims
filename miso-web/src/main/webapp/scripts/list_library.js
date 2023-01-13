@@ -244,7 +244,7 @@ ListTarget.library = {
     ];
   },
   searchTermSelector: function (searchTerms) {
-    const plainSampleTerms = [
+    var plainSampleTerms = [
       searchTerms["id"],
       searchTerms["barcode"],
       searchTerms["created"],
@@ -261,7 +261,7 @@ ListTarget.library = {
       searchTerms["distributedto"],
       searchTerms["workstation"],
     ];
-    const detailedSampleTerms = [
+    var detailedSampleTerms = [
       searchTerms["tissueOrigin"],
       searchTerms["tissueType"],
       searchTerms["groupid"],

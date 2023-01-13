@@ -1305,7 +1305,7 @@ BulkTarget.sample = (function ($) {
       );
 
       if (Constants.isDetailedSample) {
-        function filterBySubcategory(subcategories) {
+        var filterBySubcategory = function (subcategories) {
           columns = columns.filter(function (column) {
             if (!column.sampleSubcategory) {
               return true;
@@ -1317,7 +1317,7 @@ BulkTarget.sample = (function ($) {
               return subcategories.indexOf(column.sampleSubcategory) !== -1;
             }
           });
-        }
+        };
 
         if (config.targetSampleClass) {
           filterBySubcategory(

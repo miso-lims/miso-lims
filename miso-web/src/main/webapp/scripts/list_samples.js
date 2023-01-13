@@ -292,7 +292,7 @@ ListTarget.sample = (function () {
       ];
     },
     searchTermSelector: function (searchTerms) {
-      const plainSampleTerms = [
+      var plainSampleTerms = [
         searchTerms["id"],
         searchTerms["barcode"],
         searchTerms["requisition"],
@@ -307,7 +307,7 @@ ListTarget.sample = (function () {
         searchTerms["distributed"],
         searchTerms["distributedto"],
       ];
-      const detailedSampleTerms = [
+      var detailedSampleTerms = [
         searchTerms["created"],
         searchTerms["class"],
         searchTerms["tissueOrigin"],
