@@ -1,6 +1,5 @@
 BulkTarget = window.BulkTarget || {};
-BulkTarget.libraryspikein = (function() {
-
+BulkTarget.libraryspikein = (function () {
   /*
    * Expected config: {
    *   pageMode: string {create, edit}
@@ -9,21 +8,20 @@ BulkTarget.libraryspikein = (function() {
    */
 
   return {
-    getSaveUrl: function() {
+    getSaveUrl: function () {
       return Urls.rest.librarySpikeIns.bulkSave;
     },
-    getSaveProgressUrl: function(operationId) {
+    getSaveProgressUrl: function (operationId) {
       return Urls.rest.librarySpikeIns.bulkSaveProgress(operationId);
     },
-    getUserManualUrl: function() {
-      return Urls.external.userManual('type_data', 'library-spike-ins');
+    getUserManualUrl: function () {
+      return Urls.external.userManual("type_data", "library-spike-ins");
     },
-    getBulkActions: function(config) {
+    getBulkActions: function (config) {
       return !config.isAdmin ? [] : [BulkUtils.actions.edit(Urls.ui.librarySpikeIns.bulkEdit)];
     },
-    getColumns: function(config, api) {
+    getColumns: function (config, api) {
       return [BulkUtils.columns.simpleAlias(255)];
-    }
+    },
   };
-
 })();

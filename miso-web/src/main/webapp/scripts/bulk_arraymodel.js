@@ -1,6 +1,5 @@
 BulkTarget = window.BulkTarget || {};
-BulkTarget.arraymodel = (function($) {
-
+BulkTarget.arraymodel = (function ($) {
   /*
    * Expected config: {
    *   pageMode: string {create, edit}
@@ -9,33 +8,36 @@ BulkTarget.arraymodel = (function($) {
    */
 
   return {
-    getSaveUrl: function() {
+    getSaveUrl: function () {
       return Urls.rest.arrayModels.bulkSave;
     },
-    getSaveProgressUrl: function(operationId) {
+    getSaveProgressUrl: function (operationId) {
       return Urls.rest.arrayModels.bulkSaveProgress(operationId);
     },
-    getUserManualUrl: function() {
-      return Urls.external.userManual('type_data', 'array-models');
+    getUserManualUrl: function () {
+      return Urls.external.userManual("type_data", "array-models");
     },
-    getBulkActions: function(config) {
+    getBulkActions: function (config) {
       return !config.isAdmin ? [] : [BulkUtils.actions.edit(Urls.ui.arrayModels.bulkEdit)];
     },
-    getColumns: function(config, api) {
-      return [BulkUtils.columns.simpleAlias(255), {
-        title: 'Rows',
-        data: 'rows',
-        type: 'int',
-        required: true,
-        min: 1
-      }, {
-        title: 'Columns',
-        data: 'columns',
-        type: 'int',
-        required: true,
-        min: 1
-      }];
-    }
+    getColumns: function (config, api) {
+      return [
+        BulkUtils.columns.simpleAlias(255),
+        {
+          title: "Rows",
+          data: "rows",
+          type: "int",
+          required: true,
+          min: 1,
+        },
+        {
+          title: "Columns",
+          data: "columns",
+          type: "int",
+          required: true,
+          min: 1,
+        },
+      ];
+    },
   };
-
 })(jQuery);

@@ -1,6 +1,5 @@
 BulkTarget = window.BulkTarget || {};
-BulkTarget.staincategory = (function($) {
-
+BulkTarget.staincategory = (function ($) {
   /*
    * Expected config: {
    *   pageMode: string {create, edit}
@@ -9,27 +8,28 @@ BulkTarget.staincategory = (function($) {
    */
 
   return {
-    getSaveUrl: function() {
+    getSaveUrl: function () {
       return Urls.rest.stainCategories.bulkSave;
     },
-    getSaveProgressUrl: function(operationId) {
+    getSaveProgressUrl: function (operationId) {
       return Urls.rest.stainCategories.bulkSaveProgress(operationId);
     },
-    getUserManualUrl: function() {
-      return Urls.external.userManual('type_data', 'stains');
+    getUserManualUrl: function () {
+      return Urls.external.userManual("type_data", "stains");
     },
-    getBulkActions: function(config) {
+    getBulkActions: function (config) {
       return !config.isAdmin ? [] : [BulkUtils.actions.edit(Urls.ui.stainCategories.bulkEdit)];
     },
-    getColumns: function(config, api) {
-      return [{
-        title: 'Name',
-        data: 'name',
-        type: 'text',
-        required: true,
-        maxLength: 20
-      }];
-    }
+    getColumns: function (config, api) {
+      return [
+        {
+          title: "Name",
+          data: "name",
+          type: "text",
+          required: true,
+          maxLength: 20,
+        },
+      ];
+    },
   };
-
 })(jQuery);

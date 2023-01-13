@@ -1,6 +1,5 @@
 BulkTarget = window.BulkTarget || {};
-BulkTarget.sequencingcontroltype = (function($) {
-
+BulkTarget.sequencingcontroltype = (function ($) {
   /*
    * Expected config: {
    *   pageMode: string {create, edit}
@@ -9,21 +8,22 @@ BulkTarget.sequencingcontroltype = (function($) {
    */
 
   return {
-    getSaveUrl: function() {
+    getSaveUrl: function () {
       return Urls.rest.sequencingControlTypes.bulkSave;
     },
-    getSaveProgressUrl: function(operationId) {
+    getSaveProgressUrl: function (operationId) {
       return Urls.rest.sequencingControlTypes.bulkSaveProgress(operationId);
     },
-    getUserManualUrl: function() {
-      return Urls.external.userManual('type_data', 'sequencing-control-types');
+    getUserManualUrl: function () {
+      return Urls.external.userManual("type_data", "sequencing-control-types");
     },
-    getBulkActions: function(config) {
-      return !config.isAdmin ? [] : [BulkUtils.actions.edit(Urls.ui.sequencingControlTypes.bulkEdit)];
+    getBulkActions: function (config) {
+      return !config.isAdmin
+        ? []
+        : [BulkUtils.actions.edit(Urls.ui.sequencingControlTypes.bulkEdit)];
     },
-    getColumns: function(config, api) {
+    getColumns: function (config, api) {
       return [BulkUtils.columns.simpleAlias(255)];
-    }
+    },
   };
-
 })(jQuery);
