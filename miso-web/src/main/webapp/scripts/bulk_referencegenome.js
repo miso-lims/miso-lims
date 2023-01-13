@@ -1,6 +1,5 @@
 BulkTarget = window.BulkTarget || {};
-BulkTarget.referencegenome = (function() {
-
+BulkTarget.referencegenome = (function () {
   /*
    * Expected config: {
    *   pageMode: string {create, edit}
@@ -9,31 +8,31 @@ BulkTarget.referencegenome = (function() {
    */
 
   return {
-    getSaveUrl: function() {
+    getSaveUrl: function () {
       return Urls.rest.referenceGenomes.bulkSave;
     },
-    getSaveProgressUrl: function(operationId) {
+    getSaveProgressUrl: function (operationId) {
       return Urls.rest.referenceGenomes.bulkSaveProgress(operationId);
     },
-    getUserManualUrl: function() {
-      return Urls.external.userManual('type_data', 'reference-genomes');
+    getUserManualUrl: function () {
+      return Urls.external.userManual("type_data", "reference-genomes");
     },
-    getBulkActions: function(config) {
+    getBulkActions: function (config) {
       return !config.isAdmin ? [] : [BulkUtils.actions.edit(Urls.ui.referenceGenomes.bulkEdit)];
     },
-    getColumns: function(config, api) {
+    getColumns: function (config, api) {
       return [
-        BulkUtils.columns.simpleAlias(255), {
-          title: 'Default Sci. Name',
-          type: 'dropdown',
-          data: 'defaultScientificNameId',
+        BulkUtils.columns.simpleAlias(255),
+        {
+          title: "Default Sci. Name",
+          type: "dropdown",
+          data: "defaultScientificNameId",
           source: Constants.scientificNames,
           getItemLabel: Utils.array.getAlias,
           getItemValue: Utils.array.getId,
-          sortSource: true
-        }
+          sortSource: true,
+        },
       ];
-    }
+    },
   };
-
 })();

@@ -1,6 +1,5 @@
 BulkTarget = window.BulkTarget || {};
-BulkTarget.subproject = (function($) {
-
+BulkTarget.subproject = (function ($) {
   /*
    * Expected config: {
    *   pageMode: string {create, edit}
@@ -9,41 +8,45 @@ BulkTarget.subproject = (function($) {
    */
 
   return {
-    getSaveUrl: function() {
+    getSaveUrl: function () {
       return Urls.rest.subprojects.bulkSave;
     },
-    getSaveProgressUrl: function(operationId) {
+    getSaveProgressUrl: function (operationId) {
       return Urls.rest.subprojects.bulkSaveProgress(operationId);
     },
-    getUserManualUrl: function() {
-      return Urls.external.userManual('projects', 'subprojects');
+    getUserManualUrl: function () {
+      return Urls.external.userManual("projects", "subprojects");
     },
-    getBulkActions: function(config) {
+    getBulkActions: function (config) {
       return !config.isAdmin ? [] : [BulkUtils.actions.edit(Urls.ui.subprojects.bulkEdit)];
     },
-    getColumns: function(config, api) {
-      return [{
-        title: 'Project',
-        type: 'dropdown',
-        data: 'parentProjectId',
-        source: config.projects,
-        getItemLabel: Utils.array.getAlias,
-        getItemValue: Utils.array.getId,
-        sortSource: true,
-        required: true,
-        disabled: config.pageMode === 'edit'
-      }, BulkUtils.columns.simpleAlias(255), BulkUtils.columns.description,
-      BulkUtils.columns.makeBoolean('Priority', 'priority', true), {
-        title: 'Reference Genome',
-        data: 'referenceGenomeId',
-        type: 'dropdown',
-        source: Constants.referenceGenomes,
-        getItemLabel: Utils.array.getAlias,
-        getItemValue: Utils.array.getId,
-        sortSource: true,
-        required: true
-      }];
-    }
+    getColumns: function (config, api) {
+      return [
+        {
+          title: "Project",
+          type: "dropdown",
+          data: "parentProjectId",
+          source: config.projects,
+          getItemLabel: Utils.array.getAlias,
+          getItemValue: Utils.array.getId,
+          sortSource: true,
+          required: true,
+          disabled: config.pageMode === "edit",
+        },
+        BulkUtils.columns.simpleAlias(255),
+        BulkUtils.columns.description,
+        BulkUtils.columns.makeBoolean("Priority", "priority", true),
+        {
+          title: "Reference Genome",
+          data: "referenceGenomeId",
+          type: "dropdown",
+          source: Constants.referenceGenomes,
+          getItemLabel: Utils.array.getAlias,
+          getItemValue: Utils.array.getId,
+          sortSource: true,
+          required: true,
+        },
+      ];
+    },
   };
-
 })(jQuery);

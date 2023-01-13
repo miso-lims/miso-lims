@@ -1,12 +1,11 @@
-var LibraryTemplate = (function($) {
+var LibraryTemplate = (function ($) {
+  var indicesContainerSelector = "#listIndicesContainer";
+  var indicesListId = "listIndices";
+  var indicesListSelector = "#" + indicesListId;
 
-  var indicesContainerSelector = '#listIndicesContainer';
-  var indicesListId = 'listIndices';
-  var indicesListSelector = '#' + indicesListId;
-
-  var projectsContainerSelector = '#listProjectsContainer';
-  var projectsListId = 'listProjects';
-  var projectsListSelector = '#' + projectsListId;
+  var projectsContainerSelector = "#listProjectsContainer";
+  var projectsListId = "listProjects";
+  var projectsListSelector = "#" + projectsListId;
 
   var indicesListInitialized = false;
   var projectsListInitialized = false;
@@ -16,29 +15,31 @@ var LibraryTemplate = (function($) {
   var temporaryIdCounter = 0;
 
   return {
-
-    setForm: function(formApi) {
+    setForm: function (formApi) {
       form = formApi;
     },
 
-    setIndicesFromTemplate: function(template) {
+    setIndicesFromTemplate: function (template) {
       libraryTemplateId = template.id;
-      var indexFamily = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(template.indexFamilyId), Constants.indexFamilies);
+      var indexFamily = Utils.array.findUniqueOrThrow(
+        Utils.array.idPredicate(template.indexFamilyId),
+        Constants.indexFamilies
+      );
       var indices = [];
       if (template.indexOneIds) {
-        for ( var boxPosition in template.indexOneIds) {
+        for (var boxPosition in template.indexOneIds) {
           addIndex(boxPosition, indexFamily, template.indexOneIds[boxPosition], indices);
         }
       }
       if (template.indexTwoIds) {
-        for ( var boxPosition in template.indexTwoIds) {
+        for (var boxPosition in template.indexTwoIds) {
           addIndex(boxPosition, indexFamily, template.indexTwoIds[boxPosition], indices);
         }
       }
       LibraryTemplate.setIndices(indices);
     },
 
-    setIndices: function(indices) {
+    setIndices: function (indices) {
       if (indicesListInitialized) {
         form.markOtherChanges();
         $(indicesListSelector).dataTable().fnDestroy();
@@ -47,29 +48,38 @@ var LibraryTemplate = (function($) {
       }
 
       // IDs needed for list checkboxes to work correctly
-      indices.forEach(function(index) {
+      indices.forEach(function (index) {
         if (!index.id) {
           index.id = generateTemporaryId();
         }
       });
 
-      $(indicesContainerSelector).append($('<table>').attr('id', indicesListId).addClass('display no-border ui-widget-content'));
-      ListUtils.createStaticTable(indicesListId, ListTarget.libraryTemplate_index, {
-        libraryTemplateId: libraryTemplateId
-      }, indices);
+      $(indicesContainerSelector).append(
+        $("<table>").attr("id", indicesListId).addClass("display no-border ui-widget-content")
+      );
+      ListUtils.createStaticTable(
+        indicesListId,
+        ListTarget.libraryTemplate_index,
+        {
+          libraryTemplateId: libraryTemplateId,
+        },
+        indices
+      );
       indicesListInitialized = true;
     },
 
-    removeIndices: function(indices) {
-      var positionsToRemove = indices.map(function(index) {
+    removeIndices: function (indices) {
+      var positionsToRemove = indices.map(function (index) {
         return index.boxPosition;
       });
-      LibraryTemplate.setIndices(getIndices().filter(function(record) {
-        return positionsToRemove.indexOf(record.boxPosition) === -1;
-      }));
+      LibraryTemplate.setIndices(
+        getIndices().filter(function (record) {
+          return positionsToRemove.indexOf(record.boxPosition) === -1;
+        })
+      );
     },
 
-    applyIndices: function(template) {
+    applyIndices: function (template) {
       if (!indicesListInitialized) {
         return;
       }
@@ -78,7 +88,7 @@ var LibraryTemplate = (function($) {
       template.indexTwoIds = getTemplateFormatIndices(indices, 2);
     },
 
-    setProjects: function(projects) {
+    setProjects: function (projects) {
       if (projectsListInitialized) {
         form.markOtherChanges();
         $(projectsListSelector).dataTable().fnDestroy();
@@ -86,59 +96,72 @@ var LibraryTemplate = (function($) {
         ListState[projectsListId] = null;
       }
 
-      $(projectsContainerSelector).append($('<table>').attr('id', projectsListId).addClass('display no-border ui-widget-content'));
-      ListUtils.createStaticTable(projectsListId, ListTarget.project, {
-        forLibraryTemplate: true
-      }, projects);
+      $(projectsContainerSelector).append(
+        $("<table>").attr("id", projectsListId).addClass("display no-border ui-widget-content")
+      );
+      ListUtils.createStaticTable(
+        projectsListId,
+        ListTarget.project,
+        {
+          forLibraryTemplate: true,
+        },
+        projects
+      );
       projectsListInitialized = true;
     },
 
-    addProject: function(project) {
+    addProject: function (project) {
       var projects = getProjects();
       projects.push(project);
       LibraryTemplate.setProjects(projects);
     },
 
-    removeProjects: function(projects) {
+    removeProjects: function (projects) {
       var removeProjectIds = projects.map(Utils.array.getId);
-      LibraryTemplate.setProjects(getProjects().filter(function(project) {
-        return removeProjectIds.indexOf(project.id) === -1;
-      }));
+      LibraryTemplate.setProjects(
+        getProjects().filter(function (project) {
+          return removeProjectIds.indexOf(project.id) === -1;
+        })
+      );
     },
 
-    applyProjects: function(template) {
+    applyProjects: function (template) {
       template.projectIds = getProjects().map(Utils.array.getId);
-    }
-
+    },
   };
 
   function addIndex(boxPosition, indexFamily, indexId, indices) {
-    var record = Utils.array.findFirstOrNull(function(row) {
+    var record = Utils.array.findFirstOrNull(function (row) {
       return row.boxPosition === boxPosition;
     }, indices);
     if (!record) {
       record = {
-        boxPosition: boxPosition
+        boxPosition: boxPosition,
       };
       indices.push(record);
     }
-    var index = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(indexId), indexFamily.indices);
+    var index = Utils.array.findUniqueOrThrow(
+      Utils.array.idPredicate(indexId),
+      indexFamily.indices
+    );
     if (index.position === 1) {
       record.index1 = index;
     } else if (index.position === 2) {
       record.index2 = index;
     } else {
-      throw new Error('Unexpected index position: ' + index.position);
+      throw new Error("Unexpected index position: " + index.position);
     }
   }
 
   function getTemplateFormatIndices(indices, position) {
-    return indices.filter(function(index) {
-      return index['index' + position];
-    }).reduce(function(accumulator, currentValue) {
-      accumulator[currentValue.boxPosition] = currentValue['index' + position].id;
-      return accumulator;
-    }, {});
+    return indices
+      .filter(function (index) {
+        return index["index" + position];
+      })
+      .reduce(function (accumulator, currentValue) {
+        accumulator[currentValue.boxPosition] = currentValue["index" + position].id;
+        return accumulator;
+      }, {});
   }
 
   function generateTemporaryId() {
@@ -159,5 +182,4 @@ var LibraryTemplate = (function($) {
     }
     return $(projectsListSelector).dataTable().fnGetData();
   }
-
 })(jQuery);
