@@ -751,6 +751,11 @@
           <artifactId>jetty-maven-plugin</artifactId>
           <version>7.2.0.v20101020</version>
         </plugin>
+        <plugin>
+          <groupId>org.primefaces.extensions</groupId>
+          <artifactId>resources-optimizer-maven-plugin</artifactId>
+          <version>2.5.3</version>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>

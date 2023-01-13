@@ -122,7 +122,7 @@ var Utils = Utils || {
         checkboxes.push(jQuery(this));
       });
 
-      function selectRange(selectIndex, shiftIndex) {
+      var selectRange = function (selectIndex, shiftIndex) {
         var minSelectIndex = Math.min(selectIndex, shiftIndex);
         var maxSelectIndex = Math.max(selectIndex, shiftIndex);
         checkboxes.forEach(function (element, index) {
@@ -133,13 +133,13 @@ var Utils = Utils || {
             Utils.toggleListItem(true, elementId, list);
           }
         });
-      }
+      };
 
-      function getArrayIndex(elementId) {
+      var getArrayIndex = function (elementId) {
         return checkboxes.findIndex(function (item) {
           return item.attr("id") === elementId;
         });
-      }
+      };
 
       var selectIndex = getArrayIndex(list.lastSingleSelect);
       if (selectIndex === -1) {
@@ -403,7 +403,7 @@ var Utils = Utils || {
           var container = document.createElement("DIV");
           input.appendChild(container);
           output[field.property] = field.values.slice();
-          function drawOrder() {
+          var drawOrder = function () {
             while (container.hasChildNodes()) {
               container.removeChild(container.lastChild);
             }
@@ -439,7 +439,7 @@ var Utils = Utils || {
                 };
               }
             });
-          }
+          };
           drawOrder();
           break;
         default:

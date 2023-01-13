@@ -317,29 +317,61 @@
     </pluginManagement>
     <plugins>
       <plugin>
-        <groupId>com.samaxes.maven</groupId>
-        <artifactId>minify-maven-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
         <executions>
           <execution>
-            <id>default-minify</id>
+            <id>copy-resources</id>
+            <phase>generate-resources</phase>
             <goals>
-              <goal>minify</goal>
+              <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <charset>UTF-8</charset>
-              <cssSourceDir>styles</cssSourceDir>
-              <cssSourceIncludes>
-                <cssSourceInclude>*.css</cssSourceInclude>
-              </cssSourceIncludes>
-              <cssFinalFile>style.css</cssFinalFile>
-              <jsSourceDir>scripts</jsSourceDir>
-              <jsSourceIncludes>
-                <jsSourceInclude>*.js</jsSourceInclude>
-              </jsSourceIncludes>
-              <jsFinalFile>header_script.js</jsFinalFile>
+              <outputDirectory>${project.build.directory}/scripts</outputDirectory>
+              <resources>
+                <resource>
+                  <!--copy scripts to build directory early so they can be optimized below-->
+                  <directory>${project.basedir}/src/main/webapp/scripts</directory>
+                  <filtering>true</filtering>
+                  <includes>
+                    <include>*.js</include>
+                  </includes>
+                </resource>
+              </resources>
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.primefaces.extensions</groupId>
+        <artifactId>resources-optimizer-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>optimize</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>optimize</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <languageIn>ECMASCRIPT5</languageIn>
+          <compilationLevel>SIMPLE_OPTIMIZATIONS</compilationLevel>
+          <resourcesSets>
+            <resourcesSet>
+              <inputDir>${project.build.directory}/scripts</inputDir>
+              <aggregations>
+                <aggregation>
+                  <outputFile>${project.build.directory}/ROOT/scripts/header_script.js</outputFile>
+                </aggregation>
+              </aggregations>
+            </resourcesSet>
+          </resourcesSets>
+          <sourceMap>
+            <create>true</create>
+            <outputDir>${project.build.directory}/ROOT/scripts/</outputDir>
+          </sourceMap>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -349,17 +381,8 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
         <configuration>
-          <webResources>
-            <resource>
-              <directory>src/main/resources</directory>
-              <targetPath>WEB-INF/classes</targetPath>
-              <filtering>true</filtering>
-              <excludes>
-                <exclude>internal/*</exclude>
-                <exclude>external/*</exclude>
-              </excludes>
-            </resource>
-          </webResources>
+          <!--Avoid re-copying original scripts since we already handled them-->
+          <warSourceExcludes>scripts/*</warSourceExcludes>
         </configuration>
       </plugin>
     </plugins>

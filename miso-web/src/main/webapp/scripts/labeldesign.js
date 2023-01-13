@@ -345,7 +345,7 @@ function printerLabelEditor(layout, width, height, saveCallback) {
             labelElement.contents = lines;
             var table = document.createElement("table");
             editArea.appendChild(table);
-            function drawTable() {
+            var drawTable = function () {
               while (table.hasChildNodes()) {
                 table.removeChild(table.lastChild);
               }
@@ -403,7 +403,7 @@ function printerLabelEditor(layout, width, height, saveCallback) {
                     drawTable();
                   })
               );
-            }
+            };
             drawTable();
           } else {
             var container = document.createElement("div");
