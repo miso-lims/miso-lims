@@ -67,6 +67,13 @@ ListTarget.storage_location = {
         include: true,
         iSortPriority: 0,
       },
+      {
+        sTitle: "Probe ID",
+        mData: "probeId",
+        include: true,
+        iSortPriority: 0,
+
+      },
     ];
     if (config.slug == "freezers") {
       columns.push({
