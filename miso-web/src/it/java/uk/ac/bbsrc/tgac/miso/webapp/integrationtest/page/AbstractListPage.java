@@ -96,6 +96,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String POSITION = "Position";
     public static final String PRINTER = "Printer";
     public static final String PRIORITY = "Priority";
+    public static final String PROBE_ID = "probe ID";
     public static final String PROJECT = "Project";
     public static final String PROJECTS = "Projects";
     public static final String PURPOSE = "Purpose";
