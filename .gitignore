@@ -42,3 +42,7 @@ _site/
 # Password files
 .miso_db_password
 .ssl_password
+.vscode/settings.json
+.vscode/settings.json
+miso-web/src/main/java/uk/ac/bbsrc/tgac/miso/webapp/controller/rest/LibraryRestController.java
+.gitignore

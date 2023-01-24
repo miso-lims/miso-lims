@@ -1,22 +1,19 @@
 /*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
+ * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK MISO project contacts: Robert Davey @
+ * TGAC *********************************************************************
  *
  * This file is part of MISO.
  *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * MISO is free software: you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * MISO is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with MISO. If not, see
+ * <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -39,7 +36,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -186,29 +182,33 @@ public class LibraryRestController extends RestController {
 
   @GetMapping(value = "/dt/project/{id}", produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<LibraryDto> getLibrariesForProject(@PathVariable("id") Long id, HttpServletRequest request)
+  public DataTablesResponseDto<LibraryDto> getLibrariesForProject(@PathVariable("id") Long id,
+      HttpServletRequest request)
       throws IOException {
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.project(id));
   }
 
   @GetMapping(value = "/dt/batch/{batchId:.+}", produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<LibraryDto> getLibrariesForBatch(@PathVariable("batchId") String batchId, HttpServletRequest request)
+  public DataTablesResponseDto<LibraryDto> getLibrariesForBatch(@PathVariable("batchId") String batchId,
+      HttpServletRequest request)
       throws IOException {
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.batchId(batchId));
   }
 
   @GetMapping(value = "/dt/requisition/{id}", produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<LibraryDto> getLibrariesForRequisition(@PathVariable("id") Long id, HttpServletRequest request)
+  public DataTablesResponseDto<LibraryDto> getLibrariesForRequisition(@PathVariable("id") Long id,
+      HttpServletRequest request)
       throws IOException {
     List<Long> libraryIds = libraryService.listIdsByRequisitionId(id);
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.ids(libraryIds));
   }
 
-  @PostMapping(value = "/query", produces = { "application/json" })
+  @PostMapping(value = "/query", produces = {"application/json"})
   @ResponseBody
-  public List<LibraryDto> getLibrariesInBulk(@RequestBody List<String> names, HttpServletRequest request) throws IOException {
+  public List<LibraryDto> getLibrariesInBulk(@RequestBody List<String> names, HttpServletRequest request)
+      throws IOException {
     return libraryService.list(0, 0, true, "id", PaginationFilter.bulkLookup(names))
         .stream()
         .map(lib -> Dtos.asDto(lib, false))
@@ -217,8 +217,10 @@ public class LibraryRestController extends RestController {
 
   @PostMapping(value = "/spreadsheet", produces = "application/octet-stream")
   @ResponseBody
-  public HttpEntity<byte[]> getSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response) throws IOException {
-    return MisoWebUtils.generateSpreadsheet(request, libraryService::listByIdList, detailedSample, LibrarySpreadSheets::valueOf, response);
+  public HttpEntity<byte[]> getSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response)
+      throws IOException {
+    return MisoWebUtils.generateSpreadsheet(request, libraryService::listByIdList, detailedSample,
+        LibrarySpreadSheets::valueOf, response);
   }
 
   private static Stream<Sample> getSample(Library library) {
@@ -232,12 +234,16 @@ public class LibraryRestController extends RestController {
       return libraryService.listByIdList(ids);
     }
   })//
-      .add(new RelationFinder.ParentSampleAdapter<>(SampleIdentity.CATEGORY_NAME, SampleIdentity.class, LibraryRestController::getSample))//
-      .add(new RelationFinder.ParentSampleAdapter<>(SampleTissue.CATEGORY_NAME, SampleTissue.class, LibraryRestController::getSample))//
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleIdentity.CATEGORY_NAME, SampleIdentity.class,
+          LibraryRestController::getSample))//
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleTissue.CATEGORY_NAME, SampleTissue.class,
+          LibraryRestController::getSample))//
       .add(new RelationFinder.ParentSampleAdapter<>(SampleTissueProcessing.CATEGORY_NAME, SampleTissueProcessing.class,
           LibraryRestController::getSample))//
-      .add(new RelationFinder.ParentSampleAdapter<>(SampleStock.CATEGORY_NAME, SampleStock.class, LibraryRestController::getSample))//
-      .add(new RelationFinder.ParentSampleAdapter<>(SampleAliquot.CATEGORY_NAME, SampleAliquot.class, LibraryRestController::getSample))//
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleStock.CATEGORY_NAME, SampleStock.class,
+          LibraryRestController::getSample))//
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleAliquot.CATEGORY_NAME, SampleAliquot.class,
+          LibraryRestController::getSample))//
       .add(new RelationFinder.RelationAdapter<Library, Sample, SampleDto>("Sample") {
 
         @Override
@@ -253,7 +259,8 @@ public class LibraryRestController extends RestController {
 
   @PostMapping(value = "/parents/{category}")
   @ResponseBody
-  public List<?> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
+  public List<?> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids,
+      HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
     return parentFinder.list(ids, category);
   }
@@ -328,7 +335,8 @@ public class LibraryRestController extends RestController {
 
   @PostMapping(value = "/children/{category}")
   @ResponseBody
-  public List<?> getChildren(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
+  public List<?> getChildren(@PathVariable("category") String category, @RequestBody List<Long> ids,
+      HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
     return childFinder.list(ids, category);
   }
@@ -354,13 +362,15 @@ public class LibraryRestController extends RestController {
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<LibraryDto> dtos) throws IOException {
-    return asyncOperationManager.startAsyncBulkCreate("Library", dtos, WhineyFunction.rethrow(this::buildHierarchy), libraryService);
+    return asyncOperationManager.startAsyncBulkCreate("Library", dtos, WhineyFunction.rethrow(this::buildHierarchy),
+        libraryService);
   }
 
   @PutMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<LibraryDto> dtos) throws IOException {
-    return asyncOperationManager.startAsyncBulkUpdate("Library", dtos, WhineyFunction.rethrow(this::buildHierarchy), libraryService);
+    return asyncOperationManager.startAsyncBulkUpdate("Library", dtos, WhineyFunction.rethrow(this::buildHierarchy),
+        libraryService);
   }
 
   @GetMapping("/bulk/{uuid}")
@@ -368,11 +378,13 @@ public class LibraryRestController extends RestController {
     return asyncOperationManager.getAsyncProgress(uuid, Library.class, libraryService, lib -> Dtos.asDto(lib, false));
   }
 
-  @GetMapping(value = "/dt/workset/{id}", produces = { "application/json" })
+  @GetMapping(value = "/dt/workset/{id}", produces = {"application/json"})
   @ResponseBody
-  public DataTablesResponseDto<LibraryDto> getDTLibrariesByWorkset(@PathVariable("id") Long id, HttpServletRequest request)
-    throws IOException {
-    DataTablesResponseDto<LibraryDto> response = jQueryBackend.get(request, advancedSearchParser, PaginationFilter.workset(id));
+  public DataTablesResponseDto<LibraryDto> getDTLibrariesByWorkset(@PathVariable("id") Long id,
+      HttpServletRequest request)
+      throws IOException {
+    DataTablesResponseDto<LibraryDto> response =
+        jQueryBackend.get(request, advancedSearchParser, PaginationFilter.workset(id));
     if (!response.getAaData().isEmpty()) {
       Map<Long, Date> addedTimes = worksetService.getLibraryAddedTimes(id);
       for (LibraryDto dto : response.getAaData()) {
