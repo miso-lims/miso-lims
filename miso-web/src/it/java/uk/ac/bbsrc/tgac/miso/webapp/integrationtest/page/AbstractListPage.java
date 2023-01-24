@@ -6,7 +6,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
@@ -96,7 +95,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String POSITION = "Position";
     public static final String PRINTER = "Printer";
     public static final String PRIORITY = "Priority";
-    public static final String PROBE_ID = "probe ID";
+    public static final String PROBE_ID = "Probe ID";
     public static final String PROJECT = "Project";
     public static final String PROJECTS = "Projects";
     public static final String PURPOSE = "Purpose";
