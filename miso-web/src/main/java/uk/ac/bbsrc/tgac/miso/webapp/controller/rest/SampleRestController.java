@@ -1,19 +1,22 @@
 /*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK MISO project contacts: Robert Davey @
- * TGAC *********************************************************************
+ * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
+ * MISO project contacts: Robert Davey @ TGAC
+ * *********************************************************************
  *
  * This file is part of MISO.
  *
- * MISO is free software: you can redistribute it and/or modify it under the terms of the GNU
- * General Public License as published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
+ * MISO is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * MISO is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
+ * MISO is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with MISO. If not, see
- * <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -148,13 +151,13 @@ public class SampleRestController extends RestController {
     }
   };
 
-  @GetMapping(value = "/{id}", produces = {"application/json"})
+  @GetMapping(value = "/{id}", produces = { "application/json" })
   @ResponseBody
   public SampleDto getSample(@PathVariable long id) throws IOException {
     return RestUtils.getObject("Sample", id, sampleService, sam -> Dtos.asDto(sam, false));
   }
 
-  @GetMapping(produces = {"application/json"})
+  @GetMapping(produces = { "application/json" })
   @ResponseBody
   public List<SampleDto> getSamples(UriComponentsBuilder uriBuilder) throws IOException {
     List<Sample> samples = sampleService.list();
@@ -163,33 +166,31 @@ public class SampleRestController extends RestController {
     return sampleDtos;
   }
 
-  @GetMapping(value = "/dt", produces = {"application/json"})
+  @GetMapping(value = "/dt", produces = { "application/json" })
   @ResponseBody
   public DataTablesResponseDto<SampleDto> getDTSamples(HttpServletRequest request) throws IOException {
     return jQueryBackend.get(request, advancedSearchParser);
   }
 
-  @GetMapping(value = "/dt/project/{id}", produces = {"application/json"})
+  @GetMapping(value = "/dt/project/{id}", produces = { "application/json" })
   @ResponseBody
   public DataTablesResponseDto<SampleDto> getDTSamplesByProject(@PathVariable("id") long id, HttpServletRequest request)
       throws IOException {
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.project(id));
   }
 
-  @GetMapping(value = "/dt/requisition/{id}", produces = {"application/json"})
+  @GetMapping(value = "/dt/requisition/{id}", produces = { "application/json" })
   @ResponseBody
-  public DataTablesResponseDto<SampleDto> getDTSamplesByRequisition(@PathVariable("id") long id,
-      HttpServletRequest request)
+  public DataTablesResponseDto<SampleDto> getDTSamplesByRequisition(@PathVariable("id") long id, HttpServletRequest request)
       throws IOException {
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.requisitionId(id));
   }
 
-  @GetMapping(value = "/dt/workset/{id}", produces = {"application/json"})
+  @GetMapping(value = "/dt/workset/{id}", produces = { "application/json" })
   @ResponseBody
   public DataTablesResponseDto<SampleDto> getDTSamplesByWorkset(@PathVariable("id") long id, HttpServletRequest request)
-      throws IOException {
-    DataTablesResponseDto<SampleDto> response =
-        jQueryBackend.get(request, advancedSearchParser, PaginationFilter.workset(id));
+    throws IOException {
+    DataTablesResponseDto<SampleDto> response = jQueryBackend.get(request, advancedSearchParser, PaginationFilter.workset(id));
     if (!response.getAaData().isEmpty()) {
       Map<Long, Date> addedTimes = worksetService.getSampleAddedTimes(id);
       for (SampleDto dto : response.getAaData()) {
@@ -199,10 +200,9 @@ public class SampleRestController extends RestController {
     return response;
   }
 
-  @GetMapping(value = "/dt/project/{id}/arrayed", produces = {"application/json"})
+  @GetMapping(value = "/dt/project/{id}/arrayed", produces = { "application/json" })
   @ResponseBody
-  public DataTablesResponseDto<SampleDto> getDTArrayedSamplesByProject(@PathVariable("id") long id,
-      HttpServletRequest request)
+  public DataTablesResponseDto<SampleDto> getDTArrayedSamplesByProject(@PathVariable("id") long id, HttpServletRequest request)
       throws IOException {
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.project(id),
         PaginationFilter.arrayed(true));
@@ -220,8 +220,7 @@ public class SampleRestController extends RestController {
   }
 
   /**
-   * Converts the DTO to a Sample, complete with parents. Parent SampleClasses are inferred where
-   * necessary
+   * Converts the DTO to a Sample, complete with parents. Parent SampleClasses are inferred where necessary
    * 
    * @param sampleDto
    * @return
@@ -231,18 +230,14 @@ public class SampleRestController extends RestController {
     if (sampleDto instanceof SampleAliquotDto) {
       SampleAliquotDto dto = (SampleAliquotDto) sampleDto;
       dto.setStockClassId(
-          inferIntermediateSampleClassId(dto, dto.getSampleClassId(), SampleAliquot.CATEGORY_NAME,
-              SampleStock.CATEGORY_NAME, true));
+          inferIntermediateSampleClassId(dto, dto.getSampleClassId(), SampleAliquot.CATEGORY_NAME, SampleStock.CATEGORY_NAME, true));
       // Some hierarchies have two Aliquot levels
       if (dto.getStockClassId() == null) {
-        dto.setParentAliquotClassId(
-            inferIntermediateSampleClassId(dto, dto.getSampleClassId(), SampleAliquot.CATEGORY_NAME,
-                SampleAliquot.CATEGORY_NAME, false));
-        Long topAliquotClassId =
-            dto.getParentAliquotClassId() == null ? dto.getSampleClassId() : dto.getParentAliquotClassId();
+        dto.setParentAliquotClassId(inferIntermediateSampleClassId(dto, dto.getSampleClassId(), SampleAliquot.CATEGORY_NAME,
+            SampleAliquot.CATEGORY_NAME, false));
+        Long topAliquotClassId = dto.getParentAliquotClassId() == null ? dto.getSampleClassId() : dto.getParentAliquotClassId();
         dto.setStockClassId(
-            inferIntermediateSampleClassId(dto, topAliquotClassId, SampleAliquot.CATEGORY_NAME,
-                SampleStock.CATEGORY_NAME, false));
+            inferIntermediateSampleClassId(dto, topAliquotClassId, SampleAliquot.CATEGORY_NAME, SampleStock.CATEGORY_NAME, false));
       }
       if (dto.getParentId() == null) {
         // infer tissue processing class if necessary
@@ -280,9 +275,8 @@ public class SampleRestController extends RestController {
       if (sampleDto instanceof SampleTissuePieceDto) {
         SampleTissuePieceDto lcmDto = (SampleTissuePieceDto) dto;
         // Some hierarchies have two Tissue Processing levels
-        lcmDto.setParentSlideClassId(
-            inferIntermediateSampleClassId(dto, dto.getSampleClassId(), SampleTissueProcessing.CATEGORY_NAME,
-                SampleTissueProcessing.CATEGORY_NAME, true));
+        lcmDto.setParentSlideClassId(inferIntermediateSampleClassId(dto, dto.getSampleClassId(), SampleTissueProcessing.CATEGORY_NAME,
+            SampleTissueProcessing.CATEGORY_NAME, true));
         if (lcmDto.getParentSlideClassId() != null) {
           topProcessingClassId = lcmDto.getParentSlideClassId();
         }
@@ -305,38 +299,33 @@ public class SampleRestController extends RestController {
     // infer parent class
     SampleClass parentClass = sampleClassService.inferParentFromChild(childClassId, childClassCategory, parentCategory);
     if (parentClass == null && !nullOk) {
-      throw new IllegalStateException(
-          String.format("%s class with id %d has no %s parents", childClassCategory, childClassId,
-              parentCategory));
+      throw new IllegalStateException(String.format("%s class with id %d has no %s parents", childClassCategory, childClassId,
+          parentCategory));
     }
     return parentClass == null ? null : parentClass.getId();
   }
 
   @PutMapping(value = "/{id}")
   @ResponseStatus(HttpStatus.OK)
-  public @ResponseBody SampleDto updateSample(@PathVariable long id, @RequestBody SampleDto sampleDto)
-      throws IOException {
+  public @ResponseBody SampleDto updateSample(@PathVariable long id, @RequestBody SampleDto sampleDto) throws IOException {
     return RestUtils.updateObject("Sample", id, sampleDto, Dtos::to, sampleService, sam -> Dtos.asDto(sam, false));
   }
 
   /**
-   * Given a list of external name search terms, returns a list of identities which match those search
-   * terms, in the same order as the original list. Search can be scoped by project, and can be for an
-   * exact match or for a partial match.
+   * Given a list of external name search terms, returns a list of identities which match those search terms, in the
+   * same order as the original list. Search can be scoped by project, and can be for an exact match or for a partial match.
    * 
-   * @param exactMatch whether a distinct external name of an existing identity needs to exactly match
-   *        the given search term.
+   * @param exactMatch whether a distinct external name of an existing identity needs to exactly match the given search term.
    * @param json a list of search terms and possibly the project shortName
    * @return a list of maps between search terms and matching identities
    */
-  @PostMapping(value = "/identitiesLookup", headers = {"Content-type=application/json"})
+  @PostMapping(value = "/identitiesLookup", headers = { "Content-type=application/json" })
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public List<SampleIdentityDto> getIdentitiesBySearch(@RequestParam boolean exactMatch,
       @RequestBody JsonNode json, HttpServletResponse response) throws IOException {
     final JsonNode searchTerms = json.get("identitiesSearches");
-    Project project =
-        (json.get("project") == null ? null : projectService.getProjectByShortName(json.get("project").asText()));
+    Project project = (json.get("project") == null ? null : projectService.getProjectByShortName(json.get("project").asText()));
     if (!searchTerms.isArray() || searchTerms.size() == 0) {
       throw new RestException("Please provide external name or alias for identity lookup", Status.BAD_REQUEST);
     }
@@ -348,7 +337,7 @@ public class SampleRestController extends RestController {
     return results.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
-  @PostMapping(value = "/query", produces = {"application/json"})
+  @PostMapping(value = "/query", produces = { "application/json" })
   @ResponseBody
   public List<SampleDto> getSamplesInBulk(@RequestBody List<String> names) throws IOException {
     return sampleService.list(0, 0, true, "id", PaginationFilter.bulkLookup(names))
@@ -359,10 +348,8 @@ public class SampleRestController extends RestController {
 
   @PostMapping(value = "/spreadsheet", produces = "application/octet-stream")
   @ResponseBody
-  public HttpEntity<byte[]> getSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response)
-      throws IOException {
-    return MisoWebUtils.generateSpreadsheet(request, sampleService::listByIdList, detailedSample,
-        SampleSpreadSheets::valueOf, response);
+  public HttpEntity<byte[]> getSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response) throws IOException {
+    return MisoWebUtils.generateSpreadsheet(request, sampleService::listByIdList, detailedSample, SampleSpreadSheets::valueOf, response);
   }
 
   private final RelationFinder<Sample> parentFinder = (new RelationFinder<Sample>() {
@@ -397,7 +384,7 @@ public class SampleRestController extends RestController {
       .add(RelationFinder.child(SampleTissueProcessing.CATEGORY_NAME, SampleTissueProcessing.class))//
       .add(RelationFinder.child(SampleStock.CATEGORY_NAME, SampleStock.class))//
       .add(RelationFinder.child(SampleAliquot.CATEGORY_NAME, SampleAliquot.class))
-
+      
       .add(new RelationFinder.RelationAdapter<Sample, Library, LibraryDto>("Library") {
 
         @Override
@@ -426,9 +413,8 @@ public class SampleRestController extends RestController {
 
         @Override
         public Stream<LibraryAliquot> find(Sample model, Consumer<String> emitError) {
-          Set<LibraryAliquot> children =
-              RelationFinder.ChildrenSampleAdapter.searchChildrenLibraries(model, libraryService)
-                  .flatMap(library -> library.getLibraryAliquots().stream()).collect(Collectors.toSet());
+          Set<LibraryAliquot> children = RelationFinder.ChildrenSampleAdapter.searchChildrenLibraries(model, libraryService)
+              .flatMap(library -> library.getLibraryAliquots().stream()).collect(Collectors.toSet());
           if (children.isEmpty()) {
             emitError.accept(String.format("%s (%s) has no %s.", model.getName(), model.getAlias(), category()));
             return Stream.empty();
@@ -447,8 +433,7 @@ public class SampleRestController extends RestController {
         @Override
         public Stream<Pool> find(Sample model, Consumer<String> emitError) throws IOException {
           Set<Pool> children = new HashSet<>();
-          for (LibraryAliquot aliquot : RelationFinder.ChildrenSampleAdapter
-              .searchChildrenLibraries(model, libraryService)
+          for (LibraryAliquot aliquot : RelationFinder.ChildrenSampleAdapter.searchChildrenLibraries(model, libraryService)
               .flatMap(library -> library.getLibraryAliquots().stream()).collect(Collectors.toList())) {
             children.addAll(poolService.listByLibraryAliquotId(aliquot.getId()));
           }
@@ -469,8 +454,7 @@ public class SampleRestController extends RestController {
         @Override
         public Stream<Run> find(Sample model, Consumer<String> emitError) throws IOException {
           Set<Run> children = new HashSet<>();
-          for (LibraryAliquot aliquot : RelationFinder.ChildrenSampleAdapter
-              .searchChildrenLibraries(model, libraryService)
+          for (LibraryAliquot aliquot : RelationFinder.ChildrenSampleAdapter.searchChildrenLibraries(model, libraryService)
               .flatMap(library -> library.getLibraryAliquots().stream()).collect(Collectors.toList())) {
             children.addAll(runService.listByLibraryAliquotId(aliquot.getId()));
           }
@@ -511,15 +495,13 @@ public class SampleRestController extends RestController {
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<SampleDto> dtos) throws IOException {
-    return asyncOperationManager.startAsyncBulkCreate("Sample", dtos, WhineyFunction.rethrow(this::buildHierarchy),
-        sampleService);
+    return asyncOperationManager.startAsyncBulkCreate("Sample", dtos, WhineyFunction.rethrow(this::buildHierarchy), sampleService);
   }
 
   @PutMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<SampleDto> dtos) throws IOException {
-    return asyncOperationManager.startAsyncBulkUpdate("Sample", dtos, WhineyFunction.rethrow(this::buildHierarchy),
-        sampleService);
+    return asyncOperationManager.startAsyncBulkUpdate("Sample", dtos, WhineyFunction.rethrow(this::buildHierarchy), sampleService);
   }
 
   @GetMapping("/bulk/{uuid}")
