@@ -71,7 +71,7 @@ ListTarget.storage_location = {
         sTitle: "Probe ID",
         mData: "probeId",
         include: true,
-        isSortPriority: 0,
+        iSortPriority: 0,
 
       },
     ];
