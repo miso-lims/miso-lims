@@ -95,7 +95,7 @@ public class RequisitionController {
   public ModelAndView edit(@PathVariable String alias, ModelMap model) throws IOException {
     Requisition requisition = requisitionService.getByAlias(alias);
     if (requisition == null) {
-      throw new NotFoundException("No requisition found for ID: " + alias);
+      throw new NotFoundException("No requisition found with alias: " + alias);
     }
     return setupEditForm(requisition, model);
   }
