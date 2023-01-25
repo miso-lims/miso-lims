@@ -87,20 +87,20 @@ public class RequisitionController {
     if (requisition == null) {
       throw new NotFoundException("No requisition found for ID: " + id);
     }
-    return setupFormIDAlias(requisition, model);
+    return setupEditForm(requisition, model);
   }
 
-  @GetMapping("/alias/{Alias}")
-  public ModelAndView edit(@PathVariable String Alias, ModelMap model) throws IOException {
-    Requisition requisition = requisitionService.getByAlias(Alias);
+  @GetMapping("/alias/{alias}")
+  public ModelAndView edit(@PathVariable String alias, ModelMap model) throws IOException {
+    Requisition requisition = requisitionService.getByAlias(alias);
     if (requisition == null) {
-      throw new NotFoundException("No requisition found for ID: " + Alias);
+      throw new NotFoundException("No requisition found for ID: " + alias);
     }
-    return setupFormIDAlias(requisition, model);
+    return setupEditForm(requisition, model);
 
   }
 
-  private ModelAndView setupFormIDAlias(Requisition requisition, ModelMap model) throws IOException {
+  private ModelAndView setupEditForm(Requisition requisition, ModelMap model) throws IOException {
     model.put("title", "Requisition " + requisition.getId());
 
     List<Sample> samples = sampleService.list(0, 0, false, "id", PaginationFilter.requisitionId(requisition.getId()));
