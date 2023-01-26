@@ -1,2 +1,0 @@
-Added a new URL pattern for linking to requisitions by alias
-- ex) /miso/requisition/alias/REQ-1 where REQ-1 is the alias
