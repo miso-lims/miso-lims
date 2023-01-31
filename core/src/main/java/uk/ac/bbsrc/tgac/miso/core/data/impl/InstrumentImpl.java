@@ -1,22 +1,19 @@
 /*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
+ * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK MISO project contacts: Robert Davey @
+ * TGAC *********************************************************************
  *
  * This file is part of MISO.
  *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * MISO is free software: you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * MISO is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with MISO. If not, see
+ * <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -31,13 +28,13 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -252,7 +249,11 @@ public class InstrumentImpl implements Instrument {
     this.runs = runs;
   }
 
-  @OneToMany(targetEntity = ServiceRecord.class, mappedBy = "instrument", cascade = CascadeType.REMOVE)
+  @OneToMany(targetEntity = ServiceRecord.class)
+  @JoinTable(name = "Instrument_ServiceRecord", joinColumns = {@JoinColumn(name = "instrumentId")},
+      inverseJoinColumns = {
+          @JoinColumn(name = "recordId")
+      })
   private Set<ServiceRecord> serviceRecords = new HashSet<>();
 
   @Override
@@ -270,8 +271,9 @@ public class InstrumentImpl implements Instrument {
     if (getServiceRecords() == null) {
       return false;
     }
-    return getServiceRecords().stream().anyMatch(sr -> sr.isOutOfService() && sr.getEndTime() == null && sr.getStartTime() != null
-        && sr.getStartTime().before(new Date()) && sr.getPosition() == null);
+    return getServiceRecords().stream()
+        .anyMatch(sr -> sr.isOutOfService() && sr.getEndTime() == null && sr.getStartTime() != null
+            && sr.getStartTime().before(new Date()) && sr.getPosition() == null);
   }
 
   @Override
@@ -284,7 +286,8 @@ public class InstrumentImpl implements Instrument {
     }
     return getInstrumentModel().getPositions().stream()
         .filter(pos -> getServiceRecords().stream().anyMatch(sr -> sr.isOutOfService() && sr.getEndTime() == null
-            && sr.getStartTime() != null && sr.getStartTime().before(new Date()) && sr.getPosition().getAlias().equals(pos.getAlias())))
+            && sr.getStartTime() != null && sr.getStartTime().before(new Date())
+            && sr.getPosition().getAlias().equals(pos.getAlias())))
         .collect(Collectors.toSet());
   }
 

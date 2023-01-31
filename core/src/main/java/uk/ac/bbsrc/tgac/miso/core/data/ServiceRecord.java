@@ -20,7 +20,6 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 
 @Entity
 @Table(name = "ServiceRecord")
@@ -29,14 +28,10 @@ public class ServiceRecord implements Serializable, Deletable, Attachable {
   private static final long serialVersionUID = 1L;
 
   private static final long UNSAVED_ID = 0L;
-  
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long recordId = ServiceRecord.UNSAVED_ID;
-
-  @ManyToOne(targetEntity = InstrumentImpl.class)
-  @JoinColumn(name = "instrumentId")
-  private Instrument instrument;
 
   @Column(nullable = false)
   private String title;
@@ -63,8 +58,8 @@ public class ServiceRecord implements Serializable, Deletable, Attachable {
   private InstrumentPosition position;
 
   @OneToMany(targetEntity = FileAttachment.class, cascade = CascadeType.ALL)
-  @JoinTable(name = "ServiceRecord_Attachment", joinColumns = { @JoinColumn(name = "recordId") }, inverseJoinColumns = {
-      @JoinColumn(name = "attachmentId") })
+  @JoinTable(name = "ServiceRecord_Attachment", joinColumns = {@JoinColumn(name = "recordId")}, inverseJoinColumns = {
+      @JoinColumn(name = "attachmentId")})
   private List<FileAttachment> attachments;
 
   @Transient
@@ -84,13 +79,6 @@ public class ServiceRecord implements Serializable, Deletable, Attachable {
     return getId() != UNSAVED_ID;
   }
 
-  public void setInstrument(Instrument instrument) {
-    this.instrument = instrument;
-  }
-
-  public Instrument getInstrument() {
-    return instrument;
-  }
 
   public void setTitle(String title) {
     this.title = title;
@@ -196,9 +184,10 @@ public class ServiceRecord implements Serializable, Deletable, Attachable {
 
   @Override
   public String getDeleteDescription() {
-    return getInstrument().getName() + " "
-        + (getReferenceNumber() == null ? "" : "RE " + getReferenceNumber() + ": ")
-        + getTitle();
+    // return getInstrument().getName() + " "
+    // + (getReferenceNumber() == null ? "" : "RE " + getReferenceNumber() + ": ")
+    // + getTitle();
+    return (getReferenceNumber() == null ? "" : "RE " + getReferenceNumber() + ": ") + getTitle();
   }
 
 }
