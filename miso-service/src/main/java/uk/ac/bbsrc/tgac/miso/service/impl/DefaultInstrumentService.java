@@ -12,11 +12,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
+import uk.ac.bbsrc.tgac.miso.core.service.ServiceRecordService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorkstationService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
@@ -42,6 +45,9 @@ public class DefaultInstrumentService implements InstrumentService {
   private RunPurposeService runPurposeService;
   @Autowired
   private WorkstationService workstationService;
+  @Autowired
+  private ServiceRecordService serviceRecordService;
+
 
   @Override
   public List<Instrument> list() throws IOException {
@@ -72,8 +78,68 @@ public class DefaultInstrumentService implements InstrumentService {
   }
 
   @Override
+  public void addServiceRecord(ServiceRecord record, Instrument instrument) throws IOException {
+    // originally located at HibernateServiceRecordDao
+    if (instrument.getDateCommissioned() != null) {
+      throw new IOException("Cannot add service records to a retired instrument!");
+    }
+    long recordId = serviceRecordService.create(record);
+    ServiceRecord serviceRecord = serviceRecordService.get(recordId);
+
+    // add saved service record
+    instrument.getServiceRecords().add(serviceRecord);
+
+    // save instrument
+    save(instrument);
+  }
+
+  @Override
+  public void removeServiceRecord(ServiceRecord record, Instrument instrument) throws IOException {
+    if (!instrument.getServiceRecords().contains(record)) {
+      throw new IOException("Cannot remove service records that does not exist");
+    }
+    instrument.getServiceRecords().remove(record);
+    save(instrument);
+
+    // remove servicerecord
+    serviceRecordService.delete(record);
+  }
+
+  @Override
+  public void updateServiceRecord(ServiceRecord record, Instrument instrument) throws IOException {
+    // validate changes
+    if (!instrument.getServiceRecords().contains(record)) {
+      throw new IOException("Cannot update service records that does not exist");
+    }
+    // remove the old service record from the instrument
+    instrument.getServiceRecords().remove(record);
+
+    // update the servicerecord
+    long recordId = serviceRecordService.update(record);
+    ServiceRecord serviceRecord = serviceRecordService.get(recordId);
+
+    // add new service record to the instrument
+    instrument.getServiceRecords().add(serviceRecord);
+
+    // update instrument
+    update(instrument);
+
+    // save
+    save(instrument);
+  }
+
+
+  private InstrumentPosition findPosition(long id, Instrument instrument) {
+    return instrument.getInstrumentModel().getPositions().stream()
+        .filter(p -> p.getId() == id)
+        .findFirst().orElse(null);
+  }
+
+  @Override
   public long update(Instrument instrument) throws IOException {
-    authorizationManager.throwIfNonAdmin();
+    if (instrument == null) {
+      throw new IOException("Cannot update instrument that does not exist");
+    }
     Instrument managed = get(instrument.getId());
     loadChildEntities(instrument);
     validateChange(instrument, managed);
@@ -93,7 +159,8 @@ public class DefaultInstrumentService implements InstrumentService {
     }
     if (isSetAndChanged(Instrument::getUpgradedInstrument, instrument, beforeChange)
         && getByUpgradedInstrumentId(instrument.getUpgradedInstrument().getId()) != null) {
-      errors.add(new ValidationError("upgradedInstrumentId", "There is already an instrument that has been upgraded to this one"));
+      errors.add(new ValidationError("upgradedInstrumentId",
+          "There is already an instrument that has been upgraded to this one"));
     }
     if (instrument.getInstrumentModel().getInstrumentType() == InstrumentType.SEQUENCER) {
       if (instrument.getDefaultRunPurpose() == null) {
@@ -123,9 +190,12 @@ public class DefaultInstrumentService implements InstrumentService {
   }
 
   private void loadChildEntities(Instrument instrument) throws IOException {
-    loadChildEntity(instrument::setUpgradedInstrument, instrument.getUpgradedInstrument(), this, "upgradedInstrumentId");
-    loadChildEntity(instrument::setInstrumentModel, instrument.getInstrumentModel(), instrumentModelService, "instrumentModelId");
-    loadChildEntity(instrument::setDefaultRunPurpose, instrument.getDefaultRunPurpose(), runPurposeService, "defaultRunPurposeId");
+    loadChildEntity(instrument::setUpgradedInstrument, instrument.getUpgradedInstrument(), this,
+        "upgradedInstrumentId");
+    loadChildEntity(instrument::setInstrumentModel, instrument.getInstrumentModel(), instrumentModelService,
+        "instrumentModelId");
+    loadChildEntity(instrument::setDefaultRunPurpose, instrument.getDefaultRunPurpose(), runPurposeService,
+        "defaultRunPurposeId");
     loadChildEntity(instrument::setWorkstation, instrument.getWorkstation(), workstationService, "workstationId");
   }
 
@@ -135,6 +205,10 @@ public class DefaultInstrumentService implements InstrumentService {
 
   public void setAuthorizationManager(AuthorizationManager authorizationManager) {
     this.authorizationManager = authorizationManager;
+  }
+
+  public void setServiceRecordService(ServiceRecordService serviceRecordService) {
+    this.serviceRecordService = serviceRecordService;
   }
 
   @Override
@@ -172,7 +246,8 @@ public class DefaultInstrumentService implements InstrumentService {
     }
     long arrayRunUsage = instrumentDao.getUsageByArrayRuns(object);
     if (arrayRunUsage > 0L) {
-      result.addError(ValidationError.forDeletionUsage(object, arrayRunUsage, "array " + Pluralizer.runs(arrayRunUsage)));
+      result
+          .addError(ValidationError.forDeletionUsage(object, arrayRunUsage, "array " + Pluralizer.runs(arrayRunUsage)));
     }
     long qcUsage = instrumentDao.getUsageByQcs(object);
     if (qcUsage > 0L) {

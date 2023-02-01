@@ -5,10 +5,12 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
+import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface InstrumentService extends BarcodableService<Instrument>, DeleterService<Instrument>, ListService<Instrument>,
+public interface InstrumentService
+    extends BarcodableService<Instrument>, DeleterService<Instrument>, ListService<Instrument>,
     PaginatedDataSource<Instrument>, SaveService<Instrument> {
 
   @Override
@@ -22,4 +24,9 @@ public interface InstrumentService extends BarcodableService<Instrument>, Delete
 
   Instrument getByUpgradedInstrumentId(long instrumentId) throws IOException;
 
+  void addServiceRecord(ServiceRecord record, Instrument instrument) throws IOException;
+
+  void removeServiceRecord(ServiceRecord record, Instrument instrument) throws IOException;
+
+  void updateServiceRecord(ServiceRecord record, Instrument instrument) throws IOException;
 }

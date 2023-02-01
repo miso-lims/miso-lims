@@ -1,23 +1,15 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
-import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
-import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.ServiceRecordService;
-import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
-import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.persistence.ServiceRecordStore;
 
@@ -37,14 +29,6 @@ public class DefaultServiceRecordService implements ServiceRecordService {
   @Autowired
   private DeletionStore deletionStore;
 
-  @Autowired
-  private InstrumentService instrumentService;
-
-  @Override
-  public Collection<ServiceRecord> listByInstrument(long instrumentId) throws IOException {
-    return serviceRecordDao.listByInstrumentId(instrumentId);
-  }
-
   @Override
   public ServiceRecord get(long recordId) throws IOException {
     return serviceRecordDao.get(recordId);
@@ -52,15 +36,15 @@ public class DefaultServiceRecordService implements ServiceRecordService {
 
   @Override
   public long create(ServiceRecord record) throws IOException {
-    record.setInstrument(instrumentService.get(record.getInstrument().getId()));
+    // record.setInstrument(instrumentService.get(record.getInstrument().getId()));
     return serviceRecordDao.save(record);
   }
 
   @Override
   public long update(ServiceRecord record) throws IOException {
     ServiceRecord managed = get(record.getId());
-    record.setInstrument(instrumentService.get(managed.getInstrument().getId()));
-    validateChange(record, managed);
+    // record.setInstrument(instrumentService.get(managed.getInstrument().getId()));
+    // validateChange(record, managed);
     applyRecordChanges(managed, record);
     return serviceRecordDao.save(managed);
   }
@@ -71,7 +55,7 @@ public class DefaultServiceRecordService implements ServiceRecordService {
     if (source.getPosition() == null) {
       target.setPosition(null);
     } else {
-      target.setPosition(findPosition(source.getPosition().getId(), target.getInstrument()));
+      // target.setPosition(findPosition(source.getPosition().getId(), target.getInstrument()));
     }
     target.setServicedByName(source.getServicedByName());
     target.setReferenceNumber(source.getReferenceNumber());
@@ -81,23 +65,20 @@ public class DefaultServiceRecordService implements ServiceRecordService {
     target.setEndTime(source.getEndTime());
   }
 
-  private void validateChange(ServiceRecord record, ServiceRecord beforeChange) {
-    List<ValidationError> errors = new ArrayList<>();
+  // private void validateChange(ServiceRecord record, ServiceRecord beforeChange) {
+  // List<ValidationError> errors = new ArrayList<>();
 
-    if (record.getPosition() != null && findPosition(record.getPosition().getId(), record.getInstrument()) == null) {
-      errors.add(new ValidationError("position", "Position must belong to the same instrument as this record"));
-    }
+  // if (record.getPosition() != null && findPosition(record.getPosition().getId(),
+  // record.getInstrument()) == null) {
+  // errors.add(new ValidationError("position", "Position must belong to the same instrument as this
+  // record"));
+  // }
 
-    if (!errors.isEmpty()) {
-      throw new ValidationException(errors);
-    }
-  }
+  // if (!errors.isEmpty()) {
+  // throw new ValidationException(errors);
+  // }
+  // }
 
-  private InstrumentPosition findPosition(long id, Instrument instrument) {
-    return instrument.getInstrumentModel().getPositions().stream()
-        .filter(p -> p.getId() == id)
-        .findFirst().orElse(null);
-  }
 
   public void setServiceRecordDao(ServiceRecordStore serviceRecordDao) {
     this.serviceRecordDao = serviceRecordDao;
