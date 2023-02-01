@@ -27,15 +27,16 @@ public class HibernateServiceRecordDao implements ServiceRecordStore {
 
   @Override
   public long save(ServiceRecord ssr) throws IOException {
-    // if (!ssr.isSaved()) {
-    // if (ssr.getInstrument().getDateDecommissioned() != null)
-    // throw new IOException("Cannot add service records to a retired instrument!");
+    long id;
+    if (!ssr.isSaved()) {
+      if (ssr.getInstrument().getDateDecommissioned() != null)
+        throw new IOException("Cannot add service records to a retired instrument!");
 
-    // id = (long) currentSession().save(ssr);
-    // } else {
-    currentSession().update(ssr);
-    long id = ssr.getId();
-    // }
+      id = (long) currentSession().save(ssr);
+    } else {
+      currentSession().update(ssr);
+      id = ssr.getId();
+    }
     return id;
   }
 
