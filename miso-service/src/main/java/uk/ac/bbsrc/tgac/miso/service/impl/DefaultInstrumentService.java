@@ -96,7 +96,7 @@ public class DefaultInstrumentService implements InstrumentService {
   @Override
   public void removeServiceRecord(ServiceRecord record, Instrument instrument) throws IOException {
     if (!instrument.getServiceRecords().contains(record)) {
-      throw new IOException("Cannot remove service records that does not exist");
+      throw new IOException("Cannot remove service record that does not exist");
     }
     instrument.getServiceRecords().remove(record);
     save(instrument);
@@ -107,22 +107,25 @@ public class DefaultInstrumentService implements InstrumentService {
 
   @Override
   public void updateServiceRecord(ServiceRecord record, Instrument instrument) throws IOException {
-    // validate changes
+
     if (!instrument.getServiceRecords().contains(record)) {
-      throw new IOException("Cannot update service records that does not exist");
+      throw new IOException("Cannot update service record that does not exist");
     }
+    long recordId = record.getId();
+    InstrumentPosition position = findPosition(recordId, instrument);
     // remove the old service record from the instrument
     instrument.getServiceRecords().remove(record);
 
     // update the servicerecord
-    long recordId = serviceRecordService.update(record);
+    // recordId = serviceRecordService.update(record, position);
+    recordId = serviceRecordService.update(record);
     ServiceRecord serviceRecord = serviceRecordService.get(recordId);
 
     // add new service record to the instrument
     instrument.getServiceRecords().add(serviceRecord);
 
     // update instrument
-    update(instrument);
+    // update(instrument, position);
 
     // save
     save(instrument);
@@ -130,6 +133,8 @@ public class DefaultInstrumentService implements InstrumentService {
 
 
   private InstrumentPosition findPosition(long id, Instrument instrument) {
+    // must ask Dillan about how this should be handled.
+    // some functions that require InstrumentPosition are commented out for this reason
     return instrument.getInstrumentModel().getPositions().stream()
         .filter(p -> p.getId() == id)
         .findFirst().orElse(null);

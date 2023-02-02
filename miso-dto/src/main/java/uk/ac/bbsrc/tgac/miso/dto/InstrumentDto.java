@@ -1,7 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.util.Set;
+
 public class InstrumentDto {
-  
+
   private long id;
   private String name;
   private String instrumentType;
@@ -20,6 +22,7 @@ public class InstrumentDto {
   private String preUpgradeInstrumentName;
   private Long upgradedInstrumentId;
   private Long defaultRunPurposeId;
+  private Set<ServiceRecordDto> serviceRecords;
 
   public String getDateCommissioned() {
     return dateCommissioned;
@@ -163,6 +166,14 @@ public class InstrumentDto {
 
   public void setWorkstationAlias(String workstationAlias) {
     this.workstationAlias = workstationAlias;
+  }
+
+  public Set<ServiceRecordDto> getServiceRecords() {
+    return serviceRecords;
+  }
+
+  public void setServiceRecords(Set<ServiceRecordDto> serviceRecords) {
+    this.serviceRecords = serviceRecords;
   }
 
 }

@@ -959,13 +959,13 @@ Urls = (function () {
   // Service Records
   var serviceRecordUiBase = baseUrl + "/instrument/servicerecord";
   ui.serviceRecords = {
-    edit: idUrlFunction(serviceRecordUiBase),
+    edit: idUrlFunction(instrumentUiBase),
   };
 
-  var serviceRecordRestBase = restBase + "/servicerecords";
+  var serviceRecordRestBase = restBase + "/instrument/servicerecords";
   rest.serviceRecords = {
     create: serviceRecordRestBase,
-    update: idUrlFunction(serviceRecordRestBase),
+    update: idUrlFunction(instrumentRestBase),
   };
 
   // SOPs
