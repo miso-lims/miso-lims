@@ -7,6 +7,15 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.53.0] - 2023-01-26
+
+### Added
+
+* Added a Probe ID column on Freezer page in MISO
+* Added a new URL pattern for linking to requisitions by alias
+  - ex) /miso/requisition/alias/REQ-1 where REQ-1 is the alias
+
+
 ## [1.52.0] - 2023-01-12
 
 ### Added

@@ -87,9 +87,24 @@ public class RequisitionController {
     if (requisition == null) {
       throw new NotFoundException("No requisition found for ID: " + id);
     }
-    model.put("title", "Requisition " + id);
+    return setupEditForm(requisition, model);
+  }
 
-    List<Sample> samples = sampleService.list(0, 0, false, "id", PaginationFilter.requisitionId(id));
+
+  @GetMapping("/alias/{alias}")
+  public ModelAndView edit(@PathVariable String alias, ModelMap model) throws IOException {
+    Requisition requisition = requisitionService.getByAlias(alias);
+    if (requisition == null) {
+      throw new NotFoundException("No requisition found with alias: " + alias);
+    }
+    return setupEditForm(requisition, model);
+  }
+
+
+  private ModelAndView setupEditForm(Requisition requisition, ModelMap model) throws IOException {
+    model.put("title", "Requisition " + requisition.getId());
+
+    List<Sample> samples = sampleService.list(0, 0, false, "id", PaginationFilter.requisitionId(requisition.getId()));
     List<Sample> extractions = sampleService.getChildren(
         samples.stream().map(Sample::getId).collect(Collectors.toSet()), SampleStock.CATEGORY_NAME);
     List<SampleDto> extractionDtos = extractions.stream()
@@ -97,7 +112,7 @@ public class RequisitionController {
         .collect(Collectors.toList());
     model.put("extractions", extractionDtos);
 
-    List<Long> libraryIds = libraryService.listIdsByRequisitionId(id);
+    List<Long> libraryIds = libraryService.listIdsByRequisitionId(requisition.getId());
     List<Run> runs = runService.listByLibraryIdList(libraryIds);
     List<RunDto> runDtos = runs.stream()
         .map(Dtos::asDto)
@@ -107,7 +122,8 @@ public class RequisitionController {
     return setupForm(requisition, PageMode.EDIT, model);
   }
 
-  private ModelAndView setupForm(Requisition requisition, PageMode pageMode, ModelMap model) throws JsonProcessingException {
+  private ModelAndView setupForm(Requisition requisition, PageMode pageMode, ModelMap model)
+      throws JsonProcessingException {
     model.put(PageMode.PROPERTY, pageMode.getLabel());
     model.put("requisition", requisition);
     model.put("requisitionDto", mapper.writeValueAsString(RequisitionDto.from(requisition)));
@@ -115,3 +131,5 @@ public class RequisitionController {
   }
 
 }
+
+
