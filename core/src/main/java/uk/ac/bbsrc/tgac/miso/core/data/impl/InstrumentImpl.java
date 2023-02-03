@@ -28,6 +28,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -249,7 +250,7 @@ public class InstrumentImpl implements Instrument {
     this.runs = runs;
   }
 
-  @OneToMany(targetEntity = ServiceRecord.class, cascade = CascadeType.REMOVE))
+  @OneToMany(targetEntity = ServiceRecord.class, cascade = CascadeType.REMOVE)
   @JoinTable(name = "Instrument_ServiceRecord", joinColumns = {@JoinColumn(name = "instrumentId")},
       inverseJoinColumns = {
           @JoinColumn(name = "recordId")
