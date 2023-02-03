@@ -249,7 +249,7 @@ public class InstrumentImpl implements Instrument {
     this.runs = runs;
   }
 
-  @OneToMany(targetEntity = ServiceRecord.class)
+  @OneToMany(targetEntity = ServiceRecord.class, cascade = CascadeType.REMOVE))
   @JoinTable(name = "Instrument_ServiceRecord", joinColumns = {@JoinColumn(name = "instrumentId")},
       inverseJoinColumns = {
           @JoinColumn(name = "recordId")
