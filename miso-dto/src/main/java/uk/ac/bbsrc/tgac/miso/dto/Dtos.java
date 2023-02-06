@@ -3116,6 +3116,7 @@ public class Dtos {
     setObject(to::setDefaultRunPurpose, RunPurpose::new, dto.getDefaultRunPurposeId());
     setString(to::setIdentificationBarcode, dto.getIdentificationBarcode());
     setObject(to::setWorkstation, Workstation::new, dto.getWorkstationId());
+    // TODO: setObject(to::setServiceRecords, ServiceRecord::new, dto.getServiceRecords());
     return to;
   }
 
