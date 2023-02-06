@@ -79,42 +79,47 @@ public class DefaultInstrumentService implements InstrumentService {
 
   @Override
   public void addServiceRecord(ServiceRecord record, Instrument instrument) throws IOException {
-    // originally located at HibernateServiceRecordDao
     if (instrument.getDateCommissioned() != null) {
       throw new IOException("Cannot add service records to a retired instrument!");
     }
     long recordId = serviceRecordService.create(record);
-    ServiceRecord serviceRecord = serviceRecordService.get(recordId);
+    ServiceRecord managedRecord = serviceRecordService.get(recordId);
+    Instrument managedInstrument = get(instrument.getId());
 
-    // add saved service record
-    instrument.getServiceRecords().add(serviceRecord);
+    managedInstrument.getServiceRecords().add(managedRecord);
 
-    // save instrument
-    save(instrument);
+    save(managedInstrument);
   }
 
   @Override
-  public void removeServiceRecord(ServiceRecord record, Instrument instrument) throws IOException {
-    if (!instrument.getServiceRecords().contains(record)) {
-      throw new IOException("Cannot remove service record that does not exist");
+  public void removeServiceRecord(ServiceRecord record, Instrument instrument) throws ValidationException, IOException {
+    Instrument managedInstrument = get(instrument.getId());
+    ServiceRecord managedServiceRecord = getManaged(record, managedInstrument);
+    if (managedServiceRecord == null) {
+      throw new ValidationException(
+          String.format("Service record is not associated with instrument %s; does the service record exist?",
+              managedInstrument.getName()));
     }
-    instrument.getServiceRecords().remove(record);
-    save(instrument);
+    managedInstrument.getServiceRecords().remove(managedServiceRecord);
+    save(managedInstrument);
 
-    // remove servicerecord
-    serviceRecordService.delete(record);
+    serviceRecordService.delete(managedServiceRecord);
   }
 
   @Override
-  public void updateServiceRecord(ServiceRecord record, Instrument instrument) throws IOException {
-
-    if (!instrument.getServiceRecords().contains(record)) {
-      throw new IOException("Cannot update service record that does not exist");
+  public void updateServiceRecord(ServiceRecord record, Instrument instrument) throws ValidationException, IOException {
+    Instrument managedInstrument = get(instrument.getId());
+    ServiceRecord managedServiceRecord = getManaged(record, managedInstrument);
+    if (managedServiceRecord == null) {
+      throw new ValidationException(
+          String.format("Service record is not associated with instrument %s; does the service record exist?",
+              managedInstrument.getName()));
     }
+
     long recordId = record.getId();
     InstrumentPosition position = findPosition(recordId, instrument);
     // remove the old service record from the instrument
-    instrument.getServiceRecords().remove(record);
+    managedInstrument.getServiceRecords().remove(managedServiceRecord);
 
     // update the servicerecord
     // recordId = serviceRecordService.update(record, position);
@@ -122,13 +127,20 @@ public class DefaultInstrumentService implements InstrumentService {
     ServiceRecord serviceRecord = serviceRecordService.get(recordId);
 
     // add new service record to the instrument
-    instrument.getServiceRecords().add(serviceRecord);
+    managedInstrument.getServiceRecords().add(serviceRecord);
 
     // update instrument
     // update(instrument, position);
 
-    // save
-    save(instrument);
+    save(managedInstrument);
+  }
+
+  private ServiceRecord getManaged(ServiceRecord record, Instrument managedInstrument) {
+    return managedInstrument.getServiceRecords()
+        .stream()
+        .filter(sr -> sr.getId() == record.getId())
+        .findFirst()
+        .orElse(null);
   }
 
 
@@ -142,9 +154,7 @@ public class DefaultInstrumentService implements InstrumentService {
 
   @Override
   public long update(Instrument instrument) throws IOException {
-    if (instrument == null) {
-      throw new IOException("Cannot update instrument that does not exist");
-    }
+    authorizationManager.throwIfNonAdmin();
     Instrument managed = get(instrument.getId());
     loadChildEntities(instrument);
     validateChange(instrument, managed);
@@ -192,6 +202,7 @@ public class DefaultInstrumentService implements InstrumentService {
     target.setDefaultRunPurpose(source.getDefaultRunPurpose());
     target.setIdentificationBarcode(source.getIdentificationBarcode());
     target.setWorkstation(source.getWorkstation());
+    target.setServiceRecords(source.getServiceRecords());
   }
 
   private void loadChildEntities(Instrument instrument) throws IOException {

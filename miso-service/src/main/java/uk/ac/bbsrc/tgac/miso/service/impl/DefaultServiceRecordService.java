@@ -41,7 +41,6 @@ public class DefaultServiceRecordService implements ServiceRecordService {
 
   @Override
   public long create(ServiceRecord record) throws IOException {
-    // record.setInstrument(instrumentService.get(record.getInstrument().getId()));
     return serviceRecordDao.save(record);
   }
 
