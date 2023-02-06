@@ -957,15 +957,15 @@ Urls = (function () {
   };
 
   // Service Records
-  var serviceRecordUiBase = baseUrl + "/instrument/servicerecord";
+  var serviceRecordUiBase = baseUrl + "/instrument/" + instrumentId + "/servicerecord";
   ui.serviceRecords = {
-    edit: idUrlFunction(instrumentUiBase),
+    edit: idUrlFunction(serviceRecordUiBase),
   };
 
-  var serviceRecordRestBase = restBase + "/instrument/servicerecords";
+  var serviceRecordRestBase = restBase + "/instrument/" + instrumentId + "/servicerecords";
   rest.serviceRecords = {
     create: serviceRecordRestBase,
-    update: idUrlFunction(instrumentRestBase),
+    update: idUrlFunction(serviceRecordRestBase),
   };
 
   // SOPs

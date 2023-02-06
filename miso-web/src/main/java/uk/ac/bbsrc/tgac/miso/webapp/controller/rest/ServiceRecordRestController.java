@@ -17,17 +17,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
+import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.ServiceRecordService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ServiceRecordDto;
 
 @Controller
-@RequestMapping("/rest/servicerecords")
+@RequestMapping("/rest/instruments/{instrumentId}/servicerecords")
 public class ServiceRecordRestController extends RestController {
 
   @Autowired
   private ServiceRecordService serviceRecordService;
+  @Autowired
+  private InstrumentService instrumentService;
 
   @PostMapping(value = "/bulk-delete")
   @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -47,12 +51,18 @@ public class ServiceRecordRestController extends RestController {
   }
 
   @PostMapping
-  public @ResponseBody ServiceRecordDto create(@RequestBody ServiceRecordDto dto) throws IOException {
+  public @ResponseBody ServiceRecordDto create(@PathVariable long recordId, long instrumentId,
+      @RequestBody ServiceRecordDto dto)
+      throws IOException {
+    ServiceRecord record = serviceRecordService.get(recordId);
+    Instrument instrument = instrumentService.get(instrumentId);
+    instrumentService.addServiceRecord(record, instrument);
     return RestUtils.createObject("Service record", dto, Dtos::to, serviceRecordService, Dtos::asDto);
   }
 
   @PutMapping("/{recordId}")
-  public @ResponseBody ServiceRecordDto update(@PathVariable long recordId, @RequestBody ServiceRecordDto dto) throws IOException {
+  public @ResponseBody ServiceRecordDto update(@PathVariable long recordId, @RequestBody ServiceRecordDto dto)
+      throws IOException {
     return RestUtils.updateObject("Service record", recordId, dto, Dtos::to, serviceRecordService, Dtos::asDto);
   }
 

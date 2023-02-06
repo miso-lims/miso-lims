@@ -28,7 +28,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentDto;
-import uk.ac.bbsrc.tgac.miso.dto.ServiceRecordDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
@@ -71,19 +70,6 @@ public class InstrumentRestController extends RestController {
   public InstrumentDto getById(@PathVariable Long instrumentId) throws IOException {
     return RestUtils.getObject("Instrument", instrumentId, instrumentService, Dtos::asDto);
   }
-
-  @PostMapping("/{instrumentId}/servicerecords")
-  public @ResponseBody ServiceRecordDto create(@PathVariable long instrumentId, @RequestBody ServiceRecordDto dto)
-      throws IOException {
-    ServiceRecordDto recordDto =
-        RestUtils.createObject("Service record", dto, Dtos::to, serviceRecordService, Dtos::asDto);
-    long recordId = recordDto.getId();
-    Instrument instrument = instrumentService.get(instrumentId);
-
-    instrumentService.addServiceRecord(serviceRecordService.get(recordId), instrument);
-    return recordDto;
-  }
-
 
   @GetMapping(produces = "application/json")
   @ResponseBody
