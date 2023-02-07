@@ -8,10 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
+import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.ServiceRecordService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
@@ -34,6 +35,12 @@ public class DefaultServiceRecordService implements ServiceRecordService {
   @Autowired
   private DeletionStore deletionStore;
 
+  @Autowired
+  private InstrumentService instrumentService;
+
+  @Autowired
+  private Instrument instrument;
+
   @Override
   public ServiceRecord get(long recordId) throws IOException {
     return serviceRecordDao.get(recordId);
@@ -47,19 +54,20 @@ public class DefaultServiceRecordService implements ServiceRecordService {
   @Override
   public long update(ServiceRecord record) throws IOException {
     ServiceRecord managed = get(record.getId());
-    // record.setInstrument(instrumentService.get(managed.getInstrument().getId()));
-    // validateChange(record, managed, position);
-    // applyRecordChanges(managed, record, position);
+    validateChange(record, managed);
+    applyRecordChanges(managed, record);
     return serviceRecordDao.save(managed);
   }
 
-  private void applyRecordChanges(ServiceRecord target, ServiceRecord source, InstrumentPosition position) {
+  private void applyRecordChanges(ServiceRecord target, ServiceRecord source) throws IOException {
+
     target.setTitle(source.getTitle());
     target.setDetails(source.getDetails());
     if (source.getPosition() == null) {
       target.setPosition(null);
     } else {
-      target.setPosition(position);
+      target
+          .setPosition(instrument.findPosition(source.getPosition().getId(), instrumentService.getInstrument(target)));
     }
     target.setServicedByName(source.getServicedByName());
     target.setReferenceNumber(source.getReferenceNumber());
@@ -69,18 +77,16 @@ public class DefaultServiceRecordService implements ServiceRecordService {
     target.setEndTime(source.getEndTime());
   }
 
-  private void validateChange(ServiceRecord record, ServiceRecord beforeChange, InstrumentPosition position) {
+  private void validateChange(ServiceRecord record, ServiceRecord beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
-
-    if (record.getPosition() != null && position == null) {
+    if (record.getPosition() != null
+        && instrument.findPosition(record.getPosition().getId(), instrumentService.getInstrument(record)) == null) {
       errors.add(new ValidationError("position", "Position must belong to the same instrument as this record"));
     }
-
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }
   }
-
 
   public void setServiceRecordDao(ServiceRecordStore serviceRecordDao) {
     this.serviceRecordDao = serviceRecordDao;

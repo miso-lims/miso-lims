@@ -3097,10 +3097,6 @@ public class Dtos {
     setString(dto::setIdentificationBarcode, from.getIdentificationBarcode());
     setId(dto::setWorkstationId, from.getWorkstation());
     setString(dto::setWorkstationAlias, maybeGetProperty(from.getWorkstation(), Workstation::getAlias));
-    if (from.getServiceRecords() != null) {
-
-      dto.setServiceRecords(from.getServiceRecords().stream().map(Dtos::asDto).collect(Collectors.toSet()));
-    }
     return dto;
   }
 
@@ -3116,7 +3112,6 @@ public class Dtos {
     setObject(to::setDefaultRunPurpose, RunPurpose::new, dto.getDefaultRunPurposeId());
     setString(to::setIdentificationBarcode, dto.getIdentificationBarcode());
     setObject(to::setWorkstation, Workstation::new, dto.getWorkstationId());
-    // TODO: setObject(to::setServiceRecords, ServiceRecord::new, dto.getServiceRecords());
     return to;
   }
 

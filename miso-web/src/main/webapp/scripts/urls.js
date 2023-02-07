@@ -957,12 +957,20 @@ Urls = (function () {
   };
 
   // Service Records
-  var serviceRecordUiBase = baseUrl + "/instrument/" + instrumentId + "/servicerecord";
+  var serviceRecordUiBase = {
+    instrumentDatable: function (instrumentId) {
+      return baseUrl + "/instrument/" + instrumentId + "/servicerecord";
+    },
+  };
   ui.serviceRecords = {
     edit: idUrlFunction(serviceRecordUiBase),
   };
 
-  var serviceRecordRestBase = restBase + "/instrument/" + instrumentId + "/servicerecords";
+  var serviceRecordRestBase = {
+    instrumentDatable: function (instrumentId) {
+      return restBase + "/instrument/" + instrumentId + "/servicerecords";
+    },
+  };
   rest.serviceRecords = {
     create: serviceRecordRestBase,
     update: idUrlFunction(serviceRecordRestBase),

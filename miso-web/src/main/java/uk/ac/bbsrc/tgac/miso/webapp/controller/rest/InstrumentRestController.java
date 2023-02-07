@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
-import uk.ac.bbsrc.tgac.miso.core.service.ServiceRecordService;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
@@ -54,9 +53,6 @@ public class InstrumentRestController extends RestController {
 
   @Autowired
   private InstrumentService instrumentService;
-
-  @Autowired
-  private ServiceRecordService serviceRecordService;
 
   @Autowired
   private ConstantsController constantsController;

@@ -184,7 +184,6 @@ public class ServiceRecord implements Serializable, Deletable, Attachable {
 
   @Override
   public String getDeleteDescription() {
-    // TODO
     return (getReferenceNumber() == null ? "" : "RE " + getReferenceNumber() + ": ") + getTitle();
   }
 

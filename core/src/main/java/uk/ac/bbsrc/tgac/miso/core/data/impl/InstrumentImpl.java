@@ -368,4 +368,11 @@ public class InstrumentImpl implements Instrument {
     return visitor.visitInstrument(this);
   }
 
+  @Override
+  public InstrumentPosition findPosition(long id, Instrument instrument) {
+    return instrument.getInstrumentModel().getPositions().stream()
+        .filter(p -> p.getId() == id)
+        .findFirst().orElse(null);
+  }
+
 }

@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
-import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -78,9 +77,13 @@ public class DefaultInstrumentService implements InstrumentService {
   }
 
   @Override
-  public void addServiceRecord(ServiceRecord record, Instrument instrument) throws IOException {
+  public long addServiceRecord(ServiceRecord record, Instrument instrument) throws IOException, ValidationException {
     if (instrument.getDateCommissioned() != null) {
       throw new IOException("Cannot add service records to a retired instrument!");
+    }
+    if (record.getPosition() != null
+        && instrument.findPosition(record.getPosition().getId(), getInstrument(record)) == null) {
+      throw new ValidationException("Position must belong to the same instrument as this record");
     }
     long recordId = serviceRecordService.create(record);
     ServiceRecord managedRecord = serviceRecordService.get(recordId);
@@ -88,11 +91,11 @@ public class DefaultInstrumentService implements InstrumentService {
 
     managedInstrument.getServiceRecords().add(managedRecord);
 
-    save(managedInstrument);
+    return save(managedInstrument);
   }
 
   @Override
-  public void removeServiceRecord(ServiceRecord record, Instrument instrument) throws ValidationException, IOException {
+  public long removeServiceRecord(ServiceRecord record, Instrument instrument) throws IOException, ValidationException {
     Instrument managedInstrument = get(instrument.getId());
     ServiceRecord managedServiceRecord = getManaged(record, managedInstrument);
     if (managedServiceRecord == null) {
@@ -101,38 +104,10 @@ public class DefaultInstrumentService implements InstrumentService {
               managedInstrument.getName()));
     }
     managedInstrument.getServiceRecords().remove(managedServiceRecord);
-    save(managedInstrument);
+    long removedId = save(managedInstrument);
 
     serviceRecordService.delete(managedServiceRecord);
-  }
-
-  @Override
-  public void updateServiceRecord(ServiceRecord record, Instrument instrument) throws ValidationException, IOException {
-    Instrument managedInstrument = get(instrument.getId());
-    ServiceRecord managedServiceRecord = getManaged(record, managedInstrument);
-    if (managedServiceRecord == null) {
-      throw new ValidationException(
-          String.format("Service record is not associated with instrument %s; does the service record exist?",
-              managedInstrument.getName()));
-    }
-
-    long recordId = record.getId();
-    InstrumentPosition position = findPosition(recordId, instrument);
-    // remove the old service record from the instrument
-    managedInstrument.getServiceRecords().remove(managedServiceRecord);
-
-    // update the servicerecord
-    // recordId = serviceRecordService.update(record, position);
-    recordId = serviceRecordService.update(record);
-    ServiceRecord serviceRecord = serviceRecordService.get(recordId);
-
-    // add new service record to the instrument
-    managedInstrument.getServiceRecords().add(serviceRecord);
-
-    // update instrument
-    // update(instrument, position);
-
-    save(managedInstrument);
+    return removedId;
   }
 
   private ServiceRecord getManaged(ServiceRecord record, Instrument managedInstrument) {
@@ -143,13 +118,9 @@ public class DefaultInstrumentService implements InstrumentService {
         .orElse(null);
   }
 
-
-  private InstrumentPosition findPosition(long id, Instrument instrument) {
-    // must ask Dillan about how this should be handled.
-    // some functions that require InstrumentPosition are commented out for this reason
-    return instrument.getInstrumentModel().getPositions().stream()
-        .filter(p -> p.getId() == id)
-        .findFirst().orElse(null);
+  @Override
+  public Instrument getInstrument(ServiceRecord record) throws IOException {
+    return instrumentDao.getByServiceRecord(record);
   }
 
   @Override
@@ -202,7 +173,6 @@ public class DefaultInstrumentService implements InstrumentService {
     target.setDefaultRunPurpose(source.getDefaultRunPurpose());
     target.setIdentificationBarcode(source.getIdentificationBarcode());
     target.setWorkstation(source.getWorkstation());
-    target.setServiceRecords(source.getServiceRecords());
   }
 
   private void loadChildEntities(Instrument instrument) throws IOException {

@@ -1,22 +1,19 @@
 /*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
- * *********************************************************************
+ * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK MISO project contacts: Robert Davey,
+ * Mario Caccamo @ TGAC *********************************************************************
  *
  * This file is part of MISO.
  *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * MISO is free software: you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * MISO is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with MISO. If not, see
+ * <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -40,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QC;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
@@ -52,7 +50,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 @Transactional(rollbackFor = Exception.class)
 public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginatedDataSource<Instrument> {
 
-  private static final String[] SEARCH_PROPERTIES = new String[] { "name", "serialNumber", "identificationBarcode" };
+  private static final String[] SEARCH_PROPERTIES = new String[] {"name", "serialNumber", "identificationBarcode"};
   private static final List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(
       new AliasDescriptor("instrumentModel"),
       new AliasDescriptor("workstation", JoinType.LEFT_OUTER_JOIN));
@@ -155,14 +153,14 @@ public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginat
   @Override
   public String propertyForSortColumn(String original) {
     switch (original) {
-    case "platformType":
-      return "instrumentModel.platformType";
-    case "instrumentModelAlias":
-      return "instrumentModel.alias";
-    case "workstationAlias":
-      return "workstation.alias";
-    default:
-      return original;
+      case "platformType":
+        return "instrumentModel.platformType";
+      case "instrumentModelAlias":
+        return "instrumentModel.alias";
+      case "workstationAlias":
+        return "workstation.alias";
+      default:
+        return original;
     }
   }
 
@@ -172,7 +170,8 @@ public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginat
   }
 
   @Override
-  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
+  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType,
+      Consumer<String> errorHandler) {
     criteria.add(Restrictions.eq("instrumentModel.platformType", platformType));
   }
 
@@ -182,7 +181,8 @@ public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginat
   }
 
   @Override
-  public void restrictPaginationByInstrumentType(Criteria criteria, InstrumentType type, Consumer<String> errorHandler) {
+  public void restrictPaginationByInstrumentType(Criteria criteria, InstrumentType type,
+      Consumer<String> errorHandler) {
     criteria.add(Restrictions.eq("instrumentModel.instrumentType", type));
   }
 
@@ -217,6 +217,14 @@ public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginat
         .add(Restrictions.eq("instrument", instrument))
         .setProjection(Projections.rowCount()).list(); // returns one count per QC table (samples, libraries...)
     return counts.stream().mapToLong(Long::longValue).sum();
+  }
+
+  @Override
+  public Instrument getByServiceRecord(ServiceRecord record) throws IOException {
+    return (Instrument) currentSession().createCriteria(Instrument.class)
+        .createAlias("serviceRecords", "serviceRecords")
+        .add(Restrictions.eq("serviceRecords.recordId", record.getId()))
+        .uniqueResult();
   }
 
 }

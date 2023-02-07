@@ -55,8 +55,8 @@ public class EditServiceRecordController {
   private ObjectMapper mapper;
 
   @GetMapping(value = "/{recordId}")
-  public ModelAndView viewServiceRecord(@PathVariable(value = "recordId") Long recordId, Long instrumentId,
-      ModelMap model)
+  public ModelAndView viewServiceRecord(@PathVariable(value = "recordId") Long recordId,
+      @PathVariable(value = "instrumentId") Long instrumentId, ModelMap model)
       throws IOException {
     ServiceRecord record = serviceRecordService.get(recordId);
     Instrument instrument = instrumentService.get(instrumentId);
@@ -66,28 +66,26 @@ public class EditServiceRecordController {
     return showPage(record, instrument, model);
   }
 
-  @GetMapping(value = "/new/{recordId}")
+  @GetMapping(value = "/new")
   public ModelAndView newServiceRecord(@PathVariable(value = "recordId") Long recordId,
-      Long instrumentId, ModelMap model)
+      @PathVariable(value = "instrumentId") Long instrumentId, ModelMap model)
       throws IOException {
     Instrument instrument = instrumentService.get(instrumentId);
     if (instrument == null) {
       throw new NotFoundException("No instrument found for ID " + instrumentId.toString());
     }
     ServiceRecord record = new ServiceRecord();
-    instrumentService.addServiceRecord(record, instrument);
     return showPage(record, instrument, model);
   }
 
   @GetMapping(value = "/edit/{recordId}")
   public ModelAndView editServiceRecord(@PathVariable(value = "recordId") Long recordId,
-      Long instrumentId, ModelMap model) throws IOException {
+      @PathVariable(value = "instrumentId") Long instrumentId, ModelMap model) throws IOException {
     Instrument instrument = instrumentService.get(instrumentId);
     if (instrument == null) {
       throw new NotFoundException("No instrument found for ID " + instrumentId.toString());
     }
     ServiceRecord record = serviceRecordService.get(recordId);
-    instrumentService.updateServiceRecord(record, instrument);
     return showPage(record, instrument, model);
   }
 

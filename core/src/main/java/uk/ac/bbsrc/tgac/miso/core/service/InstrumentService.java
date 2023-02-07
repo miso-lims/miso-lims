@@ -7,6 +7,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 public interface InstrumentService
@@ -24,9 +25,9 @@ public interface InstrumentService
 
   Instrument getByUpgradedInstrumentId(long instrumentId) throws IOException;
 
-  void addServiceRecord(ServiceRecord record, Instrument instrument) throws IOException;
+  long addServiceRecord(ServiceRecord record, Instrument instrument) throws IOException, ValidationException;
 
-  void removeServiceRecord(ServiceRecord record, Instrument instrument) throws IOException;
+  long removeServiceRecord(ServiceRecord record, Instrument instrument) throws IOException, ValidationException;
 
-  void updateServiceRecord(ServiceRecord record, Instrument instrument) throws IOException;
+  Instrument getInstrument(ServiceRecord record) throws IOException;
 }

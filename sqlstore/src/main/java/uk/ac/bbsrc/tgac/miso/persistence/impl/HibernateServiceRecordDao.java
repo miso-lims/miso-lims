@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
+import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.persistence.ServiceRecordStore;
 
 @Repository
@@ -20,6 +21,8 @@ public class HibernateServiceRecordDao implements ServiceRecordStore {
 
   @Autowired
   private SessionFactory sessionFactory;
+  @Autowired
+  private InstrumentService instrumentService;
 
   private Session currentSession() {
     return getSessionFactory().getCurrentSession();
@@ -27,15 +30,16 @@ public class HibernateServiceRecordDao implements ServiceRecordStore {
 
   @Override
   public long save(ServiceRecord ssr) throws IOException {
-    // if (!ssr.isSaved()) {
-    // if (ssr.getInstrument().getDateDecommissioned() != null)
-    // throw new IOException("Cannot add service records to a retired instrument!");
+    long id;
+    if (!ssr.isSaved()) {
+      if (instrumentService.getInstrument(ssr).getDateDecommissioned() != null)
+        throw new IOException("Cannot add service records to a retired instrument!");
 
-    // id = (long) currentSession().save(ssr);
-    // } else {
-    currentSession().update(ssr);
-    long id = ssr.getId();
-    // }
+      id = (long) currentSession().save(ssr);
+    } else {
+      currentSession().update(ssr);
+      id = ssr.getId();
+    }
     return id;
   }
 
