@@ -1,6 +1,5 @@
 BulkTarget = window.BulkTarget || {};
-BulkTarget.workstation = (function() {
-
+BulkTarget.workstation = (function () {
   /*
    * Expected config: {
    *   pageMode: string {create, edit}
@@ -9,26 +8,29 @@ BulkTarget.workstation = (function() {
    */
 
   return {
-    getSaveUrl: function() {
+    getSaveUrl: function () {
       return Urls.rest.workstations.bulkSave;
     },
-    getSaveProgressUrl: function(operationId) {
+    getSaveProgressUrl: function (operationId) {
       return Urls.rest.workstations.bulkSaveProgress(operationId);
     },
-    getUserManualUrl: function() {
-      return Urls.external.userManual('type_data', 'workstations');
+    getUserManualUrl: function () {
+      return Urls.external.userManual("type_data", "workstations");
     },
-    getBulkActions: function(config) {
+    getBulkActions: function (config) {
       return !config.isAdmin ? [] : [BulkUtils.actions.edit(Urls.ui.workstations.bulkEdit)];
     },
-    getColumns: function(config, api) {
-      return [BulkUtils.columns.simpleAlias(50), BulkUtils.columns.description, {
-        title: 'Barcode',
-        data: 'identificationBarcode',
-        type: 'text',
-        maxLength: 255
-      }];
-    }
+    getColumns: function (config, api) {
+      return [
+        BulkUtils.columns.simpleAlias(50),
+        BulkUtils.columns.description,
+        {
+          title: "Barcode",
+          data: "identificationBarcode",
+          type: "text",
+          maxLength: 255,
+        },
+      ];
+    },
   };
-
 })();

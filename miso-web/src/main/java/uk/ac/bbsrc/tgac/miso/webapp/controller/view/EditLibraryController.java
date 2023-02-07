@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.getParent;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.getParentRequisition;
 import static uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils.*;
 
 import java.io.IOException;
@@ -70,10 +71,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotRna;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryBatch;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentTissueAttributes;
@@ -328,7 +326,15 @@ public class EditLibraryController {
       dto.setParentSampleName(item.getName());
       dto.setParentSampleAlias(item.getAlias());
       dto.setProjectId(item.getProject().getId());
+      dto.setProjectName(item.getProject().getName());
+      dto.setProjectShortName(item.getProject().getShortName());
       dto.setBox(newBox);
+
+      Requisition requisition = item.getRequisition() == null ? getParentRequisition(item)
+          : item.getRequisition();
+      if (requisition != null && requisition.getAssay() != null) {
+        dto.setRequisitionAssayId(requisition.getAssay().getId());
+      }
       return dto;
     }
 
@@ -389,11 +395,6 @@ public class EditLibraryController {
       addJsonArray(mapper, config, "sops", sopService.listByCategory(SopCategory.LIBRARY), Dtos::asDto);
     }
 
-    @Override
-    protected boolean isNewInterface() {
-      return true;
-    }
-
   }
 
   @PostMapping(value = "/bulk/propagate")
@@ -436,11 +437,6 @@ public class EditLibraryController {
         config.put(Config.SHOW_DESCRIPTION, showDescription);
         config.put(Config.SHOW_VOLUME, showVolume);
         config.put(Config.SHOW_LIBRARY_ALIAS, showLibraryAlias);
-      }
-
-      @Override
-      protected boolean isNewInterface() {
-        return true;
       }
     };
     return backend.edit(libraryIds, model);
@@ -493,11 +489,6 @@ public class EditLibraryController {
         config.put(Config.SAMPLE_ALIAS_MAYBE_REQUIRED, !alwaysGenerateSampleAliases());
         config.put(Config.LIBRARY_ALIAS_MAYBE_REQUIRED, !alwaysGenerateLibraryAliases());
         addJsonArray(mapper, config, "recipientGroups", recipientGroups, Dtos::asDto);
-      }
-
-      @Override
-      protected boolean isNewInterface() {
-        return true;
       }
     };
     return backend.create(model);

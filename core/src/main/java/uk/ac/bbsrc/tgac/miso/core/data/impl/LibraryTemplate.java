@@ -41,7 +41,7 @@ public class LibraryTemplate implements Serializable, Deletable {
   private static final long UNSAVED_ID = 0L;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long libraryTemplateId = UNSAVED_ID;
 
   String alias;

@@ -11,7 +11,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 public interface SequencingContainerModelService extends BarcodableService<SequencingContainerModel>,
-    DeleterService<SequencingContainerModel>, ListService<SequencingContainerModel>, SaveService<SequencingContainerModel> {
+    BulkSaveService<SequencingContainerModel>, DeleterService<SequencingContainerModel>,
+    ListService<SequencingContainerModel> {
 
   @Override
   default EntityType getEntityType() {

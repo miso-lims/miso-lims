@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
@@ -52,12 +53,22 @@ public class HibernateAttachmentCategoryDaoIT extends AbstractDAOTest {
   }
 
   @Test
+  public void testListByIdList() throws Exception {
+    testListByIdList(sut::listByIdList, Arrays.asList(1L, 2L));
+  }
+
+  @Test
+  public void testListByIdListNone() throws Exception {
+    testListByIdListNone(sut::listByIdList);
+  }
+
+  @Test
   public void testCreate() throws IOException {
     String alias = "test";
     AttachmentCategory cat = new AttachmentCategory();
     cat.setAlias(alias);
     assertFalse(cat.isSaved());
-    sut.save(cat);
+    sut.create(cat);
     assertTrue(cat.isSaved());
 
     sessionFactory.getCurrentSession().flush();
@@ -74,7 +85,7 @@ public class HibernateAttachmentCategoryDaoIT extends AbstractDAOTest {
     assertNotEquals(alias, cat.getAlias());
     cat.setAlias(alias);
     assertTrue(cat.isSaved());
-    sut.save(cat);
+    sut.update(cat);
 
     sessionFactory.getCurrentSession().flush();
     sessionFactory.getCurrentSession().clear();

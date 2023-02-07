@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.getParentRequisition;
 import static uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils.*;
 
 import java.io.IOException;
@@ -63,6 +64,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
@@ -420,11 +422,6 @@ public class EditSampleController {
       addJsonArray(mapper, config, Config.PROJECTS, projectService.list(), Dtos::asDto);
       addJsonArray(mapper, config, Config.SOPS, sopService.listByCategory(SopCategory.SAMPLE), Dtos::asDto);
     }
-
-    @Override
-    protected boolean isNewInterface() {
-      return true;
-    }
   }
 
   private final class BulkPropagateSampleBackend extends BulkPropagateTableBackend<Sample, SampleDto> {
@@ -473,6 +470,15 @@ public class EditSampleController {
             || (SampleTissueProcessing.CATEGORY_NAME.equals(targetCategory))) {
           setRelatedSlideDtos(sample, dto);
         }
+        Requisition requisition = sample.getRequisition() == null ? getParentRequisition(sample)
+            : sample.getRequisition();
+        if (requisition != null) {
+          dto.setEffectiveRequisitionId(requisition.getId());
+          dto.setEffectiveRequisitionAlias((requisition.getAlias()));
+          if (requisition.getAssay() != null) {
+            dto.setRequisitionAssayId(requisition.getAssay().getId());
+          }
+        }
         return dto;
       } else {
         throw new IllegalArgumentException("Cannot create plain samples from other plain samples!");
@@ -505,11 +511,6 @@ public class EditSampleController {
       addJsonArray(mapper, config, Config.PROJECTS, projectService.list(), Dtos::asDto);
       addJsonArray(mapper, config, Config.SOPS, sopService.listByCategory(SopCategory.SAMPLE), Dtos::asDto);
     }
-
-    @Override
-    protected boolean isNewInterface() {
-      return true;
-    }
   }
 
   private final class BulkCreateSampleBackend extends BulkCreateTableBackend<SampleDto> {
@@ -538,11 +539,6 @@ public class EditSampleController {
       config.putPOJO(Config.BOX, box);
       addJsonArray(mapper, config, "recipientGroups", recipientGroups, Dtos::asDto);
       addJsonArray(mapper, config, Config.SOPS, sopService.listByCategory(SopCategory.SAMPLE), Dtos::asDto);
-    }
-
-    @Override
-    protected boolean isNewInterface() {
-      return true;
     }
   }
 

@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.criterion.MatchMode;
@@ -20,7 +21,7 @@ public class HibernateContactDao extends HibernateSaveDao<Contact> implements Co
   }
 
   @Override
-  public List<Contact> listByIdList(List<Long> ids) throws IOException {
+  public List<Contact> listByIdList(Collection<Long> ids) throws IOException {
     return listByIdList("contactId", ids);
   }
 

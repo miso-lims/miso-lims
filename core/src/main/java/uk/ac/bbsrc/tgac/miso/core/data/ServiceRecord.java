@@ -31,7 +31,7 @@ public class ServiceRecord implements Serializable, Deletable, Attachable {
   private static final long UNSAVED_ID = 0L;
   
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long recordId = ServiceRecord.UNSAVED_ID;
 
   @ManyToOne(targetEntity = InstrumentImpl.class)

@@ -10,7 +10,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -62,7 +62,7 @@ public class DefaultExperimentServiceTest {
   public void setUp() {
     MockitoAnnotations.initMocks(this);
     Mockito.when(namingSchemeHolder.getPrimary()).thenReturn(namingScheme);
-    Mockito.when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
+    Mockito.when(namingScheme.validateName(ArgumentMatchers.any())).thenReturn(ValidationResult.success());
     experiment.setInstrumentModel(new InstrumentModel());
     experiment.getInstrumentModel().setId(2L);
     experiment.setLibrary(new LibraryImpl());

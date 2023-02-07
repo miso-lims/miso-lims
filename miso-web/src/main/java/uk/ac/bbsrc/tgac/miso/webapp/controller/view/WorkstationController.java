@@ -30,7 +30,7 @@ public class WorkstationController extends AbstractTypeDataController<Workstatio
   private AuthorizationManager authorizationManager;
 
   public WorkstationController() {
-    super("Workstations", "workstation", "workstation", true);
+    super("Workstations", "workstation", "workstation");
   }
 
   @GetMapping("/list")

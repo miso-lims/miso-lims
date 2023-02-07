@@ -3,7 +3,9 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 import java.io.IOException;
 import java.util.List;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,8 @@ import uk.ac.bbsrc.tgac.miso.persistence.SecurityStore;
 @Service
 public class DefaultUserService implements UserService {
 
+  private static final String[] characterClasses = {".*[A-Z].*", ".*[a-z].*", ".*[0-9].*", ".*[^A-Za-z0-9].*"};
+
   @Autowired
   private SecurityStore securityStore;
   @Autowired
@@ -30,6 +34,8 @@ public class DefaultUserService implements UserService {
   private AuthorizationManager authorizationManager;
   @Autowired
   private DeletionStore deletionStore;
+  @Autowired(required = false)
+  private PasswordEncoder passwordEncoder; // Will be null if using LDAP/AD authentication
 
   public void setSecurityStore(SecurityStore securityStore) {
     this.securityStore = securityStore;
@@ -45,7 +51,32 @@ public class DefaultUserService implements UserService {
     if (authorizationManager.getCurrentUser() != null) {
       authorizationManager.throwIfNonAdmin();
     }
+
+    user.setPassword(validateAndEncodePassword(user.getPassword(), true));
     return securityStore.saveUser(user);
+  }
+
+  @VisibleForTesting
+  protected String validateAndEncodePassword(String password, boolean newUser) {
+    if (newUser && !securityManager.isPasswordMutable() && password == null) {
+      // null expected if using LDAP/AD authentication
+      return null;
+    }
+    String passwordProperty = newUser ? "password" : "newPassword";
+    if (password.length() < 8) {
+      throw new ValidationException(new ValidationError(passwordProperty, "Must be at least 8 characters long"));
+    }
+    int complexity = 0;
+    for (String characterClass : characterClasses) {
+      if (password.matches(characterClass)) {
+        complexity++;
+      }
+    }
+    if (complexity < 3) {
+      throw new ValidationException(new ValidationError(passwordProperty,
+          "Must contain at least 3 of the following: uppercase letters, lowercase letters, numbers, special characters"));
+    }
+    return passwordEncoder.encode(password);
   }
 
   @Override
@@ -72,7 +103,7 @@ public class DefaultUserService implements UserService {
     }
     if (securityManager.isPasswordMutable()) {
       if (user.getPassword() != null) {
-        original.setPassword(user.getPassword());
+        original.setPassword(validateAndEncodePassword(user.getPassword(), false));
       }
     } else {
       original.setPassword(null);

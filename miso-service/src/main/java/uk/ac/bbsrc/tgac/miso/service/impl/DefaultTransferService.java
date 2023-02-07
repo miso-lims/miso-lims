@@ -21,14 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxPosition;
-import uk.ac.bbsrc.tgac.miso.core.data.Box;
-import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
-import uk.ac.bbsrc.tgac.miso.core.data.Lab;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryAliquotBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
@@ -142,15 +135,18 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
     }
     String position = item.getItem().getBoxPosition();
     loadChildEntity(item.getItem(), setter, service);
+    // detach to prevent Hibernate from prematurely detecting changes in this entity
+    transferStore.detachEntity(item.getItem());
     setBoxPosition(item, box, position, positionConstructor, positionSetter);
   }
 
-  private <T extends Boxable, U extends TransferItem<T>, V extends AbstractBoxPosition> void setBoxPosition(U item, Box box,
-      String position, Supplier<V> positionConstructor, BiConsumer<T, V> positionSetter) {
+  private <T extends Boxable, U extends TransferItem<T>, V extends AbstractBoxPosition> void setBoxPosition(U item,
+      Box box, String position, Supplier<V> positionConstructor, BiConsumer<T, V> positionSetter) {
     if (box == null) {
       positionSetter.accept(item.getItem(), null);
     } else {
       V boxPosition = positionConstructor.get();
+      boxPosition.setItemId(item.getItem().getId());
       boxPosition.setBox(box);
       boxPosition.setPosition(position);
       positionSetter.accept(item.getItem(), boxPosition);

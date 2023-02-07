@@ -81,7 +81,7 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable,
 
   @Id
   @Column(name = "locationId")
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id = UNSAVED_ID;
 
   @ManyToOne

@@ -477,9 +477,12 @@ public class Dtos {
       dto.setQcs(asQcDtos(from.getQCs()));
     }
 
-    setId(dto::setRequisitionId, from.getRequisition());
-    setString(dto::setRequisitionAlias, maybeGetProperty(from.getRequisition(), Requisition::getAlias));
-    setId(dto::setRequisitionAssayId, maybeGetProperty(from.getRequisition(), Requisition::getAssay));
+    if (from.getRequisition() != null) {
+      Requisition requisition = from.getRequisition();
+      setId(dto::setRequisitionId, requisition);
+      setString(dto::setRequisitionAlias, requisition.getAlias());
+      setId(dto::setRequisitionAssayId, requisition.getAssay());
+    }
 
     return dto;
   }
@@ -597,24 +600,14 @@ public class Dtos {
     }
     setEffectiveQcFailure(from, dto);
 
-    if (from.getRequisition() == null) {
-      Requisition requisition = getParentRequisition(from);
+    Requisition requisition = from.getRequisition() == null ? getParentRequisition(from) : from.getRequisition();
+    if (requisition != null) {
       setId(dto::setEffectiveRequisitionId, requisition);
-      setString(dto::setEffectiveRequisitionAlias, maybeGetProperty(requisition, Requisition::getAlias));
+      setString(dto::setEffectiveRequisitionAlias, requisition.getAlias());
+      setId(dto::setRequisitionAssayId, requisition.getAssay());
     }
 
     return dto;
-  }
-
-  private static Requisition getParentRequisition(Sample sample) {
-    if (!LimsUtils.isDetailedSample(sample)) {
-      return null;
-    }
-    DetailedSample requisitionSample = ((DetailedSample) sample).getParent();
-    while (requisitionSample != null && requisitionSample.getRequisition() == null) {
-      requisitionSample = requisitionSample.getParent();
-    }
-    return requisitionSample == null ? null : requisitionSample.getRequisition();
   }
 
   private static void setEffectiveQcFailure(HierarchyEntity from, UpstreamQcFailableDto to) {
@@ -1390,6 +1383,8 @@ public class Dtos {
     setString(dto::setParentSampleName, maybeGetProperty(from.getSample(), Sample::getName));
     dto.setParentSampleAlias(from.getSample().getAlias());
     dto.setProjectId(from.getSample().getProject().getId());
+    setString(dto::setProjectName, from.getSample().getProject().getName());
+    setString(dto::setProjectShortName, from.getSample().getProject().getShortName());
     if (from.getSample() instanceof DetailedSample) {
       dto.setParentSampleClassId(((DetailedSample) from.getSample()).getSampleClass().getId());
     }
@@ -1470,6 +1465,7 @@ public class Dtos {
     }
     setId(dto::setRequisitionId, requisition);
     setString(dto::setRequisitionAlias, maybeGetProperty(requisition, Requisition::getAlias));
+    setId(dto::setRequisitionAssayId, maybeGetProperty(requisition, Requisition::getAssay));
 
     return dto;
   }
@@ -1690,6 +1686,12 @@ public class Dtos {
         setLong(dto::setSampleId, sample.getId(), true);
         setString(dto::setSampleName, sample.getName());
         setString(dto::setSampleAlias, sample.getAlias());
+        Project project = sample.getProject();
+        if (sample.getProject() != null) {
+          setLong(dto::setProjectId, project.getId(), true);
+          setString(dto::setProjectName, project.getName());
+          setString(dto::setProjectShortName, project.getShortName());
+        }
       }
     }
     if (from.getParentAliquot() != null) {
@@ -1738,6 +1740,7 @@ public class Dtos {
     }
     setId(dto::setRequisitionId, requisition);
     setString(dto::setRequisitionAlias, maybeGetProperty(requisition, Requisition::getAlias));
+    setId(dto::setRequisitionAssayId, maybeGetProperty(requisition, Requisition::getAssay));
 
     return dto;
   }
@@ -1814,6 +1817,9 @@ public class Dtos {
     dto.setSampleId(from.getSampleId());
     dto.setSampleName(from.getSampleName());
     dto.setSampleAlias(from.getSampleAlias());
+    setLong(dto::setProjectId, from.getProjectId(), true);
+    setString(dto::setProjectName, from.getProjectName());
+    setString(dto::setProjectShortName, from.getProjectShortName());
     setString(dto::setSequencingControlTypeAlias, maybeGetProperty(from.getSampleSequencingControlType(), SequencingControlType::getAlias));
     setId(dto::setDetailedQcStatusId, from.getDetailedQcStatus());
     setString(dto::setDetailedQcStatusNote, from.getDetailedQcStatusNote());

@@ -20,12 +20,13 @@ public class PoolBoxPosition extends AbstractBoxPosition {
   @Id
   private Long poolId;
 
-  public Long getPoolId() {
+  @Override
+  public long getItemId() {
     return poolId;
   }
 
-  public void setPoolId(Long poolId) {
-    this.poolId = poolId;
+  @Override
+  public void setItemId(long id) {
+  this.poolId = poolId;
   }
-
 }

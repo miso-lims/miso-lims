@@ -35,7 +35,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -73,7 +73,7 @@ public class HibernateSequencerPartitionContainerDaoIT extends AbstractDAOTest {
     dao.setSessionFactory(sessionFactory);
 
     emptyUser.setId(1L);
-    when(securityDao.getUserById(Matchers.anyLong())).thenReturn(emptyUser);
+    when(securityDao.getUserById(ArgumentMatchers.anyLong())).thenReturn(emptyUser);
   }
 
   @Test

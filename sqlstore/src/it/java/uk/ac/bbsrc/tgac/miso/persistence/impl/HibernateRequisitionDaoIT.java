@@ -56,9 +56,4 @@ public class HibernateRequisitionDaoIT extends AbstractHibernateSaveDaoTest<Requ
     assertEquals(alias, req.getAlias());
   }
 
-  @Test
-  public void testListByIdList() throws Exception {
-    testListByIdList(HibernateRequisitionDao::listByIdList, Arrays.asList(1L, 2L));
-  }
-
 }

@@ -78,11 +78,6 @@ public class QcController {
         config.put("addControls", addControls);
         config.put("qcTarget", qcTarget.getLabel());
       }
-
-      @Override
-      protected boolean isNewInterface() {
-        return true;
-      }
     }.edit(qcIds, model);
   }
 

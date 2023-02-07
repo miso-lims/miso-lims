@@ -1,6 +1,5 @@
 BulkTarget = window.BulkTarget || {};
-BulkTarget.boxuse = (function($) {
-
+BulkTarget.boxuse = (function ($) {
   /*
    * Expected config: {
    *   pageMode: string {create, edit}
@@ -9,21 +8,20 @@ BulkTarget.boxuse = (function($) {
    */
 
   return {
-    getSaveUrl: function() {
+    getSaveUrl: function () {
       return Urls.rest.boxUses.bulkSave;
     },
-    getSaveProgressUrl: function(operationId) {
+    getSaveProgressUrl: function (operationId) {
       return Urls.rest.boxUses.bulkSaveProgress(operationId);
     },
-    getUserManualUrl: function() {
-      return Urls.external.userManual('type_data', 'box-uses');
+    getUserManualUrl: function () {
+      return Urls.external.userManual("type_data", "box-uses");
     },
-    getBulkActions: function(config) {
+    getBulkActions: function (config) {
       return !config.isAdmin ? [] : [BulkUtils.actions.edit(Urls.ui.boxUses.bulkEdit)];
     },
-    getColumns: function(config, api) {
+    getColumns: function (config, api) {
       return [BulkUtils.columns.simpleAlias(255)];
-    }
+    },
   };
-
 })(jQuery);

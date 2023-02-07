@@ -60,6 +60,8 @@ public class LibraryAliquotDto extends AbstractBoxableDto implements UpstreamQcF
   private Integer dnaSize;
   private Integer proportion;
   private Long projectId;
+  private String projectName;
+  private String projectShortName;
   private String subprojectAlias;
   private Boolean subprojectPriority;
   private String sequencingControlTypeAlias;
@@ -72,6 +74,7 @@ public class LibraryAliquotDto extends AbstractBoxableDto implements UpstreamQcF
   private String effectiveQcFailureLevel;
   private Long requisitionId;
   private String requisitionAlias;
+  private Long requisitionAssayId;
 
   public Long getId() {
     return id;
@@ -373,6 +376,22 @@ public class LibraryAliquotDto extends AbstractBoxableDto implements UpstreamQcF
     this.projectId = projectId;
   }
 
+  public String getProjectName() {
+    return projectName;
+  }
+
+  public void setProjectName(String projectName) {
+    this.projectName = projectName;
+  }
+
+  public String getProjectShortName() {
+    return projectShortName;
+  }
+
+  public void setProjectShortName(String projectShortName) {
+    this.projectShortName = projectShortName;
+  }
+
   public String getSubprojectAlias() {
     return subprojectAlias;
   }
@@ -479,6 +498,14 @@ public class LibraryAliquotDto extends AbstractBoxableDto implements UpstreamQcF
 
   public void setRequisitionAlias(String requisitionAlias) {
     this.requisitionAlias = requisitionAlias;
+  }
+
+  public Long getRequisitionAssayId() {
+    return requisitionAssayId;
+  }
+
+  public void setRequisitionAssayId(Long requisitionAssayId) {
+    this.requisitionAssayId = requisitionAssayId;
   }
 
 }

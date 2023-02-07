@@ -130,7 +130,8 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
   private List<Object[]> queryIds(String additionalQuery, long[] parameters) {
     return queryIds(additionalQuery, query -> {
       for (int i = 0; i < parameters.length; i++) {
-        query.setLong(i, parameters[i]);
+        // parameters indices start at 1, but parameters array starts at 0
+        query.setLong(i+1, parameters[i]);
       }
     });
   }

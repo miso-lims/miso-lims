@@ -1,187 +1,213 @@
 BulkTarget = window.BulkTarget || {};
-BulkTarget.pool = (function($) {
-
+BulkTarget.pool = (function ($) {
   /*
    * Expected config: {
    *   pageMode: string {create, edit}
    * }
    */
 
-  var customPoolNotes = "Switch between Pool and Library Aliquot views using the 'Choose Library Aliquots'/'Edit Pools' buttons";
+  var customPoolNotes =
+    "Switch between Pool and Library Aliquot views using the 'Choose Library Aliquots'/'Edit Pools' buttons";
 
   // used for custom pooling - table is rebuilt when switching between aliquot/pool views
   var aliquots = null;
   var pools = null;
 
   var aliquotPoolTarget = {
-    getDescription: function(config) {
+    getDescription: function (config) {
       return customPoolNotes;
     },
-    getColumns: function(config, api) {
+    getColumns: function (config, api) {
       return [
         {
-          title: 'Library Aliquot Name',
-          type: 'text',
+          title: "Library Aliquot Name",
+          type: "text",
           disabled: true,
-          data: 'name',
-        }, {
-          title: 'Alias',
-          type: 'text',
+          data: "name",
+        },
+        {
+          title: "Alias",
+          type: "text",
           disabled: true,
-          data: 'alias',
-        }, {
-          title: 'Box Alias',
-          type: 'text',
+          data: "alias",
+        },
+        {
+          title: "Box Alias",
+          type: "text",
           disabled: true,
-          data: 'box.alias'
-        }, {
-          title: 'Position',
-          type: 'text',
+          data: "box.alias",
+        },
+        {
+          title: "Position",
+          type: "text",
           disabled: true,
-          data: 'boxPosition'
-        }, {
-          title: 'Size (bp)',
-          type: 'int',
+          data: "boxPosition",
+        },
+        {
+          title: "Size (bp)",
+          type: "int",
           disabled: true,
-          data: 'dnaSize'
-        }, {
-          title: 'Pool',
-          type: 'dropdown',
-          data: 'pool',
+          data: "dnaSize",
+        },
+        {
+          title: "Pool",
+          type: "dropdown",
+          data: "pool",
           required: true,
-          source: function() {
-            return !pools ? [] : pools.filter(function(pool) {
-              return pool.alias;
-            }).map(function(pool) {
-              return pool.alias;
-            });
-          }
-        }
+          source: function () {
+            return !pools
+              ? []
+              : pools
+                  .filter(function (pool) {
+                    return pool.alias;
+                  })
+                  .map(function (pool) {
+                    return pool.alias;
+                  });
+          },
+        },
       ];
     },
-    getCustomActions: function(config, api) {
-      return [{
-        name: 'Edit Pools',
-        action: function() {
-          switchToPoolsTable(api, config);
-        }
-      }];
+    getCustomActions: function (config, api) {
+      return [
+        {
+          name: "Edit Pools",
+          action: function () {
+            switchToPoolsTable(api, config);
+          },
+        },
+      ];
     },
-    confirmSave: function(data, config, api) {
+    confirmSave: function (data, config, api) {
       var deferred = $.Deferred();
       deferred.reject(true);
-      
+
       // wait a second to allow async HandsOnTable stuff to run
-      window.setTimeout(function() {
+      window.setTimeout(function () {
         switchToPoolsTable(api, config);
-        $('#save').click();
+        $("#save").click();
       }, 1000);
-      
+
       return deferred.promise();
-    }
+    },
   };
 
   return {
-    getSaveUrl: function() {
+    getSaveUrl: function () {
       return Urls.rest.pools.bulkSave;
     },
-    getSaveProgressUrl: function(operationId) {
+    getSaveProgressUrl: function (operationId) {
       return Urls.rest.pools.bulkSaveProgress(operationId);
     },
-    getUserManualUrl: function() {
-      return Urls.external.userManual('pools');
+    getUserManualUrl: function () {
+      return Urls.external.userManual("pools");
     },
-    getDescription: function(config) {
+    getDescription: function (config) {
       return config.aliquotsToPool ? customPoolNotes : null;
     },
-    getBulkActions: function(config) {
+    getBulkActions: function (config) {
       return [
         BulkUtils.actions.edit(Urls.ui.pools.bulkEdit),
         {
           name: "Create Orders",
           excludeOnOrders: true,
-          action: function(pools) {
+          action: function (pools) {
             Utils.page.post(Urls.ui.sequencingOrders.bulkCreate, {
-              poolIds: pools.map(Utils.array.getId).join(',')
+              poolIds: pools.map(Utils.array.getId).join(","),
             });
-          }
+          },
         },
-        HotUtils.printAction('pool'),
-        HotUtils.spreadsheetAction(Urls.rest.pools.spreadsheet, Constants.poolSpreadsheets, function(pools, spreadsheet) {
-          var errors = [];
-          return errors;
-        }),
-        HotUtils.spreadsheetAction(Urls.rest.pools.contentsSpreadsheet, Constants.libraryAliquotSpreadsheets, function(aliquots,
-          spreadsheet) {
-          var errors = [];
-          return errors;
-        }, 'Download Contents'),
+        BulkUtils.actions.print("pool"),
+        BulkUtils.actions.download(
+          Urls.rest.pools.spreadsheet,
+          Constants.poolSpreadsheets,
+          function (pools, spreadsheet) {
+            var errors = [];
+            return errors;
+          }
+        ),
+        BulkUtils.actions.download(
+          Urls.rest.pools.contentsSpreadsheet,
+          Constants.libraryAliquotSpreadsheets,
+          function (aliquots, spreadsheet) {
+            var errors = [];
+            return errors;
+          },
+          "Download Contents"
+        ),
         {
           name: "Create Samplesheet",
-          action: createSamplesheet
+          action: createSamplesheet,
         },
-        HotUtils.makeParents(Urls.rest.pools.parents, HotUtils.relationCategoriesForDetailed().concat(
-          [HotUtils.relations.library(), HotUtils.relations.libraryAliquot()])),
-        HotUtils.makeChildren(Urls.rest.pools.children, [HotUtils.relations.run()])
+        BulkUtils.actions.parents(
+          Urls.rest.pools.parents,
+          BulkUtils.relations
+            .categoriesForDetailed()
+            .concat([BulkUtils.relations.library(), BulkUtils.relations.libraryAliquot()])
+        ),
+        BulkUtils.actions.children(Urls.rest.pools.children, [BulkUtils.relations.run()]),
       ]
-      .concat(BulkUtils.actions.qc('Pool'))
-      .concat([
-        BulkUtils.actions.transfer('poolIds')
-      ]);
+        .concat(BulkUtils.actions.qc("Pool"))
+        .concat([BulkUtils.actions.transfer("poolIds")]);
     },
-    getColumns: function(config, api) {
+    getColumns: function (config, api) {
       return [
         BulkUtils.columns.name,
         BulkUtils.columns.simpleAlias(255),
-        BulkUtils.columns.description
+        BulkUtils.columns.description,
       ]
-      .concat(BulkUtils.columns.boxable(config, api))
-      .concat([
-        {
-          title: 'Creation Date',
-          type: 'date',
-          data: 'creationDate',
-          required: true,
-          initial: Utils.getCurrentDate()
-        }, BulkUtils.columns.dnaSize
-      ])
-      .concat(BulkUtils.columns.concentration())
-      .concat(BulkUtils.columns.volume())
-      .concat([
-        {
-          title: 'QC Status',
-          type: 'dropdown',
-          data: 'qcPassed',
-          source: [{
-            label: 'Ready',
-            value: true
-          }, {
-            label: 'Failed',
-            value: false
-          }, {
-            label: 'Not Ready',
-            value: null
-          }],
-          getItemLabel: Utils.array.get('label'),
-          getItemValue: Utils.array.get('value')
-        }
-      ]);
+        .concat(BulkUtils.columns.boxable(config, api))
+        .concat([
+          {
+            title: "Creation Date",
+            type: "date",
+            data: "creationDate",
+            required: true,
+            initial: Utils.getCurrentDate(),
+          },
+          BulkUtils.columns.dnaSize,
+        ])
+        .concat(BulkUtils.columns.concentration())
+        .concat(BulkUtils.columns.volume())
+        .concat([
+          {
+            title: "QC Status",
+            type: "dropdown",
+            data: "qcPassed",
+            source: [
+              {
+                label: "Ready",
+                value: true,
+              },
+              {
+                label: "Failed",
+                value: false,
+              },
+              {
+                label: "Not Ready",
+                value: null,
+              },
+            ],
+            getItemLabel: Utils.array.get("label"),
+            getItemValue: Utils.array.get("value"),
+          },
+        ]);
     },
-    getCustomActions: function(config) {
+    getCustomActions: function (config) {
       var actions = BulkUtils.actions.boxable(false);
       if (config.aliquotsToPool) {
         actions.unshift({
-          name: 'Choose Library Aliquots',
-          action: function(api) {
+          name: "Choose Library Aliquots",
+          action: function (api) {
             switchToAliquotsTable(api, config);
-          }
+          },
         });
       }
       return actions;
     },
-    confirmSave: function(data, config, api) {
+    confirmSave: function (data, config, api) {
       var deferred = $.Deferred();
-      
+
       if (config.aliquotsToPool) {
         // ensure Pool aliases are unique, so we can sort the aliquots correctly
         pools = data;
@@ -195,14 +221,14 @@ BulkTarget.pool = (function($) {
           }
         }
         if (duplicateAliases) {
-          Utils.showOkDialog('Error', ['There are duplicate Pool aliases'], function() {
+          Utils.showOkDialog("Error", ["There are duplicate Pool aliases"], function () {
             deferred.reject();
           });
           return deferred.promise();
         }
 
         // sort aliquots and ensure they're all added to pools
-        pools.forEach(function(pool) {
+        pools.forEach(function (pool) {
           pool.pooledElements = [];
         });
 
@@ -210,12 +236,12 @@ BulkTarget.pool = (function($) {
           aliquots = config.aliquotsToPool;
         }
         var aliquotPoolMissing = false;
-        aliquots.forEach(function(aliquot) {
+        aliquots.forEach(function (aliquot) {
           if (!aliquot.pool) {
             aliquotPoolMissing = true;
             return deferred.promise();
           }
-          var pool = Utils.array.findFirstOrNull(function(pool) {
+          var pool = Utils.array.findFirstOrNull(function (pool) {
             return pool.alias === aliquot.pool;
           }, pools);
           if (!pool) {
@@ -225,7 +251,7 @@ BulkTarget.pool = (function($) {
           }
         });
         if (aliquotPoolMissing) {
-          Utils.showOkDialog('Error', ['All aliquots must be added to pools'], function() {
+          Utils.showOkDialog("Error", ["All aliquots must be added to pools"], function () {
             switchToAliquotsTable(api, config);
             deferred.reject();
           });
@@ -233,124 +259,174 @@ BulkTarget.pool = (function($) {
         }
 
         // check that all pools have aliquots in them
-        var empties = pools.filter(function(pool) {
+        var empties = pools.filter(function (pool) {
           return !pool.pooledElements || !pool.pooledElements.length;
         });
         if (empties.length) {
-          Utils.showOkDialog('Error', [empties.length > 1 ? 'There are empty pools' : 'Pool \'' + empties[0].alias + '\' is empty'],
-              function() {
-                switchToAliquotsTable(api, config);
-                deferred.reject();
-              });
+          Utils.showOkDialog(
+            "Error",
+            [
+              empties.length > 1
+                ? "There are empty pools"
+                : "Pool '" + empties[0].alias + "' is empty",
+            ],
+            function () {
+              switchToAliquotsTable(api, config);
+              deferred.reject();
+            }
+          );
           return deferred.promise();
         }
       }
 
-      var missingBarcodesCount = data.filter(function(item) {
+      var missingBarcodesCount = data.filter(function (item) {
         return !item.identificationBarcode;
       }).length;
-      if (config.pageMode === 'edit' || Constants.automaticBarcodes || !missingBarcodesCount) {
+      if (config.pageMode === "edit" || Constants.automaticBarcodes || !missingBarcodesCount) {
         deferred.resolve();
       } else {
-        Utils.showConfirmDialog('Missing Barcodes', 'Save', ['Pools should usually have barcodes. Are you sure you wish to save '
-            + missingBarcodesCount + (missingBarcodesCount > 1 ? ' pools without barcodes' : ' pool without one') + '?'], function() {
-          deferred.resolve();
-        }, function() {
-          deferred.reject();
-        });
+        Utils.showConfirmDialog(
+          "Missing Barcodes",
+          "Save",
+          [
+            "Pools should usually have barcodes. Are you sure you wish to save " +
+              missingBarcodesCount +
+              (missingBarcodesCount > 1 ? " pools without barcodes" : " pool without one") +
+              "?",
+          ],
+          function () {
+            deferred.resolve();
+          },
+          function () {
+            deferred.reject();
+          }
+        );
       }
       return deferred.promise();
-    }
+    },
   };
 
   function createSamplesheet(pools) {
-    var platformTypes = Utils.array.deduplicateString(pools.map(function(pool) {
-      return pool.platformType;
-    }));
+    var platformTypes = Utils.array.deduplicateString(
+      pools.map(function (pool) {
+        return pool.platformType;
+      })
+    );
     if (platformTypes.length > 1) {
-      Utils.showOkDialog("Error", ["Cannot create a sample sheet from pools for different platforms."]);
+      Utils.showOkDialog("Error", [
+        "Cannot create a sample sheet from pools for different platforms.",
+      ]);
       return;
     }
     if (platformTypes[0] != "ILLUMINA") {
       Utils.showOkDialog("Error", ["Can only create sample sheets for Illumina sequencers."]);
       return;
     }
-    var instrumentModels = Constants.instrumentModels.filter(function(model) {
-      return (model.instrumentType == "SEQUENCER" && model.platformType == platformTypes[0] && model.active);
+    var instrumentModels = Constants.instrumentModels.filter(function (model) {
+      return (
+        model.instrumentType == "SEQUENCER" &&
+        model.platformType == platformTypes[0] &&
+        model.active
+      );
     });
     if (instrumentModels.length == 0) {
-      Utils.showOkDialog("Error", ["No instruments are available for these pools.", "Please add a sequencer first."]);
+      Utils.showOkDialog("Error", [
+        "No instruments are available for these pools.",
+        "Please add a sequencer first.",
+      ]);
       return;
     }
     function showCreateDialog(modelId) {
-      Utils.showDialog("Create Samplesheet", "Download", [{
-        property: "experimentType",
-        label: "Type",
-        required: true,
-        type: "select",
-        getLabel: function(type) {
-          return type.description;
+      Utils.showDialog(
+        "Create Samplesheet",
+        "Download",
+        [
+          {
+            property: "experimentType",
+            label: "Type",
+            required: true,
+            type: "select",
+            getLabel: function (type) {
+              return type.description;
+            },
+            values: Constants.illuminaExperimentTypes,
+          },
+          {
+            property: "sequencingParameters",
+            label: "Sequencing Parameters",
+            required: true,
+            type: "select",
+            getLabel: Utils.array.getName,
+            values: Constants.sequencingParameters.filter(function (param) {
+              return param.instrumentModelId == modelId;
+            }),
+          },
+          {
+            property: "genomeFolder",
+            type: "text",
+            label: "Genome Folder",
+            value: Constants.genomeFolder,
+            required: true,
+          },
+          {
+            property: "customRead1Primer",
+            type: "text",
+            label: "Custom Read 1 Primer Well",
+            required: false,
+          },
+          {
+            property: "customIndexPrimer",
+            type: "text",
+            label: "Custom Index Primer Well",
+            required: false,
+          },
+          {
+            property: "customRead2Primer",
+            type: "text",
+            label: "Custom Read 2 Primer Well",
+            required: false,
+          },
+          {
+            property: "pools",
+            label: "Lanes Configuration",
+            required: true,
+            type: "order",
+            getLabel: Utils.array.getAlias,
+            values: pools,
+          },
+        ],
+        function (result) {
+          Utils.ajaxDownloadWithDialog(Urls.rest.pools.samplesheet, {
+            customRead1Primer: result.customRead1Primer,
+            customIndexPrimer: result.customIndexPrimer,
+            customRead2Primer: result.customRead2Primer,
+            experimentType: result.experimentType.name,
+            genomeFolder: result.genomeFolder,
+            sequencingParametersId: result.sequencingParameters.id,
+            poolIds: result.pools.map(Utils.array.getId),
+          });
         },
-        values: Constants.illuminaExperimentTypes
-      }, {
-        property: "sequencingParameters",
-        label: "Sequencing Parameters",
-        required: true,
-        type: "select",
-        getLabel: Utils.array.getName,
-        values: Constants.sequencingParameters.filter(function(param) {
-          return param.instrumentModelId == modelId;
-        })
-      }, {
-        property: 'genomeFolder',
-        type: 'text',
-        label: 'Genome Folder',
-        value: Constants.genomeFolder,
-        required: true
-      }, {
-        property: 'customRead1Primer',
-        type: 'text',
-        label: 'Custom Read 1 Primer Well',
-        required: false
-      }, {
-        property: 'customIndexPrimer',
-        type: 'text',
-        label: 'Custom Index Primer Well',
-        required: false
-      }, {
-        property: 'customRead2Primer',
-        type: 'text',
-        label: 'Custom Read 2 Primer Well',
-        required: false
-      }, {
-        property: "pools",
-        label: "Lanes Configuration",
-        required: true,
-        type: "order",
-        getLabel: Utils.array.getAlias,
-        values: pools
-      }], function(result) {
-        Utils.ajaxDownloadWithDialog(Urls.rest.pools.samplesheet, {
-          customRead1Primer: result.customRead1Primer,
-          customIndexPrimer: result.customIndexPrimer,
-          customRead2Primer: result.customRead2Primer,
-          experimentType: result.experimentType.name,
-          genomeFolder: result.genomeFolder,
-          sequencingParametersId: result.sequencingParameters.id,
-          poolIds: result.pools.map(Utils.array.getId)
-        });
-      }, null);
+        null
+      );
     }
-    Utils.showWizardDialog("Create Samplesheet", Constants.instrumentModels.filter(function(p) {
-      return p.platformType === platformTypes[0] && p.instrumentType === 'SEQUENCER' && p.active;
-    }).sort(Utils.sorting.standardSort('alias')).map(function(instrumentModel) {
-      return {
-        name: instrumentModel.alias,
-        handler: function() {
-          showCreateDialog(instrumentModel.id);
-        }
-      }
-    }));
+    Utils.showWizardDialog(
+      "Create Samplesheet",
+      Constants.instrumentModels
+        .filter(function (p) {
+          return (
+            p.platformType === platformTypes[0] && p.instrumentType === "SEQUENCER" && p.active
+          );
+        })
+        .sort(Utils.sorting.standardSort("alias"))
+        .map(function (instrumentModel) {
+          return {
+            name: instrumentModel.alias,
+            handler: function () {
+              showCreateDialog(instrumentModel.id);
+            },
+          };
+        })
+    );
   }
 
   function switchToPoolsTable(api, config) {
@@ -365,5 +441,4 @@ BulkTarget.pool = (function($) {
     }
     api.rebuildTable(aliquotPoolTarget, aliquots);
   }
-
 })(jQuery);

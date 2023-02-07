@@ -31,28 +31,33 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.TestUtils;
 
 public class PlainSampleITs extends AbstractIT {
 
-  private static final Set<String> sampleColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
-      SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS, SamColumns.BOX_POSITION, SamColumns.DISCARDED, SamColumns.RECEIVE_DATE,
-      SamColumns.RECEIVE_TIME, SamColumns.RECEIVED_FROM, SamColumns.RECEIVED_BY, SamColumns.RECEIPT_CONFIRMED, SamColumns.RECEIPT_QC_PASSED,
+  private static final Set<String> sampleColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS,
+      SamColumns.DESCRIPTION, SamColumns.REQUISITION_ASSAY, SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS,
+      SamColumns.BOX_POSITION, SamColumns.DISCARDED, SamColumns.RECEIVE_DATE, SamColumns.RECEIVE_TIME,
+      SamColumns.RECEIVED_FROM, SamColumns.RECEIVED_BY, SamColumns.RECEIPT_CONFIRMED, SamColumns.RECEIPT_QC_PASSED,
       SamColumns.RECEIPT_QC_NOTE, SamColumns.REQUISITION_ALIAS, SamColumns.REQUISITION, SamColumns.REQUISITION_ASSAY,
-      SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT, SamColumns.VOLUME, SamColumns.VOLUME_UNITS,
-      SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS, SamColumns.QC_STATUS, SamColumns.QC_NOTE);
+      SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT, SamColumns.VOLUME,
+      SamColumns.VOLUME_UNITS, SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS, SamColumns.QC_STATUS,
+      SamColumns.QC_NOTE);
 
-  private static final Set<String> libraryColumns = Sets.newHashSet(LibColumns.NAME, LibColumns.SAMPLE_NAME, LibColumns.SAMPLE_ALIAS,
-      LibColumns.SAMPLE_LOCATION, LibColumns.BOX_SEARCH, LibColumns.BOX_ALIAS, LibColumns.BOX_POSITION, LibColumns.DISCARDED,
-      LibColumns.CREATION_DATE, LibColumns.WORKSTATION, LibColumns.THERMAL_CYCLER, LibColumns.PLATFORM, LibColumns.LIBRARY_TYPE,
-      LibColumns.SELECTION, LibColumns.STRATEGY, LibColumns.INDEX_FAMILY, LibColumns.INDEX_1, LibColumns.INDEX_2, LibColumns.UMIS,
-      LibColumns.KIT_DESCRIPTOR, LibColumns.KIT_LOT, LibColumns.QC_STATUS, LibColumns.QC_NOTE, LibColumns.SIZE, LibColumns.CONCENTRATION,
-      LibColumns.CONCENTRATION_UNITS, LibColumns.SPIKE_IN, LibColumns.SPIKE_IN_DILUTION, LibColumns.SPIKE_IN_VOL);
+  private static final Set<String> libraryColumns = Sets.newHashSet(LibColumns.NAME, SamColumns.PROJECT,
+      SamColumns.REQUISITION_ASSAY, LibColumns.SAMPLE_NAME, LibColumns.SAMPLE_ALIAS, LibColumns.SAMPLE_LOCATION,
+      LibColumns.BOX_SEARCH, LibColumns.BOX_ALIAS, LibColumns.BOX_POSITION, LibColumns.DISCARDED,
+      LibColumns.CREATION_DATE, LibColumns.WORKSTATION, LibColumns.THERMAL_CYCLER, LibColumns.PLATFORM,
+      LibColumns.LIBRARY_TYPE, LibColumns.SELECTION, LibColumns.STRATEGY, LibColumns.INDEX_FAMILY, LibColumns.INDEX_1,
+      LibColumns.INDEX_2, LibColumns.UMIS, LibColumns.KIT_DESCRIPTOR, LibColumns.KIT_LOT, LibColumns.QC_STATUS,
+      LibColumns.QC_NOTE, LibColumns.SIZE, LibColumns.CONCENTRATION, LibColumns.CONCENTRATION_UNITS,
+      LibColumns.SPIKE_IN, LibColumns.SPIKE_IN_DILUTION, LibColumns.SPIKE_IN_VOL);
 
-  private static final Set<String> libraryAliquotColumns = Sets.newHashSet(LibraryAliquotColumns.NAME, LibraryAliquotColumns.ALIAS,
-      LibraryAliquotColumns.PARENT_NAME, LibraryAliquotColumns.PARENT_ALIAS, LibraryAliquotColumns.PARENT_LOCATION,
-      LibraryAliquotColumns.DESCRIPTION, LibraryAliquotColumns.BOX_SEARCH, LibraryAliquotColumns.BOX_ALIAS,
-      LibraryAliquotColumns.BOX_POSITION, LibraryAliquotColumns.DISCARDED, LibraryAliquotColumns.QC_STATUS, LibraryAliquotColumns.QC_NOTE,
+  private static final Set<String> libraryAliquotColumns = Sets.newHashSet(LibraryAliquotColumns.NAME,
+      LibraryAliquotColumns.ALIAS, SamColumns.PROJECT, SamColumns.REQUISITION_ASSAY, LibraryAliquotColumns.PARENT_NAME,
+      LibraryAliquotColumns.PARENT_ALIAS, LibraryAliquotColumns.PARENT_LOCATION, LibraryAliquotColumns.DESCRIPTION,
+      LibraryAliquotColumns.BOX_SEARCH, LibraryAliquotColumns.BOX_ALIAS, LibraryAliquotColumns.BOX_POSITION,
+      LibraryAliquotColumns.DISCARDED, LibraryAliquotColumns.QC_STATUS, LibraryAliquotColumns.QC_NOTE,
       LibraryAliquotColumns.SIZE, LibraryAliquotColumns.CONCENTRATION, LibraryAliquotColumns.CONCENTRATION_UNITS,
-      LibraryAliquotColumns.VOLUME, LibraryAliquotColumns.VOLUME_UNITS, LibraryAliquotColumns.NG_USED, LibraryAliquotColumns.VOLUME_USED,
-      LibraryAliquotColumns.CREATION_DATE, LibraryAliquotColumns.KIT, LibraryAliquotColumns.KIT_LOT,
-      LibraryAliquotColumns.TARGETED_SEQUENCING);
+      LibraryAliquotColumns.VOLUME, LibraryAliquotColumns.VOLUME_UNITS, LibraryAliquotColumns.NG_USED,
+      LibraryAliquotColumns.VOLUME_USED, LibraryAliquotColumns.CREATION_DATE, LibraryAliquotColumns.KIT,
+      LibraryAliquotColumns.KIT_LOT, LibraryAliquotColumns.TARGETED_SEQUENCING);
 
   @Override
   protected boolean isDetailedSampleMode() {

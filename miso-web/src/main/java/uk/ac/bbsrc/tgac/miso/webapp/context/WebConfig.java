@@ -1,11 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.webapp.context;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.json.JsonWriteFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,15 +21,6 @@ import uk.ac.bbsrc.tgac.miso.core.manager.ProgressStepFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.BarcodableService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.SessionConversationAttributeStore;
 
-/**
- * uk.ac.bbsrc.tgac.miso.webapp.context
- * <p/>
- * Info
- * 
- * @author Rob Davey
- * @date 07/02/13
- * @since 0.1.9
- */
 @Configuration
 public class WebConfig extends WebMvcConfigurationSupport {
 
@@ -75,7 +66,8 @@ public class WebConfig extends WebMvcConfigurationSupport {
     ObjectMapper mapper = Jackson2ObjectMapperBuilder.json()
         .modulesToInstall(new JsonStringValidator())
         .build();
-    mapper.getFactory().setCharacterEscapes(new JsonCharacterEscapes());
+    mapper.getFactory().setCharacterEscapes(new JsonCharacterEscapes())
+        .configure(JsonWriteFeature.ESCAPE_NON_ASCII.mappedFeature(), true);
     return mapper;
   }
 }

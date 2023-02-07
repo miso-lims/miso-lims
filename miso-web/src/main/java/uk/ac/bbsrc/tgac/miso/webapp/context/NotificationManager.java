@@ -42,6 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferNotification;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentTissueAttributes;
 import uk.ac.bbsrc.tgac.miso.core.service.TransferNotificationService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -316,9 +317,10 @@ public class NotificationManager {
 
     ContainerTag headerRow = tr(makeTh("Alias"));
     if (detailed) {
-      headerRow = headerRow.with(makeTh("Type"), makeTh("Exernal Identifier"));
+      headerRow = headerRow.with(makeTh("Type"), makeTh("External Identifier"), makeTh("Tissue Attributes"),
+          makeTh("Timepoint"));
     }
-    headerRow = headerRow.with(makeTh(" V O L   ( u L ) "), makeTh(" [ ]   ( n g / u L ) "), makeTh(" T o t a l   ( n g ) "));
+    headerRow = headerRow.with(makeTh("VOL (uL)"), makeTh("[] (ng/uL)"), makeTh("Total (ng)"));
     if (detailed) {
       headerRow = headerRow.with(makeTh("Subproject"), makeTh("Group ID"), makeTh("Group Description"));
     }
@@ -334,6 +336,9 @@ public class NotificationManager {
       if (detailed) {
         cells.add(makeTd(dnaOrRna(detailedSample)));
         cells.add(makeTd(detailedSample.getIdentityAttributes().getExternalName()));
+        ParentTissueAttributes tissue = detailedSample.getTissueAttributes();
+        cells.add(makeTd(tissue == null ? null : tissue.getTissueOrigin().getAlias() + "_" + tissue.getTissueType().getAlias()));
+        cells.add(makeTd(tissue == null ? null : tissue.getTimepoint()));
       }
       BigDecimal volume = transferSample.getDistributedVolume() != null ? transferSample.getDistributedVolume() : sample.getVolume();
       cells.add(makeTd(LimsUtils.toNiceString(volume)));

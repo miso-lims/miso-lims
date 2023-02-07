@@ -30,7 +30,7 @@ public class SequencingContainerModel implements Aliasable, Deletable, Serializa
   private static final long UNSAVED_ID = 0;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long sequencingContainerModelId = UNSAVED_ID;
 
   private String alias;

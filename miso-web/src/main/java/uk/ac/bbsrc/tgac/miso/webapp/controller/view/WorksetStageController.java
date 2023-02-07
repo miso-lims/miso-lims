@@ -30,7 +30,7 @@ public class WorksetStageController extends AbstractTypeDataController<WorksetSt
   private AuthorizationManager authorizationManager;
 
   public WorksetStageController() {
-    super("Workset Stages", "worksetstage", "worksetstage", true);
+    super("Workset Stages", "worksetstage", "worksetstage");
   }
 
   @GetMapping("/list")

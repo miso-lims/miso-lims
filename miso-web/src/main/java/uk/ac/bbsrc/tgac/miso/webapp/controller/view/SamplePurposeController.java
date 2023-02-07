@@ -29,7 +29,7 @@ public class SamplePurposeController extends AbstractTypeDataController<SamplePu
   private AuthorizationManager authorizationManager;
 
   public SamplePurposeController() {
-    super("Sample Purposes", "samplepurpose", "samplepurpose", true);
+    super("Sample Purposes", "samplepurpose", "samplepurpose");
   }
 
   @Override

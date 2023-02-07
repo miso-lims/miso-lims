@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -74,10 +75,26 @@ public class HibernateLibrarySelectionDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testGetUsage() throws IOException {
+  public void testGetUsageByLibraries() throws IOException {
     LibrarySelectionType type = (LibrarySelectionType) getSessionFactory().getCurrentSession().get(LibrarySelectionType.class, 1L);
     assertEquals("RT-PCR", type.getName());
-    assertEquals(15L, sut.getUsage(type));
+    assertEquals(15L, sut.getUsageByLibraries(type));
+  }
+
+  @Test
+  public void testGetUsageByLibraryDesigns() throws IOException {
+    LibrarySelectionType type = (LibrarySelectionType) getSessionFactory().getCurrentSession().get(LibrarySelectionType.class, 1L);
+    assertEquals(2L, sut.getUsageByLibraryDesigns(type));
+  }
+
+  @Test
+  public void testListByIdList() throws Exception {
+    testListByIdList(sut::listByIdList, Arrays.asList(1L, 10L));
+  }
+
+  @Test
+  public void testListByIdListNone() throws Exception {
+    testListByIdListNone(sut::listByIdList);
   }
 
 }

@@ -28,7 +28,7 @@ public class MetricController extends AbstractTypeDataController<Metric, MetricD
   private AuthorizationManager authorizationManager;
 
   public MetricController() {
-    super("Metrics", "metric", "metric", true);
+    super("Metrics", "metric", "metric");
   }
 
   @Override

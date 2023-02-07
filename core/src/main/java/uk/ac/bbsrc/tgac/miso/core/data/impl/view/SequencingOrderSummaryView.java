@@ -34,8 +34,6 @@ public class SequencingOrderSummaryView implements Serializable {
   @Id
   private String orderSummaryId;
 
-  private String loadedPartitionsId;
-
   @ManyToOne
   @JoinColumn(name = "poolId")
   private ListPoolView pool;
@@ -49,6 +47,7 @@ public class SequencingOrderSummaryView implements Serializable {
   private SequencingParameters parameters;
 
   private int requested;
+  private int loaded;
   private String description;
   private String purpose;
 
@@ -62,18 +61,6 @@ public class SequencingOrderSummaryView implements Serializable {
   @OneToMany
   @JoinColumn(name = "noContainerModelId")
   private Set<SequencingOrderPartitionView> noContainerModelPartitions;
-
-  @ElementCollection
-  @CollectionTable(name = "SequencingOrderLoadedPartitionView", joinColumns = {
-      @JoinColumn(name = "loadedPartitionsId", referencedColumnName = "loadedPartitionsId") })
-  @Column(name = "partitionId")
-  private Set<Long> loadedPartitions;
-
-  @ElementCollection
-  @CollectionTable(name = "SequencingOrderLoadedPartitionView", joinColumns = {
-      @JoinColumn(name = "noContainerModelId", referencedColumnName = "loadedPartitionsId") })
-  @Column(name = "partitionId")
-  private Set<Long> noContainerModelLoadedPartitions;
 
   @OneToOne
   @PrimaryKeyJoinColumn
@@ -89,14 +76,6 @@ public class SequencingOrderSummaryView implements Serializable {
 
   public void setId(String id) {
     this.orderSummaryId = id;
-  }
-
-  public String getLoadedPartitionsId() {
-    return loadedPartitionsId;
-  }
-
-  public void setLoadedPartitionsId(String loadedPartitionsId) {
-    this.loadedPartitionsId = loadedPartitionsId;
   }
 
   public ListPoolView getPool() {
@@ -179,22 +158,6 @@ public class SequencingOrderSummaryView implements Serializable {
     this.noContainerModelPartitions = noContainerModelPartitions;
   }
 
-  public Set<Long> getLoadedPartitions() {
-    return loadedPartitions;
-  }
-
-  public void setLoadedPartitions(Set<Long> loadedPartitions) {
-    this.loadedPartitions = loadedPartitions;
-  }
-
-  public Set<Long> getNoContainerModelLoadedPartitions() {
-    return noContainerModelLoadedPartitions;
-  }
-
-  public void setNoContainerModelLoadedPartitions(Set<Long> noContainerModelLoadedPartitions) {
-    this.noContainerModelLoadedPartitions = noContainerModelLoadedPartitions;
-  }
-
   public SequencingOrderNoContainerModelFulfillmentView getNoContainerModelFulfillmentView() {
     return noContainerModelFulfillmentView;
   }
@@ -224,16 +187,11 @@ public class SequencingOrderSummaryView implements Serializable {
   }
 
   public int getLoaded() {
-    Set<Long> effectivePartitions;
-    if (getContainerModel() == null) {
-      effectivePartitions = noContainerModelLoadedPartitions;
-    } else {
-      effectivePartitions = loadedPartitions;
-    }
-    if (effectivePartitions == null) {
-      return 0;
-    }
-    return effectivePartitions.size();
+    return loaded;
+  }
+
+  public void setLoaded(int loaded) {
+    this.loaded = loaded;
   }
 
   public int get(HealthType health) {

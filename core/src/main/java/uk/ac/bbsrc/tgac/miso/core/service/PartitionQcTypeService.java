@@ -5,8 +5,7 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
 
-public interface PartitionQcTypeService extends DeleterService<PartitionQCType>, SaveService<PartitionQCType> {
-
-  public List<PartitionQCType> list() throws IOException;
+public interface PartitionQcTypeService extends BulkSaveService<PartitionQCType>, DeleterService<PartitionQCType>,
+    ListService<PartitionQCType> {
 
 }

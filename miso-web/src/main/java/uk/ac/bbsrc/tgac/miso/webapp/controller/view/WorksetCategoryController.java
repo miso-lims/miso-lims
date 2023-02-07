@@ -30,7 +30,7 @@ public class WorksetCategoryController extends AbstractTypeDataController<Workse
   private AuthorizationManager authorizationManager;
 
   public WorksetCategoryController() {
-    super("Workset Categories", "worksetcategory", "worksetcategory", true);
+    super("Workset Categories", "worksetcategory", "worksetcategory");
   }
 
   @GetMapping("/list")

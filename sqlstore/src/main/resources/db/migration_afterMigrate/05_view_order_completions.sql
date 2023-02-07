@@ -1,31 +1,35 @@
-CREATE OR REPLACE VIEW SequencingOrderSummaryView AS
-SELECT
-  CONCAT(poolId, '_', COALESCE(sequencingContainerModelId, 0), '_', parametersId) AS orderSummaryId,
-  CONCAT(poolId, '_', COALESCE(sequencingContainerModelId, 0)) AS loadedPartitionsId,
-  poolId,
-  sequencingContainerModelId,
-  parametersId,
-  SUM(partitions) AS requested,
-  GROUP_CONCAT(description SEPARATOR '; ') as description,
-  GROUP_CONCAT(DISTINCT RunPurpose.alias SEPARATOR '; ') as purpose,
-  MAX(lastUpdated) AS lastUpdated
-FROM SequencingOrder
-JOIN RunPurpose ON RunPurpose.purposeId = SequencingOrder.purposeId
-GROUP BY poolId, sequencingContainerModelId, parametersId;
-
 -- loaded (no health, unknown parameters)
--- join via loadedPartitionsId for matching pool+containerModel
--- join via noContainerModelId for orders with null containerModel
 CREATE OR REPLACE VIEW SequencingOrderLoadedPartitionView AS
 SELECT
-  part.partitionId,
-  CONCAT(part.pool_poolId, '_', spc.sequencingContainerModelId) AS loadedPartitionsId,
-  CONCAT(part.pool_poolId, '_0') AS noContainerModelId
+  part.pool_poolId AS poolId,
+  spc.sequencingContainerModelId,
+  COUNT(*) AS loaded
 FROM _Partition part
 JOIN SequencerPartitionContainer spc ON spc.containerId = part.containerId
 LEFT JOIN Run_SequencerPartitionContainer rspc ON rspc.containers_containerId = spc.containerId
 WHERE part.pool_poolId IS NOT NULL
-AND rspc.Run_runId IS NULL;
+AND rspc.Run_runId IS NULL
+GROUP BY part.pool_poolId, spc.sequencingContainerModelId;
+
+
+CREATE OR REPLACE VIEW SequencingOrderSummaryView AS
+SELECT
+  CONCAT(o.poolId, '_', COALESCE(o.sequencingContainerModelId, 0), '_', o.parametersId) AS orderSummaryId,
+  o.poolId,
+  o.sequencingContainerModelId,
+  o.parametersId,
+  SUM(partitions) AS requested,
+  COALESCE(loaded.loaded, 0) AS loaded,
+  GROUP_CONCAT(description SEPARATOR '; ') as description,
+  GROUP_CONCAT(DISTINCT RunPurpose.alias SEPARATOR '; ') as purpose,
+  MAX(lastUpdated) AS lastUpdated
+FROM SequencingOrder o
+JOIN RunPurpose ON RunPurpose.purposeId = o.purposeId
+LEFT JOIN SequencingOrderLoadedPartitionView loaded ON loaded.poolId = o.poolId
+  AND (loaded.sequencingContainerModelId = o.sequencingContainerModelId
+    OR (loaded.sequencingContainerModelId IS NULL AND o.sequencingContainerModelId IS NULL))
+GROUP BY poolId, sequencingContainerModelId, parametersId, loaded.loaded;
+
 
 -- partitions (used in run)
 -- join via orderSummaryId for matching pool+containerModel+params

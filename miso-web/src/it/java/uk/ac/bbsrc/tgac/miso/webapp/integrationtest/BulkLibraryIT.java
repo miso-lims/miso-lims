@@ -36,12 +36,14 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtils;
 
 public class BulkLibraryIT extends AbstractIT {
 
-  private static final Set<String> commonColumns = Sets.newHashSet(LibColumns.NAME, LibColumns.ALIAS, LibColumns.ID_BARCODE,
-      LibColumns.BOX_SEARCH, LibColumns.BOX_ALIAS, LibColumns.BOX_POSITION, LibColumns.DISCARDED, LibColumns.DESCRIPTION,
-      LibColumns.GROUP_ID, LibColumns.GROUP_DESC, LibColumns.DESIGN, LibColumns.CODE, LibColumns.PLATFORM, LibColumns.LIBRARY_TYPE,
-      LibColumns.SELECTION, LibColumns.STRATEGY, LibColumns.INDEX_FAMILY, LibColumns.INDEX_1, LibColumns.INDEX_2, LibColumns.UMIS,
-      LibColumns.KIT_DESCRIPTOR, LibColumns.QC_STATUS, LibColumns.QC_NOTE, LibColumns.SIZE, LibColumns.VOLUME, LibColumns.VOLUME_UNITS,
-      LibColumns.CONCENTRATION, LibColumns.CONCENTRATION_UNITS, LibColumns.SPIKE_IN, LibColumns.SPIKE_IN_DILUTION, LibColumns.SPIKE_IN_VOL);
+  private static final Set<String> commonColumns = Sets.newHashSet(SamColumns.PROJECT, SamColumns.REQUISITION_ASSAY,
+      LibColumns.NAME, LibColumns.ALIAS, LibColumns.ID_BARCODE, LibColumns.BOX_SEARCH, LibColumns.BOX_ALIAS,
+      LibColumns.BOX_POSITION, LibColumns.DISCARDED, LibColumns.DESCRIPTION, LibColumns.GROUP_ID, LibColumns.GROUP_DESC,
+      LibColumns.DESIGN, LibColumns.CODE, LibColumns.PLATFORM, LibColumns.LIBRARY_TYPE, LibColumns.SELECTION,
+      LibColumns.STRATEGY, LibColumns.INDEX_FAMILY, LibColumns.INDEX_1, LibColumns.INDEX_2, LibColumns.UMIS,
+      LibColumns.KIT_DESCRIPTOR, LibColumns.QC_STATUS, LibColumns.QC_NOTE, LibColumns.SIZE, LibColumns.VOLUME,
+      LibColumns.VOLUME_UNITS, LibColumns.CONCENTRATION, LibColumns.CONCENTRATION_UNITS, LibColumns.SPIKE_IN,
+      LibColumns.SPIKE_IN_DILUTION, LibColumns.SPIKE_IN_VOL);
 
   private static final Set<String> editColumns = Sets.newHashSet(LibColumns.TISSUE_ORIGIN, LibColumns.TISSUE_TYPE,
       LibColumns.EFFECTIVE_GROUP_ID, LibColumns.CREATION_DATE, LibColumns.SOP, LibColumns.WORKSTATION,
@@ -53,7 +55,7 @@ public class BulkLibraryIT extends AbstractIT {
       LibColumns.CREATION_DATE, LibColumns.SOP, LibColumns.WORKSTATION, LibColumns.THERMAL_CYCLER,
       LibColumns.PARENT_NG_USED, LibColumns.PARENT_VOLUME_USED, LibColumns.KIT_LOT);
 
-  private static final Set<String> receiptColumns = Sets.newHashSet(SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT,
+  private static final Set<String> receiptColumns = Sets.newHashSet(SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME,
       SamColumns.SUBPROJECT, SamColumns.EXTERNAL_NAME, SamColumns.IDENTITY_ALIAS, SamColumns.DONOR_SEX, SamColumns.CONSENT,
       SamColumns.SAMPLE_CLASS, SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER, SamColumns.TIMES_RECEIVED,
       SamColumns.TUBE_NUMBER, SamColumns.TISSUE_MATERIAL, SamColumns.REGION, SamColumns.TIMEPOINT, LibColumns.RECEIVE_DATE,

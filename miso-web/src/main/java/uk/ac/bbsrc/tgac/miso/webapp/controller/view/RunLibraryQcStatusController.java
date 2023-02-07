@@ -30,7 +30,7 @@ public class RunLibraryQcStatusController extends AbstractTypeDataController<Run
   private AuthorizationManager authorizationManager;
 
   public RunLibraryQcStatusController() {
-    super("Run-Library QC Statuses", "runlibraryqcstatus", "runlibraryqcstatus", true);
+    super("Run-Library QC Statuses", "runlibraryqcstatus", "runlibraryqcstatus");
   }
 
   @GetMapping("/list")

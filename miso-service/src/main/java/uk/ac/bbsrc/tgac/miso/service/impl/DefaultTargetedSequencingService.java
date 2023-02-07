@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.transaction.support.TransactionTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -24,27 +25,47 @@ import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultTargetedSequencingService extends AbstractSaveService<TargetedSequencing> implements TargetedSequencingService {
+public class DefaultTargetedSequencingService extends AbstractSaveService<TargetedSequencing>
+    implements TargetedSequencingService {
 
   @Autowired
   private TargetedSequencingStore targetedSequencingDao;
-
   @Autowired
   private AuthorizationManager authorizationManager;
-
   @Autowired
   private DeletionStore deletionStore;
-
   @Autowired
   private KitDescriptorService kitDescriptorService;
+  @Autowired
+  private TransactionTemplate transactionTemplate;
 
   @Override
-  public List<TargetedSequencing> list() throws IOException {
-    return targetedSequencingDao.list();
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
+  }
+
+  @Override
+  public AuthorizationManager getAuthorizationManager() {
+    return authorizationManager;
+  }
+
+  @Override
+  public TransactionTemplate getTransactionTemplate() {
+    return transactionTemplate;
+  }
+
+  @Override
+  public SaveDao<TargetedSequencing> getDao() {
+    return targetedSequencingDao;
   }
 
   public void setTargetedSequencingDao(TargetedSequencingStore targetedSequencingDao) {
     this.targetedSequencingDao = targetedSequencingDao;
+  }
+
+  @Override
+  public List<TargetedSequencing> list() throws IOException {
+    return targetedSequencingDao.list();
   }
 
   @Override
@@ -59,18 +80,8 @@ public class DefaultTargetedSequencingService extends AbstractSaveService<Target
   }
 
   @Override
-  public DeletionStore getDeletionStore() {
-    return deletionStore;
-  }
-
-  @Override
-  public AuthorizationManager getAuthorizationManager() {
-    return authorizationManager;
-  }
-
-  @Override
-  public SaveDao<TargetedSequencing> getDao() {
-    return targetedSequencingDao;
+  public List<TargetedSequencing> listByIdList(List<Long> ids) throws IOException {
+    return targetedSequencingDao.listByIdList(ids);
   }
 
   @Override

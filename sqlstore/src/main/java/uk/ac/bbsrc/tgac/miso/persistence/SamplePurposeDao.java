@@ -6,12 +6,10 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-public interface SamplePurposeDao extends SaveDao<SamplePurpose> {
+public interface SamplePurposeDao extends BulkSaveDao<SamplePurpose> {
 
   long getUsage(SamplePurpose samplePurpose) throws IOException;
 
   SamplePurpose getByAlias(String alias) throws IOException;
-
-  List<SamplePurpose> listByIdList(Collection<Long> ids) throws IOException;
 
 }

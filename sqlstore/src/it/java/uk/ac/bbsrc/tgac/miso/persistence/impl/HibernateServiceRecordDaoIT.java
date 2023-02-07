@@ -35,7 +35,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -71,7 +71,7 @@ public class HibernateServiceRecordDaoIT extends AbstractDAOTest {
     dao.setSessionFactory(sessionFactory);
 
     emptySR.setId(2L);
-    Mockito.when(instrumentDao.get(Matchers.anyLong())).thenReturn(emptySR);
+    Mockito.when(instrumentDao.get(ArgumentMatchers.anyLong())).thenReturn(emptySR);
   }
   
   @Test

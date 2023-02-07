@@ -35,23 +35,16 @@ public abstract class AbstractTypeDataController<T extends Identifiable, R> {
   @Autowired
   private ObjectMapper mapper;
 
-  private static final String OLD_JSP = "/WEB-INF/pages/handsontables.jsp";
-  private static final String NEW_JSP = "/WEB-INF/pages/bulkPage.jsp";
+  private static final String JSP = "/WEB-INF/pages/bulkPage.jsp";
 
   private final String pluralType;
   private final String listTarget;
   private final String hotTarget;
-  private final boolean newInterface;
 
   public AbstractTypeDataController(String pluralType, String listTarget, String hotTarget) {
-    this(pluralType, listTarget, hotTarget, false);
-  }
-
-  public AbstractTypeDataController(String pluralType, String listTarget, String hotTarget, boolean newInterface) {
     this.pluralType = pluralType;
     this.listTarget = listTarget;
     this.hotTarget = hotTarget;
-    this.newInterface = newInterface;
   }
 
   protected final ModelAndView bulkCreate(Integer quantity, ModelMap model) throws IOException {
@@ -77,7 +70,7 @@ public abstract class AbstractTypeDataController<T extends Identifiable, R> {
     addHotAttributes("Create " + pluralType, config, PageMode.CREATE, model);
 
     model.put("input", mapper.writeValueAsString(Collections.nCopies(quantity, makeDto())));
-    return new ModelAndView(newInterface ? NEW_JSP : OLD_JSP, model);
+    return new ModelAndView(JSP, model);
   }
 
   protected final ModelAndView bulkEdit(String idString, ModelMap model) throws IOException {
@@ -109,7 +102,7 @@ public abstract class AbstractTypeDataController<T extends Identifiable, R> {
     }
     model.put("input", mapper.writeValueAsString(items.stream().map(this::toDto).collect(Collectors.toList())));
 
-    return new ModelAndView(newInterface ? NEW_JSP : OLD_JSP, model);
+    return new ModelAndView(JSP, model);
   }
 
   protected final ModelAndView listStatic(Collection<T> items, ModelMap model) throws IOException {
@@ -131,13 +124,8 @@ public abstract class AbstractTypeDataController<T extends Identifiable, R> {
 
   private void addHotAttributes(String title, ObjectNode config, PageMode pageMode, ModelMap model) throws JsonProcessingException {
     model.put("title", title);
-    if (newInterface) {
-      model.put("target", hotTarget);
-      config.put(PageMode.PROPERTY, pageMode.getLabel());
-    } else {
-      model.put("targetType", "HotTarget." + hotTarget);
-      model.put("create", pageMode != PageMode.EDIT);
-    }
+    model.put("target", hotTarget);
+    config.put(PageMode.PROPERTY, pageMode.getLabel());
     model.put("config", mapper.writeValueAsString(config));
   }
 

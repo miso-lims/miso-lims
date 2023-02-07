@@ -64,7 +64,7 @@ public class Submission implements Comparable<Submission>, Deletable, Serializab
   private Set<Experiment> experiments = new HashSet<>();
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long submissionId = UNSAVED_ID;
 
   @Temporal(TemporalType.DATE)

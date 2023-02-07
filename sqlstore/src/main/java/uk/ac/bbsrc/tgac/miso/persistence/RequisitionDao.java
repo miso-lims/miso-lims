@@ -11,6 +11,4 @@ public interface RequisitionDao extends PaginatedDataSource<Requisition>, SaveDa
 
   Requisition getByAlias(String alias) throws IOException;
 
-  List<Requisition> listByIdList(Collection<Long> ids) throws IOException;
-
 }

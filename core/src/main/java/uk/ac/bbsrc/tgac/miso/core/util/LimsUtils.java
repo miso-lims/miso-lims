@@ -86,6 +86,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 
 /**
  * Utility class to provde helpful functions to MISO
@@ -341,6 +342,17 @@ public class LimsUtils {
       }
     }
     return null;
+  }
+
+  public static Requisition getParentRequisition(Sample sample) {
+    if (!isDetailedSample(sample)) {
+      return null;
+    }
+    DetailedSample requisitionSample = ((DetailedSample) sample).getParent();
+    while (requisitionSample != null && requisitionSample.getRequisition() == null) {
+      requisitionSample = requisitionSample.getParent();
+    }
+    return requisitionSample == null ? null : requisitionSample.getRequisition();
   }
 
   /**

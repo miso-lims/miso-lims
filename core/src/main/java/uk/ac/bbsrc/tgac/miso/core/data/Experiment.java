@@ -147,7 +147,7 @@ public class Experiment implements Comparable<Experiment>, Nameable, ChangeLogga
   private String description;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long experimentId = UNSAVED_ID;
 
   @ManyToMany(targetEntity = KitImpl.class)

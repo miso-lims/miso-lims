@@ -7,6 +7,270 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.53.0] - 2023-01-26
+
+### Added
+
+* Added a Probe ID column on Freezer page in MISO
+* Added a new URL pattern for linking to requisitions by alias
+  - ex) /miso/requisition/alias/REQ-1 where REQ-1 is the alias
+
+
+## [1.52.0] - 2023-01-12
+
+### Added
+
+* Concentration column on sample Tracking Sheet downloads
+
+### Changed
+
+* Updated MISO to run on Java 17
+
+### Fixed
+
+* Performance and accessibility improvements for the following bulk pages
+  * Array Models
+  * Attachment Categories
+  * Labs
+  * Reference Genomes
+  * Study Types
+  * Targeted Sequencing
+
+### Upgrade Notes
+
+* Updated to Runscanner 1.14.0. This release requires Java 17.
+* MISO has been updated to use Java 17. If you use Docker to run MISO, you
+  don't need to worry about this as the images have been updated as required.
+  If you build MISO from source, run the Flyway command-line tool, or run MISO
+  on your own Tomcat installation, you will need to have JDK 17 or higher
+  installed and ensure that Tomcat is configured to use the newly installed
+  JDK. We are also discontinuing support for Tomcat 8, and recommend running
+  MISO on Tomcat 9
+* Updated to Pinery 2.24.0. This release requires Java 17.
+
+
+## [1.51.2] - 2022-12-15
+
+### Fixed
+
+* Performance and accessibility improvements for the following bulk pages
+  * Library Designs
+  * Library Design Codes
+  * Library Selection Types
+  * Library Spike-Ins
+  * Library Strategy Types
+  * Library Types
+  * Partition QC Types
+  * Run Purposes
+  * Sequencing Container Models
+  * Sequencing Parameters
+
+
+## [1.51.1] - 2022-12-01
+
+### Fixed
+
+* Some symbol characters were not displaying correctly
+
+
+## [1.51.0] - 2022-11-17
+
+### Added
+
+* Assay field on all Create and Edit Sample, Library, and Library Aliquot pages
+* View Metrics button on all Create and Edit Sample, Library, and Library
+  Aliquot pages (button will appear on single Edit pages if the item has an
+  assay assigned via requisition)
+
+### Changed
+
+* When creating samples, an existing identity will now be selected by default
+  when any of the external names entered exactly matches any of the existing
+  external names. Previously, all external names entered had to match all of
+  the existing external names for automatic selection to occur (detailed
+  sample)
+
+### Fixed
+
+* Error when saving transfers including changes to stock samples
+
+
+## [1.50.0] - 2022-11-03
+
+### Added
+
+* Project column on
+  * bulk Propagate and Edit Libraries pages
+  * bulk Propagate and Edit Library Aliquots pages
+  * Libraries lists
+  * Library Aliquots lists
+
+### Changed
+
+* Illumina sequencing parameters may now be saved with zero (0) read lengths and
+  'UNKNOWN' chemistry. This is mainly intended for "custom" parameters for
+  one-off experiments, or other times you may not want to create and use a more
+  specific option
+
+### Fixed
+
+* interface for creating/editing subprojects
+  * reference genome is required
+  * project cannot be changed
+* issues with multi-sequence indices on the Edit Indices page
+* error message when attempting to delete a library aliquot that has child
+  aliquots
+* It is no longer possible to save a QC type with auto-update field enabled and
+  no corresponding field selected. If such a QC type already exists, QCs of this
+  type will save successfully with the auto-update option having no effect
+
+
+## [1.49.1] - 2022-10-21
+
+### Fixed
+
+* exporting box to spreadsheet from the Edit Box page
+* Missing metric values were incorrectly displayed as "0" (zero) on the
+  Run-Library Metrics page
+
+
+## [1.49.0] - 2022-10-06
+
+### Changed
+* The mail domain (if entered) will now be removed from usernames when logging  in using Active Directory authentication. For example, if your domain is example.com and a user logs in as "person@example.com", their username will  be reduced to "person"
+
+### Fixed
+* Error loading project page in plain sample mode
+
+### Upgrade Notes
+* If you are using Active Directory authentication, you should check to see if  any of your usernames contain the email domain, as it will now be removed.  This may result in a new user being created, and it will no longer be  possible to access the old, domain-including user. It will be easiest to  query the database directly to find and fix these instances:
+    1. Check for usernames containing the domain: `SELECT loginName FROM User WHERE  loginName LIKE '%@%';`
+    2. For each, rename to drop the domain: `UPDATE User SET loginName = 'person'  WHERE loginName = 'person@example.com';` (replacing appropriate values)
+
+    If there is already another user with the same name, you'll have to decide  whether to ignore or delete it. If you ignore, anything associated with the  old domain-including user will NOT be associated with the new/domainless user.
+    You can try deleting the domain-including user:
+
+    ```
+    SELECT userId INTO @oldUser FROM User WHERE loginName = 'person@example.com';
+    SELECT userId INTO @newUser FROM User WHERE loginName = 'person';
+
+    DELETE FROM User_Group WHERE users_userId = @oldUser;
+    DELETE FROM User WHERE loginName = '@oldUser';
+    ```
+
+    If there is anything associated with that user, you will see a foreign key  violation error. You'll then have to update any records to associate with the new user instead of the old. e.g.
+
+    ```
+    UPDATE Sample SET creator = @newUser WHERE creator = @oldUser;
+    ```
+
+    Substitute `Sample` and `creator` with the table and field names specified in  the error. Try deleting again, and repeat until deletion is successful.
+
+
+## [1.48.2] - 2022-08-22
+
+### Fixed
+
+* error logging in new users when using LDAP/AD authentication
+
+### Known Issues
+
+* Error accessing Jira tickets on project page in plain sample mode
+
+
+## [1.48.1] - 2022-08-19
+
+### Fixed
+
+* display of tissue attributes in transfer notification emails
+* changelogs for pools added/removed from sequencing containers showing the
+  wrong date and user
+
+### Known Issues
+
+* error logging in new users when using LDAP/AD authentication
+* Error loading project page in plain sample mode
+
+
+## [1.48.0] - 2022-08-11
+
+### Changed
+
+* Transfer notification emails now include tissue origin, tissue type, and
+  timepoint of each sample (detailed sample)
+
+### Fixed
+
+* searching for library aliquots by alias in the Search widget
+* error saving array models when using a MariaDB database
+* samples were sometimes not appearing on the Edit Array Run page
+
+### Known Issues
+
+* error logging in new users when using LDAP/AD authentication
+* Error loading project page in plain sample mode
+
+
+## [1.47.1] - 2022-07-06
+
+### Fixed
+
+* Error saving transfers
+
+### Known Issues
+
+* error logging in new users when using LDAP/AD authentication
+* Error loading project page in plain sample mode
+
+
+## [1.47.0] - 2022-07-04
+
+### Changed
+
+* When using JDBC authentication, the following password requirements are now
+  enforced:
+  * minimum password length: 8
+  * minimum complexity: must contain at least 3 of the following: uppercase
+  letters, lowercase letters, numbers, special characters
+
+### Known Issues
+
+* error logging in new users when using LDAP/AD authentication
+* Error loading project page in plain sample mode
+
+
+### Fixed
+
+* Updated Spring and Hibernate libraries (security patches)
+
+
+## [1.46.0] - 2022-06-16
+
+### Added
+
+* Running Sheet sample download sheet format
+
+### Changed
+
+* Pinery requisitions now include the 'stopped' field
+* Pinery samples now include attributes for barcode names (when applicable)
+
+### Fixed
+
+* JIRA issue lookup for projects with spaces in the shortname
+* 404 Not Found error after changing user password when using JDBC authentication
+* Bulk actions not working after Parent/Child navigation
+* Bulk actions missing from the Items list on the Edit Transfer page
+
+### Known Issues
+
+* Error loading project page in plain sample mode
+
+### Upgrade Notes
+
+* Updated to Pinery 2.23.0
+
+
 ## [1.45.0] - 2022-06-02
 
 ### Changed
@@ -82,7 +346,7 @@ Starting with version 1.29.0, the format of this file is based on
 ### Fixed
 
 * Missing metric controls on the Edit Assay page
-  
+
 * When editing a sample that is a descendant of a requisitioned sample, the
   descendant was being saved as a requisitioned sample as well
 
@@ -133,7 +397,7 @@ Starting with version 1.29.0, the format of this file is based on
 
 ### Fixed
 
-* 
+*
   An issue where spaces were not trimmed from box aliases, and samples silently
   failed to save within such boxes
 * Bulk library template performance and accessibility improvements

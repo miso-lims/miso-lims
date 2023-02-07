@@ -80,7 +80,7 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   public static final int DEFAULT_PARTITION_LIMIT = 8;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long containerId = SequencerPartitionContainerImpl.UNSAVED_ID;
 
   /**

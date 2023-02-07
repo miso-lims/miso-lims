@@ -4,7 +4,7 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>1.45.1-SNAPSHOT</version>
+    <version>1.53.1-SNAPSHOT</version>
   </parent>
   <artifactId>core</artifactId>
   <packaging>jar</packaging>
@@ -117,10 +117,6 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.hibernate.javax.persistence</groupId>
-      <artifactId>hibernate-jpa-2.0-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>

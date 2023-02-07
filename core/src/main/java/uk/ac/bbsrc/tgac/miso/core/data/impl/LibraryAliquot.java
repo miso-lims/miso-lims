@@ -90,7 +90,7 @@ public class LibraryAliquot extends AbstractBoxable
   public static final Long UNSAVED_ID = 0L;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long aliquotId = LibraryAliquot.UNSAVED_ID;
 
   @Column(nullable = false)

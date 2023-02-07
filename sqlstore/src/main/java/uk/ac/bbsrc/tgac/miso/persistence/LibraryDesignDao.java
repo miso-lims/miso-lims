@@ -5,13 +5,14 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
 
-public interface LibraryDesignDao extends SaveDao<LibraryDesign> {
+public interface LibraryDesignDao extends BulkSaveDao<LibraryDesign> {
   
-  public LibraryDesign getByNameAndSampleClass(String name, SampleClass sampleClass) throws IOException;
+  LibraryDesign getByNameAndSampleClass(String name, SampleClass sampleClass) throws IOException;
 
-  public List<LibraryDesign> listByClass(SampleClass sampleClass) throws IOException;
+  List<LibraryDesign> listByClass(SampleClass sampleClass) throws IOException;
 
-  public long getUsage(LibraryDesign design) throws IOException;
+  long getUsage(LibraryDesign design) throws IOException;
 
 }

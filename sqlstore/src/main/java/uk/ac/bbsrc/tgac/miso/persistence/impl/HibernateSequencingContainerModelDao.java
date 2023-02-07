@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -93,6 +94,11 @@ public class HibernateSequencingContainerModelDao extends HibernateSaveDao<Seque
         .add(Restrictions.eq("sequencer.instrumentModel", instrumentModel))
         .setProjection(Projections.rowCount())
         .uniqueResult();
+  }
+
+  @Override
+  public List<SequencingContainerModel> listByIdList(Collection<Long> idList) throws IOException {
+    return listByIdList("sequencingContainerModelId", idList);
   }
 
 }

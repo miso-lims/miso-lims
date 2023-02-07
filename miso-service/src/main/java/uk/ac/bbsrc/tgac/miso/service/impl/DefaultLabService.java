@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.transaction.support.TransactionTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.LabService;
@@ -24,15 +25,35 @@ public class DefaultLabService extends AbstractSaveService<Lab> implements LabSe
 
   @Autowired
   private LabDao labDao;
-
   @Autowired
   private DeletionStore deletionStore;
-
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private TransactionTemplate transactionTemplate;
+
+  @Override
+  public SaveDao<Lab> getDao() {
+    return labDao;
+  }
 
   public void setLabDao(LabDao labDao) {
     this.labDao = labDao;
+  }
+
+  @Override
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
+  }
+
+  @Override
+  public AuthorizationManager getAuthorizationManager() {
+    return authorizationManager;
+  }
+
+  @Override
+  public TransactionTemplate getTransactionTemplate() {
+    return transactionTemplate;
   }
 
   public void setAuthorizationManager(AuthorizationManager authorizationManager) {
@@ -73,18 +94,8 @@ public class DefaultLabService extends AbstractSaveService<Lab> implements LabSe
   }
 
   @Override
-  public SaveDao<Lab> getDao() {
-    return labDao;
-  }
-
-  @Override
-  public DeletionStore getDeletionStore() {
-    return deletionStore;
-  }
-
-  @Override
-  public AuthorizationManager getAuthorizationManager() {
-    return authorizationManager;
+  public List<Lab> listByIdList(List<Long> ids) throws IOException {
+    return labDao.listByIdList(ids);
   }
 
   @Override

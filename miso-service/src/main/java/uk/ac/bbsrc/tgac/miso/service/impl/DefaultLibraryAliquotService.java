@@ -445,6 +445,12 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
       result.addError(ValidationError.forDeletionUsage(object, orderCount, "pool " + Pluralizer.orders(orderCount)));
     }
 
+  long childAliquotCount = libraryAliquotDao.getUsageByChildAliquots(object);
+    if (childAliquotCount > 0L) {
+      result.addError(ValidationError.forDeletionUsage(object, childAliquotCount,
+          "child " + Pluralizer.libraryAliquots(childAliquotCount)));
+    }
+
     return result;
   }
 

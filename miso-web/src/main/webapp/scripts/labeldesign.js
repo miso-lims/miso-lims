@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 function printerLabelEditor(layout, width, height, saveCallback) {
   var scale = Math.min(Math.max(width, 200) / width, Math.max(height, 200) / height);
   var margins = Math.max(width, height) * 0.25 * scale;
@@ -65,10 +42,7 @@ function printerLabelEditor(layout, width, height, saveCallback) {
     svg.appendChild(line);
   }
   // The create a group (invisible container) to put all the stuff in
-  var labelContents = document.createElementNS(
-    "http://www.w3.org/2000/svg",
-    "g"
-  );
+  var labelContents = document.createElementNS("http://www.w3.org/2000/svg", "g");
   labelContents.setAttributeNS(null, "transform", "translate(" + margins + "," + margins + ")");
   svg.appendChild(labelContents);
   jQuery(dialogNode)
@@ -77,13 +51,13 @@ function printerLabelEditor(layout, width, height, saveCallback) {
         .prop({
           type: "button",
           innerHTML: "Add",
-          "class": "btn-styled"
+          class: "btn-styled",
         })
-        .click(function() {
+        .click(function () {
           Utils.showWizardDialog("Add Element", [
             {
               name: "Single Line of Text",
-              handler: function() {
+              handler: function () {
                 current.push({
                   element: "text",
                   x: 0,
@@ -95,16 +69,16 @@ function printerLabelEditor(layout, width, height, saveCallback) {
                   style: "REGULAR",
                   contents: [
                     {
-                      use: "ALIAS"
-                    }
-                  ]
+                      use: "ALIAS",
+                    },
+                  ],
                 });
                 drawLabel();
-              }
+              },
             },
             {
               name: "Block of Text",
-              handler: function() {
+              handler: function () {
                 current.push({
                   element: "textblock",
                   x: 0,
@@ -115,16 +89,16 @@ function printerLabelEditor(layout, width, height, saveCallback) {
                   rowLimit: 5,
                   contents: [
                     {
-                      use: "ALIAS"
-                    }
-                  ]
+                      use: "ALIAS",
+                    },
+                  ],
                 });
                 drawLabel();
-              }
+              },
             },
             {
               name: "1D Barcode",
-              handler: function() {
+              handler: function () {
                 current.push({
                   element: "1dbarcode",
                   x: 0,
@@ -133,16 +107,16 @@ function printerLabelEditor(layout, width, height, saveCallback) {
                   moduleWidth: 0.3,
                   contents: [
                     {
-                      use: "BARCODE"
-                    }
-                  ]
+                      use: "BARCODE",
+                    },
+                  ],
                 });
                 drawLabel();
-              }
+              },
             },
             {
               name: "2D Barcode",
-              handler: function() {
+              handler: function () {
                 current.push({
                   element: "2dbarcode",
                   x: 0,
@@ -150,13 +124,13 @@ function printerLabelEditor(layout, width, height, saveCallback) {
                   moduleSize: 0.3,
                   contents: [
                     {
-                      use: "BARCODE"
-                    }
-                  ]
+                      use: "BARCODE",
+                    },
+                  ],
                 });
                 drawLabel();
-              }
-            }
+              },
+            },
           ]);
         })
     )
@@ -165,9 +139,9 @@ function printerLabelEditor(layout, width, height, saveCallback) {
         .prop({
           type: "button",
           innerHTML: "Revert",
-          "class": "btn-styled"
+          class: "btn-styled",
         })
-        .click(function() {
+        .click(function () {
           current = JSON.parse(JSON.stringify(layout));
           drawLabel();
         })
@@ -177,9 +151,9 @@ function printerLabelEditor(layout, width, height, saveCallback) {
         .prop({
           type: "button",
           innerHTML: "Delete",
-          "class": "btn-styled"
+          class: "btn-styled",
         })
-        .click(function() {
+        .click(function () {
           shouldDelete = true;
         })
     )
@@ -188,9 +162,9 @@ function printerLabelEditor(layout, width, height, saveCallback) {
         .prop({
           type: "button",
           innerHTML: "Delete All",
-          "class": "btn-styled"
+          class: "btn-styled",
         })
-        .click(function() {
+        .click(function () {
           current = [];
           drawLabel();
         })
@@ -208,7 +182,7 @@ function printerLabelEditor(layout, width, height, saveCallback) {
   dialogNode.appendChild(editArea);
 
   var shouldDelete = false;
-  svg.addEventListener("click", function(e) {
+  svg.addEventListener("click", function (e) {
     e.stopPropagation();
     shouldDelete = false;
   });
@@ -219,7 +193,7 @@ function printerLabelEditor(layout, width, height, saveCallback) {
       labelContents.removeChild(labelContents.lastChild);
     }
     // Set up a rectangle for a thing being drawn, these can overlap, but we're overlapping in the same way as the printer, so fine.
-    current.forEach(function(labelElement, index) {
+    current.forEach(function (labelElement, index) {
       var rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
       rect.setAttributeNS(null, "x", labelElement.x * scale);
       rect.setAttributeNS(null, "y", labelElement.y * scale);
@@ -229,24 +203,12 @@ function printerLabelEditor(layout, width, height, saveCallback) {
       switch (labelElement.element) {
         case "1dbarcode":
           rect.setAttributeNS(null, "height", labelElement.height * scale);
-          rect.setAttributeNS(
-            null,
-            "width",
-            labelElement.moduleWidth * 100 * scale
-          );
+          rect.setAttributeNS(null, "width", labelElement.moduleWidth * 100 * scale);
           rect.setAttribute("fill", "#ff000080");
           break;
         case "2dbarcode":
-          rect.setAttributeNS(
-            null,
-            "height",
-            labelElement.moduleSize * 144 * scale
-          );
-          rect.setAttributeNS(
-            null,
-            "width",
-            labelElement.moduleSize * 144 * scale
-          );
+          rect.setAttributeNS(null, "height", labelElement.moduleSize * 144 * scale);
+          rect.setAttributeNS(null, "width", labelElement.moduleSize * 144 * scale);
           rect.setAttribute("fill", "#0000ff80");
           break;
         case "textblock":
@@ -259,27 +221,23 @@ function printerLabelEditor(layout, width, height, saveCallback) {
           rect.setAttributeNS(
             null,
             blockRotate ? "height" : "width",
-            (labelElement.lineLimit * labelElement.height) / 2 * scale
+            ((labelElement.lineLimit * labelElement.height) / 2) * scale
           );
           rect.setAttribute("fill", "#d0d0d080");
           break;
         case "text":
           var textRotate = labelElement.direction.startsWith("VERTICAL");
-          rect.setAttributeNS(
-            null,
-            textRotate ? "width" : "height",
-            labelElement.height * scale
-          );
+          rect.setAttributeNS(null, textRotate ? "width" : "height", labelElement.height * scale);
           rect.setAttributeNS(
             null,
             textRotate ? "height" : "width",
-            (labelElement.lineLimit * labelElement.height) / 2 * scale
+            ((labelElement.lineLimit * labelElement.height) / 2) * scale
           );
           rect.setAttribute("fill", "#a0a0a080");
           break;
       }
       labelContents.appendChild(rect);
-      rect.addEventListener("click", function(e) {
+      rect.addEventListener("click", function (e) {
         e.stopPropagation();
         while (editArea.hasChildNodes()) {
           editArea.removeChild(editArea.lastChild);
@@ -295,14 +253,14 @@ function printerLabelEditor(layout, width, height, saveCallback) {
               type: "float",
               label: "X Position (mm)",
               property: "x",
-              value: labelElement.x
+              value: labelElement.x,
             },
             {
               type: "float",
               label: "Y Position (mm)",
               property: "y",
-              value: labelElement.y
-            }
+              value: labelElement.y,
+            },
           ];
           if (labelElement.element.startsWith("text")) {
             // Common text formatting
@@ -310,27 +268,27 @@ function printerLabelEditor(layout, width, height, saveCallback) {
               type: "float",
               label: "Height (mm)",
               property: "height",
-              value: labelElement.height
+              value: labelElement.height,
             });
             edits.push({
               type: "int",
               label: "Max Line Length (characters)",
               property: "lineLimit",
-              value: labelElement.lineLimit
+              value: labelElement.lineLimit,
             });
             edits.push({
               type: "select",
               label: "Direction",
               property: "direction",
               values: ["NORMAL", "UPSIDEDOWN", "VERTICAL_DOWN", "VERTICAL_UP"],
-              value: labelElement.direction
+              value: labelElement.direction,
             });
             edits.push({
               type: "select",
               label: "Style",
               property: "style",
               values: ["REGULAR", "BOLD"],
-              value: labelElement.style
+              value: labelElement.style,
             });
           }
 
@@ -340,13 +298,13 @@ function printerLabelEditor(layout, width, height, saveCallback) {
                 type: "float",
                 label: "Module Width (mm) [width of each stripe]",
                 property: "moduleWidth",
-                value: labelElement.moduleWidth
+                value: labelElement.moduleWidth,
               });
               edits.push({
                 type: "float",
                 label: "Barcode Height (mm)",
                 property: "height",
-                value: labelElement.height
+                value: labelElement.height,
               });
               break;
             case "2dbarcode":
@@ -354,7 +312,7 @@ function printerLabelEditor(layout, width, height, saveCallback) {
                 type: "float",
                 label: "Module Size (mm) [width/height of each square]",
                 property: "moduleSize",
-                value: labelElement.moduleSize
+                value: labelElement.moduleSize,
               });
               break;
             case "textblock":
@@ -362,7 +320,7 @@ function printerLabelEditor(layout, width, height, saveCallback) {
                 type: "int",
                 label: "Max Number of Rows",
                 property: "rowLimit",
-                value: labelElement.rowLimit
+                value: labelElement.rowLimit,
               });
               break;
             case "text":
@@ -371,11 +329,11 @@ function printerLabelEditor(layout, width, height, saveCallback) {
                 label: "Justification",
                 property: "justification",
                 values: ["LEFT", "RIGHT"],
-                value: labelElement.justification
+                value: labelElement.justification,
               });
               break;
           }
-          Utils.showDialog("Edit Element", "Update", edits, function(updated) {
+          Utils.showDialog("Edit Element", "Update", edits, function (updated) {
             Object.assign(labelElement, updated);
             drawLabel();
           });
@@ -387,12 +345,12 @@ function printerLabelEditor(layout, width, height, saveCallback) {
             labelElement.contents = lines;
             var table = document.createElement("table");
             editArea.appendChild(table);
-            function drawTable() {
+            var drawTable = function () {
               while (table.hasChildNodes()) {
                 table.removeChild(table.lastChild);
               }
 
-              lines.forEach(function(l, i) {
+              lines.forEach(function (l, i) {
                 var row = document.createElement("tr");
                 table.appendChild(row);
                 var header = document.createElement("th");
@@ -402,9 +360,9 @@ function printerLabelEditor(layout, width, height, saveCallback) {
                     .prop({
                       type: "button",
                       innerHTML: "+",
-                      "class": "btn-styled"
+                      class: "btn-styled",
                     })
-                    .click(function() {
+                    .click(function () {
                       lines.splice(i, 0, ["new row"]);
                       drawTable();
                     })
@@ -415,9 +373,9 @@ function printerLabelEditor(layout, width, height, saveCallback) {
                     .prop({
                       type: "button",
                       innerHTML: "-",
-                      "class": "btn-styled"
+                      class: "btn-styled",
                     })
-                    .click(function() {
+                    .click(function () {
                       lines.splice(i, 1);
                       drawTable();
                     })
@@ -425,7 +383,7 @@ function printerLabelEditor(layout, width, height, saveCallback) {
 
                 var cell = document.createElement("th");
                 row.appendChild(cell);
-                createLine(cell, l, true, function(output) {
+                createLine(cell, l, true, function (output) {
                   labelElement.contents[i] = output;
                 });
               });
@@ -438,21 +396,19 @@ function printerLabelEditor(layout, width, height, saveCallback) {
                   .prop({
                     type: "button",
                     innerHTML: "+",
-                    "class": "btn-styled"
+                    class: "btn-styled",
                   })
-                  .click(function() {
+                  .click(function () {
                     lines.splice(lines.length, 0, ["new row"]);
                     drawTable();
                   })
               );
-            }
+            };
             drawTable();
           } else {
             var container = document.createElement("div");
             editArea.appendChild(container);
-            createLine(container, labelElement.contents, true, function(
-              output
-            ) {
+            createLine(container, labelElement.contents, true, function (output) {
               labelElement.contents = output;
             });
           }
@@ -461,7 +417,7 @@ function printerLabelEditor(layout, width, height, saveCallback) {
     });
   }
   function createLine(container, printable, allowAlternate, callback) {
-    var printables = [printable].flat(Number.MAX_VALUE).filter(function(x) {
+    var printables = [printable].flat(Number.MAX_VALUE).filter(function (x) {
       return x !== null;
     });
     function display() {
@@ -473,31 +429,31 @@ function printerLabelEditor(layout, width, height, saveCallback) {
           .prop({
             type: "button",
             innerHTML: "+",
-            "class": "btn-styled"
+            class: "btn-styled",
           })
-          .click(function() {
+          .click(function () {
             addElement(0, allowAlternate);
           })
       );
 
-      printables.forEach(function(p, i) {
+      printables.forEach(function (p, i) {
         container.appendChild(document.createElement("br"));
         if (typeof p == "string") {
           var input = document.createElement("input");
           input.type = "text";
           input.value = p;
           container.appendChild(input);
-          input.addEventListener("keyup", function() {
+          input.addEventListener("keyup", function () {
             printables[i] = input.value;
             callback(printables);
           });
         } else if (p.hasOwnProperty("use")) {
           var select = document.createElement("select");
-          select.addEventListener("change", function() {
+          select.addEventListener("change", function () {
             printables[i] = { use: select.value };
             callback(printables);
           });
-          Constants.printableFields.forEach(function(value) {
+          Constants.printableFields.forEach(function (value) {
             var option = document.createElement("option");
             option.text = value;
             option.value = value;
@@ -510,7 +466,7 @@ function printerLabelEditor(layout, width, height, saveCallback) {
         } else {
           var alternates = document.createElement("table");
           alternates.classList.add("dataTable");
-          Object.entries(p).forEach(function(entry, index) {
+          Object.entries(p).forEach(function (entry, index) {
             var row = document.createElement("tr");
             if (index % 2 == 1) {
               row.classList.add("odd");
@@ -522,7 +478,7 @@ function printerLabelEditor(layout, width, height, saveCallback) {
             var cell = document.createElement("td");
             cell.style.border = "1px solid black";
             row.appendChild(cell);
-            createLine(cell, entry[1], false, function(output) {
+            createLine(cell, entry[1], false, function (output) {
               p[entry[0]] = output;
             });
           });
@@ -533,9 +489,9 @@ function printerLabelEditor(layout, width, height, saveCallback) {
             .prop({
               type: "button",
               innerHTML: "-",
-              "class": "btn-styled"
+              class: "btn-styled",
             })
-            .click(function() {
+            .click(function () {
               printables.splice(i, 1);
               display();
               callback(printables);
@@ -546,9 +502,9 @@ function printerLabelEditor(layout, width, height, saveCallback) {
             .prop({
               type: "button",
               innerHTML: "+",
-              "class": "btn-styled"
+              class: "btn-styled",
             })
-            .click(function() {
+            .click(function () {
               addElement(i + 1, allowAlternate);
             })
         );
@@ -557,7 +513,7 @@ function printerLabelEditor(layout, width, height, saveCallback) {
     function addElement(i, allowAlternate) {
       var options = [
         { name: "Text", value: "abc" },
-        { name: "Field", value: { use: "ALIAS" } }
+        { name: "Field", value: { use: "ALIAS" } },
       ];
       if (allowAlternate) {
         options.push({
@@ -570,20 +526,20 @@ function printerLabelEditor(layout, width, height, saveCallback) {
             BOX: "box",
             CONTAINER: "container",
             CONTAINER_MODEL: "container model",
-            KIT: "kit"
-          }
+            KIT: "kit",
+          },
         });
       }
       Utils.showWizardDialog(
         "Add",
-        options.map(function(entry) {
+        options.map(function (entry) {
           return {
             name: entry.name,
-            handler: function() {
+            handler: function () {
               printables.splice(i, 0, entry.value);
               callback(printables);
               display();
-            }
+            },
           };
         })
       );
@@ -599,14 +555,14 @@ function printerLabelEditor(layout, width, height, saveCallback) {
     modal: false,
     resizable: true,
     buttons: {
-      Save: function() {
+      Save: function () {
         saveCallback(current);
       },
-      "Save and Close": function() {
+      "Save and Close": function () {
         saveCallback(current);
         dialog.dialog("close");
-      }
+      },
     },
-    closeOnEscape: false
+    closeOnEscape: false,
   });
 }

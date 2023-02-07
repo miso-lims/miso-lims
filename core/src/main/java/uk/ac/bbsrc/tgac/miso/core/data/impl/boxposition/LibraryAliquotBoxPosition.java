@@ -20,12 +20,13 @@ public class LibraryAliquotBoxPosition extends AbstractBoxPosition {
   @Id
   private Long aliquotId;
 
-  public Long getLibraryAliquotId() {
+  @Override
+  public long getItemId() {
     return aliquotId;
   }
 
-  public void setLibraryAliquotId(Long aliquotId) {
+  @Override
+  public void setItemId(long id) {
     this.aliquotId = aliquotId;
   }
-
 }

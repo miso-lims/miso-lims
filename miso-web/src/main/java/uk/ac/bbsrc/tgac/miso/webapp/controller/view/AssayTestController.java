@@ -32,7 +32,7 @@ public class AssayTestController extends AbstractTypeDataController<AssayTest, A
   private AuthorizationManager authorizationManager;
 
   public AssayTestController() {
-    super("Assay Tests", "assaytest", "assaytest", true);
+    super("Assay Tests", "assaytest", "assaytest");
   }
 
   @Override

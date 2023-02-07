@@ -19,18 +19,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQC;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQcControlRun;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQC;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQcControlRun;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.PoolQC;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.PoolQcControlRun;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.QC;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.QcControlRun;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.QualityControlEntity;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQcControlRun;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.*;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BulkQcSaveOperation;
@@ -103,7 +92,7 @@ public class DefaultQualityControlService implements QualityControlService {
       throw new IllegalArgumentException("QC type and entity are mismatched.");
     }
 
-    if (qc.getType().isAutoUpdateField()) {
+    if (qc.getType().isAutoUpdateField() && qc.getType().getCorrespondingField() != QcCorrespondingField.NONE) {
       handler.updateEntity(qc.getEntity().getId(), qc.getType().getCorrespondingField(), qc.getResults(), qc.getType().getUnits());
     }
 

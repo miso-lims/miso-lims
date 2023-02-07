@@ -35,4 +35,8 @@ public abstract class AbstractBoxPosition implements Serializable {
     this.position = position;
   }
 
+  public abstract long getItemId();
+
+  public abstract void setItemId(long id);
+
 }

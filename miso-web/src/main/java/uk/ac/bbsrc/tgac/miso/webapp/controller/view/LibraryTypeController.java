@@ -1,11 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -41,9 +43,9 @@ public class LibraryTypeController extends AbstractTypeDataController<LibraryTyp
     return bulkCreate(quantity, model);
   }
 
-  @GetMapping("/bulk/edit")
-  public ModelAndView edit(@RequestParam("ids") String idString, ModelMap model) throws IOException {
-    return bulkEdit(idString, model);
+  @PostMapping("/bulk/edit")
+  public ModelAndView edit(@RequestParam Map<String, String> formData, ModelMap model) throws IOException {
+    return bulkEdit(formData, model);
   }
 
   @Override

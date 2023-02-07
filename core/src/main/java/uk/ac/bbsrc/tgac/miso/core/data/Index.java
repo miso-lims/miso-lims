@@ -96,7 +96,7 @@ public class Index implements Deletable, Nameable, Serializable {
   private String realSequences;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long indexId = UNSAVED_ID;
 
   public IndexFamily getFamily() {

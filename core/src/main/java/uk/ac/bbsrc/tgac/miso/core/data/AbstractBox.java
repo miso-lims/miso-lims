@@ -30,7 +30,7 @@ public abstract class AbstractBox implements Box {
   private static final Long UNSAVED_ID = 0L;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long boxId = UNSAVED_ID;
   private String name;
   private String alias;

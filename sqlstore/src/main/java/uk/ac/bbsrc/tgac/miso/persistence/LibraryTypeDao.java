@@ -6,14 +6,14 @@ import java.util.List;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
-public interface LibraryTypeDao extends SaveDao<LibraryType> {
+public interface LibraryTypeDao extends BulkSaveDao<LibraryType> {
 
-  public LibraryType getByPlatformAndDescription(PlatformType platform, String description) throws IOException;
+  LibraryType getByPlatformAndDescription(PlatformType platform, String description) throws IOException;
   
-  public List<LibraryType> listByPlatform(PlatformType platform) throws IOException;
+  List<LibraryType> listByPlatform(PlatformType platform) throws IOException;
 
-  public long getUsageByLibraries(LibraryType type) throws IOException;
+  long getUsageByLibraries(LibraryType type) throws IOException;
 
-  public long getUsageByLibraryTemplates(LibraryType type) throws IOException;
+  long getUsageByLibraryTemplates(LibraryType type) throws IOException;
 
 }

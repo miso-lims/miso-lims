@@ -49,7 +49,7 @@ public class Group implements Serializable, Comparable<Group>, Deletable, Identi
   private Set<User> users = new HashSet<>();
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long groupId = Group.UNSAVED_ID;
 
   @Override

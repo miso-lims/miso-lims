@@ -19,21 +19,23 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkLibraryAliquotPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkLibraryAliquotPage.LibraryAliquotColumns;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtils;
 
 public class BulkLibraryAliquotIT extends AbstractIT {
 
   private static final Set<String> commonColumns = Sets.newHashSet(LibraryAliquotColumns.NAME,
-      LibraryAliquotColumns.ALIAS, LibraryAliquotColumns.TISSUE_ORIGIN, LibraryAliquotColumns.TISSUE_TYPE,
-      LibraryAliquotColumns.DESCRIPTION, LibraryAliquotColumns.ID_BARCODE, LibraryAliquotColumns.BOX_SEARCH,
-      LibraryAliquotColumns.BOX_ALIAS, LibraryAliquotColumns.BOX_POSITION, LibraryAliquotColumns.DISCARDED,
-      LibraryAliquotColumns.EFFECTIVE_GROUP_ID, LibraryAliquotColumns.GROUP_ID, LibraryAliquotColumns.GROUP_DESCRIPTION,
-      LibraryAliquotColumns.DESIGN_CODE, LibraryAliquotColumns.QC_STATUS, LibraryAliquotColumns.QC_NOTE,
-      LibraryAliquotColumns.SIZE, LibraryAliquotColumns.CONCENTRATION, LibraryAliquotColumns.CONCENTRATION_UNITS,
-      LibraryAliquotColumns.VOLUME, LibraryAliquotColumns.VOLUME_UNITS, LibraryAliquotColumns.NG_USED,
-      LibraryAliquotColumns.VOLUME_USED, LibraryAliquotColumns.CREATION_DATE, LibraryAliquotColumns.KIT,
-      LibraryAliquotColumns.KIT_LOT, LibraryAliquotColumns.TARGETED_SEQUENCING);
+      LibraryAliquotColumns.ALIAS, BulkSamplePage.SamColumns.PROJECT, BulkSamplePage.SamColumns.REQUISITION_ASSAY,
+      LibraryAliquotColumns.TISSUE_ORIGIN, LibraryAliquotColumns.TISSUE_TYPE, LibraryAliquotColumns.DESCRIPTION,
+      LibraryAliquotColumns.ID_BARCODE, LibraryAliquotColumns.BOX_SEARCH, LibraryAliquotColumns.BOX_ALIAS,
+      LibraryAliquotColumns.BOX_POSITION, LibraryAliquotColumns.DISCARDED, LibraryAliquotColumns.EFFECTIVE_GROUP_ID,
+      LibraryAliquotColumns.GROUP_ID, LibraryAliquotColumns.GROUP_DESCRIPTION, LibraryAliquotColumns.DESIGN_CODE,
+      LibraryAliquotColumns.QC_STATUS, LibraryAliquotColumns.QC_NOTE, LibraryAliquotColumns.SIZE,
+      LibraryAliquotColumns.CONCENTRATION, LibraryAliquotColumns.CONCENTRATION_UNITS, LibraryAliquotColumns.VOLUME,
+      LibraryAliquotColumns.VOLUME_UNITS, LibraryAliquotColumns.NG_USED, LibraryAliquotColumns.VOLUME_USED,
+      LibraryAliquotColumns.CREATION_DATE, LibraryAliquotColumns.KIT, LibraryAliquotColumns.KIT_LOT,
+      LibraryAliquotColumns.TARGETED_SEQUENCING);
 
   private static final Set<String> propagateColumns = Sets.newHashSet(LibraryAliquotColumns.PARENT_NAME,
       LibraryAliquotColumns.PARENT_ALIAS, LibraryAliquotColumns.PARENT_LOCATION);

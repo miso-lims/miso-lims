@@ -1,21 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.persistence;
 
-import java.util.List;
+import java.io.IOException;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 
-public interface ReferenceGenomeDao {
+public interface ReferenceGenomeDao extends BulkSaveDao<ReferenceGenome> {
 
-  public List<ReferenceGenome> list();
+  ReferenceGenome getByAlias(String alias) throws IOException;
 
-  public ReferenceGenome get(long id);
-
-  public ReferenceGenome getByAlias(String alias);
-
-  public long create(ReferenceGenome reference);
-
-  public long update(ReferenceGenome reference);
-
-  public long getUsage(ReferenceGenome reference);
+  long getUsage(ReferenceGenome reference) throws IOException;
 
 }

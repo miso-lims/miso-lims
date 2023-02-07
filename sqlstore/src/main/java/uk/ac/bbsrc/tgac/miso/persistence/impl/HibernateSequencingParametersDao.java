@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.criterion.Restrictions;
@@ -29,6 +30,11 @@ public class HibernateSequencingParametersDao extends HibernateSaveDao<Sequencin
         .add(Restrictions.eq("instrumentModel", instrumentModel))
         .list();
     return results;
+  }
+
+  @Override
+  public List<SequencingParameters> listByIdList(Collection<Long> idList) throws IOException {
+    return listByIdList("parametersId", idList);
   }
 
   @Override

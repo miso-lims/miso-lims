@@ -33,7 +33,7 @@ public class TargetedSequencing implements Deletable, Identifiable, Serializable
   public static final long UNSAVED_ID = 0L;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long targetedSequencingId = UNSAVED_ID;
 
   @Column(nullable = false)

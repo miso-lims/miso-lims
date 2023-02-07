@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -11,64 +12,37 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryStrategyDao;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
-public class HibernateLibraryStrategyDao implements LibraryStrategyDao {
+public class HibernateLibraryStrategyDao extends HibernateSaveDao<LibraryStrategyType> implements LibraryStrategyDao {
 
-  @Autowired
-  private SessionFactory sessionFactory;
-
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
-  }
-
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
-  }
-
-  private Session currentSession() {
-    return getSessionFactory().getCurrentSession();
-  }
-
-  @Override
-  public LibraryStrategyType get(long id) throws IOException {
-    return (LibraryStrategyType) currentSession().get(LibraryStrategyType.class, id);
+  public HibernateLibraryStrategyDao() {
+    super(LibraryStrategyType.class);
   }
 
   @Override
   public LibraryStrategyType getByName(String name) throws IOException {
-    return (LibraryStrategyType) currentSession().createCriteria(LibraryStrategyType.class)
-        .add(Restrictions.eq("name", name))
-        .uniqueResult();
+    return getBy("name", name);
   }
 
   @Override
-  public List<LibraryStrategyType> list() throws IOException {
-    @SuppressWarnings("unchecked")
-    List<LibraryStrategyType> results = currentSession().createCriteria(LibraryStrategyType.class).list();
-    return results;
+  public long getUsageByLibraries(LibraryStrategyType type) throws IOException {
+    return getUsageBy(LibraryImpl.class, "libraryStrategyType", type);
   }
 
   @Override
-  public long create(LibraryStrategyType type) throws IOException {
-    return (long) currentSession().save(type);
+  public long getUsageByLibraryDesigns(LibraryStrategyType type) throws IOException {
+    return getUsageBy(LibraryDesign.class, "libraryStrategyType", type);
   }
 
   @Override
-  public long update(LibraryStrategyType type) throws IOException {
-    currentSession().update(type);
-    return type.getId();
-  }
-
-  @Override
-  public long getUsage(LibraryStrategyType type) throws IOException {
-    return (long) currentSession().createCriteria(LibraryImpl.class)
-        .add(Restrictions.eq("libraryStrategyType", type))
-        .setProjection(Projections.rowCount()).uniqueResult();
+  public List<LibraryStrategyType> listByIdList(Collection<Long> idList) throws IOException {
+    return listByIdList("libraryStrategyTypeId", idList);
   }
 
 }

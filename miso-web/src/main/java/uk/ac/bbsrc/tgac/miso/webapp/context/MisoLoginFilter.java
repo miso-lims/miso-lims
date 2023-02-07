@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.Authentication;
@@ -26,6 +27,9 @@ public class MisoLoginFilter extends UsernamePasswordAuthenticationFilter {
   @Autowired
   private SecurityManager securityManager;
 
+  @Value("${security.ad.emailDomain:#{null}}")
+  private String emailDomain;
+
   @Override
   public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
     Authentication authentication = super.attemptAuthentication(request, response);
@@ -33,6 +37,7 @@ public class MisoLoginFilter extends UsernamePasswordAuthenticationFilter {
       return null;
     }
     UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
     try {
       securityManager.syncUser(userDetails);
     } catch (IOException e) {
@@ -48,6 +53,15 @@ public class MisoLoginFilter extends UsernamePasswordAuthenticationFilter {
       throw new InsufficientAuthenticationException("User is not authorized for MISO login");
     }
     return authentication;
+  }
+
+  @Override
+  protected String obtainUsername(HttpServletRequest request) {
+    String username = super.obtainUsername(request);
+    if (username != null && emailDomain != null && username.endsWith("@" + emailDomain)) {
+      return username.split("@")[0];
+    }
+    return username;
   }
 
 }

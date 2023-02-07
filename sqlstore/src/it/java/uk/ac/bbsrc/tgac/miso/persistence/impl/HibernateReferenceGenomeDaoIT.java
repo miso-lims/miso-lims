@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Before;
@@ -24,10 +25,20 @@ public class HibernateReferenceGenomeDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testListAllReferenceGeonomesCountIsAtLeastThree() {
+  public void testListAllReferenceGeonomesCountIsAtLeastThree() throws Exception {
     // Three ReferenceGenomes are present in the test database.
     Collection<ReferenceGenome> referenceGenomes = dao.list();
     assertThat("count of all references", referenceGenomes.size(), is(greaterThanOrEqualTo(3)));
+  }
+
+  @Test
+  public void testListByIdList() throws Exception {
+    testListByIdList(dao::listByIdList, Arrays.asList(1L, 2L));
+  }
+
+  @Test
+  public void testListByIdListNone() throws Exception {
+    testListByIdListNone(dao::listByIdList);
   }
 
   @Test

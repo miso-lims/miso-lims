@@ -1,6 +1,5 @@
 BulkTarget = window.BulkTarget || {};
-BulkTarget.tissuematerial = (function($) {
-
+BulkTarget.tissuematerial = (function ($) {
   /*
    * Expected config: {
    *   pageMode: string {create, edit}
@@ -9,21 +8,20 @@ BulkTarget.tissuematerial = (function($) {
    */
 
   return {
-    getSaveUrl: function() {
+    getSaveUrl: function () {
       return Urls.rest.tissueMaterials.bulkSave;
     },
-    getSaveProgressUrl: function(operationId) {
+    getSaveProgressUrl: function (operationId) {
       return Urls.rest.tissueMaterials.bulkSaveProgress(operationId);
     },
-    getUserManualUrl: function() {
-      return Urls.external.userManual('type_data', 'tissue-materials');
+    getUserManualUrl: function () {
+      return Urls.external.userManual("type_data", "tissue-materials");
     },
-    getBulkActions: function(config) {
+    getBulkActions: function (config) {
       return !config.isAdmin ? [] : [BulkUtils.actions.edit(Urls.ui.tissueMaterials.bulkEdit)];
     },
-    getColumns: function(config, api) {
+    getColumns: function (config, api) {
       return [BulkUtils.columns.simpleAlias(255)];
-    }
+    },
   };
-
 })(jQuery);

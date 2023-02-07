@@ -3,7 +3,7 @@
   <parent>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
     <artifactId>miso</artifactId>
-    <version>1.45.1-SNAPSHOT</version>
+    <version>1.53.1-SNAPSHOT</version>
   </parent>
   <artifactId>pinery-miso</artifactId>
   <name>pinery-miso</name>
@@ -15,7 +15,7 @@
     <mysql.db>lims</mysql.db>
     <mysql.user>tgaclims</mysql.user>
     <mysql.pw>tgaclims</mysql.pw>
-    <pinery.version>2.23.0</pinery.version>
+    <pinery.version>2.24.0</pinery.version>
     <spring-version>5.3.20</spring-version><!-- must match version used by Pinery -->
   </properties>
 

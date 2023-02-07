@@ -46,7 +46,7 @@ public class LibraryType implements Comparable<LibraryType>, Deletable, Identifi
   public static final Long UNSAVED_ID = 0L;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long libraryTypeId = LibraryType.UNSAVED_ID;
 
   @Column(nullable = false)
@@ -150,7 +150,7 @@ public class LibraryType implements Comparable<LibraryType>, Deletable, Identifi
   @Override
   public int hashCode() {
     if (getId() != UNSAVED_ID) {
-      return new Long(getId()).intValue();
+      return Long.valueOf(getId()).intValue();
     } else {
       int hashcode = -1;
       if (getDescription() != null) hashcode = 37 * hashcode + getDescription().hashCode();

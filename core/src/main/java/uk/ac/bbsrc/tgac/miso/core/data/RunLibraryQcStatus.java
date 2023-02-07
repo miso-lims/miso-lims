@@ -18,7 +18,7 @@ public class RunLibraryQcStatus implements Deletable, Serializable {
   private static final long UNSAVED_ID = 0L;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long statusId = UNSAVED_ID;
 
   private String description;

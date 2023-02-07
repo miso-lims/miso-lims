@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.transaction.support.TransactionTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.LibrarySpikeInService;
@@ -24,7 +25,8 @@ public class DefaultLibrarySpikeInService extends AbstractSaveService<LibrarySpi
 
   @Autowired
   private LibrarySpikeInDao librarySpikeInDao;
-
+  @Autowired
+  private TransactionTemplate transactionTemplate;
   @Autowired
   private DeletionStore deletionStore;
 
@@ -47,8 +49,18 @@ public class DefaultLibrarySpikeInService extends AbstractSaveService<LibrarySpi
   }
 
   @Override
+  public TransactionTemplate getTransactionTemplate() {
+    return transactionTemplate;
+  }
+
+  @Override
   public List<LibrarySpikeIn> list() throws IOException {
     return librarySpikeInDao.list();
+  }
+
+  @Override
+  public List<LibrarySpikeIn> listByIdList(List<Long> ids) throws IOException {
+    return librarySpikeInDao.listByIdList(ids);
   }
 
   @Override

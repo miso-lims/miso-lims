@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.transaction.support.TransactionTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -39,6 +40,8 @@ public class DefaultSequencingContainerModelService extends AbstractSaveService<
   private BarcodableReferenceService barcodableReferenceService;
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private TransactionTemplate transactionTemplate;
   @Autowired
   private DeletionStore deletionStore;
 
@@ -107,8 +110,18 @@ public class DefaultSequencingContainerModelService extends AbstractSaveService<
   }
 
   @Override
+  public TransactionTemplate getTransactionTemplate() {
+    return transactionTemplate;
+  }
+
+  @Override
   public List<SequencingContainerModel> list() throws IOException {
     return containerModelDao.list();
+  }
+
+  @Override
+  public List<SequencingContainerModel> listByIdList(List<Long> ids) throws IOException {
+    return containerModelDao.listByIdList(ids);
   }
 
   @Override

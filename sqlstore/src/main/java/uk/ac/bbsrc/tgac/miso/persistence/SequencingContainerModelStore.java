@@ -30,7 +30,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
-public interface SequencingContainerModelStore extends SaveDao<SequencingContainerModel> {
+public interface SequencingContainerModelStore extends BulkSaveDao<SequencingContainerModel> {
 
   /**
    * Attempt to find a SequencingContainerModel matching the supplied parameters
@@ -43,7 +43,7 @@ public interface SequencingContainerModelStore extends SaveDao<SequencingContain
    *          the number of partitions that the model must have (required)
    * @return an appropriate model if one is found; null otherwise
    */
-  public SequencingContainerModel find(InstrumentModel platform, String search, int partitionCount);
+  SequencingContainerModel find(InstrumentModel platform, String search, int partitionCount);
 
   /**
    * Attempt to find a SequencingContainerModel matching the supplied parameters
@@ -54,14 +54,14 @@ public interface SequencingContainerModelStore extends SaveDao<SequencingContain
    * @return a list containing any matching models. This method will not return a fallback model unless its alias or identificationBarcode
    *         matches the search
    */
-  public List<SequencingContainerModel> find(PlatformType platform, String search) throws IOException;
+  List<SequencingContainerModel> find(PlatformType platform, String search) throws IOException;
 
-  public SequencingContainerModel getByPlatformAndAlias(PlatformType platform, String alias) throws IOException;
+  SequencingContainerModel getByPlatformAndAlias(PlatformType platform, String alias) throws IOException;
 
-  public SequencingContainerModel getByPlatformAndBarcode(PlatformType platform, String identificationBarcode) throws IOException;
+  SequencingContainerModel getByPlatformAndBarcode(PlatformType platform, String identificationBarcode) throws IOException;
 
-  public long getUsage(SequencingContainerModel model) throws IOException;
+  long getUsage(SequencingContainerModel model) throws IOException;
 
-  public long getUsage(SequencingContainerModel containerModel, InstrumentModel instrumentModel) throws IOException;
+  long getUsage(SequencingContainerModel containerModel, InstrumentModel instrumentModel) throws IOException;
 
 }

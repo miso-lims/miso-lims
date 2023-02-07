@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -39,7 +40,17 @@ public class HibernateLabDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testGetSingleLab() {
+  public void testListByIdList() throws Exception {
+    testListByIdList(dao::listByIdList, Arrays.asList(2L, 3L));
+  }
+
+  @Test
+  public void testListByIdListNone() throws Exception {
+    testListByIdListNone(dao::listByIdList);
+  }
+
+  @Test
+  public void testGetSingleLab() throws Exception {
     Lab l = dao.get(1L);
     assertNotNull(l);
     assertEquals(1L, l.getId());
@@ -47,7 +58,7 @@ public class HibernateLabDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testGetSingleLabNull() {
+  public void testGetSingleLabNull() throws Exception {
     Lab l = dao.get(100L);
     assertNull(l);
   }
@@ -61,7 +72,7 @@ public class HibernateLabDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testAddLab() {
+  public void testAddLab() throws Exception {
     Lab l = new LabImpl();
     l.setAlias("NewLab");
     User user = new UserImpl();
@@ -79,7 +90,7 @@ public class HibernateLabDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testUpdateLab() {
+  public void testUpdateLab() throws Exception {
     Lab l = dao.get(1L);
     final String newAlias = "Changed Alias";
     l.setAlias(newAlias);
@@ -90,13 +101,13 @@ public class HibernateLabDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testGetUsageByTissues() {
+  public void testGetUsageByTissues() throws Exception {
     Lab lab = dao.get(2L);
     assertEquals(1L, dao.getUsageByTissues(lab));
   }
 
   @Test
-  public void testGetUsageByTransfers() {
+  public void testGetUsageByTransfers() throws Exception {
     Lab lab = dao.get(1L);
     assertEquals(2L, dao.getUsageByTransfers(lab));
   }

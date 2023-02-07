@@ -37,7 +37,7 @@ public class SopController extends AbstractTypeDataController<Sop, SopDto> {
   private ObjectMapper mapper;
 
   public SopController() {
-    super("SOPs", "sop", "sop", true);
+    super("SOPs", "sop", "sop");
   }
 
   @GetMapping("/list")

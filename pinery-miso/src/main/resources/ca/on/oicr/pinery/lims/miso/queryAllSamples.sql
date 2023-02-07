@@ -36,7 +36,9 @@ SELECT s.alias NAME
         ,s.groupDescription group_id_description
         ,sp.alias purpose
         ,NULL barcode
+        ,NULL barcode_name
         ,NULL barcode_two
+        ,NULL barcode_two_name
         ,NULL barcode_kit
         ,NULL umis
         ,qpd.status qcPassed
@@ -170,8 +172,10 @@ SELECT l.alias NAME
         ,l.groupId group_id 
         ,l.groupDescription group_id_description 
         ,NULL purpose 
-        ,bc1.sequence barcode 
+        ,bc1.sequence barcode
+        ,bc1.name barcode_name
         ,bc2.sequence barcode_two
+        ,bc2.name barcode_two_name
         ,fam.name barcode_kit
         ,l.umis
         ,qpd.status qcPassed
@@ -305,8 +309,10 @@ SELECT d.alias name
         ,d.groupId group_id 
         ,d.groupDescription group_id_description 
         ,NULL purpose 
-        ,NULL barcode 
-        ,NULL barcode_two 
+        ,NULL barcode
+        ,NULL barcode_name
+        ,NULL barcode_two
+        ,NULL barcode_two_name
         ,NULL barcode_kit
         ,NULL umis
         ,qpd.status qcPassed

@@ -5,8 +5,7 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 
-public interface StudyTypeService extends DeleterService<StudyType>, SaveService<StudyType> {
-
-  public List<StudyType> list() throws IOException;
+public interface StudyTypeService extends BulkSaveService<StudyType>, DeleterService<StudyType>,
+    ListService<StudyType> {
 
 }

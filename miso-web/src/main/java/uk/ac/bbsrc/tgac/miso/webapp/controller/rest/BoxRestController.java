@@ -204,7 +204,7 @@ public class BoxRestController extends RestController {
    * @param boxId ID of the Box
    * @return JSON object with "hashCode" field representing the hash code of the spreadsheet filename
    */
-  @GetMapping(value = "/{boxId}/spreadsheet", produces = "application/octet-stream")
+  @GetMapping(value = "/{boxId}/spreadsheet")
   public @ResponseBody JSONObject createSpreadsheet(@PathVariable("boxId") Long boxId) {
     try {
       return exportBoxContentsForm(boxId);
@@ -381,10 +381,8 @@ public class BoxRestController extends RestController {
     }
     try {
       boxScanner.prepareScan(requestData.getRows(), requestData.getColumns());
-    } catch (IntegrationException e) {
-      throw new RestException("Could not find the scanner", Status.INTERNAL_SERVER_ERROR);
     } catch (Exception e) {
-      throw new RestException("Could not find the scanner", Status.INTERNAL_SERVER_ERROR);
+      throw new RestException("Could not find the scanner", Status.INTERNAL_SERVER_ERROR, e);
     }
   }
 

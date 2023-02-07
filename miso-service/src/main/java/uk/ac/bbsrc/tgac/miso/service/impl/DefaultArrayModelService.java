@@ -1,35 +1,41 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.transaction.support.TransactionTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayModel;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
-import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.ArrayModelDao;
+import uk.ac.bbsrc.tgac.miso.persistence.SaveDao;
+import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class DefaultArrayModelService implements ArrayModelService {
+public class DefaultArrayModelService extends AbstractSaveService<ArrayModel> implements ArrayModelService {
 
   @Autowired
   private ArrayModelDao arrayModelDao;
-
   @Autowired
   private AuthorizationManager authorizationManager;
-
+  @Autowired
+  private TransactionTemplate transactionTemplate;
   @Autowired
   private DeletionStore deletionStore;
+
+  @Override
+  public SaveDao<ArrayModel> getDao() {
+    return arrayModelDao;
+  }
 
   public void setArrayModelDao(ArrayModelDao arrayModelDao) {
     this.arrayModelDao = arrayModelDao;
@@ -54,29 +60,22 @@ public class DefaultArrayModelService implements ArrayModelService {
   }
 
   @Override
-  public ArrayModel get(long id) throws IOException {
-    return arrayModelDao.get(id);
+  public TransactionTemplate getTransactionTemplate() {
+    return transactionTemplate;
   }
 
   @Override
-  public long create(ArrayModel model) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    validateChange(model, null);
-    return arrayModelDao.create(model);
+  public List<ArrayModel> listByIdList(List<Long> ids) throws IOException {
+    return arrayModelDao.listByIdList(ids);
   }
 
   @Override
-  public long update(ArrayModel model) throws IOException {
+  protected void authorizeUpdate(ArrayModel object) throws IOException {
     authorizationManager.throwIfNonAdmin();
-    ArrayModel managed = get(model.getId());
-    validateChange(model, managed);
-    applyChanges(managed, model);
-    return arrayModelDao.update(managed);
   }
 
-  private void validateChange(ArrayModel model, ArrayModel beforeChange) throws IOException {
-    List<ValidationError> errors = new ArrayList<>();
-    
+  @Override
+  protected void collectValidationErrors(ArrayModel model, ArrayModel beforeChange, List<ValidationError> errors) throws IOException {
     if (ValidationUtils.isSetAndChanged(ArrayModel::getAlias, model, beforeChange)
         && arrayModelDao.getByAlias(model.getAlias()) != null) {
       errors.add(new ValidationError("alias", "There is already an array model with this alias"));
@@ -95,13 +94,10 @@ public class DefaultArrayModelService implements ArrayModelService {
         }
       }
     }
-    
-    if (!errors.isEmpty()) {
-      throw new ValidationException(errors);
-    }
   }
 
-  private void applyChanges(ArrayModel to, ArrayModel from) {
+  @Override
+  protected void applyChanges(ArrayModel to, ArrayModel from) {
     to.setAlias(from.getAlias());
     to.setRows(from.getRows());
     to.setColumns(from.getColumns());

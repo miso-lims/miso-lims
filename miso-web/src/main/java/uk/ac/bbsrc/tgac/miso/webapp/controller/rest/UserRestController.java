@@ -51,7 +51,7 @@ public class UserRestController extends RestController {
     }
     return RestUtils.createObject("User", dto, d -> {
       User user = Dtos.to(d);
-      user.setPassword(passwordEncoder.encode(d.getPassword()));
+      user.setPassword(d.getPassword());
       return user;
     }, userService, Dtos::asDto);
   }
@@ -104,7 +104,7 @@ public class UserRestController extends RestController {
         && !passwordEncoder.matches(dto.getOldPassword(), user.getPassword())) {
       throw new ValidationException(new ValidationError("oldPassword", "Existing password does not match"));
     }
-    user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+    user.setPassword(dto.getNewPassword());
     userService.update(user);
     return Dtos.asDto(userService.get(userId));
   }

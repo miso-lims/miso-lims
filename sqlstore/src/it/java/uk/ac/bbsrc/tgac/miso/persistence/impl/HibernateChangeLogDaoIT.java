@@ -1,7 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 import java.util.Collection;

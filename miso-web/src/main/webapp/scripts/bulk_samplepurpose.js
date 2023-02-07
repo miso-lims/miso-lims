@@ -1,6 +1,5 @@
 BulkTarget = window.BulkTarget || {};
-BulkTarget.samplepurpose = (function($) {
-
+BulkTarget.samplepurpose = (function ($) {
   /*
    * Expected config: {
    *   pageMode: string {create, edit}
@@ -9,21 +8,20 @@ BulkTarget.samplepurpose = (function($) {
    */
 
   return {
-    getSaveUrl: function() {
+    getSaveUrl: function () {
       return Urls.rest.samplePurposes.bulkSave;
     },
-    getSaveProgressUrl: function(operationId) {
+    getSaveProgressUrl: function (operationId) {
       return Urls.rest.samplePurposes.bulkSaveProgress(operationId);
     },
-    getUserManualUrl: function() {
-      return Urls.external.userManual('type_data', 'sample-purposes');
+    getUserManualUrl: function () {
+      return Urls.external.userManual("type_data", "sample-purposes");
     },
-    getBulkActions: function(config) {
+    getBulkActions: function (config) {
       return !config.isAdmin ? [] : [BulkUtils.actions.edit(Urls.ui.samplePurposes.bulkEdit)];
     },
-    getColumns: function(config, api) {
+    getColumns: function (config, api) {
       return [BulkUtils.columns.simpleAlias(255), BulkUtils.columns.archived()];
-    }
+    },
   };
-
 })(jQuery);

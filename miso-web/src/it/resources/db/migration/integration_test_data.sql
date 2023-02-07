@@ -1160,7 +1160,7 @@ INSERT INTO Library_Note(library_libraryId, notes_noteId) VALUES
 INSERT INTO Pool_Note(pool_poolId, notes_noteId) VALUES
   (120001, 2);
 
-INSERT INTO ArrayModel(arrayModelId, alias, rows, columns) VALUES
+INSERT INTO ArrayModel(arrayModelId, alias, arrayModelRows, arrayModelColumns) VALUES
 (1, 'Test BeadChip', 8, 1),
 (2, 'Unused', 8, 1);
 

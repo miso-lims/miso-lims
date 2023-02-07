@@ -200,11 +200,6 @@ public class EditPoolController {
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       // no config required
     }
-
-    @Override
-    protected boolean isNewInterface() {
-      return true;
-    }
   };
 
   @PostMapping(value = "/bulk/edit")
@@ -328,12 +323,6 @@ public class EditPoolController {
       }
       return proportions;
     }
-
-    @Override
-    protected boolean isNewInterface() {
-      return true;
-    }
-
   }
 
   @PostMapping(value = "/bulk/merge")

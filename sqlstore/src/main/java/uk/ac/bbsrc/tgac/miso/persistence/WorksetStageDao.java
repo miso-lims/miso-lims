@@ -6,12 +6,10 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetStage;
 
-public interface WorksetStageDao extends SaveDao<WorksetStage> {
+public interface WorksetStageDao extends BulkSaveDao<WorksetStage> {
 
   WorksetStage getByAlias(String alias) throws IOException;
 
   long getUsage(WorksetStage stage) throws IOException;
-
-  List<WorksetStage> listByIdList(Collection<Long> ids) throws IOException;
 
 }

@@ -7,16 +7,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.eaglegenomics.simlims.core.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
-import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
-import uk.ac.bbsrc.tgac.miso.core.data.Partition;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
@@ -26,11 +22,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.core.service.BarcodableReferenceService;
-import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
-import uk.ac.bbsrc.tgac.miso.core.service.KitDescriptorService;
-import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
-import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
+import uk.ac.bbsrc.tgac.miso.core.service.*;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
@@ -56,6 +48,10 @@ public class DefaultContainerService implements ContainerService {
   private SequencingContainerModelService containerModelService;
   @Autowired
   private BarcodableReferenceService barcodableReferenceService;
+  @Autowired
+  private ChangeLogService changeLogService;
+  @Autowired
+  private RunService runService;
 
   @Override
   public AuthorizationManager getAuthorizationManager() {
@@ -285,7 +281,13 @@ public class DefaultContainerService implements ContainerService {
     }
   }
 
-  private void applyChanges(Partition target, Partition source) {
+  private void applyChanges(Partition target, Partition source) throws IOException {
+    Pool targetPool = target.getPool();
+    Pool sourcePool = source.getPool();
+    if ((targetPool == null) != (sourcePool == null)
+        || (targetPool != null && sourcePool != null && targetPool.getId() != sourcePool.getId())) {
+      logPoolChanged(targetPool, sourcePool, target);
+    }
     target.setPool(source.getPool());
     target.setLoadingConcentration(source.getLoadingConcentration());
     target.setLoadingConcentrationUnits(source.getLoadingConcentrationUnits());
@@ -295,6 +297,30 @@ public class DefaultContainerService implements ContainerService {
     }
     if (target.getLoadingConcentration() == null) {
       target.setLoadingConcentrationUnits(null);
+    }
+  }
+
+  private void logPoolChanged(Pool oldPool, Pool newPool, Partition partition) throws IOException {
+    String containerBarcode = partition.getSequencerPartitionContainer().getIdentificationBarcode();
+    Integer partitionNumber = partition.getPartitionNumber();
+    User user = authorizationManager.getCurrentUser();
+    String oldAlias = oldPool == null ? "n/a" : oldPool.getAlias();
+    String newAlias = newPool == null ? "n/a" : newPool.getAlias();
+    if (oldPool != null) {
+      changeLogService.create(oldPool.createChangeLog(String.format("Removed from container %s (partition %d)",
+          containerBarcode, partitionNumber), "container", user));
+    }
+    if (newPool != null) {
+      changeLogService.create(newPool.createChangeLog(String.format("Added to container %s (partition %d)",
+          containerBarcode, partitionNumber), "container", user));
+    }
+    changeLogService.create(partition.getSequencerPartitionContainer().createChangeLog(
+        String.format("Pool changed in partition %d: %s → %s", partitionNumber, oldAlias, newAlias), "pool", user));
+    Collection<Run> runs = runService.listByContainerId(partition.getSequencerPartitionContainer().getId());
+    for (Run run : runs) {
+      changeLogService.create(run.createChangeLog(
+          String.format("Pool changed in partition %d of container %s: %s → %s", partitionNumber, containerBarcode,
+          oldAlias, newAlias), "pool", user));
     }
   }
 

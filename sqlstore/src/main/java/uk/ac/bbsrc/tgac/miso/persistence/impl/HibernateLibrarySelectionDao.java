@@ -1,42 +1,26 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.persistence.LibrarySelectionDao;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
-public class HibernateLibrarySelectionDao implements LibrarySelectionDao {
+public class HibernateLibrarySelectionDao extends HibernateSaveDao<LibrarySelectionType>
+    implements LibrarySelectionDao {
 
-  @Autowired
-  private SessionFactory sessionFactory;
-
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
-  }
-
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
-  }
-
-  private Session currentSession() {
-    return getSessionFactory().getCurrentSession();
-  }
-
-  @Override
-  public LibrarySelectionType get(long id) throws IOException {
-    return (LibrarySelectionType) currentSession().get(LibrarySelectionType.class, id);
+  public HibernateLibrarySelectionDao() {
+    super(LibrarySelectionType.class);
   }
 
   @Override
@@ -47,28 +31,19 @@ public class HibernateLibrarySelectionDao implements LibrarySelectionDao {
   }
 
   @Override
-  public List<LibrarySelectionType> list() throws IOException {
-    @SuppressWarnings("unchecked")
-    List<LibrarySelectionType> results = currentSession().createCriteria(LibrarySelectionType.class).list();
-    return results;
+  public long getUsageByLibraries(LibrarySelectionType type) throws IOException {
+    return getUsageBy(LibraryImpl.class, "librarySelectionType", type);
   }
 
   @Override
-  public long create(LibrarySelectionType type) throws IOException {
-    return (long) currentSession().save(type);
+  public long getUsageByLibraryDesigns(LibrarySelectionType type) throws IOException {
+    return getUsageBy(LibraryDesign.class, "librarySelectionType", type);
   }
 
-  @Override
-  public long update(LibrarySelectionType type) throws IOException {
-    currentSession().update(type);
-    return type.getId();
-  }
 
   @Override
-  public long getUsage(LibrarySelectionType type) throws IOException {
-    return (long) currentSession().createCriteria(LibraryImpl.class)
-        .add(Restrictions.eq("librarySelectionType", type))
-        .setProjection(Projections.rowCount()).uniqueResult();
+  public List<LibrarySelectionType> listByIdList(Collection<Long> idList) throws IOException {
+    return listByIdList("librarySelectionTypeId", idList);
   }
 
 }

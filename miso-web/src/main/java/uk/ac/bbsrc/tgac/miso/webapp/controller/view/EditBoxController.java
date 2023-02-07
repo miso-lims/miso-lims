@@ -122,11 +122,6 @@ public class EditBoxController {
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
       // No configuration required
     }
-
-    @Override
-    protected boolean isNewInterface() {
-      return true;
-    }
   }
 
   private final class BulkEditBoxBackend extends BulkEditTableBackend<Box, BoxDto> {
@@ -148,11 +143,6 @@ public class EditBoxController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.put(PageMode.PROPERTY, PageMode.EDIT.getLabel());
-    }
-
-    @Override
-    protected boolean isNewInterface() {
-      return true;
     }
   }
 }

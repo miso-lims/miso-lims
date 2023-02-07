@@ -3,7 +3,7 @@ CREATE OR REPLACE VIEW BarcodableView AS
     aliquotId AS targetId,
     identificationBarcode,
     name,
-    NULL       AS alias,
+    alias       AS alias,
     'LIBRARY_ALIQUOT' AS targetType
   FROM LibraryAliquot
   UNION ALL SELECT
