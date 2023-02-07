@@ -2,10 +2,9 @@
 CREATE TABLE Instrument_ServiceRecord (
   recordId bigint(20) NOT NULL,
   instrumentId bigint(20) NOT NULL,
-  PRIMARY KEY (recordId),
-  PRIMARY KEY (instrumenId),
+  PRIMARY KEY (recordId, instrumentId),
   CONSTRAINT fk_instrumentServiceRecord_instrument FOREIGN KEY (instrumentId) REFERENCES Instrument (instrumentId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 -- 
 
 -- add records for existing service records
