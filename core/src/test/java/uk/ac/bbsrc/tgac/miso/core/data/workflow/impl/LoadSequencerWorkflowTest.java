@@ -133,6 +133,7 @@ public class LoadSequencerWorkflowTest {
   @Test
   public void testThrowUnexpectedInput() {
     try {
+      // for step 1, a container step is not expected and should be rejected with an IllegalArgumentException
       sut.processInput(1, makeContainerStep(SERIAL_NUMBER, MODEL_ALIAS, 2, PlatformType.ILLUMINA));
       fail("testThrowUnexpectedInput should have thrown IllegalArgumentException");
     } catch (IllegalArgumentException expected) {
