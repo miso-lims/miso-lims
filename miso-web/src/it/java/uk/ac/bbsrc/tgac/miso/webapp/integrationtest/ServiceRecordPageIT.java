@@ -79,7 +79,7 @@ public class ServiceRecordPageIT extends AbstractIT {
     fields.put(Field.START_TIME, "2017-09-01 06:00:00");
     fields.put(Field.END_TIME, "2017-09-05 06:00:00");
     assertFieldValues("initial values", fields, page1);
-    
+
     Map<ServiceRecordPage.Field, String> changes = Maps.newLinkedHashMap();
     changes.put(Field.TITLE, "New Title");
     changes.put(Field.DETAILS, "new details");
@@ -89,10 +89,10 @@ public class ServiceRecordPageIT extends AbstractIT {
     changes.put(Field.START_TIME, "2012-01-01 01:00:00");
     changes.put(Field.END_TIME, "2017-12-12 23:59:59");
     page1.setFields(changes);
-    
+
     fields.putAll(changes);
     assertFieldValues("changes pre-save", fields, page1);
-    
+
     ServiceRecordPage page2 = page1.save();
     assertFieldValues("post-save", fields, page2);
     ServiceRecord savedRecord = (ServiceRecord) getSession().get(ServiceRecord.class, 150L);
@@ -172,8 +172,9 @@ public class ServiceRecordPageIT extends AbstractIT {
   }
 
   private static void assertServiceRecordAttributes(Map<Field, String> expectedValues, ServiceRecord sr) {
+    InstrumentService instrumentService;
     assertAttribute(Field.ID, expectedValues, Long.toString(sr.getId()));
-    assertAttribute(Field.INSTRUMENT, expectedValues, sr.getInstrument().getName());
+    assertAttribute(Field.INSTRUMENT, expectedValues, instrumentService.getInstrument(sr).getName());
     assertAttribute(Field.TITLE, expectedValues, sr.getTitle());
     assertAttribute(Field.DETAILS, expectedValues, sr.getDetails());
     assertAttribute(Field.SERVICE_DATE, expectedValues, formatDate(sr.getServiceDate()));
