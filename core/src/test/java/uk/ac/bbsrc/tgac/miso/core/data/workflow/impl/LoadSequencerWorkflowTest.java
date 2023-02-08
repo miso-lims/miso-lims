@@ -130,6 +130,17 @@ public class LoadSequencerWorkflowTest {
     assertEquals(pool2, container.getPartitions().get(1).getPool().getAlias());
   }
 
+  @Test
+  public void testThrowUnexpectedInput() {
+    try {
+      // for step 1, a container step is not expected and should be rejected with an IllegalArgumentException
+      sut.processInput(1, makeContainerStep(SERIAL_NUMBER, MODEL_ALIAS, 2, PlatformType.ILLUMINA));
+      fail("testThrowUnexpectedInput should have thrown IllegalArgumentException");
+    } catch (IllegalArgumentException expected) {
+      assertEquals("Unexpected input", expected.getMessage());
+    }
+  }
+
   private void assertState(boolean isComplete, Integer nextStep, InputType... inputTypes) {
     assertEquals(isComplete, sut.isComplete());
     assertEquals(nextStep, sut.getNextStepNumber());
