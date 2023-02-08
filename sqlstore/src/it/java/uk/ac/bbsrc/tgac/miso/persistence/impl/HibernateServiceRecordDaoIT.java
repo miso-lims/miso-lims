@@ -122,16 +122,4 @@ public class HibernateServiceRecordDaoIT extends AbstractDAOTest {
     assertEquals(3, list.size());
   }
 
-  @Test
-  public void testListByInstrumentId() {
-    List<ServiceRecord> list = dao.listByInstrumentId(1L);
-    assertEquals(2, list.size());
-  }
-
-  @Test
-  public void testListByInstrumentIdNone() {
-    List<ServiceRecord> list = dao.listByInstrumentId(100L);
-    assertEquals(0, list.size());
-  }
-
 }
