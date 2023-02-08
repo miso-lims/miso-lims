@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.core.util;
 
 import java.util.Comparator;
@@ -36,6 +13,7 @@ import java.util.Comparator;
  */
 public final class AlphanumericComparator implements Comparator<String> {
   public static final AlphanumericComparator INSTANCE = new AlphanumericComparator();
+
   @Override
   public final int compare(String firstString, String secondString) {
 
@@ -94,8 +72,8 @@ public final class AlphanumericComparator implements Comparator<String> {
       int result;
 
       if (Character.isDigit(space1[0]) && Character.isDigit(space2[0])) {
-        Integer firstNumberToCompare = Integer.valueOf(str1.trim());
-        Integer secondNumberToCompare = Integer.valueOf(str2.trim());
+        Long firstNumberToCompare = Long.valueOf(str1.trim());
+        Long secondNumberToCompare = Long.valueOf(str2.trim());
         result = firstNumberToCompare.compareTo(secondNumberToCompare);
       } else {
         result = str1.compareTo(str2);
