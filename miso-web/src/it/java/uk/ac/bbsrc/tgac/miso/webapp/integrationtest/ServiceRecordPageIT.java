@@ -16,6 +16,7 @@ import com.google.common.collect.Maps;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
+import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.InstrumentPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ServiceRecordPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ServiceRecordPage.Field;
