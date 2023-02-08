@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
-import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.persistence.ServiceRecordStore;
 
 @Repository
@@ -20,8 +19,6 @@ public class HibernateServiceRecordDao implements ServiceRecordStore {
 
   @Autowired
   private SessionFactory sessionFactory;
-  @Autowired
-  private InstrumentService instrumentService;
 
   private Session currentSession() {
     return getSessionFactory().getCurrentSession();
