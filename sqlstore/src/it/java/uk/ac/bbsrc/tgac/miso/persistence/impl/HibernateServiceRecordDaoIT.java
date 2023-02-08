@@ -101,7 +101,7 @@ public class HibernateServiceRecordDaoIT extends AbstractDAOTest {
     rec.setTitle(newTitle);
     Instrument sr = Mockito.mock(Instrument.class);
     Mockito.when(sr.getId()).thenReturn(1L);
-    serviceRecordService.addServiceRecord(rec, sr);
+    instrumentService.addServiceRecord(rec, sr);
 
     assertEquals(1L, dao.save(rec));
 
