@@ -85,7 +85,7 @@ public class HibernateServiceRecordDaoIT extends AbstractDAOTest {
     assertEquals(title, savedRec.getTitle());
   }
 
-  private ServiceRecord makeServiceRecord(String title) {
+  private ServiceRecord makeServiceRecord(String title) throws IOException {
     ServiceRecord rec = new ServiceRecord();
     rec.setTitle(title);
     instrumentService.addServiceRecord(rec, emptySR);

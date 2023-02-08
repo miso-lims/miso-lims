@@ -457,7 +457,7 @@ INSERT INTO ServiceRecord(recordId, title, details, servicedBy, referenceNumber,
   (151, 'Test 151', NULL, NULL, NULL, '2017-09-12', NULL, NULL, 0),
   (152, 'Test 152', 'details to remove', 'technitchin', 'Riffraff', '2017-09-12', '2017-09-11 11:00:00', '2017-09-12 12:00:00', 1);
 
-INSERT INTO `Instrument_ServiceRecord`(`recordId`, `instrumentId`) VALUES
+INSERT INTO Instrument_ServiceRecord(recordId, instrumentId) VALUES
 (150, 101),
 (151, 101),
 (152, 101);
