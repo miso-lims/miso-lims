@@ -43,7 +43,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.persistence.InstrumentStore;
 
 public class HibernateServiceRecordDaoIT extends AbstractDAOTest {
@@ -53,9 +52,6 @@ public class HibernateServiceRecordDaoIT extends AbstractDAOTest {
 
   @Autowired
   private SessionFactory sessionFactory;
-
-  @Autowired
-  private InstrumentService instrumentService;
 
   @Mock
   private MisoFilesManager misoFilesManager;
@@ -88,7 +84,6 @@ public class HibernateServiceRecordDaoIT extends AbstractDAOTest {
   private ServiceRecord makeServiceRecord(String title) throws IOException {
     ServiceRecord rec = new ServiceRecord();
     rec.setTitle(title);
-    instrumentService.addServiceRecord(rec, emptySR);
     rec.setServiceDate(new java.util.Date());
     rec.setServicedByName("Test Person");
     return rec;
@@ -101,7 +96,6 @@ public class HibernateServiceRecordDaoIT extends AbstractDAOTest {
     rec.setTitle(newTitle);
     Instrument sr = Mockito.mock(Instrument.class);
     Mockito.when(sr.getId()).thenReturn(1L);
-    instrumentService.addServiceRecord(rec, sr);
 
     assertEquals(1L, dao.save(rec));
 
