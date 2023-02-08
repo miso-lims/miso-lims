@@ -1,4 +1,5 @@
 -- Create table for instrument ServiceRecords
+
 CREATE TABLE Instrument_ServiceRecord (
   recordId bigint(20) NOT NULL,
   instrumentId bigint(20) NOT NULL,
