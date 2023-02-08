@@ -784,10 +784,10 @@ VALUES
 (31,'EXP31','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',4,'EXP_AUTOGEN_STU1_Other_31',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 9),
 (32,'EXP32','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',5,'EXP_AUTOGEN_STU1_Other_32',16,1, '2018-04-23 13:39:00', 1, '2018-04-23 13:39:00', 9);
 
-INSERT INTO `ServiceRecord`(`recordId`, `instrumentId`, `title`, `details`, `servicedBy`, `referenceNumber`, `serviceDate`, `startTime`, `endTime`, outOfService, positionId) VALUES
-(1,1,'Seq1_Rec1','Test service','Service Person','12345','2016-01-01', '2016-01-01 07:30:00', '2016-01-01 09:00:00', FALSE, NULL),
-(2,1,'Seq1_Rec2',NULL,'Service Person',NULL,'2016-01-21',NULL,NULL, FALSE, NULL),
-(3,2,'Seq2_Rec1',NULL,'Service Person',NULL,'2016-01-21','2016-01-21 9:32:00',NULL, TRUE, 2);
+INSERT INTO `ServiceRecord`(`recordId`, `title`, `details`, `servicedBy`, `referenceNumber`, `serviceDate`, `startTime`, `endTime`, outOfService, positionId) VALUES
+(1,'Seq1_Rec1','Test service','Service Person','12345','2016-01-01', '2016-01-01 07:30:00', '2016-01-01 09:00:00', FALSE, NULL),
+(2,'Seq1_Rec2',NULL,'Service Person',NULL,'2016-01-21',NULL,NULL, FALSE, NULL),
+(3,'Seq2_Rec1',NULL,'Service Person',NULL,'2016-01-21','2016-01-21 9:32:00',NULL, TRUE, 2);
 
 INSERT INTO `Instrument_ServiceRecord`(`recordId`, `instrumentId`) VALUES
 (1,1),

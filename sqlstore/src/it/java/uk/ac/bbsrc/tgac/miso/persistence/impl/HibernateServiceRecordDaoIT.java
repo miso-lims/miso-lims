@@ -110,16 +110,6 @@ public class HibernateServiceRecordDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testSaveDecommissioned() throws IOException {
-    // TODO
-    ServiceRecord newRec = makeServiceRecord("New Record 2");
-    instrumentService.getInstrument(newRec).setDateDecommissioned(new Date());
-
-    exception.expect(IOException.class);
-    dao.save(newRec);
-  }
-
-  @Test
   public void testGet() throws IOException {
     ServiceRecord rec = dao.get(1L);
     assertNotNull(rec);

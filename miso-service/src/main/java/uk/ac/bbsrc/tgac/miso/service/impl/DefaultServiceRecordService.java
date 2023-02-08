@@ -79,6 +79,10 @@ public class DefaultServiceRecordService implements ServiceRecordService {
 
   private void validateChange(ServiceRecord record, ServiceRecord beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
+
+    if (instrumentService.getInstrument(beforeChange).getDateDecommissioned() != null)
+      throw new IOException("Cannot add service records to a retired instrument!");
+
     if (record.getPosition() != null
         && instrument.findPosition(record.getPosition().getId(), instrumentService.getInstrument(record)) == null) {
       errors.add(new ValidationError("position", "Position must belong to the same instrument as this record"));
