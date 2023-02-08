@@ -173,7 +173,8 @@ public class ServiceRecordPageIT extends AbstractIT {
     assertServiceRecordAttributes(fields, savedRecord);
   }
 
-  private static void assertServiceRecordAttributes(Map<Field, String> expectedValues, ServiceRecord sr) {
+  private static void assertServiceRecordAttributes(Map<Field, String> expectedValues, ServiceRecord sr)
+      throws IOException {
     InstrumentService instrumentService;
     assertAttribute(Field.ID, expectedValues, Long.toString(sr.getId()));
     assertAttribute(Field.INSTRUMENT, expectedValues, instrumentService.getInstrument(sr).getName());
