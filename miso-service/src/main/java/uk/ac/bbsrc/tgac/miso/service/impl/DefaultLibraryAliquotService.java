@@ -23,7 +23,6 @@ import com.eaglegenomics.simlims.core.User;
 import com.google.common.annotations.VisibleForTesting;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.HierarchyEntity;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
@@ -123,7 +122,8 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
         }
         if (isDetailedLibraryAliquot(managed)) {
           // generation of non-standard aliases is allowed
-          ((DetailedLibraryAliquot) managed).setNonStandardAlias(!namingScheme.validateLibraryAliquotAlias(managed.getAlias()).isValid());
+          ((DetailedLibraryAliquot) managed)
+              .setNonStandardAlias(!namingScheme.validateLibraryAliquotAlias(managed.getAlias()).isValid());
         } else {
           validateAlias(managed, namingScheme);
         }
@@ -134,11 +134,13 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
         generateAndSetIdBarcode(managed);
         needsUpdate = true;
       }
-      if (needsUpdate) libraryAliquotDao.save(managed);
+      if (needsUpdate)
+        libraryAliquotDao.save(managed);
       return managed;
     } catch (ConstraintViolationException e) {
       // Send the nested root cause message to the user, since it contains the actual error.
-      throw new ConstraintViolationException(e.getMessage() + " " + ExceptionUtils.getRootCauseMessage(e), e.getSQLException(),
+      throw new ConstraintViolationException(e.getMessage() + " " + ExceptionUtils.getRootCauseMessage(e),
+          e.getSQLException(),
           e.getConstraintName());
     }
   }
@@ -234,14 +236,15 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
   }
 
   /**
-   * Loads persisted objects into LibraryAliquot fields. Should be called before saving LibraryAliquots. Loads all member objects
-   * <b>except</b>
+   * Loads persisted objects into LibraryAliquot fields. Should be called before saving
+   * LibraryAliquots. Loads all member objects <b>except</b>
    * <ul>
    * <li>creator/lastModifier User objects</li>
    * </ul>
    * 
-   * @param aliquot the LibraryAliquot to load entities into. Must contain at least the IDs of objects to load (e.g. to load the
-   *          persisted Library into aliquot.library, aliquot.library.id must be set)
+   * @param aliquot the LibraryAliquot to load entities into. Must contain at least the IDs of objects
+   *        to load (e.g. to load the persisted Library into aliquot.library, aliquot.library.id must
+   *        be set)
    * @throws IOException
    */
   private void loadChildEntities(LibraryAliquot aliquot) throws IOException {
@@ -254,7 +257,8 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
     if (aliquot.getTargetedSequencing() != null) {
       aliquot.setTargetedSequencing(targetedSequencingService.get(aliquot.getTargetedSequencing().getId()));
     }
-    loadChildEntity(aliquot::setDetailedQcStatus, aliquot.getDetailedQcStatus(), detailedQcStatusService, "detailedQcStatusId");
+    loadChildEntity(aliquot::setDetailedQcStatus, aliquot.getDetailedQcStatus(), detailedQcStatusService,
+        "detailedQcStatusId");
     loadChildEntity(aliquot::setKitDescriptor, aliquot.getKitDescriptor(), kitDescriptorService, "kitDescriptorId");
     if (isDetailedLibraryAliquot(aliquot)) {
       DetailedLibraryAliquot detailed = (DetailedLibraryAliquot) aliquot;
@@ -265,14 +269,16 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
   }
 
   private void maybeRemoveFromBox(LibraryAliquot aliquot, LibraryAliquot managed) {
-    if (aliquot.isDiscarded() || aliquot.getDistributionTransfer() != null || managed.getDistributionTransfer() != null) {
+    if (aliquot.isDiscarded() || aliquot.getDistributionTransfer() != null
+        || managed.getDistributionTransfer() != null) {
       aliquot.setBoxPosition(null);
       aliquot.setVolume(BigDecimal.ZERO);
     }
   }
 
   /**
-   * Copies modifiable fields from the source LibraryAliquot into the target LibraryAliquot to be persisted
+   * Copies modifiable fields from the source LibraryAliquot into the target LibraryAliquot to be
+   * persisted
    * 
    * @param target the persisted LibraryAliquot to modify
    * @param source the modified LibraryAliquot to copy modifiable fields from
@@ -316,8 +322,8 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
 
     if (!hasTemporaryAlias(aliquot)) {
       if (!isDetailedLibraryAliquot(aliquot) || !((DetailedLibraryAliquot) aliquot).isNonStandardAlias()) {
-        uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult aliasValidation
-            = getNamingScheme(aliquot).validateLibraryAlias(aliquot.getAlias());
+        uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult aliasValidation =
+            getNamingScheme(aliquot).validateLibraryAlias(aliquot.getAlias());
         if (!aliasValidation.isValid()) {
           if (isDetailedLibraryAliquot(aliquot) && !isChanged(LibraryAliquot::getAlias, aliquot, beforeChange)) {
             ((DetailedLibraryAliquot) aliquot).setNonStandardAlias(true);
@@ -445,7 +451,7 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
       result.addError(ValidationError.forDeletionUsage(object, orderCount, "pool " + Pluralizer.orders(orderCount)));
     }
 
-  long childAliquotCount = libraryAliquotDao.getUsageByChildAliquots(object);
+    long childAliquotCount = libraryAliquotDao.getUsageByChildAliquots(object);
     if (childAliquotCount > 0L) {
       result.addError(ValidationError.forDeletionUsage(object, childAliquotCount,
           "child " + Pluralizer.libraryAliquots(childAliquotCount)));
@@ -473,7 +479,8 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
   }
 
   @Override
-  public List<LibraryAliquot> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
+  public List<LibraryAliquot> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir,
+      String sortCol,
       PaginationFilter... filter) throws IOException {
     return libraryAliquotDao.list(errorHandler, offset, limit, sortDir, sortCol, filter);
   }
@@ -481,6 +488,18 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
   @Override
   public TransactionTemplate getTransactionTemplate() {
     return transactionTemplate;
+  }
+
+  @Override
+  public Long getLockProjectId(LibraryAliquot item) throws IOException {
+    if (item.getLibrary() == null) {
+      return null;
+    }
+    if (item.getLibrary().getSample() == null) {
+      Library library = libraryService.get(item.getLibrary().getId());
+      return libraryService.getLockProjectId(library);
+    }
+    return libraryService.getLockProjectId(item.getLibrary());
   }
 
 }

@@ -1,7 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.core.service;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import org.slf4j.LoggerFactory;
@@ -26,17 +28,39 @@ public interface BulkSaveService<T extends Identifiable> extends SaveService<T> 
 
   public List<T> listByIdList(List<Long> ids) throws IOException;
 
-  public default BulkSaveOperation<T> startBulkCreate(List<T> items, Consumer<BulkSaveOperation<T>> callback) throws IOException {
-    return startBulkOperation(items, x -> PrometheusAsyncMonitor.monitor(getClass().getSimpleName(), "create", this::create, x), callback);
+  /**
+   * Get the project that should be locked while saving this item
+   * 
+   * @param item the item being saved
+   * @return ID of the project to lock, or null if none. Default implementation returns null
+   */
+  public default Long getLockProjectId(T item) throws IOException {
+    return null;
   }
 
-  public default BulkSaveOperation<T> startBulkUpdate(List<T> items, Consumer<BulkSaveOperation<T>> callback) throws IOException {
-    return startBulkOperation(items, x -> PrometheusAsyncMonitor.monitor(getClass().getSimpleName(), "update", this::update, x), callback);
+  public default BulkSaveOperation<T> startBulkCreate(List<T> items, Consumer<BulkSaveOperation<T>> callback)
+      throws IOException {
+    return startBulkOperation(items,
+        x -> PrometheusAsyncMonitor.monitor(getClass().getSimpleName(), "create", this::create, x), callback);
+  }
+
+  public default BulkSaveOperation<T> startBulkUpdate(List<T> items, Consumer<BulkSaveOperation<T>> callback)
+      throws IOException {
+    return startBulkOperation(items,
+        x -> PrometheusAsyncMonitor.monitor(getClass().getSimpleName(), "update", this::update, x), callback);
   }
 
   public default BulkSaveOperation<T> startBulkOperation(List<T> items, ThrowingFunction<T, Long, IOException> action,
       Consumer<BulkSaveOperation<T>> callback) throws IOException {
-    BulkSaveOperation<T> operation = new BulkSaveOperation<>(items, getAuthorizationManager().getCurrentUser());
+    Set<Long> lockProjectIds = new HashSet<>();
+    for (T item : items) {
+      Long lockProjectId = getLockProjectId(item);
+      if (lockProjectId != null) {
+        lockProjectIds.add(lockProjectId);
+      }
+    }
+    BulkSaveOperation<T> operation =
+        new BulkSaveOperation<>(items, getAuthorizationManager().getCurrentUser(), lockProjectIds);
     // Authentication is tied to the thread, so use this same auth in the new thread
     Authentication auth = SecurityContextHolder.getContextHolderStrategy().getContext().getAuthentication();
     Thread thread = new Thread(() -> {

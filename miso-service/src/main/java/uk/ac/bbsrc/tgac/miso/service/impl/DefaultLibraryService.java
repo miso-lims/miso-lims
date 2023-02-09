@@ -33,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
@@ -161,7 +162,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
         }
         if (isDetailedLibrary(managed)) {
           // generation of non-standard aliases is allowed
-          ((DetailedLibrary) managed).setNonStandardAlias(!namingScheme.validateLibraryAlias(managed.getAlias()).isValid());
+          ((DetailedLibrary) managed)
+              .setNonStandardAlias(!namingScheme.validateLibraryAlias(managed.getAlias()).isValid());
         } else {
           validateAliasOrThrow(managed, namingScheme);
         }
@@ -181,7 +183,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
       return managed;
     } catch (ConstraintViolationException e) {
       // Send the nested root cause message to the user, since it contains the actual error.
-      throw new ConstraintViolationException(e.getMessage() + " " + ExceptionUtils.getRootCauseMessage(e), e.getSQLException(),
+      throw new ConstraintViolationException(e.getMessage() + " " + ExceptionUtils.getRootCauseMessage(e),
+          e.getSQLException(),
           e.getConstraintName());
     }
   }
@@ -227,8 +230,10 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     if (library.getCreationReceiptInfo() != null) {
       TransferLibrary transferLibrary = library.getCreationReceiptInfo();
       Transfer transfer = transferLibrary.getTransfer();
-      Transfer existingTransfer = transferService.listByProperties(transfer.getSenderLab(), transfer.getRecipientGroup(),
-          library.getSample().getProject(), transfer.getTransferTime()).stream()
+      Transfer existingTransfer = transferService
+          .listByProperties(transfer.getSenderLab(), transfer.getRecipientGroup(),
+              library.getSample().getProject(), transfer.getTransferTime())
+          .stream()
           .max(Comparator.comparing(Transfer::getCreationTime)).orElse(null);
       if (existingTransfer != null) {
         existingTransfer.getLibraryTransfers().add(transferLibrary);
@@ -316,13 +321,15 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   }
 
   /**
-   * Loads persisted objects into library fields. Should be called before saving libraries. Loads all member objects <b>except</b>
+   * Loads persisted objects into library fields. Should be called before saving libraries. Loads all
+   * member objects <b>except</b>
    * <ul>
    * <li>creator/lastModifier User objects</li>
    * </ul>
    * 
-   * @param library the Library to load entities into. Must contain at least the IDs of objects to load (e.g. to load the persisted Sample
-   *          into library.sample, library.sample.id must be set)
+   * @param library the Library to load entities into. Must contain at least the IDs of objects to
+   *        load (e.g. to load the persisted Sample into library.sample, library.sample.id must be
+   *        set)
    * @throws IOException
    */
   private void loadChildEntities(Library library) throws IOException {
@@ -353,7 +360,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
       library.setThermalCycler(instrumentService.get(library.getThermalCycler().getId()));
     }
     loadChildEntity(library::setSop, library.getSop(), sopService, "sopId");
-    loadChildEntity(library::setDetailedQcStatus, library.getDetailedQcStatus(), detailedQcStatusService, "detailedQcStatusId");
+    loadChildEntity(library::setDetailedQcStatus, library.getDetailedQcStatus(), detailedQcStatusService,
+        "detailedQcStatusId");
     if (isDetailedLibrary(library)) {
       DetailedLibrary lai = (DetailedLibrary) library;
       if (lai.getLibraryDesignCode() != null) {
@@ -368,7 +376,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
         SampleClass sampleClass = ((DetailedSample) library.getSample()).getSampleClass();
         if (sampleClass.getId() != design.getSampleClass().getId()) {
           throw new IllegalArgumentException(
-              "Cannot use design " + design.getName() + " for a library from a sample of type " + sampleClass.getAlias());
+              "Cannot use design " + design.getName() + " for a library from a sample of type "
+                  + sampleClass.getAlias());
         }
       }
     }
@@ -441,14 +450,16 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   }
 
   private void maybeRemoveFromBox(Library library, Library managed) {
-    if (library.isDiscarded() || library.getDistributionTransfer() != null || managed.getDistributionTransfer() != null) {
+    if (library.isDiscarded() || library.getDistributionTransfer() != null
+        || managed.getDistributionTransfer() != null) {
       library.setBoxPosition(null);
       library.setVolume(BigDecimal.ZERO);
     }
   }
 
   private boolean isInvalidDuplicate(Library library, NamingScheme namingScheme) throws IOException {
-    // duplicate aliases may be allowed via naming scheme, or with nonStandardAlias=true in the case of a DetailedLibrary
+    // duplicate aliases may be allowed via naming scheme, or with nonStandardAlias=true in the case of
+    // a DetailedLibrary
     if (namingScheme.duplicateLibraryAliasAllowed()
         || (LimsUtils.isDetailedLibrary(library) && ((DetailedLibrary) library).hasNonStandardAlias())) {
       return false;
@@ -477,8 +488,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
         }
       }
       if (!isDetailedLibrary(library) || !((DetailedLibrary) library).hasNonStandardAlias()) {
-        uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult aliasValidation
-            = namingScheme.validateLibraryAlias(library.getAlias());
+        uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult aliasValidation =
+            namingScheme.validateLibraryAlias(library.getAlias());
         if (!aliasValidation.isValid()) {
           if (!aliasChanged && isDetailedLibrary(library)) {
             ((DetailedLibrary) library).setNonStandardAlias(true);
@@ -489,8 +500,9 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
       }
 
       if (!isDetailedLibrary(library) || !((DetailedLibrary) library).hasNonStandardAlias()) {
-        uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult aliasValidation = namingScheme.validateLibraryAlias(library
-            .getAlias());
+        uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult aliasValidation =
+            namingScheme.validateLibraryAlias(library
+                .getAlias());
         if (!aliasValidation.isValid()) {
           throw new ValidationException(new ValidationError("alias", aliasValidation.getMessage()));
         }
@@ -504,7 +516,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     validateUnboxableFields(library, errors);
     validateDetailedQcStatus(library, errors);
     if (isDetailedLibrary(library) && beforeChange != null) {
-      validateTargetedSequencing(((DetailedLibrary) library).getLibraryDesignCode(), beforeChange.getLibraryAliquots(), errors);
+      validateTargetedSequencing(((DetailedLibrary) library).getLibraryDesignCode(), beforeChange.getLibraryAliquots(),
+          errors);
       validateGroupDescription((DetailedLibrary) library, errors);
     }
 
@@ -529,7 +542,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
       if (library.getKitLot() == null) {
         addRequiredError(errors, "kitLot");
       }
-      if (library.getSop() == null && sopService.listByCategory(SopCategory.LIBRARY).stream().anyMatch(sop -> !sop.isArchived())) {
+      if (library.getSop() == null
+          && sopService.listByCategory(SopCategory.LIBRARY).stream().anyMatch(sop -> !sop.isArchived())) {
         addRequiredError(errors, "sopId");
       }
     }
@@ -576,7 +590,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     }
   }
 
-  private void validateTargetedSequencing(LibraryDesignCode libraryDesignCode, Collection<LibraryAliquot> libraryAliquots,
+  private void validateTargetedSequencing(LibraryDesignCode libraryDesignCode,
+      Collection<LibraryAliquot> libraryAliquots,
       List<ValidationError> errors) throws IOException {
     if (libraryAliquots == null || libraryAliquots.isEmpty()) {
       return;
@@ -587,7 +602,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
           .map(LibraryAliquot::getName).collect(Collectors.toList());
       if (!badAliquots.isEmpty()) {
         errors.add(new ValidationError("libraryDesignCode",
-            String.format("Targeted sequencing must be assigned to the affected %s (%s) to use this library design code: %s",
+            String.format(
+                "Targeted sequencing must be assigned to the affected %s (%s) to use this library design code: %s",
                 Pluralizer.libraryAliquots(badAliquots.size()),
                 String.join(", ", badAliquots),
                 libraryDesignCode.getCode())));
@@ -596,8 +612,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   }
 
   /**
-   * Checks whether library's alias conforms to the naming scheme. Validation is skipped for DetailedLibraries
-   * {@code if (library.hasNonStandardAlias())}
+   * Checks whether library's alias conforms to the naming scheme. Validation is skipped for
+   * DetailedLibraries {@code if (library.hasNonStandardAlias())}
    * 
    * @param library
    * @throws IOException
@@ -606,8 +622,9 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   private void validateAliasOrThrow(Library library, NamingScheme namingScheme) throws IOException {
     validateAliasUniqueness(library, namingScheme);
     if (!isDetailedLibrary(library) || !((DetailedLibrary) library).hasNonStandardAlias()) {
-      uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult aliasValidation = namingScheme.validateLibraryAlias(library
-          .getAlias());
+      uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult aliasValidation =
+          namingScheme.validateLibraryAlias(library
+              .getAlias());
       if (!aliasValidation.isValid()) {
         throw new ValidationException(new ValidationError("alias", aliasValidation.getMessage()));
       }
@@ -615,7 +632,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   }
 
   private void validateAliasUniqueness(Library library, NamingScheme namingScheme) throws IOException {
-    // duplicate aliases may be allowed via naming scheme, or with nonStandardAlias=true in the case of a DetailedLibrary
+    // duplicate aliases may be allowed via naming scheme, or with nonStandardAlias=true in the case of
+    // a DetailedLibrary
     if (namingScheme.duplicateLibraryAliasAllowed()
         || (LimsUtils.isDetailedLibrary(library) && ((DetailedLibrary) library).hasNonStandardAlias())) {
       return;
@@ -624,13 +642,15 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
     for (EntityReference potentialDupe : potentialDupes) {
       if (!library.isSaved() || library.getId() != potentialDupe.getId()) {
         // an existing DIFFERENT library already has this alias
-        throw new ValidationException(new ValidationError("alias", "A library with this alias already exists in the database"));
+        throw new ValidationException(
+            new ValidationError("alias", "A library with this alias already exists in the database"));
       }
     }
   }
 
   private void validateParentOrThrow(Library library) {
-    if (!isDetailedLibrary(library)) return;
+    if (!isDetailedLibrary(library))
+      return;
 
     if (!isAliquotSample(library.getSample())) {
       String sc = null;
@@ -640,7 +660,8 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
       } else {
         sc = "Plain Sample";
       }
-      throw new IllegalArgumentException(String.format("Sample Class '%s' is not a valid parent for Libraries. Must be an aliquot", sc));
+      throw new IllegalArgumentException(
+          String.format("Sample Class '%s' is not a valid parent for Libraries. Must be an aliquot", sc));
     }
   }
 
@@ -757,6 +778,18 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   @Override
   public List<Long> listIdsByRequisitionId(long requisitionId) throws IOException {
     return libraryDao.listIdsByRequisitionId(requisitionId);
+  }
+
+  @Override
+  public Long getLockProjectId(Library item) throws IOException {
+    if (item.getSample() == null) {
+      return null;
+    }
+    if (item.getSample().getProject() == null) {
+      Sample sample = sampleService.get(item.getSample().getId());
+      return sampleService.getLockProjectId(sample);
+    }
+    return sampleService.getLockProjectId(item.getSample());
   }
 
 }

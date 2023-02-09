@@ -2,9 +2,11 @@ package uk.ac.bbsrc.tgac.miso.core.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -18,6 +20,7 @@ public class BulkSaveOperation<T extends Identifiable> {
   private final List<T> pendingItems;
   private final Class<T> itemClass;
   private final User owner;
+  private final Set<Long> lockProjectIds;
   private final int totalCount;
   private int progress = 0;
   private final List<Long> savedIds = new ArrayList<>();
@@ -28,11 +31,16 @@ public class BulkSaveOperation<T extends Identifiable> {
   private boolean awaitingItemResult = false;
 
   public BulkSaveOperation(List<T> pendingItems, User owner) {
+    this(pendingItems, owner, null);
+  }
+
+  public BulkSaveOperation(List<T> pendingItems, User owner, Set<Long> lockProjectIds) {
     this.pendingItems = pendingItems;
     @SuppressWarnings("unchecked")
     Class<T> clazz = (Class<T>) pendingItems.get(0).getClass();
     this.itemClass = clazz;
     this.owner = owner;
+    this.lockProjectIds = lockProjectIds == null ? Collections.emptySet() : Collections.unmodifiableSet(lockProjectIds);
     this.totalCount = pendingItems.size();
   }
 
@@ -42,6 +50,10 @@ public class BulkSaveOperation<T extends Identifiable> {
 
   public User getOwner() {
     return owner;
+  }
+
+  public Set<Long> getLockProjectIds() {
+    return lockProjectIds;
   }
 
   public synchronized T getNextItem() {
