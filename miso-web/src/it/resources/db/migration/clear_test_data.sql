@@ -101,6 +101,7 @@ DELETE FROM Instrument;
 DELETE FROM InstrumentPosition;
 DELETE FROM Experiment;
 DELETE FROM InstrumentModel;
+DELETE FROM Instrument_ServiceRecord;
 DELETE FROM StudyChangeLog;
 DELETE FROM Study;
 DELETE FROM SampleNumberPerProject;
