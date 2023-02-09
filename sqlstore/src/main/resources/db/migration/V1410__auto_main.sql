@@ -1,3 +1,4 @@
+-- delete_orphaned_runlibs
 DELETE FROM Run_Partition_LibraryAliquot
 WHERE NOT EXISTS (
   SELECT 1
@@ -8,3 +9,4 @@ WHERE NOT EXISTS (
   AND part.partitionId = partitionId
   AND pla.aliquotId = aliquotId
 );
+

@@ -7,6 +7,19 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.53.1] - 2023-02-09
+
+### Fixed
+
+* Error when trying to bulk edit samples, libraries, library aliquots, or pools
+  with aliases containing large numbers
+* error where link between library aliquots and run was not entirely removed
+  when removing a pool from a run
+* an issue where duplicate aliases could be generated if multiple batches of
+  samples, libraries, or library aliquots were saved at the same time.
+  Concurrent saves involving the same project will now be prevented.
+
+
 ## [1.53.0] - 2023-01-26
 
 ### Added
