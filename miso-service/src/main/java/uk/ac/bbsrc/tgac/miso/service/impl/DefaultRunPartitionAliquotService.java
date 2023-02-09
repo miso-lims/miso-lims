@@ -78,17 +78,22 @@ public class DefaultRunPartitionAliquotService implements RunPartitionAliquotSer
 
   @Override
   public void save(RunPartitionAliquot runPartitionAliquot) throws IOException {
-    RunPartitionAliquot managed = get(runPartitionAliquot.getRun(), runPartitionAliquot.getPartition(), runPartitionAliquot.getAliquot());
-    loadChildEntity(runPartitionAliquot::setPurpose, runPartitionAliquot.getPurpose(), runPurposeService, "runPurposeId");
-    loadChildEntity(runPartitionAliquot::setQcStatus, runPartitionAliquot.getQcStatus(), runLibraryQcStatusService, "qcStatusId");
+    RunPartitionAliquot managed =
+        get(runPartitionAliquot.getRun(), runPartitionAliquot.getPartition(), runPartitionAliquot.getAliquot());
+    loadChildEntity(runPartitionAliquot::setPurpose, runPartitionAliquot.getPurpose(), runPurposeService,
+        "runPurposeId");
+    loadChildEntity(runPartitionAliquot::setQcStatus, runPartitionAliquot.getQcStatus(), runLibraryQcStatusService,
+        "qcStatusId");
     User user = authorizationManager.getCurrentUser();
     updateQcDetails(runPartitionAliquot, managed, RunPartitionAliquot::getQcStatus, RunPartitionAliquot::getQcUser,
-        RunPartitionAliquot::setQcUser, authorizationManager, RunPartitionAliquot::getQcDate, RunPartitionAliquot::setQcDate);
+        RunPartitionAliquot::setQcUser, authorizationManager, RunPartitionAliquot::getQcDate,
+        RunPartitionAliquot::setQcDate);
     boolean qcStatusChanged = isChanged(RunPartitionAliquot::getQcStatus, runPartitionAliquot, managed);
     if (qcStatusChanged) {
       runPartitionAliquot.setDataReview(null);
     }
-    ValidationUtils.updateQcDetails(runPartitionAliquot, managed, RunPartitionAliquot::getDataReview, RunPartitionAliquot::getDataReviewer,
+    ValidationUtils.updateQcDetails(runPartitionAliquot, managed, RunPartitionAliquot::getDataReview,
+        RunPartitionAliquot::getDataReviewer,
         RunPartitionAliquot::setDataReviewer, authorizationManager, RunPartitionAliquot::getDataReviewDate,
         RunPartitionAliquot::setDataReviewDate);
 
@@ -97,9 +102,11 @@ public class DefaultRunPartitionAliquotService implements RunPartitionAliquotSer
       errors.add(new ValidationError("dataReview", "Cannot set data review before QC status"));
     }
     validateQcUser(runPartitionAliquot.getQcStatus(), runPartitionAliquot.getQcUser(), errors);
-    // data review gets cleared if QC status changes; otherwise, it can only be changed by data reviewers/admin
+    // data review gets cleared if QC status changes; otherwise, it can only be changed by data
+    // reviewers/admin
     if (isChanged(RunPartitionAliquot::getDataReview, runPartitionAliquot, managed)
-        && !user.isRunReviewer() && !user.isAdmin() && (!qcStatusChanged || runPartitionAliquot.getDataReview() != null)) {
+        && !user.isRunReviewer() && !user.isAdmin()
+        && (!qcStatusChanged || runPartitionAliquot.getDataReview() != null)) {
       errors.add(new ValidationError("dataReview", "You are not authorized to make this change"));
     }
     if (!errors.isEmpty()) {
@@ -121,6 +128,11 @@ public class DefaultRunPartitionAliquotService implements RunPartitionAliquotSer
   @Override
   public void deleteForRunContainer(Run run, SequencerPartitionContainer container) throws IOException {
     runPartitionAliquotDao.deleteForRunContainer(run, container);
+  }
+
+  @Override
+  public void deleteForPartition(Partition partition) throws IOException {
+    runPartitionAliquotDao.deleteForPartition(partition);
   }
 
   @Override

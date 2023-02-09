@@ -27,6 +27,8 @@ public interface RunPartitionAliquotService {
 
   void deleteForRunContainer(Run run, SequencerPartitionContainer container) throws IOException;
 
+  void deleteForPartition(Partition partition) throws IOException;
+
   void deleteForPoolAliquot(Pool pool, long aliquotId) throws IOException;
 
 }

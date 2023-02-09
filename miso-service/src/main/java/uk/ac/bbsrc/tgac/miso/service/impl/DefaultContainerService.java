@@ -7,12 +7,18 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.eaglegenomics.simlims.core.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.*;
+import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
@@ -22,7 +28,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.core.service.*;
+import uk.ac.bbsrc.tgac.miso.core.service.BarcodableReferenceService;
+import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
+import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
+import uk.ac.bbsrc.tgac.miso.core.service.KitDescriptorService;
+import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionAliquotService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunService;
+import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
@@ -52,6 +65,8 @@ public class DefaultContainerService implements ContainerService {
   private ChangeLogService changeLogService;
   @Autowired
   private RunService runService;
+  @Autowired
+  private RunPartitionAliquotService runPartitionAliquotService;
 
   @Override
   public AuthorizationManager getAuthorizationManager() {
@@ -106,7 +121,8 @@ public class DefaultContainerService implements ContainerService {
     }
   }
 
-  private void validateChange(SequencerPartitionContainer container, SequencerPartitionContainer beforeChange) throws IOException {
+  private void validateChange(SequencerPartitionContainer container, SequencerPartitionContainer beforeChange)
+      throws IOException {
     if (container.getModel().getPartitionCount() != container.getPartitions().size()) {
       // this is not user-correctable, so should not be reported as a validation error
       throw new IllegalArgumentException("Number of partitions does not match container model specifications");
@@ -134,15 +150,18 @@ public class DefaultContainerService implements ContainerService {
       errors.add(new ValidationError("MultiplexingKitLot", "Multiplexing kit not specified"));
     }
 
-    if (beforeChange != null && ValidationUtils.isSetAndChanged(SequencerPartitionContainer::getModel, container, beforeChange)) {
+    if (beforeChange != null
+        && ValidationUtils.isSetAndChanged(SequencerPartitionContainer::getModel, container, beforeChange)) {
       SequencingContainerModel before = beforeChange.getModel();
       SequencingContainerModel after = container.getModel();
       if (after.getPlatformType() != before.getPlatformType()) {
         errors.add(new ValidationError("model.id",
-            String.format("Can only be changed to a model of the same platform (%s)", before.getPlatformType().getKey())));
+            String.format("Can only be changed to a model of the same platform (%s)",
+                before.getPlatformType().getKey())));
       } else if (after.getPartitionCount() != before.getPartitionCount()) {
         errors.add(new ValidationError("model.id",
-            String.format("Can only be changed to a model with the same number of partitions (%d)", before.getPartitionCount())));
+            String.format("Can only be changed to a model with the same number of partitions (%d)",
+                before.getPartitionCount())));
       }
       if (beforeChange.getRunPositions() != null) {
         Set<InstrumentModel> requiredInstrumentModels = beforeChange.getRunPositions().stream()
@@ -156,7 +175,8 @@ public class DefaultContainerService implements ContainerService {
           errors.add(new ValidationError("model.id",
               String.format("Can only change to a model compatible with the linked runs' instrument models (%s)",
                   LimsUtils.joinWithConjunction(
-                      requiredInstrumentModels.stream().map(InstrumentModel::getAlias).collect(Collectors.toSet()), "and"))));
+                      requiredInstrumentModels.stream().map(InstrumentModel::getAlias).collect(Collectors.toSet()),
+                      "and"))));
         }
       }
     }
@@ -206,14 +226,15 @@ public class DefaultContainerService implements ContainerService {
   }
 
   /**
-   * Loads persisted objects into container fields. Should be called before saving new containers. Loads all member objects <b>except</b>
+   * Loads persisted objects into container fields. Should be called before saving new containers.
+   * Loads all member objects <b>except</b>
    * <ul>
    * <li>creator/lastModifier User objects</li>
    * </ul>
    * 
-   * @param container the SequencerPartitionContainer to load entities into. Must contain at least the IDs of objects to load (e.g. to load
-   *          the persisted SequencingContainerModel
-   *          into container.model, container.model.id must be set)
+   * @param container the SequencerPartitionContainer to load entities into. Must contain at least the
+   *        IDs of objects to load (e.g. to load the persisted SequencingContainerModel into
+   *        container.model, container.model.id must be set)
    * @throws IOException
    */
   private void loadChildEntities(SequencerPartitionContainer container) throws IOException {
@@ -273,7 +294,8 @@ public class DefaultContainerService implements ContainerService {
   private void validateChange(Partition partition, Partition beforeChange) {
     List<ValidationError> errors = new ArrayList<>();
 
-    ValidationUtils.validateConcentrationUnits(partition.getLoadingConcentration(), partition.getLoadingConcentrationUnits(),
+    ValidationUtils.validateConcentrationUnits(partition.getLoadingConcentration(),
+        partition.getLoadingConcentrationUnits(),
         "loadingConcentration", "Loading Concentration", errors);
 
     if (!errors.isEmpty()) {
@@ -287,6 +309,9 @@ public class DefaultContainerService implements ContainerService {
     if ((targetPool == null) != (sourcePool == null)
         || (targetPool != null && sourcePool != null && targetPool.getId() != sourcePool.getId())) {
       logPoolChanged(targetPool, sourcePool, target);
+      if (target.getPool() != null) {
+        runPartitionAliquotService.deleteForPartition(target);
+      }
     }
     target.setPool(source.getPool());
     target.setLoadingConcentration(source.getLoadingConcentration());
@@ -320,7 +345,8 @@ public class DefaultContainerService implements ContainerService {
     for (Run run : runs) {
       changeLogService.create(run.createChangeLog(
           String.format("Pool changed in partition %d of container %s: %s → %s", partitionNumber, containerBarcode,
-          oldAlias, newAlias), "pool", user));
+              oldAlias, newAlias),
+          "pool", user));
     }
   }
 

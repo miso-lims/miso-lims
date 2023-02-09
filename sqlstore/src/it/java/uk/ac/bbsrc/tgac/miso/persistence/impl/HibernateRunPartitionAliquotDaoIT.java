@@ -12,10 +12,14 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import com.eaglegenomics.simlims.core.User;
 
-import org.mockito.*;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -73,7 +77,8 @@ public class HibernateRunPartitionAliquotDaoIT extends AbstractDAOTest {
     assertNull(rpa);
   }
 
-  private RunPartitionAliquot get(long runId, long partitionId, long aliquotId, boolean expectExisting) throws IOException {
+  private RunPartitionAliquot get(long runId, long partitionId, long aliquotId, boolean expectExisting)
+      throws IOException {
     Run run = (Run) currentSession().get(Run.class, runId);
     Partition partition = (Partition) currentSession().get(PartitionImpl.class, partitionId);
     LibraryAliquot aliquot = (LibraryAliquot) currentSession().get(LibraryAliquot.class, aliquotId);
@@ -94,13 +99,13 @@ public class HibernateRunPartitionAliquotDaoIT extends AbstractDAOTest {
     long runId = 1L;
     Run run = (Run) currentSession().get(Run.class, runId);
     Mockito.when(runStore.listByIdList(Collections.singleton(runId))).thenReturn(Collections.singletonList(run));
-    // There are RunPartitionAliquots created for aliquots 1L and 2L. The dao must construct RPAs for the following
+    // There are RunPartitionAliquots created for aliquots 1L and 2L. The dao must construct RPAs for
+    // the following
     List<LibraryAliquot> aliquots = Arrays.asList(
         (LibraryAliquot) currentSession().get(LibraryAliquot.class, 3L),
         (LibraryAliquot) currentSession().get(LibraryAliquot.class, 4L),
         (LibraryAliquot) currentSession().get(LibraryAliquot.class, 5L),
-        (LibraryAliquot) currentSession().get(LibraryAliquot.class, 6L)
-    );
+        (LibraryAliquot) currentSession().get(LibraryAliquot.class, 6L));
     Mockito.when(libraryAliquotStore.listByIdList(ArgumentMatchers.any())).thenReturn(aliquots);
 
     List<RunPartitionAliquot> results = sut.listByRunId(runId);
@@ -183,7 +188,8 @@ public class HibernateRunPartitionAliquotDaoIT extends AbstractDAOTest {
   @Test
   public void testDeleteForRunContainer() throws Exception {
     Run run = (Run) currentSession().get(Run.class, 1L);
-    SequencerPartitionContainer container = (SequencerPartitionContainer) currentSession().get(SequencerPartitionContainerImpl.class, 1L);
+    SequencerPartitionContainer container =
+        (SequencerPartitionContainer) currentSession().get(SequencerPartitionContainerImpl.class, 1L);
     assertEquals(2, countForRunAndContainer(run, container));
 
     sut.deleteForRunContainer(run, container);
@@ -200,6 +206,23 @@ public class HibernateRunPartitionAliquotDaoIT extends AbstractDAOTest {
         .add(Restrictions.eq("partition.sequencerPartitionContainer", container))
         .setProjection(Projections.rowCount())
         .uniqueResult();
+  }
+
+  @Test
+  public void testDeleteForPartition() throws Exception {
+    Partition partition = (Partition) currentSession().get(PartitionImpl.class, 1L);
+    List<RunPartitionAliquot> before = currentSession().createCriteria(RunPartitionAliquot.class)
+        .add(Restrictions.eq("partition", partition))
+        .list();
+    assertEquals(2, before.size());
+
+    sut.deleteForPartition(partition);
+    clearSession();
+
+    List<RunPartitionAliquot> after = currentSession().createCriteria(RunPartitionAliquot.class)
+        .add(Restrictions.eq("partition", partition))
+        .list();
+    assertTrue(after.isEmpty());
   }
 
   @Test

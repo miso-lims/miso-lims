@@ -1,7 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -14,11 +18,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.*;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot.RunPartitionAliquotId;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAliquotStore;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.persistence.RunPartitionAliquotDao;
@@ -59,7 +66,7 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
     if (result == null) {
       // ensure the relationship exists before constructing the entity
       List<Object[]> ids = queryIds("WHERE r.runId = ? AND part.partitionId = ? AND pla.aliquotId = ?",
-          new long[]{run.getId(), partition.getId(), aliquot.getId()});
+          new long[] {run.getId(), partition.getId(), aliquot.getId()});
       if (ids.isEmpty()) {
         return null;
       }
@@ -70,7 +77,7 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
 
   @Override
   public List<RunPartitionAliquot> listByRunId(long runId) throws IOException {
-    List<Object[]> ids = queryIds("WHERE r.runId = ?", new long[]{runId});
+    List<Object[]> ids = queryIds("WHERE r.runId = ?", new long[] {runId});
 
     @SuppressWarnings("unchecked")
     List<RunPartitionAliquot> results = currentSession().createCriteria(RunPartitionAliquot.class)
@@ -83,7 +90,7 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
 
   @Override
   public List<RunPartitionAliquot> listByAliquotId(long aliquotId) throws IOException {
-    List<Object[]> ids = queryIds("WHERE pla.aliquotId = ?", new long[]{aliquotId});
+    List<Object[]> ids = queryIds("WHERE pla.aliquotId = ?", new long[] {aliquotId});
 
     @SuppressWarnings("unchecked")
     List<RunPartitionAliquot> results = currentSession().createCriteria(RunPartitionAliquot.class)
@@ -115,11 +122,11 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
 
   private List<Object[]> queryIds(String additionalQuery, Consumer<SQLQuery> addParameters) {
     SQLQuery query = currentSession().createSQLQuery(
-            "SELECT r.runId, part.partitionId, pla.aliquotId"
-                + " FROM Run r"
-                + " JOIN Run_SequencerPartitionContainer rspc ON rspc.Run_runId = r.runId"
-                + " JOIN _Partition part ON part.containerId = rspc.containers_containerId"
-                + " JOIN Pool_LibraryAliquot pla ON pla.poolId = part.pool_poolId" + " " + additionalQuery)
+        "SELECT r.runId, part.partitionId, pla.aliquotId"
+            + " FROM Run r"
+            + " JOIN Run_SequencerPartitionContainer rspc ON rspc.Run_runId = r.runId"
+            + " JOIN _Partition part ON part.containerId = rspc.containers_containerId"
+            + " JOIN Pool_LibraryAliquot pla ON pla.poolId = part.pool_poolId" + " " + additionalQuery)
         .addScalar("runId", new LongType())
         .addScalar("partitionId", new LongType())
         .addScalar("aliquotId", new LongType());
@@ -131,7 +138,7 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
     return queryIds(additionalQuery, query -> {
       for (int i = 0; i < parameters.length; i++) {
         // parameters indices start at 1, but parameters array starts at 0
-        query.setLong(i+1, parameters[i]);
+        query.setLong(i + 1, parameters[i]);
       }
     });
   }
@@ -144,7 +151,7 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
       long aliquotId = parseLong(id[2]);
 
       if (results.stream().noneMatch(x -> matches(x, rowRunId, partitionId, aliquotId))) {
-        missingIds.add(new Long[]{rowRunId, partitionId, aliquotId});
+        missingIds.add(new Long[] {rowRunId, partitionId, aliquotId});
       }
     }
 
@@ -158,7 +165,8 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
       for (Long[] id : missingIds) {
         Run run = runs.stream().filter(x -> x.getId() == id[0].longValue()).findFirst().orElseThrow();
         Partition partition = partitions.stream().filter(x -> x.getId() == id[1].longValue()).findFirst().orElseThrow();
-        LibraryAliquot aliquot = aliquots.stream().filter(x -> x.getId() == id[2].longValue()).findFirst().orElseThrow();
+        LibraryAliquot aliquot =
+            aliquots.stream().filter(x -> x.getId() == id[2].longValue()).findFirst().orElseThrow();
         results.add(new RunPartitionAliquot(run, partition, aliquot));
       }
     }
@@ -190,6 +198,19 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
         .createAlias("partition", "partition")
         .add(Restrictions.eq("run", run))
         .add(Restrictions.eq("partition.sequencerPartitionContainer", container))
+        .list();
+
+    for (RunPartitionAliquot item : items) {
+      currentSession().delete(item);
+    }
+  }
+
+  @Override
+  public void deleteForPartition(Partition partition) throws IOException {
+    @SuppressWarnings("unchecked")
+    List<RunPartitionAliquot> items = currentSession().createCriteria(RunPartitionAliquot.class)
+        .createAlias("partition", "partition")
+        .add(Restrictions.eq("partition", partition))
         .list();
 
     for (RunPartitionAliquot item : items) {
