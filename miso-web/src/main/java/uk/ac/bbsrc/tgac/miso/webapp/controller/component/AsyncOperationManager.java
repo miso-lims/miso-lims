@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -50,14 +52,15 @@ public class AsyncOperationManager {
 
   private final ConcurrentHashMap<String, BulkSaveOperation<?>> asyncOperations = new ConcurrentHashMap<>();
 
-  public <T, R extends Identifiable> ObjectNode startAsyncBulkCreate(String type, List<T> dtos, Function<T, R> toObject,
-      BulkSaveService<R> service) throws IOException {
+  public synchronized <T, R extends Identifiable> ObjectNode startAsyncBulkCreate(String type, List<T> dtos,
+      Function<T, R> toObject, BulkSaveService<R> service) throws IOException {
     return startAsyncBulkCreate(type, dtos, toObject, service, false);
   }
 
-  public <T, R extends Identifiable> ObjectNode startAsyncBulkCreate(String type, List<T> dtos, Function<T, R> toObject,
-      BulkSaveService<R> service, boolean updateConstants) throws IOException {
+  public synchronized <T, R extends Identifiable> ObjectNode startAsyncBulkCreate(String type, List<T> dtos,
+      Function<T, R> toObject, BulkSaveService<R> service, boolean updateConstants) throws IOException {
     List<R> items = validateBulkCreate(type, dtos, toObject);
+    checkProjectLocks(items, service);
     Consumer<BulkSaveOperation<R>> callback = null;
     if (updateConstants) {
       callback = operation -> {
@@ -78,7 +81,8 @@ public class AsyncOperationManager {
     return makeRunningProgress(uuid, operation);
   }
 
-  private <T, R extends Identifiable> List<R> validateBulkCreate(String type, List<T> dtos, Function<T, R> toObject) throws IOException {
+  private <T, R extends Identifiable> List<R> validateBulkCreate(String type, List<T> dtos, Function<T, R> toObject)
+      throws IOException {
     List<R> items = new ArrayList<>();
     for (T dto : dtos) {
       if (dto == null) {
@@ -93,21 +97,42 @@ public class AsyncOperationManager {
     return items;
   }
 
-  public <T extends Identifiable> ObjectNode startAsyncBulkUpdate(String type, List<T> items, BulkSaveService<T> service)
+  private <T extends Identifiable> void checkProjectLocks(List<T> items, BulkSaveService<T> service)
+      throws IOException {
+    Set<Long> lockProjectIds = new HashSet<>();
+    for (T item : items) {
+      Long lockProjectId = service.getLockProjectId(item);
+      if (lockProjectId != null) {
+        lockProjectIds.add(lockProjectId);
+      }
+    }
+    for (BulkSaveOperation<?> operation : asyncOperations.values()) {
+      if (!operation.isComplete()
+          && operation.getLockProjectIds().stream().anyMatch(id -> lockProjectIds.contains(id))) {
+        throw new RestException(
+            "There is another ongoing save operation for the same project. Please wait and try again.",
+            Status.BAD_REQUEST);
+      }
+    }
+  }
+
+  public synchronized <T extends Identifiable> ObjectNode startAsyncBulkUpdate(String type, List<T> items,
+      BulkSaveService<T> service)
       throws IOException {
     BulkSaveOperation<T> operation = service.startBulkUpdate(items, null);
     String uuid = addAsyncOperation(operation);
     return makeRunningProgress(uuid, operation);
   }
 
-  public <T, R extends Identifiable> ObjectNode startAsyncBulkUpdate(String type, List<T> dtos, Function<T, R> toObject,
-      BulkSaveService<R> service) throws IOException {
+  public synchronized <T, R extends Identifiable> ObjectNode startAsyncBulkUpdate(String type, List<T> dtos,
+      Function<T, R> toObject, BulkSaveService<R> service) throws IOException {
     return startAsyncBulkUpdate(type, dtos, toObject, service, false);
   }
 
-  public <T, R extends Identifiable> ObjectNode startAsyncBulkUpdate(String type, List<T> dtos, Function<T, R> toObject,
-      BulkSaveService<R> service, boolean updateConstants) throws IOException {
+  public synchronized <T, R extends Identifiable> ObjectNode startAsyncBulkUpdate(String type, List<T> dtos,
+      Function<T, R> toObject, BulkSaveService<R> service, boolean updateConstants) throws IOException {
     List<R> items = validateBulkUpdate(type, dtos, toObject, service::get);
+    checkProjectLocks(items, service);
     Consumer<BulkSaveOperation<R>> callback = null;
     if (updateConstants) {
       callback = operation -> {
@@ -159,7 +184,8 @@ public class AsyncOperationManager {
     return getAsyncProgress(uuid, itemClass, null);
   }
 
-  public <T, R extends Identifiable> ObjectNode getAsyncProgress(String uuid, Class<R> itemClass, BulkSaveService<R> service,
+  public <T, R extends Identifiable> ObjectNode getAsyncProgress(String uuid, Class<R> itemClass,
+      BulkSaveService<R> service,
       Function<R, T> toDto) throws Exception {
     return getAsyncProgress(uuid, itemClass, operation -> {
       return service.listByIdList(operation.getSavedIds()).stream()
