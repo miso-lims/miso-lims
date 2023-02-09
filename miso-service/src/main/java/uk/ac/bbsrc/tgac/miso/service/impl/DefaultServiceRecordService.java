@@ -38,9 +38,6 @@ public class DefaultServiceRecordService implements ServiceRecordService {
   @Autowired
   private InstrumentService instrumentService;
 
-  @Autowired
-  private Instrument instrument;
-
   @Override
   public ServiceRecord get(long recordId) throws IOException {
     return serviceRecordDao.get(recordId);
@@ -66,8 +63,9 @@ public class DefaultServiceRecordService implements ServiceRecordService {
     if (source.getPosition() == null) {
       target.setPosition(null);
     } else {
+      Instrument instrument = instrumentService.getInstrument(target);
       target
-          .setPosition(instrument.findPosition(source.getPosition().getId(), instrumentService.getInstrument(target)));
+          .setPosition(instrument.findPosition(source.getPosition().getId()));
     }
     target.setServicedByName(source.getServicedByName());
     target.setReferenceNumber(source.getReferenceNumber());
@@ -79,12 +77,13 @@ public class DefaultServiceRecordService implements ServiceRecordService {
 
   private void validateChange(ServiceRecord record, ServiceRecord beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
+    Instrument instrument = instrumentService.getInstrument(record);
 
     if (instrumentService.getInstrument(beforeChange).getDateDecommissioned() != null)
       throw new IOException("Cannot add service records to a retired instrument!");
 
     if (record.getPosition() != null
-        && instrument.findPosition(record.getPosition().getId(), instrumentService.getInstrument(record)) == null) {
+        && instrument.findPosition(record.getPosition().getId()) == null) {
       errors.add(new ValidationError("position", "Position must belong to the same instrument as this record"));
     }
     if (!errors.isEmpty()) {

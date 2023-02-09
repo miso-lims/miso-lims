@@ -369,8 +369,8 @@ public class InstrumentImpl implements Instrument {
   }
 
   @Override
-  public InstrumentPosition findPosition(long id, Instrument instrument) {
-    return instrument.getInstrumentModel().getPositions().stream()
+  public InstrumentPosition findPosition(long id) {
+    return this.getInstrumentModel().getPositions().stream()
         .filter(p -> p.getId() == id)
         .findFirst().orElse(null);
   }

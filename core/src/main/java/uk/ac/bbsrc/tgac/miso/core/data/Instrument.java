@@ -114,7 +114,7 @@ public interface Instrument extends Barcodable, Deletable, Nameable, Serializabl
 
   public void setDefaultRunPurpose(RunPurpose defaultRunPurpose);
 
-  public InstrumentPosition findPosition(long id, Instrument instrument);
+  public InstrumentPosition findPosition(long id);
 
   @Override
   int hashCode();

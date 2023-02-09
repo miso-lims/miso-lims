@@ -81,8 +81,9 @@ public class DefaultInstrumentService implements InstrumentService {
     if (instrument.getDateCommissioned() != null) {
       throw new IOException("Cannot add service records to a retired instrument!");
     }
+    Instrument getbyRecord = getInstrument(record);
     if (record.getPosition() != null
-        && instrument.findPosition(record.getPosition().getId(), getInstrument(record)) == null) {
+        && getbyRecord.findPosition(record.getPosition().getId()) == null) {
       throw new ValidationException("Position must belong to the same instrument as this record");
     }
     long recordId = serviceRecordService.create(record);
