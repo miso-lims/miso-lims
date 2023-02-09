@@ -32,8 +32,6 @@ public class ServiceRecordRestController extends RestController {
   private ServiceRecordService serviceRecordService;
   @Autowired
   private InstrumentService instrumentService;
-  @Autowired
-  Dtos dtos;
 
   @PostMapping(value = "/bulk-delete")
   @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -55,10 +53,10 @@ public class ServiceRecordRestController extends RestController {
   @PostMapping
   public @ResponseBody ServiceRecordDto create(@PathVariable long instrumentId, @RequestBody ServiceRecordDto dto)
       throws IOException {
-    ServiceRecord record = dtos.to(dto);
+    ServiceRecord record = Dtos.to(dto);
     Instrument instrument = instrumentService.get(instrumentId);
     long savedId = instrumentService.addServiceRecord(record, instrument);
-    return dtos.asDto(serviceRecordService.get(savedId));
+    return Dtos.asDto(serviceRecordService.get(savedId));
   }
 
   @PutMapping("/{recordId}")

@@ -5,8 +5,6 @@ import java.util.List;
 public class ServiceRecordDto {
 
   private Long id;
-  private Long instrumentId;
-  private String instrumentName;
   private String serviceDate;
   private String title;
   private String details;
@@ -25,22 +23,6 @@ public class ServiceRecordDto {
 
   public void setId(Long id) {
     this.id = id;
-  }
-
-  public Long getInstrumentId() {
-    return instrumentId;
-  }
-
-  public void setInstrumentId(Long instrumentId) {
-    this.instrumentId = instrumentId;
-  }
-
-  public String getInstrumentName() {
-    return instrumentName;
-  }
-
-  public void setInstrumentName(String instrumentName) {
-    this.instrumentName = instrumentName;
   }
 
   public String getServiceDate() {
