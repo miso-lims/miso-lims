@@ -957,23 +957,15 @@ Urls = (function () {
   };
 
   // Service Records
-  var serviceRecordUiBase = {
-    instrumentDatable: function (instrumentId) {
-      return baseUrl + "/instrument/" + instrumentId + "/servicerecord";
-    },
-  };
+  var serviceRecordUiBase = baseUrl + "/instrument";
   ui.serviceRecords = {
-    edit: idUrlFunction(serviceRecordUiBase),
+    edit: middleIdUrlFunction(serviceRecordUiBase, "servicerecord/new"),
   };
 
-  var serviceRecordRestBase = {
-    instrumentDatable: function (instrumentId) {
-      return restBase + "/instrument/" + instrumentId + "/servicerecords";
-    },
-  };
+  var serviceRecordRestBase = restBase + "/instruments";
   rest.serviceRecords = {
-    create: serviceRecordRestBase,
-    update: idUrlFunction(serviceRecordRestBase),
+    create: middleIdUrlFunction(serviceRecordRestBase, "servicerecords"),
+    update: middleIdUrlFunction(serviceRecordRestBase, "servicerecords"),
   };
 
   // SOPs
