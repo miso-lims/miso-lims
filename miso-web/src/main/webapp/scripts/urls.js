@@ -328,6 +328,12 @@ Urls = (function () {
   ui.instruments = {
     create: instrumentUiBase + "/new",
     edit: idUrlFunction(instrumentUiBase),
+    editRecord: function (instrumentId, recordId) {
+      return instrumentUiBase + "/" + instrumentId + "/servicerecord/" + recordId;
+    },
+    createRecord: function (instrumentId) {
+      return instrumentUiBase + "/" + instrumentId + "/servicerecord/new";
+    },
   };
 
   var instrumentRestBase = restBase + "/instruments";
@@ -337,6 +343,12 @@ Urls = (function () {
     datatable: instrumentRestBase + "/dt",
     instrumentTypeDatatable: idUrlFunction(instrumentRestBase + "/dt/instrument-type"),
     list: instrumentRestBase,
+    createRecord: function (instrumentId) {
+      return instrumentUiBase + "/" + instrumentId + "/servicerecord/";
+    },
+    updateRecord: function (instrumentId, recordId) {
+      return instrumentUiBase + "/" + instrumentId + "/servicerecord/" + recordId;
+    },
   };
 
   // Instrument Models
@@ -957,15 +969,15 @@ Urls = (function () {
   };
 
   // Service Records
-  var serviceRecordUiBase = baseUrl + "/instrument";
-  ui.serviceRecords = {
-    edit: middleIdUrlFunction(serviceRecordUiBase, "servicerecord/new"),
+  var serviceRecordRestBase = restBase + "/servicerecords";
+  rest.serviceRecords = {
+    bulkDelete: serviceRecordRestBase + "/bulk-delete",
   };
 
-  var serviceRecordRestBase = restBase + "/instruments";
-  rest.serviceRecords = {
-    create: middleIdUrlFunction(serviceRecordRestBase, "servicerecords"),
-    update: middleIdUrlFunction(serviceRecordRestBase, "servicerecords"),
+  // attachment
+  var attachmentUiBase = baseUrl + "/attachments";
+  ui.attachments = {
+    serviceRecord: attachmentUiBase + "/servicerecord",
   };
 
   // SOPs

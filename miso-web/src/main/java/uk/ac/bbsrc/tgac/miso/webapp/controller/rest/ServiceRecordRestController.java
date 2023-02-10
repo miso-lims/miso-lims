@@ -25,7 +25,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ServiceRecordDto;
 
 @Controller
-@RequestMapping("/rest/instruments")
+@RequestMapping("/rest/instruments/{instrumentId}/servicerecords")
 public class ServiceRecordRestController extends RestController {
 
   @Autowired

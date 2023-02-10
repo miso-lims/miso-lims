@@ -12,16 +12,16 @@ FormTarget.servicerecord = (function ($) {
     getUserManualUrl: function () {
       return Urls.external.userManual("instruments", "service-records");
     },
-    getSaveUrl: function (record) {
+    getSaveUrl: function (config, record) {
       return record.id
-        ? Urls.rest.serviceRecords.update(record.id)
-        : Urls.rest.serviceRecords.create;
+        ? Urls.rest.instruments.updateRecord(config.instrumendId, record.id)
+        : Urls.rest.instruments.createRecord(config.instrumentId);
     },
     getSaveMethod: function (record) {
       return record.id ? "PUT" : "POST";
     },
-    getEditUrl: function (record) {
-      return Urls.ui.serviceRecords.edit(record.id);
+    getEditUrl: function (config, record) {
+      return Urls.ui.instruments.editRecord(config.instrumentId, record.id);
     },
     getSections: function (config, object) {
       return [
@@ -40,11 +40,11 @@ FormTarget.servicerecord = (function ($) {
               title: "Instrument",
               data: "instrumentId",
               type: "read-only",
-              getDisplayValue: function (record) {
-                return record.instrumentName;
+              getDisplayValue: function (config) {
+                return config.instrumentName;
               },
-              getLink: function (record) {
-                return Urls.ui.instruments.edit(record.instrumentId);
+              getLink: function (config) {
+                return Urls.ui.instruments.edit(config.instrumentId);
               },
             },
             {
