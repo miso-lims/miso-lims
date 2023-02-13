@@ -140,6 +140,7 @@ public class HibernateInstrumentDaoIT extends AbstractDAOTest {
   @Test
   public void testGetbyServiceRecord() throws Exception {
     ServiceRecord record = serviceRecordDao.get(2);
+    assertNotNull(record);
     Instrument instrument = dao.getByServiceRecord(record);
     assertNotNull(instrument);
     assertEquals(1, instrument.getId());
