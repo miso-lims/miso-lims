@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.google.common.annotations.VisibleForTesting;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
+import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
