@@ -222,8 +222,8 @@ public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginat
   @Override
   public Instrument getByServiceRecord(ServiceRecord record) throws IOException {
     return (Instrument) currentSession().createCriteria(Instrument.class)
-        .createAlias("recordId", "recordId")
-        .add(Restrictions.eq("recordId", record.getId()))
+        .createAlias("serviceRecords", "serviceRecords")
+        .add(Restrictions.eq("serviceRecords.recordId", record.getId()))
         .uniqueResult();
   }
 
