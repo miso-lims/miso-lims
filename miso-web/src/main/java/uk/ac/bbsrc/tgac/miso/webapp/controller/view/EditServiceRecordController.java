@@ -55,43 +55,27 @@ public class EditServiceRecordController {
   private ObjectMapper mapper;
 
   @GetMapping(value = "/{recordId}")
-  public ModelAndView viewServiceRecord(@PathVariable(value = "recordId") Long recordId,
-      @PathVariable(value = "instrumentId") Long instrumentId, ModelMap model)
+  public ModelAndView viewServiceRecord(@PathVariable(value = "recordId") Long recordId, ModelMap model)
       throws IOException {
     ServiceRecord record = serviceRecordService.get(recordId);
-    Instrument instrument = instrumentService.get(instrumentId);
     if (record == null) {
       throw new NotFoundException("No service found for ID " + recordId.toString());
     }
-    return showPage(record, instrument, model);
+    return showPage(record, model);
   }
 
   @GetMapping(value = "/new")
-  public ModelAndView newServiceRecord(@PathVariable(value = "recordId") Long recordId,
-      @PathVariable(value = "instrumentId") Long instrumentId, ModelMap model)
+  public ModelAndView newServiceRecord(@PathVariable(value = "instrumentId") Long instrumentId, ModelMap model)
       throws IOException {
     Instrument instrument = instrumentService.get(instrumentId);
     if (instrument == null) {
       throw new NotFoundException("No instrument found for ID " + instrumentId.toString());
     }
     ServiceRecord record = new ServiceRecord();
-    return showPage(record, instrument, model);
+    return showPage(record, model);
   }
 
-  @GetMapping(value = "/edit/{recordId}")
-  public ModelAndView editServiceRecord(@PathVariable(value = "recordId") Long recordId,
-      @PathVariable(value = "instrumentId") Long instrumentId, ModelMap model) throws IOException {
-    Instrument instrument = instrumentService.get(instrumentId);
-    if (instrument == null) {
-      throw new NotFoundException("No instrument found for ID " + instrumentId.toString());
-    }
-    ServiceRecord record = serviceRecordService.get(recordId);
-    return showPage(record, instrument, model);
-  }
-
-
-  public ModelAndView showPage(ServiceRecord record, Instrument instrument, ModelMap model)
-      throws JsonProcessingException {
+  public ModelAndView showPage(ServiceRecord record, ModelMap model) throws JsonProcessingException, IOException {
     if (!record.isSaved()) {
       model.put("title", "New Service Record");
     } else {
@@ -100,6 +84,7 @@ public class EditServiceRecordController {
     model.put("serviceRecord", record);
     model.put("serviceRecordDto", mapper.writeValueAsString(Dtos.asDto(record)));
     ArrayNode positions = mapper.createArrayNode();
+    Instrument instrument = instrumentService.getInstrument(record);
     for (InstrumentPosition pos : instrument.getInstrumentModel().getPositions()) {
       ObjectNode dto = positions.addObject();
       dto.put("id", pos.getId());

@@ -68,7 +68,7 @@ ListTarget.servicerecord = {
           if (type === "display") {
             return data
               ? '<a href="' +
-                  Urls.ui.instruments.editRecord(full.instrumentId, full.id) +
+                  Urls.ui.instruments.editRecord(config.instrumentId, full.id) +
                   '">' +
                   data +
                   "</a>"
