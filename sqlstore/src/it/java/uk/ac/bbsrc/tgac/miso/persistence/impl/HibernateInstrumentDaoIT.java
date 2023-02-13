@@ -15,6 +15,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
@@ -32,6 +34,9 @@ public class HibernateInstrumentDaoIT extends AbstractDAOTest {
 
   @Autowired
   private SessionFactory sessionFactory;
+
+  @Autowired
+  private HibernateServiceRecordDao recordDao;
 
   @InjectMocks
   private HibernateInstrumentDao dao;
@@ -128,6 +133,14 @@ public class HibernateInstrumentDaoIT extends AbstractDAOTest {
     Instrument instrument = dao.getByName(name);
     assertNotNull(instrument);
     assertEquals(name, instrument.getName());
+  }
+
+  @Test
+  public void testGetbyServiceRecord() throws Exception {
+    ServiceRecord record = recordDao.get(2);
+    Instrument instrument = dao.getByServiceRecord(record);
+    assertNotNull(instrument);
+    assertEquals(1, instrument.getId());
   }
 
   @Test
