@@ -35,7 +35,7 @@ public class HibernateInstrumentDaoIT extends AbstractDAOTest {
   private HibernateInstrumentModelDao platformDAO;
 
   @Mock
-  private HibernateServiceRecordStore recordDao;
+  private ServiceRecordStore serviceRecordDao;
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -139,7 +139,7 @@ public class HibernateInstrumentDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetbyServiceRecord() throws Exception {
-    ServiceRecord record = recordDao.get(2);
+    ServiceRecord record = serviceRecordDao.get(2);
     Instrument instrument = dao.getByServiceRecord(record);
     assertNotNull(instrument);
     assertEquals(1, instrument.getId());
