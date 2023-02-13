@@ -24,6 +24,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.persistence.ServiceRecordStore;
 
 public class HibernateInstrumentDaoIT extends AbstractDAOTest {
 
@@ -33,11 +34,11 @@ public class HibernateInstrumentDaoIT extends AbstractDAOTest {
   @Mock
   private HibernateInstrumentModelDao platformDAO;
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  @Mock
+  private HibernateServiceRecordStore recordDao;
 
   @Autowired
-  private HibernateServiceRecordDao recordDao;
+  private SessionFactory sessionFactory;
 
   @InjectMocks
   private HibernateInstrumentDao dao;
