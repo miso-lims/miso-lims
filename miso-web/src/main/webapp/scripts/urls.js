@@ -349,6 +349,9 @@ Urls = (function () {
     updateRecord: function (instrumentId, recordId) {
       return instrumentUiBase + "/" + instrumentId + "/servicerecord/" + recordId;
     },
+    recordBulkdDelete: function (instrumentId) {
+      return instrumentUiBase;
+    },
   };
 
   // Instrument Models
@@ -969,10 +972,6 @@ Urls = (function () {
   };
 
   // Service Records
-  var serviceRecordRestBase = restBase + "/servicerecords";
-  rest.serviceRecords = {
-    bulkDelete: serviceRecordRestBase + "/bulk-delete",
-  };
 
   // attachment
   var attachmentUiBase = baseUrl + "/attachments";

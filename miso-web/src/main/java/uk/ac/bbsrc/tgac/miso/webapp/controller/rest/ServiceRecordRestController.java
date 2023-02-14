@@ -35,7 +35,8 @@ public class ServiceRecordRestController extends RestController {
 
   @PostMapping(value = "/bulk-delete")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public @ResponseBody void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
+  public @ResponseBody void bulkDelete(@PathVariable long instrumentId, @RequestBody(required = true) List<Long> ids)
+      throws IOException {
     List<ServiceRecord> records = new ArrayList<>();
     for (Long id : ids) {
       if (id == null) {
@@ -45,12 +46,15 @@ public class ServiceRecordRestController extends RestController {
       if (record == null) {
         throw new RestException("Service record " + id + " not found", Status.BAD_REQUEST);
       }
+      Instrument instrument = instrumentService.get(instrumentId);
+      instrumentService.removeServiceRecord(record, instrument);
+
       records.add(record);
     }
     serviceRecordService.bulkDelete(records);
   }
 
-  @PostMapping
+  @PostMapping(value = "/new")
   public @ResponseBody ServiceRecordDto create(@PathVariable long instrumentId, @RequestBody ServiceRecordDto dto)
       throws IOException {
     ServiceRecord record = Dtos.to(dto);
@@ -59,7 +63,7 @@ public class ServiceRecordRestController extends RestController {
     return Dtos.asDto(serviceRecordService.get(savedId));
   }
 
-  @PutMapping("/{recordId}")
+  @PutMapping(value = "/{recordId}")
   public @ResponseBody ServiceRecordDto update(@PathVariable long recordId, @RequestBody ServiceRecordDto dto)
       throws IOException {
     return RestUtils.updateObject("Service record", recordId, dto, Dtos::to, serviceRecordService, Dtos::asDto);

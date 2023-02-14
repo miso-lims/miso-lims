@@ -63,7 +63,7 @@ public class DefaultServiceRecordService implements ServiceRecordService {
     if (source.getPosition() == null) {
       target.setPosition(null);
     } else {
-      Instrument instrument = instrumentService.getInstrument(target);
+      Instrument instrument = instrumentService.getByServiceRecord(target);
       target
           .setPosition(instrument.findPosition(source.getPosition().getId()));
     }
@@ -77,9 +77,9 @@ public class DefaultServiceRecordService implements ServiceRecordService {
 
   private void validateChange(ServiceRecord record, ServiceRecord beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
-    Instrument instrument = instrumentService.getInstrument(record);
+    Instrument instrument = instrumentService.getByServiceRecord(record);
 
-    if (instrumentService.getInstrument(beforeChange).getDateDecommissioned() != null)
+    if (instrumentService.getByServiceRecord(beforeChange).getDateDecommissioned() != null)
       throw new IOException("Cannot add service records to a retired instrument!");
 
     if (record.getPosition() != null

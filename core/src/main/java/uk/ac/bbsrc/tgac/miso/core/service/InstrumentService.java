@@ -29,5 +29,5 @@ public interface InstrumentService
 
   long removeServiceRecord(ServiceRecord record, Instrument instrument) throws IOException, ValidationException;
 
-  Instrument getInstrument(ServiceRecord record) throws IOException;
+  Instrument getByServiceRecord(ServiceRecord record) throws IOException;
 }
