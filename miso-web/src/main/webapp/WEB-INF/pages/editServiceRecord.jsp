@@ -56,7 +56,8 @@
     <form:form id="serviceRecordForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
     <script type="text/javascript">
       jQuery(document).ready(function () {
-        FormUtils.createForm('serviceRecordForm', 'save', ${serviceRecordDto}, 'servicerecord', {instrumentPositions: ${instrumentPositions}});
+        FormUtils.createForm('serviceRecordForm', 'save', ${serviceRecordDto}, 'servicerecord', 
+        {instrumentId: ${instrument.id}, instrumentPositions: ${instrumentPositions}});
         Utils.ui.updateHelpLink(FormTarget.servicerecord.getUserManualUrl());
       });
     </script>

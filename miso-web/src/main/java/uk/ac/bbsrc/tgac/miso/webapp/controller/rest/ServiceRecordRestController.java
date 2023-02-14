@@ -52,7 +52,7 @@ public class ServiceRecordRestController extends RestController {
     serviceRecordService.bulkDelete(records);
   }
 
-  @PostMapping(value = "/new")
+  @PostMapping
   public @ResponseBody ServiceRecordDto create(@PathVariable long instrumentId, @RequestBody ServiceRecordDto dto)
       throws IOException {
     ServiceRecord record = Dtos.to(dto);

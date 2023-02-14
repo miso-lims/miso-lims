@@ -12,15 +12,15 @@ FormTarget.servicerecord = (function ($) {
     getUserManualUrl: function () {
       return Urls.external.userManual("instruments", "service-records");
     },
-    getSaveUrl: function (config, record) {
+    getSaveUrl: function (record, config) {
       return record.id
-        ? Urls.rest.instruments.updateRecord(config.instrumendId, record.id)
+        ? Urls.rest.instruments.updateRecord(config.instrumentId, record.id)
         : Urls.rest.instruments.createRecord(config.instrumentId);
     },
     getSaveMethod: function (record) {
       return record.id ? "PUT" : "POST";
     },
-    getEditUrl: function (config, record) {
+    getEditUrl: function (record, config) {
       return Urls.ui.instruments.editRecord(config.instrumentId, record.id);
     },
     getSections: function (config, object) {
