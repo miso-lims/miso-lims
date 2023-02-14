@@ -46,8 +46,6 @@ public class ServiceRecordRestController extends RestController {
       if (record == null) {
         throw new RestException("Service record " + id + " not found", Status.BAD_REQUEST);
       }
-      Instrument instrument = instrumentService.get(instrumentId);
-      instrumentService.removeServiceRecord(record, instrument);
 
       records.add(record);
     }

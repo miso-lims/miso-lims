@@ -42,7 +42,7 @@
           <a href='<c:url value="/miso/instruments"/>'>Instruments</a>
         </li>
         <li>
-          <a href='<c:url value="/miso/instrument/${serviceRecord.instrument.id}"/>'>${serviceRecord.instrument.name}</a>
+          <a href='<c:url value="/miso/instrument/${instrument.id}"/>'>${instrument.name}</a>
         </li>
       </ul>
     </div>

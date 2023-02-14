@@ -96,30 +96,6 @@ public class DefaultInstrumentService implements InstrumentService {
   }
 
   @Override
-  public long removeServiceRecord(ServiceRecord record, Instrument instrument) throws IOException, ValidationException {
-    Instrument managedInstrument = get(instrument.getId());
-    ServiceRecord managedServiceRecord = getManaged(record, managedInstrument);
-    if (managedServiceRecord == null) {
-      throw new ValidationException(
-          String.format("Service record is not associated with instrument %s; does the service record exist?",
-              managedInstrument.getName()));
-    }
-    managedInstrument.getServiceRecords().remove(managedServiceRecord);
-    long removedId = save(managedInstrument);
-
-    serviceRecordService.delete(managedServiceRecord);
-    return removedId;
-  }
-
-  private ServiceRecord getManaged(ServiceRecord record, Instrument managedInstrument) {
-    return managedInstrument.getServiceRecords()
-        .stream()
-        .filter(sr -> sr.getId() == record.getId())
-        .findFirst()
-        .orElse(null);
-  }
-
-  @Override
   public Instrument getByServiceRecord(ServiceRecord record) throws IOException {
     return instrumentDao.getByServiceRecord(record);
   }

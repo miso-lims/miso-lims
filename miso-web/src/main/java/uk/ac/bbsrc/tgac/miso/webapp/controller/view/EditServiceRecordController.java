@@ -63,6 +63,7 @@ public class EditServiceRecordController {
     if (record == null) {
       throw new NotFoundException("No service found for ID " + recordId.toString());
     }
+    model.put("instrument", instrument);
     return showPage(record, instrument, model);
   }
 
@@ -74,6 +75,7 @@ public class EditServiceRecordController {
       throw new NotFoundException("No instrument found for ID " + instrumentId.toString());
     }
     ServiceRecord record = new ServiceRecord();
+    model.put("instrument", instrument);
     return showPage(record, instrument, model);
   }
 

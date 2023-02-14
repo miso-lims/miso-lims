@@ -344,13 +344,13 @@ Urls = (function () {
     instrumentTypeDatatable: idUrlFunction(instrumentRestBase + "/dt/instrument-type"),
     list: instrumentRestBase,
     createRecord: function (instrumentId) {
-      return instrumentUiBase + "/" + instrumentId + "/servicerecord/";
+      return instrumentRestBase + "/" + instrumentId + "/servicerecords";
     },
     updateRecord: function (instrumentId, recordId) {
-      return instrumentUiBase + "/" + instrumentId + "/servicerecord/" + recordId;
+      return instrumentRestBase + "/" + instrumentId + "/servicerecords/" + recordId;
     },
-    recordBulkdDelete: function (instrumentId) {
-      return instrumentUiBase;
+    recordBulkDelete: function (instrumentId) {
+      return instrumentRestBase + "/" + instrumentId + "/servicerecords/bulk-delete";
     },
   };
 
