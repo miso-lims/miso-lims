@@ -53,7 +53,8 @@ public class ServiceRecordRestController extends RestController {
   }
 
   @PostMapping
-  public @ResponseBody ServiceRecordDto create(@PathVariable long instrumentId, @RequestBody ServiceRecordDto dto)
+  public @ResponseBody ServiceRecordDto create(@PathVariable long instrumentId,
+      @RequestBody ServiceRecordDto dto)
       throws IOException {
     ServiceRecord record = Dtos.to(dto);
     Instrument instrument = instrumentService.get(instrumentId);

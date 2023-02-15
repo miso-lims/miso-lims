@@ -343,8 +343,8 @@ Urls = (function () {
     datatable: instrumentRestBase + "/dt",
     instrumentTypeDatatable: idUrlFunction(instrumentRestBase + "/dt/instrument-type"),
     list: instrumentRestBase,
-    createRecord: function (instrumentId) {
-      return instrumentRestBase + "/" + instrumentId + "/servicerecords";
+    createRecord: function (instrumentId, recordId) {
+      return instrumentRestBase + "/" + instrumentId + "/servicerecords/";
     },
     updateRecord: function (instrumentId, recordId) {
       return instrumentRestBase + "/" + instrumentId + "/servicerecords/" + recordId;

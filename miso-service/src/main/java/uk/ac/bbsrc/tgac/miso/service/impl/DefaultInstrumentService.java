@@ -78,7 +78,7 @@ public class DefaultInstrumentService implements InstrumentService {
 
   @Override
   public long addServiceRecord(ServiceRecord record, Instrument instrument) throws IOException, ValidationException {
-    if (instrument.getDateCommissioned() != null) {
+    if (instrument.getDateDecommissioned() != null) {
       throw new IOException("Cannot add service records to a retired instrument!");
     }
     Instrument getbyRecord = getByServiceRecord(record);
@@ -91,8 +91,9 @@ public class DefaultInstrumentService implements InstrumentService {
     Instrument managedInstrument = get(instrument.getId());
 
     managedInstrument.getServiceRecords().add(managedRecord);
+    save(managedInstrument);
 
-    return save(managedInstrument);
+    return managedRecord.getId();
   }
 
   @Override
