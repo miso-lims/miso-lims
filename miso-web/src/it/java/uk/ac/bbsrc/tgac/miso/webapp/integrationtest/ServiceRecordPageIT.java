@@ -67,13 +67,12 @@ public class ServiceRecordPageIT extends AbstractIT {
 
   @Test
   public void testChangeValues() throws IOException {
-    ServiceRecordPage page1 = ServiceRecordPage.get(getDriver(), getBaseUrl(), null, 150L);
+    ServiceRecordPage page1 = ServiceRecordPage.get(getDriver(), getBaseUrl(), null, 150L, 101L);
     assertNotNull(page1);
 
     // initial values
     Map<ServiceRecordPage.Field, String> fields = Maps.newLinkedHashMap();
     fields.put(Field.ID, "150");
-    fields.put(Field.INSTRUMENT, "NewHiSeq_101");
     fields.put(Field.TITLE, "Test 150");
     fields.put(Field.DETAILS, "details go here");
     fields.put(Field.SERVICED_BY, "technician1");
@@ -99,17 +98,20 @@ public class ServiceRecordPageIT extends AbstractIT {
     ServiceRecordPage page2 = page1.save();
     assertFieldValues("post-save", fields, page2);
     ServiceRecord savedRecord = (ServiceRecord) getSession().get(ServiceRecord.class, 150L);
+
+    Instrument instrument = (Instrument) getSession().get(InstrumentImpl.class, 101L);
+    assertTrue(instrument.getServiceRecords().stream().anyMatch(x -> x.getId() == savedRecord.getId()));
+    assertEquals("NewHiSeq_101", instrument.getName());
     assertServiceRecordAttributes(fields, savedRecord);
   }
 
   @Test
   public void testAddValues() throws Exception {
-    ServiceRecordPage page1 = ServiceRecordPage.get(getDriver(), getBaseUrl(), null, 151L);
+    ServiceRecordPage page1 = ServiceRecordPage.get(getDriver(), getBaseUrl(), null, 151L, 101L);
 
     // initial values;
     Map<ServiceRecordPage.Field, String> fields = Maps.newLinkedHashMap();
     fields.put(Field.ID, "151");
-    fields.put(Field.INSTRUMENT, "NewHiSeq_101");
     fields.put(Field.TITLE, "Test 151");
     fields.put(Field.DETAILS, null);
     fields.put(Field.SERVICED_BY, null);
@@ -135,17 +137,20 @@ public class ServiceRecordPageIT extends AbstractIT {
     ServiceRecordPage page2 = page1.save();
     assertFieldValues("post-save", fields, page2);
     ServiceRecord savedRecord = (ServiceRecord) getSession().get(ServiceRecord.class, 151L);
+
+    Instrument instrument = (Instrument) getSession().get(InstrumentImpl.class, 101L);
+    assertTrue(instrument.getServiceRecords().stream().anyMatch(x -> x.getId() == savedRecord.getId()));
+    assertEquals("NewHiSeq_101", instrument.getName());
     assertServiceRecordAttributes(fields, savedRecord);
   }
 
   @Test
   public void testRemoveValues() throws Exception {
-    ServiceRecordPage page1 = ServiceRecordPage.get(getDriver(), getBaseUrl(), null, 152L);
+    ServiceRecordPage page1 = ServiceRecordPage.get(getDriver(), getBaseUrl(), null, 152L, 101L);
 
     // initial values;
     Map<ServiceRecordPage.Field, String> fields = Maps.newLinkedHashMap();
     fields.put(Field.ID, "152");
-    fields.put(Field.INSTRUMENT, "NewHiSeq_101");
     fields.put(Field.TITLE, "Test 152");
     fields.put(Field.DETAILS, "details to remove");
     fields.put(Field.SERVICED_BY, "technitchin");
@@ -171,13 +176,15 @@ public class ServiceRecordPageIT extends AbstractIT {
     ServiceRecordPage page2 = page1.save();
     assertFieldValues("post-save", fields, page2);
     ServiceRecord savedRecord = (ServiceRecord) getSession().get(ServiceRecord.class, 152L);
+    Instrument instrument = (Instrument) getSession().get(InstrumentImpl.class, 101L);
+    assertTrue(instrument.getServiceRecords().stream().anyMatch(x -> x.getId() == savedRecord.getId()));
+    assertEquals("NewHiSeq_101", instrument.getName());
     assertServiceRecordAttributes(fields, savedRecord);
   }
 
   private static void assertServiceRecordAttributes(Map<Field, String> expectedValues, ServiceRecord sr)
       throws IOException {
     assertAttribute(Field.ID, expectedValues, Long.toString(sr.getId()));
-    assertAttribute(Field.INSTRUMENT, expectedValues, instrumentService.getByServiceRecord(sr).getName());
     assertAttribute(Field.TITLE, expectedValues, sr.getTitle());
     assertAttribute(Field.DETAILS, expectedValues, sr.getDetails());
     assertAttribute(Field.SERVICE_DATE, expectedValues, formatDate(sr.getServiceDate()));

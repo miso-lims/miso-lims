@@ -12,7 +12,6 @@ public class ServiceRecordPage extends FormPage<ServiceRecordPage.Field> {
 
   public static enum Field implements FormPage.FieldElement {
     ID(By.id("serviceRecordForm_id")), //
-    INSTRUMENT(By.id("serviceRecordForm_instrumentIdLabel")), //
     TITLE(By.id("serviceRecordForm_title")), //
     DETAILS(By.id("serviceRecordForm_details")), //
     SERVICED_BY(By.id("serviceRecordForm_servicedBy")), //
@@ -43,13 +42,14 @@ public class ServiceRecordPage extends FormPage<ServiceRecordPage.Field> {
     waitWithTimeout().until(titleContains("Service Record "));
   }
 
-  public static ServiceRecordPage get(WebDriver driver, String baseUrl, Long sequencerId, Long serviceRecordId) {
+  public static ServiceRecordPage get(WebDriver driver, String baseUrl, Long sequencerId, Long serviceRecordId,
+      Long instrumentId) {
     if (sequencerId == null && serviceRecordId == null) {
       throw new IllegalArgumentException("Must specify either instrument ID or service record ID");
     } else if (serviceRecordId == null) {
-      driver.get(baseUrl + "miso/instrument/servicerecord/new/" + sequencerId);
+      driver.get(baseUrl + "miso/instrument/" + instrumentId + "/servicerecord/new/" + sequencerId);
     } else {
-      driver.get(baseUrl + "miso/instrument/servicerecord/" + serviceRecordId);
+      driver.get(baseUrl + "miso/instrument/" + instrumentId + "/servicerecord/" + serviceRecordId);
     }
     return new ServiceRecordPage(driver);
   }
