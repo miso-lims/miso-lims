@@ -23,9 +23,6 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ServiceRecordPage.Field
 
 public class ServiceRecordPageIT extends AbstractIT {
 
-  @Autowired
-  static InstrumentService instrumentService;
-
   @Before
   public void setup() {
     login();

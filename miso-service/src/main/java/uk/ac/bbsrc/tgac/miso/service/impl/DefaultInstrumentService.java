@@ -78,17 +78,17 @@ public class DefaultInstrumentService implements InstrumentService {
 
   @Override
   public long addServiceRecord(ServiceRecord record, Instrument instrument) throws IOException, ValidationException {
-    if (instrument.getDateDecommissioned() != null) {
+    Instrument managedInstrument = get(instrument.getId());
+
+    if (managedInstrument.getDateDecommissioned() != null) {
       throw new IOException("Cannot add service records to a retired instrument!");
     }
-    Instrument getbyRecord = getByServiceRecord(record);
     if (record.getPosition() != null
-        && getbyRecord.findPosition(record.getPosition().getId()) == null) {
+        && managedInstrument.findPosition(record.getPosition().getId()) == null) {
       throw new ValidationException("Position must belong to the same instrument as this record");
     }
     long recordId = serviceRecordService.create(record);
     ServiceRecord managedRecord = serviceRecordService.get(recordId);
-    Instrument managedInstrument = get(instrument.getId());
 
     managedInstrument.getServiceRecords().add(managedRecord);
     save(managedInstrument);
