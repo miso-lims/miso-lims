@@ -25,7 +25,7 @@ ListTarget.servicerecord = {
                 Utils.ajaxWithDialog(
                   "Deleting Service Records",
                   "POST",
-                  Urls.rest.instruments.recordBulkDelete(config.instrumentId),
+                  Urls.rest.serviceRecords.recordBulkDelete,
                   ids,
                   function () {
                     Utils.page.pageReload();
@@ -63,7 +63,7 @@ ListTarget.servicerecord = {
         include: true,
         iSortPriority: 0,
         bSortDirection: true,
-        bSortable: 0 >= 0,
+        bSortable: true,
         mRender: function (data, type, full) {
           if (type === "display") {
             return data
@@ -106,11 +106,7 @@ ListTarget.servicerecord = {
             full.attachments.forEach(function (file) {
               list +=
                 '<li><a href="' +
-                Urls.ui.attachments.serviceRecord +
-                "/" +
-                full.id +
-                "/" +
-                file.id +
+                Urls.ui.attachments.serviceRecord(full.id, file.id) +
                 '">' +
                 file.filename +
                 "</a></li>";

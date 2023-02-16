@@ -14,7 +14,7 @@ FormTarget.servicerecord = (function ($) {
     },
     getSaveUrl: function (record, config) {
       return record.id
-        ? Urls.rest.instruments.updateRecord(config.instrumentId, record.id)
+        ? Urls.rest.serviceRecords.update(record.id)
         : Urls.rest.instruments.createRecord(config.instrumentId);
     },
     getSaveMethod: function (record) {

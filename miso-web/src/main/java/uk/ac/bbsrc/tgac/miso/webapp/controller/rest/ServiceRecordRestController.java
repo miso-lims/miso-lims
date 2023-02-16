@@ -1,3 +1,4 @@
+
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
@@ -17,26 +18,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
-import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.ServiceRecordService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ServiceRecordDto;
 
 @Controller
-@RequestMapping("/rest/instruments/{instrumentId}/servicerecords")
+@RequestMapping("/rest/servicerecords")
 public class ServiceRecordRestController extends RestController {
 
   @Autowired
   private ServiceRecordService serviceRecordService;
-  @Autowired
-  private InstrumentService instrumentService;
 
   @PostMapping(value = "/bulk-delete")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public @ResponseBody void bulkDelete(@PathVariable long instrumentId, @RequestBody(required = true) List<Long> ids)
-      throws IOException {
+  public @ResponseBody void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
     List<ServiceRecord> records = new ArrayList<>();
     for (Long id : ids) {
       if (id == null) {
@@ -46,20 +42,9 @@ public class ServiceRecordRestController extends RestController {
       if (record == null) {
         throw new RestException("Service record " + id + " not found", Status.BAD_REQUEST);
       }
-
       records.add(record);
     }
     serviceRecordService.bulkDelete(records);
-  }
-
-  @PostMapping
-  public @ResponseBody ServiceRecordDto create(@PathVariable long instrumentId,
-      @RequestBody ServiceRecordDto dto)
-      throws IOException {
-    ServiceRecord record = Dtos.to(dto);
-    Instrument instrument = instrumentService.get(instrumentId);
-    long savedId = instrumentService.addServiceRecord(record, instrument);
-    return Dtos.asDto(serviceRecordService.get(savedId));
   }
 
   @PutMapping(value = "/{recordId}")

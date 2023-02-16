@@ -20,13 +20,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
+import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
+import uk.ac.bbsrc.tgac.miso.core.service.ServiceRecordService;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentDto;
+import uk.ac.bbsrc.tgac.miso.dto.ServiceRecordDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
@@ -37,6 +40,9 @@ public class InstrumentRestController extends RestController {
 
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
+
+  @Autowired
+  private ServiceRecordService serviceRecordService;
 
   private final JQueryDataTableBackend<Instrument, InstrumentDto> jQueryBackend =
       new JQueryDataTableBackend<Instrument, InstrumentDto>() {
@@ -115,6 +121,16 @@ public class InstrumentRestController extends RestController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
     RestUtils.bulkDelete("Instrument", ids, instrumentService);
+  }
+
+  @PostMapping(value = "/{instrumentId}/servicerecords")
+  public @ResponseBody ServiceRecordDto createRecord(@PathVariable long instrumentId,
+      @RequestBody ServiceRecordDto dto)
+      throws IOException {
+    ServiceRecord record = Dtos.to(dto);
+    Instrument instrument = instrumentService.get(instrumentId);
+    long savedId = instrumentService.addServiceRecord(record, instrument);
+    return Dtos.asDto(serviceRecordService.get(savedId));
   }
 
 }

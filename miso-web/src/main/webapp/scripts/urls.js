@@ -343,14 +343,8 @@ Urls = (function () {
     datatable: instrumentRestBase + "/dt",
     instrumentTypeDatatable: idUrlFunction(instrumentRestBase + "/dt/instrument-type"),
     list: instrumentRestBase,
-    createRecord: function (instrumentId, recordId) {
+    createRecord: function (instrumentId) {
       return instrumentRestBase + "/" + instrumentId + "/servicerecords/";
-    },
-    updateRecord: function (instrumentId, recordId) {
-      return instrumentRestBase + "/" + instrumentId + "/servicerecords/" + recordId;
-    },
-    recordBulkDelete: function (instrumentId) {
-      return instrumentRestBase + "/" + instrumentId + "/servicerecords/bulk-delete";
     },
   };
 
@@ -972,11 +966,18 @@ Urls = (function () {
   };
 
   // Service Records
+  var serviceRecordRestBase = restBase + "/servicerecords";
+  rest.serviceRecords = {
+    update: idUrlFunction(serviceRecordRestBase),
+    recordBulkDelete: serviceRecordRestBase + "/bulk-delete",
+  };
 
   // attachment
   var attachmentUiBase = baseUrl + "/attachments";
   ui.attachments = {
-    serviceRecord: attachmentUiBase + "/servicerecord",
+    serviceRecord: function (recordId, fileId) {
+      return attachmentUiBase + "/servicerecord/" + recordId + "/" + fileId;
+    },
   };
 
   // SOPs
