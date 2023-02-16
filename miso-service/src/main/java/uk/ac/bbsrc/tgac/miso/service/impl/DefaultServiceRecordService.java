@@ -79,13 +79,18 @@ public class DefaultServiceRecordService implements ServiceRecordService {
     List<ValidationError> errors = new ArrayList<>();
     Instrument instrument = instrumentService.getByServiceRecord(record);
 
-    if (instrumentService.getByServiceRecord(beforeChange).getDateDecommissioned() != null)
+    if (instrument != null && instrumentService.getByServiceRecord(beforeChange).getDateDecommissioned() != null) {
       throw new IOException("Cannot add service records to a retired instrument!");
-
-    if (record.getPosition() != null
-        && instrument.findPosition(record.getPosition().getId()) == null) {
-      errors.add(new ValidationError("position", "Position must belong to the same instrument as this record"));
     }
+
+    if (record.getPosition() != null) {
+      if (instrument == null) {
+        throw new NullPointerException("Position cannot be set if the record is not for an instrument");
+      } else if (instrument.findPosition(record.getPosition().getId()) == null) {
+        errors.add(new ValidationError("position", "Position must belong to the same instrument as this record"));
+      }
+    }
+
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }
