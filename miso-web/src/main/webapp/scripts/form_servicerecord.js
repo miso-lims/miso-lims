@@ -37,17 +37,6 @@ FormTarget.servicerecord = (function ($) {
               },
             },
             {
-              title: "Instrument",
-              data: "instrumentId",
-              type: "read-only",
-              getDisplayValue: function (config) {
-                return config.instrumentName;
-              },
-              getLink: function (config) {
-                return Urls.ui.instruments.edit(config.instrumentId);
-              },
-            },
-            {
               title: "Title",
               data: "title",
               type: "text",
