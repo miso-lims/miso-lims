@@ -111,8 +111,7 @@ public class DefaultInstrumentService implements InstrumentService {
     return save(managed);
   }
 
-  @Override
-  public long save(Instrument instrument) throws IOException {
+  private long save(Instrument instrument) throws IOException {
     return instrumentDao.save(instrument);
   }
 

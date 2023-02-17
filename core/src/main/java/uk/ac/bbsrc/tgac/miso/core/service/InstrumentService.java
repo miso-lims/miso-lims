@@ -29,6 +29,4 @@ public interface InstrumentService
 
   Instrument getByServiceRecord(ServiceRecord record) throws IOException;
 
-  long save(Instrument instrument) throws IOException;
-
 }

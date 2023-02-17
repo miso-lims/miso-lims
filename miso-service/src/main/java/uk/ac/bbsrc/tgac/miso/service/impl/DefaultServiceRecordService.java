@@ -117,7 +117,7 @@ public class DefaultServiceRecordService implements ServiceRecordService {
     Instrument managedInstrument = instrumentService.get(instrument.getId());
     if (managedInstrument != null) {
       managedInstrument.getServiceRecords().remove(managedRecord);
-      instrumentService.save(managedInstrument);
+      instrumentService.update(instrument);
     }
     fileAttachmentService.beforeDelete(object);
   }
