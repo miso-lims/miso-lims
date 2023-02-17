@@ -111,9 +111,11 @@ public class DefaultInstrumentService implements InstrumentService {
     return save(managed);
   }
 
-  private long save(Instrument instrument) throws IOException {
+  @Override
+  public long save(Instrument instrument) throws IOException {
     return instrumentDao.save(instrument);
   }
+
 
   private void validateChange(Instrument instrument, Instrument beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();

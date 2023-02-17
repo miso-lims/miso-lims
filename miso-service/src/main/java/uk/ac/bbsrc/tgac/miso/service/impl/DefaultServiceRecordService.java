@@ -112,6 +112,13 @@ public class DefaultServiceRecordService implements ServiceRecordService {
 
   @Override
   public void beforeDelete(ServiceRecord object) throws IOException {
+    ServiceRecord managedRecord = get(object.getId());
+    Instrument instrument = instrumentService.getByServiceRecord(object);
+    Instrument managedInstrument = instrumentService.get(instrument.getId());
+    if (managedInstrument != null) {
+      managedInstrument.getServiceRecords().remove(managedRecord);
+      instrumentService.save(managedInstrument);
+    }
     fileAttachmentService.beforeDelete(object);
   }
 

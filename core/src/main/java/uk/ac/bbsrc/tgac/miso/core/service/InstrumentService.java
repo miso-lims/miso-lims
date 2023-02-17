@@ -28,4 +28,7 @@ public interface InstrumentService
   long addServiceRecord(ServiceRecord record, Instrument instrument) throws IOException, ValidationException;
 
   Instrument getByServiceRecord(ServiceRecord record) throws IOException;
+
+  long save(Instrument instrument) throws IOException;
+
 }
