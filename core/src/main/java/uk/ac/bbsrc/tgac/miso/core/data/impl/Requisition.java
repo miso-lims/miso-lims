@@ -26,10 +26,8 @@ import javax.persistence.Transient;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.data.Attachable;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.ChangeLoggable;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RequisitionChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcCorrespondingField;
@@ -39,7 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.RequisitionQC;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
-public class Requisition implements Aliasable, Attachable, ChangeLoggable, Deletable, QualityControllable<RequisitionQC>, Serializable {
+public class Requisition implements Attachable, Deletable, QualityControllable<RequisitionQC>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -62,8 +60,9 @@ public class Requisition implements Aliasable, Attachable, ChangeLoggable, Delet
 
   @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
   @JoinTable(name = "Requisition_Note", joinColumns = {
-      @JoinColumn(name = "requisitionId") }, inverseJoinColumns = {
-          @JoinColumn(name = "noteId") })
+      @JoinColumn(name = "requisitionId")},
+      inverseJoinColumns = {
+          @JoinColumn(name = "noteId")})
   private Collection<Note> notes = new HashSet<>();
 
   @ManyToOne(targetEntity = UserImpl.class)
@@ -84,8 +83,9 @@ public class Requisition implements Aliasable, Attachable, ChangeLoggable, Delet
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @OneToMany(targetEntity = FileAttachment.class)
-  @JoinTable(name = "Requisition_Attachment", joinColumns = { @JoinColumn(name = "requisitionId") }, inverseJoinColumns = {
-      @JoinColumn(name = "attachmentId") })
+  @JoinTable(name = "Requisition_Attachment", joinColumns = {@JoinColumn(name = "requisitionId")},
+      inverseJoinColumns = {
+          @JoinColumn(name = "attachmentId")})
   private List<FileAttachment> attachments;
 
   @Transient

@@ -781,6 +781,11 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   }
 
   @Override
+  public List<Long> listIdsByAncestorSampleIds(Collection<Long> sampleIds) throws IOException {
+    return libraryDao.listIdsByAncestorSampleIdList(sampleIds);
+  }
+
+  @Override
   public Long getLockProjectId(Library item) throws IOException {
     if (item.getSample() == null) {
       return null;

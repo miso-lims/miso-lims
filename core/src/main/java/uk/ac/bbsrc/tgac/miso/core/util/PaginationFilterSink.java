@@ -105,6 +105,9 @@ public interface PaginationFilterSink<T> {
 
   public void restrictPaginationByRequisition(T item, String query, Consumer<String> errorHandler);
 
+  public void restrictPaginationBySupplementalToRequisitionId(T item, long requisitionId,
+      Consumer<String> errorHandler);
+
   public void restrictPaginationByRecipientGroups(T item, Collection<Group> groups, Consumer<String> errorHandler);
 
   public void restrictPaginationByTransferType(T item, TransferType transferType, Consumer<String> errorHandler);

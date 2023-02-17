@@ -14,7 +14,11 @@ ListTarget.sample = (function () {
       } else if (config.worksetId) {
         return Urls.rest.samples.worksetDatatable(config.worksetId);
       } else if (config.requisitionId) {
-        return Urls.rest.samples.requisitionDatatable(config.requisitionId);
+        if (config.supplemental) {
+          return Urls.rest.samples.requisitionSupplementalDatatable(config.requisitionId);
+        } else {
+          return Urls.rest.samples.requisitionDatatable(config.requisitionId);
+        }
       }
       return Urls.rest.samples.datatable;
     },
@@ -25,25 +29,40 @@ ListTarget.sample = (function () {
       var actions = BulkTarget.sample.getBulkActions(config);
 
       if (config.requisitionId) {
-        actions.unshift(
-          {
+        if (config.supplemental) {
+          actions.unshift({
             name: "Remove",
-            action: samplesUpdateFunction(
-              Urls.rest.requisitions.removeSamples(config.requisitionId)
-            ),
-          },
-          {
-            name: "Move to Req.",
             action: function (items) {
-              showMoveToRequisitionDialog(
-                items,
-                config.requisitionId,
-                config.requisition.alias,
-                config.requisition.assayId
+              Utils.ajaxWithDialog(
+                "Removing Supplemental Samples",
+                "POST",
+                Urls.rest.requisitions.removeSupplementalSamples(config.requisitionId),
+                items.map(Utils.array.getId),
+                Utils.page.pageReload
               );
             },
-          }
-        );
+          });
+        } else {
+          actions.unshift(
+            {
+              name: "Remove",
+              action: samplesUpdateFunction(
+                Urls.rest.requisitions.removeSamples(config.requisitionId)
+              ),
+            },
+            {
+              name: "Move to Req.",
+              action: function (items) {
+                showMoveToRequisitionDialog(
+                  items,
+                  config.requisitionId,
+                  config.requisition.alias,
+                  config.requisition.assayId
+                );
+              },
+            }
+          );
+        }
       }
 
       if (config.worksetId) {
@@ -87,16 +106,37 @@ ListTarget.sample = (function () {
       var actions = [];
 
       if (config.requisitionId) {
-        actions.push({
-          name: "Add",
-          handler: function () {
-            Utils.showSearchByNamesDialog(
-              "Add Samples",
-              Urls.rest.samples.query,
-              samplesUpdateFunction(Urls.rest.requisitions.addSamples(config.requisitionId))
-            );
-          },
-        });
+        if (config.supplemental) {
+          actions.push({
+            name: "Add",
+            handler: function () {
+              Utils.showSearchByNamesDialog(
+                "Add Supplemental Samples",
+                Urls.rest.samples.query,
+                function (items) {
+                  Utils.ajaxWithDialog(
+                    "Adding Supplemental Samples",
+                    "POST",
+                    Urls.rest.requisitions.addSupplementalSamples(config.requisitionId),
+                    items.map(Utils.array.getId),
+                    Utils.page.pageReload
+                  );
+                }
+              );
+            },
+          });
+        } else {
+          actions.push({
+            name: "Add",
+            handler: function () {
+              Utils.showSearchByNamesDialog(
+                "Add Samples",
+                Urls.rest.samples.query,
+                samplesUpdateFunction(Urls.rest.requisitions.addSamples(config.requisitionId))
+              );
+            },
+          });
+        }
       }
 
       actions.push({

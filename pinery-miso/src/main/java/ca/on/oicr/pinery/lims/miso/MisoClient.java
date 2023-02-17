@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -24,7 +25,6 @@ import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
-import ca.on.oicr.pinery.lims.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -58,13 +58,35 @@ import ca.on.oicr.pinery.api.SignOff;
 import ca.on.oicr.pinery.api.Status;
 import ca.on.oicr.pinery.api.Type;
 import ca.on.oicr.pinery.api.User;
+import ca.on.oicr.pinery.lims.DefaultAssay;
+import ca.on.oicr.pinery.lims.DefaultAssayMetric;
+import ca.on.oicr.pinery.lims.DefaultAssayMetricSubcategory;
+import ca.on.oicr.pinery.lims.DefaultAssayTest;
+import ca.on.oicr.pinery.lims.DefaultAttribute;
+import ca.on.oicr.pinery.lims.DefaultAttributeName;
+import ca.on.oicr.pinery.lims.DefaultChangeLog;
+import ca.on.oicr.pinery.lims.DefaultInstrument;
+import ca.on.oicr.pinery.lims.DefaultInstrumentModel;
+import ca.on.oicr.pinery.lims.DefaultOrder;
+import ca.on.oicr.pinery.lims.DefaultPreparationKit;
+import ca.on.oicr.pinery.lims.DefaultRequisition;
+import ca.on.oicr.pinery.lims.DefaultRun;
+import ca.on.oicr.pinery.lims.DefaultSample;
+import ca.on.oicr.pinery.lims.DefaultSampleProject;
+import ca.on.oicr.pinery.lims.DefaultSignOff;
+import ca.on.oicr.pinery.lims.DefaultStatus;
+import ca.on.oicr.pinery.lims.DefaultType;
+import ca.on.oicr.pinery.lims.DefaultUser;
 import ca.on.oicr.pinery.lims.miso.MisoClient.SampleRowMapper.AttributeKey;
 import ca.on.oicr.pinery.lims.miso.converters.QcConverter;
 import ca.on.oicr.pinery.lims.miso.converters.SampleTypeConverter;
 
 public class MisoClient implements Lims {
 
-  private static final Set<String> MISO_SAMPLE_ID_PREFIXES = Collections.unmodifiableSet(Sets.newHashSet("SAM", "LIB", "LDI"));
+  private static final Set<String> MISO_SAMPLE_ID_PREFIXES =
+      Collections.unmodifiableSet(Sets.newHashSet("SAM", "LIB", "LDI"));
+  private static final int[] SINGLE_ID_PARAM_TYPES = {Types.BIGINT};
+  private static final int[] SINGLE_STRING_PARAM_TYPES = {Types.VARCHAR};
 
   // @formatter:off
   // InstrumentModel queries
@@ -139,6 +161,8 @@ public class MisoClient implements Lims {
   private static final String QUERY_REQUISITION_SAMPLE_IDS_BY_ID = QUERY_ALL_REQUISITION_SAMPLE_IDS + " AND requisitionId = ?";
   private static final String QUERY_ALL_REQUISITION_QCS = getResourceAsString("queryAllRequisitionQcs.sql");
   private static final String QUERY_REQUISITION_QCS_BY_ID = QUERY_ALL_REQUISITION_QCS + " WHERE requisitionId = ?";
+  private static final String QUERY_ALL_REQUISITION_SUPPLEMENTAL_IDS = getResourceAsString("queryAllRequisitionSupplementalSampleIds.sql");
+  private static final String QUERY_REQUISITION_SUPPLEMENTAL_IDS_BY_ID = QUERY_ALL_REQUISITION_SUPPLEMENTAL_IDS + " WHERE rs.requisitionId = ?";
     // @formatter:on
 
   private final RowMapper<Instrument> instrumentMapper = new InstrumentMapper();
@@ -176,12 +200,13 @@ public class MisoClient implements Lims {
   @Override
   public Sample getSample(String id) {
     validateSampleId(id);
-    List<Sample> samples = template.query(QUERY_SAMPLE_BY_ID, new Object[] { id }, sampleMapper);
+    int[] paramTypes = {Types.VARCHAR};
+    List<Sample> samples = template.query(QUERY_SAMPLE_BY_ID, new Object[] {id}, paramTypes, sampleMapper);
     if (samples.size() != 1) {
       return null;
     }
     Sample sample = addChildren(samples.get(0));
-    template.query(QUERY_SAMPLE_QCS_BY_ID, new Object[] { sample.getId() }, rs -> {
+    template.query(QUERY_SAMPLE_QCS_BY_ID, new Object[] {sample.getId()}, paramTypes, rs -> {
       QcConverter.addToSample(rs, sample);
     });
     return sample;
@@ -207,15 +232,16 @@ public class MisoClient implements Lims {
   }
 
   @Override
-  public List<Sample> getSamples(Boolean archived, Set<String> projects, Set<String> types, ZonedDateTime before, ZonedDateTime after) {
+  public List<Sample> getSamples(Boolean archived, Set<String> projects, Set<String> types, ZonedDateTime before,
+      ZonedDateTime after) {
     List<Sample> samples = template.query(QUERY_ALL_SAMPLES, sampleMapper);
 
     Map<String, Sample> samplesById = samples.stream().collect(Collectors.toMap(Sample::getId, Function.identity()));
     mapChildren(samplesById);
     addQcAttributes(samplesById);
 
-    if (archived == null && (projects == null || projects.isEmpty()) && (types == null || types.isEmpty()) && before == null
-        && after == null) {
+    if (archived == null && (projects == null || projects.isEmpty()) && (types == null || types.isEmpty())
+        && before == null && after == null) {
       return samples;
     } else {
       return filterSamples(samples, archived, projects, types, before, after);
@@ -258,12 +284,15 @@ public class MisoClient implements Lims {
           break;
         }
       }
-      if (match) filteredSamples.add(sample);
+      if (match) {
+        filteredSamples.add(sample);
+      }
     }
     return filteredSamples;
   }
 
-  private Set<Filter<Sample>> makeSampleFilters(final Boolean archived, final Set<String> projects, final Set<String> types,
+  private Set<Filter<Sample>> makeSampleFilters(final Boolean archived, final Set<String> projects,
+      final Set<String> types,
       final ZonedDateTime before, final ZonedDateTime after) {
     Set<Filter<Sample>> filters = new HashSet<>();
 
@@ -307,8 +336,9 @@ public class MisoClient implements Lims {
   }
 
   private Sample addChildren(Sample parent) {
+    int[] argTypes = {Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR};
     List<String> children = template.query(QUERY_SAMPLE_CHILD_IDS_BY_SAMPLE_ID,
-        new Object[] { parent.getId(), parent.getId(), parent.getId(), parent.getId() }, idListMapper);
+        new Object[] {parent.getId(), parent.getId(), parent.getId(), parent.getId()}, argTypes, idListMapper);
     if (!children.isEmpty()) {
       parent.setChildren(new HashSet<>(children));
     }
@@ -322,7 +352,7 @@ public class MisoClient implements Lims {
 
   @Override
   public User getUser(Integer id) {
-    List<User> users = template.query(QUERY_USER_BY_ID, new Object[] { id }, userMapper);
+    List<User> users = template.query(QUERY_USER_BY_ID, new Object[] {id}, SINGLE_ID_PARAM_TYPES, userMapper);
     return users.size() == 1 ? users.get(0) : null;
   }
 
@@ -336,8 +366,10 @@ public class MisoClient implements Lims {
 
   @Override
   public Order getOrder(Integer id) {
-    List<Order> orders = template.query(QUERY_ORDER_BY_ID, new Object[] { id }, orderMapper);
-    if (orders.size() != 1) return null;
+    List<Order> orders = template.query(QUERY_ORDER_BY_ID, new Object[] {id}, SINGLE_ID_PARAM_TYPES, orderMapper);
+    if (orders.size() != 1) {
+      return null;
+    }
     Order order = orders.get(0);
     Set<OrderSample> os = new HashSet<>();
     os.addAll(getOrderSamples(id));
@@ -350,7 +382,8 @@ public class MisoClient implements Lims {
   }
 
   private List<MisoOrderSample> getOrderSamples(Integer orderId) {
-    return template.query(QUERY_ORDER_SAMPLES_BY_ORDER_ID, new Object[] { orderId }, orderSampleMapper);
+    return template.query(QUERY_ORDER_SAMPLES_BY_ORDER_ID, new Object[] {orderId}, SINGLE_ID_PARAM_TYPES,
+        orderSampleMapper);
   }
 
   private List<Order> mapSamplesToOrders(List<Order> orders, List<MisoOrderSample> samples) {
@@ -386,14 +419,15 @@ public class MisoClient implements Lims {
           + " WHERE pla.aliquotId IN ("
           + nParams(sampleIds.size())
           + ")";
-      Object[] runIds = template.query(idsQuery, sampleIds.toArray(), (rs, rowNum) -> rs.getInt("runId")).toArray();
+      Object[] runIds = template.query(idsQuery, sampleIds.toArray(),
+          makeRepeatArgTypes(Types.VARCHAR, sampleIds.size()), (rs, rowNum) -> rs.getInt("runId")).toArray();
       if (runIds.length == 0) {
         return Collections.emptyList();
       }
 
       String runsQuery = QUERY_ALL_RUNS
           + " WHERE r.runId IN (" + nParams(runIds.length) + ")";
-      runs = template.query(runsQuery, runIds, runMapper);
+      runs = template.query(runsQuery, runIds, makeRepeatArgTypes(Types.BIGINT, runIds.length), runMapper);
       positions = getRunPositions(runIds);
     }
 
@@ -412,23 +446,33 @@ public class MisoClient implements Lims {
     return runs;
   }
 
+  private static int[] makeRepeatArgTypes(int type, int count) {
+    int[] argTypes = new int[count];
+    for (int i = 0; i < count; i++) {
+      argTypes[i] = type;
+    }
+    return argTypes;
+  }
+
   private static String nParams(int n) {
     return String.join(",", Collections.nCopies(n, "?"));
   }
 
   @Override
   public Run getRun(Integer id) {
-    return getSingleRun(QUERY_RUN_BY_ID, new Object[] { id });
+    return getSingleRun(QUERY_RUN_BY_ID, new Object[] {id}, SINGLE_ID_PARAM_TYPES);
   }
 
   @Override
   public Run getRun(String runName) {
-    return getSingleRun(QUERY_RUN_BY_NAME, new Object[] { runName });
+    return getSingleRun(QUERY_RUN_BY_NAME, new Object[] {runName}, SINGLE_STRING_PARAM_TYPES);
   }
 
-  private Run getSingleRun(String query, Object[] params) {
-    List<Run> runs = template.query(query, params, runMapper);
-    if (runs.size() != 1) return null;
+  private Run getSingleRun(String query, Object[] params, int[] paramTypes) {
+    List<Run> runs = template.query(query, params, paramTypes, runMapper);
+    if (runs.size() != 1) {
+      return null;
+    }
     Run run = runs.get(0);
     Set<RunPosition> rp = new HashSet<>();
     rp.addAll(getRunPositions(run.getId()));
@@ -443,7 +487,8 @@ public class MisoClient implements Lims {
   }
 
   private List<MisoRunPosition> getRunPositions(Integer runId) {
-    List<MisoRunPosition> positions = template.query(QUERY_RUN_POSITIONS_BY_RUN_ID, new Object[] { runId }, runPositionMapper);
+    List<MisoRunPosition> positions =
+        template.query(QUERY_RUN_POSITIONS_BY_RUN_ID, new Object[] {runId}, SINGLE_ID_PARAM_TYPES, runPositionMapper);
     List<MisoRunSample> samples = getRunSamples(runId);
     return mapSamplesToPositions(positions, samples);
   }
@@ -453,7 +498,8 @@ public class MisoClient implements Lims {
         + " WHERE r_spc.Run_runId IN ("
         + nParams(runIds.length)
         + ")";
-    List<MisoRunPosition> positions = template.query(query, runIds, runPositionMapper);
+    List<MisoRunPosition> positions =
+        template.query(query, runIds, makeRepeatArgTypes(Types.BIGINT, runIds.length), runPositionMapper);
     List<MisoRunSample> samples = getRunSamples(runIds);
     return mapSamplesToPositions(positions, samples);
   }
@@ -490,7 +536,7 @@ public class MisoClient implements Lims {
   }
 
   private List<MisoRunSample> getRunSamples(Integer runId) {
-    return template.query(QUERY_RUN_SAMPLES_BY_RUN_ID, new Object[] { runId }, runSampleMapper);
+    return template.query(QUERY_RUN_SAMPLES_BY_RUN_ID, new Object[] {runId}, SINGLE_ID_PARAM_TYPES, runSampleMapper);
   }
 
   private List<MisoRunSample> getRunSamples(Object[] runIds) {
@@ -498,7 +544,7 @@ public class MisoClient implements Lims {
         + " WHERE Run.runId IN ("
         + nParams(runIds.length)
         + ")";
-    return template.query(query, runIds, runSampleMapper);
+    return template.query(query, runIds, makeRepeatArgTypes(Types.BIGINT, runIds.length), runSampleMapper);
   }
 
   @Override
@@ -544,7 +590,8 @@ public class MisoClient implements Lims {
   @Override
   public ChangeLog getChangeLog(String id) {
     validateSampleId(id);
-    List<ChangeLog> changes = mapChangesToChangeLogs(template.query(QUERY_SAMPLE_CHANGELOG_BY_ID, new Object[] { id }, changeMapper));
+    List<ChangeLog> changes = mapChangesToChangeLogs(
+        template.query(QUERY_SAMPLE_CHANGELOG_BY_ID, new Object[] {id}, SINGLE_STRING_PARAM_TYPES, changeMapper));
     return changes.size() == 1 ? changes.get(0) : null;
   }
 
@@ -574,7 +621,8 @@ public class MisoClient implements Lims {
 
   @Override
   public InstrumentModel getInstrumentModel(Integer id) {
-    List<InstrumentModel> models = template.query(QUERY_MODEL_BY_ID, new Object[] { id }, modelMapper);
+    List<InstrumentModel> models =
+        template.query(QUERY_MODEL_BY_ID, new Object[] {id}, SINGLE_ID_PARAM_TYPES, modelMapper);
     return models.size() == 1 ? models.get(0) : null;
   }
 
@@ -585,13 +633,14 @@ public class MisoClient implements Lims {
 
   @Override
   public Instrument getInstrument(Integer instrumentId) {
-    List<Instrument> instruments = template.query(QUERY_INSTRUMENT_BY_ID, new Object[] { instrumentId }, instrumentMapper);
+    List<Instrument> instruments =
+        template.query(QUERY_INSTRUMENT_BY_ID, new Object[] {instrumentId}, SINGLE_ID_PARAM_TYPES, instrumentMapper);
     return instruments.size() == 1 ? instruments.get(0) : null;
   }
 
   @Override
   public List<Instrument> getInstrumentModelInstrument(Integer id) {
-    return template.query(QUERY_INSTRUMENTS_BY_MODEL_ID, new Object[] { id }, instrumentMapper);
+    return template.query(QUERY_INSTRUMENTS_BY_MODEL_ID, new Object[] {id}, SINGLE_ID_PARAM_TYPES, instrumentMapper);
   }
 
   @Override
@@ -630,19 +679,19 @@ public class MisoClient implements Lims {
 
   @Override
   public Assay getAssay(Integer id) {
-    Object[] params = { id };
-    List<Assay> assays = template.query(QUERY_ASSAY_BY_ID, params, assayRowMapper);
+    Object[] params = {id};
+    List<Assay> assays = template.query(QUERY_ASSAY_BY_ID, params, SINGLE_ID_PARAM_TYPES, assayRowMapper);
     if (assays.isEmpty()) {
       return null;
     } else if (assays.size() > 1) {
       throw new IllegalStateException(String.format("Found multiple assays with ID: %d", id));
     }
     Assay assay = assays.get(0);
-    template.query(QUERY_ASSAY_TESTS_BY_ID, params, rs -> {
+    template.query(QUERY_ASSAY_TESTS_BY_ID, params, SINGLE_ID_PARAM_TYPES, rs -> {
       AssayTest test = assayTestRowMapper.mapRow(rs, 0);
-      assay.addTest(test);  
+      assay.addTest(test);
     });
-    template.query(QUERY_ASSAY_METRICS_BY_ID, params, rs -> {
+    template.query(QUERY_ASSAY_METRICS_BY_ID, params, SINGLE_ID_PARAM_TYPES, rs -> {
       AssayMetric metric = assayMetricRowMapper.mapRow(rs, 0);
       assay.addMetric(metric);
     });
@@ -652,10 +701,15 @@ public class MisoClient implements Lims {
   @Override
   public List<Requisition> getRequisitions() {
     List<Requisition> reqs = template.query(QUERY_ALL_REQUISITIONS, requisitionRowMapper);
-    Map<Integer, Requisition> reqsById = reqs.stream().collect(Collectors.toMap(Requisition::getId, Function.identity()));
+    Map<Integer, Requisition> reqsById =
+        reqs.stream().collect(Collectors.toMap(Requisition::getId, Function.identity()));
     template.query(QUERY_ALL_REQUISITION_SAMPLE_IDS, rs -> {
       Requisition req = reqsById.get(rs.getInt("requisitionId"));
       req.addSampleId(rs.getString("sampleId"));
+    });
+    template.query(QUERY_ALL_REQUISITION_SUPPLEMENTAL_IDS, rs -> {
+      Requisition req = reqsById.get(rs.getInt("requisitionId"));
+      req.addSupplementalSampleId(rs.getString("sampleId"));
     });
     template.query(QUERY_ALL_REQUISITION_QCS, rs -> {
       Requisition req = reqsById.get(rs.getInt("requisitionId"));
@@ -664,7 +718,8 @@ public class MisoClient implements Lims {
     return reqs;
   }
 
-  private static final List<String> signOffQcs = Arrays.asList("Informatics Review", "Draft Clinical Report", "Final Clinical Report");
+  private static final List<String> signOffQcs =
+      Arrays.asList("Informatics Review", "Draft Clinical Report", "Final Clinical Report");
 
   private static void addSignOff(Requisition requisition, ResultSet rs) throws SQLException {
     String qcName = rs.getString("name");
@@ -687,7 +742,8 @@ public class MisoClient implements Lims {
 
   @Override
   public Requisition getRequisition(Integer id) {
-    List<Requisition> reqs = template.query(QUERY_REQUISITION_BY_ID, new Object[] { id }, requisitionRowMapper);
+    List<Requisition> reqs =
+        template.query(QUERY_REQUISITION_BY_ID, new Object[] {id}, SINGLE_ID_PARAM_TYPES, requisitionRowMapper);
     if (reqs.isEmpty()) {
       return null;
     } else if (reqs.size() > 1) {
@@ -700,7 +756,8 @@ public class MisoClient implements Lims {
 
   @Override
   public Requisition getRequisition(String name) {
-    List<Requisition> reqs = template.query(QUERY_REQUISITION_BY_NAME, new Object[] { name }, requisitionRowMapper);
+    List<Requisition> reqs =
+        template.query(QUERY_REQUISITION_BY_NAME, new Object[] {name}, SINGLE_ID_PARAM_TYPES, requisitionRowMapper);
     if (reqs.isEmpty()) {
       return null;
     } else if (reqs.size() > 1) {
@@ -712,11 +769,14 @@ public class MisoClient implements Lims {
   }
 
   private void addSampleIdsAndSignOffs(Requisition requisition) {
-    Object[] params = { requisition.getId() };
-    template.query(QUERY_REQUISITION_SAMPLE_IDS_BY_ID, params, rs -> {
+    Object[] params = {requisition.getId()};
+    template.query(QUERY_REQUISITION_SAMPLE_IDS_BY_ID, params, SINGLE_ID_PARAM_TYPES, rs -> {
       requisition.addSampleId(rs.getString("sampleId"));
     });
-    template.query(QUERY_REQUISITION_QCS_BY_ID, params, rs -> {
+    template.query(QUERY_REQUISITION_SUPPLEMENTAL_IDS_BY_ID, params, SINGLE_ID_PARAM_TYPES, rs -> {
+      requisition.addSupplementalSampleId(rs.getString("sampleId"));
+    });
+    template.query(QUERY_REQUISITION_QCS_BY_ID, params, SINGLE_ID_PARAM_TYPES, rs -> {
       addSignOff(requisition, rs);
     });
   }
@@ -904,7 +964,9 @@ public class MisoClient implements Lims {
       s.setModifiedById(rs.getInt("modifiedById"));
       s.setTubeBarcode(rs.getString("tubeBarcode"));
       s.setVolume(rs.getFloat("volume"));
-      if (rs.wasNull()) s.setVolume(null);
+      if (rs.wasNull()) {
+        s.setVolume(null);
+      }
       s.setConcentration(rs.getFloat("concentration"));
       if (rs.wasNull()) {
         s.setConcentration(null);
@@ -930,7 +992,9 @@ public class MisoClient implements Lims {
       }
       s.setStatus(makeStatus(rs, "qcPassed", "detailedQcStatus", "qcDate", "qcUserId"));
       s.setPreMigrationId(rs.getLong("premigration_id"));
-      if (rs.wasNull()) s.setPreMigrationId(null);
+      if (rs.wasNull()) {
+        s.setPreMigrationId(null);
+      }
 
       return s;
     }
@@ -957,46 +1021,40 @@ public class MisoClient implements Lims {
     }
 
     /**
-     * Enum used to pull Attributes from a ResultSet, formatting values correctly and mapping them to the correct keys
+     * Enum used to pull Attributes from a ResultSet, formatting values correctly and mapping them to
+     * the correct keys
      */
     public enum AttributeKey {
 
-      SAMPLE_CATEGORY("sample_category", "Sample Category"),
-      RECEIVE_DATE("receive_date", "Receive Date") {
+      SAMPLE_CATEGORY("sample_category", "Sample Category"), RECEIVE_DATE("receive_date", "Receive Date") {
         @Override
         public String extractStringValueFrom(ResultSet rs) throws SQLException {
           return rs.getDate(getSqlKey()) == null ? null : rs.getDate(getSqlKey()).toString();
         }
       },
-      EXTERNAL_NAME("external_name", "External Name"),
-      SEX("sex", "Sex") {
+      EXTERNAL_NAME("external_name", "External Name"), SEX("sex", "Sex") {
         @Override
         public String extractStringValueFrom(ResultSet rs) throws SQLException {
           String str = rs.getString(getSqlKey());
           return WordUtils.capitalizeFully(str);
         }
       },
-      TISSUE_ORIGIN("tissue_origin", "Tissue Origin"),
-      TISSUE_TYPE("tissueType", "Tissue Type"),
-      TISSUE_PREPARATION("tissue_preparation", "Tissue Preparation"),
-      TISSUE_REGION("tissue_region", "Region"),
-      TUBE_ID("tube_id", "Tube Id"),
-      GROUP_ID("group_id", "Group ID"),
-      GROUP_DESCRIPTION("group_id_description", "Group Description"),
-      ORGANISM("organism", "Organism"),
-      PURPOSE("purpose", "Purpose") {
-        @Override
-        public String extractStringValueFrom(ResultSet rs) throws SQLException {
-          String str = rs.getString(getSqlKey());
-          if (str == null) {
-            String type = rs.getString("sampleType");
-            if (type != null && type.matches(".* \\(stock\\)$")) {
-              str = "Stock";
-            }
-          }
-          return str;
-        }
-      },
+      TISSUE_ORIGIN("tissue_origin", "Tissue Origin"), TISSUE_TYPE("tissueType", "Tissue Type"), TISSUE_PREPARATION(
+          "tissue_preparation", "Tissue Preparation"), TISSUE_REGION("tissue_region", "Region"), TUBE_ID("tube_id",
+              "Tube Id"), GROUP_ID("group_id", "Group ID"), GROUP_DESCRIPTION("group_id_description",
+                  "Group Description"), ORGANISM("organism", "Organism"), PURPOSE("purpose", "Purpose") {
+                    @Override
+                    public String extractStringValueFrom(ResultSet rs) throws SQLException {
+                      String str = rs.getString(getSqlKey());
+                      if (str == null) {
+                        String type = rs.getString("sampleType");
+                        if (type != null && type.matches(".* \\(stock\\)$")) {
+                          str = "Stock";
+                        }
+                      }
+                      return str;
+                    }
+                  },
       STR_RESULT("str_result", "STR") {
         @Override
         public String extractStringValueFrom(ResultSet rs) throws SQLException {
@@ -1004,57 +1062,56 @@ public class MisoClient implements Lims {
           return str == null ? null : StrStatus.valueOf(str).getValue();
         }
       },
-      BARCODE("barcode", "Barcode"),
-      BARCODE_NAME("barcode_name", "Barcode Name"),
-      BARCODE_TWO("barcode_two", "Barcode Two"),
-      BARCODE_TWO_NAME("barcode_two_name", "Barcode Two Name"),
-      BARCODE_KIT("barcode_kit", "Barcode Kit"),
-      READ_LENGTH("read_length", "Read Length") {
-        private static final String PAIRED_KEY = "paired";
+      BARCODE("barcode", "Barcode"), BARCODE_NAME("barcode_name", "Barcode Name"), BARCODE_TWO("barcode_two",
+          "Barcode Two"), BARCODE_TWO_NAME("barcode_two_name", "Barcode Two Name"), BARCODE_KIT("barcode_kit",
+              "Barcode Kit"), READ_LENGTH("read_length", "Read Length") {
+                private static final String PAIRED_KEY = "paired";
 
-        @Override
-        public String extractStringValueFrom(ResultSet rs) throws SQLException {
-          boolean paired = rs.getBoolean(PAIRED_KEY);
-          if (!rs.wasNull()) {
-            int readLength = rs.getInt(READ_LENGTH.getSqlKey());
-            if (!rs.wasNull()) {
-              return (paired ? "2x" : "1x") + readLength;
+                @Override
+                public String extractStringValueFrom(ResultSet rs) throws SQLException {
+                  boolean paired = rs.getBoolean(PAIRED_KEY);
+                  if (!rs.wasNull()) {
+                    int readLength = rs.getInt(READ_LENGTH.getSqlKey());
+                    if (!rs.wasNull()) {
+                      return (paired ? "2x" : "1x") + readLength;
+                    }
+                  }
+                  return null;
+                }
+              },
+      TARGETED_RESEQUENCING("targeted_sequencing", "Targeted Resequencing"), SOURCE_TEMPLATE_TYPE("library_design_code",
+          "Source Template Type"), SUBPROJECT("subproject", "Sub-project"), INSTITUTE("institute",
+              "Institute"), CREATION_DATE("inLabCreationDate",
+                  "In-lab Creation Date"), SYNTHETIC("isSynthetic", "Synthetic") {
+                    @Override
+                    public String extractStringValueFrom(ResultSet rs) throws SQLException {
+                      boolean isSynthetic = rs.getBoolean(getSqlKey());
+                      if (!rs.wasNull() && isSynthetic) {
+                        return "True";
+                      }
+                      return null;
+                    }
+                  },
+      STAIN("stain", "Stain"), SLIDES("slides", "Slides"), INITIAL_SLIDES("initialSlides",
+          "Initial Slides"), DISTRIBUTED("distributed", "Distributed") {
+            @Override
+            public String extractStringValueFrom(ResultSet rs) throws SQLException {
+              boolean distributed = rs.getBoolean(getSqlKey());
+              if (!rs.wasNull() && distributed) {
+                return "True";
+              }
+              return null;
             }
-          }
-          return null;
-        }
-      },
-      TARGETED_RESEQUENCING("targeted_sequencing", "Targeted Resequencing"),
-      SOURCE_TEMPLATE_TYPE("library_design_code", "Source Template Type"),
-      SUBPROJECT("subproject", "Sub-project"),
-      INSTITUTE("institute", "Institute"),
-      CREATION_DATE("inLabCreationDate", "In-lab Creation Date"),
-      SYNTHETIC("isSynthetic", "Synthetic") {
-        @Override
-        public String extractStringValueFrom(ResultSet rs) throws SQLException {
-          boolean isSynthetic = rs.getBoolean(getSqlKey());
-          if (!rs.wasNull() && isSynthetic) return "True";
-          return null;
-        }
-      },
-      STAIN("stain", "Stain"),
-      SLIDES("slides", "Slides"),
-      INITIAL_SLIDES("initialSlides", "Initial Slides"),
-      DISTRIBUTED("distributed", "Distributed") {
-        @Override
-        public String extractStringValueFrom(ResultSet rs) throws SQLException {
-          boolean distributed = rs.getBoolean(getSqlKey());
-          if (!rs.wasNull() && distributed) return "True";
-          return null;
-        }
-      },
-      DISTRIBUTION_DATE("distribution_date", "Distribution Date"),
-      SLIDES_CONSUMED("slides_consumed", "Slides Consumed"), //
+          },
+      DISTRIBUTION_DATE("distribution_date", "Distribution Date"), SLIDES_CONSUMED("slides_consumed",
+          "Slides Consumed"), //
       UMIS("umis", "UMIs") {
         @Override
         public String extractStringValueFrom(ResultSet rs) throws SQLException {
           boolean umis = rs.getBoolean(getSqlKey());
-          if (rs.wasNull()) return null;
+          if (rs.wasNull()) {
+            return null;
+          }
           return umis ? "True" : "False";
         }
       }, //
@@ -1110,16 +1167,16 @@ public class MisoClient implements Lims {
             return null;
           }
           switch (raw) {
-          case "TEN":
-            return "0.1";
-          case "HUNDRED":
-            return "0.01";
-          case "THOUSAND":
-            return "0.001";
-          case "TEN_THOUSAND":
-            return "0.0001";
-          default:
-            return null;
+            case "TEN":
+              return "0.1";
+            case "HUNDRED":
+              return "0.01";
+            case "THOUSAND":
+              return "0.001";
+            case "TEN_THOUSAND":
+              return "0.0001";
+            default:
+              return null;
           }
         }
       }, //
@@ -1153,10 +1210,10 @@ public class MisoClient implements Lims {
       }
 
       /**
-       * Extracts the Attribute represented by this key from the result set. The column name within the ResultSet must match this.getKey()
+       * Extracts the Attribute represented by this key from the result set. The column name within the
+       * ResultSet must match this.getKey()
        * 
-       * @param rs
-       *          the ResultSet to extract the Attribute from
+       * @param rs the ResultSet to extract the Attribute from
        * @return
        * @throws SQLException
        */
@@ -1168,8 +1225,7 @@ public class MisoClient implements Lims {
       /**
        * Extracts the value belonging to this AttributeKey from a ResultSet
        * 
-       * @param rs
-       *          ResultSet containing data to populate this field
+       * @param rs ResultSet containing data to populate this field
        * @return the value to associate with this AttributeKey; null if absent
        * @throws SQLException
        */
@@ -1218,48 +1274,50 @@ public class MisoClient implements Lims {
   private static class RunSampleRowMapper implements RowMapper<MisoRunSample> {
     private char complement(char nt) {
       switch (nt) {
-      case 'A':
-        return 'T';
-      case 'C':
-        return 'G';
-      case 'G':
-        return 'C';
-      case 'T':
-      case 'U':
-        return 'A';
-      // Below are all the degenerate nucleotides. I hope we never need these and if we had one, the index mismatches calculations would
-      // have
-      // to be the changed.
-      case 'R': // AG
-        return 'Y';
-      case 'Y': // CT
-        return 'R';
-      case 'S': // CG
-        return 'S';
-      case 'W': // AT
-        return 'W';
-      case 'K': // GT
-        return 'M';
-      case 'M': // AC
-        return 'K';
-      case 'B': // CGT
-        return 'V';
-      case 'D': // AGT
-        return 'H';
-      case 'H':// ACT
-        return 'D';
-      case 'V':// ACG
-        return 'B';
-      case 'N':
-        return 'N';
-      default:
-        return nt;
+        case 'A':
+          return 'T';
+        case 'C':
+          return 'G';
+        case 'G':
+          return 'C';
+        case 'T':
+        case 'U':
+          return 'A';
+        // Below are all the degenerate nucleotides. I hope we never need these and if we had one, the index
+        // mismatches calculations would
+        // have
+        // to be the changed.
+        case 'R': // AG
+          return 'Y';
+        case 'Y': // CT
+          return 'R';
+        case 'S': // CG
+          return 'S';
+        case 'W': // AT
+          return 'W';
+        case 'K': // GT
+          return 'M';
+        case 'M': // AC
+          return 'K';
+        case 'B': // CGT
+          return 'V';
+        case 'D': // AGT
+          return 'H';
+        case 'H':// ACT
+          return 'D';
+        case 'V':// ACG
+          return 'B';
+        case 'N':
+          return 'N';
+        default:
+          return nt;
       }
     }
 
     public String reverseComplement(String index) {
-      if (index == null)
+      if (index == null) {
         return null;
+      }
       StringBuilder buffer = new StringBuilder(index.length());
       for (int i = index.length() - 1; i >= 0; i--) {
         buffer.append(complement(Character.toUpperCase(index.charAt(i))));
@@ -1304,8 +1362,8 @@ public class MisoClient implements Lims {
 
   private static class OrderSampleRowMapper implements RowMapper<MisoOrderSample> {
 
-    private static final AttributeKey[] orderSampleAtts = new AttributeKey[] { AttributeKey.READ_LENGTH,
-        AttributeKey.TARGETED_RESEQUENCING };
+    private static final AttributeKey[] orderSampleAtts = new AttributeKey[] {AttributeKey.READ_LENGTH,
+        AttributeKey.TARGETED_RESEQUENCING};
 
     @Override
     public MisoOrderSample mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -1510,7 +1568,8 @@ public class MisoClient implements Lims {
     return req;
   };
 
-  private static Status makeStatus(ResultSet rs, String stateColumn, String nameColumn, String dateColumn, String userIdColumn)
+  private static Status makeStatus(ResultSet rs, String stateColumn, String nameColumn, String dateColumn,
+      String userIdColumn)
       throws SQLException {
     Status status = new DefaultStatus();
     boolean qcPassed = rs.getBoolean(stateColumn);

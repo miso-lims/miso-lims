@@ -78,15 +78,17 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   public String getFriendlyName();
 
   /**
-   * @return the property name of the project to which the item is connected, or null if not applicable
+   * @return the property name of the project to which the item is connected, or null if not
+   *         applicable
    */
   String getProjectColumn();
 
   Class<? extends T> getRealClass();
 
   /**
-   * @return an array containing the field names for all String identifier columns - usually name, alias, and/or identificationBarcode.
-   *         Required for bulk lookup by identifiers (search by names feature)
+   * @return an array containing the field names for all String identifier columns - usually name,
+   *         alias, and/or identificationBarcode. Required for bulk lookup by identifiers (search by
+   *         names feature)
    */
   default String[] getIdentifierProperties() {
     return null;
@@ -98,7 +100,8 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   public default List<T> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
       PaginationFilter... filters)
       throws IOException {
-    if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must not be less than zero");
+    if (offset < 0 || limit < 0)
+      throw new IOException("Limit and Offset must not be less than zero");
     String sortProperty = propertyForSortColumn(sortCol);
     Order primaryOrder = null;
     if (sortProperty != null && !"id".equals(sortProperty)) {
@@ -114,7 +117,8 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
       }
       idCriteria = currentSession().createCriteria(getRealClass()).setProjection(projections);
     } else {
-      // We need to keep both the id column and the sort column in the result set for the database to provide us with sorted, duplicate-free
+      // We need to keep both the id column and the sort column in the result set for the database to
+      // provide us with sorted, duplicate-free
       // results. We will throw the sort property out later.
       ProjectionList projections = Projections.projectionList().add(Projections.groupProperty("id"));
       if (primaryOrder != null) {
@@ -130,7 +134,8 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
     } else {
       idOrder = sortDir ? Order.asc("id") : Order.desc("id");
     }
-    // Always add second sort by IDs to ensure consistent order between pages (primary sort may not be deterministic)
+    // Always add second sort by IDs to ensure consistent order between pages (primary sort may not be
+    // deterministic)
     idCriteria.addOrder(idOrder);
 
     for (PaginationFilter filter : filters) {
@@ -196,7 +201,8 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   public abstract String propertyForUser(boolean creator);
 
   @Override
-  public default void restrictPaginationByArchived(Criteria criteria, boolean isArchived, Consumer<String> errorHandler) {
+  public default void restrictPaginationByArchived(Criteria criteria, boolean isArchived,
+      Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s is not archivable.", getFriendlyName()));
   }
 
@@ -231,7 +237,8 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
-  public default void restrictPaginationByDate(Criteria criteria, Date start, Date end, DateType type, Consumer<String> errorHandler) {
+  public default void restrictPaginationByDate(Criteria criteria, Date start, Date end, DateType type,
+      Consumer<String> errorHandler) {
     String property = propertyForDate(criteria, type);
     if (property != null) {
       criteria.add(Restrictions.between(property, start, end));
@@ -241,7 +248,8 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
-  public default void restrictPaginationByDistributionRecipient(Criteria criteria, String query, Consumer<String> errorHandler) {
+  public default void restrictPaginationByDistributionRecipient(Criteria criteria, String query,
+      Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s cannot be distributed.", getFriendlyName()));
   }
 
@@ -271,7 +279,8 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
-  public default void restrictPaginationByHealth(Criteria criteria, EnumSet<HealthType> healths, Consumer<String> errorHandler) {
+  public default void restrictPaginationByHealth(Criteria criteria, EnumSet<HealthType> healths,
+      Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s has no health information.", getFriendlyName()));
   }
 
@@ -306,7 +315,8 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
-  default void restrictPaginationByInstrumentType(Criteria criteria, InstrumentType type, Consumer<String> errorHandler) {
+  default void restrictPaginationByInstrumentType(Criteria criteria, InstrumentType type,
+      Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s cannot be filtered by instrument type.", getFriendlyName()));
   }
 
@@ -326,7 +336,8 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
-  default void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
+  default void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType,
+      Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s is not platform-specific.", getFriendlyName()));
   }
 
@@ -354,7 +365,8 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   default void restrictPaginationByQuery(Criteria criteria, String query, Consumer<String> errorHandler) {
     String[] properties = getSearchProperties();
     if (properties == null || properties.length == 0) {
-      errorHandler.accept(String.format("%s does not have text fields that can be queried in this way.", getFriendlyName()));
+      errorHandler
+          .accept(String.format("%s does not have text fields that can be queried in this way.", getFriendlyName()));
     }
     criteria.add(DbUtils.textRestriction(query, properties));
   }
@@ -370,7 +382,8 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
-  default void restrictPaginationBySequencingParametersName(Criteria criteria, String query, Consumer<String> errorHandler) {
+  default void restrictPaginationBySequencingParametersName(Criteria criteria, String query,
+      Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s cannot be filtered by sequencing parameters.", getFriendlyName()));
   }
 
@@ -385,7 +398,8 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
-  public default void restrictPaginationByUser(Criteria criteria, String query, boolean creator, Consumer<String> errorHandler) {
+  public default void restrictPaginationByUser(Criteria criteria, String query, boolean creator,
+      Consumer<String> errorHandler) {
     String property = propertyForUser(creator);
     if (property != null) {
       criteria.createAlias(property, property)
@@ -397,7 +411,8 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
-  public default void restrictPaginationByUserOrGroup(Criteria criteria, String query, boolean creator, Consumer<String> errorHandler) {
+  public default void restrictPaginationByUserOrGroup(Criteria criteria, String query, boolean creator,
+      Consumer<String> errorHandler) {
     String property = propertyForUser(creator);
     if (property != null) {
       criteria.createAlias(property, property)
@@ -414,7 +429,8 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
-  public default void restrictPaginationByRequisitionId(Criteria criteria, long requisitionId, Consumer<String> errorHandler) {
+  public default void restrictPaginationByRequisitionId(Criteria criteria, long requisitionId,
+      Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s cannot be filtered by requisition ID.", getFriendlyName()));
   }
 
@@ -424,12 +440,20 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
-  public default void restrictPaginationByRecipientGroups(Criteria item, Collection<Group> groups, Consumer<String> errorHandler) {
+  public default void restrictPaginationBySupplementalToRequisitionId(Criteria criteria, long requisitionId,
+      Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s cannot be filtered by supplemental to requisition ID.", getFriendlyName()));
+  }
+
+  @Override
+  public default void restrictPaginationByRecipientGroups(Criteria item, Collection<Group> groups,
+      Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s has no recipient groups", getFriendlyName()));
   }
 
   @Override
-  public default void restrictPaginationByTransferType(Criteria item, TransferType transferType, Consumer<String> errorHandler) {
+  public default void restrictPaginationByTransferType(Criteria item, TransferType transferType,
+      Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s has no transfer type", getFriendlyName()));
   }
 
@@ -469,7 +493,8 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
-  public default void restrictPaginationByIdentifiers(Criteria criteria, Collection<String> identifiers, Consumer<String> errorHandler) {
+  public default void restrictPaginationByIdentifiers(Criteria criteria, Collection<String> identifiers,
+      Consumer<String> errorHandler) {
     String[] fields = getIdentifierProperties();
     if (fields == null) {
       errorHandler.accept(String.format("%s cannot be filtered by identifiers", getFriendlyName()));
@@ -483,7 +508,8 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
-  public default void restrictPaginationByIdentityIds(Criteria criteria, List<Long> identityIds, Consumer<String> errorHandler) {
+  public default void restrictPaginationByIdentityIds(Criteria criteria, List<Long> identityIds,
+      Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s cannot be filtered by identity ID.", getFriendlyName()));
   }
 

@@ -4,13 +4,19 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -19,10 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
@@ -34,7 +38,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.persistence.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.persistence.IndexStore;
@@ -140,16 +143,6 @@ public class HibernateLibraryDaoIT extends AbstractDAOTest {
   public void testListBySampleId() throws Exception {
     long sampleId = 1L;
     List<Library> libraries = dao.listBySampleId(sampleId);
-
-    assertEquals(2, libraries.size());
-    assertEquals(sampleId, libraries.get(0).getSample().getId());
-    assertEquals(sampleId, libraries.get(1).getSample().getId());
-  }
-
-  @Test
-  public void testListBySampleIdList() throws Exception {
-    long sampleId = 1L;
-    List<Library> libraries = dao.listBySampleIdList(Arrays.asList(sampleId));
 
     assertEquals(2, libraries.size());
     assertEquals(sampleId, libraries.get(0).getSample().getId());
@@ -297,13 +290,47 @@ public class HibernateLibraryDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testListIdsByRequisitionIdDetailed() throws Exception {
-    List<Long> requisitionSampleIds = Arrays.asList(16L, 17L);
+  public void testListIdsByRequisitionIdDetailedWithSupplemental() throws Exception {
     Set<Long> aliquotSampleIds = Collections.singleton(19L);
-    Mockito.when(sampleStore.getChildIds(requisitionSampleIds, SampleAliquot.CATEGORY_NAME))
+    Mockito.when(sampleStore.getChildIds(Mockito.anyList(), Mockito.eq(SampleAliquot.CATEGORY_NAME)))
         .thenReturn(aliquotSampleIds);
 
     List<Long> ids = dao.listIdsByRequisitionId(2L);
+
+    @SuppressWarnings("unchecked")
+    ArgumentCaptor<List<Long>> captor = ArgumentCaptor.forClass(List.class);
+    Mockito.verify(sampleStore).getChildIds(captor.capture(), Mockito.eq(SampleAliquot.CATEGORY_NAME));
+    List<Long> requisitionSampleIdsUsed = captor.getValue();
+    assertEquals(3, requisitionSampleIdsUsed.size());
+    // requisitioned samples
+    assertTrue(requisitionSampleIdsUsed.contains(16L));
+    assertTrue(requisitionSampleIdsUsed.contains(17L));
+    // supplemental sample
+    assertTrue(requisitionSampleIdsUsed.contains(21L));
+
+    assertEquals(1, ids.size());
+    assertTrue(ids.contains(15L));
+  }
+
+  @Test
+  public void testListIdsByAncestorSampleIdListDirect() throws Exception {
+    List<Long> sampleIds = Arrays.asList(19L);
+    Mockito.when(sampleStore.getChildIds(sampleIds, SampleAliquot.CATEGORY_NAME))
+        .thenReturn(Collections.emptySet());
+
+    List<Long> ids = dao.listIdsByAncestorSampleIdList(sampleIds);
+    assertEquals(1, ids.size());
+    assertTrue(ids.contains(15L));
+  }
+
+  @Test
+  public void testListIdsByAncestorSampleIdListIndirect() throws Exception {
+    List<Long> sampleIds = Arrays.asList(17L);
+    Set<Long> aliquotSampleIds = Collections.singleton(19L);
+    Mockito.when(sampleStore.getChildIds(sampleIds, SampleAliquot.CATEGORY_NAME))
+        .thenReturn(aliquotSampleIds);
+
+    List<Long> ids = dao.listIdsByAncestorSampleIdList(sampleIds);
     assertEquals(1, ids.size());
     assertTrue(ids.contains(15L));
   }

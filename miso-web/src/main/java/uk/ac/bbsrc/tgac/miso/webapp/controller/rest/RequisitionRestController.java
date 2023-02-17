@@ -86,7 +86,8 @@ public class RequisitionRestController extends RestController {
   }
 
   @PutMapping("/{id}")
-  public @ResponseBody RequisitionDto update(@RequestBody RequisitionDto dto, @PathVariable long id) throws IOException {
+  public @ResponseBody RequisitionDto update(@RequestBody RequisitionDto dto, @PathVariable long id)
+      throws IOException {
     return RestUtils.updateObject(TYPE_LABEL, id, dto, RequisitionDto::to, requisitionService, RequisitionDto::from);
   }
 
@@ -98,7 +99,8 @@ public class RequisitionRestController extends RestController {
   }
 
   @PostMapping("/{requisitionId}/samples")
-  public @ResponseBody ObjectNode addSamples(@PathVariable long requisitionId, @RequestBody List<Long> ids) throws IOException {
+  public @ResponseBody ObjectNode addSamples(@PathVariable long requisitionId, @RequestBody List<Long> ids)
+      throws IOException {
     Requisition requisition = RestUtils.retrieve(TYPE_LABEL, requisitionId, requisitionService, Status.NOT_FOUND);
     return addSamples(requisition, ids);
   }
@@ -114,14 +116,16 @@ public class RequisitionRestController extends RestController {
   }
 
   @PostMapping("/{requisitionId}/samples/remove")
-  public @ResponseBody ObjectNode removeSamples(@PathVariable long requisitionId, @RequestBody List<Long> ids) throws IOException {
+  public @ResponseBody ObjectNode removeSamples(@PathVariable long requisitionId, @RequestBody List<Long> ids)
+      throws IOException {
     // Retrieve requisition just to validate existence
     RestUtils.retrieve(TYPE_LABEL, requisitionId, requisitionService, Status.NOT_FOUND);
     List<Sample> samples = new ArrayList<>();
     for (Long id : ids) {
       Sample sample = RestUtils.retrieve("Sample", id, sampleService, Status.BAD_REQUEST);
       if (sample.getRequisition() == null || sample.getRequisition().getId() != requisitionId) {
-        throw new RestException(String.format("%s (%s) is not linked to this requisition", sample.getAlias(), sample.getName()),
+        throw new RestException(
+            String.format("%s (%s) is not linked to this requisition", sample.getAlias(), sample.getName()),
             Status.BAD_REQUEST);
       }
       sample.setRequisition(null);
@@ -133,6 +137,34 @@ public class RequisitionRestController extends RestController {
   @GetMapping("/samplesupdate/{uuid}")
   public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
     return asyncOperationManager.getAsyncProgress(uuid, Sample.class);
+  }
+
+  @PostMapping("/{requisitionId}/supplementalsamples")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public @ResponseBody void addSupplementalSamples(@PathVariable long requisitionId, @RequestBody List<Long> ids)
+      throws IOException {
+    Requisition requisition = RestUtils.retrieve(TYPE_LABEL, requisitionId, requisitionService, Status.NOT_FOUND);
+    List<Sample> samples = getSamples(ids);
+    requisitionService.addSupplementalSamples(requisition, samples);
+  }
+
+  @PostMapping("/{requisitionId}/supplementalsamples/remove")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public @ResponseBody void removeSupplementalSamples(@PathVariable long requisitionId, @RequestBody List<Long> ids)
+      throws IOException {
+    // Retrieve requisition just to validate existence
+    Requisition requisition = RestUtils.retrieve(TYPE_LABEL, requisitionId, requisitionService, Status.NOT_FOUND);
+    List<Sample> samples = getSamples(ids);
+    requisitionService.removeSupplementalSamples(requisition, samples);
+  }
+
+  private List<Sample> getSamples(List<Long> ids) throws IOException {
+    List<Sample> samples = new ArrayList<>();
+    for (Long id : ids) {
+      Sample sample = RestUtils.retrieve("Sample", id, sampleService, Status.BAD_REQUEST);
+      samples.add(sample);
+    }
+    return samples;
   }
 
   @GetMapping("/search")

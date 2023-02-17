@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
@@ -15,7 +17,7 @@
     <mysql.db>lims</mysql.db>
     <mysql.user>tgaclims</mysql.user>
     <mysql.pw>tgaclims</mysql.pw>
-    <pinery.version>2.24.0</pinery.version>
+    <pinery.version>2.25.0</pinery.version>
     <spring-version>5.3.20</spring-version><!-- must match version used by Pinery -->
   </properties>
 
@@ -171,7 +173,7 @@
             <artifactId>docker-maven-plugin</artifactId>
             <version>0.21.0</version>
             <configuration>
-            <removeVolumes>true</removeVolumes>
+              <removeVolumes>true</removeVolumes>
               <images>
                 <image>
                   <name>mysql:5.7</name>
@@ -225,7 +227,8 @@
               </execution>
             </executions>
             <configuration>
-              <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?autoReconnect=true&amp;useSSL=false</url>
+              <url>
+                jdbc:mysql://localhost:${mysql.port}/${mysql.db}?autoReconnect=true&amp;useSSL=false</url>
               <user>${mysql.user}</user>
               <password>${mysql.pw}</password>
               <locations>
@@ -252,7 +255,8 @@
             <configuration>
               <systemPropertyVariables>
                 <!-- Make URLs available for tests -->
-                <miso.it.mysql.url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?autoReconnect=true&amp;useSSL=false</miso.it.mysql.url>
+                <miso.it.mysql.url>
+                  jdbc:mysql://localhost:${mysql.port}/${mysql.db}?autoReconnect=true&amp;useSSL=false</miso.it.mysql.url>
                 <miso.it.mysql.user>${mysql.user}</miso.it.mysql.user>
                 <miso.it.mysql.pw>${mysql.pw}</miso.it.mysql.pw>
               </systemPropertyVariables>

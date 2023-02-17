@@ -775,6 +775,11 @@ Urls = (function () {
     removeSamples: middleIdUrlFunction(requisitionRestBase, "/samples/remove"),
     moveSamples: middleIdUrlFunction(requisitionRestBase, "/samples/move"),
     samplesUpdateProgress: idUrlFunction(requisitionRestBase + "/samplesupdate"),
+    addSupplementalSamples: middleIdUrlFunction(requisitionRestBase, "/supplementalsamples"),
+    removeSupplementalSamples: middleIdUrlFunction(
+      requisitionRestBase,
+      "/supplementalsamples/remove"
+    ),
     search: requisitionRestBase + "/search",
     listRunLibraries: middleIdUrlFunction(requisitionRestBase, "/runlibraries"),
   };
@@ -863,6 +868,9 @@ Urls = (function () {
     bulkSaveProgress: idUrlFunction(sampleRestBase + "/bulk"),
     worksetDatatable: idUrlFunction(sampleRestBase + "/dt/workset"),
     requisitionDatatable: idUrlFunction(sampleRestBase + "/dt/requisition"),
+    requisitionSupplementalDatatable: idUrlFunction(
+      sampleRestBase + "/dt/requisition-supplemental"
+    ),
   };
 
   // Sample Classes

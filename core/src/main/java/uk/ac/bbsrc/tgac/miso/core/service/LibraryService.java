@@ -9,7 +9,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface LibraryService extends PaginatedDataSource<Library>, BarcodableService<Library>, DeleterService<Library>,
+public interface LibraryService
+    extends PaginatedDataSource<Library>, BarcodableService<Library>, DeleterService<Library>,
     NoteService<Library>, BulkSaveService<Library> {
 
   @Override
@@ -25,6 +26,16 @@ public interface LibraryService extends PaginatedDataSource<Library>, Barcodable
 
   List<Library> listByProjectId(long projectId) throws IOException;
 
+  /**
+   * Get all library IDs related to a specified requisition
+   * 
+   * @param requisitionId ID of the requisition
+   * @return a list of all library IDs descended from the requisition's requisitioned and
+   *         supplementary samples
+   * @throws IOException
+   */
   List<Long> listIdsByRequisitionId(long requisitionId) throws IOException;
+
+  List<Long> listIdsByAncestorSampleIds(Collection<Long> sampleIds) throws IOException;
 
 }

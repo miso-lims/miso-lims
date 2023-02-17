@@ -74,6 +74,7 @@ DELETE FROM Requisition;
 DELETE FROM RequisitionChangeLog;
 DELETE FROM RequisitionQc;
 DELETE FROM RequisitionQcControl;
+DELETE FROM Requisition_SupplementalSample;
 DELETE FROM Run;
 DELETE FROM RunChangeLog;
 DELETE FROM RunIllumina;
