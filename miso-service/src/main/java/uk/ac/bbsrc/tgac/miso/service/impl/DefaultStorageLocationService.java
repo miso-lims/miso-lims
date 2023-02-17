@@ -12,9 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Sets;
 
+import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.ServiceRecordService;
 import uk.ac.bbsrc.tgac.miso.core.service.StorageLabelService;
 import uk.ac.bbsrc.tgac.miso.core.service.StorageLocationMapService;
 import uk.ac.bbsrc.tgac.miso.core.service.StorageLocationService;
@@ -37,6 +39,8 @@ public class DefaultStorageLocationService implements StorageLocationService {
   private StorageLabelService storageLabelService;
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private ServiceRecordService serviceRecordService;
 
   @Autowired
   private DeletionStore deletionStore;
@@ -140,8 +144,24 @@ public class DefaultStorageLocationService implements StorageLocationService {
     return storageLocationStore.save(managed);
   }
 
+  public long addServiceRecord(ServiceRecord record, StorageLocation location) throws IOException {
+    StorageLocation managedLocation = get(location.getId());
+
+    if (location.getRetired()) {
+      throw new IOException("Cannot add service records to a retired storage location!");
+    }
+
+    long recordId = serviceRecordService.create(record);
+    ServiceRecord managedRecord = serviceRecordService.get(recordId);
+    managedLocation.getServiceRecords().add(managedRecord);
+    storageLocationStore.save(managedLocation);
+
+    return managedRecord.getId();
+  }
+
   /**
-   * Checks submitted data for validity, throwing a ValidationException containing all of the errors if invalid
+   * Checks submitted data for validity, throwing a ValidationException containing all of the errors
+   * if invalid
    * 
    * @param storage submitted StorageLocation to validate
    * @param beforeChange the already-persisted StorageLocation before changes
@@ -153,7 +173,8 @@ public class DefaultStorageLocationService implements StorageLocationService {
         && (beforeChange == null || !storage.getIdentificationBarcode().equals(beforeChange.getIdentificationBarcode()))
         && storageLocationStore.getByBarcode(storage.getIdentificationBarcode()) != null) {
       errors.add(new ValidationError("identificationBarcode",
-          String.format("There is already a storage location with this barcode (%s)", storage.getIdentificationBarcode())));
+          String.format("There is already a storage location with this barcode (%s)",
+              storage.getIdentificationBarcode())));
     }
 
     validateLocationUnitRelationships(storage, errors);
@@ -199,7 +220,8 @@ public class DefaultStorageLocationService implements StorageLocationService {
     loadChildEntities(storage);
     storage.setChangeDetails(authorizationManager.getCurrentUser());
     long savedId = storageLocationStore.save(storage);
-    StorageLocation[] childLocations = storage.getChildLocations().toArray(new StorageLocation[storage.getChildLocations().size()]);
+    StorageLocation[] childLocations =
+        storage.getChildLocations().toArray(new StorageLocation[storage.getChildLocations().size()]);
     for (StorageLocation child : childLocations) {
       addFreezerStorage(child);
     }
@@ -230,17 +252,20 @@ public class DefaultStorageLocationService implements StorageLocationService {
     ValidationResult result = new ValidationResult();
     if (object.getLocationUnit() == LocationUnit.ROOM) {
       if (!object.getChildLocations().isEmpty()) {
-        result.addError(new ValidationError(String.format("Room %s contains %d %s", object.getAlias(), object.getChildLocations().size(),
-            Pluralizer.freezers(object.getChildLocations().size()))));
+        result.addError(new ValidationError(
+            String.format("Room %s contains %d %s", object.getAlias(), object.getChildLocations().size(),
+                Pluralizer.freezers(object.getChildLocations().size()))));
       }
     } else {
-      if (object.getParentLocation() != null && !DELETABLE_FROM.contains(object.getParentLocation().getLocationUnit())) {
+      if (object.getParentLocation() != null
+          && !DELETABLE_FROM.contains(object.getParentLocation().getLocationUnit())) {
         result.addError(new ValidationError("This storage unit cannot be deleted directly"));
       } else {
         int boxCount = object.countBoxes();
         if (boxCount > 0) {
-          result.addError(new ValidationError(String.format("%s %s contains %d %s", object.getLocationUnit().getDisplayName(),
-              object.getAlias(), boxCount, Pluralizer.boxes(boxCount))));
+          result.addError(
+              new ValidationError(String.format("%s %s contains %d %s", object.getLocationUnit().getDisplayName(),
+                  object.getAlias(), boxCount, Pluralizer.boxes(boxCount))));
         }
       }
     }
