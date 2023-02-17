@@ -19,6 +19,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
@@ -32,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLoggable;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
+import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.StorageLocationChangeLog;
 
 @Entity
@@ -122,6 +124,13 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable,
   @Column(nullable = false)
   @Temporal(TemporalType.TIMESTAMP)
   private Date lastModified;
+
+  @OneToMany(targetEntity = ServiceRecord.class, cascade = CascadeType.REMOVE)
+  @JoinTable(name = "StorageLocation_ServiceRecord", joinColumns = {@JoinColumn(name = "locationId")},
+      inverseJoinColumns = {
+          @JoinColumn(name = "recordId")
+      })
+  private Set<ServiceRecord> serviceRecords = new HashSet<>();
 
   @OneToMany(targetEntity = StorageLocationChangeLog.class, mappedBy = "storageLocation", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
@@ -217,7 +226,8 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable,
   }
 
   public String getFullDisplayLocation() {
-    return (getParentLocation() == null ? "" : getParentLocation().getFullDisplayLocation() + ", ") + getDisplayLocation();
+    return (getParentLocation() == null ? "" : getParentLocation().getFullDisplayLocation() + ", ")
+        + getDisplayLocation();
   }
 
   public String getFreezerDisplayLocation() {
@@ -293,6 +303,14 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable,
     this.creationTime = creationTime;
   }
 
+  public Set<ServiceRecord> getServiceRecords() {
+    return serviceRecords;
+  }
+
+  public void setServiceRecords(Set<ServiceRecord> serviceRecords) {
+    this.serviceRecords = serviceRecords;
+  }
+
   @Override
   public Collection<ChangeLog> getChangeLog() {
     return changeLog;
@@ -307,6 +325,7 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable,
     change.setUser(user);
     return change;
   }
+
 
   @Override
   public int hashCode() {
@@ -328,37 +347,59 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable,
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     StorageLocation other = (StorageLocation) obj;
     if (alias == null) {
-      if (other.alias != null) return false;
-    } else if (!alias.equals(other.alias)) return false;
+      if (other.alias != null)
+        return false;
+    } else if (!alias.equals(other.alias))
+      return false;
     if (creationTime == null) {
-      if (other.creationTime != null) return false;
-    } else if (!creationTime.equals(other.creationTime)) return false;
+      if (other.creationTime != null)
+        return false;
+    } else if (!creationTime.equals(other.creationTime))
+      return false;
     if (creator == null) {
-      if (other.creator != null) return false;
-    } else if (!creator.equals(other.creator)) return false;
-    if (id != other.id) return false;
+      if (other.creator != null)
+        return false;
+    } else if (!creator.equals(other.creator))
+      return false;
+    if (id != other.id)
+      return false;
     if (identificationBarcode == null) {
-      if (other.identificationBarcode != null) return false;
-    } else if (!identificationBarcode.equals(other.identificationBarcode)) return false;
-    if (locationUnit != other.locationUnit) return false;
+      if (other.identificationBarcode != null)
+        return false;
+    } else if (!identificationBarcode.equals(other.identificationBarcode))
+      return false;
+    if (locationUnit != other.locationUnit)
+      return false;
     if (map == null) {
-      if (other.map != null) return false;
-    } else if (!map.equals(other.map)) return false;
+      if (other.map != null)
+        return false;
+    } else if (!map.equals(other.map))
+      return false;
     if (mapAnchor == null) {
-      if (other.mapAnchor != null) return false;
-    } else if (!mapAnchor.equals(other.mapAnchor)) return false;
+      if (other.mapAnchor != null)
+        return false;
+    } else if (!mapAnchor.equals(other.mapAnchor))
+      return false;
     if (parentLocation == null) {
-      if (other.parentLocation != null) return false;
-    } else if (!parentLocation.equals(other.parentLocation)) return false;
+      if (other.parentLocation != null)
+        return false;
+    } else if (!parentLocation.equals(other.parentLocation))
+      return false;
     if (probeId == null) {
-      if (other.probeId != null) return false;
-    } else if (!probeId.equals(other.probeId)) return false;
-    if (retired != other.retired) return false;
+      if (other.probeId != null)
+        return false;
+    } else if (!probeId.equals(other.probeId))
+      return false;
+    if (retired != other.retired)
+      return false;
     return true;
   }
 
