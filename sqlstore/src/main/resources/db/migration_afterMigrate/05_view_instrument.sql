@@ -11,7 +11,7 @@ FROM Instrument inst
 LEFT JOIN InstrumentPosition ipos ON ipos.instrumentModelId = inst.instrumentModelId
 LEFT JOIN (
   SELECT instrumentId, positionId, MIN(startTime) AS outOfServiceTime
-  FROM ServiceRecord
+  FROM ServiceRecord rec INNER JOIN Instrument_ServiceRecord instrec ON instrec.recordId = rec.recordId
   WHERE outOfService = TRUE AND startTime IS NOT NULL AND endTime IS NULL
   GROUP BY instrumentId, positionId
 ) sr ON sr.instrumentId = inst.instrumentId AND (sr.positionId IS NULL OR sr.positionId = ipos.positionId);

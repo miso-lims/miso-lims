@@ -118,7 +118,8 @@ public class PlainSampleITs extends AbstractIT {
     // Goal: ensure all expected fields are present and no extra and that dropdowns appear as expected
     // (dropdowns do not render properly when table is broken)
     login();
-    BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(1L), Arrays.asList(1));
+    BulkLibraryPage page =
+        BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(1L), Arrays.asList(1));
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
     assertEquals(libraryColumns.size(), headings.size());
@@ -126,7 +127,8 @@ public class PlainSampleITs extends AbstractIT {
     assertEquals(1, table.getRowCount());
 
     Set<String> platforms = table.getDropdownOptions(LibColumns.PLATFORM, 0);
-    assertFalse("Platform dropdown did not render; confirm one active sequencer exists and that table is not broken", platforms.isEmpty());
+    assertFalse("Platform dropdown did not render; confirm one active sequencer exists and that table is not broken",
+        platforms.isEmpty());
     assertTrue(platforms.contains("Illumina"));
     Set<String> spikeIns = table.getDropdownOptions(LibColumns.SPIKE_IN, 0);
     assertFalse(spikeIns.isEmpty());
@@ -145,7 +147,8 @@ public class PlainSampleITs extends AbstractIT {
   public void testPropagateOnePlainLibrary() {
     // Goal: ensure one library can be saved
     login();
-    BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(1L), Arrays.asList(1));
+    BulkLibraryPage page =
+        BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(1L), Arrays.asList(1));
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new LinkedHashMap<>();
@@ -210,7 +213,8 @@ public class PlainSampleITs extends AbstractIT {
 
   @Test
   public void testCreatePlainLibraryAliquotSetup() {
-    // Goal: ensure all expected fields are present and no extra and that data can be entered in date field
+    // Goal: ensure all expected fields are present and no extra and that data can be entered in date
+    // field
     // (date field cannot be entered when table is broken)
     login();
     BulkLibraryAliquotPage page = BulkLibraryAliquotPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(1L));

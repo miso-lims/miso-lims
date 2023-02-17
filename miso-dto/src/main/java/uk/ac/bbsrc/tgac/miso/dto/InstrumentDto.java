@@ -1,7 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
 public class InstrumentDto {
-  
+
   private long id;
   private String name;
   private String instrumentType;

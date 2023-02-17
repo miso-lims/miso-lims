@@ -20,15 +20,19 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
+import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
+import uk.ac.bbsrc.tgac.miso.core.service.ServiceRecordService;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentDto;
+import uk.ac.bbsrc.tgac.miso.dto.ServiceRecordDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
+
 
 @Controller
 @RequestMapping("/rest/instruments")
@@ -37,17 +41,21 @@ public class InstrumentRestController extends RestController {
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
 
-  private final JQueryDataTableBackend<Instrument, InstrumentDto> jQueryBackend = new JQueryDataTableBackend<Instrument, InstrumentDto>() {
-    @Override
-    protected InstrumentDto asDto(Instrument model) {
-      return Dtos.asDto(model);
-    }
+  @Autowired
+  private ServiceRecordService serviceRecordService;
 
-    @Override
-    protected PaginatedDataSource<Instrument> getSource() throws IOException {
-      return instrumentService;
-    }
-  };
+  private final JQueryDataTableBackend<Instrument, InstrumentDto> jQueryBackend =
+      new JQueryDataTableBackend<Instrument, InstrumentDto>() {
+        @Override
+        protected InstrumentDto asDto(Instrument model) {
+          return Dtos.asDto(model);
+        }
+
+        @Override
+        protected PaginatedDataSource<Instrument> getSource() throws IOException {
+          return instrumentService;
+        }
+      };
 
   @Autowired
   private InstrumentService instrumentService;
@@ -82,7 +90,8 @@ public class InstrumentRestController extends RestController {
   }
 
   @PutMapping("/{instrumentId}")
-  public @ResponseBody InstrumentDto update(@PathVariable long instrumentId, @RequestBody InstrumentDto dto) throws IOException {
+  public @ResponseBody InstrumentDto update(@PathVariable long instrumentId, @RequestBody InstrumentDto dto)
+      throws IOException {
     return RestUtils.updateObject("Instrument", instrumentId, dto, Dtos::to, instrumentService, inst -> {
       constantsController.refreshConstants();
       return Dtos.asDto(inst);
@@ -97,7 +106,8 @@ public class InstrumentRestController extends RestController {
 
   @GetMapping(value = "/dt/instrument-type/{type}", produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<InstrumentDto> datatableByInstrumentType(@PathVariable("type") String type, HttpServletRequest request)
+  public DataTablesResponseDto<InstrumentDto> datatableByInstrumentType(@PathVariable("type") String type,
+      HttpServletRequest request)
       throws IOException {
     InstrumentType instrumentType = InstrumentType.valueOf(type);
     if (instrumentType == null) {
@@ -111,6 +121,16 @@ public class InstrumentRestController extends RestController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
     RestUtils.bulkDelete("Instrument", ids, instrumentService);
+  }
+
+  @PostMapping(value = "/{instrumentId}/servicerecords")
+  public @ResponseBody ServiceRecordDto createRecord(@PathVariable long instrumentId,
+      @RequestBody ServiceRecordDto dto)
+      throws IOException {
+    ServiceRecord record = Dtos.to(dto);
+    Instrument instrument = instrumentService.get(instrumentId);
+    long savedId = instrumentService.addServiceRecord(record, instrument);
+    return Dtos.asDto(serviceRecordService.get(savedId));
   }
 
 }

@@ -452,10 +452,15 @@ INSERT INTO Instrument (instrumentId, name, instrumentModelId, serialNumber, dat
   (5001, 'PacBio_SR_5001', 3, '5001', '2017-09-21', NULL, NULL, 1),
   (5002, 'HiSeq_SR_5002', 1, '5002', '2017-02-01', NULL, NULL, 1);
 
-INSERT INTO ServiceRecord(recordId, instrumentId, title, details, servicedBy, referenceNumber, serviceDate, startTime, endTime, outOfService) VALUES
-  (150, 101, 'Test 150', 'details go here', 'technician1', '12345', '2017-09-05', '2017-09-01 10:00:00', '2017-09-05 10:00:00', 0),
-  (151, 101, 'Test 151', NULL, NULL, NULL, '2017-09-12', NULL, NULL, 0),
-  (152, 101, 'Test 152', 'details to remove', 'technitchin', 'Riffraff', '2017-09-12', '2017-09-11 11:00:00', '2017-09-12 12:00:00', 1);
+INSERT INTO ServiceRecord(recordId, title, details, servicedBy, referenceNumber, serviceDate, startTime, endTime, outOfService) VALUES
+  (150, 'Test 150', 'details go here', 'technician1', '12345', '2017-09-05', '2017-09-01 10:00:00', '2017-09-05 10:00:00', 0),
+  (151, 'Test 151', NULL, NULL, NULL, '2017-09-12', NULL, NULL, 0),
+  (152, 'Test 152', 'details to remove', 'technitchin', 'Riffraff', '2017-09-12', '2017-09-11 11:00:00', '2017-09-12 12:00:00', 1);
+
+INSERT INTO Instrument_ServiceRecord(recordId, instrumentId) VALUES
+(150, 101),
+(151, 101),
+(152, 101);
 
 INSERT INTO Project(projectId, name, alias, shortName, created, description, status, referenceGenomeId, lastModified, creator, lastModifier, pipelineId) VALUES
   (1, 'PRO1', 'Project One', 'PONE', '2017-06-27', 'integration test project one', 'ACTIVE', 1, '2017-06-27 14:11:00', 1, 1, 1),

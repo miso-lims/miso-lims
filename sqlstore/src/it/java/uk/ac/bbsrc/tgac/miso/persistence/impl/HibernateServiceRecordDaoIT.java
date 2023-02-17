@@ -1,22 +1,19 @@
 /*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
+ * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK MISO project contacts: Robert Davey @
+ * TGAC *********************************************************************
  *
  * This file is part of MISO.
  *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * MISO is free software: you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MISO is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with MISO. If not, see
+ * <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -52,19 +49,19 @@ public class HibernateServiceRecordDaoIT extends AbstractDAOTest {
 
   @Rule
   public final ExpectedException exception = ExpectedException.none();
-  
+
   @Autowired
   private SessionFactory sessionFactory;
-  
+
   @Mock
   private MisoFilesManager misoFilesManager;
   @Mock
   private InstrumentStore instrumentDao;
   private final Instrument emptySR = new InstrumentImpl();
-  
+
   @InjectMocks
   private HibernateServiceRecordDao dao;
-  
+
   @Before
   public void setup() throws IOException {
     MockitoAnnotations.initMocks(this);
@@ -73,25 +70,25 @@ public class HibernateServiceRecordDaoIT extends AbstractDAOTest {
     emptySR.setId(2L);
     Mockito.when(instrumentDao.get(ArgumentMatchers.anyLong())).thenReturn(emptySR);
   }
-  
+
   @Test
   public void testSaveNew() throws IOException {
+
     String title = "New Record 1";
     Long newId = dao.save(makeServiceRecord(title));
-    
+
     ServiceRecord savedRec = dao.get(newId);
     assertEquals(title, savedRec.getTitle());
   }
-  
-  private ServiceRecord makeServiceRecord(String title) {
+
+  private ServiceRecord makeServiceRecord(String title) throws IOException {
     ServiceRecord rec = new ServiceRecord();
     rec.setTitle(title);
-    rec.setInstrument(emptySR);
     rec.setServiceDate(new java.util.Date());
     rec.setServicedByName("Test Person");
     return rec;
   }
-  
+
   @Test
   public void testSaveEdit() throws IOException {
     ServiceRecord rec = dao.get(1L);
@@ -99,21 +96,11 @@ public class HibernateServiceRecordDaoIT extends AbstractDAOTest {
     rec.setTitle(newTitle);
     Instrument sr = Mockito.mock(Instrument.class);
     Mockito.when(sr.getId()).thenReturn(1L);
-    rec.setInstrument(sr);
-    
+
     assertEquals(1L, dao.save(rec));
-    
+
     ServiceRecord saved = dao.get(1L);
     assertEquals(newTitle, saved.getTitle());
-  }
-  
-  @Test
-  public void testSaveDecommissioned() throws IOException {
-    ServiceRecord newRec = makeServiceRecord("New Record 2");
-    newRec.getInstrument().setDateDecommissioned(new Date());
-    
-    exception.expect(IOException.class);
-    dao.save(newRec);
   }
 
   @Test
@@ -122,7 +109,7 @@ public class HibernateServiceRecordDaoIT extends AbstractDAOTest {
     assertNotNull(rec);
     assertEquals(1L, rec.getId());
   }
-  
+
   @Test
   public void testGetNone() throws IOException {
     ServiceRecord rec = dao.get(100L);
@@ -133,18 +120,6 @@ public class HibernateServiceRecordDaoIT extends AbstractDAOTest {
   public void testListAll() throws IOException {
     List<ServiceRecord> list = dao.listAll();
     assertEquals(3, list.size());
-  }
-
-  @Test
-  public void testListByInstrumentId() {
-    List<ServiceRecord> list = dao.listByInstrumentId(1L);
-    assertEquals(2, list.size());
-  }
-  
-  @Test
-  public void testListByInstrumentIdNone() {
-    List<ServiceRecord> list = dao.listByInstrumentId(100L);
-    assertEquals(0, list.size());
   }
 
 }

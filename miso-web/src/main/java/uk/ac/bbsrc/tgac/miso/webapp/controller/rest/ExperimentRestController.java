@@ -1,22 +1,19 @@
 /*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
+ * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK MISO project contacts: Robert Davey @
+ * TGAC *********************************************************************
  *
  * This file is part of MISO.
  *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * MISO is free software: you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * MISO is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with MISO. If not, see
+ * <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -70,7 +67,8 @@ public class ExperimentRestController extends RestController {
   private RunService runService;
 
   @PostMapping(value = "/{experimentId}/addkit", produces = "application/json")
-  public @ResponseBody KitConsumableDto addKit(@PathVariable Long experimentId, @RequestBody KitConsumableDto dto) throws IOException {
+  public @ResponseBody KitConsumableDto addKit(@PathVariable Long experimentId, @RequestBody KitConsumableDto dto)
+      throws IOException {
     Experiment experiment = experimentService.get(experimentId);
     if (experiment == null) {
       throw new RestException("No such experiment.", Status.NOT_FOUND);
@@ -130,7 +128,8 @@ public class ExperimentRestController extends RestController {
   }
 
   @PutMapping("/{experimentId}")
-  public @ResponseBody ExperimentDto update(@PathVariable long experimentId, @RequestBody ExperimentDto dto) throws IOException {
+  public @ResponseBody ExperimentDto update(@PathVariable long experimentId, @RequestBody ExperimentDto dto)
+      throws IOException {
     return RestUtils.updateObject("Experiment", experimentId, dto, Dtos::to, experimentService, Dtos::asDto);
   }
 

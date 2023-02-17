@@ -1,22 +1,19 @@
 /*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
+ * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK MISO project contacts: Robert Davey @
+ * TGAC *********************************************************************
  *
  * This file is part of MISO.
  *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * MISO is free software: you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * MISO is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with MISO. If not, see
+ * <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -71,7 +68,7 @@ public class EditInstrumentController {
   public void setInstrumentService(InstrumentService instrumentService) {
     this.instrumentService = instrumentService;
   }
-  
+
   @GetMapping("/new")
   public ModelAndView create(ModelMap model) throws IOException {
     authorizationManager.throwIfNonAdmin();
@@ -80,18 +77,19 @@ public class EditInstrumentController {
   }
 
   @GetMapping("/{instrumentId}")
-  public ModelAndView viewInstrument(@PathVariable(value = "instrumentId") Long instrumentId, ModelMap model) throws IOException {
+  public ModelAndView viewInstrument(@PathVariable(value = "instrumentId") Long instrumentId, ModelMap model)
+      throws IOException {
     Instrument instrument = instrumentService.get(instrumentId);
     if (instrument == null) {
       throw new NotFoundException("No instrument found for ID " + instrumentId.toString());
     }
     model.put("title", "Instrument " + instrument.getId());
-    
-    Collection<ServiceRecord> serviceRecords = serviceRecordService.listByInstrument(instrumentId);
+
+    Collection<ServiceRecord> serviceRecords = instrument.getServiceRecords();
     model.put("serviceRecords", serviceRecords.stream().map(Dtos::asDto).collect(Collectors.toList()));
     return setupForm(instrument, model);
   }
-  
+
   private ModelAndView setupForm(Instrument instrument, ModelMap model) throws IOException {
     InstrumentDto instrumentDto = Dtos.asDto(instrument);
 
@@ -127,5 +125,4 @@ public class EditInstrumentController {
 
     return new ModelAndView("/WEB-INF/pages/editInstrument.jsp", model);
   }
-
 }

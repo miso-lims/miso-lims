@@ -15,12 +15,16 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
+import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.persistence.ServiceRecordStore;
 
 public class HibernateInstrumentDaoIT extends AbstractDAOTest {
 
@@ -128,6 +132,14 @@ public class HibernateInstrumentDaoIT extends AbstractDAOTest {
     Instrument instrument = dao.getByName(name);
     assertNotNull(instrument);
     assertEquals(name, instrument.getName());
+  }
+
+  @Test
+  public void testGetbyServiceRecord() throws Exception {
+    ServiceRecord record = (ServiceRecord) currentSession().get(ServiceRecord.class, 3L);
+    Instrument instrument = dao.getByServiceRecord(record);
+    assertNotNull(instrument);
+    assertEquals(2L, instrument.getId());
   }
 
   @Test

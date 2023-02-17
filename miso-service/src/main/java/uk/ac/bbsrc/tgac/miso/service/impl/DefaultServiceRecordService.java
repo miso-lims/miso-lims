@@ -2,7 +2,6 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
-import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
@@ -41,37 +39,33 @@ public class DefaultServiceRecordService implements ServiceRecordService {
   private InstrumentService instrumentService;
 
   @Override
-  public Collection<ServiceRecord> listByInstrument(long instrumentId) throws IOException {
-    return serviceRecordDao.listByInstrumentId(instrumentId);
-  }
-
-  @Override
   public ServiceRecord get(long recordId) throws IOException {
     return serviceRecordDao.get(recordId);
   }
 
   @Override
   public long create(ServiceRecord record) throws IOException {
-    record.setInstrument(instrumentService.get(record.getInstrument().getId()));
     return serviceRecordDao.save(record);
   }
 
   @Override
   public long update(ServiceRecord record) throws IOException {
     ServiceRecord managed = get(record.getId());
-    record.setInstrument(instrumentService.get(managed.getInstrument().getId()));
     validateChange(record, managed);
     applyRecordChanges(managed, record);
     return serviceRecordDao.save(managed);
   }
 
-  private void applyRecordChanges(ServiceRecord target, ServiceRecord source) {
+  private void applyRecordChanges(ServiceRecord target, ServiceRecord source) throws IOException {
+
     target.setTitle(source.getTitle());
     target.setDetails(source.getDetails());
     if (source.getPosition() == null) {
       target.setPosition(null);
     } else {
-      target.setPosition(findPosition(source.getPosition().getId(), target.getInstrument()));
+      Instrument instrument = instrumentService.getByServiceRecord(target);
+      target
+          .setPosition(instrument.findPosition(source.getPosition().getId()));
     }
     target.setServicedByName(source.getServicedByName());
     target.setReferenceNumber(source.getReferenceNumber());
@@ -81,22 +75,25 @@ public class DefaultServiceRecordService implements ServiceRecordService {
     target.setEndTime(source.getEndTime());
   }
 
-  private void validateChange(ServiceRecord record, ServiceRecord beforeChange) {
+  private void validateChange(ServiceRecord record, ServiceRecord beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
+    Instrument instrument = instrumentService.getByServiceRecord(record);
 
-    if (record.getPosition() != null && findPosition(record.getPosition().getId(), record.getInstrument()) == null) {
-      errors.add(new ValidationError("position", "Position must belong to the same instrument as this record"));
+    if (instrument != null && instrumentService.getByServiceRecord(beforeChange).getDateDecommissioned() != null) {
+      throw new IOException("Cannot add service records to a retired instrument!");
+    }
+
+    if (record.getPosition() != null) {
+      if (instrument == null) {
+        errors.add(new ValidationError("Position cannot be set if the record is not for an instrument"));
+      } else if (instrument.findPosition(record.getPosition().getId()) == null) {
+        errors.add(new ValidationError("position", "Position must belong to the same instrument as this record"));
+      }
     }
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }
-  }
-
-  private InstrumentPosition findPosition(long id, Instrument instrument) {
-    return instrument.getInstrumentModel().getPositions().stream()
-        .filter(p -> p.getId() == id)
-        .findFirst().orElse(null);
   }
 
   public void setServiceRecordDao(ServiceRecordStore serviceRecordDao) {
@@ -115,6 +112,13 @@ public class DefaultServiceRecordService implements ServiceRecordService {
 
   @Override
   public void beforeDelete(ServiceRecord object) throws IOException {
+    ServiceRecord managedRecord = get(object.getId());
+    Instrument instrument = instrumentService.getByServiceRecord(object);
+    Instrument managedInstrument = instrumentService.get(instrument.getId());
+    if (managedInstrument != null) {
+      managedInstrument.getServiceRecords().remove(managedRecord);
+      instrumentService.update(instrument);
+    }
     fileAttachmentService.beforeDelete(object);
   }
 

@@ -72,7 +72,6 @@ ListTarget.storage_location = {
         mData: "probeId",
         include: true,
         iSortPriority: 0,
-
       },
     ];
     if (config.slug == "freezers") {

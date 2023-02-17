@@ -1,3 +1,4 @@
+
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
@@ -46,13 +47,9 @@ public class ServiceRecordRestController extends RestController {
     serviceRecordService.bulkDelete(records);
   }
 
-  @PostMapping
-  public @ResponseBody ServiceRecordDto create(@RequestBody ServiceRecordDto dto) throws IOException {
-    return RestUtils.createObject("Service record", dto, Dtos::to, serviceRecordService, Dtos::asDto);
-  }
-
-  @PutMapping("/{recordId}")
-  public @ResponseBody ServiceRecordDto update(@PathVariable long recordId, @RequestBody ServiceRecordDto dto) throws IOException {
+  @PutMapping(value = "/{recordId}")
+  public @ResponseBody ServiceRecordDto update(@PathVariable long recordId, @RequestBody ServiceRecordDto dto)
+      throws IOException {
     return RestUtils.updateObject("Service record", recordId, dto, Dtos::to, serviceRecordService, Dtos::asDto);
   }
 

@@ -35,6 +35,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
+import ca.on.oicr.gsi.runscanner.dto.IlluminaNotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.NotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.OxfordNanoporeNotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.type.IndexSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
@@ -202,7 +206,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListContainerRunView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListContainerView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolView;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolViewElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListWorksetView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentIdentityAttributes;
@@ -277,11 +280,6 @@ import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.RunPositionDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.SolidRunDto;
 
-import ca.on.oicr.gsi.runscanner.dto.IlluminaNotificationDto;
-import ca.on.oicr.gsi.runscanner.dto.NotificationDto;
-import ca.on.oicr.gsi.runscanner.dto.OxfordNanoporeNotificationDto;
-import ca.on.oicr.gsi.runscanner.dto.type.IndexSequencing;
-
 @SuppressWarnings("squid:S3776") // make Sonar ignore cognitive complexity warnings for this file
 public class Dtos {
   private static final Logger log = LoggerFactory.getLogger(Dtos.class);
@@ -301,7 +299,8 @@ public class Dtos {
 
   public static TissueOrigin to(TissueOriginDto from) {
     TissueOrigin to = new TissueOriginImpl();
-    if (from.getId() != null) to.setId(from.getId());
+    if (from.getId() != null)
+      to.setId(from.getId());
     setString(to::setAlias, from.getAlias());
     setString(to::setDescription, from.getDescription());
     return to;
@@ -394,10 +393,12 @@ public class Dtos {
       return st;
     });
     if (from.getParentRelationships() != null) {
-      to.getParentRelationships().addAll(from.getParentRelationships().stream().map(Dtos::to).collect(Collectors.toSet()));
+      to.getParentRelationships()
+          .addAll(from.getParentRelationships().stream().map(Dtos::to).collect(Collectors.toSet()));
     }
     if (from.getChildRelationships() != null) {
-      to.getChildRelationships().addAll(from.getChildRelationships().stream().map(Dtos::to).collect(Collectors.toSet()));
+      to.getChildRelationships()
+          .addAll(from.getChildRelationships().stream().map(Dtos::to).collect(Collectors.toSet()));
     }
     return to;
   }
@@ -493,7 +494,8 @@ public class Dtos {
         .collect(Collectors.toList());
   }
 
-  private static SampleDto copySampleFields(@Nonnull Sample from, @Nonnull SampleDto dto, boolean includeBoxPositions, int libraryCount) {
+  private static SampleDto copySampleFields(@Nonnull Sample from, @Nonnull SampleDto dto, boolean includeBoxPositions,
+      int libraryCount) {
     dto.setId(from.getId());
     dto.setName(from.getName());
     dto.setDescription(from.getDescription());
@@ -564,7 +566,8 @@ public class Dtos {
       dto.setParentSampleClassId(parent.getSampleClass().getId());
       if (parent.getBox() != null) {
         dto.setParentBoxPosition(parent.getBoxPosition());
-        dto.setParentBoxPositionLabel(BoxUtils.makeBoxPositionLabel(parent.getBox().getAlias(), parent.getBoxPosition()));
+        dto.setParentBoxPositionLabel(
+            BoxUtils.makeBoxPositionLabel(parent.getBox().getAlias(), parent.getBoxPosition()));
       }
     }
     GroupIdentifiable effective = from.getEffectiveGroupIdEntity();
@@ -642,14 +645,16 @@ public class Dtos {
         if (sam.getDetailedQcStatus() != null && Boolean.FALSE.equals(sam.getDetailedQcStatus().getStatus())) {
           to.setEffectiveQcFailureId(sam.getDetailedQcStatus().getId());
           to.setEffectiveQcFailureLevel(
-              sam.getParentSampleClass() == null ? EntityType.SAMPLE.getLabel() : sam.getParentSampleClass().getSampleCategory());
+              sam.getParentSampleClass() == null ? EntityType.SAMPLE.getLabel()
+                  : sam.getParentSampleClass().getSampleCategory());
           return;
         }
         for (GrandparentSample parent = sam.getParentSample(); parent != null; parent = parent.getParentSample()) {
           if (sam.getDetailedQcStatus() != null && Boolean.FALSE.equals(sam.getDetailedQcStatus().getStatus())) {
             to.setEffectiveQcFailureId(parent.getDetailedQcStatus().getId());
             to.setEffectiveQcFailureLevel(
-                parent.getParentSampleClass() == null ? EntityType.SAMPLE.getLabel() : parent.getParentSampleClass().getSampleCategory());
+                parent.getParentSampleClass() == null ? EntityType.SAMPLE.getLabel()
+                    : parent.getParentSampleClass().getSampleCategory());
             return;
           }
         }
@@ -694,7 +699,8 @@ public class Dtos {
     to.setGroupId(nullifyStringIfBlank(from.getGroupId()));
     to.setGroupDescription(nullifyStringIfBlank(from.getGroupDescription()));
     to.setSynthetic(from.getSynthetic());
-    to.setCreationDate(LimsUtils.isStringEmptyOrNull(from.getCreationDate()) ? null : parseDate(from.getCreationDate()));
+    to.setCreationDate(
+        LimsUtils.isStringEmptyOrNull(from.getCreationDate()) ? null : parseDate(from.getCreationDate()));
     if (from.getIdentityId() != null) {
       to.setIdentityId(from.getIdentityId());
     }
@@ -709,16 +715,19 @@ public class Dtos {
    * Extracts parent details from the DTO, according to these possible cases:
    *
    * <ol>
-   * <li>parent ID is provided. This implies that the parent exists, so no other parent information will be required</li>
-   * <li>identity information and parentSampleClassId are provided. This implies that a tissue parent should be created, and that the
-   * identity may or may not yet exist. If the sampleClassId is an aliquot, a stockClassId must be provided. ParentAliquotClassId may be
-   * provided to indicate a second aliquot level in the hierarchy</li>
-   * <li>identity information is provided, but no parentSampleClassId. You must be creating a tissue in this case.</li>
+   * <li>parent ID is provided. This implies that the parent exists, so no other parent information
+   * will be required</li>
+   * <li>identity information and parentSampleClassId are provided. This implies that a tissue parent
+   * should be created, and that the identity may or may not yet exist. If the sampleClassId is an
+   * aliquot, a stockClassId must be provided. ParentAliquotClassId may be provided to indicate a
+   * second aliquot level in the hierarchy</li>
+   * <li>identity information is provided, but no parentSampleClassId. You must be creating a tissue
+   * in this case.</li>
    * </ol>
    *
-   * @param childDto
-   *          the DTO to take parent details from
-   * @return the parent details from the DTO, or null if there are none. A returned sample will also include its own parent if applicable.
+   * @param childDto the DTO to take parent details from
+   * @return the parent details from the DTO, or null if there are none. A returned sample will also
+   *         include its own parent if applicable.
    */
   private static DetailedSample getParent(@Nonnull DetailedSampleDto childDto) {
     DetailedSample parent = null;
@@ -902,7 +911,8 @@ public class Dtos {
       to = new SampleImpl();
     }
 
-    if (from.getId() != null) to.setId(from.getId());
+    if (from.getId() != null)
+      to.setId(from.getId());
     to.setAccession(nullifyStringIfBlank(from.getAccession()));
     to.setName(from.getName());
     to.setDescription(nullifyStringIfBlank(from.getDescription()));
@@ -941,7 +951,8 @@ public class Dtos {
     return to;
   }
 
-  private static <T extends AbstractBoxableDto, U extends AbstractBoxable> AbstractBoxPosition makeBoxablePosition(@Nonnull T from,
+  private static <T extends AbstractBoxableDto, U extends AbstractBoxable> AbstractBoxPosition makeBoxablePosition(
+      @Nonnull T from,
       @Nonnull U to) {
     if (from.getBox() != null && (from.getBox().getId() != null || !isStringEmptyOrNull(from.getBoxPosition()))) {
       AbstractBoxPosition bp = to.getEntityType().makeBoxPosition();
@@ -1013,7 +1024,8 @@ public class Dtos {
     return dto;
   }
 
-  public static Set<SampleValidRelationshipDto> asSampleValidRelationshipDtos(@Nonnull Set<SampleValidRelationship> from) {
+  public static Set<SampleValidRelationshipDto> asSampleValidRelationshipDtos(
+      @Nonnull Set<SampleValidRelationship> from) {
     return from.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 
@@ -1211,7 +1223,8 @@ public class Dtos {
 
   public static KitDescriptor to(@Nonnull KitDescriptorDto from) {
     KitDescriptor to = new KitDescriptor();
-    if (from.getId() != null) to.setId(from.getId());
+    if (from.getId() != null)
+      to.setId(from.getId());
     to.setName(from.getName());
     setString(to::setDescription, from.getDescription());
     to.setManufacturer(from.getManufacturer());
@@ -1284,12 +1297,14 @@ public class Dtos {
   }
 
   public static DetailedLibrary toDetailedLibrary(DetailedLibraryDto from) {
-    if (from == null) return null;
+    if (from == null)
+      return null;
     DetailedLibrary to = new DetailedLibraryImpl();
     setObject(to::setLibraryDesign, LibraryDesign::new, from.getLibraryDesignId());
     setObject(to::setLibraryDesignCode, LibraryDesignCode::new, from.getLibraryDesignCodeId());
 
-    if (from.getArchived() != null) to.setArchived(from.getArchived());
+    if (from.getArchived() != null)
+      to.setArchived(from.getArchived());
     to.setNonStandardAlias(from.getNonStandardAlias());
     if (from.getGroupId() != null) {
       to.setGroupId(from.getGroupId());
@@ -1317,13 +1332,15 @@ public class Dtos {
     return dto;
   }
 
-  public static Set<SequencingOrderDto> asSequencingOrderDtos(@Nonnull Collection<SequencingOrder> from, IndexChecker indexChecker) {
+  public static Set<SequencingOrderDto> asSequencingOrderDtos(@Nonnull Collection<SequencingOrder> from,
+      IndexChecker indexChecker) {
     return from.stream().map(so -> Dtos.asDto(so, indexChecker)).collect(Collectors.toSet());
   }
 
   public static SequencingOrder to(@Nonnull SequencingOrderDto from) {
     SequencingOrder to = new SequencingOrderImpl();
-    if (from.getId() != null) to.setId(from.getId());
+    if (from.getId() != null)
+      to.setId(from.getId());
     to.setPool(to(from.getPool()));
     setObject(to::setContainerModel, SequencingContainerModel::new, from.getContainerModelId());
     to.setSequencingParameters(to(from.getParameters()));
@@ -1358,7 +1375,8 @@ public class Dtos {
     return to;
   }
 
-  public static List<SequencingParametersDto> asSequencingParametersDtos(@Nonnull Collection<SequencingParameters> from) {
+  public static List<SequencingParametersDto> asSequencingParametersDtos(
+      @Nonnull Collection<SequencingParameters> from) {
     List<SequencingParametersDto> dtoList = from.stream().map(Dtos::asDto).collect(Collectors.toList());
     Collections.sort(dtoList, new Comparator<SequencingParametersDto>() {
 
@@ -1447,11 +1465,13 @@ public class Dtos {
     dto.setDiscarded(from.isDiscarded());
     if (from.getSample().getBox() != null) {
       dto.setSampleBoxPosition(from.getSample().getBoxPosition());
-      dto.setSampleBoxPositionLabel(BoxUtils.makeBoxPositionLabel(from.getSample().getBox().getAlias(), from.getSample().getBoxPosition()));
+      dto.setSampleBoxPositionLabel(
+          BoxUtils.makeBoxPositionLabel(from.getSample().getBox().getAlias(), from.getSample().getBoxPosition()));
     }
     setId(dto::setSpikeInId, from.getSpikeIn());
     setString(dto::setSpikeInVolume, from.getSpikeInVolume());
-    setString(dto::setSpikeInDilutionFactor, maybeGetProperty(from.getSpikeInDilutionFactor(), DilutionFactor::getLabel));
+    setString(dto::setSpikeInDilutionFactor,
+        maybeGetProperty(from.getSpikeInDilutionFactor(), DilutionFactor::getLabel));
     setBoolean(dto::setUmis, from.getUmis(), false);
     setId(dto::setWorkstationId, from.getWorkstation());
     setId(dto::setThermalCyclerId, from.getThermalCycler());
@@ -1477,7 +1497,8 @@ public class Dtos {
     } else {
       to = new LibraryImpl();
     }
-    if (from.getId() != null) to.setId(from.getId());
+    if (from.getId() != null)
+      to.setId(from.getId());
 
     to.setAlias(from.getAlias());
     to.setName(from.getName());
@@ -1503,7 +1524,8 @@ public class Dtos {
     if (from.getLibraryTypeId() != null) {
       LibraryType type = new LibraryType();
       type.setId(from.getLibraryTypeId());
-      if (from.getLibraryTypeAlias() != null) type.setDescription(from.getLibraryTypeAlias());
+      if (from.getLibraryTypeAlias() != null)
+        type.setDescription(from.getLibraryTypeAlias());
       to.setLibraryType(type);
     }
     setObject(to::setDetailedQcStatus, DetailedQcStatusImpl::new, from.getDetailedQcStatusId());
@@ -1655,7 +1677,8 @@ public class Dtos {
       }
       if (detailed.getIdentityAttributes() != null) {
         ParentIdentityAttributes identity = detailed.getIdentityAttributes();
-        setString(detailedDto::setIdentityConsentLevel, maybeGetProperty(identity.getConsentLevel(), ConsentLevel::getLabel));
+        setString(detailedDto::setIdentityConsentLevel,
+            maybeGetProperty(identity.getConsentLevel(), ConsentLevel::getLabel));
         setString(detailedDto::setEffectiveExternalNames, identity.getExternalName());
       }
       if (detailed.getTissueAttributes() != null) {
@@ -1676,7 +1699,8 @@ public class Dtos {
       setBoolean(dto::setLibraryLowQuality, library.isLowQuality(), false);
       setString(dto::setLibraryPlatformType, library.getPlatformType().getKey());
       if (library.getIndex1() != null) {
-        List<Index> indices = Stream.of(library.getIndex1(), library.getIndex2()).filter(Objects::nonNull).collect(Collectors.toList());
+        List<Index> indices =
+            Stream.of(library.getIndex1(), library.getIndex2()).filter(Objects::nonNull).collect(Collectors.toList());
         dto.setIndexIds(indices.stream().sorted(Comparator.comparingInt(Index::getPosition)).map(Index::getId)
             .collect(Collectors.toList()));
         dto.setIndexLabels(indices.stream().sorted(Comparator.comparingInt(Index::getPosition)).map(Index::getLabel)
@@ -1770,7 +1794,8 @@ public class Dtos {
       }
       if (from.getIdentityAttributes() != null) {
         ParentIdentityAttributes identity = from.getIdentityAttributes();
-        setString(detailedDto::setIdentityConsentLevel, maybeGetProperty(identity.getConsentLevel(), ConsentLevel::getLabel));
+        setString(detailedDto::setIdentityConsentLevel,
+            maybeGetProperty(identity.getConsentLevel(), ConsentLevel::getLabel));
         setString(detailedDto::setEffectiveExternalNames, identity.getExternalName());
       }
       if (from.getTissueAttributes() != null) {
@@ -1820,7 +1845,8 @@ public class Dtos {
     setLong(dto::setProjectId, from.getProjectId(), true);
     setString(dto::setProjectName, from.getProjectName());
     setString(dto::setProjectShortName, from.getProjectShortName());
-    setString(dto::setSequencingControlTypeAlias, maybeGetProperty(from.getSampleSequencingControlType(), SequencingControlType::getAlias));
+    setString(dto::setSequencingControlTypeAlias,
+        maybeGetProperty(from.getSampleSequencingControlType(), SequencingControlType::getAlias));
     setId(dto::setDetailedQcStatusId, from.getDetailedQcStatus());
     setString(dto::setDetailedQcStatusNote, from.getDetailedQcStatusNote());
     setString(dto::setQcUserName, maybeGetProperty(from.getQcUser(), User::getFullName));
@@ -1882,7 +1908,8 @@ public class Dtos {
     return to;
   }
 
-  public static PoolDto asDto(@Nonnull Pool from, boolean includeContents, boolean includeBoxPositions, IndexChecker indexChecker) {
+  public static PoolDto asDto(@Nonnull Pool from, boolean includeContents, boolean includeBoxPositions,
+      IndexChecker indexChecker) {
     PoolDto dto = new PoolDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
@@ -1912,17 +1939,21 @@ public class Dtos {
       dto.setPooledElements(pooledElements);
       if (indexChecker != null) {
         dto.setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(from));
-        dto.setDuplicateIndices(dto.getDuplicateIndicesSequences() != null && !dto.getDuplicateIndicesSequences().isEmpty());
+        dto.setDuplicateIndices(
+            dto.getDuplicateIndicesSequences() != null && !dto.getDuplicateIndicesSequences().isEmpty());
         dto.setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(from));
-        dto.setNearDuplicateIndices(dto.getNearDuplicateIndicesSequences() != null && !dto.getNearDuplicateIndicesSequences().isEmpty());
+        dto.setNearDuplicateIndices(
+            dto.getNearDuplicateIndicesSequences() != null && !dto.getNearDuplicateIndicesSequences().isEmpty());
       }
     } else {
       dto.setPooledElements(Collections.emptySet());
       if (indexChecker != null) {
         dto.setDuplicateIndices(
-            indexChecker.getDuplicateIndicesSequences(from) != null && !indexChecker.getDuplicateIndicesSequences(from).isEmpty());
+            indexChecker.getDuplicateIndicesSequences(from) != null
+                && !indexChecker.getDuplicateIndicesSequences(from).isEmpty());
         dto.setNearDuplicateIndices(
-            indexChecker.getNearDuplicateIndicesSequences(from) != null && !indexChecker.getNearDuplicateIndicesSequences(from).isEmpty());
+            indexChecker.getNearDuplicateIndicesSequences(from) != null
+                && !indexChecker.getNearDuplicateIndicesSequences(from).isEmpty());
       }
     }
     dto.setHasEmptySequence(from.hasLibrariesWithoutIndex());
@@ -1960,9 +1991,11 @@ public class Dtos {
     to.setLibraryAliquotCount(from.getElements().size());
     setDateTimeString(to::setLastModified, from.getLastModified());
     to.setDuplicateIndices(
-        indexChecker.getDuplicateIndicesSequences(from) != null && !indexChecker.getDuplicateIndicesSequences(from).isEmpty());
+        indexChecker.getDuplicateIndicesSequences(from) != null
+            && !indexChecker.getDuplicateIndicesSequences(from).isEmpty());
     to.setNearDuplicateIndices(
-        indexChecker.getNearDuplicateIndicesSequences(from) != null && !indexChecker.getNearDuplicateIndicesSequences(from).isEmpty());
+        indexChecker.getNearDuplicateIndicesSequences(from) != null
+            && !indexChecker.getNearDuplicateIndicesSequences(from).isEmpty());
     to.setHasEmptySequence(from.getElements().stream().anyMatch(element -> element.getIndex1() == null));
     to.setPrioritySubprojectAliases(from.getPrioritySubprojectAliases());
     to.setPooledElements(from.getElements().stream()
@@ -2022,7 +2055,8 @@ public class Dtos {
     dto.setRunPath(from.getFilePath());
 
     if (includeContainers) {
-      dto.setContainers(asContainerDtos(from.getSequencerPartitionContainers(), includeContainerPartitions, includePoolContents));
+      dto.setContainers(
+          asContainerDtos(from.getSequencerPartitionContainers(), includeContainerPartitions, includePoolContents));
     }
 
     setBoolean(dto::setQcPassed, from.getQcPassed(), true);
@@ -2032,7 +2066,8 @@ public class Dtos {
     setString(dto::setDataReviewer, maybeGetProperty(from.getDataReviewer(), User::getFullName));
     setDateString(dto::setDataReviewDate, from.getDataReviewDate());
     setId(dto::setSopId, from.getSop());
-    setString(dto::setDataManglingPolicy, maybeGetProperty(from.getDataManglingPolicy(), InstrumentDataManglingPolicy::name));
+    setString(dto::setDataManglingPolicy,
+        maybeGetProperty(from.getDataManglingPolicy(), InstrumentDataManglingPolicy::name));
 
     dto.setProjectsLabel(from.getProjectsLabel());
 
@@ -2043,7 +2078,8 @@ public class Dtos {
     if (from instanceof IlluminaRun) {
       IlluminaRunDto dto = new IlluminaRunDto();
       IlluminaRun illuminaRun = (IlluminaRun) from;
-      setString(dto::setWorkflowType, maybeGetProperty(illuminaRun.getWorkflowType(), IlluminaWorkflowType::getRawValue));
+      setString(dto::setWorkflowType,
+          maybeGetProperty(illuminaRun.getWorkflowType(), IlluminaWorkflowType::getRawValue));
       dto.setNumCycles(illuminaRun.getNumCycles());
       dto.setCalledCycles(illuminaRun.getCallCycle());
       dto.setImagedCycles(illuminaRun.getImgCycle());
@@ -2145,7 +2181,8 @@ public class Dtos {
     return asDto(from, false, false, indexChecker);
   }
 
-  public static ContainerDto asDto(@Nonnull SequencerPartitionContainer from, boolean includePartitions, boolean includePoolContents,
+  public static ContainerDto asDto(@Nonnull SequencerPartitionContainer from, boolean includePartitions,
+      boolean includePoolContents,
       IndexChecker indexChecker) {
     ContainerDto dto = null;
     if (from instanceof OxfordNanoporeContainer) {
@@ -2209,7 +2246,8 @@ public class Dtos {
     }
     setLong(to::setId, from.getId(), false);
     setString(to::setIdentificationBarcode, from.getIdentificationBarcode());
-    setObject(to::setModel, SequencingContainerModel::new, maybeGetProperty(from.getModel(), SequencingContainerModelDto::getId));
+    setObject(to::setModel, SequencingContainerModel::new,
+        maybeGetProperty(from.getModel(), SequencingContainerModelDto::getId));
     setString(to::setDescription, from.getDescription());
     setObject(to::setClusteringKit, KitDescriptor::new, from.getClusteringKitId());
     setString(to::setClusteringKitLot, from.getClusteringKitLot());
@@ -2226,9 +2264,11 @@ public class Dtos {
     setId(dto::setPositionId, from.getPosition());
     setString(dto::setPositionAlias, maybeGetProperty(from.getPosition(), InstrumentPosition::getAlias));
     setId(dto::setId, from.getContainer());
-    setString(dto::setIdentificationBarcode, maybeGetProperty(from.getContainer(), SequencerPartitionContainer::getIdentificationBarcode));
+    setString(dto::setIdentificationBarcode,
+        maybeGetProperty(from.getContainer(), SequencerPartitionContainer::getIdentificationBarcode));
     setObject(dto::setContainerModel, from.getContainer().getModel(), Dtos::asDto);
-    setDateTimeString(dto::setLastModified, maybeGetProperty(from.getContainer(), SequencerPartitionContainer::getLastModified));
+    setDateTimeString(dto::setLastModified,
+        maybeGetProperty(from.getContainer(), SequencerPartitionContainer::getLastModified));
     return dto;
   }
 
@@ -2238,7 +2278,8 @@ public class Dtos {
     dto.setAlias(from.getAlias());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setPlatformType(from.getPlatformType().name());
-    dto.setInstrumentModelIds(from.getInstrumentModels().stream().map(InstrumentModel::getId).collect(Collectors.toList()));
+    dto.setInstrumentModelIds(
+        from.getInstrumentModels().stream().map(InstrumentModel::getId).collect(Collectors.toList()));
     dto.setPartitionCount(from.getPartitionCount());
     dto.setFallback(from.isFallback());
     dto.setArchived(from.isArchived());
@@ -2264,7 +2305,8 @@ public class Dtos {
     return to;
   }
 
-  public static List<PartitionDto> asPartitionDtos(@Nonnull Collection<Partition> partitionSubset, boolean includePoolContents,
+  public static List<PartitionDto> asPartitionDtos(@Nonnull Collection<Partition> partitionSubset,
+      boolean includePoolContents,
       IndexChecker indexChecker) {
     List<PartitionDto> dtoList = new ArrayList<>();
     for (Partition partition : partitionSubset) {
@@ -2300,7 +2342,8 @@ public class Dtos {
 
   public static QcType to(@Nonnull QcTypeDto from) {
     QcType to = new QcType();
-    if (from.getId() != null) to.setId(from.getId());
+    if (from.getId() != null)
+      to.setId(from.getId());
     to.setName(from.getName());
     to.setDescription(from.getDescription());
     to.setQcTarget(from.getQcTarget());
@@ -2357,43 +2400,43 @@ public class Dtos {
   public static QC to(@Nonnull QcDto dto) {
     QC to;
     switch (dto.getQcTarget()) {
-    case "Library":
-      LibraryQC newLibraryQc = new LibraryQC();
-      Library ownerLibrary = new LibraryImpl();
-      ownerLibrary.setId(dto.getEntityId());
-      newLibraryQc.setLibrary(ownerLibrary);
-      to = newLibraryQc;
-      break;
-    case "Sample":
-      SampleQC newSampleQc = new SampleQC();
-      Sample ownerSample = new SampleImpl();
-      ownerSample.setId(dto.getEntityId());
-      newSampleQc.setSample(ownerSample);
-      to = newSampleQc;
-      break;
-    case "Pool":
-      PoolQC newPoolQc = new PoolQC();
-      Pool ownerPool = new PoolImpl();
-      ownerPool.setId(dto.getEntityId());
-      newPoolQc.setPool(ownerPool);
-      to = newPoolQc;
-      break;
-    case "Container":
-      ContainerQC newContainerQc = new ContainerQC();
-      SequencerPartitionContainer ownerContainer = new SequencerPartitionContainerImpl();
-      ownerContainer.setId(dto.getEntityId());
-      newContainerQc.setContainer(ownerContainer);
-      to = newContainerQc;
-      break;
-    case "Requisition":
-      RequisitionQC newRequisitionQc = new RequisitionQC();
-      Requisition ownerRequisition = new Requisition();
-      ownerRequisition.setId(dto.getEntityId());
-      newRequisitionQc.setRequisition(ownerRequisition);
-      to = newRequisitionQc;
-      break;
-    default:
-      throw new IllegalArgumentException("No such QC target: " + dto.getQcTarget());
+      case "Library":
+        LibraryQC newLibraryQc = new LibraryQC();
+        Library ownerLibrary = new LibraryImpl();
+        ownerLibrary.setId(dto.getEntityId());
+        newLibraryQc.setLibrary(ownerLibrary);
+        to = newLibraryQc;
+        break;
+      case "Sample":
+        SampleQC newSampleQc = new SampleQC();
+        Sample ownerSample = new SampleImpl();
+        ownerSample.setId(dto.getEntityId());
+        newSampleQc.setSample(ownerSample);
+        to = newSampleQc;
+        break;
+      case "Pool":
+        PoolQC newPoolQc = new PoolQC();
+        Pool ownerPool = new PoolImpl();
+        ownerPool.setId(dto.getEntityId());
+        newPoolQc.setPool(ownerPool);
+        to = newPoolQc;
+        break;
+      case "Container":
+        ContainerQC newContainerQc = new ContainerQC();
+        SequencerPartitionContainer ownerContainer = new SequencerPartitionContainerImpl();
+        ownerContainer.setId(dto.getEntityId());
+        newContainerQc.setContainer(ownerContainer);
+        to = newContainerQc;
+        break;
+      case "Requisition":
+        RequisitionQC newRequisitionQc = new RequisitionQC();
+        Requisition ownerRequisition = new Requisition();
+        ownerRequisition.setId(dto.getEntityId());
+        newRequisitionQc.setRequisition(ownerRequisition);
+        to = newRequisitionQc;
+        break;
+      default:
+        throw new IllegalArgumentException("No such QC target: " + dto.getQcTarget());
     }
     if (dto.getId() != null) {
       to.setId(dto.getId());
@@ -2427,35 +2470,35 @@ public class Dtos {
       QcControlRun to = null;
 
       switch (qcTarget) {
-      case Container:
-        ContainerQcControlRun containerQcControlRun = new ContainerQcControlRun();
-        containerQcControlRun.setQc((ContainerQC) qc);
-        ((ContainerQC) qc).getControls().add(containerQcControlRun);
-        to = containerQcControlRun;
-        break;
-      case Library:
-        LibraryQcControlRun libraryQcControlRun = new LibraryQcControlRun();
-        libraryQcControlRun.setQc((LibraryQC) qc);
-        ((LibraryQC) qc).getControls().add(libraryQcControlRun);
-        to = libraryQcControlRun;
-        break;
-      case Pool:
-        PoolQcControlRun poolQcControlRun = new PoolQcControlRun();
-        poolQcControlRun.setQc((PoolQC) qc);
-        ((PoolQC) qc).getControls().add(poolQcControlRun);
-        to = poolQcControlRun;
-        break;
-      case Run:
-        throw new IllegalArgumentException("Unhandled QC target: Run");
-      case Sample:
-        SampleQcControlRun sampleQcControlRun = new SampleQcControlRun();
-        sampleQcControlRun.setQc((SampleQC) qc);
-        ((SampleQC) qc).getControls().add(sampleQcControlRun);
-        to = sampleQcControlRun;
-        break;
-      default:
-        throw new IllegalArgumentException(
-            "Unhandled QC target: " + qcTarget == null ? "null" : qcTarget.getLabel());
+        case Container:
+          ContainerQcControlRun containerQcControlRun = new ContainerQcControlRun();
+          containerQcControlRun.setQc((ContainerQC) qc);
+          ((ContainerQC) qc).getControls().add(containerQcControlRun);
+          to = containerQcControlRun;
+          break;
+        case Library:
+          LibraryQcControlRun libraryQcControlRun = new LibraryQcControlRun();
+          libraryQcControlRun.setQc((LibraryQC) qc);
+          ((LibraryQC) qc).getControls().add(libraryQcControlRun);
+          to = libraryQcControlRun;
+          break;
+        case Pool:
+          PoolQcControlRun poolQcControlRun = new PoolQcControlRun();
+          poolQcControlRun.setQc((PoolQC) qc);
+          ((PoolQC) qc).getControls().add(poolQcControlRun);
+          to = poolQcControlRun;
+          break;
+        case Run:
+          throw new IllegalArgumentException("Unhandled QC target: Run");
+        case Sample:
+          SampleQcControlRun sampleQcControlRun = new SampleQcControlRun();
+          sampleQcControlRun.setQc((SampleQC) qc);
+          ((SampleQC) qc).getControls().add(sampleQcControlRun);
+          to = sampleQcControlRun;
+          break;
+        default:
+          throw new IllegalArgumentException(
+              "Unhandled QC target: " + qcTarget == null ? "null" : qcTarget.getLabel());
       }
       setLong(to::setId, from.getId(), false);
       setObject(to::setControl, QcControl::new, from.getControlId());
@@ -2468,11 +2511,13 @@ public class Dtos {
     return qcTypeSubset.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
-  public static SequencingOrderCompletionDto asDto(@Nonnull SequencingOrderSummaryView from, IndexChecker indexChecker) {
+  public static SequencingOrderCompletionDto asDto(@Nonnull SequencingOrderSummaryView from,
+      IndexChecker indexChecker) {
     SequencingOrderCompletionDto dto = new SequencingOrderCompletionDto();
     setString(dto::setId, from.getId());
     dto.setPool(asDto(from.getPool(), indexChecker));
-    setString(dto::setContainerModelAlias, maybeGetProperty(from.getContainerModel(), SequencingContainerModel::getAlias));
+    setString(dto::setContainerModelAlias,
+        maybeGetProperty(from.getContainerModel(), SequencingContainerModel::getAlias));
     dto.setParameters(asDto(from.getParameters()));
     setDateTimeString(dto::setLastUpdated, from.getLastUpdated());
     dto.setRemaining(from.getRemaining());
@@ -2503,7 +2548,8 @@ public class Dtos {
     setObject(dto::setContainerModels, from.getContainerModels(), containerModels -> containerModels.stream()
         .map(Dtos::asDto)
         .collect(Collectors.toList()));
-    setString(dto::setDataManglingPolicy, maybeGetProperty(from.getDataManglingPolicy(), InstrumentDataManglingPolicy::name));
+    setString(dto::setDataManglingPolicy,
+        maybeGetProperty(from.getDataManglingPolicy(), InstrumentDataManglingPolicy::name));
     return dto;
   }
 
@@ -2525,7 +2571,8 @@ public class Dtos {
           .map(Dtos::to)
           .collect(Collectors.toSet()));
     }
-    setObject(to::setDataManglingPolicy, from.getDataManglingPolicy(), str -> InstrumentDataManglingPolicy.valueOf(str));
+    setObject(to::setDataManglingPolicy, from.getDataManglingPolicy(),
+        str -> InstrumentDataManglingPolicy.valueOf(str));
     return to;
   }
 
@@ -2589,7 +2636,8 @@ public class Dtos {
     setString(to::setRebNumber, dto.getRebNumber());
     setDate(to::setRebExpiry, dto.getRebExpiry());
     setInteger(to::setSamplesExpected, dto.getSamplesExpected(), true);
-    if (dto.getContactId() != null || !isStringEmptyOrNull(dto.getContactName()) || !isStringEmptyOrNull(dto.getContactEmail())) {
+    if (dto.getContactId() != null || !isStringEmptyOrNull(dto.getContactName())
+        || !isStringEmptyOrNull(dto.getContactEmail())) {
       Contact contact = new Contact();
       setLong(contact::setId, dto.getContactId(), false);
       setString(contact::setName, dto.getContactName());
@@ -2764,16 +2812,16 @@ public class Dtos {
     setCommonRunValues(from, to);
 
     switch (to.getPlatformType()) {
-    case PACBIO:
-      break;
-    case OXFORDNANOPORE:
-      setOxfordNanoporeRunValues((OxfordNanoporeNotificationDto) from, (OxfordNanoporeRun) to);
-      break;
-    case ILLUMINA:
-      setIlluminaRunValues((IlluminaNotificationDto) from, (IlluminaRun) to);
-      break;
-    default:
-      throw new NotImplementedException();
+      case PACBIO:
+        break;
+      case OXFORDNANOPORE:
+        setOxfordNanoporeRunValues((OxfordNanoporeNotificationDto) from, (OxfordNanoporeRun) to);
+        break;
+      case ILLUMINA:
+        setIlluminaRunValues((IlluminaNotificationDto) from, (IlluminaRun) to);
+        break;
+      default:
+        throw new NotImplementedException();
     }
     return to;
   }
@@ -2802,12 +2850,12 @@ public class Dtos {
       return null;
     }
     switch (indexSequencing) {
-    case NORMAL:
-      return InstrumentDataManglingPolicy.NONE;
-    case I5_REVERSE_COMPLEMENT:
-      return InstrumentDataManglingPolicy.I5_RC;
-    default:
-      return null;
+      case NORMAL:
+        return InstrumentDataManglingPolicy.NONE;
+      case I5_REVERSE_COMPLEMENT:
+        return InstrumentDataManglingPolicy.I5_RC;
+      default:
+        return null;
     }
   }
 
@@ -2884,7 +2932,8 @@ public class Dtos {
     }
     to.setQcPassed(dto.getQcPassed());
     to.setBoxPosition((PoolBoxPosition) makeBoxablePosition(dto, to));
-    if (dto.isMergeChild()) to.makeMergeChild();
+    if (dto.isMergeChild())
+      to.makeMergeChild();
     return to;
   }
 
@@ -3244,7 +3293,8 @@ public class Dtos {
   }
 
   private static List<ArraySampleDto> asArraySampleDtos(@Nonnull Map<String, Sample> arraySamples) {
-    return arraySamples.entrySet().stream().map(entry -> asArraySampleDto(entry.getKey(), entry.getValue())).collect(Collectors.toList());
+    return arraySamples.entrySet().stream().map(entry -> asArraySampleDto(entry.getKey(), entry.getValue()))
+        .collect(Collectors.toList());
   }
 
   private static ArraySampleDto asArraySampleDto(String position, @Nonnull Sample sample) {
@@ -3588,8 +3638,6 @@ public class Dtos {
   public static ServiceRecordDto asDto(@Nonnull ServiceRecord from) {
     ServiceRecordDto dto = new ServiceRecordDto();
     setId(dto::setId, from);
-    setId(dto::setInstrumentId, from.getInstrument());
-    setString(dto::setInstrumentName, maybeGetProperty(from.getInstrument(), Instrument::getName));
     setDateString(dto::setServiceDate, from.getServiceDate());
     setString(dto::setTitle, from.getTitle());
     setString(dto::setDetails, from.getDetails());
@@ -3609,7 +3657,6 @@ public class Dtos {
   public static ServiceRecord to(@Nonnull ServiceRecordDto dto) {
     ServiceRecord to = new ServiceRecord();
     setLong(to::setId, dto.getId(), false);
-    setObject(to::setInstrument, InstrumentImpl::new, dto.getInstrumentId());
     setDate(to::setServiceDate, dto.getServiceDate());
     setString(to::setTitle, dto.getTitle());
     setString(to::setDetails, dto.getDetails());
@@ -3644,7 +3691,8 @@ public class Dtos {
     return dto;
   }
 
-  private static void setWorksetItemIds(Collection<? extends WorksetItem<?>> worksetItems, Consumer<List<Long>> setter) {
+  private static void setWorksetItemIds(Collection<? extends WorksetItem<?>> worksetItems,
+      Consumer<List<Long>> setter) {
     if (!worksetItems.isEmpty()) {
       setter.accept(worksetItems.stream()
           .map(worksetItem -> worksetItem.getItem().getId())
@@ -3661,11 +3709,13 @@ public class Dtos {
     setObject(workset::setStage, WorksetStage::new, from.getStageId());
     setWorksetItems(workset::setWorksetSamples, from.getSampleIds(), WorksetSample::new, SampleImpl::new);
     setWorksetItems(workset::setWorksetLibraries, from.getLibraryIds(), WorksetLibrary::new, LibraryImpl::new);
-    setWorksetItems(workset::setWorksetLibraryAliquots, from.getLibraryAliquotIds(), WorksetLibraryAliquot::new, LibraryAliquot::new);
+    setWorksetItems(workset::setWorksetLibraryAliquots, from.getLibraryAliquotIds(), WorksetLibraryAliquot::new,
+        LibraryAliquot::new);
     return workset;
   }
 
-  private static <T extends Boxable, J extends WorksetItem<T>> void setWorksetItems(Consumer<Set<J>> setter, List<Long> ids,
+  private static <T extends Boxable, J extends WorksetItem<T>> void setWorksetItems(Consumer<Set<J>> setter,
+      List<Long> ids,
       Supplier<J> worksetItemConstructor, Supplier<T> itemConstructor) {
     if (ids != null && !ids.isEmpty()) {
       setter.accept(ids.stream().map(id -> {
@@ -3685,7 +3735,8 @@ public class Dtos {
     } else {
       to = new LibraryTemplate();
     }
-    if (from.getId() != null) to.setId(from.getId());
+    if (from.getId() != null)
+      to.setId(from.getId());
     to.setAlias(from.getAlias());
     setObject(to::setPlatformType, from.getPlatformType(), PlatformType::valueOf);
     setBigDecimal(to::setDefaultVolume, from.getDefaultVolume());
@@ -3742,7 +3793,8 @@ public class Dtos {
   }
 
   public static DetailedLibraryTemplate toDetailedLibraryTemplate(DetailedLibraryTemplateDto from) {
-    if (from == null) return null;
+    if (from == null)
+      return null;
     DetailedLibraryTemplate to = new DetailedLibraryTemplate();
     setObject(to::setLibraryDesign, LibraryDesign::new, from.getDesignId());
     setObject(to::setLibraryDesignCode, LibraryDesignCode::new, from.getDesignCodeId());
@@ -3879,9 +3931,11 @@ public class Dtos {
     PoolOrderDto dto = asDto(from);
     if (indexChecker != null) {
       dto.setDuplicateIndicesSequences(indexChecker.getDuplicateIndicesSequences(from));
-      dto.setDuplicateIndices(dto.getDuplicateIndicesSequences() != null && !dto.getDuplicateIndicesSequences().isEmpty());
+      dto.setDuplicateIndices(
+          dto.getDuplicateIndicesSequences() != null && !dto.getDuplicateIndicesSequences().isEmpty());
       dto.setNearDuplicateIndicesSequences(indexChecker.getNearDuplicateIndicesSequences(from));
-      dto.setNearDuplicateIndices(dto.getNearDuplicateIndicesSequences() != null && !dto.getNearDuplicateIndicesSequences().isEmpty());
+      dto.setNearDuplicateIndices(
+          dto.getNearDuplicateIndicesSequences() != null && !dto.getNearDuplicateIndicesSequences().isEmpty());
     }
     return dto;
   }
@@ -3949,7 +4003,8 @@ public class Dtos {
 
   public static TissuePieceType to(@Nonnull TissuePieceTypeDto from) {
     TissuePieceType to = new TissuePieceType();
-    if (from.getId() != null) to.setId(from.getId());
+    if (from.getId() != null)
+      to.setId(from.getId());
     setString(to::setName, from.getName());
     setString(to::setAbbreviation, from.getAbbreviation());
     setString(to::setV2NamingCode, from.getV2NamingCode());
@@ -4005,11 +4060,14 @@ public class Dtos {
     setObject(to::setRecipientGroup, Group::new, from.getRecipientGroupId());
     addTransferItems(to::getSampleTransfers, from.getItems(), EntityType.SAMPLE, TransferSample::new, SampleImpl::new,
         SampleBoxPosition::new, Sample::setBoxPosition);
-    addTransferItems(to::getLibraryTransfers, from.getItems(), EntityType.LIBRARY, TransferLibrary::new, LibraryImpl::new,
+    addTransferItems(to::getLibraryTransfers, from.getItems(), EntityType.LIBRARY, TransferLibrary::new,
+        LibraryImpl::new,
         LibraryBoxPosition::new, Library::setBoxPosition);
-    addTransferItems(to::getLibraryAliquotTransfers, from.getItems(), EntityType.LIBRARY_ALIQUOT, TransferLibraryAliquot::new,
+    addTransferItems(to::getLibraryAliquotTransfers, from.getItems(), EntityType.LIBRARY_ALIQUOT,
+        TransferLibraryAliquot::new,
         LibraryAliquot::new, LibraryAliquotBoxPosition::new, LibraryAliquot::setBoxPosition);
-    addTransferItems(to::getPoolTransfers, from.getItems(), EntityType.POOL, TransferPool::new, PoolImpl::new, PoolBoxPosition::new,
+    addTransferItems(to::getPoolTransfers, from.getItems(), EntityType.POOL, TransferPool::new, PoolImpl::new,
+        PoolBoxPosition::new,
         Pool::setBoxPosition);
     return to;
   }
@@ -4021,7 +4079,8 @@ public class Dtos {
     if (transferItemDtos != null && !transferItemDtos.isEmpty()) {
       getToSet.get().addAll(transferItemDtos.stream()
           .filter(transferItemDto -> type.getLabel().equals(transferItemDto.getType()))
-          .map(transferItemDto -> Dtos.to(transferItemDto, constructor, (xfer, item) -> xfer.setItem(item), itemConstructor,
+          .map(transferItemDto -> Dtos.to(transferItemDto, constructor, (xfer, item) -> xfer.setItem(item),
+              itemConstructor,
               boxPositionConstructor, boxPositionSetter))
           .collect(Collectors.toList()));
     }
@@ -4029,7 +4088,8 @@ public class Dtos {
 
   private static TransferItemDto asDto(@Nonnull TransferItem<?> from) {
     TransferItemDto to = new TransferItemDto();
-    setString(to::setType, maybeGetProperty(maybeGetProperty(from.getItem(), Boxable::getEntityType), EntityType::getLabel));
+    setString(to::setType,
+        maybeGetProperty(maybeGetProperty(from.getItem(), Boxable::getEntityType), EntityType::getLabel));
     setLong(to::setId, maybeGetProperty(from.getItem(), Boxable::getId), true);
     setString(to::setName, maybeGetProperty(from.getItem(), Boxable::getName));
     setString(to::setAlias, maybeGetProperty(from.getItem(), Boxable::getAlias));
@@ -4047,9 +4107,11 @@ public class Dtos {
     return to;
   }
 
-  private static <T extends Boxable, U extends TransferItem<T>, V extends AbstractBoxPosition> U to(@Nonnull TransferItemDto from,
+  private static <T extends Boxable, U extends TransferItem<T>, V extends AbstractBoxPosition> U to(
+      @Nonnull TransferItemDto from,
       Supplier<U> constructor,
-      BiConsumer<U, T> itemSetter, Supplier<T> itemConstructor, Supplier<V> boxPositionConstructor, BiConsumer<T, V> boxPositionSetter) {
+      BiConsumer<U, T> itemSetter, Supplier<T> itemConstructor, Supplier<V> boxPositionConstructor,
+      BiConsumer<T, V> boxPositionSetter) {
     U to = constructor.get();
     T toItem = itemConstructor.get();
     setLong(toItem::setId, from.getId(), false);
@@ -4103,7 +4165,8 @@ public class Dtos {
     }
     if (from.getPartition() != null && from.getPartition().getSequencerPartitionContainer() != null) {
       to.setContainerId(from.getPartition().getSequencerPartitionContainer().getId());
-      to.setContainerIdentificationBarcode(from.getPartition().getSequencerPartitionContainer().getIdentificationBarcode());
+      to.setContainerIdentificationBarcode(
+          from.getPartition().getSequencerPartitionContainer().getIdentificationBarcode());
     }
     setInteger(to::setPartitionNumber, maybeGetProperty(from.getPartition(), Partition::getPartitionNumber), true);
     setString(to::setAliquotName, maybeGetProperty(from.getAliquot(), LibraryAliquot::getName));
@@ -4162,7 +4225,8 @@ public class Dtos {
     return to;
   }
 
-  private static <T extends Boxable, R extends TransferItem<T>> R toReceiptTransfer(@Nonnull ReceivableDto<T, R> from, @Nonnull T item) {
+  private static <T extends Boxable, R extends TransferItem<T>> R toReceiptTransfer(@Nonnull ReceivableDto<T, R> from,
+      @Nonnull T item) {
     if (isStringEmptyOrNull(from.getReceivedTime())) {
       return null;
     }
@@ -4199,16 +4263,20 @@ public class Dtos {
     setLong(to::setId, from.getId(), true);
     setString(to::setIdentificationBarcode, from.getIdentificationBarcode());
     setString(to::setPlatform,
-        maybeGetProperty(maybeGetProperty(from.getModel(), SequencingContainerModel::getPlatformType), PlatformType::getKey));
+        maybeGetProperty(maybeGetProperty(from.getModel(), SequencingContainerModel::getPlatformType),
+            PlatformType::getKey));
     setDateTimeString(to::setLastModified, from.getLastModified());
 
-    ListContainerRunView lastRun = from.getRuns().stream().max(Comparator.comparing(ListContainerRunView::getStartDate)).orElse(null);
+    ListContainerRunView lastRun =
+        from.getRuns().stream().max(Comparator.comparing(ListContainerRunView::getStartDate)).orElse(null);
     if (lastRun != null) {
       setLong(to::setLastRunId, lastRun.getId(), true);
       setString(to::setLastRunName, lastRun.getName());
       setString(to::setLastRunAlias, lastRun.getAlias());
-      setLong(to::setLastSequencerId, maybeGetProperty(lastRun.getSequencer(), ListContainerRunSequencerView::getId), true);
-      setString(to::setLastSequencerName, maybeGetProperty(lastRun.getSequencer(), ListContainerRunSequencerView::getName));
+      setLong(to::setLastSequencerId, maybeGetProperty(lastRun.getSequencer(), ListContainerRunSequencerView::getId),
+          true);
+      setString(to::setLastSequencerName,
+          maybeGetProperty(lastRun.getSequencer(), ListContainerRunSequencerView::getName));
     }
     return to;
   }
@@ -4458,7 +4526,8 @@ public class Dtos {
     setter.accept(value == null ? null : value.getId());
   }
 
-  public static <T extends Identifiable> void setObject(@Nonnull Consumer<T> setter, @Nonnull Supplier<T> constructor, Long id) {
+  public static <T extends Identifiable> void setObject(@Nonnull Consumer<T> setter, @Nonnull Supplier<T> constructor,
+      Long id) {
     if (id == null) {
       setter.accept(null);
     } else {
@@ -4486,7 +4555,8 @@ public class Dtos {
    * @param rsType Runscanner Platform
    * @return equivalent MISO PlatformType
    */
-  public static PlatformType getMisoPlatformTypeFromRunscanner(@Nonnull ca.on.oicr.gsi.runscanner.dto.type.Platform rsType) {
+  public static PlatformType getMisoPlatformTypeFromRunscanner(
+      @Nonnull ca.on.oicr.gsi.runscanner.dto.type.Platform rsType) {
     return PlatformType.valueOf(rsType.name());
   }
 
@@ -4496,7 +4566,8 @@ public class Dtos {
    * @param rsType Runscanner HealthType
    * @return equivalent MISO HealthType
    */
-  public static HealthType getMisoHealthTypeFromRunscanner(@Nonnull ca.on.oicr.gsi.runscanner.dto.type.HealthType rsType) {
+  public static HealthType getMisoHealthTypeFromRunscanner(
+      @Nonnull ca.on.oicr.gsi.runscanner.dto.type.HealthType rsType) {
     return HealthType.valueOf(toMisoFormat(rsType.name()));
   }
 

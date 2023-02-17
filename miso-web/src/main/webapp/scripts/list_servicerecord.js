@@ -25,7 +25,7 @@ ListTarget.servicerecord = {
                 Utils.ajaxWithDialog(
                   "Deleting Service Records",
                   "POST",
-                  "/miso/rest/servicerecords/bulk-delete",
+                  Urls.rest.serviceRecords.bulkDelete,
                   ids,
                   function () {
                     Utils.page.pageReload();
@@ -44,7 +44,7 @@ ListTarget.servicerecord = {
           {
             name: "Add",
             handler: function () {
-              window.location = "/miso/instrument/servicerecord/new/" + config.instrumentId;
+              window.location = Urls.ui.instruments.createRecord(config.instrumentId);
             },
           },
         ];
@@ -57,16 +57,26 @@ ListTarget.servicerecord = {
         include: true,
         iSortPriority: 1,
       },
-      ListUtils.labelHyperlinkColumn(
-        "Title",
-        Urls.ui.serviceRecords.edit,
-        Utils.array.getId,
-        function (record) {
-          return record.title;
+      {
+        sTitle: "Title",
+        mData: "title",
+        include: true,
+        iSortPriority: 0,
+        bSortDirection: true,
+        bSortable: true,
+        mRender: function (data, type, full) {
+          if (type === "display") {
+            return data
+              ? '<a href="' +
+                  Urls.ui.instruments.editRecord(config.instrumentId, full.id) +
+                  '">' +
+                  data +
+                  "</a>"
+              : "";
+          }
+          return data;
         },
-        0,
-        true
-      ),
+      },
       {
         sTitle: "Position",
         mData: "position",
@@ -95,10 +105,8 @@ ListTarget.servicerecord = {
             var list = '<ul class="unformatted-list">';
             full.attachments.forEach(function (file) {
               list +=
-                '<li><a href="/miso/attachments/servicerecord/' +
-                full.id +
-                "/" +
-                file.id +
+                '<li><a href="' +
+                Urls.ui.attachments.serviceRecord(full.id, file.id) +
                 '">' +
                 file.filename +
                 "</a></li>";

@@ -6,7 +6,6 @@ import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,9 +28,6 @@ public class HibernateServiceRecordDao implements ServiceRecordStore {
   public long save(ServiceRecord ssr) throws IOException {
     long id;
     if (!ssr.isSaved()) {
-      if (ssr.getInstrument().getDateDecommissioned() != null)
-        throw new IOException("Cannot add service records to a retired instrument!");
-
       id = (long) currentSession().save(ssr);
     } else {
       currentSession().update(ssr);
@@ -48,15 +44,6 @@ public class HibernateServiceRecordDao implements ServiceRecordStore {
   @Override
   public List<ServiceRecord> listAll() throws IOException {
     Criteria criteria = currentSession().createCriteria(ServiceRecord.class);
-    @SuppressWarnings("unchecked")
-    List<ServiceRecord> records = criteria.list();
-    return records;
-  }
-
-  @Override
-  public List<ServiceRecord> listByInstrumentId(long instrumentId) {
-    Criteria criteria = currentSession().createCriteria(ServiceRecord.class);
-    criteria.add(Restrictions.eq("instrument.id", instrumentId));
     @SuppressWarnings("unchecked")
     List<ServiceRecord> records = criteria.list();
     return records;

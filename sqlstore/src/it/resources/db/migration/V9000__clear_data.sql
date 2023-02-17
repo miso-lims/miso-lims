@@ -27,6 +27,7 @@ DELETE FROM Indices;
 DELETE FROM Instrument;
 DELETE FROM InstrumentModel;
 DELETE FROM InstrumentPosition;
+DELETE FROM Instrument_ServiceRecord;
 DELETE FROM Kit;
 DELETE FROM KitDescriptor;
 DELETE FROM KitDescriptorChangeLog;
