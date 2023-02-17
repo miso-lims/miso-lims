@@ -90,7 +90,7 @@ FormTarget.servicerecord = (function ($) {
               type: "datetime",
             },
             {
-              title: "Instrument out of service?",
+              title: "Out of service?",
               data: "outOfService",
               type: "checkbox",
             },
