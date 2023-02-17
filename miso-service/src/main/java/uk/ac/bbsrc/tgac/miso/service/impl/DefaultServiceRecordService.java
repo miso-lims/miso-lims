@@ -85,7 +85,7 @@ public class DefaultServiceRecordService implements ServiceRecordService {
 
     if (record.getPosition() != null) {
       if (instrument == null) {
-        throw new NullPointerException("Position cannot be set if the record is not for an instrument");
+        errors.add(new ValidationError("Position cannot be set if the record is not for an instrument"));
       } else if (instrument.findPosition(record.getPosition().getId()) == null) {
         errors.add(new ValidationError("position", "Position must belong to the same instrument as this record"));
       }

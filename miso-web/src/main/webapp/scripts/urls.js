@@ -969,7 +969,7 @@ Urls = (function () {
   var serviceRecordRestBase = restBase + "/servicerecords";
   rest.serviceRecords = {
     update: idUrlFunction(serviceRecordRestBase),
-    recordBulkDelete: serviceRecordRestBase + "/bulk-delete",
+    bulkDelete: serviceRecordRestBase + "/bulk-delete",
   };
 
   // attachment

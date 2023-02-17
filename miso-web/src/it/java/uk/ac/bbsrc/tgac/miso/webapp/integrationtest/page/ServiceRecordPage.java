@@ -10,6 +10,9 @@ import org.openqa.selenium.support.PageFactory;
 
 public class ServiceRecordPage extends FormPage<ServiceRecordPage.Field> {
 
+  @FindBy(css = ".breadcrumbs li:last-child a")
+  private static WebElement parentBreadcrumb;
+
   public static enum Field implements FormPage.FieldElement {
     ID(By.id("serviceRecordForm_id")), //
     TITLE(By.id("serviceRecordForm_title")), //
@@ -59,6 +62,10 @@ public class ServiceRecordPage extends FormPage<ServiceRecordPage.Field> {
     saveButton.click();
     waitForPageRefresh(html);
     return new ServiceRecordPage(getDriver());
+  }
+
+  public static String getParentName() {
+    return parentBreadcrumb.getText();
   }
 
 }

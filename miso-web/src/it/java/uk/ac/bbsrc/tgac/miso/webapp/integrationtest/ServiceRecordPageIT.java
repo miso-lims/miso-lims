@@ -99,6 +99,7 @@ public class ServiceRecordPageIT extends AbstractIT {
     Instrument instrument = (Instrument) getSession().get(InstrumentImpl.class, 101L);
     assertTrue(instrument.getServiceRecords().stream().anyMatch(x -> x.getId() == savedRecord.getId()));
     assertEquals("NewHiSeq_101", instrument.getName());
+    assertEquals("NewHiSeq_101", ServiceRecordPage.getParentName());
     assertServiceRecordAttributes(fields, savedRecord);
   }
 
@@ -138,6 +139,7 @@ public class ServiceRecordPageIT extends AbstractIT {
     Instrument instrument = (Instrument) getSession().get(InstrumentImpl.class, 101L);
     assertTrue(instrument.getServiceRecords().stream().anyMatch(x -> x.getId() == savedRecord.getId()));
     assertEquals("NewHiSeq_101", instrument.getName());
+    assertEquals("NewHiSeq_101", ServiceRecordPage.getParentName());
     assertServiceRecordAttributes(fields, savedRecord);
   }
 
@@ -176,6 +178,7 @@ public class ServiceRecordPageIT extends AbstractIT {
     Instrument instrument = (Instrument) getSession().get(InstrumentImpl.class, 101L);
     assertTrue(instrument.getServiceRecords().stream().anyMatch(x -> x.getId() == savedRecord.getId()));
     assertEquals("NewHiSeq_101", instrument.getName());
+    assertEquals("NewHiSeq_101", ServiceRecordPage.getParentName());
     assertServiceRecordAttributes(fields, savedRecord);
   }
 

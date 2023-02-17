@@ -81,7 +81,7 @@ public class DefaultInstrumentService implements InstrumentService {
     Instrument managedInstrument = get(instrument.getId());
 
     if (managedInstrument.getDateDecommissioned() != null) {
-      throw new IOException("Cannot add service records to a retired instrument!");
+      throw new ValidationException("Cannot add service records to a retired instrument!");
     }
     if (record.getPosition() != null
         && managedInstrument.findPosition(record.getPosition().getId()) == null) {

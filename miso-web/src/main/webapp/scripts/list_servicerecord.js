@@ -25,7 +25,7 @@ ListTarget.servicerecord = {
                 Utils.ajaxWithDialog(
                   "Deleting Service Records",
                   "POST",
-                  Urls.rest.serviceRecords.recordBulkDelete,
+                  Urls.rest.serviceRecords.bulkDelete,
                   ids,
                   function () {
                     Utils.page.pageReload();
