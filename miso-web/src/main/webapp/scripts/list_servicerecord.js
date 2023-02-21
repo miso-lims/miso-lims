@@ -38,13 +38,25 @@ ListTarget.servicerecord = {
       : [];
   },
   createStaticActions: function (config, projectId) {
-    return config.retiredInstrument
+    if (config.instrumentId) {
+      return config.retiredInstrument
+        ? []
+        : [
+            {
+              name: "Add",
+              handler: function () {
+                window.location = Urls.ui.instruments.createRecord(config.instrumentId);
+              },
+            },
+          ];
+    }
+    return config.retiredFreezer
       ? []
       : [
           {
             name: "Add",
             handler: function () {
-              window.location = Urls.ui.instruments.createRecord(config.instrumentId);
+              window.location = Urls.ui.freezers.createRecord(config.freezerid);
             },
           },
         ];
@@ -66,13 +78,23 @@ ListTarget.servicerecord = {
         bSortable: true,
         mRender: function (data, type, full) {
           if (type === "display") {
-            return data
-              ? '<a href="' +
-                  Urls.ui.instruments.editRecord(config.instrumentId, full.id) +
-                  '">' +
-                  data +
-                  "</a>"
-              : "";
+            if (config.instrumentId) {
+              return data
+                ? '<a href="' +
+                    Urls.ui.instruments.editRecord(config.instrumentId, full.id) +
+                    '">' +
+                    data +
+                    "</a>"
+                : "";
+            } else {
+              return data
+                ? '<a href="' +
+                    Urls.ui.freezers.editRecord(config.freezerId, full.id) +
+                    '">' +
+                    data +
+                    "</a>"
+                : "";
+            }
           }
           return data;
         },
