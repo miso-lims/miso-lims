@@ -44,8 +44,8 @@ public class HibernateStorageLocationDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetbyServiceRecord() throws Exception {
-    ServiceRecord record = (ServiceRecord) currentSession.get(ServiceRecord.class, 4L);
-    StorageLocation storageLocation = dao.getByServiceRecord(record);
+    ServiceRecord record = (ServiceRecord) currentSession().get(ServiceRecord.class, 4L);
+    StorageLocation storageLocation = sut.getByServiceRecord(record);
     assertNotNull(storageLocation);
     assertEquals(1L, storageLocation.getId());
   }
