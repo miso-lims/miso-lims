@@ -159,6 +159,10 @@ public class DefaultStorageLocationService implements StorageLocationService {
     return managedRecord.getId();
   }
 
+  public StorageLocation getByServiceRecord(ServiceRecord record) throws IOException {
+    return storageLocationStore.getByServiceRecord(record);
+  }
+
   /**
    * Checks submitted data for validity, throwing a ValidationException containing all of the errors
    * if invalid

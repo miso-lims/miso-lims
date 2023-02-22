@@ -24,6 +24,8 @@ public interface StorageLocationService extends DeleterService<StorageLocation> 
 
   public long addServiceRecord(ServiceRecord record, StorageLocation location) throws IOException;
 
+  public StorageLocation getByServiceRecord(ServiceRecord record) throws IOException;
+
   /**
    * Gets a freezer associated with a given barcode. If the given barcode is associated with a storage
    * component inside the freezer, the freezer is returned. If the given barcode is associated with a

@@ -4,10 +4,12 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 
+import org.checkerframework.dataflow.qual.TerminatesExecution;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.eaglegenomics.simlims.core.User;
+import com.google.common.annotations.VisibleForTesting;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
@@ -38,6 +40,14 @@ public class HibernateStorageLocationDaoIT extends AbstractDAOTest {
     StorageLocation room = sut.getByBarcode(barcode);
     assertNotNull(room);
     assertEquals(barcode, room.getIdentificationBarcode());
+  }
+
+  @Test
+  public void testGetbyServiceRecord() throws Exception {
+    ServiceRecord record = (ServiceRecord) currentSession.get(ServiceRecord.class, 4L);
+    StorageLocation storageLocation = dao.getByServiceRecord(record);
+    assertNotNull(storageLocation);
+    assertEquals(1L, storageLocation.getId());
   }
 
   @Test

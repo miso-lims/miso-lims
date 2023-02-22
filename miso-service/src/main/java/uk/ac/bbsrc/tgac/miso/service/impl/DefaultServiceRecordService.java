@@ -10,10 +10,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.ServiceRecordService;
+import uk.ac.bbsrc.tgac.miso.core.service.StorageLocationService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
@@ -37,6 +39,9 @@ public class DefaultServiceRecordService implements ServiceRecordService {
 
   @Autowired
   private InstrumentService instrumentService;
+
+  @Autowired
+  private StorageLocationService storageLocationService;
 
   @Override
   public ServiceRecord get(long recordId) throws IOException {
@@ -77,6 +82,7 @@ public class DefaultServiceRecordService implements ServiceRecordService {
 
   private void validateChange(ServiceRecord record, ServiceRecord beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
+
     Instrument instrument = instrumentService.getByServiceRecord(record);
 
     if (instrument != null && instrumentService.getByServiceRecord(beforeChange).getDateDecommissioned() != null) {
@@ -113,6 +119,16 @@ public class DefaultServiceRecordService implements ServiceRecordService {
   @Override
   public void beforeDelete(ServiceRecord object) throws IOException {
     ServiceRecord managedRecord = get(object.getId());
+
+    StorageLocation freezer = storageLocationService.getByServiceRecord(object);
+    StorageLocation managedFreezer = storageLocationService.get(freezer.getId());
+
+    // if the record belongs to the freezer
+    if (managedFreezer != null) {
+      managedFreezer.getServiceRecords().remove(managedRecord);
+      storageLocationService.saveFreezer(freezer);
+    }
+
     Instrument instrument = instrumentService.getByServiceRecord(object);
     Instrument managedInstrument = instrumentService.get(instrument.getId());
     if (managedInstrument != null) {

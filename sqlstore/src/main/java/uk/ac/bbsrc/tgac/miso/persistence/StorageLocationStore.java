@@ -1,7 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.persistence;
 
+import java.io.IOException;
 import java.util.List;
 
+import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 
 public interface StorageLocationStore {
@@ -15,5 +17,7 @@ public interface StorageLocationStore {
   public List<StorageLocation> listFreezers();
 
   public long save(StorageLocation location);
+
+  public StorageLocation getByServiceRecord(ServiceRecord record) throws IOException;
 
 }

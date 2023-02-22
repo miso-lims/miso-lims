@@ -99,7 +99,7 @@ ListTarget.servicerecord = {
           return data;
         },
       },
-      {
+      config.instrumentId && {
         sTitle: "Position",
         mData: "position",
         include: config.hasPositions,
@@ -146,6 +146,6 @@ ListTarget.servicerecord = {
         bVisible: false,
         iSortPriority: 0,
       },
-    ];
+    ].filter(Boolean);
   },
 };

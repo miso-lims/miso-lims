@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
 import uk.ac.bbsrc.tgac.miso.persistence.StorageLocationStore;
@@ -71,6 +73,14 @@ public class HibernateStorageLocationDao implements StorageLocationStore {
       currentSession().update(location);
       return location.getId();
     }
+  }
+
+  @Override
+  public StorageLocation getByServiceRecord(ServiceRecord record) throws IOException {
+    return (StorageLocation) currentSession().createCriteria(StorageLocation.class)
+        .createAlias("serviceRecords", "serviceRecords")
+        .add(Restrictions.eq("serviceRecords.recordId", record.getId()))
+        .uniqueResult();
   }
 
 }
