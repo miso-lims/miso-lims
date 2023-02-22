@@ -119,7 +119,7 @@ public class HibernateServiceRecordDaoIT extends AbstractDAOTest {
   @Test
   public void testListAll() throws IOException {
     List<ServiceRecord> list = dao.listAll();
-    assertEquals(3, list.size());
+    assertEquals(4, list.size());
   }
 
 }
