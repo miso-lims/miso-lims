@@ -127,13 +127,13 @@ public class DefaultServiceRecordService implements ServiceRecordService {
     if (managedFreezer != null) {
       managedFreezer.getServiceRecords().remove(managedRecord);
       storageLocationService.saveFreezer(freezer);
-    }
-
-    Instrument instrument = instrumentService.getByServiceRecord(object);
-    Instrument managedInstrument = instrumentService.get(instrument.getId());
-    if (managedInstrument != null) {
-      managedInstrument.getServiceRecords().remove(managedRecord);
-      instrumentService.update(instrument);
+    } else {
+      Instrument instrument = instrumentService.getByServiceRecord(object);
+      Instrument managedInstrument = instrumentService.get(instrument.getId());
+      if (managedInstrument != null) {
+        managedInstrument.getServiceRecords().remove(managedRecord);
+        instrumentService.update(instrument);
+      }
     }
     fileAttachmentService.beforeDelete(object);
   }
