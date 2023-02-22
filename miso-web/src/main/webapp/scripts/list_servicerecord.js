@@ -56,7 +56,7 @@ ListTarget.servicerecord = {
           {
             name: "Add",
             handler: function () {
-              window.location = Urls.ui.freezers.createRecord(config.freezerid);
+              window.location = Urls.ui.freezers.createRecord(config.freezerId);
             },
           },
         ];

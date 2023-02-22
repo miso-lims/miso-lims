@@ -13,15 +13,23 @@ FormTarget.servicerecord = (function ($) {
       return Urls.external.userManual("instruments", "service-records");
     },
     getSaveUrl: function (record, config) {
+      if (config.instrumentId) {
+        return record.id
+          ? Urls.rest.serviceRecords.update(record.id)
+          : Urls.rest.instruments.createRecord(config.instrumentId);
+      }
       return record.id
         ? Urls.rest.serviceRecords.update(record.id)
-        : Urls.rest.instruments.createRecord(config.instrumentId);
+        : Urls.rest.storageLocations.createRecord(config.freezerId);
     },
     getSaveMethod: function (record) {
       return record.id ? "PUT" : "POST";
     },
     getEditUrl: function (record, config) {
-      return Urls.ui.instruments.editRecord(config.instrumentId, record.id);
+      if (config.instrumentId) {
+        return Urls.ui.instruments.editRecord(config.instrumentId, record.id);
+      }
+      return Urls.ui.freezers.editRecord(config.freezerId, record.id);
     },
     getSections: function (config, object) {
       return [
@@ -51,7 +59,7 @@ FormTarget.servicerecord = (function ($) {
                 "^[^<>]*$" /* one of the form field labels has an ampersand, so allow that here */,
               maxLength: 65535,
             },
-            {
+            config.instrumentId && {
               title: "Position Affected",
               data: "positionId",
               type: "dropdown",
@@ -99,7 +107,7 @@ FormTarget.servicerecord = (function ($) {
               data: "endTime",
               type: "datetime",
             },
-          ],
+          ].filter(Boolean),
         },
       ];
     },

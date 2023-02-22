@@ -1,26 +1,3 @@
-<%--
-  ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
-  ~ MISO project contacts: Robert Davey @ TGAC
-  ~ **********************************************************************
-  ~
-  ~ This file is part of MISO.
-  ~
-  ~ MISO is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
-  ~
-  ~ MISO is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU General Public License for more details.
-  ~
-  ~ You should have received a copy of the GNU General Public License
-  ~ along with MISO.  If not, see <http://www.gnu.org/licenses/>.
-  ~
-  ~ **********************************************************************
-  --%>
-
 <%@ include file="../header.jsp" %>
 
 <div id="maincontent">
@@ -38,12 +15,23 @@
         <li>
           <a href="<c:url value='/miso/'/>">Home</a>
         </li>
-        <li>
-          <a href='<c:url value="/miso/instruments"/>'>Instruments</a>
-        </li>
-        <li>
-          <a href='<c:url value="/miso/instrument/${instrument.id}"/>'>${instrument.name}</a>
-        </li>
+        <c:if test="${instrument.id != null}">
+          <li>
+            <a href='<c:url value="/miso/instruments"/>'>Instruments</a>
+          </li>
+          <li>
+            <a href='<c:url value="/miso/instrument/${instrument.id}"/>'>${instrument.name}</a>
+          </li>
+        </c:if>
+        <c:if test="${freezer.id != null}">
+          <li>
+            <a href='<c:url value="/miso/storagelocations"/>'>Storage Locations</a>
+          </li>
+          <li>
+            <a href='<c:url value="/miso/freezer/${freezer.id}"/>'>${freezer.alias}</a>
+          </li>
+        </c:if>
+
       </ul>
     </div>
     <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#noteArrowClick'), 'noteDiv');">Quick Help
@@ -53,14 +41,27 @@
     on an instrument
     </div>
     
-    <form:form id="serviceRecordForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
-    <script type="text/javascript">
-      jQuery(document).ready(function () {
-        FormUtils.createForm('serviceRecordForm', 'save', ${serviceRecordDto}, 'servicerecord', 
-        {instrumentId: ${instrument.id}, instrumentPositions: ${instrumentPositions}});
-        Utils.ui.updateHelpLink(FormTarget.servicerecord.getUserManualUrl());
-      });
-    </script>
+    <c:if test="${instrument.id != null}">
+      <form:form id="serviceRecordForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>	
+      <script type="text/javascript">	
+        jQuery(document).ready(function () {	
+          FormUtils.createForm('serviceRecordForm', 'save', ${serviceRecordDto}, 'servicerecord', 	
+          {instrumentId: ${instrument.id}, instrumentPositions: ${instrumentPositions}});	
+          Utils.ui.updateHelpLink(FormTarget.servicerecord.getUserManualUrl());	
+        });	
+      </script>
+    </c:if>
+    <c:if test="${freezer.id != null}">
+      <form:form id="serviceRecordForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>	
+      <script type="text/javascript">	
+        jQuery(document).ready(function () {	
+          FormUtils.createForm('serviceRecordForm', 'save', ${serviceRecordDto}, 'servicerecord', 	
+          {freezerId: ${freezer.id}});	
+          Utils.ui.updateHelpLink(FormTarget.servicerecord.getUserManualUrl());	
+        });	
+      </script>
+    </c:if>
+
     <br>
     
     <c:choose>

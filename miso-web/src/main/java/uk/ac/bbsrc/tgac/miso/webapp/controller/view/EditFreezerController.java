@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -84,6 +85,8 @@ public class EditFreezerController {
   public ModelAndView setupForm(@PathVariable(name = "locationId", required = true) long locationId, ModelMap model)
       throws IOException {
     StorageLocation freezer = storageLocationService.get(locationId);
+    Collection<ServiceRecord> serviceRecords = freezer.getServiceRecords();
+    model.put("serviceRecords", serviceRecords.stream().map(Dtos::asDto).collect(Collectors.toList()));
     return setupFreezerForm(freezer, model);
   }
 
@@ -114,7 +117,7 @@ public class EditFreezerController {
       throws IOException {
     StorageLocation freezer = storageLocationService.get(locationId);
     if (freezer == null) {
-      throw new NotFoundException("No instrument found for ID " + locationId.toString());
+      throw new NotFoundException("No location found for ID " + locationId.toString());
     }
     ServiceRecord record = new ServiceRecord();
     model.put("freezer", freezer);
@@ -151,6 +154,4 @@ public class EditFreezerController {
 
     return new ModelAndView("/WEB-INF/pages/editServiceRecord.jsp", model);
   }
-
-
 }
