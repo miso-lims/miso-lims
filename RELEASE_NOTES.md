@@ -7,6 +7,26 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.54.0] - 2023-02-23
+
+### Added
+
+* Requisition supplemental samples to specify related samples from other
+  requisitions
+
+### Changed
+
+* preliminary work to adding service records to Storage/Freezers
+
+### Fixed
+
+* error when attempting to sort on the bulk Add/Edit QCs page
+
+### Upgrade Notes
+
+* Updated to Pinery 2.25.0
+
+
 ## [1.53.1] - 2023-02-09
 
 ### Fixed
