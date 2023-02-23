@@ -2,7 +2,6 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 
-import java.util.Arrays;
 import java.util.Date;
 
 import org.junit.Test;
@@ -10,8 +9,12 @@ import org.junit.Test;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalSample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalSample.RequisitionSupplementalSampleId;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
 public class HibernateRequisitionDaoIT extends AbstractHibernateSaveDaoTest<Requisition, HibernateRequisitionDao> {
@@ -54,6 +57,48 @@ public class HibernateRequisitionDaoIT extends AbstractHibernateSaveDaoTest<Requ
     Requisition req = getTestSubject().getByAlias(alias);
     assertNotNull(req);
     assertEquals(alias, req.getAlias());
+  }
+
+  @Test
+  public void testGetSupplementalSample() throws Exception {
+    long reqId = 2L;
+    long sampleId = 21L;
+    Requisition req = (Requisition) currentSession().get(Requisition.class, reqId);
+    Sample sample = (Sample) currentSession().get(SampleImpl.class, sampleId);
+    RequisitionSupplementalSample result = getTestSubject().getSupplementalSample(req, sample);
+    assertNotNull(result);
+    assertEquals(Long.valueOf(reqId), result.getRequisitionId());
+    assertNotNull(result.getSample());
+    assertEquals(sampleId, result.getSample().getId());
+  }
+
+  @Test
+  public void testSaveSupplementalSample() throws Exception {
+    long reqId = 1L;
+    long sampleId = 5L;
+    Requisition req = (Requisition) currentSession().get(Requisition.class, reqId);
+    Sample sample = (Sample) currentSession().get(SampleImpl.class, sampleId);
+    assertNull(getTestSubject().getSupplementalSample(req, sample));
+
+    getTestSubject().saveSupplementalSample(new RequisitionSupplementalSample(req.getId(), sample));
+
+    assertNotNull(getTestSubject().getSupplementalSample(req, sample));
+  }
+
+  @Test
+  public void testRemoveSupplementalSample() throws Exception {
+    long reqId = 2L;
+    long sampleId = 21L;
+    Sample sample = (Sample) currentSession().get(SampleImpl.class, sampleId);
+    RequisitionSupplementalSampleId supplementalSampleId = new RequisitionSupplementalSampleId();
+    supplementalSampleId.setRequisitionId(reqId);
+    supplementalSampleId.setSample(sample);
+    RequisitionSupplementalSample supplementalSample = currentSession().get(RequisitionSupplementalSample.class, supplementalSampleId);
+    assertNotNull(supplementalSample);
+
+    getTestSubject().removeSupplementalSample(supplementalSample);
+
+    assertNull(currentSession().get(RequisitionSupplementalSample.class, supplementalSampleId));
   }
 
 }

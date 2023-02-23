@@ -1,9 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,16 +13,20 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Note;
 
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalSample;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.AssayService;
+import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.core.service.RequisitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.RequisitionDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SaveDao;
 import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
@@ -35,6 +41,8 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
   private AssayService assayService;
   @Autowired
   private SampleService sampleService;
+  @Autowired
+  private ChangeLogService changeLogService;
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -77,8 +85,10 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
   }
 
   @Override
-  protected void collectValidationErrors(Requisition object, Requisition beforeChange, List<ValidationError> errors) throws IOException {
-    if (ValidationUtils.isChanged(Requisition::getAlias, object, beforeChange) && requisitionDao.getByAlias(object.getAlias()) != null) {
+  protected void collectValidationErrors(Requisition object, Requisition beforeChange, List<ValidationError> errors)
+      throws IOException {
+    if (ValidationUtils.isChanged(Requisition::getAlias, object, beforeChange)
+        && requisitionDao.getByAlias(object.getAlias()) != null) {
       errors.add(ValidationError.forDuplicate("requisition", "alias"));
     }
   }
@@ -157,6 +167,43 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
       sampleService.save(managedSample);
     }
     return requisition;
+  }
+
+  @Override
+  public void addSupplementalSamples(Requisition requisition, Collection<Sample> samples) throws IOException {
+    for (Sample sample : samples) {
+      RequisitionSupplementalSample supplemental = new RequisitionSupplementalSample(requisition.getId(), sample);
+      requisitionDao.saveSupplementalSample(supplemental);
+    }
+    addSupplementalSampleChange(requisition, samples, true);
+  }
+
+  @Override
+  public void removeSupplementalSamples(Requisition requisition, Collection<Sample> samples) throws IOException {
+    for (Sample sample : samples) {
+      RequisitionSupplementalSample supplemental = requisitionDao.getSupplementalSample(requisition, sample);
+      if (supplemental == null) {
+        throw new ValidationException("Supplemental sample %s not found".formatted(sample.getAlias()));
+      }
+      requisitionDao.removeSupplementalSample(supplemental);
+    }
+    addSupplementalSampleChange(requisition, samples, false);
+  }
+
+  private void addSupplementalSampleChange(Requisition requisition, Collection<Sample> samples, boolean addition)
+      throws IOException {
+    StringBuilder sb = new StringBuilder();
+    sb.append(addition ? "Added" : "Removed")
+        .append(" supplementary ")
+        .append(Pluralizer.samples(samples.size()))
+        .append(": ")
+        .append(samples.stream()
+            .map(sample -> "%s (%s)".formatted(sample.getName(), sample.getAlias()))
+            .collect(Collectors.joining("; ")));
+
+    ChangeLog change =
+        requisition.createChangeLog(sb.toString(), "supplementary samples", authorizationManager.getCurrentUser());
+    changeLogService.create(change);
   }
 
 }

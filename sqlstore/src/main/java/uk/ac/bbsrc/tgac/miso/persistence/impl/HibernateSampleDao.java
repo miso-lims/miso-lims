@@ -40,6 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
@@ -55,7 +56,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 @Transactional(rollbackFor = Exception.class)
 public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxableSource<Sample> {
 
-  private static final String[] SEARCH_PROPERTIES = new String[] { "alias", "identificationBarcode", "name" };
+  private static final String[] SEARCH_PROPERTIES = new String[] {"alias", "identificationBarcode", "name"};
   private static final List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(
       new AliasDescriptor("parentAttributes", JoinType.LEFT_OUTER_JOIN),
       new AliasDescriptor("parentAttributes.identityAttributes", JoinType.LEFT_OUTER_JOIN),
@@ -64,8 +65,9 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
       new AliasDescriptor("tissueAttributes.tissueType", JoinType.LEFT_OUTER_JOIN),
       new AliasDescriptor("sampleClass", JoinType.LEFT_OUTER_JOIN));
 
-  private static final List<String> SAMPLE_CATEGORIES = Arrays.asList(SampleIdentity.CATEGORY_NAME, SampleTissue.CATEGORY_NAME,
-      SampleTissueProcessing.CATEGORY_NAME, SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME);
+  private static final List<String> SAMPLE_CATEGORIES =
+      Arrays.asList(SampleIdentity.CATEGORY_NAME, SampleTissue.CATEGORY_NAME,
+          SampleTissueProcessing.CATEGORY_NAME, SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME);
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
@@ -175,7 +177,8 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
-  public List<IdentityView> getIdentitiesByExternalNameOrAliasAndProject(String query, Long projectId, boolean exactMatch)
+  public List<IdentityView> getIdentitiesByExternalNameOrAliasAndProject(String query, Long projectId,
+      boolean exactMatch)
       throws IOException {
     if (isStringEmptyOrNull(query)) {
       return Collections.emptyList();
@@ -238,7 +241,8 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
     }
   }
 
-  private List<IdentityView> filterOnlyExactExternalNameMatches(Collection<IdentityView> candidates, Collection<String> externalNames) {
+  private List<IdentityView> filterOnlyExactExternalNameMatches(Collection<IdentityView> candidates,
+      Collection<String> externalNames) {
     return candidates.stream()
         .filter(identity -> {
           Set<String> names = SampleIdentityImpl.getSetFromString(identity.getExternalName());
@@ -290,16 +294,16 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   @Override
   public String propertyForSortColumn(String original) {
     switch (original) {
-    case "effectiveExternalNames":
-      return "identityAttributes.externalName";
-    case "effectiveTissueOriginAlias":
-      return "tissueOrigin.alias";
-    case "effectiveTissueTypeAlias":
-      return "tissueType.alias";
-    case "sampleClassId":
-      return "sampleClass.alias";
-    default:
-      return original;
+      case "effectiveExternalNames":
+        return "identityAttributes.externalName";
+      case "effectiveTissueOriginAlias":
+        return "tissueOrigin.alias";
+      case "effectiveTissueTypeAlias":
+        return "tissueType.alias";
+      case "sampleClassId":
+        return "sampleClass.alias";
+      default:
+        return original;
     }
   }
 
@@ -311,14 +315,14 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   @Override
   public String propertyForDate(Criteria criteria, DateType type) {
     switch (type) {
-    case CREATE:
-      return detailedSample ? "creationDate" : null;
-    case ENTERED:
-      return "creationTime";
-    case UPDATE:
-      return "lastModified";
-    default:
-      return null;
+      case CREATE:
+        return detailedSample ? "creationDate" : null;
+      case ENTERED:
+        return "creationTime";
+      case UPDATE:
+        return "lastModified";
+      default:
+        return null;
     }
   }
 
@@ -467,6 +471,16 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
+  public void restrictPaginationBySupplementalToRequisitionId(Criteria criteria, long requisitionId,
+      Consumer<String> errorHandler) {
+    DetachedCriteria subquery = DetachedCriteria.forClass(RequisitionSupplementalSample.class)
+        .createAlias("sample", "sample")
+        .add(Restrictions.eq("requisitionId", requisitionId))
+        .setProjection(Projections.property("sample.id"));
+    criteria.add(Property.forName("id").in(subquery));
+  }
+
+  @Override
   public void restrictPaginationBySubproject(Criteria criteria, String query, Consumer<String> errorHandler) {
     if (LimsUtils.isStringBlankOrNull(query)) {
       criteria.add(Restrictions.isNull("subproject"));
@@ -502,12 +516,14 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
-  public void restrictPaginationByDistributionRecipient(Criteria criteria, String query, Consumer<String> errorHandler) {
+  public void restrictPaginationByDistributionRecipient(Criteria criteria, String query,
+      Consumer<String> errorHandler) {
     DbUtils.restrictPaginationByDistributionRecipient(criteria, query, "samples", "sampleId");
   }
 
   @Override
-  public void restrictPaginationByIdentityIds(Criteria criteria, List<Long> identityIds, Consumer<String> errorHandler) {
+  public void restrictPaginationByIdentityIds(Criteria criteria, List<Long> identityIds,
+      Consumer<String> errorHandler) {
     criteria.add(Restrictions.in("identityAttributes.id", identityIds));
   }
 

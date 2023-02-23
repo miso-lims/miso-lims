@@ -2,7 +2,9 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.NotFoundException;
@@ -105,14 +107,20 @@ public class RequisitionController {
     model.put("title", "Requisition " + requisition.getId());
 
     List<Sample> samples = sampleService.list(0, 0, false, "id", PaginationFilter.requisitionId(requisition.getId()));
+    List<Sample> supplementalSamples =
+        sampleService.list(0, 0, false, "id", PaginationFilter.supplementalToRequisitionId(requisition.getId()));
+    Set<Long> sampleIds = Stream.concat(samples.stream(), supplementalSamples.stream())
+        .map(Sample::getId)
+        .collect(Collectors.toSet());
     List<Sample> extractions = sampleService.getChildren(
-        samples.stream().map(Sample::getId).collect(Collectors.toSet()), SampleStock.CATEGORY_NAME);
+        sampleIds,
+        SampleStock.CATEGORY_NAME);
     List<SampleDto> extractionDtos = extractions.stream()
         .map(sam -> Dtos.asDto(sam, false))
         .collect(Collectors.toList());
     model.put("extractions", extractionDtos);
 
-    List<Long> libraryIds = libraryService.listIdsByRequisitionId(requisition.getId());
+    List<Long> libraryIds = libraryService.listIdsByAncestorSampleIds(sampleIds);
     List<Run> runs = runService.listByLibraryIdList(libraryIds);
     List<RunDto> runDtos = runs.stream()
         .map(Dtos::asDto)

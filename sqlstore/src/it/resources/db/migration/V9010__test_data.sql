@@ -457,6 +457,9 @@ INSERT INTO SampleHierarchy(sampleId, identityId, tissueId) VALUES
 (17, 15, 17),
 (21, 15, 21);
 
+INSERT INTO Requisition_SupplementalSample(requisitionId, sampleId) VALUES
+(2, 21);
+
 -- Stocks
 INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identificationBarcode`, `locationBarcode`, `sampleType`, `detailedQcStatusId`,
   qcUser, qcDate, `alias`, `project_projectId`, `scientificNameId`, `taxonIdentifier`, sequencingControlTypeId, `lastModifier`, `lastModified`, `creator`, `created`, sopId,

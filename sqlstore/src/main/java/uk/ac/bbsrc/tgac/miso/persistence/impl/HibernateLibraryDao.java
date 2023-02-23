@@ -1,9 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -25,6 +29,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryBatch;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -90,8 +95,8 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
     return getSessionFactory().getCurrentSession();
   }
 
-  private final static String[] IDENTIFIER_FIELDS = { "name", "alias", "identificationBarcode" };
-  private final static String[] SEARCH_FIELDS = { "name", "alias", "description", "identificationBarcode" };
+  private final static String[] IDENTIFIER_FIELDS = {"name", "alias", "identificationBarcode"};
+  private final static String[] SEARCH_FIELDS = {"name", "alias", "description", "identificationBarcode"};
   private final static List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("sample"),
       new AliasDescriptor("sample.parentAttributes", JoinType.LEFT_OUTER_JOIN),
       new AliasDescriptor("parentAttributes.tissueAttributes", JoinType.LEFT_OUTER_JOIN),
@@ -177,7 +182,8 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
     criteria.setProjection(EntityReference.makeProjectionList("id", "alias"));
     criteria.setResultTransformer(EntityReference.RESULT_TRANSFORMER);
     EntityReference library = (EntityReference) criteria.uniqueResult();
-    if (library != null) return library;
+    if (library != null)
+      return library;
 
     // get library cousins
     criteria = currentSession().createCriteria(LibraryImpl.class);
@@ -194,14 +200,6 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
     return library;
   }
 
-  public List<Library> listBySampleIdList(Collection<Long> sampleIds) throws IOException {
-    Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
-    criteria.add(Restrictions.in("sample.id", sampleIds));
-    @SuppressWarnings("unchecked")
-    List<Library> records = criteria.list();
-    return records;
-  }
-
   @Override
   public List<Long> listIdsByRequisitionId(long requisitionId) throws IOException {
     List<Long> requisitionSampleIds = currentSession().createCriteria(Sample.class)
@@ -209,6 +207,11 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
         .add(Restrictions.eq("requisition.id", requisitionId))
         .setProjection(Projections.property("id"))
         .list();
+    requisitionSampleIds.addAll(currentSession().createCriteria(RequisitionSupplementalSample.class)
+        .createAlias("sample", "sample")
+        .add(Restrictions.eq("requisitionId", requisitionId))
+        .setProjection(Projections.property("sample.id"))
+        .list());
     if (requisitionSampleIds.isEmpty()) {
       return Collections.emptyList();
     }
@@ -217,6 +220,21 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
 
     Set<Long> parentIds = new HashSet<>(aliquotSampleIds);
     parentIds.addAll(requisitionSampleIds);
+
+    List<Long> results = currentSession().createCriteria(LibraryImpl.class)
+        .createAlias("sample", "sample")
+        .add(Restrictions.in("sample.id", parentIds))
+        .setProjection(Projections.property("id"))
+        .list();
+    return results;
+  }
+
+
+  public List<Long> listIdsByAncestorSampleIdList(Collection<Long> sampleIds) throws IOException {
+    Set<Long> aliquotSampleIds = sampleStore.getChildIds(sampleIds, SampleAliquot.CATEGORY_NAME);
+
+    Set<Long> parentIds = new HashSet<>(aliquotSampleIds);
+    parentIds.addAll(sampleIds);
 
     List<Long> results = currentSession().createCriteria(LibraryImpl.class)
         .createAlias("sample", "sample")
@@ -257,30 +275,30 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   @Override
   public String propertyForSortColumn(String original) {
     switch (original) {
-    case "parentSampleId":
-      return "sample.id";
-    case "parentSampleAlias":
-      return "sample.alias";
-    case "effectiveTissueOriginAlias":
-      return "tissueOrigin.alias";
-    case "effectiveTissueTypeAlias":
-      return "tissueType.alias";
-    default:
-      return original;
+      case "parentSampleId":
+        return "sample.id";
+      case "parentSampleAlias":
+        return "sample.alias";
+      case "effectiveTissueOriginAlias":
+        return "tissueOrigin.alias";
+      case "effectiveTissueTypeAlias":
+        return "tissueType.alias";
+      default:
+        return original;
     }
   }
 
   @Override
   public String propertyForDate(Criteria criteria, DateType type) {
     switch (type) {
-    case CREATE:
-      return "creationDate";
-    case ENTERED:
-      return "creationTime";
-    case UPDATE:
-      return "lastModified";
-    default:
-      return null;
+      case CREATE:
+        return "creationDate";
+      case ENTERED:
+        return "creationTime";
+      case UPDATE:
+        return "lastModified";
+      default:
+        return null;
     }
   }
 
@@ -295,7 +313,8 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   }
 
   @Override
-  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
+  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType,
+      Consumer<String> errorHandler) {
     criteria.add(Restrictions.eq("platformType", platformType));
   }
 
@@ -370,7 +389,8 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   }
 
   @Override
-  public void restrictPaginationByDistributionRecipient(Criteria criteria, String query, Consumer<String> errorHandler) {
+  public void restrictPaginationByDistributionRecipient(Criteria criteria, String query,
+      Consumer<String> errorHandler) {
     DbUtils.restrictPaginationByDistributionRecipient(criteria, query, "libraries", "libraryId");
   }
 

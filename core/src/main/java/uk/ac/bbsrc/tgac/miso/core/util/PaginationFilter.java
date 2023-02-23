@@ -374,7 +374,7 @@ public abstract interface PaginationFilter {
 
   public static PaginationFilter subproject(String subproject) {
     return new PaginationFilter() {
-      
+
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
         sink.restrictPaginationBySubproject(item, subproject, errorHandler);
@@ -428,6 +428,16 @@ public abstract interface PaginationFilter {
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
         sink.restrictPaginationByRequisition(item, requisition, errorHandler);
+      }
+    };
+  }
+
+  public static PaginationFilter supplementalToRequisitionId(final long requisitionId) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationBySupplementalToRequisitionId(item, requisitionId, errorHandler);
       }
     };
   }

@@ -36,22 +36,31 @@ requisition form stored in a separate system, or may simply be an identifier of 
 must save the requisition using the "Save" button at the top right before you can add samples. See below for
 information about adding samples and other tasks you can complete from the Edit Requisition page.
 
-### Editing Requisitions
+## Editing Requisitions
 
 After saving a new requisition from the Create Requisition page, you will be taken to the Edit Requisition page. To get
 to the Edit Requisition page for existing requisitions, you can click the requisition alias on the Requisitions list
 page, or in the Requisition field of the Edit Sample page.
 
-The Assay Information section at the top of the page allows you to modify the requisition's alias, assay, and stopped
-status. Be sure to click the "Save" button at the top right to apply your changes.
+The Requisition Information section at the top of the page allows you to modify the requisition's alias, assay, and
+stopped status. Be sure to click the "Save" button at the top right to apply your changes.
 
-You can add or remove samples from the requisition using the Samples table below. To add samples, click the "Add"
-button in the toolbar. Enter sample names, aliases, or barcodes in the dialog and click Search to find and add the
-samples. To remove samples, select them in the list and click the "Remove" button in the toolbar. The Samples list may
-also be used to perform other actions on the samples.
+You can add or remove samples from the requisition using the Requisitioned Samples table below. To add samples, click
+the "Add" button in the toolbar. Enter sample names, aliases, or barcodes in the dialog and click Search to find and
+add the samples. To remove samples, select them in the list and click the "Remove" button in the toolbar. The Samples
+list may also be used to perform other actions on the samples.
 
 Farther down the page, there are more lists showing all of the derived samples (if you are using detailed sample mode),
-libraries, library aliquots, and runs. At the very bottom of the page is the requisition's change log.
+libraries, runs, and run-libraries. At the very bottom of the page is the requisition's change log.
+
+### Supplemental Samples
+
+A supplemental sample is a sample that is related to one or more samples within the requisition, but that is not a part
+of the requisition itself. The supplemental sample may come from a different requisition, or no requisition, and may
+have a different assay, but may be used to complete an assay for one or more samples within the requisition.
+
+You can add or remove supplemental samples from the requisition using the Supplemental Samples table on the Edit
+Requisition page. This works in the same way as adding and removing requisitioned samples.
 
 ### Moving Samples to Another Requisition
 
