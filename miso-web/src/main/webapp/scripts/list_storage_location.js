@@ -81,6 +81,9 @@ ListTarget.storage_location = {
         include: true,
         mRender: function (data, type, full) {
           if (type === "display") {
+            if (full.outOfService) {
+              return "Out of Service";
+            }
             return data ? "Retired" : "Production";
           }
           return data;
