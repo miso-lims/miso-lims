@@ -59,10 +59,11 @@ FormTarget.servicerecord = (function ($) {
                 "^[^<>]*$" /* one of the form field labels has an ampersand, so allow that here */,
               maxLength: 65535,
             },
-            config.instrumentId && {
+            {
               title: "Position Affected",
               data: "positionId",
               type: "dropdown",
+              include: config.instrumentId,
               source: config.instrumentPositions,
               sortSource: Utils.sorting.standardSort("alias"),
               getItemLabel: function (item) {
@@ -107,7 +108,7 @@ FormTarget.servicerecord = (function ($) {
               data: "endTime",
               type: "datetime",
             },
-          ].filter(Boolean),
+          ],
         },
       ];
     },

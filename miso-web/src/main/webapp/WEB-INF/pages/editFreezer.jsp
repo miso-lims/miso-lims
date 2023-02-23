@@ -45,7 +45,7 @@
     <div id="records_arrowclick" class="toggleLeft"></div>
   </div>
   <div id="recordsdiv" class="expandable_section" style="display:none;">
-    <miso:list-section id="list_servicerecords" name="Service Records" target="servicerecord" alwaysShow="true" items="${serviceRecords}" config="{instrumentId: null, freezerId: ${freezer.id}, retiredFreezer: ${freezer.retired}, hasPositions: false, userIsAdmin: ${miso:isAdmin()}}"/>
+    <miso:list-section id="list_servicerecords" name="Service Records" target="servicerecord" alwaysShow="true" items="${serviceRecords}" config="{freezerId: ${freezer.id}, retired: ${freezer.retired}, hasPositions: false, userIsAdmin: ${miso:isAdmin()}}"/>
   </div>
 
   <br/>

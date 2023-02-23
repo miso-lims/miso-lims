@@ -144,11 +144,11 @@ public class DefaultStorageLocationService implements StorageLocationService {
     return storageLocationStore.save(managed);
   }
 
-  public long addServiceRecord(ServiceRecord record, StorageLocation location) throws IOException {
+  public long addServiceRecord(ServiceRecord record, StorageLocation location) throws ValidationException, IOException {
     StorageLocation managedLocation = get(location.getId());
 
     if (location.getRetired()) {
-      throw new IOException("Cannot add service records to a retired storage location!");
+      throw new ValidationException("Cannot add service records to a retired storage location!");
     }
 
     long recordId = serviceRecordService.create(record);

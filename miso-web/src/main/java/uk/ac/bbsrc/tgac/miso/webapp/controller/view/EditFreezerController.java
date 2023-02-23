@@ -103,9 +103,12 @@ public class EditFreezerController {
       @PathVariable(value = "recordId") Long recordId, ModelMap model)
       throws IOException {
     StorageLocation freezer = storageLocationService.get(locationId);
+    if (freezer == null) {
+      throw new NotFoundException("No freezer found for ID " + locationId.toString());
+    }
     ServiceRecord record = serviceRecordService.get(recordId);
     if (record == null) {
-      throw new NotFoundException("No service found for ID " + recordId.toString());
+      throw new NotFoundException("No service record found for ID " + recordId.toString());
     }
     model.put("freezer", freezer);
     return showServiceRecordPage(record, model);

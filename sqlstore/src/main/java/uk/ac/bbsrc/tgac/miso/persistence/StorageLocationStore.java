@@ -5,6 +5,8 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
+
 
 public interface StorageLocationStore {
 
@@ -18,6 +20,6 @@ public interface StorageLocationStore {
 
   public long save(StorageLocation location);
 
-  public StorageLocation getByServiceRecord(ServiceRecord record) throws IOException;
+  public StorageLocation getByServiceRecord(ServiceRecord record) throws ValidationException, IOException;
 
 }

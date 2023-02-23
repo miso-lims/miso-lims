@@ -41,27 +41,24 @@
     on an instrument
     </div>
     
-    <c:if test="${instrument.id != null}">
-      <form:form id="serviceRecordForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>	
-      <script type="text/javascript">	
-        jQuery(document).ready(function () {	
-          FormUtils.createForm('serviceRecordForm', 'save', ${serviceRecordDto}, 'servicerecord', 	
-          {instrumentId: ${instrument.id}, instrumentPositions: ${instrumentPositions}});	
-          Utils.ui.updateHelpLink(FormTarget.servicerecord.getUserManualUrl());	
-        });	
-      </script>
-    </c:if>
-    <c:if test="${freezer.id != null}">
-      <form:form id="serviceRecordForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>	
-      <script type="text/javascript">	
-        jQuery(document).ready(function () {	
-          FormUtils.createForm('serviceRecordForm', 'save', ${serviceRecordDto}, 'servicerecord', 	
-          {freezerId: ${freezer.id}});	
-          Utils.ui.updateHelpLink(FormTarget.servicerecord.getUserManualUrl());	
-        });	
-      </script>
-    </c:if>
+    <form:form id="serviceRecordForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>	
+    <script type="text/javascript">	
+      
+      jQuery(document).ready(function () {	
+        <c:choose>
+          <c:when test="${instrument.id != null}">
+            var config = {instrumentId: ${instrument.id}, instrumentPositions: ${instrumentPositions}};
+          </c:when> 
+          <c:otherwise>
+            var config = {freezerId: ${freezer.id}};	
+          </c:otherwise>
+        </c:choose>
 
+        FormUtils.createForm('serviceRecordForm', 'save', ${serviceRecordDto}, 'servicerecord', 	
+        config);	
+        Utils.ui.updateHelpLink(FormTarget.servicerecord.getUserManualUrl());	
+      });	
+    </script>
     <br>
     
     <c:choose>

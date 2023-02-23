@@ -8,6 +8,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -303,19 +304,16 @@ public class StorageLocationRestController extends RestController {
 
   @PostMapping(value = "/{locationId}/servicerecords")
   public @ResponseBody ServiceRecordDto createRecord(
-      @PathVariable(name = "locationId", required = true) long locationId,
-      @RequestBody ServiceRecordDto dto)
+      @PathVariable(name = "locationId", required = true) Long locationId, @RequestBody ServiceRecordDto dto)
       throws IOException {
+    StorageLocation retrievedFreezer = RestUtils.retrieve("Storage location", locationId, storageLocationService);
+    if (retrievedFreezer == null) {
+      throw new NotFoundException("No freezer found for ID " + locationId.toString());
+    }
     ServiceRecord record = Dtos.to(dto);
     StorageLocation freezer = storageLocationService.get(locationId);
     long savedId = storageLocationService.addServiceRecord(record, freezer);
     return Dtos.asDto(serviceRecordService.get(savedId));
-  }
-
-  @PutMapping("/servicerecords/{recordId}")
-  public @ResponseBody ServiceRecordDto update(@PathVariable long recordId, @RequestBody ServiceRecordDto dto)
-      throws IOException {
-    return RestUtils.updateObject("Service record", recordId, dto, Dtos::to, serviceRecordService, Dtos::asDto);
   }
 
 }

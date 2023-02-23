@@ -38,25 +38,16 @@ ListTarget.servicerecord = {
       : [];
   },
   createStaticActions: function (config, projectId) {
-    if (config.instrumentId) {
-      return config.retiredInstrument
-        ? []
-        : [
-            {
-              name: "Add",
-              handler: function () {
-                window.location = Urls.ui.instruments.createRecord(config.instrumentId);
-              },
-            },
-          ];
-    }
-    return config.retiredFreezer
+    var url = config.instrumentId
+      ? Urls.ui.instruments.createRecord(config.instrumentId)
+      : Urls.ui.freezers.createRecord(config.freezerId);
+    return config.retired
       ? []
       : [
           {
             name: "Add",
             handler: function () {
-              window.location = Urls.ui.freezers.createRecord(config.freezerId);
+              window.location = url;
             },
           },
         ];
@@ -78,28 +69,15 @@ ListTarget.servicerecord = {
         bSortable: true,
         mRender: function (data, type, full) {
           if (type === "display") {
-            if (config.instrumentId) {
-              return data
-                ? '<a href="' +
-                    Urls.ui.instruments.editRecord(config.instrumentId, full.id) +
-                    '">' +
-                    data +
-                    "</a>"
-                : "";
-            } else {
-              return data
-                ? '<a href="' +
-                    Urls.ui.freezers.editRecord(config.freezerId, full.id) +
-                    '">' +
-                    data +
-                    "</a>"
-                : "";
-            }
+            var url = config.instrumentId
+              ? Urls.ui.instruments.editRecord(config.instrumentId, full.id)
+              : Urls.ui.freezers.editRecord(config.freezerId, full.id);
+            return data ? '<a href="' + url + '">' + data + "</a>" : "";
           }
           return data;
         },
       },
-      config.instrumentId && {
+      {
         sTitle: "Position",
         mData: "position",
         include: config.hasPositions,
@@ -146,6 +124,6 @@ ListTarget.servicerecord = {
         bVisible: false,
         iSortPriority: 0,
       },
-    ].filter(Boolean);
+    ];
   },
 };
