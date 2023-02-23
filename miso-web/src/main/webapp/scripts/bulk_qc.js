@@ -53,6 +53,9 @@ BulkTarget.qc = (function () {
       ];
     },
     prepareData: function (data, config) {
+      data.forEach(function (qc) {
+        removeEmptyControls(qc);
+      });
       controlCount =
         Math.max.apply(
           null,
@@ -284,7 +287,13 @@ BulkTarget.qc = (function () {
               type: "dropdown",
               data: "controls." + index + ".controlId",
               getData: function (qc) {
-                if (!qc.controls || !qc.controls.length || qc.controls.length < controlNumber) {
+                if (
+                  !qc.qcTypeId ||
+                  !qc.controls ||
+                  !qc.controls.length ||
+                  qc.controls.length < controlNumber ||
+                  !qc.controls[index].controlId
+                ) {
                   return null;
                 }
                 var qcType = Utils.array.findUniqueOrThrow(
@@ -346,12 +355,16 @@ BulkTarget.qc = (function () {
     confirmSave: function (data, config) {
       data.forEach(function (qc) {
         qc.qcTarget = config.qcTarget;
-        if (qc.controls) {
-          qc.controls = qc.controls.filter(function (control) {
-            return control.controlId;
-          });
-        }
+        removeEmptyControls(qc);
       });
     },
   };
+
+  function removeEmptyControls(qc) {
+    if (qc.controls) {
+      qc.controls = qc.controls.filter(function (control) {
+        return control.controlId;
+      });
+    }
+  }
 })();
