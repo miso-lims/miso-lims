@@ -1253,7 +1253,7 @@ INSERT INTO StorageLocation(locationId, locationUnit, parentLocationId, alias, c
 (6, 'SHELF', 5, '1', 3, '2020-02-27 15:46:00', 3, '2020-02-27 15:46:00'),
 (7, 'LOOSE_STORAGE', 6, '1', 3, '2020-02-27 15:46:00', 3, '2020-02-27 15:46:00');
 
-INSERT INTO StorageLocation_ServiceRecord(locationId, recordId) VALUES
+INSERT INTO StorageLocation_ServiceRecord(recordId, locationId) VALUES
 (153, 3);
 
 INSERT INTO LibraryTemplate(libraryTemplateId, alias, defaultVolume, platformType, libraryTypeId, librarySelectionTypeId, libraryStrategyTypeId, kitDescriptorId, indexFamilyId, volumeUnits) VALUES
