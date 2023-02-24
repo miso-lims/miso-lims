@@ -311,6 +311,15 @@ public class StorageLocation implements Serializable, Aliasable, ChangeLoggable,
     this.serviceRecords = serviceRecords;
   }
 
+  public boolean isOutOfService() {
+    if (getServiceRecords() == null) {
+      return false;
+    }
+    return getServiceRecords().stream()
+        .anyMatch(sr -> sr.isOutOfService() && sr.getEndTime() == null && sr.getStartTime() != null
+            && sr.getStartTime().before(new Date()));
+  }
+
   @Override
   public Collection<ChangeLog> getChangeLog() {
     return changeLog;

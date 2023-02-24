@@ -121,12 +121,12 @@ public class DefaultServiceRecordService implements ServiceRecordService {
     ServiceRecord managedRecord = get(object.getId());
 
     StorageLocation freezer = storageLocationService.getByServiceRecord(object);
-    Instrument instrument = instrumentService.getByServiceRecord(object);
 
     if (freezer != null) {
       freezer.getServiceRecords().remove(managedRecord);
       storageLocationService.saveFreezer(freezer);
     } else {
+      Instrument instrument = instrumentService.getByServiceRecord(object);
       if (instrument != null) {
         instrument.getServiceRecords().remove(managedRecord);
         instrumentService.update(instrument);

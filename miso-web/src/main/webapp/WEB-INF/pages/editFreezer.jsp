@@ -17,6 +17,10 @@
   <a id="addingStorageLink" target="_blank" rel="noopener noreferrer">Adding Storage to a Freezer</a>
 </div>
 
+<c:choose>
+      <c:when test="${freezer.isOutOfService()}"><p class="big-warning">Out of Service</p></c:when>
+    </c:choose>
+
 <form:form id="freezerForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
 <script type="text/javascript">
   jQuery(document).ready(function () {

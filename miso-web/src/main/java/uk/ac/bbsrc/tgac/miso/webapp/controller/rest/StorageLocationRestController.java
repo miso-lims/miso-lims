@@ -8,7 +8,6 @@ import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -306,10 +305,8 @@ public class StorageLocationRestController extends RestController {
   public @ResponseBody ServiceRecordDto createRecord(
       @PathVariable(name = "locationId", required = true) Long locationId, @RequestBody ServiceRecordDto dto)
       throws IOException {
-    StorageLocation retrievedFreezer = RestUtils.retrieve("Storage location", locationId, storageLocationService);
-    if (retrievedFreezer == null) {
-      throw new NotFoundException("No freezer found for ID " + locationId.toString());
-    }
+    RestUtils.retrieve("Storage location", locationId, storageLocationService);
+
     ServiceRecord record = Dtos.to(dto);
     StorageLocation freezer = storageLocationService.get(locationId);
     long savedId = storageLocationService.addServiceRecord(record, freezer);
