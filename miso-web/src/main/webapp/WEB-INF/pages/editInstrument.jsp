@@ -83,7 +83,7 @@
         <div id="records_arrowclick" class="toggleLeft"></div>
       </div>
       <div id="recordsdiv" class="expandable_section" style="display:none;">
-        <miso:list-section id="list_servicerecords" name="Service Records" target="servicerecord" alwaysShow="true" items="${serviceRecords}" config="{instrumentId: ${instrument.id}, retiredInstrument: ${instrument.dateDecommissioned != null && instrument.upgradedInstrument == null}, hasPositions: ${not empty instrument.instrumentModel.positions}, userIsAdmin: ${miso:isAdmin()}}"/>
+        <miso:list-section id="list_servicerecords" name="Service Records" target="servicerecord" alwaysShow="true" items="${serviceRecords}" config="{instrumentId: ${instrument.id}, retired: ${instrument.dateDecommissioned != null && instrument.upgradedInstrument == null}, hasPositions: ${not empty instrument.instrumentModel.positions}, userIsAdmin: ${miso:isAdmin()}}"/>
       </div>
       
       <br/>

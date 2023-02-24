@@ -18,7 +18,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class StorageLocationDto {
 
-  public static StorageLocationDto from(@Nonnull StorageLocation from, boolean includeChildLocations, boolean recursive) {
+  public static StorageLocationDto from(@Nonnull StorageLocation from, boolean includeChildLocations,
+      boolean recursive) {
     StorageLocationDto dto = new StorageLocationDto();
     dto.setId(from.getId());
     if (from.getParentLocation() != null) {
@@ -27,17 +28,17 @@ public class StorageLocationDto {
     Dtos.setId(dto::setFreezerId, from.getFreezerLocation());
     dto.setLocationUnit(from.getLocationUnit().name());
     switch (from.getLocationUnit().getBoxStorageAmount()) {
-    case NONE:
-      dto.setAvailableStorage(false);
-      break;
-    case SINGLE:
-      dto.setAvailableStorage(from.getBoxes().isEmpty());
-      break;
-    case MULTIPLE:
-      dto.setAvailableStorage(true);
-      break;
-    default:
-      throw new IllegalStateException("Unexpected BoxStorageAmount");
+      case NONE:
+        dto.setAvailableStorage(false);
+        break;
+      case SINGLE:
+        dto.setAvailableStorage(from.getBoxes().isEmpty());
+        break;
+      case MULTIPLE:
+        dto.setAvailableStorage(true);
+        break;
+      default:
+        throw new IllegalStateException("Unexpected BoxStorageAmount");
     }
     dto.setAlias(from.getAlias());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
@@ -45,6 +46,7 @@ public class StorageLocationDto {
     dto.setFullDisplayLocation(from.getFullDisplayLocation());
     dto.setProbeId(from.getProbeId());
     dto.setRetired(from.getRetired());
+    dto.setOutOfService(from.isOutOfService());
     Dtos.setId(dto::setMapId, from.getMap());
     setString(dto::setMapFilename, maybeGetProperty(from.getMap(), StorageLocationMap::getFilename));
     setString(dto::setMapAnchor, from.getMapAnchor());
@@ -75,6 +77,7 @@ public class StorageLocationDto {
   private String mapFilename;
   private String mapAnchor;
   private Long labelId;
+  private boolean outOfService;
 
   public long getId() {
     return id;
@@ -211,6 +214,14 @@ public class StorageLocationDto {
 
   public void setLabelId(Long labelId) {
     this.labelId = labelId;
+  }
+
+  public boolean isOutOfService() {
+    return outOfService;
+  }
+
+  public void setOutOfService(boolean outOfService) {
+    this.outOfService = outOfService;
   }
 
   public StorageLocation to() {

@@ -20,11 +20,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
 import uk.ac.bbsrc.tgac.miso.core.service.SaveService;
+import uk.ac.bbsrc.tgac.miso.core.service.ServiceRecordService;
 import uk.ac.bbsrc.tgac.miso.core.service.StorageLocationService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.ServiceRecordDto;
 import uk.ac.bbsrc.tgac.miso.dto.StorageLocationDto;
 
 @Controller
@@ -33,6 +37,9 @@ public class StorageLocationRestController extends RestController {
 
   @Autowired
   private StorageLocationService storageLocationService;
+
+  @Autowired
+  private ServiceRecordService serviceRecordService;
 
   private final SaveService<StorageLocation> freezerSaveService = new SaveService<>() {
 
@@ -70,7 +77,8 @@ public class StorageLocationRestController extends RestController {
   }
 
   @GetMapping(value = "/{id}/children")
-  public @ResponseBody List<StorageLocationDto> getChildLocations(@PathVariable(name = "id", required = true) long id) throws IOException {
+  public @ResponseBody List<StorageLocationDto> getChildLocations(@PathVariable(name = "id", required = true) long id)
+      throws IOException {
     StorageLocation location = storageLocationService.get(id);
     if (location == null) {
       throw new RestException("storage location not found", Status.NOT_FOUND);
@@ -89,7 +97,8 @@ public class StorageLocationRestController extends RestController {
   }
 
   @PutMapping(value = "/freezers/{id}")
-  public @ResponseBody StorageLocationDto update(@PathVariable(name = "id", required = true) long id, @RequestBody StorageLocationDto dto)
+  public @ResponseBody StorageLocationDto update(@PathVariable(name = "id", required = true) long id,
+      @RequestBody StorageLocationDto dto)
       throws IOException {
     return RestUtils.updateObject("Freezer", id, dto, StorageLocationDto::to, freezerSaveService,
         freezer -> StorageLocationDto.from(freezer, true, true));
@@ -129,7 +138,8 @@ public class StorageLocationRestController extends RestController {
   @PostMapping(value = "/freezers/{id}/stacks")
   public @ResponseBody StorageLocationDto addFreezerStack(@PathVariable(name = "id", required = true) long id,
       @RequestParam(name = "height", required = true) int height,
-      @RequestParam(name = "identificationBarcode", required = false) String barcode, @RequestBody List<String> childBarcodes)
+      @RequestParam(name = "identificationBarcode", required = false) String barcode,
+      @RequestBody List<String> childBarcodes)
       throws IOException {
     StorageLocation freezer = getFreezer(id);
     if (height < 1) {
@@ -183,9 +193,12 @@ public class StorageLocationRestController extends RestController {
   }
 
   @PostMapping(value = "/freezers/{freezerId}/shelves/{shelfId}/stacks")
-  public @ResponseBody StorageLocationDto addShelfStack(@PathVariable(name = "freezerId", required = true) long freezerId,
-      @PathVariable(name = "shelfId", required = true) long shelfId, @RequestParam(name = "height", required = true) int height,
-      @RequestParam(name = "identificationBarcode", required = false) String barcode, @RequestBody List<String> childBarcodes)
+  public @ResponseBody StorageLocationDto addShelfStack(
+      @PathVariable(name = "freezerId", required = true) long freezerId,
+      @PathVariable(name = "shelfId", required = true) long shelfId,
+      @RequestParam(name = "height", required = true) int height,
+      @RequestParam(name = "identificationBarcode", required = false) String barcode,
+      @RequestBody List<String> childBarcodes)
       throws IOException {
     StorageLocation freezer = getFreezer(freezerId);
     StorageLocation shelf = getShelf(freezer, shelfId);
@@ -196,10 +209,13 @@ public class StorageLocationRestController extends RestController {
   }
 
   @PostMapping(value = "/freezers/{freezerId}/shelves/{shelfId}/racks")
-  public @ResponseBody StorageLocationDto addShelfRack(@PathVariable(name = "freezerId", required = true) long freezerId,
-      @PathVariable(name = "shelfId", required = true) long shelfId, @RequestParam(name = "depth", required = true) int depth,
+  public @ResponseBody StorageLocationDto addShelfRack(
+      @PathVariable(name = "freezerId", required = true) long freezerId,
+      @PathVariable(name = "shelfId", required = true) long shelfId,
+      @RequestParam(name = "depth", required = true) int depth,
       @RequestParam(name = "height", required = true) int height,
-      @RequestParam(name = "identificationBarcode", required = false) String barcode, @RequestBody List<String> childBarcodes)
+      @RequestParam(name = "identificationBarcode", required = false) String barcode,
+      @RequestBody List<String> childBarcodes)
       throws IOException {
     StorageLocation freezer = getFreezer(freezerId);
     StorageLocation shelf = getShelf(freezer, shelfId);
@@ -221,16 +237,20 @@ public class StorageLocationRestController extends RestController {
   }
 
   @PostMapping(value = "/freezers/{freezerId}/shelves/{shelfId}/tray-racks")
-  public @ResponseBody StorageLocationDto addShelfTrayRack(@PathVariable(name = "freezerId", required = true) long freezerId,
-      @PathVariable(name = "shelfId", required = true) long shelfId, @RequestParam(name = "height", required = true) int height,
-      @RequestParam(name = "identificationBarcode", required = false) String barcode, @RequestBody List<String> childBarcodes)
+  public @ResponseBody StorageLocationDto addShelfTrayRack(
+      @PathVariable(name = "freezerId", required = true) long freezerId,
+      @PathVariable(name = "shelfId", required = true) long shelfId,
+      @RequestParam(name = "height", required = true) int height,
+      @RequestParam(name = "identificationBarcode", required = false) String barcode,
+      @RequestBody List<String> childBarcodes)
       throws IOException {
     StorageLocation freezer = getFreezer(freezerId);
     StorageLocation shelf = getShelf(freezer, shelfId);
     if (height < 1) {
       throw new RestException("Invalid rack height", Status.BAD_REQUEST);
     }
-    StorageLocation trayRack = makeStorage(findNextNumber(shelf, LocationUnit.TRAY_RACK), LocationUnit.TRAY_RACK, shelf, barcode);
+    StorageLocation trayRack =
+        makeStorage(findNextNumber(shelf, LocationUnit.TRAY_RACK), LocationUnit.TRAY_RACK, shelf, barcode);
     for (int i = 1; i <= height; i++) {
       makeStorage(Integer.toString(i), LocationUnit.TRAY, trayRack, childBarcodes.get(i - 1));
     }
@@ -238,12 +258,14 @@ public class StorageLocationRestController extends RestController {
   }
 
   @PostMapping(value = "/freezers/{freezerId}/shelves/{shelfId}/loose")
-  public @ResponseBody StorageLocationDto addShelfLooseStorage(@PathVariable(name = "freezerId", required = true) long freezerId,
+  public @ResponseBody StorageLocationDto addShelfLooseStorage(
+      @PathVariable(name = "freezerId", required = true) long freezerId,
       @PathVariable(name = "shelfId", required = true) long shelfId,
       @RequestParam(name = "identificationBarcode", required = false) String barcode) throws IOException {
     StorageLocation freezer = getFreezer(freezerId);
     StorageLocation shelf = getShelf(freezer, shelfId);
-    StorageLocation storage = makeStorage(findNextNumber(shelf, LocationUnit.LOOSE_STORAGE), LocationUnit.LOOSE_STORAGE, shelf, barcode);
+    StorageLocation storage =
+        makeStorage(findNextNumber(shelf, LocationUnit.LOOSE_STORAGE), LocationUnit.LOOSE_STORAGE, shelf, barcode);
     return doSave(storage);
   }
 
@@ -274,8 +296,20 @@ public class StorageLocationRestController extends RestController {
 
   @DeleteMapping("/{locationId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public @ResponseBody void delete(@PathVariable(name = "locationId", required = true) long locationId) throws IOException {
+  public @ResponseBody void delete(@PathVariable(name = "locationId", required = true) long locationId)
+      throws IOException {
     RestUtils.delete("Storage location", locationId, storageLocationService);
+  }
+
+  @PostMapping(value = "/{locationId}/servicerecords")
+  public @ResponseBody ServiceRecordDto createRecord(
+      @PathVariable(name = "locationId", required = true) Long locationId, @RequestBody ServiceRecordDto dto)
+      throws IOException {
+    StorageLocation freezer = RestUtils.retrieve("Storage location", locationId, storageLocationService);
+
+    ServiceRecord record = Dtos.to(dto);
+    long savedId = storageLocationService.addServiceRecord(record, freezer);
+    return Dtos.asDto(serviceRecordService.get(savedId));
   }
 
 }

@@ -257,6 +257,12 @@ Urls = (function () {
   ui.freezers = {
     create: freezerUiBase + "/new",
     edit: idUrlFunction(freezerUiBase),
+    createRecord: function (locationId) {
+      return freezerUiBase + "/" + locationId + "/servicerecord/new";
+    },
+    editRecord: function (locationId, recordId) {
+      return freezerUiBase + "/" + locationId + "/servicerecord/" + recordId;
+    },
   };
 
   // Freezer Maps
@@ -1068,6 +1074,9 @@ Urls = (function () {
     updateComponent: idUrlFunction(storageLocationRestBase),
     updateFreezer: idUrlFunction(storageLocationRestBase + "/freezers"),
     queryByBarcode: storageLocationRestBase + "/bybarcode",
+    createRecord: function (locationId) {
+      return storageLocationRestBase + "/" + locationId + "/servicerecords/";
+    },
   };
 
   // Studies

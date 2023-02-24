@@ -790,12 +790,16 @@ VALUES
 INSERT INTO `ServiceRecord`(`recordId`, `title`, `details`, `servicedBy`, `referenceNumber`, `serviceDate`, `startTime`, `endTime`, outOfService, positionId) VALUES
 (1,'Seq1_Rec1','Test service','Service Person','12345','2016-01-01', '2016-01-01 07:30:00', '2016-01-01 09:00:00', FALSE, NULL),
 (2,'Seq1_Rec2',NULL,'Service Person',NULL,'2016-01-21',NULL,NULL, FALSE, NULL),
-(3,'Seq2_Rec1',NULL,'Service Person',NULL,'2016-01-21','2016-01-21 9:32:00',NULL, TRUE, 2);
+(3,'Seq2_Rec1',NULL,'Service Person',NULL,'2016-01-21','2016-01-21 9:32:00',NULL, TRUE, 2),
+(4, 'room1barcode', NULL, 'Service Person', NULL, '2023-02-22', NULL, NULL, FALSE, NULL);
 
 INSERT INTO `Instrument_ServiceRecord`(`recordId`, `instrumentId`) VALUES
 (1,1),
 (2,1),
 (3,2);
+
+INSERT INTO `StorageLocation_ServiceRecord`(`recordId`, `locationId`) VALUES
+(4,1);
 
 INSERT INTO `Run`(`runId`, `name`, `description`, `accession`, `filePath`, `alias`, `instrumentId`, `lastModifier`, `health`, `completionDate`, `lastModified`, `creator`, `created`, sequencingParameters_parametersId, sopId, sequencingKitId, sequencingKitLot) 
 VALUES (1,'RUN1','BC0JHTACXX',NULL,'/.mounts/labs/prod/archive/h1179/120323_h1179_0070_BC0JHTACXX','120323_h1179_0070_BC0JHTACXX',1,1,'Completed','2012-03-31','2016-07-07 13:30:49',1,'2016-07-07 13:30:49', 1, 5, NULL, NULL),

@@ -80,10 +80,10 @@ ListTarget.storage_location = {
         mData: "retired",
         include: true,
         mRender: function (data, type, full) {
-          if (type === "display") {
-            return data ? "Retired" : "Production";
+          if (full.outOfService) {
+            return "Out of Service";
           }
-          return data;
+          return data ? "Retired" : "Production";
         },
       });
       columns.push({

@@ -13,15 +13,23 @@ FormTarget.servicerecord = (function ($) {
       return Urls.external.userManual("instruments", "service-records");
     },
     getSaveUrl: function (record, config) {
+      if (config.instrumentId) {
+        return record.id
+          ? Urls.rest.serviceRecords.update(record.id)
+          : Urls.rest.instruments.createRecord(config.instrumentId);
+      }
       return record.id
         ? Urls.rest.serviceRecords.update(record.id)
-        : Urls.rest.instruments.createRecord(config.instrumentId);
+        : Urls.rest.storageLocations.createRecord(config.freezerId);
     },
     getSaveMethod: function (record) {
       return record.id ? "PUT" : "POST";
     },
     getEditUrl: function (record, config) {
-      return Urls.ui.instruments.editRecord(config.instrumentId, record.id);
+      if (config.instrumentId) {
+        return Urls.ui.instruments.editRecord(config.instrumentId, record.id);
+      }
+      return Urls.ui.freezers.editRecord(config.freezerId, record.id);
     },
     getSections: function (config, object) {
       return [
@@ -55,6 +63,7 @@ FormTarget.servicerecord = (function ($) {
               title: "Position Affected",
               data: "positionId",
               type: "dropdown",
+              include: config.instrumentId,
               source: config.instrumentPositions,
               sortSource: Utils.sorting.standardSort("alias"),
               getItemLabel: function (item) {
@@ -90,7 +99,7 @@ FormTarget.servicerecord = (function ($) {
               type: "datetime",
             },
             {
-              title: "Instrument out of service?",
+              title: "Out of service?",
               data: "outOfService",
               type: "checkbox",
             },

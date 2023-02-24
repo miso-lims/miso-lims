@@ -455,7 +455,8 @@ INSERT INTO Instrument (instrumentId, name, instrumentModelId, serialNumber, dat
 INSERT INTO ServiceRecord(recordId, title, details, servicedBy, referenceNumber, serviceDate, startTime, endTime, outOfService) VALUES
   (150, 'Test 150', 'details go here', 'technician1', '12345', '2017-09-05', '2017-09-01 10:00:00', '2017-09-05 10:00:00', 0),
   (151, 'Test 151', NULL, NULL, NULL, '2017-09-12', NULL, NULL, 0),
-  (152, 'Test 152', 'details to remove', 'technitchin', 'Riffraff', '2017-09-12', '2017-09-11 11:00:00', '2017-09-12 12:00:00', 1);
+  (152, 'Test 152', 'details to remove', 'technitchin', 'Riffraff', '2017-09-12', '2017-09-11 11:00:00', '2017-09-12 12:00:00', 1),
+  (153, 'Test 153', 'details go here', 'technician2', NULL, '2022-02-22', NULL, NULL, 0);
 
 INSERT INTO Instrument_ServiceRecord(recordId, instrumentId) VALUES
 (150, 101),
@@ -1251,6 +1252,9 @@ INSERT INTO StorageLocation(locationId, locationUnit, parentLocationId, alias, c
 (5, 'FREEZER', 1, 'Empty Freezer', 3, '2020-02-27 15:46:00', 3, '2020-02-27 15:46:00'),
 (6, 'SHELF', 5, '1', 3, '2020-02-27 15:46:00', 3, '2020-02-27 15:46:00'),
 (7, 'LOOSE_STORAGE', 6, '1', 3, '2020-02-27 15:46:00', 3, '2020-02-27 15:46:00');
+
+INSERT INTO StorageLocation_ServiceRecord(recordId, locationId) VALUES
+(153, 3);
 
 INSERT INTO LibraryTemplate(libraryTemplateId, alias, defaultVolume, platformType, libraryTypeId, librarySelectionTypeId, libraryStrategyTypeId, kitDescriptorId, indexFamilyId, volumeUnits) VALUES
 (1, 'TestLibTemp', 12.34, 'ILLUMINA', 1, 3, 5, 1, 1, 'MICROLITRES');

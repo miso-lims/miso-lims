@@ -1,26 +1,3 @@
-<%--
-  ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
-
-  ~ MISO project contacts: Robert Davey @ TGAC
-  ~ **********************************************************************
-  ~
-  ~ This file is part of MISO.
-  ~
-  ~ MISO is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
-  ~
-  ~ MISO is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU General Public License for more details.
-  ~
-  ~ You should have received a copy of the GNU General Public License
-  ~ along with MISO.  If not, see <http://www.gnu.org/licenses/>.
-  ~
-  ~ **********************************************************************
-  --%>
 <%@ include file="../header.jsp" %>
 
 <div id="maincontent">
@@ -39,6 +16,10 @@
   spaces, see the User Manual:
   <a id="addingStorageLink" target="_blank" rel="noopener noreferrer">Adding Storage to a Freezer</a>
 </div>
+
+<c:if test="${freezer.isOutOfService()}">
+  <p class="big-warning">Out of Service</p>
+</c:if>
 
 <form:form id="freezerForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
 <script type="text/javascript">
@@ -59,6 +40,18 @@
 </script>
 
 <c:if test="${pageMode eq 'edit'}">
+  <br/>
+  <div id="recordsHider" class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#records_arrowclick'), 'recordsdiv');">
+    <c:choose>
+      <c:when test="${fn:length(serviceRecords) == 1}">1 Service Record</c:when>
+      <c:otherwise>${fn:length(serviceRecords)} Service Records</c:otherwise>
+    </c:choose>
+    <div id="records_arrowclick" class="toggleLeft"></div>
+  </div>
+  <div id="recordsdiv" class="expandable_section" style="display:none;">
+    <miso:list-section id="list_servicerecords" name="Service Records" target="servicerecord" alwaysShow="true" items="${serviceRecords}" config="{freezerId: ${freezer.id}, retired: ${freezer.retired}, hasPositions: false, userIsAdmin: ${miso:isAdmin()}}"/>
+  </div>
+
   <br/>
   <h1>Layout</h1>
   <div id="layoutSection" style="overflow:auto">

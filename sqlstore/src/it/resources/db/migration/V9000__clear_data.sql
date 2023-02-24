@@ -110,6 +110,7 @@ DELETE FROM Stain;
 DELETE FROM StainCategory;
 DELETE FROM StorageLabel;
 DELETE FROM StorageLocation;
+DELETE FROM StorageLocation_ServiceRecord;
 DELETE FROM StorageLocationMap;
 DELETE FROM Study;
 DELETE FROM StudyChangeLog;

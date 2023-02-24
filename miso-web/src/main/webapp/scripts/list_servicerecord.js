@@ -38,13 +38,16 @@ ListTarget.servicerecord = {
       : [];
   },
   createStaticActions: function (config, projectId) {
-    return config.retiredInstrument
+    var url = config.instrumentId
+      ? Urls.ui.instruments.createRecord(config.instrumentId)
+      : Urls.ui.freezers.createRecord(config.freezerId);
+    return config.retired
       ? []
       : [
           {
             name: "Add",
             handler: function () {
-              window.location = Urls.ui.instruments.createRecord(config.instrumentId);
+              window.location = url;
             },
           },
         ];
@@ -66,13 +69,10 @@ ListTarget.servicerecord = {
         bSortable: true,
         mRender: function (data, type, full) {
           if (type === "display") {
-            return data
-              ? '<a href="' +
-                  Urls.ui.instruments.editRecord(config.instrumentId, full.id) +
-                  '">' +
-                  data +
-                  "</a>"
-              : "";
+            var url = config.instrumentId
+              ? Urls.ui.instruments.editRecord(config.instrumentId, full.id)
+              : Urls.ui.freezers.editRecord(config.freezerId, full.id);
+            return data ? '<a href="' + url + '">' + data + "</a>" : "";
           }
           return data;
         },
