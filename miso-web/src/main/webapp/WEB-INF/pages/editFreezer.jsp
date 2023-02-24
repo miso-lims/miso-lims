@@ -18,7 +18,7 @@
 </div>
 
 <c:if test="${freezer.isOutOfService()}">
-  <p class="big-warning">Out of Service</p></c:when>
+  <p class="big-warning">Out of Service</p>
 </c:if>
 
 <form:form id="freezerForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
