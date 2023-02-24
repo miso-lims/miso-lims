@@ -22,7 +22,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.TestUtils;
 
 public class BulkErrorCrawlerIT extends AbstractIT {
-  
+
   private static final Set<String> urlSlugs;
   private static final Set<String> adminSlugs;
   private static final Map<String, Map<String, String>> postPages;
@@ -157,9 +157,11 @@ public class BulkErrorCrawlerIT extends AbstractIT {
     slugs.add("arrayrun/new");
     slugs.add("arrayrun/1");
     slugs.add("instrument/1");
+    slugs.add("instrument/1/servicerecord/new");
 
     slugs.add("freezer/new");
     slugs.add("freezer/3");
+    slugs.add("freezer/3/servicerecord/new");
     slugs.add("librarytemplate/new");
     slugs.add("librarytemplate/1");
     slugs.add("kitdescriptor/new");
@@ -240,23 +242,32 @@ public class BulkErrorCrawlerIT extends AbstractIT {
 
     factoryPages = Collections.unmodifiableMap(new MapBuilder<String, BiConsumer<WebDriver, String>>()
         .put("sample/bulk/new", (driver, baseUrl) -> BulkSamplePage.getForCreate(driver, baseUrl, 5, null, "Aliquot"))
-        .put("sample/bulk/edit", (driver, baseUrl) -> BulkSamplePage.getForEdit(driver, baseUrl, Lists.newArrayList(302L, 202L)))
+        .put("sample/bulk/edit",
+            (driver, baseUrl) -> BulkSamplePage.getForEdit(driver, baseUrl, Lists.newArrayList(302L, 202L)))
         .put("sample/bulk/propagate",
-            (driver, baseUrl) -> BulkSamplePage.getForPropagate(driver, baseUrl, Arrays.asList(302L, 202L), Arrays.asList(1), "Aliquot"))
+            (driver, baseUrl) -> BulkSamplePage.getForPropagate(driver, baseUrl, Arrays.asList(302L, 202L),
+                Arrays.asList(1), "Aliquot"))
         .put("library/bulk/propagate",
-            (driver, baseUrl) -> BulkLibraryPage.getForPropagate(driver, baseUrl, Arrays.asList(304L, 305L), Arrays.asList(1)))
-        .put("library/bulk/edit", (driver, baseUrl) -> BulkLibraryPage.getForEdit(driver, baseUrl, Arrays.asList(601L, 602L, 603L, 604L)))
+            (driver, baseUrl) -> BulkLibraryPage.getForPropagate(driver, baseUrl, Arrays.asList(304L, 305L),
+                Arrays.asList(1)))
+        .put("library/bulk/edit",
+            (driver, baseUrl) -> BulkLibraryPage.getForEdit(driver, baseUrl, Arrays.asList(601L, 602L, 603L, 604L)))
         .put("library/bulk/receive", (driver, baseUrl) -> BulkLibraryPage.getForReceive(driver, baseUrl, 3, null, 15L))
         .put("libraryaliquot/bulk/propagate",
-            (driver, baseUrl) -> BulkLibraryAliquotPage.getForPropagate(driver, baseUrl, Arrays.asList(601L, 602L, 603L)))
-        .put("libraryaliquot/bulk/edit", (driver, baseUrl) -> BulkLibraryAliquotPage.getForEdit(driver, baseUrl, Arrays.asList(901L, 902L)))
+            (driver, baseUrl) -> BulkLibraryAliquotPage.getForPropagate(driver, baseUrl,
+                Arrays.asList(601L, 602L, 603L)))
+        .put("libraryaliquot/bulk/edit",
+            (driver, baseUrl) -> BulkLibraryAliquotPage.getForEdit(driver, baseUrl, Arrays.asList(901L, 902L)))
         .put("libraryaliquot/bulk/repropagate",
             (driver, baseUrl) -> BulkLibraryAliquotPage.getForRepropagate(driver, baseUrl, Arrays.asList(901L, 902L)))
-        .put("qc/bulk/addFrom/Sample", (driver, baseUrl) -> BulkQCPage.getForAddSample(driver, baseUrl, Arrays.asList(2201L, 4447L), 1, 1))
-        .put("qc/bulk/editFrom/Sample", (driver, baseUrl) -> BulkQCPage.getForEditSample(driver, baseUrl, Arrays.asList(2201L), 1))
+        .put("qc/bulk/addFrom/Sample",
+            (driver, baseUrl) -> BulkQCPage.getForAddSample(driver, baseUrl, Arrays.asList(2201L, 4447L), 1, 1))
+        .put("qc/bulk/editFrom/Sample",
+            (driver, baseUrl) -> BulkQCPage.getForEditSample(driver, baseUrl, Arrays.asList(2201L), 1))
         .put("qc/bulk/addFrom/Library",
             (driver, baseUrl) -> BulkQCPage.getForAddLibrary(driver, baseUrl, Arrays.asList(601L, 602L, 603L), 1, 1))
-        .put("qc/bulk/editFrom/Library", (driver, baseUrl) -> BulkQCPage.getForEditLibrary(driver, baseUrl, Arrays.asList(2201L), 1))
+        .put("qc/bulk/editFrom/Library",
+            (driver, baseUrl) -> BulkQCPage.getForEditLibrary(driver, baseUrl, Arrays.asList(2201L), 1))
         .build());
 
     postPages = Collections.unmodifiableMap(new MapBuilder<String, Map<String, String>>()
@@ -295,7 +306,8 @@ public class BulkErrorCrawlerIT extends AbstractIT {
         .put("libraryaliquot/bulk/merge", unmodifiableMap("ids", "901,902"))
         .put("libraryaliquot/bulk/pool-separate", unmodifiableMap("ids", "901,902"))
         .put("libraryaliquot/bulk/pool",
-            Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "901,902").put("quantity", "2").build()))
+            Collections
+                .unmodifiableMap(new MapBuilder<String, String>().put("ids", "901,902").put("quantity", "2").build()))
         .put("librarydesign/bulk/edit", unmodifiableMap("ids", "6,7,8"))
         .put("librarydesigncode/bulk/edit", unmodifiableMap("ids", "3,4,5"))
         .put("libraryselection/bulk/edit", unmodifiableMap("ids", "4,20,26"))
@@ -306,7 +318,8 @@ public class BulkErrorCrawlerIT extends AbstractIT {
         .put("partitionqctype/bulk/edit", unmodifiableMap("ids", "2,3"))
         .put("pool/bulk/edit", unmodifiableMap("ids", "801,802"))
         .put("pool/bulk/merge",
-            Collections.unmodifiableMap(new MapBuilder<String, String>().put("ids", "801,802").put("proportions", "1,1").build()))
+            Collections.unmodifiableMap(
+                new MapBuilder<String, String>().put("ids", "801,802").put("proportions", "1,1").build()))
         .put("referencegenome/bulk/edit", unmodifiableMap("ids", "1,2,3"))
         .put("runpurpose/bulk/edit", unmodifiableMap("ids", "2,1"))
         .put("sequencingparameters/bulk/edit", unmodifiableMap("ids", "2,4"))
