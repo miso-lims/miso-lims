@@ -46,6 +46,7 @@ public class StorageLocationDto {
     dto.setFullDisplayLocation(from.getFullDisplayLocation());
     dto.setProbeId(from.getProbeId());
     dto.setRetired(from.getRetired());
+    dto.setOutOfService(from.isOutOfService());
     Dtos.setId(dto::setMapId, from.getMap());
     setString(dto::setMapFilename, maybeGetProperty(from.getMap(), StorageLocationMap::getFilename));
     setString(dto::setMapAnchor, from.getMapAnchor());
