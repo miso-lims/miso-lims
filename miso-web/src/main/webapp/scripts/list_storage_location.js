@@ -82,12 +82,8 @@ ListTarget.storage_location = {
         mRender: function (data, type, full) {
           if (full.outOfService) {
             return "Out of Service";
-          } else {
-            if (type === "display") {
-              return data ? "Retired" : "Production";
-            }
           }
-          return data;
+          return data ? "Retired" : "Production";
         },
       });
       columns.push({

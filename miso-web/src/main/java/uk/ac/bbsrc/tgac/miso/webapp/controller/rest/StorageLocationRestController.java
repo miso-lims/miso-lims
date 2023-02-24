@@ -305,10 +305,9 @@ public class StorageLocationRestController extends RestController {
   public @ResponseBody ServiceRecordDto createRecord(
       @PathVariable(name = "locationId", required = true) Long locationId, @RequestBody ServiceRecordDto dto)
       throws IOException {
-    RestUtils.retrieve("Storage location", locationId, storageLocationService);
+    StorageLocation freezer = RestUtils.retrieve("Storage location", locationId, storageLocationService);
 
     ServiceRecord record = Dtos.to(dto);
-    StorageLocation freezer = storageLocationService.get(locationId);
     long savedId = storageLocationService.addServiceRecord(record, freezer);
     return Dtos.asDto(serviceRecordService.get(savedId));
   }
