@@ -116,6 +116,7 @@ DELETE FROM User;
 DELETE FROM _Group;
 DELETE FROM StorageLabel;
 DELETE FROM StorageLocation;
+DELETE FROM StorageLocation_ServiceRecord;
 DELETE FROM StorageLocationMap;
 DELETE FROM RunPurpose;
 DELETE FROM AttachmentCategory;
