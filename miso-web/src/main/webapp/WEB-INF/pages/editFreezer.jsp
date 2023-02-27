@@ -39,19 +39,6 @@
   });
 </script>
 
-<c:if test="${freezer.id != 0}">
-  <div id="recordsHider" class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#records_arrowclick'), 'recordsdiv');">
-    <c:choose>
-      <c:when test="${fn:length(serviceRecords) == 1}">1 Service Record</c:when>
-      <c:otherwise>${fn:length(serviceRecords)} Service Records</c:otherwise>
-    </c:choose>
-    <div id="records_arrowclick" class="toggleLeft"></div>
-  </div>
-  <div id="recordsdiv" class="expandable_section" style="display:none;">
-    <miso:list-section id="list_servicerecords" name="Service Records" target="servicerecord" alwaysShow="true" items="${serviceRecords}" config="{freezerId: ${freezer.id}, userIsAdmin: ${miso:isAdmin()}}"/>
-  </div>
-</c:if>
-
 <c:if test="${pageMode eq 'edit'}">
   <br/>
   <div id="recordsHider" class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#records_arrowclick'), 'recordsdiv');">
