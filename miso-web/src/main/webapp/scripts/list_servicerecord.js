@@ -114,7 +114,7 @@ ListTarget.servicerecord = {
             list += "</ul>";
             return list;
           }
-          return null;
+          return data;
         },
       },
       {
