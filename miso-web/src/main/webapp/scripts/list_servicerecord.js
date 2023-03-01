@@ -102,7 +102,7 @@ ListTarget.servicerecord = {
         iSortPriority: 0,
         bSortable: false,
         mRender: function (data, type, full) {
-          if (!file.attachments || !file.attachments.length) {
+          if (!full.attachments || !full.attachments.length) {
             return null;
           } else if (type === "display" && full.attachments && full.attachments.length) {
             var list = '<ul class="unformatted-list">';
