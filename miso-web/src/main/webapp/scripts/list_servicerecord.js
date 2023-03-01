@@ -104,8 +104,6 @@ ListTarget.servicerecord = {
         mRender: function (data, type, full) {
           if (!file.attachments || !file.attachments.length) {
             return null;
-          } else if (!file.attachments || !file.attachments.length) {
-            return null;
           } else if (type === "display" && full.attachments && full.attachments.length) {
             var list = '<ul class="unformatted-list">';
             full.attachments.forEach(function (file) {
