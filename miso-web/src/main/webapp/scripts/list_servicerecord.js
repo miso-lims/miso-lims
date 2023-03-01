@@ -119,7 +119,7 @@ ListTarget.servicerecord = {
           } else {
             return full.attachments
               .map(function (f) {
-                f.filename;
+                return f.filename;
               })
               .join(" ");
           }
