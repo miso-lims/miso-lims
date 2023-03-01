@@ -102,7 +102,11 @@ ListTarget.servicerecord = {
         iSortPriority: 0,
         bSortable: false,
         mRender: function (data, type, full) {
-          if (type === "display" && full.attachments && full.attachments.length) {
+          if (!file.attachments || !file.attachments.length) {
+            return null;
+          } else if (!file.attachments || !file.attachments.length) {
+            return null;
+          } else if (type === "display" && full.attachments && full.attachments.length) {
             var list = '<ul class="unformatted-list">';
             full.attachments.forEach(function (file) {
               list +=
@@ -114,18 +118,19 @@ ListTarget.servicerecord = {
             });
             list += "</ul>";
             return list;
+          } else {
+            var filenames = "";
+            var counts = 0;
+            full.attachments.forEach(function (file) {
+              if (full.attachments.length - 1 == counts) {
+                filenames += file.filename;
+              } else {
+                filenames += file.filename + " ";
+                ++counts;
+              }
+            });
+            return filenames;
           }
-          var filenames = "";
-          var counts = 0;
-          full.attachments.forEach(function (file) {
-            if (full.attachments.length - 1 == counts) {
-              filenames += file.filename;
-            } else {
-              filenames += file.filename + " ";
-              ++counts;
-            }
-          });
-          return filenames;
         },
       },
       {
