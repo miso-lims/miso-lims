@@ -1,1 +1,1 @@
-fix file attachment for service records
+Error when displaying file attachments in the service records list
