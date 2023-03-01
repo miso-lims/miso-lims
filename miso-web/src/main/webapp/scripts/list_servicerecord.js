@@ -116,13 +116,21 @@ ListTarget.servicerecord = {
             });
             list += "</ul>";
             return list;
-          } else {
+          } else if (type === "filter") {
+            console.log(
+              full.attachments
+                .map(function (f) {
+                  return f.filename;
+                })
+                .join(" ")
+            );
             return full.attachments
               .map(function (f) {
                 return f.filename;
               })
               .join(" ");
           }
+          return null;
         },
       },
       {
