@@ -104,7 +104,7 @@ ListTarget.servicerecord = {
         mRender: function (data, type, full) {
           if (!full.attachments || !full.attachments.length) {
             return null;
-          } else if (type === "display" && full.attachments && full.attachments.length) {
+          } else if (type === "display") {
             var list = '<ul class="unformatted-list">';
             full.attachments.forEach(function (file) {
               list +=
@@ -117,17 +117,11 @@ ListTarget.servicerecord = {
             list += "</ul>";
             return list;
           } else {
-            var filenames = "";
-            var counts = 0;
-            full.attachments.forEach(function (file) {
-              if (full.attachments.length - 1 == counts) {
-                filenames += file.filename;
-              } else {
-                filenames += file.filename + " ";
-                ++counts;
-              }
-            });
-            return filenames;
+            return full.attachments
+              .map(function (f) {
+                f.filename;
+              })
+              .join(" ");
           }
         },
       },
