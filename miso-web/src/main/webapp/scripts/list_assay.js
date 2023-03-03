@@ -1,4 +1,4 @@
-ListTarget.assay = (function () {
+ListTarget.assay = (function ($) {
   var TYPE_LABEL = "Assays";
 
   return {
@@ -11,6 +11,16 @@ ListTarget.assay = (function () {
       return !config.isAdmin
         ? []
         : [
+            {
+              name: "Copy",
+              action: function (items) {
+                if (items.length > 1) {
+                  Utils.showOkDialog("Error", ["Select an individual assay to copy"]);
+                  return;
+                }
+                window.location = Urls.ui.assays.create + "?" + $.param({ baseId: items[0].id });
+              },
+            },
             ListUtils.createBulkDeleteAction(TYPE_LABEL, "assays", function (x) {
               return x.alias + " v" + x.version;
             }),
@@ -50,4 +60,4 @@ ListTarget.assay = (function () {
       ];
     },
   };
-})();
+})(jQuery);
