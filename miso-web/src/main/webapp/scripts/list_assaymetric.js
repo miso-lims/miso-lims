@@ -169,8 +169,17 @@ ListTarget.assaymetric = (function () {
     Utils.showWizardDialog(
       "Add " + categoryLabel + " Metric",
       metrics.map(function (metric) {
+        var label = metric.label + " (";
+        if (metric.units) {
+          label += metric.units + " ";
+        }
+        var thresholdType = Utils.array.findUniqueOrThrow(function (x) {
+          return x.value === metric.thresholdType;
+        }, Constants.thresholdTypes);
+        label += Utils.decodeHtmlString(thresholdType.sign) + ")";
+
         return {
-          name: metric.label,
+          name: label,
           handler: function () {
             addSelectedMetric(metric);
           },
@@ -184,9 +193,10 @@ ListTarget.assaymetric = (function () {
       return x.value === metric.thresholdType;
     }, Constants.thresholdTypes);
     var fields = [];
+    var unitDisplay = metric.units ? " (" + metric.units + ")" : "";
     if (thresholdType.lowerBound) {
       fields.push({
-        label: "Lower Bound",
+        label: "Lower Bound" + unitDisplay,
         type: "float",
         required: true,
         property: "lowerBound",
@@ -194,7 +204,7 @@ ListTarget.assaymetric = (function () {
     }
     if (thresholdType.upperBound) {
       fields.push({
-        label: "Upper Bound",
+        label: "Upper Bound" + unitDisplay,
         type: "float",
         required: true,
         property: "upperBound",
