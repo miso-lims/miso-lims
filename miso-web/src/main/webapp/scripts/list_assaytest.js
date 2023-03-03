@@ -27,17 +27,17 @@ ListTarget.assaytest = (function () {
     createStaticActions: function (config, projectId) {
       var actions = [];
       if (config.isAdmin) {
-        if (!config.assayId) {
-          // for list page
-          actions.push(
-            ListUtils.createStaticAddAction("Assay Tests", Urls.ui.assayTests.bulkCreate, true)
-          );
-        } else if (config.pageMode === "edit") {
-          // for Edit Assay page
+        if (config.pageMode) {
+          // for Create/Edit Assay page
           actions.push({
             name: "Add",
             handler: showAddTestDialog,
           });
+        } else {
+          // for list page
+          actions.push(
+            ListUtils.createStaticAddAction("Assay Tests", Urls.ui.assayTests.bulkCreate, true)
+          );
         }
       }
       return actions;
