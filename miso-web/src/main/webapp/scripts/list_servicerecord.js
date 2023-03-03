@@ -100,8 +100,11 @@ ListTarget.servicerecord = {
         mData: null,
         include: true,
         iSortPriority: 0,
+        bSortable: false,
         mRender: function (data, type, full) {
-          if (type === "display" && full.attachments && full.attachments.length) {
+          if (!full.attachments || !full.attachments.length) {
+            return null;
+          } else if (type === "display") {
             var list = '<ul class="unformatted-list">';
             full.attachments.forEach(function (file) {
               list +=
@@ -113,8 +116,13 @@ ListTarget.servicerecord = {
             });
             list += "</ul>";
             return list;
+          } else {
+            return full.attachments
+              .map(function (f) {
+                return f.filename;
+              })
+              .join(" ");
           }
-          return data;
         },
       },
       {
