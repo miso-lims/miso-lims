@@ -53,12 +53,20 @@ ListTarget.assaytest = (function () {
           sTitle: "Tissue Type",
           mData: "tissueTypeId",
           mRender: function (data, type, full) {
-            var tissueType = Utils.array.findUniqueOrThrow(
-              Utils.array.idPredicate(data),
-              Constants.tissueTypes
-            );
-            var text = (full.negateTissueType ? "NOT " : "") + tissueType.alias;
-            return '<span title="' + tissueType.description + '">' + text + "</span>";
+            if (!data) {
+              return null;
+            } else {
+              var tissueType = Utils.array.findUniqueOrThrow(
+                Utils.array.idPredicate(data),
+                Constants.tissueTypes
+              );
+              var text = (full.negateTissueType ? "NOT " : "") + tissueType.alias;
+              if (type === "display") {
+                return '<span title="' + tissueType.description + '">' + text + "</span>";
+              } else {
+                return text;
+              }
+            }
           },
           include: Constants.isDetailedSample,
         },
@@ -76,7 +84,11 @@ ListTarget.assaytest = (function () {
               Utils.array.idPredicate(data),
               Constants.libraryDesignCodes
             );
-            return '<span title="' + code.description + '">' + code.code + "</span>";
+            if (type === "display") {
+              return '<span title="' + code.description + '">' + code.code + "</span>";
+            } else {
+              return code.code;
+            }
           },
           include: Constants.isDetailedSample,
         },

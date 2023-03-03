@@ -1504,8 +1504,8 @@ public class MisoClient implements Lims {
     test.setTissueType(rs.getString("tissueType"));
     if (test.getTissueType() != null) {
       test.setNegateTissueType(rs.getBoolean("negateTissueType"));
-      test.setRepeatPerTimepoint(rs.getBoolean("repeatPerTimepoint"));
     }
+    test.setRepeatPerTimepoint(rs.getBoolean("repeatPerTimepoint"));
     test.setExtractionSampleType(SampleTypeConverter.getSampleType(rs.getString("extractionSampleType")));
     test.setLibrarySourceTemplateType(rs.getString("librarySourceTemplateType"));
     test.setLibraryQualificationMethod(rs.getString("libraryQualificationMethod"));

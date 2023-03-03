@@ -1,10 +1,14 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
+import java.io.IOException;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
+
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AssayTest;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.AssayTestService;
@@ -18,9 +22,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.AssayTestDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SaveDao;
 import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
-
-import java.io.IOException;
-import java.util.List;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
@@ -88,15 +89,13 @@ public class DefaultAssayTestService extends AbstractSaveService<AssayTest> impl
   }
 
   @Override
-  protected void collectValidationErrors(AssayTest object, AssayTest beforeChange, List<ValidationError> errors) throws IOException {
+  protected void collectValidationErrors(AssayTest object, AssayTest beforeChange, List<ValidationError> errors)
+      throws IOException {
     if (object.getLibraryQualificationMethod() == null) {
       errors.add(ValidationError.forRequired("libraryQualificationMethod"));
     }
 
     if (detailedSample) {
-      if (object.getTissueType() == null) {
-        errors.add(ValidationError.forRequired("tissueTypeId"));
-      }
       if (object.getExtractionClass() == null) {
         errors.add(ValidationError.forRequired("extractionClassId"));
       }
@@ -104,12 +103,12 @@ public class DefaultAssayTestService extends AbstractSaveService<AssayTest> impl
         errors.add(ValidationError.forRequired("libraryDesignCodeId"));
       }
       if (object.getLibraryQualificationMethod() == AssayTest.LibraryQualificationMethod.ALIQUOT) {
-          if (object.getLibraryQualificationDesignCode() == null) {
-            errors.add(ValidationError.forRequired("libraryQualificationDesignCodeId"));
-          }
+        if (object.getLibraryQualificationDesignCode() == null) {
+          errors.add(ValidationError.forRequired("libraryQualificationDesignCodeId"));
+        }
       } else if (object.getLibraryQualificationDesignCode() != null) {
-          errors.add(new ValidationError("libraryQualificationDesignCodeId",
-              "Invalid for the selected library qualification method"));
+        errors.add(new ValidationError("libraryQualificationDesignCodeId",
+            "Invalid for the selected library qualification method"));
       }
     }
   }
