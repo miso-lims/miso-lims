@@ -34,7 +34,6 @@ BulkTarget.assaytest = (function ($) {
           getItemValue: Utils.array.getId,
           sortSource: true,
           include: Constants.isDetailedSample,
-          required: true,
         },
         BulkUtils.columns.makeBoolean("Negate Tissue Type", "negateTissueType", true),
         {
