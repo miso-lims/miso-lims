@@ -17,7 +17,7 @@
     <mysql.db>lims</mysql.db>
     <mysql.user>tgaclims</mysql.user>
     <mysql.pw>tgaclims</mysql.pw>
-    <pinery.version>2.25.0</pinery.version>
+    <pinery.version>2.25.1-SNAPSHOT</pinery.version>
     <spring-version>5.3.20</spring-version><!-- must match version used by Pinery -->
   </properties>
 

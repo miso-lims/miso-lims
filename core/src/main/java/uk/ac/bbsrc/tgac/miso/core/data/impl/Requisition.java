@@ -54,6 +54,7 @@ public class Requisition implements Attachable, Deletable, QualityControllable<R
   private Assay assay;
 
   private boolean stopped = false;
+  private String stopReason;
 
   @OneToMany(targetEntity = RequisitionQC.class, mappedBy = "requisition", cascade = CascadeType.ALL)
   private Collection<RequisitionQC> qcs = new TreeSet<>();
@@ -129,6 +130,14 @@ public class Requisition implements Attachable, Deletable, QualityControllable<R
 
   public void setStopped(boolean stopped) {
     this.stopped = stopped;
+  }
+
+  public String getStopReason() {
+    return stopReason;
+  }
+
+  public void setStopReason(String stopReason) {
+    this.stopReason = stopReason;
   }
 
   @Override

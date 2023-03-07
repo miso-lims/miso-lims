@@ -11,6 +11,7 @@ public class RequisitionDto {
   private String alias;
   private Long assayId;
   private boolean stopped = false;
+  private String stopReason;
   private String lastModified;
 
   public static RequisitionDto from(Requisition from) {
@@ -19,6 +20,7 @@ public class RequisitionDto {
     setString(to::setAlias, from.getAlias());
     Dtos.setId(to::setAssayId, from.getAssay());
     setBoolean(to::setStopped, from.isStopped(), false);
+    setString(to::setStopReason, from.getStopReason());
     setDateTimeString(to::setLastModified, from.getLastModified());
     return to;
   }
@@ -55,6 +57,14 @@ public class RequisitionDto {
     this.stopped = stopped;
   }
 
+  public String getStopReason() {
+    return stopReason;
+  }
+
+  public void setStopReason(String stopReason) {
+    this.stopReason = stopReason;
+  }
+
   public String getLastModified() {
     return lastModified;
   }
@@ -69,6 +79,7 @@ public class RequisitionDto {
     setString(to::setAlias, getAlias());
     setObject(to::setAssay, Assay::new, getAssayId());
     setBoolean(to::setStopped, isStopped(), false);
+    setString(to::setStopReason, getStopReason());
     return to;
   }
 

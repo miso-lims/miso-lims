@@ -55,6 +55,21 @@ FormTarget.requisition = (function () {
               title: "Stopped",
               type: "checkbox",
               data: "stopped",
+              onChange: function (newValue, form) {
+                var options = {
+                  disabled: !newValue,
+                  required: newValue,
+                };
+                if (!newValue) {
+                  options.value = null;
+                }
+                form.updateField("stopReason", options);
+              },
+            },
+            {
+              title: "Stop Reason",
+              type: "text",
+              data: "stopReason",
             },
           ],
         },
