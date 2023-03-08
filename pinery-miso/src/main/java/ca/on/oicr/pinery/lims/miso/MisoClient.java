@@ -757,7 +757,7 @@ public class MisoClient implements Lims {
   @Override
   public Requisition getRequisition(String name) {
     List<Requisition> reqs =
-        template.query(QUERY_REQUISITION_BY_NAME, new Object[] {name}, SINGLE_ID_PARAM_TYPES, requisitionRowMapper);
+        template.query(QUERY_REQUISITION_BY_NAME, new Object[] {name}, SINGLE_STRING_PARAM_TYPES, requisitionRowMapper);
     if (reqs.isEmpty()) {
       return null;
     } else if (reqs.size() > 1) {
