@@ -91,6 +91,15 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
         && requisitionDao.getByAlias(object.getAlias()) != null) {
       errors.add(ValidationError.forDuplicate("requisition", "alias"));
     }
+    if (object.isStopped()) {
+      if (object.getStopReason() == null) {
+        errors.add(new ValidationError("stopReason", "Required if the requisition is stopped"));
+      }
+    } else {
+      if (object.getStopReason() != null) {
+        errors.add(new ValidationError("stopReason", "Invalid if the requisition is not stopped"));
+      }
+    }
   }
 
   @Override
@@ -98,6 +107,7 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
     to.setAlias(from.getAlias());
     to.setAssay(from.getAssay());
     to.setStopped(from.isStopped());
+    to.setStopReason(from.getStopReason());
   }
 
   @Override

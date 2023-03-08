@@ -8,7 +8,8 @@ FOR EACH ROW
     SET log_message = CONCAT_WS(', ',
       makeChangeMessage('alias', OLD.alias, NEW.alias),
       makeChangeMessage('assay', (SELECT alias FROM Assay WHERE assayId = OLD.assayId), (SELECT alias FROM Assay WHERE assayId = NEW.assayId)),
-      makeChangeMessage('stopped', booleanToString(OLD.stopped), booleanToString(NEW.stopped))
+      makeChangeMessage('stopped', booleanToString(OLD.stopped), booleanToString(NEW.stopped)),
+      makeChangeMessage('stop reason', OLD.stopReason, NEW.stopReason)
     );
     IF log_message IS NOT NULL AND log_message <> '' THEN
       INSERT INTO RequisitionChangeLog(requisitionId, columnsChanged, userId, message, changeTime) VALUES (
@@ -16,7 +17,8 @@ FOR EACH ROW
         COALESCE(CONCAT_WS(',',
           makeChangeColumn('alias', OLD.alias, NEW.alias),
           makeChangeColumn('assayId', OLD.assayId, NEW.assayId),
-          makeChangeColumn('stopped', OLD.stopped, NEW.stopped)
+          makeChangeColumn('stopped', OLD.stopped, NEW.stopped),
+          makeChangeColumn('stopReason', OLD.stopReason, NEW.stopReason)
         ), ''),
         NEW.lastModifier,
         log_message,
