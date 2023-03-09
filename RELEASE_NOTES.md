@@ -7,6 +7,30 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.55.0] - 2023-03-09
+
+### Added
+
+* added service records to Storage/Freezers
+* requisition stop reason field
+* "Copy" button for duplicating an assay from the Assays list page
+
+### Changed
+
+* assay test tissue type is now optional (detailed sample)
+* units and threshold type are now displayed when adding metrics to an assay
+
+### Fixed
+
+* Error when displaying file attachments in the service records list
+* when creating a new assay, clicking the "Add" button on the Tests table
+  resulted in creating new tests instead of adding existing tests to the assay
+
+### Upgrade Notes
+
+* Updated to Pinery 2.26.0
+
+
 ## [1.54.0] - 2023-02-23
 
 ### Added
