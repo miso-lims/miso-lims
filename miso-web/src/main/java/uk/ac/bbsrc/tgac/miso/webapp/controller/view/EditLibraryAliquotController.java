@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.getParentRequisition;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.parseIds;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils.*;
 
 import java.io.IOException;
@@ -27,7 +26,13 @@ import org.springframework.web.servlet.ModelAndView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import uk.ac.bbsrc.tgac.miso.core.data.*;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
@@ -95,8 +100,9 @@ public class EditLibraryAliquotController {
     List<Pool> pools = poolService.listByLibraryAliquotId(aliquotId);
     model.put("aliquotPools",
         pools.stream().map(p -> Dtos.asDto(p, false, false, indexChecker)).collect(Collectors.toList()));
-    model.put("aliquotRuns", pools.stream().flatMap(WhineyFunction.flatRethrow(p -> runService.listByPoolId(p.getId()))).map(Dtos::asDto)
-        .collect(Collectors.toList()));
+    model.put("aliquotRuns",
+        pools.stream().flatMap(WhineyFunction.flatRethrow(p -> runService.listByPoolId(p.getId()))).map(Dtos::asDto)
+            .collect(Collectors.toList()));
 
     model.put("aliquotTransfers", aliquot.getTransferViews().stream()
         .map(Dtos::asDto)
@@ -207,16 +213,17 @@ public class EditLibraryAliquotController {
         DetailedLibraryAliquot detailedParent = (DetailedLibraryAliquot) item;
         detailed.setNonStandardAlias(detailedParent.isNonStandardAlias());
         detailed.setLibraryDesignCodeId(detailedParent.getLibraryDesignCode().getId());
-        ParentTissueAttributes tissue = ((DetailedSample) detailedParent.getLibrary().getSample()).getTissueAttributes();
+        ParentTissueAttributes tissue =
+            ((DetailedSample) detailedParent.getLibrary().getSample()).getTissueAttributes();
         setEffectiveAttributes(detailed, detailedParent, tissue);
 
         dto = detailed;
       } else {
         dto = new LibraryAliquotDto();
       }
-      dto.setAlias(item.getAlias());
       dto.setDnaSize(item.getDnaSize());
       dto.setParentAliquotId(item.getId());
+      dto.setParentAliquotAlias(item.getAlias());
       dto.setLibraryId(item.getLibrary().getId());
       dto.setLibraryName(item.getLibrary().getName());
       dto.setLibraryAlias(item.getLibrary().getAlias());
@@ -347,7 +354,8 @@ public class EditLibraryAliquotController {
       dto.setPooledElements(parents.stream().map(ldi -> Dtos.asDto(ldi, false)).collect(Collectors.toSet()));
       if (dto.getPooledElements().stream().allMatch(element -> element.getVolumeUsed() != null)) {
         dto.setVolume(
-            Double.toString(dto.getPooledElements().stream().mapToDouble(element -> Double.parseDouble(element.getVolumeUsed())).sum()));
+            Double.toString(dto.getPooledElements().stream()
+                .mapToDouble(element -> Double.parseDouble(element.getVolumeUsed())).sum()));
       }
 
       dto.setBox(newBox);
@@ -405,7 +413,8 @@ public class EditLibraryAliquotController {
       PoolDto dto = new PoolDto();
       dto.setPlatformType(this.platformType.name());
       dto.setBox(newBox);
-      return prepare(model, PageMode.CREATE, "Create Pools from Library Aliquots", Collections.nCopies(poolQuantity, dto));
+      return prepare(model, PageMode.CREATE, "Create Pools from Library Aliquots",
+          Collections.nCopies(poolQuantity, dto));
     }
 
   }
@@ -459,7 +468,8 @@ public class EditLibraryAliquotController {
   }
 
   @PostMapping(value = "/bulk/pool-separate")
-  public ModelAndView propagatePoolsIndividual(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
+  public ModelAndView propagatePoolsIndividual(@RequestParam Map<String, String> form, ModelMap model)
+      throws IOException {
     String aliquotIds = getStringInput("ids", form, true);
     Long boxId = getLongInput("boxId", form, false);
     BulkPropagateBackend bulkPropagateBackend = new BulkPropagateBackend(

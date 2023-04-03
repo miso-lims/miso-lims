@@ -48,7 +48,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAliquotStore;
@@ -56,7 +55,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.LibraryStore;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultLibraryAliquotService implements LibraryAliquotService, PaginatedDataSource<LibraryAliquot> {
+public class DefaultLibraryAliquotService implements LibraryAliquotService {
 
   @Autowired
   private LibraryAliquotStore libraryAliquotDao;
@@ -118,7 +117,7 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
         try {
           managed.setAlias(namingScheme.generateLibraryAliquotAlias(managed));
         } catch (MisoNamingException e) {
-          throw new ValidationException(new ValidationError("name", e.getMessage()));
+          throw new ValidationException(new ValidationError("alias", e.getMessage()));
         }
         if (isDetailedLibraryAliquot(managed)) {
           // generation of non-standard aliases is allowed
@@ -323,7 +322,7 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService, Pagi
     if (!hasTemporaryAlias(aliquot)) {
       if (!isDetailedLibraryAliquot(aliquot) || !((DetailedLibraryAliquot) aliquot).isNonStandardAlias()) {
         uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult aliasValidation =
-            getNamingScheme(aliquot).validateLibraryAlias(aliquot.getAlias());
+            getNamingScheme(aliquot).validateLibraryAliquotAlias(aliquot.getAlias());
         if (!aliasValidation.isValid()) {
           if (isDetailedLibraryAliquot(aliquot) && !isChanged(LibraryAliquot::getAlias, aliquot, beforeChange)) {
             ((DetailedLibraryAliquot) aliquot).setNonStandardAlias(true);
