@@ -169,8 +169,9 @@ public class DefaultStorageLocationService implements StorageLocationService {
    * 
    * @param storage submitted StorageLocation to validate
    * @param beforeChange the already-persisted StorageLocation before changes
+   * @throws IOException
    */
-  private void validateChange(StorageLocation storage, StorageLocation beforeChange) {
+  private void validateChange(StorageLocation storage, StorageLocation beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
 
     if (storage.getIdentificationBarcode() != null
@@ -179,6 +180,10 @@ public class DefaultStorageLocationService implements StorageLocationService {
       errors.add(new ValidationError("identificationBarcode",
           String.format("There is already a storage location with this barcode (%s)",
               storage.getIdentificationBarcode())));
+    }
+    if (ValidationUtils.isSetAndChanged(StorageLocation::getProbeId, storage, beforeChange)
+        && storageLocationStore.getByProbeId(storage.getProbeId()) != null) {
+      errors.add(ValidationError.forDuplicate("Freezer", "probeId", "probe ID"));
     }
 
     validateLocationUnitRelationships(storage, errors);

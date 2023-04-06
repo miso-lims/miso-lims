@@ -48,6 +48,13 @@ public class HibernateStorageLocationDao implements StorageLocationStore {
   }
 
   @Override
+  public StorageLocation getByProbeId(String probeId) throws IOException {
+    return (StorageLocation) currentSession().createCriteria(StorageLocation.class)
+        .add(Restrictions.eq("probeId", probeId))
+        .uniqueResult();
+  }
+
+  @Override
   public List<StorageLocation> listRooms() {
     Criteria criteria = currentSession().createCriteria(StorageLocation.class)
         .add(Restrictions.eq("locationUnit", LocationUnit.ROOM));

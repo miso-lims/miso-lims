@@ -9,16 +9,18 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 
 public interface StorageLocationStore {
 
-  public StorageLocation get(long id);
+  StorageLocation get(long id);
 
-  public StorageLocation getByBarcode(String barcode);
+  StorageLocation getByBarcode(String barcode);
 
-  public List<StorageLocation> listRooms();
+  StorageLocation getByProbeId(String probeId) throws IOException;
 
-  public List<StorageLocation> listFreezers();
+  List<StorageLocation> listRooms();
 
-  public long save(StorageLocation location);
+  List<StorageLocation> listFreezers();
 
-  public StorageLocation getByServiceRecord(ServiceRecord record) throws IOException;
+  long save(StorageLocation location);
+
+  StorageLocation getByServiceRecord(ServiceRecord record) throws IOException;
 
 }
