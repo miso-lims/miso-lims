@@ -5,8 +5,6 @@ attached to requisitions in order to track qualitative information, progress, re
 an assay, which details the intended work and quality control requirements. There is also a "stopped" flag on
 requisitions that may be used to indicate that no further work should be done on the case.
 
-If you are using detailed sample mode, all samples in a requisition must belong to the same identity.
-
 ## Requisitions List
 
 To get to the Requisitions list page, click "Requisitions" in the Preparation list in the menu on the left side of the
