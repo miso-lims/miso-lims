@@ -2,24 +2,18 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 
-import java.io.IOException;
 import java.util.List;
 
-import org.hibernate.SessionFactory;
-
-import org.checkerframework.dataflow.qual.TerminatesExecution;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.eaglegenomics.simlims.core.User;
-import com.google.common.annotations.VisibleForTesting;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.persistence.ServiceRecordStore;
 
 public class HibernateStorageLocationDaoIT extends AbstractDAOTest {
 
@@ -45,6 +39,14 @@ public class HibernateStorageLocationDaoIT extends AbstractDAOTest {
     StorageLocation room = sut.getByBarcode(barcode);
     assertNotNull(room);
     assertEquals(barcode, room.getIdentificationBarcode());
+  }
+
+  @Test
+  public void testGetByProbeId() throws Exception {
+    String probeId = "probe2";
+    StorageLocation freezer = sut.getByProbeId(probeId);
+    assertNotNull(freezer);
+    assertEquals(probeId, freezer.getProbeId());
   }
 
   @Test

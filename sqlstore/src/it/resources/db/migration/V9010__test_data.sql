@@ -53,14 +53,14 @@ INSERT INTO StorageLabel(labelId, label) VALUES
 (2, 'Label Two'),
 (3, 'Label Three');
 
-INSERT INTO StorageLocation(locationId, parentLocationId, locationUnit, alias, identificationBarcode, creator, created, lastModifier, lastModified, mapId, labelId) VALUES
-(1, NULL, 'ROOM', 'Room 1', 'room1barcode', 1, '2021-02-23 09:57:00', 1, '2021-02-23 09:57:00', NULL, NULL),
-(2, NULL, 'ROOM', 'Room 2', 'room2barcode', 1, '2021-02-23 09:57:00', 1, '2021-02-23 09:57:00', NULL, NULL),
-(3, 1, 'FREEZER', 'Freezer 1', 'freezer1barcode', 1, '2021-02-23 09:57:00', 1, '2021-02-23 09:57:00', 1, NULL),
-(4, 3, 'SHELF', '1', NULL, 1, '2021-02-23 09:57:00', 1, '2021-02-23 09:57:00', NULL, 2),
-(5, 3, 'SHELF', '2', NULL, 1, '2021-02-23 09:57:00', 1, '2021-02-23 09:57:00', NULL, 2),
-(6, 3, 'SHELF', '3', NULL, 1, '2021-02-23 09:57:00', 1, '2021-02-23 09:57:00', NULL, 3),
-(7, 1, 'FREEZER', 'Freezer 2', 'freezer2barcode', 1, '2021-02-23 09:57:00', 1, '2021-02-23 09:57:00', 1, NULL);
+INSERT INTO StorageLocation(locationId, parentLocationId, locationUnit, alias, identificationBarcode, creator, created, lastModifier, lastModified, mapId, labelId, probeId) VALUES
+(1, NULL, 'ROOM', 'Room 1', 'room1barcode', 1, '2021-02-23 09:57:00', 1, '2021-02-23 09:57:00', NULL, NULL, NULL),
+(2, NULL, 'ROOM', 'Room 2', 'room2barcode', 1, '2021-02-23 09:57:00', 1, '2021-02-23 09:57:00', NULL, NULL, NULL),
+(3, 1, 'FREEZER', 'Freezer 1', 'freezer1barcode', 1, '2021-02-23 09:57:00', 1, '2021-02-23 09:57:00', 1, NULL, 'probe1'),
+(4, 3, 'SHELF', '1', NULL, 1, '2021-02-23 09:57:00', 1, '2021-02-23 09:57:00', NULL, 2, NULL),
+(5, 3, 'SHELF', '2', NULL, 1, '2021-02-23 09:57:00', 1, '2021-02-23 09:57:00', NULL, 2, NULL),
+(6, 3, 'SHELF', '3', NULL, 1, '2021-02-23 09:57:00', 1, '2021-02-23 09:57:00', NULL, 3, NULL),
+(7, 1, 'FREEZER', 'Freezer 2', 'freezer2barcode', 1, '2021-02-23 09:57:00', 1, '2021-02-23 09:57:00', 1, NULL, 'probe2');
 
 INSERT INTO DetailedQcStatus (detailedQcStatusId, description, status, noteRequired, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 'Passed', TRUE, FALSE, 1, '2019-05-28 13:17:00', 1, '2019-05-28 13:17:00'),
