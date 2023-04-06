@@ -7,6 +7,17 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.55.1] - 2023-04-06
+
+### Fixed
+
+* an issue where a project became inaccessible if the user who created it had
+  been deleted
+* errors generating and validating aliases when propagating a library aliquot from a library aliquot
+* unclear error message when entering a duplicate freezer probe ID
+* Errors moving samples between worksets
+
+
 ## [1.55.0] - 2023-03-09
 
 ### Added
