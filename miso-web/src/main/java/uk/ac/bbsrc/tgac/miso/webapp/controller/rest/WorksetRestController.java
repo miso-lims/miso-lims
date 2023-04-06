@@ -291,16 +291,19 @@ public class WorksetRestController extends RestController {
   }
 
   @PostMapping("/{worksetId}/samples/move")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
   public @ResponseBody void moveSamples(@PathVariable long worksetId, @RequestBody MoveItemsDto dto) throws IOException {
     moveItems(worksetId, dto, "Sample", sampleService, worksetService::moveSamples);
   }
 
   @PostMapping("/{worksetId}/libraries/move")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
   public @ResponseBody void moveLibraries(@PathVariable long worksetId, @RequestBody MoveItemsDto dto) throws IOException {
     moveItems(worksetId, dto, "Library", libraryService, worksetService::moveLibraries);
   }
 
   @PostMapping("/{worksetId}/libraryaliquots/move")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
   public @ResponseBody void moveLibraryAliquots(@PathVariable long worksetId, @RequestBody MoveItemsDto dto) throws IOException {
     moveItems(worksetId, dto, "Library aliquot", libraryAliquotService, worksetService::moveLibraryAliquots);
   }

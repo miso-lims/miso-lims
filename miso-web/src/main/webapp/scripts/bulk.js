@@ -1275,65 +1275,72 @@ BulkUtils = (function ($) {
         return {
           name: "Move to Workset",
           action: function (items) {
-            var fields = [
-              {
-                label: "Workset search",
-                property: "query",
-                type: "text",
-                required: true,
-              },
-            ];
-            Utils.showDialog("Move to Workset", "Search", fields, function (input) {
-              Utils.ajaxWithDialog(
-                "Finding Worksets",
-                "GET",
-                Urls.rest.worksets.query +
-                  "?" +
-                  Utils.page.param({
-                    q: input.query,
-                  }),
-                null,
-                function (worksets) {
-                  if (!worksets || !worksets.length) {
-                    Utils.showOkDialog("Workset Search", ["No matching worksets found."], doSearch);
-                  } else {
-                    Utils.showWizardDialog(
-                      "Move to Workset",
-                      worksets.map(function (workset) {
-                        return {
-                          name: workset.alias,
-                          handler: function () {
-                            var requestData = {
-                              targetWorksetId: workset.id,
-                              itemIds: items.map(Utils.array.getId),
-                            };
-                            Utils.ajaxWithDialog(
-                              "Moving items",
-                              "POST",
-                              url,
-                              requestData,
-                              function () {
-                                Utils.showOkDialog(
-                                  "Items moved",
-                                  [
-                                    "The selected " +
-                                      pluralLabel +
-                                      " have been moved to workset '" +
-                                      workset.alias +
-                                      "'.",
-                                  ],
-                                  Utils.page.pageReload
-                                );
-                              }
-                            );
-                          },
-                        };
-                      })
-                    );
+            var doSearch = function () {
+              var fields = [
+                {
+                  label: "Workset search",
+                  property: "query",
+                  type: "text",
+                  required: true,
+                },
+              ];
+              Utils.showDialog("Move to Workset", "Search", fields, function (input) {
+                Utils.ajaxWithDialog(
+                  "Finding Worksets",
+                  "GET",
+                  Urls.rest.worksets.query +
+                    "?" +
+                    Utils.page.param({
+                      q: input.query,
+                    }),
+                  null,
+                  function (worksets) {
+                    if (!worksets || !worksets.length) {
+                      Utils.showOkDialog(
+                        "Workset Search",
+                        ["No matching worksets found."],
+                        doSearch
+                      );
+                    } else {
+                      Utils.showWizardDialog(
+                        "Move to Workset",
+                        worksets.map(function (workset) {
+                          return {
+                            name: workset.alias,
+                            handler: function () {
+                              var requestData = {
+                                targetWorksetId: workset.id,
+                                itemIds: items.map(Utils.array.getId),
+                              };
+                              Utils.ajaxWithDialog(
+                                "Moving items",
+                                "POST",
+                                url,
+                                requestData,
+                                function () {
+                                  Utils.showOkDialog(
+                                    "Items moved",
+                                    [
+                                      "The selected " +
+                                        pluralLabel +
+                                        " have been moved to workset '" +
+                                        workset.alias +
+                                        "'.",
+                                    ],
+                                    Utils.page.pageReload
+                                  );
+                                }
+                              );
+                            },
+                          };
+                        })
+                      );
+                    }
                   }
-                }
-              );
-            });
+                );
+              });
+            };
+            doSearch();
           },
         };
       },
