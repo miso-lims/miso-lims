@@ -884,6 +884,9 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
       validateSubproject(sample, beforeChange, errors);
       validateReferenceSlide((DetailedSample) sample, errors);
       validateGroupDescription((DetailedSample) sample, errors);
+      if (sample.getRequisition() != null && ((DetailedSample) sample).isSynthetic()) {
+        errors.add(new ValidationError("requisitionId", "Ghost samples cannot be added to requisitions"));
+      }
     }
 
     if (sample.getCreationReceiptInfo() != null) {

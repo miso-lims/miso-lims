@@ -389,7 +389,17 @@ ListTarget.sample = (function () {
             Utils.page.pageReload();
             break;
           case "failed":
-            Utils.showOkDialog("Error", ["Failed to save samples"]);
+            var lines = ["Failed to save samples:"];
+            if (update.detail === "Validation failed" && update.data) {
+              update.data.forEach(function (failure) {
+                var sample = items[failure.row];
+                lines.push(sample.alias + " (" + sample.name + "):");
+                failure.fields.forEach(function (field) {
+                  lines.push("* " + field.field + ": " + field.errors.join("; "));
+                });
+              });
+            }
+            Utils.showOkDialog("Error", lines);
             break;
           default:
             Utils.showOkDialog("Error", [
