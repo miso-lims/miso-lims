@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalSample;
@@ -25,6 +26,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.RequisitionDao;
@@ -182,6 +184,9 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
   @Override
   public void addSupplementalSamples(Requisition requisition, Collection<Sample> samples) throws IOException {
     for (Sample sample : samples) {
+      if (LimsUtils.isDetailedSample(sample) && ((DetailedSample) sample).isSynthetic()) {
+        throw new ValidationException("Ghost samples cannot be added as supplemental samples");
+      }
       RequisitionSupplementalSample supplemental = new RequisitionSupplementalSample(requisition.getId(), sample);
       requisitionDao.saveSupplementalSample(supplemental);
     }
