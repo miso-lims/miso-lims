@@ -60,7 +60,7 @@ var RunLibraryMetrics = (function ($) {
             }
           });
           if (cellAdded === false) {
-            metricCell = $("<td>").text("N/A");
+            metricCell.append("N/A");
             metricCell.addClass("na");
           }
           row.append(metricCell);
