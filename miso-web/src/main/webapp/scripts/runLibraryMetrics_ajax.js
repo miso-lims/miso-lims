@@ -29,8 +29,15 @@ var RunLibraryMetrics = (function ($) {
 
       var headerRow = $("<tr>");
       headerRow.append($("<th>").text("Library Aliquot"));
-      data[0].metrics.forEach(function (metric) {
-        headerRow.append(makeMetricHeader(metric));
+
+      var metricsHeadings = new Set();
+      data.forEach(function (element) {
+        element.metrics.forEach(function (metric) {
+          if (!metricsHeadings.has(metric.title)) {
+            headerRow.append($("<th>").text(metric.title));
+            metricsHeadings.add(metric.title);
+          }
+        });
       });
       headerRow.append($("<th>").text("Effective QC Status"));
       headerRow.append($("<th>").text("QC Status"));
@@ -40,10 +47,21 @@ var RunLibraryMetrics = (function ($) {
       data.forEach(function (rowData) {
         var row = $("<tr>");
         row.append($("<td>").text(rowData.libraryAliquot.alias));
-        rowData.metrics.forEach(function (metric) {
-          var metricCell = $("<td>").text(metric.value == null ? "?" : metric.value);
-          if (!metricPassed(metric)) {
-            metricCell.addClass("failed");
+        metricsHeadings.forEach(function (heading) {
+          var cellAdded = false;
+          var metricCell = $("<td>");
+          rowData.metrics.forEach(function (metric) {
+            if (metric.title === heading) {
+              metricCell.append($("<div>").text(metric.value), displayThreshold(metric));
+              if (!metricPassed(metric)) {
+                metricCell.addClass("failed");
+              }
+              cellAdded = true;
+            }
+          });
+          if (cellAdded === false) {
+            metricCell.append("N/A");
+            metricCell.addClass("na");
           }
           row.append(metricCell);
         });
@@ -133,9 +151,9 @@ var RunLibraryMetrics = (function ($) {
     },
   };
 
-  function makeMetricHeader(metric) {
-    return $("<th>").text(
-      metric.title + " (threshold: " + makeThresholdTypeLabel(metric) + " " + metric.threshold + ")"
+  function displayThreshold(metric) {
+    return $("<div>").text(
+      " (threshold: " + makeThresholdTypeLabel(metric) + " " + metric.threshold + ")"
     );
   }
 

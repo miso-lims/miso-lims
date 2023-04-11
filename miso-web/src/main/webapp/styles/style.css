@@ -1125,6 +1125,10 @@ ul.unformatted-list {
   background-color: var(--error-background);
 }
 
+#metricsTable td.na {
+  background-color: var(--grey-light);
+}
+
 #metricsTable select {
   width: 250px;
 }

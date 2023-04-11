@@ -73,7 +73,8 @@ public class RunLibraryController {
       RunLibraryQCTableRowDto row = new RunLibraryQCTableRowDto();
       LibraryAliquot aliquot = libraryAliquotService.get(aliquotId);
       row.setLibraryAliquot(Dtos.asDto(aliquot, false));
-      row.setMetrics(item.getMetrics().stream().map(RunLibraryQcTableRowMetricDto::fromRequestDto).collect(Collectors.toList()));
+      row.setMetrics(
+          item.getMetrics().stream().map(RunLibraryQcTableRowMetricDto::fromRequestDto).collect(Collectors.toList()));
       row.setQcNodes(getNodes(hierarchy, item.getRunId(), partitionId, aliquotId));
       rows.add(row);
     }
@@ -86,8 +87,8 @@ public class RunLibraryController {
   }
 
   /**
-   * Traverse the hierarchy and return a list of all the nodes on the direct path from the top sample to the specified
-   * run-library. Nodes not on the direct path are excluded
+   * Traverse the hierarchy and return a list of all the nodes on the direct path from the top sample
+   * to the specified run-library. Nodes not on the direct path are excluded
    * 
    * @param node
    * @param runId
@@ -130,7 +131,8 @@ public class RunLibraryController {
     return Long.parseLong(m.group(1));
   }
 
-  private static RunLibraryQcTableRequestDto validateRunLibraryQcTableRequest(Map<String, String> form, ObjectMapper mapper)
+  private static RunLibraryQcTableRequestDto validateRunLibraryQcTableRequest(Map<String, String> form,
+      ObjectMapper mapper)
       throws IOException {
     RunLibraryQcTableRequestDto data = null;
     if (form.containsKey("data")) {
@@ -147,21 +149,14 @@ public class RunLibraryController {
     } else if (data.getLibraryAliquots() == null || data.getLibraryAliquots().isEmpty()) {
       throw new ClientErrorException("No library aliquots specified");
     }
-    RunLibraryQcTableRequestLibraryDto template = data.getLibraryAliquots().get(0);
     for (RunLibraryQcTableRequestLibraryDto lib : data.getLibraryAliquots()) {
       if (lib.getMetrics() == null || lib.getMetrics().isEmpty()) {
         throw new ClientErrorException("No metrics specified");
-      } else if (lib.getMetrics().size() != template.getMetrics().size()) {
-        throw new ClientErrorException("Inconsistent metrics specified");
       }
       for (int i = 0; i < lib.getMetrics().size(); i++) {
         RunLibraryQcTableRequestMetricDto m1 = lib.getMetrics().get(i);
-        RunLibraryQcTableRequestMetricDto m2 = template.getMetrics().get(i);
         if (m1.getTitle() == null || m1.getThresholdType() == null) {
           throw new ClientErrorException("Invalid metrics specified");
-        } else if (!m1.getTitle().equals(m2.getTitle()) || !m1.getThresholdType().equals(m2.getThresholdType())
-            || m1.getThreshold() != m2.getThreshold()) {
-              throw new ClientErrorException("Inconsistent metrics specified");
         }
       }
     }
@@ -169,7 +164,8 @@ public class RunLibraryController {
   }
 
   @GetMapping("/{runId}-{partitionId}-{aliquotId}/qc-hierarchy")
-  public ModelAndView getQcHierarchy(@PathVariable long runId, @PathVariable long partitionId, @PathVariable long aliquotId, ModelMap model)
+  public ModelAndView getQcHierarchy(@PathVariable long runId, @PathVariable long partitionId,
+      @PathVariable long aliquotId, ModelMap model)
       throws IOException {
     SampleQcNode hierarchy = qcNodeService.getForRunLibrary(runId, partitionId, aliquotId);
     if (hierarchy == null) {
@@ -190,36 +186,70 @@ public class RunLibraryController {
   // final long runId = 4862L;
   // final int partitionNumber = 1;
   // final String aliquot1Name = "LDI48170";
-  //
+
+  // final String aliquot2Name = "LDI73998";
+  // final long run2Id = 4862L;
+
+
   // RunLibraryQcTableRequestDto dto = new RunLibraryQcTableRequestDto();
-  //
+
   // dto.setReport("Some Report");
   // List<RunLibraryQcTableRequestLibraryDto> aliquots = new ArrayList<>();
   // dto.setLibraryAliquots(aliquots);
-  //
+
   // RunLibraryQcTableRequestLibraryDto aliquot = new RunLibraryQcTableRequestLibraryDto();
+  // RunLibraryQcTableRequestLibraryDto aliquot2 = new RunLibraryQcTableRequestLibraryDto();
   // aliquots.add(aliquot);
-  //
+  // aliquots.add(aliquot2);
+
+
   // aliquot.setName(aliquot1Name);
   // aliquot.setRunId(runId);
   // aliquot.setPartition(partitionNumber);
   // List<RunLibraryQcTableRequestMetricDto> metrics = new ArrayList<>();
   // aliquot.setMetrics(metrics);
-  //
+
+  // aliquot2.setName(aliquot2Name);
+  // aliquot2.setRunId(run2Id);
+  // aliquot2.setPartition(partitionNumber);
+  // List<RunLibraryQcTableRequestMetricDto> metrics2 = new ArrayList<>();
+  // aliquot2.setMetrics(metrics2);
+
   // RunLibraryQcTableRequestMetricDto metric1 = new RunLibraryQcTableRequestMetricDto();
   // metrics.add(metric1);
   // metric1.setTitle("Something");
   // metric1.setThreshold(100D);
   // metric1.setThresholdType("gt");
   // metric1.setValue(120D);
-  //
+
   // RunLibraryQcTableRequestMetricDto metric2 = new RunLibraryQcTableRequestMetricDto();
   // metrics.add(metric2);
   // metric2.setTitle("Another Thing");
   // metric2.setThreshold(100D);
   // metric2.setThresholdType("le");
   // metric2.setValue(120D);
-  //
+
+  // RunLibraryQcTableRequestMetricDto metric3 = new RunLibraryQcTableRequestMetricDto();
+  // metrics2.add(metric3);
+  // metric3.setTitle("Another Thing");
+  // metric3.setThreshold(150D);
+  // metric3.setThresholdType("gt");
+  // metric3.setValue(562.6D);
+
+  // RunLibraryQcTableRequestMetricDto metric4 = new RunLibraryQcTableRequestMetricDto();
+  // metrics2.add(metric4);
+  // metric4.setTitle("Another Thing 2");
+  // metric4.setThreshold(10000D);
+  // metric4.setThresholdType("gt");
+  // metric4.setValue(46363D);
+
+  // RunLibraryQcTableRequestMetricDto metric5 = new RunLibraryQcTableRequestMetricDto();
+  // metrics2.add(metric5);
+  // metric5.setTitle("Another Thing 3");
+  // metric5.setThreshold(35D);
+  // metric5.setThresholdType("lt");
+  // metric5.setValue(3.8D);
+
   // Map<String, String> form = new HashMap<>();
   // form.put("data", mapper.writeValueAsString(dto));
   // return getRunLibraryQcTable(form, model);
