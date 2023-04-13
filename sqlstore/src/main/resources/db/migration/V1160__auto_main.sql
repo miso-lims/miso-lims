@@ -16,7 +16,7 @@ SELECT detailedQcStatusId INTO @readyId FROM DetailedQcStatus WHERE description 
 SELECT detailedQcStatusId INTO @failedId FROM DetailedQcStatus WHERE description = @failed;
 
 -- Library
-ALTER TABLE Library ADD COLUMN detailedQcStatusId bigint(20);
+ALTER TABLE Library ADD COLUMN detailedQcStatusId bigint;
 ALTER TABLE Library ADD CONSTRAINT fk_library_detailedQcStatus FOREIGN KEY (detailedQcStatusId) REFERENCES DetailedQcStatus (detailedQcStatusId);
 ALTER TABLE Library ADD COLUMN detailedQcStatusNote varchar(500);
 
@@ -26,7 +26,7 @@ UPDATE Library SET detailedQcStatusId = @failedId WHERE qcPassed = FALSE;
 ALTER TABLE Library DROP COLUMN qcPassed;
 
 -- Library Aliquot
-ALTER TABLE LibraryAliquot ADD COLUMN detailedQcStatusId bigint(20);
+ALTER TABLE LibraryAliquot ADD COLUMN detailedQcStatusId bigint;
 ALTER TABLE LibraryAliquot ADD CONSTRAINT fk_libraryAliquot_detailedQcStatus FOREIGN KEY (detailedQcStatusId) REFERENCES DetailedQcStatus (detailedQcStatusId);
 ALTER TABLE LibraryAliquot ADD COLUMN detailedQcStatusNote varchar(500);
 

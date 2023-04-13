@@ -1,6 +1,6 @@
 -- changeloggables
 
-ALTER TABLE Experiment ADD COLUMN creator bigint(20);
+ALTER TABLE Experiment ADD COLUMN creator bigint;
 ALTER TABLE Experiment ADD COLUMN created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP();
 ALTER TABLE Experiment ADD COLUMN lastModified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP();
 
@@ -12,10 +12,10 @@ UPDATE Experiment SET
   creator = COALESCE((SELECT userId FROM ExperimentChangeLog WHERE experimentId = Experiment.experimentId ORDER BY changeTime ASC LIMIT 1), @admin);
 -- EndNoTest
 
-ALTER TABLE Experiment CHANGE COLUMN creator creator bigint(20) NOT NULL;
+ALTER TABLE Experiment CHANGE COLUMN creator creator bigint NOT NULL;
 ALTER TABLE Experiment ADD CONSTRAINT fk_experiment_creator FOREIGN KEY (creator) REFERENCES User (userId);
 
-ALTER TABLE KitDescriptor ADD COLUMN creator bigint(20);
+ALTER TABLE KitDescriptor ADD COLUMN creator bigint;
 ALTER TABLE KitDescriptor ADD COLUMN created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP();
 ALTER TABLE KitDescriptor ADD COLUMN lastModified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP();
 
@@ -27,10 +27,10 @@ UPDATE KitDescriptor SET
   creator = COALESCE((SELECT userId FROM KitDescriptorChangeLog WHERE kitDescriptorId = KitDescriptor.kitDescriptorId ORDER BY changeTime ASC LIMIT 1), @admin);
 -- EndNoTest
 
-ALTER TABLE KitDescriptor CHANGE COLUMN creator creator bigint(20) NOT NULL;
+ALTER TABLE KitDescriptor CHANGE COLUMN creator creator bigint NOT NULL;
 ALTER TABLE KitDescriptor ADD CONSTRAINT fk_kitDescriptor_creator FOREIGN KEY (creator) REFERENCES User (userId);
 
-ALTER TABLE Study ADD COLUMN creator bigint(20);
+ALTER TABLE Study ADD COLUMN creator bigint;
 ALTER TABLE Study ADD COLUMN created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP();
 ALTER TABLE Study ADD COLUMN lastModified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP();
 
@@ -41,7 +41,7 @@ UPDATE Study SET
   creator = COALESCE((SELECT userId FROM StudyChangeLog WHERE studyId = Study.studyId ORDER BY changeTime ASC LIMIT 1), @admin);
 -- EndNoTest
 
-ALTER TABLE Study CHANGE COLUMN creator creator bigint(20) NOT NULL;
+ALTER TABLE Study CHANGE COLUMN creator creator bigint NOT NULL;
 ALTER TABLE Study ADD CONSTRAINT fk_study_creator FOREIGN KEY (creator) REFERENCES User (userId);
 
 

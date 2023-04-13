@@ -1,7 +1,7 @@
 -- libraryDesignCode_changes
 
 CREATE TABLE `LibraryDesignCode` (
-  `libraryDesignCodeId` BIGINT(20) NOT NULL AUTO_INCREMENT,
+  `libraryDesignCodeId` bigint NOT NULL AUTO_INCREMENT,
   `code` VARCHAR(2) NOT NULL,
   `description` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`libraryDesignCodeId`),
@@ -13,9 +13,9 @@ INSERT INTO LibraryDesignCode (code, description) SELECT DISTINCT SUBSTRING(name
 
 ALTER TABLE LibraryDesign DROP FOREIGN KEY `FK_ld_lt`;
 ALTER TABLE LibraryDesign DROP COLUMN libraryType;
-ALTER TABLE LibraryAdditionalInfo ADD COLUMN `libraryDesignCodeId` BIGINT(20);
+ALTER TABLE LibraryAdditionalInfo ADD COLUMN `libraryDesignCodeId` bigint;
 ALTER TABLE LibraryAdditionalInfo ADD CONSTRAINT `FK_lai_libraryDesignCode_libraryDesignCodeId` FOREIGN KEY (`libraryDesignCodeId`) REFERENCES `LibraryDesignCode` (`libraryDesignCodeId`);
-ALTER TABLE LibraryDesign ADD COLUMN `libraryDesignCodeId` BIGINT(20);
+ALTER TABLE LibraryDesign ADD COLUMN `libraryDesignCodeId` bigint;
 ALTER TABLE LibraryDesign ADD CONSTRAINT `FK_ld_libraryDesignCode_libraryDesignCodeId` FOREIGN KEY (`libraryDesignCodeId`) REFERENCES `LibraryDesignCode` (`libraryDesignCodeId`);
 
 -- StartNoTest
@@ -29,7 +29,7 @@ DELIMITER //
 CREATE PROCEDURE update_libraryDesignCode ()
 BEGIN
   DECLARE v_finished INT DEFAULT 0;
-  DECLARE v_ldcId BIGINT(20);
+  DECLARE v_ldcId bigint;
 
   DECLARE updateLibraryDesignCodeCursor CURSOR FOR 
     SELECT libraryDesignCodeId FROM LibraryDesignCode;
@@ -56,8 +56,8 @@ CALL update_libraryDesignCode();
 DROP PROCEDURE IF EXISTS update_libraryDesignCode;
 -- EndNoTest
 
-ALTER TABLE LibraryAdditionalInfo MODIFY COLUMN `libraryDesignCodeId` BIGINT(20) NOT NULL;
-ALTER TABLE LibraryDesign MODIFY COLUMN `libraryDesignCodeId` BIGINT(20) NOT NULL;
+ALTER TABLE LibraryAdditionalInfo MODIFY COLUMN `libraryDesignCodeId` bigint NOT NULL;
+ALTER TABLE LibraryDesign MODIFY COLUMN `libraryDesignCodeId` bigint NOT NULL;
 ALTER TABLE LibraryDesign DROP COLUMN `suffix`;
 
 

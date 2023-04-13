@@ -1,14 +1,14 @@
 -- transfers
 CREATE TABLE Transfer (
-  transferId bigint(20) PRIMARY KEY AUTO_INCREMENT,
+  transferId bigint PRIMARY KEY AUTO_INCREMENT,
   transferDate DATE NOT NULL,
-  senderLabId bigint(20),
-  senderGroupId bigint(20),
+  senderLabId bigint,
+  senderGroupId bigint,
   recipient varchar(255),
-  recipientGroupId bigint(20),
-  creator bigint(20) NOT NULL,
+  recipientGroupId bigint,
+  creator bigint NOT NULL,
   created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  lastModifier bigint(20) NOT NULL,
+  lastModifier bigint NOT NULL,
   lastModified TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_transfer_senderLab FOREIGN KEY (senderLabId) REFERENCES Lab (labId),
   CONSTRAINT fk_transfer_senderGroup FOREIGN KEY (senderGroupId) REFERENCES _Group (groupId),
@@ -18,8 +18,8 @@ CREATE TABLE Transfer (
 ) Engine=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE Transfer_Sample (
-  transferId bigint(20),
-  sampleId bigint(20),
+  transferId bigint,
+  sampleId bigint,
   received BOOLEAN,
   qcPassed BOOLEAN,
   qcNote varchar(255),
@@ -29,8 +29,8 @@ CREATE TABLE Transfer_Sample (
 ) Engine=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE Transfer_Library (
-  transferId bigint(20),
-  libraryId bigint(20),
+  transferId bigint,
+  libraryId bigint,
   received BOOLEAN,
   qcPassed BOOLEAN,
   qcNote varchar(255),
@@ -40,8 +40,8 @@ CREATE TABLE Transfer_Library (
 ) Engine=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE Transfer_LibraryAliquot (
-  transferId bigint(20),
-  aliquotId bigint(20),
+  transferId bigint,
+  aliquotId bigint,
   received BOOLEAN,
   qcPassed BOOLEAN,
   qcNote varchar(255),
@@ -51,8 +51,8 @@ CREATE TABLE Transfer_LibraryAliquot (
 ) Engine=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE Transfer_Pool (
-  transferId bigint(20),
-  poolId bigint(20),
+  transferId bigint,
+  poolId bigint,
   received BOOLEAN,
   qcPassed BOOLEAN,
   qcNote varchar(255),
@@ -65,11 +65,11 @@ ALTER TABLE Lab ADD COLUMN excludeFromPinery BOOLEAN NOT NULL DEFAULT FALSE;
 
 -- StartNoTest
 CREATE TABLE TemporaryTransfer (
-  transferId bigint(20) PRIMARY KEY AUTO_INCREMENT,
-  projectId bigint(20),
-  creator bigint(20),
+  transferId bigint PRIMARY KEY AUTO_INCREMENT,
+  projectId bigint,
+  creator bigint,
   receivedDate DATE,
-  labId bigint(20)
+  labId bigint
 ) Engine=InnoDB DEFAULT CHARSET=utf8;
 
 SELECT userId INTO @admin FROM User WHERE loginName = 'admin';
@@ -96,10 +96,10 @@ WHERE INTERNAL = TRUE;
 DELIMITER //
 
 DROP FUNCTION IF EXISTS findParentWithLab//
-CREATE FUNCTION findParentWithLab(pSampleId bigint(20)) RETURNS bigint(20)
+CREATE FUNCTION findParentWithLab(pSampleId bigint) RETURNS bigint
   NOT DETERMINISTIC READS SQL DATA
 BEGIN
-  DECLARE vTissueId bigint(20);
+  DECLARE vTissueId bigint;
   SET vTissueId = pSampleId;
   WHILE vTissueId IS NOT NULL AND NOT EXISTS (SELECT sampleId FROM SampleTissue WHERE sampleId = vTissueId AND labId IS NOT NULL) DO
     IF EXISTS (SELECT sampleId FROM DetailedSample WHERE sampleId = vTissueId) THEN
@@ -114,8 +114,8 @@ END//
 DELIMITER ;
 
 CREATE TABLE TissueParentView (
-  sampleId bigint(20),
-  tissueId bigint(20)
+  sampleId bigint,
+  tissueId bigint
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO TissueParentView (sampleId, tissueId)
@@ -193,8 +193,8 @@ DROP TABLE TissueParentView;
 
 -- Construct outbound sample transfers
 CREATE TABLE TemporaryTransfer (
-  transferId bigint(20) PRIMARY KEY AUTO_INCREMENT,
-  projectId bigint(20),
+  transferId bigint PRIMARY KEY AUTO_INCREMENT,
+  projectId bigint,
   distributionDate DATE,
   distributionRecipient varchar(250)
 ) Engine=InnoDB DEFAULT CHARSET=utf8;
@@ -279,8 +279,8 @@ DROP TABLE TemporaryTransfer;
 
 -- Construct outbound pool transfers
 CREATE TABLE TemporaryTransfer (
-  transferId bigint(20) PRIMARY KEY AUTO_INCREMENT,
-  poolId bigint(20)
+  transferId bigint PRIMARY KEY AUTO_INCREMENT,
+  poolId bigint
 ) Engine=InnoDB DEFAULT CHARSET=utf8;
 
 -- Update auto_increment sequence
@@ -327,7 +327,7 @@ ALTER TABLE Pool DROP COLUMN distributionRecipient;
 
 -- run_approval
 ALTER TABLE Run ADD COLUMN dataApproved BOOLEAN;
-ALTER TABLE Run ADD COLUMN dataApproverId bigint(20);
+ALTER TABLE Run ADD COLUMN dataApproverId bigint;
 ALTER TABLE Run ADD CONSTRAINT fk_run_approver FOREIGN KEY (dataApproverId) REFERENCES User (userId);
 
 -- remove_old_triggers
@@ -380,9 +380,9 @@ DROP PROCEDURE IF EXISTS deleteSample;
 
 -- sample_hierarchy
 CREATE TABLE SampleHierarchy (
-  sampleId bigint(20) PRIMARY KEY,
-  identityId bigint(20),
-  tissueId bigint(20),
+  sampleId bigint PRIMARY KEY,
+  identityId bigint,
+  tissueId bigint,
   CONSTRAINT fk_sampleHierarchy_sample FOREIGN KEY (sampleId) REFERENCES DetailedSample (sampleId) ON DELETE CASCADE,
   CONSTRAINT fk_sampleHierarchy_identity FOREIGN KEY (identityId) REFERENCES Identity (sampleId),
   CONSTRAINT fk_sampleHierarchy_tissue FOREIGN KEY (tissueId) REFERENCES SampleTissue (sampleId)
@@ -391,10 +391,10 @@ CREATE TABLE SampleHierarchy (
 DELIMITER //
 
 DROP FUNCTION IF EXISTS getParentTissueId//
-CREATE FUNCTION getParentTissueId(pSampleId bigint(20)) RETURNS bigint(20)
+CREATE FUNCTION getParentTissueId(pSampleId bigint) RETURNS bigint
   NOT DETERMINISTIC READS SQL DATA
 BEGIN
-  DECLARE vTissueId bigint(20);
+  DECLARE vTissueId bigint;
   SET vTissueId = pSampleId;
   WHILE vTissueId IS NOT NULL AND NOT EXISTS (SELECT sampleId FROM SampleTissue WHERE sampleId = vTissueId) DO
     SELECT parentId INTO vTissueId FROM DetailedSample WHERE sampleId = vTissueId;
@@ -403,10 +403,10 @@ BEGIN
 END//
 
 DROP FUNCTION IF EXISTS getParentIdentityId//
-CREATE FUNCTION getParentIdentityId(pSampleId bigint(20)) RETURNS bigint(20)
+CREATE FUNCTION getParentIdentityId(pSampleId bigint) RETURNS bigint
   NOT DETERMINISTIC READS SQL DATA
 BEGIN
-  DECLARE vIdentityId bigint(20);
+  DECLARE vIdentityId bigint;
   SET vIdentityId = pSampleId;
   WHILE vIdentityId IS NOT NULL AND NOT EXISTS (SELECT sampleId FROM Identity WHERE sampleId = vIdentityId) DO
     SELECT parentId INTO vIdentityId FROM DetailedSample WHERE sampleId = vIdentityId;
@@ -429,9 +429,9 @@ ALTER TABLE SampleSlide ADD COLUMN percentNecrosis DECIMAL(11,8);
 ALTER TABLE SampleSlide ADD COLUMN markedAreaSize DECIMAL(11,8);
 ALTER TABLE SampleSlide ADD COLUMN markedAreaPercentTumour DECIMAL(11,8);
 
-ALTER TABLE SampleTissuePiece ADD COLUMN referenceSlideId bigint(20);
+ALTER TABLE SampleTissuePiece ADD COLUMN referenceSlideId bigint;
 ALTER TABLE SampleTissuePiece ADD CONSTRAINT fk_sampleTissuePiece_referenceSlide FOREIGN KEY (referenceSlideId) REFERENCES SampleSlide(sampleId);
-ALTER TABLE SampleStock ADD COLUMN referenceSlideId bigint(20);
+ALTER TABLE SampleStock ADD COLUMN referenceSlideId bigint;
 ALTER TABLE SampleStock ADD CONSTRAINT fk_sampleStock_referenceSlide FOREIGN KEY (referenceSlideId) REFERENCES SampleSlide(sampleId);
 
 -- run_purposes
@@ -440,7 +440,7 @@ DROP TRIGGER IF EXISTS PartitionQCUpdate;
 
 RENAME TABLE OrderPurpose TO RunPurpose;
 
-ALTER TABLE Instrument ADD COLUMN defaultPurposeId bigint(20);
+ALTER TABLE Instrument ADD COLUMN defaultPurposeId bigint;
 ALTER TABLE Instrument ADD CONSTRAINT instrument_defaultPurpose FOREIGN KEY (defaultPurposeId) REFERENCES RunPurpose (purposeId);
 UPDATE Instrument inst
 JOIN InstrumentModel im ON im.instrumentModelId = inst.instrumentModelId
@@ -449,10 +449,10 @@ WHERE im.instrumentType = 'SEQUENCER';
 
 RENAME TABLE Run_Partition_QC TO Run_Partition;
 
-ALTER TABLE Run_Partition MODIFY COLUMN partitionQcTypeId bigint(20);
-ALTER TABLE Run_Partition ADD COLUMN purposeId bigint(20);
+ALTER TABLE Run_Partition MODIFY COLUMN partitionQcTypeId bigint;
+ALTER TABLE Run_Partition ADD COLUMN purposeId bigint;
 ALTER TABLE Run_Partition ADD CONSTRAINT runPartition_purpose FOREIGN KEY (purposeId) REFERENCES RunPurpose (purposeId);
-ALTER TABLE Run_Partition ADD COLUMN lastModifier bigint(20);
+ALTER TABLE Run_Partition ADD COLUMN lastModifier bigint;
 ALTER TABLE Run_Partition ADD CONSTRAINT runPartition_lastModifier FOREIGN KEY (lastModifier) REFERENCES User (userId);
 
 INSERT INTO Run_Partition (runId, partitionId)
@@ -465,18 +465,18 @@ WHERE NOT EXISTS (
 );
 
 UPDATE Run_Partition SET lastModifier = (SELECT userId FROM User WHERE loginName = 'admin');
-ALTER TABLE Run_Partition MODIFY COLUMN lastModifier bigint(20) NOT NULL;
+ALTER TABLE Run_Partition MODIFY COLUMN lastModifier bigint NOT NULL;
 
 UPDATE Run_Partition
 SET purposeId = (SELECT purposeId FROM RunPurpose WHERE alias = 'Production');
-ALTER TABLE Run_Partition MODIFY COLUMN purposeId bigint(20) NOT NULL;
+ALTER TABLE Run_Partition MODIFY COLUMN purposeId bigint NOT NULL;
 
 CREATE TABLE Run_Partition_LibraryAliquot (
-  runId bigint(20) NOT NULL,
-  partitionId bigint(20) NOT NULL,
-  aliquotId bigint(20) NOT NULL,
-  purposeId bigint(20),
-  lastModifier bigint(20) NOT NULL,
+  runId bigint NOT NULL,
+  partitionId bigint NOT NULL,
+  aliquotId bigint NOT NULL,
+  purposeId bigint,
+  lastModifier bigint NOT NULL,
   PRIMARY KEY (runId, partitionId, aliquotId),
   CONSTRAINT runAliquot_run FOREIGN KEY (runId) REFERENCES Run (runId),
   CONSTRAINT runAliquot_partition FOREIGN KEY (partitionId) REFERENCES _Partition (partitionId),

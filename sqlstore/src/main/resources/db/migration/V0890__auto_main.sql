@@ -1,12 +1,12 @@
 -- freezer_maps
 CREATE TABLE StorageLocationMap (
-  mapId bigint(20) NOT NULL AUTO_INCREMENT,
+  mapId bigint NOT NULL AUTO_INCREMENT,
   filename varchar(255) NOT NULL,
   description varchar(255),
   PRIMARY KEY (mapId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-ALTER TABLE StorageLocation ADD COLUMN mapId bigint(20);
+ALTER TABLE StorageLocation ADD COLUMN mapId bigint;
 ALTER TABLE StorageLocation ADD CONSTRAINT fk_storageLocation_map FOREIGN KEY (mapId) REFERENCES StorageLocationMap (mapId);
 ALTER TABLE StorageLocation ADD COLUMN mapAnchor varchar(100);
 
@@ -34,13 +34,13 @@ ALTER TABLE StorageLocation DROP COLUMN mapUrl;
 
 -- orders
 CREATE TABLE SequencingOrder (
-  sequencingOrderId bigint(20) NOT NULL AUTO_INCREMENT,
-  poolId bigint(20) NOT NULL,
-  partitions int(11) NOT NULL,
-  parametersId bigint(20) DEFAULT NULL,
-  createdBy bigint(20) NOT NULL,
+  sequencingOrderId bigint NOT NULL AUTO_INCREMENT,
+  poolId bigint NOT NULL,
+  partitions int NOT NULL,
+  parametersId bigint DEFAULT NULL,
+  createdBy bigint NOT NULL,
   creationDate timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updatedBy bigint(20) NOT NULL,
+  updatedBy bigint NOT NULL,
   lastUpdated timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   description varchar(255) DEFAULT NULL,
   PRIMARY KEY (sequencingOrderId),

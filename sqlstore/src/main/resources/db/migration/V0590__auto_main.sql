@@ -2,10 +2,10 @@
 
 DROP TABLE IF EXISTS StorageLocationChangeLog;
 CREATE TABLE StorageLocationChangeLog (
-  storageLocationChangeLogId bigint(20) NOT NULL AUTO_INCREMENT,
-  locationId bigint(20) NOT NULL,
+  storageLocationChangeLogId bigint NOT NULL AUTO_INCREMENT,
+  locationId bigint NOT NULL,
   columnsChanged varchar(500) NOT NULL,
-  userId bigint(20) NOT NULL,
+  userId bigint NOT NULL,
   message longtext NOT NULL,
   changeTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   PRIMARY KEY (storageLocationChangeLogId),
@@ -13,9 +13,9 @@ CREATE TABLE StorageLocationChangeLog (
   CONSTRAINT fk_storageLocationChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-ALTER TABLE StorageLocation ADD COLUMN creator bigint(20);
+ALTER TABLE StorageLocation ADD COLUMN creator bigint;
 ALTER TABLE StorageLocation ADD COLUMN created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP();
-ALTER TABLE StorageLocation ADD COLUMN lastModifier bigint(20);
+ALTER TABLE StorageLocation ADD COLUMN lastModifier bigint;
 ALTER TABLE StorageLocation ADD COLUMN lastModified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP();
 
 -- StartNoTest
@@ -24,9 +24,9 @@ UPDATE StorageLocation SET
   creator = @admin, lastModifier = @admin;
 -- EndNoTest
 
-ALTER TABLE StorageLocation CHANGE COLUMN creator creator bigint(20) NOT NULL;
+ALTER TABLE StorageLocation CHANGE COLUMN creator creator bigint NOT NULL;
 ALTER TABLE StorageLocation ADD CONSTRAINT fk_storagelocation_creator FOREIGN KEY (creator) REFERENCES User (userId);
-ALTER TABLE StorageLocation CHANGE COLUMN lastModifier lastModifier bigint(20) NOT NULL;
+ALTER TABLE StorageLocation CHANGE COLUMN lastModifier lastModifier bigint NOT NULL;
 ALTER TABLE StorageLocation ADD CONSTRAINT fk_storagelocation_modifier FOREIGN KEY (lastModifier) REFERENCES User (userId);
 
 

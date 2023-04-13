@@ -1,11 +1,11 @@
 -- refactor_pairedEnd_runs
 
-ALTER TABLE RunIllumina ADD COLUMN pairedEnd tinyint(1) NOT NULL DEFAULT '1';
-ALTER TABLE RunLS454 ADD COLUMN pairedEnd tinyint(1) NOT NULL DEFAULT '1';
+ALTER TABLE RunIllumina ADD COLUMN pairedEnd tinyint NOT NULL DEFAULT '1';
+ALTER TABLE RunLS454 ADD COLUMN pairedEnd tinyint NOT NULL DEFAULT '1';
 
 CREATE TABLE RunSolid(
-  runId bigint(20) NOT NULL,
-  pairedEnd tinyint(1) NOT NULL DEFAULT '1',
+  runId bigint NOT NULL,
+  pairedEnd tinyint NOT NULL DEFAULT '1',
   PRIMARY KEY (`runId`),
   CONSTRAINT runsolid_run_runid FOREIGN KEY (runId) REFERENCES Run (runId)
 ) ENGINE=InnoDB CHARSET=utf8;
@@ -30,15 +30,15 @@ UPDATE Sample
 -- merge_slides
 
 CREATE TABLE StainCategory (
-  stainCategoryId bigint(20) NOT NULL AUTO_INCREMENT,
+  stainCategoryId bigint NOT NULL AUTO_INCREMENT,
   name varchar(20) NOT NULL,
   PRIMARY KEY (stainCategoryId),
   CONSTRAINT staincategory_name UNIQUE(name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE Stain (
-  stainId bigint(20) NOT NULL AUTO_INCREMENT,
-  stainCategoryId bigint(20) DEFAULT NULL,
+  stainId bigint NOT NULL AUTO_INCREMENT,
+  stainCategoryId bigint DEFAULT NULL,
   name varchar(20) NOT NULL,
   PRIMARY KEY (stainId),
   CONSTRAINT stain_name UNIQUE(name),
@@ -48,11 +48,11 @@ CREATE TABLE Stain (
 INSERT INTO Stain(name) VALUES ('Cresyl Violet'), ('Hematoxylin+Eosin');
 
 CREATE TABLE SampleSlide(
-  sampleId bigint(20) NOT NULL,
-  slides int(11) NOT NULL DEFAULT '0',
-  discards int(11) DEFAULT '0',
-  thickness int(11) DEFAULT NULL,
-  stain bigint(20) DEFAULT NULL,
+  sampleId bigint NOT NULL,
+  slides int NOT NULL DEFAULT '0',
+  discards int DEFAULT '0',
+  thickness int DEFAULT NULL,
+  stain bigint DEFAULT NULL,
   PRIMARY KEY (sampleId),
   CONSTRAINT sampleSlide_sample_fkey FOREIGN KEY (sampleId) REFERENCES Sample (sampleId),
   CONSTRAINT sampleSlide_stain_fkey FOREIGN KEY (stain) REFERENCES Stain (stainId)

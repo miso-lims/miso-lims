@@ -1,10 +1,10 @@
 -- transfer_notifications
 CREATE TABLE TransferNotification (
-  notificationId bigint(20) NOT NULL AUTO_INCREMENT,
-  transferId bigint(20) NOT NULL,
+  notificationId bigint NOT NULL AUTO_INCREMENT,
+  transferId bigint NOT NULL,
   recipientName varchar(255) NOT NULL,
   recipientEmail varchar(255) NOT NULL,
-  creator bigint(20) NOT NULL,
+  creator bigint NOT NULL,
   created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   sentTime TIMESTAMP NULL DEFAULT NULL,
   sendSuccess BOOLEAN,
@@ -15,7 +15,7 @@ CREATE TABLE TransferNotification (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE Contact (
-  contactId bigint(20) NOT NULL AUTO_INCREMENT,
+  contactId bigint NOT NULL AUTO_INCREMENT,
   name varchar(255) NOT NULL,
   email varchar(255) NOT NULL,
   PRIMARY KEY (contactId),

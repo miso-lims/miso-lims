@@ -29,7 +29,7 @@ DELETE FROM KitDescriptor WHERE kitDescriptorId=121 AND name='Test' AND partNumb
 -- Remove duplicates added in V0002 migration
 DELIMITER //
 DROP FUNCTION IF EXISTS kitExists//
-CREATE FUNCTION kitExists (id bigint(20), kitName varchar(255), kitVersion int(3), kitManufacturer varchar(100),
+CREATE FUNCTION kitExists (id bigint, kitName varchar(255), kitVersion int, kitManufacturer varchar(100),
     kitPartNumber varchar(50), kitKitType varchar(30), kitPlatformType varchar(20))
     RETURNS boolean NOT DETERMINISTIC READS SQL DATA
 BEGIN
@@ -58,7 +58,7 @@ END//
 
 
 DROP PROCEDURE IF EXISTS removeDupes//
-CREATE PROCEDURE removeDupes (id1 bigint(20), id2 bigint(20), kitName varchar(255), kitVersion int(3), kitManufacturer varchar(100),
+CREATE PROCEDURE removeDupes (id1 bigint, id2 bigint, kitName varchar(255), kitVersion int, kitManufacturer varchar(100),
     kitPartNumber varchar(50), kitKitType varchar(30), kitPlatformType varchar(20))
 BEGIN
 	IF kitExists(id1, kitName, kitVersion, kitManufacturer, kitPartNumber, kitKitType, kitPlatformType)
@@ -105,7 +105,7 @@ UPDATE KitDescriptor SET name = 'GS Titanium SV emPCR Kit (Lib-L) V2' WHERE name
 -- Ones ending in '02' (id2, kitPartNumber2) are discontinued - delete if unused
 DELIMITER //
 DROP PROCEDURE IF EXISTS removeNearDupes//
-CREATE PROCEDURE removeNearDupes(id1 bigint(20), id2 bigint(20), kitName varchar(255), kitVersion int(3), kitManufacturer varchar(100),
+CREATE PROCEDURE removeNearDupes(id1 bigint, id2 bigint, kitName varchar(255), kitVersion int, kitManufacturer varchar(100),
     kitPartNumber1 varchar(50), kitPartNumber2 varchar(50), kitKitType varchar(30), kitPlatformType varchar(20))
 BEGIN
 	IF kitExists(id1, kitName, kitVersion, kitManufacturer, kitPartNumber1, kitKitType, kitPlatformType)

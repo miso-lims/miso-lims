@@ -1,13 +1,13 @@
 -- ts_many_to_many
 
 CREATE TABLE `TargetedSequencingTemp` (
-  `targetedSequencingId` bigint(20) NOT NULL AUTO_INCREMENT,
+  `targetedSequencingId` bigint NOT NULL AUTO_INCREMENT,
   `alias` varchar(255) NOT NULL,
   `description` varchar(255) NOT NULL,
-  `archived` bit(1) NOT NULL DEFAULT b'0',
-  `createdBy` bigint(20) NOT NULL,
+  `archived` bit NOT NULL DEFAULT b'0',
+  `createdBy` bigint NOT NULL,
   `creationDate` datetime NOT NULL,
-  `updatedBy` bigint(20) NOT NULL,
+  `updatedBy` bigint NOT NULL,
   `lastUpdated` datetime NOT NULL,
   PRIMARY KEY (`targetedSequencingId`),
   UNIQUE KEY `UK_TargetedResequencing_a_kdi2` (`alias`),
@@ -18,8 +18,8 @@ CREATE TABLE `TargetedSequencingTemp` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE TargetedSequencing_KitDescriptor (
-  targetedSequencingId bigint(20) NOT NULL,
-  kitDescriptorId bigint(20) NOT NULL,
+  targetedSequencingId bigint NOT NULL,
+  kitDescriptorId bigint NOT NULL,
   PRIMARY KEY (targetedSequencingId,kitDescriptorId),
   CONSTRAINT TK_KitDescriptor_FK FOREIGN KEY (kitDescriptorId) REFERENCES KitDescriptor (kitDescriptorId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -97,7 +97,7 @@ ALTER TABLE RunQC CHANGE COLUMN qcUserName qcCreator varchar(255) NOT NULL;
 
 -- library_size
 
-ALTER TABLE Library ADD COLUMN dnaSize bigint(20);
+ALTER TABLE Library ADD COLUMN dnaSize bigint;
 
 UPDATE Library SET dnaSize = (SELECT insertSize FROM LibraryQC WHERE LibraryQC.library_libraryId = Library.libraryId AND insertSize IS NOT NULL AND insertSize != 0 ORDER BY qcDate LIMIT 1);
 

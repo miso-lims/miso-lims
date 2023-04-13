@@ -27,7 +27,7 @@ ALTER TABLE `Library` MODIFY `creationDate` date DEFAULT NULL;
 
 -- Dilution_Creator_Id
 
-ALTER TABLE LibraryDilution ADD creator bigint(20) NOT NULL AFTER dilutionUserName;
+ALTER TABLE LibraryDilution ADD creator bigint NOT NULL AFTER dilutionUserName;
 UPDATE LibraryDilution SET creator = (SELECT userId FROM User WHERE fullName = dilutionUserName);
 ALTER TABLE LibraryDilution ADD CONSTRAINT fk_libraryDilution_creator FOREIGN KEY (creator) REFERENCES User (userId);
 ALTER TABLE LibraryDilution DROP COLUMN dilutionUserName;
@@ -35,6 +35,6 @@ ALTER TABLE LibraryDilution DROP COLUMN dilutionUserName;
 
 -- Archive_Sample_Purposes
 
-ALTER TABLE `SamplePurpose` ADD COLUMN `archived` tinyint(1) NOT NULL DEFAULT 0;
+ALTER TABLE `SamplePurpose` ADD COLUMN `archived` tinyint NOT NULL DEFAULT 0;
 
 

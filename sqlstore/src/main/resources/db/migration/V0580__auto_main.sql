@@ -24,7 +24,7 @@ ALTER TABLE `LibraryDilution` ADD COLUMN `volumeUsed` double DEFAULT NULL AFTER 
 -- QCType_Corresponding_Field
 
 ALTER TABLE QCType ADD COLUMN `correspondingField` varchar(50) NOT NULL DEFAULT 'NONE';
-ALTER TABLE QCType ADD COLUMN `autoUpdateField` tinyint(1) NOT NULL DEFAULT 0;
+ALTER TABLE QCType ADD COLUMN `autoUpdateField` tinyint NOT NULL DEFAULT 0;
 
 
 -- Dilution_Concentration_Units

@@ -39,23 +39,23 @@ UPDATE KitDescriptor SET kitType = UPPER(kitType), platformType = UPPER(platform
 
 UPDATE Platform SET name = UPPER(name);
 
-ALTER TABLE Study ADD COLUMN studyTypeId bigint(20);
+ALTER TABLE Study ADD COLUMN studyTypeId bigint;
 UPDATE Study SET studyTypeId = (SELECT typeId FROM StudyType WHERE name = studyType);
 ALTER TABLE Study ADD CONSTRAINT study_studyTypeId FOREIGN KEY (studyTypeId) REFERENCES StudyType(typeId);
 ALTER TABLE Study DROP COLUMN studyType;
-ALTER TABLE Study CHANGE COLUMN studyTypeId studyTypeId bigint(20) NOT NULL;
+ALTER TABLE Study CHANGE COLUMN studyTypeId studyTypeId bigint NOT NULL;
 ALTER TABLE Study ADD CONSTRAINT fk_study_securityProfile FOREIGN KEY (securityProfile_profileId) REFERENCES SecurityProfile (profileId);
 ALTER TABLE Study ADD CONSTRAINT fk_study_project FOREIGN KEY (project_projectId) REFERENCES Project (projectId);
 ALTER TABLE Study ADD CONSTRAINT fk_study_lastModifier_user FOREIGN KEY (lastModifier) REFERENCES User (userId);
 
-ALTER TABLE ProjectOverview ADD COLUMN project_projectId bigint(20);
+ALTER TABLE ProjectOverview ADD COLUMN project_projectId bigint;
 UPDATE ProjectOverview SET project_projectId = (SELECT project_projectId FROM Project_ProjectOverview WHERE overviews_overviewId = overviewId);
 ALTER TABLE ProjectOverview ADD CONSTRAINT projectOverview_project_project_projectId FOREIGN KEY (project_projectId) REFERENCES Project(projectId);
 DROP TABLE Project_ProjectOverview;
 
 CREATE TABLE ProjectOverview_Sample (
-  projectOverview_overviewId bigint(20) NOT NULL,
-  sample_sampleId bigint(20) NOT NULL,
+  projectOverview_overviewId bigint NOT NULL,
+  sample_sampleId bigint NOT NULL,
   CONSTRAINT projectOverview_sample_projectOverview_overviewId FOREIGN KEY (projectOverview_overviewId) REFERENCES ProjectOverview(overviewId),
   CONSTRAINT projectOverview_sample_sample_sampleId FOREIGN KEY (sample_sampleId) REFERENCES Sample(sampleId)
 ) ENGINE=InnoDB;
@@ -72,8 +72,8 @@ ALTER TABLE Pool ADD CONSTRAINT fk_pool_securityProfile FOREIGN KEY (securityPro
 ALTER TABLE Pool ADD CONSTRAINT fk_pool_lastModifier_user FOREIGN KEY (lastModifier) REFERENCES User (userId);
 
 CREATE TABLE `Pool_Dilution` (
-  `pool_poolId` bigint(20) NOT NULL,
-  `dilution_dilutionId` bigint(20) NOT NULL,
+  `pool_poolId` bigint NOT NULL,
+  `dilution_dilutionId` bigint NOT NULL,
   PRIMARY KEY (`pool_poolId`,`dilution_dilutionId`),
   CONSTRAINT `Pool_Dilution_pool_poolId` FOREIGN KEY (`pool_poolId`) REFERENCES `Pool` (`poolId`),
   CONSTRAINT `Pool_Dilution_dilution_dilutionId` FOREIGN KEY (`dilution_dilutionId`) REFERENCES `LibraryDilution` (`dilutionId`)
@@ -91,7 +91,7 @@ INSERT INTO Pool_Dilution(pool_poolId, dilution_dilutionId) SELECT DISTINCT
 
 INSERT INTO Pool_Experiment(pool_poolId, experiments_experimentId) SELECT poolId, experiment_experimentId FROM Pool WHERE NOT EXISTS(SELECT * FROM Pool_Experiment WHERE poolId = pool_poolId AND experiment_experimentId = experiments_experimentId) AND experiment_experimentId IS NOT NULL;
 ALTER TABLE Pool DROP COLUMN experiment_experimentId;
-ALTER TABLE Experiment ADD COLUMN pool_poolId bigint(20);
+ALTER TABLE Experiment ADD COLUMN pool_poolId bigint;
 UPDATE Experiment SET pool_poolId = (SELECT pool_poolId FROM Pool_Experiment WHERE experiments_experimentId = experimentId);
 ALTER TABLE Experiment ADD CONSTRAINT fk_experiment_pool_poolId FOREIGN KEY (pool_poolId) REFERENCES Pool (poolId);
 DROP TABLE Pool_Experiment;
@@ -147,9 +147,9 @@ ALTER TABLE Run ADD CONSTRAINT fk_run_sequencerReference FOREIGN KEY (sequencerR
 ALTER TABLE Run ADD CONSTRAINT fk_run_lastModifier_user FOREIGN KEY (lastModifier) REFERENCES User (userId);
 ALTER TABLE Run ADD CONSTRAINT fk_run_sequencingParameters FOREIGN KEY (sequencingParameters_parametersId) REFERENCES SequencingParameters (parametersId);
 
-ALTER TABLE RunQC_Partition ADD COLUMN partition_partitionId BIGINT(20) NOT NULL;
+ALTER TABLE RunQC_Partition ADD COLUMN partition_partitionId bigint NOT NULL;
 -- StartNoTest
-ALTER TABLE RunQC_Partition CHANGE COLUMN partition_partitionId partition_partitionId BIGINT(20);
+ALTER TABLE RunQC_Partition CHANGE COLUMN partition_partitionId partition_partitionId bigint;
 
 UPDATE RunQC_Partition rqp SET partition_partitionId = (
   SELECT p.partitionId FROM `_Partition` p 
@@ -157,7 +157,7 @@ UPDATE RunQC_Partition rqp SET partition_partitionId = (
   WHERE spcp.container_containerId = rqp.containers_containerId
   AND p.partitionNumber = rqp.partitionNumber
 );
-ALTER TABLE RunQC_Partition CHANGE COLUMN partition_partitionId partition_partitionId BIGINT(20) NOT NULL;
+ALTER TABLE RunQC_Partition CHANGE COLUMN partition_partitionId partition_partitionId bigint NOT NULL;
 -- EndNoTest
 ALTER TABLE RunQC_Partition DROP PRIMARY KEY;
 ALTER TABLE RunQC_Partition ADD PRIMARY KEY(`runQc_runQcId`, `partition_partitionId`);
@@ -169,32 +169,32 @@ ALTER TABLE RunQC_Partition DROP COLUMN containers_containerId;
 ALTER TABLE _Partition ADD CONSTRAINT fk_partition_securityProfile FOREIGN KEY (securityProfile_profileId) REFERENCES SecurityProfile (profileId);
 
 CREATE TABLE Project_Watcher (
-  projectId bigint(20) NOT NULL,
-  userId bigint(20) NOT NULL,
+  projectId bigint NOT NULL,
+  userId bigint NOT NULL,
   PRIMARY KEY (projectId, userId),
   CONSTRAINT fk_projectWatcher_project FOREIGN KEY (projectId) REFERENCES Project (projectId) ON DELETE CASCADE,
   CONSTRAINT fk_projectWatcher_user FOREIGN KEY (userId) REFERENCES User (userId) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE ProjectOverview_Watcher (
-  overviewId bigint(20) NOT NULL,
-  userId bigint(20) NOT NULL,
+  overviewId bigint NOT NULL,
+  userId bigint NOT NULL,
   PRIMARY KEY (overviewId, userId),
   CONSTRAINT fk_projectOverviewWatcher_project FOREIGN KEY (overviewId) REFERENCES ProjectOverview (overviewId) ON DELETE CASCADE,
   CONSTRAINT fk_projectOverviewWatcher_user FOREIGN KEY (userId) REFERENCES User (userId) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE Pool_Watcher (
-  poolId bigint(20) NOT NULL,
-  userId bigint(20) NOT NULL,
+  poolId bigint NOT NULL,
+  userId bigint NOT NULL,
   PRIMARY KEY (poolId, userId),
   CONSTRAINT fk_poolWatcher_pool FOREIGN KEY (poolId) REFERENCES Pool (poolId) ON DELETE CASCADE,
   CONSTRAINT fk_poolWatcher_user FOREIGN KEY (userId) REFERENCES User (userId) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE Run_Watcher (
-  runId bigint(20) NOT NULL,
-  userId bigint(20) NOT NULL,
+  runId bigint NOT NULL,
+  userId bigint NOT NULL,
   PRIMARY KEY (runId, userId),
   CONSTRAINT fk_runWatcher_run FOREIGN KEY (runId) REFERENCES Run (runId) ON DELETE CASCADE,
   CONSTRAINT fk_runWatcher_user FOREIGN KEY (userId) REFERENCES User (userId) ON DELETE CASCADE
@@ -229,7 +229,7 @@ JOIN User u ON u.userId = w.userId;
 DROP TABLE Watcher;
 
 CREATE TABLE `Printer` (
-  `printerId` bigint(20) NOT NULL AUTO_INCREMENT,
+  `printerId` bigint NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `driver` varchar(20) NOT NULL,
   `backend` varchar(20) NOT NULL,
@@ -267,10 +267,10 @@ DROP TABLE PrintJob;
 
 
 CREATE TABLE NewBoxChangeLog (
-  boxChangeLogId bigint(20) PRIMARY KEY AUTO_INCREMENT,
-  boxId bigint(20) NOT NULL,
+  boxChangeLogId bigint PRIMARY KEY AUTO_INCREMENT,
+  boxId bigint NOT NULL,
   columnsChanged varchar(500) NOT NULL,
-  userId bigint(20) NOT NULL,
+  userId bigint NOT NULL,
   message longtext NOT NULL,
   changeTime timestamp DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_boxChangeLog_box FOREIGN KEY (boxId) REFERENCES Box(boxId),
@@ -290,10 +290,10 @@ ALTER TABLE NewBoxChangeLog RENAME TO BoxChangeLog;
 
 
 CREATE TABLE NewExperimentChangeLog (
-  experimentChangeLogId bigint(20) PRIMARY KEY AUTO_INCREMENT,
-  experimentId bigint(20) NOT NULL,
+  experimentChangeLogId bigint PRIMARY KEY AUTO_INCREMENT,
+  experimentId bigint NOT NULL,
   columnsChanged varchar(500) NOT NULL,
-  userId bigint(20) NOT NULL,
+  userId bigint NOT NULL,
   message longtext NOT NULL,
   changeTime timestamp DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_experimentChangeLog_experiment FOREIGN KEY (experimentId) REFERENCES Experiment(experimentId),
@@ -313,10 +313,10 @@ ALTER TABLE NewExperimentChangeLog RENAME TO ExperimentChangeLog;
 
 
 CREATE TABLE NewKitDescriptorChangeLog (
-  kitDescriptorChangeLogId bigint(20) PRIMARY KEY AUTO_INCREMENT,
-  kitDescriptorId bigint(20) NOT NULL,
+  kitDescriptorChangeLogId bigint PRIMARY KEY AUTO_INCREMENT,
+  kitDescriptorId bigint NOT NULL,
   columnsChanged varchar(500) NOT NULL,
-  userId bigint(20) NOT NULL,
+  userId bigint NOT NULL,
   message longtext NOT NULL,
   changeTime timestamp DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_kitDescriptorChangeLog_kitDescriptor FOREIGN KEY (kitDescriptorId) REFERENCES KitDescriptor(kitDescriptorId),
@@ -336,10 +336,10 @@ ALTER TABLE NewKitDescriptorChangeLog RENAME TO KitDescriptorChangeLog;
 
 
 CREATE TABLE NewLibraryChangeLog (
-  libraryChangeLogId bigint(20) PRIMARY KEY AUTO_INCREMENT,
-  libraryId bigint(20) NOT NULL,
+  libraryChangeLogId bigint PRIMARY KEY AUTO_INCREMENT,
+  libraryId bigint NOT NULL,
   columnsChanged varchar(500) NOT NULL,
-  userId bigint(20) NOT NULL,
+  userId bigint NOT NULL,
   message longtext NOT NULL,
   changeTime timestamp DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_libraryChangeLog_library FOREIGN KEY (libraryId) REFERENCES Library(libraryId),
@@ -359,10 +359,10 @@ ALTER TABLE NewLibraryChangeLog RENAME TO LibraryChangeLog;
 
 
 CREATE TABLE NewPoolChangeLog (
-  poolChangeLogId bigint(20) PRIMARY KEY AUTO_INCREMENT,
-  poolId bigint(20) NOT NULL,
+  poolChangeLogId bigint PRIMARY KEY AUTO_INCREMENT,
+  poolId bigint NOT NULL,
   columnsChanged varchar(500) NOT NULL,
-  userId bigint(20) NOT NULL,
+  userId bigint NOT NULL,
   message longtext NOT NULL,
   changeTime timestamp DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_poolChangeLog_pool FOREIGN KEY (poolId) REFERENCES Pool(poolId),
@@ -382,10 +382,10 @@ ALTER TABLE NewPoolChangeLog RENAME TO PoolChangeLog;
 
 
 CREATE TABLE NewRunChangeLog (
-  runChangeLogId bigint(20) PRIMARY KEY AUTO_INCREMENT,
-  runId bigint(20) NOT NULL,
+  runChangeLogId bigint PRIMARY KEY AUTO_INCREMENT,
+  runId bigint NOT NULL,
   columnsChanged varchar(500) NOT NULL,
-  userId bigint(20) NOT NULL,
+  userId bigint NOT NULL,
   message longtext NOT NULL,
   changeTime timestamp DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_runChangeLog_run FOREIGN KEY (runId) REFERENCES Run(runId),
@@ -405,10 +405,10 @@ ALTER TABLE NewRunChangeLog RENAME TO RunChangeLog;
 
 
 CREATE TABLE NewSampleChangeLog (
-  sampleChangeLogId bigint(20) PRIMARY KEY AUTO_INCREMENT,
-  sampleId bigint(20) NOT NULL,
+  sampleChangeLogId bigint PRIMARY KEY AUTO_INCREMENT,
+  sampleId bigint NOT NULL,
   columnsChanged varchar(500) NOT NULL,
-  userId bigint(20) NOT NULL,
+  userId bigint NOT NULL,
   message longtext NOT NULL,
   changeTime timestamp DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_sampleChangeLog_sample FOREIGN KEY (sampleId) REFERENCES Sample(sampleId),
@@ -428,10 +428,10 @@ ALTER TABLE NewSampleChangeLog RENAME TO SampleChangeLog;
 
 
 CREATE TABLE NewSequencerPartitionContainerChangeLog (
-  containerChangeLogId bigint(20) PRIMARY KEY AUTO_INCREMENT,
-  containerId bigint(20) NOT NULL,
+  containerChangeLogId bigint PRIMARY KEY AUTO_INCREMENT,
+  containerId bigint NOT NULL,
   columnsChanged varchar(500) NOT NULL,
-  userId bigint(20) NOT NULL,
+  userId bigint NOT NULL,
   message longtext NOT NULL,
   changeTime timestamp DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_containerChangeLog_box FOREIGN KEY (containerId) REFERENCES SequencerPartitionContainer(containerId),
@@ -451,10 +451,10 @@ ALTER TABLE NewSequencerPartitionContainerChangeLog RENAME TO SequencerPartition
 
 
 CREATE TABLE NewStudyChangeLog (
-  studyChangeLogId bigint(20) PRIMARY KEY AUTO_INCREMENT,
-  studyId bigint(20) NOT NULL,
+  studyChangeLogId bigint PRIMARY KEY AUTO_INCREMENT,
+  studyId bigint NOT NULL,
   columnsChanged varchar(500) NOT NULL,
-  userId bigint(20) NOT NULL,
+  userId bigint NOT NULL,
   message longtext NOT NULL,
   changeTime timestamp DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_studyChangeLog_study FOREIGN KEY (studyId) REFERENCES Study(studyId),
@@ -474,8 +474,8 @@ ALTER TABLE NewStudyChangeLog RENAME TO StudyChangeLog;
 
 
 CREATE TABLE BoxContents (
-  boxId bigint(20) NOT NULL,
-  targetId bigint(20) NOT NULL,
+  boxId bigint NOT NULL,
+  targetId bigint NOT NULL,
   targetType varchar(50) NOT NULL,
   position varchar(3) NOT NULL,
   CONSTRAINT boxcontents_box_boxId FOREIGN KEY (boxId) REFERENCES Box(boxId),
@@ -534,9 +534,9 @@ ALTER TABLE Library ADD CONSTRAINT fk_library_sample FOREIGN KEY (sample_sampleI
 ALTER TABLE Library ADD CONSTRAINT fk_library_lastModifier_user FOREIGN KEY (lastModifier) REFERENCES User (userId);
 ALTER TABLE Library ADD CONSTRAINT fk_library_securityProfile FOREIGN KEY (securityProfile_profileId) REFERENCES SecurityProfile (profileId);
 
-ALTER TABLE LibraryDilution ADD COLUMN lastModifier bigint(20);
+ALTER TABLE LibraryDilution ADD COLUMN lastModifier bigint;
 UPDATE LibraryDilution SET lastModifier = (SELECT lastModifier FROM Library l WHERE l.libraryId = library_libraryId);
-ALTER TABLE LibraryDilution CHANGE COLUMN lastModifier lastModifier bigint(20) NOT NULL;
+ALTER TABLE LibraryDilution CHANGE COLUMN lastModifier lastModifier bigint NOT NULL;
 ALTER TABLE LibraryDilution ADD CONSTRAINT fk_libraryDilution_lastModifier_user FOREIGN KEY (lastModifier) REFERENCES User (userId);
 ALTER TABLE LibraryDilution ADD CONSTRAINT fk_libraryDilution_library FOREIGN KEY (library_libraryId) REFERENCES Library (libraryId);
 ALTER TABLE LibraryDilution ADD CONSTRAINT fk_libraryDilution_targetedSequencing FOREIGN KEY (targetedSequencingId) REFERENCES TargetedSequencing (targetedSequencingId);

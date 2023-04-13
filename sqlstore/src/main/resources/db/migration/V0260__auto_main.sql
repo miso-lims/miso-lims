@@ -1,8 +1,8 @@
 -- run_refactor
 
 CREATE TABLE RunPacBio(
-  runId bigint(20) NOT NULL,
-  movieDuration bigint(20),
+  runId bigint NOT NULL,
+  movieDuration bigint,
   wellName varchar(50),
   creationDate date,
   PRIMARY KEY (`runId`),
@@ -12,7 +12,7 @@ CREATE TABLE RunPacBio(
 INSERT INTO RunPacBio(runId) SELECT runId FROM Run WHERE platformType = 'PACBIO';
 
 CREATE TABLE RunLS454(
-  runId bigint(20) NOT NULL,
+  runId bigint NOT NULL,
   cycles int,
   PRIMARY KEY (`runId`),
   CONSTRAINT runls454_run_runid FOREIGN KEY (runId) REFERENCES Run(runId)
@@ -21,7 +21,7 @@ CREATE TABLE RunLS454(
 INSERT INTO RunLS454(runId, cycles) SELECT runId, cycles FROM Run WHERE platformType = 'LS454';
 
 CREATE TABLE RunIllumina(
-  runId bigint(20) NOT NULL,
+  runId bigint NOT NULL,
   callCycle int,
   imgCycle int,
   numCycles int,

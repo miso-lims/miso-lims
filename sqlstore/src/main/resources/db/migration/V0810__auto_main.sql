@@ -3,7 +3,7 @@
 -- StartNoTest
 DELIMITER //
 CREATE PROCEDURE TempFixPos(iOldName varchar(10), iNewName varchar(10)) BEGIN
-  DECLARE promethion bigint(20);
+  DECLARE promethion bigint;
   SELECT instrumentModelId INTO promethion FROM InstrumentModel WHERE alias = 'PromethION';
   
   IF EXISTS (SELECT 1 FROM InstrumentPosition WHERE instrumentModelId = promethion AND alias = iOldName) THEN
@@ -50,7 +50,7 @@ DROP PROCEDURE TempFixPos;
 
 DELIMITER //
 CREATE PROCEDURE TempAddPos(iName varchar(10)) BEGIN
-  DECLARE promethion bigint(20);
+  DECLARE promethion bigint;
   SELECT instrumentModelId INTO promethion FROM InstrumentModel WHERE alias = 'PromethION';
   
   IF NOT EXISTS (SELECT 1 FROM InstrumentPosition WHERE instrumentModelId = promethion AND alias = iName) THEN

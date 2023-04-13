@@ -22,8 +22,8 @@ ALTER TABLE Library ADD COLUMN initialVolume DECIMAL(14,10);
 ALTER TABLE Library ADD COLUMN volumeUsed DECIMAL(14,10);
 ALTER TABLE Library ADD COLUMN ngUsed DECIMAL(14,10);
 
-ALTER TABLE SampleSlide CHANGE COLUMN slides initialSlides int(11) NOT NULL DEFAULT 0;
-ALTER TABLE SampleSlide ADD COLUMN slides int(11) NOT NULL DEFAULT 0;
+ALTER TABLE SampleSlide CHANGE COLUMN slides initialSlides int NOT NULL DEFAULT 0;
+ALTER TABLE SampleSlide ADD COLUMN slides int NOT NULL DEFAULT 0;
 UPDATE SampleSlide SET slides = initialSlides - discards;
 UPDATE SampleSlide SET slides = slides - COALESCE((
   SELECT SUM(stp.slidesConsumed)

@@ -7,7 +7,7 @@ DROP TABLE IF EXISTS PoreVersion;
 DROP TABLE IF EXISTS RunOxfordNanopore;
 
 CREATE TABLE RunOxfordNanopore(
-  runId bigint(20) NOT NULL AUTO_INCREMENT,
+  runId bigint NOT NULL AUTO_INCREMENT,
   minKnowVersion varchar(100),
   protocolVersion varchar(100),
   PRIMARY KEY (runId),
@@ -15,21 +15,21 @@ CREATE TABLE RunOxfordNanopore(
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE FlowCellVersion(
-  flowCellVersionId bigint(20) NOT NULL AUTO_INCREMENT,
+  flowCellVersionId bigint NOT NULL AUTO_INCREMENT,
   alias varchar(100) NOT NULL,
   PRIMARY KEY (flowCellVersionId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE PoreVersion(
-  poreVersionId bigint(20) NOT NULL AUTO_INCREMENT,
+  poreVersionId bigint NOT NULL AUTO_INCREMENT,
   alias varchar(100) NOT NULL,
   PRIMARY KEY (poreVersionId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE OxfordNanoporeContainer (
-  containerId bigint(20) NOT NULL AUTO_INCREMENT,
-  flowCellVersionId bigint(20),
-  poreVersionId bigint(20),
+  containerId bigint NOT NULL AUTO_INCREMENT,
+  flowCellVersionId bigint,
+  poreVersionId bigint,
   receivedDate DATE NOT NULL,
   returnedDate DATE NULL,
   PRIMARY KEY(containerId),
@@ -39,11 +39,11 @@ CREATE TABLE OxfordNanoporeContainer (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE ContainerQC (
-  qcId bigint(20) NOT NULL AUTO_INCREMENT,
-  containerId bigint(20) NOT NULL,
-  creator bigint(20) NOT NULL,
+  qcId bigint NOT NULL AUTO_INCREMENT,
+  containerId bigint NOT NULL,
+  creator bigint NOT NULL,
   `date` date NOT NULL,
-  `type` bigint(20) DEFAULT NULL,
+  `type` bigint DEFAULT NULL,
   results double DEFAULT NULL,
   PRIMARY KEY (qcId),
   CONSTRAINT FK_ContainerQC_Container FOREIGN KEY (containerId) REFERENCES SequencerPartitionContainer (containerId),

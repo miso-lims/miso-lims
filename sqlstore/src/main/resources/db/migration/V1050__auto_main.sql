@@ -10,10 +10,10 @@ ALTER TABLE SequencerPartitionContainer ADD COLUMN multiplexingKitLot varchar(10
 
 -- transfer_changelog
 CREATE TABLE TransferChangeLog (
-  transferChangeLogId bigint(20) NOT NULL AUTO_INCREMENT,
-  transferId bigint(20) NOT NULL,
+  transferChangeLogId bigint NOT NULL AUTO_INCREMENT,
+  transferId bigint NOT NULL,
   columnsChanged varchar(500) NOT NULL,
-  userId bigint(20) NOT NULL,
+  userId bigint NOT NULL,
   message longtext NOT NULL,
   changeTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   PRIMARY KEY (transferChangeLogId),
@@ -26,11 +26,11 @@ SELECT transferId, '', creator, 'Transfer created', created FROM Transfer;
 
 -- sequencing_controls
 CREATE TABLE SequencingControlType (
-  sequencingControlTypeId bigint(20) NOT NULL AUTO_INCREMENT,
+  sequencingControlTypeId bigint NOT NULL AUTO_INCREMENT,
   alias varchar(50) NOT NULL,
   PRIMARY KEY (sequencingControlTypeId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-ALTER TABLE Sample ADD COLUMN sequencingControlTypeId bigint(20);
+ALTER TABLE Sample ADD COLUMN sequencingControlTypeId bigint;
 ALTER TABLE Sample ADD CONSTRAINT fk_sample_sequencingControlType FOREIGN KEY (sequencingControlTypeId) REFERENCES SequencingControlType (sequencingControlTypeId);
 

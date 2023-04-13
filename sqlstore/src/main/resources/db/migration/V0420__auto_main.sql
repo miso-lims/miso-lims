@@ -13,8 +13,8 @@ ALTER TABLE SequencerServiceRecord DROP FOREIGN KEY sequencerServiceRecord_seque
 -- EndNoTest
 
 ALTER TABLE SequencerReference RENAME TO Instrument;
-ALTER TABLE Instrument CHANGE COLUMN referenceId instrumentId bigint(20) AUTO_INCREMENT;
-ALTER TABLE Instrument CHANGE COLUMN upgradedSequencerReferenceId upgradedInstrumentId bigint(20);
+ALTER TABLE Instrument CHANGE COLUMN referenceId instrumentId bigint AUTO_INCREMENT;
+ALTER TABLE Instrument CHANGE COLUMN upgradedSequencerReferenceId upgradedInstrumentId bigint;
 ALTER TABLE Instrument CHANGE COLUMN ip ip varchar(50) DEFAULT NULL;
 
 -- StartNoTest
@@ -23,10 +23,10 @@ ALTER TABLE Run ADD CONSTRAINT fk_run_instrument FOREIGN KEY(sequencerReference_
 ALTER TABLE SequencerServiceRecord ADD CONSTRAINT fk_serviceRecord_instrument FOREIGN KEY(sequencerReferenceId) REFERENCES Instrument(instrumentId);
 -- EndNoTest
 
-ALTER TABLE Run CHANGE COLUMN sequencerReference_sequencerReferenceId instrumentId bigint(20) NOT NULL;
+ALTER TABLE Run CHANGE COLUMN sequencerReference_sequencerReferenceId instrumentId bigint NOT NULL;
 
 ALTER TABLE SequencerServiceRecord RENAME TO ServiceRecord;
-ALTER TABLE ServiceRecord CHANGE COLUMN sequencerReferenceId instrumentId bigint(20) NOT NULL;
+ALTER TABLE ServiceRecord CHANGE COLUMN sequencerReferenceId instrumentId bigint NOT NULL;
 
 ALTER TABLE Platform ADD COLUMN instrumentType varchar(50);
 UPDATE Platform SET instrumentType = 'SEQUENCER';

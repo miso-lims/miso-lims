@@ -1,29 +1,29 @@
 -- pool_orders
 CREATE TABLE OrderPurpose(
-  purposeId bigint(20) NOT NULL AUTO_INCREMENT,
+  purposeId bigint NOT NULL AUTO_INCREMENT,
   alias varchar(50) NOT NULL,
   PRIMARY KEY (purposeId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO OrderPurpose(purposeId, alias) VALUES (1, 'Production');
 
-ALTER TABLE SequencingOrder ADD COLUMN purposeId bigint(20) NOT NULL DEFAULT 1;
+ALTER TABLE SequencingOrder ADD COLUMN purposeId bigint NOT NULL DEFAULT 1;
 ALTER TABLE SequencingOrder ADD CONSTRAINT fk_sequencingOrder_purpose FOREIGN KEY (purposeId) REFERENCES OrderPurpose (purposeId);
-ALTER TABLE SequencingOrder MODIFY COLUMN purposeId bigint(20) NOT NULL;
+ALTER TABLE SequencingOrder MODIFY COLUMN purposeId bigint NOT NULL;
 
 CREATE TABLE PoolOrder(
-  poolOrderId bigint(20) NOT NULL AUTO_INCREMENT,
+  poolOrderId bigint NOT NULL AUTO_INCREMENT,
   alias varchar(100) NOT NULL,
   description varchar(255),
-  purposeId bigint(20) NOT NULL,
-  parametersId bigint(20),
-  partitions int(11),
+  purposeId bigint NOT NULL,
+  parametersId bigint,
+  partitions int,
   draft BOOLEAN NOT NULL DEFAULT FALSE,
-  poolId bigint(20),
-  sequencingOrderId bigint(20),
-  createdBy bigint(20) NOT NULL,
+  poolId bigint,
+  sequencingOrderId bigint,
+  createdBy bigint NOT NULL,
   creationDate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updatedBy bigint(20) NOT NULL,
+  updatedBy bigint NOT NULL,
   lastUpdated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_poolOrder_sequencingParameters FOREIGN KEY (parametersId) REFERENCES SequencingParameters (parametersId),
   CONSTRAINT fk_poolOrder_creator FOREIGN KEY (createdBy) REFERENCES User (userId),
@@ -35,9 +35,9 @@ CREATE TABLE PoolOrder(
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE PoolOrder_LibraryAliquot(
-  poolOrderId bigint(20) NOT NULL,
-  aliquotId bigint(20) NOT NULL,
-  proportion smallint(5) UNSIGNED NOT NULL DEFAULT 1,
+  poolOrderId bigint NOT NULL,
+  aliquotId bigint NOT NULL,
+  proportion smallint UNSIGNED NOT NULL DEFAULT 1,
   PRIMARY KEY (poolOrderId, aliquotId),
   CONSTRAINT fk_libraryAliquot_poolOrder FOREIGN KEY (poolOrderId) REFERENCES PoolOrder (poolOrderId),
   CONSTRAINT fk_poolOrder_libraryAliquot FOREIGN KEY (aliquotId) REFERENCES LibraryAliquot (aliquotId)

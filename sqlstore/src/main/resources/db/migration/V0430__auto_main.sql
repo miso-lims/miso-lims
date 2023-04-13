@@ -8,7 +8,7 @@ DROP TABLE IF EXISTS Array;
 DROP TABLE IF EXISTS ArrayModel;
 
 CREATE TABLE ArrayModel (
-  arrayModelId bigint(20) NOT NULL AUTO_INCREMENT,
+  arrayModelId bigint NOT NULL AUTO_INCREMENT,
   alias varchar(255) NOT NULL,
   `rows` TINYINT UNSIGNED NOT NULL,
   `columns` TINYINT UNSIGNED NOT NULL,
@@ -17,14 +17,14 @@ CREATE TABLE ArrayModel (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE Array (
-  arrayId bigint(20) NOT NULL AUTO_INCREMENT,
+  arrayId bigint NOT NULL AUTO_INCREMENT,
   alias varchar(255) NOT NULL,
-  arrayModelId bigint(20) NOT NULL,
+  arrayModelId bigint NOT NULL,
   serialNumber varchar(255),
   description varchar(255),
-  creator bigint(20) NOT NULL,
+  creator bigint NOT NULL,
   created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
-  lastModifier bigint(20) NOT NULL,
+  lastModifier bigint NOT NULL,
   lastModified TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   PRIMARY KEY (arrayId),
   CONSTRAINT fk_array_model FOREIGN KEY (arrayModelId) REFERENCES ArrayModel(arrayModelId),
@@ -35,19 +35,19 @@ CREATE TABLE Array (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE ArrayPosition (
-  arrayId bigint(20) NOT NULL,
+  arrayId bigint NOT NULL,
   position varchar(6) NOT NULL,
-  sampleId bigint(20) NOT NULL,
+  sampleId bigint NOT NULL,
   PRIMARY KEY (arrayId, position),
   CONSTRAINT fk_arrayPosition_array FOREIGN KEY (arrayId) REFERENCES Array(arrayId),
   CONSTRAINT fk_arrayPosition_sample FOREIGN KEY (sampleId) REFERENCES Sample(sampleId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE ArrayChangeLog (
-  arrayChangeLogId bigint(20) NOT NULL AUTO_INCREMENT,
-  arrayId bigint(20) NOT NULL,
+  arrayChangeLogId bigint NOT NULL AUTO_INCREMENT,
+  arrayId bigint NOT NULL,
   columnsChanged varchar(500) NOT NULL,
-  userId bigint(20) NOT NULL,
+  userId bigint NOT NULL,
   message longtext NOT NULL,
   changeTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   PRIMARY KEY (arrayChangeLogId),
@@ -56,18 +56,18 @@ CREATE TABLE ArrayChangeLog (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE ArrayRun (
-  arrayRunId bigint(20) NOT NULL AUTO_INCREMENT,
+  arrayRunId bigint NOT NULL AUTO_INCREMENT,
   alias varchar(255) NOT NULL,
-  instrumentId bigint(20) NOT NULL,
+  instrumentId bigint NOT NULL,
   description varchar(255),
   filePath varchar(255),
-  arrayId bigint(20),
+  arrayId bigint,
   health varchar(50) NOT NULL,
   startDate DATE,
   completionDate DATE,
-  creator bigint(20) NOT NULL,
+  creator bigint NOT NULL,
   created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
-  lastModifier bigint(20) NOT NULL,
+  lastModifier bigint NOT NULL,
   lastModified TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   PRIMARY KEY (arrayRunId),
   CONSTRAINT uk_arrayRun_alias UNIQUE (alias),
@@ -78,10 +78,10 @@ CREATE TABLE ArrayRun (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE ArrayRunChangeLog (
-  arrayRunChangeLogId bigint(20) NOT NULL AUTO_INCREMENT,
-  arrayRunId bigint(20) NOT NULL,
+  arrayRunChangeLogId bigint NOT NULL AUTO_INCREMENT,
+  arrayRunId bigint NOT NULL,
   columnsChanged varchar(500) NOT NULL,
-  userId bigint(20) NOT NULL,
+  userId bigint NOT NULL,
   message longtext NOT NULL,
   changeTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   PRIMARY KEY (arrayRunChangeLogId),

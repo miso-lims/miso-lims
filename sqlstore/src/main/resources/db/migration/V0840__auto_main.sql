@@ -1,9 +1,9 @@
 -- dilution_changelog
 CREATE TABLE DilutionChangeLog (
-  dilutionChangeLogId bigint(20) NOT NULL AUTO_INCREMENT,
-  dilutionId bigint(20) NOT NULL,
+  dilutionChangeLogId bigint NOT NULL AUTO_INCREMENT,
+  dilutionId bigint NOT NULL,
   columnsChanged varchar(500) NOT NULL,
-  userId bigint(20) NOT NULL,
+  userId bigint NOT NULL,
   message longtext NOT NULL,
   changeTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   PRIMARY KEY (dilutionChangeLogId),

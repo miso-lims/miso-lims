@@ -1,10 +1,10 @@
 DELIMITER //
 
 DROP FUNCTION IF EXISTS getAdminUserId//
-CREATE FUNCTION getAdminUserId() RETURNS bigint(20)
+CREATE FUNCTION getAdminUserId() RETURNS bigint
 READS SQL DATA
 BEGIN
-  DECLARE adminId bigint(20);
+  DECLARE adminId bigint;
   SELECT userId INTO adminId FROM User WHERE loginName = 'admin';
     IF adminId IS NULL
     THEN
@@ -51,7 +51,7 @@ BEGIN
 END//
 
 DROP FUNCTION IF EXISTS boxSizeToString//
-CREATE FUNCTION boxSizeToString(id bigint(20)) RETURNS varchar(50)
+CREATE FUNCTION boxSizeToString(id bigint) RETURNS varchar(50)
   NOT DETERMINISTIC READS SQL DATA
 BEGIN
   DECLARE label varchar(50);

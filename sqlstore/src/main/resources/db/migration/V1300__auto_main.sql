@@ -1,6 +1,6 @@
 -- library_aliquot_kits
 ALTER TABLE LibraryAliquot
-  ADD COLUMN kitDescriptorId bigint(20),
+  ADD COLUMN kitDescriptorId bigint,
   ADD COLUMN kitLot varchar(255),
   ADD CONSTRAINT fk_libraryAliquot_kitDescriptor FOREIGN KEY (kitDescriptorId) REFERENCES KitDescriptor (kitDescriptorId);
 

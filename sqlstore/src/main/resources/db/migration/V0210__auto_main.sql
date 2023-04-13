@@ -5,6 +5,6 @@ ALTER TABLE LibraryQC DROP COLUMN insertSize;
 
 -- spc_platform_not_null
 
-ALTER TABLE SequencerPartitionContainer CHANGE platform platform bigint(20) NOT NULL;
+ALTER TABLE SequencerPartitionContainer CHANGE platform platform bigint NOT NULL;
 
 

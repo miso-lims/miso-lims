@@ -15,9 +15,9 @@ ALTER TABLE Pool_Elements ADD FOREIGN KEY (pool_poolId) REFERENCES Pool (poolId)
 
 -- trash_to_discard
 
-ALTER TABLE Pool CHANGE COLUMN emptied discarded tinyint(1) NOT NULL DEFAULT '0';
-ALTER TABLE Library CHANGE COLUMN emptied discarded tinyint(1) NOT NULL DEFAULT '0';
-ALTER TABLE Sample CHANGE COLUMN emptied discarded tinyint(1) NOT NULL DEFAULT '0';
+ALTER TABLE Pool CHANGE COLUMN emptied discarded tinyint NOT NULL DEFAULT '0';
+ALTER TABLE Library CHANGE COLUMN emptied discarded tinyint NOT NULL DEFAULT '0';
+ALTER TABLE Sample CHANGE COLUMN emptied discarded tinyint NOT NULL DEFAULT '0';
 
 
 -- value_type_unique_constraints
