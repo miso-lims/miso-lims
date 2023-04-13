@@ -26,7 +26,7 @@ CREATE TABLE `TissueOrigin` (
   KEY `FKjdbxm47tiwma7ge045wjgvjdi` (`updatedBy`),
   CONSTRAINT `FK8gy70defmu4xsbhiubahuwto9` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `FKjdbxm47tiwma7ge045wjgvjdi` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `TissueType` (
   `tissueTypeId` bigint NOT NULL AUTO_INCREMENT,
@@ -42,7 +42,7 @@ CREATE TABLE `TissueType` (
   KEY `FK47m56tfdlpjqwgg79txgdt141` (`updatedBy`),
   CONSTRAINT `FK47m56tfdlpjqwgg79txgdt141` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `FKsnq8m3yj353mujw9c0iqrsjma` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `Identity` (
   `sampleId` bigint PRIMARY KEY,
@@ -59,7 +59,7 @@ CREATE TABLE `Identity` (
   CONSTRAINT `FKa11fikh6ktu2cn1qbgudb2st6` FOREIGN KEY (`sampleId`) REFERENCES `Sample` (`sampleId`),
   CONSTRAINT `FKa8c6e56hg9iucguhr0dcse62h` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `FKauqylg2sle5eudy0tqabtlmsb` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `Subproject` (
   `subprojectId` bigint NOT NULL AUTO_INCREMENT,
@@ -79,7 +79,7 @@ CREATE TABLE `Subproject` (
   CONSTRAINT `FK5mudbpqu96ccsmoldngfn7ulx` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `FKhb5p2460x4v7hd29wia24nnbu` FOREIGN KEY (`projectId`) REFERENCES `Project` (`projectId`),
   CONSTRAINT `FKl477a3ed1xwaqx5k9hqu8naqi` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `SampleClass` (
   `sampleClassId` bigint NOT NULL AUTO_INCREMENT,
@@ -97,7 +97,7 @@ CREATE TABLE `SampleClass` (
   KEY `FKoyjjomji7fvjrlgevecxqv12o` (`updatedBy`),
   CONSTRAINT `FK30w1j1qqj9qoxgpopa0uq9jeh` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `FKoyjjomji7fvjrlgevecxqv12o` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `QcPassedDetail` (
   `qcPassedDetailId` bigint NOT NULL AUTO_INCREMENT,
@@ -114,7 +114,7 @@ CREATE TABLE `QcPassedDetail` (
   KEY `FK8xn9wkmnf09k06en6m91g5ks3` (`updatedBy`),
   CONSTRAINT `FK82obpt4ig4g20eycits1ss1am` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `FK8xn9wkmnf09k06en6m91g5ks3` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `Institute` (
   `instituteId` bigint PRIMARY KEY AUTO_INCREMENT,
@@ -125,7 +125,7 @@ CREATE TABLE `Institute` (
   `lastUpdated` datetime NOT NULL,
   CONSTRAINT `institute_createUser_fkey` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `institute_updateUser_fkey` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `Lab` (
   `labId` bigint PRIMARY KEY AUTO_INCREMENT,
@@ -139,7 +139,7 @@ CREATE TABLE `Lab` (
   CONSTRAINT `lab_institute_fkey` FOREIGN KEY (`instituteId`) REFERENCES `Institute` (`instituteId`),
   CONSTRAINT `lab_createUser_fkey` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `lab_updateUser_fkey` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `SampleAdditionalInfo` (
   `sampleId` bigint PRIMARY KEY,
@@ -179,7 +179,7 @@ CREATE TABLE `SampleAdditionalInfo` (
   CONSTRAINT `sampleadditionalinfo_lab_fkey` FOREIGN KEY (`labId`) REFERENCES `Lab` (`labId`),
   CONSTRAINT `sampleadditionalinfo_parent_fkey` FOREIGN KEY (`parentId`) REFERENCES `Sample` (`sampleId`),
   CONSTRAINT `FKp8bvx3e7jsmnyw51toi7mq7cq` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE SampleAdditionalInfo ADD COLUMN `kitDescriptorId` BIGINT DEFAULT NULL after subprojectId;
 ALTER TABLE SampleAdditionalInfo ADD FOREIGN KEY (kitDescriptorId) REFERENCES KitDescriptor (kitDescriptorId);
@@ -199,7 +199,7 @@ CREATE TABLE `TissueMaterial` (
   KEY `FK69r5v1ppgjw6jth6saekcmv96` (`updatedBy`),
   CONSTRAINT `FK69r5v1ppgjw6jth6saekcmv96` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `FKtrwn1w8po9spxnkex9rpgsn64` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `SamplePurpose` (
   `samplePurposeId` bigint NOT NULL AUTO_INCREMENT,
@@ -215,7 +215,7 @@ CREATE TABLE `SamplePurpose` (
   KEY `FKf50vooqtktimgba328whal3o0` (`updatedBy`),
   CONSTRAINT `FKcgjgyju8kvxgi1uaceewhtmbt` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `FKf50vooqtktimgba328whal3o0` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `SampleGroup` (
   `sampleGroupId` bigint NOT NULL AUTO_INCREMENT,
@@ -235,7 +235,7 @@ CREATE TABLE `SampleGroup` (
   CONSTRAINT `FKsubproject` FOREIGN KEY (`subprojectId`) REFERENCES `Subproject` (`subprojectId`),
   CONSTRAINT `FKisowhu857cxk85o0s0fklyevx` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `FKnn6082qvedk02e1046e8y107d` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `SampleAnalyte` (
   `sampleId` bigint PRIMARY KEY,
@@ -261,7 +261,7 @@ CREATE TABLE `SampleAnalyte` (
   CONSTRAINT `FKmirq92ew3h3732cexgqdeyehk` FOREIGN KEY (`sampleGroupId`) REFERENCES `SampleGroup` (`sampleGroupId`),
   CONSTRAINT `FKpras819b6p7vh12xbeovne8o0` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `FKprqyhv40bntjrf5l64mjdgl1j` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `SampleNumberPerProject` (
   `sampleNumberPerProjectId` bigint NOT NULL AUTO_INCREMENT,
@@ -279,7 +279,7 @@ CREATE TABLE `SampleNumberPerProject` (
   CONSTRAINT `FKjxikp47dpisx3tr3vkxuknfeh` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `FKlgd3qd6d25aawdl1ldqvc1vxf` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `FKpbhtha4po9so0lup7x3sxge5p` FOREIGN KEY (`projectId`) REFERENCES `Project` (`projectId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `SampleValidRelationship` (
   `sampleValidRelationshipId` bigint NOT NULL AUTO_INCREMENT,
@@ -298,7 +298,7 @@ CREATE TABLE `SampleValidRelationship` (
   CONSTRAINT `FKb9uqsxsfb2fxnl8jjo8p5ifer` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `FKfk3wsykea5rk3svf1n702eti0` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `FKk7dtvey4xjbrt9qdwkjl00wlb` FOREIGN KEY (`childId`) REFERENCES `SampleClass` (`sampleClassId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `SampleTissue` (
   `sampleId` bigint PRIMARY KEY,
@@ -310,7 +310,7 @@ CREATE TABLE `SampleTissue` (
   CONSTRAINT `sampleTissue_sample_fkey` FOREIGN KEY (`sampleId`) REFERENCES `Sample` (`sampleId`),
   CONSTRAINT `sampleTissue_createUser_fkey` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `sampleTissue_updateUser_fkey` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `LibraryAdditionalInfo` (
   `libraryId` bigint NOT NULL PRIMARY KEY,
@@ -330,7 +330,7 @@ CREATE TABLE `LibraryAdditionalInfo` (
   CONSTRAINT `libraryAdditionalInfo_library_fkey` FOREIGN KEY (`libraryId`) REFERENCES `Library` (`libraryId`),
   CONSTRAINT `libraryAdditionalInfo_createUser_fkey` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `libraryAdditionalInfo_updateUser_fkey` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `LibraryPropagationRule` (
   `libraryPropagationRuleId` bigint PRIMARY KEY AUTO_INCREMENT,
@@ -343,7 +343,7 @@ CREATE TABLE `LibraryPropagationRule` (
   CONSTRAINT `FK_lpr_sampleClassId` FOREIGN KEY (`sampleClassId`) REFERENCES `SampleClass` (`sampleClassId`),
   CONSTRAINT `FK_lpr_selectiontype` FOREIGN KEY (`librarySelectionType`) REFERENCES `LibrarySelectionType` (`librarySelectionTypeId`),
   CONSTRAINT `FK_lpr_strategytype` FOREIGN KEY (`libraryStrategyType`) REFERENCES `LibraryStrategyType` (`libraryStrategyTypeId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `SequencingParameters` (
   `parametersId` bigint PRIMARY KEY AUTO_INCREMENT,
@@ -359,7 +359,7 @@ CREATE TABLE `SequencingParameters` (
   CONSTRAINT `sequencingParameters_createUser_fkey` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `sequencingParameters_updateUser_fkey` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `parameter_platformId_fkey` FOREIGN KEY (`platformId`) REFERENCES `Platform` (`platformId`)
-) ENGINE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO `SequencingParameters` (`platformId`, `name`, `createdBy`, `updatedBy`, `creationDate`, `lastUpdated`, `readLength`, `paired`, `xpath`)
 VALUES
@@ -410,7 +410,7 @@ CREATE TABLE `PoolOrder` (
   CONSTRAINT `order_parametersId_fkey` FOREIGN KEY (`parametersId`) REFERENCES `SequencingParameters` (`parametersId`),
   CONSTRAINT `order_createUser_fkey` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `order_updateUser_fkey` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE Run ADD COLUMN sequencingParameters_parametersId bigint DEFAULT NULL;
 ALTER TABLE Run ADD FOREIGN KEY (sequencingParameters_parametersId) REFERENCES SequencingParameters (parametersId);

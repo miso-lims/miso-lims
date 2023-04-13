@@ -7,7 +7,7 @@
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
+/*!40101 SET NAMES utf8mb4 */;
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `Alert`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Alert` (
   `alertId` bigint NOT NULL AUTO_INCREMENT,
   `title` varchar(255) DEFAULT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE `Alert` (
   `isRead` bit NOT NULL DEFAULT b'0',
   `level` varchar(8) NOT NULL DEFAULT 'INFO',
   PRIMARY KEY (`alertId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -40,14 +40,14 @@ CREATE TABLE `Alert` (
 
 DROP TABLE IF EXISTS `Chamber`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Chamber` (
   `chamberId` bigint NOT NULL AUTO_INCREMENT,
   `chamberNumber` tinyint NOT NULL,
   `pool_poolId` bigint DEFAULT NULL,
   `securityProfile_profileId` bigint DEFAULT NULL,
   PRIMARY KEY (`chamberId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -56,13 +56,13 @@ CREATE TABLE `Chamber` (
 
 DROP TABLE IF EXISTS `EntityGroup`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `EntityGroup` (
   `entityGroupId` bigint NOT NULL AUTO_INCREMENT,
   `parentId` bigint NOT NULL,
   `parentType` varchar(255) NOT NULL,
   PRIMARY KEY (`entityGroupId`,`parentId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -71,13 +71,13 @@ CREATE TABLE `EntityGroup` (
 
 DROP TABLE IF EXISTS `EntityGroup_Elements`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `EntityGroup_Elements` (
   `entityGroup_entityGroupId` bigint NOT NULL,
   `entityId` bigint NOT NULL,
   `entityType` varchar(255) NOT NULL,
   PRIMARY KEY (`entityGroup_entityGroupId`,`entityId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -86,7 +86,7 @@ CREATE TABLE `EntityGroup_Elements` (
 
 DROP TABLE IF EXISTS `Experiment`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Experiment` (
   `experimentId` bigint NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
@@ -98,7 +98,7 @@ CREATE TABLE `Experiment` (
   `alias` varchar(100) DEFAULT NULL,
   `platform_platformId` bigint NOT NULL,
   PRIMARY KEY (`experimentId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -107,12 +107,12 @@ CREATE TABLE `Experiment` (
 
 DROP TABLE IF EXISTS `Experiment_Kit`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Experiment_Kit` (
   `experiments_experimentId` bigint NOT NULL,
   `kits_kitId` bigint NOT NULL,
   PRIMARY KEY (`experiments_experimentId`,`kits_kitId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -121,12 +121,12 @@ CREATE TABLE `Experiment_Kit` (
 
 DROP TABLE IF EXISTS `Experiment_Run`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Experiment_Run` (
   `Experiment_experimentId` bigint NOT NULL,
   `runs_runId` bigint NOT NULL,
   PRIMARY KEY (`Experiment_experimentId`,`runs_runId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -135,7 +135,7 @@ CREATE TABLE `Experiment_Run` (
 
 DROP TABLE IF EXISTS `Flowcell`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Flowcell` (
   `flowcellId` bigint NOT NULL AUTO_INCREMENT,
   `reservoirType` varchar(10) NOT NULL,
@@ -146,7 +146,7 @@ CREATE TABLE `Flowcell` (
   `platformType` varchar(50) DEFAULT NULL,
   `validationBarcode` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`flowcellId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -155,12 +155,12 @@ CREATE TABLE `Flowcell` (
 
 DROP TABLE IF EXISTS `Flowcell_Chamber`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Flowcell_Chamber` (
   `Flowcell_flowcellId` bigint NOT NULL,
   `chambers_chamberId` bigint NOT NULL,
   PRIMARY KEY (`Flowcell_flowcellId`,`chambers_chamberId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -169,12 +169,12 @@ CREATE TABLE `Flowcell_Chamber` (
 
 DROP TABLE IF EXISTS `Flowcell_Lane`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Flowcell_Lane` (
   `Flowcell_flowcellId` bigint NOT NULL,
   `lanes_laneId` bigint NOT NULL,
   PRIMARY KEY (`Flowcell_flowcellId`,`lanes_laneId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -183,7 +183,7 @@ CREATE TABLE `Flowcell_Lane` (
 
 DROP TABLE IF EXISTS `Kit`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Kit` (
   `kitId` bigint NOT NULL AUTO_INCREMENT,
   `identificationBarcode` varchar(255) DEFAULT NULL,
@@ -192,7 +192,7 @@ CREATE TABLE `Kit` (
   `kitDate` date NOT NULL,
   `kitDescriptorId` bigint NOT NULL,
   PRIMARY KEY (`kitId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -201,7 +201,7 @@ CREATE TABLE `Kit` (
 
 DROP TABLE IF EXISTS `KitDescriptor`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `KitDescriptor` (
   `kitDescriptorId` bigint NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
@@ -212,7 +212,7 @@ CREATE TABLE `KitDescriptor` (
   `kitType` varchar(30) NOT NULL,
   `platformType` varchar(20) NOT NULL,
   PRIMARY KEY (`kitDescriptorId`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -221,12 +221,12 @@ CREATE TABLE `KitDescriptor` (
 
 DROP TABLE IF EXISTS `Kit_Note`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Kit_Note` (
   `kit_kitId` bigint NOT NULL,
   `notes_noteId` bigint NOT NULL,
   PRIMARY KEY (`kit_kitId`,`notes_noteId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -235,14 +235,14 @@ CREATE TABLE `Kit_Note` (
 
 DROP TABLE IF EXISTS `Lane`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Lane` (
   `laneId` bigint NOT NULL AUTO_INCREMENT,
   `laneNumber` tinyint NOT NULL,
   `pool_poolId` bigint DEFAULT NULL,
   `securityProfile_profileId` bigint DEFAULT NULL,
   PRIMARY KEY (`laneId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -251,7 +251,7 @@ CREATE TABLE `Lane` (
 
 DROP TABLE IF EXISTS `Library`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Library` (
   `libraryId` bigint NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
@@ -271,7 +271,7 @@ CREATE TABLE `Library` (
   `libraryStrategyType` bigint DEFAULT NULL,
   `qcPassed` varchar(5) DEFAULT NULL,
   PRIMARY KEY (`libraryId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -280,7 +280,7 @@ CREATE TABLE `Library` (
 
 DROP TABLE IF EXISTS `LibraryDilution`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `LibraryDilution` (
   `dilutionId` bigint NOT NULL AUTO_INCREMENT,
   `concentration` double NOT NULL,
@@ -291,7 +291,7 @@ CREATE TABLE `LibraryDilution` (
   `name` varchar(255) NOT NULL,
   `securityProfile_profileId` bigint DEFAULT NULL,
   PRIMARY KEY (`dilutionId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -300,7 +300,7 @@ CREATE TABLE `LibraryDilution` (
 
 DROP TABLE IF EXISTS `LibraryQC`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `LibraryQC` (
   `qcId` bigint NOT NULL AUTO_INCREMENT,
   `library_libraryId` bigint NOT NULL,
@@ -310,7 +310,7 @@ CREATE TABLE `LibraryQC` (
   `results` double DEFAULT NULL,
   `insertSize` int NOT NULL,
   PRIMARY KEY (`qcId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -319,13 +319,13 @@ CREATE TABLE `LibraryQC` (
 
 DROP TABLE IF EXISTS `LibrarySelectionType`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `LibrarySelectionType` (
   `librarySelectionTypeId` bigint NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
   `description` varchar(255) NOT NULL,
   PRIMARY KEY (`librarySelectionTypeId`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -334,13 +334,13 @@ CREATE TABLE `LibrarySelectionType` (
 
 DROP TABLE IF EXISTS `LibraryStrategyType`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `LibraryStrategyType` (
   `libraryStrategyTypeId` bigint NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
   `description` varchar(255) NOT NULL,
   PRIMARY KEY (`libraryStrategyTypeId`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -349,13 +349,13 @@ CREATE TABLE `LibraryStrategyType` (
 
 DROP TABLE IF EXISTS `LibraryType`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `LibraryType` (
   `libraryTypeId` bigint NOT NULL AUTO_INCREMENT,
   `description` varchar(255) NOT NULL,
   `platformType` varchar(50) NOT NULL,
   PRIMARY KEY (`libraryTypeId`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -364,12 +364,12 @@ CREATE TABLE `LibraryType` (
 
 DROP TABLE IF EXISTS `Library_Note`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Library_Note` (
   `library_libraryId` bigint NOT NULL,
   `notes_noteId` bigint NOT NULL,
   PRIMARY KEY (`library_libraryId`,`notes_noteId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -378,12 +378,12 @@ CREATE TABLE `Library_Note` (
 
 DROP TABLE IF EXISTS `Library_TagBarcode`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Library_TagBarcode` (
   `library_libraryId` bigint NOT NULL,
   `barcode_barcodeId` bigint NOT NULL,
   PRIMARY KEY (`library_libraryId`,`barcode_barcodeId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -392,7 +392,7 @@ CREATE TABLE `Library_TagBarcode` (
 
 DROP TABLE IF EXISTS `Note`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Note` (
   `noteId` bigint NOT NULL AUTO_INCREMENT,
   `creationDate` date NOT NULL,
@@ -401,7 +401,7 @@ CREATE TABLE `Note` (
   `owner_userId` bigint DEFAULT NULL,
   PRIMARY KEY (`noteId`),
   KEY `FK2524124140968C` (`owner_userId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -410,7 +410,7 @@ CREATE TABLE `Note` (
 
 DROP TABLE IF EXISTS `Plate`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Plate` (
   `plateId` bigint NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
@@ -423,7 +423,7 @@ CREATE TABLE `Plate` (
   `securityProfile_profileId` bigint DEFAULT NULL,
   `description` varchar(255) NOT NULL,
   PRIMARY KEY (`plateId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -432,14 +432,14 @@ CREATE TABLE `Plate` (
 
 DROP TABLE IF EXISTS `Plate_Elements`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Plate_Elements` (
   `plate_plateId` bigint NOT NULL,
   `elementType` varchar(255) NOT NULL,
   `elementPosition` int NOT NULL,
   `elementId` bigint NOT NULL,
   PRIMARY KEY (`plate_plateId`,`elementId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -448,12 +448,12 @@ CREATE TABLE `Plate_Elements` (
 
 DROP TABLE IF EXISTS `Plate_Library`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Plate_Library` (
   `plate_plateId` bigint NOT NULL,
   `library_libraryId` bigint NOT NULL,
   PRIMARY KEY (`plate_plateId`,`library_libraryId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -462,7 +462,7 @@ CREATE TABLE `Plate_Library` (
 
 DROP TABLE IF EXISTS `Platform`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Platform` (
   `platformId` bigint NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
@@ -470,7 +470,7 @@ CREATE TABLE `Platform` (
   `description` varchar(255) NOT NULL,
   `numContainers` tinyint NOT NULL,
   PRIMARY KEY (`platformId`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -479,7 +479,7 @@ CREATE TABLE `Platform` (
 
 DROP TABLE IF EXISTS `Pool`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Pool` (
   `poolId` bigint NOT NULL AUTO_INCREMENT,
   `concentration` double NOT NULL,
@@ -493,7 +493,7 @@ CREATE TABLE `Pool` (
   `alias` varchar(50) DEFAULT NULL,
   `qcPassed` varchar(5) DEFAULT NULL,
   PRIMARY KEY (`poolId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -502,7 +502,7 @@ CREATE TABLE `Pool` (
 
 DROP TABLE IF EXISTS `PoolQC`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `PoolQC` (
   `qcId` bigint NOT NULL AUTO_INCREMENT,
   `pool_poolId` bigint NOT NULL,
@@ -511,7 +511,7 @@ CREATE TABLE `PoolQC` (
   `qcMethod` bigint DEFAULT NULL,
   `results` double DEFAULT NULL,
   PRIMARY KEY (`qcId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -520,13 +520,13 @@ CREATE TABLE `PoolQC` (
 
 DROP TABLE IF EXISTS `Pool_Elements`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Pool_Elements` (
   `pool_poolId` bigint NOT NULL,
   `elementType` varchar(255) NOT NULL,
   `elementId` bigint NOT NULL,
   PRIMARY KEY (`pool_poolId`,`elementId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -535,12 +535,12 @@ CREATE TABLE `Pool_Elements` (
 
 DROP TABLE IF EXISTS `Pool_Experiment`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Pool_Experiment` (
   `pool_poolId` bigint NOT NULL,
   `experiments_experimentId` bigint NOT NULL,
   PRIMARY KEY (`pool_poolId`,`experiments_experimentId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -549,12 +549,12 @@ CREATE TABLE `Pool_Experiment` (
 
 DROP TABLE IF EXISTS `Pool_LibraryDilution`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Pool_LibraryDilution` (
   `pool_poolId` bigint NOT NULL,
   `dilutions_dilutionId` bigint NOT NULL,
   PRIMARY KEY (`pool_poolId`,`dilutions_dilutionId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -563,12 +563,12 @@ CREATE TABLE `Pool_LibraryDilution` (
 
 DROP TABLE IF EXISTS `Pool_emPCRDilution`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Pool_emPCRDilution` (
   `pool_poolId` bigint NOT NULL,
   `dilutions_dilutionId` bigint NOT NULL,
   PRIMARY KEY (`pool_poolId`,`dilutions_dilutionId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -577,7 +577,7 @@ CREATE TABLE `Pool_emPCRDilution` (
 
 DROP TABLE IF EXISTS `PrintJob`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `PrintJob` (
   `jobId` bigint NOT NULL AUTO_INCREMENT,
   `printServiceName` varchar(100) NOT NULL,
@@ -586,7 +586,7 @@ CREATE TABLE `PrintJob` (
   `printedElements` blob NOT NULL,
   `status` varchar(20) NOT NULL,
   PRIMARY KEY (`jobId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -595,7 +595,7 @@ CREATE TABLE `PrintJob` (
 
 DROP TABLE IF EXISTS `PrintService`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `PrintService` (
   `serviceId` bigint NOT NULL AUTO_INCREMENT,
   `serviceName` varchar(100) NOT NULL,
@@ -605,7 +605,7 @@ CREATE TABLE `PrintService` (
   `printServiceFor` varchar(255) NOT NULL,
   `printSchema` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`serviceId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -614,7 +614,7 @@ CREATE TABLE `PrintService` (
 
 DROP TABLE IF EXISTS `Project`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Project` (
   `projectId` bigint NOT NULL AUTO_INCREMENT,
   `creationDate` datetime DEFAULT NULL,
@@ -626,7 +626,7 @@ CREATE TABLE `Project` (
   `lastUpdated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`projectId`),
   KEY `FK50C8E2F960F9CBA8` (`securityProfile_profileId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -635,7 +635,7 @@ CREATE TABLE `Project` (
 
 DROP TABLE IF EXISTS `ProjectOverview`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `ProjectOverview` (
   `overviewId` bigint NOT NULL AUTO_INCREMENT,
   `principalInvestigator` varchar(255) NOT NULL,
@@ -651,7 +651,7 @@ CREATE TABLE `ProjectOverview` (
   `allRunsCompleted` bit DEFAULT b'0',
   `primaryAnalysisCompleted` bit DEFAULT b'0',
   PRIMARY KEY (`overviewId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -660,12 +660,12 @@ CREATE TABLE `ProjectOverview` (
 
 DROP TABLE IF EXISTS `ProjectOverview_Note`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `ProjectOverview_Note` (
   `overview_overviewId` bigint NOT NULL,
   `notes_noteId` bigint NOT NULL,
   PRIMARY KEY (`overview_overviewId`,`notes_noteId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -674,12 +674,12 @@ CREATE TABLE `ProjectOverview_Note` (
 
 DROP TABLE IF EXISTS `Project_Issues`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Project_Issues` (
   `project_projectId` bigint NOT NULL,
   `issueKey` varchar(255) NOT NULL,
   PRIMARY KEY (`project_projectId`,`issueKey`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -688,12 +688,12 @@ CREATE TABLE `Project_Issues` (
 
 DROP TABLE IF EXISTS `Project_Note`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Project_Note` (
   `project_projectId` bigint NOT NULL,
   `notes_noteId` bigint NOT NULL,
   PRIMARY KEY (`project_projectId`,`notes_noteId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -702,12 +702,12 @@ CREATE TABLE `Project_Note` (
 
 DROP TABLE IF EXISTS `Project_ProjectOverview`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Project_ProjectOverview` (
   `project_projectId` bigint NOT NULL,
   `overviews_overviewId` bigint NOT NULL,
   PRIMARY KEY (`project_projectId`,`overviews_overviewId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=COMPRESSED;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPRESSED;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -716,14 +716,14 @@ CREATE TABLE `Project_ProjectOverview` (
 
 DROP TABLE IF EXISTS `Project_Request`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Project_Request` (
   `Project_projectId` bigint NOT NULL,
   `requests_requestId` bigint NOT NULL,
   UNIQUE KEY `requests_requestId` (`requests_requestId`),
   KEY `FKDA6E0B2925FFBF98` (`Project_projectId`),
   KEY `FKDA6E0B29B36A83EF` (`requests_requestId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -732,13 +732,13 @@ CREATE TABLE `Project_Request` (
 
 DROP TABLE IF EXISTS `Project_Study`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Project_Study` (
   `Project_projectId` bigint NOT NULL,
   `studies_studyId` bigint NOT NULL,
   KEY `studyId` (`studies_studyId`) USING BTREE,
   KEY `projectId` (`Project_projectId`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -747,7 +747,7 @@ CREATE TABLE `Project_Study` (
 
 DROP TABLE IF EXISTS `QCType`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `QCType` (
   `qcTypeId` bigint NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
@@ -755,7 +755,7 @@ CREATE TABLE `QCType` (
   `qcTarget` varchar(50) NOT NULL,
   `units` varchar(20) NOT NULL,
   PRIMARY KEY (`qcTypeId`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -764,7 +764,7 @@ CREATE TABLE `QCType` (
 
 DROP TABLE IF EXISTS `Request`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Request` (
   `requestId` bigint NOT NULL AUTO_INCREMENT,
   `creationDate` datetime DEFAULT NULL,
@@ -778,7 +778,7 @@ CREATE TABLE `Request` (
   PRIMARY KEY (`requestId`),
   KEY `FKA4878A6F60F9CBA8` (`securityProfile_profileId`),
   KEY `FKA4878A6F25FFBF98` (`project_projectId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -787,14 +787,14 @@ CREATE TABLE `Request` (
 
 DROP TABLE IF EXISTS `Request_Note`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Request_Note` (
   `Request_requestId` bigint NOT NULL,
   `notes_noteId` bigint NOT NULL,
   UNIQUE KEY `notes_noteId` (`notes_noteId`),
   KEY `FK57687FE2A7DC4D2C` (`notes_noteId`),
   KEY `FK57687FE2E8B554FA` (`Request_requestId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -803,7 +803,7 @@ CREATE TABLE `Request_Note` (
 
 DROP TABLE IF EXISTS `Run`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Run` (
   `runId` bigint NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
@@ -819,7 +819,7 @@ CREATE TABLE `Run` (
   `alias` varchar(255) DEFAULT NULL,
   `sequencerReference_sequencerReferenceId` bigint NOT NULL,
   PRIMARY KEY (`runId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -828,7 +828,7 @@ CREATE TABLE `Run` (
 
 DROP TABLE IF EXISTS `RunQC`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `RunQC` (
   `qcId` bigint NOT NULL AUTO_INCREMENT,
   `run_runId` bigint NOT NULL,
@@ -838,7 +838,7 @@ CREATE TABLE `RunQC` (
   `information` text,
   `doNotProcess` bit NOT NULL DEFAULT b'0',
   PRIMARY KEY (`qcId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -847,13 +847,13 @@ CREATE TABLE `RunQC` (
 
 DROP TABLE IF EXISTS `RunQC_Partition`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `RunQC_Partition` (
   `runQc_runQcId` bigint NOT NULL,
   `containers_containerId` bigint NOT NULL DEFAULT '0',
   `partitionNumber` tinyint NOT NULL,
   PRIMARY KEY (`runQc_runQcId`,`containers_containerId`,`partitionNumber`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -862,12 +862,12 @@ CREATE TABLE `RunQC_Partition` (
 
 DROP TABLE IF EXISTS `Run_Flowcell`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Run_Flowcell` (
   `Run_runId` bigint NOT NULL,
   `flowcells_flowcellId` bigint NOT NULL,
   PRIMARY KEY (`Run_runId`,`flowcells_flowcellId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -876,12 +876,12 @@ CREATE TABLE `Run_Flowcell` (
 
 DROP TABLE IF EXISTS `Run_Note`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Run_Note` (
   `run_runId` bigint NOT NULL,
   `notes_noteId` bigint NOT NULL,
   PRIMARY KEY (`run_runId`,`notes_noteId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -890,12 +890,12 @@ CREATE TABLE `Run_Note` (
 
 DROP TABLE IF EXISTS `Run_SequencerPartitionContainer`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Run_SequencerPartitionContainer` (
   `Run_runId` bigint NOT NULL,
   `containers_containerId` bigint NOT NULL,
   PRIMARY KEY (`Run_runId`,`containers_containerId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -904,7 +904,7 @@ CREATE TABLE `Run_SequencerPartitionContainer` (
 
 DROP TABLE IF EXISTS `Sample`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Sample` (
   `sampleId` bigint NOT NULL AUTO_INCREMENT,
   `accession` varchar(50) DEFAULT NULL,
@@ -921,7 +921,7 @@ CREATE TABLE `Sample` (
   `scientificName` varchar(255) NOT NULL,
   `taxonIdentifier` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`sampleId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -930,7 +930,7 @@ CREATE TABLE `Sample` (
 
 DROP TABLE IF EXISTS `SampleQC`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `SampleQC` (
   `qcId` bigint NOT NULL AUTO_INCREMENT,
   `sample_sampleId` bigint NOT NULL,
@@ -939,7 +939,7 @@ CREATE TABLE `SampleQC` (
   `qcMethod` bigint DEFAULT NULL,
   `results` double DEFAULT NULL,
   PRIMARY KEY (`qcId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -948,12 +948,12 @@ CREATE TABLE `SampleQC` (
 
 DROP TABLE IF EXISTS `SampleType`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `SampleType` (
   `typeId` bigint NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`typeId`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -962,12 +962,12 @@ CREATE TABLE `SampleType` (
 
 DROP TABLE IF EXISTS `Sample_Note`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Sample_Note` (
   `sample_sampleId` bigint NOT NULL,
   `notes_noteId` bigint NOT NULL,
   PRIMARY KEY (`sample_sampleId`,`notes_noteId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -976,14 +976,14 @@ CREATE TABLE `Sample_Note` (
 
 DROP TABLE IF EXISTS `SecurityProfile`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `SecurityProfile` (
   `profileId` bigint NOT NULL AUTO_INCREMENT,
   `allowAllInternal` bit NOT NULL,
   `owner_userId` bigint DEFAULT NULL,
   PRIMARY KEY (`profileId`),
   KEY `FK18AEBA294140968C` (`owner_userId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -992,11 +992,11 @@ CREATE TABLE `SecurityProfile` (
 
 DROP TABLE IF EXISTS `SecurityProfile_ReadGroup`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `SecurityProfile_ReadGroup` (
   `SecurityProfile_profileId` bigint NOT NULL,
   `readGroup_groupId` bigint NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1005,13 +1005,13 @@ CREATE TABLE `SecurityProfile_ReadGroup` (
 
 DROP TABLE IF EXISTS `SecurityProfile_ReadUser`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `SecurityProfile_ReadUser` (
   `SecurityProfile_profileId` bigint NOT NULL,
   `readUser_userId` bigint NOT NULL,
   KEY `FKD4CF504160F9CBA8` (`SecurityProfile_profileId`),
   KEY `FKD4CF504125267E4D` (`readUser_userId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1020,11 +1020,11 @@ CREATE TABLE `SecurityProfile_ReadUser` (
 
 DROP TABLE IF EXISTS `SecurityProfile_WriteGroup`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `SecurityProfile_WriteGroup` (
   `SecurityProfile_profileId` bigint NOT NULL,
   `writeGroup_groupId` bigint NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1033,11 +1033,11 @@ CREATE TABLE `SecurityProfile_WriteGroup` (
 
 DROP TABLE IF EXISTS `SecurityProfile_WriteUser`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `SecurityProfile_WriteUser` (
   `SecurityProfile_profileId` bigint NOT NULL,
   `writeUser_userId` bigint NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1046,7 +1046,7 @@ CREATE TABLE `SecurityProfile_WriteUser` (
 
 DROP TABLE IF EXISTS `SequencerPartitionContainer`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `SequencerPartitionContainer` (
   `containerId` bigint NOT NULL AUTO_INCREMENT,
   `securityProfile_profileId` bigint DEFAULT NULL,
@@ -1055,7 +1055,7 @@ CREATE TABLE `SequencerPartitionContainer` (
   `platform` bigint DEFAULT NULL,
   `validationBarcode` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`containerId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1064,12 +1064,12 @@ CREATE TABLE `SequencerPartitionContainer` (
 
 DROP TABLE IF EXISTS `SequencerPartitionContainer_Partition`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `SequencerPartitionContainer_Partition` (
   `container_containerId` bigint NOT NULL,
   `partitions_partitionId` bigint NOT NULL,
   PRIMARY KEY (`container_containerId`,`partitions_partitionId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1078,7 +1078,7 @@ CREATE TABLE `SequencerPartitionContainer_Partition` (
 
 DROP TABLE IF EXISTS `SequencerReference`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `SequencerReference` (
   `referenceId` bigint NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL,
@@ -1086,7 +1086,7 @@ CREATE TABLE `SequencerReference` (
   `platformId` bigint NOT NULL,
   `available` bit NOT NULL DEFAULT b'0',
   PRIMARY KEY (`referenceId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1095,12 +1095,12 @@ CREATE TABLE `SequencerReference` (
 
 DROP TABLE IF EXISTS `State_Key`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `State_Key` (
   `id` bigint NOT NULL,
   `value` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1109,12 +1109,12 @@ CREATE TABLE `State_Key` (
 
 DROP TABLE IF EXISTS `State_Value`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `State_Value` (
   `id` bigint NOT NULL,
   `value` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1123,7 +1123,7 @@ CREATE TABLE `State_Value` (
 
 DROP TABLE IF EXISTS `Status`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Status` (
   `statusId` bigint NOT NULL AUTO_INCREMENT,
   `health` varchar(50) NOT NULL DEFAULT 'Unknown',
@@ -1134,7 +1134,7 @@ CREATE TABLE `Status` (
   `runName` varchar(255) NOT NULL,
   `xml` longblob,
   PRIMARY KEY (`statusId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1143,7 +1143,7 @@ CREATE TABLE `Status` (
 
 DROP TABLE IF EXISTS `Study`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Study` (
   `studyId` bigint NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
@@ -1154,7 +1154,7 @@ CREATE TABLE `Study` (
   `studyType` varchar(255) DEFAULT NULL,
   `alias` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`studyId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1163,12 +1163,12 @@ CREATE TABLE `Study` (
 
 DROP TABLE IF EXISTS `StudyType`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `StudyType` (
   `typeId` bigint NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`typeId`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1177,11 +1177,11 @@ CREATE TABLE `StudyType` (
 
 DROP TABLE IF EXISTS `Study_Experiment`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Study_Experiment` (
   `Study_studyId` bigint NOT NULL,
   `experiments_experimentId` bigint NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1190,7 +1190,7 @@ CREATE TABLE `Study_Experiment` (
 
 DROP TABLE IF EXISTS `Submission`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Submission` (
   `submissionId` bigint NOT NULL AUTO_INCREMENT,
   `creationDate` date NOT NULL,
@@ -1203,7 +1203,7 @@ CREATE TABLE `Submission` (
   `alias` varchar(100) DEFAULT NULL,
   `completed` bit DEFAULT b'0',
   PRIMARY KEY (`submissionId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1212,12 +1212,12 @@ CREATE TABLE `Submission` (
 
 DROP TABLE IF EXISTS `Submission_Chamber`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Submission_Chamber` (
   `submission_submissionId` bigint NOT NULL,
   `chambers_chamberId` bigint NOT NULL,
   PRIMARY KEY (`submission_submissionId`,`chambers_chamberId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1226,12 +1226,12 @@ CREATE TABLE `Submission_Chamber` (
 
 DROP TABLE IF EXISTS `Submission_Experiment`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Submission_Experiment` (
   `submission_submissionId` bigint NOT NULL,
   `experiments_experimentId` bigint NOT NULL,
   PRIMARY KEY (`submission_submissionId`,`experiments_experimentId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1240,12 +1240,12 @@ CREATE TABLE `Submission_Experiment` (
 
 DROP TABLE IF EXISTS `Submission_Lane`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Submission_Lane` (
   `submission_submissionId` bigint NOT NULL,
   `lanes_laneId` bigint NOT NULL,
   PRIMARY KEY (`submission_submissionId`,`lanes_laneId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1254,12 +1254,12 @@ CREATE TABLE `Submission_Lane` (
 
 DROP TABLE IF EXISTS `Submission_Partition`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Submission_Partition` (
   `submission_submissionId` bigint NOT NULL,
   `partitions_partitionId` bigint NOT NULL,
   PRIMARY KEY (`submission_submissionId`,`partitions_partitionId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1268,13 +1268,13 @@ CREATE TABLE `Submission_Partition` (
 
 DROP TABLE IF EXISTS `Submission_Partition_Dilution`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Submission_Partition_Dilution` (
   `submission_submissionId` bigint NOT NULL,
   `partition_partitionId` bigint NOT NULL,
   `dilution_dilutionId` bigint NOT NULL,
   PRIMARY KEY (`submission_submissionId`,`partition_partitionId`,`dilution_dilutionId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1283,12 +1283,12 @@ CREATE TABLE `Submission_Partition_Dilution` (
 
 DROP TABLE IF EXISTS `Submission_Sample`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Submission_Sample` (
   `submission_submissionId` bigint NOT NULL,
   `samples_sampleId` bigint NOT NULL,
   PRIMARY KEY (`submission_submissionId`,`samples_sampleId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1297,12 +1297,12 @@ CREATE TABLE `Submission_Sample` (
 
 DROP TABLE IF EXISTS `Submission_Study`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Submission_Study` (
   `submission_submissionId` bigint NOT NULL,
   `studies_studyId` bigint NOT NULL,
   PRIMARY KEY (`submission_submissionId`,`studies_studyId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1311,7 +1311,7 @@ CREATE TABLE `Submission_Study` (
 
 DROP TABLE IF EXISTS `TagBarcodes`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `TagBarcodes` (
   `tagId` bigint NOT NULL AUTO_INCREMENT,
   `name` varchar(10) NOT NULL,
@@ -1319,7 +1319,7 @@ CREATE TABLE `TagBarcodes` (
   `platformName` varchar(20) NOT NULL,
   `strategyName` varchar(100) NOT NULL,
   PRIMARY KEY (`tagId`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1328,7 +1328,7 @@ CREATE TABLE `TagBarcodes` (
 
 DROP TABLE IF EXISTS `User`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `User` (
   `userId` bigint NOT NULL AUTO_INCREMENT,
   `active` bit NOT NULL,
@@ -1341,7 +1341,7 @@ CREATE TABLE `User` (
   `password` varchar(255) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`userId`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1350,13 +1350,13 @@ CREATE TABLE `User` (
 
 DROP TABLE IF EXISTS `User_Group`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `User_Group` (
   `users_userId` bigint NOT NULL,
   `groups_groupId` bigint NOT NULL,
   KEY `FKE7B7ED0B94349B7F` (`groups_groupId`),
   KEY `FKE7B7ED0B749D8197` (`users_userId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1365,12 +1365,12 @@ CREATE TABLE `User_Group` (
 
 DROP TABLE IF EXISTS `Watcher`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Watcher` (
   `entityName` varchar(12) NOT NULL,
   `userId` bigint NOT NULL,
   PRIMARY KEY (`entityName`,`userId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1379,7 +1379,7 @@ CREATE TABLE `Watcher` (
 
 DROP TABLE IF EXISTS `Workflow`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Workflow` (
   `workflowId` bigint NOT NULL,
   `userId` bigint DEFAULT NULL,
@@ -1387,7 +1387,7 @@ CREATE TABLE `Workflow` (
   `completion_date` date DEFAULT NULL,
   `workflowDefinition_definitionId` bigint DEFAULT NULL,
   PRIMARY KEY (`workflowId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1396,7 +1396,7 @@ CREATE TABLE `Workflow` (
 
 DROP TABLE IF EXISTS `WorkflowDefinition`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `WorkflowDefinition` (
   `workflowDefinitionId` bigint NOT NULL,
   `userId` bigint DEFAULT NULL,
@@ -1404,7 +1404,7 @@ CREATE TABLE `WorkflowDefinition` (
   `name` varchar(255) DEFAULT NULL,
   `description` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`workflowDefinitionId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1413,13 +1413,13 @@ CREATE TABLE `WorkflowDefinition` (
 
 DROP TABLE IF EXISTS `WorkflowDefinition_State`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `WorkflowDefinition_State` (
   `workflowDefinitionId` bigint NOT NULL,
   `state_key` varchar(45) DEFAULT NULL,
   `required` tinyint DEFAULT NULL,
   PRIMARY KEY (`workflowDefinitionId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1428,12 +1428,12 @@ CREATE TABLE `WorkflowDefinition_State` (
 
 DROP TABLE IF EXISTS `WorkflowDefinition_WorkflowProcessDefinition`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `WorkflowDefinition_WorkflowProcessDefinition` (
   `workflowDefinitionId` bigint NOT NULL,
   `workflowProcessDefinitionId` bigint NOT NULL,
   PRIMARY KEY (`workflowDefinitionId`,`workflowProcessDefinitionId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1442,7 +1442,7 @@ CREATE TABLE `WorkflowDefinition_WorkflowProcessDefinition` (
 
 DROP TABLE IF EXISTS `WorkflowProcess`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `WorkflowProcess` (
   `processId` bigint NOT NULL,
   `userId` bigint DEFAULT NULL,
@@ -1450,7 +1450,7 @@ CREATE TABLE `WorkflowProcess` (
   `completion_date` date DEFAULT NULL,
   `workflowProcessDefinition_definitionId` bigint DEFAULT NULL,
   PRIMARY KEY (`processId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1459,7 +1459,7 @@ CREATE TABLE `WorkflowProcess` (
 
 DROP TABLE IF EXISTS `WorkflowProcessDefinition`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `WorkflowProcessDefinition` (
   `workflowProcessDefinitionId` bigint NOT NULL,
   `userId` bigint DEFAULT NULL,
@@ -1470,7 +1470,7 @@ CREATE TABLE `WorkflowProcessDefinition` (
   `inputType` text,
   `outputType` text,
   PRIMARY KEY (`workflowProcessDefinitionId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1479,13 +1479,13 @@ CREATE TABLE `WorkflowProcessDefinition` (
 
 DROP TABLE IF EXISTS `WorkflowProcessDefinition_State`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `WorkflowProcessDefinition_State` (
   `workflowProcessDefinitionId` bigint NOT NULL,
   `state_key` varchar(45) DEFAULT NULL,
   `required` tinyint DEFAULT NULL,
   PRIMARY KEY (`workflowProcessDefinitionId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1494,13 +1494,13 @@ CREATE TABLE `WorkflowProcessDefinition_State` (
 
 DROP TABLE IF EXISTS `WorkflowProcess_State`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `WorkflowProcess_State` (
   `processId` bigint NOT NULL,
   `state_key_id` bigint NOT NULL,
   `state_value_id` bigint NOT NULL,
   PRIMARY KEY (`processId`,`state_value_id`,`state_key_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1509,13 +1509,13 @@ CREATE TABLE `WorkflowProcess_State` (
 
 DROP TABLE IF EXISTS `Workflow_State`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Workflow_State` (
   `workflowId` bigint NOT NULL,
   `state_key_id` bigint NOT NULL,
   `state_value_id` bigint NOT NULL,
   PRIMARY KEY (`workflowId`,`state_key_id`,`state_value_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1524,12 +1524,12 @@ CREATE TABLE `Workflow_State` (
 
 DROP TABLE IF EXISTS `Workflow_WorkflowProcess`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Workflow_WorkflowProcess` (
   `workflowId` bigint NOT NULL,
   `processId` bigint NOT NULL,
   PRIMARY KEY (`workflowId`,`processId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1538,13 +1538,13 @@ CREATE TABLE `Workflow_WorkflowProcess` (
 
 DROP TABLE IF EXISTS `_Group`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `_Group` (
   `groupId` bigint NOT NULL AUTO_INCREMENT,
   `description` varchar(255) DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`groupId`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1553,14 +1553,14 @@ CREATE TABLE `_Group` (
 
 DROP TABLE IF EXISTS `_Partition`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `_Partition` (
   `partitionId` bigint NOT NULL AUTO_INCREMENT,
   `partitionNumber` tinyint NOT NULL,
   `pool_poolId` bigint DEFAULT NULL,
   `securityProfile_profileId` bigint DEFAULT NULL,
   PRIMARY KEY (`partitionId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1569,7 +1569,7 @@ CREATE TABLE `_Partition` (
 
 DROP TABLE IF EXISTS `emPCR`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `emPCR` (
   `pcrId` bigint NOT NULL AUTO_INCREMENT,
   `concentration` double NOT NULL,
@@ -1579,7 +1579,7 @@ CREATE TABLE `emPCR` (
   `name` varchar(255) NOT NULL,
   `securityProfile_profileId` bigint DEFAULT NULL,
   PRIMARY KEY (`pcrId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1588,7 +1588,7 @@ CREATE TABLE `emPCR` (
 
 DROP TABLE IF EXISTS `emPCRDilution`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `emPCRDilution` (
   `dilutionId` bigint NOT NULL AUTO_INCREMENT,
   `concentration` double NOT NULL,
@@ -1599,7 +1599,7 @@ CREATE TABLE `emPCRDilution` (
   `name` varchar(255) NOT NULL,
   `securityProfile_profileId` bigint DEFAULT NULL,
   PRIMARY KEY (`dilutionId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1608,14 +1608,14 @@ CREATE TABLE `emPCRDilution` (
 
 DROP TABLE IF EXISTS `persistent_logins`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `persistent_logins` (
   `username` varchar(64) NOT NULL,
   `series` varchar(64) NOT NULL,
   `token` varchar(64) NOT NULL,
   `last_used` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`series`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

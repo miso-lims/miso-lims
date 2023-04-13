@@ -8,7 +8,7 @@ CREATE TABLE RunSolid(
   pairedEnd tinyint NOT NULL DEFAULT '1',
   PRIMARY KEY (`runId`),
   CONSTRAINT runsolid_run_runid FOREIGN KEY (runId) REFERENCES Run (runId)
-) ENGINE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO RunSolid (runId, pairedEnd) SELECT runId, pairedEnd FROM Run WHERE 
   sequencerReference_sequencerReferenceId IN (SELECT sr.referenceId FROM SequencerReference sr 
@@ -34,7 +34,7 @@ CREATE TABLE StainCategory (
   name varchar(20) NOT NULL,
   PRIMARY KEY (stainCategoryId),
   CONSTRAINT staincategory_name UNIQUE(name)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE Stain (
   stainId bigint NOT NULL AUTO_INCREMENT,
@@ -43,7 +43,7 @@ CREATE TABLE Stain (
   PRIMARY KEY (stainId),
   CONSTRAINT stain_name UNIQUE(name),
   CONSTRAINT stain_staincategory FOREIGN KEY (stainCategoryId) REFERENCES StainCategory (stainCategoryId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO Stain(name) VALUES ('Cresyl Violet'), ('Hematoxylin+Eosin');
 
@@ -56,7 +56,7 @@ CREATE TABLE SampleSlide(
   PRIMARY KEY (sampleId),
   CONSTRAINT sampleSlide_sample_fkey FOREIGN KEY (sampleId) REFERENCES Sample (sampleId),
   CONSTRAINT sampleSlide_stain_fkey FOREIGN KEY (stain) REFERENCES Stain (stainId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO SampleSlide(sampleId, slides, discards, thickness, stain)
   SELECT sampleId, slides, discards, thickness, (SELECT stainId FROM Stain WHERE name = 'Cresyl Violet') FROM SampleCVSlide;

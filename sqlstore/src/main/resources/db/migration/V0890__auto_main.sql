@@ -4,7 +4,7 @@ CREATE TABLE StorageLocationMap (
   filename varchar(255) NOT NULL,
   description varchar(255),
   PRIMARY KEY (mapId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE StorageLocation ADD COLUMN mapId bigint;
 ALTER TABLE StorageLocation ADD CONSTRAINT fk_storageLocation_map FOREIGN KEY (mapId) REFERENCES StorageLocationMap (mapId);
@@ -48,7 +48,7 @@ CREATE TABLE SequencingOrder (
   CONSTRAINT fk_sequencingOrder_parameters FOREIGN KEY (parametersId) REFERENCES SequencingParameters (parametersId),
   CONSTRAINT fk_sequencingOrder_pool FOREIGN KEY (poolId) REFERENCES Pool (poolId),
   CONSTRAINT fk_sequencingOrder_updater FOREIGN KEY (updatedBy) REFERENCES User (userId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO SequencingOrder (sequencingOrderId, poolId, partitions, parametersId, createdBy, creationDate, updatedBy, lastUpdated, description)
 SELECT poolOrderId, poolId, partitions, parametersId, createdBy, creationDate, updatedBy, lastUpdated, description

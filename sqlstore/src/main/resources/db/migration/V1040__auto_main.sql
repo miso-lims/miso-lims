@@ -15,7 +15,7 @@ CREATE TABLE Workstation (
   description varchar(255),
   PRIMARY KEY (workstationId),
   UNIQUE KEY uk_workstation_alias (alias)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE Library ADD COLUMN thermalCyclerId bigint;
 ALTER TABLE Library ADD CONSTRAINT fk_library_thermalCycler FOREIGN KEY (thermalCyclerId) REFERENCES Instrument (instrumentId);
@@ -31,7 +31,7 @@ CREATE TABLE QCType_KitDescriptor (
   PRIMARY KEY (qcTypeId, kitDescriptorId),
   CONSTRAINT fk_kitDescriptor_qcType FOREIGN KEY (qcTypeId) REFERENCES QCType (qcTypeId),
   CONSTRAINT fk_qcType_kitDescriptor FOREIGN KEY (kitDescriptorId) REFERENCES KitDescriptor (kitDescriptorId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE SampleQC ADD COLUMN kitDescriptorId bigint;
 ALTER TABLE SampleQC ADD CONSTRAINT fk_sampleQc_kit FOREIGN KEY (kitDescriptorId) REFERENCES KitDescriptor (kitDescriptorId);

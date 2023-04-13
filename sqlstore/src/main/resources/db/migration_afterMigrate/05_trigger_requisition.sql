@@ -4,7 +4,7 @@ DROP TRIGGER IF EXISTS RequisitionChange//
 CREATE TRIGGER RequisitionChange BEFORE UPDATE ON Requisition
 FOR EACH ROW
   BEGIN
-    DECLARE log_message longtext CHARACTER SET utf8;
+    DECLARE log_message longtext;
     SET log_message = CONCAT_WS(', ',
       makeChangeMessage('alias', OLD.alias, NEW.alias),
       makeChangeMessage('assay', (SELECT alias FROM Assay WHERE assayId = OLD.assayId), (SELECT alias FROM Assay WHERE assayId = NEW.assayId)),

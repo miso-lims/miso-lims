@@ -4,7 +4,7 @@ DROP TRIGGER IF EXISTS WorksetChange//
 CREATE TRIGGER WorksetChange BEFORE UPDATE ON Workset
 FOR EACH ROW
   BEGIN
-    DECLARE log_message longtext CHARACTER SET utf8;
+    DECLARE log_message longtext;
     SET log_message = CONCAT_WS(', ',
       makeChangeMessage('alias', OLD.alias, NEW.alias),
       makeChangeMessage('description', OLD.description, NEW.description)

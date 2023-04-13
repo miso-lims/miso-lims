@@ -32,7 +32,7 @@ CREATE TABLE Sop (
   archived BOOLEAN NOT NULL DEFAULT FALSE,
   PRIMARY KEY (sopId),
   CONSTRAINT uk_sop_version UNIQUE (category, alias, version)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE Sample ADD COLUMN sopId bigint;
 ALTER TABLE Sample ADD CONSTRAINT fk_sample_sop FOREIGN KEY (sopId) REFERENCES Sop (sopId);

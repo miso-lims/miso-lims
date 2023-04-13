@@ -8,7 +8,7 @@ CREATE TABLE PoolOrderChangeLog (
   changeTime timestamp DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_poolOrderChangeLog_pool FOREIGN KEY (poolOrderId) REFERENCES PoolOrder(poolOrderId),
   CONSTRAINT fk_poolOrderChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
-) Engine=InnoDB DEFAULT CHARSET=utf8;
+) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 -- pool_order_create_trigger
@@ -21,7 +21,7 @@ DROP TRIGGER IF EXISTS PoolOrderChange//
 CREATE TRIGGER PoolOrderChange BEFORE UPDATE ON PoolOrder
 FOR EACH ROW
   BEGIN
-  DECLARE log_message varchar(500) CHARACTER SET utf8;
+  DECLARE log_message varchar(500) CHARACTER SET utf8mb4;
   SET log_message = CONCAT_WS(', ',
         CASE WHEN NEW.alias <> OLD.alias THEN CONCAT('alias: ', COALESCE(OLD.alias, 'n/a'), ' → ', COALESCE(NEW.alias, 'n/a')) END,
         CASE WHEN (NEW.description IS NULL) <> (OLD.description IS NULL) OR NEW.description <> OLD.description THEN CONCAT('description: ', COALESCE(OLD.description, 'n/a'), ' → ', COALESCE(NEW.description, 'n/a')) END,

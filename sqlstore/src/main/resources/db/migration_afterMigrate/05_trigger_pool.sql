@@ -5,7 +5,7 @@ DROP TRIGGER IF EXISTS PoolChange//
 CREATE TRIGGER PoolChange BEFORE UPDATE ON Pool
 FOR EACH ROW
   BEGIN
-  DECLARE log_message longtext CHARACTER SET utf8;
+  DECLARE log_message longtext;
   SET log_message = CONCAT_WS(', ',
     makeChangeMessage('alias', OLD.alias, NEW.alias),
     makeChangeMessage('description', OLD.description, NEW.description),

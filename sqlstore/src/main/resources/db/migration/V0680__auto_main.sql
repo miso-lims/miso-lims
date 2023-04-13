@@ -11,7 +11,7 @@ CREATE TABLE AttachmentCategory (
   alias varchar(255) NOT NULL,
   PRIMARY KEY (categoryId),
   UNIQUE KEY uk_attachmentCategory_alias (alias)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE Attachment ADD COLUMN categoryId bigint;
 ALTER TABLE Attachment ADD CONSTRAINT fk_attachment_category FOREIGN KEY (categoryId) REFERENCES AttachmentCategory (categoryId);
@@ -25,7 +25,7 @@ CREATE TABLE Sample_Attachment (
   PRIMARY KEY (sampleId, attachmentId),
   CONSTRAINT fk_attachment_sample FOREIGN KEY (sampleId) REFERENCES Sample (sampleId),
   CONSTRAINT fk_sample_attachment FOREIGN KEY (attachmentId) REFERENCES Attachment (attachmentId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE Library_Attachment (
   libraryId bigint NOT NULL,
@@ -33,6 +33,6 @@ CREATE TABLE Library_Attachment (
   PRIMARY KEY (libraryId, attachmentId),
   CONSTRAINT fk_attachment_library FOREIGN KEY (libraryId) REFERENCES Library (libraryId),
   CONSTRAINT fk_library_attachment FOREIGN KEY (attachmentId) REFERENCES Attachment (attachmentId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 

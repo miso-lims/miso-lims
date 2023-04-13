@@ -22,7 +22,7 @@ CREATE TABLE LibraryTemplate (
   CONSTRAINT fk_libraryTemplate_strategy FOREIGN KEY (libraryStrategyTypeId) REFERENCES LibraryStrategyType (libraryStrategyTypeId),
   CONSTRAINT fk_libraryTemplate_kitDescriptor FOREIGN KEY (kitDescriptorId) REFERENCES KitDescriptor (kitDescriptorId),
   CONSTRAINT fk_libraryTemplate_indexFamily FOREIGN KEY (indexFamilyId) REFERENCES IndexFamily (indexFamilyId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE DetailedLibraryTemplate (
   libraryTemplateId bigint NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE DetailedLibraryTemplate (
   CONSTRAINT fk_detailedLibraryTemplate_libraryTemplate FOREIGN KEY (libraryTemplateId) REFERENCES LibraryTemplate (libraryTemplateId),
   CONSTRAINT fk_detailedLibraryTemplate_design FOREIGN KEY (libraryDesignId) REFERENCES LibraryDesign (libraryDesignId),
   CONSTRAINT fk_detailedLibraryTemplate_designCode FOREIGN KEY (libraryDesignCodeId) REFERENCES LibraryDesignCode (libraryDesignCodeId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE LibraryTemplate_Index1 (
   libraryTemplateId bigint NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE LibraryTemplate_Index1 (
   PRIMARY KEY (libraryTemplateId, position),
   CONSTRAINT fk_libraryTemplateIndex1_libraryTemplate FOREIGN KEY (libraryTemplateId) REFERENCES LibraryTemplate (libraryTemplateId),
   CONSTRAINT fk_libraryTemplateIndex1_index FOREIGN KEY (indexId) REFERENCES Indices (indexId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE LibraryTemplate_Index2 (
   libraryTemplateId bigint NOT NULL,
@@ -50,7 +50,7 @@ CREATE TABLE LibraryTemplate_Index2 (
   PRIMARY KEY (libraryTemplateId, position),
   CONSTRAINT fk_libraryTemplateIndex2_libraryTemplate FOREIGN KEY (libraryTemplateId) REFERENCES LibraryTemplate (libraryTemplateId),
   CONSTRAINT fk_libraryTemplateIndex2_index FOREIGN KEY (indexId) REFERENCES Indices (indexId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 -- index_name

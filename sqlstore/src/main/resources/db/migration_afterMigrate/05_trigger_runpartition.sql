@@ -5,8 +5,8 @@ DROP TRIGGER IF EXISTS RunPartitionUpdate//
 CREATE TRIGGER RunPartitionUpdate BEFORE UPDATE ON Run_Partition
 FOR EACH ROW
   BEGIN
-	DECLARE log_message longtext CHARACTER SET utf8;
-	DECLARE log_columns varchar(500) CHARACTER SET utf8;
+	DECLARE log_message longtext;
+	DECLARE log_columns varchar(500);
     SELECT
       spc.identificationBarcode,
       spc.containerId,
@@ -34,7 +34,7 @@ DROP TRIGGER IF EXISTS RunPartitionLibraryAliquotInsert//
 CREATE TRIGGER RunPartitionLibraryAliquotInsert AFTER INSERT ON Run_Partition_LibraryAliquot
 FOR EACH ROW
   BEGIN
-    DECLARE log_message longtext CHARACTER SET utf8;
+    DECLARE log_message longtext;
     SET log_message = CONCAT_WS(', ',
       makeChangeMessage('purpose', NULL, (SELECT alias FROM RunPurpose WHERE purposeId = NEW.purposeId)),
       makeChangeMessage('QC status', NULL, (SELECT description FROM RunLibraryQcStatus WHERE statusId = NEW.statusId)),
@@ -77,7 +77,7 @@ DROP TRIGGER IF EXISTS RunPartitionLibraryAliquotUpdate//
 CREATE TRIGGER RunPartitionLibraryAliquotUpdate BEFORE UPDATE ON Run_Partition_LibraryAliquot
 FOR EACH ROW
   BEGIN
-    DECLARE log_message longtext CHARACTER SET utf8;
+    DECLARE log_message longtext;
     SET log_message = CONCAT_WS(', ',
       makeChangeMessage('purpose', (SELECT alias FROM RunPurpose WHERE purposeId = OLD.purposeId), (SELECT alias FROM RunPurpose WHERE purposeId = NEW.purposeId)),
       makeChangeMessage('QC status', (SELECT description FROM RunLibraryQcStatus WHERE statusId = OLD.statusId), (SELECT description FROM RunLibraryQcStatus WHERE statusId = NEW.statusId)),

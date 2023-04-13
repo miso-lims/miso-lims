@@ -5,7 +5,7 @@ DROP TRIGGER IF EXISTS ExperimentChange//
 CREATE TRIGGER ExperimentChange BEFORE UPDATE ON Experiment
 FOR EACH ROW
   BEGIN
-  DECLARE log_message longtext CHARACTER SET utf8;
+  DECLARE log_message longtext;
   SET log_message = CONCAT_WS(', ',
         CASE WHEN (NEW.accession IS NULL) <> (OLD.accession IS NULL) OR NEW.accession <> OLD.accession THEN CONCAT('accession: ', COALESCE(OLD.accession, 'n/a'), ' → ', COALESCE(NEW.accession, 'n/a')) END,
         CASE WHEN (NEW.alias IS NULL) <> (OLD.alias IS NULL) OR NEW.alias <> OLD.alias THEN CONCAT('alias: ', COALESCE(OLD.alias, 'n/a'), ' → ', COALESCE(NEW.alias, 'n/a')) END,

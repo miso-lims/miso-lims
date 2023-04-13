@@ -12,7 +12,7 @@ CREATE TABLE TransferNotification (
   PRIMARY KEY (notificationId),
   CONSTRAINT fk_transferNotification_transfer FOREIGN KEY (transferId) REFERENCES Transfer (transferId),
   CONSTRAINT fk_transferNotification_creator FOREIGN KEY (creator) REFERENCES User (userId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE Contact (
   contactId bigint NOT NULL AUTO_INCREMENT,
@@ -20,5 +20,5 @@ CREATE TABLE Contact (
   email varchar(255) NOT NULL,
   PRIMARY KEY (contactId),
   CONSTRAINT uk_contact_email UNIQUE (email)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

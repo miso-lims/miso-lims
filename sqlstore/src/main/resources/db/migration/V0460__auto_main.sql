@@ -10,7 +10,7 @@ CREATE TABLE WorkflowProgress (
   FOREIGN KEY (userId) REFERENCES User (userId)
 )
   ENGINE = InnoDB
-  DEFAULT CHARSET = utf8;
+  DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE WorkflowProgressStep (
   workflowProgressId bigint NOT NULL,
@@ -19,7 +19,7 @@ CREATE TABLE WorkflowProgressStep (
   FOREIGN KEY (workflowProgressId) REFERENCES WorkflowProgress (workflowProgressId)
 )
   ENGINE = InnoDB
-  DEFAULT CHARSET = utf8;
+  DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE StepSample (
   workflowProgressId bigint NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE StepSample (
   FOREIGN KEY (sampleId) REFERENCES Sample (sampleId)
 )
   ENGINE = InnoDB
-  DEFAULT CHARSET = utf8;
+  DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE StepPool (
   workflowProgressId bigint NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE StepPool (
   FOREIGN KEY (poolId) REFERENCES Pool (poolId)
 )
   ENGINE = InnoDB
-  DEFAULT CHARSET = utf8;
+  DEFAULT CHARSET = utf8mb4;
 
 
 -- schema_consistency

@@ -14,7 +14,7 @@ CREATE TABLE ArrayModel (
   `columns` TINYINT UNSIGNED NOT NULL,
   PRIMARY KEY (arrayModelId),
   CONSTRAINT uk_arrayModel_alias UNIQUE (alias)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE Array (
   arrayId bigint NOT NULL AUTO_INCREMENT,
@@ -32,7 +32,7 @@ CREATE TABLE Array (
   CONSTRAINT fk_array_modifier FOREIGN KEY (lastModifier) REFERENCES User(userId),
   CONSTRAINT uk_array_alias UNIQUE (alias),
   CONSTRAINT uk_array_serialNumber UNIQUE (serialNumber)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE ArrayPosition (
   arrayId bigint NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE ArrayPosition (
   PRIMARY KEY (arrayId, position),
   CONSTRAINT fk_arrayPosition_array FOREIGN KEY (arrayId) REFERENCES Array(arrayId),
   CONSTRAINT fk_arrayPosition_sample FOREIGN KEY (sampleId) REFERENCES Sample(sampleId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE ArrayChangeLog (
   arrayChangeLogId bigint NOT NULL AUTO_INCREMENT,
@@ -53,7 +53,7 @@ CREATE TABLE ArrayChangeLog (
   PRIMARY KEY (arrayChangeLogId),
   CONSTRAINT fk_arrayChangeLog_array FOREIGN KEY (arrayId) REFERENCES Array(arrayId),
   CONSTRAINT fk_arrayChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE ArrayRun (
   arrayRunId bigint NOT NULL AUTO_INCREMENT,
@@ -75,7 +75,7 @@ CREATE TABLE ArrayRun (
   CONSTRAINT fk_arrayRun_array FOREIGN KEY (arrayId) REFERENCES Array(arrayId),
   CONSTRAINT fk_arrayRun_creator FOREIGN KEY (creator) REFERENCES User(userId),
   CONSTRAINT fk_arrayRun_modifier FOREIGN KEY (lastModifier) REFERENCES User(userId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE ArrayRunChangeLog (
   arrayRunChangeLogId bigint NOT NULL AUTO_INCREMENT,
@@ -87,7 +87,7 @@ CREATE TABLE ArrayRunChangeLog (
   PRIMARY KEY (arrayRunChangeLogId),
   CONSTRAINT fk_arrayRunChangeLog_arrayRun FOREIGN KEY (arrayRunId) REFERENCES ArrayRun(arrayRunId),
   CONSTRAINT fk_arrayRunChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO Platform (name, instrumentModel, description, numContainers, instrumentType)
 SELECT 'ILLUMINA', 'Illumina iScan', 'Array scanner for extensive applications', 1, 'ARRAY_SCANNER' FROM DUAL

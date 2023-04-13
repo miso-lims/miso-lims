@@ -3,7 +3,7 @@ CREATE TABLE OrderPurpose(
   purposeId bigint NOT NULL AUTO_INCREMENT,
   alias varchar(50) NOT NULL,
   PRIMARY KEY (purposeId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO OrderPurpose(purposeId, alias) VALUES (1, 'Production');
 
@@ -32,7 +32,7 @@ CREATE TABLE PoolOrder(
   CONSTRAINT fk_poolOrder_sequencingOrder FOREIGN KEY (sequencingOrderId) REFERENCES SequencingOrder (sequencingOrderId),
   CONSTRAINT fk_poolOrder_purpose FOREIGN KEY (purposeId) REFERENCES OrderPurpose (purposeId),
   PRIMARY KEY (poolOrderId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE PoolOrder_LibraryAliquot(
   poolOrderId bigint NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE PoolOrder_LibraryAliquot(
   PRIMARY KEY (poolOrderId, aliquotId),
   CONSTRAINT fk_libraryAliquot_poolOrder FOREIGN KEY (poolOrderId) REFERENCES PoolOrder (poolOrderId),
   CONSTRAINT fk_poolOrder_libraryAliquot FOREIGN KEY (aliquotId) REFERENCES LibraryAliquot (aliquotId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- data_fixes
 -- StartNoTest

@@ -9,7 +9,7 @@ CREATE TABLE PlatformPosition (
   alias varchar(10) NOT NULL,
   PRIMARY KEY (positionId),
   CONSTRAINT fk_platformPosition_platform FOREIGN KEY (platformId) REFERENCES Platform (platformId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE ServiceRecord ADD COLUMN positionId bigint;
 ALTER TABLE ServiceRecord ADD CONSTRAINT fk_serviceRecord_position FOREIGN KEY (positionId) REFERENCES PlatformPosition (positionId);

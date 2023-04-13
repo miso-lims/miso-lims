@@ -14,7 +14,7 @@ CREATE TABLE WorksetChangeLog (
   PRIMARY KEY (worksetChangeLogId),
   CONSTRAINT fk_worksetChangeLog_workset FOREIGN KEY (worksetId) REFERENCES Workset(worksetId),
   CONSTRAINT fk_worksetChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO WorksetChangeLog (worksetId, columnsChanged, userId, message, changeTime)
 SELECT worksetId, '', creator, 'Workset created', created FROM Workset;

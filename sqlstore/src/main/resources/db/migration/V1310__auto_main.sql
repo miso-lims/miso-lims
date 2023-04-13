@@ -21,7 +21,7 @@ CREATE TABLE StorageLabel (
   labelId bigint NOT NULL AUTO_INCREMENT,
   label varchar(100) NOT NULL,
   PRIMARY KEY (labelId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE StorageLocation
   ADD COLUMN labelId bigint,

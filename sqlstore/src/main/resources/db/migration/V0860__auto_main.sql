@@ -18,7 +18,7 @@ CREATE TABLE ProjectChangeLog (
   PRIMARY KEY (projectChangeLogId),
   CONSTRAINT fk_projectChangeLog_project FOREIGN KEY (projectId) REFERENCES Project(projectId),
   CONSTRAINT fk_projectChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO ProjectChangeLog(projectId, columnsChanged, userId, message, changeTime)
 SELECT projectId, '', 1, 'Project created.', created FROM Project;

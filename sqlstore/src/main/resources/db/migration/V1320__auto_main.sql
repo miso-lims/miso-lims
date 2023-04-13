@@ -7,7 +7,7 @@ CREATE TABLE Metric(
   units varchar(20),
   PRIMARY KEY (metricId),
   CONSTRAINT uk_metric_alias_category UNIQUE (alias, category) 
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE Assay(
   assayId bigint NOT NULL AUTO_INCREMENT,
@@ -16,7 +16,7 @@ CREATE TABLE Assay(
   description varchar(255),
   archived BOOLEAN NOT NULL DEFAULT FALSE,
   PRIMARY KEY (assayId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE Assay_Metric(
   assayId bigint NOT NULL,
@@ -26,7 +26,7 @@ CREATE TABLE Assay_Metric(
   PRIMARY KEY (assayId, metricId),
   CONSTRAINT fk_assay_metric FOREIGN KEY (metricId) REFERENCES Metric(metricId),
   CONSTRAINT fk_metric_assay FOREIGN KEY (assayId) REFERENCES Assay(assayId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE Requisition(
   requisitionId bigint NOT NULL AUTO_INCREMENT,
@@ -42,7 +42,7 @@ CREATE TABLE Requisition(
   CONSTRAINT fk_requisition_assay FOREIGN KEY (assayId) REFERENCES Assay(assayId),
   CONSTRAINT fk_requisition_creator FOREIGN KEY (creator) REFERENCES User (userId),
   CONSTRAINT fk_requisition_modifier FOREIGN KEY (lastModifier) REFERENCES User (userId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE RequisitionQc(
   qcId bigint NOT NULL AUTO_INCREMENT,
@@ -62,7 +62,7 @@ CREATE TABLE RequisitionQc(
   CONSTRAINT fk_requisitionQc_creator FOREIGN KEY (creator) REFERENCES User(userId),
   CONSTRAINT fk_requisitionQc_type FOREIGN KEY (type) REFERENCES QCType(qcTypeId),
   CONSTRAINT fk_requisitionQc_kit FOREIGN KEY (kitDescriptorId) REFERENCES KitDescriptor(kitDescriptorId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE RequisitionQcControl (
   qcControlId bigint PRIMARY KEY AUTO_INCREMENT,
@@ -72,7 +72,7 @@ CREATE TABLE RequisitionQcControl (
   qcPassed BOOLEAN NOT NULL,
   CONSTRAINT fk_requisitionQcControl_qc FOREIGN KEY (qcId) REFERENCES RequisitionQc (qcId),
   CONSTRAINT fk_requisitionQcControl_control FOREIGN KEY (controlId) REFERENCES QcControl (controlId)
-) Engine=InnoDB DEFAULT CHARSET=utf8;
+) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE Sample
   CHANGE COLUMN requisitionId requisitionAlias varchar(50),
@@ -87,7 +87,7 @@ CREATE TABLE TempRequisition (
   created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   lastModifier bigint NOT NULL,
   lastModified TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO TempRequisition (alias, sampleId, creator, created, lastModifier, lastModified)
 SELECT requisitionAlias, sampleId, creator, created, lastModifier, lastModified
@@ -126,7 +126,7 @@ CREATE TABLE RequisitionChangeLog (
   PRIMARY KEY (requisitionChangeLogId),
   CONSTRAINT fk_requisitionChangeLog_requisition FOREIGN KEY (requisitionId) REFERENCES Requisition(requisitionId),
   CONSTRAINT fk_requisitionChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO RequisitionChangeLog (requisitionId, columnsChanged, userId, message, changeTime)
 SELECT requisitionId, '', creator, 'Requisition created', created FROM Requisition;
@@ -137,7 +137,7 @@ CREATE TABLE Requisition_Attachment (
   PRIMARY KEY (requisitionId, attachmentId),
   CONSTRAINT fk_attachment_requisition FOREIGN KEY (requisitionId) REFERENCES Requisition (requisitionId),
   CONSTRAINT fk_requisition_attachment FOREIGN KEY (attachmentId) REFERENCES Attachment (attachmentId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE Requisition_Note (
   requisitionId bigint NOT NULL,
@@ -145,5 +145,5 @@ CREATE TABLE Requisition_Note (
   PRIMARY KEY (requisitionId, noteId),
   CONSTRAINT fk_note_requisition FOREIGN KEY (requisitionId) REFERENCES Requisition (requisitionId),
   CONSTRAINT fk_requisition_note FOREIGN KEY (noteId) REFERENCES Note (noteId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

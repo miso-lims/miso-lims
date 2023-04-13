@@ -11,7 +11,7 @@ CREATE TABLE StorageLocationChangeLog (
   PRIMARY KEY (storageLocationChangeLogId),
   CONSTRAINT fk_storageLocationChangeLog_storageLocation FOREIGN KEY (locationId) REFERENCES StorageLocation(locationId),
   CONSTRAINT fk_storageLocationChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE StorageLocation ADD COLUMN creator bigint;
 ALTER TABLE StorageLocation ADD COLUMN created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP();

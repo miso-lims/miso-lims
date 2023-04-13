@@ -19,7 +19,7 @@ CREATE TABLE TransferChangeLog (
   PRIMARY KEY (transferChangeLogId),
   CONSTRAINT fk_transferChangeLog_transfer FOREIGN KEY (transferId) REFERENCES Transfer(transferId),
   CONSTRAINT fk_transferChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO TransferChangeLog (transferId, columnsChanged, userId, message, changeTime)
 SELECT transferId, '', creator, 'Transfer created', created FROM Transfer;
@@ -29,7 +29,7 @@ CREATE TABLE SequencingControlType (
   sequencingControlTypeId bigint NOT NULL AUTO_INCREMENT,
   alias varchar(50) NOT NULL,
   PRIMARY KEY (sequencingControlTypeId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE Sample ADD COLUMN sequencingControlTypeId bigint;
 ALTER TABLE Sample ADD CONSTRAINT fk_sample_sequencingControlType FOREIGN KEY (sequencingControlTypeId) REFERENCES SequencingControlType (sequencingControlTypeId);

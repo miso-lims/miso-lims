@@ -5,7 +5,7 @@ CREATE TABLE RunLibraryQcStatus (
   qcPassed BOOLEAN,
   PRIMARY KEY (statusId),
   CONSTRAINT uk_runLibraryQcStatus_description UNIQUE (description)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO RunLibraryQcStatus (statusId, description, qcPassed) VALUES
 (1, 'Passed', TRUE),
@@ -31,14 +31,14 @@ CREATE TABLE WorksetCategory (
   alias varchar(20),
   PRIMARY KEY (categoryId),
   CONSTRAINT uk_worksetCategory_alias UNIQUE (alias)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE WorksetStage (
   stageId bigint NOT NULL AUTO_INCREMENT,
   alias varchar(20),
   PRIMARY KEY (stageId),
   CONSTRAINT uk_worksetStage_alias UNIQUE (alias)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE Workset
   ADD COLUMN categoryId bigint,

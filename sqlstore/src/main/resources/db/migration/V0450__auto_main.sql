@@ -17,6 +17,6 @@ CREATE TABLE Deletion (
   PRIMARY KEY (deletionId),
   CONSTRAINT fk_deletion_securityProfile FOREIGN KEY (securityProfileId) REFERENCES SecurityProfile(profileId),
   CONSTRAINT fk_deletion_user FOREIGN KEY (userId) REFERENCES User(userId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 

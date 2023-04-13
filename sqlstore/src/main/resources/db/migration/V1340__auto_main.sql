@@ -8,7 +8,7 @@ CREATE TABLE MetricSubcategory(
   PRIMARY KEY (subcategoryId),
   CONSTRAINT uk_metricSubcategory_alias_category UNIQUE (alias, category),
   CONSTRAINT fk_metricSubcategory_libraryDesignCode FOREIGN KEY (libraryDesignCodeId) REFERENCES LibraryDesignCode (libraryDesignCodeId) 
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE Metric
   ADD COLUMN subcategoryId bigint,

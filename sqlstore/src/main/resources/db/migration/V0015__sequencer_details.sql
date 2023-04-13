@@ -18,4 +18,4 @@ CREATE TABLE SequencerServiceRecord (
   shutdownTime datetime DEFAULT NULL,
   restoredTime datetime DEFAULT NULL,
   CONSTRAINT sequencerServiceRecord_sequencer_fkey FOREIGN KEY (sequencerReferenceId) REFERENCES SequencerReference(referenceId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

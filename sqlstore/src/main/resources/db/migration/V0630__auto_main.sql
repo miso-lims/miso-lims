@@ -17,7 +17,7 @@ CREATE TABLE Workset (
   UNIQUE KEY uk_workset_alias (alias),
   CONSTRAINT fk_workset_creator FOREIGN KEY (creator) REFERENCES User (userId),
   CONSTRAINT fk_workset_modifier FOREIGN KEY (lastModifier) REFERENCES User (userId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE Workset_Sample (
   worksetId bigint NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE Workset_Sample (
   PRIMARY KEY (worksetId, sampleId),
   CONSTRAINT fk_sample_workset FOREIGN KEY (worksetId) REFERENCES Workset (worksetId),
   CONSTRAINT fk_workset_sample FOREIGN KEY (sampleId) REFERENCES Sample (sampleId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE Workset_Library (
   worksetId bigint NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE Workset_Library (
   PRIMARY KEY (worksetId, libraryId),
   CONSTRAINT fk_library_workset FOREIGN KEY (worksetId) REFERENCES Workset (worksetId),
   CONSTRAINT fk_workset_library FOREIGN KEY (libraryId) REFERENCES Library (libraryId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE Workset_Dilution (
   worksetId bigint NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE Workset_Dilution (
   PRIMARY KEY (worksetId, dilutionId),
   CONSTRAINT fk_dilution_workset FOREIGN KEY (worksetId) REFERENCES Workset (worksetId),
   CONSTRAINT fk_workset_dilution FOREIGN KEY (dilutionId) REFERENCES LibraryDilution (dilutionId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 -- serviceRecord
@@ -67,7 +67,7 @@ CREATE TABLE `LibraryTemplate_Project` (
    FOREIGN KEY (`libraryTemplateId`) REFERENCES `LibraryTemplate` (`libraryTemplateId`),
   CONSTRAINT `LibraryTemplate_Project_fk_2` 
    FOREIGN KEY (`projectId`) REFERENCES `Project` (`projectId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO `LibraryTemplate_Project` (`libraryTemplateId`, `projectId`) 
   SELECT `libraryTemplateId`, `projectId` FROM `LibraryTemplate`;

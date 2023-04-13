@@ -5,7 +5,7 @@ DROP TRIGGER IF EXISTS SequencerPartitionContainerChange//
 CREATE TRIGGER SequencerPartitionContainerChange BEFORE UPDATE ON SequencerPartitionContainer
 FOR EACH ROW
   BEGIN
-  DECLARE log_message longtext CHARACTER SET utf8;
+  DECLARE log_message longtext;
   SET log_message = CONCAT_WS(', ',
         CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN CONCAT('identification barcode: ', COALESCE(OLD.identificationBarcode, 'n/a'), ' → ', COALESCE(NEW.identificationBarcode, 'n/a')) END,
         CASE WHEN NEW.sequencingContainerModelId <> OLD.sequencingContainerModelId THEN CONCAT('model: ', (SELECT alias FROM SequencingContainerModel WHERE sequencingContainerModelId = OLD.sequencingContainerModelId), ' → ', (SELECT alias FROM SequencingContainerModel WHERE sequencingContainerModelId = NEW.sequencingContainerModelId)) END);
@@ -36,7 +36,7 @@ DROP TRIGGER IF EXISTS OxfordNanoporeContainerChange//
 CREATE TRIGGER OxfordNanoporeContainerChange BEFORE UPDATE ON OxfordNanoporeContainer
 FOR EACH ROW
 BEGIN
-  DECLARE log_message longtext CHARACTER SET utf8;
+  DECLARE log_message longtext;
   SET log_message = CONCAT_WS(', ',
         CASE WHEN (NEW.poreVersionId IS NULL) <> (OLD.poreVersionId IS NULL) OR NEW.poreVersionId <> OLD.poreVersionId THEN CONCAT('pore version: ', COALESCE((SELECT alias FROM PoreVersion WHERE poreVersionId = OLD.poreVersionId), 'n/a'), ' → ', COALESCE((SELECT alias FROM PoreVersion WHERE poreVersionId = NEW.poreVersionId), 'n/a')) END,
         CASE WHEN NEW.receivedDate <> OLD.receivedDate THEN CONCAT('received: ', OLD.receivedDate, ' → ', NEW.receivedDate) END,

@@ -8,7 +8,7 @@ CREATE TABLE StepPositiveDouble (
   CONSTRAINT `fk_StepPositiveDouble_step` FOREIGN KEY (workflowProgressId, stepNumber) REFERENCES WorkflowProgressStep (workflowProgressId, stepNumber)
 )
   ENGINE = InnoDB
-  DEFAULT CHARSET = utf8;
+  DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE StepPositiveInteger (
   workflowProgressId bigint NOT NULL,
@@ -18,7 +18,7 @@ CREATE TABLE StepPositiveInteger (
   CONSTRAINT `fk_StepPositiveInteger_step` FOREIGN KEY (workflowProgressId, stepNumber) REFERENCES WorkflowProgressStep (workflowProgressId, stepNumber)
 )
   ENGINE = InnoDB
-  DEFAULT CHARSET = utf8;
+  DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE StepBox (
   workflowProgressId bigint NOT NULL,
@@ -29,7 +29,7 @@ CREATE TABLE StepBox (
   CONSTRAINT `fk_StepBox_Box` FOREIGN KEY (boxId) REFERENCES Box (boxId)
 )
   ENGINE = InnoDB
-  DEFAULT CHARSET = utf8;
+  DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE StepBoxPosition (
   workflowProgressId bigint  NOT NULL,
@@ -39,7 +39,7 @@ CREATE TABLE StepBoxPosition (
   CONSTRAINT `fk_StepBoxPosition_step` FOREIGN KEY (workflowProgressId, stepNumber) REFERENCES WorkflowProgressStep (workflowProgressId, stepNumber)
 )
   ENGINE = InnoDB
-  DEFAULT CHARSET = utf8;
+  DEFAULT CHARSET = utf8mb4;
 
 
 -- Template_Default_Volume

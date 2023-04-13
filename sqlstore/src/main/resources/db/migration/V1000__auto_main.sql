@@ -15,7 +15,7 @@ CREATE TABLE Transfer (
   CONSTRAINT fk_transfer_recipientGroup FOREIGN KEY (recipientGroupId) REFERENCES _Group (groupId),
   CONSTRAINT fk_transfer_creator FOREIGN KEY (creator) REFERENCES User (userId),
   CONSTRAINT fk_transfer_modifier FOREIGN KEY (lastModifier) REFERENCES User (userId)
-) Engine=InnoDB DEFAULT CHARSET=utf8;
+) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE Transfer_Sample (
   transferId bigint,
@@ -26,7 +26,7 @@ CREATE TABLE Transfer_Sample (
   PRIMARY KEY (transferId, sampleId),
   CONSTRAINT fk_sample_transfer FOREIGN KEY (transferId) REFERENCES Transfer (transferId),
   CONSTRAINT fk_transfer_sample FOREIGN KEY (sampleId) REFERENCES Sample (sampleId)
-) Engine=InnoDB DEFAULT CHARSET=utf8;
+) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE Transfer_Library (
   transferId bigint,
@@ -37,7 +37,7 @@ CREATE TABLE Transfer_Library (
   PRIMARY KEY (transferId, libraryId),
   CONSTRAINT fk_library_transfer FOREIGN KEY (transferId) REFERENCES Transfer (transferId),
   CONSTRAINT fk_transfer_library FOREIGN KEY (libraryId) REFERENCES Library (libraryId)
-) Engine=InnoDB DEFAULT CHARSET=utf8;
+) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE Transfer_LibraryAliquot (
   transferId bigint,
@@ -48,7 +48,7 @@ CREATE TABLE Transfer_LibraryAliquot (
   PRIMARY KEY (transferId, aliquotId),
   CONSTRAINT fk_libraryAliquot_transfer FOREIGN KEY (transferId) REFERENCES Transfer (transferId),
   CONSTRAINT fk_transfer_libraryAliquot FOREIGN KEY (aliquotId) REFERENCES LibraryAliquot (aliquotId)
-) Engine=InnoDB DEFAULT CHARSET=utf8;
+) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE Transfer_Pool (
   transferId bigint,
@@ -59,7 +59,7 @@ CREATE TABLE Transfer_Pool (
   PRIMARY KEY (transferId, poolId),
   CONSTRAINT fk_pool_transfer FOREIGN KEY (transferId) REFERENCES Transfer (transferId),
   CONSTRAINT fk_transfer_pool FOREIGN KEY (poolId) REFERENCES Pool (poolId)
-) Engine=InnoDB DEFAULT CHARSET=utf8;
+) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE Lab ADD COLUMN excludeFromPinery BOOLEAN NOT NULL DEFAULT FALSE;
 
@@ -70,7 +70,7 @@ CREATE TABLE TemporaryTransfer (
   creator bigint,
   receivedDate DATE,
   labId bigint
-) Engine=InnoDB DEFAULT CHARSET=utf8;
+) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
 SELECT userId INTO @admin FROM User WHERE loginName = 'admin';
 SET @now = NOW();
@@ -116,7 +116,7 @@ DELIMITER ;
 CREATE TABLE TissueParentView (
   sampleId bigint,
   tissueId bigint
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO TissueParentView (sampleId, tissueId)
 SELECT sampleId, findParentWithLab(sampleId)
@@ -197,7 +197,7 @@ CREATE TABLE TemporaryTransfer (
   projectId bigint,
   distributionDate DATE,
   distributionRecipient varchar(250)
-) Engine=InnoDB DEFAULT CHARSET=utf8;
+) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Update auto_increment sequence
 INSERT INTO TemporaryTransfer (transferId) VALUES ((SELECT MAX(transferId) FROM Transfer));
@@ -281,7 +281,7 @@ DROP TABLE TemporaryTransfer;
 CREATE TABLE TemporaryTransfer (
   transferId bigint PRIMARY KEY AUTO_INCREMENT,
   poolId bigint
-) Engine=InnoDB DEFAULT CHARSET=utf8;
+) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Update auto_increment sequence
 INSERT INTO TemporaryTransfer (transferId) VALUES ((SELECT MAX(transferId) FROM Transfer));
@@ -386,7 +386,7 @@ CREATE TABLE SampleHierarchy (
   CONSTRAINT fk_sampleHierarchy_sample FOREIGN KEY (sampleId) REFERENCES DetailedSample (sampleId) ON DELETE CASCADE,
   CONSTRAINT fk_sampleHierarchy_identity FOREIGN KEY (identityId) REFERENCES Identity (sampleId),
   CONSTRAINT fk_sampleHierarchy_tissue FOREIGN KEY (tissueId) REFERENCES SampleTissue (sampleId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 DELIMITER //
 
@@ -483,5 +483,5 @@ CREATE TABLE Run_Partition_LibraryAliquot (
   CONSTRAINT runAliquot_aliquot FOREIGN KEY (aliquotId) REFERENCES LibraryAliquot (aliquotId),
   CONSTRAINT runAliquot_purpose FOREIGN KEY (purposeId) REFERENCES RunPurpose (purposeId),
   CONSTRAINT runAliquot_lastModifier FOREIGN KEY (lastModifier) REFERENCES User (userId)
-) Engine=InnoDB DEFAULT CHARSET=utf8;
+) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 

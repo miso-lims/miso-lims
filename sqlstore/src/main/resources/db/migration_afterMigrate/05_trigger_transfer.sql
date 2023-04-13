@@ -4,7 +4,7 @@ DROP TRIGGER IF EXISTS TransferChange//
 CREATE TRIGGER TransferChange BEFORE UPDATE ON Transfer
 FOR EACH ROW
   BEGIN
-    DECLARE log_message longtext CHARACTER SET utf8;
+    DECLARE log_message longtext;
     SET log_message = CONCAT_WS(', ',
       makeChangeMessage('transfer request name', OLD.transferRequestName, NEW.transferRequestName),
       makeChangeMessage('transfer time', OLD.transferTime, NEW.transferTime),

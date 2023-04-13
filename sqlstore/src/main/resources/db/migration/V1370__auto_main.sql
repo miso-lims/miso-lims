@@ -22,7 +22,7 @@ CREATE TABLE AssayTest(
     REFERENCES LibraryDesignCode (libraryDesignCodeId),
   CONSTRAINT fk_assayTest_qualificationDesignCode FOREIGN KEY (libraryQualificationDesignCodeId)
     REFERENCES LibraryDesignCode (libraryDesignCodeId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE Assay_AssayTest(
   assayId bigint NOT NULL,
@@ -30,5 +30,5 @@ CREATE TABLE Assay_AssayTest(
   PRIMARY KEY (assayId, testId),
   CONSTRAINT fk_assayTest_assay FOREIGN KEY (assayId) REFERENCES Assay (assayId),
   CONSTRAINT fk_assay_assayTest FOREIGN KEY (testId) REFERENCES AssayTest (testId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

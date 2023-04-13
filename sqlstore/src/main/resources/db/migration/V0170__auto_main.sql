@@ -77,7 +77,7 @@ CREATE TABLE `Pool_Dilution` (
   PRIMARY KEY (`pool_poolId`,`dilution_dilutionId`),
   CONSTRAINT `Pool_Dilution_pool_poolId` FOREIGN KEY (`pool_poolId`) REFERENCES `Pool` (`poolId`),
   CONSTRAINT `Pool_Dilution_dilution_dilutionId` FOREIGN KEY (`dilution_dilutionId`) REFERENCES `LibraryDilution` (`dilutionId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO Pool_Dilution(pool_poolId, dilution_dilutionId) SELECT
   pool_poolId, elementId FROM Pool_Elements
@@ -174,7 +174,7 @@ CREATE TABLE Project_Watcher (
   PRIMARY KEY (projectId, userId),
   CONSTRAINT fk_projectWatcher_project FOREIGN KEY (projectId) REFERENCES Project (projectId) ON DELETE CASCADE,
   CONSTRAINT fk_projectWatcher_user FOREIGN KEY (userId) REFERENCES User (userId) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE ProjectOverview_Watcher (
   overviewId bigint NOT NULL,
@@ -182,7 +182,7 @@ CREATE TABLE ProjectOverview_Watcher (
   PRIMARY KEY (overviewId, userId),
   CONSTRAINT fk_projectOverviewWatcher_project FOREIGN KEY (overviewId) REFERENCES ProjectOverview (overviewId) ON DELETE CASCADE,
   CONSTRAINT fk_projectOverviewWatcher_user FOREIGN KEY (userId) REFERENCES User (userId) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE Pool_Watcher (
   poolId bigint NOT NULL,
@@ -190,7 +190,7 @@ CREATE TABLE Pool_Watcher (
   PRIMARY KEY (poolId, userId),
   CONSTRAINT fk_poolWatcher_pool FOREIGN KEY (poolId) REFERENCES Pool (poolId) ON DELETE CASCADE,
   CONSTRAINT fk_poolWatcher_user FOREIGN KEY (userId) REFERENCES User (userId) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE Run_Watcher (
   runId bigint NOT NULL,
@@ -198,7 +198,7 @@ CREATE TABLE Run_Watcher (
   PRIMARY KEY (runId, userId),
   CONSTRAINT fk_runWatcher_run FOREIGN KEY (runId) REFERENCES Run (runId) ON DELETE CASCADE,
   CONSTRAINT fk_runWatcher_user FOREIGN KEY (userId) REFERENCES User (userId) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- StartNoTest
 INSERT INTO Project_Watcher(projectId, userId)
@@ -237,7 +237,7 @@ CREATE TABLE `Printer` (
   `enabled` boolean NOT NULL DEFAULT '1',
   PRIMARY KEY (`printerId`),
   CONSTRAINT printer_name UNIQUE(name)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO Printer (name, driver, backend, configuration, enabled)
   SELECT DISTINCT
@@ -275,7 +275,7 @@ CREATE TABLE NewBoxChangeLog (
   changeTime timestamp DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_boxChangeLog_box FOREIGN KEY (boxId) REFERENCES Box(boxId),
   CONSTRAINT fk_boxChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
-) Engine=InnoDB DEFAULT CHARSET=utf8;
+) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- StartNoTest
 INSERT INTO NewBoxChangeLog(boxId, columnsChanged, userId, message, changeTime)
@@ -298,7 +298,7 @@ CREATE TABLE NewExperimentChangeLog (
   changeTime timestamp DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_experimentChangeLog_experiment FOREIGN KEY (experimentId) REFERENCES Experiment(experimentId),
   CONSTRAINT fk_experimentChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
-) Engine=InnoDB DEFAULT CHARSET=utf8;
+) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- StartNoTest
 INSERT INTO NewExperimentChangeLog(experimentId, columnsChanged, userId, message, changeTime)
@@ -321,7 +321,7 @@ CREATE TABLE NewKitDescriptorChangeLog (
   changeTime timestamp DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_kitDescriptorChangeLog_kitDescriptor FOREIGN KEY (kitDescriptorId) REFERENCES KitDescriptor(kitDescriptorId),
   CONSTRAINT fk_kitDescriptorChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
-) Engine=InnoDB DEFAULT CHARSET=utf8;
+) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- StartNoTest
 INSERT INTO NewKitDescriptorChangeLog(kitDescriptorId, columnsChanged, userId, message, changeTime)
@@ -344,7 +344,7 @@ CREATE TABLE NewLibraryChangeLog (
   changeTime timestamp DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_libraryChangeLog_library FOREIGN KEY (libraryId) REFERENCES Library(libraryId),
   CONSTRAINT fk_libraryChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
-) Engine=InnoDB DEFAULT CHARSET=utf8;
+) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- StartNoTest
 INSERT INTO NewLibraryChangeLog(libraryId, columnsChanged, userId, message, changeTime)
@@ -367,7 +367,7 @@ CREATE TABLE NewPoolChangeLog (
   changeTime timestamp DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_poolChangeLog_pool FOREIGN KEY (poolId) REFERENCES Pool(poolId),
   CONSTRAINT fk_poolChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
-) Engine=InnoDB DEFAULT CHARSET=utf8;
+) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- StartNoTest
 INSERT INTO NewPoolChangeLog(poolId, columnsChanged, userId, message, changeTime)
@@ -390,7 +390,7 @@ CREATE TABLE NewRunChangeLog (
   changeTime timestamp DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_runChangeLog_run FOREIGN KEY (runId) REFERENCES Run(runId),
   CONSTRAINT fk_runChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
-) Engine=InnoDB DEFAULT CHARSET=utf8;
+) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- StartNoTest
 INSERT INTO NewRunChangeLog(runId, columnsChanged, userId, message, changeTime)
@@ -413,7 +413,7 @@ CREATE TABLE NewSampleChangeLog (
   changeTime timestamp DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_sampleChangeLog_sample FOREIGN KEY (sampleId) REFERENCES Sample(sampleId),
   CONSTRAINT fk_sampleChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
-) Engine=InnoDB DEFAULT CHARSET=utf8;
+) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- StartNoTest
 INSERT INTO NewSampleChangeLog(sampleId, columnsChanged, userId, message, changeTime)
@@ -436,7 +436,7 @@ CREATE TABLE NewSequencerPartitionContainerChangeLog (
   changeTime timestamp DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_containerChangeLog_box FOREIGN KEY (containerId) REFERENCES SequencerPartitionContainer(containerId),
   CONSTRAINT fk_containerChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
-) Engine=InnoDB DEFAULT CHARSET=utf8;
+) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- StartNoTest
 INSERT INTO NewSequencerPartitionContainerChangeLog(containerId, columnsChanged, userId, message, changeTime)
@@ -459,7 +459,7 @@ CREATE TABLE NewStudyChangeLog (
   changeTime timestamp DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_studyChangeLog_study FOREIGN KEY (studyId) REFERENCES Study(studyId),
   CONSTRAINT fk_studyChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
-) Engine=InnoDB DEFAULT CHARSET=utf8;
+) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- StartNoTest
 INSERT INTO NewStudyChangeLog(studyId, columnsChanged, userId, message, changeTime)

@@ -10,7 +10,7 @@ CREATE TABLE SampleSingleCell (
   digestion varchar(255) NOT NULL,
   PRIMARY KEY (sampleId),
   CONSTRAINT fk_sampleSingleCell_sample FOREIGN KEY (sampleId) REFERENCES Sample (sampleId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE SampleStockSingleCell (
   sampleId bigint NOT NULL,
@@ -19,14 +19,14 @@ CREATE TABLE SampleStockSingleCell (
   loadingCellConcentration DECIMAL(14,10),
   PRIMARY KEY (sampleId),
   CONSTRAINT fk_sampleStockSingleCell_sample FOREIGN KEY (sampleId) REFERENCES Sample (sampleId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE SampleAliquotSingleCell (
   sampleId bigint NOT NULL,
   inputIntoLibrary DECIMAL(14,10),
   PRIMARY KEY (sampleId),
   CONSTRAINT fk_sampleAliquotSingleCell_sample FOREIGN KEY (sampleId) REFERENCES Sample (sampleId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 -- remove_on_update
@@ -61,7 +61,7 @@ CREATE TABLE LibrarySpikeIn (
   spikeInId bigint NOT NULL AUTO_INCREMENT,
   alias varchar(255) NOT NULL,
   PRIMARY KEY (spikeInId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE Library ADD COLUMN spikeInId bigint;
 ALTER TABLE Library ADD CONSTRAINT fk_library_spikeIn FOREIGN KEY (spikeInId) REFERENCES LibrarySpikeIn(spikeInId);

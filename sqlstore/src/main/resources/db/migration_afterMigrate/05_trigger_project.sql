@@ -11,7 +11,7 @@ DROP TRIGGER IF EXISTS ProjectChange//
 CREATE TRIGGER ProjectChange BEFORE UPDATE ON Project
 FOR EACH ROW
   BEGIN
-  DECLARE log_message longtext CHARACTER SET utf8;
+  DECLARE log_message longtext;
   SET log_message = CONCAT_WS(', ',
     makeChangeMessage('alias', OLD.alias, NEW.alias),
     makeChangeMessage('short name', OLD.shortName, NEW.shortName),

@@ -7,7 +7,7 @@ CREATE TABLE RunPacBio(
   creationDate date,
   PRIMARY KEY (`runId`),
   CONSTRAINT runpacbio_run_runid FOREIGN KEY (runId) REFERENCES Run(runId)
-) ENGINE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO RunPacBio(runId) SELECT runId FROM Run WHERE platformType = 'PACBIO';
 
@@ -16,7 +16,7 @@ CREATE TABLE RunLS454(
   cycles int,
   PRIMARY KEY (`runId`),
   CONSTRAINT runls454_run_runid FOREIGN KEY (runId) REFERENCES Run(runId)
-) ENGINE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO RunLS454(runId, cycles) SELECT runId, cycles FROM Run WHERE platformType = 'LS454';
 
@@ -28,7 +28,7 @@ CREATE TABLE RunIllumina(
   scoreCycle int,
   PRIMARY KEY (`runId`),
   CONSTRAINT runillumina_run_runid FOREIGN KEY (runId) REFERENCES Run(runId)
-) ENGINE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO RunIllumina(runId, callCycle, imgCycle, numCycles, scoreCycle)
  SELECT runId, callCycle, imgCycle, numCycles, scoreCycle FROM Run WHERE platformType = 'ILLUMINA';

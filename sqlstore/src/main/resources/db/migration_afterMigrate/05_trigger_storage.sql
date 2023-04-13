@@ -12,7 +12,7 @@ DROP TRIGGER IF EXISTS StorageLocationChange//
 CREATE TRIGGER StorageLocationChange BEFORE UPDATE ON StorageLocation
 FOR EACH ROW
   BEGIN
-  DECLARE log_message longtext CHARACTER SET utf8;
+  DECLARE log_message longtext;
   IF NEW.locationUnit = 'FREEZER' THEN
     SET log_message = CONCAT_WS(', ',
       makeChangeMessage('alias', OLD.alias, NEW.alias),

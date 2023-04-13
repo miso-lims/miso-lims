@@ -9,7 +9,7 @@ CREATE TABLE StepSequencerPartitionContainer (
   CONSTRAINT fk_StepSequencerPartitionContainer_container FOREIGN KEY (containerId) REFERENCES SequencerPartitionContainer (containerId)
 )
   ENGINE = InnoDB
-  DEFAULT CHARSET = utf8;
+  DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE StepSequencingContainerModel (
   workflowProgressId         bigint NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE StepSequencingContainerModel (
   CONSTRAINT fk_StepSequencingContainerModel_model FOREIGN KEY (sequencingContainerModelId) REFERENCES SequencingContainerModel (sequencingContainerModelId)
 )
   ENGINE = InnoDB
-  DEFAULT CHARSET = utf8;
+  DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE StepString (
   workflowProgressId bigint  NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE StepString (
   CONSTRAINT fk_StepString_step FOREIGN KEY (workflowProgressId, stepNumber) REFERENCES WorkflowProgressStep (workflowProgressId, stepNumber)
 )
   ENGINE = InnoDB
-  DEFAULT CHARSET = utf8;
+  DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE StepSkip (
   workflowProgressId bigint  NOT NULL,
@@ -39,7 +39,7 @@ CREATE TABLE StepSkip (
   CONSTRAINT fk_StepSkip_step FOREIGN KEY (workflowProgressId, stepNumber) REFERENCES WorkflowProgressStep (workflowProgressId, stepNumber)
 )
   ENGINE = InnoDB
-  DEFAULT CHARSET = utf8;
+  DEFAULT CHARSET = utf8mb4;
 
 
 -- add_index_family_fake

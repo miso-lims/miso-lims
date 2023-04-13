@@ -15,14 +15,14 @@ CREATE TABLE `TargetedSequencingTemp` (
   KEY `FK_TargetedResequencing_ub2` (`updatedBy`),
   CONSTRAINT `FK_TargetedResequencing_cb2` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `FK_TargetedResequencing_ub2` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE TargetedSequencing_KitDescriptor (
   targetedSequencingId bigint NOT NULL,
   kitDescriptorId bigint NOT NULL,
   PRIMARY KEY (targetedSequencingId,kitDescriptorId),
   CONSTRAINT TK_KitDescriptor_FK FOREIGN KEY (kitDescriptorId) REFERENCES KitDescriptor (kitDescriptorId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO TargetedSequencingTemp(targetedSequencingId, alias, description, archived, createdBy, creationDate, updatedBy, lastUpdated)
 SELECT targetedSequencingId, alias, description, archived, createdBy, creationDate, updatedBy, lastUpdated FROM TargetedSequencing;

@@ -11,14 +11,14 @@ CREATE TABLE BoxSize (
   scannable boolean DEFAULT 0,
   PRIMARY KEY (boxSizeId),
   UNIQUE (`rows`, `columns`, scannable)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE BoxUse (
   boxUseId bigint NOT NULL AUTO_INCREMENT,
   alias varchar(255) NOT NULL,
   PRIMARY KEY (boxUseId),
   UNIQUE (alias)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE Box (
   boxId bigint NOT NULL AUTO_INCREMENT,
@@ -37,7 +37,7 @@ CREATE TABLE Box (
   FOREIGN KEY(lastModifier) REFERENCES User(userId),
   UNIQUE (name),
   UNIQUE (alias)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE BoxPosition (
   boxPositionId bigint NOT NULL,
@@ -48,14 +48,14 @@ CREATE TABLE BoxPosition (
   PRIMARY KEY (boxPositionId),
   UNIQUE KEY (`boxId`, `column`, `row`),
   FOREIGN KEY(lastModifier) REFERENCES User(userId)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE BoxChangeLog (
   boxId bigint NOT NULL REFERENCES Box(boxId),
   columnsChanged text NOT NULL,
   userId bigint NOT NULL,
   message text NOT NULL,
-  changeTime timestamp DEFAULT CURRENT_TIMESTAMP) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  changeTime timestamp DEFAULT CURRENT_TIMESTAMP) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE Sample ADD COLUMN (
 	boxPositionId bigint,

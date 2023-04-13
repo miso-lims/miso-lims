@@ -25,7 +25,7 @@ CREATE TABLE Experiment_Run_Partition (
   CONSTRAINT experiment_run_partition_experimentId_fkey FOREIGN KEY (experiment_experimentId) REFERENCES Experiment (experimentId),
   CONSTRAINT experiment_run_partition_runId_fkey FOREIGN KEY (run_runId) REFERENCES Run (runId),
   CONSTRAINT experiment_run_partition_partitionId_fkey FOREIGN KEY (partition_partitionId) REFERENCES _Partition (partitionId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO Experiment_Run_Partition(experiment_experimentId, run_runId, partition_partitionId)
   SELECT DISTINCT Experiment.experimentId, Experiment_Run.runs_runId, _Partition.partitionId

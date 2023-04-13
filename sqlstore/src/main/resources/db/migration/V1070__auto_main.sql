@@ -4,7 +4,7 @@ CREATE TABLE ScientificName (
   alias varchar(100) NOT NULL,
   PRIMARY KEY (scientificNameId),
   CONSTRAINT uk_scientificName_alias UNIQUE (alias)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO ScientificName (alias)
 SELECT DISTINCT scientificName FROM Sample;

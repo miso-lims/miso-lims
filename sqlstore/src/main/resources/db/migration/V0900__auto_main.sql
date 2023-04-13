@@ -29,7 +29,7 @@ CREATE TABLE LibraryAliquot (
   CONSTRAINT fk_libraryAliquot_creator FOREIGN KEY (creator) REFERENCES User (userId),
   CONSTRAINT fk_libraryAliquot_lastModifier_user FOREIGN KEY (lastModifier) REFERENCES User (userId),
   CONSTRAINT fk_libraryAliquot_library FOREIGN KEY (libraryId) REFERENCES Library (libraryId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO LibraryAliquot(aliquotId, name, libraryId, preMigrationId, identificationBarcode, volumeUsed, volume, volumeUnits, discarded,
   concentration, concentrationUnits, targetedSequencingId, ngUsed, distributed, distributionDate, distributionRecipient, creationDate,
@@ -49,7 +49,7 @@ CREATE TABLE LibraryAliquotChangeLog (
   PRIMARY KEY (aliquotChangeLogId),
   CONSTRAINT fk_libraryAliquotChangeLog_libraryAliquot FOREIGN KEY (aliquotId) REFERENCES LibraryAliquot (aliquotId),
   CONSTRAINT fk_libraryAliquotChangeLog_user FOREIGN KEY (userId) REFERENCES User (userId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO LibraryAliquotChangeLog (aliquotChangeLogId, aliquotId, columnsChanged, userId, message, changeTime)
 SELECT dilutionChangeLogId, dilutionId, columnsChanged, userId, message, changeTime
@@ -61,7 +61,7 @@ CREATE TABLE Workset_LibraryAliquot (
   PRIMARY KEY (worksetId, aliquotId),
   CONSTRAINT fk_libraryAliquot_workset FOREIGN KEY (worksetId) REFERENCES Workset (worksetId),
   CONSTRAINT fk_workset_libraryAliquot FOREIGN KEY (aliquotId) REFERENCES LibraryAliquot (aliquotId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO Workset_LibraryAliquot (worksetId, aliquotId)
 SELECT worksetId, dilutionId
@@ -74,7 +74,7 @@ CREATE TABLE Pool_LibraryAliquot (
   PRIMARY KEY (poolId, aliquotId),
   CONSTRAINT fk_libraryAliquot_pool FOREIGN KEY (poolId) REFERENCES Pool (poolId),
   CONSTRAINT fk_pool_libraryAliquot FOREIGN KEY (aliquotId) REFERENCES LibraryAliquot (aliquotId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO Pool_LibraryAliquot (poolId, aliquotId, proportion)
 SELECT pool_poolId, dilution_dilutionId, proportion

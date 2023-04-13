@@ -11,7 +11,7 @@ CREATE TABLE `BoxSize` (
   `scannable` boolean DEFAULT 0 NOT NULL,
   PRIMARY KEY (`boxSizeId`),
   UNIQUE (`boxSizeRows`, `boxSizeColumns`, `scannable`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Copy table
 INSERT INTO `BoxSize` (`boxSizeId`, `boxSizeRows`, `boxSizeColumns`, `scannable`)
@@ -49,7 +49,7 @@ CREATE TABLE DetailedLibraryAliquot (
   PRIMARY KEY (aliquotId),
   CONSTRAINT fk_detailedLibraryAliquot_libraryAliquot FOREIGN KEY (aliquotId) REFERENCES LibraryAliquot (aliquotId),
   CONSTRAINT fk_detailedLibraryAliquot_libraryDesignCode FOREIGN KEY (libraryDesignCodeId) REFERENCES LibraryDesignCode (libraryDesignCodeId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO DetailedLibraryAliquot (aliquotId, nonStandardAlias, libraryDesignCodeId)
 SELECT ali.aliquotId, dl.nonStandardAlias, dl.libraryDesignCodeId

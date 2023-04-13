@@ -7,7 +7,7 @@ CREATE TABLE Instrument_ServiceRecord (
   PRIMARY KEY (recordId, instrumentId),
   CONSTRAINT fk_instrumentServiceRecord_instrument FOREIGN KEY (instrumentId) REFERENCES Instrument (instrumentId),
   CONSTRAINT fk_instrumentServiceRecord_ServiceRecord FOREIGN KEY (recordId) REFERENCES ServiceRecord (recordId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 -- 
 
 -- add records for existing service records
@@ -30,5 +30,5 @@ CREATE TABLE Requisition_SupplementalSample (
   PRIMARY KEY (requisitionId, sampleId),
   FOREIGN KEY fk_supplementalSample_requisition (requisitionId) REFERENCES Requisition (requisitionId),
   FOREIGN KEY fk_requisition_supplementalSample (sampleId) REFERENCES Sample (sampleId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

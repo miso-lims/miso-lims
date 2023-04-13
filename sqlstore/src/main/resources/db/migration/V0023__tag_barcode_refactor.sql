@@ -10,7 +10,7 @@ CREATE TABLE `TagBarcodeFamily` (
   `archived` BOOLEAN NOT NULL DEFAULT FALSE,
   PRIMARY KEY (`tagFamilyId`),
   UNIQUE KEY `UK_tbs_name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO TagBarcodeFamily(platformType, name) VALUES
   ('ILLUMINA', 'TruSeq Single Index'),

@@ -16,7 +16,7 @@ CREATE TABLE TissuePieceType (
   name varchar(500) NOT NULL,
   archived boolean NOT NULL,
   CONSTRAINT uk_tissuePieceType_name UNIQUE (name)
-) Engine=InnoDB DEFAULT CHARSET=utf8;
+) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE SampleLCMTube RENAME TO SampleTissuePiece;
 ALTER TABLE SampleTissuePiece ADD COLUMN tissuePieceType bigint;

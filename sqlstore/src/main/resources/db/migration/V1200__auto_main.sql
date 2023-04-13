@@ -68,7 +68,7 @@ CREATE TABLE Pipeline (
   alias varchar(50) NOT NULL,
   PRIMARY KEY (pipelineId),
   CONSTRAINT uk_pipeline_alias UNIQUE (alias)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO Pipeline (alias) VALUES ('Default');
 INSERT INTO Pipeline (alias)

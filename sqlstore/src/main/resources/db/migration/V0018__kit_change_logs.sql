@@ -6,4 +6,4 @@ CREATE TABLE KitDescriptorChangeLog (
   columnsChanged text NOT NULL,
   userId bigint NOT NULL,
   message text NOT NULL,
-  changeTime timestamp DEFAULT CURRENT_TIMESTAMP) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  changeTime timestamp DEFAULT CURRENT_TIMESTAMP) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;

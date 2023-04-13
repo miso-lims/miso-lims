@@ -12,19 +12,19 @@ CREATE TABLE RunOxfordNanopore(
   protocolVersion varchar(100),
   PRIMARY KEY (runId),
   CONSTRAINT FK_OxfordNanopore_Run FOREIGN KEY (runId) REFERENCES Run (runId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE FlowCellVersion(
   flowCellVersionId bigint NOT NULL AUTO_INCREMENT,
   alias varchar(100) NOT NULL,
   PRIMARY KEY (flowCellVersionId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE PoreVersion(
   poreVersionId bigint NOT NULL AUTO_INCREMENT,
   alias varchar(100) NOT NULL,
   PRIMARY KEY (poreVersionId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE OxfordNanoporeContainer (
   containerId bigint NOT NULL AUTO_INCREMENT,
@@ -36,7 +36,7 @@ CREATE TABLE OxfordNanoporeContainer (
   CONSTRAINT FK_OxfordNanoporeContainer_Container FOREIGN KEY (containerId) REFERENCES SequencerPartitionContainer (containerId),
   CONSTRAINT FK_OxfordNanoporeContainer_FlowCellVersion FOREIGN KEY (flowCellVersionId) REFERENCES FlowCellVersion (flowCellVersionId),
   CONSTRAINT FK_OxfordNanoporeContainer_PoreVersion FOREIGN KEY (poreVersionId) REFERENCES PoreVersion (poreVersionId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE ContainerQC (
   qcId bigint NOT NULL AUTO_INCREMENT,
@@ -48,7 +48,7 @@ CREATE TABLE ContainerQC (
   PRIMARY KEY (qcId),
   CONSTRAINT FK_ContainerQC_Container FOREIGN KEY (containerId) REFERENCES SequencerPartitionContainer (containerId),
   CONSTRAINT FK_ContainerQC_Creator FOREIGN KEY (creator) REFERENCES User (userId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE Indices MODIFY COLUMN sequence VARCHAR(24);
 

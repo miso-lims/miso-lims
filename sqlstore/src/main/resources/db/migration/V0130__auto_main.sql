@@ -6,7 +6,7 @@ CREATE TABLE `LibraryDesignCode` (
   `description` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`libraryDesignCodeId`),
   UNIQUE KEY `libraryDesignCode_unique` (`code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- add current LibraryDesignCode values into the table
 INSERT INTO LibraryDesignCode (code, description) SELECT DISTINCT SUBSTRING(name, 1,2), SUBSTRING(name, 1,2) FROM LibraryDesign;

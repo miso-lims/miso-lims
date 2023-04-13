@@ -37,8 +37,8 @@ ALTER TABLE Platform CHANGE COLUMN instrumentType instrumentType varchar(50) NOT
 
 -- StartNoTest
 SET foreign_key_checks = 0;
-ALTER TABLE BoxPosition CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
-ALTER TABLE ProjectOverview_Sample CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE BoxPosition CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+ALTER TABLE ProjectOverview_Sample CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 SET foreign_key_checks = 1;
 -- EndNoTest
 

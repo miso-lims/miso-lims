@@ -19,7 +19,7 @@ CREATE TABLE `TargetedResequencing` (
   CONSTRAINT `FK_TargetedResequencing_kdi` FOREIGN KEY (`kitDescriptorId`) REFERENCES `KitDescriptor` (`kitDescriptorId`),
   CONSTRAINT `FK_TargetedResequencing_cb` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `FK_TargetedResequencing_ub` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE LibraryDilution ADD COLUMN `targetedResequencingId` BIGINT DEFAULT NULL after securityProfile_profileId;
 ALTER TABLE LibraryDilution ADD FOREIGN KEY (targetedResequencingId) REFERENCES TargetedResequencing (targetedResequencingId);

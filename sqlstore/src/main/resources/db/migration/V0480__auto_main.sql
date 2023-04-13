@@ -12,7 +12,7 @@ CREATE TABLE SequencingContainerModel (
   fallback tinyint NOT NULL DEFAULT 0,
   archived tinyint NOT NULL DEFAULT 0,
   PRIMARY KEY (sequencingContainerModelId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE SequencingContainerModel_Platform (
   sequencingContainerModelId bigint NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE SequencingContainerModel_Platform (
   PRIMARY KEY (sequencingContainerModelId, platformId),
   CONSTRAINT fk_SequencingContainerModel_Platform_model FOREIGN KEY (sequencingContainerModelId) REFERENCES SequencingContainerModel (sequencingContainerModelId),
   CONSTRAINT fk_SequencingContainerModel_Platform_platform FOREIGN KEY (platformId) REFERENCES Platform (platformId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- StartNoTest
 DROP PROCEDURE IF EXISTS tempMakeModels;

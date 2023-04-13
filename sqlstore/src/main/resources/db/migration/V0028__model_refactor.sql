@@ -65,7 +65,7 @@ CREATE TABLE `SampleStock` (
   PRIMARY KEY (`sampleId`),
   KEY `K_ss_sampleId` (`sampleId`),
   CONSTRAINT `FK_ss_sample_sampleId` FOREIGN KEY (`sampleId`) REFERENCES `Sample` (`sampleId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `SampleAliquot` (
   `sampleId` bigint NOT NULL,
@@ -75,7 +75,7 @@ CREATE TABLE `SampleAliquot` (
   KEY `K_sa_samplePurposeId` (`samplePurposeId`),
   CONSTRAINT `FK_sa_samplePurpose_samplePurposeId` FOREIGN KEY (`samplePurposeId`) REFERENCES `SamplePurpose` (`samplePurposeId`),
   CONSTRAINT `FK_sa_sample_sampleId` FOREIGN KEY (`sampleId`) REFERENCES `Sample` (`sampleId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 UPDATE SampleClass SET sampleCategory = 'Aliquot' WHERE sampleCategory = 'Analyte' AND NOT isStock;
 UPDATE SampleClass SET sampleCategory = 'Stock' WHERE sampleCategory = 'Analyte' AND isStock;
@@ -116,7 +116,7 @@ ALTER TABLE LibraryAdditionalInfo DROP COLUMN tissueTypeId;
 CREATE TABLE `SampleTissueProcessing` (
     `sampleId` bigint PRIMARY KEY,
     CONSTRAINT `sampleTP_sample_fkey` FOREIGN KEY (`sampleId`) REFERENCES `Sample` (`sampleId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `SampleCVSlide` (
     `sampleId` bigint PRIMARY KEY,
@@ -124,11 +124,11 @@ CREATE TABLE `SampleCVSlide` (
     `discards` int DEFAULT 0,
     `thickness` int,
     CONSTRAINT `sampleCVSlide_sample_fkey` FOREIGN KEY (`sampleId`) REFERENCES `Sample` (`sampleId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `SampleLCMTube` (
     `sampleId` bigint PRIMARY KEY,
     `cutsConsumed` int NOT NULL DEFAULT 0,
     CONSTRAINT `sampleLCMTube_sample_fkey` FOREIGN KEY (`sampleId`) REFERENCES `Sample` (`sampleId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

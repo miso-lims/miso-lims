@@ -16,7 +16,7 @@ CREATE TABLE `LibraryQC2` (
   CONSTRAINT `FK_library_qc_library` FOREIGN KEY (`library_libraryId`) REFERENCES `Library` (`libraryId`),
   CONSTRAINT `FK_library_qc_creator` FOREIGN KEY (`creator`) REFERENCES `User` (`userId`),
   CONSTRAINT `FK_library_qc_type` FOREIGN KEY (`type`) REFERENCES `QCType` (`qcTypeId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `SampleQC2` (
   `qcId` bigint NOT NULL AUTO_INCREMENT,
@@ -29,7 +29,7 @@ CREATE TABLE `SampleQC2` (
   CONSTRAINT `FK_sample_qc_sample` FOREIGN KEY (`sample_sampleId`) REFERENCES `Sample` (`sampleId`),
   CONSTRAINT `FK_sample_qc_creator` FOREIGN KEY (`creator`) REFERENCES `User` (`userId`),
   CONSTRAINT `FK_sample_qc_type` FOREIGN KEY (`type`) REFERENCES `QCType` (`qcTypeId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `PoolQC2` (
   `qcId` bigint NOT NULL AUTO_INCREMENT,
@@ -42,7 +42,7 @@ CREATE TABLE `PoolQC2` (
   CONSTRAINT `FK_pool_qc_pool` FOREIGN KEY (`pool_poolId`) REFERENCES `Pool` (`poolId`),
   CONSTRAINT `FK_pool_qc_creator` FOREIGN KEY (`creator`) REFERENCES `User` (`userId`),
   CONSTRAINT `FK_pool_qc_type` FOREIGN KEY (`type`) REFERENCES `QCType` (`qcTypeId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO LibraryQC2(`qcId`, `library_libraryId`, `creator`, `date`, `type`, `results`)
 	SELECT qcId, library_libraryId, (SELECT userId FROM `User` WHERE fullName = qcCreator), qcDate, qcMethod, results FROM LibraryQC;
@@ -81,7 +81,7 @@ CREATE TABLE PlatformSizes (
   partitionSize int NOT NULL,
   PRIMARY KEY (platform_platformId, partitionSize),
   CONSTRAINT fk_platform_size_platform FOREIGN KEY (platform_platformId) REFERENCES Platform (platformId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO PlatformSizes(platform_platformId, partitionSize)
   SELECT DISTINCT platform, COUNT(*) AS c FROM SequencerPartitionContainer JOIN SequencerPartitionContainer_Partition ON containerId = container_containerId GROUP BY containerId
@@ -125,7 +125,7 @@ CREATE TABLE PartitionQCType (
   noteRequired boolean DEFAULT false,
   PRIMARY KEY (partitionQcTypeId),
   UNIQUE KEY uk_partitionqctype_description (description)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE Run_Partition_QC (
   runId bigint NOT NULL,
@@ -136,7 +136,7 @@ CREATE TABLE Run_Partition_QC (
   CONSTRAINT fk_rpq_run_runId FOREIGN KEY (runId) REFERENCES Run (runId),
   CONSTRAINT fk_rpq_partition_partitionId FOREIGN KEY (partitionId) REFERENCES _Partition (partitionId),
   CONSTRAINT fk_rpq_partitiontypeqc_partitiontypeqc FOREIGN KEY (partitionQcTypeId) REFERENCES PartitionQCType (partitionQcTypeId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO PartitionQCType(description, noteRequired) VALUES
   ('OK', false),
