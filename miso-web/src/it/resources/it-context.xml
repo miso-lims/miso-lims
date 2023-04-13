@@ -21,7 +21,6 @@
   <bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
   
   <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-    <property name="driverClassName" value="com.mysql.jdbc.Driver" />
     <property name="url" value="${miso.it.mysql.url}" />
     <property name="username" value="${miso.it.mysql.user}" />
     <property name="password" value="${miso.it.mysql.pw}" />

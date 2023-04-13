@@ -1,7 +1,8 @@
 DELIMITER //
 
 DROP FUNCTION IF EXISTS getParentIdByDiscriminator//
-CREATE FUNCTION getParentIdByDiscriminator(pSampleId bigint(20), pDiscriminator varchar(50)) RETURNS bigint(20)
+CREATE FUNCTION getParentIdByDiscriminator(pSampleId bigint(20), pDiscriminator varchar(50))
+  RETURNS bigint(20) NOT DETERMINISTIC READS SQL DATA
 BEGIN
   DECLARE vSampleId bigint(20);
   DECLARE vDiscriminator varchar(50);

@@ -2,6 +2,7 @@ DELIMITER //
 
 DROP FUNCTION IF EXISTS getAdminUserId//
 CREATE FUNCTION getAdminUserId() RETURNS bigint(20)
+READS SQL DATA
 BEGIN
   DECLARE adminId bigint(20);
   SELECT userId INTO adminId FROM User WHERE loginName = 'admin';
@@ -14,13 +15,13 @@ BEGIN
 END//
 
 DROP FUNCTION IF EXISTS decimalToString//
-CREATE FUNCTION decimalToString(original DECIMAL(20,10)) RETURNS CHAR(21)
+CREATE FUNCTION decimalToString(original DECIMAL(20,10)) RETURNS CHAR(21) DETERMINISTIC
 BEGIN
   RETURN CAST(original AS CHAR(21))+0;
 END//
 
 DROP FUNCTION IF EXISTS booleanToString//
-CREATE FUNCTION booleanToString(original BOOLEAN) RETURNS CHAR(21)
+CREATE FUNCTION booleanToString(original BOOLEAN) RETURNS CHAR(21) DETERMINISTIC
 BEGIN
   RETURN CASE original
     WHEN TRUE THEN 'yes'
@@ -30,7 +31,7 @@ BEGIN
 END//
 
 DROP FUNCTION IF EXISTS qcPassedToString//
-CREATE FUNCTION qcPassedToString(original BOOLEAN) RETURNS CHAR(21)
+CREATE FUNCTION qcPassedToString(original BOOLEAN) RETURNS CHAR(21) DETERMINISTIC NO SQL
 BEGIN
   RETURN CASE original
     WHEN TRUE THEN 'Ready'
@@ -40,7 +41,7 @@ BEGIN
 END//
 
 DROP FUNCTION IF EXISTS dataReviewToString//
-CREATE FUNCTION dataReviewToString(original BOOLEAN) RETURNS CHAR(21)
+CREATE FUNCTION dataReviewToString(original BOOLEAN) RETURNS CHAR(21) DETERMINISTIC NO SQL
 BEGIN
   RETURN CASE original
     WHEN TRUE THEN 'Pass'
@@ -51,6 +52,7 @@ END//
 
 DROP FUNCTION IF EXISTS boxSizeToString//
 CREATE FUNCTION boxSizeToString(id bigint(20)) RETURNS varchar(50)
+  NOT DETERMINISTIC READS SQL DATA
 BEGIN
   DECLARE label varchar(50);
   SELECT CONCAT(boxSizeRows, '×', boxSizeColumns, ' ', LOWER(boxType)) INTO label
@@ -60,6 +62,7 @@ END//
 
 DROP FUNCTION IF EXISTS isChanged//
 CREATE FUNCTION isChanged(val1 varchar(255), val2 varchar(255)) RETURNS BOOLEAN
+DETERMINISTIC NO SQL
 BEGIN
   IF (val1 IS NULL) <> (val2 IS NULL) THEN
     RETURN TRUE;
@@ -71,7 +74,8 @@ BEGIN
 END//
 
 DROP FUNCTION IF EXISTS makeChangeMessage//
-CREATE FUNCTION makeChangeMessage(fieldName varchar(255), beforeVal varchar(255), afterVal varchar(255)) RETURNS longtext
+CREATE FUNCTION makeChangeMessage(fieldName varchar(255), beforeVal varchar(255), afterVal varchar(255))
+  RETURNS longtext DETERMINISTIC NO SQL
 BEGIN
   IF isChanged(beforeVal, afterVal) THEN
     RETURN CONCAT(fieldName, ': ', COALESCE(beforeVal, 'n/a'), ' → ', COALESCE(afterVal, 'n/a'));
@@ -81,7 +85,8 @@ BEGIN
 END//
 
 DROP FUNCTION IF EXISTS makeChangeColumn//
-CREATE FUNCTION makeChangeColumn(fieldName varchar(255), beforeVal varchar(255), afterVal varchar(255)) RETURNS varchar(255)
+CREATE FUNCTION makeChangeColumn(fieldName varchar(255), beforeVal varchar(255), afterVal varchar(255))
+  RETURNS varchar(255) DETERMINISTIC NO SQL
 BEGIN
   IF isChanged(beforeVal, afterVal) THEN
     RETURN fieldName;

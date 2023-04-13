@@ -97,6 +97,7 @@ DELIMITER //
 
 DROP FUNCTION IF EXISTS findParentWithLab//
 CREATE FUNCTION findParentWithLab(pSampleId bigint(20)) RETURNS bigint(20)
+  NOT DETERMINISTIC READS SQL DATA
 BEGIN
   DECLARE vTissueId bigint(20);
   SET vTissueId = pSampleId;
@@ -391,6 +392,7 @@ DELIMITER //
 
 DROP FUNCTION IF EXISTS getParentTissueId//
 CREATE FUNCTION getParentTissueId(pSampleId bigint(20)) RETURNS bigint(20)
+  NOT DETERMINISTIC READS SQL DATA
 BEGIN
   DECLARE vTissueId bigint(20);
   SET vTissueId = pSampleId;
@@ -402,6 +404,7 @@ END//
 
 DROP FUNCTION IF EXISTS getParentIdentityId//
 CREATE FUNCTION getParentIdentityId(pSampleId bigint(20)) RETURNS bigint(20)
+  NOT DETERMINISTIC READS SQL DATA
 BEGIN
   DECLARE vIdentityId bigint(20);
   SET vIdentityId = pSampleId;

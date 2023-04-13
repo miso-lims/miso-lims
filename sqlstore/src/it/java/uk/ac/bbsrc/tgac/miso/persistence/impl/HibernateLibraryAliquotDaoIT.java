@@ -198,13 +198,15 @@ public class HibernateLibraryAliquotDaoIT extends AbstractDAOTest {
     UserImpl user = new UserImpl();
     user.setId(1L);
     user.setFullName("moi");
+    Date now = new Date();
     lib.setId(1L);
     ld.setCreator(user);
     ld.setLastModifier(user);
+    ld.setLastModified(now);
     ld.setLibrary(lib);
     ld.setConcentration(new BigDecimal("12.5"));
-    ld.setCreationDate(new Date());
-    ld.setCreationTime(new Date());
+    ld.setCreationDate(now);
+    ld.setCreationTime(now);
     ld.setName("nom de plume");
     ld.setAlias("TEST");
     Long newId = dao.save(ld);

@@ -10,7 +10,6 @@
   <context:component-scan base-package="ca.on.oicr.pinery" />
 
   <bean id="misoDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-    <property name="driverClassName" value="com.mysql.jdbc.Driver" />
     <property name="url" value="#{systemProperties['miso.it.mysql.url']}" />
     <property name="username" value="#{systemProperties['miso.it.mysql.user']}" />
     <property name="password" value="#{systemProperties['miso.it.mysql.pw']}" />

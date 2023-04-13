@@ -31,7 +31,7 @@ DELIMITER //
 DROP FUNCTION IF EXISTS kitExists//
 CREATE FUNCTION kitExists (id bigint(20), kitName varchar(255), kitVersion int(3), kitManufacturer varchar(100),
     kitPartNumber varchar(50), kitKitType varchar(30), kitPlatformType varchar(20))
-    RETURNS boolean
+    RETURNS boolean NOT DETERMINISTIC READS SQL DATA
 BEGIN
 	IF EXISTS (SELECT 1 FROM KitDescriptor WHERE kitDescriptorId = id AND name = kitName AND manufacturer = kitManufacturer
 	AND partNumber LIKE kitPartNumber AND kitType = kitKitType AND platformType = kitPlatformType)

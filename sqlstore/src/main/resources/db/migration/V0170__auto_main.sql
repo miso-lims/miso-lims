@@ -487,7 +487,7 @@ CREATE TABLE BoxContents (
 
 INSERT INTO BoxContents(boxId, position, targetType, targetId) SELECT
   boxId,
-  CONCAT(CHAR(65 + `column`), LPAD(row + 1, 2, '0')),
+  CONCAT(CHAR(65 + `column`), LPAD(`row` + 1, 2, '0')),
   (SELECT CONCAT('Sample',
       CASE
         WHEN EXISTS(SELECT * FROM SampleAliquot WHERE SampleAliquot.sampleId = Sample.sampleId) THEN 'Aliquot'

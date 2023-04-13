@@ -4,22 +4,6 @@ CREATE TABLE `sequence_data` (
     PRIMARY KEY (`sequence_name`)
 ) ENGINE=MyISAM;
 
--- StartNoTest
-DELIMITER //
-CREATE FUNCTION `nextval` (`seq_name` varchar(100))
-RETURNS bigint(20) NOT DETERMINISTIC
-BEGIN
-    DECLARE cur_val bigint(20);
-    SELECT sequence_cur_value INTO cur_val FROM sequence_data WHERE sequence_name = seq_name;
- 
-    IF cur_val IS NOT NULL THEN
-        UPDATE sequence_data SET sequence_cur_value = sequence_cur_value + 1 WHERE sequence_name = seq_name;
-    END IF;
-    RETURN cur_val;
-END//
-DELIMITER ;
--- EndNoTest
-
 CREATE TABLE BoxSize (
   boxSizeId bigint(20) NOT NULL AUTO_INCREMENT,
   `rows` bigint(20) NOT NULL,
@@ -73,53 +57,47 @@ CREATE TABLE BoxChangeLog (
   message text NOT NULL,
   changeTime timestamp DEFAULT CURRENT_TIMESTAMP) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-INSERT INTO sequence_data(sequence_name) VALUES('box_position_seq');
-
 ALTER TABLE Sample ADD COLUMN (
 	boxPositionId bigint(20),
 	emptied boolean NOT NULL DEFAULT 0,
 	volume double DEFAULT NULL);
 
--- StartNoTest
 ALTER TABLE Sample
   MODIFY identificationBarcode VARCHAR(255) UNIQUE;
--- EndNoTest
 
-UPDATE Sample set boxPositionId = nextval('box_position_seq') WHERE boxPositionId IS NULL;
-
+SET @sequence = 0;
+UPDATE Sample SET boxPositionId = @sequence := @sequence + 1;
 
 ALTER TABLE Library ADD COLUMN (
 	boxPositionId bigint(20),
 	emptied boolean NOT NULL DEFAULT 0,
 	volume double DEFAULT NULL);
 
--- StartNoTest
 ALTER TABLE Library
   MODIFY identificationBarcode VARCHAR(255) UNIQUE;
--- EndNoTest
 
-UPDATE Library set boxPositionId = nextval('box_position_seq') WHERE boxPositionId IS NULL;
+UPDATE Library SET boxPositionId = @sequence := @sequence + 1;
 
 ALTER TABLE Pool ADD COLUMN (
   boxPositionId bigint(20),
   emptied boolean NOT NULL DEFAULT 0,
   volume double DEFAULT NULL);
 
--- StartNoTest
 ALTER TABLE Pool 
   MODIFY identificationBarcode VARCHAR(255) UNIQUE;
--- EndNoTest
 
-UPDATE Pool set boxPositionId = nextval('box_position_seq') WHERE boxPositionId IS NULL;
+UPDATE Pool SET boxPositionId = @sequence := @sequence + 1;
 
+INSERT INTO sequence_data(sequence_name, sequence_cur_value) VALUES ('box_position_seq', @sequence);
 DROP TRIGGER IF EXISTS BeforeInsertPool;
+DELIMITER //
 CREATE TRIGGER BeforeInsertPool BEFORE INSERT ON Pool
   FOR EACH ROW
-  SET NEW.boxPositionId = nextval('box_position_seq');
+  BEGIN
+    UPDATE sequence_data
+    SET sequence_cur_value = sequence_cur_value + 1
+    WHERE sequence_name = 'box_position_seq';
 
-
--- There is no check that identificationBarcode and boxPositionId aren't reused between Sample, Library, and Pool, but there should be. 
-
-
-
-
+    SET NEW.boxPositionId = (SELECT sequence_cur_value FROM sequence_data WHERE sequence_name = 'box_position_seq');
+  END//
+DELIMITER ;

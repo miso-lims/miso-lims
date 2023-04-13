@@ -20,9 +20,10 @@ ALTER TABLE KitDescriptor ADD COLUMN created timestamp NOT NULL DEFAULT CURRENT_
 ALTER TABLE KitDescriptor ADD COLUMN lastModified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP();
 
 -- StartNoTest
+SET @now = NOW();
 UPDATE KitDescriptor SET
-  created = (SELECT MIN(changeTime) FROM KitDescriptorChangeLog WHERE kitDescriptorId = KitDescriptor.kitDescriptorId),
-  lastModified = (SELECT MAX(changeTime) FROM KitDescriptorChangeLog WHERE kitDescriptorId = KitDescriptor.kitDescriptorId),
+  created = COALESCE((SELECT MIN(changeTime) FROM KitDescriptorChangeLog WHERE kitDescriptorId = KitDescriptor.kitDescriptorId), @now),
+  lastModified = COALESCE((SELECT MAX(changeTime) FROM KitDescriptorChangeLog WHERE kitDescriptorId = KitDescriptor.kitDescriptorId), @now),
   creator = COALESCE((SELECT userId FROM KitDescriptorChangeLog WHERE kitDescriptorId = KitDescriptor.kitDescriptorId ORDER BY changeTime ASC LIMIT 1), @admin);
 -- EndNoTest
 
