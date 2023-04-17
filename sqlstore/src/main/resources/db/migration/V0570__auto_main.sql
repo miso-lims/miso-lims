@@ -3,7 +3,7 @@
 CREATE TABLE StepPositiveDouble (
   workflowProgressId bigint NOT NULL,
   stepNumber         bigint NOT NULL,
-  `input`             FLOAT unsigned NOT NULL,
+  `input`             FLOAT NOT NULL,
   PRIMARY KEY (workflowProgressId, stepNumber),
   CONSTRAINT `fk_StepPositiveDouble_step` FOREIGN KEY (workflowProgressId, stepNumber) REFERENCES WorkflowProgressStep (workflowProgressId, stepNumber)
 )

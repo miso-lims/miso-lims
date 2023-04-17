@@ -1,4 +1,4 @@
--- This table should have been removed in the V0320 migration
+-- These tables should have been removed in the V0320 migration
 
 DROP TABLE IF EXISTS RunQC_Partition;
 DROP TABLE IF EXISTS RunQC;
@@ -185,3 +185,6 @@ ALTER TABLE _Group CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 ALTER TABLE _Partition CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 ALTER TABLE flyway_schema_history CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 ALTER TABLE persistent_logins CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+
+-- Remove deprecated 'UNSIGNED'
+ALTER TABLE StepPositiveDouble MODIFY `input` FLOAT NOT NULL;
