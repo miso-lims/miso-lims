@@ -32,9 +32,6 @@ CREATE TABLE Box (
   securityProfile_profileId bigint DEFAULT NULL,
   lastModifier bigint NOT NULL DEFAULT 1,
   PRIMARY KEY (boxId),
-  FOREIGN KEY (boxSizeId) REFERENCES BoxSize(boxSizeId),
-  FOREIGN KEY (boxUseId) REFERENCES BoxUse(boxUseId),
-  FOREIGN KEY(lastModifier) REFERENCES User(userId),
   UNIQUE (name),
   UNIQUE (alias)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
@@ -46,8 +43,7 @@ CREATE TABLE BoxPosition (
   `row` bigint NOT NULL,
   lastModifier bigint NOT NULL DEFAULT 1,
   PRIMARY KEY (boxPositionId),
-  UNIQUE KEY (`boxId`, `column`, `row`),
-  FOREIGN KEY(lastModifier) REFERENCES User(userId)
+  UNIQUE KEY (`boxId`, `column`, `row`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE BoxChangeLog (

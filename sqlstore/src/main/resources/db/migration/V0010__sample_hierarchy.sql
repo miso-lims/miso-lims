@@ -413,4 +413,3 @@ CREATE TABLE `PoolOrder` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE Run ADD COLUMN sequencingParameters_parametersId bigint DEFAULT NULL;
-ALTER TABLE Run ADD FOREIGN KEY (sequencingParameters_parametersId) REFERENCES SequencingParameters (parametersId);

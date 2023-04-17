@@ -1,19 +1,11 @@
 ALTER TABLE Experiment ADD COLUMN lastModifier bigint NOT NULL DEFAULT 1;
-ALTER TABLE Experiment ADD CONSTRAINT experiment_user_userid_fkey FOREIGN KEY(lastModifier) REFERENCES User(userId);
 ALTER TABLE Library ADD COLUMN lastModifier bigint NOT NULL DEFAULT 1;
-ALTER TABLE Library ADD CONSTRAINT library_user_userid_fkey FOREIGN KEY(lastModifier) REFERENCES User(userId);
 ALTER TABLE Plate ADD COLUMN lastModifier bigint NOT NULL DEFAULT 1;
-ALTER TABLE Plate ADD CONSTRAINT plate_user_userid_fkey FOREIGN KEY(lastModifier) REFERENCES User(userId);
 ALTER TABLE Pool ADD COLUMN lastModifier bigint NOT NULL DEFAULT 1;
-ALTER TABLE Pool ADD CONSTRAINT pool_user_userid_fkey FOREIGN KEY(lastModifier) REFERENCES User(userId);
 ALTER TABLE Run ADD COLUMN lastModifier bigint NOT NULL DEFAULT 1;
-ALTER TABLE Run ADD CONSTRAINT run_user_userid_fkey FOREIGN KEY(lastModifier) REFERENCES User(userId);
 ALTER TABLE Sample ADD COLUMN lastModifier bigint NOT NULL DEFAULT 1;
-ALTER TABLE Sample ADD CONSTRAINT sample_user_userid_fkey FOREIGN KEY(lastModifier) REFERENCES User(userId);
 ALTER TABLE SequencerPartitionContainer ADD COLUMN lastModifier bigint NOT NULL DEFAULT 1;
-ALTER TABLE SequencerPartitionContainer ADD CONSTRAINT sequencerpartitioncontainer_user_userid_fkey FOREIGN KEY(lastModifier) REFERENCES User(userId);
 ALTER TABLE Study ADD COLUMN lastModifier bigint NOT NULL DEFAULT 1;
-ALTER TABLE Study ADD CONSTRAINT study_user_userid_fkey FOREIGN KEY(lastModifier) REFERENCES User(userId);
 
 CREATE TABLE SampleChangeLog (
   sampleId bigint NOT NULL REFERENCES Sample(sampleId),
