@@ -62,7 +62,13 @@ ALTER TABLE Sample
   MODIFY identificationBarcode VARCHAR(255) UNIQUE;
 
 SET @sequence = 0;
-UPDATE Sample SET boxPositionId = @sequence := @sequence + 1;
+UPDATE Sample s
+JOIN (
+  SELECT sampleId, ROW_NUMBER() OVER() AS value
+  FROM Sample
+) seq ON seq.sampleId = s.sampleId
+SET s.boxPositionId = seq.value + @sequence;
+SELECT MAX(boxPositionId) FROM Sample INTO @sequence;
 
 ALTER TABLE Library ADD COLUMN (
 	boxPositionId bigint,
@@ -72,7 +78,13 @@ ALTER TABLE Library ADD COLUMN (
 ALTER TABLE Library
   MODIFY identificationBarcode VARCHAR(255) UNIQUE;
 
-UPDATE Library SET boxPositionId = @sequence := @sequence + 1;
+UPDATE Library l
+JOIN (
+  SELECT libraryId, ROW_NUMBER() OVER() AS value
+  FROM Library
+) seq ON seq.libraryId = l.libraryId
+SET l.boxPositionId = seq.value + @sequence;
+SELECT MAX(boxPositionId) FROM Library INTO @sequence;
 
 ALTER TABLE Pool ADD COLUMN (
   boxPositionId bigint,
@@ -82,7 +94,13 @@ ALTER TABLE Pool ADD COLUMN (
 ALTER TABLE Pool 
   MODIFY identificationBarcode VARCHAR(255) UNIQUE;
 
-UPDATE Pool SET boxPositionId = @sequence := @sequence + 1;
+UPDATE Pool p
+JOIN (
+  SELECT poolId, ROW_NUMBER() OVER() AS value
+  FROM Pool
+) seq ON seq.poolId = p.poolId
+SET p.boxPositionId = seq.value + @sequence;
+SELECT MAX(boxPositionId) FROM Pool INTO @sequence;
 
 INSERT INTO sequence_data(sequence_name, sequence_cur_value) VALUES ('box_position_seq', @sequence);
 DROP TRIGGER IF EXISTS BeforeInsertPool;
