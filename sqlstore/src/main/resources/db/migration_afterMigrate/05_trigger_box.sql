@@ -1,4 +1,3 @@
--- StartNoTest
 DELIMITER //
 
 DROP TRIGGER IF EXISTS BoxChange//
@@ -44,4 +43,3 @@ FOR EACH ROW
   )//
 
 DELIMITER ;
--- EndNoTest

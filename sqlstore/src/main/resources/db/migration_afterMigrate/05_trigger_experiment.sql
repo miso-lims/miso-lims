@@ -1,4 +1,3 @@
--- StartNoTest
 DELIMITER //
 
 DROP TRIGGER IF EXISTS ExperimentChange//
@@ -38,4 +37,3 @@ FOR EACH ROW
     'Experiment created.')//
 
 DELIMITER ;
--- EndNoTest

@@ -1,4 +1,3 @@
--- StartNoTest
 DELIMITER //
 
 DROP TRIGGER IF EXISTS SequencerPartitionContainerChange//
@@ -56,5 +55,3 @@ BEGIN
 END//
 
 DELIMITER ;
-
--- EndNoTest

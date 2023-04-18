@@ -1,4 +1,3 @@
--- StartNoTest
 DELIMITER //
 
 DROP TRIGGER IF EXISTS LibraryAliquotChange//
@@ -77,4 +76,3 @@ FOR EACH ROW
     NEW.lastUpdated)//
 
 DELIMITER ;
--- EndNoTest

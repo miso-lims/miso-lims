@@ -1,6 +1,4 @@
 -- tarReseq_to_tarSeq
-
--- StartNoTest because FK was never named in the original migration
 SELECT CONSTRAINT_NAME INTO @constraint
     FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
     WHERE TABLE_NAME = 'LibraryDilution' AND COLUMN_NAME = 'targetedResequencingId'
@@ -9,7 +7,7 @@ SET @q = CONCAT('ALTER TABLE LibraryDilution DROP FOREIGN KEY ',@constraint);
 PREPARE stmt FROM @q;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
--- EndNoTest
+
 ALTER TABLE TargetedResequencing CHANGE `targetedResequencingId` `targetedSequencingId` bigint NOT NULL AUTO_INCREMENT;
 ALTER TABLE TargetedResequencing RENAME TO TargetedSequencing;
 ALTER TABLE LibraryDilution CHANGE `targetedResequencingId` `targetedSequencingId` bigint DEFAULT NULL;

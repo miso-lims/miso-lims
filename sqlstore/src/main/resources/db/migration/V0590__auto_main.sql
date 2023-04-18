@@ -18,11 +18,9 @@ ALTER TABLE StorageLocation ADD COLUMN created timestamp NOT NULL DEFAULT CURREN
 ALTER TABLE StorageLocation ADD COLUMN lastModifier bigint;
 ALTER TABLE StorageLocation ADD COLUMN lastModified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP();
 
--- StartNoTest
 SELECT userId INTO @admin FROM User WHERE loginName = 'admin';
 UPDATE StorageLocation SET
   creator = @admin, lastModifier = @admin;
--- EndNoTest
 
 ALTER TABLE StorageLocation CHANGE COLUMN creator creator bigint NOT NULL;
 ALTER TABLE StorageLocation ADD CONSTRAINT fk_storagelocation_creator FOREIGN KEY (creator) REFERENCES User (userId);

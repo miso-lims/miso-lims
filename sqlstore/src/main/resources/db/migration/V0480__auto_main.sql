@@ -22,7 +22,6 @@ CREATE TABLE SequencingContainerModel_Platform (
   CONSTRAINT fk_SequencingContainerModel_Platform_platform FOREIGN KEY (platformId) REFERENCES Platform (platformId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- StartNoTest
 DROP PROCEDURE IF EXISTS tempMakeModels;
 
 DELIMITER //
@@ -59,11 +58,9 @@ DELIMITER ;
 
 CALL tempMakeModels();
 DROP PROCEDURE tempMakeModels;
--- EndNoTest
 
 ALTER TABLE SequencerPartitionContainer ADD COLUMN sequencingContainerModelId bigint;
 
--- StartNoTest
 UPDATE SequencerPartitionContainer spc
 JOIN (
   SELECT container_containerId, COUNT(*) AS partitionCount
@@ -76,7 +73,6 @@ SET spc.sequencingContainerModelId = (
   WHERE mp.platformId = spc.platform
   AND m.partitionCount = pc.partitionCount
 );
--- EndNoTest
 
 ALTER TABLE SequencerPartitionContainer MODIFY COLUMN sequencingContainerModelId bigint NOT NULL;
 ALTER TABLE SequencerPartitionContainer ADD CONSTRAINT fk_SequencerPartitionContainer_model
@@ -85,7 +81,6 @@ ALTER TABLE SequencerPartitionContainer ADD CONSTRAINT fk_SequencerPartitionCont
 ALTER TABLE SequencerPartitionContainer DROP COLUMN platform;
 DROP TABLE PlatformSizes;
 
--- StartNoTest
 INSERT INTO SequencingContainerModel(alias, identificationBarcode, partitionCount, platformType) VALUES
 ('S2 Flow Cell', '20015845', 2, 'ILLUMINA'),
 ('S4 Flow Cell', '20015843', 4, 'ILLUMINA'),
@@ -170,6 +165,3 @@ WHERE m.alias = 'High Output Flow Cell Cartridge V2' AND p.instrumentModel LIKE 
 INSERT INTO SequencingContainerModel_Platform (sequencingContainerModelId, platformId)
 SELECT m.sequencingContainerModelId, p.platformId FROM SequencingContainerModel m JOIN Platform p
 WHERE m.alias = 'Mid Output Flow Cell Cartridge V2' AND p.instrumentModel LIKE '%NextSeq 550';
--- EndNoTest
-
-

@@ -12,7 +12,6 @@ CREATE TABLE PoolOrderChangeLog (
 
 
 -- pool_order_create_trigger
--- StartNoTest
 DELIMITER //
 
 DROP TRIGGER IF EXISTS BeforeInsertPoolOrder//
@@ -56,7 +55,6 @@ FOR EACH ROW
     NEW.lastUpdated)//
 
 DELIMITER ;
--- EndNoTest
 
 -- sequencing_parameters_paired
 ALTER TABLE SequencingParameters ADD COLUMN readLength2 int;

@@ -1,4 +1,3 @@
--- StartNoTest
 DELIMITER //
 
 DROP TRIGGER IF EXISTS ProjectInsert//
@@ -40,4 +39,3 @@ FOR EACH ROW
 END//
 
 DELIMITER ;
--- EndNoTest

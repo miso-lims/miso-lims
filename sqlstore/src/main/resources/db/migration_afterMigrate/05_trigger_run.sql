@@ -1,4 +1,3 @@
--- StartNoTest
 DELIMITER //
 
 DROP TRIGGER IF EXISTS RunChange//
@@ -157,4 +156,3 @@ FOR EACH ROW
     'Run created.',
     NEW.lastModified)//
 DELIMITER ;
--- EndNoTest

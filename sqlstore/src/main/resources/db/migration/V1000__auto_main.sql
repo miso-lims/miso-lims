@@ -63,7 +63,6 @@ CREATE TABLE Transfer_Pool (
 
 ALTER TABLE Lab ADD COLUMN excludeFromPinery BOOLEAN NOT NULL DEFAULT FALSE;
 
--- StartNoTest
 CREATE TABLE TemporaryTransfer (
   transferId bigint PRIMARY KEY AUTO_INCREMENT,
   projectId bigint,
@@ -305,7 +304,6 @@ JOIN Pool p ON p.poolId = tt.poolId
 WHERE p.distributed = TRUE;
 
 DROP TABLE TemporaryTransfer;
--- EndNoTest
 
 ALTER TABLE Sample DROP COLUMN receivedDate;
 ALTER TABLE Sample DROP COLUMN distributed;

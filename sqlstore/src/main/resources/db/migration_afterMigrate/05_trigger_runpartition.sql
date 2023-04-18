@@ -1,4 +1,3 @@
--- StartNoTest
 DELIMITER //
 
 DROP TRIGGER IF EXISTS RunPartitionUpdate//
@@ -117,4 +116,3 @@ FOR EACH ROW
   END//
 
 DELIMITER ;
--- EndNoTest

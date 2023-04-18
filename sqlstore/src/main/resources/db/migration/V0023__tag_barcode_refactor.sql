@@ -1,7 +1,5 @@
 -- Switch tables to InnoDB to permit foreign key constraints.
--- StartNoTest
 ALTER TABLE TagBarcodes ENGINE = InnoDB ROW_FORMAT = DEFAULT;
--- EndNoTest
 
 CREATE TABLE `TagBarcodeFamily` (
   `tagFamilyId` bigint NOT NULL AUTO_INCREMENT,

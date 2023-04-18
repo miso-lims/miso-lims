@@ -1,4 +1,3 @@
--- StartNoTest
 DELIMITER //
 
 DROP TRIGGER IF EXISTS KitDescriptorChange//
@@ -61,4 +60,3 @@ FOR EACH ROW
     CONCAT('Removed targeted sequencing: ', (SELECT ts.alias FROM TargetedSequencing ts WHERE ts.targetedSequencingId = OLD.targetedSequencingId)))//
 
 DELIMITER ;
--- EndNoTest

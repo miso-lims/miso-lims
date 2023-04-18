@@ -18,13 +18,10 @@ ALTER TABLE LibraryAdditionalInfo ADD CONSTRAINT `FK_lai_libraryDesignCode_libra
 ALTER TABLE LibraryDesign ADD COLUMN `libraryDesignCodeId` bigint;
 ALTER TABLE LibraryDesign ADD CONSTRAINT `FK_ld_libraryDesignCode_libraryDesignCodeId` FOREIGN KEY (`libraryDesignCodeId`) REFERENCES `LibraryDesignCode` (`libraryDesignCodeId`);
 
--- StartNoTest
 ALTER TABLE LibraryDesign DROP INDEX `uk_libraryDesign_name`;
 ALTER TABLE LibraryDesign ADD CONSTRAINT `uk_libraryDesign_name_sampleClass` UNIQUE (`name`, `sampleClassId`); 
--- EndNoTest
 
 -- fill in the libraryDesignCode values before making the column non-null
--- StartNoTest
 DELIMITER //
 CREATE PROCEDURE update_libraryDesignCode ()
 BEGIN
@@ -54,7 +51,6 @@ END//
 DELIMITER ;
 CALL update_libraryDesignCode();
 DROP PROCEDURE IF EXISTS update_libraryDesignCode;
--- EndNoTest
 
 ALTER TABLE LibraryAdditionalInfo MODIFY COLUMN `libraryDesignCodeId` bigint NOT NULL;
 ALTER TABLE LibraryDesign MODIFY COLUMN `libraryDesignCodeId` bigint NOT NULL;

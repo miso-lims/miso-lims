@@ -1,7 +1,5 @@
 -- nonUniqueIndices
 
---StartNoTest
-
 ALTER TABLE Indices DROP FOREIGN KEY Indices_ibfk_1;
 
 set @var=if((SELECT true FROM information_schema.TABLE_CONSTRAINTS WHERE
@@ -16,8 +14,6 @@ execute stmt;
 deallocate prepare stmt;
 
 ALTER TABLE Indices ADD CONSTRAINT `Indices_ibfk_1` FOREIGN KEY (`indexFamilyId`) REFERENCES `IndexFamily` (`indexFamilyId`);
-
--- EndNoTest
 
 
 -- Edit_Library_creationDate

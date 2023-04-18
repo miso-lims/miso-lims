@@ -1,4 +1,3 @@
--- StartNoTest
 DELIMITER //
 
 DROP TRIGGER IF EXISTS ArrayRunInsert//
@@ -59,4 +58,3 @@ FOR EACH ROW
 END//
 
 DELIMITER ;
--- EndNoTest

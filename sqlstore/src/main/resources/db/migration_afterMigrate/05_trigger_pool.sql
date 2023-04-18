@@ -1,4 +1,3 @@
--- StartNoTest
 DELIMITER //
 
 DROP TRIGGER IF EXISTS PoolChange//
@@ -52,4 +51,3 @@ FOR EACH ROW
     NEW.lastModified)//
 
 DELIMITER ;
--- EndNoTest

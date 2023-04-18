@@ -44,8 +44,6 @@ ALTER TABLE SampleTissue ADD COLUMN timesReceived int;
 ALTER TABLE SampleTissue ADD COLUMN tissueMaterialId bigint;
 ALTER TABLE SampleTissue ADD CONSTRAINT `FK_st_tm_tissueMaterialId` FOREIGN KEY (`tissueMaterialId`) REFERENCES `TissueMaterial` (`tissueMaterialId`);
 
--- StartNoTest
--- H2 can't cope with a JOIN in an UPDATE
 UPDATE SampleTissue JOIN SampleAdditionalInfo ON SampleTissue.sampleId = SampleAdditionalInfo.sampleId SET
   SampleTissue.tissueOriginId = SampleAdditionalInfo.tissueOriginId,
   SampleTissue.tissueTypeId = SampleAdditionalInfo.tissueTypeId,
@@ -54,7 +52,6 @@ UPDATE SampleTissue JOIN SampleAdditionalInfo ON SampleTissue.sampleId = SampleA
   SampleTissue.passageNumber = SampleAdditionalInfo.passageNumber,
   SampleTissue.tubeNumber = SampleAdditionalInfo.tubeNumber,
   SampleTissue.timesReceived = SampleAdditionalInfo.timesReceived;
--- EndNoTest
 
 DROP TABLE IF EXISTS SampleStock;
 DROP TABLE IF EXISTS SampleAliquot;
@@ -87,12 +84,10 @@ DROP TABLE SampleAnalyte;
 DELETE FROM SampleClass WHERE sampleCategory = 'Analyte';
 ALTER TABLE SampleClass DROP COLUMN isStock;
 
--- StartNoTest
 DELETE svr FROM SampleValidRelationship svr
 JOIN SampleClass parent ON parent.sampleClassId = svr.parentId
 JOIN SampleClass child ON child.sampleClassId = svr.childId
 WHERE parent.sampleCategory = 'Identity' AND child.sampleCategory <> 'Tissue';
--- EndNoTest
 
 -- tissueOrigin fkey
 ALTER TABLE SampleAdditionalInfo DROP FOREIGN KEY FK24aduvv5cljo3ggnt0s2cs1w3;

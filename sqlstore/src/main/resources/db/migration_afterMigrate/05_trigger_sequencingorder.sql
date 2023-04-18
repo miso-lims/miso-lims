@@ -1,4 +1,3 @@
--- StartNoTest
 DELIMITER //
 
 DROP TRIGGER IF EXISTS SequencingOrderInsert//
@@ -49,4 +48,3 @@ FOR EACH ROW
   END//
 
 DELIMITER ;
--- EndNoTest

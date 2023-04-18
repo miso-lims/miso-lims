@@ -110,10 +110,7 @@ INSERT INTO PoolChangeLog(poolId, userId, message) SELECT
 DROP TABLE Pool_Elements;
 
 ALTER TABLE SequencerReference ADD COLUMN ip VARCHAR(50) NOT NULL DEFAULT 'localhost';
--- H2 doesn't have INET_NTOA function
--- StartNoTest
 UPDATE SequencerReference SET ip = INET_NTOA(ipAddress);
--- EndNoTest
 ALTER TABLE SequencerReference DROP COLUMN available;
 ALTER TABLE SequencerReference DROP COLUMN ipAddress;
 ALTER TABLE SequencerReference ADD CONSTRAINT upgraded_SR_UK UNIQUE (upgradedSequencerReferenceId);
@@ -148,7 +145,6 @@ ALTER TABLE Run ADD CONSTRAINT fk_run_lastModifier_user FOREIGN KEY (lastModifie
 ALTER TABLE Run ADD CONSTRAINT fk_run_sequencingParameters FOREIGN KEY (sequencingParameters_parametersId) REFERENCES SequencingParameters (parametersId);
 
 ALTER TABLE RunQC_Partition ADD COLUMN partition_partitionId bigint NOT NULL;
--- StartNoTest
 ALTER TABLE RunQC_Partition CHANGE COLUMN partition_partitionId partition_partitionId bigint;
 
 UPDATE RunQC_Partition rqp SET partition_partitionId = (
@@ -158,7 +154,6 @@ UPDATE RunQC_Partition rqp SET partition_partitionId = (
   AND p.partitionNumber = rqp.partitionNumber
 );
 ALTER TABLE RunQC_Partition CHANGE COLUMN partition_partitionId partition_partitionId bigint NOT NULL;
--- EndNoTest
 ALTER TABLE RunQC_Partition DROP PRIMARY KEY;
 ALTER TABLE RunQC_Partition ADD PRIMARY KEY(`runQc_runQcId`, `partition_partitionId`);
 ALTER TABLE RunQC_Partition ADD CONSTRAINT RunQCPartition_Partition_FK FOREIGN KEY (partition_partitionId) REFERENCES `_Partition` (partitionId);
@@ -200,7 +195,6 @@ CREATE TABLE Run_Watcher (
   CONSTRAINT fk_runWatcher_user FOREIGN KEY (userId) REFERENCES User (userId) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- StartNoTest
 INSERT INTO Project_Watcher(projectId, userId)
 SELECT p.projectId, u.userId
 FROM Watcher w
@@ -224,7 +218,6 @@ SELECT r.runId, u.userId
 FROM Watcher w
 JOIN Run r ON r.name = w.entityName
 JOIN User u ON u.userId = w.userId;
--- EndNoTest
 
 DROP TABLE Watcher;
 
@@ -277,13 +270,11 @@ CREATE TABLE NewBoxChangeLog (
   CONSTRAINT fk_boxChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
 ) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- StartNoTest
 INSERT INTO NewBoxChangeLog(boxId, columnsChanged, userId, message, changeTime)
 SELECT boxId, columnsChanged, userId, message, changeTime FROM BoxChangeLog
 WHERE EXISTS (
     SELECT * FROM Box WHERE Box.boxId = BoxChangeLog.boxId
 );
--- EndNoTest
 
 DROP TABLE BoxChangeLog;
 ALTER TABLE NewBoxChangeLog RENAME TO BoxChangeLog;
@@ -300,13 +291,11 @@ CREATE TABLE NewExperimentChangeLog (
   CONSTRAINT fk_experimentChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
 ) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- StartNoTest
 INSERT INTO NewExperimentChangeLog(experimentId, columnsChanged, userId, message, changeTime)
 SELECT experimentId, columnsChanged, userId, message, changeTime FROM ExperimentChangeLog
 WHERE EXISTS (
     SELECT * FROM Experiment WHERE Experiment.experimentId = ExperimentChangeLog.experimentId
 );
--- EndNoTest
 
 DROP TABLE ExperimentChangeLog;
 ALTER TABLE NewExperimentChangeLog RENAME TO ExperimentChangeLog;
@@ -323,13 +312,11 @@ CREATE TABLE NewKitDescriptorChangeLog (
   CONSTRAINT fk_kitDescriptorChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
 ) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- StartNoTest
 INSERT INTO NewKitDescriptorChangeLog(kitDescriptorId, columnsChanged, userId, message, changeTime)
 SELECT kitDescriptorId, columnsChanged, userId, message, changeTime FROM KitDescriptorChangeLog
 WHERE EXISTS (
     SELECT * FROM KitDescriptor WHERE KitDescriptor.kitDescriptorId = KitDescriptorChangeLog.kitDescriptorId
 );
--- EndNoTest
 
 DROP TABLE KitDescriptorChangeLog;
 ALTER TABLE NewKitDescriptorChangeLog RENAME TO KitDescriptorChangeLog;
@@ -346,13 +333,11 @@ CREATE TABLE NewLibraryChangeLog (
   CONSTRAINT fk_libraryChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
 ) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- StartNoTest
 INSERT INTO NewLibraryChangeLog(libraryId, columnsChanged, userId, message, changeTime)
 SELECT libraryId, columnsChanged, userId, message, changeTime FROM LibraryChangeLog
 WHERE EXISTS (
     SELECT * FROM Library WHERE Library.libraryId = LibraryChangeLog.libraryId
 );
--- EndNoTest
 
 DROP TABLE LibraryChangeLog;
 ALTER TABLE NewLibraryChangeLog RENAME TO LibraryChangeLog;
@@ -369,13 +354,11 @@ CREATE TABLE NewPoolChangeLog (
   CONSTRAINT fk_poolChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
 ) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- StartNoTest
 INSERT INTO NewPoolChangeLog(poolId, columnsChanged, userId, message, changeTime)
 SELECT poolId, columnsChanged, userId, message, changeTime FROM PoolChangeLog
 WHERE EXISTS (
     SELECT * FROM Pool WHERE Pool.poolId = PoolChangeLog.poolId
 );
--- EndNoTest
 
 DROP TABLE PoolChangeLog;
 ALTER TABLE NewPoolChangeLog RENAME TO PoolChangeLog;
@@ -392,13 +375,11 @@ CREATE TABLE NewRunChangeLog (
   CONSTRAINT fk_runChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
 ) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- StartNoTest
 INSERT INTO NewRunChangeLog(runId, columnsChanged, userId, message, changeTime)
 SELECT runId, columnsChanged, userId, message, changeTime FROM RunChangeLog
 WHERE EXISTS (
     SELECT * FROM Run WHERE Run.runId = RunChangeLog.runId
 );
--- EndNoTest
 
 DROP TABLE RunChangeLog;
 ALTER TABLE NewRunChangeLog RENAME TO RunChangeLog;
@@ -415,13 +396,11 @@ CREATE TABLE NewSampleChangeLog (
   CONSTRAINT fk_sampleChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
 ) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- StartNoTest
 INSERT INTO NewSampleChangeLog(sampleId, columnsChanged, userId, message, changeTime)
 SELECT sampleId, columnsChanged, userId, message, changeTime FROM SampleChangeLog
 WHERE EXISTS (
     SELECT * FROM Sample WHERE Sample.sampleId = SampleChangeLog.sampleId
 );
--- EndNoTest
 
 DROP TABLE SampleChangeLog;
 ALTER TABLE NewSampleChangeLog RENAME TO SampleChangeLog;
@@ -438,13 +417,11 @@ CREATE TABLE NewSequencerPartitionContainerChangeLog (
   CONSTRAINT fk_containerChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
 ) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- StartNoTest
 INSERT INTO NewSequencerPartitionContainerChangeLog(containerId, columnsChanged, userId, message, changeTime)
 SELECT containerId, columnsChanged, userId, message, changeTime FROM SequencerPartitionContainerChangeLog
 WHERE EXISTS (
     SELECT * FROM SequencerPartitionContainer WHERE SequencerPartitionContainer.containerId = SequencerPartitionContainerChangeLog.containerId
 );
--- EndNoTest
 
 DROP TABLE SequencerPartitionContainerChangeLog;
 ALTER TABLE NewSequencerPartitionContainerChangeLog RENAME TO SequencerPartitionContainerChangeLog;
@@ -461,13 +438,11 @@ CREATE TABLE NewStudyChangeLog (
   CONSTRAINT fk_studyChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
 ) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- StartNoTest
 INSERT INTO NewStudyChangeLog(studyId, columnsChanged, userId, message, changeTime)
 SELECT studyId, columnsChanged, userId, message, changeTime FROM StudyChangeLog
 WHERE EXISTS (
     SELECT * FROM Study WHERE Study.studyId = StudyChangeLog.studyId
 );
--- EndNoTest
 
 DROP TABLE StudyChangeLog;
 ALTER TABLE NewStudyChangeLog RENAME TO StudyChangeLog;

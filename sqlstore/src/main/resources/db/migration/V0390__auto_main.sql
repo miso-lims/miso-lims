@@ -52,7 +52,6 @@ CREATE TABLE ContainerQC (
 
 ALTER TABLE Indices MODIFY COLUMN sequence VARCHAR(24);
 
--- StartNoTest
 INSERT INTO QCType(name, description, qcTarget, units, precisionAfterDecimal)
 VALUES ('Pore Count', 'Number of pores', 'Container', 'pores', 0);
 
@@ -117,12 +116,9 @@ SELECT
 FROM SequencerPartitionContainer spc
 JOIN Platform p ON p.platformId = spc.platform
 WHERE p.name = 'OXFORDNANOPORE';
--- EndNoTest
 
 
 -- dnase
-
--- StartNoTest
 SELECT qcTypeId INTO @dnaseQc FROM QCType WHERE name = 'DNAse Treated';
 
 UPDATE SampleStock ss
@@ -142,10 +138,7 @@ AND sample_sampleId IN (
   JOIN SampleClass sc ON sc.sampleClassId = ds.sampleClassId
   WHERE sc.dnaseTreatable = 1
 );
--- EndNoTest
 
 -- DNAse treated should only be set on dnaseTreatable Stocks. These cases have been fixed automatically.
 -- Next line will fail and require manual fixing for other (unexpected) cases.
 DELETE FROM QCType WHERE name = 'DNAse Treated';
-
-

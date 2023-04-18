@@ -91,9 +91,7 @@ DROP TRIGGER IF EXISTS LibraryDilutionInsert;
 DROP VIEW IF EXISTS DilutionBoxableView;
 DROP VIEW IF EXISTS DilutionBoxPosition;
 
--- StartNoTest
 DROP PROCEDURE IF EXISTS deleteDilution;
 
 UPDATE BoxPosition SET targetType = 'LIBRARY_ALIQUOT' WHERE targetType = 'DILUTION';
--- EndNoTest
 

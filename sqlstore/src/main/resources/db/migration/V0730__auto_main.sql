@@ -48,10 +48,6 @@ ALTER TABLE Experiment CHANGE COLUMN platform_platformId instrumentModelId bigin
 ALTER TABLE Experiment ADD CONSTRAINT fk_experiment_instrumentModel FOREIGN KEY (instrumentModelId)
   REFERENCES InstrumentModel (instrumentModelId);
 
--- StartNoTest
 DROP FUNCTION IF EXISTS toIpAddressBlob;
 DROP FUNCTION IF EXISTS toHexString;
 DROP PROCEDURE IF EXISTS addPlatform;
--- EndNoTest
-
-

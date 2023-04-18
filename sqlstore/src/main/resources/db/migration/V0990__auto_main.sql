@@ -2,9 +2,7 @@
 ALTER TABLE Sample ADD COLUMN requisitionId varchar(50);
 
 -- qcs
--- StartNoTest
 ALTER TABLE QCType DROP INDEX uk_qcType_byTarget;
--- EndNoTest
 
 
 CREATE TABLE QcControl (

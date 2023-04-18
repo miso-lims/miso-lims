@@ -17,7 +17,6 @@ ALTER TABLE ServiceRecord ADD CONSTRAINT fk_serviceRecord_position FOREIGN KEY (
 ALTER TABLE Run_SequencerPartitionContainer ADD COLUMN positionId bigint;
 ALTER TABLE Run_SequencerPartitionContainer ADD CONSTRAINT fk_run_container_position FOREIGN KEY (positionId) REFERENCES PlatformPosition (positionId);
 
--- StartNoTest
 -- Add positions for Illumina HiSeq and NovaSeq
 INSERT INTO PlatformPosition (platformId, alias)
 SELECT platformId, 'A' FROM Platform WHERE instrumentModel LIKE 'Illumina HiSeq%' OR instrumentModel LIKE 'Illumina NovaSeq%';
@@ -101,7 +100,6 @@ SET rspc.positionId = (
 )
 WHERE (p.instrumentModel LIKE 'Illumina HiSeq%' OR p.instrumentModel LIKE 'Illumina NovaSeq%')
 AND alias REGEXP '^[0-9]{6}_.*_[0-9]{4}_B.*$';
--- EndNoTest
 
 
 -- loading_concentration

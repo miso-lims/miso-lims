@@ -32,11 +32,9 @@ DROP TABLE `BoxSize_old`;
 ALTER TABLE LibraryAliquot ADD COLUMN alias varchar(100);
 ALTER TABLE LibraryAliquot ADD COLUMN dnaSize bigint;
 
--- StartNoTest
 UPDATE LibraryAliquot ali
 JOIN Library lib ON lib.libraryId = ali.libraryId
 SET ali.alias = lib.alias, ali.dnaSize = lib.dnaSize;
--- EndNoTest
 
 ALTER TABLE LibraryAliquot MODIFY COLUMN alias varchar(100) NOT NULL;
 

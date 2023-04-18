@@ -1,4 +1,3 @@
--- StartNoTest
 DELIMITER //
 
 DROP TRIGGER IF EXISTS StudyChange//
@@ -37,4 +36,3 @@ FOR EACH ROW
     'Study created.')//
 
 DELIMITER ;
--- EndNoTest

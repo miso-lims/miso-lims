@@ -1,4 +1,3 @@
--- StartNoTest
 DELIMITER //
 
 DROP TRIGGER IF EXISTS ArrayInsert//
@@ -39,4 +38,3 @@ FOR EACH ROW
   FROM Array a WHERE a.arrayId = NEW.arrayId//
 
 DELIMITER ;
--- EndNoTest

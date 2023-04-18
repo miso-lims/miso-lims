@@ -1,4 +1,3 @@
--- StartNoTest
 DELIMITER //
 
 DROP TRIGGER IF EXISTS LibraryQCInsert//
@@ -35,4 +34,3 @@ FOR EACH ROW
   END//
 
 DELIMITER;
--- EndNoTest

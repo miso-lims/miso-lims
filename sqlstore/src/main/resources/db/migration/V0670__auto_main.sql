@@ -71,7 +71,6 @@ ALTER TABLE Library ADD COLUMN spikeInVolume DECIMAL(14,10);
 
 -- ont_container_models
 
--- StartNoTest
 INSERT INTO SequencingContainerModel(alias, partitionCount, platformType)
 SELECT alias, 1, 'OXFORDNANOPORE' FROM FlowCellVersion;
 
@@ -92,7 +91,6 @@ SET spc.sequencingContainerModelId = COALESCE(
   (SELECT sequencingContainerModelId FROM SequencingContainerModel WHERE alias = fcv.alias AND platformType = 'OXFORDNANOPORE'),
   spc.sequencingContainerModelId
 );
--- EndNoTest
 
 ALTER TABLE OxfordNanoporeContainer DROP FOREIGN KEY FK_OxfordNanoporeContainer_FlowCellVersion;
 ALTER TABLE OxfordNanoporeContainer DROP COLUMN flowCellVersionId;

@@ -1,6 +1,4 @@
--- StartNoTest
 ALTER TABLE SequencerReference ENGINE=InnoDB;
--- EndNoTest
 ALTER TABLE SequencerReference ADD COLUMN serialNumber varchar(30);
 ALTER TABLE SequencerReference ADD COLUMN dateCommissioned date DEFAULT NULL;
 ALTER TABLE SequencerReference ADD COLUMN dateDecommissioned date DEFAULT NULL;
