@@ -30,6 +30,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -39,6 +40,7 @@ import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.persistence.SecurityStore;
 
 /**
@@ -140,5 +142,15 @@ public class HibernateSecurityDao implements SecurityStore {
 
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
+  }
+
+  @Override
+  public long getUsageByTransfers(Group group) throws IOException {
+    return (long) currentSession().createCriteria(Transfer.class)
+    .add(Restrictions.or(
+      Restrictions.eq("senderGroup", group), Restrictions.eq("recipientGroup", group)))
+      .setProjection(Projections.rowCount())
+      .uniqueResult();
+      
   }
 }

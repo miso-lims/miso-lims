@@ -8,22 +8,24 @@ import com.eaglegenomics.simlims.core.User;
 
 public interface SecurityStore {
 
-  public long saveUser(User user) throws IOException;
+  long saveUser(User user) throws IOException;
 
-  public User getUserById(Long userId) throws IOException;
+  User getUserById(Long userId) throws IOException;
 
-  public User getUserByLoginName(String loginName) throws IOException;
+  User getUserByLoginName(String loginName) throws IOException;
 
-  public List<User> listUsersBySearch(String search) throws IOException;
+  List<User> listUsersBySearch(String search) throws IOException;
 
-  public long saveGroup(Group group) throws IOException;
+  long saveGroup(Group group) throws IOException;
 
-  public Group getGroupById(Long groupId) throws IOException;
+  Group getGroupById(Long groupId) throws IOException;
 
-  public Group getGroupByName(String loginName) throws IOException;
+  Group getGroupByName(String loginName) throws IOException;
 
-  public List<User> listAllUsers() throws IOException;
+  List<User> listAllUsers() throws IOException;
 
-  public List<Group> listAllGroups() throws IOException;
-  
+  List<Group> listAllGroups() throws IOException;
+
+  long getUsageByTransfers(Group group) throws IOException;
+
 }

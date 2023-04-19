@@ -15,6 +15,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.SecurityStore;
 
 @Transactional(rollbackFor = Exception.class)
@@ -96,6 +97,10 @@ public class DefaultGroupService implements GroupService {
     ValidationResult result = new ValidationResult();
     if (object.isBuiltIn()) {
       result.addError(new ValidationError("This group is built-in and required for MISO functionality"));
+    }
+    long usage = securityStore.getUsageByTransfers(object);
+    if (usage > 0L) {
+      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.transfers(usage)));
     }
     return result;
   }
