@@ -59,7 +59,8 @@ public class DefaultGroupService implements GroupService {
   }
 
   private void validateChange(Group group, Group beforeChange) throws IOException {
-    if (ValidationUtils.isSetAndChanged(Group::getName, group, beforeChange) && securityStore.getGroupByName(group.getName()) != null) {
+    if (ValidationUtils.isSetAndChanged(Group::getName, group, beforeChange)
+        && securityStore.getGroupByName(group.getName()) != null) {
       throw new ValidationException(new ValidationError("name", "There is already a group with this name"));
     }
   }

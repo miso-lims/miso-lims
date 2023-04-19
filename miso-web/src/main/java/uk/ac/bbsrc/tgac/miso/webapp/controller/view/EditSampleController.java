@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.getParentRequisition;
@@ -180,7 +157,8 @@ public class EditSampleController {
   @GetMapping(value = "/{sampleId}")
   public ModelAndView setupForm(@PathVariable Long sampleId, ModelMap model) throws IOException {
     Sample sample = sampleService.get(sampleId);
-    if (sample == null) throw new NotFoundException("No sample found for ID " + sampleId.toString());
+    if (sample == null)
+      throw new NotFoundException("No sample found for ID " + sampleId.toString());
 
     model.put("title", "Sample " + sampleId);
 
@@ -190,15 +168,17 @@ public class EditSampleController {
     model.put("sampleCategory",
         LimsUtils.isDetailedSample(sample) ? ((DetailedSample) sample).getSampleClass().getSampleCategory() : "plain");
     List<LibraryDto> libraries = sample.isSaved()
-        ? libraryService.listBySampleId(sample.getId()).stream().map(lib -> Dtos.asDto(lib, false)).collect(Collectors.toList())
+        ? libraryService.listBySampleId(sample.getId()).stream().map(lib -> Dtos.asDto(lib, false))
+            .collect(Collectors.toList())
         : Collections.emptyList();
     model.put("sampleLibraries", libraries);
     Set<Pool> pools = libraries.stream()
         .flatMap(WhineyFunction.flatRethrow(library -> poolService.listByLibraryId(library.getId())))
         .distinct().collect(Collectors.toSet());
-    List<RunDto> runDtos = pools.stream().flatMap(WhineyFunction.flatRethrow(pool -> runService.listByPoolId(pool.getId())))
-        .map(Dtos::asDto)
-        .collect(Collectors.toList());
+    List<RunDto> runDtos =
+        pools.stream().flatMap(WhineyFunction.flatRethrow(pool -> runService.listByPoolId(pool.getId())))
+            .map(Dtos::asDto)
+            .collect(Collectors.toList());
     model.put("samplePools",
         pools.stream().map(p -> Dtos.asDto(p, false, false, indexChecker)).collect(Collectors.toList()));
     model.put("sampleRuns", runDtos);
@@ -217,7 +197,8 @@ public class EditSampleController {
     ObjectNode formConfig = mapper.createObjectNode();
     formConfig.put("detailedSample", isDetailedSampleEnabled());
     MisoWebUtils.addJsonArray(mapper, formConfig, "projects", projectService.list(), Dtos::asDto);
-    MisoWebUtils.addJsonArray(mapper, formConfig, Config.SOPS, sopService.listByCategory(SopCategory.SAMPLE), Dtos::asDto);
+    MisoWebUtils.addJsonArray(mapper, formConfig, Config.SOPS, sopService.listByCategory(SopCategory.SAMPLE),
+        Dtos::asDto);
     model.put("formConfig", mapper.writeValueAsString(formConfig));
 
     return new ModelAndView("/WEB-INF/pages/editSample.jsp", model);
@@ -280,8 +261,8 @@ public class EditSampleController {
   }
 
   /**
-   * Used to edit samples with ids from given {sampleIds}.
-   * Sends Dtos objects which will then be used for editing in grid.
+   * Used to edit samples with ids from given {sampleIds}. Sends Dtos objects which will then be used
+   * for editing in grid.
    */
   @PostMapping(value = "/bulk/edit")
   public ModelAndView editBulkSamples(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
@@ -315,7 +296,8 @@ public class EditSampleController {
   /**
    * Used to create new samples.
    * <ul>
-   * <li>Detailed Sample: create new samples of a given sample class. Root identities will be found or created.</li>
+   * <li>Detailed Sample: create new samples of a given sample class. Root identities will be found or
+   * created.</li>
    * <li>Plain Sample: create new samples.</li>
    * </ul>
    * Sends Dtos objects which will then be used for editing in grid.
@@ -327,7 +309,8 @@ public class EditSampleController {
     Long projectId = getLongInput("projectId", form, false);
     Long boxId = getLongInput("boxId", form, false);
 
-    if (quantity == null || quantity <= 0) throw new RestException("Must specify quantity of samples to create", Status.BAD_REQUEST);
+    if (quantity == null || quantity <= 0)
+      throw new RestException("Must specify quantity of samples to create", Status.BAD_REQUEST);
 
     final SampleDto template;
 
@@ -359,25 +342,26 @@ public class EditSampleController {
   private void confirmClassesExist(String targetCategory) throws IOException {
     List<SampleClass> categoryClasses = sampleClassService.listByCategory(targetCategory);
     if (categoryClasses.isEmpty()) {
-      throw new RestException(String.format("No classes available for category '%s'", targetCategory), Status.BAD_REQUEST);
+      throw new RestException(String.format("No classes available for category '%s'", targetCategory),
+          Status.BAD_REQUEST);
     }
   }
 
   private static DetailedSampleDto getCorrectDetailedSampleDto(String sampleCategory) {
     // need to instantiate the correct DetailedSampleDto class to get the correct fields
     switch (sampleCategory) {
-    case SampleIdentity.CATEGORY_NAME:
-      return new SampleIdentityDto();
-    case SampleTissue.CATEGORY_NAME:
-      return new SampleTissueDto();
-    case SampleTissueProcessing.CATEGORY_NAME:
-      return new SampleTissueProcessingDto();
-    case SampleStock.CATEGORY_NAME:
-      return new SampleStockDto();
-    case SampleAliquot.CATEGORY_NAME:
-      return new SampleAliquotDto();
-    default:
-      throw new RestException("Unknown sample category : " + sampleCategory, Status.BAD_REQUEST);
+      case SampleIdentity.CATEGORY_NAME:
+        return new SampleIdentityDto();
+      case SampleTissue.CATEGORY_NAME:
+        return new SampleTissueDto();
+      case SampleTissueProcessing.CATEGORY_NAME:
+        return new SampleTissueProcessingDto();
+      case SampleStock.CATEGORY_NAME:
+        return new SampleStockDto();
+      case SampleAliquot.CATEGORY_NAME:
+        return new SampleAliquotDto();
+      default:
+        throw new RestException("Unknown sample category : " + sampleCategory, Status.BAD_REQUEST);
     }
   }
 
@@ -451,7 +435,8 @@ public class EditSampleController {
         dto.setParentAlias(sample.getAlias());
         if (sample.getBox() != null) {
           dto.setParentBoxPosition(sample.getBoxPosition());
-          dto.setParentBoxPositionLabel(BoxUtils.makeBoxPositionLabel(sample.getBox().getAlias(), sample.getBoxPosition()));
+          dto.setParentBoxPositionLabel(
+              BoxUtils.makeBoxPositionLabel(sample.getBox().getAlias(), sample.getBoxPosition()));
         }
         dto.setParentSampleClassId(sample.getSampleClass().getId());
         dto.setProjectId(sample.getProject().getId());
@@ -519,7 +504,8 @@ public class EditSampleController {
     private final BoxDto box;
     private final Set<Group> recipientGroups;
 
-    public BulkCreateSampleBackend(Class<? extends SampleDto> dtoClass, SampleDto dto, Integer quantity, Project project,
+    public BulkCreateSampleBackend(Class<? extends SampleDto> dtoClass, SampleDto dto, Integer quantity,
+        Project project,
         String targetCategory, Set<Group> recipientGroups, ObjectMapper mapper) {
       super("sample", dtoClass, "Samples", dto, quantity, mapper);
       this.targetCategory = targetCategory;
