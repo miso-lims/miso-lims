@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
@@ -69,7 +46,8 @@ public class HibernateSecurityDao implements SecurityStore {
 
   @Override
   public Group getGroupByName(String groupName) throws IOException {
-    if (groupName == null) throw new NullPointerException("Can not get by null group name");
+    if (groupName == null)
+      throw new NullPointerException("Can not get by null group name");
     Criteria criteria = currentSession().createCriteria(Group.class);
     criteria.add(Restrictions.eq("name", groupName));
     return (Group) criteria.uniqueResult();
@@ -111,7 +89,8 @@ public class HibernateSecurityDao implements SecurityStore {
   public List<User> listUsersBySearch(String search) throws IOException {
     @SuppressWarnings("unchecked")
     List<User> results = currentSession().createCriteria(UserImpl.class)
-        .add(Restrictions.or(Restrictions.ilike("fullName", search, MatchMode.ANYWHERE), Restrictions.ilike("loginName", search)))
+        .add(Restrictions.or(Restrictions.ilike("fullName", search, MatchMode.ANYWHERE),
+            Restrictions.ilike("loginName", search)))
         .list();
     return results;
   }
@@ -147,10 +126,10 @@ public class HibernateSecurityDao implements SecurityStore {
   @Override
   public long getUsageByTransfers(Group group) throws IOException {
     return (long) currentSession().createCriteria(Transfer.class)
-    .add(Restrictions.or(
-      Restrictions.eq("senderGroup", group), Restrictions.eq("recipientGroup", group)))
-      .setProjection(Projections.rowCount())
-      .uniqueResult();
-      
+        .add(Restrictions.or(
+            Restrictions.eq("senderGroup", group), Restrictions.eq("recipientGroup", group)))
+        .setProjection(Projections.rowCount())
+        .uniqueResult();
+
   }
 }
