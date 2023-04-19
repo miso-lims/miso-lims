@@ -56,10 +56,9 @@ COPY --from=builder /miso-lims/sqlstore/target/classes/db/migration/*.sql /flywa
 COPY --from=builder /miso-lims/sqlstore/target/sqlstore*.jar /flyway/jars/
 COPY ./.docker/run-flyway /
 
-ENV MISO_DB_USER tgaclims
 ENV MISO_DB lims
 ENV MISO_DB_HOST_PORT db:3306
-ENV MISO_DB_PASS_FILE /run/secrets/lims_password
+ENV MISO_DB_ROOT_PASS_FILE /run/secrets/root_password
 ENV MISO_FILES_DIR /storage/miso/files/
 
 ENTRYPOINT ["/run-flyway"]

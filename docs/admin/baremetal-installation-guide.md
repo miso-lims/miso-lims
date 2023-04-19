@@ -17,7 +17,7 @@ Application Server:
 
 Database Server:
 
-* MySQL 5.7.7 or MariaDB 10.2.3
+* MySQL 8.0
 * [Flyway 5.2.4](https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/5.2.4/) (newer versions may cause issues)
 
 *Important Note*: MISO requires SSL (HTTPS) to function correctly over a
@@ -38,7 +38,7 @@ Use the GitHub interface to download the following files for the
 
 ## Setting Up the Database Server
 
-The database server needs to have [MySQL 5.7](https://www.mysql.com/). The tool
+The database server needs to have [MySQL 8.0](https://www.mysql.com/). The tool
 [Flyway](https://flywaydb.org/) must also be present to migrate the database as
 the application is developed, but it can be installed on a different server so
 long as it can access the database server.
@@ -53,7 +53,7 @@ default-time-zone='+00:00'
 ```
 
 You could use a named timezone instead if you've populated the timezone tables.
-See the [MySQL docs](https://dev.mysql.com/doc/refman/5.7/en/time-zone-support.html)
+See the [MySQL docs](https://dev.mysql.com/doc/refman/8.0/en/time-zone-support.html)
 for more information.
 
 The default password in the following `IDENTIFIED BY` clauses should be
@@ -102,7 +102,7 @@ and populate it with the following information:
       testOnBorrow="true"
       testOnReturn="true"
       validationQuery="select 1"
-      url="jdbc:mysql://localhost:3306/lims?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useLegacyDatetimeCode=false"
+      url="jdbc:mysql://localhost:3306/lims?autoReconnect=true&amp;characterEncoding=UTF-8&amp;allowPublicKeyRetrieval=true&amp;sslMode=DISABLED"
       username="tgaclims"
       password="tgaclims"/>
       <Parameter name="miso.propertiesFile" value="file:${catalina.home}/conf/Catalina/localhost/miso.properties" override="false"/>
@@ -111,8 +111,6 @@ and populate it with the following information:
 Make sure the database path in `ROOT.xml` is correct for your install:
 
     url="jdbc:mysql://your.database.server:3306/dbname"
-
-If you use MariaDB instead of MySQL, replace 'mysql' with 'mariadb' in the URL.
 
 Extract the `setup_files.tar.gz` file and copy `miso.properties` to
 `$CATALINA_HOME/conf/Catalina/localhost/miso.properties`. This file contains site-specific configuration that you should
@@ -228,11 +226,11 @@ path should be used for `MISO_FILES_DIR` as is set for `miso.fileStorageDirector
     cp ${SQLSTORE.JAR} jars
     ./flyway -user=$MISO_DB_USER -password=$MISO_DB_PASS -url=$MISO_DB_URL -outOfOrder=true -locations=classpath:db/migration,classpath:uk.ac.bbsrc.tgac.miso.db.migration migrate -placeholders.filesDir=${MISO_FILES_DIR}
 
-`$DB_URL` should be in the same format as in the `ROOT.xml`, except replacing `&amp;` with just `&`
-and replacing `zeroDateTimeBehavior=convertToNull` with `zeroDateTimeBehavior=CONVERT_TO_NULL`:
+`$MISO_DB_URL` should be in the same format as in the `ROOT.xml`, except replacing `&amp;` with just
+`&`, and adding `&useSSL=false` (redundant, but prevents some warning messages):
 
 ```
-jdbc:mysql://localhost:3306/lims?autoReconnect=true&zeroDateTimeBehavior=CONVERT_TO_NULL&useUnicode=true&characterEncoding=UTF-8&useLegacyDatetimeCode=false
+jdbc:mysql://localhost:3306/lims?autoReconnect=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&sslMode=DISABLED&useSSL=false
 ```
 
 If you run into an issue with migration `V0611`, ensure that the user running Flyway has read and write permissions on
