@@ -8,9 +8,11 @@ ListTarget.group = {
   },
   getQueryUrl: null,
   createBulkActions: function (config, projectId) {
-    return !config.isAdmin
-      ? []
-      : [ListUtils.createBulkDeleteAction("Groups", "groups", Utils.array.getName)];
+    if (config.isAdmin && !config.userId) {
+      return [ListUtils.createBulkDeleteAction("Groups", "groups", Utils.array.getName)];
+    } else {
+      return [];
+    }
   },
   createStaticActions: function (config, projectId) {
     if (config.isAdmin && !config.userId) {
