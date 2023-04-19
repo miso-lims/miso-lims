@@ -23,7 +23,8 @@ import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
-public class HibernateListTransferViewDao implements ListTransferViewDao, HibernatePaginatedDataSource<ListTransferView> {
+public class HibernateListTransferViewDao
+    implements ListTransferViewDao, HibernatePaginatedDataSource<ListTransferView> {
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -65,11 +66,11 @@ public class HibernateListTransferViewDao implements ListTransferViewDao, Hibern
   @Override
   public String propertyForDate(Criteria criteria, DateType type) {
     switch (type) {
-    case CREATE:
-    case RECEIVE:
-      return "transferTime";
-    default:
-      return null;
+      case CREATE:
+      case RECEIVE:
+        return "transferTime";
+      default:
+        return null;
     }
   }
 
@@ -101,25 +102,27 @@ public class HibernateListTransferViewDao implements ListTransferViewDao, Hibern
   }
 
   @Override
-  public void restrictPaginationByRecipientGroups(Criteria criteria, Collection<Group> groups, Consumer<String> errorHandler) {
+  public void restrictPaginationByRecipientGroups(Criteria criteria, Collection<Group> groups,
+      Consumer<String> errorHandler) {
     criteria.add(Restrictions.in("recipientGroup", groups));
   }
 
   @Override
-  public void restrictPaginationByTransferType(Criteria criteria, TransferType transferType, Consumer<String> errorHandler) {
+  public void restrictPaginationByTransferType(Criteria criteria, TransferType transferType,
+      Consumer<String> errorHandler) {
     switch (transferType) {
-    case DISTRIBUTION:
-      criteria.add(Restrictions.isNotNull("recipient"));
-      break;
-    case INTERNAL:
-      criteria.add(Restrictions.isNotNull("senderGroup"))
-          .add(Restrictions.isNotNull("recipientGroup"));
-      break;
-    case RECEIPT:
-      criteria.add(Restrictions.isNotNull("senderLab"));
-      break;
-    default:
-      throw new IllegalArgumentException("Unhandled transfer type: " + transferType);
+      case DISTRIBUTION:
+        criteria.add(Restrictions.isNotNull("recipient"));
+        break;
+      case INTERNAL:
+        criteria.add(Restrictions.isNotNull("senderGroup"))
+            .add(Restrictions.isNotNull("recipientGroup"));
+        break;
+      case RECEIPT:
+        criteria.add(Restrictions.isNotNull("senderLab"));
+        break;
+      default:
+        throw new IllegalArgumentException("Unhandled transfer type: " + transferType);
     }
   }
 
