@@ -7,6 +7,20 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [1.56.0] - 2023-04-20
+
+### Changed
+
+* Ghost samples cannot be added to requisitions (detailed sample)
+* Run-Library Metrics page to display QC libraries with different assays/designs together
+
+### Fixed
+
+* Advanced search by project failed on the Pending Transfers tab
+* Error message when attempting to delete a group that has been used for transfers
+* Delete group action should not be available on the Edit User page
+
+
 ## [1.55.1] - 2023-04-06
 
 ### Fixed
