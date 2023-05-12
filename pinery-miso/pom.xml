@@ -176,7 +176,7 @@
               <removeVolumes>true</removeVolumes>
               <images>
                 <image>
-                  <name>mysql:5.7</name>
+                  <name>mysql:8.0</name>
                   <alias>mysql</alias>
                   <run>
                     <env>
@@ -282,7 +282,7 @@
             <configuration>
               <images>
                 <image>
-                  <name>mysql:5.7</name>
+                  <name>mysql:8.0</name>
                   <alias>mysql</alias>
                   <run>
                     <wait>
