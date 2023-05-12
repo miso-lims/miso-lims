@@ -76,7 +76,7 @@ need to add a grant privilege to the MISO database from your remote machine:
     GRANT ALL ON `lims`.* TO 'tgaclims'@'your.tomcat.install.server' IDENTIFIED BY 'tgaclims';
 
 
-# Setting Up the Application Server
+## Setting Up the Application Server
 
 Download the [Flyway command line tool](https://flywaydb.org/download/community) version 5.2.4 and install it.
 Newer versions of Flyway may cause issues, and are not recommended.
@@ -141,7 +141,7 @@ the `/storage/miso/` directory:
 | `security.properties`     | properties to set the security environment (see below).    |
 | `submission.properties`   | properties to set the submission environment.              |
 
-## Security Environment (updating `/storage/miso/security.properties`)
+### Security Environment (updating `/storage/miso/security.properties`)
 
 MISO can use either LDAP (`ldap`), Active Directory LDAP (`ad`), or JDBC
 (`jdbc`) as an authentication mechanism. This is set by the `-Dsecurity.method`
@@ -177,7 +177,7 @@ If using JDBC, once running, you should change the passwords of the `admin` and
 `notification` accounts.
 
 
-# Setting Up the Run Scanner
+## Setting Up the Run Scanner
 
 [Run Scanner](https://github.com/miso-lims/runscanner) is a webservice that scans the paths containing sequencer output.
 It is not required for a functioning MISO install, but without it, sequencer runs must be added manually.
@@ -192,7 +192,7 @@ different sequencers and add all the URLs to `miso.properties`. If you are addin
 previously-established MISO environment, restart MISO.
 
 
-# Installing and Upgrading
+## Installing and Upgrading
 
 Prior to the installation, ensure that you have followed the instructions in the above and have WAR files for both MISO
 (`ROOT.war`) and, if desired, [Run Scanner](https://github.com/miso-lims/runscanner)(`runscanner-*.war`).
@@ -220,11 +220,12 @@ To install or upgrade, perform the following steps:
 Flyway is used to apply patches to your database to make it compatible with the new MISO version. The same
 path should be used for `MISO_FILES_DIR` as is set for `miso.fileStorageDirectory` in `miso.properties`
 (`/storage/miso/files/` by default). `SQLSTORE.JAR` should be the `sqlstore.jar` file you downloaded.
+The root user must be used.
 
     cd ${FLYWAY}
     rm -f jars/sqlstore-*.jar
     cp ${SQLSTORE.JAR} jars
-    ./flyway -user=$MISO_DB_USER -password=$MISO_DB_PASS -url=$MISO_DB_URL -outOfOrder=true -locations=classpath:db/migration,classpath:uk.ac.bbsrc.tgac.miso.db.migration migrate -placeholders.filesDir=${MISO_FILES_DIR}
+    ./flyway -user=root -password=$MYSQL_ROOT_PASSWORD -url=$MISO_DB_URL -outOfOrder=true -locations=classpath:db/migration,classpath:uk.ac.bbsrc.tgac.miso.db.migration migrate -placeholders.filesDir=${MISO_FILES_DIR}
 
 `$MISO_DB_URL` should be in the same format as in the `ROOT.xml`, except replacing `&amp;` with just
 `&`, and adding `&useSSL=false` (redundant, but prevents some warning messages):
