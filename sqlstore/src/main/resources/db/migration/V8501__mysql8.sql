@@ -1,3 +1,14 @@
+-- Fail fast if not running MySQL 8.0
+DELIMITER //
+CREATE PROCEDURE assertVersion()
+BEGIN
+  IF VERSION() < '8.0' OR VERSION() LIKE '%MariaDB%' THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'MySQL 8.0 required';
+  END IF;
+END//
+DELIMITER ;
+DROP PROCEDURE assertVersion;
+
 -- These tables should have been removed in the V0320 migration
 
 DROP TABLE IF EXISTS RunQC_Partition;
