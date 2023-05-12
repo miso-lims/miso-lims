@@ -15,6 +15,7 @@
     <failOnMissingWebXml>false</failOnMissingWebXml>
     <skipITs>true</skipITs>
     <mysql.db>lims</mysql.db>
+    <mysql.rootpw>abc123</mysql.rootpw>
     <mysql.user>tgaclims</mysql.user>
     <mysql.pw>tgaclims</mysql.pw>
     <db.params>
@@ -231,8 +232,8 @@
             <configuration>
               <url>
                 jdbc:mysql://localhost:${mysql.port}/${mysql.db}?${db.params}</url>
-              <user>${mysql.user}</user>
-              <password>${mysql.pw}</password>
+              <user>root</user>
+              <password>${mysql.rootpw}</password>
               <locations>
                 <location>classpath:uk.ac.bbsrc.tgac.miso.db.migration</location>
                 <location>filesystem:target/test-classes/db/migration</location>
