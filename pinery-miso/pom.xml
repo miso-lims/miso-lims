@@ -17,6 +17,8 @@
     <mysql.db>lims</mysql.db>
     <mysql.user>tgaclims</mysql.user>
     <mysql.pw>tgaclims</mysql.pw>
+    <db.params>
+      autoReconnect=true&amp;characterEncoding=UTF-8&amp;allowPublicKeyRetrieval=true&amp;sslMode=DISABLED</db.params>
     <pinery.version>2.26.0</pinery.version>
     <spring-version>5.3.20</spring-version><!-- must match version used by Pinery -->
   </properties>
@@ -228,7 +230,7 @@
             </executions>
             <configuration>
               <url>
-                jdbc:mysql://localhost:${mysql.port}/${mysql.db}?autoReconnect=true&amp;useSSL=false</url>
+                jdbc:mysql://localhost:${mysql.port}/${mysql.db}?${db.params}</url>
               <user>${mysql.user}</user>
               <password>${mysql.pw}</password>
               <locations>
@@ -256,7 +258,7 @@
               <systemPropertyVariables>
                 <!-- Make URLs available for tests -->
                 <miso.it.mysql.url>
-                  jdbc:mysql://localhost:${mysql.port}/${mysql.db}?autoReconnect=true&amp;useSSL=false</miso.it.mysql.url>
+                  jdbc:mysql://localhost:${mysql.port}/${mysql.db}?${db.params}</miso.it.mysql.url>
                 <miso.it.mysql.user>${mysql.user}</miso.it.mysql.user>
                 <miso.it.mysql.pw>${mysql.pw}</miso.it.mysql.pw>
               </systemPropertyVariables>
