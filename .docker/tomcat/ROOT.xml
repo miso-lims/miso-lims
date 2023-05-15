@@ -13,7 +13,7 @@
     testOnBorrow="true"
     testOnReturn="true"
     validationQuery="select 1"
-    url="jdbc:mysql://${misohostport}/${misodb}?autoReconnect=true&amp;characterEncoding=UTF-8&amp;allowPublicKeyRetrieval=true&amp;sslMode=DISABLED"
+    url="jdbc:mysql://${misohostport}/${misodb}?autoReconnect=true&amp;characterEncoding=UTF-8&amp;allowPublicKeyRetrieval=true&amp;sslMode=DISABLED&amp;connectionTimeZone=SERVER"
     username="${misouser}"
     password="${misopass}" />
   <Parameter name="miso.propertiesFile"

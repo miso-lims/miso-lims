@@ -102,7 +102,7 @@ and populate it with the following information:
       testOnBorrow="true"
       testOnReturn="true"
       validationQuery="select 1"
-      url="jdbc:mysql://localhost:3306/lims?autoReconnect=true&amp;characterEncoding=UTF-8&amp;allowPublicKeyRetrieval=true&amp;sslMode=DISABLED"
+      url="jdbc:mysql://localhost:3306/lims?autoReconnect=true&amp;characterEncoding=UTF-8&amp;allowPublicKeyRetrieval=true&amp;sslMode=DISABLED&amp;connectionTimeZone=SERVER"
       username="tgaclims"
       password="tgaclims"/>
       <Parameter name="miso.propertiesFile" value="file:${catalina.home}/conf/Catalina/localhost/miso.properties" override="false"/>
@@ -231,7 +231,7 @@ The root user must be used.
 `&`, and adding `&useSSL=false` (redundant, but prevents some warning messages):
 
 ```
-jdbc:mysql://localhost:3306/lims?autoReconnect=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&sslMode=DISABLED&useSSL=false
+jdbc:mysql://localhost:3306/lims?autoReconnect=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&sslMode=DISABLED&connectionTimeZone=SERVER&useSSL=false
 ```
 
 If you run into an issue with migration `V0611`, ensure that the user running Flyway has read and write permissions on
