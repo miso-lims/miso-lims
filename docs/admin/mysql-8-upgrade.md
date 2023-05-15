@@ -37,7 +37,7 @@ move to a later 2.x version if available.
 1. restore tables-only backup to mysql 8.0 using root user
 
    ```
-   mysql -D ${DATABASE} -uroot -p < /misodb_5_7.sql
+   mysql -D ${DATABASE} -uroot -p < misodb_5_7.sql
    ```
 
 1. Update the database URL in your `ROOT.xml`. Replace `localhost` and `lims` with the correct host

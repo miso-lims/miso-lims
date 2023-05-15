@@ -510,7 +510,7 @@ secrets:
 
 services:
   db:
-    image: mysql:5.8
+    image: mysql:8.0
     restart: always
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
