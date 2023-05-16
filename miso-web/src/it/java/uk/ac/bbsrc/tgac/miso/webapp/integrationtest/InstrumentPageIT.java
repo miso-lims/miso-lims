@@ -3,10 +3,9 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 import static org.junit.Assert.assertNotNull;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.FormPageTestUtils.*;
 
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -48,7 +47,8 @@ public class InstrumentPageIT extends AbstractIT {
 
     // copy unchanged except for Upgraded Instrument name, which should be hidden
     fields.forEach((key, val) -> {
-      if (!retired.containsKey(key) && !Field.UPGRADED_INSTRUMENT.equals(key)) retired.put(key, val);
+      if (!retired.containsKey(key) && !Field.UPGRADED_INSTRUMENT.equals(key))
+        retired.put(key, val);
     });
     assertFieldValues("changes pre-save (retired)", retired, page);
 
@@ -63,7 +63,8 @@ public class InstrumentPageIT extends AbstractIT {
 
     // copy unchanged except for Decommissioned date, which should be hidden
     retired.forEach((key, val) -> {
-      if (!production.containsKey(key) && !Field.DECOMMISSIONED.equals(key)) production.put(key, val);
+      if (!production.containsKey(key) && !Field.DECOMMISSIONED.equals(key))
+        production.put(key, val);
     });
     assertFieldValues("changes pre-save (production)", production, page);
 
@@ -100,7 +101,8 @@ public class InstrumentPageIT extends AbstractIT {
 
     // copy unchanged
     fields.forEach((key, val) -> {
-      if (!changes.containsKey(key)) changes.put(key, val);
+      if (!changes.containsKey(key))
+        changes.put(key, val);
     });
     assertFieldValues("changes pre-save", changes, page);
 
@@ -112,19 +114,20 @@ public class InstrumentPageIT extends AbstractIT {
     assertInstrumentAttributes(changes, sr);
   }
 
-  private static final DateTimeFormatter dateFormatter = ISODateTimeFormat.date();
+  private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ISO_DATE;
 
   private static void assertInstrumentAttributes(Map<Field, String> expectedValues, Instrument sr) {
     assertAttribute(Field.ID, expectedValues, Long.toString(sr.getId()));
     assertAttribute(Field.NAME, expectedValues, sr.getName());
     assertAttribute(Field.INSTRUMENT_MODEL, expectedValues, sr.getInstrumentModel().getPlatformAndAlias());
     assertAttribute(Field.SERIAL_NUMBER, expectedValues, sr.getSerialNumber());
-    assertAttribute(Field.COMMISSIONED, expectedValues, dateFormatter.print(sr.getDateCommissioned().getTime()));
+    assertAttribute(Field.COMMISSIONED, expectedValues, sr.getDateCommissioned().format(dateFormatter));
     assertAttribute(Field.STATUS, expectedValues,
-        sr.getUpgradedInstrument() != null ? "Upgraded" : (sr.getDateDecommissioned() != null ? "Retired" : "Production"));
+        sr.getUpgradedInstrument() != null ? "Upgraded"
+            : (sr.getDateDecommissioned() != null ? "Retired" : "Production"));
     if (expectedValues.containsKey(Field.DECOMMISSIONED)) {
       assertAttribute(Field.DECOMMISSIONED, expectedValues,
-          (sr.getDateDecommissioned() == null ? null : dateFormatter.print(sr.getDateDecommissioned().getTime())));
+          (sr.getDateDecommissioned() == null ? null : sr.getDateDecommissioned().format(dateFormatter)));
     }
     if (expectedValues.containsKey(Field.UPGRADED_INSTRUMENT)) {
       assertAttribute(Field.UPGRADED_INSTRUMENT, expectedValues, sr.getUpgradedInstrument().getName());

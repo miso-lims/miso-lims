@@ -51,7 +51,7 @@ move to a later 2.x version if available.
   after copying the sqlstore jar, but before running Flyway migrate, run Flyway repair
 
     ```
-    ./flyway -user=root -password=$MYSQL_ROOT_PASSWORD -url=$MISO_DB_URL -outOfOrder=true -locations=classpath:db/migration,classpath:uk.ac.bbsrc.tgac.miso.db.migration migrate -placeholders.filesDir=${MISO_FILES_DIR}
+    ./flyway -user=root -password=$MYSQL_ROOT_PASSWORD -url=$MISO_DB_URL -outOfOrder=true -locations=classpath:db/migration,classpath:uk.ac.bbsrc.tgac.miso.db.migration repair -placeholders.filesDir=${MISO_FILES_DIR}
     ```
   
     Note the database URL should be updated (replacing `localhost` and `lims` with the correct host

@@ -1,31 +1,7 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -84,7 +60,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 @DiscriminatorColumn(name = "discriminator")
 @DiscriminatorValue("LibraryAliquot")
 public class LibraryAliquot extends AbstractBoxable
-    implements Comparable<LibraryAliquot>, Deletable, HierarchyEntity, Serializable {
+    implements Comparable<LibraryAliquot>, Deletable, HierarchyEntity {
 
   private static final long serialVersionUID = 1L;
   public static final Long UNSAVED_ID = 0L;
@@ -177,8 +153,8 @@ public class LibraryAliquot extends AbstractBoxable
 
   @Immutable
   @ManyToMany
-  @JoinTable(name = "Transfer_LibraryAliquot", joinColumns = { @JoinColumn(name = "aliquotId") }, inverseJoinColumns = {
-      @JoinColumn(name = "transferId") })
+  @JoinTable(name = "Transfer_LibraryAliquot", joinColumns = {@JoinColumn(name = "aliquotId")}, inverseJoinColumns = {
+      @JoinColumn(name = "transferId")})
   private Set<ListTransferView> listTransferViews;
 
   @Override
@@ -376,8 +352,10 @@ public class LibraryAliquot extends AbstractBoxable
 
   @Override
   public int compareTo(LibraryAliquot o) {
-    if (getId() < o.getId()) return -1;
-    if (getId() > o.getId()) return 1;
+    if (getId() < o.getId())
+      return -1;
+    if (getId() > o.getId())
+      return 1;
     return 0;
   }
 

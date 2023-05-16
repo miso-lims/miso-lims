@@ -4,6 +4,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -3103,8 +3104,8 @@ public class Dtos {
   public static Instrument to(@Nonnull InstrumentDto dto) {
     Instrument to = new InstrumentImpl();
     setLong(to::setId, dto.getId(), false);
-    setDate(to::setDateCommissioned, dto.getDateCommissioned());
-    setDate(to::setDateDecommissioned, dto.getDateDecommissioned());
+    setLocalDate(to::setDateCommissioned, dto.getDateCommissioned());
+    setLocalDate(to::setDateDecommissioned, dto.getDateDecommissioned());
     setString(to::setName, dto.getName());
     setObject(to::setInstrumentModel, InstrumentModel::new, dto.getInstrumentModelId());
     setString(to::setSerialNumber, dto.getSerialNumber());
@@ -4502,8 +4503,16 @@ public class Dtos {
     setter.accept(value == null ? null : formatDate(value));
   }
 
+  public static void setDateString(@Nonnull Consumer<String> setter, LocalDate value) {
+    setter.accept(value == null ? null : formatDate(value));
+  }
+
   public static void setDate(@Nonnull Consumer<Date> setter, String value) {
     setter.accept(value == null ? null : parseDate(value));
+  }
+
+  public static void setLocalDate(@Nonnull Consumer<LocalDate> setter, String value) {
+    setter.accept(value == null ? null : parseLocalDate(value));
   }
 
   public static void setDateTimeString(@Nonnull Consumer<String> setter, Date value) {
