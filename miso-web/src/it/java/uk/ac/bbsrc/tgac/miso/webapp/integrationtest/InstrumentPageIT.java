@@ -114,7 +114,7 @@ public class InstrumentPageIT extends AbstractIT {
     assertInstrumentAttributes(changes, sr);
   }
 
-  private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ISO_DATE;
+  private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE;
 
   private static void assertInstrumentAttributes(Map<Field, String> expectedValues, Instrument sr) {
     assertAttribute(Field.ID, expectedValues, Long.toString(sr.getId()));
