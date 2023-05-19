@@ -1,7 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.component;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
@@ -9,7 +13,6 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -62,161 +65,161 @@ public class AdvancedSearchParser {
         String term = m.group(1).toLowerCase();
         String phrase = m.group(2);
         switch (term) {
-        case "is":
-        case "has":
-          switch (phrase.toLowerCase()) {
-          case "fulfilled":
-            return PaginationFilter.fulfilled(true);
-          case "active":
-          case "order":
-          case "ordered":
-          case "unfulfilled":
-            return PaginationFilter.fulfilled(false);
-          case "unknown":
-            return PaginationFilter.health(HealthType.Unknown);
-          case "complete":
-          case "completed":
-            return PaginationFilter.health(HealthType.Completed);
-          case "failed":
-            return PaginationFilter.health(HealthType.Failed);
-          case "started":
-            return PaginationFilter.health(HealthType.Started);
-          case "stopped":
-            return PaginationFilter.health(HealthType.Stopped);
-          case "running":
-            return PaginationFilter.health(HealthType.Running);
-          case "incomplete":
-            return PaginationFilter.health(EnumSet.of(HealthType.Running, HealthType.Started, HealthType.Stopped));
-          case "ghost":
-            return PaginationFilter.ghost(true);
-          case "real":
-            return PaginationFilter.ghost(false);
-          case "archived":
-          case "retired":
-            return PaginationFilter.archived(true);
-          default:
-            errorHandler.accept("No filter for " + x);
-            return null;
-          }
-        case "not":
-          switch (phrase.toLowerCase()) {
-          case "archived":
-          case "retired":
-            return PaginationFilter.archived(false);
-          default:
-            errorHandler.accept("No filter for " + x);
-            return null;
-          }
-        case "barcode":
-          return PaginationFilter.barcode(phrase);
-        case "created":
-        case "createdon":
-          return parseDate(phrase, DateType.CREATE, errorHandler);
-        case "entered":
-        case "enteredon":
-        case "recorded":
-        case "recordedon":
-          return parseDate(phrase, DateType.ENTERED, errorHandler);
-        case "changed":
-        case "modified":
-        case "updated":
-        case "changedon":
-        case "modifiedon":
-        case "updatedon":
-          return parseDate(phrase, DateType.UPDATE, errorHandler);
-        case "received":
-        case "recieved":
-        case "receivedon":
-        case "recievedon":
-          return parseDate(phrase, DateType.RECEIVE, errorHandler);
-        case "createdby":
-        case "creator":
-        case "creater":
-          return parseUser(phrase, currentUser, true);
-        case "changedby":
-        case "modifier":
-        case "updater":
-          return parseUser(phrase, currentUser, false);
-        case "platform":
-          try {
-            return PaginationFilter.platformType(PlatformType.valueOf(phrase.toUpperCase()));
-          } catch (IllegalArgumentException e) {
-            errorHandler.accept("Invalid platform: " + phrase);
-            return null;
-          }
-        case "id":
-          try {
-            if (phrase.contains(",")) {
-              return PaginationFilter.ids(LimsUtils.parseIds(phrase));
-            } else {
-              return PaginationFilter.id(Long.parseLong(phrase));
+          case "is":
+          case "has":
+            switch (phrase.toLowerCase()) {
+              case "fulfilled":
+                return PaginationFilter.fulfilled(true);
+              case "active":
+              case "order":
+              case "ordered":
+              case "unfulfilled":
+                return PaginationFilter.fulfilled(false);
+              case "unknown":
+                return PaginationFilter.health(HealthType.Unknown);
+              case "complete":
+              case "completed":
+                return PaginationFilter.health(HealthType.Completed);
+              case "failed":
+                return PaginationFilter.health(HealthType.Failed);
+              case "started":
+                return PaginationFilter.health(HealthType.Started);
+              case "stopped":
+                return PaginationFilter.health(HealthType.Stopped);
+              case "running":
+                return PaginationFilter.health(HealthType.Running);
+              case "incomplete":
+                return PaginationFilter.health(EnumSet.of(HealthType.Running, HealthType.Started, HealthType.Stopped));
+              case "ghost":
+                return PaginationFilter.ghost(true);
+              case "real":
+                return PaginationFilter.ghost(false);
+              case "archived":
+              case "retired":
+                return PaginationFilter.archived(true);
+              default:
+                errorHandler.accept("No filter for " + x);
+                return null;
             }
-          } catch (NumberFormatException ex) {
-            errorHandler.accept("Invalid ID: " + phrase);
-            return null;
-          }
-        case "identityid":
-          try {
-            return PaginationFilter.identityIds(LimsUtils.parseIds(phrase));
-          } catch (NumberFormatException ex) {
-            errorHandler.accept("Invalid identity ID: " + phrase);
-            return null;
-          }
-        case "index":
-          return PaginationFilter.index(phrase);
-        case "class":
-          return PaginationFilter.sampleClass(phrase);
-        case "external":
-        case "ext":
-        case "extern":
-          return PaginationFilter.external(phrase);
-        case "lab":
-          return PaginationFilter.lab(phrase);
-        case "box":
-          return PaginationFilter.box(phrase);
-        case "boxType":
-          try {
-            return PaginationFilter.boxType(BoxType.valueOf(phrase.toUpperCase()));
-          } catch (IllegalArgumentException e) {
-            errorHandler.accept("Invalid box type: " + phrase);
-            return null;
-          }
-        case "kitname":
-          return PaginationFilter.kitName(phrase);
-        case "project":
-          return PaginationFilter.project(phrase);
-        case "subproject":
-          return PaginationFilter.subproject(phrase);
-        case "sequencingparameters":
-        case "parameters":
-        case "params":
-          return PaginationFilter.sequencingParameters(phrase);
-        case "groupid":
-          return PaginationFilter.groupId(phrase);
-        case "distributed":
-          return parseDate(phrase, DateType.DISTRIBUTED, errorHandler);
-        case "distributedto":
-          return PaginationFilter.distributedTo(phrase);
-        case "freezer":
-          return PaginationFilter.freezer(phrase);
-        case "req":
-        case "requisition":
-          return PaginationFilter.requisition(phrase);
-        case "tissueorigin":
-        case "origin":
-          return PaginationFilter.tissueOrigin(phrase);
-        case "tissuetype":
-          return PaginationFilter.tissueType(phrase);
-        case "timepoint":
-          return PaginationFilter.timepoint(phrase);
-        case "stage":
-          return PaginationFilter.stage(phrase);
-        case "model":
-          return PaginationFilter.model(phrase);
-        case "workstation":
-          return PaginationFilter.workstation(phrase);
-        default:
-          errorHandler.accept("Unknown search term: " + term);
+          case "not":
+            switch (phrase.toLowerCase()) {
+              case "archived":
+              case "retired":
+                return PaginationFilter.archived(false);
+              default:
+                errorHandler.accept("No filter for " + x);
+                return null;
+            }
+          case "barcode":
+            return PaginationFilter.barcode(phrase);
+          case "created":
+          case "createdon":
+            return parseDate(phrase, DateType.CREATE, errorHandler);
+          case "entered":
+          case "enteredon":
+          case "recorded":
+          case "recordedon":
+            return parseDate(phrase, DateType.ENTERED, errorHandler);
+          case "changed":
+          case "modified":
+          case "updated":
+          case "changedon":
+          case "modifiedon":
+          case "updatedon":
+            return parseDate(phrase, DateType.UPDATE, errorHandler);
+          case "received":
+          case "recieved":
+          case "receivedon":
+          case "recievedon":
+            return parseDate(phrase, DateType.RECEIVE, errorHandler);
+          case "createdby":
+          case "creator":
+          case "creater":
+            return parseUser(phrase, currentUser, true);
+          case "changedby":
+          case "modifier":
+          case "updater":
+            return parseUser(phrase, currentUser, false);
+          case "platform":
+            try {
+              return PaginationFilter.platformType(PlatformType.valueOf(phrase.toUpperCase()));
+            } catch (IllegalArgumentException e) {
+              errorHandler.accept("Invalid platform: " + phrase);
+              return null;
+            }
+          case "id":
+            try {
+              if (phrase.contains(",")) {
+                return PaginationFilter.ids(LimsUtils.parseIds(phrase));
+              } else {
+                return PaginationFilter.id(Long.parseLong(phrase));
+              }
+            } catch (NumberFormatException ex) {
+              errorHandler.accept("Invalid ID: " + phrase);
+              return null;
+            }
+          case "identityid":
+            try {
+              return PaginationFilter.identityIds(LimsUtils.parseIds(phrase));
+            } catch (NumberFormatException ex) {
+              errorHandler.accept("Invalid identity ID: " + phrase);
+              return null;
+            }
+          case "index":
+            return PaginationFilter.index(phrase);
+          case "class":
+            return PaginationFilter.sampleClass(phrase);
+          case "external":
+          case "ext":
+          case "extern":
+            return PaginationFilter.external(phrase);
+          case "lab":
+            return PaginationFilter.lab(phrase);
+          case "box":
+            return PaginationFilter.box(phrase);
+          case "boxType":
+            try {
+              return PaginationFilter.boxType(BoxType.valueOf(phrase.toUpperCase()));
+            } catch (IllegalArgumentException e) {
+              errorHandler.accept("Invalid box type: " + phrase);
+              return null;
+            }
+          case "kitname":
+            return PaginationFilter.kitName(phrase);
+          case "project":
+            return PaginationFilter.project(phrase);
+          case "subproject":
+            return PaginationFilter.subproject(phrase);
+          case "sequencingparameters":
+          case "parameters":
+          case "params":
+            return PaginationFilter.sequencingParameters(phrase);
+          case "groupid":
+            return PaginationFilter.groupId(phrase);
+          case "distributed":
+            return parseDate(phrase, DateType.DISTRIBUTED, errorHandler);
+          case "distributedto":
+            return PaginationFilter.distributedTo(phrase);
+          case "freezer":
+            return PaginationFilter.freezer(phrase);
+          case "req":
+          case "requisition":
+            return PaginationFilter.requisition(phrase);
+          case "tissueorigin":
+          case "origin":
+            return PaginationFilter.tissueOrigin(phrase);
+          case "tissuetype":
+            return PaginationFilter.tissueType(phrase);
+          case "timepoint":
+            return PaginationFilter.timepoint(phrase);
+          case "stage":
+            return PaginationFilter.stage(phrase);
+          case "model":
+            return PaginationFilter.model(phrase);
+          case "workstation":
+            return PaginationFilter.workstation(phrase);
+          default:
+            errorHandler.accept("Unknown search term: " + term);
         }
       }
       return PaginationFilter.query(x);
@@ -224,7 +227,8 @@ public class AdvancedSearchParser {
   }
 
   /**
-   * The first criterion may not have a term. All others must have a term. Any word containing an unescaped colon is treated as a term
+   * The first criterion may not have a term. All others must have a term. Any word containing an
+   * unescaped colon is treated as a term
    * 
    * @param request
    * @return all the separate criteria with any colons unescaped
@@ -247,28 +251,30 @@ public class AdvancedSearchParser {
   }
 
   private PaginationFilter parseDate(String text, DateType type, Consumer<String> errorHandler) {
-    DateTime start;
-    DateTime end;
+    ZonedDateTime start;
+    ZonedDateTime end;
     String lowerCaseText = text.toLowerCase();
     if (lowerCaseText.startsWith("before ")) {
-      start = new DateTime(0L); // epoch (1970-01-01)
+      start = ZonedDateTime.ofInstant(Instant.EPOCH, ZoneId.systemDefault()); // epoch (1970-01-01)
       end = parseDate(lowerCaseText.substring(7), DateRangePoint.START);
     } else if (lowerCaseText.startsWith("after ")) {
       start = parseDate(lowerCaseText.substring(6), DateRangePoint.END);
-      end = new DateTime();
+      end = ZonedDateTime.now();
     } else {
       start = parseDate(lowerCaseText, DateRangePoint.START);
       end = parseDate(lowerCaseText, DateRangePoint.UNQUALIFIED_END);
     }
     if (start != null && end != null) {
-      return PaginationFilter.date(start.toDate(), end.toDate(), type);
+      Date startDate = Date.from(start.toInstant());
+      Date endDate = Date.from(end.toInstant());
+      return PaginationFilter.date(startDate, endDate, type);
     } else {
       errorHandler.accept("Invalid date format: " + text);
       return null;
     }
   }
 
-  private DateTime parseDate(String text, DateRangePoint dateRangePoint) {
+  private ZonedDateTime parseDate(String text, DateRangePoint dateRangePoint) {
     if (fiscalYearStartMonth != null) {
       Matcher fiscalQuarterMatcher = fiscalQuarter.matcher(text);
       if (fiscalQuarterMatcher.matches()) {
@@ -283,28 +289,28 @@ public class AdvancedSearchParser {
           fiscalYear = Integer.parseInt(fiscalQuarterMatcher.group(1));
         }
         int quarter = Integer.parseInt(fiscalQuarterMatcher.group(2));
-        DateTime date = new DateTime(fiscalYear, fiscalYearStartMonth, 1, 0, 0)
+        ZonedDateTime date = ZonedDateTime.of(fiscalYear, fiscalYearStartMonth, 1, 0, 0, 0, 0, ZoneId.systemDefault())
             .plusMonths(3 * (quarter - 1));
         return dateRangePoint == DateRangePoint.START ? date : date.plusMonths(3);
       }
       Matcher fiscalYearMatcher = fiscalYear.matcher(text);
       if (fiscalYearMatcher.matches()) {
         int fiscalYear = Integer.parseInt(fiscalYearMatcher.group(1));
-        DateTime date = new DateTime(fiscalYear, fiscalYearStartMonth, 1, 0, 0);
+        ZonedDateTime date = ZonedDateTime.of(fiscalYear, fiscalYearStartMonth, 1, 0, 0, 0, 0, ZoneId.systemDefault());
         return dateRangePoint == DateRangePoint.START ? date : date.plusYears(1);
       }
     }
     for (DateRangeParser parser : DateRangeParser.values()) {
       if (parser.matches(text)) {
         switch (dateRangePoint) {
-        case START:
-          return parser.getStart(text);
-        case END:
-          return parser.getEnd(text);
-        case UNQUALIFIED_END:
-          return parser.getUnqualifiedEnd(text);
-        default:
-          throw new IllegalStateException("Unhandled DateRangePoint");
+          case START:
+            return parser.getStart(text);
+          case END:
+            return parser.getEnd(text);
+          case UNQUALIFIED_END:
+            return parser.getUnqualifiedEnd(text);
+          default:
+            throw new IllegalStateException("Unhandled DateRangePoint");
         }
       }
     }

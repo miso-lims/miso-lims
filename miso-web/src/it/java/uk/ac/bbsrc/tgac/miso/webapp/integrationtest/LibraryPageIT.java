@@ -4,12 +4,12 @@ import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.FormPageTestUtils.*;
 
 import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -90,7 +90,8 @@ public class LibraryPageIT extends AbstractIT {
 
     // copy unchanged
     fields.forEach((key, val) -> {
-      if (!changes.containsKey(key)) changes.put(key, val);
+      if (!changes.containsKey(key))
+        changes.put(key, val);
     });
     changes.remove(Field.INDEX_2);
     assertFieldValues("changes pre-save", changes, page);
@@ -153,7 +154,8 @@ public class LibraryPageIT extends AbstractIT {
 
     // copy unchanged
     fields.forEach((key, val) -> {
-      if (!changes.containsKey(key)) changes.put(key, val);
+      if (!changes.containsKey(key))
+        changes.put(key, val);
     });
     changes.remove(Field.INDEX_1);
     changes.remove(Field.INDEX_2);
@@ -214,7 +216,8 @@ public class LibraryPageIT extends AbstractIT {
 
     // copy unchanged
     fields.forEach((key, val) -> {
-      if (!changes.containsKey(key)) changes.put(key, val);
+      if (!changes.containsKey(key))
+        changes.put(key, val);
     });
     // affected by library design change
     changes.put(Field.SELECTION, "PCR");
@@ -378,7 +381,7 @@ public class LibraryPageIT extends AbstractIT {
     assertTrue("Page fails to show '" + warning + "' warning", page.getField(Field.WARNINGS).contains(warning));
   }
 
-  private static final DateTimeFormatter dateFormatter = ISODateTimeFormat.date();
+  private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
   private static void assertDetailedLibraryAttributes(Map<Field, String> expectedValues, DetailedLibrary lib) {
     assertAttribute(Field.ID, expectedValues, Long.toString(lib.getId()));
@@ -386,10 +389,12 @@ public class LibraryPageIT extends AbstractIT {
     assertAttribute(Field.ALIAS, expectedValues, lib.getAlias());
     assertAttribute(Field.BARCODE, expectedValues, lib.getIdentificationBarcode());
     assertAttribute(Field.DESCRIPTION, expectedValues, lib.getDescription());
-    assertAttribute(Field.CREATION_DATE, expectedValues, dateFormatter.print(lib.getCreationDate().getTime()));
+
+    assertAttribute(Field.CREATION_DATE, expectedValues, dateFormat.format(lib.getCreationDate()));
     assertAttribute(Field.PLATFORM, expectedValues, lib.getPlatformType().getKey());
     assertAttribute(Field.LIBRARY_TYPE, expectedValues, lib.getLibraryType().getDescription());
-    assertAttribute(Field.DESIGN, expectedValues, nullValueOrGet(lib.getLibraryDesign(), LibraryDesign::getName, "None"));
+    assertAttribute(Field.DESIGN, expectedValues,
+        nullValueOrGet(lib.getLibraryDesign(), LibraryDesign::getName, "None"));
     assertAttribute(Field.DESIGN_CODE, expectedValues, nullOrGet(lib.getLibraryDesignCode(),
         code -> code.getCode() + " (" + code.getDescription() + ")"));
     assertAttribute(Field.SELECTION, expectedValues,
@@ -405,7 +410,8 @@ public class LibraryPageIT extends AbstractIT {
       assertAttribute(Field.INDEX_2, expectedValues, lib.getIndex2() == null ? "None" : lib.getIndex2().getLabel());
     }
     assertAttribute(Field.DETAILED_QC_STATUS, expectedValues,
-        replaceIfNull(lib.getDetailedQcStatus() == null ? null : lib.getDetailedQcStatus().getDescription(), "Not Ready"));
+        replaceIfNull(lib.getDetailedQcStatus() == null ? null : lib.getDetailedQcStatus().getDescription(),
+            "Not Ready"));
     assertAttribute(Field.QC_STATUS_NOTE, expectedValues, lib.getDetailedQcStatusNote());
     assertAttribute(Field.LOW_QUALITY, expectedValues, Boolean.toString(lib.isLowQuality()));
     assertAttribute(Field.SIZE, expectedValues, nullOrToString(lib.getDnaSize()));

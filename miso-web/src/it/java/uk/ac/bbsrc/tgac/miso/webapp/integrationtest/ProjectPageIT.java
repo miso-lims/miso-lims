@@ -3,14 +3,14 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,7 +22,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ProjectPage.ProjectTabl
 
 public class ProjectPageIT extends AbstractIT {
 
-  static DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
+  private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
   @Before
   public void setup() {
@@ -42,14 +42,14 @@ public class ProjectPageIT extends AbstractIT {
     Map<String, String> unsaved = new HashMap<>();
     unsaved.put(Fields.ID, "Unsaved");
     unsaved.put(Fields.NAME, "Unsaved");
-    unsaved.put(Fields.CREATION_DATE, dateFormatter.print(new Date().getTime()));
+    unsaved.put(Fields.CREATION_DATE, dateFormat.format(new Date().getTime()));
     unsaved.put(Fields.ALIAS, "Create New Project via UI");
     unsaved.put(Fields.SHORTNAME, "SUCHNEW");
     unsaved.put(Fields.DESCRIPTION, "New Project via UI");
     unsaved.put(Fields.STATUS, "Proposed");
     unsaved.put(Fields.REFERENCE_GENOME, "Human hg18 random");
     unsaved.put(Fields.PIPELINE, "Special");
-    
+
     assertEquals("Project ID is unsaved", unsaved.get(Fields.ID), page.getId());
     assertEquals("Project name is unsaved", unsaved.get(Fields.NAME), page.getName());
     page.setAlias(unsaved.get(Fields.ALIAS));
@@ -63,7 +63,8 @@ public class ProjectPageIT extends AbstractIT {
 
     assertNotEquals("Project ID is now a number", unsaved.get(Fields.ID), savedPage.getId());
     assertNotEquals("Project name is saved", unsaved.get(Fields.NAME), savedPage.getName());
-    assertEquals("Project creation date saved correctly", unsaved.get(Fields.CREATION_DATE), savedPage.getCreationDate());
+    assertEquals("Project creation date saved correctly", unsaved.get(Fields.CREATION_DATE),
+        savedPage.getCreationDate());
     assertEquals(unsaved.get(Fields.ALIAS), savedPage.getAlias());
     assertEquals(unsaved.get(Fields.SHORTNAME), savedPage.getShortName());
     assertEquals(unsaved.get(Fields.DESCRIPTION), savedPage.getDescription());
@@ -108,7 +109,7 @@ public class ProjectPageIT extends AbstractIT {
     page.setDescription("");
     page.clickSave();
     assertTrue(isStringEmptyOrNull(page.getDescription()));
-    
+
     page.setDescription(originalDescription);
     page.clickSave();
     assertEquals(originalDescription, page.getDescription());
@@ -118,8 +119,9 @@ public class ProjectPageIT extends AbstractIT {
   public void testConfirmTablesAllVisibleWithoutErrors() throws Exception {
     // goal: ensure all tables are present on the page and have no errors
     ProjectPage page = getProjectPage(1L);
-    
-    Set<String> tableIds = Sets.newHashSet(ProjectTable.STUDIES, ProjectTable.SAMPLES, ProjectTable.LIBRARIES, ProjectTable.LIBRARY_ALIQUOTS, ProjectTable.POOLS,
+
+    Set<String> tableIds = Sets.newHashSet(ProjectTable.STUDIES, ProjectTable.SAMPLES, ProjectTable.LIBRARIES,
+        ProjectTable.LIBRARY_ALIQUOTS, ProjectTable.POOLS,
         ProjectTable.RUNS);
     tableIds.forEach(id -> assertNotNull("table " + id + " should exist on page", page.getTable(id)));
 
