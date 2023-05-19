@@ -1,0 +1,1 @@
+Added a "troubleshooting" section to the *MISO Baremetal Installation* guide
