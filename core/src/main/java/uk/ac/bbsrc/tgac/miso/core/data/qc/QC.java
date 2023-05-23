@@ -1,28 +1,9 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK MISO project contacts: Robert Davey @
- * TGAC *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify it under the terms of the GNU
- * General Public License as published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with MISO. If not, see
- * <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.core.data.qc;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -55,14 +36,14 @@ public abstract class QC implements Deletable, Serializable, Comparable<QC> {
 
   @Column(name = "created", nullable = false, updatable = false)
 
-  private LocalDate creationTime;
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date creationTime;
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "creator")
   private User creator;
 
-  @Temporal(TemporalType.DATE)
-  private Date date = new Date();
+  private LocalDate date = LocalDate.now(ZoneId.systemDefault());
 
   @Column(nullable = false)
   @Temporal(TemporalType.TIMESTAMP)
@@ -90,7 +71,7 @@ public abstract class QC implements Deletable, Serializable, Comparable<QC> {
 
   private String kitLot;
 
-  public LocalDate getCreationTime() {
+  public Date getCreationTime() {
     return creationTime;
   }
 
@@ -98,7 +79,7 @@ public abstract class QC implements Deletable, Serializable, Comparable<QC> {
     return creator;
   }
 
-  public Date getDate() {
+  public LocalDate getDate() {
     return date;
   }
 
@@ -135,7 +116,7 @@ public abstract class QC implements Deletable, Serializable, Comparable<QC> {
 
   public abstract List<? extends QcControlRun> getControls();
 
-  public void setCreationTime(LocalDate creationTime) {
+  public void setCreationTime(Date creationTime) {
     this.creationTime = creationTime;
   }
 
@@ -143,7 +124,7 @@ public abstract class QC implements Deletable, Serializable, Comparable<QC> {
     this.creator = creator;
   }
 
-  public void setDate(Date date) {
+  public void setDate(LocalDate date) {
     this.date = date;
   }
 

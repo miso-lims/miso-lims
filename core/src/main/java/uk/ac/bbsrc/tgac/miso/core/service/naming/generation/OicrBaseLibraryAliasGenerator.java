@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.service.naming.generation;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,11 +18,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.SiblingNumberGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrSampleAliasValidator;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public abstract class OicrBaseLibraryAliasGenerator<T, R> implements NameGenerator<T> {
 
   private static final String SEPARATOR = "_";
+  private static final DateTimeFormatter NAME_DATE_FORMATTER = DateTimeFormatter.ofPattern("uuuuMMdd");
 
   private static final @RegEx String sampleRegex = "^"
       + OicrSampleAliasValidator.IDENTITY_REGEX_PART
@@ -172,7 +173,7 @@ public abstract class OicrBaseLibraryAliasGenerator<T, R> implements NameGenerat
   }
 
   private String getCreationDateString(R item) {
-    return LimsUtils.formatDate(getCreationDate(item));
+    return getCreationDate(item).format(NAME_DATE_FORMATTER);
   }
 
   private String generateOxfordNanoporeLibraryAlias(R item) throws MisoNamingException, IOException {

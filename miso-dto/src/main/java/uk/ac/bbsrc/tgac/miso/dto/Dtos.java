@@ -2442,7 +2442,7 @@ public class Dtos {
     if (dto.getId() != null) {
       to.setId(dto.getId());
     }
-    to.setDate(parseDate(dto.getDate()));
+    setLocalDate(to::setDate, dto.getDate());
     setBigDecimal(to::setResults, dto.getResults());
     setObject(to::setType, QcType::new, dto.getQcTypeId());
     to.setDescription(dto.getDescription());

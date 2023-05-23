@@ -4,8 +4,9 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
@@ -106,7 +107,7 @@ public class HibernateKitDaoIT extends AbstractDAOTest {
     kit.setIdentificationBarcode("KittVsCarr");
     KitDescriptor kitDescriptor = dao.getKitDescriptorById(1L);
     kit.setKitDescriptor(kitDescriptor);
-    kit.setKitDate(new Date());
+    kit.setKitDate(LocalDate.now(ZoneId.systemDefault()));
     kit.setLotNumber("ABCD1234");
     return kit;
   }

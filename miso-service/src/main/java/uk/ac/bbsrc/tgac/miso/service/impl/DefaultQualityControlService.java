@@ -98,7 +98,7 @@ public class DefaultQualityControlService implements QualityControlService {
 
     User user = authorizationManager.getCurrentUser();
     qc.setCreator(user);
-    qc.setCreationTime(LocalDate.now());
+    qc.setCreationTime(new Date());
     qc.setLastModified(new Date());
 
     if (!qc.getType().getQcTarget().equals(entity.getQcTarget())) {

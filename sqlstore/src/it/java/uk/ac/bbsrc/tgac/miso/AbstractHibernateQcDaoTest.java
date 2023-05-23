@@ -1,6 +1,3 @@
-/**
- * 
- */
 package uk.ac.bbsrc.tgac.miso;
 
 import static org.junit.Assert.*;
@@ -45,7 +42,8 @@ public abstract class AbstractHibernateQcDaoTest<T extends QC, U extends Hiberna
 
   private U dao;
 
-  public AbstractHibernateQcDaoTest(Class<T> qcClass, Class<? extends V> entityClass, Class<W> controlRunClass, QcTarget qcTarget, long qcTypeId,
+  public AbstractHibernateQcDaoTest(Class<T> qcClass, Class<? extends V> entityClass, Class<W> controlRunClass,
+      QcTarget qcTarget, long qcTypeId,
       long entityWithOneQcId, long existingQcId, long controlTypeId, long qcWithControlId, long qcControlId) {
     this.qcClass = qcClass;
     this.entityClass = entityClass;
