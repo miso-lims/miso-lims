@@ -5,7 +5,7 @@ Docker compose, and is not trivial to set up. We recommend using Docker compose
 if possible by following the
 [Docker compose installation guide](../compose-installation-guide).
 
-Refer to [Troubleshooting](#troubleshooting) in the event that you run into issues during installation.
+Refer [here](#server-deployment-troubleshooting) in the event that you run into issues during installation.
 
 ## Prerequisites
 
@@ -76,6 +76,8 @@ need to add a grant privilege to the MISO database from your remote machine:
 
     GRANT ALL ON `lims`.* TO 'tgaclims'@'your.tomcat.install.server';
     GRANT ALL ON `lims`.* TO 'tgaclims'@'your.tomcat.install.server' IDENTIFIED BY 'tgaclims';
+
+Refer to [Development Alternatives](#development-alternatives) for a different way to do this step.
 
 
 # Setting Up the Application Server
@@ -243,10 +245,16 @@ If you run into an issue with migration `V0611`, ensure that the user running Fl
 If you encounter other errors migrating the database, make sure that you are using the recommended version of Flyway
 (see [Prerequisites](#prerequisites)).
 
-# Troubleshooting
+# Server Deployment Troubleshooting
+
+* Whenever unexpected behaviour arises, be sure to check the build logs, located at `${CATALINA_BASE}/logs`. Read through the output of `catalina.out`, `catalina.<date>.log`, and `localhost.<date>.log`.
+* Ensure you are using the correct version of Java with Tomcat. This can be checked in `catalina.out`. In case you are not, append/modify the value of `$JAVA_HOME` in `setenv.sh` or `/etc/default/tomcat9`. 
+* If file access for `/storage/miso` is causing an error, [this](https://stackoverflow.com/questions/56827735/how-to-allow-tomcat-war-app-to-write-in-folder) may help.
 
 
-If using the correct MySQL version for your database server is causing trouble, consider downloading [Docker](https://docs.docker.com/get-docker/) to use a Docker container. Creating the container:
+# Development Alternatives
+
+ If using the correct MySQL version for your database server is causing trouble, consider downloading [Docker](https://docs.docker.com/get-docker/) to use a Docker container. Creating the container:
 
     docker run --name CONTAINER_NAME -e MYSQL_ROOT_PASSWORD=ROOT_PASSWORD -e MYSQL_DATABASE=DB_NAME -e MYSQL_USER=DB_USERNAME -e MYSQL_PASSWORD=DB_PASSWORD -p 3306:3306 -d mysql:MYSQL_VERSION
 
@@ -261,13 +269,3 @@ Where:
 
 
 You do not need to do anything else from **Step 3** if you use this container method.
-
-
-* To find `$CATALINA_HOME`, if you are running linux, enter `ps aux | grep catalina.home` into terminal and find the part of the output message containing the pathway.
-* Migrating the database:
-   * Ensure you are using the correct version of flyway. Different version will almost definitely cause an error.
-   * If an SSL error comes up and you are accessing MISO over a localhost connection, it is not needed. Consider adding `&amp;useSSL=false` to the end of the URL in the `ROOT.xml` file, and `&useSSL=false` to the end of the `$MISO_DB_URL` when running the `./flyway` command to migrate the database.
-* Some common Tomcat server setup errors and useful information:
-   * Whenever unexpected behaviour arises, be sure to check the build logs, located at `${CATALINA_BASE}/logs`. Read through the output of `catalina.out`, `catalina.<date>.log`, and `localhost.<date>.log`.
-   * Ensure you are using the correct version of Java (input `java -version` in terminal). In the case you are not, append `JAVA_HOME=$PATHWAY_TO_CORRECT_JAVA_VERSION` to the end of the `setenv.sh` file. If this doesn't work, add `$PATHWAY_TO_CORRECT_JAVA_VERSION` to the system's `$PATH` environment variable (NOTE: this will change default Java version for your entire device, not just this server).
-   * If file access for `/storage/miso` is causing an error, [this](https://stackoverflow.com/questions/56827735/how-to-allow-tomcat-war-app-to-write-in-folder) may help.
