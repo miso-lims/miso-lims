@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.function.Consumer;
 
+import javax.persistence.TemporalType;
+
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -23,7 +25,8 @@ import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 @Repository
 public class HibernateListPoolViewDao implements ListPoolViewDao, HibernatePaginatedDataSource<ListPoolView> {
 
-  private final static String[] SEARCH_PROPERTIES = new String[] { "name", "alias", "identificationBarcode", "description" };
+  private final static String[] SEARCH_PROPERTIES =
+      new String[] {"name", "alias", "identificationBarcode", "description"};
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -75,14 +78,27 @@ public class HibernateListPoolViewDao implements ListPoolViewDao, HibernatePagin
   @Override
   public String propertyForDate(Criteria criteria, DateType type) {
     switch (type) {
-    case CREATE:
-      return "creationDate";
-    case ENTERED:
-      return "creationTime";
-    case UPDATE:
-      return "lastModified";
-    default:
-      return null;
+      case CREATE:
+        return "creationDate";
+      case ENTERED:
+        return "creationTime";
+      case UPDATE:
+        return "lastModified";
+      default:
+        return null;
+    }
+  }
+
+  @Override
+  public TemporalType temporalTypeForDate(DateType type) {
+    switch (type) {
+      case CREATE:
+        return TemporalType.DATE;
+      case ENTERED:
+      case UPDATE:
+        return TemporalType.TIMESTAMP;
+      default:
+        return null;
     }
   }
 
@@ -100,7 +116,8 @@ public class HibernateListPoolViewDao implements ListPoolViewDao, HibernatePagin
   }
 
   @Override
-  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
+  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType,
+      Consumer<String> errorHandler) {
     criteria.add(Restrictions.eq("platformType", platformType));
   }
 
@@ -125,7 +142,8 @@ public class HibernateListPoolViewDao implements ListPoolViewDao, HibernatePagin
   }
 
   @Override
-  public void restrictPaginationByDate(Criteria criteria, Date start, Date end, DateType type, Consumer<String> errorHandler) {
+  public void restrictPaginationByDate(Criteria criteria, Date start, Date end, DateType type,
+      Consumer<String> errorHandler) {
     if (type == DateType.RECEIVE) {
       DbUtils.restrictPaginationByReceiptTransferDate(criteria, start, end);
     } else if (type == DateType.DISTRIBUTED) {
@@ -136,7 +154,8 @@ public class HibernateListPoolViewDao implements ListPoolViewDao, HibernatePagin
   }
 
   @Override
-  public void restrictPaginationByDistributionRecipient(Criteria criteria, String query, Consumer<String> errorHandler) {
+  public void restrictPaginationByDistributionRecipient(Criteria criteria, String query,
+      Consumer<String> errorHandler) {
     DbUtils.restrictPaginationByDistributionRecipient(criteria, query, "pools", "poolId");
   }
 

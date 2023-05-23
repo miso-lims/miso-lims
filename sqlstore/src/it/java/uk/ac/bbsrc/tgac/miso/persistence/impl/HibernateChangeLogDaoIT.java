@@ -97,7 +97,7 @@ public class HibernateChangeLogDaoIT extends AbstractDAOTest {
     assertEquals(1L, cl.getUser().getId());
     assertEquals("false -> true", cl.getSummary());
 
-    Date date = Date.from(ZonedDateTime.parse("2016-07-07T13:31:01").toInstant());
+    Date date = Date.from(ZonedDateTime.parse("2016-07-07T13:31:01Z").toInstant());
 
     assertEquals(LimsUtils.formatDate(date), LimsUtils.formatDate(cl.getTime()));
   }

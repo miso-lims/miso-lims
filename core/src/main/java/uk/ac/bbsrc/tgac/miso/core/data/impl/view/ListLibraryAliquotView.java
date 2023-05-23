@@ -91,7 +91,7 @@ public class ListLibraryAliquotView
 
   private Long preMigrationId;
   private Long targetedSequencingId;
-  private LocalDate created;
+  private Date created;
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "creator", nullable = false, updatable = false)
@@ -346,11 +346,11 @@ public class ListLibraryAliquotView
     this.lastUpdated = lastModified;
   }
 
-  public LocalDate getCreated() {
+  public Date getCreated() {
     return created;
   }
 
-  public void setCreated(LocalDate created) {
+  public void setCreated(Date created) {
     this.created = created;
   }
 

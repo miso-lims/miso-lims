@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
+import javax.persistence.TemporalType;
+
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -27,8 +29,8 @@ import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 @Repository
 public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSource<Pool> {
 
-  private final static String[] IDENTIFIER_PROPERTIES = { "name", "alias", "identificationBarcode" };
-  private final static String[] SEARCH_PROPERTIES = { "name", "alias", "identificationBarcode", "description" };
+  private final static String[] IDENTIFIER_PROPERTIES = {"name", "alias", "identificationBarcode"};
+  private final static String[] SEARCH_PROPERTIES = {"name", "alias", "identificationBarcode", "description"};
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -49,7 +51,8 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
 
   @Override
   public Pool getByBarcode(String barcode) throws IOException {
-    if (barcode == null) throw new NullPointerException("cannot look up null barcode");
+    if (barcode == null)
+      throw new NullPointerException("cannot look up null barcode");
     return (Pool) createCriteria().add(Restrictions.eq("identificationBarcode", barcode)).uniqueResult();
   }
 
@@ -130,7 +133,8 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   @Override
   public String propertyForSortColumn(String sortCol) {
     sortCol = sortCol.replaceAll("[^\\w]", "");
-    if ("id".equals(sortCol)) sortCol = "poolId";
+    if ("id".equals(sortCol))
+      sortCol = "poolId";
     return sortCol;
   }
 
@@ -146,21 +150,35 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   }
 
   @Override
-  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
+  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType,
+      Consumer<String> errorHandler) {
     criteria.add(Restrictions.eq("platformType", platformType));
   }
 
   @Override
   public String propertyForDate(Criteria criteria, DateType type) {
     switch (type) {
-    case CREATE:
-      return "creationDate";
-    case ENTERED:
-      return "creationTime";
-    case UPDATE:
-      return "lastModified";
-    default:
-      return null;
+      case CREATE:
+        return "creationDate";
+      case ENTERED:
+        return "creationTime";
+      case UPDATE:
+        return "lastModified";
+      default:
+        return null;
+    }
+  }
+
+  @Override
+  public TemporalType temporalTypeForDate(DateType type) {
+    switch (type) {
+      case CREATE:
+        return TemporalType.DATE;
+      case ENTERED:
+      case UPDATE:
+        return TemporalType.TIMESTAMP;
+      default:
+        return null;
     }
   }
 
@@ -185,7 +203,8 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   }
 
   @Override
-  public void restrictPaginationByDistributionRecipient(Criteria criteria, String query, Consumer<String> errorHandler) {
+  public void restrictPaginationByDistributionRecipient(Criteria criteria, String query,
+      Consumer<String> errorHandler) {
     DbUtils.restrictPaginationByDistributionRecipient(criteria, query, "pools", "poolId");
   }
 
@@ -196,7 +215,8 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
 
   @Override
   public List<Pool> listByIdList(List<Long> poolIds) {
-    if (poolIds.isEmpty()) return Collections.emptyList();
+    if (poolIds.isEmpty())
+      return Collections.emptyList();
     Criteria criteria = currentSession().createCriteria(PoolImpl.class);
     criteria.add(Restrictions.in("id", poolIds));
     @SuppressWarnings("unchecked")

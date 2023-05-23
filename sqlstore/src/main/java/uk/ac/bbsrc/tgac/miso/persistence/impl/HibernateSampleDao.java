@@ -13,6 +13,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import javax.persistence.TemporalType;
+
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -321,6 +323,19 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
         return "creationTime";
       case UPDATE:
         return "lastModified";
+      default:
+        return null;
+    }
+  }
+
+  @Override
+  public TemporalType temporalTypeForDate(DateType type) {
+    switch (type) {
+      case CREATE:
+        return TemporalType.DATE;
+      case ENTERED:
+      case UPDATE:
+        return TemporalType.TIMESTAMP;
       default:
         return null;
     }

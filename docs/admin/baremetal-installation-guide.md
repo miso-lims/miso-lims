@@ -112,11 +112,16 @@ Make sure the database path in `ROOT.xml` is correct for your install:
 
     url="jdbc:mysql://your.database.server:3306/dbname"
 
+Note that the connection parameters suggested above disable SSL between the web and database server,
+meaning that the communications will not be encrypted. You should consider the security implications
+of this -- especially if the connection is over a public network -- and configure SSL properly if
+required.
+
 Extract the `setup_files.tar.gz` file and copy `miso.properties` to
 `$CATALINA_HOME/conf/Catalina/localhost/miso.properties`. This file contains site-specific configuration that you should
 review and modify as appropriate. See [Site Configuration](../site-configuration) for more information.
 
-Append the following line to `$CATALINA_HOME/bin/setenv.sh` or, if you installed Tomcat through apt, `/etc/default/tomcat8`:
+Append the following line to `$CATALINA_HOME/bin/setenv.sh` or, if you installed Tomcat through apt, `/etc/default/tomcat9`:
 
     JAVA_OPTS="$JAVA_OPTS -Dsecurity.method=jdbc -Xmx768M"
 

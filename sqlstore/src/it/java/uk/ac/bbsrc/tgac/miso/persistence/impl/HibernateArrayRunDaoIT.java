@@ -102,7 +102,7 @@ public class HibernateArrayRunDaoIT extends AbstractDAOTest {
     assertNotNull(run.getArray());
     assertEquals("Array_1", run.getArray().getAlias());
     assertEquals(HealthType.Running, run.getHealth());
-    assertEquals(LimsUtils.parseDate("2018-02-02"), run.getStartDate());
+    assertEquals(LocalDate.of(2018, 2, 2), run.getStartDate());
   }
 
   @Test
