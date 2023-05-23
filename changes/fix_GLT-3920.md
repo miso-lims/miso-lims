@@ -1,0 +1,1 @@
+Fixed bug where an add button would display on the "Edit Assays" page's "Test" table without being in edit mode.
