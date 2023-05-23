@@ -254,18 +254,18 @@ If you encounter other errors migrating the database, make sure that you are usi
 
 # Development Alternatives
 
- If using the correct MySQL version for your database server is causing trouble, consider downloading [Docker](https://docs.docker.com/get-docker/) to use a Docker container. Creating the container:
+ If using the correct MySQL version for your database server is causing trouble, consider downloading [Docker](https://docs.docker.com/get-docker/) to use a Docker container. Creating the container (note: things prefixed with `VAR_` are a variable, and their value will be specified below):
 
-    docker run --name CONTAINER_NAME -e MYSQL_ROOT_PASSWORD=ROOT_PASSWORD -e MYSQL_DATABASE=DB_NAME -e MYSQL_USER=DB_USERNAME -e MYSQL_PASSWORD=DB_PASSWORD -p 3306:3306 -d mysql:MYSQL_VERSION
+    docker run --name VAR_CONTAINER_NAME -e MYSQL_ROOT_PASSWORD=VAR_ROOT_PASSWORD -e MYSQL_DATABASE=VAR_DB_NAME -e MYSQL_USER=VAR_DB_USERNAME -e MYSQL_PASSWORD=VAR_DB_PASSWORD -p 3306:3306 -d mysql:VAR_MYSQL_VERSION
 
 
 Where:
-* `CONTAINER_NAME` is your desired Docker container name.
-* `ROOT_PASSWORD` is the root password to your MySQL.
-* `DB_NAME` is the name of the database (e.g. "lims").
-* `DB_USERNAME` is the username to access the database (e.g. "tgaclims").
-* `DB_PASSWORD` is the password to access the database (e.g. "tgaclims").
-* `MYSQL_VERSION` is the version of MySQL for the database (e.g. "5,7").
+* `VAR_CONTAINER_NAME` is your desired Docker container name.
+* `VAR_ROOT_PASSWORD` is the root password to your MySQL.
+* `VAR_DB_NAME` is the name of the database (e.g. "lims").
+* `VAR_DB_USERNAME` is the username to access the database (e.g. "tgaclims").
+* `VAR_DB_PASSWORD` is the password to access the database (e.g. "tgaclims").
+* `VAR_MYSQL_VERSION` is the version of MySQL for the database (e.g. "5,7").
 
 
 You do not need to do anything else from **Step 3** if you use this container method.
