@@ -2,7 +2,6 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.Set;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
@@ -65,17 +64,6 @@ public interface Instrument extends Barcodable, Deletable, Nameable, Serializabl
    * @return true if the instrument is currently being used in production; false if it is retired
    */
   public boolean isActive();
-
-  /**
-   * @param date the date when this instrument was most recently serviced
-   */
-  public void setLastServicedDate(Date date);
-
-  /**
-   * @return the service date of the most recent service record for this instrument, or null if there
-   *         are no such service records
-   */
-  public Date getLastServicedDate();
 
   public Set<Run> getRuns();
 

@@ -2,9 +2,6 @@ package uk.ac.bbsrc.tgac.miso.core.service.naming.generation;
 
 import static org.junit.Assert.assertEquals;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -20,6 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.SiblingNumberGenerator;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class OicrLibraryAliasGeneratorTest {
 
@@ -60,8 +58,7 @@ public class OicrLibraryAliasGeneratorTest {
   public void testGeneratePacBioLibraryAlias() throws Exception {
     DetailedLibrary library = new DetailedLibraryImpl();
     library.setPlatformType(PlatformType.PACBIO);
-    DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-    library.setCreationDate(df.parse("2017-09-13"));
+    library.setCreationDate(LimsUtils.parseLocalDate("2017-09-13"));
     DetailedSample parent = new DetailedSampleImpl();
     parent.setAlias("PROJ_1234_Pa_P_nn_1-1_D_8");
     library.setSample(parent);

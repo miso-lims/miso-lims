@@ -1,30 +1,7 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
 
 import javax.persistence.CascadeType;
@@ -37,8 +14,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import com.eaglegenomics.simlims.core.Note;
 
@@ -65,14 +40,14 @@ public class KitImpl implements Kit {
 
   @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
   @JoinTable(name = "Kit_Note", joinColumns = {
-      @JoinColumn(name = "kit_kitId") }, inverseJoinColumns = {
-          @JoinColumn(name = "notes_noteId") })
+      @JoinColumn(name = "kit_kitId")},
+      inverseJoinColumns = {
+          @JoinColumn(name = "notes_noteId")})
   private Collection<Note> notes = new HashSet<>();
 
   private String lotNumber;
 
-  @Temporal(TemporalType.DATE)
-  private Date kitDate;
+  private LocalDate kitDate;
 
   @ManyToOne(targetEntity = KitDescriptor.class)
   @JoinColumn(name = "kitDescriptorId", nullable = false)
@@ -99,12 +74,12 @@ public class KitImpl implements Kit {
   }
 
   @Override
-  public Date getKitDate() {
+  public LocalDate getKitDate() {
     return kitDate;
   }
 
   @Override
-  public void setKitDate(Date kitDate) {
+  public void setKitDate(LocalDate kitDate) {
     this.kitDate = kitDate;
   }
 
@@ -169,8 +144,10 @@ public class KitImpl implements Kit {
   @CoverageIgnore
   @Override
   public int compareTo(Kit t) {
-    if (getId() < t.getId()) return -1;
-    if (getId() > t.getId()) return 1;
+    if (getId() < t.getId())
+      return -1;
+    if (getId() > t.getId())
+      return 1;
     return 0;
   }
 
@@ -189,7 +166,7 @@ public class KitImpl implements Kit {
   }
 
   @Override
-  public Date getBarcodeDate() {
+  public LocalDate getBarcodeDate() {
     return getKitDate();
   }
 

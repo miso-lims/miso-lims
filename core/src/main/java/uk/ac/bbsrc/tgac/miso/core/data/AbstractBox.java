@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -200,8 +202,8 @@ public abstract class AbstractBox implements Box {
   }
 
   @Override
-  public Date getBarcodeDate() {
-    return getCreationTime();
+  public LocalDate getBarcodeDate() {
+    return LocalDate.ofInstant(getCreationTime().toInstant(), ZoneId.systemDefault());
   }
 
   @Override
@@ -249,41 +251,65 @@ public abstract class AbstractBox implements Box {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     AbstractBox other = (AbstractBox) obj;
     if (alias == null) {
-      if (other.alias != null) return false;
-    } else if (!alias.equals(other.alias)) return false;
-    if (boxId != other.boxId) return false;
+      if (other.alias != null)
+        return false;
+    } else if (!alias.equals(other.alias))
+      return false;
+    if (boxId != other.boxId)
+      return false;
     if (creationTime == null) {
-      if (other.creationTime != null) return false;
-    } else if (!creationTime.equals(other.creationTime)) return false;
+      if (other.creationTime != null)
+        return false;
+    } else if (!creationTime.equals(other.creationTime))
+      return false;
     if (creator == null) {
-      if (other.creator != null) return false;
-    } else if (!creator.equals(other.creator)) return false;
+      if (other.creator != null)
+        return false;
+    } else if (!creator.equals(other.creator))
+      return false;
     if (description == null) {
-      if (other.description != null) return false;
-    } else if (!description.equals(other.description)) return false;
+      if (other.description != null)
+        return false;
+    } else if (!description.equals(other.description))
+      return false;
     if (identificationBarcode == null) {
-      if (other.identificationBarcode != null) return false;
-    } else if (!identificationBarcode.equals(other.identificationBarcode)) return false;
+      if (other.identificationBarcode != null)
+        return false;
+    } else if (!identificationBarcode.equals(other.identificationBarcode))
+      return false;
     if (locationBarcode == null) {
-      if (other.locationBarcode != null) return false;
-    } else if (!locationBarcode.equals(other.locationBarcode)) return false;
+      if (other.locationBarcode != null)
+        return false;
+    } else if (!locationBarcode.equals(other.locationBarcode))
+      return false;
     if (name == null) {
-      if (other.name != null) return false;
-    } else if (!name.equals(other.name)) return false;
+      if (other.name != null)
+        return false;
+    } else if (!name.equals(other.name))
+      return false;
     if (size == null) {
-      if (other.size != null) return false;
-    } else if (!size.equals(other.size)) return false;
+      if (other.size != null)
+        return false;
+    } else if (!size.equals(other.size))
+      return false;
     if (storageLocation == null) {
-      if (other.storageLocation != null) return false;
-    } else if (!storageLocation.equals(other.storageLocation)) return false;
+      if (other.storageLocation != null)
+        return false;
+    } else if (!storageLocation.equals(other.storageLocation))
+      return false;
     if (use == null) {
-      if (other.use != null) return false;
-    } else if (!use.equals(other.use)) return false;
+      if (other.use != null)
+        return false;
+    } else if (!use.equals(other.use))
+      return false;
     return true;
   }
 

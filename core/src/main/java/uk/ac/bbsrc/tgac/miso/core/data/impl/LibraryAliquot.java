@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -76,8 +77,7 @@ public class LibraryAliquot extends AbstractBoxable
   private String description;
 
   @Column(nullable = false)
-  @Temporal(TemporalType.DATE)
-  private Date creationDate;
+  private LocalDate creationDate;
 
   @Column(name = "created", nullable = false, updatable = false)
   @Temporal(TemporalType.TIMESTAMP)
@@ -145,8 +145,7 @@ public class LibraryAliquot extends AbstractBoxable
   @JoinColumn(name = "qcUser")
   private User qcUser;
 
-  @Temporal(TemporalType.DATE)
-  private Date qcDate;
+  private LocalDate qcDate;
 
   @OneToMany(targetEntity = LibraryAliquotChangeLog.class, mappedBy = "libraryAliquot", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
@@ -225,11 +224,11 @@ public class LibraryAliquot extends AbstractBoxable
     this.creator = creator;
   }
 
-  public Date getCreationDate() {
+  public LocalDate getCreationDate() {
     return this.creationDate;
   }
 
-  public void setCreationDate(Date creationDate) {
+  public void setCreationDate(LocalDate creationDate) {
     this.creationDate = creationDate;
   }
 
@@ -412,7 +411,7 @@ public class LibraryAliquot extends AbstractBoxable
   }
 
   @Override
-  public Date getBarcodeDate() {
+  public LocalDate getBarcodeDate() {
     return getCreationDate();
   }
 
@@ -477,12 +476,12 @@ public class LibraryAliquot extends AbstractBoxable
   }
 
   @Override
-  public Date getQcDate() {
+  public LocalDate getQcDate() {
     return qcDate;
   }
 
   @Override
-  public void setQcDate(Date qcDate) {
+  public void setQcDate(LocalDate qcDate) {
     this.qcDate = qcDate;
   }
 

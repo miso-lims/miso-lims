@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.service.naming.generation;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
@@ -11,7 +11,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
-public class OicrLibraryAliquotAliasGenerator extends OicrBaseLibraryAliasGenerator<LibraryAliquot, DetailedLibraryAliquot> {
+public class OicrLibraryAliquotAliasGenerator
+    extends OicrBaseLibraryAliasGenerator<LibraryAliquot, DetailedLibraryAliquot> {
 
   @Override
   protected boolean isDetailed(LibraryAliquot item) {
@@ -40,11 +41,12 @@ public class OicrLibraryAliquotAliasGenerator extends OicrBaseLibraryAliasGenera
 
   @Override
   protected LibraryDesignCode getLibraryDesignCode(DetailedLibraryAliquot item) {
-    return item.getLibraryDesignCode() != null ? item.getLibraryDesignCode() : ((DetailedLibrary) item.getLibrary()).getLibraryDesignCode();
+    return item.getLibraryDesignCode() != null ? item.getLibraryDesignCode()
+        : ((DetailedLibrary) item.getLibrary()).getLibraryDesignCode();
   }
 
   @Override
-  protected Date getCreationDate(DetailedLibraryAliquot item) {
+  protected LocalDate getCreationDate(DetailedLibraryAliquot item) {
     return item.getCreationDate();
   }
 

@@ -6,7 +6,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -48,7 +49,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
 public class EnaSubmissionPreparation {
   private abstract class ChildSubmissionFile {
     public String fileName() {
-      return String.format("%s_%s_%s.xml", submission.getAlias(), name(), DF_TIMESTAMP.format(submission.getSubmissionDate()));
+      return String.format("%s_%s_%s.xml", submission.getAlias(), name(),
+          DF_TIMESTAMP.format(submission.getSubmissionDate()));
     }
 
     public abstract void generateDocument(ZipOutputStream output)
@@ -227,17 +229,20 @@ public class EnaSubmissionPreparation {
       libraryDescriptor.appendChild(libraryLayout);
 
       Element poolingStrategy = xml.getOwnerDocument().createElementNS(null, "POOLING_STRATEGY");
-      boolean isMultiplexed = experiment.getRunPartitions().stream().map(RunPartition::getPartition).map(Partition::getPool)
-          .map(Pool::getPoolContents)
-          .mapToInt(Set::size).anyMatch(x -> x > 1);
+      boolean isMultiplexed =
+          experiment.getRunPartitions().stream().map(RunPartition::getPartition).map(Partition::getPool)
+              .map(Pool::getPoolContents)
+              .mapToInt(Set::size).anyMatch(x -> x > 1);
       poolingStrategy.setTextContent(isMultiplexed ? "multiplexed libraries" : "none");
       libraryDescriptor.appendChild(poolingStrategy);
 
       xmlDesign.appendChild(libraryDescriptor);
 
-      if (experiment.getInstrumentModel() != null && experiment.getInstrumentModel().getPlatformType().getSraName() != null) {
+      if (experiment.getInstrumentModel() != null
+          && experiment.getInstrumentModel().getPlatformType().getSraName() != null) {
         Element platform = xml.getOwnerDocument().createElementNS(null, "PLATFORM");
-        Element type = xml.getOwnerDocument().createElementNS(null, experiment.getInstrumentModel().getPlatformType().getSraName());
+        Element type = xml.getOwnerDocument().createElementNS(null,
+            experiment.getInstrumentModel().getPlatformType().getSraName());
         platform.appendChild(type);
 
         Element model = xml.getOwnerDocument().createElementNS(null, "INSTRUMENT_MODEL");
@@ -405,15 +410,16 @@ public class EnaSubmissionPreparation {
 
   private final Submission submission;
 
-  private final ChildSubmissionFile[] FILES = new ChildSubmissionFile[] { new StudyXmlSubfile(), new SampleXmlSubfile(),
+  private final ChildSubmissionFile[] FILES = new ChildSubmissionFile[] {new StudyXmlSubfile(), new SampleXmlSubfile(),
       new LibraryAliquotXmlSubfile(),
-      new ExperimentXmlSubfile() };
+      new ExperimentXmlSubfile()};
 
   private final SubmissionActionType submissionAction;
 
   private final User user;
 
-  public EnaSubmissionPreparation(Submission submission, User user, String centreName, SubmissionActionType submissionAction) {
+  public EnaSubmissionPreparation(Submission submission, User user, String centreName,
+      SubmissionActionType submissionAction) {
     super();
     this.submission = submission;
     this.user = user;
@@ -425,7 +431,7 @@ public class EnaSubmissionPreparation {
     try (ByteArrayOutputStream outputBytes = new ByteArrayOutputStream()) {
 
       ZipOutputStream output = new ZipOutputStream(outputBytes);
-      submission.setSubmissionDate(new Date());
+      submission.setSubmissionDate(LocalDate.now(ZoneId.systemDefault()));
 
       Document submissionDocument = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
 

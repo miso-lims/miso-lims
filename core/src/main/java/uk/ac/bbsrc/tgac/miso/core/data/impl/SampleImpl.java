@@ -1,31 +1,10 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -108,8 +87,9 @@ public class SampleImpl extends AbstractBoxable implements Sample {
 
   @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
   @JoinTable(name = "Sample_Note", joinColumns = {
-      @JoinColumn(name = "sample_sampleId") }, inverseJoinColumns = {
-          @JoinColumn(name = "notes_noteId") })
+      @JoinColumn(name = "sample_sampleId")},
+      inverseJoinColumns = {
+          @JoinColumn(name = "notes_noteId")})
   private Collection<Note> notes = new HashSet<>();
 
   @OneToMany(targetEntity = SampleChangeLog.class, mappedBy = "sample", cascade = CascadeType.REMOVE)
@@ -148,8 +128,7 @@ public class SampleImpl extends AbstractBoxable implements Sample {
   @JoinColumn(name = "qcUser")
   private User qcUser;
 
-  @Temporal(TemporalType.DATE)
-  private Date qcDate;
+  private LocalDate qcDate;
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "creator", nullable = false, updatable = false)
@@ -172,8 +151,8 @@ public class SampleImpl extends AbstractBoxable implements Sample {
   private SampleBoxPosition boxPosition;
 
   @OneToMany(targetEntity = FileAttachment.class)
-  @JoinTable(name = "Sample_Attachment", joinColumns = { @JoinColumn(name = "sampleId") }, inverseJoinColumns = {
-      @JoinColumn(name = "attachmentId") })
+  @JoinTable(name = "Sample_Attachment", joinColumns = {@JoinColumn(name = "sampleId")}, inverseJoinColumns = {
+      @JoinColumn(name = "attachmentId")})
   private List<FileAttachment> attachments;
 
   @Transient
@@ -181,8 +160,8 @@ public class SampleImpl extends AbstractBoxable implements Sample {
 
   @Immutable
   @ManyToMany
-  @JoinTable(name = "Transfer_Sample", joinColumns = { @JoinColumn(name = "sampleId") }, inverseJoinColumns = {
-      @JoinColumn(name = "transferId") })
+  @JoinTable(name = "Transfer_Sample", joinColumns = {@JoinColumn(name = "sampleId")}, inverseJoinColumns = {
+      @JoinColumn(name = "transferId")})
   private Set<ListTransferView> listTransferViews;
 
   @ManyToOne
@@ -414,8 +393,10 @@ public class SampleImpl extends AbstractBoxable implements Sample {
   @Override
   public int compareTo(Sample s) {
     if (getId() != 0L && s.getId() != 0L) {
-      if (getId() < s.getId()) return -1;
-      if (getId() > s.getId()) return 1;
+      if (getId() < s.getId())
+        return -1;
+      if (getId() > s.getId())
+        return 1;
     } else if (getAlias() != null && s.getAlias() != null) {
       return getAlias().compareTo(s.getAlias());
     }
@@ -464,9 +445,12 @@ public class SampleImpl extends AbstractBoxable implements Sample {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     SampleImpl other = (SampleImpl) obj;
     return new EqualsBuilder()
         .appendSuper(super.equals(obj))
@@ -493,9 +477,13 @@ public class SampleImpl extends AbstractBoxable implements Sample {
   }
 
   @Override
-  public Date getBarcodeDate() {
+  public LocalDate getBarcodeDate() {
     ListTransferView receipt = getReceiptTransfer();
-    return receipt == null ? getCreationTime() : receipt.getTransferTime();
+    if (receipt == null) {
+      return LocalDate.ofInstant(getCreationTime().toInstant(), ZoneId.systemDefault());
+    } else {
+      return LocalDate.ofInstant(receipt.getTransferTime().toInstant(), ZoneId.systemDefault());
+    }
   }
 
   @Override
@@ -637,12 +625,12 @@ public class SampleImpl extends AbstractBoxable implements Sample {
   }
 
   @Override
-  public Date getQcDate() {
+  public LocalDate getQcDate() {
     return qcDate;
   }
 
   @Override
-  public void setQcDate(Date qcDate) {
+  public void setQcDate(LocalDate qcDate) {
     this.qcDate = qcDate;
   }
 

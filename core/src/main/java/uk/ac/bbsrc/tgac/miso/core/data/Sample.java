@@ -1,29 +1,5 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Collection;
 
@@ -38,11 +14,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.QualityControllable;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
 
 /**
- * A Sample contains information about the original material upon which a sequencing experiment is to be based.
+ * A Sample contains information about the original material upon which a sequencing experiment is
+ * to be based.
  * <p/>
- * Samples can be used in any number of sequencing {@link Experiment}s in the form of a {@link Library} that is processed further into
- * pooled {@link LibraryAliquot}s. Samples can be described further by a scientific name which, when enabled, will be checked against the
- * NCBI
+ * Samples can be used in any number of sequencing {@link Experiment}s in the form of a
+ * {@link Library} that is processed further into pooled {@link LibraryAliquot}s. Samples can be
+ * described further by a scientific name which, when enabled, will be checked against the NCBI
  * Taxonomy database.
  * <p/>
  * 
@@ -50,7 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
  * @since 0.0.2
  */
 public interface Sample extends Attachable, Comparable<Sample>, Deletable, HierarchyEntity, Locatable,
-    QualityControllable<SampleQC>, Serializable {
+    QualityControllable<SampleQC> {
 
   public static final String PLAIN_CATEGORY_NAME = "Plain";
 
@@ -64,16 +41,14 @@ public interface Sample extends Attachable, Comparable<Sample>, Deletable, Hiera
   /**
    * Sets the accession of this Sample object.
    * 
-   * @param accession
-   *          accession.
+   * @param accession accession.
    */
   public void setAccession(String accession);
 
   /**
    * Sets the name of this Sample object.
    * 
-   * @param name
-   *          name.
+   * @param name name.
    */
   public void setName(String name);
 
@@ -87,38 +62,39 @@ public interface Sample extends Attachable, Comparable<Sample>, Deletable, Hiera
   /**
    * Sets the description of this Sample object.
    * 
-   * @param description
-   *          description.
+   * @param description description.
    */
   public void setDescription(String description);
 
   /**
-   * Returns the scientificName of this Sample object. This should ideally match a taxon name of a species in the NCBI Taxonomy database.
+   * Returns the scientificName of this Sample object. This should ideally match a taxon name of a
+   * species in the NCBI Taxonomy database.
    * 
    * @return String scientificName.
    */
   public ScientificName getScientificName();
 
   /**
-   * Sets the scientificName of this Sample object. This should ideally match a taxon name of a species in the NCBI Taxonomy database.
+   * Sets the scientificName of this Sample object. This should ideally match a taxon name of a
+   * species in the NCBI Taxonomy database.
    * 
-   * @param scientificName
-   *          scientificName.
+   * @param scientificName scientificName.
    */
   public void setScientificName(ScientificName scientificName);
 
   /**
-   * Returns the taxonIdentifier of this Sample object. This should ideally match a taxon ID of a strain in the NCBI Taxonomy database.
+   * Returns the taxonIdentifier of this Sample object. This should ideally match a taxon ID of a
+   * strain in the NCBI Taxonomy database.
    * 
    * @return String taxonIdentifier.
    */
   public String getTaxonIdentifier();
 
   /**
-   * Sets the taxonIdentifier of this Sample object. This should ideally match a taxon ID of a strain in the NCBI Taxonomy database.
+   * Sets the taxonIdentifier of this Sample object. This should ideally match a taxon ID of a strain
+   * in the NCBI Taxonomy database.
    * 
-   * @param taxonIdentifier
-   *          taxonIdentifier.
+   * @param taxonIdentifier taxonIdentifier.
    */
   public void setTaxonIdentifier(String taxonIdentifier);
 
@@ -132,24 +108,21 @@ public interface Sample extends Attachable, Comparable<Sample>, Deletable, Hiera
   /**
    * Sets the project of this Sample object.
    * 
-   * @param project
-   *          project.
+   * @param project project.
    */
   public void setProject(Project project);
 
   /**
    * Sets the notes of this Sample object.
    * 
-   * @param notes
-   *          notes.
+   * @param notes notes.
    */
   public void setNotes(Collection<Note> notes);
 
   /**
    * Adds a Note to the Set of notes of this Sample object.
    * 
-   * @param note
-   *          Note.
+   * @param note Note.
    */
   public void addNote(Note note);
 
@@ -178,16 +151,14 @@ public interface Sample extends Attachable, Comparable<Sample>, Deletable, Hiera
   /**
    * Sets the sampleType of this Sample object.
    * 
-   * @param string
-   *          sampleType.
+   * @param string sampleType.
    */
   public void setSampleType(String string);
 
   /**
    * Registers a collection of QCs to this Sample object.
    * 
-   * @param qcs
-   *          qcs.
+   * @param qcs qcs.
    */
   public void setQCs(Collection<SampleQC> qcs);
 
@@ -251,8 +222,8 @@ public interface Sample extends Attachable, Comparable<Sample>, Deletable, Hiera
   public void setSequencingControlType(SequencingControlType sequencingControlType);
 
   /**
-   * @return information to be used for creating a receipt transfer during sample creation only. This field should
-   *         otherwise be null
+   * @return information to be used for creating a receipt transfer during sample creation only. This
+   *         field should otherwise be null
    */
   public TransferSample getCreationReceiptInfo();
 

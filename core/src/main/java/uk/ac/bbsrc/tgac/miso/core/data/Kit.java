@@ -1,39 +1,17 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Date;
 
 import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 
 /**
- * A Kit represents a consumable that can be used as part of a lab procedure, whereby its type is described by a {@link KitDescriptor} and
- * its actual existence by a lot number. {@link Note} objects can be added to Kits.
+ * A Kit represents a consumable that can be used as part of a lab procedure, whereby its type is
+ * described by a {@link KitDescriptor} and its actual existence by a lot number. {@link Note}
+ * objects can be added to Kits.
  * 
  * @author Rob Davey
  * @since 0.0.2
@@ -50,8 +28,7 @@ public interface Kit extends Comparable<Kit>, Barcodable, Locatable, Nameable, S
   /**
    * Sets the lotNumber of this Kit object.
    * 
-   * @param lotNumber
-   *          the Kit lot number.
+   * @param lotNumber the Kit lot number.
    * 
    */
   void setLotNumber(String lotNumber);
@@ -61,16 +38,15 @@ public interface Kit extends Comparable<Kit>, Barcodable, Locatable, Nameable, S
    * 
    * @return Date kitDate.
    */
-  Date getKitDate();
+  LocalDate getKitDate();
 
   /**
    * Sets the kitDate of this Kit object.
    * 
-   * @param kitDate
-   *          kitDate.
+   * @param kitDate kitDate.
    * 
    */
-  void setKitDate(Date kitDate);
+  void setKitDate(LocalDate kitDate);
 
   /**
    * Returns the notes of this Kit object.
@@ -89,8 +65,7 @@ public interface Kit extends Comparable<Kit>, Barcodable, Locatable, Nameable, S
   /**
    * Sets the kitDescriptor of this Kit object.
    * 
-   * @param kd
-   *          kitDescriptor.
+   * @param kd kitDescriptor.
    * 
    */
   void setKitDescriptor(KitDescriptor kd);
@@ -98,8 +73,7 @@ public interface Kit extends Comparable<Kit>, Barcodable, Locatable, Nameable, S
   /**
    * Sets the notes of this Kit object.
    * 
-   * @param notes
-   *          notes.
+   * @param notes notes.
    * 
    */
   void setNotes(Collection<Note> notes);
@@ -107,8 +81,7 @@ public interface Kit extends Comparable<Kit>, Barcodable, Locatable, Nameable, S
   /**
    * Add a note to this Kit
    * 
-   * @param note
-   *          of type {@link Note}
+   * @param note of type {@link Note}
    */
   void addNote(Note note);
 }

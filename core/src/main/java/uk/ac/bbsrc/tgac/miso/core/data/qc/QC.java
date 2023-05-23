@@ -1,22 +1,19 @@
 /*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
+ * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK MISO project contacts: Robert Davey @
+ * TGAC *********************************************************************
  *
  * This file is part of MISO.
  *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * MISO is free software: you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * MISO is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with MISO. If not, see
+ * <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -25,6 +22,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.qc;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -42,7 +40,6 @@ import javax.persistence.TemporalType;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
-import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -51,15 +48,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @MappedSuperclass
-public abstract class QC implements Deletable, Serializable, Comparable<QC>, Identifiable {
+public abstract class QC implements Deletable, Serializable, Comparable<QC> {
   private static final long serialVersionUID = 1L;
 
   public static final Long UNSAVED_ID = 0L;
 
   @Column(name = "created", nullable = false, updatable = false)
 
-  @Temporal(TemporalType.TIMESTAMP)
-  private Date creationTime;
+  private LocalDate creationTime;
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "creator")
@@ -94,7 +90,7 @@ public abstract class QC implements Deletable, Serializable, Comparable<QC>, Ide
 
   private String kitLot;
 
-  public Date getCreationTime() {
+  public LocalDate getCreationTime() {
     return creationTime;
   }
 
@@ -139,7 +135,7 @@ public abstract class QC implements Deletable, Serializable, Comparable<QC>, Ide
 
   public abstract List<? extends QcControlRun> getControls();
 
-  public void setCreationTime(Date creationTime) {
+  public void setCreationTime(LocalDate creationTime) {
     this.creationTime = creationTime;
   }
 

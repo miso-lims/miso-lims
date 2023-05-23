@@ -2,7 +2,6 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -205,16 +204,6 @@ public class InstrumentImpl implements Instrument {
     return dateDecommissioned == null;
   }
 
-  @Override
-  public void setLastServicedDate(Date date) {
-    this.lastServicedDate = date;
-  }
-
-  @Override
-  public Date getLastServicedDate() {
-    return lastServicedDate;
-  }
-
   @OneToMany(targetEntity = Run.class, mappedBy = "sequencer")
   private Set<Run> runs = new HashSet<>();
 
@@ -289,7 +278,6 @@ public class InstrumentImpl implements Instrument {
     return Objects.hash(getDateCommissioned(),
         getDateDecommissioned(),
         getId(),
-        getLastServicedDate(),
         getName(),
         getInstrumentModel(),
         getRuns(),
@@ -305,7 +293,6 @@ public class InstrumentImpl implements Instrument {
     return LimsUtils.equals(this, obj, InstrumentImpl::getDateCommissioned,
         InstrumentImpl::getDateDecommissioned,
         InstrumentImpl::getId,
-        InstrumentImpl::getLastServicedDate,
         InstrumentImpl::getName,
         InstrumentImpl::getInstrumentModel,
         InstrumentImpl::getRuns,
@@ -337,10 +324,8 @@ public class InstrumentImpl implements Instrument {
   }
 
   @Override
-  public Date getBarcodeDate() {
-    // TODO: change getBarcodeDate to return LocalDate?
-    return Date.from(getDateCommissioned().atStartOfDay(ZoneId.systemDefault()).toInstant());
-    // return getDateCommissioned();
+  public LocalDate getBarcodeDate() {
+    return getDateCommissioned();
   }
 
   @Override

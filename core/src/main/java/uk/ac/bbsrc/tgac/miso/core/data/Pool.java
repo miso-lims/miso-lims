@@ -1,32 +1,8 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Set;
 
 import com.eaglegenomics.simlims.core.Note;
@@ -39,19 +15,20 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.QualityControllable;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 /**
- * A Pool represents a collection of one or more {@link Poolable} objects, which enables multiplexing to be modelled if necessary. Pools
- * provide the link between the {@link Sample} tree and the {@link Run} tree of the MISO data model, which means that multiple samples from
- * multiple {@link Project}s can be pooled together.
+ * A Pool represents a collection of one or more {@link Poolable} objects, which enables
+ * multiplexing to be modelled if necessary. Pools provide the link between the {@link Sample} tree
+ * and the {@link Run} tree of the MISO data model, which means that multiple samples from multiple
+ * {@link Project}s can be pooled together.
  * <p/>
- * Pools are typed by the {@link Poolable} interface type they can accept, and as such, Pools can accept {@link LibraryAliquot}
- * objects at present. At creation time, a Pool is said to be "ready to run", which makes it easy to categorise and list Pools according to
- * whether they have been placed on a {@link SequencerPoolPartition} (at which point ready to run becomes false) or not.
+ * Pools are typed by the {@link Poolable} interface type they can accept, and as such, Pools can
+ * accept {@link LibraryAliquot} objects at present. At creation time, a Pool is said to be "ready
+ * to run", which makes it easy to categorise and list Pools according to whether they have been
+ * placed on a {@link SequencerPoolPartition} (at which point ready to run becomes false) or not.
  * 
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface Pool extends Comparable<Pool>, Barcodable, Boxable, Nameable, ChangeLoggable, Serializable, Aliasable,
-    QualityControllable<PoolQC>, Deletable, Attachable {
+public interface Pool extends Comparable<Pool>, Boxable, QualityControllable<PoolQC>, Deletable, Attachable {
 
   /**
    * Sets the name of this Pool object.
@@ -136,8 +113,8 @@ public interface Pool extends Comparable<Pool>, Barcodable, Boxable, Nameable, C
   public Boolean getQcPassed();
 
   /**
-   * Sets the qcPassed attribute of this Pool object. This should be true when a suitable QC has been carried out that passes a given
-   * result.
+   * Sets the qcPassed attribute of this Pool object. This should be true when a suitable QC has been
+   * carried out that passes a given result.
    * 
    * @param qcPassed qcPassed.
    */
@@ -188,14 +165,14 @@ public interface Pool extends Comparable<Pool>, Barcodable, Boxable, Nameable, C
   /**
    * @return the user-specified date that this Pool was created
    */
-  public Date getCreationDate();
+  public LocalDate getCreationDate();
 
   /**
    * Sets the user-specified date that this Pool was created
    * 
    * @param creationDate
    */
-  public void setCreationDate(Date creationDate);
+  public void setCreationDate(LocalDate creationDate);
 
   public String getLongestIndex();
 

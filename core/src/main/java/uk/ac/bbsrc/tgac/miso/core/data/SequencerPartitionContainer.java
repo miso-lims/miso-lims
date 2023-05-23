@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
@@ -34,7 +11,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QualityControllable;
 
 /**
- * A SequencerPartitionContainer describes a collection of {@link Partition} objects that can be used as part of a sequencer {@link Run}.
+ * A SequencerPartitionContainer describes a collection of {@link Partition} objects that can be
+ * used as part of a sequencer {@link Run}.
  * 
  * @author Rob Davey
  * @date 14/05/12
@@ -51,8 +29,7 @@ public interface SequencerPartitionContainer
   public Set<RunPosition> getRunPositions();
 
   /**
-   * Returns the {@link Run} with
-   * a) the latest start date (of the runs which have a known status), or
+   * Returns the {@link Run} with a) the latest start date (of the runs which have a known status), or
    * b) the last modified date
    * 
    * @return Run run

@@ -1,30 +1,7 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -65,8 +42,8 @@ public class InstrumentStatusRestController extends RestController {
           if (aRunning != bRunning) {
             return bRunning.ordinal() - aRunning.ordinal();
           }
-          Date aDate = getCompareDate(a);
-          Date bDate = getCompareDate(b);
+          LocalDate aDate = getCompareDate(a);
+          LocalDate bDate = getCompareDate(b);
           if (bDate == null) {
             return -1;
           } else if (aDate == null) {
@@ -89,16 +66,16 @@ public class InstrumentStatusRestController extends RestController {
     }
   }
 
-  private static Date getCompareDate(InstrumentStatus status) {
+  private static LocalDate getCompareDate(InstrumentStatus status) {
     return status.getPositions().stream()
         .map(InstrumentStatusPosition::getRun)
         .filter(Objects::nonNull)
         .map(run -> getCompareDate(run))
-        .max(Date::compareTo)
+        .max(LocalDate::compareTo)
         .orElse(null);
   }
 
-  private static Date getCompareDate(InstrumentStatusPositionRun run) {
+  private static LocalDate getCompareDate(InstrumentStatusPositionRun run) {
     return run.getCompletionDate() == null ? run.getStartDate() : run.getCompletionDate();
   }
 

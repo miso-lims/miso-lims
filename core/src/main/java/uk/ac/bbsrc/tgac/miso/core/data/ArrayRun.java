@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -55,12 +56,10 @@ public class ArrayRun implements Serializable, Aliasable, ChangeLoggable, Deleta
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private HealthType health = HealthType.Unknown;
-  
-  @Temporal(TemporalType.DATE)
-  private Date startDate;
 
-  @Temporal(TemporalType.DATE)
-  private Date completionDate;
+  private LocalDate startDate;
+
+  private LocalDate completionDate;
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "creator", nullable = false, updatable = false)
@@ -140,19 +139,19 @@ public class ArrayRun implements Serializable, Aliasable, ChangeLoggable, Deleta
     this.health = health;
   }
 
-  public Date getStartDate() {
+  public LocalDate getStartDate() {
     return startDate;
   }
 
-  public void setStartDate(Date startDate) {
+  public void setStartDate(LocalDate startDate) {
     this.startDate = startDate;
   }
 
-  public Date getCompletionDate() {
+  public LocalDate getCompletionDate() {
     return completionDate;
   }
 
-  public void setCompletionDate(Date completionDate) {
+  public void setCompletionDate(LocalDate completionDate) {
     this.completionDate = completionDate;
   }
 

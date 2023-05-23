@@ -1,9 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.service.naming.generation;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,18 +17,19 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.SiblingNumberGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrSampleAliasValidator;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public abstract class OicrBaseLibraryAliasGenerator<T, R> implements NameGenerator<T> {
 
   private static final String SEPARATOR = "_";
 
   private static final @RegEx String sampleRegex = "^"
-          + OicrSampleAliasValidator.IDENTITY_REGEX_PART
-          + "(_(?:"
-          + OicrSampleAliasValidator.TISSUE_NAME_REGEX
-          + ")_"
-          + OicrSampleAliasValidator.TISSUE_NAME_REGEX
-          + ")_.*";
+      + OicrSampleAliasValidator.IDENTITY_REGEX_PART
+      + "(_(?:"
+      + OicrSampleAliasValidator.TISSUE_NAME_REGEX
+      + ")_"
+      + OicrSampleAliasValidator.TISSUE_NAME_REGEX
+      + ")_.*";
   private static final Pattern samplePattern = Pattern.compile(sampleRegex);
 
   @Autowired
@@ -49,14 +48,15 @@ public abstract class OicrBaseLibraryAliasGenerator<T, R> implements NameGenerat
     R detailedItem = (R) item;
 
     switch (getPlatformType(detailedItem)) {
-    case ILLUMINA:
-      return generateIlluminaLibraryAlias(detailedItem);
-    case PACBIO:
-      return generatePacBioLibraryAlias(detailedItem);
-    case OXFORDNANOPORE:
-      return generateOxfordNanoporeLibraryAlias(detailedItem);
-    default:
-      throw new MisoNamingException("Alias generation is only available for Illumina, PacBio, and Oxford Nanopore Libraries");
+      case ILLUMINA:
+        return generateIlluminaLibraryAlias(detailedItem);
+      case PACBIO:
+        return generatePacBioLibraryAlias(detailedItem);
+      case OXFORDNANOPORE:
+        return generateOxfordNanoporeLibraryAlias(detailedItem);
+      default:
+        throw new MisoNamingException(
+            "Alias generation is only available for Illumina, PacBio, and Oxford Nanopore Libraries");
     }
   }
 
@@ -72,7 +72,7 @@ public abstract class OicrBaseLibraryAliasGenerator<T, R> implements NameGenerat
 
   protected abstract LibraryDesignCode getLibraryDesignCode(R item);
 
-  protected abstract Date getCreationDate(R item);
+  protected abstract LocalDate getCreationDate(R item);
 
   private String generateIlluminaLibraryAlias(R item) throws MisoNamingException {
     // e.g. PROJ_0001_Pa_P_PE_300_WG
@@ -85,8 +85,8 @@ public abstract class OicrBaseLibraryAliasGenerator<T, R> implements NameGenerat
   }
 
   /**
-   * Get the beginning of the Sample alias, to be used in the Library alias,
-   * e.g. PCSI_0123_Pa_R (project name, patient number, tissue origin, tissue type)
+   * Get the beginning of the Sample alias, to be used in the Library alias, e.g. PCSI_0123_Pa_R
+   * (project name, patient number, tissue origin, tissue type)
    * 
    * @param item the item that an alias is being generated for
    * @return the portion of the Sample alias to be used in the generated alias
@@ -158,8 +158,8 @@ public abstract class OicrBaseLibraryAliasGenerator<T, R> implements NameGenerat
   }
 
   /**
-   * Get the beginning of the Sample alias which should be the Identity, to be used in the generated alias,
-   * e.g. PCSI_0123 (project name, patient number)
+   * Get the beginning of the Sample alias which should be the Identity, to be used in the generated
+   * alias, e.g. PCSI_0123 (project name, patient number)
    * 
    * @param item the item that an alias is being generated for
    * @return the portion of the Sample alias to be used in the generated alias
@@ -172,8 +172,7 @@ public abstract class OicrBaseLibraryAliasGenerator<T, R> implements NameGenerat
   }
 
   private String getCreationDateString(R item) {
-    DateFormat df = new SimpleDateFormat("yyyyMMdd");
-    return df.format(getCreationDate(item));
+    return LimsUtils.formatDate(getCreationDate(item));
   }
 
   private String generateOxfordNanoporeLibraryAlias(R item) throws MisoNamingException, IOException {
