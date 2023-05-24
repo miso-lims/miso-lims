@@ -27,13 +27,13 @@ ListTarget.assaytest = (function () {
     createStaticActions: function (config, projectId) {
       var actions = [];
       if (config.isAdmin) {
-        if (config.pageMode) {
+        if (config.pageMode === "edit" || config.pageMode === "create") {
           // for Create/Edit Assay page
           actions.push({
             name: "Add",
             handler: showAddTestDialog,
           });
-        } else {
+        } else if (!config.assayId) {
           // for list page
           actions.push(
             ListUtils.createStaticAddAction("Assay Tests", Urls.ui.assayTests.bulkCreate, true)
