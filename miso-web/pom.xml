@@ -19,9 +19,9 @@
     <mysql.user>tgaclims</mysql.user>
     <mysql.pw>tgaclims</mysql.pw>
     <db.params>
-      autoReconnect=true&amp;characterEncoding=UTF-8&amp;allowPublicKeyRetrieval=true&amp;sslMode=DISABLED&amp;connectionTimeZone=SERVER</db.params>
+      autoReconnect=true&amp;characterEncoding=UTF-8&amp;allowPublicKeyRetrieval=true&amp;sslMode=DISABLED&amp;connectionTimeZone=SERVER&amp;cacheDefaultTimeZone=false</db.params>
     <db.params.jndi>
-      autoReconnect=true&amp;amp;characterEncoding=UTF-8&amp;amp;allowPublicKeyRetrieval=true&amp;amp;sslMode=DISABLED&amp;amp;connectionTimeZone=SERVER</db.params.jndi>
+      autoReconnect=true&amp;amp;characterEncoding=UTF-8&amp;amp;allowPublicKeyRetrieval=true&amp;amp;sslMode=DISABLED&amp;amp;connectionTimeZone=SERVER&amp;amp;cacheDefaultTimeZone=false</db.params.jndi>
 
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
