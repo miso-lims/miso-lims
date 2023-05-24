@@ -268,4 +268,4 @@ Where:
 * `$MYSQL_VERSION` is the version of MySQL for the database (e.g. "5.7").
 
 
-You do not need to do anything else from **Step 3** if you use this container method.
+If you use this container method, you can skip the [database configuration](#setting-up-the-database-server) step entirely.
