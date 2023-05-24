@@ -90,7 +90,7 @@ and populate it with the following information:
     <Context path="/ROOT" docBase="${catalina.home}/webapps/ROOT" reloadable="false">
       <Resources allowLinking="true"/>
       <Resource name="jdbc/MISODB" type="javax.sql.DataSource"
-      driverClassName="com.mysql.jdbc.Driver"
+      driverClassName="com.mysql.cj.jdbc.Driver"
       initialSize="32"
       maxIdle="10"
       maxActive="100"

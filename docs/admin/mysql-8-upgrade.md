@@ -40,6 +40,8 @@ move to a later 2.x version if available.
    mysql -D ${DATABASE} -uroot -p < misodb_5_7.sql
    ```
 
+1. Update the `driverClassName` in your `ROOT.xml` to "com.mysql.cj.jdbc.Driver"
+
 1. Update the database URL in your `ROOT.xml`. Replace `localhost` and `lims` with the correct host
   and database name. Note the recommended connection options have changed
 
