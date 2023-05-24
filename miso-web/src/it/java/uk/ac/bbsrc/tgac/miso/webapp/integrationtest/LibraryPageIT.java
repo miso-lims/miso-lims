@@ -4,8 +4,7 @@ import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.FormPageTestUtils.*;
 
 import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -381,7 +380,7 @@ public class LibraryPageIT extends AbstractIT {
     assertTrue("Page fails to show '" + warning + "' warning", page.getField(Field.WARNINGS).contains(warning));
   }
 
-  private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+  private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE;
 
   private static void assertDetailedLibraryAttributes(Map<Field, String> expectedValues, DetailedLibrary lib) {
     assertAttribute(Field.ID, expectedValues, Long.toString(lib.getId()));
@@ -390,7 +389,7 @@ public class LibraryPageIT extends AbstractIT {
     assertAttribute(Field.BARCODE, expectedValues, lib.getIdentificationBarcode());
     assertAttribute(Field.DESCRIPTION, expectedValues, lib.getDescription());
 
-    assertAttribute(Field.CREATION_DATE, expectedValues, dateFormat.format(lib.getCreationDate()));
+    assertAttribute(Field.CREATION_DATE, expectedValues, lib.getCreationDate().format(dateFormatter));
     assertAttribute(Field.PLATFORM, expectedValues, lib.getPlatformType().getKey());
     assertAttribute(Field.LIBRARY_TYPE, expectedValues, lib.getLibraryType().getDescription());
     assertAttribute(Field.DESIGN, expectedValues,
