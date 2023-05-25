@@ -254,9 +254,9 @@ If you encounter other errors migrating the database, make sure that you are usi
 
 # Development Alternatives
 
- If you are don't have the correct version of MySQL installed, this alternative allows the same result without you downloading it. To do this, download [Docker](https://docs.docker.com/get-docker/) to use a Docker container. Creating the container:
+ If you can't or don't want to install the correct version of MySQL installed, this alternative allows the same result without you downloading it. To do this, download [Docker](https://docs.docker.com/get-docker/) to use a Docker container. Creating the container:
 
-    docker run --name $CONTAINER_NAME -e MYSQL_ROOT_PASSWORD=$ROOT_PASSWORD -e MYSQL_DATABASE=$DB_NAME -e MYSQL_USER=$DB_USERNAME -e MYSQL_PASSWORD=$DB_PASSWORD -p 3306:3306 -d mysql:$MYSQL_VERSION
+    docker run --name $CONTAINER_NAME -e MYSQL_ROOT_PASSWORD=$ROOT_PASSWORD -e MYSQL_DATABASE=$DB_NAME -e MYSQL_USER=$DB_USERNAME -e MYSQL_PASSWORD=$DB_PASSWORD -p 3306:3306 -d mysql:8.0
 
 
 Where:
@@ -265,7 +265,7 @@ Where:
 * `$DB_NAME` is the name of the database (e.g. "lims").
 * `$DB_USERNAME` is the username to access the database (e.g. "tgaclims").
 * `$DB_PASSWORD` is the password to access the database (e.g. "tgaclims").
-* `$MYSQL_VERSION` is the version of MySQL for the database (e.g. "5.7").
 
+To map to a different port, change `-p 3306:3306` to `-p $PORT:3306`, where `$PORT` is your desired port.
 
 If you use this container method, you can skip the [database configuration](#setting-up-the-database-server) step entirely.
