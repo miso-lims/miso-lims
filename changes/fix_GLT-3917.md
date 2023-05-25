@@ -1,0 +1,1 @@
+Bug where regular bulk actions were not available to all users in the _Edit Transfer_ page.

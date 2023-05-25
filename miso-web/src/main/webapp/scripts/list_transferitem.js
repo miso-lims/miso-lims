@@ -6,6 +6,10 @@ ListTarget.transferitem = (function () {
     },
     createBulkActions: function (config, projectId) {
       var actions = [];
+      // pushing a null into actions as people without admin access would otherside have no bulk actions to
+      // interact with table data. Other solutions require refactoring the way bulk actions are given for
+      // the following: samples, libraries, library aliquots and pools.
+      actions.push(null);
       if (config.editSend) {
         actions.push({
           name: "Remove",
