@@ -7,6 +7,7 @@ BEGIN
   END IF;
 END//
 DELIMITER ;
+CALL assertVersion();
 DROP PROCEDURE assertVersion;
 
 -- These tables should have been removed in the V0320 migration

@@ -23,8 +23,10 @@ move to a later 2.x version if available.
       | xargs mysqldump -u root -p --single-transaction --skip-triggers "${DATABASE}" > misodb_5_7.sql
     ```
 
-1. remove MySQL 5.7 and install MySQL 8
+1. remove MySQL 5.7 and install MySQL 8.0
    * set the root password. Going forward, root must be used to run Flyway and restore backups
+   * configure the MySQL server time zone (UTC is recommended). You may want to populate the MySQL
+     time zone tables. See the [MySQL docs for this](https://dev.mysql.com/doc/refman/8.0/en/time-zone-support.html)
 1. prepare MySQL 8 database. Replace `lims` with your database name if different.
    * `CREATE DATABASE lims;`
    * Create any necessary users. e.g.
@@ -46,7 +48,7 @@ move to a later 2.x version if available.
   and database name. Note the recommended connection options have changed
 
     ```
-    url="jdbc:mysql://localhost:3306/lims?autoReconnect=true&amp;characterEncoding=UTF-8&amp;allowPublicKeyRetrieval=true&amp;sslMode=DISABLED"
+    url="jdbc:mysql://localhost:3306/lims?autoReconnect=true&amp;characterEncoding=UTF-8&amp;allowPublicKeyRetrieval=true&amp;sslMode=DISABLED&amp;connectionTimeZone=SERVER"
     ```
 
 1. Follow the usual [update procedure](https://miso-lims.readthedocs.io/projects/docs/en/latest/admin/baremetal-installation-guide/#installing-and-upgrading), but with one additional step:
@@ -60,8 +62,10 @@ move to a later 2.x version if available.
     and database name):
 
     ```
-    jdbc:mysql://localhost:3306/lims?autoReconnect=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&sslMode=DISABLED&useSSL=false
+    jdbc:mysql://localhost:3306/lims?autoReconnect=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&sslMode=DISABLED&connectionTimeZone=SERVER&useSSL=false
     ```
+
+1. Run Flyway migrate and continue with the usual update procedure.
 
 ## Docker Compose
 
