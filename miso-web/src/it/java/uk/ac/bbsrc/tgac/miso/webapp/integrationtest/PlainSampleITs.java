@@ -159,6 +159,7 @@ public class PlainSampleITs extends AbstractIT {
     attrs.put(LibColumns.INDEX_FAMILY, "Dual Index 6bp");
     attrs.put(LibColumns.INDEX_1, "A01 (AAACCC)");
     attrs.put(LibColumns.INDEX_2, "B01 (AAATTT)");
+    attrs.put(LibColumns.UMIS, "False");
     attrs.put(LibColumns.KIT_DESCRIPTOR, "Test Kit");
     attrs.put(LibColumns.KIT_LOT, "20200730");
     attrs.put(LibColumns.QC_STATUS, "Ready");
@@ -196,6 +197,7 @@ public class PlainSampleITs extends AbstractIT {
     attrs.put(LibColumns.SELECTION, "PCR");
     attrs.put(LibColumns.STRATEGY, "WGS");
     attrs.put(LibColumns.INDEX_FAMILY, "No indices");
+    attrs.put(LibColumns.UMIS, "False");
     attrs.put(LibColumns.KIT_DESCRIPTOR, "Test Kit");
     attrs.put(LibColumns.QC_STATUS, "Ready");
     attrs.put(LibColumns.SIZE, "321");
