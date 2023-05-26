@@ -65,6 +65,9 @@ move to a later 2.x version if available.
     jdbc:mysql://localhost:3306/lims?autoReconnect=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&sslMode=DISABLED&connectionTimeZone=SERVER&useSSL=false
     ```
 
+    If you receive an error regarding the time zone, ensure that you have configured the MySQL time
+    zone as instructed above.
+
 1. Run Flyway migrate and continue with the usual update procedure.
 
 ## Docker Compose
