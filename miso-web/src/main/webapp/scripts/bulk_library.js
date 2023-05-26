@@ -866,7 +866,6 @@ BulkTarget.library = (function ($) {
           ],
           getItemLabel: Utils.array.get("label"),
           getItemValue: Utils.array.get("value"),
-          initial: "False",
         },
         {
           title: "Kit",

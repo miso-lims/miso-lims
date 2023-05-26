@@ -1,34 +1,9 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.getParent;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.getParentRequisition;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils.*;
 
 import java.io.IOException;
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -71,7 +46,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotRna;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryBatch;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentTissueAttributes;
@@ -232,7 +211,8 @@ public class EditLibraryController {
   @GetMapping(value = "/{libraryId}")
   public ModelAndView setupForm(@PathVariable Long libraryId, ModelMap model) throws IOException {
     Library library = libraryService.get(libraryId);
-    if (library == null) throw new NotFoundException("No library found for ID " + libraryId.toString());
+    if (library == null)
+      throw new NotFoundException("No library found for ID " + libraryId.toString());
     model.put("title", "Library " + library.getId());
 
     model.put("library", library);
@@ -241,8 +221,9 @@ public class EditLibraryController {
     Collection<Pool> pools = poolService.listByLibraryId(library.getId());
     model.put("libraryPools",
         pools.stream().map(p -> Dtos.asDto(p, false, false, indexChecker)).collect(Collectors.toList()));
-    model.put("libraryRuns", pools.stream().flatMap(WhineyFunction.flatRethrow(p -> runService.listByPoolId(p.getId()))).map(Dtos::asDto)
-        .collect(Collectors.toList()));
+    model.put("libraryRuns",
+        pools.stream().flatMap(WhineyFunction.flatRethrow(p -> runService.listByPoolId(p.getId()))).map(Dtos::asDto)
+            .collect(Collectors.toList()));
     model.put("libraryAliquots", library.getLibraryAliquots().stream()
         .map(ldi -> Dtos.asDto(ldi, false)).collect(Collectors.toList()));
     ObjectNode config = mapper.createObjectNode();
@@ -250,7 +231,7 @@ public class EditLibraryController {
     model.put("libraryAliquotsConfig", mapper.writeValueAsString(config));
     model.put("experiments",
         experimentService.listAllByLibraryId(library.getId()).stream().map(exp -> Dtos.asDto(exp))
-        .collect(Collectors.toList()));
+            .collect(Collectors.toList()));
     model.put("libraryDto", mapper.writeValueAsString(Dtos.asDto(library, false)));
 
     if (LimsUtils.isDetailedLibrary(library)) {
@@ -306,7 +287,8 @@ public class EditLibraryController {
         detailedDto.setNonStandardAlias(sample.hasNonStandardAlias());
         if (sample.getBox() != null) {
           detailedDto.setSampleBoxPosition(sample.getBoxPosition());
-          detailedDto.setSampleBoxPositionLabel(BoxUtils.makeBoxPositionLabel(sample.getBox().getAlias(), sample.getBoxPosition()));
+          detailedDto.setSampleBoxPositionLabel(
+              BoxUtils.makeBoxPositionLabel(sample.getBox().getAlias(), sample.getBoxPosition()));
         }
         GroupIdentifiable effective = sample.getEffectiveGroupIdEntity();
         if (effective != null) {
@@ -329,6 +311,7 @@ public class EditLibraryController {
       dto.setProjectName(item.getProject().getName());
       dto.setProjectShortName(item.getProject().getShortName());
       dto.setBox(newBox);
+      dto.setUmis(null);
 
       Requisition requisition = item.getRequisition() == null ? getParentRequisition(item)
           : item.getRequisition();
@@ -541,6 +524,7 @@ public class EditLibraryController {
     if (boxId != null) {
       libDto.setBox(Dtos.asDto(boxService.get(boxId), true));
     }
+    libDto.setUmis(null);
     return libDto;
   }
 

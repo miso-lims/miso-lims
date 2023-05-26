@@ -7,7 +7,11 @@ import java.util.function.Function;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -19,9 +23,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
     @JsonSubTypes.Type(value = DetailedLibraryDto.class, name = "Detailed"),
-    @JsonSubTypes.Type(value = LibraryDto.class, name = "Plain") })
+    @JsonSubTypes.Type(value = LibraryDto.class, name = "Plain")})
 @JsonTypeName(value = "Plain")
-public class LibraryDto extends AbstractBoxableDto implements ReceivableDto<Library, TransferLibrary>, UpstreamQcFailableDto {
+public class LibraryDto extends AbstractBoxableDto
+    implements ReceivableDto<Library, TransferLibrary>, UpstreamQcFailableDto {
 
   private String alias;
   private String concentration;
@@ -81,7 +86,7 @@ public class LibraryDto extends AbstractBoxableDto implements ReceivableDto<Libr
   private Long spikeInId;
   private String spikeInVolume;
   private String spikeInDilutionFactor;
-  private boolean umis;
+  private Boolean umis;
   private Long workstationId;
   private Long thermalCyclerId;
   private Long sopId;
@@ -507,11 +512,11 @@ public class LibraryDto extends AbstractBoxableDto implements ReceivableDto<Libr
     this.ngUsed = ngUsed;
   }
 
-  public boolean getUmis() {
+  public Boolean getUmis() {
     return umis;
   }
 
-  public void setUmis(boolean umis) {
+  public void setUmis(Boolean umis) {
     this.umis = umis;
   }
 
