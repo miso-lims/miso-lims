@@ -1,6 +1,6 @@
 -- Subproject_Priority_Notice
 
-ALTER TABLE `Subproject` MODIFY `priority` tinyint(1) NOT NULL;
+ALTER TABLE `Subproject` MODIFY `priority` tinyint NOT NULL;
 
 
 -- Drop_DetailedSample_Concentration

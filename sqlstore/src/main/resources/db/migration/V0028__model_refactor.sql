@@ -1,6 +1,6 @@
 -- This migration may delete sample valid relationships that are in use. To find bad entities, do:
 -- SELECT child.sampleId AS sampleId FROM SampleAdditionalInfo child JOIN SampleAdditionalInfo parent ON child.parentId = parent.sampleId WHERE (SELECT COUNT(*) FROM SampleValidRelationship WHERE SampleValidRelationship.parentId = parent.sampleClassId AND SampleValidRelationship.childId = child.sampleClassId) = 0;
-ALTER TABLE SampleAdditionalInfo ADD COLUMN groupId int(10);
+ALTER TABLE SampleAdditionalInfo ADD COLUMN groupId int;
 ALTER TABLE SampleAdditionalInfo ADD COLUMN groupDescription varchar(255);
 ALTER TABLE SampleAdditionalInfo ADD COLUMN isSynthetic BOOLEAN NOT NULL DEFAULT FALSE;
 
@@ -30,22 +30,20 @@ ALTER TABLE SampleTissue DROP COLUMN updatedBy;
 ALTER TABLE SampleTissue DROP COLUMN lastUpdated;
 ALTER TABLE SampleTissue DROP COLUMN cellularity;
 
-ALTER TABLE SampleTissue ADD COLUMN tissueOriginId bigint(20);
+ALTER TABLE SampleTissue ADD COLUMN tissueOriginId bigint;
 ALTER TABLE SampleTissue ADD CONSTRAINT `FK_st_tissueOrigin_tissueOriginId` FOREIGN KEY (`tissueOriginId`) REFERENCES `TissueOrigin` (`tissueOriginId`);
-ALTER TABLE SampleTissue ADD COLUMN tissueTypeId bigint(20);
+ALTER TABLE SampleTissue ADD COLUMN tissueTypeId bigint;
 ALTER TABLE SampleTissue ADD CONSTRAINT `FK_st_tissueType_tissueTypeId` FOREIGN KEY (`tissueTypeId`) REFERENCES `TissueType` (`tissueTypeId`);
 ALTER TABLE SampleTissue ADD COLUMN externalInstituteIdentifier varchar(255);
-ALTER TABLE SampleTissue ADD COLUMN labId bigint(20);
+ALTER TABLE SampleTissue ADD COLUMN labId bigint;
 ALTER TABLE SampleTissue ADD CONSTRAINT `FK_st_lab_labId` FOREIGN KEY (`labId`) REFERENCES `Lab` (`labId`);
 ALTER TABLE SampleTissue ADD COLUMN region varchar(255); 
-ALTER TABLE SampleTissue ADD COLUMN passageNumber int(11);
-ALTER TABLE SampleTissue ADD COLUMN tubeNumber int(11);
-ALTER TABLE SampleTissue ADD COLUMN timesReceived int(11);
-ALTER TABLE SampleTissue ADD COLUMN tissueMaterialId bigint(20);
+ALTER TABLE SampleTissue ADD COLUMN passageNumber int;
+ALTER TABLE SampleTissue ADD COLUMN tubeNumber int;
+ALTER TABLE SampleTissue ADD COLUMN timesReceived int;
+ALTER TABLE SampleTissue ADD COLUMN tissueMaterialId bigint;
 ALTER TABLE SampleTissue ADD CONSTRAINT `FK_st_tm_tissueMaterialId` FOREIGN KEY (`tissueMaterialId`) REFERENCES `TissueMaterial` (`tissueMaterialId`);
 
--- StartNoTest
--- H2 can't cope with a JOIN in an UPDATE
 UPDATE SampleTissue JOIN SampleAdditionalInfo ON SampleTissue.sampleId = SampleAdditionalInfo.sampleId SET
   SampleTissue.tissueOriginId = SampleAdditionalInfo.tissueOriginId,
   SampleTissue.tissueTypeId = SampleAdditionalInfo.tissueTypeId,
@@ -54,28 +52,27 @@ UPDATE SampleTissue JOIN SampleAdditionalInfo ON SampleTissue.sampleId = SampleA
   SampleTissue.passageNumber = SampleAdditionalInfo.passageNumber,
   SampleTissue.tubeNumber = SampleAdditionalInfo.tubeNumber,
   SampleTissue.timesReceived = SampleAdditionalInfo.timesReceived;
--- EndNoTest
 
 DROP TABLE IF EXISTS SampleStock;
 DROP TABLE IF EXISTS SampleAliquot;
 CREATE TABLE `SampleStock` (
-  `sampleId` bigint(20) NOT NULL,
-  `concentration` int(11) DEFAULT NULL,
+  `sampleId` bigint NOT NULL,
+  `concentration` int DEFAULT NULL,
   `strStatus` varchar(50) NOT NULL DEFAULT 'NOT_SUBMITTED',
   PRIMARY KEY (`sampleId`),
   KEY `K_ss_sampleId` (`sampleId`),
   CONSTRAINT `FK_ss_sample_sampleId` FOREIGN KEY (`sampleId`) REFERENCES `Sample` (`sampleId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `SampleAliquot` (
-  `sampleId` bigint(20) NOT NULL,
-  `samplePurposeId` bigint(20) DEFAULT NULL,
+  `sampleId` bigint NOT NULL,
+  `samplePurposeId` bigint DEFAULT NULL,
   PRIMARY KEY (`sampleId`),
   KEY `K_sa_sampleId` (`sampleId`),
   KEY `K_sa_samplePurposeId` (`samplePurposeId`),
   CONSTRAINT `FK_sa_samplePurpose_samplePurposeId` FOREIGN KEY (`samplePurposeId`) REFERENCES `SamplePurpose` (`samplePurposeId`),
   CONSTRAINT `FK_sa_sample_sampleId` FOREIGN KEY (`sampleId`) REFERENCES `Sample` (`sampleId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 UPDATE SampleClass SET sampleCategory = 'Aliquot' WHERE sampleCategory = 'Analyte' AND NOT isStock;
 UPDATE SampleClass SET sampleCategory = 'Stock' WHERE sampleCategory = 'Analyte' AND isStock;
@@ -87,12 +84,10 @@ DROP TABLE SampleAnalyte;
 DELETE FROM SampleClass WHERE sampleCategory = 'Analyte';
 ALTER TABLE SampleClass DROP COLUMN isStock;
 
--- StartNoTest
 DELETE svr FROM SampleValidRelationship svr
 JOIN SampleClass parent ON parent.sampleClassId = svr.parentId
 JOIN SampleClass child ON child.sampleClassId = svr.childId
 WHERE parent.sampleCategory = 'Identity' AND child.sampleCategory <> 'Tissue';
--- EndNoTest
 
 -- tissueOrigin fkey
 ALTER TABLE SampleAdditionalInfo DROP FOREIGN KEY FK24aduvv5cljo3ggnt0s2cs1w3;
@@ -114,21 +109,21 @@ ALTER TABLE LibraryAdditionalInfo DROP COLUMN tissueOriginId;
 ALTER TABLE LibraryAdditionalInfo DROP COLUMN tissueTypeId;
 
 CREATE TABLE `SampleTissueProcessing` (
-    `sampleId` bigint(20) PRIMARY KEY,
+    `sampleId` bigint PRIMARY KEY,
     CONSTRAINT `sampleTP_sample_fkey` FOREIGN KEY (`sampleId`) REFERENCES `Sample` (`sampleId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `SampleCVSlide` (
-    `sampleId` bigint(20) PRIMARY KEY,
+    `sampleId` bigint PRIMARY KEY,
     `cuts` int NOT NULL DEFAULT 0,
     `discards` int DEFAULT 0,
     `thickness` int,
     CONSTRAINT `sampleCVSlide_sample_fkey` FOREIGN KEY (`sampleId`) REFERENCES `Sample` (`sampleId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `SampleLCMTube` (
-    `sampleId` bigint(20) PRIMARY KEY,
+    `sampleId` bigint PRIMARY KEY,
     `cutsConsumed` int NOT NULL DEFAULT 0,
     CONSTRAINT `sampleLCMTube_sample_fkey` FOREIGN KEY (`sampleId`) REFERENCES `Sample` (`sampleId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

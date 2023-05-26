@@ -1,11 +1,10 @@
--- StartNoTest
 DELIMITER //
 
 DROP TRIGGER IF EXISTS LibraryChange//
 CREATE TRIGGER LibraryChange BEFORE UPDATE ON Library
 FOR EACH ROW
   BEGIN
-  DECLARE log_message longtext CHARACTER SET utf8;
+  DECLARE log_message longtext;
   SET log_message = CONCAT_WS(', ',
     makeChangeMessage('accession', OLD.accession, NEW.accession),
     CASE WHEN OLD.alias NOT LIKE 'TEMPORARY%' THEN makeChangeMessage('alias', OLD.alias, NEW.alias) END,
@@ -107,4 +106,3 @@ FOR EACH ROW
     NEW.lastModified)//
 
 DELIMITER ;
--- EndNoTest

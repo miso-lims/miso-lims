@@ -1,4 +1,3 @@
--- StartNoTest
 DELIMITER //
 
 DROP TRIGGER IF EXISTS ArrayInsert//
@@ -11,7 +10,7 @@ DROP TRIGGER IF EXISTS ArrayChange//
 CREATE TRIGGER ArrayChange BEFORE UPDATE ON Array
 FOR EACH ROW
   BEGIN
-  DECLARE log_message longtext CHARACTER SET utf8;
+  DECLARE log_message longtext;
   SET log_message = CONCAT_WS(', ',
         CASE WHEN NEW.alias <> OLD.alias THEN CONCAT('alias: ', OLD.alias, ' → ', NEW.alias) END,
         CASE WHEN (NEW.serialNumber IS NULL) <> (OLD.serialNumber IS NULL) OR NEW.serialNumber <> OLD.serialNumber THEN CONCAT('serial number: ', COALESCE(OLD.serialNumber, 'n/a'), ' → ', COALESCE(NEW.serialNumber, 'n/a')) END,
@@ -39,4 +38,3 @@ FOR EACH ROW
   FROM Array a WHERE a.arrayId = NEW.arrayId//
 
 DELIMITER ;
--- EndNoTest

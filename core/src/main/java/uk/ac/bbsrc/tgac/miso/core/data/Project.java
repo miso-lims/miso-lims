@@ -1,31 +1,8 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Date;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Contact;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Pipeline;
@@ -33,8 +10,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
 
 /**
- * A Project represents the top level object in the MISO data model. A Project couples together {@link Study} and {@link Sample} objects to
- * record information about a given sequencing project.
+ * A Project represents the top level object in the MISO data model. A Project couples together
+ * {@link Study} and {@link Sample} objects to record information about a given sequencing project.
  * <p/>
  * A Project's status is tracked by its {@link StatusType} enumeration.
  * 
@@ -62,13 +39,13 @@ public interface Project extends Comparable<Project>, Deletable, Nameable, Seria
   /**
    * Sets the alias of this Project object.
    * 
-   * @param alias
-   *          alias.
+   * @param alias alias.
    */
   void setAlias(String alias);
 
   /**
-   * Returns the short name, used as a prefix for generating sample names, or the alias if not specified.
+   * Returns the short name, used as a prefix for generating sample names, or the alias if not
+   * specified.
    */
   String getShortName();
 
@@ -99,8 +76,7 @@ public interface Project extends Comparable<Project>, Deletable, Nameable, Seria
   /**
    * Registers a collection of studies to this Project object.
    * 
-   * @param studies
-   *          studies.
+   * @param studies studies.
    */
   void setStudies(Collection<Study> studies);
 
@@ -127,9 +103,9 @@ public interface Project extends Comparable<Project>, Deletable, Nameable, Seria
 
   public void setRebNumber(String rebNumber);
 
-  public Date getRebExpiry();
+  public LocalDate getRebExpiry();
 
-  public void setRebExpiry(Date rebExpiry);
+  public void setRebExpiry(LocalDate rebExpiry);
 
   public Integer getSamplesExpected();
 

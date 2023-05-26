@@ -4,7 +4,7 @@ DROP TRIGGER IF EXISTS PoolOrderChange//
 CREATE TRIGGER PoolOrderChange BEFORE UPDATE ON PoolOrder
 FOR EACH ROW
   BEGIN
-  DECLARE log_message longtext CHARACTER SET utf8;
+  DECLARE log_message longtext;
   SET log_message = CONCAT_WS(', ',
     makeChangeMessage('alias', OLD.alias, NEW.alias),
     makeChangeMessage('description', OLD.description, NEW.description),

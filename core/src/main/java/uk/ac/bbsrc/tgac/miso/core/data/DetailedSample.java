@@ -1,7 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentAttributes;
@@ -37,38 +37,41 @@ public interface DetailedSample extends Sample, GroupIdentifiable {
   Integer getSiblingNumber();
 
   /**
-   * Specifies the number of this Sample amongst Samples of the same SampleClass sharing the same parent
+   * Specifies the number of this Sample amongst Samples of the same SampleClass sharing the same
+   * parent
    * 
    * @param siblingNumber
    */
   void setSiblingNumber(Integer siblingNumber);
 
   /**
-   * True if the entity is not a physical sample, but one created to create the appearance of a complete hierarchy when partially processed
-   * sample is received by the lab.
+   * True if the entity is not a physical sample, but one created to create the appearance of a
+   * complete hierarchy when partially processed sample is received by the lab.
    */
   Boolean isSynthetic();
 
   void setSynthetic(Boolean synthetic);
 
   /**
-   * True if the sample's alias does not pass alias validation but cannot be changed (usually for historical reasons). Setting this to true
-   * means the sample will skip alias validation (and uniqueness validation, if enabled) during save.
+   * True if the sample's alias does not pass alias validation but cannot be changed (usually for
+   * historical reasons). Setting this to true means the sample will skip alias validation (and
+   * uniqueness validation, if enabled) during save.
    */
   boolean hasNonStandardAlias();
 
   void setNonStandardAlias(boolean nonStandardAlias);
-  
+
   /**
    * @return the old LIMS' ID for this sample prior to being migrated to MISO
    */
   @Override
   Long getPreMigrationId();
-  
+
   void setPreMigrationId(Long preMigrationId);
 
   /**
-   * Transient field for storing the ID of the identity which will be at the root of the hierarchy for this Detailed Sample
+   * Transient field for storing the ID of the identity which will be at the root of the hierarchy for
+   * this Detailed Sample
    * 
    * @return Long identityId
    */
@@ -77,20 +80,22 @@ public interface DetailedSample extends Sample, GroupIdentifiable {
   void setIdentityId(Long identityId);
 
   /**
-   * Field for storing the date of sample creation. This is not the date that the sample was entered into MISO.
-   * This field is not automatically generated on sample creation and must be specified by a user.
+   * Field for storing the date of sample creation. This is not the date that the sample was entered
+   * into MISO. This field is not automatically generated on sample creation and must be specified by
+   * a user.
    * 
    * @return creationDate
    */
-  Date getCreationDate();
+  LocalDate getCreationDate();
 
   /**
-   * Sets the date of sample creation to the specified date. This is not the date the sample was entered into MISO.
-   * This field is not automatically generated on sample creation and must be specified by a user.
+   * Sets the date of sample creation to the specified date. This is not the date the sample was
+   * entered into MISO. This field is not automatically generated on sample creation and must be
+   * specified by a user.
    * 
    * @param creationDate
    */
-  void setCreationDate(Date creationDate);
+  void setCreationDate(LocalDate creationDate);
 
   public BigDecimal getNgUsed();
 

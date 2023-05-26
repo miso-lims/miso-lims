@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl.view.instrumentstatus;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -83,11 +84,8 @@ public class InstrumentStatusPositionRun implements Serializable {
   @Column(nullable = false)
   private HealthType health = HealthType.Unknown;
 
-  @Temporal(TemporalType.DATE)
-  private Date startDate;
-
-  @Temporal(TemporalType.DATE)
-  private Date completionDate;
+  private LocalDate startDate;
+  private LocalDate completionDate;
 
   @Column(nullable = false)
   @Temporal(TemporalType.TIMESTAMP)
@@ -144,19 +142,19 @@ public class InstrumentStatusPositionRun implements Serializable {
     this.health = health;
   }
 
-  public Date getStartDate() {
+  public LocalDate getStartDate() {
     return startDate;
   }
 
-  public void setStartDate(Date startDate) {
+  public void setStartDate(LocalDate startDate) {
     this.startDate = startDate;
   }
 
-  public Date getCompletionDate() {
+  public LocalDate getCompletionDate() {
     return completionDate;
   }
 
-  public void setCompletionDate(Date completionDate) {
+  public void setCompletionDate(LocalDate completionDate) {
     this.completionDate = completionDate;
   }
 

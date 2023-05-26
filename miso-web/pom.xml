@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>miso</artifactId>
@@ -13,10 +15,14 @@
     <skipITs>true</skipITs>
     <cargoInitGoal>start</cargoInitGoal>
     <mysql.db>lims</mysql.db>
+    <mysql.rootpw>abc123</mysql.rootpw>
     <mysql.user>tgaclims</mysql.user>
     <mysql.pw>tgaclims</mysql.pw>
-    <db.params>autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useLegacyDatetimeCode=false&amp;useSSL=false</db.params>
-    <db.params.jndi>autoReconnect=true&amp;amp;zeroDateTimeBehavior=convertToNull&amp;amp;useUnicode=true&amp;amp;characterEncoding=UTF-8&amp;amp;useLegacyDatetimeCode=false&amp;amp;useSSL=false</db.params.jndi>
+    <db.params>
+      autoReconnect=true&amp;characterEncoding=UTF-8&amp;allowPublicKeyRetrieval=true&amp;sslMode=DISABLED&amp;connectionTimeZone=SERVER&amp;cacheDefaultTimeZone=false</db.params>
+    <db.params.jndi>
+      autoReconnect=true&amp;amp;characterEncoding=UTF-8&amp;amp;allowPublicKeyRetrieval=true&amp;amp;sslMode=DISABLED&amp;amp;connectionTimeZone=SERVER&amp;amp;cacheDefaultTimeZone=false</db.params.jndi>
+
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
   <dependencies>
@@ -46,14 +52,14 @@
       <artifactId>oauth-signature</artifactId>
     </dependency>
     <dependency>
-     <groupId>commons-fileupload</groupId>
-     <artifactId>commons-fileupload</artifactId>
-     <exclusions>
-       <exclusion>
-         <groupId>commons-io</groupId>
-         <artifactId>commons-io</artifactId>
-       </exclusion>
-     </exclusions>
+      <groupId>commons-fileupload</groupId>
+      <artifactId>commons-fileupload</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-io</groupId>
+          <artifactId>commons-io</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>commons-httpclient</groupId>
@@ -272,8 +278,8 @@
       <artifactId>xml-apis</artifactId>
     </dependency>
     <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
+      <groupId>com.mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
@@ -288,16 +294,15 @@
         <plugin>
           <groupId>io.fabric8</groupId>
           <artifactId>docker-maven-plugin</artifactId>
-          <version>0.40.3</version>
           <configuration>
             <removeVolumes>true</removeVolumes>
             <images>
               <image>
-                <name>mysql:5.7</name>
+                <name>mysql:8.0</name>
                 <alias>mysql</alias>
                 <run>
                   <env>
-                    <MYSQL_ROOT_PASSWORD>abc123</MYSQL_ROOT_PASSWORD>
+                    <MYSQL_ROOT_PASSWORD>${mysql.rootpw}</MYSQL_ROOT_PASSWORD>
                     <MYSQL_USER>${mysql.user}</MYSQL_USER>
                     <MYSQL_PASSWORD>${mysql.pw}</MYSQL_PASSWORD>
                     <MYSQL_DATABASE>${mysql.db}</MYSQL_DATABASE>
@@ -330,7 +335,8 @@
               <outputDirectory>${project.build.directory}/scripts</outputDirectory>
               <resources>
                 <resource>
-                  <!--copy scripts to build directory early so they can be optimized below-->
+                  <!--copy
+                  scripts to build directory early so they can be optimized below-->
                   <directory>${project.basedir}/src/main/webapp/scripts</directory>
                   <filtering>true</filtering>
                   <includes>
@@ -381,7 +387,8 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
         <configuration>
-          <!--Avoid re-copying original scripts since we already handled them-->
+          <!--Avoid
+          re-copying original scripts since we already handled them-->
           <warSourceExcludes>scripts/*</warSourceExcludes>
         </configuration>
       </plugin>
@@ -401,93 +408,93 @@
         <plugins>
           <plugin>
             <!-- separate integration test sources/resources from unit tests -->
-	        <groupId>org.codehaus.mojo</groupId>
-	        <artifactId>build-helper-maven-plugin</artifactId>
-	        <executions>
-	          <execution>
-	            <id>add-it-sources</id>
-	            <phase>generate-test-sources</phase>
-	            <goals>
-	              <goal>add-test-source</goal>
-	            </goals>
-	            <configuration>
-	              <sources>
-	                <source>src/it/java</source>
-	              </sources>
-	            </configuration>
-	          </execution>
-	          <execution>
-	            <id>add-it-resources</id>
-	            <phase>generate-test-resources</phase>
-	            <goals>
-	              <goal>add-test-resource</goal>
-	            </goals>
-	            <configuration>
-	              <resources>
-	                <resource>
-	                  <filtering>true</filtering>
-	                  <directory>src/it/resources</directory>
-	                </resource>
-	              </resources>
-	            </configuration>
-	          </execution>
-	          <!-- Reserve ports for Tomcat -->
-	          <execution>
-	            <id>reserve-network-port</id>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>add-it-sources</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>add-test-source</goal>
+                </goals>
+                <configuration>
+                  <sources>
+                    <source>src/it/java</source>
+                  </sources>
+                </configuration>
+              </execution>
+              <execution>
+                <id>add-it-resources</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>add-test-resource</goal>
+                </goals>
+                <configuration>
+                  <resources>
+                    <resource>
+                      <filtering>true</filtering>
+                      <directory>src/it/resources</directory>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+              <!-- Reserve ports for Tomcat -->
+              <execution>
+                <id>reserve-network-port</id>
                 <phase>pre-integration-test</phase>
-	            <goals>
-	              <goal>reserve-network-port</goal>
-	            </goals>
-	            <configuration>
-	              <portNames>
-	                <portName>miso.it.tomcat.servlet.port</portName>
+                <goals>
+                  <goal>reserve-network-port</goal>
+                </goals>
+                <configuration>
+                  <portNames>
+                    <portName>miso.it.tomcat.servlet.port</portName>
                     <portName>miso.it.tomcat.ajp.port</portName>
-	              </portNames>
-	            </configuration>
-	          </execution>
-	        </executions>
-	      </plugin>
-	      <plugin>
-	        <!-- copy Flyway migrations from sqlstore -->
-	        <groupId>org.apache.maven.plugins</groupId>
-	        <artifactId>maven-dependency-plugin</artifactId>
-	        <executions>
-	          <execution>
-	            <id>copy-sqlstore-scripts</id>
-	            <phase>generate-test-resources</phase>
-	            <goals>
-	              <goal>unpack</goal>
-	            </goals>
-	            <configuration>
-	              <artifactItems>
-	                <artifactItem>
-	                  <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-	                  <artifactId>sqlstore</artifactId>
-	                  <outputDirectory>target/test-classes/sqlstore</outputDirectory>
-	                  <includes>db/**</includes>
-	                </artifactItem>
-	              </artifactItems>
-	            </configuration>
-	          </execution>
-	        </executions>
-	      </plugin>
-	      <plugin>
-	        <!-- translate Flyway migrations -->
-	        <groupId>org.codehaus.gmaven</groupId>
-	        <artifactId>groovy-maven-plugin</artifactId>
-	        <executions>
-	          <execution>
-	            <id>translate-schema</id>
-	            <phase>generate-test-resources</phase>
-	            <goals>
-	              <goal>execute</goal>
-	            </goals>
-	            <configuration>
-	              <source>${project.basedir}/src/it/resources/db/scripts/schema_translator.groovy</source>
-	            </configuration>
-	          </execution>
-	        </executions>
-	      </plugin>
+                  </portNames>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <!-- copy Flyway migrations from sqlstore -->
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>copy-sqlstore-scripts</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+                      <artifactId>sqlstore</artifactId>
+                      <outputDirectory>target/test-classes/sqlstore</outputDirectory>
+                      <includes>db/**</includes>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <!-- translate Flyway migrations -->
+            <groupId>org.codehaus.gmaven</groupId>
+            <artifactId>groovy-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>translate-schema</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <source>${project.basedir}/src/it/resources/db/scripts/schema_translator.groovy</source>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
           <plugin>
             <groupId>io.fabric8</groupId>
             <artifactId>docker-maven-plugin</artifactId>
@@ -508,97 +515,102 @@
               </execution>
             </executions>
           </plugin>
-	      <plugin>
-	        <!-- populate DB -->
-	        <groupId>org.flywaydb</groupId>
-	        <artifactId>flyway-maven-plugin</artifactId>
-	        <executions>
-	          <execution>
-	            <id>integration-test-db</id>
-	            <phase>pre-integration-test</phase>
-	            <goals>
-	              <goal>clean</goal>
-	              <goal>migrate</goal>
-	            </goals>
-	          </execution>
-	        </executions>
-	        <configuration>
-	          <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?${db.params}</url>
-	          <user>${mysql.user}</user>
-	          <password>${mysql.pw}</password>
-	          <locations>
+          <plugin>
+            <!-- populate DB -->
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>integration-test-db</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>clean</goal>
+                  <goal>migrate</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?${db.params}</url>
+              <user>root</user>
+              <password>${mysql.rootpw}</password>
+              <locations>
                 <location>classpath:uk.ac.bbsrc.tgac.miso.db.migration</location>
                 <location>filesystem:target/test-classes/db/migration</location>
               </locations>
-	          <sqlMigrationSuffix>.test.sql</sqlMigrationSuffix>
+              <sqlMigrationSuffix>.test.sql</sqlMigrationSuffix>
               <placeholders>
                 <filesDir>/storage/miso/files/</filesDir>
               </placeholders>
-	        </configuration>
-	      </plugin>
-	      <plugin>
-	        <!-- launch standalone Tomcat server and deploy MISO -->
-	        <groupId>org.codehaus.cargo</groupId>
-	        <artifactId>cargo-maven2-plugin</artifactId>
-	        <executions>
+            </configuration>
+          </plugin>
+          <plugin>
+            <!-- launch standalone Tomcat server and deploy MISO -->
+            <groupId>org.codehaus.cargo</groupId>
+            <artifactId>cargo-maven2-plugin</artifactId>
+            <executions>
               <execution>
                 <id>start-container</id>
                 <phase>pre-integration-test</phase>
                 <goals>
-                  <!-- 'start' by default. Specify 'run' to keep Tomcat running until stopped manually.
+                  <!-- 'start' by default. Specify 'run' to keep Tomcat running until stopped
+                  manually.
                   If you want test data, you can populate it manually using Docker:
                   
-                  sudo docker exec -i ${CONTAINER_ID} sh -c 'exec mysql -uroot -pabc123 -D lims' < ./src/it/resources/db/migration/clear_test_data.sql; sudo docker exec -i ${CONTAINER_ID} sh -c 'exec mysql -uroot -pabc123 -D lims' < ./src/it/resources/db/migration/integration_test_data.sql (then refresh constants manually via admin My Account page) -->
+                  sudo docker exec -i ${CONTAINER_ID} sh -c 'exec mysql -uroot -pabc123 -D lims' \
+                  < ./src/it/resources/db/migration/clear_test_data.sql;
+                  sudo docker exec -i ${CONTAINER_ID} sh -c 'exec mysql -uroot -pabc123 -D lims' \
+                  < ./src/it/resources/db/migration/integration_test_data.sql
+                  (then refresh constants manually via admin My Account page) -->
                   <goal>${cargoInitGoal}</goal>
                 </goals>
               </execution>
-	          <execution>
-	            <id>stop-container</id>
-	            <phase>post-integration-test</phase>
-	            <goals>
-	              <goal>stop</goal>
-	            </goals>
-	          </execution>
-	        </executions>
-	        <configuration>
-	          <container>
-	            <containerId>tomcat9x</containerId>
-	            <artifactInstaller>
-	              <groupId>org.apache.tomcat</groupId>
-	              <artifactId>tomcat</artifactId>
-	              <version>9.0.70</version>
-	            </artifactInstaller>
-	            <systemProperties>
-	              <security.method>jdbc</security.method>
-	            </systemProperties>
-	          </container>
-	          <configuration>
-	            <type>standalone</type>
-	            <home>${project.build.directory}/tomcat9</home>
-	            <properties>
-	              <cargo.servlet.port>${miso.it.tomcat.servlet.port}</cargo.servlet.port>
+              <execution>
+                <id>stop-container</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>stop</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <container>
+                <containerId>tomcat9x</containerId>
+                <artifactInstaller>
+                  <groupId>org.apache.tomcat</groupId>
+                  <artifactId>tomcat</artifactId>
+                  <version>9.0.70</version>
+                </artifactInstaller>
+                <systemProperties>
+                  <security.method>jdbc</security.method>
+                </systemProperties>
+              </container>
+              <configuration>
+                <type>standalone</type>
+                <home>${project.build.directory}/tomcat9</home>
+                <properties>
+                  <cargo.servlet.port>${miso.it.tomcat.servlet.port}</cargo.servlet.port>
                   <cargo.tomcat.ajp.port>${miso.it.tomcat.ajp.port}</cargo.tomcat.ajp.port>
-	            </properties>
-	            <configfiles>
-	              <configfile>
-	                <file>${project.build.directory}/test-classes/tomcat-config/</file>
-	                <todir>conf/Catalina/localhost</todir>
-	              </configfile>
-	            </configfiles>
-	            <datasources>
-	              <datasource>
-	                <jndiName>jdbc/MISODB</jndiName>
-	                <connectionType>javax.sql.Datasource</connectionType>
-	                <driverClass>com.mysql.jdbc.Driver</driverClass>
-	                <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?${db.params.jndi}</url>
-	                <username>${mysql.user}</username>
-	                <password>${mysql.pw}</password>
-	              </datasource>
-	            </datasources>
-	          </configuration>
-	        </configuration>
-	      </plugin>
-	      <!-- run integration tests -->
+                </properties>
+                <configfiles>
+                  <configfile>
+                    <file>${project.build.directory}/test-classes/tomcat-config/</file>
+                    <todir>conf/Catalina/localhost</todir>
+                  </configfile>
+                </configfiles>
+                <datasources>
+                  <datasource>
+                    <jndiName>jdbc/MISODB</jndiName>
+                    <connectionType>javax.sql.Datasource</connectionType>
+                    <driverClass>com.mysql.cj.jdbc.Driver</driverClass>
+                    <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?${db.params.jndi}</url>
+                    <username>${mysql.user}</username>
+                    <password>${mysql.pw}</password>
+                  </datasource>
+                </datasources>
+              </configuration>
+            </configuration>
+          </plugin>
+          <!-- run integration tests -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
@@ -647,93 +659,93 @@
         <plugins>
           <plugin>
             <!-- separate integration test sources/resources from unit tests -->
-	        <groupId>org.codehaus.mojo</groupId>
-	        <artifactId>build-helper-maven-plugin</artifactId>
-	        <executions>
-	          <execution>
-	            <id>add-it-sources</id>
-	            <phase>generate-test-sources</phase>
-	            <goals>
-	              <goal>add-test-source</goal>
-	            </goals>
-	            <configuration>
-	              <sources>
-	                <source>src/it/java</source>
-	              </sources>
-	            </configuration>
-	          </execution>
-	          <execution>
-	            <id>add-it-resources</id>
-	            <phase>generate-test-resources</phase>
-	            <goals>
-	              <goal>add-test-resource</goal>
-	            </goals>
-	            <configuration>
-	              <resources>
-	                <resource>
-	                  <filtering>true</filtering>
-	                  <directory>src/it/resources</directory>
-	                </resource>
-	              </resources>
-	            </configuration>
-	          </execution>
-	          <!-- Reserve ports for Tomcat -->
-	          <execution>
-	            <id>reserve-network-port</id>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>add-it-sources</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>add-test-source</goal>
+                </goals>
+                <configuration>
+                  <sources>
+                    <source>src/it/java</source>
+                  </sources>
+                </configuration>
+              </execution>
+              <execution>
+                <id>add-it-resources</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>add-test-resource</goal>
+                </goals>
+                <configuration>
+                  <resources>
+                    <resource>
+                      <filtering>true</filtering>
+                      <directory>src/it/resources</directory>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+              <!-- Reserve ports for Tomcat -->
+              <execution>
+                <id>reserve-network-port</id>
                 <phase>pre-integration-test</phase>
-	            <goals>
-	              <goal>reserve-network-port</goal>
-	            </goals>
-	            <configuration>
-	              <portNames>
-	                <portName>miso.it.plain.tomcat.servlet.port</portName>
+                <goals>
+                  <goal>reserve-network-port</goal>
+                </goals>
+                <configuration>
+                  <portNames>
+                    <portName>miso.it.plain.tomcat.servlet.port</portName>
                     <portName>miso.it.plain.tomcat.ajp.port</portName>
-	              </portNames>
-	            </configuration>
-	          </execution>
-	        </executions>
-	      </plugin>
-	      <plugin>
-	        <!-- copy Flyway migrations from sqlstore -->
-	        <groupId>org.apache.maven.plugins</groupId>
-	        <artifactId>maven-dependency-plugin</artifactId>
-	        <executions>
-	          <execution>
-	            <id>copy-sqlstore-scripts</id>
-	            <phase>generate-test-resources</phase>
-	            <goals>
-	              <goal>unpack</goal>
-	            </goals>
-	            <configuration>
-	              <artifactItems>
-	                <artifactItem>
-	                  <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-	                  <artifactId>sqlstore</artifactId>
-	                  <outputDirectory>target/test-classes/sqlstore</outputDirectory>
-	                  <includes>db/**</includes>
-	                </artifactItem>
-	              </artifactItems>
-	            </configuration>
-	          </execution>
-	        </executions>
-	      </plugin>
-	      <plugin>
-	        <!-- translate Flyway migrations -->
-	        <groupId>org.codehaus.gmaven</groupId>
-	        <artifactId>groovy-maven-plugin</artifactId>
-	        <executions>
-	          <execution>
-	            <id>translate-schema</id>
-	            <phase>generate-test-resources</phase>
-	            <goals>
-	              <goal>execute</goal>
-	            </goals>
-	            <configuration>
-	              <source>${project.basedir}/src/it/resources/db/scripts/schema_translator.groovy</source>
-	            </configuration>
-	          </execution>
-	        </executions>
-	      </plugin>
+                  </portNames>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <!-- copy Flyway migrations from sqlstore -->
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>copy-sqlstore-scripts</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+                      <artifactId>sqlstore</artifactId>
+                      <outputDirectory>target/test-classes/sqlstore</outputDirectory>
+                      <includes>db/**</includes>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <!-- translate Flyway migrations -->
+            <groupId>org.codehaus.gmaven</groupId>
+            <artifactId>groovy-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>translate-schema</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <source>${project.basedir}/src/it/resources/db/scripts/schema_translator.groovy</source>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
           <plugin>
             <groupId>io.fabric8</groupId>
             <artifactId>docker-maven-plugin</artifactId>
@@ -754,94 +766,95 @@
               </execution>
             </executions>
           </plugin>
-	      <plugin>
-	        <!-- populate DB -->
-	        <groupId>org.flywaydb</groupId>
-	        <artifactId>flyway-maven-plugin</artifactId>
-	        <executions>
-	          <execution>
-	            <id>integration-test-db</id>
-	            <phase>pre-integration-test</phase>
-	            <goals>
-	              <goal>clean</goal>
-	              <goal>migrate</goal>
-	            </goals>
-	          </execution>
-	        </executions>
-	        <configuration>
-	          <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?${db.params}</url>
-	          <user>${mysql.user}</user>
-	          <password>${mysql.pw}</password>
-	          <locations>
+          <plugin>
+            <!-- populate DB -->
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>integration-test-db</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>clean</goal>
+                  <goal>migrate</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?${db.params}</url>
+              <user>root</user>
+              <password>${mysql.rootpw}</password>
+              <locations>
                 <location>classpath:uk.ac.bbsrc.tgac.miso.db.migration</location>
                 <location>filesystem:target/test-classes/db/migration</location>
               </locations>
-	          <sqlMigrationSuffix>.test.sql</sqlMigrationSuffix>
+              <sqlMigrationSuffix>.test.sql</sqlMigrationSuffix>
               <placeholders>
                 <filesDir>/storage/miso/files/</filesDir>
               </placeholders>
-	        </configuration>
-	      </plugin>
-	      <plugin>
-	        <!-- launch standalone Tomcat server and deploy MISO -->
-	        <groupId>org.codehaus.cargo</groupId>
-	        <artifactId>cargo-maven2-plugin</artifactId>
-	        <executions>
+            </configuration>
+          </plugin>
+          <plugin>
+            <!-- launch standalone Tomcat server and deploy MISO -->
+            <groupId>org.codehaus.cargo</groupId>
+            <artifactId>cargo-maven2-plugin</artifactId>
+            <executions>
               <execution>
                 <id>start-container</id>
                 <phase>pre-integration-test</phase>
                 <goals>
-                  <!-- 'start' by default. Specify 'run' to keep Tomcat running until stopped manually -->
+                  <!-- 'start' by default. Specify 'run' to keep Tomcat running until stopped
+                  manually -->
                   <goal>${cargoInitGoal}</goal>
                 </goals>
               </execution>
-	          <execution>
-	            <id>stop-container</id>
-	            <phase>post-integration-test</phase>
-	            <goals>
-	              <goal>stop</goal>
-	            </goals>
-	          </execution>
-	        </executions>
-	        <configuration>
-	          <container>
-	            <containerId>tomcat9x</containerId>
-	            <artifactInstaller>
-	              <groupId>org.apache.tomcat</groupId>
-	              <artifactId>tomcat</artifactId>
-	              <version>9.0.70</version>
-	            </artifactInstaller>
-	            <systemProperties>
-	              <security.method>jdbc</security.method>
-	            </systemProperties>
-	          </container>
-	          <configuration>
-	            <type>standalone</type>
-	            <home>${project.build.directory}/tomcat9</home>
-	            <properties>
-	              <cargo.servlet.port>${miso.it.plain.tomcat.servlet.port}</cargo.servlet.port>
+              <execution>
+                <id>stop-container</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>stop</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <container>
+                <containerId>tomcat9x</containerId>
+                <artifactInstaller>
+                  <groupId>org.apache.tomcat</groupId>
+                  <artifactId>tomcat</artifactId>
+                  <version>9.0.70</version>
+                </artifactInstaller>
+                <systemProperties>
+                  <security.method>jdbc</security.method>
+                </systemProperties>
+              </container>
+              <configuration>
+                <type>standalone</type>
+                <home>${project.build.directory}/tomcat9</home>
+                <properties>
+                  <cargo.servlet.port>${miso.it.plain.tomcat.servlet.port}</cargo.servlet.port>
                   <cargo.tomcat.ajp.port>${miso.it.plain.tomcat.ajp.port}</cargo.tomcat.ajp.port>
-	            </properties>
-	            <configfiles>
-	              <configfile>
-	                <file>${project.build.directory}/test-classes/tomcat-plain-config/</file>
-	                <todir>conf/Catalina/localhost</todir>
-	              </configfile>
-	            </configfiles>
-	            <datasources>
-	              <datasource>
-	                <jndiName>jdbc/MISODB</jndiName>
-	                <connectionType>javax.sql.Datasource</connectionType>
-	                <driverClass>com.mysql.jdbc.Driver</driverClass>
-	                <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?${db.params.jndi}</url>
-	                <username>${mysql.user}</username>
-	                <password>${mysql.pw}</password>
-	              </datasource>
-	            </datasources>
-	          </configuration>
-	        </configuration>
-	      </plugin>
-	      <!-- run integration tests -->
+                </properties>
+                <configfiles>
+                  <configfile>
+                    <file>${project.build.directory}/test-classes/tomcat-plain-config/</file>
+                    <todir>conf/Catalina/localhost</todir>
+                  </configfile>
+                </configfiles>
+                <datasources>
+                  <datasource>
+                    <jndiName>jdbc/MISODB</jndiName>
+                    <connectionType>javax.sql.Datasource</connectionType>
+                    <driverClass>com.mysql.cj.jdbc.Driver</driverClass>
+                    <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?${db.params.jndi}</url>
+                    <username>${mysql.user}</username>
+                    <password>${mysql.pw}</password>
+                  </datasource>
+                </datasources>
+              </configuration>
+            </configuration>
+          </plugin>
+          <!-- run integration tests -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
@@ -896,7 +909,7 @@
             <configuration>
               <images>
                 <image>
-                  <name>mysql:5.7</name>
+                  <name>mysql:8.0</name>
                   <alias>mysql</alias>
                   <run>
                     <wait>

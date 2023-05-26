@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.service.naming.generation;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -43,7 +43,7 @@ public class OicrLibraryAliasGenerator extends OicrBaseLibraryAliasGenerator<Lib
   }
 
   @Override
-  protected Date getCreationDate(DetailedLibrary item) {
+  protected LocalDate getCreationDate(DetailedLibrary item) {
     return item.getCreationDate();
   }
 

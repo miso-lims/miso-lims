@@ -13,10 +13,10 @@ ALTER TABLE DetailedQcStatus MODIFY status BOOLEAN NULL;
 -- iontorrent
 
 CREATE TABLE RunIonTorrent(
-  runId bigint(20) NOT NULL,
+  runId bigint NOT NULL,
   PRIMARY KEY (`runId`),
   CONSTRAINT runiontorrent_run_runid FOREIGN KEY (runId) REFERENCES Run(runId)
-) ENGINE=InnoDB CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO RunIonTorrent (runId) SELECT runId FROM Run WHERE 
   sequencerReference_sequencerReferenceId IN (SELECT sr.referenceId FROM SequencerReference sr 

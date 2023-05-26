@@ -1,7 +1,7 @@
 -- new_project_fields
 ALTER TABLE Project
   ADD COLUMN samplesExpected int,
-  ADD COLUMN contactId bigint(20),
+  ADD COLUMN contactId bigint,
   ADD CONSTRAINT fk_project_contact FOREIGN KEY (contactId) REFERENCES Contact (contactId);
 
 -- library_aliquot_description

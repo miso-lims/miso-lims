@@ -1,18 +1,17 @@
 -- pool_order_changelog
 CREATE TABLE PoolOrderChangeLog (
-  poolOrderChangeLogId bigint(20) PRIMARY KEY AUTO_INCREMENT,
-  poolOrderId bigint(20) NOT NULL,
+  poolOrderChangeLogId bigint PRIMARY KEY AUTO_INCREMENT,
+  poolOrderId bigint NOT NULL,
   columnsChanged varchar(500) NOT NULL,
-  userId bigint(20) NOT NULL,
+  userId bigint NOT NULL,
   message longtext NOT NULL,
   changeTime timestamp DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_poolOrderChangeLog_pool FOREIGN KEY (poolOrderId) REFERENCES PoolOrder(poolOrderId),
   CONSTRAINT fk_poolOrderChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
-) Engine=InnoDB DEFAULT CHARSET=utf8;
+) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 -- pool_order_create_trigger
--- StartNoTest
 DELIMITER //
 
 DROP TRIGGER IF EXISTS BeforeInsertPoolOrder//
@@ -21,7 +20,7 @@ DROP TRIGGER IF EXISTS PoolOrderChange//
 CREATE TRIGGER PoolOrderChange BEFORE UPDATE ON PoolOrder
 FOR EACH ROW
   BEGIN
-  DECLARE log_message varchar(500) CHARACTER SET utf8;
+  DECLARE log_message varchar(500) CHARACTER SET utf8mb4;
   SET log_message = CONCAT_WS(', ',
         CASE WHEN NEW.alias <> OLD.alias THEN CONCAT('alias: ', COALESCE(OLD.alias, 'n/a'), ' → ', COALESCE(NEW.alias, 'n/a')) END,
         CASE WHEN (NEW.description IS NULL) <> (OLD.description IS NULL) OR NEW.description <> OLD.description THEN CONCAT('description: ', COALESCE(OLD.description, 'n/a'), ' → ', COALESCE(NEW.description, 'n/a')) END,
@@ -56,7 +55,6 @@ FOR EACH ROW
     NEW.lastUpdated)//
 
 DELIMITER ;
--- EndNoTest
 
 -- sequencing_parameters_paired
 ALTER TABLE SequencingParameters ADD COLUMN readLength2 int;

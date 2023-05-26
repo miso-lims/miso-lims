@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl.view;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -43,7 +44,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 @Entity
 @Immutable
 @Table(name = "LibraryAliquot")
-public class ListLibraryAliquotView implements DetailedQcItem, Identifiable, Serializable, Comparable<ListLibraryAliquotView> {
+public class ListLibraryAliquotView
+    implements DetailedQcItem, Identifiable, Serializable, Comparable<ListLibraryAliquotView> {
 
   private static final long serialVersionUID = 1L;
 
@@ -81,8 +83,7 @@ public class ListLibraryAliquotView implements DetailedQcItem, Identifiable, Ser
   @JoinColumn(name = "qcUser")
   private User qcUser;
 
-  @Temporal(TemporalType.DATE)
-  private Date qcDate;
+  private LocalDate qcDate;
 
   @ManyToOne
   @JoinColumn(name = "libraryDesignCodeId")
@@ -90,8 +91,6 @@ public class ListLibraryAliquotView implements DetailedQcItem, Identifiable, Ser
 
   private Long preMigrationId;
   private Long targetedSequencingId;
-
-  @Temporal(TemporalType.DATE)
   private Date created;
 
   @ManyToOne(targetEntity = UserImpl.class)
@@ -111,8 +110,8 @@ public class ListLibraryAliquotView implements DetailedQcItem, Identifiable, Ser
 
   @Immutable
   @ManyToMany
-  @JoinTable(name = "Transfer_LibraryAliquot", joinColumns = { @JoinColumn(name = "aliquotId") }, inverseJoinColumns = {
-      @JoinColumn(name = "transferId") })
+  @JoinTable(name = "Transfer_LibraryAliquot", joinColumns = {@JoinColumn(name = "aliquotId")}, inverseJoinColumns = {
+      @JoinColumn(name = "transferId")})
   private Set<ListTransferView> listTransferViews;
 
   @ManyToOne
@@ -214,12 +213,12 @@ public class ListLibraryAliquotView implements DetailedQcItem, Identifiable, Ser
   }
 
   @Override
-  public Date getQcDate() {
+  public LocalDate getQcDate() {
     return qcDate;
   }
 
   @Override
-  public void setQcDate(Date qcDate) {
+  public void setQcDate(LocalDate qcDate) {
     this.qcDate = qcDate;
   }
 
@@ -374,8 +373,10 @@ public class ListLibraryAliquotView implements DetailedQcItem, Identifiable, Ser
   @Override
   public int compareTo(ListLibraryAliquotView o) {
     ListLibraryAliquotView t = o;
-    if (getId() < t.getId()) return -1;
-    if (getId() > t.getId()) return 1;
+    if (getId() < t.getId())
+      return -1;
+    if (getId() > t.getId())
+      return 1;
     return 0;
   }
 
@@ -461,59 +462,95 @@ public class ListLibraryAliquotView implements DetailedQcItem, Identifiable, Ser
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     ListLibraryAliquotView other = (ListLibraryAliquotView) obj;
     if (created == null) {
-      if (other.created != null) return false;
-    } else if (!created.equals(other.created)) return false;
+      if (other.created != null)
+        return false;
+    } else if (!created.equals(other.created))
+      return false;
     if (creator == null) {
-      if (other.creator != null) return false;
-    } else if (!creator.equals(other.creator)) return false;
+      if (other.creator != null)
+        return false;
+    } else if (!creator.equals(other.creator))
+      return false;
     if (identificationBarcode == null) {
-      if (other.identificationBarcode != null) return false;
-    } else if (!identificationBarcode.equals(other.identificationBarcode)) return false;
+      if (other.identificationBarcode != null)
+        return false;
+    } else if (!identificationBarcode.equals(other.identificationBarcode))
+      return false;
     if (dnaSize == null) {
-      if (other.dnaSize != null) return false;
-    } else if (!dnaSize.equals(other.dnaSize)) return false;
+      if (other.dnaSize != null)
+        return false;
+    } else if (!dnaSize.equals(other.dnaSize))
+      return false;
     if (concentration == null) {
-      if (other.concentration != null) return false;
-    } else if (!concentration.equals(other.concentration)) return false;
+      if (other.concentration != null)
+        return false;
+    } else if (!concentration.equals(other.concentration))
+      return false;
     if (concentrationUnits == null) {
-      if (other.concentrationUnits != null) return false;
-    } else if (!concentrationUnits.equals(other.concentrationUnits)) return false;
-    if (aliquotId != other.aliquotId) return false;
+      if (other.concentrationUnits != null)
+        return false;
+    } else if (!concentrationUnits.equals(other.concentrationUnits))
+      return false;
+    if (aliquotId != other.aliquotId)
+      return false;
     if (name == null) {
-      if (other.name != null) return false;
-    } else if (!name.equals(other.name)) return false;
+      if (other.name != null)
+        return false;
+    } else if (!name.equals(other.name))
+      return false;
     if (ngUsed == null) {
-      if (other.ngUsed != null) return false;
-    } else if (!ngUsed.equals(other.ngUsed)) return false;
+      if (other.ngUsed != null)
+        return false;
+    } else if (!ngUsed.equals(other.ngUsed))
+      return false;
     if (volume == null) {
-      if (other.volume != null) return false;
-    } else if (!volume.equals(other.volume)) return false;
+      if (other.volume != null)
+        return false;
+    } else if (!volume.equals(other.volume))
+      return false;
     if (volumeUsed == null) {
-      if (other.volumeUsed != null) return false;
-    } else if (!volumeUsed.equals(other.volumeUsed)) return false;
+      if (other.volumeUsed != null)
+        return false;
+    } else if (!volumeUsed.equals(other.volumeUsed))
+      return false;
     if (detailedQcStatus == null) {
-      if (other.detailedQcStatus != null) return false;
-    } else if (!detailedQcStatus.equals(other.detailedQcStatus)) return false;
+      if (other.detailedQcStatus != null)
+        return false;
+    } else if (!detailedQcStatus.equals(other.detailedQcStatus))
+      return false;
     if (detailedQcStatusNote == null) {
-      if (other.detailedQcStatusNote != null) return false;
-    } else if (!detailedQcStatusNote.equals(other.detailedQcStatusNote)) return false;
+      if (other.detailedQcStatusNote != null)
+        return false;
+    } else if (!detailedQcStatusNote.equals(other.detailedQcStatusNote))
+      return false;
     if (lastUpdated == null) {
-      if (other.lastUpdated != null) return false;
-    } else if (!lastUpdated.equals(other.lastUpdated)) return false;
+      if (other.lastUpdated != null)
+        return false;
+    } else if (!lastUpdated.equals(other.lastUpdated))
+      return false;
     if (lastModifier == null) {
-      if (other.lastModifier != null) return false;
-    } else if (!lastModifier.equals(other.lastModifier)) return false;
+      if (other.lastModifier != null)
+        return false;
+    } else if (!lastModifier.equals(other.lastModifier))
+      return false;
     if (preMigrationId == null) {
-      if (other.preMigrationId != null) return false;
-    } else if (!preMigrationId.equals(other.preMigrationId)) return false;
+      if (other.preMigrationId != null)
+        return false;
+    } else if (!preMigrationId.equals(other.preMigrationId))
+      return false;
     if (targetedSequencingId == null) {
-      if (other.targetedSequencingId != null) return false;
-    } else if (!targetedSequencingId.equals(other.targetedSequencingId)) return false;
+      if (other.targetedSequencingId != null)
+        return false;
+    } else if (!targetedSequencingId.equals(other.targetedSequencingId))
+      return false;
     return true;
   }
 
@@ -544,14 +581,16 @@ public class ListLibraryAliquotView implements DetailedQcItem, Identifiable, Ser
   }
 
   private <T> T getProjectAttribute(Function<ParentProject, T> getter) {
-    if (parentLibrary == null || parentLibrary.getParentSample() == null || parentLibrary.getParentSample().getParentProject() == null) {
+    if (parentLibrary == null || parentLibrary.getParentSample() == null
+        || parentLibrary.getParentSample().getParentProject() == null) {
       return null;
     }
     return getter.apply(parentLibrary.getParentSample().getParentProject());
   }
 
   private <T> T getSubprojectAttribute(Function<ParentSubproject, T> getter) {
-    if (parentLibrary == null || parentLibrary.getParentSample() == null || parentLibrary.getParentSample().getParentSubproject() == null) {
+    if (parentLibrary == null || parentLibrary.getParentSample() == null
+        || parentLibrary.getParentSample().getParentSubproject() == null) {
       return null;
     }
     return getter.apply(parentLibrary.getParentSample().getParentSubproject());

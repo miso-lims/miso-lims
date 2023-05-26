@@ -1,29 +1,7 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -66,10 +44,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 /**
- * A Run represents a sequencing run on a single sequencing instrument, referenced by a {@link Instrument}, comprising one or more
- * {@link SequencerPartitionContainer} objects in which {@link Pool}s are placed on {@link SequencerPoolPartition}s.
+ * A Run represents a sequencing run on a single sequencing instrument, referenced by a
+ * {@link Instrument}, comprising one or more {@link SequencerPartitionContainer} objects in which
+ * {@link Pool}s are placed on {@link SequencerPoolPartition}s.
  * <p/>
- * Runs can be QCed via {@link RunQC} objects, and are always associated with a given {@link PlatformType}
+ * Runs can be QCed via {@link RunQC} objects, and are always associated with a given
+ * {@link PlatformType}
  * 
  * @author Rob Davey
  * @since 0.0.2
@@ -94,8 +74,7 @@ public abstract class Run
   @OneToMany(targetEntity = RunChangeLog.class, mappedBy = "run", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLogs = new ArrayList<>();
 
-  @Temporal(TemporalType.DATE)
-  private Date completionDate;
+  private LocalDate completionDate;
 
   @OneToMany(mappedBy = "run", orphanRemoval = true, cascade = CascadeType.ALL)
   private Set<RunPosition> runPositions;
@@ -129,8 +108,9 @@ public abstract class Run
 
   @ManyToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
   @JoinTable(name = "Run_Note", joinColumns = {
-      @JoinColumn(name = "run_runId") }, inverseJoinColumns = {
-          @JoinColumn(name = "notes_noteId") })
+      @JoinColumn(name = "run_runId")},
+      inverseJoinColumns = {
+          @JoinColumn(name = "notes_noteId")})
   private Collection<Note> notes = new HashSet<>();
 
   @Id
@@ -151,12 +131,11 @@ public abstract class Run
 
   private String sequencingKitLot;
 
-  @Temporal(TemporalType.DATE)
-  private Date startDate;
+  private LocalDate startDate;
 
   @OneToMany(targetEntity = FileAttachment.class)
-  @JoinTable(name = "Run_Attachment", joinColumns = { @JoinColumn(name = "runId") }, inverseJoinColumns = {
-      @JoinColumn(name = "attachmentId") })
+  @JoinTable(name = "Run_Attachment", joinColumns = {@JoinColumn(name = "runId")}, inverseJoinColumns = {
+      @JoinColumn(name = "attachmentId")})
   private List<FileAttachment> attachments;
 
   @Transient
@@ -168,8 +147,7 @@ public abstract class Run
   @JoinColumn(name = "qcUser")
   private User qcUser;
 
-  @Temporal(TemporalType.DATE)
-  private Date qcDate;
+  private LocalDate qcDate;
 
   private Boolean dataReview;
 
@@ -177,8 +155,7 @@ public abstract class Run
   @JoinColumn(name = "dataReviewerId")
   private User dataReviewer;
 
-  @Temporal(TemporalType.DATE)
-  private Date dataReviewDate;
+  private LocalDate dataReviewDate;
 
   @Transient
   private String projectsLabel;
@@ -193,8 +170,7 @@ public abstract class Run
   /**
    * Construct a new Run with a default empty SecurityProfile
    */
-  public Run() {
-  }
+  public Run() {}
 
   public void addNote(Note note) {
     this.notes.add(note);
@@ -210,8 +186,10 @@ public abstract class Run
 
   @Override
   public int compareTo(Run t) {
-    if (getId() < t.getId()) return -1;
-    if (getId() > t.getId()) return 1;
+    if (getId() < t.getId())
+      return -1;
+    if (getId() > t.getId())
+      return 1;
     return 0;
   }
 
@@ -227,9 +205,12 @@ public abstract class Run
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) return false;
-    if (obj == this) return true;
-    if (!(obj instanceof Run)) return false;
+    if (obj == null)
+      return false;
+    if (obj == this)
+      return true;
+    if (!(obj instanceof Run))
+      return false;
     Run them = (Run) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
@@ -249,7 +230,7 @@ public abstract class Run
     return alias;
   }
 
-  public Date getCompletionDate() {
+  public LocalDate getCompletionDate() {
     return completionDate;
   }
 
@@ -342,7 +323,7 @@ public abstract class Run
     return sequencingParameters;
   }
 
-  public Date getStartDate() {
+  public LocalDate getStartDate() {
     return startDate;
   }
 
@@ -378,7 +359,8 @@ public abstract class Run
     } else {
       final int PRIME = 37;
       int hashcode = 1;
-      if (getAlias() != null) hashcode = PRIME * hashcode + getAlias().hashCode();
+      if (getAlias() != null)
+        hashcode = PRIME * hashcode + getAlias().hashCode();
       return hashcode;
     }
   }
@@ -395,7 +377,7 @@ public abstract class Run
     this.alias = alias;
   }
 
-  public void setCompletionDate(Date completionDate) {
+  public void setCompletionDate(LocalDate completionDate) {
     this.completionDate = completionDate;
   }
 
@@ -440,7 +422,7 @@ public abstract class Run
     this.sequencingParameters = parameters;
   }
 
-  public void setStartDate(Date startDate) {
+  public void setStartDate(LocalDate startDate) {
     this.startDate = startDate;
   }
 
@@ -456,7 +438,7 @@ public abstract class Run
   public void setPairedEnd(boolean pairedEnd) {
     throw new UnsupportedOperationException("Cannot set paired end on runs from this platform.");
   }
-  
+
   public abstract PlatformType getPlatformType();
 
   public String getProgress() {
@@ -505,11 +487,11 @@ public abstract class Run
     this.qcUser = qcUser;
   }
 
-  public Date getQcDate() {
+  public LocalDate getQcDate() {
     return qcDate;
   }
 
-  public void setQcDate(Date qcDate) {
+  public void setQcDate(LocalDate qcDate) {
     this.qcDate = qcDate;
   }
 
@@ -529,11 +511,11 @@ public abstract class Run
     this.dataReviewer = dataReviewer;
   }
 
-  public Date getDataReviewDate() {
+  public LocalDate getDataReviewDate() {
     return dataReviewDate;
   }
 
-  public void setDataReviewDate(Date dataReviewDate) {
+  public void setDataReviewDate(LocalDate dataReviewDate) {
     this.dataReviewDate = dataReviewDate;
   }
 

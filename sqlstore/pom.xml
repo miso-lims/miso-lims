@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>miso</artifactId>
@@ -12,9 +14,11 @@
   <properties>
     <skipITs>true</skipITs>
     <mysql.db>lims</mysql.db>
+    <mysql.rootpw>abc123</mysql.rootpw>
     <mysql.user>tgaclims</mysql.user>
     <mysql.pw>tgaclims</mysql.pw>
-    <mysql.params>autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useLegacyDatetimeCode=false&amp;useSSL=false</mysql.params>
+    <mysql.params>
+      autoReconnect=true&amp;characterEncoding=UTF-8&amp;allowPublicKeyRetrieval=true&amp;sslMode=DISABLED&amp;connectionTimeZone=SERVER</mysql.params>
   </properties>
   <dependencies>
     <dependency>
@@ -36,8 +40,8 @@
       <artifactId>jaxb-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
+      <groupId>com.mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
     </dependency>
     <dependency>
       <groupId>net.sf.json-lib</groupId>
@@ -144,9 +148,12 @@
         <artifactId>flyway-maven-plugin</artifactId>
         <configuration>
           <!--
-            Do not modify these placeholder database credentials and risk committing them to git. Instead create a "flyway.properties"
-            file in the same directory as this "pom.xml" file. The "flyway.properties" file is .gitignored and the values it contains
-            will take precedence over the values in this "pom.xml" file. Here is an example of the properties in the
+            Do not modify these placeholder database credentials and risk committing them to git. Instead
+          create a "flyway.properties"
+            file in the same directory as this "pom.xml" file. The "flyway.properties" file is .gitignored and
+          the values it contains
+            will take precedence over the values in this "pom.xml" file. Here is an example of the properties
+          in the
             "flyway.properties" file:
             flyway.user=miso
             flyway.password=secret
@@ -155,7 +162,6 @@
            -->
           <user>tgaclims</user>
           <password>tgaclims</password>
-          <driver>com.mysql.jdbc.Driver</driver>
           <url>jdbc:mysql://localhost:3306/lims?characterEncoding=UTF-8</url>
           <outOfOrder>true</outOfOrder>
           <ignoreMissingMigrations>true</ignoreMissingMigrations>
@@ -172,69 +178,70 @@
       </plugin>
     </plugins>
     <pluginManagement>
-    	<plugins>
-	   		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-	   		<plugin>
-	   			<groupId>org.eclipse.m2e</groupId>
-	   			<artifactId>lifecycle-mapping</artifactId>
-    			<version>1.0.0</version>
-    			<configuration>
-    				<lifecycleMappingMetadata>
-    					<pluginExecutions>
-    						<pluginExecution>
-    							<pluginExecutionFilter>
-    								<groupId>
-    									org.codehaus.gmaven
-    								</groupId>
-    								<artifactId>
-    									groovy-maven-plugin
-    								</artifactId>
-    								<versionRange>[2.0,)</versionRange>
-    								<goals>
-    									<goal>execute</goal>
-    								</goals>
-    							</pluginExecutionFilter>
-    							<action>
-    								<ignore />
-    							</action>
-    						</pluginExecution>
-    					</pluginExecutions>
-    				</lifecycleMappingMetadata>
-    			</configuration>
-    		</plugin>
-    		<plugin>
-    		  <groupId>io.fabric8</groupId>
-              <artifactId>docker-maven-plugin</artifactId>
-              <version>0.21.0</version>
-              <configuration>
-              <removeVolumes>true</removeVolumes>
-                <images>
-                  <image>
-                    <name>mysql:5.7</name>
-                    <alias>mysql</alias>
-                    <run>
-                      <env>
-                        <MYSQL_ROOT_PASSWORD>abc123</MYSQL_ROOT_PASSWORD>
-                        <MYSQL_USER>${mysql.user}</MYSQL_USER>
-                        <MYSQL_PASSWORD>${mysql.pw}</MYSQL_PASSWORD>
-                        <MYSQL_DATABASE>${mysql.db}</MYSQL_DATABASE>
-                      </env>
-                      <ports>
-                        <port>${mysql.port}:3306</port>
-                      </ports>
-                      <wait>
-                        <time>30000</time>
-                      </wait>
-                    </run>
-                  </image>
-                </images>
-              </configuration>
-    		</plugin>
-    	</plugins>
+      <plugins>
+        <!--This
+        plugin's configuration is used to store Eclipse m2e settings only. It has no influence on
+        the Maven build itself.-->
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>
+                      org.codehaus.gmaven
+                    </groupId>
+                    <artifactId>
+                      groovy-maven-plugin
+                    </artifactId>
+                    <versionRange>[2.0,)</versionRange>
+                    <goals>
+                      <goal>execute</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore />
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>io.fabric8</groupId>
+          <artifactId>docker-maven-plugin</artifactId>
+          <configuration>
+            <removeVolumes>true</removeVolumes>
+            <images>
+              <image>
+                <name>mysql:8.0</name>
+                <alias>mysql</alias>
+                <run>
+                  <env>
+                    <MYSQL_ROOT_PASSWORD>${mysql.rootpw}</MYSQL_ROOT_PASSWORD>
+                    <MYSQL_USER>${mysql.user}</MYSQL_USER>
+                    <MYSQL_PASSWORD>${mysql.pw}</MYSQL_PASSWORD>
+                    <MYSQL_DATABASE>${mysql.db}</MYSQL_DATABASE>
+                  </env>
+                  <ports>
+                    <port>${mysql.port}:3306</port>
+                  </ports>
+                  <wait>
+                    <time>30000</time>
+                  </wait>
+                </run>
+              </image>
+            </images>
+          </configuration>
+        </plugin>
+      </plugins>
     </pluginManagement>
   </build>
   <profiles>
-  	<profile>
+    <profile>
       <id>integration-test-setup</id>
       <activation>
         <property>
@@ -247,40 +254,40 @@
         <plugins>
           <plugin>
             <!-- separate integration test sources/resources from unit tests -->
-	        <groupId>org.codehaus.mojo</groupId>
-	        <artifactId>build-helper-maven-plugin</artifactId>
-	        <executions>
-	          <execution>
-	            <id>add-it-sources</id>
-	            <phase>generate-test-sources</phase>
-	            <goals>
-	              <goal>add-test-source</goal>
-	            </goals>
-	            <configuration>
-	              <sources>
-	                <source>src/it/java</source>
-	              </sources>
-	            </configuration>
-	          </execution>
-	          <execution>
-	            <id>add-it-resources</id>
-	            <phase>generate-test-resources</phase>
-	            <goals>
-	              <goal>add-test-resource</goal>
-	            </goals>
-	            <configuration>
-	              <resources>
-	                <resource>
-	                  <filtering>true</filtering>
-	                  <directory>src/it/resources</directory>
-	                </resource>
-	              </resources>
-	            </configuration>
-	          </execution>
-	        </executions>
-	      </plugin>
-	      <plugin>
-	        <!-- Start MySQL Docker container -->
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>add-it-sources</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>add-test-source</goal>
+                </goals>
+                <configuration>
+                  <sources>
+                    <source>src/it/java</source>
+                  </sources>
+                </configuration>
+              </execution>
+              <execution>
+                <id>add-it-resources</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>add-test-resource</goal>
+                </goals>
+                <configuration>
+                  <resources>
+                    <resource>
+                      <filtering>true</filtering>
+                      <directory>src/it/resources</directory>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <!-- Start MySQL Docker container -->
             <groupId>io.fabric8</groupId>
             <artifactId>docker-maven-plugin</artifactId>
             <executions>
@@ -301,36 +308,36 @@
             </executions>
           </plugin>
           <plugin>
-	        <!-- populate DB -->
-	        <groupId>org.flywaydb</groupId>
-	        <artifactId>flyway-maven-plugin</artifactId>
-	        <executions>
-	          <execution>
-	            <id>integration-test-db</id>
-	            <phase>pre-integration-test</phase>
-	            <goals>
-	              <goal>clean</goal>
-	              <goal>migrate</goal>
-	            </goals>
-	          </execution>
-	        </executions>
-	        <configuration>
-	          <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?${mysql.params}</url>
-	          <user>${mysql.user}</user>
-	          <password>${mysql.pw}</password>
-	          <locations>
+            <!-- populate DB -->
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>integration-test-db</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>clean</goal>
+                  <goal>migrate</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?${mysql.params}</url>
+              <user>root</user>
+              <password>${mysql.rootpw}</password>
+              <locations>
                 <location>classpath:uk.ac.bbsrc.tgac.miso.db.migration</location>
                 <location>filesystem:target/classes/db/migration</location>
                 <location>filesystem:target/test-classes/db/migration</location>
               </locations>
-	          <sqlMigrationSuffix>.sql</sqlMigrationSuffix>
+              <sqlMigrationSuffix>.sql</sqlMigrationSuffix>
               <placeholders>
                 <filesDir>/storage/miso/files/</filesDir>
               </placeholders>
               <!-- this is to prevent flyway.properties from overriding the settings here -->
               <configFile>empty.properties</configFile>
-	        </configuration>
-	      </plugin>
+            </configuration>
+          </plugin>
           <plugin>
             <!-- run integration tests -->
             <groupId>org.apache.maven.plugins</groupId>
@@ -373,7 +380,7 @@
             <configuration>
               <images>
                 <image>
-                  <name>mysql:5.7</name>
+                  <name>mysql:8.0</name>
                   <alias>mysql</alias>
                   <run>
                     <wait>

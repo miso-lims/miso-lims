@@ -7,12 +7,13 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -86,7 +87,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.ProjectStore;
@@ -99,7 +99,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.TissueTypeDao;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultSampleService implements SampleService, PaginatedDataSource<Sample> {
+public class DefaultSampleService implements SampleService {
 
   private static final Logger log = LoggerFactory.getLogger(DefaultSampleService.class);
 
@@ -1124,7 +1124,7 @@ public class DefaultSampleService implements SampleService, PaginatedDataSource<
   @Override
   public void addNote(Sample sample, Note note) throws IOException {
     Sample managed = sampleStore.get(sample.getId());
-    note.setCreationDate(new Date());
+    note.setCreationDate(LocalDate.now(ZoneId.systemDefault()));
     note.setOwner(authorizationManager.getCurrentUser());
     managed.addNote(note);
     sampleStore.update(managed);

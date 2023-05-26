@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -74,7 +76,7 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
     rtn.setDescription("Description " + counter);
     for (int i = 0; i < notes; i++) {
       Note note = new Note();
-      note.setCreationDate(new Date());
+      note.setCreationDate(LocalDate.now(ZoneId.systemDefault()));
       note.setOwner(mockUser);
       note.setText(note.getCreationDate().toString() + " stuff");
       rtn.addNote(note);
@@ -202,7 +204,8 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
 
   @Test
   public void testCountIlluminaPoolsBadSearch() throws IOException {
-    assertEquals(0L, dao.count(PaginationFilter.platformType(PlatformType.ILLUMINA), PaginationFilter.query("DROP TABLE Pool;")));
+    assertEquals(0L,
+        dao.count(PaginationFilter.platformType(PlatformType.ILLUMINA), PaginationFilter.query("DROP TABLE Pool;")));
   }
 
   @Test
@@ -257,7 +260,8 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
 
   @Test
   public void testListByIlluminaSearchWithLimit() throws IOException {
-    List<Pool> pools = dao.list(5, 3, true, "id", PaginationFilter.platformType(PlatformType.ILLUMINA), PaginationFilter.query("IPO*"));
+    List<Pool> pools = dao.list(5, 3, true, "id", PaginationFilter.platformType(PlatformType.ILLUMINA),
+        PaginationFilter.query("IPO*"));
     assertEquals(3, pools.size());
     assertEquals(6L, pools.get(0).getId());
   }
@@ -308,7 +312,8 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
   public void testAddAliquot() throws IOException {
     Pool pool = dao.get(1L);
     int originalSize = pool.getPoolContents().size();
-    ListLibraryAliquotView ldi = (ListLibraryAliquotView) sessionFactory.getCurrentSession().get(ListLibraryAliquotView.class, 14L);
+    ListLibraryAliquotView ldi =
+        (ListLibraryAliquotView) sessionFactory.getCurrentSession().get(ListLibraryAliquotView.class, 14L);
     PoolElement element = new PoolElement(pool, ldi);
     pool.getPoolContents().add(element);
     dao.save(pool);
@@ -341,7 +346,7 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
           pd.getProportion());
     });
   }
-  
+
   @Test
   public void testListByIdList() throws Exception {
     testListByIdList(dao::listByIdList, Arrays.asList(1L, 3L, 5L));

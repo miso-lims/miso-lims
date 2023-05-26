@@ -6,8 +6,9 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -42,10 +43,12 @@ public class ValidationUtils {
     throw new IllegalStateException("Static util class not intended for instantiation");
   }
 
-  public static <T extends Barcodable> void validateBarcodeUniqueness(T barcodable, T beforeChange, BarcodableReferenceService service,
+  public static <T extends Barcodable> void validateBarcodeUniqueness(T barcodable, T beforeChange,
+      BarcodableReferenceService service,
       Collection<ValidationError> errors) throws IOException {
     if (barcodable.getIdentificationBarcode() != null
-        && (beforeChange == null || !barcodable.getIdentificationBarcode().equals(beforeChange.getIdentificationBarcode()))) {
+        && (beforeChange == null
+            || !barcodable.getIdentificationBarcode().equals(beforeChange.getIdentificationBarcode()))) {
       BarcodableReference ref = service.checkForExisting(barcodable.getIdentificationBarcode());
       if (ref != null) {
         errors.add(new ValidationError("identificationBarcode",
@@ -54,14 +57,16 @@ public class ValidationUtils {
     }
   }
 
-  public static void validateConcentrationUnits(BigDecimal concentration, ConcentrationUnit units, String field, String label,
+  public static void validateConcentrationUnits(BigDecimal concentration, ConcentrationUnit units, String field,
+      String label,
       Collection<ValidationError> errors) {
     if (concentration != null && units == null) {
       errors.add(new ValidationError(field, label + " units must be specified"));
     }
   }
 
-  public static void validateConcentrationUnits(BigDecimal concentration, ConcentrationUnit units, Collection<ValidationError> errors) {
+  public static void validateConcentrationUnits(BigDecimal concentration, ConcentrationUnit units,
+      Collection<ValidationError> errors) {
     if (concentration != null && concentration.compareTo(BigDecimal.ZERO) > 0 && units == null) {
       errors.add(new ValidationError("concentrationUnits", "Concentration units must be specified"));
     }
@@ -81,8 +86,10 @@ public class ValidationUtils {
 
   public static void validateUnboxableFields(Boxable item, Collection<ValidationError> errors) {
     if (item.getBox() != null) {
-      if (item.isDiscarded()) errors.add(new ValidationError("Discarded item cannot be added to a box"));
-      if (item.getDistributionTransfer() != null) errors.add(new ValidationError("Distributed item cannot be added to a box"));
+      if (item.isDiscarded())
+        errors.add(new ValidationError("Discarded item cannot be added to a box"));
+      if (item.getDistributionTransfer() != null)
+        errors.add(new ValidationError("Distributed item cannot be added to a box"));
     }
   }
 
@@ -98,10 +105,12 @@ public class ValidationUtils {
     validateQcUser(qcStatus, qcUser, errors, "QC status", "QC user");
   }
 
-  public static void validateQcUser(Object qcStatus, User qcUser, Collection<ValidationError> errors, String qcFieldLabel,
+  public static void validateQcUser(Object qcStatus, User qcUser, Collection<ValidationError> errors,
+      String qcFieldLabel,
       String qcUserLabel) {
     if (qcStatus == null && qcUser != null) {
-      errors.add(new ValidationError(String.format("%s cannot be set when %s is not specified", qcUserLabel, qcFieldLabel)));
+      errors.add(
+          new ValidationError(String.format("%s cannot be set when %s is not specified", qcUserLabel, qcFieldLabel)));
     } else if (qcStatus != null && qcUser == null) {
       errors.add(new ValidationError(String.format("%s must be set when %s is specified", qcUserLabel, qcFieldLabel)));
     }
@@ -113,8 +122,10 @@ public class ValidationUtils {
     }
   }
 
-  public static void validateUrl(String fieldName, String maybeUrl, boolean allowEmptyUrl, Collection<ValidationError> errors) {
-    if (isStringEmptyOrNull(maybeUrl) && allowEmptyUrl) return;
+  public static void validateUrl(String fieldName, String maybeUrl, boolean allowEmptyUrl,
+      Collection<ValidationError> errors) {
+    if (isStringEmptyOrNull(maybeUrl) && allowEmptyUrl)
+      return;
     URL url = parseUrl(maybeUrl);
     if (url == null) {
       errors.add(new ValidationError(fieldName, INVALID_URL));
@@ -171,7 +182,8 @@ public class ValidationUtils {
     }
   }
 
-  public static <T extends Identifiable> void loadChildEntity(Consumer<T> setter, T childEntity, ProviderService<T> service,
+  public static <T extends Identifiable> void loadChildEntity(Consumer<T> setter, T childEntity,
+      ProviderService<T> service,
       String property)
       throws IOException {
     if (childEntity != null) {
@@ -194,12 +206,15 @@ public class ValidationUtils {
 
   public static void updateDetailedQcStatusDetails(DetailedQcItem object, DetailedQcItem beforeChange,
       AuthorizationManager authorizationManager) throws IOException {
-    updateQcDetails(object, beforeChange, DetailedQcItem::getDetailedQcStatus, DetailedQcItem::getQcUser, DetailedQcItem::setQcUser,
+    updateQcDetails(object, beforeChange, DetailedQcItem::getDetailedQcStatus, DetailedQcItem::getQcUser,
+        DetailedQcItem::setQcUser,
         authorizationManager, DetailedQcItem::getQcDate, DetailedQcItem::setQcDate);
   }
 
-  public static <T> void updateQcDetails(T object, T beforeChange, Function<T, Object> getStatus, Function<T, User> getUser,
-      BiConsumer<T, User> setUser, AuthorizationManager authorizationManager, Function<T, Date> getDate, BiConsumer<T, Date> setDate)
+  public static <T> void updateQcDetails(T object, T beforeChange, Function<T, Object> getStatus,
+      Function<T, User> getUser,
+      BiConsumer<T, User> setUser, AuthorizationManager authorizationManager, Function<T, LocalDate> getDate,
+      BiConsumer<T, LocalDate> setDate)
       throws IOException {
     if (isChanged(getStatus, object, beforeChange)) {
       if (getStatus.apply(object) == null) {
@@ -207,7 +222,7 @@ public class ValidationUtils {
         setDate.accept(object, null);
       } else {
         setUser.accept(object, authorizationManager.getCurrentUser());
-        setDate.accept(object, new Date());
+        setDate.accept(object, LocalDate.now(ZoneId.systemDefault()));
       }
     } else if (beforeChange != null) {
       setUser.accept(object, getUser.apply(beforeChange));

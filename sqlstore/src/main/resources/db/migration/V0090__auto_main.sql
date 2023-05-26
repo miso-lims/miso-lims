@@ -197,11 +197,11 @@ INSERT INTO Indices(indexFamilyId, position, name, sequence) VALUES
 
 -- pre-migration_ids
 
-ALTER TABLE DetailedSample ADD COLUMN preMigrationId bigint(20);
+ALTER TABLE DetailedSample ADD COLUMN preMigrationId bigint;
 ALTER TABLE DetailedSample ADD CONSTRAINT sample_preMigrationId UNIQUE (premigrationId);
-ALTER TABLE LibraryAdditionalInfo ADD COLUMN preMigrationId bigint(20);
+ALTER TABLE LibraryAdditionalInfo ADD COLUMN preMigrationId bigint;
 ALTER TABLE LibraryAdditionalInfo ADD CONSTRAINT library_preMigrationId UNIQUE (premigrationId);
-ALTER TABLE LibraryDilution ADD COLUMN preMigrationId bigint(20);
+ALTER TABLE LibraryDilution ADD COLUMN preMigrationId bigint;
 ALTER TABLE LibraryDilution ADD CONSTRAINT dilution_preMigrationId UNIQUE (premigrationId);
 
 
@@ -246,8 +246,8 @@ UPDATE DetailedSample ds
 ALTER TABLE DetailedSample ADD COLUMN detailedQcStatusNote VARCHAR(500) DEFAULT NULL;
 
 ALTER TABLE QcPassedDetail RENAME TO DetailedQcStatus;
-ALTER TABLE DetailedQcStatus CHANGE COLUMN qcPassedDetailId detailedQcStatusId BIGINT(20) NOT NULL AUTO_INCREMENT;
-ALTER TABLE DetailedSample CHANGE COLUMN qcPassedDetailId detailedQcStatusId BIGINT(20) DEFAULT NULL;
+ALTER TABLE DetailedQcStatus CHANGE COLUMN qcPassedDetailId detailedQcStatusId bigint NOT NULL AUTO_INCREMENT;
+ALTER TABLE DetailedSample CHANGE COLUMN qcPassedDetailId detailedQcStatusId bigint DEFAULT NULL;
 ALTER TABLE DetailedSample ADD CONSTRAINT `FK_detailedQcStatus` FOREIGN KEY (detailedQcStatusId) REFERENCES DetailedQcStatus (detailedQcStatusId);
 
 

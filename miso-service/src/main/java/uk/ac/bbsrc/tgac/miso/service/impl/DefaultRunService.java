@@ -4,7 +4,17 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
-import java.util.*;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -71,14 +81,13 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.persistence.RunStore;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
+public class DefaultRunService implements RunService {
 
   private static class NotIn implements Predicate<SequencerPartitionContainer> {
 
@@ -182,7 +191,7 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   @Override
   public void addNote(Run run, Note note) throws IOException {
     Run managed = runDao.get(run.getId());
-    note.setCreationDate(new Date());
+    note.setCreationDate(LocalDate.now(ZoneId.systemDefault()));
     note.setOwner(authorizationManager.getCurrentUser());
     managed.addNote(note);
     managed.setLastModifier(authorizationManager.getCurrentUser());
@@ -256,7 +265,8 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       throw new IllegalArgumentException("Name generator failed to generate a valid name", e);
     } catch (ConstraintViolationException e) {
       // Send the nested root cause message to the user, since it contains the actual error.
-      throw new ConstraintViolationException(e.getMessage() + " " + ExceptionUtils.getRootCauseMessage(e), e.getSQLException(),
+      throw new ConstraintViolationException(e.getMessage() + " " + ExceptionUtils.getRootCauseMessage(e),
+          e.getSQLException(),
           e.getConstraintName());
     }
   }
@@ -294,7 +304,8 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   }
 
   /**
-   * Loads persisted objects into run fields. Should be called before saving or updating. Loads all fields except for:
+   * Loads persisted objects into run fields. Should be called before saving or updating. Loads all
+   * fields except for:
    * <ul>
    * <li>creator/lastModifier User objects</li>
    * </ul>
@@ -324,12 +335,14 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   }
 
   private void validateChanges(Run before, Run changed) throws IOException {
-    ValidationUtils.updateQcDetails(changed, before, Run::getQcPassed, Run::getQcUser, Run::setQcUser, authorizationManager, Run::getQcDate,
+    ValidationUtils.updateQcDetails(changed, before, Run::getQcPassed, Run::getQcUser, Run::setQcUser,
+        authorizationManager, Run::getQcDate,
         Run::setQcDate);
     if (isChanged(Run::getQcPassed, changed, before)) {
       changed.setDataReview(null);
     }
-    ValidationUtils.updateQcDetails(changed, before, Run::getDataReview, Run::getDataReviewer, Run::setDataReviewer, authorizationManager,
+    ValidationUtils.updateQcDetails(changed, before, Run::getDataReview, Run::getDataReviewer, Run::setDataReviewer,
+        authorizationManager,
         Run::getDataReviewDate, Run::setDataReviewDate);
 
     List<ValidationError> errors = new ArrayList<>();
@@ -350,7 +363,8 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       }
     }
     if (isSetAndChanged(Run::getAlias, changed, before) && getRunByAlias(changed.getAlias()) != null) {
-      errors.add(new ValidationError("alias", "A different run with this alias already exists. Run alias must be unique."));
+      errors.add(
+          new ValidationError("alias", "A different run with this alias already exists. Run alias must be unique."));
     }
 
     InstrumentModel platform = changed.getSequencer().getInstrumentModel();
@@ -372,25 +386,30 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       errors.add(new ValidationError("dataReview", "Cannot set data review before QC status"));
     }
     ValidationUtils.validateQcUser(changed.getQcPassed(), changed.getQcUser(), errors);
-    ValidationUtils.validateQcUser(changed.getDataReview(), changed.getDataReviewer(), errors, "data review", "Data reviewer");
+    ValidationUtils.validateQcUser(changed.getDataReview(), changed.getDataReviewer(), errors, "data review",
+        "Data reviewer");
 
     User user = authorizationManager.getCurrentUser();
-    if (((before == null && changed.getDataReview() != null) || (before != null && isChanged(Run::getDataReview, changed, before)))
+    if (((before == null && changed.getDataReview() != null)
+        || (before != null && isChanged(Run::getDataReview, changed, before)))
         && !user.isRunReviewer() && !user.isAdmin()) {
       errors.add(new ValidationError("dataReview", "You are not authorized to make this change"));
     }
 
     if (changed.getSequencerPartitionContainers() != null) {
-      if (changed.getSequencerPartitionContainers().size() > changed.getSequencer().getInstrumentModel().getNumContainers()) {
+      if (changed.getSequencerPartitionContainers().size() > changed.getSequencer().getInstrumentModel()
+          .getNumContainers()) {
         errors.add(new ValidationError(
-            String.format("Cannot have more than %d containers", changed.getSequencer().getInstrumentModel().getNumContainers())));
+            String.format("Cannot have more than %d containers",
+                changed.getSequencer().getInstrumentModel().getNumContainers())));
       }
       for (SequencerPartitionContainer container : changed.getSequencerPartitionContainers()) {
         if (changed.getSequencer().getInstrumentModel().getContainerModels().stream()
             .noneMatch(model -> model.getId() == container.getModel().getId())) {
           errors.add(
-              new ValidationError(String.format("Container '%s' is not valid for instrument '%s'", container.getIdentificationBarcode(),
-              changed.getSequencer().getInstrumentModel().getAlias())));
+              new ValidationError(
+                  String.format("Container '%s' is not valid for instrument '%s'", container.getIdentificationBarcode(),
+                      changed.getSequencer().getInstrumentModel().getAlias())));
         }
       }
     }
@@ -410,7 +429,8 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     target.setStartDate(source.getStartDate());
     target.setCompletionDate(source.getCompletionDate());
 
-    makeContainerChangesChangeLog(target, target.getSequencerPartitionContainers(), source.getSequencerPartitionContainers());
+    makeContainerChangesChangeLog(target, target.getSequencerPartitionContainers(),
+        source.getSequencerPartitionContainers());
     applyContainerChanges(target, source);
     target.setSequencingParameters(source.getSequencingParameters());
     target.setSequencer(source.getSequencer());
@@ -498,9 +518,10 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   }
 
   /**
-   * If any containers were added or removed from the run, generates and saves a single Run changelog entry and one Container changelog
-   * entry for each Container affected. May be called before or after managedRun is updated, as the original and updated container list
-   * are both provided separately
+   * If any containers were added or removed from the run, generates and saves a single Run changelog
+   * entry and one Container changelog entry for each Container affected. May be called before or
+   * after managedRun is updated, as the original and updated container list are both provided
+   * separately
    * 
    * @param managedRun Run to add changelog entry to
    * @param originalContainers Containers attached to the Run before change
@@ -584,7 +605,8 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   }
 
   @Override
-  public boolean processNotification(Run source, int laneCount, String containerModel, String containerSerialNumber, String sequencerName,
+  public boolean processNotification(Run source, int laneCount, String containerModel, String containerSerialNumber,
+      String sequencerName,
       Predicate<SequencingParameters> filterParameters, GetLaneContents getLaneContents, String positionName)
       throws IOException, MisoNamingException {
     User user = userService.getByLoginName("notification");
@@ -619,7 +641,8 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     }
     target.setSequencer(sequencer);
 
-    SequencingContainerModel model = containerModelService.find(sequencer.getInstrumentModel(), containerModel, laneCount);
+    SequencingContainerModel model =
+        containerModelService.find(sequencer.getInstrumentModel(), containerModel, laneCount);
     if (model == null) {
       throw new IllegalArgumentException(
           "Could not find container or fallback for parameters: model=" + containerModel + ", lanes=" + laneCount);
@@ -629,33 +652,36 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
           + " for run " + source.getAlias() + "; used fallback container model instead.");
     }
 
-    isMutated |= updateContainerFromNotification(target, user, model, containerSerialNumber, getLaneContents, positionName);
+    isMutated |=
+        updateContainerFromNotification(target, user, model, containerSerialNumber, getLaneContents, positionName);
     isMutated |= updateHealthFromNotification(source, target, user);
     isMutated |= updateSequencingKitFromNotification(target, source.getSequencingKit());
     isMutated |= updateDataManglingPolicyFromNotification(target, source.getDataManglingPolicy(), user);
 
     switch (source.getPlatformType()) {
-    case ILLUMINA:
-      isMutated |= updateIlluminaRunFromNotification((IlluminaRun) source, (IlluminaRun) target);
-      break;
-    case LS454:
-      isMutated |= updateField(((LS454Run) source).getCycles(), ((LS454Run) target).getCycles(),
-              ((LS454Run) target)::setCycles);
-      isMutated |= updateField(source.getPairedEnd(), target.getPairedEnd(), target::setPairedEnd);
-      break;
-    case OXFORDNANOPORE:
-      isMutated |= updateField(((OxfordNanoporeRun)source).getMinKnowVersion(), ((OxfordNanoporeRun) target).getMinKnowVersion(),
-              ((OxfordNanoporeRun) target)::setMinKnowVersion);
-      isMutated |= updateField(((OxfordNanoporeRun)source).getProtocolVersion(), ((OxfordNanoporeRun)target).getProtocolVersion(),
-              ((OxfordNanoporeRun) target)::setProtocolVersion);
-      break;
-    case IONTORRENT:
-    case PACBIO:
-    case SOLID:
-      // Nothing to do
-      break;
-    default:
-      throw new NotImplementedException();
+      case ILLUMINA:
+        isMutated |= updateIlluminaRunFromNotification((IlluminaRun) source, (IlluminaRun) target);
+        break;
+      case LS454:
+        isMutated |= updateField(((LS454Run) source).getCycles(), ((LS454Run) target).getCycles(),
+            ((LS454Run) target)::setCycles);
+        isMutated |= updateField(source.getPairedEnd(), target.getPairedEnd(), target::setPairedEnd);
+        break;
+      case OXFORDNANOPORE:
+        isMutated |= updateField(((OxfordNanoporeRun) source).getMinKnowVersion(),
+            ((OxfordNanoporeRun) target).getMinKnowVersion(),
+            ((OxfordNanoporeRun) target)::setMinKnowVersion);
+        isMutated |= updateField(((OxfordNanoporeRun) source).getProtocolVersion(),
+            ((OxfordNanoporeRun) target).getProtocolVersion(),
+            ((OxfordNanoporeRun) target)::setProtocolVersion);
+        break;
+      case IONTORRENT:
+      case PACBIO:
+      case SOLID:
+        // Nothing to do
+        break;
+      default:
+        throw new NotImplementedException();
     }
 
     isMutated |= updateSequencingParameters(target, user, filterParameters, sequencer);
@@ -672,7 +698,8 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     if (source.getMetrics() == null) {
       return false;
     }
-    if (source.getMetrics().equals(target.getMetrics())) return false;
+    if (source.getMetrics().equals(target.getMetrics()))
+      return false;
     if (target.getMetrics() == null) {
       target.setMetrics(source.getMetrics());
       return true;
@@ -739,12 +766,16 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     return isMutated;
   }
 
-  private boolean updateSequencingParameters(final Run target, User user, Predicate<SequencingParameters> filterParameters,
+  private boolean updateSequencingParameters(final Run target, User user,
+      Predicate<SequencingParameters> filterParameters,
       final Instrument sequencer) throws IOException {
-    // If the sequencing parameters haven't been updated by a human, see if we can find exactly one that matches.
+    // If the sequencing parameters haven't been updated by a human, see if we can find exactly one that
+    // matches.
     if (!target.didSomeoneElseChangeColumn("sequencingParameters_parametersId", user)) {
-      List<SequencingParameters> possibleParameters = sequencingParametersService.listByInstrumentModelId(sequencer.getInstrumentModel().getId()).stream()
-          .filter(parameters -> !parameters.getName().startsWith("Custom")).filter(filterParameters).collect(Collectors.toList());
+      List<SequencingParameters> possibleParameters =
+          sequencingParametersService.listByInstrumentModelId(sequencer.getInstrumentModel().getId()).stream()
+              .filter(parameters -> !parameters.getName().startsWith("Custom")).filter(filterParameters)
+              .collect(Collectors.toList());
       if (possibleParameters.size() == 1) {
         if (target.getSequencingParameters() == null
             || possibleParameters.get(0).getId() != target.getSequencingParameters().getId()) {
@@ -767,54 +798,59 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
     if (!isStringEmptyOrNull(positionName)) {
       position = target.getSequencer().getInstrumentModel().getPositions().stream()
           .filter(pos -> positionName.equals(pos.getAlias()))
-          .findFirst().orElseThrow(() -> new IllegalArgumentException(String.format("Unknown position '%s' for platform '%s'", positionName,
-              target.getSequencer().getInstrumentModel().getAlias())));
+          .findFirst().orElseThrow(
+              () -> new IllegalArgumentException(String.format("Unknown position '%s' for platform '%s'", positionName,
+                  target.getSequencer().getInstrumentModel().getAlias())));
     }
     switch (containers.size()) {
-    case 0:
-      SequencerPartitionContainer newContainer = containerModel.getPlatformType().createContainer();
-      newContainer.setModel(containerModel);
-      newContainer.setCreator(user);
-      newContainer.setIdentificationBarcode(containerSerialNumber);
-      newContainer.setPartitionLimit(laneCount);
-      newContainer.setPartitions(IntStream.range(0, laneCount)
-          .mapToObj(i -> new PartitionImpl(newContainer, i + 1))
-          .collect(Collectors.toList()));
-      updatePartitionContents(getLaneContents, newContainer);
+      case 0:
+        SequencerPartitionContainer newContainer = containerModel.getPlatformType().createContainer();
+        newContainer.setModel(containerModel);
+        newContainer.setCreator(user);
+        newContainer.setIdentificationBarcode(containerSerialNumber);
+        newContainer.setPartitionLimit(laneCount);
+        newContainer.setPartitions(IntStream.range(0, laneCount)
+            .mapToObj(i -> new PartitionImpl(newContainer, i + 1))
+            .collect(Collectors.toList()));
+        updatePartitionContents(getLaneContents, newContainer);
 
-      RunPosition newRunPos = new RunPosition();
-      newRunPos.setRun(target);
-      newRunPos.setContainer(newContainer);
-      newRunPos.setPosition(position);
-      target.getRunPositions().clear();
-      target.getRunPositions().add(newRunPos);
-      return true;
-    case 1:
-      SequencerPartitionContainer container = containers.iterator().next();
-      boolean isMutated = false;
-      if (container.getPartitions().size() != laneCount) {
-        throw new IllegalArgumentException(String.format("The container %s has %d partitions, but %d were detected by the scanner.",
-            containerSerialNumber, container.getPartitions().size(), laneCount));
-      }
-      // only update container model from fallback to non-fallback
-      if (container.getModel().isFallback() && !containerModel.isFallback() && container.getModel().getId() != containerModel.getId()) {
-        container.setModel(containerModel);
-        isMutated = true;
-      }
-      if (target.getSequencerPartitionContainers().stream().noneMatch(c -> c.getId() == container.getId())) {
-        target.addSequencerPartitionContainer(container, position);
-        updatePartitionContents(getLaneContents, container);
-        isMutated = true;
-      }
-      return isMutated;
-    default:
-      throw new IllegalArgumentException("Multiple containers with same identifier: " + containerSerialNumber);
+        RunPosition newRunPos = new RunPosition();
+        newRunPos.setRun(target);
+        newRunPos.setContainer(newContainer);
+        newRunPos.setPosition(position);
+        target.getRunPositions().clear();
+        target.getRunPositions().add(newRunPos);
+        return true;
+      case 1:
+        SequencerPartitionContainer container = containers.iterator().next();
+        boolean isMutated = false;
+        if (container.getPartitions().size() != laneCount) {
+          throw new IllegalArgumentException(
+              String.format("The container %s has %d partitions, but %d were detected by the scanner.",
+                  containerSerialNumber, container.getPartitions().size(), laneCount));
+        }
+        // only update container model from fallback to non-fallback
+        if (container.getModel().isFallback() && !containerModel.isFallback()
+            && container.getModel().getId() != containerModel.getId()) {
+          container.setModel(containerModel);
+          isMutated = true;
+        }
+        if (target.getSequencerPartitionContainers().stream().noneMatch(c -> c.getId() == container.getId())) {
+          target.addSequencerPartitionContainer(container, position);
+          updatePartitionContents(getLaneContents, container);
+          isMutated = true;
+        }
+        return isMutated;
+      default:
+        throw new IllegalArgumentException("Multiple containers with same identifier: " + containerSerialNumber);
     }
   }
 
-  private void updatePartitionContents(final GetLaneContents getLaneContents, SequencerPartitionContainer newContainer) {
+  private void updatePartitionContents(final GetLaneContents getLaneContents,
+      SequencerPartitionContainer newContainer) {
     newContainer.getPartitions().stream().filter(partition -> partition.getPool() == null)
-        .forEach(partition -> getLaneContents.getLaneContents(partition.getPartitionNumber()).filter(s -> !LimsUtils.isStringBlankOrNull(s))
+        .forEach(partition -> getLaneContents.getLaneContents(partition.getPartitionNumber())
+            .filter(s -> !LimsUtils.isStringBlankOrNull(s))
             .map(WhineyFunction.rethrow(poolService::getByBarcode)).ifPresent(partition::setPool));
   }
 
@@ -830,21 +866,24 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
         return true;
       }
     } else {
-      if (!managed.didSomeoneElseChangeColumn("health", user) || (!managed.getHealth().isDone() && notification.getHealth().isDone())) {
+      if (!managed.didSomeoneElseChangeColumn("health", user)
+          || (!managed.getHealth().isDone() && notification.getHealth().isDone())) {
         // A human user has never changed the health of this run, so we will.
-        // Alternatively, a human set the status to not-done but runscanner has indicated that the run is now done, so we will update with
+        // Alternatively, a human set the status to not-done but runscanner has indicated that the run is
+        // now done, so we will update with
         // this.
         managed.setHealth(notification.getHealth());
-        Date completionDate = null;
+        LocalDate completionDate = null;
         if (notification.getHealth().isDone()) {
-          // RunScanner might not have been able to figure out a date this run was completed. If so, use the existing completion date,
+          // RunScanner might not have been able to figure out a date this run was completed. If so, use the
+          // existing completion date,
           // otherwise, guess.
           if (notification.getCompletionDate() != null) {
             completionDate = notification.getCompletionDate();
           } else if (managed.getCompletionDate() != null) {
             completionDate = managed.getCompletionDate();
           } else {
-            completionDate = new Date();
+            completionDate = LocalDate.now(ZoneId.systemDefault());
           }
         }
         managed.setCompletionDate(completionDate);
@@ -860,7 +899,8 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
       target.setSequencingKit(null);
       return changed;
     }
-    KitDescriptor managedKit = kitDescriptorService.getByPartNumber(kit.getPartNumber(), KitType.SEQUENCING, target.getPlatformType());
+    KitDescriptor managedKit =
+        kitDescriptorService.getByPartNumber(kit.getPartNumber(), KitType.SEQUENCING, target.getPlatformType());
     if (managedKit == null) {
       managedKit = kitDescriptorService.getByName(kit.getName());
       if (managedKit == null || managedKit.getKitType() != KitType.SEQUENCING
@@ -897,7 +937,8 @@ public class DefaultRunService implements RunService, PaginatedDataSource<Run> {
   }
 
   @Override
-  public List<Run> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol, PaginationFilter... filter)
+  public List<Run> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
+      PaginationFilter... filter)
       throws IOException {
     return runDao.list(errorHandler, offset, limit, sortDir, sortCol, filter);
   }

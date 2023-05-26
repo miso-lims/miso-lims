@@ -20,12 +20,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
-import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunLibraryQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
-import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.persistence.RunPartitionAliquotDao;
@@ -36,12 +33,6 @@ public class DefaultRunPartitionAliquotService implements RunPartitionAliquotSer
 
   @Autowired
   private RunPartitionAliquotDao runPartitionAliquotDao;
-  @Autowired
-  private RunService runService;
-  @Autowired
-  private ContainerService containerService;
-  @Autowired
-  private LibraryAliquotService libraryAliquotService;
   @Autowired
   private RunPurposeService runPurposeService;
   @Autowired

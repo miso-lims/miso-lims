@@ -3,9 +3,10 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import org.hibernate.criterion.Projections;
@@ -150,7 +151,7 @@ public class HibernateRunPartitionAliquotDaoIT extends AbstractDAOTest {
     RunLibraryQcStatus qc = (RunLibraryQcStatus) currentSession().get(RunLibraryQcStatus.class, 1L);
     rpa.setQcStatus(qc);
     rpa.setQcUser(user);
-    rpa.setQcDate(new Date());
+    rpa.setQcDate(LocalDate.now(ZoneId.systemDefault()));
     sut.save(rpa);
 
     clearSession();

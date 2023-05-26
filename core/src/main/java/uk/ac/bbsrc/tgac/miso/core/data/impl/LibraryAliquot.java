@@ -1,32 +1,9 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -84,7 +61,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 @DiscriminatorColumn(name = "discriminator")
 @DiscriminatorValue("LibraryAliquot")
 public class LibraryAliquot extends AbstractBoxable
-    implements Comparable<LibraryAliquot>, Deletable, HierarchyEntity, Serializable {
+    implements Comparable<LibraryAliquot>, Deletable, HierarchyEntity {
 
   private static final long serialVersionUID = 1L;
   public static final Long UNSAVED_ID = 0L;
@@ -100,8 +77,7 @@ public class LibraryAliquot extends AbstractBoxable
   private String description;
 
   @Column(nullable = false)
-  @Temporal(TemporalType.DATE)
-  private Date creationDate;
+  private LocalDate creationDate;
 
   @Column(name = "created", nullable = false, updatable = false)
   @Temporal(TemporalType.TIMESTAMP)
@@ -169,16 +145,15 @@ public class LibraryAliquot extends AbstractBoxable
   @JoinColumn(name = "qcUser")
   private User qcUser;
 
-  @Temporal(TemporalType.DATE)
-  private Date qcDate;
+  private LocalDate qcDate;
 
   @OneToMany(targetEntity = LibraryAliquotChangeLog.class, mappedBy = "libraryAliquot", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @Immutable
   @ManyToMany
-  @JoinTable(name = "Transfer_LibraryAliquot", joinColumns = { @JoinColumn(name = "aliquotId") }, inverseJoinColumns = {
-      @JoinColumn(name = "transferId") })
+  @JoinTable(name = "Transfer_LibraryAliquot", joinColumns = {@JoinColumn(name = "aliquotId")}, inverseJoinColumns = {
+      @JoinColumn(name = "transferId")})
   private Set<ListTransferView> listTransferViews;
 
   @Override
@@ -249,11 +224,11 @@ public class LibraryAliquot extends AbstractBoxable
     this.creator = creator;
   }
 
-  public Date getCreationDate() {
+  public LocalDate getCreationDate() {
     return this.creationDate;
   }
 
-  public void setCreationDate(Date creationDate) {
+  public void setCreationDate(LocalDate creationDate) {
     this.creationDate = creationDate;
   }
 
@@ -376,8 +351,10 @@ public class LibraryAliquot extends AbstractBoxable
 
   @Override
   public int compareTo(LibraryAliquot o) {
-    if (getId() < o.getId()) return -1;
-    if (getId() > o.getId()) return 1;
+    if (getId() < o.getId())
+      return -1;
+    if (getId() > o.getId())
+      return 1;
     return 0;
   }
 
@@ -434,7 +411,7 @@ public class LibraryAliquot extends AbstractBoxable
   }
 
   @Override
-  public Date getBarcodeDate() {
+  public LocalDate getBarcodeDate() {
     return getCreationDate();
   }
 
@@ -499,12 +476,12 @@ public class LibraryAliquot extends AbstractBoxable
   }
 
   @Override
-  public Date getQcDate() {
+  public LocalDate getQcDate() {
     return qcDate;
   }
 
   @Override
-  public void setQcDate(Date qcDate) {
+  public void setQcDate(LocalDate qcDate) {
     this.qcDate = qcDate;
   }
 

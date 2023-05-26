@@ -7,52 +7,51 @@ DROP TABLE IF EXISTS PoreVersion;
 DROP TABLE IF EXISTS RunOxfordNanopore;
 
 CREATE TABLE RunOxfordNanopore(
-  runId bigint(20) NOT NULL AUTO_INCREMENT,
+  runId bigint NOT NULL AUTO_INCREMENT,
   minKnowVersion varchar(100),
   protocolVersion varchar(100),
   PRIMARY KEY (runId),
   CONSTRAINT FK_OxfordNanopore_Run FOREIGN KEY (runId) REFERENCES Run (runId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE FlowCellVersion(
-  flowCellVersionId bigint(20) NOT NULL AUTO_INCREMENT,
+  flowCellVersionId bigint NOT NULL AUTO_INCREMENT,
   alias varchar(100) NOT NULL,
   PRIMARY KEY (flowCellVersionId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE PoreVersion(
-  poreVersionId bigint(20) NOT NULL AUTO_INCREMENT,
+  poreVersionId bigint NOT NULL AUTO_INCREMENT,
   alias varchar(100) NOT NULL,
   PRIMARY KEY (poreVersionId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE OxfordNanoporeContainer (
-  containerId bigint(20) NOT NULL AUTO_INCREMENT,
-  flowCellVersionId bigint(20),
-  poreVersionId bigint(20),
+  containerId bigint NOT NULL AUTO_INCREMENT,
+  flowCellVersionId bigint,
+  poreVersionId bigint,
   receivedDate DATE NOT NULL,
   returnedDate DATE NULL,
   PRIMARY KEY(containerId),
   CONSTRAINT FK_OxfordNanoporeContainer_Container FOREIGN KEY (containerId) REFERENCES SequencerPartitionContainer (containerId),
   CONSTRAINT FK_OxfordNanoporeContainer_FlowCellVersion FOREIGN KEY (flowCellVersionId) REFERENCES FlowCellVersion (flowCellVersionId),
   CONSTRAINT FK_OxfordNanoporeContainer_PoreVersion FOREIGN KEY (poreVersionId) REFERENCES PoreVersion (poreVersionId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE ContainerQC (
-  qcId bigint(20) NOT NULL AUTO_INCREMENT,
-  containerId bigint(20) NOT NULL,
-  creator bigint(20) NOT NULL,
+  qcId bigint NOT NULL AUTO_INCREMENT,
+  containerId bigint NOT NULL,
+  creator bigint NOT NULL,
   `date` date NOT NULL,
-  `type` bigint(20) DEFAULT NULL,
+  `type` bigint DEFAULT NULL,
   results double DEFAULT NULL,
   PRIMARY KEY (qcId),
   CONSTRAINT FK_ContainerQC_Container FOREIGN KEY (containerId) REFERENCES SequencerPartitionContainer (containerId),
   CONSTRAINT FK_ContainerQC_Creator FOREIGN KEY (creator) REFERENCES User (userId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE Indices MODIFY COLUMN sequence VARCHAR(24);
 
--- StartNoTest
 INSERT INTO QCType(name, description, qcTarget, units, precisionAfterDecimal)
 VALUES ('Pore Count', 'Number of pores', 'Container', 'pores', 0);
 
@@ -117,12 +116,9 @@ SELECT
 FROM SequencerPartitionContainer spc
 JOIN Platform p ON p.platformId = spc.platform
 WHERE p.name = 'OXFORDNANOPORE';
--- EndNoTest
 
 
 -- dnase
-
--- StartNoTest
 SELECT qcTypeId INTO @dnaseQc FROM QCType WHERE name = 'DNAse Treated';
 
 UPDATE SampleStock ss
@@ -142,10 +138,7 @@ AND sample_sampleId IN (
   JOIN SampleClass sc ON sc.sampleClassId = ds.sampleClassId
   WHERE sc.dnaseTreatable = 1
 );
--- EndNoTest
 
 -- DNAse treated should only be set on dnaseTreatable Stocks. These cases have been fixed automatically.
 -- Next line will fail and require manual fixing for other (unexpected) cases.
 DELETE FROM QCType WHERE name = 'DNAse Treated';
-
-

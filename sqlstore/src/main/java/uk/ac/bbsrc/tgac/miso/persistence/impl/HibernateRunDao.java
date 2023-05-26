@@ -1,15 +1,23 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import javax.persistence.TemporalType;
+
 import org.hibernate.Criteria;
-import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.*;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.hibernate.type.LongType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +40,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   private static final List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("sequencer"),
       new AliasDescriptor("sequencer.instrumentModel"));
 
-  private static final String[] SEARCH_PROPERTIES = new String[] { "name", "alias", "description" };
+  private static final String[] SEARCH_PROPERTIES = new String[] {"name", "alias", "description"};
   @Autowired
   private SessionFactory sessionFactory;
 
@@ -63,7 +71,8 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   @Override
   public Run getLatestStartDateRunBySequencerPartitionContainerId(long containerId) throws IOException {
-    // flush here because if Hibernate has not persisted recent changes to container-run relationships, unexpected associations may
+    // flush here because if Hibernate has not persisted recent changes to container-run relationships,
+    // unexpected associations may
     // show up
     currentSession().flush();
 
@@ -78,7 +87,8 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   @Override
   public Run getLatestRunIdRunBySequencerPartitionContainerId(long containerId) throws IOException {
-    // flush here because if Hibernate has not persisted recent changes to container-run relationships, unexpected associations may
+    // flush here because if Hibernate has not persisted recent changes to container-run relationships,
+    // unexpected associations may
     // show up
     currentSession().flush();
 
@@ -161,7 +171,8 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   @Override
   public List<Run> listBySequencerPartitionContainerId(long containerId) throws IOException {
-    // flush here because if Hibernate has not persisted recent changes to container-run relationships, unexpected associations may
+    // flush here because if Hibernate has not persisted recent changes to container-run relationships,
+    // unexpected associations may
     // show up
     currentSession().flush();
 
@@ -247,9 +258,12 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   @Override
   public String propertyForSortColumn(String original) {
-    if ("platformType".equals(original)) return "instrumentModel.platformType";
-    if ("status".equals(original)) return "health";
-    if ("endDate".equals(original)) return "completionDate";
+    if ("platformType".equals(original))
+      return "instrumentModel.platformType";
+    if ("status".equals(original))
+      return "health";
+    if ("endDate".equals(original))
+      return "completionDate";
     return original;
 
   }
@@ -257,14 +271,27 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   @Override
   public String propertyForDate(Criteria criteria, DateType type) {
     switch (type) {
-    case CREATE:
-      return "startDate";
-    case ENTERED:
-      return "creationTime";
-    case UPDATE:
-      return "lastModified";
-    default:
-      return null;
+      case CREATE:
+        return "startDate";
+      case ENTERED:
+        return "creationTime";
+      case UPDATE:
+        return "lastModified";
+      default:
+        return null;
+    }
+  }
+
+  @Override
+  public TemporalType temporalTypeForDate(DateType type) {
+    switch (type) {
+      case CREATE:
+        return TemporalType.DATE;
+      case ENTERED:
+      case UPDATE:
+        return TemporalType.TIMESTAMP;
+      default:
+        return null;
     }
   }
 
@@ -293,7 +320,8 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   }
 
   @Override
-  public void restrictPaginationBySequencingParametersName(Criteria criteria, String query, Consumer<String> errorHandler) {
+  public void restrictPaginationBySequencingParametersName(Criteria criteria, String query,
+      Consumer<String> errorHandler) {
     if (LimsUtils.isStringBlankOrNull(query)) {
       criteria.add(Restrictions.isNull("sequencingParameters"));
     } else {
@@ -303,12 +331,14 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   }
 
   @Override
-  public void restrictPaginationByHealth(Criteria criteria, EnumSet<HealthType> healths, Consumer<String> errorHandler) {
+  public void restrictPaginationByHealth(Criteria criteria, EnumSet<HealthType> healths,
+      Consumer<String> errorHandler) {
     criteria.add(Restrictions.in("health", healths.toArray()));
   }
 
   @Override
-  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
+  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType,
+      Consumer<String> errorHandler) {
     criteria.add(Restrictions.eq("instrumentModel.platformType", platformType));
   }
 
@@ -338,7 +368,8 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   }
 
   @Override
-  public List<Run> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol, PaginationFilter... filter)
+  public List<Run> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
+      PaginationFilter... filter)
       throws IOException {
     List<Run> runs = HibernatePaginatedDataSource.super.list(errorHandler, offset, limit, sortDir, sortCol, filter);
     if (runs.isEmpty()) {

@@ -1,7 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Objects;
 
 import javax.persistence.Entity;
@@ -10,8 +10,6 @@ import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -92,7 +90,7 @@ public class RunPartitionAliquot implements Serializable {
     }
 
   }
-  
+
   private static final long serialVersionUID = 1L;
 
   @Id
@@ -118,8 +116,7 @@ public class RunPartitionAliquot implements Serializable {
   @JoinColumn(name = "qcUser")
   private User qcUser;
 
-  @Temporal(TemporalType.DATE)
-  private Date qcDate;
+  private LocalDate qcDate;
 
   private Boolean dataReview;
 
@@ -127,8 +124,7 @@ public class RunPartitionAliquot implements Serializable {
   @JoinColumn(name = "dataReviewerId")
   private User dataReviewer;
 
-  @Temporal(TemporalType.DATE)
-  private Date dataReviewDate;
+  private LocalDate dataReviewDate;
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier")
@@ -209,11 +205,11 @@ public class RunPartitionAliquot implements Serializable {
     this.qcUser = qcUser;
   }
 
-  public Date getQcDate() {
+  public LocalDate getQcDate() {
     return qcDate;
   }
 
-  public void setQcDate(Date qcDate) {
+  public void setQcDate(LocalDate qcDate) {
     this.qcDate = qcDate;
   }
 
@@ -233,11 +229,11 @@ public class RunPartitionAliquot implements Serializable {
     this.dataReviewer = dataReviewer;
   }
 
-  public Date getDataReviewDate() {
+  public LocalDate getDataReviewDate() {
     return dataReviewDate;
   }
 
-  public void setDataReviewDate(Date dataReviewDate) {
+  public void setDataReviewDate(LocalDate dataReviewDate) {
     this.dataReviewDate = dataReviewDate;
   }
 

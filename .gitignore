@@ -41,4 +41,5 @@ _site/
 
 # Password files
 .miso_db_password
+.miso_root_password
 .ssl_password

@@ -2,6 +2,8 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -11,6 +13,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javax.persistence.Table;
+import javax.persistence.TemporalType;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -187,6 +190,10 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
 
   public abstract String propertyForDate(Criteria criteria, DateType type);
 
+  public default TemporalType temporalTypeForDate(DateType type) {
+    return TemporalType.TIMESTAMP;
+  }
+
   /**
    * Determine the correct Hibernate property given the user-supplied sort column.
    */
@@ -240,8 +247,32 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   public default void restrictPaginationByDate(Criteria criteria, Date start, Date end, DateType type,
       Consumer<String> errorHandler) {
     String property = propertyForDate(criteria, type);
+    TemporalType temporalType = temporalTypeForDate(type);
     if (property != null) {
-      criteria.add(Restrictions.between(property, start, end));
+      switch (temporalType) {
+        case TIMESTAMP:
+          criteria.add(Restrictions.between(property, start, end));
+          break;
+        case DATE:
+          LocalDate startDate = LocalDate.ofInstant(start.toInstant(), ZoneId.systemDefault());
+          LocalDate endDate = LocalDate.ofInstant(end.toInstant(), ZoneId.systemDefault());
+          criteria.add(Restrictions.between(property, startDate, endDate));
+          break;
+        default:
+          throw new IllegalArgumentException("Unhandled temporal type: %s".formatted(temporalType));
+      }
+    } else {
+      errorHandler.accept(String.format("%s has no %s date.", getFriendlyName(), type.name().toLowerCase()));
+    }
+  }
+
+  public default void restrictPaginationByLocalDate(Criteria criteria, Date start, Date end, DateType type,
+      Consumer<String> errorHandler) {
+    LocalDate startDate = LocalDate.ofInstant(start.toInstant(), ZoneId.systemDefault());
+    LocalDate endDate = LocalDate.ofInstant(end.toInstant(), ZoneId.systemDefault());
+    String property = propertyForDate(criteria, type);
+    if (property != null) {
+      criteria.add(Restrictions.between(property, startDate, endDate));
     } else {
       errorHandler.accept(String.format("%s has no %s date.", getFriendlyName(), type.name().toLowerCase()));
     }

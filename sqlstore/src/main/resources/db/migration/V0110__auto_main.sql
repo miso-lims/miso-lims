@@ -12,16 +12,11 @@ ALTER TABLE `Identity` DROP COLUMN internalName;
 */
 
 -- Remove DetailedSample.kitDescriptorId field (currently unused; also only applicable to Stocks)
--- StartNoTest
 ALTER TABLE DetailedSample DROP FOREIGN KEY DetailedSample_ibfk_1;
--- EndNoTest
 ALTER TABLE DetailedSample DROP COLUMN kitDescriptorId;
 
 -- Add missing FK
 ALTER TABLE Kit ADD CONSTRAINT kit_kitDescriptor_fkey FOREIGN KEY (kitDescriptorId) REFERENCES KitDescriptor (kitDescriptorId);
-
-
--- StartNoTest
 
 -- Remove 'Test' kit added in V0002 migration
 DELETE FROM KitDescriptor WHERE kitDescriptorId=121 AND name='Test' AND partNumber='123123123';
@@ -29,9 +24,9 @@ DELETE FROM KitDescriptor WHERE kitDescriptorId=121 AND name='Test' AND partNumb
 -- Remove duplicates added in V0002 migration
 DELIMITER //
 DROP FUNCTION IF EXISTS kitExists//
-CREATE FUNCTION kitExists (id bigint(20), kitName varchar(255), kitVersion int(3), kitManufacturer varchar(100),
+CREATE FUNCTION kitExists (id bigint, kitName varchar(255), kitVersion int, kitManufacturer varchar(100),
     kitPartNumber varchar(50), kitKitType varchar(30), kitPlatformType varchar(20))
-    RETURNS boolean
+    RETURNS boolean NOT DETERMINISTIC READS SQL DATA
 BEGIN
 	IF EXISTS (SELECT 1 FROM KitDescriptor WHERE kitDescriptorId = id AND name = kitName AND manufacturer = kitManufacturer
 	AND partNumber LIKE kitPartNumber AND kitType = kitKitType AND platformType = kitPlatformType)
@@ -58,7 +53,7 @@ END//
 
 
 DROP PROCEDURE IF EXISTS removeDupes//
-CREATE PROCEDURE removeDupes (id1 bigint(20), id2 bigint(20), kitName varchar(255), kitVersion int(3), kitManufacturer varchar(100),
+CREATE PROCEDURE removeDupes (id1 bigint, id2 bigint, kitName varchar(255), kitVersion int, kitManufacturer varchar(100),
     kitPartNumber varchar(50), kitKitType varchar(30), kitPlatformType varchar(20))
 BEGIN
 	IF kitExists(id1, kitName, kitVersion, kitManufacturer, kitPartNumber, kitKitType, kitPlatformType)
@@ -105,7 +100,7 @@ UPDATE KitDescriptor SET name = 'GS Titanium SV emPCR Kit (Lib-L) V2' WHERE name
 -- Ones ending in '02' (id2, kitPartNumber2) are discontinued - delete if unused
 DELIMITER //
 DROP PROCEDURE IF EXISTS removeNearDupes//
-CREATE PROCEDURE removeNearDupes(id1 bigint(20), id2 bigint(20), kitName varchar(255), kitVersion int(3), kitManufacturer varchar(100),
+CREATE PROCEDURE removeNearDupes(id1 bigint, id2 bigint, kitName varchar(255), kitVersion int, kitManufacturer varchar(100),
     kitPartNumber1 varchar(50), kitPartNumber2 varchar(50), kitKitType varchar(30), kitPlatformType varchar(20))
 BEGIN
 	IF kitExists(id1, kitName, kitVersion, kitManufacturer, kitPartNumber1, kitKitType, kitPlatformType)
@@ -128,7 +123,3 @@ DROP FUNCTION kitExists;
 
 -- add constraint
 ALTER TABLE KitDescriptor ADD CONSTRAINT uk_kitDescriptor_name UNIQUE (name);
-
--- EndNoTest
-
-

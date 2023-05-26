@@ -1,7 +1,7 @@
 package com.eaglegenomics.simlims.core;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,8 +11,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -32,8 +30,8 @@ public class Note implements Serializable, Comparable<Note>, Identifiable {
   private static final long serialVersionUID = 1L;
 
   /**
-   * Use this ID to indicate that a note has not yet been saved, and therefore
-   * does not yet have a unique ID.
+   * Use this ID to indicate that a note has not yet been saved, and therefore does not yet have a
+   * unique ID.
    */
   public static final long UNSAVED_ID = 0L;
 
@@ -42,8 +40,7 @@ public class Note implements Serializable, Comparable<Note>, Identifiable {
   private long noteId = Note.UNSAVED_ID;
 
   @Column(nullable = false)
-  @Temporal(TemporalType.DATE)
-  private Date creationDate = new Date();
+  private LocalDate creationDate = LocalDate.now();
 
   @Column(nullable = false)
   private String text = "";
@@ -55,8 +52,7 @@ public class Note implements Serializable, Comparable<Note>, Identifiable {
   @Column(nullable = false)
   private boolean internalOnly = false;
 
-  public Note() {
-  }
+  public Note() {}
 
   public Note(User user) {
     setOwner(user);
@@ -72,7 +68,7 @@ public class Note implements Serializable, Comparable<Note>, Identifiable {
     this.noteId = noteId;
   }
 
-  public Date getCreationDate() {
+  public LocalDate getCreationDate() {
     return creationDate;
   }
 
@@ -80,7 +76,7 @@ public class Note implements Serializable, Comparable<Note>, Identifiable {
     return text;
   }
 
-  public void setCreationDate(Date creationDate) {
+  public void setCreationDate(LocalDate creationDate) {
     this.creationDate = creationDate;
   }
 
@@ -125,12 +121,14 @@ public class Note implements Serializable, Comparable<Note>, Identifiable {
   public int hashCode() {
     if (isSaved()) {
       return Long.valueOf(getId()).hashCode();
-    }
-    else {
+    } else {
       int hashcode = 1;
-      if (getCreationDate() != null) hashcode = 37 * hashcode + getCreationDate().hashCode();
-      if (getOwner() != null) hashcode = 37 * hashcode + getOwner().hashCode();
-      if (getText() != null) hashcode = 37 * hashcode + getText().hashCode();
+      if (getCreationDate() != null)
+        hashcode = 37 * hashcode + getCreationDate().hashCode();
+      if (getOwner() != null)
+        hashcode = 37 * hashcode + getOwner().hashCode();
+      if (getText() != null)
+        hashcode = 37 * hashcode + getText().hashCode();
       return hashcode;
     }
   }
@@ -152,10 +150,11 @@ public class Note implements Serializable, Comparable<Note>, Identifiable {
   @Override
   public int compareTo(Note o) {
     if (isSaved() && o.isSaved()) {
-      if (getId() < o.getId()) return -1;
-      if (getId() > o.getId()) return 1;
-    }
-    else if (getText() != null && o.getText() != null) {
+      if (getId() < o.getId())
+        return -1;
+      if (getId() > o.getId())
+        return 1;
+    } else if (getText() != null && o.getText() != null) {
       return getText().compareTo(o.getText());
     }
     return 0;

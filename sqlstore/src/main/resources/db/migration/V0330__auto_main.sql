@@ -1,6 +1,6 @@
 -- move_library_kit
 
-ALTER TABLE Library ADD COLUMN `kitDescriptorId` bigint(20);
+ALTER TABLE Library ADD COLUMN `kitDescriptorId` bigint;
 ALTER TABLE Library ADD CONSTRAINT library_kitDescriptor_fkey FOREIGN KEY (kitDescriptorId) REFERENCES KitDescriptor (kitDescriptorId);
 UPDATE Library SET kitDescriptorId = (SELECT kitDescriptorId FROM DetailedLibrary WHERE DetailedLibrary.libraryId = Library.libraryId);
 ALTER TABLE DetailedLibrary DROP FOREIGN KEY libraryAdditionalInfo_kitDescriptor_fkey;
@@ -20,8 +20,8 @@ UPDATE Library SET kitDescriptorId = (SELECT DISTINCT KitDescriptor.kitDescripto
 
 -- add_kits_to_containers
 
-ALTER TABLE SequencerPartitionContainer ADD COLUMN clusteringKit bigint(20);
-ALTER TABLE SequencerPartitionContainer ADD COLUMN multiplexingKit bigint(20);
+ALTER TABLE SequencerPartitionContainer ADD COLUMN clusteringKit bigint;
+ALTER TABLE SequencerPartitionContainer ADD COLUMN multiplexingKit bigint;
 
 ALTER TABLE SequencerPartitionContainer ADD CONSTRAINT container_clusteringKit_kitDescriptor_fkey FOREIGN KEY (clusteringKit) REFERENCES KitDescriptor (kitDescriptorId);
 ALTER TABLE SequencerPartitionContainer ADD CONSTRAINT container_multiplexingKit_kitDescriptor_fkey FOREIGN KEY (multiplexingKit) REFERENCES KitDescriptor (kitDescriptorId);

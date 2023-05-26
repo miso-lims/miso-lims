@@ -4,6 +4,9 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -268,7 +271,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.PoolOrderDto.OrderAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.dashi.QcHierarchyNodeDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.IlluminaRunDto;
@@ -699,8 +701,7 @@ public class Dtos {
     to.setGroupId(nullifyStringIfBlank(from.getGroupId()));
     to.setGroupDescription(nullifyStringIfBlank(from.getGroupDescription()));
     to.setSynthetic(from.getSynthetic());
-    to.setCreationDate(
-        LimsUtils.isStringEmptyOrNull(from.getCreationDate()) ? null : parseDate(from.getCreationDate()));
+    setLocalDate(to::setCreationDate, from.getCreationDate());
     if (from.getIdentityId() != null) {
       to.setIdentityId(from.getIdentityId());
     }
@@ -1553,7 +1554,7 @@ public class Dtos {
     }
     setString(to::setKitLot, from.getKitLot());
     to.setLocationBarcode(from.getLocationBarcode());
-    to.setCreationDate(parseDate(from.getCreationDate()));
+    setLocalDate(to::setCreationDate, from.getCreationDate());
     to.setBoxPosition((LibraryBoxPosition) makeBoxablePosition(from, (LibraryImpl) to));
     to.setDiscarded(from.isDiscarded());
     setObject(to::setSpikeIn, LibrarySpikeIn::new, from.getSpikeInId());
@@ -1883,7 +1884,7 @@ public class Dtos {
     setBigDecimal(to::setVolume, from.getVolume());
     to.setVolumeUnits(from.getVolumeUnits());
     setBigDecimal(to::setVolumeUsed, from.getVolumeUsed());
-    to.setCreationDate(parseDate(from.getCreationDate()));
+    setLocalDate(to::setCreationDate, from.getCreationDate());
     if (from.getTargetedSequencingId() != null) {
       to.setTargetedSequencing(new TargetedSequencing());
       to.getTargetedSequencing().setId(from.getTargetedSequencingId());
@@ -2126,8 +2127,8 @@ public class Dtos {
     setObject(to::setHealth, dto.getStatus(), status -> HealthType.get(status));
     setString(to::setAccession, dto.getAccession());
     setObject(to::setSequencer, InstrumentImpl::new, dto.getInstrumentId());
-    setDate(to::setStartDate, dto.getStartDate());
-    setDate(to::setCompletionDate, dto.getEndDate());
+    setLocalDate(to::setStartDate, dto.getStartDate());
+    setLocalDate(to::setCompletionDate, dto.getEndDate());
     setObject(to::setSequencingParameters, SequencingParameters::new, dto.getSequencingParametersId());
     setObject(to::setSequencingKit, KitDescriptor::new, dto.getSequencingKitId());
     setString(to::setSequencingKitLot, dto.getSequencingKitLot());
@@ -2238,8 +2239,8 @@ public class Dtos {
       OxfordNanoporeContainerDto ontFrom = (OxfordNanoporeContainerDto) from;
       OxfordNanoporeContainer ontTo = new OxfordNanoporeContainer();
       setObject(ontTo::setPoreVersion, PoreVersion::new, ontFrom.getPoreVersionId());
-      setDate(ontTo::setReceivedDate, ontFrom.getReceivedDate());
-      setDate(ontTo::setReturnedDate, ontFrom.getReturnedDate());
+      setLocalDate(ontTo::setReceivedDate, ontFrom.getReceivedDate());
+      setLocalDate(ontTo::setReturnedDate, ontFrom.getReturnedDate());
       to = ontTo;
     } else {
       to = new SequencerPartitionContainerImpl();
@@ -2441,7 +2442,7 @@ public class Dtos {
     if (dto.getId() != null) {
       to.setId(dto.getId());
     }
-    to.setDate(parseDate(dto.getDate()));
+    setLocalDate(to::setDate, dto.getDate());
     setBigDecimal(to::setResults, dto.getResults());
     setObject(to::setType, QcType::new, dto.getQcTypeId());
     to.setDescription(dto.getDescription());
@@ -2634,7 +2635,7 @@ public class Dtos {
     setObject(to::setPipeline, Pipeline::new, dto.getPipelineId());
     setBoolean(to::setSecondaryNaming, dto.isSecondaryNaming(), false);
     setString(to::setRebNumber, dto.getRebNumber());
-    setDate(to::setRebExpiry, dto.getRebExpiry());
+    setLocalDate(to::setRebExpiry, dto.getRebExpiry());
     setInteger(to::setSamplesExpected, dto.getSamplesExpected(), true);
     if (dto.getContactId() != null || !isStringEmptyOrNull(dto.getContactName())
         || !isStringEmptyOrNull(dto.getContactEmail())) {
@@ -2863,8 +2864,8 @@ public class Dtos {
     to.setAlias(from.getRunAlias());
     to.setFilePath(from.getSequencerFolderPath());
     to.setHealth(getMisoHealthTypeFromRunscanner(from.getHealthType()));
-    to.setStartDate(LimsUtils.toBadDate(from.getStartDate()));
-    to.setCompletionDate(LimsUtils.toBadDate(from.getCompletionDate()));
+    setLocalDate(to::setStartDate, from.getStartDate());
+    setLocalDate(to::setCompletionDate, from.getCompletionDate());
     to.setMetrics(from.getMetrics());
     if (from.getSequencingKit() != null) {
       to.setSequencingKit(new KitDescriptor());
@@ -2910,7 +2911,7 @@ public class Dtos {
     setBigDecimal(to::setConcentration, dto.getConcentration());
     to.setConcentrationUnits(dto.getConcentrationUnits());
     setInteger(to::setDnaSize, dto.getDnaSize(), true);
-    to.setCreationDate(parseDate(dto.getCreationDate()));
+    setLocalDate(to::setCreationDate, dto.getCreationDate());
     to.setDescription(dto.getDescription());
     to.setIdentificationBarcode(dto.getIdentificationBarcode());
     to.setDiscarded(dto.isDiscarded());
@@ -3103,8 +3104,8 @@ public class Dtos {
   public static Instrument to(@Nonnull InstrumentDto dto) {
     Instrument to = new InstrumentImpl();
     setLong(to::setId, dto.getId(), false);
-    setDate(to::setDateCommissioned, dto.getDateCommissioned());
-    setDate(to::setDateDecommissioned, dto.getDateDecommissioned());
+    setLocalDate(to::setDateCommissioned, dto.getDateCommissioned());
+    setLocalDate(to::setDateDecommissioned, dto.getDateDecommissioned());
     setString(to::setName, dto.getName());
     setObject(to::setInstrumentModel, InstrumentModel::new, dto.getInstrumentModelId());
     setString(to::setSerialNumber, dto.getSerialNumber());
@@ -3221,7 +3222,7 @@ public class Dtos {
     if (dto.getId() != null) {
       to.setId(dto.getId());
     }
-    to.setKitDate(parseDate(dto.getDate()));
+    setLocalDate(to::setKitDate, dto.getDate());
     to.setKitDescriptor(to(dto.getDescriptor()));
     to.setLotNumber(dto.getLotNumber());
     return to;
@@ -3256,9 +3257,9 @@ public class Dtos {
     setString(to::setAccession, dto.getAccession());
     setString(to::setAlias, dto.getAlias());
     to.setCompleted(dto.isCompleted());
-    setDate(to::setCreationDate, dto.getCreationDate());
+    setLocalDate(to::setCreationDate, dto.getCreationDate());
     setString(to::setDescription, dto.getDescription());
-    setDate(to::setSubmissionDate, dto.getSubmittedDate());
+    setLocalDate(to::setSubmissionDate, dto.getSubmittedDate());
     setString(to::setTitle, dto.getTitle());
     to.setVerified(dto.isVerified());
     if (dto.getExperimentIds() != null && !dto.getExperimentIds().isEmpty()) {
@@ -3397,8 +3398,8 @@ public class Dtos {
     setObject(run::setInstrument, InstrumentImpl::new, from.getInstrumentId());
     setObject(run::setArray, Array::new, from.getArrayId());
     run.setHealth(HealthType.get(from.getStatus()));
-    setDate(run::setStartDate, from.getStartDate());
-    setDate(run::setCompletionDate, from.getCompletionDate());
+    setLocalDate(run::setStartDate, from.getStartDate());
+    setLocalDate(run::setCompletionDate, from.getCompletionDate());
     setDate(run::setLastModified, from.getLastModified());
     return run;
   }
@@ -3657,7 +3658,7 @@ public class Dtos {
   public static ServiceRecord to(@Nonnull ServiceRecordDto dto) {
     ServiceRecord to = new ServiceRecord();
     setLong(to::setId, dto.getId(), false);
-    setDate(to::setServiceDate, dto.getServiceDate());
+    setLocalDate(to::setServiceDate, dto.getServiceDate());
     setString(to::setTitle, dto.getTitle());
     setString(to::setDetails, dto.getDetails());
     setString(to::setReferenceNumber, dto.getReferenceNumber());
@@ -4502,8 +4503,20 @@ public class Dtos {
     setter.accept(value == null ? null : formatDate(value));
   }
 
+  public static void setDateString(@Nonnull Consumer<String> setter, LocalDate value) {
+    setter.accept(value == null ? null : formatDate(value));
+  }
+
   public static void setDate(@Nonnull Consumer<Date> setter, String value) {
     setter.accept(value == null ? null : parseDate(value));
+  }
+
+  public static void setLocalDate(@Nonnull Consumer<LocalDate> setter, String value) {
+    setter.accept(value == null ? null : parseLocalDate(value));
+  }
+
+  public static void setLocalDate(@Nonnull Consumer<LocalDate> setter, Instant value) {
+    setter.accept(value == null ? null : LocalDate.ofInstant(value, ZoneId.systemDefault()));
   }
 
   public static void setDateTimeString(@Nonnull Consumer<String> setter, Date value) {

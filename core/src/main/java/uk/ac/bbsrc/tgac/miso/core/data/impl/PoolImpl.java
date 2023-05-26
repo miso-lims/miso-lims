@@ -1,31 +1,9 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -102,8 +80,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   private Integer dnaSize;
 
-  @Temporal(TemporalType.DATE)
-  private Date creationDate = new Date();
+  private LocalDate creationDate = LocalDate.now();
 
   @Column(length = DESCRIPTION_LENGTH)
   private String description;
@@ -134,8 +111,9 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
   @JoinTable(name = "Pool_Note", joinColumns = {
-      @JoinColumn(name = "pool_poolId") }, inverseJoinColumns = {
-          @JoinColumn(name = "notes_noteId") })
+      @JoinColumn(name = "pool_poolId")},
+      inverseJoinColumns = {
+          @JoinColumn(name = "notes_noteId")})
   private Collection<Note> notes = new HashSet<>();
 
   @Enumerated(EnumType.STRING)
@@ -163,8 +141,8 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   private VolumeUnit volumeUnits;
 
   @OneToMany(targetEntity = FileAttachment.class)
-  @JoinTable(name = "Pool_Attachment", joinColumns = { @JoinColumn(name = "poolId") }, inverseJoinColumns = {
-      @JoinColumn(name = "attachmentId") })
+  @JoinTable(name = "Pool_Attachment", joinColumns = {@JoinColumn(name = "poolId")}, inverseJoinColumns = {
+      @JoinColumn(name = "attachmentId")})
   private List<FileAttachment> attachments;
 
   @Transient
@@ -172,8 +150,8 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   @Immutable
   @ManyToMany
-  @JoinTable(name = "Transfer_Pool", joinColumns = { @JoinColumn(name = "poolId") }, inverseJoinColumns = {
-      @JoinColumn(name = "transferId") })
+  @JoinTable(name = "Transfer_Pool", joinColumns = {@JoinColumn(name = "poolId")}, inverseJoinColumns = {
+      @JoinColumn(name = "transferId")})
   private Set<ListTransferView> listTransferViews;
 
   @Transient
@@ -185,8 +163,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Transient
   private boolean mergeChild = false;
 
-  public PoolImpl() {
-  }
+  public PoolImpl() {}
 
   @Override
   public Boxable.EntityType getEntityType() {
@@ -201,8 +178,10 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Override
   public int compareTo(Pool t) {
     if (getId() != 0L && t.getId() != 0L) {
-      if (getId() < t.getId()) return -1;
-      if (getId() > t.getId()) return 1;
+      if (getId() < t.getId())
+        return -1;
+      if (getId() > t.getId())
+        return 1;
     } else if (getName() != null && t.getName() != null) {
       return getName().compareTo(t.getName());
     } else if (getAlias() != null && t.getAlias() != null) {
@@ -274,7 +253,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
-  public Date getCreationDate() {
+  public LocalDate getCreationDate() {
     return creationDate;
   }
 
@@ -376,7 +355,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
-  public void setCreationDate(Date creationDate) {
+  public void setCreationDate(LocalDate creationDate) {
     this.creationDate = creationDate;
   }
 
@@ -540,7 +519,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
-  public Date getBarcodeDate() {
+  public LocalDate getBarcodeDate() {
     return getCreationDate();
   }
 
@@ -563,7 +542,8 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Override
   public Set<String> getPrioritySubprojectAliases() {
     return poolElements.stream()
-        .map(PoolElement::getAliquot).filter(view -> view.getSubprojectPriority() != null && view.getSubprojectPriority())
+        .map(PoolElement::getAliquot)
+        .filter(view -> view.getSubprojectPriority() != null && view.getSubprojectPriority())
         .map(view -> view.getSubprojectAlias()).collect(Collectors.toSet());
   }
 

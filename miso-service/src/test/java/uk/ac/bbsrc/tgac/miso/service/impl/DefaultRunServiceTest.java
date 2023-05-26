@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 import static org.junit.Assert.assertFalse;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Arrays;
@@ -47,12 +48,11 @@ import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
-import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
-import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.persistence.RunStore;
 
 public class DefaultRunServiceTest {
 
+  private static final LocalDate ORIGINAL_DATE = LocalDate.of(2021, 11, 15);
   private static final Date ORIGINAL_TIME = Date.from(LocalDateTime.of(2021, 11, 15, 0, 0).toInstant(ZoneOffset.UTC));
   private static final long RUN_ID = 1l;
   private static final String RUN_ALIAS = "RUN1_ALIAS";
@@ -94,18 +94,20 @@ public class DefaultRunServiceTest {
     Mockito.when(containerModelService.find(Mockito.any(), Mockito.eq(CONTAINER_MODEL_BARCODE), Mockito.eq(1)))
         .thenReturn(makeContainerModel());
     Mockito.when(runStore.getByAlias(RUN_ALIAS)).thenReturn(makeSavedRun());
-    Mockito.when(sequencingParametersService.listByInstrumentModelId(1L)).thenReturn(Arrays.asList(makeSequencingParameters()));
-    Mockito.when(runPartitionService.get(Mockito.any(Run.class), Mockito.any(Partition.class))).thenAnswer((invocation) -> {
-      Run run = (Run) invocation.getArguments()[0];
-      if (!RUN_ALIAS.equals(run.getAlias())) {
-        return null;
-      }
-      Partition part = (Partition) invocation.getArguments()[1];
-      RunPartition runPart = new RunPartition();
-      runPart.setRunId(run.getId());
-      runPart.setPartitionId(part.getId());
-      return runPart;
-    });
+    Mockito.when(sequencingParametersService.listByInstrumentModelId(1L))
+        .thenReturn(Arrays.asList(makeSequencingParameters()));
+    Mockito.when(runPartitionService.get(Mockito.any(Run.class), Mockito.any(Partition.class)))
+        .thenAnswer((invocation) -> {
+          Run run = (Run) invocation.getArguments()[0];
+          if (!RUN_ALIAS.equals(run.getAlias())) {
+            return null;
+          }
+          Partition part = (Partition) invocation.getArguments()[1];
+          RunPartition runPart = new RunPartition();
+          runPart.setRunId(run.getId());
+          runPart.setPartitionId(part.getId());
+          return runPart;
+        });
     Mockito.when(containerService.listByBarcode(CONTAINER_SERIAL_NO)).thenReturn(Arrays.asList(makeContainer()));
   }
 
@@ -114,8 +116,9 @@ public class DefaultRunServiceTest {
     Run notificationRun = makeRun();
     Predicate<SequencingParameters> filterParameters = (params) -> false;
     GetLaneContents getLaneContents = (lane) -> Optional.empty();
-    assertFalse(sut.processNotification(notificationRun, 1, CONTAINER_MODEL_BARCODE, CONTAINER_SERIAL_NO, SEQUENCER_NAME, filterParameters,
-            getLaneContents, null));
+    assertFalse(sut.processNotification(notificationRun, 1, CONTAINER_MODEL_BARCODE, CONTAINER_SERIAL_NO,
+        SEQUENCER_NAME, filterParameters,
+        getLaneContents, null));
     Mockito.verify(runStore, Mockito.times(0)).save(Mockito.any());
   }
 
@@ -127,7 +130,8 @@ public class DefaultRunServiceTest {
     Predicate<SequencingParameters> filterParameters = (params) -> false;
     GetLaneContents getLaneContents = (lane) -> Optional.empty();
 
-    assertFalse(sut.processNotification(notificationRun, 1, CONTAINER_MODEL_BARCODE, CONTAINER_SERIAL_NO, SEQUENCER_NAME, filterParameters,
+    assertFalse(sut.processNotification(notificationRun, 1, CONTAINER_MODEL_BARCODE, CONTAINER_SERIAL_NO,
+        SEQUENCER_NAME, filterParameters,
         getLaneContents, null));
     Mockito.verify(runStore, Mockito.times(0)).save(Mockito.any());
   }
@@ -155,8 +159,8 @@ public class DefaultRunServiceTest {
     IlluminaRun run = new IlluminaRun();
     run.setAlias(RUN_ALIAS);
     run.setFilePath("/path/to/run");
-    run.setStartDate(ORIGINAL_TIME);
-    run.setCompletionDate(ORIGINAL_TIME);
+    run.setStartDate(ORIGINAL_DATE);
+    run.setCompletionDate(ORIGINAL_DATE);
     run.setHealth(HealthType.Completed);
     return run;
   }

@@ -1,4 +1,3 @@
--- StartNoTest
 DELIMITER //
 
 DROP TRIGGER IF EXISTS ArrayRunInsert//
@@ -11,7 +10,7 @@ DROP TRIGGER IF EXISTS ArrayRunChange//
 CREATE TRIGGER ArrayRunChange BEFORE UPDATE ON ArrayRun
 FOR EACH ROW
   BEGIN
-  DECLARE log_message longtext CHARACTER SET utf8;
+  DECLARE log_message longtext;
   SET log_message = CONCAT_WS(', ',
     CASE WHEN NEW.alias <> OLD.alias THEN
       CONCAT('alias: ', OLD.alias, ' → ', NEW.alias)
@@ -59,4 +58,3 @@ FOR EACH ROW
 END//
 
 DELIMITER ;
--- EndNoTest

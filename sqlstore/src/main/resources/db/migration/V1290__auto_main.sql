@@ -12,8 +12,8 @@ WHERE EXISTS (SELECT 1 FROM Index_RealSequences WHERE indexId = Indices.indexId)
 DROP TABLE Index_RealSequences;
 
 ALTER TABLE Library
-  ADD COLUMN index1Id bigint(20),
-  ADD COLUMN index2Id bigint(20),
+  ADD COLUMN index1Id bigint,
+  ADD COLUMN index2Id bigint,
   ADD CONSTRAINT fk_library_index1 FOREIGN KEY (index1id) REFERENCES Indices (indexId),
   ADD CONSTRAINT fk_library_index2 FOREIGN KEY (index2id) REFERENCES Indices (indexId);
 

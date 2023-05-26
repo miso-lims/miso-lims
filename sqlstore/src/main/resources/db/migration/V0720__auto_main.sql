@@ -4,20 +4,19 @@ DROP VIEW IF EXISTS InstrumentStats;
 
 DROP TABLE IF EXISTS PlatformPosition;
 CREATE TABLE PlatformPosition (
-  positionId bigint(20) NOT NULL AUTO_INCREMENT,
-  platformId bigint(20) NOT NULL,
+  positionId bigint NOT NULL AUTO_INCREMENT,
+  platformId bigint NOT NULL,
   alias varchar(10) NOT NULL,
   PRIMARY KEY (positionId),
   CONSTRAINT fk_platformPosition_platform FOREIGN KEY (platformId) REFERENCES Platform (platformId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-ALTER TABLE ServiceRecord ADD COLUMN positionId bigint(20);
+ALTER TABLE ServiceRecord ADD COLUMN positionId bigint;
 ALTER TABLE ServiceRecord ADD CONSTRAINT fk_serviceRecord_position FOREIGN KEY (positionId) REFERENCES PlatformPosition (positionId);
 
-ALTER TABLE Run_SequencerPartitionContainer ADD COLUMN positionId bigint(20);
+ALTER TABLE Run_SequencerPartitionContainer ADD COLUMN positionId bigint;
 ALTER TABLE Run_SequencerPartitionContainer ADD CONSTRAINT fk_run_container_position FOREIGN KEY (positionId) REFERENCES PlatformPosition (positionId);
 
--- StartNoTest
 -- Add positions for Illumina HiSeq and NovaSeq
 INSERT INTO PlatformPosition (platformId, alias)
 SELECT platformId, 'A' FROM Platform WHERE instrumentModel LIKE 'Illumina HiSeq%' OR instrumentModel LIKE 'Illumina NovaSeq%';
@@ -101,7 +100,6 @@ SET rspc.positionId = (
 )
 WHERE (p.instrumentModel LIKE 'Illumina HiSeq%' OR p.instrumentModel LIKE 'Illumina NovaSeq%')
 AND alias REGEXP '^[0-9]{6}_.*_[0-9]{4}_B.*$';
--- EndNoTest
 
 
 -- loading_concentration

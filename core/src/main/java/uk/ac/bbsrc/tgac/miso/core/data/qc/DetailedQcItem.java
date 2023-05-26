@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data.qc;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -20,8 +20,8 @@ public interface DetailedQcItem {
 
   public void setQcUser(User qcUser);
 
-  public Date getQcDate();
+  public LocalDate getQcDate();
 
-  public void setQcDate(Date qcDate);
+  public void setQcDate(LocalDate qcDate);
 
 }

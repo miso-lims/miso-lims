@@ -1,8 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -134,7 +135,7 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
   @Override
   public void addNote(Requisition entity, Note note) throws IOException {
     Requisition managed = requisitionDao.get(entity.getId());
-    note.setCreationDate(new Date());
+    note.setCreationDate(LocalDate.now(ZoneId.systemDefault()));
     note.setOwner(authorizationManager.getCurrentUser());
     managed.addNote(note);
     managed.setLastModifier(authorizationManager.getCurrentUser());

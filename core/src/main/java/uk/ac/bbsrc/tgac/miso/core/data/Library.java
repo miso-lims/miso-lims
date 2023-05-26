@@ -1,32 +1,8 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Date;
 
 import com.eaglegenomics.simlims.core.Note;
 
@@ -44,24 +20,25 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 /**
- * A Library is the first step in constructing sequenceable material from an initial {@link Sample}. A Library is then diluted down to a
- * {@link LibraryAliquot}, and put in a {@link Pool}, which is then sequenced.
+ * A Library is the first step in constructing sequenceable material from an initial {@link Sample}.
+ * A Library is then diluted down to a {@link LibraryAliquot}, and put in a {@link Pool}, which is
+ * then sequenced.
  * <p/>
- * Libraries also have a target {@link InstrumentModel} and can be uniquely identified via {@link Index} objects for multiplexing purposes.
+ * Libraries also have a target {@link InstrumentModel} and can be uniquely identified via
+ * {@link Index} objects for multiplexing purposes.
  * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public interface Library extends Attachable, Comparable<Library>, Deletable, HierarchyEntity, IndexedLibrary, Locatable,
-    QualityControllable<LibraryQC>, Serializable {
+    QualityControllable<LibraryQC> {
 
   public static final String PREFIX = "LIB";
 
   /**
    * Sets the name of this Library object.
    * 
-   * @param name
-   *          name.
+   * @param name name.
    */
   public void setName(String name);
 
@@ -75,8 +52,7 @@ public interface Library extends Attachable, Comparable<Library>, Deletable, Hie
   /**
    * Sets the description of this Library object.
    * 
-   * @param description
-   *          description.
+   * @param description description.
    */
   public void setDescription(String description);
 
@@ -90,8 +66,7 @@ public interface Library extends Attachable, Comparable<Library>, Deletable, Hie
   /**
    * Sets the accession of this Library object.
    * 
-   * @param accession
-   *          accession.
+   * @param accession accession.
    */
   public void setAccession(String accession);
 
@@ -105,24 +80,21 @@ public interface Library extends Attachable, Comparable<Library>, Deletable, Hie
   /**
    * Sets the sample of this Library object.
    * 
-   * @param sample
-   *          sample.
+   * @param sample sample.
    */
   public void setSample(Sample sample);
 
   /**
    * Sets the notes of this Library object.
    * 
-   * @param notes
-   *          notes.
+   * @param notes notes.
    */
   public void setNotes(Collection<Note> notes);
 
   /**
    * Adds a Note to the Set of notes of this Library object.
    * 
-   * @param note
-   *          Note
+   * @param note Note
    */
   public void addNote(Note note);
 
@@ -155,8 +127,7 @@ public interface Library extends Attachable, Comparable<Library>, Deletable, Hie
   /**
    * Sets the paired attribute of this Library object, i.e. true is paired, false is single.
    * 
-   * @param paired
-   *          paired.
+   * @param paired paired.
    */
   public void setPaired(Boolean paired);
 
@@ -170,8 +141,7 @@ public interface Library extends Attachable, Comparable<Library>, Deletable, Hie
   /**
    * Sets the libraryType of this Library object.
    * 
-   * @param libraryType
-   *          libraryType.
+   * @param libraryType libraryType.
    */
   public void setLibraryType(LibraryType libraryType);
 
@@ -185,8 +155,7 @@ public interface Library extends Attachable, Comparable<Library>, Deletable, Hie
   /**
    * Sets the librarySelectionType of this Library object.
    * 
-   * @param librarySelectionType
-   *          LibrarySelectionType.
+   * @param librarySelectionType LibrarySelectionType.
    */
   public void setLibrarySelectionType(LibrarySelectionType librarySelectionType);
 
@@ -200,8 +169,7 @@ public interface Library extends Attachable, Comparable<Library>, Deletable, Hie
   /**
    * Sets the libraryStrategyType of this Library object.
    * 
-   * @param libraryStrategyType
-   *          LibraryStrategyType.
+   * @param libraryStrategyType LibraryStrategyType.
    */
   public void setLibraryStrategyType(LibraryStrategyType libraryStrategyType);
 
@@ -250,14 +218,14 @@ public interface Library extends Attachable, Comparable<Library>, Deletable, Hie
   /**
    * @return the user-specified date that this Library was created
    */
-  public Date getCreationDate();
+  public LocalDate getCreationDate();
 
   /**
    * Sets the user-specified date that this Library was created
    * 
    * @param creationDate
    */
-  public void setCreationDate(Date creationDate);
+  public void setCreationDate(LocalDate creationDate);
 
   public KitDescriptor getKitDescriptor();
 
@@ -331,8 +299,8 @@ public interface Library extends Attachable, Comparable<Library>, Deletable, Hie
   public void setThermalCycler(Instrument thermalCycler);
 
   /**
-   * @return information to be used for creating a receipt transfer during library creation only. This field should
-   *         otherwise be null
+   * @return information to be used for creating a receipt transfer during library creation only. This
+   *         field should otherwise be null
    */
   public TransferLibrary getCreationReceiptInfo();
 

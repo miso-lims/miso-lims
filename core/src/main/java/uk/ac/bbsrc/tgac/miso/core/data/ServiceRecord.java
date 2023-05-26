@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -42,8 +43,7 @@ public class ServiceRecord implements Serializable, Deletable, Attachable {
   private String referenceNumber;
 
   @Column(nullable = false)
-  @Temporal(TemporalType.DATE)
-  private Date serviceDate;
+  private LocalDate serviceDate;
 
   @Temporal(TemporalType.TIMESTAMP)
   private Date startTime;
@@ -112,11 +112,11 @@ public class ServiceRecord implements Serializable, Deletable, Attachable {
     return referenceNumber;
   }
 
-  public void setServiceDate(Date date) {
+  public void setServiceDate(LocalDate date) {
     this.serviceDate = date;
   }
 
-  public Date getServiceDate() {
+  public LocalDate getServiceDate() {
     return serviceDate;
   }
 

@@ -1,9 +1,10 @@
 DELIMITER //
 
 DROP FUNCTION IF EXISTS getParentIdByDiscriminator//
-CREATE FUNCTION getParentIdByDiscriminator(pSampleId bigint(20), pDiscriminator varchar(50)) RETURNS bigint(20)
+CREATE FUNCTION getParentIdByDiscriminator(pSampleId bigint, pDiscriminator varchar(50))
+  RETURNS bigint NOT DETERMINISTIC READS SQL DATA
 BEGIN
-  DECLARE vSampleId bigint(20);
+  DECLARE vSampleId bigint;
   DECLARE vDiscriminator varchar(50);
   SET vSampleId = pSampleId;
   SELECT discriminator INTO vDiscriminator FROM Sample WHERE sampleId = pSampleId;
@@ -17,13 +18,13 @@ BEGIN
 END//
 
 DROP PROCEDURE IF EXISTS updateSampleHierarchy//
-CREATE PROCEDURE updateSampleHierarchy(pSampleId bigint(20))
+CREATE PROCEDURE updateSampleHierarchy(pSampleId bigint)
 BEGIN
-  DECLARE vTissueId bigint(20);
-  DECLARE vIdentityId bigint(20);
+  DECLARE vTissueId bigint;
+  DECLARE vIdentityId bigint;
   
   DECLARE vDone BOOLEAN DEFAULT FALSE;
-  DECLARE vChildId bigint(20);
+  DECLARE vChildId bigint;
   DECLARE vCursor CURSOR FOR SELECT sampleId FROM Sample WHERE parentId = pSampleId;
   DECLARE CONTINUE HANDLER FOR NOT FOUND SET vDone = TRUE;
   

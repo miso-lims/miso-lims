@@ -5,6 +5,8 @@ import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -52,14 +54,13 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.persistence.PoolStore;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool> {
+public class DefaultPoolService implements PoolService {
 
   @Value("${miso.pools.strictIndexChecking:false}")
   private Boolean strictPools;
@@ -267,7 +268,8 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   }
 
   private Set<String> getAllBadIndices(Pool pool) {
-    if(pool == null) return new HashSet<>();
+    if (pool == null)
+      return new HashSet<>();
     Set<String> indices = indexChecker.getDuplicateIndicesSequences(pool);
     indices.addAll(indexChecker.getNearDuplicateIndicesSequences(pool));
     return indices;
@@ -283,7 +285,8 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
           "fewer positions of difference, please address the following conflicts: ",
           indexChecker.getWarningMismatches());
       indices.removeAll(bcIndices);
-      errorMessage += indices.stream().map(index -> index.length() == 0 ? "(no indices)" : index).collect(Collectors.joining(", "));
+      errorMessage +=
+          indices.stream().map(index -> index.length() == 0 ? "(no indices)" : index).collect(Collectors.joining(", "));
       errors.add(new ValidationError("poolElements", errorMessage));
     }
   }
@@ -292,9 +295,10 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     Set<Long> poolAliquotIds = new HashSet<>();
     List<ValidationError> errors = new LinkedList<>();
 
-    for(PoolElement pe: pool.getPoolContents()){
+    for (PoolElement pe : pool.getPoolContents()) {
       poolAliquotIds.add(pe.getAliquot().getId());
-      for (ParentAliquot parent = pe.getAliquot().getParentAliquot(); parent != null; parent = parent.getParentAliquot()) {
+      for (ParentAliquot parent = pe.getAliquot().getParentAliquot(); parent != null; parent =
+          parent.getParentAliquot()) {
         poolAliquotIds.add(parent.getId());
       }
     }
@@ -314,7 +318,8 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   private void validateChange(Pool pool, Pool beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
 
-    if (ValidationUtils.isSetAndChanged(Pool::getAlias, pool, beforeChange) && poolStore.getByAlias(pool.getAlias()) != null) {
+    if (ValidationUtils.isSetAndChanged(Pool::getAlias, pool, beforeChange)
+        && poolStore.getByAlias(pool.getAlias()) != null) {
       errors.add(new ValidationError("alias", "There is already a pool with this alias"));
     }
 
@@ -326,8 +331,10 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
     if (strictPools && !pool.isMergeChild()) {
       validateIndices(pool, beforeChange, errors);
     }
-    //If this is a new pool, we don't have to worry about syncing to pool orders: either it's irrelevant, or a guarantee
-    List<PoolOrder> potentialPoolOrders = beforeChange == null ? null : poolOrderService.getAllByPoolId(beforeChange.getId());
+    // If this is a new pool, we don't have to worry about syncing to pool orders: either it's
+    // irrelevant, or a guarantee
+    List<PoolOrder> potentialPoolOrders =
+        beforeChange == null ? null : poolOrderService.getAllByPoolId(beforeChange.getId());
     if (potentialPoolOrders != null && potentialPoolOrders.size() != 0) {
       errors.addAll(getMismatchesWithOrders(pool, potentialPoolOrders));
     }
@@ -387,7 +394,7 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   @Override
   public void addNote(Pool pool, Note note) throws IOException {
     Pool managed = poolStore.get(pool.getId());
-    note.setCreationDate(new Date());
+    note.setCreationDate(LocalDate.now(ZoneId.systemDefault()));
     note.setOwner(authorizationManager.getCurrentUser());
     managed.addNote(note);
     poolStore.save(managed);
@@ -442,7 +449,8 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
 
     long usage = poolStore.getPartitionCount(object);
     if (usage > 0L) {
-      result.addError(new ValidationError("Pool '" + object.getName() + "' has been added to " + usage + " partitions"));
+      result
+          .addError(new ValidationError("Pool '" + object.getName() + "' has been added to " + usage + " partitions"));
     }
 
     return result;
@@ -454,7 +462,8 @@ public class DefaultPoolService implements PoolService, PaginatedDataSource<Pool
   }
 
   @Override
-  public List<Pool> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol, PaginationFilter... filter)
+  public List<Pool> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
+      PaginationFilter... filter)
       throws IOException {
     return poolStore.list(errorHandler, offset, limit, sortDir, sortCol, filter);
   }

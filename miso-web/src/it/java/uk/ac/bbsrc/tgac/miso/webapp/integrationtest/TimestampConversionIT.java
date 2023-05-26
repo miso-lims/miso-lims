@@ -64,7 +64,8 @@ public class TimestampConversionIT extends AbstractIT {
     DataTable changes = page.getChangeLogTable();
     for (String changeTimeString : changes.getColumnValues("Time")) {
       Date changeTime = formatter.parse(changeTimeString);
-      assertTrue("Existing changes should be more than 5 minutes in the past", now.getTime() - changeTime.getTime() > 300000);
+      assertTrue("Existing changes should be more than 5 minutes in the past",
+          now.getTime() - changeTime.getTime() > 300000);
     }
 
     page.setField(LibraryPage.Field.DESCRIPTION, "updated description");
@@ -73,7 +74,8 @@ public class TimestampConversionIT extends AbstractIT {
     DataTable changes2 = page2.getChangeLogTable();
     String latestString = changes2.getColumnValues("Time").stream().max(String::compareTo).orElse(null);
     Date latest = formatter.parse(latestString);
-    assertTrue("New change should show approximately current time", Math.abs(latest.getTime() - now.getTime()) < 300000L);
+    assertTrue("New change should show approximately current time",
+        Math.abs(latest.getTime() - now.getTime()) < 300000L);
   }
 
 }

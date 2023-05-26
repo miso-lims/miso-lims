@@ -6,5 +6,5 @@ UPDATE Run SET
 WHERE health = 'Failed' AND completionDate IS NULL;
 
 -- pool_size
-ALTER TABLE Pool ADD COLUMN dnaSize bigint(20);
+ALTER TABLE Pool ADD COLUMN dnaSize bigint;
 

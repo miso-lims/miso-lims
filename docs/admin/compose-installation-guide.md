@@ -40,10 +40,11 @@ following commands.
 Pool workflow and is sufficient for basic laboratory tracking for sequencing.
 
 Launch the plain sample demo with docker-compose:
-```
+```bash
 cd miso-lims-compose
-export MISO_DB_USER=tgaclims && export MISO_DB=lims && export MISO_DB_PASSWORD_FILE=./.miso_db_password && export MISO_TAG=latest
+export MISO_DB_USER=tgaclims && export MISO_DB=lims && export MISO_DB_PASSWORD_FILE=./.miso_db_password && export MISO_DB_ROOT_PASSWORD_FILE=./.miso_root_password && export MISO_TAG=latest
 echo "changeme" > ./.miso_db_password
+echo "changeme" > ./.miso_root_password
 docker-compose -f demo.plain.yml up
 ```
 
@@ -54,8 +55,9 @@ allows users to build a hierarchy of Samples (e.g. Identity -> Tissue -> Slide
 Launch the detailed sample demo with docker-compose:
 ```bash
 cd miso-lims-compose
-export MISO_DB_USER=tgaclims && export MISO_DB=lims && export MISO_DB_PASSWORD_FILE=./.miso_db_password && export MISO_TAG=latest
+export MISO_DB_USER=tgaclims && export MISO_DB=lims && export MISO_DB_PASSWORD_FILE=./.miso_db_password && export MISO_DB_ROOT_PASSWORD_FILE=./.miso_root_password && export MISO_TAG=latest
 echo "changeme" > ./.miso_db_password
+echo "changeme" > ./.miso_root_password
 docker-compose -f demo.detailed.yml up
 ```
 
@@ -461,9 +463,10 @@ This environment:
 * has SSL encryption for HTTPS (`ssl.conf` and `.ssl_password`) and
   automatically generates the SSL certificate on startup
 * has a `.env` file with environment variables:
-  * `MISO_DB_USER` : the MySQL database version
-  * `MISO_DB` : the MySQL database user
+  * `MISO_DB_USER` : the MySQL database user
+  * `MISO_DB` : the MySQL database name
   * `MISO_DB_PASSWORD_FILE` pointing to `.miso_db_password` for MISO_DB_USER
+  * `MISO_DB_ROOT_PASSWORD_FILE` pointing to `.miso_root_password` for MySQL root user
   * `MISO_TAG` set to a [specific MISO Docker container version](https://github.com/miso-lims/miso-lims/pkgs/container/miso-lims-webapp/versions), and
   * `SSL_PASSWORD_FILE` pointing to `.ssl_password`.
 
@@ -481,6 +484,7 @@ miso-lims:/home/miso$ tree -a
 ├── files
 ├── logs
 ├── .miso_db_password
+├── .miso_root_password
 ├── miso.properties
 ├── nginx
 │   ├── self-sign-cert.sh
@@ -499,12 +503,14 @@ version: '3.7'
 secrets:
   lims_password:
     file: ${MISO_DB_PASSWORD_FILE}
+  root_password:
+    file: ${MISO_DB_PASSWORD_FILE}
   ssl_password:
     file: ${SSL_PASSWORD_FILE}
 
 services:
   db:
-    image: mysql:5.7.25
+    image: mysql:8.0
     restart: always
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
@@ -512,6 +518,7 @@ services:
       MYSQL_USER: ${MISO_DB_USER}
       MYSQL_PASSWORD_FILE: /run/secrets/lims_password
     secrets:
+      - root_password
       - lims_password
     volumes:
       - type: bind
@@ -522,7 +529,7 @@ services:
     image: ghcr.io/miso-lims/miso-lims-migration:${MISO_TAG}
     command: migrate
     secrets:
-      - lims_password
+      - root_password
     links:
       - db
     depends_on:
@@ -624,7 +631,7 @@ starting.
     password on the existing database, you'll have to log in to the MySQL container
     (with `docker exec -it <container-name> mysql`) with the old password and
     change the database user's password. See the
-    [MySQL documentation](https://dev.mysql.com/doc/refman/5.7/en/set-password.html)
+    [MySQL documentation](https://dev.mysql.com/doc/refman/8.0/en/set-password.html)
     for more information.
 
     The more straightforward option is to destroy the database and rebuild it.

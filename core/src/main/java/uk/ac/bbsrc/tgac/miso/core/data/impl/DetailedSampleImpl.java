@@ -3,11 +3,11 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Stream;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,8 +19,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
@@ -64,12 +62,11 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
 
   @Column(nullable = false)
   private boolean nonStandardAlias = false;
-  
+
   @Column(updatable = false)
   private Long preMigrationId;
 
-  @Temporal(TemporalType.DATE)
-  private Date creationDate;
+  private LocalDate creationDate;
 
   private BigDecimal volumeUsed;
   private BigDecimal ngUsed;
@@ -182,7 +179,7 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   public void setNonStandardAlias(boolean nonStandardAlias) {
     this.nonStandardAlias = nonStandardAlias;
   }
-  
+
   @Override
   public Long getPreMigrationId() {
     return preMigrationId;
@@ -204,12 +201,12 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   }
 
   @Override
-  public Date getCreationDate() {
+  public LocalDate getCreationDate() {
     return creationDate;
   }
 
   @Override
-  public void setCreationDate(Date creationDate) {
+  public void setCreationDate(LocalDate creationDate) {
     this.creationDate = creationDate;
   }
 
@@ -234,8 +231,18 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   }
 
   @Override
-  public Date getBarcodeDate() {
-    return Stream.of(getReceivedDate(), getCreationDate(), getCreationTime()).filter(Objects::nonNull).findFirst().orElse(null);
+  public LocalDate getBarcodeDate() {
+    Date receivedDate = getReceivedDate();
+    if (receivedDate != null) {
+      return LocalDate.ofInstant(receivedDate.toInstant(), ZoneId.systemDefault());
+    }
+    if (getCreationDate() != null) {
+      return getCreationDate();
+    }
+    if (getCreationTime() != null) {
+      return LocalDate.ofInstant(getCreationTime().toInstant(), ZoneId.systemDefault());
+    }
+    return null;
   }
 
   private Date getReceivedDate() {

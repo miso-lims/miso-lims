@@ -2,9 +2,6 @@ package uk.ac.bbsrc.tgac.miso.core.service.naming.generation;
 
 import static org.junit.Assert.assertEquals;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -21,6 +18,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.SiblingNumberGenerator;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class OicrLibraryAliquotAliasGeneratorTest {
 
@@ -63,8 +61,7 @@ public class OicrLibraryAliquotAliasGeneratorTest {
     lib.setPlatformType(PlatformType.PACBIO);
     DetailedLibraryAliquot aliquot = new DetailedLibraryAliquot();
     aliquot.setLibrary(lib);
-    DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-    aliquot.setCreationDate(df.parse("2017-09-13"));
+    aliquot.setCreationDate(LimsUtils.parseLocalDate("2017-09-13"));
     Mockito.when(siblingNumberGenerator.getNextSiblingNumber(Mockito.any(), Mockito.any())).thenReturn(2);
     assertEquals("PROJ_1234_20170913_2", sut.generate(aliquot));
   }

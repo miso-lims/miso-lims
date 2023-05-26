@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl.view;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -59,8 +60,7 @@ public class ListPoolView implements Aliasable, Nameable, Serializable, Timestam
   @JoinColumn(name = "creator", nullable = false, updatable = false)
   private User creator;
 
-  @Temporal(TemporalType.DATE)
-  private Date creationDate;
+  private LocalDate creationDate;
 
   @Column(name = "created", nullable = false, updatable = false)
   @Temporal(TemporalType.TIMESTAMP)
@@ -94,13 +94,14 @@ public class ListPoolView implements Aliasable, Nameable, Serializable, Timestam
   private String boxPosition;
 
   @ManyToMany
-  @JoinTable(name = "Pool_LibraryAliquot", joinColumns = @JoinColumn(name = "poolId"), inverseJoinColumns = @JoinColumn(name = "aliquotId"))
+  @JoinTable(name = "Pool_LibraryAliquot", joinColumns = @JoinColumn(name = "poolId"),
+      inverseJoinColumns = @JoinColumn(name = "aliquotId"))
   private List<ListPoolViewElement> elements;
 
   @Immutable
   @ManyToMany
-  @JoinTable(name = "Transfer_Pool", joinColumns = { @JoinColumn(name = "poolId") }, inverseJoinColumns = {
-      @JoinColumn(name = "transferId") })
+  @JoinTable(name = "Transfer_Pool", joinColumns = {@JoinColumn(name = "poolId")}, inverseJoinColumns = {
+      @JoinColumn(name = "transferId")})
   private Set<ListTransferView> listTransferViews;
 
   @Override
@@ -168,7 +169,7 @@ public class ListPoolView implements Aliasable, Nameable, Serializable, Timestam
   /**
    * @return the user-specified creation date of the pool
    */
-  public Date getCreationDate() {
+  public LocalDate getCreationDate() {
     return creationDate;
   }
 
@@ -177,7 +178,7 @@ public class ListPoolView implements Aliasable, Nameable, Serializable, Timestam
    * 
    * @param creationDate
    */
-  public void setCreationDate(Date creationDate) {
+  public void setCreationDate(LocalDate creationDate) {
     this.creationDate = creationDate;
   }
 
@@ -339,51 +340,82 @@ public class ListPoolView implements Aliasable, Nameable, Serializable, Timestam
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     ListPoolView other = (ListPoolView) obj;
     if (alias == null) {
-      if (other.alias != null) return false;
-    } else if (!alias.equals(other.alias)) return false;
+      if (other.alias != null)
+        return false;
+    } else if (!alias.equals(other.alias))
+      return false;
     if (boxAlias == null) {
-      if (other.boxAlias != null) return false;
-    } else if (!boxAlias.equals(other.boxAlias)) return false;
+      if (other.boxAlias != null)
+        return false;
+    } else if (!boxAlias.equals(other.boxAlias))
+      return false;
     if (boxId == null) {
-      if (other.boxId != null) return false;
-    } else if (!boxId.equals(other.boxId)) return false;
+      if (other.boxId != null)
+        return false;
+    } else if (!boxId.equals(other.boxId))
+      return false;
     if (boxLocationBarcode == null) {
-      if (other.boxLocationBarcode != null) return false;
-    } else if (!boxLocationBarcode.equals(other.boxLocationBarcode)) return false;
+      if (other.boxLocationBarcode != null)
+        return false;
+    } else if (!boxLocationBarcode.equals(other.boxLocationBarcode))
+      return false;
     if (boxName == null) {
-      if (other.boxName != null) return false;
-    } else if (!boxName.equals(other.boxName)) return false;
+      if (other.boxName != null)
+        return false;
+    } else if (!boxName.equals(other.boxName))
+      return false;
     if (boxPosition == null) {
-      if (other.boxPosition != null) return false;
-    } else if (!boxPosition.equals(other.boxPosition)) return false;
+      if (other.boxPosition != null)
+        return false;
+    } else if (!boxPosition.equals(other.boxPosition))
+      return false;
     if (concentration == null) {
-      if (other.concentration != null) return false;
-    } else if (!concentration.equals(other.concentration)) return false;
-    if (concentrationUnits != other.concentrationUnits) return false;
+      if (other.concentration != null)
+        return false;
+    } else if (!concentration.equals(other.concentration))
+      return false;
+    if (concentrationUnits != other.concentrationUnits)
+      return false;
     if (creationTime == null) {
-      if (other.creationTime != null) return false;
-    } else if (!creationTime.equals(other.creationTime)) return false;
+      if (other.creationTime != null)
+        return false;
+    } else if (!creationTime.equals(other.creationTime))
+      return false;
     if (creator == null) {
-      if (other.creator != null) return false;
-    } else if (!creator.equals(other.creator)) return false;
+      if (other.creator != null)
+        return false;
+    } else if (!creator.equals(other.creator))
+      return false;
     if (description == null) {
-      if (other.description != null) return false;
-    } else if (!description.equals(other.description)) return false;
+      if (other.description != null)
+        return false;
+    } else if (!description.equals(other.description))
+      return false;
     if (lastModified == null) {
-      if (other.lastModified != null) return false;
-    } else if (!lastModified.equals(other.lastModified)) return false;
+      if (other.lastModified != null)
+        return false;
+    } else if (!lastModified.equals(other.lastModified))
+      return false;
     if (lastModifier == null) {
-      if (other.lastModifier != null) return false;
-    } else if (!lastModifier.equals(other.lastModifier)) return false;
+      if (other.lastModifier != null)
+        return false;
+    } else if (!lastModifier.equals(other.lastModifier))
+      return false;
     if (name == null) {
-      if (other.name != null) return false;
-    } else if (!name.equals(other.name)) return false;
-    if (poolId != other.poolId) return false;
+      if (other.name != null)
+        return false;
+    } else if (!name.equals(other.name))
+      return false;
+    if (poolId != other.poolId)
+      return false;
     return true;
   }
 

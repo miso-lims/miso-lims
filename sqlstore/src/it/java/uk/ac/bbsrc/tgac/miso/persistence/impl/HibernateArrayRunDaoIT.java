@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -48,7 +49,8 @@ public class HibernateArrayRunDaoIT extends AbstractDAOTest {
     run.setInstrument(inst);
     run.setHealth(HealthType.Running);
     Date now = new Date();
-    run.setStartDate(now);
+    LocalDate today = LocalDate.now();
+    run.setStartDate(today);
     User user = (User) sessionFactory.getCurrentSession().get(UserImpl.class, 1L);
     run.setCreator(user);
     run.setCreationTime(now);
@@ -100,7 +102,7 @@ public class HibernateArrayRunDaoIT extends AbstractDAOTest {
     assertNotNull(run.getArray());
     assertEquals("Array_1", run.getArray().getAlias());
     assertEquals(HealthType.Running, run.getHealth());
-    assertEquals(LimsUtils.parseDate("2018-02-02"), run.getStartDate());
+    assertEquals(LocalDate.of(2018, 2, 2), run.getStartDate());
   }
 
   @Test

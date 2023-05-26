@@ -1,27 +1,6 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -74,7 +53,8 @@ public class ProjectImpl implements Project {
   private static final long serialVersionUID = 1L;
 
   /**
-   * Use this ID to indicate that a project has not yet been saved, and therefore does not yet have a unique ID.
+   * Use this ID to indicate that a project has not yet been saved, and therefore does not yet have a
+   * unique ID.
    */
   private static final long UNSAVED_ID = 0L;
 
@@ -84,8 +64,7 @@ public class ProjectImpl implements Project {
   private String shortName;
   private String rebNumber;
 
-  @Temporal(TemporalType.DATE)
-  private Date rebExpiry;
+  private LocalDate rebExpiry;
 
   private Integer samplesExpected;
 
@@ -113,8 +92,8 @@ public class ProjectImpl implements Project {
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @OneToMany(targetEntity = FileAttachment.class)
-  @JoinTable(name = "Project_Attachment", joinColumns = { @JoinColumn(name = "projectId") }, inverseJoinColumns = {
-      @JoinColumn(name = "attachmentId") })
+  @JoinTable(name = "Project_Attachment", joinColumns = {@JoinColumn(name = "projectId")}, inverseJoinColumns = {
+      @JoinColumn(name = "attachmentId")})
   private List<FileAttachment> attachments;
 
   @Transient
@@ -251,8 +230,10 @@ public class ProjectImpl implements Project {
   @Override
   public int compareTo(Project o) {
     if (getId() != 0L && o.getId() != 0L) {
-      if (getId() < o.getId()) return -1;
-      if (getId() > o.getId()) return 1;
+      if (getId() < o.getId())
+        return -1;
+      if (getId() > o.getId())
+        return 1;
     } else if (getAlias() != null && o.getAlias() != null) {
       return getAlias().compareTo(o.getAlias());
     }
@@ -298,9 +279,12 @@ public class ProjectImpl implements Project {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     ProjectImpl other = (ProjectImpl) obj;
     return new EqualsBuilder()
         .append(alias, other.alias)
@@ -428,12 +412,12 @@ public class ProjectImpl implements Project {
   }
 
   @Override
-  public Date getRebExpiry() {
+  public LocalDate getRebExpiry() {
     return rebExpiry;
   }
 
   @Override
-  public void setRebExpiry(Date rebExpiry) {
+  public void setRebExpiry(LocalDate rebExpiry) {
     this.rebExpiry = rebExpiry;
   }
 

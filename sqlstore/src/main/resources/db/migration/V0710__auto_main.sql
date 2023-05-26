@@ -1,6 +1,5 @@
 -- add_run_alias_index
 
--- StartNoTest
 DELIMITER //
 
 DROP PROCEDURE IF EXISTS createRunAliasIndex //
@@ -32,6 +31,3 @@ CALL createRunAliasIndex()//
 DROP PROCEDURE createRunAliasIndex//
 
 DELIMITER ;
--- EndNoTest
-
-

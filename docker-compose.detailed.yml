@@ -28,17 +28,20 @@ version: '3.7'
 secrets:
   lims_password: 
     file: ${MISO_DB_PASSWORD_FILE}
+  root_password:
+    file: ${MISO_DB_ROOT_PASSWORD_FILE}
 
 services:
   db:
-    image: mysql:5.7.25
+    image: mysql:8.0
     restart: always
     environment:
-      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/root_password
       MYSQL_DATABASE: ${MISO_DB}
       MYSQL_USER: ${MISO_DB_USER}
       MYSQL_PASSWORD_FILE: /run/secrets/lims_password
     secrets:
+      - root_password
       - lims_password
 
   flyway:
@@ -47,7 +50,7 @@ services:
       target: flyway-migration
     command: migrate
     secrets:
-      - lims_password
+      - root_password
     links:
       - db
     depends_on:

@@ -5,13 +5,13 @@ ALTER TABLE `BoxSize`
 
 -- Recreate table
 CREATE TABLE `BoxSize` (
-  `boxSizeId` bigint(20) NOT NULL AUTO_INCREMENT,
-  `boxSizeRows` bigint(20) NOT NULL,
-  `boxSizeColumns` bigint(20) NOT NULL,
+  `boxSizeId` bigint NOT NULL AUTO_INCREMENT,
+  `boxSizeRows` bigint NOT NULL,
+  `boxSizeColumns` bigint NOT NULL,
   `scannable` boolean DEFAULT 0 NOT NULL,
   PRIMARY KEY (`boxSizeId`),
   UNIQUE (`boxSizeRows`, `boxSizeColumns`, `scannable`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Copy table
 INSERT INTO `BoxSize` (`boxSizeId`, `boxSizeRows`, `boxSizeColumns`, `scannable`)
@@ -30,26 +30,24 @@ DROP TABLE `BoxSize_old`;
 
 -- library_aliquots
 ALTER TABLE LibraryAliquot ADD COLUMN alias varchar(100);
-ALTER TABLE LibraryAliquot ADD COLUMN dnaSize bigint(20);
+ALTER TABLE LibraryAliquot ADD COLUMN dnaSize bigint;
 
--- StartNoTest
 UPDATE LibraryAliquot ali
 JOIN Library lib ON lib.libraryId = ali.libraryId
 SET ali.alias = lib.alias, ali.dnaSize = lib.dnaSize;
--- EndNoTest
 
 ALTER TABLE LibraryAliquot MODIFY COLUMN alias varchar(100) NOT NULL;
 
 CREATE TABLE DetailedLibraryAliquot (
-  aliquotId bigint(20) NOT NULL,
+  aliquotId bigint NOT NULL,
   nonStandardAlias BOOLEAN NOT NULL DEFAULT FALSE,
-  libraryDesignCodeId bigint(20) NOT NULL,
+  libraryDesignCodeId bigint NOT NULL,
   groupId varchar(100),
   groupDescription varchar(255),
   PRIMARY KEY (aliquotId),
   CONSTRAINT fk_detailedLibraryAliquot_libraryAliquot FOREIGN KEY (aliquotId) REFERENCES LibraryAliquot (aliquotId),
   CONSTRAINT fk_detailedLibraryAliquot_libraryDesignCode FOREIGN KEY (libraryDesignCodeId) REFERENCES LibraryDesignCode (libraryDesignCodeId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO DetailedLibraryAliquot (aliquotId, nonStandardAlias, libraryDesignCodeId)
 SELECT ali.aliquotId, dl.nonStandardAlias, dl.libraryDesignCodeId
@@ -58,7 +56,7 @@ JOIN Library lib ON lib.libraryId = ali.libraryId
 JOIN DetailedLibrary dl ON dl.libraryId = lib.libraryId;
 
 -- propagate_ali_to_ali
-ALTER TABLE LibraryAliquot ADD COLUMN parentAliquotId bigint(20);
+ALTER TABLE LibraryAliquot ADD COLUMN parentAliquotId bigint;
 ALTER TABLE LibraryAliquot ADD CONSTRAINT fk_libraryAliquot_parentAliquot FOREIGN KEY (parentAliquotId) REFERENCES LibraryAliquot (aliquotId);
 
 -- rm_external_role

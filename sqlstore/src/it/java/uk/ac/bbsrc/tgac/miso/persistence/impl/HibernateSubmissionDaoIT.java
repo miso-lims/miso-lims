@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.ZoneId;
 
 import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
@@ -23,7 +24,7 @@ public class HibernateSubmissionDaoIT extends AbstractHibernateSaveDaoTest<Submi
     Submission sub = new Submission();
     sub.setAlias("Test Sub");
     sub.setTitle("Test sub");
-    sub.setCreationDate(new Date());
+    sub.setCreationDate(LocalDate.now(ZoneId.systemDefault()));
     sub.setVerified(false);
     sub.setCompleted(false);
     return sub;

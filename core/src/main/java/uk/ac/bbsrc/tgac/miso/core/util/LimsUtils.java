@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.core.util;
 
 import java.io.File;
@@ -33,6 +10,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -145,8 +124,8 @@ public class LimsUtils {
   }
 
   /**
-   * Checks that a directory exists. This method will attempt to create the directory if it doesn't exist and if the attemptMkdir flag is
-   * true
+   * Checks that a directory exists. This method will attempt to create the directory if it doesn't
+   * exist and if the attemptMkdir flag is true
    * 
    * @param path of type File
    * @param attemptMkdir of type boolean
@@ -191,6 +170,11 @@ public class LimsUtils {
     return date == null ? null : getDateFormat().format(date);
   }
 
+  public static String formatDate(LocalDate date) {
+    DateTimeFormatter dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE;
+    return date == null ? null : date.format(dateFormatter);
+  }
+
   public static Date parseDate(String dateString) {
     if (isStringEmptyOrNull(dateString)) {
       return null;
@@ -198,6 +182,17 @@ public class LimsUtils {
     try {
       return getDateFormat().parse(dateString);
     } catch (ParseException e) {
+      throw new IllegalArgumentException("Invalid date string");
+    }
+  }
+
+  public static LocalDate parseLocalDate(String dateString) {
+    if (isStringEmptyOrNull(dateString)) {
+      return null;
+    }
+    try {
+      return LocalDate.parse(dateString);
+    } catch (DateTimeParseException e) {
       throw new IllegalArgumentException("Invalid date string");
     }
   }
@@ -235,47 +230,56 @@ public class LimsUtils {
 
   private static boolean safeCategoryCheck(Sample sample, String category) {
     DetailedSample detailedSample = (DetailedSample) sample;
-    if (detailedSample.getSampleClass() == null) return false;
+    if (detailedSample.getSampleClass() == null)
+      return false;
     return category.equals(detailedSample.getSampleClass().getSampleCategory());
   }
 
   public static boolean isIdentitySample(Sample sample) {
-    if (!isDetailedSample(sample)) return false;
+    if (!isDetailedSample(sample))
+      return false;
     return sample instanceof SampleIdentity || safeCategoryCheck(sample, SampleIdentity.CATEGORY_NAME);
   }
 
   public static boolean isTissueSample(Sample sample) {
-    if (!isDetailedSample(sample)) return false;
+    if (!isDetailedSample(sample))
+      return false;
     return sample instanceof SampleTissue || safeCategoryCheck(sample, SampleTissue.CATEGORY_NAME);
   }
 
   public static boolean isTissueProcessingSample(Sample sample) {
-    if (!isDetailedSample(sample)) return false;
+    if (!isDetailedSample(sample))
+      return false;
     return sample instanceof SampleTissueProcessing || safeCategoryCheck(sample, SampleTissueProcessing.CATEGORY_NAME);
   }
 
   public static boolean isTissuePieceSample(Sample sample) {
-    if (!isDetailedSample(sample)) return false;
+    if (!isDetailedSample(sample))
+      return false;
     return sample instanceof SampleTissuePiece;
   }
 
   public static boolean isProcessingSingleCellSample(Sample sample) {
-    if (!isDetailedSample(sample)) return false;
+    if (!isDetailedSample(sample))
+      return false;
     return sample instanceof SampleSingleCell;
   }
 
   public static boolean isStockSample(Sample sample) {
-    if (!isDetailedSample(sample)) return false;
+    if (!isDetailedSample(sample))
+      return false;
     return sample instanceof SampleStock || safeCategoryCheck(sample, SampleStock.CATEGORY_NAME);
   }
 
   public static boolean isStockSingleCellSample(Sample sample) {
-    if (!isDetailedSample(sample)) return false;
+    if (!isDetailedSample(sample))
+      return false;
     return sample instanceof SampleStockSingleCell;
   }
 
   public static boolean isStockRnaSample(Sample sample) {
-    if (!isDetailedSample(sample)) return false;
+    if (!isDetailedSample(sample))
+      return false;
     return sample instanceof SampleStockRna;
   }
 
@@ -284,12 +288,14 @@ public class LimsUtils {
   }
 
   public static boolean isAliquotSingleCellSample(Sample sample) {
-    if (!isDetailedSample(sample)) return false;
+    if (!isDetailedSample(sample))
+      return false;
     return sample instanceof SampleAliquotSingleCell;
   }
 
   public static boolean isSampleSlide(Sample sample) {
-    if (!isDetailedSample(sample)) return false;
+    if (!isDetailedSample(sample))
+      return false;
     return sample instanceof SampleSlide
         || SampleSlide.SUBCATEGORY_NAME.equals(((DetailedSample) sample).getSampleClass().getSampleSubcategory());
   }
@@ -327,7 +333,8 @@ public class LimsUtils {
   }
 
   public static <T extends DetailedSample> T getParent(Class<T> targetParentClass, DetailedSample start) {
-    for (DetailedSample current = deproxify(start.getParent()); current != null; current = deproxify(current.getParent())) {
+    for (DetailedSample current = deproxify(start.getParent()); current != null; current =
+        deproxify(current.getParent())) {
       if (targetParentClass.isInstance(current)) {
         return targetParentClass.cast(current);
       }
@@ -356,8 +363,8 @@ public class LimsUtils {
   }
 
   /**
-   * universal temporary name prefix. TODO: these same methods are in sqlstore DbUtils;
-   * use those when refactoring away the ProjectService.
+   * universal temporary name prefix. TODO: these same methods are in sqlstore DbUtils; use those when
+   * refactoring away the ProjectService.
    */
   static final private String TEMPORARY_NAME_PREFIX = "TEMPORARY_";
 
@@ -391,7 +398,8 @@ public class LimsUtils {
   }
 
   /**
-   * Generates a unique barcode for a Nameable entity, and sets the identificationBarcode property for Boxables and LibraryAliquots.
+   * Generates a unique barcode for a Nameable entity, and sets the identificationBarcode property for
+   * Boxables and LibraryAliquots.
    * 
    * @param nameable Nameable object
    * @throws IOException
@@ -417,7 +425,8 @@ public class LimsUtils {
   }
 
   public static void appendSet(StringBuilder target, Collection<String> items, String prefix) {
-    if (items.isEmpty()) return;
+    if (items.isEmpty())
+      return;
     target.append(" ");
     target.append(prefix);
     target.append(": ");
@@ -450,11 +459,13 @@ public class LimsUtils {
   }
 
   /**
-   * Switches from a representation of date without time or a time zone to one that contains milliseconds from epoch as interpreted from
-   * some place with a time zone. No good will come of this. Turn back now.
+   * Switches from a representation of date without time or a time zone to one that contains
+   * milliseconds from epoch as interpreted from some place with a time zone. No good will come of
+   * this. Turn back now.
    * 
    * @param localDate A date without time.
-   * @param timezone A time zone. We'll calculate milliseconds from the epoch from this particular time zone.
+   * @param timezone A time zone. We'll calculate milliseconds from the epoch from this particular
+   *        time zone.
    * @return Milliseconds from the epoch.
    */
   public static Date toBadDate(LocalDate localDate, ZoneId timezone) {
@@ -517,21 +528,24 @@ public class LimsUtils {
 
   public static String joinWithConjunction(Collection<String> words, String conjunction) {
     switch (words.size()) {
-    case 0:
-      throw new IllegalArgumentException("No words provided");
-    case 1:
-      return words.iterator().next();
-    case 2:
-      Iterator<String> iterator = words.iterator();
-      return iterator.next() + " " + conjunction + " " + iterator.next();
-    default:
-      List<String> wordsCopy = new ArrayList<>(words);
-      wordsCopy.set(wordsCopy.size() - 1, conjunction + " " + wordsCopy.get(wordsCopy.size() - 1));
-      return String.join(", ", wordsCopy);
+      case 0:
+        throw new IllegalArgumentException("No words provided");
+      case 1:
+        return words.iterator().next();
+      case 2:
+        Iterator<String> iterator = words.iterator();
+        return iterator.next() + " " + conjunction + " " + iterator.next();
+      default:
+        List<String> wordsCopy = new ArrayList<>(words);
+        wordsCopy.set(wordsCopy.size() - 1, conjunction + " " + wordsCopy.get(wordsCopy.size() - 1));
+        return String.join(", ", wordsCopy);
     }
   }
 
-  /** Given a bunch of strings, find the long substring that matches all of them that doesn't end in numbers or underscores. */
+  /**
+   * Given a bunch of strings, find the long substring that matches all of them that doesn't end in
+   * numbers or underscores.
+   */
   public static String findCommonPrefix(String[] str) {
     StringBuilder commonPrefix = new StringBuilder();
 
@@ -564,7 +578,8 @@ public class LimsUtils {
    * Update the volume of the entity's parent based on the entity's volumeUsed property
    * 
    * @param entity the child entity
-   * @param beforeChange the child entity before the current change; null if the child entity is just being created
+   * @param beforeChange the child entity before the current change; null if the child entity is just
+   *        being created
    */
   public static void updateParentVolume(HierarchyEntity entity, HierarchyEntity beforeChange, User changeUser) {
     HierarchyEntity parent = entity.getParent();
@@ -578,7 +593,8 @@ public class LimsUtils {
     } else {
       if (entity.getVolumeUsed() != null && beforeChange.getVolumeUsed() != null) {
         if (entity.getVolumeUsed().compareTo(beforeChange.getVolumeUsed()) != 0) {
-          updateParentVolume(parent, parent.getVolume().add(beforeChange.getVolumeUsed()).subtract(entity.getVolumeUsed()), changeUser);
+          updateParentVolume(parent,
+              parent.getVolume().add(beforeChange.getVolumeUsed()).subtract(entity.getVolumeUsed()), changeUser);
         }
       } else if (beforeChange.getVolumeUsed() != null) {
         updateParentVolume(parent, parent.getVolume().add(beforeChange.getVolumeUsed()), changeUser);
@@ -595,9 +611,12 @@ public class LimsUtils {
 
   @SafeVarargs
   public static <T> boolean equals(T item, Object other, Function<T, Object>... getters) {
-    if (item == other) return true;
-    if (other == null) return false;
-    if (item.getClass() != other.getClass()) return false;
+    if (item == other)
+      return true;
+    if (other == null)
+      return false;
+    if (item.getClass() != other.getClass())
+      return false;
 
     @SuppressWarnings("unchecked")
     T castedOther = (T) other;
@@ -607,9 +626,12 @@ public class LimsUtils {
 
   @SafeVarargs
   public static <T extends Identifiable> boolean equalsByIdFirst(T item, Object other, Function<T, Object>... getters) {
-    if (item == other) return true;
-    if (other == null) return false;
-    if (item.getClass() != other.getClass()) return false;
+    if (item == other)
+      return true;
+    if (other == null)
+      return false;
+    if (item.getClass() != other.getClass())
+      return false;
 
     @SuppressWarnings("unchecked")
     T castedOther = (T) other;
@@ -648,7 +670,8 @@ public class LimsUtils {
     }
   }
 
-  public static int getLongestIndex(Collection<? extends IndexedLibrary> libraries, Function<IndexedLibrary, Index> getIndex) {
+  public static int getLongestIndex(Collection<? extends IndexedLibrary> libraries,
+      Function<IndexedLibrary, Index> getIndex) {
     return libraries.stream()
         .map(getIndex)
         .filter(Objects::nonNull)

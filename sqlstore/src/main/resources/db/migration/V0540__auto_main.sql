@@ -1,5 +1,3 @@
 -- favourite_workflows
 
-CREATE TABLE User_FavouriteWorkflows (userId BIGINT(20), favouriteWorkflow VARCHAR(20), CONSTRAINT fk_user_favouriteworkflow_user FOREIGN KEY (userId) REFERENCES User(UserId)) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
+CREATE TABLE User_FavouriteWorkflows (userId bigint, favouriteWorkflow VARCHAR(20), CONSTRAINT fk_user_favouriteworkflow_user FOREIGN KEY (userId) REFERENCES User(UserId)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

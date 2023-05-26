@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
+import javax.persistence.TemporalType;
+
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -30,10 +32,11 @@ import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
-public class HibernateListLibraryAliquotViewDao implements ListLibraryAliquotViewDao, HibernatePaginatedDataSource<ListLibraryAliquotView> {
+public class HibernateListLibraryAliquotViewDao
+    implements ListLibraryAliquotViewDao, HibernatePaginatedDataSource<ListLibraryAliquotView> {
 
   // Make sure these match the HiberateLibraryAliquotDao
-  private static final String[] SEARCH_PROPERTIES = new String[] { "name", "alias", "identificationBarcode" };
+  private static final String[] SEARCH_PROPERTIES = new String[] {"name", "alias", "identificationBarcode"};
   private final static List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(
       new AliasDescriptor("parentLibrary", "library"),
       new AliasDescriptor("library.parentSample", "sample"),
@@ -90,25 +93,25 @@ public class HibernateListLibraryAliquotViewDao implements ListLibraryAliquotVie
   @Override
   public String propertyForSortColumn(String original) {
     switch (original) {
-    case "lastModified":
-      return "lastUpdated";
-    case "library.parentSampleId":
-      return "sample.id";
-    case "library.parentSampleAlias":
-      return "sample.alias";
-    case "libraryPlatformType":
-    case "library.platformType":
-      return "library.platformType";
-    case "creatorName":
-      return "creator.fullName";
-    case "creationDate":
-      return "created";
-    case "effectiveTissueOriginAlias":
-      return "tissueOrigin.alias";
-    case "effectiveTissueTypeAlias":
-      return "tissueType.alias";
-    default:
-      return original;
+      case "lastModified":
+        return "lastUpdated";
+      case "library.parentSampleId":
+        return "sample.id";
+      case "library.parentSampleAlias":
+        return "sample.alias";
+      case "libraryPlatformType":
+      case "library.platformType":
+        return "library.platformType";
+      case "creatorName":
+        return "creator.fullName";
+      case "creationDate":
+        return "created";
+      case "effectiveTissueOriginAlias":
+        return "tissueOrigin.alias";
+      case "effectiveTissueTypeAlias":
+        return "tissueType.alias";
+      default:
+        return original;
     }
   }
 
@@ -125,12 +128,23 @@ public class HibernateListLibraryAliquotViewDao implements ListLibraryAliquotVie
   @Override
   public String propertyForDate(Criteria item, DateType type) {
     switch (type) {
-    case CREATE:
-      return "created";
-    case UPDATE:
-      return "lastUpdated";
-    default:
-      return null;
+      case CREATE:
+        return "created";
+      case UPDATE:
+        return "lastUpdated";
+      default:
+        return null;
+    }
+  }
+
+  @Override
+  public TemporalType temporalTypeForDate(DateType type) {
+    switch (type) {
+      case CREATE:
+      case UPDATE:
+        return TemporalType.TIMESTAMP;
+      default:
+        return null;
     }
   }
 
@@ -153,14 +167,16 @@ public class HibernateListLibraryAliquotViewDao implements ListLibraryAliquotVie
   }
 
   @Override
-  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
+  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType,
+      Consumer<String> errorHandler) {
     criteria.add(Restrictions.eq("library.platformType", platformType));
   }
 
   @Override
   public void restrictPaginationByPoolId(Criteria criteria, long poolId, Consumer<String> errorHandler) {
     criteria
-        .add(Restrictions.sqlRestriction("EXISTS(SELECT * FROM Pool_LibraryAliquot WHERE poolId = ? AND aliquotId = aliquotId)",
+        .add(Restrictions.sqlRestriction(
+            "EXISTS(SELECT * FROM Pool_LibraryAliquot WHERE poolId = ? AND aliquotId = aliquotId)",
             poolId, LongType.INSTANCE));
   }
 
@@ -195,7 +211,8 @@ public class HibernateListLibraryAliquotViewDao implements ListLibraryAliquotVie
   }
 
   @Override
-  public void restrictPaginationByDate(Criteria criteria, Date start, Date end, DateType type, Consumer<String> errorHandler) {
+  public void restrictPaginationByDate(Criteria criteria, Date start, Date end, DateType type,
+      Consumer<String> errorHandler) {
     if (type == DateType.RECEIVE) {
       DbUtils.restrictPaginationByReceiptTransferDate(criteria, start, end);
     } else if (type == DateType.DISTRIBUTED) {
@@ -206,7 +223,8 @@ public class HibernateListLibraryAliquotViewDao implements ListLibraryAliquotVie
   }
 
   @Override
-  public void restrictPaginationByDistributionRecipient(Criteria criteria, String query, Consumer<String> errorHandler) {
+  public void restrictPaginationByDistributionRecipient(Criteria criteria, String query,
+      Consumer<String> errorHandler) {
     DbUtils.restrictPaginationByDistributionRecipient(criteria, query, "libraryAliquots", "aliquotId");
   }
 

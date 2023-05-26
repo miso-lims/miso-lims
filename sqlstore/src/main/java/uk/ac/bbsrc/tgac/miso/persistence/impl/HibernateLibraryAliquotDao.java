@@ -7,6 +7,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
+import javax.persistence.TemporalType;
+
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -34,7 +36,7 @@ public class HibernateLibraryAliquotDao
     implements LibraryAliquotStore, HibernatePaginatedBoxableSource<LibraryAliquot> {
 
   // Make sure these match the HiberateListLibraryAliquotViewDao
-  private final static String[] SEARCH_PROPERTIES = new String[] { "name", "alias", "identificationBarcode" };
+  private final static String[] SEARCH_PROPERTIES = new String[] {"name", "alias", "identificationBarcode"};
   private final static List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("library"));
 
   @Autowired
@@ -79,7 +81,8 @@ public class HibernateLibraryAliquotDao
 
   @Override
   public LibraryAliquot getByBarcode(String barcode) throws IOException {
-    if (barcode == null) throw new IOException("Barcode cannot be null!");
+    if (barcode == null)
+      throw new IOException("Barcode cannot be null!");
     Criteria criteria = currentSession().createCriteria(LibraryAliquot.class);
     criteria.add(Restrictions.eq("identificationBarcode", barcode));
     return (LibraryAliquot) criteria.uniqueResult();
@@ -136,21 +139,35 @@ public class HibernateLibraryAliquotDao
   }
 
   @Override
-  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
+  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType,
+      Consumer<String> errorHandler) {
     criteria.add(Restrictions.eq("library.platformType", platformType));
   }
 
   @Override
   public String propertyForDate(Criteria item, DateType type) {
     switch (type) {
-    case CREATE:
-      return "creationDate";
-    case ENTERED:
-      return "creationTime";
-    case UPDATE:
-      return "lastUpdated";
-    default:
-      return null;
+      case CREATE:
+        return "creationDate";
+      case ENTERED:
+        return "creationTime";
+      case UPDATE:
+        return "lastUpdated";
+      default:
+        return null;
+    }
+  }
+
+  @Override
+  public TemporalType temporalTypeForDate(DateType type) {
+    switch (type) {
+      case CREATE:
+        return TemporalType.DATE;
+      case ENTERED:
+      case UPDATE:
+        return TemporalType.TIMESTAMP;
+      default:
+        return null;
     }
   }
 
@@ -176,7 +193,8 @@ public class HibernateLibraryAliquotDao
   }
 
   @Override
-  public void restrictPaginationByDistributionRecipient(Criteria criteria, String query, Consumer<String> errorHandler) {
+  public void restrictPaginationByDistributionRecipient(Criteria criteria, String query,
+      Consumer<String> errorHandler) {
     DbUtils.restrictPaginationByDistributionRecipient(criteria, query, "libraryAliquots", "aliquotId");
   }
 

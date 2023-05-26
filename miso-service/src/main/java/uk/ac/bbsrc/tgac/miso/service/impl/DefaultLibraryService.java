@@ -5,11 +5,12 @@ import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -70,7 +71,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryStore;
@@ -78,7 +78,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.SampleStore;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultLibraryService implements LibraryService, PaginatedDataSource<Library> {
+public class DefaultLibraryService implements LibraryService {
 
   @Autowired
   private LibraryStore libraryDao;
@@ -293,7 +293,7 @@ public class DefaultLibraryService implements LibraryService, PaginatedDataSourc
   @Override
   public void addNote(Library library, Note note) throws IOException {
     Library managed = libraryDao.get(library.getId());
-    note.setCreationDate(new Date());
+    note.setCreationDate(LocalDate.now(ZoneId.systemDefault()));
     note.setOwner(authorizationManager.getCurrentUser());
     managed.addNote(note);
     save(managed, false);

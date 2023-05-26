@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -19,7 +20,19 @@ import org.springframework.transaction.support.TransactionTemplate;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.*;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQC;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQcControlRun;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQcControlRun;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.PoolQC;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.PoolQcControlRun;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QC;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcControlRun;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcCorrespondingField;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QualityControlEntity;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQcControlRun;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BulkQcSaveOperation;
@@ -86,14 +99,15 @@ public class DefaultQualityControlService implements QualityControlService {
     User user = authorizationManager.getCurrentUser();
     qc.setCreator(user);
     qc.setCreationTime(new Date());
-    qc.setLastModified(qc.getCreationTime());
+    qc.setLastModified(new Date());
 
     if (!qc.getType().getQcTarget().equals(entity.getQcTarget())) {
       throw new IllegalArgumentException("QC type and entity are mismatched.");
     }
 
     if (qc.getType().isAutoUpdateField() && qc.getType().getCorrespondingField() != QcCorrespondingField.NONE) {
-      handler.updateEntity(qc.getEntity().getId(), qc.getType().getCorrespondingField(), qc.getResults(), qc.getType().getUnits());
+      handler.updateEntity(qc.getEntity().getId(), qc.getType().getCorrespondingField(), qc.getResults(),
+          qc.getType().getUnits());
     }
 
     entity.setChangeDetails(user);
@@ -155,20 +169,20 @@ public class DefaultQualityControlService implements QualityControlService {
     for (QcControlRun fromControl : from.getControls()) {
       if (!fromControl.isSaved()) {
         switch (to.getType().getQcTarget()) {
-        case Container:
-          ((ContainerQcControlRun) fromControl).setQc((ContainerQC) to);
-          break;
-        case Library:
-          ((LibraryQcControlRun) fromControl).setQc((LibraryQC) to);
-          break;
-        case Pool:
-          ((PoolQcControlRun) fromControl).setQc((PoolQC) to);
-          break;
-        case Sample:
-          ((SampleQcControlRun) fromControl).setQc((SampleQC) to);
-          break;
-        default:
-          throw new IllegalArgumentException("Unhandled QC target: " + to.getType().getQcTarget());
+          case Container:
+            ((ContainerQcControlRun) fromControl).setQc((ContainerQC) to);
+            break;
+          case Library:
+            ((LibraryQcControlRun) fromControl).setQc((LibraryQC) to);
+            break;
+          case Pool:
+            ((PoolQcControlRun) fromControl).setQc((PoolQC) to);
+            break;
+          case Sample:
+            ((SampleQcControlRun) fromControl).setQc((SampleQC) to);
+            break;
+          default:
+            throw new IllegalArgumentException("Unhandled QC target: " + to.getType().getQcTarget());
         }
         handler.createControlRun(fromControl);
       }
@@ -217,7 +231,8 @@ public class DefaultQualityControlService implements QualityControlService {
     }
 
     for (QcControlRun controlRun : qc.getControls()) {
-      if (qc.getType().getControls().stream().noneMatch(control -> control.getId() == controlRun.getControl().getId())) {
+      if (qc.getType().getControls().stream()
+          .noneMatch(control -> control.getId() == controlRun.getControl().getId())) {
         errors.add(new ValidationError("controlId", "Invalid control for this QC type"));
       }
     }
@@ -239,18 +254,18 @@ public class DefaultQualityControlService implements QualityControlService {
 
   private QcTargetStore getHandler(QcTarget target) {
     switch (target) {
-    case Library:
-      return libraryQcStore;
-    case Pool:
-      return poolQcStore;
-    case Sample:
-      return sampleQcStore;
-    case Container:
-      return containerQcStore;
-    case Requisition:
-      return requisitionQcStore;
-    default:
-      throw new IllegalArgumentException("Unknown QC target: " + target);
+      case Library:
+        return libraryQcStore;
+      case Pool:
+        return poolQcStore;
+      case Sample:
+        return sampleQcStore;
+      case Container:
+        return containerQcStore;
+      case Requisition:
+        return requisitionQcStore;
+      default:
+        throw new IllegalArgumentException("Unknown QC target: " + target);
     }
   }
 
@@ -301,15 +316,18 @@ public class DefaultQualityControlService implements QualityControlService {
 
   @Override
   public BulkQcSaveOperation startBulkCreate(List<QC> items) throws IOException {
-    return startBulkOperation(items, x -> PrometheusAsyncMonitor.monitor(getClass().getSimpleName(), "create", this::create, x));
+    return startBulkOperation(items,
+        x -> PrometheusAsyncMonitor.monitor(getClass().getSimpleName(), "create", this::create, x));
   }
 
   @Override
   public BulkQcSaveOperation startBulkUpdate(List<QC> items) throws IOException {
-    return startBulkOperation(items, x -> PrometheusAsyncMonitor.monitor(getClass().getSimpleName(), "update", this::update, x));
+    return startBulkOperation(items,
+        x -> PrometheusAsyncMonitor.monitor(getClass().getSimpleName(), "update", this::update, x));
   }
 
-  private BulkQcSaveOperation startBulkOperation(List<QC> items, ThrowingFunction<QC, QC, IOException> action) throws IOException {
+  private BulkQcSaveOperation startBulkOperation(List<QC> items, ThrowingFunction<QC, QC, IOException> action)
+      throws IOException {
     QcTarget qcTarget = qcTypeService.get(items.get(0).getType().getId()).getQcTarget();
     BulkQcSaveOperation operation = new BulkQcSaveOperation(qcTarget, items, authorizationManager.getCurrentUser());
     // Authentication is tied to the thread, so use this same auth in the new thread
@@ -383,7 +401,8 @@ public class DefaultQualityControlService implements QualityControlService {
   public void beforeDelete(QC object) throws IOException {
     QcTargetStore handler = getHandler(object.getType().getQcTarget());
     QualityControlEntity entity = handler.getEntity(object.getEntity().getId());
-    ChangeLog change = entity.createChangeLog("QC deleted: " + object.getType().getName(), "", authorizationManager.getCurrentUser());
+    ChangeLog change =
+        entity.createChangeLog("QC deleted: " + object.getType().getName(), "", authorizationManager.getCurrentUser());
     changeLogService.create(change);
   }
 

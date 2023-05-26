@@ -1,11 +1,10 @@
--- StartNoTest
 DELIMITER //
 
 DROP TRIGGER IF EXISTS LibraryAliquotChange//
 CREATE TRIGGER LibraryAliquotChange BEFORE UPDATE ON LibraryAliquot
 FOR EACH ROW
   BEGIN
-    DECLARE log_message longtext CHARACTER SET utf8;
+    DECLARE log_message longtext;
     SET log_message = CONCAT_WS(', ',
       CASE WHEN OLD.alias NOT LIKE 'TEMPORARY%' THEN makeChangeMessage('alias', OLD.alias, NEW.alias) END,
       makeChangeMessage('barcode', OLD.identificationBarcode, NEW.identificationBarcode),
@@ -77,4 +76,3 @@ FOR EACH ROW
     NEW.lastUpdated)//
 
 DELIMITER ;
--- EndNoTest

@@ -1,26 +1,7 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK MISO project contacts: Robert Davey @
- * TGAC *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify it under the terms of the GNU
- * General Public License as published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with MISO. If not, see
- * <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -40,8 +21,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import uk.ac.bbsrc.tgac.miso.core.data.BarcodableVisitor;
@@ -80,10 +59,8 @@ public class InstrumentImpl implements Instrument {
   @JoinColumn(name = "workstationId")
   private Workstation workstation;
 
-  @Temporal(TemporalType.DATE)
-  private Date dateCommissioned;
-  @Temporal(TemporalType.DATE)
-  private Date dateDecommissioned = null;
+  private LocalDate dateCommissioned;
+  private LocalDate dateDecommissioned = null;
 
   @OneToOne(targetEntity = InstrumentImpl.class, optional = true)
   @JoinColumn(name = "upgradedInstrumentId")
@@ -172,22 +149,22 @@ public class InstrumentImpl implements Instrument {
   }
 
   @Override
-  public void setDateCommissioned(Date date) {
+  public void setDateCommissioned(LocalDate date) {
     this.dateCommissioned = date;
   }
 
   @Override
-  public Date getDateCommissioned() {
+  public LocalDate getDateCommissioned() {
     return dateCommissioned;
   }
 
   @Override
-  public void setDateDecommissioned(Date date) {
+  public void setDateDecommissioned(LocalDate date) {
     this.dateDecommissioned = date;
   }
 
   @Override
-  public Date getDateDecommissioned() {
+  public LocalDate getDateDecommissioned() {
     return dateDecommissioned;
   }
 
@@ -225,16 +202,6 @@ public class InstrumentImpl implements Instrument {
   @Override
   public boolean isActive() {
     return dateDecommissioned == null;
-  }
-
-  @Override
-  public void setLastServicedDate(Date date) {
-    this.lastServicedDate = date;
-  }
-
-  @Override
-  public Date getLastServicedDate() {
-    return lastServicedDate;
   }
 
   @OneToMany(targetEntity = Run.class, mappedBy = "sequencer")
@@ -311,7 +278,6 @@ public class InstrumentImpl implements Instrument {
     return Objects.hash(getDateCommissioned(),
         getDateDecommissioned(),
         getId(),
-        getLastServicedDate(),
         getName(),
         getInstrumentModel(),
         getRuns(),
@@ -327,7 +293,6 @@ public class InstrumentImpl implements Instrument {
     return LimsUtils.equals(this, obj, InstrumentImpl::getDateCommissioned,
         InstrumentImpl::getDateDecommissioned,
         InstrumentImpl::getId,
-        InstrumentImpl::getLastServicedDate,
         InstrumentImpl::getName,
         InstrumentImpl::getInstrumentModel,
         InstrumentImpl::getRuns,
@@ -359,7 +324,7 @@ public class InstrumentImpl implements Instrument {
   }
 
   @Override
-  public Date getBarcodeDate() {
+  public LocalDate getBarcodeDate() {
     return getDateCommissioned();
   }
 

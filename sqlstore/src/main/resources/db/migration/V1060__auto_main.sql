@@ -14,17 +14,17 @@ DROP TRIGGER IF EXISTS DetailedSampleInsert;
 ALTER TABLE Sample
   ADD COLUMN discriminator varchar(50) NOT NULL DEFAULT 'Sample',
   -- DetailedSample
-  ADD COLUMN `sampleClassId` bigint(20),
-  ADD COLUMN `detailedQcStatusId` bigint(20),
-  ADD COLUMN `subprojectId` bigint(20),
-  ADD COLUMN `archived` bit(1),
-  ADD COLUMN `parentId` bigint(20),
-  ADD COLUMN `siblingNumber` int(11),
+  ADD COLUMN `sampleClassId` bigint,
+  ADD COLUMN `detailedQcStatusId` bigint,
+  ADD COLUMN `subprojectId` bigint,
+  ADD COLUMN `archived` bit,
+  ADD COLUMN `parentId` bigint,
+  ADD COLUMN `siblingNumber` int,
   ADD COLUMN `groupId` varchar(100),
   ADD COLUMN `groupDescription` varchar(255),
-  ADD COLUMN `isSynthetic` tinyint(1),
-  ADD COLUMN `nonStandardAlias` tinyint(1),
-  ADD COLUMN `preMigrationId` bigint(20),
+  ADD COLUMN `isSynthetic` tinyint,
+  ADD COLUMN `nonStandardAlias` tinyint,
+  ADD COLUMN `preMigrationId` bigint,
   ADD COLUMN `detailedQcStatusNote` varchar(500),
   ADD COLUMN `creationDate` date,
   ADD COLUMN `volumeUsed` decimal(14,10),
@@ -39,35 +39,35 @@ ALTER TABLE Sample
   ADD COLUMN `donorSex` varchar(50),
   ADD COLUMN `consentLevel` varchar(50),
   -- SampleTissue
-  ADD COLUMN `tissueOriginId` bigint(20),
-  ADD COLUMN `tissueTypeId` bigint(20),
+  ADD COLUMN `tissueOriginId` bigint,
+  ADD COLUMN `tissueTypeId` bigint,
   ADD COLUMN `secondaryIdentifier` varchar(255),
-  ADD COLUMN `labId` bigint(20),
+  ADD COLUMN `labId` bigint,
   ADD COLUMN `region` varchar(255),
-  ADD COLUMN `passageNumber` int(11),
-  ADD COLUMN `tubeNumber` int(11),
-  ADD COLUMN `timesReceived` int(11),
-  ADD COLUMN `tissueMaterialId` bigint(20),
+  ADD COLUMN `passageNumber` int,
+  ADD COLUMN `tubeNumber` int,
+  ADD COLUMN `timesReceived` int,
+  ADD COLUMN `tissueMaterialId` bigint,
   ADD CONSTRAINT `fk_sample_lab` FOREIGN KEY (`labId`) REFERENCES `Lab` (`labId`),
   ADD CONSTRAINT `fk_sample_tissueOrigin` FOREIGN KEY (`tissueOriginId`) REFERENCES `TissueOrigin` (`tissueOriginId`),
   ADD CONSTRAINT `fk_sample_tissueType` FOREIGN KEY (`tissueTypeId`) REFERENCES `TissueType` (`tissueTypeId`),
   ADD CONSTRAINT `fk_sample_tissueMaterial` FOREIGN KEY (`tissueMaterialId`) REFERENCES `TissueMaterial` (`tissueMaterialId`),
   -- SampleTissueProcessing (no columns)
   -- SampleSlide
-  ADD COLUMN `initialSlides` int(11),
-  ADD COLUMN `discards` int(11),
-  ADD COLUMN `thickness` int(11),
-  ADD COLUMN `stain` bigint(20),
-  ADD COLUMN `slides` int(11),
+  ADD COLUMN `initialSlides` int,
+  ADD COLUMN `discards` int,
+  ADD COLUMN `thickness` int,
+  ADD COLUMN `stain` bigint,
+  ADD COLUMN `slides` int,
   ADD COLUMN `percentTumour` decimal(11,8),
   ADD COLUMN `percentNecrosis` decimal(11,8),
   ADD COLUMN `markedAreaSize` decimal(11,8),
   ADD COLUMN `markedAreaPercentTumour` decimal(11,8),
   ADD CONSTRAINT `fk_sample_stain` FOREIGN KEY (`stain`) REFERENCES `Stain` (`stainId`),
   -- SampleTissuePiece
-  ADD COLUMN `slidesConsumed` int(11),
-  ADD COLUMN `tissuePieceType` bigint(20),
-  ADD COLUMN `referenceSlideId` bigint(20), -- (shared with SampleStock)
+  ADD COLUMN `slidesConsumed` int,
+  ADD COLUMN `tissuePieceType` bigint,
+  ADD COLUMN `referenceSlideId` bigint, -- (shared with SampleStock)
   ADD CONSTRAINT `fk_sample_referenceSlide` FOREIGN KEY (`referenceSlideId`) REFERENCES `Sample` (`sampleId`),
   ADD CONSTRAINT `fk_sample_tissuePieceType` FOREIGN KEY (`tissuePieceType`) REFERENCES `TissuePieceType` (`tissuePieceTypeId`),
   -- SampleSingleCell
@@ -75,13 +75,13 @@ ALTER TABLE Sample
   ADD COLUMN `digestion` varchar(255),
   -- SampleStock
   ADD COLUMN `strStatus` varchar(50),
-  ADD COLUMN `dnaseTreated` tinyint(1),
+  ADD COLUMN `dnaseTreated` tinyint,
   -- SampleStockSingleCell
   ADD COLUMN `targetCellRecovery` decimal(14,10),
   ADD COLUMN `cellViability` decimal(14,10),
   ADD COLUMN `loadingCellConcentration` decimal(14,10),
   -- SampleAliquot
-  ADD COLUMN `samplePurposeId` bigint(20),
+  ADD COLUMN `samplePurposeId` bigint,
   ADD CONSTRAINT `fk_sample_samplePurpose` FOREIGN KEY (`samplePurposeId`) REFERENCES `SamplePurpose` (`samplePurposeId`),
   -- SampleAliquotSingleCell
   ADD COLUMN `inputIntoLibrary` decimal(14,10);
@@ -229,11 +229,11 @@ DROP TRIGGER IF EXISTS DetailedLibraryChange;
 
 ALTER TABLE Library
   ADD COLUMN discriminator varchar(50) NOT NULL DEFAULT 'Library',
-  ADD COLUMN `archived` bit(1),
-  ADD COLUMN `libraryDesign` bigint(20),
-  ADD COLUMN `nonStandardAlias` tinyint(1),
-  ADD COLUMN `preMigrationId` bigint(20),
-  ADD COLUMN `libraryDesignCodeId` bigint(20),
+  ADD COLUMN `archived` bit,
+  ADD COLUMN `libraryDesign` bigint,
+  ADD COLUMN `nonStandardAlias` tinyint,
+  ADD COLUMN `preMigrationId` bigint,
+  ADD COLUMN `libraryDesignCodeId` bigint,
   ADD COLUMN `groupId` varchar(100),
   ADD COLUMN `groupDescription` varchar(255),
   ADD CONSTRAINT `uk_library_preMigrationId` UNIQUE (`preMigrationId`),
@@ -256,8 +256,8 @@ DROP TABLE DetailedLibrary;
 
 ALTER TABLE LibraryAliquot
   ADD COLUMN discriminator varchar(50) NOT NULL DEFAULT 'LibraryAliquot',
-  ADD COLUMN `nonStandardAlias` tinyint(1),
-  ADD COLUMN `libraryDesignCodeId` bigint(20),
+  ADD COLUMN `nonStandardAlias` tinyint,
+  ADD COLUMN `libraryDesignCodeId` bigint,
   ADD COLUMN `groupId` varchar(100),
   ADD COLUMN `groupDescription` varchar(255),
   ADD CONSTRAINT `fk_libraryAliquot_libraryDesignCode` FOREIGN KEY (`libraryDesignCodeId`) REFERENCES `LibraryDesignCode` (`libraryDesignCodeId`);

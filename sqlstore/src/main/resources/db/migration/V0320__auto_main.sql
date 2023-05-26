@@ -6,43 +6,43 @@ ALTER TABLE SampleTissue CHANGE COLUMN externalInstituteIdentifier secondaryIden
 -- qcs
 
 CREATE TABLE `LibraryQC2` (
-  `qcId` bigint(20) NOT NULL AUTO_INCREMENT,
-  `library_libraryId` bigint(20) NOT NULL,
-  `creator` bigint(20) NOT NULL,
+  `qcId` bigint NOT NULL AUTO_INCREMENT,
+  `library_libraryId` bigint NOT NULL,
+  `creator` bigint NOT NULL,
   `date` date NOT NULL,
-  `type` bigint(20) NOT NULL,
+  `type` bigint NOT NULL,
   `results` double NOT NULL,
   PRIMARY KEY (`qcId`),
   CONSTRAINT `FK_library_qc_library` FOREIGN KEY (`library_libraryId`) REFERENCES `Library` (`libraryId`),
   CONSTRAINT `FK_library_qc_creator` FOREIGN KEY (`creator`) REFERENCES `User` (`userId`),
   CONSTRAINT `FK_library_qc_type` FOREIGN KEY (`type`) REFERENCES `QCType` (`qcTypeId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `SampleQC2` (
-  `qcId` bigint(20) NOT NULL AUTO_INCREMENT,
-  `sample_sampleId` bigint(20) NOT NULL,
-  `creator` bigint(20) NOT NULL,
+  `qcId` bigint NOT NULL AUTO_INCREMENT,
+  `sample_sampleId` bigint NOT NULL,
+  `creator` bigint NOT NULL,
   `date` date NOT NULL,
-  `type` bigint(20) NOT NULL,
+  `type` bigint NOT NULL,
   `results` double NOT NULL,
   PRIMARY KEY (`qcId`),
   CONSTRAINT `FK_sample_qc_sample` FOREIGN KEY (`sample_sampleId`) REFERENCES `Sample` (`sampleId`),
   CONSTRAINT `FK_sample_qc_creator` FOREIGN KEY (`creator`) REFERENCES `User` (`userId`),
   CONSTRAINT `FK_sample_qc_type` FOREIGN KEY (`type`) REFERENCES `QCType` (`qcTypeId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `PoolQC2` (
-  `qcId` bigint(20) NOT NULL AUTO_INCREMENT,
-  `pool_poolId` bigint(20) NOT NULL,
-  `creator` bigint(20) NOT NULL,
+  `qcId` bigint NOT NULL AUTO_INCREMENT,
+  `pool_poolId` bigint NOT NULL,
+  `creator` bigint NOT NULL,
   `date` date NOT NULL,
-  `type` bigint(20) NOT NULL,
+  `type` bigint NOT NULL,
   `results` double NOT NULL,
   PRIMARY KEY (`qcId`),
   CONSTRAINT `FK_pool_qc_pool` FOREIGN KEY (`pool_poolId`) REFERENCES `Pool` (`poolId`),
   CONSTRAINT `FK_pool_qc_creator` FOREIGN KEY (`creator`) REFERENCES `User` (`userId`),
   CONSTRAINT `FK_pool_qc_type` FOREIGN KEY (`type`) REFERENCES `QCType` (`qcTypeId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO LibraryQC2(`qcId`, `library_libraryId`, `creator`, `date`, `type`, `results`)
 	SELECT qcId, library_libraryId, (SELECT userId FROM `User` WHERE fullName = qcCreator), qcDate, qcMethod, results FROM LibraryQC;
@@ -77,11 +77,11 @@ UPDATE Printer SET driver = 'BRADY_THT_181_492_3' WHERE backend = 'BRADY_STANDAR
 -- paritions_for_platform
 
 CREATE TABLE PlatformSizes (
-  platform_platformId bigint(20) NOT NULL,
+  platform_platformId bigint NOT NULL,
   partitionSize int NOT NULL,
   PRIMARY KEY (platform_platformId, partitionSize),
   CONSTRAINT fk_platform_size_platform FOREIGN KEY (platform_platformId) REFERENCES Platform (platformId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO PlatformSizes(platform_platformId, partitionSize)
   SELECT DISTINCT platform, COUNT(*) AS c FROM SequencerPartitionContainer JOIN SequencerPartitionContainer_Partition ON containerId = container_containerId GROUP BY containerId
@@ -120,23 +120,23 @@ INSERT INTO PlatformSizes(platform_platformId, partitionSize)
 ;
 
 CREATE TABLE PartitionQCType (
-  partitionQcTypeId bigint(20) NOT NULL AUTO_INCREMENT,
+  partitionQcTypeId bigint NOT NULL AUTO_INCREMENT,
   description varchar(255) NOT NULL,
   noteRequired boolean DEFAULT false,
   PRIMARY KEY (partitionQcTypeId),
   UNIQUE KEY uk_partitionqctype_description (description)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE Run_Partition_QC (
-  runId bigint(20) NOT NULL,
-  partitionId bigint(20) NOT NULL,
-  partitionQcTypeId bigint(20) NOT NULL,
+  runId bigint NOT NULL,
+  partitionId bigint NOT NULL,
+  partitionQcTypeId bigint NOT NULL,
   notes varchar(1024),
   PRIMARY KEY(runId, partitionId),
   CONSTRAINT fk_rpq_run_runId FOREIGN KEY (runId) REFERENCES Run (runId),
   CONSTRAINT fk_rpq_partition_partitionId FOREIGN KEY (partitionId) REFERENCES _Partition (partitionId),
   CONSTRAINT fk_rpq_partitiontypeqc_partitiontypeqc FOREIGN KEY (partitionQcTypeId) REFERENCES PartitionQCType (partitionQcTypeId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO PartitionQCType(description, noteRequired) VALUES
   ('OK', false),

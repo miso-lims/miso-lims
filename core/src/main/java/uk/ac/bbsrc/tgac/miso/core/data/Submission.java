@@ -1,30 +1,7 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,13 +13,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 @Entity
 @Table(name = "Submission")
-public class Submission implements Comparable<Submission>, Deletable, Serializable, Identifiable
-{
+public class Submission implements Comparable<Submission>, Deletable, Serializable, Identifiable {
 
   private static final long UNSAVED_ID = 0L;
 
@@ -51,32 +25,31 @@ public class Submission implements Comparable<Submission>, Deletable, Serializab
   private String accession;
   private String alias;
   private boolean completed;
-
-  @Temporal(TemporalType.DATE)
-  private Date creationDate;
-
+  private LocalDate creationDate;
   private String description;
 
   @ManyToMany(targetEntity = Experiment.class)
   @JoinTable(name = "Submission_Experiment", joinColumns = {
-      @JoinColumn(name = "submission_submissionId") }, inverseJoinColumns = {
-          @JoinColumn(name = "experiments_experimentId") })
+      @JoinColumn(name = "submission_submissionId")},
+      inverseJoinColumns = {
+          @JoinColumn(name = "experiments_experimentId")})
   private Set<Experiment> experiments = new HashSet<>();
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long submissionId = UNSAVED_ID;
 
-  @Temporal(TemporalType.DATE)
-  private Date submittedDate;
+  private LocalDate submittedDate;
 
   private String title;
   private boolean verified;
 
   @Override
   public int compareTo(Submission t) {
-    if (getId() < t.getId()) return -1;
-    if (getId() > t.getId()) return 1;
+    if (getId() < t.getId())
+      return -1;
+    if (getId() > t.getId())
+      return 1;
     return 0;
   }
 
@@ -88,7 +61,7 @@ public class Submission implements Comparable<Submission>, Deletable, Serializab
     return alias;
   }
 
-  public Date getCreationDate() {
+  public LocalDate getCreationDate() {
     return creationDate;
   }
 
@@ -105,7 +78,7 @@ public class Submission implements Comparable<Submission>, Deletable, Serializab
     return submissionId;
   }
 
-  public Date getSubmissionDate() {
+  public LocalDate getSubmissionDate() {
     return submittedDate;
   }
 
@@ -133,7 +106,7 @@ public class Submission implements Comparable<Submission>, Deletable, Serializab
     this.completed = completed;
   }
 
-  public void setCreationDate(Date creationDate) {
+  public void setCreationDate(LocalDate creationDate) {
     this.creationDate = creationDate;
   }
 
@@ -151,7 +124,7 @@ public class Submission implements Comparable<Submission>, Deletable, Serializab
     this.submissionId = id;
   }
 
-  public void setSubmissionDate(Date submissionDate) {
+  public void setSubmissionDate(LocalDate submissionDate) {
     this.submittedDate = submissionDate;
   }
 

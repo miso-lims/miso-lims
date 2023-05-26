@@ -10,39 +10,39 @@ ALTER TABLE Submission_Experiment ADD CONSTRAINT fk_submission_experiment_submis
 
 -- new_library_fields
 CREATE TABLE Workstation (
-  workstationId bigint(20) NOT NULL AUTO_INCREMENT,
+  workstationId bigint NOT NULL AUTO_INCREMENT,
   alias varchar(50) NOT NULL,
   description varchar(255),
   PRIMARY KEY (workstationId),
   UNIQUE KEY uk_workstation_alias (alias)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-ALTER TABLE Library ADD COLUMN thermalCyclerId bigint(20);
+ALTER TABLE Library ADD COLUMN thermalCyclerId bigint;
 ALTER TABLE Library ADD CONSTRAINT fk_library_thermalCycler FOREIGN KEY (thermalCyclerId) REFERENCES Instrument (instrumentId);
-ALTER TABLE Library ADD COLUMN workstationId bigint(20);
+ALTER TABLE Library ADD COLUMN workstationId bigint;
 ALTER TABLE Library ADD CONSTRAINT fk_library_workstation FOREIGN KEY (workstationId) REFERENCES Workstation (workstationId);
 
 -- qc_type_kits
 ALTER TABLE QCType DROP FOREIGN KEY fk_qcType_kitDescriptor;
 
 CREATE TABLE QCType_KitDescriptor (
-  qcTypeId bigint(20) NOT NULL,
-  kitDescriptorId bigint(20) NOT NULL,
+  qcTypeId bigint NOT NULL,
+  kitDescriptorId bigint NOT NULL,
   PRIMARY KEY (qcTypeId, kitDescriptorId),
   CONSTRAINT fk_kitDescriptor_qcType FOREIGN KEY (qcTypeId) REFERENCES QCType (qcTypeId),
   CONSTRAINT fk_qcType_kitDescriptor FOREIGN KEY (kitDescriptorId) REFERENCES KitDescriptor (kitDescriptorId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-ALTER TABLE SampleQC ADD COLUMN kitDescriptorId bigint(20);
+ALTER TABLE SampleQC ADD COLUMN kitDescriptorId bigint;
 ALTER TABLE SampleQC ADD CONSTRAINT fk_sampleQc_kit FOREIGN KEY (kitDescriptorId) REFERENCES KitDescriptor (kitDescriptorId);
 
-ALTER TABLE LibraryQC ADD COLUMN kitDescriptorId bigint(20);
+ALTER TABLE LibraryQC ADD COLUMN kitDescriptorId bigint;
 ALTER TABLE LibraryQC ADD CONSTRAINT fk_libraryQc_kit FOREIGN KEY (kitDescriptorId) REFERENCES KitDescriptor (kitDescriptorId);
 
-ALTER TABLE PoolQC ADD COLUMN kitDescriptorId bigint(20);
+ALTER TABLE PoolQC ADD COLUMN kitDescriptorId bigint;
 ALTER TABLE PoolQC ADD CONSTRAINT fk_poolQc_kit FOREIGN KEY (kitDescriptorId) REFERENCES KitDescriptor (kitDescriptorId);
 
-ALTER TABLE ContainerQC ADD COLUMN kitDescriptorId bigint(20);
+ALTER TABLE ContainerQC ADD COLUMN kitDescriptorId bigint;
 ALTER TABLE ContainerQC ADD CONSTRAINT fk_containerQc_kit FOREIGN KEY (kitDescriptorId) REFERENCES KitDescriptor (kitDescriptorId);
 
 INSERT INTO QCType_KitDescriptor (qcTypeId, kitDescriptorId)

@@ -1,7 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -13,17 +13,19 @@ public class LibraryBatch implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private static final Pattern batchIdPattern = Pattern.compile("^(\\d{4}-\\d{2}-\\d{2})_u(\\d+)_s(\\d+)_k(\\d+)-(.+)$");
+  private static final Pattern batchIdPattern =
+      Pattern.compile("^(\\d{4}-\\d{2}-\\d{2})_u(\\d+)_s(\\d+)_k(\\d+)-(.+)$");
 
   private final String batchId;
-  private final Date date;
+  private final LocalDate date;
   private final long userId;
   private final long sopId;
   private final long kitId;
   private final String kitLot;
 
   public static String generateId(Library library) {
-    if (library.getCreationDate() == null || library.getCreator() == null || library.getSop() == null || library.getKitDescriptor() == null
+    if (library.getCreationDate() == null || library.getCreator() == null || library.getSop() == null
+        || library.getKitDescriptor() == null
         || library.getKitLot() == null) {
       return null;
     }
@@ -39,7 +41,7 @@ public class LibraryBatch implements Serializable {
       throw new IllegalArgumentException("Invalid batch ID");
     }
     this.batchId = batchId;
-    this.date = LimsUtils.parseDate(m.group(1));
+    this.date = LimsUtils.parseLocalDate(m.group(1));
     this.userId = Long.parseLong(m.group(2));
     this.sopId = Long.parseLong(m.group(3));
     this.kitId = Long.parseLong(m.group(4));
@@ -50,7 +52,7 @@ public class LibraryBatch implements Serializable {
     return batchId;
   }
 
-  public Date getDate() {
+  public LocalDate getDate() {
     return date;
   }
 

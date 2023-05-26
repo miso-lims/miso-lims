@@ -1,13 +1,13 @@
 -- ts_many_to_many
 
 CREATE TABLE `TargetedSequencingTemp` (
-  `targetedSequencingId` bigint(20) NOT NULL AUTO_INCREMENT,
+  `targetedSequencingId` bigint NOT NULL AUTO_INCREMENT,
   `alias` varchar(255) NOT NULL,
   `description` varchar(255) NOT NULL,
-  `archived` bit(1) NOT NULL DEFAULT b'0',
-  `createdBy` bigint(20) NOT NULL,
+  `archived` bit NOT NULL DEFAULT b'0',
+  `createdBy` bigint NOT NULL,
   `creationDate` datetime NOT NULL,
-  `updatedBy` bigint(20) NOT NULL,
+  `updatedBy` bigint NOT NULL,
   `lastUpdated` datetime NOT NULL,
   PRIMARY KEY (`targetedSequencingId`),
   UNIQUE KEY `UK_TargetedResequencing_a_kdi2` (`alias`),
@@ -15,22 +15,20 @@ CREATE TABLE `TargetedSequencingTemp` (
   KEY `FK_TargetedResequencing_ub2` (`updatedBy`),
   CONSTRAINT `FK_TargetedResequencing_cb2` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `FK_TargetedResequencing_ub2` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE TargetedSequencing_KitDescriptor (
-  targetedSequencingId bigint(20) NOT NULL,
-  kitDescriptorId bigint(20) NOT NULL,
+  targetedSequencingId bigint NOT NULL,
+  kitDescriptorId bigint NOT NULL,
   PRIMARY KEY (targetedSequencingId,kitDescriptorId),
   CONSTRAINT TK_KitDescriptor_FK FOREIGN KEY (kitDescriptorId) REFERENCES KitDescriptor (kitDescriptorId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO TargetedSequencingTemp(targetedSequencingId, alias, description, archived, createdBy, creationDate, updatedBy, lastUpdated)
 SELECT targetedSequencingId, alias, description, archived, createdBy, creationDate, updatedBy, lastUpdated FROM TargetedSequencing;
 
 INSERT INTO TargetedSequencing_KitDescriptor(targetedSequencingId, kitDescriptorId)
 SELECT targetedSequencingId, kitDescriptorId FROM TargetedSequencing;
-
--- StartNoTest
 
 -- Delete foreign keys if they exist.
 
@@ -55,7 +53,6 @@ set @var=if((SELECT true FROM information_schema.TABLE_CONSTRAINTS WHERE
 prepare stmt from @var;
 execute stmt;
 deallocate prepare stmt;
--- EndNoTest
 
 DROP TABLE TargetedSequencing;
 ALTER TABLE TargetedSequencingTemp RENAME TO TargetedSequencing;
@@ -69,17 +66,14 @@ ALTER TABLE TargetedSequencing_KitDescriptor ADD CONSTRAINT TK_TargetedSequencin
 ALTER TABLE QCType ADD COLUMN archived BOOLEAN NOT NULL DEFAULT FALSE;
 ALTER TABLE QCType ADD COLUMN precisionAfterDecimal INT NOT NULL DEFAULT 0;
 
--- StartNoTest
 DELETE FROM QCType WHERE name = 'STR';
 UPDATE QCType SET precisionAfterDecimal = 0 WHERE name = 'Tape Station';
 UPDATE QCType SET precisionAfterDecimal = -1 WHERE name = 'DNAse Treated';
 UPDATE QCType SET name = 'Qubit' WHERE name = 'QuBit';
--- EndNoTest
 
 ALTER TABLE LibraryQC ADD CONSTRAINT fk_libraryQc_library FOREIGN KEY (library_libraryId) REFERENCES Library (libraryId);
 ALTER TABLE LibraryQC ADD CONSTRAINT fk_libraryQc_qcType FOREIGN KEY (qcMethod) REFERENCES QCType (qcTypeId);
 
--- StartNoTest
 INSERT INTO QCType (name, description, qcTarget, units) 
 SELECT 'Insert Size', 'Insert Size', 'Library', 'bp' FROM DUAL
 WHERE NOT EXISTS (SELECT * FROM QCType WHERE qcTarget = 'Library' AND units = 'bp') LIMIT 1;
@@ -87,17 +81,15 @@ WHERE NOT EXISTS (SELECT * FROM QCType WHERE qcTarget = 'Library' AND units = 'b
 SELECT qcTypeId INTO @tapeStationId FROM QCType WHERE qcTarget = 'Library' AND units = 'bp'; 
 INSERT INTO LibraryQC (library_libraryId, qcUserName, qcDate, results, qcMethod, insertSize) 
   SELECT library_libraryId, qcUserName, qcDate, insertSize, @tapeStationId, 1 FROM LibraryQC WHERE insertSize <> 0;
--- EndNoTest
 
 ALTER TABLE SampleQC CHANGE COLUMN qcUserName qcCreator varchar(255) NOT NULL;
 ALTER TABLE LibraryQC CHANGE COLUMN qcUserName qcCreator varchar(255) NOT NULL;
 ALTER TABLE PoolQC CHANGE COLUMN qcUserName qcCreator varchar(255) NOT NULL;
 ALTER TABLE RunQC CHANGE COLUMN qcUserName qcCreator varchar(255) NOT NULL;
 
-
 -- library_size
 
-ALTER TABLE Library ADD COLUMN dnaSize bigint(20);
+ALTER TABLE Library ADD COLUMN dnaSize bigint;
 
 UPDATE Library SET dnaSize = (SELECT insertSize FROM LibraryQC WHERE LibraryQC.library_libraryId = Library.libraryId AND insertSize IS NOT NULL AND insertSize != 0 ORDER BY qcDate LIMIT 1);
 

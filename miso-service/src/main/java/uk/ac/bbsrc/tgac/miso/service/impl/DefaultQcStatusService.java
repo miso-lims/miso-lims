@@ -1,8 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Collection;
-import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -71,122 +72,122 @@ public class DefaultQcStatusService implements QcStatusService {
     // Since we're editing managed objects in session here, we can't depend on the saving service
     // to detect changes and set QC users
     switch (update.getEntityType()) {
-    case SAMPLE: {
-      Sample sample = sampleService.get(update.getId());
-      updateDetailedStatus(EntityType.SAMPLE.getLabel(), sample, update);
-      sampleService.update(sample);
-      break;
-    }
-    case LIBRARY: {
-      Library library = libraryService.get(update.getId());
-      updateDetailedStatus(EntityType.LIBRARY.getLabel(), library, update);
-      libraryService.update(library);
-      break;
-    }
-    case LIBRARY_ALIQUOT: {
-      LibraryAliquot aliquot = libraryAliquotService.get(update.getId());
-      updateDetailedStatus(EntityType.LIBRARY_ALIQUOT.getLabel(), aliquot, update);
-      libraryAliquotService.update(aliquot);
-      break;
-    }
-    case POOL: {
-      Pool pool = poolService.get(update.getId());
-      throwIfNull(EntityType.POOL.getLabel(), pool);
-      pool.setQcPassed(update.getQcPassed());
-      poolService.update(pool);
-      break;
-    }
-    case RUN: {
-      Run run = runService.get(update.getId());
-      throwIfNull("Run", run);
-      if (update.getQcPassed() == null) {
-        // QC Passed not set
-        run.setQcPassed(null);
-        run.setQcUser(null);
-        run.setQcDate(null);
-        clearDataReview(run);
-      } else if (!update.getQcPassed().equals(run.getQcPassed())) {
-        // QC Passed set and changed
-        run.setQcPassed(update.getQcPassed());
-        run.setQcUser(authorizationManager.getCurrentUser());
-        run.setQcDate(new Date());
-        clearDataReview(run);
-      } else if (update.getDataReview() == null) {
-        // QC Passed set and not changed, data review not set
-        clearDataReview(run);
-      } else {
-        // QC Passed set and not changed, data review set and changed
-        run.setDataReview(update.getDataReview());
-        run.setDataReviewer(authorizationManager.getCurrentUser());
-        run.setDataReviewDate(new Date());
+      case SAMPLE: {
+        Sample sample = sampleService.get(update.getId());
+        updateDetailedStatus(EntityType.SAMPLE.getLabel(), sample, update);
+        sampleService.update(sample);
+        break;
       }
-      runService.update(run);
-      break;
-    }
-    case RUN_PARTITION: {
-      if (update.getIds() == null || update.getIds().length != 2) {
-        throw new ValidationException("Invalid ID for run-partition");
+      case LIBRARY: {
+        Library library = libraryService.get(update.getId());
+        updateDetailedStatus(EntityType.LIBRARY.getLabel(), library, update);
+        libraryService.update(library);
+        break;
       }
-      Run run = runService.get(update.getIds()[0]);
-      throwIfNull("Run", run);
-      Partition partition = findPartitionInRun(run, update.getIds()[1]);
-      RunPartition runPartition = runPartitionService.get(run, partition);
+      case LIBRARY_ALIQUOT: {
+        LibraryAliquot aliquot = libraryAliquotService.get(update.getId());
+        updateDetailedStatus(EntityType.LIBRARY_ALIQUOT.getLabel(), aliquot, update);
+        libraryAliquotService.update(aliquot);
+        break;
+      }
+      case POOL: {
+        Pool pool = poolService.get(update.getId());
+        throwIfNull(EntityType.POOL.getLabel(), pool);
+        pool.setQcPassed(update.getQcPassed());
+        poolService.update(pool);
+        break;
+      }
+      case RUN: {
+        Run run = runService.get(update.getId());
+        throwIfNull("Run", run);
+        if (update.getQcPassed() == null) {
+          // QC Passed not set
+          run.setQcPassed(null);
+          run.setQcUser(null);
+          run.setQcDate(null);
+          clearDataReview(run);
+        } else if (!update.getQcPassed().equals(run.getQcPassed())) {
+          // QC Passed set and changed
+          run.setQcPassed(update.getQcPassed());
+          run.setQcUser(authorizationManager.getCurrentUser());
+          run.setQcDate(LocalDate.now(ZoneId.systemDefault()));
+          clearDataReview(run);
+        } else if (update.getDataReview() == null) {
+          // QC Passed set and not changed, data review not set
+          clearDataReview(run);
+        } else {
+          // QC Passed set and not changed, data review set and changed
+          run.setDataReview(update.getDataReview());
+          run.setDataReviewer(authorizationManager.getCurrentUser());
+          run.setDataReviewDate(LocalDate.now(ZoneId.systemDefault()));
+        }
+        runService.update(run);
+        break;
+      }
+      case RUN_PARTITION: {
+        if (update.getIds() == null || update.getIds().length != 2) {
+          throw new ValidationException("Invalid ID for run-partition");
+        }
+        Run run = runService.get(update.getIds()[0]);
+        throwIfNull("Run", run);
+        Partition partition = findPartitionInRun(run, update.getIds()[1]);
+        RunPartition runPartition = runPartitionService.get(run, partition);
 
-      if (update.getQcStatusId() == null) {
-        runPartition.setQcType(null);
-      } else {
-        PartitionQCType status = partitionQcTypeService.get(update.getQcStatusId());
-        throwIfNull("Partition QC type", status);
-        runPartition.setQcType(status);
+        if (update.getQcStatusId() == null) {
+          runPartition.setQcType(null);
+        } else {
+          PartitionQCType status = partitionQcTypeService.get(update.getQcStatusId());
+          throwIfNull("Partition QC type", status);
+          runPartition.setQcType(status);
+        }
+        runPartition.setNotes(update.getQcNote());
+        runPartition.setLastModifier(authorizationManager.getCurrentUser());
+        runPartitionService.save(runPartition);
+        break;
       }
-      runPartition.setNotes(update.getQcNote());
-      runPartition.setLastModifier(authorizationManager.getCurrentUser());
-      runPartitionService.save(runPartition);
-      break;
-    }
-    case RUN_LIBRARY: {
-      if (update.getIds() == null || update.getIds().length != 3) {
-        throw new ValidationException("Invalid ID for run-partition");
+      case RUN_LIBRARY: {
+        if (update.getIds() == null || update.getIds().length != 3) {
+          throw new ValidationException("Invalid ID for run-partition");
+        }
+        Run run = runService.get(update.getIds()[0]);
+        throwIfNull("Run", run);
+        Partition partition = findPartitionInRun(run, update.getIds()[1]);
+        ListLibraryAliquotView aliquotView = partition.getPool().getPoolContents().stream()
+            .map(PoolElement::getAliquot)
+            .filter(x -> x.getId() == update.getIds()[2])
+            .findFirst().orElse(null);
+        throwIfNull("Run-library", aliquotView);
+        LibraryAliquot aliquot = libraryAliquotService.get(update.getIds()[2]);
+        RunPartitionAliquot runLib = runPartitionAliquotService.get(run, partition, aliquot);
+        if (update.getQcStatusId() == null) {
+          // QC status not set
+          runLib.setQcStatus(null);
+          runLib.setQcUser(null);
+          runLib.setQcDate(null);
+          clearDataReview(runLib);
+        } else if (runLib.getQcStatus() == null || runLib.getQcStatus().getId() != update.getQcStatusId().longValue()) {
+          // QC status set and changed
+          RunLibraryQcStatus status = runLibraryQcStatusService.get(update.getQcStatusId());
+          throwIfNull("Run-library QC status", status);
+          runLib.setQcStatus(status);
+          runLib.setQcUser(authorizationManager.getCurrentUser());
+          runLib.setQcDate(LocalDate.now(ZoneId.systemDefault()));
+          clearDataReview(runLib);
+        } else if (update.getDataReview() == null) {
+          // QC status set and not changed, data review not set
+          clearDataReview(runLib);
+        } else if (update.getDataReview() != runLib.getDataReview()) {
+          // QC status set and not changed, data review set and changed
+          runLib.setDataReview(update.getDataReview());
+          runLib.setDataReviewer(authorizationManager.getCurrentUser());
+          runLib.setDataReviewDate(LocalDate.now(ZoneId.systemDefault()));
+        }
+        runLib.setQcNote(update.getQcNote());
+        runPartitionAliquotService.save(runLib);
+        break;
       }
-      Run run = runService.get(update.getIds()[0]);
-      throwIfNull("Run", run);
-      Partition partition = findPartitionInRun(run, update.getIds()[1]);
-      ListLibraryAliquotView aliquotView = partition.getPool().getPoolContents().stream()
-          .map(PoolElement::getAliquot)
-          .filter(x -> x.getId() == update.getIds()[2])
-          .findFirst().orElse(null);
-      throwIfNull("Run-library", aliquotView);
-      LibraryAliquot aliquot = libraryAliquotService.get(update.getIds()[2]);
-      RunPartitionAliquot runLib = runPartitionAliquotService.get(run, partition, aliquot);
-      if (update.getQcStatusId() == null) {
-        // QC status not set
-        runLib.setQcStatus(null);
-        runLib.setQcUser(null);
-        runLib.setQcDate(null);
-        clearDataReview(runLib);
-      } else if (runLib.getQcStatus() == null || runLib.getQcStatus().getId() != update.getQcStatusId().longValue()) {
-        // QC status set and changed
-        RunLibraryQcStatus status = runLibraryQcStatusService.get(update.getQcStatusId());
-        throwIfNull("Run-library QC status", status);
-        runLib.setQcStatus(status);
-        runLib.setQcUser(authorizationManager.getCurrentUser());
-        runLib.setQcDate(new Date());
-        clearDataReview(runLib);
-      } else if (update.getDataReview() == null) {
-        // QC status set and not changed, data review not set
-        clearDataReview(runLib);
-      } else if (update.getDataReview() != runLib.getDataReview()) {
-        // QC status set and not changed, data review set and changed
-        runLib.setDataReview(update.getDataReview());
-        runLib.setDataReviewer(authorizationManager.getCurrentUser());
-        runLib.setDataReviewDate(new Date());
-      }
-      runLib.setQcNote(update.getQcNote());
-      runPartitionAliquotService.save(runLib);
-      break;
-    }
-    default:
-      throw new ValidationException("Unsupported entity type");
+      default:
+        throw new ValidationException("Unsupported entity type");
     }
   }
 
@@ -208,12 +209,13 @@ public class DefaultQcStatusService implements QcStatusService {
       item.setDetailedQcStatus(null);
       item.setQcUser(null);
       item.setQcDate(null);
-    } else if (item.getDetailedQcStatus() == null || item.getDetailedQcStatus().getId() != update.getQcStatusId().longValue()) {
+    } else if (item.getDetailedQcStatus() == null
+        || item.getDetailedQcStatus().getId() != update.getQcStatusId().longValue()) {
       DetailedQcStatus status = detailedQcStatusService.get(update.getQcStatusId());
       throwIfNull("QC status", status);
       item.setDetailedQcStatus(status);
       item.setQcUser(authorizationManager.getCurrentUser());
-      item.setQcDate(new Date());
+      item.setQcDate(LocalDate.now(ZoneId.systemDefault()));
     }
     item.setDetailedQcStatusNote(update.getQcNote());
   }

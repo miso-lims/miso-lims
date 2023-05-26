@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -104,8 +106,9 @@ public class HibernateLibraryAliquotDaoIT extends AbstractDAOTest {
 
   @Test
   public void testListAllLibraryAliquotsBySearchByIdentificationBarcode() throws IOException {
-    final Collection<LibraryAliquot> list = dao.list(0, 0, false, "id", PaginationFilter.query("LDI1::TEST_0001_Bn_P_PE_300_WG"),
-        PaginationFilter.platformType(PlatformType.ILLUMINA));
+    final Collection<LibraryAliquot> list =
+        dao.list(0, 0, false, "id", PaginationFilter.query("LDI1::TEST_0001_Bn_P_PE_300_WG"),
+            PaginationFilter.platformType(PlatformType.ILLUMINA));
     assertEquals(1, list.size());
     assertEquals("LDI1::TEST_0001_Bn_P_PE_300_WG", list.iterator().next().getIdentificationBarcode());
   }
@@ -198,13 +201,15 @@ public class HibernateLibraryAliquotDaoIT extends AbstractDAOTest {
     UserImpl user = new UserImpl();
     user.setId(1L);
     user.setFullName("moi");
+    Date now = new Date();
     lib.setId(1L);
     ld.setCreator(user);
     ld.setLastModifier(user);
+    ld.setLastModified(now);
     ld.setLibrary(lib);
     ld.setConcentration(new BigDecimal("12.5"));
-    ld.setCreationDate(new Date());
-    ld.setCreationTime(new Date());
+    ld.setCreationDate(LocalDate.now(ZoneId.systemDefault()));
+    ld.setCreationTime(now);
     ld.setName("nom de plume");
     ld.setAlias("TEST");
     Long newId = dao.save(ld);

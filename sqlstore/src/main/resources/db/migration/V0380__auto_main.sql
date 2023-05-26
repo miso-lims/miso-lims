@@ -13,6 +13,6 @@ ALTER TABLE Submission DROP COLUMN name;
 
 -- tarseq_required
 
-ALTER TABLE LibraryDesignCode ADD COLUMN targetedSequencingRequired TINYINT(1) NOT NULL DEFAULT 0;
+ALTER TABLE LibraryDesignCode ADD COLUMN targetedSequencingRequired tinyint NOT NULL DEFAULT 0;
 
 

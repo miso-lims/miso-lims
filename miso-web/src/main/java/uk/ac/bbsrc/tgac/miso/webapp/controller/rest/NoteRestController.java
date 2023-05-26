@@ -1,30 +1,8 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.ZoneId;
 
 import javax.ws.rs.core.Response.Status;
 
@@ -88,24 +66,27 @@ public class NoteRestController extends RestController {
   @Autowired
   private RequisitionService requisitionService;
 
-  private <T extends Identifiable> void addNote(NoteService<T> service, long entityId, NoteRequest request) throws IOException {
+  private <T extends Identifiable> void addNote(NoteService<T> service, long entityId, NoteRequest request)
+      throws IOException {
     T entity = service.get(entityId);
     Note note = new Note();
 
     note.setInternalOnly(request.isInternalOnly());
     note.setText(request.getText());
-    note.setCreationDate(new Date());
+    note.setCreationDate(LocalDate.now(ZoneId.systemDefault()));
     service.addNote(entity, note);
   }
 
   @PostMapping(value = "/{entityType}/{entityId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void addNote(@PathVariable(name = "entityType") String entityType, @PathVariable(name = "entityId") long entityId,
+  public void addNote(@PathVariable(name = "entityType") String entityType,
+      @PathVariable(name = "entityId") long entityId,
       @RequestBody NoteRequest request) throws IOException {
     addNote(serviceForEntityType(entityType), entityId, request);
   }
 
-  private <T extends Identifiable> void deleteNote(NoteService<T> service, long entityId, long noteId) throws IOException {
+  private <T extends Identifiable> void deleteNote(NoteService<T> service, long entityId, long noteId)
+      throws IOException {
     T entity = service.get(entityId);
     service.deleteNote(entity, noteId);
 
@@ -113,25 +94,26 @@ public class NoteRestController extends RestController {
 
   @DeleteMapping(value = "/{entityType}/{entityId}/{noteId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void deleteNote(@PathVariable(name = "entityType") String entityType, @PathVariable(name = "entityId") long entityId,
+  public void deleteNote(@PathVariable(name = "entityType") String entityType,
+      @PathVariable(name = "entityId") long entityId,
       @PathVariable(name = "noteId") long noteId) throws IOException {
     deleteNote(serviceForEntityType(entityType), entityId, noteId);
   }
 
   private NoteService<?> serviceForEntityType(String entityType) {
     switch (entityType) {
-    case "sample":
-      return sampleService;
-    case "library":
-      return libraryService;
-    case "pool":
-      return poolService;
-    case "run":
-      return runService;
-    case "requisition":
-      return requisitionService;
-    default:
-      throw new RestException("Unknown entity type: " + entityType, Status.NOT_FOUND);
+      case "sample":
+        return sampleService;
+      case "library":
+        return libraryService;
+      case "pool":
+        return poolService;
+      case "run":
+        return runService;
+      case "requisition":
+        return requisitionService;
+      default:
+        throw new RestException("Unknown entity type: " + entityType, Status.NOT_FOUND);
     }
   }
 

@@ -1,8 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -79,7 +79,7 @@ public class SequencingContainerModel implements Aliasable, Deletable, Serializa
   }
 
   @Override
-  public Date getBarcodeDate() {
+  public LocalDate getBarcodeDate() {
     return null;
   }
 
