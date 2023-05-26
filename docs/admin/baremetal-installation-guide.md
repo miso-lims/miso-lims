@@ -5,6 +5,8 @@ Docker compose, and is not trivial to set up. We recommend using Docker compose
 if possible by following the
 [Docker compose installation guide](../compose-installation-guide).
 
+Refer [here](#server-deployment-troubleshooting) in the event that you run into issues during installation.
+
 ## Prerequisites
 
 For each service, which may be put on the same machine, the following tools are
@@ -74,6 +76,8 @@ need to add a grant privilege to the MISO database from your remote machine:
 
     GRANT ALL ON `lims`.* TO 'tgaclims'@'your.tomcat.install.server';
     GRANT ALL ON `lims`.* TO 'tgaclims'@'your.tomcat.install.server' IDENTIFIED BY 'tgaclims';
+
+Refer to [Development Alternatives](#development-alternatives) for a different way to do this step.
 
 
 # Setting Up the Application Server
@@ -240,3 +244,28 @@ If you run into an issue with migration `V0611`, ensure that the user running Fl
 
 If you encounter other errors migrating the database, make sure that you are using the recommended version of Flyway
 (see [Prerequisites](#prerequisites)).
+
+# Server Deployment Troubleshooting
+
+* Whenever unexpected behaviour arises, be sure to check the build logs, located at `${CATALINA_BASE}/logs`. Read through the output of `catalina.out`, `catalina.<date>.log`, and `localhost.<date>.log`.
+* Ensure you are using the correct version of Java with Tomcat. This can be checked in `catalina.out`. In case you are not, append/modify the value of `$JAVA_HOME` in `setenv.sh` or `/etc/default/tomcat9`. 
+* If file access for `/storage/miso` is causing an error, [this](https://stackoverflow.com/questions/56827735/how-to-allow-tomcat-war-app-to-write-in-folder) may help.
+
+
+# Development Alternatives
+
+ If you can't or don't want to install the correct version of MySQL, this alternative allows the same result without you downloading it. To do this, download [Docker](https://docs.docker.com/get-docker/) to use a Docker container. Creating the container:
+
+    docker run --name $CONTAINER_NAME -e MYSQL_ROOT_PASSWORD=$ROOT_PASSWORD -e MYSQL_DATABASE=$DB_NAME -e MYSQL_USER=$DB_USERNAME -e MYSQL_PASSWORD=$DB_PASSWORD -p 3306:3306 -d mysql:8.0
+
+
+Where:
+* `$CONTAINER_NAME` is your desired Docker container name.
+* `$ROOT_PASSWORD` is the root password to your MySQL.
+* `$DB_NAME` is the name of the database (e.g. "lims").
+* `$DB_USERNAME` is the username to access the database (e.g. "tgaclims").
+* `$DB_PASSWORD` is the password to access the database (e.g. "tgaclims").
+
+To map to a different port, change `-p 3306:3306` to `-p $PORT:3306`, where `$PORT` is your desired port.
+
+If you use this container method, you can skip the [database configuration](#setting-up-the-database-server) step entirely.
