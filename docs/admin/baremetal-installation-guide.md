@@ -254,7 +254,7 @@ If you encounter other errors migrating the database, make sure that you are usi
 
 # Development Alternatives
 
- If you can't or don't want to install the correct version of MySQL installed, this alternative allows the same result without you downloading it. To do this, download [Docker](https://docs.docker.com/get-docker/) to use a Docker container. Creating the container:
+ If you can't or don't want to install the correct version of MySQL, this alternative allows the same result without you downloading it. To do this, download [Docker](https://docs.docker.com/get-docker/) to use a Docker container. Creating the container:
 
     docker run --name $CONTAINER_NAME -e MYSQL_ROOT_PASSWORD=$ROOT_PASSWORD -e MYSQL_DATABASE=$DB_NAME -e MYSQL_USER=$DB_USERNAME -e MYSQL_PASSWORD=$DB_PASSWORD -p 3306:3306 -d mysql:8.0
 
