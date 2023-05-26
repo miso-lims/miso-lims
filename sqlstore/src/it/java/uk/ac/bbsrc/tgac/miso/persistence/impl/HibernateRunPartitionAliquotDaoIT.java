@@ -35,6 +35,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAliquotStore;
 import uk.ac.bbsrc.tgac.miso.persistence.RunStore;
 
@@ -82,7 +83,8 @@ public class HibernateRunPartitionAliquotDaoIT extends AbstractDAOTest {
       throws IOException {
     Run run = (Run) currentSession().get(Run.class, runId);
     Partition partition = (Partition) currentSession().get(PartitionImpl.class, partitionId);
-    LibraryAliquot aliquot = (LibraryAliquot) currentSession().get(LibraryAliquot.class, aliquotId);
+    ListLibraryAliquotView aliquot =
+        (ListLibraryAliquotView) currentSession().get(ListLibraryAliquotView.class, aliquotId);
 
     RunPartitionAliquotId id = new RunPartitionAliquotId(run, partition, aliquot);
     RunPartitionAliquot existing = (RunPartitionAliquot) currentSession().get(RunPartitionAliquot.class, id);
@@ -134,14 +136,14 @@ public class HibernateRunPartitionAliquotDaoIT extends AbstractDAOTest {
     List<RunPartitionAliquot> results = sut.listByLibraryIdList(Arrays.asList(2L));
     assertNotNull(results);
     assertEquals(1, results.size());
-    assertEquals(2L, results.get(0).getAliquot().getLibrary().getId());
+    assertEquals(2L, results.get(0).getAliquot().getParentLibrary().getId());
   }
 
   @Test
   public void testSaveCreate() throws Exception {
     Run run = (Run) currentSession().get(Run.class, 1L);
     Partition partition = (Partition) currentSession().get(PartitionImpl.class, 2L);
-    LibraryAliquot aliquot = (LibraryAliquot) currentSession().get(LibraryAliquot.class, 3L);
+    ListLibraryAliquotView aliquot = (ListLibraryAliquotView) currentSession().get(ListLibraryAliquotView.class, 3L);
     RunPartitionAliquotId id = new RunPartitionAliquotId(run, partition, aliquot);
     assertNull(currentSession().get(RunPartitionAliquot.class, id));
 
@@ -167,7 +169,7 @@ public class HibernateRunPartitionAliquotDaoIT extends AbstractDAOTest {
   public void testSaveUpdate() throws Exception {
     Run run = (Run) currentSession().get(Run.class, 1L);
     Partition partition = (Partition) currentSession().get(PartitionImpl.class, 1L);
-    LibraryAliquot aliquot = (LibraryAliquot) currentSession().get(LibraryAliquot.class, 1L);
+    ListLibraryAliquotView aliquot = (ListLibraryAliquotView) currentSession().get(ListLibraryAliquotView.class, 1L);
     RunPartitionAliquotId id = new RunPartitionAliquotId(run, partition, aliquot);
 
     RunPartitionAliquot existing = (RunPartitionAliquot) currentSession().get(RunPartitionAliquot.class, id);

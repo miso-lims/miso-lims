@@ -4,10 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentSample;
 
 public enum RunLibrarySpreadsheets implements Spreadsheet<RunPartitionAliquot> {
 
@@ -18,16 +16,19 @@ public enum RunLibrarySpreadsheets implements Spreadsheet<RunPartitionAliquot> {
       Column.forString("Pool Name", runLib -> runLib.getPartition().getPool().getName()), //
       Column.forString("Library Aliquot Name", runLib -> runLib.getAliquot().getName()), //
       Column.forString("Library Aliquot Alias", runLib -> runLib.getAliquot().getAlias()), //
-      Column.forString("External Name", true, getDetailedSampleAttribute(sam -> sam.getIdentityAttributes().getExternalName())), //
+      Column.forString("External Name", true,
+          getDetailedSampleAttribute(sam -> sam.getIdentityAttributes().getExternalName())), //
       Column.forString("Subproject", true,
-          getDetailedSampleAttribute(sam -> sam.getSubproject() == null ? null : sam.getSubproject().getAlias())) //
+          getDetailedSampleAttribute(
+              sam -> sam.getParentSubproject() == null ? null : sam.getParentSubproject().getAlias())) //
   );
 
-  private static Function<RunPartitionAliquot, String> getDetailedSampleAttribute(Function<DetailedSample, String> getter) {
+  private static Function<RunPartitionAliquot, String> getDetailedSampleAttribute(
+      Function<ParentSample, String> getter) {
     return runLibrary -> {
-      Sample sample = runLibrary.getAliquot().getLibrary().getSample();
-      if (LimsUtils.isDetailedSample(sample)) {
-        return getter.apply((DetailedSample) sample);
+      ParentSample sample = runLibrary.getAliquot().getParentLibrary().getParentSample();
+      if (sample.getParentAttributes() != null) {
+        return getter.apply((ParentSample) sample);
       } else {
         return null;
       }

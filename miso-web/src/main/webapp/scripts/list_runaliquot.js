@@ -187,6 +187,44 @@ ListTarget.runaliquot = {
         true
       ),
       {
+        sTitle: "Tissue Attributes",
+        mData: "tissueOriginAlias",
+        include: Constants.isDetailedSample,
+        mRender: function (data, type, full) {
+          if (type !== "display") {
+            return data;
+          } else if (!data) {
+            return "n/a";
+          }
+          return (
+            '<div class="tooltip" style="width: 100%;">' +
+            "<span>" +
+            full.tissueOriginAlias +
+            " " +
+            full.tissueTypeAlias +
+            "</span>" +
+            '<span class="tooltiptext">' +
+            "Tissue origin: " +
+            full.tissueOriginAlias +
+            " (" +
+            full.tissueOriginDescription +
+            ")<br/>" +
+            "Tissue type: " +
+            full.tissueTypeAlias +
+            " (" +
+            full.tissueTypeDescription +
+            ")<br/>" +
+            "</span>" +
+            "</div>"
+          );
+        },
+      },
+      {
+        sTitle: "Design",
+        mData: "libraryDesignCode",
+        include: Constants.isDetailedSample,
+      },
+      {
         sTitle: "QC Status",
         mData: "qcStatusId",
         mRender: function (data, type, full) {

@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
@@ -73,7 +50,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
@@ -85,6 +61,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.core.service.ListLibraryAliquotViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.PartitionQcTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionService;
@@ -223,6 +200,8 @@ public class RunRestController extends RestController {
   @Autowired
   private LibraryAliquotService libraryAliquotService;
   @Autowired
+  private ListLibraryAliquotViewService listLibraryAliquotViewService;
+  @Autowired
   private ExperimentService experimentService;
   @Autowired
   private RunPurposeService runPurposeService;
@@ -252,7 +231,8 @@ public class RunRestController extends RestController {
     }
 
   })
-      .add(new RelationFinder.ParentSampleAdapter<>(SampleIdentity.CATEGORY_NAME, SampleIdentity.class, this::getSamples))//
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleIdentity.CATEGORY_NAME, SampleIdentity.class,
+          this::getSamples))//
       .add(new RelationFinder.ParentSampleAdapter<>(SampleTissue.CATEGORY_NAME, SampleTissue.class, this::getSamples))//
       .add(new RelationFinder.ParentSampleAdapter<>(SampleTissueProcessing.CATEGORY_NAME, SampleTissueProcessing.class,
           this::getSamples))//
@@ -269,7 +249,7 @@ public class RunRestController extends RestController {
         public Stream<Sample> find(Run model, Consumer<String> emitError) throws IOException {
           return getSamples(model);
         }
-        
+
       })
       .add(new RelationFinder.RelationAdapter<Run, Library, LibraryDto>("Library") {
 
@@ -366,7 +346,8 @@ public class RunRestController extends RestController {
   }
 
   @GetMapping(value = "/{runId}/samplesheet/{sheet}")
-  public HttpEntity<String> getSampleSheetForRun(@PathVariable(name = "runId") Long runId, @PathVariable(name = "sheet") String sheet,
+  public HttpEntity<String> getSampleSheetForRun(@PathVariable(name = "runId") Long runId,
+      @PathVariable(name = "sheet") String sheet,
       HttpServletResponse response) throws IOException {
     Run run = runService.get(runId);
     return getSampleSheetForRun(run, SampleSheet.valueOf(sheet), response);
@@ -379,14 +360,16 @@ public class RunRestController extends RestController {
     return getSampleSheetForRun(run, SampleSheet.valueOf(sheet), response);
   }
 
-  private HttpEntity<String> getSampleSheetForRun(Run run, SampleSheet casavaVersion, HttpServletResponse response) throws IOException {
+  private HttpEntity<String> getSampleSheetForRun(Run run, SampleSheet casavaVersion, HttpServletResponse response)
+      throws IOException {
     if (run == null) {
       throw new RestException("Run does not exist.", Status.NOT_FOUND);
     }
     User user = authorizationManager.getCurrentUser();
     if (run.getSequencerPartitionContainers().size() != 1) {
       throw new RestException(
-          "Expected 1 sequencing container for run " + run.getAlias() + ", but found " + run.getSequencerPartitionContainers().size());
+          "Expected 1 sequencing container for run " + run.getAlias() + ", but found "
+              + run.getSequencerPartitionContainers().size());
     }
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(new MediaType("text", "csv"));
@@ -404,13 +387,15 @@ public class RunRestController extends RestController {
 
   @GetMapping(value = "/dt/project/{id}", produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<RunDto> dataTableByProject(@PathVariable("id") Long id, HttpServletRequest request) throws IOException {
+  public DataTablesResponseDto<RunDto> dataTableByProject(@PathVariable("id") Long id, HttpServletRequest request)
+      throws IOException {
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.project(id));
   }
 
   @GetMapping(value = "/dt/platform/{platform}", produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<RunDto> dataTableByPlatform(@PathVariable("platform") String platform, HttpServletRequest request)
+  public DataTablesResponseDto<RunDto> dataTableByPlatform(@PathVariable("platform") String platform,
+      HttpServletRequest request)
       throws IOException {
     PlatformType platformType = PlatformType.valueOf(platform);
     if (platformType == null) {
@@ -444,7 +429,8 @@ public class RunRestController extends RestController {
     if (container.getModel().getInstrumentModels().stream()
         .noneMatch(platform -> platform.getId() == runPlatform.getId())) {
       throw new RestException(String.format("Container model '%s' (%s) is not compatible with %s (%s) run",
-          container.getModel().getAlias(), container.getModel().getPlatformType(), run.getSequencer().getInstrumentModel().getAlias(),
+          container.getModel().getAlias(), container.getModel().getPlatformType(),
+          run.getSequencer().getInstrumentModel().getAlias(),
           run.getSequencer().getInstrumentModel().getPlatformType()), Status.BAD_REQUEST);
     }
     RunPosition runPos = new RunPosition();
@@ -472,9 +458,11 @@ public class RunRestController extends RestController {
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
   public void setQc(@PathVariable Long runId, @RequestBody RunPartitionQCRequest request) throws IOException {
     Run run = RestUtils.retrieve("Run", runId, runService);
-    PartitionQCType qcType = partitionQcTypeService.list().stream().filter(qt -> qt.getId() == request.getQcTypeId().longValue()).findAny()
-        .orElseThrow(
-            () -> new RestException(String.format("No partition QC type found with ID: %d", request.getQcTypeId()), Status.BAD_REQUEST));
+    PartitionQCType qcType =
+        partitionQcTypeService.list().stream().filter(qt -> qt.getId() == request.getQcTypeId().longValue()).findAny()
+            .orElseThrow(
+                () -> new RestException(String.format("No partition QC type found with ID: %d", request.getQcTypeId()),
+                    Status.BAD_REQUEST));
     run.getSequencerPartitionContainers().stream()//
         .flatMap(container -> container.getPartitions().stream())//
         .filter(partition -> request.partitionIds.contains(partition.getId()))//
@@ -493,7 +481,8 @@ public class RunRestController extends RestController {
 
   @PutMapping("/{runId}/partition-purposes")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void setPartitionPurposes(@PathVariable long runId, @RequestBody RunPartitionPurposeRequest request) throws IOException {
+  public void setPartitionPurposes(@PathVariable long runId, @RequestBody RunPartitionPurposeRequest request)
+      throws IOException {
     Run run = RestUtils.retrieve("Run", runId, runService);
     RunPurpose purpose = RestUtils.retrieve("Run purpose", request.getRunPurposeId(), runPurposeService);
     List<Partition> partitions = run.getSequencerPartitionContainers().stream()
@@ -514,7 +503,8 @@ public class RunRestController extends RestController {
 
   @PutMapping("/{runId}/aliquots")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void saveAliquots(@PathVariable long runId, @RequestBody List<RunPartitionAliquotDto> dtos) throws IOException {
+  public void saveAliquots(@PathVariable long runId, @RequestBody List<RunPartitionAliquotDto> dtos)
+      throws IOException {
     RestUtils.retrieve("Run", runId, runService);
     List<RunPartitionAliquot> runPartitionAliquots = dtos.stream().map(Dtos::to).collect(Collectors.toList());
     runPartitionAliquotService.save(runPartitionAliquots);
@@ -560,7 +550,8 @@ public class RunRestController extends RestController {
           result.experiment.setInstrumentModel(instrumentModelDto);
           result.experiment.setPartitions(group.getValue());
 
-          result.studies = group.getKey().getSample().getProject().getStudies().stream().map(Dtos::asDto).collect(Collectors.toList());
+          result.studies = group.getKey().getSample().getProject().getStudies().stream().map(Dtos::asDto)
+              .collect(Collectors.toList());
           return result;
         }).collect(Collectors.toList());
   }
@@ -593,11 +584,13 @@ public class RunRestController extends RestController {
     Map<Library, List<Partition>> libraryGroups = getLibraryGroups(run);
 
     return libraryGroups.entrySet().stream()
-        .<AddRequest> flatMap(WhineyFunction.rethrow(group -> //
+        .<AddRequest>flatMap(WhineyFunction.rethrow(group -> //
         experimentService.listAllByLibraryId(group.getKey().getId()).stream()//
-            .filter(experiment -> experiment.getInstrumentModel().getId() == run.getSequencer().getInstrumentModel().getId())
+            .filter(experiment -> experiment.getInstrumentModel().getId() == run.getSequencer().getInstrumentModel()
+                .getId())
             .flatMap(experiment -> group.getValue().stream()//
-                .filter(partition -> experiment.getRunPartitions().stream().noneMatch(rp -> rp.getPartition().equals(partition)))
+                .filter(partition -> experiment.getRunPartitions().stream()
+                    .noneMatch(rp -> rp.getPartition().equals(partition)))
                 .map(partition -> {
                   AddRequest request = new AddRequest();
                   request.experiment = Dtos.asDto(experiment);
@@ -685,14 +678,15 @@ public class RunRestController extends RestController {
         for (Partition partition : runPosition.getContainer().getPartitions()) {
           if (partition.getPool() != null) {
             for (PoolElement element : partition.getPool().getPoolContents()) {
-              LibraryAliquot aliquot = libraryAliquotService.get(element.getAliquot().getId());
+              ListLibraryAliquotView aliquot = listLibraryAliquotViewService.get(element.getAliquot().getId());
               runLibraries.add(new RunPartitionAliquot(run, partition, aliquot));
             }
           }
         }
       }
     }
-    return MisoWebUtils.generateSpreadsheet(request, runLibraries.stream(), detailedSample, RunLibrarySpreadsheets::valueOf, response);
+    return MisoWebUtils.generateSpreadsheet(request, runLibraries.stream(), detailedSample,
+        RunLibrarySpreadsheets::valueOf, response);
   }
 
 }

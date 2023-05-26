@@ -24,10 +24,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot.RunPartitionAliquotId;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
-import uk.ac.bbsrc.tgac.miso.persistence.LibraryAliquotStore;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryStore;
+import uk.ac.bbsrc.tgac.miso.persistence.ListLibraryAliquotViewDao;
 import uk.ac.bbsrc.tgac.miso.persistence.RunPartitionAliquotDao;
 import uk.ac.bbsrc.tgac.miso.persistence.RunStore;
 
@@ -40,7 +40,7 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
   @Autowired
   private RunStore runStore;
   @Autowired
-  private LibraryAliquotStore libraryAliquotStore;
+  private ListLibraryAliquotViewDao listLibraryAliquotViewDao;
   @Autowired
   private LibraryStore libraryStore;
 
@@ -57,7 +57,7 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
   }
 
   @Override
-  public RunPartitionAliquot get(Run run, Partition partition, LibraryAliquot aliquot) throws IOException {
+  public RunPartitionAliquot get(Run run, Partition partition, ListLibraryAliquotView aliquot) throws IOException {
     RunPartitionAliquotId id = new RunPartitionAliquotId();
     id.setRun(run);
     id.setPartition(partition);
@@ -160,12 +160,12 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
       List<Partition> partitions = currentSession().createCriteria(PartitionImpl.class)
           .add(Restrictions.in("id", getIdComponent(missingIds, 1)))
           .list();
-      List<LibraryAliquot> aliquots = libraryAliquotStore.listByIdList(getIdComponent(missingIds, 2));
+      List<ListLibraryAliquotView> aliquots = listLibraryAliquotViewDao.listByIdList(getIdComponent(missingIds, 2));
 
       for (Long[] id : missingIds) {
         Run run = runs.stream().filter(x -> x.getId() == id[0].longValue()).findFirst().orElseThrow();
         Partition partition = partitions.stream().filter(x -> x.getId() == id[1].longValue()).findFirst().orElseThrow();
-        LibraryAliquot aliquot =
+        ListLibraryAliquotView aliquot =
             aliquots.stream().filter(x -> x.getId() == id[2].longValue()).findFirst().orElseThrow();
         results.add(new RunPartitionAliquot(run, partition, aliquot));
       }

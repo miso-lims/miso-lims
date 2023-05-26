@@ -14,7 +14,6 @@ import javax.persistence.Table;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot.RunPartitionAliquotId;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -40,13 +39,13 @@ public class RunPartitionAliquot implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "aliquotId")
-    private LibraryAliquot aliquot;
+    private ListLibraryAliquotView aliquot;
 
     public RunPartitionAliquotId() {
       // default constructor
     }
 
-    public RunPartitionAliquotId(Run run, Partition partition, LibraryAliquot aliquot) {
+    public RunPartitionAliquotId(Run run, Partition partition, ListLibraryAliquotView aliquot) {
       this.run = run;
       this.partition = partition;
       this.aliquot = aliquot;
@@ -68,11 +67,11 @@ public class RunPartitionAliquot implements Serializable {
       this.partition = partition;
     }
 
-    public LibraryAliquot getAliquot() {
+    public ListLibraryAliquotView getAliquot() {
       return aliquot;
     }
 
-    public void setAliquot(LibraryAliquot aliquot) {
+    public void setAliquot(ListLibraryAliquotView aliquot) {
       this.aliquot = aliquot;
     }
 
@@ -100,7 +99,7 @@ public class RunPartitionAliquot implements Serializable {
   private Partition partition;
 
   @Id
-  private LibraryAliquot aliquot;
+  private ListLibraryAliquotView aliquot;
 
   @ManyToOne
   @JoinColumn(name = "purposeId")
@@ -134,19 +133,10 @@ public class RunPartitionAliquot implements Serializable {
     // Default constructor
   }
 
-  public RunPartitionAliquot(Run run, Partition partition, LibraryAliquot aliquot) {
-    this.run = run;
-    this.partition = partition;
-    this.aliquot = aliquot;
-  }
-
   public RunPartitionAliquot(Run run, Partition partition, ListLibraryAliquotView aliquot) {
     this.run = run;
     this.partition = partition;
-    this.aliquot = new LibraryAliquot();
-    this.aliquot.setId(aliquot.getId());
-    this.aliquot.setName(aliquot.getName());
-    this.aliquot.setAlias(aliquot.getAlias());
+    this.aliquot = aliquot;
   }
 
   public Run getRun() {
@@ -165,11 +155,11 @@ public class RunPartitionAliquot implements Serializable {
     this.partition = partition;
   }
 
-  public LibraryAliquot getAliquot() {
+  public ListLibraryAliquotView getAliquot() {
     return aliquot;
   }
 
-  public void setAliquot(LibraryAliquot aliquot) {
+  public void setAliquot(ListLibraryAliquotView aliquot) {
     this.aliquot = aliquot;
   }
 
