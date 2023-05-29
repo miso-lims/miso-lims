@@ -6,10 +6,6 @@ ListTarget.transferitem = (function () {
     },
     createBulkActions: function (config, projectId) {
       var actions = [];
-      // pushing a null into actions as people without admin access would otherside have no bulk actions to
-      // interact with table data. Other solutions require refactoring the way bulk actions are given for
-      // the following: samples, libraries, library aliquots and pools.
-      actions.push(null);
       if (config.editSend) {
         actions.push({
           name: "Remove",
@@ -116,6 +112,13 @@ ListTarget.transferitem = (function () {
             },
           }
         );
+      }
+      // Sample, library, library aliquot and pool controls are added after the table's main actions
+      // have been added (the ones above). If no main actions are added to the variable we return,
+      // actions, controls are not added. Pushing the null makes actions non-empty, allowing
+      // bulk actions to be added.
+      if (actions.length === 0) {
+        actions.push(null);
       }
       return actions;
     },
