@@ -113,6 +113,13 @@ ListTarget.transferitem = (function () {
           }
         );
       }
+      // Sample, library, library aliquot and pool controls are added after the table's main actions
+      // have been added (the ones above). If no main actions are added to the variable we return,
+      // actions, controls are not added. Pushing the null makes actions non-empty, allowing
+      // bulk actions to be added.
+      if (actions.length === 0) {
+        actions.push(null);
+      }
       return actions;
     },
     createStaticActions: function (config, projectId) {
