@@ -14,56 +14,44 @@ move to a later 2.x version if available.
 1. Make a backup in your usual way, to use for roll-back if necessary
 1. Make a backup of tables only, to use for the migration (views/triggers/functions/procedures will
   be re-created by Flyway). Replace `lims` with your database name if different
-  
-    ```
-    DATABASE=lims
 
-    mysql -u root -p --skip-column-names -b -e \
-      "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '${DATABASE}' AND TABLE_TYPE = 'BASE TABLE';" \
-      | xargs mysqldump -u root -p --single-transaction --skip-triggers "${DATABASE}" > misodb_5_7.sql
-    ```
+        DATABASE=lims
+
+        mysql -u root -p --skip-column-names -b -e \
+          "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '${DATABASE}' AND TABLE_TYPE = 'BASE TABLE';" \
+          | xargs mysqldump -u root -p --single-transaction --skip-triggers "${DATABASE}" > misodb_5_7.sql
 
 1. remove MySQL 5.7 and install MySQL 8.0
-   * set the root password. Going forward, root must be used to run Flyway and restore backups
-   * configure the MySQL server time zone (UTC is recommended). You may want to populate the MySQL
-     time zone tables. See the [MySQL docs for this](https://dev.mysql.com/doc/refman/8.0/en/time-zone-support.html)
+    * set the MySQL root password. Going forward, root must be used to run Flyway and restore backups
+    * configure the MySQL server time zone (UTC is recommended). You may want to populate the MySQL
+      time zone tables. See the [MySQL docs for this](https://dev.mysql.com/doc/refman/8.0/en/time-zone-support.html)
 1. prepare MySQL 8 database. Replace `lims` with your database name if different.
-   * `CREATE DATABASE lims;`
-   * Create any necessary users. e.g.
+    * `CREATE DATABASE lims;`
+    * Create any necessary users. e.g.
 
-     ```
-     CREATE USER 'tgaclims'@'localhost' IDENTIFIED BY 'tgaclims';
-     GRANT ALL ON `lims`.* TO 'tgaclims'@'localhost';
-     ```
+            CREATE USER 'tgaclims'@'localhost' IDENTIFIED BY 'tgaclims';
+            GRANT ALL ON `lims`.* TO 'tgaclims'@'localhost';
 
-1. restore tables-only backup to mysql 8.0 using root user
+1. restore tables-only backup to mysql 8.0 using MySQL root user
 
-   ```
-   mysql -D ${DATABASE} -uroot -p < misodb_5_7.sql
-   ```
+        mysql -D ${DATABASE} -uroot -p < misodb_5_7.sql
 
 1. Update the `driverClassName` in your `ROOT.xml` to "com.mysql.cj.jdbc.Driver"
 
 1. Update the database URL in your `ROOT.xml`. Replace `localhost` and `lims` with the correct host
   and database name. Note the recommended connection options have changed
 
-    ```
-    url="jdbc:mysql://localhost:3306/lims?autoReconnect=true&amp;characterEncoding=UTF-8&amp;allowPublicKeyRetrieval=true&amp;sslMode=DISABLED&amp;connectionTimeZone=SERVER"
-    ```
+        url="jdbc:mysql://localhost:3306/lims?autoReconnect=true&amp;characterEncoding=UTF-8&amp;allowPublicKeyRetrieval=true&amp;sslMode=DISABLED&amp;connectionTimeZone=SERVER"
 
 1. Follow the usual [update procedure](https://miso-lims.readthedocs.io/projects/docs/en/latest/admin/baremetal-installation-guide/#installing-and-upgrading), but with one additional step:
   after copying the sqlstore jar, but before running Flyway migrate, run Flyway repair
 
-    ```
-    ./flyway -user=root -password=$MYSQL_ROOT_PASSWORD -url=$MISO_DB_URL -outOfOrder=true -locations=classpath:db/migration,classpath:uk.ac.bbsrc.tgac.miso.db.migration repair -placeholders.filesDir=${MISO_FILES_DIR}
-    ```
+        ./flyway -user=root -password=$MYSQL_ROOT_PASSWORD -url=$MISO_DB_URL -outOfOrder=true -locations=classpath:db/migration,classpath:uk.ac.bbsrc.tgac.miso.db.migration repair -placeholders.filesDir=${MISO_FILES_DIR}
   
     Note the database URL should be updated (replacing `localhost` and `lims` with the correct host
     and database name):
 
-    ```
-    jdbc:mysql://localhost:3306/lims?autoReconnect=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&sslMode=DISABLED&connectionTimeZone=SERVER&useSSL=false
-    ```
+        jdbc:mysql://localhost:3306/lims?autoReconnect=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&sslMode=DISABLED&connectionTimeZone=SERVER&useSSL=false
 
     If you receive an error regarding the time zone, ensure that you have configured the MySQL time
     zone as instructed above.
@@ -90,45 +78,39 @@ move to a later 2.x version if available.
   be re-created by Flyway). Replace `lims` with your database name if different. Replace
   `miso-lims_db_1` with the correct container ID or name if different
 
-    ```
-    DATABASE=lims
-    read -rs ROOT_PASSWORD
-    # enter your root password
-    docker exec -it miso-lims_db_1 /bin/bash -c "mysql -u root -p${ROOT_PASSWORD} --skip-column-names -b -e \
-      \"SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '${DATABASE}' AND TABLE_TYPE = 'BASE TABLE';\" 2> /dev/null \
-      | xargs mysqldump -u root -p${ROOT_PASSWORD} --single-transaction --skip-triggers ${DATABASE} 2> /dev/null" > misodb_5_7.sql
-    ```
+        DATABASE=lims
+        read -rs ROOT_PASSWORD
+        # enter your root password
+        docker exec -it miso-lims_db_1 /bin/bash -c "mysql -u root -p${ROOT_PASSWORD} --skip-column-names -b -e \
+          \"SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '${DATABASE}' AND TABLE_TYPE = 'BASE TABLE';\" 2> /dev/null \
+          | xargs mysqldump -u root -p${ROOT_PASSWORD} --single-transaction --skip-triggers ${DATABASE} 2> /dev/null" > misodb_5_7.sql
 
 1. Update your docker-compose file to use the new MISO version and MySQL 8.0
     * add secret: `root_password`
     * **db** service:
-      * change image to `mysql:8.0`
-      * set environment variable
-        * `MYSQL_ROOT_PASSWORD_FILE: /run/secrets/root_password`
-        * If you previously had `MYSQL_RANDOM_ROOT_PASSWORD`, remove it
-      * add secret: `root_password`
-      * change the volume targeting `/var/lib/mysql` to a new source
+        * change image to `mysql:8.0`
+        * set environment variable
+            * `MYSQL_ROOT_PASSWORD_FILE: /run/secrets/root_password`
+            * If you previously had `MYSQL_RANDOM_ROOT_PASSWORD`, remove it
+        * add secret: `root_password`
+        * change the volume targeting `/var/lib/mysql` to a new source
     * **flyway** service:
-      * update image to `ghcr.io/miso-lims/miso-lims-migration:2.0.0` (or update version in
-        environment variable if applicable)
-      * remove secret: `lims_password`
-      * add secret: `root_password`
+        * update image to `ghcr.io/miso-lims/miso-lims-migration:2.0.0` (or update version in
+          environment variable if applicable)
+        * remove secret: `lims_password`
+        * add secret: `root_password`
     * **webapp** service:
-      * update image to `ghcr.io/miso-lims/miso-lims-webapp:2.0.0` (or update version in environment
-        variable if applicable)
+        * update image to `ghcr.io/miso-lims/miso-lims-webapp:2.0.0` (or update version in
+        environment variable if applicable)
 
 1. Spin up the MySQL container only, with new mounted volume
 
-    ```
-    docker-compose up db
-    ```
+        docker-compose up db
 
 1. Restore tables-only backup to the new container using root user. Replace `miso-lims_db_1` with
   the correct container ID or name if different
 
-    ```
-    docker exec -i miso-lims_db_1 sh -c "exec mysql -u root -p${ROOT_PASSWORD} ${DATABASE}" < misodb_5_7.sql
-    ```
+        docker exec -i miso-lims_db_1 sh -c "exec mysql -u root -p${ROOT_PASSWORD} ${DATABASE}" < misodb_5_7.sql
 
 1. Use Flyway container to run `repair` command
     * edit docker-compose file - change flyway service `command` to `repair`
@@ -136,15 +118,11 @@ move to a later 2.x version if available.
     * edit docker-compose file - change flyway service `command` back to `migrate`
 1. Shut down MySQL container
 
-    ```
-    docker-compose down
-    ```
+        docker-compose down
 
 1. Bring up full docker-compose
 
-    ```
-    docker-compose up
-    ```
+        docker-compose up
 
 1. Watch the logs to ensure the Flyway migration completes successfully. It will likely take a few minutes, and you should see a message like "miso-lims_flyway_1 exited with code 0" when it's done
 

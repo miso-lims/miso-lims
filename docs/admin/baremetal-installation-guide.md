@@ -210,9 +210,9 @@ To install or upgrade, perform the following steps:
 
 1. If performing an upgrade, make sure to read all release notes since the previous version you were running. Some
    releases indicate additional upgrade instructions, which may include
-   * Configuration changes (in `miso.properties` or elsewhere)
-   * Database preparation or cleanup steps
-   * Other necessary steps or warnings
+    * Configuration changes (in `miso.properties` or elsewhere)
+    * Database preparation or cleanup steps
+    * Other necessary steps or warnings
 1. Backup your existing database.
 1. Stop MISO's Tomcat.
 1. Remove `$CATALINA_HOME/webapps/ROOT` directory and `$CATALINA_HOME/webapps/ROOT.war` file if they exist.
@@ -264,6 +264,7 @@ If you encounter other errors migrating the database, make sure that you are usi
 
 
 Where:
+
 * `$CONTAINER_NAME` is your desired Docker container name.
 * `$ROOT_PASSWORD` is the root password to your MySQL.
 * `$DB_NAME` is the name of the database (e.g. "lims").
