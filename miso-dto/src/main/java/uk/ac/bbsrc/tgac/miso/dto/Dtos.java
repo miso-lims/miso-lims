@@ -1473,7 +1473,7 @@ public class Dtos {
     setString(dto::setSpikeInVolume, from.getSpikeInVolume());
     setString(dto::setSpikeInDilutionFactor,
         maybeGetProperty(from.getSpikeInDilutionFactor(), DilutionFactor::getLabel));
-    setBoolean(dto::setUmis, from.getUmis(), false);
+    setBoolean(dto::setUmis, from.getUmis(), true);
     setId(dto::setWorkstationId, from.getWorkstation());
     setId(dto::setThermalCyclerId, from.getThermalCycler());
     setId(dto::setSopId, from.getSop());

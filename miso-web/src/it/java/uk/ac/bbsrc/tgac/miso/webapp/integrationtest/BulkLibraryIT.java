@@ -56,10 +56,14 @@ public class BulkLibraryIT extends AbstractIT {
       LibColumns.PARENT_NG_USED, LibColumns.PARENT_VOLUME_USED, LibColumns.KIT_LOT);
 
   private static final Set<String> receiptColumns = Sets.newHashSet(SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME,
-      SamColumns.SUBPROJECT, SamColumns.EXTERNAL_NAME, SamColumns.IDENTITY_ALIAS, SamColumns.DONOR_SEX, SamColumns.CONSENT,
-      SamColumns.SAMPLE_CLASS, SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER, SamColumns.TIMES_RECEIVED,
-      SamColumns.TUBE_NUMBER, SamColumns.TISSUE_MATERIAL, SamColumns.REGION, SamColumns.TIMEPOINT, LibColumns.RECEIVE_DATE,
-      LibColumns.RECEIVE_TIME, LibColumns.RECEIVED_FROM, LibColumns.RECEIVED_BY, LibColumns.RECEIPT_CONFIRMED, LibColumns.RECEIPT_QC_PASSED,
+      SamColumns.SUBPROJECT, SamColumns.EXTERNAL_NAME, SamColumns.IDENTITY_ALIAS, SamColumns.DONOR_SEX,
+      SamColumns.CONSENT,
+      SamColumns.SAMPLE_CLASS, SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER,
+      SamColumns.TIMES_RECEIVED,
+      SamColumns.TUBE_NUMBER, SamColumns.TISSUE_MATERIAL, SamColumns.REGION, SamColumns.TIMEPOINT,
+      LibColumns.RECEIVE_DATE,
+      LibColumns.RECEIVE_TIME, LibColumns.RECEIVED_FROM, LibColumns.RECEIVED_BY, LibColumns.RECEIPT_CONFIRMED,
+      LibColumns.RECEIPT_QC_PASSED,
       LibColumns.RECEIPT_QC_NOTE, LibColumns.TEMPLATE);
 
   private static final String NO_INDEX_FAMILY = "No indices";
@@ -82,7 +86,8 @@ public class BulkLibraryIT extends AbstractIT {
   @Test
   public void testPropagateSetup() throws Exception {
     // Goal: ensure all expected fields are present and no extra
-    BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L), Arrays.asList(4));
+    BulkLibraryPage page =
+        BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L), Arrays.asList(4));
     Set<String> expectedColumns = Sets.newHashSet();
     expectedColumns.addAll(commonColumns);
     expectedColumns.addAll(propagateColumns);
@@ -119,7 +124,8 @@ public class BulkLibraryIT extends AbstractIT {
 
   @Test
   public void testPropagateDropdowns() throws Exception {
-    BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L), Arrays.asList(1));
+    BulkLibraryPage page =
+        BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L), Arrays.asList(1));
     HandsOnTable table = page.getTable();
 
     Set<String> designs = table.getDropdownOptions(LibColumns.DESIGN, 0);
@@ -155,7 +161,8 @@ public class BulkLibraryIT extends AbstractIT {
 
   @Test
   public void testPropagateDependencyCells() {
-    BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L), Arrays.asList(1));
+    BulkLibraryPage page =
+        BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L), Arrays.asList(1));
     HandsOnTable table = page.getTable();
 
     // verify empty options; library type, index family, and kit depend on platform
@@ -214,7 +221,8 @@ public class BulkLibraryIT extends AbstractIT {
 
   @Test
   public void testReadOnlyCells() {
-    BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L), Arrays.asList(1));
+    BulkLibraryPage page =
+        BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L), Arrays.asList(1));
     HandsOnTable table = page.getTable();
 
     assertFalse(table.isWritable(LibColumns.NAME, 0));
@@ -232,7 +240,8 @@ public class BulkLibraryIT extends AbstractIT {
 
   @Test
   public void testPropagate() {
-    BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L), Arrays.asList(1));
+    BulkLibraryPage page =
+        BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L), Arrays.asList(1));
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = Maps.newLinkedHashMap();
@@ -245,6 +254,7 @@ public class BulkLibraryIT extends AbstractIT {
     attrs.put(LibColumns.INDEX_FAMILY, "Dual Index 6bp");
     attrs.put(LibColumns.INDEX_1, "A01 (AAACCC)");
     attrs.put(LibColumns.INDEX_2, "B01 (AAATTT)");
+    attrs.put(LibColumns.UMIS, "False");
     attrs.put(LibColumns.KIT_DESCRIPTOR, "Test Kit");
     attrs.put(LibColumns.KIT_LOT, "20200728");
     attrs.put(LibColumns.QC_STATUS, "Ready");
@@ -271,7 +281,8 @@ public class BulkLibraryIT extends AbstractIT {
 
   @Test
   public void testPropagateTwoMinimal() {
-    BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L), Arrays.asList(2));
+    BulkLibraryPage page =
+        BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L), Arrays.asList(2));
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = Maps.newLinkedHashMap();
@@ -282,6 +293,7 @@ public class BulkLibraryIT extends AbstractIT {
     attrs.put(LibColumns.SELECTION, "CAGE");
     attrs.put(LibColumns.STRATEGY, "AMPLICON");
     attrs.put(LibColumns.INDEX_FAMILY, NO_INDEX_FAMILY);
+    attrs.put(LibColumns.UMIS, "False");
     attrs.put(LibColumns.KIT_DESCRIPTOR, "Test Kit");
     attrs.put(LibColumns.KIT_LOT, "20200728");
     attrs.put(LibColumns.SIZE, "205");
@@ -524,6 +536,7 @@ public class BulkLibraryIT extends AbstractIT {
     attrs.put(LibColumns.INDEX_FAMILY, "Dual Index 6bp");
     attrs.put(LibColumns.INDEX_1, "A01 (AAACCC)");
     attrs.put(LibColumns.INDEX_2, "B01 (AAATTT)");
+    attrs.put(LibColumns.UMIS, "False");
     attrs.put(LibColumns.KIT_DESCRIPTOR, "Test Kit");
     attrs.put(LibColumns.QC_STATUS, "Ready");
     attrs.put(LibColumns.SIZE, "123");
@@ -551,7 +564,8 @@ public class BulkLibraryIT extends AbstractIT {
   @Test
   public void testPropagateToEditToPropagate() {
     // propagate sample to library
-    BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L), Arrays.asList(1));
+    BulkLibraryPage page =
+        BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L), Arrays.asList(1));
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = Maps.newLinkedHashMap();
@@ -562,6 +576,7 @@ public class BulkLibraryIT extends AbstractIT {
     attrs.put(LibColumns.SELECTION, "CAGE");
     attrs.put(LibColumns.STRATEGY, "AMPLICON");
     attrs.put(LibColumns.INDEX_FAMILY, NO_INDEX_FAMILY);
+    attrs.put(LibColumns.UMIS, "False");
     attrs.put(LibColumns.KIT_DESCRIPTOR, "Test Kit");
     attrs.put(LibColumns.KIT_LOT, "20200728");
     attrs.put(LibColumns.SIZE, "207");
@@ -622,10 +637,11 @@ public class BulkLibraryIT extends AbstractIT {
 
   @Test
   public void testSortByBoxPosition() {
-    BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Lists.newArrayList(204L, 205L, 206L),
-        Lists.newArrayList(1, 1, 1));
+    BulkLibraryPage page =
+        BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Lists.newArrayList(204L, 205L, 206L),
+            Lists.newArrayList(1, 1, 1));
     HandsOnTable table = page.getTable();
-    
+
     final class Libs {
       final static String C06 = "C06";
       final static String A07 = "A07";
@@ -637,23 +653,25 @@ public class BulkLibraryIT extends AbstractIT {
     initial.put(1, Libs.A07);
     initial.put(2, Libs.B05);
 
-    initial.forEach((k, v) -> assertTrue("initial value " + v + " in row " + k, table.getText(LibColumns.SAMPLE_LOCATION, k).endsWith(v)));
-    
+    initial.forEach((k, v) -> assertTrue("initial value " + v + " in row " + k,
+        table.getText(LibColumns.SAMPLE_LOCATION, k).endsWith(v)));
+
     Map<Integer, String> sortCols = new HashMap<>();
     sortCols.put(0, Libs.B05);
     sortCols.put(1, Libs.C06);
     sortCols.put(2, Libs.A07);
-    
+
     page.sortTable(BulkLibraryPage.SORT_SAMPLE_LOCATION_COLS);
     HandsOnTable sort1Table = page.getTable();
     sortCols.forEach(
-        (k, v) -> assertTrue("sortCols value " + v + " in row " + k, sort1Table.getText(LibColumns.SAMPLE_LOCATION, k).endsWith(v)));
-    
+        (k, v) -> assertTrue("sortCols value " + v + " in row " + k,
+            sort1Table.getText(LibColumns.SAMPLE_LOCATION, k).endsWith(v)));
+
     Map<Integer, String> sortRows = new HashMap<>();
     sortRows.put(0, Libs.A07);
     sortRows.put(1, Libs.B05);
     sortRows.put(2, Libs.C06);
-    
+
     page.sortTable(BulkLibraryPage.SORT_SAMPLE_LOCATION_ROWS);
     HandsOnTable sort2Table = page.getTable();
     sortRows.forEach((k, v) -> assertTrue(sort2Table.getText(LibColumns.SAMPLE_LOCATION, k).endsWith(v)));
@@ -749,8 +767,9 @@ public class BulkLibraryIT extends AbstractIT {
 
   @Test
   public void testPropagateSpecifiedReplicates() {
-    BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L, 110004L, 120004L),
-        Arrays.asList(1, 2, 3));
+    BulkLibraryPage page =
+        BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L, 110004L, 120004L),
+            Arrays.asList(1, 2, 3));
     HandsOnTable table = page.getTable();
     assertEquals(6, table.getRowCount());
     assertEquals("1IPO_0001_Ly_P_1-1_D1", table.getText(LibColumns.SAMPLE_ALIAS, 0));
@@ -778,8 +797,10 @@ public class BulkLibraryIT extends AbstractIT {
     testLibraryAttribute(LibColumns.LIBRARY_TYPE, attributes, library, lib -> lib.getLibraryType().getDescription());
     testLibraryAttribute(LibColumns.INDEX_FAMILY, attributes, library,
         lib -> lib.getIndex1() == null ? null : lib.getIndex1().getFamily().getName());
-    testLibraryAttribute(LibColumns.INDEX_1, attributes, library, lib -> lib.getIndex1() == null ? null : lib.getIndex1().getLabel());
-    testLibraryAttribute(LibColumns.INDEX_2, attributes, library, lib -> lib.getIndex2() == null ? null : lib.getIndex2().getLabel());
+    testLibraryAttribute(LibColumns.INDEX_1, attributes, library,
+        lib -> lib.getIndex1() == null ? null : lib.getIndex1().getLabel());
+    testLibraryAttribute(LibColumns.INDEX_2, attributes, library,
+        lib -> lib.getIndex2() == null ? null : lib.getIndex2().getLabel());
     testLibraryAttribute(LibColumns.QC_STATUS, attributes, library,
         lib -> lib.getDetailedQcStatus() == null ? "Not Ready" : lib.getDetailedQcStatus().getDescription());
     testLibraryAttribute(LibColumns.QC_NOTE, attributes, library, Library::getDetailedQcStatusNote);
@@ -787,7 +808,8 @@ public class BulkLibraryIT extends AbstractIT {
       return lib.getDnaSize() == null ? null : lib.getDnaSize().toString();
     });
     testLibraryAttribute(LibColumns.VOLUME, attributes, library, lib -> LimsUtils.toNiceString(lib.getVolume()));
-    testLibraryAttribute(LibColumns.CONCENTRATION, attributes, library, lib -> LimsUtils.toNiceString(lib.getConcentration()));
+    testLibraryAttribute(LibColumns.CONCENTRATION, attributes, library,
+        lib -> LimsUtils.toNiceString(lib.getConcentration()));
     if (attributes.containsKey(LibColumns.RECEIVE_DATE)) {
       assertReceiptAttributes(attributes, library);
     }
@@ -841,10 +863,13 @@ public class BulkLibraryIT extends AbstractIT {
 
   private void assertParentSampleAttributes(Map<String, String> attributes, DetailedLibrary library) {
     testLibraryAttribute(SamColumns.SAMPLE_TYPE, attributes, library, lib -> lib.getSample().getSampleType());
-    testLibraryAttribute(SamColumns.SCIENTIFIC_NAME, attributes, library, lib -> lib.getSample().getScientificName().getAlias());
+    testLibraryAttribute(SamColumns.SCIENTIFIC_NAME, attributes, library,
+        lib -> lib.getSample().getScientificName().getAlias());
     testLibraryAttribute(SamColumns.PROJECT, attributes, library, lib -> lib.getSample().getProject().getShortName());
-    testLibraryAttribute(SamColumns.EXTERNAL_NAME, attributes, library, lib -> identityGetter.apply(lib).getExternalName());
-    testLibraryAttribute(SamColumns.DONOR_SEX, attributes, library, lib -> identityGetter.apply(lib).getDonorSex().getLabel());
+    testLibraryAttribute(SamColumns.EXTERNAL_NAME, attributes, library,
+        lib -> identityGetter.apply(lib).getExternalName());
+    testLibraryAttribute(SamColumns.DONOR_SEX, attributes, library,
+        lib -> identityGetter.apply(lib).getDonorSex().getLabel());
     testLibraryAttribute(SamColumns.TISSUE_ORIGIN, attributes, library,
         lib -> tissueGetter.apply(lib).getTissueOrigin().getItemLabel());
     testLibraryAttribute(SamColumns.TISSUE_TYPE, attributes, library,
@@ -877,12 +902,14 @@ public class BulkLibraryIT extends AbstractIT {
     return (SampleTissue) deproxify(sam);
   };
 
-  private <T> void testLibraryAttribute(String column, Map<String, String> attributes, T object, Function<T, String> getter) {
+  private <T> void testLibraryAttribute(String column, Map<String, String> attributes, T object,
+      Function<T, String> getter) {
     if (attributes.containsKey(column)) {
       String objectAttribute = getter.apply(object);
       String tableAttribute = cleanNullValues(column, attributes.get(column));
       if (tableAttribute == null) {
-        assertTrue(String.format("persisted attribute expected empty '%s'", column), isStringEmptyOrNull(objectAttribute));
+        assertTrue(String.format("persisted attribute expected empty '%s'", column),
+            isStringEmptyOrNull(objectAttribute));
       } else {
         assertEquals(String.format("persisted attribute '%s'", column), tableAttribute, objectAttribute);
       }
