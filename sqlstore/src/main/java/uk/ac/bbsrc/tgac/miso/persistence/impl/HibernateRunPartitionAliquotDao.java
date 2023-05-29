@@ -26,7 +26,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot.RunPartitionAliquotId
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
-import uk.ac.bbsrc.tgac.miso.persistence.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.persistence.ListLibraryAliquotViewDao;
 import uk.ac.bbsrc.tgac.miso.persistence.RunPartitionAliquotDao;
 import uk.ac.bbsrc.tgac.miso.persistence.RunStore;
@@ -41,8 +40,6 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
   private RunStore runStore;
   @Autowired
   private ListLibraryAliquotViewDao listLibraryAliquotViewDao;
-  @Autowired
-  private LibraryStore libraryStore;
 
   public SessionFactory getSessionFactory() {
     return sessionFactory;
@@ -54,6 +51,10 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
 
   public Session currentSession() {
     return getSessionFactory().getCurrentSession();
+  }
+
+  public void setListLibraryAliquotViewDao(ListLibraryAliquotViewDao listLibraryAliquotViewDao) {
+    this.listLibraryAliquotViewDao = listLibraryAliquotViewDao;
   }
 
   @Override
