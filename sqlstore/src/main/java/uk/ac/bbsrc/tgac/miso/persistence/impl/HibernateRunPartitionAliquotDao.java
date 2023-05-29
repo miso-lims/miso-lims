@@ -112,7 +112,7 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
 
     @SuppressWarnings("unchecked")
     List<RunPartitionAliquot> results = currentSession().createCriteria(RunPartitionAliquot.class)
-        .createAlias("aliquot.library", "library")
+        .createAlias("aliquot.parentLibrary", "library")
         .add(Restrictions.in("library.libraryId", libraryIds))
         .list();
 
