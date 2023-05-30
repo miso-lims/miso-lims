@@ -105,7 +105,8 @@ public class DeleteIT extends AbstractIT {
 
   @Test
   public void testDeleteContainer() {
-    testDelete(ListTarget.CONTAINERS, null, "CHANGEABLE", Columns.SERIAL_NUMBER, SequencerPartitionContainerImpl.class, 6001L);
+    testDelete(ListTarget.CONTAINERS, null, "CHANGEABLE", Columns.SERIAL_NUMBER, SequencerPartitionContainerImpl.class,
+        6001L);
   }
 
   @Test
@@ -125,12 +126,14 @@ public class DeleteIT extends AbstractIT {
 
   @Test
   public void testDeleteInstrument() {
-    testAdminDelete(ListTarget.INSTRUMENTS, Tabs.ARRAY_SCANNER, "Deletable", Columns.INSTRUMENT_NAME, InstrumentImpl.class, 5L);
+    testAdminDelete(ListTarget.INSTRUMENTS, Tabs.ARRAY_SCANNER, "Deletable", Columns.INSTRUMENT_NAME,
+        InstrumentImpl.class, 5L);
   }
 
   @Test
   public void testDeleteFreezer() {
-    testAdminDelete(ListTarget.STORAGE_LOCATIONS, Tabs.FREEZERS, "Empty Freezer", Columns.ALIAS, StorageLocation.class, 5L);
+    testAdminDelete(ListTarget.STORAGE_LOCATIONS, Tabs.FREEZERS, "Empty Freezer", Columns.ALIAS, StorageLocation.class,
+        5L);
   }
 
   @Test
@@ -165,7 +168,8 @@ public class DeleteIT extends AbstractIT {
 
   @Test
   public void testDeleteAttachmentCategory() {
-    testAdminDelete(ListTarget.ATTACHMENT_CATEGORIES, null, "Submission Forms", Columns.ALIAS, AttachmentCategory.class, 1L);
+    testAdminDelete(ListTarget.ATTACHMENT_CATEGORIES, null, "Submission Forms", Columns.ALIAS, AttachmentCategory.class,
+        1L);
   }
 
   @Test
@@ -175,7 +179,8 @@ public class DeleteIT extends AbstractIT {
 
   @Test
   public void testDeleteSequencingControlType() {
-    testAdminDelete(ListTarget.SEQUENCING_CONTROL_TYPES, null, "Delete Me", Columns.ALIAS, SequencingControlType.class, 3L);
+    testAdminDelete(ListTarget.SEQUENCING_CONTROL_TYPES, null, "Delete Me", Columns.ALIAS, SequencingControlType.class,
+        3L);
   }
 
   @Test
@@ -200,7 +205,8 @@ public class DeleteIT extends AbstractIT {
 
   @Test
   public void testDeleteTargetedSequencing() {
-    testAdminDelete(ListTarget.TARGETED_SEQUENCINGS, null, "Test TarSeq Three", Columns.ALIAS, TargetedSequencing.class, 3L);
+    testAdminDelete(ListTarget.TARGETED_SEQUENCINGS, null, "Test TarSeq Three", Columns.ALIAS, TargetedSequencing.class,
+        3L);
   }
 
   @Test
@@ -210,12 +216,14 @@ public class DeleteIT extends AbstractIT {
 
   @Test
   public void testDeleteSequencingParameters() {
-    testAdminDelete(ListTarget.SEQUENCING_PARAMETERS, null, "Custom (see notes)", Columns.NAME, SequencingParameters.class, 1L);
+    testAdminDelete(ListTarget.SEQUENCING_PARAMETERS, null, "Custom (see notes)", Columns.NAME,
+        SequencingParameters.class, 1L);
   }
 
   @Test
   public void testDeleteContainerModel() {
-    testAdminDelete(ListTarget.CONTAINER_MODELS, null, "Generic 11-SMRT-Cell PacBio 8Pac", Columns.ALIAS, SequencingContainerModel.class,
+    testAdminDelete(ListTarget.CONTAINER_MODELS, null, "Generic 11-SMRT-Cell PacBio 8Pac", Columns.ALIAS,
+        SequencingContainerModel.class,
         14L);
   }
 
@@ -246,7 +254,8 @@ public class DeleteIT extends AbstractIT {
 
   @Test
   public void testDeletePartitionQcType() {
-    testAdminDelete(ListTarget.PARTITION_QC_TYPE, null, "Failed: Sasquatch Problem", Columns.DESCRIPTION, PartitionQCType.class, 3L);
+    testAdminDelete(ListTarget.PARTITION_QC_TYPE, null, "Failed: Sasquatch Problem", Columns.DESCRIPTION,
+        PartitionQCType.class, 3L);
   }
 
   @Test
@@ -256,7 +265,8 @@ public class DeleteIT extends AbstractIT {
 
   @Test
   public void testDeleteReferenceGenome() {
-    testAdminDelete(ListTarget.REFERENCE_GENOMES, null, "Sasquatch sg12 random", Columns.ALIAS, ReferenceGenomeImpl.class, 4L);
+    testAdminDelete(ListTarget.REFERENCE_GENOMES, null, "Sasquatch sg12 random", Columns.ALIAS,
+        ReferenceGenomeImpl.class, 4L);
   }
 
   @Test
@@ -331,7 +341,8 @@ public class DeleteIT extends AbstractIT {
 
   @Test
   public void testDeleteDetailedQcStatus() {
-    testAdminDelete(ListTarget.DETAILED_QC_STATUS, null, "Reference Required", Columns.DESCRIPTION, DetailedQcStatusImpl.class, 8L);
+    testAdminDelete(ListTarget.DETAILED_QC_STATUS, null, "Reference Required", Columns.DESCRIPTION,
+        DetailedQcStatusImpl.class, 8L);
   }
 
   @Test
@@ -371,7 +382,8 @@ public class DeleteIT extends AbstractIT {
 
   @Test
   public void testDeleteRunLibraryQcStatus() {
-    testAdminDelete(ListTarget.RUN_LIBRARY_QC_STATUSES, null, "DeleteMe", Columns.DESCRIPTION, RunLibraryQcStatus.class, 4L);
+    testAdminDelete(ListTarget.RUN_LIBRARY_QC_STATUSES, null, "DeleteMe", Columns.DESCRIPTION, RunLibraryQcStatus.class,
+        4L);
   }
 
   @Test
@@ -409,7 +421,8 @@ public class DeleteIT extends AbstractIT {
     testDelete(listTarget, tab, search, selectByColumn, search, clazz, id);
   }
 
-  private void testDelete(String listTarget, String tab, String search, String selectByColumn, String columnValue, Class<?> clazz,
+  private void testDelete(String listTarget, String tab, String search, String selectByColumn, String columnValue,
+      Class<?> clazz,
       Long id) {
     login();
     doTestDelete(listTarget, tab, search, selectByColumn, columnValue, clazz, id);
@@ -421,7 +434,8 @@ public class DeleteIT extends AbstractIT {
     doTestDelete(listTarget, tab, search, selectByColumn, search, clazz, id);
   }
 
-  private void doTestDelete(String listTarget, String tab, String search, String selectByColumn, String columnValue, Class<?> clazz,
+  private void doTestDelete(String listTarget, String tab, String search, String selectByColumn, String columnValue,
+      Class<?> clazz,
       Long id) {
     assertNotNull("Couldn't find item in the database", getSession().get(clazz, id));
     AbstractListPage page = null;
@@ -458,7 +472,8 @@ public class DeleteIT extends AbstractIT {
     if (search != null) {
       table2.searchFor(search);
     }
-    assertFalse("Found item in list table after delete attempt", table2.getColumnValues(selectByColumn).contains(search));
+    assertFalse("Found item in list table after delete attempt",
+        table2.getColumnValues(selectByColumn).contains(search));
     assertNull("Found item in database after delete attempt", getSession().get(clazz, id));
   }
 
