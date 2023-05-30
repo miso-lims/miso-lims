@@ -66,7 +66,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
 
   protected void assertPlainSampleAttributes(Map<String, String> attributes, Sample sample, boolean newlyCreated) {
     if (newlyCreated) {
-      assertEntityAttribute(SamColumns.PROJECT, attributes, sample, s -> s.getProject().getShortName());
+      assertEntityAttribute(SamColumns.PROJECT, attributes, sample, s -> s.getProject().getCode());
     }
     assertEntityAttribute(SamColumns.ALIAS, attributes, sample, Sample::getAlias);
     assertEntityAttribute(SamColumns.DESCRIPTION, attributes, sample,
