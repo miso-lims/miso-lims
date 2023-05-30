@@ -622,20 +622,20 @@ BulkTarget.sample = (function ($) {
               );
             });
           },
-          sortSource: Utils.sorting.standardSort(Constants.isDetailedSample ? "shortName" : "id"),
+          sortSource: Utils.sorting.standardSort(Constants.isDetailedSample ? "code" : "id"),
           getItemLabel: Constants.isDetailedSample
             ? function (item) {
-                return item.shortName;
+                return item.code;
               }
             : Utils.array.getName,
           getItemValue: Utils.array.getId,
           initial: config.project
-            ? config.project[Constants.isDetailedSample ? "shortName" : "name"]
+            ? config.project[Constants.isDetailedSample ? "code" : "name"]
             : null,
           onChange: function (rowIndex, newValue, api) {
             var project = config.projects.find(function (item) {
               if (Constants.isDetailedSample) {
-                return item.shortName === newValue;
+                return item.code === newValue;
               } else {
                 return item.name === newValue;
               }
@@ -797,7 +797,7 @@ BulkTarget.sample = (function ($) {
               });
               return;
             }
-            var label = Constants.isDetailedSample ? "shortName" : "name";
+            var label = Constants.isDetailedSample ? "code" : "name";
             var selectedProject = Utils.array.findFirstOrNull(function (project) {
               return project[label] === api.getValue(rowIndex, "projectId");
             }, config.projects);
@@ -1375,7 +1375,7 @@ BulkTarget.sample = (function ($) {
             };
           });
 
-        var projectLabel = Constants.isDetailedSample ? "shortName" : "name";
+        var projectLabel = Constants.isDetailedSample ? "code" : "name";
         var consentWarnings = changed
           .filter(function (change) {
             return (

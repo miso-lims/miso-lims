@@ -1,10 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.core.service.naming.validation;
 
-public class OicrProjectShortNameValidator extends RegexValidator {
+public class OicrProjectCodeValidator extends RegexValidator {
 
   public static final String REGEX = "[A-Z0-9]{3,10}";
 
-  public OicrProjectShortNameValidator() {
+  public OicrProjectCodeValidator() {
     super("^" + REGEX + "$", false, false);
 
     setValidationMessage("Short name must be 3-10 characters and include only capital letters and numbers");

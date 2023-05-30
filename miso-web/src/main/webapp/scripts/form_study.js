@@ -43,10 +43,10 @@ FormTarget.study = (function ($) {
               required: true,
               source: config.projects,
               getItemLabel: function (item) {
-                return config.detailedSample ? item.shortName : item.alias;
+                return config.detailedSample ? item.code : item.title;
               },
               getItemValue: Utils.array.getId,
-              sortSource: Utils.sorting.standardSort(config.detailedSample ? "shortName" : "alias"),
+              sortSource: Utils.sorting.standardSort(config.detailedSample ? "code" : "title"),
             },
             {
               title: "Project",
@@ -58,7 +58,7 @@ FormTarget.study = (function ($) {
                   Utils.array.idPredicate(study.projectId),
                   config.projects
                 );
-                return config.detailedSample ? project.shortName : project.alias;
+                return config.detailedSample ? project.code : project.title;
               },
               getLink: function (study) {
                 return "/miso/project/" + study.projectId;

@@ -30,29 +30,28 @@ public interface Project extends Comparable<Project>, Deletable, Nameable, Seria
   void setName(String name);
 
   /**
-   * Returns the alias of this Project object.
+   * Returns the title of this Project object.
    * 
-   * @return String alias.
+   * @return String title.
    */
-  String getAlias();
+  String getTitle();
 
   /**
-   * Sets the alias of this Project object.
+   * Sets the title of this Project object.
    * 
-   * @param alias alias.
+   * @param title title.
    */
-  void setAlias(String alias);
+  void setTitle(String title);
 
   /**
-   * Returns the short name, used as a prefix for generating sample names, or the alias if not
-   * specified.
+   * Returns the code, used as a prefix for generating sample names, or the title if not specified.
    */
-  String getShortName();
+  String getCode();
 
   /**
-   * Sets the short name, used as a prefix for generating sample names.
+   * Sets the code, used as a prefix for generating sample names.
    */
-  void setShortName(String shortName);
+  void setCode(String code);
 
   /**
    * @return the status of this Project

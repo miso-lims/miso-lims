@@ -28,6 +28,9 @@ import org.springframework.stereotype.Component;
 
 import com.eaglegenomics.simlims.core.User;
 
+import io.prometheus.client.Gauge;
+import j2html.tags.ContainerTag;
+import j2html.tags.DomContent;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -46,10 +49,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentTissueAttributes;
 import uk.ac.bbsrc.tgac.miso.core.service.TransferNotificationService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
-import io.prometheus.client.Gauge;
-import j2html.tags.ContainerTag;
-import j2html.tags.DomContent;
-
 @Component
 public class NotificationManager {
 
@@ -58,7 +57,8 @@ public class NotificationManager {
   private static final long ONE_MINUTE = 60000;
 
   private static final String LIST_CONTAINER_STYLE = "display: inline-block;";
-  private static final String HEADING_STYLE = "background-color: #F0F0FF; color: #666666; margin-bottom: 2px; text-align: center; border-bottom: 1px solid #A9A9A9; border-right: 1px solid #A9A9A9;";
+  private static final String HEADING_STYLE =
+      "background-color: #F0F0FF; color: #666666; margin-bottom: 2px; text-align: center; border-bottom: 1px solid #A9A9A9; border-right: 1px solid #A9A9A9;";
   private static final String TABLE_STYLE = "border-collapse: collapse;";
   private static final String TH_STYLE = "background-color: #E6E6E6; border: 1px solid #D3D3D3; padding: 4px";
   private static final String CELL_STYLE = "padding: 4px;";
@@ -122,7 +122,8 @@ public class NotificationManager {
   }
 
   private void sendPendingTransferNotifications() throws IOException {
-    List<TransferNotification> pendingNotifications = transferNotificationService.listPending(smtpHoldMinutes, getCurrentAllowance());
+    List<TransferNotification> pendingNotifications =
+        transferNotificationService.listPending(smtpHoldMinutes, getCurrentAllowance());
     for (TransferNotification pending : pendingNotifications) {
       pending.setSentTime(new Date());
       try {
@@ -232,10 +233,10 @@ public class NotificationManager {
     if (mainProject == null) {
       sb.append("Undetermined project");
     } else {
-      if (transfer.isDistribution() || mainProject.getShortName() == null) {
-        sb.append(mainProject.getAlias());
+      if (transfer.isDistribution() || mainProject.getCode() == null) {
+        sb.append(mainProject.getTitle());
       } else {
-        sb.append(mainProject.getShortName());
+        sb.append(mainProject.getCode());
       }
       if (otherProjects) {
         sb.append(" and others");
@@ -262,7 +263,8 @@ public class NotificationManager {
       bodyElements.add(error.withStyle(ERROR_STYLE));
     }
     bodyElements.add(p(String.format("The following items are being transferred from %s to %s, %s.",
-        getSender(transfer), getRecipient(transfer), LimsUtils.getDateTimeFormat().format(transfer.getTransferTime()))));
+        getSender(transfer), getRecipient(transfer),
+        LimsUtils.getDateTimeFormat().format(transfer.getTransferTime()))));
 
     if (!transfer.getSampleTransfers().isEmpty()) {
       bodyElements.add(makeList("Samples", makeSampleTable(transfer.getSampleTransfers())));
@@ -278,7 +280,8 @@ public class NotificationManager {
     }
 
     if (baseUrl != null && internalDomain != null && notification.getRecipientEmail().endsWith("@" + internalDomain)) {
-      bodyElements.add(p(a("View transfer in MISO").withHref(String.format("%s/miso/transfer/%d", baseUrl, transfer.getId()))));
+      bodyElements
+          .add(p(a("View transfer in MISO").withHref(String.format("%s/miso/transfer/%d", baseUrl, transfer.getId()))));
     }
     bodyElements.add(p("Please do not reply to this email. This address is not monitored."));
 
@@ -337,10 +340,12 @@ public class NotificationManager {
         cells.add(makeTd(dnaOrRna(detailedSample)));
         cells.add(makeTd(detailedSample.getIdentityAttributes().getExternalName()));
         ParentTissueAttributes tissue = detailedSample.getTissueAttributes();
-        cells.add(makeTd(tissue == null ? null : tissue.getTissueOrigin().getAlias() + "_" + tissue.getTissueType().getAlias()));
+        cells.add(makeTd(
+            tissue == null ? null : tissue.getTissueOrigin().getAlias() + "_" + tissue.getTissueType().getAlias()));
         cells.add(makeTd(tissue == null ? null : tissue.getTimepoint()));
       }
-      BigDecimal volume = transferSample.getDistributedVolume() != null ? transferSample.getDistributedVolume() : sample.getVolume();
+      BigDecimal volume =
+          transferSample.getDistributedVolume() != null ? transferSample.getDistributedVolume() : sample.getVolume();
       cells.add(makeTd(LimsUtils.toNiceString(volume)));
       cells.add(makeTd(LimsUtils.toNiceString(sample.getConcentration())));
       cells.add(makeTd(getYieldString(volume, sample.getConcentration())));
@@ -375,8 +380,9 @@ public class NotificationManager {
   }
 
   private static ContainerTag makeLibraryTable(Collection<TransferLibrary> transferLibraries) {
-    ContainerTag headerRow = tr(makeTh("Alias"), makeTh("Barcode"), makeTh("Location"), makeTh("Platform"), makeTh("Type"),
-        makeTh("i7 Index Name"), makeTh("i7 Index"), makeTh("i5 Index Name"), makeTh("i5 Index"));
+    ContainerTag headerRow =
+        tr(makeTh("Alias"), makeTh("Barcode"), makeTh("Location"), makeTh("Platform"), makeTh("Type"),
+            makeTh("i7 Index Name"), makeTh("i7 Index"), makeTh("i5 Index Name"), makeTh("i5 Index"));
 
     List<ContainerTag> rows = new ArrayList<>();
     List<TransferLibrary> sorted = sortByAlias(transferLibraries);
@@ -399,8 +405,10 @@ public class NotificationManager {
   }
 
   private static ContainerTag makeLibraryAliquotTable(Collection<TransferLibraryAliquot> transferLibraryAliquots) {
-    ContainerTag headerRow = tr(makeTh("Alias"), makeTh("Barcode"), makeTh("Location"), makeTh("Platform"), makeTh("Type"),
-        makeTh("i7 Index Name"), makeTh("i7 Index"), makeTh("i5 Index Name"), makeTh("i5 Index"), makeTh("Targeted Sequencing"));
+    ContainerTag headerRow =
+        tr(makeTh("Alias"), makeTh("Barcode"), makeTh("Location"), makeTh("Platform"), makeTh("Type"),
+            makeTh("i7 Index Name"), makeTh("i7 Index"), makeTh("i5 Index Name"), makeTh("i5 Index"),
+            makeTh("Targeted Sequencing"));
 
     List<ContainerTag> rows = new ArrayList<>();
     List<TransferLibraryAliquot> sorted = sortByAlias(transferLibraryAliquots);

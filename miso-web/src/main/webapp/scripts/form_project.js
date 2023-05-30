@@ -5,12 +5,12 @@ FormTarget.project = (function ($) {
    *   statusOptions: array
    *   naming: {
    *     primary: {
-   *       shortNameRequired: boolean
-   *       shortNameMofifiable: boolean
+   *       codeRequired: boolean
+   *       codeMofifiable: boolean
    *     },
    *     secondary: { // optional
-   *       shortNameRequired: boolean
-   *       shortNameMofifiable: boolean
+   *       codeRequired: boolean
+   *       codeMofifiable: boolean
    *     }
    *   }
    * }
@@ -56,8 +56,8 @@ FormTarget.project = (function ($) {
               type: "read-only",
             },
             {
-              title: "Alias",
-              data: "alias",
+              title: "Title",
+              data: "title",
               type: "text",
               required: true,
               maxLength: 100,
@@ -69,9 +69,9 @@ FormTarget.project = (function ($) {
               include: !!config.naming.secondary && !object.id,
               onChange: function (newValue, form) {
                 var scheme = config.naming[newValue ? "secondary" : "primary"];
-                form.updateField("shortName", {
-                  required: Constants.isDetailedSample || scheme.shortNameRequired,
-                  disabled: !scheme.shortNameModifiable,
+                form.updateField("code", {
+                  required: Constants.isDetailedSample || scheme.codeRequired,
+                  disabled: !scheme.codeModifiable,
                 });
               },
             },
@@ -85,12 +85,12 @@ FormTarget.project = (function ($) {
               },
             },
             {
-              title: "Short Name",
-              data: "shortName",
+              title: "Code",
+              data: "doe3",
               type: "text",
               maxLength: 255,
-              required: Constants.isDetailedSample || config.naming.primary.shortNameRequired,
-              disabled: !config.naming.primary.shortNameModifiable,
+              required: Constants.isDetailedSample || config.naming.primary.codeRequired,
+              disabled: !config.naming.primary.codeNameModifiable,
             },
             {
               title: "REB Number",

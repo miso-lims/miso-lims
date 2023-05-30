@@ -20,12 +20,12 @@ ListTarget.project = {
     } else {
       return [
         ListUtils.createBulkDeleteAction("Projects", "projects", function (project) {
-          if (!project.alias) {
-            return project.shortName;
-          } else if (!project.shortName) {
-            return project.alias;
+          if (!project.title) {
+            return project.code;
+          } else if (!project.code) {
+            return project.title;
           } else {
-            return project.alias + " (" + project.shortName + ")";
+            return project.title + " (" + project.code + ")";
           }
         }),
       ];
@@ -66,8 +66,8 @@ ListTarget.project = {
                           name:
                             project.name +
                             ": " +
-                            project.alias +
-                            (project.shortName ? " (" + project.shortName + ")" : ""),
+                            project.title +
+                            (project.code ? " (" + project.code + ")" : ""),
                           handler: function () {
                             LibraryTemplate.addProject(project);
                           },
@@ -110,18 +110,18 @@ ListTarget.project = {
         sClass: "nowrap",
       },
       ListUtils.labelHyperlinkColumn(
-        "Alias",
+        "Title",
         Urls.ui.projects.edit,
         Utils.array.getId,
-        "alias",
+        "title",
         1,
         true
       ),
       ListUtils.labelHyperlinkColumn(
-        "Short Name",
+        "Code",
         Urls.ui.projects.edit,
         Utils.array.getId,
-        "shortName",
+        "code",
         0,
         true
       ),

@@ -1,0 +1,1 @@
+Two fields in *Project*: "short name" -> "code" and "alias" -> "title"

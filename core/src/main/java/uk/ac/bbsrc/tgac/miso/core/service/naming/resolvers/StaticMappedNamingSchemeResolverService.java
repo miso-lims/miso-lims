@@ -32,7 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.DefaultNameValidator
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.DefaultSampleAliasValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.NameValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrLibraryAliasValidator;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrProjectShortNameValidator;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrProjectCodeValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrSampleAliasValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.V2LibraryAliasValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.V2LibraryAliquotAliasValidator;
@@ -48,7 +48,8 @@ public class StaticMappedNamingSchemeResolverService implements NamingSchemeReso
   private static final Map<String, Class<? extends NameGenerator<Nameable>>> nameGenerators = new HashMap<>();
   private static final Map<String, Class<? extends NameGenerator<Sample>>> sampleAliasGenerators = new HashMap<>();
   private static final Map<String, Class<? extends NameGenerator<Library>>> libraryAliasGenerators = new HashMap<>();
-  private static final Map<String, Class<? extends NameGenerator<LibraryAliquot>>> libraryAliquotAliasGenerators = new HashMap<>();
+  private static final Map<String, Class<? extends NameGenerator<LibraryAliquot>>> libraryAliquotAliasGenerators =
+      new HashMap<>();
   private static final Map<String, Class<? extends NameValidator>> nameValidators = new HashMap<>();
   private static final Map<String, Class<? extends NameValidator>> sampleAliasValidators = new HashMap<>();
   private static final Map<String, Class<? extends NameValidator>> libraryAliasValidators = new HashMap<>();
@@ -61,10 +62,10 @@ public class StaticMappedNamingSchemeResolverService implements NamingSchemeReso
     namingSchemes.put("default", DefaultNamingScheme.class);
     namingSchemes.put("oicr", OicrNamingScheme.class);
     namingSchemes.put("v2", V2NamingScheme.class);
-    
+
     nameGenerators.put("default", DefaultNameGenerator.class);
     nameGenerators.put("classname", ClassnameNameGenerator.class);
-    
+
     sampleAliasGenerators.put("oicr", OicrSampleAliasGenerator.class);
     sampleAliasGenerators.put("v2", V2SampleAliasGenerator.class);
 
@@ -95,7 +96,7 @@ public class StaticMappedNamingSchemeResolverService implements NamingSchemeReso
     libraryAliquotAliasValidators.put("v2", V2LibraryAliquotAliasValidator.class);
 
     projectShortNameValidators.put("allowany", AllowAnythingValidator.class);
-    projectShortNameValidators.put("oicr", OicrProjectShortNameValidator.class);
+    projectShortNameValidators.put("oicr", OicrProjectCodeValidator.class);
   }
 
   @Override
@@ -124,7 +125,8 @@ public class StaticMappedNamingSchemeResolverService implements NamingSchemeReso
 
   @Override
   public NameGenerator<LibraryAliquot> getLibraryAliquotAliasGenerator(String generatorName) {
-    Class<? extends NameGenerator<LibraryAliquot>> clazz = libraryAliquotAliasGenerators.get(generatorName.toLowerCase());
+    Class<? extends NameGenerator<LibraryAliquot>> clazz =
+        libraryAliquotAliasGenerators.get(generatorName.toLowerCase());
     return loadClass(clazz, "library aliquot alias generator", generatorName);
   }
 

@@ -29,7 +29,7 @@ public abstract class ListTransferViewItem implements Serializable {
 
   public String getProjectLabel() {
     ListTransferViewProject project = getProject();
-    return project.getShortName() == null ? project.getName() : project.getShortName();
+    return project.getCode() == null ? project.getName() : project.getCode();
   }
 
   public Boolean isReceived() {

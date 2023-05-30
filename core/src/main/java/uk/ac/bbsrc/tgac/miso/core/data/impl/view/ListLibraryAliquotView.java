@@ -231,11 +231,11 @@ public class ListLibraryAliquotView
   }
 
   public String getProjectShortName() {
-    return getProjectAttribute(ParentProject::getShortName);
+    return getProjectAttribute(ParentProject::getCode);
   }
 
   public String getProjectAlias() {
-    return getProjectAttribute(ParentProject::getAlias);
+    return getProjectAttribute(ParentProject::getTitle);
   }
 
   public Long getProjectId() {

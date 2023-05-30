@@ -26,12 +26,15 @@ public class ExternalUriBuilder {
   private static final String REPLACEHOLDER = "REPLACE";
 
   public Map<String, String> getUris(Project project) {
-    if (!project.isSaved() || projectUris.isEmpty()) return Collections.emptyMap();
-    return projectUris.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, m -> expandProjectUrl(m.getValue(), project)));
+    if (!project.isSaved() || projectUris.isEmpty())
+      return Collections.emptyMap();
+    return projectUris.entrySet().stream()
+        .collect(Collectors.toMap(Map.Entry::getKey, m -> expandProjectUrl(m.getValue(), project)));
   }
 
   public Map<String, String> getUris(Run run) {
-    if (run.getId() == Run.UNSAVED_ID || runUris.isEmpty() || runUris.get(run.getPlatformType()) == null) return Collections.emptyMap();
+    if (run.getId() == Run.UNSAVED_ID || runUris.isEmpty() || runUris.get(run.getPlatformType()) == null)
+      return Collections.emptyMap();
 
     return runUris.get(run.getPlatformType())
         .entrySet().stream()
@@ -41,7 +44,7 @@ public class ExternalUriBuilder {
   private String expandProjectUrl(String uriWithPlaceholders, Project project) {
     return uriWithPlaceholders.replaceAll(ID_PLACEHOLDER, String.valueOf(project.getId()))
         .replaceAll(NAME_PLACEHOLDER, project.getName())
-        .replaceAll(SHORTNAME_PLACEHOLDER, project.getShortName());
+        .replaceAll(SHORTNAME_PLACEHOLDER, project.getCode());
   }
 
   private String expandRunUrl(String uriWithPlaceholders, Run run) {
@@ -59,11 +62,14 @@ public class ExternalUriBuilder {
   }
 
   public void processProjectLinksConfig(String linksConfigLine, Map<String, String> uriMap) {
-    if (LimsUtils.isStringBlankOrNull(linksConfigLine)) return;
+    if (LimsUtils.isStringBlankOrNull(linksConfigLine))
+      return;
 
-    String[] configStrings = linksConfigLine.split("\\\\"); // multiple project report links can be double-backslash-separated (\\)
+    String[] configStrings = linksConfigLine.split("\\\\"); // multiple project report links can be
+                                                            // double-backslash-separated (\\)
     for (int i = 0; i < configStrings.length; i++) {
-      String[] configParts = configStrings[i].split("\\|"); // linksConfigLine format: <link text>|<URI with placeholders>
+      String[] configParts = configStrings[i].split("\\|"); // linksConfigLine format: <link text>|<URI with
+                                                            // placeholders>
       validateConfigLength(configParts, 2);
 
       String linkText = configParts[0].trim();
@@ -75,19 +81,24 @@ public class ExternalUriBuilder {
   }
 
   public void processRunLinksConfig(String linksConfigLine, Map<PlatformType, Map<String, String>> uriMap) {
-    if (LimsUtils.isStringBlankOrNull(linksConfigLine)) return;
+    if (LimsUtils.isStringBlankOrNull(linksConfigLine))
+      return;
 
-    String[] configStrings = linksConfigLine.split("\\\\"); // multiple run report links can be double-backslash-separated (\\)
+    String[] configStrings = linksConfigLine.split("\\\\"); // multiple run report links can be
+                                                            // double-backslash-separated (\\)
     for (int i = 0; i < configStrings.length; i++) {
-      String[] configParts = configStrings[i].split("\\|"); // linksConfigLine format: <PlatformType,PlatformType>|<link text>|<URI with
+      String[] configParts = configStrings[i].split("\\|"); // linksConfigLine format: <PlatformType,PlatformType>|<link
+                                                            // text>|<URI with
                                                             // placeholders>
       validateConfigLength(configParts, 3);
 
       Set<String> platformTypeStrings = Sets.newHashSet(configParts[0].trim().split(","));
-      Set<PlatformType> platformTypes = platformTypeStrings.stream().map(pt -> PlatformType.get(pt.trim())).collect(Collectors.toSet());
+      Set<PlatformType> platformTypes =
+          platformTypeStrings.stream().map(pt -> PlatformType.get(pt.trim())).collect(Collectors.toSet());
       if (platformTypes.isEmpty()) {
         throw new IllegalArgumentException(
-            String.format("Invalid configuration: could not find any matching platforms for string %s", configParts[0]));
+            String.format("Invalid configuration: could not find any matching platforms for string %s",
+                configParts[0]));
       }
       String linkText = configParts[1].trim();
       String uriWithPlaceholders = configParts[2].trim();
@@ -106,7 +117,8 @@ public class ExternalUriBuilder {
   private void validateConfigLength(String[] configParts, Integer expectedLength) {
     if (configParts.length != expectedLength) {
       throw new IllegalArgumentException(
-          String.format("Invalid configuration: expected %d link config parts separated by '|' for config string %s but got %d parts",
+          String.format(
+              "Invalid configuration: expected %d link config parts separated by '|' for config string %s but got %d parts",
               expectedLength, String.join("|", configParts), configParts.length));
     }
   }
@@ -120,7 +132,8 @@ public class ExternalUriBuilder {
       new URI(validateableUri);
     } catch (URISyntaxException e) {
       throw new IllegalArgumentException(
-          String.format("Invalid configuration: unable to parse valid URL from external link config %s", uriWithPlaceholders));
+          String.format("Invalid configuration: unable to parse valid URL from external link config %s",
+              uriWithPlaceholders));
     }
   }
 }

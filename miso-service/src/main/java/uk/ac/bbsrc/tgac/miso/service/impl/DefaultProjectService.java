@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.generateTemporaryName;
@@ -102,8 +79,8 @@ public class DefaultProjectService implements ProjectService {
   }
 
   @Override
-  public Project getProjectByShortName(String projectShortName) throws IOException {
-    return projectStore.getByShortName(projectShortName);
+  public Project getProjectByCode(String projectCode) throws IOException {
+    return projectStore.getByCode(projectCode);
   }
 
   @Override
@@ -168,26 +145,28 @@ public class DefaultProjectService implements ProjectService {
     List<ValidationError> errors = new ArrayList<>();
 
     NamingScheme namingScheme = namingSchemeHolder.get(project.isSecondaryNaming());
-    if (ValidationUtils.isSetAndChanged(Project::getShortName, project, beforeChange)) {
-      // assume that if project shortname is required by the naming scheme, it is used for generating sample aliases
-      if (beforeChange != null && !namingScheme.nullProjectShortNameAllowed() && hasSamples(beforeChange)) {
-        errors.add(new ValidationError("shortName", "Cannot change because there are already samples in the project"));
+    if (ValidationUtils.isSetAndChanged(Project::getCode, project, beforeChange)) {
+      // assume that if project code is required by the naming scheme, it is used for generating
+      // sample titles
+      if (beforeChange != null && !namingScheme.nullProjectCodeAllowed() && hasSamples(beforeChange)) {
+        errors.add(new ValidationError("code", "Cannot change because there are already samples in the project"));
       }
     }
-    if (project.getShortName() == null && detailedSample) {
-      errors.add(ValidationError.forRequired("shortName"));
+    if (project.getCode() == null && detailedSample) {
+      errors.add(ValidationError.forRequired("code"));
     }
-    ValidationResult shortNameValidation = namingScheme.validateProjectShortName(project.getShortName());
-    if (!shortNameValidation.isValid()) {
-      errors.add(new ValidationError("shortName", shortNameValidation.getMessage()));
+    ValidationResult codeValidation = namingScheme.validateProjectCode(project.getCode());
+    if (!codeValidation.isValid()) {
+      errors.add(new ValidationError("code", codeValidation.getMessage()));
     }
-    if ((beforeChange == null || (project.getShortName() != null && !project.getShortName().equals(beforeChange.getShortName())))
-        && (project.getShortName() != null && getProjectByShortName(project.getShortName()) != null)) {
-      errors.add(new ValidationError("shortName", "There is already a project with this short name"));
+    if ((beforeChange == null
+        || (project.getCode() != null && !project.getCode().equals(beforeChange.getCode())))
+        && (project.getCode() != null && getProjectByCode(project.getCode()) != null)) {
+      errors.add(new ValidationError("code", "There is already a project with this code"));
     }
-    if ((beforeChange == null || !project.getAlias().equals(beforeChange.getAlias()))
-        && projectStore.getByAlias(project.getAlias()) != null) {
-      errors.add(new ValidationError("alias", "There is already a project with this alias"));
+    if ((beforeChange == null || !project.getTitle().equals(beforeChange.getTitle()))
+        && projectStore.getByTitle(project.getTitle()) != null) {
+      errors.add(new ValidationError("title", "There is already a project with this title"));
     }
 
     if (!errors.isEmpty()) {
@@ -196,8 +175,10 @@ public class DefaultProjectService implements ProjectService {
   }
 
   private void loadChildEntities(Project project) throws IOException {
-    loadChildEntity(project::setReferenceGenome, project.getReferenceGenome(), referenceGenomeService, "referenceGenomeId");
-    loadChildEntity(project::setDefaultTargetedSequencing, project.getDefaultTargetedSequencing(), targetedSequencingService,
+    loadChildEntity(project::setReferenceGenome, project.getReferenceGenome(), referenceGenomeService,
+        "referenceGenomeId");
+    loadChildEntity(project::setDefaultTargetedSequencing, project.getDefaultTargetedSequencing(),
+        targetedSequencingService,
         "defaultTargetedSequencingId");
     loadChildEntity(project::setPipeline, project.getPipeline(), pipelineService, "pipelineId");
     loadChildEntity(project::setContact, project.getContact(), contactService, "contactId");
@@ -205,12 +186,12 @@ public class DefaultProjectService implements ProjectService {
   }
 
   private void applyChanges(Project original, Project project) {
-    original.setAlias(project.getAlias());
+    original.setTitle(project.getTitle());
     original.setDescription(project.getDescription());
     original.setStatus(project.getStatus());
     original.setReferenceGenome(project.getReferenceGenome());
     original.setDefaultTargetedSequencing(project.getDefaultTargetedSequencing());
-    original.setShortName(project.getShortName());
+    original.setCode(project.getCode());
     original.setPipeline(project.getPipeline());
     original.setRebNumber(project.getRebNumber());
     original.setRebExpiry(project.getRebExpiry());
@@ -250,13 +231,15 @@ public class DefaultProjectService implements ProjectService {
   }
 
   @Override
-  public uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult validateDeletion(Project object) throws IOException {
-    uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult result = new uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult();
+  public uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult validateDeletion(Project object)
+      throws IOException {
+    uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult result =
+        new uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult();
 
     long samples = sampleService.count(PaginationFilter.project(object.getId()));
     if (samples > 0L) {
       result.addError(new ValidationError(String.format("Project %s contains %d samples",
-          object.getShortName() == null ? object.getAlias() : object.getShortName(), samples)));
+          object.getCode() == null ? object.getTitle() : object.getCode(), samples)));
     }
 
     return result;

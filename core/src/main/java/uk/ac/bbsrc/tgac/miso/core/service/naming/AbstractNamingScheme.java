@@ -20,16 +20,19 @@ public abstract class AbstractNamingScheme implements NamingScheme {
 
   @Override
   public String generateNameFor(Nameable nameable) throws MisoNamingException, IOException {
-    if (getNameGenerator() == null) throw new UnsupportedOperationException("check hasNameGenerator() to determine availability");
+    if (getNameGenerator() == null)
+      throw new UnsupportedOperationException("check hasNameGenerator() to determine availability");
     String name = getNameGenerator().generate(nameable);
     ValidationResult vr = validateName(name);
-    if (vr.isValid()) return name;
+    if (vr.isValid())
+      return name;
     throw new MisoNamingException("failed to generate a valid name: " + vr.getMessage());
   }
 
   @Override
   public ValidationResult validateName(String name) {
-    if (getNameValidator() == null) return ValidationResult.success();
+    if (getNameValidator() == null)
+      return ValidationResult.success();
     return getNameValidator().validate(name);
   }
 
@@ -47,7 +50,8 @@ public abstract class AbstractNamingScheme implements NamingScheme {
 
   @Override
   public ValidationResult validateSampleAlias(String alias) {
-    if (getSampleAliasValidator() == null) return ValidationResult.success();
+    if (getSampleAliasValidator() == null)
+      return ValidationResult.success();
     return getSampleAliasValidator().validate(alias);
   }
 
@@ -65,7 +69,8 @@ public abstract class AbstractNamingScheme implements NamingScheme {
 
   @Override
   public ValidationResult validateLibraryAlias(String alias) {
-    if (getLibraryAliasValidator() == null) return ValidationResult.success();
+    if (getLibraryAliasValidator() == null)
+      return ValidationResult.success();
     return getLibraryAliasValidator().validate(alias);
   }
 
@@ -111,19 +116,20 @@ public abstract class AbstractNamingScheme implements NamingScheme {
   }
 
   @Override
-  public ValidationResult validateProjectShortName(String shortName) {
-    if (getProjectShortNameValidator() == null) return ValidationResult.success();
-    return getProjectShortNameValidator().validate(shortName);
+  public ValidationResult validateProjectCode(String code) {
+    if (getProjectCodeValidator() == null)
+      return ValidationResult.success();
+    return getProjectCodeValidator().validate(code);
   }
 
   @Override
-  public boolean duplicateProjectShortNamesAllowed() {
-    return getProjectShortNameValidator() == null ? true : getProjectShortNameValidator().duplicatesAllowed();
+  public boolean duplicateProjectCodesAllowed() {
+    return getProjectCodeValidator() == null ? true : getProjectCodeValidator().duplicatesAllowed();
   }
 
   @Override
-  public boolean nullProjectShortNameAllowed() {
-    return getProjectShortNameValidator() == null ? false : getProjectShortNameValidator().nullsAllowed();
+  public boolean nullProjectCodeAllowed() {
+    return getProjectCodeValidator() == null ? false : getProjectCodeValidator().nullsAllowed();
   }
 
   protected abstract NameValidator getNameValidator();
@@ -142,6 +148,6 @@ public abstract class AbstractNamingScheme implements NamingScheme {
 
   protected abstract NameGenerator<LibraryAliquot> getLibraryAliquotAliasGenerator();
 
-  protected abstract NameValidator getProjectShortNameValidator();
+  protected abstract NameValidator getProjectCodeValidator();
 
 }

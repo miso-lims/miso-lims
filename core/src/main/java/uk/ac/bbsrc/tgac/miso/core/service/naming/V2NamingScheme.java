@@ -14,7 +14,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.V2LibraryAliquotAlia
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.V2SampleAliasGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.DefaultNameValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.NameValidator;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrProjectShortNameValidator;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrProjectCodeValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.V2LibraryAliasValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.V2LibraryAliquotAliasValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.V2SampleAliasValidator;
@@ -32,12 +32,13 @@ public class V2NamingScheme extends AbstractNamingScheme {
   private final V2LibraryAliasGenerator libraryAliasGenerator = new V2LibraryAliasGenerator();
   private final V2LibraryAliquotAliasValidator libraryAliquotAliasValidator = new V2LibraryAliquotAliasValidator();
   private final V2LibraryAliquotAliasGenerator libraryAliquotAliasGenerator = new V2LibraryAliquotAliasGenerator();
-  private final OicrProjectShortNameValidator projectShortNameValidator = new OicrProjectShortNameValidator();
+  private final OicrProjectCodeValidator projectShortNameValidator = new OicrProjectCodeValidator();
 
   /**
-   * Creates a new V2NamingScheme and attempts to autowire all of its validators' and generators' dependencies. If no
-   * WebApplicationContext is available, wiring will be skipped, and setters within this class (e.g.
-   * {@link #setSiblingNumberGenerator(SiblingNumberGenerator)}) should be used to complete the necessary wiring manually
+   * Creates a new V2NamingScheme and attempts to autowire all of its validators' and generators'
+   * dependencies. If no WebApplicationContext is available, wiring will be skipped, and setters
+   * within this class (e.g. {@link #setSiblingNumberGenerator(SiblingNumberGenerator)}) should be
+   * used to complete the necessary wiring manually
    */
   public V2NamingScheme() {
     SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(sampleAliasGenerator);
@@ -46,8 +47,8 @@ public class V2NamingScheme extends AbstractNamingScheme {
   }
 
   /**
-   * Sets the SiblingNumberGenerator to use in generating aliases. Within a Spring context, this will be autowired. This
-   * method exists for cases where the V2NamingScheme is not a Spring-managed bean
+   * Sets the SiblingNumberGenerator to use in generating aliases. Within a Spring context, this will
+   * be autowired. This method exists for cases where the V2NamingScheme is not a Spring-managed bean
    * 
    * @param siblingNumberGenerator
    */
@@ -58,8 +59,9 @@ public class V2NamingScheme extends AbstractNamingScheme {
   }
 
   /**
-   * Sets the SampleNumberPerProjectService to use in generating aliases. Within a Spring context, this will be autowired. This
-   * method exists for cases where the V2NamingScheme is not a Spring-managed bean
+   * Sets the SampleNumberPerProjectService to use in generating aliases. Within a Spring context,
+   * this will be autowired. This method exists for cases where the V2NamingScheme is not a
+   * Spring-managed bean
    * 
    * @param sampleNumberPerProjectService
    */
@@ -108,7 +110,7 @@ public class V2NamingScheme extends AbstractNamingScheme {
   }
 
   @Override
-  public void setProjectShortNameValidator(NameValidator validator) {
+  public void setProjectCodeValidator(NameValidator validator) {
     throwUnsupported();
   }
 
@@ -157,7 +159,7 @@ public class V2NamingScheme extends AbstractNamingScheme {
   }
 
   @Override
-  protected NameValidator getProjectShortNameValidator() {
+  protected NameValidator getProjectCodeValidator() {
     return projectShortNameValidator;
   }
 

@@ -344,7 +344,7 @@ public class SampleRestController extends RestController {
       @RequestBody JsonNode json, HttpServletResponse response) throws IOException {
     final JsonNode searchTerms = json.get("identitiesSearches");
     Project project =
-        (json.get("project") == null ? null : projectService.getProjectByShortName(json.get("project").asText()));
+        (json.get("project") == null ? null : projectService.getProjectByCode(json.get("project").asText()));
     if (!searchTerms.isArray() || searchTerms.size() == 0) {
       throw new RestException("Please provide external name or alias for identity lookup", Status.BAD_REQUEST);
     }

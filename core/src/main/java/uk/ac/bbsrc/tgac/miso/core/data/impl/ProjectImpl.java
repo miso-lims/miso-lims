@@ -60,8 +60,8 @@ public class ProjectImpl implements Project {
 
   private String description = "";
   private String name = "";
-  private String alias = "";
-  private String shortName;
+  private String title = "";
+  private String code;
   private String rebNumber;
 
   private LocalDate rebExpiry;
@@ -135,18 +135,18 @@ public class ProjectImpl implements Project {
   }
 
   @Override
-  public String getAlias() {
-    return alias;
+  public String getTitle() {
+    return title;
   }
 
   @Override
-  public String getShortName() {
-    return shortName;
+  public String getCode() {
+    return code;
   }
 
   @Override
-  public void setShortName(String shortName) {
-    this.shortName = shortName;
+  public void setCode(String code) {
+    this.code = code;
   }
 
   @Override
@@ -175,8 +175,8 @@ public class ProjectImpl implements Project {
   }
 
   @Override
-  public void setAlias(String alias) {
-    this.alias = alias;
+  public void setTitle(String title) {
+    this.title = title;
   }
 
   @Override
@@ -234,8 +234,8 @@ public class ProjectImpl implements Project {
         return -1;
       if (getId() > o.getId())
         return 1;
-    } else if (getAlias() != null && o.getAlias() != null) {
-      return getAlias().compareTo(o.getAlias());
+    } else if (getTitle() != null && o.getTitle() != null) {
+      return getTitle().compareTo(o.getTitle());
     }
     return 0;
   }
@@ -269,11 +269,11 @@ public class ProjectImpl implements Project {
   @Override
   public int hashCode() {
     return new HashCodeBuilder(5, 35)
-        .append(alias)
+        .append(title)
         .append(description)
         .append(status)
         .append(referenceGenome)
-        .append(shortName)
+        .append(code)
         .toHashCode();
   }
 
@@ -287,11 +287,11 @@ public class ProjectImpl implements Project {
       return false;
     ProjectImpl other = (ProjectImpl) obj;
     return new EqualsBuilder()
-        .append(alias, other.alias)
+        .append(title, other.title)
         .append(description, other.description)
         .append(status, other.status)
         .append(referenceGenome, other.referenceGenome)
-        .append(shortName, other.shortName)
+        .append(code, other.code)
         .isEquals();
   }
 
@@ -372,12 +372,12 @@ public class ProjectImpl implements Project {
 
   @Override
   public String getDeleteDescription() {
-    if (getAlias() == null) {
-      return getShortName();
-    } else if (getShortName() == null) {
-      return getAlias();
+    if (getTitle() == null) {
+      return getCode();
+    } else if (getCode() == null) {
+      return getTitle();
     } else {
-      return getAlias() + " (" + getShortName() + ")";
+      return getTitle() + " (" + getCode() + ")";
     }
   }
 

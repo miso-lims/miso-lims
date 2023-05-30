@@ -26,7 +26,7 @@ public class ListTransferViewPool extends ListTransferViewItem {
     private static final String SHORT_NAME = "Undetermined (pool)";
 
     @Override
-    public String getShortName() {
+    public String getCode() {
       return SHORT_NAME;
     }
 

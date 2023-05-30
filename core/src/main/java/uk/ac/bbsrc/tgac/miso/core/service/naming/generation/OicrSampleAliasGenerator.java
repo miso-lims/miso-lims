@@ -65,7 +65,8 @@ public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
         }
       }
       if (isIdentitySample(parent)) {
-        if (!isTissueSample(detailed)) throw new IllegalArgumentException("Missing parent tissue");
+        if (!isTissueSample(detailed))
+          throw new IllegalArgumentException("Missing parent tissue");
         return generateTissueAlias((SampleTissue) detailed, (SampleIdentity) LimsUtils.deproxify(parent));
       }
     }
@@ -73,10 +74,10 @@ public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
   }
 
   private String generateIdentityAlias(SampleIdentity identity) throws IOException {
-    if (identity.getProject().getShortName() == null) {
+    if (identity.getProject().getCode() == null) {
       throw new NullPointerException("Project shortname required to generate Identity alias");
     }
-    String internalName = identity.getProject().getShortName() + "_";
+    String internalName = identity.getProject().getCode() + "_";
     String number = sampleNumberPerProjectService.nextNumber(identity.getProject(), internalName);
     internalName += number;
     return internalName;
@@ -139,15 +140,16 @@ public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
   }
 
   private String passageNumber(Integer passageNumber) {
-    if (passageNumber == null) return NO_PASSAGE;
+    if (passageNumber == null)
+      return NO_PASSAGE;
     String p = passageNumber.toString();
     switch (p.length()) {
-    case 1:
-      return "0" + p;
-    case 2:
-      return p;
-    default:
-      throw new IllegalArgumentException("Invalid passage number. Must be 1-2 digits, or null");
+      case 1:
+        return "0" + p;
+      case 2:
+        return p;
+      default:
+        throw new IllegalArgumentException("Invalid passage number. Must be 1-2 digits, or null");
     }
   }
 

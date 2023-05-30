@@ -14,8 +14,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -173,9 +173,11 @@ public class DefaultSampleServiceTest {
     ArgumentCaptor<Sample> createdCapture = ArgumentCaptor.forClass(Sample.class);
     Mockito.verify(sampleStore).create(createdCapture.capture());
     Sample created = createdCapture.getValue();
-    assertEquals("shell project should be replaced by real project", expectedProject.getAlias(), created.getProject().getAlias());
+    assertEquals("shell project should be replaced by real project", expectedProject.getTitle(),
+        created.getProject().getTitle());
     assertNotNull("modification details should be added", created.getLastModifier());
-    assertEquals("modification details should be added", expectedLastModifier.getId(), created.getLastModifier().getId());
+    assertEquals("modification details should be added", expectedLastModifier.getId(),
+        created.getLastModifier().getId());
     assertTrue("expected a plain sample", LimsUtils.isPlainSample(created));
 
     // name generators get called after initial save
@@ -297,7 +299,8 @@ public class DefaultSampleServiceTest {
     mockShellProjectWithRealLookup(sample);
     mockUser();
 
-    // because of mocked dao, we can't actually continue with the same parent sample that should be created, but the partial
+    // because of mocked dao, we can't actually continue with the same parent sample that should be
+    // created, but the partial
     // parent sample that gets created is caught and examined below
     SampleIdentity parent = makeParentIdentityWithLookup();
     Mockito.when(sampleStore.create(Mockito.any(Sample.class))).thenReturn(parent.getId());
@@ -319,7 +322,8 @@ public class DefaultSampleServiceTest {
 
     ArgumentCaptor<Sample> updatedCapture = ArgumentCaptor.forClass(Sample.class);
     Mockito.verify(sampleStore, Mockito.times(3)).update(updatedCapture.capture());
-    // note: finalParent is not actually derived from partialParent because of mocked dao (above), but it should be the parent
+    // note: finalParent is not actually derived from partialParent because of mocked dao (above), but
+    // it should be the parent
     // linked to finalChild
     Sample finalParent = updatedCapture.getAllValues().get(0);
     Sample finalChild = updatedCapture.getAllValues().get(1);
@@ -421,9 +425,11 @@ public class DefaultSampleServiceTest {
     assertEquals("Sample sampleType should be modifiable", updated.getSampleType(), result.getSampleType());
     assertEquals("Sample description should be modifiable", updated.getDescription(), result.getDescription());
     assertEquals("Sample sampleType should be modifiable", updated.getSampleType(), result.getSampleType());
-    assertEquals("Sample detailedQcStatus should be modifiable", updated.getDetailedQcStatus(), result.getDetailedQcStatus());
+    assertEquals("Sample detailedQcStatus should be modifiable", updated.getDetailedQcStatus(),
+        result.getDetailedQcStatus());
     assertEquals("Sample scientificName should be modifiable", updated.getScientificName(), result.getScientificName());
-    assertEquals("Sample taxonIdentifier should be modifiable", updated.getTaxonIdentifier(), result.getTaxonIdentifier());
+    assertEquals("Sample taxonIdentifier should be modifiable", updated.getTaxonIdentifier(),
+        result.getTaxonIdentifier());
     assertEquals("Sample volume should be modifiable", updated.getVolume(), result.getVolume());
     assertEquals("Sample project should be modifiable", updated.getProject().getId(), result.getProject().getId());
 
@@ -446,7 +452,7 @@ public class DefaultSampleServiceTest {
     id1.setExternalName("String1,String2");
     id1.setProjectId(project.getId());
     Mockito.when(sut.getIdentitiesByExternalNameOrAliasAndProject(ArgumentMatchers.anyString(),
-            ArgumentMatchers.anyLong(), ArgumentMatchers.anyBoolean()))
+        ArgumentMatchers.anyLong(), ArgumentMatchers.anyBoolean()))
         .thenReturn(Collections.singletonList(id1));
     Sample newSample = new SampleImpl();
     newSample.setProject(project);
@@ -465,7 +471,7 @@ public class DefaultSampleServiceTest {
     Sample newSample = new SampleImpl();
     newSample.setProject(project);
     Mockito.when(sut.getIdentitiesByExternalNameOrAliasAndProject(ArgumentMatchers.anyString(),
-            ArgumentMatchers.anyLong(), ArgumentMatchers.anyBoolean()))
+        ArgumentMatchers.anyLong(), ArgumentMatchers.anyBoolean()))
         .thenReturn(Collections.singletonList(id1));
     exception.expect(ValidationException.class);
     sut.confirmExternalNameUniqueForProjectIfRequired("String1,String3", newSample);
@@ -481,7 +487,7 @@ public class DefaultSampleServiceTest {
     id1.setExternalName("String1,String2");
     id1.setProjectId(project.getId());
     Mockito.when(sut.getIdentitiesByExternalNameOrAliasAndProject(ArgumentMatchers.anyString(),
-            ArgumentMatchers.anyLong(), ArgumentMatchers.anyBoolean()))
+        ArgumentMatchers.anyLong(), ArgumentMatchers.anyBoolean()))
         .thenReturn(Collections.singletonList(id1));
     Sample newSample = new SampleImpl();
     newSample.setProject(project);
@@ -499,28 +505,28 @@ public class DefaultSampleServiceTest {
     id1.setProjectId(project.getId());
     sut.setUniqueExternalNameWithinProjectRequired(false);
     Mockito.when(sut.getIdentitiesByExternalNameOrAliasAndProject(ArgumentMatchers.anyString(),
-            ArgumentMatchers.anyLong(), ArgumentMatchers.anyBoolean()))
+        ArgumentMatchers.anyLong(), ArgumentMatchers.anyBoolean()))
         .thenReturn(Collections.singletonList(id1));
     Sample newSample = new SampleImpl();
     newSample.setProject(project);
     sut.confirmExternalNameUniqueForProjectIfRequired("String1", newSample);
   }
-  
+
   @Test
   public void testAddNote() throws Exception {
     Sample paramSample = new SampleImpl();
     paramSample.setId(1L);
     paramSample.setAlias("paramSample");
-    
+
     Note note = new Note();
-    
+
     Sample dbSample = new SampleImpl();
     dbSample.setId(paramSample.getId());
     dbSample.setAlias("persistedSample");
     Mockito.when(sampleStore.get(paramSample.getId())).thenReturn(dbSample);
-    
+
     sut.addNote(paramSample, note);
-    
+
     ArgumentCaptor<Sample> capture = ArgumentCaptor.forClass(Sample.class);
     Mockito.verify(sampleStore).update(capture.capture());
     Sample savedSample = capture.getValue();
@@ -623,8 +629,9 @@ public class DefaultSampleServiceTest {
   }
 
   /**
-   * Adds a shell project to the provided Sample, and adds the real project to the mocked projectStore. The projectStore should be queried
-   * to swap in the persisted object in place of the shell
+   * Adds a shell project to the provided Sample, and adds the real project to the mocked
+   * projectStore. The projectStore should be queried to swap in the persisted object in place of the
+   * shell
    * 
    * @param sample the Sample to add shell project to
    * @return the "real" project that will be returned by the mock projectStore
@@ -632,14 +639,14 @@ public class DefaultSampleServiceTest {
    */
   private Project mockShellProjectWithRealLookup(Sample sample) throws IOException {
     Project shell = new ProjectImpl();
-    shell.setAlias("shell_project");
+    shell.setTitle("shell_project");
     shell.setId(32L);
     sample.setProject(shell);
 
     Project project = new ProjectImpl();
     project.setId(shell.getId());
-    project.setAlias("real_project");
-    project.setShortName("PROJ");
+    project.setTitle("real_project");
+    project.setCode("PROJ");
     Mockito.when(projectStore.get(shell.getId())).thenReturn(project);
     return project;
   }
