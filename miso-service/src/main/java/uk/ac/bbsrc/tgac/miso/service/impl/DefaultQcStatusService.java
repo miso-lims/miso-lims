@@ -157,8 +157,7 @@ public class DefaultQcStatusService implements QcStatusService {
             .filter(x -> x.getId() == update.getIds()[2])
             .findFirst().orElse(null);
         throwIfNull("Run-library", aliquotView);
-        LibraryAliquot aliquot = libraryAliquotService.get(update.getIds()[2]);
-        RunPartitionAliquot runLib = runPartitionAliquotService.get(run, partition, aliquot);
+        RunPartitionAliquot runLib = runPartitionAliquotService.get(run, partition, aliquotView);
         if (update.getQcStatusId() == null) {
           // QC status not set
           runLib.setQcStatus(null);

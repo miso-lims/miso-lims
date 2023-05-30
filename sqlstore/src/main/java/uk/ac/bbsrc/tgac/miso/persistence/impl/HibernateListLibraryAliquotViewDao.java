@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -74,7 +75,7 @@ public class HibernateListLibraryAliquotViewDao
   }
 
   @Override
-  public List<ListLibraryAliquotView> listByIdList(List<Long> aliquotIds) throws IOException {
+  public List<ListLibraryAliquotView> listByIdList(Collection<Long> aliquotIds) throws IOException {
     if (aliquotIds.size() == 0) {
       return Collections.emptyList();
     }

@@ -14,6 +14,11 @@ public class RunPartitionAliquotDto {
   private Long aliquotId;
   private String aliquotName;
   private String aliquotAlias;
+  private String tissueOriginAlias;
+  private String tissueOriginDescription;
+  private String tissueTypeAlias;
+  private String tissueTypeDescription;
+  private String libraryDesignCode;
   private Long runPurposeId;
   private Long qcStatusId;
   private String qcNote;
@@ -109,6 +114,46 @@ public class RunPartitionAliquotDto {
 
   public void setAliquotAlias(String aliquotAlias) {
     this.aliquotAlias = aliquotAlias;
+  }
+
+  public String getTissueOriginAlias() {
+    return tissueOriginAlias;
+  }
+
+  public void setTissueOriginAlias(String tissueOriginAlias) {
+    this.tissueOriginAlias = tissueOriginAlias;
+  }
+
+  public String getTissueOriginDescription() {
+    return tissueOriginDescription;
+  }
+
+  public void setTissueOriginDescription(String tissueOriginDescription) {
+    this.tissueOriginDescription = tissueOriginDescription;
+  }
+
+  public String getTissueTypeAlias() {
+    return tissueTypeAlias;
+  }
+
+  public void setTissueTypeAlias(String tissueTypeAlias) {
+    this.tissueTypeAlias = tissueTypeAlias;
+  }
+
+  public String getTissueTypeDescription() {
+    return tissueTypeDescription;
+  }
+
+  public void setTissueTypeDescription(String tissueTypeDescription) {
+    this.tissueTypeDescription = tissueTypeDescription;
+  }
+
+  public String getLibraryDesignCode() {
+    return libraryDesignCode;
+  }
+
+  public void setLibraryDesignCode(String libraryDesignCode) {
+    this.libraryDesignCode = libraryDesignCode;
   }
 
   public Long getRunPurposeId() {

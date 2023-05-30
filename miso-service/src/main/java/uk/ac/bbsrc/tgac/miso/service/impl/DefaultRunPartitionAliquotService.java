@@ -18,7 +18,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.RunLibraryQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionAliquotService;
@@ -41,7 +41,7 @@ public class DefaultRunPartitionAliquotService implements RunPartitionAliquotSer
   private AuthorizationManager authorizationManager;
 
   @Override
-  public RunPartitionAliquot get(Run run, Partition partition, LibraryAliquot aliquot) throws IOException {
+  public RunPartitionAliquot get(Run run, Partition partition, ListLibraryAliquotView aliquot) throws IOException {
     return runPartitionAliquotDao.get(run, partition, aliquot);
   }
 

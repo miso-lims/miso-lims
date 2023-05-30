@@ -4170,8 +4170,17 @@ public class Dtos {
           from.getPartition().getSequencerPartitionContainer().getIdentificationBarcode());
     }
     setInteger(to::setPartitionNumber, maybeGetProperty(from.getPartition(), Partition::getPartitionNumber), true);
-    setString(to::setAliquotName, maybeGetProperty(from.getAliquot(), LibraryAliquot::getName));
-    setString(to::setAliquotAlias, maybeGetProperty(from.getAliquot(), LibraryAliquot::getAlias));
+    setString(to::setAliquotName, from.getAliquot().getName());
+    setString(to::setAliquotAlias, from.getAliquot().getAlias());
+    if (from.getAliquot().getTissueAttributes() != null) {
+      ParentTissueAttributes tissue = from.getAliquot().getTissueAttributes();
+      setString(to::setTissueOriginAlias, tissue.getTissueOrigin().getAlias());
+      setString(to::setTissueOriginDescription, tissue.getTissueOrigin().getDescription());
+      setString(to::setTissueTypeAlias, tissue.getTissueType().getAlias());
+      setString(to::setTissueTypeDescription, tissue.getTissueType().getDescription());
+    }
+    setString(to::setLibraryDesignCode,
+        maybeGetProperty(from.getAliquot().getDesignCode(), LibraryDesignCode::getCode));
     setId(to::setRunPurposeId, from.getPurpose());
     setId(to::setQcStatusId, from.getQcStatus());
     setString(to::setQcNote, from.getQcNote());
@@ -4188,7 +4197,7 @@ public class Dtos {
     PlatformType platform = PlatformType.valueOf(from.getPlatformType());
     setObject(to::setRun, platform::createRun, from.getRunId());
     setObject(to::setPartition, PartitionImpl::new, from.getPartitionId());
-    setObject(to::setAliquot, LibraryAliquot::new, from.getAliquotId());
+    setObject(to::setAliquot, ListLibraryAliquotView::new, from.getAliquotId());
     setObject(to::setPurpose, RunPurpose::new, from.getRunPurposeId());
     setObject(to::setQcStatus, RunLibraryQcStatus::new, from.getQcStatusId());
     setString(to::setQcNote, from.getQcNote());

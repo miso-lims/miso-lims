@@ -9,11 +9,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 
 public interface RunPartitionAliquotService {
 
-  RunPartitionAliquot get(Run run, Partition partition, LibraryAliquot aliquot) throws IOException;
+  RunPartitionAliquot get(Run run, Partition partition, ListLibraryAliquotView aliquot) throws IOException;
 
   List<RunPartitionAliquot> listByRunId(long runId) throws IOException;
 
