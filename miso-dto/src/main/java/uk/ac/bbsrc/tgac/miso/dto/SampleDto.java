@@ -7,7 +7,11 @@ import java.util.function.Function;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -28,7 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
-@JsonSubTypes({ @JsonSubTypes.Type(value = SampleAliquotDto.class, name = SampleAliquot.CATEGORY_NAME),
+@JsonSubTypes({@JsonSubTypes.Type(value = SampleAliquotDto.class, name = SampleAliquot.CATEGORY_NAME),
     @JsonSubTypes.Type(value = SampleAliquotRnaDto.class, name = SampleAliquotRna.SUBCATEGORY_NAME),
     @JsonSubTypes.Type(value = SampleAliquotSingleCellDto.class, name = SampleAliquotSingleCell.SUBCATEGORY_NAME),
     @JsonSubTypes.Type(value = SampleIdentityDto.class, name = SampleIdentity.CATEGORY_NAME),
@@ -40,7 +44,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
     @JsonSubTypes.Type(value = SampleSlideDto.class, name = SampleSlide.SUBCATEGORY_NAME),
     @JsonSubTypes.Type(value = SampleTissuePieceDto.class, name = SampleTissuePiece.SUBCATEGORY_NAME),
     @JsonSubTypes.Type(value = SampleSingleCellDto.class, name = SampleSingleCell.SUBCATEGORY_NAME),
-    @JsonSubTypes.Type(value = SampleDto.class, name = "Plain") })
+    @JsonSubTypes.Type(value = SampleDto.class, name = "Plain")})
 @JsonTypeName(value = "Plain")
 public class SampleDto extends AbstractBoxableDto implements ReceivableDto<Sample, TransferSample> {
 
@@ -66,8 +70,8 @@ public class SampleDto extends AbstractBoxableDto implements ReceivableDto<Sampl
   private String alias;
   private Long projectId;
   private String projectName;
-  private String projectAlias;
-  private String projectShortName;
+  private String projectTitle;
+  private String projectCode;
   private Long scientificNameId;
   private String taxonIdentifier;
   private Long rootSampleClassId;
@@ -273,20 +277,20 @@ public class SampleDto extends AbstractBoxableDto implements ReceivableDto<Sampl
     this.projectName = projectName;
   }
 
-  public String getProjectAlias() {
-    return projectAlias;
+  public String getProjectTitle() {
+    return projectTitle;
   }
 
-  public void setProjectAlias(String projectAlias) {
-    this.projectAlias = projectAlias;
+  public void setProjectTitle(String projectTitle) {
+    this.projectTitle = projectTitle;
   }
 
-  public String getProjectShortName() {
-    return projectShortName;
+  public String getProjectCode() {
+    return projectCode;
   }
 
-  public void setProjectShortName(String projectShortName) {
-    this.projectShortName = projectShortName;
+  public void setProjectCode(String projectCode) {
+    this.projectCode = projectCode;
   }
 
   public Long getScientificNameId() {

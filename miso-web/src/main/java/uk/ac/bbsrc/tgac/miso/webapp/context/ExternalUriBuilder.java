@@ -22,7 +22,7 @@ public class ExternalUriBuilder {
   private static final String ID_PLACEHOLDER = "\\{id\\}";
   private static final String NAME_PLACEHOLDER = "\\{name\\}";
   private static final String ALIAS_PLACEHOLDER = "\\{alias\\}";
-  private static final String SHORTNAME_PLACEHOLDER = "\\{shortName\\}";
+  private static final String CODE_PLACEHOLDER = "\\{code\\}";
   private static final String REPLACEHOLDER = "REPLACE";
 
   public Map<String, String> getUris(Project project) {
@@ -44,7 +44,7 @@ public class ExternalUriBuilder {
   private String expandProjectUrl(String uriWithPlaceholders, Project project) {
     return uriWithPlaceholders.replaceAll(ID_PLACEHOLDER, String.valueOf(project.getId()))
         .replaceAll(NAME_PLACEHOLDER, project.getName())
-        .replaceAll(SHORTNAME_PLACEHOLDER, project.getCode());
+        .replaceAll(CODE_PLACEHOLDER, project.getCode());
   }
 
   private String expandRunUrl(String uriWithPlaceholders, Run run) {
@@ -74,7 +74,7 @@ public class ExternalUriBuilder {
 
       String linkText = configParts[0].trim();
       String uriWithPlaceholders = configParts[1].trim();
-      validateUri(uriWithPlaceholders, Sets.newHashSet(ID_PLACEHOLDER, NAME_PLACEHOLDER, SHORTNAME_PLACEHOLDER));
+      validateUri(uriWithPlaceholders, Sets.newHashSet(ID_PLACEHOLDER, NAME_PLACEHOLDER, CODE_PLACEHOLDER));
 
       uriMap.put(linkText, uriWithPlaceholders);
     }

@@ -52,7 +52,7 @@ public class LibraryDto extends AbstractBoxableDto
   private Long parentSampleClassId;
   private Long projectId;
   private String projectName;
-  private String projectShortName;
+  private String projectCode;
   private String platformType;
   private Long detailedQcStatusId;
   private String detailedQcStatusNote;
@@ -663,11 +663,11 @@ public class LibraryDto extends AbstractBoxableDto
     this.projectName = projectName;
   }
 
-  public String getProjectShortName() {
-    return projectShortName;
+  public String getProjectCode() {
+    return projectCode;
   }
 
-  public void setProjectShortName(String projectShortName) {
-    this.projectShortName = projectShortName;
+  public void setProjectCode(String projectCode) {
+    this.projectCode = projectCode;
   }
 }

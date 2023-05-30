@@ -86,7 +86,7 @@ FormTarget.project = (function ($) {
             },
             {
               title: "Code",
-              data: "doe3",
+              data: "code",
               type: "text",
               maxLength: 255,
               required: Constants.isDetailedSample || config.naming.primary.codeRequired,

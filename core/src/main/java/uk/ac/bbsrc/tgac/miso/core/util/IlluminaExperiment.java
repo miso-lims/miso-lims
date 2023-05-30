@@ -88,6 +88,7 @@ public enum IlluminaExperiment {
       settings.put("AdapterRead2", "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT");
     }
   };
+
   private static final DateTimeFormatter MDY = DateTimeFormatter.ofPattern("M/d/yyyy");
 
   private final String description;
@@ -100,7 +101,8 @@ public enum IlluminaExperiment {
   protected abstract void applyAttribute(Map<String, String> header, Map<String, String> settings);
 
   private Pair<String, String> buildIndex(Optional<Index> index, int length) {
-    return new Pair<>(index.map(Index::getName).orElse("No Index"), pad(length, index.map(Index::getSequence).orElse("")));
+    return new Pair<>(index.map(Index::getName).orElse("No Index"),
+        pad(length, index.map(Index::getSequence).orElse("")));
   }
 
   private Optional<Index> extract(List<Index> indices, int position) {
@@ -134,7 +136,8 @@ public enum IlluminaExperiment {
     }
   }
 
-  public final String makeSampleSheet(String genomeFolder, SequencingParameters parameters, String read1Primer, String indexPrimer,
+  public final String makeSampleSheet(String genomeFolder, SequencingParameters parameters, String read1Primer,
+      String indexPrimer,
       String read2Primer, List<Pool> pools) {
     final Map<String, String> header = new LinkedHashMap<>();
     final Map<String, String> settings = new LinkedHashMap<>();
@@ -215,7 +218,8 @@ public enum IlluminaExperiment {
           }
         } else {
           outputIndicies = Collections
-              .singletonList(new Pair<>(buildIndex(extract(indices, 1), i7Length), buildIndex(extract(indices, 2), i5Length)));
+              .singletonList(
+                  new Pair<>(buildIndex(extract(indices, 1), i7Length), buildIndex(extract(indices, 2), i5Length)));
         }
         int suffix = 0;
         for (final Pair<Pair<String, String>, Pair<String, String>> paddedIndices : outputIndicies) {
@@ -243,7 +247,7 @@ public enum IlluminaExperiment {
           output.append(",")//
               .append(genomeFolder)//
               .append(",")//
-              .append(element.getAliquot().getProjectShortName())//
+              .append(element.getAliquot().getProjectCode())//
               .append(",");
           if (element.getAliquot().getAliquotBarcode() != null) {
             escape(output, element.getAliquot().getAliquotBarcode());

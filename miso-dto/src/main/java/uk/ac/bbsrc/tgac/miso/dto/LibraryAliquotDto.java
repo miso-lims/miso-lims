@@ -16,7 +16,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
     @JsonSubTypes.Type(value = DetailedLibraryAliquotDto.class, name = "Detailed"),
-    @JsonSubTypes.Type(value = LibraryAliquotDto.class, name = "Plain") })
+    @JsonSubTypes.Type(value = LibraryAliquotDto.class, name = "Plain")})
 @JsonTypeName(value = "Plain")
 public class LibraryAliquotDto extends AbstractBoxableDto implements UpstreamQcFailableDto {
 
@@ -61,7 +61,7 @@ public class LibraryAliquotDto extends AbstractBoxableDto implements UpstreamQcF
   private Integer proportion;
   private Long projectId;
   private String projectName;
-  private String projectShortName;
+  private String projectCode;
   private String subprojectAlias;
   private Boolean subprojectPriority;
   private String sequencingControlTypeAlias;
@@ -384,12 +384,12 @@ public class LibraryAliquotDto extends AbstractBoxableDto implements UpstreamQcF
     this.projectName = projectName;
   }
 
-  public String getProjectShortName() {
-    return projectShortName;
+  public String getProjectCode() {
+    return projectCode;
   }
 
-  public void setProjectShortName(String projectShortName) {
-    this.projectShortName = projectShortName;
+  public void setProjectCode(String projectCode) {
+    this.projectCode = projectCode;
   }
 
   public String getSubprojectAlias() {

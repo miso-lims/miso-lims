@@ -192,7 +192,7 @@ public class MisoAppListener implements ServletContextListener {
     applyValidator(namespace + ".validator.libraryaliquot.alias", misoProperties,
         resolver::getLibraryAliquotAliasValidator,
         scheme::setLibraryAliquotAliasValidator);
-    applyValidator(namespace + ".validator.project.shortName", misoProperties, resolver::getProjectShortNameValidator,
+    applyValidator(namespace + ".validator.project.code", misoProperties, resolver::getProjectCodeValidator,
         scheme::setProjectCodeValidator);
 
     return scheme;

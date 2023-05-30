@@ -517,8 +517,8 @@ public class Dtos {
     dto.setAlias(from.getAlias());
     dto.setProjectId(from.getProject().getId());
     dto.setProjectName(from.getProject().getName());
-    dto.setProjectAlias(from.getProject().getTitle());
-    dto.setProjectShortName(from.getProject().getCode());
+    dto.setProjectTitle(from.getProject().getTitle());
+    dto.setProjectCode(from.getProject().getCode());
     setId(dto::setScientificNameId, from.getScientificName());
     dto.setTaxonIdentifier(from.getTaxonIdentifier());
     setString(dto::setInitialVolume, from.getInitialVolume());
@@ -1403,7 +1403,7 @@ public class Dtos {
     dto.setParentSampleAlias(from.getSample().getAlias());
     dto.setProjectId(from.getSample().getProject().getId());
     setString(dto::setProjectName, from.getSample().getProject().getName());
-    setString(dto::setProjectShortName, from.getSample().getProject().getCode());
+    setString(dto::setProjectCode, from.getSample().getProject().getCode());
     if (from.getSample() instanceof DetailedSample) {
       dto.setParentSampleClassId(((DetailedSample) from.getSample()).getSampleClass().getId());
     }
@@ -1715,7 +1715,7 @@ public class Dtos {
         if (sample.getProject() != null) {
           setLong(dto::setProjectId, project.getId(), true);
           setString(dto::setProjectName, project.getName());
-          setString(dto::setProjectShortName, project.getCode());
+          setString(dto::setProjectCode, project.getCode());
         }
       }
     }
@@ -1845,7 +1845,7 @@ public class Dtos {
     dto.setSampleAlias(from.getSampleAlias());
     setLong(dto::setProjectId, from.getProjectId(), true);
     setString(dto::setProjectName, from.getProjectName());
-    setString(dto::setProjectShortName, from.getProjectShortName());
+    setString(dto::setProjectCode, from.getProjectCode());
     setString(dto::setSequencingControlTypeAlias,
         maybeGetProperty(from.getSampleSequencingControlType(), SequencingControlType::getAlias));
     setId(dto::setDetailedQcStatusId, from.getDetailedQcStatus());

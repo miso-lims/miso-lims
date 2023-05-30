@@ -1,0 +1,1 @@
+If your `miso.properties` file contains the property `miso.naming.validator.project.shortName` or `miso.naming.validator.project.shortName.duplicates`, these will need to be changed, by replacing `shortName` with `code`.
