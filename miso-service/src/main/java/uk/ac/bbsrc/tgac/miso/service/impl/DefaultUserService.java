@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 import java.io.IOException;
 import java.util.List;
 
-import com.google.common.annotations.VisibleForTesting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -11,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.google.common.annotations.VisibleForTesting;
 
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
@@ -51,7 +51,7 @@ public class DefaultUserService implements UserService {
     if (authorizationManager.getCurrentUser() != null) {
       authorizationManager.throwIfNonAdmin();
     }
-
+    validateChange(user, null);
     user.setPassword(validateAndEncodePassword(user.getPassword(), true));
     return securityStore.saveUser(user);
   }
@@ -112,7 +112,8 @@ public class DefaultUserService implements UserService {
   }
 
   private void validateChange(User user, User beforeChange) throws IOException {
-    if (ValidationUtils.isSetAndChanged(User::getLoginName, user, beforeChange) && getByLoginName(user.getLoginName()) != null) {
+    if (ValidationUtils.isSetAndChanged(User::getLoginName, user, beforeChange)
+        && getByLoginName(user.getLoginName()) != null) {
       throw new ValidationException(new ValidationError("loginName", "There is already a user with this login name"));
     }
   }

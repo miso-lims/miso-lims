@@ -1011,7 +1011,12 @@ FormUtils = (function ($) {
         td.append(makeTextareaInput(inputId, field, value));
         break;
       case "password":
-        td.append(makeTextInput(inputId, field, value, "password", form));
+        td.append(
+          makeTextInput(inputId, field, value, "password", form).attr(
+            "autocomplete",
+            "new-password"
+          )
+        );
         break;
       case "dropdown":
         td.append(makeDropdownInput(inputId, field, value, form));
