@@ -58,7 +58,7 @@ public class V2SampleAliasGenerator implements NameGenerator<Sample> {
 
   private String generateIdentityAlias(DetailedSample sample) throws IOException, MisoNamingException {
     if (sample.getProject().getCode() == null) {
-      throw new MisoNamingException("Project shortname required to generate Identity alias");
+      throw new MisoNamingException("Project code required to generate Identity alias");
     }
     String partialAlias = sample.getProject().getCode() + UNDERSCORE;
     String number = sampleNumberPerProjectService.nextNumber(sample.getProject(), partialAlias);

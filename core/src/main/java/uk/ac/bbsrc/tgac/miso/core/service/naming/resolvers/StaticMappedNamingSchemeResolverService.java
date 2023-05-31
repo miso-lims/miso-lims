@@ -54,7 +54,7 @@ public class StaticMappedNamingSchemeResolverService implements NamingSchemeReso
   private static final Map<String, Class<? extends NameValidator>> sampleAliasValidators = new HashMap<>();
   private static final Map<String, Class<? extends NameValidator>> libraryAliasValidators = new HashMap<>();
   private static final Map<String, Class<? extends NameValidator>> libraryAliquotAliasValidators = new HashMap<>();
-  private static final Map<String, Class<? extends NameValidator>> projectShortNameValidators = new HashMap<>();
+  private static final Map<String, Class<? extends NameValidator>> projectCodeValidators = new HashMap<>();
 
   static {
     // Add new naming schemes/generators/validators to the relevant map(s). Use only lowercase for keys
@@ -95,8 +95,8 @@ public class StaticMappedNamingSchemeResolverService implements NamingSchemeReso
     libraryAliquotAliasValidators.put("oicr", OicrLibraryAliasValidator.class);
     libraryAliquotAliasValidators.put("v2", V2LibraryAliquotAliasValidator.class);
 
-    projectShortNameValidators.put("allowany", AllowAnythingValidator.class);
-    projectShortNameValidators.put("oicr", OicrProjectCodeValidator.class);
+    projectCodeValidators.put("allowany", AllowAnythingValidator.class);
+    projectCodeValidators.put("oicr", OicrProjectCodeValidator.class);
   }
 
   @Override
@@ -156,7 +156,7 @@ public class StaticMappedNamingSchemeResolverService implements NamingSchemeReso
 
   @Override
   public NameValidator getProjectCodeValidator(String validatorName) {
-    Class<? extends NameValidator> clazz = projectShortNameValidators.get(validatorName.toLowerCase());
+    Class<? extends NameValidator> clazz = projectCodeValidators.get(validatorName.toLowerCase());
     return loadClass(clazz, "project short name validator", validatorName);
   }
 

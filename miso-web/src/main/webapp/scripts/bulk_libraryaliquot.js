@@ -261,7 +261,7 @@ BulkTarget.libraryaliquot = (function ($) {
           title: "Project",
           type: "text",
           disabled: true,
-          data: Constants.isDetailedSample ? "projectShortName" : "projectName",
+          data: Constants.isDetailedSample ? "projectCode" : "projectName",
         },
         BulkUtils.columns.assay(),
         {

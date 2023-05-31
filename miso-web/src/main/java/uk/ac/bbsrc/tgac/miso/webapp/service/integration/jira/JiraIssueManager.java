@@ -1,22 +1,19 @@
 /*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
+ * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK MISO project contacts: Robert Davey @
+ * TGAC *********************************************************************
  *
  * This file is part of MISO.
  *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * MISO is free software: you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * MISO is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with MISO. If not, see
+ * <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -48,20 +45,18 @@ import com.sun.jersey.oauth.client.OAuthClientFilter;
 import com.sun.jersey.oauth.signature.OAuthParameters;
 import com.sun.jersey.oauth.signature.OAuthSecrets;
 
+import io.prometheus.client.Gauge;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Issue;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
-import io.prometheus.client.Gauge;
-
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.service.integration.jira
  * <p/>
- * Class to grab issues from a JIRA server via the JIRA REST API. Supports only HTTP basic authentication at present. OAuth is available but
- * untested and most likely not working.
+ * Class to grab issues from a JIRA server via the JIRA REST API. Supports only HTTP basic
+ * authentication at present. OAuth is available but untested and most likely not working.
  * 
  * @author Rob Davey
  * @date 20-Jan-2011
@@ -106,7 +101,7 @@ public class JiraIssueManager implements IssueTrackerManager {
   @Override
   public List<Issue> getIssuesByTag(String tag) throws IOException {
     Map<String, String> params = new HashMap<>();
-    String replaceableTag = (tag == null ? "null" : tag); // project shortname might be null in plain sample mode
+    String replaceableTag = (tag == null ? "null" : tag); // project code might be null in plain sample mode
     params.put("jql", "labels=" + replaceableTag.replaceAll("\\s+", "-"));
     WebResource webResource = prepareWebResource(getRestUri("/search", params));
     return retrieveList(webResource);
@@ -130,7 +125,8 @@ public class JiraIssueManager implements IssueTrackerManager {
         DefaultApacheHttpClientConfig config = new DefaultApacheHttpClientConfig();
         config.getState().setCredentials(null, null, -1, httpBasicAuthUsername, httpBasicAuthPassword);
         config.getProperties().put(ApacheHttpClientConfig.PROPERTY_PREEMPTIVE_AUTHENTICATION, true);
-        ApacheHttpClientHandler ahcHandler = new ApacheHttpClientHandler(new HttpClient(new MultiThreadedHttpConnectionManager()), config);
+        ApacheHttpClientHandler ahcHandler =
+            new ApacheHttpClientHandler(new HttpClient(new MultiThreadedHttpConnectionManager()), config);
         ApacheHttpClient ahc = new ApacheHttpClient(ahcHandler);
         this.client = ahc;
         wr = ahc.resource(uri);
@@ -140,7 +136,8 @@ public class JiraIssueManager implements IssueTrackerManager {
     } else if (oAuthConsumerKey != null && oAuthConsumerSecret != null && oAuthSignatureMethod != null) {
       if (this.client == null) {
         Client c = new Client();
-        OAuthParameters params = new OAuthParameters().signatureMethod(oAuthSignatureMethod).consumerKey(oAuthConsumerKey).version("1.1");
+        OAuthParameters params =
+            new OAuthParameters().signatureMethod(oAuthSignatureMethod).consumerKey(oAuthConsumerKey).version("1.1");
 
         OAuthSecrets secrets = new OAuthSecrets().consumerSecret(oAuthConsumerSecret);
         OAuthClientFilter filter = new OAuthClientFilter(c.getProviders(), params, secrets);
@@ -151,7 +148,8 @@ public class JiraIssueManager implements IssueTrackerManager {
         wr = this.client.resource(uri);
       }
     } else {
-      throw new IllegalStateException("No viable credentials to query for issue. Please check your IssueTrackerManager configuration.");
+      throw new IllegalStateException(
+          "No viable credentials to query for issue. Please check your IssueTrackerManager configuration.");
     }
     return wr;
   }

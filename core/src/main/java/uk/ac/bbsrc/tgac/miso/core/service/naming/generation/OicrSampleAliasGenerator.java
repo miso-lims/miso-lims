@@ -75,7 +75,7 @@ public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
 
   private String generateIdentityAlias(SampleIdentity identity) throws IOException {
     if (identity.getProject().getCode() == null) {
-      throw new NullPointerException("Project shortname required to generate Identity alias");
+      throw new NullPointerException("Project code required to generate Identity alias");
     }
     String internalName = identity.getProject().getCode() + "_";
     String number = sampleNumberPerProjectService.nextNumber(identity.getProject(), internalName);

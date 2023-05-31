@@ -30,7 +30,7 @@ public class DefaultNamingScheme extends AbstractNamingScheme {
   private NameGenerator<Library> libraryAliasGenerator = new DefaultLibraryAliasGenerator();
   private NameValidator libraryAliquotAliasValidator = new DefaultLibraryAliquotAliasValidator();
   private NameGenerator<LibraryAliquot> libraryAliquotAliasGenerator = new DefaultLibraryAliquotAliasGenerator();
-  private NameValidator projectShortNameValidator = new AllowAnythingValidator();
+  private NameValidator projectCodeValidator = new AllowAnythingValidator();
 
   /**
    * Creates a new DefaultNamingScheme and attempts to autowire all of its validators' and generators'
@@ -107,12 +107,12 @@ public class DefaultNamingScheme extends AbstractNamingScheme {
 
   @Override
   public void setProjectCodeValidator(NameValidator validator) {
-    this.projectShortNameValidator = validator;
+    this.projectCodeValidator = validator;
   }
 
   @Override
   protected NameValidator getProjectCodeValidator() {
-    return projectShortNameValidator;
+    return projectCodeValidator;
   }
 
   @Override

@@ -32,7 +32,7 @@ public class V2NamingScheme extends AbstractNamingScheme {
   private final V2LibraryAliasGenerator libraryAliasGenerator = new V2LibraryAliasGenerator();
   private final V2LibraryAliquotAliasValidator libraryAliquotAliasValidator = new V2LibraryAliquotAliasValidator();
   private final V2LibraryAliquotAliasGenerator libraryAliquotAliasGenerator = new V2LibraryAliquotAliasGenerator();
-  private final OicrProjectCodeValidator projectShortNameValidator = new OicrProjectCodeValidator();
+  private final OicrProjectCodeValidator projectCodeValidator = new OicrProjectCodeValidator();
 
   /**
    * Creates a new V2NamingScheme and attempts to autowire all of its validators' and generators'
@@ -160,7 +160,7 @@ public class V2NamingScheme extends AbstractNamingScheme {
 
   @Override
   protected NameValidator getProjectCodeValidator() {
-    return projectShortNameValidator;
+    return projectCodeValidator;
   }
 
 }

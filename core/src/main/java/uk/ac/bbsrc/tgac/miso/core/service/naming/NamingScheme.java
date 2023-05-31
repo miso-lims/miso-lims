@@ -211,29 +211,29 @@ public interface NamingScheme {
   public boolean duplicateLibraryAliquotAliasAllowed();
 
   /**
-   * Optional method. Sets a validator to be used for {@link Project} short names
+   * Optional method. Sets a validator to be used for {@link Project} codes
    * 
    * @param validator
    * @throws UnsupportedOperationException if this NamingScheme does not accept custom {@link Project}
-   *         short name validators
+   *         code validators
    */
   public void setProjectCodeValidator(NameValidator validator);
 
   /**
-   * Checks that the provided {@link Project} short name conforms to the naming scheme
+   * Checks that the provided {@link Project} code conforms to the naming scheme
    * 
    * @param name
    * @return the {@link ValidationResult}
    */
-  public ValidationResult validateProjectCode(String shortName);
+  public ValidationResult validateProjectCode(String code);
 
   /**
-   * @return true if duplicate {@link Project} short names are allowed by this NamingScheme
+   * @return true if duplicate {@link Project} codes are allowed by this NamingScheme
    */
   public boolean duplicateProjectCodesAllowed();
 
   /**
-   * @return true if {@link Project} shortName is a mandatory field; false if null is allowed
+   * @return true if {@link Project} code is a mandatory field; false if null is allowed
    */
   public boolean nullProjectCodeAllowed();
 

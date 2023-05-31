@@ -125,7 +125,7 @@ ListTarget.libraryaliquot = {
         "Project",
         Urls.ui.projects.edit,
         Utils.array.get("projectId"),
-        Constants.isDetailedSample ? "projectShortName" : "projectName",
+        Constants.isDetailedSample ? "projectCode" : "projectName",
         0,
         true
       ),
