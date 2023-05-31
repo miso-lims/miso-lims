@@ -166,6 +166,14 @@ ListUtils = (function ($) {
       term: "project:TEXT",
       help: "Checks whether the item involves the specified project (name or code)",
     },
+    pipeline: {
+      term: "pipeline:TEXT",
+      help: "Checks whether the pipeline matches",
+    },
+    status: {
+      term: "status:STATUS",
+      help: "Checks whether the status matches. STATUS must be a valid status value",
+    },
   };
 
   var makeTooltipHelp = function (target) {

@@ -1,9 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.persistence;
 
 import java.io.IOException;
-import java.util.Collection;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 /**
  * Defines a DAO interface for storing Projects
@@ -11,7 +11,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface ProjectStore extends Store<Project> {
+public interface ProjectStore extends PaginatedDataSource<Project>, SaveDao<Project> {
   /**
    * Get a Project given a title
    * 
@@ -22,15 +22,6 @@ public interface ProjectStore extends Store<Project> {
   Project getByTitle(String title) throws IOException;
 
   Project getByCode(String code) throws IOException;
-
-  /**
-   * List all Projects that match a search criteria
-   * 
-   * @param query of type String
-   * @return Collection<Project>
-   * @throws IOException when
-   */
-  Collection<Project> listBySearch(String query) throws IOException;
 
   long getUsage(Project project) throws IOException;
 

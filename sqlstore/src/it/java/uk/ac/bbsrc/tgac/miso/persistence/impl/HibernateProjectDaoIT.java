@@ -1,25 +1,12 @@
-/**
- * 
- */
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
-
-import java.io.IOException;
 import java.util.Date;
-import java.util.List;
 
-import org.hibernate.SessionFactory;
-import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
+import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Pipeline;
@@ -27,36 +14,26 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.persistence.SecurityStore;
 
-/**
- * @author Chris Salt
- *
- */
-public class HibernateProjectDaoIT extends AbstractDAOTest {
+public class HibernateProjectDaoIT extends AbstractHibernateSaveDaoTest<Project, HibernateProjectDao> {
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  public HibernateProjectDaoIT() {
+    super(ProjectImpl.class, 3L, 3);
+  }
 
-  @Mock
-  private SecurityStore securityStore;
+  @Override
+  public HibernateProjectDao constructTestSubject() {
+    HibernateProjectDao sut = new HibernateProjectDao();
+    sut.setSessionFactory(getSessionFactory());
+    return sut;
+  }
 
-  @InjectMocks
-  private HibernateProjectDao projectDAO;
-
-  // a project to save
-  private final Project project = new ProjectImpl();
-
-  /**
-   * @throws java.lang.Exception
-   */
-  @Before
-  public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
-    projectDAO.setSessionFactory(sessionFactory);
-    projectDAO.setSecurityStore(securityStore);
-
+  @Override
+  public Project getCreateItem() {
+    Project project = new ProjectImpl();
+    Pipeline pipeline = (Pipeline) currentSession().get(Pipeline.class, 1L);
+    project.setTitle("test title");
+    project.setPipeline(pipeline);
     project.setStatus(StatusType.ACTIVE);
     ReferenceGenome referenceGenome = new ReferenceGenomeImpl();
     referenceGenome.setId(1L);
@@ -68,73 +45,28 @@ public class HibernateProjectDaoIT extends AbstractDAOTest {
     project.setCreationTime(new Date());
     project.setLastModifier(user);
     project.setLastModified(new Date());
+    return project;
   }
 
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#save(uk.ac.bbsrc.tgac.miso.core.data.Project)}
-   * .
-   */
-  @Test
-  public void testSave() throws Exception {
-    Pipeline pipeline = (Pipeline) currentSession().get(Pipeline.class, 1L);
-    final String testTitle = "test title";
-    project.setTitle(testTitle);
-    project.setPipeline(pipeline);
-
-    long savedProjectId = projectDAO.save(project);
-
-    Project savedProject = projectDAO.get(savedProjectId);
-    assertEquals(testTitle, savedProject.getTitle());
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#listAll()}.
-   */
-  @Test
-  public void testListAll() throws Exception {
-    List<Project> projects = projectDAO.listAll();
-    assertEquals(3, projects.size());
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#get(long)}.
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testGet() throws IOException {
-    Project p = projectDAO.get(1);
-    assertNotNull(p);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#getByTitle(java.lang.String)} .
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testGetByTitle() throws IOException {
-    String title = projectDAO.listAll().get(1).getTitle();
-    assertFalse(LimsUtils.isStringEmptyOrNull(title));
-    Project p = projectDAO.getByTitle(title);
-    assertNotNull(p);
-    assertEquals(title, p.getTitle());
+  @SuppressWarnings("unchecked")
+  @Override
+  public UpdateParameters<Project, String> getUpdateParams() {
+    return new UpdateParameters<Project, String>(2L, Project::getDescription, Project::setDescription, "test desc");
   }
 
   @Test
-  public void testGetByCode() throws IOException {
-    String expected = "TEST1";
-    Project p = projectDAO.getByCode(expected);
-    assertNotNull(p);
-    assertEquals(expected, p.getCode());
+  public void testGetByTitle() throws Exception {
+    testGetBy(HibernateProjectDao::getByTitle, "TEST2", Project::getTitle);
+  }
+
+  @Test
+  public void testGetByCode() throws Exception {
+    testGetBy(HibernateProjectDao::getByCode, "TEST1", Project::getCode);
   }
 
   @Test
   public void testGetUsage() throws Exception {
-    Project proj = (Project) currentSession().get(ProjectImpl.class, 1L);
-    assertEquals(21L, projectDAO.getUsage(proj));
+    testGetUsage(HibernateProjectDao::getUsage, 1L, 21L);
   }
 
 }

@@ -5,8 +5,8 @@ import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -85,12 +85,7 @@ public class DefaultProjectService implements ProjectService {
 
   @Override
   public List<Project> list() throws IOException {
-    return projectStore.listAll();
-  }
-
-  @Override
-  public Collection<Project> listAllProjectsBySearch(String query) throws IOException {
-    return projectStore.listBySearch(query);
+    return projectStore.list();
   }
 
   @Override
@@ -100,7 +95,7 @@ public class DefaultProjectService implements ProjectService {
     validateChange(project, null);
     project.setChangeDetails(authorizationManager.getCurrentUser());
     project.setName(generateTemporaryName());
-    projectStore.save(project);
+    projectStore.create(project);
     NamingScheme namingScheme = namingSchemeHolder.get(project.isSecondaryNaming());
     try {
       project.setName(namingScheme.generateNameFor(project));
@@ -108,7 +103,7 @@ public class DefaultProjectService implements ProjectService {
       throw new ValidationException(new ValidationError("name", e.getMessage()));
     }
     validateNameOrThrow(project, namingScheme);
-    return projectStore.save(project);
+    return projectStore.update(project);
   }
 
   @Override
@@ -120,7 +115,7 @@ public class DefaultProjectService implements ProjectService {
     applyChanges(original, project);
     project = original;
     project.setChangeDetails(authorizationManager.getCurrentUser());
-    return projectStore.save(project);
+    return projectStore.update(project);
   }
 
   private void saveNewContact(Contact contact) throws IOException {
@@ -269,6 +264,17 @@ public class DefaultProjectService implements ProjectService {
   public boolean hasSamples(Project project) throws IOException {
     Project managed = projectStore.get(project.getId());
     return projectStore.getUsage(managed) > 0L;
+  }
+
+  @Override
+  public long count(Consumer<String> errorHandler, PaginationFilter... filter) throws IOException {
+    return projectStore.count(errorHandler, filter);
+  }
+
+  @Override
+  public List<Project> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
+      PaginationFilter... filter) throws IOException {
+    return projectStore.list(errorHandler, offset, limit, sortDir, sortCol, filter);
   }
 
 }

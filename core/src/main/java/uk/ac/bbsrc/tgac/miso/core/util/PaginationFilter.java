@@ -283,6 +283,16 @@ public abstract interface PaginationFilter {
     };
   }
 
+  public static PaginationFilter pipeline(String pipeline) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByPipeline(item, pipeline, errorHandler);
+      }
+    };
+  }
+
   public static PaginationFilter platformType(final PlatformType platformType) {
     return new PaginationFilter() {
 
@@ -368,6 +378,16 @@ public abstract interface PaginationFilter {
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
         sink.restrictPaginationBySequencingParametersId(item, parametersId, errorHandler);
+      }
+    };
+  }
+
+  public static PaginationFilter status(String status) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByStatus(item, status, errorHandler);
       }
     };
   }

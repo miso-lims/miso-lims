@@ -194,6 +194,10 @@ public class AdvancedSearchParser {
           case "parameters":
           case "params":
             return PaginationFilter.sequencingParameters(phrase);
+          case "status":
+            return PaginationFilter.status(phrase);
+          case "pipeline":
+            return PaginationFilter.pipeline(phrase);
           case "groupid":
             return PaginationFilter.groupId(phrase);
           case "distributed":

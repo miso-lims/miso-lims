@@ -1,32 +1,10 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,9 +22,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.AttachmentDto;
+import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ProjectDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
 /**
  * A controller to handle all REST requests for Projects
@@ -61,6 +43,23 @@ public class ProjectRestController extends RestController {
 
   @Autowired
   private ProjectService projectService;
+  @Autowired
+  private AdvancedSearchParser advancedSearchParser;
+
+  private final JQueryDataTableBackend<Project, ProjectDto> jQueryBackend =
+      new JQueryDataTableBackend<Project, ProjectDto>() {
+
+        @Override
+        protected ProjectDto asDto(Project model) {
+          return Dtos.asDto(model);
+        }
+
+        @Override
+        protected PaginatedDataSource<Project> getSource() throws IOException {
+          return projectService;
+        }
+
+      };
 
   public void setProjectService(ProjectService projectService) {
     this.projectService = projectService;
@@ -74,11 +73,15 @@ public class ProjectRestController extends RestController {
   @GetMapping(value = "/search")
   @ResponseBody
   public List<ProjectDto> getProjectsBySearch(@RequestParam("q") String query) throws IOException {
-    return projectService.listAllProjectsBySearch(query).stream().map(Dtos::asDto).collect(Collectors.toList());
+    return projectService.list(0, 0, false, "id", PaginationFilter.query(query))
+        .stream()
+        .map(Dtos::asDto)
+        .toList();
   }
 
   @GetMapping(value = "/{projectId}/files")
-  public @ResponseBody List<AttachmentDto> getAttachments(@PathVariable(name = "projectId", required = true) long projectId)
+  public @ResponseBody List<AttachmentDto> getAttachments(
+      @PathVariable(name = "projectId", required = true) long projectId)
       throws IOException {
     Project project = projectService.get(projectId);
     if (project == null) {
@@ -102,6 +105,12 @@ public class ProjectRestController extends RestController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
     RestUtils.bulkDelete("Project", ids, projectService);
+  }
+
+  @GetMapping(value = "/dt", produces = "application/json")
+  @ResponseBody
+  public DataTablesResponseDto<ProjectDto> getLibraryAliquots(HttpServletRequest request) throws IOException {
+    return jQueryBackend.get(request, advancedSearchParser);
   }
 
 }
