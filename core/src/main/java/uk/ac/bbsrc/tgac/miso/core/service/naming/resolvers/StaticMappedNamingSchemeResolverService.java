@@ -157,7 +157,7 @@ public class StaticMappedNamingSchemeResolverService implements NamingSchemeReso
   @Override
   public NameValidator getProjectCodeValidator(String validatorName) {
     Class<? extends NameValidator> clazz = projectCodeValidators.get(validatorName.toLowerCase());
-    return loadClass(clazz, "project short name validator", validatorName);
+    return loadClass(clazz, "project code validator", validatorName);
   }
 
   private <T> T loadClass(Class<T> clazz, String property, String value) {
