@@ -412,7 +412,7 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListProjectsSetup() throws Exception {
     testPageSetup(ListTarget.PROJECTS,
-        Sets.newHashSet(Columns.SELECTOR, Columns.NAME, Columns.ALIAS, Columns.CODE, Columns.DESCRIPTION,
+        Sets.newHashSet(Columns.SELECTOR, Columns.NAME, Columns.TITLE, Columns.CODE, Columns.DESCRIPTION,
             Columns.STATUS));
   }
 
