@@ -44,7 +44,7 @@ public class ProjectPageIT extends AbstractIT {
     unsaved.put(Fields.NAME, "Unsaved");
     unsaved.put(Fields.CREATION_DATE, dateFormat.format(new Date().getTime()));
     unsaved.put(Fields.TITLE, "Create New Project via UI");
-    unsaved.put(Fields.COE, "SUCHNEW");
+    unsaved.put(Fields.CODE, "SUCHNEW");
     unsaved.put(Fields.DESCRIPTION, "New Project via UI");
     unsaved.put(Fields.STATUS, "Proposed");
     unsaved.put(Fields.REFERENCE_GENOME, "Human hg18 random");
@@ -84,7 +84,7 @@ public class ProjectPageIT extends AbstractIT {
     updated.put(Fields.STATUS, "Active");
     updated.put(Fields.REFERENCE_GENOME, "Human hg19 random");
 
-    page.setTitle(updated.get(Fields.Title));
+    page.setTitle(updated.get(Fields.TITLE));
     page.setCode(updated.get(Fields.CODE));
     page.setDescription(updated.get(Fields.DESCRIPTION));
     page.setStatus(updated.get(Fields.STATUS));
