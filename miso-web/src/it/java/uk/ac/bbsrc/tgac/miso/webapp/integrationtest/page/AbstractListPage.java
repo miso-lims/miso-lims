@@ -120,7 +120,6 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String SEQUENCE = "Sequence(s)";
     public static final String SEQUENCING_PARAMETERS = "Sequencing Parameters";
     public static final String SERIAL_NUMBER = "Serial Number";
-    public static final String SHORT_NAME = "Short Name";
     public static final String SIZE = "Size";
     public static final String SIZE_BP = "Size (bp)";
     public static final String SOP = "SOP";

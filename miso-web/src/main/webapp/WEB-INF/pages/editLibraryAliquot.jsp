@@ -20,7 +20,7 @@
     <li>
       <div class="breadcrumbsbubbleInfo">
         <div class="trigger">
-          <a href='<c:url value="/miso/project/${aliquot.library.sample.project.id}"/>'>${aliquot.library.sample.project.alias}</a>
+          <a href='<c:url value="/miso/project/${aliquot.library.sample.project.id}"/>'>${aliquot.library.sample.project.title}</a>
         </div>
         <div class="breadcrumbspopup">
             ${aliquot.library.sample.project.name}

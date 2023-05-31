@@ -60,7 +60,7 @@ public class DeleteIT extends AbstractIT {
 
   @Test
   public void testDeleteProject() {
-    testDelete(ListTarget.PROJECTS, null, "GSLE", Columns.SHORT_NAME, ProjectImpl.class, 7L);
+    testDelete(ListTarget.PROJECTS, null, "GSLE", Columns.CODE, ProjectImpl.class, 7L);
   }
 
   @Test

@@ -22,7 +22,7 @@
       <li>
         <div class="breadcrumbsbubbleInfo">
           <div class="trigger">
-            <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${detailedSample ? sample.project.code : sample.project.alias}</a>
+            <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${detailedSample ? sample.project.code : sample.project.title}</a>
           </div>
           <div class="breadcrumbspopup">
               ${sample.project.name}
