@@ -140,7 +140,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String TISSUE_ATTRIBUTES = "Tissue Attributes";
     public static final String TISSUE_ORIGIN = "Tissue Origin";
     public static final String TISSUE_TYPE = "Tissue Type";
-    public static final String TITLE = "title";
+    public static final String TITLE = "Title";
     public static final String TRANSFER_TIME = "Transfer Time";
     public static final String TYPE = "Type";
     public static final String UNIQUE_DUAL_INDICES = "Unique Dual Indices";
