@@ -90,7 +90,7 @@ FormTarget.project = (function ($) {
               type: "text",
               maxLength: 255,
               required: Constants.isDetailedSample || config.naming.primary.codeRequired,
-              disabled: !config.naming.primary.codeNameModifiable,
+              disabled: !config.naming.primary.codeModifiable,
             },
             {
               title: "REB Number",
