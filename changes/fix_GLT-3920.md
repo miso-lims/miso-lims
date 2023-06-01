@@ -1,1 +1,0 @@
-An add button would display on the "Edit Assay" page's "Tests" table without being in edit mode.

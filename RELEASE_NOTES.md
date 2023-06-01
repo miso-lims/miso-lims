@@ -7,6 +7,31 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [2.0.0] - 2023-06-01
+
+### Added
+
+* Tissue Attributes and Design columns on Run-Libraries lists (detailed sample)
+
+### Changed
+
+* Library "Has UMIs" field is now blank by default, requiring selection
+* Database has been moved to MySQL 8.0
+
+### Fixed
+
+* Autocomplete entering saved login name and password on Create User page
+* Bug where regular bulk actions were not available to all users in the _Edit Transfer_ page.
+* Error message when attempting to create a new user with an existing login name
+* An add button would display on the "Edit Assay" page's "Tests" table without being in edit mode.
+
+### Upgrade Notes
+
+* This version requires an upgrade from MySQL 5.7 (or equivalent MariaDB
+  version) to MySQL 8.0. See the [Migrating to MySQL 8.0 guide](/docs/admin/mysql-8-upgrade.md)
+  and follow the instructions there instead of the regular upgrade procedure
+
+
 ## [1.56.0] - 2023-04-20
 
 ### Changed

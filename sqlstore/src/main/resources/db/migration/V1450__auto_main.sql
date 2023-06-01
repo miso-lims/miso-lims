@@ -1,3 +1,4 @@
+-- mysql8
 -- Fail fast if not running MySQL 8.0
 DELIMITER //
 CREATE PROCEDURE assertVersion()
@@ -200,3 +201,4 @@ ALTER TABLE persistent_logins CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_0
 
 -- Remove deprecated 'UNSIGNED'
 ALTER TABLE StepPositiveDouble MODIFY `input` FLOAT NOT NULL;
+
