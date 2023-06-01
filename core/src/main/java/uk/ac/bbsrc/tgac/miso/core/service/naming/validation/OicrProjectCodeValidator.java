@@ -7,12 +7,12 @@ public class OicrProjectCodeValidator extends RegexValidator {
   public OicrProjectCodeValidator() {
     super("^" + REGEX + "$", false, false);
 
-    setValidationMessage("Short name must be 3-10 characters and include only capital letters and numbers");
+    setValidationMessage("Code must be 3-10 characters and include only capital letters and numbers");
   }
 
   @Override
   protected String getFieldName() {
-    return "Short name";
+    return "Code";
   }
 
   @Override

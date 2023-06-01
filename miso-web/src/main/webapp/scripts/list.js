@@ -164,7 +164,7 @@ ListUtils = (function ($) {
     },
     project: {
       term: "project:TEXT",
-      help: "Checks whether the item involves the specified project (name or short name)",
+      help: "Checks whether the item involves the specified project (name or code)",
     },
   };
 
