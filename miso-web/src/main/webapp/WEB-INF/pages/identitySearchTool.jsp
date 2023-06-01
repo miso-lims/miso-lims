@@ -1,3 +1,5 @@
+-<%@ include file="../header.jsp" %>
+
 <div id="maincontent">
 <div id="contentcolumn">
 <div id="tab-1">
@@ -19,7 +21,7 @@
       <textarea id="externalNames" rows="15" cols="40" style="width:98%;"></textarea>
     </label>
     <label>Project<br/>
-      <input id="projectAlias" style="width:98%;"/>
+      <input id="projectTitle" style="width:98%;"/>
     </label>
     <button class="ui-button ui-state-default" onclick="IdentitySearch.lookup(true);"
       style="width:100%; margin-top:8px;">Search for Exact Match</button><br/>
