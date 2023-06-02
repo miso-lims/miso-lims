@@ -10,6 +10,10 @@ move to a later 2.x version if available.
 
 ## Bare Metal
 
+**Note**: The steps that use the MySQL root user may alternately be done using a different user with
+similar privileges (`GRANT ALL PRIVILEGES ON *.* TO 'username'@'host';` works. Only a subset of
+these is required, but we have not investigated specifics)
+
 1. Stop Tomcat to prevent MISO access during maintenance
 1. Make a backup in your usual way, to use for roll-back if necessary
 1. Make a backup of tables only, to use for the migration (views/triggers/functions/procedures will
@@ -22,7 +26,8 @@ move to a later 2.x version if available.
           | xargs mysqldump -u root -p --single-transaction --skip-triggers "${DATABASE}" > misodb_5_7.sql
 
 1. remove MySQL 5.7 and install MySQL 8.0
-    * set the MySQL root password. Going forward, root must be used to run Flyway and restore backups
+    * set the MySQL root password. Going forward, root (or a user with similar privileges) must be
+      used to run Flyway and create and restore backups
     * configure the MySQL server time zone (UTC is recommended). You may want to populate the MySQL
       time zone tables. See the [MySQL docs for this](https://dev.mysql.com/doc/refman/8.0/en/time-zone-support.html)
 1. prepare MySQL 8 database. Replace `lims` with your database name if different.
@@ -70,6 +75,9 @@ move to a later 2.x version if available.
   a second terminal is ideal
 * You will need to know your MySQL root password. See below for instructions to reset it if
   necessary
+* The steps that use the MySQL root user may alternately be done using a different user with similar
+  privileges (`GRANT ALL PRIVILEGES ON *.* TO 'username'@'host';` works. Only a subset of these is
+  required, but we have not investigated specifics)
 
 ### Instructions
 
