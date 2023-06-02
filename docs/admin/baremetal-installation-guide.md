@@ -226,10 +226,16 @@ To install or upgrade, perform the following steps:
 
 ## Migrating the database
 
-Flyway is used to apply patches to your database to make it compatible with the new MISO version. The same
-path should be used for `MISO_FILES_DIR` as is set for `miso.fileStorageDirectory` in `miso.properties`
-(`/storage/miso/files/` by default). `SQLSTORE.JAR` should be the `sqlstore.jar` file you downloaded.
-The root user must be used.
+Flyway is used to apply patches to your database to make it compatible with the new MISO version.
+The same path should be used for `MISO_FILES_DIR` as is set for `miso.fileStorageDirectory` in
+`miso.properties` (`/storage/miso/files/` by default). `SQLSTORE.JAR` should be the `sqlstore.jar`
+file you downloaded.
+
+The MySQL root user, or another user with similar privileges, must be used to run Flyway and create
+and restore backups. `GRANT ALL PRIVILEGES ON *.* TO 'username'@'host';` will grant all the
+necessary privileges. Only a subset of these is required, but we have not investigated specifics.
+The user specified in `ROOT.xml`, which the web server will use to communicate with the database,
+should **NOT** be granted global (`*.*`) privileges, so this should be a different user.
 
     cd ${FLYWAY}
     rm -f jars/sqlstore-*.jar
