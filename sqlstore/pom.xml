@@ -18,7 +18,7 @@
     <mysql.user>tgaclims</mysql.user>
     <mysql.pw>tgaclims</mysql.pw>
     <mysql.params>
-      autoReconnect=true&amp;characterEncoding=UTF-8&amp;allowPublicKeyRetrieval=true&amp;sslMode=DISABLED&amp;connectionTimeZone=SERVER</mysql.params>
+      autoReconnect=true&amp;characterEncoding=UTF-8&amp;allowPublicKeyRetrieval=true&amp;sslMode=DISABLED&amp;connectionTimeZone=SERVER&amp;cacheDefaultTimeZone=false</mysql.params>
   </properties>
   <dependencies>
     <dependency>

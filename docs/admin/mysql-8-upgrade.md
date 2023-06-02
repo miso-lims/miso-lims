@@ -46,7 +46,7 @@ these is required, but we have not investigated specifics)
 1. Update the database URL in your `ROOT.xml`. Replace `localhost` and `lims` with the correct host
   and database name. Note the recommended connection options have changed
 
-        url="jdbc:mysql://localhost:3306/lims?autoReconnect=true&amp;characterEncoding=UTF-8&amp;allowPublicKeyRetrieval=true&amp;sslMode=DISABLED&amp;connectionTimeZone=SERVER"
+        url="jdbc:mysql://localhost:3306/lims?autoReconnect=true&amp;characterEncoding=UTF-8&amp;allowPublicKeyRetrieval=true&amp;sslMode=DISABLED&amp;connectionTimeZone=SERVER&amp;cacheDefaultTimeZone=false"
 
 1. Follow the usual [update procedure](https://miso-lims.readthedocs.io/projects/docs/en/latest/admin/baremetal-installation-guide/#installing-and-upgrading), but with one additional step:
   after copying the sqlstore jar, but before running Flyway migrate, run Flyway repair
@@ -56,7 +56,7 @@ these is required, but we have not investigated specifics)
     Note the database URL should be updated (replacing `localhost` and `lims` with the correct host
     and database name):
 
-        jdbc:mysql://localhost:3306/lims?autoReconnect=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&sslMode=DISABLED&connectionTimeZone=SERVER&useSSL=false
+        jdbc:mysql://localhost:3306/lims?autoReconnect=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&sslMode=DISABLED&connectionTimeZone=SERVER&cacheDefaultTimeZone=false&useSSL=false
 
     If you receive an error regarding the time zone, ensure that you have configured the MySQL time
     zone as instructed above.
