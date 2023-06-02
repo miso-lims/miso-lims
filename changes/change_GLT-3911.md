@@ -1,1 +1,3 @@
-Two fields in *Project*: "short name" -> "code" and "alias" -> "title"
+Names of two project fields:
+* short name -> code
+* alias -> title

@@ -76,6 +76,15 @@ public class EditProjectController {
     return setupForm(new ProjectImpl(), model);
   }
 
+  @GetMapping("/shortname/{shortName}")
+  public ModelAndView byProjectShortName(@PathVariable String shortName, ModelMap model) throws IOException {
+    Project project = projectService.getProjectByCode(shortName);
+    if (project == null) {
+      throw new NotFoundException("No project found for short name " + shortName);
+    }
+    return new ModelAndView("forward:/project/code/%s".formatted(shortName), model);
+  }
+
   @GetMapping("/code/{code}")
   public ModelAndView byProjectCode(@PathVariable String code, ModelMap model) throws IOException {
     Project project = projectService.getProjectByCode(code);

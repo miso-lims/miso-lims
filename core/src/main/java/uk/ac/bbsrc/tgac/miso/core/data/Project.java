@@ -44,7 +44,7 @@ public interface Project extends Comparable<Project>, Deletable, Nameable, Seria
   void setTitle(String title);
 
   /**
-   * Returns the code, used as a prefix for generating sample names, or the title if not specified.
+   * Returns the code, used as a prefix for generating sample names
    */
   String getCode();
 
