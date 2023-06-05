@@ -268,7 +268,7 @@ BulkTarget.library = (function ($) {
         {
           title: "Project",
           type: "text",
-          data: Constants.isDetailedSample ? "projectShortName" : "projectName",
+          data: Constants.isDetailedSample ? "projectCode" : "projectName",
           include: !config.isLibraryReceipt,
           disabled: true,
         },
@@ -347,7 +347,7 @@ BulkTarget.library = (function ($) {
           projectColumn.onChange = function (rowIndex, newValue, api) {
             originalOnChange(rowIndex, newValue, api);
 
-            var projectLabel = Constants.isDetailedSample ? "shortName" : "name";
+            var projectLabel = Constants.isDetailedSample ? "code" : "name";
             var project = config.projects.find(function (proj) {
               return proj[projectLabel] === newValue;
             });

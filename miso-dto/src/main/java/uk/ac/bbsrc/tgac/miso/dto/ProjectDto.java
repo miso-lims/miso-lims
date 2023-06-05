@@ -2,10 +2,10 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 public class ProjectDto {
   private long id;
-  private String alias;
+  private String title;
   private String name;
   private String creationDate;
-  private String shortName;
+  private String code;
   private String description;
   private String status;
   private Long referenceGenomeId;
@@ -28,12 +28,12 @@ public class ProjectDto {
     this.id = id;
   }
 
-  public String getAlias() {
-    return alias;
+  public String getTitle() {
+    return title;
   }
 
-  public void setAlias(String alias) {
-    this.alias = alias;
+  public void setTitle(String title) {
+    this.title = title;
   }
 
   public String getName() {
@@ -52,12 +52,12 @@ public class ProjectDto {
     this.creationDate = creationDate;
   }
 
-  public String getShortName() {
-    return shortName;
+  public String getCode() {
+    return code;
   }
 
-  public void setShortName(String shortName) {
-    this.shortName = shortName;
+  public void setCode(String code) {
+    this.code = code;
   }
 
   public String getDescription() {

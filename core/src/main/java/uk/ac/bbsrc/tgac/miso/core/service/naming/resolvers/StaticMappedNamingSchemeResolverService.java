@@ -32,7 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.DefaultNameValidator
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.DefaultSampleAliasValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.NameValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrLibraryAliasValidator;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrProjectShortNameValidator;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrProjectCodeValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrSampleAliasValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.V2LibraryAliasValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.V2LibraryAliquotAliasValidator;
@@ -48,12 +48,13 @@ public class StaticMappedNamingSchemeResolverService implements NamingSchemeReso
   private static final Map<String, Class<? extends NameGenerator<Nameable>>> nameGenerators = new HashMap<>();
   private static final Map<String, Class<? extends NameGenerator<Sample>>> sampleAliasGenerators = new HashMap<>();
   private static final Map<String, Class<? extends NameGenerator<Library>>> libraryAliasGenerators = new HashMap<>();
-  private static final Map<String, Class<? extends NameGenerator<LibraryAliquot>>> libraryAliquotAliasGenerators = new HashMap<>();
+  private static final Map<String, Class<? extends NameGenerator<LibraryAliquot>>> libraryAliquotAliasGenerators =
+      new HashMap<>();
   private static final Map<String, Class<? extends NameValidator>> nameValidators = new HashMap<>();
   private static final Map<String, Class<? extends NameValidator>> sampleAliasValidators = new HashMap<>();
   private static final Map<String, Class<? extends NameValidator>> libraryAliasValidators = new HashMap<>();
   private static final Map<String, Class<? extends NameValidator>> libraryAliquotAliasValidators = new HashMap<>();
-  private static final Map<String, Class<? extends NameValidator>> projectShortNameValidators = new HashMap<>();
+  private static final Map<String, Class<? extends NameValidator>> projectCodeValidators = new HashMap<>();
 
   static {
     // Add new naming schemes/generators/validators to the relevant map(s). Use only lowercase for keys
@@ -61,10 +62,10 @@ public class StaticMappedNamingSchemeResolverService implements NamingSchemeReso
     namingSchemes.put("default", DefaultNamingScheme.class);
     namingSchemes.put("oicr", OicrNamingScheme.class);
     namingSchemes.put("v2", V2NamingScheme.class);
-    
+
     nameGenerators.put("default", DefaultNameGenerator.class);
     nameGenerators.put("classname", ClassnameNameGenerator.class);
-    
+
     sampleAliasGenerators.put("oicr", OicrSampleAliasGenerator.class);
     sampleAliasGenerators.put("v2", V2SampleAliasGenerator.class);
 
@@ -94,8 +95,8 @@ public class StaticMappedNamingSchemeResolverService implements NamingSchemeReso
     libraryAliquotAliasValidators.put("oicr", OicrLibraryAliasValidator.class);
     libraryAliquotAliasValidators.put("v2", V2LibraryAliquotAliasValidator.class);
 
-    projectShortNameValidators.put("allowany", AllowAnythingValidator.class);
-    projectShortNameValidators.put("oicr", OicrProjectShortNameValidator.class);
+    projectCodeValidators.put("allowany", AllowAnythingValidator.class);
+    projectCodeValidators.put("oicr", OicrProjectCodeValidator.class);
   }
 
   @Override
@@ -124,7 +125,8 @@ public class StaticMappedNamingSchemeResolverService implements NamingSchemeReso
 
   @Override
   public NameGenerator<LibraryAliquot> getLibraryAliquotAliasGenerator(String generatorName) {
-    Class<? extends NameGenerator<LibraryAliquot>> clazz = libraryAliquotAliasGenerators.get(generatorName.toLowerCase());
+    Class<? extends NameGenerator<LibraryAliquot>> clazz =
+        libraryAliquotAliasGenerators.get(generatorName.toLowerCase());
     return loadClass(clazz, "library aliquot alias generator", generatorName);
   }
 
@@ -153,9 +155,9 @@ public class StaticMappedNamingSchemeResolverService implements NamingSchemeReso
   }
 
   @Override
-  public NameValidator getProjectShortNameValidator(String validatorName) {
-    Class<? extends NameValidator> clazz = projectShortNameValidators.get(validatorName.toLowerCase());
-    return loadClass(clazz, "project short name validator", validatorName);
+  public NameValidator getProjectCodeValidator(String validatorName) {
+    Class<? extends NameValidator> clazz = projectCodeValidators.get(validatorName.toLowerCase());
+    return loadClass(clazz, "project code validator", validatorName);
   }
 
   private <T> T loadClass(Class<T> clazz, String property, String value) {

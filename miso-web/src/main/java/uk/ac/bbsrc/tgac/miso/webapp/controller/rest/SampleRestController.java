@@ -1,23 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK MISO project contacts: Robert Davey @
- * TGAC *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify it under the terms of the GNU
- * General Public License as published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with MISO. If not, see
- * <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
@@ -334,7 +314,7 @@ public class SampleRestController extends RestController {
    * 
    * @param exactMatch whether a distinct external name of an existing identity needs to exactly match
    *        the given search term.
-   * @param json a list of search terms and possibly the project shortName
+   * @param json a list of search terms and possibly the project code
    * @return a list of maps between search terms and matching identities
    */
   @PostMapping(value = "/identitiesLookup", headers = {"Content-type=application/json"})
@@ -344,7 +324,7 @@ public class SampleRestController extends RestController {
       @RequestBody JsonNode json, HttpServletResponse response) throws IOException {
     final JsonNode searchTerms = json.get("identitiesSearches");
     Project project =
-        (json.get("project") == null ? null : projectService.getProjectByShortName(json.get("project").asText()));
+        (json.get("project") == null ? null : projectService.getProjectByCode(json.get("project").asText()));
     if (!searchTerms.isArray() || searchTerms.size() == 0) {
       throw new RestException("Please provide external name or alias for identity lookup", Status.BAD_REQUEST);
     }

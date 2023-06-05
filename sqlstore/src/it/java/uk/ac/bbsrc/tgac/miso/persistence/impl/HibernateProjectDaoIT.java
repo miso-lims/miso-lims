@@ -71,19 +71,21 @@ public class HibernateProjectDaoIT extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#save(uk.ac.bbsrc.tgac.miso.core.data.Project)} .
+   * Test method for
+   * {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#save(uk.ac.bbsrc.tgac.miso.core.data.Project)}
+   * .
    */
   @Test
   public void testSave() throws Exception {
     Pipeline pipeline = (Pipeline) currentSession().get(Pipeline.class, 1L);
-    final String testAlias = "test alias";
-    project.setAlias(testAlias);
+    final String testTitle = "test title";
+    project.setTitle(testTitle);
     project.setPipeline(pipeline);
 
     long savedProjectId = projectDAO.save(project);
 
     Project savedProject = projectDAO.get(savedProjectId);
-    assertEquals(testAlias, savedProject.getAlias());
+    assertEquals(testTitle, savedProject.getTitle());
   }
 
   /**
@@ -107,25 +109,26 @@ public class HibernateProjectDaoIT extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#getByAlias(java.lang.String)} .
+   * Test method for
+   * {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#getByTitle(java.lang.String)} .
    * 
    * @throws IOException
    */
   @Test
-  public void testGetByAlias() throws IOException {
-    String alias = projectDAO.listAll().get(1).getAlias();
-    assertFalse(LimsUtils.isStringEmptyOrNull(alias));
-    Project p = projectDAO.getByAlias(alias);
+  public void testGetByTitle() throws IOException {
+    String title = projectDAO.listAll().get(1).getTitle();
+    assertFalse(LimsUtils.isStringEmptyOrNull(title));
+    Project p = projectDAO.getByTitle(title);
     assertNotNull(p);
-    assertEquals(alias, p.getAlias());
+    assertEquals(title, p.getTitle());
   }
 
   @Test
-  public void testGetByShortName() throws IOException {
+  public void testGetByCode() throws IOException {
     String expected = "TEST1";
-    Project p = projectDAO.getByShortName(expected);
+    Project p = projectDAO.getByCode(expected);
     assertNotNull(p);
-    assertEquals(expected, p.getShortName());
+    assertEquals(expected, p.getCode());
   }
 
   @Test

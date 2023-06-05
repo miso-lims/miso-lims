@@ -12,8 +12,8 @@ FOR EACH ROW
   BEGIN
   DECLARE log_message longtext;
   SET log_message = CONCAT_WS(', ',
-    makeChangeMessage('alias', OLD.alias, NEW.alias),
-    makeChangeMessage('short name', OLD.shortName, NEW.shortName),
+    makeChangeMessage('title', OLD.title, NEW.title),
+    makeChangeMessage('code', OLD.code, NEW.code),
     makeChangeMessage('description', OLD.description, NEW.description),
     makeChangeMessage('status', OLD.status, NEW.status),
     makeChangeMessage('reference genome', (SELECT alias FROM ReferenceGenome WHERE referenceGenomeId = OLD.referenceGenomeId), (SELECT alias FROM ReferenceGenome WHERE referenceGenomeId = NEW.referenceGenomeId)),
@@ -24,8 +24,8 @@ FOR EACH ROW
     INSERT INTO ProjectChangeLog(projectId, columnsChanged, userId, message, changeTime) VALUES (
       NEW.projectId,
       COALESCE(CONCAT_WS(',',
-        makeChangeColumn('alias', OLD.alias, NEW.alias),
-        makeChangeColumn('short name', OLD.shortName, NEW.shortName),
+        makeChangeColumn('title', OLD.title, NEW.title),
+        makeChangeColumn('code', OLD.code, NEW.code),
         makeChangeColumn('description', OLD.description, NEW.description),
         makeChangeColumn('status', OLD.status, NEW.status),
         makeChangeColumn('reference genome', OLD.referenceGenomeId, NEW.referenceGenomeId),

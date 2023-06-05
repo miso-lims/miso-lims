@@ -1,26 +1,3 @@
-<%--
-  ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
-  ~ MISO project contacts: Robert Davey @ TGAC
-  ~ **********************************************************************
-  ~
-  ~ This file is part of MISO.
-  ~
-  ~ MISO is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
-  ~
-  ~ MISO is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU General Public License for more details.
-  ~
-  ~ You should have received a copy of the GNU General Public License
-  ~ along with MISO.  If not, see <http://www.gnu.org/licenses/>.
-  ~
-  ~ **********************************************************************
-  --%>
-
 <%@ include file="../header.jsp" %>
 
 <div id="maincontent">
@@ -94,7 +71,7 @@
       <div id="issues_arrowclick" class="toggleLeft"></div>
     </div>
     <div id="issuesdiv" class="expandable_section" style="display:none;">
-      <div class="note">Tag an issue with the project's short name (${project.shortName}) to have it show up here.</div>
+      <div class="note">Tag an issue with the project's code (${project.code}) to have it show up here.</div>
       <c:choose>
         <c:when test="${issueLookupError}">
       	  <p class="big big-error">Error retrieving issues</p>

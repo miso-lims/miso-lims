@@ -20,7 +20,7 @@ public class ListTransferViewProject implements Serializable {
   @Column(name = "projectId")
   private long id;
 
-  private String shortName;
+  private String code;
 
   private String name;
 
@@ -32,12 +32,12 @@ public class ListTransferViewProject implements Serializable {
     this.id = id;
   }
 
-  public String getShortName() {
-    return shortName;
+  public String getCode() {
+    return code;
   }
 
-  public void setShortName(String shortName) {
-    this.shortName = shortName;
+  public void setCode(String code) {
+    this.code = code;
   }
 
   public String getName() {

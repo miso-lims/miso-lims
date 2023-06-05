@@ -1,4 +1,4 @@
-INSERT INTO Project(projectId, name, alias, shortName, created, description,
+INSERT INTO Project(projectId, name, title, code, created, description,
   status, referenceGenomeId, lastModified, creator, lastModifier, pipelineId) VALUES
   (1, 'PRO1', 'Project One', 'PRO1', '2017-06-27', 'integration test project one', 'ACTIVE', 1, '2017-06-27 14:11:00', 1, 1, 1),
   (2, 'PRO2', 'Project Two', 'PRO2', '2017-06-27', 'integration test project two', 'ACTIVE', 1, '2017-06-27 14:11:00', 1, 1, 2);

@@ -1,22 +1,19 @@
 /*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
+ * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK MISO project contacts: Robert Davey @
+ * TGAC *********************************************************************
  *
  * This file is part of MISO.
  *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * MISO is free software: you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * MISO is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with MISO. If not, see
+ * <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -48,6 +45,9 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 
+import io.prometheus.client.hibernate.HibernateStatisticsCollector;
+import io.prometheus.client.hotspot.DefaultExports;
+import io.prometheus.jmx.JmxCollector;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.NameGenerator;
@@ -57,13 +57,9 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
-import io.prometheus.client.hibernate.HibernateStatisticsCollector;
-import io.prometheus.client.hotspot.DefaultExports;
-import io.prometheus.jmx.JmxCollector;
-
 /**
- * The custom MISO context listener class. On webapp context init, we can do some startup checks, e.g. checking the existence of required
- * directories/files for sane app startup
+ * The custom MISO context listener class. On webapp context init, we can do some startup checks,
+ * e.g. checking the existence of required directories/files for sane app startup
  * 
  * @author Rob Davey
  * @since 0.0.2
@@ -79,8 +75,7 @@ public class MisoAppListener implements ServletContextListener {
   /**
    * Called on webapp context init
    * 
-   * @param event
-   *          of type ServletContextEvent
+   * @param event of type ServletContextEvent
    */
   @Override
   public void contextInitialized(ServletContextEvent event) {
@@ -88,7 +83,8 @@ public class MisoAppListener implements ServletContextListener {
     DefaultExports.initialize();
 
     ServletContext application = event.getServletContext();
-    XmlWebApplicationContext context = (XmlWebApplicationContext) WebApplicationContextUtils.getRequiredWebApplicationContext(application);
+    XmlWebApplicationContext context =
+        (XmlWebApplicationContext) WebApplicationContextUtils.getRequiredWebApplicationContext(application);
 
     // resolve property file configuration placeholders
     MisoPropertyExporter exporter = (MisoPropertyExporter) context.getBean("propertyConfigurer");
@@ -173,31 +169,37 @@ public class MisoAppListener implements ServletContextListener {
       return null;
     }
     NamingScheme scheme = resolver.getNamingScheme(schemeName);
-    if (scheme == null) throw new IllegalArgumentException("Failed to load naming scheme '" + schemeName + "'");
+    if (scheme == null)
+      throw new IllegalArgumentException("Failed to load naming scheme '" + schemeName + "'");
     SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(scheme);
 
-    applyGenerator(namespace + ".generator.nameable.name", misoProperties, resolver::getNameGenerator, scheme::setNameGenerator);
+    applyGenerator(namespace + ".generator.nameable.name", misoProperties, resolver::getNameGenerator,
+        scheme::setNameGenerator);
     applyGenerator(namespace + ".generator.sample.alias", misoProperties, resolver::getSampleAliasGenerator,
         scheme::setSampleAliasGenerator);
     applyGenerator(namespace + ".generator.library.alias", misoProperties, resolver::getLibraryAliasGenerator,
         scheme::setLibraryAliasGenerator);
-    applyGenerator(namespace + ".generator.libraryaliquot.alias", misoProperties, resolver::getLibraryAliquotAliasGenerator,
+    applyGenerator(namespace + ".generator.libraryaliquot.alias", misoProperties,
+        resolver::getLibraryAliquotAliasGenerator,
         scheme::setLibraryAliquotAliasGenerator);
 
-    applyValidator(namespace + ".validator.nameable.name", misoProperties, resolver::getNameValidator, scheme::setNameValidator);
+    applyValidator(namespace + ".validator.nameable.name", misoProperties, resolver::getNameValidator,
+        scheme::setNameValidator);
     applyValidator(namespace + ".validator.sample.alias", misoProperties, resolver::getSampleAliasValidator,
         scheme::setSampleAliasValidator);
     applyValidator(namespace + ".validator.library.alias", misoProperties, resolver::getLibraryAliasValidator,
         scheme::setLibraryAliasValidator);
-    applyValidator(namespace + ".validator.libraryaliquot.alias", misoProperties, resolver::getLibraryAliquotAliasValidator,
+    applyValidator(namespace + ".validator.libraryaliquot.alias", misoProperties,
+        resolver::getLibraryAliquotAliasValidator,
         scheme::setLibraryAliquotAliasValidator);
-    applyValidator(namespace + ".validator.project.shortName", misoProperties, resolver::getProjectShortNameValidator,
-        scheme::setProjectShortNameValidator);
+    applyValidator(namespace + ".validator.project.code", misoProperties, resolver::getProjectCodeValidator,
+        scheme::setProjectCodeValidator);
 
     return scheme;
   }
 
-  private <T> void applyGenerator(String property, Map<String, String> misoProperties, Function<String, NameGenerator<T>> resolver,
+  private <T> void applyGenerator(String property, Map<String, String> misoProperties,
+      Function<String, NameGenerator<T>> resolver,
       Consumer<NameGenerator<T>> setter) {
     NameGenerator<T> generator = loadComponent(property, misoProperties, resolver);
     if (generator != null) {
@@ -205,7 +207,8 @@ public class MisoAppListener implements ServletContextListener {
     }
   }
 
-  private void applyValidator(String property, Map<String, String> misoProperties, Function<String, NameValidator> resolver,
+  private void applyValidator(String property, Map<String, String> misoProperties,
+      Function<String, NameValidator> resolver,
       Consumer<NameValidator> setter) {
     NameValidator validator = loadComponent(property, misoProperties, resolver);
     if (validator != null) {
@@ -221,7 +224,7 @@ public class MisoAppListener implements ServletContextListener {
       setter.accept(validator);
     }
   }
-  
+
   private <T> T loadComponent(String property, Map<String, String> misoProperties, Function<String, T> resolver) {
     String value = getStringPropertyOrNull(property, misoProperties);
     if (value == null) {
@@ -229,7 +232,8 @@ public class MisoAppListener implements ServletContextListener {
     }
     T component = resolver.apply(value);
     if (component == null) {
-      throw new IllegalArgumentException("Failed to load name naming scheme component specified for '" + property + "'");
+      throw new IllegalArgumentException(
+          "Failed to load name naming scheme component specified for '" + property + "'");
     }
     SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(component);
     return component;
@@ -238,8 +242,7 @@ public class MisoAppListener implements ServletContextListener {
   /**
    * Called on webapp destruction
    * 
-   * @param event
-   *          of type ServletContextEvent
+   * @param event of type ServletContextEvent
    */
   @Override
   public void contextDestroyed(ServletContextEvent event) {

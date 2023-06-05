@@ -66,17 +66,20 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
 
   protected void assertPlainSampleAttributes(Map<String, String> attributes, Sample sample, boolean newlyCreated) {
     if (newlyCreated) {
-      assertEntityAttribute(SamColumns.PROJECT, attributes, sample, s -> s.getProject().getShortName());
+      assertEntityAttribute(SamColumns.PROJECT, attributes, sample, s -> s.getProject().getCode());
     }
     assertEntityAttribute(SamColumns.ALIAS, attributes, sample, Sample::getAlias);
-    assertEntityAttribute(SamColumns.DESCRIPTION, attributes, sample, s -> s.getDescription() == null ? "" : s.getDescription());
+    assertEntityAttribute(SamColumns.DESCRIPTION, attributes, sample,
+        s -> s.getDescription() == null ? "" : s.getDescription());
     assertEntityAttribute(SamColumns.ID_BARCODE, attributes, sample,
         s -> s.getIdentificationBarcode() == null ? "" : s.getIdentificationBarcode());
     assertEntityAttribute(SamColumns.SAMPLE_TYPE, attributes, sample, Sample::getSampleType);
     assertEntityAttribute(SamColumns.SCIENTIFIC_NAME, attributes, sample,
         s -> s.getScientificName() == null ? "" : s.getScientificName().getAlias());
-    assertEntityAttribute(SamColumns.BOX_ALIAS, attributes, sample, s -> s.getBox() == null ? "" : s.getBox().getAlias());
-    assertEntityAttribute(SamColumns.BOX_POSITION, attributes, sample, s -> s.getBoxPosition() == null ? "" : s.getBoxPosition());
+    assertEntityAttribute(SamColumns.BOX_ALIAS, attributes, sample,
+        s -> s.getBox() == null ? "" : s.getBox().getAlias());
+    assertEntityAttribute(SamColumns.BOX_POSITION, attributes, sample,
+        s -> s.getBoxPosition() == null ? "" : s.getBoxPosition());
     if (attributes.containsKey(SamColumns.RECEIVE_DATE)) {
       assertReceiptAttributes(attributes, sample);
     }
@@ -132,7 +135,8 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
 
   protected void assertIdentityAttributes(Map<String, String> attributes, SampleIdentity sample) {
     assertEntityAttribute(SamColumns.EXTERNAL_NAME, attributes, sample, SampleIdentity::getExternalName);
-    assertEntityAttribute(SamColumns.DONOR_SEX, attributes, sample, s -> s.getDonorSex() == null ? "Unknown" : s.getDonorSex().getLabel());
+    assertEntityAttribute(SamColumns.DONOR_SEX, attributes, sample,
+        s -> s.getDonorSex() == null ? "Unknown" : s.getDonorSex().getLabel());
     assertEntityAttribute(SamColumns.CONSENT, attributes, sample, s -> s.getConsentLevel().getLabel());
   }
 
@@ -155,7 +159,8 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
     assertEntityAttribute(SamColumns.SLIDES, attributes, sample, s -> s.getSlides().toString());
     assertEntityAttribute(SamColumns.THICKNESS, attributes, sample,
         s -> s.getThickness() == null ? "" : sample.getThickness().toString());
-    assertEntityAttribute(SamColumns.STAIN, attributes, sample, s -> s.getStain() == null ? "" : s.getStain().getName());
+    assertEntityAttribute(SamColumns.STAIN, attributes, sample,
+        s -> s.getStain() == null ? "" : s.getStain().getName());
   }
 
   protected void assertLcmTubeAttributes(Map<String, String> attributes, SampleTissuePiece sample) {
@@ -163,12 +168,14 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   }
 
   protected void assertSingleCellAttributes(Map<String, String> attributes, SampleSingleCell sample) {
-    assertEntityAttribute(SamColumns.INITIAL_CELL_CONC, attributes, sample, s -> emptyIfNull(s.getInitialCellConcentration()));
+    assertEntityAttribute(SamColumns.INITIAL_CELL_CONC, attributes, sample,
+        s -> emptyIfNull(s.getInitialCellConcentration()));
     assertEntityAttribute(SamColumns.DIGESTION, attributes, sample, s -> s.getDigestion());
   }
 
   protected void assertAnalyteAttributes(Map<String, String> attributes, DetailedSample sample) {
-    assertEntityAttribute(SamColumns.VOLUME, attributes, sample, s -> s.getVolume() == null ? "" : LimsUtils.toNiceString(s.getVolume()));
+    assertEntityAttribute(SamColumns.VOLUME, attributes, sample,
+        s -> s.getVolume() == null ? "" : LimsUtils.toNiceString(s.getVolume()));
     assertEntityAttribute(SamColumns.CONCENTRATION, attributes, sample,
         s -> s.getConcentration() == null ? "" : LimsUtils.toNiceString(s.getConcentration()));
   }
@@ -178,9 +185,11 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   }
 
   protected void assertSingleCellStockAttributes(Map<String, String> attributes, SampleStockSingleCell sample) {
-    assertEntityAttribute(SamColumns.TARGET_CELL_RECOVERERY, attributes, sample, s -> emptyIfNull(s.getTargetCellRecovery()));
+    assertEntityAttribute(SamColumns.TARGET_CELL_RECOVERERY, attributes, sample,
+        s -> emptyIfNull(s.getTargetCellRecovery()));
     assertEntityAttribute(SamColumns.CELL_VIABILITY, attributes, sample, s -> emptyIfNull(s.getCellViability()));
-    assertEntityAttribute(SamColumns.LOADING_CELL_CONC, attributes, sample, s -> emptyIfNull(s.getLoadingCellConcentration()));
+    assertEntityAttribute(SamColumns.LOADING_CELL_CONC, attributes, sample,
+        s -> emptyIfNull(s.getLoadingCellConcentration()));
   }
 
   protected void assertRnaStockSampleAttributes(Map<String, String> attributes, SampleStockRna sample) {
@@ -251,7 +260,8 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   }
 
   protected void assertAllForTissueProcessing(Map<String, String> tproc, Long sampleId, boolean newlyCreated) {
-    SampleTissueProcessing target = (SampleTissueProcessing) getSession().get(SampleTissueProcessingImpl.class, sampleId);
+    SampleTissueProcessing target =
+        (SampleTissueProcessing) getSession().get(SampleTissueProcessingImpl.class, sampleId);
 
     assertPlainSampleAttributes(tproc, target, newlyCreated);
     assertDetailedSampleAttributes(tproc, target);
@@ -355,7 +365,8 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   }
 
   protected void assertAllForSingleCellAliquot(Map<String, String> aliquot, Long sampleId, boolean newlyCreated) {
-    SampleAliquotSingleCell target = (SampleAliquotSingleCell) getSession().get(SampleAliquotSingleCellImpl.class, sampleId);
+    SampleAliquotSingleCell target =
+        (SampleAliquotSingleCell) getSession().get(SampleAliquotSingleCellImpl.class, sampleId);
 
     assertPlainSampleAttributes(aliquot, target, newlyCreated);
     assertDetailedSampleAttributes(aliquot, target);

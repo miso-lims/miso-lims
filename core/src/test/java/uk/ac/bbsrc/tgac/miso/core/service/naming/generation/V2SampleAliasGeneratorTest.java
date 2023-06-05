@@ -228,15 +228,16 @@ public class V2SampleAliasGeneratorTest {
 
     Project proj = new ProjectImpl();
     proj.setId(1L);
-    proj.setAlias("PROJ");
-    proj.setShortName("PROJ");
+    proj.setTitle("PROJ");
+    proj.setCode("PROJ");
     identity.setProject(proj);
 
     return identity;
   }
 
   private void mockFirstAvailableSiblingNumber(int siblingNumber) throws IOException {
-    Mockito.when(siblingNumberGenerator.getFirstAvailableSiblingNumber(Mockito.any(), Mockito.anyString())).thenReturn(siblingNumber);
+    Mockito.when(siblingNumberGenerator.getFirstAvailableSiblingNumber(Mockito.any(), Mockito.anyString()))
+        .thenReturn(siblingNumber);
   }
 
 }

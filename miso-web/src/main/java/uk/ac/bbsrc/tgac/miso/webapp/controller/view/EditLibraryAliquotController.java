@@ -156,7 +156,7 @@ public class EditLibraryAliquotController {
       Project project = sample.getProject();
       dto.setProjectId(project.getId());
       dto.setProjectName(project.getName());
-      dto.setProjectShortName(project.getShortName());
+      dto.setProjectCode(project.getCode());
       if (project.getDefaultTargetedSequencing() != null) {
         defaultTargetedSequencingByProject.put(project.getId(), project.getDefaultTargetedSequencing().getId());
       }
@@ -243,7 +243,7 @@ public class EditLibraryAliquotController {
       Project project = sample.getProject();
       dto.setProjectId(project.getId());
       dto.setProjectName(project.getName());
-      dto.setProjectShortName(project.getShortName());
+      dto.setProjectCode(project.getCode());
       if (project.getDefaultTargetedSequencing() != null) {
         defaultTargetedSequencingByProject.put(project.getId(), project.getDefaultTargetedSequencing().getId());
       }

@@ -140,8 +140,8 @@ public class HibernateListTransferViewDao
         .createAlias("parentAliquot.library", "aliquotLibrary", JoinType.LEFT_OUTER_JOIN)
         .createAlias("aliquotLibrary.sample", "aliquotSample", JoinType.LEFT_OUTER_JOIN)
         .createAlias("aliquotSample.project", "aliquotProject", JoinType.LEFT_OUTER_JOIN)
-        .add(DbUtils.textRestriction(project, "sampleProject.name", "sampleProject.shortName", "libraryProject.name",
-            "libraryProject.shortName", "aliquotProject.name", "aliquotProject.shortName"));
+        .add(DbUtils.textRestriction(project, "sampleProject.name", "sampleProject.code", "libraryProject.name",
+            "libraryProject.code", "aliquotProject.name", "aliquotProject.code"));
   }
 
 }

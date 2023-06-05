@@ -1,5 +1,5 @@
 SELECT
-  COALESCE(proj.shortName, proj.alias) NAME,
+  COALESCE(proj.code, proj.title) NAME,
   COALESCE(stats.count, 0) count,
   COALESCE(stats.archivedCount, 0) archivedCount,
   stats.earliest,

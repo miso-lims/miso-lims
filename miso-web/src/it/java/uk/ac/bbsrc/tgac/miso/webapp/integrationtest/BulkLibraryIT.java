@@ -865,7 +865,7 @@ public class BulkLibraryIT extends AbstractIT {
     testLibraryAttribute(SamColumns.SAMPLE_TYPE, attributes, library, lib -> lib.getSample().getSampleType());
     testLibraryAttribute(SamColumns.SCIENTIFIC_NAME, attributes, library,
         lib -> lib.getSample().getScientificName().getAlias());
-    testLibraryAttribute(SamColumns.PROJECT, attributes, library, lib -> lib.getSample().getProject().getShortName());
+    testLibraryAttribute(SamColumns.PROJECT, attributes, library, lib -> lib.getSample().getProject().getCode());
     testLibraryAttribute(SamColumns.EXTERNAL_NAME, attributes, library,
         lib -> identityGetter.apply(lib).getExternalName());
     testLibraryAttribute(SamColumns.DONOR_SEX, attributes, library,

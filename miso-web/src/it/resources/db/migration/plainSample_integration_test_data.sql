@@ -160,7 +160,7 @@ INSERT INTO SequencingParameters (parametersId, name, instrumentModelId, readLen
 INSERT INTO Instrument (instrumentId, name, instrumentModelId) VALUES
   (1, 'T2500', 1);
 
-INSERT INTO Project(projectId, name, alias, shortName, created, description, status, referenceGenomeId, lastModified, creator, lastModifier, pipelineId) VALUES
+INSERT INTO Project(projectId, name, title, code, created, description, status, referenceGenomeId, lastModified, creator, lastModifier, pipelineId) VALUES
   (1, 'PRO1', 'PLAIN', NULL, '2017-06-27', 'integration test project one', 'ACTIVE', 1, '2017-06-27 14:11:00', 1, 1, 1);
   
 INSERT INTO Study (studyId, name, project_projectId, alias, studyTypeId, creator, created, lastModifier, lastModified) VALUES

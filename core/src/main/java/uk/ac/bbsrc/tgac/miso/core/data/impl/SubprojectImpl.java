@@ -172,7 +172,7 @@ public class SubprojectImpl implements Subproject {
   @Override
   public String getDeleteDescription() {
     Project p = getParentProject();
-    return (p.getShortName() == null ? p.getAlias() : p.getShortName())
+    return (p.getCode() == null ? p.getTitle() : p.getCode())
         + " - "
         + getAlias()
         + (getAlias().equals(getDescription()) ? "" : " (" + getDescription() + ")");

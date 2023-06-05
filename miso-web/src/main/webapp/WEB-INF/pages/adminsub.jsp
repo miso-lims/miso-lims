@@ -62,8 +62,8 @@
         <a href="<c:url value="/miso/tools/indexdistance"/>">Index Distance</a>
         <a href="<c:url value="/miso/tools/indexsearch"/>">Index Search</a>
         <c:if test="${detailedSample}">
-          <a href="<c:url value="/miso/tools/identitysearch"/>">Identity Search</a>
-        </c:if>
+         <a href="<c:url value="/miso/tools/identitysearch"/>">Identity Search</a>
+       </c:if>
         <a href="<c:url value="/miso/deletions"/>">Deletion Log</a>
     </div>
     

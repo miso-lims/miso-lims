@@ -120,7 +120,6 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String SEQUENCE = "Sequence(s)";
     public static final String SEQUENCING_PARAMETERS = "Sequencing Parameters";
     public static final String SERIAL_NUMBER = "Serial Number";
-    public static final String SHORT_NAME = "Short Name";
     public static final String SIZE = "Size";
     public static final String SIZE_BP = "Size (bp)";
     public static final String SOP = "SOP";
@@ -141,6 +140,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String TISSUE_ATTRIBUTES = "Tissue Attributes";
     public static final String TISSUE_ORIGIN = "Tissue Origin";
     public static final String TISSUE_TYPE = "Tissue Type";
+    public static final String TITLE = "Title";
     public static final String TRANSFER_TIME = "Transfer Time";
     public static final String TYPE = "Type";
     public static final String UNIQUE_DUAL_INDICES = "Unique Dual Indices";

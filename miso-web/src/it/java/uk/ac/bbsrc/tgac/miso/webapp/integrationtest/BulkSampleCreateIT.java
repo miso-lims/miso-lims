@@ -34,46 +34,60 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtils;
 public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
   // columns for creating Identity and everything else
-  private static final Set<String> identityColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
-      SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT, SamColumns.EXTERNAL_NAME, SamColumns.DONOR_SEX,
-      SamColumns.CONSENT, SamColumns.SUBPROJECT, SamColumns.SAMPLE_CLASS, SamColumns.GROUP_ID, SamColumns.GROUP_DESCRIPTION,
-      SamColumns.CREATION_DATE, SamColumns.QC_STATUS, SamColumns.QC_NOTE);
+  private static final Set<String> identityColumns =
+      Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
+          SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT, SamColumns.EXTERNAL_NAME,
+          SamColumns.DONOR_SEX,
+          SamColumns.CONSENT, SamColumns.SUBPROJECT, SamColumns.SAMPLE_CLASS, SamColumns.GROUP_ID,
+          SamColumns.GROUP_DESCRIPTION,
+          SamColumns.CREATION_DATE, SamColumns.QC_STATUS, SamColumns.QC_NOTE);
 
   // columns for creating Tissue and everything downstream of it
-  private static final Set<String> tissueColumns = Sets.newHashSet(SamColumns.ID_BARCODE, SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS,
-      SamColumns.BOX_POSITION, SamColumns.DISCARDED, SamColumns.RECEIVE_DATE, SamColumns.RECEIVE_TIME, SamColumns.RECEIVED_FROM,
+  private static final Set<String> tissueColumns = Sets.newHashSet(SamColumns.ID_BARCODE, SamColumns.BOX_SEARCH,
+      SamColumns.BOX_ALIAS,
+      SamColumns.BOX_POSITION, SamColumns.DISCARDED, SamColumns.RECEIVE_DATE, SamColumns.RECEIVE_TIME,
+      SamColumns.RECEIVED_FROM,
       SamColumns.RECEIVED_BY, SamColumns.RECEIPT_CONFIRMED, SamColumns.RECEIPT_QC_PASSED, SamColumns.RECEIPT_QC_NOTE,
       SamColumns.REQUISITION_ALIAS, SamColumns.REQUISITION, SamColumns.REQUISITION_ASSAY, SamColumns.IDENTITY_ALIAS,
-      SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER, SamColumns.TIMES_RECEIVED, SamColumns.TUBE_NUMBER,
+      SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER, SamColumns.TIMES_RECEIVED,
+      SamColumns.TUBE_NUMBER,
       SamColumns.SECONDARY_ID, SamColumns.TISSUE_MATERIAL, SamColumns.REGION, SamColumns.TIMEPOINT);
 
   // columns specific to creating Slides
-  private static final Set<String> slideColumns = Sets.newHashSet(SamColumns.SOP, SamColumns.SLIDES, SamColumns.THICKNESS, SamColumns.STAIN,
-      SamColumns.PERCENT_TUMOUR, SamColumns.PERCENT_NECROSIS, SamColumns.MARKED_AREA, SamColumns.MARKED_AREA_PERCENT_TUMOUR);
+  private static final Set<String> slideColumns =
+      Sets.newHashSet(SamColumns.SOP, SamColumns.SLIDES, SamColumns.THICKNESS, SamColumns.STAIN,
+          SamColumns.PERCENT_TUMOUR, SamColumns.PERCENT_NECROSIS, SamColumns.MARKED_AREA,
+          SamColumns.MARKED_AREA_PERCENT_TUMOUR);
 
   // columns specific to creating curls
-  private static final Set<String> tissuePieceColumns = Sets.newHashSet(SamColumns.SOP, SamColumns.PIECE_TYPE, SamColumns.SLIDES_CONSUMED);
+  private static final Set<String> tissuePieceColumns =
+      Sets.newHashSet(SamColumns.SOP, SamColumns.PIECE_TYPE, SamColumns.SLIDES_CONSUMED);
 
   // columns specific to creating single cells (tissue processing)
-  private static final Set<String> singleCellColumns = Sets.newHashSet(SamColumns.SOP, SamColumns.INITIAL_CELL_CONC, SamColumns.DIGESTION);
+  private static final Set<String> singleCellColumns =
+      Sets.newHashSet(SamColumns.SOP, SamColumns.INITIAL_CELL_CONC, SamColumns.DIGESTION);
 
   // columns specific to creating stocks
-  private static final Set<String> stockColumns = Sets.newHashSet(SamColumns.SOP, SamColumns.STR_STATUS, SamColumns.VOLUME,
-      SamColumns.VOLUME_UNITS, SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS, SamColumns.PARENT_NG_USED,
-      SamColumns.PARENT_VOLUME_USED);
+  private static final Set<String> stockColumns =
+      Sets.newHashSet(SamColumns.SOP, SamColumns.STR_STATUS, SamColumns.VOLUME,
+          SamColumns.VOLUME_UNITS, SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS, SamColumns.PARENT_NG_USED,
+          SamColumns.PARENT_VOLUME_USED);
 
   // columns specific to creating RNA stocks
   private static final Set<String> rnaStockColumns = Sets.newHashSet(SamColumns.DNASE_TREATED);
 
-  private static final Set<String> singleCellStockColumns = Sets.newHashSet(SamColumns.TARGET_CELL_RECOVERERY, SamColumns.CELL_VIABILITY,
-      SamColumns.LOADING_CELL_CONC, SamColumns.PARENT_NG_USED, SamColumns.PARENT_VOLUME_USED);
+  private static final Set<String> singleCellStockColumns =
+      Sets.newHashSet(SamColumns.TARGET_CELL_RECOVERERY, SamColumns.CELL_VIABILITY,
+          SamColumns.LOADING_CELL_CONC, SamColumns.PARENT_NG_USED, SamColumns.PARENT_VOLUME_USED);
 
   // columns specific to creating aliquots
-  private static final Set<String> aliquotColumns = Sets.newHashSet(SamColumns.SOP, SamColumns.PURPOSE, SamColumns.PARENT_NG_USED,
-      SamColumns.PARENT_VOLUME_USED);
+  private static final Set<String> aliquotColumns =
+      Sets.newHashSet(SamColumns.SOP, SamColumns.PURPOSE, SamColumns.PARENT_NG_USED,
+          SamColumns.PARENT_VOLUME_USED);
 
-  private static final Set<String> singleCellAliquotColumns = Sets.newHashSet(SamColumns.INPUT_INTO_LIBRARY, SamColumns.PARENT_NG_USED,
-      SamColumns.PARENT_VOLUME_USED);
+  private static final Set<String> singleCellAliquotColumns =
+      Sets.newHashSet(SamColumns.INPUT_INTO_LIBRARY, SamColumns.PARENT_NG_USED,
+          SamColumns.PARENT_VOLUME_USED);
 
   private BulkSamplePage getCreatePage(Integer quantity, Long projectId, String sampleCategory) {
     return BulkSamplePage.getForCreate(getDriver(), getBaseUrl(), quantity, projectId, sampleCategory);
@@ -160,7 +174,8 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
   @Test
   public void testCreateTissueDependencyCells() throws Exception {
-    // Goal: ensure that changing the external name value causes the identity alias dropdown to be populated
+    // Goal: ensure that changing the external name value causes the identity alias dropdown to be
+    // populated
     BulkSamplePage page = getCreatePage(1, null, SampleTissue.CATEGORY_NAME);
     HandsOnTable table = page.getTable();
 
@@ -264,13 +279,15 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
     SampleTissue created = (SampleTissue) getSession().get(SampleTissueImpl.class, Long.valueOf(newId));
 
-    assertEquals("confirm project", predefined.getShortName(), created.getProject().getShortName());
-    // everything else should be the same as in testCreateOneTissueNoProject() since the `pack` methods do not differ
+    assertEquals("confirm project", predefined.getCode(), created.getProject().getCode());
+    // everything else should be the same as in testCreateOneTissueNoProject() since the `pack` methods
+    // do not differ
   }
 
   @Test
   public void testCreateTwoTissuesForOneIdentityWithProject() throws Exception {
-    // Goal: ensure one tissue associated with a predefined project and a single (but not pre-existing) identity can be saved
+    // Goal: ensure one tissue associated with a predefined project and a single (but not pre-existing)
+    // identity can be saved
     BulkSamplePage page = getCreatePage(2, projectId, SampleTissue.CATEGORY_NAME);
     HandsOnTable table = page.getTable();
 
@@ -318,12 +335,13 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
     SampleTissue created = (SampleTissue) getSession().get(SampleTissueImpl.class, newId);
 
-    assertEquals("confirm project", predefined.getShortName(), created.getProject().getShortName());
+    assertEquals("confirm project", predefined.getCode(), created.getProject().getCode());
     String row0Alias = savedTable.getText(SamColumns.ALIAS, 0);
     String row1Alias = savedTable.getText(SamColumns.ALIAS, 1);
     assertFalse("confirm alias generated", isStringEmptyOrNull(row0Alias));
     assertEquals("confirm same identity alias", row0Alias.substring(0, 9), row1Alias.substring(0, 9));
-    // everything else should be the same as in testCreateOneTissueNoProject() since the `pack` methods do not differ
+    // everything else should be the same as in testCreateOneTissueNoProject() since the `pack` methods
+    // do not differ
   }
 
   @Test
@@ -463,7 +481,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
     SampleSlide created = (SampleSlide) getSession().get(SampleSlideImpl.class, newId);
 
-    assertEquals("confirm project", predefined.getShortName(), created.getProject().getShortName());
+    assertEquals("confirm project", predefined.getCode(), created.getProject().getCode());
     // everything else should be the same as in testCreateOneSlideNoProject()
   }
 
@@ -563,7 +581,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
     SampleTissueProcessing created = (SampleTissueProcessing) getSession().get(SampleTissueProcessingImpl.class, newId);
 
-    assertEquals("confirm project", predefined.getShortName(), created.getProject().getShortName());
+    assertEquals("confirm project", predefined.getCode(), created.getProject().getCode());
     // everything else should be the same as in testCreateOneCurlsNoProject
   }
 
@@ -744,9 +762,10 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
     // verify attributes against what got saved to the database
     Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
-    SampleStock created = (SampleStock) getSession().get(SampleStockImpl.class, Long.valueOf(getIdForRow(savedTable, 0)));
+    SampleStock created =
+        (SampleStock) getSession().get(SampleStockImpl.class, Long.valueOf(getIdForRow(savedTable, 0)));
 
-    assertEquals("confirm project", predefined.getShortName(), created.getProject().getShortName());
+    assertEquals("confirm project", predefined.getCode(), created.getProject().getCode());
     // everything else should be the same as in testCreateOneGdnaStockNoProject
   }
 
@@ -901,7 +920,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
     SampleStock created = (SampleStock) getSession().get(SampleStockImpl.class, newId);
 
-    assertEquals("confirm project", predefined.getShortName(), created.getProject().getShortName());
+    assertEquals("confirm project", predefined.getCode(), created.getProject().getCode());
     // everything else should be the same as in testCreateOneRnaStockNoProject
   }
 
@@ -1035,7 +1054,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
     SampleAliquot created = (SampleAliquot) getSession().get(SampleAliquotImpl.class, newId);
 
-    assertEquals("confirm project", predefined.getShortName(), created.getProject().getShortName());
+    assertEquals("confirm project", predefined.getCode(), created.getProject().getCode());
     // everything else should be the same as in testCreateOneGdnaAliquotNoProject
   }
 
@@ -1248,7 +1267,8 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     identity.put(SamColumns.DESCRIPTION, "");
     identity.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     identity.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
-    identity.put(SamColumns.PROJECT, "PTWO"); // different project so as not to mess with the SampleNumberPerProject generator
+    identity.put(SamColumns.PROJECT, "PTWO"); // different project so as not to mess with the SampleNumberPerProject
+                                              // generator
     identity.put(SamColumns.EXTERNAL_NAME, "ext2001"); // increment
     identity.put(SamColumns.DONOR_SEX, "Female");
     identity.put(SamColumns.CONSENT, ConsentLevel.ALL_PROJECTS.getLabel());
@@ -1294,7 +1314,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Project predefined = (Project) getSession().get(ProjectImpl.class, 2L);
     SampleIdentity created = (SampleIdentity) getSession().get(SampleIdentityImpl.class, newId);
 
-    assertEquals("confirm project", predefined.getShortName(), created.getProject().getShortName());
+    assertEquals("confirm project", predefined.getCode(), created.getProject().getCode());
     // rest should be same as testCreateOneIdentityNoProject
   }
 

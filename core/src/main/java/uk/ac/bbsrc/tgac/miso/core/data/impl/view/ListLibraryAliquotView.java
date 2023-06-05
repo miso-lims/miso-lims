@@ -230,12 +230,12 @@ public class ListLibraryAliquotView
     this.designCode = aliquotDesignCode;
   }
 
-  public String getProjectShortName() {
-    return getProjectAttribute(ParentProject::getShortName);
+  public String getProjectCode() {
+    return getProjectAttribute(ParentProject::getCode);
   }
 
-  public String getProjectAlias() {
-    return getProjectAttribute(ParentProject::getAlias);
+  public String getProjectTitle() {
+    return getProjectAttribute(ParentProject::getTitle);
   }
 
   public Long getProjectId() {

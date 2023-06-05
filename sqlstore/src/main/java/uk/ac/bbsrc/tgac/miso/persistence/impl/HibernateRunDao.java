@@ -390,7 +390,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
         .setProjection(Projections.distinct(
             Projections.projectionList()
                 .add(Projections.property("id"))
-                .add(Projections.property("project.shortName"))
+                .add(Projections.property("project.code"))
                 .add(Projections.property("project.name"))))
         .add(Restrictions.in("id", runs.stream().map(Run::getId).toArray()))
         .list();

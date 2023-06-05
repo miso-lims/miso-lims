@@ -30,5 +30,5 @@ public interface NamingSchemeResolverService {
 
   NameValidator getLibraryAliquotAliasValidator(String validatorName);
 
-  NameValidator getProjectShortNameValidator(String validatorName);
+  NameValidator getProjectCodeValidator(String validatorName);
 }

@@ -30,10 +30,11 @@ public class DefaultNamingScheme extends AbstractNamingScheme {
   private NameGenerator<Library> libraryAliasGenerator = new DefaultLibraryAliasGenerator();
   private NameValidator libraryAliquotAliasValidator = new DefaultLibraryAliquotAliasValidator();
   private NameGenerator<LibraryAliquot> libraryAliquotAliasGenerator = new DefaultLibraryAliquotAliasGenerator();
-  private NameValidator projectShortNameValidator = new AllowAnythingValidator();
+  private NameValidator projectCodeValidator = new AllowAnythingValidator();
 
   /**
-   * Creates a new DefaultNamingScheme and attempts to autowire all of its validators' and generators' dependencies.
+   * Creates a new DefaultNamingScheme and attempts to autowire all of its validators' and generators'
+   * dependencies.
    */
   public DefaultNamingScheme() {
     SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(libraryAliasGenerator);
@@ -105,13 +106,13 @@ public class DefaultNamingScheme extends AbstractNamingScheme {
   }
 
   @Override
-  public void setProjectShortNameValidator(NameValidator validator) {
-    this.projectShortNameValidator = validator;
+  public void setProjectCodeValidator(NameValidator validator) {
+    this.projectCodeValidator = validator;
   }
 
   @Override
-  protected NameValidator getProjectShortNameValidator() {
-    return projectShortNameValidator;
+  protected NameValidator getProjectCodeValidator() {
+    return projectCodeValidator;
   }
 
   @Override

@@ -43,8 +43,8 @@ public class ProjectPageIT extends AbstractIT {
     unsaved.put(Fields.ID, "Unsaved");
     unsaved.put(Fields.NAME, "Unsaved");
     unsaved.put(Fields.CREATION_DATE, dateFormat.format(new Date().getTime()));
-    unsaved.put(Fields.ALIAS, "Create New Project via UI");
-    unsaved.put(Fields.SHORTNAME, "SUCHNEW");
+    unsaved.put(Fields.TITLE, "Create New Project via UI");
+    unsaved.put(Fields.CODE, "SUCHNEW");
     unsaved.put(Fields.DESCRIPTION, "New Project via UI");
     unsaved.put(Fields.STATUS, "Proposed");
     unsaved.put(Fields.REFERENCE_GENOME, "Human hg18 random");
@@ -52,8 +52,8 @@ public class ProjectPageIT extends AbstractIT {
 
     assertEquals("Project ID is unsaved", unsaved.get(Fields.ID), page.getId());
     assertEquals("Project name is unsaved", unsaved.get(Fields.NAME), page.getName());
-    page.setAlias(unsaved.get(Fields.ALIAS));
-    page.setShortName(unsaved.get(Fields.SHORTNAME));
+    page.setTitle(unsaved.get(Fields.TITLE));
+    page.setCode(unsaved.get(Fields.CODE));
     page.setDescription(unsaved.get(Fields.DESCRIPTION));
     page.setStatus(unsaved.get(Fields.STATUS));
     page.setReferenceGenome(unsaved.get(Fields.REFERENCE_GENOME));
@@ -65,8 +65,8 @@ public class ProjectPageIT extends AbstractIT {
     assertNotEquals("Project name is saved", unsaved.get(Fields.NAME), savedPage.getName());
     assertEquals("Project creation date saved correctly", unsaved.get(Fields.CREATION_DATE),
         savedPage.getCreationDate());
-    assertEquals(unsaved.get(Fields.ALIAS), savedPage.getAlias());
-    assertEquals(unsaved.get(Fields.SHORTNAME), savedPage.getShortName());
+    assertEquals(unsaved.get(Fields.TITLE), savedPage.getTitle());
+    assertEquals(unsaved.get(Fields.CODE), savedPage.getCode());
     assertEquals(unsaved.get(Fields.DESCRIPTION), savedPage.getDescription());
     assertEquals(unsaved.get(Fields.STATUS), savedPage.getStatus());
     assertEquals(unsaved.get(Fields.REFERENCE_GENOME), savedPage.getReferenceGenome());
@@ -78,22 +78,22 @@ public class ProjectPageIT extends AbstractIT {
     // Goal: change all editable fields for one project
     ProjectPage page = getProjectPage(4L);
     Map<String, String> updated = new HashMap<>();
-    updated.put(Fields.ALIAS, "Changed Project");
+    updated.put(Fields.TITLE, "Changed Project");
     updated.put(Fields.DESCRIPTION, "Changed Description");
-    updated.put(Fields.SHORTNAME, "NEWER");
+    updated.put(Fields.CODE, "NEWER");
     updated.put(Fields.STATUS, "Active");
     updated.put(Fields.REFERENCE_GENOME, "Human hg19 random");
 
-    page.setAlias(updated.get(Fields.ALIAS));
-    page.setShortName(updated.get(Fields.SHORTNAME));
+    page.setTitle(updated.get(Fields.TITLE));
+    page.setCode(updated.get(Fields.CODE));
     page.setDescription(updated.get(Fields.DESCRIPTION));
     page.setStatus(updated.get(Fields.STATUS));
     page.setReferenceGenome(updated.get(Fields.REFERENCE_GENOME));
 
     ProjectPage savedPage = page.clickSave();
 
-    assertEquals(updated.get(Fields.ALIAS), savedPage.getAlias());
-    assertEquals(updated.get(Fields.SHORTNAME), savedPage.getShortName());
+    assertEquals(updated.get(Fields.TITLE), savedPage.getTitle());
+    assertEquals(updated.get(Fields.CODE), savedPage.getCode());
     assertEquals(updated.get(Fields.DESCRIPTION), savedPage.getDescription());
     assertEquals(updated.get(Fields.STATUS), savedPage.getStatus());
     assertEquals(updated.get(Fields.REFERENCE_GENOME), savedPage.getReferenceGenome());

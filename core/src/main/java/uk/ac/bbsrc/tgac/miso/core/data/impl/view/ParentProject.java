@@ -19,8 +19,8 @@ public class ParentProject implements Serializable {
   private long projectId;
 
   private String name;
-  private String shortName;
-  private String alias;
+  private String code;
+  private String title;
 
   public long getId() {
     return projectId;
@@ -38,20 +38,20 @@ public class ParentProject implements Serializable {
     this.name = name;
   }
 
-  public String getShortName() {
-    return shortName;
+  public String getCode() {
+    return code;
   }
 
-  public void setShortName(String shortName) {
-    this.shortName = shortName;
+  public void setCode(String code) {
+    this.code = code;
   }
 
-  public String getAlias() {
-    return alias;
+  public String getTitle() {
+    return title;
   }
 
-  public void setAlias(String alias) {
-    this.alias = alias;
+  public void setTitle(String title) {
+    this.title = title;
   }
 
 }

@@ -160,7 +160,7 @@ unspecified, emails will not contain links to MISO entries.
 ## Naming Schemes
 
 MISO Naming Schemes are used to validate and generate entity String fields. They are used for all `name` fields, some
-`alias` fields, and project short names.
+`alias` fields, and project codes.
 
 ### `miso.naming.scheme`\*
 
@@ -178,7 +178,7 @@ plain sample mode. For detailed sample mode, `v2` is recommended.
 | Library Alias Validator     | DefaultLibraryAliasValidator | OicrLibraryAliasValidator     | V2LibraryAliasValidator |
 | Library Aliquot Alias Generator | DefaultLibraryAliquotAliasGenerator | OicrLibraryAliquotAliasGenerator | V2LibraryAliquotAliasGenerator |
 | Library Aliquot Alias Validator | DefaultLibraryAliquotAliasValidator | OicrLibraryAliasValidator | V2LibraryAliquotAliasValidator |
-| Project ShortName Validator | AllowAnythingValidator       | OicrProjectShortNameValidator | OicrProjectShortNameValidator |
+| Project Code Validator | AllowAnythingValidator       | OicrProjectCodeValidator | OicrProjectCodeValidator |
 | Configurable components     | all                          | none                          | none |
 
 ### `miso.naming.generator.nameable.name`
@@ -261,9 +261,9 @@ Change the validator for library aliquot aliases.
 | oicr     | Matches 'oicr' generator               | no         | no               | no           | no                 |
 | v2       | Matches 'v2' generator                 | no         | no               | no           | no                 |
 
-### `miso.naming.validator.project.shortName`
+### `miso.naming.validator.project.code`
 
-Change the validator for project short names.
+Change the validator for project codes.
 
 | Option   | Detail                                 | Allow null | Allow duplicates | Custom Regex | Custom Duplication |
 |----------|----------------------------------------|------------|------------------|--------------|--------------------|
@@ -321,7 +321,7 @@ Example: `Lab 1 Scanner:192.168.0.120:8000,Lab 2 Scanner:192.168.0.121:8000`
 ### `miso.project.report.links`
 
 Config for links to external project report services to display on Edit Project page. Enter in format
-`<link text>|<URI with placeholders>`. Placeholders can be any of `{id}`, `{name}`, `{shortName}`. Multiple reports can
+`<link text>|<URI with placeholders>`. Placeholders can be any of `{id}`, `{name}`, `{code}`. Multiple reports can
 be specified by using a double backslash to separate.
 
 Example: `miso.project.report.links: External Project Link|http://example.com/{id}\\Another Project Link|http://example.com/project/{name}`

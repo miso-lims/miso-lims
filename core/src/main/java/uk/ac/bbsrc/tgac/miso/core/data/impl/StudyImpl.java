@@ -1,22 +1,19 @@
 /*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
+ * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK MISO project contacts: Robert Davey @
+ * TGAC *********************************************************************
  *
  * This file is part of MISO.
  *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * MISO is free software: you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MISO is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with MISO. If not, see
+ * <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -91,7 +88,7 @@ public class StudyImpl implements Study {
   private StudyType studyType;
   @Column(name = "alias")
   private String alias;
-  @OneToMany(targetEntity = StudyChangeLog.class, mappedBy = "study", cascade = { CascadeType.REMOVE })
+  @OneToMany(targetEntity = StudyChangeLog.class, mappedBy = "study", cascade = {CascadeType.REMOVE})
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @ManyToOne(targetEntity = UserImpl.class)
@@ -113,8 +110,7 @@ public class StudyImpl implements Study {
   /**
    * Construct a new Study with a default empty SecurityProfile
    */
-  public StudyImpl() {
-  }
+  public StudyImpl() {}
 
   @Override
   public void addExperiment(Experiment e) {
@@ -123,8 +119,10 @@ public class StudyImpl implements Study {
 
   @Override
   public int compareTo(Study t) {
-    if (getId() < t.getId()) return -1;
-    if (getId() > t.getId()) return 1;
+    if (getId() < t.getId())
+      return -1;
+    if (getId() > t.getId())
+      return 1;
     return 0;
   }
 
@@ -133,9 +131,12 @@ public class StudyImpl implements Study {
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) return false;
-    if (obj == this) return true;
-    if (!(obj instanceof Study)) return false;
+    if (obj == null)
+      return false;
+    if (obj == this)
+      return true;
+    if (!(obj instanceof Study))
+      return false;
     Study them = (Study) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
@@ -202,8 +203,10 @@ public class StudyImpl implements Study {
     } else {
       final int PRIME = 37;
       int hashcode = 1;
-      if (getName() != null) hashcode = PRIME * hashcode + getName().hashCode();
-      if (getAlias() != null) hashcode = PRIME * hashcode + getAlias().hashCode();
+      if (getName() != null)
+        hashcode = PRIME * hashcode + getName().hashCode();
+      if (getAlias() != null)
+        hashcode = PRIME * hashcode + getAlias().hashCode();
       return hashcode;
     }
   }
@@ -261,7 +264,7 @@ public class StudyImpl implements Study {
     sb.append(" : ");
 
     if (getProject() != null) {
-      sb.append(getProject().getAlias());
+      sb.append(getProject().getTitle());
       sb.append("(" + getProject().getName() + ")");
     }
     return sb.toString();
@@ -285,7 +288,7 @@ public class StudyImpl implements Study {
   @Override
   public String getDeleteDescription() {
     Project p = getProject();
-    return (p.getShortName() == null ? p.getAlias() : p.getShortName())
+    return (p.getCode() == null ? p.getTitle() : p.getCode())
         + " " + getName() + " (" + getAlias() + ")";
   }
 

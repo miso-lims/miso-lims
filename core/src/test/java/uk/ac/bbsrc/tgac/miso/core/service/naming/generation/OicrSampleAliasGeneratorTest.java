@@ -15,9 +15,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
@@ -25,9 +25,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissuePieceImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissuePieceImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleNumberPerProjectService;
@@ -242,8 +242,8 @@ public class OicrSampleAliasGeneratorTest {
 
     Project proj = new ProjectImpl();
     proj.setId(1L);
-    proj.setAlias("PROJ");
-    proj.setShortName("PROJ");
+    proj.setTitle("PROJ");
+    proj.setCode("PROJ");
     identity.setProject(proj);
 
     return identity;

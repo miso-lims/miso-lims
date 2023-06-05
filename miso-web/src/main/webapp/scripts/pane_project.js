@@ -4,9 +4,9 @@ PaneTarget.project = (function () {
   var transform = function (project) {
     return Tile.make(
       [
-        Tile.title(project.shortName || project.alias),
+        Tile.title(project.code || project.title),
         Tile.lines(
-          ["Name: " + project.name, project.shortName ? "Alias: " + project.alias : null].filter(
+          ["Name: " + project.name, project.code ? "Title: " + project.title : null].filter(
             function (x) {
               return !!x;
             }
@@ -22,7 +22,7 @@ PaneTarget.project = (function () {
   var createHelpMessage = function () {
     var message = document.createElement("P");
 
-    message.innerText = "Search projects by name, alias, short name, or description.";
+    message.innerText = "Search projects by name, title, code, or description.";
 
     return message;
   };

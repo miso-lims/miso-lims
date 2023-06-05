@@ -1,22 +1,19 @@
 /*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
+ * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK MISO project contacts: Robert Davey @
+ * TGAC *********************************************************************
  *
  * This file is part of MISO.
  *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * MISO is free software: you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * MISO is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with MISO. If not, see
+ * <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -46,8 +43,8 @@ import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 @Repository
 public class HibernateProjectDao implements ProjectStore {
 
-  private static final String[] SEARCH_PROPERTIES = new String[] { "name", "alias",
-      "description", "shortName" };
+  private static final String[] SEARCH_PROPERTIES = new String[] {"name", "title",
+      "description", "code"};
 
   @Autowired
   private SecurityStore securityStore;
@@ -66,16 +63,16 @@ public class HibernateProjectDao implements ProjectStore {
   }
 
   @Override
-  public Project getByAlias(String alias) throws IOException {
+  public Project getByTitle(String title) throws IOException {
     Criteria criteria = currentSession().createCriteria(ProjectImpl.class);
-    criteria.add(Restrictions.eq("alias", alias));
+    criteria.add(Restrictions.eq("title", title));
     return (Project) criteria.uniqueResult();
   }
 
   @Override
-  public Project getByShortName(String shortName) throws IOException {
+  public Project getByCode(String code) throws IOException {
     Criteria criteria = currentSession().createCriteria(ProjectImpl.class);
-    criteria.add(Restrictions.eq("shortName", shortName));
+    criteria.add(Restrictions.eq("code", code));
     return (Project) criteria.uniqueResult();
   }
 
@@ -114,6 +111,7 @@ public class HibernateProjectDao implements ProjectStore {
       return project.getId();
     }
   }
+
   public void setSecurityStore(SecurityStore securityStore) {
     this.securityStore = securityStore;
   }

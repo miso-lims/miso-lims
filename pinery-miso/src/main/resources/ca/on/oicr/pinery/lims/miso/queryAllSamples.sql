@@ -7,7 +7,7 @@ SELECT s.alias NAME
         ,NULL sampleType_platform
         ,NULL sampleType_description
         ,tt.alias tissueType
-        ,p.shortName project
+        ,p.code project
         ,s.archived archived
         ,s.creationDate inLabCreationDate
         ,s.created created
@@ -144,7 +144,7 @@ SELECT l.alias NAME
         ,lt.platformType sampleType_platform 
         ,lt.description sampleType_description 
         ,NULL tissueType 
-        ,sp.shortName project 
+        ,sp.code project 
         ,l.archived archived 
         ,l.creationDate inLabCreationDate
         ,l.created created 
@@ -281,7 +281,7 @@ SELECT d.alias name
         ,lt.platformType sampleType_platform 
         ,lt.description sampleType_description 
         ,NULL tissueType 
-        ,sp.shortName project 
+        ,sp.code project 
         ,0 archived 
         ,d.creationDate inLabCreationDate
         ,d.created created 

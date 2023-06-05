@@ -49,12 +49,10 @@ FormTarget.sample = (function ($) {
                 return project.status === "Active" || project.id === object.projectId;
               }),
               getItemLabel: function (item) {
-                return Constants.isDetailedSample ? item.shortName : item.name;
+                return Constants.isDetailedSample ? item.code : item.name;
               },
               getItemValue: Utils.array.getId,
-              sortSource: Utils.sorting.standardSort(
-                Constants.isDetailedSample ? "shortName" : "id"
-              ),
+              sortSource: Utils.sorting.standardSort(Constants.isDetailedSample ? "code" : "id"),
               onChange: function (newValue, form) {
                 if (Constants.isDetailedSample) {
                   form.updateField("subprojectId", {

@@ -463,7 +463,7 @@ INSERT INTO Instrument_ServiceRecord(recordId, instrumentId) VALUES
 (151, 101),
 (152, 101);
 
-INSERT INTO Project(projectId, name, alias, shortName, created, description, status, referenceGenomeId, lastModified, creator, lastModifier, pipelineId) VALUES
+INSERT INTO Project(projectId, name, title, code, created, description, status, referenceGenomeId, lastModified, creator, lastModifier, pipelineId) VALUES
   (1, 'PRO1', 'Project One', 'PONE', '2017-06-27', 'integration test project one', 'ACTIVE', 1, '2017-06-27 14:11:00', 1, 1, 1),
   (2, 'PRO2', 'Project Two', 'PTWO', '2017-07-20', 'integration test project for custom identities', 'ACTIVE', 1, '2017-07-20 16:55:00', 1, 1, 1),
   (3, 'PRO3', 'Test Data', 'TEST', '2017-06-27', 'integration test project three', 'ACTIVE', 1, '2017-06-27 14:12:00', 1, 1, 1),

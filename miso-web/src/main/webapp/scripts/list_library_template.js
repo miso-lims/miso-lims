@@ -52,8 +52,8 @@ ListTarget.library_template = {
                       name:
                         project.name +
                         ": " +
-                        project.alias +
-                        (project.shortName ? " (" + project.shortName + ")" : ""),
+                        project.title +
+                        (project.code ? " (" + project.code + ")" : ""),
                       handler: function () {
                         var templateIds = items.map(function (template) {
                           return template.id;
@@ -74,7 +74,7 @@ ListTarget.library_template = {
                                 "Successfully added Library Template" +
                                   (items.length > 1 ? "s" : "") +
                                   " to Project " +
-                                  project.alias,
+                                  project.title,
                               ],
                               Utils.page.pageReload
                             );
@@ -108,7 +108,7 @@ ListTarget.library_template = {
                   })
                   .done(function (project) {
                     projectActions.push({
-                      name: project.alias,
+                      name: project.title,
                       handler: function () {
                         var templateIds = items.map(function (item) {
                           return item.id;
@@ -131,7 +131,7 @@ ListTarget.library_template = {
                                 "Successfully removed Library Template" +
                                   (items.length > 1 ? "s" : "") +
                                   " from Project " +
-                                  project.alias,
+                                  project.title,
                               ],
                               Utils.page.pageReload
                             );

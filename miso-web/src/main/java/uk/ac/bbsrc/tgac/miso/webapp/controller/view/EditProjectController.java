@@ -1,22 +1,19 @@
 /*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
+ * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK MISO project contacts: Robert Davey @
+ * TGAC *********************************************************************
  *
  * This file is part of MISO.
  *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * MISO is free software: you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * MISO is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with MISO. If not, see
+ * <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -81,9 +78,15 @@ public class EditProjectController {
 
   @GetMapping("/shortname/{shortName}")
   public ModelAndView byProjectShortName(@PathVariable String shortName, ModelMap model) throws IOException {
-    Project project = projectService.getProjectByShortName(shortName);
+    model.clear();
+    return new ModelAndView("redirect:/miso/project/code/%s".formatted(shortName), model);
+  }
+
+  @GetMapping("/code/{code}")
+  public ModelAndView byProjectCode(@PathVariable String code, ModelMap model) throws IOException {
+    Project project = projectService.getProjectByCode(code);
     if (project == null) {
-      throw new NotFoundException("No project found for shortname " + shortName);
+      throw new NotFoundException("No project found for code " + code);
     }
     return setupForm(project, model);
   }
@@ -102,7 +105,7 @@ public class EditProjectController {
       Collection<Subproject> subprojects = subprojectService.listByProjectId(project.getId());
       model.put("subprojects", Dtos.asSubprojectDtos(subprojects));
       model.put("title", "Project " + project.getId());
-      MisoWebUtils.addIssues(issueTrackerManager, () -> issueTrackerManager.getIssuesByTag(project.getShortName()), model);
+      MisoWebUtils.addIssues(issueTrackerManager, () -> issueTrackerManager.getIssuesByTag(project.getCode()), model);
       model.put("projectReportLinks", externalUriBuilder.getUris(project));
     }
 
@@ -110,7 +113,8 @@ public class EditProjectController {
     model.put("projectDto", mapper.writeValueAsString(Dtos.asDto(project)));
 
     ObjectNode formConfig = mapper.createObjectNode();
-    MisoWebUtils.addJsonArray(mapper, formConfig, "statusOptions", Arrays.asList(StatusType.values()), StatusType::getKey);
+    MisoWebUtils.addJsonArray(mapper, formConfig, "statusOptions", Arrays.asList(StatusType.values()),
+        StatusType::getKey);
     ObjectNode namingConfig = formConfig.putObject("naming");
     addNamingSchemeConfig(namingConfig, "primary", namingSchemeHolder.getPrimary(), project);
     addNamingSchemeConfig(namingConfig, "secondary", namingSchemeHolder.getSecondary(), project);
@@ -119,11 +123,12 @@ public class EditProjectController {
     return new ModelAndView("/WEB-INF/pages/editProject.jsp", model);
   }
 
-  private void addNamingSchemeConfig(ObjectNode namingConfig, String property, NamingScheme scheme, Project project) throws IOException {
+  private void addNamingSchemeConfig(ObjectNode namingConfig, String property, NamingScheme scheme, Project project)
+      throws IOException {
     if (scheme != null) {
       ObjectNode config = namingConfig.putObject(property);
-      config.put("shortNameRequired", !scheme.nullProjectShortNameAllowed());
-      config.put("shortNameModifiable", scheme.nullProjectShortNameAllowed() || !projectService.hasSamples(project));
+      config.put("codeRequired", !scheme.nullProjectCodeAllowed());
+      config.put("codeModifiable", scheme.nullProjectCodeAllowed() || !projectService.hasSamples(project));
     }
   }
 

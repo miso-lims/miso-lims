@@ -19,8 +19,8 @@ public class ProjectPage extends HeaderFooterPage {
     public static final String ID = "id";
     public static final String NAME = "name";
     public static final String CREATION_DATE = "creationDate";
-    public static final String ALIAS = "alias";
-    public static final String SHORTNAME = "shortName";
+    public static final String TITLE = "title";
+    public static final String CODE = "code";
     public static final String DESCRIPTION = "description";
     public static final String STATUS = "status";
     public static final String REFERENCE_GENOME = "referenceGenome";
@@ -46,10 +46,10 @@ public class ProjectPage extends HeaderFooterPage {
   private WebElement nameLabel;
   @FindBy(id = "projectForm_creationDate")
   private WebElement creationDateLabel;
-  @FindBy(id = "projectForm_alias")
-  private WebElement aliasInput;
-  @FindBy(id = "projectForm_shortName")
-  private WebElement shortNameInput;
+  @FindBy(id = "projectForm_title")
+  private WebElement titleInput;
+  @FindBy(id = "projectForm_code")
+  private WebElement codeInput;
   @FindBy(id = "projectForm_description")
   private WebElement descriptionInput;
   @FindBy(id = "projectForm_status")
@@ -87,20 +87,20 @@ public class ProjectPage extends HeaderFooterPage {
     return creationDateLabel.getText();
   }
 
-  public String getAlias() {
-    return aliasInput.getAttribute("value");
+  public String getTitle() {
+    return titleInput.getAttribute("value");
   }
 
-  public void setAlias(String alias) {
-    setText(alias, aliasInput);
+  public void setTitle(String title) {
+    setText(title, titleInput);
   }
 
-  public String getShortName() {
-    return shortNameInput.getAttribute("value");
+  public String getCode() {
+    return codeInput.getAttribute("value");
   }
 
-  public void setShortName(String shortName) {
-    setText(shortName, shortNameInput);
+  public void setCode(String code) {
+    setText(code, codeInput);
   }
 
   public String getDescription() {

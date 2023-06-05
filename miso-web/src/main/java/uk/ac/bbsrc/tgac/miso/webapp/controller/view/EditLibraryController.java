@@ -309,7 +309,7 @@ public class EditLibraryController {
       dto.setParentSampleAlias(item.getAlias());
       dto.setProjectId(item.getProject().getId());
       dto.setProjectName(item.getProject().getName());
-      dto.setProjectShortName(item.getProject().getShortName());
+      dto.setProjectCode(item.getProject().getCode());
       dto.setBox(newBox);
       dto.setUmis(null);
 

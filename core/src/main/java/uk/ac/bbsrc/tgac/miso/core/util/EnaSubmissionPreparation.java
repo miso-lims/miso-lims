@@ -346,7 +346,7 @@ public class EnaSubmissionPreparation {
       studyDescriptor.appendChild(studyType);
 
       Element centerProjectName = xml.getOwnerDocument().createElementNS(null, "CENTER_PROJECT_NAME");
-      centerProjectName.setTextContent(s.getProject().getAlias());
+      centerProjectName.setTextContent(s.getProject().getTitle());
       studyDescriptor.appendChild(centerProjectName);
 
       Element studyAbstract = xml.getOwnerDocument().createElementNS(null, "STUDY_ABSTRACT");

@@ -23,7 +23,7 @@
         contentType: "application/json; charset=utf8",
         data: JSON.stringify({
           identitiesSearches: data,
-          project: $("#projectAlias").val(),
+          project: $("#projectTitle").val(),
         }),
       })
         .done(function (results) {

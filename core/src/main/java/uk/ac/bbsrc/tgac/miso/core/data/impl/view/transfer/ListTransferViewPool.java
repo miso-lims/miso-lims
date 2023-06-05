@@ -23,11 +23,11 @@ public class ListTransferViewPool extends ListTransferViewItem {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String SHORT_NAME = "Undetermined (pool)";
+    private static final String CODE = "Undetermined (pool)";
 
     @Override
-    public String getShortName() {
-      return SHORT_NAME;
+    public String getCode() {
+      return CODE;
     }
 
   };
