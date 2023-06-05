@@ -8,10 +8,11 @@ FOR EACH ROW
   SET log_message = CONCAT_WS(', ',
     makeChangeMessage('alias', OLD.alias, NEW.alias),
     makeChangeMessage('barcode', OLD.identificationBarcode, NEW.identificationBarcode),
-    makeChangeMessage('location', OLD.locationBarcode, NEW.locationBarcode),
+    makeChangeMessage('location barcode', OLD.locationBarcode, NEW.locationBarcode),
     makeChangeMessage('description', OLD.description, NEW.description),
     makeChangeMessage('use', (SELECT alias FROM BoxUse WHERE boxUseId = OLD.boxUseId), (SELECT alias FROM BoxUse WHERE boxUseId = NEW.boxUseId)),
-    makeChangeMessage('size', boxSizeToString(OLD.boxSizeId), boxSizeToString(NEW.boxSizeId))
+    makeChangeMessage('size', boxSizeToString(OLD.boxSizeId), boxSizeToString(NEW.boxSizeId)),
+    makeChangeMessage('freezer', getFreezerName(OLD.locationId), getFreezerName(NEW.locationId))
   );
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO BoxChangeLog(boxId, columnsChanged, userId, message, changeTime) VALUES (
@@ -22,7 +23,8 @@ FOR EACH ROW
         makeChangeColumn('locationBarcode', NEW.locationBarcode, OLD.locationBarcode),
         makeChangeColumn('description', NEW.description, OLD.description),
         makeChangeColumn('boxUseId', NEW.boxUseId, OLD.boxUseId),
-        makeChangeColumn('boxSizeId', NEW.boxSizeId, OLD.boxSizeId)
+        makeChangeColumn('boxSizeId', NEW.boxSizeId, OLD.boxSizeId),
+        makeChangeColumn('locationId', NEW.locationId, OLD.locationId)
       ), ''),
       NEW.lastModifier,
       log_message,
