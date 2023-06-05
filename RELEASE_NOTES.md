@@ -31,6 +31,10 @@ Starting with version 1.29.0, the format of this file is based on
   version) to MySQL 8.0. See the [Migrating to MySQL 8.0 guide](/docs/admin/mysql-8-upgrade.md)
   and follow the instructions there instead of the regular upgrade procedure
 
+### Known Issues
+
+* When using the miso-lims-webapp Docker image, dates may be shifted by one day when saving
+
 
 ## [1.56.0] - 2023-04-20
 

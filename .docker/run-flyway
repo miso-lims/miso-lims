@@ -11,7 +11,7 @@ password=$(cat ${MISO_DB_ROOT_PASS_FILE})
 
 # note: MySQL useSSL option is deprecated in favour of sslMode, but included here because Flyway shows a warning otherwise
 command="flyway -user=root -password='${password}' \
-  -url='jdbc:mysql://${MISO_DB_HOST_PORT}/${MISO_DB}?autoReconnect=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&sslMode=DISABLED&useSSL=false' \
+  -url='jdbc:mysql://${MISO_DB_HOST_PORT}/${MISO_DB}?autoReconnect=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&sslMode=DISABLED&connectionTimeZone=SERVER&cacheDefaultTimeZone=false&useSSL=false' \
   -locations='filesystem:/flyway/sql,classpath:uk.ac.bbsrc.tgac.miso.db.migration' -outOfOrder=true -placeholders.filesDir='${MISO_FILES_DIR}' -connectRetries=60"
 
 eval "${command} $1"
