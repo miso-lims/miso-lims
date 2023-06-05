@@ -1,0 +1,1 @@
+Links for external projects that use their short names changed from (`http://example.com/project/{shortName}`) to using their code (`http://example.com/project/{code}`)

@@ -1,1 +1,0 @@
-Placeholder options of links to external projects from {id}, {name}, {shortName} to {id}, {name}, {code} (line 72-76 in `miso.properties`)

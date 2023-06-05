@@ -82,7 +82,7 @@ public class EditProjectController {
     if (project == null) {
       throw new NotFoundException("No project found for short name " + shortName);
     }
-    return new ModelAndView("forward:/project/code/%s".formatted(shortName), model);
+    return new ModelAndView("redirect:/project/code/%s".formatted(shortName), model);
   }
 
   @GetMapping("/code/{code}")
