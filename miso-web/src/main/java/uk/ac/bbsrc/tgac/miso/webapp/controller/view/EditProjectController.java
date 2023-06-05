@@ -78,10 +78,6 @@ public class EditProjectController {
 
   @GetMapping("/shortname/{shortName}")
   public ModelAndView byProjectShortName(@PathVariable String shortName, ModelMap model) throws IOException {
-    Project project = projectService.getProjectByCode(shortName);
-    if (project == null) {
-      throw new NotFoundException("No project found for short name " + shortName);
-    }
     return new ModelAndView("redirect:/project/code/%s".formatted(shortName), model);
   }
 

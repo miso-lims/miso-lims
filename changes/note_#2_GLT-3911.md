@@ -1,1 +1,1 @@
-Links for external projects that use their short names changed from (`http://example.com/project/{shortName}`) to using their code (`http://example.com/project/{code}`)
+If your `miso.properties` file specifies `miso.project.report.links`, any and all `{shortName}` placeholders must be changed to `{code}`
