@@ -75,6 +75,8 @@ public interface PaginationFilterSink<T> {
 
   public void restrictPaginationByPending(T item, Consumer<String> errorHandler);
 
+  public void restrictPaginationByPipeline(T item, String query, Consumer<String> errorHandler);
+
   public void restrictPaginationByPlatformType(T item, PlatformType platformType, Consumer<String> errorHandler);
 
   public void restrictPaginationByPoolId(T item, long poolId, Consumer<String> errorHandler);
@@ -90,6 +92,8 @@ public interface PaginationFilterSink<T> {
   public void restrictPaginationBySequencingParametersName(T item, String query, Consumer<String> errorHandler);
 
   public void restrictPaginationBySequencingParametersId(T item, long id, Consumer<String> errorHandler);
+
+  public void restrictPaginationByStatus(T item, String query, Consumer<String> errorHandler);
 
   public void restrictPaginationByStage(T item, String query, Consumer<String> errorHandler);
 

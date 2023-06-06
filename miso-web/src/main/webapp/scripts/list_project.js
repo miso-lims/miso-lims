@@ -4,9 +4,8 @@ ListTarget.project = {
     return Urls.external.userManual("projects");
   },
   createUrl: function (config, projectId) {
-    throw new Error("Static display only");
+    return Urls.rest.projects.datatable;
   },
-  getQueryUrl: null,
   createBulkActions: function (config, projectId) {
     if (config.forLibraryTemplate) {
       return [
@@ -137,6 +136,18 @@ ListTarget.project = {
         include: true,
         iSortPriority: 0,
       },
+    ];
+  },
+  searchTermSelector: function (searchTerms) {
+    return [
+      searchTerms.status,
+      searchTerms.pipeline,
+      searchTerms.id,
+      searchTerms.created,
+      searchTerms.entered,
+      searchTerms.changed,
+      searchTerms.creator,
+      searchTerms.changedby,
     ];
   },
 };

@@ -710,6 +710,7 @@ Urls = (function () {
 
   var projectRestBase = restBase + "/projects";
   rest.projects = {
+    datatable: projectRestBase + "/dt",
     get: idUrlFunction(projectRestBase),
     create: projectRestBase,
     update: idUrlFunction(projectRestBase),

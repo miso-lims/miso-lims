@@ -195,9 +195,12 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   /**
-   * Determine the correct Hibernate property given the user-supplied sort column.
+   * Determine the correct Hibernate property given the user-supplied sort column. Default
+   * implementation always returns the original value unmodified
    */
-  String propertyForSortColumn(String original);
+  public default String propertyForSortColumn(String original) {
+    return original;
+  }
 
   /**
    * The property name for the user
@@ -367,6 +370,11 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
+  default void restrictPaginationByPipeline(Criteria criteria, String query, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s does not have a pipeline.", getFriendlyName()));
+  }
+
+  @Override
   default void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType,
       Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s is not platform-specific.", getFriendlyName()));
@@ -410,6 +418,11 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   @Override
   default void restrictPaginationBySequencingParametersId(Criteria criteria, long id, Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s cannot be filtered by sequencing parameters.", getFriendlyName()));
+  }
+
+  @Override
+  default void restrictPaginationByStatus(Criteria criteria, String query, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s cannot be filtered by status.", getFriendlyName()));
   }
 
   @Override
