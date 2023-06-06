@@ -14,6 +14,28 @@ BEGIN
     END IF;
 END//
 
+DROP FUNCTION IF EXISTS getFreezerName//
+CREATE FUNCTION getFreezerName(iLocationId bigint) RETURNS varchar(255)
+READS SQL DATA
+BEGIN
+  DECLARE vLocationId bigint;
+  DECLARE vLocationUnit varchar(255);
+  DECLARE vAlias varchar(255);
+  SET vLocationId = iLocationId;
+  SELECT locationUnit INTO vLocationUnit FROM StorageLocation WHERE locationId = vLocationId;
+  WHILE vLocationId IS NOT NULL AND vLocationUnit <> 'FREEZER' DO
+    SELECT parentLocationId INTO vLocationId
+    FROM StorageLocation
+    WHERE locationId = vLocationId;
+
+    SELECT locationUnit INTO vLocationUnit
+    FROM StorageLocation
+    WHERE locationId = vLocationId;
+  END WHILE;
+  SELECT alias INTO vAlias FROM StorageLocation WHERE locationId = vLocationId;
+  RETURN vAlias;
+END//
+
 DROP FUNCTION IF EXISTS decimalToString//
 CREATE FUNCTION decimalToString(original DECIMAL(20,10)) RETURNS CHAR(21) DETERMINISTIC
 BEGIN
