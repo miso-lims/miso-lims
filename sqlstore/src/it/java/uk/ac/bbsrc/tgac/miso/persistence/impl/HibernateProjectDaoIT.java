@@ -1,10 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 import org.junit.Test;
 
 import com.eaglegenomics.simlims.core.User;
+import com.google.common.annotations.VisibleForTesting;
 
 import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -67,6 +70,19 @@ public class HibernateProjectDaoIT extends AbstractHibernateSaveDaoTest<Project,
   @Test
   public void testGetUsage() throws Exception {
     testGetUsage(HibernateProjectDao::getUsage, 1L, 21L);
+  }
+
+
+  @Test
+  public void testAssays() throws IOException {
+    String code = "TEST1";
+    Set<Assay> assays = projectDAO.getByCode(code).getAssays();
+    assertNotNull(assays);
+    boolean checker = false;
+    if (assays.size() > 0) {
+      checker = true;
+    }
+    assertTrue(checker);
   }
 
 }

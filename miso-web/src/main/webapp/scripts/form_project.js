@@ -185,6 +185,9 @@ FormTarget.project = (function ($) {
         },
       ];
     },
+    confirmSave: function (object, isDialog, form) {
+      object.assays = Project.getAssays();
+    },
   };
 
   function makeButton(text, callback) {

@@ -22,14 +22,6 @@
 <div id="warnings"></div>
 
 <form:form id="projectForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
-<script type="text/javascript">
-  jQuery(document).ready(function () {
-    var projectDto = ${projectDto};
-    Warning.generateHeaderWarnings('warnings', WarningTarget.project, projectDto);
-    FormUtils.createForm('projectForm', 'save', projectDto, 'project', ${formConfig});
-    Utils.ui.updateHelpLink(FormTarget.project.getUserManualUrl());
-  });
-</script>
 
 <c:if test="${project.id != 0 && (detailedSample || not empty projectReportLinks)}">
   <table class="in">
@@ -92,8 +84,18 @@
       <miso:attachments item="${project}"/>
     </div>
   </div>
-  <br/>
-  
+  <!-- <br/> -->
+</c:if>
+
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#assays_section_arrowclick'), 'assays_section');">
+  Assays
+<div id="assays_section_arrowclick" class="toggleLeftDown"></div>
+</div>
+<div id="assays_section" class="expandable_section">
+  <h1>Assays</h1>
+</div>
+
+<c:if test="${project.id != 0}">
   <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#studies_section_arrowclick'), 'studies_section');">
     Studies
   <div id="studies_section_arrowclick" class="toggleLeft"></div>
@@ -174,6 +176,22 @@
       Collapse all
   </button>
 </c:if>
+
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    var projectDto = ${projectDto};
+    var config = ${formConfig};
+    config["projectId"] = projectDto.id;
+    
+    Warning.generateHeaderWarnings('warnings', WarningTarget.project, projectDto);
+    var form = FormUtils.createForm('projectForm', 'save', projectDto, 'project', config);
+
+    Project.setForm(form);
+    Project.setListConfig(config);
+    Project.setAssays(projectDto.assays);
+    Utils.ui.updateHelpLink(FormTarget.project.getUserManualUrl());
+  });
+</script>
 
 </div>
 </div>

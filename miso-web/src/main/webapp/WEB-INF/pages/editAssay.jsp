@@ -51,6 +51,7 @@
     Assay.setListConfig(config);
     Assay.setMetrics(assay.metrics);
     Assay.setTests(assay.tests);
+    console.log(assay);
     Utils.ui.updateHelpLink(FormTarget.assay.getUserManualUrl());
   });
 </script>

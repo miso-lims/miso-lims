@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -92,8 +93,8 @@ public class ProjectImpl implements Project {
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @OneToMany(targetEntity = FileAttachment.class)
-  @JoinTable(name = "Project_Attachment", joinColumns = {@JoinColumn(name = "projectId")}, inverseJoinColumns = {
-      @JoinColumn(name = "attachmentId")})
+  @JoinTable(name = "Project_Attachment", joinColumns = @JoinColumn(name = "projectId"),
+      inverseJoinColumns = @JoinColumn(name = "attachmentId"))
   private List<FileAttachment> attachments;
 
   @Transient
@@ -103,6 +104,12 @@ public class ProjectImpl implements Project {
   @Column(name = "projectId")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id = UNSAVED_ID;
+
+  @OneToMany
+  @JoinTable(name = "Project_Assay", joinColumns = {@JoinColumn(name = "projectId")},
+      inverseJoinColumns = {@JoinColumn(name = "assayId")})
+  private Set<Assay> assays;
+
 
   @OneToMany(targetEntity = StudyImpl.class, fetch = FetchType.LAZY, mappedBy = "project", cascade = CascadeType.REMOVE)
   private Collection<Study> studies = new HashSet<>();
@@ -200,6 +207,13 @@ public class ProjectImpl implements Project {
     s.setProject(this);
     // add
     this.studies.add(s);
+  }
+
+  public Set<Assay> getAssays() {
+    if (assays == null) {
+      assays = new HashSet<>();
+    }
+    return assays;
   }
 
   @Override

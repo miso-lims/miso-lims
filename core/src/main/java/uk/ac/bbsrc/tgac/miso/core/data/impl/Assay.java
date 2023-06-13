@@ -5,13 +5,21 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.OneToMany;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
-@Entity
+@Entity(name = "Assay")
 public class Assay implements Aliasable, Deletable, Serializable {
 
   private static final long serialVersionUID = 1L;
@@ -30,9 +38,10 @@ public class Assay implements Aliasable, Deletable, Serializable {
   private boolean archived = false;
 
   @OneToMany
-  @JoinTable(name = "Assay_AssayTest", joinColumns = { @JoinColumn(name = "assayId") },
-      inverseJoinColumns = { @JoinColumn(name = "testId") })
+  @JoinTable(name = "Assay_AssayTest", joinColumns = {@JoinColumn(name = "assayId")},
+      inverseJoinColumns = {@JoinColumn(name = "testId")})
   private Set<AssayTest> assayTests;
+
 
   @OneToMany(mappedBy = "assay", cascade = CascadeType.ALL)
   private Set<AssayMetric> assayMetrics;

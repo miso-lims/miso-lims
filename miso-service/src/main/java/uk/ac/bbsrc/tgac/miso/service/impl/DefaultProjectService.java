@@ -192,6 +192,7 @@ public class DefaultProjectService implements ProjectService {
     original.setRebExpiry(project.getRebExpiry());
     original.setSamplesExpected(project.getSamplesExpected());
     original.setContact(project.getContact());
+    ValidationUtils.applySetChanges(original.getAssays(), project.getAssays());
   }
 
   public void setNamingSchemeHolder(NamingSchemeHolder namingSchemeHolder) {

@@ -3,7 +3,9 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Set;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Contact;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Pipeline;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
@@ -87,6 +89,8 @@ public interface Project extends Comparable<Project>, Deletable, Nameable, Seria
 
   public void setDefaultTargetedSequencing(TargetedSequencing defaultTargetedSequencing);
 
+  public Set<Assay> getAssays();
+
   @Override
   public boolean isSaved();
 
@@ -113,5 +117,4 @@ public interface Project extends Comparable<Project>, Deletable, Nameable, Seria
   public Contact getContact();
 
   public void setContact(Contact contact);
-
 }

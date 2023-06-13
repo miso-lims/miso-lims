@@ -1,7 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -30,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.dto.AssayDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.RequisitionDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
@@ -107,6 +111,30 @@ public class RequisitionController {
     model.put("title", "Requisition " + requisition.getId());
 
     List<Sample> samples = sampleService.list(0, 0, false, "id", PaginationFilter.requisitionId(requisition.getId()));
+
+    // algorithm to go through all requisitioned samples' projects' assays, and return all the assayIds
+    // of the mutual assays
+    Map<Long, Integer> assayMap = new HashMap<Long, Integer>();
+    for (int i = 0; i < samples.size(); i++) {
+      List<AssayDto> assayLst = Dtos.asDto(samples.get(i).getProject(), true).getAssays();
+      for (int j = 0; j < assayLst.size(); j++) {
+        Long curAssayId = assayLst.get(j).getId();
+        if (assayMap.containsKey(curAssayId)) {
+          int freq = assayMap.get(curAssayId);
+          assayMap.put(curAssayId, freq + 1);
+        } else {
+          assayMap.put(curAssayId, 1);
+        }
+      }
+    }
+    List<Long> assayIds = new ArrayList<>();
+    for (Map.Entry<Long, Integer> entry : assayMap.entrySet()) {
+      if (entry.getValue() == samples.size()) {
+        assayIds.add(entry.getKey());
+      }
+    }
+    model.put("potentialAssays", mapper.writeValueAsString(assayIds));
+
     List<Sample> supplementalSamples =
         sampleService.list(0, 0, false, "id", PaginationFilter.supplementalToRequisitionId(requisition.getId()));
     Set<Long> sampleIds = Stream.concat(samples.stream(), supplementalSamples.stream())
@@ -135,6 +163,12 @@ public class RequisitionController {
     model.put(PageMode.PROPERTY, pageMode.getLabel());
     model.put("requisition", requisition);
     model.put("requisitionDto", mapper.writeValueAsString(RequisitionDto.from(requisition)));
+
+    // if creating a requisition, return empty variable used in editRequisition.jsp to prevent errors
+    if (!model.containsKey("potentialAssays")) {
+      List<Long> emptyAssayIds = new ArrayList<>();
+      model.put("potentialAssays", mapper.writeValueAsString(emptyAssayIds));
+    }
     return new ModelAndView("/WEB-INF/pages/editRequisition.jsp", model);
   }
 

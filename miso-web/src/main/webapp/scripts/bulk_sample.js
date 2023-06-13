@@ -499,6 +499,63 @@ BulkTarget.sample = (function ($) {
       ) {
         columns.push(
           {
+            title: "Project",
+            type: "dropdown",
+            data: "projectId",
+            required: true,
+            disabled: !!config.project,
+            source: function (sample, api) {
+              return config.projects.filter(function (project) {
+                return (
+                  project.status === "Active" ||
+                  project.id === sample.projectId ||
+                  (config.project && project.id === config.project.id)
+                );
+              });
+            },
+            sortSource: Utils.sorting.standardSort(Constants.isDetailedSample ? "code" : "id"),
+            getItemLabel: Constants.isDetailedSample
+              ? function (item) {
+                  return item.code;
+                }
+              : Utils.array.getName,
+            getItemValue: Utils.array.getId,
+            initial: config.project
+              ? config.project[Constants.isDetailedSample ? "code" : "name"]
+              : null,
+            onChange: function (rowIndex, newValue, api) {
+              var project = config.projects.find(function (item) {
+                if (Constants.isDetailedSample) {
+                  return item.code === newValue;
+                } else {
+                  return item.name === newValue;
+                }
+              });
+
+              if (Constants.isDetailedSample) {
+                var subprojects = project
+                  ? Constants.subprojects.filter(function (subproject) {
+                      return subproject.parentProjectId === project.id;
+                    })
+                  : [];
+                var changes = {
+                  source: subprojects,
+                  disabled: !subprojects.length,
+                };
+                if (!subprojects.length) {
+                  changes.value = null;
+                }
+                api.updateField(rowIndex, "subprojectId", changes);
+              }
+
+              if (project && project.defaultSciName && config.pageMode !== "edit") {
+                api.updateField(rowIndex, "scientificNameId", {
+                  value: project.defaultSciName,
+                });
+              }
+            },
+          },
+          {
             title: "Requisition Alias",
             data: "requisitionAlias",
             type: "text",
@@ -571,6 +628,7 @@ BulkTarget.sample = (function ($) {
             disabled: true,
             onChange: function (rowIndex, newValue, api) {
               var requisition = api.getValueObject(rowIndex, "requisitionId");
+              var projectSelected = api.getValueObject(rowIndex, "projectId");
               if (!requisition) {
                 api.updateField(rowIndex, "requisitionAssayId", {
                   source: [],
@@ -593,13 +651,17 @@ BulkTarget.sample = (function ($) {
                       })(),
                   disabled: true,
                 });
-              } else {
+              } else if (projectSelected.assays) {
                 api.updateField(rowIndex, "requisitionAssayId", {
-                  source: Constants.assays.filter(function (x) {
-                    return !x.archived;
-                  }),
+                  source: projectSelected.assays,
                   value: null,
                   disabled: false,
+                });
+              } else {
+                api.updateField(rowIndex, "requisitionAssayId", {
+                  source: [],
+                  value: null,
+                  disabled: true,
                 });
               }
             },
@@ -613,63 +675,6 @@ BulkTarget.sample = (function ($) {
       }
 
       columns.push(
-        {
-          title: "Project",
-          type: "dropdown",
-          data: "projectId",
-          required: true,
-          disabled: !!config.project,
-          source: function (sample, api) {
-            return config.projects.filter(function (project) {
-              return (
-                project.status === "Active" ||
-                project.id === sample.projectId ||
-                (config.project && project.id === config.project.id)
-              );
-            });
-          },
-          sortSource: Utils.sorting.standardSort(Constants.isDetailedSample ? "code" : "id"),
-          getItemLabel: Constants.isDetailedSample
-            ? function (item) {
-                return item.code;
-              }
-            : Utils.array.getName,
-          getItemValue: Utils.array.getId,
-          initial: config.project
-            ? config.project[Constants.isDetailedSample ? "code" : "name"]
-            : null,
-          onChange: function (rowIndex, newValue, api) {
-            var project = config.projects.find(function (item) {
-              if (Constants.isDetailedSample) {
-                return item.code === newValue;
-              } else {
-                return item.name === newValue;
-              }
-            });
-
-            if (Constants.isDetailedSample) {
-              var subprojects = project
-                ? Constants.subprojects.filter(function (subproject) {
-                    return subproject.parentProjectId === project.id;
-                  })
-                : [];
-              var changes = {
-                source: subprojects,
-                disabled: !subprojects.length,
-              };
-              if (!subprojects.length) {
-                changes.value = null;
-              }
-              api.updateField(rowIndex, "subprojectId", changes);
-            }
-
-            if (project && project.defaultSciName && config.pageMode !== "edit") {
-              api.updateField(rowIndex, "scientificNameId", {
-                value: project.defaultSciName,
-              });
-            }
-          },
-        },
         {
           title: "Subproject",
           type: "dropdown",

@@ -1,0 +1,1 @@
+Available assays to choose from in edit requisitions page (only options are currently selected one and mutual assays between all requisitioned samples' projects' assays)
