@@ -102,7 +102,7 @@ ListUtils = (function ($) {
     },
     subproject: {
       term: "subproject:TEXT",
-      help: "Checks if an item is tagged with the given subproject",
+      help: "Checks whether the item involves the specified subproject",
     },
     parameters: {
       term: "parameters:TEXT",

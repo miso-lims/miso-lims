@@ -6,10 +6,13 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Immutable;
+
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentSubproject;
 
 @Entity
 @Table(name = "Sample")
@@ -26,6 +29,10 @@ public class ListTransferViewSampleParent implements Serializable {
   @JoinColumn(name = "project_projectId")
   private ListTransferViewProject project;
 
+  @ManyToOne
+  @JoinColumn(name = "subprojectId")
+  private ParentSubproject subproject;
+
   public long getId() {
     return id;
   }
@@ -40,6 +47,14 @@ public class ListTransferViewSampleParent implements Serializable {
 
   public void setProject(ListTransferViewProject project) {
     this.project = project;
+  }
+
+  public ParentSubproject getSubproject() {
+    return subproject;
+  }
+
+  public void setSubproject(ParentSubproject subproject) {
+    this.subproject = subproject;
   }
 
 }
