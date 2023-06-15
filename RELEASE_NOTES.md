@@ -7,6 +7,31 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [2.1.0] - 2023-06-15
+
+### Added
+
+* Advanced search on the Projects list, including search by status and pipeline
+  
+* Search by subproject on the Transfers list
+
+### Changed
+
+* Names of two project fields:
+  * short name -> code
+  * alias -> title
+
+### Fixed
+
+* When using the miso-lims-webapp Docker image, dates may be shifted by one day when saving
+* Box location (freezer) changes were not logged
+
+### Upgrade Notes
+
+* If your `miso.properties` file specifies `miso.project.report.links`, any and all `{shortName}` placeholders must be changed to `{code}`
+* If your `miso.properties` file contains the property `miso.naming.validator.project.shortName` or `miso.naming.validator.project.shortName.duplicates`, these will need to be changed, by replacing `shortName` with `code`.
+
+
 ## [2.0.0] - 2023-06-01
 
 ### Added

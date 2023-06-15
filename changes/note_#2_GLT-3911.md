@@ -1,1 +1,0 @@
-If your `miso.properties` file specifies `miso.project.report.links`, any and all `{shortName}` placeholders must be changed to `{code}`
