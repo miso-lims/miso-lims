@@ -91,6 +91,7 @@ ListTarget.transfer = (function () {
       return [
         searchTerms["id"],
         searchTerms["project"],
+        searchTerms["subproject"],
         searchTerms["entered"],
         searchTerms["creator"],
         searchTerms["changed"],

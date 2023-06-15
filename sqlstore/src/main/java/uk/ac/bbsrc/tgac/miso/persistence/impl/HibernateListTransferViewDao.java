@@ -144,4 +144,22 @@ public class HibernateListTransferViewDao
             "libraryProject.code", "aliquotProject.name", "aliquotProject.code"));
   }
 
+  @Override
+  public void restrictPaginationBySubproject(Criteria criteria, String subproject, Consumer<String> errorHandler) {
+    criteria.createAlias("samples", "sample", JoinType.LEFT_OUTER_JOIN)
+        .createAlias("sample.sample", "parentSample", JoinType.LEFT_OUTER_JOIN)
+        .createAlias("parentSample.subproject", "sampleSubproject", JoinType.LEFT_OUTER_JOIN)
+        .createAlias("libraries", "library", JoinType.LEFT_OUTER_JOIN)
+        .createAlias("library.library", "parentLibrary", JoinType.LEFT_OUTER_JOIN)
+        .createAlias("parentLibrary.sample", "librarySample", JoinType.LEFT_OUTER_JOIN)
+        .createAlias("librarySample.subproject", "librarySubproject", JoinType.LEFT_OUTER_JOIN)
+        .createAlias("libraryAliquots", "aliquot", JoinType.LEFT_OUTER_JOIN)
+        .createAlias("aliquot.aliquot", "parentAliquot", JoinType.LEFT_OUTER_JOIN)
+        .createAlias("parentAliquot.library", "aliquotLibrary", JoinType.LEFT_OUTER_JOIN)
+        .createAlias("aliquotLibrary.sample", "aliquotSample", JoinType.LEFT_OUTER_JOIN)
+        .createAlias("aliquotSample.subproject", "aliquotSubproject", JoinType.LEFT_OUTER_JOIN)
+        .add(DbUtils.textRestriction(subproject, "sampleSubproject.alias", "librarySubproject.alias",
+            "aliquotSubproject.alias"));
+  }
+
 }
