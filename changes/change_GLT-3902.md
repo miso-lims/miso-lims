@@ -1,1 +1,1 @@
-Available assays to choose from in edit requisitions page (only options are currently selected one and mutual assays between all requisitioned samples' projects' assays)
+Assay options on the Edit Requisition page are now limited to the assays assigned to all of the requisitioned samples' projects

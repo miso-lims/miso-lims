@@ -91,6 +91,8 @@ public interface Project extends Comparable<Project>, Deletable, Nameable, Seria
 
   public Set<Assay> getAssays();
 
+  public void setAssays(Set<Assay> assays);
+
   @Override
   public boolean isSaved();
 

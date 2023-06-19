@@ -2621,11 +2621,10 @@ public class Dtos {
     return from.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
-  // Returns a project DTO that loads associated assays
   public static ProjectDto asDto(@Nonnull Project from, boolean includeAssays) {
     ProjectDto dto = asDto(from);
     if (includeAssays) {
-      dto.setAssays(from.getAssays().stream().map(AssayDto::from).collect(Collectors.toList()));
+      dto.setAssayIds(from.getAssays().stream().map(Assay::getId).collect(Collectors.toList()));
     }
     return dto;
   }
@@ -2654,8 +2653,15 @@ public class Dtos {
       setString(contact::setEmail, dto.getContactEmail());
       to.setContact(contact);
     }
-    if (dto.getAssays() != null) {
-      dto.getAssays().stream().map(AssayDto::to).forEach(x -> to.getAssays().add(x));
+    if (dto.getAssayIds() != null) {
+      List<Assay> assays = new ArrayList<>();
+      for (int i = 0; i < dto.getAssayIds().size(); i++) {
+        Long holder = dto.getAssayIds().get(i);
+        Assay temp = new Assay();
+        temp.setId(holder);
+        assays.add(temp);
+      }
+      assays.stream().forEach(x -> to.getAssays().add(x));
     }
     return to;
   }

@@ -12,7 +12,14 @@ ListTarget.assay = (function ($) {
     getQueryUrl: null,
     showNewOptionSop: true,
     createBulkActions: function (config, projectId) {
-      if (config.admin) {
+      if (config.createProject) {
+        return [
+          {
+            name: "Remove",
+            action: Project.removeAssays,
+          },
+        ];
+      } else if (config.isAdmin) {
         return [
           {
             name: "Copy",
@@ -29,27 +36,23 @@ ListTarget.assay = (function ($) {
           }),
         ];
       }
-      if (config.projectId >= 0) {
-        return BulkUtils.actions.removeAssaysFromProject();
-      }
       return [];
     },
     createStaticActions: function (config, projectId) {
-      if (config.isAdmin) {
+      if (config.createProject) {
+        return [
+          {
+            name: "Add",
+            handler: showAddAssayDialog,
+          },
+        ];
+      } else if (config.isAdmin) {
         return [
           {
             name: "Add",
             handler: function () {
               Utils.page.pageRedirect(Urls.ui.assays.create);
             },
-          },
-        ];
-      }
-      if (config.projectId >= 0) {
-        return [
-          {
-            name: "Add",
-            handler: showAddAssayDialog,
           },
         ];
       }
@@ -79,9 +82,12 @@ ListTarget.assay = (function ($) {
   };
 
   function showAddAssayDialog() {
+    var nonArchivedAssays = Constants.assays.filter(function (x) {
+      return !x.archived;
+    });
     Utils.showWizardDialog(
       "Add Assay",
-      Constants.assays.map(function (assay) {
+      nonArchivedAssays.map(function (assay) {
         return {
           name: assay.alias,
           handler: function () {

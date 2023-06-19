@@ -824,16 +824,6 @@ BulkUtils = (function ($) {
     },
 
     actions: {
-      // this is for removing assay's from a project
-      removeAssaysFromProject: function () {
-        return [
-          {
-            name: "Remove",
-            action: Project.removeAssays,
-          },
-        ];
-      },
-
       boxable: function (allowMatchParentPos, parentLocationsByRow) {
         var actions = [
           {

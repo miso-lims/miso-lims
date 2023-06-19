@@ -53,7 +53,7 @@ public class EditProjectController {
   @GetMapping("/new")
   public ModelAndView setupForm(ModelMap model) throws IOException {
     model.put("title", "New Project");
-    return setupForm(new ProjectImpl(), model, true);
+    return setupForm(new ProjectImpl(), model);
   }
 
   @GetMapping("/shortname/{shortName}")
@@ -68,7 +68,7 @@ public class EditProjectController {
     if (project == null) {
       throw new NotFoundException("No project found for code " + code);
     }
-    return setupForm(project, model, true);
+    return setupForm(project, model);
   }
 
   @GetMapping("/{projectId}")
@@ -77,10 +77,10 @@ public class EditProjectController {
     if (project == null) {
       throw new NotFoundException("No project found for ID " + projectId.toString());
     }
-    return setupForm(project, model, true);
+    return setupForm(project, model);
   }
 
-  private ModelAndView setupForm(Project project, ModelMap model, boolean includeAssays) throws IOException {
+  private ModelAndView setupForm(Project project, ModelMap model) throws IOException {
     if (project.isSaved()) {
       Collection<Subproject> subprojects = subprojectService.listByProjectId(project.getId());
       model.put("subprojects", Dtos.asSubprojectDtos(subprojects));
@@ -90,11 +90,7 @@ public class EditProjectController {
     }
 
     model.put("project", project);
-    if (includeAssays == true) {
-      model.put("projectDto", mapper.writeValueAsString(Dtos.asDto(project, true)));
-    } else {
-      model.put("projectDto", mapper.writeValueAsString(Dtos.asDto(project)));
-    }
+    model.put("projectDto", mapper.writeValueAsString(Dtos.asDto(project, true)));
 
     ObjectNode formConfig = mapper.createObjectNode();
     MisoWebUtils.addJsonArray(mapper, formConfig, "statusOptions", Arrays.asList(StatusType.values()),

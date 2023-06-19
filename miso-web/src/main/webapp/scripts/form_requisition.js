@@ -27,17 +27,14 @@ FormTarget.requisition = (function () {
       /* adding the currently assigned assay to the requisition to the options of assays to choose from, because it
            may not be part of the set of mutual assays between all the requisitioned samples' assays. */
       var assayDropdown = [];
-      for (var i = 0; i < config.assayIdDropdownOptions.length; i++) {
-        var holder = Constants.assays.filter(function (x) {
-          return x.id === config.assayIdDropdownOptions[i];
-        });
-        assayDropdown.push(holder[0]);
+      if (config.potentialAssayIds !== undefined) {
+        for (var i = 0; i < config.potentialAssayIds.length; i++) {
+          var holder = Constants.assays.find(function (x) {
+            return x.id === config.potentialAssayIds[i];
+          });
+          assayDropdown.push(holder);
+        }
       }
-      var curAssay = Constants.assays.filter(function (x) {
-        return x.id === object.assayId;
-      });
-      assayDropdown.push(curAssay[0]);
-      console.log(assayDropdown);
 
       return [
         {
@@ -57,7 +54,12 @@ FormTarget.requisition = (function () {
               title: "Assay",
               type: "dropdown",
               data: "assayId",
-              source: config.pageMode === "create" ? Constants.assays : assayDropdown,
+              source:
+                config.numberOfRequisitionedSamples > 0
+                  ? assayDropdown
+                  : Constants.assays.filter(function (x) {
+                      return !x.archived || x.id === object.assayId;
+                    }),
               getItemLabel: function (x) {
                 return x.alias + " v" + x.version;
               },

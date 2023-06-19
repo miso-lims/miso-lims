@@ -197,7 +197,7 @@ public class EditSampleController {
     ObjectNode formConfig = mapper.createObjectNode();
     formConfig.put("detailedSample", isDetailedSampleEnabled());
     MisoWebUtils.addJsonArray(mapper, formConfig, "projects", projectService.list(),
-        project -> Dtos.asDto(project, true));
+        Dtos::asDto);
     MisoWebUtils.addJsonArray(mapper, formConfig, Config.SOPS, sopService.listByCategory(SopCategory.SAMPLE),
         Dtos::asDto);
     model.put("formConfig", mapper.writeValueAsString(formConfig));
@@ -404,7 +404,7 @@ public class EditSampleController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
       config.put(Config.TARGET_CATEGORY, targetCategory);
-      addJsonArray(mapper, config, Config.PROJECTS, projectService.list(), project -> Dtos.asDto(project, true));
+      addJsonArray(mapper, config, Config.PROJECTS, projectService.list(), Dtos::asDto);
       addJsonArray(mapper, config, Config.SOPS, sopService.listByCategory(SopCategory.SAMPLE), Dtos::asDto);
     }
   }
@@ -494,7 +494,7 @@ public class EditSampleController {
       config.put(Config.TARGET_CATEGORY, targetCategory);
       config.putPOJO(Config.BOX, newBox);
       addJsonArray(mapper, config, Config.RECIPIENT_GROUPS, recipientGroups, Dtos::asDto);
-      addJsonArray(mapper, config, Config.PROJECTS, projectService.list(), project -> Dtos.asDto(project, true));
+      addJsonArray(mapper, config, Config.PROJECTS, projectService.list(), Dtos::asDto);
       addJsonArray(mapper, config, Config.SOPS, sopService.listByCategory(SopCategory.SAMPLE), Dtos::asDto);
     }
   }

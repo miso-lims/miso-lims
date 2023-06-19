@@ -209,11 +209,17 @@ public class ProjectImpl implements Project {
     this.studies.add(s);
   }
 
+  @Override
   public Set<Assay> getAssays() {
     if (assays == null) {
       assays = new HashSet<>();
     }
     return assays;
+  }
+
+  @Override
+  public void setAssays(Set<Assay> assays) {
+    this.assays = assays;
   }
 
   @Override

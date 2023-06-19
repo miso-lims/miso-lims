@@ -41,6 +41,29 @@ FormTarget.sample = (function ($) {
               },
             },
             {
+              title: "Project",
+              data: "projectId",
+              type: "dropdown",
+              required: true,
+              source: config.projects.filter(function (project) {
+                return project.status === "Active" || project.id === object.projectId;
+              }),
+              getItemLabel: function (item) {
+                return Constants.isDetailedSample ? item.code : item.name;
+              },
+              getItemValue: Utils.array.getId,
+              sortSource: Utils.sorting.standardSort(Constants.isDetailedSample ? "code" : "id"),
+              onChange: function (newValue, form) {
+                if (Constants.isDetailedSample) {
+                  form.updateField("subprojectId", {
+                    source: Constants.subprojects.filter(function (subproject) {
+                      return subproject.parentProjectId === parseInt(newValue);
+                    }),
+                  });
+                }
+              },
+            },
+            {
               title: "Name",
               data: "name",
               type: "read-only",
@@ -70,29 +93,6 @@ FormTarget.sample = (function ($) {
               data: "identificationBarcode",
               type: "text",
               maxLength: 255,
-            },
-            {
-              title: "Project",
-              data: "projectId",
-              type: "dropdown",
-              required: true,
-              source: config.projects.filter(function (project) {
-                return project.status === "Active" || project.id === object.projectId;
-              }),
-              getItemLabel: function (item) {
-                return Constants.isDetailedSample ? item.code : item.name;
-              },
-              getItemValue: Utils.array.getId,
-              sortSource: Utils.sorting.standardSort(Constants.isDetailedSample ? "code" : "id"),
-              onChange: function (newValue, form) {
-                if (Constants.isDetailedSample) {
-                  form.updateField("subprojectId", {
-                    source: Constants.subprojects.filter(function (subproject) {
-                      return subproject.parentProjectId === parseInt(newValue);
-                    }),
-                  });
-                }
-              },
             },
             {
               title: "Requisition",

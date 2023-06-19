@@ -1,6 +1,3 @@
-if (typeof FormTarget === "undefined") {
-  FormTarget = {};
-}
 var Project = (function () {
   var assaysListId = "assays_section";
 

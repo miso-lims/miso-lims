@@ -186,7 +186,9 @@ FormTarget.project = (function ($) {
       ];
     },
     confirmSave: function (object, isDialog, form) {
-      object.assays = Project.getAssays();
+      object.assayIds = Project.getAssays().map(function (x) {
+        return x.id;
+      });
     },
   };
 

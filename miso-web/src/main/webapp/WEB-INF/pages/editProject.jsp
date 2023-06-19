@@ -91,6 +91,7 @@
   Assays
 <div id="assays_section_arrowclick" class="toggleLeftDown"></div>
 </div>
+<div id="projectForm_assaysError"></div>
 <div id="assays_section" class="expandable_section">
   <h1>Assays</h1>
 </div>
@@ -181,14 +182,22 @@
   jQuery(document).ready(function () {
     var projectDto = ${projectDto};
     var config = ${formConfig};
-    config["projectId"] = projectDto.id;
-    
+    config["createProject"] = true;
+
+    var assays = [];
+    for (var i = 0; i < projectDto.assayIds.length; i++) {
+      var holder = Constants.assays.find(function (x) {
+        return x.id === projectDto.assayIds[i];
+      });
+      assays.push(holder);
+    }
+
     Warning.generateHeaderWarnings('warnings', WarningTarget.project, projectDto);
     var form = FormUtils.createForm('projectForm', 'save', projectDto, 'project', config);
 
     Project.setForm(form);
     Project.setListConfig(config);
-    Project.setAssays(projectDto.assays);
+    Project.setAssays(assays);
     Utils.ui.updateHelpLink(FormTarget.project.getUserManualUrl());
   });
 </script>

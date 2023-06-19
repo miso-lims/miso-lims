@@ -19,7 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
-@Entity(name = "Assay")
+@Entity
 public class Assay implements Aliasable, Deletable, Serializable {
 
   private static final long serialVersionUID = 1L;

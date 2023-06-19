@@ -15,7 +15,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyBiFunction;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSaveDao;
 
-public abstract class AbstractHibernateSaveDaoTest<T extends Identifiable, D extends HibernateSaveDao<T>> extends AbstractDAOTest {
+public abstract class AbstractHibernateSaveDaoTest<T extends Identifiable, D extends HibernateSaveDao<T>>
+    extends AbstractDAOTest {
 
   public static class UpdateParameters<T, R> {
 
@@ -123,7 +124,8 @@ public abstract class AbstractHibernateSaveDaoTest<T extends Identifiable, D ext
     assertEquals(value, getter.apply(item));
   }
 
-  protected void testGetUsage(WhineyBiFunction<D, T, Long> testMethod, long itemId, Long expectedUsage) throws Exception {
+  protected void testGetUsage(WhineyBiFunction<D, T, Long> testMethod, long itemId, Long expectedUsage)
+      throws Exception {
     T item = getItem(itemId);
     assertEquals(expectedUsage, testMethod.apply(sut, item));
   }
@@ -133,7 +135,8 @@ public abstract class AbstractHibernateSaveDaoTest<T extends Identifiable, D ext
     return (T) currentSession().get(implClass, id);
   }
 
-  protected void testListByIdList(WhineyBiFunction<D, Collection<Long>, List<T>> testMethod, Collection<Long> ids) throws Exception {
+  protected void testListByIdList(WhineyBiFunction<D, Collection<Long>, List<T>> testMethod, Collection<Long> ids)
+      throws Exception {
     List<T> items = testMethod.apply(getTestSubject(), ids);
     assertNotNull(items);
     assertEquals(ids.size(), items.size());
@@ -141,5 +144,4 @@ public abstract class AbstractHibernateSaveDaoTest<T extends Identifiable, D ext
       assertTrue(items.stream().anyMatch(item -> item.getId() == id.longValue()));
     }
   }
-
 }

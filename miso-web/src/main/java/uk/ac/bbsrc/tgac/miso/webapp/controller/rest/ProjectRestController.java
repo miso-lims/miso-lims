@@ -67,7 +67,7 @@ public class ProjectRestController extends RestController {
 
   @GetMapping(value = "/{projectId}", produces = "application/json")
   public @ResponseBody ProjectDto getProjectById(@PathVariable long projectId) throws IOException {
-    return RestUtils.getObject("Project", projectId, projectService, project -> Dtos.asDto(project, true));
+    return RestUtils.getObject("Project", projectId, projectService, Dtos::asDto);
   }
 
   @GetMapping(value = "/search")
