@@ -416,7 +416,20 @@ BulkTarget.libraryaliquot = (function ($) {
       );
       return columns;
     },
-    prepareData: function (data) {
+    getDefaultSortFunction: function (config) {
+      if (config.pageMode === "propagate") {
+        return function (a, b) {
+          // on this page, either all rows will have parent aliquots, or no rows will
+          if (a.parentAliquotId && b.parentAliquotId) {
+            return Utils.sorting.standardSort("parentAliquotId")(a, b);
+          } else {
+            return Utils.sorting.standardSort("libraryId")(a, b);
+          }
+        };
+      }
+      return null;
+    },
+    prepareData: function (data, config) {
       parentLocationsByRow = {};
       data.forEach(function (aliquot, index) {
         originalDataByRow[index] = {

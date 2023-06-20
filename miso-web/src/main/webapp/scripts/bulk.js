@@ -14,6 +14,8 @@ BulkUtils = (function ($) {
    *   getFixedColumns: optional function(config) returning int. Number of columns to freeze.
    *       Default: 0
    *   getColumns: required function(config, limitedApi) returning array of columns (see below)
+   *   getDefaultSortFunction: optional function(config) returning sort function to be used
+   *       on initial load and after saving, or null to default back to sorting by ID
    *   prepareData: optional function(data, config); allows manipulating source data prior to table
    *       creation. Note that this may be called multiple times, including when the table is first
    *       built, and whenever it is rebuilt (for sorting, showing data after save, etc.).
@@ -172,6 +174,7 @@ BulkUtils = (function ($) {
     makeTable: function (target, config, data) {
       // No HTML IDs params required as this is only made to work with bulkPage.jsp
       Utils.showWorkingDialog("Bulk Table", function () {
+        applyDefaultSort(target, config, data);
         makeTable(target, config, data);
         showLoading(false, true);
       });
@@ -1534,6 +1537,15 @@ BulkUtils = (function ($) {
     };
   }
 
+  function applyDefaultSort(target, config, data) {
+    var byId = Utils.sorting.standardSort("id");
+    if (target.getDefaultSortFunction) {
+      data.sort(target.getDefaultSortFunction(config) || byId);
+    } else {
+      data.sort(byId);
+    }
+  }
+
   function makeTable(target, config, data) {
     var hotContainer = document.getElementById(CONTAINER_ID);
 
@@ -2841,6 +2853,7 @@ BulkUtils = (function ($) {
               var savedData = target.manipulateSavedData
                 ? target.manipulateSavedData(update.data)
                 : update.data;
+              applyDefaultSort(target, config, savedData);
               rebuildTable(hot, target, config, savedData);
               showSuccess("Saved " + update.totalUnits + " items");
               showLoading(false, false);

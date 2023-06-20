@@ -309,6 +309,12 @@ BulkTarget.sample = (function ($) {
 
       return actions;
     },
+    getDefaultSortFunction: function (config) {
+      if (config.pageMode === "propagate") {
+        return Utils.sorting.standardSort("parentId");
+      }
+      return null;
+    },
     prepareData: function (data, config) {
       parentLocationsByRow = {};
       data.forEach(function (sample, index) {

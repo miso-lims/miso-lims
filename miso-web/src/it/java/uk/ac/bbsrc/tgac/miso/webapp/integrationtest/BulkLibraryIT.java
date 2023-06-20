@@ -653,8 +653,11 @@ public class BulkLibraryIT extends AbstractIT {
     initial.put(1, Libs.A07);
     initial.put(2, Libs.B05);
 
-    initial.forEach((k, v) -> assertTrue("initial value " + v + " in row " + k,
-        table.getText(LibColumns.SAMPLE_LOCATION, k).endsWith(v)));
+    initial.forEach((k, v) -> {
+      String text = table.getText(LibColumns.SAMPLE_LOCATION, k);
+      assertTrue("initial value expected %s in row %d, but was '%s'".formatted(v, k, text),
+          text.endsWith(v));
+    });
 
     Map<Integer, String> sortCols = new HashMap<>();
     sortCols.put(0, Libs.B05);
@@ -663,9 +666,11 @@ public class BulkLibraryIT extends AbstractIT {
 
     page.sortTable(BulkLibraryPage.SORT_SAMPLE_LOCATION_COLS);
     HandsOnTable sort1Table = page.getTable();
-    sortCols.forEach(
-        (k, v) -> assertTrue("sortCols value " + v + " in row " + k,
-            sort1Table.getText(LibColumns.SAMPLE_LOCATION, k).endsWith(v)));
+    sortCols.forEach((k, v) -> {
+      String text = sort1Table.getText(LibColumns.SAMPLE_LOCATION, k);
+      assertTrue("sortCols value expected %s in row %d, but was '%s'".formatted(v, k, text),
+          text.endsWith(v));
+    });
 
     Map<Integer, String> sortRows = new HashMap<>();
     sortRows.put(0, Libs.A07);
@@ -674,7 +679,11 @@ public class BulkLibraryIT extends AbstractIT {
 
     page.sortTable(BulkLibraryPage.SORT_SAMPLE_LOCATION_ROWS);
     HandsOnTable sort2Table = page.getTable();
-    sortRows.forEach((k, v) -> assertTrue(sort2Table.getText(LibColumns.SAMPLE_LOCATION, k).endsWith(v)));
+    sortRows.forEach((k, v) -> {
+      String text = sort2Table.getText(LibColumns.SAMPLE_LOCATION, k);
+      assertTrue("sortRows value expected %s in row %d, but was '%s'".formatted(v, k, text),
+          text.endsWith(v));
+    });
   }
 
   @Test
@@ -772,12 +781,12 @@ public class BulkLibraryIT extends AbstractIT {
             Arrays.asList(1, 2, 3));
     HandsOnTable table = page.getTable();
     assertEquals(6, table.getRowCount());
-    assertEquals("1IPO_0001_Ly_P_1-1_D1", table.getText(LibColumns.SAMPLE_ALIAS, 0));
-    assertEquals("1IPO_0001_Ly_P_1-1_D1", table.getText(LibColumns.SAMPLE_ALIAS, 1));
-    assertEquals("1IPO_0001_Ly_P_1-1_D1", table.getText(LibColumns.SAMPLE_ALIAS, 2));
-    assertEquals("1LIB_0001_Ly_P_1-1_D1", table.getText(LibColumns.SAMPLE_ALIAS, 3));
-    assertEquals("1LIB_0001_Ly_P_1-1_D1", table.getText(LibColumns.SAMPLE_ALIAS, 4));
-    assertEquals("LIBT_0001_Ly_P_1-1_D1", table.getText(LibColumns.SAMPLE_ALIAS, 5));
+    assertEquals("LIBT_0001_Ly_P_1-1_D1", table.getText(LibColumns.SAMPLE_ALIAS, 0));
+    assertEquals("1LIB_0001_Ly_P_1-1_D1", table.getText(LibColumns.SAMPLE_ALIAS, 1));
+    assertEquals("1LIB_0001_Ly_P_1-1_D1", table.getText(LibColumns.SAMPLE_ALIAS, 2));
+    assertEquals("1IPO_0001_Ly_P_1-1_D1", table.getText(LibColumns.SAMPLE_ALIAS, 3));
+    assertEquals("1IPO_0001_Ly_P_1-1_D1", table.getText(LibColumns.SAMPLE_ALIAS, 4));
+    assertEquals("1IPO_0001_Ly_P_1-1_D1", table.getText(LibColumns.SAMPLE_ALIAS, 5));
   }
 
   private void fillRow(HandsOnTable table, int rowNum, Map<String, String> attributes) {
