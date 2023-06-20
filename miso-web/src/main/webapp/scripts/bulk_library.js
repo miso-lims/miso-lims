@@ -203,6 +203,15 @@ BulkTarget.library = (function ($) {
         }
         allowUniqueDualIndexSelectionByRow[index] = false;
       });
+
+      // Sorting
+      if (config.sort === "sampleBoxColumn") {
+        data.sort(function (a, b) {
+          return Utils.sorting.sortBoxPositions(a.sampleBoxPosition, b.sampleBoxPosition, false);
+        });
+      } else if (config.pageMode === "propagate") {
+        data.sort(Utils.sorting.standardSort("parentSampleId"));
+      }
     },
     getFixedColumns: function (config) {
       switch (config.pageMode) {

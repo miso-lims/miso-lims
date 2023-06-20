@@ -1537,6 +1537,9 @@ BulkUtils = (function ($) {
   function makeTable(target, config, data) {
     var hotContainer = document.getElementById(CONTAINER_ID);
 
+    // Default sort by ID. Targets may do their own sorting in prepareData if desired
+    data.sort(Utils.sorting.standardSort("id"));
+
     if (target.prepareData) {
       target.prepareData(data, config);
     }

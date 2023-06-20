@@ -362,6 +362,11 @@ BulkTarget.sample = (function ($) {
       if (config.targetCategory === "Stock") {
         metricCategories.push("EXTRACTION");
       }
+
+      // Sorting
+      if (config.pageMode === "propagate") {
+        data.sort(Utils.sorting.standardSort("parentId"));
+      }
     },
     getFixedColumns: function (config) {
       switch (config.pageMode) {

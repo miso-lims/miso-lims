@@ -416,7 +416,7 @@ BulkTarget.libraryaliquot = (function ($) {
       );
       return columns;
     },
-    prepareData: function (data) {
+    prepareData: function (data, config) {
       parentLocationsByRow = {};
       data.forEach(function (aliquot, index) {
         originalDataByRow[index] = {
@@ -439,6 +439,19 @@ BulkTarget.libraryaliquot = (function ($) {
           parentLocationsByRow[index] = aliquot.parentBoxPosition;
         }
       });
+
+      // sorting
+      if (config.pageMode === "propagate") {
+        if (data[0].parentAliquotId) {
+          data.sort(function (a, b) {
+            return Utils.sorting.standardSort("parentAliquotId");
+          });
+        } else {
+          data.sort(function (a, b) {
+            return Utils.sorting.standardSort("libraryId");
+          });
+        }
+      }
     },
     confirmSave: function (data) {
       var deferred = jQuery.Deferred();
