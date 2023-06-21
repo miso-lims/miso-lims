@@ -20,7 +20,8 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
 
   private BulkSamplePage getPropagatePage(List<Long> parentIds, Integer quantity, String sampleCategory) {
-    return BulkSamplePage.getForPropagate(getDriver(), getBaseUrl(), parentIds, Arrays.asList(quantity), sampleCategory);
+    return BulkSamplePage.getForPropagate(getDriver(), getBaseUrl(), parentIds, Arrays.asList(quantity),
+        sampleCategory);
   }
 
   @Test
@@ -397,15 +398,16 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
 
   @Test
   public void testPropagateSpecifiedReplicates() {
-    BulkSamplePage page = BulkSamplePage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100003L, 110003L, 120003L),
-        Arrays.asList(1, 2, 3), SampleAliquot.CATEGORY_NAME);
+    BulkSamplePage page =
+        BulkSamplePage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100003L, 110003L, 120003L),
+            Arrays.asList(1, 2, 3), SampleAliquot.CATEGORY_NAME);
     HandsOnTable table = page.getTable();
     assertEquals(6, table.getRowCount());
-    assertEquals("1IPO_0001_Ly_P_1-1_D_S1", table.getText(SamColumns.PARENT_ALIAS, 0));
-    assertEquals("1IPO_0001_Ly_P_1-1_D_S1", table.getText(SamColumns.PARENT_ALIAS, 1));
-    assertEquals("1IPO_0001_Ly_P_1-1_D_S1", table.getText(SamColumns.PARENT_ALIAS, 2));
-    assertEquals("1LIB_0001_Ly_P_1-1_D_S1", table.getText(SamColumns.PARENT_ALIAS, 3));
-    assertEquals("1LIB_0001_Ly_P_1-1_D_S1", table.getText(SamColumns.PARENT_ALIAS, 4));
-    assertEquals("LIBT_0001_Ly_P_1-1_D_S1", table.getText(SamColumns.PARENT_ALIAS, 5));
+    assertEquals("LIBT_0001_Ly_P_1-1_D_S1", table.getText(SamColumns.PARENT_ALIAS, 0));
+    assertEquals("1LIB_0001_Ly_P_1-1_D_S1", table.getText(SamColumns.PARENT_ALIAS, 1));
+    assertEquals("1LIB_0001_Ly_P_1-1_D_S1", table.getText(SamColumns.PARENT_ALIAS, 2));
+    assertEquals("1IPO_0001_Ly_P_1-1_D_S1", table.getText(SamColumns.PARENT_ALIAS, 3));
+    assertEquals("1IPO_0001_Ly_P_1-1_D_S1", table.getText(SamColumns.PARENT_ALIAS, 4));
+    assertEquals("1IPO_0001_Ly_P_1-1_D_S1", table.getText(SamColumns.PARENT_ALIAS, 5));
   }
 }

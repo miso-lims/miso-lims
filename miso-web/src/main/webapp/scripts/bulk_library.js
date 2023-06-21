@@ -187,6 +187,16 @@ BulkTarget.library = (function ($) {
           BulkUtils.actions.transfer("libraryIds"),
         ]);
     },
+    getDefaultSortFunction: function (config) {
+      if (config.sort === "sampleBoxColumn") {
+        return function (a, b) {
+          return Utils.sorting.sortBoxPositions(a.sampleBoxPosition, b.sampleBoxPosition, false);
+        };
+      } else if (config.pageMode === "propagate") {
+        return Utils.sorting.standardSort("parentSampleId");
+      }
+      return null;
+    },
     prepareData: function (data, config) {
       parentLocationsByRow = {};
       allowUniqueDualIndexSelectionByRow = {};
