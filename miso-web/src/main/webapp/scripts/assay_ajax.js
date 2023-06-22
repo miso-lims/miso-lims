@@ -24,8 +24,16 @@ var Assay = (function () {
 
     addMetric: function (addMetric) {
       var metrics = Assay.getMetrics();
-      metrics.push(addMetric);
-      Assay.setMetrics(metrics);
+      if (
+        metrics.find(function (metric) {
+          return metric.id === addMetric.id;
+        })
+      ) {
+        Utils.showOkDialog("Error", ["This metric is already included"]);
+      } else {
+        metrics.push(addMetric);
+        Assay.setMetrics(metrics);
+      }
     },
 
     removeMetrics: function (removeMetrics) {
@@ -47,8 +55,16 @@ var Assay = (function () {
 
     addTest: function (addTest) {
       var tests = Assay.getTests();
-      tests.push(addTest);
-      Assay.setTests(tests);
+      if (
+        tests.find(function (test) {
+          return test.id === addTest.id;
+        })
+      ) {
+        Utils.showOkDialog("Error", ["This test is already included"]);
+      } else {
+        tests.push(addTest);
+        Assay.setTests(tests);
+      }
     },
 
     removeTests: function (removeTests) {
