@@ -21,19 +21,26 @@ public enum LibraryAliquotSpreadSheets implements Spreadsheet<LibraryAliquot> {
       Column.forString("Library Alias", libraryAliquot -> libraryAliquot.getLibrary().getAlias()), //
       Column.forString("Library Barcode", libraryAliquot -> libraryAliquot.getLibrary().getIdentificationBarcode()), //
       Column.forString("Library Type", libraryAliquot -> libraryAliquot.getLibrary().getLibraryType().getDescription()), //
-      Column.forString("Library Design", true, libraryAliquot -> ((DetailedLibraryAliquot)libraryAliquot).getLibraryDesignCode().getCode()), //
+      Column.forString("Library Design", true,
+          libraryAliquot -> ((DetailedLibraryAliquot) libraryAliquot).getLibraryDesignCode().getCode()), //
       Column.forString("Index(es)", LibraryAliquotSpreadSheets::listIndices), //
       Column.forString("i7 Index", libraryAliquot -> getSequence(libraryAliquot.getLibrary().getIndex1())), //
       Column.forString("i5 Index", libraryAliquot -> getSequence(libraryAliquot.getLibrary().getIndex2())), //
       Column.forString("Targeted Sequencing",
-          libraryAliquot -> libraryAliquot.getTargetedSequencing() != null ? libraryAliquot.getTargetedSequencing().getAlias() : ""), //
+          libraryAliquot -> libraryAliquot.getTargetedSequencing() != null
+              ? libraryAliquot.getTargetedSequencing().getAlias()
+              : ""), //
       Column.forString("Sample Name", libraryAliquot -> libraryAliquot.getLibrary().getSample().getName()), //
       Column.forString("Sample Alias", libraryAliquot -> libraryAliquot.getLibrary().getSample().getAlias()), //
-      Column.forString("Sample Barcode", libraryAliquot -> libraryAliquot.getLibrary().getSample().getIdentificationBarcode()), //
+      Column.forString("Sample Barcode",
+          libraryAliquot -> libraryAliquot.getLibrary().getSample().getIdentificationBarcode()), //
       Column.forString("Identity Name", detailedSample(SampleIdentity.class, SampleIdentity::getName, "")), //
       Column.forString("Identity Alias", detailedSample(SampleIdentity.class, SampleIdentity::getAlias, "")), //
-      Column.forString("External Identifier", detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
-      Column.forString("Secondary Identifier", detailedSample(SampleTissue.class, SampleTissue::getSecondaryIdentifier, "")), //
+      Column.forString("External Identifier",
+          detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
+      Column.forString("Secondary Identifier",
+          detailedSample(SampleTissue.class, SampleTissue::getSecondaryIdentifier, "")), //
+      Column.forString("Group ID", groupIdFunction()), //
       Column.forString("Location", BoxUtils::makeLocationLabel)), //
   POOL_PREPARATION("Pool Preparation", //
       Column.forString("Name", LibraryAliquot::getName), //
@@ -49,7 +56,8 @@ public enum LibraryAliquotSpreadSheets implements Spreadsheet<LibraryAliquot> {
       Column.forString("Index 1", libraryAliquot -> getSequence(libraryAliquot.getLibrary().getIndex1())), //
       Column.forString("Index 2", libraryAliquot -> getSequence(libraryAliquot.getLibrary().getIndex2())), //
       Column.forString("Index Family",
-          aliquot -> aliquot.getLibrary().getIndex1() == null ? null : aliquot.getLibrary().getIndex1().getFamily().getName())), //
+          aliquot -> aliquot.getLibrary().getIndex1() == null ? null
+              : aliquot.getLibrary().getIndex1().getFamily().getName())), //
   DILUTION_PREPARATION("Dilution Preparation", //
       Column.forString("Name", LibraryAliquot::getName), //
       Column.forString("Alias", LibraryAliquot::getAlias), //
@@ -61,14 +69,17 @@ public enum LibraryAliquotSpreadSheets implements Spreadsheet<LibraryAliquot> {
       Column.forString("Concentration Units",
           aliquot -> aliquot.getConcentrationUnits() == null ? "" : aliquot.getConcentrationUnits().getRawLabel()), //
       Column.forBigDecimal("Volume", LibraryAliquot::getVolume), //
-      Column.forString("Volume Units", aliquot -> aliquot.getVolumeUnits() == null ? "" : aliquot.getVolumeUnits().getRawLabel()), //
+      Column.forString("Volume Units",
+          aliquot -> aliquot.getVolumeUnits() == null ? "" : aliquot.getVolumeUnits().getRawLabel()), //
       Column.forInteger("Size (bp)", LibraryAliquot::getDnaSize), //
       Column.forString("Index 1", libraryAliquot -> getSequence(libraryAliquot.getLibrary().getIndex1())), //
       Column.forString("Index 2", libraryAliquot -> getSequence(libraryAliquot.getLibrary().getIndex2())), //
       Column.forString("Index Family",
-          aliquot -> aliquot.getLibrary().getIndex1() == null ? null : aliquot.getLibrary().getIndex1().getFamily().getName()));
+          aliquot -> aliquot.getLibrary().getIndex1() == null ? null
+              : aliquot.getLibrary().getIndex1().getFamily().getName()));
 
-  private static <S extends DetailedSample, T> Function<LibraryAliquot, T> detailedSample(Class<S> clazz, Function<S, T> function,
+  private static <S extends DetailedSample, T> Function<LibraryAliquot, T> detailedSample(Class<S> clazz,
+      Function<S, T> function,
       T defaultValue) {
     return aliquot -> {
       Sample sample = aliquot.getLibrary().getSample();
