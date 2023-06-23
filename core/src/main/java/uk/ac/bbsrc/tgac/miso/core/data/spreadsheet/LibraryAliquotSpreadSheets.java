@@ -4,7 +4,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-import uk.ac.bbsrc.tgac.miso.core.data.*;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
@@ -34,20 +39,20 @@ public enum LibraryAliquotSpreadSheets implements Spreadsheet<LibraryAliquot> {
       Column.forString("Sample Alias", libraryAliquot -> libraryAliquot.getLibrary().getSample().getAlias()), //
       Column.forString("Sample Barcode",
           libraryAliquot -> libraryAliquot.getLibrary().getSample().getIdentificationBarcode()), //
-      Column.forString("Identity Name", detailedSample(SampleIdentity.class, SampleIdentity::getName, "")), //
-      Column.forString("Identity Alias", detailedSample(SampleIdentity.class, SampleIdentity::getAlias, "")), //
-      Column.forString("External Identifier",
+      Column.forString("Identity Name", true, detailedSample(SampleIdentity.class, SampleIdentity::getName, "")), //
+      Column.forString("Identity Alias", true, detailedSample(SampleIdentity.class, SampleIdentity::getAlias, "")), //
+      Column.forString("External Identifier", true,
           detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
-      Column.forString("Secondary Identifier",
+      Column.forString("Secondary Identifier", true,
           detailedSample(SampleTissue.class, SampleTissue::getSecondaryIdentifier, "")), //
-      Column.forString("Group ID", groupIdFunction()), //
+      Column.forString("Group ID", true, groupIdFunction()), //
       Column.forString("Location", BoxUtils::makeLocationLabel)), //
   POOL_PREPARATION("Pool Preparation", //
       Column.forString("Name", LibraryAliquot::getName), //
       Column.forString("Alias", LibraryAliquot::getAlias), //
       Column.forString("Tissue Origin", true, tissueOrigin()), //
       Column.forString("Tissue Type", true, tissueType()), //
-      Column.forString("Group ID", groupIdFunction()), //
+      Column.forString("Group ID", true, groupIdFunction()), //
       Column.forString("Library Description", aliquot -> aliquot.getLibrary().getDescription()), //
       Column.forBigDecimal("Concentration", LibraryAliquot::getConcentration), //
       Column.forString("Concentration Units",
@@ -63,7 +68,7 @@ public enum LibraryAliquotSpreadSheets implements Spreadsheet<LibraryAliquot> {
       Column.forString("Alias", LibraryAliquot::getAlias), //
       Column.forString("Tissue Origin", true, tissueOrigin()), //
       Column.forString("Tissue Type", true, tissueType()), //
-      Column.forString("Group ID", groupIdFunction()), //
+      Column.forString("Group ID", true, groupIdFunction()), //
       Column.forString("Library Description", aliquot -> aliquot.getLibrary().getDescription()), //
       Column.forBigDecimal("Concentration", LibraryAliquot::getConcentration), //
       Column.forString("Concentration Units",

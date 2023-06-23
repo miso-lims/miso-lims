@@ -22,7 +22,7 @@ public enum LibrarySpreadSheets implements Spreadsheet<Library> {
       Column.forString("Tissue Type", true, tissueType()), //
       Column.forString("Barcode", Library::getIdentificationBarcode), //
       Column.forString("Library Type", library -> library.getLibraryType().getDescription()),
-      Column.forString("Library Design", true, library -> ((DetailedLibrary)library).getLibraryDesignCode().getCode()), //
+      Column.forString("Library Design", true, library -> ((DetailedLibrary) library).getLibraryDesignCode().getCode()), //
       Column.forString("i7 Index Name", library -> getName(library.getIndex1())), //
       Column.forString("i7 Index", library -> getSequence(library.getIndex1())), //
       Column.forString("i5 Index Name", library -> getName(library.getIndex2())), //
@@ -30,20 +30,23 @@ public enum LibrarySpreadSheets implements Spreadsheet<Library> {
       Column.forString("Sample Name", library -> library.getSample().getName()), //
       Column.forString("Sample Alias", library -> library.getSample().getAlias()), //
       Column.forString("Sample Barcode", library -> library.getSample().getIdentificationBarcode()), //
-      Column.forString("Identity Name", detailedSample(SampleIdentity.class, SampleIdentity::getName, "")), //
-      Column.forString("Identity Alias", detailedSample(SampleIdentity.class, SampleIdentity::getAlias, "")), //
-      Column.forString("External Identifier", true, detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
-      Column.forString("Secondary Identifier", true, detailedSample(SampleTissue.class, SampleTissue::getSecondaryIdentifier, "")), //
+      Column.forString("Identity Name", true, detailedSample(SampleIdentity.class, SampleIdentity::getName, "")), //
+      Column.forString("Identity Alias", true, detailedSample(SampleIdentity.class, SampleIdentity::getAlias, "")), //
+      Column.forString("External Identifier", true,
+          detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
+      Column.forString("Secondary Identifier", true,
+          detailedSample(SampleTissue.class, SampleTissue::getSecondaryIdentifier, "")), //
       Column.forString("Location", BoxUtils::makeLocationLabel)), //
   POOL_PREPARATION("Pool Preparation", //
       Column.forString("Name", Library::getName), //
       Column.forString("Alias", Library::getAlias), //
       Column.forString("Tissue Origin", true, tissueOrigin()), //
       Column.forString("Tissue Type", true, tissueType()), //
-      Column.forString("Group ID", groupIdFunction()), //
+      Column.forString("Group ID", true, groupIdFunction()), //
       Column.forString("Description", Library::getDescription), //
       Column.forBigDecimal("Concentration", Library::getConcentration), //
-      Column.forString("Concentration Units", lib -> lib.getConcentrationUnits() == null ? "" : lib.getConcentrationUnits().getRawLabel()), //
+      Column.forString("Concentration Units",
+          lib -> lib.getConcentrationUnits() == null ? "" : lib.getConcentrationUnits().getRawLabel()), //
       Column.forInteger("Size (bp)", Library::getDnaSize), //
       Column.forString("Index 1", library -> getSequence(library.getIndex1())), //
       Column.forString("Index 2", library -> getSequence(library.getIndex2())), //
@@ -54,10 +57,11 @@ public enum LibrarySpreadSheets implements Spreadsheet<Library> {
       Column.forString("Alias", Library::getAlias), //
       Column.forString("Tissue Origin", true, tissueOrigin()), //
       Column.forString("Tissue Type", true, tissueType()), //
-      Column.forString("Group ID", groupIdFunction()), //
+      Column.forString("Group ID", true, groupIdFunction()), //
       Column.forString("Description", Library::getDescription), //
       Column.forBigDecimal("Concentration", Library::getConcentration), //
-      Column.forString("Concentration Units", lib -> lib.getConcentrationUnits() == null ? "" : lib.getConcentrationUnits().getRawLabel()), //
+      Column.forString("Concentration Units",
+          lib -> lib.getConcentrationUnits() == null ? "" : lib.getConcentrationUnits().getRawLabel()), //
       Column.forBigDecimal("Volume", Library::getVolume), //
       Column.forString("Volume Units", lib -> lib.getVolumeUnits() == null ? "" : lib.getVolumeUnits().getRawLabel()), //
       Column.forInteger("Size (bp)", Library::getDnaSize), //
@@ -83,7 +87,8 @@ public enum LibrarySpreadSheets implements Spreadsheet<Library> {
     };
   }
 
-  private static <S extends DetailedSample, T> Function<Library, T> detailedSample(Class<S> clazz, Function<S, T> function,
+  private static <S extends DetailedSample, T> Function<Library, T> detailedSample(Class<S> clazz,
+      Function<S, T> function,
       T defaultValue) {
     return l -> {
       if (clazz.isInstance(l.getSample())) {
