@@ -112,6 +112,13 @@ FormTarget.project = (function ($) {
               maxLength: 255,
             },
             {
+              title: "Details",
+              data: "additionalDetails",
+              type: "text",
+              description: "Long text field, can be more in-depth than the 'Description' field",
+              maxLength: 65535,
+            },
+            {
               title: "Status",
               data: "status",
               type: "dropdown",

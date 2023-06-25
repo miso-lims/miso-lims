@@ -202,6 +202,7 @@ public class DefaultProjectService implements ProjectService {
     original.setRebExpiry(project.getRebExpiry());
     original.setSamplesExpected(project.getSamplesExpected());
     original.setContact(project.getContact());
+    original.setAdditionalDetails(project.getAdditionalDetails());
     ValidationUtils.applySetChanges(original.getAssays(), project.getAssays());
   }
 

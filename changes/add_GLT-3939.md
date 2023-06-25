@@ -1,0 +1,1 @@
+Details field on Project form

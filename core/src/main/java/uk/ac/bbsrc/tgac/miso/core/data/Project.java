@@ -119,4 +119,8 @@ public interface Project extends Comparable<Project>, Deletable, Nameable, Seria
   public Contact getContact();
 
   public void setContact(Contact contact);
+
+  public String getAdditionalDetails();
+
+  public void setAdditionalDetails(String additionalDetails);
 }

@@ -49,6 +49,7 @@ public class ProjectPageIT extends AbstractIT {
     unsaved.put(Fields.STATUS, "Proposed");
     unsaved.put(Fields.REFERENCE_GENOME, "Human hg18 random");
     unsaved.put(Fields.PIPELINE, "Special");
+    unsaved.put(Fields.ADDITIONAL_DETAILS, "This is a test");
 
     assertEquals("Project ID is unsaved", unsaved.get(Fields.ID), page.getId());
     assertEquals("Project name is unsaved", unsaved.get(Fields.NAME), page.getName());
@@ -58,6 +59,7 @@ public class ProjectPageIT extends AbstractIT {
     page.setStatus(unsaved.get(Fields.STATUS));
     page.setReferenceGenome(unsaved.get(Fields.REFERENCE_GENOME));
     page.setPipeline(unsaved.get(Fields.PIPELINE));
+    page.setAdditionalDetails(unsaved.get(Fields.ADDITIONAL_DETAILS));
 
     ProjectPage savedPage = page.clickSave();
 
@@ -71,6 +73,7 @@ public class ProjectPageIT extends AbstractIT {
     assertEquals(unsaved.get(Fields.STATUS), savedPage.getStatus());
     assertEquals(unsaved.get(Fields.REFERENCE_GENOME), savedPage.getReferenceGenome());
     assertEquals(unsaved.get(Fields.PIPELINE), savedPage.getPipeline());
+    assertEquals(unsaved.get(Fields.ADDITIONAL_DETAILS, savedPaged.getAdditionalDetails()));
   }
 
   @Test
@@ -83,12 +86,14 @@ public class ProjectPageIT extends AbstractIT {
     updated.put(Fields.CODE, "NEWER");
     updated.put(Fields.STATUS, "Active");
     updated.put(Fields.REFERENCE_GENOME, "Human hg19 random");
+    updated.put(Fields.ADDITIONAL_DETAILS, "Changed additional details");
 
     page.setTitle(updated.get(Fields.TITLE));
     page.setCode(updated.get(Fields.CODE));
     page.setDescription(updated.get(Fields.DESCRIPTION));
     page.setStatus(updated.get(Fields.STATUS));
     page.setReferenceGenome(updated.get(Fields.REFERENCE_GENOME));
+    page.setAdditionalDetails(updated.get(Fields.ADDITIONAL_DETAILS));
 
     ProjectPage savedPage = page.clickSave();
 
@@ -97,6 +102,7 @@ public class ProjectPageIT extends AbstractIT {
     assertEquals(updated.get(Fields.DESCRIPTION), savedPage.getDescription());
     assertEquals(updated.get(Fields.STATUS), savedPage.getStatus());
     assertEquals(updated.get(Fields.REFERENCE_GENOME), savedPage.getReferenceGenome());
+    assertEquals(updated.get(Fields.ADDITIONAL_DETAILS, savedPage.getAdditionalDetails()));
   }
 
   @Test
