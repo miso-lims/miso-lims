@@ -526,15 +526,7 @@ BulkTarget.sample = (function ($) {
             if (api.getValue(rowIndex, "requisitionId") === "Create New") {
               var projectSelected = api.getValueObject(rowIndex, "projectId");
               if (projectSelected && projectSelected.assayIds !== null) {
-                api.updateField(rowIndex, "requisitionAssayId", {
-                  source: projectSelected.assayIds.map(function (assayId) {
-                    return Utils.array.findUniqueOrThrow(
-                      Utils.array.idPredicate(assayId),
-                      Constants.assays
-                    );
-                  }),
-                  value: null,
-                });
+                returnProjectAssays(projectSelected, api, rowIndex);
               } else {
                 api.updateField(rowIndex, "requisitionAssayId", {
                   source: [],
@@ -677,16 +669,7 @@ BulkTarget.sample = (function ($) {
                   disabled: true,
                 });
               } else if (projectSelected && projectSelected.assayIds !== null) {
-                api.updateField(rowIndex, "requisitionAssayId", {
-                  source: projectSelected.assayIds.map(function (assayId) {
-                    return Utils.array.findUniqueOrThrow(
-                      Utils.array.idPredicate(assayId),
-                      Constants.assays
-                    );
-                  }),
-                  value: null,
-                  disabled: false,
-                });
+                returnProjectAssays(projectSelected, api, rowIndex);
               } else {
                 api.updateField(rowIndex, "requisitionAssayId", {
                   source: Constants.assays.filter(function (x) {
@@ -1602,6 +1585,23 @@ BulkTarget.sample = (function ($) {
   function anyMatch(arr1, arr2) {
     return arr1.some(function (x) {
       return arr2.includes(x);
+    });
+  }
+
+  function returnProjectAssays(projectSelected, api, rowIndex) {
+    var notArchivedProjectAssays = [];
+    for (var i = 0; i < projectSelected.assayIds.length; i++) {
+      var tempAssay = Constants.assays.find(function (x) {
+        return x.id === projectSelected.assayIds[i];
+      });
+      if (!tempAssay.archived) {
+        notArchivedProjectAssays.push(tempAssay);
+      }
+    }
+    api.updateField(rowIndex, "requisitionAssayId", {
+      source: notArchivedProjectAssays,
+      value: null,
+      disabled: false,
     });
   }
 })(jQuery);

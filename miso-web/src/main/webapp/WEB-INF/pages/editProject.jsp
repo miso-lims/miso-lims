@@ -182,7 +182,7 @@
   jQuery(document).ready(function () {
     var projectDto = ${projectDto};
     var config = ${formConfig};
-    config["createProject"] = true;
+    config["projectId"] = projectDto.id;
 
     var assays = [];
     for (var i = 0; i < projectDto.assayIds.length; i++) {

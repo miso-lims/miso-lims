@@ -90,11 +90,11 @@ information about attachments, see the [Attachments section](../attachments/).
 
 ### Assigning Assays to Projects
 
-In the Edit Project page, there will be an Assays table (between Project Files and Studies). There, you may assign 
-assays to the selected project. To add an assay, click the "Add" button on the table, and selected the assay you 
+On the Edit Project page, there is an Assays table (between Project Files and Studies). There, you may assign 
+assays to the selected project. To add an assay, click the "Add" button on the table, and select the assay you 
 would like to add. To remove assays, click the checkboxes that correspond to the assays you want to remove, and
  then click the "Remove" button. For more information about assays, see the 
- [Assays Section](./requisitions.md#assays).
+ [Assays Section](../requisitions/#assays).
 
 ## Subprojects
 

@@ -24,8 +24,6 @@ FormTarget.requisition = (function () {
       return Urls.ui.requisitions.edit(requisition.id);
     },
     getSections: function (config, object) {
-      /* adding the currently assigned assay to the requisition to the options of assays to choose from, because it
-           may not be part of the set of mutual assays between all the requisitioned samples' assays. */
       var assayDropdown = [];
       if (config.potentialAssayIds !== undefined) {
         for (var i = 0; i < config.potentialAssayIds.length; i++) {

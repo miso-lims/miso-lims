@@ -12,7 +12,7 @@ ListTarget.assay = (function ($) {
     getQueryUrl: null,
     showNewOptionSop: true,
     createBulkActions: function (config, projectId) {
-      if (config.createProject) {
+      if (config.projectId != null && config.projectId >= 0) {
         return [
           {
             name: "Remove",
@@ -39,7 +39,7 @@ ListTarget.assay = (function ($) {
       return [];
     },
     createStaticActions: function (config, projectId) {
-      if (config.createProject) {
+      if (config.projectId != null && config.projectId >= 0) {
         return [
           {
             name: "Add",

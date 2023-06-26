@@ -159,10 +159,9 @@ public class RequisitionController {
       Project curProject = samples.get(i).getProject();
       if (!uniqueProjectIds.contains(curProject.getId())) {
         uniqueProjectIds.add(curProject.getId());
-        List<Assay> assayLst = curProject.getAssays().stream().collect(Collectors.toList());
-        for (int j = 0; j < assayLst.size(); j++) {
-          Long curAssayId = assayLst.get(j).getId();
-          if (assayMap.containsKey(curAssayId)) {
+        for (Assay element : curProject.getAssays()) {
+          Long curAssayId = element.getId();
+          if (!element.isArchived() && assayMap.containsKey(curAssayId)) {
             int freq = assayMap.get(curAssayId);
             assayMap.put(curAssayId, freq + 1);
           } else {
