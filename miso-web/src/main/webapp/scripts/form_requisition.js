@@ -52,6 +52,8 @@ FormTarget.requisition = (function () {
               title: "Assay",
               type: "dropdown",
               data: "assayId",
+              description:
+                "If the requisition has no requisitioned samples, you may assign any assay to it. Once you add requisitioned samples, the options of available assays are limited to the assays that are assigned to all of the requisitioned samples' projects",
               source:
                 config.numberOfRequisitionedSamples > 0
                   ? assayDropdown

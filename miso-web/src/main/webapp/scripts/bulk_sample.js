@@ -1600,7 +1600,6 @@ BulkTarget.sample = (function ($) {
     }
     api.updateField(rowIndex, "requisitionAssayId", {
       source: notArchivedProjectAssays,
-      value: null,
       disabled: false,
     });
   }

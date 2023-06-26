@@ -89,7 +89,7 @@ ListTarget.assay = (function ($) {
       "Add Assay",
       nonArchivedAssays.map(function (assay) {
         return {
-          name: assay.alias,
+          name: Assay.utils.makeLabel(assay),
           handler: function () {
             Project.addAssay(assay);
           },

@@ -183,10 +183,9 @@ public class DefaultProjectService implements ProjectService {
         "defaultTargetedSequencingId");
     loadChildEntity(project::setPipeline, project.getPipeline(), pipelineService, "pipelineId");
     loadChildEntity(project::setContact, project.getContact(), contactService, "contactId");
-    List<Assay> recieveAssays = project.getAssays().stream().collect(Collectors.toList());
     Set<Assay> assays = new HashSet<>();
-    for (int i = 0; i < recieveAssays.size(); i++) {
-      loadChildEntity(x -> assays.add(x), recieveAssays.get(i), assayService, "assays");
+    for (Assay element : project.getAssays()) {
+      loadChildEntity(x -> assays.add(x), element, assayService, "assays");
     }
     project.setAssays(assays);
   }
