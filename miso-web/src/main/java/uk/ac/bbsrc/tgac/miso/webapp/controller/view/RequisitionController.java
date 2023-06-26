@@ -161,11 +161,13 @@ public class RequisitionController {
         uniqueProjectIds.add(curProject.getId());
         for (Assay element : curProject.getAssays()) {
           Long curAssayId = element.getId();
-          if (!element.isArchived() && assayMap.containsKey(curAssayId)) {
-            int freq = assayMap.get(curAssayId);
-            assayMap.put(curAssayId, freq + 1);
-          } else {
-            assayMap.put(curAssayId, 1);
+          if (!element.isArchived()) {
+            if (assayMap.containsKey(curAssayId)) {
+              int freq = assayMap.get(curAssayId);
+              assayMap.put(curAssayId, freq + 1);
+            } else {
+              assayMap.put(curAssayId, 1);
+            }
           }
         }
       }

@@ -182,7 +182,6 @@
   jQuery(document).ready(function () {
     var projectDto = ${projectDto};
     var config = ${formConfig};
-    config["projectId"] = projectDto.id;
 
     var assays = [];
     for (var i = 0; i < projectDto.assayIds.length; i++) {
@@ -196,7 +195,7 @@
     var form = FormUtils.createForm('projectForm', 'save', projectDto, 'project', config);
 
     Project.setForm(form);
-    Project.setListConfig(config);
+    Project.setListConfig({projectId: projectDto.id});
     Project.setAssays(assays);
     Utils.ui.updateHelpLink(FormTarget.project.getUserManualUrl());
   });

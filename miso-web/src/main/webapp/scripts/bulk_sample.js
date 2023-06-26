@@ -526,7 +526,7 @@ BulkTarget.sample = (function ($) {
             if (api.getValue(rowIndex, "requisitionId") === "Create New") {
               var projectSelected = api.getValueObject(rowIndex, "projectId");
               if (projectSelected && projectSelected.assayIds !== null) {
-                returnProjectAssays(projectSelected, api, rowIndex);
+                updateProjectAssays(projectSelected, api, rowIndex);
               } else {
                 api.updateField(rowIndex, "requisitionAssayId", {
                   source: [],
@@ -669,7 +669,7 @@ BulkTarget.sample = (function ($) {
                   disabled: true,
                 });
               } else if (projectSelected && projectSelected.assayIds !== null) {
-                returnProjectAssays(projectSelected, api, rowIndex);
+                updateProjectAssays(projectSelected, api, rowIndex);
               } else {
                 api.updateField(rowIndex, "requisitionAssayId", {
                   source: Constants.assays.filter(function (x) {
@@ -1588,7 +1588,7 @@ BulkTarget.sample = (function ($) {
     });
   }
 
-  function returnProjectAssays(projectSelected, api, rowIndex) {
+  function updateProjectAssays(projectSelected, api, rowIndex) {
     var notArchivedProjectAssays = [];
     for (var i = 0; i < projectSelected.assayIds.length; i++) {
       var tempAssay = Constants.assays.find(function (x) {
