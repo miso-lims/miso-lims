@@ -1284,3 +1284,8 @@ INSERT INTO Printer(printerId, name, driver, backend, configuration, enabled, wi
 
 -- Keep this at bottom - checked to verify that script has completed and constants all loaded
 INSERT INTO AttachmentCategory(categoryId, alias) VALUES (4, 'last entry');
+
+INSERT INTO Deliverable(deliverableId, name) VALUES
+(1, "deliverable1"),
+(2, "deliverable2"),
+(3, "deliverable3");

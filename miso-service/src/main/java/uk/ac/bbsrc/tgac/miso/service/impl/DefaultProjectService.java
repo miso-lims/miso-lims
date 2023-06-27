@@ -203,6 +203,7 @@ public class DefaultProjectService implements ProjectService {
     original.setSamplesExpected(project.getSamplesExpected());
     original.setContact(project.getContact());
     original.setAdditionalDetails(project.getAdditionalDetails());
+    original.setDeliverableId(project.getDeliverableId());
     ValidationUtils.applySetChanges(original.getAssays(), project.getAssays());
   }
 

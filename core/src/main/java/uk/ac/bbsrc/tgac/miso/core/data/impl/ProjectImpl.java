@@ -70,6 +70,8 @@ public class ProjectImpl implements Project {
 
   private Integer samplesExpected;
 
+  private Long deliverableId;
+
   @ManyToOne
   @JoinColumn(name = "contactId")
   private Contact contact;
@@ -222,6 +224,7 @@ public class ProjectImpl implements Project {
   public void setAssays(Set<Assay> assays) {
     this.assays = assays;
   }
+
 
   @Override
   public List<FileAttachment> getAttachments() {
@@ -470,5 +473,15 @@ public class ProjectImpl implements Project {
   @Override
   public void setAdditionalDetails(String additionalDetails) {
     this.additionalDetails = additionalDetails;
+  }
+
+  @Override
+  public Long getDeliverableId() {
+    return deliverableId;
+  }
+
+  @Override
+  public void setDeliverableId(Long deliverableId) {
+    this.deliverableId = deliverableId;
   }
 }

@@ -1066,3 +1066,8 @@ INSERT INTO Project_Assay(projectId, assayId) VALUES
 (1, 2),
 (2, 1),
 (3, 2);
+
+INSERT INTO Deliverable(deliverableId, name) VALUES
+(1, "deliverable1"),
+(2, "deliverable2"),
+(3, "deliverable3");

@@ -134,6 +134,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Contact;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Deletion;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Deliverable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryTemplate;
@@ -2600,6 +2601,7 @@ public class Dtos {
     dto.setCode(from.getCode());
     dto.setDescription(from.getDescription());
     dto.setAdditionalDetails(from.getAdditionalDetails());
+    setLong(dto::setDeliverableId, from.getDeliverableId(), true);
     setObject(dto::setStatus, from.getStatus(), (progress) -> progress.getKey());
     if (from.getReferenceGenome() != null) {
       dto.setReferenceGenomeId(from.getReferenceGenome().getId());
@@ -2639,6 +2641,7 @@ public class Dtos {
     setString(to::setCode, dto.getCode());
     setString(to::setDescription, dto.getDescription());
     setString(to::setAdditionalDetails, dto.getAdditionalDetails());
+    setLong(to::setDeliverableId, dto.getDeliverableId(), true);
     setObject(to::setStatus, dto.getStatus(), (key) -> StatusType.get(key));
     setObject(to::setReferenceGenome, ReferenceGenomeImpl::new, dto.getReferenceGenomeId());
     setObject(to::setDefaultTargetedSequencing, TargetedSequencing::new, dto.getDefaultTargetedSequencingId());
@@ -4479,6 +4482,20 @@ public class Dtos {
     SimpleAliasableDto to = new SimpleAliasableDto();
     setLong(to::setId, from.getId(), true);
     setString(to::setAlias, from.getAlias());
+    return to;
+  }
+
+  public static DeliverableDto asDto(Deliverable from) {
+    DeliverableDto to = new DeliverableDto();
+    to.setId(from.getId());
+    to.setName(from.getName());
+    return to;
+  }
+
+  public static Deliverable to(DeliverableDto from) {
+    Deliverable to = new Deliverable();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setName, from.getName());
     return to;
   }
 

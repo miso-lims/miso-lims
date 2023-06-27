@@ -164,6 +164,18 @@ FormTarget.project = (function ($) {
               nullLabel: "(Choose)",
             },
             {
+              title: "Deliverable",
+              data: "deliverableId",
+              type: "dropdown",
+              source: config.deliverables,
+              getItemLabel: function (item) {
+                return item.name;
+              },
+              getItemValue: function (item) {
+                return item.id;
+              },
+            },
+            {
               title: "Samples Expected",
               data: "samplesExpected",
               type: "int",

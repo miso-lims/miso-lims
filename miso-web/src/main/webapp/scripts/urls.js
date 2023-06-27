@@ -1239,6 +1239,19 @@ Urls = (function () {
     search: userRestBase,
   };
 
+  // Deliverables
+  var deliverableUiBase = baseUrl + "/deliverable";
+  ui.deliverables = {
+    bulkCreate: deliverableUiBase + "/bulk/new",
+    bulkEdit: deliverableUiBase + "/bulk/edit",
+  };
+
+  var deliverableRestBase = restBase + "/deliverables";
+  rest.deliverables = {
+    bulkSave: deliverableRestBase + "/bulk",
+    bulkSaveProgress: idUrlFunction(deliverableRestBase + "/bulk"),
+  };
+
   // Worksets
   var worksetUiBase = baseUrl + "/workset";
   ui.worksets = {

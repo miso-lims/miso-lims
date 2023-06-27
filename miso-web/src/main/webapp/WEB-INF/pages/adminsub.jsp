@@ -96,6 +96,7 @@
       <a href="<c:url value="/miso/attachmentcategories/list"/>">Attachment Categories</a>
       <a href="<c:url value="/miso/boxsize/list"/>">Box Sizes</a>
       <a href="<c:url value="/miso/boxuse/list"/>">Box Uses</a>
+      <a href="<c:url value="/miso/deliverable/list"/>">Deliverables</a>
       <a href="<c:url value="/miso/detailedqcstatus/list"/>">Detailed QC Statuses</a>
       <a href="<c:url value="/miso/indexfamily/list"/>">Index Families</a>
       <a href="<c:url value="/miso/instrumentmodel/list"/>">Instrument Models</a>

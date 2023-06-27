@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.Test;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -119,7 +120,8 @@ public class ListTablesIT extends AbstractIT {
   private static final Comparator<String> nameNumericComparator = (name1, name2) -> {
     if (name1.matches(NAME_REGEX) && name2.matches(NAME_REGEX) && name1.substring(0, 3).equals(name2.substring(0, 3))) {
       int id1 = Integer.parseInt(name1.substring(3, name1.length()));
-      int id2 = Integer.parseInt(name2.substring(3, name2.length()));
+      int id2 = Integer.parseInt(name2.substring(3,
+          name2.length()));
       return Integer.compare(id1, id2);
     } else {
       return standardComparator.compare(name1, name2);
@@ -1024,6 +1026,17 @@ public class ListTablesIT extends AbstractIT {
   public void testListAssayTestsColumnSort() throws Exception {
     testColumnsSort(ListTarget.ASSAY_TESTS);
   }
+
+  // @Test
+  // public void testListDeliverablesSetup() throws Exception {
+  // testPageSetup(ListTarget.DELIVERABLES,
+  // Sets.newHashSet(Columns.SELECTOR, Columns.NAME));
+  // }
+
+  // @Test
+  // public void testListDeliverablesColumnSort() throws Exception() {
+  // testColumnsSort(ListTarget.DELIVERABLES);
+  // }
 
   private void testPageSetup(String listTarget, Set<String> targetColumns) {
     testPageSetup(listTarget, targetColumns, false);

@@ -123,4 +123,8 @@ public interface Project extends Comparable<Project>, Deletable, Nameable, Seria
   public String getAdditionalDetails();
 
   public void setAdditionalDetails(String additionalDetails);
+
+  public Long getDeliverableId();
+
+  public void setDeliverableId(Long deliverableId);
 }
