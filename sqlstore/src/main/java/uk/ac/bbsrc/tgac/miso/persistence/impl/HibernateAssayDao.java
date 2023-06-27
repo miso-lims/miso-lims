@@ -15,7 +15,8 @@ import uk.ac.bbsrc.tgac.miso.persistence.AssayDao;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
-public class HibernateAssayDao extends HibernateSaveDao<Assay> implements AssayDao {
+public class HibernateAssayDao extends HibernateSaveDao<Assay>
+    implements AssayDao {
 
   public HibernateAssayDao() {
     super(Assay.class);

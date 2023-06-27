@@ -90,12 +90,17 @@
 
       <script type="text/javascript">
         jQuery(document).ready(function () {
-          var requisition = ${ requisitionDto };
+          var requisition = ${requisitionDto};
           var config = {
-            pageMode: '${pageMode}'
+            pageMode: '${pageMode}',
           };
+          
+          <c:if test="${pageMode eq 'edit'}">
+            config["potentialAssayIds"] = ${potentialAssayIds};
+            config["numberOfRequisitionedSamples"] = ${numberOfRequisitionedSamples};
+          </c:if>
+          
           var form = FormUtils.createForm('requisitionForm', 'save', requisition, 'requisition', config);
-
           Utils.ui.updateHelpLink(FormTarget.requisition.getUserManualUrl());
 
           if ('${pageMode}' === 'edit') {

@@ -6,37 +6,57 @@ ListTarget.assay = (function ($) {
     getUserManualUrl: function () {
       return Urls.external.userManual("requisitions", "assays");
     },
+    createUrl: function (config, projectId) {
+      throw new Error("Must be provided statically");
+    },
+    getQueryUrl: null,
     showNewOptionSop: true,
     createBulkActions: function (config, projectId) {
-      return !config.isAdmin
-        ? []
-        : [
-            {
-              name: "Copy",
-              action: function (items) {
-                if (items.length > 1) {
-                  Utils.showOkDialog("Error", ["Select an individual assay to copy"]);
-                  return;
-                }
-                window.location = Urls.ui.assays.create + "?" + $.param({ baseId: items[0].id });
-              },
+      if (config.projectId != null && config.projectId >= 0) {
+        return [
+          {
+            name: "Remove",
+            action: Project.removeAssays,
+          },
+        ];
+      } else if (config.isAdmin) {
+        return [
+          {
+            name: "Copy",
+            action: function (items) {
+              if (items.length > 1) {
+                Utils.showOkDialog("Error", ["Select an individual assay to copy"]);
+                return;
+              }
+              window.location = Urls.ui.assays.create + "?" + $.param({ baseId: items[0].id });
             },
-            ListUtils.createBulkDeleteAction(TYPE_LABEL, "assays", function (x) {
-              return x.alias + " v" + x.version;
-            }),
-          ];
+          },
+          ListUtils.createBulkDeleteAction(TYPE_LABEL, "assays", function (x) {
+            return x.alias + " v" + x.version;
+          }),
+        ];
+      }
+      return [];
     },
     createStaticActions: function (config, projectId) {
-      return !config.isAdmin
-        ? []
-        : [
-            {
-              name: "Add",
-              handler: function () {
-                Utils.page.pageRedirect(Urls.ui.assays.create);
-              },
+      if (config.projectId != null && config.projectId >= 0) {
+        return [
+          {
+            name: "Add",
+            handler: showAddAssayDialog,
+          },
+        ];
+      } else if (config.isAdmin) {
+        return [
+          {
+            name: "Add",
+            handler: function () {
+              Utils.page.pageRedirect(Urls.ui.assays.create);
             },
-          ];
+          },
+        ];
+      }
+      return [];
     },
     createColumns: function (config, projectId) {
       return [
@@ -60,4 +80,21 @@ ListTarget.assay = (function ($) {
       ];
     },
   };
+
+  function showAddAssayDialog() {
+    var nonArchivedAssays = Constants.assays.filter(function (x) {
+      return !x.archived;
+    });
+    Utils.showWizardDialog(
+      "Add Assay",
+      nonArchivedAssays.map(function (assay) {
+        return {
+          name: Assay.utils.makeLabel(assay),
+          handler: function () {
+            Project.addAssay(assay);
+          },
+        };
+      })
+    );
+  }
 })(jQuery);

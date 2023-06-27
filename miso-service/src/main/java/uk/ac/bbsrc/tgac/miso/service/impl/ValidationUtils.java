@@ -182,6 +182,23 @@ public class ValidationUtils {
     }
   }
 
+  /**
+   * Loads data from the backend through the given parameters, and checks if it is a valid item to
+   * attempt to load. If it is valid, it will load and the passed setter method will accept the item
+   * as its function parameters. If it is invalid, it will throw a ValidationException.
+   * 
+   * @param <T>
+   * @param setter
+   * @param childEntity
+   * @param service
+   * @param property Used to place the error message on the front end. As such, correct naming
+   *        convention is required in order for the error message to be accurate. For simple fields,
+   *        the property name should match the name of the field in the DTO. For collections, a
+   *        sensible collection name should be used, and you need to add a div to the code in the JSP
+   *        file that loads the DTO in order for the error message to display.
+   * @throws IOException
+   * 
+   */
   public static <T extends Identifiable> void loadChildEntity(Consumer<T> setter, T childEntity,
       ProviderService<T> service,
       String property)

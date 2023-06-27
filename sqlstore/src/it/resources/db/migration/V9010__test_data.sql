@@ -1060,3 +1060,9 @@ INSERT INTO Attachment(attachmentId, filename, path, creator, created, categoryI
 INSERT INTO Sample_Attachment(sampleId, attachmentId) VALUES
 (1, 1),
 (2, 2);
+
+INSERT INTO Project_Assay(projectId, assayId) VALUES
+(1, 1),
+(1, 2),
+(2, 1),
+(3, 2);

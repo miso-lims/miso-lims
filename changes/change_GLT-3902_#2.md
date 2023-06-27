@@ -1,0 +1,1 @@
+When receiving a sample, if you create a new requisition, the assay options are now only those that are assigned to the selected project.

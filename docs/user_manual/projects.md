@@ -68,6 +68,7 @@ information and functionalities. To get to the Edit Project page, click the proj
 Projects list page. You can edit the project's details by changing them on this page and then clicking the "Save"
 button to confirm.
 
+
 ### Tracked Issues
 
 The Tracked Issues section of the Edit Project page shows issues from an issue tracking system that are related to the
@@ -87,7 +88,13 @@ trackers to MISO.
 Files can be attached to a project and will show up in the Project Files section of the Edit Project page. For more
 information about attachments, see the [Attachments section](../attachments/).
 
+### Assigning Assays to Projects
 
+On the Edit Project page, there is an Assays table (between Project Files and Studies). There, you may assign 
+assays to the selected project. To add an assay, click the "Add" button on the table, and select the assay you 
+would like to add. To remove assays, click the checkboxes that correspond to the assays you want to remove, and
+ then click the "Remove" button. For more information about assays, see the 
+ [Assays Section](../requisitions/#assays).
 
 ## Subprojects
 

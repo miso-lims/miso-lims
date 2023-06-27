@@ -24,6 +24,16 @@ FormTarget.requisition = (function () {
       return Urls.ui.requisitions.edit(requisition.id);
     },
     getSections: function (config, object) {
+      var assayDropdown = [];
+      if (config.potentialAssayIds !== undefined) {
+        for (var i = 0; i < config.potentialAssayIds.length; i++) {
+          var holder = Constants.assays.find(function (x) {
+            return x.id === config.potentialAssayIds[i];
+          });
+          assayDropdown.push(holder);
+        }
+      }
+
       return [
         {
           title: "Assay Information",
@@ -42,9 +52,14 @@ FormTarget.requisition = (function () {
               title: "Assay",
               type: "dropdown",
               data: "assayId",
-              source: Constants.assays.filter(function (x) {
-                return !x.archived || x.id === object.assayId;
-              }),
+              description:
+                "If the requisition has no requisitioned samples, you may assign any assay to it. Once you add requisitioned samples, the options of available assays are limited to the assays that are assigned to all of the requisitioned samples' projects",
+              source:
+                config.numberOfRequisitionedSamples > 0
+                  ? assayDropdown
+                  : Constants.assays.filter(function (x) {
+                      return !x.archived || x.id === object.assayId;
+                    }),
               getItemLabel: function (x) {
                 return x.alias + " v" + x.version;
               },

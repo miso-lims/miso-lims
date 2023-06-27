@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.util.List;
+
 public class ProjectDto {
   private long id;
   private String title;
@@ -19,6 +21,7 @@ public class ProjectDto {
   private Long contactId;
   private String contactName;
   private String contactEmail;
+  private List<Long> assayIds;
 
   public long getId() {
     return id;
@@ -162,5 +165,13 @@ public class ProjectDto {
 
   public void setContactEmail(String contactEmail) {
     this.contactEmail = contactEmail;
+  }
+
+  public List<Long> getAssayIds() {
+    return assayIds;
+  }
+
+  public void setAssayIds(List<Long> assayIds) {
+    this.assayIds = assayIds;
   }
 }

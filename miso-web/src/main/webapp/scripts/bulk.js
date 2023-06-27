@@ -780,6 +780,8 @@ BulkUtils = (function ($) {
           title: "Assay",
           data: "requisitionAssayId",
           type: "dropdown",
+          description:
+            "The assay assigned to the requisition that the sample belongs to. When receiving samples, the options are limited to the assays assigned to the project.",
           source: Constants.assays.filter(function (x) {
             return !x.archived;
           }),

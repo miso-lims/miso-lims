@@ -5,7 +5,9 @@ import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -18,10 +20,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Contact;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.AssayService;
 import uk.ac.bbsrc.tgac.miso.core.service.ContactService;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryTemplateService;
@@ -69,6 +73,8 @@ public class DefaultProjectService implements ProjectService {
   private PipelineService pipelineService;
   @Autowired
   private ContactService contactService;
+  @Autowired
+  private AssayService assayService;
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
@@ -177,7 +183,11 @@ public class DefaultProjectService implements ProjectService {
         "defaultTargetedSequencingId");
     loadChildEntity(project::setPipeline, project.getPipeline(), pipelineService, "pipelineId");
     loadChildEntity(project::setContact, project.getContact(), contactService, "contactId");
-
+    Set<Assay> assays = new HashSet<>();
+    for (Assay element : project.getAssays()) {
+      loadChildEntity(x -> assays.add(x), element, assayService, "assays");
+    }
+    project.setAssays(assays);
   }
 
   private void applyChanges(Project original, Project project) {
@@ -192,6 +202,7 @@ public class DefaultProjectService implements ProjectService {
     original.setRebExpiry(project.getRebExpiry());
     original.setSamplesExpected(project.getSamplesExpected());
     original.setContact(project.getContact());
+    ValidationUtils.applySetChanges(original.getAssays(), project.getAssays());
   }
 
   public void setNamingSchemeHolder(NamingSchemeHolder namingSchemeHolder) {

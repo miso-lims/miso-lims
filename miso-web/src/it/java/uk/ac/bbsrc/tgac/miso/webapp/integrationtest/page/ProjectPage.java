@@ -32,6 +32,7 @@ public class ProjectPage extends HeaderFooterPage {
   }
 
   public static class ProjectTable {
+    public static final String ASSAYS = "project_assays_wrapper";
     public static final String STUDIES = "project_studies_wrapper";
     public static final String SAMPLES = "project_samples_wrapper";
     public static final String LIBRARIES = "project_libraries_wrapper";

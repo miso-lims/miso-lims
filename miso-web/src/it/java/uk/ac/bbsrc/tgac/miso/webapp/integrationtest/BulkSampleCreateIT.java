@@ -199,10 +199,10 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     tissue.put(SamColumns.RECEIPT_CONFIRMED, "True");
     tissue.put(SamColumns.RECEIPT_QC_PASSED, "True");
     tissue.put(SamColumns.RECEIPT_QC_NOTE, "");
+    tissue.put(SamColumns.PROJECT, "PONE");
     tissue.put(SamColumns.ID_BARCODE, "101"); // increment
     tissue.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     tissue.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
-    tissue.put(SamColumns.PROJECT, "PONE");
     tissue.put(SamColumns.GROUP_ID, "1");
     tissue.put(SamColumns.GROUP_DESCRIPTION, "Test one");
     tissue.put(SamColumns.TISSUE_ORIGIN, "Bn (Brain)");
@@ -398,11 +398,11 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     slide.put(SamColumns.RECEIPT_CONFIRMED, "True");
     slide.put(SamColumns.RECEIPT_QC_PASSED, "True");
     slide.put(SamColumns.RECEIPT_QC_NOTE, "");
+    slide.put(SamColumns.PROJECT, "PONE");
     slide.put(SamColumns.ID_BARCODE, "103"); // increment
     slide.put(SamColumns.SAMPLE_CLASS, "Slide");
     slide.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     slide.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
-    slide.put(SamColumns.PROJECT, "PONE");
     slide.put(SamColumns.GROUP_ID, "1");
     slide.put(SamColumns.GROUP_DESCRIPTION, "Test one");
     slide.put(SamColumns.TISSUE_ORIGIN, "Bn (Brain)");
@@ -499,11 +499,11 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     curls.put(SamColumns.RECEIPT_CONFIRMED, "True");
     curls.put(SamColumns.RECEIPT_QC_PASSED, "True");
     curls.put(SamColumns.RECEIPT_QC_NOTE, "");
+    curls.put(SamColumns.PROJECT, "PONE");
     curls.put(SamColumns.ID_BARCODE, "105"); // increment
     curls.put(SamColumns.SAMPLE_CLASS, "Tissue Piece");
     curls.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     curls.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
-    curls.put(SamColumns.PROJECT, "PONE");
     curls.put(SamColumns.EXTERNAL_NAME, "ext5"); // increment
     curls.put(SamColumns.GROUP_ID, "1");
     curls.put(SamColumns.GROUP_DESCRIPTION, "Test one");
@@ -599,11 +599,11 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     singleCell.put(SamColumns.RECEIPT_CONFIRMED, "True");
     singleCell.put(SamColumns.RECEIPT_QC_PASSED, "True");
     singleCell.put(SamColumns.RECEIPT_QC_NOTE, "");
+    singleCell.put(SamColumns.PROJECT, "PONE");
     singleCell.put(SamColumns.ID_BARCODE, "105");
     singleCell.put(SamColumns.SAMPLE_CLASS, "Single Cell");
     singleCell.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     singleCell.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
-    singleCell.put(SamColumns.PROJECT, "PONE");
     singleCell.put(SamColumns.EXTERNAL_NAME, "ext5");
     singleCell.put(SamColumns.GROUP_ID, "1");
     singleCell.put(SamColumns.GROUP_DESCRIPTION, "Test one");
@@ -683,11 +683,11 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     gDnaStock.put(SamColumns.RECEIPT_CONFIRMED, "True");
     gDnaStock.put(SamColumns.RECEIPT_QC_PASSED, "True");
     gDnaStock.put(SamColumns.RECEIPT_QC_NOTE, "");
+    gDnaStock.put(SamColumns.PROJECT, "PONE");
     gDnaStock.put(SamColumns.ID_BARCODE, "107"); // increment
     gDnaStock.put(SamColumns.SAMPLE_CLASS, "gDNA (stock)");
     gDnaStock.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     gDnaStock.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
-    gDnaStock.put(SamColumns.PROJECT, "PONE");
     gDnaStock.put(SamColumns.GROUP_ID, "1");
     gDnaStock.put(SamColumns.GROUP_DESCRIPTION, "Test one");
     gDnaStock.put(SamColumns.TISSUE_ORIGIN, "Bn (Brain)");
@@ -783,11 +783,11 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     stock.put(SamColumns.RECEIPT_CONFIRMED, "True");
     stock.put(SamColumns.RECEIPT_QC_PASSED, "True");
     stock.put(SamColumns.RECEIPT_QC_NOTE, "");
+    stock.put(SamColumns.PROJECT, "PONE");
     stock.put(SamColumns.ID_BARCODE, "107"); // increment
     stock.put(SamColumns.SAMPLE_CLASS, "Single Cell DNA (stock)");
     stock.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     stock.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
-    stock.put(SamColumns.PROJECT, "PONE");
     stock.put(SamColumns.GROUP_ID, "1");
     stock.put(SamColumns.GROUP_DESCRIPTION, "Test one");
     stock.put(SamColumns.TISSUE_ORIGIN, "Bn (Brain)");
@@ -836,11 +836,11 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     rnaStock.put(SamColumns.RECEIPT_CONFIRMED, "True");
     rnaStock.put(SamColumns.RECEIPT_QC_PASSED, "True");
     rnaStock.put(SamColumns.RECEIPT_QC_NOTE, "");
+    rnaStock.put(SamColumns.PROJECT, "PONE");
     rnaStock.put(SamColumns.ID_BARCODE, "109"); // increment
     rnaStock.put(SamColumns.SAMPLE_CLASS, "whole RNA (stock)");
     rnaStock.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     rnaStock.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
-    rnaStock.put(SamColumns.PROJECT, "PONE");
     rnaStock.put(SamColumns.GROUP_ID, "1");
     rnaStock.put(SamColumns.GROUP_DESCRIPTION, "Test one");
     rnaStock.put(SamColumns.TISSUE_ORIGIN, "Bn (Brain)");
@@ -970,11 +970,11 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     gDnaAliquot.put(SamColumns.RECEIPT_CONFIRMED, "True");
     gDnaAliquot.put(SamColumns.RECEIPT_QC_PASSED, "True");
     gDnaAliquot.put(SamColumns.RECEIPT_QC_NOTE, "");
+    gDnaAliquot.put(SamColumns.PROJECT, "PONE");
     gDnaAliquot.put(SamColumns.ID_BARCODE, "111"); // increment
     gDnaAliquot.put(SamColumns.SAMPLE_CLASS, "gDNA (aliquot)");
     gDnaAliquot.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     gDnaAliquot.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
-    gDnaAliquot.put(SamColumns.PROJECT, "PONE");
     gDnaAliquot.put(SamColumns.GROUP_ID, "1");
     gDnaAliquot.put(SamColumns.GROUP_DESCRIPTION, "Test one");
     gDnaAliquot.put(SamColumns.TISSUE_ORIGIN, "Bn (Brain)");
@@ -1072,11 +1072,11 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     aliquot.put(SamColumns.RECEIPT_CONFIRMED, "True");
     aliquot.put(SamColumns.RECEIPT_QC_PASSED, "True");
     aliquot.put(SamColumns.RECEIPT_QC_NOTE, "");
+    aliquot.put(SamColumns.PROJECT, "PONE");
     aliquot.put(SamColumns.ID_BARCODE, "111"); // increment
     aliquot.put(SamColumns.SAMPLE_CLASS, "Single Cell DNA (aliquot)");
     aliquot.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     aliquot.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
-    aliquot.put(SamColumns.PROJECT, "PONE");
     aliquot.put(SamColumns.GROUP_ID, "1");
     aliquot.put(SamColumns.GROUP_DESCRIPTION, "Test one");
     aliquot.put(SamColumns.TISSUE_ORIGIN, "Bn (Brain)");
@@ -1126,11 +1126,11 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     rnaAliquot.put(SamColumns.RECEIPT_CONFIRMED, "True");
     rnaAliquot.put(SamColumns.RECEIPT_QC_PASSED, "True");
     rnaAliquot.put(SamColumns.RECEIPT_QC_NOTE, "");
+    rnaAliquot.put(SamColumns.PROJECT, "PONE");
     rnaAliquot.put(SamColumns.ID_BARCODE, "113"); // increment
     rnaAliquot.put(SamColumns.SAMPLE_CLASS, "whole RNA (aliquot)");
     rnaAliquot.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
     rnaAliquot.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
-    rnaAliquot.put(SamColumns.PROJECT, "PONE");
     rnaAliquot.put(SamColumns.GROUP_ID, "1");
     rnaAliquot.put(SamColumns.GROUP_DESCRIPTION, "Test one");
     rnaAliquot.put(SamColumns.TISSUE_ORIGIN, "Bn (Brain)");
@@ -1265,10 +1265,10 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Map<String, String> identity = new LinkedHashMap<>();
     identity.put(SamColumns.ALIAS, "PTWO_1001");
     identity.put(SamColumns.DESCRIPTION, "");
-    identity.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
-    identity.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
     identity.put(SamColumns.PROJECT, "PTWO"); // different project so as not to mess with the SampleNumberPerProject
                                               // generator
+    identity.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
+    identity.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
     identity.put(SamColumns.EXTERNAL_NAME, "ext2001"); // increment
     identity.put(SamColumns.DONOR_SEX, "Female");
     identity.put(SamColumns.CONSENT, ConsentLevel.ALL_PROJECTS.getLabel());

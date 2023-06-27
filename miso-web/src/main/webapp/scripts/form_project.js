@@ -185,6 +185,11 @@ FormTarget.project = (function ($) {
         },
       ];
     },
+    confirmSave: function (object, isDialog, form) {
+      object.assayIds = Project.getAssays().map(function (x) {
+        return x.id;
+      });
+    },
   };
 
   function makeButton(text, callback) {

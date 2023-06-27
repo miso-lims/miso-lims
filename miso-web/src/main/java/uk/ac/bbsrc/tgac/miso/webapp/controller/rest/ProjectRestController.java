@@ -92,12 +92,13 @@ public class ProjectRestController extends RestController {
 
   @PostMapping
   public @ResponseBody ProjectDto create(@RequestBody ProjectDto dto) throws IOException {
-    return RestUtils.createObject("Project", dto, Dtos::to, projectService, Dtos::asDto);
+    return RestUtils.createObject("Project", dto, Dtos::to, projectService, project -> Dtos.asDto(project, true));
   }
 
   @PutMapping("/{projectId}")
   public @ResponseBody ProjectDto update(@PathVariable long projectId, @RequestBody ProjectDto dto) throws IOException {
-    return RestUtils.updateObject("Project", projectId, dto, Dtos::to, projectService, Dtos::asDto);
+    return RestUtils.updateObject("Project", projectId, dto, Dtos::to, projectService,
+        project -> Dtos.asDto(project, true));
   }
 
   @PostMapping(value = "/bulk-delete")

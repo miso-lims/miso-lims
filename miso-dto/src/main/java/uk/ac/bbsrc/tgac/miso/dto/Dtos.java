@@ -2621,6 +2621,14 @@ public class Dtos {
     return from.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
+  public static ProjectDto asDto(@Nonnull Project from, boolean includeAssays) {
+    ProjectDto dto = asDto(from);
+    if (includeAssays) {
+      dto.setAssayIds(from.getAssays().stream().map(Assay::getId).collect(Collectors.toList()));
+    }
+    return dto;
+  }
+
   public static Project to(@Nonnull ProjectDto dto) {
     Project to = new ProjectImpl();
     setLong(to::setId, dto.getId(), false);
@@ -2644,6 +2652,16 @@ public class Dtos {
       setString(contact::setName, dto.getContactName());
       setString(contact::setEmail, dto.getContactEmail());
       to.setContact(contact);
+    }
+    if (dto.getAssayIds() != null) {
+      List<Assay> assays = new ArrayList<>();
+      for (int i = 0; i < dto.getAssayIds().size(); i++) {
+        Long holder = dto.getAssayIds().get(i);
+        Assay temp = new Assay();
+        temp.setId(holder);
+        assays.add(temp);
+      }
+      assays.stream().forEach(x -> to.getAssays().add(x));
     }
     return to;
   }

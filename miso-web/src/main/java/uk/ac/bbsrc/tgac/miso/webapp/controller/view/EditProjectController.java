@@ -90,7 +90,7 @@ public class EditProjectController {
     }
 
     model.put("project", project);
-    model.put("projectDto", mapper.writeValueAsString(Dtos.asDto(project)));
+    model.put("projectDto", mapper.writeValueAsString(Dtos.asDto(project, true)));
 
     ObjectNode formConfig = mapper.createObjectNode();
     MisoWebUtils.addJsonArray(mapper, formConfig, "statusOptions", Arrays.asList(StatusType.values()),

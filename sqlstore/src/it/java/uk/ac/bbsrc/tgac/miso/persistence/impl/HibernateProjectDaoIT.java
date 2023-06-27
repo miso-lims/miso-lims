@@ -1,6 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
+
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
@@ -8,6 +12,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Pipeline;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
@@ -67,6 +72,16 @@ public class HibernateProjectDaoIT extends AbstractHibernateSaveDaoTest<Project,
   @Test
   public void testGetUsage() throws Exception {
     testGetUsage(HibernateProjectDao::getUsage, 1L, 21L);
+  }
+
+  @Test
+  public void testAssays() throws Exception {
+    String code = "TEST1";
+    Set<Assay> assays = getTestSubject().getByCode(code).getAssays();
+    assertNotNull(assays);
+    assertTrue(assays.size() == 2);
+    assertTrue(assays.stream().anyMatch(a -> a.getId() == 1));
+    assertTrue(assays.stream().anyMatch(a -> a.getId() == 2));
   }
 
 }
