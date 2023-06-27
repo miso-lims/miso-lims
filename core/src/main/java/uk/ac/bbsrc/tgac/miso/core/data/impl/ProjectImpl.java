@@ -64,7 +64,7 @@ public class ProjectImpl implements Project {
   private String title = "";
   private String code;
   private String rebNumber;
-  private String additionalDetails = "";
+  private String additionalDetails;
 
   private LocalDate rebExpiry;
 

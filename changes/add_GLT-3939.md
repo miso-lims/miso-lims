@@ -1,1 +1,1 @@
-Details field on Project form
+Additional details field on Edit Project page
