@@ -114,7 +114,7 @@ FormTarget.project = (function ($) {
             {
               title: "Additional Details",
               data: "additionalDetails",
-              type: "text",
+              type: "textarea",
               description: "Long text field, can be more in-depth than the 'Description' field",
               maxLength: 65535,
             },
