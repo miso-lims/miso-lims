@@ -73,7 +73,7 @@ public class ProjectPageIT extends AbstractIT {
     assertEquals(unsaved.get(Fields.STATUS), savedPage.getStatus());
     assertEquals(unsaved.get(Fields.REFERENCE_GENOME), savedPage.getReferenceGenome());
     assertEquals(unsaved.get(Fields.PIPELINE), savedPage.getPipeline());
-    assertEquals(unsaved.get(Fields.ADDITIONAL_DETAILS, savedPaged.getAdditionalDetails()));
+    assertEquals(unsaved.get(Fields.ADDITIONAL_DETAILS, savedPage.getAdditionalDetails()));
   }
 
   @Test
@@ -102,7 +102,7 @@ public class ProjectPageIT extends AbstractIT {
     assertEquals(updated.get(Fields.DESCRIPTION), savedPage.getDescription());
     assertEquals(updated.get(Fields.STATUS), savedPage.getStatus());
     assertEquals(updated.get(Fields.REFERENCE_GENOME), savedPage.getReferenceGenome());
-    assertEquals(updated.get(Fields.ADDITIONAL_DETAILS, savedPage.getAdditionalDetails()));
+    assertEquals(updated.get(Fields.ADDITIONAL_DETAILS), savedPage.getAdditionalDetails());
   }
 
   @Test
