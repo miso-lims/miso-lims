@@ -25,6 +25,7 @@ public class ProjectPage extends HeaderFooterPage {
     public static final String STATUS = "status";
     public static final String REFERENCE_GENOME = "referenceGenome";
     public static final String PIPELINE = "pipeline";
+    public static final String ADDITIONAL_DETAILS = "additionalDetails";
 
     private Fields() {
       throw new IllegalStateException("Util class not intended for instantiation");
@@ -59,6 +60,8 @@ public class ProjectPage extends HeaderFooterPage {
   private WebElement referenceGenomeInput;
   @FindBy(id = "projectForm_pipelineId")
   private WebElement pipelineInput;
+  @FindBy(id = "projectForm_additionalDetails")
+  private WebElement additionalDetailsInput;
   @FindBy(id = "save")
   private WebElement saveButton;
 
@@ -110,6 +113,14 @@ public class ProjectPage extends HeaderFooterPage {
 
   public void setDescription(String description) {
     setText(description, descriptionInput);
+  }
+
+  public String getAdditionalDetails() {
+    return additionalDetailsInput.getAttribute("value");
+  }
+
+  public void setAdditionalDetails(String additionalDetails) {
+    setText(additionalDetails, additionalDetailsInput);
   }
 
   public String getStatus() {

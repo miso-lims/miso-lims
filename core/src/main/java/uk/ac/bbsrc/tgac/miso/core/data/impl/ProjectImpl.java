@@ -64,6 +64,7 @@ public class ProjectImpl implements Project {
   private String title = "";
   private String code;
   private String rebNumber;
+  private String additionalDetails;
 
   private LocalDate rebExpiry;
 
@@ -461,4 +462,13 @@ public class ProjectImpl implements Project {
     this.contact = contact;
   }
 
+  @Override
+  public String getAdditionalDetails() {
+    return additionalDetails;
+  }
+
+  @Override
+  public void setAdditionalDetails(String additionalDetails) {
+    this.additionalDetails = additionalDetails;
+  }
 }

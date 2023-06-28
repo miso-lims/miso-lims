@@ -2599,6 +2599,7 @@ public class Dtos {
     dto.setTitle(from.getTitle());
     dto.setCode(from.getCode());
     dto.setDescription(from.getDescription());
+    dto.setAdditionalDetails(from.getAdditionalDetails());
     setObject(dto::setStatus, from.getStatus(), (progress) -> progress.getKey());
     if (from.getReferenceGenome() != null) {
       dto.setReferenceGenomeId(from.getReferenceGenome().getId());
@@ -2637,6 +2638,7 @@ public class Dtos {
     setString(to::setTitle, dto.getTitle());
     setString(to::setCode, dto.getCode());
     setString(to::setDescription, dto.getDescription());
+    setString(to::setAdditionalDetails, dto.getAdditionalDetails());
     setObject(to::setStatus, dto.getStatus(), (key) -> StatusType.get(key));
     setObject(to::setReferenceGenome, ReferenceGenomeImpl::new, dto.getReferenceGenomeId());
     setObject(to::setDefaultTargetedSequencing, TargetedSequencing::new, dto.getDefaultTargetedSequencingId());
