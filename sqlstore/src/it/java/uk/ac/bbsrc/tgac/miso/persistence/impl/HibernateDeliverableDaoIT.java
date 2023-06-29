@@ -33,7 +33,7 @@ public class HibernateDeliverableDaoIT extends AbstractHibernateSaveDaoTest<Deli
   @SuppressWarnings("unchecked")
   @Override
   public UpdateParameters<Deliverable, String> getUpdateParams() {
-    return new UpdateParameters(1L, Deliverable::getName, Deliverable::setName, "New Name");
+    return new UpdateParameters<>(1L, Deliverable::getName, Deliverable::setName, "New Name");
   }
 
   @Test
