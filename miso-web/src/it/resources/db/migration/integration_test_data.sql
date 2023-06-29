@@ -1286,6 +1286,6 @@ INSERT INTO Printer(printerId, name, driver, backend, configuration, enabled, wi
 INSERT INTO AttachmentCategory(categoryId, alias) VALUES (4, 'last entry');
 
 INSERT INTO Deliverable(deliverableId, name) VALUES
-(1, "deliverable1"),
-(2, "deliverable2"),
-(3, "deliverable3");
+(100, "deliverable1"),
+(101, "deliverable2"),
+(102, "deliverable3");

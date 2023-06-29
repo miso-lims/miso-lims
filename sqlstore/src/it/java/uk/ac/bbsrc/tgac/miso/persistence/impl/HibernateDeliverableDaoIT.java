@@ -1,11 +1,14 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import org.checkerframework.dataflow.qual.TerminatesExecution;
+import static org.junit.Assert.*;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.mysql.cj.xdevapi.UpdateParams;
+import java.util.Arrays;
 
+import org.junit.Test;
+
+import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Deliverable;
+
 
 public class HibernateDeliverableDaoIT extends AbstractHibernateSaveDaoTest<Deliverable, HibernateDeliverableDao> {
 
@@ -43,7 +46,7 @@ public class HibernateDeliverableDaoIT extends AbstractHibernateSaveDaoTest<Deli
 
   @Test
   public void testGetUsage() throws Exception {
-    Deliverable deliverable = (Deliverable) currentSession.get(Deliverable.class, 1L);
+    Deliverable deliverable = (Deliverable) currentSession().get(Deliverable.class, 1L);
     assertEquals(1L, getTestSubject.getUsage(Deliverable));
   }
 
