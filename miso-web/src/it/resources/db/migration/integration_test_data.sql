@@ -1276,6 +1276,11 @@ INSERT INTO Experiment_Run_Partition(experiment_experimentId, run_runId, partiti
 INSERT INTO Submission(submissionId, title, alias, creationDate) VALUES
 (1, 'Submission One', 'Submission One', '2020-02-20');
 
+INSERT INTO Deliverable(deliverableId, name) VALUES
+(100, 'deliverable100'),
+(101, 'deliverable101'),
+(102, 'deliverable102');
+
 INSERT INTO Submission_Experiment(submission_submissionId, experiments_experimentId) VALUES
 (1, 1);
 
@@ -1284,8 +1289,3 @@ INSERT INTO Printer(printerId, name, driver, backend, configuration, enabled, wi
 
 -- Keep this at bottom - checked to verify that script has completed and constants all loaded
 INSERT INTO AttachmentCategory(categoryId, alias) VALUES (4, 'last entry');
-
-INSERT INTO Deliverable(deliverableId, name) VALUES
-(100, "deliverable100"),
-(101, "deliverable101"),
-(102, "deliverable102");
