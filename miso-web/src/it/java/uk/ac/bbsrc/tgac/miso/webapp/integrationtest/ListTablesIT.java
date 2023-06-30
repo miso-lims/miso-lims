@@ -1027,16 +1027,17 @@ public class ListTablesIT extends AbstractIT {
     testColumnsSort(ListTarget.ASSAY_TESTS);
   }
 
-  // @Test
-  // public void testListDeliverablesSetup() throws Exception {
-  // testPageSetup(ListTarget.DELIVERABLES,
-  // Sets.newHashSet(Columns.SELECTOR, Columns.NAME));
-  // }
+  @Test
+  public void testListDeliverablesSetup() throws Exception {
+    testPageSetup(ListTarget.DELIVERABLES,
+        Sets.newHashSet(Columns.SELECTOR, Columns.NAME));
+  }
 
-  // @Test
-  // public void testListDeliverablesColumnSort() throws Exception() {
-  // testColumnsSort(ListTarget.DELIVERABLES);
-  // }
+  @Test
+  public void testListDeliverablesColumnSort() throws Exception {
+    testColumnsSort(ListTarget.DELIVERABLES);
+  }
+
 
   private void testPageSetup(String listTarget, Set<String> targetColumns) {
     testPageSetup(listTarget, targetColumns, false);
